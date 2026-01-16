@@ -1,3 +1,4 @@
+import React from "react";
 import type Konva from "konva";
 import type { BezierPoint } from "../types";
 import { snapToPixel } from "../eventHandlers/utils";
@@ -15,6 +16,63 @@ export interface TransformResult {
  */
 export function resetTransformState() {
   // No longer needed, but keeping for backward compatibility
+}
+
+/**
+ * Checks if any boundary point would be constrained (wouldn't move) after a transformation.
+ * If so, the entire transformation should be prevented to avoid shape corruption.
+ * 
+ * This follows the same pattern as dragBoundFunc - when one point touches boundary,
+ * all points should stop moving together.
+ * 
+ * @param currentPoints - Current point positions
+ * @param selectedPoints - Set of selected point indices
+ * @param bounds - Image bounds {width, height}
+ * @param calculateTransformedPosition - Function that calculates where a point would be after transformation
+ * @returns true if transformation should be prevented (any boundary point wouldn't move)
+ */
+export function shouldPreventTransformationDueToBoundary(
+  currentPoints: BezierPoint[],
+  selectedPoints: Set<number>,
+  bounds: { width: number; height: number },
+  calculateTransformedPosition: (point: BezierPoint, pointIndex: number) => { x: number; y: number },
+): boolean {
+  const tolerance = 0.1;
+  const toleranceCheck = 0.001;
+  
+  // Check each selected point
+  for (const pointIndex of Array.from(selectedPoints)) {
+    const currentPoint = currentPoints[pointIndex];
+    if (!currentPoint) continue;
+    
+    // Check if point is at boundary
+    const atBoundary = 
+      currentPoint.x <= tolerance ||
+      currentPoint.x >= bounds.width - tolerance ||
+      currentPoint.y <= tolerance ||
+      currentPoint.y >= bounds.height - tolerance;
+    
+    if (atBoundary) {
+      // Calculate where point would be after transformation
+      const transformedPos = calculateTransformedPosition(currentPoint, pointIndex);
+      
+      // Constrain to bounds
+      const constrainedX = Math.max(0, Math.min(bounds.width, transformedPos.x));
+      const constrainedY = Math.max(0, Math.min(bounds.height, transformedPos.y));
+      
+      // Check if point would actually move
+      const wouldMove =
+        Math.abs(constrainedX - currentPoint.x) > toleranceCheck ||
+        Math.abs(constrainedY - currentPoint.y) > toleranceCheck;
+      
+      // If point wouldn't move, prevent transformation
+      if (!wouldMove) {
+        return true;
+      }
+    }
+  }
+  
+  return false;
 }
 
 /**

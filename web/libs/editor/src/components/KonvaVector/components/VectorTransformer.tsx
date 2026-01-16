@@ -8,6 +8,7 @@ import {
   resetTransformState,
   applyTransformationToControlPoints,
   updateOriginalPositions,
+  shouldPreventTransformationDueToBoundary,
 } from "../utils/transformUtils";
 
 const BBOX_MIN_WIDTH = 10;
@@ -341,31 +342,21 @@ export const VectorTransformer: React.FC<VectorTransformerProps> = ({
       resizeBoundFunc={(oldBox: any, newBox: any) => {
         // Check if transformation would move any point out of bounds
         // If so, prevent the transformation to avoid deformation
+        // This follows the EXACT same pattern as dragBoundFunc
         if (!bounds) return newBox;
 
         const transformer = transformerRef.current;
         if (!transformer) return newBox;
-
-        // Calculate scale changes from box dimensions
-        const scaleX = oldBox.width > 0 ? newBox.width / oldBox.width : 1;
-        const scaleY = oldBox.height > 0 ? newBox.height / oldBox.height : 1;
-        const rotationChange = (newBox.rotation || 0) - (oldBox.rotation || 0);
-        const newRotation = (newBox.rotation || 0) * (Math.PI / 180);
-
-        // Use old center for calculating offsets
-        const oldCenterX = oldBox.x + oldBox.width / 2;
-        const oldCenterY = oldBox.y + oldBox.height / 2;
-
-        // Use new center for final position
-        const newCenterX = newBox.x + newBox.width / 2;
-        const newCenterY = newBox.y + newBox.height / 2;
 
         // Check actual point positions, not proxy nodes
         const currentPoints = getCurrentPointsRef ? getCurrentPointsRef() : initialPoints;
         const tolerance = 0.1;
         const toleranceCheck = 0.001;
         
-        // Check each selected point to see if it's at a boundary and would be constrained
+        // Get proxy nodes to see where they would be after transformation
+        const nodes = transformer.nodes();
+        
+        // Check each selected point
         for (const pointIndex of Array.from(selectedPoints)) {
           const currentPoint = currentPoints[pointIndex];
           if (!currentPoint) continue;
@@ -378,38 +369,29 @@ export const VectorTransformer: React.FC<VectorTransformerProps> = ({
             currentPoint.y >= bounds.height - tolerance;
           
           if (atBoundary) {
-            // Calculate where point would be after transformation
-            const offsetX = currentPoint.x - oldCenterX;
-            const offsetY = currentPoint.y - oldCenterY;
-
-            // Apply scaling
-            let scaledX = offsetX * scaleX;
-            let scaledY = offsetY * scaleY;
-
-            // Apply rotation if there's a rotation change
-            if (Math.abs(rotationChange) > 0.01) {
-              const cos = Math.cos(newRotation);
-              const sin = Math.sin(newRotation);
-              const rotatedX = scaledX * cos - scaledY * sin;
-              const rotatedY = scaledX * sin + scaledY * cos;
-              scaledX = rotatedX;
-              scaledY = rotatedY;
-            }
-
-            // Calculate final position relative to new center
-            const finalX = newCenterX + scaledX;
-            const finalY = newCenterY + scaledY;
-
-            // Constrain to bounds
-            const constrainedX = Math.max(0, Math.min(bounds.width, finalX));
-            const constrainedY = Math.max(0, Math.min(bounds.height, finalY));
-
-            // Check if point would actually move
+            // Find the proxy node for this point
+            const proxyNode = nodes.find((node) => {
+              if (!node || !node.name()) return false;
+              const idx = Number.parseInt(node.name().split("-")[1]);
+              return idx === pointIndex;
+            });
+            
+            if (!proxyNode) continue;
+            
+            // Get where the proxy node would be after transformation (Konva has already moved it)
+            const transformedX = proxyNode.x();
+            const transformedY = proxyNode.y();
+            
+            // Constrain to bounds (same as dragBoundFunc)
+            const constrainedX = Math.max(0, Math.min(bounds.width, transformedX));
+            const constrainedY = Math.max(0, Math.min(bounds.height, transformedY));
+            
+            // Check if point would actually move (same as dragBoundFunc)
             const wouldMove =
               Math.abs(constrainedX - currentPoint.x) > toleranceCheck ||
               Math.abs(constrainedY - currentPoint.y) > toleranceCheck;
-
-            // If point wouldn't move, prevent transformation
+            
+            // If point wouldn't move, prevent transformation (same as dragBoundFunc)
             if (!wouldMove) {
               return oldBox;
             }
@@ -487,6 +469,7 @@ export const VectorTransformer: React.FC<VectorTransformerProps> = ({
       boundBoxFunc={(oldBox, newBox) => {
         // Check if rotation would move any point out of bounds
         // Prevent rotation entirely when points are at boundaries to avoid shape corruption
+        // This follows the EXACT same pattern as dragBoundFunc
         if (!bounds) return newBox;
 
         const transformer = transformerRef.current;
@@ -499,30 +482,15 @@ export const VectorTransformer: React.FC<VectorTransformerProps> = ({
           return newBox;
         }
 
-        // Get current transformer state
-        const oldRotation = oldBox.rotation || 0;
-        const newRotation = newBox.rotation || 0;
-        const oldRotationRadians = oldRotation * (Math.PI / 180);
-        const newRotationRadians = newRotation * (Math.PI / 180);
-
-        // Get current scale from transformer
-        const currentScaleX = transformer.scaleX();
-        const currentScaleY = transformer.scaleY();
-
-        // Use old center for calculating offsets (where points currently are relative to)
-        const oldCenterX = oldBox.x + oldBox.width / 2;
-        const oldCenterY = oldBox.y + oldBox.height / 2;
-
-        // Use new center for final position (where transformer would be after transformation)
-        const newCenterX = newBox.x + newBox.width / 2;
-        const newCenterY = newBox.y + newBox.height / 2;
-
         // Check actual point positions, not proxy nodes
         const currentPoints = getCurrentPointsRef ? getCurrentPointsRef() : initialPoints;
         const tolerance = 0.1;
         const toleranceCheck = 0.001;
         
-        // Check each selected point to see if it's at a boundary and would be constrained
+        // Get proxy nodes to see where they would be after transformation
+        const nodes = transformer.nodes();
+        
+        // Check each selected point
         for (const pointIndex of Array.from(selectedPoints)) {
           const currentPoint = currentPoints[pointIndex];
           if (!currentPoint) continue;
@@ -535,37 +503,29 @@ export const VectorTransformer: React.FC<VectorTransformerProps> = ({
             currentPoint.y >= bounds.height - tolerance;
           
           if (atBoundary) {
-            // Use original point position (from transformation start) for calculation
-            const originalPoint = originalPositionsRef.current[pointIndex] || currentPoint;
+            // Find the proxy node for this point
+            const proxyNode = nodes.find((node) => {
+              if (!node || !node.name()) return false;
+              const idx = Number.parseInt(node.name().split("-")[1]);
+              return idx === pointIndex;
+            });
             
-            // Calculate where point would be after rotation
-            const offsetX = originalPoint.x - oldCenterX;
-            const offsetY = originalPoint.y - oldCenterY;
-
-            // Apply current scale to get current offset
-            let scaledX = offsetX * currentScaleX;
-            let scaledY = offsetY * currentScaleY;
-
-            // Calculate position after new rotation (full rotation, not incremental)
-            const newCos = Math.cos(newRotationRadians);
-            const newSin = Math.sin(newRotationRadians);
-            const newRotatedX = scaledX * newCos - scaledY * newSin;
-            const newRotatedY = scaledX * newSin + scaledY * newCos;
+            if (!proxyNode) continue;
             
-            // Final position relative to new center
-            const finalX = newCenterX + newRotatedX;
-            const finalY = newCenterY + newRotatedY;
-
-            // Constrain to bounds
-            const constrainedX = Math.max(0, Math.min(bounds.width, finalX));
-            const constrainedY = Math.max(0, Math.min(bounds.height, finalY));
-
-            // Check if point would actually move
+            // Get where the proxy node would be after transformation (Konva has already moved it)
+            const transformedX = proxyNode.x();
+            const transformedY = proxyNode.y();
+            
+            // Constrain to bounds (same as dragBoundFunc)
+            const constrainedX = Math.max(0, Math.min(bounds.width, transformedX));
+            const constrainedY = Math.max(0, Math.min(bounds.height, transformedY));
+            
+            // Check if point would actually move (same as dragBoundFunc)
             const wouldMove =
               Math.abs(constrainedX - currentPoint.x) > toleranceCheck ||
               Math.abs(constrainedY - currentPoint.y) > toleranceCheck;
-
-            // If point wouldn't move, prevent rotation
+            
+            // If point wouldn't move, prevent rotation (same as dragBoundFunc)
             if (!wouldMove) {
               return oldBox;
             }
@@ -573,48 +533,41 @@ export const VectorTransformer: React.FC<VectorTransformerProps> = ({
         }
 
         // No points are locked - check if rotation would move any point out of bounds
+        // Use proxy nodes to check where points would be after transformation
         for (const pointIndex of Array.from(selectedPoints)) {
           const currentPoint = currentPoints[pointIndex];
           if (!currentPoint) continue;
 
-          // Use original point position (from transformation start) for calculation
-          const originalPoint = originalPositionsRef.current[pointIndex] || currentPoint;
-
-          // Calculate offset from old center using original point position
-          const offsetX = originalPoint.x - (oldBox.x + oldBox.width / 2);
-          const offsetY = originalPoint.y - (oldBox.y + oldBox.height / 2);
-
-          // Apply current scale to get current offset
-          let scaledX = offsetX * currentScaleX;
-          let scaledY = offsetY * currentScaleY;
-
-          // Calculate position after new rotation (full rotation, not incremental)
-          const newCos = Math.cos(newRotationRadians);
-          const newSin = Math.sin(newRotationRadians);
-          const newRotatedX = scaledX * newCos - scaledY * newSin;
-          const newRotatedY = scaledX * newSin + scaledY * newCos;
-
-          // Final position relative to new center
-          const finalX = newCenterX + newRotatedX;
-          const finalY = newCenterY + newRotatedY;
+          // Find the proxy node for this point
+          const proxyNode = nodes.find((node) => {
+            if (!node || !node.name()) return false;
+            const idx = Number.parseInt(node.name().split("-")[1]);
+            return idx === pointIndex;
+          });
+          
+          if (!proxyNode) continue;
+          
+          // Get where the proxy node would be after transformation
+          const transformedX = proxyNode.x();
+          const transformedY = proxyNode.y();
 
           // Check if final position would be out of bounds
           const wouldBeOutOfBounds =
-            finalX < 0 ||
-            finalX > bounds.width ||
-            finalY < 0 ||
-            finalY > bounds.height;
+            transformedX < 0 ||
+            transformedX > bounds.width ||
+            transformedY < 0 ||
+            transformedY > bounds.height;
 
           if (wouldBeOutOfBounds) {
             // Point would go out of bounds - prevent rotation
             // Restore proxy nodes to match current point positions to prevent drift
             for (const node of nodes) {
               if (!node || !node.name()) continue;
-              const pointIndex = Number.parseInt(node.name().split("-")[1]);
-              const currentPoint = currentPoints[pointIndex];
-              if (currentPoint) {
-                node.x(currentPoint.x);
-                node.y(currentPoint.y);
+              const pointIdx = Number.parseInt(node.name().split("-")[1]);
+              const point = currentPoints[pointIdx];
+              if (point) {
+                node.x(point.x);
+                node.y(point.y);
               }
             }
             return oldBox;
