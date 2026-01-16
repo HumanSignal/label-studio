@@ -29,8 +29,11 @@ from tasks.models import (
     AnnotationComment,
     AnnotationDraft,
     AnnotationMetrics,
+    AnnotationVersion,
+    AuditLog,
     Prediction,
     PredictionMeta,
+    ProjectChangeLog,
     QualityScore,
     Task,
 )
@@ -1127,6 +1130,105 @@ class ProjectMetricsSerializer(serializers.Serializer):
     outlier_count = serializers.IntegerField()
     annotator_count = serializers.IntegerField()
     avg_annotations_per_annotator = serializers.FloatField()
+
+
+class AuditLogUserSerializer(UserSerializer):
+    """Serializer for audit log user"""
+    class Meta:
+        model = User
+        fields = ['id', 'first_name', 'last_name', 'email']
+
+
+class AuditLogSerializer(ModelSerializer):
+    """Serializer for audit logs"""
+    user = AuditLogUserSerializer(read_only=True)
+
+    class Meta:
+        model = AuditLog
+        fields = [
+            'id',
+            'user',
+            'action',
+            'entity_type',
+            'entity_id',
+            'project',
+            'description',
+            'changes',
+            'metadata',
+            'created_at',
+        ]
+        read_only_fields = ['id', 'user', 'created_at']
+
+
+class AnnotationVersionSerializer(ModelSerializer):
+    """Serializer for annotation versions"""
+    created_by = AuditLogUserSerializer(read_only=True)
+
+    class Meta:
+        model = AnnotationVersion
+        fields = [
+            'id',
+            'annotation',
+            'version_number',
+            'result',
+            'lead_time',
+            'created_by',
+            'change_summary',
+            'changes_diff',
+            'created_at',
+            'is_rollback',
+            'rolled_back_from_version',
+        ]
+        read_only_fields = ['id', 'created_by', 'created_at']
+
+
+class ProjectChangeLogSerializer(ModelSerializer):
+    """Serializer for project change logs"""
+    user = AuditLogUserSerializer(read_only=True)
+
+    class Meta:
+        model = ProjectChangeLog
+        fields = [
+            'id',
+            'project',
+            'user',
+            'field_name',
+            'old_value',
+            'new_value',
+            'change_type',
+            'description',
+            'created_at',
+        ]
+        read_only_fields = ['id', 'user', 'created_at']
+
+
+class AuditLogExportSerializer(serializers.Serializer):
+    """Serializer for audit log export parameters"""
+    start_date = serializers.DateTimeField(
+        required=False,
+        help_text='Start date for export'
+    )
+    end_date = serializers.DateTimeField(
+        required=False,
+        help_text='End date for export'
+    )
+    action = serializers.CharField(
+        required=False,
+        help_text='Filter by action type'
+    )
+    entity_type = serializers.CharField(
+        required=False,
+        help_text='Filter by entity type'
+    )
+    user_id = serializers.IntegerField(
+        required=False,
+        help_text='Filter by user ID'
+    )
+    format = serializers.ChoiceField(
+        choices=['json', 'csv'],
+        default='json',
+        help_text='Export format'
+    )
 
 
 TaskSerializerBulk = load_func(settings.TASK_SERIALIZER_BULK)

@@ -28,7 +28,10 @@ from tasks.models import (
     AnnotationComment,
     AnnotationDraft,
     AnnotationMetrics,
+    AnnotationVersion,
+    AuditLog,
     Prediction,
+    ProjectChangeLog,
     QualityScore,
     Task,
 )
@@ -975,8 +978,12 @@ from tasks.serializers import (
     AnnotationCommentSerializer,
     AnnotationMetricsSerializer,
     AnnotationReviewSerializer,
+    AnnotationVersionSerializer,
     AnnotationWithReviewSerializer,
     AnnotatorMetricsSerializer,
+    AuditLogExportSerializer,
+    AuditLogSerializer,
+    ProjectChangeLogSerializer,
     ProjectMetricsSerializer,
     QualityScoreCreateSerializer,
     QualityScoreSerializer,
@@ -1499,3 +1506,250 @@ def _update_annotation_quality_metrics(annotation):
         metrics.num_regions = len(annotation.result)
 
     metrics.save()
+
+
+# ================== Audit Logs and Activity Tracking APIs ==================
+
+
+class AuditLogListAPI(generics.ListAPIView):
+    """API endpoint for listing audit logs with filters"""
+    permission_required = all_permissions.projects_view
+    serializer_class = AuditLogSerializer
+    pagination_class = PageNumberPagination
+
+    def get_queryset(self):
+        project_id = self.request.GET.get('project')
+        if project_id:
+            project = generics.get_object_or_404(Project, pk=project_id)
+            if not project.has_permission(self.request.user):
+                raise PermissionDenied('You do not have permission to access this project')
+
+            queryset = AuditLog.objects.filter(project=project)
+        else:
+            # If no project specified, show logs for all projects user has access to
+            # This requires checking permissions, which can be expensive
+            # For now, require project ID
+            raise ValidationError('project parameter is required')
+
+        # Apply filters
+        action = self.request.GET.get('action')
+        if action:
+            queryset = queryset.filter(action=action)
+
+        entity_type = self.request.GET.get('entity_type')
+        if entity_type:
+            queryset = queryset.filter(entity_type=entity_type)
+
+        user_id = self.request.GET.get('user_id')
+        if user_id:
+            queryset = queryset.filter(user_id=user_id)
+
+        start_date = self.request.GET.get('start_date')
+        if start_date:
+            queryset = queryset.filter(created_at__gte=start_date)
+
+        end_date = self.request.GET.get('end_date')
+        if end_date:
+            queryset = queryset.filter(created_at__lte=end_date)
+
+        return queryset.select_related('user', 'project')
+
+
+class AuditLogExportAPI(generics.GenericAPIView):
+    """API endpoint for exporting audit logs"""
+    permission_required = all_permissions.projects_view
+
+    def post(self, request, *args, **kwargs):
+        project_id = self.kwargs.get('pk')
+        project = generics.get_object_or_404(Project, pk=project_id)
+
+        if not project.has_permission(request.user):
+            raise PermissionDenied('You do not have permission to access this project')
+
+        # Get filters from request
+        serializer = AuditLogExportSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        queryset = AuditLog.objects.filter(project=project)
+
+        # Apply filters
+        if serializer.validated_data.get('start_date'):
+            queryset = queryset.filter(created_at__gte=serializer.validated_data['start_date'])
+
+        if serializer.validated_data.get('end_date'):
+            queryset = queryset.filter(created_at__lte=serializer.validated_data['end_date'])
+
+        if serializer.validated_data.get('action'):
+            queryset = queryset.filter(action=serializer.validated_data['action'])
+
+        if serializer.validated_data.get('entity_type'):
+            queryset = queryset.filter(entity_type=serializer.validated_data['entity_type'])
+
+        if serializer.validated_data.get('user_id'):
+            queryset = queryset.filter(user_id=serializer.validated_data['user_id'])
+
+        export_format = serializer.validated_data.get('format', 'json')
+
+        if export_format == 'json':
+            logs = AuditLogSerializer(queryset, many=True).data
+            return Response(logs, status=status.HTTP_200_OK)
+        elif export_format == 'csv':
+            import csv
+            from django.http import HttpResponse
+
+            response = HttpResponse(content_type='text/csv')
+            response['Content-Disposition'] = f'attachment; filename="audit_log_{project_id}.csv"'
+
+            writer = csv.writer(response)
+            writer.writerow(['ID', 'User', 'Action', 'Entity Type', 'Entity ID', 'Description', 'Created At'])
+
+            for log in queryset:
+                writer.writerow([
+                    log.id,
+                    f"{log.user.first_name} {log.user.last_name}" if log.user else 'System',
+                    log.get_action_display(),
+                    log.get_entity_type_display(),
+                    log.entity_id,
+                    log.description,
+                    log.created_at.isoformat(),
+                ])
+
+            return response
+
+
+class AnnotationHistoryAPI(generics.ListAPIView):
+    """API endpoint for annotation version history"""
+    permission_required = all_permissions.annotations_view
+    serializer_class = AnnotationVersionSerializer
+
+    def get_queryset(self):
+        annotation_id = self.kwargs.get('pk')
+        annotation = generics.get_object_or_404(Annotation, pk=annotation_id)
+
+        # Check project permissions
+        project = annotation.project
+        if not project.has_permission(self.request.user):
+            raise PermissionDenied('You do not have permission to access this annotation')
+
+        return AnnotationVersion.objects.filter(annotation=annotation).select_related('created_by')
+
+
+class AnnotationRollbackAPI(generics.GenericAPIView):
+    """API endpoint for rolling back annotation to a previous version"""
+    permission_required = all_permissions.annotations_change
+
+    def post(self, request, *args, **kwargs):
+        annotation_id = self.kwargs.get('pk')
+        version_number = request.data.get('version_number')
+
+        if not version_number:
+            raise ValidationError('version_number is required')
+
+        annotation = generics.get_object_or_404(Annotation, pk=annotation_id)
+
+        # Check project permissions
+        project = annotation.project
+        if not project.has_permission(request.user):
+            raise PermissionDenied('You do not have permission to access this annotation')
+
+        # Get the version to rollback to
+        version = generics.get_object_or_404(
+            AnnotationVersion,
+            annotation=annotation,
+            version_number=version_number
+        )
+
+        # Save current state as a new version before rollback
+        current_version_number = annotation.versions.count() + 1
+        AnnotationVersion.objects.create(
+            annotation=annotation,
+            version_number=current_version_number,
+            result=annotation.result,
+            lead_time=annotation.lead_time,
+            created_by=request.user,
+            change_summary=f'Saved before rollback to version {version_number}',
+        )
+
+        # Rollback annotation to the specified version
+        annotation.result = version.result
+        annotation.lead_time = version.lead_time
+        annotation.save()
+
+        # Create a new version for the rollback
+        rollback_version_number = current_version_number + 1
+        AnnotationVersion.objects.create(
+            annotation=annotation,
+            version_number=rollback_version_number,
+            result=version.result,
+            lead_time=version.lead_time,
+            created_by=request.user,
+            change_summary=f'Rolled back to version {version_number}',
+            is_rollback=True,
+            rolled_back_from_version=version_number,
+        )
+
+        # Create audit log entry
+        AuditLog.objects.create(
+            user=request.user,
+            action='rollback',
+            entity_type='annotation',
+            entity_id=annotation.id,
+            project=project,
+            description=f'Rolled back annotation {annotation.id} to version {version_number}',
+            changes={
+                'from_version': current_version_number,
+                'to_version': version_number,
+            },
+        )
+
+        serializer = AnnotationSerializer(annotation)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class ProjectChangeLogAPI(generics.ListAPIView):
+    """API endpoint for project change history"""
+    permission_required = all_permissions.projects_view
+    serializer_class = ProjectChangeLogSerializer
+
+    def get_queryset(self):
+        project_id = self.kwargs.get('pk')
+        project = generics.get_object_or_404(Project, pk=project_id)
+
+        if not project.has_permission(self.request.user):
+            raise PermissionDenied('You do not have permission to access this project')
+
+        queryset = ProjectChangeLog.objects.filter(project=project).select_related('user')
+
+        # Apply filters
+        change_type = self.request.GET.get('change_type')
+        if change_type:
+            queryset = queryset.filter(change_type=change_type)
+
+        return queryset
+
+
+def create_audit_log(user, action, entity_type, entity_id, project=None, description='', changes=None, metadata=None):
+    """Helper function to create audit log entries"""
+    AuditLog.objects.create(
+        user=user,
+        action=action,
+        entity_type=entity_type,
+        entity_id=entity_id,
+        project=project,
+        description=description,
+        changes=changes or {},
+        metadata=metadata or {},
+    )
+
+
+def create_annotation_version(annotation, user, change_summary=''):
+    """Helper function to create annotation version snapshots"""
+    version_number = annotation.versions.count() + 1
+    AnnotationVersion.objects.create(
+        annotation=annotation,
+        version_number=version_number,
+        result=annotation.result,
+        lead_time=annotation.lead_time,
+        created_by=user,
+        change_summary=change_summary,
+    )

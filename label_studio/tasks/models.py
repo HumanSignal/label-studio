@@ -1848,4 +1848,475 @@ class QualityScore(models.Model):
     def project(self):
         """Get the project this quality score belongs to"""
         return self.annotation.project
+
+
+class AuditLog(models.Model):
+    """Comprehensive audit log for all system activities"""
+
+    ACTION_CHOICES = [
+        ('create', 'Created'),
+        ('update', 'Updated'),
+        ('delete', 'Deleted'),
+        ('view', 'Viewed'),
+        ('export', 'Exported'),
+        ('import', 'Imported'),
+        ('approve', 'Approved'),
+        ('reject', 'Rejected'),
+        ('assign', 'Assigned'),
+        ('unassign', 'Unassigned'),
+        ('comment', 'Commented'),
+        ('review', 'Reviewed'),
+        ('rollback', 'Rolled Back'),
+    ]
+
+    ENTITY_TYPE_CHOICES = [
+        ('annotation', 'Annotation'),
+        ('task', 'Task'),
+        ('project', 'Project'),
+        ('user', 'User'),
+        ('comment', 'Comment'),
+        ('quality_score', 'Quality Score'),
+        ('member', 'Project Member'),
+        ('settings', 'Settings'),
+    ]
+
+    # Who
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name='audit_logs',
+        help_text='User who performed the action'
+    )
+
+    # What
+    action = models.CharField(
+        _('action'),
+        max_length=20,
+        choices=ACTION_CHOICES,
+        help_text='Action performed'
+    )
+
+    entity_type = models.CharField(
+        _('entity type'),
+        max_length=30,
+        choices=ENTITY_TYPE_CHOICES,
+        help_text='Type of entity affected'
+    )
+
+    entity_id = models.IntegerField(
+        _('entity id'),
+        help_text='ID of the affected entity'
+    )
+
+    # Context
+    project = models.ForeignKey(
+        'projects.Project',
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name='audit_logs',
+        help_text='Project context (if applicable)'
+    )
+
+    # Details
+    description = models.TextField(
+        _('description'),
+        help_text='Human-readable description of the action'
+    )
+
+    changes = JSONField(
+        _('changes'),
+        null=True,
+        blank=True,
+        help_text='JSON of what changed (before/after)'
+    )
+
+    metadata = JSONField(
+        _('metadata'),
+        null=True,
+        blank=True,
+        help_text='Additional metadata (IP, user agent, etc.)'
+    )
+
+    # When
+    created_at = models.DateTimeField(_('created at'), auto_now_add=True, db_index=True)
+
+    class Meta:
+        db_table = 'audit_log'
+        ordering = ['-created_at']
+        indexes = [
+            models.Index(fields=['user', 'created_at']),
+            models.Index(fields=['project', 'created_at']),
+            models.Index(fields=['entity_type', 'entity_id']),
+            models.Index(fields=['action', 'created_at']),
+            models.Index(fields=['created_at']),
+        ]
+
+    def __str__(self):
+        return f'{self.user} {self.action} {self.entity_type} #{self.entity_id} at {self.created_at}'
+
+
+class AnnotationVersion(models.Model):
+    """Version history for annotations with rollback capability"""
+
+    annotation = models.ForeignKey(
+        'Annotation',
+        on_delete=models.CASCADE,
+        related_name='versions',
+        help_text='Annotation this version belongs to'
+    )
+
+    version_number = models.IntegerField(
+        _('version number'),
+        help_text='Sequential version number'
+    )
+
+    # Snapshot of annotation state
+    result = JSONField(
+        _('result'),
+        help_text='Annotation result at this version'
+    )
+
+    lead_time = models.FloatField(
+        _('lead time'),
+        null=True,
+        blank=True,
+        help_text='Lead time at this version'
+    )
+
+    # Who changed it
+    created_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name='annotation_versions_created',
+        help_text='User who created this version'
+    )
+
+    # What changed
+    change_summary = models.TextField(
+        _('change summary'),
+        blank=True,
+        help_text='Summary of changes in this version'
+    )
+
+    changes_diff = JSONField(
+        _('changes diff'),
+        null=True,
+        blank=True,
+        help_text='Detailed diff of changes'
+    )
+
+    # When
+    created_at = models.DateTimeField(_('created at'), auto_now_add=True)
+
+    # Rollback tracking
+    is_rollback = models.BooleanField(
+        _('is rollback'),
+        default=False,
+        help_text='Whether this version is a rollback'
+    )
+
+    rolled_back_from_version = models.IntegerField(
+        _('rolled back from version'),
+        null=True,
+        blank=True,
+        help_text='Version number this was rolled back from'
+    )
+
+    class Meta:
+        db_table = 'annotation_version'
+        ordering = ['-version_number']
+        unique_together = ['annotation', 'version_number']
+        indexes = [
+            models.Index(fields=['annotation', 'version_number']),
+            models.Index(fields=['annotation', 'created_at']),
+            models.Index(fields=['created_by']),
+        ]
+
+    def __str__(self):
+        return f'Annotation {self.annotation_id} v{self.version_number}'
+
+    @property
+    def project(self):
+        """Get the project this version belongs to"""
+        return self.annotation.project
+
+
+class ProjectChangeLog(models.Model):
+    """Detailed change log for project configuration and settings"""
+
+    project = models.ForeignKey(
+        'projects.Project',
+        on_delete=models.CASCADE,
+        related_name='change_logs',
+        help_text='Project being changed'
+    )
+
+    # Who
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name='project_changes',
+        help_text='User who made the change'
+    )
+
+    # What changed
+    field_name = models.CharField(
+        _('field name'),
+        max_length=100,
+        help_text='Name of the field that changed'
+    )
+
+    old_value = models.TextField(
+        _('old value'),
+        blank=True,
+        help_text='Previous value (JSON serialized)'
+    )
+
+    new_value = models.TextField(
+        _('new value'),
+        blank=True,
+        help_text='New value (JSON serialized)'
+    )
+
+    change_type = models.CharField(
+        _('change type'),
+        max_length=20,
+        choices=[
+            ('settings', 'Settings'),
+            ('members', 'Members'),
+            ('config', 'Label Config'),
+            ('storage', 'Storage'),
+            ('ml', 'ML Backend'),
+            ('webhook', 'Webhook'),
+        ],
+        help_text='Type of change'
+    )
+
+    description = models.TextField(
+        _('description'),
+        help_text='Description of the change'
+    )
+
+    # When
+    created_at = models.DateTimeField(_('created at'), auto_now_add=True)
+
+    class Meta:
+        db_table = 'project_change_log'
+        ordering = ['-created_at']
+        indexes = [
+            models.Index(fields=['project', 'created_at']),
+            models.Index(fields=['user', 'created_at']),
+            models.Index(fields=['change_type']),
+        ]
+
+    def __str__(self):
+        return f'Project {self.project_id} - {self.field_name} changed by {self.user}'
+
+
+class AnnotatorTeam(models.Model):
+    """Teams/groups of annotators for task assignment"""
+
+    project = models.ForeignKey(
+        'projects.Project',
+        on_delete=models.CASCADE,
+        related_name='annotator_teams',
+        help_text='Project this team belongs to'
+    )
+
+    name = models.CharField(
+        _('team name'),
+        max_length=200,
+        help_text='Name of the team'
+    )
+
+    description = models.TextField(
+        _('description'),
+        blank=True,
+        help_text='Team description'
+    )
+
+    members = models.ManyToManyField(
+        settings.AUTH_USER_MODEL,
+        related_name='annotator_teams',
+        help_text='Team members'
+    )
+
+    created_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name='created_teams',
+        help_text='User who created the team'
+    )
+
+    created_at = models.DateTimeField(_('created at'), auto_now_add=True)
+    updated_at = models.DateTimeField(_('updated at'), auto_now=True)
+
+    class Meta:
+        db_table = 'annotator_team'
+        ordering = ['name']
+        unique_together = ['project', 'name']
+        indexes = [
+            models.Index(fields=['project']),
+        ]
+
+    def __str__(self):
+        return f'{self.name} ({self.project.title})'
+
+    def get_member_count(self):
+        """Get number of team members"""
+        return self.members.count()
+
+
+class TaskAssignment(models.Model):
+    """Task assignments to users or teams"""
+
+    ASSIGNMENT_STATUS_CHOICES = [
+        ('pending', 'Pending'),
+        ('claimed', 'Claimed'),
+        ('in_progress', 'In Progress'),
+        ('completed', 'Completed'),
+        ('cancelled', 'Cancelled'),
+    ]
+
+    task = models.ForeignKey(
+        'Task',
+        on_delete=models.CASCADE,
+        related_name='assignments',
+        help_text='Task being assigned'
+    )
+
+    # Assign to user OR team
+    assigned_to_user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name='task_assignments',
+        help_text='User this task is assigned to'
+    )
+
+    assigned_to_team = models.ForeignKey(
+        'AnnotatorTeam',
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name='task_assignments',
+        help_text='Team this task is assigned to'
+    )
+
+    # Assignment details
+    assigned_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name='assignments_created',
+        help_text='User who created the assignment'
+    )
+
+    status = models.CharField(
+        _('status'),
+        max_length=20,
+        choices=ASSIGNMENT_STATUS_CHOICES,
+        default='pending',
+        help_text='Assignment status'
+    )
+
+    # Claiming (for team assignments)
+    claimed_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='claimed_tasks',
+        help_text='Team member who claimed this task'
+    )
+
+    claimed_at = models.DateTimeField(
+        _('claimed at'),
+        null=True,
+        blank=True,
+        help_text='When the task was claimed'
+    )
+
+    # Timestamps
+    assigned_at = models.DateTimeField(_('assigned at'), auto_now_add=True)
+    started_at = models.DateTimeField(_('started at'), null=True, blank=True)
+    completed_at = models.DateTimeField(_('completed at'), null=True, blank=True)
+
+    # Priority and deadline
+    priority = models.IntegerField(
+        _('priority'),
+        default=0,
+        help_text='Assignment priority (higher = more important)'
+    )
+
+    deadline = models.DateTimeField(
+        _('deadline'),
+        null=True,
+        blank=True,
+        help_text='Assignment deadline'
+    )
+
+    notes = models.TextField(
+        _('notes'),
+        blank=True,
+        help_text='Assignment notes or instructions'
+    )
+
+    class Meta:
+        db_table = 'task_assignment'
+        ordering = ['-priority', '-assigned_at']
+        indexes = [
+            models.Index(fields=['task']),
+            models.Index(fields=['assigned_to_user', 'status']),
+            models.Index(fields=['assigned_to_team', 'status']),
+            models.Index(fields=['claimed_by']),
+            models.Index(fields=['status']),
+            models.Index(fields=['priority', 'assigned_at']),
+        ]
+
+    def __str__(self):
+        if self.assigned_to_user:
+            return f'Task {self.task_id} → User {self.assigned_to_user}'
+        elif self.assigned_to_team:
+            return f'Task {self.task_id} → Team {self.assigned_to_team}'
+        return f'Task Assignment {self.id}'
+
+    @property
+    def project(self):
+        """Get the project this assignment belongs to"""
+        return self.task.project
+
+    def can_claim(self, user):
+        """Check if user can claim this assignment"""
+        if self.assigned_to_team and self.status == 'pending':
+            return self.assigned_to_team.members.filter(id=user.id).exists()
+        return False
+
+    def claim(self, user):
+        """Claim assignment for a team member"""
+        if not self.can_claim(user):
+            raise ValidationError('User cannot claim this task')
+
+        self.claimed_by = user
+        self.claimed_at = timezone.now()
+        self.status = 'claimed'
+        self.save()
+
+    def start(self):
+        """Mark assignment as in progress"""
+        self.status = 'in_progress'
+        self.started_at = timezone.now()
+        self.save()
+
+    def complete(self):
+        """Mark assignment as completed"""
+        self.status = 'completed'
+        self.completed_at = timezone.now()
+        self.save()
 Q_task_finished_annotations = Q(annotations__was_cancelled=False) & Q(annotations__result__isnull=False)

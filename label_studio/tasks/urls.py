@@ -31,6 +31,8 @@ _api_annotations_urlpatterns = [
     path('<int:pk>/comments/bulk-resolve/', api.BulkResolveCommentsAPI.as_view(), name='annotation-comments-bulk-resolve'),
     path('<int:pk>/metrics/', api.AnnotationMetricsAPI.as_view(), name='annotation-metrics'),
     path('<int:pk>/quality-scores/', api.AnnotationQualityScoresAPI.as_view(), name='annotation-quality-scores'),
+    path('<int:pk>/history/', api.AnnotationHistoryAPI.as_view(), name='annotation-history'),
+    path('<int:pk>/rollback/', api.AnnotationRollbackAPI.as_view(), name='annotation-rollback'),
 ]
 
 _api_comments_urlpatterns = [

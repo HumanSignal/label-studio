@@ -57,6 +57,10 @@ _api_urlpatterns = [
     # Quality control and metrics
     path('<int:pk>/metrics/', tasks_api.ProjectMetricsAPI.as_view(), name='project-metrics'),
     path('<int:pk>/annotator-metrics/', tasks_api.AnnotatorMetricsAPI.as_view(), name='project-annotator-metrics'),
+    # Audit logs and activity tracking
+    path('<int:pk>/audit-logs/', tasks_api.AuditLogListAPI.as_view(), name='project-audit-logs'),
+    path('<int:pk>/audit-logs/export/', tasks_api.AuditLogExportAPI.as_view(), name='project-audit-logs-export'),
+    path('<int:pk>/change-logs/', tasks_api.ProjectChangeLogAPI.as_view(), name='project-change-logs'),
 ]
 
 _api_urlpatterns_templates = [
