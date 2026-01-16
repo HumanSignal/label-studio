@@ -269,6 +269,38 @@ def get_all_columns(project, *_):
             'visibility_defaults': {'explore': False, 'labeling': False},
             'project_defined': False,
         },
+        {
+            'id': 'review_status',
+            'title': 'Review Status',
+            'type': 'String',
+            'help': 'Review status of the annotation (pending, approved, rejected, fixed)',
+            'target': 'tasks',
+            'schema': {
+                'items': ['pending', 'approved', 'rejected', 'fixed'],
+                'multiple': False,
+            },
+            'visibility_defaults': {'explore': True, 'labeling': False},
+            'project_defined': False,
+        },
+        {
+            'id': 'reviewed_by',
+            'title': 'Reviewed By',
+            'type': 'List',
+            'help': 'User who reviewed the annotation',
+            'target': 'tasks',
+            **({'schema': {'items': project_members}} if not remove_members_schema else {}),
+            'visibility_defaults': {'explore': False, 'labeling': False},
+            'project_defined': False,
+        },
+        {
+            'id': 'reviewed_at',
+            'title': 'Reviewed At',
+            'type': 'Datetime',
+            'help': 'Date and time when the annotation was reviewed',
+            'target': 'tasks',
+            'visibility_defaults': {'explore': False, 'labeling': False},
+            'project_defined': False,
+        },
     ]
 
     result['columns'].append(data_root)

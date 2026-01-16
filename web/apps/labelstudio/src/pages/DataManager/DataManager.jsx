@@ -7,6 +7,7 @@ import { modal } from "../../components/Modal/Modal";
 import { Space } from "../../components/Space/Space";
 import { useAPI } from "../../providers/ApiProvider";
 import { useProject } from "../../providers/ProjectProvider";
+import { useProjectPermissions } from "../../hooks/useProjectPermissions";
 import { useContextProps, useParams } from "../../providers/RoutesProvider";
 import { addCrumb, deleteCrumb } from "../../services/breadrumbs";
 import { cn } from "../../utils/bem";
@@ -236,9 +237,11 @@ DataManagerPage.pages = {
 };
 DataManagerPage.context = ({ dmRef }) => {
   const { project } = useProject();
+  const { canReviewAnnotations } = useProjectPermissions();
   const [mode, setMode] = useState(dmRef?.mode ?? "explorer");
 
   const links = {
+    ...(canReviewAnnotations && { "/review": "Review Queue" }),
     "/settings": "Settings",
   };
 

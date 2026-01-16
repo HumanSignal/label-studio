@@ -26,6 +26,14 @@ _api_urlpatterns = [
 _api_annotations_urlpatterns = [
     path('<int:pk>/', api.AnnotationAPI.as_view(), name='annotation-detail'),
     path('<int:pk>/convert-to-draft', api.AnnotationConvertAPI.as_view(), name='annotation-convert-to-draft'),
+    path('<int:pk>/review/', api.AnnotationReviewAPI.as_view(), name='annotation-review'),
+    path('<int:pk>/comments/', api.AnnotationCommentsListAPI.as_view(), name='annotation-comments-list'),
+    path('<int:pk>/comments/bulk-resolve/', api.BulkResolveCommentsAPI.as_view(), name='annotation-comments-bulk-resolve'),
+]
+
+_api_comments_urlpatterns = [
+    path('<int:pk>/', api.AnnotationCommentDetailAPI.as_view(), name='comment-detail'),
+    path('<int:pk>/resolve/', api.AnnotationCommentResolveAPI.as_view(), name='comment-resolve'),
 ]
 
 _api_drafts_urlpatterns = [
@@ -39,6 +47,7 @@ urlpatterns = [
     path('api/tasks/', include((_api_urlpatterns, app_name), namespace='api')),
     # TODO: these should be moved to the separate apps
     path('api/annotations/', include((_api_annotations_urlpatterns, app_name), namespace='api-annotations')),
+    path('api/comments/', include((_api_comments_urlpatterns, app_name), namespace='api-comments')),
     path('api/drafts/', include((_api_drafts_urlpatterns, app_name), namespace='api-drafts')),
     path('api/', include((_api_predictions_urlpatterns, app_name), namespace='api-predictions')),
 ]

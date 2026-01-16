@@ -23,7 +23,7 @@ from rest_framework import generics, viewsets
 from rest_framework.exceptions import PermissionDenied, ValidationError
 from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
 from rest_framework.response import Response
-from tasks.models import Annotation, AnnotationDraft, Prediction, Task
+from tasks.models import Annotation, AnnotationComment, AnnotationDraft, Prediction, Task
 from tasks.openapi_schema import (
     annotation_request_schema,
     annotation_response_example,
@@ -961,3 +961,318 @@ class AnnotationConvertAPI(generics.RetrieveAPIView):
         emit_webhooks_for_instance(organization, project, WebhookAction.ANNOTATIONS_DELETED, [pk])
         data = AnnotationDraftSerializer(instance=draft).data
         return Response(status=201, data=data)
+
+
+from tasks.serializers import (
+    AnnotationCommentSerializer,
+    AnnotationReviewSerializer,
+    AnnotationWithReviewSerializer,
+)
+
+
+@extend_schema(
+    tags=['Annotations'],
+    summary='Review annotation',
+    description='Submit a review (approve/reject) for an annotation. Only reviewers and owners can review annotations.',
+    request=AnnotationReviewSerializer,
+    responses={
+        200: AnnotationWithReviewSerializer,
+    },
+)
+class AnnotationReviewAPI(generics.UpdateAPIView):
+    """API endpoint for reviewing annotations"""
+    queryset = Annotation.objects.all()
+    serializer_class = AnnotationReviewSerializer
+    permission_required = ViewClassPermission(
+        POST=all_permissions.annotations_change,
+    )
+
+    def post(self, request, *args, **kwargs):
+        annotation = self.get_object()
+        project = annotation.task.project
+
+        # RBAC: Only reviewers and owners can review annotations
+        if not project.user_can_review(request.user):
+            raise PermissionDenied('Only project reviewers and owners can review annotations')
+
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        # Update annotation with review information
+        annotation.review_status = serializer.validated_data['review_status']
+        annotation.review_comment = serializer.validated_data.get('review_comment', '')
+        annotation.reviewed_by = request.user
+        annotation.reviewed_at = timezone.now()
+        annotation.save(update_fields=['review_status', 'review_comment', 'reviewed_by', 'reviewed_at'])
+
+        # Return updated annotation with review info
+        response_serializer = AnnotationWithReviewSerializer(annotation, context={'request': request})
+        return Response(response_serializer.data, status=status.HTTP_200_OK)
+
+
+@extend_schema(
+    tags=['Annotations'],
+    summary='Get review queue',
+    description='Get list of annotations pending review for a project. Only reviewers and owners can access this.',
+    parameters=[
+        OpenApiParameter(name='status', type=OpenApiTypes.STR, location='query',
+                        description='Filter by review status (pending, approved, rejected, fixed)'),
+        OpenApiParameter(name='annotator', type=OpenApiTypes.INT, location='query',
+                        description='Filter by annotator user ID'),
+    ],
+    responses={
+        200: AnnotationWithReviewSerializer(many=True),
+    },
+)
+class AnnotationReviewQueueAPI(generics.ListAPIView):
+    """API endpoint for getting annotations that need review"""
+    serializer_class = AnnotationWithReviewSerializer
+    permission_required = all_permissions.annotations_view
+
+    def get_queryset(self):
+        project_id = self.kwargs.get('pk')
+        project = generics.get_object_or_404(Project, pk=project_id)
+
+        # RBAC: Only reviewers and owners can access review queue
+        if not project.user_can_review(self.request.user):
+            raise PermissionDenied('Only project reviewers and owners can access the review queue')
+
+        queryset = Annotation.objects.filter(
+            project=project,
+            was_cancelled=False
+        ).select_related('completed_by', 'reviewed_by', 'task').order_by('-created_at')
+
+        # Filter by review status
+        review_status = self.request.query_params.get('status')
+        if review_status:
+            queryset = queryset.filter(review_status=review_status)
+        else:
+            # Default to pending reviews
+            queryset = queryset.filter(review_status='pending')
+
+        # Filter by annotator
+        annotator_id = self.request.query_params.get('annotator')
+        if annotator_id:
+            queryset = queryset.filter(completed_by_id=annotator_id)
+
+        return queryset
+
+
+@extend_schema(
+    tags=['Annotations'],
+    summary='Bulk review annotations',
+    description='Review multiple annotations at once. Only reviewers and owners can bulk review.',
+    request={
+        'application/json': {
+            'type': 'object',
+            'properties': {
+                'annotation_ids': {
+                    'type': 'array',
+                    'items': {'type': 'integer'},
+                    'description': 'List of annotation IDs to review'
+                },
+                'review_status': {
+                    'type': 'string',
+                    'enum': ['approved', 'rejected', 'fixed'],
+                    'description': 'Review status to set for all annotations'
+                },
+                'review_comment': {
+                    'type': 'string',
+                    'description': 'Optional comment for all reviews'
+                }
+            },
+            'required': ['annotation_ids', 'review_status']
+        }
+    },
+    responses={
+        200: {
+            'type': 'object',
+            'properties': {
+                'updated_count': {'type': 'integer'},
+                'annotations': AnnotationWithReviewSerializer(many=True)
+            }
+        }
+    },
+)
+class AnnotationBulkReviewAPI(generics.GenericAPIView):
+    """API endpoint for bulk reviewing annotations"""
+    permission_required = all_permissions.annotations_change
+
+    def post(self, request, *args, **kwargs):
+        project_id = self.kwargs.get('pk')
+        project = generics.get_object_or_404(Project, pk=project_id)
+
+        # RBAC: Only reviewers and owners can bulk review
+        if not project.user_can_review(request.user):
+            raise PermissionDenied('Only project reviewers and owners can bulk review annotations')
+
+        annotation_ids = request.data.get('annotation_ids', [])
+        review_status = request.data.get('review_status')
+        review_comment = request.data.get('review_comment', '')
+
+        if not annotation_ids:
+            raise ValidationError('annotation_ids is required')
+
+        if review_status not in ['approved', 'rejected', 'fixed']:
+            raise ValidationError('review_status must be one of: approved, rejected, fixed')
+
+        # Update annotations
+        annotations = Annotation.objects.filter(
+            id__in=annotation_ids,
+            project=project
+        )
+
+        updated_count = annotations.update(
+            review_status=review_status,
+            review_comment=review_comment,
+            reviewed_by=request.user,
+            reviewed_at=timezone.now()
+        )
+
+        # Fetch updated annotations for response
+        updated_annotations = Annotation.objects.filter(id__in=annotation_ids).select_related(
+            'completed_by', 'reviewed_by', 'task'
+        )
+
+        serializer = AnnotationWithReviewSerializer(updated_annotations, many=True, context={'request': request})
+
+        return Response({
+            'updated_count': updated_count,
+            'annotations': serializer.data
+        }, status=status.HTTP_200_OK)
+
+
+class AnnotationCommentsListAPI(generics.ListCreateAPIView):
+    """API endpoint for listing and creating annotation comments"""
+    permission_required = all_permissions.annotations_view
+    serializer_class = AnnotationCommentSerializer
+
+    def get_queryset(self):
+        annotation_id = self.kwargs.get('pk')
+        annotation = generics.get_object_or_404(Annotation, pk=annotation_id)
+
+        # Check project permissions
+        project = annotation.project
+        if not project.has_permission(self.request.user):
+            raise PermissionDenied('You do not have permission to access this annotation')
+
+        # Return only top-level comments (no parent), replies are nested in serializer
+        return AnnotationComment.objects.filter(
+            annotation=annotation,
+            parent__isnull=True
+        ).select_related('author').prefetch_related('replies__author')
+
+    def perform_create(self, serializer):
+        annotation_id = self.kwargs.get('pk')
+        annotation = generics.get_object_or_404(Annotation, pk=annotation_id)
+
+        # Check project permissions
+        project = annotation.project
+        if not project.has_permission(self.request.user):
+            raise PermissionDenied('You do not have permission to comment on this annotation')
+
+        # Handle parent comment if provided
+        parent_id = self.request.data.get('parent')
+        parent = None
+        if parent_id:
+            parent = generics.get_object_or_404(AnnotationComment, pk=parent_id)
+            # Ensure parent belongs to same annotation
+            if parent.annotation_id != annotation.id:
+                raise ValidationError('Parent comment must belong to the same annotation')
+
+        serializer.save(
+            annotation=annotation,
+            author=self.request.user,
+            parent=parent
+        )
+
+
+class AnnotationCommentDetailAPI(generics.RetrieveUpdateDestroyAPIView):
+    """API endpoint for retrieving, updating, and deleting a comment"""
+    permission_required = all_permissions.annotations_view
+    serializer_class = AnnotationCommentSerializer
+    queryset = AnnotationComment.objects.select_related('author').prefetch_related('replies__author')
+
+    def get_object(self):
+        obj = super().get_object()
+
+        # Check project permissions
+        project = obj.annotation.project
+        if not project.has_permission(self.request.user):
+            raise PermissionDenied('You do not have permission to access this comment')
+
+        return obj
+
+    def perform_update(self, serializer):
+        comment = self.get_object()
+
+        # Only author or project owners can edit comments
+        project = comment.annotation.project
+        if comment.author != self.request.user and not project.user_can_manage(self.request.user):
+            raise PermissionDenied('You can only edit your own comments or be a project owner')
+
+        serializer.save()
+
+    def perform_destroy(self, instance):
+        # Only author or project owners can delete comments
+        project = instance.annotation.project
+        if instance.author != self.request.user and not project.user_can_manage(self.request.user):
+            raise PermissionDenied('You can only delete your own comments or be a project owner')
+
+        instance.delete()
+
+
+class AnnotationCommentResolveAPI(generics.GenericAPIView):
+    """API endpoint for resolving/unresolving comment threads"""
+    permission_required = all_permissions.annotations_view
+
+    def post(self, request, *args, **kwargs):
+        comment_id = self.kwargs.get('pk')
+        comment = generics.get_object_or_404(AnnotationComment, pk=comment_id)
+
+        # Check project permissions
+        project = comment.annotation.project
+        if not project.has_permission(request.user):
+            raise PermissionDenied('You do not have permission to access this comment')
+
+        # Get resolve status from request
+        is_resolved = request.data.get('is_resolved', True)
+
+        # Get root comment of thread
+        root_comment = comment.get_thread_root()
+        root_comment.is_resolved = is_resolved
+        root_comment.save()
+
+        serializer = AnnotationCommentSerializer(root_comment)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class BulkResolveCommentsAPI(generics.GenericAPIView):
+    """API endpoint for bulk resolving comments"""
+    permission_required = all_permissions.annotations_view
+
+    def post(self, request, *args, **kwargs):
+        annotation_id = self.kwargs.get('pk')
+        annotation = generics.get_object_or_404(Annotation, pk=annotation_id)
+
+        # Check project permissions
+        project = annotation.project
+        if not project.has_permission(request.user):
+            raise PermissionDenied('You do not have permission to access this annotation')
+
+        comment_ids = request.data.get('comment_ids', [])
+        is_resolved = request.data.get('is_resolved', True)
+
+        if not comment_ids:
+            raise ValidationError('comment_ids is required')
+
+        # Update comments
+        updated_count = AnnotationComment.objects.filter(
+            id__in=comment_ids,
+            annotation=annotation
+        ).update(is_resolved=is_resolved)
+
+        return Response({
+            'updated_count': updated_count,
+            'is_resolved': is_resolved
+        }, status=status.HTTP_200_OK)

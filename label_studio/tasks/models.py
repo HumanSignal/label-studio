@@ -724,6 +724,45 @@ class Annotation(AnnotationMixin, FsmHistoryStateModel):
         help_text='Annotation was created in bulk mode',
     )
 
+    # Review and approval fields
+    REVIEW_STATUS_CHOICES = [
+        ('pending', 'Pending Review'),
+        ('approved', 'Approved'),
+        ('rejected', 'Rejected'),
+        ('fixed', 'Fixed'),
+    ]
+
+    review_status = models.CharField(
+        _('review status'),
+        max_length=20,
+        choices=REVIEW_STATUS_CHOICES,
+        default='pending',
+        null=True,
+        blank=True,
+        db_index=True,
+        help_text='Current review status of this annotation',
+    )
+    reviewed_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        related_name='reviewed_annotations',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        help_text='User who reviewed this annotation',
+    )
+    reviewed_at = models.DateTimeField(
+        _('reviewed at'),
+        null=True,
+        blank=True,
+        help_text='Time when this annotation was reviewed',
+    )
+    review_comment = models.TextField(
+        _('review comment'),
+        null=True,
+        blank=True,
+        help_text='Feedback or comments from the reviewer',
+    )
+
     class Meta:
         db_table = 'task_completion'
         indexes = [
@@ -738,6 +777,9 @@ class Annotation(AnnotationMixin, FsmHistoryStateModel):
             models.Index(fields=['task', 'ground_truth']),
             models.Index(fields=['task', 'was_cancelled']),
             models.Index(fields=['was_cancelled']),
+            models.Index(fields=['review_status']),
+            models.Index(fields=['project', 'review_status']),
+            models.Index(fields=['reviewed_by']),
         ]
 
     def created_ago(self):
@@ -1556,4 +1598,76 @@ def bulk_update_stats_project_tasks(tasks, project=None):
 
 
 Q_finished_annotations = Q(was_cancelled=False) & Q(result__isnull=False)
+
+
+class AnnotationComment(models.Model):
+    """Comments and discussions for annotations"""
+
+    annotation = models.ForeignKey(
+        'Annotation',
+        on_delete=models.CASCADE,
+        related_name='comments',
+        help_text='Annotation this comment belongs to'
+    )
+
+    author = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='annotation_comments',
+        help_text='User who created this comment'
+    )
+
+    text = models.TextField(
+        _('comment text'),
+        help_text='Comment content'
+    )
+
+    parent = models.ForeignKey(
+        'self',
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name='replies',
+        help_text='Parent comment for threaded discussions'
+    )
+
+    is_resolved = models.BooleanField(
+        _('is resolved'),
+        default=False,
+        help_text='Whether this comment thread is resolved'
+    )
+
+    created_at = models.DateTimeField(_('created at'), auto_now_add=True)
+    updated_at = models.DateTimeField(_('updated at'), auto_now=True)
+
+    class Meta:
+        db_table = 'annotation_comment'
+        ordering = ['created_at']
+        indexes = [
+            models.Index(fields=['annotation', 'created_at']),
+            models.Index(fields=['author']),
+            models.Index(fields=['parent']),
+            models.Index(fields=['is_resolved']),
+        ]
+
+    def __str__(self):
+        return f'Comment by {self.author} on Annotation {self.annotation_id}'
+
+    @property
+    def project(self):
+        """Get the project this comment belongs to"""
+        return self.annotation.project
+
+    def get_thread_root(self):
+        """Get the root comment of this thread"""
+        if self.parent is None:
+            return self
+        return self.parent.get_thread_root()
+
+    def get_all_replies(self):
+        """Get all replies in this thread recursively"""
+        replies = list(self.replies.all())
+        for reply in self.replies.all():
+            replies.extend(reply.get_all_replies())
+        return replies
 Q_task_finished_annotations = Q(annotations__was_cancelled=False) & Q(annotations__result__isnull=False)

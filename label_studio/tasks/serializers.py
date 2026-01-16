@@ -24,7 +24,7 @@ from rest_framework.fields import SkipField
 from rest_framework.serializers import ModelSerializer
 from rest_framework.settings import api_settings
 from tasks.exceptions import AnnotationDuplicateError
-from tasks.models import Annotation, AnnotationDraft, Prediction, PredictionMeta, Task
+from tasks.models import Annotation, AnnotationComment, AnnotationDraft, Prediction, PredictionMeta, Task
 from tasks.validation import TaskValidator
 from users.models import User
 from users.serializers import UserSerializer
@@ -905,5 +905,113 @@ class PredictionMetaSerializer(ModelSerializer):
         read_only_fields = ['prediction', 'failed_prediction']
 
 
+class AnnotationReviewSerializer(serializers.Serializer):
+    """Serializer for reviewing annotations"""
+    review_status = serializers.ChoiceField(
+        choices=['approved', 'rejected', 'fixed'],
+        required=True,
+        help_text='Review status to set'
+    )
+    review_comment = serializers.CharField(
+        required=False,
+        allow_blank=True,
+        help_text='Optional comment for the review'
+    )
+
+
+class ReviewedBySerializer(UserSerializer):
+    """Serializer for reviewed_by user"""
+    class Meta:
+        model = User
+        fields = ['id', 'first_name', 'last_name', 'email', 'avatar']
+
+
+class AnnotationWithReviewSerializer(AnnotationSerializer):
+    """Extended annotation serializer including review information"""
+    reviewed_by_info = ReviewedBySerializer(source='reviewed_by', read_only=True)
+
+    class Meta(AnnotationSerializer.Meta):
+        model = Annotation
+        exclude = ['prediction', 'result_count']
+        expandable_fields = {
+            'completed_by': (CompletedByDMSerializer,),
+            'reviewed_by_info': (ReviewedBySerializer,),
+        }
+
+
 # LSE inherits this serializer
+
+
+class CommentAuthorSerializer(UserSerializer):
+    """Serializer for comment author"""
+    class Meta:
+        model = User
+        fields = ['id', 'first_name', 'last_name', 'email', 'avatar']
+
+
+class AnnotationCommentSerializer(ModelSerializer):
+    """Serializer for annotation comments"""
+    author = CommentAuthorSerializer(read_only=True)
+    replies = serializers.SerializerMethodField()
+
+    class Meta:
+        model = AnnotationComment
+        fields = [
+            'id',
+            'annotation',
+            'author',
+            'text',
+            'parent',
+            'is_resolved',
+            'created_at',
+            'updated_at',
+            'replies',
+        ]
+        read_only_fields = ['id', 'author', 'created_at', 'updated_at']
+
+    def get_replies(self, obj):
+        """Get all direct replies to this comment"""
+        if obj.replies.exists():
+            return AnnotationCommentSerializer(obj.replies.all(), many=True).data
+        return []
+
+
+class AnnotationCommentCreateSerializer(serializers.Serializer):
+    """Serializer for creating comments"""
+    text = serializers.CharField(
+        required=True,
+        allow_blank=False,
+        help_text='Comment text content'
+    )
+    parent = serializers.IntegerField(
+        required=False,
+        allow_null=True,
+        help_text='Parent comment ID for threaded replies'
+    )
+
+
+class AnnotationCommentUpdateSerializer(serializers.Serializer):
+    """Serializer for updating comments"""
+    text = serializers.CharField(
+        required=False,
+        allow_blank=False,
+        help_text='Updated comment text'
+    )
+    is_resolved = serializers.BooleanField(
+        required=False,
+        help_text='Mark comment thread as resolved'
+    )
+
+
+class BulkResolveCommentsSerializer(serializers.Serializer):
+    """Serializer for bulk resolving comments"""
+    comment_ids = serializers.ListField(
+        child=serializers.IntegerField(),
+        required=True,
+        help_text='List of comment IDs to resolve'
+    )
+    is_resolved = serializers.BooleanField(
+        default=True,
+        help_text='Whether to resolve or unresolve'
+    )
 TaskSerializerBulk = load_func(settings.TASK_SERIALIZER_BULK)
