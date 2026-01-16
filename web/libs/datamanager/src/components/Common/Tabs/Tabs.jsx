@@ -1,4 +1,5 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
+import { observer } from "mobx-react";
 import { DragDropContext, Droppable } from "react-beautiful-dnd";
 import { IconEllipsisVertical, IconPlus } from "@humansignal/icons";
 import { cn } from "../../../utils/bem";
@@ -71,132 +72,134 @@ export const Tabs = ({
   );
 };
 
-export const TabsItem = ({
-  title,
-  tab,
-  onFinishEditing,
-  onCancelEditing,
-  onClose,
-  onDuplicate,
-  onSave,
-  editable = true,
-  deletable = true,
-  managable = true,
-  virtual = false,
-}) => {
-  const { switchTab, selectedTab, lastTab, allowedActions } = useContext(TabsContext);
-  const [currentTitle, setCurrentTitle] = useState(title);
-  const [renameMode, setRenameMode] = useState(false);
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
+export const TabsItem = observer(
+  ({
+    title,
+    tab,
+    onFinishEditing,
+    onCancelEditing,
+    onClose,
+    onDuplicate,
+    onSave,
+    editable = true,
+    deletable = true,
+    managable = true,
+    virtual = false,
+  }) => {
+    const { switchTab, selectedTab, lastTab, allowedActions } = useContext(TabsContext);
+    const [currentTitle, setCurrentTitle] = useState(title);
+    const [renameMode, setRenameMode] = useState(false);
+    const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-  const active = tab === selectedTab;
+    const active = tab === selectedTab;
 
-  const tabIsEditable = useMemo(() => editable && allowedActions.edit, [editable, allowedActions]);
+    const tabIsEditable = useMemo(() => editable && allowedActions.edit, [editable, allowedActions]);
 
-  const tabIsDeletable = useMemo(
-    () => !lastTab && deletable && allowedActions.delete,
-    [lastTab, deletable, allowedActions],
-  );
+    const tabIsDeletable = useMemo(
+      () => !lastTab && deletable && allowedActions.delete,
+      [lastTab, deletable, allowedActions],
+    );
 
-  const tabIsCloneable = useMemo(
-    () => allowedActions.add && allowedActions.duplicate,
-    [allowedActions.add, allowedActions.duplicate],
-  );
+    const tabIsCloneable = useMemo(
+      () => allowedActions.add && allowedActions.duplicate,
+      [allowedActions.add, allowedActions.duplicate],
+    );
 
-  const showMenu = useMemo(() => {
-    return managable && (tabIsEditable || tabIsDeletable || tabIsCloneable);
-  }, [managable, tabIsEditable, tabIsDeletable, tabIsCloneable]);
+    const showMenu = useMemo(() => {
+      return managable && (tabIsEditable || tabIsDeletable || tabIsCloneable);
+    }, [managable, tabIsEditable, tabIsDeletable, tabIsCloneable]);
 
-  const saveTabTitle = useCallback(
-    (ev) => {
-      const { type, key } = ev;
+    const saveTabTitle = useCallback(
+      (ev) => {
+        const { type, key } = ev;
 
-      if (type === "blur" || ["Enter", "Escape"].includes(key)) {
-        ev.preventDefault();
-        setRenameMode(false);
+        if (type === "blur" || ["Enter", "Escape"].includes(key)) {
+          ev.preventDefault();
+          setRenameMode(false);
 
-        if (key === "Escape") {
-          setCurrentTitle(title);
-          onCancelEditing?.();
+          if (key === "Escape") {
+            setCurrentTitle(title);
+            onCancelEditing?.();
+          }
+
+          onFinishEditing(currentTitle);
         }
+      },
+      [currentTitle],
+    );
 
-        onFinishEditing(currentTitle);
-      }
-    },
-    [currentTitle],
-  );
-
-  return (
-    <div className={tabsCN.elem("item").mod({ active, virtual, menuOpen: isMenuOpen }).toString()}>
-      <div
-        className={tabsCN
-          .elem("item-left")
-          .mod({
-            edit: renameMode,
-          })
-          .toString()}
-        onClick={() => switchTab?.(tab)}
-        title={currentTitle}
-        data-leave
-      >
-        {renameMode ? (
-          <Input
-            size="small"
-            autoFocus={true}
-            value={currentTitle}
-            onKeyDownCapture={saveTabTitle}
-            onBlur={saveTabTitle}
-            onChange={(ev) => {
-              setCurrentTitle(ev.target.value);
-            }}
-          />
-        ) : (
-          <span
-            style={{
-              whiteSpace: "nowrap",
-              overflow: "hidden",
-              textOverflow: "ellipsis",
-            }}
-          >
-            {currentTitle}
-          </span>
-        )}
+    return (
+      <div className={tabsCN.elem("item").mod({ active, virtual, menuOpen: isMenuOpen }).toString()}>
+        <div
+          className={tabsCN
+            .elem("item-left")
+            .mod({
+              edit: renameMode,
+            })
+            .toString()}
+          onClick={() => switchTab?.(tab)}
+          title={currentTitle}
+          data-leave
+        >
+          {renameMode ? (
+            <Input
+              size="small"
+              autoFocus={true}
+              value={currentTitle}
+              onKeyDownCapture={saveTabTitle}
+              onBlur={saveTabTitle}
+              onChange={(ev) => {
+                setCurrentTitle(ev.target.value);
+              }}
+            />
+          ) : (
+            <span
+              style={{
+                whiteSpace: "nowrap",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+              }}
+            >
+              {currentTitle}
+            </span>
+          )}
+        </div>
+        <div className={tabsCN.elem("item-right").toString()}>
+          {showMenu && (
+            <Dropdown.Trigger
+              align="bottom-left"
+              openUpwardForShortViewport={false}
+              onToggle={setIsMenuOpen}
+              content={
+                <TabsMenu
+                  editable={tabIsEditable}
+                  closable={tabIsDeletable}
+                  clonable={tabIsCloneable}
+                  virtual={virtual}
+                  onClick={(action) => {
+                    switch (action) {
+                      case "edit":
+                        return setRenameMode(true);
+                      case "duplicate":
+                        return onDuplicate?.();
+                      case "close":
+                        return onClose?.();
+                      case "save":
+                        return onSave?.();
+                    }
+                  }}
+                />
+              }
+            >
+              <div className={tabsCN.elem("item-right-button").toString()}>
+                <Button look="outline" size="smaller" variant="neutral">
+                  <IconEllipsisVertical className="w-4 h-4" />
+                </Button>
+              </div>
+            </Dropdown.Trigger>
+          )}
+        </div>
       </div>
-      <div className={tabsCN.elem("item-right").toString()}>
-        {showMenu && (
-          <Dropdown.Trigger
-            align="bottom-left"
-            openUpwardForShortViewport={false}
-            onToggle={setIsMenuOpen}
-            content={
-              <TabsMenu
-                editable={tabIsEditable}
-                closable={tabIsDeletable}
-                clonable={tabIsCloneable}
-                virtual={virtual}
-                onClick={(action) => {
-                  switch (action) {
-                    case "edit":
-                      return setRenameMode(true);
-                    case "duplicate":
-                      return onDuplicate?.();
-                    case "close":
-                      return onClose?.();
-                    case "save":
-                      return onSave?.();
-                  }
-                }}
-              />
-            }
-          >
-            <div className={tabsCN.elem("item-right-button").toString()}>
-              <Button look="outline" size="smaller" variant="neutral">
-                <IconEllipsisVertical className="w-4 h-4" />
-              </Button>
-            </div>
-          </Dropdown.Trigger>
-        )}
-      </div>
-    </div>
-  );
-};
+    );
+  },
+);
