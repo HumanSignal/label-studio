@@ -10,7 +10,7 @@ from data_manager.api import TaskListAPI as DMTaskListAPI
 from data_manager.functions import evaluate_predictions
 from data_manager.models import PrepareParams
 from data_manager.serializers import DataManagerTaskSerializer
-from django.db import transaction
+from django.db import models, transaction
 from django.db.models import Q
 from django.utils import timezone
 from django.utils.decorators import method_decorator
@@ -23,7 +23,15 @@ from rest_framework import generics, viewsets
 from rest_framework.exceptions import PermissionDenied, ValidationError
 from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
 from rest_framework.response import Response
-from tasks.models import Annotation, AnnotationComment, AnnotationDraft, Prediction, Task
+from tasks.models import (
+    Annotation,
+    AnnotationComment,
+    AnnotationDraft,
+    AnnotationMetrics,
+    Prediction,
+    QualityScore,
+    Task,
+)
 from tasks.openapi_schema import (
     annotation_request_schema,
     annotation_response_example,
@@ -965,8 +973,13 @@ class AnnotationConvertAPI(generics.RetrieveAPIView):
 
 from tasks.serializers import (
     AnnotationCommentSerializer,
+    AnnotationMetricsSerializer,
     AnnotationReviewSerializer,
     AnnotationWithReviewSerializer,
+    AnnotatorMetricsSerializer,
+    ProjectMetricsSerializer,
+    QualityScoreCreateSerializer,
+    QualityScoreSerializer,
 )
 
 
@@ -1276,3 +1289,213 @@ class BulkResolveCommentsAPI(generics.GenericAPIView):
             'updated_count': updated_count,
             'is_resolved': is_resolved
         }, status=status.HTTP_200_OK)
+
+
+# ================== Quality Control and Metrics APIs ==================
+
+
+class AnnotationMetricsAPI(generics.RetrieveUpdateAPIView):
+    """API endpoint for annotation metrics"""
+    permission_required = all_permissions.annotations_view
+    serializer_class = AnnotationMetricsSerializer
+
+    def get_object(self):
+        annotation_id = self.kwargs.get('pk')
+        annotation = generics.get_object_or_404(Annotation, pk=annotation_id)
+
+        # Check project permissions
+        project = annotation.project
+        if not project.has_permission(self.request.user):
+            raise PermissionDenied('You do not have permission to access this annotation')
+
+        # Get or create metrics
+        metrics, created = AnnotationMetrics.objects.get_or_create(annotation=annotation)
+        return metrics
+
+
+class AnnotationQualityScoresAPI(generics.ListCreateAPIView):
+    """API endpoint for listing and creating quality scores"""
+    permission_required = all_permissions.annotations_view
+    serializer_class = QualityScoreSerializer
+
+    def get_queryset(self):
+        annotation_id = self.kwargs.get('pk')
+        annotation = generics.get_object_or_404(Annotation, pk=annotation_id)
+
+        # Check project permissions
+        project = annotation.project
+        if not project.has_permission(self.request.user):
+            raise PermissionDenied('You do not have permission to access this annotation')
+
+        return QualityScore.objects.filter(annotation=annotation).select_related('reviewer')
+
+    def perform_create(self, serializer):
+        annotation_id = self.kwargs.get('pk')
+        annotation = generics.get_object_or_404(Annotation, pk=annotation_id)
+
+        # Check project permissions - only reviewers can score
+        project = annotation.project
+        if not project.user_can_review(self.request.user):
+            raise PermissionDenied('Only project reviewers and owners can submit quality scores')
+
+        # Create or update quality score
+        quality_score, created = QualityScore.objects.update_or_create(
+            annotation=annotation,
+            reviewer=self.request.user,
+            defaults={
+                'score': self.request.data.get('score'),
+                'completeness_score': self.request.data.get('completeness_score'),
+                'accuracy_score': self.request.data.get('accuracy_score'),
+                'consistency_score': self.request.data.get('consistency_score'),
+                'feedback': self.request.data.get('feedback', ''),
+            }
+        )
+
+        # Update annotation metrics
+        _update_annotation_quality_metrics(annotation)
+
+
+class ProjectMetricsAPI(generics.GenericAPIView):
+    """API endpoint for project-level metrics"""
+    permission_required = all_permissions.projects_view
+
+    def get(self, request, *args, **kwargs):
+        project_id = self.kwargs.get('pk')
+        project = generics.get_object_or_404(Project, pk=project_id)
+
+        # Check project permissions
+        if not project.has_permission(request.user):
+            raise PermissionDenied('You do not have permission to access this project')
+
+        # Calculate project metrics
+        annotations = Annotation.objects.filter(project=project)
+        tasks = Task.objects.filter(project=project)
+        metrics_qs = AnnotationMetrics.objects.filter(annotation__project=project)
+
+        total_annotations = annotations.count()
+        total_tasks = tasks.count()
+        completion_rate = (total_annotations / total_tasks * 100) if total_tasks > 0 else 0
+
+        # Quality metrics
+        avg_quality = metrics_qs.aggregate(models.Avg('quality_score'))['quality_score__avg'] or 0
+        avg_agreement = metrics_qs.aggregate(models.Avg('agreement_score'))['agreement_score__avg'] or 0
+
+        # Flags
+        needs_review_count = metrics_qs.filter(needs_review=True).count()
+        outlier_count = metrics_qs.filter(is_outlier=True).count()
+
+        # Annotator stats
+        annotators = annotations.values('completed_by').distinct().count()
+        avg_per_annotator = (total_annotations / annotators) if annotators > 0 else 0
+
+        metrics_data = {
+            'total_annotations': total_annotations,
+            'total_tasks': total_tasks,
+            'completion_rate': round(completion_rate, 2),
+            'average_quality_score': round(avg_quality, 2),
+            'average_agreement_score': round(avg_agreement, 2),
+            'annotations_needing_review': needs_review_count,
+            'outlier_count': outlier_count,
+            'annotator_count': annotators,
+            'avg_annotations_per_annotator': round(avg_per_annotator, 2),
+        }
+
+        serializer = ProjectMetricsSerializer(metrics_data)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class AnnotatorMetricsAPI(generics.GenericAPIView):
+    """API endpoint for per-annotator metrics"""
+    permission_required = all_permissions.projects_view
+
+    def get(self, request, *args, **kwargs):
+        project_id = self.kwargs.get('pk')
+        project = generics.get_object_or_404(Project, pk=project_id)
+
+        # Check project permissions
+        if not project.has_permission(request.user):
+            raise PermissionDenied('You do not have permission to access this project')
+
+        # Get all annotators for this project
+        annotators_data = []
+        annotations = Annotation.objects.filter(project=project).select_related('completed_by')
+
+        # Group by annotator
+        from django.db.models import Avg, Count, F
+        annotator_stats = annotations.values(
+            'completed_by',
+            'completed_by__first_name',
+            'completed_by__last_name'
+        ).annotate(
+            total=Count('id')
+        )
+
+        for annotator in annotator_stats:
+            annotator_id = annotator['completed_by']
+            if not annotator_id:
+                continue
+
+            annotator_annotations = annotations.filter(completed_by_id=annotator_id)
+            metrics = AnnotationMetrics.objects.filter(annotation__in=annotator_annotations)
+
+            # Calculate metrics
+            avg_quality = metrics.aggregate(Avg('quality_score'))['quality_score__avg'] or 0
+            avg_accuracy = metrics.aggregate(Avg('accuracy_score'))['accuracy_score__avg'] or 0
+            avg_time = metrics.aggregate(Avg('time_spent'))['time_spent__avg'] or 0
+
+            # Review metrics
+            approved = annotator_annotations.filter(review_status='approved').count()
+            rejected = annotator_annotations.filter(review_status='rejected').count()
+            total = annotator['total']
+
+            approval_rate = (approved / total * 100) if total > 0 else 0
+            rejection_rate = (rejected / total * 100) if total > 0 else 0
+
+            # Time-based metrics
+            import datetime
+            from django.utils import timezone
+            days_active = (timezone.now() - annotator_annotations.order_by('created_at').first().created_at).days or 1
+            annotations_per_day = total / days_active if days_active > 0 else 0
+
+            annotators_data.append({
+                'annotator_id': annotator_id,
+                'annotator_name': f"{annotator['completed_by__first_name']} {annotator['completed_by__last_name']}",
+                'total_annotations': total,
+                'average_quality_score': round(avg_quality, 2),
+                'average_accuracy_score': round(avg_accuracy, 2),
+                'average_time_spent': round(avg_time, 2),
+                'approval_rate': round(approval_rate, 2),
+                'rejection_rate': round(rejection_rate, 2),
+                'annotations_per_day': round(annotations_per_day, 2),
+            })
+
+        serializer = AnnotatorMetricsSerializer(annotators_data, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+def _update_annotation_quality_metrics(annotation):
+    """Helper function to update annotation quality metrics"""
+    metrics, created = AnnotationMetrics.objects.get_or_create(annotation=annotation)
+
+    # Calculate average quality score from all quality scores
+    quality_scores = QualityScore.objects.filter(annotation=annotation)
+    if quality_scores.exists():
+        avg_score = quality_scores.aggregate(models.Avg('score'))['score__avg']
+        metrics.quality_score = (avg_score / 5.0) * 100  # Convert to 0-100 scale
+
+        # Update other scores
+        avg_completeness = quality_scores.aggregate(models.Avg('completeness_score'))['completeness_score__avg']
+        avg_accuracy = quality_scores.aggregate(models.Avg('accuracy_score'))['accuracy_score__avg']
+
+        if avg_accuracy:
+            metrics.accuracy_score = (avg_accuracy / 5.0) * 100
+
+        # Flag for review if quality is low
+        if metrics.quality_score and metrics.quality_score < 60:
+            metrics.needs_review = True
+
+    # Count regions in annotation result
+    if annotation.result:
+        metrics.num_regions = len(annotation.result)
+
+    metrics.save()

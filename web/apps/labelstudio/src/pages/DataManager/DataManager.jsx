@@ -241,6 +241,7 @@ DataManagerPage.context = ({ dmRef }) => {
   const [mode, setMode] = useState(dmRef?.mode ?? "explorer");
 
   const links = {
+    "/quality": "Quality",
     ...(canReviewAnnotations && { "/review": "Review Queue" }),
     "/settings": "Settings",
   };

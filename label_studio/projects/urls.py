@@ -54,6 +54,9 @@ _api_urlpatterns = [
     # Annotation review and approval
     path('<int:pk>/annotations/review-queue/', tasks_api.AnnotationReviewQueueAPI.as_view(), name='annotation-review-queue'),
     path('<int:pk>/annotations/bulk-review/', tasks_api.AnnotationBulkReviewAPI.as_view(), name='annotation-bulk-review'),
+    # Quality control and metrics
+    path('<int:pk>/metrics/', tasks_api.ProjectMetricsAPI.as_view(), name='project-metrics'),
+    path('<int:pk>/annotator-metrics/', tasks_api.AnnotatorMetricsAPI.as_view(), name='project-annotator-metrics'),
 ]
 
 _api_urlpatterns_templates = [

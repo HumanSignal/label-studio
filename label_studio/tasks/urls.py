@@ -29,6 +29,8 @@ _api_annotations_urlpatterns = [
     path('<int:pk>/review/', api.AnnotationReviewAPI.as_view(), name='annotation-review'),
     path('<int:pk>/comments/', api.AnnotationCommentsListAPI.as_view(), name='annotation-comments-list'),
     path('<int:pk>/comments/bulk-resolve/', api.BulkResolveCommentsAPI.as_view(), name='annotation-comments-bulk-resolve'),
+    path('<int:pk>/metrics/', api.AnnotationMetricsAPI.as_view(), name='annotation-metrics'),
+    path('<int:pk>/quality-scores/', api.AnnotationQualityScoresAPI.as_view(), name='annotation-quality-scores'),
 ]
 
 _api_comments_urlpatterns = [

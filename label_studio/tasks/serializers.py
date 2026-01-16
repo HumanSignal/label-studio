@@ -24,7 +24,16 @@ from rest_framework.fields import SkipField
 from rest_framework.serializers import ModelSerializer
 from rest_framework.settings import api_settings
 from tasks.exceptions import AnnotationDuplicateError
-from tasks.models import Annotation, AnnotationComment, AnnotationDraft, Prediction, PredictionMeta, Task
+from tasks.models import (
+    Annotation,
+    AnnotationComment,
+    AnnotationDraft,
+    AnnotationMetrics,
+    Prediction,
+    PredictionMeta,
+    QualityScore,
+    Task,
+)
 from tasks.validation import TaskValidator
 from users.models import User
 from users.serializers import UserSerializer
@@ -1014,4 +1023,110 @@ class BulkResolveCommentsSerializer(serializers.Serializer):
         default=True,
         help_text='Whether to resolve or unresolve'
     )
+
+
+class AnnotationMetricsSerializer(ModelSerializer):
+    """Serializer for annotation metrics"""
+
+    class Meta:
+        model = AnnotationMetrics
+        fields = [
+            'id',
+            'annotation',
+            'time_spent',
+            'quality_score',
+            'accuracy_score',
+            'agreement_score',
+            'num_regions',
+            'num_revisions',
+            'is_outlier',
+            'needs_review',
+            'calculated_at',
+        ]
+        read_only_fields = ['id', 'calculated_at']
+
+
+class QualityScoreSerializer(ModelSerializer):
+    """Serializer for quality scores"""
+    reviewer = CommentAuthorSerializer(read_only=True)
+
+    class Meta:
+        model = QualityScore
+        fields = [
+            'id',
+            'annotation',
+            'reviewer',
+            'score',
+            'completeness_score',
+            'accuracy_score',
+            'consistency_score',
+            'feedback',
+            'created_at',
+            'updated_at',
+        ]
+        read_only_fields = ['id', 'reviewer', 'created_at', 'updated_at']
+
+
+class QualityScoreCreateSerializer(serializers.Serializer):
+    """Serializer for creating quality scores"""
+    score = serializers.IntegerField(
+        min_value=1,
+        max_value=5,
+        required=True,
+        help_text='Overall quality rating (1-5)'
+    )
+    completeness_score = serializers.IntegerField(
+        min_value=1,
+        max_value=5,
+        required=False,
+        allow_null=True,
+        help_text='Completeness rating (1-5)'
+    )
+    accuracy_score = serializers.IntegerField(
+        min_value=1,
+        max_value=5,
+        required=False,
+        allow_null=True,
+        help_text='Accuracy rating (1-5)'
+    )
+    consistency_score = serializers.IntegerField(
+        min_value=1,
+        max_value=5,
+        required=False,
+        allow_null=True,
+        help_text='Consistency rating (1-5)'
+    )
+    feedback = serializers.CharField(
+        required=False,
+        allow_blank=True,
+        help_text='Detailed feedback text'
+    )
+
+
+class AnnotatorMetricsSerializer(serializers.Serializer):
+    """Serializer for annotator performance metrics"""
+    annotator_id = serializers.IntegerField()
+    annotator_name = serializers.CharField()
+    total_annotations = serializers.IntegerField()
+    average_quality_score = serializers.FloatField()
+    average_accuracy_score = serializers.FloatField()
+    average_time_spent = serializers.FloatField()
+    approval_rate = serializers.FloatField()
+    rejection_rate = serializers.FloatField()
+    annotations_per_day = serializers.FloatField()
+
+
+class ProjectMetricsSerializer(serializers.Serializer):
+    """Serializer for project-level metrics"""
+    total_annotations = serializers.IntegerField()
+    total_tasks = serializers.IntegerField()
+    completion_rate = serializers.FloatField()
+    average_quality_score = serializers.FloatField()
+    average_agreement_score = serializers.FloatField()
+    annotations_needing_review = serializers.IntegerField()
+    outlier_count = serializers.IntegerField()
+    annotator_count = serializers.IntegerField()
+    avg_annotations_per_annotator = serializers.FloatField()
+
+
 TaskSerializerBulk = load_func(settings.TASK_SERIALIZER_BULK)

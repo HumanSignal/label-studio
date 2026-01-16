@@ -1670,4 +1670,182 @@ class AnnotationComment(models.Model):
         for reply in self.replies.all():
             replies.extend(reply.get_all_replies())
         return replies
+
+
+class AnnotationMetrics(models.Model):
+    """Quality metrics for annotations"""
+
+    annotation = models.OneToOneField(
+        'Annotation',
+        on_delete=models.CASCADE,
+        related_name='metrics',
+        help_text='Annotation these metrics belong to'
+    )
+
+    # Time metrics
+    time_spent = models.FloatField(
+        _('time spent'),
+        null=True,
+        blank=True,
+        help_text='Time spent on annotation in seconds'
+    )
+
+    # Quality scores
+    quality_score = models.FloatField(
+        _('quality score'),
+        null=True,
+        blank=True,
+        help_text='Overall quality score (0-100)'
+    )
+
+    accuracy_score = models.FloatField(
+        _('accuracy score'),
+        null=True,
+        blank=True,
+        help_text='Accuracy compared to ground truth (0-100)'
+    )
+
+    agreement_score = models.FloatField(
+        _('agreement score'),
+        null=True,
+        blank=True,
+        help_text='Inter-annotator agreement score (0-100)'
+    )
+
+    # Complexity metrics
+    num_regions = models.IntegerField(
+        _('number of regions'),
+        default=0,
+        help_text='Number of labeled regions in annotation'
+    )
+
+    num_revisions = models.IntegerField(
+        _('number of revisions'),
+        default=0,
+        help_text='Number of times annotation was revised'
+    )
+
+    # Flags
+    is_outlier = models.BooleanField(
+        _('is outlier'),
+        default=False,
+        help_text='Whether this annotation is statistical outlier'
+    )
+
+    needs_review = models.BooleanField(
+        _('needs review'),
+        default=False,
+        help_text='Whether this annotation needs quality review'
+    )
+
+    # Metadata
+    calculated_at = models.DateTimeField(
+        _('calculated at'),
+        auto_now=True,
+        help_text='Last time metrics were calculated'
+    )
+
+    class Meta:
+        db_table = 'annotation_metrics'
+        verbose_name_plural = 'Annotation metrics'
+        indexes = [
+            models.Index(fields=['annotation']),
+            models.Index(fields=['quality_score']),
+            models.Index(fields=['accuracy_score']),
+            models.Index(fields=['agreement_score']),
+            models.Index(fields=['is_outlier']),
+            models.Index(fields=['needs_review']),
+        ]
+
+    def __str__(self):
+        return f'Metrics for Annotation {self.annotation_id}'
+
+    @property
+    def project(self):
+        """Get the project this metrics belong to"""
+        return self.annotation.project
+
+
+class QualityScore(models.Model):
+    """Quality evaluation from reviewers"""
+
+    SCORE_CHOICES = [
+        (1, 'Poor'),
+        (2, 'Below Average'),
+        (3, 'Average'),
+        (4, 'Good'),
+        (5, 'Excellent'),
+    ]
+
+    annotation = models.ForeignKey(
+        'Annotation',
+        on_delete=models.CASCADE,
+        related_name='quality_scores',
+        help_text='Annotation being evaluated'
+    )
+
+    reviewer = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='quality_reviews',
+        help_text='Reviewer who evaluated quality'
+    )
+
+    score = models.IntegerField(
+        _('quality score'),
+        choices=SCORE_CHOICES,
+        help_text='Quality rating from 1 (poor) to 5 (excellent)'
+    )
+
+    # Detailed scoring criteria
+    completeness_score = models.IntegerField(
+        _('completeness'),
+        choices=SCORE_CHOICES,
+        null=True,
+        blank=True,
+        help_text='How complete is the annotation'
+    )
+
+    accuracy_score = models.IntegerField(
+        _('accuracy'),
+        choices=SCORE_CHOICES,
+        null=True,
+        blank=True,
+        help_text='How accurate is the annotation'
+    )
+
+    consistency_score = models.IntegerField(
+        _('consistency'),
+        choices=SCORE_CHOICES,
+        null=True,
+        blank=True,
+        help_text='How consistent with guidelines'
+    )
+
+    feedback = models.TextField(
+        _('feedback'),
+        blank=True,
+        help_text='Detailed feedback for annotator'
+    )
+
+    created_at = models.DateTimeField(_('created at'), auto_now_add=True)
+    updated_at = models.DateTimeField(_('updated at'), auto_now=True)
+
+    class Meta:
+        db_table = 'quality_score'
+        unique_together = ['annotation', 'reviewer']
+        ordering = ['-created_at']
+        indexes = [
+            models.Index(fields=['annotation', 'created_at']),
+            models.Index(fields=['reviewer']),
+            models.Index(fields=['score']),
+        ]
+
+    def __str__(self):
+        return f'Quality Score {self.score}/5 for Annotation {self.annotation_id}'
+
+    @property
+    def project(self):
+        """Get the project this quality score belongs to"""
+        return self.annotation.project
 Q_task_finished_annotations = Q(annotations__was_cancelled=False) & Q(annotations__result__isnull=False)

@@ -1,0 +1,106 @@
+.quality-dashboard {
+  padding: 24px;
+  background-color: #f0f2f5;
+  min-height: 100vh;
+
+  .dashboard-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 24px;
+
+    h3 {
+      margin: 0;
+      display: flex;
+      align-items: center;
+    }
+
+    .refresh-button {
+      padding: 8px 16px;
+      border: 1px solid #d9d9d9;
+      border-radius: 4px;
+      background-color: #fff;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+      transition: all 0.3s;
+
+      &:hover:not(:disabled) {
+        border-color: #40a9ff;
+        color: #40a9ff;
+      }
+
+      &:disabled {
+        cursor: not-allowed;
+        opacity: 0.6;
+      }
+    }
+  }
+
+  .metrics-row {
+    margin-bottom: 24px;
+
+    .ant-card {
+      height: 100%;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+      transition: box-shadow 0.3s;
+
+      &:hover {
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.09);
+      }
+    }
+  }
+
+  .annotator-metrics-card {
+    margin-bottom: 24px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+
+    .quality-score-cell {
+      min-width: 120px;
+    }
+
+    .ant-progress {
+      margin: 0;
+    }
+  }
+
+  .insights-card {
+    margin-bottom: 16px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+
+    .insight-item {
+      display: flex;
+      align-items: flex-start;
+      padding: 12px;
+      border-radius: 4px;
+
+      &.warning {
+        background-color: #fffbe6;
+        border-left: 4px solid #faad14;
+        color: #ad6800;
+      }
+
+      &.info {
+        background-color: #e6f7ff;
+        border-left: 4px solid #1890ff;
+        color: #0050b3;
+      }
+
+      &.error {
+        background-color: #fff1f0;
+        border-left: 4px solid #ff4d4f;
+        color: #a8071a;
+      }
+    }
+  }
+}
+
+.quality-dashboard-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  background-color: #f0f2f5;
+}

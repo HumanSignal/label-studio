@@ -9,6 +9,7 @@ import { useContextProps } from "../../providers/RoutesProvider";
 import { cn } from "../../utils/bem";
 import { CreateProject } from "../CreateProject/CreateProject";
 import { DataManagerPage } from "../DataManager/DataManager";
+import { QualityDashboard } from "../QualityDashboard";
 import { ReviewQueue } from "../ReviewQueue";
 import { SettingsPage } from "../Settings";
 import { EmptyProjectsList, ProjectsList } from "./ProjectsList";
@@ -157,6 +158,7 @@ ProjectsPage.routes = ({ store }) => [
     },
     pages: {
       DataManagerPage,
+      QualityDashboard,
       ReviewQueue,
       SettingsPage,
     },
