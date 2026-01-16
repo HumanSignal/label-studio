@@ -372,12 +372,20 @@ const Model = types
       },
 
       setFrame(frame) {
-        if (self.frame !== frame && self.framerate) {
+        if (self.frame !== frame && self.framerate && self.ref.current) {
           self.frame = frame;
-          if (isFF(FF_VIDEO_FRAME_SEEK_PRECISION)) {
-            self.ref.current.goToFrame(frame);
-          } else {
-            self.ref.current.currentTime = frame / self.framerate;
+
+          // Seek immediately - batching is handled at a higher level
+          if (!self.ref.current) return;
+
+          try {
+            if (isFF(FF_VIDEO_FRAME_SEEK_PRECISION)) {
+              self.ref.current.goToFrame(frame);
+            } else {
+              self.ref.current.currentTime = frame / self.framerate;
+            }
+          } catch (error) {
+            console.warn("Error seeking video:", error);
           }
         }
       },

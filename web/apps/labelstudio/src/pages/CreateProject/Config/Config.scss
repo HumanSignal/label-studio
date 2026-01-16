@@ -22,19 +22,28 @@ $scroll-width: 5px;
   min-height: 0;
   display: flex;
   align-items: stretch;
+  position: relative;
 
   >* {
     flex: 50%;
+    min-width: 0;
   }
 }
 
 .wizard .configure__container {
-  display: flex;
-  flex-direction: column;
-  padding: 16px 16px - $scroll-width 16px 20px;
+  display: grid;
+  position: relative;
+  padding: 0;
   overflow-y: scroll;
   background-color: var(--color-neutral-background);
-  gap: var(--spacing-base);
+
+  & > div {
+    padding: var(--spacing-base) 24px - $scroll-width var(--spacing-base) 20px;
+
+    &:first-child {
+      height: calc(100vh - var(--header-height));
+    }
+  }
 
   &::-webkit-scrollbar {
     width: $scroll-width;
@@ -45,21 +54,29 @@ $scroll-width: 5px;
   }
 }
 
+// Apply max-height only in Create Project wizard context (not in Labeling Settings)
+.create-project .wizard .configure__container > div {
+  --create-project-header-height: 73px;
+  --create-project-modal-padding: calc(var(--spacing-widest) * 2);
+
+  max-height: calc(100vh - var(--create-project-header-height) - var(--create-project-modal-padding));
+}
+
 .templates-list {
   display: grid;
   height: 100%;
   grid-template: 1fr auto / 224px auto;
 
   &__sidebar {
-    padding: 16px 8px 16px 32px;
+    padding: var(--spacing-base) var(--spacing-tight) var(--spacing-base) var(--spacing-wider);
 
     h3:not(:first-child) {
-      margin-top: 2em;
+      margin-top: var(--spacing-wide);
     }
 
     .templates-list__custom-template {
       margin-top: 20px;
-      padding-left: 8px;
+      padding-left: var(--spacing-tight);
       font-weight: 500;
       border: none;
       color: var(--grape_500);
@@ -227,6 +244,7 @@ $scroll-width: 5px;
   width: 100%;
   display: flex;
   color: var(--color-neutral-content);
+  padding: 0 var(--spacing-tighter);
 }
 
 .wizard h1 a[name="config"] {
@@ -250,10 +268,11 @@ $scroll-width: 5px;
   line-height: 1;
 }
 
-.configure__container>header {
+.configure__container > div > header {
   display: flex;
   justify-content: flex-end;
   align-items: center;
+  padding: var(--spacing-tight) var(--spacing-tighter);
 }
 
 .configure__editor {
@@ -272,7 +291,7 @@ $scroll-width: 5px;
   }
 }
 
-.configure__container>header .toggle-items {
+.configure__container > div > header .toggle-items {
   margin-left: auto;
 }
 
@@ -288,6 +307,8 @@ $scroll-width: 5px;
 }
 
 .wizard .configure__visual {
+  padding: 0 var(--spacing-tighter);
+
   >* {
     border-top: 1px solid var(--color-neutral-border);
     padding-top: 16px;
@@ -307,6 +328,8 @@ $scroll-width: 5px;
 
   input,
   select {
+    flex: 1;
+    min-width: 160px;
     padding: 4px 8px;
     font: inherit;
     color: inherit;
@@ -321,14 +344,28 @@ $scroll-width: 5px;
     color: var(--color-neutral-content);
   }
 
-  >p {
+  &>p {
     line-height: 32px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--spacing-tight);
     color: var(--color-neutral-content-subtler);
+
+    button {
+      min-width: 160px;
+      flex: 1;
+    }
+
+    .input-ls {
+      min-width: 160px;
+      flex: 1;
+      margin-left: 0;
+    }
   }
 
-  >p.configure__object-error {
-    line-height: 22px;
-    margin-top: 8px;
+  &>p.configure__object-error {
+    line-height: 140%;
     color: var(--color-negative-content);
   }
 
@@ -349,7 +386,8 @@ $scroll-width: 5px;
 
 .wizard .configure__labels {
   display: flex;
-  max-height: 200px;
+  flex-flow: row wrap;
+  gap: var(--spacing-base);
 }
 
 .wizard .configure__add-labels {
@@ -357,6 +395,7 @@ $scroll-width: 5px;
   flex-direction: column;
   align-items: flex-start;
   flex: 1;
+  min-width: 300px;
 
   span {
     color: var(--color-neutral-content-subtler);
@@ -369,6 +408,7 @@ $scroll-width: 5px;
     background: var(--color-neutral-surface);
     color: var(--color-neutral-content);
     font: inherit;
+    width: 100%;
   }
 }
 
@@ -383,19 +423,18 @@ $scroll-width: 5px;
   flex: 1;
   display: flex;
   flex-direction: column;
-  overflow-x: hidden;
   margin-right: 8px;
+  min-width: 225px;
 
   h3 {
     font-size: 16px;
-    margin: 0 32px 7px;
+    padding-bottom: var(--spacing-tighter);
     color: var(--color-neutral-content);
   }
 }
 
 .wizard .configure__labels ul {
-  overflow-y: scroll;
-  padding: 0 2em;
+  padding: 0 var(--spacing-tight);
   margin: 0;
   list-style: none;
   min-width: 140px;
@@ -538,18 +577,17 @@ $scroll-width: 5px;
 }
 
 .wizard .configure__preview {
-  background-color: var(--color-neutral-surface);
   flex-grow: 10;
-  min-width: 500px;
-  padding: 16px 16px 0;
+  min-width: 468px;
+  padding: 0;
   overflow-y: auto;
-  border-left: 1px solid var(--color-neutral-border);
   display: flex;
   flex-direction: column;
   color: var(--color-neutral-content);
+  height: 100%;
 
   h3 {
-    margin: 8px 0 16px;
+    padding: var(--spacing-tight) 0;
     font-size: 16px;
     color: var(--color-neutral-content);
   }
@@ -563,6 +601,10 @@ $scroll-width: 5px;
   &-ui {
     flex: 1;
     min-height: 0;
+    background-color: var(--color-neutral-surface);
+    border: 1px solid var(--color-neutral-border);
+    border-radius: var(--corner-radius-small);
+    padding: var(--spacing-base);
   }
 
   &-error {
@@ -606,4 +648,10 @@ div[class^="App_menu"]>div {
 :global(input.lsf-configure__add:hover) {
   color: var(--color-neutral-content);
   background: var(--color-primary-emphasis-subtle);
+}
+
+.form {
+  &__submit {
+    gap: var(--spacing-base);
+  }
 }
