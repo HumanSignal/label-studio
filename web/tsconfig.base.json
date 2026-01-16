@@ -13,6 +13,8 @@
     "jsx": "react",
     "target": "esnext",
     "module": "esnext",
+    "strict": true,
+    "forceConsistentCasingInFileNames": true,
     "lib": [
       "es2020",
       "dom",
@@ -57,9 +59,7 @@
         "libs/ui/src/*"
       ]
     },
-    "types": [
-      "vite-plugin-svgr/client"
-    ],
+    "types": [],
     "plugins": [
       {
         "name": "typescript-plugin-css-modules",

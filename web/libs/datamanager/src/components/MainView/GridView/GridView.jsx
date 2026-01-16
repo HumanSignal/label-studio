@@ -14,6 +14,7 @@ import { GridViewContext, GridViewProvider } from "./GridPreview";
 import "./GridView.scss";
 import { groupBy } from "../../../utils/utils";
 import { IMAGE_SIZE_COEFFICIENT } from "../../DataGroups/ImageDataGroup";
+import { Spinner } from "../../Common/Spinner";
 
 const NO_IMAGE_CELL_HEIGHT = 250;
 const CELL_HEADER_HEIGHT = 32;
@@ -306,31 +307,51 @@ export const GridView = observer(({ data, view, loadMore, fields, onChange, hidd
       <div className={cn("grid-view").mod({ columnCount }).toClassName()}>
         <AutoSizer className={cn("grid-view").elem("resize").toClassName()}>
           {({ width, height }) => (
-            <InfiniteLoader
-              itemCount={itemCount}
-              isItemLoaded={isItemLoaded}
-              loadMoreItems={customLoadMore}
-              threshold={Math.max(1, Math.floor(view.dataStore.pageSize / 4))}
-              minimumBatchSize={Math.max(1, Math.floor(view.dataStore.pageSize / 2))}
-            >
-              {({ onItemsRendered, ref }) => (
-                <FixedSizeGrid
-                  className={cn("grid-view").elem("list").toClassName()}
-                  ref={ref}
-                  width={width}
-                  height={height}
-                  rowHeight={finalRowHeight}
-                  overscanRowCount={Math.max(2, Math.floor(view.dataStore.pageSize / 2))}
-                  columnCount={columnCount}
-                  rowCount={loadedRows}
-                  columnWidth={width / columnCount - 9.5}
-                  onItemsRendered={onItemsRenderedWrap(onItemsRendered)}
-                  style={{ overflowX: "hidden" }}
+            <div style={{ position: "relative", width, height }}>
+              <InfiniteLoader
+                itemCount={itemCount}
+                isItemLoaded={isItemLoaded}
+                loadMoreItems={customLoadMore}
+                threshold={Math.max(1, Math.floor(view.dataStore.pageSize / 4))}
+                minimumBatchSize={Math.max(1, Math.floor(view.dataStore.pageSize / 2))}
+              >
+                {({ onItemsRendered, ref }) => (
+                  <FixedSizeGrid
+                    className={cn("grid-view").elem("list").toClassName()}
+                    ref={ref}
+                    width={width}
+                    height={height}
+                    rowHeight={finalRowHeight}
+                    overscanRowCount={Math.max(2, Math.floor(view.dataStore.pageSize / 2))}
+                    columnCount={columnCount}
+                    rowCount={loadedRows}
+                    columnWidth={width / columnCount - 9.5}
+                    onItemsRendered={onItemsRenderedWrap(onItemsRendered)}
+                    style={{ overflowX: "hidden" }}
+                  >
+                    {renderItem}
+                  </FixedSizeGrid>
+                )}
+              </InfiniteLoader>
+              {view.dataStore.loading && data.length > 0 && view.dataStore.hasNextPage && (
+                <div
+                  style={{
+                    position: "absolute",
+                    bottom: 0,
+                    left: 0,
+                    right: 0,
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    padding: "16px",
+                    backgroundColor: "rgba(255, 255, 255, 0.9)",
+                    pointerEvents: "none",
+                  }}
                 >
-                  {renderItem}
-                </FixedSizeGrid>
+                  <Spinner size="small" />
+                </div>
               )}
-            </InfiniteLoader>
+            </div>
           )}
         </AutoSizer>
       </div>

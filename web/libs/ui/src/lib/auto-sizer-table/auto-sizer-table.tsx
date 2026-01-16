@@ -14,6 +14,7 @@ export interface AutoSizerTableProps {
   className?: string;
   children: FC<any>;
   heightAdjustment?: number;
+  isLoading?: boolean;
 }
 
 export const AutoSizerTable = forwardRef<VariableSizeList, AutoSizerTableProps>(
@@ -28,10 +29,13 @@ export const AutoSizerTable = forwardRef<VariableSizeList, AutoSizerTableProps>(
       className,
       children: ItemWrapper,
       heightAdjustment = 0,
+      isLoading = false,
       ...rest
     },
     ref: ForwardedRef<VariableSizeList>,
   ) => {
+    // Enhance itemData with isLoading state
+    const enhancedItemData = { ...itemData, isLoading };
     return (
       <AutoSizer className={clsx(className)}>
         {({ width, height }) => {
@@ -56,7 +60,7 @@ export const AutoSizerTable = forwardRef<VariableSizeList, AutoSizerTableProps>(
                     width={width}
                     height={adjustedHeight}
                     itemCount={totalCount}
-                    itemData={itemData}
+                    itemData={enhancedItemData}
                     itemSize={itemSize}
                     onItemsRendered={onItemsRendered}
                     initialScrollOffset={initialScrollOffset?.(adjustedHeight) ?? 0}

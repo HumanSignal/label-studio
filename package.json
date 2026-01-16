@@ -1,0 +1,6 @@
+{
+  "devDependencies": {
+    "@types/node": "^25.0.8",
+    "vite-plugin-svgr": "^4.5.0"
+  }
+}
