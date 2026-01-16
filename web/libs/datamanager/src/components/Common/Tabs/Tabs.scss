@@ -47,7 +47,8 @@
     }
 
     &:hover {
-      background-color: var(--color-neutral-background);
+      background-color: var(--color-primary-emphasis-subtle);
+      box-shadow: -1px 0 0 var(--color-primary-border-subtler) inset, 1px 0 0 var(--color-primary-border-subtler) inset, 0 1px 0 var(--color-primary-border-subtler) inset, 0 -1px 0 var(--color-neutral-border) inset;
 
       & .tabs-dm__item-right {
         opacity: 1;
@@ -60,6 +61,11 @@
       cursor: default;
       background-color: var(--color-neutral-background);
       box-shadow: -1px 0 0 var(--color-neutral-border) inset, 1px 0 0 var(--color-neutral-border) inset, 0 1px 0 var(--color-neutral-border) inset;
+
+      &:hover {
+        background-color: var(--color-neutral-background);
+        box-shadow: -1px 0 0 var(--color-neutral-border) inset, 1px 0 0 var(--color-neutral-border) inset, 0 1px 0 var(--color-neutral-border) inset;
+      }
     }
 
     &_virtual {
