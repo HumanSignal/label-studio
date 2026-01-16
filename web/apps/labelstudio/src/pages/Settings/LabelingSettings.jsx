@@ -2,12 +2,14 @@ import { useCallback, useMemo, useState } from "react";
 import { useUpdatePageTitle, createTitleFromSegments } from "@humansignal/core";
 import { useAPI } from "../../providers/ApiProvider";
 import { useProject } from "../../providers/ProjectProvider";
+import { useProjectPermissions } from "../../hooks/useProjectPermissions";
 import { FF_UNSAVED_CHANGES, isFF } from "../../utils/feature-flags";
 import { isEmptyString } from "../../utils/helpers";
 import { ConfigPage } from "../CreateProject/Config/Config";
 
 export const LabelingSettings = () => {
   const { project, fetchProject, updateProject } = useProject();
+  const { canEditProject } = useProjectPermissions();
   const [config, setConfig] = useState("");
   const [essentialDataChanged, setEssentialDataChanged] = useState(false);
   const hasChanges = isFF(FF_UNSAVED_CHANGES) && config !== project.label_config;
@@ -87,6 +89,7 @@ export const LabelingSettings = () => {
       onSaveClick={onSave}
       onValidate={onValidate}
       hasChanges={hasChanges}
+      disableSaveButton={!canEditProject}
     />
   );
 };

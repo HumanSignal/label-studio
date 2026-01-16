@@ -26,6 +26,7 @@ export const StorageSet = forwardRef(
       loading,
       loaded,
       fetchStorages,
+      canEdit = true,
     },
     ref,
   ) => {
@@ -128,7 +129,7 @@ export const StorageSet = forwardRef(
         <div className={rootClass.elem("controls")}>
           <Button
             onClick={() => showStorageFormModal()}
-            disabled={loading}
+            disabled={loading || !canEdit}
             look="outlined"
             data-testid={`add-${target === "export" ? "target" : "source"}-storage-button`}
             aria-label={`Add ${target === "export" ? "Target" : "Source"} Storage`}
@@ -151,6 +152,7 @@ export const StorageSet = forwardRef(
               storageTypes={storageTypes}
               onEditStorage={onEditStorage}
               onDeleteStorage={onDeleteStorage}
+              canEdit={canEdit}
             />
           ))
         )}

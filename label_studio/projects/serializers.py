@@ -29,7 +29,7 @@ from label_studio_sdk.label_interface.control_tags import (
     TimeSeriesLabelsTag,
     VideoRectangleTag,
 )
-from projects.models import Project, ProjectImport, ProjectOnboarding, ProjectReimport, ProjectSummary
+from projects.models import Project, ProjectImport, ProjectMember, ProjectOnboarding, ProjectReimport, ProjectSummary
 from rest_flex_fields import FlexFieldsModelSerializer
 from rest_framework import serializers
 from rest_framework.serializers import SerializerMethodField
@@ -101,6 +101,9 @@ class ProjectSerializer(FlexFieldsModelSerializer):
     queue_total = serializers.SerializerMethodField()
     queue_done = serializers.SerializerMethodField()
     state = FSMStateField(read_only=True)  # FSM state - automatically uses annotation if present
+    current_user_role = serializers.SerializerMethodField(
+        read_only=True, help_text="Current user's role in this project (owner, reviewer, or annotator)"
+    )
 
     @property
     def user_id(self):
@@ -312,6 +315,13 @@ class ProjectSerializer(FlexFieldsModelSerializer):
 
         return result
 
+    def get_current_user_role(self, project):
+        """Get current user's role in this project"""
+        request = self.context.get('request')
+        if request and request.user.is_authenticated:
+            return project.get_user_role(request.user)
+        return None
+
 
 class ProjectCountsSerializer(ProjectSerializer):
     class Meta:
@@ -438,3 +448,89 @@ class GetFieldsSerializer(serializers.Serializer):
     def validate_filter(self, value):
         if value in ['all', 'pinned_only', 'exclude_pinned']:
             return value
+
+
+class ProjectMemberSerializer(serializers.ModelSerializer):
+    """Serializer for project members with role information"""
+
+    user = UserSimpleSerializer(read_only=True)
+    user_id = serializers.IntegerField(write_only=True, help_text='User ID to add as project member')
+    role = serializers.ChoiceField(
+        choices=ProjectMember.ROLE_CHOICES,
+        default=ProjectMember.ANNOTATOR,
+        help_text='Role of the user in the project',
+    )
+
+    class Meta:
+        model = ProjectMember
+        fields = ['id', 'user', 'user_id', 'project', 'role', 'enabled', 'created_at', 'updated_at']
+        read_only_fields = ['id', 'created_at', 'updated_at', 'project']
+
+    def validate_user_id(self, value):
+        """Ensure user exists"""
+        from users.models import User
+
+        if not User.objects.filter(id=value).exists():
+            raise serializers.ValidationError('User does not exist')
+        return value
+
+    def validate(self, attrs):
+        """Ensure user is in the same organization as the project"""
+        from users.models import User
+
+        user_id = attrs.get('user_id')
+        project = self.context.get('project') or (self.instance.project if self.instance else None)
+
+        if not project:
+            raise serializers.ValidationError('Project context is required')
+
+        user = User.objects.get(id=user_id)
+
+        # Check if user is in the same organization
+        if user.active_organization != project.organization:
+            raise serializers.ValidationError(
+                'User must belong to the same organization as the project'
+            )
+
+        # Check for duplicate membership
+        if ProjectMember.objects.filter(user=user, project=project, enabled=True).exists():
+            raise serializers.ValidationError('User is already a member of this project')
+
+        return attrs
+
+
+class ProjectMemberUpdateSerializer(serializers.ModelSerializer):
+    """Serializer for updating project member role only"""
+
+    role = serializers.ChoiceField(
+        choices=ProjectMember.ROLE_CHOICES,
+        help_text='New role for the project member',
+    )
+
+    class Meta:
+        model = ProjectMember
+        fields = ['role']
+
+    def validate_role(self, value):
+        """Validate role change is allowed"""
+        instance = self.instance
+        request = self.context.get('request')
+
+        if not instance or not request:
+            return value
+
+        # Prevent changing own role
+        if instance.user == request.user:
+            raise serializers.ValidationError('You cannot change your own role')
+
+        # Ensure at least one owner remains if demoting an owner
+        if instance.role == ProjectMember.OWNER and value != ProjectMember.OWNER:
+            owner_count = ProjectMember.objects.filter(
+                project=instance.project, role=ProjectMember.OWNER, enabled=True
+            ).count()
+            if owner_count <= 1:
+                raise serializers.ValidationError(
+                    'Cannot change role: Project must have at least one owner'
+                )
+
+        return value

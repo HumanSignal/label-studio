@@ -16,6 +16,7 @@ import { useEffect, useRef } from "react";
 import { useHistory, useLocation } from "react-router-dom";
 import { useUpdatePageTitle, createTitleFromSegments } from "@humansignal/core";
 import { useProject } from "../../../providers/ProjectProvider";
+import { useProjectPermissions } from "../../../hooks/useProjectPermissions";
 import { cn } from "../../../utils/bem";
 import { StorageSet } from "./StorageSet";
 import { useStorageCard } from "./hooks/useStorageCard";
@@ -23,6 +24,7 @@ import "./StorageSettings.scss";
 
 export const StorageSettings = () => {
   const { project } = useProject();
+  const { canEditProject } = useProjectPermissions();
   const rootClass = cn("storage-settings"); // TODO: Remove in the next BEM cleanup
   const history = useHistory();
   const location = useLocation();
@@ -86,6 +88,7 @@ export const StorageSettings = () => {
             loading={sourceStorage.loading}
             loaded={sourceStorage.loaded}
             fetchStorages={sourceStorage.fetchStorages}
+            canEdit={canEditProject}
           />
 
           <StorageSet
@@ -100,6 +103,7 @@ export const StorageSettings = () => {
             loading={targetStorage.loading}
             loaded={targetStorage.loaded}
             fetchStorages={targetStorage.fetchStorages}
+            canEdit={canEditProject}
           />
         </div>
       </div>
@@ -144,6 +148,7 @@ export const StorageSettings = () => {
                   data-testid="add-source-storage-button-empty-state"
                   aria-label="Add Source Storage"
                   onClick={() => sourceStorageRef.current?.openAddModal()}
+                  disabled={!canEditProject}
                 >
                   Add Source Storage
                 </Button>
@@ -152,6 +157,7 @@ export const StorageSettings = () => {
                   data-testid="add-target-storage-button-empty-state"
                   aria-label="Add Target Storage"
                   onClick={() => targetStorageRef.current?.openAddModal()}
+                  disabled={!canEditProject}
                 >
                   Add Target Storage
                 </Button>

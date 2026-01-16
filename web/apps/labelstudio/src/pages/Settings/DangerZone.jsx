@@ -10,6 +10,7 @@ import { Space } from "../../components/Space/Space";
 import { Spinner } from "../../components/Spinner/Spinner";
 import { useAPI } from "../../providers/ApiProvider";
 import { useProject } from "../../providers/ProjectProvider";
+import { useProjectPermissions } from "../../hooks/useProjectPermissions";
 import { cn } from "../../utils/bem";
 
 export const DangerZone = () => {
@@ -18,6 +19,7 @@ export const DangerZone = () => {
   const history = useHistory();
   const toast = useToast();
   const [processing, setProcessing] = useState(null);
+  const { canDeleteProject } = useProjectPermissions();
 
   useUpdatePageTitle(createTitleFromSegments([project?.title, "Danger Zone"]));
 
@@ -161,21 +163,22 @@ export const DangerZone = () => {
     () => [
       {
         type: "annotations",
-        disabled: true, //&& !project.total_annotations_number,
+        disabled: !canDeleteProject || true, //&& !project.total_annotations_number,
         label: `Delete ${project.total_annotations_number} Annotations`,
       },
       {
         type: "tasks",
-        disabled: true, //&& !project.task_number,
+        disabled: !canDeleteProject || true, //&& !project.task_number,
         label: `Delete ${project.task_number} Tasks`,
       },
       {
         type: "predictions",
-        disabled: true, //&& !project.total_predictions_number,
+        disabled: !canDeleteProject || true, //&& !project.total_predictions_number,
         label: `Delete ${project.total_predictions_number} Predictions`,
       },
       {
         type: "reset_cache",
+        disabled: !canDeleteProject,
         help:
           "Reset Cache may help in cases like if you are unable to modify the labeling configuration due " +
           "to validation errors concerning existing labels, but you are confident that the labels don't exist. You can " +
@@ -184,16 +187,18 @@ export const DangerZone = () => {
       },
       {
         type: "tabs",
+        disabled: !canDeleteProject,
         help: "If the Data Manager is not loading, dropping all Data Manager tabs can help.",
         label: "Drop All Tabs",
       },
       {
         type: "project",
+        disabled: !canDeleteProject,
         help: "Deleting a project removes all tasks, annotations, and project data from the database.",
         label: "Delete Project",
       },
     ],
-    [project],
+    [project, canDeleteProject],
   );
 
   return (

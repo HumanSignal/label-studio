@@ -63,10 +63,9 @@ const WebhookListItem = ({ webhook, onSelectActive, onActiveChange, onDelete, ca
   );
 };
 
-const WebhookList = ({ onSelectActive, onAddWebhook, webhooks, fetchWebhooks }) => {
+const WebhookList = ({ onSelectActive, onAddWebhook, webhooks, fetchWebhooks, canEdit = true }) => {
   const api = useAPI();
-  const { permissions } = useAuth();
-  const canChangeWebhooks = permissions.can(ABILITY.can_change_webhooks);
+  const canChangeWebhooks = canEdit;
 
   if (webhooks === null) return <></>;
 

@@ -4,6 +4,7 @@ import { Button } from "@humansignal/ui";
 import { Form, Input, TextArea } from "../../components/Form";
 import { RadioGroup } from "../../components/Form/Elements/RadioGroup/RadioGroup";
 import { ProjectContext } from "../../providers/ProjectProvider";
+import { useProjectPermissions } from "../../hooks/useProjectPermissions";
 import { cn } from "../../utils/bem";
 import { HeidiTips } from "../../components/HeidiTips/HeidiTips";
 import { FF_LSDV_E_297, isFF } from "../../utils/feature-flags";
@@ -11,6 +12,7 @@ import { createURL } from "../../components/HeidiTips/utils";
 
 export const GeneralSettings = () => {
   const { project, fetchProject } = useContext(ProjectContext);
+  const { canEditProject } = useProjectPermissions();
 
   const updateProject = useCallback(() => {
     if (project.id) fetchProject(project.id, true);
@@ -30,9 +32,9 @@ export const GeneralSettings = () => {
         <div className={cn("settings-wrapper").toClassName()}>
           <Form action="updateProject" formData={{ ...project }} params={{ pk: project.id }} onSubmit={updateProject}>
             <Form.Row columnCount={1} rowGap="16px">
-              <Input name="title" label="Project Name" />
+              <Input name="title" label="Project Name" disabled={!canEditProject} />
 
-              <TextArea name="description" label="Description" style={{ minHeight: 128 }} />
+              <TextArea name="description" label="Description" style={{ minHeight: 128 }} disabled={!canEditProject} />
               {isFF(FF_LSDV_E_297) && (
                 <div className={cn("workspace-placeholder").toClassName()}>
                   <div className={cn("workspace-placeholder").elem("badge-wrapper").toClassName()}>
@@ -59,7 +61,7 @@ export const GeneralSettings = () => {
                   </Typography>
                 </div>
               )}
-              <RadioGroup name="color" label="Color" size="large" labelProps={{ size: "large" }}>
+              <RadioGroup name="color" label="Color" size="large" labelProps={{ size: "large" }} disabled={!canEditProject}>
                 {colors.map((color) => (
                   <RadioGroup.Button key={color} value={color}>
                     <div className={cn("color").toClassName()} style={{ "--background": color }} />
@@ -67,7 +69,7 @@ export const GeneralSettings = () => {
                 ))}
               </RadioGroup>
 
-              <RadioGroup label="Task Sampling" labelProps={{ size: "large" }} name="sampling" simple>
+              <RadioGroup label="Task Sampling" labelProps={{ size: "large" }} name="sampling" simple disabled={!canEditProject}>
                 {samplings.map(({ value, label, description }) => (
                   <RadioGroup.Button
                     key={value}
@@ -110,7 +112,7 @@ export const GeneralSettings = () => {
               <Form.Indicator>
                 <span case="success">Saved!</span>
               </Form.Indicator>
-              <Button type="submit" className="w-[150px]" aria-label="Save general settings">
+              <Button type="submit" className="w-[150px]" aria-label="Save general settings" disabled={!canEditProject}>
                 Save
               </Button>
             </Form.Actions>

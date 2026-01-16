@@ -13,7 +13,7 @@ import { cn } from "../../../utils/bem";
 
 import "./MachineLearningList.scss";
 
-export const MachineLearningList = ({ backends, fetchBackends, onEdit, onTestRequest, onStartTraining }) => {
+export const MachineLearningList = ({ backends, fetchBackends, onEdit, onTestRequest, onStartTraining, canEdit = true }) => {
   const api = useContext(ApiContext);
 
   const onDeleteModel = useCallback(
@@ -38,13 +38,14 @@ export const MachineLearningList = ({ backends, fetchBackends, onEdit, onTestReq
           onDelete={onDeleteModel}
           onEdit={onEdit}
           onTestRequest={onTestRequest}
+          canEdit={canEdit}
         />
       ))}
     </div>
   );
 };
 
-const BackendCard = ({ backend, onStartTrain, onEdit, onDelete, onTestRequest }) => {
+const BackendCard = ({ backend, onStartTrain, onEdit, onDelete, onTestRequest, canEdit = true }) => {
   const confirmDelete = useCallback(
     (backend) => {
       confirm({
@@ -69,26 +70,28 @@ const BackendCard = ({ backend, onStartTrain, onEdit, onDelete, onTestRequest })
           <div className={rootClass.elem("title")}>{backend.title}</div>
         </div>
 
-        <div className={rootClass.elem("menu")}>
-          <Dropdown.Trigger
-            align="right"
-            content={
-              <Menu size="medium" contextual>
-                <Menu.Item onClick={() => onEdit(backend)}>Edit</Menu.Item>
-                <Menu.Item onClick={() => onTestRequest(backend)}>Send Test Request</Menu.Item>
-                <Menu.Item onClick={() => onStartTrain(backend)}>Start Training</Menu.Item>
-                <Menu.Divider />
-                <Menu.Item onClick={() => confirmDelete(backend)} isDangerous>
-                  Delete
-                </Menu.Item>
-              </Menu>
-            }
-          >
-            <Button look="string" size="small" className="!p-0" aria-label="Machine learning model options">
-              <IconEllipsis />
-            </Button>
-          </Dropdown.Trigger>
-        </div>
+        {canEdit && (
+          <div className={rootClass.elem("menu")}>
+            <Dropdown.Trigger
+              align="right"
+              content={
+                <Menu size="medium" contextual>
+                  <Menu.Item onClick={() => onEdit(backend)}>Edit</Menu.Item>
+                  <Menu.Item onClick={() => onTestRequest(backend)}>Send Test Request</Menu.Item>
+                  <Menu.Item onClick={() => onStartTrain(backend)}>Start Training</Menu.Item>
+                  <Menu.Divider />
+                  <Menu.Item onClick={() => confirmDelete(backend)} isDangerous>
+                    Delete
+                  </Menu.Item>
+                </Menu>
+              }
+            >
+              <Button look="string" size="small" className="!p-0" aria-label="Machine learning model options">
+                <IconEllipsis />
+              </Button>
+            </Dropdown.Trigger>
+          </div>
+        )}
       </div>
 
       <div className={rootClass.elem("meta")}>

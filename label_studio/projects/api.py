@@ -30,12 +30,14 @@ from ml.serializers import MLBackendSerializer
 from projects.functions.next_task import get_next_task
 from projects.functions.stream_history import get_label_stream_history
 from projects.functions.utils import recalculate_created_annotations_and_labels_from_scratch
-from projects.models import Project, ProjectImport, ProjectManager, ProjectReimport, ProjectSummary
+from projects.models import Project, ProjectImport, ProjectManager, ProjectMember, ProjectReimport, ProjectSummary
 from projects.serializers import (
     GetFieldsSerializer,
     ProjectCountsSerializer,
     ProjectImportSerializer,
     ProjectLabelConfigSerializer,
+    ProjectMemberSerializer,
+    ProjectMemberUpdateSerializer,
     ProjectModelVersionExtendedSerializer,
     ProjectModelVersionParamsSerializer,
     ProjectReimportSerializer,
@@ -43,7 +45,7 @@ from projects.serializers import (
     ProjectSummarySerializer,
 )
 from rest_framework import filters, generics, status
-from rest_framework.exceptions import NotFound
+from rest_framework.exceptions import NotFound, PermissionDenied
 from rest_framework.exceptions import ValidationError as RestValidationError
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
@@ -930,3 +932,135 @@ class ProjectAnnotatorsAPI(generics.RetrieveAPIView):
         users = User.objects.filter(id__in=annotator_ids).prefetch_related('om_through').order_by('id')
         data = UserSimpleSerializer(users, many=True, context={'request': request}).data
         return Response(data)
+
+
+@extend_schema(tags=['Projects'])
+class ProjectMemberListAPI(generics.ListCreateAPIView):
+    """
+    get: List all members of a project with their roles
+    post: Add a new member to the project (owners only)
+    """
+
+    serializer_class = ProjectMemberSerializer
+    permission_required = ViewClassPermission(
+        GET=all_permissions.projects_view,
+        POST=all_permissions.projects_change,
+    )
+
+    def get_project(self):
+        """Get the project from URL parameters"""
+        project_pk = self.kwargs.get('pk')
+        return generics.get_object_or_404(
+            Project.objects.filter(organization=self.request.user.active_organization), pk=project_pk
+        )
+
+    def get_queryset(self):
+        """Return members for the specified project"""
+        project = self.get_project()
+
+        # Check if user can view project
+        if not project.has_permission(self.request.user):
+            raise PermissionDenied("You don't have access to this project")
+
+        return ProjectMember.objects.filter(project=project, enabled=True).select_related('user').order_by('id')
+
+    def get_serializer_context(self):
+        """Add project to serializer context"""
+        context = super().get_serializer_context()
+        context['project'] = self.get_project()
+        return context
+
+    def perform_create(self, serializer):
+        """Create a new project member (owners only)"""
+        project = self.get_project()
+
+        # Only owners can add members
+        if not project.user_can_manage(self.request.user):
+            raise PermissionDenied('Only project owners can add members')
+
+        # Get the user to be added
+        from users.models import User
+
+        user_id = serializer.validated_data.get('user_id')
+        user = User.objects.get(id=user_id)
+
+        serializer.save(project=project, user=user)
+
+
+@extend_schema(tags=['Projects'])
+class ProjectMemberDetailAPI(generics.RetrieveUpdateDestroyAPIView):
+    """
+    get: Retrieve project member details
+    patch: Update member role (owners only)
+    delete: Remove member from project (owners only)
+    """
+
+    permission_required = ViewClassPermission(
+        GET=all_permissions.projects_view,
+        PATCH=all_permissions.projects_change,
+        DELETE=all_permissions.projects_change,
+    )
+
+    def get_project(self):
+        """Get the project from URL parameters"""
+        project_pk = self.kwargs.get('pk')
+        return generics.get_object_or_404(
+            Project.objects.filter(organization=self.request.user.active_organization), pk=project_pk
+        )
+
+    def get_queryset(self):
+        """Return members for the specified project"""
+        project = self.get_project()
+
+        # Check if user can view project
+        if not project.has_permission(self.request.user):
+            raise PermissionDenied("You don't have access to this project")
+
+        return ProjectMember.objects.filter(project=project, enabled=True)
+
+    def get_object(self):
+        """Get the specific project member"""
+        queryset = self.get_queryset()
+        member_pk = self.kwargs.get('member_pk')
+        obj = generics.get_object_or_404(queryset, pk=member_pk)
+        return obj
+
+    def get_serializer_class(self):
+        """Use different serializer for PATCH requests"""
+        if self.request.method == 'PATCH':
+            return ProjectMemberUpdateSerializer
+        return ProjectMemberSerializer
+
+    def perform_update(self, serializer):
+        """Update member role (owners only)"""
+        project = self.get_project()
+
+        # Only owners can change roles
+        if not project.user_can_manage(self.request.user):
+            raise PermissionDenied('Only project owners can change member roles')
+
+        serializer.save()
+
+    def perform_destroy(self, instance):
+        """Remove member from project (owners only)"""
+        project = self.get_project()
+
+        # Only owners can remove members
+        if not project.user_can_manage(self.request.user):
+            raise PermissionDenied('Only project owners can remove members')
+
+        # Prevent removing self
+        if instance.user == self.request.user:
+            raise RestValidationError('You cannot remove yourself from the project')
+
+        # Ensure at least one owner remains
+        if instance.role == ProjectMember.OWNER:
+            owner_count = ProjectMember.objects.filter(
+                project=project, role=ProjectMember.OWNER, enabled=True
+            ).count()
+            if owner_count <= 1:
+                raise RestValidationError('Cannot remove: Project must have at least one owner')
+
+        # Soft delete by disabling
+        instance.enabled = False
+        instance.save()

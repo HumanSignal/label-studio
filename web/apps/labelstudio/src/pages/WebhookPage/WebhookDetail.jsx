@@ -29,6 +29,7 @@ const WebhookForm = ({
   setSendPayload,
   api,
   rootClass,
+  canEdit = true,
 }) => {
   return (
     <Form
@@ -58,7 +59,7 @@ const WebhookForm = ({
       <Form.Row columnCount={1}>
         <Label text="Payload URL" large />
         <div className="grid grid-cols-[1fr_135px] gap-tight">
-          <Input name="url" className="self-stretch w-auto" placeholder="URL" />
+          <Input name="url" className="self-stretch w-auto" placeholder="URL" disabled={!canEdit} />
           <div className="grid grid-flow-col auto-cols-max items-center justify-end gap-tight self-center">
             <span className="text-neutral-content">Is Active</span>
             <Toggle
@@ -67,6 +68,7 @@ const WebhookForm = ({
               onChange={(e) => {
                 setIsActive(e.target.checked);
               }}
+              disabled={!canEdit}
             />
           </div>
         </div>
@@ -84,6 +86,7 @@ const WebhookForm = ({
                 className="!p-0 [&_span]:!text-[var(--grape_500)]"
                 leading={<IconPlus />}
                 tooltip="Add Header"
+                disabled={!canEdit}
               />
             </div>
             {headers.map((header, index) => {
@@ -94,12 +97,14 @@ const WebhookForm = ({
                     placeholder="header"
                     value={header.key}
                     onChange={(e) => onHeaderChange("key", e, index)}
+                    disabled={!canEdit}
                   />
                   <Input
                     skip
                     placeholder="value"
                     value={header.value}
                     onChange={(e) => onHeaderChange("value", e, index)}
+                    disabled={!canEdit}
                   />
                   <div>
                     <Button
@@ -110,6 +115,7 @@ const WebhookForm = ({
                       icon={<IconCross />}
                       onClick={() => onHeaderRemove(index)}
                       tooltip="Remove Header"
+                      disabled={!canEdit}
                     />
                   </div>
                 </div>
@@ -131,6 +137,7 @@ const WebhookForm = ({
                 setSendPayload(e.target.checked);
               }}
               label="Send payload"
+              disabled={!canEdit}
             />
           </div>
           <div className="my-2">
@@ -141,6 +148,7 @@ const WebhookForm = ({
               onChange={(e) => {
                 setSendForAllActions(e.target.checked);
               }}
+              disabled={!canEdit}
             />
           </div>
           <div>
@@ -159,6 +167,7 @@ const WebhookForm = ({
                             label={value.name}
                             onChange={onActionChange}
                             checked={actions.has(key)}
+                            disabled={!canEdit}
                           />
                         </div>
                       </Form.Row>
@@ -171,7 +180,7 @@ const WebhookForm = ({
         </div>
       </div>
       <div className="flex items-center gap-2 mt-base">
-        {webhook !== null && (
+        {webhook !== null && canEdit && (
           <Button
             type="button"
             variant="negative"
@@ -208,6 +217,7 @@ const WebhookForm = ({
         <Button
           className={rootClass.elem("save-button")}
           aria-label={webhook === null ? "Add Webhook" : "Save Changes"}
+          disabled={!canEdit}
         >
           {webhook === null ? "Add Webhook" : "Save Changes"}
         </Button>
@@ -216,7 +226,7 @@ const WebhookForm = ({
   );
 };
 
-const WebhookDetail = ({ webhook, webhooksInfo, fetchWebhooks, onBack, onSelectActive }) => {
+const WebhookDetail = ({ webhook, webhooksInfo, fetchWebhooks, onBack, onSelectActive, canEdit = true }) => {
   const rootClass = cn("webhook-detail");
 
   const api = useAPI();
@@ -347,6 +357,7 @@ const WebhookDetail = ({ webhook, webhooksInfo, fetchWebhooks, onBack, onSelectA
           setSendPayload={setSendPayload}
           api={api}
           rootClass={rootClass}
+          canEdit={canEdit}
         />
       </div>
     </>

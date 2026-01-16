@@ -7,6 +7,7 @@ import { modal } from "../../../components/Modal/Modal";
 import { IconModels, IconExternal } from "@humansignal/icons";
 import { useAPI } from "../../../providers/ApiProvider";
 import { ProjectContext } from "../../../providers/ProjectProvider";
+import { useProjectPermissions } from "../../../hooks/useProjectPermissions";
 import { MachineLearningList } from "./MachineLearningList";
 import { CustomBackendForm } from "./Forms";
 import { TestRequest } from "./TestRequest";
@@ -16,6 +17,7 @@ import "./MachineLearningSettings.scss";
 export const MachineLearningSettings = () => {
   const api = useAPI();
   const { project, fetchProject } = useContext(ProjectContext);
+  const { canEditProject } = useProjectPermissions();
   const [backends, setBackends] = useState([]);
   const [loading, setLoading] = useState(false);
   const [loaded, setLoaded] = useState(false);
@@ -116,6 +118,7 @@ export const MachineLearningSettings = () => {
                   look="filled"
                   onClick={() => showMLFormModal()}
                   aria-label="Add machine learning model"
+                  disabled={!canEditProject}
                 >
                   Connect Model
                 </Button>
@@ -146,6 +149,7 @@ export const MachineLearningSettings = () => {
           onStartTraining={(backend) => startTrainingModal(backend)}
           fetchBackends={fetchBackends}
           backends={backends}
+          canEdit={canEditProject}
         />
 
         {backends.length > 0 && (
@@ -189,6 +193,7 @@ export const MachineLearningSettings = () => {
                     label="Start model training on annotation submission"
                     description="This option will send a request to /train with information about annotations. You can use this to enable an Active Learning loop. You can also manually start training through model menu in its card."
                     name="start_training_on_annotation_update"
+                    disabled={!canEditProject}
                   />
                 </div>
               </Form.Row>
@@ -200,7 +205,7 @@ export const MachineLearningSettings = () => {
               <Form.Indicator>
                 <span case="success">Saved!</span>
               </Form.Indicator>
-              <Button type="submit" look="primary" className="w-[120px]" aria-label="Save machine learning settings">
+              <Button type="submit" look="primary" className="w-[120px]" aria-label="Save machine learning settings" disabled={!canEditProject}>
                 Save
               </Button>
             </Form.Actions>

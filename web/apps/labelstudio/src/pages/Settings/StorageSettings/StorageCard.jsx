@@ -5,7 +5,7 @@ import { ApiContext } from "../../../providers/ApiProvider";
 import { StorageSummary } from "./StorageSummary";
 import { IconEllipsisVertical } from "@humansignal/icons";
 
-export const StorageCard = ({ rootClass, target, storage, onEditStorage, onDeleteStorage, storageTypes }) => {
+export const StorageCard = ({ rootClass, target, storage, onEditStorage, onDeleteStorage, storageTypes, canEdit = true }) => {
   const [syncing, setSyncing] = useState(false);
   const api = useContext(ApiContext);
   const [storageData, setStorageData] = useState({ ...storage });
@@ -41,19 +41,21 @@ export const StorageCard = ({ rootClass, target, storage, onEditStorage, onDelet
     <Card
       header={storageData.title ?? `Untitled ${storageData.type}`}
       extra={
-        <Dropdown.Trigger
-          align="right"
-          content={
-            <Menu size="compact" style={{ width: 110 }}>
-              <Menu.Item onClick={() => onEditStorage(storageData)}>Edit</Menu.Item>
-              <Menu.Item onClick={() => onDeleteStorage(storageData)}>Delete</Menu.Item>
-            </Menu>
-          }
-        >
-          <Button look="string" className="-ml-3" aria-label="Storage options">
-            <IconEllipsisVertical />
-          </Button>
-        </Dropdown.Trigger>
+        canEdit ? (
+          <Dropdown.Trigger
+            align="right"
+            content={
+              <Menu size="compact" style={{ width: 110 }}>
+                <Menu.Item onClick={() => onEditStorage(storageData)}>Edit</Menu.Item>
+                <Menu.Item onClick={() => onDeleteStorage(storageData)}>Delete</Menu.Item>
+              </Menu>
+            }
+          >
+            <Button look="string" className="-ml-3" aria-label="Storage options">
+              <IconEllipsisVertical />
+            </Button>
+          </Dropdown.Trigger>
+        ) : null
       }
     >
       <StorageSummary

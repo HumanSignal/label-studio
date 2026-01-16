@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { useAPI } from "../../providers/ApiProvider";
+import { useProjectPermissions } from "../../hooks/useProjectPermissions";
 
 import { useHistory } from "react-router";
 import { useProject } from "../../providers/ProjectProvider";
@@ -17,6 +18,7 @@ const Webhook = () => {
 
   const api = useAPI();
   const { project } = useProject();
+  const { canEditProject } = useProjectPermissions();
 
   useUpdatePageTitle(createTitleFromSegments([project?.title, "Webhooks Settings"]));
 
@@ -85,6 +87,7 @@ const Webhook = () => {
         webhook={null}
         fetchWebhooks={fetchWebhooks}
         webhooksInfo={webhooksInfo}
+        canEdit={canEditProject}
       />
     );
   } else if (activeWebhook === null) {
@@ -96,6 +99,7 @@ const Webhook = () => {
         }}
         fetchWebhooks={fetchWebhooks}
         webhooks={webhooks}
+        canEdit={canEditProject}
       />
     );
   } else {
@@ -106,6 +110,7 @@ const Webhook = () => {
         webhook={webhooks[webhooks.findIndex((x) => x.id === activeWebhook)]}
         fetchWebhooks={fetchWebhooks}
         webhooksInfo={webhooksInfo}
+        canEdit={canEditProject}
       />
     );
   }
