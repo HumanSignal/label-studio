@@ -87,6 +87,7 @@ export const TabsItem = ({
   const { switchTab, selectedTab, lastTab, allowedActions } = useContext(TabsContext);
   const [currentTitle, setCurrentTitle] = useState(title);
   const [renameMode, setRenameMode] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const active = tab === selectedTab;
 
@@ -126,9 +127,7 @@ export const TabsItem = ({
   );
 
   return (
-    <div
-      className={tabsCN.elem("item").mod({ active, virtual }).toString()}
-    >
+    <div className={tabsCN.elem("item").mod({ active, virtual, menuOpen: isMenuOpen }).toString()}>
       <div
         className={tabsCN
           .elem("item-left")
@@ -144,7 +143,6 @@ export const TabsItem = ({
           <Input
             size="small"
             autoFocus={true}
-            style={{ width: 100 }}
             value={currentTitle}
             onKeyDownCapture={saveTabTitle}
             onBlur={saveTabTitle}
@@ -169,6 +167,7 @@ export const TabsItem = ({
           <Dropdown.Trigger
             align="bottom-left"
             openUpwardForShortViewport={false}
+            onToggle={setIsMenuOpen}
             content={
               <TabsMenu
                 editable={tabIsEditable}
@@ -191,7 +190,7 @@ export const TabsItem = ({
             }
           >
             <div className={tabsCN.elem("item-right-button").toString()}>
-              <Button look="string" size="small" variant="neutral">
+              <Button look="outline" size="smaller" variant="neutral">
                 <IconEllipsisVertical className="w-4 h-4" />
               </Button>
             </div>
