@@ -23,7 +23,7 @@ from drf_spectacular.utils import OpenApiParameter, OpenApiResponse, extend_sche
 from projects.models import Project
 from ranged_fileresponse import RangedFileResponse
 from rest_framework import generics, status
-from rest_framework.exceptions import NotFound, ValidationError
+from rest_framework.exceptions import NotFound, PermissionDenied, ValidationError
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from tasks.models import Task
@@ -369,6 +369,11 @@ class ExportListAPI(generics.ListCreateAPIView):
         serialization_options = serializer.validated_data.pop('serialization_options')
 
         project = self._get_project()
+
+        # RBAC: Only reviewers and owners can create exports
+        if not project.user_can_review(self.request.user):
+            raise PermissionDenied('Only project owners and reviewers can create exports')
+
         serializer.save(project=project, created_by=self.request.user)
         instance = serializer.instance
 
@@ -552,6 +557,12 @@ class ExportDownloadAPI(generics.RetrieveAPIView):
 
     def get(self, request, *args, **kwargs):
         snapshot = self.get_object()
+        project = snapshot.project
+
+        # RBAC: Only reviewers and owners can download exports
+        if not project.user_can_review(self.request.user):
+            raise PermissionDenied('Only project owners and reviewers can download exports')
+
         export_type = request.GET.get('exportType')
 
         if snapshot.status != Export.Status.COMPLETED:

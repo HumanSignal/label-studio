@@ -197,6 +197,11 @@ class TaskListAPI(DMTaskListAPI):
     def perform_create(self, serializer):
         project_id = self.request.data.get('project')
         project = generics.get_object_or_404(Project, pk=project_id)
+
+        # RBAC: Only project owners can create tasks
+        if not project.user_can_manage(self.request.user):
+            raise PermissionDenied('Only project owners can create tasks')
+
         instance = serializer.save(project=project)
         emit_webhooks_for_instance(
             self.request.user.active_organization, project, WebhookAction.TASKS_CREATED, [instance]
@@ -364,6 +369,25 @@ class TaskAPI(generics.RetrieveUpdateDestroyAPIView):
         else:
             return TaskSimpleSerializer
 
+    def perform_update(self, serializer):
+        task = self.get_object()
+        project = task.project
+
+        # RBAC: Only project owners can update tasks
+        if not project.user_can_manage(self.request.user):
+            raise PermissionDenied('Only project owners can update tasks')
+
+        serializer.save()
+
+    def perform_destroy(self, instance):
+        project = instance.project
+
+        # RBAC: Only project owners can delete tasks
+        if not project.user_can_manage(self.request.user):
+            raise PermissionDenied('Only project owners can delete tasks')
+
+        instance.delete()
+
     def patch(self, request, *args, **kwargs):
         return super(TaskAPI, self).patch(request, *args, **kwargs)
 
@@ -451,11 +475,25 @@ class AnnotationAPI(generics.RetrieveUpdateDestroyAPIView):
     queryset = Annotation.objects.all()
 
     def perform_destroy(self, annotation):
+        project = annotation.task.project
+
+        # RBAC: Annotators can only delete their own annotations
+        if not project.user_can_review(self.request.user):
+            if annotation.completed_by != self.request.user:
+                raise PermissionDenied('Annotators can only delete their own annotations')
+
         annotation.delete()
 
     def update(self, request, *args, **kwargs):
         # save user history with annotator_id, time & annotation result
         annotation = self.get_object()
+        project = annotation.task.project
+
+        # RBAC: Annotators can only update their own annotations
+        if not project.user_can_review(self.request.user):
+            if annotation.completed_by != self.request.user:
+                raise PermissionDenied('Annotators can only update their own annotations')
+
         # use updated instead of save to avoid duplicated signals
         Annotation.objects.filter(id=annotation.id).update(updated_by=request.user)
 
@@ -472,6 +510,14 @@ class AnnotationAPI(generics.RetrieveUpdateDestroyAPIView):
         return result
 
     def get(self, request, *args, **kwargs):
+        annotation = self.get_object()
+        project = annotation.task.project
+
+        # RBAC: Annotators can only view their own annotations
+        if not project.user_can_review(self.request.user):
+            if annotation.completed_by != self.request.user:
+                raise PermissionDenied('Annotators can only view their own annotations')
+
         return super(AnnotationAPI, self).get(request, *args, **kwargs)
 
     @api_webhook(WebhookAction.ANNOTATION_UPDATED)
@@ -576,7 +622,15 @@ class AnnotationsListAPI(GetParentObjectMixin, generics.ListCreateAPIView):
 
     def get_queryset(self):
         task = generics.get_object_or_404(Task.objects.for_user(self.request.user), pk=self.kwargs.get('pk', 0))
-        return Annotation.objects.filter(Q(task=task) & Q(was_cancelled=False)).order_by('pk')
+        queryset = Annotation.objects.filter(Q(task=task) & Q(was_cancelled=False)).order_by('pk')
+
+        # RBAC: Annotators can only view their own annotations, reviewers/owners see all
+        project = task.project
+        if not project.user_can_review(self.request.user):
+            # User is an annotator, filter to only their annotations
+            queryset = queryset.filter(completed_by=self.request.user)
+
+        return queryset
 
     def delete_draft(self, draft_id, annotation_id):
         try:

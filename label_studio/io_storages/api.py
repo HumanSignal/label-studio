@@ -12,7 +12,7 @@ from drf_spectacular.utils import extend_schema
 from io_storages.serializers import ExportStorageSerializer, ImportStorageSerializer
 from projects.models import Project
 from rest_framework import generics, status
-from rest_framework.exceptions import NotFound, ValidationError
+from rest_framework.exceptions import NotFound, PermissionDenied, ValidationError
 from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
 from rest_framework.response import Response
 
@@ -42,6 +42,18 @@ class ImportStorageListAPI(generics.ListCreateAPIView):
         StorageClass.ensure_storage_statuses(storages)
         return storages
 
+    def perform_create(self, serializer):
+        storage = serializer.save()
+        project = storage.project
+
+        # RBAC: Only project owners can add storage
+        if not project.user_can_manage(self.request.user):
+            # Rollback the save
+            storage.delete()
+            raise PermissionDenied('Only project owners can add storage')
+
+        return storage
+
 
 class ImportStorageDetailAPI(generics.RetrieveUpdateDestroyAPIView):
     """RUD storage by pk specified in URL"""
@@ -54,6 +66,25 @@ class ImportStorageDetailAPI(generics.RetrieveUpdateDestroyAPIView):
     )
     parser_classes = (JSONParser, FormParser, MultiPartParser)
     serializer_class = ImportStorageSerializer
+
+    def perform_update(self, serializer):
+        storage = self.get_object()
+        project = storage.project
+
+        # RBAC: Only project owners can update storage
+        if not project.user_can_manage(self.request.user):
+            raise PermissionDenied('Only project owners can update storage')
+
+        serializer.save()
+
+    def perform_destroy(self, instance):
+        project = instance.project
+
+        # RBAC: Only project owners can delete storage
+        if not project.user_can_manage(self.request.user):
+            raise PermissionDenied('Only project owners can delete storage')
+
+        instance.delete()
 
     @extend_schema(exclude=True)
     def put(self, request, *args, **kwargs):
@@ -93,6 +124,14 @@ class ExportStorageListAPI(generics.ListCreateAPIView):
             raise ValidationError(exc)
 
         storage = serializer.save()
+        project = storage.project
+
+        # RBAC: Only project owners can add storage
+        if not project.user_can_manage(self.request.user):
+            # Rollback the save
+            storage.delete()
+            raise PermissionDenied('Only project owners can add storage')
+
         if settings.SYNC_ON_TARGET_STORAGE_CREATION:
             storage.sync()
 
@@ -108,6 +147,25 @@ class ExportStorageDetailAPI(generics.RetrieveUpdateDestroyAPIView):
     )
     parser_classes = (JSONParser, FormParser, MultiPartParser)
     serializer_class = ExportStorageSerializer
+
+    def perform_update(self, serializer):
+        storage = self.get_object()
+        project = storage.project
+
+        # RBAC: Only project owners can update storage
+        if not project.user_can_manage(self.request.user):
+            raise PermissionDenied('Only project owners can update storage')
+
+        serializer.save()
+
+    def perform_destroy(self, instance):
+        project = instance.project
+
+        # RBAC: Only project owners can delete storage
+        if not project.user_can_manage(self.request.user):
+            raise PermissionDenied('Only project owners can delete storage')
+
+        instance.delete()
 
     @extend_schema(exclude=True)
     def put(self, request, *args, **kwargs):

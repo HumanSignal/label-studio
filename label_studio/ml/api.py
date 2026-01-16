@@ -13,6 +13,7 @@ from ml.models import MLBackend
 from ml.serializers import MLBackendSerializer, MLInteractiveAnnotatingRequest
 from projects.models import Project, Task
 from rest_framework import generics, status
+from rest_framework.exceptions import PermissionDenied
 from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -141,6 +142,10 @@ class MLBackendListAPI(generics.ListCreateAPIView):
 
         project = ml_backend.project
 
+        # RBAC: Only project owners can add ML backends
+        if not project.user_can_manage(self.request.user):
+            raise PermissionDenied('Only project owners can add ML backends')
+
         # In case we are adding the model, let's set it as the default
         # to obtain predictions. This approach is consistent with uploading
         # offline predictions, which would be set automatically.
@@ -227,8 +232,24 @@ class MLBackendDetailAPI(generics.RetrieveUpdateDestroyAPIView):
         return ml_backend
 
     def perform_update(self, serializer):
+        ml_backend = self.get_object()
+        project = ml_backend.project
+
+        # RBAC: Only project owners can update ML backends
+        if not project.user_can_manage(self.request.user):
+            raise PermissionDenied('Only project owners can update ML backends')
+
         ml_backend = serializer.save()
         ml_backend.update_state()
+
+    def perform_destroy(self, instance):
+        project = instance.project
+
+        # RBAC: Only project owners can delete ML backends
+        if not project.user_can_manage(self.request.user):
+            raise PermissionDenied('Only project owners can delete ML backends')
+
+        instance.delete()
 
 
 @method_decorator(

@@ -6,7 +6,7 @@ from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import OpenApiParameter, OpenApiResponse, extend_schema
 from projects import models as project_models
 from rest_framework import generics
-from rest_framework.exceptions import NotFound
+from rest_framework.exceptions import NotFound, PermissionDenied
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -73,6 +73,11 @@ class WebhookListAPI(generics.ListCreateAPIView):
         project = serializer.validated_data.get('project')
         if project is None or project.organization_id != self.request.user.active_organization.id:
             raise NotFound('Project not found.')
+
+        # RBAC: Only project owners can create webhooks
+        if project and not project.user_can_manage(self.request.user):
+            raise PermissionDenied('Only project owners can create webhooks')
+
         serializer.save(organization=self.request.user.active_organization)
 
 
@@ -142,6 +147,25 @@ class WebhookAPI(generics.RetrieveUpdateDestroyAPIView):
 
     def get_queryset(self):
         return Webhook.objects.filter(organization=self.request.user.active_organization)
+
+    def perform_update(self, serializer):
+        webhook = self.get_object()
+        project = webhook.project
+
+        # RBAC: Only project owners can update webhooks
+        if project and not project.user_can_manage(self.request.user):
+            raise PermissionDenied('Only project owners can update webhooks')
+
+        serializer.save()
+
+    def perform_destroy(self, instance):
+        project = instance.project
+
+        # RBAC: Only project owners can delete webhooks
+        if project and not project.user_can_manage(self.request.user):
+            raise PermissionDenied('Only project owners can delete webhooks')
+
+        instance.delete()
 
 
 @method_decorator(
