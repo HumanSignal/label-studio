@@ -34,7 +34,7 @@
     user-select: none;
 
     &[disabled] {
-      color: var(--color-neutral-content-subtlest);
+      color: var(--color-neutral-content-subtlest) !important;
 
       &:hover {
         background-color: transparent !important;

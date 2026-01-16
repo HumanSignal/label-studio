@@ -54,6 +54,10 @@ $check-icon: "data:image/svg+xml;charset=UTF-8,%3csvg width='13' height='10' vie
           background-color: var(--checkbox-disabled-color, var(--checkbox-default-disabled-color));
         }
       }
+
+      &__label {
+        color: var(--checkbox-disabled-color, var(--checkbox-default-disabled-color));
+      }
     }
   }
 

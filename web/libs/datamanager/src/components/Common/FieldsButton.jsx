@@ -12,8 +12,8 @@ const injector = inject(({ store }) => {
 
 const FieldsMenu = observer(({ columns, WrapperComponent, onClick, onReset, selected, resetTitle }) => {
   const MenuItem = (col, onClick) => {
-    const shouldDisable = col.disabled;
     const enterpriseBadge = col.enterprise_badge ?? col.original?.enterprise_badge;
+    const shouldDisable = col.disabled || enterpriseBadge;
 
     const titleContent = <span>{col.title}</span>;
 
