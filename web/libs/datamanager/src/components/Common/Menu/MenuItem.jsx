@@ -1,6 +1,7 @@
 import React from "react";
 import { cn } from "../../../utils/bem";
 import { MenuContext } from "./MenuContext";
+import { Tooltip } from "@humansignal/ui";
 
 export const MenuItem = ({
   name,
@@ -17,6 +18,8 @@ export const MenuItem = ({
   active = false,
   onClick,
   disabled,
+  tooltip,
+  tooltipAlignment = "bottom-center",
   ...rest
 }) => {
   const { selected } = React.useContext(MenuContext);
@@ -72,7 +75,7 @@ export const MenuItem = ({
     };
   }
 
-  return (
+  const menuItem = (
     <li>
       {href ? (
         <a href={disabled ? undefined : (href ?? "#")} {...linkAttributes}>
@@ -83,4 +86,15 @@ export const MenuItem = ({
       )}
     </li>
   );
+
+  // Only wrap in tooltip if tooltip prop is provided and should be shown
+  if (tooltip) {
+    return (
+      <Tooltip title={tooltip} alignment={tooltipAlignment}>
+        {menuItem}
+      </Tooltip>
+    );
+  }
+
+  return menuItem;
 };
