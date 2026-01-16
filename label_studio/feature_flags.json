@@ -2420,7 +2420,7 @@
     },
     "fflag_feat_fit_890_ask_ai_event_stream": {
       "key": "fflag_feat_fit_890_ask_ai_event_stream",
-      "on": false,
+      "on": true,
       "prerequisites": [],
       "targets": [],
       "contextTargets": [],
@@ -2442,7 +2442,7 @@
       "trackEvents": false,
       "trackEventsFallthrough": false,
       "debugEventsUntilDate": null,
-      "version": 2,
+      "version": 3,
       "deleted": false
     },
     "fflag_feat_front_bros_194_custom_tags_short": {

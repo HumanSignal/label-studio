@@ -180,6 +180,12 @@ Label Studio is available to everyone as open source software (Label Studio Comm
    <tr>
     <td colspan="4" style="text-align:center"><b>Customization & Development</b></td>
   </tr>
+ <tr>
+    <td><b>Programmable & embeddable interfaces</b><br/><a href="https://docs.humansignal.com/tags/reactcode">Build fully customized labeling and evaluation interfaces with React. Embed into your own applications.</a></td>
+    <td style="text-align:center">❌</td>
+    <td style="text-align:center">❌</td>
+    <td style="text-align:center">✅</td>
+  </tr>
   <tr>
     <td><b>Tag library</b><br/><a href="/tags">Use our tag library to customize the labeling interface by modifying pre-built templates or by building your own templates.</a></td>
     <td style="text-align:center">✅</td>
@@ -289,9 +295,15 @@ Label Studio is available to everyone as open source software (Label Studio Comm
     <td style="text-align:center">✅</td>
   </tr>
   <tr>
-    <td><b>Agreement metrics</b><br/><a href="https://docs.humansignal.com/guide/stats.html">Define how annotator consensus is calculated. You can choose from pre-defined metrics or customize your own.</a></td>
+    <td><b>Agreement metrics</b><br/><a href="https://docs.humansignal.com/guide/stats.html">Define how annotator consensus is calculated using pre-defined agreement metrics.</a></td>
     <td style="text-align:center">❌</td>
     <td style="text-align:center">✅</td>
+    <td style="text-align:center">✅</td>
+  </tr>
+  <tr>
+    <td><b>Custom agreement metrics</b><br/><a href="https://docs.humansignal.com/guide/custom_metric.html">Write your own custom agreement metric.</a></td>
+    <td style="text-align:center">❌</td>
+    <td style="text-align:center">❌</td>
     <td style="text-align:center">✅</td>
   </tr>
   <tr>
