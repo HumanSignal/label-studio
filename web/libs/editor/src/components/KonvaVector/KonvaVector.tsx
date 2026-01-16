@@ -207,6 +207,35 @@ import {
  * />
  * ```
  */
+/**
+ * Find all endpoint indices based on path structure (prevPointId relationships)
+ * In non-skeleton mode, endpoints are:
+ * 1. Points with no prevPointId (starting points)
+ * 2. Points that are not referenced by any other point's prevPointId (ending points)
+ */
+function getEndpointIndices(points: BezierPoint[]): Set<number> {
+  const endpointIndices = new Set<number>();
+  
+  // Create a set of all point IDs that are referenced as prevPointId
+  const referencedPointIds = new Set<string>();
+  points.forEach((point) => {
+    if (point.prevPointId) {
+      referencedPointIds.add(point.prevPointId);
+    }
+  });
+  
+  // Find endpoints:
+  // 1. Points with no prevPointId (starting points)
+  // 2. Points that are not referenced by any other point (ending points)
+  points.forEach((point, index) => {
+    if (!point.prevPointId || !referencedPointIds.has(point.id)) {
+      endpointIndices.add(index);
+    }
+  });
+  
+  return endpointIndices;
+}
+
 export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, ref) => {
   // Generate unique instance ID
   const instanceId = useMemo(
@@ -361,10 +390,10 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
     if (initialPoints.length > 0) {
       const lastPoint = initialPoints[initialPoints.length - 1];
       setLastAddedPointId(lastPoint.id);
-      // Only set activePointId if skeleton mode is enabled
-      if (skeletonEnabled) {
-        setActivePointId(lastPoint.id);
-      }
+      // Set activePointId to last point for both skeleton and non-skeleton mode
+      // In skeleton mode: allows drawing from any point
+      // In non-skeleton mode: allows drawing from last point (can be changed by selecting first point)
+      setActivePointId(lastPoint.id);
     }
   }, [initialPoints.length, skeletonEnabled]); // Only run when the number of points changes or skeleton mode changes
 
@@ -1531,6 +1560,12 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
 
       for (let i = 0; i < initialPoints.length; i++) {
         if (pointIds.includes(initialPoints[i].id)) {
+          // Non-skeleton mode: only allow selecting endpoints (based on path structure)
+          if (!skeletonEnabled && !getEndpointIndices(initialPoints).has(i)) {
+            // Skip non-endpoint points in non-skeleton mode
+            continue;
+          }
+          
           selectedIndices.add(i);
           // Set the first found point as the primary selected point
           if (primarySelectedIndex === null) {
@@ -1542,6 +1577,12 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
       // Use tracker for global selection management
       isProgrammaticSelection.current = true;
       tracker.selectPoints(instanceId, selectedIndices);
+      
+      // In non-skeleton mode, set activePointId to the primary selected point (first or last)
+      if (!skeletonEnabled && primarySelectedIndex !== null && initialPoints[primarySelectedIndex]) {
+        setActivePointId(initialPoints[primarySelectedIndex].id);
+      }
+      
       setTimeout(() => {
         isProgrammaticSelection.current = false;
       }, 0);
@@ -3808,8 +3849,18 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
                 !e.evt.metaKey &&
                 !transformMode
               ) {
+                // Non-skeleton mode: only allow selecting endpoints (based on path structure)
+                if (!skeletonEnabled && !getEndpointIndices(initialPoints).has(pointIndex)) {
+                  // Don't allow selecting non-endpoint points in non-skeleton mode
+                  return;
+                }
+
                 // Select the point first
                 tracker.selectPoints(instanceId, new Set([pointIndex]));
+                // In non-skeleton mode, set activePointId when selecting an endpoint
+                if (!skeletonEnabled && getEndpointIndices(initialPoints).has(pointIndex) && initialPoints[pointIndex]) {
+                  setActivePointId(initialPoints[pointIndex].id);
+                }
                 // Directly call handleClickWithDebouncing to trigger region selection
                 // This works even when selected=false (Group onClick is undefined)
                 pointSelectionHandled.current = true;
@@ -3888,14 +3939,30 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
 
                 // Handle regular point selection (only when not in transform mode)
                 if (!transformMode) {
+                  // Non-skeleton mode: only allow selecting endpoints (based on path structure)
+                  if (!skeletonEnabled && !getEndpointIndices(initialPoints).has(pointIndex)) {
+                    // Don't allow selecting non-endpoint points in non-skeleton mode
+                    return;
+                  }
+
                   if (e.evt.ctrlKey || e.evt.metaKey) {
                     // Add to multi-selection
                     const newSelection = new Set(selectedPoints);
                     newSelection.add(pointIndex);
                     tracker.selectPoints(instanceId, newSelection);
+                    // In non-skeleton mode, update activePointId when selecting an endpoint
+                    // This allows drawing continuation from the selected endpoint
+                    if (!skeletonEnabled && getEndpointIndices(initialPoints).has(pointIndex) && initialPoints[pointIndex]) {
+                      setActivePointId(initialPoints[pointIndex].id);
+                    }
                   } else {
                     // Select only this point
                     tracker.selectPoints(instanceId, new Set([pointIndex]));
+                    // In non-skeleton mode, set activePointId when selecting an endpoint
+                    // This allows drawing continuation from the selected endpoint
+                    if (!skeletonEnabled && getEndpointIndices(initialPoints).has(pointIndex) && initialPoints[pointIndex]) {
+                      setActivePointId(initialPoints[pointIndex].id);
+                    }
                   }
                 }
 
@@ -4258,6 +4325,17 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
                   return; // Block the selection
                 }
 
+                // Non-skeleton mode: only allow multi-selecting first or last point
+                if (!skeletonEnabled) {
+                  const isFirstPoint = pointIndex === 0;
+                  const isLastPoint = pointIndex === initialPoints.length - 1;
+                  
+                  if (!isFirstPoint && !isLastPoint) {
+                    // Don't allow selecting middle points in non-skeleton mode
+                    return;
+                  }
+                }
+
                 // Check if this point is already selected - if so, deselect it
                 if (effectiveSelectedPoints.has(pointIndex)) {
                   const newSelection = new Set(effectiveSelectedPoints);
@@ -4272,6 +4350,10 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
                 const newSelection = new Set(effectiveSelectedPoints);
                 newSelection.add(pointIndex);
                 tracker.selectPoints(instanceId, newSelection);
+                // In non-skeleton mode, update activePointId when multi-selecting first or last point
+                if (!skeletonEnabled && initialPoints[pointIndex]) {
+                  setActivePointId(initialPoints[pointIndex].id);
+                }
                 pointSelectionHandled.current = true;
                 e.evt.stopImmediatePropagation();
                 return;
@@ -4286,6 +4368,12 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
                 // Check if this instance can have selection
                 if (!tracker.canInstanceHaveSelection(instanceId)) {
                   return; // Block the selection
+                }
+
+                // Non-skeleton mode: only allow selecting endpoints (based on path structure)
+                if (!skeletonEnabled && !getEndpointIndices(initialPoints).has(pointIndex)) {
+                  // Don't allow selecting non-endpoint points in non-skeleton mode
+                  return;
                 }
 
                 // Check if we're about to close the path - prevent point selection in this case
@@ -4307,6 +4395,10 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
 
                 // For non-selected mode, still allow point selection
                 tracker.selectPoints(instanceId, new Set([pointIndex]));
+                // In non-skeleton mode, set activePointId when selecting an endpoint
+                if (!skeletonEnabled && getEndpointIndices(initialPoints).has(pointIndex) && initialPoints[pointIndex]) {
+                  setActivePointId(initialPoints[pointIndex].id);
+                }
                 pointSelectionHandled.current = true;
 
                 // CRITICAL: For single-point regions, directly call onClick handler so the region can be selected
@@ -4332,8 +4424,18 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
                   return; // Block the selection
                 }
 
+                // Non-skeleton mode: only allow selecting endpoints (based on path structure)
+                if (!skeletonEnabled && !getEndpointIndices(initialPoints).has(pointIndex)) {
+                  // Don't allow selecting non-endpoint points in non-skeleton mode
+                  return;
+                }
+
                 // Select only this point (single selection for regular click)
                 tracker.selectPoints(instanceId, new Set([pointIndex]));
+                // In non-skeleton mode, set activePointId when selecting an endpoint
+                if (!skeletonEnabled && getEndpointIndices(initialPoints).has(pointIndex) && initialPoints[pointIndex]) {
+                  setActivePointId(initialPoints[pointIndex].id);
+                }
                 pointSelectionHandled.current = true;
 
                 // CRITICAL: For single-point regions, directly call onClick handler so the region can be selected
