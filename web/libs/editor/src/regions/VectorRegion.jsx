@@ -447,6 +447,10 @@ const Model = types
         self._justSelected = false;
       },
 
+      setJustSelectedFlag(value) {
+        self._justSelected = value;
+      },
+
       /**
        * Override selectRegion to reset transform mode when selecting from sidebar
        * This ensures transform mode is reset whether selecting by clicking on the shape
@@ -696,7 +700,7 @@ const HtxVectorView = observer(({ item, suggestion }) => {
             // to prevent unselection if this is part of a double-click
             // The flag will be cleared by the double-click handler or after timeout
             if (item.selected) {
-              item._justSelected = true;
+              item.setJustSelectedFlag(true);
               setTimeout(() => {
                 // Only clear if still set (double-click handler might have cleared it)
                 if (item._justSelected) {
