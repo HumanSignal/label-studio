@@ -16,10 +16,18 @@ class DummyModelMixin:
 
 class GetParentObjectMixin:
     parent_queryset = None
+    parent_lookup_field = None   # Defaults to lookup_field
+    parent_lookup_url_kwarg = None   # Defaults to lookup_url_kwarg
 
     @cached_property
     def parent_object(self):
         return self._get_parent_object()
+
+    def _get_parent_lookup_field(self):
+        return self.parent_lookup_field or self.lookup_field
+
+    def _get_parent_lookup_url_kwarg(self):
+        return self.parent_lookup_url_kwarg or self.lookup_url_kwarg or self.lookup_field
 
     def _get_parent_object(self):
         """
@@ -35,7 +43,7 @@ class GetParentObjectMixin:
             queryset = queryset.all()
 
         # Perform the lookup filtering.
-        lookup_url_kwarg = self.lookup_url_kwarg or self.lookup_field
+        lookup_url_kwarg = self._get_parent_lookup_url_kwarg()
 
         assert lookup_url_kwarg in self.kwargs, (
             'Expected view %s to be called with a URL keyword argument '
@@ -43,7 +51,9 @@ class GetParentObjectMixin:
             'attribute on the view correctly.' % (self.__class__.__name__, lookup_url_kwarg)
         )
 
-        filter_kwargs = {self.lookup_field: self.kwargs[lookup_url_kwarg]}
+        lookup_field = self._get_parent_lookup_field()
+
+        filter_kwargs = {lookup_field: self.kwargs[lookup_url_kwarg]}
         obj = get_object_or_404(queryset, **filter_kwargs)
 
         # May raise a permission denied
