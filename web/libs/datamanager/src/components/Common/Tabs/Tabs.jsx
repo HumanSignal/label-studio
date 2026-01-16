@@ -87,7 +87,6 @@ export const TabsItem = ({
   const { switchTab, selectedTab, lastTab, allowedActions } = useContext(TabsContext);
   const [currentTitle, setCurrentTitle] = useState(title);
   const [renameMode, setRenameMode] = useState(false);
-  const [hover, setHover] = useState(false);
 
   const active = tab === selectedTab;
 
@@ -128,9 +127,7 @@ export const TabsItem = ({
 
   return (
     <div
-      className={tabsCN.elem("item").mod({ active, hover, virtual }).toString()}
-      onMouseEnter={() => setHover(true)}
-      onMouseLeave={() => setHover(false)}
+      className={tabsCN.elem("item").mod({ active, virtual }).toString()}
     >
       <div
         className={tabsCN
