@@ -390,10 +390,13 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
     if (initialPoints.length > 0) {
       const lastPoint = initialPoints[initialPoints.length - 1];
       setLastAddedPointId(lastPoint.id);
-      // Set activePointId to last point for both skeleton and non-skeleton mode
+      // Set activePointId to last point only if it's not already set to a valid point
+      // This prevents overriding activePointId when a new point is created (which sets it immediately)
       // In skeleton mode: allows drawing from any point
       // In non-skeleton mode: allows drawing from last point (can be changed by selecting first point)
-      setActivePointId(lastPoint.id);
+      if (!activePointId || !initialPoints.find((p) => p.id === activePointId)) {
+        setActivePointId(lastPoint.id);
+      }
     }
   }, [initialPoints.length, skeletonEnabled]); // Only run when the number of points changes or skeleton mode changes
 
