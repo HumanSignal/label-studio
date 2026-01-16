@@ -148,6 +148,7 @@ const injector = inject(({ store }) => {
 const hoverIntentDelay = 300;
 
 // Helper function to create badge style objects with consistent CSS variable pattern
+// Note: CSS variables are overridden in SCSS to always use light mode values for tooltip badges
 const createBadgeStyle = (label: string, colorName: string) => ({
   label,
   backgroundColor: `var(--color-accent-${colorName}-subtle)`,
@@ -359,9 +360,6 @@ function AnnotationButtonTooltip({
 
   return typeof document !== "undefined" ? createPortal(tooltipContent, document.body) : null;
 }
-
-// Manager roles that can force-skip unskippable tasks (OW=Owner, AD=Admin, MA=Manager)
-const MANAGER_ROLES = ["OW", "AD", "MA"];
 
 // AnnotationButtonContextMenu component - must be defined outside AnnotationButton
 // to maintain stable component reference and prevent hooks order issues
@@ -878,16 +876,49 @@ export const AnnotationButton = observer(
       }
     }, [entityIsAlive, entity, annotationStore]);
 
-    // Get review badge
-    // Note: acceptedState is set from serialized data: sn.accepted_state ?? sn.acceptedState ?? null
-    // The badge will only display when the backend includes review status in the annotation serialization.
-    // Review status is only visible to owners/administrators or reviewers with data manager access
-    const userRole = (window as any).APP_SETTINGS?.user?.role;
-    const isManager = MANAGER_ROLES.includes(userRole);
-    const isReviewer = userRole === "RE";
-    const hasDataManagerAccess =
-      isReviewer && (window as any).APP_SETTINGS?.project?.review_settings?.show_data_manager_to_reviewers !== false;
-    const canViewReviewStatus = isManager || hasDataManagerAccess;
+    // Get review status from task source (LSE-only feature)
+    // The backend builds the annotators array by iterating through annotations in order,
+    // so we match by finding the annotation's position in the backend's annotation list
+    const getReviewStatus = useCallback(() => {
+      // Only available in LSE for non-predictions
+      const isLSE = (window as any).APP_SETTINGS?.version?.edition === "Enterprise";
+      if (!isLSE || !entityIsAlive || isPrediction) {
+        return null;
+      }
+
+      // Parse task source to get annotators array and backend annotations list
+      const task = annotationStore?.store?.task;
+      const sourceStr = task?.dataObj?.source;
+      if (!sourceStr) return null;
+
+      try {
+        const taskSource = typeof sourceStr === "string" ? JSON.parse(sourceStr) : sourceStr;
+        const annotators = taskSource?.annotators;
+        const backendAnnotations = taskSource?.annotations;
+
+        if (!Array.isArray(annotators) || !Array.isArray(backendAnnotations)) {
+          return null;
+        }
+
+        // Find the current annotation's index in the backend's annotations array
+        // The backend builds annotators array by iterating through this same list
+        const annotationIndex = backendAnnotations.findIndex((ann: any) => {
+          if (entity.pk && ann.id) {
+            return String(ann.id) === String(entity.pk);
+          }
+          return false;
+        });
+
+        if (annotationIndex === -1 || annotationIndex >= annotators.length) {
+          return null;
+        }
+
+        // Use the same index to get the corresponding annotator's review status
+        return annotators[annotationIndex]?.review ?? null;
+      } catch {
+        return null;
+      }
+    }, [entityIsAlive, isPrediction, annotationStore, entity.pk]);
 
     // Return null if entity is not alive, but only after all hooks have been called
     if (!entityIsAlive) {
@@ -895,8 +926,8 @@ export const AnnotationButton = observer(
     }
 
     // After this point, entityIsAlive is guaranteed to be true, so we can safely access entity properties
-    const acceptedState = canViewReviewStatus ? entity.accepted_state || entity.acceptedState : null;
-    const reviewBadge = canViewReviewStatus ? getReviewBadge(acceptedState) : null;
+    const acceptedState = getReviewStatus();
+    const reviewBadge = getReviewBadge(acceptedState);
 
     return (
       <div

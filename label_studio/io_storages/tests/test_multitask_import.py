@@ -1,7 +1,6 @@
 import json
 
 import boto3
-import mock
 import pytest
 from io_storages.models import S3ImportStorage
 from io_storages.s3.models import S3ImportStorageLink
@@ -15,34 +14,7 @@ from io_storages.utils import StorageObject, load_tasks_json
 from moto import mock_s3
 from projects.tests.factories import ProjectFactory
 from rest_framework.test import APIClient
-from tests.utils import azure_client_mock, gcs_client_mock, mock_feature_flag, redis_client_mock
-
-
-@pytest.fixture(name='fflag_feat_root_11_support_jsonl_cloud_storage_on')
-def fflag_feat_root_11_support_jsonl_cloud_storage_on():
-    from core.feature_flags import flag_set
-
-    def fake_flag_set(*args, **kwargs):
-        if args[0] == 'fflag_feat_root_11_support_jsonl_cloud_storage':
-            return True
-        return flag_set(*args, **kwargs)
-
-    with mock.patch('io_storages.utils.flag_set', wraps=fake_flag_set):
-        yield
-
-
-@pytest.fixture(name='fflag_feat_root_11_support_jsonl_cloud_storage_off')
-def fflag_feat_root_11_support_jsonl_cloud_storage_off():
-    from core.feature_flags import flag_set
-
-    def fake_flag_set(*args, **kwargs):
-        if args[0] == 'fflag_feat_root_11_support_jsonl_cloud_storage':
-            return False
-        return flag_set(*args, **kwargs)
-
-    with mock.patch('io_storages.utils.flag_set', wraps=fake_flag_set):
-        yield
-
+from tests.utils import azure_client_mock, gcs_client_mock, redis_client_mock
 
 #
 # Integration tests for storage.sync()
@@ -354,7 +326,6 @@ def test_mixed_formats(storage):
     create_tasks(storage, list(output))
 
 
-@mock_feature_flag('fflag_feat_root_11_support_jsonl_cloud_storage', True, 'io_storages.utils')
 def test_list_jsonl(storage):
     task_data = bare_task_list
 
@@ -369,7 +340,6 @@ def test_list_jsonl(storage):
     create_tasks(storage, list(output))
 
 
-@mock_feature_flag('fflag_feat_root_11_support_jsonl_cloud_storage', True, 'io_storages.utils')
 def test_list_jsonl_with_preds_and_annots(storage):
     task_data = annots_preds_task_list
 
@@ -385,13 +355,6 @@ def test_list_jsonl_with_preds_and_annots(storage):
     create_tasks(storage, list(output))
 
 
-@mock_feature_flag('fflag_feat_root_11_support_jsonl_cloud_storage', False, 'io_storages.utils')
-def test_ff_blocks_jsonl():
-    with pytest.raises(ValueError):
-        list(load_tasks_json(b'{"text": "Test task 1"}\n{"text": "Test task 2"}', 'test.jsonl'))
-
-
-@mock_feature_flag('fflag_feat_root_11_support_jsonl_cloud_storage', True, 'io_storages.utils')
 def test_mixed_formats_jsonl(storage):
     task_data = [bare_task_list[0], annots_preds_task_list[0]]
 
@@ -407,7 +370,6 @@ def test_mixed_formats_jsonl(storage):
     create_tasks(storage, list(output))
 
 
-@mock_feature_flag('fflag_feat_root_11_support_jsonl_cloud_storage', True, 'io_storages.utils')
 def test_list_jsonl_with_datetimes(storage):
     task_data = [
         {'data': {'text': 'Test task 1', 'created_at': '2021-01-01T00:00:00Z'}},
