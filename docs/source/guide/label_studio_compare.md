@@ -295,9 +295,15 @@ Label Studio is available to everyone as open source software (Label Studio Comm
     <td style="text-align:center">✅</td>
   </tr>
   <tr>
-    <td><b>Agreement metrics</b><br/><a href="https://docs.humansignal.com/guide/stats.html">Define how annotator consensus is calculated. You can choose from pre-defined metrics or customize your own.</a></td>
+    <td><b>Agreement metrics</b><br/><a href="https://docs.humansignal.com/guide/stats.html">Define how annotator consensus is calculated using pre-defined agreement metrics.</a></td>
     <td style="text-align:center">❌</td>
     <td style="text-align:center">✅</td>
+    <td style="text-align:center">✅</td>
+  </tr>
+  <tr>
+    <td><b>Custom agreement metrics</b><br/><a href="https://docs.humansignal.com/guide/custom_metric.html">Write your own custom agreement metric.</a></td>
+    <td style="text-align:center">❌</td>
+    <td style="text-align:center">❌</td>
     <td style="text-align:center">✅</td>
   </tr>
   <tr>

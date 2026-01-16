@@ -13,7 +13,7 @@ All labeling activities in Label Studio occur in the context of a project. After
 
 !!! error Enterprise
     Does your project need a fully customized interface? 
-    The UI engine on Label Studio Enterprise makes it possible to create programmable and embeddable interfaces for AI and agents. [Learn more](https://humansignal.com/blog/new-ui-engine).
+    The UI engine on Label Studio Enterprise makes it possible to create programmable and embeddable interfaces for AI and agents. [Learn more](https://humansignal.com/programmable-ui/).
 
 ## Set up the labeling interface for your project
 
