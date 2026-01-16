@@ -34,10 +34,18 @@ jobs:
           github-token: ${{ secrets.GIT_PAT }}
           script: |
             const { repo, owner } = context.repo;
+            const actor = '${{ github.actor }}';
+            
+            // Bypass membership check for Cursor GitHub App
+            if (actor === 'cursor[bot]') {
+              console.log(`Bypassing membership check for Cursor GitHub App: ${actor}`);
+              return true;
+            }
+            
             try {
               return (await github.rest.orgs.getMembershipForUser({
                 org: owner,
-                username: '${{ github.actor }}',
+                username: actor,
               }))?.data?.state == "active";
             } catch (error) {
               return false;

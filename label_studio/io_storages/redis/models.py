@@ -107,7 +107,9 @@ class RedisImportStorageBase(ImportStorage, RedisStorageMixin):
         value_str = client.get(key)
         if not value_str:
             return []
-        return load_tasks_json(value_str, key)
+        # Encode to bytes as load_tasks_json expects bytes
+        value_bytes = value_str.encode('utf-8')
+        return load_tasks_json(value_bytes, key)
 
     def scan_and_create_links(self):
         return self._scan_and_create_links(RedisImportStorageLink)

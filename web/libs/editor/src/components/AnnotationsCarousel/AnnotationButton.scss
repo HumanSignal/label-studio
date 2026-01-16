@@ -46,23 +46,6 @@
         border-radius: 2px;
         box-shadow: 0 0 0 2px var(--color-neutral-background);
         transform: translate(2px,2px);
-  
-        svg {
-          width: 6px;
-          height: 6px;
-        }
-  
-        &_accepted {          
-          background-color: var(--color-accent-kale-base);
-        }
-  
-        &_rejected {
-          background-color: var(--color-accent-persimmon-base);
-        }
-  
-        &_fixed {
-          background-color: var(--color-accent-canteloupe-base);
-        }
       }
     }
   }
@@ -328,6 +311,17 @@
     gap: 8px;
     margin-bottom: 8px;
     flex-wrap: wrap;
+
+    // Force light mode colors for better readability in dark mode tooltips
+    // Override the CSS variables to always use light mode values
+    --color-accent-grape-subtle: var(--color-grape-100);
+    --color-accent-grape-bold: var(--color-grape-700);
+    --color-accent-kale-subtle: var(--color-kale-100);
+    --color-accent-kale-bold: var(--color-kale-700);
+    --color-accent-canteloupe-subtle: var(--color-canteloupe-100);
+    --color-accent-canteloupe-bold: var(--color-canteloupe-700);
+    --color-accent-persimmon-subtle: var(--color-persimmon-100);
+    --color-accent-persimmon-bold: var(--color-persimmon-700);
   }
 
   &__tooltipStatusBadge {

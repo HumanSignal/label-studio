@@ -92,14 +92,44 @@
     cursor: pointer;
     background-color: var(--color-neutral-background);
 
+
+    &::after {
+      content: '';
+      position: absolute;
+      right: 0;
+      top: 0;
+      bottom: 0;
+      flex: 1;
+      width: var(--spacing-base);
+      height: 100%;
+      background: inherit;
+      z-index: -1;
+      transform: translateX(100%);
+    }
+
     &_disabled,
     &_loading {
       opacity: 0.6;
       pointer-events: none;
     }
 
-    &_even:not(.table__row_wrapper_selected) {
+    &_even:not(.table__row-wrapper_selected) {
       background-color: var(--color-neutral-emphasis-subtle);
+      position: relative;
+
+      &::after {
+        content: '';
+        position: absolute;
+        right: 0;
+        top: 0;
+        bottom: 0;
+        flex: 1;
+        width: var(--spacing-base);
+        height: 100%;
+        background: inherit;
+        z-index: -1;
+        transform: translateX(100%);
+      }
     }
 
     &_selected {
@@ -136,6 +166,10 @@
     position: relative;
     word-break: break-word;
     color: var(--color-neutral-content-subtler);
+
+    &.show-source {
+      padding: 0;
+    }
   }
 
   &__cell-content {
