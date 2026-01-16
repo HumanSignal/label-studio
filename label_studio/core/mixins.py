@@ -15,9 +15,30 @@ class DummyModelMixin:
 
 
 class GetParentObjectMixin:
+    """
+    Mixin for nested resources that fetches the parent object from URL kwargs.
+
+    Provides `self.parent_object` (cached) based on `parent_queryset`.
+
+    Attributes:
+        parent_queryset: QuerySet for the parent model (required)
+        parent_lookup_field: Field to filter on (default: lookup_field, usually 'pk')
+        parent_lookup_url_kwarg: URL kwarg name (default: lookup_url_kwarg or lookup_field)
+
+    Example:
+        # URL: /api/organizations/<int:pk>/member-tags/<int:tag_pk>
+        class MemberTagAPI(GetParentObjectMixin, viewsets.ModelViewSet):
+            parent_queryset = Organization.objects.all()
+            parent_lookup_url_kwarg = 'pk'      # org ID from URL
+            lookup_url_kwarg = 'tag_pk'         # tag ID from URL
+
+            def get_queryset(self):
+                return MemberTag.objects.filter(organization=self.parent_object)
+    """
+
     parent_queryset = None
-    parent_lookup_field = None   # Defaults to lookup_field
-    parent_lookup_url_kwarg = None   # Defaults to lookup_url_kwarg
+    parent_lookup_field = None
+    parent_lookup_url_kwarg = None
 
     @cached_property
     def parent_object(self):
