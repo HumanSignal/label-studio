@@ -1383,14 +1383,59 @@ class LabelStreamHistory(models.Model):
 
 
 class ProjectMember(models.Model):
+    """Project membership with role-based access control"""
+
+    # Role choices - hierarchical design
+    OWNER = 'owner'
+    REVIEWER = 'reviewer'
+    ANNOTATOR = 'annotator'
+
+    ROLE_CHOICES = [
+        (OWNER, 'Owner'),
+        (REVIEWER, 'Reviewer'),
+        (ANNOTATOR, 'Annotator'),
+    ]
 
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='project_memberships', help_text='User ID'
     )
     project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name='members', help_text='Project ID')
+    role = models.CharField(
+        max_length=20,
+        choices=ROLE_CHOICES,
+        default=ANNOTATOR,
+        help_text='User role in this project',
+    )
     enabled = models.BooleanField(default=True, help_text='Project member is enabled')
     created_at = models.DateTimeField(_('created at'), auto_now_add=True)
     updated_at = models.DateTimeField(_('updated at'), auto_now=True)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=['user', 'project'],
+                name='unique_user_project_member',
+            )
+        ]
+        indexes = [
+            models.Index(fields=['project', 'role'], name='projectmember_project_role_idx'),
+        ]
+        db_table = 'project_member'
+
+    def __str__(self):
+        return f'{self.user.email} - {self.project.title} ({self.get_role_display()})'
+
+    def is_owner(self):
+        """Check if user has owner role"""
+        return self.role == self.OWNER
+
+    def is_reviewer(self):
+        """Check if user has reviewer or owner role (hierarchical)"""
+        return self.role in [self.OWNER, self.REVIEWER]
+
+    def is_annotator(self):
+        """Check if user has any role (all roles can annotate)"""
+        return self.role in [self.OWNER, self.REVIEWER, self.ANNOTATOR]
 
 
 class ProjectSummary(models.Model):

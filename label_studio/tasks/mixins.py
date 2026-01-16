@@ -1,7 +1,31 @@
 class TaskMixin:
     def has_permission(self, user: 'User') -> bool:  # noqa: F821
-        """Called by Task#has_permission"""
-        return True
+        """
+        Check if user has permission to access this task
+        Delegates to project-level permission check
+        """
+        if not user or not user.is_authenticated:
+            return False
+
+        # Delegate to project permission
+        return self.project.has_permission(user)
+
+    def user_can_annotate(self, user: 'User') -> bool:  # noqa: F821
+        """
+        Check if user can create annotations on this task
+        All project members can annotate
+        """
+        return self.has_permission(user)
+
+    def user_can_review(self, user: 'User') -> bool:  # noqa: F821
+        """
+        Check if user can review/modify annotations on this task
+        Only reviewers and owners can review
+        """
+        if not user or not user.is_authenticated:
+            return False
+
+        return self.project.user_can_review(user)
 
     def _get_is_labeled_value(self) -> bool:
         n = self.completed_annotations.values('completed_by').distinct().count()
@@ -36,5 +60,24 @@ class TaskMixin:
 
 class AnnotationMixin:
     def has_permission(self, user: 'User') -> bool:  # noqa: F821
-        """Called by Annotation#has_permission"""
-        return True
+        """
+        Check if user has permission to access this annotation
+        Delegates to task/project permission check
+        """
+        if not user or not user.is_authenticated:
+            return False
+
+        # Basic access: user must be project member
+        if not self.task.project.has_permission(user):
+            return False
+
+        # For viewing/modifying: check role-based permissions
+        # Owners and reviewers can access all annotations
+        # Annotators can only access their own
+        role = self.task.project.get_user_role(user)
+
+        if role in ['owner', 'reviewer']:
+            return True
+
+        # Annotators can only access their own annotations
+        return self.completed_by == user

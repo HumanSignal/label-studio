@@ -73,10 +73,96 @@ class ProjectMixin:
 
     def has_permission(self, user):
         """
-        Dummy stub for has_permission
+        Check if user has permission to access this project (is a project member)
         """
+        from projects.models import ProjectMember
+
         user.project = self  # link for activity log
-        return True
+
+        if not user or not user.is_authenticated:
+            return False
+
+        # Check if user is an enabled member of this project
+        return ProjectMember.objects.filter(
+            user=user,
+            project=self,
+            enabled=True
+        ).exists()
+
+    def get_user_role(self, user):
+        """
+        Get user's role in this project
+
+        Args:
+            user: User instance
+
+        Returns:
+            str: Role name ('owner', 'reviewer', 'annotator') or None
+        """
+        from projects.models import ProjectMember
+
+        if not user or not user.is_authenticated:
+            return None
+
+        try:
+            membership = ProjectMember.objects.get(
+                user=user,
+                project=self,
+                enabled=True
+            )
+            return membership.role
+        except ProjectMember.DoesNotExist:
+            return None
+
+    def user_can_manage(self, user):
+        """
+        Check if user can manage this project (is owner)
+
+        Args:
+            user: User instance
+
+        Returns:
+            bool: True if user is project owner
+        """
+        from projects.models import ProjectMember
+
+        if not user or not user.is_authenticated:
+            return False
+
+        try:
+            membership = ProjectMember.objects.get(
+                user=user,
+                project=self,
+                enabled=True
+            )
+            return membership.role == ProjectMember.OWNER
+        except ProjectMember.DoesNotExist:
+            return False
+
+    def user_can_review(self, user):
+        """
+        Check if user can review annotations (is reviewer or owner)
+
+        Args:
+            user: User instance
+
+        Returns:
+            bool: True if user is reviewer or owner
+        """
+        from projects.models import ProjectMember
+
+        if not user or not user.is_authenticated:
+            return False
+
+        try:
+            membership = ProjectMember.objects.get(
+                user=user,
+                project=self,
+                enabled=True
+            )
+            return membership.role in [ProjectMember.OWNER, ProjectMember.REVIEWER]
+        except ProjectMember.DoesNotExist:
+            return False
 
     def _can_use_overlap(self):
         """
