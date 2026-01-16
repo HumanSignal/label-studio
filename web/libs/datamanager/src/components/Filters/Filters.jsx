@@ -36,13 +36,11 @@ export const Filters = injector(({ views, currentView, filters }) => {
           options: [],
         };
 
-        const shouldDisable = filter.field.disabled;
-
         group.options.push({
           value: filter.id,
           title: filter.field.title,
           original: filter,
-          disabled: shouldDisable,
+          disabled: filter.field.disabled,
         });
 
         return { ...res, [target]: group };

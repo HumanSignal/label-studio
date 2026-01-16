@@ -32,27 +32,9 @@ export const OrderButton = injector(({ size, ordering, view, ...rest }) => {
             <Space style={{ width: "100%", justifyContent: "space-between" }}>
               {children}
 
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "8px",
-                }}
-              >
+              <div className="flex items-center gap-tight">
                 {enterpriseBadge && <EnterpriseBadge ghost />}
-                {column?.icon && (
-                  <div
-                    style={{
-                      width: 24,
-                      height: 24,
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                    }}
-                  >
-                    {column.icon}
-                  </div>
-                )}
+                {column?.icon && <div className="w-6 h-6 flex items-center justify-center">{column.icon}</div>}
               </div>
             </Space>
           )}
