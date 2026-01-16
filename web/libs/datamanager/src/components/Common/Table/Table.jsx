@@ -17,6 +17,7 @@ import { cn } from "../../../utils/bem";
 import { FieldsButton } from "../FieldsButton";
 import { FF_LOPS_E_3, isFF } from "../../../utils/feature-flags";
 import { DensityToggle } from "../../DataManager/Toolbar/DensityToggle";
+import { Spinner } from "../Spinner";
 
 const Decorator = (decoration) => {
   return {
