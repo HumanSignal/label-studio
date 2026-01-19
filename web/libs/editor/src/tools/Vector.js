@@ -331,22 +331,22 @@ const _Tool = types
         return Math.abs(distX) >= 5 || Math.abs(distY) >= 5;
       },
 
-       _finishDrawing() {
-         const { currentArea, control } = self;
+      _finishDrawing() {
+        const { currentArea, control } = self;
 
-         if (currentArea === null) return;
+        if (currentArea === null) return;
 
-         down = false;
-         self.currentArea?.notifyDrawingFinished();
-         self.setDrawing(false);
-         self.mode = "viewing";
-         self.currentArea = null;
-         self.stopListening();
-         // For incomplete vector regions, don't trigger selectAfterCreate behavior
-         if (!currentArea.incomplete) {
-           self.annotation.afterCreateResult(currentArea, control);
-         }
-       },
+        down = false;
+        self.currentArea?.notifyDrawingFinished();
+        self.setDrawing(false);
+        self.mode = "viewing";
+        self.currentArea = null;
+        self.stopListening();
+        // For incomplete vector regions, don't trigger selectAfterCreate behavior
+        if (!currentArea.incomplete) {
+          self.annotation.afterCreateResult(currentArea, control);
+        }
+      },
 
       setDrawing(drawing) {
         self.currentArea?.setDrawing(drawing);

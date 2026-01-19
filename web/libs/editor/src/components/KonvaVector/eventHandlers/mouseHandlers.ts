@@ -1066,7 +1066,7 @@ export function createClickHandler(props: EventHandlerProps, handledSelectionInM
  */
 function getEndpointIndices(points: BezierPoint[]): Set<number> {
   const endpointIndices = new Set<number>();
-  
+
   // Create a set of all point IDs that are referenced as prevPointId
   const referencedPointIds = new Set<string>();
   points.forEach((point) => {
@@ -1074,7 +1074,7 @@ function getEndpointIndices(points: BezierPoint[]): Set<number> {
       referencedPointIds.add(point.prevPointId);
     }
   });
-  
+
   // Find endpoints:
   // 1. Points with no prevPointId (starting points)
   // 2. Points that are not referenced by any other point (ending points)
@@ -1083,7 +1083,7 @@ function getEndpointIndices(points: BezierPoint[]): Set<number> {
       endpointIndices.add(index);
     }
   });
-  
+
   return endpointIndices;
 }
 
