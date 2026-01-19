@@ -57,6 +57,10 @@
       & .table-head {
         border-top: 1px solid var(--color-neutral-border);
       }
+
+      & .table__row-wrapper::after {
+        display: none;
+      }
     }
   }
 
