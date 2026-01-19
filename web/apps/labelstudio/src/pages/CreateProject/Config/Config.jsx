@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState, useRef } from "react";
 import CM from "codemirror";
 import { Button, cnm } from "@humansignal/ui";
-import { IconTrash } from "@humansignal/icons";
+import { IconTrash, IconInfoOutline } from "@humansignal/icons";
 import { ToggleItems } from "../../../components";
 import { Form, Input } from "../../../components/Form";
 import { useAPI } from "../../../providers/ApiProvider";
@@ -11,6 +11,7 @@ import { FF_UNSAVED_CHANGES, isFF } from "../../../utils/feature-flags";
 import { colorNames } from "./colors";
 import "./Config.scss";
 import { Preview } from "./Preview";
+import { LightweightPreview, LIGHTWEIGHT_PREVIEW_MESSAGE, LIGHTWEIGHT_PREVIEW_THRESHOLD } from "@humansignal/core";
 import { DEFAULT_COLUMN, EMPTY_CONFIG, isEmptyConfig, Template } from "./Template";
 import { TemplatesList } from "./TemplatesList";
 
@@ -23,6 +24,38 @@ import { EditorResizer } from "./EditorResizer";
 
 const wizardClass = cn("wizard");
 const configClass = cn("configure");
+
+/**
+ * AdaptivePreview - Uses lightweight static preview for large configs,
+ * full interactive preview for smaller configs.
+ * 
+ * Always uses full preview for configs containing ReactCode tag since
+ * it requires full React/MST integration to function.
+ */
+const AdaptivePreview = (props) => {
+  const config = props.config || "";
+  const configLength = config.length;
+  
+  // Check if config contains ReactCode tag - always use full preview for ReactCode
+  // since lightweight preview can't render custom React components
+  const hasReactCode = /<ReactCode/i.test(config);
+  
+  const useLightweight = !hasReactCode && configLength > LIGHTWEIGHT_PREVIEW_THRESHOLD;
+
+  if (useLightweight) {
+    return (
+      <div className={configClass.elem("preview-container")}>
+        <div className={configClass.elem("preview-info-banner")}>
+          <IconInfoOutline width={16} height={16} />
+          <span>{LIGHTWEIGHT_PREVIEW_MESSAGE}</span>
+        </div>
+        <LightweightPreview {...props} />
+      </div>
+    );
+  }
+
+  return <Preview {...props} />;
+};
 
 const EmptyConfigPlaceholder = () => (
   <div className={configClass.elem("empty-config")}>
@@ -400,8 +433,11 @@ const Configurator = ({
   const api = useAPI();
 
   React.useEffect(() => {
-    // config may change during init, so wait for that, but for a very short time only
-    debounceTimer.current = window.setTimeout(() => setConfigToCheck(config), configToCheck ? 500 : 30);
+    // Debounce config changes before triggering validation API calls
+    debounceTimer.current = window.setTimeout(() => {
+      setConfigToCheck(config);
+    }, 300);
+
     return () => window.clearTimeout(debounceTimer.current);
   }, [config]);
 
@@ -606,7 +642,7 @@ const Configurator = ({
             onResize={setEditorWidthPixels}
             constraints={constraints}
           />
-          <Preview
+          <AdaptivePreview
             config={configToDisplay}
             data={data}
             project={project}
@@ -646,20 +682,24 @@ export const ConfigPage = ({
   );
 
   const setConfig = React.useCallback(
-    (config) => {
-      _setConfig(config);
-      onUpdate(config);
+    (newConfig) => {
+      _setConfig(newConfig);
+      onUpdate(newConfig);
     },
     [_setConfig, onUpdate],
   );
 
+  // setTemplate - handles both config state and Template object creation
   const setTemplate = React.useCallback(
-    (config) => {
-      const tpl = new Template({ config });
-
-      tpl.onConfigUpdate = setConfig;
-      setConfig(config);
-      setCurrentTemplate(tpl);
+    (newConfig) => {
+      setConfig(newConfig);
+      try {
+        const tpl = new Template({ config: newConfig });
+        tpl.onConfigUpdate = setConfig;
+        setCurrentTemplate(tpl);
+      } catch (e) {
+        console.error("Template parsing error:", e);
+      }
     },
     [setConfig, setCurrentTemplate],
   );
