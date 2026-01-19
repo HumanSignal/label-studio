@@ -1,5 +1,7 @@
 import throttle from "lodash/throttle";
 import { destroy, detach, flow, getEnv, getParent, getRoot, isAlive, onSnapshot, types } from "mobx-state-tree";
+import Canvas from "../../utils/canvas";
+import { decode, encode } from "@thi.ng/rle-pack";
 import { ff } from "@humansignal/core";
 import { errorBuilder } from "../../core/DataValidator/ConfigValidator";
 import { guidGenerator } from "../../core/Helpers";
@@ -10,7 +12,15 @@ import Types from "../../core/Types";
 import Area from "../../regions/Area";
 import Result from "../../regions/Result";
 import Utils from "../../utils";
-import { FF_DEV_1284, FF_DEV_3391, FF_LLM_EPIC, FF_LSDV_4583, FF_REVIEWER_FLOW, isFF } from "../../utils/feature-flags";
+import {
+  FF_DEV_1284,
+  FF_DEV_3391,
+  FF_LLM_EPIC,
+  FF_LSDV_3009,
+  FF_LSDV_4583,
+  FF_REVIEWER_FLOW,
+  isFF,
+} from "../../utils/feature-flags";
 import { delay, isDefined } from "../../utils/utilities";
 import { CommentStore } from "../Comment/CommentStore";
 import RegionStore from "../RegionStore";
@@ -520,6 +530,161 @@ const _Annotation = types
       }
     },
 
+    async mergeSelectedRegions() { // Merge selected annotations with RLE masks
+      const selected = (self.selectedRegions || []).filter((r) => !!r);
+      if (!selected || selected.length < 2) return null;
+
+      // Collect only regions that actually provide RLE (either stored or
+      // generated). Ignore all other selected labels (rectangles, etc.).
+      const contributors = [];
+      for (const region of selected) {
+        let sourceRLE = null;
+        if (region.rle && region.rle.length) {
+          sourceRLE = region.rle;
+        } else {
+          try {
+            sourceRLE = Canvas.Region2RLE?.(region) || null;
+          } catch (e) {
+            sourceRLE = null;
+          }
+        }
+
+        if (sourceRLE && sourceRLE.length) {
+          contributors.push({ region, sourceRLE });
+        }
+      }
+
+      // If nothing to merge (no RLE contributors), do nothing and keep
+      // all selected regions intact.
+      if (!contributors.length) return null;
+
+      // Determine image dimensions and class from the first contributor.
+      const first = contributors[0].region;
+      const ent = first.currentImageEntity;
+      const nw = ent?.naturalWidth ?? 0;
+      const nh = ent?.naturalHeight ?? 0;
+      if (!nw || !nh) return null;
+
+      // Ensure all contributors belong to the same image entity
+      for (const c of contributors) {
+        if (c.region.currentImageEntity !== ent) {
+          console.error("merge: selected regions (contributors) belong to different image entities");
+          return null;
+        }
+      }
+
+      // Build a union that preserves original RGBA per-pixel
+      const unionAlpha = new Uint8ClampedArray(nw * nh);
+      const unionRGBA = new Uint8ClampedArray(nw * nh * 4);
+      const mergedRegionIds = new Set();
+      let foundAnyRLE = false;
+
+      for (const region of selected) {
+        try {
+          const sourceRLE = region.rle && region.rle.length
+            ? region.rle
+            : (() => {
+                try { return Canvas.Region2RLE?.(region) || null; }
+                catch (e) { return null; }
+            })();
+          if (!sourceRLE || !sourceRLE.length) continue;
+
+          const decoded = decode(sourceRLE); // RGBA bytes
+          if (!decoded) continue;
+
+          foundAnyRLE = true;
+          mergedRegionIds.add(region.id);
+
+          // For each pixel, if this region's alpha is greater than the current
+          // union alpha, copy the full RGBA into the union buffer.
+          for (let p = 0, pix = nw * nh; p < pix; p++) {
+            const off = p * 4;
+            const alpha = decoded[off + 3] || 0;
+            if (alpha > unionAlpha[p]) {
+              unionAlpha[p] = alpha;
+              unionRGBA[off] = decoded[off] || 0;
+              unionRGBA[off + 1] = decoded[off + 1] || 0;
+              unionRGBA[off + 2] = decoded[off + 2] || 0;
+              unionRGBA[off + 3] = alpha;
+            }
+          }
+        } catch (err) {
+          console.debug("merge: region decode failed", err);
+        }
+      }
+
+      if (!foundAnyRLE) return null;
+
+      // Build mergedDataURL from the merged RGBA buffer
+      const canvas = document.createElement("canvas");
+      canvas.width = nw;
+      canvas.height = nh;
+      const ctx = canvas.getContext("2d");
+      const imageData = ctx.createImageData(nw, nh);
+      imageData.data.set(unionRGBA);
+      ctx.putImageData(imageData, 0, 0);
+      const mergedDataURL = canvas.toDataURL();
+      const mergedBase64 = typeof mergedDataURL === "string" ? mergedDataURL.split(",")[1] : null;
+
+      // Use first selected region's result as label/class
+      const firstResult = first.results?.[0];
+      const resultValue = firstResult?.value?.toJSON
+          ? firstResult.value.toJSON()
+          : structuredClone(firstResult?.value ?? {});
+      const control = firstResult?.from_name ?? first.results?.[0]?.from_name;
+      const object = firstResult?.to_name ?? first.results?.[0]?.to_name;
+
+      // Encode RLE from the merged RGBA buffer (preserving original RGB and
+      // using max-alpha per overlapping pixel).
+      let rleEncoded = null;
+      try {
+        const encoded = encode(unionRGBA);
+        if (encoded && encoded.length) {
+          rleEncoded = Array.isArray(encoded) ? encoded : Array.from(encoded);
+        }
+      } catch (err) {
+        rleEncoded = null;
+      }
+
+      const areaValue = {
+        ...(rleEncoded ? { rle: rleEncoded } : {}),
+        maskDataURL: mergedDataURL,
+        base64: mergedBase64,
+        original_width: nw,
+        original_height: nh,
+      };
+
+      const newArea = self.createResult(areaValue, resultValue, control, object);
+
+      try { newArea?.updateMaskImage?.(); } catch (e) {}
+
+      try {
+          const valueForSerialization = {
+              format: "rle",
+              rle: rleEncoded ? Array.from(rleEncoded) : [],
+              ...(resultValue || {}),
+          };
+          const serialized = {
+              original_width: nw,
+              original_height: nh,
+              image_rotation: ent?.rotation ?? 0,
+              value: valueForSerialization,
+          };
+          if (first.results?.[0]?.item_index !== undefined) serialized.item_index = first.results[0].item_index;
+          Object.defineProperty(newArea, "_rawResult", { value: Object.freeze(structuredClone(serialized)) });
+      } catch (e) {}
+
+        try {
+          for (const r of selected) {
+            // Only delete regions that actually contributed RLE data to the merge.
+            if (!mergedRegionIds.has(r.id)) continue;
+            try { r.deleteRegion(); } catch (err) { console.debug("merge: failed to delete region", r?.id, err); }
+          }
+        } catch (err) { console.debug("merge: error while deleting selected regions", err); }
+
+      return newArea;
+    },
+
     deleteSelectedRegions() {
       for (const region of self.selectedRegions) {
         region.deleteRegion();
@@ -660,10 +825,6 @@ const _Annotation = types
           const points = currentRegion?.points?.length ?? 0;
 
           stopDrawingAfterNextUndo = points <= 1;
-        } else if (currentRegion?.type === "vectorregion") {
-          const vertices = currentRegion?.vertices?.length ?? 0;
-
-          stopDrawingAfterNextUndo = vertices <= 1;
         }
 
         history.undo();
@@ -801,6 +962,9 @@ const _Annotation = types
       if (!self.editable) return;
 
       const result = self.serializeAnnotation({ fast: true });
+      // if this is new annotation and no regions added yet
+
+      if (!isFF(FF_LSDV_3009) && !self.pk && !result.length) return;
 
       self.setDraftSelected();
       self.versions.draft = result;
@@ -966,8 +1130,7 @@ const _Annotation = types
       //   }
       // };
 
-      const { enableHotkeys } = self.store.settings;
-      Hotkey.setScope(enableHotkeys ? Hotkey.DEFAULT_SCOPE : "__none__");
+      Hotkey.setScope(Hotkey.DEFAULT_SCOPE);
     },
 
     createResult(areaValue, resultValue, control, object, skipAfrerCreate = false, additionalStates = []) {

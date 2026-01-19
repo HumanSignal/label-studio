@@ -16,6 +16,8 @@ import { Dropdown } from "@humansignal/ui";
 // eslint-disable-next-line
 // @ts-ignore
 import { Menu } from "../../../common/Menu/Menu";
+// local merge icon
+import MergeIcon from "./MergeIcon";
 import { cn } from "../../../utils/bem";
 import { SidePanelsContext } from "../SidePanelsContext";
 import "./ViewControls.scss";
@@ -164,6 +166,7 @@ export const ViewControls: FC<ViewControlsProps> = observer(
             />
           </div>
         )}
+        <MergeRegionsButton regions={regions} />
         <ToggleRegionsVisibilityButton regions={regions} />
       </div>
     );
@@ -321,6 +324,33 @@ const ToggleRegionsVisibilityButton = observer<FC<ToggleRegionsVisibilityButton>
       ) : (
         <IconOutlinerEyeOpened width={16} height={16} />
       )}
+    </Button>
+  );
+});
+
+const MergeRegionsButton = observer<FC<ToggleRegionsVisibilityButton>>(({ regions }) => {
+  const merge = useCallback(
+    (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      regions.annotation.mergeSelectedRegions?.();
+    },
+    [regions],
+  );
+
+  const isDisabled = !regions?.selection || regions.selection.size < 2;
+
+  return (
+    <Button
+      variant="neutral"
+      size="smaller"
+      look="string"
+      disabled={isDisabled}
+      onClick={merge}
+      aria-label={"Merge selected regions"}
+      tooltip={"Merge selected regions"}
+    >
+      <MergeIcon width={16} height={16} />
     </Button>
   );
 });
