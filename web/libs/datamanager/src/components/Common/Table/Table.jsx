@@ -17,6 +17,7 @@ import { cn } from "../../../utils/bem";
 import { FieldsButton } from "../FieldsButton";
 import { FF_LOPS_E_3, isFF } from "../../../utils/feature-flags";
 import { DensityToggle } from "../../DataManager/Toolbar/DensityToggle";
+import { Spinner } from "../Spinner";
 
 const Decorator = (decoration) => {
   return {
@@ -252,10 +253,31 @@ export const Table = observer(
     );
 
     const renderRow = useCallback(
-      ({ style, index }) => {
+      ({ style, index, isLoading }) => {
         // Both QuickView and Regular mode: Index 0 is header (sticky), Index 1+ are data rows
         const dataIndex = index - 1;
         const row = data[dataIndex];
+
+        // Show loading indicator at the end of the list when loading more data
+        if (!row && isLoading && dataIndex >= data.length) {
+          return (
+            <div
+              key="loading-indicator"
+              style={{
+                ...style,
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                height: props.rowHeight,
+              }}
+            >
+              <Spinner size="small" />
+            </div>
+          );
+        }
+
+        if (!row) return null;
+
         const isEven = dataIndex % 2 === 0;
 
         if (isQuickView) {
@@ -383,6 +405,7 @@ export const Table = observer(
             initialScrollOffset={initialScrollOffset}
             isItemLoaded={isItemLoaded}
             loadMore={props.loadMore}
+            isLoading={view.dataStore.loading && data.length > 0}
             toolbarHeight={toolbarHeight}
             headerHeight={headerHeight}
             isQuickView={isQuickView}
@@ -402,13 +425,13 @@ const StickyListContext = createContext();
 StickyListContext.displayName = "StickyListProvider";
 
 const ItemWrapper = ({ data, index, style }) => {
-  const { Renderer, stickyItems } = data;
+  const { Renderer, stickyItems, isLoading } = data;
 
   if (stickyItems?.includes(index) === true) {
     return null;
   }
 
-  return <Renderer index={index} style={style} />;
+  return <Renderer index={index} style={style} isLoading={isLoading} />;
 };
 
 const StickyList = observer(
@@ -421,6 +444,7 @@ const StickyList = observer(
       totalCount,
       isItemLoaded,
       loadMore,
+      isLoading,
       initialScrollOffset,
       toolbarHeight,
       headerHeight,
@@ -439,6 +463,7 @@ const StickyList = observer(
       headerTopOffset,
       isQuickView,
       toolbarHeight,
+      isLoading,
     };
 
     const itemSize = (index) => {
@@ -480,6 +505,7 @@ const StickyList = observer(
           totalCount={totalCount}
           loadMore={loadMore}
           isItemLoaded={isItemLoaded}
+          isLoading={isLoading}
           itemData={itemData}
           itemSize={itemSize}
           initialScrollOffset={initialScrollOffset}
