@@ -557,6 +557,7 @@ const Configurator = ({
         className={configClass.elem("container").toClassName()}
         ref={containerRef}
         style={{
+          display: "grid",
           gridTemplateColumns: `${editorWidthPixels}px minmax(516px, 1fr)`,
         }}
       >
