@@ -203,39 +203,39 @@ export const VectorTransformer: React.FC<VectorTransformerProps> = ({
               pixelSnapping,
             );
 
-            // Update the ref immediately so next transformation tick uses latest points
-            if (updateCurrentPointsRef) {
-              updateCurrentPointsRef(newPoints);
-            }
+            // Check if this is a rotation operation
+            const originalRotation = originalPositionsRef.current.initialRotation || 0;
+            const rotationDelta = Math.abs(transformer.rotation() - originalRotation);
+            const isActualRotation = rotationDelta > 1.0;
 
-            // Skip control point transformations on the first tick to avoid jumping
-            if (isFirstTransformTickRef.current) {
-              isFirstTransformTickRef.current = false;
-              onPointsChange?.(newPoints);
+            // Apply control point transformations synchronously during rotation to prevent shifting
+            // Skip on first tick to avoid jumping
+            let finalPoints = newPoints;
+            if (!isFirstTransformTickRef.current) {
+              // Apply transformation to control points immediately (synchronously) during rotation
+              // This ensures anchor and control points stay in sync during quick rotation
+              finalPoints = applyTransformationToControlPoints(
+                newPoints,
+                originalPositionsRef.current,
+                transformer.rotation(),
+                transformer.scaleX(),
+                transformer.scaleY(),
+                transformerCenter.x,
+                transformerCenter.y,
+                isActualRotation,
+                pixelSnapping,
+              );
             } else {
-              // Apply transformation to control points using RAF
-              if (rafIdRef.current) {
-                cancelAnimationFrame(rafIdRef.current);
-              }
-              rafIdRef.current = requestAnimationFrame(() => {
-                // Check if this is actually a rotation operation (not just scaling)
-                const isActualRotation = Math.abs(transformer.rotation()) > 1.0;
-
-                // Apply transformation to control points using original positions as base
-                const updatedPoints = applyTransformationToControlPoints(
-                  newPoints,
-                  originalPositionsRef.current,
-                  transformer.rotation(),
-                  transformer.scaleX(),
-                  transformer.scaleY(),
-                  transformerCenter.x,
-                  transformerCenter.y,
-                  isActualRotation, // Only apply rotation logic if there's actual rotation
-                  pixelSnapping,
-                );
-                onPointsChange?.(updatedPoints);
-              });
+              isFirstTransformTickRef.current = false;
             }
+
+            // Update the ref immediately with both anchor and control points
+            if (updateCurrentPointsRef) {
+              updateCurrentPointsRef(finalPoints);
+            }
+
+            // Notify of changes
+            onPointsChange?.(finalPoints);
           } catch (error) {
             console.warn("Transform error:", error);
           }
