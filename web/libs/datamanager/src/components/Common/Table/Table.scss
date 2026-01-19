@@ -55,6 +55,7 @@
       }
 
       & .table-head {
+        width: calc(100% + var(--spacing-base));
         border-top: 1px solid var(--color-neutral-border);
       }
     }
