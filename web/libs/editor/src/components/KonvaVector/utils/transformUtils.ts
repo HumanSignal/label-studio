@@ -1,13 +1,10 @@
-import React from "react";
 import type Konva from "konva";
 import type { BezierPoint } from "../types";
 import { snapToPixel } from "../eventHandlers/utils";
-import { constrainPointToBounds } from "./boundsChecking";
 
 export interface TransformResult {
   newPoints: BezierPoint[];
   transformer: Konva.Transformer;
-  wasPrevented?: boolean; // True if transformation was prevented due to boundary constraints
 }
 
 /**
@@ -16,63 +13,6 @@ export interface TransformResult {
  */
 export function resetTransformState() {
   // No longer needed, but keeping for backward compatibility
-}
-
-/**
- * Checks if any boundary point would be constrained (wouldn't move) after a transformation.
- * If so, the entire transformation should be prevented to avoid shape corruption.
- * 
- * This follows the same pattern as dragBoundFunc - when one point touches boundary,
- * all points should stop moving together.
- * 
- * @param currentPoints - Current point positions
- * @param selectedPoints - Set of selected point indices
- * @param bounds - Image bounds {width, height}
- * @param calculateTransformedPosition - Function that calculates where a point would be after transformation
- * @returns true if transformation should be prevented (any boundary point wouldn't move)
- */
-export function shouldPreventTransformationDueToBoundary(
-  currentPoints: BezierPoint[],
-  selectedPoints: Set<number>,
-  bounds: { width: number; height: number },
-  calculateTransformedPosition: (point: BezierPoint, pointIndex: number) => { x: number; y: number },
-): boolean {
-  const tolerance = 0.1;
-  const toleranceCheck = 0.001;
-  
-  // Check each selected point
-  for (const pointIndex of Array.from(selectedPoints)) {
-    const currentPoint = currentPoints[pointIndex];
-    if (!currentPoint) continue;
-    
-    // Check if point is at boundary
-    const atBoundary = 
-      currentPoint.x <= tolerance ||
-      currentPoint.x >= bounds.width - tolerance ||
-      currentPoint.y <= tolerance ||
-      currentPoint.y >= bounds.height - tolerance;
-    
-    if (atBoundary) {
-      // Calculate where point would be after transformation
-      const transformedPos = calculateTransformedPosition(currentPoint, pointIndex);
-      
-      // Constrain to bounds
-      const constrainedX = Math.max(0, Math.min(bounds.width, transformedPos.x));
-      const constrainedY = Math.max(0, Math.min(bounds.height, transformedPos.y));
-      
-      // Check if point would actually move
-      const wouldMove =
-        Math.abs(constrainedX - currentPoint.x) > toleranceCheck ||
-        Math.abs(constrainedY - currentPoint.y) > toleranceCheck;
-      
-      // If point wouldn't move, prevent transformation
-      if (!wouldMove) {
-        return true;
-      }
-    }
-  }
-  
-  return false;
 }
 
 /**
@@ -228,7 +168,7 @@ export function applyTransformationToPoints(
     };
   },
   transformerCenter?: { x: number; y: number },
-  bounds?: { x: number; y: number; width: number; height: number },
+  bounds?: { width: number; height: number },
   getCurrentPointsRef?: () => BezierPoint[],
   updateCurrentPointsRef?: (points: BezierPoint[]) => void,
   pixelSnapping = false,
@@ -254,55 +194,6 @@ export function applyTransformationToPoints(
   const scaleX = transformer.scaleX();
   const scaleY = transformer.scaleY();
 
-  // Track if any point was constrained (didn't move when transformer moved)
-  let anyPointConstrained = false;
-  
-  // First pass: check if any point at boundary would be constrained BEFORE applying transformations
-  // This prevents partial transformations where some points move and others don't
-  if (bounds) {
-    const tolerance = 0.1;
-    const toleranceCheck = 0.001;
-    
-    for (const node of nodes) {
-      if (!node || !node.name()) continue;
-      
-      const pointIndex = Number.parseInt(node.name().split("-")[1]);
-      const originalPoint = currentPoints[pointIndex];
-      if (!originalPoint) continue;
-      
-      // Check if point is at boundary
-      const atBoundary = 
-        originalPoint.x <= tolerance ||
-        originalPoint.x >= bounds.width - tolerance ||
-        originalPoint.y <= tolerance ||
-        originalPoint.y >= bounds.height - tolerance;
-      
-      if (atBoundary) {
-        // Get the node's transformed position
-        const transformedX = node.x();
-        const transformedY = node.y();
-        const snappedPos = snapToPixel({ x: transformedX, y: transformedY }, pixelSnapping);
-        
-        // Check where point would be after constraint
-        const constrainedPos = constrainPointToBounds(
-          snappedPos,
-          { width: bounds.width, height: bounds.height },
-        );
-        
-        // Check if point would actually move
-        const didPointMove =
-          Math.abs(constrainedPos.x - originalPoint.x) > toleranceCheck ||
-          Math.abs(constrainedPos.y - originalPoint.y) > toleranceCheck;
-        
-        // If point is at boundary and wouldn't move, prevent ALL transformations
-        if (!didPointMove) {
-          anyPointConstrained = true;
-          break; // Early exit - we know we need to prevent all transformations
-        }
-      }
-    }
-  }
-
   // Apply the transformation to each selected point
   for (const node of nodes) {
     if (!node || !node.name()) continue;
@@ -312,70 +203,28 @@ export function applyTransformationToPoints(
     // Use currentPoints to get original point, not initialPoints prop (which might be stale)
     const originalPoint = currentPoints[pointIndex];
 
-      if (point && originalPoint) {
-      if (anyPointConstrained) {
-        // Prevent entire transformation - keep all points at current positions
-        point.x = originalPoint.x;
-        point.y = originalPoint.y;
-        // Don't update proxy nodes yet - we'll do it after reverting all points
-      } else {
-        // Get the node's transformed position - trust the transformer
-        const transformedX = node.x();
-        const transformedY = node.y();
+    if (point && originalPoint) {
+      // Get the node's transformed position - trust the transformer
+      const transformedX = node.x();
+      const transformedY = node.y();
 
-        // Update the point position with pixel snapping if enabled
-        const snappedPos = snapToPixel({ x: transformedX, y: transformedY }, pixelSnapping);
-        
-        // Constrain point to image boundaries (point-level constraint)
-        if (bounds) {
-          // Constrain point to bounds
-          const constrainedPos = constrainPointToBounds(
-            snappedPos,
-            { width: bounds.width, height: bounds.height },
-          );
-          
-          point.x = constrainedPos.x;
-          point.y = constrainedPos.y;
-        } else {
-          point.x = snappedPos.x;
-          point.y = snappedPos.y;
-        }
-        
-        // Update proxy node position to match point position (only if not constrained)
-        if (proxyRefs && proxyRefs.current[pointIndex]) {
-          const proxyNode = proxyRefs.current[pointIndex];
-          if (proxyNode) {
-            proxyNode.x(point.x);
-            proxyNode.y(point.y);
-          }
-        }
-      }
+      // Use stored original positions if available, otherwise use current positions
+      const originalPos = originalPositions?.[pointIndex] || originalPoint;
+
+      // Update the point position with pixel snapping if enabled
+      const snappedPos = snapToPixel({ x: transformedX, y: transformedY }, pixelSnapping);
+      point.x = snappedPos.x;
+      point.y = snappedPos.y;
+
+      // Don't update proxy node position - let transformer manage it
+      // This prevents the update loop
 
       // Control points will be handled separately using delta transformation
     }
   }
 
-    // If any point at boundary didn't move, all points should already be at original positions
-    // (we prevented transformations in the loop above)
-    // But ensure proxy nodes are updated to match
-    if (anyPointConstrained) {
-      for (const node of nodes) {
-        if (!node || !node.name()) continue;
-        const pointIndex = Number.parseInt(node.name().split("-")[1]);
-        const point = newPoints[pointIndex];
-        
-        if (point && proxyRefs && proxyRefs.current[pointIndex]) {
-          const proxyNode = proxyRefs.current[pointIndex];
-          if (proxyNode) {
-            proxyNode.x(point.x);
-            proxyNode.y(point.y);
-          }
-        }
-      }
-    }
+  // Let Konva's built-in dragBoundFunc and resizeBoundFunc handle all boundary constraints
+  // No need for custom point constraint logic
 
-    // Mark transformation as prevented if any point at boundary didn't move
-    const wasPrevented = anyPointConstrained;
-
-    return { newPoints, transformer, wasPrevented };
-  }
+  return { newPoints, transformer };
+}

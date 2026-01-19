@@ -8,7 +8,6 @@ import {
   resetTransformState,
   applyTransformationToControlPoints,
   updateOriginalPositions,
-  shouldPreventTransformationDueToBoundary,
 } from "../utils/transformUtils";
 
 const BBOX_MIN_WIDTH = 10;
@@ -83,18 +82,6 @@ export const VectorTransformer: React.FC<VectorTransformerProps> = ({
     initialRotation?: number;
   }>({});
 
-  // Store last valid transformer state (before any point would go out of bounds)
-  // This is the state we revert to when transformation is prevented
-  const lastValidTransformerStateRef = React.useRef<{
-    x: number;
-    y: number;
-    width: number;
-    height: number;
-    rotation: number;
-    scaleX: number;
-    scaleY: number;
-  } | null>(null);
-
   // RAF for smooth control point updates
   const rafIdRef = React.useRef<number | null>(null);
 
@@ -128,80 +115,33 @@ export const VectorTransformer: React.FC<VectorTransformerProps> = ({
       draggable={true}
       keepRatio={false}
       shouldOverdrawWholeArea={true}
-      dragBoundFunc={(oldPos, newPos) => {
-        // Prevent dragging when points are at boundaries and would stay there
-        if (!bounds) return newPos;
-        
-        const transformer = transformerRef.current;
-        if (!transformer) return newPos;
-        
-        // Check actual point positions, not proxy nodes
-        const currentPoints = getCurrentPointsRef ? getCurrentPointsRef() : initialPoints;
-        const tolerance = 0.1;
-        const toleranceCheck = 0.001;
-        
-        // Calculate drag delta
-        const deltaX = newPos.x - oldPos.x;
-        const deltaY = newPos.y - oldPos.y;
-        
-        // Check each selected point
-        for (const pointIndex of Array.from(selectedPoints)) {
-          const currentPoint = currentPoints[pointIndex];
-          if (!currentPoint) continue;
-          
-          // Check if point is at boundary
-          const atBoundary = 
-            currentPoint.x <= tolerance ||
-            currentPoint.x >= bounds.width - tolerance ||
-            currentPoint.y <= tolerance ||
-            currentPoint.y >= bounds.height - tolerance;
-          
-          if (atBoundary) {
-            // Calculate where point would be after drag
-            const newX = currentPoint.x + deltaX;
-            const newY = currentPoint.y + deltaY;
-            
-            // Constrain to bounds
-            const constrainedX = Math.max(0, Math.min(bounds.width, newX));
-            const constrainedY = Math.max(0, Math.min(bounds.height, newY));
-            
-            // Check if point would actually move
-            const wouldMove =
-              Math.abs(constrainedX - currentPoint.x) > toleranceCheck ||
-              Math.abs(constrainedY - currentPoint.y) > toleranceCheck;
-            
-            // If point wouldn't move, prevent drag
-            if (!wouldMove) {
-              return oldPos;
-            }
-          }
-        }
-        
-        return newPos;
-      }}
+      // Remove dragBoundFunc - we'll handle constraints in onDragMove instead
       onTransform={(_e: any) => {
         // Apply proxy coordinates to real points in real-time
         const transformer = transformerRef.current;
         if (transformer && bounds) {
           try {
-            // Store transformer state BEFORE applying transformation
-            // This is the state we'll revert to if points are constrained
-            const transformerStateBeforeTransform = {
-              x: transformer.x(),
-              y: transformer.y(),
-              width: transformer.width(),
-              height: transformer.height(),
-              rotation: transformer.rotation(),
-              scaleX: transformer.scaleX(),
-              scaleY: transformer.scaleY(),
-            };
-            
-            // Allow transformer to move freely - points will be constrained individually
+            // Check if we need to constrain the transformer position
+            const constraints = calculateTransformerConstraints(
+              transformer,
+              bounds,
+              scaleX,
+              scaleY,
+              transform,
+              fitScale,
+            );
+
+            if (constraints) {
+              // Force the transformer to the constrained position
+              transformer.x(constraints.x);
+              transformer.y(constraints.y);
+            }
+
             const transformerCenter = {
               x: transformer.x() + transformer.width() / 2,
               y: transformer.y() + transformer.height() / 2,
             };
-            const { newPoints, wasPrevented } = applyTransformationToPoints(
+            const { newPoints } = applyTransformationToPoints(
               transformer,
               initialPoints,
               proxyRefs,
@@ -213,93 +153,6 @@ export const VectorTransformer: React.FC<VectorTransformerProps> = ({
               updateCurrentPointsRef,
               pixelSnapping,
             );
-
-            // If transformation was prevented (points stopped moving), ALWAYS revert transformer
-            // This ensures transformer bbox stops whenever points stop
-            if (wasPrevented) {
-              // Revert to the state BEFORE this transformation attempt
-              const validState = lastValidTransformerStateRef.current || transformerStateBeforeTransform;
-
-              // Revert transformer to last valid state
-              // Use setAttrs to update all properties atomically
-              transformer.setAttrs({
-                x: validState.x,
-                y: validState.y,
-                width: validState.width,
-                height: validState.height,
-                rotation: validState.rotation,
-                scaleX: validState.scaleX,
-                scaleY: validState.scaleY,
-              });
-
-              // Restore proxy nodes to match constrained point positions
-              // This prevents drift when transformation is prevented
-              const nodes = transformer.nodes();
-              for (const node of nodes) {
-                if (!node || !node.name()) continue;
-                const pointIndex = Number.parseInt(node.name().split("-")[1]);
-                const constrainedPoint = newPoints[pointIndex];
-                if (constrainedPoint) {
-                  node.x(constrainedPoint.x);
-                  node.y(constrainedPoint.y);
-                }
-              }
-
-              // Force update the transformer and its layer
-              // This ensures proxy nodes are also updated to match the reverted transformer state
-              transformer.forceUpdate();
-              transformer.getLayer()?.batchDraw();
-              
-              // Also force update all proxy nodes to ensure they're in sync
-              nodes.forEach((node) => {
-                node.getLayer()?.batchDraw();
-              });
-
-              // Still update points ref with constrained positions (points may have been constrained)
-              // This ensures next transformation tick uses the correct constrained positions
-              if (updateCurrentPointsRef) {
-                updateCurrentPointsRef(newPoints);
-              }
-
-              // Early return - don't process control points or call onPointsChange
-              return;
-            }
-
-            // Transformation was allowed - check if points actually moved
-            const pointsMoved = newPoints.some((newPoint, index) => {
-              const currentPoint = getCurrentPointsRef ? getCurrentPointsRef()[index] : initialPoints[index];
-              if (!currentPoint) return false;
-              return (
-                Math.abs(newPoint.x - currentPoint.x) > 0.001 ||
-                Math.abs(newPoint.y - currentPoint.y) > 0.001
-              );
-            });
-
-            // Only update last valid state if points actually moved and are in bounds
-            if (pointsMoved) {
-              const allPointsInBounds = newPoints.every((point) => {
-                if (!bounds) return true;
-                return (
-                  point.x >= 0 &&
-                  point.x <= bounds.width &&
-                  point.y >= 0 &&
-                  point.y <= bounds.height
-                );
-              });
-
-              if (allPointsInBounds) {
-                // All points are in bounds and moved - this is a valid state
-                lastValidTransformerStateRef.current = {
-                  x: transformer.x(),
-                  y: transformer.y(),
-                  width: transformer.width(),
-                  height: transformer.height(),
-                  rotation: transformer.rotation(),
-                  scaleX: transformer.scaleX(),
-                  scaleY: transformer.scaleY(),
-                };
-              }
-            }
 
             // Update the ref immediately so next transformation tick uses latest points
             if (updateCurrentPointsRef) {
@@ -340,65 +193,33 @@ export const VectorTransformer: React.FC<VectorTransformerProps> = ({
         }
       }}
       resizeBoundFunc={(oldBox: any, newBox: any) => {
-        // Check if transformation would move any point out of bounds
-        // If so, prevent the transformation to avoid deformation
-        // This follows the EXACT same pattern as dragBoundFunc
-        if (!bounds) return newBox;
+        // Use Konva's built-in constraint system
+        if (bounds) {
+          const constrainedBox = { ...newBox };
 
-        const transformer = transformerRef.current;
-        if (!transformer) return newBox;
-
-        // Check actual point positions, not proxy nodes
-        const currentPoints = getCurrentPointsRef ? getCurrentPointsRef() : initialPoints;
-        const tolerance = 0.1;
-        const toleranceCheck = 0.001;
-        
-        // Get proxy nodes to see where they would be after transformation
-        const nodes = transformer.nodes();
-        
-        // Check each selected point
-        for (const pointIndex of Array.from(selectedPoints)) {
-          const currentPoint = currentPoints[pointIndex];
-          if (!currentPoint) continue;
-          
-          // Check if point is at boundary
-          const atBoundary = 
-            currentPoint.x <= tolerance ||
-            currentPoint.x >= bounds.width - tolerance ||
-            currentPoint.y <= tolerance ||
-            currentPoint.y >= bounds.height - tolerance;
-          
-          if (atBoundary) {
-            // Find the proxy node for this point
-            const proxyNode = nodes.find((node) => {
-              if (!node || !node.name()) return false;
-              const idx = Number.parseInt(node.name().split("-")[1]);
-              return idx === pointIndex;
-            });
-            
-            if (!proxyNode) continue;
-            
-            // Get where the proxy node would be after transformation (Konva has already moved it)
-            const transformedX = proxyNode.x();
-            const transformedY = proxyNode.y();
-            
-            // Constrain to bounds (same as dragBoundFunc)
-            const constrainedX = Math.max(0, Math.min(bounds.width, transformedX));
-            const constrainedY = Math.max(0, Math.min(bounds.height, transformedY));
-            
-            // Check if point would actually move (same as dragBoundFunc)
-            const wouldMove =
-              Math.abs(constrainedX - currentPoint.x) > toleranceCheck ||
-              Math.abs(constrainedY - currentPoint.y) > toleranceCheck;
-            
-            // If point wouldn't move, prevent transformation (same as dragBoundFunc)
-            if (!wouldMove) {
-              return oldBox;
-            }
+          // Constrain to left edge
+          if (constrainedBox.x < bounds.x) {
+            const deltaX = bounds.x - constrainedBox.x;
+            constrainedBox.x = bounds.x;
+            constrainedBox.width = Math.max(BBOX_MIN_WIDTH, constrainedBox.width - deltaX);
           }
-        }
+          // Constrain to right edge
+          if (constrainedBox.x + constrainedBox.width > bounds.x + bounds.width) {
+            constrainedBox.width = bounds.x + bounds.width - constrainedBox.x;
+          }
+          // Constrain to top edge
+          if (constrainedBox.y < bounds.y) {
+            const deltaY = bounds.y - constrainedBox.y;
+            constrainedBox.y = bounds.y;
+            constrainedBox.height = Math.max(BBOX_MIN_WIDTH, constrainedBox.height - deltaY);
+          }
+          // Constrain to bottom edge
+          if (constrainedBox.y + constrainedBox.height > bounds.y + bounds.height) {
+            constrainedBox.height = bounds.y + bounds.height - constrainedBox.y;
+          }
 
-        // All points would stay within bounds - allow transformation
+          return constrainedBox;
+        }
         return newBox;
       }}
       onTransformStart={(_e: any) => {
@@ -421,20 +242,6 @@ export const VectorTransformer: React.FC<VectorTransformerProps> = ({
 
         // Store initial rotation
         originalPositionsRef.current.initialRotation = transformerRef.current?.rotation() || 0;
-
-        // Store initial transformer state as the last valid state
-        const transformer = transformerRef.current;
-        if (transformer) {
-          lastValidTransformerStateRef.current = {
-            x: transformer.x(),
-            y: transformer.y(),
-            width: transformer.width(),
-            height: transformer.height(),
-            rotation: transformer.rotation(),
-            scaleX: transformer.scaleX(),
-            scaleY: transformer.scaleY(),
-          };
-        }
 
         // Reset the first transform flag to ensure proper rotation tracking
         resetTransformState();
@@ -467,124 +274,56 @@ export const VectorTransformer: React.FC<VectorTransformerProps> = ({
         isFirstTransformTickRef.current = true;
       }}
       boundBoxFunc={(oldBox, newBox) => {
-        // Check if rotation would move any point out of bounds
-        // Prevent rotation entirely when points are at boundaries to avoid shape corruption
-        // This follows the EXACT same pattern as dragBoundFunc
         if (!bounds) return newBox;
 
-        const transformer = transformerRef.current;
-        if (!transformer) return newBox;
+        // Calculate the rotated bounding box properly
+        const getCorner = (pivotX: number, pivotY: number, diffX: number, diffY: number, angle: number) => {
+          const distance = Math.sqrt(diffX * diffX + diffY * diffY);
+          angle += Math.atan2(diffY, diffX);
+          const x = pivotX + distance * Math.cos(angle);
+          const y = pivotY + distance * Math.sin(angle);
+          return { x, y };
+        };
 
-        // Calculate rotation change
-        const rotationChange = (newBox.rotation || 0) - (oldBox.rotation || 0);
-        if (Math.abs(rotationChange) < 0.01) {
-          // No rotation change - allow transformation
-          return newBox;
-        }
+        const { x, y, width, height, rotation = 0 } = newBox;
+        const rad = rotation;
 
-        // Check actual point positions, not proxy nodes
-        const currentPoints = getCurrentPointsRef ? getCurrentPointsRef() : initialPoints;
-        const tolerance = 0.1;
-        const toleranceCheck = 0.001;
-        
-        // Get proxy nodes to see where they would be after transformation
-        const nodes = transformer.nodes();
-        
-        // Check each selected point
-        for (const pointIndex of Array.from(selectedPoints)) {
-          const currentPoint = currentPoints[pointIndex];
-          if (!currentPoint) continue;
-          
-          // Check if point is at boundary
-          const atBoundary = 
-            currentPoint.x <= tolerance ||
-            currentPoint.x >= bounds.width - tolerance ||
-            currentPoint.y <= tolerance ||
-            currentPoint.y >= bounds.height - tolerance;
-          
-          if (atBoundary) {
-            // Find the proxy node for this point
-            const proxyNode = nodes.find((node) => {
-              if (!node || !node.name()) return false;
-              const idx = Number.parseInt(node.name().split("-")[1]);
-              return idx === pointIndex;
-            });
-            
-            if (!proxyNode) continue;
-            
-            // Get where the proxy node would be after transformation (Konva has already moved it)
-            const transformedX = proxyNode.x();
-            const transformedY = proxyNode.y();
-            
-            // Constrain to bounds (same as dragBoundFunc)
-            const constrainedX = Math.max(0, Math.min(bounds.width, transformedX));
-            const constrainedY = Math.max(0, Math.min(bounds.height, transformedY));
-            
-            // Check if point would actually move (same as dragBoundFunc)
-            const wouldMove =
-              Math.abs(constrainedX - currentPoint.x) > toleranceCheck ||
-              Math.abs(constrainedY - currentPoint.y) > toleranceCheck;
-            
-            // If point wouldn't move, prevent rotation (same as dragBoundFunc)
-            if (!wouldMove) {
-              return oldBox;
-            }
-          }
-        }
+        // Get all four corners of the rotated rectangle
+        const p1 = getCorner(x, y, 0, 0, rad);
+        const p2 = getCorner(x, y, width, 0, rad);
+        const p3 = getCorner(x, y, width, height, rad);
+        const p4 = getCorner(x, y, 0, height, rad);
 
-        // No points are locked - check if rotation would move any point out of bounds
-        // Use proxy nodes to check where points would be after transformation
-        for (const pointIndex of Array.from(selectedPoints)) {
-          const currentPoint = currentPoints[pointIndex];
-          if (!currentPoint) continue;
+        // Calculate the bounding box of the rotated rectangle
+        const rotatedBox = {
+          x: Math.min(p1.x, p2.x, p3.x, p4.x),
+          y: Math.min(p1.y, p2.y, p3.y, p4.y),
+          width: Math.max(p1.x, p2.x, p3.x, p4.x) - Math.min(p1.x, p2.x, p3.x, p4.x),
+          height: Math.max(p1.y, p2.y, p3.y, p4.y) - Math.min(p1.y, p2.y, p3.y, p4.y),
+        };
 
-          // Find the proxy node for this point
-          const proxyNode = nodes.find((node) => {
-            if (!node || !node.name()) return false;
-            const idx = Number.parseInt(node.name().split("-")[1]);
-            return idx === pointIndex;
-          });
-          
-          if (!proxyNode) continue;
-          
-          // Get where the proxy node would be after transformation
-          const transformedX = proxyNode.x();
-          const transformedY = proxyNode.y();
+        // Convert rotated box to image coordinates
+        const imageBox = {
+          x: (rotatedBox.x - transform.offsetX) / (transform.zoom * fitScale),
+          y: (rotatedBox.y - transform.offsetY) / (transform.zoom * fitScale),
+          width: rotatedBox.width / (transform.zoom * fitScale),
+          height: rotatedBox.height / (transform.zoom * fitScale),
+        };
 
-          // Check if final position would be out of bounds
-          const wouldBeOutOfBounds =
-            transformedX < 0 ||
-            transformedX > bounds.width ||
-            transformedY < 0 ||
-            transformedY > bounds.height;
+        // Check if the rotated box would go out of bounds
+        const isOut =
+          imageBox.x < bounds.x ||
+          imageBox.y < bounds.y ||
+          imageBox.x + imageBox.width > bounds.x + bounds.width ||
+          imageBox.y + imageBox.height > bounds.y + bounds.height;
 
-          if (wouldBeOutOfBounds) {
-            // Point would go out of bounds - prevent rotation
-            // Restore proxy nodes to match current point positions to prevent drift
-            for (const node of nodes) {
-              if (!node || !node.name()) continue;
-              const pointIdx = Number.parseInt(node.name().split("-")[1]);
-              const point = currentPoints[pointIdx];
-              if (point) {
-                node.x(point.x);
-                node.y(point.y);
-              }
-            }
-            return oldBox;
-          }
-        }
-
-        // No points are locked and rotation wouldn't move any point out of bounds - allow rotation
-        return newBox;
+        return isOut ? oldBox : newBox;
       }}
       onDragMove={(_e: any) => {
         // Apply drag movement to real points in real-time with constraints
         const transformer = transformerRef.current;
         if (transformer && bounds) {
           try {
-            // Note: We'll check constraints after applying transformation to points
-            // This allows us to detect if points were constrained and revert transformer accordingly
-
             // Get all shapes in the transformer
             const shapes = transformer.nodes();
             if (shapes.length === 0) return;
@@ -637,7 +376,7 @@ export const VectorTransformer: React.FC<VectorTransformerProps> = ({
               x: transformer.x() + transformer.width() / 2,
               y: transformer.y() + transformer.height() / 2,
             };
-            const { newPoints, wasPrevented } = applyTransformationToPoints(
+            const { newPoints } = applyTransformationToPoints(
               transformer,
               initialPoints,
               proxyRefs,
@@ -650,72 +389,9 @@ export const VectorTransformer: React.FC<VectorTransformerProps> = ({
               pixelSnapping,
             );
 
-            // If transformation was prevented (points stopped moving), revert transformer
-            if (wasPrevented && lastValidTransformerStateRef.current) {
-              const validState = lastValidTransformerStateRef.current;
-              transformer.setAttrs({
-                x: validState.x,
-                y: validState.y,
-                width: validState.width,
-                height: validState.height,
-                rotation: validState.rotation,
-                scaleX: validState.scaleX,
-                scaleY: validState.scaleY,
-              });
-              transformer.forceUpdate();
-              transformer.getLayer()?.batchDraw();
-              
-              // Also force update all proxy nodes to ensure they're in sync
-              const nodes = transformer.nodes();
-              nodes.forEach((node) => {
-                node.getLayer()?.batchDraw();
-              });
-
-              // Still update points ref with constrained positions
-              if (updateCurrentPointsRef) {
-                updateCurrentPointsRef(newPoints);
-              }
-
-              return; // Early return - don't process further
-            }
-
             // Update the ref immediately so next transformation tick uses latest points
             if (updateCurrentPointsRef) {
               updateCurrentPointsRef(newPoints);
-            }
-
-            // Update last valid state if points moved successfully
-            const pointsMoved = newPoints.some((newPoint, index) => {
-              const currentPoint = getCurrentPointsRef ? getCurrentPointsRef()[index] : initialPoints[index];
-              if (!currentPoint) return false;
-              return (
-                Math.abs(newPoint.x - currentPoint.x) > 0.001 ||
-                Math.abs(newPoint.y - currentPoint.y) > 0.001
-              );
-            });
-
-            if (pointsMoved) {
-              const allPointsInBounds = newPoints.every((point) => {
-                if (!bounds) return true;
-                return (
-                  point.x >= 0 &&
-                  point.x <= bounds.width &&
-                  point.y >= 0 &&
-                  point.y <= bounds.height
-                );
-              });
-
-              if (allPointsInBounds) {
-                lastValidTransformerStateRef.current = {
-                  x: transformer.x(),
-                  y: transformer.y(),
-                  width: transformer.width(),
-                  height: transformer.height(),
-                  rotation: transformer.rotation(),
-                  scaleX: transformer.scaleX(),
-                  scaleY: transformer.scaleY(),
-                };
-              }
             }
 
             // Apply transformation to control points using RAF
