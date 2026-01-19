@@ -28,18 +28,18 @@ const configClass = cn("configure");
 /**
  * AdaptivePreview - Uses lightweight static preview for large configs,
  * full interactive preview for smaller configs.
- * 
+ *
  * Always uses full preview for configs containing ReactCode tag since
  * it requires full React/MST integration to function.
  */
 const AdaptivePreview = (props) => {
   const config = props.config || "";
   const configLength = config.length;
-  
+
   // Check if config contains ReactCode tag - always use full preview for ReactCode
   // since lightweight preview can't render custom React components
   const hasReactCode = /<ReactCode/i.test(config);
-  
+
   const useLightweight = !hasReactCode && configLength > LIGHTWEIGHT_PREVIEW_THRESHOLD;
 
   if (useLightweight) {

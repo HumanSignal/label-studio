@@ -1,23 +1,24 @@
 /**
  * LightweightPreview - Fast preview using static rendering (no MST)
- * 
+ *
  * This is a drop-in replacement for the full Preview that renders configs
  * much faster by avoiding MobX-State-Tree entirely. Updates are instant
  * because it's just React re-renders.
- * 
+ *
  * Trade-offs:
  * - Pros: Very fast renders, no UI blocking, instant updates
  * - Cons: Doesn't show exactly how the editor will look (simplified rendering)
  */
 
-import React, { useMemo, useState, useEffect, useRef } from 'react';
-import { Spinner } from '@humansignal/ui';
-import { cnb as cn } from '../utils/bem';
-import { StaticConfigPreview } from './StaticConfigPreview';
+import type React from "react";
+import { useMemo, useState, useEffect, useRef } from "react";
+import { Spinner } from "@humansignal/ui";
+import { cnb as cn } from "../utils/bem";
+import { StaticConfigPreview } from "./StaticConfigPreview";
 
-const EMPTY_CONFIG = '<View></View>';
+const EMPTY_CONFIG = "<View></View>";
 
-const configClass = cn('configure');
+const configClass = cn("configure");
 
 export interface LightweightPreviewProps {
   config?: string;
@@ -61,41 +62,46 @@ export const LightweightPreview: React.FC<LightweightPreviewProps> = ({
 
   const previewUIStyle: React.CSSProperties = {
     opacity: loading || error ? 0.6 : 1,
-    overflow: 'auto',
+    overflow: "auto",
   };
 
   if (viewOnly) {
     return (
-      <div className={configClass.elem('preview').mod({ viewOnly: true }).toClassName()}>
-        <div className={configClass.elem('preview-ui').toClassName()}>
+      <div className={configClass.elem("preview").mod({ viewOnly: true }).toClassName()}>
+        <div className={configClass.elem("preview-ui").toClassName()}>
           <StaticConfigPreview config={currentConfig} data={taskData} />
         </div>
-        <div className={configClass.elem('preview-overlay').toClassName()} />
+        <div className={configClass.elem("preview-overlay").toClassName()} />
       </div>
     );
   }
 
   return (
-    <div className={configClass.elem('preview').toClassName()}>
+    <div className={configClass.elem("preview").toClassName()}>
       {error && (
-        <div className={configClass.elem('preview-error').toClassName()}>
-          <h2>{error.detail} {error.id}</h2>
-          {error.validation_errors?.non_field_errors?.map?.((err: string) => <p key={err}>{err}</p>)}
-          {error.validation_errors?.label_config?.map?.((err: string) => <p key={err}>{err}</p>)}
-          {error.validation_errors?.map?.((err: string) => <p key={err}>{err}</p>)}
+        <div className={configClass.elem("preview-error").toClassName()}>
+          <h2>
+            {error.detail} {error.id}
+          </h2>
+          {error.validation_errors?.non_field_errors?.map?.((err: string) => (
+            <p key={err}>{err}</p>
+          ))}
+          {error.validation_errors?.label_config?.map?.((err: string) => (
+            <p key={err}>{err}</p>
+          ))}
+          {error.validation_errors?.map?.((err: string) => (
+            <p key={err}>{err}</p>
+          ))}
         </div>
       )}
-      
+
       {isLoading && (
-        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%', height: '50vh' }}>
+        <div style={{ display: "flex", justifyContent: "center", alignItems: "center", width: "100%", height: "50vh" }}>
           <Spinner size={40} />
         </div>
       )}
-      
-      <div
-        className={configClass.elem('preview-ui').mod({ isLoading }).toClassName()}
-        style={previewUIStyle}
-      >
+
+      <div className={configClass.elem("preview-ui").mod({ isLoading }).toClassName()} style={previewUIStyle}>
         <StaticConfigPreview config={currentConfig} data={taskData} />
       </div>
     </div>
