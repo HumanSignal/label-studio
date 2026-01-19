@@ -323,50 +323,95 @@ export const VectorTransformer: React.FC<VectorTransformerProps> = ({
         isFirstTransformTickRef.current = true;
       }}
       boundBoxFunc={(oldBox, newBox) => {
-        if (!bounds) return newBox;
+        if (!bounds) {
+          // Only enforce minimum size
+          const constrainedBox = { ...newBox };
+          if (constrainedBox.width < BBOX_MIN_WIDTH) {
+            constrainedBox.width = BBOX_MIN_WIDTH;
+          }
+          if (constrainedBox.height < BBOX_MIN_WIDTH) {
+            constrainedBox.height = BBOX_MIN_WIDTH;
+          }
+          return constrainedBox;
+        }
 
-        // Calculate the rotated bounding box properly
-        const getCorner = (pivotX: number, pivotY: number, diffX: number, diffY: number, angle: number) => {
-          const distance = Math.sqrt(diffX * diffX + diffY * diffY);
-          angle += Math.atan2(diffY, diffX);
-          const x = pivotX + distance * Math.cos(angle);
-          const y = pivotY + distance * Math.sin(angle);
-          return { x, y };
-        };
+        const transformer = transformerRef.current;
+        if (!transformer) {
+          // Only enforce minimum size
+          const constrainedBox = { ...newBox };
+          if (constrainedBox.width < BBOX_MIN_WIDTH) {
+            constrainedBox.width = BBOX_MIN_WIDTH;
+          }
+          if (constrainedBox.height < BBOX_MIN_WIDTH) {
+            constrainedBox.height = BBOX_MIN_WIDTH;
+          }
+          return constrainedBox;
+        }
 
-        const { x, y, width, height, rotation = 0 } = newBox;
-        const rad = rotation;
+        const nodes = transformer.nodes();
 
-        // Get all four corners of the rotated rectangle
-        const p1 = getCorner(x, y, 0, 0, rad);
-        const p2 = getCorner(x, y, width, 0, rad);
-        const p3 = getCorner(x, y, width, height, rad);
-        const p4 = getCorner(x, y, 0, height, rad);
+        if (nodes.length === 0) {
+          // Only enforce minimum size
+          const constrainedBox = { ...newBox };
+          if (constrainedBox.width < BBOX_MIN_WIDTH) {
+            constrainedBox.width = BBOX_MIN_WIDTH;
+          }
+          if (constrainedBox.height < BBOX_MIN_WIDTH) {
+            constrainedBox.height = BBOX_MIN_WIDTH;
+          }
+          return constrainedBox;
+        }
 
-        // Calculate the bounding box of the rotated rectangle
-        const rotatedBox = {
-          x: Math.min(p1.x, p2.x, p3.x, p4.x),
-          y: Math.min(p1.y, p2.y, p3.y, p4.y),
-          width: Math.max(p1.x, p2.x, p3.x, p4.x) - Math.min(p1.x, p2.x, p3.x, p4.x),
-          height: Math.max(p1.y, p2.y, p3.y, p4.y) - Math.min(p1.y, p2.y, p3.y, p4.y),
-        };
+        // Get point positions from nodes (they're already in image coordinates)
+        // Konva updates node positions during transformation, so we can read them directly
+        const projectedPoints: Array<{ x: number; y: number }> = [];
+        for (const node of nodes) {
+          if (!node || !node.name()) continue;
+          const pointIndex = Number.parseInt(node.name().split("-")[1]);
+          if (pointIndex >= 0 && selectedPoints.has(pointIndex)) {
+            // Node positions are in image coordinates
+            projectedPoints.push({ x: node.x(), y: node.y() });
+          }
+        }
 
-        // Convert rotated box to image coordinates
-        const imageBox = {
-          x: (rotatedBox.x - transform.offsetX) / (transform.zoom * fitScale),
-          y: (rotatedBox.y - transform.offsetY) / (transform.zoom * fitScale),
-          width: rotatedBox.width / (transform.zoom * fitScale),
-          height: rotatedBox.height / (transform.zoom * fitScale),
-        };
+        if (projectedPoints.length === 0) {
+          // Only enforce minimum size
+          const constrainedBox = { ...newBox };
+          if (constrainedBox.width < BBOX_MIN_WIDTH) {
+            constrainedBox.width = BBOX_MIN_WIDTH;
+          }
+          if (constrainedBox.height < BBOX_MIN_WIDTH) {
+            constrainedBox.height = BBOX_MIN_WIDTH;
+          }
+          return constrainedBox;
+        }
 
-        // Check if the rotated box would go out of bounds
-        const isOut =
-          imageBox.x < bounds.x ||
-          imageBox.y < bounds.y ||
-          imageBox.x + imageBox.width > bounds.x + bounds.width ||
-          imageBox.y + imageBox.height > bounds.y + bounds.height;
+        // Check if any projected point would be out of bounds
+        const minX = Math.min(...projectedPoints.map((p) => p.x));
+        const maxX = Math.max(...projectedPoints.map((p) => p.x));
+        const minY = Math.min(...projectedPoints.map((p) => p.y));
+        const maxY = Math.max(...projectedPoints.map((p) => p.y));
 
-        return isOut ? oldBox : newBox;
+        const isOutOfBounds =
+          minX < bounds.x || maxX > bounds.x + bounds.width || minY < bounds.y || maxY > bounds.y + bounds.height;
+
+        if (isOutOfBounds) {
+          // Return oldBox to prevent transformation
+          const constrainedBox = { ...oldBox };
+          if (constrainedBox.width < BBOX_MIN_WIDTH) constrainedBox.width = BBOX_MIN_WIDTH;
+          if (constrainedBox.height < BBOX_MIN_WIDTH) constrainedBox.height = BBOX_MIN_WIDTH;
+          return constrainedBox;
+        }
+
+        // Only enforce minimum size
+        const constrainedBox = { ...newBox };
+        if (constrainedBox.width < BBOX_MIN_WIDTH) {
+          constrainedBox.width = BBOX_MIN_WIDTH;
+        }
+        if (constrainedBox.height < BBOX_MIN_WIDTH) {
+          constrainedBox.height = BBOX_MIN_WIDTH;
+        }
+        return constrainedBox;
       }}
       onDragMove={(_e: any) => {
         // Apply drag movement to real points in real-time with constraints
