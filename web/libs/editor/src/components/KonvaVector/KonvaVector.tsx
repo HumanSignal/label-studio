@@ -384,7 +384,7 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
   const transformerRef = useRef<Konva.Transformer>(null);
   const stageRef = useRef<Konva.Layer>(null);
   const pointRefs = useRef<{ [key: number]: Konva.Circle | null }>({});
-  const proxyRefs = useRef<{ [key: number]: Konva.Circle | null }>({});
+  const proxyRefs = useRef<{ [key: number]: Konva.Rect | null }>({});
   // Store transformer state to preserve rotation, scale, and center when updating selection
   const transformerStateRef = useRef<{
     rotation: number;

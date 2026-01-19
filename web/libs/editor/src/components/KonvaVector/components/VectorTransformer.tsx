@@ -16,7 +16,7 @@ interface VectorTransformerProps {
   selectedPoints: Set<number>;
   initialPoints: BezierPoint[];
   transformerRef: React.RefObject<any>;
-  proxyRefs?: React.MutableRefObject<{ [key: number]: Konva.Circle | null }>;
+  proxyRefs?: React.MutableRefObject<{ [key: number]: Konva.Rect | null }>;
   onPointsChange?: (points: BezierPoint[]) => void;
   onTransformStateChange?: (state: {
     rotation: number;
@@ -115,6 +115,11 @@ export const VectorTransformer: React.FC<VectorTransformerProps> = ({
       draggable={true}
       keepRatio={false}
       shouldOverdrawWholeArea={true}
+      padding={0}
+      anchorSize={1}
+      anchorStrokeWidth={0}
+      borderStrokeWidth={1}
+      rotateAnchorOffset={10}
       // Remove dragBoundFunc - we'll handle constraints in onDragMove instead
       onTransform={(_e: any) => {
         // Apply proxy coordinates to real points in real-time
