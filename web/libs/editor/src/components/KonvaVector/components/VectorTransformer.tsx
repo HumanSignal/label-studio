@@ -97,6 +97,48 @@ export const VectorTransformer: React.FC<VectorTransformerProps> = ({
     };
   }, []);
 
+  // Ensure transformer layer and parent groups don't clip rotation handle
+  React.useEffect(() => {
+    const checkClipping = () => {
+      if (transformerRef.current) {
+        const layer = transformerRef.current.getLayer();
+        if (layer) {
+          // Disable clipping on the layer
+          layer.clipFunc(undefined);
+          layer.clipX(undefined);
+          layer.clipY(undefined);
+          layer.clipWidth(undefined);
+          layer.clipHeight(undefined);
+          
+          // Also check parent groups
+          let parent = layer.getParent();
+          while (parent) {
+            if (parent.clipFunc) {
+              parent.clipFunc(undefined);
+            }
+            if (parent.clipX !== undefined) {
+              parent.clipX(undefined);
+              parent.clipY(undefined);
+              parent.clipWidth(undefined);
+              parent.clipHeight(undefined);
+            }
+            parent = parent.getParent();
+          }
+        }
+      }
+    };
+    
+    // Check immediately and after delays to ensure transformer is attached
+    checkClipping();
+    const timeout1 = setTimeout(checkClipping, 100);
+    const timeout2 = setTimeout(checkClipping, 300);
+    
+    return () => {
+      clearTimeout(timeout1);
+      clearTimeout(timeout2);
+    };
+  }, [selectedPoints.size]); // Re-run when selection changes
+
   if (selectedPoints.size <= 1 || initialPoints.length === 0) return null;
 
   // Calculate the bounding box of selected points for the drag area
@@ -116,10 +158,12 @@ export const VectorTransformer: React.FC<VectorTransformerProps> = ({
       keepRatio={false}
       shouldOverdrawWholeArea={true}
       padding={0}
-      anchorSize={1}
-      anchorStrokeWidth={0}
+      anchorSize={8}
+      anchorStrokeWidth={2}
       borderStrokeWidth={1}
-      rotateAnchorOffset={10}
+      rotateAnchorOffset={50}
+      ignoreStroke={true}
+      enabledAnchors={["top-left", "top-right", "bottom-left", "bottom-right", "middle-left", "middle-right", "middle-top", "middle-bottom"]}
       // Remove dragBoundFunc - we'll handle constraints in onDragMove instead
       onTransform={(_e: any) => {
         // Apply proxy coordinates to real points in real-time
