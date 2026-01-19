@@ -18,8 +18,6 @@ export const TagAutocomplete = forwardRef(
       required,
       disabled = false,
       isLoading = false,
-      placeholder = "Select tags...",
-      searchPlaceholder = "Search...",
       name,
       size = "medium",
       triggerClassName,
@@ -190,7 +188,7 @@ export const TagAutocomplete = forwardRef(
 
               {hiddenTagCount > 0 && (
                 <span className={styles.hiddenCount} data-testid="tag-autocomplete-hidden-count">
-                  +{hiddenTagCount} more
+                  +{hiddenTagCount}
                 </span>
               )}
 
@@ -206,7 +204,6 @@ export const TagAutocomplete = forwardRef(
                     setIsOpen(true);
                   }
                 }}
-                placeholder={selectedValues.length === 0 ? placeholder : searchPlaceholder}
                 disabled={disabled}
                 aria-label={label || "Search tags"}
                 aria-autocomplete="list"

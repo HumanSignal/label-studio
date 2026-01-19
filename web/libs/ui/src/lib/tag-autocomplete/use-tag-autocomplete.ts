@@ -37,11 +37,9 @@ export interface UseTagAutocompleteReturn<T> {
 // Constants for width calculations
 const INPUT_MIN_WIDTH = 60;
 const GAP_WIDTH = 4;
-const HIDDEN_BADGE_WIDTH = 70; // Approximate width of "+N more" badge
+const HIDDEN_BADGE_WIDTH = 35; // Approximate width of "+N" badge
 
-export function useTagAutocomplete<T = string>(
-  props: TagAutocompleteProps<T>,
-): UseTagAutocompleteReturn<T> {
+export function useTagAutocomplete<T = string>(props: TagAutocompleteProps<T>): UseTagAutocompleteReturn<T> {
   const {
     options,
     value: controlledValue,
@@ -92,42 +90,63 @@ export function useTagAutocomplete<T = string>(
       return;
     }
 
-    const containerWidth = container.offsetWidth;
-    const tags = Array.from(tagRefs.current.values());
+    // Wait for next frame to ensure all tags are rendered and measured
+    requestAnimationFrame(() => {
+      const containerWidth = container.offsetWidth;
+      const tags = Array.from(tagRefs.current.values());
 
-    if (tags.length === 0) {
-      setVisibleTagCount(null);
-      return;
-    }
-
-    // Calculate available width (container - input min width - gaps)
-    let availableWidth = containerWidth - INPUT_MIN_WIDTH;
-    let count = 0;
-
-    for (let i = 0; i < tags.length; i++) {
-      const tag = tags[i];
-      if (!tag) continue;
-
-      const tagWidth = tag.offsetWidth + GAP_WIDTH;
-
-      // If this is not the last tag, we need to reserve space for the "+N more" badge
-      const needsHiddenBadge = i < selectedOptions.length - 1;
-      const reservedWidth = needsHiddenBadge ? HIDDEN_BADGE_WIDTH + GAP_WIDTH : 0;
-
-      if (availableWidth - tagWidth - reservedWidth >= 0) {
-        availableWidth -= tagWidth;
-        count++;
-      } else {
-        break;
+      // Need all tags to be rendered to measure them
+      if (tags.length !== selectedOptions.length) {
+        return;
       }
-    }
 
-    // Ensure at least 1 tag is visible if there are any
-    setVisibleTagCount(Math.max(1, count));
+      // Calculate available space
+      const availableSpace = containerWidth - INPUT_MIN_WIDTH;
+
+      // Step 1: Fit as many tags as possible (greedy)
+      let usedWidth = 0;
+      let count = 0;
+
+      for (let i = 0; i < tags.length; i++) {
+        const tag = tags[i];
+        if (!tag) continue;
+
+        const tagWidth = tag.offsetWidth + GAP_WIDTH;
+
+        if (usedWidth + tagWidth <= availableSpace) {
+          usedWidth += tagWidth;
+          count++;
+        } else {
+          break;
+        }
+      }
+
+      // Step 2: All tags fit, no badge needed
+      if (count >= selectedOptions.length) {
+        setVisibleTagCount(null);
+        return;
+      }
+
+      // Step 3: Some tags are hidden, ensure we have room for the "+N" badge
+      const badgeWidth = HIDDEN_BADGE_WIDTH + GAP_WIDTH;
+      const remainingSpace = availableSpace - usedWidth;
+
+      // If badge doesn't fit in remaining space, remove the last visible tag
+      if (remainingSpace < badgeWidth && count > 0) {
+        count--;
+        const lastTagWidth = tags[count]?.offsetWidth || 0;
+        usedWidth -= lastTagWidth + GAP_WIDTH;
+      }
+
+      // Ensure at least 1 tag is visible
+      setVisibleTagCount(Math.max(1, count));
+    });
   }, [selectedOptions.length]);
 
-  // Recalculate on resize and when tags change
+  // Reset and recalculate when tags change
   useLayoutEffect(() => {
+    // Reset to show all tags first, then calculate
+    setVisibleTagCount(null);
     calculateVisibleTags();
   }, [selectedOptions, calculateVisibleTags]);
 

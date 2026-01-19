@@ -27,12 +27,6 @@ export interface TagAutocompleteProps<T = string> {
   /** Custom filter function for local filtering */
   searchFilter?: (option: TagAutocompleteOption<T>, query: string) => boolean;
 
-  /** Placeholder text when no tags selected */
-  placeholder?: string;
-
-  /** Search input placeholder */
-  searchPlaceholder?: string;
-
   /** Form field name */
   name?: string;
 
