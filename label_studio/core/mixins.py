@@ -15,11 +15,40 @@ class DummyModelMixin:
 
 
 class GetParentObjectMixin:
+    """
+    Mixin for nested resources that fetches the parent object from URL kwargs.
+
+    Provides `self.parent_object` (cached) based on `parent_queryset`.
+
+    Attributes:
+        parent_queryset: QuerySet for the parent model (required)
+        parent_lookup_field: Field to filter on (default: lookup_field, usually 'pk')
+        parent_lookup_url_kwarg: URL kwarg name (default: lookup_url_kwarg or lookup_field)
+
+    Example:
+        # URL: /api/organizations/<int:pk>/member-tags/<int:tag_pk>
+        class MemberTagAPI(GetParentObjectMixin, viewsets.ModelViewSet):
+            parent_queryset = Organization.objects.all()
+            parent_lookup_url_kwarg = 'pk'      # org ID from URL
+            lookup_url_kwarg = 'tag_pk'         # tag ID from URL
+
+            def get_queryset(self):
+                return MemberTag.objects.filter(organization=self.parent_object)
+    """
+
     parent_queryset = None
+    parent_lookup_field = None
+    parent_lookup_url_kwarg = None
 
     @cached_property
     def parent_object(self):
         return self._get_parent_object()
+
+    def _get_parent_lookup_field(self):
+        return self.parent_lookup_field or self.lookup_field
+
+    def _get_parent_lookup_url_kwarg(self):
+        return self.parent_lookup_url_kwarg or self.lookup_url_kwarg or self.lookup_field
 
     def _get_parent_object(self):
         """
@@ -35,7 +64,7 @@ class GetParentObjectMixin:
             queryset = queryset.all()
 
         # Perform the lookup filtering.
-        lookup_url_kwarg = self.lookup_url_kwarg or self.lookup_field
+        lookup_url_kwarg = self._get_parent_lookup_url_kwarg()
 
         assert lookup_url_kwarg in self.kwargs, (
             'Expected view %s to be called with a URL keyword argument '
@@ -43,7 +72,9 @@ class GetParentObjectMixin:
             'attribute on the view correctly.' % (self.__class__.__name__, lookup_url_kwarg)
         )
 
-        filter_kwargs = {self.lookup_field: self.kwargs[lookup_url_kwarg]}
+        lookup_field = self._get_parent_lookup_field()
+
+        filter_kwargs = {lookup_field: self.kwargs[lookup_url_kwarg]}
         obj = get_object_or_404(queryset, **filter_kwargs)
 
         # May raise a permission denied
