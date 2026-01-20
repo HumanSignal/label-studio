@@ -11,7 +11,12 @@ import { FF_UNSAVED_CHANGES, isFF } from "../../../utils/feature-flags";
 import { colorNames } from "./colors";
 import "./Config.scss";
 import { Preview } from "./Preview";
-import { LightweightPreview, LIGHTWEIGHT_PREVIEW_MESSAGE, LIGHTWEIGHT_PREVIEW_THRESHOLD } from "@humansignal/core";
+import {
+  LightweightPreview,
+  LIGHTWEIGHT_PREVIEW_MESSAGE,
+  LIGHTWEIGHT_PREVIEW_TAG_THRESHOLD,
+  countConfigTags,
+} from "@humansignal/core";
 import { DEFAULT_COLUMN, EMPTY_CONFIG, isEmptyConfig, Template } from "./Template";
 import { TemplatesList } from "./TemplatesList";
 
@@ -34,13 +39,14 @@ const configClass = cn("configure");
  */
 const AdaptivePreview = (props) => {
   const config = props.config || "";
-  const configLength = config.length;
 
   // Check if config contains ReactCode tag - always use full preview for ReactCode
   // since lightweight preview can't render custom React components
   const hasReactCode = /<ReactCode/i.test(config);
 
-  const useLightweight = !hasReactCode && configLength > LIGHTWEIGHT_PREVIEW_THRESHOLD;
+  // Use tag count instead of character length - MST performance degrades with many nodes
+  const tagCount = countConfigTags(config);
+  const useLightweight = !hasReactCode && tagCount > LIGHTWEIGHT_PREVIEW_TAG_THRESHOLD;
 
   if (useLightweight) {
     return (
