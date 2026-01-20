@@ -11,6 +11,8 @@ import {
 } from "../utils/transformUtils";
 
 const BBOX_MIN_WIDTH = 10;
+const LOCKING_THRESHOLD = 0.1; // Lock when point touches boundary (within 0.1px)
+const VALIDATION_THRESHOLD = 5; // Allow transformation if violation is within 5px (for unlocking)
 
 interface VectorTransformerProps {
   selectedPoints: Set<number>;
@@ -88,16 +90,25 @@ export const VectorTransformer: React.FC<VectorTransformerProps> = ({
   // Track if this is the first transformation tick to avoid control point jumping
   const isFirstTransformTickRef = React.useRef<boolean>(true);
 
-  // Track previous point positions to detect if violation is reducing
-  const previousPointsRef = React.useRef<Array<{ x: number; y: number }> | null>(null);
+  // Track initial rotation when transform starts
+  const initialRotationRef = React.useRef<number>(0);
 
-  // Helper function to calculate constraint based on point bounding box (similar to onDragMove logic)
+  // Track previous point positions and box to detect direction
+  const previousPointsRef = React.useRef<Array<{ x: number; y: number }> | null>(null);
+  const previousBoxRef = React.useRef<any>(null);
+  const previousRotationRef = React.useRef<number | null>(null);
+  // Track last allowed rotation direction (1 for CW, -1 for CCW, 0 for none)
+  const lastRotationDirectionRef = React.useRef<number>(0);
+
+  // Helper function to calculate constraint based on point bounding box with direction detection
   const calculatePointBasedConstraints = React.useCallback(
     (
       projectedPoints: Array<{ x: number; y: number }>,
       oldBox: any,
       newBox: any,
     ): { constrainedBox: any; isOutOfBounds: boolean; violationReducing: boolean } => {
+      const EPS = 0.01;
+
       if (!bounds || projectedPoints.length === 0) {
         const constrainedBox = { ...newBox };
         if (constrainedBox.width < BBOX_MIN_WIDTH) constrainedBox.width = BBOX_MIN_WIDTH;
@@ -118,62 +129,361 @@ export const VectorTransformer: React.FC<VectorTransformerProps> = ({
         height: maxY - minY,
       };
 
-      // Check if out of bounds
-      const isOutOfBounds =
-        pointBox.x < bounds.x ||
-        pointBox.x + pointBox.width > bounds.x + bounds.width ||
-        pointBox.y < bounds.y ||
-        pointBox.y + pointBox.height > bounds.y + bounds.height;
+      // Detect transformation type and direction FIRST (before checking bounds)
+      const oldRotation = oldBox.rotation || 0;
+      const newRotation = newBox.rotation || 0;
+      const rotationDelta = newRotation - oldRotation;
+      const isRotating = Math.abs(rotationDelta) > EPS;
 
-      if (!isOutOfBounds) {
-        // Points are in bounds - allow transformation
-        const constrainedBox = { ...newBox };
-        if (constrainedBox.width < BBOX_MIN_WIDTH) constrainedBox.width = BBOX_MIN_WIDTH;
-        if (constrainedBox.height < BBOX_MIN_WIDTH) constrainedBox.height = BBOX_MIN_WIDTH;
-        previousPointsRef.current = projectedPoints;
-        return { constrainedBox, isOutOfBounds: false, violationReducing: false };
-      }
+      const scaleXDelta = oldBox.width !== 0 ? newBox.width / oldBox.width : 1;
+      const scaleYDelta = oldBox.height !== 0 ? newBox.height / oldBox.height : 1;
+      const isScaling = Math.abs(scaleXDelta - 1) > EPS || Math.abs(scaleYDelta - 1) > EPS;
 
-      // Calculate violation amounts
+      const positionDeltaX = newBox.x - oldBox.x;
+      const positionDeltaY = newBox.y - oldBox.y;
+      const isDragging = Math.abs(positionDeltaX) > EPS || Math.abs(positionDeltaY) > EPS;
+
+      // Calculate violation amounts for each edge
       const violationLeft = Math.max(0, bounds.x - pointBox.x);
       const violationRight = Math.max(0, pointBox.x + pointBox.width - (bounds.x + bounds.width));
       const violationTop = Math.max(0, bounds.y - pointBox.y);
       const violationBottom = Math.max(0, pointBox.y + pointBox.height - (bounds.y + bounds.height));
       const currentViolation = Math.max(violationLeft, violationRight, violationTop, violationBottom);
 
-      // Check if violation is reducing compared to previous points
-      let violationReducing = false;
+      // LOCKING: Check if violation exceeds locking threshold (strict - prevents going past boundary)
+      const exceedsLockingThreshold = currentViolation > LOCKING_THRESHOLD;
+
+      // VALIDATION: Check if violation is within validation threshold (lenient - allows unlocking)
+      const withinValidationThreshold = currentViolation <= VALIDATION_THRESHOLD;
+
+      // Calculate previous violation if we have previous points
+      let prevViolationLeft = 0;
+      let prevViolationRight = 0;
+      let prevViolationTop = 0;
+      let prevViolationBottom = 0;
+      let prevViolation = 0;
+
       if (previousPointsRef.current) {
         const prevMinX = Math.min(...previousPointsRef.current.map((p) => p.x));
         const prevMaxX = Math.max(...previousPointsRef.current.map((p) => p.x));
         const prevMinY = Math.min(...previousPointsRef.current.map((p) => p.y));
         const prevMaxY = Math.max(...previousPointsRef.current.map((p) => p.y));
 
-        const prevViolationLeft = Math.max(0, bounds.x - prevMinX);
-        const prevViolationRight = Math.max(0, prevMaxX - (bounds.x + bounds.width));
-        const prevViolationTop = Math.max(0, bounds.y - prevMinY);
-        const prevViolationBottom = Math.max(0, prevMaxY - (bounds.y + bounds.height));
-        const prevViolation = Math.max(prevViolationLeft, prevViolationRight, prevViolationTop, prevViolationBottom);
-
-        violationReducing = currentViolation < prevViolation - 0.01; // EPS threshold
+        prevViolationLeft = Math.max(0, bounds.x - prevMinX);
+        prevViolationRight = Math.max(0, prevMaxX - (bounds.x + bounds.width));
+        prevViolationTop = Math.max(0, bounds.y - prevMinY);
+        prevViolationBottom = Math.max(0, prevMaxY - (bounds.y + bounds.height));
+        prevViolation = Math.max(prevViolationLeft, prevViolationRight, prevViolationTop, prevViolationBottom);
       }
 
-      // If violation is reducing, allow the transformation
-      if (violationReducing) {
+      // If violation is within locking threshold, treat as in bounds and allow transformation
+      if (!exceedsLockingThreshold) {
         const constrainedBox = { ...newBox };
         if (constrainedBox.width < BBOX_MIN_WIDTH) constrainedBox.width = BBOX_MIN_WIDTH;
         if (constrainedBox.height < BBOX_MIN_WIDTH) constrainedBox.height = BBOX_MIN_WIDTH;
         previousPointsRef.current = projectedPoints;
-        return { constrainedBox, isOutOfBounds: true, violationReducing: true };
+        previousBoxRef.current = newBox;
+        previousRotationRef.current = newBox.rotation || 0;
+        return { constrainedBox, isOutOfBounds: false, violationReducing: false };
       }
 
-      // Violation is not reducing - block transformation
+      // Check if violation is increasing (this is what we want to block)
+      // If no previous points, assume violation is not increasing (allow transformation)
+      let violationIncreasing = false;
+      let violationReducing = false;
+      if (previousPointsRef.current) {
+        violationIncreasing =
+          violationLeft > prevViolationLeft + EPS ||
+          violationRight > prevViolationRight + EPS ||
+          violationTop > prevViolationTop + EPS ||
+          violationBottom > prevViolationBottom + EPS;
+
+        violationReducing =
+          violationLeft < prevViolationLeft - EPS ||
+          violationRight < prevViolationRight - EPS ||
+          violationTop < prevViolationTop - EPS ||
+          violationBottom < prevViolationBottom - EPS;
+      }
+
+      // ROTATION: Allow if opposite direction, reducing violation, within validation threshold, or not increasing violation
+      if (isRotating) {
+        // Detect rotation direction by comparing newRotation with oldRotation directly
+        // newRotation > oldRotation = CW (clockwise, positive), newRotation < oldRotation = CCW (counter-clockwise, negative)
+        const currentRotationDirection = newRotation > oldRotation ? 1 : newRotation < oldRotation ? -1 : 0;
+
+        // Check if rotating in opposite direction from last allowed rotation
+        const isRotatingOppositeDirection =
+          lastRotationDirectionRef.current !== 0 &&
+          currentRotationDirection !== 0 &&
+          currentRotationDirection !== lastRotationDirectionRef.current;
+
+        // STRICT CHECK: Always block if violation exceeds validation threshold
+        // Only allow if reducing violation or rotating opposite direction
+        if (currentViolation > VALIDATION_THRESHOLD) {
+          // Only allow if reducing violation (bringing back in bounds) or rotating opposite (unlocking)
+          if (violationReducing || isRotatingOppositeDirection) {
+            const constrainedBox = { ...newBox };
+            if (constrainedBox.width < BBOX_MIN_WIDTH) constrainedBox.width = BBOX_MIN_WIDTH;
+            if (constrainedBox.height < BBOX_MIN_WIDTH) constrainedBox.height = BBOX_MIN_WIDTH;
+            previousPointsRef.current = projectedPoints;
+            previousBoxRef.current = newBox;
+            previousRotationRef.current = newRotation;
+            lastRotationDirectionRef.current = currentRotationDirection;
+            return { constrainedBox, isOutOfBounds: true, violationReducing: violationReducing };
+          }
+          // Block - violation exceeds threshold and not reducing or opposite
+          const constrainedBox = { ...oldBox };
+          if (constrainedBox.width < BBOX_MIN_WIDTH) constrainedBox.width = BBOX_MIN_WIDTH;
+          if (constrainedBox.height < BBOX_MIN_WIDTH) constrainedBox.height = BBOX_MIN_WIDTH;
+          return { constrainedBox, isOutOfBounds: true, violationReducing: false };
+        }
+
+        // Violation is within validation threshold - allow if:
+        // 1. Rotating opposite direction (to unlock)
+        // 2. Violation is reducing (bringing points back in bounds)
+        // 3. Violation is within validation threshold (allows slight violation for unlocking)
+        if (isRotatingOppositeDirection || violationReducing || withinValidationThreshold) {
+          const constrainedBox = { ...newBox };
+          if (constrainedBox.width < BBOX_MIN_WIDTH) constrainedBox.width = BBOX_MIN_WIDTH;
+          if (constrainedBox.height < BBOX_MIN_WIDTH) constrainedBox.height = BBOX_MIN_WIDTH;
+          previousPointsRef.current = projectedPoints;
+          previousBoxRef.current = newBox;
+          previousRotationRef.current = newRotation;
+          // Update last allowed rotation direction
+          lastRotationDirectionRef.current = currentRotationDirection;
+          return { constrainedBox, isOutOfBounds: true, violationReducing: violationReducing };
+        }
+
+        // Fallback: block if we get here
+        const constrainedBox = { ...oldBox };
+        // IMPORTANT: Don't update lastRotationDirectionRef when blocking - keep it so we can detect opposite direction
+        if (constrainedBox.width < BBOX_MIN_WIDTH) constrainedBox.width = BBOX_MIN_WIDTH;
+        if (constrainedBox.height < BBOX_MIN_WIDTH) constrainedBox.height = BBOX_MIN_WIDTH;
+        return { constrainedBox, isOutOfBounds: true, violationReducing: false };
+      }
+
+      // SCALING: Strict check - block if violation exceeds validation threshold
+      if (isScaling) {
+        // STRICT CHECK: Always block if violation exceeds validation threshold
+        if (currentViolation > VALIDATION_THRESHOLD && !violationReducing) {
+          const constrainedBox = { ...oldBox };
+          if (constrainedBox.width < BBOX_MIN_WIDTH) constrainedBox.width = BBOX_MIN_WIDTH;
+          if (constrainedBox.height < BBOX_MIN_WIDTH) constrainedBox.height = BBOX_MIN_WIDTH;
+          return { constrainedBox, isOutOfBounds: true, violationReducing: false };
+        }
+
+        // Detect resize direction by comparing box edges
+        const oldLeft = oldBox.x;
+        const oldRight = oldBox.x + oldBox.width;
+        const oldTop = oldBox.y;
+        const oldBottom = oldBox.y + oldBox.height;
+
+        const newLeft = newBox.x;
+        const newRight = newBox.x + newBox.width;
+        const newTop = newBox.y;
+        const newBottom = newBox.y + newBox.height;
+
+        // Check if we're resizing toward boundaries (only relevant if violation is increasing)
+        const movingTowardLeft = newLeft < oldLeft && violationLeft > EPS;
+        const movingTowardRight = newRight > oldRight && violationRight > EPS;
+        const movingTowardTop = newTop < oldTop && violationTop > EPS;
+        const movingTowardBottom = newBottom > oldBottom && violationBottom > EPS;
+        const isMovingTowardAnyBoundary =
+          movingTowardLeft || movingTowardRight || movingTowardTop || movingTowardBottom;
+
+        // Violation is within validation threshold - allow if:
+        // 1. Violation is reducing (bringing points back in bounds)
+        // 2. Violation is within validation threshold (allows slight violation for unlocking)
+        // 3. Not moving toward boundary (resizing from opposite side)
+        if (
+          violationReducing ||
+          withinValidationThreshold ||
+          !isMovingTowardAnyBoundary
+        ) {
+          const constrainedBox = { ...newBox };
+          if (constrainedBox.width < BBOX_MIN_WIDTH) constrainedBox.width = BBOX_MIN_WIDTH;
+          if (constrainedBox.height < BBOX_MIN_WIDTH) constrainedBox.height = BBOX_MIN_WIDTH;
+          previousPointsRef.current = projectedPoints;
+          previousBoxRef.current = newBox;
+          previousRotationRef.current = newRotation;
+          return { constrainedBox, isOutOfBounds: true, violationReducing: violationReducing };
+        }
+
+        // Block scaling that moves toward boundary AND increases violation beyond validation threshold
+        const constrainedBox = { ...oldBox };
+        if (constrainedBox.width < BBOX_MIN_WIDTH) constrainedBox.width = BBOX_MIN_WIDTH;
+        if (constrainedBox.height < BBOX_MIN_WIDTH) constrainedBox.height = BBOX_MIN_WIDTH;
+        return { constrainedBox, isOutOfBounds: true, violationReducing: false };
+      }
+
+      // DRAGGING: Strict check - block if violation exceeds validation threshold
+      if (isDragging) {
+        // STRICT CHECK: Always block if violation exceeds validation threshold
+        if (currentViolation > VALIDATION_THRESHOLD && !violationReducing) {
+          const constrainedBox = { ...oldBox };
+          if (constrainedBox.width < BBOX_MIN_WIDTH) constrainedBox.width = BBOX_MIN_WIDTH;
+          if (constrainedBox.height < BBOX_MIN_WIDTH) constrainedBox.height = BBOX_MIN_WIDTH;
+          return { constrainedBox, isOutOfBounds: true, violationReducing: false };
+        }
+
+        // Check if dragging away from boundaries (only relevant if violation is increasing)
+        let draggingAway = false;
+        if (previousPointsRef.current && violationIncreasing) {
+          const prevMinX = Math.min(...previousPointsRef.current.map((p) => p.x));
+          const prevMaxX = Math.max(...previousPointsRef.current.map((p) => p.x));
+          const prevMinY = Math.min(...previousPointsRef.current.map((p) => p.y));
+          const prevMaxY = Math.max(...previousPointsRef.current.map((p) => p.y));
+
+          // Check if we're moving away from each boundary
+          if (violationLeft > EPS && minX > prevMinX) draggingAway = true;
+          if (violationRight > EPS && maxX < prevMaxX) draggingAway = true;
+          if (violationTop > EPS && minY > prevMinY) draggingAway = true;
+          if (violationBottom > EPS && maxY < prevMaxY) draggingAway = true;
+        }
+
+        // Violation is within validation threshold - allow if:
+        // 1. Violation is reducing (bringing points back in bounds)
+        // 2. Violation is within validation threshold (allows slight violation for unlocking)
+        // 3. Dragging away from boundaries
+        if (violationReducing || withinValidationThreshold || draggingAway) {
+          const constrainedBox = { ...newBox };
+          if (constrainedBox.width < BBOX_MIN_WIDTH) constrainedBox.width = BBOX_MIN_WIDTH;
+          if (constrainedBox.height < BBOX_MIN_WIDTH) constrainedBox.height = BBOX_MIN_WIDTH;
+          previousPointsRef.current = projectedPoints;
+          previousBoxRef.current = newBox;
+          previousRotationRef.current = newRotation;
+          return { constrainedBox, isOutOfBounds: true, violationReducing: violationReducing };
+        }
+
+        // Block dragging that increases violation beyond validation threshold
+        const constrainedBox = { ...oldBox };
+        if (constrainedBox.width < BBOX_MIN_WIDTH) constrainedBox.width = BBOX_MIN_WIDTH;
+        if (constrainedBox.height < BBOX_MIN_WIDTH) constrainedBox.height = BBOX_MIN_WIDTH;
+        return { constrainedBox, isOutOfBounds: true, violationReducing: false };
+      }
+
+      // Unknown transformation - strict check
+      // STRICT CHECK: Always block if violation exceeds validation threshold
+      if (currentViolation > VALIDATION_THRESHOLD && !violationReducing) {
+        const constrainedBox = { ...oldBox };
+        if (constrainedBox.width < BBOX_MIN_WIDTH) constrainedBox.width = BBOX_MIN_WIDTH;
+        if (constrainedBox.height < BBOX_MIN_WIDTH) constrainedBox.height = BBOX_MIN_WIDTH;
+        return { constrainedBox, isOutOfBounds: true, violationReducing: false };
+      }
+
+      // Violation is within validation threshold - allow if reducing or within threshold
+      if (violationReducing || withinValidationThreshold) {
+        const constrainedBox = { ...newBox };
+        if (constrainedBox.width < BBOX_MIN_WIDTH) constrainedBox.width = BBOX_MIN_WIDTH;
+        if (constrainedBox.height < BBOX_MIN_WIDTH) constrainedBox.height = BBOX_MIN_WIDTH;
+        previousPointsRef.current = projectedPoints;
+        previousBoxRef.current = newBox;
+        previousRotationRef.current = newRotation;
+        return { constrainedBox, isOutOfBounds: true, violationReducing: violationReducing };
+      }
+
+      // Default: block only if violation is increasing beyond validation threshold
       const constrainedBox = { ...oldBox };
       if (constrainedBox.width < BBOX_MIN_WIDTH) constrainedBox.width = BBOX_MIN_WIDTH;
       if (constrainedBox.height < BBOX_MIN_WIDTH) constrainedBox.height = BBOX_MIN_WIDTH;
       return { constrainedBox, isOutOfBounds: true, violationReducing: false };
     },
     [bounds],
+  );
+
+  // Handle transform event
+  const handleTransform = React.useCallback(
+    (_e: any) => {
+      // Apply proxy coordinates to real points in real-time
+      const transformer = transformerRef.current;
+      if (transformer && bounds) {
+        try {
+          // Check if we need to constrain the transformer position
+          const constraints = calculateTransformerConstraints(transformer, bounds, scaleX, scaleY, transform, fitScale);
+
+          if (constraints) {
+            // Force the transformer to the constrained position
+            transformer.x(constraints.x);
+            transformer.y(constraints.y);
+          }
+
+          const transformerCenter = {
+            x: transformer.x() + transformer.width() / 2,
+            y: transformer.y() + transformer.height() / 2,
+          };
+          const { newPoints } = applyTransformationToPoints(
+            transformer,
+            initialPoints,
+            proxyRefs,
+            false, // Don't update control points here
+            originalPositionsRef.current,
+            transformerCenter,
+            bounds,
+            getCurrentPointsRef,
+            updateCurrentPointsRef,
+            pixelSnapping,
+          );
+
+          // Check if this is a rotation operation
+          const originalRotation = initialRotationRef.current;
+          const currentRotation = transformer.rotation();
+          const rotationDelta = originalRotation - currentRotation;
+          const isActualRotation = currentRotation !== 0;
+          const rotationDirection = rotationDelta > 0 ? "cw" : ("ccw" as const);
+          console.log("Rotation check:", {
+            originalRotation,
+            currentRotation,
+            rotationDelta,
+            isActualRotation,
+            rotationDirection,
+          });
+
+          // Apply control point transformations synchronously during rotation to prevent shifting
+          // Skip on first tick to avoid jumping
+          let finalPoints = newPoints;
+          if (!isFirstTransformTickRef.current) {
+            // Apply transformation to control points immediately (synchronously) during rotation
+            // This ensures anchor and control points stay in sync during quick rotation
+            finalPoints = applyTransformationToControlPoints(
+              newPoints,
+              originalPositionsRef.current,
+              transformer.rotation(),
+              transformer.scaleX(),
+              transformer.scaleY(),
+              transformerCenter.x,
+              transformerCenter.y,
+              isActualRotation,
+              pixelSnapping,
+            );
+          } else {
+            isFirstTransformTickRef.current = false;
+          }
+
+          // Update the ref immediately with both anchor and control points
+          if (updateCurrentPointsRef) {
+            updateCurrentPointsRef(finalPoints);
+          }
+
+          // Notify of changes
+          onPointsChange?.(finalPoints);
+        } catch (error) {
+          console.warn("Transform error:", error);
+        }
+      }
+    },
+    [
+      bounds,
+      scaleX,
+      scaleY,
+      transform,
+      fitScale,
+      initialPoints,
+      proxyRefs,
+      getCurrentPointsRef,
+      updateCurrentPointsRef,
+      pixelSnapping,
+      onPointsChange,
+    ],
   );
 
   // Cleanup RAF on unmount
@@ -197,7 +507,7 @@ export const VectorTransformer: React.FC<VectorTransformerProps> = ({
           layer.clipY(undefined);
           layer.clipWidth(undefined);
           layer.clipHeight(undefined);
-          
+
           // Also check parent groups
           let parent = layer.getParent();
           while (parent) {
@@ -215,12 +525,12 @@ export const VectorTransformer: React.FC<VectorTransformerProps> = ({
         }
       }
     };
-    
+
     // Check immediately and after delays to ensure transformer is attached
     checkClipping();
     const timeout1 = setTimeout(checkClipping, 100);
     const timeout2 = setTimeout(checkClipping, 300);
-    
+
     return () => {
       clearTimeout(timeout1);
       clearTimeout(timeout2);
@@ -251,84 +561,18 @@ export const VectorTransformer: React.FC<VectorTransformerProps> = ({
       borderStrokeWidth={1}
       rotateAnchorOffset={50}
       ignoreStroke={true}
-      enabledAnchors={["top-left", "top-right", "bottom-left", "bottom-right", "middle-left", "middle-right", "middle-top", "middle-bottom"]}
+      enabledAnchors={[
+        "top-left",
+        "top-right",
+        "bottom-left",
+        "bottom-right",
+        "middle-left",
+        "middle-right",
+        "middle-top",
+        "middle-bottom",
+      ]}
       // Remove dragBoundFunc - we'll handle constraints in onDragMove instead
-      onTransform={(_e: any) => {
-        // Apply proxy coordinates to real points in real-time
-        const transformer = transformerRef.current;
-        if (transformer && bounds) {
-          try {
-            // Check if we need to constrain the transformer position
-            const constraints = calculateTransformerConstraints(
-              transformer,
-              bounds,
-              scaleX,
-              scaleY,
-              transform,
-              fitScale,
-            );
-
-            if (constraints) {
-              // Force the transformer to the constrained position
-              transformer.x(constraints.x);
-              transformer.y(constraints.y);
-            }
-
-            const transformerCenter = {
-              x: transformer.x() + transformer.width() / 2,
-              y: transformer.y() + transformer.height() / 2,
-            };
-            const { newPoints } = applyTransformationToPoints(
-              transformer,
-              initialPoints,
-              proxyRefs,
-              false, // Don't update control points here
-              originalPositionsRef.current,
-              transformerCenter,
-              bounds,
-              getCurrentPointsRef,
-              updateCurrentPointsRef,
-              pixelSnapping,
-            );
-
-            // Check if this is a rotation operation
-            const originalRotation = originalPositionsRef.current.initialRotation || 0;
-            const rotationDelta = Math.abs(transformer.rotation() - originalRotation);
-            const isActualRotation = rotationDelta > 1.0;
-
-            // Apply control point transformations synchronously during rotation to prevent shifting
-            // Skip on first tick to avoid jumping
-            let finalPoints = newPoints;
-            if (!isFirstTransformTickRef.current) {
-              // Apply transformation to control points immediately (synchronously) during rotation
-              // This ensures anchor and control points stay in sync during quick rotation
-              finalPoints = applyTransformationToControlPoints(
-                newPoints,
-                originalPositionsRef.current,
-                transformer.rotation(),
-                transformer.scaleX(),
-                transformer.scaleY(),
-                transformerCenter.x,
-                transformerCenter.y,
-                isActualRotation,
-                pixelSnapping,
-              );
-            } else {
-              isFirstTransformTickRef.current = false;
-            }
-
-            // Update the ref immediately with both anchor and control points
-            if (updateCurrentPointsRef) {
-              updateCurrentPointsRef(finalPoints);
-            }
-
-            // Notify of changes
-            onPointsChange?.(finalPoints);
-          } catch (error) {
-            console.warn("Transform error:", error);
-          }
-        }
-      }}
+      onTransform={handleTransform}
       resizeBoundFunc={(oldBox: any, newBox: any) => {
         // Use Konva's built-in constraint system
         if (bounds) {
@@ -377,8 +621,13 @@ export const VectorTransformer: React.FC<VectorTransformerProps> = ({
           }
         });
 
-        // Store initial rotation
-        originalPositionsRef.current.initialRotation = transformerRef.current?.rotation() || 0;
+        // Store initial rotation in dedicated ref
+        const currentRotation = transformerRef.current?.rotation() || 0;
+        initialRotationRef.current = currentRotation;
+        originalPositionsRef.current.initialRotation = currentRotation; // Keep for compatibility
+
+        // Reset rotation direction tracking
+        lastRotationDirectionRef.current = 0;
 
         // Reset the first transform flag to ensure proper rotation tracking
         resetTransformState();
@@ -404,14 +653,18 @@ export const VectorTransformer: React.FC<VectorTransformerProps> = ({
           }
         });
 
-        // Store initial rotation
-        originalPositionsRef.current.initialRotation = transformerRef.current?.rotation() || 0;
+        // Store initial rotation in dedicated ref
+        const currentRotation = transformerRef.current?.rotation() || 0;
+        initialRotationRef.current = currentRotation;
+        originalPositionsRef.current.initialRotation = currentRotation; // Keep for compatibility
 
         // Reset the first transform tick flag
         isFirstTransformTickRef.current = true;
 
-        // Reset previous points tracking
+        // Reset previous points and box tracking
         previousPointsRef.current = null;
+        previousBoxRef.current = null;
+        previousRotationRef.current = null;
       }}
       boundBoxFunc={(oldBox, newBox) => {
         if (!bounds) {
