@@ -64,7 +64,7 @@ dependencies = [
     "sentry-sdk (>=2.16.0)",
     "launchdarkly-server-sdk (==8.2.1)",
     "python-json-logger (==2.0.4)",
-    "google-cloud-storage (>=2.13.0,<3.0.0)",
+    "google-cloud-storage (>=3.8.0,<4.0.0)",
     "google-cloud-logging (>=3.10.0,<4.0.0)",
     "django-csp (==3.7)",
     "openai (>=1.10.0,<2.0.0)",
