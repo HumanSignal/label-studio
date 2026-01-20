@@ -88,6 +88,94 @@ export const VectorTransformer: React.FC<VectorTransformerProps> = ({
   // Track if this is the first transformation tick to avoid control point jumping
   const isFirstTransformTickRef = React.useRef<boolean>(true);
 
+  // Track previous point positions to detect if violation is reducing
+  const previousPointsRef = React.useRef<Array<{ x: number; y: number }> | null>(null);
+
+  // Helper function to calculate constraint based on point bounding box (similar to onDragMove logic)
+  const calculatePointBasedConstraints = React.useCallback(
+    (
+      projectedPoints: Array<{ x: number; y: number }>,
+      oldBox: any,
+      newBox: any,
+    ): { constrainedBox: any; isOutOfBounds: boolean; violationReducing: boolean } => {
+      if (!bounds || projectedPoints.length === 0) {
+        const constrainedBox = { ...newBox };
+        if (constrainedBox.width < BBOX_MIN_WIDTH) constrainedBox.width = BBOX_MIN_WIDTH;
+        if (constrainedBox.height < BBOX_MIN_WIDTH) constrainedBox.height = BBOX_MIN_WIDTH;
+        return { constrainedBox, isOutOfBounds: false, violationReducing: false };
+      }
+
+      // Calculate bounding box of projected points (in image coordinates)
+      const minX = Math.min(...projectedPoints.map((p) => p.x));
+      const maxX = Math.max(...projectedPoints.map((p) => p.x));
+      const minY = Math.min(...projectedPoints.map((p) => p.y));
+      const maxY = Math.max(...projectedPoints.map((p) => p.y));
+
+      const pointBox = {
+        x: minX,
+        y: minY,
+        width: maxX - minX,
+        height: maxY - minY,
+      };
+
+      // Check if out of bounds
+      const isOutOfBounds =
+        pointBox.x < bounds.x ||
+        pointBox.x + pointBox.width > bounds.x + bounds.width ||
+        pointBox.y < bounds.y ||
+        pointBox.y + pointBox.height > bounds.y + bounds.height;
+
+      if (!isOutOfBounds) {
+        // Points are in bounds - allow transformation
+        const constrainedBox = { ...newBox };
+        if (constrainedBox.width < BBOX_MIN_WIDTH) constrainedBox.width = BBOX_MIN_WIDTH;
+        if (constrainedBox.height < BBOX_MIN_WIDTH) constrainedBox.height = BBOX_MIN_WIDTH;
+        previousPointsRef.current = projectedPoints;
+        return { constrainedBox, isOutOfBounds: false, violationReducing: false };
+      }
+
+      // Calculate violation amounts
+      const violationLeft = Math.max(0, bounds.x - pointBox.x);
+      const violationRight = Math.max(0, pointBox.x + pointBox.width - (bounds.x + bounds.width));
+      const violationTop = Math.max(0, bounds.y - pointBox.y);
+      const violationBottom = Math.max(0, pointBox.y + pointBox.height - (bounds.y + bounds.height));
+      const currentViolation = Math.max(violationLeft, violationRight, violationTop, violationBottom);
+
+      // Check if violation is reducing compared to previous points
+      let violationReducing = false;
+      if (previousPointsRef.current) {
+        const prevMinX = Math.min(...previousPointsRef.current.map((p) => p.x));
+        const prevMaxX = Math.max(...previousPointsRef.current.map((p) => p.x));
+        const prevMinY = Math.min(...previousPointsRef.current.map((p) => p.y));
+        const prevMaxY = Math.max(...previousPointsRef.current.map((p) => p.y));
+
+        const prevViolationLeft = Math.max(0, bounds.x - prevMinX);
+        const prevViolationRight = Math.max(0, prevMaxX - (bounds.x + bounds.width));
+        const prevViolationTop = Math.max(0, bounds.y - prevMinY);
+        const prevViolationBottom = Math.max(0, prevMaxY - (bounds.y + bounds.height));
+        const prevViolation = Math.max(prevViolationLeft, prevViolationRight, prevViolationTop, prevViolationBottom);
+
+        violationReducing = currentViolation < prevViolation - 0.01; // EPS threshold
+      }
+
+      // If violation is reducing, allow the transformation
+      if (violationReducing) {
+        const constrainedBox = { ...newBox };
+        if (constrainedBox.width < BBOX_MIN_WIDTH) constrainedBox.width = BBOX_MIN_WIDTH;
+        if (constrainedBox.height < BBOX_MIN_WIDTH) constrainedBox.height = BBOX_MIN_WIDTH;
+        previousPointsRef.current = projectedPoints;
+        return { constrainedBox, isOutOfBounds: true, violationReducing: true };
+      }
+
+      // Violation is not reducing - block transformation
+      const constrainedBox = { ...oldBox };
+      if (constrainedBox.width < BBOX_MIN_WIDTH) constrainedBox.width = BBOX_MIN_WIDTH;
+      if (constrainedBox.height < BBOX_MIN_WIDTH) constrainedBox.height = BBOX_MIN_WIDTH;
+      return { constrainedBox, isOutOfBounds: true, violationReducing: false };
+    },
+    [bounds],
+  );
+
   // Cleanup RAF on unmount
   React.useEffect(() => {
     return () => {
@@ -321,6 +409,9 @@ export const VectorTransformer: React.FC<VectorTransformerProps> = ({
 
         // Reset the first transform tick flag
         isFirstTransformTickRef.current = true;
+
+        // Reset previous points tracking
+        previousPointsRef.current = null;
       }}
       boundBoxFunc={(oldBox, newBox) => {
         if (!bounds) {
@@ -386,31 +477,8 @@ export const VectorTransformer: React.FC<VectorTransformerProps> = ({
           return constrainedBox;
         }
 
-        // Check if any projected point would be out of bounds
-        const minX = Math.min(...projectedPoints.map((p) => p.x));
-        const maxX = Math.max(...projectedPoints.map((p) => p.x));
-        const minY = Math.min(...projectedPoints.map((p) => p.y));
-        const maxY = Math.max(...projectedPoints.map((p) => p.y));
-
-        const isOutOfBounds =
-          minX < bounds.x || maxX > bounds.x + bounds.width || minY < bounds.y || maxY > bounds.y + bounds.height;
-
-        if (isOutOfBounds) {
-          // Return oldBox to prevent transformation
-          const constrainedBox = { ...oldBox };
-          if (constrainedBox.width < BBOX_MIN_WIDTH) constrainedBox.width = BBOX_MIN_WIDTH;
-          if (constrainedBox.height < BBOX_MIN_WIDTH) constrainedBox.height = BBOX_MIN_WIDTH;
-          return constrainedBox;
-        }
-
-        // Only enforce minimum size
-        const constrainedBox = { ...newBox };
-        if (constrainedBox.width < BBOX_MIN_WIDTH) {
-          constrainedBox.width = BBOX_MIN_WIDTH;
-        }
-        if (constrainedBox.height < BBOX_MIN_WIDTH) {
-          constrainedBox.height = BBOX_MIN_WIDTH;
-        }
+        // Use the same constraint logic as onDragMove
+        const { constrainedBox } = calculatePointBasedConstraints(projectedPoints, oldBox, newBox);
         return constrainedBox;
       }}
       onDragMove={(_e: any) => {
