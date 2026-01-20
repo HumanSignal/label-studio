@@ -13,6 +13,7 @@ import {
 const BBOX_MIN_WIDTH = 10;
 const LOCKING_THRESHOLD = 0.1; // Lock when point touches boundary (within 0.1px)
 const VALIDATION_THRESHOLD = 5; // Allow transformation if violation is within 5px (for unlocking)
+const PRECISION_TOLERANCE = 1.0; // Tolerance for floating-point precision errors (allow up to 1px past threshold)
 
 interface VectorTransformerProps {
   selectedPoints: Set<number>;
@@ -153,8 +154,10 @@ export const VectorTransformer: React.FC<VectorTransformerProps> = ({
       // LOCKING: Check if violation exceeds locking threshold (strict - prevents going past boundary)
       const exceedsLockingThreshold = currentViolation > LOCKING_THRESHOLD;
 
-      // VALIDATION: Check if violation is within validation threshold (lenient - allows unlocking)
-      const withinValidationThreshold = currentViolation <= VALIDATION_THRESHOLD;
+      // VALIDATION: Check if violation is within validation threshold + precision tolerance
+      // Add precision tolerance to account for floating-point errors
+      const effectiveValidationThreshold = VALIDATION_THRESHOLD + PRECISION_TOLERANCE;
+      const withinValidationThreshold = currentViolation <= effectiveValidationThreshold;
 
       // Calculate previous violation if we have previous points
       let prevViolationLeft = 0;
@@ -217,9 +220,9 @@ export const VectorTransformer: React.FC<VectorTransformerProps> = ({
           currentRotationDirection !== 0 &&
           currentRotationDirection !== lastRotationDirectionRef.current;
 
-        // STRICT CHECK: Always block if violation exceeds validation threshold
+        // STRICT CHECK: Always block if violation exceeds validation threshold + precision tolerance
         // Only allow if reducing violation or rotating opposite direction
-        if (currentViolation > VALIDATION_THRESHOLD) {
+        if (currentViolation > effectiveValidationThreshold) {
           // Only allow if reducing violation (bringing back in bounds) or rotating opposite (unlocking)
           if (violationReducing || isRotatingOppositeDirection) {
             const constrainedBox = { ...newBox };
@@ -262,10 +265,10 @@ export const VectorTransformer: React.FC<VectorTransformerProps> = ({
         return { constrainedBox, isOutOfBounds: true, violationReducing: false };
       }
 
-      // SCALING: Strict check - block if violation exceeds validation threshold
+      // SCALING: Strict check - block if violation exceeds validation threshold + precision tolerance
       if (isScaling) {
-        // STRICT CHECK: Always block if violation exceeds validation threshold
-        if (currentViolation > VALIDATION_THRESHOLD && !violationReducing) {
+        // STRICT CHECK: Always block if violation exceeds validation threshold + precision tolerance
+        if (currentViolation > effectiveValidationThreshold && !violationReducing) {
           const constrainedBox = { ...oldBox };
           if (constrainedBox.width < BBOX_MIN_WIDTH) constrainedBox.width = BBOX_MIN_WIDTH;
           if (constrainedBox.height < BBOX_MIN_WIDTH) constrainedBox.height = BBOX_MIN_WIDTH;
@@ -316,10 +319,10 @@ export const VectorTransformer: React.FC<VectorTransformerProps> = ({
         return { constrainedBox, isOutOfBounds: true, violationReducing: false };
       }
 
-      // DRAGGING: Strict check - block if violation exceeds validation threshold
+      // DRAGGING: Strict check - block if violation exceeds validation threshold + precision tolerance
       if (isDragging) {
-        // STRICT CHECK: Always block if violation exceeds validation threshold
-        if (currentViolation > VALIDATION_THRESHOLD && !violationReducing) {
+        // STRICT CHECK: Always block if violation exceeds validation threshold + precision tolerance
+        if (currentViolation > effectiveValidationThreshold && !violationReducing) {
           const constrainedBox = { ...oldBox };
           if (constrainedBox.width < BBOX_MIN_WIDTH) constrainedBox.width = BBOX_MIN_WIDTH;
           if (constrainedBox.height < BBOX_MIN_WIDTH) constrainedBox.height = BBOX_MIN_WIDTH;
@@ -363,8 +366,8 @@ export const VectorTransformer: React.FC<VectorTransformerProps> = ({
       }
 
       // Unknown transformation - strict check
-      // STRICT CHECK: Always block if violation exceeds validation threshold
-      if (currentViolation > VALIDATION_THRESHOLD && !violationReducing) {
+      // STRICT CHECK: Always block if violation exceeds validation threshold + precision tolerance
+      if (currentViolation > effectiveValidationThreshold && !violationReducing) {
         const constrainedBox = { ...oldBox };
         if (constrainedBox.width < BBOX_MIN_WIDTH) constrainedBox.width = BBOX_MIN_WIDTH;
         if (constrainedBox.height < BBOX_MIN_WIDTH) constrainedBox.height = BBOX_MIN_WIDTH;
@@ -405,6 +408,64 @@ export const VectorTransformer: React.FC<VectorTransformerProps> = ({
             // Force the transformer to the constrained position
             transformer.x(constraints.x);
             transformer.y(constraints.y);
+          }
+
+          // Constrain proxy nodes directly to prevent points from going beyond boundaries
+          // This ensures precise boundary checking like in onDragMove
+          const nodes = transformer.nodes();
+          if (nodes.length > 0 && proxyRefs) {
+            // Get bounding box of all proxy nodes in image coordinates
+            const nodePositions = nodes
+              .map((node: Konva.Node) => {
+                if (!node || !node.name()) return null;
+                const pointIndex = Number.parseInt(node.name().split("-")[1]);
+                if (pointIndex >= 0 && selectedPoints.has(pointIndex)) {
+                  return { x: node.x(), y: node.y(), index: pointIndex };
+                }
+                return null;
+              })
+              .filter((p: { x: number; y: number; index: number } | null): p is { x: number; y: number; index: number } => p !== null);
+
+            if (nodePositions.length > 0) {
+              const minX = Math.min(...nodePositions.map((p: { x: number; y: number; index: number }) => p.x));
+              const maxX = Math.max(...nodePositions.map((p: { x: number; y: number; index: number }) => p.x));
+              const minY = Math.min(...nodePositions.map((p: { x: number; y: number; index: number }) => p.y));
+              const maxY = Math.max(...nodePositions.map((p: { x: number; y: number; index: number }) => p.y));
+
+              // Calculate violations
+              const violationLeft = Math.max(0, bounds.x - minX);
+              const violationRight = Math.max(0, maxX - (bounds.x + bounds.width));
+              const violationTop = Math.max(0, bounds.y - minY);
+              const violationBottom = Math.max(0, maxY - (bounds.y + bounds.height));
+
+              // Constrain each node if it violates bounds (allow up to VALIDATION_THRESHOLD)
+              nodePositions.forEach((nodePos: { x: number; y: number; index: number }) => {
+                const node = proxyRefs.current[nodePos.index];
+                if (!node) return;
+
+                let constrainedX = nodePos.x;
+                let constrainedY = nodePos.y;
+
+                // Constrain to bounds (strict - no tolerance for precision errors in actual node positions)
+                if (nodePos.x < bounds.x) {
+                  constrainedX = bounds.x;
+                } else if (nodePos.x > bounds.x + bounds.width) {
+                  constrainedX = bounds.x + bounds.width;
+                }
+
+                if (nodePos.y < bounds.y) {
+                  constrainedY = bounds.y;
+                } else if (nodePos.y > bounds.y + bounds.height) {
+                  constrainedY = bounds.y + bounds.height;
+                }
+
+                // Only update if position changed (to avoid unnecessary updates)
+                if (constrainedX !== nodePos.x || constrainedY !== nodePos.y) {
+                  node.x(constrainedX);
+                  node.y(constrainedY);
+                }
+              });
+            }
           }
 
           const transformerCenter = {
