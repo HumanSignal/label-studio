@@ -34,6 +34,9 @@ jobs:
         run: |
           pip install bandit
 
+      - name: Install custom bandit plugins
+        run: pip install ./tools/bandit_ls_custom_checks
+
       - name: Run Bandit
         run: |
           mkdir -p bandit_results
