@@ -208,23 +208,22 @@ export const WithHelpTooltips: Story = {
 };
 
 /**
- * Icon-Only Column Headers
+ * Custom React Node Headers
  *
- * Demonstrates using a React node (icon) as a column header instead of text.
- * The header supports any React node - when you need a tooltip, wrap the icon
- * with a Tooltip component. This is useful for compact columns where space
- * is limited, such as showing active sessions with a monitors icon.
+ * Demonstrates using custom React nodes as column headers instead of text.
+ * The header property accepts any React node - icons, buttons, dropdowns, or any
+ * custom component. Simply pass a function that returns your custom header content.
  *
- * Note: The DataTable header now supports any React node, not just strings.
- * Simply pass a function that returns your custom header content.
+ * This example shows an icon wrapped in a Tooltip for a compact column, but you can
+ * use any React component as a header (buttons, dropdowns, badges, etc.).
  *
  * Hover over the monitors icon to see the tooltip explaining the column.
  */
-export const WithIconHeaders: Story = {
+export const WithCustomHeaders: Story = {
   render: () => {
     const [sorting, setSorting] = useState<SortingState>([]);
 
-    const columnsWithIconHeader: ColumnDef<User>[] = [
+    const columnsWithCustomHeaders: ColumnDef<User>[] = [
       {
         accessorKey: "name",
         header: "Name",
@@ -287,7 +286,7 @@ export const WithIconHeaders: Story = {
         </div>
         <DataTable
           data={sampleData}
-          columns={columnsWithIconHeader}
+          columns={columnsWithCustomHeaders}
           enableSorting
           sorting={sorting}
           onSortingChange={setSorting}
