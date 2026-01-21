@@ -251,10 +251,7 @@ export const WithIconHeaders: Story = {
         accessorKey: "activeSessions",
         // Icon-only header with tooltip - wrap icon in Tooltip directly
         header: () => (
-          <Tooltip
-            title="Active Sessions: Number of active browser sessions. Multiple sessions (>1) may indicate account sharing."
-            alignment="top-center"
-          >
+          <Tooltip title="Active Sessions: Number of active browser sessions." alignment="top-center">
             <div className="flex items-center cursor-help">
               <IconMonitors width={24} height={24} />
             </div>
