@@ -27,7 +27,8 @@ The organization Owner or Administrator for Label Studio Enterprise can set up S
 - [Google SAML](google_saml.html)
 - [Ping Federate and Ping Identity SAML SSO Setup Example](pingone.html)
 - OneLogin
-- Microsoft Active Directory
+- Microsoft Entra ID (formerly Azure Active Directory, Azure AD)
+- Auth0
 - Others that use SAML assertions
 
 After setting up the SSO, you can use native authentication to access the Label Studio UI, however it's not a recommended option especially for the user with the Owner role.
@@ -63,12 +64,39 @@ The details will vary depending on your IdP, but in general you will complete th
 2. Generate a metadata XML file, or a URL that specifies the metadata for the IdP.
 3. Set up or confirm setup of the following SAML attributes. Label Studio Enterprise expects specific attribute mappings for user identities.
 
-    | Data | Required Attribute |
+**The default attribute names are:**
+
+    | Data | Default Attribute |
     | --- | --- |
     | Email address | Email |
     | First or given name | FirstName |
     | Last or family name | LastName |
     | Group name | Groups | 
+
+!!! note Note
+    Different Identity Providers use different attribute names. Label Studio provides **presets** in the SSO & SAML settings page to quickly configure the correct attribute mappings for popular IdPs. You can also manually configure custom attribute names if your IdP uses different values.
+
+**Attribute presets by IdP:**
+
+| IdP | Email | FirstName | LastName | Groups |
+| --- | --- | --- | --- | --- |
+| Default | `Email` | `FirstName` | `LastName` | `Groups` |
+| Auth0 | `email` | `given_name` | `family_name` | `groups` |
+| Entra ID (short) | `emailAddress` | `givenName` | `surname` | `groups` |
+| Google | `Email` | `FirstName` | `LastName` | `Groups` |
+| PingOne | `emailAddress` | `givenName` | `surname` | `Groups` |
+| Okta | `email` | `firstName` | `lastName` | `groups` |
+
+**Microsoft Entra ID with full URI format:**
+
+If your Entra ID is configured with default claim URIs, use:
+
+| Attribute | URI |
+| --- | --- |
+| Email | `http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress` |
+| FirstName | `http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname` |
+| LastName | `http://schemas.xmlsoap.org/ws/2005/05/identity/claims/surname` |
+| Groups | `http://schemas.microsoft.com/ws/2008/06/identity/claims/groups` |
 
 
 

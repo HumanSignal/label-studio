@@ -40,9 +40,16 @@ $check-icon: "data:image/svg+xml;charset=UTF-8,%3csvg width='13' height='10' vie
   // }
 
   &_disabled {
+    cursor: not-allowed !important;
+
     .checkbox {
       &__box {
         border-color: var(--checkbox-disabled-border-color, var(--checkbox-default-disabled-border-color));
+        cursor: not-allowed !important;
+      }
+
+      &__input {
+        cursor: not-allowed !important;
       }
 
       &__check {
@@ -53,6 +60,11 @@ $check-icon: "data:image/svg+xml;charset=UTF-8,%3csvg width='13' height='10' vie
         &_indeterminate::after {
           background-color: var(--checkbox-disabled-color, var(--checkbox-default-disabled-color));
         }
+      }
+
+      &__label {
+        color: var(--checkbox-disabled-color, var(--checkbox-default-disabled-color));
+        cursor: not-allowed !important;
       }
     }
   }

@@ -238,7 +238,7 @@
     "@radix-ui/react-slot": "1.2.3",
     "d3-color": "3.1.0",
     "debug": ">=4.3.1",
-    "diff": ">=3.5.0",
+    "diff": ">=8.0.3",
     "esbuild": ">=0.25.5",
     "jpeg-js": "0.4.4",
     "js-yaml": "4.1.1",

@@ -38,13 +38,13 @@ Label Studio is available to everyone as open source software (Label Studio Comm
   <tr>
     <td><b>Role-based workflows</b><br/><a href="https://docs.humansignal.com/guide/project_settings_lse#Annotation">Role-based automated workflows for annotators and reviewers.</a></td>
     <td style="text-align:center">❌</td>
-    <td style="text-align:center">✅</td>
+    <td style="text-align:center">Limited</td>
     <td style="text-align:center">✅</td>
   </tr>
   <tr>
     <td><b>Role-based access control</b><br/><a href="https://docs.humansignal.com/guide/admin_roles">Role-based access control into workspaces and projects: Admin, Manager, Reviewer, and Annotator.</a></td>
     <td style="text-align:center">❌</td>
-    <td style="text-align:center">✅</td>
+    <td style="text-align:center">Limited</td>
     <td style="text-align:center">✅</td>
   </tr>
   <tr>
@@ -140,13 +140,13 @@ Label Studio is available to everyone as open source software (Label Studio Comm
   <tr>
     <td><b>Project-level roles</b><br/><a href="https://docs.humansignal.com/guide/project_settings_lse#Members">Annotator and Reviewer can be assigned to Annotator/Reviewer roles at a per-project level. </a></td>
     <td style="text-align:center">❌</td>
-    <td style="text-align:center">✅</td>
+    <td style="text-align:center">Limited</td>
     <td style="text-align:center">✅</td>
   </tr>
   <tr>
     <td><b>Project-level user settings</b><br/><a href="https://docs.humansignal.com/guide/project_settings_lse#Annotation">Multiple configuration options for how Annotators and Reviewers interact with tasks and what information they can see.</a></td>
     <td style="text-align:center">❌</td>
-    <td style="text-align:center">✅</td>
+    <td style="text-align:center">Limited</td>
     <td style="text-align:center">✅</td>
   </tr>
 
@@ -285,7 +285,7 @@ Label Studio is available to everyone as open source software (Label Studio Comm
   <tr>
     <td><b>Assign reviewers</b><br/><a href="https://docs.humansignal.com/guide/quality.html">Assign reviewers to review, fix and update annotations.</a></td>
     <td style="text-align:center">❌</td>
-    <td style="text-align:center">✅</td>
+    <td style="text-align:center">❌</td>
     <td style="text-align:center">✅</td>
   </tr>
   <tr>
