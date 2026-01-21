@@ -394,118 +394,111 @@ export const VectorTransformer: React.FC<VectorTransformerProps> = ({
     [bounds],
   );
 
-  // Handle transform event
-  const handleTransform = React.useCallback(
-    (_e: any) => {
-      // Apply proxy coordinates to real points in real-time
+  // Shared function to apply transformation and update points (used by both drag and transform)
+  // Uses EXACT same logic as onDragMove to ensure consistent behavior
+  const applyTransformationAndUpdatePoints = React.useCallback(
+    (isRotation: boolean) => {
       const transformer = transformerRef.current;
-      if (transformer && bounds) {
-        try {
-          // Check if we need to constrain the transformer position
-          const constraints = calculateTransformerConstraints(transformer, bounds, scaleX, scaleY, transform, fitScale);
+      if (!transformer || !bounds) return;
 
-          if (constraints) {
-            // Force the transformer to the constrained position
-            transformer.x(constraints.x);
-            transformer.y(constraints.y);
+      try {
+        // Get all shapes in the transformer (EXACT same as onDragMove)
+        const shapes = transformer.nodes();
+        if (shapes.length === 0) return;
+
+        // Get bounding box of all shapes (EXACT same as onDragMove)
+        const boxes = shapes.map((shape: Konva.Node) => shape.getClientRect());
+        const box = {
+          x: Math.min(...boxes.map((b: { x: number; y: number; width: number; height: number }) => b.x)),
+          y: Math.min(...boxes.map((b: { x: number; y: number; width: number; height: number }) => b.y)),
+          width:
+            Math.max(...boxes.map((b: { x: number; y: number; width: number; height: number }) => b.x + b.width)) -
+            Math.min(...boxes.map((b: { x: number; y: number; width: number; height: number }) => b.x)),
+          height:
+            Math.max(...boxes.map((b: { x: number; y: number; width: number; height: number }) => b.y + b.height)) -
+            Math.min(...boxes.map((b: { x: number; y: number; width: number; height: number }) => b.y)),
+        };
+
+        // Convert box to image coordinates (EXACT same as onDragMove)
+        const imageBox = {
+          x: (box.x - transform.offsetX) / (transform.zoom * fitScale),
+          y: (box.y - transform.offsetY) / (transform.zoom * fitScale),
+          width: box.width / (transform.zoom * fitScale),
+          height: box.height / (transform.zoom * fitScale),
+        };
+
+        // Constrain shapes as a group (EXACT same logic as onDragMove - preserves shape)
+        shapes.forEach((shape: Konva.Node) => {
+          const absPos = shape.getAbsolutePosition();
+          const offsetX = box.x - absPos.x;
+          const offsetY = box.y - absPos.y;
+
+          const newAbsPos = { ...absPos };
+
+          if (imageBox.x < bounds.x) {
+            newAbsPos.x = bounds.x * (transform.zoom * fitScale) + transform.offsetX - offsetX;
+          }
+          if (imageBox.y < bounds.y) {
+            newAbsPos.y = bounds.y * (transform.zoom * fitScale) + transform.offsetY - offsetY;
+          }
+          if (imageBox.x + imageBox.width > bounds.x + bounds.width) {
+            newAbsPos.x =
+              (bounds.x + bounds.width) * (transform.zoom * fitScale) + transform.offsetX - box.width - offsetX;
+          }
+          if (imageBox.y + imageBox.height > bounds.y + bounds.height) {
+            newAbsPos.y =
+              (bounds.y + bounds.height) * (transform.zoom * fitScale) + transform.offsetY - box.height - offsetY;
           }
 
-          // Constrain proxy nodes directly to prevent points from going beyond boundaries
-          // This ensures precise boundary checking like in onDragMove
-          const nodes = transformer.nodes();
-          if (nodes.length > 0 && proxyRefs) {
-            // Get bounding box of all proxy nodes in image coordinates
-            const nodePositions = nodes
-              .map((node: Konva.Node) => {
-                if (!node || !node.name()) return null;
-                const pointIndex = Number.parseInt(node.name().split("-")[1]);
-                if (pointIndex >= 0 && selectedPoints.has(pointIndex)) {
-                  return { x: node.x(), y: node.y(), index: pointIndex };
-                }
-                return null;
-              })
-              .filter((p: { x: number; y: number; index: number } | null): p is { x: number; y: number; index: number } => p !== null);
+          // Apply the constrained position to the individual shape (EXACT same as onDragMove)
+          shape.setAbsolutePosition(newAbsPos);
+        });
 
-            if (nodePositions.length > 0) {
-              const minX = Math.min(...nodePositions.map((p: { x: number; y: number; index: number }) => p.x));
-              const maxX = Math.max(...nodePositions.map((p: { x: number; y: number; index: number }) => p.x));
-              const minY = Math.min(...nodePositions.map((p: { x: number; y: number; index: number }) => p.y));
-              const maxY = Math.max(...nodePositions.map((p: { x: number; y: number; index: number }) => p.y));
+        // Apply transformation to points (EXACT same as onDragMove)
+        const transformerCenter = {
+          x: transformer.x() + transformer.width() / 2,
+          y: transformer.y() + transformer.height() / 2,
+        };
+        const { newPoints } = applyTransformationToPoints(
+          transformer,
+          initialPoints,
+          proxyRefs,
+          false, // Don't update control points here
+          originalPositionsRef.current,
+          transformerCenter,
+          bounds,
+          getCurrentPointsRef,
+          updateCurrentPointsRef,
+          pixelSnapping,
+        );
 
-              // Calculate violations
-              const violationLeft = Math.max(0, bounds.x - minX);
-              const violationRight = Math.max(0, maxX - (bounds.x + bounds.width));
-              const violationTop = Math.max(0, bounds.y - minY);
-              const violationBottom = Math.max(0, maxY - (bounds.y + bounds.height));
+        // Update the ref immediately (EXACT same as onDragMove)
+        if (updateCurrentPointsRef) {
+          updateCurrentPointsRef(newPoints);
+        }
 
-              // Constrain each node if it violates bounds (allow up to VALIDATION_THRESHOLD)
-              nodePositions.forEach((nodePos: { x: number; y: number; index: number }) => {
-                const node = proxyRefs.current[nodePos.index];
-                if (!node) return;
-
-                let constrainedX = nodePos.x;
-                let constrainedY = nodePos.y;
-
-                // Constrain to bounds (strict - no tolerance for precision errors in actual node positions)
-                if (nodePos.x < bounds.x) {
-                  constrainedX = bounds.x;
-                } else if (nodePos.x > bounds.x + bounds.width) {
-                  constrainedX = bounds.x + bounds.width;
-                }
-
-                if (nodePos.y < bounds.y) {
-                  constrainedY = bounds.y;
-                } else if (nodePos.y > bounds.y + bounds.height) {
-                  constrainedY = bounds.y + bounds.height;
-                }
-
-                // Only update if position changed (to avoid unnecessary updates)
-                if (constrainedX !== nodePos.x || constrainedY !== nodePos.y) {
-                  node.x(constrainedX);
-                  node.y(constrainedY);
-                }
-              });
-            }
-          }
-
-          const transformerCenter = {
-            x: transformer.x() + transformer.width() / 2,
-            y: transformer.y() + transformer.height() / 2,
-          };
-          const { newPoints } = applyTransformationToPoints(
-            transformer,
-            initialPoints,
-            proxyRefs,
-            false, // Don't update control points here
+        // Apply transformation to control points (EXACT same as onDragMove)
+        if (isRotation && !isFirstTransformTickRef.current) {
+          // For rotation, apply control points synchronously to prevent shifting
+          const finalPoints = applyTransformationToControlPoints(
+            newPoints,
             originalPositionsRef.current,
-            transformerCenter,
-            bounds,
-            getCurrentPointsRef,
-            updateCurrentPointsRef,
+            transformer.rotation(),
+            transformer.scaleX(),
+            transformer.scaleY(),
+            transformerCenter.x,
+            transformerCenter.y,
+            true, // isRotation = true
             pixelSnapping,
           );
-
-          // Check if this is a rotation operation
-          const originalRotation = initialRotationRef.current;
-          const currentRotation = transformer.rotation();
-          const rotationDelta = originalRotation - currentRotation;
-          const isActualRotation = currentRotation !== 0;
-          const rotationDirection = rotationDelta > 0 ? "cw" : ("ccw" as const);
-          console.log("Rotation check:", {
-            originalRotation,
-            currentRotation,
-            rotationDelta,
-            isActualRotation,
-            rotationDirection,
-          });
-
-          // Apply control point transformations synchronously during rotation to prevent shifting
-          // Skip on first tick to avoid jumping
-          let finalPoints = newPoints;
-          if (!isFirstTransformTickRef.current) {
-            // Apply transformation to control points immediately (synchronously) during rotation
-            // This ensures anchor and control points stay in sync during quick rotation
-            finalPoints = applyTransformationToControlPoints(
+          onPointsChange?.(finalPoints);
+        } else {
+          // For other transformations, use RAF (EXACT same as onDragMove)
+          if (rafIdRef.current) {
+            cancelAnimationFrame(rafIdRef.current);
+          }
+          rafIdRef.current = requestAnimationFrame(() => {
+            const updatedPoints = applyTransformationToControlPoints(
               newPoints,
               originalPositionsRef.current,
               transformer.rotation(),
@@ -513,23 +506,18 @@ export const VectorTransformer: React.FC<VectorTransformerProps> = ({
               transformer.scaleY(),
               transformerCenter.x,
               transformerCenter.y,
-              isActualRotation,
+              false, // isRotation = false
               pixelSnapping,
             );
-          } else {
-            isFirstTransformTickRef.current = false;
-          }
-
-          // Update the ref immediately with both anchor and control points
-          if (updateCurrentPointsRef) {
-            updateCurrentPointsRef(finalPoints);
-          }
-
-          // Notify of changes
-          onPointsChange?.(finalPoints);
-        } catch (error) {
-          console.warn("Transform error:", error);
+            onPointsChange?.(updatedPoints);
+          });
         }
+
+        if (isFirstTransformTickRef.current) {
+          isFirstTransformTickRef.current = false;
+        }
+      } catch (error) {
+        console.warn("Transform error:", error);
       }
     },
     [
@@ -544,7 +532,24 @@ export const VectorTransformer: React.FC<VectorTransformerProps> = ({
       updateCurrentPointsRef,
       pixelSnapping,
       onPointsChange,
+      originalPositionsRef,
+      isFirstTransformTickRef,
+      rafIdRef,
     ],
+  );
+
+  // Handle transform event
+  const handleTransform = React.useCallback(
+    (_e: any) => {
+      const transformer = transformerRef.current;
+      if (transformer && bounds) {
+        const currentRotation = transformer.rotation();
+        const originalRotation = initialRotationRef.current;
+        const isActualRotation = Math.abs(currentRotation - originalRotation) > 0.1;
+        applyTransformationAndUpdatePoints(isActualRotation);
+      }
+    },
+    [applyTransformationAndUpdatePoints, initialRotationRef],
   );
 
   // Cleanup RAF on unmount
@@ -728,324 +733,16 @@ export const VectorTransformer: React.FC<VectorTransformerProps> = ({
         previousRotationRef.current = null;
       }}
       boundBoxFunc={(oldBox: any, newBox: any) => {
-        // Step 1: When function starts, remember oldBox state (current node positions and points)
-        const currentPoints = getCurrentPointsRef?.() || initialPoints;
-        const savedPoints = currentPoints.map((p) => ({ ...p }));
-
-        // Save current node positions (which represent oldBox state)
-        const savedNodePositions = new Map<number, { x: number; y: number }>();
-        const transformer = transformerRef.current;
-        if (transformer) {
-          const nodes = transformer.nodes();
-          for (const node of nodes) {
-            if (!node || !node.name()) continue;
-            const pointIndex = Number.parseInt(node.name().split("-")[1]);
-            if (pointIndex >= 0 && selectedPoints.has(pointIndex)) {
-              savedNodePositions.set(pointIndex, { x: node.x(), y: node.y() });
-            }
-          }
-        }
-
-        console.log("[boundBoxFunc] Start:", { oldBox, newBox, savedPointsCount: savedPoints.length });
-
-        if (!bounds) {
-          const constrainedBox = { ...newBox };
-          if (constrainedBox.width < BBOX_MIN_WIDTH) {
-            constrainedBox.width = BBOX_MIN_WIDTH;
-          }
-          if (constrainedBox.height < BBOX_MIN_WIDTH) {
-            constrainedBox.height = BBOX_MIN_WIDTH;
-          }
-          return constrainedBox;
-        }
-
-        if (!transformer) {
-          const constrainedBox = { ...newBox };
-          if (constrainedBox.width < BBOX_MIN_WIDTH) {
-            constrainedBox.width = BBOX_MIN_WIDTH;
-          }
-          if (constrainedBox.height < BBOX_MIN_WIDTH) {
-            constrainedBox.height = BBOX_MIN_WIDTH;
-          }
-          return constrainedBox;
-        }
-
-        const nodes = transformer.nodes();
-        if (nodes.length === 0) {
-          const constrainedBox = { ...newBox };
-          if (constrainedBox.width < BBOX_MIN_WIDTH) {
-            constrainedBox.width = BBOX_MIN_WIDTH;
-          }
-          if (constrainedBox.height < BBOX_MIN_WIDTH) {
-            constrainedBox.height = BBOX_MIN_WIDTH;
-          }
-          return constrainedBox;
-        }
-
-        // Step 2: Calculate new points according to newBox transformation state
-        // Manually calculate projected points by applying transformation to original points
-        const projectedPoints: Array<{ x: number; y: number }> = [];
-
-        // Get transformation centers
-        const oldCenterX = oldBox.x + (oldBox.width || transformer.width()) / 2;
-        const oldCenterY = oldBox.y + (oldBox.height || transformer.height()) / 2;
-        const newCenterX = newBox.x + (newBox.width || transformer.width()) / 2;
-        const newCenterY = newBox.y + (newBox.height || transformer.height()) / 2;
-
-        // Calculate transformation deltas from oldBox to newBox
-        const rotationDelta = ((newBox.rotation || 0) - (oldBox.rotation || 0)) * (Math.PI / 180);
-        const scaleXDelta = (newBox.scaleX || 1) / (oldBox.scaleX || 1);
-        const scaleYDelta = (newBox.scaleY || 1) / (oldBox.scaleY || 1);
-
-        const cos = Math.cos(rotationDelta);
-        const sin = Math.sin(rotationDelta);
-
-        // Apply transformation to current node positions (which represent oldBox state)
-        for (const node of nodes) {
-          if (!node || !node.name()) continue;
-          const pointIndex = Number.parseInt(node.name().split("-")[1]);
-          if (pointIndex >= 0 && selectedPoints.has(pointIndex)) {
-            // Get current position (which is the oldBox state)
-            const currentX = node.x();
-            const currentY = node.y();
-
-            // Get position relative to old center
-            let x = currentX - oldCenterX;
-            let y = currentY - oldCenterY;
-
-            // Apply scaling
-            x *= scaleXDelta;
-            y *= scaleYDelta;
-
-            // Apply rotation
-            const rotatedX = x * cos - y * sin;
-            const rotatedY = x * sin + y * cos;
-
-            // Translate to new center
-            const projectedX = rotatedX + newCenterX;
-            const projectedY = rotatedY + newCenterY;
-
-            projectedPoints.push({ x: projectedX, y: projectedY });
-          }
-        }
-
-        console.log("[boundBoxFunc] Projected points:", projectedPoints);
-
-        if (projectedPoints.length === 0) {
-          const constrainedBox = { ...newBox };
-          if (constrainedBox.width < BBOX_MIN_WIDTH) {
-            constrainedBox.width = BBOX_MIN_WIDTH;
-          }
-          if (constrainedBox.height < BBOX_MIN_WIDTH) {
-            constrainedBox.height = BBOX_MIN_WIDTH;
-          }
-          return constrainedBox;
-        }
-
-        // Step 3: Check newly calculated box and points for violation
-        const minX = Math.min(...projectedPoints.map((p) => p.x));
-        const maxX = Math.max(...projectedPoints.map((p) => p.x));
-        const minY = Math.min(...projectedPoints.map((p) => p.y));
-        const maxY = Math.max(...projectedPoints.map((p) => p.y));
-
-        const violationLeft = Math.max(0, bounds.x - minX);
-        const violationRight = Math.max(0, maxX - (bounds.x + bounds.width));
-        const violationTop = Math.max(0, bounds.y - minY);
-        const violationBottom = Math.max(0, maxY - (bounds.y + bounds.height));
-        const currentViolation = Math.max(violationLeft, violationRight, violationTop, violationBottom);
-
-        // Log each point individually
-        projectedPoints.forEach((p, i) => {
-          const outLeft = p.x < bounds.x;
-          const outRight = p.x > bounds.x + bounds.width;
-          const outTop = p.y < bounds.y;
-          const outBottom = p.y > bounds.y + bounds.height;
-          if (outLeft || outRight || outTop || outBottom) {
-            console.log(`[boundBoxFunc] Point ${i} OUT OF BOUNDS:`, {
-              x: p.x,
-              y: p.y,
-              outLeft,
-              outRight,
-              outTop,
-              outBottom,
-              boundsX: bounds.x,
-              boundsY: bounds.y,
-              boundsRight: bounds.x + bounds.width,
-              boundsBottom: bounds.y + bounds.height,
-            });
-          }
-        });
-
-        console.log("[boundBoxFunc] Violation check:", {
-          currentViolation,
-          LOCKING_THRESHOLD,
-          shouldBlock: currentViolation > 0,
-          bounds: { x: bounds.x, y: bounds.y, width: bounds.width, height: bounds.height },
-          boundsRight: bounds.x + bounds.width,
-          boundsBottom: bounds.y + bounds.height,
-          minX,
-          maxX,
-          minY,
-          maxY,
-          violationLeft,
-          violationRight,
-          violationTop,
-          violationBottom,
-          projectedPoints: projectedPoints.map((p, i) => ({ index: i, x: p.x, y: p.y })),
-        });
-
-        // Step 4: If violation, restore box to oldBox and points to saved state
-        // Block ANY violation, not just ones above threshold
-        if (currentViolation > 0) {
-          console.log("[boundBoxFunc] BLOCKING - restoring to oldBox");
-
-          // Restore transformer to oldBox
-          transformer.x(oldBox.x);
-          transformer.y(oldBox.y);
-          transformer.width(oldBox.width || transformer.width());
-          transformer.height(oldBox.height || transformer.height());
-          transformer.rotation(oldBox.rotation || 0);
-          transformer.scaleX(oldBox.scaleX || 1);
-          transformer.scaleY(oldBox.scaleY || 1);
-
-          // Restore nodes to saved positions (oldBox state)
-          if (proxyRefs) {
-            nodes.forEach((node: Konva.Node) => {
-              if (!node || !node.name()) return;
-              const pointIndex = Number.parseInt(node.name().split("-")[1]);
-              if (pointIndex >= 0 && selectedPoints.has(pointIndex)) {
-                const savedPos = savedNodePositions.get(pointIndex);
-                if (savedPos) {
-                  node.x(savedPos.x);
-                  node.y(savedPos.y);
-                }
-              }
-            });
-          }
-
-          // Restore full points array to saved state (oldBox state)
-          const restoredPoints = savedPoints.map((point) => ({ ...point }));
-
-          if (updateCurrentPointsRef) {
-            updateCurrentPointsRef(restoredPoints);
-          }
-          onPointsChange?.(restoredPoints);
-
-          transformer.getLayer()?.batchDraw();
-
-          console.log("[boundBoxFunc] Returning oldBox to block transformation");
-          return oldBox;
-        }
-
-        // No violation - return newBox
-        console.log("[boundBoxFunc] No violation - returning newBox");
+        // Always allow transformation - let the shared function handle constraints (same as drag)
+        // This ensures transform behaves exactly like drag (no blocking, just constraining)
         const constrainedBox = { ...newBox };
-        if (constrainedBox.width < BBOX_MIN_WIDTH) {
-          constrainedBox.width = BBOX_MIN_WIDTH;
-        }
-        if (constrainedBox.height < BBOX_MIN_WIDTH) {
-          constrainedBox.height = BBOX_MIN_WIDTH;
-        }
+        if (constrainedBox.width < BBOX_MIN_WIDTH) constrainedBox.width = BBOX_MIN_WIDTH;
+        if (constrainedBox.height < BBOX_MIN_WIDTH) constrainedBox.height = BBOX_MIN_WIDTH;
         return constrainedBox;
       }}
       onDragMove={(_e: any) => {
-        // Apply drag movement to real points in real-time with constraints
-        const transformer = transformerRef.current;
-        if (transformer && bounds) {
-          try {
-            // Get all shapes in the transformer
-            const shapes = transformer.nodes();
-            if (shapes.length === 0) return;
-
-            // Get bounding box of all shapes (like getTotalBox in the example)
-            const boxes = shapes.map((shape) => shape.getClientRect());
-            const box = {
-              x: Math.min(...boxes.map((b) => b.x)),
-              y: Math.min(...boxes.map((b) => b.y)),
-              width: Math.max(...boxes.map((b) => b.x + b.width)) - Math.min(...boxes.map((b) => b.x)),
-              height: Math.max(...boxes.map((b) => b.y + b.height)) - Math.min(...boxes.map((b) => b.y)),
-            };
-
-            // Convert box to image coordinates
-            const imageBox = {
-              x: (box.x - transform.offsetX) / (transform.zoom * fitScale),
-              y: (box.y - transform.offsetY) / (transform.zoom * fitScale),
-              width: box.width / (transform.zoom * fitScale),
-              height: box.height / (transform.zoom * fitScale),
-            };
-
-            // Check if out of bounds and constrain each shape
-            shapes.forEach((shape) => {
-              const absPos = shape.getAbsolutePosition();
-              const offsetX = box.x - absPos.x;
-              const offsetY = box.y - absPos.y;
-
-              const newAbsPos = { ...absPos };
-
-              if (imageBox.x < bounds.x) {
-                newAbsPos.x = bounds.x * (transform.zoom * fitScale) + transform.offsetX - offsetX;
-              }
-              if (imageBox.y < bounds.y) {
-                newAbsPos.y = bounds.y * (transform.zoom * fitScale) + transform.offsetY - offsetY;
-              }
-              if (imageBox.x + imageBox.width > bounds.x + bounds.width) {
-                newAbsPos.x =
-                  (bounds.x + bounds.width) * (transform.zoom * fitScale) + transform.offsetX - box.width - offsetX;
-              }
-              if (imageBox.y + imageBox.height > bounds.y + bounds.height) {
-                newAbsPos.y =
-                  (bounds.y + bounds.height) * (transform.zoom * fitScale) + transform.offsetY - box.height - offsetY;
-              }
-
-              // Apply the constrained position to the individual shape
-              shape.setAbsolutePosition(newAbsPos);
-            });
-
-            const transformerCenter = {
-              x: transformer.x() + transformer.width() / 2,
-              y: transformer.y() + transformer.height() / 2,
-            };
-            const { newPoints } = applyTransformationToPoints(
-              transformer,
-              initialPoints,
-              proxyRefs,
-              false, // Don't update control points here
-              originalPositionsRef.current,
-              transformerCenter,
-              bounds,
-              getCurrentPointsRef,
-              updateCurrentPointsRef,
-              pixelSnapping,
-            );
-
-            // Update the ref immediately so next transformation tick uses latest points
-            if (updateCurrentPointsRef) {
-              updateCurrentPointsRef(newPoints);
-            }
-
-            // Apply transformation to control points using RAF
-            if (rafIdRef.current) {
-              cancelAnimationFrame(rafIdRef.current);
-            }
-            rafIdRef.current = requestAnimationFrame(() => {
-              // Apply transformation to control points using original positions as base
-              const updatedPoints = applyTransformationToControlPoints(
-                newPoints,
-                originalPositionsRef.current,
-                transformer.rotation(),
-                transformer.scaleX(),
-                transformer.scaleY(),
-                transformerCenter.x,
-                transformerCenter.y,
-                false, // isRotation = false for onDragMove (translation only)
-                pixelSnapping,
-              );
-              onPointsChange?.(updatedPoints);
-            });
-          } catch (error) {
-            console.warn("Drag move error:", error);
-          }
-        }
+        // Use shared transformation logic (same as handleTransform)
+        applyTransformationAndUpdatePoints(false); // isRotation = false for drag
       }}
       onDragEnd={(_e: any) => {
         // Get the transformer
