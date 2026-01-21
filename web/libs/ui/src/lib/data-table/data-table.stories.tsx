@@ -32,8 +32,24 @@ type User = {
 };
 
 const sampleData: User[] = [
-  { id: 1, name: "John Doe", email: "john@example.com", role: "Admin", status: "active", lastActive: "2024-01-15", activeSessions: 2 },
-  { id: 2, name: "Jane Smith", email: "jane@example.com", role: "Editor", status: "active", lastActive: "2024-01-14", activeSessions: 1 },
+  {
+    id: 1,
+    name: "John Doe",
+    email: "john@example.com",
+    role: "Admin",
+    status: "active",
+    lastActive: "2024-01-15",
+    activeSessions: 2,
+  },
+  {
+    id: 2,
+    name: "Jane Smith",
+    email: "jane@example.com",
+    role: "Editor",
+    status: "active",
+    lastActive: "2024-01-14",
+    activeSessions: 1,
+  },
   {
     id: 3,
     name: "Bob Johnson",
