@@ -971,7 +971,8 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
     const hasSelection = selectedPoints.size > 0 || effectiveSelectedPoints.size > 0;
     const isInstanceSelected = tracker.isInstanceSelected(instanceId);
     // Show ghost line only if not disabled AND selected AND not in transform mode AND (active OR has selection)
-    const shouldShowGhostLine = !disabled && selected && !transformMode && (isActiveInstance || hasSelection || isInstanceSelected);
+    const shouldShowGhostLine =
+      !disabled && selected && !transformMode && (isActiveInstance || hasSelection || isInstanceSelected);
 
     // If we couldn't get the position and we have points, set a fallback position
     // Use the last point or center of the region as a fallback until mouse moves
@@ -2203,7 +2204,14 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
         transformMode: refTransformMode,
       } = currentValuesRef.current;
 
-      if (disabled || !selected || refTransformMode || isDragging.current || isDraggingNewBezier || ghostPointDragInfo?.isDragging) {
+      if (
+        disabled ||
+        !selected ||
+        refTransformMode ||
+        isDragging.current ||
+        isDraggingNewBezier ||
+        ghostPointDragInfo?.isDragging
+      ) {
         return;
       }
 
@@ -2666,7 +2674,10 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
 
       // Prevent all interactions when disabled or in transform mode (but allow cursor position updates for ghost line)
       // Only block dragging and point interactions
-      if ((disabled || transformMode) && (draggedPointIndex !== null || draggedControlPoint !== null || isDraggingShape)) {
+      if (
+        (disabled || transformMode) &&
+        (draggedPointIndex !== null || draggedControlPoint !== null || isDraggingShape)
+      ) {
         // Stop any ongoing drags when disabled or in transform mode
         setDraggedPointIndex(null);
         setDraggedControlPoint(null);
@@ -4222,7 +4233,7 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
                 e.cancelBubble = true;
                 return;
               }
-              
+
               // Handle Alt+click point deletion FIRST (before other checks)
               if (e.evt.altKey && !e.evt.shiftKey && selected) {
                 deletePoint(

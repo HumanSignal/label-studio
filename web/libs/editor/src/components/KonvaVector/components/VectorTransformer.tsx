@@ -2,7 +2,6 @@ import React from "react";
 import { Transformer as KonvaTransformer } from "react-konva";
 import type Konva from "konva";
 import type { BezierPoint } from "../types";
-import { calculateTransformerConstraints } from "../utils/boundsChecking";
 import {
   applyTransformationToPoints,
   resetTransformState,
@@ -298,11 +297,7 @@ export const VectorTransformer: React.FC<VectorTransformerProps> = ({
         // 1. Violation is reducing (bringing points back in bounds)
         // 2. Violation is within validation threshold (allows slight violation for unlocking)
         // 3. Not moving toward boundary (resizing from opposite side)
-        if (
-          violationReducing ||
-          withinValidationThreshold ||
-          !isMovingTowardAnyBoundary
-        ) {
+        if (violationReducing || withinValidationThreshold || !isMovingTowardAnyBoundary) {
           const constrainedBox = { ...newBox };
           if (constrainedBox.width < BBOX_MIN_WIDTH) constrainedBox.width = BBOX_MIN_WIDTH;
           if (constrainedBox.height < BBOX_MIN_WIDTH) constrainedBox.height = BBOX_MIN_WIDTH;
@@ -427,7 +422,19 @@ export const VectorTransformer: React.FC<VectorTransformerProps> = ({
           height: box.height / (transform.zoom * fitScale),
         };
 
-        // Constrain shapes as a group (EXACT same logic as onDragMove - preserves shape)
+        // Check if any constraint would be applied
+        const wouldConstrain =
+          imageBox.x < bounds.x ||
+          imageBox.y < bounds.y ||
+          imageBox.x + imageBox.width > bounds.x + bounds.width ||
+          imageBox.y + imageBox.height > bounds.y + bounds.height;
+
+        // If we would constrain, don't apply any transformation - just return early
+        if (wouldConstrain) {
+          return;
+        }
+
+        // No constraints needed - proceed normally
         shapes.forEach((shape: Konva.Node) => {
           const absPos = shape.getAbsolutePosition();
           const offsetX = box.x - absPos.x;
@@ -665,6 +672,20 @@ export const VectorTransformer: React.FC<VectorTransformerProps> = ({
             constrainedBox.height = bounds.y + bounds.height - constrainedBox.y;
           }
 
+          // Check if center shifted due to constraints
+          const oldCenterX = oldBox.x + oldBox.width / 2;
+          const oldCenterY = oldBox.y + oldBox.height / 2;
+          const newCenterX = constrainedBox.x + constrainedBox.width / 2;
+          const newCenterY = constrainedBox.y + constrainedBox.height / 2;
+
+          const centerShiftX = newCenterX - oldCenterX;
+          const centerShiftY = newCenterY - oldCenterY;
+
+          // If center shifted significantly, block the transformation by returning oldBox
+          if (Math.abs(centerShiftX) > 1 || Math.abs(centerShiftY) > 1) {
+            return oldBox;
+          }
+
           return constrainedBox;
         }
         return newBox;
@@ -732,7 +753,7 @@ export const VectorTransformer: React.FC<VectorTransformerProps> = ({
         previousBoxRef.current = null;
         previousRotationRef.current = null;
       }}
-      boundBoxFunc={(oldBox: any, newBox: any) => {
+      boundBoxFunc={(_oldBox: any, newBox: any) => {
         // Always allow transformation - let the shared function handle constraints (same as drag)
         // This ensures transform behaves exactly like drag (no blocking, just constraining)
         const constrainedBox = { ...newBox };
