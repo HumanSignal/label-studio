@@ -5,10 +5,9 @@ loading heavy task.data fields during pagination.
 """
 from unittest.mock import MagicMock, patch
 
+from data_manager.api import TaskPagination
 from django.test import TestCase
 from rest_framework.pagination import PageNumberPagination
-
-from data_manager.api import TaskPagination
 
 
 class TestTaskPaginationMemoryOptimization(TestCase):
@@ -47,9 +46,7 @@ class TestTaskPaginationMemoryOptimization(TestCase):
                 mock_annotation.objects.filter.return_value.count.return_value = 5
 
                 # Mock the parent's paginate_queryset
-                with patch.object(
-                    PageNumberPagination, 'paginate_queryset', return_value=[]
-                ) as mock_parent_paginate:
+                with patch.object(PageNumberPagination, 'paginate_queryset', return_value=[]) as mock_parent_paginate:
                     self.pagination.sync_paginate_queryset(mock_queryset, self.mock_request)
 
                     # Verify .only('id') was called on the queryset
@@ -76,9 +73,7 @@ class TestTaskPaginationMemoryOptimization(TestCase):
             'total_predictions': 5,
         }
 
-        with patch.object(
-            PageNumberPagination, 'paginate_queryset', return_value=[]
-        ) as mock_parent_paginate:
+        with patch.object(PageNumberPagination, 'paginate_queryset', return_value=[]) as mock_parent_paginate:
             self.pagination.paginate_totals_queryset(mock_queryset, self.mock_request)
 
             # Verify .only('id') was called on the queryset
