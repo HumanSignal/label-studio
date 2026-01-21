@@ -189,3 +189,24 @@ export const WithCustomRenderSelected: Story = {
     renderSelected: () => "Always show this",
   },
 };
+
+export const MultipleWithBadges: Story = {
+  args: {
+    label: "Select technologies (with badges)",
+    multiple: true,
+    renderAsBadges: true,
+    searchable: true,
+    value: ["javascript", "react"],
+    options: [
+      { value: "javascript", label: "JavaScript" },
+      { value: "typescript", label: "TypeScript" },
+      { value: "react", label: "React" },
+      { value: "vue", label: "Vue" },
+      { value: "angular", label: "Angular" },
+      { value: "node", label: "Node.js" },
+      { value: "python", label: "Python" },
+      { value: "django", label: "Django" },
+    ] as any[],
+    placeholder: "Choose technologies...",
+  },
+};

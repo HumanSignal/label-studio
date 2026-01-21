@@ -10,7 +10,7 @@ import {
 } from "@humansignal/shad/components/ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "@humansignal/shad/components/ui/popover";
 import type { SelectOption, OptionProps, SelectProps } from "./types.ts";
-import { Checkbox, Label } from "@humansignal/ui";
+import { Checkbox, Label, Badge } from "@humansignal/ui";
 import { isDefined } from "@humansignal/core/lib/utils/helpers";
 import { IconChevron, IconChevronDown } from "@humansignal/icons";
 import clsx from "clsx";
@@ -82,6 +82,7 @@ export const Select = forwardRef(
       selectedValueRenderer,
       selectFirstIfEmpty,
       renderSelected,
+      renderAsBadges = false,
       isVirtualList = false,
       loadMore,
       pageSize = VARIABLE_LIST_PAGE_SIZE,
@@ -231,6 +232,16 @@ export const Select = forwardRef(
                   );
                 }
                 const optionValue = option?.value ?? option;
+
+                // Render as badges if renderAsBadges is true and multiple is true
+                if (renderAsBadges && multiple) {
+                  return (
+                    <Badge key={`${optionValue}_${index}`} variant="info" shape="squared">
+                      {option?.label ?? optionValue}
+                    </Badge>
+                  );
+                }
+
                 return (
                   <span key={`${optionValue}_${index}`} className="truncate only:w-full">
                     {option?.label ?? optionValue}
@@ -243,7 +254,7 @@ export const Select = forwardRef(
           )}
         </>
       );
-    }, [selectedOptions, props?.placeholder, selectedValueRenderer]);
+    }, [selectedOptions, props?.placeholder, selectedValueRenderer, renderAsBadges, multiple]);
 
     const renderedOptions = useMemo(() => {
       return _options.map((option, index) => {

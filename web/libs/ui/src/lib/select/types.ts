@@ -78,6 +78,7 @@ export type SelectProps<T, A extends SelectOption<T>[]> = {
   onSearch?: (value: string) => void;
   selectFirstIfEmpty?: boolean;
   renderSelected?: (selectedOptions?: A[number][], placeholder?: string) => React.ReactNode | string;
+  renderAsBadges?: boolean;
   isVirtualList?: boolean;
   loadMore?: () => void;
   pageSize?: number;
