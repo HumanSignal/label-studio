@@ -18,7 +18,7 @@ declare module "@tanstack/react-table" {
     noDivider?: boolean;
   }
 }
-import React, { memo, useState, useMemo, useCallback } from "react";
+import { memo, useState, useMemo, useCallback } from "react";
 import { cn } from "../../utils/utils";
 import { useColumnSizing, useDataColumns } from "../../hooks/data-table";
 import { Checkbox } from "../checkbox/checkbox";
@@ -116,6 +116,7 @@ export const DataTable = <T extends DataShape>(props: DataTableProps<T>) => {
   } = props;
   const [internalRowSelection, setInternalRowSelection] = useState<Record<string, boolean>>({});
   const [internalSorting, setInternalSorting] = useState<SortingState>([]);
+  const [internalActiveRowId, setInternalActiveRowId] = useState<string | undefined>(undefined);
 
   // Restore column sizes from localStorage if storageKey is provided
   const restoredColumnSizing = useMemo(() => {
@@ -144,11 +145,11 @@ export const DataTable = <T extends DataShape>(props: DataTableProps<T>) => {
 
   const [internalColumnSizing, setInternalColumnSizing] = useState<Record<string, number>>(restoredColumnSizing);
 
-  // Use controlled activeRowId ONLY if onRowClick is provided (parent controls state via clicks)
-  // Active state should only be enabled when rows are clickable
+  // Use controlled activeRowId if onRowClick is provided (parent controls state via clicks)
+  // OR if activeRowId is explicitly provided (not undefined)
   // When onRowClick is provided, activeRowId is read-only for display purposes
-  const isActiveRowControlled = props.onRowClick !== undefined;
-  const activeRowId = isActiveRowControlled ? (controlledActiveRowId ?? undefined) : undefined;
+  const isActiveRowControlled = props.onRowClick !== undefined || controlledActiveRowId !== undefined;
+  const activeRowId = isActiveRowControlled ? (controlledActiveRowId ?? undefined) : internalActiveRowId;
 
   // Use controlled selection if provided, otherwise use internal state
   const rowSelection = controlledRowSelection ?? internalRowSelection;
@@ -177,7 +178,7 @@ export const DataTable = <T extends DataShape>(props: DataTableProps<T>) => {
       // Determine if sorting is enabled for this column
       const columnSortingEnabled = enableSorting && col.enableSorting === true;
 
-      // Preserve original header - extract string if it's a string, or call function if it's a function
+      // Preserve original header - extract string or call function to get React node
       const originalHeader =
         typeof col.header === "string"
           ? col.header
@@ -378,11 +379,14 @@ export const DataTable = <T extends DataShape>(props: DataTableProps<T>) => {
       // Call parent's onRowClick handler if provided
       if (props.onRowClick) {
         props.onRowClick(row);
+      } else if (!isActiveRowControlled && row) {
+        // Only manage internal state if uncontrolled AND no onRowClick provided
+        // When controlled, parent handles all state via onRowClick
+        const newActiveRowId = activeRowId === row.id ? undefined : row.id;
+        setInternalActiveRowId(newActiveRowId);
       }
-      // Active state is only enabled when onRowClick is provided
-      // No internal state management for active rows
     },
-    [props.onRowClick],
+    [props.onRowClick, activeRowId, isActiveRowControlled],
   );
 
   // Check if we should show empty state
@@ -416,7 +420,7 @@ export const DataTable = <T extends DataShape>(props: DataTableProps<T>) => {
         <MemoizedDataTableBody
           rows={rows}
           rowClassName={props.rowClassName}
-          onRowClick={props.onRowClick ? handleRowClick : undefined}
+          onRowClick={handleRowClick}
           columnVisibility={props.columnVisibility}
           columnSizing={columnSizing}
           rowSelection={rowSelection}
@@ -532,7 +536,7 @@ const DataTableRow = <T,>({ row, className, onRowClick, isSelected, isActive }: 
         isActive && styles.bodyRowActive,
         className,
       )}
-      onClick={onRowClick ? handleRowClick : undefined}
+      onClick={handleRowClick}
       data-testid={`data-table-row-${row.id}`}
     >
       {row.getVisibleCells().map((cell) => {
@@ -730,33 +734,23 @@ export const Header = <T,>({
     return null;
   }
 
-  // Check if headerLabel is a React element (icon) vs text
-  const isReactElement = React.isValidElement(headerLabel);
-  const isTextHeader = typeof headerLabel === "string";
+  // Check if headerLabel is a string to wrap with Typography, or a React node to render directly
+  const isStringHeader = typeof headerLabel === "string";
 
   const headerContent = (
-    <div className={cn(styles.headerContent, help && !isReactElement && "gap-tighter")}>
+    <div className={cn(styles.headerContent, help && "gap-tighter")}>
       <div className="flex items-center gap-2">
-        {isReactElement && help ? (
-          // If it's an icon with help text, wrap the icon with the tooltip
-          <Tooltip title={help} alignment="top-center">
-            <div className="flex items-center cursor-help">{headerLabel}</div>
-          </Tooltip>
-        ) : isTextHeader ? (
-          // If it's text, wrap with Typography
-          <>
-            <Typography variant="label" size="small" className={cn(isSorted && styles.headerTextSorted)}>
-              {headerLabel}
-            </Typography>
-            {help && (
-              <Tooltip title={help} alignment="top-center">
-                <IconInfoOutline width={18} height={18} className="text-neutral-content-subtler cursor-help shrink-0" />
-              </Tooltip>
-            )}
-          </>
+        {isStringHeader ? (
+          <Typography variant="label" size="small" className={cn(isSorted && styles.headerTextSorted)}>
+            {headerLabel}
+          </Typography>
         ) : (
-          // If it's a React element without help, just render it
           headerLabel
+        )}
+        {help && (
+          <Tooltip title={help} alignment="top-center">
+            <IconInfoOutline width={18} height={18} className="text-neutral-content-subtler cursor-help shrink-0" />
+          </Tooltip>
         )}
       </div>
       {enableSorting && (

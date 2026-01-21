@@ -5,6 +5,7 @@ import type { ColumnDef, SortingState } from "@tanstack/react-table";
 import type { ExtendedDataTableColumnDef } from "./data-table";
 import { Badge } from "../badge/badge";
 import { Button } from "../button/button";
+import { Tooltip } from "../Tooltip/Tooltip";
 import { IconEdit, IconTrash, IconMonitors } from "@humansignal/icons";
 
 const meta: Meta<typeof DataTable> = {
@@ -209,10 +210,13 @@ export const WithHelpTooltips: Story = {
 /**
  * Icon-Only Column Headers
  *
- * Demonstrates using an icon as a column header instead of text.
- * When combined with the `help` property, the icon itself becomes the tooltip trigger
- * (no separate info icon is shown). This is useful for compact columns where space
+ * Demonstrates using a React node (icon) as a column header instead of text.
+ * The header supports any React node - when you need a tooltip, wrap the icon
+ * with a Tooltip component. This is useful for compact columns where space
  * is limited, such as showing active sessions with a monitors icon.
+ *
+ * Note: The DataTable header now supports any React node, not just strings.
+ * Simply pass a function that returns your custom header content.
  *
  * Hover over the monitors icon to see the tooltip explaining the column.
  */
@@ -220,7 +224,7 @@ export const WithIconHeaders: Story = {
   render: () => {
     const [sorting, setSorting] = useState<SortingState>([]);
 
-    const columnsWithIconHeader: ExtendedDataTableColumnDef<User>[] = [
+    const columnsWithIconHeader: ColumnDef<User>[] = [
       {
         accessorKey: "name",
         header: "Name",
@@ -245,10 +249,19 @@ export const WithIconHeaders: Story = {
       },
       {
         accessorKey: "activeSessions",
-        // Icon-only header with tooltip
-        header: () => <IconMonitors width={24} height={24} />,
-        help: "Number of active browser sessions. Multiple sessions (>1) may indicate account sharing.",
-        size: 40,
+        // Icon-only header with tooltip - wrap icon in Tooltip directly
+        header: () => (
+          <Tooltip
+            title="Number of active browser sessions. Multiple sessions (>1) may indicate account sharing."
+            alignment="top-center"
+          >
+            <div className="flex items-center cursor-help">
+              <IconMonitors width={24} height={24} />
+            </div>
+          </Tooltip>
+        ),
+        size: 32,
+        minSize: 30,
         cell: ({ getValue }) => {
           const sessions = getValue() as number;
           return (
@@ -271,8 +284,8 @@ export const WithIconHeaders: Story = {
       <div className="flex flex-col gap-4">
         <div className="p-4 bg-neutral-surface rounded-md">
           <p className="text-sm text-neutral-content-subtle">
-            💡 The column between "Role" and "Last Active" uses an icon instead of text as the header. Hover over the
-            monitors icon to see what it represents.
+            💡 The column between "Role" and "Last Active" uses an icon wrapped in a Tooltip as the header. Hover over
+            the monitors icon to see the tooltip.
           </p>
         </div>
         <DataTable
