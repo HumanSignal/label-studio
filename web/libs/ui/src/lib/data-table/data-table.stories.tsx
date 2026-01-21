@@ -252,7 +252,7 @@ export const WithIconHeaders: Story = {
         // Icon-only header with tooltip - wrap icon in Tooltip directly
         header: () => (
           <Tooltip
-            title="Number of active browser sessions. Multiple sessions (>1) may indicate account sharing."
+            title="Active Sessions: Number of active browser sessions. Multiple sessions (>1) may indicate account sharing."
             alignment="top-center"
           >
             <div className="flex items-center cursor-help">
