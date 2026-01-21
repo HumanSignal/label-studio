@@ -100,6 +100,9 @@ export const VectorTransformer: React.FC<VectorTransformerProps> = ({
   // Track last allowed rotation direction (1 for CW, -1 for CCW, 0 for none)
   const lastRotationDirectionRef = React.useRef<number>(0);
 
+  // Track if last transformation was blocked due to boundary
+  const transformationBlockedRef = React.useRef<boolean>(false);
+
   // Helper function to calculate constraint based on point bounding box with direction detection
   const calculatePointBasedConstraints = React.useCallback(
     (
@@ -429,10 +432,15 @@ export const VectorTransformer: React.FC<VectorTransformerProps> = ({
           imageBox.x + imageBox.width > bounds.x + bounds.width ||
           imageBox.y + imageBox.height > bounds.y + bounds.height;
 
-        // If we would constrain, don't apply any transformation - just return early
+        // If we would constrain, don't apply any transformation - mark as blocked and return early
         if (wouldConstrain) {
+          transformationBlockedRef.current = true;
+          // Reset transformer to match the actual shape positions
+          transformer.getLayer()?.batchDraw();
           return;
         }
+
+        transformationBlockedRef.current = false;
 
         // No constraints needed - proceed normally
         shapes.forEach((shape: Konva.Node) => {
@@ -647,48 +655,12 @@ export const VectorTransformer: React.FC<VectorTransformerProps> = ({
       // Remove dragBoundFunc - we'll handle constraints in onDragMove instead
       onTransform={handleTransform}
       resizeBoundFunc={(oldBox: any, newBox: any) => {
-        // Use Konva's built-in constraint system
-        if (bounds) {
-          const constrainedBox = { ...newBox };
-
-          // Constrain to left edge
-          if (constrainedBox.x < bounds.x) {
-            const deltaX = bounds.x - constrainedBox.x;
-            constrainedBox.x = bounds.x;
-            constrainedBox.width = Math.max(BBOX_MIN_WIDTH, constrainedBox.width - deltaX);
-          }
-          // Constrain to right edge
-          if (constrainedBox.x + constrainedBox.width > bounds.x + bounds.width) {
-            constrainedBox.width = bounds.x + bounds.width - constrainedBox.x;
-          }
-          // Constrain to top edge
-          if (constrainedBox.y < bounds.y) {
-            const deltaY = bounds.y - constrainedBox.y;
-            constrainedBox.y = bounds.y;
-            constrainedBox.height = Math.max(BBOX_MIN_WIDTH, constrainedBox.height - deltaY);
-          }
-          // Constrain to bottom edge
-          if (constrainedBox.y + constrainedBox.height > bounds.y + bounds.height) {
-            constrainedBox.height = bounds.y + bounds.height - constrainedBox.y;
-          }
-
-          // Check if center shifted due to constraints
-          const oldCenterX = oldBox.x + oldBox.width / 2;
-          const oldCenterY = oldBox.y + oldBox.height / 2;
-          const newCenterX = constrainedBox.x + constrainedBox.width / 2;
-          const newCenterY = constrainedBox.y + constrainedBox.height / 2;
-
-          const centerShiftX = newCenterX - oldCenterX;
-          const centerShiftY = newCenterY - oldCenterY;
-
-          // If center shifted significantly, block the transformation by returning oldBox
-          if (Math.abs(centerShiftX) > 1 || Math.abs(centerShiftY) > 1) {
-            return oldBox;
-          }
-
-          return constrainedBox;
-        }
-        return newBox;
+        // Don't block here - let applyTransformationAndUpdatePoints handle it
+        // Just ensure minimum size
+        const constrainedBox = { ...newBox };
+        if (constrainedBox.width < BBOX_MIN_WIDTH) constrainedBox.width = BBOX_MIN_WIDTH;
+        if (constrainedBox.height < BBOX_MIN_WIDTH) constrainedBox.height = BBOX_MIN_WIDTH;
+        return constrainedBox;
       }}
       onTransformStart={(_e: any) => {
         // Notify that transformation has started
@@ -754,8 +726,8 @@ export const VectorTransformer: React.FC<VectorTransformerProps> = ({
         previousRotationRef.current = null;
       }}
       boundBoxFunc={(_oldBox: any, newBox: any) => {
-        // Always allow transformation - let the shared function handle constraints (same as drag)
-        // This ensures transform behaves exactly like drag (no blocking, just constraining)
+        // Don't block here - let applyTransformationAndUpdatePoints handle it
+        // Just ensure minimum size
         const constrainedBox = { ...newBox };
         if (constrainedBox.width < BBOX_MIN_WIDTH) constrainedBox.width = BBOX_MIN_WIDTH;
         if (constrainedBox.height < BBOX_MIN_WIDTH) constrainedBox.height = BBOX_MIN_WIDTH;
@@ -769,6 +741,13 @@ export const VectorTransformer: React.FC<VectorTransformerProps> = ({
         // Get the transformer
         const transformer = transformerRef.current;
         if (!transformer) {
+          return;
+        }
+
+        // If transformation was blocked, don't apply changes - just reset the blocked flag
+        if (transformationBlockedRef.current) {
+          transformationBlockedRef.current = false;
+          onTransformationEnd?.();
           return;
         }
 
@@ -835,6 +814,14 @@ export const VectorTransformer: React.FC<VectorTransformerProps> = ({
         // Get the transformer
         const transformer = transformerRef.current;
         if (!transformer) {
+          return;
+        }
+
+        // If transformation was blocked, don't apply changes - just reset the blocked flag
+        if (transformationBlockedRef.current) {
+          transformationBlockedRef.current = false;
+          onTransformationEnd?.();
+          onTransformEnd?.(_e);
           return;
         }
 
