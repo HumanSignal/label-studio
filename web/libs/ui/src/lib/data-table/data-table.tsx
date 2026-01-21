@@ -18,7 +18,7 @@ declare module "@tanstack/react-table" {
     noDivider?: boolean;
   }
 }
-import { memo, useState, useMemo, useCallback } from "react";
+import React, { memo, useState, useMemo, useCallback } from "react";
 import { cn } from "../../utils/utils";
 import { useColumnSizing, useDataColumns } from "../../hooks/data-table";
 import { Checkbox } from "../checkbox/checkbox";
@@ -177,8 +177,13 @@ export const DataTable = <T extends DataShape>(props: DataTableProps<T>) => {
       // Determine if sorting is enabled for this column
       const columnSortingEnabled = enableSorting && col.enableSorting === true;
 
-      // Preserve original header - extract string if it's a string
-      const originalHeader = typeof col.header === "string" ? col.header : undefined;
+      // Preserve original header - extract string if it's a string, or call function if it's a function
+      const originalHeader =
+        typeof col.header === "string"
+          ? col.header
+          : typeof col.header === "function"
+            ? col.header({} as any) // Call the function to get the React node
+            : undefined;
 
       // Wrap all headers with unified Header component
       return {
@@ -725,16 +730,33 @@ export const Header = <T,>({
     return null;
   }
 
+  // Check if headerLabel is a React element (icon) vs text
+  const isReactElement = React.isValidElement(headerLabel);
+  const isTextHeader = typeof headerLabel === "string";
+
   const headerContent = (
-    <div className={cn(styles.headerContent, help && "gap-tighter")}>
+    <div className={cn(styles.headerContent, help && !isReactElement && "gap-tighter")}>
       <div className="flex items-center gap-2">
-        <Typography variant="label" size="small" className={cn(isSorted && styles.headerTextSorted)}>
-          {headerLabel}
-        </Typography>
-        {help && (
+        {isReactElement && help ? (
+          // If it's an icon with help text, wrap the icon with the tooltip
           <Tooltip title={help} alignment="top-center">
-            <IconInfoOutline width={18} height={18} className="text-neutral-content-subtler cursor-help shrink-0" />
+            <div className="flex items-center cursor-help">{headerLabel}</div>
           </Tooltip>
+        ) : isTextHeader ? (
+          // If it's text, wrap with Typography
+          <>
+            <Typography variant="label" size="small" className={cn(isSorted && styles.headerTextSorted)}>
+              {headerLabel}
+            </Typography>
+            {help && (
+              <Tooltip title={help} alignment="top-center">
+                <IconInfoOutline width={18} height={18} className="text-neutral-content-subtler cursor-help shrink-0" />
+              </Tooltip>
+            )}
+          </>
+        ) : (
+          // If it's a React element without help, just render it
+          headerLabel
         )}
       </div>
       {enableSorting && (
