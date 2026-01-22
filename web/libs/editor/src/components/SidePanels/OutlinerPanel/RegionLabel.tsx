@@ -16,10 +16,10 @@ export const RegionLabel = observer(({ item }: RegionLabelProps) => {
     if (item.values?.length) {
       return (
         <div className={cn("labels-list").toClassName()}>
-          {item.values.map((value, index) => [
+          {item.values.map((value: string, index: number) => [
             index ? ", " : null,
             <div key={value} className={cn("labels-list").toClassName()}>
-              {value}
+              {value.length > 50 ? value.slice(0, 50) + "..." : value}
             </div>,
           ])}
         </div>
