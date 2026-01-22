@@ -3,7 +3,7 @@ import { observer } from "mobx-react";
 import { DragDropContext, Droppable } from "react-beautiful-dnd";
 import { IconEllipsisVertical, IconPlus } from "@humansignal/icons";
 import { cn } from "../../../utils/bem";
-import { Button } from "@humansignal/ui";
+import { Button, Tooltip } from "@humansignal/ui";
 import { Dropdown } from "@humansignal/ui";
 import Input from "../Input/Input";
 import "./Tabs.scss";
@@ -47,16 +47,18 @@ export const Tabs = ({
       <div className={tabsCN.toString()}>
         <span className={tabsCN.elem("list").toString()}>
           {allowedActions.add !== false && (
-            <Button
-              className={tabsCN.elem("add").toString()}
-              size="smaller"
-              look="outline"
-              variant="neutral"
-              onClick={onAdd}
-              data-leave
-            >
-              <IconPlus className="!h-3 !w-3" />
-            </Button>
+            <Tooltip title="Open New Tab" alignment="bottom-right">
+              <Button
+                className={tabsCN.elem("add").toString()}
+                size="smaller"
+                look="outline"
+                variant="neutral"
+                onClick={onAdd}
+                data-leave
+              >
+                <IconPlus className="!h-3 !w-3" />
+              </Button>
+            </Tooltip>
           )}
           <DragDropContext onDragEnd={onDragEnd}>
             <Droppable droppableId="droppable" direction="horizontal">
