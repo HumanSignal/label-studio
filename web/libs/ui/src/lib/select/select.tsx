@@ -368,7 +368,7 @@ export const Select = forwardRef(
             )}
           </button>
         </PopoverTrigger>
-        <PopoverContent align="start" data-testid="select-popup" className={contentClassName}>
+        <PopoverContent align="start" data-testid="select-popup" className={cnm("min-w-full", contentClassName)}>
           {isLoading ? (
             <span className={styles.selectLoading} tabIndex={-1}>
               Loading...

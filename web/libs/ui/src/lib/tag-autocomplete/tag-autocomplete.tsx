@@ -292,8 +292,10 @@ export const TagAutocomplete = forwardRef(
 
           <PopoverContent
             align="start"
-            className={cnm("p-0 !w-max !inline-block !max-w-[90vw] !min-w-[200px]", contentClassName)}
-            // style={{ width: "auto" }}
+            className={cnm(
+              "p-0 w-max inline-block max-w-[90vw] min-w-[200px] border border-neutral-border",
+              contentClassName,
+            )}
             data-testid="tag-autocomplete-dropdown"
             onOpenAutoFocus={(e) => {
               // Prevent popover from stealing focus from input
@@ -308,7 +310,7 @@ export const TagAutocomplete = forwardRef(
               id="tag-autocomplete-listbox"
               role="listbox"
               aria-label="Available options"
-              className="bg-neutral-background"
+              className="bg-neutral-background rounded-md"
             >
               {isLoading ? (
                 <div className={styles.loadingContainer}>

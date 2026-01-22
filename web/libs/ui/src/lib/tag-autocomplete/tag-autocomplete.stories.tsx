@@ -84,13 +84,40 @@ export const Default: Story = {
           onChange={setValue}
           placeholder="Type at least 2 characters to search..."
         />
-        <div className="mt-4">
+        <div className="mt-base">
           <Typography variant="body" size="small" className="text-neutral-content-subtle">
             <strong>Available:</strong> {sampleTags.map((tag) => tag.label).join(", ")}
           </Typography>
           <Typography variant="body" size="small" className="text-neutral-content-subtle">
             <strong>Selected:</strong> {value.length > 0 ? value.join(", ") : "None"}
           </Typography>
+        </div>
+        <div className="mt-base p-base bg-neutral-surface rounded text-sm w-[300px]">
+          <Typography variant="body" size="small" className="font-medium mb-tight">
+            Keyboard shortcuts:
+          </Typography>
+          <ul className="space-y-tight text-neutral-content-subtle">
+            <li>
+              • <kbd className="px-tight bg-neutral-surface-bold rounded">←</kbd> /{" "}
+              <kbd className="px-tight bg-neutral-surface-bold rounded">→</kbd> Navigate between tags
+            </li>
+            <li>
+              • <kbd className="px-tight bg-neutral-surface-bold rounded">↑</kbd> /{" "}
+              <kbd className="px-tight bg-neutral-surface-bold rounded">↓</kbd> Navigate dropdown options
+            </li>
+            <li>
+              • <kbd className="px-tight bg-neutral-surface-bold rounded">Enter</kbd> Select highlighted option
+            </li>
+            <li>
+              • <kbd className="px-tight bg-neutral-surface-bold rounded">Backspace</kbd> Remove tag or focus last tag
+            </li>
+            <li>
+              • <kbd className="px-tight bg-neutral-surface-bold rounded">Delete</kbd> Remove focused tag
+            </li>
+            <li>
+              • <kbd className="px-tight bg-neutral-surface-bold rounded">Esc</kbd> Close dropdown
+            </li>
+          </ul>
         </div>
       </div>
     );
@@ -149,9 +176,9 @@ export const MultipleTagsWrapping: Story = {
     return (
       <div className="w-96">
         <TagAutocomplete options={sampleTags} value={value} onChange={setValue} placeholder="Type to search..." />
-        <p className="mt-2 text-sm text-neutral-content-subtle">
+        <Typography variant="body" size="small" className="mt-tight text-neutral-content-subtle">
           All {value.length} tags are shown and wrap to multiple lines
-        </p>
+        </Typography>
       </div>
     );
   },
@@ -174,7 +201,9 @@ export const LimitedSelection: Story = {
           placeholder="Select up to 3 skills..."
           maxTags={3}
         />
-        <p className="mt-2 text-sm text-neutral-content-subtle">{value.length}/3 selected (max: 3)</p>
+        <Typography variant="body" size="small" className="mt-tight text-neutral-content-subtle">
+          {value.length}/3 selected (max: 3)
+        </Typography>
       </div>
     );
   },
@@ -198,7 +227,9 @@ export const LoadingState: Story = {
           isLoading={true}
           minSearchLength={1}
         />
-        <p className="mt-2 text-sm text-neutral-content-subtle">Type to see the loading spinner in the dropdown</p>
+        <Typography variant="body" size="small" className="mt-tight text-neutral-content-subtle">
+          Type to see the loading spinner in the dropdown
+        </Typography>
       </div>
     );
   },
@@ -267,9 +298,9 @@ export const WithTagCreation: Story = {
           onCreate={handleCreate}
           placeholder="Type to search or create new tags..."
         />
-        <p className="mt-4 text-sm text-neutral-content-subtle">
+        <Typography variant="body" size="small" className="mt-base text-neutral-content-subtle">
           Available: {options.map((tag) => tag.label).join(", ")}
-        </p>
+        </Typography>
       </div>
     );
   },
@@ -337,7 +368,9 @@ export const DisabledOptions: Story = {
     return (
       <div className="w-96">
         <TagAutocomplete options={optionsWithDisabled} value={value} onChange={setValue} placeholder="Select tags..." />
-        <p className="mt-2 text-sm text-neutral-content-subtle">DevOps and QA options are disabled</p>
+        <Typography variant="body" size="small" className="mt-tight text-neutral-content-subtle">
+          DevOps and QA options are disabled
+        </Typography>
       </div>
     );
   },
@@ -359,9 +392,11 @@ export const InFormContext: Story = {
     };
 
     return (
-      <form onSubmit={handleSubmit} className="w-96 space-y-6">
+      <form onSubmit={handleSubmit} className="w-96 space-y-wide">
         <div>
-          <p className="text-sm font-medium mb-2">Skills</p>
+          <Typography variant="body" size="small" className="font-medium mb-tight">
+            Skills
+          </Typography>
           <TagAutocomplete
             name="skills"
             options={sampleTags}
@@ -372,7 +407,9 @@ export const InFormContext: Story = {
         </div>
 
         <div>
-          <p className="text-sm font-medium mb-2">Interests</p>
+          <Typography variant="body" size="small" className="font-medium mb-tight">
+            Interests
+          </Typography>
           <TagAutocomplete
             name="interests"
             options={[
@@ -390,57 +427,11 @@ export const InFormContext: Story = {
 
         <button
           type="submit"
-          className="px-4 py-2 bg-primary-emphasis text-white rounded hover:bg-primary-emphasis-bold"
+          className="px-base py-tight bg-primary-emphasis text-white rounded hover:bg-primary-emphasis-bold"
         >
           Submit
         </button>
       </form>
-    );
-  },
-};
-
-/**
- * Keyboard Navigation Demo
- *
- * Demonstrates keyboard navigation features.
- */
-export const KeyboardNavigation: Story = {
-  render: () => {
-    const [value, setValue] = useState<string[]>(["frontend", "backend", "devops"]);
-    return (
-      <div className="w-96">
-        <TagAutocomplete
-          options={sampleTags}
-          value={value}
-          onChange={setValue}
-          placeholder="Try keyboard navigation..."
-        />
-        <div className="mt-4 p-4 bg-neutral-surface rounded text-sm">
-          <p className="font-medium mb-2">Try these keyboard shortcuts:</p>
-          <ul className="space-y-1 text-neutral-content-subtle">
-            <li>
-              • <kbd className="px-1 bg-neutral-surface-bold rounded">←</kbd> /{" "}
-              <kbd className="px-1 bg-neutral-surface-bold rounded">→</kbd> Navigate between tags
-            </li>
-            <li>
-              • <kbd className="px-1 bg-neutral-surface-bold rounded">↑</kbd> /{" "}
-              <kbd className="px-1 bg-neutral-surface-bold rounded">↓</kbd> Navigate dropdown options
-            </li>
-            <li>
-              • <kbd className="px-1 bg-neutral-surface-bold rounded">Enter</kbd> Select highlighted option
-            </li>
-            <li>
-              • <kbd className="px-1 bg-neutral-surface-bold rounded">Backspace</kbd> Remove tag or focus last tag
-            </li>
-            <li>
-              • <kbd className="px-1 bg-neutral-surface-bold rounded">Delete</kbd> Remove focused tag
-            </li>
-            <li>
-              • <kbd className="px-1 bg-neutral-surface-bold rounded">Esc</kbd> Close dropdown
-            </li>
-          </ul>
-        </div>
-      </div>
     );
   },
 };
@@ -484,7 +475,9 @@ export const ManyOptions: Story = {
     return (
       <div className="w-96">
         <TagAutocomplete options={manyOptions} value={value} onChange={setValue} placeholder="Search 50 options..." />
-        <p className="mt-2 text-sm text-neutral-content-subtle">50 options available - use search to filter</p>
+        <Typography variant="body" size="small" className="mt-tight text-neutral-content-subtle">
+          50 options available - use search to filter
+        </Typography>
       </div>
     );
   },
@@ -536,9 +529,9 @@ export const CustomMinSearchLength: Story = {
           minSearchLength={1}
           placeholder="Minimum 1 character to search..."
         />
-        <p className="mt-4 text-sm text-neutral-content-subtle">
+        <Typography variant="body" size="small" className="mt-base text-neutral-content-subtle">
           Available: {sampleTags.map((tag) => tag.label).join(", ")}
-        </p>
+        </Typography>
       </div>
     );
   },
@@ -564,10 +557,10 @@ export const WithAvailableOptionsList: Story = {
           onChange={setValue}
           placeholder="Type at least 2 characters to search..."
         />
-        <div className="mt-4">
-          <p className="text-sm text-neutral-content-subtle">
+        <div className="mt-base">
+          <Typography variant="body" size="small" className="text-neutral-content-subtle">
             Available: {availableOptions.map((tag) => tag.label).join(", ") || "All selected"}
-          </p>
+          </Typography>
         </div>
       </div>
     );
