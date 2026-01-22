@@ -19,7 +19,7 @@
 
   &__droppable {
     display: flex;
-    overflow: hidden;
+    overflow: visible;
     gap: 2px;
   }
 
@@ -46,13 +46,27 @@
       right: calc(var(--spacing-tightest) * -1);
     }
 
+    & .tabs-dm__item-drag {
+      opacity: 0;
+      position: absolute;
+      pointer-events: none;
+      left: -2px;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+
     &:hover {
       background-color: var(--color-primary-emphasis-subtle);
       box-shadow: -1px 0 0 var(--color-primary-border-subtler) inset, 1px 0 0 var(--color-primary-border-subtler) inset, 0 1px 0 var(--color-primary-border-subtler) inset, 0 -1px 0 var(--color-neutral-border) inset;
+      cursor: grab;
 
       & .tabs-dm__item-right {
         opacity: 1;
         right: var(--spacing-tightest);
+      }
+
+      & .tabs-dm__item-drag {
+        opacity: 1;
       }
     }
 
@@ -124,6 +138,32 @@
         right: var(--spacing-tightest);
       }
     }
+
+    &_edit {
+      &:hover {
+        cursor: pointer;
+
+        & .tabs-dm__item-right {
+          opacity: 0;
+          right: calc(var(--spacing-tightest) * -1);
+        }
+      }
+    }
+  }
+
+  &__item-drag {
+    position: absolute;
+    left: var(--spacing-tight);
+    top: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 36px;
+    width: 24px;
+    color: var(--color-neutral-content-subtler);
+    opacity: 0;
+    transition: opacity 150ms ease-out;
+    pointer-events: none;
   }
 
   &__item-left {

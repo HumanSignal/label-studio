@@ -1,7 +1,7 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { observer } from "mobx-react";
 import { DragDropContext, Droppable } from "react-beautiful-dnd";
-import { IconEllipsisVertical, IconPlus } from "@humansignal/icons";
+import { IconDragIndicator, IconEllipsisVertical, IconPlus } from "@humansignal/icons";
 import { cn } from "../../../utils/bem";
 import { Button, Tooltip } from "@humansignal/ui";
 import { Dropdown } from "@humansignal/ui";
@@ -128,18 +128,28 @@ export const TabsItem = observer(
     const saveTabTitle = useCallback(
       (ev) => {
         const { type, key } = ev;
+        const isBlur = type === "blur";
+        const isEnter = key === "Enter";
+        const isEscape = key === "Escape";
 
-        if (type === "blur" || ["Enter", "Escape"].includes(key)) {
-          ev.preventDefault();
+        console.log('[saveTabTitle]', { type, key, isBlur, isEnter, isEscape });
+
+        if (isBlur || isEnter || isEscape) {
+          if (isEnter || isEscape) {
+            ev.preventDefault();
+            ev.stopPropagation();
+          }
           setRenameMode(false);
 
-          if (key === "Escape") {
+          if (isEscape) {
+            console.log('[saveTabTitle] Escape - reverting');
             setCurrentTitle(savedTitle);
             onCancelEditing?.();
             return;
           }
 
           // Update the saved title when user confirms the save
+          console.log('[saveTabTitle] Saving:', currentTitle);
           setSavedTitle(currentTitle);
           onFinishEditing(currentTitle);
         }
@@ -148,7 +158,12 @@ export const TabsItem = observer(
     );
 
     return (
-      <div className={tabsCN.elem("item").mod({ active, virtual, menuOpen: isMenuOpen }).toString()}>
+      <div className={tabsCN.elem("item").mod({ active, virtual, menuOpen: isMenuOpen, edit: renameMode }).toString()}>
+        {!renameMode && (
+          <div className={tabsCN.elem("item-drag").toString()}>
+            <IconDragIndicator className="w-4 h-4" />
+          </div>
+        )}
         <div
           className={tabsCN
             .elem("item-left")
@@ -165,7 +180,7 @@ export const TabsItem = observer(
               size="small"
               autoFocus={true}
               value={currentTitle}
-              onKeyDownCapture={saveTabTitle}
+              onKeyDown={saveTabTitle}
               onBlur={saveTabTitle}
               onChange={(ev) => {
                 setCurrentTitle(ev.target.value);
