@@ -132,8 +132,6 @@ export const TabsItem = observer(
         const isEnter = key === "Enter";
         const isEscape = key === "Escape";
 
-        console.log('[saveTabTitle]', { type, key, isBlur, isEnter, isEscape });
-
         if (isBlur || isEnter || isEscape) {
           if (isEnter || isEscape) {
             ev.preventDefault();
@@ -142,14 +140,12 @@ export const TabsItem = observer(
           setRenameMode(false);
 
           if (isEscape) {
-            console.log('[saveTabTitle] Escape - reverting');
             setCurrentTitle(savedTitle);
             onCancelEditing?.();
             return;
           }
 
           // Update the saved title when user confirms the save
-          console.log('[saveTabTitle] Saving:', currentTitle);
           setSavedTitle(currentTitle);
           onFinishEditing(currentTitle);
         }
