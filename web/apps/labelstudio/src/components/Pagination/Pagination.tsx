@@ -8,7 +8,7 @@ import {
   useMemo,
   useState,
 } from "react";
-import { Block, Elem } from "../../utils/bem";
+import { cn } from "../../utils/bem";
 import { clamp, isDefined } from "../../utils/helpers";
 import { useValueTracker } from "../Form/Utils";
 import { Select } from "@humansignal/ui";
@@ -182,13 +182,13 @@ export const Pagination: FC<PaginationProps> = forwardRef(
     }, [props.urlParamName]);
 
     return totalPages > 1 ? (
-      <Block name="pagination-ls" mod={{ disabled, size, waiting }} style={props.style}>
+      <div className={cn("pagination-ls").mod({ disabled, size, waiting }).toClassName()} style={props.style}>
         {props.label && isDefined(pageSize) && (
-          <Elem name="label">
+          <div className={cn("pagination-ls").elem("label").toClassName()}>
             {props.label}: {visibleItems.start}-{visibleItems.end}
-          </Elem>
+          </div>
         )}
-        <Elem name="navigation">
+        <div className={cn("pagination-ls").elem("navigation").toClassName()}>
           {allowRewind && (
             <>
               <NavigationButton
@@ -196,7 +196,7 @@ export const Pagination: FC<PaginationProps> = forwardRef(
                 onClick={() => setPageClamped(1)}
                 disabled={currentPage === 1}
               />
-              <Elem name="divider" />
+              <div className={cn("pagination-ls").elem("divider").toClassName()} />
             </>
           )}
           <NavigationButton
@@ -204,7 +204,7 @@ export const Pagination: FC<PaginationProps> = forwardRef(
             onClick={() => setPageClamped(currentPage - 1)}
             disabled={currentPage === 1}
           />
-          <Elem name="input">
+          <div className={cn("pagination-ls").elem("input").toClassName()}>
             {inputMode ? (
               <input
                 type="text"
@@ -226,8 +226,8 @@ export const Pagination: FC<PaginationProps> = forwardRef(
                 }}
               />
             ) : (
-              <Elem
-                name="page-indicator"
+              <div
+                className={cn("pagination-ls").elem("page-indicator").toClassName()}
                 onClick={() => {
                   if (allowInput) setInputMode(true);
                 }}
@@ -238,9 +238,9 @@ export const Pagination: FC<PaginationProps> = forwardRef(
                     /*  */
                   }}
                 />
-              </Elem>
+              </div>
             )}
-          </Elem>
+          </div>
           <NavigationButton
             mod={["arrow-right"]}
             onClick={() => setPageClamped(currentPage + 1)}
@@ -248,7 +248,7 @@ export const Pagination: FC<PaginationProps> = forwardRef(
           />
           {allowRewind && (
             <>
-              <Elem name="divider" />
+              <div className={cn("pagination-ls").elem("divider").toClassName()} />
               <NavigationButton
                 mod={["arrow-right", "arrow-right-double"]}
                 onClick={() => setPageClamped(totalPages)}
@@ -256,10 +256,10 @@ export const Pagination: FC<PaginationProps> = forwardRef(
               />
             </>
           )}
-        </Elem>
+        </div>
 
         {pageSizeOptions?.length > 0 && (
-          <Elem name="page-size">
+          <div className={cn("pagination-ls").elem("page-size").toClassName()}>
             <Select
               value={pageSize}
               options={pageSizeOptions.map((v) => ({ label: `${v} per page`, value: v }))}
@@ -273,9 +273,9 @@ export const Pagination: FC<PaginationProps> = forwardRef(
                 }
               }}
             />
-          </Elem>
+          </div>
         )}
-      </Block>
+      </div>
     ) : null;
   },
 );
@@ -289,7 +289,7 @@ const NavigationButton: FC<{
 
   mod.disabled = props.disabled === true;
 
-  return <Elem name="btn" mod={mod} onClick={props.onClick} />;
+  return <div className={cn("pagination-ls").elem("btn").mod(mod).toClassName()} onClick={props.onClick} />;
 };
 
 export const usePage = (paramName: string, initialValue = 1) => {

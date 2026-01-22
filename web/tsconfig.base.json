@@ -13,31 +13,65 @@
     "jsx": "react",
     "target": "esnext",
     "module": "esnext",
-    "lib": ["es2020", "dom", "dom.iterable", "esnext.array"],
+    "lib": [
+      "es2020",
+      "dom",
+      "dom.iterable",
+      "esnext.array"
+    ],
     "skipLibCheck": true,
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
-      "@humansignal/app-common": ["libs/app-common/src/index.ts"],
-      "@humansignal/app-common/*": ["libs/app-common/src/*"],
-      "@humansignal/core": ["libs/core/src/index.ts"],
-      "@humansignal/core/*": ["libs/core/src/*"],
-      "@humansignal/datamanager": ["libs/datamanager/src/index.js"],
-      "@humansignal/editor": ["libs/editor/src/index.js"],
-      "@humansignal/frontend-test/*": ["libs/frontend-test/src/*"],
-      "@humansignal/icons": ["libs/ui/src/assets/icons"],
-      "@humansignal/shad/*": ["./libs/ui/src/shad/*"],
-      "@humansignal/ui": ["libs/ui/src/index.ts"],
-      "@humansignal/ui/*": ["libs/ui/src/*"]
+      "@humansignal/app-common": [
+        "libs/app-common/src/index.ts"
+      ],
+      "@humansignal/app-common/*": [
+        "libs/app-common/src/*"
+      ],
+      "@humansignal/core": [
+        "libs/core/src/index.ts"
+      ],
+      "@humansignal/core/*": [
+        "libs/core/src/*"
+      ],
+      "@humansignal/datamanager": [
+        "libs/datamanager/src/index.js"
+      ],
+      "@humansignal/editor": [
+        "libs/editor/src/index.js"
+      ],
+      "@humansignal/frontend-test/*": [
+        "libs/frontend-test/src/*"
+      ],
+      "@humansignal/icons": [
+        "libs/ui/src/assets/icons"
+      ],
+      "@humansignal/shad/*": [
+        "./libs/ui/src/shad/*"
+      ],
+      "@humansignal/ui": [
+        "libs/ui/src/index.ts"
+      ],
+      "@humansignal/ui/*": [
+        "libs/ui/src/*"
+      ]
     },
-    "types": ["vite-plugin-svgr/client"],
-    "plugins": [{
+    "types": [
+      "vite-plugin-svgr/client"
+    ],
+    "plugins": [
+      {
         "name": "typescript-plugin-css-modules",
         "options": {
           "customMatcher": "\\.module\\.scss$",
           "classnameTransform": "asIs"
         }
-      }]
+      }
+    ]
   },
-  "exclude": ["node_modules", "tmp"]
+  "exclude": [
+    "node_modules",
+    "tmp"
+  ]
 }

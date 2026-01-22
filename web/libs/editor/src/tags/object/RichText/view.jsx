@@ -14,6 +14,7 @@ import { htmlEscape, matchesSelector } from "../../../utils/html";
 import {
   applyTextGranularity,
   fixCodePointsInRange,
+  fixRange,
   rangeToGlobalOffset,
   trimSelection,
 } from "../../../utils/selection-tools";
@@ -194,7 +195,7 @@ class RichTextPieceView extends Component {
       if (selection.isCollapsed) return false;
       if (!area) return false;
 
-      let range = selection.getRangeAt(0);
+      let range = fixRange(selection.getRangeAt(0));
 
       // @todo would be more convenient to try to reduce the range to be within the root,
       // @todo so for example if we drag to the left and the range is outside of the root, we would
@@ -587,7 +588,7 @@ class RichTextPieceView extends Component {
           key="root"
           className={cn("richtext").elem("iframe").mix("htx-richtext").toClassName()}
           referrerPolicy="no-referrer"
-          sandbox="allow-same-origin allow-scripts"
+          sandbox="allow-same-origin allow-scripts allow-presentation"
           ref={(el) => {
             item.setReady(false);
             item.mountNodeRef.current = el;

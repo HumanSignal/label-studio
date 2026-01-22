@@ -19,36 +19,6 @@ import { KonvaRegionMixin } from "../mixins/KonvaRegion";
 import { observer } from "mobx-react";
 import { createDragBoundFunc } from "../utils/image";
 import { ImageViewContext } from "../components/ImageView/ImageViewContext";
-import { FF_DEV_3793, isFF } from "../utils/feature-flags";
-import { fixMobxObserve } from "../utils/utilities";
-import { RELATIVE_STAGE_HEIGHT, RELATIVE_STAGE_WIDTH } from "../components/ImageView/Image";
-
-const PolygonRegionAbsoluteCoordsDEV3793 = types
-  .model({
-    coordstype: types.optional(types.enumeration(["px", "perc"]), "perc"),
-  })
-  .actions((self) => ({
-    updateImageSize(wp, hp, sw, sh) {
-      if (self.coordstype === "px") {
-        self.points.forEach((p) => {
-          const x = (sw * p.relativeX) / RELATIVE_STAGE_WIDTH;
-          const y = (sh * p.relativeY) / RELATIVE_STAGE_HEIGHT;
-
-          p._setPos(x, y);
-        });
-      }
-
-      if (!self.annotation.sentUserGenerate && self.coordstype === "perc") {
-        self.points.forEach((p) => {
-          const x = (sw * p.x) / RELATIVE_STAGE_WIDTH;
-          const y = (sh * p.y) / RELATIVE_STAGE_HEIGHT;
-
-          self.coordstype = "px";
-          p._setPos(x, y);
-        });
-      }
-    },
-  }));
 
 const Model = types
   .model({
@@ -91,11 +61,6 @@ const Model = types
           bottom: self.points[0].y,
         },
       );
-
-      if (!isFF(FF_DEV_3793)) {
-        // recalc on resize
-        fixMobxObserve(self.parent.stageWidth, self.parent.stageHeight);
-      }
 
       return bbox;
     },
@@ -307,9 +272,7 @@ const Model = types
        */
       serialize() {
         const value = {
-          points: isFF(FF_DEV_3793)
-            ? self.points.map((p) => [p.x, p.y])
-            : self.points.map((p) => [self.convertXToPerc(p.x), self.convertYToPerc(p.y)]),
+          points: self.points.map((p) => [p.x, p.y]),
           closed: self.closed,
         };
 
@@ -325,7 +288,6 @@ const PolygonRegionModel = types.compose(
   NormalizationMixin,
   KonvaRegionMixin,
   Model,
-  ...(isFF(FF_DEV_3793) ? [] : [PolygonRegionAbsoluteCoordsDEV3793]),
 );
 
 /**

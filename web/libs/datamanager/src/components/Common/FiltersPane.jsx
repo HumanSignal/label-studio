@@ -4,7 +4,7 @@ import { IconChevronDown } from "@humansignal/icons";
 import { Filters } from "../Filters/Filters";
 import { Badge } from "./Badge/Badge";
 import { Button } from "@humansignal/ui";
-import { Dropdown } from "./Dropdown/Dropdown";
+import { Dropdown } from "@humansignal/ui";
 import { Icon } from "./Icon/Icon";
 
 const buttonInjector = inject(({ store }) => {

@@ -14,7 +14,6 @@ from data_export.serializers import ExportDataSerializer
 from data_manager.managers import TaskQuerySet
 from django.conf import settings
 from django.db.models import Count, F, Q
-from django.db.models.lookups import GreaterThanOrEqual
 from organizations.models import Organization
 from projects.models import Project
 from tasks.models import Annotation, Prediction, Task
@@ -197,7 +196,8 @@ def update_tasks_counters(queryset, from_scratch=True):
         )
 
     # filter our tasks with 0 annotations and 0 predictions and update them with 0
-    queryset.filter(annotations__isnull=True, predictions__isnull=True).update(
+    # order_by('id') ensures consistent row locking order to prevent deadlocks
+    queryset.filter(annotations__isnull=True, predictions__isnull=True).order_by('id').update(
         total_annotations=0, cancelled_annotations=0, total_predictions=0
     )
 
@@ -239,14 +239,31 @@ def bulk_update_is_labeled_by_overlap(tasks_ids, project):
     if not tasks_ids:
         return
 
-    completed_annotations_f_expr = F('total_annotations')
-    if project.skip_queue == project.SkipQueue.IGNORE_SKIPPED:
-        completed_annotations_f_expr += F('cancelled_annotations')
-    finished_q = Q(GreaterThanOrEqual(completed_annotations_f_expr, F('overlap')))
-
     batch_size = settings.BATCH_SIZE
+
+    # Use distinct annotator count for overlap comparison
     for i in range(0, len(tasks_ids), batch_size):
         batch_ids = tasks_ids[i : i + batch_size]
 
-        Task.objects.filter(id__in=batch_ids, project=project).filter(finished_q).update(is_labeled=True)
-        Task.objects.filter(id__in=batch_ids, project=project).exclude(finished_q).update(is_labeled=False)
+        # Annotate with distinct annotator count
+        if project.skip_queue == project.SkipQueue.IGNORE_SKIPPED:
+            annotator_count_expr = Count('annotations__completed_by', distinct=True)
+        else:
+            annotator_count_expr = Count(
+                'annotations__completed_by',
+                distinct=True,
+                filter=Q(annotations__was_cancelled=False),
+            )
+
+        tasks_qs = Task.objects.filter(id__in=batch_ids, project=project).annotate(
+            annotator_count=annotator_count_expr
+        )
+
+        # Get IDs of tasks that meet the overlap requirement
+        finished_task_ids = list(tasks_qs.filter(annotator_count__gte=F('overlap')).values_list('id', flat=True))
+
+        # Update is_labeled based on annotator count
+        Task.objects.filter(id__in=finished_task_ids, project=project).update(is_labeled=True)
+        Task.objects.filter(id__in=batch_ids, project=project).exclude(id__in=finished_task_ids).update(
+            is_labeled=False
+        )

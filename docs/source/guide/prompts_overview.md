@@ -62,7 +62,7 @@ By utilizing AI to handle the bulk of the annotation work, you can significantly
     * [Sync data from external storage](storage)
 2. Annotate a subset of tasks, marking as many as possible as ground truth annotations. The more data you have for the prompt evaluation, the more confident you can be with the results.
 
-    If you want to skip this step, see the [bootstrapping use case](#Bootstrapping-projects-with-prompts) outlined below. 
+    If you want to skip this step, see the [bootstrapping use case](#Bootstrapping-projects-with-Prompts) outlined below. 
 
     * [Labeling guide](labeling)
     * [Define ground truth annotations for a project](quality#Define-ground-truth-annotations-for-a-project)

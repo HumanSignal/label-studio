@@ -1,0 +1,163 @@
+.container {
+  @apply w-full text-base text-left text-neutral-content border border-neutral-border rounded-lg flex flex-col overflow-x-auto overflow-y-hidden;
+
+  font-family: var(--font-sans);
+
+  // Let parent control height; we grow until constrained
+  max-height: 100%;
+}
+
+.head {
+  @apply bg-neutral-background min-w-min flex justify-stretch border-b border-neutral-border flex-shrink-0 sticky top-0 z-[2] shadow-sm;
+
+  border-top-left-radius: inherit;
+  border-top-right-radius: inherit;
+}
+
+.headRow {
+  @apply relative min-w-min flex justify-start w-full;
+}
+
+.headCell {
+  @apply relative font-medium bg-neutral-background text-neutral-content select-none cursor-default;
+  @apply flex items-center box-content p-tight;
+
+  min-width: 0;
+  height: 32px;
+
+  // Add divider between header cells (except first, pinned, and noDivider)
+  &:not(:first-child, .headCellPinned, .headCellNoDivider)::after {
+    content: "";
+    display: block;
+    width: 1px;
+    height: 60%;
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    background: var(--color-neutral-border);
+  }
+
+  > * {
+    @apply min-w-0 truncate;
+  }
+}
+
+.headCellContent {
+  @apply flex items-center flex-1 min-w-0 overflow-hidden;
+}
+
+.headCellPinned {
+  @apply sticky right-0 border-l border-neutral-border bg-neutral-background;
+}
+
+.headCellSortable {
+  @apply cursor-pointer;
+
+  &:hover {
+    @apply bg-neutral-surface;
+
+    .headerIcon {
+      opacity: 1;
+    }
+  }
+}
+
+.headerContent {
+  @apply flex items-center justify-between w-full;
+}
+
+.headerTextSorted {
+  @apply text-neutral-content;
+}
+
+.headerIcon {
+  @apply ml-2 flex items-center shrink-0 transition-opacity duration-150;
+
+  opacity: 0;
+}
+
+.headerIconVisible {
+  opacity: 1;
+}
+
+.headCellResizer {
+  @apply absolute -right-[5px] top-0 bottom-0 opacity-0 w-[11px] cursor-col-resize z-[100];
+
+  &:hover {
+    @apply opacity-100;
+  }
+}
+
+.body {
+  @apply z-[1] relative overflow-y-auto;
+
+  flex: 1 1 auto;
+  min-height: 0;
+  width: max-content;
+  min-width: 100%;
+  border-bottom-left-radius: inherit;
+  border-bottom-right-radius: inherit;
+}
+
+.bodyRow {
+  @apply min-w-min flex justify-start transition-all duration-150 ease-out w-full;
+
+  cursor: default;
+
+  &:nth-child(2n) {
+    @apply bg-neutral-surface;
+  }
+
+  &:hover:not(.bodyRowError, .bodyRowActive) {
+    @apply bg-primary-emphasis-subtle;
+  }
+
+  &.bodyRowClickable {
+    cursor: pointer !important;
+  }
+}
+
+.bodyRowError {
+  @apply bg-negative-background;
+
+  border-bottom-color: var(--color-negative-accent-light);
+}
+
+.bodyRowSelected:not(.bodyRowError) {
+  @apply bg-primary-emphasis-subtle;
+}
+
+.bodyRowActive:not(.bodyRowError) {
+  @apply bg-primary-emphasis;
+}
+
+.bodyRowSelected.bodyRowActive:not(.bodyRowError) {
+  @apply bg-primary-emphasis;
+}
+
+.bodyCell {
+  @apply flex items-center min-h-[28px] box-content p-tight;
+
+  min-width: 0;
+  height: 32px;
+
+  > * {
+    @apply min-w-0 truncate;
+  }
+
+  // Style for disabled checkboxes in data table
+  :global(.checkbox_disabled) {
+    opacity: 0.5;
+    cursor: not-allowed;
+
+    :global(.checkbox__box),
+    :global(.checkbox__input) {
+      cursor: not-allowed;
+    }
+  }
+}
+
+.bodyCellPinned {
+  @apply sticky right-0 border-l border-neutral-border bg-neutral-background;
+}

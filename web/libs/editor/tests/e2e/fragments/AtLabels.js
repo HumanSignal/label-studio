@@ -11,6 +11,7 @@ module.exports = {
   },
   clickLabel(text) {
     I.click(this.locateLabel(text));
+    I.waitTicks(3); // Wait for label selection to be processed
   },
   seeSelectedLabel(text) {
     if (text || typeof text === "string") {

@@ -1,5 +1,5 @@
 import { type FC, type MouseEvent, useCallback, useMemo } from "react";
-import { Block, Elem } from "../../utils/bem";
+import { cn } from "../../utils/bem";
 import { IconCross } from "@humansignal/icons";
 import "./HeidiTip.scss";
 import { Button } from "@humansignal/ui";
@@ -16,10 +16,15 @@ const HeidiLink: FC<{ link: Tip["link"]; onClick: () => void }> = ({ link, onCli
   }, [link]);
 
   return (
-    /* @ts-ignore-next-line */
-    <Elem name="link" tag="a" href={url} target="_blank" onClick={onClick}>
+    <a
+      className={cn("heidy-tip").elem("link").toClassName()}
+      href={url}
+      target="_blank"
+      onClick={onClick}
+      rel="noreferrer"
+    >
       {link.label}
-    </Elem>
+    </a>
   );
 };
 
@@ -31,24 +36,24 @@ export const HeidiTip: FC<HeidiTipProps> = ({ tip, onDismiss, onLinkClick }) => 
   }, []);
 
   return (
-    <Block name="heidy-tip">
-      <Elem name="content">
-        <Elem name="header">
-          <Elem name="title">{tip.title}</Elem>
+    <div className={cn("heidy-tip").toClassName()}>
+      <div className={cn("heidy-tip").elem("content").toClassName()}>
+        <div className={cn("heidy-tip").elem("header").toClassName()}>
+          <div className={cn("heidy-tip").elem("title").toClassName()}>{tip.title}</div>
           {tip.closable && (
             <Button tooltip="Don't show" look="string" size="small" onClick={handleClick} className="!p-0">
               <IconCross />
             </Button>
           )}
-        </Elem>
-        <Elem name="text">
+        </div>
+        <div className={cn("heidy-tip").elem("text").toClassName()}>
           {tip.content}
           <HeidiLink link={tip.link} onClick={onLinkClick} />
-        </Elem>
-      </Elem>
-      <Elem name="heidi">
+        </div>
+      </div>
+      <div className={cn("heidy-tip").elem("heidi").toClassName()}>
         <HeidiSpeaking />
-      </Elem>
-    </Block>
+      </div>
+    </div>
   );
 };

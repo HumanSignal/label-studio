@@ -9,7 +9,7 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.event.client_payload.branch_name || 'schedule' }}
 
 env:
-  POETRY_VERSION: 2.1.4
+  POETRY_VERSION: 2.2.1
 
 jobs:
   open:
@@ -19,7 +19,7 @@ jobs:
       - uses: hmarr/debug-action@v3.0.0
 
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           token: ${{ secrets.GIT_PAT }}
           ref: ${{ github.event.repository.default_branch }}

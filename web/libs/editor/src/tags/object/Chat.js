@@ -43,7 +43,6 @@
  * </View>
  *
  * @name Chat
- * @regions ChatRegion
  * @meta_title Chat Tag for Conversational Transcripts
  * @meta_description Display and extend chat transcripts; optionally request assistant replies from an LLM. Supports message editing controls and min/max limits.
  *

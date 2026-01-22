@@ -4,7 +4,7 @@
   align-items: center;
   box-sizing: border-box;
   background-color: var(--color-neutral-background);
-  margin-left: 16px;
+  margin-left: var(--spacing-tight);
 
   &__wrapper {
     width: 100%;

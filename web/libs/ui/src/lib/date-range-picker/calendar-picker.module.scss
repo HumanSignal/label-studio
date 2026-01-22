@@ -1,0 +1,115 @@
+.monthCalendar {
+  text-align: center;
+}
+
+.daysWeek {
+  display: table-row;
+  cursor: default;
+}
+
+.monthWrapper {
+  display: grid;
+  gap: var(--spacing-tighter);
+}
+
+.labels {
+  height: 40px;
+  width: 40px;
+  display: table-cell;
+  font-size: 11px;
+  color: var(--color-neutral-content-subtler);
+  vertical-align: middle;
+}
+
+.week {
+  display: table-row;
+}
+
+.day {
+  display: table-cell;
+  height: 40px;
+  width: 40px;
+  font-size: 14px;
+  vertical-align: middle;
+  text-align: center;
+  transition: all 150ms ease-out;
+
+  &.inRange {
+    background: var(--color-primary-emphasis);
+  }
+
+  &.rangeStart {
+    border-top-left-radius: 50%;
+    border-bottom-left-radius: 50%;
+    background: var(--color-primary-emphasis);
+  }
+
+  &.rangeEnd {
+    border-top-right-radius: 50%;
+    border-bottom-right-radius: 50%;
+    background: var(--color-primary-emphasis);
+  }
+
+  &.disabled {
+    cursor: default;
+    color: var(--color-neutral-content-subtlest);
+    pointer-events: none;
+    background: unset;
+  }
+}
+
+.highlight {
+  display: table-cell;
+  position: relative;
+  left: 4px;
+  height: 32px;
+  width: 32px;
+  font-size: 14px;
+  vertical-align: middle;
+  cursor: pointer;
+  border-radius: 50%;
+  transition: all 150ms ease-out;
+  border: 2px solid transparent;
+
+  &:hover {
+    border: 2px solid var(--color-primary-border);
+    color: var(--color-neutral-content);
+    border-radius: 50%;
+  }
+
+  &.inRange {
+    &:hover {
+      border: 2px solid var(--color-primary-border);
+    }
+  }
+
+  &.disabled {
+    cursor: default;
+    color: var(--color-neutral-content-subtlest);
+    pointer-events: none;
+  }
+
+  &.today {
+    &::before {
+      content: '';
+      position: absolute;
+      left: calc(50% - 2px);
+      bottom: 0;
+      height: 4px;
+      width: 4px;
+      background: var(--color-primary-surface);
+      border-radius: 4px;
+    }
+  }
+
+  &.selected {
+    border-radius: 50%;
+    background: var(--color-primary-surface);
+    color: var(--color-primary-surface-content);
+
+    &:hover {
+      color: var(--color-neutral-on-dark-content);
+    }
+  }
+}
+

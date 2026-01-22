@@ -2,22 +2,29 @@
 title: Ranker
 type: tags
 order: 419
-meta_title: Ranker Tag allows you to rank items in a List or, if Buckets are used, pick relevant items from a List
-meta_description: Customize Label Studio by sorting results for machine learning and data science projects.
+meta_title: Ranker Tag 
+meta_description: Use the Ranker tag to sort list items. 
 ---
 
-The `Ranker` tag is used to rank items in a `List` tag or pick relevant items from a `List`, depending on using nested `Bucket` tags.
-In simple case of `List` + `Ranker` tags the first one becomes interactive and saved result is a dict with the only key of tag's name and with value of array of ids in new order.
-With `Bucket`s any items from the `List` can be moved to these buckets, and resulting groups will be exported as a dict `{ bucket-name-1: [array of ids in this bucket], ... }`
-By default all items will sit in `List` and will not be exported, unless they are moved to a bucket. But with `default="true"` parameter you can specify a bucket where all items will be placed by default, so exported result will always have all items from the list, grouped by buckets.
-Columns and items can be styled in `Style` tag by using respective `.htx-ranker-column` and `.htx-ranker-item` classes. Titles of columns are defined in `title` parameter of `Bucket` tag.
-Note: When `Bucket`s used without `default` param, the original list will also be stored as "_" named column in results, but that's internal value and this may be changed later.
+You can use `Ranker` to select relevant items from a `List` and sort them. You can either sort them to order them or sort them into buckets (defined using a nested `Bucket` tag). 
+
+Use with the following data types: [`List`](list). 
+
 
 {% insertmd includes/tags/ranker.md %}
 
-### Example
 
-Visual appearance can be changed via Style tag with these predefined classnames
+## List + Ranker
+
+When you use `List` with `Ranker` (and no buckets), the list becomes interactive so that users can reorder items.
+
+### Example labeling config
+
+You can style the ranker layout using the `Style` tag:
+
+* `.htx-ranker-column` for columns (buckets)
+
+* `.htx-ranker-item `for items
 
 ```html
 <View>
@@ -29,9 +36,10 @@ Visual appearance can be changed via Style tag with these predefined classnames
   <Ranker name="rank" toName="results" />
 </View>
 ```
-### Example
 
-Example task data for Ranker tag
+### Example input data
+
+Example list to use as input data:
 
 ```json
 {
@@ -42,21 +50,41 @@ Example task data for Ranker tag
   ]
 }
 ```
-### Example
 
-Example result for Ranker tag
+### Example results
+
+The saved result is a dictionary with one key (the Ranker tag’s name) and a value that is an array of list item IDs in their new order.
+
+In this example, the annotator moved the list item with `"id": "mdn"` to the top, and `"id": "blog"` to the bottom. The data output would appear as follows:
 
 ```json
-{
-  "from_name": "rank",
-  "to_name": "results",
-  "type": "ranker",
-  "value": { "ranker": { "rank": ["mdn", "wiki", "blog"] } }
-}
+[
+  {
+    "value": {
+      "ranker": {
+        "rank": [
+          "mdn",
+          "wiki",
+          "blog"
+        ]
+      }
+    },
+    "id": "PpwBv_NMxd",
+    "from_name": "rank",
+    "to_name": "results",
+    "type": "ranker",
+    "origin": "manual"
+  }
+]
 ```
-### Example
 
-Example of using Buckets with Ranker tag
+## List + Ranker + Buckets
+
+When you use `Ranker` with a nested `Bucket`, you can sort list items into bucket categories. 
+
+### Example labeling config 
+
+See the [example above](#Example-labeling-config) for notes on adding styling. 
 
 ```html
 <View>
@@ -67,18 +95,89 @@ Example of using Buckets with Ranker tag
   </Ranker>
 </View>
 ```
-### Example
 
-Example result for Ranker tag with Buckets; data is the same
+### Example input data
+
+See the [example list](#Example-input-data) provided above. 
+
+### Example results
+
+The saved result is a dictionary where each key is the bucket name and each value is an array of item IDs in that bucket, for example:
 
 ```json
-{
-  "from_name": "rank",
-  "to_name": "results",
-  "type": "ranker",
-  "value": { "ranker": {
-    "best": ["mdn"],
-    "ads": ["blog"]
-  } }
-}
+[
+  {
+    "value": {
+      "ranker": {
+        "_": [
+          "wiki"
+        ],
+        "best": [
+          "mdn"
+        ],
+        "ads": [
+          "blog"
+        ]
+      }
+    },
+    "id": "sjYK7Bcl7g",
+    "from_name": "rank",
+    "to_name": "results",
+    "type": "ranker",
+    "origin": "manual"
+  }
+]
 ```
+
+Note that the `"_"` array contains the list items that were **not** sorted into buckets. 
+
+You can change this behavior by designating a default bucket. See the example below. 
+
+### Default buckets
+
+You can mark a default bucket by adding `default="true"` to the bucket's parameters:
+
+```html
+<View>
+  <List name="results" value="$items" title="Search Results" />
+  <Ranker name="rank" toName="results">
+    <Bucket name="best" title="Best results" default="true" />
+    <Bucket name="ads" title="Paid results" />
+  </Ranker>
+</View>
+```
+
+This does two things:
+
+- Hides the "Search Results" column (the column that contained all the unsorted list items)
+- Places the unsorted list items into the default bucket
+  
+This would also affect your results so that unsorted list items are stored under the default bucket key, for example:
+
+```json
+[
+  {
+    "value": {
+      "ranker": {
+        "best": [
+          "mdn",
+          "wiki"
+        ],
+        "ads": [
+          "blog"
+        ]
+      }
+    },
+    "id": "8QaNxe4hN3",
+    "from_name": "rank",
+    "to_name": "results",
+    "type": "ranker",
+    "origin": "manual"
+  }
+]
+```
+
+## Related templates
+
+- [Visual Ranker](/templates/generative-visual-ranker)
+- [RAG Retrieval](/templates/generative-llm-ranker)

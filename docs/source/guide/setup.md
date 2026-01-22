@@ -11,6 +11,10 @@ section: "Create & Manage Projects"
 
 All labeling activities in Label Studio occur in the context of a project. After you [create a project](setup_project.html#Create-a-project) and [import data](tasks.html), set up the labeling interface and labeling configuration for your project. This setup process is essential to your labeling project.
 
+!!! error Enterprise
+    Does your project need a fully customized interface? 
+    The UI engine on Label Studio Enterprise makes it possible to create programmable and embeddable interfaces for AI and agents. [Learn more](https://humansignal.com/programmable-ui/).
+
 ## Set up the labeling interface for your project
 
 Configure the labels and task type for annotators using the templates included with Label Studio or by defining your own combination of tags to set up the labeling interface for your project.

@@ -11,6 +11,7 @@
   border: 1px solid rgba(var(--color-neutral-shadow-raw) / 10% );
   box-shadow: none;
   transition: all 150ms ease-out;
+  user-select: none;
 
   .avatar {
     opacity: 0;
@@ -21,6 +22,13 @@
     object-fit: cover;
     position: absolute;
     border-radius: 100%;
+
+    // Firefox displays weird empty box extending viewport's width (img shouldn't render ::before at all!)
+    // this is a hack to prevent it from rendering
+    &::before {
+      content: none;
+      display: none;
+    }
   }
 
   .username {
@@ -34,6 +42,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    user-select: none;
   }
 
   .badge {

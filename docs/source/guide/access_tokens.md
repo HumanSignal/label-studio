@@ -9,6 +9,7 @@ meta_title: Access tokens
 meta_description: Access tokens to interact with the Label Studio API and SDK. 
 section: "Manage Your Organization"
 date: 2025-02-18 12:03:59
+parent_enterprise: "admin_settings"
 ---
 
 Label Studio has personal access tokens and legacy tokens. These tokens are also referred to as your "API keys." 
@@ -39,7 +40,6 @@ Label Studio has personal access tokens and legacy tokens. These tokens are also
         <li>Can be manually revoked
         <li>Do not need to be refreshed with used with HTTP API
         <li> <code>-H 'Authorization: Token  &lt;token&gt;'</code> with HTTP API requests
-        <li>Currently required to use the <a target="_blank" rel="noopener" href="https://github.com/HumanSignal/label-studio-ml-backend">Label Studio ML backend</a>
         <li>Only need to be set once when used with the SDK
     </ul>
   </td>
@@ -152,8 +152,6 @@ token_is_expired = (exp <= datetime.now(timezone.utc).timestamp())
 ## Legacy tokens
 
 Generally speaking, the legacy tokens are not as secure as personal access tokens because they must be manually revoked. 
-
-However, they are easier to use with HTTP API and are required for use with the [Label Studio ML backend](https://github.com/HumanSignal/label-studio-ml-backend).
 
 ### SDK
 

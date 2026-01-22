@@ -14,7 +14,7 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.db import transaction
 from django.utils import timezone as django_timezone
-from django_rq import get_connection, job
+from django_rq import get_connection
 
 logger = logging.getLogger(__name__)
 
@@ -47,7 +47,6 @@ def set_user_last_activity(user_id: int, timestamp: Optional[datetime] = None) -
         True if successfully set, False otherwise
     """
     if not redis_connected():
-        logger.warning('Redis not connected, skipping activity update for user %s', user_id)
         return False
 
     if timestamp is None:
@@ -302,7 +301,6 @@ def cleanup_redis_activity_data(user_ids: Set[int]) -> bool:
         return False
 
 
-@job('low', timeout=3600)
 def sync_user_activities_to_db(max_users: int = None) -> dict:
     """
     Synchronize user activities from Redis to database.
@@ -385,7 +383,9 @@ def _bulk_update_user_activities(activities: List[dict]) -> dict:
             # Get existing users
             User = get_user_model()
             user_ids = [activity['user_id'] for activity in activities]
-            existing_users = User.objects.filter(id__in=user_ids).only('id', 'last_activity')
+            existing_users = (
+                User.objects.select_for_update(skip_locked=True).filter(id__in=user_ids).only('id', 'last_activity')
+            )
             user_dict = {user.id: user for user in existing_users}
 
             # Update activities

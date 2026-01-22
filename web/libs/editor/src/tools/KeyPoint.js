@@ -4,7 +4,6 @@ import BaseTool from "./Base";
 import ToolMixin from "../mixins/Tool";
 import { NodeViews } from "../components/Node/Node";
 import { DrawingTool } from "../mixins/DrawingTool";
-import { FF_DEV_3793, isFF } from "../utils/feature-flags";
 
 const _Tool = types
   .model("KeyPointTool", {
@@ -42,15 +41,8 @@ const _Tool = types
           x,
           y,
         }),
-        ...(isFF(FF_DEV_3793)
-          ? {
-              // strokeWidth is visual only, so it's in screen dimensions in config
-              width: self.obj.canvasToInternalX(Number(c.strokewidth)),
-            }
-          : {
-              width: Number(c.strokewidth),
-              coordstype: "px",
-            }),
+        // strokeWidth is visual only, so it's in screen dimensions in config
+        width: self.obj.canvasToInternalX(Number(c.strokewidth)),
         dynamic: self.dynamic,
         negative: self.dynamic && ev.altKey,
       });

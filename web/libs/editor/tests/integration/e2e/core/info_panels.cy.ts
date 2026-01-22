@@ -36,7 +36,7 @@ describe("Label Studio UI info panels", () => {
     cy.wait(200);
     cy.contains("Group by Label").click();
     cy.get("[class$=lsf-outliner-item__title").contains("Word1").should("be.visible");
-    cy.contains("Group by Label").should("not.be.visible");
+    cy.contains("Group by Label").should("not.exist");
 
     // Select Relations panel, empty state is shown, Regions will be unselected
     cy.get("#Relations-draggable").click();

@@ -1,0 +1,76 @@
+.inputContainer {
+  padding: var(--spacing-tight) var(--spacing-base);
+  display: flex;
+  gap: var(--spacing-tightest);
+}
+
+.validationSwitcher {
+  &:only-child {
+    flex: 1;
+    width: 100%;
+
+    .dateInput {
+      width: 100%;
+    }
+  }
+
+  &.invalid {
+    input {
+      color: var(--color-negative-content);
+    }
+  }
+}
+
+.errorText {
+  position: absolute;
+  color: var(--color-negative-content);
+  transform: translateY(var(--spacing-tight));
+}
+
+.input {
+  display: flex;
+  padding: 0 var(--spacing-tight);
+}
+
+.dateInput {
+  width: 130px;
+  height: 40px;
+}
+
+.timeInput {
+  padding-left: 0;
+  padding-right: 0;
+  width: 60px;
+  text-align: center;
+  height: 40px;
+}
+
+.meridiemButton {
+  padding-left: 0;
+  padding-right: 0;
+
+  &.selected {
+    cursor: default;
+    pointer-events: none;
+  }
+}
+
+.inputField {
+  padding: var(--spacing-tight) var(--spacing-tight);
+  border: 1px solid var(--color-neutral-border);
+  border-radius: var(--corner-radius-smaller);
+  background-color: var(--color-neutral-background);
+  color: var(--color-neutral-content);
+  transition: border-color 0.15s ease-out;
+
+  &:focus {
+    outline: none;
+    border-color: var(--color-primary-border);
+    box-shadow: 0 0 0 3px var(--color-primary-focus-outline);
+  }
+
+  &.error {
+    border-color: var(--color-negative-content);
+  }
+}
+

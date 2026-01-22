@@ -23,9 +23,9 @@ const TaskSummary = ({ annotations: all, store: annotationStore }: TaskSummaryPr
 
   const onSelect = (entity: Annotation) => {
     if (entity.type === "annotation") {
-      annotationStore.selectAnnotation(entity.id);
+      annotationStore.selectAnnotation(entity.id, { exitViewAll: true });
     } else {
-      annotationStore.selectPrediction(entity.id);
+      annotationStore.selectPrediction(entity.id, { exitViewAll: true });
     }
   };
 
@@ -60,7 +60,7 @@ const TaskSummary = ({ annotations: all, store: annotationStore }: TaskSummaryPr
         type: object.type,
         value:
           // @ts-expect-error parsedValue, dataObj and _url are very specific and not added to types
-          object.parsedValue ?? object.dataObj ?? object._url ?? object._value ?? object.value,
+          object.loadedData ?? object.parsedValue ?? object.dataObj ?? object._url ?? object._value ?? object.value,
       },
     ]),
   );
@@ -90,17 +90,23 @@ const TaskSummary = ({ annotations: all, store: annotationStore }: TaskSummaryPr
   ];
 
   return (
-    <div className="p-4">
-      <h2 className="px-4 mb-4">Review Summary</h2>
-      <NumbersSummary values={values} />
-      <LabelingSummary
-        annotations={annotations}
-        controls={controls}
-        onSelect={onSelect}
-        hideInfo={annotationStore.store.hasInterface("annotations:hide-info")}
-      />
-      <h2 className="px-4">Task Data</h2>
-      <DataSummary data_types={dataTypes} />
+    <div className="p-6">
+      <div className="mb-base">
+        <h2 className="mb-base text-headline-small font-semibold text-neutral-content">Task Summary</h2>
+        <NumbersSummary values={values} />
+      </div>
+      <div className="mb-relaxed">
+        <LabelingSummary
+          annotations={annotations}
+          controls={controls}
+          onSelect={onSelect}
+          hideInfo={annotationStore.store.hasInterface("annotations:hide-info")}
+        />
+      </div>
+      <div className="mb-relaxed">
+        <h2 className="mb-base text-headline-small font-semibold text-neutral-content">Task Data</h2>
+        <DataSummary data_types={dataTypes} />
+      </div>
     </div>
   );
 };

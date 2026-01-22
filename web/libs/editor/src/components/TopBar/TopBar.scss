@@ -22,6 +22,7 @@
     display: flex;
     align-items: stretch;
     gap: var(--spacing-tight);
+    padding-left: var(--spacing-tight);
   }
 
   &__section {

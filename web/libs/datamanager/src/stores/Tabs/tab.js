@@ -91,7 +91,7 @@ export const Tab = types
     },
 
     get hiddenColumnsList() {
-      return self.columns.filter((c) => c.hidden).map((c) => c.key);
+      return self.columns.filter((c) => c.is_hidden).map((c) => c.key);
     },
 
     get availableFilters() {
@@ -357,6 +357,15 @@ export const Tab = types
 
     toggleSelected(id) {
       self.selected.toggleItem(id);
+    },
+
+    /**
+     * Select or unselect a range of items by their IDs (used for shift-click range selection)
+     * @param {Array} ids - Array of item IDs
+     * @param {boolean} select - true to select, false to unselect
+     */
+    selectRange(ids, select = true) {
+      self.selected.selectRange(ids, select);
     },
 
     setColumnWidth(columnID, width) {

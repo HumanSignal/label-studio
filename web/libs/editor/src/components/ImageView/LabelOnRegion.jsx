@@ -324,4 +324,42 @@ const LabelOnVideoBbox = observer(({ reg, box, color, scale, strokeWidth, adjace
   );
 });
 
-export { LabelOnBbox, LabelOnPolygon, LabelOnRect, LabelOnEllipse, LabelOnKP, LabelOnMask, LabelOnVideoBbox };
+const LabelOnOcrBox = observer(({ region, color, strokeWidth = 1, viewRect, pageRotationDeg = 0, zoomScale = 1 }) => {
+  if (!region?.store) return null;
+
+  const labelText = region.getLabelText(",") || region?.ocrtext || region?.noLabelView || "";
+  const showLabels = region.store.settings?.showLabels;
+  const isTexting = Boolean(region.texting || region.ocrtext);
+  const rotation = ((((region.rotation ?? 0) + (pageRotationDeg ?? 0)) % 360) + 360) % 360;
+  const safeStrokeWidth = typeof strokeWidth === "number" ? strokeWidth : 0;
+  const rect = viewRect ?? { x: 0, y: 0, width: 0, height: 0 };
+  const width = Math.max(1, rect.width);
+
+  return (
+    <LabelOnBbox
+      x={rect.x - safeStrokeWidth / 2 / zoomScale}
+      y={rect.y - safeStrokeWidth / 2 / zoomScale}
+      isTexting={isTexting}
+      text={labelText}
+      score={region.score}
+      showLabels={showLabels}
+      zoomScale={zoomScale}
+      rotation={rotation}
+      color={color}
+      maxWidth={width + safeStrokeWidth}
+      adjacent
+      onClickLabel={region.onClickRegion}
+    />
+  );
+});
+
+export {
+  LabelOnBbox,
+  LabelOnPolygon,
+  LabelOnRect,
+  LabelOnEllipse,
+  LabelOnKP,
+  LabelOnMask,
+  LabelOnVideoBbox,
+  LabelOnOcrBox,
+};

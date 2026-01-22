@@ -133,14 +133,12 @@ def _get_filter_config(filter_field: Any, overrides: dict) -> dict:
         config['enum'] = _get_choice_enum(filter_field)
 
     elif isinstance(filter_field, (MultipleChoiceFilter, TypedMultipleChoiceFilter, AllValuesMultipleFilter)):
-        config['type'] = OpenApiTypes.ARRAY
-        config['extra_kwargs']['items'] = {'type': _map_filter_type(filter_field)}
+        config['type'] = OpenApiTypes.STR
         if hasattr(filter_field, 'choices') and filter_field.choices:
             config['extra_kwargs']['items']['enum'] = _get_choice_enum(filter_field)
 
     elif isinstance(filter_field, BaseInFilter):
-        config['type'] = OpenApiTypes.ARRAY
-        config['extra_kwargs']['items'] = {'type': _map_filter_type(filter_field)}
+        config['type'] = OpenApiTypes.STR
         config['description'] = config.get('description', '') + ' (comma-separated values)'
 
     elif isinstance(
@@ -162,7 +160,7 @@ def _get_filter_config(filter_field: Any, overrides: dict) -> dict:
             config['description'] = config.get('description', '') + ' (search term)'
 
     elif isinstance(filter_field, (ModelChoiceFilter, ModelMultipleChoiceFilter)):
-        config['type'] = OpenApiTypes.INT if isinstance(filter_field, ModelChoiceFilter) else OpenApiTypes.ARRAY
+        config['type'] = OpenApiTypes.INT if isinstance(filter_field, ModelChoiceFilter) else OpenApiTypes.STR
         if isinstance(filter_field, ModelMultipleChoiceFilter):
             config['extra_kwargs']['items'] = {'type': OpenApiTypes.INT}
 
@@ -208,7 +206,7 @@ def _map_filter_type(filter_field: Any) -> str:
     elif isinstance(
         filter_field, (MultipleChoiceFilter, TypedMultipleChoiceFilter, AllValuesMultipleFilter, BaseInFilter)
     ):
-        return OpenApiTypes.ARRAY
+        return OpenApiTypes.STR
 
     elif isinstance(
         filter_field,

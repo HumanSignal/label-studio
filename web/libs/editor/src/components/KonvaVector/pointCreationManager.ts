@@ -1,6 +1,7 @@
-import type { BezierPoint } from "./types";
+import type { BezierPoint, GhostPoint } from "./types";
 import { PointType } from "./types";
-import { snapToPixel } from "./eventHandlers/utils";
+import { HIT_RADIUS } from "./constants";
+import { snapToPixel, getDistance } from "./eventHandlers/utils";
 import { generatePointId } from "./utils";
 
 export interface PointCreationState {
@@ -18,6 +19,8 @@ export interface PointCreationManagerProps {
   pixelSnapping?: boolean;
   width?: number;
   height?: number;
+  transform?: { zoom: number; offsetX: number; offsetY: number };
+  fitScale?: number;
   onPointsChange?: (points: BezierPoint[]) => void;
   onPointAdded?: (point: BezierPoint, index: number) => void;
   onPointEdited?: (point: BezierPoint, index: number) => void;
@@ -30,6 +33,10 @@ export interface PointCreationManagerProps {
   setVisibleControlPoints?: (points: Set<number> | ((prev: Set<number>) => Set<number>)) => void;
   setNewPointDragIndex?: (index: number | null) => void;
   setIsDraggingNewBezier?: (dragging: boolean) => void;
+  ghostPoint?: GhostPoint | null;
+  isShiftKeyHeld?: boolean;
+  setGhostPoint?: (point: GhostPoint | null) => void;
+  selectedPoints?: Set<number>;
 }
 
 export class PointCreationManager {
@@ -55,6 +62,11 @@ export class PointCreationManager {
       return false;
     }
 
+    // Don't allow drawing when transformer is active (two or more points are selected)
+    if (this.props.selectedPoints && this.props.selectedPoints.size > 1) {
+      return false;
+    }
+
     // Check if we can add more points
     if (this.props.canAddMorePoints && !this.props.canAddMorePoints()) {
       return false;
@@ -75,6 +87,20 @@ export class PointCreationManager {
       }
     }
 
+    // Check if hovering over an existing point - if so, don't create a new point
+    if (this.props.initialPoints.length > 0 && this.props.transform && this.props.fitScale !== undefined) {
+      const scale = this.props.transform.zoom * this.props.fitScale;
+      const hitRadius = HIT_RADIUS.SELECTION / scale;
+
+      for (const point of this.props.initialPoints) {
+        const distance = getDistance(snappedCoords, point);
+        if (distance <= hitRadius) {
+          // Hovering over an existing point - don't create a new one
+          return false;
+        }
+      }
+    }
+
     // Initialize state
     this.state = {
       isCreating: true,
@@ -90,6 +116,11 @@ export class PointCreationManager {
 
   updatePoint(x: number, y: number): boolean {
     if (!this.props || !this.state.isCreating) {
+      return false;
+    }
+
+    // Don't allow drawing when transformer is active (two or more points are selected)
+    if (this.props.selectedPoints && this.props.selectedPoints.size > 1) {
       return false;
     }
 
@@ -144,8 +175,29 @@ export class PointCreationManager {
       return false;
     }
 
+    // Don't allow drawing when transformer is active (two or more points are selected)
+    if (this.props.selectedPoints && this.props.selectedPoints.size > 1) {
+      return false;
+    }
+
+    // Check if Shift is held and we have a ghost point
+    let finalX = x;
+    let finalY = y;
+    let insertBetween = false;
+    let prevPointId: string | undefined;
+    let nextPointId: string | undefined;
+
+    if (this.props.isShiftKeyHeld && this.props.ghostPoint) {
+      // Use ghost point coordinates instead of provided coordinates
+      finalX = this.props.ghostPoint.x;
+      finalY = this.props.ghostPoint.y;
+      insertBetween = true;
+      prevPointId = this.props.ghostPoint.prevPointId;
+      nextPointId = this.props.ghostPoint.nextPointId;
+    }
+
     // Snap to pixel grid if enabled
-    const snappedCoords = snapToPixel({ x, y }, this.props.pixelSnapping);
+    const snappedCoords = snapToPixel({ x: finalX, y: finalY }, this.props.pixelSnapping);
 
     // Check if we're within canvas bounds (only if bounds checking is enabled)
     if (this.props.width && this.props.height) {
@@ -159,6 +211,44 @@ export class PointCreationManager {
       }
     }
 
+    // If we need to insert between points (shift-click on segment)
+    if (insertBetween && prevPointId && nextPointId) {
+      // Cancel the current creation state
+      this.state = {
+        isCreating: false,
+        startX: 0,
+        startY: 0,
+        currentPointIndex: null,
+        isBezier: false,
+        hasCreatedPoint: false,
+      };
+
+      // Clear dragging state
+      if (this.props.setNewPointDragIndex) {
+        this.props.setNewPointDragIndex(null);
+      }
+      if (this.props.setIsDraggingNewBezier) {
+        this.props.setIsDraggingNewBezier(false);
+      }
+
+      // Insert the point between the two points
+      const result = this.insertPointBetween(
+        snappedCoords.x,
+        snappedCoords.y,
+        prevPointId,
+        nextPointId,
+        PointType.REGULAR,
+      );
+
+      // Clear ghost point immediately after adding a real point
+      if (result.success && this.props.setGhostPoint) {
+        this.props.setGhostPoint(null);
+      }
+
+      return result.success;
+    }
+
+    // Normal point creation flow
     // If we haven't created a point yet (no point was created during updatePoint), create a regular point
     if (!this.state.hasCreatedPoint) {
       this.createRegularPoint(snappedCoords.x, snappedCoords.y);

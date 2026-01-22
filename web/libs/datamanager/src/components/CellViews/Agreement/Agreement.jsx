@@ -2,8 +2,6 @@ import { useSDK } from "../../../providers/SDKProvider";
 import { isDefined } from "../../../utils/utils";
 import { useState } from "react";
 import { Popover } from "@humansignal/ui";
-import { ff } from "@humansignal/core";
-import { FF_AVERAGE_AGREEMENT_SCORE_POPOVER } from "../../../utils/feature-flags";
 
 const LOW_AGREEMENT_SCORE = 33;
 const MEDIUM_AGREEMENT_SCORE = 66;
@@ -29,8 +27,20 @@ export const Agreement = (cell) => {
   const { value, original: task } = cell;
   const sdk = useSDK();
   const [content, setContent] = useState(null);
-  const isAgreementPopoverEnabled =
-    window.APP_SETTINGS.billing?.enterprise && ff.isActive(FF_AVERAGE_AGREEMENT_SCORE_POPOVER);
+  const basePopoverEnabled = window.APP_SETTINGS.billing?.enterprise;
+
+  const colId =
+    (cell && cell.column && typeof cell.column.id === "string" && cell.column.id) ||
+    (cell &&
+      cell.column &&
+      cell.column.original &&
+      typeof cell.column.original.alias === "string" &&
+      cell.column.original.alias) ||
+    "";
+
+  const colPath = String(colId).split(":").pop() || "";
+  const isDimensionAgreementColumn = colPath.startsWith("dimension_agreement__");
+  const isAgreementPopoverEnabled = basePopoverEnabled && !isDimensionAgreementColumn;
 
   const handleClick = isAgreementPopoverEnabled
     ? (e) => {

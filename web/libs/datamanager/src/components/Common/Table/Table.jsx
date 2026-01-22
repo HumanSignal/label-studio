@@ -49,6 +49,7 @@ export const Table = observer(
     onColumnReset,
     headerExtra,
     onDensityChange,
+    onRangeSelect,
     ...props
   }) => {
     const colOrderKey = "dm:columnorder";
@@ -60,6 +61,8 @@ export const Table = observer(
     const toolbarHeight = 41;
     const isQuickView = view.root.isLabeling;
     const [toolbarVisible, setToolbarVisible] = useState(true);
+    // Track last clicked row ID for shift-click range selection
+    const lastClickedId = useRef(null);
 
     // Reset virtualizer cache when rowHeight changes
     useEffect(() => {
@@ -81,17 +84,39 @@ export const Table = observer(
     }, [props.onSelectAll, selectedItems]);
 
     const rowCheckBoxCell = useCallback(
-      ({ data }) => {
-        const isChecked = selectedItems.isSelected(data.id);
+      ({ data: rowData }) => {
+        const isChecked = selectedItems.isSelected(rowData.id);
         return (
           <TableCheckboxCell
             checked={isChecked}
-            onChange={() => props.onSelectRow(data.id)}
-            ariaLabel={`${isChecked ? "Unselect" : "Select"} Task ${data.id}`}
+            onChange={(checked, shiftKey) => {
+              // Handle shift-click for range selection (works for both select and unselect)
+              if (shiftKey && lastClickedId.current !== null && onRangeSelect) {
+                const lastClickedIndex = data.findIndex((item) => item.id === lastClickedId.current);
+                const currentIndex = data.findIndex((item) => item.id === rowData.id);
+
+                if (lastClickedIndex !== -1 && currentIndex !== -1) {
+                  const startIndex = Math.min(lastClickedIndex, currentIndex);
+                  const endIndex = Math.max(lastClickedIndex, currentIndex);
+                  const rangeIds = data.slice(startIndex, endIndex + 1).map((item) => item.id);
+
+                  // Pass the select state: true = select range, false = unselect range
+                  onRangeSelect(rangeIds, checked);
+                  lastClickedId.current = rowData.id;
+                  return;
+                }
+              }
+
+              // Normal single-item toggle
+              props.onSelectRow(rowData.id);
+              // Always remember last clicked for shift-click range
+              lastClickedId.current = rowData.id;
+            }}
+            ariaLabel={`${isChecked ? "Unselect" : "Select"} Task ${rowData.id}`}
           />
         );
       },
-      [props.onSelectRow, selectedItems],
+      [props.onSelectRow, selectedItems, data, onRangeSelect],
     );
 
     const columns = prepareColumns(props.columns, props.hiddenColumns);
@@ -113,14 +138,15 @@ export const Table = observer(
     columns.push({
       id: "show-source",
       cellClassName: "show-source",
+      headerClassName: "show-source",
       style: {
-        width: 40,
-        maxWidth: 40,
+        width: 44,
+        maxWidth: 44,
         justifyContent: "center",
       },
       onClick: (e) => e.stopPropagation(),
       Header() {
-        return <div style={{ width: 40 }} />;
+        return <div style={{ width: 44 }} />;
       },
       Cell({ data }) {
         let out = JSON.parse(data.source ?? "{}");
@@ -525,6 +551,9 @@ const TaskSourceView = ({ content, onTaskLoad, sdkType }) => {
       if (sdkType !== "DE") {
         formatted.annotations = response.annotations ?? [];
         formatted.predictions = response.predictions ?? [];
+      }
+      if (response.state) {
+        formatted.state = response.state;
       }
       setSource(formatted);
     });

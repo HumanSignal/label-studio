@@ -1,6 +1,6 @@
 import { Button, Typography } from "@humansignal/ui";
 import { Space } from "@humansignal/ui/lib/space/space";
-import { Block } from "apps/labelstudio/src/components/Menu/MenuContext";
+import { cn } from "apps/labelstudio/src/utils/bem";
 import { Modal } from "apps/labelstudio/src/components/Modal/ModalPopup";
 import { API } from "apps/labelstudio/src/providers/ApiProvider";
 import { useAtomValue } from "jotai";
@@ -54,7 +54,7 @@ export function InviteLink({
 const InvitationModal = () => {
   const { data: link } = useAtomValue(linkAtom);
   return (
-    <Block name="invite">
+    <div className={cn("invite").toClassName()}>
       <Input value={link} style={{ width: "100%" }} readOnly />
       <Typography size="small" className="text-neutral-content-subtler mt-base mb-wider">
         Invite members to join your Label Studio instance. People that you invite have full access to all of your
@@ -74,7 +74,7 @@ const InvitationModal = () => {
         </a>
         .
       </Typography>
-    </Block>
+    </div>
   );
 };
 

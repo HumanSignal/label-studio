@@ -11,6 +11,7 @@ const alertVariants = cva(
         default: "bg-neutral-background text-card-foreground",
         destructive:
           "text-negative-content bg-negative-background border-negative-border-subtler [&>svg]:text-current *:data-[slot=alert-description]:text-negative-content/90",
+        info: "text-[var(--color-accent-blueberry-dark)] bg-[var(--color-accent-blueberry-subtlest)] border-[var(--color-accent-blueberry-bold)] [&>svg]:text-current *:data-[slot=alert-description]:text-[var(--color-accent-blueberry-dark)]/90",
         gradient:
           "text-[var(--color-accent-persimmon-base)] bg-gradient-to-br from-[var(--color-accent-canteloupe-subtlest)] via-[var(--color-accent-persimmon-subtlest)] to-[var(--color-accent-plum-subtlest)] border-[var(--color-accent-persimmon-border)] [&>svg]:text-current [&>[data-slot=alert-description]]:!block [&>[data-slot=alert-description]]:!col-start-2 [&>[data-slot=alert-description]]:text-sm has-[>svg]:!grid-cols-[16px_1fr] has-[>svg]:!gap-x-3",
       },

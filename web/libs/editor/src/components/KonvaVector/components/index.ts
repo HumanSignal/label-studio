@@ -4,5 +4,5 @@ export { VectorPoints } from "./VectorPoints";
 export { ProxyNodes } from "./ProxyNodes";
 export { VectorTransformer } from "./VectorTransformer";
 export { ControlPoints } from "./ControlPoints";
-export { GhostPoint } from "./GhostPoint";
+export { GhostPoint, type GhostPointRef } from "./GhostPoint";
 export { ConnectionLines } from "./ConnectionLines";

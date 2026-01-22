@@ -1,6 +1,5 @@
 import { getParent, types } from "mobx-state-tree";
 import { ImageSelectionPoint } from "./ImageSelectionPoint";
-import { FF_DEV_3793, isFF } from "../../../utils/feature-flags";
 import { RELATIVE_STAGE_HEIGHT, RELATIVE_STAGE_WIDTH } from "../../../components/ImageView/Image";
 
 export const ImageSelection = types
@@ -62,8 +61,6 @@ export const ImageSelection = types
         };
       },
       get onCanvasRect() {
-        if (!isFF(FF_DEV_3793)) return self;
-
         if (!self.isActive) return null;
 
         const bbox = self.onCanvasBbox;
@@ -103,9 +100,7 @@ export const ImageSelection = types
       get selectionBorders() {
         if (self.isActive || !self.obj.selectedRegions.length) return null;
 
-        const initial = isFF(FF_DEV_3793)
-          ? { left: RELATIVE_STAGE_WIDTH, top: RELATIVE_STAGE_HEIGHT, right: 0, bottom: 0 }
-          : { left: self.obj.stageWidth, top: self.obj.stageHeight, right: 0, bottom: 0 };
+        const initial = { left: RELATIVE_STAGE_WIDTH, top: RELATIVE_STAGE_HEIGHT, right: 0, bottom: 0 };
         const bbox = self.obj.selectedRegions.reduce((borders, region) => {
           return region.bboxCoords
             ? {
@@ -116,8 +111,6 @@ export const ImageSelection = types
               }
             : borders;
         }, initial);
-
-        if (!isFF(FF_DEV_3793)) return bbox;
 
         return {
           left: self.obj.internalToCanvasX(bbox.left),

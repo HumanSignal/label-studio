@@ -17,7 +17,7 @@ on:
 env:
   NODE: "22"
   CACHE_NAME_PREFIX: v1
-  POETRY_VERSION: 2.1.4
+  POETRY_VERSION: 2.2.1
   DJANGO_SETTINGS_MODULE: core.settings.label_studio
   COVERAGE_PROCESS_START: 1
   LOG_DIR: pytest_logs
@@ -48,7 +48,7 @@ jobs:
       - uses: hmarr/debug-action@v3.0.0
 
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           ref: ${{ inputs.head_sha }}
 
@@ -109,7 +109,7 @@ jobs:
       - uses: hmarr/debug-action@v3.0.0
 
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           ref: ${{ inputs.head_sha }}
 
@@ -177,7 +177,7 @@ jobs:
       - uses: hmarr/debug-action@v3.0.0
 
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           ref: ${{ inputs.head_sha }}
 

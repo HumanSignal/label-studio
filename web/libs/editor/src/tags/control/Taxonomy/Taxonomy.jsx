@@ -19,7 +19,7 @@ import SelectedChoiceMixin from "../../../mixins/SelectedChoiceMixin";
 import { SharedStoreMixin } from "../../../mixins/SharedChoiceStore/mixin";
 import VisibilityMixin from "../../../mixins/Visibility";
 import { parseValue } from "../../../utils/data";
-import { FF_LEAP_218, FF_LSDV_4583, FF_TAXONOMY_ASYNC, FF_TAXONOMY_LABELING, isFF } from "../../../utils/feature-flags";
+import { FF_LSDV_4583, FF_TAXONOMY_ASYNC, FF_TAXONOMY_LABELING, isFF } from "../../../utils/feature-flags";
 import ControlBase from "../Base";
 import ClassificationBase from "../ClassificationBase";
 
@@ -625,7 +625,6 @@ const HtxTaxonomy = observer(({ item }) => {
           onAddLabel={item.userLabels && item.onAddLabel}
           onDeleteLabel={item.userLabels && item.onDeleteLabel}
           options={options}
-          defaultSearch={!isFF(FF_LEAP_218)}
           isEditable={!item.isReadOnly()}
         />
       ) : (

@@ -1,3 +1,7 @@
+/**
+ * @deprecated this file is not used; App/ViewAll is used instead
+ */
+
 import React, { Component } from "react";
 import { Spin } from "antd";
 import { Button } from "@humansignal/ui";

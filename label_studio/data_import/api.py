@@ -11,9 +11,11 @@ from core.feature_flags import flag_set
 from core.permissions import ViewClassPermission, all_permissions
 from core.redis import start_job_async_or_sync
 from core.utils.common import retry_database_locked, timeit
+from core.utils.exceptions import extract_message
 from core.utils.params import bool_from_request, list_of_strings_from_request
 from csp.decorators import csp
 from django.conf import settings
+from django.core.files.storage import FileSystemStorage
 from django.db import transaction
 from django.http import HttpResponse
 from django.utils.decorators import method_decorator
@@ -54,35 +56,40 @@ ProjectImportPermission = load_func(settings.PROJECT_IMPORT_PERMISSION)
 
 task_create_response_scheme = {
     201: OpenApiResponse(
-        description='Tasks successfully imported',
+        description='Tasks successfully imported or import queued. **For non-Community editions**, the response will be `{"import": <import_id>}` which you can use to poll the import status. **For Community edition**, the response contains task counts and is processed synchronously.',
         response={
             'title': 'Task creation response',
-            'description': 'Task creation response',
+            'description': 'Response format varies by edition. Non-Community editions return `{"import": <import_id>}` for async processing. Community edition returns the detailed response below with task counts.',
             'type': 'object',
             'properties': {
+                'import': {
+                    'title': 'import',
+                    'description': 'Import ID for async operations (non-Community editions only). Use this ID to poll `/api/projects/{project_id}/imports/{import_id}` for status.',
+                    'type': 'integer',
+                },
                 'task_count': {
                     'title': 'task_count',
-                    'description': 'Number of tasks added',
+                    'description': 'Number of tasks added (Community edition sync import only)',
                     'type': 'integer',
                 },
                 'annotation_count': {
                     'title': 'annotation_count',
-                    'description': 'Number of annotations added',
+                    'description': 'Number of annotations added (Community edition sync import only)',
                     'type': 'integer',
                 },
                 'predictions_count': {
                     'title': 'predictions_count',
-                    'description': 'Number of predictions added',
+                    'description': 'Number of predictions added (Community edition sync import only)',
                     'type': 'integer',
                 },
                 'duration': {
                     'title': 'duration',
-                    'description': 'Time in seconds to create',
+                    'description': 'Time in seconds to create (Community edition sync import only)',
                     'type': 'number',
                 },
                 'file_upload_ids': {
                     'title': 'file_upload_ids',
-                    'description': 'Database IDs of uploaded files',
+                    'description': 'Database IDs of uploaded files (Community edition sync import only)',
                     'type': 'array',
                     'items': {
                         'title': 'File Upload IDs',
@@ -91,12 +98,12 @@ task_create_response_scheme = {
                 },
                 'could_be_tasks_list': {
                     'title': 'could_be_tasks_list',
-                    'description': 'Whether uploaded files can contain lists of tasks, like CSV/TSV files',
+                    'description': 'Whether uploaded files can contain lists of tasks, like CSV/TSV files (Community edition sync import only)',
                     'type': 'boolean',
                 },
                 'found_formats': {
                     'title': 'found_formats',
-                    'description': 'The list of found file formats',
+                    'description': 'The list of found file formats (Community edition sync import only)',
                     'type': 'array',
                     'items': {
                         'title': 'File format',
@@ -105,7 +112,7 @@ task_create_response_scheme = {
                 },
                 'data_columns': {
                     'title': 'data_columns',
-                    'description': 'The list of found data columns',
+                    'description': 'The list of found data columns (Community edition sync import only)',
                     'type': 'array',
                     'items': {
                         'title': 'Data column name',
@@ -175,6 +182,20 @@ task_create_response_scheme = {
             include all variables that were used in the *label_config*. For example,
             if the label configuration has a *$text* variable, then each item in a data object
             must include a "text" field.
+            <br>
+
+            ## Async Import Behavior
+            <hr style="opacity:0.3">
+
+            **For non-Community editions, this endpoint processes imports asynchronously.**
+            
+            - The POST request **can fail** for invalid parameters, malformed request body, or other request-level validation errors.
+            - However, **data validation errors** that occur during import processing are handled asynchronously and will not cause the POST request to fail.
+            - Upon successful request validation, a response is returned: `{{"import": <import_id>}}`
+            - Use the returned `import_id` to poll the GET `/api/projects/{{project_id}}/imports/{{import_id}}` endpoint to check the import status and see any data validation errors.
+            - Data-level errors and import failures will only be visible in the GET request response.
+
+            For Community edition, imports are processed synchronously and return task counts immediately.
             <br>
 
             ## POST requests
@@ -285,7 +306,7 @@ class ImportAPI(generics.CreateAPIView):
                                 for error in validation_errors_list:
                                     validation_errors.append(f'Task {i}, prediction {j}: {error}')
                         except Exception as e:
-                            error_msg = f'Task {i}, prediction {j}: Error validating prediction - {str(e)}'
+                            error_msg = f'Task {i}, prediction {j}: Error validating prediction - {extract_message(e)}'
                             validation_errors.append(error_msg)
 
             if validation_errors:
@@ -591,7 +612,7 @@ class ImportPredictionsAPI(generics.CreateAPIView):
                     continue
 
             except Exception as e:
-                validation_errors.append(f'Prediction {i}: Error validating prediction - {str(e)}')
+                validation_errors.append(f'Prediction {i}: Error validating prediction - {extract_message(e)}')
                 continue
 
             # If prediction is valid, add it to predictions list to be created
@@ -606,7 +627,7 @@ class ImportPredictionsAPI(generics.CreateAPIView):
                     )
                 )
             except Exception as e:
-                validation_errors.append(f'Prediction {i}: Failed to create prediction - {str(e)}')
+                validation_errors.append(f'Prediction {i}: Failed to create prediction - {extract_message(e)}')
                 continue
 
         # If there are validation errors, raise them before creating any predictions
@@ -717,10 +738,7 @@ class ReImportAPI(ImportAPI):
                 status=status.HTTP_200_OK,
             )
 
-        if (
-            flag_set('fflag_fix_all_lsdv_4971_async_reimport_09052023_short', request.user)
-            and settings.VERSION_EDITION != 'Community'
-        ):
+        if settings.VERSION_EDITION != 'Community':
             return self.async_reimport(
                 project, file_upload_ids, files_as_tasks_list, request.user.active_organization_id
             )
@@ -980,6 +998,18 @@ class DownloadStorageData(APIView):
 
         # NGINX handling is the default for better performance
         if settings.USE_NGINX_FOR_UPLOADS:
+            if isinstance(file_obj.storage, FileSystemStorage):
+                logger.warning(
+                    'USE_NGINX_FOR_UPLOADS is enabled, but FileSystemStorage '
+                    'does not support storage_url=True; Set USE_NGINX_FOR_UPLOADS=False.'
+                )
+                return Response(
+                    {
+                        'detail': 'NGINX mode for uploads is not supported when using local FileSystemStorage. '
+                        'Disable USE_NGINX_FOR_UPLOADS or switch to a cloud storage backend that supports proxy URLs like S3/GCS/Azure.'
+                    },
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
             url = file_obj.storage.url(file_obj.name, storage_url=True)
 
             protocol = urlparse(url).scheme

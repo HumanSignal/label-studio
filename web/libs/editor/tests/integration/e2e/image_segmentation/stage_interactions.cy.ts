@@ -6,7 +6,6 @@ import { TWO_FRAMES_TIMEOUT } from "../utils/constants";
 beforeEach(() => {
   LabelStudio.addFeatureFlagsOnPageLoad({
     fflag_fix_front_leap_32_zoom_perf_190923_short: true,
-    fflag_fix_front_dev_3793_relative_coords_short: true,
   });
 });
 

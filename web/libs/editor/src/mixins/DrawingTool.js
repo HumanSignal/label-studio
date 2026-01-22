@@ -3,7 +3,7 @@ import { types } from "mobx-state-tree";
 import Utils from "../utils";
 import throttle from "lodash/throttle";
 import { MIN_SIZE } from "../tools/Base";
-import { FF_DEV_3391, FF_DEV_3793, isFF } from "../utils/feature-flags";
+import { FF_DEV_3391, isFF } from "../utils/feature-flags";
 import { ff } from "@humansignal/core";
 import { RELATIVE_STAGE_HEIGHT, RELATIVE_STAGE_WIDTH } from "../components/ImageView/Image";
 
@@ -57,16 +57,9 @@ const DrawingTool = types
         return {};
       },
       get MIN_SIZE() {
-        if (isFF(FF_DEV_3793)) {
-          return {
-            X: (MIN_SIZE.X / self.obj.stageScale / self.obj.stageWidth) * RELATIVE_STAGE_WIDTH,
-            Y: (MIN_SIZE.Y / self.obj.stageScale / self.obj.stageHeight) * RELATIVE_STAGE_HEIGHT,
-          };
-        }
-
         return {
-          X: MIN_SIZE.X / self.obj.stageScale,
-          Y: MIN_SIZE.Y / self.obj.stageScale,
+          X: (MIN_SIZE.X / self.obj.stageScale / self.obj.stageWidth) * RELATIVE_STAGE_WIDTH,
+          Y: (MIN_SIZE.Y / self.obj.stageScale / self.obj.stageHeight) * RELATIVE_STAGE_HEIGHT,
         };
       },
       /**
@@ -275,8 +268,8 @@ const TwoPointsDrawingTool = DrawingTool.named("TwoPointsDrawingTool")
 
         if (!shape) return;
         const isEllipse = shape.type.includes("ellipse");
-        const maxStageWidth = isFF(FF_DEV_3793) ? RELATIVE_STAGE_WIDTH : self.obj.stageWidth;
-        const maxStageHeight = isFF(FF_DEV_3793) ? RELATIVE_STAGE_HEIGHT : self.obj.stageHeight;
+        const maxStageWidth = RELATIVE_STAGE_WIDTH;
+        const maxStageHeight = RELATIVE_STAGE_HEIGHT;
 
         let { x1, y1, x2, y2 } = isEllipse
           ? {
@@ -364,13 +357,8 @@ const TwoPointsDrawingTool = DrawingTool.named("TwoPointsDrawingTool")
         if (!self.canStartDrawing()) return;
         if (!self.isAllowedInteraction(ev)) return;
 
-        let dX = self.defaultDimensions.width;
-        let dY = self.defaultDimensions.height;
-
-        if (isFF(FF_DEV_3793)) {
-          dX = self.obj.canvasToInternalX(dX);
-          dY = self.obj.canvasToInternalY(dY);
-        }
+        const dX = self.obj.canvasToInternalX(self.defaultDimensions.width);
+        const dY = self.obj.canvasToInternalY(self.defaultDimensions.height);
 
         if (currentMode === DEFAULT_MODE) {
           self.startDrawing(x, y);
@@ -488,13 +476,8 @@ const MultipleClicksDrawingTool = DrawingTool.named("MultipleClicksMixin")
 
       drawDefault() {
         const { x, y } = startPoint;
-        let dX = self.defaultDimensions.length;
-        let dY = self.defaultDimensions.length;
-
-        if (isFF(FF_DEV_3793)) {
-          dX = self.obj.canvasToInternalX(dX);
-          dY = self.obj.canvasToInternalY(dY);
-        }
+        const dX = self.obj.canvasToInternalX(self.defaultDimensions.length);
+        const dY = self.obj.canvasToInternalY(self.defaultDimensions.length);
 
         self.nextPoint(x + dX, y);
         self.nextPoint(x + dX / 2, y + Math.sin(Math.PI / 3) * dY);
@@ -547,8 +530,8 @@ const ThreePointsDrawingTool = DrawingTool.named("ThreePointsDrawingTool")
         const shape = self.getCurrentArea();
 
         if (!shape) return;
-        const maxStageWidth = isFF(FF_DEV_3793) ? RELATIVE_STAGE_WIDTH : self.obj.stageWidth;
-        const maxStageHeight = isFF(FF_DEV_3793) ? RELATIVE_STAGE_HEIGHT : self.obj.stageHeight;
+        const maxStageWidth = RELATIVE_STAGE_WIDTH;
+        const maxStageHeight = RELATIVE_STAGE_HEIGHT;
 
         let { x1, y1, x2, y2 } = Utils.Image.reverseCoordinates({ x: shape.startX, y: shape.startY }, { x, y });
 
@@ -627,13 +610,8 @@ const ThreePointsDrawingTool = DrawingTool.named("ThreePointsDrawingTool")
         if (!self.canStartDrawing()) return;
         if (!self.isAllowedInteraction(ev)) return;
 
-        let dX = self.defaultDimensions.width;
-        let dY = self.defaultDimensions.height;
-
-        if (isFF(FF_DEV_3793)) {
-          dX = self.obj.canvasToInternalX(dX);
-          dY = self.obj.canvasToInternalY(dY);
-        }
+        const dX = self.obj.canvasToInternalX(self.defaultDimensions.width);
+        const dY = self.obj.canvasToInternalY(self.defaultDimensions.height);
 
         if (currentMode === DEFAULT_MODE) {
           self.startDrawing(x, y);

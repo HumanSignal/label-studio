@@ -1,8 +1,7 @@
-"""This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
-"""
+"""This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license."""
+
 import logging
 
-from core.feature_flags import flag_set
 from core.mixins import GetParentObjectMixin
 from core.permissions import ViewClassPermission, all_permissions
 from core.utils.common import is_community
@@ -21,7 +20,7 @@ from drf_spectacular.utils import OpenApiExample, OpenApiParameter, OpenApiRespo
 from projects.functions.stream_history import fill_history_annotation
 from projects.models import Project
 from rest_framework import generics, viewsets
-from rest_framework.exceptions import PermissionDenied
+from rest_framework.exceptions import PermissionDenied, ValidationError
 from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
 from rest_framework.response import Response
 from tasks.models import Annotation, AnnotationDraft, Prediction, Task
@@ -343,13 +342,10 @@ class TaskAPI(generics.RetrieveUpdateDestroyAPIView):
         if review:
             kwargs = {'fields_for_evaluation': ['annotators', 'reviewed']}
         else:
-            if flag_set('fflag_fix_back_bros_182_api_task_optimizations', user=self.request.user):
-                kwargs = {
-                    'all_fields': True,
-                    'excluded_fields_for_evaluation': self.get_excluded_fields_for_evaluation(),
-                }
-            else:
-                kwargs = {'all_fields': True}
+            kwargs = {
+                'all_fields': True,
+                'excluded_fields_for_evaluation': self.get_excluded_fields_for_evaluation(),
+            }
         project = self.request.query_params.get('project') or self.request.data.get('project')
         if not project:
             project = task.project.id
@@ -524,10 +520,10 @@ class AnnotationAPI(generics.RetrieveUpdateDestroyAPIView):
         tags=['Annotations'],
         summary='Create annotation',
         description="""
-        Add annotations to a task like an annotator does. The content of the result field depends on your 
-        labeling configuration. For example, send the following data as part of your POST 
+        Add annotations to a task like an annotator does. The content of the result field depends on your
+        labeling configuration. For example, send the following data as part of your POST
         request to send an empty annotation with the ID of the user who completed the task:
-        
+
         ```json
         {
         "result": {},
@@ -536,7 +532,7 @@ class AnnotationAPI(generics.RetrieveUpdateDestroyAPIView):
         "lead_time": 0,
         "task": 0
         "completed_by": 123
-        } 
+        }
         ```
         """,
         parameters=[
@@ -597,6 +593,14 @@ class AnnotationsListAPI(GetParentObjectMixin, generics.ListCreateAPIView):
         task = self.parent_object
         # annotator has write access only to annotations and it can't be checked it after serializer.save()
         user = self.request.user
+
+        # Check if task is being skipped and if it's allowed
+        was_cancelled_get = bool_from_request(self.request.GET, 'was_cancelled', False)
+        was_cancelled_data = self.request.data.get('was_cancelled', False)
+        is_skipping = was_cancelled_get or was_cancelled_data
+
+        if is_skipping and not task.can_be_skipped():
+            raise ValidationError({'detail': 'This task cannot be skipped.'})
 
         # updates history
         result = ser.validated_data.get('result')

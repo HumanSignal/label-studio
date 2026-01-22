@@ -112,9 +112,7 @@ const HotkeyHelpModal = ({ sectionsToShow }: HotkeyHelpModalProps) => {
               {subgroups.map((subgroup) => (
                 <div
                   key={subgroup}
-                  className={clsx(
-                    subgroup !== "default" && "mt-4 pt-2 border rounded-md border-gray-200 dark:border-gray-700 p-3",
-                  )}
+                  className={clsx(subgroup !== "default" && "mt-4 pt-2 border rounded-md border-neutral-border p-3")}
                 >
                   {/* Subgroup Header */}
                   {subgroup !== "default" && (

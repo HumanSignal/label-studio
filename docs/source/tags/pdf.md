@@ -74,6 +74,16 @@ Labeling configuration for PDFs:
   "pdf": "https://app.humansignal.com/static/samples/opossum-cuteness.pdf"
 }
 ```
+
+#### PDF styling
+
+PDF renders the full height of the current page. If you want to limit it you can apply styles to the `.htx-pdf` class to set the height. Good default would be `calc(100vh - 250px)` but you might need to adjust the number of pixels based on extra elements you have in config:
+```xml
+<Style>
+  .htx-pdf { height: calc(100vh - 250px); }
+</Style>
+```
+
 ### OcrLabels 
 
 This tag adds bounding boxes to the PDF and allows you to assign labels to them. 

@@ -38,7 +38,7 @@ To resolve this issue, update the host specified as an environment variable or w
 
 * If you want to upload a large volume of data (thousands of items), consider doing that at a time when people are not labeling or use a different database backend such as PostgreSQL or Redis. You can run Docker Compose from the root directory of Label Studio to use PostgreSQL: `docker-compose up -d`, or see [Sync data from cloud or database storage](storage). 
 
-* If you are using a labeling schema that has many thousands of labels, consider using an [external taxonomy](/tags/taxonomy) instead. 
+* If you are using a labeling schema that has many thousands of labels, consider using an [external taxonomy](/tags/taxonomy.html) instead. 
 
 ### Image/audio/resource loading error while labeling
 

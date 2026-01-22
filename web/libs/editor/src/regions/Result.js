@@ -37,7 +37,6 @@ const resultTypes = [
   "pairwise",
   "videorectangle",
   "ranker",
-  "custominterface",
 ];
 
 const resultValues = {
@@ -66,7 +65,6 @@ const resultValues = {
   bitmasklabels: types.maybe(types.array(types.string)),
   taxonomy: types.frozen(), // array of arrays of strings
   sequence: types.frozen(),
-  custom: types.maybe(types.frozen()), // for CustomInterface regions
 };
 
 const Result = types

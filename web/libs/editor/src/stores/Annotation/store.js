@@ -16,6 +16,10 @@ import { HistoryItem } from "./HistoryItem";
 
 const SelectedItem = types.union(Annotation, HistoryItem);
 
+const localStorageKeys = {
+  viewingAll: "annotation-store-viewing-all",
+};
+
 const AnnotationStoreModel = types
   .model("AnnotationStore", {
     selected: types.maybeNull(types.reference(SelectedItem)),
@@ -29,7 +33,13 @@ const AnnotationStoreModel = types
     predictions: types.array(Annotation),
     history: types.array(HistoryItem),
 
-    viewingAllAnnotations: types.optional(types.boolean, false),
+    viewingAllAnnotations: types.optional(
+      types.boolean,
+      // Initialize from localStorage, defaulting to false if not set
+      () => {
+        return window.localStorage.getItem(localStorageKeys.viewingAll) === "true";
+      },
+    ),
 
     validation: types.maybeNull(types.array(ValidationError)),
   })
@@ -42,12 +52,18 @@ const AnnotationStoreModel = types
     },
 
     get viewingAll() {
+      // Even if we have View All flag stored as true, but we are in environment without it
+      // or if we are not ready yet — don't go into View All mode, it will be broken.
+      if (!self.initialized) return false;
+      if (!self.store.hasInterface("annotations:view-all")) return false;
       return self.viewingAllAnnotations;
     },
   }))
   .actions((self) => {
     function toggleViewingAll() {
       self.viewingAllAnnotations = !self.viewingAllAnnotations;
+      // Persist the state to localStorage
+      window.localStorage.setItem(localStorageKeys.viewingAll, String(self.viewingAllAnnotations));
 
       if (self.viewingAllAnnotations) {
         if (self.selected) {
@@ -101,6 +117,8 @@ const AnnotationStoreModel = types
 
     function unselectViewingAll() {
       self.viewingAllAnnotations = false;
+      // Persist the state to localStorage
+      window.localStorage.setItem(localStorageKeys.viewingAll, String(self.viewingAllAnnotations));
     }
 
     function _unselectAll() {
@@ -110,6 +128,7 @@ const AnnotationStoreModel = types
       }
     }
 
+    // used only in old version of View All — Grid.jsx
     function _selectItem(item) {
       self._unselectAll();
       item.editable = false;
@@ -118,8 +137,10 @@ const AnnotationStoreModel = types
       item.updateObjects();
     }
 
+    // Select annotation or prediction
     function selectItem(id, list, resetHistory = true) {
-      unselectViewingAll();
+      // might be better to protect this change with FF_SIMPLE_INIT
+      // unselectViewingAll();
 
       self._unselectAll();
 
@@ -147,6 +168,13 @@ const AnnotationStoreModel = types
      * @param {*} id
      */
     function selectAnnotation(id, options = {}) {
+      // `selectAnnotation()` is used a lot during init, usually for all annotations.
+      // It should only exit View All mode when it's explicitly requested.
+      // All other calls are just setting things up and should not affect View All mode.
+      if (options.exitViewAll) {
+        unselectViewingAll();
+      }
+
       if (!self.annotations.length) return null;
 
       const { selected } = self;
@@ -160,10 +188,13 @@ const AnnotationStoreModel = types
       return c;
     }
 
-    function selectPrediction(id) {
-      const p = selectItem(id, self.predictions);
+    function selectPrediction(id, options = {}) {
+      // The same logic as in `selectAnnotation()`
+      if (options.exitViewAll) {
+        unselectViewingAll();
+      }
 
-      return p;
+      return selectItem(id, self.predictions);
     }
 
     function clearDeletedParents(annotation) {

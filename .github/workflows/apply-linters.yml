@@ -35,14 +35,14 @@ jobs:
             > [Workflow run](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
 
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           token: ${{ secrets.GIT_PAT }}
           ref: ${{ inputs.branch_name }}
           repository: "${{ github.event.client_payload.pull_request.head.repo.full_name || github.repository }}"
 
       - name: Checkout Actions Hub
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           token: ${{ secrets.GIT_PAT }}
           repository: HumanSignal/actions-hub

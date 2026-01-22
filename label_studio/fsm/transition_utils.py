@@ -51,19 +51,25 @@ def get_available_transitions(entity: Model, user=None, validate: bool = False) 
             # Build minimal context for validation
             from .transitions import TransitionContext
 
-            # Get target state from class or instance
-            target_state = transition_class.get_target_state()
-            if target_state is None:
-                # Need to create an instance to get target_state
-                # For validation purposes, we try to create with minimal/default data
-                try:
-                    temp_instance = transition_class()
-                    target_state = temp_instance.target_state
-                except (TypeError, ValueError):
-                    # Can't instantiate without required data - include in results
-                    # since we can't validate state transitions, we assume they're available
-                    valid_transitions[name] = transition_class
-                    continue
+            # Get target state from instance (may need entity context)
+            # For validation purposes, we try to create with minimal/default data
+            try:
+                temp_instance = transition_class()
+                # Create minimal context for dynamic target_state computation
+                minimal_context = TransitionContext(
+                    entity=entity,
+                    current_user=user,
+                    current_state_object=current_state_object,
+                    current_state=current_state,
+                    target_state=None,  # Will be computed
+                    organization_id=getattr(entity, 'organization_id', None),
+                )
+                target_state = temp_instance.get_target_state(minimal_context)
+            except (TypeError, ValueError):
+                # Can't instantiate without required data - include in results
+                # since we can't validate state transitions, we assume they're available
+                valid_transitions[name] = transition_class
+                continue
 
             context = TransitionContext(
                 entity=entity,
@@ -185,8 +191,23 @@ def get_entity_state_flow(entity: Model) -> List[Dict[str, Any]]:
     for transition_name, transition_class in transitions.items():
         # Create instance to get target state
         try:
+            from .transitions import TransitionContext
+
             transition = transition_class()
-            target = transition.target_state
+            # Create minimal context for dynamic target_state computation
+            minimal_context = (
+                TransitionContext(
+                    entity=entity,
+                    current_user=None,
+                    current_state_object=None,
+                    current_state=None,
+                    target_state=None,  # Will be computed
+                    organization_id=getattr(entity, 'organization_id', None),
+                )
+                if hasattr(entity, 'pk')
+                else None
+            )
+            target = transition.get_target_state(minimal_context)
             states.add(target)
 
             flows.append(

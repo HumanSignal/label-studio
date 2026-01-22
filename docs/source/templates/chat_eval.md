@@ -97,7 +97,7 @@ The `Chat` tag provides an interface where the annotator can type and send messa
 
   You can customize this parameter with `user`, `assistant`, `system`, `tool`, and `developer`. 
 
-For more information and additional parameters, see the [Chat tag](/tags/chat). 
+For more information and additional parameters, see the [Chat tag](/tags/chat.html). 
 
 
 ## Input data
@@ -146,11 +146,11 @@ You can also import demo chat messages as follows:
 !!! attention
     The chat messages that you import are not selectable. This means that you cannot edit them or apply annotations (ratings, choices, etc) to them.
 
-    You can only select and annotate messages that are added to the chat by an annotator or that are imported as [predictions](/tags/chat#Prediction-format).
+    You can only select and annotate messages that are added to the chat by an annotator or that are imported as [predictions](/tags/chat.html#Prediction-format).
 
 ## Related tags
 
-* [Chat](/tags/chat)
+* [Chat](/tags/chat.html)
 * [Style](/tags/style)
 * [View](/tags/view)
 * [Text](/tags/text)

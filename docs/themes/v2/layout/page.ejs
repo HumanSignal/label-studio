@@ -1,5 +1,5 @@
 <% const isEnterpriseTheme=theme.tier==="enterprise" %>
-<% const tocPageTypes = page.type === "guide" || page.type === "blog" || page.type === "templates" || page.type === "tags" || page.type === "plugins" %>
+<% const tocPageTypes = page.type === "guide" || page.type === "blog" || page.type === "templates" || page.type === "tags" || page.type === "plugins" || page.tutorial %>
 
 <% const formattedContent=removeContent(page.content) %>
 <% const tocContent=replaceContent(formattedContent) %>

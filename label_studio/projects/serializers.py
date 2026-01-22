@@ -3,6 +3,8 @@
 import bleach
 from constants import SAFE_HTML_ATTRIBUTES, SAFE_HTML_TAGS
 from django.db.models import Q
+from drf_spectacular.utils import extend_schema_serializer
+from fsm.serializer_fields import FSMStateField
 from label_studio_sdk.label_interface import LabelInterface
 from label_studio_sdk.label_interface.control_tags import (
     BrushLabelsTag,
@@ -42,6 +44,7 @@ class CreatedByFromContext:
         return serializer_field.context.get('created_by')
 
 
+@extend_schema_serializer(deprecate_fields=['show_ground_truth_first'])
 class ProjectSerializer(FlexFieldsModelSerializer):
     """Serializer get numbers from project queryset annotation,
     make sure, that you use correct one(Project.objects.with_counts())
@@ -97,6 +100,7 @@ class ProjectSerializer(FlexFieldsModelSerializer):
 
     queue_total = serializers.SerializerMethodField()
     queue_done = serializers.SerializerMethodField()
+    state = FSMStateField(read_only=True)  # FSM state - automatically uses annotation if present
 
     @property
     def user_id(self):
@@ -234,6 +238,7 @@ class ProjectSerializer(FlexFieldsModelSerializer):
             'total_predictions_number',
             'sampling',
             'show_ground_truth_first',
+            'annotator_evaluation_enabled',
             'show_overlap_first',
             'overlap_cohort_percentage',
             'task_data_login',
@@ -249,6 +254,7 @@ class ProjectSerializer(FlexFieldsModelSerializer):
             'queue_total',
             'queue_done',
             'config_suitable_for_bulk_annotation',
+            'state',
         ]
 
     def validate_label_config(self, value):

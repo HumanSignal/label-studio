@@ -17,7 +17,7 @@ from datetime import timedelta
 
 from django.core.exceptions import ImproperlyConfigured
 
-from label_studio.core.utils.params import get_bool_env, get_env_list
+from label_studio.core.utils.params import get_bool_env, get_env, get_env_list, has_env
 
 formatter = 'standard'
 JSON_LOG = get_bool_env('JSON_LOG', False)
@@ -69,6 +69,10 @@ LOGGING = {
             'handlers': ['console'],
             'level': 'ERROR',
         },
+        'faker': {
+            'level': 'WARNING',
+            'propagate': False,
+        },
     },
 }
 
@@ -76,8 +80,11 @@ LOGGING = {
 if not logging.getLogger().hasHandlers():
     logging.basicConfig(level=logging.DEBUG, format='%(message)s')
 
+# Suppress verbose Faker locale messages early, before Faker is imported
+logging.getLogger('faker').setLevel(logging.WARNING)
+logging.getLogger('faker.providers').setLevel(logging.WARNING)
+
 from label_studio.core.utils.io import get_data_dir
-from label_studio.core.utils.params import get_bool_env, get_env
 
 logger = logging.getLogger(__name__)
 SILENCED_SYSTEM_CHECKS = []
@@ -140,6 +147,10 @@ logger.info('=> Database and media directory: %s', BASE_DATA_DIR)
 
 # This indicates whether the code is running in a Continuous Integration environment.
 CI = get_bool_env('CI', False)
+
+# Control whether async SQL migrations can be scheduled (SCHEDULED status) instead of running immediately.
+# If False, migrations that would normally be scheduled will be executed immediately.
+ALLOW_SCHEDULED_MIGRATIONS = get_bool_env('ALLOW_SCHEDULED_MIGRATIONS', False)
 
 # Databases
 # https://docs.djangoproject.com/en/2.1/ref/settings/#databases
@@ -342,6 +353,9 @@ TEMPLATES = [
     }
 ]
 
+# OSS version does not support Redis
+REDIS_ENABLED = False
+
 # RQ
 RQ_QUEUES = {
     'critical': {
@@ -398,6 +412,7 @@ SPECTACULAR_SETTINGS = {
     ],
     'CONTACT': {'url': 'https://labelstud.io'},
     'X_LOGO': {'url': '../../static/icons/logo-black.svg'},
+    'ENUM_ADD_EXPLICIT_BLANK_NULL_CHOICE': False,
 }
 
 SENTRY_DSN = get_env('SENTRY_DSN', None)
@@ -590,6 +605,22 @@ EXPERIMENTAL_FEATURES = get_bool_env('EXPERIMENTAL_FEATURES', False)
 USE_ENFORCE_CSRF_CHECKS = get_bool_env('USE_ENFORCE_CSRF_CHECKS', True)  # False is for tests
 CLOUD_FILE_STORAGE_ENABLED = False
 
+if (
+    VERSION_EDITION == 'Community'
+    and not has_env('LOCAL_FILES_DOCUMENT_ROOT')
+    and not has_env('LOCAL_FILES_SERVING_ENABLED')
+):
+    from label_studio.io_storages.localfiles.functions import autodetect_local_files_root
+
+    _autodetected_root = autodetect_local_files_root()
+    if _autodetected_root:
+        LOCAL_FILES_DOCUMENT_ROOT = _autodetected_root
+        LOCAL_FILES_SERVING_ENABLED = True
+        logger.info(
+            'LOCAL_FILES_DOCUMENT_ROOT auto-configured to %s and LOCAL_FILES_SERVING_ENABLED set to true.',
+            LOCAL_FILES_DOCUMENT_ROOT,
+        )
+
 IO_STORAGES_IMPORT_LINK_NAMES = [
     'io_storages_s3importstoragelink',
     'io_storages_gcsimportstoragelink',
@@ -633,6 +664,7 @@ PREPROCESS_FIELD_NAME = 'data_manager.functions.preprocess_field_name'
 INTERACTIVE_DATA_SERIALIZER = 'data_export.serializers.BaseExportDataSerializerForInteractive'
 PROJECT_IMPORT_PERMISSION = 'projects.permissions.ProjectImportPermission'
 DELETE_TASKS_ANNOTATIONS_POSTPROCESS = None
+PROJECT_SAVE_DIMENSIONS_POSTPROCESS = None
 FEATURE_FLAGS_GET_USER_REPR = 'core.feature_flags.utils.get_user_repr'
 FEATURE_FLAGS_GET_USER_REPR_FROM_ORGANIZATION = 'core.feature_flags.utils.get_user_repr_from_organization'
 
@@ -887,8 +919,8 @@ IMPORT_STORAGE_SERIALIZER_VALIDATE = None
 
 # User activity Redis caching settings
 USER_ACTIVITY_REDIS_KEY_PREFIX = get_env('USER_ACTIVITY_REDIS_KEY_PREFIX', 'user_activity')
-USER_ACTIVITY_BATCH_SIZE = int(get_env('USER_ACTIVITY_BATCH_SIZE', '100'))
-USER_ACTIVITY_SYNC_THRESHOLD = int(get_env('USER_ACTIVITY_SYNC_THRESHOLD', '500'))
+USER_ACTIVITY_BATCH_SIZE = int(get_env('USER_ACTIVITY_BATCH_SIZE', 200))
+USER_ACTIVITY_SYNC_THRESHOLD = int(get_env('USER_ACTIVITY_SYNC_THRESHOLD', 1000))
 USER_ACTIVITY_REDIS_TTL = int(get_env('USER_ACTIVITY_REDIS_TTL', '86400'))  # 24 hours
 
 # QuerySet iterator settings
@@ -900,6 +932,9 @@ DM_MAX_USERS_TO_DISPLAY = int(get_env('DM_MAX_USERS_TO_DISPLAY', 10))
 
 # Base FSM (Finite State Machine) Configuration for Label Studio
 FSM_CACHE_TTL = 300  # Cache TTL in seconds (5 minutes)
+FSM_SYNC_PROJECT_STATE = 'fsm.project_transitions.sync_project_state'
+FSM_INFERENCE_FUNCTION = 'fsm.state_inference._get_or_infer_state'
+FSM_INITIALIZATION_TRANSITION_NAME = 'fsm.utils._get_initialization_transition_name'
 
 # Used for async migrations. In LSE this is set to a real queue name, including here so we
 # can use settings.SERVICE_QUEUE_NAME in async migrations in LSO

@@ -90,7 +90,7 @@ export const isSimplePoint = (point: PointInput): point is SimplePoint => {
  * @returns True if point is a BezierPoint object
  */
 export const isBezierPoint = (point: PointInput): point is BezierPoint => {
-  return typeof point === "object" && point !== null && "x" in point && "y" in point && "id" in point;
+  return typeof point === "object" && point !== null && "x" in point && "y" in point;
 };
 
 /**
@@ -121,13 +121,14 @@ export const normalizePoints = (points: PointInput[]): BezierPoint[] => {
       // Already in BezierPoint format, ensure it has proper prevPointId
       const newPoint = {
         ...point,
+        id: point.id || generatePointId(),
         prevPointId: point.prevPointId || (index > 0 ? lastPointId : undefined),
       };
       lastPointId = newPoint.id;
       return newPoint;
     }
     // Fallback for any other format
-    throw new Error(`Invalid point format at index ${index}`);
+    throw new Error(`Invalid point format at index ${index}: ${JSON.stringify(point)}`);
   });
 };
 

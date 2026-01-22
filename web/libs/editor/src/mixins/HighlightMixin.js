@@ -1,7 +1,7 @@
 import { types, getRoot } from "mobx-state-tree";
 
 import Utils from "../utils";
-import { defaultStyle } from "../core/Constants";
+import Constants, { defaultStyle } from "../core/Constants";
 import { isDefined } from "../utils/utilities";
 
 const HIGHLIGHT_CN = "htx-highlight";
@@ -264,15 +264,21 @@ export const HighlightMixin = types
     getColors() {
       const labelColor = self.parent.highlightcolor || (self.style || self.tag || defaultStyle).fillcolor;
 
-      const background = Utils.Colors.convertToRGBA(labelColor ?? "#DA935D", LABEL_COLOR_ALPHA);
-      const activeBackground = Utils.Colors.convertToRGBA(labelColor ?? "#DA935D", LABEL_COLOR_ALPHA_ACTIVE);
+      const background = Utils.Colors.convertToRGBA(labelColor ?? Constants.LABEL_BACKGROUND, LABEL_COLOR_ALPHA);
+      const activeBackground = Utils.Colors.convertToRGBA(
+        labelColor ?? Constants.LABEL_BACKGROUND,
+        LABEL_COLOR_ALPHA_ACTIVE,
+      );
       // Extended/reduced parts of the region should be colored differently in a lighter color.
       // With extension it's simple, because it's the browser selection, so we just set a different color to it.
       // But to color the reduced part we use opacity of overlayed blocks — region hightlight and browser selection,
       // and multiplication of them should be the same as original activeBackground.
       // Region color should also be different from the original one, and for simplicity we use just one color.
       // So this color should have an opacity twice closer to 1 than the original one: 1 - (1 - alpha) * 2
-      const resizeBackground = Utils.Colors.convertToRGBA(labelColor ?? "#DA935D", 2 * LABEL_COLOR_ALPHA_ACTIVE - 1);
+      const resizeBackground = Utils.Colors.convertToRGBA(
+        labelColor ?? Constants.LABEL_BACKGROUND,
+        2 * LABEL_COLOR_ALPHA_ACTIVE - 1,
+      );
       const activeText = Utils.Colors.contrastColor(activeBackground);
 
       return {

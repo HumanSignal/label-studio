@@ -1,5 +1,5 @@
 import type React from "react";
-import { forwardRef } from "react";
+import { forwardRef, useState, useEffect, useRef } from "react";
 import { cnm } from "../../utils/utils";
 import styles from "./typography.module.scss";
 
@@ -51,14 +51,36 @@ type TypographyProps<V extends Variant = Variant> = {
   className?: string;
   fontStyle?: "normal" | "italic";
   style?: React.CSSProperties;
-  children: React.ReactNode;
+  children?: React.ReactNode;
+  truncateLines?: number;
+  expandable?: boolean;
+  expandLabel?: string;
+  collapseLabel?: string;
+  expandToggleClassName?: string;
 } & Omit<React.HTMLAttributes<HTMLElement>, "style" | "className" | "children">;
 
 const DEFAULT_TAG = "p";
 const DEFAULT_CLASS = "typography-body-medium";
 
 const Typography = forwardRef<HTMLElement, TypographyProps>(
-  ({ variant = "body", size = SIZES.MEDIUM, as, className, children, fontStyle = "normal", style, ...rest }, ref) => {
+  (
+    {
+      variant = "body",
+      size = SIZES.MEDIUM,
+      as,
+      className,
+      children,
+      fontStyle = "normal",
+      style,
+      truncateLines,
+      expandable = true,
+      expandLabel = "Show more",
+      collapseLabel = "Show less",
+      expandToggleClassName,
+      ...rest
+    },
+    ref,
+  ) => {
     const variantConfig = config[variant];
     const tagMap = variantConfig?.tag;
     const tag = tagMap && size in tagMap ? tagMap[size as keyof typeof tagMap] : DEFAULT_TAG;
@@ -66,15 +88,85 @@ const Typography = forwardRef<HTMLElement, TypographyProps>(
     const baseClass = isValid ? `typography-${variant}-${size}` : DEFAULT_CLASS;
     const Tag = (as || tag) as React.ElementType;
 
+    const hasTruncation = truncateLines !== undefined && truncateLines > 0;
+
+    // Only set up truncation logic if truncateLines is provided
+    const [isExpanded, setIsExpanded] = useState(false);
+    const [isClamped, setIsClamped] = useState(false);
+    const contentRef = useRef<HTMLElement | null>(null);
+
+    // Use internal ref for truncation, forwarded ref otherwise
+    const elementRef = hasTruncation ? contentRef : (ref as React.Ref<HTMLElement>);
+
+    // Check if content needs clamping using ResizeObserver
+    useEffect(() => {
+      if (!hasTruncation) return;
+
+      const el = contentRef.current;
+      if (!el) return;
+
+      const compute = () => {
+        const wasExpanded = isExpanded;
+        // Temporarily collapse to check if clamping is needed
+        if (wasExpanded) el.dataset.tmpCollapse = "1";
+        const needsClamp = el.scrollHeight > el.clientHeight + 1;
+        setIsClamped(needsClamp);
+        if (wasExpanded) el.dataset.tmpCollapse = "";
+      };
+
+      compute();
+      const ro = new ResizeObserver(() => compute());
+      ro.observe(el);
+      const onResize = () => compute();
+      window.addEventListener("resize", onResize);
+
+      return () => {
+        ro.disconnect();
+        window.removeEventListener("resize", onResize);
+      };
+    }, [hasTruncation, children, isExpanded]);
+
+    // Apply inline styles for line-clamping when needed
+    const clampStyles =
+      hasTruncation && !isExpanded
+        ? {
+            display: "-webkit-box",
+            WebkitLineClamp: truncateLines,
+            WebkitBoxOrient: "vertical" as const,
+            overflow: "hidden",
+            ...style,
+          }
+        : style;
+
     return (
-      <Tag
-        ref={ref}
-        className={cnm(styles[baseClass], fontStyle === "italic" && "italic", className)}
-        style={style}
-        {...rest}
-      >
-        {children}
-      </Tag>
+      <>
+        <Tag
+          ref={elementRef}
+          className={cnm(styles[baseClass], fontStyle === "italic" && "italic", className)}
+          style={clampStyles}
+          {...(hasTruncation && {
+            "data-tmp-collapse": !isExpanded ? undefined : "",
+            "aria-expanded": isExpanded,
+          })}
+          {...rest}
+        >
+          {children}
+        </Tag>
+        {hasTruncation && expandable && (isClamped || isExpanded) && (
+          <button
+            type="button"
+            onClick={() => setIsExpanded((v) => !v)}
+            className={cnm(
+              styles[baseClass],
+              "text-primary-content hover:text-primary-content-hover block mt-1",
+              expandToggleClassName,
+            )}
+            aria-expanded={isExpanded}
+          >
+            {isExpanded ? collapseLabel : expandLabel}
+          </button>
+        )}
+      </>
     );
   },
 );

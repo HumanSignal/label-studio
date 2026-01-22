@@ -1,11 +1,12 @@
 import type React from "react";
 import { Shape } from "react-konva";
 import type { BezierPoint } from "../types";
-import { GHOST_LINE_STYLING, DEFAULT_STROKE_COLOR } from "../constants";
+import { GHOST_LINE_STYLING, DEFAULT_STROKE_COLOR, HIT_RADIUS } from "../constants";
+import { findClosestPointOnPath, getDistance } from "../eventHandlers/utils";
 
 interface GhostLineProps {
   initialPoints: BezierPoint[];
-  cursorPosition: { x: number; y: number } | null;
+  cursorPositionRef: React.RefObject<{ x: number; y: number } | null>;
   draggedControlPoint: { pointIndex: number; controlIndex: number } | null;
   draggedPointIndex?: number | null;
   isDraggingNewBezier?: boolean;
@@ -22,11 +23,15 @@ interface GhostLineProps {
   stroke?: string;
   pixelSnapping?: boolean;
   drawingDisabled?: boolean;
+  // Non-hover-related disabled states (for real-time checks)
+  isShiftKeyHeld?: boolean;
+  transformMode?: boolean;
+  effectiveSelectedPointsSize?: number;
 }
 
 export const GhostLine: React.FC<GhostLineProps> = ({
   initialPoints,
-  cursorPosition,
+  cursorPositionRef,
   draggedControlPoint,
   draggedPointIndex = null,
   isDraggingNewBezier = false,
@@ -37,11 +42,15 @@ export const GhostLine: React.FC<GhostLineProps> = ({
   maxPoints,
   minPoints,
   skeletonEnabled,
+  selectedPointIndex = null,
   lastAddedPointId,
   activePointId = null,
   stroke = DEFAULT_STROKE_COLOR,
   pixelSnapping = false,
   drawingDisabled = false,
+  isShiftKeyHeld = false,
+  transformMode = false,
+  effectiveSelectedPointsSize = 0,
 }) => {
   // Helper function to snap coordinates to pixel grid
   const snapToPixel = (point: { x: number; y: number }) => {
@@ -61,7 +70,17 @@ export const GhostLine: React.FC<GhostLineProps> = ({
       }
     }
 
-    // In non-skeleton mode, always use the last added point
+    // If a point is selected, use that point for the ghost line
+    if (
+      selectedPointIndex !== null &&
+      selectedPointIndex !== undefined &&
+      selectedPointIndex >= 0 &&
+      selectedPointIndex < initialPoints.length
+    ) {
+      return initialPoints[selectedPointIndex];
+    }
+
+    // In non-skeleton mode, use the last added point
     // Fallback to lastAddedPointId for backward compatibility
     if (lastAddedPointId) {
       const lastAddedPoint = initialPoints.find((p) => p.id === lastAddedPointId);
@@ -80,91 +99,13 @@ export const GhostLine: React.FC<GhostLineProps> = ({
 
   const activePoint = getActivePoint();
 
-  // Check if we're near the first or last point (for closing indicator)
-  const getClosingTarget = () => {
-    if (!allowClose || !cursorPosition || !activePoint) {
-      return null;
-    }
-
-    // Check if we can close the path based on point count or bezier points
-    const canClosePath = () => {
-      // Allow closing if we have more than 2 points
-      if (initialPoints.length > 2) {
-        return true;
-      }
-
-      // Allow closing if we have at least one bezier point
-      const hasBezierPoint = initialPoints.some((point) => point.isBezier);
-      if (hasBezierPoint) {
-        return true;
-      }
-
-      return false;
-    };
-
-    if (!canClosePath()) {
-      return null;
-    }
-
-    // Additional validation: ensure we meet the minimum points requirement
-    if (minPoints && initialPoints.length < minPoints) {
-      return null;
-    }
-
-    const firstPoint = initialPoints[0];
-    const lastPoint = initialPoints[initialPoints.length - 1];
-    const closeRadius = GHOST_LINE_STYLING.CLOSE_RADIUS / (transform.zoom * fitScale);
-
-    // Only show closing indicator if the active point is the first or last point
-    const isActivePointFirst = activePoint.id === firstPoint.id;
-    const isActivePointLast = activePoint.id === lastPoint.id;
-
-    if (!isActivePointFirst && !isActivePointLast) {
-      return null; // Active point is not first or last, no closing possible
-    }
-
-    const distanceToFirst = Math.sqrt((cursorPosition.x - firstPoint.x) ** 2 + (cursorPosition.y - firstPoint.y) ** 2);
-    const distanceToLast = Math.sqrt((cursorPosition.x - lastPoint.x) ** 2 + (cursorPosition.y - lastPoint.y) ** 2);
-
-    // If active point is first, show closing to last point when hovering near last
-    if (isActivePointFirst && distanceToLast <= closeRadius) {
-      return { point: lastPoint, index: initialPoints.length - 1 };
-    }
-
-    // If active point is last, show closing to first point when hovering near first
-    if (isActivePointLast && distanceToFirst <= closeRadius) {
-      return { point: firstPoint, index: 0 };
-    }
-
-    return null;
-  };
-
-  // Check if we should show the ghost line
-  const shouldShowGhostLine =
-    !drawingDisabled &&
-    cursorPosition &&
-    !draggedControlPoint &&
-    draggedPointIndex === null &&
-    !isDraggingNewBezier &&
-    !isPathClosed &&
-    (maxPoints === undefined || initialPoints.length < maxPoints) &&
-    activePoint &&
-    !getClosingTarget(); // Hide ghost line when green closing line is visible
-
-  // Always render if we have the necessary conditions for ghost line or closing indicator
-  // But allow rendering even when drawing is disabled if we're near a closing target
-  const closingTarget = getClosingTarget();
-  const shouldRender = cursorPosition && !isPathClosed && (!drawingDisabled || closingTarget);
-
-  if (!shouldRender) {
-    return null;
-  }
-
+  // Always render the Shape components - conditional logic happens inside sceneFunc
+  // This allows the ghost line to update via stage.batchDraw() without React re-renders
   return (
     <>
       {/* Ghost line from active point to cursor */}
       {/* Only show ghost line when not at max points */}
-      {shouldShowGhostLine && activePoint && (
+      {activePoint && (
         <Shape
           stroke={stroke}
           strokeWidth={GHOST_LINE_STYLING.STROKE_WIDTH}
@@ -174,11 +115,135 @@ export const GhostLine: React.FC<GhostLineProps> = ({
           dash={GHOST_LINE_STYLING.DASH}
           opacity={GHOST_LINE_STYLING.OPACITY}
           sceneFunc={(ctx, shape) => {
+            // Read cursor position from ref inside sceneFunc for real-time updates
+            const cursorPos = cursorPositionRef.current;
+
+            // Check all conditions for showing ghost line
+            // Show ghost line when we have points and cursor position, unless:
+            // - We're dragging something
+            // - Path is closed
+            // - Max points reached
+            // - Drawing is disabled (includes hovering over points, control points, or segments)
+            if (
+              !cursorPos ||
+              draggedControlPoint ||
+              draggedPointIndex !== null ||
+              isDraggingNewBezier ||
+              isPathClosed ||
+              (maxPoints !== undefined && initialPoints.length >= maxPoints)
+            ) {
+              return; // Don't draw anything
+            }
+
+            // Real-time hover detection: check if cursor is over points, control points, or segments
+            // This runs inside sceneFunc for real-time updates without React re-renders
+            const scale = transform.zoom * fitScale;
+
+            // Check if hovering over control points
+            if (cursorPos && initialPoints.length > 0) {
+              const controlPointHitRadius = HIT_RADIUS.CONTROL_POINT / scale;
+              for (let i = 0; i < initialPoints.length; i++) {
+                const point = initialPoints[i];
+                if (point.isBezier) {
+                  if (point.controlPoint1) {
+                    const distance = Math.sqrt(
+                      (cursorPos.x - point.controlPoint1.x) ** 2 + (cursorPos.y - point.controlPoint1.y) ** 2,
+                    );
+                    if (distance <= controlPointHitRadius) {
+                      return; // Hide ghost line when hovering over control points
+                    }
+                  }
+                  if (point.controlPoint2) {
+                    const distance = Math.sqrt(
+                      (cursorPos.x - point.controlPoint2.x) ** 2 + (cursorPos.y - point.controlPoint2.y) ** 2,
+                    );
+                    if (distance <= controlPointHitRadius) {
+                      return; // Hide ghost line when hovering over control points
+                    }
+                  }
+                }
+              }
+            }
+
+            // Check if hovering over points (except last point and first point when closing is possible)
+            if (cursorPos && initialPoints.length > 0) {
+              const selectionHitRadius = HIT_RADIUS.SELECTION / scale;
+              for (let i = 0; i < initialPoints.length; i++) {
+                const point = initialPoints[i];
+                const distance = Math.sqrt((cursorPos.x - point.x) ** 2 + (cursorPos.y - point.y) ** 2);
+                if (distance <= selectionHitRadius) {
+                  // Allow ghost line when hovering over the last point (so you can continue drawing)
+                  if (i === initialPoints.length - 1) {
+                    continue; // Don't hide ghost line for the last point
+                  }
+                  // Allow ghost line when hovering over the first point if path closing is possible
+                  if (i === 0 && allowClose && !isPathClosed) {
+                    continue; // Don't hide ghost line for the first point when closing is possible
+                  }
+                  // Hide ghost line when hovering over other points
+                  return;
+                }
+              }
+            }
+
+            // Check if hovering over path segments
+            if (cursorPos && initialPoints.length >= 2) {
+              const segmentHitRadius = HIT_RADIUS.SEGMENT / scale;
+              const closestPathPoint = findClosestPointOnPath(cursorPos, initialPoints, allowClose, isPathClosed);
+              if (closestPathPoint && getDistance(cursorPos, closestPathPoint.point) <= segmentHitRadius) {
+                return; // Hide ghost line when hovering over segments
+              }
+            }
+
+            // Hide ghost line when drawing is disabled for non-hover reasons (Shift key, transform mode, etc.)
+            // Note: Hover detection (points, control points, segments) is handled above in real-time
+            // Check non-hover-related disabled states directly (not from drawingDisabled which includes hover state)
+            // Only show ghost line if drawing is enabled OR if we have a selected point (for editing)
+            const isNonHoverDisabled = isShiftKeyHeld || transformMode || effectiveSelectedPointsSize > 1;
+            if (isNonHoverDisabled) {
+              // If we have a selected point, still show ghost line (useful for editing)
+              // Otherwise, hide it when drawing is disabled (but only for non-hover reasons)
+              // Hover detection is already handled above, so this only checks Shift key, transform mode, etc.
+              if (selectedPointIndex === null) {
+                return; // Don't draw anything - drawing is disabled and no point is selected
+              }
+            }
+
+            // Check if we should hide ghost line when closing indicator is visible
+            const closingTargetCheck = (() => {
+              if (!allowClose || !activePoint) return null;
+
+              const canClosePath = initialPoints.length > 2 || initialPoints.some((p) => p.isBezier);
+              if (!canClosePath || (minPoints && initialPoints.length < minPoints)) return null;
+
+              const firstPoint = initialPoints[0];
+              const lastPoint = initialPoints[initialPoints.length - 1];
+              const closeRadius = GHOST_LINE_STYLING.CLOSE_RADIUS / (transform.zoom * fitScale);
+
+              const isActivePointFirst = activePoint.id === firstPoint.id;
+              const isActivePointLast = activePoint.id === lastPoint.id;
+
+              if (!isActivePointFirst && !isActivePointLast) return null;
+
+              const distanceToFirst = Math.sqrt((cursorPos.x - firstPoint.x) ** 2 + (cursorPos.y - firstPoint.y) ** 2);
+              const distanceToLast = Math.sqrt((cursorPos.x - lastPoint.x) ** 2 + (cursorPos.y - lastPoint.y) ** 2);
+
+              if (isActivePointFirst && distanceToLast <= closeRadius) {
+                return { point: lastPoint, index: initialPoints.length - 1 };
+              }
+              if (isActivePointLast && distanceToFirst <= closeRadius) {
+                return { point: firstPoint, index: 0 };
+              }
+              return null;
+            })();
+
+            if (closingTargetCheck) return; // Hide ghost line when closing indicator should show
+
             ctx.beginPath();
             ctx.moveTo(activePoint.x, activePoint.y);
 
             // Snap cursor position to pixel grid if enabled
-            const snappedCursor = snapToPixel(cursorPosition);
+            const snappedCursor = snapToPixel(cursorPos);
 
             // Check if the active point is a bezier point and has control points
             if (activePoint.isBezier && activePoint.controlPoint1 && activePoint.controlPoint2) {
@@ -210,79 +275,108 @@ export const GhostLine: React.FC<GhostLineProps> = ({
       )}
 
       {/* Closing indicator when near first or last point - always show when appropriate */}
-      {(() => {
-        return (
-          closingTarget &&
-          activePoint && (
-            <Shape
-              stroke={GHOST_LINE_STYLING.CLOSING_INDICATOR_STROKE}
-              strokeWidth={GHOST_LINE_STYLING.CLOSING_INDICATOR_STROKE_WIDTH}
-              strokeScaleEnabled={false}
-              lineCap="round"
-              lineJoin="round"
-              dash={GHOST_LINE_STYLING.CLOSING_INDICATOR_DASH}
-              opacity={GHOST_LINE_STYLING.CLOSING_INDICATOR_OPACITY}
-              sceneFunc={(ctx, shape) => {
-                ctx.beginPath();
-                ctx.moveTo(activePoint.x, activePoint.y);
+      {activePoint && (
+        <Shape
+          stroke={GHOST_LINE_STYLING.CLOSING_INDICATOR_STROKE}
+          strokeWidth={GHOST_LINE_STYLING.CLOSING_INDICATOR_STROKE_WIDTH}
+          strokeScaleEnabled={false}
+          lineCap="round"
+          lineJoin="round"
+          dash={GHOST_LINE_STYLING.CLOSING_INDICATOR_DASH}
+          opacity={GHOST_LINE_STYLING.CLOSING_INDICATOR_OPACITY}
+          sceneFunc={(ctx, shape) => {
+            // Read cursor position and check for closing target inside sceneFunc
+            const cursorPos = cursorPositionRef.current;
+            if (!cursorPos || isPathClosed || (drawingDisabled && !allowClose)) return;
 
-                const targetPoint = closingTarget.point;
+            // Calculate closing target
+            const closingTarget = (() => {
+              if (!allowClose) return null;
 
-                // Check if either point is a bezier point and handle curves accordingly
-                if (
-                  activePoint.isBezier &&
-                  activePoint.controlPoint2 &&
-                  targetPoint.isBezier &&
-                  targetPoint.controlPoint1
-                ) {
-                  // Both points are bezier - use their control points
-                  ctx.bezierCurveTo(
-                    activePoint.controlPoint2.x,
-                    activePoint.controlPoint2.y,
-                    targetPoint.controlPoint1.x,
-                    targetPoint.controlPoint1.y,
-                    targetPoint.x,
-                    targetPoint.y,
-                  );
-                } else if (activePoint.isBezier && activePoint.controlPoint2) {
-                  // Only active point is bezier - calculate control point for target point
-                  const dx = targetPoint.x - activePoint.x;
-                  const dy = targetPoint.y - activePoint.y;
-                  const controlX = targetPoint.x - dx * GHOST_LINE_STYLING.BEZIER_CONTROL_MULTIPLIER;
-                  const controlY = targetPoint.y - dy * GHOST_LINE_STYLING.BEZIER_CONTROL_MULTIPLIER;
-                  ctx.bezierCurveTo(
-                    activePoint.controlPoint2.x,
-                    activePoint.controlPoint2.y,
-                    controlX,
-                    controlY,
-                    targetPoint.x,
-                    targetPoint.y,
-                  );
-                } else if (targetPoint.isBezier && targetPoint.controlPoint1) {
-                  // Only target point is bezier - calculate control point for active point
-                  const dx = targetPoint.x - activePoint.x;
-                  const dy = targetPoint.y - activePoint.y;
-                  const controlX = activePoint.x + dx * GHOST_LINE_STYLING.BEZIER_CONTROL_MULTIPLIER;
-                  const controlY = activePoint.y + dy * GHOST_LINE_STYLING.BEZIER_CONTROL_MULTIPLIER;
-                  ctx.bezierCurveTo(
-                    controlX,
-                    controlY,
-                    targetPoint.controlPoint1.x,
-                    targetPoint.controlPoint1.y,
-                    targetPoint.x,
-                    targetPoint.y,
-                  );
-                } else {
-                  // Both points are regular - straight line
-                  ctx.lineTo(targetPoint.x, targetPoint.y);
-                }
+              const canClosePath = initialPoints.length > 2 || initialPoints.some((p) => p.isBezier);
+              if (!canClosePath || (minPoints && initialPoints.length < minPoints)) return null;
 
-                ctx.strokeShape(shape);
-              }}
-            />
-          )
-        );
-      })()}
+              const firstPoint = initialPoints[0];
+              const lastPoint = initialPoints[initialPoints.length - 1];
+              const closeRadius = GHOST_LINE_STYLING.CLOSE_RADIUS / (transform.zoom * fitScale);
+
+              const isActivePointFirst = activePoint.id === firstPoint.id;
+              const isActivePointLast = activePoint.id === lastPoint.id;
+
+              if (!isActivePointFirst && !isActivePointLast) return null;
+
+              const distanceToFirst = Math.sqrt((cursorPos.x - firstPoint.x) ** 2 + (cursorPos.y - firstPoint.y) ** 2);
+              const distanceToLast = Math.sqrt((cursorPos.x - lastPoint.x) ** 2 + (cursorPos.y - lastPoint.y) ** 2);
+
+              if (isActivePointFirst && distanceToLast <= closeRadius) {
+                return { point: lastPoint, index: initialPoints.length - 1 };
+              }
+              if (isActivePointLast && distanceToFirst <= closeRadius) {
+                return { point: firstPoint, index: 0 };
+              }
+              return null;
+            })();
+
+            if (!closingTarget) return;
+
+            ctx.beginPath();
+            ctx.moveTo(activePoint.x, activePoint.y);
+
+            const targetPoint = closingTarget.point;
+
+            // Check if either point is a bezier point and handle curves accordingly
+            if (
+              activePoint.isBezier &&
+              activePoint.controlPoint2 &&
+              targetPoint.isBezier &&
+              targetPoint.controlPoint1
+            ) {
+              // Both points are bezier - use their control points
+              ctx.bezierCurveTo(
+                activePoint.controlPoint2.x,
+                activePoint.controlPoint2.y,
+                targetPoint.controlPoint1.x,
+                targetPoint.controlPoint1.y,
+                targetPoint.x,
+                targetPoint.y,
+              );
+            } else if (activePoint.isBezier && activePoint.controlPoint2) {
+              // Only active point is bezier - calculate control point for target point
+              const dx = targetPoint.x - activePoint.x;
+              const dy = targetPoint.y - activePoint.y;
+              const controlX = targetPoint.x - dx * GHOST_LINE_STYLING.BEZIER_CONTROL_MULTIPLIER;
+              const controlY = targetPoint.y - dy * GHOST_LINE_STYLING.BEZIER_CONTROL_MULTIPLIER;
+              ctx.bezierCurveTo(
+                activePoint.controlPoint2.x,
+                activePoint.controlPoint2.y,
+                controlX,
+                controlY,
+                targetPoint.x,
+                targetPoint.y,
+              );
+            } else if (targetPoint.isBezier && targetPoint.controlPoint1) {
+              // Only target point is bezier - calculate control point for active point
+              const dx = targetPoint.x - activePoint.x;
+              const dy = targetPoint.y - activePoint.y;
+              const controlX = activePoint.x + dx * GHOST_LINE_STYLING.BEZIER_CONTROL_MULTIPLIER;
+              const controlY = activePoint.y + dy * GHOST_LINE_STYLING.BEZIER_CONTROL_MULTIPLIER;
+              ctx.bezierCurveTo(
+                controlX,
+                controlY,
+                targetPoint.controlPoint1.x,
+                targetPoint.controlPoint1.y,
+                targetPoint.x,
+                targetPoint.y,
+              );
+            } else {
+              // Both points are regular - straight line
+              ctx.lineTo(targetPoint.x, targetPoint.y);
+            }
+
+            ctx.strokeShape(shape);
+          }}
+        />
+      )}
     </>
   );
 };

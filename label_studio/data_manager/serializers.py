@@ -1,12 +1,15 @@
-"""This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
-"""
+"""This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license."""
+
 import os
 
 import ujson as json
+from core.current_request import CurrentContext
+from core.feature_flags import flag_set
 from data_manager.models import Filter, FilterGroup, View
 from django.conf import settings
 from django.db import transaction
 from drf_spectacular.utils import extend_schema_field
+from fsm.serializer_fields import FSMStateField
 from projects.models import Project
 from rest_framework import serializers
 from tasks.models import Task
@@ -114,7 +117,7 @@ class FilterGroupSerializer(serializers.ModelSerializer):
             # Add child filter if exists (only one level of nesting)
             child_filters = filter_obj.children.all()
             if child_filters:
-                child = child_filters[0]   # Only support one child
+                child = child_filters[0]  # Only support one child
                 child_item = {
                     'filter': child.column,
                     'operator': child.operator,
@@ -225,7 +228,6 @@ class ViewSerializer(serializers.ModelSerializer):
         """
 
         def _create_recursive(data, parent=None, index=None):
-
             # Extract nested children early (if any) and remove them from payload
             child_filter = data.pop('child_filter', None)
 
@@ -434,6 +436,8 @@ class PredictionsDMFieldSerializer(serializers.SerializerMethodField):
 
 
 class DataManagerTaskSerializer(TaskSerializer):
+    """Data Manager Task Serializer with FSM state support."""
+
     predictions = PredictionsDMFieldSerializer(required=False, read_only=True)
     annotations = AnnotationsDMFieldSerializer(required=False, many=True, default=[], read_only=True)
     drafts = AnnotationDraftDMFieldSerializer(required=False, read_only=True)
@@ -454,13 +458,14 @@ class DataManagerTaskSerializer(TaskSerializer):
     avg_lead_time = serializers.FloatField(required=False)
     draft_exists = serializers.BooleanField(required=False)
     updated_by = UpdatedByDMFieldSerializer(required=False, read_only=True)
+    state = FSMStateField(read_only=True)  # FSM state - automatically uses annotation if present
 
     CHAR_LIMITS = 500
 
     class Meta:
         model = Task
         ref_name = 'data_manager_task_serializer'
-        exclude = ('precomputed_agreement',)
+        exclude = ('precomputed_agreement', 'allow_skip')
         expandable_fields = {'annotations': (AnnotationSerializer, {'many': True})}
 
     def to_representation(self, obj):
@@ -470,6 +475,13 @@ class DataManagerTaskSerializer(TaskSerializer):
             ret.pop('annotations', None)
         if not self.context.get('predictions'):
             ret.pop('predictions', None)
+        # Remove state field if feature flags are disabled
+        user = CurrentContext.get_user()
+        if not (
+            flag_set('fflag_feat_fit_568_finite_state_management', user=user)
+            and flag_set('fflag_feat_fit_710_fsm_state_fields', user=user)
+        ):
+            ret.pop('state', None)
         return ret
 
     def _pretty_results(self, task, field, unique=False):

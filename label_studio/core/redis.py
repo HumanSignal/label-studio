@@ -79,7 +79,9 @@ def redis_healthcheck():
 
 
 def redis_connected():
-    return redis_healthcheck()
+    if settings.REDIS_ENABLED:
+        return redis_healthcheck()
+    return False
 
 
 def _is_serializable(value: Any) -> bool:
@@ -154,9 +156,11 @@ def start_job_async_or_sync(job, *args, in_seconds=0, **kwargs):
     :param job: Job function
     :param args: Function arguments
     :param in_seconds: Job will be delayed for in_seconds
+    :param retry: RQ Retry object or int (max retries). Only used in async mode.
     :param kwargs: Function keywords arguments
     :return: Job or function result
     """
+    from rq import Retry
 
     redis = redis_connected() and kwargs.get('redis', True)
     queue_name = kwargs.get('queue_name', 'default')
@@ -170,6 +174,15 @@ def start_job_async_or_sync(job, *args, in_seconds=0, **kwargs):
     if 'job_timeout' in kwargs:
         job_timeout = kwargs['job_timeout']
         del kwargs['job_timeout']
+
+    retry = None
+    if 'retry' in kwargs:
+        retry = kwargs['retry']
+        del kwargs['retry']
+        if isinstance(retry, int):
+            retry = Retry(max=retry)
+
+    on_failure = kwargs.pop('on_failure', None)
 
     if redis:
         # Async execution with Redis - wrap job for context management
@@ -200,11 +213,11 @@ def start_job_async_or_sync(job, *args, in_seconds=0, **kwargs):
             **kwargs,
             job_timeout=job_timeout,
             failure_ttl=settings.RQ_FAILED_JOB_TTL,
+            retry=retry,
+            on_failure=on_failure,
         )
         return job
     else:
-        on_failure = kwargs.pop('on_failure', None)
-
         try:
             result = job(*args, **kwargs)
             return result
@@ -236,9 +249,16 @@ def is_job_on_worker(job_id, queue_name):
     :param queue_name: Queue name
     :return: True if job on worker
     """
+    if not job_id:
+        return False
     registry = StartedJobRegistry(queue_name, connection=_redis)
-    ids = registry.get_job_ids()
-    return job_id in ids
+    member = job_id.encode() if isinstance(job_id, str) else job_id
+    # Use Redis ZSET membership check (ZSCORE) instead of registry.get_job_ids(),
+    # because the latter calls registry.cleanup(), which installs SIGALRM timers and
+    # crashes when executed outside the interpreter's main thread (e.g., inside WSGI).
+    # ZSCORE simply looks up the score of the member in the sorted set: if it returns
+    # None, the member/job ID is not present; otherwise it is currently marked as running.
+    return registry.connection.zscore(registry.key, member) is not None
 
 
 def delete_job_by_id(queue, id):

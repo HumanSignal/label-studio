@@ -63,6 +63,10 @@ Follow all steps below to implement a new storage. More details follow after the
   - [ ] Make poetry lock: `poetry install && poetry lock`
 12. [ ] Create database migrations using `poetry run python manage.py makemigrations` only!   
 13. [ ] Ensure that you correctly handle token and security fields; they should not be displayed on the frontend or backend after they are initially entered and saved. Verify how this works with other storage codes.
+14. [ ] **Error Handling Strategy:**  
+   - **Import**: If `VolumesAPI.iter_files` or other listing helpers call `resp.raise_for_status()`, make sure callers wrap these in try/except (or downgrade to debug logging) so recursive listing failures can be surfaced without crashing the sync job.  
+   - **Export**: When saving/deleting annotations, *never* let `resp.raise_for_status()` propagate to the RQ worker. Catch `RequestException` (and generic exceptions), log a warning, and record the error in `Storage.meta` and `Storage.traceback` so the user can see why some files were skipped. Jobs must finish with the correct storage status (`completed_with_errors`) even when the provider intermittently fails.  
+   - Update this guide whenever new patterns emerge so providers keep consistent behavior.
 
 ### 3. Frontend Implementation  
 1. [ ] Check examples: for Open Source see: `label-studio/web/apps/labelstudio/src/pages/Settings/StorageSettings/providers/`, for Enterprise see: `label-studio-enterprise/web/apps/labelstudio/src/pages/Settings/StorageSettings/providers/`

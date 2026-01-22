@@ -6,18 +6,8 @@ import {
 } from "../../data/timeseries/charts-displaying";
 import { TWO_FRAMES_TIMEOUT } from "../utils/constants";
 
-before(() => {
-  LabelStudio.addFeatureFlagsOnPageLoad({
-    fflag_feat_front_bros58_timeseries_multichannel_short: true,
-  });
-});
-
 describe("TimeSeries charts displaying - MultiChannel", () => {
   it("should not displace charts while navigating", () => {
-    LabelStudio.setFeatureFlags({
-      fflag_feat_front_bros58_timeseries_multichannel_short: true,
-    });
-
     cy.log("Initialize MultiChannel TimeSeries for navigation testing");
     LabelStudio.params().config(multiChannelConfig).data(heavyDatasetForDisplacement).withResult([]).init();
 
@@ -139,10 +129,6 @@ describe("TimeSeries charts displaying - MultiChannel", () => {
 });
 describe("TimeSeries charts displaying - Single Channel", () => {
   it("should not displace charts while navigating", () => {
-    LabelStudio.setFeatureFlags({
-      fflag_feat_front_bros58_timeseries_multichannel_short: false,
-    });
-
     cy.log("Initialize Single Channel TimeSeries for navigation testing");
     LabelStudio.params().config(singleChannelConfig).data(heavyDatasetForDisplacement).withResult([]).init();
 
@@ -166,10 +152,6 @@ describe("TimeSeries charts displaying - Single Channel", () => {
   });
 
   it("should not displace charts after window resize", () => {
-    LabelStudio.setFeatureFlags({
-      fflag_feat_front_bros58_timeseries_multichannel_short: false,
-    });
-
     LabelStudio.params().config(singleChannelConfig).data(heavyDatasetForDisplacement).withResult([]).init();
 
     LabelStudio.waitForObjectsReady();
@@ -211,10 +193,6 @@ describe("TimeSeries charts displaying - Single Channel", () => {
   });
 
   it("should not displace charts on X-axis after window resize at maximum zoom", () => {
-    LabelStudio.setFeatureFlags({
-      fflag_feat_front_bros58_timeseries_multichannel_short: false,
-    });
-
     cy.log("Initialize Single Channel TimeSeries for X-axis displacement testing");
     LabelStudio.params().config(singleChannelConfig).data(heavyDatasetForDisplacement).withResult([]).init();
 

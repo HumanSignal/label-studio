@@ -116,7 +116,7 @@ export const useToast = () => {
 
 export const ToastProvider: FC<ToastProviderWithTypes> = ({ swipeDirection = "down", children, type, ...props }) => {
   const [toastMessage, setToastMessage] = useState<ToastShowArgs | null>();
-  const defaultDuration = 2000;
+  const defaultDuration = 4000;
   const duration = toastMessage?.duration ?? defaultDuration;
   const show = ({ message, type, duration = defaultDuration }: ToastShowArgs) => {
     setToastMessage({ message, type });

@@ -34,18 +34,17 @@
     user-select: none;
 
     &[disabled] {
+      color: var(--color-neutral-content-subtlest) !important;
+
       &:hover {
         background-color: transparent !important;
+        color: var(--color-neutral-content-subtlest) !important;
         cursor: not-allowed;
       }
 
       * {
         cursor: not-allowed;
         pointer-events: none;
-      }
-
-      > * {
-        opacity: 0.5;
       }
     }
 
@@ -57,7 +56,7 @@
       justify-content: center;
     }
 
-    &:not(.menu-dm__item_look_danger):hover {
+    &:not(.menu-dm__item_look_danger, [disabled]):hover {
       color: var(--color-neutral-content);
       background-color: var(--color-primary-emphasis-subtle);
     }

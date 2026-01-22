@@ -18,7 +18,7 @@ import IsReadyMixin from "../mixins/IsReadyMixin";
 import { KonvaRegionMixin } from "../mixins/KonvaRegion";
 import { ImageModel } from "../tags/object/Image";
 import { colorToRGBAArray, rgbArrayToHex } from "../utils/colors";
-import { FF_DEV_3793, FF_ZOOM_OPTIM, isFF } from "../utils/feature-flags";
+import { FF_ZOOM_OPTIM, isFF } from "../utils/feature-flags";
 import { AliveRegion } from "./AliveRegion";
 import { RegionWrapper } from "./RegionWrapper";
 
@@ -219,7 +219,6 @@ const Model = types
         const bbox = self.bboxCoordsCanvas;
 
         if (!bbox) return null;
-        if (!isFF(FF_DEV_3793)) return bbox;
 
         return {
           left: self.parent.canvasToInternalX(bbox.left),

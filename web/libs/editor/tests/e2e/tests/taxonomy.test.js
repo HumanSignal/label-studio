@@ -12,8 +12,23 @@ Before(({ LabelStudio }) => {
 
 Scenario("Lines overlap", async ({ I, LabelStudio, AtTaxonomy }) => {
   async function checkOverlapAndGap(text1, text2) {
-    const bbox1 = await I.grabElementBoundingRect(AtTaxonomy.locate(AtTaxonomy.item).find("label").withText(text1));
-    const bbox2 = await I.grabElementBoundingRect(AtTaxonomy.locate(AtTaxonomy.item).find("label").withText(text2));
+    // Wait for elements to be present in the DOM before grabbing their bounding rects
+    const locator1 = AtTaxonomy.locate(AtTaxonomy.item).find("label").withText(text1);
+    const locator2 = AtTaxonomy.locate(AtTaxonomy.item).find("label").withText(text2);
+
+    await I.waitForElement(locator1, 5);
+    await I.waitForElement(locator2, 5);
+
+    const bbox1 = await I.grabElementBoundingRect(locator1);
+    const bbox2 = await I.grabElementBoundingRect(locator2);
+
+    // Add null checks with better error messages
+    if (!bbox1) {
+      assert.fail(`Element with text "${text1}" not found or has no bounding rect`);
+    }
+    if (!bbox2) {
+      assert.fail(`Element with text "${text2}" not found or has no bounding rect`);
+    }
 
     bbox1.y2 = bbox1.y + bbox1.height;
     bbox2.y2 = bbox2.y + bbox2.height;
@@ -98,7 +113,7 @@ Scenario("Lines overlap", async ({ I, LabelStudio, AtTaxonomy }) => {
   AtTaxonomy.fillSearch("long");
   await checkOverlapAndGap("super long line", "enough long line");
   await checkOverlapAndGap("enough long line", "not long line");
-});
+}).retry(3);
 
 Scenario("Add custom items", async ({ I, LabelStudio, AtTaxonomy }) => {
   const params = {

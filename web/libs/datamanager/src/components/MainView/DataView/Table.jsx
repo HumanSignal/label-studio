@@ -1,5 +1,5 @@
 import { IconQuestionOutline } from "@humansignal/icons";
-import { Tooltip } from "@humansignal/ui";
+import { Tooltip, EnterpriseBadge } from "@humansignal/ui";
 import { inject } from "mobx-react";
 import { getRoot } from "mobx-state-tree";
 import { useCallback, useMemo } from "react";
@@ -131,6 +131,27 @@ export const DataView = injector(
             {original?.readableType ?? parent.title}
           </Tag>,
         );
+      } else if (typeof original?.alias === "string" && original.alias.startsWith("dimension_agreement__")) {
+        // Show a short tag for per-dimension agreement columns (root columns, no parent)
+        children.push(
+          <Tag
+            key="column-type"
+            color="blue"
+            style={{
+              fontWeight: "500",
+              fontSize: 14,
+              cursor: "pointer",
+              padding: "0 6px",
+            }}
+          >
+            {original.readableType}
+          </Tag>,
+        );
+      }
+
+      // Add EnterpriseBadge when enterprise badge is set
+      if (original.enterprise_badge) {
+        children.push(<EnterpriseBadge key="enterprise-badge" className="ml-2" compact />);
       }
 
       if (help && decoration?.help !== false) {
@@ -147,6 +168,8 @@ export const DataView = injector(
     const onSelectAll = useCallback(() => view.selectAll(), [view]);
 
     const onRowSelect = useCallback((id) => view.toggleSelected(id), [view]);
+
+    const onRangeSelect = useCallback((ids, select) => view.selectRange(ids, select), [view]);
 
     const onRowClick = useCallback(
       async (item, e) => {
@@ -349,6 +372,7 @@ export const DataView = injector(
           selectedItems={selectedItems}
           onSelectAll={onSelectAll}
           onSelectRow={onRowSelect}
+          onRangeSelect={onRangeSelect}
           onRowClick={onRowClick}
           stopInteractions={isLocked}
           onTypeChange={(col, type) => col.original.setType(type)}

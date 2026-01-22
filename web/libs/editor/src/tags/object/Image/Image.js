@@ -19,7 +19,6 @@ import { parseValue } from "../../../utils/data";
 import {
   FF_DEV_3377,
   FF_DEV_3391,
-  FF_DEV_3793,
   FF_LSDV_4583,
   FF_LSDV_4583_6,
   FF_ZOOM_OPTIM,
@@ -327,16 +326,9 @@ const Model = types
     get zoomedPixelSize() {
       const { naturalWidth, naturalHeight } = self;
 
-      if (isFF(FF_DEV_3793)) {
-        return {
-          x: 100 / naturalWidth,
-          y: 100 / naturalHeight,
-        };
-      }
-
       return {
-        x: self.stageWidth / naturalWidth,
-        y: self.stageHeight / naturalHeight,
+        x: 100 / naturalWidth,
+        y: 100 / naturalHeight,
       };
     },
 
@@ -1276,9 +1268,6 @@ const CoordsCalculations = types
   .views((self) => ({
     // helps to calculate rotation because internal coords are square and real one usually aren't
     get whRatio() {
-      // don't need this for absolute coords
-      if (!isFF(FF_DEV_3793)) return 1;
-
       return self.stageWidth / self.stageHeight;
     },
 
@@ -1320,22 +1309,6 @@ const CoordsCalculations = types
     },
   }));
 
-// mock coords calculations to transparently pass coords with FF 3793 off
-const AbsoluteCoordsCalculations = CoordsCalculations.views(() => ({
-  canvasToInternalX(n) {
-    return n;
-  },
-  canvasToInternalY(n) {
-    return n;
-  },
-  internalToCanvasX(n) {
-    return n;
-  },
-  internalToCanvasY(n) {
-    return n;
-  },
-}));
-
 const ImageModel = types.compose(
   "ImageModel",
   TagAttrs,
@@ -1345,7 +1318,7 @@ const ImageModel = types.compose(
   IsReadyWithDepsMixin,
   ImageEntityMixin,
   Model,
-  isFF(FF_DEV_3793) ? CoordsCalculations : AbsoluteCoordsCalculations,
+  CoordsCalculations,
 );
 
 const HtxImage = inject("store")(ImageView);

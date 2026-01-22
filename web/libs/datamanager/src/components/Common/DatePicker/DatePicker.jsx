@@ -4,7 +4,7 @@ import { default as DP } from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { cn } from "../../../utils/bem";
 import { isDefined } from "../../../utils/utils";
-import { Dropdown } from "../Dropdown/Dropdown";
+import { Dropdown } from "@humansignal/ui";
 import Input from "../Input/Input";
 import "./DatePicker.global.scss";
 import "./DatePicker.scss";

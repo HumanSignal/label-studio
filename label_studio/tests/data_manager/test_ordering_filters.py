@@ -7,9 +7,13 @@ from data_import.models import FileUpload
 from django.conf import settings
 from django.core.files.base import ContentFile
 from django.utils.timezone import now
+from fsm.state_choices import TaskStateChoices
+from fsm.tests.factories import TaskStateFactory
 from projects.models import Project
-
-from ..utils import make_annotation, make_annotator, make_prediction, make_task, project_id  # noqa
+from projects.tests.factories import ProjectFactory
+from rest_framework.test import APIClient
+from tasks.tests.factories import TaskFactory
+from tests.utils import make_annotation, make_annotator, make_prediction, make_task, project_id  # noqa
 
 
 @pytest.mark.parametrize(
@@ -99,6 +103,49 @@ def test_views_ordering(ordering, element_index, undefined, business_client, pro
     response_data = response.json()
 
     assert response_data['tasks'][0]['id'] == task_ids[element_index]
+
+
+@pytest.mark.django_db
+def test_views_ordering_task_state():
+    """
+    This test verifies that ordering by task state orders by the state progression, and not in alphabetical order.
+    """
+    project = ProjectFactory()
+    user = project.created_by
+
+    task_created = TaskFactory(project=project)
+    TaskStateFactory(task=task_created, state=TaskStateChoices.CREATED)
+    task_in_progress = TaskFactory(project=project)
+    TaskStateFactory(task=task_in_progress, state=TaskStateChoices.IN_PROGRESS)
+    task_completed = TaskFactory(project=project)
+    TaskStateFactory(task=task_completed, state=TaskStateChoices.COMPLETED)
+
+    api_client = APIClient()
+    api_client.force_authenticate(user=user)
+
+    # Create view
+    payload = {'project': project.id, 'data': {'test': 1, 'ordering': ['tasks:state']}}
+    response = api_client.post('/api/dm/views/', data=payload, format='json')
+    assert response.status_code == 201
+    view_id = response.json()['id']
+
+    response = api_client.get(f'/api/tasks?view={view_id}')
+    response_data = response.json()
+
+    assert response_data['tasks'][0]['id'] == task_created.id
+    assert response_data['tasks'][1]['id'] == task_in_progress.id
+    assert response_data['tasks'][2]['id'] == task_completed.id
+
+    # Update view descending
+    payload = {'project': project.id, 'data': {'test': 1, 'ordering': ['tasks:-state']}}
+    response = api_client.patch(f'/api/dm/views/{view_id}', data=payload, format='json')
+    assert response.status_code == 200
+
+    response = api_client.get(f'/api/tasks?view={view_id}')
+    response_data = response.json()
+    assert response_data['tasks'][0]['id'] == task_completed.id
+    assert response_data['tasks'][1]['id'] == task_in_progress.id
+    assert response_data['tasks'][2]['id'] == task_created.id
 
 
 @pytest.mark.parametrize(

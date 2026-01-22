@@ -12,4 +12,4 @@ Use a minimum of **8GB RAM**, but 16GB RAM is recommended. for example, t3.large
 For more on using Label Studio at scale and labeling performance, see [Start Label Studio](https://labelstud.io/guide/start).
 
 ### Software requirements
-PostgreSQL version 11.5 or SQLite version 3.35 or higher.
+PostgreSQL version 13 or higher or SQLite version 3.35 or higher.

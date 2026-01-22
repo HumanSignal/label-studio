@@ -135,7 +135,9 @@ class App extends Component {
   }
 
   _renderUI(root, as) {
-    if (as.viewingAll) return this.renderAllAnnotations();
+    if (as.viewingAll && getRoot(as).hasInterface("annotations:view-all")) {
+      return this.renderAllAnnotations();
+    }
 
     return (
       <div

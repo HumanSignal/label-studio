@@ -1128,9 +1128,21 @@
         "decorators": ""
     },
     {
+        "url": "/api/fsm/entities/<str:entity_name>/<int:entity_id>/history",
+        "module": "fsm.api.FSMEntityHistoryAPI",
+        "name": "fsm:fsm-entity-history",
+        "decorators": ""
+    },
+    {
+        "url": "/api/fsm/entities/<str:entity_name>/<int:entity_id>/transition/",
+        "module": "fsm.api.FSMEntityTransitionAPI",
+        "name": "fsm:fsm-entity-transition",
+        "decorators": ""
+    },
+    {
         "url": "/data/local-files/",
-        "module": "core.views.localfiles_data",
-        "name": "localfiles_data",
+        "module": "io_storages.localfiles.views.localfiles_data",
+        "name": "storages:localfiles_data",
         "decorators": ""
     },
     {

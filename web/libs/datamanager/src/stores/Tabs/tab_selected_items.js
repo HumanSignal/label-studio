@@ -83,6 +83,40 @@ export const TabSelectedItems = types
       self._invokeChangeEvent();
     },
 
+    /**
+     * Select or unselect multiple items by their IDs (used for shift-click range selection).
+     * @param {Array} ids - Array of item IDs to select/unselect
+     * @param {boolean} select - true to select, false to unselect
+     */
+    selectRange(ids, select = true) {
+      if (self.all) {
+        // In "all selected" mode:
+        // - To select: remove IDs from the excluded list
+        // - To unselect: add IDs to the excluded list
+        for (const id of ids) {
+          const index = self.list.indexOf(id);
+          if (select && index !== -1) {
+            self.list.splice(index, 1);
+          } else if (!select && index === -1) {
+            self.list.push(id);
+          }
+        }
+      } else {
+        // In normal mode:
+        // - To select: add IDs to the included list
+        // - To unselect: remove IDs from the included list
+        for (const id of ids) {
+          const index = self.list.indexOf(id);
+          if (select && index === -1) {
+            self.list.push(id);
+          } else if (!select && index !== -1) {
+            self.list.splice(index, 1);
+          }
+        }
+      }
+      self._invokeChangeEvent();
+    },
+
     update(data) {
       self.all = data?.all ?? self.all;
       self.list = data?.[self.listName] ?? self.list;

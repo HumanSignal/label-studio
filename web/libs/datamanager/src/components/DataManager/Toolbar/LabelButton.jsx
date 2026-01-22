@@ -3,7 +3,7 @@ import { Button, ButtonGroup } from "@humansignal/ui";
 import { Interface } from "../../Common/Interface";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { IconChevronDown } from "@humansignal/icons";
-import { Dropdown } from "../../Common/Dropdown/DropdownComponent";
+import { Dropdown } from "@humansignal/ui";
 import { Menu } from "../../Common/Menu/Menu";
 
 const injector = inject(({ store }) => {
@@ -37,7 +37,9 @@ export const LabelButton = injector(({ store, canLabel, size, target, selectedCo
     document.addEventListener("click", handleClickOutside, { capture: true });
 
     return () => {
-      document.removeEventListener("click", handleClickOutside, { capture: true });
+      document.removeEventListener("click", handleClickOutside, {
+        capture: true,
+      });
     };
   }, []);
 
@@ -92,7 +94,8 @@ export const LabelButton = injector(({ store, canLabel, size, target, selectedCo
             style={primaryStyle}
             onClick={onLabelAll}
           >
-            Label {selectedCount ? selectedCount : "All"} Task{!selectedCount || selectedCount > 1 ? "s" : ""}
+            Label {selectedCount ? selectedCount : "All"} Task
+            {!selectedCount || selectedCount > 1 ? "s" : ""}
           </Button>
           <Dropdown.Trigger
             align="bottom-right"

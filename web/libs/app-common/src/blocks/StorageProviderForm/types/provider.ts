@@ -105,6 +105,15 @@ export function extractDefaultValues(fields: (FieldDefinition | MessageDefinitio
 
   fields.forEach((field) => {
     if (field.type === "message") return;
+
+    // Check if the field has a default value
+    if (Object.prototype.hasOwnProperty.call(field, "defaultValue") && field.defaultValue !== undefined) {
+      const customDefault = typeof field.defaultValue === "function" ? field.defaultValue() : field.defaultValue;
+      defaultValues[field.name] = customDefault;
+      return;
+    }
+
+    // If the field does not have a default value, try to get it from the schema
     try {
       // Try to get the default value from the schema by accessing the internal structure
       const schemaAny = field.schema as any;

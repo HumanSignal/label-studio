@@ -15,6 +15,7 @@ from io_storages.gcs.models import GCSImportStorageLink
 from io_storages.localfiles.models import LocalFilesImportStorageLink
 from io_storages.redis.models import RedisImportStorageLink
 from io_storages.s3.models import S3ImportStorageLink
+from rest_framework.exceptions import ValidationError
 from tasks.models import Task
 
 logger = logging.getLogger(__name__)
@@ -90,7 +91,7 @@ def remove_duplicated_tasks(duplicates, project, queryset):
 
     # check that we don't remove tasks with annotations
     if queryset.count() != len(removing):
-        raise Exception(
+        raise ValidationError(
             f'Remove duplicates failed, operation is not finished: '
             f'queryset count {queryset.count()} != removing {len(removing)}. '
             'It means that some of duplicated tasks have been annotated twice or more.'

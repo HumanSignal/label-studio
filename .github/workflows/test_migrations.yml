@@ -16,7 +16,7 @@ env:
   LABEL_STUDIO_TEST_ENVIRONMENT: false
   SENTRY_RATE: 0
   JSON_LOG: 0
-  POETRY_VERSION: 2.1.4
+  POETRY_VERSION: 2.2.1
 
 jobs:
   sqlite-migrations:
@@ -31,7 +31,7 @@ jobs:
       - uses: hmarr/debug-action@v3.0.0
 
       - name: "Checkout"
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           ref: ${{ inputs.ref }}
 
@@ -93,10 +93,10 @@ jobs:
       - uses: hmarr/debug-action@v3.0.0
 
       - name: "Checkout"
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           ref: ${{ inputs.ref }}
-          fetch-depth: 0
+          fetch-depth: 2147483647
 
       - name: "Install poetry"
         run: pipx install "poetry==${{ env.POETRY_VERSION }}"

@@ -1,7 +1,7 @@
 import { Fragment, useCallback, useMemo, useState } from "react";
 import sanitizeHtml from "sanitize-html";
 import { IconSlack } from "@humansignal/icons";
-import { Block, Elem } from "../../utils/bem";
+import { cn } from "../../utils/bem";
 import { absoluteURL, copyText } from "../../utils/helpers";
 import { Button } from "@humansignal/ui";
 import { Space } from "../Space/Space";
@@ -34,22 +34,21 @@ export const ErrorWrapper = ({
   }, [preparedStackTrace]);
 
   return (
-    <Block name="error-message">
+    <div className={cn("error-message").toClassName()}>
       {!minimal && possum !== false && (
-        <Elem
-          tag="img"
-          name="heidi"
+        <img
+          className={cn("error-message").elem("heidi").toClassName()}
           src={absoluteURL("/static/images/opossum_broken.svg")}
           height="111"
           alt="Heidi's down"
         />
       )}
 
-      {!minimal && title && <Elem name="title">{title}</Elem>}
+      {!minimal && title && <div className={cn("error-message").elem("title").toClassName()}>{title}</div>}
 
       {!minimal && message && (
-        <Elem
-          name="detail"
+        <div
+          className={cn("error-message").elem("detail").toClassName()}
           dangerouslySetInnerHTML={{
             __html: sanitizeHtml(String(message)),
           }}
@@ -57,8 +56,8 @@ export const ErrorWrapper = ({
       )}
 
       {!minimal && preparedStackTrace && (
-        <Elem
-          name="stracktrace"
+        <div
+          className={cn("error-message").elem("stracktrace").toClassName()}
           dangerouslySetInnerHTML={{
             __html: sanitizeHtml(preparedStackTrace.replace(/(\n)/g, "<br>")),
           }}
@@ -66,32 +65,41 @@ export const ErrorWrapper = ({
       )}
 
       {validation?.length > 0 && (
-        <Elem tag="ul" name="validation">
+        <ul className={cn("error-message").elem("validation").toClassName()}>
           {validation.map(([field, errors]) => (
             <Fragment key={field}>
               {[].concat(errors).map((err, i) => (
-                <Elem tag="li" key={i} name="message" dangerouslySetInnerHTML={{ __html: sanitizeHtml(err) }} />
+                <li
+                  key={i}
+                  className={cn("error-message").elem("message").toClassName()}
+                  dangerouslySetInnerHTML={{ __html: sanitizeHtml(err) }}
+                />
               ))}
             </Fragment>
           ))}
-        </Elem>
+        </ul>
       )}
 
       {!minimal && (version || errorId) && (
-        <Elem name="version">
+        <div className={cn("error-message").elem("version").toClassName()}>
           <Space>
             {version && `Version: ${version}`}
             {errorId && `Error ID: ${errorId}`}
           </Space>
-        </Elem>
+        </div>
       )}
 
       {!minimal && (
-        <Elem name="actions">
+        <div className={cn("error-message").elem("actions").toClassName()}>
           <Space spread>
-            <Elem tag={Button} name="action-slack" target="_blank" icon={<IconSlack />} href={SLACK_INVITE_URL}>
+            <Button
+              className={cn("error-message").elem("action-slack").toClassName()}
+              target="_blank"
+              icon={<IconSlack />}
+              href={SLACK_INVITE_URL}
+            >
               Ask on Slack
-            </Elem>
+            </Button>
 
             <Space size="small">
               {preparedStackTrace && (
@@ -116,8 +124,8 @@ export const ErrorWrapper = ({
               )}
             </Space>
           </Space>
-        </Elem>
+        </div>
       )}
-    </Block>
+    </div>
   );
 };

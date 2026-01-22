@@ -47,10 +47,6 @@ export const FF_DEV_3391 = "fflag_fix_front_dev_3391_interactive_view_all";
  * @link https://app.launchdarkly.com/default/production/features/fflag_fix_front_dev_1284_auto_detect_undo_281022_short
  */
 export const FF_DEV_3873 = "fflag_feat_front_dev_3873_labeling_ui_improvements_short";
-
-// Use only relative coords internally to improve performance and reduce bugs
-export const FF_DEV_3793 = "fflag_fix_front_dev_3793_relative_coords_short";
-
 /**
  * Label stream ablation experiment for solving overlap issue
  * @link https://app.launchdarkly.com/default/production/features/fflag_fix_back_dev_4174_overlap_issue_experiments_10012023_short
@@ -87,14 +83,6 @@ export const FF_LSDV_4583 = "fflag_feat_front_lsdv_4583_multi_image_segmentation
 export const FF_LSDV_4583_6 = "fflag_feat_front_lsdv_4583_6_images_preloading_short";
 
 /**
- * Removing interrupting from the draft saving
- *
- * Without this flag we have a situation when changes in history leading to the empty results break functionality of adding comments and make the draft saving process indicator stay forever.
- * @link https://app.launchdarkly.com/default/production/features/fflag_fix_font_lsdv_3009_draft_saving_stuck_130223_short
- */
-export const FF_LSDV_3009 = "fflag_fix_font_lsdv_3009_draft_saving_stuck_130223_short";
-
-/**
  * Allows to count time spend on textarea results and store it to lead_time meta field
  * @link https://app.launchdarkly.com/default/production/features/fflag_fix_front_lsdv_4600_lead_time_27072023_short
  */
@@ -126,8 +114,6 @@ export const FF_LSDV_4998 = "fflag_fix_front_lsdv_4998_missed_dynamic_children_0
  * @link https://app.launchdarkly.com/default/production/features/fflag_feat_front_lsdv_5451_async_taxonomy_110823_short
  */
 export const FF_TAXONOMY_ASYNC = "fflag_feat_front_lsdv_5451_async_taxonomy_110823_short";
-
-export const FF_LEAP_218 = "fflag_fix_front_leap_218_improve_performance_of_taxonomy_search_short";
 
 /**
  * Allow to label NER directly with Taxonomy instead of Labels
@@ -183,14 +169,6 @@ export const FF_IMAGE_MEMORY_USAGE = "fflag_feat_front_optic_1479_improve_image_
 
 export const FF_VIDEO_FRAME_SEEK_PRECISION = "fflag_fix_front_optic_1608_improve_video_frame_seek_precision_short";
 
-/**
- * Allows the time series component to participate in synchronized playback with other media components (like audio and video)
- * when the feature flag is enabled, while maintaining independent operation when the flag is disabled.
- *
- * @link https://app.launchdarkly.com/projects/default/flags/fflag_feat_optic_2125_timeseries_sync
- */
-export const FF_TIMESERIES_SYNC = "fflag_feat_optic_2125_timeseries_sync";
-
 Object.assign(window, {
   APP_SETTINGS: {
     ...(window.APP_SETTINGS ?? {}),
@@ -204,7 +182,7 @@ Object.assign(window, {
 function getFeatureFlags() {
   return {
     ...(window.APP_SETTINGS?.feature_flags ?? {}),
-    // could be used to explicitly set flags for testing, i.e. [FF_DEV_3793]: true
+    // could be used to explicitly set flags for testing
   };
 }
 

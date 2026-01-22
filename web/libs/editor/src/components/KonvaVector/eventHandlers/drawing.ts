@@ -1,6 +1,7 @@
 import type { KonvaEventObject } from "konva/lib/Node";
 import type { EventHandlerProps } from "./types";
 import { PointType } from "../types";
+import { HIT_RADIUS } from "../constants";
 import { getDistance, isPointInCanvasBounds, snapToPixel, stageToImageCoordinates } from "./utils";
 
 export interface AddPointOptions {
@@ -256,7 +257,7 @@ export function handleShiftClickPointConversion(e: KonvaEventObject<MouseEvent>,
   for (let i = 0; i < props.initialPoints.length; i++) {
     const point = props.initialPoints[i];
     const distance = getDistance(imagePos, point);
-    const hitRadius = 10 / (props.transform.zoom * props.fitScale);
+    const hitRadius = HIT_RADIUS.SELECTION / (props.transform.zoom * props.fitScale);
 
     if (distance <= hitRadius && distance < closestDistance) {
       closestDistance = distance;

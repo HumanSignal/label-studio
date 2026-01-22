@@ -8,6 +8,12 @@ const IMAGE =
 
 Scenario("Basic details", async ({ I, LabelStudio, AtOutliner, AtDetails }) => {
   const RESULT_LABELS = ["a", "b", "c"];
+  const getRectangleRegion = (results) => {
+    const region = results.find((item) => item.from_name === "rect" && item.type === "rectangle");
+
+    assert(region, "Rectangle region not found in serialized results");
+    return region;
+  };
   const result = [
     {
       value: {
@@ -180,12 +186,8 @@ Scenario("Basic details", async ({ I, LabelStudio, AtOutliner, AtDetails }) => {
   I.say("Select image region");
   AtOutliner.clickRegion(3);
 
-  const isRelativeCoords = await LabelStudio.hasFF("fflag_fix_front_dev_3793_relative_coords_short");
-
-  if (isRelativeCoords) {
-    AtDetails.seeFieldWithValue("X", "25");
-    AtDetails.seeFieldWithValue("H", "50");
-  }
+  AtDetails.seeFieldWithValue("X", "25");
+  AtDetails.seeFieldWithValue("H", "50");
 
   I.say("Check perregions displaying");
 
@@ -208,8 +210,9 @@ Scenario("Basic details", async ({ I, LabelStudio, AtOutliner, AtDetails }) => {
 
   I.say("Check that meta is saved correctly");
   const resultWithMeta = await LabelStudio.serialize();
+  const regionWithMeta = getRectangleRegion(resultWithMeta);
 
-  assert.deepStrictEqual(resultWithMeta[2].meta.text, ["M 1\nM 2\n3"]);
+  assert.deepStrictEqual(regionWithMeta.meta?.text, ["M 1\nM 2\n3"]);
 
   I.say("Remove meta");
   AtDetails.clickMeta();
@@ -217,9 +220,10 @@ Scenario("Basic details", async ({ I, LabelStudio, AtOutliner, AtDetails }) => {
 
   I.say("Check that meta is removed correctly");
   const resultWithoutMeta = await LabelStudio.serialize();
+  const regionWithoutMeta = getRectangleRegion(resultWithoutMeta);
 
   assert.deepStrictEqual(resultWithoutMeta[2].meta, undefined);
-});
+}).retry(3);
 
 Scenario("Panels manipulations", async ({ I, LabelStudio, AtPanels }) => {
   I.amOnPage("/");

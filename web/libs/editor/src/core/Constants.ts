@@ -11,7 +11,7 @@ export default {
   STROKE_WIDTH: 1,
 
   // labels
-  LABEL_BACKGROUND: "#36B37E",
+  LABEL_BACKGROUND: "#DA935D",
   EMPTY_LABEL: "blank",
 
   RELATION_BACKGROUND: "#fff",

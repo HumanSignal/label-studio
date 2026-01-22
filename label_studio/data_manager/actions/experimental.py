@@ -10,6 +10,7 @@ from core.utils.db import fast_first
 from data_manager.actions import DataManagerAction
 from data_manager.functions import DataManagerException
 from django.conf import settings
+from rest_framework.exceptions import ValidationError
 from tasks.models import Annotation, Task
 from tasks.serializers import TaskSerializerBulk
 
@@ -76,7 +77,7 @@ def rename_labels(project, queryset, **kwargs):
 
     labels = project.get_parsed_config()
     if control_tag not in labels:
-        raise Exception('Wrong old label name, it is not from labeling config: ' + old_label_name)
+        raise ValidationError('Wrong old label name, it is not from labeling config: ' + old_label_name)
     label_type = labels[control_tag]['type'].lower()
 
     annotations = Annotation.objects.filter(project=project)
@@ -266,7 +267,7 @@ def add_expression(queryset, size, value, value_name):
                 task.data[value_name] = task.data[value_name].replace(old_value, new_value)
 
     else:
-        raise Exception('Undefined expression, you can use: ' + add_data_field_examples)
+        raise ValidationError('Undefined expression, you can use: ' + add_data_field_examples)
 
     Task.objects.bulk_update(tasks, fields=['data'], batch_size=1000)
 

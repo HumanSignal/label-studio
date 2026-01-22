@@ -24,10 +24,11 @@ describe("analytics", () => {
       collect_analytics: true,
     };
 
-    // Mock window.location
+    // Mock window.location - simple pattern works with JSDOM 22 (jest-environment-jsdom v29)
     Object.defineProperty(window, "location", {
       value: { href: testUrl },
       configurable: true,
+      writable: true,
     });
   });
 
@@ -38,7 +39,6 @@ describe("analytics", () => {
       value: originalSendBeacon,
       configurable: true,
     });
-    jest.clearAllMocks();
   });
 
   it("should register analytics function on window", () => {

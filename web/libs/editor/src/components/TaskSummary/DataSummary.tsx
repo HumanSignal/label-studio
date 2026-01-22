@@ -1,9 +1,19 @@
 import { useMemo } from "react";
 import { flexRender, getCoreRowModel, useReactTable, createColumnHelper } from "@tanstack/react-table";
 import { cnm } from "@humansignal/ui";
-import { SummaryBadge } from "./SummaryBadge";
+import { Chip } from "./Chip";
 import { ResizeHandler } from "./ResizeHandler";
 import type { ObjectTypes } from "./types";
+
+const MAX_JSON_LENGTH = 10000;
+
+const formatValue = (value: unknown): { text: string; truncated: boolean } => {
+  const json = JSON.stringify(value, null, 2);
+  if (json.length <= MAX_JSON_LENGTH) {
+    return { text: json, truncated: false };
+  }
+  return { text: `${json.slice(0, MAX_JSON_LENGTH)}...`, truncated: true };
+};
 
 export const DataSummary = ({ data_types }: { data_types: ObjectTypes }) => {
   const data: Record<string, any> = useMemo(() => {
@@ -18,7 +28,7 @@ export const DataSummary = ({ data_types }: { data_types: ObjectTypes }) => {
         id: field,
         header: () => (
           <>
-            {field} <SummaryBadge>{type}</SummaryBadge>
+            {field} <Chip>{type}</Chip>
           </>
         ),
         cell: ({ getValue }) => {
@@ -40,18 +50,16 @@ export const DataSummary = ({ data_types }: { data_types: ObjectTypes }) => {
             return <video src={value} controls className="w-full" />;
           }
 
-          // List: [{ id: <id>, body: text, title: text }, ...]
-          // Paragraphs: [{ <nameKey>: name, <textKey>: text }, ...]
-          if (Array.isArray(value)) {
-            return JSON.stringify(value);
-          }
-
-          // Timeseries: <channel name>: [array of values]
-          // Table: <key>: <value>
-          if (typeof value === "object") {
-            return Object.entries(value)
-              .map(([key, value]) => `${key}: ${String(value).substring(0, 300)}`)
-              .join("\n");
+          // Arrays: List, Paragraphs, Timeseries values
+          // Objects: Table, JSON-like structures with nested dictionaries
+          if (typeof value === "object" && value !== null) {
+            const { text, truncated } = formatValue(value);
+            return (
+              <div className="whitespace-pre-wrap">
+                {text}
+                {truncated && <div className="text-neutral-content-subtle italic mt-tight">(truncated)</div>}
+              </div>
+            );
           }
 
           return value;

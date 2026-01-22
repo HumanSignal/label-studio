@@ -27,8 +27,10 @@ export const ViewColumnType = types.enumeration([
   "Text",
   "HyperText",
   "TimeSeries",
+  "Time",
   "Unknown",
   "AgreementSelected",
+  "TaskState",
 ]);
 
 const typeShortMap = {
@@ -43,6 +45,7 @@ const typeShortMap = {
   Text: "txt",
   HyperText: "html",
   TimeSeries: "ts",
+  Time: "time",
 };
 
 export const ViewColumnTypeShort = (type) => typeShortMap[type] || "str";
@@ -59,6 +62,7 @@ const typeNameMap = {
   Text: "Text",
   HyperText: "Hyper Text",
   TimeSeries: "Time Series",
+  Time: "Time",
 };
 
 export const ViewColumnTypeName = (type) => typeNameMap[type] || "String";
@@ -70,6 +74,7 @@ export const TabColumn = types
     alias: types.string,
     type: types.optional(ViewColumnType, "String"),
     displayType: types.optional(types.maybeNull(ViewColumnType), null),
+    // Hidden by default, can be toggled by the user
     defaultHidden: types.optional(types.boolean, false),
     parent: types.maybeNull(types.late(() => types.reference(TabColumn))),
     children: types.maybeNull(types.array(types.late(() => types.reference(TabColumn)))),
@@ -78,14 +83,19 @@ export const TabColumn = types
     help: types.maybeNull(types.string),
     // Column alias whose filter should be joined automatically when a filter is created for this column
     child_filter: types.maybeNull(types.string),
+    // Whether filtering and selection is disabled for the column
     disabled: types.optional(types.boolean, false),
+    // Whether the column is hidden in the data manager, can't be toggled by the user
+    hidden: types.optional(types.boolean, false),
+    // Whether to show an EnterpriseBadge for the column
+    enterprise_badge: types.optional(types.boolean, false),
   })
   .views((self) => ({
-    get hidden() {
+    get is_hidden() {
       if (self.children) {
-        return all(self.children, (c) => c.hidden);
+        return all(self.children, (c) => c.is_hidden);
       }
-      return self.disabled || (self.parentView?.hiddenColumns.hasColumn(self) ?? (self.parent.hidden || false));
+      return self.hidden || (self.parentView?.hiddenColumns.hasColumn(self) ?? (self.parent.is_hidden || false));
     },
 
     get parentView() {
@@ -152,7 +162,7 @@ export const TabColumn = types
           ...self,
           id: self.key,
           accessor: self.accessor,
-          hidden: self.hidden,
+          hidden: self.is_hidden,
           original: self,
           currentType: self.currentType,
           width: self.width,
@@ -186,6 +196,12 @@ export const TabColumn = types
     },
 
     get readableType() {
+      // Show a friendly tag for per-dimension agreement columns
+      if (typeof self.alias === "string") {
+        if (self.alias.startsWith("dimension_agreement__")) {
+          return "agreement";
+        }
+      }
       return ViewColumnTypeShort(self.currentType);
     },
 

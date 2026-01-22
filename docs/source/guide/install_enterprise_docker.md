@@ -4,7 +4,7 @@ short: Install using Docker
 type: guide
 tier: enterprise
 order: 0
-order_enterprise: 66
+order_enterprise: 75
 meta_title: Install Label Studio Enterprise on-premises using Docker
 meta_description: Install, back up, and upgrade Label Studio Enterprise with Docker to create machine learning and data science projects on-premises.
 section: "Install & Setup"
@@ -16,6 +16,9 @@ Install Label Studio Enterprise on-premises if you need to meet strong privacy r
 - You can run Label Studio Enterprise in an airgapped environment, and no data leaves your infrastructure. See [Install Label Studio Enterprise without public internet access](install_k8s_airgapped).
 
 See [Secure Label Studio](security.html) for more details about security and hardening for Label Studio Enterprise.
+
+!!! note
+    Docker deployments are more suitable for proof-of-concept builds and small projects. For production environments and larger deployments, we strongly recommend using Kubernetes. Kubernetes deployments provide better scalability, reliability, and access to advanced features such as Prompts. See [Deploy Label Studio Enterprise on Kubernetes](install_enterprise_k8s.html) for more information.
 
 To install Label Studio Community Edition, see [Install Label Studio](https://labelstud.io/guide/install). This page is specific to the Enterprise version of Label Studio.
 
@@ -36,8 +39,8 @@ Make sure you have an authorization token to retrieve Docker images and a curren
 Make sure [Docker Compose](https://docs.docker.com/compose/install/) is installed on your system.
 
 After you install Label Studio Enterprise, the app is automatically connected to the following running services:
-- PostgresSQL (versions 11, 12, 13)
-- Redis (version 5)
+- PostgresSQL (versions >=13)
+- Redis (version >=6.0)
 
 ### Log in to a Docker registry
 
@@ -176,7 +179,7 @@ services:
       - ./mydata:/label-studio/data:rw
       - ./license.txt:/label-studio-enterprise/license.txt:ro
     working_dir: /label-studio-enterprise
-    command: [ "python3", "/label-studio-enterprise/label_studio_enterprise/manage.py", "rqworker", "low" ]
+    command: [ "python3", "/label-studio-enterprise/label_studio_enterprise/manage.py", "rqworker", "--with-scheduler", "low" ]
 
   rqworkers_default:
     image: heartexlabs/label-studio-enterprise:VERSION
@@ -188,7 +191,7 @@ services:
       - ./mydata:/label-studio/data:rw
       - ./license.txt:/label-studio-enterprise/license.txt:ro
     working_dir: /label-studio-enterprise
-    command: [ "python3", "/label-studio-enterprise/label_studio_enterprise/manage.py", "rqworker", "default"]
+    command: [ "python3", "/label-studio-enterprise/label_studio_enterprise/manage.py", "rqworker", "--with-scheduler", "default" ]
 
   rqworkers_high:
     image: heartexlabs/label-studio-enterprise:VERSION
@@ -200,7 +203,7 @@ services:
       - ./mydata:/label-studio/data:rw
       - ./license.txt:/label-studio-enterprise/license.txt:ro
     working_dir: /label-studio-enterprise
-    command: [ "python3", "/label-studio-enterprise/label_studio_enterprise/manage.py", "rqworker", "high" ]
+    command: [ "python3", "/label-studio-enterprise/label_studio_enterprise/manage.py", "rqworker", "--with-scheduler", "high"]
 
   rqworkers_critical:
     image: heartexlabs/label-studio-enterprise:VERSION
@@ -212,7 +215,7 @@ services:
       - ./mydata:/label-studio/data:rw
       - ./license.txt:/label-studio-enterprise/license.txt:ro
     working_dir: /label-studio-enterprise
-    command: [ "python3", "/label-studio-enterprise/label_studio_enterprise/manage.py", "rqworker", "critical" ]
+    command: [ "python3", "/label-studio-enterprise/label_studio_enterprise/manage.py", "rqworker", "--with-scheduler", "critical" ]
 ```
 
 3. Run Docker Compose:

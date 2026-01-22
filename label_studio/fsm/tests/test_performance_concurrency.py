@@ -10,7 +10,7 @@ import threading
 import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 from unittest.mock import Mock
 
 from django.test import TestCase, TransactionTestCase
@@ -25,12 +25,7 @@ class PerformanceTestTransition(BaseTransition):
     operation_id: int = Field(..., description='Operation identifier')
     data_size: int = Field(1, description='Size of data to process')
 
-    @property
-    def target_state(self) -> str:
-        return 'PROCESSED'
-
-    @classmethod
-    def get_target_state(cls) -> str:
+    def get_target_state(self, context: Optional[TransitionContext] = None) -> str:
         return 'PROCESSED'
 
     @classmethod
@@ -61,13 +56,8 @@ class ConcurrencyTestTransition(BaseTransition):
     sleep_duration: float = Field(0.0, description='Simulate processing delay')
     execution_order: list = Field(default_factory=list, description='Track execution order')
 
-    @property
-    def target_state(self) -> str:
+    def get_target_state(self, context: Optional[TransitionContext] = None) -> str:
         return f'PROCESSED_BY_THREAD_{self.thread_id}'
-
-    @classmethod
-    def get_target_state(cls) -> str:
-        return 'PROCESSED_BY_THREAD_0'  # Default for class-level queries
 
     @classmethod
     def can_transition_from_state(cls, context: TransitionContext) -> bool:
@@ -127,7 +117,7 @@ class PerformanceTests(TestCase):
             entity=self.mock_entity,
             current_user=self.mock_user,
             current_state='CREATED',
-            target_state=transition.target_state,
+            target_state=transition.get_target_state(),
         )
 
         # Measure validation performance
@@ -303,7 +293,7 @@ class PerformanceTests(TestCase):
                 entity=self.mock_entity,
                 current_user=self.mock_user,
                 current_state='CREATED',
-                target_state=transition.target_state,
+                target_state=transition.get_target_state(),
                 metadata={'large_data': 'x' * 1000},  # Add some bulk
             )
             transition.context = context
@@ -415,7 +405,7 @@ class ConcurrencyTests(TransactionTestCase):
                 entity=self.mock_entity,
                 current_user=self.mock_user,
                 current_state='CREATED',
-                target_state=transition.target_state,
+                target_state=transition.get_target_state(),
                 timestamp=datetime.now(),
             )
 
@@ -552,7 +542,7 @@ class ConcurrencyTests(TransactionTestCase):
                 entity=self.mock_entity,
                 current_user=self.mock_user,
                 current_state='CREATED',
-                target_state=transition.target_state,
+                target_state=transition.get_target_state(),
                 metadata=unique_data,
             )
 
@@ -654,7 +644,9 @@ class ConcurrencyTests(TransactionTestCase):
                         # Validate transition
                         transition = ConcurrencyTestTransition(thread_id=worker_id, shared_counter=operation_counter)
                         context = TransitionContext(
-                            entity=self.mock_entity, current_state='CREATED', target_state=transition.target_state
+                            entity=self.mock_entity,
+                            current_state='CREATED',
+                            target_state=transition.get_target_state(),
                         )
                         transition.validate_transition(context)
                         local_stats['validations_performed'] += 1
@@ -663,7 +655,9 @@ class ConcurrencyTests(TransactionTestCase):
                         # Execute transition
                         transition = ConcurrencyTestTransition(thread_id=worker_id, shared_counter=operation_counter)
                         context = TransitionContext(
-                            entity=self.mock_entity, current_state='CREATED', target_state=transition.target_state
+                            entity=self.mock_entity,
+                            current_state='CREATED',
+                            target_state=transition.get_target_state(),
                         )
                         transition.transition(context)
                         local_stats['transitions_executed'] += 1

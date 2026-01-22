@@ -124,9 +124,16 @@ export function constrainAnchorPointsToBounds(
     y: number;
     controlPoint1?: { x: number; y: number };
     controlPoint2?: { x: number; y: number };
+    [key: string]: any; // Allow additional properties (id, prevPointId, isBezier, etc.)
   }>,
   bounds: { width: number; height: number },
-): Array<{ x: number; y: number; controlPoint1?: { x: number; y: number }; controlPoint2?: { x: number; y: number } }> {
+): Array<{
+  x: number;
+  y: number;
+  controlPoint1?: { x: number; y: number };
+  controlPoint2?: { x: number; y: number };
+  [key: string]: any;
+}> {
   if (points.length === 0) return points;
 
   // Calculate the bounding box of only the anchor points (not control points)
@@ -161,13 +168,11 @@ export function constrainAnchorPointsToBounds(
   }
 
   // Apply the constraint to anchor points and their control points
+  // Preserve all properties from the original point (id, prevPointId, isBezier, etc.)
   const constrainedPoints = points.map((point) => {
-    const constrainedPoint: {
-      x: number;
-      y: number;
-      controlPoint1?: { x: number; y: number };
-      controlPoint2?: { x: number; y: number };
-    } = {
+    // Spread all properties from the original point to preserve skeleton relationships
+    const constrainedPoint = {
+      ...point,
       x: point.x + deltaX,
       y: point.y + deltaY,
     };
@@ -190,14 +195,6 @@ export function constrainAnchorPointsToBounds(
   });
 
   // Debug logging
-  console.log("Anchor points constraint applied:", {
-    originalAnchorBbox: anchorBbox,
-    delta: { x: deltaX, y: deltaY },
-    bounds,
-    constrainedAnchorBbox: calculateGroupBoundingBox(constrainedPoints.map((p) => ({ x: p.x, y: p.y }))),
-    pointCount: points.length,
-  });
-
   return constrainedPoints;
 }
 
@@ -283,15 +280,6 @@ export function calculateTransformerConstraints(
     needsConstraint = true;
   }
 
-  // Debug logging (can be removed later)
-  if (needsConstraint) {
-    console.log("CONSTRAINT APPLIED:", {
-      transformerInImageCoords,
-      imageBounds,
-      constrained: { x: constrainedX, y: constrainedY },
-    });
-  }
-
   return needsConstraint ? { x: constrainedX, y: constrainedY } : null;
 }
 
@@ -308,9 +296,16 @@ export function constrainGroupToBounds(
     y: number;
     controlPoint1?: { x: number; y: number };
     controlPoint2?: { x: number; y: number };
+    [key: string]: any; // Allow additional properties (id, prevPointId, isBezier, etc.)
   }>,
   bounds: { width: number; height: number },
-): Array<{ x: number; y: number; controlPoint1?: { x: number; y: number }; controlPoint2?: { x: number; y: number } }> {
+): Array<{
+  x: number;
+  y: number;
+  controlPoint1?: { x: number; y: number };
+  controlPoint2?: { x: number; y: number };
+  [key: string]: any;
+}> {
   if (points.length === 0) return points;
 
   // Only constrain anchor points as a group

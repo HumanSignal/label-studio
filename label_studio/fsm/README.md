@@ -99,8 +99,7 @@ class ProcessOrderTransition(BaseTransition):
     processor_id: int = Field(..., description="ID of user processing the order")
     priority: str = Field('normal', description="Processing priority")
     
-    @property
-    def target_state(self) -> str:
+    def get_target_state(self, context: Optional[TransitionContext] = None) -> str:
         return OrderStateChoices.PROCESSING
     
     def validate_transition(self, context) -> bool:
@@ -142,7 +141,7 @@ StateManager = get_state_manager()
 current_state = StateManager.get_current_state_value(order)
 
 # Get state history
-history = StateManager.get_state_history(order, limit=10)
+history = StateManager.get_state_history(order)
 
 # Get current state object (full details)
 current_state_obj = StateManager.get_current_state_object(order)
@@ -195,8 +194,7 @@ class ShipOrderTransition(BaseTransition):
     tracking_number: str = Field(..., description="Shipping tracking number")
     carrier: str = Field(..., description="Shipping carrier")
     
-    @property
-    def target_state(self) -> str:
+    def get_target_state(self, context: Optional[TransitionContext] = None) -> str:
         return OrderStateChoices.SHIPPED
     
     def pre_transition_hook(self, context):
@@ -312,3 +310,4 @@ When contributing:
 - Add performance tests for UUID7 optimizations
 - Document extension points and customization options
 - Ensure extensibility is preserved
+- When adding pytests, use and extend reusable helper functions in `fsm/tests/helpers.py` when appropriate

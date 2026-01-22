@@ -33,6 +33,7 @@ async function initLabelStudio({
     "annotations:menu",
     "annotations:add-new",
     "annotations:delete",
+    "annotations:view-all",
     "predictions:tabs",
     "predictions:menu",
     "edit-history",

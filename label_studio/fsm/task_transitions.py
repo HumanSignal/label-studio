@@ -8,7 +8,7 @@ are triggered by Annotation changes, not Task field changes. Those are handled b
 annotation transitions via post_transition_hooks that update the parent task.
 """
 
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 
 from fsm.registry import register_state_transition
 from fsm.state_choices import TaskStateChoices
@@ -29,8 +29,7 @@ class TaskCreatedTransition(ModelChangeTransition):
     triggered by Annotation model changes, not Task field changes.
     """
 
-    @property
-    def target_state(self) -> str:
+    def get_target_state(self, context: Optional[TransitionContext] = None) -> str:
         return TaskStateChoices.CREATED
 
     def get_reason(self, context: TransitionContext) -> str:
@@ -50,7 +49,6 @@ class TaskCreatedTransition(ModelChangeTransition):
         task = context.entity
 
         return {
-            'reason': 'Task created in the system',
             'project_id': task.project_id,
             'data_keys': list(task.data.keys()) if task.data else [],
         }
@@ -69,8 +67,7 @@ class TaskCompletedTransition(ModelChangeTransition):
     From: CREATED -> COMPLETED or IN_PROGRESS -> COMPLETED
     """
 
-    @property
-    def target_state(self) -> str:
+    def get_target_state(self, context: Optional[TransitionContext] = None) -> str:
         return TaskStateChoices.COMPLETED
 
     def get_reason(self, context: TransitionContext) -> str:
@@ -79,7 +76,6 @@ class TaskCompletedTransition(ModelChangeTransition):
     def transition(self, context: TransitionContext) -> Dict[str, Any]:
         task = context.entity
         return {
-            'reason': 'Task completed - annotation submitted',
             'task_id': task.id,
             'project_id': task.project_id,
             'total_annotations': task.total_annotations,
@@ -97,8 +93,7 @@ class TaskInProgressTransition(ModelChangeTransition):
     From: COMPLETED -> IN_PROGRESS
     """
 
-    @property
-    def target_state(self) -> str:
+    def get_target_state(self, context: Optional[TransitionContext] = None) -> str:
         return TaskStateChoices.IN_PROGRESS
 
     def get_reason(self, context: TransitionContext) -> str:
@@ -107,7 +102,6 @@ class TaskInProgressTransition(ModelChangeTransition):
     def transition(self, context: TransitionContext) -> Dict[str, Any]:
         task = context.entity
         return {
-            'reason': 'Task moved to in progress - annotations deleted',
             'task_id': task.id,
             'project_id': task.project_id,
             'total_annotations': task.total_annotations,

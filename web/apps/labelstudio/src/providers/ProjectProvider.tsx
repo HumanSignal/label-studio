@@ -1,6 +1,8 @@
 import type React from "react";
 import { createContext, useCallback, useContext, useEffect, useState } from "react";
 import { shallowEqualObjects } from "shallow-equal";
+import { addVisitedProject } from "@humansignal/core";
+import { useAuth } from "@humansignal/core/providers/AuthProvider";
 import { FF_UNSAVED_CHANGES, isFF } from "../utils/feature-flags";
 import { useAPI, type WrappedResponse } from "./ApiProvider";
 import { useAppStore } from "./AppStoreProvider";
@@ -30,6 +32,7 @@ type UpdateProjectOptions = {
 export const ProjectProvider: React.FunctionComponent = ({ children }) => {
   const api = useAPI();
   const params = useParams();
+  const { user } = useAuth();
   const { update: updateStore } = useAppStore();
   // @todo use null for missed project data
   const [projectData, _setProjectData] = useState<APIProject | Empty>(projectCache.get(+params.id) ?? {});
@@ -61,6 +64,10 @@ export const ProjectProvider: React.FunctionComponent = ({ children }) => {
         setProjectData(projectInfo);
         updateStore({ project: projectInfo });
         projectCache.set(projectInfo.id, projectInfo);
+      }
+
+      if (projectInfo?.id) {
+        addVisitedProject(projectInfo.id, user?.id);
       }
 
       return projectInfo;

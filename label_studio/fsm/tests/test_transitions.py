@@ -7,7 +7,7 @@ patterns to serve as both tests and documentation.
 """
 
 from datetime import datetime, timedelta
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 from unittest.mock import Mock, patch
 
 import pytest
@@ -85,8 +85,7 @@ class CoreFrameworkTests(TestCase):
         class TestTransition(BaseTransition):
             test_field: str = Field('default', description='Test field')
 
-            @property
-            def target_state(self) -> str:
+            def get_target_state(self, context: Optional[TransitionContext] = None) -> str:
                 return TestStateChoices.IN_PROGRESS
 
             def transition(self, context: TransitionContext) -> Dict[str, Any]:
@@ -95,7 +94,7 @@ class CoreFrameworkTests(TestCase):
         # Test instantiation
         transition = TestTransition(test_field='test_value')
         assert transition.test_field == 'test_value'
-        assert transition.target_state == TestStateChoices.IN_PROGRESS
+        assert transition.get_target_state() == TestStateChoices.IN_PROGRESS
         assert transition.transition_name == 'test_transition'
 
     def test_transition_context(self):
@@ -136,8 +135,7 @@ class CoreFrameworkTests(TestCase):
 
         @register_state_transition('test_entity', 'test_transition')
         class TestTransition(BaseTransition):
-            @property
-            def target_state(self) -> str:
+            def get_target_state(self, context: Optional[TransitionContext] = None) -> str:
                 return TestStateChoices.COMPLETED
 
             def transition(self, context: TransitionContext) -> Dict[str, Any]:
@@ -160,8 +158,7 @@ class CoreFrameworkTests(TestCase):
             required_field: str = Field(..., description='Required field')
             optional_field: int = Field(42, description='Optional field')
 
-            @property
-            def target_state(self) -> str:
+            def get_target_state(self, context: Optional[TransitionContext] = None) -> str:
                 return TestStateChoices.COMPLETED
 
             def transition(self, context: TransitionContext) -> Dict[str, Any]:
@@ -183,8 +180,7 @@ class CoreFrameworkTests(TestCase):
         class ExecutionTestTransition(BaseTransition):
             value: str = Field('test', description='Test value')
 
-            @property
-            def target_state(self) -> str:
+            def get_target_state(self, context: Optional[TransitionContext] = None) -> str:
                 return TestStateChoices.COMPLETED
 
             def validate_transition(self, context: TransitionContext) -> bool:
@@ -201,7 +197,7 @@ class CoreFrameworkTests(TestCase):
         context = TransitionContext(
             entity=self.mock_entity,
             current_state=TestStateChoices.IN_PROGRESS,
-            target_state=transition.target_state,
+            target_state=transition.get_target_state(),
             timestamp=datetime.now(),
         )
 
@@ -219,8 +215,7 @@ class CoreFrameworkTests(TestCase):
 
         @register_state_transition('test_entity', 'validation_test')
         class ValidationTestTransition(BaseTransition):
-            @property
-            def target_state(self) -> str:
+            def get_target_state(self, context: Optional[TransitionContext] = None) -> str:
                 return TestStateChoices.COMPLETED
 
             def validate_transition(self, context: TransitionContext) -> bool:
@@ -239,7 +234,7 @@ class CoreFrameworkTests(TestCase):
         valid_context = TransitionContext(
             entity=self.mock_entity,
             current_state=TestStateChoices.IN_PROGRESS,
-            target_state=transition.target_state,
+            target_state=transition.get_target_state(),
         )
         assert transition.validate_transition(valid_context)
 
@@ -247,7 +242,7 @@ class CoreFrameworkTests(TestCase):
         invalid_context = TransitionContext(
             entity=self.mock_entity,
             current_state=TestStateChoices.CREATED,
-            target_state=transition.target_state,
+            target_state=transition.get_target_state(),
         )
 
         # Test validation error
@@ -265,8 +260,7 @@ class CoreFrameworkTests(TestCase):
         class StateManagerTestTransition(BaseTransition):
             value: str = Field('default', description='Test value')
 
-            @property
-            def target_state(self) -> str:
+            def get_target_state(self, context: Optional[TransitionContext] = None) -> str:
                 return TestStateChoices.COMPLETED
 
             def transition(self, context: TransitionContext) -> Dict[str, Any]:
@@ -283,7 +277,7 @@ class CoreFrameworkTests(TestCase):
         # Create instance and verify it works
         transition = transition_class(value='state_manager_test_value')
         assert transition.value == 'state_manager_test_value'
-        assert transition.target_state == TestStateChoices.COMPLETED
+        assert transition.get_target_state() == TestStateChoices.COMPLETED
 
     def test_transition_hooks(self):
         """Test transition lifecycle hooks"""
@@ -292,8 +286,7 @@ class CoreFrameworkTests(TestCase):
 
         @register_state_transition('test_entity', 'hook_test')
         class HookTestTransition(BaseTransition):
-            @property
-            def target_state(self) -> str:
+            def get_target_state(self, context: Optional[TransitionContext] = None) -> str:
                 return TestStateChoices.COMPLETED
 
             def pre_transition_hook(self, context: TransitionContext) -> None:
@@ -310,7 +303,7 @@ class CoreFrameworkTests(TestCase):
         context = TransitionContext(
             entity=self.mock_entity,
             current_state=TestStateChoices.IN_PROGRESS,
-            target_state=transition.target_state,
+            target_state=transition.get_target_state(),
         )
 
         # Test hook execution order
@@ -333,8 +326,7 @@ class TransitionUtilsTests(TestCase):
 
         @register_state_transition('test_entity', 'available_test')
         class AvailableTestTransition(BaseTransition):
-            @property
-            def target_state(self) -> str:
+            def get_target_state(self, context: Optional[TransitionContext] = None) -> str:
                 return TestStateChoices.COMPLETED
 
             def transition(self, context: TransitionContext) -> Dict[str, Any]:
@@ -356,8 +348,7 @@ class TransitionUtilsTests(TestCase):
 
         @register_state_transition('test_entity', 'validation_test_1')
         class ValidationTestTransition1(BaseTransition):
-            @property
-            def target_state(self) -> str:
+            def get_target_state(self, context: Optional[TransitionContext] = None) -> str:
                 return TestStateChoices.IN_PROGRESS
 
             @classmethod
@@ -370,8 +361,7 @@ class TransitionUtilsTests(TestCase):
 
         @register_state_transition('test_entity', 'validation_test_2')
         class ValidationTestTransition2(BaseTransition):
-            @property
-            def target_state(self) -> str:
+            def get_target_state(self, context: Optional[TransitionContext] = None) -> str:
                 return TestStateChoices.COMPLETED
 
             @classmethod
@@ -425,8 +415,7 @@ class TransitionUtilsTests(TestCase):
         class RequiredFieldTransition(BaseTransition):
             required_field: str = Field(..., description='This field is required')
 
-            @property
-            def target_state(self) -> str:
+            def get_target_state(self, context: Optional[TransitionContext] = None) -> str:
                 return TestStateChoices.IN_PROGRESS
 
             @classmethod
@@ -483,8 +472,7 @@ class ComprehensiveUsageExampleTests(TestCase):
 
             message: str = Field(..., description='Message for the transition')
 
-            @property
-            def target_state(self) -> str:
+            def get_target_state(self, context: Optional[TransitionContext] = None) -> str:
                 return 'PROCESSED'
 
             def validate_transition(self, context: TransitionContext) -> bool:
@@ -503,11 +491,14 @@ class ComprehensiveUsageExampleTests(TestCase):
         # Test the implementation
         transition = BasicTransition(message='Processing task')
         assert transition.message == 'Processing task'
-        assert transition.target_state == 'PROCESSED'
+        assert transition.get_target_state() == 'PROCESSED'
 
         # Test validation
         context = TransitionContext(
-            entity=self.task, current_user=self.user, current_state='CREATED', target_state=transition.target_state
+            entity=self.task,
+            current_user=self.user,
+            current_state='CREATED',
+            target_state=transition.get_target_state(),
         )
 
         assert transition.validate_transition(context)
@@ -532,8 +523,7 @@ class ComprehensiveUsageExampleTests(TestCase):
             priority: str = Field('normal', description='Task priority')
             deadline: datetime = Field(None, description='Task deadline')
 
-            @property
-            def target_state(self) -> str:
+            def get_target_state(self, context: Optional[TransitionContext] = None) -> str:
                 return 'ASSIGNED'
 
             def validate_transition(self, context: TransitionContext) -> bool:
@@ -573,7 +563,10 @@ class ComprehensiveUsageExampleTests(TestCase):
         transition = TaskAssignmentTransition(assignee_id=456, priority='high', deadline=future_deadline)
 
         context = TransitionContext(
-            entity=self.task, current_user=self.user, current_state='CREATED', target_state=transition.target_state
+            entity=self.task,
+            current_user=self.user,
+            current_state='CREATED',
+            target_state=transition.get_target_state(),
         )
 
         assert transition.validate_transition(context)
@@ -610,8 +603,7 @@ class ComprehensiveUsageExampleTests(TestCase):
             publish_immediately: bool = Field(True, description='Publish immediately')
             scheduled_time: datetime = Field(None, description='Scheduled publish time')
 
-            @property
-            def target_state(self) -> str:
+            def get_target_state(self, context: Optional[TransitionContext] = None) -> str:
                 return 'PUBLISHED' if self.publish_immediately else 'SCHEDULED'
 
             def transition(self, context: TransitionContext) -> Dict[str, Any]:
@@ -639,7 +631,7 @@ class ComprehensiveUsageExampleTests(TestCase):
 
         # Test transition creation and validation
         transition = PublishDocumentTransition(**transition_data)
-        assert transition.target_state == 'SCHEDULED'
+        assert transition.get_target_state() == 'SCHEDULED'
 
 
 class ValidationAndErrorHandlingTests(TestCase):
@@ -661,8 +653,7 @@ class ValidationAndErrorHandlingTests(TestCase):
             email_field: str = Field(..., pattern=r'^[\w\.-]+@[\w\.-]+\.\w+$', description='Valid email')
             number_field: int = Field(..., ge=1, le=100, description='Number between 1-100')
 
-            @property
-            def target_state(self) -> str:
+            def get_target_state(self, context: Optional[TransitionContext] = None) -> str:
                 return 'VALIDATED'
 
             @classmethod
@@ -701,8 +692,7 @@ class ValidationAndErrorHandlingTests(TestCase):
             amount: float = Field(..., description='Transaction amount')
             currency: str = Field('USD', description='Currency code')
 
-            @property
-            def target_state(self) -> str:
+            def get_target_state(self, context: Optional[TransitionContext] = None) -> str:
                 return 'PROCESSED'
 
             def validate_transition(self, context: TransitionContext) -> bool:
@@ -805,8 +795,7 @@ def test_pydantic_validation():
         test_field: str
         optional_field: int = 42
 
-        @property
-        def target_state(self) -> str:
+        def get_target_state(self, context: Optional[TransitionContext] = None) -> str:
             return 'TEST_STATE'
 
         def transition(self, context: TransitionContext) -> dict:
@@ -820,3 +809,387 @@ def test_pydantic_validation():
     # Invalid data should raise validation error
     with pytest.raises(ValidationError):  # Pydantic validation error
         SampleTransition()  # Missing required field
+
+
+def test_side_effect_only_transition():
+    """Test side-effect only transitions (target_state=None)"""
+
+    class SideEffectTransition(BaseTransition):
+        action_performed: str = 'notification_sent'
+
+        def get_target_state(self, context: Optional[TransitionContext] = None) -> Optional[str]:
+            # Return None to indicate no state change, only side effects
+            return None
+
+        def transition(self, context: TransitionContext) -> dict:
+            # Perform side effect (e.g., send notification, log event)
+            return {'action': self.action_performed}
+
+        def post_transition_hook(self, context: TransitionContext, state_record) -> None:
+            # State record should be None for side-effect only transitions
+            assert state_record is None
+
+    # Test instantiation
+    transition = SideEffectTransition(action_performed='email_sent')
+    assert transition.get_target_state() is None
+
+    # Test context creation with None target_state
+    mock_entity = type('MockEntity', (), {'pk': 1, '_meta': type('Meta', (), {'model_name': 'test'})})()
+    context = TransitionContext(
+        entity=mock_entity,
+        target_state=None,  # Should be allowed for side-effect only transitions
+    )
+    assert context.target_state is None
+
+    # Test transition execution
+    result = transition.transition(context)
+    assert result['action'] == 'email_sent'
+
+
+def test_skip_validation_flag():
+    """
+    Test the skip_validation flag in TransitionContext.
+
+    This test validates step by step:
+    - Creating a transition with validation logic that would normally fail
+    - Verifying that validation runs and fails when skip_validation=False (default)
+    - Verifying that validation is skipped when skip_validation=True
+    - Confirming that prepare_and_validate respects the skip_validation flag
+    - Ensuring the transition can execute successfully when validation is skipped
+
+    Critical validation: The skip_validation flag provides a mechanism to bypass
+    validation checks for special cases like system migrations, data imports, or
+    administrative operations that need to override normal business rules.
+    """
+
+    class StrictValidationTransition(BaseTransition):
+        """Test transition with strict validation rules"""
+
+        action: str = Field(..., description='Action to perform')
+
+        def get_target_state(self, context: Optional[TransitionContext] = None) -> str:
+            return TestStateChoices.COMPLETED
+
+        def validate_transition(self, context: TransitionContext) -> bool:
+            """Validation that only allows transition from IN_PROGRESS state"""
+            if context.current_state != TestStateChoices.IN_PROGRESS:
+                raise TransitionValidationError(
+                    f'Can only complete from IN_PROGRESS state, not {context.current_state}',
+                    {'current_state': context.current_state, 'target_state': context.target_state},
+                )
+            return True
+
+        def transition(self, context: TransitionContext) -> Dict[str, Any]:
+            return {'action': self.action, 'completed': True}
+
+    # Create mock entity
+    mock_entity = MockEntity()
+
+    # Test 1: Normal validation (skip_validation=False, default behavior)
+    # This should fail because current_state is CREATED, not IN_PROGRESS
+    transition = StrictValidationTransition(action='test_action')
+    context_with_validation = TransitionContext(
+        entity=mock_entity,
+        current_state=TestStateChoices.CREATED,  # Invalid state for this transition
+        target_state=transition.get_target_state(),
+        skip_validation=False,  # Explicit False (same as default)
+    )
+
+    # Verify that validation fails as expected
+    with pytest.raises(TransitionValidationError) as cm:
+        transition.prepare_and_validate(context_with_validation)
+
+    error = cm.value
+    assert 'Can only complete from IN_PROGRESS state' in str(error)
+    assert error.context['current_state'] == TestStateChoices.CREATED
+
+    # Test 2: Skip validation (skip_validation=True)
+    # This should succeed even though current_state is CREATED
+    transition_skip = StrictValidationTransition(action='skip_validation_action')
+    context_skip_validation = TransitionContext(
+        entity=mock_entity,
+        current_state=TestStateChoices.CREATED,  # Same invalid state
+        target_state=transition_skip.get_target_state(),
+        skip_validation=True,  # Validation should be skipped
+    )
+
+    # This should NOT raise an error because validation is skipped
+    result = transition_skip.prepare_and_validate(context_skip_validation)
+
+    # Verify the transition executed successfully
+    assert result['action'] == 'skip_validation_action'
+    assert result['completed'] is True
+
+    # Test 3: Verify default behavior (skip_validation not specified, defaults to False)
+    transition_default = StrictValidationTransition(action='default_action')
+    context_default = TransitionContext(
+        entity=mock_entity,
+        current_state=TestStateChoices.CREATED,
+        target_state=transition_default.get_target_state(),
+        # skip_validation not specified, should default to False
+    )
+
+    # Verify default is False (validation should run and fail)
+    assert context_default.skip_validation is False
+
+    with pytest.raises(TransitionValidationError) as cm:
+        transition_default.prepare_and_validate(context_default)
+
+    assert 'Can only complete from IN_PROGRESS state' in str(cm.value)
+
+    # Test 4: Verify that with correct state and skip_validation=False, it succeeds
+    transition_valid = StrictValidationTransition(action='valid_action')
+    context_valid = TransitionContext(
+        entity=mock_entity,
+        current_state=TestStateChoices.IN_PROGRESS,  # Correct state
+        target_state=transition_valid.get_target_state(),
+        skip_validation=False,
+    )
+
+    # This should succeed because state is valid
+    result_valid = transition_valid.prepare_and_validate(context_valid)
+    assert result_valid['action'] == 'valid_action'
+    assert result_valid['completed'] is True
+
+
+def test_transition_context_reason_field():
+    """
+    Test the reason field in TransitionContext.
+
+    This test validates step by step:
+    - Creating a TransitionContext with no reason (defaults to None)
+    - Creating a TransitionContext with a custom reason
+    - Verifying the reason is accessible on the context
+
+    Critical validation: The reason field allows callers to provide context-specific
+    reasons for transitions (e.g., "Bulk import completed") that override the
+    transition's default get_reason() method.
+    """
+    mock_entity = MockEntity()
+
+    # Test 1: Default reason is None
+    context_default = TransitionContext(
+        entity=mock_entity,
+        current_state=TestStateChoices.CREATED,
+        target_state=TestStateChoices.IN_PROGRESS,
+    )
+    assert context_default.reason is None
+
+    # Test 2: Custom reason can be set
+    custom_reason = 'Bulk import completed - 100 tasks added'
+    context_with_reason = TransitionContext(
+        entity=mock_entity,
+        current_state=TestStateChoices.CREATED,
+        target_state=TestStateChoices.IN_PROGRESS,
+        reason=custom_reason,
+    )
+    assert context_with_reason.reason == custom_reason
+
+
+def test_transition_context_context_data_field():
+    """
+    Test the context_data field in TransitionContext.
+
+    This test validates step by step:
+    - Creating a TransitionContext with no context_data (defaults to empty dict)
+    - Creating a TransitionContext with custom context_data
+    - Verifying the context_data is accessible and correct
+
+    Critical validation: The context_data field allows callers to add additional
+    data to be stored in the state record's JSONB context_data field for
+    historical tracking and auditing purposes.
+    """
+    mock_entity = MockEntity()
+
+    # Test 1: Default context_data is empty dict
+    context_default = TransitionContext(
+        entity=mock_entity,
+        current_state=TestStateChoices.CREATED,
+        target_state=TestStateChoices.IN_PROGRESS,
+    )
+    assert context_default.context_data == {}
+
+    # Test 2: Custom context_data can be set
+    custom_context_data = {
+        'import_source': 'cloud_storage',
+        'import_id': 123,
+        'task_count': 100,
+        'triggered_by': 'api',
+        'batch_id': 456,
+        'is_automatic': False,
+    }
+    context_with_data = TransitionContext(
+        entity=mock_entity,
+        current_state=TestStateChoices.CREATED,
+        target_state=TestStateChoices.IN_PROGRESS,
+        context_data=custom_context_data,
+    )
+    assert context_with_data.context_data == custom_context_data
+    assert context_with_data.context_data['import_id'] == 123
+    assert context_with_data.context_data['is_automatic'] is False
+
+
+def test_transition_reason_override():
+    """
+    Test that context.reason overrides transition.get_reason() in executor.
+
+    This test validates step by step:
+    - Creating a transition with a custom get_reason() implementation
+    - Executing with no context.reason (should use transition's get_reason)
+    - Executing with context.reason set (should override get_reason)
+
+    Critical validation: The reason override mechanism allows for context-specific
+    reasons without modifying transition classes.
+    """
+
+    class CustomReasonTransition(BaseTransition):
+        """Transition with custom get_reason"""
+
+        def get_target_state(self, context: Optional[TransitionContext] = None) -> str:
+            return TestStateChoices.IN_PROGRESS
+
+        def get_reason(self, context: TransitionContext) -> str:
+            return 'Default transition reason'
+
+        def transition(self, context: TransitionContext) -> Dict[str, Any]:
+            return {'executed': True}
+
+    mock_entity = MockEntity()
+    transition = CustomReasonTransition()
+
+    # Test 1: Without reason override - uses transition's get_reason
+    context_no_override = TransitionContext(
+        entity=mock_entity,
+        current_state=TestStateChoices.CREATED,
+        target_state=TestStateChoices.IN_PROGRESS,
+    )
+    default_reason = transition.get_reason(context_no_override)
+    assert default_reason == 'Default transition reason'
+
+    # Verify context.reason is None
+    assert context_no_override.reason is None
+
+    # The executor would use: context.reason if context.reason else transition.get_reason(context)
+    effective_reason = (
+        context_no_override.reason if context_no_override.reason else transition.get_reason(context_no_override)
+    )
+    assert effective_reason == 'Default transition reason'
+
+    # Test 2: With reason override - uses context.reason
+    custom_reason = 'Bulk import completed with 500 tasks'
+    context_with_override = TransitionContext(
+        entity=mock_entity,
+        current_state=TestStateChoices.CREATED,
+        target_state=TestStateChoices.IN_PROGRESS,
+        reason=custom_reason,
+    )
+
+    # The executor would use: context.reason if context.reason else transition.get_reason(context)
+    effective_reason = (
+        context_with_override.reason if context_with_override.reason else transition.get_reason(context_with_override)
+    )
+    assert effective_reason == custom_reason
+
+
+def test_transition_context_data_merge():
+    """
+    Test that context.context_data is merged with transition output.
+
+    This test validates step by step:
+    - Creating a transition that returns context data
+    - Adding additional context_data via TransitionContext
+    - Verifying both are merged correctly
+
+    Critical validation: Additional context_data from TransitionContext should
+    be merged with the data returned by transition.transition() method.
+    """
+
+    class DataProducingTransition(BaseTransition):
+        """Transition that produces context data"""
+
+        action: str = 'test_action'
+
+        def get_target_state(self, context: Optional[TransitionContext] = None) -> str:
+            return TestStateChoices.IN_PROGRESS
+
+        def transition(self, context: TransitionContext) -> Dict[str, Any]:
+            return {
+                'action': self.action,
+                'timestamp': context.timestamp.isoformat(),
+            }
+
+    mock_entity = MockEntity()
+    transition = DataProducingTransition(action='bulk_import')
+
+    # Create context with additional context_data
+    additional_context_data = {
+        'import_source_id': 123,
+        'task_count': 456,
+    }
+    context = TransitionContext(
+        entity=mock_entity,
+        current_state=TestStateChoices.CREATED,
+        target_state=TestStateChoices.IN_PROGRESS,
+        context_data=additional_context_data,
+    )
+
+    # Get transition output
+    transition_output = transition.transition(context)
+
+    # Simulate merge (as done in transition_executor.py)
+    merged_data = {**transition_output, **context.context_data}
+
+    # Verify both transition output and additional context_data are present
+    assert merged_data['action'] == 'bulk_import'
+    assert 'timestamp' in merged_data
+    assert merged_data['import_source_id'] == 123
+    assert merged_data['task_count'] == 456
+
+
+def test_transition_context_data_override():
+    """
+    Test that context.context_data can override transition output keys.
+
+    This test validates step by step:
+    - Creating a transition that returns a key
+    - Adding the same key in context_data with different value
+    - Verifying context_data wins (as it's merged second)
+
+    Critical validation: When the same key exists in both transition output
+    and context_data, the context_data value should win since it represents
+    caller-provided context that should take precedence.
+    """
+
+    class OverrideTestTransition(BaseTransition):
+        """Transition that produces a 'reason_code' key"""
+
+        def get_target_state(self, context: Optional[TransitionContext] = None) -> str:
+            return TestStateChoices.IN_PROGRESS
+
+        def transition(self, context: TransitionContext) -> Dict[str, Any]:
+            return {
+                'reason_code': 'default_reason',
+                'other_data': 'preserved',
+            }
+
+    mock_entity = MockEntity()
+    transition = OverrideTestTransition()
+
+    # Create context with context_data that overrides 'reason_code'
+    context = TransitionContext(
+        entity=mock_entity,
+        current_state=TestStateChoices.CREATED,
+        target_state=TestStateChoices.IN_PROGRESS,
+        context_data={'reason_code': 'custom_reason'},
+    )
+
+    # Get transition output
+    transition_output = transition.transition(context)
+
+    # Simulate merge (as done in transition_executor.py)
+    merged_data = {**transition_output, **context.context_data}
+
+    # Verify context_data wins for 'reason_code'
+    assert merged_data['reason_code'] == 'custom_reason'
+    # Other data should be preserved
+    assert merged_data['other_data'] == 'preserved'

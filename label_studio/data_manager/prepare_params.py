@@ -37,12 +37,24 @@ class SelectedItems(BaseModel):
 
 
 class PrepareParams(BaseModel):
-    project: int
+    project: Union[int, List[int]]  # Support both single project and multiple projects
     ordering: List[str] = []
     selectedItems: Optional[SelectedItems] = None
     filters: Optional[Filters] = None
     data: Optional[dict] = None
     request: Optional[Any] = None
+
+    @property
+    def projects(self) -> List[int]:
+        """Get project IDs as a list, whether single or multiple were provided."""
+        if isinstance(self.project, list):
+            return self.project
+        return [self.project]
+
+    @property
+    def is_multi_project(self) -> bool:
+        """Check if this PrepareParams includes multiple projects."""
+        return isinstance(self.project, list) and len(self.project) > 1
 
 
 class CustomEnum(Enum):

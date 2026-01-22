@@ -1,7 +1,7 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
 from django.conf import settings
-from django.urls import include, path
+from django.urls import include, path, re_path
 from io_storages import proxy_api
 from io_storages.all_api import (
     AllExportStorageListAPI,
@@ -49,6 +49,7 @@ from io_storages.localfiles.api import (
     LocalFilesImportStorageSyncAPI,
     LocalFilesImportStorageValidateAPI,
 )
+from io_storages.localfiles.views import localfiles_data
 from io_storages.redis.api import (
     RedisExportStorageDetailAPI,
     RedisExportStorageFormLayoutAPI,
@@ -206,4 +207,8 @@ urlpatterns += [
         proxy_api.ProjectResolveStorageUri.as_view(),
         name='project-storage-data-presign',
     ),
+]
+
+urlpatterns += [
+    re_path(r'data/local-files/', localfiles_data, name='localfiles_data'),
 ]

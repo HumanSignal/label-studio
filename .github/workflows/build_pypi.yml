@@ -64,7 +64,7 @@ env:
   PYTHON_VERSION_FILE: "pyproject.toml"
   FRONTEND_MONOREPO_DIR: "web"
   NODE: "22"
-  POETRY_VERSION: 2.1.4
+  POETRY_VERSION: 2.2.1
 
 jobs:
   pypi:
@@ -77,7 +77,7 @@ jobs:
       - uses: hmarr/debug-action@v3.0.0
 
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           ref: ${{ inputs.ref }}
 
@@ -217,7 +217,7 @@ jobs:
 
       - name: Upload to artifact
         if: always() && inputs.release_type == 'release'
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: Dist
           path: dist/

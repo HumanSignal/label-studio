@@ -392,13 +392,23 @@ export const Select = forwardRef(
                       {({
                         onItemsRendered,
                         ref: infiniteLoaderRef,
-                      }: { onItemsRendered: (params: any) => void; ref: any }) => {
+                      }: {
+                        onItemsRendered: (params: any) => void;
+                        ref: any;
+                      }) => {
+                        // Calculate height based on actual item count from flatOptions
+                        // When searching, _options is filtered and flat; when not searching, _options === options (all items)
+                        const actualItemCount = searchable && query.trim() ? _options.length : flatOptions.length;
+                        const maxVisibleItems = VARIABLE_LIST_COUNT_RENDERED;
+                        const listHeight = Math.min(actualItemCount, maxVisibleItems) * VARIABLE_LIST_ITEM_HEIGHT;
+
                         return (
                           <VariableSizeList
+                            key={renderedOptions.length}
                             itemData={renderedOptions}
                             itemSize={() => VARIABLE_LIST_ITEM_HEIGHT}
                             itemCount={renderedOptions.length}
-                            height={5 * VARIABLE_LIST_ITEM_HEIGHT} // only render 5 items
+                            height={listHeight}
                             // width={VARIABLE_LIST_WIDTH}
                             onItemsRendered={onItemsRendered}
                             ref={infiniteLoaderRef}
@@ -531,7 +541,15 @@ const Option = ({
         )}
         data-disabled={disabled}
       >
-        {multiple && <Checkbox tabIndex={-1} checked={isOptionSelected} indeterminate={isIndeterminate} readOnly />}
+        {multiple && (
+          <Checkbox
+            tabIndex={-1}
+            checked={isOptionSelected}
+            indeterminate={isIndeterminate}
+            readOnly
+            disabled={disabled}
+          />
+        )}
         <div data-testid="select-option-label" className="w-full min-w-0 truncate">
           {label}
         </div>

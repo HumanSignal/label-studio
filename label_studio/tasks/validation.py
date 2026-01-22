@@ -7,6 +7,7 @@ from urllib.parse import urlparse
 
 import ujson as json
 from core.label_config import replace_task_data_undefined_with_config_field
+from core.utils.exceptions import extract_message
 from rest_framework.exceptions import ValidationError
 
 
@@ -145,7 +146,7 @@ class TaskValidator:
                 try:
                     data = json.loads(self.instance.data)
                 except ValueError as e:
-                    raise ValidationError("Can't parse task data: " + str(e))
+                    raise ValidationError("Can't parse task data: " + extract_message(e))
             else:
                 raise ValidationError(
                     'Field "data" must be string or dict, but not "' + type(self.instance.data) + '"'

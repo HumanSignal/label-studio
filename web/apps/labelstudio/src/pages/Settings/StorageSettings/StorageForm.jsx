@@ -4,7 +4,7 @@ import { InlineError } from "../../../components/Error/InlineError";
 import { Form, Input } from "../../../components/Form";
 import { Oneof } from "../../../components/Oneof/Oneof";
 import { ApiContext } from "../../../providers/ApiProvider";
-import { Block, Elem } from "../../../utils/bem";
+import { cn } from "../../../utils/bem";
 import { isDefined } from "../../../utils/helpers";
 
 export const StorageForm = forwardRef(({ onSubmit, target, project, rootClass, storage, storageTypes }, ref) => {
@@ -97,16 +97,16 @@ export const StorageForm = forwardRef(({ onSubmit, target, project, rootClass, s
         valid={connectionValid}
         extra={
           connectionValid !== null && (
-            <Block name="form-indicator">
+            <div className={cn("form-indicator").toClassName()}>
               <Oneof value={connectionValid}>
-                <Elem tag="span" mod={{ type: "success" }} name="item" case={true}>
+                <span className={cn("form-indicator").elem("item").mod({ type: "success" }).toClassName()} case={true}>
                   Successfully connected!
-                </Elem>
-                <Elem tag="span" mod={{ type: "fail" }} name="item" case={false}>
+                </span>
+                <span className={cn("form-indicator").elem("item").mod({ type: "fail" }).toClassName()} case={false}>
                   Connection failed
-                </Elem>
+                </span>
               </Oneof>
-            </Block>
+            </div>
           )
         }
       >

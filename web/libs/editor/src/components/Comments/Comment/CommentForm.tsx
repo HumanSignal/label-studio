@@ -177,7 +177,6 @@ export const CommentForm: FC<CommentFormProps> = observer(({ commentStore, annot
               items={classificationsItems}
               onChange={taxonomyOnChange}
               options={COMMENT_TAXONOMY_OPTIONS}
-              defaultSearch={false}
             />
           </div>
           <CommentFormButtons region={region} linking={linking} onLinkTo={linkToHandler} />

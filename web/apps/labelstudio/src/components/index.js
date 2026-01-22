@@ -1,7 +1,6 @@
 export { Breadcrumbs } from "./Breadcrumbs/Breadcrumbs";
 export { Card } from "./Card/Card";
 export { Columns } from "./Columns/Columns";
-export { Dropdown } from "./Dropdown/Dropdown";
 export { Hamburger } from "./Hamburger/Hamburger";
 export { Menu } from "./Menu/Menu";
 export { Menubar } from "./Menubar/Menubar";

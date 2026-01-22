@@ -9,7 +9,7 @@ import { useAPI } from "../../providers/ApiProvider";
 import { useProject } from "../../providers/ProjectProvider";
 import { useContextProps, useParams } from "../../providers/RoutesProvider";
 import { addCrumb, deleteCrumb } from "../../services/breadrumbs";
-import { Block, Elem } from "../../utils/bem";
+import { cn } from "../../utils/bem";
 import { isDefined } from "../../utils/helpers";
 import { ImportModal } from "../CreateProject/Import/ImportModal";
 import { ExportPage } from "../ExportPage/ExportPage";
@@ -209,13 +209,13 @@ export const DataManagerPage = ({ ...props }) => {
   }, []);
 
   return crashed ? (
-    <Block name="crash">
-      <Elem name="info">Project was deleted or not yet created</Elem>
+    <div className={cn("crash").toClassName()}>
+      <div className={cn("crash").elem("info").toClassName()}>Project was deleted or not yet created</div>
 
       <Button to="/projects" aria-label="Back to projects">
         Back to projects
       </Button>
-    </Block>
+    </div>
   ) : (
     <>
       {loading && (
@@ -224,7 +224,7 @@ export const DataManagerPage = ({ ...props }) => {
         </div>
       )}
       {/* Allow this to exist before the DataManager is initialized as the async app.fetchData call eventually calls startLabeling, and that requires the root element to exist */}
-      <Block ref={root} name="datamanager" />
+      <div ref={root} className={cn("datamanager").toClassName()} />
     </>
   );
 };

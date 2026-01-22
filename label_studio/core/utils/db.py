@@ -150,6 +150,7 @@ def has_column_cached(table_name: str, column_name: str) -> bool:
     Notes:
     - Uses Django introspection; caches per (table, column) with case-insensitive column keys.
     - Safe during early migrations; returns False on any error.
+    - Works in both sync and async contexts by temporarily allowing async-unsafe operations.
     """
     col_key = column_name.lower()
     db_cache = _column_presence_cache.get(current_db_key())
@@ -157,12 +158,38 @@ def has_column_cached(table_name: str, column_name: str) -> bool:
     if table_cache and col_key in table_cache:
         return table_cache[col_key]
 
+    # Check if we're in an async context and need to allow async-unsafe operations
+    import asyncio
+    import os
+
+    in_async_context = False
+    previous_value = os.environ.get('DJANGO_ALLOW_ASYNC_UNSAFE')
+
+    try:
+        asyncio.get_running_loop()
+        in_async_context = True
+        # Temporarily allow async-unsafe operations for schema introspection
+        # This is safe because:
+        # 1. We're only reading DB schema metadata, not data
+        # 2. This happens once per process during startup and is cached
+        # 3. No concurrent access to the same data
+        os.environ['DJANGO_ALLOW_ASYNC_UNSAFE'] = 'true'
+    except RuntimeError:
+        pass  # Not in async context
+
     try:
         with connection.cursor() as cursor:
             cols = connection.introspection.get_table_description(cursor, table_name)
         present = any(getattr(col, 'name', '').lower() == col_key for col in cols)
     except (DatabaseError, ProgrammingError):
         present = False
+    finally:
+        # Restore the previous value
+        if in_async_context:
+            if previous_value is None:
+                os.environ.pop('DJANGO_ALLOW_ASYNC_UNSAFE', None)
+            else:
+                os.environ['DJANGO_ALLOW_ASYNC_UNSAFE'] = previous_value
 
     _column_presence_cache.setdefault(current_db_key(), {}).setdefault(table_name, {})[col_key] = present
     return present

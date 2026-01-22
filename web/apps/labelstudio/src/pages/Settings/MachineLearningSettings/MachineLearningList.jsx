@@ -2,14 +2,14 @@ import { formatDistanceToNow, format, parseISO } from "date-fns";
 import { useCallback, useContext } from "react";
 
 import truncate from "truncate-middle";
-import { Dropdown, Menu } from "../../../components";
-import { Button } from "@humansignal/ui";
+import { Menu } from "../../../components";
+import { Button, Dropdown } from "@humansignal/ui";
 import { confirm } from "../../../components/Modal/Modal";
 import { Oneof } from "../../../components/Oneof/Oneof";
 import { IconEllipsis } from "@humansignal/icons";
 import { Tooltip } from "@humansignal/ui";
 import { ApiContext } from "../../../providers/ApiProvider";
-import { Block, cn } from "../../../utils/bem";
+import { cn } from "../../../utils/bem";
 
 import "./MachineLearningList.scss";
 
@@ -62,7 +62,7 @@ const BackendCard = ({ backend, onStartTrain, onEdit, onDelete, onTestRequest })
   const rootClass = cn("backend-card");
 
   return (
-    <Block name="backend-card">
+    <div className={rootClass.toClassName()}>
       <div className={rootClass.elem("title-container")}>
         <div>
           <BackendState backend={backend} />
@@ -95,11 +95,16 @@ const BackendCard = ({ backend, onStartTrain, onEdit, onDelete, onTestRequest })
         <div className={rootClass.elem("group")}>{truncate(backend.url, 20, 10, "...")}</div>
         <div className={rootClass.elem("group")}>
           <Tooltip title={format(parseISO(backend.created_at), "yyyy-MM-dd HH:mm:ss")}>
-            <span>Created&nbsp;{formatDistanceToNow(parseISO(backend.created_at), { addSuffix: true })}</span>
+            <span>
+              Created&nbsp;
+              {formatDistanceToNow(parseISO(backend.created_at), {
+                addSuffix: true,
+              })}
+            </span>
           </Tooltip>
         </div>
       </div>
-    </Block>
+    </div>
   );
 };
 

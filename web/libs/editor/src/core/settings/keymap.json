@@ -76,16 +76,6 @@
     "description": "Redo"
   },
 
-  "vector:undo": {
-    "key": "ctrl+z",
-    "mac": "command+z",
-    "description": "Undo"
-  },
-  "vector:redo": {
-    "key": "ctrl+shift+z",
-    "mac": "command+shift+z",
-    "description": "Redo"
-  },
   "region:delete-all": {
     "key": "ctrl+backspace",
     "mac": "command+backspace",

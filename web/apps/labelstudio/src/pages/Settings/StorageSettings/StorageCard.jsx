@@ -1,6 +1,6 @@
 import { useCallback, useContext, useEffect, useState } from "react";
-import { Card, Dropdown, Menu } from "../../../components";
-import { Button } from "@humansignal/ui";
+import { Card, Menu } from "../../../components";
+import { Button, Dropdown } from "@humansignal/ui";
 import { ApiContext } from "../../../providers/ApiProvider";
 import { StorageSummary } from "./StorageSummary";
 import { IconEllipsisVertical } from "@humansignal/icons";

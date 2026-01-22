@@ -1,13 +1,13 @@
 import { useCallback, useContext } from "react";
 
 import { format, formatDistanceToNow, parseISO } from "date-fns";
-import { Dropdown, Menu } from "../../../components";
-import { Button } from "@humansignal/ui";
+import { Menu } from "../../../components";
+import { Button, Dropdown } from "@humansignal/ui";
 import { IconInfoOutline, IconPredictions, IconEllipsis } from "@humansignal/icons";
 import { Tooltip } from "@humansignal/ui";
 import { confirm } from "../../../components/Modal/Modal";
 import { ApiContext } from "../../../providers/ApiProvider";
-import { Block, cn } from "../../../utils/bem";
+import { cn } from "../../../utils/bem";
 
 import "./PredictionsList.scss";
 
@@ -56,7 +56,7 @@ const VersionCard = ({ version, selected, onSelect, editable, onDelete }) => {
   );
 
   return (
-    <Block name="prediction-card">
+    <div className={rootClass.toClassName()}>
       <div>
         <div className={rootClass.elem("title")}>
           {version.model_version}
@@ -74,7 +74,11 @@ const VersionCard = ({ version, selected, onSelect, editable, onDelete }) => {
           <div className={rootClass.elem("group")}>
             Last prediction created&nbsp;
             <Tooltip title={format(parseISO(version.latest), "yyyy-MM-dd HH:mm:ss")}>
-              <span>{formatDistanceToNow(parseISO(version.latest), { addSuffix: true })}</span>
+              <span>
+                {formatDistanceToNow(parseISO(version.latest), {
+                  addSuffix: true,
+                })}
+              </span>
             </Tooltip>
           </div>
         </div>
@@ -95,6 +99,6 @@ const VersionCard = ({ version, selected, onSelect, editable, onDelete }) => {
           </Button>
         </Dropdown.Trigger>
       </div>
-    </Block>
+    </div>
   );
 };

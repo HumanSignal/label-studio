@@ -16,10 +16,6 @@ export const FF_DEV_1682 = "ff_front_dev_1682_model_version_dropdown_070622_shor
  */
 export const FF_LSDV_E_297 = "fflag_feat_front_lsdv_e_297_increase_oss_to_enterprise_adoption_short";
 
-/**
- * Project list search
- */
-export const FF_PROD_281 = "fflag_feat_front_prod_281_project_list_search_19072023_short";
 //// END OF LEGACY FLAGS ////
 
 /**
@@ -79,11 +75,6 @@ export const FF_SYNCED_BUFFERING = "fflag_fix_front_fit_31_synced_media_bufferin
 export const FF_SUMMARY = "fflag_feat_front_leap_2036_annotations_summary";
 
 /**
- * TimeSeries Multi-channel functionality
- */
-export const FF_MULTICHANNEL_TS = "fflag_feat_front_bros58_timeseries_multichannel_short";
-
-/**
  * Enables enterprise email notifications
  */
 export const FF_ENTERPRISE_EMAIL_NOTIFICATIONS = "fflag_feat_front_fit_183_email_notifications_short";
@@ -113,3 +104,14 @@ export const FF_MULTIPLE_LABELS_REGIONS = "fflag_feat_front_bros_327_multiple_la
  * Agreement Filtered
  */
 export const FF_AGREEMENT_FILTERED = "fflag_feat_utc_239_filterable_agreement_column_short";
+
+/**
+ * FSM State Fields
+ */
+export const FF_FSM_STATE_FIELDS = "fflag_feat_fit_710_fsm_state_fields";
+
+/**
+ * Starter Cloud (Self Serve) plan
+ * @link https://app.launchdarkly.com/default/test/features/fflag_feat_front_leap_482_self_serve_short/
+ */
+export const FF_SELF_SERVE = "fflag_feat_front_leap_482_self_serve_short";

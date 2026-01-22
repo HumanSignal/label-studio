@@ -1,15 +1,9 @@
 .history-buttons {
   display: flex;
-  gap: 8px;
-  margin-left: 8px;
+  gap: var(--spacing-tight);
+  padding-left: var(--spacing-tight);
 
   &__action {
-    width: 36px;
-    height: 36px;
-    border: none;
-    padding: 0 !important;
-    background: none !important;
-
     &:disabled {
       opacity: 0.6;
     }
@@ -19,7 +13,7 @@
     }
 
     &_delete {
-      color: var(--color-negative-content);
+      color: var(--color-negative-icon);
     }
   }
 }

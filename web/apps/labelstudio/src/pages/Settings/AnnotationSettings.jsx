@@ -3,7 +3,7 @@ import { Button } from "@humansignal/ui";
 import { useUpdatePageTitle, createTitleFromSegments } from "@humansignal/core";
 import { Form, TextArea, Toggle } from "../../components/Form";
 import { MenubarContext } from "../../components/Menubar/Menubar";
-import { Block, Elem } from "../../utils/bem";
+import { cn } from "../../utils/bem";
 
 import { ModelVersionSelector } from "./AnnotationSettings/ModelVersionSelector";
 import { ProjectContext } from "../../providers/ProjectProvider";
@@ -26,10 +26,10 @@ export const AnnotationSettings = () => {
   }, [project]);
 
   return (
-    <Block name="annotation-settings">
-      <Elem name={"wrapper"}>
+    <div className={cn("annotation-settings").toClassName()}>
+      <div className={cn("annotation-settings").elem("wrapper").toClassName()}>
         <h1>Annotation Settings</h1>
-        <Block name="settings-wrapper">
+        <div className={cn("settings-wrapper").toClassName()}>
           <Form
             ref={formRef}
             action="updateProject"
@@ -38,7 +38,7 @@ export const AnnotationSettings = () => {
             onSubmit={updateProject}
           >
             <Form.Row columnCount={1}>
-              <Elem name={"header"}>Labeling Instructions</Elem>
+              <div className={cn("settings-wrapper").elem("header").toClassName()}>Labeling Instructions</div>
               <div class="settings-description">
                 <p style={{ marginBottom: "0" }}>Write instructions to help users complete labeling tasks.</p>
                 <p style={{ marginTop: "8px" }}>
@@ -55,7 +55,7 @@ export const AnnotationSettings = () => {
 
             <Form.Row columnCount={1}>
               <br />
-              <Elem name={"header"}>Prelabeling</Elem>
+              <div className={cn("settings-wrapper").elem("header").toClassName()}>Prelabeling</div>
               <div>
                 <Toggle
                   label="Use predictions to prelabel tasks"
@@ -79,9 +79,9 @@ export const AnnotationSettings = () => {
               </Button>
             </Form.Actions>
           </Form>
-        </Block>
-      </Elem>
-    </Block>
+        </div>
+      </div>
+    </div>
   );
 };
 

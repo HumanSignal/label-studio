@@ -147,17 +147,9 @@ Scenario("Image with perRegion tags", async ({ I, LabelStudio, AtOutliner }) => 
   assert.deepStrictEqual(result[0].value.rectanglelabels, ["Moonwalker"]);
 });
 
-const outOfBoundsFFs = new DataTable(["FF_DEV_3793"]);
-
-outOfBoundsFFs.add([true]);
-outOfBoundsFFs.add([false]);
-
-Data(outOfBoundsFFs).Scenario(
+Scenario(
   "Can't create rectangles outside of canvas",
-  async ({ I, AtLabels, AtOutliner, AtImageView, LabelStudio, AtPanels, current }) => {
-    LabelStudio.setFeatureFlags({
-      fflag_fix_front_dev_3793_relative_coords_short: current.FF_DEV_3793,
-    });
+  async ({ I, AtLabels, AtOutliner, AtImageView, LabelStudio, AtPanels }) => {
     const AtDetailsPanel = AtPanels.usePanel(AtPanels.PANEL.DETAILS);
 
     I.amOnPage("/");
@@ -218,12 +210,9 @@ Data(outOfBoundsFFs).Scenario(
   },
 );
 
-Data(outOfBoundsFFs).Scenario(
+Scenario(
   "Can't create ellipses outside of canvas",
-  async ({ I, AtLabels, AtOutliner, AtImageView, LabelStudio, AtPanels, current }) => {
-    LabelStudio.setFeatureFlags({
-      fflag_fix_front_dev_3793_relative_coords_short: current.FF_DEV_3793,
-    });
+  async ({ I, AtLabels, AtOutliner, AtImageView, LabelStudio, AtPanels }) => {
     const AtDetailsPanel = AtPanels.usePanel(AtPanels.PANEL.DETAILS);
 
     I.amOnPage("/");

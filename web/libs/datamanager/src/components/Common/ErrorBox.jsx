@@ -1,6 +1,6 @@
 import { inject } from "mobx-react";
 import { Button } from "@humansignal/ui";
-import { Dropdown } from "./Dropdown/Dropdown";
+import { Dropdown } from "@humansignal/ui";
 import { Menu } from "./Menu/Menu";
 import { IconInfo } from "@humansignal/icons";
 

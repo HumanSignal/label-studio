@@ -35,11 +35,17 @@ Use the following steps to export data and annotations from the Label Studio UI.
 !!! note
     1. The export will always include the annotated tasks, regardless of filters set on the tab. 
     2. Cancelled annotated tasks will be included in the exported result too.
-    3. If you want to apply tab filters to the export, try to use [export snapshots using the SDK](https://labelstud.io/sdk/project.html#label_studio_sdk.project.Project.export_snapshot_create) or [API](#Export-snapshots-using-the-Snapshot-API).
+    3. If you want to apply tab filters to the export, try creating [export snapshots using the SDK](https://api.labelstud.io/api-reference/api-reference/projects/exports/create).
 
 ### Export timeout in Community Edition
 
-If the export times out, see how to [export snapshots using the SDK](https://labelstud.io/sdk/project.html#label_studio_sdk.project.Project.export_snapshot_create) or [API](#Export-snapshots-using-the-Snapshot-API). You can also use a [console command](#Export-using-console-command) to export your project. For more information, see the following section.
+Exports from the Community Edition UI are generated **synchronously** as part of the request. Community Edition keeps deployment simple and does not run background export workers by default. Label Studio Enterprise supports background workers for asynchronous snapshot exports, which is better suited for large-scale projects. For large projects, the community's export can take longer than the timeout configured in your reverse proxy or ingress (often around **90 seconds**), which can result in 502/504 errors or an export timeout.
+
+If you hit this limitation, you can still export your data using one of these options:
+
+- **Export snapshots using the SDK**: See how to [export snapshots using the SDK](https://api.labelstud.io/api-reference/api-reference/projects/exports/create).
+- **Export using the console command**: Use the [console command](#Export-using-console-command) to export your project directly from the machine running Label Studio.
+- **Export in the UI at scale**: Label Studio Enterprise includes **background snapshot exports** in the UI for large datasets (see [Export snapshots using the UI](#Export-snapshots-using-the-UI)).
 
 ### Export using console command
 
@@ -82,30 +88,30 @@ In Label Studio Enterprise, create a snapshot of your data and annotations. Crea
 
 ### Export using the Easy Export API
 
-You can call the Label Studio API to export annotations. For a small labeling project, call the [export endpoint](/api#operation/api_projects_export_read) to export annotations.
+You can call the Label Studio API to export annotations. For a small labeling project, call the [export endpoint](https://api.labelstud.io/api-reference/api-reference/projects/exports/download-sync) to export annotations.
 
 
 #### Export all tasks including tasks without annotations
 
-Label Studio open source exports tasks with annotations only by default. If you want to easily export all tasks including tasks without annotations, you can call  the [Easy Export API](https://api.labelstud.io/#operation/api_projects_export_read) with query param `download_all_tasks=true`. For example:
+Label Studio open source exports tasks with annotations only by default. If you want to easily export all tasks including tasks without annotations, you can call  the [Easy Export API](https://api.labelstud.io/api-reference/api-reference/projects/exports/download-sync) with query param `download_all_tasks=true`. For example:
 ```
 curl -X GET https://localhost:8080/api/projects/{id}/export?exportType=JSON&download_all_tasks=true
 ``` 
 
-If your project is large, you can use a [snapshot export](https://api.labelstud.io/#operation/api_projects_exports_create) (or [snapshot SDK](https://labelstud.io/sdk/project.html#create-new-export-snapshot)) to avoid timeouts in most cases. Snapshots include all tasks without annotations by default.
+If your project is large, you can use a [snapshot export](https://api.labelstud.io/api-reference/api-reference/projects/exports/create) to avoid timeouts in most cases. Snapshots include all tasks without annotations by default.
 
 
 ### Export snapshots using the Snapshot API 
 
 For a large labeling project with hundreds of thousands of tasks, do the following:
-1. Make a POST request to [create a new export file or snapshot](/api#operation/api_projects_exports_create). The response includes an `id` for the created file.
-2. [Check the status of the export file created](/api#operation/api_projects_exports_read) using the `id` as the `export_pk`. 
-3. Using the `id` from the created snapshot as the export primary key, or `export_pk`, make a GET request to [download the export file](/api#operation/api_projects_exports_download_read).
+1. Make a POST request to [create a new export file or snapshot](https://api.labelstud.io/api-reference/api-reference/projects/exports/create). The response includes an `id` for the created file.
+2. [Check the status of the export file created](https://api.labelstud.io/api-reference/api-reference/projects/exports/get) using the `id` as the `export_pk`. 
+3. Using the `id` from the created snapshot as the export primary key, or `export_pk`, make a GET request to [download the export file](https://api.labelstud.io/api-reference/api-reference/projects/exports/download).
 
 
 ## Export formats supported by Label Studio
 
-Label Studio supports many common and standard formats for exporting completed labeling tasks. If you don't see a format that works for you, you can contribute one. For more information, see the [GitHub repository for the Label Studio Converter tool](https://github.com/HumanSignal/label-studio-converter).
+Label Studio supports many common and standard formats for exporting completed labeling tasks. If you don't see a format that works for you, you can contribute one. For more information, see the [Label Studio Converter tool in our SDK repo](https://github.com/HumanSignal/label-studio-sdk/tree/master/src/label_studio_sdk/converter).
 
 ### ASR_MANIFEST
 
@@ -336,7 +342,7 @@ Export object detection annotations in the YOLOv3 and YOLOv4 format. Supports ob
 {% insertmd includes/image_units.md %}
 
 ## Manually convert JSON annotations to another format
-You can run the [Label Studio converter tool](https://github.com/HumanSignal/label-studio-converter) on a directory or file of completed JSON annotations using the command line or Python to convert the completed annotations from Label Studio JSON format into another format. 
+You can run the [Label Studio converter tool](https://github.com/HumanSignal/label-studio-sdk/tree/master/src/label_studio_sdk/converter) on a directory or file of completed JSON annotations using the command line or Python to convert the completed annotations from Label Studio JSON format into another format. 
 
 !!! note
     If you use versions of Label Studio earlier than 1.0.0, then this is the only way to convert your Label Studio JSON format annotations into another labeling format. 
@@ -370,7 +376,7 @@ You can use `label_studio_tools.core.utils.io.get_local_path` method to get data
 
 You can get data with `label_studio_tools.core.utils.io.get_local_path` in case if you mount same disk to your machine. If you mount same disk to external box 
 
-Another way of accessing data is to use link from task and ACCESS_TOKEN ([see documentation for authentication](api.html#Authenticate-to-the-API)). Concatenate Label Studio hostname and link from task data. Then add access token to your request:
+Another way of accessing data is to use link from task and ACCESS_TOKEN ([see documentation for authentication](access_tokens)). Concatenate Label Studio hostname and link from task data. Then add access token to your request:
 
 ```json
 curl -X GET http://localhost:8080/api/projects/ -H 'Authorization: Token {YOUR_TOKEN}'

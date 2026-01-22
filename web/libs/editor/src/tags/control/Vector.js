@@ -79,32 +79,7 @@ const Model = types
   })
   .volatile(() => ({
     toolNames: ["Vector"],
-  }))
-  .actions((self) => {
-    return {
-      initializeHotkeys() {
-        hotkeys.addNamed("vector:undo", () => {
-          if (self.annotation?.selected && self.annotation.isDrawing) self.annotation.undo();
-        });
-        hotkeys.addNamed("vector:redo", () => {
-          if (self.annotation?.selected && self.annotation.isDrawing) self.annotation.redo();
-        });
-      },
-
-      disposeHotkeys() {
-        hotkeys.removeNamed("vector:undo");
-        hotkeys.removeNamed("vector:redo");
-      },
-
-      afterCreate() {
-        self.initializeHotkeys();
-      },
-
-      beforeDestroy() {
-        self.disposeHotkeys();
-      },
-    };
-  });
+  }));
 
 const VectorModel = types.compose(
   "VectorModel",

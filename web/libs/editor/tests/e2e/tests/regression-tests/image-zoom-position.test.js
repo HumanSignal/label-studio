@@ -18,17 +18,11 @@ async function getStrokeColor() {
   return circle.attrs.stroke;
 }
 
-const relativeCoordsFF = new DataTable(["enabled"]);
-
-relativeCoordsFF.add([true]);
-relativeCoordsFF.add([false]);
-
-Data(relativeCoordsFF).Scenario(
+Scenario(
   "Zoomed image should keep center image in center of canvas on resizes",
-  async ({ I, LabelStudio, AtImageView, AtOutliner, AtDetails, AtPanels, current }) => {
+  async ({ I, LabelStudio, AtImageView, AtOutliner, AtDetails, AtPanels }) => {
     const AtDetailsPanel = AtPanels.usePanel(AtPanels.PANEL.DETAILS);
     const AtOutlinerPanel = AtPanels.usePanel(AtPanels.PANEL.OUTLINER);
-    const FF3793 = current;
 
     const params = {
       config,
@@ -78,7 +72,6 @@ Data(relativeCoordsFF).Scenario(
 
     LabelStudio.setFeatureFlags({
       fflag_fix_front_dev_3377_image_regions_shift_on_resize_280922_short: true,
-      fflag_fix_front_dev_3793_relative_coords_short: FF3793.enabled,
     });
 
     I.amOnPage("/");
@@ -108,7 +101,7 @@ Data(relativeCoordsFF).Scenario(
     AtOutliner.seeSelectedRegion();
     // these values depend on screen size, interface elements size, etc.
     // so if they were changed slightly, just replace them with actual data.
-    AtDetails.seeFieldWithValue("X", FF3793.enabled ? "88.567" : "430.15");
+    AtDetails.seeFieldWithValue("X", "88.567");
     I.pressKey("U");
 
     I.say("Collapse the details panel");
@@ -163,7 +156,7 @@ Data(relativeCoordsFF).Scenario(
     I.say("Check that there is a region at the center of visible area");
     AtImageView.clickAt(AtImageView.percToX(50), AtImageView.percToY(50));
     AtOutliner.seeSelectedRegion();
-    AtDetails.seeFieldWithValue("X", FF3793.enabled ? "68.75" : "333.90");
+    AtDetails.seeFieldWithValue("X", "68.75");
     I.pressKey("U");
 
     I.say("Collapse the details panel");

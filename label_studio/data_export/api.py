@@ -10,10 +10,12 @@ from core.feature_flags import flag_set
 from core.permissions import all_permissions
 from core.redis import start_job_async_or_sync
 from core.utils.common import batch
+from core.utils.exceptions import extract_message
 from django.conf import settings
 from django.core.files import File
 from django.core.files.storage import FileSystemStorage
 from django.db import transaction
+from django.db.models import Prefetch
 from django.http import FileResponse, HttpResponse
 from django.utils.decorators import method_decorator
 from drf_spectacular.types import OpenApiTypes
@@ -42,8 +44,15 @@ logger = logging.getLogger(__name__)
     name='get',
     decorator=extend_schema(
         tags=['Export'],
-        summary='Get export formats',
-        description='Retrieve the available export formats for the current project by ID.',
+        summary='[Deprecated] Get export formats',
+        description="""
+        This endpoint is deprecated in Enterprise. Use the async export API instead:
+        POST /api/projects/{{id}}/exports/ (see [Create new export](/api#operation/api_projects_exports_create)).
+
+        In Label Studio Enterprise, this endpoint will always return a 404 Not Found response with instructions to use the async export API.
+
+        Retrieve the available export formats for the current project by ID.""",
+        deprecated=True,
         parameters=[
             OpenApiParameter(
                 name='id',
@@ -118,8 +127,13 @@ class ExportFormatsListAPI(generics.RetrieveAPIView):
             ),
         ],
         tags=['Export'],
-        summary='Easy export of tasks and annotations',
+        summary='[Deprecated] Easy export of tasks and annotations',
         description="""
+        This endpoint is deprecated in Enterprise. Use the async export API instead:
+        POST /api/projects/{{id}}/exports/ (see [Create new export](/api#operation/api_projects_exports_create)).
+
+        In Label Studio Enterprise, this endpoint will always return a 404 Not Found response with instructions to use the async export API.
+
         <i>Note: if you have a large project it's recommended to use
         export snapshots, this easy export endpoint might have timeouts.</i><br/><br>
         Export annotated tasks as a file in a specific format.
@@ -141,6 +155,7 @@ class ExportFormatsListAPI(generics.RetrieveAPIView):
             settings.HOSTNAME or 'https://localhost:8080',
             settings.HOSTNAME or 'https://localhost:8080',
         ),
+        deprecated=True,
         responses={
             200: OpenApiResponse(
                 description='Exported data',
@@ -166,7 +181,34 @@ class ExportAPI(generics.RetrieveAPIView):
         return Project.objects.filter(organization=self.request.user.active_organization)
 
     def get_task_queryset(self, queryset):
-        return queryset.select_related('project').prefetch_related('annotations', 'predictions')
+        # Import here to avoid circular dependencies
+        from core.feature_flags import flag_set
+        from tasks.models import Annotation
+
+        # Create a prefetch for annotations with FSM state
+        annotations_qs = Annotation.objects.all()
+
+        # Only annotate FSM state if both feature flags are enabled
+        user = getattr(self.request, 'user', None)
+        if (
+            flag_set('fflag_feat_fit_568_finite_state_management', user=user)
+            and flag_set('fflag_feat_fit_710_fsm_state_fields', user=user)
+            and hasattr(annotations_qs, 'with_state')
+        ):
+            annotations_qs = annotations_qs.with_state()
+
+        qs = queryset.select_related('project').prefetch_related(
+            Prefetch('annotations', queryset=annotations_qs), 'predictions'
+        )
+
+        # Add FSM state annotation to tasks as well to avoid N+1 queries during export
+        if (
+            flag_set('fflag_feat_fit_568_finite_state_management', user=user)
+            and flag_set('fflag_feat_fit_710_fsm_state_fields', user=user)
+            and hasattr(qs, 'with_state')
+        ):
+            qs = qs.with_state()
+        return qs
 
     def get(self, request, *args, **kwargs):
         project = self.get_object()
@@ -434,7 +476,7 @@ class ExportDetailAPI(generics.RetrieveDestroyAPIView):
                     status=status.HTTP_500_INTERNAL_SERVER_ERROR,
                     data={
                         'detail': 'Could not delete file from storage. Check that your user has permissions to delete files: %s'
-                        % str(e)
+                        % extract_message(e)
                     },
                 )
 

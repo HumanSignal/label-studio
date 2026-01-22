@@ -19,6 +19,7 @@ import { useProject } from "../../../providers/ProjectProvider";
 import { cn } from "../../../utils/bem";
 import { StorageSet } from "./StorageSet";
 import { useStorageCard } from "./hooks/useStorageCard";
+import "./StorageSettings.scss";
 
 export const StorageSettings = () => {
   const { project } = useProject();

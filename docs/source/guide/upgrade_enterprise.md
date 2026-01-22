@@ -4,7 +4,7 @@ short: Upgrade Label Studio
 tier: enterprise
 type: guide
 order: 0
-order_enterprise: 75
+order_enterprise: 76
 meta_title: Upgrade Label Studio Enterprise
 meta_description: Steps you should take when upgrading Label Studio Enterprise.
 section: "Install & Setup"
@@ -23,6 +23,9 @@ If you are using the on-premises version of Label Studio, you will need to take 
 2. Perform the upgrade on your development server first. 
 3. Run health checks and tests. ([See below.](#Checks-after-upgrading))
 4. Perform the upgrade on your production server. 
+
+!!! attention "important"
+    Before upgrading, check the [release notes](release_notes) for any breaking changes. 
 
 ## Upgrade using Helm
 

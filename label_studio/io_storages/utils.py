@@ -5,9 +5,9 @@ import json
 import logging
 import re
 from dataclasses import dataclass
-from typing import Optional, Union
+from typing import Iterator, Optional, Union
 
-from core.feature_flags import flag_set
+import ijson
 from core.utils.common import load_func
 from django.conf import settings
 
@@ -138,29 +138,24 @@ class StorageObject:
         ]
 
 
-def load_tasks_json_lso(blob: bytes, key: str) -> list[StorageObject]:
+def load_tasks_json_lso(blob: bytes, key: str) -> Iterator[StorageObject]:
     """
-    Parse blob containing task JSON(s) and return the validated result or raise an error.
+    Parse blob containing task JSON(s) using memory-efficient streaming and yield StorageObjects.
+
+    This function uses ijson for streaming JSON array parsing to avoid loading the entire
+    file into memory at once, which is critical for large files (>100k rows, >200MB).
+
+    Supported formats:
+        - Single JSON object: {"data": {...}}
+        - JSON array: [{"data": {...}}, {"data": {...}}, ...]
+        - JSONL (newline-delimited JSON): {"data": {...}}\n{"data": {...}}\n...
 
     Args:
-        blob (bytes): The blob string to parse.
+        blob (bytes): The blob bytes to parse.
         key (str): The key of the blob. Used for error messages.
 
-    Returns:
-        list[StorageObject]: link params for each task.
-    """
-    # Check feature flag to decide between generator and list
-    if flag_set('fflag_fix_back_plt_870_import_from_storage_batch_28082025_short'):
-        # Return generator version
-        return _load_tasks_json_lso_generator(blob, key)
-    else:
-        # Return list version (current implementation)
-        return _load_tasks_json_lso_list(blob, key)
-
-
-def _load_tasks_json_lso_list(blob: bytes, key: str) -> list[StorageObject]:
-    """
-    Current implementation - returns list of StorageObjects.
+    Yields:
+        StorageObject: link params for each task.
     """
 
     def _error_wrapper(exc: Optional[Exception] = None):
@@ -171,72 +166,75 @@ def _load_tasks_json_lso_list(blob: bytes, key: str) -> list[StorageObject]:
             )
         ) from exc
 
-    try:
-        value = json.loads(blob)
-    except json.decoder.JSONDecodeError as e:
-        if flag_set('fflag_feat_root_11_support_jsonl_cloud_storage'):
-            try:
-                value = []
-                with io.BytesIO(blob) as f:
-                    for line in f:
-                        value.append(json.loads(line))
-                return StorageObject.bulk_create(value, key, range(len(value)))
-            except Exception as e:
-                _error_wrapper(e)
-        else:
+    # Peek at the first non-whitespace character to determine format
+    first_char = None
+    for byte in blob:
+        char = chr(byte)
+        if not char.isspace():
+            first_char = char
+            break
+
+    if first_char is None:
+        _error_wrapper(ValueError('Empty or whitespace-only content'))
+
+    if first_char == '[':
+        # JSON array - use ijson for memory-efficient streaming
+        try:
+            row_index = 0
+            with io.BytesIO(blob) as f:
+                # ijson.items parses the array incrementally, yielding one item at a time
+                # use_float=True ensures numbers are parsed as float (not Decimal), which is JSON-serializable
+                for task_data in ijson.items(f, 'item', use_float=True):
+                    yield StorageObject(key=key, task_data=task_data, row_index=row_index)
+                    row_index += 1
+            # Check if we got any items - if not, it's an empty array which is valid
+            return
+        except ijson.JSONError as e:
+            _error_wrapper(e)
+        except Exception as e:
             _error_wrapper(e)
 
-    if isinstance(value, dict):
-        return [StorageObject(key=key, task_data=value)]
-    if isinstance(value, list):
-        return StorageObject.bulk_create(value, key, range(len(value)))
+    elif first_char == '{':
+        # Could be single JSON object or JSONL
+        try:
+            value = json.loads(blob)
+            # Successfully parsed as single JSON object
+            yield StorageObject(key=key, task_data=value)
+            return
+        except json.decoder.JSONDecodeError:
+            # Failed to parse as single object, try JSONL
+            pass
 
-    _error_wrapper()
-
-
-def _load_tasks_json_lso_generator(blob: bytes, key: str):
-    """
-    Generator version - yields StorageObjects one by one to save memory.
-    """
-
-    def _error_wrapper(exc: Optional[Exception] = None):
-        raise ValueError(
-            (
-                f"Can't import JSON-formatted tasks from {key}. If you're trying to import binary objects, "
-                f'perhaps you forgot to enable "Tasks" import method?'
-            )
-        ) from exc
-
-    try:
-        value = json.loads(blob)
-    except json.decoder.JSONDecodeError as e:
-        if flag_set('fflag_feat_root_11_support_jsonl_cloud_storage'):
-            try:
-                # For JSONL: yield one object per line as we parse
-                row_index = 0
-                with io.BytesIO(blob) as f:
-                    for line in f:
+        # Try JSONL format (newline-delimited JSON)
+        try:
+            row_index = 0
+            with io.BytesIO(blob) as f:
+                for line in f:
+                    line = line.strip()
+                    if line:  # Skip empty lines
                         task_data = json.loads(line)
                         yield StorageObject(key=key, task_data=task_data, row_index=row_index)
                         row_index += 1
-                return
-            except Exception as e:
-                _error_wrapper(e)
-        else:
+            return
+        except Exception as e:
             _error_wrapper(e)
 
-    if isinstance(value, dict):
-        # Single dict - yield one object
-        yield StorageObject(key=key, task_data=value)
-    elif isinstance(value, list):
-        # JSON array - yield one object at a time
-        for row_index, task_data in enumerate(value):
-            yield StorageObject(key=key, task_data=task_data, row_index=row_index)
     else:
-        _error_wrapper()
+        _error_wrapper(ValueError(f'Unexpected character at start of JSON: {first_char}'))
 
 
-def load_tasks_json(blob: str, key: str) -> list[StorageObject]:
-    # uses load_tasks_json_lso here and an LSE-specific implementation in LSE
+def load_tasks_json(blob: bytes, key: str) -> Iterator[StorageObject]:
+    """
+    Load tasks from a JSON/JSONL blob using the configured loader.
+
+    Uses load_tasks_json_lso in open-source and an LSE-specific implementation in enterprise.
+
+    Args:
+        blob (bytes): The blob bytes to parse.
+        key (str): The key of the blob. Used for error messages.
+
+    Yields:
+        StorageObject: link params for each task.
+    """
     load_tasks_json_func = load_func(settings.STORAGE_LOAD_TASKS_JSON)
     return load_tasks_json_func(blob, key)

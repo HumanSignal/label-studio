@@ -1,5 +1,5 @@
 import { types } from "mobx-state-tree";
-import { FF_DEV_3793, FF_ZOOM_OPTIM, isFF } from "../utils/feature-flags";
+import { FF_ZOOM_OPTIM, isFF } from "../utils/feature-flags";
 import Constants from "../core/Constants";
 
 export const KonvaRegionMixin = types
@@ -13,7 +13,6 @@ export const KonvaRegionMixin = types
       get bboxCoordsCanvas() {
         const bbox = self.bboxCoords;
 
-        if (!isFF(FF_DEV_3793)) return bbox;
         if (!self.parent) return null;
 
         return {

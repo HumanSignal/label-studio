@@ -3,7 +3,6 @@ import { guidGenerator } from "../core/Helpers";
 import { isDefined } from "../utils/utilities";
 import { AnnotationMixin } from "./AnnotationMixin";
 import { ReadOnlyRegionMixin } from "./ReadOnlyMixin";
-import { RELATIVE_STAGE_HEIGHT, RELATIVE_STAGE_WIDTH } from "../components/ImageView/Image";
 
 const RegionsMixin = types
   .model({
@@ -162,23 +161,6 @@ const RegionsMixin = types
 
       makeDynamic() {
         self.dynamic = true;
-      },
-
-      // @todo this conversion methods should be removed after removing FF_DEV_3793
-      convertXToPerc(x) {
-        return (x * RELATIVE_STAGE_WIDTH) / self.currentImageEntity.stageWidth;
-      },
-
-      convertYToPerc(y) {
-        return (y * RELATIVE_STAGE_HEIGHT) / self.currentImageEntity.stageHeight;
-      },
-
-      convertHDimensionToPerc(hd) {
-        return (hd * (self.scaleX || 1) * RELATIVE_STAGE_WIDTH) / self.currentImageEntity.stageWidth;
-      },
-
-      convertVDimensionToPerc(vd) {
-        return (vd * (self.scaleY || 1) * RELATIVE_STAGE_HEIGHT) / self.currentImageEntity.stageHeight;
       },
 
       // update region appearence based on it's current states, for

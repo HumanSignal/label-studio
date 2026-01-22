@@ -1,6 +1,6 @@
 import React from "react";
 import { ApiContext } from "../../providers/ApiProvider";
-import { Block } from "../../utils/bem";
+import { cn } from "../../utils/bem";
 import { ErrorWrapper } from "./Error";
 
 export const InlineError = ({ minimal, children, includeValidation, className, style }) => {
@@ -11,13 +11,13 @@ export const InlineError = ({ minimal, children, includeValidation, className, s
   }, [context]);
 
   return context.error ? (
-    <Block name="inline-error" mix={className} style={style}>
+    <div className={cn("inline-error").mix(className).toClassName()} style={style}>
       <ErrorWrapper
         possum={false}
         minimal={minimal}
         {...context.errorFormatter(context.error, { includeValidation })}
       />
       {children}
-    </Block>
+    </div>
   ) : null;
 };

@@ -2,7 +2,7 @@ import { format } from "date-fns";
 import { createContext, useCallback, useContext, useEffect, useReducer } from "react";
 import { Link } from "react-router-dom";
 import { useAPI } from "../../providers/ApiProvider";
-import { Block, Elem } from "../../utils/bem";
+import { cn } from "../../utils/bem";
 import "./VersionNotifier.scss";
 import { IconBell } from "@humansignal/icons";
 
@@ -47,22 +47,22 @@ export const VersionNotifier = ({ showNewVersion, showCurrentVersion }) => {
   const url = `https://labelstud.io/redirect/update?version=${version}`;
 
   return newVersion && showNewVersion ? (
-    <Block tag="li" name="version-notifier">
+    <li className={cn("version-notifier").toClassName()}>
       <a href={url} target="_blank" rel="noreferrer">
-        <Elem name="icon">
+        <div className={cn("version-notifier").elem("icon").toClassName()}>
           <IconBell />
-        </Elem>
-        <Elem name="content">
-          <Elem name="title" data-date={updateTime}>
+        </div>
+        <div className={cn("version-notifier").elem("content").toClassName()}>
+          <div className={cn("version-notifier").elem("title").toClassName()} data-date={updateTime}>
             {latestVersion} Available
-          </Elem>
-          <Elem name="description">Current version: {version}</Elem>
-        </Elem>
+          </div>
+          <div className={cn("version-notifier").elem("description").toClassName()}>Current version: {version}</div>
+        </div>
       </a>
-    </Block>
+    </li>
   ) : version && showCurrentVersion ? (
-    <Block tag={Link} name="current-version" to="/version" target="_blank">
+    <Link className={cn("current-version").toClassName()} to="/version" target="_blank">
       v{version}
-    </Block>
+    </Link>
   ) : null;
 };
