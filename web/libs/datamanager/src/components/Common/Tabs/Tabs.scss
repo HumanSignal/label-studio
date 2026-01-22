@@ -135,8 +135,25 @@
     display: flex;
     align-items: center;
 
+    span {
+      border: 1px solid transparent;
+    }
+
     &_edit {
-      padding-left: 6px;
+      padding-left: var(--spacing-tight);
+      padding-right: var(--spacing-tight);
+
+      input {
+        height: 24px;
+        font-size: 14px;
+        padding-left: var(--spacing-tight);
+        padding-right: var(--spacing-tight);
+
+        &:focus {
+          outline: 2px solid var(--color-primary-focus-outline);
+          box-shadow: none;
+        }
+      }
     }
   }
 

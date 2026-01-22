@@ -88,10 +88,17 @@ export const TabsItem = observer(
   }) => {
     const { switchTab, selectedTab, lastTab, allowedActions } = useContext(TabsContext);
     const [currentTitle, setCurrentTitle] = useState(title);
+    const [savedTitle, setSavedTitle] = useState(title); // Track the last saved title
     const [renameMode, setRenameMode] = useState(false);
     const [isMenuOpen, setIsMenuOpen] = useState(false);
 
     const active = tab === selectedTab;
+
+    // Sync with title prop on initial mount and when prop changes
+    useEffect(() => {
+      setCurrentTitle(title);
+      setSavedTitle(title);
+    }, [title]);
 
     const tabIsEditable = useMemo(() => editable && allowedActions.edit, [editable, allowedActions]);
 
@@ -118,14 +125,17 @@ export const TabsItem = observer(
           setRenameMode(false);
 
           if (key === "Escape") {
-            setCurrentTitle(title);
+            setCurrentTitle(savedTitle);
             onCancelEditing?.();
+            return;
           }
 
+          // Update the saved title when user confirms the save
+          setSavedTitle(currentTitle);
           onFinishEditing(currentTitle);
         }
       },
-      [currentTitle],
+      [currentTitle, savedTitle, onCancelEditing, onFinishEditing],
     );
 
     return (
