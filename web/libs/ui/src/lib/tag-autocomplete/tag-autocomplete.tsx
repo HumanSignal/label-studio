@@ -1,8 +1,8 @@
-import React, { forwardRef, useCallback, type ChangeEvent, type ForwardedRef } from "react";
+import React, { forwardRef, useCallback, useRef, type ChangeEvent, type ForwardedRef } from "react";
 import { Command, CommandEmpty, CommandGroup, CommandItem, CommandList } from "@humansignal/shad/components/ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "@humansignal/shad/components/ui/popover";
-import { IconChevron, IconChevronDown } from "@humansignal/icons";
-import { Checkbox, Label, Spinner } from "@humansignal/ui";
+import { Spinner } from "@humansignal/ui";
+import { IconPlus } from "@humansignal/icons";
 import { cnm } from "../../utils/utils";
 import { Tag } from "./tag";
 import { useTagAutocomplete } from "./use-tag-autocomplete";
@@ -12,21 +12,22 @@ import styles from "./tag-autocomplete.module.scss";
 export const TagAutocomplete = forwardRef(
   <T = string>(props: TagAutocompleteProps<T>, ref: ForwardedRef<HTMLSelectElement>) => {
     const {
-      label,
-      description,
-      labelProps,
-      required,
       disabled = false,
       isLoading = false,
       name,
-      size = "medium",
+      placeholder,
       triggerClassName,
       contentClassName,
       tagClassName,
       renderTag,
       renderOption,
       dataTestid,
+      minSearchLength = 2,
+      onCreate,
     } = props;
+
+    // First, set up a ref to track the create tag callback
+    const createTagCallbackRef = useRef<(() => void) | undefined>();
 
     const {
       selectedValues,
@@ -36,8 +37,6 @@ export const TagAutocomplete = forwardRef(
       highlightedOptionIndex,
       filteredOptions,
       selectedOptions,
-      visibleTags,
-      hiddenTagCount,
       inputRef,
       triggerRef,
       tagsContainerRef,
@@ -50,7 +49,7 @@ export const TagAutocomplete = forwardRef(
       setHighlightedOptionIndex,
       handleKeyDown,
       focusInput,
-    } = useTagAutocomplete(props);
+    } = useTagAutocomplete({ ...props, createTagCallbackRef });
 
     const handleInputChange = useCallback(
       (e: ChangeEvent<HTMLInputElement>) => {
@@ -59,20 +58,46 @@ export const TagAutocomplete = forwardRef(
       [setQuery],
     );
 
-    const handleCaretClick = useCallback(
-      (e: React.MouseEvent) => {
-        e.stopPropagation();
-        setIsOpen(!isOpen);
-      },
-      [isOpen, setIsOpen],
-    );
-
     const isOptionSelected = useCallback(
       (option: NormalizedTagOption<T>) => {
         return selectedValues.includes(option.value);
       },
       [selectedValues],
     );
+
+    const highlightMatch = useCallback((text: string, query: string) => {
+      if (!query.trim()) return text;
+
+      const parts = text.split(new RegExp(`(${query})`, "gi"));
+      return parts.map((part, index) =>
+        part.toLowerCase() === query.toLowerCase() ? (
+          <mark key={index} className={styles.highlight}>
+            {part}
+          </mark>
+        ) : (
+          <React.Fragment key={index}>{part}</React.Fragment>
+        ),
+      );
+    }, []);
+
+    const canCreateTag = useCallback(() => {
+      if (!onCreate || !query.trim()) return false;
+      // Check if query exactly matches an existing option
+      const exactMatch = filteredOptions.some((option) => option.label.toLowerCase() === query.toLowerCase().trim());
+      return !exactMatch;
+    }, [onCreate, query, filteredOptions]);
+
+    const showCreateOption = canCreateTag();
+
+    const handleCreateTag = useCallback(() => {
+      if (!onCreate || !query.trim()) return;
+      onCreate(query.trim());
+      setQuery("");
+      setIsOpen(false);
+    }, [onCreate, query, setQuery, setIsOpen]);
+
+    // Update the ref so the hook can access it
+    createTagCallbackRef.current = showCreateOption ? handleCreateTag : undefined;
 
     const renderTagItem = useCallback(
       (option: NormalizedTagOption<T>, index: number) => {
@@ -117,12 +142,12 @@ export const TagAutocomplete = forwardRef(
               value={String(option.value)}
               onSelect={() => selectOption(option)}
               disabled={option.disabled}
-              data-highlighted={highlightedOptionIndex === index}
-              className={cnm(styles.option, {
-                [styles.optionHighlighted]: highlightedOptionIndex === index,
-              })}
+              onMouseEnter={() => setHighlightedOptionIndex(index)}
+              className="rounded-4 text-neutral-content-subtle overflow-hidden p-1 outline-none group duration-150 ease-out data-[disabled=true]:opacity-50 data-[disabled=true]:cursor-not-allowed data-[disabled=true]:bg-transparent"
             >
-              {renderOption(option, selected)}
+              <div className="flex gap-2 w-full px-4 py-1 hover:bg-primary-emphasis-subtle hover:cursor-pointer group-focus-within:bg-primary-emphasis-subtle group-aria-selected:bg-primary-emphasis-subtle rounded-4 hover:data-[disabled=true]:bg-transparent hover:data-[disabled=true]:cursor-not-allowed duration-150 ease-out">
+                {renderOption(option, selected)}
+              </div>
             </CommandItem>
           );
         }
@@ -133,125 +158,143 @@ export const TagAutocomplete = forwardRef(
             value={String(option.value)}
             onSelect={() => selectOption(option)}
             disabled={option.disabled}
-            data-highlighted={highlightedOptionIndex === index}
             onMouseEnter={() => setHighlightedOptionIndex(index)}
-            className={cnm(styles.option, {
-              [styles.optionHighlighted]: highlightedOptionIndex === index,
-              [styles.optionDisabled]: option.disabled,
-            })}
+            className="rounded-4 text-neutral-content-subtle overflow-hidden p-1 outline-none group duration-150 ease-out data-[disabled=true]:opacity-50 data-[disabled=true]:cursor-not-allowed data-[disabled=true]:bg-transparent"
           >
-            <Checkbox checked={selected} readOnly tabIndex={-1} className={styles.optionCheckbox} />
-            <span className={styles.optionLabel}>{option.label}</span>
+            <div className="flex gap-2 w-full px-4 py-1 hover:bg-primary-emphasis-subtle hover:cursor-pointer group-focus-within:bg-primary-emphasis-subtle group-aria-selected:bg-primary-emphasis-subtle rounded-4 hover:data-[disabled=true]:bg-transparent hover:data-[disabled=true]:cursor-not-allowed duration-150 ease-out">
+              <span className="truncate">{highlightMatch(option.label, query)}</span>
+            </div>
           </CommandItem>
         );
       },
-      [isOptionSelected, renderOption, selectOption, highlightedOptionIndex, setHighlightedOptionIndex],
+      [
+        isOptionSelected,
+        renderOption,
+        selectOption,
+        highlightedOptionIndex,
+        setHighlightedOptionIndex,
+        query,
+        highlightMatch,
+      ],
     );
 
     const combobox = (
-      <Popover open={isOpen} onOpenChange={setIsOpen}>
-        <PopoverTrigger asChild disabled={disabled}>
-          <div
-            ref={triggerRef}
-            className={cnm(
-              styles.trigger,
-              {
-                [styles.triggerOpen]: isOpen,
-                [styles.triggerDisabled]: disabled,
-                [styles.triggerSmall]: size === "small",
-                [styles.triggerMedium]: size === "medium",
-                [styles.triggerLarge]: size === "large",
-              },
-              triggerClassName,
-            )}
-            onKeyDown={handleKeyDown}
-            data-testid={dataTestid ?? "tag-autocomplete-trigger"}
-            // Prevent PopoverTrigger from toggling on click - we manage open state ourselves
-            onClick={(e) => {
-              // Stop the PopoverTrigger's default toggle behavior
+      <Command
+        shouldFilter={false}
+        onKeyDown={handleKeyDown}
+        className="!border-0 !bg-transparent !h-auto !overflow-visible !rounded-none"
+        onValueChange={(value) => {
+          // Sync CMDK's selection back to our state
+          if (value === "create-tag-option") {
+            setHighlightedOptionIndex(filteredOptions.length);
+          } else {
+            const index = filteredOptions.findIndex((opt) => String(opt.value) === value);
+            if (index >= 0) {
+              setHighlightedOptionIndex(index);
+            }
+          }
+        }}
+      >
+        <Popover open={isOpen} onOpenChange={setIsOpen}>
+          <PopoverTrigger asChild disabled={disabled}>
+            <div
+              ref={triggerRef}
+              className={cnm(
+                styles.trigger,
+                {
+                  [styles.triggerOpen]: isOpen,
+                  [styles.triggerDisabled]: disabled,
+                },
+                triggerClassName,
+              )}
+              data-testid={dataTestid ?? "tag-autocomplete-trigger"}
+              // Prevent PopoverTrigger from toggling on click - we manage open state ourselves
+              onClick={(e) => {
+                // Stop the PopoverTrigger's default toggle behavior
+                e.preventDefault();
+                // Handle our custom click logic
+                const target = e.target as HTMLElement;
+                if (target.closest(`.${styles.tag}`) || target.closest(`.${styles.tagRemove}`)) {
+                  return;
+                }
+                // Otherwise focus the input
+                focusInput();
+              }}
+            >
+              <div ref={tagsContainerRef} className={styles.tagsContainer} aria-label="Selected tags">
+                {selectedOptions.map((option, index) => renderTagItem(option, index))}
+
+                <input
+                  ref={inputRef}
+                  type="text"
+                  className={styles.input}
+                  value={query}
+                  onChange={handleInputChange}
+                  onFocus={() => {
+                    setFocusedTagIndex(null);
+                    // Don't automatically open dropdown on focus - wait for user to type
+                  }}
+                  disabled={disabled}
+                  placeholder={placeholder}
+                  aria-label={placeholder || "Search tags"}
+                  aria-autocomplete="list"
+                  aria-expanded={isOpen}
+                  aria-controls="tag-autocomplete-listbox"
+                  data-testid="tag-autocomplete-input"
+                />
+              </div>
+            </div>
+          </PopoverTrigger>
+          <PopoverContent
+            align="start"
+            className={contentClassName}
+            data-testid="tag-autocomplete-dropdown"
+            onOpenAutoFocus={(e) => {
+              // Prevent popover from stealing focus from input
               e.preventDefault();
-              // Handle our custom click logic
-              const target = e.target as HTMLElement;
-              if (target.closest(`.${styles.tag}`) || target.closest(`.${styles.tagRemove}`)) {
-                return;
-              }
-              // If clicking on caret button, let handleCaretClick handle it
-              if (target.closest(`.${styles.caretButton}`)) {
-                return;
-              }
-              // Otherwise focus the input (which will open the dropdown)
-              focusInput();
             }}
           >
-            <div ref={tagsContainerRef} className={styles.tagsContainer} aria-label="Selected tags">
-              {visibleTags.map((option, index) => renderTagItem(option, index))}
-
-              {hiddenTagCount > 0 && (
-                <span className={styles.hiddenCount} data-testid="tag-autocomplete-hidden-count">
-                  +{hiddenTagCount}
-                </span>
-              )}
-
-              <input
-                ref={inputRef}
-                type="text"
-                className={styles.input}
-                value={query}
-                onChange={handleInputChange}
-                onFocus={() => {
-                  setFocusedTagIndex(null);
-                  if (!isOpen) {
-                    setIsOpen(true);
-                  }
-                }}
-                disabled={disabled}
-                aria-label={label || "Search tags"}
-                aria-autocomplete="list"
-                aria-expanded={isOpen}
-                aria-controls="tag-autocomplete-listbox"
-                data-testid="tag-autocomplete-input"
-              />
-            </div>
-
-            <button
-              type="button"
-              className={styles.caretButton}
-              onClick={handleCaretClick}
-              disabled={disabled}
-              tabIndex={-1}
-              aria-label={isOpen ? "Close dropdown" : "Open dropdown"}
-            >
-              {isLoading ? (
-                <Spinner size={16} className={styles.spinner} />
-              ) : isOpen ? (
-                <IconChevron className={styles.caretIcon} />
-              ) : (
-                <IconChevronDown className={styles.caretIcon} />
-              )}
-            </button>
-          </div>
-        </PopoverTrigger>
-        <PopoverContent
-          align="start"
-          className={cnm(styles.content, contentClassName)}
-          data-testid="tag-autocomplete-dropdown"
-          onOpenAutoFocus={(e) => {
-            // Prevent popover from stealing focus from input
-            e.preventDefault();
-          }}
-        >
-          <Command shouldFilter={false}>
             <CommandList
+              key={`${isOpen}-${filteredOptions.length}-${query}`}
               id="tag-autocomplete-listbox"
               role="listbox"
               aria-label="Available options"
-              className={styles.list}
+              className="bg-neutral-background"
             >
-              <CommandEmpty className={styles.empty}>{isLoading ? "Loading..." : "No options found."}</CommandEmpty>
-              <CommandGroup>{filteredOptions.map((option, index) => renderOptionItem(option, index))}</CommandGroup>
+              {isLoading ? (
+                <div className={styles.loadingContainer}>
+                  <Spinner size={20} />
+                </div>
+              ) : (
+                <>
+                  {filteredOptions.length === 0 && !showCreateOption && <CommandEmpty>No options found.</CommandEmpty>}
+                  <CommandGroup>{filteredOptions.map((option, index) => renderOptionItem(option, index))}</CommandGroup>
+                  {showCreateOption && (
+                    <CommandItem
+                      value="create-tag-option"
+                      onSelect={handleCreateTag}
+                      className={cnm(
+                        "rounded-4 text-neutral-content-subtle overflow-hidden p-1 outline-none group duration-150 ease-out",
+                        {
+                          [styles.createOptionWithBorder]: filteredOptions.length > 0,
+                        },
+                      )}
+                      onMouseEnter={() => setHighlightedOptionIndex(filteredOptions.length)}
+                      data-testid="tag-autocomplete-create-option"
+                    >
+                      <div className="flex gap-2 w-full px-4 py-1 hover:bg-primary-emphasis-subtle hover:cursor-pointer group-focus-within:bg-primary-emphasis-subtle group-aria-selected:bg-primary-emphasis-subtle rounded-4 duration-150 ease-out">
+                        <IconPlus className={styles.createIcon} />
+                        <span>
+                          Add "<strong>{query.trim()}</strong>" tag
+                        </span>
+                      </div>
+                    </CommandItem>
+                  )}
+                </>
+              )}
             </CommandList>
-          </Command>
-        </PopoverContent>
+          </PopoverContent>
+        </Popover>
 
         {/* Hidden select for form integration */}
         <select
@@ -271,16 +314,8 @@ export const TagAutocomplete = forwardRef(
             </option>
           ))}
         </select>
-      </Popover>
+      </Command>
     );
-
-    if (label) {
-      return (
-        <Label required={required} description={description} text={label} {...labelProps}>
-          {combobox}
-        </Label>
-      );
-    }
 
     return combobox;
   },

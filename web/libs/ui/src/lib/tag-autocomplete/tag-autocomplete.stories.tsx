@@ -1,15 +1,12 @@
 import { useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import { TagAutocomplete } from "./tag-autocomplete";
+import { Typography } from "../typography/typography";
 
 const meta: Meta<typeof TagAutocomplete> = {
   component: TagAutocomplete,
   title: "UI/TagAutocomplete",
   argTypes: {
-    size: {
-      control: "select",
-      options: ["small", "medium", "large"],
-    },
     disabled: {
       control: "boolean",
     },
@@ -19,7 +16,7 @@ const meta: Meta<typeof TagAutocomplete> = {
     maxTags: {
       control: "number",
     },
-    maxVisibleTags: {
+    minSearchLength: {
       control: "number",
     },
   },
@@ -30,11 +27,13 @@ const meta: Meta<typeof TagAutocomplete> = {
 A tag-like autocomplete component that allows users to select multiple tags from a predefined list.
 
 ## Features
-- **Typeahead search** - Filter options by typing
+- **Typeahead search** - Filter options by typing (minimum 2 characters by default)
 - **Keyboard navigation** - Full keyboard support for selecting and removing tags
-- **Tag overflow** - Shows "+N more" badge when tags exceed the visible limit
-- **Loading state** - Displays a spinner while fetching options
-- **Form integration** - Works with standard HTML forms
+- **Multiline tags** - Tags automatically wrap to multiple lines when needed
+- **Highlighted search** - Search text is highlighted in matching options
+- **Tag creation** - Allow users to create new tags on the fly (with onCreate prop)
+- **Loading state** - Displays a spinner in the dropdown while fetching options
+- **Form integration** - Works with standard HTML forms via name prop
 
 ## Keyboard Shortcuts
 | Key | Action |
@@ -71,22 +70,28 @@ const simpleTags = ["React", "Vue", "Angular", "Svelte", "Next.js", "Nuxt", "Rem
 /**
  * Default TagAutocomplete
  *
- * Basic usage with a list of options.
+ * Basic usage with a list of options. Users need to type at least 2 characters to see the dropdown.
  */
 export const Default: Story = {
   render: () => {
     const [value, setValue] = useState<string[]>([]);
     return (
-      <div className="w-96">
+      <div className="w-full">
         <TagAutocomplete
+          triggerClassName="w-96"
           options={sampleTags}
           value={value}
           onChange={setValue}
-          placeholder="Select tags..."
+          placeholder="Type at least 2 characters to search..."
         />
-        <p className="mt-4 text-sm text-neutral-content-subtle">
-          Selected: {value.length > 0 ? value.join(", ") : "None"}
-        </p>
+        <div className="mt-4">
+          <Typography variant="body" size="small" className="text-neutral-content-subtle">
+            <strong>Available:</strong> {sampleTags.map((tag) => tag.label).join(", ")}
+          </Typography>
+          <Typography variant="body" size="small" className="text-neutral-content-subtle">
+            <strong>Selected:</strong> {value.length > 0 ? value.join(", ") : "None"}
+          </Typography>
+        </div>
       </div>
     );
   },
@@ -102,37 +107,7 @@ export const SimpleStrings: Story = {
     const [value, setValue] = useState<string[]>(["React", "Next.js"]);
     return (
       <div className="w-96">
-        <TagAutocomplete
-          options={simpleTags}
-          value={value}
-          onChange={setValue}
-          placeholder="Select frameworks..."
-        />
-      </div>
-    );
-  },
-};
-
-/**
- * With Label and Description
- *
- * Form field with label and helper text.
- */
-export const WithLabel: Story = {
-  render: () => {
-    const [value, setValue] = useState<string[]>([]);
-    return (
-      <div className="w-96">
-        <TagAutocomplete
-          label="Project Tags"
-          description="Select up to 5 tags that describe your project"
-          options={sampleTags}
-          value={value}
-          onChange={setValue}
-          placeholder="Add tags..."
-          maxTags={5}
-          required
-        />
+        <TagAutocomplete options={simpleTags} value={value} onChange={setValue} placeholder="Select frameworks..." />
       </div>
     );
   },
@@ -148,23 +123,18 @@ export const PreSelected: Story = {
     const [value, setValue] = useState<string[]>(["frontend", "backend", "devops"]);
     return (
       <div className="w-96">
-        <TagAutocomplete
-          options={sampleTags}
-          value={value}
-          onChange={setValue}
-          placeholder="Select tags..."
-        />
+        <TagAutocomplete options={sampleTags} value={value} onChange={setValue} placeholder="Select tags..." />
       </div>
     );
   },
 };
 
 /**
- * Tag Overflow with +N More
+ * Multiple Tags - Multiline Wrapping
  *
- * When tags exceed maxVisibleTags, shows a "+N more" badge.
+ * When many tags are selected, they automatically wrap to multiple lines.
  */
-export const TagOverflow: Story = {
+export const MultipleTagsWrapping: Story = {
   render: () => {
     const [value, setValue] = useState<string[]>([
       "frontend",
@@ -173,18 +143,14 @@ export const TagOverflow: Story = {
       "design",
       "qa",
       "mobile",
+      "data-science",
+      "machine-learning",
     ]);
     return (
       <div className="w-96">
-        <TagAutocomplete
-          options={sampleTags}
-          value={value}
-          onChange={setValue}
-          placeholder="Select tags..."
-          maxVisibleTags={3}
-        />
+        <TagAutocomplete options={sampleTags} value={value} onChange={setValue} placeholder="Type to search..." />
         <p className="mt-2 text-sm text-neutral-content-subtle">
-          maxVisibleTags is set to 3, showing "+{Math.max(0, value.length - 3)} more"
+          All {value.length} tags are shown and wrap to multiple lines
         </p>
       </div>
     );
@@ -202,17 +168,13 @@ export const LimitedSelection: Story = {
     return (
       <div className="w-96">
         <TagAutocomplete
-          label="Skills"
-          description="Select up to 3 skills"
           options={sampleTags}
           value={value}
           onChange={setValue}
-          placeholder="Select skills..."
+          placeholder="Select up to 3 skills..."
           maxTags={3}
         />
-        <p className="mt-2 text-sm text-neutral-content-subtle">
-          {value.length}/3 selected
-        </p>
+        <p className="mt-2 text-sm text-neutral-content-subtle">{value.length}/3 selected (max: 3)</p>
       </div>
     );
   },
@@ -221,7 +183,7 @@ export const LimitedSelection: Story = {
 /**
  * Loading State
  *
- * Shows a spinner while options are being loaded.
+ * Shows a spinner in the dropdown while options are being loaded.
  */
 export const LoadingState: Story = {
   render: () => {
@@ -232,12 +194,11 @@ export const LoadingState: Story = {
           options={sampleTags}
           value={value}
           onChange={setValue}
-          placeholder="Loading tags..."
+          placeholder="Type to search..."
           isLoading={true}
+          minSearchLength={1}
         />
-        <p className="mt-2 text-sm text-neutral-content-subtle">
-          The spinner replaces the caret icon when loading
-        </p>
+        <p className="mt-2 text-sm text-neutral-content-subtle">Type to see the loading spinner in the dropdown</p>
       </div>
     );
   },
@@ -258,9 +219,7 @@ export const AsyncSearch: Story = {
       setIsLoading(true);
       // Simulate API delay
       setTimeout(() => {
-        const filtered = sampleTags.filter((tag) =>
-          tag.label.toLowerCase().includes(query.toLowerCase()),
-        );
+        const filtered = sampleTags.filter((tag) => tag.label.toLowerCase().includes(query.toLowerCase()));
         setOptions(filtered);
         setIsLoading(false);
       }, 500);
@@ -269,15 +228,48 @@ export const AsyncSearch: Story = {
     return (
       <div className="w-96">
         <TagAutocomplete
-          label="Search Tags"
-          description="Type to search (simulated 500ms delay)"
           options={options}
           value={value}
           onChange={setValue}
           onSearch={handleSearch}
           isLoading={isLoading}
-          placeholder="Type to search..."
+          placeholder="Type to search (simulated 500ms delay)..."
         />
+      </div>
+    );
+  },
+};
+
+/**
+ * With Tag Creation
+ *
+ * Allow users to create new tags that don't exist in the list.
+ */
+export const WithTagCreation: Story = {
+  render: () => {
+    const [value, setValue] = useState<string[]>(["frontend"]);
+    const [options, setOptions] = useState(sampleTags);
+
+    const handleCreate = (newTag: string) => {
+      // Add the new tag to options
+      const newOption = { value: newTag.toLowerCase().replace(/\s+/g, "-"), label: newTag };
+      setOptions([...options, newOption]);
+      // Add to selected values
+      setValue([...value, newOption.value]);
+    };
+
+    return (
+      <div className="w-96">
+        <TagAutocomplete
+          options={options}
+          value={value}
+          onChange={setValue}
+          onCreate={handleCreate}
+          placeholder="Type to search or create new tags..."
+        />
+        <p className="mt-4 text-sm text-neutral-content-subtle">
+          Available: {options.map((tag) => tag.label).join(", ")}
+        </p>
       </div>
     );
   },
@@ -299,54 +291,6 @@ export const Disabled: Story = {
           placeholder="Select tags..."
           disabled
         />
-      </div>
-    );
-  },
-};
-
-/**
- * Size Variants
- *
- * Available size options: small, medium (default), large.
- */
-export const SizeVariants: Story = {
-  render: () => {
-    const [value1, setValue1] = useState<string[]>(["frontend"]);
-    const [value2, setValue2] = useState<string[]>(["frontend", "backend"]);
-    const [value3, setValue3] = useState<string[]>(["frontend"]);
-
-    return (
-      <div className="flex flex-col gap-6 w-96">
-        <div>
-          <p className="text-sm text-neutral-content-subtle mb-2">Small:</p>
-          <TagAutocomplete
-            options={sampleTags}
-            value={value1}
-            onChange={setValue1}
-            size="small"
-            placeholder="Small..."
-          />
-        </div>
-        <div>
-          <p className="text-sm text-neutral-content-subtle mb-2">Medium (default):</p>
-          <TagAutocomplete
-            options={sampleTags}
-            value={value2}
-            onChange={setValue2}
-            size="medium"
-            placeholder="Medium..."
-          />
-        </div>
-        <div>
-          <p className="text-sm text-neutral-content-subtle mb-2">Large:</p>
-          <TagAutocomplete
-            options={sampleTags}
-            value={value3}
-            onChange={setValue3}
-            size="large"
-            placeholder="Large..."
-          />
-        </div>
       </div>
     );
   },
@@ -392,15 +336,8 @@ export const DisabledOptions: Story = {
 
     return (
       <div className="w-96">
-        <TagAutocomplete
-          options={optionsWithDisabled}
-          value={value}
-          onChange={setValue}
-          placeholder="Select tags..."
-        />
-        <p className="mt-2 text-sm text-neutral-content-subtle">
-          DevOps and QA options are disabled
-        </p>
+        <TagAutocomplete options={optionsWithDisabled} value={value} onChange={setValue} placeholder="Select tags..." />
+        <p className="mt-2 text-sm text-neutral-content-subtle">DevOps and QA options are disabled</p>
       </div>
     );
   },
@@ -423,32 +360,33 @@ export const InFormContext: Story = {
 
     return (
       <form onSubmit={handleSubmit} className="w-96 space-y-6">
-        <TagAutocomplete
-          name="skills"
-          label="Skills"
-          description="Select your technical skills"
-          options={sampleTags}
-          value={skills}
-          onChange={setSkills}
-          placeholder="Add skills..."
-          required
-        />
+        <div>
+          <p className="text-sm font-medium mb-2">Skills</p>
+          <TagAutocomplete
+            name="skills"
+            options={sampleTags}
+            value={skills}
+            onChange={setSkills}
+            placeholder="Add skills..."
+          />
+        </div>
 
-        <TagAutocomplete
-          name="interests"
-          label="Interests"
-          description="What areas interest you?"
-          options={[
-            { value: "ai", label: "Artificial Intelligence" },
-            { value: "web3", label: "Web3 / Blockchain" },
-            { value: "iot", label: "Internet of Things" },
-            { value: "ar-vr", label: "AR / VR" },
-            { value: "robotics", label: "Robotics" },
-          ]}
-          value={interests}
-          onChange={setInterests}
-          placeholder="Add interests..."
-        />
+        <div>
+          <p className="text-sm font-medium mb-2">Interests</p>
+          <TagAutocomplete
+            name="interests"
+            options={[
+              { value: "ai", label: "Artificial Intelligence" },
+              { value: "web3", label: "Web3 / Blockchain" },
+              { value: "iot", label: "Internet of Things" },
+              { value: "ar-vr", label: "AR / VR" },
+              { value: "robotics", label: "Robotics" },
+            ]}
+            value={interests}
+            onChange={setInterests}
+            placeholder="Add interests..."
+          />
+        </div>
 
         <button
           type="submit"
@@ -480,12 +418,26 @@ export const KeyboardNavigation: Story = {
         <div className="mt-4 p-4 bg-neutral-surface rounded text-sm">
           <p className="font-medium mb-2">Try these keyboard shortcuts:</p>
           <ul className="space-y-1 text-neutral-content-subtle">
-            <li>• <kbd className="px-1 bg-neutral-surface-bold rounded">←</kbd> / <kbd className="px-1 bg-neutral-surface-bold rounded">→</kbd> Navigate between tags</li>
-            <li>• <kbd className="px-1 bg-neutral-surface-bold rounded">↑</kbd> / <kbd className="px-1 bg-neutral-surface-bold rounded">↓</kbd> Navigate dropdown options</li>
-            <li>• <kbd className="px-1 bg-neutral-surface-bold rounded">Enter</kbd> Select highlighted option</li>
-            <li>• <kbd className="px-1 bg-neutral-surface-bold rounded">Backspace</kbd> Remove tag or focus last tag</li>
-            <li>• <kbd className="px-1 bg-neutral-surface-bold rounded">Delete</kbd> Remove focused tag</li>
-            <li>• <kbd className="px-1 bg-neutral-surface-bold rounded">Esc</kbd> Close dropdown</li>
+            <li>
+              • <kbd className="px-1 bg-neutral-surface-bold rounded">←</kbd> /{" "}
+              <kbd className="px-1 bg-neutral-surface-bold rounded">→</kbd> Navigate between tags
+            </li>
+            <li>
+              • <kbd className="px-1 bg-neutral-surface-bold rounded">↑</kbd> /{" "}
+              <kbd className="px-1 bg-neutral-surface-bold rounded">↓</kbd> Navigate dropdown options
+            </li>
+            <li>
+              • <kbd className="px-1 bg-neutral-surface-bold rounded">Enter</kbd> Select highlighted option
+            </li>
+            <li>
+              • <kbd className="px-1 bg-neutral-surface-bold rounded">Backspace</kbd> Remove tag or focus last tag
+            </li>
+            <li>
+              • <kbd className="px-1 bg-neutral-surface-bold rounded">Delete</kbd> Remove focused tag
+            </li>
+            <li>
+              • <kbd className="px-1 bg-neutral-surface-bold rounded">Esc</kbd> Close dropdown
+            </li>
           </ul>
         </div>
       </div>
@@ -510,12 +462,7 @@ export const LongLabels: Story = {
 
     return (
       <div className="w-96">
-        <TagAutocomplete
-          options={longOptions}
-          value={value}
-          onChange={setValue}
-          placeholder="Select tags..."
-        />
+        <TagAutocomplete options={longOptions} value={value} onChange={setValue} placeholder="Select tags..." />
       </div>
     );
   },
@@ -536,15 +483,8 @@ export const ManyOptions: Story = {
 
     return (
       <div className="w-96">
-        <TagAutocomplete
-          options={manyOptions}
-          value={value}
-          onChange={setValue}
-          placeholder="Search 50 options..."
-        />
-        <p className="mt-2 text-sm text-neutral-content-subtle">
-          50 options available - use search to filter
-        </p>
+        <TagAutocomplete options={manyOptions} value={value} onChange={setValue} placeholder="Search 50 options..." />
+        <p className="mt-2 text-sm text-neutral-content-subtle">50 options available - use search to filter</p>
       </div>
     );
   },
@@ -568,14 +508,67 @@ export const CustomFilter: Story = {
     return (
       <div className="w-96">
         <TagAutocomplete
-          label="Custom Filter"
-          description="Only matches options that START with your query"
           options={sampleTags}
           value={value}
           onChange={setValue}
           searchFilter={startsWithFilter}
-          placeholder="Type 'f' to find Frontend..."
+          placeholder="Custom filter: matches start only (type 'f' for Frontend)..."
         />
+      </div>
+    );
+  },
+};
+
+/**
+ * Custom Minimum Search Length
+ *
+ * Configure the minimum number of characters required before showing the dropdown.
+ */
+export const CustomMinSearchLength: Story = {
+  render: () => {
+    const [value, setValue] = useState<string[]>([]);
+    return (
+      <div className="w-96">
+        <TagAutocomplete
+          options={sampleTags}
+          value={value}
+          onChange={setValue}
+          minSearchLength={1}
+          placeholder="Minimum 1 character to search..."
+        />
+        <p className="mt-4 text-sm text-neutral-content-subtle">
+          Available: {sampleTags.map((tag) => tag.label).join(", ")}
+        </p>
+      </div>
+    );
+  },
+};
+
+/**
+ * With Available Options List
+ *
+ * Shows available options to help users discover what they can select.
+ */
+export const WithAvailableOptionsList: Story = {
+  render: () => {
+    const [value, setValue] = useState<string[]>(["frontend"]);
+
+    // Filter out already selected options to show only available ones
+    const availableOptions = sampleTags.filter((tag) => !value.includes(tag.value));
+
+    return (
+      <div className="w-96">
+        <TagAutocomplete
+          options={sampleTags}
+          value={value}
+          onChange={setValue}
+          placeholder="Type at least 2 characters to search..."
+        />
+        <div className="mt-4">
+          <p className="text-sm text-neutral-content-subtle">
+            Available: {availableOptions.map((tag) => tag.label).join(", ") || "All selected"}
+          </p>
+        </div>
       </div>
     );
   },

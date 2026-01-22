@@ -30,17 +30,8 @@ export interface TagAutocompleteProps<T = string> {
   /** Form field name */
   name?: string;
 
-  /** Label text */
-  label?: string;
-
-  /** Description text below label */
-  description?: string;
-
-  /** Props to pass to Label wrapper */
-  labelProps?: Record<string, unknown>;
-
-  /** Mark as required */
-  required?: boolean;
+  /** Placeholder text */
+  placeholder?: string;
 
   /** Disable the entire component */
   disabled?: boolean;
@@ -75,9 +66,6 @@ export interface TagAutocompleteProps<T = string> {
   /** Page size for loading */
   pageSize?: number;
 
-  /** Size variant */
-  size?: "small" | "medium" | "large";
-
   /** Custom class names */
   triggerClassName?: string;
   contentClassName?: string;
@@ -89,6 +77,9 @@ export interface TagAutocompleteProps<T = string> {
 
   /** Test ID */
   dataTestid?: string;
+
+  /** Minimum search length before showing dropdown (default: 2) */
+  minSearchLength?: number;
 }
 
 /** Normalized option with value and label */

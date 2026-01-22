@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react";
-import { Select } from "../../ui/src/lib/select/select";
+import { Select } from "./select";
 
 const thousandOptions = (() => {
   return Array.from({ length: 1000 }, (_, i) => `Option ${i}`);

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { TagAutocompleteOption, TagAutocompleteProps, NormalizedTagOption } from "./types";
 import { normalizeOption } from "./types";
 
@@ -13,8 +13,6 @@ export interface UseTagAutocompleteReturn<T> {
   // Computed
   filteredOptions: NormalizedTagOption<T>[];
   selectedOptions: NormalizedTagOption<T>[];
-  visibleTags: NormalizedTagOption<T>[];
-  hiddenTagCount: number;
 
   // Refs
   inputRef: React.RefObject<HTMLInputElement>;
@@ -34,12 +32,9 @@ export interface UseTagAutocompleteReturn<T> {
   focusInput: () => void;
 }
 
-// Constants for width calculations
-const INPUT_MIN_WIDTH = 60;
-const GAP_WIDTH = 4;
-const HIDDEN_BADGE_WIDTH = 35; // Approximate width of "+N" badge
-
-export function useTagAutocomplete<T = string>(props: TagAutocompleteProps<T>): UseTagAutocompleteReturn<T> {
+export function useTagAutocomplete<T = string>(
+  props: TagAutocompleteProps<T> & { createTagCallbackRef?: React.MutableRefObject<(() => void) | undefined> },
+): UseTagAutocompleteReturn<T> {
   const {
     options,
     value: controlledValue,
@@ -51,6 +46,8 @@ export function useTagAutocomplete<T = string>(props: TagAutocompleteProps<T>): 
     disabled,
     onOpen,
     onClose,
+    minSearchLength = 2,
+    createTagCallbackRef,
   } = props;
 
   // Refs
@@ -65,7 +62,6 @@ export function useTagAutocomplete<T = string>(props: TagAutocompleteProps<T>): 
   const [query, setQueryState] = useState("");
   const [focusedTagIndex, setFocusedTagIndex] = useState<number | null>(null);
   const [highlightedOptionIndex, setHighlightedOptionIndex] = useState(0);
-  const [visibleTagCount, setVisibleTagCount] = useState<number | null>(null);
 
   // Controlled vs uncontrolled value
   const selectedValues = controlledValue ?? internalValue;
@@ -82,102 +78,6 @@ export function useTagAutocomplete<T = string>(props: TagAutocompleteProps<T>): 
       .filter((opt): opt is NormalizedTagOption<T> => opt !== undefined);
   }, [selectedValues, normalizedOptions]);
 
-  // Calculate how many tags can fit in the available space
-  const calculateVisibleTags = useCallback(() => {
-    const container = tagsContainerRef.current;
-    if (!container || selectedOptions.length === 0) {
-      setVisibleTagCount(null);
-      return;
-    }
-
-    // Wait for next frame to ensure all tags are rendered and measured
-    requestAnimationFrame(() => {
-      const containerWidth = container.offsetWidth;
-      const tags = Array.from(tagRefs.current.values());
-
-      // Need all tags to be rendered to measure them
-      if (tags.length !== selectedOptions.length) {
-        return;
-      }
-
-      // Calculate available space
-      const availableSpace = containerWidth - INPUT_MIN_WIDTH;
-
-      // Step 1: Fit as many tags as possible (greedy)
-      let usedWidth = 0;
-      let count = 0;
-
-      for (let i = 0; i < tags.length; i++) {
-        const tag = tags[i];
-        if (!tag) continue;
-
-        const tagWidth = tag.offsetWidth + GAP_WIDTH;
-
-        if (usedWidth + tagWidth <= availableSpace) {
-          usedWidth += tagWidth;
-          count++;
-        } else {
-          break;
-        }
-      }
-
-      // Step 2: All tags fit, no badge needed
-      if (count >= selectedOptions.length) {
-        setVisibleTagCount(null);
-        return;
-      }
-
-      // Step 3: Some tags are hidden, ensure we have room for the "+N" badge
-      const badgeWidth = HIDDEN_BADGE_WIDTH + GAP_WIDTH;
-      const remainingSpace = availableSpace - usedWidth;
-
-      // If badge doesn't fit in remaining space, remove the last visible tag
-      if (remainingSpace < badgeWidth && count > 0) {
-        count--;
-        const lastTagWidth = tags[count]?.offsetWidth || 0;
-        usedWidth -= lastTagWidth + GAP_WIDTH;
-      }
-
-      // Ensure at least 1 tag is visible
-      setVisibleTagCount(Math.max(1, count));
-    });
-  }, [selectedOptions.length]);
-
-  // Reset and recalculate when tags change
-  useLayoutEffect(() => {
-    // Reset to show all tags first, then calculate
-    setVisibleTagCount(null);
-    calculateVisibleTags();
-  }, [selectedOptions, calculateVisibleTags]);
-
-  useEffect(() => {
-    const container = tagsContainerRef.current;
-    if (!container) return;
-
-    const resizeObserver = new ResizeObserver(() => {
-      calculateVisibleTags();
-    });
-
-    resizeObserver.observe(container);
-    return () => resizeObserver.disconnect();
-  }, [calculateVisibleTags]);
-
-  // Visible tags based on dynamic calculation
-  const visibleTags = useMemo(() => {
-    if (visibleTagCount === null) {
-      return selectedOptions;
-    }
-    return selectedOptions.slice(0, visibleTagCount);
-  }, [selectedOptions, visibleTagCount]);
-
-  // Count of hidden tags
-  const hiddenTagCount = useMemo(() => {
-    if (visibleTagCount === null) {
-      return 0;
-    }
-    return Math.max(0, selectedOptions.length - visibleTagCount);
-  }, [selectedOptions.length, visibleTagCount]);
-
   // Filter options based on query
   const filteredOptions = useMemo(() => {
     if (!query.trim()) {
@@ -193,10 +93,12 @@ export function useTagAutocomplete<T = string>(props: TagAutocompleteProps<T>): 
     return normalizedOptions.filter((opt) => filterFn(opt, query));
   }, [normalizedOptions, query, searchFilter]);
 
-  // Reset highlighted index when filtered options change
+  // Auto-highlight first item when dropdown opens or results change
   useEffect(() => {
-    setHighlightedOptionIndex(0);
-  }, [filteredOptions.length]);
+    if (isOpen) {
+      setHighlightedOptionIndex(0);
+    }
+  }, [filteredOptions.length, isOpen]);
 
   // Open/close handlers
   const setIsOpen = useCallback(
@@ -219,11 +121,15 @@ export function useTagAutocomplete<T = string>(props: TagAutocompleteProps<T>): 
     (newQuery: string) => {
       setQueryState(newQuery);
       onSearch?.(newQuery);
-      if (!isOpen && newQuery) {
+      // Only open dropdown if query meets minimum length requirement
+      if (!isOpen && newQuery.length >= minSearchLength) {
         setIsOpen(true);
+      } else if (isOpen && newQuery.length < minSearchLength) {
+        // Close dropdown if query becomes too short
+        setIsOpen(false);
       }
     },
-    [onSearch, isOpen, setIsOpen],
+    [onSearch, isOpen, setIsOpen, minSearchLength],
   );
 
   // Select an option
@@ -313,17 +219,19 @@ export function useTagAutocomplete<T = string>(props: TagAutocompleteProps<T>): 
             }
             e.preventDefault();
           } else if (cursorAtStart && hasSelectedTags && !query) {
-            // Move from input to last visible tag
-            const lastIndex = Math.min(visibleTags.length - 1, selectedValues.length - 1);
-            setFocusedTagIndex(lastIndex);
-            tagRefs.current.get(lastIndex)?.focus();
+            // Move from input to last tag
+            const lastIndex = selectedValues.length - 1;
+            if (lastIndex >= 0) {
+              setFocusedTagIndex(lastIndex);
+              tagRefs.current.get(lastIndex)?.focus();
+            }
             e.preventDefault();
           }
           break;
 
         case "ArrowRight":
           if (focusedTagIndex !== null) {
-            const maxIndex = Math.min(visibleTags.length - 1, selectedValues.length - 1);
+            const maxIndex = selectedValues.length - 1;
             if (focusedTagIndex < maxIndex) {
               // Move to next tag
               setFocusedTagIndex(focusedTagIndex + 1);
@@ -339,28 +247,20 @@ export function useTagAutocomplete<T = string>(props: TagAutocompleteProps<T>): 
 
         // Dropdown navigation
         case "ArrowDown":
-          if (!isOpen) {
+          if (!isOpen && query.length >= minSearchLength) {
             setIsOpen(true);
-          } else {
-            // Move highlight down in dropdown
-            setHighlightedOptionIndex((prev) => Math.min(prev + 1, filteredOptions.length - 1));
+            e.preventDefault();
           }
-          e.preventDefault();
+          // When dropdown is open, let CMDK handle the navigation
           break;
 
         case "ArrowUp":
-          if (isOpen) {
-            setHighlightedOptionIndex((prev) => Math.max(prev - 1, 0));
-          }
-          e.preventDefault();
+          // When dropdown is open, let CMDK handle the navigation
           break;
 
-        // Selection
+        // Selection - let CMDK handle Enter when dropdown is open
         case "Enter":
-          if (isOpen && highlightedOptionIndex >= 0 && filteredOptions[highlightedOptionIndex]) {
-            selectOption(filteredOptions[highlightedOptionIndex]);
-            e.preventDefault();
-          }
+          // CMDK will handle selection via onSelect callback
           break;
 
         // Removal
@@ -381,10 +281,12 @@ export function useTagAutocomplete<T = string>(props: TagAutocompleteProps<T>): 
             }
             e.preventDefault();
           } else if (cursorAtStart && hasSelectedTags && !query) {
-            // Focus last visible tag (don't remove yet)
-            const lastIndex = Math.min(visibleTags.length - 1, selectedValues.length - 1);
-            setFocusedTagIndex(lastIndex);
-            tagRefs.current.get(lastIndex)?.focus();
+            // Focus last tag (don't remove yet)
+            const lastIndex = selectedValues.length - 1;
+            if (lastIndex >= 0) {
+              setFocusedTagIndex(lastIndex);
+              tagRefs.current.get(lastIndex)?.focus();
+            }
             e.preventDefault();
           }
           break;
@@ -432,13 +334,14 @@ export function useTagAutocomplete<T = string>(props: TagAutocompleteProps<T>): 
       selectedValues,
       focusedTagIndex,
       query,
-      visibleTags.length,
       isOpen,
       filteredOptions,
       highlightedOptionIndex,
       selectOption,
       removeTag,
       setIsOpen,
+      minSearchLength,
+      createTagCallbackRef,
     ],
   );
 
@@ -453,8 +356,6 @@ export function useTagAutocomplete<T = string>(props: TagAutocompleteProps<T>): 
     // Computed
     filteredOptions,
     selectedOptions,
-    visibleTags,
-    hiddenTagCount,
 
     // Refs
     inputRef,

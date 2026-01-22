@@ -36,26 +36,15 @@
   opacity: 0.6;
 }
 
-// Size variants
-.triggerSmall {
-  min-height: 24px;
-  padding: 2px 4px;
-  font-size: 0.75rem;
-}
-
-.triggerMedium {
+// Default size (medium)
+.trigger {
   min-height: 40px;
 }
 
-.triggerLarge {
-  min-height: 60px;
-  font-size: 1.25rem;
-}
-
-// Tags container (single line, no wrapping)
+// Tags container (multiline, with wrapping)
 .tagsContainer {
   display: flex;
-  flex-wrap: nowrap;
+  flex-wrap: wrap;
   align-items: center;
   gap: 4px;
   flex: 1;
@@ -143,21 +132,6 @@
   color: var(--color-accent-grape-dark);
 }
 
-// Hidden count badge (Badge variant="info" shape="squared" styling)
-.hiddenCount {
-  display: inline-flex;
-  align-items: center;
-  padding: 2px 10px; // px-2.5 py-0.5
-  background-color: var(--color-primary-background);
-  border: 1px solid var(--color-primary-emphasis);
-  border-radius: 0.125rem; // rounded-sm
-  font-size: 0.75rem; // text-xs
-  font-weight: 400; // font-normal
-  color: var(--color-accent-grape-dark);
-  white-space: nowrap;
-  flex-shrink: 0;
-}
-
 // Input field
 .input {
   flex: 1;
@@ -179,95 +153,33 @@
   }
 }
 
-// Caret button
-.caretButton {
+// Dropdown content
+.loadingContainer {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 24px;
-  height: 24px;
-  padding: 0;
-  background: none;
-  border: none;
-  cursor: pointer;
-  border-radius: 4px;
+  padding: 8px;
+}
+
+// Text highlighting in options
+.highlight {
+  background: transparent;
+  font-weight: 600;
+  color: inherit;
+}
+
+// Create option styling
+.createOptionWithBorder {
+  border-top: 1px solid var(--color-neutral-border);
+  margin-top: 0.25rem;
+  padding-top: 0.5rem;
+}
+
+.createIcon {
+  width: 1rem;
+  height: 1rem;
   flex-shrink: 0;
-  transition: background-color 150ms ease-out;
-
-  &:hover:not(:disabled) {
-    background: var(--color-neutral-surface-bold, rgba(0, 0, 0, 0.05));
-  }
-
-  &:disabled {
-    cursor: not-allowed;
-    opacity: 0.5;
-  }
-}
-
-.caretIcon {
-  width: 16px;
-  height: 16px;
-  color: var(--color-neutral-content-subtle, #666);
-}
-
-.spinner {
-  color: var(--color-primary-emphasis, #0066cc);
-}
-
-// Dropdown content
-.content {
-  width: var(--radix-popover-trigger-width);
-  min-width: 200px;
-  max-height: 300px;
-  padding: 4px;
-  overflow: hidden;
-}
-
-.list {
-  max-height: 280px;
-  overflow-y: auto;
-}
-
-.empty {
-  padding: 12px;
-  text-align: center;
-  color: var(--color-neutral-content-subtle, #666);
-  font-size: 0.875rem;
-}
-
-// Option item
-.option {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 12px;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: background-color 150ms ease-out;
-
-  &:hover:not(.optionDisabled) {
-    background: var(--color-primary-emphasis-subtle, rgba(0, 102, 204, 0.08));
-  }
-}
-
-.optionHighlighted {
-  background: var(--color-primary-emphasis-subtle, rgba(0, 102, 204, 0.08));
-}
-
-.optionDisabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.optionCheckbox {
-  flex-shrink: 0;
-}
-
-.optionLabel {
-  flex: 1;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  color: var(--color-neutral-content-subtle);
 }
 
 // Hidden select for form integration
