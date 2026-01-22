@@ -123,8 +123,8 @@ export const TabsItem = observer(
     );
 
     const showMenu = useMemo(() => {
-      return managable && (tabIsEditable || tabIsDeletable || tabIsCloneable);
-    }, [managable, tabIsEditable, tabIsDeletable, tabIsCloneable]);
+      return !renameMode && managable && (tabIsEditable || tabIsDeletable || tabIsCloneable);
+    }, [renameMode, managable, tabIsEditable, tabIsDeletable, tabIsCloneable]);
 
     const saveTabTitle = useCallback(
       (ev) => {
