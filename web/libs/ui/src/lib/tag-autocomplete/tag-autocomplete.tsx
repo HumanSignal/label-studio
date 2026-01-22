@@ -214,7 +214,8 @@ export const TagAutocomplete = forwardRef(
                 e.preventDefault();
                 // Handle our custom click logic
                 const target = e.target as HTMLElement;
-                if (target.closest(`.${styles.tag}`) || target.closest(`.${styles.tagRemove}`)) {
+                // Check if click was on a tag or its remove button
+                if (target.closest('[data-tag="true"]')) {
                   return;
                 }
                 // Otherwise focus the input

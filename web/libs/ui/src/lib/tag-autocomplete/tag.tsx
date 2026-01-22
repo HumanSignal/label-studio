@@ -1,5 +1,6 @@
 import { forwardRef, type KeyboardEvent, type MouseEvent } from "react";
 import { IconClose } from "@humansignal/icons";
+import { Badge } from "../../shad/components/ui/badge";
 import { cnm } from "../../utils/utils";
 import styles from "./tag-autocomplete.module.scss";
 
@@ -33,33 +34,36 @@ export const Tag = forwardRef<HTMLDivElement, TagProps>(
     };
 
     return (
-      <div
+      <Badge
         ref={ref}
+        variant="info"
+        shape="squared"
         tabIndex={disabled ? -1 : tabIndex}
         className={cnm(
-          styles.tag,
+          "gap-1 max-w-[150px] flex-shrink-0 group focus:ring-0 focus:ring-offset-0",
           {
             [styles.tagFocused]: isFocused,
-            [styles.tagDisabled]: disabled,
+            "opacity-60 cursor-not-allowed": disabled,
           },
           className,
         )}
         onKeyDown={onKeyDown}
         data-testid={dataTestid ?? `tag-${label}`}
+        data-tag="true"
         aria-label={`${label}, press Delete or Backspace to remove`}
       >
-        <span className={styles.tagLabel}>{label}</span>
+        <span className="overflow-hidden text-ellipsis whitespace-nowrap">{label}</span>
         <button
           type="button"
-          className={styles.tagRemove}
+          className="flex items-center justify-center p-0 m-0 ml-0.5 -mr-1 bg-transparent border-none cursor-pointer opacity-70 rounded-sm transition-all duration-150 hover:opacity-100 hover:bg-primary-emphasis-subtle disabled:cursor-not-allowed disabled:opacity-40 group-hover:opacity-100"
           onClick={handleRemoveClick}
           disabled={disabled}
           tabIndex={-1}
           aria-label={`Remove ${label}`}
         >
-          <IconClose className={styles.tagRemoveIcon} />
+          <IconClose className="w-3 h-3" />
         </button>
-      </div>
+      </Badge>
     );
   },
 );

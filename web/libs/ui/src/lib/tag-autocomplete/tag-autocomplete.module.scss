@@ -51,85 +51,12 @@
   min-width: 0;
 }
 
-// Individual tag (Badge variant="info" shape="squared" styling)
-// Matches: inline-flex items-center border px-2.5 py-0.5 text-xs font-semibold transition-colors
-//          bg-primary-background border-primary-emphasis text-accent-grape-dark font-normal rounded-sm
-.tag {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  padding: 2px 10px; // px-2.5 = 10px, py-0.5 = 2px
-  background-color: var(--color-primary-background);
-  border: 1px solid var(--color-primary-emphasis);
-  border-radius: 0.125rem; // rounded-sm
-  font-size: 0.75rem; // text-xs
-  font-weight: 400; // font-normal
-  color: var(--color-accent-grape-dark);
-  line-height: 1.25;
-  cursor: default;
-  transition: colors 150ms ease-out;
-  max-width: 150px;
-  flex-shrink: 0;
-
-  &:hover:not(.tagDisabled) {
-    .tagRemove {
-      opacity: 1;
-    }
-  }
-
-  &:focus {
-    outline: none;
-    box-shadow: 0 0 0 2px var(--ring-ring), 0 0 0 4px var(--ring-offset);
-  }
-}
-
+// Tag focused state (for keyboard navigation)
 .tagFocused {
-  outline: none;
-  box-shadow: 0 0 0 2px var(--color-primary-emphasis);
-}
-
-.tagDisabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
-.tagLabel {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.tagRemove {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0;
-  margin: 0;
-  margin-left: 2px;
-  margin-right: -4px; // Compensate for padding
-  background: none;
-  border: none;
-  cursor: pointer;
-  opacity: 0.7;
-  border-radius: 2px;
-  transition: opacity 150ms ease-out, background-color 150ms ease-out;
-  flex-shrink: 0;
-
-  &:hover {
-    opacity: 1;
-    background: var(--color-primary-emphasis-subtle, rgba(0, 102, 204, 0.15));
-  }
-
-  &:disabled {
-    cursor: not-allowed;
-    opacity: 0.4;
-  }
-}
-
-.tagRemoveIcon {
-  width: 12px;
-  height: 12px;
-  color: var(--color-accent-grape-dark);
+  outline: none !important;
+  border-color: var(--color-primary-border-subtle) !important;
+  // Remove the ring offset so it looks like a border
+  box-shadow: none !important;
 }
 
 // Input field
