@@ -94,6 +94,7 @@ const TabsSwitch = switchInjector(
                 ref={provided.innerRef}
                 {...provided.draggableProps}
                 {...provided.dragHandleProps}
+                tabIndex={-1}
                 style={{
                   background: snapshot.isDragging,
                   ...provided.draggableProps.style,

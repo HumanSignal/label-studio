@@ -45,7 +45,7 @@ export const Tabs = ({
   return (
     <TabsContext.Provider value={contextValue}>
       <div className={tabsCN.toString()}>
-        <span className={tabsCN.elem("list").toString()}>
+        <div className={tabsCN.elem("list").toString()} role="tablist">
           {allowedActions.add !== false && (
             <Tooltip title="Open New Tab" alignment="bottom-right">
               <Button
@@ -54,9 +54,10 @@ export const Tabs = ({
                 look="outline"
                 variant="neutral"
                 onClick={onAdd}
+                aria-label="Open New Tab"
                 data-leave
               >
-                <IconPlus className="!h-3 !w-3" />
+                <IconPlus className="!h-3 !w-3" aria-hidden="true" />
               </Button>
             </Tooltip>
           )}
@@ -74,8 +75,8 @@ export const Tabs = ({
               )}
             </Droppable>
           </DragDropContext>
-        </span>
-        <span className={tabsCN.elem("extra").toString()}>{tabBarExtraContent}</span>
+        </div>
+        <div className={tabsCN.elem("extra").toString()}>{tabBarExtraContent}</div>
       </div>
     </TabsContext.Provider>
   );
@@ -153,10 +154,25 @@ export const TabsItem = observer(
       [currentTitle, savedTitle, onCancelEditing, onFinishEditing],
     );
 
+    const handleKeyDown = useCallback(
+      (ev) => {
+        if (renameMode) return;
+
+        // Enter or Space to activate tab
+        if (ev.key === "Enter" || ev.key === " ") {
+          ev.preventDefault();
+          switchTab?.(tab);
+        }
+      },
+      [renameMode, switchTab, tab],
+    );
+
+    const tabLabel = virtual ? `${currentTitle} (unsaved)` : currentTitle;
+
     return (
       <div className={tabsCN.elem("item").mod({ active, virtual, menuOpen: isMenuOpen, edit: renameMode }).toString()}>
         {!renameMode && (
-          <div className={tabsCN.elem("item-drag").toString()}>
+          <div className={tabsCN.elem("item-drag").toString()} aria-hidden="true">
             <IconDragIndicator className="w-4 h-4" />
           </div>
         )}
@@ -167,7 +183,12 @@ export const TabsItem = observer(
               edit: renameMode,
             })
             .toString()}
-          onClick={() => switchTab?.(tab)}
+          role="tab"
+          aria-selected={active}
+          aria-label={tabLabel}
+          tabIndex={renameMode ? -1 : 0}
+          onClick={() => !renameMode && switchTab?.(tab)}
+          onKeyDown={handleKeyDown}
           title={currentTitle}
           data-leave
         >
@@ -176,6 +197,7 @@ export const TabsItem = observer(
               size="small"
               autoFocus={true}
               value={currentTitle}
+              aria-label="Tab name"
               onKeyDown={saveTabTitle}
               onBlur={saveTabTitle}
               onChange={(ev) => {
@@ -189,6 +211,7 @@ export const TabsItem = observer(
                 overflow: "hidden",
                 textOverflow: "ellipsis",
               }}
+              aria-hidden="true"
             >
               {currentTitle}
             </span>
@@ -222,8 +245,8 @@ export const TabsItem = observer(
               }
             >
               <div className={tabsCN.elem("item-right-button").toString()}>
-                <Button look="outline" size="smaller" variant="neutral">
-                  <IconEllipsisVertical className="w-4 h-4" />
+                <Button look="outline" size="smaller" variant="neutral" aria-label="Tab options">
+                  <IconEllipsisVertical className="w-4 h-4" aria-hidden="true" />
                 </Button>
               </div>
             </Dropdown.Trigger>
