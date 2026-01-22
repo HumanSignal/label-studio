@@ -12,6 +12,20 @@ export const RegionLabel = observer(({ item }: RegionLabelProps) => {
   if (type.includes("label")) {
     return item.value;
   }
+  if (type === "reactcode") {
+    if (item.values?.length) {
+      return (
+        <div className={cn("labels-list").toClassName()}>
+          {item.values.map((value, index) => [
+            index ? ", " : null,
+            <div key={value} className={cn("labels-list").toClassName()}>
+              {value}
+            </div>,
+          ])}
+        </div>
+      );
+    }
+  }
   if (type.includes("region") || type.includes("range")) {
     const labelsInResults = item.labelings.map((result: any) => result.selectedLabels || []);
 
