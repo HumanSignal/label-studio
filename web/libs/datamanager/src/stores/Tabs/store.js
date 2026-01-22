@@ -394,6 +394,9 @@ export const TabStore = types
       const hiddenColumns = {};
       const addedColumns = new Set();
 
+      // Clear availableFilters to rebuild it fresh
+      self.availableFilters.clear();
+
       const createColumnPath = (columns, column) => {
         const result = [];
 

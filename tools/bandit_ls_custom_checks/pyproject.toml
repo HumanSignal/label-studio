@@ -1,0 +1,16 @@
+[project]
+name = "bandit-ls-custom-checks"
+version = "1.0.0"
+description = "Bandit plugins with custom security checks for Label Studio"
+requires-python = ">=3.9"
+dependencies = ["bandit>=1.7.0"]
+
+[project.entry-points."bandit.plugins"]
+direct_rq_enqueue = "checks.rq_enqueue:direct_rq_enqueue"
+
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+packages = ["checks"]

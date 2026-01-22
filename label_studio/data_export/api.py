@@ -47,7 +47,7 @@ logger = logging.getLogger(__name__)
         summary='[Deprecated] Get export formats',
         description="""
         This endpoint is deprecated in Enterprise. Use the async export API instead:
-        POST /api/projects/\{id\}/exports/ (see [Create new export](/api#operation/api_projects_exports_create)).
+        POST /api/projects/{{id}}/exports/ (see [Create new export](/api#operation/api_projects_exports_create)).
 
         In Label Studio Enterprise, this endpoint will always return a 404 Not Found response with instructions to use the async export API.
 
