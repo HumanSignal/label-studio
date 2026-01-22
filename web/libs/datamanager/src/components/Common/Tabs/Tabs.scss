@@ -183,26 +183,15 @@
 
   &__add {
     padding: 0;
-    border: none;
-    outline: none;
-    width: 30px;
-    height: 30px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    align-self: center;
-    color: var(--color-neutral-content-subtler);
-    background: none;
-    transition: all 150ms ease-out;
+    width: 28px;
+    height: 28px;
+    margin-left: var(--spacing-tighter);
+    margin-bottom: var(--spacing-tightest);
+    margin-right: var(--spacing-tightest);
 
     &:focus {
+      outline: 2px solid var(--color-primary-focus-outline);
       box-shadow: none;
-    }
-
-    &:hover {
-      background-color: var(--color-primary-emphasis-subtle);
-      color: var(--color-primary-content);
-      border: 0;
     }
   }
 

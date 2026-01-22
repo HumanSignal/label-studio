@@ -46,6 +46,18 @@ export const Tabs = ({
     <TabsContext.Provider value={contextValue}>
       <div className={tabsCN.toString()}>
         <span className={tabsCN.elem("list").toString()}>
+          {allowedActions.add !== false && (
+            <Button
+              className={tabsCN.elem("add").toString()}
+              size="smaller"
+              look="outline"
+              variant="neutral"
+              onClick={onAdd}
+              data-leave
+            >
+              <IconPlus className="!h-3 !w-3" />
+            </Button>
+          )}
           <DragDropContext onDragEnd={onDragEnd}>
             <Droppable droppableId="droppable" direction="horizontal">
               {(provided) => (
@@ -60,11 +72,6 @@ export const Tabs = ({
               )}
             </Droppable>
           </DragDropContext>
-          {allowedActions.add !== false && (
-            <Button size="small" look="string" variant="neutral" onClick={onAdd} data-leave>
-              <IconPlus className="!h-3 !w-3" />
-            </Button>
-          )}
         </span>
         <span className={tabsCN.elem("extra").toString()}>{tabBarExtraContent}</span>
       </div>
