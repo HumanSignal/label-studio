@@ -515,7 +515,7 @@ export const Tab = types
       const originalId = self.id;
       self.setVirtual(false);
       const newView = yield self.save(options);
-      
+
       // If a new view was created (different ID), the old view is destroyed
       // Use the new view for navigation
       if (newView && newView.id !== originalId) {
