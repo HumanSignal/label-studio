@@ -1,0 +1,235 @@
+import type { Meta, StoryObj } from "@storybook/react";
+import { JsonViewer } from "./json-viewer";
+
+// Sample data for stories
+const sampleTaskData = {
+  id: 123,
+  data: {
+    text: "This is a sample text for annotation",
+    image: "https://example.com/image.jpg",
+    metadata: {
+      source: "web",
+      timestamp: "2024-01-15T10:30:00Z",
+      author: "John Doe",
+    },
+  },
+  annotations: [
+    {
+      id: 1,
+      completed_by: 5,
+      result: [
+        {
+          value: {
+            start: 0,
+            end: 10,
+            text: "This is a ",
+            labels: ["ENTITY"],
+          },
+          from_name: "label",
+          to_name: "text",
+          type: "labels",
+        },
+      ],
+      was_cancelled: false,
+      ground_truth: false,
+      created_at: "2024-01-15T11:00:00Z",
+      updated_at: "2024-01-15T11:05:00Z",
+      lead_time: 45.5,
+    },
+  ],
+  predictions: [
+    {
+      id: 1,
+      model_version: "v1.2.3",
+      score: 0.95,
+      result: [
+        {
+          value: {
+            start: 0,
+            end: 10,
+            text: "This is a ",
+            labels: ["PREDICTED_ENTITY"],
+          },
+          from_name: "label",
+          to_name: "text",
+          type: "labels",
+        },
+      ],
+      created_at: "2024-01-15T10:45:00Z",
+    },
+  ],
+  state: "completed",
+};
+
+const simpleData = {
+  name: "John Doe",
+  age: 30,
+  email: "john@example.com",
+  active: true,
+  roles: ["admin", "user"],
+  settings: {
+    theme: "dark",
+    notifications: true,
+  },
+};
+
+const complexNestedData = {
+  project: {
+    id: "proj_123",
+    name: "ML Annotation Project",
+    description: "A project for machine learning annotations",
+    created: "2024-01-01",
+    team: {
+      members: [
+        { id: 1, name: "Alice", role: "annotator" },
+        { id: 2, name: "Bob", role: "reviewer" },
+        { id: 3, name: "Charlie", role: "admin" },
+      ],
+      settings: {
+        autoAssign: true,
+        reviewRequired: true,
+        qualityThreshold: 0.95,
+      },
+    },
+    statistics: {
+      totalTasks: 1000,
+      completed: 750,
+      inProgress: 150,
+      pending: 100,
+      accuracy: 0.98,
+    },
+  },
+};
+
+const meta: Meta<typeof JsonViewer> = {
+  component: JsonViewer,
+  title: "UI/JsonViewer",
+  argTypes: {
+    data: { control: "object" },
+    viewOnly: { control: "boolean" },
+    showSearch: { control: "boolean" },
+    maxHeight: { control: "number" },
+  },
+  decorators: [
+    (Story) => (
+      <div style={{ padding: "20px", maxWidth: "1200px" }}>
+        <Story />
+      </div>
+    ),
+  ],
+};
+
+export default meta;
+type Story = StoryObj<typeof JsonViewer>;
+
+export const Default: Story = {
+  args: {
+    data: simpleData,
+    viewOnly: true,
+    showSearch: true,
+    maxHeight: 500,
+  },
+};
+
+export const TaskSourceData: Story = {
+  args: {
+    data: sampleTaskData,
+    viewOnly: true,
+    showSearch: true,
+    maxHeight: 500,
+  },
+};
+
+export const WithFilters: Story = {
+  args: {
+    data: sampleTaskData,
+    viewOnly: true,
+    showSearch: true,
+    maxHeight: 500,
+    customFilters: [
+      {
+        id: "annotations",
+        label: "Annotations",
+        filterFn: (nodeData) => {
+          const path = nodeData.path;
+          return path && path.includes("annotations");
+        },
+      },
+      {
+        id: "predictions",
+        label: "Predictions",
+        filterFn: (nodeData) => {
+          const path = nodeData.path;
+          return path && path.includes("predictions");
+        },
+      },
+    ],
+  },
+};
+
+export const ComplexData: Story = {
+  args: {
+    data: complexNestedData,
+    viewOnly: true,
+    showSearch: true,
+    maxHeight: 600,
+  },
+};
+
+export const WithoutSearch: Story = {
+  args: {
+    data: simpleData,
+    viewOnly: true,
+    showSearch: false,
+    maxHeight: 400,
+  },
+};
+
+export const LargeDataset: Story = {
+  args: {
+    data: {
+      tasks: Array.from({ length: 50 }, (_, i) => ({
+        id: i + 1,
+        title: `Task ${i + 1}`,
+        description: `Description for task ${i + 1}`,
+        status: i % 3 === 0 ? "completed" : i % 3 === 1 ? "in_progress" : "pending",
+        assignee: `user_${(i % 5) + 1}`,
+        tags: [`tag${i % 3}`, `category${i % 4}`],
+        metadata: {
+          created: new Date(2024, 0, i + 1).toISOString(),
+          priority: i % 3 === 0 ? "high" : i % 3 === 1 ? "medium" : "low",
+        },
+      })),
+    },
+    viewOnly: true,
+    showSearch: true,
+    maxHeight: 600,
+  },
+};
+
+export const CustomHeight: Story = {
+  args: {
+    data: complexNestedData,
+    viewOnly: true,
+    showSearch: true,
+    maxHeight: 300,
+  },
+};
+
+export const EmptyData: Story = {
+  args: {
+    data: {},
+    viewOnly: true,
+    showSearch: true,
+    maxHeight: 400,
+  },
+};
+
+export const NullData: Story = {
+  args: {
+    data: null,
+    viewOnly: true,
+    showSearch: true,
+    maxHeight: 400,
+  },
+};

@@ -56,6 +56,12 @@ export const FF_BETTER_USER_FILTER = "fflag_root_45_better_user_filter";
 export const FF_DISABLE_GLOBAL_USER_FETCHING =
   "fflag_all_feat_utc_204_users_performance_improvements_in_dm_for_large_orgs";
 
+/**
+ * Enable interactive JSON viewer for task source in Data Manager
+ * @link TBD - LaunchDarkly flag to be created
+ */
+export const FF_INTERACTIVE_JSON_VIEWER = "fflag_feat_front_interactive_json_viewer_short";
+
 // Customize flags
 const flags = {};
 

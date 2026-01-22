@@ -1,0 +1,139 @@
+.jsonViewer {
+  width: 100%;
+  gap: var(--spacing-base);
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: stretch;
+  flex: 1;
+  min-height: 500px;
+}
+
+.controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-base);
+}
+
+.leftControls {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-base);
+  flex: 0 1 auto;
+}
+
+.rightControls {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-tight);
+  flex: 0 0 auto;
+}
+
+.searchWrapper {
+  position: relative;
+  width: 320px;
+  max-width: 100%;
+}
+
+.searchIcon {
+  position: absolute;
+  left: var(--spacing-base);
+  top: 50%;
+  transform: translateY(-50%);
+  width: 16px;
+  height: 16px;
+  color: var(--color-neutral-content-subtler);
+  pointer-events: none;
+}
+
+.searchInput {
+  width: 100%;
+  padding: var(--spacing-tight) var(--spacing-base);
+  padding-left: var(--spacing-widest);
+  background: var(--color-neutral-background);
+  border: 1px solid var(--color-neutral-border);
+  border-radius: var(--corner-radius-small);
+  color: var(--color-neutral-content);
+  font-size: var(--font-size-regular);
+  transition: border-color 150ms ease;
+  
+  &:hover {
+    border-color: var(--color-primary-border-subtle);
+  }
+  
+  &:focus {
+    outline: none;
+    border-color: var(--color-primary-border);
+    box-shadow: 0 0 0 1px var(--color-primary-border);
+  }
+  
+  &::placeholder {
+    color: var(--color-neutral-content-subtler);
+  }
+}
+
+.filters {
+  display: flex;
+  gap: var(--spacing-tight);
+  flex-wrap: wrap;
+}
+
+.jsonEditorContainer {  
+  border: 1px solid var(--color-neutral-border);
+  box-shadow: inset 0 2px 8px rgba(var(--color-neutral-shadow-raw) / 12%);
+
+  // Override json-edit-react styles to match Label Studio theme
+  :global {
+    .jer-container {
+      font-family: var(--font-family-mono);
+      font-size: var(--font-size-smaller);
+      line-height: 1.6;
+    }
+    
+    // Override button styles
+    .jer-button {
+      transition: background-color 150ms ease;
+      
+      &:hover {
+        background-color: var(--color-neutral-surface-hover);
+      }
+      
+      &:focus {
+        outline: 2px solid var(--color-primary-border);
+        outline-offset: 2px;
+      }
+    }
+    
+    // Override input styles
+    .jer-input {
+      background: var(--color-neutral-background);
+      border: 1px solid var(--color-neutral-border);
+      color: var(--color-neutral-content);
+      border-radius: var(--corner-radius-small);
+      padding: var(--spacing-tight) var(--spacing-base);
+      transition: border-color 150ms ease;
+      
+      &:hover {
+        border-color: var(--color-primary-border-subtle);
+      }
+      
+      &:focus {
+        outline: none;
+        border-color: var(--color-primary-border);
+        box-shadow: 0 0 0 1px var(--color-primary-border);
+      }
+    }
+    
+    // Override collection/object/array backgrounds
+    .jer-collection {
+      background-color: var(--color-neutral-surface);
+      border-radius: var(--corner-radius-small);
+    }
+    
+    // Override key-value pair spacing
+    .jer-key-value-pair {
+      padding: var(--spacing-tighter) 0;
+    }
+  }
+}

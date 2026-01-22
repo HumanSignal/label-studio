@@ -1,0 +1,15 @@
+.taskSourceView {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-base);
+  width: 100%;
+}
+
+.viewToggle {
+  margin-bottom: var(--spacing-tight);
+}
+
+.viewContent {
+  flex: 1;
+  min-height: 0;
+}
