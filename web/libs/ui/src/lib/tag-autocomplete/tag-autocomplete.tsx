@@ -292,7 +292,8 @@ export const TagAutocomplete = forwardRef(
 
           <PopoverContent
             align="start"
-            className={contentClassName}
+            className={cnm("p-0 !w-max !inline-block !max-w-[90vw] !min-w-[200px]", contentClassName)}
+            // style={{ width: "auto" }}
             data-testid="tag-autocomplete-dropdown"
             onOpenAutoFocus={(e) => {
               // Prevent popover from stealing focus from input
