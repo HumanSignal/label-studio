@@ -46,21 +46,6 @@ export const Tabs = ({
     <TabsContext.Provider value={contextValue}>
       <div className={tabsCN.toString()}>
         <div className={tabsCN.elem("list").toString()} role="tablist">
-          {allowedActions.add !== false && (
-            <Tooltip title="Open New Tab" alignment="bottom-right">
-              <Button
-                className={tabsCN.elem("add").toString()}
-                size="smaller"
-                look="outline"
-                variant="neutral"
-                onClick={onAdd}
-                aria-label="Open New Tab"
-                data-leave
-              >
-                <IconPlus className="!h-3 !w-3" aria-hidden="true" />
-              </Button>
-            </Tooltip>
-          )}
           <DragDropContext onDragEnd={onDragEnd}>
             <Droppable droppableId="droppable" direction="horizontal">
               {(provided) => (
@@ -75,6 +60,21 @@ export const Tabs = ({
               )}
             </Droppable>
           </DragDropContext>
+          {allowedActions.add !== false && (
+            <Tooltip title="Open New Tab">
+              <Button
+                className={tabsCN.elem("add").toString()}
+                size="smaller"
+                look="outline"
+                variant="neutral"
+                onClick={onAdd}
+                aria-label="Open New Tab"
+                data-leave
+              >
+                <IconPlus className="!h-3 !w-3" aria-hidden="true" />
+              </Button>
+            </Tooltip>
+          )}
         </div>
         <div className={tabsCN.elem("extra").toString()}>{tabBarExtraContent}</div>
       </div>

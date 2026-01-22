@@ -245,9 +245,9 @@
     padding: 0;
     width: 28px;
     height: 28px;
-    margin-left: var(--spacing-tighter);
+    margin-right: var(--spacing-tighter);
+    margin-left: var(--spacing-tightest);
     margin-bottom: var(--spacing-tightest);
-    margin-right: var(--spacing-tightest);
 
     &:focus {
       outline: 2px solid var(--color-primary-focus-outline);
