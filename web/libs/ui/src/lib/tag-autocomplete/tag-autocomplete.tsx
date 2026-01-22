@@ -1,4 +1,12 @@
-import React, { forwardRef, useCallback, useRef, type ChangeEvent, type ForwardedRef } from "react";
+import React, {
+  forwardRef,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  type ChangeEvent,
+  type ForwardedRef,
+} from "react";
 import { Command, CommandEmpty, CommandGroup, CommandItem, CommandList } from "@humansignal/shad/components/ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "@humansignal/shad/components/ui/popover";
 import { Spinner } from "@humansignal/ui";
@@ -34,7 +42,6 @@ export const TagAutocomplete = forwardRef(
       isOpen,
       query,
       focusedTagIndex,
-      highlightedOptionIndex,
       filteredOptions,
       selectedOptions,
       inputRef,
@@ -50,6 +57,41 @@ export const TagAutocomplete = forwardRef(
       handleKeyDown,
       focusInput,
     } = useTagAutocomplete({ ...props, createTagCallbackRef });
+
+    // --- NEW: control cmdk selection so first item is always highlighted ---
+    const [cmdkValue, setCmdkValue] = useState("");
+
+    const getDefaultCmdkValue = useCallback(() => {
+      // Default to first option if available, otherwise "create" option if shown
+      if (filteredOptions.length > 0) return String(filteredOptions[0].value);
+      // create option is appended after options, but can be default when no options exist
+      // (or change this if you want create to be preferred even when options exist)
+      const trimmed = query.trim();
+      if (onCreate && trimmed) {
+        const exactMatch = filteredOptions.some((opt) => opt.label.toLowerCase() === trimmed.toLowerCase());
+        if (!exactMatch) return "create-tag-option";
+      }
+      return "";
+    }, [filteredOptions, onCreate, query]);
+
+    useEffect(() => {
+      if (!isOpen) return;
+
+      const next = getDefaultCmdkValue();
+      setCmdkValue(next);
+
+      if (next === "create-tag-option") {
+        setHighlightedOptionIndex(filteredOptions.length);
+      } else if (next) {
+        setHighlightedOptionIndex(0);
+      }
+    }, [isOpen, getDefaultCmdkValue, filteredOptions.length, setHighlightedOptionIndex]);
+
+    useEffect(() => {
+      if (isOpen) return;
+      setCmdkValue("");
+    }, [isOpen]);
+    // --- END NEW ---
 
     const handleInputChange = useCallback(
       (e: ChangeEvent<HTMLInputElement>) => {
@@ -142,7 +184,10 @@ export const TagAutocomplete = forwardRef(
               value={String(option.value)}
               onSelect={() => selectOption(option)}
               disabled={option.disabled}
-              onMouseEnter={() => setHighlightedOptionIndex(index)}
+              onMouseEnter={() => {
+                setHighlightedOptionIndex(index);
+                setCmdkValue(String(option.value));
+              }}
               className="rounded-4 text-neutral-content-subtle overflow-hidden p-1 outline-none group duration-150 ease-out data-[disabled=true]:opacity-50 data-[disabled=true]:cursor-not-allowed data-[disabled=true]:bg-transparent"
             >
               <div className="flex gap-2 w-full px-4 py-1 hover:bg-primary-emphasis-subtle hover:cursor-pointer group-focus-within:bg-primary-emphasis-subtle group-aria-selected:bg-primary-emphasis-subtle rounded-4 hover:data-[disabled=true]:bg-transparent hover:data-[disabled=true]:cursor-not-allowed duration-150 ease-out">
@@ -158,7 +203,10 @@ export const TagAutocomplete = forwardRef(
             value={String(option.value)}
             onSelect={() => selectOption(option)}
             disabled={option.disabled}
-            onMouseEnter={() => setHighlightedOptionIndex(index)}
+            onMouseEnter={() => {
+              setHighlightedOptionIndex(index);
+              setCmdkValue(String(option.value));
+            }}
             className="rounded-4 text-neutral-content-subtle overflow-hidden p-1 outline-none group duration-150 ease-out data-[disabled=true]:opacity-50 data-[disabled=true]:cursor-not-allowed data-[disabled=true]:bg-transparent"
           >
             <div className="flex gap-2 w-full px-4 py-1 hover:bg-primary-emphasis-subtle hover:cursor-pointer group-focus-within:bg-primary-emphasis-subtle group-aria-selected:bg-primary-emphasis-subtle rounded-4 hover:data-[disabled=true]:bg-transparent hover:data-[disabled=true]:cursor-not-allowed duration-150 ease-out">
@@ -167,15 +215,7 @@ export const TagAutocomplete = forwardRef(
           </CommandItem>
         );
       },
-      [
-        isOptionSelected,
-        renderOption,
-        selectOption,
-        highlightedOptionIndex,
-        setHighlightedOptionIndex,
-        query,
-        highlightMatch,
-      ],
+      [isOptionSelected, renderOption, selectOption, setHighlightedOptionIndex, query, highlightMatch],
     );
 
     const combobox = (
@@ -183,7 +223,10 @@ export const TagAutocomplete = forwardRef(
         shouldFilter={false}
         onKeyDown={handleKeyDown}
         className="!border-0 !bg-transparent !h-auto !overflow-visible !rounded-none"
+        value={cmdkValue}
         onValueChange={(value) => {
+          setCmdkValue(value);
+
           // Sync CMDK's selection back to our state
           if (value === "create-tag-option") {
             setHighlightedOptionIndex(filteredOptions.length);
@@ -246,6 +289,7 @@ export const TagAutocomplete = forwardRef(
               </div>
             </div>
           </PopoverTrigger>
+
           <PopoverContent
             align="start"
             className={contentClassName}
@@ -254,9 +298,12 @@ export const TagAutocomplete = forwardRef(
               // Prevent popover from stealing focus from input
               e.preventDefault();
             }}
+            onCloseAutoFocus={(e) => {
+              // Prevent focus being forced elsewhere on close
+              e.preventDefault();
+            }}
           >
             <CommandList
-              key={`${isOpen}-${filteredOptions.length}-${query}`}
               id="tag-autocomplete-listbox"
               role="listbox"
               aria-label="Available options"
@@ -269,7 +316,9 @@ export const TagAutocomplete = forwardRef(
               ) : (
                 <>
                   {filteredOptions.length === 0 && !showCreateOption && <CommandEmpty>No options found.</CommandEmpty>}
+
                   <CommandGroup>{filteredOptions.map((option, index) => renderOptionItem(option, index))}</CommandGroup>
+
                   {showCreateOption && (
                     <CommandItem
                       value="create-tag-option"
@@ -280,7 +329,10 @@ export const TagAutocomplete = forwardRef(
                           [styles.createOptionWithBorder]: filteredOptions.length > 0,
                         },
                       )}
-                      onMouseEnter={() => setHighlightedOptionIndex(filteredOptions.length)}
+                      onMouseEnter={() => {
+                        setHighlightedOptionIndex(filteredOptions.length);
+                        setCmdkValue("create-tag-option");
+                      }}
                       data-testid="tag-autocomplete-create-option"
                     >
                       <div className="flex gap-2 w-full px-4 py-1 hover:bg-primary-emphasis-subtle hover:cursor-pointer group-focus-within:bg-primary-emphasis-subtle group-aria-selected:bg-primary-emphasis-subtle rounded-4 duration-150 ease-out">
