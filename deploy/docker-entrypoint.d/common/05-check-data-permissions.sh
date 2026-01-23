@@ -10,7 +10,7 @@ if [ ! -w "$LABEL_STUDIO_BASE_DATA_DIR" ]; then
     echo >&3 "-----------------------------------------------------"
     echo >&3 "Current user:"
     echo >&3 "  UID        = $(id -u)"
-    echo >&3 "  Group      = $(id -g)"
+    echo >&3 "  GID        = $(id -g)"
     echo >&3 ""
     echo >&3 "Directory owner and permissions:"
     ls -ld "$LABEL_STUDIO_BASE_DATA_DIR" >&3 || echo >&3 "  Unable to stat directory: $LABEL_STUDIO_BASE_DATA_DIR"
