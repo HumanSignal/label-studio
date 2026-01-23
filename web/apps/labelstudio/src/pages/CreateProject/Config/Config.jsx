@@ -12,6 +12,7 @@ import { colorNames } from "./colors";
 import "./Config.scss";
 import { Preview } from "./Preview";
 import {
+  ff,
   LightweightPreview,
   LIGHTWEIGHT_PREVIEW_MESSAGE,
   LIGHTWEIGHT_PREVIEW_TAG_THRESHOLD,
@@ -36,9 +37,12 @@ const configClass = cn("configure");
  *
  * Always uses full preview for configs containing ReactCode tag since
  * it requires full React/MST integration to function.
+ *
+ * Controlled by FF_PREVIEW_PERFORMANCE feature flag.
  */
 const AdaptivePreview = (props) => {
   const config = props.config || "";
+  const isPreviewPerformanceEnabled = ff.isActive(ff.FF_PREVIEW_PERFORMANCE);
 
   // Check if config contains ReactCode tag - always use full preview for ReactCode
   // since lightweight preview can't render custom React components
@@ -46,7 +50,7 @@ const AdaptivePreview = (props) => {
 
   // Use tag count instead of character length - MST performance degrades with many nodes
   const tagCount = countConfigTags(config);
-  const useLightweight = !hasReactCode && tagCount > LIGHTWEIGHT_PREVIEW_TAG_THRESHOLD;
+  const useLightweight = isPreviewPerformanceEnabled && !hasReactCode && tagCount > LIGHTWEIGHT_PREVIEW_TAG_THRESHOLD;
 
   if (useLightweight) {
     return (
