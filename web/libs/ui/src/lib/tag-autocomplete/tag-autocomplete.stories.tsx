@@ -383,6 +383,7 @@ export const InFormContext: Story = {
     };
 
     const handleAdd = () => {
+      // Validation checks
       if (skills.length === 0) return;
 
       // Distinguish between existing and new tags
@@ -403,7 +404,13 @@ export const InFormContext: Story = {
           <Typography variant="body" size="small" className="font-medium mb-tight">
             Skills
           </Typography>
-          <div className="flex gap-tight items-start">
+          <form
+            className="flex gap-tight items-start"
+            onSubmit={(e) => {
+              e.preventDefault();
+              handleAdd();
+            }}
+          >
             <div className="flex-1">
               <TagAutocomplete
                 name="skills"
@@ -414,10 +421,10 @@ export const InFormContext: Story = {
                 placeholder="Type to add skills..."
               />
             </div>
-            <Button variant="primary" onClick={handleAdd} disabled={skills.length === 0}>
+            <Button type="submit" variant="primary" disabled={skills.length === 0}>
               Add
             </Button>
-          </div>
+          </form>
         </div>
 
         {submittedTags.length > 0 && (

@@ -217,6 +217,18 @@ export function useTagAutocomplete<T = string>(
       const cursorAtStart = inputElement?.selectionStart === 0 && inputElement?.selectionEnd === 0;
       const hasSelectedTags = selectedValues.length > 0;
 
+      // Allow Enter to bubble up to form submission when dropdown is closed and no tag is focused
+      if (e.key === "Enter" && !isOpen && focusedTagIndex === null) {
+        // Find the parent form and trigger submission
+        const form = inputRef.current?.closest("form");
+        if (form) {
+          e.preventDefault();
+          e.stopPropagation();
+          form.requestSubmit();
+        }
+        return;
+      }
+
       switch (e.key) {
         // Tag navigation
         case "ArrowLeft":
