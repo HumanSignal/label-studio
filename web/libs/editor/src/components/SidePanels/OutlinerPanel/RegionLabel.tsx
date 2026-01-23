@@ -19,7 +19,7 @@ export const RegionLabel = observer(({ item }: RegionLabelProps) => {
           {item.values.map((value: string, index: number) => [
             index ? ", " : null,
             <div key={value} className={cn("labels-list").toClassName()}>
-              {value.length > 50 ? value.slice(0, 50) + "..." : value}
+              {value.length > 50 ? `${value.slice(0, 50)}...` : value}
             </div>,
           ])}
         </div>
