@@ -18,6 +18,7 @@ if [ ! -w "$LABEL_STUDIO_BASE_DATA_DIR" ]; then
     echo >&3 "To resolve this issue:"
     echo >&3 "  - On the Docker host, ensure the user running the container has write access to the mount volume."
     echo >&3 "  - If you are mounting a host directory as -v mydata:/label-studio/data:"
+    echo >&3 "      rm -rf mydata"
     echo >&3 "      mkdir -p mydata"
     echo >&3 "      sudo chown :0 mydata"
     echo >&3 ""
