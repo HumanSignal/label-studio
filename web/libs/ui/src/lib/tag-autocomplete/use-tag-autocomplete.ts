@@ -87,10 +87,13 @@ export function useTagAutocomplete<T = string>(
     });
   }, [selectedValues, normalizedOptions]);
 
-  // Filter options based on query
+  // Filter options based on query and exclude already selected values
   const filteredOptions = useMemo(() => {
+    // First, filter out already selected tags
+    const availableOptions = normalizedOptions.filter((opt) => !selectedValues.includes(opt.value));
+
     if (!query.trim()) {
-      return normalizedOptions;
+      return availableOptions;
     }
 
     const defaultFilter = (option: TagAutocompleteOption<T>, q: string) => {
@@ -99,8 +102,8 @@ export function useTagAutocomplete<T = string>(
     };
 
     const filterFn = searchFilter ?? defaultFilter;
-    return normalizedOptions.filter((opt) => filterFn(opt, query));
-  }, [normalizedOptions, query, searchFilter]);
+    return availableOptions.filter((opt) => filterFn(opt, query));
+  }, [normalizedOptions, query, searchFilter, selectedValues]);
 
   // Auto-highlight first item when dropdown opens or results change
   useEffect(() => {
@@ -149,17 +152,17 @@ export function useTagAutocomplete<T = string>(
       const value = option.value;
       const isSelected = selectedValues.includes(value);
 
-      let newValues: T[];
+      // Don't allow deselecting via dropdown - tags should only be removed via the X button or keyboard
       if (isSelected) {
-        // Deselect
-        newValues = selectedValues.filter((v) => v !== value);
-      } else {
-        // Select (check maxTags)
-        if (maxTags && selectedValues.length >= maxTags) {
-          return;
-        }
-        newValues = [...selectedValues, value];
+        return;
       }
+
+      // Check maxTags
+      if (maxTags && selectedValues.length >= maxTags) {
+        return;
+      }
+
+      const newValues = [...selectedValues, value];
 
       if (controlledValue === undefined) {
         setInternalValue(newValues);

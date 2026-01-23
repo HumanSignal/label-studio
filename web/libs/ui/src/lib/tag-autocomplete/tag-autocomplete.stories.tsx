@@ -93,9 +93,9 @@ export const Default: Story = {
             <strong>Selected:</strong> {value.length > 0 ? value.join(", ") : "None"}
           </Typography>
         </div>
-        <div className="mt-base p-base bg-neutral-surface rounded text-sm w-[300px]">
-          <Typography variant="body" size="small" className="font-medium mb-tight">
-            Keyboard shortcuts:
+        <div className="mt-base p-base bg-neutral-surface rounded text-sm w-[400px]">
+          <Typography variant="body" size="small" className="mb-tight">
+            <strong>Keyboard shortcuts:</strong>
           </Typography>
           <ul className="space-y-tight text-neutral-content-subtle">
             <li>
@@ -136,22 +136,6 @@ export const SimpleStrings: Story = {
     return (
       <div className="w-96">
         <TagAutocomplete options={simpleTags} value={value} onChange={setValue} placeholder="Select frameworks..." />
-      </div>
-    );
-  },
-};
-
-/**
- * Pre-selected Values
- *
- * Component initialized with pre-selected tags.
- */
-export const PreSelected: Story = {
-  render: () => {
-    const [value, setValue] = useState<string[]>(["frontend", "backend", "devops"]);
-    return (
-      <div className="w-96">
-        <TagAutocomplete options={sampleTags} value={value} onChange={setValue} placeholder="Select tags..." />
       </div>
     );
   },
@@ -427,6 +411,12 @@ export const InFormContext: Story = {
           </form>
         </div>
 
+        <div className="mt-base">
+          <Typography variant="body" size="small" className="text-neutral-content-subtle">
+            Available: {sampleTags.map((tag) => tag.label).join(", ") || "All selected"}
+          </Typography>
+        </div>
+
         {submittedTags.length > 0 && (
           <div className="p-base bg-neutral-surface rounded">
             <Typography variant="body" size="small" className="font-medium mb-tight">
@@ -538,36 +528,6 @@ export const CustomMinSearchLength: Story = {
         <Typography variant="body" size="small" className="mt-base text-neutral-content-subtle">
           Available: {sampleTags.map((tag) => tag.label).join(", ")}
         </Typography>
-      </div>
-    );
-  },
-};
-
-/**
- * With Available Options List
- *
- * Shows available options to help users discover what they can select.
- */
-export const WithAvailableOptionsList: Story = {
-  render: () => {
-    const [value, setValue] = useState<string[]>(["frontend"]);
-
-    // Filter out already selected options to show only available ones
-    const availableOptions = sampleTags.filter((tag) => !value.includes(tag.value));
-
-    return (
-      <div className="w-96">
-        <TagAutocomplete
-          options={sampleTags}
-          value={value}
-          onChange={setValue}
-          placeholder="Type at least 2 characters to search..."
-        />
-        <div className="mt-base">
-          <Typography variant="body" size="small" className="text-neutral-content-subtle">
-            Available: {availableOptions.map((tag) => tag.label).join(", ") || "All selected"}
-          </Typography>
-        </div>
       </div>
     );
   },
