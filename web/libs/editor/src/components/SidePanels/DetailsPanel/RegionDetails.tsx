@@ -37,7 +37,9 @@ const RatingResult: FC<{ mainValue: string[] }> = observer(({ mainValue }) => {
 });
 
 const isNested = (value: unknown): boolean =>
-  value !== null && typeof value === "object" && (Array.isArray(value) ? value.length > 0 : Object.keys(value).length > 0);
+  value !== null &&
+  typeof value === "object" &&
+  (Array.isArray(value) ? value.length > 0 : Object.keys(value).length > 0);
 
 const JsonValue: FC<{ value: unknown }> = ({ value }) => {
   // Primitives: string, number, boolean, null, undefined
