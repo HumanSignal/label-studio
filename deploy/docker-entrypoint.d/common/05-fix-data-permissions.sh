@@ -2,21 +2,18 @@
 
 set -e ${DEBUG:+-x}
 
-# Get the data directory from environment variable or use default
-DATA_DIR="${LABEL_STUDIO_BASE_DATA_DIR:-/label-studio/data}"
-
-echo >&3 "=> Checking data directory permissions: $DATA_DIR"
+echo >&3 "=> Checking data directory permissions: $LABEL_STUDIO_BASE_DATA_DIR"
 
 # Check if data directory is writable
-if [ ! -w "$DATA_DIR" ]; then
-    echo >&3 "ERROR: Data directory is not writable: $DATA_DIR"
+if [ ! -w "$LABEL_STUDIO_BASE_DATA_DIR" ]; then
+    echo >&3 "ERROR: Data directory is not writable: $LABEL_STUDIO_BASE_DATA_DIR"
     echo >&3 "-----------------------------------------------------"
     echo >&3 "Current user:"
     echo >&3 "  UID        = $(id -u)"
     echo >&3 "  Group      = $(id -g)"
     echo >&3 ""
     echo >&3 "Directory owner and permissions:"
-    ls -ld "$DATA_DIR" >&3 || echo >&3 "  Unable to stat directory: $DATA_DIR"
+    ls -ld "$LABEL_STUDIO_BASE_DATA_DIR" >&3 || echo >&3 "  Unable to stat directory: $LABEL_STUDIO_BASE_DATA_DIR"
     echo >&3 ""
     echo >&3 "To resolve this issue:"
     echo >&3 "  - On the Docker host, ensure the user running the container has write access to the mount volume."
