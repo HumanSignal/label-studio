@@ -1,0 +1,32 @@
+#!/bin/bash
+
+set -e ${DEBUG:+-x}
+
+# Get the data directory from environment variable or use default
+DATA_DIR="${LABEL_STUDIO_BASE_DATA_DIR:-/label-studio/data}"
+
+echo >&3 "=> Checking data directory permissions: $DATA_DIR"
+
+# Check if data directory is writable
+if [ ! -w "$DATA_DIR" ]; then
+    echo >&3 "ERROR: Data directory is not writable: $DATA_DIR"
+    echo >&3 "-----------------------------------------------------"
+    echo >&3 "Current user:"
+    echo >&3 "  UID        = $(id -u)"
+    echo >&3 "  Group      = $(id -g)"
+    echo >&3 ""
+    echo >&3 "Directory owner and permissions:"
+    ls -ld "$DATA_DIR" >&3 || echo >&3 "  Unable to stat directory: $DATA_DIR"
+    echo >&3 ""
+    echo >&3 "To resolve this issue:"
+    echo >&3 "  - On the Docker host, ensure the user running the container has write access to the mount volume."
+    echo >&3 "  - If you are mounting a host directory as -v mydata:/label-studio/data:"
+    echo >&3 "      mkdir -p mydata"
+    echo >&3 "      sudo chown :0 mydata"
+    echo >&3 ""
+    echo >&3 "Refer to the documentation for more details:"
+    echo >&3 "  https://labelstud.io/guide/install_troubleshoot.html#File-permissions-for-non-root-user"
+    exit 1
+fi
+
+echo >&3 "=> Data directory permissions check completed successfully"
