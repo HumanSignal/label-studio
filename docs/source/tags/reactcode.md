@@ -42,11 +42,19 @@ If you are not using it with control tags, you must make it self-referencing (th
 
 ### Data parameter
 
-Typically, you would use the `value` parameter to reference the task data. But for the `ReactCode` tag, you must use the `data` parameter instead. For example:
+With other Label Studio tags, you use the `value` parameter to reference task data. 
 
-`<ReactCode name="react-app" toName="react-app" data="$image">`
+But the `ReactCode` does not have a `value` parameter that you can explicitly set.  Instead, to reference task data, there are two approaches you can take:
 
-You can then access task data from within your React code:
+* If you want to pass all task data, you do not need to reference the data at all. For example:
+
+  `<ReactCode name="react-app" toName="react-app">`
+
+* If you want to reference a specific field, you can use the `data` parameter. For example:
+
+  `<ReactCode name="react-app" toName="react-app" data="$image">`
+
+  You can then access task data from within your React code:
 
 ```javascript
 function MyComponent({ React, addRegion, regions, data }) {
@@ -57,6 +65,8 @@ function MyComponent({ React, addRegion, regions, data }) {
   return React.createElement('img', { src: imageUrl });
 }
 ```
+
+
 
 ## React usage notes
 

@@ -6,6 +6,8 @@ const meta: Meta<typeof EnterpriseBadge> = {
   title: "UI/EnterpriseBadge",
   argTypes: {
     filled: { control: "boolean" },
+    compact: { control: "boolean" },
+    ghost: { control: "boolean" },
   },
 };
 
@@ -19,5 +21,31 @@ export const Default: Story = {
 export const Filled: Story = {
   args: {
     filled: true,
+  },
+};
+
+export const Compact: Story = {
+  args: {
+    compact: true,
+  },
+};
+
+export const CompactFilled: Story = {
+  args: {
+    compact: true,
+    filled: true,
+  },
+};
+
+export const Ghost: Story = {
+  args: {
+    ghost: true,
+  },
+};
+
+export const GhostCompact: Story = {
+  args: {
+    ghost: true,
+    compact: true,
   },
 };

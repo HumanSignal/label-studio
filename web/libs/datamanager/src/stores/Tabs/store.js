@@ -311,12 +311,13 @@ export const TabStore = types
         ...viewSnapshot,
         ...result,
         saved: true,
+        virtual: false,
         filters: viewSnapshot.filters,
         conjunction: viewSnapshot.conjunction,
       };
 
       if (result.id !== view.id) {
-        self.views.push({ ...newViewSnapshot, saved: true });
+        self.views.push({ ...newViewSnapshot, saved: true, virtual: false });
         const newView = self.views[self.views.length - 1];
 
         root.SDK.hasInterface("tabs") && newView.reload();
@@ -393,6 +394,9 @@ export const TabStore = types
       const targets = unique(columns.map((c) => c.target));
       const hiddenColumns = {};
       const addedColumns = new Set();
+
+      // Clear availableFilters to rebuild it fresh
+      self.availableFilters.clear();
 
       const createColumnPath = (columns, column) => {
         const result = [];
