@@ -13,6 +13,8 @@ export interface JsonViewerProps {
   showSearch?: boolean;
   /** Optional custom filter buttons */
   customFilters?: FilterConfig[];
+  /** Container min height */
+  minHeight?: string | number;
   /** Container max height */
   maxHeight?: string | number;
   /** Callback when copy is triggered */

@@ -1,5 +1,5 @@
 import { type FC, useCallback, useEffect, useState } from "react";
-import { JsonViewer, type FilterConfig, ToggleItems } from "@humansignal/ui";
+import { JsonViewer, type FilterConfig, Tabs, TabsList, TabsTrigger } from "@humansignal/ui";
 import { FF_LOPS_E_3, FF_INTERACTIVE_JSON_VIEWER, isFF } from "../../../utils/feature-flags";
 import { CodeView } from "./CodeView";
 import styles from "./TaskSourceViewer.module.scss";
@@ -31,6 +31,14 @@ const TASK_SOURCE_FILTERS: FilterConfig[] = [
     filterFn: (nodeData) => {
       const path = nodeData.path;
       return path && path.includes("predictions");
+    },
+  },
+  {
+    id: "data",
+    label: "Data",
+    filterFn: (nodeData) => {
+      const path = nodeData.path;
+      return path && path.includes("data");
     },
   },
 ];
@@ -97,17 +105,24 @@ export const TaskSourceViewer: FC<TaskSourceViewerProps> = ({ content, onTaskLoa
 
   return (
     <div className={styles.taskSourceView}>
-      <ToggleItems
-        items={{ code: "Code", interactive: "Interactive" }}
-        active={view}
-        onSelect={handleViewChange}
-        className={styles.viewToggle}
-      />
+      <Tabs value={view} onValueChange={handleViewChange} variant="default">
+        <TabsList className={styles.viewToggle}>
+          <TabsTrigger value="code">Code</TabsTrigger>
+          <TabsTrigger value="interactive">Interactive</TabsTrigger>
+        </TabsList>
+      </Tabs>
       <div className={styles.viewContent}>
         {view === "code" ? (
           <CodeView data={taskData} />
         ) : (
-          <JsonViewer data={taskData} viewOnly={true} showSearch={true} customFilters={customFilters} maxHeight={500} />
+          <JsonViewer
+            data={taskData}
+            viewOnly={true}
+            showSearch={true}
+            customFilters={customFilters}
+            minHeight={552}
+            maxHeight={552}
+          />
         )}
       </div>
     </div>

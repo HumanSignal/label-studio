@@ -2,38 +2,26 @@ import { type FC, useCallback, useMemo, useState } from "react";
 import { JsonEditor, defaultTheme, matchNode } from "json-edit-react";
 import { Button } from "../button/button";
 import { Tooltip } from "../Tooltip/Tooltip";
-import { IconCopy, IconSearch } from "@humansignal/icons";
-import type { JsonViewerProps } from "./types";
+import { Typography } from "../typography/typography";
+import { IconSearch, IconFilter, IconReset, IconClose, IconCopy } from "@humansignal/icons";
+import type { FilterConfig, JsonViewerProps } from "./types";
 import styles from "./json-viewer.module.scss";
 
 // Custom Label Studio theme for json-edit-react
+// Note: Colors are applied via SCSS using :global selectors because
+// json-edit-react doesn't support CSS variables in theme configuration
 const labelStudioTheme = {
   ...defaultTheme,
   displayName: "Label Studio",
-  fragments: {
-    ...defaultTheme.fragments,
-    edit: "var(--color-primary-content)",
-    add: "var(--color-positive-content)",
-    del: "var(--color-negative-content)",
-    brackets: "var(--color-accent-grape-base)",
-    keys: "var(--color-primary-content)",
-    values: {
-      ...defaultTheme.fragments.values,
-      string: "var(--color-accent-kale-bold)",
-      number: "var(--color-accent-grape-bold)",
-      boolean: "var(--color-accent-canteloupe-bold)",
-      null: "var(--color-neutral-content-subtler)",
-    },
-  },
   styles: {
     ...defaultTheme.styles,
     container: {
-      backgroundColor: "var(--color-neutral-surface-inset)",
+      backgroundColor: "var(--json-viewer-background)",
       color: "var(--color-neutral-content)",
     },
     collection: {
       ...defaultTheme.styles.collection,
-      backgroundColor: "var(--color-neutral-surface-inset)",
+      backgroundColor: "var(--json-viewer-collection-background)",
     },
   },
 };
@@ -52,6 +40,7 @@ export const JsonViewer: FC<JsonViewerProps> = ({
   viewOnly = true,
   showSearch = true,
   customFilters = [],
+  minHeight = 500,
   maxHeight = 500,
   onCopy,
   className = "",
@@ -59,6 +48,23 @@ export const JsonViewer: FC<JsonViewerProps> = ({
   const [searchText, setSearchText] = useState("");
   const [copied, setCopied] = useState(false);
   const [activeFilter, setActiveFilter] = useState<string | null>(null);
+  const [collapseDepth, setCollapseDepth] = useState<number | boolean>(false);
+  const [resetKey, setResetKey] = useState(0);
+
+  // Built-in filters
+  const builtInFilters: FilterConfig[] = useMemo(
+    () => [
+      {
+        id: "all",
+        label: "All",
+        filterFn: () => true, // Show everything
+      },
+    ],
+    [],
+  );
+
+  // Combine built-in and custom filters
+  const allFilters = useMemo(() => [...builtInFilters, ...customFilters], [builtInFilters, customFilters]);
 
   // Format JSON for copying
   const jsonString = useMemo(() => {
@@ -80,7 +86,7 @@ export const JsonViewer: FC<JsonViewerProps> = ({
       return "all" as const;
     }
 
-    const filterConfig = customFilters.find((f) => f.id === activeFilter);
+    const filterConfig = allFilters.find((f) => f.id === activeFilter);
     if (!filterConfig) {
       return "all" as const;
     }
@@ -96,16 +102,35 @@ export const JsonViewer: FC<JsonViewerProps> = ({
       }
       return true;
     };
-  }, [activeFilter, customFilters]);
+  }, [activeFilter, allFilters]);
 
   const handleFilterClick = useCallback((filterId: string) => {
-    setActiveFilter((prev) => (prev === filterId ? null : filterId));
+    setActiveFilter((prev) => {
+      // Don't toggle off if already selected - just keep it selected
+      if (prev === filterId) {
+        return prev;
+      }
+
+      return filterId;
+    });
+
+    // Always expand all nodes when a filter is applied so filtered results are visible
+    // Use Number.POSITIVE_INFINITY to expand all levels
+    setCollapseDepth(Number.POSITIVE_INFINITY);
+    setResetKey((prev) => prev + 1); // Force remount to reset collapse state
+  }, []);
+
+  const handleResetFilters = useCallback(() => {
+    setActiveFilter(null);
+    setSearchText("");
+    setCollapseDepth(Number.POSITIVE_INFINITY); // Expand all nodes at all levels
+    setResetKey((prev) => prev + 1); // Force remount to reset collapse state
   }, []);
 
   const content = useMemo(
     () => (
-      <div className={styles.jsonViewer}>
-        {(showSearch || customFilters.length > 0) && (
+      <div className={styles.jsonViewer} style={{ minHeight }}>
+        {(showSearch || allFilters.length > 0) && (
           <div className={styles.controls}>
             <div className={styles.leftControls}>
               {showSearch && (
@@ -113,55 +138,77 @@ export const JsonViewer: FC<JsonViewerProps> = ({
                   <IconSearch className={styles.searchIcon} />
                   <input
                     type="text"
-                    placeholder="Search JSON keys and values..."
+                    placeholder="Search keys or value"
                     value={searchText}
                     onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchText(e.target.value)}
                     className={styles.searchInput}
                     aria-label="Search JSON"
                   />
-                </div>
-              )}
-              {customFilters.length > 0 && (
-                <div className={styles.filters}>
-                  {customFilters.map((filter) => (
-                    <Button
-                      key={filter.id}
-                      look="outlined"
-                      variant={activeFilter === filter.id ? "primary" : "neutral"}
-                      size="small"
-                      onClick={() => handleFilterClick(filter.id)}
-                    >
-                      {filter.label}
-                    </Button>
-                  ))}
-                  {activeFilter && (
-                    <Button look="outlined" variant="neutral" size="small" onClick={() => setActiveFilter(null)}>
-                      Clear Filters
-                    </Button>
+                  {searchText && (
+                    <Tooltip title="Clear Search">
+                      <Button
+                        look="outlined"
+                        variant="neutral"
+                        size="small"
+                        onClick={() => setSearchText("")}
+                        className={styles.searchClear}
+                        leading={<IconClose width={20} height={20} />}
+                        aria-label="Clear Search"
+                      />
+                    </Tooltip>
                   )}
                 </div>
               )}
-            </div>
-            <div className={styles.rightControls}>
-              <Tooltip title={copied ? "Copied!" : "Copy JSON"}>
-                <Button
-                  look="outlined"
-                  variant="neutral"
-                  size="small"
-                  onClick={handleCopy}
-                  leading={<IconCopy size={24} />}
-                >
-                  Copy
-                </Button>
-              </Tooltip>
+              {allFilters.length > 0 && (
+                <>
+                  <div className={styles.filterLabel}>
+                    <IconFilter className={styles.filterIcon} width={24} height={24} />
+                    <Typography variant="label" size="small" className={styles.filterLabelText}>
+                      Quick Filters:
+                    </Typography>
+                  </div>
+                  <div className={styles.filters}>
+                    {allFilters.map((filter) => (
+                      <Button
+                        key={filter.id}
+                        look="outlined"
+                        variant={activeFilter === filter.id ? "primary" : "neutral"}
+                        size="small"
+                        onClick={() => handleFilterClick(filter.id)}
+                      >
+                        {filter.label}
+                      </Button>
+                    ))}
+                    {activeFilter && (
+                      <Tooltip title="Reset filters">
+                        <Button
+                          look="outlined"
+                          variant="neutral"
+                          size="small"
+                          onClick={handleResetFilters}
+                          leading={<IconReset width={16} height={16} />}
+                        />
+                      </Tooltip>
+                    )}
+                  </div>
+                </>
+              )}
             </div>
           </div>
         )}
-        <div
-          className={`${styles.jsonEditorContainer} bg-neutral-surface-inset rounded-small overflow-auto`}
-          style={{ maxHeight }}
-        >
+        <div className={styles.jsonEditorContainer} style={{ minHeight, maxHeight }}>
+          <Tooltip title={copied ? "Copied!" : "Copy JSON"}>
+            <Button
+              look="outline"
+              variant="neutral"
+              size="small"
+              className={styles.copyButton}
+              onClick={handleCopy}
+              leading={<IconCopy width={32} height={32} />}
+            />
+          </Tooltip>
           <JsonEditor
+            key={resetKey}
             data={data}
             restrictEdit={viewOnly}
             restrictDelete={viewOnly}
@@ -169,7 +216,7 @@ export const JsonViewer: FC<JsonViewerProps> = ({
             searchText={searchText}
             searchFilter={searchFilter}
             theme={labelStudioTheme}
-            collapse={false}
+            collapse={collapseDepth}
             showCollectionCount={true}
             minWidth="100%"
             maxWidth="100%"
@@ -180,16 +227,23 @@ export const JsonViewer: FC<JsonViewerProps> = ({
     ),
     [
       activeFilter,
+      allFilters,
+      collapseDepth,
       copied,
-      customFilters,
       data,
       handleCopy,
       handleFilterClick,
+      handleResetFilters,
+      minHeight,
       maxHeight,
+      resetKey,
       searchFilter,
       searchText,
       showSearch,
       styles.controls,
+      styles.filterIcon,
+      styles.filterLabel,
+      styles.filterLabelText,
       styles.filters,
       styles.jsonEditorContainer,
       styles.jsonViewer,

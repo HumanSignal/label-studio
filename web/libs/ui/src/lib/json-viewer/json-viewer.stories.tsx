@@ -108,6 +108,7 @@ const meta: Meta<typeof JsonViewer> = {
     data: { control: "object" },
     viewOnly: { control: "boolean" },
     showSearch: { control: "boolean" },
+    minHeight: { control: "number" },
     maxHeight: { control: "number" },
   },
   decorators: [
@@ -127,6 +128,7 @@ export const Default: Story = {
     data: simpleData,
     viewOnly: true,
     showSearch: true,
+    minHeight: 500,
     maxHeight: 500,
   },
 };
@@ -136,6 +138,7 @@ export const TaskSourceData: Story = {
     data: sampleTaskData,
     viewOnly: true,
     showSearch: true,
+    minHeight: 500,
     maxHeight: 500,
   },
 };
@@ -145,8 +148,17 @@ export const WithFilters: Story = {
     data: sampleTaskData,
     viewOnly: true,
     showSearch: true,
+    minHeight: 500,
     maxHeight: 500,
     customFilters: [
+      {
+        id: "data",
+        label: "Data",
+        filterFn: (nodeData) => {
+          const path = nodeData.path;
+          return path && (path.includes("data") || path[0] === "data");
+        },
+      },
       {
         id: "annotations",
         label: "Annotations",
@@ -172,6 +184,7 @@ export const ComplexData: Story = {
     data: complexNestedData,
     viewOnly: true,
     showSearch: true,
+    minHeight: 600,
     maxHeight: 600,
   },
 };
@@ -181,6 +194,7 @@ export const WithoutSearch: Story = {
     data: simpleData,
     viewOnly: true,
     showSearch: false,
+    minHeight: 400,
     maxHeight: 400,
   },
 };
@@ -203,6 +217,7 @@ export const LargeDataset: Story = {
     },
     viewOnly: true,
     showSearch: true,
+    minHeight: 600,
     maxHeight: 600,
   },
 };
@@ -212,6 +227,7 @@ export const CustomHeight: Story = {
     data: complexNestedData,
     viewOnly: true,
     showSearch: true,
+    minHeight: 300,
     maxHeight: 300,
   },
 };
@@ -221,6 +237,7 @@ export const EmptyData: Story = {
     data: {},
     viewOnly: true,
     showSearch: true,
+    minHeight: 400,
     maxHeight: 400,
   },
 };
@@ -230,6 +247,7 @@ export const NullData: Story = {
     data: null,
     viewOnly: true,
     showSearch: true,
+    minHeight: 400,
     maxHeight: 400,
   },
 };
