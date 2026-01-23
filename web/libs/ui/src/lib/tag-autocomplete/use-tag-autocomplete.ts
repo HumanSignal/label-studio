@@ -72,10 +72,19 @@ export function useTagAutocomplete<T = string>(
   }, [options]);
 
   // Get selected options as normalized objects
+  // If a value isn't in options, create a synthetic option for it (for new tags)
   const selectedOptions = useMemo(() => {
-    return selectedValues
-      .map((val) => normalizedOptions.find((opt) => opt.value === val))
-      .filter((opt): opt is NormalizedTagOption<T> => opt !== undefined);
+    return selectedValues.map((val) => {
+      // Try to find in provided options
+      const existingOption = normalizedOptions.find((opt) => opt.value === val);
+      if (existingOption) return existingOption;
+
+      // If not found, create synthetic option (for newly created tags)
+      return {
+        value: val,
+        label: String(val),
+      } as NormalizedTagOption<T>;
+    });
   }, [selectedValues, normalizedOptions]);
 
   // Filter options based on query

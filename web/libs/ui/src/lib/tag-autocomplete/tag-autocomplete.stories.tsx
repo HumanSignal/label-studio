@@ -2,6 +2,7 @@ import { useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import { TagAutocomplete } from "./tag-autocomplete";
 import { Typography } from "../typography/typography";
+import { Button } from "../button/button";
 
 const meta: Meta<typeof TagAutocomplete> = {
   component: TagAutocomplete,
@@ -31,7 +32,7 @@ A tag-like autocomplete component that allows users to select multiple tags from
 - **Keyboard navigation** - Full keyboard support for selecting and removing tags
 - **Multiline tags** - Tags automatically wrap to multiple lines when needed
 - **Highlighted search** - Search text is highlighted in matching options
-- **Tag creation** - Allow users to create new tags on the fly (with onCreate prop)
+- **Tag creation** - Allow users to create new tags on the fly (with allowCreate prop)
 - **Loading state** - Displays a spinner in the dropdown while fetching options
 - **Form integration** - Works with standard HTML forms via name prop
 
@@ -279,27 +280,18 @@ export const AsyncSearch: Story = {
 export const WithTagCreation: Story = {
   render: () => {
     const [value, setValue] = useState<string[]>(["frontend"]);
-    const [options, setOptions] = useState(sampleTags);
-
-    const handleCreate = (newTag: string) => {
-      // Add the new tag to options
-      const newOption = { value: newTag.toLowerCase().replace(/\s+/g, "-"), label: newTag };
-      setOptions([...options, newOption]);
-      // Add to selected values
-      setValue([...value, newOption.value]);
-    };
 
     return (
       <div className="w-96">
         <TagAutocomplete
-          options={options}
+          options={sampleTags}
           value={value}
           onChange={setValue}
-          onCreate={handleCreate}
+          allowCreate={true}
           placeholder="Type to search or create new tags..."
         />
         <Typography variant="body" size="small" className="mt-base text-neutral-content-subtle">
-          Available: {options.map((tag) => tag.label).join(", ")}
+          Selected: {value.join(", ")}
         </Typography>
       </div>
     );
@@ -379,59 +371,66 @@ export const DisabledOptions: Story = {
 /**
  * In a Form Context
  *
- * Example of TagAutocomplete used in a form.
+ * Example of TagAutocomplete with tag creation and submission.
  */
 export const InFormContext: Story = {
   render: () => {
-    const [skills, setSkills] = useState<string[]>(["frontend"]);
-    const [interests, setInterests] = useState<string[]>([]);
+    const [skills, setSkills] = useState<string[]>([]);
+    const [submittedTags, setSubmittedTags] = useState<string[]>([]);
 
-    const handleSubmit = (e: React.FormEvent) => {
-      e.preventDefault();
-      alert(`Skills: ${skills.join(", ")}\nInterests: ${interests.join(", ")}`);
+    const handleSkillsChange = (values: string[]) => {
+      setSkills(values);
+    };
+
+    const handleAdd = () => {
+      if (skills.length === 0) return;
+
+      // Distinguish between existing and new tags
+      const existingSkills = skills.filter((skill) => sampleTags.some((tag) => tag.value === skill));
+      const newSkills = skills.filter((skill) => !sampleTags.some((tag) => tag.value === skill));
+
+      console.log("Existing skills:", existingSkills);
+      console.log("New skills to create:", newSkills);
+      console.log("All skills:", skills);
+
+      setSubmittedTags(skills);
+      setSkills([]);
     };
 
     return (
-      <form onSubmit={handleSubmit} className="w-96 space-y-wide">
+      <div className="w-full max-w-2xl space-y-wide">
         <div>
           <Typography variant="body" size="small" className="font-medium mb-tight">
             Skills
           </Typography>
-          <TagAutocomplete
-            name="skills"
-            options={sampleTags}
-            value={skills}
-            onChange={setSkills}
-            placeholder="Add skills..."
-          />
+          <div className="flex gap-tight items-start">
+            <div className="flex-1">
+              <TagAutocomplete
+                name="skills"
+                options={sampleTags}
+                value={skills}
+                onChange={handleSkillsChange}
+                allowCreate={true}
+                placeholder="Type to add skills..."
+              />
+            </div>
+            <Button variant="primary" onClick={handleAdd} disabled={skills.length === 0}>
+              Add
+            </Button>
+          </div>
         </div>
 
-        <div>
-          <Typography variant="body" size="small" className="font-medium mb-tight">
-            Interests
-          </Typography>
-          <TagAutocomplete
-            name="interests"
-            options={[
-              { value: "ai", label: "Artificial Intelligence" },
-              { value: "web3", label: "Web3 / Blockchain" },
-              { value: "iot", label: "Internet of Things" },
-              { value: "ar-vr", label: "AR / VR" },
-              { value: "robotics", label: "Robotics" },
-            ]}
-            value={interests}
-            onChange={setInterests}
-            placeholder="Add interests..."
-          />
-        </div>
-
-        <button
-          type="submit"
-          className="px-base py-tight bg-primary-emphasis text-white rounded hover:bg-primary-emphasis-bold"
-        >
-          Submit
-        </button>
-      </form>
+        {submittedTags.length > 0 && (
+          <div className="p-base bg-neutral-surface rounded">
+            <Typography variant="body" size="small" className="font-medium mb-tight">
+              Submitted Tags:
+            </Typography>
+            <Typography variant="body" size="small" className="text-neutral-content-subtle">
+              {submittedTags.join(", ")}
+            </Typography>
+          </div>
+        )}
+      </div>
     );
   },
 };

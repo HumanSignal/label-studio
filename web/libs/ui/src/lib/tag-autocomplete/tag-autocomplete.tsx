@@ -31,7 +31,6 @@ export const TagAutocomplete = forwardRef(
       renderOption,
       dataTestid,
       minSearchLength = 2,
-      onCreate,
     } = props;
 
     // First, set up a ref to track the create tag callback
@@ -65,14 +64,16 @@ export const TagAutocomplete = forwardRef(
       // Default to first option if available, otherwise "create" option if shown
       if (filteredOptions.length > 0) return String(filteredOptions[0].value);
       // create option is appended after options, but can be default when no options exist
-      // (or change this if you want create to be preferred even when options exist)
       const trimmed = query.trim();
-      if (onCreate && trimmed) {
+      // Check if create option should be shown (inline logic)
+      if (props.allowCreate && trimmed) {
         const exactMatch = filteredOptions.some((opt) => opt.label.toLowerCase() === trimmed.toLowerCase());
-        if (!exactMatch) return "create-tag-option";
+        if (!exactMatch) {
+          return "create-tag-option";
+        }
       }
       return "";
-    }, [filteredOptions, onCreate, query]);
+    }, [filteredOptions, props.allowCreate, query]);
 
     useEffect(() => {
       if (!isOpen) return;
@@ -123,20 +124,24 @@ export const TagAutocomplete = forwardRef(
     }, []);
 
     const canCreateTag = useCallback(() => {
-      if (!onCreate || !query.trim()) return false;
+      // Only show create option if allowCreate is true and there's a query
+      if (!props.allowCreate || !query.trim()) return false;
       // Check if query exactly matches an existing option
       const exactMatch = filteredOptions.some((option) => option.label.toLowerCase() === query.toLowerCase().trim());
       return !exactMatch;
-    }, [onCreate, query, filteredOptions]);
+    }, [props.allowCreate, query, filteredOptions]);
 
     const showCreateOption = canCreateTag();
 
     const handleCreateTag = useCallback(() => {
-      if (!onCreate || !query.trim()) return;
-      onCreate(query.trim());
+      if (!query.trim()) return;
+
+      const newValue = query.trim() as T;
+      selectOption({ value: newValue, label: query.trim() });
+
       setQuery("");
       setIsOpen(false);
-    }, [onCreate, query, setQuery, setIsOpen]);
+    }, [query, setQuery, setIsOpen, selectOption]);
 
     // Update the ref so the hook can access it
     createTagCallbackRef.current = showCreateOption ? handleCreateTag : undefined;
@@ -338,7 +343,7 @@ export const TagAutocomplete = forwardRef(
                       }}
                       data-testid="tag-autocomplete-create-option"
                     >
-                      <div className="flex gap-2 w-full px-4 py-1 hover:bg-primary-emphasis-subtle hover:cursor-pointer group-focus-within:bg-primary-emphasis-subtle group-aria-selected:bg-primary-emphasis-subtle rounded-4 duration-150 ease-out">
+                      <div className="flex items-center gap-2 w-full px-4 py-1 hover:bg-primary-emphasis-subtle hover:cursor-pointer group-focus-within:bg-primary-emphasis-subtle group-aria-selected:bg-primary-emphasis-subtle rounded-4 duration-150 ease-out">
                         <IconPlus className={styles.createIcon} />
                         <span>
                           Add "<strong>{query.trim()}</strong>" tag

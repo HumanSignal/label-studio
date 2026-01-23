@@ -48,11 +48,12 @@ export interface TagAutocompleteProps<T = string> {
   /** Custom renderer for options in the dropdown */
   renderOption?: (option: TagOption<T>, isSelected: boolean) => ReactNode;
 
-  /** Allow creating new tags (free text) - defaults to false */
+  /**
+   * Allow creating new tags (free text) - defaults to false
+   * When true, users can create new tags by typing and pressing Enter
+   * New tags are automatically added to the value array
+   */
   allowCreate?: boolean;
-
-  /** Callback when new tag is created (only if allowCreate=true) */
-  onCreate?: (value: string) => void;
 
   /** Enable virtual list for large option sets */
   isVirtualList?: boolean;
