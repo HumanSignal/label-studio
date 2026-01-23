@@ -103,6 +103,9 @@ export const VectorTransformer: React.FC<VectorTransformerProps> = ({
   // Track if last transformation was blocked due to boundary
   const transformationBlockedRef = React.useRef<boolean>(false);
 
+  // Track if shapes are currently locked at boundaries
+  const shapesLockedAtBoundaryRef = React.useRef<boolean>(false);
+
   // Helper function to calculate constraint based on point bounding box with direction detection
   const calculatePointBasedConstraints = React.useCallback(
     (
@@ -432,6 +435,18 @@ export const VectorTransformer: React.FC<VectorTransformerProps> = ({
           imageBox.x + imageBox.width > bounds.x + bounds.width ||
           imageBox.y + imageBox.height > bounds.y + bounds.height;
 
+        // Check if shapes are currently at boundaries (locked)
+        const isAtLeftBoundary = imageBox.x <= bounds.x + LOCKING_THRESHOLD;
+        const isAtRightBoundary =
+          imageBox.x + imageBox.width >= bounds.x + bounds.width - LOCKING_THRESHOLD;
+        const isAtTopBoundary = imageBox.y <= bounds.y + LOCKING_THRESHOLD;
+        const isAtBottomBoundary =
+          imageBox.y + imageBox.height >= bounds.y + bounds.height - LOCKING_THRESHOLD;
+        const isLockedAtBoundary = isAtLeftBoundary || isAtRightBoundary || isAtTopBoundary || isAtBottomBoundary;
+
+        // Update the locked flag
+        shapesLockedAtBoundaryRef.current = isLockedAtBoundary;
+
         // If we would constrain, don't apply any transformation - mark as blocked and return early
         if (wouldConstrain) {
           transformationBlockedRef.current = true;
@@ -652,10 +667,101 @@ export const VectorTransformer: React.FC<VectorTransformerProps> = ({
         "middle-top",
         "middle-bottom",
       ]}
-      // Remove dragBoundFunc - we'll handle constraints in onDragMove instead
+      dragBoundFunc={(pos: { x: number; y: number }) => {
+        // Check if shapes are currently locked at boundary
+        const transformer = transformerRef.current;
+        if (!transformer || !bounds) return pos;
+
+        try {
+          const shapes = transformer.nodes();
+          if (shapes.length === 0) return pos;
+
+          const boxes = shapes.map((shape: Konva.Node) => shape.getClientRect());
+          const shapeBox = {
+            x: Math.min(...boxes.map((b: { x: number; y: number }) => b.x)),
+            y: Math.min(...boxes.map((b: { x: number; y: number }) => b.y)),
+          };
+
+          const imageBox = {
+            x: (shapeBox.x - transform.offsetX) / (transform.zoom * fitScale),
+            y: (shapeBox.y - transform.offsetY) / (transform.zoom * fitScale),
+          };
+
+          const isAtLeftBoundary = imageBox.x <= bounds.x + LOCKING_THRESHOLD;
+          const isAtRightBoundary = imageBox.x >= bounds.x + bounds.width - LOCKING_THRESHOLD;
+          const isAtTopBoundary = imageBox.y <= bounds.y + LOCKING_THRESHOLD;
+          const isAtBottomBoundary = imageBox.y >= bounds.y + bounds.height - LOCKING_THRESHOLD;
+
+          if (isAtLeftBoundary || isAtRightBoundary || isAtTopBoundary || isAtBottomBoundary) {
+            // Shapes are locked at boundary - prevent dragging
+            const transformerBox = transformer.getClientRect();
+            return { x: transformerBox.x, y: transformerBox.y };
+          }
+        } catch (error) {
+          // Fall through to default behavior
+        }
+
+        return pos;
+      }}
       onTransform={handleTransform}
       resizeBoundFunc={(oldBox: any, newBox: any) => {
-        // Don't block here - let applyTransformationAndUpdatePoints handle it
+        // Check if shapes are currently locked at boundary
+        const transformer = transformerRef.current;
+        if (transformer && bounds) {
+          try {
+            const shapes = transformer.nodes();
+            if (shapes.length > 0) {
+              const boxes = shapes.map((shape: Konva.Node) => shape.getClientRect());
+              const shapeBox = {
+                x: Math.min(...boxes.map((b: { x: number; y: number }) => b.x)),
+                y: Math.min(...boxes.map((b: { x: number; y: number }) => b.y)),
+                width:
+                  Math.max(...boxes.map((b: { x: number; y: number; width: number }) => b.x + b.width)) -
+                  Math.min(...boxes.map((b: { x: number; y: number }) => b.x)),
+                height:
+                  Math.max(...boxes.map((b: { x: number; y: number; height: number }) => b.y + b.height)) -
+                  Math.min(...boxes.map((b: { x: number; y: number }) => b.y)),
+              };
+
+              const imageBox = {
+                x: (shapeBox.x - transform.offsetX) / (transform.zoom * fitScale),
+                y: (shapeBox.y - transform.offsetY) / (transform.zoom * fitScale),
+                width: shapeBox.width / (transform.zoom * fitScale),
+                height: shapeBox.height / (transform.zoom * fitScale),
+              };
+
+              const isAtLeftBoundary = imageBox.x <= bounds.x + LOCKING_THRESHOLD;
+              const isAtRightBoundary =
+                imageBox.x + imageBox.width >= bounds.x + bounds.width - LOCKING_THRESHOLD;
+              const isAtTopBoundary = imageBox.y <= bounds.y + LOCKING_THRESHOLD;
+              const isAtBottomBoundary =
+                imageBox.y + imageBox.height >= bounds.y + bounds.height - LOCKING_THRESHOLD;
+
+              if (isAtLeftBoundary || isAtRightBoundary || isAtTopBoundary || isAtBottomBoundary) {
+                // Shapes are locked at boundary - check if resize would reduce violations
+                const oldSize = oldBox.width * oldBox.height;
+                const newSize = newBox.width * newBox.height;
+                const isMakingSmaller = newSize < oldSize;
+
+                // Allow resize if making shape smaller (reducing violations)
+                if (isMakingSmaller) {
+                  const constrainedBox = { ...newBox };
+                  if (constrainedBox.width < BBOX_MIN_WIDTH) constrainedBox.width = BBOX_MIN_WIDTH;
+                  if (constrainedBox.height < BBOX_MIN_WIDTH) constrainedBox.height = BBOX_MIN_WIDTH;
+                  return constrainedBox;
+                }
+
+                // Block resize if making shape bigger (would increase violations)
+                const constrainedBox = { ...oldBox };
+                if (constrainedBox.width < BBOX_MIN_WIDTH) constrainedBox.width = BBOX_MIN_WIDTH;
+                if (constrainedBox.height < BBOX_MIN_WIDTH) constrainedBox.height = BBOX_MIN_WIDTH;
+                return constrainedBox;
+              }
+            }
+          } catch (error) {
+            // Fall through to default behavior
+          }
+        }
         // Just ensure minimum size
         const constrainedBox = { ...newBox };
         if (constrainedBox.width < BBOX_MIN_WIDTH) constrainedBox.width = BBOX_MIN_WIDTH;
@@ -665,6 +771,9 @@ export const VectorTransformer: React.FC<VectorTransformerProps> = ({
       onTransformStart={(_e: any) => {
         // Notify that transformation has started
         onTransformationStart?.();
+
+        // Reset locked flag at start of transformation
+        shapesLockedAtBoundaryRef.current = false;
 
         // Store original positions of selected points
         originalPositionsRef.current = {};
@@ -698,6 +807,9 @@ export const VectorTransformer: React.FC<VectorTransformerProps> = ({
         // Notify that transformation has started (for history freezing)
         onTransformationStart?.();
 
+        // Reset locked flag at start of drag
+        shapesLockedAtBoundaryRef.current = false;
+
         // Store original positions when dragging starts (for pure drag operations)
         originalPositionsRef.current = {};
         Array.from(selectedPoints).forEach((index) => {
@@ -725,8 +837,120 @@ export const VectorTransformer: React.FC<VectorTransformerProps> = ({
         previousBoxRef.current = null;
         previousRotationRef.current = null;
       }}
-      boundBoxFunc={(_oldBox: any, newBox: any) => {
-        // Don't block here - let applyTransformationAndUpdatePoints handle it
+      boundBoxFunc={(oldBox: any, newBox: any) => {
+        // Check if shapes are currently locked at boundary
+        const transformer = transformerRef.current;
+        if (transformer && bounds) {
+          try {
+            const shapes = transformer.nodes();
+            if (shapes.length > 0) {
+              const boxes = shapes.map((shape: Konva.Node) => shape.getClientRect());
+              const shapeBox = {
+                x: Math.min(...boxes.map((b: { x: number; y: number }) => b.x)),
+                y: Math.min(...boxes.map((b: { x: number; y: number }) => b.y)),
+                width:
+                  Math.max(...boxes.map((b: { x: number; y: number; width: number }) => b.x + b.width)) -
+                  Math.min(...boxes.map((b: { x: number; y: number }) => b.x)),
+                height:
+                  Math.max(...boxes.map((b: { x: number; y: number; height: number }) => b.y + b.height)) -
+                  Math.min(...boxes.map((b: { x: number; y: number }) => b.y)),
+              };
+
+              const imageBox = {
+                x: (shapeBox.x - transform.offsetX) / (transform.zoom * fitScale),
+                y: (shapeBox.y - transform.offsetY) / (transform.zoom * fitScale),
+                width: shapeBox.width / (transform.zoom * fitScale),
+                height: shapeBox.height / (transform.zoom * fitScale),
+              };
+
+              const isAtLeftBoundary = imageBox.x <= bounds.x + LOCKING_THRESHOLD;
+              const isAtRightBoundary =
+                imageBox.x + imageBox.width >= bounds.x + bounds.width - LOCKING_THRESHOLD;
+              const isAtTopBoundary = imageBox.y <= bounds.y + LOCKING_THRESHOLD;
+              const isAtBottomBoundary =
+                imageBox.y + imageBox.height >= bounds.y + bounds.height - LOCKING_THRESHOLD;
+
+              if (isAtLeftBoundary || isAtRightBoundary || isAtTopBoundary || isAtBottomBoundary) {
+                // Shapes are locked at boundary - check transformation type
+                const oldRotation = oldBox.rotation || 0;
+                const newRotation = newBox.rotation || 0;
+                const rotationDelta = Math.abs(newRotation - oldRotation);
+                const isRotating = rotationDelta > 0.1;
+
+                const scaleXDelta = oldBox.width !== 0 ? newBox.width / oldBox.width : 1;
+                const scaleYDelta = oldBox.height !== 0 ? newBox.height / oldBox.height : 1;
+                const isScaling = Math.abs(scaleXDelta - 1) > 0.01 || Math.abs(scaleYDelta - 1) > 0.01;
+
+                const positionDeltaX = newBox.x - oldBox.x;
+                const positionDeltaY = newBox.y - oldBox.y;
+                const isDragging = Math.abs(positionDeltaX) > 0.01 || Math.abs(positionDeltaY) > 0.01;
+
+                // ROTATION: Always allow rotation when locked (rotation can help unlock)
+                if (isRotating) {
+                  // Update rotation direction tracking
+                  const currentRotationDirection = newRotation > oldRotation ? 1 : newRotation < oldRotation ? -1 : 0;
+                  if (currentRotationDirection !== 0) {
+                    lastRotationDirectionRef.current = currentRotationDirection;
+                  }
+                  // Allow rotation - let point constraint logic handle whether it reduces violations
+                  const constrainedBox = { ...newBox };
+                  if (constrainedBox.width < BBOX_MIN_WIDTH) constrainedBox.width = BBOX_MIN_WIDTH;
+                  if (constrainedBox.height < BBOX_MIN_WIDTH) constrainedBox.height = BBOX_MIN_WIDTH;
+                  return constrainedBox;
+                }
+
+                // SCALING: Allow if making smaller (reducing violations)
+                if (isScaling) {
+                  const oldSize = oldBox.width * oldBox.height;
+                  const newSize = newBox.width * newBox.height;
+                  const isMakingSmaller = newSize < oldSize;
+
+                  if (isMakingSmaller) {
+                    // Allow resize if making shape smaller
+                    const constrainedBox = { ...newBox };
+                    if (constrainedBox.width < BBOX_MIN_WIDTH) constrainedBox.width = BBOX_MIN_WIDTH;
+                    if (constrainedBox.height < BBOX_MIN_WIDTH) constrainedBox.height = BBOX_MIN_WIDTH;
+                    return constrainedBox;
+                  }
+
+                  // Block resize if making shape bigger
+                  const constrainedBox = { ...oldBox };
+                  if (constrainedBox.width < BBOX_MIN_WIDTH) constrainedBox.width = BBOX_MIN_WIDTH;
+                  if (constrainedBox.height < BBOX_MIN_WIDTH) constrainedBox.height = BBOX_MIN_WIDTH;
+                  return constrainedBox;
+                }
+
+                // DRAGGING: Block dragging when locked (would increase violations)
+                if (isDragging) {
+                  const constrainedBox = { ...oldBox };
+                  if (constrainedBox.width < BBOX_MIN_WIDTH) constrainedBox.width = BBOX_MIN_WIDTH;
+                  if (constrainedBox.height < BBOX_MIN_WIDTH) constrainedBox.height = BBOX_MIN_WIDTH;
+                  return constrainedBox;
+                }
+
+                // Unknown transformation - block it
+                const constrainedBox = { ...oldBox };
+                if (constrainedBox.width < BBOX_MIN_WIDTH) constrainedBox.width = BBOX_MIN_WIDTH;
+                if (constrainedBox.height < BBOX_MIN_WIDTH) constrainedBox.height = BBOX_MIN_WIDTH;
+                return constrainedBox;
+              }
+            }
+          } catch (error) {
+            // Fall through to default behavior
+          }
+        }
+
+        // Update rotation direction tracking when not locked (for future unlock detection)
+        const oldRotation = oldBox.rotation || 0;
+        const newRotation = newBox.rotation || 0;
+        const rotationDelta = Math.abs(newRotation - oldRotation);
+        if (rotationDelta > 0.1) {
+          const currentRotationDirection = newRotation > oldRotation ? 1 : newRotation < oldRotation ? -1 : 0;
+          if (currentRotationDirection !== 0) {
+            lastRotationDirectionRef.current = currentRotationDirection;
+          }
+        }
+
         // Just ensure minimum size
         const constrainedBox = { ...newBox };
         if (constrainedBox.width < BBOX_MIN_WIDTH) constrainedBox.width = BBOX_MIN_WIDTH;
