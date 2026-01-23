@@ -30,7 +30,6 @@ export const TagAutocomplete = forwardRef(
       renderTag,
       renderOption,
       dataTestid,
-      minSearchLength = 2,
     } = props;
 
     // First, set up a ref to track the create tag callback
@@ -313,6 +312,7 @@ export const TagAutocomplete = forwardRef(
           >
             <CommandList
               id="tag-autocomplete-listbox"
+              // biome-ignore lint/a11y/useSemanticElements: This is a combobox pattern, not a traditional select
               role="listbox"
               aria-label="Available options"
               className="bg-neutral-background rounded-md"

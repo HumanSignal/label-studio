@@ -42,7 +42,6 @@ export function useTagAutocomplete<T = string>(
     onChange,
     onSearch,
     searchFilter,
-    maxTags,
     disabled,
     onOpen,
     onClose,
@@ -157,11 +156,6 @@ export function useTagAutocomplete<T = string>(
         return;
       }
 
-      // Check maxTags
-      if (maxTags && selectedValues.length >= maxTags) {
-        return;
-      }
-
       const newValues = [...selectedValues, value];
 
       if (controlledValue === undefined) {
@@ -174,7 +168,7 @@ export function useTagAutocomplete<T = string>(
       setQueryState("");
       onClose?.();
     },
-    [selectedValues, maxTags, controlledValue, onChange, onClose],
+    [selectedValues, controlledValue, onChange, onClose],
   );
 
   // Remove a tag by index

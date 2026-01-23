@@ -39,9 +39,6 @@ export interface TagAutocompleteProps<T = string> {
   /** Loading state (shows spinner, disables interaction) */
   isLoading?: boolean;
 
-  /** Maximum number of tags that can be selected */
-  maxTags?: number;
-
   /** Custom renderer for tags in the trigger */
   renderTag?: (option: TagOption<T>, onRemove: () => void) => ReactNode;
 
