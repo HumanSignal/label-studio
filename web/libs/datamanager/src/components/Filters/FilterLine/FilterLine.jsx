@@ -1,6 +1,6 @@
 import { observer } from "mobx-react";
 import { cn } from "../../../utils/bem";
-import { Button } from "@humansignal/ui";
+import { Button, EnterpriseBadge } from "@humansignal/ui";
 import { IconClose } from "@humansignal/icons";
 import { Tag } from "../../Common/Tag/Tag";
 import { FilterDropdown } from "../FilterDropdown";
@@ -52,16 +52,23 @@ export const FilterLine = observer(({ filter, availableFilters, index, view, sid
               return `${title} ${parentTitle}`.toLowerCase().includes(query.toLowerCase());
             }}
             onChange={(value) => filter.setFilterDelayed(value)}
-            optionRender={({ item: { original: filter } }) => (
-              <div className={cn("filterLine").elem("selector")}>
-                {filter.field.title}
-                {filter.field.parent && (
-                  <Tag size="small" className="filters-data-tag" color="#1d91e4" style={{ marginLeft: 7 }}>
-                    {filter.field.parent.title}
-                  </Tag>
-                )}
-              </div>
-            )}
+            optionRender={({ item: { original: filter } }) => {
+              const showEnterpriseBadge = filter.field.enterprise_badge;
+              return (
+                <div
+                  className={cn("filterLine").elem("selector")}
+                  style={{ display: "flex", alignItems: "center", gap: "8px" }}
+                >
+                  <span>{filter.field.title}</span>
+                  {showEnterpriseBadge && <EnterpriseBadge ghost />}
+                  {filter.field.parent && (
+                    <Tag size="small" className="filters-data-tag" color="#1d91e4" style={{ marginLeft: 7 }}>
+                      {filter.field.parent.title}
+                    </Tag>
+                  )}
+                </div>
+              );
+            }}
             disabled={filter.field.disabled}
           />
         </div>
@@ -156,7 +163,7 @@ export const FilterLine = observer(({ filter, availableFilters, index, view, sid
           defaultValue={filter.filter.id}
           items={availableFilters}
           width={80}
-          dropdownWidth={120}
+          dropdownWidth={170}
           dropdownClassName={dropdownClassName}
           searchFilter={(option, query) => {
             const original = option?.original ?? option;
@@ -165,16 +172,23 @@ export const FilterLine = observer(({ filter, availableFilters, index, view, sid
             return `${title} ${parentTitle}`.toLowerCase().includes(query.toLowerCase());
           }}
           onChange={(value) => filter.setFilterDelayed(value)}
-          optionRender={({ item: { original: filter } }) => (
-            <div className={cn("filterLine").elem("selector")}>
-              {filter.field.title}
-              {filter.field.parent && (
-                <Tag size="small" className="filters-data-tag" color="#1d91e4" style={{ marginLeft: 7 }}>
-                  {filter.field.parent.title}
-                </Tag>
-              )}
-            </div>
-          )}
+          optionRender={({ item: { original: filter } }) => {
+            const showEnterpriseBadge = filter.field.enterprise_badge;
+            return (
+              <div
+                className={cn("filterLine").elem("selector")}
+                style={{ display: "flex", alignItems: "center", gap: "8px" }}
+              >
+                <span>{filter.field.title}</span>
+                {showEnterpriseBadge && <EnterpriseBadge ghost />}
+                {filter.field.parent && (
+                  <Tag size="small" className="filters-data-tag" color="#1d91e4" style={{ marginLeft: 7 }}>
+                    {filter.field.parent.title}
+                  </Tag>
+                )}
+              </div>
+            );
+          }}
           disabled={filter.field.disabled}
         />
       </div>

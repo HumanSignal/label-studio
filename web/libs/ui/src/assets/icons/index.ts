@@ -179,6 +179,7 @@ export { ReactComponent as IconMinus } from "./minus.svg";
 export { ReactComponent as IconModel } from "./model.svg";
 export { ReactComponent as IconModels } from "./models.svg";
 export { ReactComponent as IconModelVersion } from "./model-version.svg";
+export { ReactComponent as IconMonitors } from "./monitors.svg";
 export { ReactComponent as IconMoveLeft } from "./move-left.svg";
 export { ReactComponent as IconMoveRight } from "./move-right.svg";
 export { ReactComponent as IconMoveUp } from "./move-up.svg";
