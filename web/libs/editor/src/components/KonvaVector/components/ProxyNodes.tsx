@@ -1,11 +1,11 @@
-import { Rect } from "react-konva";
+import { Circle } from "react-konva";
 import type Konva from "konva";
 import type { BezierPoint } from "../types";
 
 interface ProxyNodesProps {
   selectedPoints: Set<number>;
   initialPoints: BezierPoint[];
-  proxyRefs: React.MutableRefObject<{ [key: number]: Konva.Rect | null }>;
+  proxyRefs: React.MutableRefObject<{ [key: number]: Konva.Circle | null }>;
 }
 
 export const ProxyNodes: React.FC<ProxyNodesProps> = ({ selectedPoints, initialPoints, proxyRefs }) => {
@@ -18,18 +18,17 @@ export const ProxyNodes: React.FC<ProxyNodesProps> = ({ selectedPoints, initialP
         if (!point) return null;
 
         return (
-          <Rect
+          <Circle
             key={`proxy-${pointIndex}`}
             ref={(node) => {
               proxyRefs.current[pointIndex] = node;
             }}
             x={point.x}
             y={point.y}
-            width={0.001}
-            height={0.001}
+            radius={10}
             fill="transparent"
             stroke="transparent"
-            strokeWidth={0}
+            strokeWidth={1}
             listening={true}
             name={`proxy-${pointIndex}`}
           />

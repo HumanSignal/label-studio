@@ -157,7 +157,7 @@ export function updateOriginalPositions(
 export function applyTransformationToPoints(
   transformer: Konva.Transformer,
   initialPoints: BezierPoint[],
-  proxyRefs?: React.MutableRefObject<{ [key: number]: Konva.Rect | null }>,
+  proxyRefs?: React.MutableRefObject<{ [key: number]: Konva.Circle | null }>,
   updateControlPoints = true,
   originalPositions?: {
     [key: number]: {
