@@ -663,6 +663,11 @@ $scroll-width: 5px;
   svg {
     flex-shrink: 0;
   }
+
+  button {
+    margin-left: auto;
+    flex-shrink: 0;
+  }
 }
 
 div[class^="App_menu"]>div {
