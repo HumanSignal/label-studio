@@ -116,7 +116,6 @@ export const DataTable = <T extends DataShape>(props: DataTableProps<T>) => {
   } = props;
   const [internalRowSelection, setInternalRowSelection] = useState<Record<string, boolean>>({});
   const [internalSorting, setInternalSorting] = useState<SortingState>([]);
-  const [internalActiveRowId, setInternalActiveRowId] = useState<string | undefined>(undefined);
 
   // Restore column sizes from localStorage if storageKey is provided
   const restoredColumnSizing = useMemo(() => {
@@ -145,11 +144,11 @@ export const DataTable = <T extends DataShape>(props: DataTableProps<T>) => {
 
   const [internalColumnSizing, setInternalColumnSizing] = useState<Record<string, number>>(restoredColumnSizing);
 
-  // Use controlled activeRowId if onRowClick is provided (parent controls state via clicks)
-  // OR if activeRowId is explicitly provided (not undefined)
+  // Use controlled activeRowId ONLY if onRowClick is provided (parent controls state via clicks)
+  // Active state should only be enabled when rows are clickable
   // When onRowClick is provided, activeRowId is read-only for display purposes
-  const isActiveRowControlled = props.onRowClick !== undefined || controlledActiveRowId !== undefined;
-  const activeRowId = isActiveRowControlled ? (controlledActiveRowId ?? undefined) : internalActiveRowId;
+  const isActiveRowControlled = props.onRowClick !== undefined;
+  const activeRowId = isActiveRowControlled ? (controlledActiveRowId ?? undefined) : undefined;
 
   // Use controlled selection if provided, otherwise use internal state
   const rowSelection = controlledRowSelection ?? internalRowSelection;
@@ -178,8 +177,13 @@ export const DataTable = <T extends DataShape>(props: DataTableProps<T>) => {
       // Determine if sorting is enabled for this column
       const columnSortingEnabled = enableSorting && col.enableSorting === true;
 
-      // Preserve original header - extract string if it's a string
-      const originalHeader = typeof col.header === "string" ? col.header : undefined;
+      // Preserve original header - extract string or call function to get React node
+      const originalHeader =
+        typeof col.header === "string"
+          ? col.header
+          : typeof col.header === "function"
+            ? col.header({} as any) // Call the function to get the React node
+            : undefined;
 
       // Wrap all headers with unified Header component
       return {
@@ -374,14 +378,11 @@ export const DataTable = <T extends DataShape>(props: DataTableProps<T>) => {
       // Call parent's onRowClick handler if provided
       if (props.onRowClick) {
         props.onRowClick(row);
-      } else if (!isActiveRowControlled && row) {
-        // Only manage internal state if uncontrolled AND no onRowClick provided
-        // When controlled, parent handles all state via onRowClick
-        const newActiveRowId = activeRowId === row.id ? undefined : row.id;
-        setInternalActiveRowId(newActiveRowId);
       }
+      // Active state is only enabled when onRowClick is provided
+      // No internal state management for active rows
     },
-    [props.onRowClick, activeRowId, isActiveRowControlled],
+    [props.onRowClick],
   );
 
   // Check if we should show empty state
@@ -415,7 +416,7 @@ export const DataTable = <T extends DataShape>(props: DataTableProps<T>) => {
         <MemoizedDataTableBody
           rows={rows}
           rowClassName={props.rowClassName}
-          onRowClick={handleRowClick}
+          onRowClick={props.onRowClick ? handleRowClick : undefined}
           columnVisibility={props.columnVisibility}
           columnSizing={columnSizing}
           rowSelection={rowSelection}
@@ -531,7 +532,7 @@ const DataTableRow = <T,>({ row, className, onRowClick, isSelected, isActive }: 
         isActive && styles.bodyRowActive,
         className,
       )}
-      onClick={handleRowClick}
+      onClick={onRowClick ? handleRowClick : undefined}
       data-testid={`data-table-row-${row.id}`}
     >
       {row.getVisibleCells().map((cell) => {
@@ -729,12 +730,19 @@ export const Header = <T,>({
     return null;
   }
 
+  // Check if headerLabel is a string to wrap with Typography, or a React node to render directly
+  const isStringHeader = typeof headerLabel === "string";
+
   const headerContent = (
     <div className={cn(styles.headerContent, help && "gap-tighter")}>
       <div className="flex items-center gap-2">
-        <Typography variant="label" size="small" className={cn(isSorted && styles.headerTextSorted)}>
-          {headerLabel}
-        </Typography>
+        {isStringHeader ? (
+          <Typography variant="label" size="small" className={cn(isSorted && styles.headerTextSorted)}>
+            {headerLabel}
+          </Typography>
+        ) : (
+          headerLabel
+        )}
         {help && (
           <Tooltip title={help} alignment="top-center">
             <IconInfoOutline width={18} height={18} className="text-neutral-content-subtler cursor-help shrink-0" />

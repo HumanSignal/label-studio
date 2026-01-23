@@ -1,0 +1,25 @@
+.handle {
+  --handle-size: 2px;
+  --handle-size-hover: 3px;
+
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: var(--handle-size);
+  cursor: col-resize;
+  z-index: 100;
+  background: var(--color-neutral-border);
+  transform: translateX(-50%);
+  transition: width 0.15s ease, background-color 0.15s ease;
+
+  &:hover {
+    width: var(--handle-size-hover);
+    background-color: var(--color-primary-border-subtle);
+  }
+
+  &.handleResizing {
+    width: var(--handle-size-hover);
+    background-color: var(--color-primary-border-subtle);
+  }
+}

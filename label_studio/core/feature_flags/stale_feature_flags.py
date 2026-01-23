@@ -63,4 +63,36 @@ STALE_FEATURE_FLAGS = {
     # Jan 6
     'fflag_root_223_optimize_delete_predictions': True,
     'fflag_root_212_reduce_importstoragelink_counts': True,
+    # Jan 8
+    'fflag_feat_all_dia_2067_tasks_table_component': True,  # Removed from code
+    'fflag_feat_front_dia_1747_projects_list_banner': True,  # Removed from code
+    'fflag_feat_front_leap_1424_grid_preview_short': True,  # Removed from code
+    'ff_front_dev_1536_taxonomy_user_labels_150222_long': True,  # Removed from code
+    'fflag_feat_front_leap_2036_annotations_summary': True,  # Removed from code
+    'fflag_feat_front_leap_1973_adjustable_spans_090425_short': True,  # Removed from code
+    'fflag_feat_front_lsdv_5451_async_taxonomy_110823_short': True,  # Removed from code
+    'fflag_feat_all_lsdv_e_294_llm_annotations_180723_long': True,  # Removed from code
+    'fflag_fix_front_dev_3793_relative_coords_short': True,  # Removed from code
+    'fflag_feat_front_lsdv_4583_6_images_preloading_short': True,  # Removed from code
+    'fflag_feat_all_leap_1821_annotation_limit_short': True,
+    'fflag_all_feat_dia_1777_ls_homepage_short': True,
+    'fflag_feat_all_leap_1181_bulk_annotation_short': True,
+    'fflag_feat_front_lsdv_4583_multi_image_segmentation_short': True,
+    'fflag_fix_back_plt_914_projects_list_cache_sdk_09102025_short': True,
+    'fflag_fix_back_plt_913_cache_annotator_queue_total_07102025_short': True,
+    'fflag_fix_back_plt_913_cache_finished_task_number_06102025_short': True,
+    'fflag_fix_back_plt_893_project_list_oom_fix_02102025_short': True,
+    'fflag_fix_back_plt_902_async_import_background_oom_fix_22092025_short': True,
+    'fflag_fix_back_plt_870_import_from_storage_batch_28082025_short': True,
+    'fflag_fix_back_plt_863_remove_iterator_27082025_short': True,
+    'fflag_fix_back_plt_843_webhook_memory_improvement_12082025_short': True,
+    'fflag_fix_back_plt_838_reimport_memory_improvement_05082025_short': True,
+    'fflag_fix_back_plt_840_redis_last_activity_29072025_short': True,
+    'fflag_fix_back_plt_816_recalculate_stats_batch_15072025_short': True,
+    'fflag_fix_back_plt_825_rate_limiter_debug_14072025_short': False,
+    'fflag_fix_back_plt_804_check_file_extension_11072025_short': True,
+    'fflag_fix_back_plt_819_per_org_rate_limiter_09072025_short': True,
+    'fflag_fix_back_plt_811_finished_task_number_01072025_short': True,
+    'fflag_fix_back_plt_807_batch_size_26062025_short': True,
+    'fflag_fix_back_plt_802_update_is_labeled_20062025_short': True,
 }

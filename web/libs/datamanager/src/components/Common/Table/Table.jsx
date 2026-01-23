@@ -138,14 +138,15 @@ export const Table = observer(
     columns.push({
       id: "show-source",
       cellClassName: "show-source",
+      headerClassName: "show-source",
       style: {
-        width: 40,
-        maxWidth: 40,
+        width: 44,
+        maxWidth: 44,
         justifyContent: "center",
       },
       onClick: (e) => e.stopPropagation(),
       Header() {
-        return <div style={{ width: 40 }} />;
+        return <div style={{ width: 44 }} />;
       },
       Cell({ data }) {
         let out = JSON.parse(data.source ?? "{}");

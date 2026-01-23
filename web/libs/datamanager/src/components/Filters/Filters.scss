@@ -76,3 +76,7 @@
 }
 
 // Note: Dropdown padding is now controlled via triggerProps in FilterDropdown component
+
+:global(.filter-dropdown-content) {
+  min-width: 270px !important;
+}
