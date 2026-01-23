@@ -40,6 +40,22 @@ const TaskSummary = ({ annotations: all, store: annotationStore }: TaskSummaryPr
     label_attrs: getLabelColors(control),
     per_region: !!control.perregion,
   }));
+
+  // Add pseudo-controls for ReactCode dimensions
+  // ReactCode tags are object tags that can have dimensions defined via outputs schema
+  const reactcodeTags = allTags.filter(([_, tag]) => tag.type === "reactcode") as [string, any][];
+  for (const [tagName, tag] of reactcodeTags) {
+    const dimensions: string[] = tag.dimensions ?? [];
+    for (const dimension of dimensions) {
+      controlsList.push({
+        name: dimension, // JSONPath used to extract value
+        type: "reactcode",
+        to_name: tagName, // Reference to the ReactCode tag
+        label_attrs: {},
+        per_region: false,
+      });
+    }
+  }
   // place all controls with the same to_name together
   const grouped = Object.groupBy(controlsList, (control) => control.to_name);
   // show global classifications first, then labels, then per-regions

@@ -7,9 +7,20 @@ import { cnm, IconSparks, Userpic } from "@humansignal/ui";
 import type { MSTAnnotation, MSTResult, RawResult } from "../../stores/types";
 import { AggregationTableRow } from "./Aggregation";
 import { Chip } from "./Chip";
-import { renderers } from "./labelings";
+import { renderers, jsonPathToTitle } from "./labelings";
 import { ResizeHandler } from "./ResizeHandler";
 import type { AnnotationSummary, ControlTag, RendererType } from "./types";
+
+/**
+ * Get display name for a control column header.
+ * For reactcode controls, converts JSONPath to readable title.
+ */
+const getControlDisplayName = (control: ControlTag): string => {
+  if (control.type === "reactcode") {
+    return jsonPathToTitle(control.name);
+  }
+  return control.name;
+};
 
 type Props = {
   annotations: MSTAnnotation[];
@@ -20,7 +31,9 @@ type Props = {
 
 const cellFn = (control: ControlTag, render: RendererType) => (props: { row: Row<AnnotationSummary> }) => {
   const annotation = props.row.original;
-  const results = annotation.results.filter((result) => result.from_name === control.name);
+  // For reactcode controls, results are associated with the tag name (to_name), not the JSONPath (name)
+  const filterKey = control.type === "reactcode" ? control.to_name : control.name;
+  const results = annotation.results.filter((result) => result.from_name === filterKey);
   const content = !results.length ? (
     <span className="text-neutral-content-subtler text-sm">—</span>
   ) : (
@@ -92,7 +105,7 @@ export const LabelingSummary = ({ hideInfo, annotations: all, controls, onSelect
         id: control.name,
         header: () => (
           <div>
-            <span className="font-semibold text-sm pb-small">{control.name}</span>
+            <span className="font-semibold text-sm pb-small">{getControlDisplayName(control)}</span>
             <Chip prefix={control.per_region ? "per-region " : ""} className="px-small ml-2">
               {control.type}
             </Chip>

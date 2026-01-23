@@ -1,7 +1,25 @@
+import { JSONPath } from "jsonpath-plus";
 import type { RawResult } from "../../stores/types";
 import { Chip } from "./Chip";
 import type { RendererType } from "./types";
 import { getLabelCounts } from "./utils";
+
+/**
+ * Convert a JSONPath string to a human-readable column title.
+ * @param jsonPath - JSONPath string (e.g., "$.details.category")
+ * @returns Human-readable title (e.g., "Details / Category")
+ */
+export const jsonPathToTitle = (jsonPath: string): string => {
+  return (
+    jsonPath
+      .replace(/^\$\.?/, "") // Remove leading $. or $
+      .replace(/\[\*\]/g, "") // Remove array wildcards
+      .split(".")
+      .filter(Boolean)
+      .map((part) => part.charAt(0).toUpperCase() + part.slice(1)) // Capitalize
+      .join(" / ") || "Value"
+  );
+};
 
 const resultValue = (result: RawResult) => {
   if (result.type === "textarea") {
@@ -145,5 +163,56 @@ export const renderers: Record<string, RendererType> = {
     if (!value) return null;
 
     return <span className="text-lg text-yellow-500">{"★".repeat(value)}</span>;
+  },
+  reactcode: (results, control) => {
+    if (!results.length) return null;
+
+    // For ReactCode, control.name is a JSONPath to extract from the result value
+    // Results always have a single entry with the full JSON object
+    const result = results[0];
+    const fullValue = result.value?.reactcode;
+
+    if (!fullValue) return null;
+
+    // Extract value using JSONPath
+    const jsonPath = control.name;
+    const extracted = JSONPath({ path: jsonPath, json: fullValue, wrap: false });
+
+    // Handle different value types
+    if (extracted === undefined || extracted === null) {
+      return <span className="text-neutral-content-subtler text-sm">—</span>;
+    }
+
+    // Format the value based on its type
+    if (typeof extracted === "boolean") {
+      return <span className="text-sm font-mono">{extracted ? "true" : "false"}</span>;
+    }
+
+    if (typeof extracted === "number") {
+      return <span className="text-sm font-mono font-semibold">{extracted}</span>;
+    }
+
+    if (typeof extracted === "string") {
+      return (
+        <div className="text-sm text-ellipsis line-clamp-3 break-words">
+          <p>{extracted}</p>
+        </div>
+      );
+    }
+
+    // For arrays or objects, show a summary
+    if (Array.isArray(extracted)) {
+      return (
+        <span className="flex gap-tighter flex-wrap">
+          {extracted.slice(0, 5).map((item, i) => (
+            <Chip key={i}>{typeof item === "object" ? JSON.stringify(item) : String(item)}</Chip>
+          ))}
+          {extracted.length > 5 && <span className="text-neutral-content-subtle text-sm">+{extracted.length - 5}</span>}
+        </span>
+      );
+    }
+
+    // Object fallback
+    return <span className="text-sm font-mono">{JSON.stringify(extracted)}</span>;
   },
 };
