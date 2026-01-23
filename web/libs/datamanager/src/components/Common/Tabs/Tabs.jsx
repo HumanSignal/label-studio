@@ -71,7 +71,7 @@ export const Tabs = ({
                 aria-label="Open New Tab"
                 data-leave
               >
-                <IconPlus className="!h-3 !w-3" aria-hidden="true" />
+                <IconPlus width={12} height={12} aria-hidden="true" />
               </Button>
             </Tooltip>
           )}
