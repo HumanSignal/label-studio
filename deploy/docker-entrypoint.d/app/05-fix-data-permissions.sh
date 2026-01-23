@@ -1,1 +1,0 @@
-../common/05-fix-data-permissions.sh
