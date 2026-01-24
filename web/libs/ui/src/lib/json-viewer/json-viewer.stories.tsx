@@ -110,6 +110,7 @@ const meta: Meta<typeof JsonViewer> = {
     showSearch: { control: "boolean" },
     minHeight: { control: "number" },
     maxHeight: { control: "number" },
+    fontSize: { control: "number" },
   },
   decorators: [
     (Story) => (
@@ -130,6 +131,7 @@ export const Default: Story = {
     showSearch: true,
     minHeight: 500,
     maxHeight: 500,
+    fontSize: 14,
   },
 };
 
@@ -140,6 +142,7 @@ export const TaskSourceData: Story = {
     showSearch: true,
     minHeight: 500,
     maxHeight: 500,
+    fontSize: 14,
   },
 };
 
@@ -150,6 +153,7 @@ export const WithFilters: Story = {
     showSearch: true,
     minHeight: 500,
     maxHeight: 500,
+    fontSize: 14,
     customFilters: [
       {
         id: "data",
@@ -186,6 +190,7 @@ export const ComplexData: Story = {
     showSearch: true,
     minHeight: 600,
     maxHeight: 600,
+    fontSize: 14,
   },
 };
 
@@ -196,6 +201,7 @@ export const WithoutSearch: Story = {
     showSearch: false,
     minHeight: 400,
     maxHeight: 400,
+    fontSize: 14,
   },
 };
 
@@ -219,6 +225,7 @@ export const LargeDataset: Story = {
     showSearch: true,
     minHeight: 600,
     maxHeight: 600,
+    fontSize: 14,
   },
 };
 
@@ -229,6 +236,7 @@ export const CustomHeight: Story = {
     showSearch: true,
     minHeight: 300,
     maxHeight: 300,
+    fontSize: 14,
   },
 };
 
@@ -239,6 +247,7 @@ export const EmptyData: Story = {
     showSearch: true,
     minHeight: 400,
     maxHeight: 400,
+    fontSize: 14,
   },
 };
 
@@ -249,5 +258,6 @@ export const NullData: Story = {
     showSearch: true,
     minHeight: 400,
     maxHeight: 400,
+    fontSize: 14,
   },
 };

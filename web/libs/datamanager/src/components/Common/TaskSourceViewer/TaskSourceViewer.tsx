@@ -1,8 +1,11 @@
-import { type FC, useCallback, useEffect, useState } from "react";
-import { JsonViewer, type FilterConfig, Tabs, TabsList, TabsTrigger } from "@humansignal/ui";
+import { type FC, useEffect, useState, useCallback } from "react";
+import { JsonViewer, type FilterConfig } from "@humansignal/ui";
 import { FF_LOPS_E_3, FF_INTERACTIVE_JSON_VIEWER, isFF } from "../../../utils/feature-flags";
 import { CodeView } from "./CodeView";
 import styles from "./TaskSourceViewer.module.scss";
+import { ViewToggle, type ViewMode } from "./ViewToggle";
+
+export type { ViewMode };
 
 export interface TaskSourceViewerProps {
   /** Task content data */
@@ -11,9 +14,11 @@ export interface TaskSourceViewerProps {
   onTaskLoad: () => Promise<any>;
   /** SDK type (e.g., "DE" for Data Explorer) */
   sdkType?: string;
+  /** Storage key for localStorage persistence */
+  storageKey?: string;
+  /** Render toggle in external location (e.g., modal header) */
+  renderToggle?: (toggle: React.ReactNode) => void;
 }
-
-type ViewMode = "code" | "interactive";
 
 // Define filters outside component to prevent recreation on every render
 const TASK_SOURCE_FILTERS: FilterConfig[] = [
@@ -46,15 +51,22 @@ const TASK_SOURCE_FILTERS: FilterConfig[] = [
 /**
  * TaskSourceViewer - Displays task source with code and interactive views
  *
- * Loads task data and provides a toggle between code view and interactive JSON viewer.
+ * Loads task data and provides either code view or interactive JSON viewer.
  * Specific to the Data Manager and should not be part of the reusable UI library.
  */
-export const TaskSourceViewer: FC<TaskSourceViewerProps> = ({ content, onTaskLoad, sdkType }) => {
-  const storageKey = "dm:tasksource";
+export const TaskSourceViewer: FC<TaskSourceViewerProps> = ({
+  content,
+  onTaskLoad,
+  sdkType,
+  storageKey = "dm:tasksource",
+  renderToggle,
+}) => {
   const customFilters = TASK_SOURCE_FILTERS;
   const isInteractiveViewerEnabled = isFF(FF_INTERACTIVE_JSON_VIEWER);
 
   const [taskData, setTaskData] = useState(content);
+
+  // Manage view state internally
   const [view, setView] = useState<ViewMode>(() => {
     if (storageKey && isInteractiveViewerEnabled) {
       const saved = localStorage.getItem(`${storageKey}:view`);
@@ -62,6 +74,18 @@ export const TaskSourceViewer: FC<TaskSourceViewerProps> = ({ content, onTaskLoa
     }
     return "code";
   });
+
+  const handleViewChange = useCallback(
+    (newView: ViewMode) => {
+      setView(newView);
+
+      // Save to localStorage
+      if (storageKey && isInteractiveViewerEnabled) {
+        localStorage.setItem(`${storageKey}:view`, newView);
+      }
+    },
+    [storageKey, isInteractiveViewerEnabled]
+  );
 
   // Load full task data
   useEffect(() => {
@@ -85,32 +109,15 @@ export const TaskSourceViewer: FC<TaskSourceViewerProps> = ({ content, onTaskLoa
     });
   }, [onTaskLoad, sdkType]);
 
-  // Save view preference to localStorage
+  // Provide toggle to external render location (e.g., modal header)
   useEffect(() => {
-    if (storageKey && isInteractiveViewerEnabled) {
-      localStorage.setItem(`${storageKey}:view`, view);
+    if (renderToggle && isInteractiveViewerEnabled) {
+      renderToggle(<ViewToggle view={view} onViewChange={handleViewChange} />);
     }
-  }, [view, storageKey, isInteractiveViewerEnabled]);
-
-  // If feature flag is disabled, show simple code view
-  if (!isInteractiveViewerEnabled) {
-    return <CodeView data={taskData} />;
-  }
-
-  // Feature flag enabled: Show toggle with code + interactive views
-
-  const handleViewChange = useCallback((v: string) => {
-    setView(v as ViewMode);
-  }, []);
+  }, [renderToggle, view, handleViewChange, isInteractiveViewerEnabled]);
 
   return (
     <div className={styles.taskSourceView}>
-      <Tabs value={view} onValueChange={handleViewChange} variant="default">
-        <TabsList className={styles.viewToggle}>
-          <TabsTrigger value="code">Code</TabsTrigger>
-          <TabsTrigger value="interactive">Interactive</TabsTrigger>
-        </TabsList>
-      </Tabs>
       <div className={styles.viewContent}>
         {view === "code" ? (
           <CodeView data={taskData} />

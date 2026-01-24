@@ -172,10 +172,24 @@ export const Table = observer(
             look="string"
             className="w-6 h-6 p-0 text-primary-content hover:text-primary-content-hover"
             onClick={() => {
-              modal({
+              let modalInstance;
+              
+              modalInstance = modal({
                 title: `Source for task ${out?.id}`,
                 style: { width: 900 },
-                body: <TaskSourceViewer content={out} onTaskLoad={onTaskLoad} sdkType={type} />,
+                header: null, // Will be set by renderToggle
+                body: (
+                  <TaskSourceViewer 
+                    content={out} 
+                    onTaskLoad={onTaskLoad} 
+                    sdkType={type}
+                    storageKey="dm:tasksource"
+                    renderToggle={(toggle) => {
+                      // Update modal header with toggle
+                      modalInstance?.update({ header: toggle });
+                    }}
+                  />
+                ),
               });
             }}
             leading={<Icon icon={IconCode} />}

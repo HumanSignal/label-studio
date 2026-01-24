@@ -42,6 +42,7 @@ export const JsonViewer: FC<JsonViewerProps> = ({
   customFilters = [],
   minHeight = 500,
   maxHeight = 500,
+  fontSize = 14,
   onCopy,
   className = "",
 }) => {
@@ -199,7 +200,7 @@ export const JsonViewer: FC<JsonViewerProps> = ({
         <div className={styles.jsonEditorContainer} style={{ minHeight, maxHeight }}>
           <Tooltip title={copied ? "Copied!" : "Copy JSON"}>
             <Button
-              look="outline"
+              look="outlined"
               variant="neutral"
               size="small"
               className={styles.copyButton}
@@ -220,6 +221,7 @@ export const JsonViewer: FC<JsonViewerProps> = ({
             showCollectionCount={true}
             minWidth="100%"
             maxWidth="100%"
+            rootFontSize={fontSize}
             enableClipboard={true}
           />
         </div>
@@ -231,6 +233,7 @@ export const JsonViewer: FC<JsonViewerProps> = ({
       collapseDepth,
       copied,
       data,
+      fontSize,
       handleCopy,
       handleFilterClick,
       handleResetFilters,

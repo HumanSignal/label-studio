@@ -7,16 +7,16 @@
   --json-viewer-button-hover-background: var(--color-neutral-surface-hover);
   
   // Color tokens for JSON values
-  --json-viewer-color-edit: var(--color-primary-icon);
-  --json-viewer-color-add: var(--color-primary-icon);
-  --json-viewer-color-delete: var(--color-negative-icon);
-  --json-viewer-color-brackets: var(--color-accent-sand-base);
+  --json-viewer-color-edit: var(--color-primary-content);
+  --json-viewer-color-add: var(--color-primary-content);
+  --json-viewer-color-delete: var(--color-negative-content);
+  --json-viewer-color-brackets: var(--color-accent-sand-bold);
   --json-viewer-color-keys: var(--color-primary-content);
   --json-viewer-color-string: var(--color-accent-kale-bold);
   --json-viewer-color-number: var(--color-accent-blueberry-bold);
   --json-viewer-color-boolean: var(--color-accent-canteloupe-bold);
   --json-viewer-color-null: var(--color-accent-persimmon-bold);
-  --json-viewer-copy-pulse: var(--color-primary-icon);
+  --json-viewer-copy-pulse: var(--color-primary-content);
   --json-viewer-accordion-icon: var(--color-accent-plum-base);
 
   width: 100%;
@@ -220,6 +220,10 @@
 
     .jer-value-null {
       color: var(--json-viewer-color-null) !important;
+    }
+
+    .jer-value-main-row {
+      align-items: flex-start;
     }
 
     // Override key colors

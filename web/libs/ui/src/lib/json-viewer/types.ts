@@ -17,6 +17,8 @@ export interface JsonViewerProps {
   minHeight?: string | number;
   /** Container max height */
   maxHeight?: string | number;
+  /** Font size for the JSON content (passed to json-edit-react's rootFontSize) */
+  fontSize?: string | number;
   /** Callback when copy is triggered */
   onCopy?: () => void;
   /** Additional CSS classes */
