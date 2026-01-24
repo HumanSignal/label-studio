@@ -173,15 +173,15 @@ export const Table = observer(
             className="w-6 h-6 p-0 text-primary-content hover:text-primary-content-hover"
             onClick={() => {
               let modalInstance;
-              
+
               modalInstance = modal({
                 title: `Source for task ${out?.id}`,
                 style: { width: 900 },
                 header: null, // Will be set by renderToggle
                 body: (
-                  <TaskSourceViewer 
-                    content={out} 
-                    onTaskLoad={onTaskLoad} 
+                  <TaskSourceViewer
+                    content={out}
+                    onTaskLoad={onTaskLoad}
                     sdkType={type}
                     storageKey="dm:tasksource"
                     renderToggle={(toggle) => {

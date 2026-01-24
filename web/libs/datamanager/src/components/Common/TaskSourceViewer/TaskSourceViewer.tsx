@@ -84,7 +84,7 @@ export const TaskSourceViewer: FC<TaskSourceViewerProps> = ({
         localStorage.setItem(`${storageKey}:view`, newView);
       }
     },
-    [storageKey, isInteractiveViewerEnabled]
+    [storageKey, isInteractiveViewerEnabled],
   );
 
   // Load full task data
