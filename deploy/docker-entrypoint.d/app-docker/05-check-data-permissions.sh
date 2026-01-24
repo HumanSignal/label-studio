@@ -1,0 +1,1 @@
+../common/05-check-data-permissions.sh
