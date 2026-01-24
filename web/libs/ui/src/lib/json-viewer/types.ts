@@ -25,4 +25,6 @@ export interface JsonViewerProps {
   onCopy?: () => void;
   /** Additional CSS classes */
   className?: string;
+  /** Threshold (in characters) for showing Reader View button on strings. Set to 0 to disable. Default: 100 */
+  readerViewThreshold?: number;
 }

@@ -3,8 +3,9 @@ import { JsonEditor, defaultTheme, matchNode } from "json-edit-react";
 import { Button } from "../button/button";
 import { Tooltip } from "../Tooltip/Tooltip";
 import { Typography } from "../typography/typography";
-import { IconSearch, IconFilter, IconReset, IconClose, IconCopy } from "@humansignal/icons";
+import { IconSearch, IconFilter, IconReset, IconClose, IconCopyOutline } from "@humansignal/icons";
 import type { FilterConfig, JsonViewerProps } from "./types";
+import { ReaderViewButton } from "./reader-view-button";
 import styles from "./json-viewer.module.scss";
 
 // Custom Label Studio theme for json-edit-react
@@ -20,7 +21,7 @@ const labelStudioTheme = {
       color: "var(--color-neutral-content)",
     },
     collection: {
-      ...defaultTheme.styles.collection,
+      ...((defaultTheme.styles as any).collection || {}),
       backgroundColor: "var(--json-viewer-collection-background)",
     },
   },
@@ -46,6 +47,7 @@ export const JsonViewer: FC<JsonViewerProps> = ({
   stringTruncate,
   onCopy,
   className = "",
+  readerViewThreshold = 100,
 }) => {
   const [searchText, setSearchText] = useState("");
   const [copied, setCopied] = useState(false);
@@ -129,6 +131,27 @@ export const JsonViewer: FC<JsonViewerProps> = ({
     setResetKey((prev) => prev + 1); // Force remount to reset collapse state
   }, []);
 
+  // Custom buttons for Reader View
+  const customButtons = useMemo(() => {
+    if (!readerViewThreshold || readerViewThreshold <= 0) {
+      return undefined;
+    }
+
+    return [
+      {
+        Element: (props: any) => <ReaderViewButton {...props} threshold={readerViewThreshold} />,
+      },
+    ] as any; // Type assertion needed as json-edit-react's CustomButtonDefinition requires onClick
+  }, [readerViewThreshold]);
+
+  // Custom icons using Label Studio's icon library
+  const customIcons = useMemo(
+    () => ({
+      copy: <IconCopyOutline width={20} height={20} />,
+    }),
+    [],
+  );
+
   const content = useMemo(
     () => (
       <div className={styles.jsonViewer} style={{ minHeight }}>
@@ -206,7 +229,7 @@ export const JsonViewer: FC<JsonViewerProps> = ({
               size="small"
               className={styles.copyButton}
               onClick={handleCopy}
-              leading={<IconCopy width={32} height={32} />}
+              leading={<IconCopyOutline width={20} height={20} />}
             />
           </Tooltip>
           <JsonEditor
@@ -225,6 +248,8 @@ export const JsonViewer: FC<JsonViewerProps> = ({
             rootFontSize={fontSize}
             stringTruncate={stringTruncate}
             enableClipboard={true}
+            icons={customIcons}
+            customButtons={customButtons}
           />
         </div>
       </div>
@@ -234,6 +259,8 @@ export const JsonViewer: FC<JsonViewerProps> = ({
       allFilters,
       collapseDepth,
       copied,
+      customButtons,
+      customIcons,
       data,
       fontSize,
       handleCopy,
@@ -247,6 +274,7 @@ export const JsonViewer: FC<JsonViewerProps> = ({
       showSearch,
       stringTruncate,
       styles.controls,
+      styles.copyButton,
       styles.filterIcon,
       styles.filterLabel,
       styles.filterLabelText,
@@ -255,6 +283,7 @@ export const JsonViewer: FC<JsonViewerProps> = ({
       styles.jsonViewer,
       styles.leftControls,
       styles.rightControls,
+      styles.searchClear,
       styles.searchIcon,
       styles.searchInput,
       styles.searchWrapper,

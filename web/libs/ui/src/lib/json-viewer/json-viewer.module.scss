@@ -4,10 +4,11 @@
   --json-viewer-background: transparent;
   --json-viewer-collection-background: transparent;
   --json-viewer-input-background: var(--color-neutral-background);
-  --json-viewer-button-hover-background: var(--color-neutral-surface-hover);
+  --json-viewer-button-hover-background: var(--color-primary-emphasis-subtle);
   
   // Color tokens for JSON values
   --json-viewer-color-edit: var(--color-primary-content);
+  --json-viewer-color-copy: var(--color-primary-content);
   --json-viewer-color-add: var(--color-primary-content);
   --json-viewer-color-delete: var(--color-negative-content);
   --json-viewer-color-brackets: var(--color-accent-sand-bold);
@@ -133,7 +134,6 @@
   right: var(--spacing-tight);
   z-index: 1;
   padding: 0 !important;
-  box-shadow: 0 2px 8px rgba(var(--color-neutral-shadow-raw) / 12%);
 }
 
 .jsonEditorContainer {
@@ -237,8 +237,30 @@
     }
 
     // Override edit buttons
-    .jer-edit-buttons button {
-      color: var(--json-viewer-color-edit) !important;
+    .jer-edit-buttons .jer-copy-pulse {
+      color: var(--json-viewer-color-copy) !important;
+      width: 32px;
+      height: 32px;
+      align-items: center;
+      justify-content: center;
+      display: flex;
+      transform: none;
+      border-radius: var(--corner-radius-small);
+      transition: background-color 150ms ease-out, color 150ms ease-out, opacity 150ms ease-out;
+
+      &::after {
+        display: none;
+      }
+
+      svg {
+        width: 20px;
+        height: 20px;
+      }
+
+      &:hover {
+        transform: none;
+        background-color: var(--json-viewer-button-hover-background);
+      }
     }
 
     .jer-copy-pulse svg {

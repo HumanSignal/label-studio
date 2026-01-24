@@ -1,6 +1,6 @@
 import { type FC, useCallback, useMemo, useState } from "react";
 import { Button, Tooltip } from "@humansignal/ui";
-import { IconCopy } from "@humansignal/icons";
+import { IconCopyOutline } from "@humansignal/icons";
 import styles from "./CodeView.module.scss";
 
 interface CodeViewProps {
@@ -39,7 +39,7 @@ export const CodeView: FC<CodeViewProps> = ({ data }) => {
             variant="neutral"
             className={styles.copyButton}
             onClick={handleCopy}
-            leading={<IconCopy />}
+            leading={<IconCopyOutline Width={20} height={20} />}
           />
         </Tooltip>
         <pre className={styles.codeBlock}>{jsonString}</pre>

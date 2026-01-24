@@ -35,6 +35,7 @@ export { ReactComponent as IconBlock } from "./block.svg";
 export { ReactComponent as IconBlog } from "./blog.svg";
 export { ReactComponent as IconBook } from "./book.svg";
 export { ReactComponent as IconBookEdit } from "./book-edit.svg";
+export { ReactComponent as IconBookOpenText } from "./book-open-text.svg";
 export { ReactComponent as IconClosedBook } from "./closed-book.svg";
 export { ReactComponent as IconBouncing3Dots } from "./bouncing-3-dots.svg";
 export { ReactComponent as IconBoundingBox } from "./bounding-box.svg";

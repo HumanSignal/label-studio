@@ -129,6 +129,7 @@ export const TaskSourceViewer: FC<TaskSourceViewerProps> = ({
             customFilters={customFilters}
             minHeight={552}
             maxHeight={552}
+            readerViewThreshold={100}
           />
         )}
       </div>
