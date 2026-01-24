@@ -43,6 +43,7 @@ export const JsonViewer: FC<JsonViewerProps> = ({
   minHeight = 500,
   maxHeight = 500,
   fontSize = 14,
+  stringTruncate,
   onCopy,
   className = "",
 }) => {
@@ -222,6 +223,7 @@ export const JsonViewer: FC<JsonViewerProps> = ({
             minWidth="100%"
             maxWidth="100%"
             rootFontSize={fontSize}
+            stringTruncate={stringTruncate}
             enableClipboard={true}
           />
         </div>
@@ -243,6 +245,7 @@ export const JsonViewer: FC<JsonViewerProps> = ({
       searchFilter,
       searchText,
       showSearch,
+      stringTruncate,
       styles.controls,
       styles.filterIcon,
       styles.filterLabel,

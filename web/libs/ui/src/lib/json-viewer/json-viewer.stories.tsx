@@ -111,6 +111,7 @@ const meta: Meta<typeof JsonViewer> = {
     minHeight: { control: "number" },
     maxHeight: { control: "number" },
     fontSize: { control: "number" },
+    stringTruncate: { control: "number" },
   },
   decorators: [
     (Story) => (
@@ -132,6 +133,7 @@ export const Default: Story = {
     minHeight: 500,
     maxHeight: 500,
     fontSize: 14,
+    stringTruncate: 100,
   },
 };
 
@@ -259,5 +261,29 @@ export const NullData: Story = {
     minHeight: 400,
     maxHeight: 400,
     fontSize: 14,
+  },
+};
+
+export const WithStringTruncation: Story = {
+  args: {
+    data: {
+      shortString: "This is a short string",
+      longString:
+        "This is a very long string that will be truncated. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
+      url: "https://example.com/very/long/path/to/some/resource/that/might/be/truncated/in/the/viewer",
+      description:
+        "Another long text field that demonstrates the truncation feature. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
+      nested: {
+        data: "Short",
+        longNestedString:
+          "This nested string is also very long and will be truncated to demonstrate that truncation works at any depth in the JSON structure. Click to expand and see the full content.",
+      },
+    },
+    viewOnly: true,
+    showSearch: true,
+    minHeight: 500,
+    maxHeight: 500,
+    fontSize: 14,
+    stringTruncate: 80,
   },
 };

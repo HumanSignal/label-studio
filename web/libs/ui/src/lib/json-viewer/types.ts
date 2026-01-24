@@ -19,6 +19,8 @@ export interface JsonViewerProps {
   maxHeight?: string | number;
   /** Font size for the JSON content (passed to json-edit-react's rootFontSize) */
   fontSize?: string | number;
+  /** Number of characters before truncating strings (click to expand) */
+  stringTruncate?: number;
   /** Callback when copy is triggered */
   onCopy?: () => void;
   /** Additional CSS classes */
