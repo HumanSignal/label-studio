@@ -172,9 +172,7 @@ export const Table = observer(
             look="string"
             className="w-6 h-6 p-0 text-primary-content hover:text-primary-content-hover"
             onClick={() => {
-              let modalInstance;
-
-              modalInstance = modal({
+              const modalInstance = modal({
                 title: `Source for task ${out?.id}`,
                 style: { width: 900 },
                 header: null, // Will be set by renderToggle
