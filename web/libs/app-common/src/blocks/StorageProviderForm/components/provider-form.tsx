@@ -50,9 +50,6 @@ const isFieldVisible = (field: FieldDefinition | MessageDefinition, formData: Re
     isVisible = currentValue === expectedValue;
   }
 
-  // Debug: uncomment to trace visibility issues
-  // console.log(`[visibleWhen] ${fieldDef.name}: currentValue=${currentValue}, expected=${JSON.stringify(expectedValue)}, visible=${isVisible}`);
-
   return isVisible;
 };
 
