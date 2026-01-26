@@ -245,7 +245,7 @@
       justify-content: center;
       display: flex;
       transform: none;
-      border-radius: var(--corner-radius-small);
+      border-radius: var(--corner-radius-smaller);
       transition: background-color 150ms ease-out, color 150ms ease-out, opacity 150ms ease-out;
 
       &::after {
@@ -260,6 +260,7 @@
       &:hover {
         transform: none;
         background-color: var(--json-viewer-button-hover-background);
+        opacity: 1 !important;
       }
     }
 

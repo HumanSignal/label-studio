@@ -35,8 +35,9 @@ export const CodeView: FC<CodeViewProps> = ({ data }) => {
       <div className={styles.codeViewContent}>
         <Tooltip title={copied ? "Copied!" : "Copy JSON"}>
           <Button
-            look="outline"
+            look="outlined"
             variant="neutral"
+            size="small"
             className={styles.copyButton}
             onClick={handleCopy}
             leading={<IconCopyOutline Width={20} height={20} />}
