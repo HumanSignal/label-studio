@@ -152,11 +152,11 @@ const AnnotationStoreModel = types
       const c = list.find((c) => c.id === id || c.pk === String(id)) || list[0];
 
       if (!c) return null;
-      
+
       // Only set selected if not in view-all mode OR if explicitly exiting view-all
       const viewAllTab = typeof window !== "undefined" ? window.localStorage.getItem("view-all-tab") : null;
       const isInViewAllMode = self.viewingAllAnnotations || viewAllTab === "compare" || viewAllTab === "summary";
-      
+
       if (!isInViewAllMode || options.exitViewAll) {
         c.selected = true;
       }
@@ -194,7 +194,7 @@ const AnnotationStoreModel = types
       // Set editable based on view-all mode
       const viewAllTab = typeof window !== "undefined" ? window.localStorage.getItem("view-all-tab") : null;
       const isInViewAllMode = self.viewingAllAnnotations || viewAllTab === "compare" || viewAllTab === "summary";
-      
+
       if (!isInViewAllMode || options.exitViewAll) {
         c.editable = true;
       } else {
