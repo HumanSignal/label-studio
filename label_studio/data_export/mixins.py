@@ -7,9 +7,8 @@ import shutil
 from datetime import datetime
 from functools import reduce
 
-import django_rq
 from core.feature_flags import flag_set
-from core.redis import redis_connected
+from core.redis import redis_connected, start_job_async_or_sync
 from core.utils.common import batch
 from core.utils.io import (
     SerializableGenerator,
@@ -325,13 +324,13 @@ class ExportMixin:
         self.save(update_fields=['status'])
 
         if redis_connected():
-            queue = django_rq.get_queue('default')
-            queue.enqueue(
+            start_job_async_or_sync(
                 export_background,
                 self.id,
                 task_filter_options,
                 annotation_filter_options,
                 serialization_options,
+                queue_name='default',
                 on_failure=set_export_background_failure,
                 job_timeout='3h',  # 3 hours
             )

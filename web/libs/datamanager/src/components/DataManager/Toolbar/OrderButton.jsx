@@ -1,5 +1,5 @@
 import { IconSortDown, IconSortUp } from "@humansignal/icons";
-import { Button, ButtonGroup } from "@humansignal/ui";
+import { Button, ButtonGroup, EnterpriseBadge } from "@humansignal/ui";
 import { inject } from "mobx-react";
 import { FieldsButton } from "../../Common/FieldsButton";
 import { Space } from "../../Common/Space/Space";
@@ -28,20 +28,13 @@ export const OrderButton = injector(({ size, ordering, view, ...rest }) => {
           filter={(col) => {
             return col.orderable ?? col.original?.orderable;
           }}
-          wrapper={({ column, children }) => (
+          wrapper={({ column, children, enterpriseBadge }) => (
             <Space style={{ width: "100%", justifyContent: "space-between" }}>
               {children}
 
-              <div
-                style={{
-                  width: 24,
-                  height: 24,
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
-              >
-                {column?.icon}
+              <div className="flex items-center gap-tight">
+                {enterpriseBadge && <EnterpriseBadge ghost />}
+                {column?.icon && <div className="w-6 h-6 flex items-center justify-center">{column.icon}</div>}
               </div>
             </Space>
           )}
