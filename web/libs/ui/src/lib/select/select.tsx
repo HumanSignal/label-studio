@@ -1,4 +1,12 @@
-import React, { type ForwardedRef, forwardRef, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import React, {
+  type ForwardedRef,
+  forwardRef,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 
 import {
   Command,
@@ -18,6 +26,7 @@ import styles from "./select.module.scss";
 import { cnm } from "../../utils/utils";
 import { VariableSizeList } from "react-window";
 import InfiniteLoader from "react-window-infinite-loader";
+import { useBadgeOverflow } from "./useBadgeOverflow";
 
 const VARIABLE_LIST_ITEM_HEIGHT = 40;
 const VARIABLE_LIST_COUNT_RENDERED = 5;
@@ -91,12 +100,14 @@ export const Select = forwardRef(
       itemCount,
       onClose,
       onOpen,
+      footer,
       ...props
     }: SelectProps<T, A>,
     _ref: ForwardedRef<HTMLSelectElement>,
   ) => {
     const ref = _ref ?? useRef<HTMLSelectElement>();
-    const triggerRef = useRef<HTMLDivElement>();
+    const triggerRef = useRef<HTMLDivElement>(null);
+    const badgesContainerRef = useRef<HTMLSpanElement>(null);
     const [query, setQuery] = useState<string>(defaultSearchValue);
     const valueRef = useRef<any>();
     let initialValue = defaultValue?.value ?? defaultValue ?? externalValue?.value ?? externalValue;
@@ -180,8 +191,23 @@ export const Select = forwardRef(
     );
 
     const flatOptions = useMemo(() => {
-      return options.flatMap((option) => option?.children ?? option);
-    }, [options]);
+      const flat = options.flatMap((option) => option?.children ?? option);
+
+      // For multiple selects with badges, ensure selected values are always in flatOptions
+      // This handles cases where parent component might temporarily not include selected items
+      if (multiple && renderAsBadges && value && Array.isArray(value)) {
+        const flatValues = flat.map((opt) => opt?.value ?? opt);
+        const missingValues = value.filter((val) => !flatValues.includes(val));
+
+        if (missingValues.length > 0) {
+          // Add missing selected values as simple options
+          const missingOptions = missingValues.map((val) => val);
+          return [...flat, ...missingOptions];
+        }
+      }
+
+      return flat;
+    }, [options, multiple, renderAsBadges, value]);
 
     const _options = useMemo(() => {
       if (!searchable || !query.trim()) return options;
@@ -221,6 +247,14 @@ export const Select = forwardRef(
       return Array.from(uniqueSelected.values());
     }, [flatOptions, isSelected, value, multiple]);
 
+    // Use custom hook to calculate badge overflow
+    const visibleBadgeCount = useBadgeOverflow({
+      enabled: renderAsBadges && multiple,
+      badgesContainerRef,
+      triggerRef,
+      selectedOptionsCount: selectedOptions.length,
+    });
+
     const onSearchInputHandler = useCallback(
       (e: React.ChangeEvent<HTMLInputElement>) => {
         const val = e.target.value;
@@ -251,8 +285,15 @@ export const Select = forwardRef(
 
                 // Render as badges if renderAsBadges is true and multiple is true
                 if (renderAsBadges && multiple) {
+                  const shouldHide = visibleBadgeCount !== null && index >= visibleBadgeCount;
+
                   return (
-                    <Badge key={`${optionValue}_${index}`} variant="info" shape="squared">
+                    <Badge
+                      key={`${optionValue}_${index}`}
+                      variant="info"
+                      shape="squared"
+                      style={shouldHide ? { visibility: "hidden", position: "absolute" } : undefined}
+                    >
                       {option?.label ?? optionValue}
                     </Badge>
                   );
@@ -264,13 +305,22 @@ export const Select = forwardRef(
                   </span>
                 );
               })}
+              {/* Show +n badge if there are hidden badges */}
+              {renderAsBadges &&
+                multiple &&
+                visibleBadgeCount !== null &&
+                visibleBadgeCount < selectedOptions.length && (
+                  <Badge variant="info" shape="squared" data-overflow-badge="true">
+                    +{selectedOptions.length - visibleBadgeCount}
+                  </Badge>
+                )}
             </>
           ) : (
             <span className="truncate w-full">{props?.placeholder ?? ""}</span>
           )}
         </>
       );
-    }, [selectedOptions, props?.placeholder, selectedValueRenderer, renderAsBadges, multiple]);
+    }, [selectedOptions, props?.placeholder, selectedValueRenderer, renderAsBadges, multiple, visibleBadgeCount]);
 
     const renderedOptions = useMemo(() => {
       return _options.map((option, index) => {
@@ -372,7 +422,11 @@ export const Select = forwardRef(
             {...triggerProps}
           >
             <span
-              className="flex flex-1 text-left gap-2 max-w-full w-[calc(100%-1rem-0.5rem)]"
+              ref={badgesContainerRef}
+              className={cnm(
+                "flex text-left gap-2",
+                renderAsBadges && multiple ? styles.badgesContainer : "flex-1 max-w-full overflow-hidden",
+              )}
               data-testid="select-display-value"
             >
               {renderSelected ? renderSelected?.(selectedOptions, props?.placeholder) : displayValue}
@@ -455,6 +509,7 @@ export const Select = forwardRef(
                     renderedOptions
                   )}
                 </CommandGroup>
+                {footer && <div className="px-base py-tight border-t border-neutral-border">{footer}</div>}
               </CommandList>
             </Command>
           )}

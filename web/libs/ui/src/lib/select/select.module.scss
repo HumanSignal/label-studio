@@ -12,6 +12,7 @@
   text-overflow: ellipsis;
   height: var(--select-trigger-height);
   width: 100%;
+  min-width: 0;
   background: var(--color-neutral-background);
   transition: background 150ms ease-out, border-color 150ms ease-out;
 
@@ -77,6 +78,18 @@
 
 .valueInput {
   display: none !important;
+}
+
+.badgesContainer {
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
+  flex-wrap: nowrap;
+  flex: 1 1 auto;
+  
+  > * {
+    flex-shrink: 0;
+  }
 }
 
 [data-radix-popper-content-wrapper] {

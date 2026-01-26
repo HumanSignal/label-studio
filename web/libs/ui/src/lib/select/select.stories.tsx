@@ -191,22 +191,27 @@ export const WithCustomRenderSelected: Story = {
 };
 
 export const MultipleWithBadges: Story = {
-  args: {
-    label: "Select technologies (with badges)",
-    multiple: true,
-    renderAsBadges: true,
-    searchable: true,
-    value: ["javascript", "react"],
-    options: [
-      { value: "javascript", label: "JavaScript" },
-      { value: "typescript", label: "TypeScript" },
-      { value: "react", label: "React" },
-      { value: "vue", label: "Vue" },
-      { value: "angular", label: "Angular" },
-      { value: "node", label: "Node.js" },
-      { value: "python", label: "Python" },
-      { value: "django", label: "Django" },
-    ] as any[],
-    placeholder: "Choose technologies...",
+  render: () => {
+    return (
+      <div style={{ width: "350px", border: "1px dashed #ccc", padding: "8px" }}>
+        <Select
+          multiple
+          renderAsBadges
+          searchable
+          value={["javascript", "react", "typescript", "vue", "angular"]}
+          options={[
+            { value: "javascript", label: "JavaScript" },
+            { value: "typescript", label: "TypeScript" },
+            { value: "react", label: "React" },
+            { value: "vue", label: "Vue" },
+            { value: "angular", label: "Angular" },
+            { value: "node", label: "Node.js" },
+            { value: "python", label: "Python" },
+            { value: "django", label: "Django" },
+          ]}
+          placeholder="Choose technologies..."
+        />
+      </div>
+    );
   },
 };

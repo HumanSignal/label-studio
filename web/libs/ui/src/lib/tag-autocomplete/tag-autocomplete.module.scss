@@ -4,34 +4,34 @@
 .trigger {
   display: flex;
   align-items: center;
-  gap: var(--spacing-tight, 0.5rem);
-  min-height: var(--select-trigger-height, 40px);
+  gap: var(--spacing-tight);
+  min-height: var(--select-trigger-height);
   padding: 4px 8px;
-  background: var(--color-neutral-surface, #fff);
-  border: 1px solid var(--color-neutral-border, #e0e0e0);
-  border-radius: var(--corner-radius-smaller, 4px);
+  background: var(--color-neutral-surface);
+  border: 1px solid var(--color-neutral-border);
+  border-radius: var(--corner-radius-smaller);
   cursor: text;
   transition: border-color 150ms ease-out, box-shadow 150ms ease-out;
   overflow: hidden;
 
   &:hover:not(.triggerDisabled) {
-    border-color: var(--color-neutral-border-bold, #c0c0c0);
+    border-color: var(--color-neutral-border-bold);
   }
 
   &:focus-within:not(.triggerDisabled) {
-    border-color: var(--color-primary-emphasis, #06c);
-    box-shadow: 0 0 0 2px var(--color-primary-surface, rgb(0 102 204 / 10%));
+    border-color: var(--color-primary-emphasis);
+    box-shadow: 0 0 0 2px var(--color-primary-surface);
     outline: none;
   }
 }
 
 .triggerOpen {
-  border-color: var(--color-primary-emphasis, #06c);
-  box-shadow: 0 0 0 2px var(--color-primary-surface, rgb(0 102 204 / 10%));
+  border-color: var(--color-primary-emphasis);
+  box-shadow: 0 0 0 2px var(--color-primary-surface);
 }
 
 .triggerDisabled {
-  background: var(--color-neutral-surface-inset, #f5f5f5);
+  background: var(--color-neutral-surface-inset);
   cursor: not-allowed;
   opacity: 0.6;
 }
@@ -65,10 +65,10 @@
   outline: none;
   font-size: inherit;
   font-family: inherit;
-  color: var(--color-neutral-content, #333);
+  color: var(--color-neutral-content);
 
   &::placeholder {
-    color: var(--color-neutral-content-subtler, #999);
+    color: var(--color-neutral-content-subtler);
   }
 
   &:disabled {
