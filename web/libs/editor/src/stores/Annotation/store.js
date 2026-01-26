@@ -119,6 +119,10 @@ const AnnotationStoreModel = types
       self.viewingAllAnnotations = false;
       // Persist the state to localStorage
       window.localStorage.setItem(localStorageKeys.viewingAll, String(self.viewingAllAnnotations));
+      // Also clear the new tab state
+      if (typeof window !== "undefined") {
+        window.localStorage.removeItem("view-all-tab");
+      }
     }
 
     function _unselectAll() {
@@ -138,7 +142,7 @@ const AnnotationStoreModel = types
     }
 
     // Select annotation or prediction
-    function selectItem(id, list, resetHistory = true) {
+    function selectItem(id, list, resetHistory = true, options = {}) {
       // might be better to protect this change with FF_SIMPLE_INIT
       // unselectViewingAll();
 
@@ -148,7 +152,14 @@ const AnnotationStoreModel = types
       const c = list.find((c) => c.id === id || c.pk === String(id)) || list[0];
 
       if (!c) return null;
-      c.selected = true;
+      
+      // Only set selected if not in view-all mode OR if explicitly exiting view-all
+      const viewAllTab = typeof window !== "undefined" ? window.localStorage.getItem("view-all-tab") : null;
+      const isInViewAllMode = self.viewingAllAnnotations || viewAllTab === "compare" || viewAllTab === "summary";
+      
+      if (!isInViewAllMode || options.exitViewAll) {
+        c.selected = true;
+      }
 
       if (resetHistory) {
         self.selectedHistory = null;
@@ -178,9 +189,18 @@ const AnnotationStoreModel = types
       if (!self.annotations.length) return null;
 
       const { selected } = self;
-      const c = selectItem(id, self.annotations, !options.retainHistory);
+      const c = selectItem(id, self.annotations, !options.retainHistory, options);
 
-      c.editable = true;
+      // Set editable based on view-all mode
+      const viewAllTab = typeof window !== "undefined" ? window.localStorage.getItem("view-all-tab") : null;
+      const isInViewAllMode = self.viewingAllAnnotations || viewAllTab === "compare" || viewAllTab === "summary";
+      
+      if (!isInViewAllMode || options.exitViewAll) {
+        c.editable = true;
+      } else {
+        // Explicitly set to false when in view-all mode
+        c.editable = false;
+      }
       c.setupHotKeys();
 
       getEnv(self).events.invoke("selectAnnotation", c, selected, options ?? {});
@@ -194,7 +214,7 @@ const AnnotationStoreModel = types
         unselectViewingAll();
       }
 
-      return selectItem(id, self.predictions);
+      return selectItem(id, self.predictions, true, options);
     }
 
     function clearDeletedParents(annotation) {
