@@ -412,9 +412,12 @@ export const Select = forwardRef(
                   {isVirtualList ? (
                     <InfiniteLoader
                       itemCount={itemCount ?? renderedOptions.length}
-                      loadMoreItems={() => loadMore?.()}
+                      loadMoreItems={() => {
+                        loadMore?.();
+                        return Promise.resolve();
+                      }}
                       isItemLoaded={(index) => index < renderedOptions.length}
-                      threshold={pageSize}
+                      threshold={1}
                       minimumBatchSize={pageSize / 2}
                     >
                       {({
@@ -424,15 +427,14 @@ export const Select = forwardRef(
                         onItemsRendered: (params: any) => void;
                         ref: any;
                       }) => {
-                        // Calculate height based on actual item count from flatOptions
-                        // When searching, _options is filtered and flat; when not searching, _options === options (all items)
-                        const actualItemCount = searchable && query.trim() ? _options.length : flatOptions.length;
+                        // Calculate height based on loaded items to prevent premature loading
+                        const actualItemCount = renderedOptions.length;
                         const maxVisibleItems = VARIABLE_LIST_COUNT_RENDERED;
                         const listHeight = Math.min(actualItemCount, maxVisibleItems) * VARIABLE_LIST_ITEM_HEIGHT;
 
                         return (
                           <VariableSizeList
-                            key={renderedOptions.length}
+                            key="virtual-list"
                             itemData={renderedOptions}
                             itemSize={() => VARIABLE_LIST_ITEM_HEIGHT}
                             itemCount={renderedOptions.length}
@@ -440,7 +442,7 @@ export const Select = forwardRef(
                             // width={VARIABLE_LIST_WIDTH}
                             onItemsRendered={onItemsRendered}
                             ref={infiniteLoaderRef}
-                            overscanCount={1}
+                            overscanCount={0}
                           >
                             {({ index, style }) => {
                               return <div style={style}>{renderedOptions[index]}</div>;
