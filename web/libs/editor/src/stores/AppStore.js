@@ -863,6 +863,11 @@ export default types
         const current = as.annotations.at(-1);
         const currentPrediction = !current && as.predictions.at(-1);
 
+        // Check if we're in the new ViewAll mode with tabs (Summary/Compare)
+        // The new mode stores its state in localStorage as "view-all-tab"
+        const isInNewViewAllMode = window.localStorage.getItem("view-all-tab") !== null;
+        const isInViewAllMode = as.viewingAllAnnotations || isInNewViewAllMode;
+
         // Always select annotation for proper initialization
         if (current) {
           as.selectAnnotation(current.id);
@@ -873,11 +878,11 @@ export default types
           as.selectPrediction(currentPrediction.id);
         }
 
-        // If in Compare All mode, mark annotations as not selected for UI display
+        // If in Compare All mode (old or new), mark annotations as not selected for UI display
         // but keep as.selected reference for proper functioning
         // Use viewingAllAnnotations (the property) instead of viewingAll (the getter)
         // because viewingAll returns false during initialization
-        if (as.viewingAllAnnotations) {
+        if (isInViewAllMode) {
           as.annotations.forEach((a) => {
             a.selected = false;
             a.editable = false;
