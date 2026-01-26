@@ -23,6 +23,7 @@
     align-items: stretch;
     gap: var(--spacing-tight);
     padding-left: var(--spacing-tight);
+    overflow: hidden;
   }
 
   &__section {
