@@ -1,8 +1,7 @@
-import { Button, Checkbox } from "@humansignal/ui";
+import { Button, Checkbox, Dropdown, EnterpriseBadge } from "@humansignal/ui";
 import { inject, observer } from "mobx-react";
 import React from "react";
 import { cn } from "../../utils/bem";
-import { Dropdown } from "@humansignal/ui";
 import { Menu } from "./Menu/Menu";
 
 const injector = inject(({ store }) => {
@@ -13,14 +12,22 @@ const injector = inject(({ store }) => {
 
 const FieldsMenu = observer(({ columns, WrapperComponent, onClick, onReset, selected, resetTitle }) => {
   const MenuItem = (col, onClick) => {
+    const enterpriseBadge = col.enterprise_badge ?? col.original?.enterprise_badge;
+    const shouldDisable = col.disabled || enterpriseBadge;
+
+    const titleContent = <span>{col.title}</span>;
+
     return (
-      <Menu.Item key={col.key} name={col.key} onClick={onClick} disabled={col.disabled}>
+      <Menu.Item key={col.key} name={col.key} onClick={onClick} disabled={shouldDisable}>
         {WrapperComponent && col.wra !== false ? (
-          <WrapperComponent column={col} disabled={col.disabled}>
-            {col.title}
+          <WrapperComponent column={col} disabled={shouldDisable} enterpriseBadge={enterpriseBadge}>
+            {titleContent}
           </WrapperComponent>
         ) : (
-          col.title
+          <span className="flex items-center justify-between w-full gap-base">
+            {titleContent}
+            {enterpriseBadge && <EnterpriseBadge ghost />}
+          </span>
         )}
       </Menu.Item>
     );
@@ -133,16 +140,21 @@ export const FieldsButton = injector(
   },
 );
 
-FieldsButton.Checkbox = observer(({ column, children, disabled }) => {
+FieldsButton.Checkbox = observer(({ column, children, disabled, enterpriseBadge }) => {
+  const shouldDisable = disabled;
+
   return (
-    <Checkbox
-      size="small"
-      checked={!column.hidden}
-      onChange={column.toggleVisibility}
-      style={{ width: "100%", height: "100%" }}
-      disabled={disabled}
-    >
-      {children}
-    </Checkbox>
+    <div style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between", gap: "8px" }}>
+      <div style={{ flex: 1, minWidth: 0, overflow: "hidden" }}>
+        <Checkbox size="small" checked={!column.is_hidden} onChange={column.toggleVisibility} disabled={shouldDisable}>
+          {children}
+        </Checkbox>
+      </div>
+      {enterpriseBadge && (
+        <div style={{ flexShrink: 0 }}>
+          <EnterpriseBadge ghost />
+        </div>
+      )}
+    </div>
   );
 });

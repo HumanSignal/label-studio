@@ -68,6 +68,7 @@ export const Select = forwardRef(
       defaultValue,
       searchable,
       searchPlaceholder,
+      defaultSearchValue = "",
       value: externalValue,
       disabled = false,
       multiple = false,
@@ -95,7 +96,7 @@ export const Select = forwardRef(
   ) => {
     const ref = _ref ?? useRef<HTMLSelectElement>();
     const triggerRef = useRef<HTMLDivElement>();
-    const [query, setQuery] = useState<string>("");
+    const [query, setQuery] = useState<string>(defaultSearchValue);
     const valueRef = useRef<any>();
     let initialValue = defaultValue?.value ?? defaultValue ?? externalValue?.value ?? externalValue;
     if (selectFirstIfEmpty && !initialValue) {
@@ -129,9 +130,24 @@ export const Select = forwardRef(
       setValue(val);
     }, [selectFirstIfEmpty, options, multiple]);
 
+    const prevIsOpenRef = useRef(false);
     useEffect(() => {
-      if (!isOpen) setQuery("");
-    }, [isOpen]);
+      const wasJustOpened = isOpen && !prevIsOpenRef.current;
+      const wasJustClosed = !isOpen && prevIsOpenRef.current;
+      prevIsOpenRef.current = isOpen;
+
+      if (wasJustOpened) {
+        // When opening, restore search from defaultSearchValue if provided
+        if (defaultSearchValue) {
+          setQuery(defaultSearchValue);
+          // Only trigger onSearch if value is different from current to avoid unnecessary API calls
+          onSearch?.(defaultSearchValue);
+        }
+      } else if (wasJustClosed) {
+        // When closing, reset to defaultSearchValue (or empty if not provided)
+        setQuery(defaultSearchValue || "");
+      }
+    }, [isOpen, defaultSearchValue, onSearch]);
     const _onChange = useCallback(
       (val: string, isSelected: boolean) => {
         if (disabled) return;
@@ -367,6 +383,7 @@ export const Select = forwardRef(
               {searchable && (
                 <CommandInput
                   placeholder={searchPlaceholder ?? "Search"}
+                  value={query}
                   onChangeCapture={onSearchInputHandler}
                   data-testid="select-search-field"
                   autoFocus
@@ -541,7 +558,15 @@ const Option = ({
         )}
         data-disabled={disabled}
       >
-        {multiple && <Checkbox tabIndex={-1} checked={isOptionSelected} indeterminate={isIndeterminate} readOnly />}
+        {multiple && (
+          <Checkbox
+            tabIndex={-1}
+            checked={isOptionSelected}
+            indeterminate={isIndeterminate}
+            readOnly
+            disabled={disabled}
+          />
+        )}
         <div data-testid="select-option-label" className="w-full min-w-0 truncate">
           {label}
         </div>

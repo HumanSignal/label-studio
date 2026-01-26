@@ -5,7 +5,8 @@ import type { ColumnDef, SortingState } from "@tanstack/react-table";
 import type { ExtendedDataTableColumnDef } from "./data-table";
 import { Badge } from "../badge/badge";
 import { Button } from "../button/button";
-import { IconEdit, IconTrash } from "@humansignal/icons";
+import { Tooltip } from "../Tooltip/Tooltip";
+import { IconEdit, IconTrash, IconMonitors } from "@humansignal/icons";
 
 const meta: Meta<typeof DataTable> = {
   component: DataTable,
@@ -27,11 +28,28 @@ type User = {
   role: string;
   status: "active" | "inactive";
   lastActive: string;
+  activeSessions?: number;
 };
 
 const sampleData: User[] = [
-  { id: 1, name: "John Doe", email: "john@example.com", role: "Admin", status: "active", lastActive: "2024-01-15" },
-  { id: 2, name: "Jane Smith", email: "jane@example.com", role: "Editor", status: "active", lastActive: "2024-01-14" },
+  {
+    id: 1,
+    name: "John Doe",
+    email: "john@example.com",
+    role: "Admin",
+    status: "active",
+    lastActive: "2024-01-15",
+    activeSessions: 2,
+  },
+  {
+    id: 2,
+    name: "Jane Smith",
+    email: "jane@example.com",
+    role: "Editor",
+    status: "active",
+    lastActive: "2024-01-14",
+    activeSessions: 1,
+  },
   {
     id: 3,
     name: "Bob Johnson",
@@ -39,6 +57,7 @@ const sampleData: User[] = [
     role: "Viewer",
     status: "inactive",
     lastActive: "2024-01-10",
+    activeSessions: 0,
   },
   {
     id: 4,
@@ -47,6 +66,7 @@ const sampleData: User[] = [
     role: "Editor",
     status: "active",
     lastActive: "2024-01-15",
+    activeSessions: 1,
   },
   {
     id: 5,
@@ -55,6 +75,7 @@ const sampleData: User[] = [
     role: "Viewer",
     status: "active",
     lastActive: "2024-01-13",
+    activeSessions: 3,
   },
 ];
 
@@ -511,6 +532,95 @@ export const ConditionalRowSelection: Story = {
           rowSelection={rowSelection}
           onRowSelectionChange={setRowSelection}
           isRowSelectable={(row) => row.original.status === "active"}
+        />
+      </div>
+    );
+  },
+};
+
+/**
+ * Custom React Node Headers
+ *
+ * Demonstrates using custom React nodes as column headers instead of text.
+ * The header property accepts any React node - icons, buttons, dropdowns, or any
+ * custom component. Simply pass a function that returns your custom header content.
+ *
+ * This example shows an icon wrapped in a Tooltip for a compact column, but you can
+ * use any React component as a header (buttons, dropdowns, badges, etc.).
+ *
+ * Hover over the monitors icon to see the tooltip explaining the column.
+ */
+export const WithCustomHeaders: Story = {
+  render: () => {
+    const [sorting, setSorting] = useState<SortingState>([]);
+
+    const columnsWithCustomHeaders: ColumnDef<User>[] = [
+      {
+        accessorKey: "name",
+        header: "Name",
+        enableSorting: true,
+      },
+      {
+        accessorKey: "email",
+        header: "Email",
+        enableSorting: true,
+      },
+      {
+        accessorKey: "role",
+        header: "Role",
+        cell: ({ getValue }) => {
+          const role = getValue() as string;
+          return (
+            <Badge variant={role === "Admin" ? "primary" : role === "Editor" ? "success" : "info"} size="small">
+              {role}
+            </Badge>
+          );
+        },
+      },
+      {
+        accessorKey: "activeSessions",
+        // Icon-only header with tooltip - wrap icon in Tooltip directly
+        header: () => (
+          <Tooltip title="Active Sessions: Number of active browser sessions." alignment="top-center">
+            <div className="flex items-center cursor-help">
+              <IconMonitors width={24} height={24} />
+            </div>
+          </Tooltip>
+        ),
+        size: 32,
+        minSize: 30,
+        cell: ({ getValue }) => {
+          const sessions = getValue() as number;
+          return (
+            <div className="flex items-center justify-center">
+              <Badge variant={sessions > 1 ? "warning" : "default"} size="small">
+                {sessions}
+              </Badge>
+            </div>
+          );
+        },
+      },
+      {
+        accessorKey: "lastActive",
+        header: "Last Active",
+        enableSorting: true,
+      },
+    ];
+
+    return (
+      <div className="flex flex-col gap-4">
+        <div className="p-4 bg-neutral-surface rounded-md">
+          <p className="text-sm text-neutral-content-subtle">
+            💡 The column between "Role" and "Last Active" uses an icon wrapped in a Tooltip as the header. Hover over
+            the monitors icon to see the tooltip.
+          </p>
+        </div>
+        <DataTable
+          data={sampleData}
+          columns={columnsWithCustomHeaders}
+          enableSorting
+          sorting={sorting}
+          onSortingChange={setSorting}
         />
       </div>
     );

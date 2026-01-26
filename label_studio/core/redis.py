@@ -182,6 +182,8 @@ def start_job_async_or_sync(job, *args, in_seconds=0, **kwargs):
         if isinstance(retry, int):
             retry = Retry(max=retry)
 
+    on_failure = kwargs.pop('on_failure', None)
+
     if redis:
         # Async execution with Redis - wrap job for context management
         try:
@@ -212,11 +214,10 @@ def start_job_async_or_sync(job, *args, in_seconds=0, **kwargs):
             job_timeout=job_timeout,
             failure_ttl=settings.RQ_FAILED_JOB_TTL,
             retry=retry,
+            on_failure=on_failure,
         )
         return job
     else:
-        on_failure = kwargs.pop('on_failure', None)
-
         try:
             result = job(*args, **kwargs)
             return result

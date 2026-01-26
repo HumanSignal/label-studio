@@ -1,6 +1,7 @@
 import React from "react";
 import { cn } from "../../../utils/bem";
 import { MenuContext } from "./MenuContext";
+import { Tooltip } from "@humansignal/ui";
 
 export const MenuItem = ({
   name,
@@ -16,6 +17,9 @@ export const MenuItem = ({
   forceReload = false,
   active = false,
   onClick,
+  disabled,
+  tooltip,
+  tooltipAlignment = "bottom-center",
   ...rest
 }) => {
   const { selected } = React.useContext(MenuContext);
@@ -43,6 +47,15 @@ export const MenuItem = ({
   // Support both deprecated danger prop and new variant prop
   const isNegative = danger || variant === "negative";
 
+  const handleClick = (e) => {
+    if (disabled) {
+      e.preventDefault();
+      e.stopPropagation();
+      return;
+    }
+    onClick?.(e);
+  };
+
   const linkAttributes = {
     className: rootClass
       .mod({
@@ -50,20 +63,22 @@ export const MenuItem = ({
         look: isNegative && "danger", // Keep existing CSS class for compatibility
       })
       .mix(className),
-    onClick,
+    onClick: handleClick,
+    disabled: disabled || undefined,
+    "aria-disabled": disabled || undefined,
     ...rest,
   };
 
-  if (forceReload) {
+  if (forceReload && !disabled) {
     linkAttributes.onClick = () => {
       window.location.href = to ?? href;
     };
   }
 
-  return (
+  const menuItem = (
     <li>
       {href ? (
-        <a href={href ?? "#"} {...linkAttributes}>
+        <a href={disabled ? undefined : (href ?? "#")} {...linkAttributes}>
           {linkContent}
         </a>
       ) : (
@@ -71,4 +86,15 @@ export const MenuItem = ({
       )}
     </li>
   );
+
+  // Only wrap in tooltip if tooltip prop is provided and should be shown
+  if (tooltip) {
+    return (
+      <Tooltip title={tooltip} alignment={tooltipAlignment}>
+        {menuItem}
+      </Tooltip>
+    );
+  }
+
+  return menuItem;
 };
