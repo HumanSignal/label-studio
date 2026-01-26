@@ -863,6 +863,7 @@ export default types
         const current = as.annotations.at(-1);
         const currentPrediction = !current && as.predictions.at(-1);
 
+        // Always select annotation for proper initialization
         if (current) {
           as.selectAnnotation(current.id);
           // looks like we still need it anyway, but it's fast and harmless,
@@ -870,6 +871,21 @@ export default types
           current.reinitHistory();
         } else if (currentPrediction) {
           as.selectPrediction(currentPrediction.id);
+        }
+
+        // If in Compare All mode, mark annotations as not selected for UI display
+        // but keep as.selected reference for proper functioning
+        // Use viewingAllAnnotations (the property) instead of viewingAll (the getter)
+        // because viewingAll returns false during initialization
+        if (as.viewingAllAnnotations) {
+          as.annotations.forEach((a) => {
+            a.selected = false;
+            a.editable = false;
+            // Update objects for all annotations to show their results in Compare All mode
+            if (a !== current) {
+              a.updateObjects();
+            }
+          });
         }
 
         // annotation history is set when annotation is selected,
@@ -900,6 +916,17 @@ export default types
         if (current) current.setInitialValues();
 
         self.setHistory(annotationHistory);
+
+        // If we're in Compare All mode, mark annotations as not selected for UI display
+        // but keep as.selected reference for proper functioning
+        // Use viewingAllAnnotations (the property) instead of viewingAll (the getter)
+        // because viewingAll returns false during initialization
+        if (as.viewingAllAnnotations) {
+          as.annotations.forEach((a) => {
+            a.selected = false;
+            a.editable = false;
+          });
+        }
       }
 
       if (!self.initialized) {
