@@ -1,10 +1,10 @@
 import { type FC, useCallback, useEffect, useMemo, useState } from "react";
 import { JsonEditor, defaultTheme, matchNode } from "json-edit-react";
+import { IconSearch, IconFilter, IconReset, IconClose, IconCopyOutline } from "@humansignal/icons";
 import { Button } from "../button/button";
 import { Tooltip } from "../Tooltip/Tooltip";
 import { Typography } from "../typography/typography";
-import { IconSearch, IconFilter, IconReset, IconClose, IconCopyOutline } from "@humansignal/icons";
-import type { FilterConfig, JsonViewerProps } from "./types";
+import type { JsonViewerProps } from "./types";
 import { ReaderViewButton } from "./reader-view-button";
 import styles from "./json-viewer.module.scss";
 
@@ -60,46 +60,34 @@ export const JsonViewer: FC<JsonViewerProps> = ({
   onCopy,
 }) => {
   // Initialize state from localStorage if storageKey is provided
-  const [searchText, setSearchText] = useState(() => {
-    if (storageKey) {
-      const saved = localStorage.getItem(`${storageKey}:search`);
-      return saved || "";
-    }
-    return "";
-  });
+  const [searchText, setSearchText] = useState(() => 
+    storageKey ? localStorage.getItem(`${storageKey}:search`) || "" : ""
+  );
 
   const [copied, setCopied] = useState(false);
 
-  const [activeFilter, setActiveFilter] = useState<string | null>(() => {
-    if (storageKey) {
-      const saved = localStorage.getItem(`${storageKey}:filter`);
-      return saved || null;
-    }
-    return null;
-  });
+  const [activeFilter, setActiveFilter] = useState<string | null>(() =>
+    storageKey ? localStorage.getItem(`${storageKey}:filter`) : null
+  );
 
   const [collapseDepth, setCollapseDepth] = useState<number | boolean>(false);
   const [resetKey, setResetKey] = useState(0);
 
-  // Built-in filters
-  const builtInFilters: FilterConfig[] = useMemo(
+  // Combine built-in "All" filter with custom filters
+  const allFilters = useMemo(
     () => [
       {
         id: "all",
         label: "All",
-        filterFn: () => true, // Show everything
+        filterFn: () => true,
       },
+      ...customFilters,
     ],
-    [],
+    [customFilters],
   );
 
-  // Combine built-in and custom filters
-  const allFilters = useMemo(() => [...builtInFilters, ...customFilters], [builtInFilters, customFilters]);
-
   // Format JSON for copying
-  const jsonString = useMemo(() => {
-    return data ? JSON.stringify(data, null, 2) : "";
-  }, [data]);
+  const jsonString = useMemo(() => JSON.stringify(data, null, 2), [data]);
 
   // Copy to clipboard functionality
   const handleCopy = useCallback(() => {
@@ -142,20 +130,17 @@ export const JsonViewer: FC<JsonViewerProps> = ({
           return prev;
         }
 
-        const newFilter = filterId;
-
         // Save to localStorage
         if (storageKey) {
-          localStorage.setItem(`${storageKey}:filter`, newFilter);
+          localStorage.setItem(`${storageKey}:filter`, filterId);
         }
 
-        return newFilter;
+        return filterId;
       });
 
       // Always expand all nodes when a filter is applied so filtered results are visible
-      // Use Number.POSITIVE_INFINITY to expand all levels
       setCollapseDepth(Number.POSITIVE_INFINITY);
-      setResetKey((prev) => prev + 1); // Force remount to reset collapse state
+      setResetKey((prev) => prev + 1);
     },
     [storageKey],
   );
@@ -163,8 +148,8 @@ export const JsonViewer: FC<JsonViewerProps> = ({
   const handleResetFilters = useCallback(() => {
     setActiveFilter(null);
     setSearchText("");
-    setCollapseDepth(Number.POSITIVE_INFINITY); // Expand all nodes at all levels
-    setResetKey((prev) => prev + 1); // Force remount to reset collapse state
+    setCollapseDepth(false); // Reset to default collapsed state
+    setResetKey((prev) => prev + 1);
 
     // Clear from localStorage
     if (storageKey) {
@@ -183,6 +168,8 @@ export const JsonViewer: FC<JsonViewerProps> = ({
   }, [searchText, storageKey]);
 
   // Custom buttons for Reader View
+  // Note: Type assertion is required because json-edit-react's CustomButtonDefinition
+  // expects an onClick prop, but our ReaderViewButton handles clicks internally
   const customButtons = useMemo(() => {
     if (!readerViewThreshold || readerViewThreshold <= 0) {
       return undefined;
@@ -192,7 +179,7 @@ export const JsonViewer: FC<JsonViewerProps> = ({
       {
         Element: (props: any) => <ReaderViewButton {...props} threshold={readerViewThreshold} />,
       },
-    ] as any; // Type assertion needed as json-edit-react's CustomButtonDefinition requires onClick
+    ] as any;
   }, [readerViewThreshold]);
 
   // Custom icons using Label Studio's icon library
@@ -203,8 +190,8 @@ export const JsonViewer: FC<JsonViewerProps> = ({
     [],
   );
 
-  const content = useMemo(
-    () => (
+  return (
+    <div className={className}>
       <div className={styles.jsonViewer} style={{ minHeight }}>
         {(showSearch || (showFilters && allFilters.length > 0)) && (
           <div className={styles.controls}>
@@ -306,48 +293,6 @@ export const JsonViewer: FC<JsonViewerProps> = ({
           />
         </div>
       </div>
-    ),
-    [
-      activeFilter,
-      allFilters,
-      collapseDepth,
-      copied,
-      customButtons,
-      customIcons,
-      data,
-      fontSize,
-      handleCopy,
-      handleFilterClick,
-      handleResetFilters,
-      minHeight,
-      maxHeight,
-      resetKey,
-      searchFilter,
-      searchText,
-      showCopyButton,
-      showFilters,
-      showSearch,
-      stringTruncate,
-      styles.controls,
-      styles.copyButton,
-      styles.filterIcon,
-      styles.filterLabel,
-      styles.filterLabelText,
-      styles.filters,
-      styles.jsonEditorContainer,
-      styles.jsonViewer,
-      styles.leftControls,
-      styles.searchClear,
-      styles.searchIcon,
-      styles.searchInput,
-      styles.searchWrapper,
-      viewOnly,
-    ],
-  );
-
-  return (
-    <div className={className} onClick={(e: React.MouseEvent) => e.stopPropagation()}>
-      {content}
     </div>
   );
 };

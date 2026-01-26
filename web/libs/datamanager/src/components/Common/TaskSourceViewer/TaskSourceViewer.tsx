@@ -61,30 +61,25 @@ export const TaskSourceViewer: FC<TaskSourceViewerProps> = ({
   storageKey = "dm:tasksource",
   renderToggle,
 }) => {
-  const customFilters = TASK_SOURCE_FILTERS;
   const isInteractiveViewerEnabled = isFF(FF_INTERACTIVE_JSON_VIEWER);
 
   const [taskData, setTaskData] = useState(content);
 
   // Manage view state internally
-  const [view, setView] = useState<ViewMode>(() => {
-    if (storageKey && isInteractiveViewerEnabled) {
-      const saved = localStorage.getItem(`${storageKey}:view`);
-      return (saved as ViewMode) || "code";
-    }
-    return "code";
-  });
+  const [view, setView] = useState<ViewMode>(() =>
+    storageKey ? ((localStorage.getItem(`${storageKey}:view`) as ViewMode) || "code") : "code"
+  );
 
   const handleViewChange = useCallback(
     (newView: ViewMode) => {
       setView(newView);
 
       // Save to localStorage
-      if (storageKey && isInteractiveViewerEnabled) {
+      if (storageKey) {
         localStorage.setItem(`${storageKey}:view`, newView);
       }
     },
-    [storageKey, isInteractiveViewerEnabled],
+    [storageKey],
   );
 
   // Load full task data
@@ -126,7 +121,7 @@ export const TaskSourceViewer: FC<TaskSourceViewerProps> = ({
             data={taskData}
             viewOnly={true}
             showSearch={true}
-            customFilters={customFilters}
+            customFilters={TASK_SOURCE_FILTERS}
             minHeight={552}
             maxHeight={552}
             readerViewThreshold={100}

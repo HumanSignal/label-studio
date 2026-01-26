@@ -18,9 +18,7 @@ export const CodeView: FC<CodeViewProps> = ({ data }) => {
   const [copied, setCopied] = useState(false);
 
   // Format JSON for display
-  const jsonString = useMemo(() => {
-    return data ? JSON.stringify(data, null, 2) : "";
-  }, [data]);
+  const jsonString = useMemo(() => JSON.stringify(data, null, 2), [data]);
 
   // Copy to clipboard functionality
   const handleCopy = useCallback(() => {
@@ -40,7 +38,7 @@ export const CodeView: FC<CodeViewProps> = ({ data }) => {
             size="small"
             className={styles.copyButton}
             onClick={handleCopy}
-            leading={<IconCopyOutline Width={20} height={20} />}
+            leading={<IconCopyOutline width={20} height={20} />}
           />
         </Tooltip>
         <pre className={styles.codeBlock}>{jsonString}</pre>
