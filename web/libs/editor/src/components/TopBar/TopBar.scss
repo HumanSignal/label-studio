@@ -12,6 +12,10 @@
   position: sticky;
   top: 0;
 
+  &__button {
+    transform: translateX(var(--spacing-tighter));
+  }
+
   &__group {
     display: flex;
     align-items: stretch;

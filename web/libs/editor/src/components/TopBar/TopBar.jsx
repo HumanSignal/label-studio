@@ -42,7 +42,7 @@ export const TopBar = observer(({ store }) => {
           )}
           {store.hasInterface("annotations:add-new") && (
             <Button
-              className={"topbar__button"}
+              className={cn("topbar").elem("button").toClassName()}
               type={isViewAll ? undefined : "text"}
               aria-label="Create an annotation"
               variant="neutral"
