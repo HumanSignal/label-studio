@@ -38,10 +38,7 @@ export const TopBar = observer(({ store }) => {
       {isFF(FF_DEV_3873) ? (
         <div className={cn("topbar").elem("group").toClassName()}>
           {store.hasInterface("annotations:view-all") && (
-            <ViewAllToggle
-              isActive={isViewAll}
-              onClick={annotationStore.toggleViewingAllAnnotations}
-            />
+            <ViewAllToggle isActive={isViewAll} onClick={annotationStore.toggleViewingAllAnnotations} />
           )}
           {store.hasInterface("annotations:add-new") && (
             <Button

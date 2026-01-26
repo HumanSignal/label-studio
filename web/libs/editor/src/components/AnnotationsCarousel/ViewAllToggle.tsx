@@ -12,9 +12,7 @@ interface ViewAllToggleProps {
 export const ViewAllToggle = observer(({ isActive, onClick }: ViewAllToggleProps) => {
   return (
     <div
-      className={cn("view-all-toggle")
-        .mod({ selected: isActive })
-        .toClassName()}
+      className={cn("view-all-toggle").mod({ selected: isActive }).toClassName()}
       onClick={onClick}
       role="button"
       tabIndex={0}
