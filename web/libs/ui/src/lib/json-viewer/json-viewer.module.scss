@@ -73,43 +73,67 @@
   position: absolute;
   left: var(--spacing-tight);
   top: 50%;
-  transform: translateY(-50%);
-  width: 24px;
-  height: 24px;
-  color: var(--color-neutral-content-subtler);
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-neutral-content-subtlest);
   pointer-events: none;
+  transform: translateY(-50%);
 }
 
 .searchClear {
   position: absolute;
-  right: var(--spacing-tight);
   top: 50%;
+  right: var(--spacing-tighter);
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  border: none;
+  padding: 0;
+  color: var(--color-primary-content);
+  transition: color 80ms ease;
   transform: translateY(-50%);
-  padding: 0 !important;
-  min-width: auto !important;
-  height: auto !important;
+
+  &:hover {
+    color: var(--color-primary-content-hover);
+  }
+
+  svg {
+    width: 20px;
+    height: 20px;
+  }
 }
 
 .searchInput {
   width: 100%;
-  padding: var(--spacing-tight) var(--spacing-base);
-  padding-left: var(--spacing-widest);
-  padding-right: var(--spacing-base);
-  background: var(--json-viewer-input-background);
+  height: 32px;
+  padding: 0 var(--spacing-wide) 0 var(--spacing-wider);
+  background: var(--color-neutral-background);
   border: 1px solid var(--color-neutral-border);
-  border-radius: var(--corner-radius-small);
+  border-radius: 5px;
   color: var(--color-neutral-content);
-  font-size: var(--font-size-regular);
-  transition: border-color 150ms ease;
+  font-size: var(--font-size-body-small);
+  line-height: var(--line-height-body-small);
+  box-sizing: border-box;
+  transition: box-shadow 180ms ease-out;
   
-  &:hover {
-    border-color: var(--color-primary-border-subtle);
+  &:not(:disabled):hover {
+    border-color: var(--color-neutral-border-bold);
+  }
+  
+  &:not(:disabled):active {
+    border-color: var(--color-neutral-border-bolder);
   }
   
   &:focus {
     outline: none;
-    border-color: var(--color-primary-border);
-    box-shadow: 0 0 0 1px var(--color-primary-border);
+    box-shadow: 0 0 0 4px var(--color-primary-focus-outline), inset 0 -1px 0 rgb(0 0 0 / 10%), inset 0 0 0 1px rgb(0 0 0 / 15%), inset 0 0 0 1px var(--color-primary-surface-content-subtle);
+    border-color: var(--color-neutral-border-bold);
   }
   
   &::placeholder {

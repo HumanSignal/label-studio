@@ -201,7 +201,7 @@ export const JsonViewer: FC<JsonViewerProps> = ({
                   <IconSearch className={styles.searchIcon} />
                   <input
                     type="text"
-                    placeholder="Search keys or value"
+                    placeholder="Search keys or values"
                     value={searchText}
                     onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchText(e.target.value)}
                     className={styles.searchInput}
@@ -210,8 +210,8 @@ export const JsonViewer: FC<JsonViewerProps> = ({
                   {searchText && (
                     <Tooltip title="Clear Search">
                       <Button
-                        look="outlined"
-                        variant="neutral"
+                        look="string"
+                        variant="primary"
                         size="small"
                         onClick={() => setSearchText("")}
                         className={styles.searchClear}
