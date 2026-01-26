@@ -122,8 +122,8 @@ export const TaskSourceViewer: FC<TaskSourceViewerProps> = ({
             viewOnly={true}
             showSearch={true}
             customFilters={TASK_SOURCE_FILTERS}
-            minHeight={552}
-            maxHeight={552}
+            minHeight={560}
+            maxHeight={560}
             readerViewThreshold={100}
             storageKey={storageKey}
           />
