@@ -47,7 +47,7 @@ export const TopBar = observer(({ store }) => {
               aria-label="Create an annotation"
               variant="neutral"
               size="small"
-              look="string"
+              look="outlined"
               tooltip="Create a new annotation"
               onClick={(event) => {
                 event.preventDefault();

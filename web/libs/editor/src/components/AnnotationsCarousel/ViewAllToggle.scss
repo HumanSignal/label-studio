@@ -1,4 +1,13 @@
 .view-all-toggle {
+  // Button reset
+  appearance: none;
+  font-family: inherit;
+  font-size: inherit;
+  line-height: inherit;
+  text-align: left;
+  width: auto;
+
+  // Original styles
   display: flex;
   padding: var(--spacing-tighter) var(--spacing-base) var(--spacing-tighter) var(--spacing-tight);
   border-radius: var(--corner-radius-small) var(--corner-radius-small) 0 0;

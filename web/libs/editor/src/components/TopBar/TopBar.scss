@@ -12,12 +12,6 @@
   position: sticky;
   top: 0;
 
-  &__button:not(.button_look_primary) {
-    &:hover {
-      background-color: var(--color-primary-emphasis-subtle);
-    }
-  }
-
   &__group {
     display: flex;
     align-items: stretch;
