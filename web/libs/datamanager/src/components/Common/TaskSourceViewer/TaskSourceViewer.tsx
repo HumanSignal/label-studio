@@ -67,7 +67,7 @@ export const TaskSourceViewer: FC<TaskSourceViewerProps> = ({
 
   // Manage view state internally
   const [view, setView] = useState<ViewMode>(() =>
-    storageKey ? ((localStorage.getItem(`${storageKey}:view`) as ViewMode) || "code") : "code"
+    storageKey ? (localStorage.getItem(`${storageKey}:view`) as ViewMode) || "code" : "code",
   );
 
   const handleViewChange = useCallback(

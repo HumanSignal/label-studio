@@ -60,14 +60,14 @@ export const JsonViewer: FC<JsonViewerProps> = ({
   onCopy,
 }) => {
   // Initialize state from localStorage if storageKey is provided
-  const [searchText, setSearchText] = useState(() => 
-    storageKey ? localStorage.getItem(`${storageKey}:search`) || "" : ""
+  const [searchText, setSearchText] = useState(() =>
+    storageKey ? localStorage.getItem(`${storageKey}:search`) || "" : "",
   );
 
   const [copied, setCopied] = useState(false);
 
   const [activeFilter, setActiveFilter] = useState<string | null>(() =>
-    storageKey ? localStorage.getItem(`${storageKey}:filter`) : null
+    storageKey ? localStorage.getItem(`${storageKey}:filter`) : null,
   );
 
   const [collapseDepth, setCollapseDepth] = useState<number | boolean>(false);
