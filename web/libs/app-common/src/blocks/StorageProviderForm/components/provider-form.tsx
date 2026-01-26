@@ -22,10 +22,6 @@ interface ProviderFormProps {
  * @returns true if field should be visible, false otherwise
  */
 const isFieldVisible = (field: FieldDefinition | MessageDefinition, formData: Record<string, any>): boolean => {
-  console.log("isFieldVisible field", field);
-  console.log("isFieldVisible formData", formData);
-  console.log("isFieldVisible field.type", field.type);
-
   // Messages don't have visibleWhen, always visible
   if (field.type === "message") {
     return true;
