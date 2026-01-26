@@ -27,4 +27,6 @@ export interface JsonViewerProps {
   className?: string;
   /** Threshold (in characters) for showing Reader View button on strings. Set to 0 to disable. Default: 100 */
   readerViewThreshold?: number;
+  /** Storage key for localStorage persistence of filters and search state */
+  storageKey?: string;
 }

@@ -1,4 +1,4 @@
-import { type FC, useCallback, useMemo, useState } from "react";
+import { type FC, useCallback, useEffect, useMemo, useState } from "react";
 import { JsonEditor, defaultTheme, matchNode } from "json-edit-react";
 import { Button } from "../button/button";
 import { Tooltip } from "../Tooltip/Tooltip";
@@ -48,10 +48,27 @@ export const JsonViewer: FC<JsonViewerProps> = ({
   onCopy,
   className = "",
   readerViewThreshold = 100,
+  storageKey,
 }) => {
-  const [searchText, setSearchText] = useState("");
+  // Initialize state from localStorage if storageKey is provided
+  const [searchText, setSearchText] = useState(() => {
+    if (storageKey) {
+      const saved = localStorage.getItem(`${storageKey}:search`);
+      return saved || "";
+    }
+    return "";
+  });
+
   const [copied, setCopied] = useState(false);
-  const [activeFilter, setActiveFilter] = useState<string | null>(null);
+
+  const [activeFilter, setActiveFilter] = useState<string | null>(() => {
+    if (storageKey) {
+      const saved = localStorage.getItem(`${storageKey}:filter`);
+      return saved || null;
+    }
+    return null;
+  });
+
   const [collapseDepth, setCollapseDepth] = useState<number | boolean>(false);
   const [resetKey, setResetKey] = useState(0);
 
@@ -108,28 +125,53 @@ export const JsonViewer: FC<JsonViewerProps> = ({
     };
   }, [activeFilter, allFilters]);
 
-  const handleFilterClick = useCallback((filterId: string) => {
-    setActiveFilter((prev) => {
-      // Don't toggle off if already selected - just keep it selected
-      if (prev === filterId) {
-        return prev;
-      }
+  const handleFilterClick = useCallback(
+    (filterId: string) => {
+      setActiveFilter((prev) => {
+        // Don't toggle off if already selected - just keep it selected
+        if (prev === filterId) {
+          return prev;
+        }
 
-      return filterId;
-    });
+        const newFilter = filterId;
 
-    // Always expand all nodes when a filter is applied so filtered results are visible
-    // Use Number.POSITIVE_INFINITY to expand all levels
-    setCollapseDepth(Number.POSITIVE_INFINITY);
-    setResetKey((prev) => prev + 1); // Force remount to reset collapse state
-  }, []);
+        // Save to localStorage
+        if (storageKey) {
+          localStorage.setItem(`${storageKey}:filter`, newFilter);
+        }
+
+        return newFilter;
+      });
+
+      // Always expand all nodes when a filter is applied so filtered results are visible
+      // Use Number.POSITIVE_INFINITY to expand all levels
+      setCollapseDepth(Number.POSITIVE_INFINITY);
+      setResetKey((prev) => prev + 1); // Force remount to reset collapse state
+    },
+    [storageKey],
+  );
 
   const handleResetFilters = useCallback(() => {
     setActiveFilter(null);
     setSearchText("");
     setCollapseDepth(Number.POSITIVE_INFINITY); // Expand all nodes at all levels
     setResetKey((prev) => prev + 1); // Force remount to reset collapse state
-  }, []);
+
+    // Clear from localStorage
+    if (storageKey) {
+      localStorage.removeItem(`${storageKey}:filter`);
+      localStorage.removeItem(`${storageKey}:search`);
+    }
+  }, [storageKey]);
+
+  // Persist search text to localStorage when it changes
+  useEffect(() => {
+    if (storageKey && searchText) {
+      localStorage.setItem(`${storageKey}:search`, searchText);
+    } else if (storageKey && !searchText) {
+      localStorage.removeItem(`${storageKey}:search`);
+    }
+  }, [searchText, storageKey]);
 
   // Custom buttons for Reader View
   const customButtons = useMemo(() => {

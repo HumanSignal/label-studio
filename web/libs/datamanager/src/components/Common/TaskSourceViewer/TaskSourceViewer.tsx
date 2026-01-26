@@ -130,6 +130,7 @@ export const TaskSourceViewer: FC<TaskSourceViewerProps> = ({
             minHeight={552}
             maxHeight={552}
             readerViewThreshold={100}
+            storageKey={storageKey}
           />
         )}
       </div>
