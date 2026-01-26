@@ -37,18 +37,27 @@ const labelStudioTheme = {
  * - Copy to clipboard
  */
 export const JsonViewer: FC<JsonViewerProps> = ({
+  // Core data
   data,
+  // Behavior
   viewOnly = true,
+  // UI Controls visibility
   showSearch = true,
+  showFilters = true,
+  showCopyButton = true,
+  // Features
   customFilters = [],
-  minHeight = 500,
-  maxHeight = 500,
-  fontSize = 14,
-  stringTruncate,
-  onCopy,
-  className = "",
   readerViewThreshold = 100,
   storageKey,
+  // Display settings
+  minHeight = 500,
+  maxHeight = 500,
+  fontSize = 13,
+  stringTruncate,
+  // Styling
+  className = "",
+  // Callbacks
+  onCopy,
 }) => {
   // Initialize state from localStorage if storageKey is provided
   const [searchText, setSearchText] = useState(() => {
@@ -197,7 +206,7 @@ export const JsonViewer: FC<JsonViewerProps> = ({
   const content = useMemo(
     () => (
       <div className={styles.jsonViewer} style={{ minHeight }}>
-        {(showSearch || allFilters.length > 0) && (
+        {(showSearch || (showFilters && allFilters.length > 0)) && (
           <div className={styles.controls}>
             <div className={styles.leftControls}>
               {showSearch && (
@@ -226,7 +235,7 @@ export const JsonViewer: FC<JsonViewerProps> = ({
                   )}
                 </div>
               )}
-              {allFilters.length > 0 && (
+              {showFilters && allFilters.length > 0 && (
                 <>
                   <div className={styles.filterLabel}>
                     <IconFilter className={styles.filterIcon} width={24} height={24} />
@@ -264,16 +273,18 @@ export const JsonViewer: FC<JsonViewerProps> = ({
           </div>
         )}
         <div className={styles.jsonEditorContainer} style={{ minHeight, maxHeight }}>
-          <Tooltip title={copied ? "Copied!" : "Copy JSON"}>
-            <Button
-              look="outlined"
-              variant="neutral"
-              size="small"
-              className={styles.copyButton}
-              onClick={handleCopy}
-              leading={<IconCopyOutline width={20} height={20} />}
-            />
-          </Tooltip>
+          {showCopyButton && (
+            <Tooltip title={copied ? "Copied!" : "Copy JSON"}>
+              <Button
+                look="outlined"
+                variant="neutral"
+                size="small"
+                className={styles.copyButton}
+                onClick={handleCopy}
+                leading={<IconCopyOutline width={20} height={20} />}
+              />
+            </Tooltip>
+          )}
           <JsonEditor
             key={resetKey}
             data={data}
@@ -313,6 +324,8 @@ export const JsonViewer: FC<JsonViewerProps> = ({
       resetKey,
       searchFilter,
       searchText,
+      showCopyButton,
+      showFilters,
       showSearch,
       stringTruncate,
       styles.controls,
@@ -324,7 +337,6 @@ export const JsonViewer: FC<JsonViewerProps> = ({
       styles.jsonEditorContainer,
       styles.jsonViewer,
       styles.leftControls,
-      styles.rightControls,
       styles.searchClear,
       styles.searchIcon,
       styles.searchInput,

@@ -1,3 +1,4 @@
+import React from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import { JsonViewer } from "./json-viewer";
 
@@ -108,6 +109,8 @@ const meta: Meta<typeof JsonViewer> = {
     data: { control: "object" },
     viewOnly: { control: "boolean" },
     showSearch: { control: "boolean" },
+    showFilters: { control: "boolean" },
+    showCopyButton: { control: "boolean" },
     minHeight: { control: "number" },
     maxHeight: { control: "number" },
     fontSize: { control: "number" },
@@ -285,5 +288,60 @@ export const WithStringTruncation: Story = {
     maxHeight: 500,
     fontSize: 14,
     stringTruncate: 80,
+  },
+};
+
+export const WithoutCopyButton: Story = {
+  args: {
+    data: simpleData,
+    viewOnly: true,
+    showSearch: true,
+    showCopyButton: false,
+    minHeight: 400,
+    maxHeight: 400,
+    fontSize: 14,
+  },
+};
+
+export const WithoutFilters: Story = {
+  args: {
+    data: sampleTaskData,
+    viewOnly: true,
+    showSearch: true,
+    showFilters: false,
+    minHeight: 500,
+    maxHeight: 500,
+    fontSize: 14,
+    customFilters: [
+      {
+        id: "data",
+        label: "Data",
+        filterFn: (nodeData) => {
+          const path = nodeData.path;
+          return path && (path.includes("data") || path[0] === "data");
+        },
+      },
+      {
+        id: "annotations",
+        label: "Annotations",
+        filterFn: (nodeData) => {
+          const path = nodeData.path;
+          return path && path.includes("annotations");
+        },
+      },
+    ],
+  },
+};
+
+export const MinimalControls: Story = {
+  args: {
+    data: simpleData,
+    viewOnly: true,
+    showSearch: false,
+    showFilters: false,
+    showCopyButton: false,
+    minHeight: 400,
+    maxHeight: 400,
+    fontSize: 14,
   },
 };

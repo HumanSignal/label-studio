@@ -5,14 +5,31 @@ export interface FilterConfig {
 }
 
 export interface JsonViewerProps {
+  // Core data
   /** JSON data to display */
   data: any;
+
+  // Behavior
   /** Read-only mode */
   viewOnly?: boolean;
+
+  // UI Controls visibility
   /** Show/hide search bar */
   showSearch?: boolean;
+  /** Show/hide filter buttons */
+  showFilters?: boolean;
+  /** Show/hide copy JSON button */
+  showCopyButton?: boolean;
+
+  // Features
   /** Optional custom filter buttons */
   customFilters?: FilterConfig[];
+  /** Threshold (in characters) for showing Reader View button on strings. Set to 0 to disable. Default: 100 */
+  readerViewThreshold?: number;
+  /** Storage key for localStorage persistence of filters and search state */
+  storageKey?: string;
+
+  // Display settings
   /** Container min height */
   minHeight?: string | number;
   /** Container max height */
@@ -21,12 +38,12 @@ export interface JsonViewerProps {
   fontSize?: string | number;
   /** Number of characters before truncating strings (click to expand) */
   stringTruncate?: number;
-  /** Callback when copy is triggered */
-  onCopy?: () => void;
+
+  // Styling
   /** Additional CSS classes */
   className?: string;
-  /** Threshold (in characters) for showing Reader View button on strings. Set to 0 to disable. Default: 100 */
-  readerViewThreshold?: number;
-  /** Storage key for localStorage persistence of filters and search state */
-  storageKey?: string;
+
+  // Callbacks
+  /** Callback when copy is triggered */
+  onCopy?: () => void;
 }

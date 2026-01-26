@@ -48,7 +48,7 @@
 .filterLabel {
   display: flex;
   align-items: center;
-  gap: var(--spacing-tighter);
+  gap: var(--spacing-tightest);
   color: var(--color-neutral-content-subtle);
   font-size: var(--font-size-small);
   font-weight: var(--font-weight-medium);
@@ -206,19 +206,28 @@
 
     // Override JSON value colors
     // Using !important to ensure our theme overrides the default
-    .jer-value-string {
+    // Using multiple selectors to increase specificity for Storybook compatibility
+    .jer-value-string,
+    .jer-value-string span,
+    .jer-value-string div {
       color: var(--json-viewer-color-string) !important;
     }
 
-    .jer-value-number {
+    .jer-value-number,
+    .jer-value-number span,
+    .jer-value-number div {
       color: var(--json-viewer-color-number) !important;
     }
 
-    .jer-value-boolean {
+    .jer-value-boolean,
+    .jer-value-boolean span,
+    .jer-value-boolean div {
       color: var(--json-viewer-color-boolean) !important;
     }
 
-    .jer-value-null {
+    .jer-value-null,
+    .jer-value-null span,
+    .jer-value-null div {
       color: var(--json-viewer-color-null) !important;
     }
 
@@ -227,12 +236,16 @@
     }
 
     // Override key colors
-    .jer-key-text {
+    .jer-key-text,
+    .jer-key-text span,
+    .jer-key-text div {
       color: var(--json-viewer-color-keys) !important;
     }
 
     // Override bracket colors
-    .jer-brackets {
+    .jer-brackets,
+    .jer-brackets span,
+    .jer-brackets div {
       color: var(--json-viewer-color-brackets) !important;
     }
 
