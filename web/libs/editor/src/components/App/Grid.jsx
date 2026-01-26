@@ -178,7 +178,6 @@ export default class Grid extends Component {
               <div id={`c-${c.id}`} key={`anno-${c.id}`} style={{ position: "relative" }}>
                 <EntityTab
                   entity={c}
-                  onClick={() => this.select(c)}
                   prediction={c.type === "prediction"}
                   bordered={false}
                   style={{ height: 44 }}
@@ -207,12 +206,7 @@ export default class Grid extends Component {
             ))}
           {isRenderingNext && (
             <div id={"c-tmp"} key={"anno-tmp"} style={{ opacity: 0, position: "relative", right: 99999 }}>
-              <EntityTab
-                entity={selected}
-                prediction={selected.type === "prediction"}
-                bordered={false}
-                style={{ height: 44 }}
-              />
+              <EntityTab entity={selected} prediction={selected.type === "prediction"} bordered={false} style={{ height: 44 }} />
               <Item root={this.props.root} onFinish={this.onFinish} key={i} annotation={selected} />
             </div>
           )}

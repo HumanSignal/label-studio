@@ -11,18 +11,23 @@ export const EntityTab = observer(
     ({ entity, selected, style, onClick, bordered = true, prediction = false, displayGroundTruth = false }, ref) => {
       const isUnsaved = (entity.userGenerate && !entity.sentUserGenerate) || entity.draftSelected;
       const infoIsHidden = entity.store.hasInterface("annotations:hide-info");
+      const isInteractive = !!onClick;
 
       return (
         <div
           ref={ref}
           data-annotation-id={entity.pk ?? entity.id}
-          className={cn("entity-tab").mod({ selected, bordered }).toClassName()}
+          className={cn("entity-tab").mod({ selected, bordered, interactive: isInteractive }).toClassName()}
           style={style}
-          onClick={(e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            onClick?.(entity, prediction);
-          }}
+          onClick={
+            isInteractive
+              ? (e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  onClick(entity, prediction);
+                }
+              : undefined
+          }
         >
           <Space size="small">
             <Userpic
