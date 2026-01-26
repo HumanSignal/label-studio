@@ -383,7 +383,9 @@ def _bulk_update_user_activities(activities: List[dict]) -> dict:
             # Get existing users
             User = get_user_model()
             user_ids = [activity['user_id'] for activity in activities]
-            existing_users = User.objects.filter(id__in=user_ids).only('id', 'last_activity')
+            existing_users = (
+                User.objects.select_for_update(skip_locked=True).filter(id__in=user_ids).only('id', 'last_activity')
+            )
             user_dict = {user.id: user for user in existing_users}
 
             # Update activities

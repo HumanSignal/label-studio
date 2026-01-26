@@ -458,17 +458,22 @@ export class PointCreationManager {
     if (!this.props) return null;
 
     // Determine the active point ID to connect from
-    let finalPrevPointId = prevPointId;
+    // If prevPointId is explicitly provided (not undefined), use it
+    // Otherwise, check activePointId first (works for both skeleton and non-skeleton mode)
+    let finalPrevPointId: string | undefined = prevPointId;
 
+    // If prevPointId is not provided or is empty, check activePointId
     if (!finalPrevPointId) {
-      if (this.props.skeletonEnabled && this.props.activePointId) {
-        // In skeleton mode: always connect to the active point
+      if (this.props.activePointId) {
+        // Use activePointId if available (works for both skeleton and non-skeleton mode)
+        // In skeleton mode: can be any point
+        // In non-skeleton mode: should be first or last point
         finalPrevPointId = this.props.activePointId;
       } else if (this.props.skeletonEnabled && this.props.lastAddedPointId) {
-        // Fallback to lastAddedPointId for backward compatibility
+        // Fallback to lastAddedPointId for backward compatibility (skeleton mode only)
         finalPrevPointId = this.props.lastAddedPointId;
       } else if (this.props.initialPoints.length > 0) {
-        // Normal mode: use last point in array
+        // Normal mode fallback: use last point in array
         finalPrevPointId = this.props.initialPoints[this.props.initialPoints.length - 1].id;
       }
     }
@@ -509,14 +514,16 @@ export class PointCreationManager {
     // Determine the active point ID to connect from
     let prevPointId: string | undefined;
 
-    if (this.props.skeletonEnabled && this.props.activePointId) {
-      // In skeleton mode: always connect to the active point
+    if (this.props.activePointId) {
+      // Use activePointId if available (works for both skeleton and non-skeleton mode)
+      // In skeleton mode: can be any point
+      // In non-skeleton mode: should be first or last point
       prevPointId = this.props.activePointId;
     } else if (this.props.skeletonEnabled && this.props.lastAddedPointId) {
-      // Fallback to lastAddedPointId for backward compatibility
+      // Fallback to lastAddedPointId for backward compatibility (skeleton mode only)
       prevPointId = this.props.lastAddedPointId;
     } else if (this.props.initialPoints.length > 0) {
-      // Normal mode: use last point in array
+      // Normal mode fallback: use last point in array
       prevPointId = this.props.initialPoints[this.props.initialPoints.length - 1].id;
     }
 
@@ -581,14 +588,16 @@ export class PointCreationManager {
     let finalPrevPointId = prevPointId;
 
     if (!finalPrevPointId) {
-      if (this.props.skeletonEnabled && this.props.activePointId) {
-        // In skeleton mode: always connect to the active point
+      if (this.props.activePointId) {
+        // Use activePointId if available (works for both skeleton and non-skeleton mode)
+        // In skeleton mode: can be any point
+        // In non-skeleton mode: should be first or last point
         finalPrevPointId = this.props.activePointId;
       } else if (this.props.skeletonEnabled && this.props.lastAddedPointId) {
-        // Fallback to lastAddedPointId for backward compatibility
+        // Fallback to lastAddedPointId for backward compatibility (skeleton mode only)
         finalPrevPointId = this.props.lastAddedPointId;
       } else if (this.props.initialPoints.length > 0) {
-        // Normal mode: use last point in array
+        // Normal mode fallback: use last point in array
         finalPrevPointId = this.props.initialPoints[this.props.initialPoints.length - 1].id;
       }
     }
