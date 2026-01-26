@@ -274,6 +274,10 @@ export const Tab = types
       self.title = title;
     },
 
+    setVirtual(value) {
+      self.virtual = value;
+    },
+
     setRenameMode(mode) {
       self.renameMode = mode;
       if (self.renameMode) self.oldTitle = self.title;
@@ -508,9 +512,19 @@ export const Tab = types
     }),
 
     saveVirtual: flow(function* (options) {
-      self.virtual = false;
-      yield self.save(options);
-      History.navigate({ tab: self.id }, true);
+      const originalId = self.id;
+      self.setVirtual(false);
+      const newView = yield self.save(options);
+
+      // If a new view was created (different ID), the old view is destroyed
+      // Use the new view for navigation
+      if (newView && newView.id !== originalId) {
+        History.navigate({ tab: newView.id }, true);
+      } else {
+        // Same view, ensure virtual is false
+        self.setVirtual(false);
+        History.navigate({ tab: self.id }, true);
+      }
     }),
 
     delete: flow(function* () {
