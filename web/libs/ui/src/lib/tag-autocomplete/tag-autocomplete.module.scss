@@ -19,26 +19,21 @@
   }
 
   &:focus-within:not(.triggerDisabled) {
-    border-color: var(--color-primary-emphasis, #0066cc);
-    box-shadow: 0 0 0 2px var(--color-primary-surface, rgba(0, 102, 204, 0.1));
+    border-color: var(--color-primary-emphasis, #06c);
+    box-shadow: 0 0 0 2px var(--color-primary-surface, rgb(0 102 204 / 10%));
     outline: none;
   }
 }
 
 .triggerOpen {
-  border-color: var(--color-primary-emphasis, #0066cc);
-  box-shadow: 0 0 0 2px var(--color-primary-surface, rgba(0, 102, 204, 0.1));
+  border-color: var(--color-primary-emphasis, #06c);
+  box-shadow: 0 0 0 2px var(--color-primary-surface, rgb(0 102 204 / 10%));
 }
 
 .triggerDisabled {
   background: var(--color-neutral-surface-inset, #f5f5f5);
   cursor: not-allowed;
   opacity: 0.6;
-}
-
-// Default size (medium)
-.trigger {
-  min-height: 40px;
 }
 
 // Tags container (multiline, with wrapping)
@@ -55,6 +50,7 @@
 .tagFocused {
   outline: none !important;
   border-color: var(--color-primary-border-subtle) !important;
+
   // Remove the ring offset so it looks like a border
   box-shadow: none !important;
 }
