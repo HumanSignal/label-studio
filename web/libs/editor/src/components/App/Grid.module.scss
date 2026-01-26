@@ -28,6 +28,7 @@ $gap: 30px;
   position: relative;
   flex-grow: 1;
   min-width: 0; // famous flex hack to prevent block from growing enormously
+  margin-top: var(--spacing-tight);
 
   &::before, &::after {
     content: '';
