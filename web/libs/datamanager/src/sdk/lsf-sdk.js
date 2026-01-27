@@ -406,14 +406,11 @@ export class LSFWrapper {
       this.task.overlap_reached_message ||
       "Annotation overlap has been reached for this task. Your draft is preserved but cannot be submitted.";
 
-    if (overlapReached) {
-      // Disable submission-related interfaces
-      this.lsf.toggleInterface("submit", false);
-      this.lsf.toggleInterface("update", false);
-      this.lsf.toggleInterface("skip", false);
-      // Keep navigation enabled - users must be able to move to next task
-      // The Next/Prev buttons should remain functional
-    }
+    // Set overlap state on LSF store - this will disable buttons with tooltips
+    this.lsf.setFlags({
+      overlapReached,
+      overlapReachedMessage: this.overlapReachedMessage,
+    });
 
     this.lsf.assignTask(task);
     this.lsf.initializeStore(lsfTask);
@@ -655,9 +652,14 @@ export class LSFWrapper {
         // Also update local state for overlap reached
         if (displayReason === "OVERLAP_REACHED") {
           this.overlapReached = true;
-          this.lsf.toggleInterface("submit", false);
-          this.lsf.toggleInterface("update", false);
-          this.lsf.toggleInterface("skip", false);
+          this.overlapReachedMessage =
+            result?.response?.detail ||
+            "Annotation overlap has been reached for this task. Your draft is preserved but cannot be submitted.";
+          // Set overlap state on LSF store - this will disable buttons with tooltips
+          this.lsf.setFlags({
+            overlapReached: true,
+            overlapReachedMessage: this.overlapReachedMessage,
+          });
         }
         return;
       }

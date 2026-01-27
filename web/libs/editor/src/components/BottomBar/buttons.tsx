@@ -106,9 +106,14 @@ export const SkipButton = memo(
     const userRole = (window as any).APP_SETTINGS?.user?.role;
     const hasForceSkipPermission = MANAGER_ROLES.includes(userRole);
     const canSkip = !skipDisabled || hasForceSkipPermission;
-    const isDisabled = disabled || !canSkip;
+    const overlapReached = store.overlapReached === true;
+    const isDisabled = disabled || !canSkip || overlapReached;
 
-    const tooltip: string = canSkip ? "Cancel (skip) task [ Ctrl+Space ]" : "This task cannot be skipped";
+    const tooltip: string = overlapReached
+      ? store.overlapReachedMessage
+      : canSkip
+        ? "Cancel (skip) task [ Ctrl+Space ]"
+        : "This task cannot be skipped";
 
     const showInfoIcon = skipDisabled && hasForceSkipPermission;
 

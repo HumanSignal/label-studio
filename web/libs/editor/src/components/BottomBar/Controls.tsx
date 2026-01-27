@@ -195,7 +195,9 @@ export const Controls = controlsInjector<{ annotation: MSTAnnotation }>(
         buttons.push(<SkipButton key="skip" disabled={disabled} store={store} onSkipWithComment={onSkipWithComment} />);
       }
 
-      const isDisabled = disabled || submitDisabled;
+      // Also disable when overlap is reached
+      const overlapDisabled = store.overlapReached === true;
+      const isDisabled = disabled || submitDisabled || overlapDisabled;
 
       const useExitOption = !isDisabled && isNotQuickView;
 
@@ -241,7 +243,11 @@ export const Controls = controlsInjector<{ annotation: MSTAnnotation }>(
       };
 
       if (userGenerate || (store.explore && !userGenerate && store.hasInterface("submit"))) {
-        const title = submitDisabled ? EMPTY_SUBMIT_TOOLTIP : "Save results: [ Ctrl+Enter ]";
+        const title = overlapDisabled
+          ? store.overlapReachedMessage
+          : submitDisabled
+            ? EMPTY_SUBMIT_TOOLTIP
+            : "Save results: [ Ctrl+Enter ]";
 
         buttons.push(
           <ButtonTooltip key="submit" title={title}>
@@ -291,8 +297,13 @@ export const Controls = controlsInjector<{ annotation: MSTAnnotation }>(
         // no changes were made over previously submitted version — no drafts, no pending changes
         const noChanges = isFF(FF_REVIEWER_FLOW) && !history.canUndo && !annotation.draftId;
         const isUpdateDisabled = isDisabled || noChanges;
+        const updateTitle = overlapDisabled
+          ? store.overlapReachedMessage
+          : noChanges
+            ? "No changes were made"
+            : "Update this task: [ Ctrl+Enter ]";
         const button = (
-          <ButtonTooltip key="update" title={noChanges ? "No changes were made" : "Update this task: [ Ctrl+Enter ]"}>
+          <ButtonTooltip key="update" title={updateTitle}>
             <ButtonGroup>
               <Button
                 aria-label="submit"
