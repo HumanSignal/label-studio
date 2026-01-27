@@ -115,6 +115,12 @@ export class LSFWrapper {
     this.interfacesModifier = interfacesModifier;
     this.isInteractivePreannotations = isInteractivePreannotations ?? false;
 
+    // Listen for overlap error modal events
+    this.handleOverlapNextTask = () => this.loadTask();
+    this.handleOverlapCloseTask = () => this.closeTask();
+    window.addEventListener("overlap-error-next-task", this.handleOverlapNextTask);
+    window.addEventListener("overlap-error-close-task", this.handleOverlapCloseTask);
+
     let interfaces = [...DEFAULT_INTERFACES];
 
     if (this.project.enable_empty_annotation === false) {
@@ -643,7 +649,8 @@ export class LSFWrapper {
     } else if (status !== undefined) {
       // Skip toast for errors that are handled by global modal handlers via display_context
       // These errors bubble up to ApiProvider which shows appropriate modals
-      const displayReason = result?.display_context?.reason;
+      // Note: display_context is in result.response for API error responses
+      const displayReason = result?.response?.display_context?.reason;
       if (displayReason === "PAUSED" || displayReason === "OVERLAP_REACHED") {
         // Also update local state for overlap reached
         if (displayReason === "OVERLAP_REACHED") {
@@ -731,7 +738,7 @@ export class LSFWrapper {
           body: serializedAnnotation,
         },
         // errors are displayed by "toast" event - we don't want to show blocking modal
-        { errorHandler: errorHandlerAllowPaused },
+        { errorHandler: errorHandlerAllowSpecialErrors },
       );
     });
     const status = result?.$meta?.status;
@@ -1152,8 +1159,20 @@ export class LSFWrapper {
   }
 
   destroy() {
+    // Clean up overlap error event listeners
+    window.removeEventListener("overlap-error-next-task", this.handleOverlapNextTask);
+    window.removeEventListener("overlap-error-close-task", this.handleOverlapCloseTask);
+
     this.lsfInstance?.destroy?.();
     this.lsfInstance = null;
+  }
+
+  /**
+   * Close the current task panel (for DataManager context)
+   */
+  closeTask() {
+    // Invoke the data manager's close task action
+    this.datamanager.invoke("closeTask");
   }
 
   get taskID() {
