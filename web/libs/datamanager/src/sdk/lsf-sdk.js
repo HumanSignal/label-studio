@@ -118,8 +118,10 @@ export class LSFWrapper {
     // Listen for overlap error modal events
     this.handleOverlapNextTask = () => this.loadTask();
     this.handleOverlapCloseTask = () => this.closeTask();
+    this.handleOverlapExitStream = () => this.exitStream();
     window.addEventListener("overlap-error-next-task", this.handleOverlapNextTask);
     window.addEventListener("overlap-error-close-task", this.handleOverlapCloseTask);
+    window.addEventListener("overlap-error-exit-stream", this.handleOverlapExitStream);
 
     let interfaces = [...DEFAULT_INTERFACES];
 
@@ -1164,6 +1166,7 @@ export class LSFWrapper {
     // Clean up overlap error event listeners
     window.removeEventListener("overlap-error-next-task", this.handleOverlapNextTask);
     window.removeEventListener("overlap-error-close-task", this.handleOverlapCloseTask);
+    window.removeEventListener("overlap-error-exit-stream", this.handleOverlapExitStream);
 
     this.lsfInstance?.destroy?.();
     this.lsfInstance = null;
