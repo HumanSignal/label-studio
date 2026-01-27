@@ -2,20 +2,20 @@ import { useLayoutEffect, useRef, useState } from "react";
 
 interface UseBadgeOverflowProps {
   enabled: boolean;
-  badgesContainerRef: React.RefObject<HTMLSpanElement>;
-  triggerRef: React.RefObject<HTMLDivElement>;
-  selectedOptionsCount: number;
+  containerRef: React.RefObject<HTMLDivElement>;
+  itemCount: number;
 }
 
 /**
  * Custom hook to calculate badge overflow and determine how many badges should be visible
  * Returns the number of badges that fit in the available space, or null if all fit
+ * 
+ * This is a self-contained version that measures its own container width
  */
 export const useBadgeOverflow = ({
   enabled,
-  badgesContainerRef,
-  triggerRef,
-  selectedOptionsCount,
+  containerRef,
+  itemCount,
 }: UseBadgeOverflowProps): number | null => {
   const [visibleBadgeCount, setVisibleBadgeCount] = useState<number | null>(null);
   const isCalculatingRef = useRef<boolean>(false);
@@ -39,9 +39,8 @@ export const useBadgeOverflow = ({
       // Prevent recursive calculations
       if (isCalculatingRef.current) return;
 
-      const container = badgesContainerRef.current;
-      const trigger = triggerRef.current;
-      if (!container || !trigger) return;
+      const container = containerRef.current;
+      if (!container) return;
 
       // Get all badge elements (excluding the +n badge if it exists)
       const badges = Array.from(container.children).filter(
@@ -52,10 +51,7 @@ export const useBadgeOverflow = ({
 
       isCalculatingRef.current = true;
 
-      // With visibility:hidden + position:absolute, badges are always measurable
-      // No need to temporarily show them
-
-      // Get available width from the badges container itself (most accurate)
+      // Get available width from the container itself
       const containerWidth = container.offsetWidth;
       const availableWidth = containerWidth;
 
@@ -106,7 +102,7 @@ export const useBadgeOverflow = ({
         lastVisibleCountRef.current = newVisibleCount;
 
         // Temporarily disconnect MutationObserver to prevent it from seeing our changes
-        const shouldReconnect = mutationObserverRef.current && badgesContainerRef.current;
+        const shouldReconnect = mutationObserverRef.current && containerRef.current;
         if (shouldReconnect) {
           mutationObserverRef.current?.disconnect();
         }
@@ -116,8 +112,8 @@ export const useBadgeOverflow = ({
         // Reconnect after state update
         if (shouldReconnect) {
           requestAnimationFrame(() => {
-            if (mutationObserverRef.current && badgesContainerRef.current) {
-              mutationObserverRef.current.observe(badgesContainerRef.current, {
+            if (mutationObserverRef.current && containerRef.current) {
+              mutationObserverRef.current.observe(containerRef.current, {
                 childList: true,
                 subtree: false,
               });
@@ -135,13 +131,13 @@ export const useBadgeOverflow = ({
     });
 
     // Watch for badge additions/removals (for async data)
-    let lastChildCount = badgesContainerRef.current?.children.length || 0;
+    let lastChildCount = containerRef.current?.children.length || 0;
     mutationObserverRef.current = new MutationObserver((mutations) => {
       // Only react to actual child node additions/removals, not attribute changes
       const hasChildListChange = mutations.some((mutation) => mutation.type === "childList");
       if (!hasChildListChange) return;
 
-      const currentChildCount = badgesContainerRef.current?.children.length || 0;
+      const currentChildCount = containerRef.current?.children.length || 0;
       // Only recalculate if the number of children actually changed
       if (currentChildCount === lastChildCount) return;
 
@@ -158,14 +154,14 @@ export const useBadgeOverflow = ({
       }, 100); // 100ms debounce
     });
 
-    if (badgesContainerRef.current) {
-      mutationObserverRef.current.observe(badgesContainerRef.current, {
+    if (containerRef.current) {
+      mutationObserverRef.current.observe(containerRef.current, {
         childList: true,
         subtree: false,
       });
     }
 
-    // Recalculate on resize - observe both trigger and badges container
+    // Recalculate on resize - observe container only
     const resizeObserver = new ResizeObserver(() => {
       // Debounce resize calculations
       if (calculationTimeoutRef.current) {
@@ -178,11 +174,8 @@ export const useBadgeOverflow = ({
       }, 100); // 100ms debounce
     });
 
-    if (triggerRef.current) {
-      resizeObserver.observe(triggerRef.current);
-    }
-    if (badgesContainerRef.current) {
-      resizeObserver.observe(badgesContainerRef.current);
+    if (containerRef.current) {
+      resizeObserver.observe(containerRef.current);
     }
 
     return () => {
@@ -192,7 +185,7 @@ export const useBadgeOverflow = ({
         clearTimeout(calculationTimeoutRef.current);
       }
     };
-  }, [enabled, badgesContainerRef, triggerRef, selectedOptionsCount]);
+  }, [enabled, containerRef, itemCount]);
 
   return visibleBadgeCount;
 };

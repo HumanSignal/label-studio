@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import { Select } from "./select";
+import { BadgeGroup } from "../badge-group";
 
 const thousandOptions = (() => {
   return Array.from({ length: 1000 }, (_, i) => `Option ${i}`);
@@ -193,10 +194,9 @@ export const WithCustomRenderSelected: Story = {
 export const MultipleWithBadges: Story = {
   render: () => {
     return (
-      <div style={{ width: "350px", border: "1px dashed #ccc", padding: "8px" }}>
+      <div className="w-[350px] border border-dashed border-neutral-border p-tight">
         <Select
           multiple
-          renderAsBadges
           searchable
           value={["javascript", "react", "typescript", "vue", "angular"]}
           options={[
@@ -210,6 +210,19 @@ export const MultipleWithBadges: Story = {
             { value: "django", label: "Django" },
           ]}
           placeholder="Choose technologies..."
+          renderSelected={(selectedOptions) => {
+            if (!selectedOptions || selectedOptions.length === 0) return null;
+            return (
+              <BadgeGroup
+                items={selectedOptions.map((opt: any) => ({
+                  id: opt?.value ?? opt,
+                  label: opt?.label ?? opt?.value ?? opt,
+                }))}
+                variant="info"
+                shape="squared"
+              />
+            );
+          }}
         />
       </div>
     );

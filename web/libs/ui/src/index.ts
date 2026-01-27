@@ -5,6 +5,7 @@ export * from "./lib/ThemeToggle/ThemeToggle";
 export * from "./lib/Tooltip/Tooltip";
 export * from "./lib/Userpic/Userpic";
 export * from "./lib/badge/badge";
+export * from "./lib/badge-group";
 export * from "./lib/button/button";
 export * from "./lib/callout/callout";
 export * from "./lib/checkbox/checkbox";

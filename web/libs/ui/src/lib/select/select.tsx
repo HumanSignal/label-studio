@@ -10,7 +10,7 @@ import {
 } from "@humansignal/shad/components/ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "@humansignal/shad/components/ui/popover";
 import type { SelectOption, OptionProps, SelectProps } from "./types.ts";
-import { Checkbox, Label, Badge } from "@humansignal/ui";
+import { Checkbox, Label } from "@humansignal/ui";
 import { isDefined } from "@humansignal/core/lib/utils/helpers";
 import { IconChevron, IconChevronDown } from "@humansignal/icons";
 import clsx from "clsx";
@@ -18,7 +18,6 @@ import styles from "./select.module.scss";
 import { cnm } from "../../utils/utils";
 import { VariableSizeList } from "react-window";
 import InfiniteLoader from "react-window-infinite-loader";
-import { useBadgeOverflow } from "./useBadgeOverflow";
 
 const VARIABLE_LIST_ITEM_HEIGHT = 40;
 const VARIABLE_LIST_COUNT_RENDERED = 5;
@@ -84,7 +83,6 @@ export const Select = forwardRef(
       selectedValueRenderer,
       selectFirstIfEmpty,
       renderSelected,
-      renderAsBadges = false,
       isVirtualList = false,
       loadMore,
       pageSize = VARIABLE_LIST_PAGE_SIZE,
@@ -99,7 +97,6 @@ export const Select = forwardRef(
   ) => {
     const ref = _ref ?? useRef<HTMLSelectElement>();
     const triggerRef = useRef<HTMLDivElement>(null);
-    const badgesContainerRef = useRef<HTMLSpanElement>(null);
     const [query, setQuery] = useState<string>(defaultSearchValue);
     const valueRef = useRef<any>();
     let initialValue = defaultValue?.value ?? defaultValue ?? externalValue?.value ?? externalValue;
@@ -183,23 +180,8 @@ export const Select = forwardRef(
     );
 
     const flatOptions = useMemo(() => {
-      const flat = options.flatMap((option) => option?.children ?? option);
-
-      // For multiple selects with badges, ensure selected values are always in flatOptions
-      // This handles cases where parent component might temporarily not include selected items
-      if (multiple && renderAsBadges && value && Array.isArray(value)) {
-        const flatValues = flat.map((opt) => opt?.value ?? opt);
-        const missingValues = value.filter((val) => !flatValues.includes(val));
-
-        if (missingValues.length > 0) {
-          // Add missing selected values as simple options
-          const missingOptions = missingValues.map((val) => val);
-          return [...flat, ...missingOptions];
-        }
-      }
-
-      return flat;
-    }, [options, multiple, renderAsBadges, value]);
+      return options.flatMap((option) => option?.children ?? option);
+    }, [options]);
 
     const _options = useMemo(() => {
       if (!searchable || !query.trim()) return options;
@@ -239,14 +221,6 @@ export const Select = forwardRef(
       return Array.from(uniqueSelected.values());
     }, [flatOptions, isSelected, value, multiple]);
 
-    // Use custom hook to calculate badge overflow
-    const visibleBadgeCount = useBadgeOverflow({
-      enabled: renderAsBadges && multiple,
-      badgesContainerRef,
-      triggerRef,
-      selectedOptionsCount: selectedOptions.length,
-    });
-
     const onSearchInputHandler = useCallback(
       (e: React.ChangeEvent<HTMLInputElement>) => {
         const val = e.target.value;
@@ -270,26 +244,12 @@ export const Select = forwardRef(
               {selectedOptions?.map((option, index) => {
                 if (selectedValueRenderer) {
                   return (
-                    <React.Fragment key={`${option?.value}_${index}`}>{selectedValueRenderer(option)}</React.Fragment>
+                    <React.Fragment key={`${option?.value}_${index}`}>
+                      {selectedValueRenderer(option)}
+                    </React.Fragment>
                   );
                 }
                 const optionValue = option?.value ?? option;
-
-                // Render as badges if renderAsBadges is true and multiple is true
-                if (renderAsBadges && multiple) {
-                  const shouldHide = visibleBadgeCount !== null && index >= visibleBadgeCount;
-
-                  return (
-                    <Badge
-                      key={`${optionValue}_${index}`}
-                      variant="info"
-                      shape="squared"
-                      style={shouldHide ? { visibility: "hidden", position: "absolute" } : undefined}
-                    >
-                      {option?.label ?? optionValue}
-                    </Badge>
-                  );
-                }
 
                 return (
                   <span key={`${optionValue}_${index}`} className="truncate only:w-full">
@@ -297,22 +257,13 @@ export const Select = forwardRef(
                   </span>
                 );
               })}
-              {/* Show +n badge if there are hidden badges */}
-              {renderAsBadges &&
-                multiple &&
-                visibleBadgeCount !== null &&
-                visibleBadgeCount < selectedOptions.length && (
-                  <Badge variant="info" shape="squared" data-overflow-badge="true">
-                    +{selectedOptions.length - visibleBadgeCount}
-                  </Badge>
-                )}
             </>
           ) : (
             <span className="truncate w-full">{props?.placeholder ?? ""}</span>
           )}
         </>
       );
-    }, [selectedOptions, props?.placeholder, selectedValueRenderer, renderAsBadges, multiple, visibleBadgeCount]);
+    }, [selectedOptions, props?.placeholder, selectedValueRenderer]);
 
     const renderedOptions = useMemo(() => {
       return _options.map((option, index) => {
@@ -414,11 +365,7 @@ export const Select = forwardRef(
             {...triggerProps}
           >
             <span
-              ref={badgesContainerRef}
-              className={cnm(
-                "flex text-left gap-2",
-                renderAsBadges && multiple ? styles.badgesContainer : "flex-1 max-w-full overflow-hidden",
-              )}
+              className="flex flex-1 text-left gap-2 max-w-full overflow-hidden"
               data-testid="select-display-value"
             >
               {renderSelected ? renderSelected?.(selectedOptions, props?.placeholder) : displayValue}
