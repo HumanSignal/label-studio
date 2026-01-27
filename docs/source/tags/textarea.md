@@ -56,17 +56,25 @@ To keep submissions unique, you can set `skipDuplicates="true"`. The user will r
 
 ### Example: Ensure users can submit by pressing Enter
 
-If you are trying to optimize your annotation process by speed, you may want to use keyboard shortcuts.
+If you are trying to optimize your annotation process by speed, you may want to use keyboard shortcuts or want to avoid additional clicks.
 
 For that you should note the following:
 
 - If `rows="1"` you can press Enter to submit your text. 
 - If rows > 1, the **Add** button appears. You can click this or press Shift + Enter. 
+- You do not have to add the text (meaning click **Add** or pressing Enter/Shift + Enter) to save your text when you press **Submit**. 
+
+  It is enough to simply enter your text into the input field. You only need to add your text if you want to include multiple submissions from the same TextArea. See the video below. 
+
+<video style="max-width: 600px;" class="gif-border" autoplay loop muted>
+  <source src="/images/tags/textarea-demo.mp4">
+</video>
+
 
 !!! info Tip
-  You can click Control + Enter (Windows) or Command + Enter (Mac) to submit the annotation. 
+    You can click Control + Enter (Windows) or Command + Enter (Mac) to submit the annotation. 
 
-  You can also configure your own [custom hotkeys](/guide/user_account#Set-custom-hotkeys) 
+    You can also configure your own [custom hotkeys](/guide/user_account#Set-custom-hotkeys) 
 
 ```html
 <View>

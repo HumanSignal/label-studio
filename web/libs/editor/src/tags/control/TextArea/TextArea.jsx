@@ -59,16 +59,16 @@ const { TextArea } = Input;
  * @name TextArea
  * @meta_title Textarea Tag for Text areas
  * @meta_description Customize Label Studio with the TextArea tag to support audio transcription, image captioning, and OCR tasks for machine learning and data science projects.
- * @param {string} name                    - Name to identify the TextArea field
- * @param {string} toName                  - Name assigned to the object element that the TextArea is labeling
- * @param {string} [value]                 - A pre-filled default value that can be submitted
- * @param {string=} [placeholder]          - Placeholder text that appears inside the TextArea field, but unlike `value` it cannot be submitted
+ * @param {string} name                    - Name to identify the TextArea
+ * @param {string} toName                  - Name assigned to the object tag that the TextArea is labeling
+ * @param {string} [value]                 - A pre-filled default value that appears within the rendered TextArea field and can be submitted
+ * @param {string=} [placeholder]          - Placeholder text that appears inside the rendered TextArea field, but unlike `value` it cannot be submitted
  * @param {string=} [maxSubmissions]       - Maximum number of submissions
  * @param {boolean=} [editable=false]      - Whether to display an icon that allows the annotator to edit their text after adding it
- * @param {boolean=} [transcription=false] - When set to true and used with `editable="true"`, the TextArea will remain an editable field even after you add your text
- * @param {boolean} [skipDuplicates=false] - Show a pop-up warning and prevent duplicate values. See [the example below](#Example-Enforce-unique-values)
- * @param {tag|region-list} [displayMode=tag] - Display mode for the TextArea field; `region-list` shows it for every region in the Regions pane. See [the example below](#Example-Region-list-TextArea-fields)
- * @param {number} [rows=1]                - Number of rows in the TextArea field. If `1`, you can submit text by pressing Enter. If greater than `1`, you can submit text by clicking **Add** or pressing Shift + Enter
+ * @param {boolean=} [transcription=false] - When set to true and used with `editable="true"`, the TextArea UI will remain an editable field even after you add your text
+ * @param {boolean} [skipDuplicates=false] - When set to true, a pop-up warning will appear and prevent duplicate values. See [the example below](#Example-Enforce-unique-values)
+ * @param {tag|region-list} [displayMode=tag] - Display mode for the TextArea; when set to `region-list` there will be an input field for every region in the Regions panel. See [the example below](#Example-Region-list-TextArea-fields)
+ * @param {number} [rows=1]                - Number of rows in the TextArea input field. If `1`, you can submit text by pressing Enter. If greater than `1`, you can submit text by clicking **Add** or pressing Shift + Enter
  * @param {boolean} [required=false]       - Determine whether content in TextArea is required
  * @param {string} [requiredMessage]       - Message to show if validation fails
  * @param {boolean=} [showSubmitButton]    - Determine whether to show or hide the **Add** button. By default it's hidden if `rows="1"`, and it's visible if there are more than 1 row.
