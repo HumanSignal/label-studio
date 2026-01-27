@@ -634,7 +634,14 @@ export class LSFWrapper {
     } else if (status !== undefined) {
       // Check if this is an overlap_reached error from the API
       // This happens when another annotator completed the task while user was working
-      if (result?.overlap_reached === true || result?.code === "overlap_reached") {
+      // Note: DRF ValidationError wraps values in arrays, so check both formats
+      const isOverlapReached =
+        result?.overlap_reached === true ||
+        result?.overlap_reached?.[0] === true ||
+        result?.code === "overlap_reached" ||
+        result?.code?.[0] === "overlap_reached";
+
+      if (isOverlapReached) {
         this.handleOverlapReachedError(result);
         return;
       }
@@ -671,8 +678,10 @@ export class LSFWrapper {
   handleOverlapReachedError(result) {
     // Update local state
     this.overlapReached = true;
+    // Handle both array format (DRF ValidationError) and plain format
+    const detail = Array.isArray(result?.detail) ? result.detail[0] : result?.detail;
     this.overlapReachedMessage =
-      result?.detail || "Annotation overlap has been reached for this task. Your draft is preserved but cannot be submitted.";
+      detail || "Annotation overlap has been reached for this task. Your draft is preserved but cannot be submitted.";
 
     // Disable submission-related interfaces
     this.lsf.toggleInterface("submit", false);
