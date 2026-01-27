@@ -32,13 +32,22 @@ const resolveLabelStudio = () => {
 };
 
 // Returns true to suppress (swallow) the error, false to bubble to global handler.
-// We allow 403 PAUSED to bubble so the app-level ApiProvider can show the paused modal
-const errorHandlerAllowPaused = (result) => {
+// We allow certain errors to bubble so the app-level ApiProvider can show modals:
+// - 403 PAUSED: User is paused in the project
+// - 400 OVERLAP_REACHED: Annotation overlap limit has been reached
+const errorHandlerAllowSpecialErrors = (result) => {
   const isPaused =
     result?.status === 403 &&
     typeof result?.response === "object" &&
     result?.response?.display_context?.reason === "PAUSED";
-  return !isPaused;
+
+  const isOverlapReached =
+    result?.status === 400 &&
+    typeof result?.response === "object" &&
+    result?.response?.display_context?.reason === "OVERLAP_REACHED";
+
+  // Return false to allow these errors to bubble up to the global handler
+  return !(isPaused || isOverlapReached);
 };
 
 // Support portal URL constants used to construct error reporting links
@@ -632,17 +641,17 @@ export class LSFWrapper {
     if (status === 200 || status === 201) {
       this.datamanager.invoke("toast", { message: successMessage, type: "info" });
     } else if (status !== undefined) {
-      // Check if this is an overlap_reached error from the API
-      // This happens when another annotator completed the task while user was working
-      // Note: DRF ValidationError wraps values in arrays, so check both formats
-      const isOverlapReached =
-        result?.overlap_reached === true ||
-        result?.overlap_reached?.[0] === true ||
-        result?.code === "overlap_reached" ||
-        result?.code?.[0] === "overlap_reached";
-
-      if (isOverlapReached) {
-        this.handleOverlapReachedError(result);
+      // Skip toast for errors that are handled by global modal handlers via display_context
+      // These errors bubble up to ApiProvider which shows appropriate modals
+      const displayReason = result?.display_context?.reason;
+      if (displayReason === "PAUSED" || displayReason === "OVERLAP_REACHED") {
+        // Also update local state for overlap reached
+        if (displayReason === "OVERLAP_REACHED") {
+          this.overlapReached = true;
+          this.lsf.toggleInterface("submit", false);
+          this.lsf.toggleInterface("update", false);
+          this.lsf.toggleInterface("skip", false);
+        }
         return;
       }
 
@@ -670,28 +679,6 @@ export class LSFWrapper {
     }
   }
 
-  /**
-   * Handle overlap_reached error from API
-   * This occurs when the user tries to submit but another annotator completed the task
-   * @private
-   */
-  handleOverlapReachedError(result) {
-    // Update local state
-    this.overlapReached = true;
-    // Handle both array format (DRF ValidationError) and plain format
-    const detail = Array.isArray(result?.detail) ? result.detail[0] : result?.detail;
-    this.overlapReachedMessage =
-      detail || "Annotation overlap has been reached for this task. Your draft is preserved but cannot be submitted.";
-
-    // Disable submission-related interfaces
-    this.lsf.toggleInterface("submit", false);
-    this.lsf.toggleInterface("update", false);
-    this.lsf.toggleInterface("skip", false);
-
-    // Show informational message
-    this.showOverlapReachedMessage();
-  }
-
   /** @private */
   onSubmitAnnotation = async () => {
     // Prevent submission if overlap is reached
@@ -710,7 +697,7 @@ export class LSFWrapper {
           { taskID },
           { body },
           // errors are displayed by "toast" event - we don't want to show blocking modal
-          { errorHandler: errorHandlerAllowPaused },
+          { errorHandler: errorHandlerAllowSpecialErrors },
         );
       },
       false,
@@ -915,7 +902,7 @@ export class LSFWrapper {
           id === undefined ? "submitAnnotation" : "updateAnnotation",
           params,
           options,
-          { errorHandler: errorHandlerAllowPaused },
+          { errorHandler: errorHandlerAllowSpecialErrors },
         );
       },
       true,
