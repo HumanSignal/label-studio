@@ -62,7 +62,6 @@ const { TextArea } = Input;
  * @param {string} name                    - Name to identify the TextArea field
  * @param {string} toName                  - Name assigned to the object element that the TextArea is labeling
  * @param {string} [value]                 - A pre-filled default value that can be submitted
- * @param {string=} [label]                - Label text
  * @param {string=} [placeholder]          - Placeholder text that appears inside the TextArea field, but unlike `value` it cannot be submitted
  * @param {string=} [maxSubmissions]       - Maximum number of submissions
  * @param {boolean=} [editable=false]      - Whether to display an icon that allows the annotator to edit their text after adding it
