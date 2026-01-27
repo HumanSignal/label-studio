@@ -12998,10 +12998,10 @@ koa-compose@^4.1.0:
   resolved "https://registry.yarnpkg.com/koa-compose/-/koa-compose-4.1.0.tgz#507306b9371901db41121c812e923d0d67d3e877"
   integrity sha512-8ODW8TrDuMYvXRwra/Kh7/rJo9BtOfPc6qO8eAfC80CnCvSjSl0bkRM24X6/XBBEyj0v1nRUQ1LyOy3dbqOWXw==
 
-koa@3.0.1, koa@3.0.3, koa@>=3.0.3:
-  version "3.1.1"
-  resolved "https://registry.yarnpkg.com/koa/-/koa-3.1.1.tgz#5550bef74f690412b1f6f2a3cbed851b80ed9809"
-  integrity sha512-KDDuvpfqSK0ZKEO2gCPedNjl5wYpfj+HNiuVRlbhd1A88S3M0ySkdf2V/EJ4NWt5dwh5PXCdcenrKK2IQJAxsg==
+koa@3.0.1, koa@3.0.3:
+  version "3.0.3"
+  resolved "https://registry.yarnpkg.com/koa/-/koa-3.0.3.tgz#40a97b6da0c0d49a704af82db2b3e5a618ed9042"
+  integrity sha512-MeuwbCoN1daWS32/Ni5qkzmrOtQO2qrnfdxDHjrm6s4b59yG4nexAJ0pTEFyzjLp0pBVO80CZp0vW8Ze30Ebow==
   dependencies:
     accepts "^1.3.8"
     content-disposition "~0.5.4"
