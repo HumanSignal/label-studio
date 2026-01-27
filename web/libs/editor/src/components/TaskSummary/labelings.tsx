@@ -167,21 +167,65 @@ export const renderers: Record<string, RendererType> = {
   reactcode: (results, control) => {
     if (!results.length) return null;
 
-    // For ReactCode, control.name is a JSONPath to extract from the result value
-    // Results always have a single entry with the full JSON object
-    const result = results[0];
-    const fullValue = result.value?.reactcode;
+    const MAX_CHIPS = 10;
+    const MAX_TEXT_LENGTH = 30;
 
-    if (!fullValue) return null;
-
-    // Extract value using JSONPath
+    // Extract values from all results using JSONPath
     const jsonPath = control.name;
-    const extracted = JSONPath({ path: jsonPath, json: fullValue, wrap: false });
+    const extractedValues: unknown[] = [];
 
-    // Handle different value types
-    if (extracted === undefined || extracted === null) {
+    for (const result of results) {
+      const fullValue = result.value?.reactcode;
+      if (!fullValue) continue;
+
+      const extracted = JSONPath({ path: jsonPath, json: fullValue, wrap: false });
+      if (extracted !== undefined && extracted !== null) {
+        extractedValues.push(extracted);
+      }
+    }
+
+    if (extractedValues.length === 0) {
       return <span className="text-neutral-content-subtler text-sm">—</span>;
     }
+
+    // Helper to truncate text
+    const truncate = (text: string) => {
+      if (text.length <= MAX_TEXT_LENGTH) return text;
+      return `${text.slice(0, MAX_TEXT_LENGTH)}…`;
+    };
+
+    // Helper to format value for display
+    const formatValue = (value: unknown) => typeof value === "object" ? JSON.stringify(value) : String(value);
+
+    // Single result - display with original formatting logic
+    if (extractedValues.length > 1) {
+      // Multiple results - group by value
+      const groupped: Record<string, unknown[]> = Object.groupBy(extractedValues, formatValue);
+
+      // Check if all groups have exactly 1 item (all unique)
+      const allUnique = Object.values(groupped).every((values) => values.length === 1);
+
+      // Sort by count descending; for unique values, keep the original order
+      const sortedGroups = allUnique
+        ? extractedValues.map((value): [string, unknown[]] => [formatValue(value), [value]])
+        : Object.entries(groupped).sort((a, b) => b[1].length - a[1].length);
+
+      const visibleGroups = sortedGroups.length > MAX_CHIPS ? sortedGroups.slice(0, MAX_CHIPS - 1) : sortedGroups;
+      const hiddenCount = sortedGroups.length - visibleGroups.length;
+
+      return (
+        <span className="flex gap-tighter flex-wrap">
+          {visibleGroups.map(([key, values]) => (
+            <Chip key={key} prefix={allUnique ? undefined : values.length}>
+              {truncate(key)}
+            </Chip>
+          ))}
+          {hiddenCount > 0 && <span className="text-neutral-content-subtle text-sm">+{hiddenCount} more</span>}
+        </span>
+      );
+    }
+
+    const extracted = extractedValues[0];
 
     // Format the value based on its type
     if (typeof extracted === "boolean") {
@@ -200,14 +244,17 @@ export const renderers: Record<string, RendererType> = {
       );
     }
 
-    // For arrays or objects, show a summary
+    // For arrays, show chips
     if (Array.isArray(extracted)) {
       return (
         <span className="flex gap-tighter flex-wrap">
           {extracted.slice(0, 5).map((item, i) => (
+            // biome-ignore lint/suspicious/noArrayIndexKey: static content, won't be reordered
             <Chip key={i}>{typeof item === "object" ? JSON.stringify(item) : String(item)}</Chip>
           ))}
-          {extracted.length > 5 && <span className="text-neutral-content-subtle text-sm">+{extracted.length - 5}</span>}
+          {extracted.length > 5 && (
+            <span className="text-neutral-content-subtle text-sm">+{extracted.length - 5} more</span>
+          )}
         </span>
       );
     }
