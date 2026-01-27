@@ -2457,12 +2457,6 @@
         "type": "string",
         "required": false
       },
-      "label": {
-        "name": "label",
-        "description": "Label text",
-        "type": "string",
-        "required": false
-      },
       "placeholder": {
         "name": "placeholder",
         "description": "Placeholder text that appears inside the TextArea field, but unlike `value` it cannot be submitted",

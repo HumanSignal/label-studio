@@ -5,7 +5,6 @@
 | name | <code>string</code> |  | Name to identify the TextArea field |
 | toName | <code>string</code> |  | Name assigned to the object element that the TextArea is labeling |
 | [value] | <code>string</code> |  | A pre-filled default value that can be submitted |
-| [label] | <code>string</code> |  | Label text |
 | [placeholder] | <code>string</code> |  | Placeholder text that appears inside the TextArea field, but unlike `value` it cannot be submitted |
 | [maxSubmissions] | <code>string</code> |  | Maximum number of submissions |
 | [editable] | <code>boolean</code> | <code>false</code> | Whether to display an icon that allows the annotator to edit their text after adding it |
