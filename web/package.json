@@ -196,7 +196,7 @@
     "jest-util": "30.0.5",
     "jsdoc-to-markdown": "8.0.1",
     "jsdom": "~22.1.0",
-    "koa": ">=3.0.3",
+    "koa": "3.0.3",
     "loader-utils": "^3.2.1",
     "mini-css-extract-plugin": "^2.7.6",
     "nx": "21.4.0",
