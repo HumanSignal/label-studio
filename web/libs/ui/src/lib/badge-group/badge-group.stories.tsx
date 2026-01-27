@@ -273,9 +273,7 @@ export const InTableCell: Story = {
         header: "Tags",
         accessorKey: "tags",
         minSize: 300,
-        cell: ({ row }: any) => (
-          <BadgeGroup items={row.original.tags} variant="info" shape="squared" />
-        ),
+        cell: ({ row }: any) => <BadgeGroup items={row.original.tags} variant="info" shape="squared" />,
       },
     ];
 

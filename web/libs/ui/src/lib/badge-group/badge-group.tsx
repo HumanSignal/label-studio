@@ -24,13 +24,13 @@ export interface BadgeGroupProps {
 
 /**
  * BadgeGroup - Displays a collection of badges with automatic overflow handling
- * 
+ *
  * Automatically calculates how many badges fit in the available width and shows
  * a "+n" badge for any overflowing items. Fully self-contained and reusable.
- * 
+ *
  * @example
  * ```tsx
- * <BadgeGroup 
+ * <BadgeGroup
  *   items={[
  *     { id: 1, label: "Tag 1" },
  *     { id: 2, label: "Tag 2" }
@@ -56,11 +56,7 @@ export const BadgeGroup = forwardRef<HTMLDivElement, BadgeGroupProps>(
     }
 
     return (
-      <div
-        ref={ref || containerRef}
-        className={clsx(styles.container, className)}
-        data-testid={dataTestId}
-      >
+      <div ref={ref || containerRef} className={clsx(styles.container, className)} data-testid={dataTestId}>
         {items.map((item, index) => {
           const shouldHide = visibleBadgeCount !== null && index >= visibleBadgeCount;
 

@@ -9,14 +9,10 @@ interface UseBadgeOverflowProps {
 /**
  * Custom hook to calculate badge overflow and determine how many badges should be visible
  * Returns the number of badges that fit in the available space, or null if all fit
- * 
+ *
  * This is a self-contained version that measures its own container width
  */
-export const useBadgeOverflow = ({
-  enabled,
-  containerRef,
-  itemCount,
-}: UseBadgeOverflowProps): number | null => {
+export const useBadgeOverflow = ({ enabled, containerRef, itemCount }: UseBadgeOverflowProps): number | null => {
   const [visibleBadgeCount, setVisibleBadgeCount] = useState<number | null>(null);
   const isCalculatingRef = useRef<boolean>(false);
   const lastVisibleCountRef = useRef<number | null>(null);

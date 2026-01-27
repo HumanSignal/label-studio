@@ -244,9 +244,7 @@ export const Select = forwardRef(
               {selectedOptions?.map((option, index) => {
                 if (selectedValueRenderer) {
                   return (
-                    <React.Fragment key={`${option?.value}_${index}`}>
-                      {selectedValueRenderer(option)}
-                    </React.Fragment>
+                    <React.Fragment key={`${option?.value}_${index}`}>{selectedValueRenderer(option)}</React.Fragment>
                   );
                 }
                 const optionValue = option?.value ?? option;
@@ -364,10 +362,7 @@ export const Select = forwardRef(
             data-value={value ?? ""}
             {...triggerProps}
           >
-            <span
-              className="flex flex-1 text-left gap-2 max-w-full overflow-hidden"
-              data-testid="select-display-value"
-            >
+            <span className="flex flex-1 text-left gap-2 max-w-full overflow-hidden" data-testid="select-display-value">
               {renderSelected ? renderSelected?.(selectedOptions, props?.placeholder) : displayValue}
             </span>
             {isOpen ? (
