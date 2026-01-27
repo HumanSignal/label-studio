@@ -632,6 +632,13 @@ export class LSFWrapper {
     if (status === 200 || status === 201) {
       this.datamanager.invoke("toast", { message: successMessage, type: "info" });
     } else if (status !== undefined) {
+      // Check if this is an overlap_reached error from the API
+      // This happens when another annotator completed the task while user was working
+      if (result?.overlap_reached === true || result?.code === "overlap_reached") {
+        this.handleOverlapReachedError(result);
+        return;
+      }
+
       const requestId = result?.$meta?.headers?.get("x-ls-request-id");
       const supportUrl = requestId ? `${SUPPORT_URL}?${SUPPORT_URL_REQUEST_ID_PARAM}=${requestId}` : SUPPORT_URL;
 
@@ -654,6 +661,26 @@ export class LSFWrapper {
         type: "error",
       });
     }
+  }
+
+  /**
+   * Handle overlap_reached error from API
+   * This occurs when the user tries to submit but another annotator completed the task
+   * @private
+   */
+  handleOverlapReachedError(result) {
+    // Update local state
+    this.overlapReached = true;
+    this.overlapReachedMessage =
+      result?.detail || "Annotation overlap has been reached for this task. Your draft is preserved but cannot be submitted.";
+
+    // Disable submission-related interfaces
+    this.lsf.toggleInterface("submit", false);
+    this.lsf.toggleInterface("update", false);
+    this.lsf.toggleInterface("skip", false);
+
+    // Show informational message
+    this.showOverlapReachedMessage();
   }
 
   /** @private */
