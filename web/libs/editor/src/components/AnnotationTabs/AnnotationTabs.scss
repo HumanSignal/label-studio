@@ -70,7 +70,7 @@
   display: flex;
   cursor: pointer;
   align-items: center;
-  padding: 9px 11px;
+  padding: var(--spacing-tight);
   box-sizing: border-box;
   margin-bottom: var(--spacing-tight);
   color: var(--color-primary-content);
@@ -112,7 +112,7 @@
     &_prediction {
       color: var(--color-accent-plum-bold);
       background-color: var(--color-accent-plum-subtle);
-      box-shadow: inset 0 0 0 1px rgb(148 75 255 / 15%);
+      box-shadow: inset 0 0 0 1px rgba(var(--color-accent-plum-bolder-raw) / 15%);
     }
   }
 
