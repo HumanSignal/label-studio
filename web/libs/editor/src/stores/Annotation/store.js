@@ -154,8 +154,8 @@ const AnnotationStoreModel = types
       if (!c) return null;
 
       // Only set selected if not in view-all mode OR if explicitly exiting view-all
-      const viewAllTab = typeof window !== "undefined" ? window.localStorage.getItem("view-all-tab") : null;
-      const isInViewAllMode = self.viewingAllAnnotations || viewAllTab === "compare" || viewAllTab === "summary";
+      // Use self.viewingAll as the primary source of truth
+      const isInViewAllMode = self.viewingAll;
 
       if (!isInViewAllMode || options.exitViewAll) {
         c.selected = true;
@@ -192,8 +192,11 @@ const AnnotationStoreModel = types
       const c = selectItem(id, self.annotations, !options.retainHistory, options);
 
       // Set editable based on view-all mode
-      const viewAllTab = typeof window !== "undefined" ? window.localStorage.getItem("view-all-tab") : null;
-      const isInViewAllMode = self.viewingAllAnnotations || viewAllTab === "compare" || viewAllTab === "summary";
+      // Use self.viewingAll as the primary source of truth, which checks:
+      // 1. self.viewingAllAnnotations flag (set when ViewAll component is active)
+      // 2. Whether the interface is available
+      // 3. Whether the store is initialized
+      const isInViewAllMode = self.viewingAll;
 
       if (!isInViewAllMode || options.exitViewAll) {
         c.editable = true;
