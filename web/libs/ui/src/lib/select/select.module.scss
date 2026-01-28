@@ -12,6 +12,7 @@
   text-overflow: ellipsis;
   height: var(--select-trigger-height);
   width: 100%;
+  min-width: 0;
   background: var(--color-neutral-background);
   transition: background 150ms ease-out, border-color 150ms ease-out;
 

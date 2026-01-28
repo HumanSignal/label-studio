@@ -4,6 +4,44 @@ import { HIT_RADIUS } from "../constants";
 import { isPointInHitRadius, stageToImageCoordinates } from "./utils";
 import { closePathBetweenFirstAndLast } from "./drawing";
 import { VectorSelectionTracker } from "../VectorSelectionTracker";
+import type { BezierPoint } from "../types";
+
+/**
+ * Find all endpoint indices based on path structure (prevPointId relationships)
+ * In non-skeleton mode, endpoints are:
+ * 1. Points with no prevPointId (starting points)
+ * 2. Points that are not referenced by any other point's prevPointId (ending points)
+ */
+function getEndpointIndices(points: BezierPoint[]): Set<number> {
+  const endpointIndices = new Set<number>();
+
+  // Create a set of all point IDs that are referenced as prevPointId
+  const referencedPointIds = new Set<string>();
+  points.forEach((point) => {
+    if (point.prevPointId) {
+      referencedPointIds.add(point.prevPointId);
+    }
+  });
+
+  // Find endpoints:
+  // 1. Points with no prevPointId (starting points)
+  // 2. Points that are not referenced by any other point (ending points)
+  points.forEach((point, index) => {
+    if (!point.prevPointId || !referencedPointIds.has(point.id)) {
+      endpointIndices.add(index);
+    }
+  });
+
+  return endpointIndices;
+}
+
+/**
+ * Check if a point at the given index is an endpoint
+ */
+function isEndpoint(pointIndex: number, points: BezierPoint[]): boolean {
+  const endpointIndices = getEndpointIndices(points);
+  return endpointIndices.has(pointIndex);
+}
 
 // Helper function to check if a point click should trigger path closing
 export function shouldClosePathOnPointClick(
@@ -160,6 +198,12 @@ export function handlePointSelection(e: KonvaEventObject<MouseEvent>, props: Eve
 
       // If Cmd/Ctrl is held, add to selection (multi-selection) - this takes priority
       if (e.evt.ctrlKey || e.evt.metaKey) {
+        // Non-skeleton mode: only allow multi-selecting endpoints
+        if (!props.skeletonEnabled && !isEndpoint(i, props.initialPoints)) {
+          // Don't allow selecting non-endpoint points in non-skeleton mode
+          return false;
+        }
+
         const currentSelection = props.selectedPoints;
         const newSelection = new Set(currentSelection);
         newSelection.add(i);
@@ -179,9 +223,18 @@ export function handlePointSelection(e: KonvaEventObject<MouseEvent>, props: Eve
         return true;
       }
 
+      // Non-skeleton mode: only allow selecting endpoints (based on path structure)
+      if (!props.skeletonEnabled && !isEndpoint(i, props.initialPoints)) {
+        // Don't allow selecting non-endpoint points in non-skeleton mode
+        return false;
+      }
+
       // If no Cmd/Ctrl and not skeleton mode, clear multi-selection and select only this point
       // Use tracker for global selection management
       tracker.selectPoints(props.instanceId || "unknown", new Set([i]));
+      // In non-skeleton mode, set activePointId when selecting first or last point
+      // This allows drawing continuation from either endpoint
+      props.setActivePointId?.(point.id);
       // Return true to indicate we handled the selection
       return true;
     }

@@ -68,6 +68,7 @@ export const Select = forwardRef(
       defaultValue,
       searchable,
       searchPlaceholder,
+      defaultSearchValue = "",
       value: externalValue,
       disabled = false,
       multiple = false,
@@ -89,13 +90,14 @@ export const Select = forwardRef(
       itemCount,
       onClose,
       onOpen,
+      footer,
       ...props
     }: SelectProps<T, A>,
     _ref: ForwardedRef<HTMLSelectElement>,
   ) => {
     const ref = _ref ?? useRef<HTMLSelectElement>();
-    const triggerRef = useRef<HTMLDivElement>();
-    const [query, setQuery] = useState<string>("");
+    const triggerRef = useRef<HTMLDivElement>(null);
+    const [query, setQuery] = useState<string>(defaultSearchValue);
     const valueRef = useRef<any>();
     let initialValue = defaultValue?.value ?? defaultValue ?? externalValue?.value ?? externalValue;
     if (selectFirstIfEmpty && !initialValue) {
@@ -129,9 +131,24 @@ export const Select = forwardRef(
       setValue(val);
     }, [selectFirstIfEmpty, options, multiple]);
 
+    const prevIsOpenRef = useRef(false);
     useEffect(() => {
-      if (!isOpen) setQuery("");
-    }, [isOpen]);
+      const wasJustOpened = isOpen && !prevIsOpenRef.current;
+      const wasJustClosed = !isOpen && prevIsOpenRef.current;
+      prevIsOpenRef.current = isOpen;
+
+      if (wasJustOpened) {
+        // When opening, restore search from defaultSearchValue if provided
+        if (defaultSearchValue) {
+          setQuery(defaultSearchValue);
+          // Only trigger onSearch if value is different from current to avoid unnecessary API calls
+          onSearch?.(defaultSearchValue);
+        }
+      } else if (wasJustClosed) {
+        // When closing, reset to defaultSearchValue (or empty if not provided)
+        setQuery(defaultSearchValue || "");
+      }
+    }, [isOpen, defaultSearchValue, onSearch]);
     const _onChange = useCallback(
       (val: string, isSelected: boolean) => {
         if (disabled) return;
@@ -231,6 +248,7 @@ export const Select = forwardRef(
                   );
                 }
                 const optionValue = option?.value ?? option;
+
                 return (
                   <span key={`${optionValue}_${index}`} className="truncate only:w-full">
                     {option?.label ?? optionValue}
@@ -344,10 +362,7 @@ export const Select = forwardRef(
             data-value={value ?? ""}
             {...triggerProps}
           >
-            <span
-              className="flex flex-1 text-left gap-2 max-w-full w-[calc(100%-1rem-0.5rem)]"
-              data-testid="select-display-value"
-            >
+            <span className="flex flex-1 text-left gap-2 max-w-full overflow-hidden" data-testid="select-display-value">
               {renderSelected ? renderSelected?.(selectedOptions, props?.placeholder) : displayValue}
             </span>
             {isOpen ? (
@@ -357,7 +372,7 @@ export const Select = forwardRef(
             )}
           </button>
         </PopoverTrigger>
-        <PopoverContent align="start" data-testid="select-popup" className={contentClassName}>
+        <PopoverContent align="start" data-testid="select-popup" className={cnm("min-w-full", contentClassName)}>
           {isLoading ? (
             <span className={styles.selectLoading} tabIndex={-1}>
               Loading...
@@ -367,6 +382,7 @@ export const Select = forwardRef(
               {searchable && (
                 <CommandInput
                   placeholder={searchPlaceholder ?? "Search"}
+                  value={query}
                   onChangeCapture={onSearchInputHandler}
                   data-testid="select-search-field"
                   autoFocus
@@ -384,9 +400,12 @@ export const Select = forwardRef(
                   {isVirtualList ? (
                     <InfiniteLoader
                       itemCount={itemCount ?? renderedOptions.length}
-                      loadMoreItems={() => loadMore?.()}
+                      loadMoreItems={() => {
+                        loadMore?.();
+                        return Promise.resolve();
+                      }}
                       isItemLoaded={(index) => index < renderedOptions.length}
-                      threshold={pageSize}
+                      threshold={1}
                       minimumBatchSize={pageSize / 2}
                     >
                       {({
@@ -396,15 +415,14 @@ export const Select = forwardRef(
                         onItemsRendered: (params: any) => void;
                         ref: any;
                       }) => {
-                        // Calculate height based on actual item count from flatOptions
-                        // When searching, _options is filtered and flat; when not searching, _options === options (all items)
-                        const actualItemCount = searchable && query.trim() ? _options.length : flatOptions.length;
+                        // Calculate height based on loaded items to prevent premature loading
+                        const actualItemCount = renderedOptions.length;
                         const maxVisibleItems = VARIABLE_LIST_COUNT_RENDERED;
                         const listHeight = Math.min(actualItemCount, maxVisibleItems) * VARIABLE_LIST_ITEM_HEIGHT;
 
                         return (
                           <VariableSizeList
-                            key={renderedOptions.length}
+                            key="virtual-list"
                             itemData={renderedOptions}
                             itemSize={() => VARIABLE_LIST_ITEM_HEIGHT}
                             itemCount={renderedOptions.length}
@@ -412,7 +430,7 @@ export const Select = forwardRef(
                             // width={VARIABLE_LIST_WIDTH}
                             onItemsRendered={onItemsRendered}
                             ref={infiniteLoaderRef}
-                            overscanCount={1}
+                            overscanCount={0}
                           >
                             {({ index, style }) => {
                               return <div style={style}>{renderedOptions[index]}</div>;
@@ -425,6 +443,7 @@ export const Select = forwardRef(
                     renderedOptions
                   )}
                 </CommandGroup>
+                {footer && <div className="px-base py-tight border-t border-neutral-border">{footer}</div>}
               </CommandList>
             </Command>
           )}

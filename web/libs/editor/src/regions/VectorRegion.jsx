@@ -71,7 +71,6 @@ const Model = types
     isDrawing: false,
     vectorRef: null,
     groupRef: null,
-    _justSelected: false,
   }))
   .views((self) => ({
     get store() {
@@ -203,36 +202,6 @@ const Model = types
         self.vectorRef.close();
       },
 
-      onSelection(type) {
-        if (type === "reset") {
-          self.vectorRef.clearSelection();
-          return;
-        }
-
-        const image = self.parent;
-        const selection = image.selectionArea;
-        const bbox = selection.bbox;
-
-        if (!bbox) return;
-
-        const xs = image.internalToImageX(bbox.left);
-        const xe = image.internalToImageX(bbox.right);
-
-        const ys = image.internalToImageY(bbox.top);
-        const ye = image.internalToImageY(bbox.bottom);
-
-        const selectedPoints = self.vertices
-          .filter((p) => {
-            const matchX = xs <= p.x && p.x <= xe;
-            const matchY = ys <= p.y && p.y <= ye;
-            return matchX && matchY;
-          })
-          .map((p) => p.id);
-
-        const vector = self.vectorRef;
-        vector?.selectPointsByIds(selectedPoints);
-      },
-
       _selectArea(additiveMode = false, preserveTransformMode = false) {
         const annotation = self.annotation;
         if (!preserveTransformMode) {
@@ -246,16 +215,9 @@ const Model = types
           const wasNotSelected = !self.selected;
 
           if (wasNotSelected) {
-            // Set the flag before selecting to prevent double-click issues
-            // This will be cleared by selectRegion() when called from RegionStore
-            self._justSelected = true;
             annotation.selectArea(self);
           } else {
-            // If _justSelected is true, it means this click is part of a double-click
-            // Don't unselect - let the double-click handler manage selection
-            if (!self._justSelected) {
-              annotation.unselectAll();
-            }
+            annotation.unselectAll();
           }
         }
       },
@@ -441,17 +403,6 @@ const Model = types
       },
 
       /**
-       * Clear the just-selected flag (action for use in setTimeout)
-       */
-      clearJustSelectedFlag() {
-        self._justSelected = false;
-      },
-
-      setJustSelectedFlag(value) {
-        self._justSelected = value;
-      },
-
-      /**
        * Override selectRegion to reset transform mode when selecting from sidebar
        * This ensures transform mode is reset whether selecting by clicking on the shape
        * or selecting from the sidebar/outliner
@@ -462,11 +413,6 @@ const Model = types
         if (!preserveTransformMode) {
           self.setTransformMode(false);
         }
-        // Mark that we just selected this region (to prevent double-click from enabling transform mode)
-        self._justSelected = true;
-        setTimeout(() => {
-          self.clearJustSelectedFlag();
-        }, 300); // Clear after double-click detection window
         // Call parent selectRegion to handle scrolling
         self.scrollToRegion();
       },
@@ -687,27 +633,7 @@ const HtxVectorView = observer(({ item, suggestion }) => {
             if (item.isDrawing) return;
             if (e.evt.altKey || e.evt.ctrlKey || e.evt.shiftKey || e.evt.metaKey) return;
 
-            // If region was just selected (part of a double-click on unselected region),
-            // ignore this click to prevent it from unselecting
-            if (item._justSelected) {
-              e.cancelBubble = true;
-              return;
-            }
-
             e.cancelBubble = true;
-
-            // When clicking a selected region, set _justSelected flag temporarily
-            // to prevent unselection if this is part of a double-click
-            // The flag will be cleared by the double-click handler or after timeout
-            if (item.selected) {
-              item.setJustSelectedFlag(true);
-              setTimeout(() => {
-                // Only clear if still set (double-click handler might have cleared it)
-                if (item._justSelected) {
-                  item.clearJustSelectedFlag();
-                }
-              }, 200); // Slightly longer than debounce timeout to ensure double-click is detected
-            }
 
             // Allow selection regardless of whether the path is closed
             // The Selection tool will handle multi-selection logic
@@ -729,38 +655,6 @@ const HtxVectorView = observer(({ item, suggestion }) => {
               item.setHighlight(false);
             }
             item.updateCursor();
-          }}
-          onDblClick={(e) => {
-            e.evt.stopImmediatePropagation();
-            e.evt.stopPropagation();
-            e.evt.preventDefault();
-            e.cancelBubble = true;
-
-            // Clear the _justSelected flag if it was set (from first click of double-click)
-            // This prevents unselection logic from running
-            if (item._justSelected) {
-              item.clearJustSelectedFlag();
-            }
-
-            // Always ensure the region is selected first
-            // This handles the case where double-click starts from unselected state
-            const annotation = item.annotation;
-            if (!item.selected && annotation) {
-              // Select the region directly without going through _selectArea
-              // to avoid any potential unselection logic
-              annotation.selectArea(item);
-            }
-
-            // Always toggle transform mode for double-click (regardless of initial state)
-            // This ensures double-click always enters transform mode, whether starting from
-            // selected or unselected state
-            item.toggleTransformMode();
-
-            // Ensure the region stays selected after entering transform mode
-            // Transform mode requires the region to be selected (see line 868: transformMode={item.selected && ...})
-            if (!item.selected && annotation) {
-              annotation.selectArea(item);
-            }
           }}
           closed={item.closed}
           width={stageWidth}

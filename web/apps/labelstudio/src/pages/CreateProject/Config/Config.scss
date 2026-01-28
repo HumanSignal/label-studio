@@ -37,7 +37,7 @@ $scroll-width: 5px;
   overflow-y: scroll;
   background-color: var(--color-neutral-background);
 
-  & > div {
+  &>div {
     padding: var(--spacing-base) 24px - $scroll-width var(--spacing-base) 20px;
 
     &:first-child {
@@ -55,7 +55,7 @@ $scroll-width: 5px;
 }
 
 // Apply max-height only in Create Project wizard context (not in Labeling Settings)
-.create-project .wizard .configure__container > div {
+.create-project .wizard .configure__container>div {
   --create-project-header-height: 73px;
   --create-project-modal-padding: calc(var(--spacing-widest) * 2);
 
@@ -138,11 +138,11 @@ $scroll-width: 5px;
       gap: var(--spacing-wide);
 
       // Better space utilization on larger screens
-      @media (width >= 1200px) {
+      @media (width >=1200px) {
         grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
       }
 
-      @media (width >= 1600px) {
+      @media (width >=1600px) {
         grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
       }
     }
@@ -159,9 +159,9 @@ $scroll-width: 5px;
     border: 1px solid var(--color-neutral-border);
     background: var(--color-neutral-background);
     box-shadow: 0 4px 8px 0 rgb(var(--color-neutral-shadow-raw) / 8%);
-    
+
     // Smooth transitions for hover/focus interactions
-    transition: 
+    transition:
       transform 0.2s ease-in-out,
       border-color 0.15s ease-in-out,
       background-color 0.15s ease-in-out,
@@ -268,7 +268,7 @@ $scroll-width: 5px;
   line-height: 1;
 }
 
-.configure__container > div > header {
+.configure__container>div>header {
   display: flex;
   justify-content: flex-end;
   align-items: center;
@@ -291,7 +291,7 @@ $scroll-width: 5px;
   }
 }
 
-.configure__container > div > header .toggle-items {
+.configure__container>div>header .toggle-items {
   margin-left: auto;
 }
 
@@ -631,6 +631,42 @@ $scroll-width: 5px;
     &__annotation {
       padding: 0;
     }
+  }
+}
+
+.wizard .configure__preview-container {
+  flex-grow: 10;
+  min-width: 468px;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+
+  .configure__preview {
+    flex: 1;
+    min-width: 0;
+  }
+}
+
+.wizard .configure__preview-info-banner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  margin-bottom: 12px;
+  background: rgb(59 130 246 / 10%);
+  border: 1px solid rgb(59 130 246 / 30%);
+  border-radius: 4px;
+  color: rgb(59 130 246);
+  font-size: 13px;
+  line-height: 1.4;
+
+  svg {
+    flex-shrink: 0;
+  }
+
+  button {
+    margin-left: auto;
+    flex-shrink: 0;
   }
 }
 
