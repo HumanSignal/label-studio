@@ -570,7 +570,7 @@ const HtxVectorView = observer(({ item, suggestion }) => {
   const { x: offsetX, y: offsetY } = item.parent?.layerZoomScalePosition ?? { x: 0, y: 0 };
   const disabled = item.disabled || suggestion || store.annotationStore.selected.isLinkingMode;
   const selected = !disabled; // Invert disabled to selected for KonvaVector
-  const isDisabled = item.locked; // Completely disable all interactions when locked
+  const isDisabled = item.locked || item.parent?.getSkipInteractions(); // Completely disable all interactions when locked or Pan tool is active
 
   // Wait for stage to be properly initialized
   if (!item.parent?.stageWidth || !item.parent?.stageHeight) {
