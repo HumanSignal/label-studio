@@ -1,0 +1,119 @@
+// Tag Autocomplete Component Styles
+
+// Trigger (input-like container)
+.trigger {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-tight);
+  min-height: var(--select-trigger-height);
+  padding: 4px 8px;
+  background: var(--color-neutral-surface);
+  border: 1px solid var(--color-neutral-border);
+  border-radius: var(--corner-radius-smaller);
+  cursor: text;
+  transition: border-color 150ms ease-out, box-shadow 150ms ease-out;
+  overflow: hidden;
+
+  &:hover:not(.triggerDisabled) {
+    border-color: var(--color-neutral-border-bold);
+  }
+
+  &:focus-within:not(.triggerDisabled) {
+    border-color: var(--color-primary-emphasis);
+    box-shadow: 0 0 0 2px var(--color-primary-surface);
+    outline: none;
+  }
+}
+
+.triggerOpen {
+  border-color: var(--color-primary-emphasis);
+  box-shadow: 0 0 0 2px var(--color-primary-surface);
+}
+
+.triggerDisabled {
+  background: var(--color-neutral-surface-inset);
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+// Tags container (multiline, with wrapping)
+.tagsContainer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+  flex: 1;
+  min-width: 0;
+}
+
+// Tag focused state (for keyboard navigation)
+.tagFocused {
+  outline: none !important;
+  border-color: var(--color-primary-border-subtle) !important;
+
+  // Remove the ring offset so it looks like a border
+  box-shadow: none !important;
+}
+
+// Input field
+.input {
+  flex: 1;
+  min-width: 60px;
+  padding: 4px 0;
+  background: transparent;
+  border: none;
+  outline: none;
+  font-size: inherit;
+  font-family: inherit;
+  color: var(--color-neutral-content);
+
+  &::placeholder {
+    color: var(--color-neutral-content-subtler);
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+  }
+}
+
+// Dropdown content
+.loadingContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
+}
+
+// Text highlighting in options
+.highlight {
+  background: transparent;
+  font-weight: 600;
+  color: inherit;
+}
+
+// Create option styling
+.createOptionWithBorder {
+  border-top: 1px solid var(--color-neutral-border);
+  margin-top: 0.25rem;
+  padding-top: 0.5rem;
+}
+
+.createIcon {
+  width: 1rem;
+  height: 1rem;
+  flex-shrink: 0;
+  color: var(--color-neutral-content-subtle);
+}
+
+// Hidden select for form integration
+.hiddenSelect {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
