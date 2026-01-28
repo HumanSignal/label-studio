@@ -58,7 +58,7 @@ const { TextArea } = Input;
  * </View>
  * @name TextArea
  * @meta_title Textarea Tag for Text areas
- * @meta_description Customize Label Studio with the TextArea tag to support audio transcription, image captioning, and OCR tasks for machine learning and data science projects.
+ * @meta_description Customize Label Studio with the TextArea tag to support audio transcription, image captioning, and OCR tasks for machine learning and data science projects
  * @param {string} name                    - Name to identify the TextArea
  * @param {string} toName                  - Name assigned to the object tag that the TextArea is labeling
  * @param {string} [value]                 - A pre-filled default value that appears within the rendered TextArea field and can be submitted
@@ -71,7 +71,7 @@ const { TextArea } = Input;
  * @param {number} [rows=1]                - Number of rows in the TextArea input field. If `1`, you can submit text by pressing Enter. If greater than `1`, you can submit text by clicking **Add** or pressing Shift + Enter
  * @param {boolean} [required=false]       - Determine whether content in TextArea is required
  * @param {string} [requiredMessage]       - Message to show if validation fails
- * @param {boolean=} [showSubmitButton]    - Determine whether to show or hide the **Add** button. By default it's hidden if `rows="1"`, and it's visible if there are more than 1 row.
+ * @param {boolean=} [showSubmitButton]    - Determine whether to show or hide the **Add** button. By default it's hidden if `rows="1"`, and it's visible if there are more than 1 row
  * @param {boolean} [perRegion]            - Use this tag to label regions instead of whole objects
  * @param {boolean} [perItem]              - Use this tag to label items inside objects instead of whole objects
  */
