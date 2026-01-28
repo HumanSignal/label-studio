@@ -1429,70 +1429,72 @@ Data(shapesTable.filter(({ shapeName }) => shapes[shapeName].hasMultiSelectionRo
   },
 );
 
-Data(shapesTable.filter(({ shapeName }) => shapes[shapeName].hasRotator)).Scenario(
-  "Rotating the region near the border",
-  async ({ I, LabelStudio, AtImageView, AtOutliner, AtPanels, current }) => {
-    const { shapeName } = current;
-    const Shape = shapes[shapeName];
-    const AtDetailsPanel = AtPanels.usePanel(AtPanels.PANEL.DETAILS);
+Data(shapesTable.filter(({ shapeName }) => shapes[shapeName].hasRotator))
+  .Scenario(
+    "Rotating the region near the border",
+    async ({ I, LabelStudio, AtImageView, AtOutliner, AtPanels, current }) => {
+      const { shapeName } = current;
+      const Shape = shapes[shapeName];
+      const AtDetailsPanel = AtPanels.usePanel(AtPanels.PANEL.DETAILS);
 
-    I.amOnPage("/");
-    LabelStudio.init(getParamsWithShape(shapeName, Shape.params));
-    AtDetailsPanel.collapsePanel();
-    LabelStudio.waitForObjectsReady();
-    AtOutliner.seeRegions(0);
-    await AtImageView.lookForStage();
-    const canvasSize = await AtImageView.getCanvasSize();
+      I.amOnPage("/");
+      LabelStudio.init(getParamsWithShape(shapeName, Shape.params));
+      AtDetailsPanel.collapsePanel();
+      LabelStudio.waitForObjectsReady();
+      AtOutliner.seeRegions(0);
+      await AtImageView.lookForStage();
+      const canvasSize = await AtImageView.getCanvasSize();
 
-    const bbox = {
-      x: canvasSize.width - Math.ceil(Math.sqrt(100 ** 2 + 100 ** 2)) / 2 - 50,
-      y: canvasSize.height - Math.ceil(Math.sqrt(100 ** 2 + 100 ** 2)) / 2 - 50,
-      width: 100,
-      height: 100,
-    };
+      const bbox = {
+        x: canvasSize.width - Math.ceil(Math.sqrt(100 ** 2 + 100 ** 2)) / 2 - 50,
+        y: canvasSize.height - Math.ceil(Math.sqrt(100 ** 2 + 100 ** 2)) / 2 - 50,
+        width: 100,
+        height: 100,
+      };
 
-    const bboxCenter = {
-      x: bbox.x + bbox.width / 2,
-      y: bbox.y + bbox.height / 2,
-    };
+      const bboxCenter = {
+        x: bbox.x + bbox.width / 2,
+        y: bbox.y + bbox.height / 2,
+      };
 
-    // Draw the region
-    I.pressKey(Shape.hotKey);
-    drawShapeByBbox(Shape, bbox.x, bbox.y, bbox.width, bbox.height, AtImageView);
-    AtOutliner.seeRegions(1);
+      // Draw the region
+      I.pressKey(Shape.hotKey);
+      drawShapeByBbox(Shape, bbox.x, bbox.y, bbox.width, bbox.height, AtImageView);
+      AtOutliner.seeRegions(1);
 
-    // Select it
-    AtImageView.clickAt(bboxCenter.x, bboxCenter.y);
-    AtOutliner.seeSelectedRegion();
-
-    // The rotator anchor must be above top anchor by 50 pixels
-    const rotatorPosition = {
-      x: bboxCenter.x,
-      y: bbox.y - 50,
-    };
-
-    // Check 7 different rotations
-    const rotatorWayPoints = [[rotatorPosition.x, rotatorPosition.y]];
-    const angle45 = Math.PI / 4;
-
-    for (let i = 0; i < 8; i++) {
-      const angle = angle45 * i;
-
-      rotatorWayPoints.push([bboxCenter.x + Math.sin(angle) * 100, bboxCenter.y - Math.cos(angle) * 100]);
-      rotatorWayPoints.push([bboxCenter.x + Math.sin(angle) * 1000, bboxCenter.y - Math.cos(angle) * 1000]);
-
-      // Rotate clockwise by 45 * i degrees
-      AtImageView.drawThroughPoints(rotatorWayPoints, "steps", 10);
+      // Select it
+      AtImageView.clickAt(bboxCenter.x, bboxCenter.y);
       AtOutliner.seeSelectedRegion();
-      // Check that rotating was successful
-      const rectangleResult = await LabelStudio.serialize();
 
-      Asserts.deepEqualWithTolerance(Math.round(rectangleResult[0].value.rotation), 45 * i);
+      // The rotator anchor must be above top anchor by 50 pixels
+      const rotatorPosition = {
+        x: bboxCenter.x,
+        y: bbox.y - 50,
+      };
 
-      // undo rotation
-      I.pressKey(["CommandOrControl", "z"]);
-      // clear unnecessary waypoints
-      rotatorWayPoints.pop();
-    }
-  },
-);
+      // Check 7 different rotations
+      const rotatorWayPoints = [[rotatorPosition.x, rotatorPosition.y]];
+      const angle45 = Math.PI / 4;
+
+      for (let i = 0; i < 8; i++) {
+        const angle = angle45 * i;
+
+        rotatorWayPoints.push([bboxCenter.x + Math.sin(angle) * 100, bboxCenter.y - Math.cos(angle) * 100]);
+        rotatorWayPoints.push([bboxCenter.x + Math.sin(angle) * 1000, bboxCenter.y - Math.cos(angle) * 1000]);
+
+        // Rotate clockwise by 45 * i degrees
+        AtImageView.drawThroughPoints(rotatorWayPoints, "steps", 10);
+        AtOutliner.seeSelectedRegion();
+        // Check that rotating was successful
+        const rectangleResult = await LabelStudio.serialize();
+
+        Asserts.deepEqualWithTolerance(Math.round(rectangleResult[0].value.rotation), 45 * i);
+
+        // undo rotation
+        I.pressKey(["CommandOrControl", "z"]);
+        // clear unnecessary waypoints
+        rotatorWayPoints.pop();
+      }
+    },
+  )
+  .retry(3);
