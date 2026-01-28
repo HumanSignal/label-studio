@@ -2019,17 +2019,20 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
         return false;
       }
 
+      // For closed polygons, check if point is inside the polygon FIRST
+      // This ensures the fill area is detected even when far from path segments
+      if (finalIsPathClosed && initialPoints.length >= 3) {
+        if (isPointInPolygon(point, initialPoints)) {
+          return true;
+        }
+      }
+
       // For polylines and polygons, check if point is close to any segment
       const closestPathPoint = findClosestPointOnPath(point, initialPoints, allowClose, finalIsPathClosed);
 
       if (closestPathPoint) {
         const distance = getDistance(point, closestPathPoint.point);
         return distance <= hitRadius / (fitScale * transform.zoom);
-      }
-
-      // For closed polygons, also check if point is inside the polygon
-      if (finalIsPathClosed && initialPoints.length >= 3) {
-        return isPointInPolygon(point, initialPoints);
       }
 
       return false;

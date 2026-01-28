@@ -226,30 +226,38 @@ const Model = types
         self._highlighted = val;
       },
 
-      updateCursor(isHovered = false) {
-        const stage = self.parent?.stageRef;
-        if (!stage) return;
-        const style = stage.container().style;
-
-        if (isHovered) {
-          if (self.annotation.isLinkingMode) {
-            style.cursor = "crosshair";
-          } else {
-            style.cursor = "pointer";
-          }
-          return;
-        }
-
-        const selectedTool = self.parent?.getToolsManager().findSelectedTool();
-        if (!selectedTool || !selectedTool.updateCursor) {
-          style.cursor = "default";
-        } else {
-          selectedTool.updateCursor();
-        }
-      },
-
       isReadOnly() {
         return self.readonly || self.annotation?.isReadOnly();
+      },
+
+      /**
+       * Check if mouse pointer is currently over the vector shape
+       * Used by ImageView to determine cursor state
+       * For closed shapes, this checks both the path and the filled area inside
+       */
+      isHovered() {
+        if (!self.vectorRef || !self.parent?.stageRef) {
+          return false;
+        }
+
+        const stage = self.parent.stageRef;
+        const pointerPos = stage.getPointerPosition();
+
+        if (!pointerPos) {
+          return false;
+        }
+
+        // Use KonvaVector's hit testing method
+        // This method already checks:
+        // 1. If hovering over vertices
+        // 2. If hovering near path segments (within hitRadius)
+        // 3. If hovering inside closed polygons (for filled areas)
+        if (typeof self.vectorRef.isPointOverShape === "function") {
+          const isHovered = self.vectorRef.isPointOverShape(pointerPos.x, pointerPos.y);
+          return isHovered;
+        }
+
+        return false;
       },
 
       /**
@@ -590,7 +598,6 @@ const HtxVectorView = observer(({ item, suggestion }) => {
           isMultiRegionSelected={item.object?.selectedRegions?.length > 1}
           disableGhostLine={disableGhostLine}
           onFinish={(e) => {
-            console.log("on finish");
             if (disabled) return;
             e.evt.stopPropagation();
             e.evt.preventDefault();
