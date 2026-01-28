@@ -120,7 +120,7 @@ export const useToast = () => {
 export const ToastProvider: FC<ToastProviderWithTypes> = ({ swipeDirection = "down", children, type, ...props }) => {
   const [toastMessage, setToastMessage] = useState<ToastShowArgs | null>();
   const timerRef = useRef<NodeJS.Timeout>();
-  
+
   const defaultDuration = 4000;
   const duration = toastMessage?.duration ?? defaultDuration;
 
@@ -135,10 +135,10 @@ export const ToastProvider: FC<ToastProviderWithTypes> = ({ swipeDirection = "do
 
   const show = ({ message, type, duration = defaultDuration, id }: ToastShowArgs) => {
     if (timerRef.current) clearTimeout(timerRef.current);
-    
+
     const toastId = id ?? nanoid();
     setToastMessage({ message, type, duration, id: toastId });
-    
+
     if (duration >= 0) {
       timerRef.current = setTimeout(() => dismiss(toastId), duration);
     }
