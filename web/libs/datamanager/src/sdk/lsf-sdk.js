@@ -1,3 +1,4 @@
+import { Button } from "@humansignal/ui";
 import { FF_DEV_1752, FF_DEV_2186, FF_DEV_2887, FF_DEV_3034, FF_LSDV_4620_3_ML, isFF } from "../utils/feature-flags";
 import { isDefined } from "../utils/utils";
 import { Modal } from "../components/Common/Modal/Modal";
@@ -434,23 +435,16 @@ export class LSFWrapper {
     // This is informational, not an error, so we use a neutral tone
     this.datamanager.invoke("toast", {
       message: (
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+        <div className="flex items-center justify-between">
           <span>{this.overlapReachedMessage}</span>
-          <button
+          <Button
             onClick={() => this.handleOverlapNextTask()}
-            style={{
-              marginLeft: 16,
-              cursor: "pointer",
-              padding: "4px 12px",
-              background: "rgba(0,0,0,0.1)",
-              border: "1px solid rgba(0,0,0,0.1)",
-              borderRadius: "4px",
-              color: "inherit",
-              fontWeight: 500,
-            }}
+            className="ml-4"
+            size="small"
+            look="outlined"
           >
             Next Task
-          </button>
+          </Button>
         </div>
       ),
       type: "info",
