@@ -119,10 +119,6 @@ const AnnotationStoreModel = types
       self.viewingAllAnnotations = false;
       // Persist the state to localStorage
       window.localStorage.setItem(localStorageKeys.viewingAll, String(self.viewingAllAnnotations));
-      // Also clear the new tab state
-      if (typeof window !== "undefined") {
-        window.localStorage.removeItem("view-all-tab");
-      }
     }
 
     function _unselectAll() {
