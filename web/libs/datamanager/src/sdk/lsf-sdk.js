@@ -438,7 +438,10 @@ export class LSFWrapper {
         <div className="flex items-center justify-between">
           <span>{this.overlapReachedMessage}</span>
           <Button
-            onClick={() => this.handleOverlapNextTask()}
+            onClick={() => {
+              this.datamanager.invoke("toast:dismiss");
+              this.handleOverlapNextTask();
+            }}
             className="ml-4"
             size="small"
             look="outlined"
