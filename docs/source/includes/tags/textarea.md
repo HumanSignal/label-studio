@@ -14,7 +14,7 @@
 | [rows] | <code>number</code> | <code>1</code> | Number of rows in the TextArea input field. If `1`, you can submit text by pressing Enter. If greater than `1`, you can submit text by clicking **Add** or pressing Shift + Enter |
 | [required] | <code>boolean</code> | <code>false</code> | Determine whether content in TextArea is required |
 | [requiredMessage] | <code>string</code> |  | Message to show if validation fails |
-| [showSubmitButton] | <code>boolean</code> |  | Determine whether to show or hide the **Add** button. By default it's hidden if `rows="1"`, and it's visible if there are more than 1 row. |
+| [showSubmitButton] | <code>boolean</code> |  | Determine whether to show or hide the **Add** button. By default it's hidden if `rows="1"`, and it's visible if there are more than 1 row |
 | [perRegion] | <code>boolean</code> |  | Use this tag to label regions instead of whole objects |
 | [perItem] | <code>boolean</code> |  | Use this tag to label items inside objects instead of whole objects |
 

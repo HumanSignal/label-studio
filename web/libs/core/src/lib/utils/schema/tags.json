@@ -2519,7 +2519,7 @@
       },
       "showSubmitButton": {
         "name": "showSubmitButton",
-        "description": "Determine whether to show or hide the **Add** button. By default it's hidden if `rows=\"1\"`, and it's visible if there are more than 1 row.",
+        "description": "Determine whether to show or hide the **Add** button. By default it's hidden if `rows=\"1\"`, and it's visible if there are more than 1 row",
         "type": ["true", "false"],
         "required": false
       },
