@@ -1,9 +1,8 @@
 import { type FC, useCallback, useEffect, useMemo, useState } from "react";
 import { JsonEditor, defaultTheme, matchNode } from "json-edit-react";
-import { IconSearch, IconFilter, IconReset, IconClose, IconCopyOutline } from "@humansignal/icons";
+import { IconSearch, IconReset, IconClose, IconCopyOutline } from "@humansignal/icons";
 import { Button } from "../button/button";
 import { Tooltip } from "../Tooltip/Tooltip";
-import { Typography } from "../typography/typography";
 import type { JsonViewerProps } from "./types";
 import { ReaderViewButton } from "./reader-view-button";
 import styles from "./json-viewer.module.scss";
@@ -224,12 +223,6 @@ export const JsonViewer: FC<JsonViewerProps> = ({
               )}
               {showFilters && allFilters.length > 0 && (
                 <>
-                  <div className={styles.filterLabel}>
-                    <IconFilter className={styles.filterIcon} width={24} height={24} />
-                    <Typography variant="label" size="small" className={styles.filterLabelText}>
-                      Quick Filters:
-                    </Typography>
-                  </div>
                   <div className={styles.filters}>
                     {allFilters.map((filter) => (
                       <Button
