@@ -339,7 +339,7 @@ export class LSFWrapper {
   }
 
   exitStream() {
-    this.datamanager.invoke("navigate", "projects");
+    this.datamanager.invoke("navigate", "/");
   }
 
   selectTask(task, annotationID, fromHistory = false) {
@@ -433,8 +433,28 @@ export class LSFWrapper {
     // Use info toast to communicate the overlap status
     // This is informational, not an error, so we use a neutral tone
     this.datamanager.invoke("toast", {
-      message: `${this.overlapReachedMessage} Click the Next arrow (→) to continue.`,
+      message: (
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+          <span>{this.overlapReachedMessage}</span>
+          <button
+            onClick={() => this.handleOverlapNextTask()}
+            style={{
+              marginLeft: 16,
+              cursor: "pointer",
+              padding: "4px 12px",
+              background: "rgba(0,0,0,0.1)",
+              border: "1px solid rgba(0,0,0,0.1)",
+              borderRadius: "4px",
+              color: "inherit",
+              fontWeight: 500,
+            }}
+          >
+            Next Task
+          </button>
+        </div>
+      ),
       type: "info",
+      duration: -1,
     });
   }
 
