@@ -1495,4 +1495,4 @@ Data(shapesTable.filter(({ shapeName }) => shapes[shapeName].hasRotator)).Scenar
       rotatorWayPoints.pop();
     }
   },
-);
+).retry(3);
