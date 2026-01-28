@@ -51,7 +51,7 @@ export const VectorPoints: React.FC<VectorPointsProps> = ({
   // BUT: Never allow clicks when disabled or in transform mode
   const isSinglePointRegion = initialPoints.length === 1;
   const shouldListenToClicks = !disabled && !transformMode && (selected || isSinglePointRegion);
-  
+
   // CRITICAL: Always enable listening for hit detection to ensure consistent hit box
   // regardless of selected state. The hitFunc will always use HIT_RADIUS.SELECTION / scale
   // for consistent hit detection. We handle click events conditionally in onClick handler.
