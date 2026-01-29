@@ -352,7 +352,7 @@ export class LSFWrapper {
   }
 
   exitStream() {
-    this.datamanager.invoke("navigate", "/");
+    this.datamanager.invoke("navigate", "projects");
   }
 
   selectTask(task, annotationID, fromHistory = false) {
