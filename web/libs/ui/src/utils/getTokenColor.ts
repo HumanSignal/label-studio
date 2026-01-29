@@ -103,7 +103,6 @@ function formatColor(rgb: { r: number; g: number; b: number }, format: ColorForm
       return `rgb(${r}, ${g}, ${b})`;
     case "rgba":
       return `rgba(${r}, ${g}, ${b}, 1)`;
-    case "hex":
     default: {
       const toHex = (n: number) => n.toString(16).padStart(2, "0");
       return `#${toHex(r)}${toHex(g)}${toHex(b)}`;
