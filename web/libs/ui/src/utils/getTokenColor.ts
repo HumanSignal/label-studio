@@ -90,11 +90,7 @@ function rgbaToRgb(rgba: string): { r: number; g: number; b: number } | null {
 /**
  * Format RGB components to the requested format
  */
-function formatColor(
-  rgb: { r: number; g: number; b: number },
-  format: ColorFormat,
-  alpha?: number,
-): string {
+function formatColor(rgb: { r: number; g: number; b: number }, format: ColorFormat, alpha?: number): string {
   const { r, g, b } = rgb;
 
   // If alpha is provided, always use rgba
@@ -296,7 +292,4 @@ export function getTokenColor(tokenName: string, options: GetTokenColorOptions):
 /**
  * Type for the getColor function returned by useTokenColor hook
  */
-export type GetColorFn = (
-  tokenName: string,
-  options?: Omit<GetTokenColorOptions, "theme">,
-) => string;
+export type GetColorFn = (tokenName: string, options?: Omit<GetTokenColorOptions, "theme">) => string;
