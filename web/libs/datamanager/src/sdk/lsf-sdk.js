@@ -1,12 +1,12 @@
 import { Button } from "@humansignal/ui";
 import {
-	FF_DEV_1752,
-	FF_DEV_2186,
-	FF_DEV_2887,
-	FF_DEV_3034,
-	FF_LSDV_4620_3_ML,
-	FF_FIT_1304_STRICT_OVERLAP,
-	isFF,
+  FF_DEV_1752,
+  FF_DEV_2186,
+  FF_DEV_2887,
+  FF_DEV_3034,
+  FF_LSDV_4620_3_ML,
+  FF_FIT_1304_STRICT_OVERLAP,
+  isFF,
 } from "../utils/feature-flags";
 import { isDefined } from "../utils/utils";
 import { Modal } from "../components/Common/Modal/Modal";
@@ -46,19 +46,19 @@ const resolveLabelStudio = () => {
 // - 400 OVERLAP_REACHED: Annotation overlap limit has been reached (only when feature flag is enabled)
 const errorHandlerAllowSpecialErrors = (result) => {
   const isPaused =
-			result?.status === 403 &&
-			typeof result?.response === "object" &&
-			result?.response?.display_context?.reason === "PAUSED";
+    result?.status === 403 &&
+    typeof result?.response === "object" &&
+    result?.response?.display_context?.reason === "PAUSED";
 
   // Only handle OVERLAP_REACHED when feature flag is enabled
-		const isOverlapReached =
-			isFF(FF_FIT_1304_STRICT_OVERLAP) &&
-			result?.status === 400 &&
-			typeof result?.response === "object" &&
-			result?.response?.display_context?.reason === "OVERLAP_REACHED";
+  const isOverlapReached =
+    isFF(FF_FIT_1304_STRICT_OVERLAP) &&
+    result?.status === 400 &&
+    typeof result?.response === "object" &&
+    result?.response?.display_context?.reason === "OVERLAP_REACHED";
 
   // Return false to allow these errors to bubble up to the global handler
-		return !(isPaused || isOverlapReached);
+  return !(isPaused || isOverlapReached);
 };
 
 // Support portal URL constants used to construct error reporting links
@@ -127,22 +127,14 @@ export class LSFWrapper {
     this.isInteractivePreannotations = isInteractivePreannotations ?? false;
 
     // Listen for overlap error modal events (only when feature flag is enabled)
-					this.handleOverlapNextTask = () => this.loadTask();
-					this.handleOverlapCloseTask = () => this.closeTask();
-					this.handleOverlapExitStream = () => this.exitStream();
-					window.addEventListener(
-						"overlap-error-next-task",
-						this.handleOverlapNextTask,
-					);
-					window.addEventListener(
-						"overlap-error-close-task",
-						this.handleOverlapCloseTask,
-					);
-					window.addEventListener(
-						"overlap-error-exit-stream",
-						this.handleOverlapExitStream,
-					);
-				}
+    if (isFF(FF_FIT_1304_STRICT_OVERLAP)) {
+      this.handleOverlapNextTask = () => this.loadTask();
+      this.handleOverlapCloseTask = () => this.closeTask();
+      this.handleOverlapExitStream = () => this.exitStream();
+      window.addEventListener("overlap-error-next-task", this.handleOverlapNextTask);
+      window.addEventListener("overlap-error-close-task", this.handleOverlapCloseTask);
+      window.addEventListener("overlap-error-exit-stream", this.handleOverlapExitStream);
+    }
 
     let interfaces = [...DEFAULT_INTERFACES];
 
@@ -381,84 +373,75 @@ export class LSFWrapper {
   setLSFTask(task, annotationID, fromHistory, selectPrediction = false) {
     if (!this.lsf) return;
 
-				const hasChangedTasks = this.lsf?.task?.id !== task?.id && task?.id;
+    const hasChangedTasks = this.lsf?.task?.id !== task?.id && task?.id;
 
-				this.setLoading(true, hasChangedTasks);
-				const lsfTask = taskToLSFormat(task);
-				const isRejectedQueue = isDefined(task.default_selected_annotation);
-				const taskList = this.datamanager.store.taskStore.list;
-				// annotations are set in LSF only and order in DM only, so combine them
-				const taskHistory = taskList
-					.map((task) =>
-						this.taskHistory.find((item) => item.taskId === task.id),
-					)
-					.filter(Boolean);
+    this.setLoading(true, hasChangedTasks);
+    const lsfTask = taskToLSFormat(task);
+    const isRejectedQueue = isDefined(task.default_selected_annotation);
+    const taskList = this.datamanager.store.taskStore.list;
+    // annotations are set in LSF only and order in DM only, so combine them
+    const taskHistory = taskList
+      .map((task) => this.taskHistory.find((item) => item.taskId === task.id))
+      .filter(Boolean);
 
-				const extracted = taskHistory.find((item) => item.taskId === task.id);
+    const extracted = taskHistory.find((item) => item.taskId === task.id);
 
-				if (!fromHistory && extracted) {
-					taskHistory.splice(taskHistory.indexOf(extracted), 1);
-					taskHistory.push(extracted);
-				}
+    if (!fromHistory && extracted) {
+      taskHistory.splice(taskHistory.indexOf(extracted), 1);
+      taskHistory.push(extracted);
+    }
 
-				if (!extracted) {
-					taskHistory.push({ taskId: task.id, annotationId: null });
-				}
+    if (!extracted) {
+      taskHistory.push({ taskId: task.id, annotationId: null });
+    }
 
-				if (isRejectedQueue && !annotationID) {
-					annotationID = task.default_selected_annotation;
-				}
+    if (isRejectedQueue && !annotationID) {
+      annotationID = task.default_selected_annotation;
+    }
 
-				if (hasChangedTasks) {
-					this.lsf.resetState();
-				} else {
-					this.lsf.resetAnnotationStore();
-				}
+    if (hasChangedTasks) {
+      this.lsf.resetState();
+    } else {
+      this.lsf.resetAnnotationStore();
+    }
 
-				// Initial idea to show counter for Manual assignment only
-				// But currently we decided to hide it for any stream
-				// const distribution = this.project.assignment_settings.label_stream_task_distribution;
-				// const isManuallyAssigned = distribution === "assigned_only";
+    // Initial idea to show counter for Manual assignment only
+    // But currently we decided to hide it for any stream
+    // const distribution = this.project.assignment_settings.label_stream_task_distribution;
+    // const isManuallyAssigned = distribution === "assigned_only";
 
-				// undefined or true for backward compatibility
-				this.lsf.toggleInterface(
-					"postpone",
-					this.task.allow_postpone !== false,
-				);
-				this.lsf.toggleInterface("topbar:task-counter", true);
+    // undefined or true for backward compatibility
+    this.lsf.toggleInterface("postpone", this.task.allow_postpone !== false);
+    this.lsf.toggleInterface("topbar:task-counter", true);
 
-				if (isFF(FF_FIT_1304_STRICT_OVERLAP)) {
-					// Handle strict task overlap - disable submission controls when overlap is reached
-					// Only process when feature flag is enabled
-					const overlapReached = this.task.overlap_reached === true;
-					this.overlapReached = overlapReached;
-					this.overlapReachedMessage =
-						this.task.overlap_reached_message ||
-						"Annotation overlap has been reached for this task. Your draft is preserved but cannot be submitted.";
+    if (isFF(FF_FIT_1304_STRICT_OVERLAP)) {
+      // Handle strict task overlap - disable submission controls when overlap is reached
+      // Only process when feature flag is enabled
+      const overlapReached = this.task.overlap_reached === true;
+      this.overlapReached = overlapReached;
+      this.overlapReachedMessage =
+        this.task.overlap_reached_message ||
+        "Annotation overlap has been reached for this task. Your draft is preserved but cannot be submitted.";
 
-					// Set overlap state on LSF store - this will disable buttons with tooltips
-					this.lsf.setFlags({
-						overlapReached,
-						overlapReachedMessage: this.overlapReachedMessage,
-					});
-				} else {
-					this.overlapReached = false;
-					this.overlapReachedMessage = "";
-				}
+      // Set overlap state on LSF store - this will disable buttons with tooltips
+      this.lsf.setFlags({
+        overlapReached,
+        overlapReachedMessage: this.overlapReachedMessage,
+      });
+    } else {
+      this.overlapReached = false;
+      this.overlapReachedMessage = "";
+    }
 
-				this.lsf.assignTask(task);
-				this.lsf.initializeStore(lsfTask);
-				this.setAnnotation(
-					annotationID,
-					fromHistory || isRejectedQueue,
-					selectPrediction,
-				);
-				this.setLoading(false);
+    this.lsf.assignTask(task);
+    this.lsf.initializeStore(lsfTask);
+    this.setAnnotation(annotationID, fromHistory || isRejectedQueue, selectPrediction);
+    this.setLoading(false);
 
-				if (isFF(FF_FIT_1304_STRICT_OVERLAP) && this.overlapReached) {
-					// Show informational message if overlap is reached (only when feature flag is enabled)
-					this.showOverlapReachedMessage();
-				}
+    if (isFF(FF_FIT_1304_STRICT_OVERLAP) && this.overlapReached) {
+      // Show informational message if overlap is reached (only when feature flag is enabled)
+      this.showOverlapReachedMessage();
+    }
   }
 
   /**
@@ -703,24 +686,22 @@ export class LSFWrapper {
       // Note: display_context is in result.response for API error responses
       const displayReason = result?.response?.display_context?.reason;
       const isPausedError = displayReason === "PAUSED";
-      const isOverlapError =
-							isFF(FF_FIT_1304_STRICT_OVERLAP) &&
-							displayReason === "OVERLAP_REACHED";
-						if (isPausedError || isOverlapError) {
-							// Also update local state for overlap reached (only when feature flag is enabled)
-							if (isOverlapError) {
-								this.overlapReached = true;
-								this.overlapReachedMessage =
-									result?.response?.detail ||
-									"Annotation overlap has been reached for this task. Your draft is preserved but cannot be submitted.";
-								// Set overlap state on LSF store - this will disable buttons with tooltips
-								this.lsf.setFlags({
-									overlapReached: true,
-									overlapReachedMessage: this.overlapReachedMessage,
-								});
-							}
-							return;
-						}
+      const isOverlapError = isFF(FF_FIT_1304_STRICT_OVERLAP) && displayReason === "OVERLAP_REACHED";
+      if (isPausedError || isOverlapError) {
+        // Also update local state for overlap reached (only when feature flag is enabled)
+        if (isOverlapError) {
+          this.overlapReached = true;
+          this.overlapReachedMessage =
+            result?.response?.detail ||
+            "Annotation overlap has been reached for this task. Your draft is preserved but cannot be submitted.";
+          // Set overlap state on LSF store - this will disable buttons with tooltips
+          this.lsf.setFlags({
+            overlapReached: true,
+            overlapReachedMessage: this.overlapReachedMessage,
+          });
+        }
+        return;
+      }
 
       const requestId = result?.$meta?.headers?.get("x-ls-request-id");
       const supportUrl = requestId ? `${SUPPORT_URL}?${SUPPORT_URL_REQUEST_ID_PARAM}=${requestId}` : SUPPORT_URL;
@@ -749,36 +730,32 @@ export class LSFWrapper {
   /** @private */
   onSubmitAnnotation = async () => {
     // Prevent submission if overlap is reached (only when feature flag is enabled)
-					this.showOverlapReachedMessage();
-					return;
-				}
+    if (isFF(FF_FIT_1304_STRICT_OVERLAP) && this.overlapReached) {
+      this.showOverlapReachedMessage();
+      return;
+    }
 
-				const exitStream = this.shouldExitStream();
-				const loadNext = exitStream ? false : this.shouldLoadNext();
-				const result = await this.submitCurrentAnnotation(
-					"submitAnnotation",
-					async (taskID, body) => {
-						return await this.datamanager.apiCall(
-							"submitAnnotation",
-							{ taskID },
-							{ body },
-							// errors are displayed by "toast" event - we don't want to show blocking modal
-							{ errorHandler: errorHandlerAllowSpecialErrors },
-						);
-					},
-					false,
-					loadNext,
-				);
-				const status = result?.$meta?.status;
+    const exitStream = this.shouldExitStream();
+    const loadNext = exitStream ? false : this.shouldLoadNext();
+    const result = await this.submitCurrentAnnotation(
+      "submitAnnotation",
+      async (taskID, body) => {
+        return await this.datamanager.apiCall(
+          "submitAnnotation",
+          { taskID },
+          { body },
+          // errors are displayed by "toast" event - we don't want to show blocking modal
+          { errorHandler: errorHandlerAllowSpecialErrors },
+        );
+      },
+      false,
+      loadNext,
+    );
+    const status = result?.$meta?.status;
 
-				this.showOperationToast(
-					status,
-					"Annotation saved successfully",
-					"Annotation is not saved",
-					result,
-				);
+    this.showOperationToast(status, "Annotation saved successfully", "Annotation is not saved", result);
 
-				if (exitStream) return this.exitStream();
+    if (exitStream) return this.exitStream();
   };
 
   /** @private */
@@ -940,56 +917,50 @@ export class LSFWrapper {
 
   onSkipTask = async (_, { comment } = {}) => {
     // Prevent skipping if overlap is reached (only when feature flag is enabled)
-					this.showOverlapReachedMessage();
-					return;
-				}
+    if (isFF(FF_FIT_1304_STRICT_OVERLAP) && this.overlapReached) {
+      this.showOverlapReachedMessage();
+      return;
+    }
 
-				// Manager roles that can force-skip unskippable tasks (OW=Owner, AD=Admin, MA=Manager)
-				const MANAGER_ROLES = ["OW", "AD", "MA"];
-				const task = this.task;
-				const isEnterprise = window.APP_SETTINGS?.billing?.enterprise;
-				const skipDisabled = isEnterprise ? task?.allow_skip === false : false;
-				const userRole = window.APP_SETTINGS?.user?.role;
-				const hasForceSkipPermission = MANAGER_ROLES.includes(userRole);
-				const canSkip = !skipDisabled || hasForceSkipPermission;
-				if (!canSkip) {
-					console.warn(
-						"Task cannot be skipped: allow_skip is false and user lacks manager role",
-					);
-					this.showOperationToast(400, null, "This task cannot be skipped", {
-						error: "Task cannot be skipped",
-					});
-					return;
-				}
-				const result = await this.submitCurrentAnnotation(
-					"skipTask",
-					async (taskID, body) => {
-						const { id, ...annotation } = body;
-						const params = { taskID };
-						const options = { body: { ...annotation, was_cancelled: true } };
+    // Manager roles that can force-skip unskippable tasks (OW=Owner, AD=Admin, MA=Manager)
+    const MANAGER_ROLES = ["OW", "AD", "MA"];
+    const task = this.task;
+    const isEnterprise = window.APP_SETTINGS?.billing?.enterprise;
+    const skipDisabled = isEnterprise ? task?.allow_skip === false : false;
+    const userRole = window.APP_SETTINGS?.user?.role;
+    const hasForceSkipPermission = MANAGER_ROLES.includes(userRole);
+    const canSkip = !skipDisabled || hasForceSkipPermission;
+    if (!canSkip) {
+      console.warn("Task cannot be skipped: allow_skip is false and user lacks manager role");
+      this.showOperationToast(400, null, "This task cannot be skipped", {
+        error: "Task cannot be skipped",
+      });
+      return;
+    }
+    const result = await this.submitCurrentAnnotation(
+      "skipTask",
+      async (taskID, body) => {
+        const { id, ...annotation } = body;
+        const params = { taskID };
+        const options = { body: { ...annotation, was_cancelled: true } };
 
-						if (comment) options.body.comment = comment;
+        if (comment) options.body.comment = comment;
 
-						if (id !== undefined) params.annotationID = id;
+        if (id !== undefined) params.annotationID = id;
 
-						return await this.datamanager.apiCall(
-							id === undefined ? "submitAnnotation" : "updateAnnotation",
-							params,
-							options,
-							{ errorHandler: errorHandlerAllowSpecialErrors },
-						);
-					},
-					true,
-					this.shouldLoadNext(),
-				);
-				const status = result?.$meta?.status;
+        return await this.datamanager.apiCall(
+          id === undefined ? "submitAnnotation" : "updateAnnotation",
+          params,
+          options,
+          { errorHandler: errorHandlerAllowSpecialErrors },
+        );
+      },
+      true,
+      this.shouldLoadNext(),
+    );
+    const status = result?.$meta?.status;
 
-				this.showOperationToast(
-					status,
-					"Task skipped successfully",
-					"Task is not skipped",
-					result,
-				);
+    this.showOperationToast(status, "Task skipped successfully", "Task is not skipped", result);
   };
 
   onUnskipTask = async () => {
@@ -1232,22 +1203,14 @@ export class LSFWrapper {
 
   destroy() {
     // Clean up overlap error event listeners (only when feature flag is enabled)
-					window.removeEventListener(
-						"overlap-error-next-task",
-						this.handleOverlapNextTask,
-					);
-					window.removeEventListener(
-						"overlap-error-close-task",
-						this.handleOverlapCloseTask,
-					);
-					window.removeEventListener(
-						"overlap-error-exit-stream",
-						this.handleOverlapExitStream,
-					);
-				}
+    if (isFF(FF_FIT_1304_STRICT_OVERLAP)) {
+      window.removeEventListener("overlap-error-next-task", this.handleOverlapNextTask);
+      window.removeEventListener("overlap-error-close-task", this.handleOverlapCloseTask);
+      window.removeEventListener("overlap-error-exit-stream", this.handleOverlapExitStream);
+    }
 
-				this.lsfInstance?.destroy?.();
-				this.lsfInstance = null;
+    this.lsfInstance?.destroy?.();
+    this.lsfInstance = null;
   }
 
   /**
