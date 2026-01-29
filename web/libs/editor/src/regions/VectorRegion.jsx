@@ -202,6 +202,36 @@ const Model = types
         self.vectorRef.close();
       },
 
+      onSelection(type) {
+        if (type === "reset") {
+          self.vectorRef.clearSelection();
+          return;
+        }
+
+        const image = self.parent;
+        const selection = image.selectionArea;
+        const bbox = selection.bbox;
+
+        if (!bbox) return;
+
+        const xs = image.internalToImageX(bbox.left);
+        const xe = image.internalToImageX(bbox.right);
+
+        const ys = image.internalToImageY(bbox.top);
+        const ye = image.internalToImageY(bbox.bottom);
+
+        const selectedPoints = self.vertices
+          .filter((p) => {
+            const matchX = xs <= p.x && p.x <= xe;
+            const matchY = ys <= p.y && p.y <= ye;
+            return matchX && matchY;
+          })
+          .map((p) => p.id);
+
+        const vector = self.vectorRef;
+        vector?.selectPointsByIds(selectedPoints);
+      },
+
       _selectArea(additiveMode = false, preserveTransformMode = false) {
         const annotation = self.annotation;
         if (!preserveTransformMode) {
