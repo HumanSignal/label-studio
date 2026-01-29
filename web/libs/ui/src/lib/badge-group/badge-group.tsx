@@ -1,5 +1,6 @@
-import { forwardRef, useRef } from "react";
-import { Badge, type BadgeProps } from "../badge/badge";
+import { forwardRef, useRef, useEffect, useState } from "react";
+import { Badge } from "../badge/badge";
+import type { BadgeProps } from "../../shadcn";
 import { useBadgeOverflow } from "./useBadgeOverflow";
 import styles from "./badge-group.module.scss";
 import clsx from "clsx";
@@ -20,6 +21,8 @@ export interface BadgeGroupProps {
   className?: string;
   /** Test ID for testing */
   "data-testid"?: string;
+  /** Whether to truncate badges that overflow (default: true) */
+  truncate?: boolean;
 }
 
 /**
@@ -41,14 +44,25 @@ export interface BadgeGroupProps {
  * ```
  */
 export const BadgeGroup = forwardRef<HTMLDivElement, BadgeGroupProps>(
-  ({ items, variant = "info", shape = "squared", className, "data-testid": dataTestId }, ref) => {
+  ({ items, variant = "info", shape = "squared", className, "data-testid": dataTestId, truncate = true }, ref) => {
     const containerRef = useRef<HTMLDivElement>(null);
+    const mergedRef = ref || containerRef;
+    const [recalcTrigger, setRecalcTrigger] = useState(0);
 
-    // Use custom hook to calculate badge overflow
+    // Force recalculation when truncate changes to true (from false)
+    useEffect(() => {
+      if (truncate) {
+        // Trigger recalculation by incrementing the trigger
+        setRecalcTrigger((prev) => prev + 1);
+      }
+    }, [truncate]);
+
+    // Use custom hook to calculate badge overflow only when truncate is enabled
     const visibleBadgeCount = useBadgeOverflow({
-      enabled: items.length > 0,
-      containerRef,
+      enabled: truncate && items.length > 0,
+      containerRef: containerRef,
       itemCount: items.length,
+      recalcTrigger,
     });
 
     if (items.length === 0) {
@@ -56,9 +70,13 @@ export const BadgeGroup = forwardRef<HTMLDivElement, BadgeGroupProps>(
     }
 
     return (
-      <div ref={ref || containerRef} className={clsx(styles.container, className)} data-testid={dataTestId}>
+      <div
+        ref={mergedRef}
+        className={clsx(styles.container, !truncate && styles.wrap, className)}
+        data-testid={dataTestId}
+      >
         {items.map((item, index) => {
-          const shouldHide = visibleBadgeCount !== null && index >= visibleBadgeCount;
+          const shouldHide = truncate && visibleBadgeCount !== null && index >= visibleBadgeCount;
 
           return (
             <Badge
@@ -71,8 +89,8 @@ export const BadgeGroup = forwardRef<HTMLDivElement, BadgeGroupProps>(
             </Badge>
           );
         })}
-        {/* Show +n badge if there are hidden badges */}
-        {visibleBadgeCount !== null && visibleBadgeCount < items.length && (
+        {/* Show +n badge if truncate is enabled and there are hidden badges */}
+        {truncate && visibleBadgeCount !== null && visibleBadgeCount < items.length && (
           <Badge variant={variant} shape={shape} data-overflow-badge="true">
             +{items.length - visibleBadgeCount}
           </Badge>
