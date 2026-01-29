@@ -106,7 +106,8 @@ export const Default: Story = {
             </li>
             <li>
               • <kbd className="px-tight bg-neutral-surface-bold rounded">Enter</kbd> /{" "}
-              <kbd className="px-tight bg-neutral-surface-bold rounded">,</kbd> Select highlighted option or create new tag
+              <kbd className="px-tight bg-neutral-surface-bold rounded">,</kbd> Select highlighted option or create new
+              tag
             </li>
             <li>
               • <kbd className="px-tight bg-neutral-surface-bold rounded">Backspace</kbd> Remove tag or focus last tag

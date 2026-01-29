@@ -285,7 +285,7 @@ export function useTagAutocomplete<T = string>(
         case ",": {
           e.preventDefault();
           e.stopPropagation();
-          
+
           // Create and dispatch a synthetic Enter key event
           const enterEvent = new KeyboardEvent("keydown", {
             key: "Enter",
