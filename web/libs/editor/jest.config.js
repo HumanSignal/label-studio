@@ -2,12 +2,10 @@ const { pathsToModuleNameMapper } = require("ts-jest");
 const tsconfig = require("../../tsconfig.base.json");
 /** @type {import('ts-jest/dist/types').InitialOptionsTsJest} */
 module.exports = {
-  bail: true,
   roots: ["<rootDir>/src"],
   preset: "../../jest.preset.js",
   setupFilesAfterEnv: ["./jest.setup.js"],
   testEnvironment: "jsdom",
-  verbose: false,
   collectCoverageFrom: [
     "src/**/*.{js,jsx,ts,tsx}",
     // @todo they actually don't work, so we had to add `istanbul ignore` directive to some files
@@ -32,6 +30,8 @@ module.exports = {
     "^.+\\.[tj]sx?$": [
       "babel-jest",
       {
+        babelrc: false,
+        configFile: false,
         presets: [
           [
             "@babel/preset-react",

@@ -1,12 +1,13 @@
 import { observer } from "mobx-react";
 
-import { IconViewAll, IconPlus } from "@humansignal/icons";
+import { IconPlus } from "@humansignal/icons";
 import { Button } from "@humansignal/ui";
 import { ff } from "@humansignal/core";
 import { cn } from "../../utils/bem";
 import { isSelfServe } from "../../utils/billing";
 import { FF_BULK_ANNOTATION, FF_DEV_3873, isFF } from "../../utils/feature-flags";
 import { AnnotationsCarousel } from "../AnnotationsCarousel/AnnotationsCarousel";
+import { ViewAllToggle } from "../AnnotationsCarousel/ViewAllToggle";
 import { DynamicPreannotationsToggle } from "../AnnotationTab/DynamicPreannotationsToggle";
 import { Actions } from "./Actions";
 import { Annotations } from "./Annotations";
@@ -37,27 +38,16 @@ export const TopBar = observer(({ store }) => {
       {isFF(FF_DEV_3873) ? (
         <div className={cn("topbar").elem("group").toClassName()}>
           {store.hasInterface("annotations:view-all") && (
-            <Button
-              className={"topbar__button"}
-              type={isViewAll ? undefined : "string"}
-              aria-label="Compare all annotations"
-              onClick={annotationStore.toggleViewingAllAnnotations}
-              variant={isViewAll ? "primary" : "neutral"}
-              look={isViewAll ? "filled" : "string"}
-              tooltip="Compare all annotations"
-              size="small"
-            >
-              <IconViewAll />
-            </Button>
+            <ViewAllToggle isActive={isViewAll} onClick={annotationStore.toggleViewingAllAnnotations} />
           )}
           {store.hasInterface("annotations:add-new") && (
             <Button
-              className={"topbar__button"}
+              className={cn("topbar").elem("button").toClassName()}
               type={isViewAll ? undefined : "text"}
               aria-label="Create an annotation"
               variant="neutral"
               size="small"
-              look="string"
+              look="outlined"
               tooltip="Create a new annotation"
               onClick={(event) => {
                 event.preventDefault();

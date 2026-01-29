@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react";
-import { Select } from "../../ui/src/lib/select/select";
+import { Select } from "./select";
+import { BadgeGroup } from "../badge-group";
 
 const thousandOptions = (() => {
   return Array.from({ length: 1000 }, (_, i) => `Option ${i}`);
@@ -187,5 +188,43 @@ export const WithCustomRenderSelected: Story = {
     ] as any[],
     label: "Boolean values with renderSelected",
     renderSelected: () => "Always show this",
+  },
+};
+
+export const MultipleWithBadges: Story = {
+  render: () => {
+    return (
+      <div className="w-[350px] border border-dashed border-neutral-border p-tight">
+        <Select
+          multiple
+          searchable
+          value={["javascript", "react", "typescript", "vue", "angular"]}
+          options={[
+            { value: "javascript", label: "JavaScript" },
+            { value: "typescript", label: "TypeScript" },
+            { value: "react", label: "React" },
+            { value: "vue", label: "Vue" },
+            { value: "angular", label: "Angular" },
+            { value: "node", label: "Node.js" },
+            { value: "python", label: "Python" },
+            { value: "django", label: "Django" },
+          ]}
+          placeholder="Choose technologies..."
+          renderSelected={(selectedOptions) => {
+            if (!selectedOptions || selectedOptions.length === 0) return null;
+            return (
+              <BadgeGroup
+                items={selectedOptions.map((opt: any) => ({
+                  id: opt?.value ?? opt,
+                  label: opt?.label ?? opt?.value ?? opt,
+                }))}
+                variant="info"
+                shape="squared"
+              />
+            );
+          }}
+        />
+      </div>
+    );
   },
 };
