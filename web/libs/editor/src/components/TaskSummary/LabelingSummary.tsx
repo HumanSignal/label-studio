@@ -162,6 +162,12 @@ export const LabelingSummary = ({ hideInfo, annotations: all, controls, onSelect
     },
   });
 
+  // We can't calculate aggregation for reactcode controls for now, so we hide it if there are no other tags
+  const hideAggregation = useMemo(() => {
+    if (controls.length === 0) return true;
+    return controls.every((control) => control.type === "reactcode");
+  }, [controls]);
+
   return (
     <div className="mb-base">
       <div className="overflow-x-auto pb-tight">
@@ -178,7 +184,7 @@ export const LabelingSummary = ({ hideInfo, annotations: all, controls, onSelect
           {/* Sticky Header */}
           <thead className="sticky top-0 z-10">
             {table.getHeaderGroups().map((headerGroup) => (
-              <tr key={headerGroup.id} className="border-b border-neutral-border">
+              <tr key={headerGroup.id}>
                 {headerGroup.headers.map((header, index) => (
                   <th
                     key={header.id}
@@ -191,6 +197,7 @@ export const LabelingSummary = ({ hideInfo, annotations: all, controls, onSelect
                       zIndex: index === 0 ? 20 : 1,
                     }}
                     className={cnm(
+                      hideAggregation ? "border-b border-neutral-border" : "",
                       "px-4 py-2.5 text-left whitespace-nowrap font-semibold text-sm bg-neutral-surface-subtle",
                       index === 0 && "border-r border-neutral-border bg-neutral-surface",
                     )}
@@ -206,11 +213,13 @@ export const LabelingSummary = ({ hideInfo, annotations: all, controls, onSelect
           </thead>
           <tbody>
             {/* Distribution/Aggregation Row */}
-            <AggregationTableRow
-              headers={table.getHeaderGroups()[0]?.headers ?? []}
-              controls={controls}
-              annotations={annotations}
-            />
+            {!hideAggregation && (
+              <AggregationTableRow
+                headers={table.getHeaderGroups()[0]?.headers ?? []}
+                controls={controls}
+                annotations={annotations}
+              />
+            )}
             {/* Annotation Rows */}
             {table.getRowModel().rows.map((row, rowIndex) => (
               <tr key={row.id} className="group">
