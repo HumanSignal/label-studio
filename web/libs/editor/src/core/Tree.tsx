@@ -235,7 +235,8 @@ function renderItem(ref: IAnyStateTreeNode, annotation: IAnnotation, includeKey 
   const typeName = type.name;
   const View = Registry.getViewByModel(typeName);
 
-  const isBulkMode = isFF(FF_BULK_ANNOTATION) && !isStarterCloudPlan() && annotation?.store?.hasInterface("annotation:bulk");
+  const isBulkMode =
+    isFF(FF_BULK_ANNOTATION) && !isStarterCloudPlan() && annotation?.store?.hasInterface("annotation:bulk");
   const isNotIndependentTag = el.isIndependent !== true;
   if (isBulkMode && isNotIndependentTag) {
     return null;
