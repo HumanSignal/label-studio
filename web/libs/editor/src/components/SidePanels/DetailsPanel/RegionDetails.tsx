@@ -62,13 +62,13 @@ const JsonValue: FC<{ value: unknown }> = ({ value }) => {
   // Arrays: list all items
   if (Array.isArray(value)) {
     if (value.length === 0) {
-      return <span className="text-neutral-500 text-xs italic">empty array</span>;
+      return <span className="text-neutral-500 italic">empty array</span>;
     }
     return (
       <>
         {value.map((item, index) => (
           <div key={index} className={isNested(item) ? "mt-1" : ""}>
-            <span className="text-neutral-400 select-none text-xs">[{index}]</span>
+            <span className="text-neutral-400 select-none">[{index}]</span>
             {isNested(item) ? (
               <div className="ml-1 pl-2 border-l border-neutral-200">
                 <JsonValue value={item} />
@@ -88,13 +88,13 @@ const JsonValue: FC<{ value: unknown }> = ({ value }) => {
   if (typeof value === "object") {
     const entries = Object.entries(value);
     if (entries.length === 0) {
-      return <span className="text-neutral-500 text-xs italic">empty object</span>;
+      return <span className="text-neutral-500 italic">empty object</span>;
     }
     return (
       <>
         {entries.map(([key, val]) => (
           <div key={key}>
-            <span className="text-neutral-500 text-xs">
+            <span className="text-neutral-500">
               {key}
               {isNested(val) ? "" : ":"}
             </span>
