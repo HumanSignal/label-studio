@@ -1,6 +1,6 @@
 import { IconChevronDown } from "@humansignal/icons";
+import { isStarterCloudPlan } from "@humansignal/core";
 import { cn } from "../../../utils/bem";
-import { FF_SELF_SERVE, isFF } from "../../../utils/feature-flags";
 import { ErrorBox } from "../../Common/ErrorBox";
 import { FieldsButton } from "../../Common/FieldsButton";
 import { FiltersPane } from "../../Common/FiltersPane";
@@ -30,7 +30,7 @@ const ImportButtonWithChecks = ({ size }) => {
   const simpleButton = <ImportButton size={size}>Import</ImportButton>;
   const isOpenSource = !window.APP_SETTINGS.billing;
   // Check if user is self-serve; Enterprise flag === false is the main condition
-  const isSelfServe = isFF(FF_SELF_SERVE) && window.APP_SETTINGS.billing?.enterprise === false;
+  const isSelfServe = isStarterCloudPlan();
 
   if (isOpenSource || !isSelfServe) return simpleButton;
 
