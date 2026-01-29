@@ -13,7 +13,7 @@ import { IconBan, IconChevronDown } from "@humansignal/icons";
 import { Dropdown } from "@humansignal/ui";
 import type { CustomButtonType } from "../../stores/CustomButton";
 import { cn } from "../../utils/bem";
-import { FF_REVIEWER_FLOW, isFF } from "../../utils/feature-flags";
+import { FF_REVIEWER_FLOW, FF_FIT_1304_STRICT_OVERLAP, isFF } from "../../utils/feature-flags";
 import { isDefined, toArray } from "../../utils/utilities";
 import {
   AcceptButton,
@@ -195,8 +195,8 @@ export const Controls = controlsInjector<{ annotation: MSTAnnotation }>(
         buttons.push(<SkipButton key="skip" disabled={disabled} store={store} onSkipWithComment={onSkipWithComment} />);
       }
 
-      // Also disable when overlap is reached
-      const overlapDisabled = store.overlapReached === true;
+      // Also disable when overlap is reached (only when feature flag is enabled)
+      const overlapDisabled = isFF(FF_FIT_1304_STRICT_OVERLAP) && store.overlapReached === true;
       const isDisabled = disabled || submitDisabled || overlapDisabled;
 
       const useExitOption = !isDisabled && isNotQuickView;
