@@ -67,6 +67,10 @@ const errorHandlerAllowSpecialErrors = (result) => {
 export const SUPPORT_URL = "https://support.humansignal.com/hc/en-us/requests/new";
 export const SUPPORT_URL_REQUEST_ID_PARAM = "tf_37934448633869"; // request_id field ID in ZD
 
+// Toast ID for overlap reached message - used to dismiss this specific toast
+// without affecting other toasts like "Annotation Saved"
+const OVERLAP_TOAST_ID = "overlap-reached-toast";
+
 export class LSFWrapper {
   /** @type {HTMLElement} */
   root = null;
@@ -451,13 +455,15 @@ export class LSFWrapper {
   showOverlapReachedMessage() {
     // Use info toast to communicate the overlap status
     // This is informational, not an error, so we use a neutral tone
+    // Use a specific ID so we can dismiss this toast without affecting others
     this.datamanager.invoke("toast", {
+      id: OVERLAP_TOAST_ID,
       message: (
         <div className="flex items-center justify-between">
           <span>{this.overlapReachedMessage}</span>
           <Button
             onClick={() => {
-              this.datamanager.invoke("toast:dismiss");
+              this.datamanager.invoke("toast:dismiss", { id: OVERLAP_TOAST_ID });
               this.handleOverlapNextTask();
             }}
             className="ml-4"
@@ -471,6 +477,14 @@ export class LSFWrapper {
       type: "info",
       duration: -1,
     });
+  }
+
+  /**
+   * Dismiss the overlap reached toast if it's showing
+   * @private
+   */
+  dismissOverlapToast() {
+    this.datamanager.invoke("toast:dismiss", { id: OVERLAP_TOAST_ID });
   }
 
   /** @private */
@@ -1202,11 +1216,14 @@ export class LSFWrapper {
   }
 
   destroy() {
-    // Clean up overlap error event listeners (only when feature flag is enabled)
+    // Clean up overlap error event listeners and dismiss toast (only when feature flag is enabled)
     if (isFF(FF_FIT_1304_STRICT_OVERLAP)) {
       window.removeEventListener("overlap-error-next-task", this.handleOverlapNextTask);
       window.removeEventListener("overlap-error-close-task", this.handleOverlapCloseTask);
       window.removeEventListener("overlap-error-exit-stream", this.handleOverlapExitStream);
+      // Dismiss the overlap toast if it's showing - this ensures the toast doesn't
+      // persist after leaving the labeling interface
+      this.dismissOverlapToast();
     }
 
     this.lsfInstance?.destroy?.();
