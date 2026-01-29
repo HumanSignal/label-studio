@@ -2441,31 +2441,25 @@
     "attrs": {
       "name": {
         "name": "name",
-        "description": "Name of the element",
+        "description": "Name to identify the TextArea",
         "type": "string",
         "required": true
       },
       "toName": {
         "name": "toName",
-        "description": "Name of the element that you want to label",
+        "description": "Name assigned to the object tag that the TextArea is labeling",
         "type": "string",
         "required": true
       },
       "value": {
         "name": "value",
-        "description": "Pre-filled value",
-        "type": "string",
-        "required": true
-      },
-      "label": {
-        "name": "label",
-        "description": "Label text",
+        "description": "A pre-filled default value that appears within the rendered TextArea field and can be submitted",
         "type": "string",
         "required": false
       },
       "placeholder": {
         "name": "placeholder",
-        "description": "Placeholder text",
+        "description": "Placeholder text that appears inside the rendered TextArea field, but unlike `value` it cannot be submitted",
         "type": "string",
         "required": false
       },
@@ -2477,41 +2471,42 @@
       },
       "editable": {
         "name": "editable",
-        "description": "Whether to display an editable textarea",
-        "type": ["true", "false"],
-        "required": false,
-        "default": false
-      },
-      "skipDuplicates": {
-        "name": "skipDuplicates",
-        "description": "Prevent duplicates in textarea inputs",
+        "description": "Whether to display an icon that allows the annotator to edit their text after adding it",
         "type": ["true", "false"],
         "required": false,
         "default": false
       },
       "transcription": {
         "name": "transcription",
-        "description": "If false, always show editor",
+        "description": "When set to true and used with `editable=\"true\"`, the TextArea UI will remain an editable field even after you add your text",
+        "type": ["true", "false"],
+        "required": false,
+        "default": false
+      },
+      "skipDuplicates": {
+        "name": "skipDuplicates",
+        "description": "When set to true, a pop-up warning will appear and prevent duplicate values. See [the example below](#Example-Enforce-unique-values)",
         "type": ["true", "false"],
         "required": false,
         "default": false
       },
       "displayMode": {
         "name": "displayMode",
-        "description": "Display mode for the textarea; region-list shows it for every region in regions list",
+        "description": "Display mode for the TextArea; when set to `region-list` there will be an input field for every region in the Regions panel. See [the example below](#Example-Region-list-TextArea-fields)",
         "type": ["tag", "region-list"],
         "required": false,
         "default": "tag"
       },
       "rows": {
         "name": "rows",
-        "description": "Number of rows in the textarea",
+        "description": "Number of rows in the TextArea input field. If `1`, you can submit text by pressing Enter. If greater than `1`, you can submit text by clicking **Add** or pressing Shift + Enter",
         "type": "number",
-        "required": false
+        "required": false,
+        "default": 1
       },
       "required": {
         "name": "required",
-        "description": "Validate whether content in textarea is required",
+        "description": "Determine whether content in TextArea is required",
         "type": ["true", "false"],
         "required": false,
         "default": false
@@ -2524,7 +2519,7 @@
       },
       "showSubmitButton": {
         "name": "showSubmitButton",
-        "description": "Whether to show or hide the submit button. By default it shows when there are more than one rows of text, such as in textarea mode.",
+        "description": "Determine whether to show or hide the **Add** button. By default it's hidden if `rows=\"1\"`, and it's visible if there are more than 1 row",
         "type": ["true", "false"],
         "required": false
       },
