@@ -3,7 +3,7 @@ import { type FC, useEffect, useMemo, useRef } from "react";
 import { cn } from "../../../utils/bem";
 import { RegionEditor } from "./RegionEditor";
 import "./RegionDetails.scss";
-import { Typography } from "@humansignal/ui";
+import { JsonViewer, Typography } from "@humansignal/ui";
 
 const TextResult: FC<{ mainValue: string[] }> = observer(({ mainValue }) => {
   return (
@@ -36,96 +36,17 @@ const RatingResult: FC<{ mainValue: string[] }> = observer(({ mainValue }) => {
   return <span>{mainValue}</span>;
 });
 
-const isNested = (value: unknown): boolean =>
-  value !== null &&
-  typeof value === "object" &&
-  (Array.isArray(value) ? value.length > 0 : Object.keys(value).length > 0);
-
-const JsonValue: FC<{ value: unknown }> = ({ value }) => {
-  // Primitives: string, number, boolean, null, undefined
-  if (value === null) {
-    return <span className="text-neutral-500 italic">null</span>;
-  }
-  if (value === undefined) {
-    return <span className="text-neutral-500 italic">undefined</span>;
-  }
-  if (typeof value === "string") {
-    return <span className="text-neutral-content">{value ? value : '""'}</span>;
-  }
-  if (typeof value === "number") {
-    return <span className="text-neutral-content">{value}</span>;
-  }
-  if (typeof value === "boolean") {
-    return <span className="text-neutral-content">{value ? "true" : "false"}</span>;
-  }
-
-  // Arrays: list all items
-  if (Array.isArray(value)) {
-    if (value.length === 0) {
-      return <span className="text-neutral-500 italic">empty array</span>;
-    }
-    return (
-      <>
-        {value.map((item, index) => (
-          <div key={index} className={isNested(item) ? "mt-1" : ""}>
-            <span className="text-neutral-400 select-none">[{index}]</span>
-            {isNested(item) ? (
-              <div className="ml-1 pl-2 border-l border-neutral-200">
-                <JsonValue value={item} />
-              </div>
-            ) : (
-              <span className="ml-1">
-                <JsonValue value={item} />
-              </span>
-            )}
-          </div>
-        ))}
-      </>
-    );
-  }
-
-  // Objects: nested key-value view
-  if (typeof value === "object") {
-    const entries = Object.entries(value);
-    if (entries.length === 0) {
-      return <span className="text-neutral-500 italic">empty object</span>;
-    }
-    return (
-      <>
-        {entries.map(([key, val]) => (
-          <div key={key}>
-            <span className="text-neutral-500">
-              {key}
-              {isNested(val) ? "" : ":"}
-            </span>
-            {isNested(val) ? (
-              <div className="ml-1 pl-2 border-l border-neutral-200">
-                <JsonValue value={val} />
-              </div>
-            ) : (
-              <span className="ml-1">
-                <JsonValue value={val} />
-              </span>
-            )}
-          </div>
-        ))}
-      </>
-    );
-  }
-
-  // Fallback: stringify other types
-  try {
-    return <span className="text-neutral-500">{JSON.stringify(value)}</span>;
-  } catch {
-    return <span className="text-neutral-500 italic">[unserializable]</span>;
-  }
-};
-
 const ReactCodeResult: FC<{ mainValue: unknown }> = observer(({ mainValue }) => {
   return (
-    <div className="text-sm">
-      <JsonValue value={mainValue} />
-    </div>
+    <JsonViewer
+      data={mainValue}
+      showSearch={false}
+      showFilters={false}
+      showCopyButton={false}
+      minHeight={100}
+      maxHeight={300}
+      fontSize={12}
+    />
   );
 });
 
