@@ -1,7 +1,7 @@
 import { Button, IconChevronLeft, IconChevronRight } from "@humansignal/ui";
 import { observer } from "mobx-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { FixedSizeList as List, ListChildComponentProps } from "react-window";
+import { FixedSizeList as List, type ListChildComponentProps } from "react-window";
 import AutoSizer from "react-virtualized-auto-sizer";
 import { cn } from "../../utils/bem";
 import { clamp, sortAnnotations } from "../../utils/utilities";
