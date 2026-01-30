@@ -4,6 +4,7 @@ import {
   FF_DEV_2186,
   FF_DEV_2887,
   FF_DEV_3034,
+  FF_FIT_720_LAZY_LOAD_ANNOTATIONS,
   FF_LSDV_4620_3_ML,
   FF_FIT_1304_STRICT_OVERLAP,
   isFF,
@@ -14,6 +15,8 @@ import { CommentsSdk } from "./comments-sdk";
 // import { LSFHistory } from "./lsf-history";
 import { annotationToServer, taskToLSFormat } from "./lsf-utils";
 import { when } from "mobx";
+// FIT-720: Import image cache for cleanup on destroy
+import { imageCache } from "@humansignal/core";
 
 const DEFAULT_INTERFACES = [
   "basic",
@@ -1228,6 +1231,11 @@ export class LSFWrapper {
       // Dismiss the overlap toast if it's showing - this ensures the toast doesn't
       // persist after leaving the labeling interface
       this.dismissOverlapToast();
+    }
+
+    // FIT-720: Clear image cache when destroying LSF to release memory
+    if (isFF(FF_FIT_720_LAZY_LOAD_ANNOTATIONS)) {
+      imageCache?.forceClear?.();
     }
 
     this.lsfInstance?.destroy?.();

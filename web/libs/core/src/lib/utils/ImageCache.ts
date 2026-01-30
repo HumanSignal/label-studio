@@ -285,6 +285,18 @@ class ImageCacheManager {
       this.cache.delete(url);
     }
   }
+
+  /**
+   * Force clear all cached images and release memory
+   * Called when LSF is destroyed to prevent memory leaks
+   */
+  forceClear(): void {
+    for (const cached of this.cache.values()) {
+      this.safeRevokeBlobUrl(cached);
+    }
+    this.cache.clear();
+    this.pendingLoads.clear();
+  }
 }
 
 // Singleton instance - persists across annotation switches
