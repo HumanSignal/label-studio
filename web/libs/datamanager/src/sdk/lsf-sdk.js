@@ -377,6 +377,10 @@ export class LSFWrapper {
   setLSFTask(task, annotationID, fromHistory, selectPrediction = false) {
     if (!this.lsf) return;
 
+    if (isFF(FF_FIT_1304_STRICT_OVERLAP)) {
+      this.dismissOverlapToast();
+    }
+
     const hasChangedTasks = this.lsf?.task?.id !== task?.id && task?.id;
 
     this.setLoading(true, hasChangedTasks);
