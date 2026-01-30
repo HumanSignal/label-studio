@@ -5,6 +5,7 @@ import React, { Component } from "react";
 import { Result, Spin } from "antd";
 import { getEnv, getRoot } from "mobx-state-tree";
 import { observer, Provider } from "mobx-react";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 /**
  * Core
@@ -33,6 +34,7 @@ import { reactCleaner } from "../../utils/reactCleaner";
 import { guidGenerator } from "../../utils/unique";
 import { isDefined, sortAnnotations } from "../../utils/utilities";
 import { ToastProvider, ToastViewport } from "@humansignal/ui/lib/toast/toast";
+import { setEditorQueryClient } from "../../hooks/useAnnotationQuery";
 
 /**
  * Components
@@ -54,12 +56,29 @@ import { ViewAll } from "./ViewAll";
 import "./App.scss";
 
 /**
+ * FIT-720: QueryClient for the editor - handles distribution and other queries
+ */
+const editorQueryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      refetchOnWindowFocus: false,
+      gcTime: 5 * 60 * 1000, // 5 minutes
+      staleTime: 30000, // 30 seconds
+      networkMode: "always",
+    },
+  },
+});
+
+/**
  * App
  */
 class App extends Component {
   relationsRef = React.createRef();
 
   componentDidMount() {
+    // FIT-720: Set global query client reference for cache invalidation
+    setEditorQueryClient(editorQueryClient);
+
     // Hack to activate app hotkeys
     window.blur();
     document.body.focus();
@@ -237,77 +256,78 @@ class App extends Component {
     const newUIEnabled = isFF(FF_DEV_3873);
 
     return (
-      <div
-        className={cn("editor").mod({ fullscreen: settings.fullscreen }).toClassName()}
-        ref={isFF(FF_LSDV_4620_3_ML) ? reactCleaner(this) : null}
-      >
-        <Settings store={store} />
-        <Provider store={store}>
-          <ToastProvider>
-            {newUIEnabled ? (
-              <InstructionsModal
-                visible={store.showingDescription}
-                onCancel={() => store.toggleDescription()}
-                title={store.hasInterface("review") ? "Review Instructions" : "Labeling Instructions"}
-              >
-                {store.description}
-              </InstructionsModal>
-            ) : (
-              <>
-                {store.showingDescription && (
-                  <div className="p-base mb-base">
-                    {/* biome-ignore lint/security/noDangerouslySetInnerHtml: we need html here and it's sanitized */}
-                    <div dangerouslySetInnerHTML={{ __html: sanitizeHtml(store.description) }} />
-                  </div>
-                )}
-              </>
-            )}
-
-            {isDefined(store) && store.hasInterface("topbar") && <TopBar store={store} />}
-            <div
-              className={cn("wrapper")
-                .mod({
-                  viewAll: viewingAll,
-                  bsp: settings.effectiveBottomSidePanel,
-                  showingBottomBar: newUIEnabled,
-                })
-                .toClassName()}
-            >
+      <QueryClientProvider client={editorQueryClient}>
+        <div
+          className={cn("editor").mod({ fullscreen: settings.fullscreen }).toClassName()}
+          ref={isFF(FF_LSDV_4620_3_ML) ? reactCleaner(this) : null}
+        >
+          <Settings store={store} />
+          <Provider store={store}>
+            <ToastProvider>
               {newUIEnabled ? (
-                isBulkMode || !store.hasInterface("side-column") ? (
-                  <>
-                    {mainContent}
-                    {store.hasInterface("topbar") && <BottomBar store={store} />}
-                  </>
+                <InstructionsModal
+                  visible={store.showingDescription}
+                  onCancel={() => store.toggleDescription()}
+                  title={store.hasInterface("review") ? "Review Instructions" : "Labeling Instructions"}
+                >
+                  {store.description}
+                </InstructionsModal>
+              ) : (
+                <>
+                  {store.showingDescription && (
+                    <div className="p-base mb-base">
+                      <div dangerouslySetInnerHTML={{ __html: sanitizeHtml(store.description) }} />
+                    </div>
+                  )}
+                </>
+              )}
+
+              {isDefined(store) && store.hasInterface("topbar") && <TopBar store={store} />}
+              <div
+                className={cn("wrapper")
+                  .mod({
+                    viewAll: viewingAll,
+                    bsp: settings.effectiveBottomSidePanel,
+                    showingBottomBar: newUIEnabled,
+                  })
+                  .toClassName()}
+              >
+                {newUIEnabled ? (
+                  isBulkMode || !store.hasInterface("side-column") ? (
+                    <>
+                      {mainContent}
+                      {store.hasInterface("topbar") && <BottomBar store={store} />}
+                    </>
+                  ) : (
+                    <SideTabsPanels
+                      panelsHidden={viewingAll}
+                      currentEntity={as.selectedHistory ?? as.selected}
+                      regions={as.selected.regionStore}
+                      showComments={store.hasInterface("annotations:comments")}
+                      focusTab={store.commentStore.tooltipMessage ? "comments" : null}
+                    >
+                      {mainContent}
+                      {store.hasInterface("topbar") && <BottomBar store={store} />}
+                    </SideTabsPanels>
+                  )
+                ) : isBulkMode || !store.hasInterface("side-column") ? (
+                  mainContent
                 ) : (
-                  <SideTabsPanels
+                  <SidePanels
                     panelsHidden={viewingAll}
                     currentEntity={as.selectedHistory ?? as.selected}
                     regions={as.selected.regionStore}
-                    showComments={store.hasInterface("annotations:comments")}
-                    focusTab={store.commentStore.tooltipMessage ? "comments" : null}
                   >
                     {mainContent}
-                    {store.hasInterface("topbar") && <BottomBar store={store} />}
-                  </SideTabsPanels>
-                )
-              ) : isBulkMode || !store.hasInterface("side-column") ? (
-                mainContent
-              ) : (
-                <SidePanels
-                  panelsHidden={viewingAll}
-                  currentEntity={as.selectedHistory ?? as.selected}
-                  regions={as.selected.regionStore}
-                >
-                  {mainContent}
-                </SidePanels>
-              )}
-            </div>
-            <ToastViewport />
-          </ToastProvider>
-        </Provider>
-        {store.hasInterface("debug") && <Debug store={store} />}
-      </div>
+                  </SidePanels>
+                )}
+              </div>
+              <ToastViewport />
+            </ToastProvider>
+          </Provider>
+          {store.hasInterface("debug") && <Debug store={store} />}
+        </div>
+      </QueryClientProvider>
     );
   }
 

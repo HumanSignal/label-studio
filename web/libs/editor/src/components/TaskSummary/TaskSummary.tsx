@@ -101,6 +101,7 @@ const TaskSummary = ({ annotations: all, store: annotationStore }: TaskSummaryPr
           controls={controls}
           onSelect={onSelect}
           hideInfo={annotationStore.store.hasInterface("annotations:hide-info")}
+          taskId={task?.id}
         />
       </div>
       <div className="mb-relaxed">

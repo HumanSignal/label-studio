@@ -21,7 +21,7 @@ _api_urlpatterns = [
         api.AnnotationDraftListAPI.as_view(),
         name='task-annotations-drafts',
     ),
-    # FIT-720: Distribution endpoint for Summary view
+    # FIT-720: Efficient distribution endpoint for Summary view
     path('<int:pk>/distribution/', api.TaskDistributionAPI.as_view(), name='task-distribution'),
 ]
 

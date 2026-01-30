@@ -4,6 +4,7 @@ import {
   FF_DEV_2186,
   FF_DEV_2887,
   FF_DEV_3034,
+  FF_FIT_720_LAZY_LOAD_ANNOTATIONS,
   FF_LSDV_4620_3_ML,
   FF_FIT_1304_STRICT_OVERLAP,
   isFF,
@@ -14,6 +15,20 @@ import { CommentsSdk } from "./comments-sdk";
 // import { LSFHistory } from "./lsf-history";
 import { annotationToServer, taskToLSFormat } from "./lsf-utils";
 import { when } from "mobx";
+
+// FIT-720: Import cache invalidation functions
+let invalidateAnnotationCache = null;
+let invalidateDistributionCache = null;
+
+// Dynamically import from editor to avoid circular dependency
+// This is safe because the functions will be available when the app is fully loaded
+try {
+  const editorHooks = require("@humansignal/editor/src/hooks/useAnnotationQuery");
+  invalidateAnnotationCache = editorHooks.invalidateAnnotationCache;
+  invalidateDistributionCache = editorHooks.invalidateDistributionCache;
+} catch {
+  // Editor hooks not available, invalidation will be skipped
+}
 
 const DEFAULT_INTERFACES = [
   "basic",
@@ -374,7 +389,7 @@ export class LSFWrapper {
     this.setLSFTask(task, annotationID, fromHistory);
   }
 
-  setLSFTask(task, annotationID, fromHistory, selectPrediction = false) {
+  async setLSFTask(task, annotationID, fromHistory, selectPrediction = false) {
     if (!this.lsf) return;
 
     if (isFF(FF_FIT_1304_STRICT_OVERLAP)) {
@@ -443,7 +458,7 @@ export class LSFWrapper {
 
     this.lsf.assignTask(task);
     this.lsf.initializeStore(lsfTask);
-    this.setAnnotation(annotationID, fromHistory || isRejectedQueue, selectPrediction);
+    await this.setAnnotation(annotationID, fromHistory || isRejectedQueue, selectPrediction);
     this.setLoading(false);
 
     if (isFF(FF_FIT_1304_STRICT_OVERLAP) && this.overlapReached) {
@@ -491,8 +506,69 @@ export class LSFWrapper {
     this.datamanager.invoke("toast:dismiss", { id: OVERLAP_TOAST_ID });
   }
 
+  /**
+   * Ensure annotation is fully loaded (for lazy loading - FIT-720)
+   * If the annotation is a stub, fetch the full annotation data from the server.
+   * @param {string} annotationPk - The annotation pk to load
+   * @returns {Promise<Object|null>} The full annotation data or null if not a stub
+   * @private
+   */
+  async ensureAnnotationLoaded(annotationPk) {
+    if (!isFF(FF_FIT_720_LAZY_LOAD_ANNOTATIONS) || !this.labelStream) {
+      return null;
+    }
+
+    // Check if this annotation is a stub in the original task data
+    const taskAnnotation = this.task?.annotations?.find((a) => String(a.id) === String(annotationPk));
+    if (!taskAnnotation?.is_stub) {
+      return null;
+    }
+
+    // Fetch full annotation from backend
+    try {
+      const taskStore = this.datamanager.store.taskStore;
+      const fullAnnotation = await taskStore.loadAnnotation(annotationPk);
+
+      if (fullAnnotation && !fullAnnotation.error) {
+        // IMPORTANT: Re-fetch the annotation from the store after async operation
+        // The original reference might be stale (user navigated, scrolled, etc.)
+        // which causes MST "object is protected" errors
+        const lsfAnnotation = this.annotations.find((a) => String(a.pk) === String(annotationPk));
+        if (!lsfAnnotation) {
+          // Annotation no longer exists in the store
+          return fullAnnotation;
+        }
+
+        // Check if already hydrated while we were fetching
+        const versionsResult = lsfAnnotation.versions?.result;
+        const hasVersionsResult = Array.isArray(versionsResult) && versionsResult.length > 0;
+        const hasRegions = lsfAnnotation.areas?.size > 0;
+
+        if (hasVersionsResult || hasRegions) {
+          // Already hydrated
+          return fullAnnotation;
+        }
+
+        if (fullAnnotation.result) {
+          lsfAnnotation.history.freeze();
+          lsfAnnotation.deserializeResults(fullAnnotation.result);
+          // Critical: updateObjects() is required to render visual regions after deserializing
+          lsfAnnotation.updateObjects();
+          lsfAnnotation.history.safeUnfreeze();
+          lsfAnnotation.history.reinit();
+        }
+
+        return fullAnnotation;
+      }
+    } catch {
+      // Failed to load annotation - will retry on next attempt
+    }
+
+    return null;
+  }
+
   /** @private */
-  setAnnotation(annotationID, selectAnnotation = false, selectPrediction = false) {
+  async setAnnotation(annotationID, selectAnnotation = false, selectPrediction = false) {
     const id = annotationID ? annotationID.toString() : null;
     const { annotationStore: cs } = this.lsf;
     let annotation;
@@ -549,6 +625,8 @@ export class LSFWrapper {
         // not submitted draft, most likely from previous labeling session
         annotation = first;
       } else if (isDefined(annotationID) && selectAnnotation) {
+        // Lazy load annotation if it's a stub (FIT-720)
+        await this.ensureAnnotationLoaded(annotationID);
         annotation = this.annotations.find(({ pk }) => pk === annotationID);
       } else if (showPredictions && this.predictions.length > 0 && !this.isInteractivePreannotations) {
         annotation = cs.addAnnotationFromPrediction(this.predictions[0]);
@@ -690,7 +768,7 @@ export class LSFWrapper {
       const annotationID =
         this.initialAnnotation?.pk ?? this.task.lastAnnotation?.pk ?? this.task.lastAnnotation?.id ?? "auto";
 
-      this.setAnnotation(annotationID);
+      await this.setAnnotation(annotationID);
     }
   };
 
@@ -773,6 +851,16 @@ export class LSFWrapper {
 
     this.showOperationToast(status, "Annotation saved successfully", "Annotation is not saved", result);
 
+    // FIT-720: Invalidate caches after successful submit
+    if (status < 400) {
+      // Invalidate specific annotation if ID is in result
+      if (result?.id) {
+        invalidateAnnotationCache?.(result.id);
+      }
+      // Invalidate distribution for the task
+      invalidateDistributionCache?.(this.task?.id);
+    }
+
     if (exitStream) return this.exitStream();
   };
 
@@ -805,6 +893,12 @@ export class LSFWrapper {
     this.showOperationToast(status, "Annotation updated successfully", "Annotation is not updated", result);
 
     this.datamanager.invoke("updateAnnotation", ls, annotation, result);
+
+    // FIT-720: Invalidate annotation cache after successful update
+    if (status < 400 && annotation.pk) {
+      invalidateAnnotationCache?.(annotation.pk);
+      invalidateDistributionCache?.(task.id);
+    }
 
     if (exitStream) return this.exitStream();
 
@@ -860,7 +954,7 @@ export class LSFWrapper {
       const lastAnnotation = this.annotations[this.annotations.length - 1] ?? {};
       const annotationID = lastAnnotation.pk ?? undefined;
 
-      this.setAnnotation(annotationID);
+      await this.setAnnotation(annotationID);
     }
   };
 
@@ -892,7 +986,7 @@ export class LSFWrapper {
     }
   };
 
-  onSubmitDraft = async (studio, annotation, params = {}) => {
+  onSubmitDraft = async (_studio, annotation, params = {}) => {
     // It should be preserved as soon as possible because each `await` will allow it to be changed
     const taskId = this.task.id;
     const annotationDoesntExist = !annotation.pk;
@@ -1059,16 +1153,111 @@ export class LSFWrapper {
   // Proxy events that are unused by DM integration
   onEntityCreate = (...args) => this.datamanager.invoke("onEntityCreate", ...args);
   onEntityDelete = (...args) => this.datamanager.invoke("onEntityDelete", ...args);
+  _selectAnnotationTimeout = null;
   onSelectAnnotation = (prevAnnotation, nextAnnotation, options) => {
     if (window.APP_SETTINGS.read_only_quick_view_enabled && !this.labelStream) {
       prevAnnotation?.setEditable(false);
     }
+
+    // FIT-720: Debounce selectAnnotation callbacks during batch selection (init)
+    // During init, selectAnnotation fires for ALL annotations in rapid succession
+    // This debounce ensures only the final selection triggers the callback
+    if (isFF(FF_FIT_720_LAZY_LOAD_ANNOTATIONS)) {
+      if (this._selectAnnotationTimeout) {
+        clearTimeout(this._selectAnnotationTimeout);
+      }
+      this._selectAnnotationTimeout = setTimeout(() => {
+        this._selectAnnotationTimeout = null;
+        this._invokeSelectAnnotation(prevAnnotation, nextAnnotation, options);
+      }, 0);
+      return;
+    }
+
+    this._invokeSelectAnnotation(prevAnnotation, nextAnnotation, options);
+  };
+
+  _invokeSelectAnnotation = async (prevAnnotation, nextAnnotation, options) => {
+    // FIT-720: Hydrate stub annotations when selected
+    // IMPORTANT: Use the CURRENTLY SELECTED annotation, not the one from the callback
+    // The debounce may have caused the callback annotation to be stale
+    if (isFF(FF_FIT_720_LAZY_LOAD_ANNOTATIONS)) {
+      const currentSelected = this.lsf?.annotationStore?.selected;
+      if (currentSelected?.pk) {
+        await this._hydrateStubAnnotation(currentSelected);
+      }
+    }
+
     if (nextAnnotation?.history?.undoIdx) {
       this.saveDraft(nextAnnotation).then(() => {
         this.datamanager.invoke("onSelectAnnotation", prevAnnotation, nextAnnotation, options, this);
       });
     } else {
       this.datamanager.invoke("onSelectAnnotation", prevAnnotation, nextAnnotation, options, this);
+    }
+  };
+
+  // FIT-720: Hydrate a stub annotation by fetching full data from API
+  _hydrateStubAnnotation = async (annotation) => {
+    // Check if annotation is a stub (no regions/results)
+    // Stubs have empty results - check via the areas map which holds deserialized regions
+    const hasRegions = annotation.areas?.size > 0;
+    const isUserGenerated = annotation.userGenerate && !annotation.sentUserGenerate;
+
+    // Also check versions.result to see if the annotation was loaded with actual results
+    const versionsResult = annotation.versions?.result;
+    const hasVersionsResult = Array.isArray(versionsResult) && versionsResult.length > 0;
+
+    // Skip if already hydrated or is a new user-generated annotation
+    // Use versionsResult as the source of truth - if it has data, the annotation is already hydrated
+    if (hasVersionsResult || isUserGenerated) {
+      return;
+    }
+
+    const annotationPk = annotation.pk;
+
+    try {
+      const fullAnnotation = await this.datamanager.apiCall("fetchAnnotation", {
+        annotationID: annotationPk,
+      });
+
+      if (fullAnnotation?.result && !fullAnnotation.error) {
+        // IMPORTANT: Re-fetch the annotation from the store after async operation
+        // The original reference might be stale (user navigated, scrolled, etc.)
+        // which causes MST "object is protected" errors
+        const freshAnnotation = this.annotations.find((a) => String(a.pk) === String(annotationPk));
+        if (!freshAnnotation) {
+          // Annotation no longer exists in the store
+          return;
+        }
+
+        // Check if annotation was already hydrated while we were fetching
+        const freshVersionsResult = freshAnnotation.versions?.result;
+        const freshHasVersionsResult = Array.isArray(freshVersionsResult) && freshVersionsResult.length > 0;
+        const freshHasRegions = freshAnnotation.areas?.size > 0;
+
+        if (freshHasVersionsResult || freshHasRegions) {
+          // Already hydrated (possibly by another code path)
+          return;
+        }
+
+        // Freeze history to prevent undo/redo issues during hydration
+        freshAnnotation.history?.freeze?.();
+
+        // Deserialize the results into the annotation
+        freshAnnotation.deserializeResults(fullAnnotation.result);
+
+        // Critical: updateObjects() MUST be called to render visual regions after deserializing
+        freshAnnotation.updateObjects?.();
+
+        // Unfreeze history
+        freshAnnotation.history?.safeUnfreeze?.();
+
+        // reinitHistory cancels autosave and sets initial values so LSF knows this is the base state
+        // This prevents the hydration from being treated as a user modification
+        freshAnnotation.reinitHistory?.();
+      }
+    } catch {
+      // Failed to hydrate annotation - will show stub state
     }
   };
 

@@ -1,7 +1,7 @@
 import { Button, IconChevronLeft, IconChevronRight } from "@humansignal/ui";
 import { observer } from "mobx-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { FixedSizeList as List, ListChildComponentProps } from "react-window";
+import { FixedSizeList as List } from "react-window";
 import AutoSizer from "react-virtualized-auto-sizer";
 import { cn } from "../../utils/bem";
 import { clamp, sortAnnotations } from "../../utils/utilities";
@@ -20,18 +20,22 @@ interface AnnotationsCarouselInterface {
   commentStore?: any;
 }
 
-// FIT-720: Item data type for virtualized list
-interface ItemData {
-  entities: any[];
-  capabilities: any;
-  annotationStore: any;
-  store: any;
+// FIT-720: Virtualized row renderer for annotation buttons
+interface RowProps {
+  index: number;
+  style: React.CSSProperties;
+  data: {
+    entities: any[];
+    capabilities: any;
+    annotationStore: any;
+    store: any;
+  };
 }
 
-const VirtualizedAnnotationButton = ({ index, style, data }: ListChildComponentProps<ItemData>) => {
+const VirtualizedAnnotationButton = ({ index, style, data }: RowProps) => {
   const entity = data.entities[index];
   return (
-    <div style={{ ...(style as React.CSSProperties), paddingRight: ITEM_GAP }}>
+    <div style={{ ...style, paddingRight: ITEM_GAP }}>
       <AnnotationButton
         key={entity?.id}
         entity={entity}
@@ -180,7 +184,6 @@ export const AnnotationsCarousel = observer(({ store, annotationStore }: Annotat
                 setContainerWidth(width - 77); // Account for controls width
               }
               return (
-                // @ts-expect-error - react-window types incompatible with React 18
                 <List
                   ref={listRef}
                   layout="horizontal"

@@ -51,6 +51,12 @@ export const FF_DISABLE_GLOBAL_USER_FETCHING =
   "fflag_all_feat_utc_204_users_performance_improvements_in_dm_for_large_orgs";
 
 /**
+ * Lazy load annotations in LabelStream to improve performance for tasks with many annotations
+ * @link https://labelstudio.atlassian.net/browse/FIT-720
+ */
+export const FF_FIT_720_LAZY_LOAD_ANNOTATIONS = "fflag_fix_all_fit_720_lazy_load_annotations";
+
+/**
  * Enable interactive JSON viewer for task source in Data Manager
  * @link TBD - LaunchDarkly flag to be created
  */

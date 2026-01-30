@@ -197,6 +197,52 @@ class AnnotationSerializer(FlexFieldsModelSerializer):
         expandable_fields = {'completed_by': (CompletedByDMSerializer,)}
 
 
+class AnnotationStubSerializer(FlexFieldsModelSerializer):
+    """
+    Lightweight Annotation Serializer for lazy loading.
+
+    Returns only minimal metadata needed for annotation list display.
+    Used when fflag_fix_all_fit_720_lazy_load_annotations is enabled
+    to improve performance for tasks with many annotations.
+
+    Fields included:
+    - id: for selection and hydration
+    - created_username: for display in annotation list
+    - created_ago: for display in annotation list (relative time string)
+    - created_at: for TimeAgo component (actual timestamp)
+    - completed_by: user id for avatar lookup
+    - ground_truth: for showing star indicator
+    - is_stub: signals frontend to fetch full data on selection
+    """
+
+    created_username = serializers.SerializerMethodField(default='', read_only=True, help_text='Username string')
+    created_ago = serializers.CharField(default='', read_only=True, help_text='Time delta from creation time')
+    completed_by = serializers.PrimaryKeyRelatedField(required=False, queryset=User.objects.all())
+    # Mark this as a stub so frontend knows to fetch full data on selection
+    is_stub = serializers.SerializerMethodField(read_only=True)
+
+    def get_created_username(self, annotation) -> str:
+        user = annotation.completed_by
+        if not user:
+            return ''
+
+        name = user.first_name
+        if len(user.last_name):
+            name = name + ' ' + user.last_name
+
+        name += f' {user.email}, {user.id}'
+        return name
+
+    def get_is_stub(self, annotation) -> bool:
+        return True
+
+    class Meta:
+        model = Annotation
+        # Minimal fields for annotation list display only
+        # ground_truth and created_at are simple model fields (no extra query)
+        fields = ['id', 'created_username', 'created_ago', 'created_at', 'completed_by', 'ground_truth', 'is_stub']
+
+
 class TaskSimpleSerializer(ModelSerializer):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -871,11 +917,24 @@ class NextTaskSerializer(TaskWithAnnotationsAndPredictionsAndDraftsSerializer):
     def get_annotations(self, task):
         result = []
         if self.context.get('annotations', False):
-            annotations = super().get_annotations(task)
+            # Support lazy loading of annotations (FIT-720)
+            # When annotations_stub is True, return lightweight stubs without result field
+            use_stub = self.context.get('annotations_stub', False)
             user = self.context['request'].user
-            for annotation in annotations:
-                if annotation.get('completed_by') == user.id:
-                    result.append(annotation)
+
+            if use_stub:
+                # Get annotations queryset and filter by user
+                annotations = task.annotations
+                if user.is_annotator:
+                    annotations = annotations.filter(completed_by=user)
+                else:
+                    annotations = annotations.filter(completed_by=user)
+                return AnnotationStubSerializer(annotations, many=True, read_only=True, context=self.context).data
+            else:
+                annotations = super().get_annotations(task)
+                for annotation in annotations:
+                    if annotation.get('completed_by') == user.id:
+                        result.append(annotation)
         return result
 
 

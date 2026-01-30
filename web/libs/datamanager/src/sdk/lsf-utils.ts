@@ -31,6 +31,10 @@ export const taskToLSFormat = (task: APITask): LSFTaskData | void => {
 export const annotationToLSF = (annotation: APIAnnotation) => {
   const createdDate = annotation.draft_created_at || annotation.created_at;
 
+  // For stub annotations (FIT-720 lazy loading), use empty result to prevent
+  // LSF from trying to deserialize undefined results
+  const isStub = (annotation as any).is_stub === true;
+
   return {
     ...annotation,
     id: undefined,
@@ -40,6 +44,8 @@ export const annotationToLSF = (annotation: APIAnnotation) => {
     createdDate,
     leadTime: annotation.lead_time ?? 0,
     skipped: annotation.was_cancelled ?? false,
+    // Use empty array for stubs to prevent JSON parse errors
+    result: isStub ? [] : annotation.result,
   };
 };
 

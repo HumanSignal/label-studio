@@ -5,7 +5,13 @@ import { isDefined } from "../../utils/utils";
 import { Assignee } from "../Assignee";
 import { DynamicModel, registerModel } from "../DynamicModel";
 import { CustomJSON } from "../types";
-import { FF_DEV_2536, FF_DISABLE_GLOBAL_USER_FETCHING, FF_LOPS_E_3, isFF } from "../../utils/feature-flags";
+import {
+  FF_DEV_2536,
+  FF_DISABLE_GLOBAL_USER_FETCHING,
+  FF_FIT_720_LAZY_LOAD_ANNOTATIONS,
+  FF_LOPS_E_3,
+  isFF,
+} from "../../utils/feature-flags";
 
 const SIMILARITY_UPPER_LIMIT_PRECISION = 1000;
 const fileAttributes = types.model({
@@ -161,6 +167,11 @@ export const create = (columns) => {
         if (isLabelStream) {
           taskParams.interaction = "labelstream";
         }
+        // FIT-720: Lazy load annotations - use stubs for both label stream and quick view modes
+        // Hydration happens in lsf-sdk.js when the annotation is selected
+        if (isFF(FF_FIT_720_LAZY_LOAD_ANNOTATIONS)) {
+          taskParams.annotations_stub = true;
+        }
 
         const taskData = yield self.root.apiCall("task", taskParams);
 
@@ -211,6 +222,16 @@ export const create = (columns) => {
         }
 
         return task;
+      }),
+
+      /**
+       * Load a single annotation by ID (for lazy loading - FIT-720)
+       * @param {number} annotationID - The annotation ID to fetch
+       * @returns {Promise<Object>} The full annotation data
+       */
+      loadAnnotation: flow(function* (annotationID) {
+        const annotationData = yield self.root.apiCall("fetchAnnotation", { annotationID });
+        return annotationData;
       }),
 
       applyTaskSnapshot(taskData, taskID) {
