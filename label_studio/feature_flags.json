@@ -1162,6 +1162,33 @@
       "version": 2,
       "deleted": false
     },
+    "fflag_feat_all_fit_1304_strict_overlap": {
+      "key": "fflag_feat_all_fit_1304_strict_overlap",
+      "on": false,
+      "prerequisites": [],
+      "targets": [],
+      "contextTargets": [],
+      "rules": [],
+      "fallthrough": {
+        "variation": 0
+      },
+      "offVariation": 1,
+      "variations": [
+        true,
+        false
+      ],
+      "clientSideAvailability": {
+        "usingMobileKey": false,
+        "usingEnvironmentId": false
+      },
+      "clientSide": false,
+      "salt": "c0004259e75540149ff3a4025e89534e",
+      "trackEvents": false,
+      "trackEventsFallthrough": false,
+      "debugEventsUntilDate": null,
+      "version": 2,
+      "deleted": false
+    },
     "fflag_feat_all_fit_162_workspaces_projects_ui_improvements": {
       "key": "fflag_feat_all_fit_162_workspaces_projects_ui_improvements",
       "on": true,
