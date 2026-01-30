@@ -1,19 +1,9 @@
 import { useMemo } from "react";
 import { flexRender, getCoreRowModel, useReactTable, createColumnHelper } from "@tanstack/react-table";
-import { cnm } from "@humansignal/ui";
+import { cnm, JsonViewer } from "@humansignal/ui";
 import { Chip } from "./Chip";
 import { ResizeHandler } from "./ResizeHandler";
 import type { ObjectTypes } from "./types";
-
-const MAX_JSON_LENGTH = 10000;
-
-const formatValue = (value: unknown): { text: string; truncated: boolean } => {
-  const json = JSON.stringify(value, null, 2);
-  if (json.length <= MAX_JSON_LENGTH) {
-    return { text: json, truncated: false };
-  }
-  return { text: `${json.slice(0, MAX_JSON_LENGTH)}...`, truncated: true };
-};
 
 export const DataSummary = ({ data_types }: { data_types: ObjectTypes }) => {
   const data: Record<string, any> = useMemo(() => {
@@ -53,12 +43,15 @@ export const DataSummary = ({ data_types }: { data_types: ObjectTypes }) => {
           // Arrays: List, Paragraphs, Timeseries values
           // Objects: Table, JSON-like structures with nested dictionaries
           if (typeof value === "object" && value !== null) {
-            const { text, truncated } = formatValue(value);
             return (
-              <div className="whitespace-pre-wrap">
-                {text}
-                {truncated && <div className="text-neutral-content-subtle italic mt-tight">(truncated)</div>}
-              </div>
+              <JsonViewer
+                data={value}
+                showSearch={false}
+                showFilters={false}
+                showCopyButton={false}
+                minHeight={100}
+                maxHeight={300}
+              />
             );
           }
 
