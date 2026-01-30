@@ -77,49 +77,39 @@ export const DataSummary = ({ data_types }: { data_types: ObjectTypes }) => {
 
   return (
     <div className="overflow-x-auto pb-tight mb-base">
-      <div className="border border-neutral-border rounded-small border-collapse overflow-hidden w-max">
-        <div>
+      <table className="border border-neutral-border rounded-small border-collapse overflow-hidden w-full">
+        <thead className="bg-neutral-surface">
           {table.getHeaderGroups().map((headerGroup) => (
-            <div
-              key={headerGroup.id}
-              className={cnm(
-                "flex [&>*]:flex-shrink-0 [&>*]:px-4 [&>*]:py-2 bg-neutral-surface",
-                "[&>*]:overflow-hidden [&>*]:text-ellipsis [&>*]:text-left [&>*]:whitespace-nowrap",
-              )}
-            >
+            <tr key={headerGroup.id}>
               {headerGroup.headers.map((header) => (
-                <div
+                <th
                   key={header.id}
-                  style={{
-                    width: header.getSize(),
-                    position: "relative",
-                  }}
+                  className="px-4 py-2 overflow-hidden text-ellipsis text-left whitespace-nowrap font-normal relative"
+                  style={{ minWidth: header.getSize() }}
                 >
                   {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
                   <ResizeHandler header={header} />
-                </div>
+                </th>
               ))}
-            </div>
+            </tr>
           ))}
-        </div>
-        <div>
+        </thead>
+        <tbody>
           {table.getRowModel().rows.map((row) => (
-            <div
-              key={row.id}
-              className={cnm(
-                "flex [&>*]:flex-shrink-0 even:bg-neutral-surface [&_td]:align-top [&>*]:px-4 [&>*]:py-2",
-                "[&>*]:overflow-hidden [&>*]:text-ellipsis",
-              )}
-            >
+            <tr key={row.id} className="even:bg-neutral-surface">
               {row.getVisibleCells().map((cell) => (
-                <div key={cell.id} style={{ width: cell.column.getSize() }}>
+                <td
+                  key={cell.id}
+                  className="px-4 py-2 overflow-hidden text-ellipsis align-top"
+                  style={{ minWidth: cell.column.getSize() }}
+                >
                   {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                </div>
+                </td>
               ))}
-            </div>
+            </tr>
           ))}
-        </div>
-      </div>
+        </tbody>
+      </table>
     </div>
   );
 };
