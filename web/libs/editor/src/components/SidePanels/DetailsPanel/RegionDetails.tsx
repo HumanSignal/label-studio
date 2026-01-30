@@ -45,7 +45,6 @@ const ReactCodeResult: FC<{ mainValue: unknown }> = observer(({ mainValue }) => 
       showCopyButton={false}
       minHeight={100}
       maxHeight={300}
-      fontSize={12}
     />
   );
 });

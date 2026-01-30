@@ -1,3 +1,4 @@
+import { clsx } from "clsx";
 import { type FC, useCallback, useEffect, useMemo, useState } from "react";
 import { JsonEditor, defaultTheme, matchNode } from "json-edit-react";
 import { IconSearch, IconReset, IconClose, IconCopyOutline } from "@humansignal/icons";
@@ -55,6 +56,7 @@ export const JsonViewer: FC<JsonViewerProps> = ({
   stringTruncate,
   // Styling
   className = "",
+  inset = false,
   // Callbacks
   onCopy,
 }) => {
@@ -252,7 +254,10 @@ export const JsonViewer: FC<JsonViewerProps> = ({
             </div>
           </div>
         )}
-        <div className={styles.jsonEditorContainer} style={{ minHeight, maxHeight }}>
+        <div
+          className={clsx(styles.jsonEditorContainer, inset && styles.inset)}
+          style={{ minHeight, maxHeight }}
+        >
           {showCopyButton && (
             <Tooltip title={copied ? "Copied!" : "Copy JSON"}>
               <Button
