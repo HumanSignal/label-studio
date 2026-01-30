@@ -52,7 +52,7 @@ export const JsonViewer: FC<JsonViewerProps> = ({
   // Display settings
   minHeight = 500,
   maxHeight = 500,
-  fontSize = 13,
+  fontSize = "inherit",
   stringTruncate,
   // Styling
   className = "",
