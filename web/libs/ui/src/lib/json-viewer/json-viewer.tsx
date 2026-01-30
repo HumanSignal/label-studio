@@ -254,10 +254,7 @@ export const JsonViewer: FC<JsonViewerProps> = ({
             </div>
           </div>
         )}
-        <div
-          className={clsx(styles.jsonEditorContainer, inset && styles.inset)}
-          style={{ minHeight, maxHeight }}
-        >
+        <div className={clsx(styles.jsonEditorContainer, inset && styles.inset)} style={{ minHeight, maxHeight }}>
           {showCopyButton && (
             <Tooltip title={copied ? "Copied!" : "Copy JSON"}>
               <Button

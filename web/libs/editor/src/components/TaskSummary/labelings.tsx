@@ -195,7 +195,7 @@ export const renderers: Record<string, RendererType> = {
     };
 
     // Helper to format value for display
-    const formatValue = (value: unknown) => typeof value === "object" ? JSON.stringify(value) : String(value);
+    const formatValue = (value: unknown) => (typeof value === "object" ? JSON.stringify(value) : String(value));
 
     // Single result - display with original formatting logic
     if (extractedValues.length > 1) {
