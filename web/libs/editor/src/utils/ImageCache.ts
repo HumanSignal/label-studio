@@ -3,6 +3,19 @@
  * This prevents re-downloading the same images when switching between annotations on the same task
  */
 
+/**
+ * Custom error class for image cache errors that should not be sent to Sentry
+ * These are expected errors (network issues, invalid images) not code bugs
+ */
+class ImageCacheError extends Error {
+  sentry_skip = true;
+
+  constructor(message: string) {
+    super(message);
+    this.name = "ImageCacheError";
+  }
+}
+
 type CachedImage = {
   blobUrl: string;
   naturalWidth: number;
@@ -26,29 +39,6 @@ class ImageCacheManager {
   private readonly maxSize = 100;
   // Minimum blob size in bytes (reject empty blobs)
   private readonly minBlobSize = 100;
-
-  /**
-   * Check if an image is already cached and valid
-   */
-  has(url: string): boolean {
-    const cached = this.cache.get(url);
-    if (!cached) return false;
-
-    // Check if cache entry is still valid (age check)
-    if (Date.now() - cached.timestamp > this.maxAge) {
-      this.safeRevokeBlobUrl(cached);
-      this.cache.delete(url);
-      return false;
-    }
-
-    // Check if blob URL has been revoked
-    if (this.revokedUrls.has(cached.blobUrl)) {
-      this.cache.delete(url);
-      return false;
-    }
-
-    return true;
-  }
 
   /**
    * Get a cached image's blob URL
@@ -116,13 +106,6 @@ class ImageCacheManager {
   }
 
   /**
-   * Check if a blob URL is known to be revoked/invalid
-   */
-  isBlobUrlRevoked(blobUrl: string): boolean {
-    return this.revokedUrls.has(blobUrl);
-  }
-
-  /**
    * Check if an image is currently being loaded
    */
   isLoading(url: string): boolean {
@@ -182,13 +165,15 @@ class ImageCacheManager {
 
           // Validate blob size - reject empty or too small blobs
           if (!blob || blob.size < this.minBlobSize) {
-            reject(new Error(`Empty or invalid image data received: ${url} (size: ${blob?.size ?? 0} bytes)`));
+            reject(
+              new ImageCacheError(`Empty or invalid image data received: ${url} (size: ${blob?.size ?? 0} bytes)`),
+            );
             return;
           }
 
           // Validate content type is an image
           if (blob.type && !blob.type.startsWith("image/")) {
-            reject(new Error(`Invalid content type for image: ${blob.type} (url: ${url})`));
+            reject(new ImageCacheError(`Invalid content type for image: ${blob.type} (url: ${url})`));
             return;
           }
 
@@ -203,7 +188,7 @@ class ImageCacheManager {
             if (img.naturalWidth === 0 || img.naturalHeight === 0) {
               URL.revokeObjectURL(blobUrl);
               this.revokedUrls.add(blobUrl);
-              reject(new Error(`Image has invalid dimensions (0x0): ${url}`));
+              reject(new ImageCacheError(`Image has invalid dimensions (0x0): ${url}`));
               return;
             }
 
@@ -226,12 +211,12 @@ class ImageCacheManager {
           img.onerror = () => {
             URL.revokeObjectURL(blobUrl);
             this.revokedUrls.add(blobUrl);
-            reject(new Error(`Failed to load image dimensions: ${url}`));
+            reject(new ImageCacheError(`Failed to load image dimensions: ${url}`));
           };
 
           img.src = blobUrl;
         } else {
-          reject(new Error(`Failed to download image: ${xhr.status}`));
+          reject(new ImageCacheError(`Failed to download image: ${xhr.status}`));
         }
       });
 
@@ -242,7 +227,7 @@ class ImageCacheManager {
       });
 
       xhr.addEventListener("error", () => {
-        reject(new Error(`Network error loading image: ${url}`));
+        reject(new ImageCacheError(`Network error loading image: ${url}`));
       });
 
       xhr.open("GET", url);
@@ -290,46 +275,8 @@ class ImageCacheManager {
   }
 
   /**
-   * Clear the entire cache (useful for cleanup)
-   * Only clears entries with no active references
-   */
-  clear(): void {
-    for (const [key, value] of this.cache) {
-      if (value.refCount === 0) {
-        this.safeRevokeBlobUrl(value);
-        this.cache.delete(key);
-      }
-    }
-  }
-
-  /**
-   * Force clear all cache entries (use with caution - may break active images)
-   */
-  forceClear(): void {
-    for (const value of this.cache.values()) {
-      this.safeRevokeBlobUrl(value);
-    }
-    this.cache.clear();
-  }
-
-  /**
-   * Remove a specific image from cache
-   * Only removes if not in active use (refCount === 0)
-   */
-  remove(url: string): void {
-    const cached = this.cache.get(url);
-    if (cached) {
-      if (cached.refCount === 0) {
-        this.safeRevokeBlobUrl(cached);
-        this.cache.delete(url);
-      } else {
-        console.warn(`ImageCache: Cannot remove ${url} - still in use (refCount: ${cached.refCount})`);
-      }
-    }
-  }
-
-  /**
-   * Force remove a specific image from cache (use with caution)
+   * Force remove a specific image from cache
+   * Used for error recovery when a cached blob URL becomes invalid
    */
   forceRemove(url: string): void {
     const cached = this.cache.get(url);

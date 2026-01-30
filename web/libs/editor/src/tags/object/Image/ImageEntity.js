@@ -1,4 +1,4 @@
-import { types, getParent } from "mobx-state-tree";
+import { types, getParent, addDisposer } from "mobx-state-tree";
 import { FileLoader } from "../../../utils/FileLoader";
 import { imageCache } from "../../../utils/ImageCache";
 import { clamp } from "../../../utils/utilities";
@@ -70,6 +70,8 @@ export const ImageEntity = types
     _retryAttempted: false,
     /** Track the original URL for error recovery */
     _originalUrl: undefined,
+    /** Track if we've added a cache reference (to avoid double-release) */
+    _hasCacheRef: false,
   }))
   .views((self) => ({
     get parent() {
@@ -93,14 +95,7 @@ export const ImageEntity = types
       // Check if already cached in global cache
       const cached = imageCache.get(self.src);
       if (cached) {
-        // Add reference to prevent cache eviction while we're using this image
-        imageCache.addRef(self.src);
-        self.setCurrentSrc(cached.blobUrl);
-        self.setDownloaded(true);
-        self.setProgress(1);
-        self.setDownloading(false);
-        // DO NOT set imageLoaded here - wait for the actual <img> onLoad event
-        // This prevents false positives when blob URLs are invalid/revoked
+        self.markAsLoaded(cached.blobUrl, { addCacheRef: true });
         return;
       }
 
@@ -110,16 +105,10 @@ export const ImageEntity = types
         imageCache
           .getPendingLoad(self.src)
           ?.then((result) => {
-            imageCache.addRef(self.src);
-            self.setCurrentSrc(result.blobUrl);
-            self.setDownloaded(true);
-            self.setProgress(1);
-            self.setDownloading(false);
-            // DO NOT set imageLoaded here - wait for <img> onLoad
+            self.markAsLoaded(result.blobUrl, { addCacheRef: true });
           })
           .catch(() => {
-            self.setError(true);
-            self.setDownloading(false);
+            self.markAsFailed();
           });
         return;
       }
@@ -132,12 +121,7 @@ export const ImageEntity = types
           self.setProgress(progress);
         })
         .then((result) => {
-          imageCache.addRef(self.src);
-          self.setCurrentSrc(result.blobUrl);
-          self.setDownloaded(true);
-          self.setProgress(1);
-          self.setDownloading(false);
-          // DO NOT set imageLoaded here - wait for <img> onLoad
+          self.markAsLoaded(result.blobUrl, { addCacheRef: true });
         })
         .catch(() => {
           // Fallback to old behavior if global cache fails
@@ -145,15 +129,10 @@ export const ImageEntity = types
             const img = new Image();
             if (crossOrigin) img.crossOrigin = crossOrigin;
             img.onload = () => {
-              self.setCurrentSrc(self.src);
-              self.setDownloaded(true);
-              self.setProgress(1);
-              self.setDownloading(false);
-              // imageLoaded will be set by <img> onLoad in the component
+              self.markAsLoaded(self.src);
             };
             img.onerror = () => {
-              self.setError(true);
-              self.setDownloading(false);
+              self.markAsFailed();
             };
             img.src = self.src;
           } else {
@@ -162,14 +141,10 @@ export const ImageEntity = types
                 self.setProgress(progress);
               })
               .then((url) => {
-                self.setDownloaded(true);
-                self.setDownloading(false);
-                self.setCurrentSrc(url);
-                // imageLoaded will be set by <img> onLoad in the component
+                self.markAsLoaded(url);
               })
               .catch(() => {
-                self.setDownloading(false);
-                self.setError(true);
+                self.markAsFailed();
               });
           }
         });
@@ -179,27 +154,18 @@ export const ImageEntity = types
       // FIT-720: First check global image cache
       const cached = imageCache.get(self.src);
       if (cached) {
-        imageCache.addRef(self.src);
-        self.setDownloading(false);
-        self.setDownloaded(true);
-        self.setProgress(1);
-        self.setCurrentSrc(cached.blobUrl);
-        // DO NOT set imageLoaded here - wait for <img> onLoad
+        self.markAsLoaded(cached.blobUrl, { addCacheRef: true });
         return true;
       }
 
       if (isFF(FF_IMAGE_MEMORY_USAGE)) return self.currentSrc !== undefined;
 
       if (fileLoader.isError(self.src)) {
-        self.setDownloading(false);
-        self.setError(true);
+        self.markAsFailed();
         return true;
       }
       if (fileLoader.isPreloaded(self.src)) {
-        self.setDownloading(false);
-        self.setDownloaded(true);
-        self.setProgress(1);
-        self.setCurrentSrc(fileLoader.getPreloadedURL(self.src));
+        self.markAsLoaded(fileLoader.getPreloadedURL(self.src));
         return true;
       }
       return false;
@@ -210,8 +176,9 @@ export const ImageEntity = types
      * Should be called when the component unmounts or switches images
      */
     releaseImage() {
-      if (self.src) {
+      if (self.src && self._hasCacheRef) {
         imageCache.releaseRef(self.src);
+        self._hasCacheRef = false;
       }
     },
 
@@ -261,11 +228,7 @@ export const ImageEntity = types
             self.setProgress(progress);
           })
           .then((result) => {
-            imageCache.addRef(self.src);
-            self.setCurrentSrc(result.blobUrl);
-            self.setDownloaded(true);
-            self.setProgress(1);
-            self.setDownloading(false);
+            self.markAsLoaded(result.blobUrl, { addCacheRef: true });
           })
           .catch(() => {
             // Final failure - set error state
@@ -275,6 +238,34 @@ export const ImageEntity = types
       } else {
         self.error = value;
       }
+    },
+
+    /**
+     * Mark image as successfully loaded with the given source URL
+     * Consolidates the common pattern of setting download state after successful load
+     * @param {string} src - The source URL (blob URL or original URL)
+     * @param {Object} options - Optional configuration
+     * @param {boolean} options.addCacheRef - Whether to add a reference to the image cache
+     */
+    markAsLoaded(src, { addCacheRef = false } = {}) {
+      if (addCacheRef && !self._hasCacheRef) {
+        imageCache.addRef(self.src);
+        self._hasCacheRef = true;
+      }
+      self.setCurrentSrc(src);
+      self.setDownloaded(true);
+      self.setProgress(1);
+      self.setDownloading(false);
+      // Note: imageLoaded is NOT set here - wait for the actual <img> onLoad event
+    },
+
+    /**
+     * Mark image as failed to load
+     * Consolidates the common error handling pattern
+     */
+    markAsFailed() {
+      self.setError(true);
+      self.setDownloading(false);
     },
   }))
   .actions((self) => ({
@@ -344,5 +335,15 @@ export const ImageEntity = types
 
     setContrastGrade(grade) {
       self.contrastGrade = grade;
+    },
+  }))
+  .actions((self) => ({
+    /**
+     * Register cleanup to release cache reference when this entity is destroyed
+     */
+    afterCreate() {
+      addDisposer(self, () => {
+        self.releaseImage();
+      });
     },
   }));

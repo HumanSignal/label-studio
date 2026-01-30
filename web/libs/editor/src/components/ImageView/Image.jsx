@@ -59,6 +59,7 @@ export const Image = observer(
         />
         {imageEntity.downloaded ? (
           <ImageRenderer
+            // biome-ignore lint/a11y/noRedundantAlt: alt="image" is intentional for accessibility
             alt="image"
             ref={ref}
             src={imageEntity.currentSrc}
@@ -114,6 +115,7 @@ const ImageRenderer = observer(
     }, [imageTransform, isLoaded]);
 
     return (
+      // biome-ignore lint/a11y/noRedundantAlt: alt="image" is intentional for accessibility
       <img {...imgDefaultProps} ref={ref} alt="image" src={src} onLoad={onLoad} onError={onError} style={imageStyles} />
     );
   }),
