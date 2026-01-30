@@ -169,6 +169,12 @@ export const FF_IMAGE_MEMORY_USAGE = "fflag_feat_front_optic_1479_improve_image_
 
 export const FF_VIDEO_FRAME_SEEK_PRECISION = "fflag_fix_front_optic_1608_improve_video_frame_seek_precision_short";
 
+/**
+ * Strict task overlap enforcement - prevents annotators from submitting
+ * annotations when task overlap limit has been reached
+ */
+export const FF_FIT_1304_STRICT_OVERLAP = "fflag_feat_all_fit_1304_strict_overlap";
+
 Object.assign(window, {
   APP_SETTINGS: {
     ...(window.APP_SETTINGS ?? {}),
