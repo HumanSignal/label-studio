@@ -77,39 +77,41 @@ export const DataSummary = ({ data_types }: { data_types: ObjectTypes }) => {
 
   return (
     <div className="overflow-x-auto pb-tight mb-base">
-      <table className="border border-neutral-border rounded-small border-collapse overflow-hidden w-full">
-        <thead className="bg-neutral-surface">
-          {table.getHeaderGroups().map((headerGroup) => (
-            <tr key={headerGroup.id}>
-              {headerGroup.headers.map((header) => (
-                <th
-                  key={header.id}
-                  className="px-4 py-2 overflow-hidden text-ellipsis text-left whitespace-nowrap font-normal relative"
-                  style={{ minWidth: header.getSize() }}
-                >
-                  {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
-                  <ResizeHandler header={header} />
-                </th>
-              ))}
-            </tr>
-          ))}
-        </thead>
-        <tbody>
-          {table.getRowModel().rows.map((row) => (
-            <tr key={row.id} className="even:bg-neutral-surface">
-              {row.getVisibleCells().map((cell) => (
-                <td
-                  key={cell.id}
-                  className="px-4 py-2 overflow-hidden text-ellipsis align-top"
-                  style={{ minWidth: cell.column.getSize() }}
-                >
-                  {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                </td>
-              ))}
-            </tr>
-          ))}
-        </tbody>
-      </table>
+      <div className="border border-neutral-border rounded-small overflow-hidden">
+        <table className="w-full">
+          <thead className="bg-neutral-surface">
+            {table.getHeaderGroups().map((headerGroup) => (
+              <tr key={headerGroup.id}>
+                {headerGroup.headers.map((header) => (
+                  <th
+                    key={header.id}
+                    className="px-4 py-2 overflow-hidden text-ellipsis text-left whitespace-nowrap font-normal relative"
+                    style={{ minWidth: header.getSize() }}
+                  >
+                    {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
+                    <ResizeHandler header={header} />
+                  </th>
+                ))}
+              </tr>
+            ))}
+          </thead>
+          <tbody>
+            {table.getRowModel().rows.map((row) => (
+              <tr key={row.id} className="even:bg-neutral-surface">
+                {row.getVisibleCells().map((cell) => (
+                  <td
+                    key={cell.id}
+                    className="px-4 py-2 overflow-hidden text-ellipsis align-top"
+                    style={{ minWidth: cell.column.getSize() }}
+                  >
+                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                  </td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 };
