@@ -129,6 +129,17 @@ export default types
      */
     noAccess: types.optional(types.boolean, false),
     /**
+     * Flag for overlap reached - prevents annotation submission
+     */
+    overlapReached: types.optional(types.boolean, false),
+    /**
+     * Message to show when overlap is reached
+     */
+    overlapReachedMessage: types.optional(
+      types.string,
+      "Annotation overlap has been reached for this task. Your draft is preserved but cannot be submitted.",
+    ),
+    /**
      * Finish of labeling
      */
     labeledSuccess: types.optional(types.boolean, false),
@@ -283,6 +294,8 @@ export default types
         "isSubmitting",
         "noTask",
         "noAccess",
+        "overlapReached",
+        "overlapReachedMessage",
         "labeledSuccess",
         "awaitingSuggestions",
       ];
