@@ -20,7 +20,6 @@ import { UserLabels } from "./UserLabels";
 import {
   FF_CUSTOM_SCRIPT,
   FF_DEV_1536,
-  FF_FIT_720_LAZY_LOAD_ANNOTATIONS,
   FF_LSDV_4620_3_ML,
   FF_LSDV_4998,
   FF_REVIEWER_FLOW,
@@ -28,6 +27,7 @@ import {
   isFF,
 } from "../utils/feature-flags";
 import { imageCache } from "@humansignal/core";
+import { isActive, FF_FIT_720_LAZY_LOAD_ANNOTATIONS } from "@humansignal/core/lib/utils/feature-flags";
 import { CommentStore } from "./Comment/CommentStore";
 import { CustomButton } from "./CustomButton";
 
@@ -818,7 +818,7 @@ export default types
       // FIT-720: Clear image cache when leaving a task to release memory
       // forceClear() revokes all blob URLs regardless of reference count
       // This is safe here because we're destroying the annotation store anyway
-      if (isFF(FF_FIT_720_LAZY_LOAD_ANNOTATIONS)) {
+      if (isActive(FF_FIT_720_LAZY_LOAD_ANNOTATIONS)) {
         imageCache.forceClear();
       }
 

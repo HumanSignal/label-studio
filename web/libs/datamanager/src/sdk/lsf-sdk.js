@@ -4,11 +4,11 @@ import {
   FF_DEV_2186,
   FF_DEV_2887,
   FF_DEV_3034,
-  FF_FIT_720_LAZY_LOAD_ANNOTATIONS,
   FF_LSDV_4620_3_ML,
   FF_FIT_1304_STRICT_OVERLAP,
   isFF,
 } from "../utils/feature-flags";
+import { isActive, FF_FIT_720_LAZY_LOAD_ANNOTATIONS } from "@humansignal/core/lib/utils/feature-flags";
 import { isDefined } from "../utils/utils";
 import { Modal } from "../components/Common/Modal/Modal";
 import { CommentsSdk } from "./comments-sdk";
@@ -1234,7 +1234,7 @@ export class LSFWrapper {
     }
 
     // FIT-720: Clear image cache when destroying LSF to release memory
-    if (isFF(FF_FIT_720_LAZY_LOAD_ANNOTATIONS)) {
+    if (isActive(FF_FIT_720_LAZY_LOAD_ANNOTATIONS)) {
       imageCache?.forceClear?.();
     }
 
