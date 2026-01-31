@@ -207,37 +207,41 @@ export const ImageEntity = types
      * @param {boolean} value - Whether to set error state
      */
     setError(value = true) {
-      if (value && !self._retryAttempted && self._originalUrl) {
-        // Attempt recovery: force re-fetch from original URL
-        self._retryAttempted = true;
-        self.error = false;
-
-        // Remove potentially corrupt cache entry
-        imageCache.forceRemove(self.src);
-
-        // Re-attempt load
-        self.setDownloading(true);
-        self.setDownloaded(false);
+      if (value) {
+        // Always reset imageLoaded when setting error
         self.setImageLoaded(false);
-        self.setCurrentSrc(undefined);
 
-        const crossOrigin = self.imageCrossOrigin;
+        if (!self._retryAttempted && self._originalUrl) {
+          // Attempt recovery: force re-fetch from original URL
+          self._retryAttempted = true;
+          self.error = false;
 
-        imageCache
-          .load(self.src, crossOrigin, (progress) => {
-            self.setProgress(progress);
-          })
-          .then((result) => {
-            self.markAsLoaded(result.blobUrl, { addCacheRef: true });
-          })
-          .catch(() => {
-            // Final failure - set error state
-            self.error = true;
-            self.setDownloading(false);
-          });
-      } else {
-        self.error = value;
+          // Remove potentially corrupt cache entry
+          imageCache.forceRemove(self.src);
+
+          // Re-attempt load
+          self.setDownloading(true);
+          self.setDownloaded(false);
+          self.setCurrentSrc(undefined);
+
+          const crossOrigin = self.imageCrossOrigin;
+
+          imageCache
+            .load(self.src, crossOrigin, (progress) => {
+              self.setProgress(progress);
+            })
+            .then((result) => {
+              self.markAsLoaded(result.blobUrl, { addCacheRef: true });
+            })
+            .catch(() => {
+              // Final failure - set error state
+              self.error = true;
+              self.setDownloading(false);
+            });
+          return;
+        }
       }
+      self.error = value;
     },
 
     /**
