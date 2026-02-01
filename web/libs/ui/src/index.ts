@@ -41,7 +41,8 @@ export * from "./lib/pagination";
 export * from "./lib/drawer";
 
 export * from "./utils/utils";
+export * from "./utils/getTokenColor";
+export * from "./hooks/useTokenColor";
 
 // TODO: Remove when DIA-2142 and DIA-2175 are delivered
 export * from "./shadcn";
-export * from "./utils/utils";
