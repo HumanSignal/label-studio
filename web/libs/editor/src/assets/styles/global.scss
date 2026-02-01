@@ -204,3 +204,7 @@
 :global([data-color-scheme="dark"] .htx-datetime input[type="time"]) {
   color-scheme: dark;
 }
+
+* {
+  scrollbar-color: var(--color-neutral-border-bold) transparent;
+}

@@ -10,6 +10,7 @@ import { memo, type ReactElement } from "react";
 import { Tooltip, Button } from "@humansignal/ui";
 import { IconInfoOutline } from "@humansignal/icons";
 import type { MSTStore } from "../../stores/types";
+import { FF_FIT_1304_STRICT_OVERLAP, isFF } from "../../utils/feature-flags";
 
 type MixedInParams = {
   store: MSTStore;
@@ -106,9 +107,15 @@ export const SkipButton = memo(
     const userRole = (window as any).APP_SETTINGS?.user?.role;
     const hasForceSkipPermission = MANAGER_ROLES.includes(userRole);
     const canSkip = !skipDisabled || hasForceSkipPermission;
-    const isDisabled = disabled || !canSkip;
+    // Only check overlap reached when feature flag is enabled
+    const overlapReached = isFF(FF_FIT_1304_STRICT_OVERLAP) && store.overlapReached === true;
+    const isDisabled = disabled || !canSkip || overlapReached;
 
-    const tooltip: string = canSkip ? "Cancel (skip) task [ Ctrl+Space ]" : "This task cannot be skipped";
+    const tooltip: string = overlapReached
+      ? store.overlapReachedMessage
+      : canSkip
+        ? "Cancel (skip) task [ Ctrl+Space ]"
+        : "This task cannot be skipped";
 
     const showInfoIcon = skipDisabled && hasForceSkipPermission;
 

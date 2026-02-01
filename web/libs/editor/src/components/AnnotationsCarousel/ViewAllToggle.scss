@@ -1,0 +1,96 @@
+.view-all-toggle {
+  // Button reset
+  appearance: none;
+  font-family: inherit;
+  font-size: inherit;
+  line-height: inherit;
+  text-align: left;
+  width: auto;
+
+  // Original styles
+  display: flex;
+  padding: var(--spacing-tighter) var(--spacing-base) var(--spacing-tighter) var(--spacing-tight);
+  border-radius: var(--corner-radius-small) var(--corner-radius-small) 0 0;
+  border-width: 1px 1px 0;
+  border-style: solid;
+  background-color: var(--color-neutral-surface);
+  margin-top: var(--spacing-tightest);
+  align-items: center;
+  gap: var(--spacing-tight);
+  cursor: pointer;
+  height: calc(100% - 3px);
+  border-color: var(--color-neutral-border);
+  transition: all 150ms ease-out;
+  position: relative;
+
+  &__mainSection {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-tight);
+    flex: 1 0 auto;
+  }
+
+  &__iconContainer {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background-color: var(--color-accent-grape-subtle);
+    color: var(--color-accent-grape-bold);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+
+    svg {
+      width: 16px;
+      height: 16px;
+    }
+  }
+
+  &__content {
+    flex: 1 0 auto;
+  }
+
+  &__label {
+    color: var(--color-neutral-content-subtle);
+  }
+
+  &:hover {
+    background-color: var(--color-primary-emphasis-subtle);
+    border-color: var(--color-primary-border-subtler);
+    border-bottom-color: transparent;
+
+    & .view-all-toggle__label {
+      color: var(--color-neutral-content);
+    }
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--color-primary-border);
+    outline-offset: 2px;
+  }
+
+  &_selected {
+    background-color: var(--color-neutral-background);
+    border-color: var(--color-neutral-border);
+    transform: translate(0, 1px);
+    margin-top: 1px;
+    height: calc(100% - 2px);
+    box-shadow: inset 0 4px 2px 0 var(--color-neutral-background), 0 4px 2px 0 rgba(var(--color-neutral-shadow-raw) / 20%);
+
+    & .view-all-toggle__label {
+      color: var(--color-neutral-content);
+    }
+
+    & .view-all-toggle__iconContainer {
+      background-color: var(--color-accent-grape-base);
+      color: var(--color-neutral-background);
+    }
+
+    &:hover {
+      cursor: default;
+      background-color: var(--color-neutral-background);
+      border-color: var(--color-neutral-border);
+    }
+  }
+}

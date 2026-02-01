@@ -39,7 +39,7 @@ A tag-like autocomplete component that allows users to select multiple tags from
 |-----|--------|
 | Arrow Left/Right | Navigate between tags |
 | Arrow Up/Down | Navigate dropdown options |
-| Enter | Select highlighted option |
+| Enter / Comma | Select highlighted option or create new tag |
 | Backspace/Delete | Remove focused tag |
 | Escape | Close dropdown |
         `,
@@ -105,7 +105,9 @@ export const Default: Story = {
               <kbd className="px-tight bg-neutral-surface-bold rounded">↓</kbd> Navigate dropdown options
             </li>
             <li>
-              • <kbd className="px-tight bg-neutral-surface-bold rounded">Enter</kbd> Select highlighted option
+              • <kbd className="px-tight bg-neutral-surface-bold rounded">Enter</kbd> /{" "}
+              <kbd className="px-tight bg-neutral-surface-bold rounded">,</kbd> Select highlighted option or create new
+              tag
             </li>
             <li>
               • <kbd className="px-tight bg-neutral-surface-bold rounded">Backspace</kbd> Remove tag or focus last tag
