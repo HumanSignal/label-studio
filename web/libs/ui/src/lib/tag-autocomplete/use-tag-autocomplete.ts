@@ -281,6 +281,24 @@ export function useTagAutocomplete<T = string>(
           // CMDK will handle selection via onSelect callback
           break;
 
+        // Comma - simulate Enter keypress
+        case ",": {
+          e.preventDefault();
+          e.stopPropagation();
+
+          // Create and dispatch a synthetic Enter key event
+          const enterEvent = new KeyboardEvent("keydown", {
+            key: "Enter",
+            code: "Enter",
+            keyCode: 13,
+            which: 13,
+            bubbles: true,
+            cancelable: true,
+          });
+          e.currentTarget.dispatchEvent(enterEvent);
+          break;
+        }
+
         // Removal
         case "Backspace":
           if (focusedTagIndex !== null) {

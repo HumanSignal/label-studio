@@ -4,6 +4,7 @@ interface UseBadgeOverflowProps {
   enabled: boolean;
   containerRef: React.RefObject<HTMLDivElement>;
   itemCount: number;
+  recalcTrigger?: number;
 }
 
 /**
@@ -12,7 +13,12 @@ interface UseBadgeOverflowProps {
  *
  * This is a self-contained version that measures its own container width
  */
-export const useBadgeOverflow = ({ enabled, containerRef, itemCount }: UseBadgeOverflowProps): number | null => {
+export const useBadgeOverflow = ({
+  enabled,
+  containerRef,
+  itemCount,
+  recalcTrigger,
+}: UseBadgeOverflowProps): number | null => {
   const [visibleBadgeCount, setVisibleBadgeCount] = useState<number | null>(null);
   const isCalculatingRef = useRef<boolean>(false);
   const lastVisibleCountRef = useRef<number | null>(null);
@@ -20,8 +26,10 @@ export const useBadgeOverflow = ({ enabled, containerRef, itemCount }: UseBadgeO
   const mutationObserverRef = useRef<MutationObserver | null>(null);
 
   useLayoutEffect(() => {
+    // Reset state when disabled
     if (!enabled) {
       setVisibleBadgeCount(null);
+      lastVisibleCountRef.current = null;
       return;
     }
 
@@ -181,7 +189,7 @@ export const useBadgeOverflow = ({ enabled, containerRef, itemCount }: UseBadgeO
         clearTimeout(calculationTimeoutRef.current);
       }
     };
-  }, [enabled, containerRef, itemCount]);
+  }, [enabled, containerRef, itemCount, recalcTrigger]);
 
   return visibleBadgeCount;
 };
