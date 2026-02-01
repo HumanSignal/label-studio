@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react";
+import React from "react";
 import { BadgeGroup } from "./badge-group";
 import { Typography } from "../typography/typography";
 import { DataTable } from "../data-table";
@@ -68,7 +69,7 @@ export const WithVariants: Story = {
       </div>
       <div>
         <Typography variant="body" className="mb-tight font-semibold">
-          Error
+          Destructive
         </Typography>
         <BadgeGroup
           items={[
@@ -76,27 +77,7 @@ export const WithVariants: Story = {
             { id: 2, label: "TypeScript" },
             { id: 3, label: "React" },
           ]}
-          variant="error"
-        />
-      </div>
-    </div>
-  ),
-};
-
-export const WithShapes: Story = {
-  render: () => (
-    <div className="flex flex-col gap-base w-[400px]">
-      <div>
-        <Typography variant="body" className="mb-tight font-semibold">
-          Squared (default)
-        </Typography>
-        <BadgeGroup
-          items={[
-            { id: 1, label: "JavaScript" },
-            { id: 2, label: "TypeScript" },
-            { id: 3, label: "React" },
-          ]}
-          shape="squared"
+          variant="destructive"
         />
       </div>
       <div>
@@ -112,56 +93,6 @@ export const WithShapes: Story = {
           shape="rounded"
         />
       </div>
-    </div>
-  ),
-};
-
-export const WithOverflow: Story = {
-  render: () => (
-    <div className="w-[300px] border border-dashed border-neutral-border p-base">
-      <Typography variant="body" size="small" className="mb-tight text-neutral-text-secondary">
-        Container width: 300px - Badges will show +n when overflow
-      </Typography>
-      <BadgeGroup
-        items={[
-          { id: 1, label: "JavaScript" },
-          { id: 2, label: "TypeScript" },
-          { id: 3, label: "React" },
-          { id: 4, label: "Vue" },
-          { id: 5, label: "Angular" },
-          { id: 6, label: "Node.js" },
-          { id: 7, label: "Python" },
-          { id: 8, label: "Django" },
-        ]}
-        variant="info"
-        shape="squared"
-      />
-    </div>
-  ),
-};
-
-export const WithManyItems: Story = {
-  render: () => (
-    <div className="w-[250px] border border-dashed border-neutral-border p-base">
-      <Typography variant="body" size="small" className="mb-tight text-neutral-text-secondary">
-        Container width: 250px - Very narrow container
-      </Typography>
-      <BadgeGroup
-        items={[
-          { id: 1, label: "JavaScript" },
-          { id: 2, label: "TypeScript" },
-          { id: 3, label: "React" },
-          { id: 4, label: "Vue.js" },
-          { id: 5, label: "Angular" },
-          { id: 6, label: "Svelte" },
-          { id: 7, label: "Node.js" },
-          { id: 8, label: "Python" },
-          { id: 9, label: "Django" },
-          { id: 10, label: "Flask" },
-        ]}
-        variant="info"
-        shape="squared"
-      />
     </div>
   ),
 };
@@ -278,5 +209,45 @@ export const InTableCell: Story = {
     ];
 
     return <DataTable data={data} columns={columns} />;
+  },
+};
+
+export const WithShowAllButton: Story = {
+  render: () => {
+    const [showAll, setShowAll] = React.useState(false);
+
+    const tags = [
+      { id: 1, label: "English" },
+      { id: 2, label: "Spanish" },
+      { id: 3, label: "French" },
+      { id: 4, label: "German" },
+      { id: 5, label: "Translator" },
+      { id: 6, label: "Legal" },
+      { id: 7, label: "Technical" },
+      { id: 8, label: "Medical" },
+      { id: 9, label: "Finance" },
+    ];
+
+    return (
+      <div className="w-[400px] border border-dashed border-neutral-border p-base">
+        <Typography variant="body" size="small" className="mb-tight text-neutral-text-secondary">
+          When truncated: badges overflow with +n badge
+          <br />
+          When not truncated: badges wrap to multiple lines
+        </Typography>
+        <div className="flex flex-col gap-tight">
+          <BadgeGroup items={tags} variant="info" shape="squared" truncate={!showAll} />
+          {tags.length > 0 && (
+            <button
+              type="button"
+              onClick={() => setShowAll(!showAll)}
+              className="self-start px-tight py-tighter text-sm text-primary-content hover:underline"
+            >
+              {showAll ? "Show Less" : "Show All"}
+            </button>
+          )}
+        </div>
+      </div>
+    );
   },
 };

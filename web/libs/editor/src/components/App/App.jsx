@@ -25,8 +25,8 @@ import "../../tags/Custom";
  */
 import { Space } from "../../common/Space/Space";
 import { Button } from "@humansignal/ui";
+import { isStarterCloudPlan } from "@humansignal/core";
 import { cn } from "../../utils/bem";
-import { isSelfServe } from "../../utils/billing";
 import { FF_BULK_ANNOTATION, FF_DEV_3873, FF_LSDV_4620_3_ML, FF_SIMPLE_INIT, isFF } from "../../utils/feature-flags";
 import { sanitizeHtml } from "../../utils/html";
 import { reactCleaner } from "../../utils/reactCleaner";
@@ -233,7 +233,7 @@ class App extends Component {
       </div>
     );
 
-    const isBulkMode = isFF(FF_BULK_ANNOTATION) && !isSelfServe() && store.hasInterface("annotation:bulk");
+    const isBulkMode = isFF(FF_BULK_ANNOTATION) && !isStarterCloudPlan() && store.hasInterface("annotation:bulk");
     const newUIEnabled = isFF(FF_DEV_3873);
 
     return (

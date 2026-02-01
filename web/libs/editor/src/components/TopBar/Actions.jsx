@@ -1,8 +1,8 @@
 import { Button } from "@humansignal/ui";
 import { IconCopy, IconInfo, IconViewAll, IconTrash, IconSettings } from "@humansignal/icons";
 import { Tooltip } from "@humansignal/ui";
+import { isStarterCloudPlan } from "@humansignal/core";
 import { cn } from "../../utils/bem";
-import { isSelfServe } from "../../utils/billing";
 import { FF_BULK_ANNOTATION, isFF } from "../../utils/feature-flags";
 import { GroundTruth } from "../CurrentEntity/GroundTruth";
 import { EditingHistory } from "./HistoryActions";
@@ -15,7 +15,7 @@ export const Actions = ({ store }) => {
   const saved = !entity.userGenerate || entity.sentUserGenerate;
   const isPrediction = entity?.type === "prediction";
   const isViewAll = annotationStore.viewingAll;
-  const isBulkMode = isFF(FF_BULK_ANNOTATION) && !isSelfServe() && store.hasInterface("annotation:bulk");
+  const isBulkMode = isFF(FF_BULK_ANNOTATION) && !isStarterCloudPlan() && store.hasInterface("annotation:bulk");
 
   const onToggleVisibility = useCallback(() => {
     annotationStore.toggleViewingAllAnnotations();

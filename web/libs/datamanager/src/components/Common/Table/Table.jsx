@@ -4,9 +4,8 @@ import { useSDK } from "../../../providers/SDKProvider";
 import { isDefined } from "../../../utils/utils";
 import { Icon } from "../Icon/Icon";
 import { modal } from "../Modal/Modal";
-import { IconCode, IconCopyOutline, IconChevronDown } from "@humansignal/icons";
-import { AutoSizerTable, Tooltip, Button } from "@humansignal/ui";
-import { useCopyText } from "@humansignal/core";
+import { IconCode, IconChevronDown } from "@humansignal/icons";
+import { AutoSizerTable, Button } from "@humansignal/ui";
 import "./Table.scss";
 import { TableCheckboxCell } from "./TableCheckbox";
 import { tableCN, TableContext } from "./TableContext";
@@ -17,6 +16,7 @@ import { cn } from "../../../utils/bem";
 import { FieldsButton } from "../FieldsButton";
 import { FF_LOPS_E_3, isFF } from "../../../utils/feature-flags";
 import { DensityToggle } from "../../DataManager/Toolbar/DensityToggle";
+import { TaskSourceViewer } from "../TaskSourceViewer";
 
 const Decorator = (decoration) => {
   return {
@@ -172,10 +172,22 @@ export const Table = observer(
             look="string"
             className="w-6 h-6 p-0 text-primary-content hover:text-primary-content-hover"
             onClick={() => {
-              modal({
+              const modalInstance = modal({
                 title: `Source for task ${out?.id}`,
-                style: { width: 800 },
-                body: <TaskSourceView content={out} onTaskLoad={onTaskLoad} sdkType={type} />,
+                style: { width: 900 },
+                header: null, // Will be set by renderToggle
+                body: (
+                  <TaskSourceViewer
+                    content={out}
+                    onTaskLoad={onTaskLoad}
+                    sdkType={type}
+                    storageKey="dm:tasksource"
+                    renderToggle={(toggle) => {
+                      // Update modal header with toggle
+                      modalInstance?.update({ header: toggle });
+                    }}
+                  />
+                ),
               });
             }}
             leading={<Icon icon={IconCode} />}
@@ -537,62 +549,3 @@ const innerElementType = forwardRef(({ children, ...rest }, ref) => {
     </StickyListContext.Consumer>
   );
 });
-
-const TaskSourceView = ({ content, onTaskLoad, sdkType }) => {
-  const [source, setSource] = useState(content);
-
-  useEffect(() => {
-    onTaskLoad().then((response) => {
-      const formatted = {
-        id: response.id,
-        data: response.data,
-      };
-
-      if (sdkType !== "DE") {
-        formatted.annotations = response.annotations ?? [];
-        formatted.predictions = response.predictions ?? [];
-      }
-      if (response.state) {
-        formatted.state = response.state;
-      }
-      setSource(formatted);
-    });
-  }, []);
-
-  const jsonString = useMemo(() => {
-    return source ? JSON.stringify(source, null, 2) : "";
-  }, [source]);
-
-  const [handleCopy, copied] = useCopyText({ defaultText: jsonString });
-
-  return (
-    <div
-      className="bg-neutral-surface rounded-small font-mono text-body-small leading-body-small overflow-auto max-h-[500px]"
-      style={{ position: "relative" }}
-    >
-      <div style={{ padding: "16px", paddingTop: "16px" }}>
-        <Tooltip title={copied ? "Copied!" : "Copy JSON"}>
-          <Button
-            look="string"
-            variant="neutral"
-            style={{
-              position: "absolute",
-              top: "8px",
-              right: "8px",
-              width: 32,
-              height: 32,
-              padding: 0,
-              zIndex: 10,
-              color: "var(--color-neutral-content-subtle)",
-            }}
-            onClick={() => handleCopy()}
-            leading={<Icon icon={IconCopyOutline} style={{ color: "var(--color-neutral-content-subtle)" }} />}
-          />
-        </Tooltip>
-        <pre className="m-0 whitespace-pre-wrap break-words max-w-full" style={{ marginRight: "40px" }}>
-          {jsonString}
-        </pre>
-      </div>
-    </div>
-  );
-};
