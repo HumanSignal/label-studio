@@ -1,4 +1,5 @@
 import { JSONPath } from "jsonpath-plus";
+import capitalize from "lodash/capitalize";
 import type { RawResult } from "../../stores/types";
 import { Chip } from "./Chip";
 import type { RendererType } from "./types";
@@ -16,7 +17,7 @@ export const jsonPathToTitle = (jsonPath: string): string => {
       .replace(/\[\*\]/g, "") // Remove array wildcards
       .split(".")
       .filter(Boolean)
-      .map((part) => part.charAt(0).toUpperCase() + part.slice(1)) // Capitalize
+      .map(capitalize)
       .join(" / ") || "Value"
   );
 };
