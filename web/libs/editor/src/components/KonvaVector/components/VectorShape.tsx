@@ -341,7 +341,7 @@ export const VectorShape: React.FC<VectorShapeProps> = ({
                     target: e.target?.getClassName(),
                     currentTarget: e.currentTarget?.getClassName(),
                     pointerPos: e.target?.getStage()?.getPointerPosition(),
-                    pathData: pathData.substring(0, 50) + "...",
+                    pathData: `${pathData.substring(0, 50)}...`,
                   });
                   // Clear any pending leave timeout
                   if (hoverTimeoutRef.current[index]) {
