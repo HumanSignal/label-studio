@@ -2744,7 +2744,7 @@
     },
     "fflag_feat_front_interactive_json_viewer_short": {
       "key": "fflag_feat_front_interactive_json_viewer_short",
-      "on": false,
+      "on": true,
       "prerequisites": [],
       "targets": [],
       "contextTargets": [],
@@ -2766,7 +2766,7 @@
       "trackEvents": false,
       "trackEventsFallthrough": false,
       "debugEventsUntilDate": null,
-      "version": 2,
+      "version": 3,
       "deleted": false
     },
     "fflag_feat_front_leap_1173_disable_postpone_skip_short": {
