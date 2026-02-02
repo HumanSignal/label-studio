@@ -16,7 +16,8 @@ import { observe } from "mobx";
 import Konva from "konva";
 import { Annotation } from "./Annotation";
 import { isDefined } from "../../utils/utilities";
-import { FF_DEV_3391, FF_FIT_720_LAZY_LOAD_ANNOTATIONS, isFF } from "../../utils/feature-flags";
+import { FF_DEV_3391, isFF } from "../../utils/feature-flags";
+import { isActive, FF_FIT_720_LAZY_LOAD_ANNOTATIONS } from "@humansignal/core/lib/utils/feature-flags";
 import { moveStylesBetweenHeadTags } from "../../utils/html";
 
 // FIT-720: Virtualization constants for Compare view
@@ -399,7 +400,7 @@ export default function Grid(props) {
   const visibleCount = annotations.filter((c) => !c.hidden).length;
 
   // FIT-720: Use virtualization when FF is enabled AND there are many annotations
-  const shouldVirtualize = isFF(FF_FIT_720_LAZY_LOAD_ANNOTATIONS) && visibleCount > VIRTUALIZATION_THRESHOLD;
+  const shouldVirtualize = isActive(FF_FIT_720_LAZY_LOAD_ANNOTATIONS) && visibleCount > VIRTUALIZATION_THRESHOLD;
 
   if (shouldVirtualize) {
     return <VirtualizedGrid {...props} />;

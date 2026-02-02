@@ -5,7 +5,7 @@ import { FixedSizeList as List, type ListChildComponentProps } from "react-windo
 import AutoSizer from "react-virtualized-auto-sizer";
 import { cn } from "../../utils/bem";
 import { clamp, sortAnnotations } from "../../utils/utilities";
-import { FF_FIT_720_LAZY_LOAD_ANNOTATIONS, isFF } from "../../utils/feature-flags";
+import { isActive, FF_FIT_720_LAZY_LOAD_ANNOTATIONS } from "@humansignal/core/lib/utils/feature-flags";
 import { AnnotationButton } from "./AnnotationButton";
 import "./AnnotationsCarousel.scss";
 
@@ -80,7 +80,8 @@ export const AnnotationsCarousel = observer(({ store, annotationStore }: Annotat
   // FIT-720: Calculate total width and determine if virtualization is needed
   const totalWidth = sortedEntities.length * (ITEM_WIDTH + ITEM_GAP);
   // FIT-720: Only virtualize when FF is enabled AND there are many items
-  const shouldVirtualize = isFF(FF_FIT_720_LAZY_LOAD_ANNOTATIONS) && sortedEntities.length > VIRTUALIZATION_THRESHOLD;
+  const shouldVirtualize =
+    isActive(FF_FIT_720_LAZY_LOAD_ANNOTATIONS) && sortedEntities.length > VIRTUALIZATION_THRESHOLD;
 
   // FIT-720: Navigation button states for virtualized list
   const isLeftDisabled = scrollOffset <= 0;
