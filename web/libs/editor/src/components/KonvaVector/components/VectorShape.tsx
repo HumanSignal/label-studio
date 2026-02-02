@@ -1,5 +1,5 @@
 import React, { useRef } from "react";
-import { Path, Shape, Group } from "react-konva";
+import { Path, Shape } from "react-konva";
 import type { BezierPoint } from "../types";
 import chroma from "chroma-js";
 import type { KonvaEventObject } from "konva/lib/Node";
