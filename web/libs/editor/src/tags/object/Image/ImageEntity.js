@@ -150,44 +150,6 @@ export const ImageEntity = types
         });
     },
 
-    /**
-     * Fallback preload method for when global cache fails
-     */
-    fallbackPreload() {
-      const crossOrigin = self.imageCrossOrigin;
-      if (isFF(FF_IMAGE_MEMORY_USAGE)) {
-        const img = new Image();
-        if (crossOrigin) img.crossOrigin = crossOrigin;
-        img.onload = () => {
-          self.setCurrentSrc(self.src);
-          self.setDownloaded(true);
-          self.setProgress(1);
-          self.setDownloading(false);
-          // imageLoaded will be set by <img> onLoad in the component
-        };
-        img.onerror = () => {
-          self.setError(true);
-          self.setDownloading(false);
-        };
-        img.src = self.src;
-      } else {
-        fileLoader
-          .download(self.src, (_t, _l, progress) => {
-            self.setProgress(progress);
-          })
-          .then((url) => {
-            self.setDownloaded(true);
-            self.setDownloading(false);
-            self.setCurrentSrc(url);
-            // imageLoaded will be set by <img> onLoad in the component
-          })
-          .catch(() => {
-            self.setDownloading(false);
-            self.setError(true);
-          });
-      }
-    },
-
     ensurePreloaded() {
       // FIT-720: First check global image cache
       const cached = imageCache.get(self.src);
