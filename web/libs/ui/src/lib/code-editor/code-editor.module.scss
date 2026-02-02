@@ -95,6 +95,21 @@
       color: var(--color-accent-sand-bold);
     }
 
+    :global(.cm-atom),
+    :global(.cm-meta) {
+      color: var(--color-accent-blueberry-bolder);
+    }
+
+    :global(.cm-variable),
+    :global(.cm-variable-2) {
+      color: var(--color-neutral-content);
+    }
+
+    :global(.cm-variable-3),
+    :global(.cm-type) {
+      color: var(--color-accent-kale-bolder);
+    }
+
     :global(.CodeMirror-gutters) {
       background-color: var(--color-neutral-surface-inset);
       color: var(--color-neutral-content-subtlest);

@@ -120,3 +120,10 @@ export const FF_SELF_SERVE = "fflag_feat_front_leap_482_self_serve_short";
  * Preview performance improvements - uses lightweight static preview for large configs
  */
 export const FF_PREVIEW_PERFORMANCE = "fflag_fix_all_fit_287_preview_performance_improvements";
+
+/**
+ * Lazy load annotations in LabelStream to improve performance for tasks with many annotations
+ * Also enables virtualization of annotation tabs carousel
+ * @link https://app.launchdarkly.com/default/production/features/fflag_fix_all_fit_720_lazy_load_annotations
+ */
+export const FF_FIT_720_LAZY_LOAD_ANNOTATIONS = "fflag_fix_all_fit_720_lazy_load_annotations";

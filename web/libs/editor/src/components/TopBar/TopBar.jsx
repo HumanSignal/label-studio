@@ -2,9 +2,8 @@ import { observer } from "mobx-react";
 
 import { IconPlus } from "@humansignal/icons";
 import { Button } from "@humansignal/ui";
-import { ff } from "@humansignal/core";
+import { ff, isStarterCloudPlan } from "@humansignal/core";
 import { cn } from "../../utils/bem";
-import { isSelfServe } from "../../utils/billing";
 import { FF_BULK_ANNOTATION, FF_DEV_3873, isFF } from "../../utils/feature-flags";
 import { AnnotationsCarousel } from "../AnnotationsCarousel/AnnotationsCarousel";
 import { ViewAllToggle } from "../AnnotationsCarousel/ViewAllToggle";
@@ -21,7 +20,7 @@ export const TopBar = observer(({ store }) => {
   const isPrediction = entity?.type === "prediction";
 
   const isViewAll = annotationStore?.viewingAll === true;
-  const isBulkMode = isFF(FF_BULK_ANNOTATION) && !isSelfServe() && store.hasInterface("annotation:bulk");
+  const isBulkMode = isFF(FF_BULK_ANNOTATION) && !isStarterCloudPlan() && store.hasInterface("annotation:bulk");
 
   if (isFF(FF_DEV_3873) && isBulkMode) return null;
 

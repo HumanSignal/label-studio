@@ -29,6 +29,8 @@ export const create = (columns) => {
     drafts: types.frozen(),
     source: types.maybeNull(types.string),
     was_cancelled: false,
+    overlap_reached: types.maybeNull(types.boolean),
+    overlap_reached_message: types.maybeNull(types.string),
     assigned_task: false,
     queue: types.optional(types.maybeNull(types.string), null),
     // annotation to select on rejected queue
