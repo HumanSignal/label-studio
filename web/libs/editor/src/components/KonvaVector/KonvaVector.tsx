@@ -1,14 +1,7 @@
 import type Konva from "konva";
 import { useState, useRef, forwardRef, useImperativeHandle, useEffect, useMemo, useCallback } from "react";
 import { Group, Shape } from "react-konva";
-import {
-  ControlPoints,
-  GhostLine,
-  GhostPoint,
-  type GhostPointRef,
-  VectorPoints,
-  VectorShape,
-} from "./components";
+import { ControlPoints, GhostLine, GhostPoint, type GhostPointRef, VectorPoints, VectorShape } from "./components";
 import { createEventHandlers } from "./eventHandlers";
 import { convertPoint } from "./pointManagement";
 import { normalizePoints, convertBezierToSimplePoints, isPointInPolygon } from "./utils";
@@ -42,8 +35,6 @@ import {
   DEFAULT_POINT_STROKE_SELECTED,
   DEFAULT_POINT_STROKE_WIDTH,
   HIT_RADIUS,
-  TRANSFORMER_SETUP_DELAY,
-  TRANSFORMER_CLEAR_DELAY,
   MIN_POINTS_FOR_CLOSING,
   MIN_POINTS_FOR_BEZIER_CLOSING,
   INVISIBLE_SHAPE_OPACITY,
@@ -2852,7 +2843,6 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
 
         // Handle point dragging
         if (draggedPointIndex !== null && lastPos.current && !disabled) {
-
           // Check if we should start dragging
           const dragThreshold = 5;
           const mouseDeltaX = Math.abs(e.evt.clientX - lastPos.current.x);
