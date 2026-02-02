@@ -2,7 +2,7 @@ import { types, getParent, addDisposer } from "mobx-state-tree";
 import { FileLoader } from "../../../utils/FileLoader";
 import { imageCache } from "@humansignal/core";
 import { clamp } from "../../../utils/utilities";
-import { FF_FIT_720_LAZY_LOAD_ANNOTATIONS, FF_IMAGE_MEMORY_USAGE, isFF } from "../../../utils/feature-flags";
+import { FF_IMAGE_MEMORY_USAGE, isFF } from "../../../utils/feature-flags";
 
 const fileLoader = new FileLoader();
 
