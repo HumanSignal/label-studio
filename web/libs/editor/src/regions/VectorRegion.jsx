@@ -672,6 +672,13 @@ const HtxVectorView = observer(({ item, suggestion }) => {
 
             e.cancelBubble = true;
 
+            // If another region is being drawn, complete the drawing first
+            const tm = item.parent.getToolsManager();
+            const tool = tm.findSelectedTool();
+            if (tool?.currentArea && tool.currentArea !== item && tool.complete) {
+              tool.complete();
+            }
+
             // Allow selection regardless of whether the path is closed
             // The Selection tool will handle multi-selection logic
             if (store.annotationStore.selected.isLinkingMode) {

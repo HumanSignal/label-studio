@@ -2318,10 +2318,35 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
           setIsShiftKeyHeld(e.evt.shiftKey);
         }
 
-        // Debug: Log coordinate conversion
         const imagePos = stageToImageCoordinates(pos, transform, fitScale, x, y);
 
-        // Always update cursor position (even outside bounds) so ghost line can work
+        // Check if event target belongs to this instance's group
+        const target = e.target;
+        const group = stageRef.current;
+        let targetGroup: Konva.Node | null = target;
+        while (targetGroup && targetGroup !== group && targetGroup.getParent()) {
+          targetGroup = targetGroup.getParent();
+        }
+        const isTargetInGroup = targetGroup === group;
+        // Also allow when hovering over empty space (stage or layer)
+        const isStageOrLayer = target === stage || target.getParent() === stage;
+
+        // When hovering over another region, clear cursor position to hide ghost line
+        if (!isTargetInGroup && !isStageOrLayer) {
+          // Clear cursor position when hovering over other regions to hide ghost line
+          cursorPositionRef.current = null;
+          setGhostPoint(null);
+          // Trigger redraw to hide ghost line
+          if (ghostLineRafRef.current) {
+            cancelAnimationFrame(ghostLineRafRef.current);
+          }
+          ghostLineRafRef.current = requestAnimationFrame(() => {
+            stage.batchDraw();
+          });
+          return;
+        }
+
+        // Update cursor position (only when not hovering over another region)
         cursorPositionRef.current = imagePos;
 
         // Use RAF to batch redraw calls for performance
@@ -2667,7 +2692,6 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
         return;
       }
 
-      // Always update cursor position first (for ghost line to work everywhere)
       const pos = e.target.getStage()?.getPointerPosition();
       if (!pos) return;
 
@@ -2678,22 +2702,19 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
 
       const imagePos = stageToImageCoordinates(pos, transform, fitScale, x, y);
 
-      // Always update cursor position (even outside bounds) so ghost line can work
-      cursorPositionRef.current = imagePos;
-
-      // Use RAF to batch redraw calls for performance
-      if (ghostLineRafRef.current) {
-        cancelAnimationFrame(ghostLineRafRef.current);
+      // Check if event target belongs to this instance's group
+      const target = e.target;
+      let targetGroup: Konva.Node | null = target;
+      while (targetGroup && targetGroup !== group && targetGroup.getParent()) {
+        targetGroup = targetGroup.getParent();
       }
-      ghostLineRafRef.current = requestAnimationFrame(() => {
-        stage.batchDraw();
-      });
+      const isTargetInGroup = targetGroup === group;
+      // Also allow when hovering over empty space (stage or layer)
+      const isStageOrLayer = target === stage || target.getParent() === stage;
 
-      // Recalculate ghost point using the helper function
-      // Pass the event's shiftKey state and position for real-time updates
-      if (calculateGhostPointRef.current) {
-        calculateGhostPointRef.current(e.evt.shiftKey, pos);
-      }
+      // If we're dragging a point from this instance, allow dragging to continue
+      // even if mouse moves outside our group (user might drag outside bounds)
+      const isDraggingFromThisInstance = draggedPointIndex !== null || draggedControlPoint !== null;
 
       // Handle shape dragging first (if active, allow dragging to continue even outside bounds)
       // Skip individual shape dragging if disabled or in multi-region mode (ImageTransformer handles it)
@@ -2747,30 +2768,40 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
         return; // Don't process other logic when dragging shape
       }
 
-      // If we're dragging a point from this instance, allow dragging to continue
-      // even if mouse moves outside our group (user might drag outside bounds)
-      const isDraggingFromThisInstance = draggedPointIndex !== null || draggedControlPoint !== null;
-
-      // Check if event target belongs to this instance's group
-      // This prevents ghost point snapping from working for other regions
-      // But we still update cursor position above so ghost line can work
-      const target = e.target;
-      let targetGroup: Konva.Node | null = target;
-      while (targetGroup && targetGroup !== group && targetGroup.getParent()) {
-        targetGroup = targetGroup.getParent();
-      }
-      const isTargetInGroup = targetGroup === group;
-      // Also allow when hovering over empty space (stage or layer)
-      const isStageOrLayer = target === stage || target.getParent() === stage;
-
-      // Only process ghost point snapping and dragging if:
+      // Only update cursor position and show ghost line if:
       // - Target is in our group, OR
       // - We're hovering over empty space (stage/layer), OR
       // - We're dragging from this instance
+      // When hovering over another region, clear cursor position to hide ghost line
       if (!isDraggingFromThisInstance && !isTargetInGroup && !isStageOrLayer) {
-        // Clear ghost point when hovering over other regions, but keep cursor position for ghost line
+        // Clear cursor position when hovering over other regions to hide ghost line
+        cursorPositionRef.current = null;
         setGhostPoint(null);
+        // Trigger redraw to hide ghost line
+        if (ghostLineRafRef.current) {
+          cancelAnimationFrame(ghostLineRafRef.current);
+        }
+        ghostLineRafRef.current = requestAnimationFrame(() => {
+          stage.batchDraw();
+        });
         return;
+      }
+
+      // Update cursor position (only when not hovering over another region)
+      cursorPositionRef.current = imagePos;
+
+      // Use RAF to batch redraw calls for performance
+      if (ghostLineRafRef.current) {
+        cancelAnimationFrame(ghostLineRafRef.current);
+      }
+      ghostLineRafRef.current = requestAnimationFrame(() => {
+        stage.batchDraw();
+      });
+
+      // Recalculate ghost point using the helper function
+      // Pass the event's shiftKey state and position for real-time updates
+      if (calculateGhostPointRef.current) {
+        calculateGhostPointRef.current(e.evt.shiftKey, pos);
       }
 
       // Only process ghost point and other logic if within bounds
