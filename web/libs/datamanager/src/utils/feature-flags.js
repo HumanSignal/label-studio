@@ -28,12 +28,6 @@ export const FF_LOPS_E_3 = "fflag_feat_all_lops_e_3_datasets_short";
  */
 export const FF_LSDV_4620_3_ML = "fflag_fix_front_lsdv_4620_memory_leaks_100723_short";
 
-/**
- * Self Serve
- * @link https://app.launchdarkly.com/default/test/features/fflag_feat_front_leap_482_self_serve_short/
- */
-export const FF_SELF_SERVE = "fflag_feat_front_leap_482_self_serve_short";
-
 /** Add ability to preview image tasks in Data Manager Grid View */
 export const FF_GRID_PREVIEW = "fflag_feat_front_leap_1424_grid_preview_short";
 
