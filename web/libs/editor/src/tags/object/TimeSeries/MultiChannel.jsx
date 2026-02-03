@@ -45,6 +45,9 @@ const Model = types
     },
 
     get margin() {
+      // If Y axis is hidden, we don't need to consider it for margin calculation
+      if (!self.showyaxis) return self.parent?.margin;
+
       const channelsWithYAxis = self.channels.filter((channel) => channel.showaxis && channel.showyaxis);
       if (channelsWithYAxis.length > 1) {
         return {

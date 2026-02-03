@@ -230,7 +230,7 @@ def get_not_solved_tasks_qs(
     # Note: Only applies to annotators and reviewers - managers and admins can access all tasks
     # Note: Postponed tasks are NOT filtered here - they are served with overlap_reached flag
     # so users can see their work and understand why they can't submit
-    if flag_set('fflag_feat_all_fit_1304_strict_overlap', user=user):
+    if flag_set('fflag_feat_all_fit_1304_strict_overlap', user=user) and not assigned_flag:
         lse_project = getattr(project, 'lse_project', None)
         is_restricted_role = getattr(user, 'is_annotator', False) or getattr(user, 'is_reviewer', False)
         if lse_project and getattr(lse_project, 'strict_task_overlap', False) and is_restricted_role:
