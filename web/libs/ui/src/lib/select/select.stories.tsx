@@ -211,13 +211,15 @@ export const MultipleWithBadges: Story = {
           ]}
           placeholder="Choose technologies..."
           renderSelected={(selectedOptions) => {
-            if (!selectedOptions || selectedOptions.length === 0) return null;
+            if (!selectedOptions || selectedOptions?.length === 0) return null;
             return (
               <BadgeGroup
-                items={selectedOptions.map((opt: any) => ({
-                  id: opt?.value ?? opt,
-                  label: opt?.label ?? opt?.value ?? opt,
-                }))}
+                items={
+                  selectedOptions?.map((opt: any) => ({
+                    id: opt?.value ?? opt,
+                    label: opt?.label ?? opt?.value ?? opt,
+                  })) ?? []
+                }
                 variant="info"
                 shape="squared"
               />
@@ -226,5 +228,36 @@ export const MultipleWithBadges: Story = {
         />
       </div>
     );
+  },
+};
+
+const techOptions = Array.from({ length: 100 }, (_, i) => ({
+  value: `tech-${i}`,
+  label: `Technology ${i}`,
+}));
+
+/**
+ * Multiple Select with Virtual List and Search - Base Demo
+ *
+ * This story demonstrates the new "Selected Items Group" feature that appears
+ * at the top of the dropdown when:
+ * - multiple={true}
+ * - searchable={true}
+ * - isVirtualList={true}
+ * - Items are selected
+ *
+ * The group starts collapsed by default. Click the caret to expand and see
+ * all selected items. Selected items also appear in their normal position
+ * in the list (dual representation).
+ */
+export const MultipleSelectWithVirtualListAndSearch: Story = {
+  args: {
+    multiple: true,
+    searchable: true,
+    isVirtualList: true,
+    value: ["tech-5", "tech-12", "tech-23", "tech-45", "tech-67"],
+    options: techOptions as any[],
+    placeholder: "Select technologies...",
+    label: "Multiple Select with Selected Items Group",
   },
 };
