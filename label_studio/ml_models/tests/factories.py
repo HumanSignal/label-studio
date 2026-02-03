@@ -46,4 +46,3 @@ class ModelRunFactory(factory.django.DjangoModelFactory):
             if self.completed_at is None:
                 self.completed_at = now
             self.save(update_fields=['triggered_at', 'completed_at'])
-
