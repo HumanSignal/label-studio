@@ -506,14 +506,10 @@ export const Select = forwardRef(
               )}
               <CommandList
                 label="Select an option"
-                className={
-                  searchable ? "shadow-inner shadow-neutral-surface-inset border-t border-neutral-border shadow-" : ""
-                }
-                style={
-                  selectedGroupExpanded && multiple && searchable && isVirtualList && selectedOptions.length > 0
-                    ? { maxHeight: "560px" }
-                    : undefined
-                }
+                className={cnm({
+                  "shadow-inner shadow-neutral-surface-inset border-t border-neutral-border shadow-": searchable,
+                  "max-h-none": footer !== undefined,
+                })}
               >
                 {/* Selected Items Group - Only for multiple + searchable + virtual lists */}
                 {multiple && searchable && isVirtualList && selectedOptions.length > 0 && (

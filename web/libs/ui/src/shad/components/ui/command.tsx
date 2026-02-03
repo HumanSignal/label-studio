@@ -42,7 +42,7 @@ function CommandList({ className, ...props }: React.ComponentProps<typeof Comman
   return (
     <CommandPrimitive.List
       data-slot="command-list"
-      className={cn("scroll-py-2 overflow-x-hidden overflow-y-auto", className)}
+      className={cn("max-h-[300px] scroll-py-2 overflow-x-hidden overflow-y-auto", className)}
       {...props}
     />
   );
