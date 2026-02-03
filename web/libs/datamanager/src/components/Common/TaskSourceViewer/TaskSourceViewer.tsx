@@ -119,6 +119,7 @@ export const TaskSourceViewer: FC<TaskSourceViewerProps> = ({
         ) : (
           <JsonViewer
             data={taskData}
+            inset={true}
             viewOnly={true}
             showSearch={true}
             customFilters={TASK_SOURCE_FILTERS}
