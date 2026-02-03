@@ -92,7 +92,7 @@
   color: var(--color-neutral-content);
   border-color: var(--color-neutral-border);
   border-radius: var(--corner-radius-smaller);
-  padding: var(--spacing-tight) var(--spacing-tight) 48px;
+  padding: var(--spacing-tight);
 }
 
 :global(.ant-form-item .ant-form-item-control-input-content input:focus) {

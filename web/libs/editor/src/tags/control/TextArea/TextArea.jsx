@@ -3,6 +3,7 @@ import { Button, Typography } from "@humansignal/ui";
 import { Form, Input } from "antd";
 import { observer } from "mobx-react";
 import { destroy, isAlive, types } from "mobx-state-tree";
+import { IconPlus } from "@humansignal/icons";
 
 import InfoModal from "../../../components/Infomodal/Infomodal";
 import Registry from "../../../core/Registry";
@@ -418,7 +419,7 @@ const HtxTextArea = observer(({ item }) => {
               <TextArea {...props} aria-label="TextArea Input" />
             )}
             {showAddButton && (
-              <div className="flex items-center justify-between gap-base mt-tight w-full">
+              <div className="flex items-center justify-between gap-tight w-full">
                 {/* Counts on the left */}
                 <div className="flex items-center gap-base" aria-live="polite" aria-atomic="true">
                   {/* Character count */}
@@ -452,7 +453,14 @@ const HtxTextArea = observer(({ item }) => {
 
                   {/* Add button */}
                   <Form.Item>
-                    <Button size="small" type="primary" htmlType="submit">
+                    <Button
+                      size="small"
+                      variant="primary"
+                      look="outlined"
+                      leading={<IconPlus />}
+                      className="w-20 px-tight"
+                      htmlType="submit"
+                    >
                       Add
                     </Button>
                   </Form.Item>
