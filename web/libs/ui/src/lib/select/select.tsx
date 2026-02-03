@@ -509,9 +509,12 @@ export const Select = forwardRef(
                 className={
                   searchable ? "shadow-inner shadow-neutral-surface-inset border-t border-neutral-border shadow-" : ""
                 }
+                style={
+                  selectedGroupExpanded && multiple && searchable && isVirtualList && selectedOptions.length > 0
+                    ? { maxHeight: "560px" }
+                    : undefined
+                }
               >
-                <CommandEmpty>{searchable ? "No results found." : ""}</CommandEmpty>
-
                 {/* Selected Items Group - Only for multiple + searchable + virtual lists */}
                 {multiple && searchable && isVirtualList && selectedOptions.length > 0 && (
                   <SelectedItemsGroup
@@ -528,6 +531,8 @@ export const Select = forwardRef(
                     disabled={disabled}
                   />
                 )}
+
+                <CommandEmpty>{searchable ? "No results found." : ""}</CommandEmpty>
 
                 <CommandGroup>
                   {props.header ? props.header : null}
