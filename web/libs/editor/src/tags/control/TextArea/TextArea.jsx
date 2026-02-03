@@ -418,30 +418,28 @@ const HtxTextArea = observer(({ item }) => {
               <TextArea {...props} aria-label="TextArea Input" />
             )}
             {showAddButton && (
-              <div className="flex items-center justify-between gap-base mt-tight">
+              <div className="flex items-center justify-between gap-base mt-tight w-full">
                 {/* Counts on the left */}
-                {item._value && (
-                  <div className="flex items-center gap-base" aria-live="polite" aria-atomic="true">
-                    {/* Character count */}
-                    <Typography size="small" className="text-neutral-content-subtler">
-                      {item._value.length} {pluralize(item._value.length, "character", "characters")}
-                    </Typography>
+                <div className="flex items-center gap-base" aria-live="polite" aria-atomic="true">
+                  {/* Character count */}
+                  <Typography size="small" className="text-neutral-content-subtler">
+                    {item._value?.length ?? 0} {pluralize(item._value?.length ?? 0, "character", "characters")}
+                  </Typography>
 
-                    {/* Region count - use submissionsNum computed view */}
-                    {(item.submissionsNum > 0 || item.maxsubmissions) && (
-                      <>
-                        <Typography size="small" className="text-neutral-content-subtler" aria-hidden="true">
-                          •
-                        </Typography>
-                        <Typography size="small" className="text-neutral-content-subtler">
-                          {item.submissionsNum}
-                          {item.maxsubmissions && ` / ${item.maxsubmissions}`}{" "}
-                          {pluralize(item.submissionsNum, "region", "regions")}
-                        </Typography>
-                      </>
-                    )}
-                  </div>
-                )}
+                  {/* Region count - use submissionsNum computed view */}
+                  {(item.submissionsNum > 0 || item.maxsubmissions) && (
+                    <>
+                      <Typography size="small" className="text-neutral-content-subtler" aria-hidden="true">
+                        •
+                      </Typography>
+                      <Typography size="small" className="text-neutral-content-subtler">
+                        {item.submissionsNum}
+                        {item.maxsubmissions && ` / ${item.maxsubmissions}`}{" "}
+                        {pluralize(item.submissionsNum, "region", "regions")}
+                      </Typography>
+                    </>
+                  )}
+                </div>
 
                 {/* Instruction text and Add button on the right */}
                 <div className="flex items-center gap-base">
