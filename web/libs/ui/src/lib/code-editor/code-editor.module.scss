@@ -129,6 +129,7 @@
 
   // Create Project modal has z-index: 10000, so we have to overrule it
   z-index: 11000;
+  max-width: 600px;
 }
 
 :global(.CodeMirror-hints .CodeMirror-hint) {
