@@ -129,4 +129,46 @@ describe("MultiChannel", () => {
       cy.log("Channel visibility toggling works correctly");
     });
   });
+  it("should align MultiChannel x-axis with standard Channel", () => {
+    // Config with one outside channel for comparison and MultiChannel with showYAxis=false
+    const config = multiChannwlCnfig.replace(
+      "<MultiChannel>",
+      '<Channel column="velocity" legend="Standalone"/><MultiChannel showYAxis="false">',
+    );
+
+    cy.log("Initialize MultiChannel TimeSeries for alignment reproduction");
+    LabelStudio.params().config(config).data(multiChannelSampleData).withResult([]).init();
+
+    LabelStudio.waitForObjectsReady();
+    TimeSeries.waitForReady();
+
+    // Verify paths are present
+    TimeSeries.paths.should("have.length.greaterThan", 0);
+
+    // Get the first plot (Sensor A / Standalone)
+    cy.get(".htx-timeseries-channel:not(.htx-timeseries-multichannel *) path")
+      .first()
+      .then(($pathA) => {
+        const d_A = $pathA.attr("d");
+        const firstPointA_X = Number.parseFloat(d_A.substring(1).split(",")[0]);
+
+        // Get the path for channel inside MultiChannel
+        cy.get(".htx-timeseries-multichannel path")
+          .first()
+          .then(($pathB) => {
+            const d_B = $pathB.attr("d");
+            const firstPointB_X = Number.parseFloat(d_B.substring(1).split(",")[0]);
+
+            cy.log(`Sensor A First Point X: ${firstPointA_X}`);
+            cy.log(`Sensor B First Point X: ${firstPointB_X}`);
+
+            if (Math.abs(firstPointB_X - firstPointA_X) > 1) {
+              console.error(`Mismatch! A: ${firstPointA_X}, B: ${firstPointB_X}`);
+            }
+
+            // Tolerance of 1px
+            expect(firstPointB_X, `Mismatch! A: ${firstPointA_X}, B: ${firstPointB_X}`).to.be.closeTo(firstPointA_X, 1);
+          });
+      });
+  });
 });
