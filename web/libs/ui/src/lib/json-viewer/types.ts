@@ -42,6 +42,8 @@ export interface JsonViewerProps {
   // Styling
   /** Additional CSS classes */
   className?: string;
+  /** Use inset styles for the container */
+  inset?: boolean;
 
   // Callbacks
   /** Callback when copy is triggered */
