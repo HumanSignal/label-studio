@@ -1,7 +1,8 @@
 import React from "react";
-import { IconEdit, IconTrashAlt, IconCheck } from "@humansignal/icons";
+import { IconPencil, IconTrashAlt, IconCheck } from "@humansignal/icons";
 import { Button, Tooltip, Typography } from "@humansignal/ui";
 import throttle from "lodash/throttle";
+import { cn } from "../../utils/bem";
 
 // used for correct auto-height calculation
 const BORDER_WIDTH = 1;
@@ -14,7 +15,7 @@ export class HtxTextBox extends React.Component {
   };
 
   inputClassName =
-    "text-color-neutral-content bg-neutral-surface border border-neutral-border px-base py-tight rounded-md w-full focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary-focus-outline leading-body-small";
+    "text-color-neutral-content bg-neutral-surface border border-neutral-border px-base py-tight rounded-md w-full focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary-focus-outline leading-body-small min-h-10";
 
   textRef = React.createRef();
   inputRef = React.createRef();
@@ -184,7 +185,7 @@ export class HtxTextBox extends React.Component {
     } = this.props;
 
     return (
-      <>
+      <div className={cn("textarea").elem("region").toClassName()}>
         <div className={this.inputClassName} id={props.id} name={props.name}>
           <Typography ref={this.textRef} size="small">
             {text.split("\n").map((line, index, array) => {
@@ -198,16 +199,15 @@ export class HtxTextBox extends React.Component {
             })}
           </Typography>
         </div>
-        <div className="flex gap-tight pr-tight">
+        <div className={cn("textarea").elem("actions").toClassName()}>
           {isEditable && onChange && (
             <Button
-              type="text"
               variant="neutral"
               look="outlined"
               size="small"
               tooltip="Edit"
               tooltipTheme="Dark"
-              leading={<IconEdit />}
+              leading={<IconPencil />}
               aria-label="Edit Region"
               onClick={this.startEditing}
             />
@@ -226,7 +226,7 @@ export class HtxTextBox extends React.Component {
             />
           )}
         </div>
-      </>
+      </div>
     );
   }
 

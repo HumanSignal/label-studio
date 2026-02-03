@@ -39,23 +39,6 @@
   align-items: center;
   gap: var(--spacing-tight);
 
-  .button {
-    display: flex;
-    flex: 0 0 32px;
-
-    &:hover {
-      background-color: var(--color-neutral-surface);
-    }
-
-    &_look {
-      &_danger {
-        &:hover {
-          background-color: var(--color-negative-emphasis-subtle);
-        }
-      }
-    }
-  }
-
   // fix antd styles to resize textarea container and fix paddings
   div[class~="ant-typography-edit-content"] {
     flex-grow: 1;
@@ -89,4 +72,11 @@
   box-shadow: 0 0 0 4px var(--color-primary-focus-outline);
 }
 
+.textarea .actions {
+  background-color: blue;
+}
+
+:global(.lsf-textarea .actions) {
+  background-color: red;
+}
 

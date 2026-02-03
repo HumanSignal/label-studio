@@ -1,5 +1,5 @@
 import { createRef, useCallback } from "react";
-import { Button } from "@humansignal/ui";
+import { Button, Typography } from "@humansignal/ui";
 import { Form, Input } from "antd";
 import { observer } from "mobx-react";
 import { destroy, isAlive, types } from "mobx-state-tree";
@@ -21,6 +21,7 @@ import ControlBase from "../Base";
 import ClassificationBase from "../ClassificationBase";
 import "./TextAreaRegionView";
 import VisibilityMixin from "../../../mixins/Visibility";
+import { IconPlus } from "@humansignal/icons";
 
 import "./TextArea.scss";
 import { cn } from "../../../utils/bem";
@@ -344,6 +345,11 @@ const HtxTextArea = observer(({ item }) => {
     [item],
   );
 
+  // Helper function for pluralization
+  const pluralize = (count, singular, plural) => {
+    return count === 1 ? singular : plural;
+  };
+
   const props = {
     name: item.name,
     value: item._value,
@@ -415,11 +421,55 @@ const HtxTextArea = observer(({ item }) => {
               <TextArea {...props} aria-label="TextArea Input" />
             )}
             {showAddButton && (
-              <Form.Item>
-                <Button size="small" className="mt-[10px]" type="primary" htmlType="submit">
-                  Add
-                </Button>
-              </Form.Item>
+              <div className="flex items-center justify-between gap-base mt-tight">
+                {/* Counts on the left */}
+                {item._value && (
+                  <div className="flex items-center gap-base" aria-live="polite" aria-atomic="true">
+                    {/* Character count */}
+                    <Typography size="small" className="text-neutral-content-subtler">
+                      {item._value.length} {pluralize(item._value.length, "character", "characters")}
+                    </Typography>
+
+                    {/* Region count - show when regions exist or maxsubmissions is set */}
+                    {(item.regions.length > 0 || item.maxsubmissions) && (
+                      <>
+                        <Typography size="small" className="text-neutral-content-subtler" aria-hidden="true">
+                          •
+                        </Typography>
+                        <Typography size="small" className="text-neutral-content-subtler">
+                          {item.regions.length}
+                          {item.maxsubmissions && ` / ${item.maxsubmissions}`}{" "}
+                          {pluralize(item.regions.length, "region", "regions")}
+                        </Typography>
+                      </>
+                    )}
+                  </div>
+                )}
+
+                {/* Instruction text and Add button on the right */}
+                <div className="flex items-center gap-base">
+                  {/* Show instruction for multiline textarea */}
+                  {rows > 1 && (
+                    <Typography size="small" className="text-neutral-content-subtler italic">
+                      Press Shift + Enter to Add
+                    </Typography>
+                  )}
+
+                  {/* Add button */}
+                  <Form.Item className="mb-0">
+                    <Button
+                      size="small"
+                      variant="primary"
+                      look="outlined"
+                      leading={<IconPlus />}
+                      className="w-20 px-tight"
+                      htmlType="submit"
+                    >
+                      Add
+                    </Button>
+                  </Form.Item>
+                </div>
+              </div>
             )}
           </Form.Item>
         </Form>
