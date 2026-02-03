@@ -21,7 +21,6 @@ import ControlBase from "../Base";
 import ClassificationBase from "../ClassificationBase";
 import "./TextAreaRegionView";
 import VisibilityMixin from "../../../mixins/Visibility";
-import { IconPlus } from "@humansignal/icons";
 
 import "./TextArea.scss";
 import { cn } from "../../../utils/bem";
@@ -346,9 +345,7 @@ const HtxTextArea = observer(({ item }) => {
   );
 
   // Helper function for pluralization
-  const pluralize = (count, singular, plural) => {
-    return count === 1 ? singular : plural;
-  };
+  const pluralize = (count, singular, plural) => (count === 1 ? singular : plural);
 
   const props = {
     name: item.name,
@@ -430,16 +427,16 @@ const HtxTextArea = observer(({ item }) => {
                       {item._value.length} {pluralize(item._value.length, "character", "characters")}
                     </Typography>
 
-                    {/* Region count - show when regions exist or maxsubmissions is set */}
-                    {(item.regions.length > 0 || item.maxsubmissions) && (
+                    {/* Region count - use submissionsNum computed view */}
+                    {(item.submissionsNum > 0 || item.maxsubmissions) && (
                       <>
                         <Typography size="small" className="text-neutral-content-subtler" aria-hidden="true">
                           •
                         </Typography>
                         <Typography size="small" className="text-neutral-content-subtler">
-                          {item.regions.length}
+                          {item.submissionsNum}
                           {item.maxsubmissions && ` / ${item.maxsubmissions}`}{" "}
-                          {pluralize(item.regions.length, "region", "regions")}
+                          {pluralize(item.submissionsNum, "region", "regions")}
                         </Typography>
                       </>
                     )}
@@ -456,15 +453,8 @@ const HtxTextArea = observer(({ item }) => {
                   )}
 
                   {/* Add button */}
-                  <Form.Item className="mb-0">
-                    <Button
-                      size="small"
-                      variant="primary"
-                      look="outlined"
-                      leading={<IconPlus />}
-                      className="w-20 px-tight"
-                      htmlType="submit"
-                    >
+                  <Form.Item>
+                    <Button size="small" type="primary" htmlType="submit">
                       Add
                     </Button>
                   </Form.Item>
