@@ -3,30 +3,13 @@
   flex-direction: column;
   gap: var(--spacing-base);
   width: 100%;
-  // Prevent modal from resizing when switching views (Code vs Interactive)
-  // This avoids accidental clicks outside the modal when the content shrinks
-  min-height: 400px;
-}
 
-.viewToggleContainer {
-  display: flex;
-  justify-content: flex-end;
+  // Fixed height prevents modal from resizing when switching Code/Interactive views
+  // that leads to accidental clicks outside and unexpecteddd modal closing
+  height: 600px;
 }
 
 .viewContent {
   flex: 1;
-  min-height: 300px;
-  max-height: 60vh;
-  overflow: auto;
-}
-
-.loadingContainer {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 300px;
-}
-
-.resolveUriToggle {
-  margin-left: auto;
+  min-height: 0;
 }

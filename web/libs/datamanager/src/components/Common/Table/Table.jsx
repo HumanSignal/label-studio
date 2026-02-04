@@ -158,13 +158,6 @@ export const Table = observer(
           predictions: out?.predictions,
         };
 
-        /**
-         * Load full task data from API.
-         * @param {Object} options - Load options
-         * @param {boolean} [options.resolveUri=false] - Whether to resolve storage URIs to proxy URLs.
-         *   When false, original storage URIs (s3://..., gs://...) are preserved for debugging.
-         *   When true, URIs are converted to proxy URLs (/tasks/.../resolve/?fileuri=...).
-         */
         const onTaskLoad = async (options = {}) => {
           if (isFF(FF_LOPS_E_3) && type === "DE") {
             return new Promise((resolve) => resolve(out));
@@ -185,8 +178,18 @@ export const Table = observer(
               const modalInstance = modal({
                 title: `Source for task ${out?.id}`,
                 style: { width: 900 },
+                header: null, // Will be set by renderToggle
                 body: (
-                  <TaskSourceViewer content={out} onTaskLoad={onTaskLoad} sdkType={type} storageKey="dm:tasksource" />
+                  <TaskSourceViewer
+                    content={out}
+                    onTaskLoad={onTaskLoad}
+                    sdkType={type}
+                    storageKey="dm:tasksource"
+                    renderToggle={(toggle) => {
+                      // Update modal header with toggle
+                      modalInstance?.update({ header: toggle });
+                    }}
+                  />
                 ),
               });
             }}
