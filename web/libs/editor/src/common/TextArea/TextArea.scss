@@ -53,6 +53,21 @@
         transform: translateX(calc(var(--spacing-tighter) * -1));
       }
     }
+
+    input, textarea {
+      background-color: var(--color-neutral-background);
+      padding: var(--spacing-tight) var(--spacing-widest) var(--spacing-tight) var(--spacing-base);
+      font-size: var(--font-size-body-small);
+      letter-spacing: var(--letter-spacing-wider);
+      border: 1px solid var(--color-neutral-border-bold);
+      line-height: var(--line-height-body-small);
+      transition: border-color 150ms ease-out, box-shadow 150ms ease-out;
+
+      &:focus {
+        border-color: var(--color-neutral-border-bolder);
+        box-shadow: 0 0 0 4px var(--color-primary-focus-outline);
+      }
+    }
   }
 
   &__actions {

@@ -419,7 +419,7 @@ const HtxTextArea = observer(({ item }) => {
               <TextArea {...props} aria-label="TextArea Input" />
             )}
             {showAddButton && (
-              <div className="flex items-center justify-between gap-tight w-full">
+              <div className="flex items-center justify-between gap-tight w-full mb-tighter">
                 {/* Counts on the left */}
                 <div className="flex items-center gap-base" aria-live="polite" aria-atomic="true">
                   {/* Character count */}
