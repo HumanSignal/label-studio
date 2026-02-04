@@ -56,7 +56,7 @@ const ToolMixin = types
     },
 
     get getSelectedShape() {
-      return self.control.annotation.highlightedNode;
+      return self.control?.annotation?.highlightedNode;
     },
 
     get extraShortcuts() {
@@ -106,7 +106,7 @@ const ToolMixin = types
      */
     shouldSkipInteractions(e) {
       const isCtrlPressed = e.evt && (e.evt.metaKey || e.evt.ctrlKey);
-      const hasSelection = self.control.annotation.hasSelection;
+      const hasSelection = self.control?.annotation?.hasSelection;
 
       return !!isCtrlPressed && !hasSelection;
     },

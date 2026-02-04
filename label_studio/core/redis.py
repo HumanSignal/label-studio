@@ -189,11 +189,10 @@ def start_job_async_or_sync(job, *args, in_seconds=0, **kwargs):
         try:
             context_data = _capture_context()
 
-            if context_data:
-                meta = kwargs.get('meta', {})
-                # Store context data in job meta for worker access
-                meta.update(context_data)
-                kwargs['meta'] = meta
+            meta = kwargs.get('meta', {})
+            # Store context data in job meta for worker access
+            meta.update(context_data)
+            kwargs['meta'] = meta
         except Exception:
             logger.info(f'Failed to capture context for job {job.__name__} on queue {queue_name}')
 
