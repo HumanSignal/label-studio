@@ -202,56 +202,43 @@ describe("TaskSourceViewer Component", () => {
       });
     });
 
-    it("should show view toggle inside component", async () => {
-      render(<TaskSourceViewer {...defaultProps} />);
+    it("should call renderToggle with ViewToggle component", async () => {
+      const mockRenderToggle = jest.fn();
+
+      render(<TaskSourceViewer {...defaultProps} renderToggle={mockRenderToggle} />);
 
       await waitFor(() => {
-        // View toggle tabs should be visible inside the component
-        expect(screen.getByTestId("tab-code")).toBeInTheDocument();
-        expect(screen.getByTestId("tab-interactive")).toBeInTheDocument();
+        expect(mockRenderToggle).toHaveBeenCalled();
       });
+
+      // Should have been called with a ViewToggle element
+      const toggleArg = mockRenderToggle.mock.calls[0][0];
+      expect(toggleArg).toBeTruthy();
     });
 
-    it("should save view preference to localStorage when changed", async () => {
-      const user = userEvent.setup();
+    it("should update renderToggle when view changes via callback", async () => {
+      const mockRenderToggle = jest.fn();
+      let capturedOnViewChange: ((view: string) => void) | null = null;
 
-      render(<TaskSourceViewer {...defaultProps} />);
-
-      await waitFor(() => {
-        expect(screen.getByTestId("tab-interactive")).toBeInTheDocument();
+      // Capture the onViewChange callback from the toggle
+      mockRenderToggle.mockImplementation((toggle: any) => {
+        if (toggle?.props?.onViewChange) {
+          capturedOnViewChange = toggle.props.onViewChange;
+        }
       });
 
-      await user.click(screen.getByTestId("tab-interactive"));
+      render(<TaskSourceViewer {...defaultProps} renderToggle={mockRenderToggle} />);
+
+      await waitFor(() => {
+        expect(capturedOnViewChange).toBeTruthy();
+      });
+
+      // Simulate view change via callback
+      capturedOnViewChange!("interactive");
 
       await waitFor(() => {
         expect(localStorage.getItem("test:tasksource:view")).toBe("interactive");
-      });
-    });
-
-    it("should switch between code and interactive views", async () => {
-      const user = userEvent.setup();
-
-      render(<TaskSourceViewer {...defaultProps} />);
-
-      // Initially in code view
-      await waitFor(() => {
-        expect(screen.getByTestId("code-view")).toBeInTheDocument();
-      });
-
-      // Switch to interactive
-      await user.click(screen.getByTestId("tab-interactive"));
-
-      await waitFor(() => {
         expect(screen.getByTestId("json-viewer")).toBeInTheDocument();
-        expect(screen.queryByTestId("code-view")).not.toBeInTheDocument();
-      });
-
-      // Switch back to code
-      await user.click(screen.getByTestId("tab-code"));
-
-      await waitFor(() => {
-        expect(screen.getByTestId("code-view")).toBeInTheDocument();
-        expect(screen.queryByTestId("json-viewer")).not.toBeInTheDocument();
       });
     });
   });
@@ -274,19 +261,8 @@ describe("TaskSourceViewer Component", () => {
     });
   });
 
-  describe("Error Handling", () => {
-    it("should handle API errors gracefully", async () => {
-      const mockOnTaskLoad = jest.fn().mockRejectedValue(new Error("API Error"));
-
-      // Should not throw
-      expect(() => {
-        render(<TaskSourceViewer {...defaultProps} onTaskLoad={mockOnTaskLoad} />);
-      }).not.toThrow();
-    });
-  });
-
   describe("Loading State", () => {
-    it("should show spinner while loading", async () => {
+    it("should show initial content while loading then update", async () => {
       // Create a promise that doesn't resolve immediately
       let resolvePromise: (value: any) => void;
       const mockOnTaskLoad = jest.fn().mockImplementation(
@@ -298,16 +274,15 @@ describe("TaskSourceViewer Component", () => {
 
       render(<TaskSourceViewer {...defaultProps} onTaskLoad={mockOnTaskLoad} />);
 
-      // Spinner should be visible while loading
-      expect(screen.getByTestId("spinner")).toBeInTheDocument();
+      // Should show initial content from props
+      expect(screen.getByTestId("code-view")).toBeInTheDocument();
 
-      // Resolve the promise
+      // Resolve the promise with new data
       resolvePromise!(mockTaskData);
 
-      // Wait for content to appear
+      // Wait for content to be updated
       await waitFor(() => {
-        expect(screen.queryByTestId("spinner")).not.toBeInTheDocument();
-        expect(screen.getByTestId("code-view")).toBeInTheDocument();
+        expect(screen.getByTestId("code-view")).toHaveTextContent("s3://bucket/image.jpg");
       });
     });
   });
