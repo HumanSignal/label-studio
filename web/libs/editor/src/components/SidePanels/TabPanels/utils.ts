@@ -8,7 +8,7 @@ import {
   DEFAULT_PANEL_WIDTH,
   PANEL_HEADER_HEIGHT,
 } from "../constants";
-import { Comments, History, Info, Relations } from "../DetailsPanel/DetailsPanel";
+import { Comments, Custom, History, Info, Relations } from "../DetailsPanel/DetailsPanel";
 import { OutlinerComponent } from "../OutlinerPanel/OutlinerPanel";
 import type { PanelProps } from "../PanelBase";
 import {
@@ -125,6 +125,7 @@ export const panelComponents: { [key: string]: FC<PanelProps> } = {
   relations: Relations as FC<PanelProps>,
   comments: Comments as FC<PanelProps>,
   info: Info as FC<PanelProps>,
+  custom: Custom as FC<PanelProps>,
 };
 
 const panelViews = [
@@ -159,6 +160,12 @@ const panelViews = [
     component: panelComponents.comments as FC<PanelProps>,
     active: false,
   },
+  {
+    name: "custom",
+    title: "Custom",
+    component: panelComponents.custom as FC<PanelProps>,
+    active: false,
+  }
 ];
 
 export const enterprisePanelDefault: Record<string, PanelBBox> = {
@@ -177,7 +184,7 @@ export const enterprisePanelDefault: Record<string, PanelBBox> = {
     maxHeight: DEFAULT_PANEL_MAX_HEIGHT,
     panelViews: [panelViews[3], panelViews[4], panelViews[1]],
   },
-  "regions-relations": {
+  "regions-relations-custom": {
     order: 2,
     top: 0,
     left: 0,
@@ -190,7 +197,7 @@ export const enterprisePanelDefault: Record<string, PanelBBox> = {
     detached: false,
     alignment: Side.right,
     maxHeight: DEFAULT_PANEL_MAX_HEIGHT,
-    panelViews: [panelViews[0], panelViews[2]],
+    panelViews: [panelViews[0], panelViews[2], panelViews[5]],
   },
 };
 
