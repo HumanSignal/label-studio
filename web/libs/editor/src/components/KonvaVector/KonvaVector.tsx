@@ -1609,9 +1609,19 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
       };
     },
     // Programmatic point creation methods
-    startPoint: (x: number, y: number) => pointCreationManager.startPoint(x, y),
-    updatePoint: (x: number, y: number) => pointCreationManager.updatePoint(x, y),
-    commitPoint: (x: number, y: number) => pointCreationManager.commitPoint(x, y),
+    // These check the disabled prop to prevent point creation when the region is locked
+    startPoint: (x: number, y: number) => {
+      if (disabled) return false;
+      return pointCreationManager.startPoint(x, y);
+    },
+    updatePoint: (x: number, y: number) => {
+      if (disabled) return;
+      pointCreationManager.updatePoint(x, y);
+    },
+    commitPoint: (x: number, y: number) => {
+      if (disabled) return;
+      pointCreationManager.commitPoint(x, y);
+    },
     // Programmatic point transformation methods
     translatePoints: (dx: number, dy: number, pointIds?: string[]) => {
       const pointsToTransform = pointIds ? initialPoints.filter((p) => pointIds.includes(p.id)) : initialPoints;
