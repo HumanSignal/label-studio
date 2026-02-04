@@ -436,7 +436,7 @@ const HtxTextArea = observer(({ item }) => {
                       <Typography size="small" className="text-neutral-content-subtler">
                         {item.submissionsNum}
                         {item.maxsubmissions && ` / ${item.maxsubmissions}`}{" "}
-                        {pluralize(item.submissionsNum, "region", "regions")}
+                        {pluralize(item.submissionsNum, "submission", "submissions")}
                       </Typography>
                     </>
                   )}
