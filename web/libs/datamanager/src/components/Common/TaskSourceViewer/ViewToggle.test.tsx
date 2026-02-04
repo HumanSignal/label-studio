@@ -29,12 +29,6 @@ jest.mock("@humansignal/ui", () => ({
       {children}
     </button>
   ),
-  Toggle: ({ label, checked, onChange }: any) => (
-    <label data-testid="toggle-container">
-      <input type="checkbox" data-testid="resolve-urls-toggle" checked={checked} onChange={onChange} />
-      <span>{label}</span>
-    </label>
-  ),
 }));
 
 describe("ViewToggle Component", () => {
@@ -73,59 +67,16 @@ describe("ViewToggle Component", () => {
 
       expect(screen.getByTestId("tabs")).toHaveAttribute("data-value", "interactive");
     });
-  });
 
-  describe("Resolve URLs Toggle", () => {
-    it("should not render resolve URLs toggle when onResolveUrlsChange is not provided", () => {
-      render(<ViewToggle {...defaultProps} />);
-
-      expect(screen.queryByTestId("resolve-urls-toggle")).not.toBeInTheDocument();
-    });
-
-    it("should render resolve URLs toggle when onResolveUrlsChange is provided", () => {
-      render(<ViewToggle {...defaultProps} resolveUrls={false} onResolveUrlsChange={jest.fn()} />);
-
-      expect(screen.getByTestId("resolve-urls-toggle")).toBeInTheDocument();
-      expect(screen.getByText("Resolve URLs")).toBeInTheDocument();
-    });
-
-    it("should reflect resolveUrls state in toggle", () => {
-      render(<ViewToggle {...defaultProps} resolveUrls={true} onResolveUrlsChange={jest.fn()} />);
-
-      expect(screen.getByTestId("resolve-urls-toggle")).toBeChecked();
-    });
-
-    it("should call onResolveUrlsChange when toggle is clicked", async () => {
+    it("should switch from interactive to code view", async () => {
       const user = userEvent.setup();
-      const mockOnResolveUrlsChange = jest.fn();
+      const mockOnViewChange = jest.fn();
 
-      render(<ViewToggle {...defaultProps} resolveUrls={false} onResolveUrlsChange={mockOnResolveUrlsChange} />);
+      render(<ViewToggle view="interactive" onViewChange={mockOnViewChange} />);
 
-      await user.click(screen.getByTestId("resolve-urls-toggle"));
+      await user.click(screen.getByTestId("tab-code"));
 
-      expect(mockOnResolveUrlsChange).toHaveBeenCalledWith(true);
-    });
-
-    it("should call onResolveUrlsChange with false when toggle is unchecked", async () => {
-      const user = userEvent.setup();
-      const mockOnResolveUrlsChange = jest.fn();
-
-      render(<ViewToggle {...defaultProps} resolveUrls={true} onResolveUrlsChange={mockOnResolveUrlsChange} />);
-
-      await user.click(screen.getByTestId("resolve-urls-toggle"));
-
-      expect(mockOnResolveUrlsChange).toHaveBeenCalledWith(false);
-    });
-  });
-
-  describe("Layout", () => {
-    it("should render both toggles when all props are provided", () => {
-      render(<ViewToggle {...defaultProps} resolveUrls={false} onResolveUrlsChange={jest.fn()} />);
-
-      // View mode tabs should be present
-      expect(screen.getByTestId("tabs")).toBeInTheDocument();
-      // Resolve URLs toggle should be present
-      expect(screen.getByTestId("resolve-urls-toggle")).toBeInTheDocument();
+      expect(mockOnViewChange).toHaveBeenCalledWith("code");
     });
   });
 });

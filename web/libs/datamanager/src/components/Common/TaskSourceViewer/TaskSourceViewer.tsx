@@ -1,5 +1,5 @@
-import { type FC, useEffect, useState, useCallback, useRef } from "react";
-import { JsonViewer, type FilterConfig } from "@humansignal/ui";
+import { type ChangeEvent, type FC, useEffect, useState, useCallback, useRef, useMemo } from "react";
+import { JsonViewer, type FilterConfig, Toggle, Spinner } from "@humansignal/ui";
 import { FF_LOPS_E_3, FF_INTERACTIVE_JSON_VIEWER, isFF } from "../../../utils/feature-flags";
 import { CodeView } from "./CodeView";
 import styles from "./TaskSourceViewer.module.scss";
@@ -9,12 +9,12 @@ export type { ViewMode };
 
 /** Options passed to onTaskLoad callback */
 export interface TaskLoadOptions {
-  /** Whether to resolve storage URLs to proxy URLs (default: false) */
+  /** Whether to resolve storage URIs to proxy URLs (default: false) */
   resolveUri?: boolean;
 }
 
 export interface TaskSourceViewerProps {
-  /** Task content data */
+  /** Task content data (not used - data is loaded fresh via onTaskLoad) */
   content: any;
   /**
    * Function to load full task data.
@@ -26,8 +26,6 @@ export interface TaskSourceViewerProps {
   sdkType?: string;
   /** Storage key for localStorage persistence */
   storageKey?: string;
-  /** Render toggle in external location (e.g., modal header) */
-  renderToggle?: (toggle: React.ReactNode) => void;
 }
 
 // Define filters outside component to prevent recreation on every render
@@ -66,29 +64,25 @@ const TASK_SOURCE_FILTERS: FilterConfig[] = [
  *
  * Features:
  * - Code/Interactive view toggle for different JSON display modes
- * - Resolve URLs toggle to show original storage URLs (s3://...) or resolved proxy URLs
+ * - Resolve URIs toggle to show original storage URIs (s3://...) or resolved proxy URLs
  */
-export const TaskSourceViewer: FC<TaskSourceViewerProps> = ({
-  content,
-  onTaskLoad,
-  sdkType,
-  storageKey = "dm:tasksource",
-  renderToggle,
-}) => {
+export const TaskSourceViewer: FC<TaskSourceViewerProps> = ({ onTaskLoad, sdkType, storageKey = "dm:tasksource" }) => {
   const isInteractiveViewerEnabled = isFF(FF_INTERACTIVE_JSON_VIEWER);
 
-  const [taskData, setTaskData] = useState(content);
-  const [isLoading, setIsLoading] = useState(false);
+  // Don't use content prop - load fresh data to ensure correct resolve_uri setting
+  const [taskData, setTaskData] = useState<any>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   // Track if this is the initial load to avoid double-fetching
   const isInitialLoadRef = useRef(true);
 
   // Manage view state internally
-  const [view, setView] = useState<ViewMode>(() =>
-    storageKey ? (localStorage.getItem(`${storageKey}:view`) as ViewMode) || "code" : "code",
-  );
+  const [view, setView] = useState<ViewMode>(() => {
+    const stored = storageKey ? (localStorage.getItem(`${storageKey}:view`) as ViewMode) || "code" : "code";
+    return stored;
+  });
 
-  // Manage resolve URLs state - default OFF to show original storage URLs
+  // Manage resolve URIs state - default OFF to show original storage URIs
   const [resolveUrls, setResolveUrls] = useState<boolean>(() =>
     storageKey ? localStorage.getItem(`${storageKey}:resolveUrls`) === "true" : false,
   );
@@ -151,6 +145,8 @@ export const TaskSourceViewer: FC<TaskSourceViewerProps> = ({
     try {
       const response = await onTaskLoad({ resolveUri: resolveUrls });
       setTaskData(formatTaskData(response));
+    } catch (error) {
+      console.error("Failed to load task data:", error);
     } finally {
       setIsLoading(false);
     }
@@ -171,22 +167,44 @@ export const TaskSourceViewer: FC<TaskSourceViewerProps> = ({
     }
   }, [resolveUrls]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Provide toggle to external render location (e.g., modal header)
-  useEffect(() => {
-    if (renderToggle && isInteractiveViewerEnabled) {
-      renderToggle(
-        <ViewToggle
-          view={view}
-          onViewChange={handleViewChange}
-          resolveUrls={resolveUrls}
-          onResolveUrlsChange={handleResolveUrlsChange}
-        />,
-      );
-    }
-  }, [renderToggle, view, handleViewChange, resolveUrls, handleResolveUrlsChange, isInteractiveViewerEnabled]);
+  // Handler for the resolve URIs toggle
+  const onResolveToggleChange = useCallback(
+    (e: ChangeEvent<HTMLInputElement>) => {
+      handleResolveUrlsChange(e.target.checked);
+    },
+    [handleResolveUrlsChange],
+  );
+
+  // Resolve URIs toggle element for toolbar (right-aligned)
+  const resolveUriToggle = useMemo(
+    () => (
+      <div className={styles.resolveUriToggle}>
+        <Toggle label="Resolve URIs" checked={resolveUrls} onChange={onResolveToggleChange} />
+      </div>
+    ),
+    [resolveUrls, onResolveToggleChange],
+  );
+
+  // Show loading state while fetching data
+  if (isLoading || !taskData) {
+    return (
+      <div className={styles.taskSourceView}>
+        <div className={styles.loadingContainer}>
+          <Spinner size={32} />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className={styles.taskSourceView}>
+      {/* View mode toggle - shown inside component to avoid modal update issues */}
+      {isInteractiveViewerEnabled && (
+        <div className={styles.viewToggleContainer}>
+          <ViewToggle view={view} onViewChange={handleViewChange} />
+        </div>
+      )}
+
       <div className={styles.viewContent}>
         {view === "code" ? (
           <CodeView data={taskData} />
@@ -201,6 +219,7 @@ export const TaskSourceViewer: FC<TaskSourceViewerProps> = ({
             maxHeight={560}
             readerViewThreshold={100}
             storageKey={storageKey}
+            toolbarExtra={resolveUriToggle}
           />
         )}
       </div>
