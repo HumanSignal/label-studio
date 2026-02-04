@@ -1,8 +1,8 @@
 ---
-title: Spreadsheet Editor
+title: Spreadsheet Editor 🔒
 type: templates
 category: Programmable Interfaces
-order: 750
+order: 350
 is_new: t
 meta_title: Template for spreadsheet editing
 meta_description: Template that uses a custom UI to edit a spreadsheet and then output any changes. 

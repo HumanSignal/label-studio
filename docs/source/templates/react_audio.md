@@ -1,8 +1,8 @@
 ---
-title: Multi-Channel Audio Transcription
+title: Multi-Channel Audio Transcription 🔒
 type: templates
 category: Programmable Interfaces
-order: 753
+order: 353
 is_new: t
 meta_title: Template for multi-channel audio transcription
 meta_description: Template that uses a custom UI to visualize and transcribe multiple audio channels 

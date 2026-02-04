@@ -1,8 +1,8 @@
 ---
-title: Agentic Tracing for Claims
+title: Agentic Tracing for Claims 🔒
 type: templates
 category: Programmable Interfaces
-order: 756
+order: 356
 is_new: t
 meta_title: Template for agentic tracing
 meta_description: Template that uses a custom UI to trace agentic responses to insurance claims  
