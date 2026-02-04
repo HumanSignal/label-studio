@@ -15,7 +15,7 @@ export class HtxTextBox extends React.Component {
   };
 
   inputClassName =
-    "text-color-neutral-content bg-neutral-surface border border-neutral-border px-base py-tight rounded-md w-full focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary-focus-outline leading-body-small min-h-10";
+    "text-color-neutral-content bg-neutral-surface border border-neutral-border px-base py-tight rounded-md w-full focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary-focus-outline leading-body-small min-h-10 hover:border-neutral-border-bold hover:bg-neutral-surface-hover transition-colors transition-background-color duration-150 ease-out";
 
   textRef = React.createRef();
   inputRef = React.createRef();
@@ -148,17 +148,16 @@ export class HtxTextBox extends React.Component {
     this.updateHeight();
 
     return (
-      <div className="grow p-0 relative">
+      <div className={cn("textarea").elem("region").toClassName()}>
         {rows > 1 ? <textarea {...inputProps} /> : <input {...inputProps} />}
         {!onlyEdit && (
           <Tooltip title="Save: [shift+enter]">
             <Button
               type="text"
               variant="neutral"
-              look="string"
+              look="outlined"
               size="small"
-              className="absolute right-0 mr-4"
-              style={{ bottom: "1px" }}
+              className="absolute right-tight top-[50%] translate-y-[-50%]"
               icon={<IconCheck />}
               aria-label="Save"
               onClick={this.save}
@@ -203,7 +202,7 @@ export class HtxTextBox extends React.Component {
           {isEditable && onChange && (
             <Button
               variant="neutral"
-              look="outlined"
+              look="string"
               size="small"
               tooltip="Edit"
               tooltipTheme="Dark"
@@ -216,7 +215,7 @@ export class HtxTextBox extends React.Component {
             <Button
               type="text"
               variant="negative"
-              look="outlined"
+              look="string"
               size="small"
               tooltip="Delete"
               tooltipTheme="Dark"
