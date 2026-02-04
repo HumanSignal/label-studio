@@ -1,4 +1,12 @@
-import { AudioView, Choices, ImageView, LabelStudio, Rating, Taxonomy, ToolBar } from "@humansignal/frontend-test/helpers/LSF";
+import {
+  AudioView,
+  Choices,
+  ImageView,
+  LabelStudio,
+  Rating,
+  Taxonomy,
+  ToolBar,
+} from "@humansignal/frontend-test/helpers/LSF";
 import { FF_DEV_3391, FF_TAXONOMY_ASYNC } from "../../../../src/utils/feature-flags";
 import {
   audioConfig,
