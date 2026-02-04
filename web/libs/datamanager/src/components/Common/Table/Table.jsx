@@ -158,11 +158,21 @@ export const Table = observer(
           predictions: out?.predictions,
         };
 
-        const onTaskLoad = async () => {
+        /**
+         * Load full task data from API.
+         * @param {Object} options - Load options
+         * @param {boolean} [options.resolveUri=false] - Whether to resolve storage URLs to proxy URLs.
+         *   When false, original storage URLs (s3://..., gs://...) are preserved for debugging.
+         *   When true, URLs are converted to proxy URLs (/tasks/.../resolve/?fileuri=...).
+         */
+        const onTaskLoad = async (options = {}) => {
           if (isFF(FF_LOPS_E_3) && type === "DE") {
             return new Promise((resolve) => resolve(out));
           }
-          const response = await api.task({ taskID: out.id });
+          const response = await api.task({
+            taskID: out.id,
+            resolve_uri: options.resolveUri ?? false,
+          });
 
           return response ?? {};
         };
