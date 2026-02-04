@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import { flexRender, getCoreRowModel, useReactTable, createColumnHelper } from "@tanstack/react-table";
-import { cnm, JsonViewer } from "@humansignal/ui";
+import { JsonViewer } from "@humansignal/ui";
 import { Chip } from "./Chip";
 import { ResizeHandler } from "./ResizeHandler";
 import type { ObjectTypes } from "./types";
