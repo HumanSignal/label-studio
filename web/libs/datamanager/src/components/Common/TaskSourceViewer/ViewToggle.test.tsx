@@ -6,12 +6,16 @@ import { ViewToggle } from "./ViewToggle";
 // Mock the UI components
 jest.mock("@humansignal/ui", () => ({
   Tabs: ({ children, value, onValueChange }: any) => (
-    <div data-testid="tabs" data-value={value} onClick={(e: any) => {
-      const target = e.target as HTMLElement;
-      if (target.dataset.value) {
-        onValueChange(target.dataset.value);
-      }
-    }}>
+    <div
+      data-testid="tabs"
+      data-value={value}
+      onClick={(e: any) => {
+        const target = e.target as HTMLElement;
+        if (target.dataset.value) {
+          onValueChange(target.dataset.value);
+        }
+      }}
+    >
       {children}
     </div>
   ),
@@ -21,18 +25,13 @@ jest.mock("@humansignal/ui", () => ({
     </div>
   ),
   TabsTrigger: ({ children, value }: any) => (
-    <button data-testid={`tab-${value}`} data-value={value}>
+    <button type="button" data-testid={`tab-${value}`} data-value={value}>
       {children}
     </button>
   ),
   Toggle: ({ label, checked, onChange }: any) => (
     <label data-testid="toggle-container">
-      <input
-        type="checkbox"
-        data-testid="resolve-urls-toggle"
-        checked={checked}
-        onChange={onChange}
-      />
+      <input type="checkbox" data-testid="resolve-urls-toggle" checked={checked} onChange={onChange} />
       <span>{label}</span>
     </label>
   ),
@@ -84,26 +83,14 @@ describe("ViewToggle Component", () => {
     });
 
     it("should render resolve URLs toggle when onResolveUrlsChange is provided", () => {
-      render(
-        <ViewToggle
-          {...defaultProps}
-          resolveUrls={false}
-          onResolveUrlsChange={jest.fn()}
-        />
-      );
+      render(<ViewToggle {...defaultProps} resolveUrls={false} onResolveUrlsChange={jest.fn()} />);
 
       expect(screen.getByTestId("resolve-urls-toggle")).toBeInTheDocument();
       expect(screen.getByText("Resolve URLs")).toBeInTheDocument();
     });
 
     it("should reflect resolveUrls state in toggle", () => {
-      render(
-        <ViewToggle
-          {...defaultProps}
-          resolveUrls={true}
-          onResolveUrlsChange={jest.fn()}
-        />
-      );
+      render(<ViewToggle {...defaultProps} resolveUrls={true} onResolveUrlsChange={jest.fn()} />);
 
       expect(screen.getByTestId("resolve-urls-toggle")).toBeChecked();
     });
@@ -112,13 +99,7 @@ describe("ViewToggle Component", () => {
       const user = userEvent.setup();
       const mockOnResolveUrlsChange = jest.fn();
 
-      render(
-        <ViewToggle
-          {...defaultProps}
-          resolveUrls={false}
-          onResolveUrlsChange={mockOnResolveUrlsChange}
-        />
-      );
+      render(<ViewToggle {...defaultProps} resolveUrls={false} onResolveUrlsChange={mockOnResolveUrlsChange} />);
 
       await user.click(screen.getByTestId("resolve-urls-toggle"));
 
@@ -129,13 +110,7 @@ describe("ViewToggle Component", () => {
       const user = userEvent.setup();
       const mockOnResolveUrlsChange = jest.fn();
 
-      render(
-        <ViewToggle
-          {...defaultProps}
-          resolveUrls={true}
-          onResolveUrlsChange={mockOnResolveUrlsChange}
-        />
-      );
+      render(<ViewToggle {...defaultProps} resolveUrls={true} onResolveUrlsChange={mockOnResolveUrlsChange} />);
 
       await user.click(screen.getByTestId("resolve-urls-toggle"));
 
@@ -145,13 +120,7 @@ describe("ViewToggle Component", () => {
 
   describe("Layout", () => {
     it("should render both toggles when all props are provided", () => {
-      render(
-        <ViewToggle
-          {...defaultProps}
-          resolveUrls={false}
-          onResolveUrlsChange={jest.fn()}
-        />
-      );
+      render(<ViewToggle {...defaultProps} resolveUrls={false} onResolveUrlsChange={jest.fn()} />);
 
       // View mode tabs should be present
       expect(screen.getByTestId("tabs")).toBeInTheDocument();

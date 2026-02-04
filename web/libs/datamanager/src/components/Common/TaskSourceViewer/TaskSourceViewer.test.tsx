@@ -1,7 +1,7 @@
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import "@testing-library/jest-dom";
-import { TaskSourceViewer, type TaskLoadOptions } from "./TaskSourceViewer";
+import { TaskSourceViewer } from "./TaskSourceViewer";
 
 // Mock feature flags
 jest.mock("../../../utils/feature-flags", () => ({
@@ -12,22 +12,24 @@ jest.mock("../../../utils/feature-flags", () => ({
 
 // Mock UI components
 jest.mock("@humansignal/ui", () => ({
-  JsonViewer: ({ data }: any) => (
-    <div data-testid="json-viewer">{JSON.stringify(data)}</div>
-  ),
+  JsonViewer: ({ data }: any) => <div data-testid="json-viewer">{JSON.stringify(data)}</div>,
   Tabs: ({ children, value, onValueChange }: any) => (
-    <div data-testid="tabs" data-value={value} onClick={(e: any) => {
-      const target = e.target as HTMLElement;
-      if (target.dataset.value) {
-        onValueChange(target.dataset.value);
-      }
-    }}>
+    <div
+      data-testid="tabs"
+      data-value={value}
+      onClick={(e: any) => {
+        const target = e.target as HTMLElement;
+        if (target.dataset.value) {
+          onValueChange(target.dataset.value);
+        }
+      }}
+    >
       {children}
     </div>
   ),
   TabsList: ({ children }: any) => <div data-testid="tabs-list">{children}</div>,
   TabsTrigger: ({ children, value }: any) => (
-    <button data-testid={`tab-${value}`} data-value={value}>
+    <button type="button" data-testid={`tab-${value}`} data-value={value}>
       {children}
     </button>
   ),
@@ -47,9 +49,7 @@ jest.mock("@humansignal/ui", () => ({
 
 // Mock CodeView component
 jest.mock("./CodeView", () => ({
-  CodeView: ({ data }: any) => (
-    <pre data-testid="code-view">{JSON.stringify(data, null, 2)}</pre>
-  ),
+  CodeView: ({ data }: any) => <pre data-testid="code-view">{JSON.stringify(data, null, 2)}</pre>,
 }));
 
 // Mock styles
@@ -118,13 +118,7 @@ describe("TaskSourceViewer Component", () => {
       const mockOnTaskLoad = jest.fn().mockResolvedValue(mockTaskData);
       const mockRenderToggle = jest.fn();
 
-      render(
-        <TaskSourceViewer
-          {...defaultProps}
-          onTaskLoad={mockOnTaskLoad}
-          renderToggle={mockRenderToggle}
-        />
-      );
+      render(<TaskSourceViewer {...defaultProps} onTaskLoad={mockOnTaskLoad} renderToggle={mockRenderToggle} />);
 
       // Wait for initial load
       await waitFor(() => {
@@ -157,12 +151,7 @@ describe("TaskSourceViewer Component", () => {
       const user = userEvent.setup();
       const mockRenderToggle = jest.fn();
 
-      render(
-        <TaskSourceViewer
-          {...defaultProps}
-          renderToggle={mockRenderToggle}
-        />
-      );
+      render(<TaskSourceViewer {...defaultProps} renderToggle={mockRenderToggle} />);
 
       await waitFor(() => {
         expect(mockRenderToggle).toHaveBeenCalled();
@@ -203,12 +192,7 @@ describe("TaskSourceViewer Component", () => {
       const user = userEvent.setup();
       const mockRenderToggle = jest.fn();
 
-      render(
-        <TaskSourceViewer
-          {...defaultProps}
-          renderToggle={mockRenderToggle}
-        />
-      );
+      render(<TaskSourceViewer {...defaultProps} renderToggle={mockRenderToggle} />);
 
       await waitFor(() => {
         expect(mockRenderToggle).toHaveBeenCalled();
@@ -234,13 +218,7 @@ describe("TaskSourceViewer Component", () => {
         predictions: [{ id: 2 }],
       });
 
-      render(
-        <TaskSourceViewer
-          {...defaultProps}
-          onTaskLoad={mockOnTaskLoad}
-          sdkType="DE"
-        />
-      );
+      render(<TaskSourceViewer {...defaultProps} onTaskLoad={mockOnTaskLoad} sdkType="DE" />);
 
       await waitFor(() => {
         const codeView = screen.getByTestId("code-view");
@@ -265,12 +243,7 @@ describe("TaskSourceViewer Component", () => {
     it("should call renderToggle with ViewToggle component when interactive viewer is enabled", async () => {
       const mockRenderToggle = jest.fn();
 
-      render(
-        <TaskSourceViewer
-          {...defaultProps}
-          renderToggle={mockRenderToggle}
-        />
-      );
+      render(<TaskSourceViewer {...defaultProps} renderToggle={mockRenderToggle} />);
 
       await waitFor(() => {
         expect(mockRenderToggle).toHaveBeenCalled();
