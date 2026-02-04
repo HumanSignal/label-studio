@@ -28,6 +28,8 @@ export interface JsonViewerProps {
   readerViewThreshold?: number;
   /** Storage key for localStorage persistence of filters and search state */
   storageKey?: string;
+  /** Additional elements to render in the toolbar (after filters) */
+  toolbarExtra?: React.ReactNode;
 
   // Display settings
   /** Container min height */
