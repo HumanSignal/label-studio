@@ -1,4 +1,4 @@
-import { type ChangeEvent, type FC, useEffect, useState, useCallback, useRef } from "react";
+import { type ChangeEvent, type FC, useEffect, useState, useCallback } from "react";
 import { JsonViewer, type FilterConfig, Toggle } from "@humansignal/ui";
 import { FF_LOPS_E_3, FF_INTERACTIVE_JSON_VIEWER, isFF } from "../../../utils/feature-flags";
 import { CodeView } from "./CodeView";
@@ -70,7 +70,6 @@ export const TaskSourceViewer: FC<TaskSourceViewerProps> = ({
   const isInteractiveViewerEnabled = isFF(FF_INTERACTIVE_JSON_VIEWER);
 
   const [taskData, setTaskData] = useState(content);
-  const isInitialLoad = useRef(true);
 
   // Manage view state internally
   const [view, setView] = useState<ViewMode>(() =>
@@ -113,7 +112,6 @@ export const TaskSourceViewer: FC<TaskSourceViewerProps> = ({
       }
 
       setTaskData(formatted);
-      isInitialLoad.current = false;
     });
   }, [onTaskLoad, sdkType, resolveUrls]);
 
