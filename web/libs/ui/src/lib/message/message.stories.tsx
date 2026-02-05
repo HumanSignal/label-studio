@@ -23,13 +23,18 @@ const meta: Meta<typeof Message> = {
       description:
         "Visual variant of the message. Primary variants: primary, neutral, negative, positive, warning. Aliases: info (→primary), success (→positive), error (→negative)",
     },
+    size: {
+      control: "select",
+      options: ["medium", "small"],
+      description: "Size of the message. medium: standard padding and 20px icon, small: compact padding and 18px icon",
+    },
     icon: {
       control: false,
       description: "Icon element to display. Defaults based on variant if not provided.",
     },
     iconSize: {
       control: "number",
-      description: "Size of the icon in pixels. Defaults to 20.",
+      description: "Size of the icon in pixels. If not provided, defaults based on size prop (medium: 20, small: 18).",
     },
     title: {
       control: "text",
@@ -126,6 +131,13 @@ export const WithoutTitle: Story = {
   args: {
     variant: "warning",
     children: "This message has no title, just the main content.",
+  },
+};
+
+export const BodyTextOnly: Story = {
+  args: {
+    variant: "primary",
+    children: "A simple informational message with just body text and no title. Perfect for brief notifications.",
   },
 };
 
@@ -229,6 +241,45 @@ export const WithCustomIconSize: Story = {
       </Message>
     </div>
   ),
+};
+
+export const SizeComparison: Story = {
+  render: () => (
+    <div className="space-y-4">
+      <div>
+        <h3 className="text-lg font-semibold mb-2">Medium Size (Default)</h3>
+        <Message variant="primary" size="medium" title="Medium Message">
+          This is a medium-sized message with standard padding and 20px icon.
+        </Message>
+      </div>
+
+      <div>
+        <h3 className="text-lg font-semibold mb-2">Small Size (Compact)</h3>
+        <Message variant="primary" size="small" title="Small Message">
+          This is a small-sized message with reduced padding and 18px icon.
+        </Message>
+      </div>
+    </div>
+  ),
+};
+
+export const SmallWithActions: Story = {
+  args: {
+    variant: "warning",
+    size: "small",
+    title: "Compact Warning",
+    children: "This is a compact message with actions.",
+    actions: (
+      <>
+        <Button variant="primary" look="filled" size="small">
+          Confirm
+        </Button>
+        <Button variant="neutral" look="outlined" size="small">
+          Cancel
+        </Button>
+      </>
+    ),
+  },
 };
 
 // Real-world Examples

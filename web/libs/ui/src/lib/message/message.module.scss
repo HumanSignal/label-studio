@@ -1,9 +1,40 @@
 /* Message Base Styles */
 .base {
-  @apply flex items-start gap-tight p-base rounded-small border;
+  @apply flex items-start rounded-small border;
+}
+
+/* Size Styles */
+
+/* Medium Size - Default */
+.size-medium {
+  @apply gap-tight p-base;
+
+  .close {
+    @apply max-h-6 max-w-6;
+  }
+}
+
+/* Small Size - Compact */
+.size-small {
+  @apply gap-tight p-tight;
+
+  .title {
+    @apply text-label-small;
+  }
+
+  .body {
+    @apply text-body-small;
+  }
+
+  .close {
+    @apply max-h-5 max-w-5;
+  }
 }
 
 /* Icon Container */
+.icon {
+  @apply flex items-center justify-center rounded flex-shrink-0;
+}
 
 /* Content Container */
 .content {

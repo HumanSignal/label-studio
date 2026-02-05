@@ -7,6 +7,9 @@ import { Button } from "../button/button";
 // Mock the styles since they're SCSS modules
 jest.mock("./message.module.scss", () => ({
   base: "base",
+  // Size classes
+  "size-medium": "size-medium",
+  "size-small": "size-small",
   // Variant classes
   "variant-primary": "variant-primary",
   "variant-neutral": "variant-neutral",
@@ -62,6 +65,20 @@ describe("Message Component", () => {
     expect(screen.getByTestId("message")).toHaveClass("variant-primary");
   });
 
+  it("applies correct size classes", () => {
+    const { rerender } = render(<Message {...defaultProps} size="medium" data-testid="message" />);
+
+    expect(screen.getByTestId("message")).toHaveClass("size-medium");
+
+    rerender(<Message {...defaultProps} size="small" data-testid="message" />);
+    expect(screen.getByTestId("message")).toHaveClass("size-small");
+  });
+
+  it("defaults to medium size", () => {
+    render(<Message {...defaultProps} data-testid="message" />);
+    expect(screen.getByTestId("message")).toHaveClass("size-medium");
+  });
+
   it("normalizes variant aliases to primary variants", () => {
     const { rerender } = render(<Message {...defaultProps} variant="info" data-testid="message" />);
     expect(screen.getByTestId("message")).toHaveClass("variant-primary");
@@ -102,6 +119,19 @@ describe("Message Component", () => {
     const icon = screen.getByTestId("icon");
     expect(icon).toHaveAttribute("width", "32");
     expect(icon).toHaveAttribute("height", "32");
+  });
+
+  it("uses default icon size based on size prop", () => {
+    const { rerender } = render(<Message {...defaultProps} size="medium" icon={<IconUpload data-testid="icon" />} />);
+
+    let icon = screen.getByTestId("icon");
+    expect(icon).toHaveAttribute("width", "20");
+    expect(icon).toHaveAttribute("height", "20");
+
+    rerender(<Message {...defaultProps} size="small" icon={<IconUpload data-testid="icon" />} />);
+    icon = screen.getByTestId("icon");
+    expect(icon).toHaveAttribute("width", "18");
+    expect(icon).toHaveAttribute("height", "18");
   });
 
   it("renders title when provided", () => {

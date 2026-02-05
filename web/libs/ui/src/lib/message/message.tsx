@@ -21,7 +21,14 @@ const variants = {
   warning: styles["variant-warning"],
 } as const;
 
+// Size configuration
+const sizes = {
+  medium: styles["size-medium"],
+  small: styles["size-small"],
+} as const;
+
 export type MessageVariant = keyof typeof variants | "info" | "success" | "error";
+export type MessageSize = keyof typeof sizes;
 
 export interface MessageProps extends React.HTMLAttributes<HTMLDivElement> {
   /**
@@ -40,12 +47,19 @@ export interface MessageProps extends React.HTMLAttributes<HTMLDivElement> {
   variant?: MessageVariant;
 
   /**
+   * Size of the message
+   * - medium: Default size with standard padding and 20px icon (default)
+   * - small: Compact size with reduced padding and 18px icon
+   */
+  size?: MessageSize;
+
+  /**
    * Icon element to display. If not provided, a default icon based on variant will be used.
    */
   icon?: ReactNode;
 
   /**
-   * Size of the icon in pixels. Defaults to 20.
+   * Size of the icon in pixels. If not provided, defaults based on size prop (medium: 20, small: 18).
    */
   iconSize?: number;
 
@@ -154,8 +168,9 @@ export const Message = forwardRef<HTMLDivElement, MessageProps>(
   (
     {
       variant = "primary",
+      size = "medium",
       icon,
-      iconSize = 24,
+      iconSize,
       title,
       children,
       closable = false,
@@ -200,11 +215,14 @@ export const Message = forwardRef<HTMLDivElement, MessageProps>(
 
     const iconElement = icon || defaultIcon;
 
+    // Determine icon size based on size prop if not explicitly provided
+    const finalIconSize = iconSize ?? (size === "small" ? 20 : 24);
+
     // Clone the icon to ensure consistent sizing
     const iconWithSize = React.isValidElement(iconElement)
       ? React.cloneElement(iconElement as React.ReactElement, {
-          width: iconSize,
-          height: iconSize,
+          width: finalIconSize,
+          height: finalIconSize,
         })
       : iconElement;
 
@@ -215,7 +233,7 @@ export const Message = forwardRef<HTMLDivElement, MessageProps>(
     return (
       <div
         ref={ref}
-        className={cn("message", styles.base, variants[normalizedVariant], className)}
+        className={cn("message", styles.base, sizes[size], variants[normalizedVariant], className)}
         data-testid={testId}
         role="alert"
         aria-live="polite"
@@ -261,6 +279,7 @@ export const Message = forwardRef<HTMLDivElement, MessageProps>(
             size="smaller"
             className={cn("message__close", styles.close)}
             onClick={onClose}
+            tooltip="Dismiss"
             aria-label="Close message"
             data-testid="message-close-button"
             leading={<IconClose />}
