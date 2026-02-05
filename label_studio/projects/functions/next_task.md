@@ -37,7 +37,7 @@ flowchart TD
     F{prioritized_low_agreement?} -- yes --> LAL["Low agreement queue<br/>first unlocked"] --> K
     F -- no --> G
 
-    G{"GT-first gating?<br/>should_attempt_ground_truth_first(user, project)"} -- yes --> GT["Onboarding ground truth queue<br/>_try_ground_truth()"] --> H
+    G{"GT-first gating?<br/>should_attempt_ground_truth_first(user, project)"} -- yes --> GT["Onboarding ground truth queue<br/>_try_onboarding_ground_truth()"] --> H
     G -- no --> H
 
     H{project.maximum_annotations > 1?} -- yes --> BF["Breadth first queue<br/>_try_breadth_first()"] --> I
@@ -78,7 +78,7 @@ The `queue_info` string aggregates labels as specific stages are attempted:
 - "Manually assigned queue" when `assigned_flag` path is used.
 - "Task lock" when returning a task already locked by the user.
 - "Low agreement queue" when the prioritized low-agreement branch returns a task.
-- "Onboarding ground truth queue" when GT is attempted during onboarding (label may appear even if selection falls through).
+- "Onboarding ground truth queue" when GT onboarding is attempted (label may appear even if selection falls through).
 - "Breadth first queue" for in-progress tasks (when `maximum_annotations > 1`).
 - "Show overlap first" when overlap filtering is applied.
 - Sampling labels:
