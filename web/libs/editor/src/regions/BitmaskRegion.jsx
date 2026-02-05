@@ -176,7 +176,7 @@ const Model = types
 
           image.src = self.imageDataURL;
 
-          // Fallback onload
+          // Fallback onload()
           image.onload = () => {
             context.canvas.width = image.naturalWidth;
             context.canvas.height = image.naturalHeight;
@@ -188,7 +188,7 @@ const Model = types
 
           try {
             await image.decode();
-            image.onload(); // on success of decode() onload() get called manually
+            image.onload(); // on success of decode() onload() get called manually to fix a Bug known for Chromium: https://issues.chromium.org/issues/40792189
           } catch (err) {
             console.log(err);
           }
