@@ -119,6 +119,7 @@ export class HtxTextBox extends React.Component {
       autoFocus: true,
       ref: this.inputRef,
       value,
+      "data-testid": "htx-textbox-input",
       onBlur: () => {
         onChange(this.state.value);
       },
@@ -148,7 +149,7 @@ export class HtxTextBox extends React.Component {
     this.updateHeight();
 
     return (
-      <div className={cn("textarea").elem("region").toClassName()}>
+      <div className={cn("textarea").elem("region").toClassName()} data-testid="htx-textbox-edit">
         {rows > 1 ? <textarea {...inputProps} /> : <input {...inputProps} />}
         {!onlyEdit && (
           <Tooltip title="Save: [shift+enter]">
@@ -160,6 +161,7 @@ export class HtxTextBox extends React.Component {
               className="absolute right-tight top-tighter"
               icon={<IconCheck />}
               aria-label="Save"
+              data-testid="htx-textbox-save"
               onClick={this.save}
             />
           </Tooltip>
@@ -184,8 +186,8 @@ export class HtxTextBox extends React.Component {
     } = this.props;
 
     return (
-      <div className={cn("textarea").elem("region").toClassName()}>
-        <div className={this.inputClassName} id={props.id} name={props.name}>
+      <div className={cn("textarea").elem("region").toClassName()} data-testid="htx-textbox-view">
+        <div className={this.inputClassName} id={props.id} name={props.name} data-testid="htx-textbox-content">
           <Typography ref={this.textRef} size="small">
             {text.split("\n").map((line, index, array) => {
               const isLastLine = index === array.length - 1;
@@ -198,7 +200,7 @@ export class HtxTextBox extends React.Component {
             })}
           </Typography>
         </div>
-        <div className={cn("textarea").elem("actions").toClassName()}>
+        <div className={cn("textarea").elem("actions").toClassName()} data-testid="htx-textbox-actions">
           {isEditable && onChange && (
             <Button
               variant="neutral"
@@ -208,6 +210,7 @@ export class HtxTextBox extends React.Component {
               tooltipTheme="Dark"
               leading={<IconPencil />}
               aria-label="Edit Region"
+              data-testid="htx-textbox-edit-button"
               onClick={this.startEditing}
             />
           )}
@@ -221,6 +224,7 @@ export class HtxTextBox extends React.Component {
               tooltipTheme="Dark"
               leading={<IconTrashAlt />}
               aria-label="Delete Region"
+              data-testid="htx-textbox-delete-button"
               onClick={onDelete}
             />
           )}

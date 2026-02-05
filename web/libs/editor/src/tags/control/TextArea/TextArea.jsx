@@ -398,7 +398,7 @@ const HtxTextArea = observer(({ item }) => {
   visibleStyle.marginTop = "4px";
 
   return item.displaymode === PER_REGION_MODES.TAG ? (
-    <div className={textareaClassName} style={visibleStyle} ref={item.elementRef}>
+    <div className={textareaClassName} style={visibleStyle} ref={item.elementRef} data-testid="textarea-control">
       {Tree.renderChildren(item, item.annotation)}
 
       {item.showSubmit && (
@@ -411,19 +411,20 @@ const HtxTextArea = observer(({ item }) => {
 
             return false;
           }}
+          data-testid="textarea-form"
         >
           <Form.Item style={itemStyle}>
             {rows === 1 ? (
-              <Input {...props} aria-label="TextArea Input" />
+              <Input {...props} aria-label="TextArea Input" data-testid="textarea-input" />
             ) : (
-              <TextArea {...props} aria-label="TextArea Input" />
+              <TextArea {...props} aria-label="TextArea Input" data-testid="textarea-input" />
             )}
             {showAddButton && (
-              <div className="flex items-center justify-between gap-tight w-full mb-tighter">
+              <div className="flex items-center justify-between gap-tight w-full mb-tighter" data-testid="textarea-submit-section">
                 {/* Counts on the left */}
-                <div className="flex items-center gap-base" aria-live="polite" aria-atomic="true">
+                <div className="flex items-center gap-base" aria-live="polite" aria-atomic="true" data-testid="textarea-counts">
                   {/* Character count */}
-                  <Typography size="small" className="text-neutral-content-subtler">
+                  <Typography size="small" className="text-neutral-content-subtler" data-testid="textarea-character-count">
                     {item._value?.length ?? 0} {pluralize(item._value?.length ?? 0, "character", "characters")}
                   </Typography>
 
@@ -433,7 +434,7 @@ const HtxTextArea = observer(({ item }) => {
                       <Typography size="small" className="text-neutral-content-subtler" aria-hidden="true">
                         •
                       </Typography>
-                      <Typography size="small" className="text-neutral-content-subtler">
+                      <Typography size="small" className="text-neutral-content-subtler" data-testid="textarea-submission-count">
                         {item.submissionsNum}
                         {item.maxsubmissions && ` / ${item.maxsubmissions}`}{" "}
                         {pluralize(item.submissionsNum, "submission", "submissions")}
@@ -446,7 +447,7 @@ const HtxTextArea = observer(({ item }) => {
                 <div className="flex items-center gap-base">
                   {/* Show instruction for multiline textarea */}
                   {rows > 1 && (
-                    <Typography size="small" className="text-neutral-content-subtler italic">
+                    <Typography size="small" className="text-neutral-content-subtler italic" data-testid="textarea-instruction">
                       Press Shift + Enter to Add
                     </Typography>
                   )}
@@ -460,6 +461,7 @@ const HtxTextArea = observer(({ item }) => {
                       leading={<IconPlus />}
                       className="w-20 px-tight"
                       htmlType="submit"
+                      data-testid="textarea-add-button"
                     >
                       Add
                     </Button>
@@ -472,7 +474,7 @@ const HtxTextArea = observer(({ item }) => {
       )}
 
       {item.regions.length > 0 && (
-        <div style={{ marginBottom: "1em" }}>
+        <div style={{ marginBottom: "1em" }} data-testid="textarea-regions">
           {item.regions.map((t) => (
             <HtxTextAreaRegion key={t.id} item={t} onFocus={onFocus} />
           ))}
