@@ -303,7 +303,7 @@ def get_next_task_without_dm_queue(
         logger.debug(f'User={user} tries ground truth from prepared tasks')
         next_task = _try_ground_truth(not_solved_tasks, project, user)
         if next_task:
-            queue_info += (' & ' if queue_info else '') + 'Ground truth queue'
+            queue_info += (' & ' if queue_info else '') + 'Onboarding ground truth queue'
 
     # Low agreement strategy: reassign this annotator to low agreement tasks
     if not next_task and prioritized_low_agreement:
