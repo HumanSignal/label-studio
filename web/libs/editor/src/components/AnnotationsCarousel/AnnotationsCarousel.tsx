@@ -9,7 +9,6 @@ import { isActive, FF_FIT_720_LAZY_LOAD_ANNOTATIONS } from "@humansignal/core/li
 import { AnnotationButton } from "./AnnotationButton";
 import "./AnnotationsCarousel.scss";
 
-// FIT-720: Virtualization constants
 const ITEM_WIDTH = 200; // Approximate width of each annotation button (min-width: 186px + gap)
 const ITEM_GAP = 4; // Gap between items (--spacing-tighter)
 const VIRTUALIZATION_THRESHOLD = 50; // Only virtualize if more than this many items
@@ -20,7 +19,6 @@ interface AnnotationsCarouselInterface {
   commentStore?: any;
 }
 
-// FIT-720: Item data type for virtualized list
 interface ItemData {
   entities: any[];
   capabilities: any;
@@ -54,7 +52,6 @@ export const AnnotationsCarousel = observer(({ store, annotationStore }: Annotat
   const carouselRef = useRef<HTMLElement>();
   const containerRef = useRef<HTMLElement>();
 
-  // FIT-720: Track scroll position for virtualized navigation buttons
   const [scrollOffset, setScrollOffset] = useState(0);
   const [containerWidth, setContainerWidth] = useState(0);
 
@@ -74,16 +71,12 @@ export const AnnotationsCarousel = observer(({ store, annotationStore }: Annotat
     [enablePredictions, enableCreateAnnotation, groundTruthEnabled, enableAnnotations, enableAnnotationDelete],
   );
 
-  // FIT-720: Sort entities once
   const sortedEntities = useMemo(() => sortAnnotations(entities), [entities]);
 
-  // FIT-720: Calculate total width and determine if virtualization is needed
   const totalWidth = sortedEntities.length * (ITEM_WIDTH + ITEM_GAP);
-  // FIT-720: Only virtualize when FF is enabled AND there are many items
   const shouldVirtualize =
     isActive(FF_FIT_720_LAZY_LOAD_ANNOTATIONS) && sortedEntities.length > VIRTUALIZATION_THRESHOLD;
 
-  // FIT-720: Navigation button states for virtualized list
   const isLeftDisabled = scrollOffset <= 0;
   const isRightDisabled = scrollOffset >= totalWidth - containerWidth;
   const showControls = totalWidth > containerWidth;
@@ -131,7 +124,6 @@ export const AnnotationsCarousel = observer(({ store, annotationStore }: Annotat
     }
   }, [sortedEntities.length, containerRef.current, carouselRef.current, currentPosition, shouldVirtualize]);
 
-  // FIT-720: Scroll to selected annotation when it changes (virtualized only)
   useEffect(() => {
     if (shouldVirtualize && listRef.current && annotationStore.selected) {
       const selectedIndex = sortedEntities.findIndex((e: any) => e?.id === annotationStore.selected?.id);
@@ -150,7 +142,6 @@ export const AnnotationsCarousel = observer(({ store, annotationStore }: Annotat
     setEntities(newEntities);
   }, [annotationStore, JSON.stringify(annotationStore.predictions), JSON.stringify(annotationStore.annotations)]);
 
-  // FIT-720: Data passed to virtualized items
   const itemData = useMemo(
     () => ({
       entities: sortedEntities,
@@ -165,7 +156,6 @@ export const AnnotationsCarousel = observer(({ store, annotationStore }: Annotat
     return null;
   }
 
-  // FIT-720: Use virtualization for large lists when FF is enabled
   if (shouldVirtualize) {
     return (
       <div

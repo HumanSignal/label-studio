@@ -20,7 +20,6 @@ import { FF_DEV_3391, isFF } from "../../utils/feature-flags";
 import { isActive, FF_FIT_720_LAZY_LOAD_ANNOTATIONS } from "@humansignal/core/lib/utils/feature-flags";
 import { moveStylesBetweenHeadTags } from "../../utils/html";
 
-// FIT-720: Virtualization constants for Compare view
 const PANEL_WIDTH = 500; // Width of each annotation panel (approximately 50% of typical viewport)
 const PANEL_GAP = 30; // Gap between panels (matches $gap in Grid.module.scss)
 const VIRTUALIZATION_THRESHOLD = 10; // Only virtualize if more than this many annotations
@@ -62,7 +61,6 @@ class Item extends Component {
   }
 }
 
-// FIT-720: Virtualized annotation panel (UI only - hydration will be added in stub-hydration branch)
 const VirtualizedAnnotationPanel = observer(({ annotation, root, style, onSelect }) => {
   return (
     <div style={{ ...style, paddingRight: PANEL_GAP }}>
@@ -80,7 +78,6 @@ const VirtualizedAnnotationPanel = observer(({ annotation, root, style, onSelect
   );
 });
 
-// FIT-720: Virtualized Grid component (UI only - hydration triggers will be added in stub-hydration branch)
 const VirtualizedGrid = observer(({ store, annotations, root }) => {
   const listRef = useRef(null);
   const [containerWidth, setContainerWidth] = useState(0);
@@ -394,12 +391,10 @@ class GridClassComponent extends Component {
   }
 }
 
-// FIT-720: Grid wrapper that chooses virtualized or original based on FF and annotation count
 export default function Grid(props) {
   const { annotations } = props;
   const visibleCount = annotations.filter((c) => !c.hidden).length;
 
-  // FIT-720: Use virtualization when FF is enabled AND there are many annotations
   const shouldVirtualize = isActive(FF_FIT_720_LAZY_LOAD_ANNOTATIONS) && visibleCount > VIRTUALIZATION_THRESHOLD;
 
   if (shouldVirtualize) {

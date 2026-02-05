@@ -19,7 +19,6 @@ $gap: 30px;
   overflow: auto;
   position: relative;
 
-  // FIT-720: Virtualized grid uses react-window, not CSS grid
   &:has([data-virtualized="true"]) {
     display: block;
   }
@@ -57,7 +56,6 @@ $gap: 30px;
   }
 }
 
-// FIT-720: Virtualized container needs explicit height for AutoSizer
 .containerVirtualized {
   position: relative;
   flex-grow: 1;
