@@ -10,7 +10,8 @@ import {
 } from "@humansignal/shad/components/ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "@humansignal/shad/components/ui/popover";
 import type { SelectOption, OptionProps, SelectProps } from "./types.ts";
-import { Checkbox, Label } from "@humansignal/ui";
+import { Checkbox, Label, Typography } from "@humansignal/ui";
+import { Badge } from "../badge/badge";
 import { isDefined } from "@humansignal/core/lib/utils/helpers";
 import { IconChevron, IconChevronDown } from "@humansignal/icons";
 import clsx from "clsx";
@@ -22,6 +23,113 @@ import InfiniteLoader from "react-window-infinite-loader";
 const VARIABLE_LIST_ITEM_HEIGHT = 40;
 const VARIABLE_LIST_COUNT_RENDERED = 5;
 const VARIABLE_LIST_PAGE_SIZE = 20;
+
+/**
+ * Props for SelectedItemsGroup component
+ */
+type SelectedItemsGroupProps = {
+  expanded: boolean;
+  onToggleExpand: () => void;
+  selectedOptions: any[];
+  onDeselectItem: (value: any) => void;
+  onDeselectAll: () => void;
+  disabled?: boolean;
+};
+
+/**
+ * SelectedItemsGroup - Internal component for displaying selected items in a collapsible group
+ * Only visible when multiple, searchable, and isVirtualList are all true
+ */
+const SelectedItemsGroup = ({
+  expanded,
+  onToggleExpand,
+  selectedOptions,
+  onDeselectItem,
+  onDeselectAll,
+  disabled,
+}: SelectedItemsGroupProps) => {
+  const handleItemClick = useCallback(
+    (option: any) => {
+      if (disabled) return;
+      const value = option?.value ?? option;
+      onDeselectItem(value);
+    },
+    [onDeselectItem, disabled],
+  );
+
+  const handleDeselectAllClick = useCallback(
+    (e: React.MouseEvent) => {
+      e.stopPropagation();
+      if (disabled) return;
+      onDeselectAll();
+    },
+    [onDeselectAll, disabled],
+  );
+
+  return (
+    <div className={styles.selectedItemsGroup}>
+      {/* Header - Always visible */}
+      <button
+        type="button"
+        className={styles.selectedItemsHeader}
+        onClick={onToggleExpand}
+        aria-expanded={expanded}
+        aria-label={`Selected items group, ${selectedOptions.length} items selected`}
+      >
+        {/* Caret icon */}
+        {expanded ? (
+          <IconChevron className={styles.selectedItemsCaret} aria-hidden="true" />
+        ) : (
+          <IconChevronDown className={styles.selectedItemsCaret} aria-hidden="true" />
+        )}
+
+        {/* Deselect all checkbox */}
+        <Checkbox
+          tabIndex={-1}
+          checked={true}
+          readOnly
+          disabled={disabled}
+          onClick={handleDeselectAllClick}
+          aria-label="Deselect all items"
+        />
+
+        {/* Title with counter badge */}
+        <div className={styles.selectedItemsTitle}>
+          <Typography variant="body">Selected items</Typography>
+          <Badge variant="info" shape="squared" className="ml-auto">
+            {selectedOptions.length}
+          </Badge>
+        </div>
+      </button>
+
+      {/* Content - Conditionally rendered when expanded */}
+      {expanded && (
+        <div className={styles.selectedItemsContent}>
+          {selectedOptions.map((option, index) => {
+            const optionValue = option?.value ?? option;
+            const label = option?.label ?? optionValue;
+
+            return (
+              <button
+                key={`selected-${optionValue}-${index}`}
+                type="button"
+                className={styles.selectedItem}
+                onClick={() => handleItemClick(option)}
+                tabIndex={disabled ? -1 : 0}
+                aria-label={`Deselect ${label}`}
+                disabled={disabled}
+              >
+                <Checkbox tabIndex={-1} checked={true} readOnly disabled={disabled} />
+                <div className="w-full min-w-0 truncate">{label}</div>
+              </button>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+};
+
 /*
  * This file defines a custom Select component for the Design System, which uses a fully custom UI for
  * dropdowns and options.
@@ -109,6 +217,7 @@ export const Select = forwardRef(
       initialValue = initialValue[0];
     }
     const [isOpen, setIsOpen] = useState<boolean>(false);
+    const [selectedGroupExpanded, setSelectedGroupExpanded] = useState<boolean>(false);
     const [value, setValue] = useState<any>(initialValue);
 
     valueRef.current = value;
@@ -184,6 +293,13 @@ export const Select = forwardRef(
     }, [options]);
 
     const _options = useMemo(() => {
+      // If searchFilter is provided, always use it (even with empty query)
+      // This allows custom filtering logic for API-based searches
+      if (searchFilter) {
+        return flatOptions.filter((option) => searchFilter(option, query ?? ""));
+      }
+
+      // Default behavior: no filtering when not searchable or query is empty
       if (!searchable || !query.trim()) return options;
 
       const filterHandler = (option: any, queryString: string) => {
@@ -194,7 +310,7 @@ export const Select = forwardRef(
           value?.toString()?.toLowerCase().includes(queryString.toLowerCase())
         );
       };
-      return flatOptions.filter((option) => (searchFilter ?? filterHandler)(option, query));
+      return flatOptions.filter((option) => filterHandler(option, query));
     }, [options, flatOptions, searchable, query, searchFilter]);
 
     const isSelected = useCallback(
@@ -390,11 +506,30 @@ export const Select = forwardRef(
               )}
               <CommandList
                 label="Select an option"
-                className={
-                  searchable ? "shadow-inner shadow-neutral-surface-inset border-t border-neutral-border shadow-" : ""
-                }
+                className={cnm({
+                  "shadow-inner shadow-neutral-surface-inset border-t border-neutral-border shadow-": searchable,
+                  "max-h-none": footer !== undefined,
+                })}
               >
+                {/* Selected Items Group - Only for multiple + searchable + virtual lists */}
+                {multiple && searchable && isVirtualList && selectedOptions.length > 0 && (
+                  <SelectedItemsGroup
+                    expanded={selectedGroupExpanded}
+                    onToggleExpand={() => setSelectedGroupExpanded(!selectedGroupExpanded)}
+                    selectedOptions={selectedOptions}
+                    onDeselectItem={(value) => _onChange(value, true)}
+                    onDeselectAll={() => {
+                      selectedOptions.forEach((opt) => {
+                        const val = opt?.value ?? opt;
+                        _onChange(val, true);
+                      });
+                    }}
+                    disabled={disabled}
+                  />
+                )}
+
                 <CommandEmpty>{searchable ? "No results found." : ""}</CommandEmpty>
+
                 <CommandGroup>
                   {props.header ? props.header : null}
                   {isVirtualList ? (
