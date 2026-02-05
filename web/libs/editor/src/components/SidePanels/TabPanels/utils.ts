@@ -137,7 +137,9 @@ const fixCustomPanel = (state: Record<string, PanelBBox>, panelName: string, sho
 // We only need to check "regions-relations" panel
 const checkForCustomPanel = (state: Record<string, PanelBBox>, showCustomPanel: boolean) => {
   const findPanelWithCustomPanel = (state: Record<string, PanelBBox>) => {
-    return Object.keys(state).find((panel) => state[panel].panelViews.some((view) => view.name === customPanelView.name));
+    return Object.keys(state).find((panel) =>
+      state[panel].panelViews.some((view) => view.name === customPanelView.name),
+    );
   };
 
   // if we need custom panel but it's not present, or we don't need it but it's there, update the state accordingly
@@ -201,7 +203,7 @@ const panelViews = [
     title: "Custom",
     component: panelComponents.custom as FC<PanelProps>,
     active: false,
-  }
+  },
 ];
 
 // Custom panel for special tags; sits in "regions-relations" panel by default
