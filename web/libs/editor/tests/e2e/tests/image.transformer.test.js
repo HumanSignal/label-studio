@@ -4,7 +4,7 @@ const Helpers = require("./helpers");
 
 Feature("Image transformer");
 
-const IMAGE = "https://data.heartex.net/open-images/train_0/mini/0030019819f25b28.jpg";
+const IMAGE = "/public/files/images/0030019819f25b28.jpg";
 
 const annotationEmpty = {
   id: "1000",

@@ -3,8 +3,7 @@ const Asserts = require("../../utils/asserts");
 
 Feature("Creating regions over other regions").tag("@regress");
 
-const IMAGE =
-  "https://htx-pub.s3.us-east-1.amazonaws.com/examples/images/nick-owuor-astro-nic-visuals-wDifg5xc9Z4-unsplash.jpg";
+const IMAGE = "/public/files/images/nick-owuor-unsplash.jpg";
 
 const BLUEVIOLET = {
   color: "#8A2BE2",

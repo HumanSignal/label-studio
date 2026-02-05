@@ -3,13 +3,13 @@ Feature("Repeater paginate and scroll");
 const data = {
   images: [
     {
-      url: "https://htx-pub.s3.amazonaws.com/demo/images/demo_stock_purchase_agreement/0001.jpg",
+      url: "/public/files/images/demo_stock_purchase_0001.jpg",
     },
     {
-      url: "https://htx-pub.s3.amazonaws.com/demo/images/demo_stock_purchase_agreement/0002.jpg",
+      url: "/public/files/images/demo_stock_purchase_0002.jpg",
     },
     {
-      url: "https://htx-pub.s3.amazonaws.com/demo/images/demo_stock_purchase_agreement/0003.jpg",
+      url: "/public/files/images/demo_stock_purchase_0003.jpg",
     },
   ],
 };
