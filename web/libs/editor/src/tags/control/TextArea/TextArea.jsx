@@ -420,11 +420,23 @@ const HtxTextArea = observer(({ item }) => {
               <TextArea {...props} aria-label="TextArea Input" data-testid="textarea-input" />
             )}
             {showAddButton && (
-              <div className="flex items-center justify-between gap-tight w-full mb-tighter" data-testid="textarea-submit-section">
+              <div
+                className="flex items-center justify-between gap-tight w-full mb-tighter"
+                data-testid="textarea-submit-section"
+              >
                 {/* Counts on the left */}
-                <div className="flex items-center gap-base" aria-live="polite" aria-atomic="true" data-testid="textarea-counts">
+                <div
+                  className="flex items-center gap-base"
+                  aria-live="polite"
+                  aria-atomic="true"
+                  data-testid="textarea-counts"
+                >
                   {/* Character count */}
-                  <Typography size="small" className="text-neutral-content-subtler" data-testid="textarea-character-count">
+                  <Typography
+                    size="small"
+                    className="text-neutral-content-subtler"
+                    data-testid="textarea-character-count"
+                  >
                     {item._value?.length ?? 0} {pluralize(item._value?.length ?? 0, "character", "characters")}
                   </Typography>
 
@@ -434,7 +446,11 @@ const HtxTextArea = observer(({ item }) => {
                       <Typography size="small" className="text-neutral-content-subtler" aria-hidden="true">
                         •
                       </Typography>
-                      <Typography size="small" className="text-neutral-content-subtler" data-testid="textarea-submission-count">
+                      <Typography
+                        size="small"
+                        className="text-neutral-content-subtler"
+                        data-testid="textarea-submission-count"
+                      >
                         {item.submissionsNum}
                         {item.maxsubmissions && ` / ${item.maxsubmissions}`}{" "}
                         {pluralize(item.submissionsNum, "submission", "submissions")}
@@ -447,7 +463,11 @@ const HtxTextArea = observer(({ item }) => {
                 <div className="flex items-center gap-base">
                   {/* Show instruction for multiline textarea */}
                   {rows > 1 && (
-                    <Typography size="small" className="text-neutral-content-subtler italic" data-testid="textarea-instruction">
+                    <Typography
+                      size="small"
+                      className="text-neutral-content-subtler italic"
+                      data-testid="textarea-instruction"
+                    >
                       Press Shift + Enter to Add
                     </Typography>
                   )}
