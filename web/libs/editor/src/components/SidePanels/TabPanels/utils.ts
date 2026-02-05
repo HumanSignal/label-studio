@@ -119,6 +119,42 @@ export const stateRemovePanelEmptyViews = (state: Record<string, PanelBBox> | nu
   return newState;
 };
 
+// Unconditionally add/remove the custom panel to/from the state at given panel
+const fixCustomPanel = (state: Record<string, PanelBBox>, panelName: string, showCustomPanel: boolean) => {
+  const newState: Record<string, PanelBBox> = {
+    ...state,
+    [panelName]: {
+      ...state[panelName],
+      panelViews: showCustomPanel
+        ? [...state[panelName].panelViews, customPanelView]
+        : state[panelName].panelViews.filter((view) => view.name !== customPanelView.name),
+    },
+  };
+  return newState;
+};
+
+// Check if the custom panel is present in the state and add/remove it if needed
+// We only need to check "regions-relations" panel
+const checkForCustomPanel = (state: Record<string, PanelBBox>, showCustomPanel: boolean) => {
+  const findPanelWithCustomPanel = (state: Record<string, PanelBBox>) => {
+    return Object.keys(state).find((panel) => state[panel].panelViews.some((view) => view.name === customPanelView.name));
+  };
+
+  // if we need custom panel but it's not present, or we don't need it but it's there, update the state accordingly
+  if (showCustomPanel) {
+    if (!findPanelWithCustomPanel(state)) {
+      return fixCustomPanel(state, "regions-relations", true);
+    }
+  } else {
+    const panel = findPanelWithCustomPanel(state);
+    if (panel) {
+      return fixCustomPanel(state, panel, false);
+    }
+  }
+
+  return state;
+};
+
 export const panelComponents: { [key: string]: FC<PanelProps> } = {
   regions: OutlinerComponent as FC<PanelProps>,
   history: History as FC<PanelProps>,
@@ -168,6 +204,9 @@ const panelViews = [
   }
 ];
 
+// Custom panel for special tags; sits in "regions-relations" panel by default
+const customPanelView = panelViews[5];
+
 export const enterprisePanelDefault: Record<string, PanelBBox> = {
   "info-comments-history": {
     order: 1,
@@ -184,7 +223,7 @@ export const enterprisePanelDefault: Record<string, PanelBBox> = {
     maxHeight: DEFAULT_PANEL_MAX_HEIGHT,
     panelViews: [panelViews[3], panelViews[4], panelViews[1]],
   },
-  "regions-relations-custom": {
+  "regions-relations": {
     order: 2,
     top: 0,
     left: 0,
@@ -197,7 +236,7 @@ export const enterprisePanelDefault: Record<string, PanelBBox> = {
     detached: false,
     alignment: Side.right,
     maxHeight: DEFAULT_PANEL_MAX_HEIGHT,
-    panelViews: [panelViews[0], panelViews[2], panelViews[5]],
+    panelViews: [panelViews[0], panelViews[2]],
   },
 };
 
@@ -272,7 +311,7 @@ export const checkCollapsedPanelsHaveData = (collapsedSide: PanelsCollapsed, pan
   return collapsedCopy;
 };
 
-export const restorePanel = (showComments: boolean): StoredPanelState => {
+export const restorePanel = (showComments: boolean, showCustomPanel = false): StoredPanelState => {
   const previousState = window.localStorage.getItem("panelState");
   const parsed: StoredPanelState | null = previousState && JSON.parse(previousState);
   const panelData = parsed && parsed.panelData;
@@ -285,13 +324,16 @@ export const restorePanel = (showComments: boolean): StoredPanelState => {
   // stored state can have less tabs than available, for example if it was stored on old version
   // or if comments were enabled; then return default state
   if (!allTabs || allTabs.length !== countOfAllAvailableTabs) {
-    const defaultPanel = showComments ? enterprisePanelDefault : openSourcePanelDefault;
+    let defaultPanel = showComments ? enterprisePanelDefault : openSourcePanelDefault;
+    if (showComments && showCustomPanel) {
+      defaultPanel = fixCustomPanel(defaultPanel, "regions-relations", true);
+    }
 
     return { panelData: defaultPanel, collapsedSide: defaultCollapsedSide };
   }
 
-  const noEmptyPanels = stateRemovePanelEmptyViews(panelData);
-  const withActiveDefaults = setActiveDefaults(noEmptyPanels);
+  const fixedPanels = stateRemovePanelEmptyViews(checkForCustomPanel(panelData, showCustomPanel));
+  const withActiveDefaults = setActiveDefaults(fixedPanels);
   const safeCollapsedSide = checkCollapsedPanelsHaveData(collapsedSide, withActiveDefaults);
 
   return { panelData: restoreComponentsToState(withActiveDefaults), collapsedSide: safeCollapsedSide };

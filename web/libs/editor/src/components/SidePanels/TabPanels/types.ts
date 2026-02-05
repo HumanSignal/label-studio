@@ -24,6 +24,7 @@ export interface SidePanelsProps {
   store: any;
   currentEntity: any;
   showComments: boolean;
+  showCustomPanel: boolean;
   focusTab: string;
 }
 
