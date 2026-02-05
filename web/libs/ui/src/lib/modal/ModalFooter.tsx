@@ -1,5 +1,5 @@
 import type { CSSProperties, PropsWithChildren } from "react";
-import { Elem } from "./ModalContext";
+import { cnb as cn } from "@humansignal/core/lib/utils/bem";
 
 type ModalFooterProps = PropsWithChildren<{
   bare?: boolean;
@@ -8,7 +8,7 @@ type ModalFooterProps = PropsWithChildren<{
 }>;
 
 export const ModalFooter = ({ children, bare, style, className }: ModalFooterProps) => (
-  <Elem name="footer" mod={{ bare }} mix={className} style={style}>
+  <div className={cn("modal-ls").elem("footer").mod({ bare }).mix(className).toClassName()} style={style}>
     {children}
-  </Elem>
+  </div>
 );
