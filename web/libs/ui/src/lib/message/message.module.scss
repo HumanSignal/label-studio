@@ -45,16 +45,16 @@
 .variant-primary {
   @apply bg-primary-background border-primary-border-subtle;
 
-  .icon {
+  .icon svg {
     @apply text-primary-icon;
   }
 }
 
 /* Neutral Variant - Gray theme */
 .variant-neutral {
-  @apply bg-neutral-background border-neutral-border-subtle;
+  @apply bg-neutral-background border-neutral-border;
 
-  .icon {
+  .icon svg {
     @apply text-neutral-icon;
   }
 }
@@ -63,7 +63,7 @@
 .variant-negative {
   @apply bg-negative-background border-negative-border-subtle;
 
-  .icon {
+  .icon svg {
     @apply text-negative-icon;
   }
 }
@@ -72,7 +72,7 @@
 .variant-positive {
   @apply bg-positive-background border-positive-border-subtle;
 
-  .icon {
+  .icon svg {
     @apply text-positive-icon;
   }
 }
@@ -81,7 +81,7 @@
 .variant-warning {
   @apply bg-warning-background border-warning-border-subtle;
 
-  .icon {
+  .icon svg {
     @apply text-warning-icon;
   }
 }
