@@ -15,7 +15,6 @@ import { CommentsSdk } from "./comments-sdk";
 // import { LSFHistory } from "./lsf-history";
 import { annotationToServer, taskToLSFormat } from "./lsf-utils";
 import { when } from "mobx";
-// FIT-720: Import image cache for cleanup on destroy
 import { imageCache } from "@humansignal/core";
 
 const DEFAULT_INTERFACES = [
@@ -1233,7 +1232,6 @@ export class LSFWrapper {
       this.dismissOverlapToast();
     }
 
-    // FIT-720: Clear image cache when destroying LSF to release memory
     if (isActive(FF_FIT_720_LAZY_LOAD_ANNOTATIONS)) {
       imageCache?.forceClear?.();
     }

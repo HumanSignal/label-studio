@@ -8,7 +8,7 @@ const config = `
   </View>
 `;
 
-const data = { url: "https://htx-pub.s3.amazonaws.com/example.txt" };
+const data = { url: "/public/files/example.txt" };
 
 const result = [
   {
