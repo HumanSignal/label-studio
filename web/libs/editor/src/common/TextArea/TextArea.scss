@@ -81,6 +81,10 @@
     pointer-events: none;
     opacity: 0;
     transition: transform 150ms ease-out, opacity 150ms ease-out;
+
+    button {
+      pointer-events: auto;
+    }
   }
 }
 
