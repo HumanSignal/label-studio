@@ -38,13 +38,12 @@ const annotationEmpty = {
 
 const data = {
   image: [
-    "http://htx-pub.s3.amazonaws.com/samples/magicwand/magic_wand_scale_1_20200902_015806_26_2235_1B_AnalyticMS_00750_00750.jpg",
-    "http://htx-pub.s3.amazonaws.com/samples/magicwand/magic_wand_scale_2_20200902_015806_26_2235_1B_AnalyticMS_00750_00750.jpg",
-    "http://htx-pub.s3.amazonaws.com/samples/magicwand/magic_wand_scale_3_20200902_015806_26_2235_1B_AnalyticMS_00750_00750.jpg",
-    "http://htx-pub.s3.amazonaws.com/samples/magicwand/magic_wand_false_color_20200902_015806_26_2235_1B_AnalyticMS_00750_00750.jpg",
+    "/public/files/images/magic_wand_scale_1.jpg",
+    "/public/files/images/magic_wand_scale_2.jpg",
+    "/public/files/images/magic_wand_scale_3.jpg",
+    "/public/files/images/magic_wand_false_color.jpg",
   ],
-  thumb:
-    "http://htx-pub.s3.amazonaws.com/samples/magicwand/magic_wand_thumbnail_20200902_015806_26_2235_1B_AnalyticMS_00750_00750.jpg",
+  thumb: "/public/files/images/magic_wand_thumbnail.jpg",
 };
 
 async function assertMagicWandPixel(I, x, y, assertValue, rgbArray, msg) {
