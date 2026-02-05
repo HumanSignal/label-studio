@@ -1,0 +1,87 @@
+/* Message Base Styles */
+.base {
+  @apply flex items-start gap-tight p-base rounded-small border;
+}
+
+/* Icon Container */
+
+/* Content Container */
+.content {
+  @apply flex-1 flex flex-col gap-tight;
+}
+
+/* Title */
+.title {
+  @apply font-medium;
+}
+
+/* Body */
+.body {
+  @apply text-neutral-content;
+}
+
+/* Extra Content */
+.extra {
+  @apply mt-tight;
+}
+
+/* Actions */
+.actions {
+  @apply mt-tight flex items-center gap-tight flex-wrap;
+}
+
+/* Close Button */
+.close {
+  @apply flex-shrink-0;
+}
+
+.icon svg {
+  color: inherit;
+}
+
+/* Variant Styles */
+
+/* Primary Variant - Blue theme */
+.variant-primary {
+  @apply bg-primary-background border-primary-border-subtle;
+
+  .icon {
+    @apply text-primary-icon;
+  }
+}
+
+/* Neutral Variant - Gray theme */
+.variant-neutral {
+  @apply bg-neutral-background border-neutral-border-subtle;
+
+  .icon {
+    @apply text-neutral-icon;
+  }
+}
+
+/* Negative Variant - Red theme */
+.variant-negative {
+  @apply bg-negative-background border-negative-border-subtle;
+
+  .icon {
+    @apply text-negative-icon;
+  }
+}
+
+/* Positive Variant - Green theme */
+.variant-positive {
+  @apply bg-positive-background border-positive-border-subtle;
+
+  .icon {
+    @apply text-positive-icon;
+  }
+}
+
+/* Warning Variant - Orange/Yellow theme */
+.variant-warning {
+  @apply bg-warning-background border-warning-border-subtle;
+
+  .icon {
+    @apply text-warning-icon;
+  }
+}

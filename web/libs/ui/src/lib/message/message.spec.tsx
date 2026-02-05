@@ -1,0 +1,328 @@
+import { render, screen, fireEvent } from "@testing-library/react";
+import "@testing-library/jest-dom";
+import { Message, type MessageProps } from "./message";
+import { IconUpload } from "@humansignal/icons";
+import { Button } from "../button/button";
+
+// Mock the styles since they're SCSS modules
+jest.mock("./message.module.scss", () => ({
+  base: "base",
+  // Variant classes
+  "variant-primary": "variant-primary",
+  "variant-neutral": "variant-neutral",
+  "variant-negative": "variant-negative",
+  "variant-positive": "variant-positive",
+  "variant-warning": "variant-warning",
+  // Element classes
+  icon: "icon",
+  content: "content",
+  title: "title",
+  body: "body",
+  extra: "extra",
+  actions: "actions",
+  close: "close",
+}));
+
+// Mock the Markdown component
+jest.mock("../../../../editor/src/components/Markdown/Markdown", () => ({
+  Markdown: ({ text }: { text: string }) => <div data-testid="markdown-content">{text}</div>,
+}));
+
+const defaultProps: MessageProps = {
+  children: "Test message content",
+};
+
+describe("Message Component", () => {
+  it("renders with basic props", () => {
+    render(<Message {...defaultProps} />);
+
+    expect(screen.getByText("Test message content")).toBeInTheDocument();
+  });
+
+  it("applies correct variant classes", () => {
+    const { rerender } = render(<Message {...defaultProps} variant="primary" data-testid="message" />);
+
+    expect(screen.getByTestId("message")).toHaveClass("variant-primary");
+
+    rerender(<Message {...defaultProps} variant="neutral" data-testid="message" />);
+    expect(screen.getByTestId("message")).toHaveClass("variant-neutral");
+
+    rerender(<Message {...defaultProps} variant="negative" data-testid="message" />);
+    expect(screen.getByTestId("message")).toHaveClass("variant-negative");
+
+    rerender(<Message {...defaultProps} variant="positive" data-testid="message" />);
+    expect(screen.getByTestId("message")).toHaveClass("variant-positive");
+
+    rerender(<Message {...defaultProps} variant="warning" data-testid="message" />);
+    expect(screen.getByTestId("message")).toHaveClass("variant-warning");
+  });
+
+  it("defaults to primary variant", () => {
+    render(<Message {...defaultProps} data-testid="message" />);
+    expect(screen.getByTestId("message")).toHaveClass("variant-primary");
+  });
+
+  it("normalizes variant aliases to primary variants", () => {
+    const { rerender } = render(<Message {...defaultProps} variant="info" data-testid="message" />);
+    expect(screen.getByTestId("message")).toHaveClass("variant-primary");
+
+    rerender(<Message {...defaultProps} variant="error" data-testid="message" />);
+    expect(screen.getByTestId("message")).toHaveClass("variant-negative");
+
+    rerender(<Message {...defaultProps} variant="success" data-testid="message" />);
+    expect(screen.getByTestId("message")).toHaveClass("variant-positive");
+  });
+
+  it("renders custom icon", () => {
+    render(<Message {...defaultProps} icon={<IconUpload data-testid="custom-icon" />} />);
+
+    expect(screen.getByTestId("custom-icon")).toBeInTheDocument();
+  });
+
+  it("renders default icon when not provided", () => {
+    render(<Message {...defaultProps} variant="primary" />);
+
+    // Default icon should be rendered (IconInfoOutline for primary)
+    const iconContainer = screen.getByRole("alert").querySelector(".icon");
+    expect(iconContainer).toBeInTheDocument();
+    expect(iconContainer?.querySelector("svg")).toBeInTheDocument();
+  });
+
+  it("renders icon with correct size", () => {
+    render(<Message {...defaultProps} icon={<IconUpload data-testid="icon" />} />);
+
+    const icon = screen.getByTestId("icon");
+    expect(icon).toHaveAttribute("width", "20");
+    expect(icon).toHaveAttribute("height", "20");
+  });
+
+  it("renders icon with custom size", () => {
+    render(<Message {...defaultProps} icon={<IconUpload data-testid="icon" />} iconSize={32} />);
+
+    const icon = screen.getByTestId("icon");
+    expect(icon).toHaveAttribute("width", "32");
+    expect(icon).toHaveAttribute("height", "32");
+  });
+
+  it("renders title when provided", () => {
+    render(<Message {...defaultProps} title="Test Title" />);
+
+    expect(screen.getByText("Test Title")).toBeInTheDocument();
+  });
+
+  it("does not render title when not provided", () => {
+    render(<Message {...defaultProps} />);
+
+    const titleElement = screen.queryByText("Test Title");
+    expect(titleElement).not.toBeInTheDocument();
+  });
+
+  it("renders children content", () => {
+    render(<Message {...defaultProps}>Custom content here</Message>);
+
+    expect(screen.getByText("Custom content here")).toBeInTheDocument();
+  });
+
+  it("renders markdown when isMarkdown is true", () => {
+    render(
+      <Message {...defaultProps} isMarkdown>
+        **Bold text** and *italic text*
+      </Message>,
+    );
+
+    // Markdown component should be rendered
+    expect(screen.getByTestId("markdown-content")).toBeInTheDocument();
+    expect(screen.getByTestId("markdown-content")).toHaveTextContent("**Bold text** and *italic text*");
+  });
+
+  it("renders plain text when isMarkdown is false", () => {
+    render(
+      <Message {...defaultProps} isMarkdown={false}>
+        **Bold text**
+      </Message>,
+    );
+
+    expect(screen.getByText("**Bold text**")).toBeInTheDocument();
+  });
+
+  it("renders extra content when provided", () => {
+    render(<Message {...defaultProps} extra={<div data-testid="extra-content">Extra content</div>} />);
+
+    expect(screen.getByTestId("extra-content")).toBeInTheDocument();
+    expect(screen.getByText("Extra content")).toBeInTheDocument();
+  });
+
+  it("does not render extra content when not provided", () => {
+    render(<Message {...defaultProps} />);
+
+    const extraElement = screen.queryByText("Extra content");
+    expect(extraElement).not.toBeInTheDocument();
+  });
+
+  it("renders actions when provided", () => {
+    render(<Message {...defaultProps} actions={<Button data-testid="action-button">Click me</Button>} />);
+
+    expect(screen.getByTestId("action-button")).toBeInTheDocument();
+    expect(screen.getByText("Click me")).toBeInTheDocument();
+  });
+
+  it("renders multiple actions", () => {
+    render(
+      <Message
+        {...defaultProps}
+        actions={
+          <>
+            <Button data-testid="action-1">Action 1</Button>
+            <Button data-testid="action-2">Action 2</Button>
+          </>
+        }
+      />,
+    );
+
+    expect(screen.getByTestId("action-1")).toBeInTheDocument();
+    expect(screen.getByTestId("action-2")).toBeInTheDocument();
+  });
+
+  it("does not render actions when not provided", () => {
+    render(<Message {...defaultProps} />);
+
+    const actionElement = screen.queryByText("Click me");
+    expect(actionElement).not.toBeInTheDocument();
+  });
+
+  it("renders close button when closable is true", () => {
+    render(<Message {...defaultProps} closable />);
+
+    expect(screen.getByTestId("message-close-button")).toBeInTheDocument();
+  });
+
+  it("does not render close button when closable is false", () => {
+    render(<Message {...defaultProps} closable={false} />);
+
+    expect(screen.queryByTestId("message-close-button")).not.toBeInTheDocument();
+  });
+
+  it("calls onClose when close button is clicked", () => {
+    const onClose = jest.fn();
+    render(<Message {...defaultProps} closable onClose={onClose} />);
+
+    const closeButton = screen.getByTestId("message-close-button");
+    fireEvent.click(closeButton);
+
+    expect(onClose).toHaveBeenCalledTimes(1);
+  });
+
+  it("applies custom className", () => {
+    render(<Message {...defaultProps} className="custom-class" data-testid="message" />);
+
+    expect(screen.getByTestId("message")).toHaveClass("custom-class");
+  });
+
+  it("sets proper ARIA attributes", () => {
+    render(<Message {...defaultProps} title="Test Title" aria-label="Custom aria label" data-testid="message" />);
+
+    const message = screen.getByTestId("message");
+    expect(message).toHaveAttribute("role", "alert");
+    expect(message).toHaveAttribute("aria-live", "polite");
+    expect(message).toHaveAttribute("aria-label", "Custom aria label");
+  });
+
+  it("generates unique IDs for title and content", () => {
+    render(<Message {...defaultProps} title="Test Title" />);
+
+    const title = screen.getByText("Test Title");
+    const content = screen.getByText("Test message content");
+
+    expect(title).toHaveAttribute("id");
+    expect(content.parentElement).toHaveAttribute("id");
+
+    // IDs should be different
+    const titleId = title.getAttribute("id");
+    const contentId = content.parentElement?.getAttribute("id");
+    expect(titleId).not.toBe(contentId);
+  });
+
+  it("uses aria-labelledby when title is provided and aria-label is not", () => {
+    render(<Message {...defaultProps} title="Test Title" data-testid="message" />);
+
+    const message = screen.getByTestId("message");
+    const title = screen.getByText("Test Title");
+
+    expect(message).toHaveAttribute("aria-labelledby", title.getAttribute("id"));
+    expect(message).not.toHaveAttribute("aria-label");
+  });
+
+  it("uses aria-describedby for content", () => {
+    render(<Message {...defaultProps} data-testid="message" />);
+
+    const message = screen.getByTestId("message");
+    const content = screen.getByText("Test message content");
+
+    expect(message).toHaveAttribute("aria-describedby", content.parentElement?.getAttribute("id"));
+  });
+
+  it("forwards ref correctly", () => {
+    const ref = { current: null };
+    render(<Message {...defaultProps} ref={ref} />);
+
+    expect(ref.current).toBeInstanceOf(HTMLDivElement);
+  });
+
+  it("passes through additional HTML attributes", () => {
+    render(<Message {...defaultProps} data-testid="message" tabIndex={0} />);
+
+    const message = screen.getByTestId("message");
+    expect(message).toHaveAttribute("tabIndex", "0");
+  });
+
+  it("renders with all features combined", () => {
+    const onClose = jest.fn();
+    render(
+      <Message
+        variant="warning"
+        title="Warning Title"
+        icon={<IconUpload data-testid="icon" />}
+        closable
+        onClose={onClose}
+        extra={<div data-testid="extra">Extra</div>}
+        actions={<Button data-testid="action">Action</Button>}
+        data-testid="message"
+      >
+        Warning content
+      </Message>,
+    );
+
+    expect(screen.getByTestId("message")).toHaveClass("variant-warning");
+    expect(screen.getByText("Warning Title")).toBeInTheDocument();
+    expect(screen.getByText("Warning content")).toBeInTheDocument();
+    expect(screen.getByTestId("icon")).toBeInTheDocument();
+    expect(screen.getByTestId("extra")).toBeInTheDocument();
+    expect(screen.getByTestId("action")).toBeInTheDocument();
+    expect(screen.getByTestId("message-close-button")).toBeInTheDocument();
+
+    fireEvent.click(screen.getByTestId("message-close-button"));
+    expect(onClose).toHaveBeenCalledTimes(1);
+  });
+
+  it("handles complex children content", () => {
+    render(
+      <Message {...defaultProps}>
+        <div>
+          <p>First paragraph</p>
+          <p>Second paragraph</p>
+        </div>
+      </Message>,
+    );
+
+    expect(screen.getByText("First paragraph")).toBeInTheDocument();
+    expect(screen.getByText("Second paragraph")).toBeInTheDocument();
+  });
+
+  it("applies correct ARIA role and live region", () => {
+    render(<Message {...defaultProps} data-testid="message" />);
+
+    const message = screen.getByTestId("message");
+    expect(message).toHaveAttribute("role", "alert");
+    expect(message).toHaveAttribute("aria-live", "polite");
+  });
+});

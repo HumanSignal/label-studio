@@ -19,6 +19,7 @@ export * from "./lib/enterprise-badge/enterprise-badge";
 export * from "./lib/enterprise-upgrade-overlay/enterprise-upgrade-overlay";
 export * from "./lib/json-viewer";
 export * from "./lib/label/label";
+export * from "./lib/message/message";
 export * from "./lib/select/select";
 export * from "./lib/tag-autocomplete";
 export * from "./lib/skeleton/skeleton";
