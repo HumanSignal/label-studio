@@ -1,7 +1,7 @@
 import { IconInfoOutline, IconSettings } from "@humansignal/icons";
 import { Button } from "@humansignal/ui";
+import { isStarterCloudPlan } from "@humansignal/core";
 import { cn } from "../../utils/bem";
-import { isSelfServe } from "../../utils/billing";
 import { FF_BULK_ANNOTATION, isFF } from "../../utils/feature-flags";
 import { AutoAcceptToggle } from "../AnnotationTab/AutoAcceptToggle";
 import { DynamicPreannotationsToggle } from "../AnnotationTab/DynamicPreannotationsToggle";
@@ -14,7 +14,7 @@ export const Actions = ({ store }) => {
   const entity = annotationStore.selected;
   const isPrediction = entity?.type === "prediction";
   const isViewAll = annotationStore.viewingAll === true;
-  const isBulkMode = isFF(FF_BULK_ANNOTATION) && !isSelfServe() && store.hasInterface("annotation:bulk");
+  const isBulkMode = isFF(FF_BULK_ANNOTATION) && !isStarterCloudPlan() && store.hasInterface("annotation:bulk");
 
   return (
     <div className={cn("bottombar").elem("section").toClassName()}>

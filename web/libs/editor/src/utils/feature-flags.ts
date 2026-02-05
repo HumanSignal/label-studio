@@ -149,12 +149,6 @@ export const FF_REVIEWER_FLOW = "fflag_feat_all_leap_1081_reviewer_flow_updates"
 export const FF_CUSTOM_SCRIPT = "fflag_feat_all_leap_883_custom_script_270524_short";
 
 /**
- * Self Serve
- * @link https://app.launchdarkly.com/default/test/features/fflag_feat_front_leap_482_self_serve_short/
- */
-export const FF_SELF_SERVE = "fflag_feat_front_leap_482_self_serve_short";
-
-/**
  * It adds functionality of bulk annotation
  */
 export const FF_BULK_ANNOTATION = "fflag_feat_all_leap_1181_bulk_annotation_short";
@@ -168,6 +162,12 @@ export const FF_LEAP_1173 = "fflag_feat_front_leap_1173_disable_postpone_skip_sh
 export const FF_IMAGE_MEMORY_USAGE = "fflag_feat_front_optic_1479_improve_image_tag_memory_usage_short";
 
 export const FF_VIDEO_FRAME_SEEK_PRECISION = "fflag_fix_front_optic_1608_improve_video_frame_seek_precision_short";
+
+/**
+ * Strict task overlap enforcement - prevents annotators from submitting
+ * annotations when task overlap limit has been reached
+ */
+export const FF_FIT_1304_STRICT_OVERLAP = "fflag_feat_all_fit_1304_strict_overlap";
 
 Object.assign(window, {
   APP_SETTINGS: {

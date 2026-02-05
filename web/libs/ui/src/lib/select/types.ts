@@ -70,6 +70,7 @@ export type SelectProps<T, A extends SelectOption<T>[]> = {
   onChange?: (value: any) => void | false;
   setValue?: (value: ExtractOption<A>) => void;
   header?: string | FC | JSX.Element;
+  footer?: ReactNode;
   multiple?: boolean;
   disabled?: boolean;
   triggerProps?: any;

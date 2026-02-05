@@ -1162,6 +1162,33 @@
       "version": 2,
       "deleted": false
     },
+    "fflag_feat_all_fit_1304_strict_overlap": {
+      "key": "fflag_feat_all_fit_1304_strict_overlap",
+      "on": false,
+      "prerequisites": [],
+      "targets": [],
+      "contextTargets": [],
+      "rules": [],
+      "fallthrough": {
+        "variation": 0
+      },
+      "offVariation": 1,
+      "variations": [
+        true,
+        false
+      ],
+      "clientSideAvailability": {
+        "usingMobileKey": false,
+        "usingEnvironmentId": false
+      },
+      "clientSide": false,
+      "salt": "c0004259e75540149ff3a4025e89534e",
+      "trackEvents": false,
+      "trackEventsFallthrough": false,
+      "debugEventsUntilDate": null,
+      "version": 2,
+      "deleted": false
+    },
     "fflag_feat_all_fit_162_workspaces_projects_ui_improvements": {
       "key": "fflag_feat_all_fit_162_workspaces_projects_ui_improvements",
       "on": true,
@@ -2717,7 +2744,7 @@
     },
     "fflag_feat_front_interactive_json_viewer_short": {
       "key": "fflag_feat_front_interactive_json_viewer_short",
-      "on": false,
+      "on": true,
       "prerequisites": [],
       "targets": [],
       "contextTargets": [],
@@ -2739,7 +2766,7 @@
       "trackEvents": false,
       "trackEventsFallthrough": false,
       "debugEventsUntilDate": null,
-      "version": 2,
+      "version": 3,
       "deleted": false
     },
     "fflag_feat_front_leap_1173_disable_postpone_skip_short": {
@@ -3708,6 +3735,33 @@
       },
       "clientSide": false,
       "salt": "10146580fd8840a1bb842ae885c92a69",
+      "trackEvents": false,
+      "trackEventsFallthrough": false,
+      "debugEventsUntilDate": null,
+      "version": 2,
+      "deleted": false
+    },
+    "fflag_fix_all_fit_720_lazy_load_annotations": {
+      "key": "fflag_fix_all_fit_720_lazy_load_annotations",
+      "on": false,
+      "prerequisites": [],
+      "targets": [],
+      "contextTargets": [],
+      "rules": [],
+      "fallthrough": {
+        "variation": 0
+      },
+      "offVariation": 1,
+      "variations": [
+        true,
+        false
+      ],
+      "clientSideAvailability": {
+        "usingMobileKey": false,
+        "usingEnvironmentId": false
+      },
+      "clientSide": false,
+      "salt": "d74b6e4a926040529bbd32d8a58320dc",
       "trackEvents": false,
       "trackEventsFallthrough": false,
       "debugEventsUntilDate": null,
@@ -5211,6 +5265,33 @@
       "trackEventsFallthrough": false,
       "debugEventsUntilDate": null,
       "version": 2,
+      "deleted": false
+    },
+    "fflag_fix_plt_1004_skip_job_for_disabled_webhook_04022026_short": {
+      "key": "fflag_fix_plt_1004_skip_job_for_disabled_webhook_04022026_short",
+      "on": true,
+      "prerequisites": [],
+      "targets": [],
+      "contextTargets": [],
+      "rules": [],
+      "fallthrough": {
+        "variation": 0
+      },
+      "offVariation": 1,
+      "variations": [
+        true,
+        false
+      ],
+      "clientSideAvailability": {
+        "usingMobileKey": false,
+        "usingEnvironmentId": false
+      },
+      "clientSide": false,
+      "salt": "90a9bd7101a6403e83a5cf0a5cb135c6",
+      "trackEvents": false,
+      "trackEventsFallthrough": false,
+      "debugEventsUntilDate": null,
+      "version": 3,
       "deleted": false
     },
     "fflag_front_dia_1150_ddisco_sneak_preview": {

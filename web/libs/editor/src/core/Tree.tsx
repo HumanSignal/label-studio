@@ -3,7 +3,7 @@ import type { IAnyComplexType, IAnyStateTreeNode } from "mobx-state-tree/dist/in
 
 import Registry from "./Registry";
 import { parseValue } from "../utils/data";
-import { isSelfServe } from "../utils/billing";
+import { isStarterCloudPlan } from "@humansignal/core";
 import { FF_BULK_ANNOTATION, FF_DEV_3391, isFF } from "../utils/feature-flags";
 import { guidGenerator } from "../utils/unique";
 
@@ -235,7 +235,8 @@ function renderItem(ref: IAnyStateTreeNode, annotation: IAnnotation, includeKey 
   const typeName = type.name;
   const View = Registry.getViewByModel(typeName);
 
-  const isBulkMode = isFF(FF_BULK_ANNOTATION) && !isSelfServe() && annotation?.store?.hasInterface("annotation:bulk");
+  const isBulkMode =
+    isFF(FF_BULK_ANNOTATION) && !isStarterCloudPlan() && annotation?.store?.hasInterface("annotation:bulk");
   const isNotIndependentTag = el.isIndependent !== true;
   if (isBulkMode && isNotIndependentTag) {
     return null;

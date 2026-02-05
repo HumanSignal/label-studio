@@ -52,6 +52,11 @@ export const VectorPoints: React.FC<VectorPointsProps> = ({
   const isSinglePointRegion = initialPoints.length === 1;
   const shouldListenToClicks = !disabled && !transformMode && (selected || isSinglePointRegion);
 
+  // CRITICAL: Always enable listening for hit detection to ensure consistent hit box
+  // regardless of selected state. The hitFunc will always use HIT_RADIUS.SELECTION / scale
+  // for consistent hit detection. We handle click events conditionally in onClick handler.
+  const shouldEnableListening = !disabled && !transformMode;
+
   return (
     <>
       {initialPoints.map((point, index) => {
@@ -111,12 +116,17 @@ export const VectorPoints: React.FC<VectorPointsProps> = ({
               stroke={pointStroke}
               strokeScaleEnabled={false}
               strokeWidth={pointStrokeWidth}
-              listening={shouldListenToClicks}
+              // Always enable listening for hit detection to ensure consistent hit box
+              // regardless of selected state. The hitFunc will always use HIT_RADIUS.SELECTION / scale
+              // for consistent hit detection. We handle click events conditionally in onClick handler.
+              listening={shouldEnableListening}
               name={`point-${index}`}
               // Use custom hit function to create a larger clickable area around the point
               // This makes points easier to click even when the cursor is not exactly over the point
+              // CRITICAL: Always use the same hit radius regardless of selected state for consistent behavior
               hitFunc={(context, shape) => {
                 // Calculate a larger hit radius using the constant (scaled for current zoom)
+                // This ensures consistent hit detection regardless of selected/unselected state
                 const hitRadius = HIT_RADIUS.SELECTION / scale;
                 context.beginPath();
                 context.arc(0, 0, hitRadius, 0, Math.PI * 2);
@@ -125,6 +135,13 @@ export const VectorPoints: React.FC<VectorPointsProps> = ({
               onClick={
                 onPointClick
                   ? (e) => {
+                      // Only handle clicks when shouldListenToClicks is true
+                      // Otherwise, let the event bubble to stage-level handlers
+                      if (!shouldListenToClicks) {
+                        // Don't handle the click, let it bubble to stage-level handlers
+                        return;
+                      }
+
                       // For single-point regions, call onPointClick but don't stop propagation
                       // The onPointClick handler in KonvaVector will directly call handleClickWithDebouncing
                       // to trigger region selection
