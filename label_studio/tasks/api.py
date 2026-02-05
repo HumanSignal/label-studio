@@ -303,10 +303,18 @@ class TaskAPI(generics.RetrieveUpdateDestroyAPIView):
         )
 
     def get_retrieve_serializer_context(self, request):
+        """Build serializer context for task retrieval.
+
+        The resolve_uri parameter controls whether storage URLs (e.g., s3://bucket/file.jpg)
+        are converted to proxy URLs (/tasks/<id>/resolve/?fileuri=...). This is useful for:
+        - resolve_uri=True (default): URLs are proxied through Label Studio for security
+        - resolve_uri=False: Original storage URLs are preserved, useful for debugging
+          or when users need to see the actual source paths in task preview
+        """
         fields = ['drafts', 'predictions', 'annotations']
 
         return {
-            'resolve_uri': True,
+            'resolve_uri': bool_from_request(request.GET, 'resolve_uri', True),
             'predictions': 'predictions' in fields,
             'annotations': 'annotations' in fields,
             'drafts': 'drafts' in fields,

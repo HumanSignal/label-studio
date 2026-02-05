@@ -234,9 +234,8 @@ export const ImageEntity = types
               self.markAsLoaded(result.blobUrl, { addCacheRef: true });
             })
             .catch(() => {
-              // Final failure - set error state
-              self.error = true;
-              self.setDownloading(false);
+              // Final failure - set error state (async-safe via action)
+              self.markAsFailed();
             });
           return;
         }

@@ -1,5 +1,5 @@
-import { type FC, useEffect, useState, useCallback } from "react";
-import { JsonViewer, type FilterConfig } from "@humansignal/ui";
+import { type ChangeEvent, type FC, useEffect, useState, useCallback } from "react";
+import { JsonViewer, type FilterConfig, Toggle } from "@humansignal/ui";
 import { FF_LOPS_E_3, FF_INTERACTIVE_JSON_VIEWER, isFF } from "../../../utils/feature-flags";
 import { CodeView } from "./CodeView";
 import styles from "./TaskSourceViewer.module.scss";
@@ -7,11 +7,17 @@ import { ViewToggle, type ViewMode } from "./ViewToggle";
 
 export type { ViewMode };
 
+/** Options passed to onTaskLoad callback */
+export interface TaskLoadOptions {
+  /** Whether to resolve storage URIs to proxy URLs (default: false) */
+  resolveUri?: boolean;
+}
+
 export interface TaskSourceViewerProps {
   /** Task content data */
   content: any;
   /** Function to load full task data */
-  onTaskLoad: () => Promise<any>;
+  onTaskLoad: (options?: TaskLoadOptions) => Promise<any>;
   /** SDK type (e.g., "DE" for Data Explorer) */
   sdkType?: string;
   /** Storage key for localStorage persistence */
@@ -70,6 +76,11 @@ export const TaskSourceViewer: FC<TaskSourceViewerProps> = ({
     storageKey ? (localStorage.getItem(`${storageKey}:view`) as ViewMode) || "code" : "code",
   );
 
+  // Manage resolve URIs state - default OFF to show original storage URIs
+  const [resolveUrls, setResolveUrls] = useState<boolean>(() =>
+    storageKey ? localStorage.getItem(`${storageKey}:resolveUrls`) === "true" : false,
+  );
+
   const handleViewChange = useCallback(
     (newView: ViewMode) => {
       setView(newView);
@@ -84,7 +95,7 @@ export const TaskSourceViewer: FC<TaskSourceViewerProps> = ({
 
   // Load full task data
   useEffect(() => {
-    onTaskLoad().then((response) => {
+    onTaskLoad({ resolveUri: resolveUrls }).then((response) => {
       const formatted: any = {
         id: response.id,
         data: response.data,
@@ -102,7 +113,19 @@ export const TaskSourceViewer: FC<TaskSourceViewerProps> = ({
 
       setTaskData(formatted);
     });
-  }, [onTaskLoad, sdkType]);
+  }, [onTaskLoad, sdkType, resolveUrls]);
+
+  // Handle resolve URIs toggle change
+  const handleResolveUrlsChange = useCallback(
+    (e: ChangeEvent<HTMLInputElement>) => {
+      const newValue = e.target.checked;
+      setResolveUrls(newValue);
+      if (storageKey) {
+        localStorage.setItem(`${storageKey}:resolveUrls`, String(newValue));
+      }
+    },
+    [storageKey],
+  );
 
   // Provide toggle to external render location (e.g., modal header)
   useEffect(() => {
@@ -127,6 +150,11 @@ export const TaskSourceViewer: FC<TaskSourceViewerProps> = ({
             maxHeight={560}
             readerViewThreshold={100}
             storageKey={storageKey}
+            toolbarExtra={
+              <div style={{ marginLeft: "auto" }}>
+                <Toggle label="Resolve URIs" checked={resolveUrls} onChange={handleResolveUrlsChange} />
+              </div>
+            }
           />
         )}
       </div>
