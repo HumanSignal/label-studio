@@ -563,6 +563,9 @@ Note that in certain situations, this may be exceeded. For example, if there are
 
 Also note that only annotations created by distinct users count towards the overlap. For example, if the overlap is `2` and a user creates and submits two annotations on a single task (which can be done in Quick View), the overlap threshold will not be reached until another user submits an annotation. 
 
+!!! note
+    Setting annotations per task above 20 may impact loading performance in the Data Manager.
+
 </td>
 </tr>
 <tr>

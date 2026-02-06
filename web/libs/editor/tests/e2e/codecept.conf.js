@@ -37,6 +37,9 @@ module.exports.config = {
       // Paris is in +1/+2 timezone, so date with midnight (00:00)
       // will be always in previous day in ISO
       timezoneId: "Europe/Paris",
+      // Explicit locale ensures <input type="date"> has a deterministic format
+      // across all developer machines, preventing locale-dependent test failures
+      locale: "en-US",
       trace: false,
       keepTraceForPassedTests: false,
     },

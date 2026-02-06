@@ -2,7 +2,7 @@ const assert = require("assert");
 
 Feature("Image width parameter").tag("@regress");
 
-const IMAGE = "https://data.heartex.net/open-images/train_0/mini/0030019819f25b28.jpg";
+const IMAGE = "/public/files/images/0030019819f25b28.jpg";
 
 const config = `
   <View>
