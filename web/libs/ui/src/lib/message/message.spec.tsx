@@ -150,7 +150,7 @@ describe("Message Component", () => {
     expect(screen.getByText("bold")).toBeInTheDocument();
     const boldElement = screen.getByText("bold");
     expect(boldElement.tagName).toBe("STRONG");
-    
+
     // Verify the full title text is present
     const titleElement = screen.getByText((content, element) => {
       return element?.textContent === "This is a bold title";
@@ -260,7 +260,7 @@ describe("Message Component", () => {
     const message = screen.getByTestId("message");
 
     expect(title).toHaveAttribute("id");
-    
+
     // Get the content wrapper by class
     const contentWrapper = message.querySelector(".message__body");
     expect(contentWrapper).toHaveAttribute("id");
@@ -285,11 +285,11 @@ describe("Message Component", () => {
     render(<Message {...defaultProps} data-testid="message" />);
 
     const message = screen.getByTestId("message");
-    
+
     // Get the content wrapper by class
     const contentWrapper = message.querySelector(".message__body");
     const contentId = contentWrapper?.getAttribute("id");
-    
+
     expect(contentId).toBeTruthy();
     expect(message).toHaveAttribute("aria-describedby", contentId);
   });
