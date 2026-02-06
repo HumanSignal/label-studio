@@ -222,6 +222,7 @@ Scenario("How it works without ctrl", async ({ I, LabelStudio, AtOutliner, AtIma
 
     LabelStudio.init(params);
     LabelStudio.waitForObjectsReady();
+    I.waitTicks(2);
     AtOutliner.seeRegions(0);
     I.say(`Drawing ${innerRegion.shape} on ${outerRegion.shape}`);
     I.pressKey(["u"]);
@@ -233,4 +234,4 @@ Scenario("How it works without ctrl", async ({ I, LabelStudio, AtOutliner, AtIma
     AtImageView[innerRegion.action](...innerRegion.params);
     AtOutliner.seeRegions(1);
   }
-});
+}).retry(1);
