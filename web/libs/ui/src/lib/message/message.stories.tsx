@@ -38,7 +38,7 @@ const meta: Meta<typeof Message> = {
     },
     title: {
       control: "text",
-      description: "Optional title text displayed above the main content",
+      description: "Optional title displayed above the main content. Can be a string or ReactNode for rich content.",
     },
     children: {
       control: "text",
@@ -124,6 +124,18 @@ export const WithTitle: Story = {
     variant: "primary",
     title: "Important Update",
     children: "We've updated our terms of service. Please review the changes before continuing.",
+  },
+};
+
+export const WithRichTitle: Story = {
+  args: {
+    variant: "warning",
+    title: (
+      <>
+        Your <strong>Personal Sandbox</strong> is private
+      </>
+    ),
+    children: "Move this project to a workspace to share access with others in your organization.",
   },
 };
 

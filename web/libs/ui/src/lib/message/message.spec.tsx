@@ -109,8 +109,8 @@ describe("Message Component", () => {
     render(<Message {...defaultProps} icon={<IconUpload data-testid="icon" />} />);
 
     const icon = screen.getByTestId("icon");
-    expect(icon).toHaveAttribute("width", "20");
-    expect(icon).toHaveAttribute("height", "20");
+    expect(icon).toHaveAttribute("width", "24");
+    expect(icon).toHaveAttribute("height", "24");
   });
 
   it("renders icon with custom size", () => {
@@ -125,19 +125,42 @@ describe("Message Component", () => {
     const { rerender } = render(<Message {...defaultProps} size="medium" icon={<IconUpload data-testid="icon" />} />);
 
     let icon = screen.getByTestId("icon");
-    expect(icon).toHaveAttribute("width", "20");
-    expect(icon).toHaveAttribute("height", "20");
+    expect(icon).toHaveAttribute("width", "24");
+    expect(icon).toHaveAttribute("height", "24");
 
     rerender(<Message {...defaultProps} size="small" icon={<IconUpload data-testid="icon" />} />);
     icon = screen.getByTestId("icon");
-    expect(icon).toHaveAttribute("width", "18");
-    expect(icon).toHaveAttribute("height", "18");
+    expect(icon).toHaveAttribute("width", "20");
+    expect(icon).toHaveAttribute("height", "20");
   });
 
   it("renders title when provided", () => {
     render(<Message {...defaultProps} title="Test Title" />);
 
     expect(screen.getByText("Test Title")).toBeInTheDocument();
+  });
+
+  it("renders title as ReactNode with rich content", () => {
+    render(
+      <Message
+        {...defaultProps}
+        title={
+          <>
+            This is a <strong>bold</strong> title
+          </>
+        }
+      />,
+    );
+
+    expect(screen.getByText("bold")).toBeInTheDocument();
+    const boldElement = screen.getByText("bold");
+    expect(boldElement.tagName).toBe("STRONG");
+    
+    // Verify the full title text is present
+    const titleElement = screen.getByText((content, element) => {
+      return element?.textContent === "This is a bold title";
+    });
+    expect(titleElement).toBeInTheDocument();
   });
 
   it("does not render title when not provided", () => {
@@ -223,20 +246,20 @@ describe("Message Component", () => {
   it("renders close button when closable is true", () => {
     render(<Message {...defaultProps} closable />);
 
-    expect(screen.getByTestId("message-close-button")).toBeInTheDocument();
+    expect(screen.getByTestId("message-dismiss-button")).toBeInTheDocument();
   });
 
   it("does not render close button when closable is false", () => {
     render(<Message {...defaultProps} closable={false} />);
 
-    expect(screen.queryByTestId("message-close-button")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("message-dismiss-button")).not.toBeInTheDocument();
   });
 
   it("calls onClose when close button is clicked", () => {
     const onClose = jest.fn();
     render(<Message {...defaultProps} closable onClose={onClose} />);
 
-    const closeButton = screen.getByTestId("message-close-button");
+    const closeButton = screen.getByTestId("message-dismiss-button");
     fireEvent.click(closeButton);
 
     expect(onClose).toHaveBeenCalledTimes(1);
@@ -258,17 +281,20 @@ describe("Message Component", () => {
   });
 
   it("generates unique IDs for title and content", () => {
-    render(<Message {...defaultProps} title="Test Title" />);
+    render(<Message {...defaultProps} title="Test Title" data-testid="message" />);
 
     const title = screen.getByText("Test Title");
-    const content = screen.getByText("Test message content");
+    const message = screen.getByTestId("message");
 
     expect(title).toHaveAttribute("id");
-    expect(content.parentElement).toHaveAttribute("id");
+    
+    // Get the content wrapper by class
+    const contentWrapper = message.querySelector(".message__body");
+    expect(contentWrapper).toHaveAttribute("id");
 
     // IDs should be different
     const titleId = title.getAttribute("id");
-    const contentId = content.parentElement?.getAttribute("id");
+    const contentId = contentWrapper?.getAttribute("id");
     expect(titleId).not.toBe(contentId);
   });
 
@@ -286,9 +312,13 @@ describe("Message Component", () => {
     render(<Message {...defaultProps} data-testid="message" />);
 
     const message = screen.getByTestId("message");
-    const content = screen.getByText("Test message content");
-
-    expect(message).toHaveAttribute("aria-describedby", content.parentElement?.getAttribute("id"));
+    
+    // Get the content wrapper by class
+    const contentWrapper = message.querySelector(".message__body");
+    const contentId = contentWrapper?.getAttribute("id");
+    
+    expect(contentId).toBeTruthy();
+    expect(message).toHaveAttribute("aria-describedby", contentId);
   });
 
   it("forwards ref correctly", () => {
@@ -328,9 +358,9 @@ describe("Message Component", () => {
     expect(screen.getByTestId("icon")).toBeInTheDocument();
     expect(screen.getByTestId("extra")).toBeInTheDocument();
     expect(screen.getByTestId("action")).toBeInTheDocument();
-    expect(screen.getByTestId("message-close-button")).toBeInTheDocument();
+    expect(screen.getByTestId("message-dismiss-button")).toBeInTheDocument();
 
-    fireEvent.click(screen.getByTestId("message-close-button"));
+    fireEvent.click(screen.getByTestId("message-dismiss-button"));
     expect(onClose).toHaveBeenCalledTimes(1);
   });
 

@@ -64,9 +64,10 @@ export interface MessageProps extends React.HTMLAttributes<HTMLDivElement> {
   iconSize?: number;
 
   /**
-   * Optional title text displayed above the main content
+   * Optional title displayed above the main content.
+   * Can be a string or ReactNode for rich content like bold text.
    */
-  title?: string;
+  title?: ReactNode;
 
   /**
    * Main content of the message
