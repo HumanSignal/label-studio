@@ -23,8 +23,14 @@
   }
 
   &_scrolled {
-    &::before {       
+    &::before {
       opacity: 1;
+    }
+  }
+
+  &_virtualized {
+    .annotations-carousel__container {
+      overflow: visible;
     }
   }
 

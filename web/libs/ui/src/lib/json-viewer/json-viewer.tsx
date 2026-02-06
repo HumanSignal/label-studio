@@ -49,6 +49,7 @@ export const JsonViewer: FC<JsonViewerProps> = ({
   customFilters = [],
   readerViewThreshold = 100,
   storageKey,
+  toolbarExtra,
   // Display settings
   minHeight = 500,
   maxHeight = 500,
@@ -224,33 +225,32 @@ export const JsonViewer: FC<JsonViewerProps> = ({
                 </div>
               )}
               {showFilters && allFilters.length > 0 && (
-                <>
-                  <div className={styles.filters}>
-                    {allFilters.map((filter) => (
+                <div className={styles.filters}>
+                  {allFilters.map((filter) => (
+                    <Button
+                      key={filter.id}
+                      look="outlined"
+                      variant={activeFilter === filter.id ? "primary" : "neutral"}
+                      size="small"
+                      onClick={() => handleFilterClick(filter.id)}
+                    >
+                      {filter.label}
+                    </Button>
+                  ))}
+                  {activeFilter && (
+                    <Tooltip title="Reset filters">
                       <Button
-                        key={filter.id}
                         look="outlined"
-                        variant={activeFilter === filter.id ? "primary" : "neutral"}
+                        variant="neutral"
                         size="small"
-                        onClick={() => handleFilterClick(filter.id)}
-                      >
-                        {filter.label}
-                      </Button>
-                    ))}
-                    {activeFilter && (
-                      <Tooltip title="Reset filters">
-                        <Button
-                          look="outlined"
-                          variant="neutral"
-                          size="small"
-                          onClick={handleResetFilters}
-                          leading={<IconReset width={16} height={16} />}
-                        />
-                      </Tooltip>
-                    )}
-                  </div>
-                </>
+                        onClick={handleResetFilters}
+                        leading={<IconReset width={16} height={16} />}
+                      />
+                    </Tooltip>
+                  )}
+                </div>
               )}
+              {toolbarExtra}
             </div>
           </div>
         )}
