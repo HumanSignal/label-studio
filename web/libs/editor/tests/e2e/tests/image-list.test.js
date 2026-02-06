@@ -24,10 +24,10 @@ const brushConfig = `
 
 const data = {
   images: [
-    "https://data.heartex.net/open-images/train_0/mini/0030019819f25b28.jpg",
-    "https://data.heartex.net/open-images/train_0/mini/00155094b7acc33b.jpg",
-    "https://data.heartex.net/open-images/train_0/mini/00133643bbf063a9.jpg",
-    "https://data.heartex.net/open-images/train_0/mini/0061ec6e9576b520.jpg",
+    "/public/files/images/0030019819f25b28.jpg",
+    "/public/files/images/00155094b7acc33b.jpg",
+    "/public/files/images/00133643bbf063a9.jpg",
+    "/public/files/images/0061ec6e9576b520.jpg",
   ],
 };
 

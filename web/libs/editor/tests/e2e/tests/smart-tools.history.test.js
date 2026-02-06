@@ -25,7 +25,7 @@ function createRectangleConfig(params = {}) {
 </View>`;
 }
 
-const IMAGE = "https://upload.wikimedia.org/wikipedia/commons/thumb/d/df/Html_headers.png/640px-Html_headers.png";
+const IMAGE = "/public/files/images/html_headers.png";
 
 function getRectangleSuggestions(reg, group) {
   const allSuggestions = [
