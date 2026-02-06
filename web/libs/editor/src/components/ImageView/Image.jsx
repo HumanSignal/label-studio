@@ -42,9 +42,8 @@ export const Image = observer(
 
     const onError = useCallback(() => {
       // Handle image load failure (e.g., revoked blob URL, empty blob, network error)
-      // This sets the error state so the UI can show an error message
+      // setError(true) also resets imageLoaded state
       imageEntity.setError(true);
-      imageEntity.setImageLoaded(false);
     }, [imageEntity]);
 
     return (
@@ -59,6 +58,7 @@ export const Image = observer(
         />
         {imageEntity.downloaded ? (
           <ImageRenderer
+            // biome-ignore lint/a11y/noRedundantAlt: alt="image" is intentional for accessibility
             alt="image"
             ref={ref}
             src={imageEntity.currentSrc}
@@ -114,6 +114,7 @@ const ImageRenderer = observer(
     }, [imageTransform, isLoaded]);
 
     return (
+      // biome-ignore lint/a11y/noRedundantAlt: alt="image" is intentional for accessibility
       <img {...imgDefaultProps} ref={ref} alt="image" src={src} onLoad={onLoad} onError={onError} style={imageStyles} />
     );
   }),

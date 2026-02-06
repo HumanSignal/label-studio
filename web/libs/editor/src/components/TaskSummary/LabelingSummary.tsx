@@ -8,11 +8,22 @@ import { cnm, IconSparks, Userpic } from "@humansignal/ui";
 import type { MSTAnnotation, MSTResult, RawResult } from "../../stores/types";
 import { AggregationTableRow } from "./Aggregation";
 import { Chip } from "./Chip";
-import { renderers } from "./labelings";
+import { renderers, jsonPathToTitle } from "./labelings";
 import { ResizeHandler } from "./ResizeHandler";
 import type { AnnotationSummary, ControlTag, RendererType } from "./types";
 import { FF_FIT_720_LAZY_LOAD_ANNOTATIONS, isFF } from "../../utils/feature-flags";
 import { useAnnotationFetcher } from "../../hooks/useAnnotationQuery";
+
+/**
+ * Get display name for a control column header.
+ * For reactcode controls, converts JSONPath to readable title.
+ */
+const getControlDisplayName = (control: ControlTag): string => {
+  if (control.type === "reactcode") {
+    return jsonPathToTitle(control.name);
+  }
+  return control.name;
+};
 
 type Props = {
   annotations: MSTAnnotation[];
@@ -22,74 +33,22 @@ type Props = {
   taskId?: number | string; // FIT-720: Task ID for distribution API
 };
 
-// FIT-720: Observable cell component that reads directly from MST annotation
-const ObservableCell = observer(
-  ({
-    annotation,
-    control,
-    render,
-  }: {
-    annotation: AnnotationSummary;
-    control: ControlTag;
-    render: RendererType;
-  }) => {
-    // Read directly from MST annotation if available (for MobX reactivity)
-    const mstAnnotation = annotation._mstAnnotation;
-    const isPrediction = mstAnnotation?.type === "prediction" || annotation.type === "prediction";
-
-    // Get the results - read from MST annotation for MobX tracking
-    let allResults: RawResult[] = [];
-
-    if (mstAnnotation) {
-      if (isPrediction) {
-        // Predictions have results in a different format
-        allResults =
-          mstAnnotation.results?.map((r: MSTResult) => {
-            const json = r.toJSON() as RawResult;
-            return { ...json, from_name: json.from_name.replace(/@.*$/, "") };
-          }) ?? [];
-      } else {
-        // Regular annotations - read from versions.result (this is MobX tracked)
-        allResults = mstAnnotation.versions?.result ?? [];
-      }
-    } else {
-      allResults = annotation.results ?? [];
-    }
-
-    // Filter results for this specific control
-    const results = allResults.filter((result: RawResult) => result.from_name === control.name);
-
-    // FIT-720: Check if this is a stub that needs hydration
-    // A stub is identified by having no data loaded yet - check:
-    // 1. is_stub flag from backend (true when backend returns stub, false after hydration)
-    // 2. No actual results data in the annotation
-    // If is_stub is explicitly false, it was hydrated (even if result is empty)
-    const isStubFlag = (mstAnnotation as any)?.is_stub;
-    const wasHydrated = isStubFlag === false; // Explicitly false means hydrated
-    const isStubFromBackend = isStubFlag === true; // True means still a stub
-    const hasNoData = allResults.length === 0;
-    const isStub =
-      !isPrediction && !mstAnnotation?.userGenerate && annotation.id && isStubFromBackend && hasNoData && !wasHydrated;
-
-    // Show skeleton for stubs that haven't been hydrated yet
-    if (isStub && isFF(FF_FIT_720_LAZY_LOAD_ANNOTATIONS)) {
-      return <SkeletonCell width="60%" />;
-    }
-
-    const content = !results.length ? (
-      <span className="text-neutral-content-subtler text-sm">—</span>
-    ) : (
-      (render?.(results, control) ?? (
-        <span className="inline-flex items-center px-2 py-0.5 rounded-4 bg-neutral-surface-subtle text-xs font-medium">
-          {results.length} result{results.length > 1 ? "s" : ""}
-        </span>
-      ))
-    );
-    return <div className="min-h-[2rem] flex items-center">{content}</div>;
-  },
-);
-
-// cellFn is now created inside the component to access hydratedIds
+const cellFn = (control: ControlTag, render: RendererType) => (props: { row: Row<AnnotationSummary> }) => {
+  const annotation = props.row.original;
+  // For reactcode controls, results are associated with the tag name (to_name), not the JSONPath (name)
+  const filterKey = control.type === "reactcode" ? control.to_name : control.name;
+  const results = annotation.results.filter((result) => result.from_name === filterKey);
+  const content = !results.length ? (
+    <span className="text-neutral-content-subtler text-sm">—</span>
+  ) : (
+    (render?.(results, control) ?? (
+      <span className="inline-flex items-center px-2 py-0.5 rounded-4 bg-neutral-surface-subtle text-xs font-medium">
+        {results.length} result{results.length > 1 ? "s" : ""}
+      </span>
+    ))
+  );
+  return <div className="min-h-[2rem] flex items-center">{content}</div>;
+};
 
 const convertPredictionResult = (result: MSTResult) => {
   const json = result.toJSON() as RawResult;
@@ -357,7 +316,7 @@ export const LabelingSummary = observer(({ hideInfo, annotations: all, controls,
         id: control.name,
         header: () => (
           <div>
-            <span className="font-semibold text-sm pb-small">{control.name}</span>
+            <span className="font-semibold text-sm pb-small">{getControlDisplayName(control)}</span>
             <Chip prefix={control.per_region ? "per-region " : ""} className="px-small ml-2">
               {control.type}
             </Chip>
@@ -414,86 +373,11 @@ export const LabelingSummary = observer(({ hideInfo, annotations: all, controls,
     },
   });
 
-  // FIT-720: Row component with IntersectionObserver for lazy loading
-  const TableRow = useCallback(
-    ({ row, rowIndex, totalRows }: { row: Row<AnnotationSummary>; rowIndex: number; totalRows: number }) => {
-      const rowRef = useRef<HTMLTableRowElement>(null);
-      const annotation = all[rowIndex];
-      const isStub = annotation && isAnnotationStub(annotation);
-
-      // Use IntersectionObserver to detect when row enters/leaves viewport
-      useEffect(() => {
-        if (!isFF(FF_FIT_720_LAZY_LOAD_ANNOTATIONS)) return;
-        if (!annotation || !rowRef.current) return;
-
-        const annotationId = annotation.pk;
-        const element = rowRef.current;
-
-        // IntersectionObserver with rootMargin to trigger slightly before entering viewport
-        const observer = new IntersectionObserver(
-          (entries) => {
-            const entry = entries[0];
-            if (!entry) return;
-
-            if (entry.isIntersecting) {
-              // Row came into view - schedule hydration (deduplication handled in scheduleHydration)
-              if (isStub) {
-                scheduleHydration(annotation);
-              }
-            } else {
-              // Row left view - cancel pending timer (but let in-flight requests complete)
-              cancelHydration(annotationId);
-            }
-          },
-          {
-            threshold: 0.1,
-            // Expand observation area to pre-fetch slightly before rows enter viewport
-            rootMargin: "100px 0px",
-          },
-        );
-
-        observer.observe(element);
-        return () => {
-          observer.disconnect();
-          // Cancel any pending/in-flight request when unmounting
-          cancelHydration(annotationId);
-        };
-      }, [annotation, isStub]);
-
-      const isEvenRow = rowIndex % 2 === 0;
-      const isLastRow = rowIndex === totalRows - 1;
-
-      return (
-        <tr ref={rowRef} key={row.id} className="group">
-          {row.getVisibleCells().map((cell, cellIndex) => {
-            const isSticky = cellIndex === 0;
-
-            return (
-              <td
-                key={cell.id}
-                style={{
-                  position: isSticky ? "sticky" : "relative",
-                  left: isSticky ? 0 : "auto",
-                  width: cell.column.getSize(),
-                  zIndex: isSticky ? 10 : "auto",
-                }}
-                className={cnm(
-                  "px-4 py-2.5 align-top overflow-hidden transition-colors",
-                  isEvenRow ? "bg-neutral-surface" : "bg-neutral-background",
-                  "group-hover:bg-neutral-surface-subtle",
-                  !isLastRow && "border-b border-neutral-border-subtle",
-                  isSticky && "border-r border-neutral-border",
-                )}
-              >
-                {flexRender(cell.column.columnDef.cell, cell.getContext())}
-              </td>
-            );
-          })}
-        </tr>
-      );
-    },
-    [all, scheduleHydration, cancelHydration],
-  );
+  // We can't calculate aggregation for reactcode controls for now, so we hide it if there are no other tags
+  const hideAggregation = useMemo(() => {
+    if (controls.length === 0) return true;
+    return controls.every((control) => control.type === "reactcode");
+  }, [controls]);
 
   return (
     <div className="mb-base" ref={containerRef}>
@@ -525,7 +409,7 @@ export const LabelingSummary = observer(({ hideInfo, annotations: all, controls,
             }}
           >
             {table.getHeaderGroups().map((headerGroup) => (
-              <tr key={headerGroup.id} className="border-b border-neutral-border">
+              <tr key={headerGroup.id}>
                 {headerGroup.headers.map((header, index) => (
                   <th
                     key={header.id}
@@ -539,8 +423,9 @@ export const LabelingSummary = observer(({ hideInfo, annotations: all, controls,
                       background: "var(--neutral-surface, #fff)", // Solid background to prevent content bleed-through
                     }}
                     className={cnm(
-                      "px-4 py-2.5 text-left whitespace-nowrap font-semibold text-sm",
-                      index === 0 && "border-r border-neutral-border",
+                      hideAggregation ? "border-b border-neutral-border" : "",
+                      "px-4 py-2.5 text-left whitespace-nowrap font-semibold text-sm bg-neutral-surface-subtle",
+                      index === 0 && "border-r border-neutral-border bg-neutral-surface",
                     )}
                   >
                     <div className="overflow-hidden text-ellipsis flex items-start gap-2">
@@ -554,13 +439,14 @@ export const LabelingSummary = observer(({ hideInfo, annotations: all, controls,
           </thead>
           <tbody>
             {/* Distribution/Aggregation Row */}
-            <AggregationTableRow
-              headers={table.getHeaderGroups()[0]?.headers ?? []}
-              controls={controls}
-              annotations={annotations}
-              taskId={taskId}
-            />
-            {/* Annotation Rows - with lazy loading */}
+            {!hideAggregation && (
+              <AggregationTableRow
+                headers={table.getHeaderGroups()[0]?.headers ?? []}
+                controls={controls}
+                annotations={annotations}
+              />
+            )}
+            {/* Annotation Rows */}
             {table.getRowModel().rows.map((row, rowIndex) => (
               <TableRow key={row.id} row={row} rowIndex={rowIndex} totalRows={table.getRowModel().rows.length} />
             ))}

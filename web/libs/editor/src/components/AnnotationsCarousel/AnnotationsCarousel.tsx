@@ -1,15 +1,14 @@
 import { Button, IconChevronLeft, IconChevronRight } from "@humansignal/ui";
 import { observer } from "mobx-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { FixedSizeList as List } from "react-window";
+import { FixedSizeList as List, type ListChildComponentProps } from "react-window";
 import AutoSizer from "react-virtualized-auto-sizer";
 import { cn } from "../../utils/bem";
 import { clamp, sortAnnotations } from "../../utils/utilities";
-import { FF_FIT_720_LAZY_LOAD_ANNOTATIONS, isFF } from "../../utils/feature-flags";
+import { isActive, FF_FIT_720_LAZY_LOAD_ANNOTATIONS } from "@humansignal/core/lib/utils/feature-flags";
 import { AnnotationButton } from "./AnnotationButton";
 import "./AnnotationsCarousel.scss";
 
-// FIT-720: Virtualization constants
 const ITEM_WIDTH = 200; // Approximate width of each annotation button (min-width: 186px + gap)
 const ITEM_GAP = 4; // Gap between items (--spacing-tighter)
 const VIRTUALIZATION_THRESHOLD = 50; // Only virtualize if more than this many items
@@ -20,22 +19,17 @@ interface AnnotationsCarouselInterface {
   commentStore?: any;
 }
 
-// FIT-720: Virtualized row renderer for annotation buttons
-interface RowProps {
-  index: number;
-  style: React.CSSProperties;
-  data: {
-    entities: any[];
-    capabilities: any;
-    annotationStore: any;
-    store: any;
-  };
+interface ItemData {
+  entities: any[];
+  capabilities: any;
+  annotationStore: any;
+  store: any;
 }
 
-const VirtualizedAnnotationButton = ({ index, style, data }: RowProps) => {
+const VirtualizedAnnotationButton = ({ index, style, data }: ListChildComponentProps<ItemData>) => {
   const entity = data.entities[index];
   return (
-    <div style={{ ...style, paddingRight: ITEM_GAP }}>
+    <div style={{ ...(style as React.CSSProperties), paddingRight: ITEM_GAP }}>
       <AnnotationButton
         key={entity?.id}
         entity={entity}
@@ -58,7 +52,6 @@ export const AnnotationsCarousel = observer(({ store, annotationStore }: Annotat
   const carouselRef = useRef<HTMLElement>();
   const containerRef = useRef<HTMLElement>();
 
-  // FIT-720: Track scroll position for virtualized navigation buttons
   const [scrollOffset, setScrollOffset] = useState(0);
   const [containerWidth, setContainerWidth] = useState(0);
 
@@ -78,15 +71,12 @@ export const AnnotationsCarousel = observer(({ store, annotationStore }: Annotat
     [enablePredictions, enableCreateAnnotation, groundTruthEnabled, enableAnnotations, enableAnnotationDelete],
   );
 
-  // FIT-720: Sort entities once
   const sortedEntities = useMemo(() => sortAnnotations(entities), [entities]);
 
-  // FIT-720: Calculate total width and determine if virtualization is needed
   const totalWidth = sortedEntities.length * (ITEM_WIDTH + ITEM_GAP);
-  // FIT-720: Only virtualize when FF is enabled AND there are many items
-  const shouldVirtualize = isFF(FF_FIT_720_LAZY_LOAD_ANNOTATIONS) && sortedEntities.length > VIRTUALIZATION_THRESHOLD;
+  const shouldVirtualize =
+    isActive(FF_FIT_720_LAZY_LOAD_ANNOTATIONS) && sortedEntities.length > VIRTUALIZATION_THRESHOLD;
 
-  // FIT-720: Navigation button states for virtualized list
   const isLeftDisabled = scrollOffset <= 0;
   const isRightDisabled = scrollOffset >= totalWidth - containerWidth;
   const showControls = totalWidth > containerWidth;
@@ -134,7 +124,6 @@ export const AnnotationsCarousel = observer(({ store, annotationStore }: Annotat
     }
   }, [sortedEntities.length, containerRef.current, carouselRef.current, currentPosition, shouldVirtualize]);
 
-  // FIT-720: Scroll to selected annotation when it changes (virtualized only)
   useEffect(() => {
     if (shouldVirtualize && listRef.current && annotationStore.selected) {
       const selectedIndex = sortedEntities.findIndex((e: any) => e?.id === annotationStore.selected?.id);
@@ -153,7 +142,6 @@ export const AnnotationsCarousel = observer(({ store, annotationStore }: Annotat
     setEntities(newEntities);
   }, [annotationStore, JSON.stringify(annotationStore.predictions), JSON.stringify(annotationStore.annotations)]);
 
-  // FIT-720: Data passed to virtualized items
   const itemData = useMemo(
     () => ({
       entities: sortedEntities,
@@ -168,7 +156,6 @@ export const AnnotationsCarousel = observer(({ store, annotationStore }: Annotat
     return null;
   }
 
-  // FIT-720: Use virtualization for large lists when FF is enabled
   if (shouldVirtualize) {
     return (
       <div
@@ -184,6 +171,7 @@ export const AnnotationsCarousel = observer(({ store, annotationStore }: Annotat
                 setContainerWidth(width - 77); // Account for controls width
               }
               return (
+                // @ts-expect-error - react-window types incompatible with React 18
                 <List
                   ref={listRef}
                   layout="horizontal"

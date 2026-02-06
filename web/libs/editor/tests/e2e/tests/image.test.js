@@ -62,8 +62,7 @@ const annotationWithPerRegion = {
   result: [annotationMoonwalker.result[0], createRegion("answer", "textarea", { text: ["blah"] })],
 };
 
-const image =
-  "https://htx-pub.s3.us-east-1.amazonaws.com/examples/images/nick-owuor-astro-nic-visuals-wDifg5xc9Z4-unsplash.jpg";
+const image = "/public/files/images/nick-owuor-unsplash.jpg";
 
 Scenario("Check Rect region for Image", async ({ I, LabelStudio, AtImageView, AtOutliner, AtPanels }) => {
   const params = {

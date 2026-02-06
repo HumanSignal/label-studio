@@ -57,6 +57,7 @@ export class Modal<BP = unknown> extends Component<ModalProps<BP>, ModalState> {
   static CloseButton = ModalCloseButton;
 
   modalRef = createRef<HTMLElement>();
+  mouseDownTarget: HTMLElement | null = null;
 
   constructor(props: ModalProps<BP>) {
     super(props);
@@ -155,6 +156,7 @@ export class Modal<BP = unknown> extends Component<ModalProps<BP>, ModalState> {
           ref={(el) => setRef(this.modalRef, el)}
           mod={mods}
           mix={mixes}
+          onMouseDown={this.onMouseDown}
           onClick={this.onClickOutside}
           data-testid={this.props["data-testid"]}
           style={styles}
@@ -180,6 +182,10 @@ export class Modal<BP = unknown> extends Component<ModalProps<BP>, ModalState> {
     return createPortal(modalContent, document.body);
   }
 
+  onMouseDown = (e: React.MouseEvent) => {
+    this.mouseDownTarget = e.target as HTMLElement;
+  };
+
   onClickOutside = (e: React.MouseEvent) => {
     if (!this.modalRef.current) return;
     const { closeOnClickOutside } = this.props;
@@ -189,9 +195,17 @@ export class Modal<BP = unknown> extends Component<ModalProps<BP>, ModalState> {
     const content = cn("modal-ls").elem("content").closest(elem);
     const close = cn("modal-ls").elem("close").closest(elem);
 
+    // Don't close if mousedown started inside content (e.g., text selection dragged outside)
+    const mouseDownContent = this.mouseDownTarget ? cn("modal-ls").elem("content").closest(this.mouseDownTarget) : null;
+    if (mouseDownContent && content === null) {
+      this.mouseDownTarget = null;
+      return;
+    }
+
     if (allowClose && ((isInModal && close) || (content === null && closeOnClickOutside !== false))) {
       this.hide();
     }
+    this.mouseDownTarget = null;
   };
 
   closeOnEscape = (e: KeyboardEvent) => {

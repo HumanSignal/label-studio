@@ -304,6 +304,14 @@ class TaskAPI(generics.RetrieveUpdateDestroyAPIView):
         )
 
     def get_retrieve_serializer_context(self, request):
+        """Build serializer context for task retrieval.
+
+        The resolve_uri parameter controls whether storage URLs (e.g., s3://bucket/file.jpg)
+        are converted to proxy URLs (/tasks/<id>/resolve/?fileuri=...). This is useful for:
+        - resolve_uri=True (default): URLs are proxied through Label Studio for security
+        - resolve_uri=False: Original storage URLs are preserved, useful for debugging
+          or when users need to see the actual source paths in task preview
+        """
         fields = ['drafts', 'predictions', 'annotations']
 
         # Lazy load annotations behind feature flag (FIT-720)
@@ -312,7 +320,7 @@ class TaskAPI(generics.RetrieveUpdateDestroyAPIView):
             annotations_stub = bool_from_request(request.GET, 'annotations_stub', False)
 
         return {
-            'resolve_uri': True,
+            'resolve_uri': bool_from_request(request.GET, 'resolve_uri', True),
             'predictions': 'predictions' in fields,
             'annotations': 'annotations' in fields,
             'drafts': 'drafts' in fields,
@@ -363,6 +371,27 @@ class TaskAPI(generics.RetrieveUpdateDestroyAPIView):
                 prepare_params=PrepareParams(project=project, selectedItems=selected, request=self.request), **kwargs
             )
         )
+
+    def get_object(self):
+        """
+        Override to check permissions on a lightweight task first.
+
+        This avoids executing the expensive PreparedTaskManager query
+        when the user doesn't have permission to access the task.
+        """
+        task_id = self.kwargs.get('pk')
+
+        # First check permissions using a lightweight query
+        # select_related('project') avoids extra query when permission check accesses task.project
+        lean_task = generics.get_object_or_404(
+            Task.objects.filter(project__organization=self.request.user.active_organization).select_related('project'),
+            pk=task_id,
+        )
+        self.check_object_permissions(self.request, lean_task)
+
+        # Now fetch full task with heavy queryset (prefetches, annotations, etc.)
+        queryset = self.filter_queryset(self.get_queryset())
+        return generics.get_object_or_404(queryset, pk=task_id)
 
     def get_serializer_class(self):
         # GET => task + annotations + predictions + drafts

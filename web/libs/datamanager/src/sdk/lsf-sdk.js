@@ -9,12 +9,14 @@ import {
   FF_FIT_1304_STRICT_OVERLAP,
   isFF,
 } from "../utils/feature-flags";
+import { isActive, FF_FIT_720_LAZY_LOAD_ANNOTATIONS } from "@humansignal/core/lib/utils/feature-flags";
 import { isDefined } from "../utils/utils";
 import { Modal } from "../components/Common/Modal/Modal";
 import { CommentsSdk } from "./comments-sdk";
 // import { LSFHistory } from "./lsf-history";
 import { annotationToServer, taskToLSFormat } from "./lsf-utils";
 import { when } from "mobx";
+import { imageCache } from "@humansignal/core";
 
 // FIT-720: Import cache invalidation functions
 let invalidateAnnotationCache = null;
@@ -1417,6 +1419,10 @@ export class LSFWrapper {
       // Dismiss the overlap toast if it's showing - this ensures the toast doesn't
       // persist after leaving the labeling interface
       this.dismissOverlapToast();
+    }
+
+    if (isActive(FF_FIT_720_LAZY_LOAD_ANNOTATIONS)) {
+      imageCache?.forceClear?.();
     }
 
     this.lsfInstance?.destroy?.();
