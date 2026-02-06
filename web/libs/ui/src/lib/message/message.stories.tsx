@@ -135,20 +135,6 @@ export const WithRichTitle: Story = {
   },
 };
 
-export const WithoutTitle: Story = {
-  args: {
-    variant: "warning",
-    children: "This message has no title, just the main content.",
-  },
-};
-
-export const BodyTextOnly: Story = {
-  args: {
-    variant: "primary",
-    children: "A simple informational message with just body text and no title. Perfect for brief notifications.",
-  },
-};
-
 export const WithExtraContent: Story = {
   args: {
     variant: "warning",
@@ -162,20 +148,7 @@ export const WithExtraContent: Story = {
   },
 };
 
-export const WithSingleAction: Story = {
-  args: {
-    variant: "primary",
-    title: "Action Required",
-    children: "Please confirm your email address to continue.",
-    actions: (
-      <Button variant="primary" look="filled" size="small">
-        Verify Email
-      </Button>
-    ),
-  },
-};
-
-export const WithMultipleActions: Story = {
+export const WithActions: Story = {
   args: {
     variant: "warning",
     title: "Unsaved Changes",
@@ -261,56 +234,7 @@ export const SizeComparison: Story = {
   ),
 };
 
-export const SmallWithActions: Story = {
-  args: {
-    variant: "warning",
-    size: "small",
-    title: "Compact Warning",
-    children: "This is a compact message with actions.",
-    actions: (
-      <>
-        <Button variant="primary" look="filled" size="small">
-          Confirm
-        </Button>
-        <Button variant="neutral" look="outlined" size="small">
-          Cancel
-        </Button>
-      </>
-    ),
-  },
-};
-
 // Real-world Examples
-export const PersonalSandboxWarning: Story = {
-  args: {
-    variant: "warning",
-    children: (
-      <Typography>
-        Your <b>Personal Sandbox</b> keeps this project private. Move it to a workspace to share access with others in
-        your organization.
-      </Typography>
-    ),
-    actions: (
-      <Button variant="primary" look="outlined" size="small">
-        Go to General
-      </Button>
-    ),
-  },
-};
-
-export const ApiConnectionError: Story = {
-  args: {
-    variant: "negative",
-    title: "Connection Failed",
-    children: "Unable to connect to the API server. Please check your internet connection and try again.",
-    actions: (
-      <Button variant="primary" look="filled" size="small">
-        Retry Connection
-      </Button>
-    ),
-  },
-};
-
 export const SuccessNotification: Story = {
   args: {
     variant: "positive",
@@ -324,7 +248,7 @@ export const SuccessNotification: Story = {
   },
 };
 
-export const InfoWithLink: Story = {
+export const WithExtraLink: Story = {
   args: {
     variant: "primary",
     title: "Need Help?",
@@ -336,27 +260,6 @@ export const InfoWithLink: Story = {
           <IconExternal width={16} height={16} />
         </a>
       </Typography>
-    ),
-  },
-};
-
-export const WarningWithMultipleActions: Story = {
-  args: {
-    variant: "warning",
-    title: "Storage Limit Approaching",
-    children: "You've used 90% of your storage quota. Consider upgrading your plan or removing unused files.",
-    actions: (
-      <>
-        <Button variant="primary" look="filled" size="small">
-          Upgrade Plan
-        </Button>
-        <Button variant="neutral" look="outlined" size="small">
-          Manage Storage
-        </Button>
-        <Button variant="neutral" look="text" size="small">
-          Dismiss
-        </Button>
-      </>
     ),
   },
 };
@@ -388,130 +291,3 @@ export const AllVariants: Story = {
   ),
 };
 
-export const WithAndWithoutTitles: Story = {
-  render: () => (
-    <div className="space-y-4">
-      <div>
-        <h3 className="text-lg font-semibold mb-2">With Titles</h3>
-        <div className="space-y-4">
-          <Message variant="primary" title="Information">
-            Message content with a title.
-          </Message>
-          <Message variant="warning" title="Warning">
-            Warning message with a title.
-          </Message>
-        </div>
-      </div>
-
-      <div>
-        <h3 className="text-lg font-semibold mb-2">Without Titles</h3>
-        <div className="space-y-4">
-          <Message variant="primary">Message content without a title.</Message>
-          <Message variant="warning">Warning message without a title.</Message>
-        </div>
-      </div>
-    </div>
-  ),
-};
-
-export const DifferentActionLayouts: Story = {
-  render: () => (
-    <div className="space-y-4">
-      <div>
-        <h3 className="text-lg font-semibold mb-2">Single Action</h3>
-        <Message
-          variant="primary"
-          title="Single Action"
-          actions={
-            <Button variant="primary" look="filled" size="small">
-              Action
-            </Button>
-          }
-        >
-          Message with a single action button.
-        </Message>
-      </div>
-
-      <div>
-        <h3 className="text-lg font-semibold mb-2">Two Actions</h3>
-        <Message
-          variant="warning"
-          title="Two Actions"
-          actions={
-            <>
-              <Button variant="primary" look="filled" size="small">
-                Primary
-              </Button>
-              <Button variant="neutral" look="outlined" size="small">
-                Secondary
-              </Button>
-            </>
-          }
-        >
-          Message with two action buttons.
-        </Message>
-      </div>
-
-      <div>
-        <h3 className="text-lg font-semibold mb-2">Three Actions</h3>
-        <Message
-          variant="negative"
-          title="Three Actions"
-          actions={
-            <>
-              <Button variant="primary" look="filled" size="small">
-                Confirm
-              </Button>
-              <Button variant="neutral" look="outlined" size="small">
-                Cancel
-              </Button>
-              <Button variant="neutral" look="text" size="small">
-                Learn More
-              </Button>
-            </>
-          }
-        >
-          Message with three action buttons.
-        </Message>
-      </div>
-    </div>
-  ),
-};
-
-// Accessibility Example
-export const WithAccessibility: Story = {
-  args: {
-    variant: "warning",
-    title: "Accessible Message",
-    "aria-label": "Important warning message",
-    "data-testid": "accessible-message",
-    closable: true,
-    onClose: () => console.log("Message closed"),
-    children: "This message demonstrates proper accessibility features including ARIA labels and keyboard navigation.",
-  },
-};
-
-// Backward Compatibility - Aliases
-export const AliasInfo: Story = {
-  args: {
-    variant: "info",
-    title: "Info Alias",
-    children: "This uses the 'info' alias which maps to 'primary' variant.",
-  },
-};
-
-export const AliasSuccess: Story = {
-  args: {
-    variant: "success",
-    title: "Success Alias",
-    children: "This uses the 'success' alias which maps to 'positive' variant.",
-  },
-};
-
-export const AliasError: Story = {
-  args: {
-    variant: "error",
-    title: "Error Alias",
-    children: "This uses the 'error' alias which maps to 'negative' variant.",
-  },
-};
