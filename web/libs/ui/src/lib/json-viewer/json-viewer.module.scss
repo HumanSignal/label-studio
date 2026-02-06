@@ -15,6 +15,7 @@
   --json-viewer-color-keys: var(--color-primary-content);
   --json-viewer-color-string: var(--color-accent-kale-bold);
   --json-viewer-color-number: var(--color-accent-blueberry-bold);
+  --json-viewer-color-collection-count: var(--color-neutral-content-subtlest);
   --json-viewer-color-boolean: var(--color-accent-canteloupe-bold);
   --json-viewer-color-null: var(--color-accent-persimmon-bold);
   --json-viewer-copy-pulse: var(--color-primary-content);
@@ -229,6 +230,10 @@
     // Override key-value pair spacing
     .jer-key-value-pair {
       padding: var(--spacing-tighter) 0;
+    }
+
+    .jer-collection-item-count {
+      color: var(--json-viewer-color-collection-count) !important;
     }
 
     // Override JSON value colors
