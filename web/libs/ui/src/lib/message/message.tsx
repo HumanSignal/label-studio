@@ -47,8 +47,9 @@ export interface MessageProps extends React.HTMLAttributes<HTMLDivElement> {
 
   /**
    * Size of the message
-   * - medium: Default size with standard padding and 20px icon (default)
-   * - small: Compact size with reduced padding and 18px icon
+   * - medium: Default size with standard padding and 24px icon (default)
+   * - small: Compact size with reduced padding and 20px icon.
+   *          Use only when vertical space is limited.
    */
   size?: MessageSize;
 

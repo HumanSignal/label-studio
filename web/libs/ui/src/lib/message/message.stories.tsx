@@ -26,7 +26,8 @@ const meta: Meta<typeof Message> = {
     size: {
       control: "select",
       options: ["medium", "small"],
-      description: "Size of the message. medium: standard padding and 20px icon, small: compact padding and 18px icon",
+      description:
+        "Size of the message. medium: standard padding and 24px icon (default), small: compact padding and 20px icon (use only when vertical space is limited)",
     },
     icon: {
       control: false,
@@ -195,14 +196,14 @@ export const SizeComparison: Story = {
       <div>
         <h3 className="text-lg font-semibold mb-2">Medium Size (Default)</h3>
         <Message variant="primary" size="medium" title="Medium Message">
-          This is a medium-sized message with standard padding and 20px icon.
+          This is a medium-sized message with standard padding and 24px icon. Use this size by default.
         </Message>
       </div>
 
       <div>
         <h3 className="text-lg font-semibold mb-2">Small Size (Compact)</h3>
         <Message variant="primary" size="small" title="Small Message">
-          This is a small-sized message with reduced padding and 18px icon.
+          This is a small-sized message with reduced padding and 20px icon. Use only when vertical space is limited.
         </Message>
       </div>
     </div>
