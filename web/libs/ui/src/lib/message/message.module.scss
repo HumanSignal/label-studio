@@ -7,7 +7,7 @@
 
 /* Medium Size - Default */
 .size-medium {
-  @apply gap-tight p-base;
+  @apply gap-base p-base;
 
   .close {
     @apply max-h-6 max-w-6;
