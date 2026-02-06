@@ -52,10 +52,6 @@ const meta: Meta<typeof Message> = {
       control: false,
       description: "Callback function when the close button is clicked",
     },
-    isMarkdown: {
-      control: "boolean",
-      description: "Whether to render children as markdown",
-    },
     extra: {
       control: false,
       description: "Extra content area displayed below the main content",
@@ -150,16 +146,6 @@ export const BodyTextOnly: Story = {
   args: {
     variant: "primary",
     children: "A simple informational message with just body text and no title. Perfect for brief notifications.",
-  },
-};
-
-export const WithMarkdown: Story = {
-  args: {
-    variant: "primary",
-    title: "Markdown Support",
-    isMarkdown: true,
-    children:
-      "This message supports **bold text**, *italic text*, and [links](https://example.com). You can also use lists:\n\n- Item 1\n- Item 2\n- Item 3",
   },
 };
 

@@ -26,11 +26,6 @@ jest.mock("./message.module.scss", () => ({
   close: "close",
 }));
 
-// Mock the Markdown component
-jest.mock("../../../../editor/src/components/Markdown/Markdown", () => ({
-  Markdown: ({ text }: { text: string }) => <div data-testid="markdown-content">{text}</div>,
-}));
-
 const defaultProps: MessageProps = {
   children: "Test message content",
 };
@@ -174,28 +169,6 @@ describe("Message Component", () => {
     render(<Message {...defaultProps}>Custom content here</Message>);
 
     expect(screen.getByText("Custom content here")).toBeInTheDocument();
-  });
-
-  it("renders markdown when isMarkdown is true", () => {
-    render(
-      <Message {...defaultProps} isMarkdown>
-        **Bold text** and *italic text*
-      </Message>,
-    );
-
-    // Markdown component should be rendered
-    expect(screen.getByTestId("markdown-content")).toBeInTheDocument();
-    expect(screen.getByTestId("markdown-content")).toHaveTextContent("**Bold text** and *italic text*");
-  });
-
-  it("renders plain text when isMarkdown is false", () => {
-    render(
-      <Message {...defaultProps} isMarkdown={false}>
-        **Bold text**
-      </Message>,
-    );
-
-    expect(screen.getByText("**Bold text**")).toBeInTheDocument();
   });
 
   it("renders extra content when provided", () => {

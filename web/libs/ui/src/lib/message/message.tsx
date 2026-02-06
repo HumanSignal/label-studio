@@ -1,7 +1,6 @@
 import React, { type ReactNode, forwardRef, useMemo } from "react";
 import { cn } from "../../utils/utils";
 import { Typography } from "../typography/typography";
-import { Markdown } from "../../../../editor/src/components/Markdown/Markdown";
 import { Button } from "../button/button";
 import {
   IconInfoOutline,
@@ -85,11 +84,6 @@ export interface MessageProps extends React.HTMLAttributes<HTMLDivElement> {
   onClose?: () => void;
 
   /**
-   * Whether to render children as markdown
-   */
-  isMarkdown?: boolean;
-
-  /**
    * Extra content area displayed below the main content
    */
   extra?: ReactNode;
@@ -127,7 +121,6 @@ export interface MessageProps extends React.HTMLAttributes<HTMLDivElement> {
  * - Five primary variants: primary, neutral, negative, positive, warning
  * - Backward compatibility aliases: info, success, error
  * - Optional closable functionality
- * - Markdown rendering support
  * - Flexible content areas for actions and extra elements
  * - Full accessibility support with ARIA attributes
  *
@@ -176,7 +169,6 @@ export const Message = forwardRef<HTMLDivElement, MessageProps>(
       children,
       closable = false,
       onClose,
-      isMarkdown = false,
       extra,
       actions,
       className,
@@ -262,7 +254,7 @@ export const Message = forwardRef<HTMLDivElement, MessageProps>(
 
           {/* Main Content */}
           <div className={cn("message__body", styles.body)} id={contentElementId}>
-            {isMarkdown ? <Markdown text={children as string} /> : children}
+            {children}
           </div>
 
           {/* Extra Content */}
