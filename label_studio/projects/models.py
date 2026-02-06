@@ -543,8 +543,9 @@ class Project(ProjectMixin, FsmHistoryStateModel):
 
         if tasks_number_changed:
             # FSM: Recalculate project state after task deletion or import
-            user = CurrentContext.get_user()
-            update_project_state_after_task_change(self, user=user)
+            if CurrentContext.is_fsm_enabled():
+                user = CurrentContext.get_user()
+                update_project_state_after_task_change(self, user=user)
 
     def _batch_update_with_retry(self, queryset, batch_size=500, max_retries=3, **update_fields):
         batch_update_with_retry(queryset, batch_size, max_retries, **update_fields)
