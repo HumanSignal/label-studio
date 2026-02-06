@@ -18,7 +18,7 @@ const configSimple = `
   </View>
 `;
 
-const url = "https://htx-pub.s3.amazonaws.com/example.txt";
+const url = "/public/files/example.txt";
 const configUrl = configSimple.replace('value="$text"', 'valueType="url" value="$url"');
 const configUrlSaveText = configUrl.replace('valueType="url"', 'valueType="url" saveTextResult="yes"');
 

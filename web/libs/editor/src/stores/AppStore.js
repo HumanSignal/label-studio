@@ -815,7 +815,6 @@ export default types
         destroy(oldAnnotationStore);
       }
 
-      // FIT-720: Clear image cache when leaving a task to release memory
       // forceClear() revokes all blob URLs regardless of reference count
       // This is safe here because we're destroying the annotation store anyway
       if (isActive(FF_FIT_720_LAZY_LOAD_ANNOTATIONS)) {

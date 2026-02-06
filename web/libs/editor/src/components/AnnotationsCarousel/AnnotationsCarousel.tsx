@@ -1,16 +1,45 @@
 import { Button, IconChevronLeft, IconChevronRight } from "@humansignal/ui";
 import { observer } from "mobx-react";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { FixedSizeList as List, type ListChildComponentProps } from "react-window";
+import AutoSizer from "react-virtualized-auto-sizer";
 import { cn } from "../../utils/bem";
 import { clamp, sortAnnotations } from "../../utils/utilities";
+import { isActive, FF_FIT_720_LAZY_LOAD_ANNOTATIONS } from "@humansignal/core/lib/utils/feature-flags";
 import { AnnotationButton } from "./AnnotationButton";
 import "./AnnotationsCarousel.scss";
+
+const ITEM_WIDTH = 200; // Approximate width of each annotation button (min-width: 186px + gap)
+const ITEM_GAP = 4; // Gap between items (--spacing-tighter)
+const VIRTUALIZATION_THRESHOLD = 50; // Only virtualize if more than this many items
 
 interface AnnotationsCarouselInterface {
   store: any;
   annotationStore: any;
   commentStore?: any;
 }
+
+interface ItemData {
+  entities: any[];
+  capabilities: any;
+  annotationStore: any;
+  store: any;
+}
+
+const VirtualizedAnnotationButton = ({ index, style, data }: ListChildComponentProps<ItemData>) => {
+  const entity = data.entities[index];
+  return (
+    <div style={{ ...(style as React.CSSProperties), paddingRight: ITEM_GAP }}>
+      <AnnotationButton
+        key={entity?.id}
+        entity={entity}
+        capabilities={data.capabilities}
+        annotationStore={data.annotationStore}
+        store={data.store}
+      />
+    </div>
+  );
+};
 
 export const AnnotationsCarousel = observer(({ store, annotationStore }: AnnotationsCarouselInterface) => {
   const [entities, setEntities] = useState<any[]>([]);
@@ -19,12 +48,59 @@ export const AnnotationsCarousel = observer(({ store, annotationStore }: Annotat
   const enableCreateAnnotation = store.hasInterface("annotations:add-new");
   const groundTruthEnabled = store.hasInterface("ground-truth");
   const enableAnnotationDelete = store.hasInterface("annotations:delete");
+  const listRef = useRef<List>(null);
   const carouselRef = useRef<HTMLElement>();
   const containerRef = useRef<HTMLElement>();
-  const [currentPosition, setCurrentPosition] = useState(0);
-  const [isLeftDisabled, setIsLeftDisabled] = useState(false);
-  const [isRightDisabled, setIsRightDisabled] = useState(false);
 
+  const [scrollOffset, setScrollOffset] = useState(0);
+  const [containerWidth, setContainerWidth] = useState(0);
+
+  // Original: Track position for non-virtualized CSS transform scrolling
+  const [currentPosition, setCurrentPosition] = useState(0);
+  const [isLeftDisabledOriginal, setIsLeftDisabledOriginal] = useState(false);
+  const [isRightDisabledOriginal, setIsRightDisabledOriginal] = useState(false);
+
+  const capabilities = useMemo(
+    () => ({
+      enablePredictions,
+      enableCreateAnnotation,
+      groundTruthEnabled,
+      enableAnnotations,
+      enableAnnotationDelete,
+    }),
+    [enablePredictions, enableCreateAnnotation, groundTruthEnabled, enableAnnotations, enableAnnotationDelete],
+  );
+
+  const sortedEntities = useMemo(() => sortAnnotations(entities), [entities]);
+
+  const totalWidth = sortedEntities.length * (ITEM_WIDTH + ITEM_GAP);
+  const shouldVirtualize =
+    isActive(FF_FIT_720_LAZY_LOAD_ANNOTATIONS) && sortedEntities.length > VIRTUALIZATION_THRESHOLD;
+
+  const isLeftDisabled = scrollOffset <= 0;
+  const isRightDisabled = scrollOffset >= totalWidth - containerWidth;
+  const showControls = totalWidth > containerWidth;
+
+  const handleScroll = useCallback(({ scrollOffset: newOffset }: { scrollOffset: number }) => {
+    setScrollOffset(newOffset);
+  }, []);
+
+  const scrollLeft = useCallback(() => {
+    if (listRef.current) {
+      const newOffset = Math.max(0, scrollOffset - containerWidth);
+      listRef.current.scrollTo(newOffset);
+    }
+  }, [scrollOffset, containerWidth]);
+
+  const scrollRight = useCallback(() => {
+    if (listRef.current) {
+      const maxOffset = totalWidth - containerWidth;
+      const newOffset = Math.min(maxOffset, scrollOffset + containerWidth);
+      listRef.current.scrollTo(newOffset);
+    }
+  }, [scrollOffset, containerWidth, totalWidth]);
+
+  // Original: Update position for non-virtualized CSS transform scrolling
   const updatePosition = useCallback(
     (_e: React.MouseEvent, goLeft = true) => {
       if (containerRef.current && carouselRef.current) {
@@ -38,19 +114,24 @@ export const AnnotationsCarousel = observer(({ store, annotationStore }: Annotat
     [containerRef, carouselRef, currentPosition],
   );
 
+  // Original: Update button disabled states for non-virtualized scrolling
   useEffect(() => {
-    setIsLeftDisabled(currentPosition <= 0);
-    setIsRightDisabled(
-      currentPosition >= (carouselRef.current?.clientWidth ?? 0) - (containerRef.current?.clientWidth ?? 0),
-    );
-  }, [
-    entities.length,
-    containerRef.current,
-    carouselRef.current,
-    currentPosition,
-    window.innerWidth,
-    window.innerHeight,
-  ]);
+    if (!shouldVirtualize) {
+      setIsLeftDisabledOriginal(currentPosition <= 0);
+      setIsRightDisabledOriginal(
+        currentPosition >= (carouselRef.current?.clientWidth ?? 0) - (containerRef.current?.clientWidth ?? 0),
+      );
+    }
+  }, [sortedEntities.length, containerRef.current, carouselRef.current, currentPosition, shouldVirtualize]);
+
+  useEffect(() => {
+    if (shouldVirtualize && listRef.current && annotationStore.selected) {
+      const selectedIndex = sortedEntities.findIndex((e: any) => e?.id === annotationStore.selected?.id);
+      if (selectedIndex >= 0) {
+        listRef.current.scrollToItem(selectedIndex, "center");
+      }
+    }
+  }, [annotationStore.selected?.id, sortedEntities, shouldVirtualize]);
 
   useEffect(() => {
     const newEntities = [];
@@ -61,7 +142,82 @@ export const AnnotationsCarousel = observer(({ store, annotationStore }: Annotat
     setEntities(newEntities);
   }, [annotationStore, JSON.stringify(annotationStore.predictions), JSON.stringify(annotationStore.annotations)]);
 
-  return enableAnnotations || enablePredictions || enableCreateAnnotation ? (
+  const itemData = useMemo(
+    () => ({
+      entities: sortedEntities,
+      capabilities,
+      annotationStore,
+      store,
+    }),
+    [sortedEntities, capabilities, annotationStore, store],
+  );
+
+  if (!(enableAnnotations || enablePredictions || enableCreateAnnotation)) {
+    return null;
+  }
+
+  if (shouldVirtualize) {
+    return (
+      <div
+        className={cn("annotations-carousel")
+          .mod({ scrolled: scrollOffset > 0, virtualized: true })
+          .toClassName()}
+      >
+        <div className={cn("annotations-carousel").elem("container").toClassName()}>
+          <AutoSizer>
+            {({ width, height }) => {
+              // Update container width for navigation calculations
+              if (width !== containerWidth) {
+                setContainerWidth(width - 77); // Account for controls width
+              }
+              return (
+                // @ts-expect-error - react-window types incompatible with React 18
+                <List
+                  ref={listRef}
+                  layout="horizontal"
+                  height={height}
+                  width={width - 77} // Account for controls
+                  itemCount={sortedEntities.length}
+                  itemSize={ITEM_WIDTH + ITEM_GAP}
+                  itemData={itemData}
+                  onScroll={handleScroll}
+                  overscanCount={5} // Render 5 extra items on each side for smooth scrolling
+                  style={{ paddingLeft: ITEM_GAP }}
+                >
+                  {VirtualizedAnnotationButton}
+                </List>
+              );
+            }}
+          </AutoSizer>
+        </div>
+        {showControls && (
+          <div className={cn("annotations-carousel").elem("carousel-controls").toClassName()}>
+            <Button
+              disabled={isLeftDisabled}
+              aria-label="Carousel left"
+              size="small"
+              variant="neutral"
+              onClick={scrollLeft}
+            >
+              <IconChevronLeft />
+            </Button>
+            <Button
+              disabled={isRightDisabled}
+              aria-label="Carousel right"
+              size="small"
+              variant="neutral"
+              onClick={scrollRight}
+            >
+              <IconChevronRight />
+            </Button>
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  // Original: Non-virtualized rendering (FF off or small lists)
+  return (
     <div
       className={cn("annotations-carousel")
         .mod({ scrolled: currentPosition > 0 })
@@ -70,44 +226,39 @@ export const AnnotationsCarousel = observer(({ store, annotationStore }: Annotat
     >
       <div ref={containerRef as any} className={cn("annotations-carousel").elem("container").toClassName()}>
         <div ref={carouselRef as any} className={cn("annotations-carousel").elem("carosel").toClassName()}>
-          {sortAnnotations(entities).map((entity) => (
+          {sortedEntities.map((entity) => (
             <AnnotationButton
               key={entity?.id}
               entity={entity}
-              capabilities={{
-                enablePredictions,
-                enableCreateAnnotation,
-                groundTruthEnabled,
-                enableAnnotations,
-                enableAnnotationDelete,
-              }}
+              capabilities={capabilities}
               annotationStore={annotationStore}
+              store={store}
             />
           ))}
         </div>
       </div>
-      {(!isLeftDisabled || !isRightDisabled) && (
+      {(!isLeftDisabledOriginal || !isRightDisabledOriginal) && (
         <div className={cn("annotations-carousel").elem("carousel-controls").toClassName()}>
           <Button
-            disabled={isLeftDisabled}
+            disabled={isLeftDisabledOriginal}
             aria-label="Carousel left"
             size="small"
             variant="neutral"
-            onClick={(e) => !isLeftDisabled && updatePosition(e, true)}
+            onClick={(e) => !isLeftDisabledOriginal && updatePosition(e, true)}
           >
             <IconChevronLeft />
           </Button>
           <Button
-            disabled={isRightDisabled}
+            disabled={isRightDisabledOriginal}
             aria-label="Carousel right"
             size="small"
             variant="neutral"
-            onClick={(e) => !isRightDisabled && updatePosition(e, false)}
+            onClick={(e) => !isRightDisabledOriginal && updatePosition(e, false)}
           >
             <IconChevronRight />
           </Button>
         </div>
       )}
     </div>
-  ) : null;
+  );
 });
