@@ -16,7 +16,7 @@ env:
   LABEL_STUDIO_TEST_ENVIRONMENT: false
   SENTRY_RATE: 0
   JSON_LOG: 0
-  POETRY_VERSION: 2.2.1
+  POETRY_VERSION: 2.3.2
 
 jobs:
   sqlite-migrations:

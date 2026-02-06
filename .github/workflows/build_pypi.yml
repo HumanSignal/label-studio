@@ -64,7 +64,7 @@ env:
   PYTHON_VERSION_FILE: "pyproject.toml"
   FRONTEND_MONOREPO_DIR: "web"
   NODE: "22"
-  POETRY_VERSION: 2.2.1
+  POETRY_VERSION: 2.3.2
 
 jobs:
   pypi:
