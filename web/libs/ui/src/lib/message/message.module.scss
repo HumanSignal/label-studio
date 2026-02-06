@@ -48,7 +48,7 @@
 
 /* Body */
 .body {
-  @apply text-neutral-content;
+  @apply text-neutral-content flex flex-col gap-tight;
 }
 
 /* Close Button */

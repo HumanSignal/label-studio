@@ -133,7 +133,7 @@ export const WithActions: Story = {
     variant: "warning",
     title: "Unsaved Changes",
     children: (
-      <div className="flex flex-col gap-tight">
+      <>
         <Typography>You have unsaved changes. Do you want to save them before leaving?</Typography>
         <div className="flex gap-tight">
           <Button variant="primary" look="filled" size="small">
@@ -143,7 +143,7 @@ export const WithActions: Story = {
             Discard
           </Button>
         </div>
-      </div>
+      </>
     ),
   },
 };
@@ -216,7 +216,7 @@ export const WithLink: Story = {
     variant: "primary",
     title: "Need Help?",
     children: (
-      <div className="flex flex-col gap-tight">
+      <>
         <Typography>Visit our documentation to learn more about this feature.</Typography>
         <Typography variant="label" size="small" className="text-primary-link">
           <a href="/docs" className="inline-flex items-center gap-1 hover:underline">
@@ -224,7 +224,7 @@ export const WithLink: Story = {
             <IconExternal width={16} height={16} />
           </a>
         </Typography>
-      </div>
+      </>
     ),
   },
 };
