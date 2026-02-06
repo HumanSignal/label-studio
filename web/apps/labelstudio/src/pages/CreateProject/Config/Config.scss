@@ -699,6 +699,8 @@ div[class^="App_menu"]>div {
   box-shadow: 0 0 0 1.5px rgba(var(--color-accent-mango-base-raw) / 70%);
   opacity: 1;
   border-radius: var(--corner-radius-smallest);
+  transform: translateX(-1px);
+  max-width: 8px;
 }
 
 :global(.cm-searching) {
