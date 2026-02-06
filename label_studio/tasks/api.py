@@ -344,7 +344,9 @@ class TaskAPI(generics.RetrieveUpdateDestroyAPIView):
 
     def get_queryset(self):
         task_id = self.request.parser_context['kwargs'].get('pk')
-        task = generics.get_object_or_404(Task, pk=task_id)
+        task = generics.get_object_or_404(
+            Task.objects.filter(project__organization=self.request.user.active_organization), pk=task_id
+        )
         review = bool_from_request(self.request.GET, 'review', False)
         selected = {'all': False, 'included': [self.kwargs.get('pk')]}
         if review:
@@ -374,7 +376,10 @@ class TaskAPI(generics.RetrieveUpdateDestroyAPIView):
 
         # First check permissions using a lightweight query
         # select_related('project') avoids extra query when permission check accesses task.project
-        lean_task = generics.get_object_or_404(Task.objects.select_related('project'), pk=task_id)
+        lean_task = generics.get_object_or_404(
+            Task.objects.filter(project__organization=self.request.user.active_organization).select_related('project'),
+            pk=task_id,
+        )
         self.check_object_permissions(self.request, lean_task)
 
         # Now fetch full task with heavy queryset (prefetches, annotations, etc.)
