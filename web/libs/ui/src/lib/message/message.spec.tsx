@@ -2,7 +2,6 @@ import { render, screen, fireEvent } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import { Message, type MessageProps } from "./message";
 import { IconUpload } from "@humansignal/icons";
-import { Button } from "../button/button";
 
 // Mock the styles since they're SCSS modules
 jest.mock("./message.module.scss", () => ({
