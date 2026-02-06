@@ -691,3 +691,47 @@ div[class^="App_menu"]>div {
     gap: var(--spacing-base);
   }
 }
+
+:global(.CodeMirror-search-match) {
+  background: var(--color-accent-mango-base);
+  border-top: var(--color-accent-mango-bold) 1px solid;
+  border-bottom: var(--color-accent-mango-bold) 1px solid;
+  opacity: 0.5;
+  border-radius: var(--corner-radius-smaller);
+}
+
+:global(.cm-searching) {
+  background-color: rgba(var(--color-accent-mango-base-raw) / 25%);
+  color: var(--color-accent-mango-bold) !important;
+  border-radius: var(--corner-radius-smaller);
+  box-shadow: 0 0 0 1.5px rgba(var(--color-accent-mango-base-raw) / 25%) ;
+}
+
+:global(.CodeMirror-dialog-top) {
+  border-bottom-color: var(--color-neutral-border);
+  padding: var(--spacing-tight);
+  background: var(--color-neutral-surface);
+  box-shadow: 0 4px 8px rgba(var(--color-neutral-shadow-raw) / 16%);
+  display: flex;
+  align-items: center;
+  flex-flow: row nowrap;
+}
+
+:global(.CodeMirror-search-label) {
+  color: var(--color-neutral-content-subtler);
+  flex-grow: 1;
+  display: flex;
+  align-items: center;
+  margin-bottom: 0;
+}
+
+:global(.CodeMirror-search-field) {
+  color: var(--color-neutral-content);
+  margin-left: var(--spacing-tighter);
+  flex-grow: 1;
+}
+
+:global(.CodeMirror-search-hint) {
+  color: var(--color-neutral-content-subtlest);
+  font-size: var(--font-size-body-smaller);
+}
