@@ -692,6 +692,10 @@ div[class^="App_menu"]>div {
   }
 }
 
+:global(.CodeMirror-scrollbar-filler) {
+  background-color: var(--color-neutral-background) !important;
+}
+
 :global(.CodeMirror-search-match) {
   background-color: rgba(var(--color-accent-mango-base-raw) / 50%);
   border-top: 0;
