@@ -363,6 +363,27 @@ class TaskAPI(generics.RetrieveUpdateDestroyAPIView):
             )
         )
 
+    def get_object(self):
+        """
+        Override to check permissions on a lightweight task first.
+
+        This avoids executing the expensive PreparedTaskManager query
+        when the user doesn't have permission to access the task.
+        """
+        task_id = self.kwargs.get('pk')
+
+        # First check permissions using a lightweight query
+        # select_related('project') avoids extra query when permission check accesses task.project
+        lean_task = generics.get_object_or_404(
+            Task.objects.filter(project__organization=self.request.user.active_organization).select_related('project'),
+            pk=task_id,
+        )
+        self.check_object_permissions(self.request, lean_task)
+
+        # Now fetch full task with heavy queryset (prefetches, annotations, etc.)
+        queryset = self.filter_queryset(self.get_queryset())
+        return generics.get_object_or_404(queryset, pk=task_id)
+
     def get_serializer_class(self):
         # GET => task + annotations + predictions + drafts
         if self.request.method == 'GET':
