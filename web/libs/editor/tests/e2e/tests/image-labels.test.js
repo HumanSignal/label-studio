@@ -3,8 +3,7 @@ const { kebabCase } = require("lodash");
 
 Feature("Images' labels type matching");
 
-const IMAGE =
-  "https://htx-pub.s3.us-east-1.amazonaws.com/examples/images/nick-owuor-astro-nic-visuals-wDifg5xc9Z4-unsplash.jpg";
+const IMAGE = "/public/files/images/nick-owuor-unsplash.jpg";
 
 const createConfig = ({ shapes = ["Rectangle"], props } = {}) => {
   return `<View>

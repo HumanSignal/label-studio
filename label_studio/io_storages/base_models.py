@@ -805,7 +805,7 @@ class ExportStorage(Storage, ProjectStorageMixin):
             # Updating progress in thread requires coordinating on count and db writes, so just
             # batching to keep it simpler.
             for annotation_batch in _batched(
-                iterate_queryset(Annotation.objects.filter(project=self.project), chunk_size=chunk_size),
+                iterate_queryset(annotations, chunk_size=chunk_size),
                 chunk_size,
             ):
                 futures = []
