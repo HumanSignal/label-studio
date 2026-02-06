@@ -182,12 +182,6 @@ export const WithCustomIconSize: Story = {
       <Message variant="primary" icon={<IconInfoOutline />} iconSize={16}>
         Small icon (16px)
       </Message>
-      <Message variant="primary" icon={<IconInfoOutline />} iconSize={20}>
-        Default icon (20px)
-      </Message>
-      <Message variant="primary" icon={<IconInfoOutline />} iconSize={24}>
-        Medium icon (24px)
-      </Message>
       <Message variant="primary" icon={<IconInfoOutline />} iconSize={32}>
         Large icon (32px)
       </Message>
