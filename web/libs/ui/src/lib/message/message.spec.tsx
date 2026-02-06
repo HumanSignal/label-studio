@@ -21,8 +21,6 @@ jest.mock("./message.module.scss", () => ({
   content: "content",
   title: "title",
   body: "body",
-  extra: "extra",
-  actions: "actions",
   close: "close",
 }));
 
@@ -171,51 +169,6 @@ describe("Message Component", () => {
     expect(screen.getByText("Custom content here")).toBeInTheDocument();
   });
 
-  it("renders extra content when provided", () => {
-    render(<Message {...defaultProps} extra={<div data-testid="extra-content">Extra content</div>} />);
-
-    expect(screen.getByTestId("extra-content")).toBeInTheDocument();
-    expect(screen.getByText("Extra content")).toBeInTheDocument();
-  });
-
-  it("does not render extra content when not provided", () => {
-    render(<Message {...defaultProps} />);
-
-    const extraElement = screen.queryByText("Extra content");
-    expect(extraElement).not.toBeInTheDocument();
-  });
-
-  it("renders actions when provided", () => {
-    render(<Message {...defaultProps} actions={<Button data-testid="action-button">Click me</Button>} />);
-
-    expect(screen.getByTestId("action-button")).toBeInTheDocument();
-    expect(screen.getByText("Click me")).toBeInTheDocument();
-  });
-
-  it("renders multiple actions", () => {
-    render(
-      <Message
-        {...defaultProps}
-        actions={
-          <>
-            <Button data-testid="action-1">Action 1</Button>
-            <Button data-testid="action-2">Action 2</Button>
-          </>
-        }
-      />,
-    );
-
-    expect(screen.getByTestId("action-1")).toBeInTheDocument();
-    expect(screen.getByTestId("action-2")).toBeInTheDocument();
-  });
-
-  it("does not render actions when not provided", () => {
-    render(<Message {...defaultProps} />);
-
-    const actionElement = screen.queryByText("Click me");
-    expect(actionElement).not.toBeInTheDocument();
-  });
-
   it("renders close button when closable is true", () => {
     render(<Message {...defaultProps} closable />);
 
@@ -317,8 +270,6 @@ describe("Message Component", () => {
         icon={<IconUpload data-testid="icon" />}
         closable
         onClose={onClose}
-        extra={<div data-testid="extra">Extra</div>}
-        actions={<Button data-testid="action">Action</Button>}
         data-testid="message"
       >
         Warning content
@@ -329,8 +280,6 @@ describe("Message Component", () => {
     expect(screen.getByText("Warning Title")).toBeInTheDocument();
     expect(screen.getByText("Warning content")).toBeInTheDocument();
     expect(screen.getByTestId("icon")).toBeInTheDocument();
-    expect(screen.getByTestId("extra")).toBeInTheDocument();
-    expect(screen.getByTestId("action")).toBeInTheDocument();
     expect(screen.getByTestId("message-dismiss-button")).toBeInTheDocument();
 
     fireEvent.click(screen.getByTestId("message-dismiss-button"));

@@ -84,16 +84,6 @@ export interface MessageProps extends React.HTMLAttributes<HTMLDivElement> {
   onClose?: () => void;
 
   /**
-   * Extra content area displayed below the main content
-   */
-  extra?: ReactNode;
-
-  /**
-   * Action buttons or other interactive elements
-   */
-  actions?: ReactNode;
-
-  /**
    * Custom wrapper class name
    */
   className?: string;
@@ -169,8 +159,6 @@ export const Message = forwardRef<HTMLDivElement, MessageProps>(
       children,
       closable = false,
       onClose,
-      extra,
-      actions,
       className,
       "data-testid": testId,
       "aria-label": ariaLabel,
@@ -256,12 +244,6 @@ export const Message = forwardRef<HTMLDivElement, MessageProps>(
           <div className={cn("message__body", styles.body)} id={contentElementId}>
             {children}
           </div>
-
-          {/* Extra Content */}
-          {extra && <div className={cn("message__extra", styles.extra)}>{extra}</div>}
-
-          {/* Actions */}
-          {actions && <div className={cn("message__actions", styles.actions)}>{actions}</div>}
         </div>
 
         {/* Close Button */}

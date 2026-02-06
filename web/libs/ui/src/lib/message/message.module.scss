@@ -51,16 +51,6 @@
   @apply text-neutral-content;
 }
 
-/* Extra Content */
-.extra {
-  @apply mt-tight;
-}
-
-/* Actions */
-.actions {
-  @apply mt-tight flex items-center gap-tight flex-wrap;
-}
-
 /* Close Button */
 .close {
   @apply flex-shrink-0;

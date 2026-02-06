@@ -52,14 +52,6 @@ const meta: Meta<typeof Message> = {
       control: false,
       description: "Callback function when the close button is clicked",
     },
-    extra: {
-      control: false,
-      description: "Extra content area displayed below the main content",
-    },
-    actions: {
-      control: false,
-      description: "Action buttons or other interactive elements",
-    },
   },
 };
 
@@ -135,33 +127,22 @@ export const WithRichTitle: Story = {
   },
 };
 
-export const WithExtraContent: Story = {
-  args: {
-    variant: "warning",
-    title: "Additional Information",
-    children: "This message has extra content below the main text.",
-    extra: (
-      <Typography variant="body" size="small" className="text-neutral-content-subtler">
-        Extra information or context can be displayed here.
-      </Typography>
-    ),
-  },
-};
-
 export const WithActions: Story = {
   args: {
     variant: "warning",
     title: "Unsaved Changes",
-    children: "You have unsaved changes. Do you want to save them before leaving?",
-    actions: (
-      <>
-        <Button variant="primary" look="filled" size="small">
-          Save Changes
-        </Button>
-        <Button variant="neutral" look="outlined" size="small">
-          Discard
-        </Button>
-      </>
+    children: (
+      <div className="flex flex-col gap-tight">
+        <Typography>You have unsaved changes. Do you want to save them before leaving?</Typography>
+        <div className="flex gap-tight">
+          <Button variant="primary" look="filled" size="small">
+            Save Changes
+          </Button>
+          <Button variant="neutral" look="outlined" size="small">
+            Discard
+          </Button>
+        </div>
+      </div>
     ),
   },
 };
@@ -235,31 +216,20 @@ export const SizeComparison: Story = {
 };
 
 // Real-world Examples
-export const SuccessNotification: Story = {
-  args: {
-    variant: "positive",
-    title: "Task Completed",
-    children: "All tasks have been processed successfully. You can now proceed to the next step.",
-    actions: (
-      <Button variant="primary" look="filled" size="small">
-        Continue
-      </Button>
-    ),
-  },
-};
-
-export const WithExtraLink: Story = {
+export const WithLink: Story = {
   args: {
     variant: "primary",
     title: "Need Help?",
-    children: "Visit our documentation to learn more about this feature.",
-    extra: (
-      <Typography variant="label" size="small" className="text-primary-link">
-        <a href="/docs" className="inline-flex items-center gap-1 hover:underline">
-          View Documentation
-          <IconExternal width={16} height={16} />
-        </a>
-      </Typography>
+    children: (
+      <div className="flex flex-col gap-tight">
+        <Typography>Visit our documentation to learn more about this feature.</Typography>
+        <Typography variant="label" size="small" className="text-primary-link">
+          <a href="/docs" className="inline-flex items-center gap-1 hover:underline">
+            View Documentation
+            <IconExternal width={16} height={16} />
+          </a>
+        </Typography>
+      </div>
     ),
   },
 };
