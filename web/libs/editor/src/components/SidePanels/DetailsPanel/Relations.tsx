@@ -164,7 +164,7 @@ const RelationMeta: FC<any> = observer(({ relation }) => {
   );
 
   const onNotesChange = useCallback(
-    (e: any) => {
+    (e: React.ChangeEvent<HTMLTextAreaElement>) => {
       relation.setNotes(e.target.value);
     },
     [relation],
