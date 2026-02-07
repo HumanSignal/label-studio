@@ -77,39 +77,3 @@ export const audioResult = [
     },
   },
 ];
-
-export const vectorConfig = `
-<View>
-    <Image name="img" value="$image" />
-    <VectorLabels name="vectorlabels" toName="img">
-        <Label value="Road" />
-        <Label value="Path" />
-    </VectorLabels>
-</View>
-`;
-
-export const imageData = {
-  image:
-    "https://htx-pub.s3.us-east-1.amazonaws.com/examples/images/nick-owuor-astro-nic-visuals-wDifg5xc9Z4-unsplash.jpg",
-};
-
-export const vectorResult = [
-  {
-    id: "vector1",
-    from_name: "vectorlabels",
-    to_name: "img",
-    type: "vectorlabels",
-    origin: "manual",
-    value: {
-      vertices: [
-        { x: 10, y: 10 },
-        { x: 20, y: 20 },
-        { x: 30, y: 15 },
-      ],
-      closed: false,
-      vectorlabels: ["Road"],
-    },
-    original_width: 1920,
-    original_height: 1280,
-  },
-];
