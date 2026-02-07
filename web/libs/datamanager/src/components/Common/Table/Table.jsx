@@ -158,11 +158,14 @@ export const Table = observer(
           predictions: out?.predictions,
         };
 
-        const onTaskLoad = async () => {
+        const onTaskLoad = async (options = {}) => {
           if (isFF(FF_LOPS_E_3) && type === "DE") {
             return new Promise((resolve) => resolve(out));
           }
-          const response = await api.task({ taskID: out.id });
+          const response = await api.task({
+            taskID: out.id,
+            resolve_uri: options.resolveUri ?? false,
+          });
 
           return response ?? {};
         };

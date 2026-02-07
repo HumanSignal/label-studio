@@ -17,7 +17,7 @@ on:
 env:
   NODE: "22"
   CACHE_NAME_PREFIX: v1
-  POETRY_VERSION: 2.2.1
+  POETRY_VERSION: 2.3.2
   DJANGO_SETTINGS_MODULE: core.settings.label_studio
   COVERAGE_PROCESS_START: 1
   LOG_DIR: pytest_logs

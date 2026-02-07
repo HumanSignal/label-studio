@@ -9,7 +9,7 @@ const config = `
 `;
 
 const data = {
-  image: "https://data.heartex.net/open-images/train_0/mini/0030019819f25b28.jpg",
+  image: "/public/files/images/0030019819f25b28.jpg",
 };
 
 const result = [
