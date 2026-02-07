@@ -162,6 +162,14 @@ const RelationMeta: FC<any> = observer(({ relation }) => {
     },
     [relation],
   );
+
+  const onNotesChange = useCallback(
+    (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+      relation.setNotes(e.target.value);
+    },
+    [relation],
+  );
+
   const options = useMemo(
     () =>
       children.map((c: any) => ({
@@ -180,6 +188,13 @@ const RelationMeta: FC<any> = observer(({ relation }) => {
         value={selectedValues}
         onChange={onChange}
         options={options}
+      />
+      <textarea
+        className={cn("relation-meta").elem("notes").toClassName()}
+        placeholder="Add notes..."
+        value={relation.notes}
+        onChange={onNotesChange}
+        rows={2}
       />
     </div>
   );

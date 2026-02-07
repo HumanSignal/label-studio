@@ -182,6 +182,15 @@ You can draw relation arrow between two objects. For example, object detection c
   "type": "relation",
   "to_id": "RQbW3Sj_Zr",
   "from_id": "oid66",
-  "direction": "right"
+  "direction": "right",
+  "labels": ["similar"],
+  "notes": "Optional free text notes about this relationship"
 }]
 ```
+
+The relation object can include:
+- `from_id`: ID of the first region
+- `to_id`: ID of the second region
+- `direction`: Direction of the relation arrow (`"left"`, `"right"`, or `"bi"` for bidirectional)
+- `labels`: Optional array of relation labels (if using `<Relations>` tag with `<Relation>` values)
+- `notes`: Optional free text notes about the relationship

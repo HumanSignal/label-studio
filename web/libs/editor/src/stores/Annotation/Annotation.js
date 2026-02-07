@@ -1256,6 +1256,7 @@ const _Annotation = types
               `${obj.to_id}#${self.id}`,
               obj.direction,
               obj.labels,
+              obj.notes,
             );
           }
         }

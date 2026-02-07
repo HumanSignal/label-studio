@@ -85,9 +85,11 @@
 
 .relation-meta {
   display: flex;
+  flex-direction: column;
+  gap: 8px;
   padding-left: 64px;
   padding-bottom: 5px;
-  align-items: center;
+  align-items: stretch;
 
   &__title {
     flex: none;
@@ -96,5 +98,27 @@
 
   &__select {
     flex: 1;
+  }
+
+  &__notes {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid var(--color-neutral-border);
+    border-radius: 4px;
+    background-color: var(--color-neutral-background);
+    color: var(--color-neutral-content);
+    font-family: inherit;
+    font-size: 14px;
+    resize: vertical;
+    min-height: 48px;
+    
+    &:focus {
+      outline: none;
+      border-color: var(--color-primary-border);
+    }
+    
+    &::placeholder {
+      color: var(--color-neutral-content-subtle);
+    }
   }
 }
