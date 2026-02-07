@@ -23,7 +23,7 @@ const Relation = types
 
     // labels
     labels: types.maybeNull(types.array(types.string)),
-    
+
     // notes (free text)
     notes: types.optional(types.string, ""),
   })

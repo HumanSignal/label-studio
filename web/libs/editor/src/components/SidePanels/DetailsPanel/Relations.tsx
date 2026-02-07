@@ -162,14 +162,14 @@ const RelationMeta: FC<any> = observer(({ relation }) => {
     },
     [relation],
   );
-  
+
   const onNotesChange = useCallback(
     (e: any) => {
       relation.setNotes(e.target.value);
     },
     [relation],
   );
-  
+
   const options = useMemo(
     () =>
       children.map((c: any) => ({
