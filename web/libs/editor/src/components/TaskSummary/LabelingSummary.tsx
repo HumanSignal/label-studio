@@ -90,7 +90,7 @@ const ObservableCell = observer(
       <span className="text-neutral-content-subtler text-sm">—</span>
     ) : (
       (render?.(results, control) ?? (
-        <span className="inline-flex items-center px-2 py-0.5 rounded-4 bg-neutral-surface-subtle text-xs font-medium">
+        <span className="inline-flex items-center px-2 py-0.5 rounded-4 bg-neutral-surface-active text-xs font-medium">
           {results.length} result{results.length > 1 ? "s" : ""}
         </span>
       ))
@@ -428,7 +428,7 @@ export const LabelingSummary = observer(({ hideInfo, annotations: all, controls,
         return (
           <button
             type="button"
-            className="flex gap-tight items-center cursor-pointer hover:bg-neutral-surface-subtle transition-colors p-1 rounded-small -ml-1"
+            className="flex gap-tight items-center cursor-pointer hover:bg-neutral-surface-active transition-colors p-1 rounded-small -ml-1"
             onClick={() => onSelect(annotation)}
           >
             <Userpic
@@ -528,7 +528,7 @@ export const LabelingSummary = observer(({ hideInfo, annotations: all, controls,
                 className={cnm(
                   "px-4 py-2.5 align-top overflow-hidden transition-colors",
                   isEvenRow ? "bg-neutral-surface" : "bg-neutral-background",
-                  "group-hover:bg-neutral-surface-subtle",
+                  "group-hover:bg-neutral-surface-hover",
                   !isLastRow && "border-b border-neutral-border-subtle",
                   isSticky && "border-r border-neutral-border",
                 )}
@@ -565,7 +565,7 @@ export const LabelingSummary = observer(({ hideInfo, annotations: all, controls,
         >
           {/* Sticky Header - z-20 to be above all row content */}
           <thead
-            className="bg-neutral-surface-subtle"
+            className="bg-neutral-surface-active"
             style={{
               position: "sticky",
               top: 0,
@@ -584,12 +584,12 @@ export const LabelingSummary = observer(({ hideInfo, annotations: all, controls,
                       minWidth: header.column.columnDef.minSize || 120,
                       maxWidth: header.column.columnDef.maxSize || 600,
                       zIndex: index === 0 ? 30 : 20, // All header cells need z-index for proper stacking
-                      background: "var(--neutral-surface, #fff)", // Solid background to prevent content bleed-through
+                      background: "var(--color-neutral-surface-active)", // Solid background to prevent content bleed-through
                     }}
                     className={cnm(
                       hideAggregation ? "border-b border-neutral-border" : "",
-                      "px-4 py-2.5 text-left whitespace-nowrap font-semibold text-sm bg-neutral-surface-subtle",
-                      index === 0 && "border-r border-neutral-border bg-neutral-surface",
+                      "px-4 py-2.5 text-left whitespace-nowrap font-semibold text-sm bg-neutral-surface-active",
+                      index === 0 && "border-r border-neutral-border",
                     )}
                   >
                     <div className="overflow-hidden text-ellipsis flex items-start gap-2">
