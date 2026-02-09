@@ -4,7 +4,7 @@ import type { ColumnDef, Row } from "@tanstack/react-table";
 import { observer } from "mobx-react";
 
 import { userDisplayName } from "@humansignal/core";
-import { cnm, IconSparks, Userpic } from "@humansignal/ui";
+import { cnm, IconSparks, Skeleton, Userpic } from "@humansignal/ui";
 import type { MSTAnnotation, MSTResult, RawResult } from "../../stores/types";
 import { AggregationTableRow } from "./Aggregation";
 import { Chip } from "./Chip";
@@ -83,7 +83,7 @@ const ObservableCell = observer(
 
     // Show skeleton for stubs that haven't been hydrated yet
     if (isStub && isFF(FF_FIT_720_LAZY_LOAD_ANNOTATIONS)) {
-      return <SkeletonCell width="60%" />;
+      return <SkeletonCell controlType={control.type} />;
     }
 
     const content = !results.length ? (
@@ -119,10 +119,44 @@ const isAnnotationStub = (annotation: MSTAnnotation): boolean => {
   return !hasVersionsResult;
 };
 
-// FIT-720: Skeleton loader for table cells
-const SkeletonCell = ({ width = "60%" }: { width?: string }) => (
-  <div className="min-h-[2rem] flex items-center">
-    <div className="h-4 bg-neutral-surface-subtle rounded animate-pulse" style={{ width }} />
+// FIT-720: Skeleton loader for table cells - renders chip-like skeletons for label controls,
+// simple bars for other types
+const SkeletonCell = ({ controlType }: { controlType?: string }) => {
+  // For label-type controls, show chip-like skeleton shapes
+  if (controlType?.endsWith("labels")) {
+    return (
+      <div className="min-h-[2rem] flex items-center gap-1.5 flex-wrap">
+        <Skeleton className="h-5 w-16 rounded-small" />
+        <Skeleton className="h-5 w-12 rounded-small" />
+      </div>
+    );
+  }
+
+  // For choices/taxonomy, show smaller chips
+  if (controlType === "choices" || controlType === "taxonomy") {
+    return (
+      <div className="min-h-[2rem] flex items-center gap-1.5">
+        <Skeleton className="h-5 w-20 rounded-small" />
+      </div>
+    );
+  }
+
+  // Default: simple bar skeleton
+  return (
+    <div className="min-h-[2rem] flex items-center">
+      <Skeleton className="h-4 w-3/5 rounded-small" />
+    </div>
+  );
+};
+
+// FIT-720: Skeleton loader for the Annotator column (first column)
+const AnnotatorSkeletonCell = () => (
+  <div className="flex gap-tight items-center p-1 -ml-1">
+    <Skeleton className="h-6 w-6 rounded-full shrink-0" />
+    <div className="flex flex-col gap-1">
+      <Skeleton className="h-3.5 w-20 rounded-small" />
+      <Skeleton className="h-3 w-12 rounded-small" />
+    </div>
   </div>
 );
 
@@ -385,6 +419,11 @@ export const LabelingSummary = observer(({ hideInfo, annotations: all, controls,
       maxSize: 300,
       cell: ({ row }) => {
         const annotation = row.original;
+
+        // FIT-720: Show skeleton for stub annotations that haven't been hydrated yet
+        if (annotation._isStub && isFF(FF_FIT_720_LAZY_LOAD_ANNOTATIONS)) {
+          return <AnnotatorSkeletonCell />;
+        }
 
         return (
           <button
