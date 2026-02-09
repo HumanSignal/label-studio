@@ -121,6 +121,7 @@ Your React component receives these props from Label Studio:
 - **`addRegion`**: Function to create new regions
 - **`regions`**: Array of all existing regions for this tag
 - **`data`**: The task data referenced in the `data` parameter
+- **`viewState`**: Object containing current view/UI state information
 
 #### `addRegion(value, extraData = {})`
 
@@ -162,6 +163,39 @@ region.update({ ...region.value, status: 'updated' });
 
 // Delete a region
 region.delete();
+```
+
+#### `viewState`
+
+Object containing current view/UI state information for conditional rendering.
+
+**Properties:**
+- **`currentScreen`**: `"quick_view" | "side_by_side" | "label_stream" | "review_stream"` - Current screen context
+  - `"review_stream"`: Review mode (reviewer interface)
+  - `"label_stream"`: Label stream mode (annotator streaming)
+  - `"side_by_side"`: View all annotations mode (comparing annotations)
+  - `"quick_view"`: Single task view (default)
+- **`darkMode`**: `boolean` - Whether the application is currently in dark mode
+
+**Example:**
+```javascript
+function MyComponent({ React, addRegion, regions, data, viewState }) {
+  const { currentScreen, darkMode } = viewState;
+  
+  // Conditional rendering based on screen
+  const isReviewing = currentScreen === "review_stream";
+  
+  // Apply dark mode styles
+  const containerStyle = {
+    backgroundColor: darkMode ? '#1a1a1a' : '#ffffff',
+    color: darkMode ? '#e5e5e5' : '#333333',
+  };
+  
+  return React.createElement('div', { style: containerStyle },
+    isReviewing && React.createElement('p', null, 'Review Mode Active'),
+    // ... rest of component
+  );
+}
 ```
 
 ## Output format for regions
