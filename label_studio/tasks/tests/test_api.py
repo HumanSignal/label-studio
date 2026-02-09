@@ -241,8 +241,8 @@ class TestTaskAPIResolveUri(APITestCase):
         assert response_data['text'] == 'Plain text field'
 
 
-class TestTaskDistributionAPIFeatureOff(APITestCase):
-    """When feature flag is off, distribution endpoint returns 403. Always run this test."""
+class TestTaskAgreementAPIFeatureOff(APITestCase):
+    """When feature flag is off, agreement endpoint returns 403. Always run this test."""
 
     @classmethod
     def setUpTestData(cls):
@@ -262,10 +262,10 @@ class TestTaskDistributionAPIFeatureOff(APITestCase):
 
 @unittest.skipUnless(
     flag_set('fflag_fix_all_fit_720_lazy_load_annotations', user=None),
-    'Distribution API tests require fflag_fix_all_fit_720_lazy_load_annotations to be on',
+    'Agreement API tests require fflag_fix_all_fit_720_lazy_load_annotations to be on',
 )
-class TestTaskDistributionAPI(APITestCase):
-    """Tests for TaskDistributionAPI (GET /api/tasks/<id>/agreement/). Run only when feature flag is on."""
+class TestTaskAgreementAPI(APITestCase):
+    """Tests for TaskAgreementAPI (GET /api/tasks/<id>/agreement/). Run only when feature flag is on."""
 
     @classmethod
     def setUpTestData(cls):

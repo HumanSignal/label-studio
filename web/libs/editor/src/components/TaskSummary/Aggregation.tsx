@@ -48,7 +48,7 @@ export const AggregationCell = ({
   isExpanded,
 }: { control: ControlTag; annotations: AnnotationSummary[]; isExpanded: boolean }) => {
   const allResults = annotations.flatMap((ann) => ann.results.filter((r) => r.from_name === control.name));
-  // Exclude predictions for percentage denominator to match backend TaskDistributionAPI
+  // Exclude predictions for percentage denominator to match backend TaskAgreementAPI
   const totalAnnotations = annotations.filter((a) => a.type === "annotation").length;
 
   if (!allResults.length) {
@@ -162,7 +162,7 @@ export const AggregationCell = ({
     );
   }
 
-  // Handle rating - average over annotations that have a value (matches backend TaskDistributionAPI)
+  // Handle rating - average over annotations that have a value (matches backend TaskAgreementAPI)
   if (control.type === "rating") {
     const ratings = allResults.map((r) => resultValue(r)).filter(Boolean);
     if (!ratings.length) return <span className="text-neutral-content-subtler text-xs italic">No ratings</span>;
@@ -175,7 +175,7 @@ export const AggregationCell = ({
     );
   }
 
-  // Handle number - average over annotations that have a value (matches backend TaskDistributionAPI)
+  // Handle number - average over annotations that have a value (matches backend TaskAgreementAPI)
   if (control.type === "number") {
     const numbers = allResults.map((r) => resultValue(r)).filter((v) => v !== null && v !== undefined);
     if (!numbers.length) return <span className="text-neutral-content-subtler text-xs italic">No data</span>;
