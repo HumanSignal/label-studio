@@ -255,7 +255,7 @@ class TestTaskDistributionAPIFeatureOff(APITestCase):
         mock_flag_set.return_value = False
         task = TaskFactory(project=self.project)
         self.client.force_authenticate(user=self.user)
-        response = self.client.get(f'/api/tasks/{task.id}/distribution/')
+        response = self.client.get(f'/api/tasks/{task.id}/agreement/')
         assert response.status_code == 403
         assert 'detail' in response.json() or 'error' in response.json()
 
@@ -265,7 +265,7 @@ class TestTaskDistributionAPIFeatureOff(APITestCase):
     'Distribution API tests require fflag_fix_all_fit_720_lazy_load_annotations to be on',
 )
 class TestTaskDistributionAPI(APITestCase):
-    """Tests for TaskDistributionAPI (GET /api/tasks/<id>/distribution/). Run only when feature flag is on."""
+    """Tests for TaskDistributionAPI (GET /api/tasks/<id>/agreement/). Run only when feature flag is on."""
 
     @classmethod
     def setUpTestData(cls):
@@ -277,7 +277,7 @@ class TestTaskDistributionAPI(APITestCase):
     def test_distribution_returns_404_for_nonexistent_task(self, mock_flag_set):
         mock_flag_set.return_value = True
         self.client.force_authenticate(user=self.user)
-        response = self.client.get('/api/tasks/99999/distribution/')
+        response = self.client.get('/api/tasks/99999/agreement/')
         assert response.status_code == 404
         assert response.json() == {'error': 'Task not found'}
 
@@ -294,7 +294,7 @@ class TestTaskDistributionAPI(APITestCase):
 
         mock_has_permission.side_effect = has_perm
         self.client.force_authenticate(user=self.user)
-        response = self.client.get(f'/api/tasks/{task.id}/distribution/')
+        response = self.client.get(f'/api/tasks/{task.id}/agreement/')
         assert response.status_code == 403
 
     @patch('tasks.api.flag_set')
@@ -302,7 +302,7 @@ class TestTaskDistributionAPI(APITestCase):
         mock_flag_set.return_value = True
         task = TaskFactory(project=self.project)
         self.client.force_authenticate(user=self.user)
-        response = self.client.get(f'/api/tasks/{task.id}/distribution/')
+        response = self.client.get(f'/api/tasks/{task.id}/agreement/')
         assert response.status_code == 200
         data = response.json()
         assert data['total_annotations'] == 0
@@ -337,7 +337,7 @@ class TestTaskDistributionAPI(APITestCase):
             ],
         )
         self.client.force_authenticate(user=self.user)
-        response = self.client.get(f'/api/tasks/{task.id}/distribution/')
+        response = self.client.get(f'/api/tasks/{task.id}/agreement/')
         assert response.status_code == 200
         data = response.json()
         assert data['total_annotations'] == 2
@@ -387,7 +387,7 @@ class TestTaskDistributionAPI(APITestCase):
             ],
         )
         self.client.force_authenticate(user=self.user)
-        response = self.client.get(f'/api/tasks/{task.id}/distribution/')
+        response = self.client.get(f'/api/tasks/{task.id}/agreement/')
         assert response.status_code == 200
         data = response.json()
         assert data['total_annotations'] == 3
@@ -425,7 +425,7 @@ class TestTaskDistributionAPI(APITestCase):
             ],
         )
         self.client.force_authenticate(user=self.user)
-        response = self.client.get(f'/api/tasks/{task.id}/distribution/')
+        response = self.client.get(f'/api/tasks/{task.id}/agreement/')
         assert response.status_code == 200
         data = response.json()
         assert data['total_annotations'] == 2
@@ -463,7 +463,7 @@ class TestTaskDistributionAPI(APITestCase):
             ],
         )
         self.client.force_authenticate(user=self.user)
-        response = self.client.get(f'/api/tasks/{task.id}/distribution/')
+        response = self.client.get(f'/api/tasks/{task.id}/agreement/')
         assert response.status_code == 200
         data = response.json()
         assert data['total_annotations'] == 2
@@ -500,7 +500,7 @@ class TestTaskDistributionAPI(APITestCase):
             ],
         )
         self.client.force_authenticate(user=self.user)
-        response = self.client.get(f'/api/tasks/{task.id}/distribution/')
+        response = self.client.get(f'/api/tasks/{task.id}/agreement/')
         assert response.status_code == 200
         data = response.json()
         assert data['total_annotations'] == 2
@@ -538,7 +538,7 @@ class TestTaskDistributionAPI(APITestCase):
             ],
         )
         self.client.force_authenticate(user=self.user)
-        response = self.client.get(f'/api/tasks/{task.id}/distribution/')
+        response = self.client.get(f'/api/tasks/{task.id}/agreement/')
         assert response.status_code == 200
         data = response.json()
         assert data['total_annotations'] == 2
@@ -577,7 +577,7 @@ class TestTaskDistributionAPI(APITestCase):
             ],
         )
         self.client.force_authenticate(user=self.user)
-        response = self.client.get(f'/api/tasks/{task.id}/distribution/')
+        response = self.client.get(f'/api/tasks/{task.id}/agreement/')
         assert response.status_code == 200
         data = response.json()
         assert data['total_annotations'] == 1
@@ -613,7 +613,7 @@ class TestTaskDistributionAPI(APITestCase):
             ],
         )
         self.client.force_authenticate(user=self.user)
-        response = self.client.get(f'/api/tasks/{task.id}/distribution/')
+        response = self.client.get(f'/api/tasks/{task.id}/agreement/')
         assert response.status_code == 200
         data = response.json()
         assert data['total_annotations'] == 1

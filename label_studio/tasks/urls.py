@@ -21,8 +21,8 @@ _api_urlpatterns = [
         api.AnnotationDraftListAPI.as_view(),
         name='task-annotations-drafts',
     ),
-    # Distribution endpoint for Summary view
-    path('<int:pk>/distribution/', api.TaskDistributionAPI.as_view(), name='task-distribution'),
+    # Agreement endpoint for Summary view
+    path('<int:pk>/agreement/', api.TaskDistributionAPI.as_view(), name='task-agreement'),
 ]
 
 _api_annotations_urlpatterns = [

@@ -24,7 +24,7 @@ type DistributionData = {
 };
 
 const fetchDistribution = async (taskId: number | string): Promise<DistributionData> => {
-  const response = await fetch(`/api/tasks/${taskId}/distribution/`);
+  const response = await fetch(`/api/tasks/${taskId}/agreement/`);
   if (!response.ok) {
     throw new Error("Failed to load distribution");
   }
@@ -297,7 +297,7 @@ export const AggregationTableRow = ({
     isLoading,
     error,
   } = useQuery({
-    queryKey: ["task-distribution", taskId],
+    queryKey: ["task-agreement", taskId],
     queryFn: () => fetchDistribution(taskId!),
     enabled: useApiData && !!taskId,
     staleTime: 30000, // Consider data fresh for 30 seconds
