@@ -20,7 +20,7 @@ import {
   Side,
   type StoredPanelState,
   type ViewportSize,
-  ShowCustomTab,
+  type ShowCustomTab,
 } from "./types";
 
 export const determineLeftOrRight = (event: any, droppableElement?: ReactNode) => {
@@ -151,11 +151,7 @@ const checkForCustomTab = (state: Record<string, PanelBBox>, showCustomTab: Show
       return fixCustomTab(state, "regions-relations", showCustomTab);
     } else if (customTab.title !== showCustomTab) {
       // remove the custom tab from the state and add it back with the new title
-      return fixCustomTab(
-        fixCustomTab(state, panel, false),
-        panel,
-        showCustomTab,
-      );
+      return fixCustomTab(fixCustomTab(state, panel, false), panel, showCustomTab);
     }
   } else {
     const panel = findPanelWithCustomTab(state);
