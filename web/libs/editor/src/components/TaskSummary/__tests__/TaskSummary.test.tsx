@@ -2,7 +2,7 @@ import type { ReactElement } from "react";
 import { render, screen } from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import type { MSTAnnotation, MSTStore } from "../../../stores/types";
-import { FF_FIT_720_LAZY_LOAD_ANNOTATIONS } from "../../../utils/feature-flags";
+import { FF_FIT_720_LAZY_LOAD_ANNOTATIONS } from "@humansignal/core/lib/utils/feature-flags";
 import TaskSummary from "../TaskSummary";
 
 const createTestQueryClient = () =>
@@ -48,11 +48,6 @@ Object.defineProperty(window, "APP_SETTINGS", {
   },
   writable: true,
 });
-
-const createTestQueryClient = () =>
-  new QueryClient({
-    defaultOptions: { queries: { retry: false } },
-  });
 
 const renderWithProviders = (
   ui: React.ReactElement,

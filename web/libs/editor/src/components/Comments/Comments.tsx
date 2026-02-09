@@ -6,7 +6,8 @@ import { cn } from "../../utils/bem";
 import { CommentForm } from "./Comment/CommentForm";
 import { CommentsList } from "./Comment/CommentsList";
 import { useMounted } from "../../common/Utils/useMounted";
-import { FF_DEV_3034, FF_FIT_720_LAZY_LOAD_ANNOTATIONS, isFF } from "../../utils/feature-flags";
+import { FF_DEV_3034, isFF } from "../../utils/feature-flags";
+import { FF_FIT_720_LAZY_LOAD_ANNOTATIONS } from "@humansignal/core/lib/utils/feature-flags";
 
 import "./Comments.scss";
 
