@@ -66,29 +66,48 @@ const SelectedItemsGroup = ({
     [onDeselectAll, disabled],
   );
 
+  const hasNoItems = selectedOptions.length === 0;
+
+  // Collapse the group when no items are selected
+  useEffect(() => {
+    if (hasNoItems && expanded) {
+      onToggleExpand();
+    }
+  }, [hasNoItems, expanded, onToggleExpand]);
+
   return (
     <div className={styles.selectedItemsGroup}>
       {/* Header - Always visible */}
       <button
         type="button"
         className={styles.selectedItemsHeader}
-        onClick={onToggleExpand}
+        onClick={hasNoItems ? undefined : onToggleExpand}
         aria-expanded={expanded}
         aria-label={`Selected items group, ${selectedOptions.length} items selected`}
+        disabled={hasNoItems}
+        style={{ cursor: hasNoItems ? "default" : "pointer" }}
       >
         {/* Caret icon */}
         {expanded ? (
-          <IconChevron className={styles.selectedItemsCaret} aria-hidden="true" />
+          <IconChevron
+            className={styles.selectedItemsCaret}
+            aria-hidden="true"
+            style={{ opacity: hasNoItems ? 0.3 : 1 }}
+          />
         ) : (
-          <IconChevronDown className={styles.selectedItemsCaret} aria-hidden="true" />
+          <IconChevronDown
+            className={styles.selectedItemsCaret}
+            aria-hidden="true"
+            style={{ opacity: hasNoItems ? 0.3 : 1 }}
+          />
         )}
 
         {/* Deselect all checkbox */}
         <Checkbox
           tabIndex={-1}
-          checked={true}
+          checked={selectedOptions.length > 0}
           readOnly
-          disabled={disabled}
+          disabled={disabled || selectedOptions.length === 0}
           onClick={handleDeselectAllClick}
           aria-label="Deselect all items"
         />
@@ -105,25 +124,29 @@ const SelectedItemsGroup = ({
       {/* Content - Conditionally rendered when expanded */}
       {expanded && (
         <div className={styles.selectedItemsContent}>
-          {selectedOptions.map((option, index) => {
-            const optionValue = option?.value ?? option;
-            const label = option?.label ?? optionValue;
+          {selectedOptions.length > 0 ? (
+            <CommandGroup>
+              {selectedOptions.map((option, index) => {
+                const optionValue = option?.value ?? option;
+                const label = option?.label ?? optionValue;
 
-            return (
-              <button
-                key={`selected-${optionValue}-${index}`}
-                type="button"
-                className={styles.selectedItem}
-                onClick={() => handleItemClick(option)}
-                tabIndex={disabled ? -1 : 0}
-                aria-label={`Deselect ${label}`}
-                disabled={disabled}
-              >
-                <Checkbox tabIndex={-1} checked={true} readOnly disabled={disabled} />
-                <div className="w-full min-w-0 truncate">{label}</div>
-              </button>
-            );
-          })}
+                return (
+                  <Option
+                    key={`selected-${optionValue}-${index}`}
+                    value={optionValue}
+                    label={label}
+                    isOptionSelected={true}
+                    disabled={disabled}
+                    multiple={true}
+                    onSelect={() => handleItemClick(option)}
+                    style={{ paddingLeft: "var(--spacing-wider)" }}
+                  />
+                );
+              })}
+            </CommandGroup>
+          ) : (
+            <div className="px-base py-tight text-neutral-content-subtler text-center">No items selected</div>
+          )}
         </div>
       )}
     </div>
@@ -199,6 +222,7 @@ export const Select = forwardRef(
       onClose,
       onOpen,
       footer,
+      alwaysShowSelectedGroup = false,
       ...props
     }: SelectProps<T, A>,
     _ref: ForwardedRef<HTMLSelectElement>,
@@ -512,7 +536,7 @@ export const Select = forwardRef(
                 })}
               >
                 {/* Selected Items Group - Only for multiple + searchable + virtual lists */}
-                {multiple && searchable && isVirtualList && selectedOptions.length > 0 && (
+                {multiple && searchable && isVirtualList && (selectedOptions.length > 0 || alwaysShowSelectedGroup) && (
                   <SelectedItemsGroup
                     expanded={selectedGroupExpanded}
                     onToggleExpand={() => setSelectedGroupExpanded(!selectedGroupExpanded)}

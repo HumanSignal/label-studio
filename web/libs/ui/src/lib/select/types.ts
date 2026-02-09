@@ -88,6 +88,7 @@ export type SelectProps<T, A extends SelectOption<T>[]> = {
   itemCount?: number;
   onClose?: () => void;
   onOpen?: () => void;
+  alwaysShowSelectedGroup?: boolean;
 } & SelectVirtualizedProps &
   Omit<React.SelectHTMLAttributes<HTMLSelectElement>, "value" | "placeholder">;
 

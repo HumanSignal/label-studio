@@ -137,34 +137,3 @@
   border-top: 1px solid var(--color-neutral-border-subtler);
 }
 
-.selectedItem {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-tight);
-  padding: var(--spacing-tight);
-  padding-left: var(--spacing-widest);
-  cursor: pointer;
-  transition: background 150ms ease-out;
-
-  // Button reset styles
-  width: 100%;
-  border: none;
-  background: transparent;
-  text-align: left;
-  font: inherit;
-  color: inherit;
-
-  &:hover:not(:disabled) {
-    background: var(--color-primary-background-hover);
-  }
-
-  &:focus {
-    outline: 2px solid var(--color-primary-border);
-    outline-offset: -2px;
-  }
-
-  &:disabled {
-    cursor: not-allowed;
-    opacity: 0.5;
-  }
-}
