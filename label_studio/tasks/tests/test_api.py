@@ -1,9 +1,12 @@
+import unittest
 from unittest.mock import patch
 
+from core.feature_flags import flag_set
 from organizations.tests.factories import OrganizationFactory
+from projects.models import Project
 from projects.tests.factories import ProjectFactory
 from rest_framework.test import APITestCase
-from tasks.tests.factories import TaskFactory
+from tasks.tests.factories import AnnotationFactory, PredictionFactory, TaskFactory
 
 
 class TestTaskAPI(APITestCase):
@@ -236,3 +239,382 @@ class TestTaskAPIResolveUri(APITestCase):
         assert response_data['image_2'] == 'gs://bucket-2/image2.png'
         assert response_data['audio'] == 'azure-blob://container/audio.mp3'
         assert response_data['text'] == 'Plain text field'
+
+
+class TestTaskDistributionAPIFeatureOff(APITestCase):
+    """When feature flag is off, distribution endpoint returns 403. Always run this test."""
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.organization = OrganizationFactory()
+        cls.project = ProjectFactory(organization=cls.organization)
+        cls.user = cls.organization.created_by
+
+    @patch('tasks.api.flag_set')
+    def test_distribution_returns_403_when_feature_flag_disabled(self, mock_flag_set):
+        mock_flag_set.return_value = False
+        task = TaskFactory(project=self.project)
+        self.client.force_authenticate(user=self.user)
+        response = self.client.get(f'/api/tasks/{task.id}/distribution/')
+        assert response.status_code == 403
+        assert 'detail' in response.json() or 'error' in response.json()
+
+
+@unittest.skipUnless(
+    flag_set('fflag_fix_all_fit_720_lazy_load_annotations', user=None),
+    'Distribution API tests require fflag_fix_all_fit_720_lazy_load_annotations to be on',
+)
+class TestTaskDistributionAPI(APITestCase):
+    """Tests for TaskDistributionAPI (GET /api/tasks/<id>/distribution/). Run only when feature flag is on."""
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.organization = OrganizationFactory()
+        cls.project = ProjectFactory(organization=cls.organization)
+        cls.user = cls.organization.created_by
+
+    @patch('tasks.api.flag_set')
+    def test_distribution_returns_404_for_nonexistent_task(self, mock_flag_set):
+        mock_flag_set.return_value = True
+        self.client.force_authenticate(user=self.user)
+        response = self.client.get('/api/tasks/99999/distribution/')
+        assert response.status_code == 404
+        assert response.json() == {'error': 'Task not found'}
+
+    @patch('tasks.api.flag_set')
+    @patch.object(Project, 'has_permission')
+    def test_distribution_permission_denied_for_other_project(self, mock_has_permission, mock_flag_set):
+        mock_flag_set.return_value = True
+        other_org = OrganizationFactory()
+        other_project = ProjectFactory(organization=other_org)
+        task = TaskFactory(project=other_project)
+        # In OSS Project.has_permission is a stub that always returns True; patch so other_project denies access
+        def has_perm(project, user):
+            return project.id != other_project.id
+
+        mock_has_permission.side_effect = has_perm
+        self.client.force_authenticate(user=self.user)
+        response = self.client.get(f'/api/tasks/{task.id}/distribution/')
+        assert response.status_code == 403
+
+    @patch('tasks.api.flag_set')
+    def test_distribution_empty_task_returns_zero_annotations(self, mock_flag_set):
+        mock_flag_set.return_value = True
+        task = TaskFactory(project=self.project)
+        self.client.force_authenticate(user=self.user)
+        response = self.client.get(f'/api/tasks/{task.id}/distribution/')
+        assert response.status_code == 200
+        data = response.json()
+        assert data['total_annotations'] == 0
+        assert data['distributions'] == {}
+
+    @patch('tasks.api.flag_set')
+    def test_distribution_with_rectanglelabels(self, mock_flag_set):
+        mock_flag_set.return_value = True
+        task = TaskFactory(project=self.project)
+        AnnotationFactory(
+            task=task,
+            project=self.project,
+            result=[
+                {
+                    'from_name': 'label',
+                    'to_name': 'image',
+                    'type': 'rectanglelabels',
+                    'value': {'rectanglelabels': ['Car', 'Car']},
+                }
+            ],
+        )
+        AnnotationFactory(
+            task=task,
+            project=self.project,
+            result=[
+                {
+                    'from_name': 'label',
+                    'to_name': 'image',
+                    'type': 'rectanglelabels',
+                    'value': {'rectanglelabels': ['Person']},
+                }
+            ],
+        )
+        self.client.force_authenticate(user=self.user)
+        response = self.client.get(f'/api/tasks/{task.id}/distribution/')
+        assert response.status_code == 200
+        data = response.json()
+        assert data['total_annotations'] == 2
+        assert data['distributions']['label'] == {
+            'type': 'rectanglelabels',
+            'labels': {'Car': 2, 'Person': 1},
+        }
+
+    @patch('tasks.api.flag_set')
+    def test_distribution_with_choices(self, mock_flag_set):
+        mock_flag_set.return_value = True
+        task = TaskFactory(project=self.project)
+        AnnotationFactory(
+            task=task,
+            project=self.project,
+            result=[
+                {
+                    'from_name': 'sentiment',
+                    'to_name': 'text',
+                    'type': 'choices',
+                    'value': {'choices': ['Positive']},
+                }
+            ],
+        )
+        AnnotationFactory(
+            task=task,
+            project=self.project,
+            result=[
+                {
+                    'from_name': 'sentiment',
+                    'to_name': 'text',
+                    'type': 'choices',
+                    'value': {'choices': ['Negative']},
+                }
+            ],
+        )
+        AnnotationFactory(
+            task=task,
+            project=self.project,
+            result=[
+                {
+                    'from_name': 'sentiment',
+                    'to_name': 'text',
+                    'type': 'choices',
+                    'value': {'choices': ['Positive']},
+                }
+            ],
+        )
+        self.client.force_authenticate(user=self.user)
+        response = self.client.get(f'/api/tasks/{task.id}/distribution/')
+        assert response.status_code == 200
+        data = response.json()
+        assert data['total_annotations'] == 3
+        assert data['distributions']['sentiment'] == {
+            'type': 'choices',
+            'labels': {'Positive': 2, 'Negative': 1},
+        }
+
+    @patch('tasks.api.flag_set')
+    def test_distribution_with_rating(self, mock_flag_set):
+        mock_flag_set.return_value = True
+        task = TaskFactory(project=self.project)
+        AnnotationFactory(
+            task=task,
+            project=self.project,
+            result=[
+                {
+                    'from_name': 'rating',
+                    'to_name': 'text',
+                    'type': 'rating',
+                    'value': {'rating': 4},
+                }
+            ],
+        )
+        AnnotationFactory(
+            task=task,
+            project=self.project,
+            result=[
+                {
+                    'from_name': 'rating',
+                    'to_name': 'text',
+                    'type': 'rating',
+                    'value': {'rating': 5},
+                }
+            ],
+        )
+        self.client.force_authenticate(user=self.user)
+        response = self.client.get(f'/api/tasks/{task.id}/distribution/')
+        assert response.status_code == 200
+        data = response.json()
+        assert data['total_annotations'] == 2
+        assert data['distributions']['rating']['type'] == 'rating'
+        assert data['distributions']['rating']['average'] == 4.5
+        assert data['distributions']['rating']['count'] == 2
+        assert 'values' not in data['distributions']['rating']
+
+    @patch('tasks.api.flag_set')
+    def test_distribution_with_number(self, mock_flag_set):
+        mock_flag_set.return_value = True
+        task = TaskFactory(project=self.project)
+        AnnotationFactory(
+            task=task,
+            project=self.project,
+            result=[
+                {
+                    'from_name': 'count',
+                    'to_name': 'text',
+                    'type': 'number',
+                    'value': {'number': 10},
+                }
+            ],
+        )
+        AnnotationFactory(
+            task=task,
+            project=self.project,
+            result=[
+                {
+                    'from_name': 'count',
+                    'to_name': 'text',
+                    'type': 'number',
+                    'value': {'number': 20},
+                }
+            ],
+        )
+        self.client.force_authenticate(user=self.user)
+        response = self.client.get(f'/api/tasks/{task.id}/distribution/')
+        assert response.status_code == 200
+        data = response.json()
+        assert data['total_annotations'] == 2
+        assert data['distributions']['count']['type'] == 'number'
+        assert data['distributions']['count']['average'] == 15.0
+        assert data['distributions']['count']['count'] == 2
+
+    @patch('tasks.api.flag_set')
+    def test_distribution_with_taxonomy(self, mock_flag_set):
+        mock_flag_set.return_value = True
+        task = TaskFactory(project=self.project)
+        AnnotationFactory(
+            task=task,
+            project=self.project,
+            result=[
+                {
+                    'from_name': 'tax',
+                    'to_name': 'text',
+                    'type': 'taxonomy',
+                    'value': {'taxonomy': [['Animals', 'Dog']]},
+                }
+            ],
+        )
+        AnnotationFactory(
+            task=task,
+            project=self.project,
+            result=[
+                {
+                    'from_name': 'tax',
+                    'to_name': 'text',
+                    'type': 'taxonomy',
+                    'value': {'taxonomy': [['Animals', 'Cat']]},
+                }
+            ],
+        )
+        self.client.force_authenticate(user=self.user)
+        response = self.client.get(f'/api/tasks/{task.id}/distribution/')
+        assert response.status_code == 200
+        data = response.json()
+        assert data['total_annotations'] == 2
+        assert data['distributions']['tax'] == {
+            'type': 'taxonomy',
+            'labels': {'Dog': 1, 'Cat': 1},
+        }
+
+    @patch('tasks.api.flag_set')
+    def test_distribution_with_pairwise(self, mock_flag_set):
+        mock_flag_set.return_value = True
+        task = TaskFactory(project=self.project)
+        AnnotationFactory(
+            task=task,
+            project=self.project,
+            result=[
+                {
+                    'from_name': 'pair',
+                    'to_name': 'text',
+                    'type': 'pairwise',
+                    'value': {'selected': 'left'},
+                }
+            ],
+        )
+        AnnotationFactory(
+            task=task,
+            project=self.project,
+            result=[
+                {
+                    'from_name': 'pair',
+                    'to_name': 'text',
+                    'type': 'pairwise',
+                    'value': {'selected': 'right'},
+                }
+            ],
+        )
+        self.client.force_authenticate(user=self.user)
+        response = self.client.get(f'/api/tasks/{task.id}/distribution/')
+        assert response.status_code == 200
+        data = response.json()
+        assert data['total_annotations'] == 2
+        assert data['distributions']['pair'] == {
+            'type': 'pairwise',
+            'labels': {'left': 1, 'right': 1},
+        }
+
+    @patch('tasks.api.flag_set')
+    def test_distribution_excludes_cancelled_annotations(self, mock_flag_set):
+        mock_flag_set.return_value = True
+        task = TaskFactory(project=self.project)
+        AnnotationFactory(
+            task=task,
+            project=self.project,
+            result=[
+                {
+                    'from_name': 'label',
+                    'to_name': 'image',
+                    'type': 'rectanglelabels',
+                    'value': {'rectanglelabels': ['Car']},
+                }
+            ],
+        )
+        AnnotationFactory(
+            task=task,
+            project=self.project,
+            was_cancelled=True,
+            result=[
+                {
+                    'from_name': 'label',
+                    'to_name': 'image',
+                    'type': 'rectanglelabels',
+                    'value': {'rectanglelabels': ['Person']},
+                }
+            ],
+        )
+        self.client.force_authenticate(user=self.user)
+        response = self.client.get(f'/api/tasks/{task.id}/distribution/')
+        assert response.status_code == 200
+        data = response.json()
+        assert data['total_annotations'] == 1
+        assert data['distributions']['label']['labels'] == {'Car': 1}
+
+    @patch('tasks.api.flag_set')
+    def test_distribution_includes_predictions_in_label_counts(self, mock_flag_set):
+        """Predictions are merged into distributions so aggregate matches client-side (develop / FF off)."""
+        mock_flag_set.return_value = True
+        task = TaskFactory(project=self.project)
+        AnnotationFactory(
+            task=task,
+            project=self.project,
+            result=[
+                {
+                    'from_name': 'label',
+                    'to_name': 'image',
+                    'type': 'rectanglelabels',
+                    'value': {'rectanglelabels': ['Car', 'Car']},
+                }
+            ],
+        )
+        PredictionFactory(
+            task=task,
+            project=self.project,
+            result=[
+                {
+                    'from_name': 'label',
+                    'to_name': 'image',
+                    'type': 'rectanglelabels',
+                    'value': {'rectanglelabels': ['Car']},
+                }
+            ],
+        )
+        self.client.force_authenticate(user=self.user)
+        response = self.client.get(f'/api/tasks/{task.id}/distribution/')
+        assert response.status_code == 200
+        data = response.json()
+        assert data['total_annotations'] == 1
+        assert data['distributions']['label']['labels'] == {'Car': 3}

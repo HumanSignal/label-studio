@@ -33,6 +33,8 @@ import { sanitizeHtml } from "../../utils/html";
 import { reactCleaner } from "../../utils/reactCleaner";
 import { guidGenerator } from "../../utils/unique";
 import { isDefined, sortAnnotations } from "../../utils/utilities";
+import { QueryClientProvider } from "@tanstack/react-query";
+import { queryClient } from "@humansignal/core/lib/utils/query-client";
 import { ToastProvider, ToastViewport } from "@humansignal/ui/lib/toast/toast";
 import { setEditorQueryClient } from "../../hooks/useAnnotationQuery";
 
@@ -54,20 +56,6 @@ import { ViewAll } from "./ViewAll";
  * Styles
  */
 import "./App.scss";
-
-/**
- * FIT-720: QueryClient for the editor - handles distribution and other queries
- */
-const editorQueryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      refetchOnWindowFocus: false,
-      gcTime: 5 * 60 * 1000, // 5 minutes
-      staleTime: 30000, // 30 seconds
-      networkMode: "always",
-    },
-  },
-});
 
 /** 
  * Check if annotation has any tag that should be rendered in sidebar
@@ -91,8 +79,7 @@ class App extends Component {
   relationsRef = React.createRef();
 
   componentDidMount() {
-    // FIT-720: Set global query client reference for cache invalidation
-    setEditorQueryClient(editorQueryClient);
+    setEditorQueryClient(queryClient);
 
     // Hack to activate app hotkeys
     window.blur();
@@ -271,11 +258,11 @@ class App extends Component {
     const newUIEnabled = isFF(FF_DEV_3873);
 
     return (
-      <QueryClientProvider client={editorQueryClient}>
-        <div
-          className={cn("editor").mod({ fullscreen: settings.fullscreen }).toClassName()}
-          ref={isFF(FF_LSDV_4620_3_ML) ? reactCleaner(this) : null}
-        >
+      <div
+        className={cn("editor").mod({ fullscreen: settings.fullscreen }).toClassName()}
+        ref={isFF(FF_LSDV_4620_3_ML) ? reactCleaner(this) : null}
+      >
+        <QueryClientProvider client={queryClient}>
           <Settings store={store} />
           <Provider store={store}>
             <ToastProvider>
@@ -291,6 +278,7 @@ class App extends Component {
                 <>
                   {store.showingDescription && (
                     <div className="p-base mb-base">
+                      {/* biome-ignore lint/security/noDangerouslySetInnerHtml: we need html here and it's sanitized */}
                       <div dangerouslySetInnerHTML={{ __html: sanitizeHtml(store.description) }} />
                     </div>
                   )}
@@ -344,8 +332,8 @@ class App extends Component {
             </ToastProvider>
           </Provider>
           {store.hasInterface("debug") && <Debug store={store} />}
-        </div>
-      </QueryClientProvider>
+        </QueryClientProvider>
+      </div>
     );
   }
 

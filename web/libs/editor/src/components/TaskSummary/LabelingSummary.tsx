@@ -30,7 +30,7 @@ type Props = {
   controls: ControlTag[];
   onSelect: (entity: AnnotationSummary) => void;
   hideInfo: boolean;
-  taskId?: number | string; // FIT-720: Task ID for distribution API
+  taskId?: number | string;
 };
 
 const cellFn = (control: ControlTag, render: RendererType) => (props: { row: Row<AnnotationSummary> }) => {
@@ -444,6 +444,7 @@ export const LabelingSummary = observer(({ hideInfo, annotations: all, controls,
                 headers={table.getHeaderGroups()[0]?.headers ?? []}
                 controls={controls}
                 annotations={annotations}
+                taskId={taskId}
               />
             )}
             {/* Annotation Rows */}

@@ -164,13 +164,6 @@ export const FF_IMAGE_MEMORY_USAGE = "fflag_feat_front_optic_1479_improve_image_
 export const FF_VIDEO_FRAME_SEEK_PRECISION = "fflag_fix_front_optic_1608_improve_video_frame_seek_precision_short";
 
 /**
- * Lazy load annotations in LabelStream to improve performance for tasks with many annotations
- * Also enables virtualization of annotation tabs carousel
- * @link https://app.launchdarkly.com/default/production/features/fflag_fix_all_fit_720_lazy_load_annotations
- */
-export const FF_FIT_720_LAZY_LOAD_ANNOTATIONS = "fflag_fix_all_fit_720_lazy_load_annotations";
-
-/**
  * Strict task overlap enforcement - prevents annotators from submitting
  * annotations when task overlap limit has been reached
  */

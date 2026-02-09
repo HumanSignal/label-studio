@@ -576,6 +576,12 @@
         "decorators": ""
     },
     {
+        "url": "/api/tasks/<int:pk>/distribution/",
+        "module": "tasks.api.TaskDistributionAPI",
+        "name": "tasks:api:task-distribution",
+        "decorators": ""
+    },
+    {
         "url": "/api/annotations/<int:pk>/",
         "module": "tasks.api.AnnotationAPI",
         "name": "tasks:api-annotations:annotation-detail",

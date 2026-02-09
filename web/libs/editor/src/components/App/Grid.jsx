@@ -1,6 +1,6 @@
 /**
  * Grid component for Compare view - renders annotation panels side-by-side
- * FIT-720: Added virtualization support for large annotation counts
+ * Added virtualization support for large annotation counts
  */
 
 import React, { Component, useCallback, useMemo, useRef, useState } from "react";

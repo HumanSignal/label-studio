@@ -6,11 +6,10 @@ import type { RawResult } from "../../stores/types";
 import { Chip } from "./Chip";
 import type { AnnotationSummary, ControlTag } from "./types";
 import { getLabelCounts } from "./utils";
-import { FF_FIT_720_LAZY_LOAD_ANNOTATIONS, isFF } from "../../utils/feature-flags";
+import { isActive, FF_FIT_720_LAZY_LOAD_ANNOTATIONS } from "@humansignal/core/lib/utils/feature-flags";
 
 import styles from "./TaskSummary.module.scss";
 
-// FIT-720: Type for distribution API response
 type DistributionData = {
   total_annotations: number;
   distributions: Record<
@@ -24,7 +23,6 @@ type DistributionData = {
   >;
 };
 
-// FIT-720: Fetch function for distribution data
 const fetchDistribution = async (taskId: number | string): Promise<DistributionData> => {
   const response = await fetch(`/api/tasks/${taskId}/distribution/`);
   if (!response.ok) {
@@ -50,10 +48,11 @@ export const AggregationCell = ({
   isExpanded,
 }: { control: ControlTag; annotations: AnnotationSummary[]; isExpanded: boolean }) => {
   const allResults = annotations.flatMap((ann) => ann.results.filter((r) => r.from_name === control.name));
-  const totalAnnotations = annotations.length;
+  // Exclude predictions for percentage denominator to match backend TaskDistributionAPI
+  const totalAnnotations = annotations.filter((a) => a.type === "annotation").length;
 
   if (!allResults.length) {
-    return <span className="text-neutral-content-subtler text-xs italic">No data</span>;
+    return <span className="text-neutral-content-subtler text-xs italic">N/A</span>;
   }
 
   // Handle labels-type controls (rectanglelabels, polygonlabels, labels, etc.)
@@ -163,12 +162,12 @@ export const AggregationCell = ({
     );
   }
 
-  // Handle rating - calculate average rating across all annotations
+  // Handle rating - average over annotations that have a value (matches backend TaskDistributionAPI)
   if (control.type === "rating") {
     const ratings = allResults.map((r) => resultValue(r)).filter(Boolean);
     if (!ratings.length) return <span className="text-neutral-content-subtler text-xs italic">No ratings</span>;
 
-    const avgRating = ratings.reduce((sum, val) => sum + val, 0) / totalAnnotations;
+    const avgRating = ratings.reduce((sum, val) => sum + val, 0) / ratings.length;
     return (
       <span className="text-sm font-medium text-neutral-content-subtle">
         Avg: <span className="font-bold">{avgRating.toFixed(1)}</span> <span className="text-yellow-500">★</span>
@@ -176,12 +175,12 @@ export const AggregationCell = ({
     );
   }
 
-  // Handle number - calculate average number value across all annotations
+  // Handle number - average over annotations that have a value (matches backend TaskDistributionAPI)
   if (control.type === "number") {
     const numbers = allResults.map((r) => resultValue(r)).filter((v) => v !== null && v !== undefined);
     if (!numbers.length) return <span className="text-neutral-content-subtler text-xs italic">No data</span>;
 
-    const avg = numbers.reduce((sum, val) => sum + Number(val), 0) / totalAnnotations;
+    const avg = numbers.reduce((sum, val) => sum + Number(val), 0) / numbers.length;
     return (
       <span className="text-sm font-medium text-neutral-content-subtle">
         Avg: <span className="font-bold">{avg.toFixed(1)}</span>
@@ -193,7 +192,6 @@ export const AggregationCell = ({
   return <span className="text-neutral-content-subtler text-xs italic">N/A</span>;
 };
 
-// FIT-720: Skeleton loader for distribution cells
 const DistributionSkeleton = () => (
   <div className="flex items-center gap-2">
     <div className="h-5 w-16 bg-neutral-surface-subtle rounded animate-pulse" />
@@ -201,7 +199,6 @@ const DistributionSkeleton = () => (
   </div>
 );
 
-// FIT-720: Cell component that renders from API distribution data
 const ApiAggregationCell = ({
   control,
   distribution,
@@ -223,7 +220,7 @@ const ApiAggregationCell = ({
         </span>
       );
     }
-    return <span className="text-neutral-content-subtler text-xs italic">No data</span>;
+    return <span className="text-neutral-content-subtler text-xs italic">N/A</span>;
   }
 
   // Sort labels by count descending
@@ -274,7 +271,7 @@ const ApiAggregationCell = ({
  * Includes a toggle button in the first cell that only appears when content overflows.
  * The toggle expands/collapses the cells to show full content.
  *
- * FIT-720: With lazy loading, fetches distribution from dedicated API endpoint
+ * With lazy loading, fetches distribution from dedicated API endpoint
  * for efficient aggregation without N+1 queries.
  */
 export const AggregationTableRow = ({
@@ -293,9 +290,8 @@ export const AggregationTableRow = ({
   const rowRef = useRef<HTMLTableRowElement>(null);
 
   // For non-lazy loading mode, compute from annotations as before
-  const useApiData = isFF(FF_FIT_720_LAZY_LOAD_ANNOTATIONS) && taskId;
+  const useApiData = isActive(FF_FIT_720_LAZY_LOAD_ANNOTATIONS) && taskId;
 
-  // FIT-720: Use TanStack Query for distribution data - handles deduplication and caching
   const {
     data: distributionData,
     isLoading,
@@ -345,7 +341,7 @@ export const AggregationTableRow = ({
               ) : (
                 <span className="font-semibold text-neutral-content">Distribution</span>
               )}
-              {/* FIT-720: Show total count from API */}
+              {/* Show total count from API */}
               {useApiData && distributionData && (
                 <span className="text-xs text-neutral-content-subtle">
                   {distributionData.total_annotations} annotations
@@ -359,9 +355,9 @@ export const AggregationTableRow = ({
             className="px-4 py-2.5 overflow-hidden border-y-2 border-neutral-border-bold"
             style={{ width: header.getSize() }}
           >
-            {isLoading ? (
+            {useApiData && isLoading ? (
               <DistributionSkeleton />
-            ) : error ? (
+            ) : useApiData && error ? (
               <span className="text-neutral-content-subtler text-xs italic">Failed to load</span>
             ) : useApiData && distributionData ? (
               <ApiAggregationCell
