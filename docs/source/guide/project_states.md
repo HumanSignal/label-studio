@@ -1,6 +1,6 @@
 ---
 title: Project and Task State Management
-short: Project and Task States
+short: Project and task states
 type: guide
 tier: enterprise
 order: 105
