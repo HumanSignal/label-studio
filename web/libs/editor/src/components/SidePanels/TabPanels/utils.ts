@@ -20,6 +20,7 @@ import {
   Side,
   type StoredPanelState,
   type ViewportSize,
+  ShowCustomTab,
 } from "./types";
 
 export const determineLeftOrRight = (event: any, droppableElement?: ReactNode) => {
@@ -119,38 +120,47 @@ export const stateRemovePanelEmptyViews = (state: Record<string, PanelBBox> | nu
   return newState;
 };
 
-// Unconditionally add/remove the custom panel to/from the state at given panel
-const fixCustomPanel = (state: Record<string, PanelBBox>, panelName: string, showCustomPanel: boolean) => {
+// Unconditionally add/remove the custom tab to/from the state at given panel
+const fixCustomTab = (state: Record<string, PanelBBox>, panelName: string, showCustomPanelWithTitle: ShowCustomTab) => {
   const newState: Record<string, PanelBBox> = {
     ...state,
     [panelName]: {
       ...state[panelName],
-      panelViews: showCustomPanel
-        ? [...state[panelName].panelViews, customPanelView]
+      panelViews: showCustomPanelWithTitle
+        ? [...state[panelName].panelViews, { ...customPanelView, title: showCustomPanelWithTitle }]
         : state[panelName].panelViews.filter((view) => view.name !== customPanelView.name),
     },
   };
   return newState;
 };
 
-// Check if the custom panel is present in the state and add/remove it if needed
-// We only need to check "regions-relations" panel
-const checkForCustomPanel = (state: Record<string, PanelBBox>, showCustomPanel: boolean) => {
-  const findPanelWithCustomPanel = (state: Record<string, PanelBBox>) => {
+// Check if the custom tab is present in the state and add/remove it if needed
+// We add it to "regions-relations" panel, plus we fix the title if it's different from the one we need
+const checkForCustomTab = (state: Record<string, PanelBBox>, showCustomTab: ShowCustomTab) => {
+  const findPanelWithCustomTab = (state: Record<string, PanelBBox>) => {
     return Object.keys(state).find((panel) =>
       state[panel].panelViews.some((view) => view.name === customPanelView.name),
     );
   };
 
-  // if we need custom panel but it's not present, or we don't need it but it's there, update the state accordingly
-  if (showCustomPanel) {
-    if (!findPanelWithCustomPanel(state)) {
-      return fixCustomPanel(state, "regions-relations", true);
+  // if we need custom tab but it's not present, or we don't need it but it's there, update the state accordingly
+  if (showCustomTab) {
+    const panel = findPanelWithCustomTab(state);
+    const customTab = panel && state[panel]?.panelViews.find((view) => view.name === customPanelView.name);
+    if (!customTab) {
+      return fixCustomTab(state, "regions-relations", showCustomTab);
+    } else if (customTab.title !== showCustomTab) {
+      // remove the custom tab from the state and add it back with the new title
+      return fixCustomTab(
+        fixCustomTab(state, panel, false),
+        panel,
+        showCustomTab,
+      );
     }
   } else {
-    const panel = findPanelWithCustomPanel(state);
+    const panel = findPanelWithCustomTab(state);
     if (panel) {
-      return fixCustomPanel(state, panel, false);
+      return fixCustomTab(state, panel, false);
     }
   }
 
@@ -206,7 +216,7 @@ const panelViews = [
   },
 ];
 
-// Custom panel for special tags; sits in "regions-relations" panel by default
+// Custom tab for special tags; will be placed in "regions-relations" panel by default
 const customPanelView = panelViews[5];
 
 export const enterprisePanelDefault: Record<string, PanelBBox> = {
@@ -313,28 +323,28 @@ export const checkCollapsedPanelsHaveData = (collapsedSide: PanelsCollapsed, pan
   return collapsedCopy;
 };
 
-export const restorePanel = (showComments: boolean, showCustomPanel = false): StoredPanelState => {
+export const restorePanel = (showComments: boolean, showCustomTab: ShowCustomTab = false): StoredPanelState => {
   const previousState = window.localStorage.getItem("panelState");
   const parsed: StoredPanelState | null = previousState && JSON.parse(previousState);
   const panelData = parsed && parsed.panelData;
   const defaultCollapsedSide = { [Side.left]: false, [Side.right]: false };
   const collapsedSide = parsed?.collapsedSide ?? defaultCollapsedSide;
   const allTabs = panelData && Object.values(panelData).flatMap((panel) => panel.panelViews);
-  // don't use comments tab anywhere if it's disabled
-  const countOfAllAvailableTabs = panelViews.length - (showComments ? 0 : 1);
+  // don't use comments and custom tabs anywhere if it's disabled
+  const countOfAllAvailableTabs = panelViews.length - (showComments ? 0 : 1) - (showCustomTab ? 0 : 1);
 
   // stored state can have less tabs than available, for example if it was stored on old version
   // or if comments were enabled; then return default state
   if (!allTabs || allTabs.length !== countOfAllAvailableTabs) {
     let defaultPanel = showComments ? enterprisePanelDefault : openSourcePanelDefault;
-    if (showComments && showCustomPanel) {
-      defaultPanel = fixCustomPanel(defaultPanel, "regions-relations", true);
+    if (showComments && showCustomTab) {
+      defaultPanel = fixCustomTab(defaultPanel, "regions-relations", showCustomTab);
     }
 
     return { panelData: defaultPanel, collapsedSide: defaultCollapsedSide };
   }
 
-  const fixedPanels = stateRemovePanelEmptyViews(checkForCustomPanel(panelData, showCustomPanel));
+  const fixedPanels = stateRemovePanelEmptyViews(checkForCustomTab(panelData, showCustomTab));
   const withActiveDefaults = setActiveDefaults(fixedPanels);
   const safeCollapsedSide = checkCollapsedPanelsHaveData(collapsedSide, withActiveDefaults);
 
