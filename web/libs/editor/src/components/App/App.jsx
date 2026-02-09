@@ -56,7 +56,7 @@ import { ViewAll } from "./ViewAll";
  */
 import "./App.scss";
 
-/** 
+/**
  * Check if annotation has any tag that should be rendered in sidebar
  * Used to conditionally show the custom tab in the side panel
  * @returns {boolean|string} - false or the title of the tab that should be rendered in sidebar
