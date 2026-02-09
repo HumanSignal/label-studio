@@ -1,6 +1,6 @@
 Feature("Max usage");
 
-const IMAGE = "https://data.heartex.net/open-images/train_0/mini/0030019819f25b28.jpg";
+const IMAGE = "/public/files/images/0030019819f25b28.jpg";
 
 const createImageToolsConfig = ({ maxUsage }) => `
 <View>
@@ -254,7 +254,7 @@ Data(maxUsageDataTable).Scenario(
   <HyperText name="text" valueType="url" value="$url" inline="true" />
 </View>`,
       data: {
-        url: "https://htx-pub.s3.amazonaws.com/example.txt",
+        url: "/public/files/example.txt",
       },
     });
 

@@ -89,7 +89,6 @@ export const ImageEntity = types
       // Store original URL for error recovery
       self._originalUrl = self.src;
 
-      // FIT-720: Use global image cache to prevent re-downloading on annotation switch
       const crossOrigin = self.imageCrossOrigin;
 
       // Check if already cached in global cache
@@ -151,7 +150,6 @@ export const ImageEntity = types
     },
 
     ensurePreloaded() {
-      // FIT-720: First check global image cache
       const cached = imageCache.get(self.src);
       if (cached) {
         self.markAsLoaded(cached.blobUrl, { addCacheRef: true });
