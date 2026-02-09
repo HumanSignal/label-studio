@@ -145,7 +145,7 @@ const SelectedItemsGroup = ({
               })}
             </CommandGroup>
           ) : (
-            <div className="px-4 py-2 text-neutral-content-subtler text-center">No items selected</div>
+            <div className="px-base py-tight text-neutral-content-subtler text-center">No items selected</div>
           )}
         </div>
       )}
