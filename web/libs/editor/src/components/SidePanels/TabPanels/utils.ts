@@ -149,7 +149,8 @@ const checkForCustomTab = (state: Record<string, PanelBBox>, showCustomTab: Show
     const customTab = panel && state[panel]?.panelViews.find((view) => view.name === customPanelView.name);
     if (!customTab) {
       return fixCustomTab(state, "regions-relations", showCustomTab);
-    } else if (customTab.title !== showCustomTab) {
+    }
+    if (customTab.title !== showCustomTab) {
       // remove the custom tab from the state and add it back with the new title
       return fixCustomTab(fixCustomTab(state, panel, false), panel, showCustomTab);
     }
