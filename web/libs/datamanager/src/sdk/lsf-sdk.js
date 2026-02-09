@@ -9,7 +9,7 @@ import {
   FF_FIT_1304_STRICT_OVERLAP,
   isFF,
 } from "../utils/feature-flags";
-import { isActive, FF_FIT_720_LAZY_LOAD_ANNOTATIONS } from "@humansignal/core/lib/utils/feature-flags";
+import { isActive } from "@humansignal/core/lib/utils/feature-flags";
 import { isDefined } from "../utils/utils";
 import { Modal } from "../components/Common/Modal/Modal";
 import { CommentsSdk } from "./comments-sdk";

@@ -26,10 +26,6 @@ const PANEL_WIDTH = 500; // Width of each annotation panel (approximately 50% of
 const PANEL_GAP = 30; // Gap between panels (matches $gap in Grid.module.scss)
 const VIRTUALIZATION_THRESHOLD = 10; // Only virtualize if more than this many annotations
 
-const PANEL_WIDTH = 500; // Width of each annotation panel (approximately 50% of typical viewport)
-const PANEL_GAP = 30; // Gap between panels (matches $gap in Grid.module.scss)
-const VIRTUALIZATION_THRESHOLD = 10; // Only virtualize if more than this many annotations
-
 /***** DON'T TRY THIS AT HOME *****/
 /*
 Grid renders a container which remains untouched all the process.
