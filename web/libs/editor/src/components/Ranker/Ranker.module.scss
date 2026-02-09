@@ -18,7 +18,7 @@
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  overflow-y: scroll;
+  overflow-y: auto;
 
   [data-rbd-droppable-id] {
     // to spread column to the full height
@@ -31,30 +31,14 @@
 
   .columnTitle {
     display: flex;
+    align-items: center;
 
     button {
       margin-left: auto;
-      background: none;
-      border: none;
-      font-size: 0.75em;
-      width: 2em;
-      cursor: pointer;
     }
 
-    &.expanded button span::after {
-      content: '△';
-    }
-
-    &.expanded button:hover span::after {
-      content: '▲';
-    }
-
-    &.collapsed button span::after {
-      content: '▽';
-    }
-
-    &.collapsed button:hover span::after {
-      content: '▼';
+    h3 {
+      font-size: 1.5rem; // Special case to override the too restrictive and generalistic Config.scss
     }
   }
 }
@@ -77,29 +61,18 @@
 .itemTitle {
   margin: 0;
   display: flex;
+  align-items: center;
   cursor: pointer;
+}
+
+.itemIcon {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
 }
 
 .item.collapsed>*:not(.itemTitle) {
   display: none;
-}
-
-.item.expanded>.itemTitle::after {
-  content: '△';
-  margin-left: auto;
-}
-
-.item.expanded > .itemTitle:hover::after {
-  content: '▲';
-}
-
-.item.collapsed > .itemTitle::after {
-  content: '▽';
-  margin-left: auto;
-}
-
-.item.collapsed > .itemTitle:hover::after {
-  content: '▼';
 }
 
 .dropArea {

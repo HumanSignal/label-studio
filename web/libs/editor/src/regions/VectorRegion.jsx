@@ -456,6 +456,11 @@ const Model = types
       },
 
       addPoint(x, y) {
+        // Don't allow adding points when region is locked or readonly
+        if (self.locked || self.isReadOnly()) {
+          return null;
+        }
+
         const image = self.parent.currentImageEntity;
         const width = image.naturalWidth;
         const height = image.naturalHeight;
@@ -483,6 +488,10 @@ const Model = types
       // Uses KonvaVector startPoint to start drawing
       // This will only initiate point drawing, but won't create actual point
       startPoint(x, y) {
+        // Don't allow adding points when region is locked or readonly
+        if (self.locked || self.isReadOnly()) {
+          return;
+        }
         self.vectorRef.startPoint(x, y);
       },
 
@@ -492,6 +501,10 @@ const Model = types
       //
       // This method is designed to create Bezier curve
       updatePoint(x, y) {
+        // Don't allow modifying points when region is locked or readonly
+        if (self.locked || self.isReadOnly()) {
+          return;
+        }
         self.vectorRef.updatePoint(x, y);
       },
 
@@ -499,6 +512,10 @@ const Model = types
       //
       // Will create a new point if it was started but never updated (regular click)
       commitPoint(x, y) {
+        // Don't allow adding points when region is locked or readonly
+        if (self.locked || self.isReadOnly()) {
+          return;
+        }
         self.vectorRef?.commitPoint(x, y);
       },
 
@@ -608,7 +625,8 @@ const HtxVectorView = observer(({ item, suggestion }) => {
   const { x: offsetX, y: offsetY } = item.parent?.layerZoomScalePosition ?? { x: 0, y: 0 };
   const disabled = item.disabled || suggestion || store.annotationStore.selected.isLinkingMode;
   const selected = !disabled; // Invert disabled to selected for KonvaVector
-  const isDisabled = item.locked || item.parent?.getSkipInteractions(); // Completely disable all interactions when locked or Pan tool is active
+  // Completely disable all interactions when locked, readonly (e.g., in View All mode), or Pan tool is active
+  const isDisabled = item.locked || item.isReadOnly() || item.parent?.getSkipInteractions();
 
   // Wait for stage to be properly initialized
   if (!item.parent?.stageWidth || !item.parent?.stageHeight) {

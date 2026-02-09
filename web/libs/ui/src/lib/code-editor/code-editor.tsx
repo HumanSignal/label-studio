@@ -7,10 +7,17 @@ import {
 import "codemirror/mode/javascript/javascript";
 import "codemirror/mode/xml/xml";
 import "codemirror/addon/hint/show-hint";
+import "codemirror/addon/search/search";
+import "codemirror/addon/search/searchcursor";
+import "codemirror/addon/search/matchesonscrollbar";
+import "codemirror/addon/dialog/dialog";
+import "codemirror/addon/scroll/annotatescrollbar";
 import "./config-hint";
 
 import "codemirror/lib/codemirror.css";
 import "codemirror/addon/hint/show-hint.css";
+import "codemirror/addon/dialog/dialog.css";
+import "codemirror/addon/search/matchesonscrollbar.css";
 import styles from "./code-editor.module.scss";
 import { cn } from "@humansignal/shad/utils";
 import { forwardRef } from "react";

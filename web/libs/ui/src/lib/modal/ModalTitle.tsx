@@ -1,6 +1,6 @@
 import type { PropsWithChildren } from "react";
-import { Elem } from "./ModalContext";
+import { cnb as cn } from "@humansignal/core/lib/utils/bem";
 
 export const ModalTitle = ({ children }: PropsWithChildren) => {
-  return <Elem name="title">{children}</Elem>;
+  return <div className={cn("modal-ls").elem("title").toClassName()}>{children}</div>;
 };

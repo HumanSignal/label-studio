@@ -19,11 +19,16 @@ export type TabProps = {
   setActiveTab: EventHandlers["setActiveTab"];
   checkSnap: EventHandlers["checkSnap"];
 };
+
+// false: don't show the tab; string: show tab with given title
+export type ShowCustomTab = false | string;
+
 export interface SidePanelsProps {
   panelsHidden: boolean;
   store: any;
   currentEntity: any;
   showComments: boolean;
+  showCustomTab: ShowCustomTab;
   focusTab: string;
 }
 

@@ -1609,9 +1609,19 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
       };
     },
     // Programmatic point creation methods
-    startPoint: (x: number, y: number) => pointCreationManager.startPoint(x, y),
-    updatePoint: (x: number, y: number) => pointCreationManager.updatePoint(x, y),
-    commitPoint: (x: number, y: number) => pointCreationManager.commitPoint(x, y),
+    // These check the disabled prop to prevent point creation when the region is locked
+    startPoint: (x: number, y: number) => {
+      if (disabled) return false;
+      return pointCreationManager.startPoint(x, y);
+    },
+    updatePoint: (x: number, y: number) => {
+      if (disabled) return;
+      pointCreationManager.updatePoint(x, y);
+    },
+    commitPoint: (x: number, y: number) => {
+      if (disabled) return;
+      pointCreationManager.commitPoint(x, y);
+    },
     // Programmatic point transformation methods
     translatePoints: (dx: number, dy: number, pointIds?: string[]) => {
       const pointsToTransform = pointIds ? initialPoints.filter((p) => pointIds.includes(p.id)) : initialPoints;
@@ -4312,6 +4322,9 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
                 }
 
                 // Check if we're about to close the path - prevent point selection in this case
+                // IMPORTANT: Also check isActivePointEligibleForClosing to ensure closing is actually possible
+                // When the region is unselected and no activePointId is set, clicking on first/last point
+                // should NOT be blocked - it should select the point so drawing can start from that endpoint
                 if (
                   shouldClosePathOnPointClick(
                     pointIndex,
@@ -4323,7 +4336,12 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
                       activePointId,
                     } as any,
                     e,
-                  )
+                  ) &&
+                  isActivePointEligibleForClosing({
+                    initialPoints,
+                    skeletonEnabled,
+                    activePointId,
+                  } as any)
                 ) {
                   return; // Block the selection
                 }
