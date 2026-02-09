@@ -164,6 +164,10 @@ const Model = types
           return { enabled: 6, disabled: 4 };
       }
     },
+    // Point style: "circle" or "rectangle"
+    get pointStyle() {
+      return self.control?.pointstyle ?? "circle";
+    },
     get disabled() {
       const tool = self.parent?.getToolsManager().findSelectedTool();
       return (tool?.disabled ?? false) || self.isReadOnly() || (!self.selected && !self.isDrawing);
@@ -746,6 +750,7 @@ const HtxVectorView = observer(({ item, suggestion }) => {
           pointStroke={item.selected ? "#ff0000" : regionStyles.strokeColor}
           pointStrokeSelected="#ff6b35"
           pointStrokeWidth={item.selected ? 2 : 1}
+          pointStyle={item.pointStyle}
           disableInternalPointAddition={true}
         />
 
