@@ -209,8 +209,8 @@ class TestSingleAnnotationEndpoint(APITestCase):
         assert data['id'] == self.annotation.id
 
 
-class TestTaskDistributionAPI(APITestCase):
-    """Test the task distribution endpoint for efficient label aggregation (FIT-720)."""
+class TestTaskAgreementAPI(APITestCase):
+    """Test the task agreement endpoint for efficient label aggregation (FIT-720)."""
 
     @classmethod
     def setUpTestData(cls):
@@ -220,19 +220,19 @@ class TestTaskDistributionAPI(APITestCase):
         cls.task = TaskFactory(project=cls.project, data={'text': 'test'})
 
     @pytest.mark.usefixtures('fflag_fix_all_fit_720_lazy_load_annotations_off')
-    def test_distribution_endpoint_requires_feature_flag(self):
-        """Test that distribution endpoint returns 404 when feature flag is disabled."""
+    def test_agreement_endpoint_requires_feature_flag(self):
+        """Test that agreement endpoint returns 403 when feature flag is disabled."""
         self.client.force_authenticate(user=self.user)
-        response = self.client.get(f'/api/tasks/{self.task.id}/distribution/')
+        response = self.client.get(f'/api/tasks/{self.task.id}/agreement/')
 
-        assert response.status_code == 404
-        assert response.json()['error'] == 'Feature not enabled'
+        assert response.status_code == 403
+        assert response.json()['detail'] == 'Feature not enabled'
 
     @pytest.mark.usefixtures('fflag_fix_all_fit_720_lazy_load_annotations_on')
-    def test_distribution_endpoint_empty_task(self):
-        """Test distribution endpoint returns empty distribution for task with no annotations."""
+    def test_agreement_endpoint_empty_task(self):
+        """Test agreement endpoint returns empty distributions for task with no annotations."""
         self.client.force_authenticate(user=self.user)
-        response = self.client.get(f'/api/tasks/{self.task.id}/distribution/')
+        response = self.client.get(f'/api/tasks/{self.task.id}/agreement/')
 
         assert response.status_code == 200
         data = response.json()
@@ -241,8 +241,8 @@ class TestTaskDistributionAPI(APITestCase):
         assert data['distributions'] == {}
 
     @pytest.mark.usefixtures('fflag_fix_all_fit_720_lazy_load_annotations_on')
-    def test_distribution_endpoint_with_labels(self):
-        """Test distribution endpoint correctly aggregates label annotations."""
+    def test_agreement_endpoint_with_labels(self):
+        """Test agreement endpoint correctly aggregates label annotations."""
         # Create multiple annotations with different labels
         AnnotationFactory(
             task=self.task,
@@ -288,7 +288,7 @@ class TestTaskDistributionAPI(APITestCase):
         )
 
         self.client.force_authenticate(user=self.user)
-        response = self.client.get(f'/api/tasks/{self.task.id}/distribution/')
+        response = self.client.get(f'/api/tasks/{self.task.id}/agreement/')
 
         assert response.status_code == 200
         data = response.json()
@@ -300,8 +300,8 @@ class TestTaskDistributionAPI(APITestCase):
         assert data['distributions']['label']['labels'] == {'Car': 2, 'Person': 1, 'Dog': 1}
 
     @pytest.mark.usefixtures('fflag_fix_all_fit_720_lazy_load_annotations_on')
-    def test_distribution_endpoint_with_choices(self):
-        """Test distribution endpoint correctly aggregates choices."""
+    def test_agreement_endpoint_with_choices(self):
+        """Test agreement endpoint correctly aggregates choices."""
         AnnotationFactory(
             task=self.task,
             completed_by=self.user,
@@ -340,7 +340,7 @@ class TestTaskDistributionAPI(APITestCase):
         )
 
         self.client.force_authenticate(user=self.user)
-        response = self.client.get(f'/api/tasks/{self.task.id}/distribution/')
+        response = self.client.get(f'/api/tasks/{self.task.id}/agreement/')
 
         assert response.status_code == 200
         data = response.json()
@@ -350,8 +350,8 @@ class TestTaskDistributionAPI(APITestCase):
         assert data['distributions']['sentiment']['labels'] == {'Positive': 2, 'Negative': 1}
 
     @pytest.mark.usefixtures('fflag_fix_all_fit_720_lazy_load_annotations_on')
-    def test_distribution_endpoint_with_ratings(self):
-        """Test distribution endpoint correctly calculates rating average."""
+    def test_agreement_endpoint_with_ratings(self):
+        """Test agreement endpoint correctly calculates rating average."""
         AnnotationFactory(
             task=self.task,
             completed_by=self.user,
@@ -390,7 +390,7 @@ class TestTaskDistributionAPI(APITestCase):
         )
 
         self.client.force_authenticate(user=self.user)
-        response = self.client.get(f'/api/tasks/{self.task.id}/distribution/')
+        response = self.client.get(f'/api/tasks/{self.task.id}/agreement/')
 
         assert response.status_code == 200
         data = response.json()
@@ -401,8 +401,8 @@ class TestTaskDistributionAPI(APITestCase):
         assert data['distributions']['rating']['count'] == 3
 
     @pytest.mark.usefixtures('fflag_fix_all_fit_720_lazy_load_annotations_on')
-    def test_distribution_endpoint_excludes_cancelled_annotations(self):
-        """Test that cancelled annotations are not included in distribution."""
+    def test_agreement_endpoint_excludes_cancelled_annotations(self):
+        """Test that cancelled annotations are not included in agreement distributions."""
         # Create a normal annotation
         AnnotationFactory(
             task=self.task,
@@ -432,7 +432,7 @@ class TestTaskDistributionAPI(APITestCase):
         )
 
         self.client.force_authenticate(user=self.user)
-        response = self.client.get(f'/api/tasks/{self.task.id}/distribution/')
+        response = self.client.get(f'/api/tasks/{self.task.id}/agreement/')
 
         assert response.status_code == 200
         data = response.json()
@@ -444,8 +444,8 @@ class TestTaskDistributionAPI(APITestCase):
         assert 'Skipped' not in data['distributions']['label']['labels']
 
     @pytest.mark.usefixtures('fflag_fix_all_fit_720_lazy_load_annotations_on')
-    def test_distribution_endpoint_with_multiple_controls(self):
-        """Test distribution endpoint handles multiple control types in one annotation."""
+    def test_agreement_endpoint_with_multiple_controls(self):
+        """Test agreement endpoint handles multiple control types in one annotation."""
         AnnotationFactory(
             task=self.task,
             completed_by=self.user,
@@ -472,7 +472,7 @@ class TestTaskDistributionAPI(APITestCase):
         )
 
         self.client.force_authenticate(user=self.user)
-        response = self.client.get(f'/api/tasks/{self.task.id}/distribution/')
+        response = self.client.get(f'/api/tasks/{self.task.id}/agreement/')
 
         assert response.status_code == 200
         data = response.json()
@@ -487,17 +487,17 @@ class TestTaskDistributionAPI(APITestCase):
         assert data['distributions']['quality']['average'] == 5.0
 
     @pytest.mark.usefixtures('fflag_fix_all_fit_720_lazy_load_annotations_on')
-    def test_distribution_endpoint_task_not_found(self):
-        """Test that distribution endpoint returns 404 for non-existent task."""
+    def test_agreement_endpoint_task_not_found(self):
+        """Test that agreement endpoint returns 404 for non-existent task."""
         self.client.force_authenticate(user=self.user)
-        response = self.client.get('/api/tasks/99999999/distribution/')
+        response = self.client.get('/api/tasks/99999999/agreement/')
 
         assert response.status_code == 404
         assert response.json()['error'] == 'Task not found'
 
     @pytest.mark.usefixtures('fflag_fix_all_fit_720_lazy_load_annotations_on')
-    def test_distribution_endpoint_with_taxonomy(self):
-        """Test distribution endpoint correctly handles taxonomy labels."""
+    def test_agreement_endpoint_with_taxonomy(self):
+        """Test agreement endpoint correctly handles taxonomy labels."""
         AnnotationFactory(
             task=self.task,
             completed_by=self.user,
@@ -524,7 +524,7 @@ class TestTaskDistributionAPI(APITestCase):
         )
 
         self.client.force_authenticate(user=self.user)
-        response = self.client.get(f'/api/tasks/{self.task.id}/distribution/')
+        response = self.client.get(f'/api/tasks/{self.task.id}/agreement/')
 
         assert response.status_code == 200
         data = response.json()
