@@ -5,12 +5,7 @@ import { isDefined } from "../../utils/utils";
 import { Assignee } from "../Assignee";
 import { DynamicModel, registerModel } from "../DynamicModel";
 import { CustomJSON } from "../types";
-import {
-  FF_DEV_2536,
-  FF_DISABLE_GLOBAL_USER_FETCHING,
-  FF_LOPS_E_3,
-  isFF,
-} from "../../utils/feature-flags";
+import { FF_DEV_2536, FF_DISABLE_GLOBAL_USER_FETCHING, FF_LOPS_E_3, isFF } from "../../utils/feature-flags";
 import { isActive, FF_FIT_720_LAZY_LOAD_ANNOTATIONS } from "@humansignal/core/lib/utils/feature-flags";
 
 const SIMILARITY_UPPER_LIMIT_PRECISION = 1000;
