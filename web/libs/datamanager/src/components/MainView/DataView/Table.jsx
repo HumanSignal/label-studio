@@ -75,6 +75,8 @@ export const DataView = injector(
     project,
     hasFilters,
     canLabel,
+    onReviewTask,
+    onViewAnalytics,
     ...props
   }) => {
     const [datasetStatusID, setDatasetStatusID] = useState(store.SDK.dataset?.status?.id);
@@ -383,6 +385,8 @@ export const DataView = injector(
             col.original.resetWidth();
           }}
           onDensityChange={setDensity}
+          onReviewTask={props.onReviewTask}
+          onViewAnalytics={props.onViewAnalytics}
         />
       ) : (
         <GridView
