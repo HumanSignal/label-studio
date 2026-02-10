@@ -93,6 +93,10 @@ stateDiagram-v2
 | **In Review** | First review has been created for any annotation within the task.  <br/><br/>Whether the task enters this state depends on your project settings. See [Additional notes](#Additional-notes) below.|
 | **Done** | All required annotations and reviews have been completed. |
 
+!!! info Tip
+    You can click on the state in the Data Manager to view a history of state changes:
+
+    <img src="/images/project/state-history.png" style="max-width: 450px" alt="Screenshot">
 
 ## Additional notes
 
