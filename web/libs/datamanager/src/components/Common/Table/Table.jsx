@@ -1,5 +1,6 @@
 import { observer } from "mobx-react";
-import { createContext, forwardRef, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { createContext, forwardRef, memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { useSDK } from "../../../providers/SDKProvider";
 import { isDefined } from "../../../utils/utils";
 import { Icon } from "../Icon/Icon";
@@ -11,6 +12,7 @@ import { TableCheckboxCell } from "./TableCheckbox";
 import { tableCN, TableContext } from "./TableContext";
 import { TableHead } from "./TableHead/TableHead";
 import { TableRow } from "./TableRow/TableRow";
+import { RowContextMenu } from "./RowContextMenu";
 import { prepareColumns } from "./utils";
 import { cn } from "../../../utils/bem";
 import { FieldsButton } from "../FieldsButton";
@@ -50,6 +52,8 @@ export const Table = observer(
     headerExtra,
     onDensityChange,
     onRangeSelect,
+    onReviewTask,
+    onViewAnalytics,
     ...props
   }) => {
     const colOrderKey = "dm:columnorder";
@@ -63,6 +67,9 @@ export const Table = observer(
     const [toolbarVisible, setToolbarVisible] = useState(true);
     // Track last clicked row ID for shift-click range selection
     const lastClickedId = useRef(null);
+    
+    // Global context menu state
+    const [contextMenu, setContextMenu] = useState(null);
 
     // Reset virtualizer cache when rowHeight changes
     useEffect(() => {
@@ -209,6 +216,59 @@ export const Table = observer(
       localStorage.setItem(colOrderKey, JSON.stringify(colOrder));
     }, [colOrder]);
 
+    // Store columns in a ref to avoid recreating handleContextMenu
+    const columnsRef = useRef(columns);
+    columnsRef.current = columns;
+
+    // Handle context menu - defined after columns are initialized
+    const handleContextMenu = useCallback((e, row) => {
+      e.preventDefault();
+      e.stopPropagation();
+      
+      // Find which column was clicked (actual class: lsf-table__cell)
+      const cell = e.target.closest(".lsf-table__cell");
+      const cellIndex = cell ? Array.from(cell.parentElement.children).indexOf(cell) : -1;
+      const column = cellIndex >= 0 ? columnsRef.current[cellIndex] : null;
+      
+      setContextMenu({
+        x: e.clientX,
+        y: e.clientY,
+        row,
+        column,
+      });
+    }, []); // Empty deps - stable callback
+
+    // Close context menu on click outside or escape
+    useEffect(() => {
+      if (!contextMenu) return;
+
+      const handleClose = (e) => {
+        // Don't close if clicking inside the menu
+        if (e.target.closest('[data-context-menu]')) return;
+        setContextMenu(null);
+      };
+
+      const handleEscape = (e) => {
+        if (e.key === 'Escape') {
+          setContextMenu(null);
+        }
+      };
+
+      // Use capture phase and add slight delay to prevent immediate closing
+      const timerId = setTimeout(() => {
+        document.addEventListener('click', handleClose, true);
+        document.addEventListener('contextmenu', handleClose, true);
+        document.addEventListener('keydown', handleEscape);
+      }, 0);
+
+      return () => {
+        clearTimeout(timerId);
+        document.removeEventListener('click', handleClose, true);
+        document.removeEventListener('contextmenu', handleClose, true);
+        document.removeEventListener('keydown', handleEscape);
+      };
+    }, [contextMenu]);
+
     const contextValue = {
       columns,
       data,
@@ -274,21 +334,22 @@ export const Table = observer(
         const isEven = dataIndex % 2 === 0;
 
         if (isQuickView) {
-          return (
-            <TableRow
-              key={row.id}
-              data={row}
-              even={isEven}
-              onClick={(row, e) => props.onRowClick(row, e)}
-              stopInteractions={stopInteractions}
-              wrapperStyle={{ ...style, height: props.rowHeight }}
-              style={{
-                height: props.rowHeight,
-                width: props.fitContent ? "fit-content" : "auto",
-              }}
-              decoration={Decoration}
-            />
-          );
+        return (
+          <TableRow
+            key={row.id}
+            data={row}
+            even={isEven}
+            onClick={(row, e) => props.onRowClick(row, e)}
+            stopInteractions={stopInteractions}
+            wrapperStyle={{ ...style, height: props.rowHeight }}
+            style={{
+              height: props.rowHeight,
+              width: props.fitContent ? "fit-content" : "auto",
+            }}
+            decoration={Decoration}
+            onContextMenu={handleContextMenu}
+          />
+        );
         }
 
         // Invert for visual consistency in Regular mode: we want odd rows (2nd, 4th, etc.) to have background
@@ -307,6 +368,7 @@ export const Table = observer(
               width: props.fitContent ? "fit-content" : "auto",
             }}
             decoration={Decoration}
+            onContextMenu={handleContextMenu}
           />
         );
       },
@@ -321,6 +383,8 @@ export const Table = observer(
         view.selected.list,
         view.selected.all,
         isQuickView,
+        Decoration,
+        handleContextMenu,
       ],
     );
 
@@ -381,33 +445,45 @@ export const Table = observer(
     );
 
     return (
-      <div ref={tableWrapper} className={tableCN.mod({ fit: props.fitToContent }).toString()}>
-        {isQuickView && renderTableToolbar()}
-        <TableContext.Provider value={contextValue}>
-          <StickyList
-            ref={listRef}
-            overscanCount={10}
-            itemHeight={props.rowHeight}
-            totalCount={props.total}
-            itemCount={data.length + 1}
-            itemKey={itemKey}
-            innerElementType={innerElementType}
-            stickyItems={[0]}
-            stickyItemsHeight={[headerHeight]}
-            stickyComponent={renderTableHeader}
-            initialScrollOffset={initialScrollOffset}
-            isItemLoaded={isItemLoaded}
-            loadMore={props.loadMore}
-            toolbarHeight={toolbarHeight}
-            headerHeight={headerHeight}
-            isQuickView={isQuickView}
-            onScroll={handleScroll}
-            toolbarVisible={toolbarVisible}
-          >
-            {renderRow}
-          </StickyList>
-        </TableContext.Provider>
-      </div>
+      <>
+        <div ref={tableWrapper} className={tableCN.mod({ fit: props.fitToContent }).toString()}>
+          {isQuickView && renderTableToolbar()}
+          <TableContext.Provider value={contextValue}>
+            <StickyList
+              ref={listRef}
+              overscanCount={10}
+              itemHeight={props.rowHeight}
+              totalCount={props.total}
+              itemCount={data.length + 1}
+              itemKey={itemKey}
+              innerElementType={innerElementType}
+              stickyItems={[0]}
+              stickyItemsHeight={[headerHeight]}
+              stickyComponent={renderTableHeader}
+              initialScrollOffset={initialScrollOffset}
+              isItemLoaded={isItemLoaded}
+              loadMore={props.loadMore}
+              toolbarHeight={toolbarHeight}
+              headerHeight={headerHeight}
+              isQuickView={isQuickView}
+              onScroll={handleScroll}
+              toolbarVisible={toolbarVisible}
+            >
+              {renderRow}
+            </StickyList>
+          </TableContext.Provider>
+        </div>
+        {contextMenu && typeof document !== 'undefined' && createPortal(
+          <ContextMenuPortal
+            contextMenu={contextMenu}
+            view={view}
+            onReviewTask={onReviewTask}
+            onViewAnalytics={onViewAnalytics}
+            onClose={() => setContextMenu(null)}
+          />,
+          document.body
+        )}
+      </>
     );
   },
 );
@@ -550,5 +626,74 @@ const innerElementType = forwardRef(({ children, ...rest }, ref) => {
         );
       }}
     </StickyListContext.Consumer>
+  );
+});
+
+// Context menu portal component with smart positioning
+const ContextMenuPortal = memo(({ contextMenu, view, onReviewTask, onViewAnalytics, onClose }) => {
+  const menuRef = useRef(null);
+  
+  // Helper to calculate position with given dimensions
+  const calculatePosition = useCallback((width, height) => {
+    const viewportWidth = window.innerWidth;
+    const viewportHeight = window.innerHeight;
+    
+    let x = contextMenu.x;
+    let y = contextMenu.y;
+    
+    // Adjust if would go off right edge
+    if (x + width > viewportWidth) {
+      x = Math.max(10, viewportWidth - width - 10);
+    }
+    
+    // Adjust if would go off bottom edge
+    if (y + height > viewportHeight) {
+      y = Math.max(10, viewportHeight - height - 10);
+    }
+    
+    return { x, y };
+  }, [contextMenu.x, contextMenu.y]);
+  
+  // Calculate initial position with estimated dimensions
+  const [position, setPosition] = useState(() => calculatePosition(250, 300));
+
+  // Reset position when context menu location changes
+  useEffect(() => {
+    setPosition(calculatePosition(250, 300));
+  }, [contextMenu.x, contextMenu.y, calculatePosition]);
+
+  // Refine position once we have actual dimensions
+  useEffect(() => {
+    if (!menuRef.current) return;
+
+    const menuRect = menuRef.current.getBoundingClientRect();
+    const newPosition = calculatePosition(menuRect.width, menuRect.height);
+
+    // Only update if position changed
+    if (newPosition.x !== position.x || newPosition.y !== position.y) {
+      setPosition(newPosition);
+    }
+  }, [contextMenu.x, contextMenu.y, position.x, position.y, calculatePosition]);
+
+  return (
+    <div
+      ref={menuRef}
+      data-context-menu
+      style={{
+        position: 'fixed',
+        left: `${position.x}px`,
+        top: `${position.y}px`,
+        zIndex: 10000,
+      }}
+    >
+      <RowContextMenu
+        row={contextMenu.row}
+        column={contextMenu.column}
+        view={view}
+        onReviewTask={onReviewTask}
+        onViewAnalytics={onViewAnalytics}
+        onClose={onClose}
+      />
+    </div>
   );
 });
