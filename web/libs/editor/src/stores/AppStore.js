@@ -216,6 +216,12 @@ export default types
     suggestionsRequest: null,
     // @todo should be removed along with the FF; it's used to detect FF in other parts
     simpleInit: isFF(FF_SIMPLE_INIT),
+    /**
+     * Whether dark mode is currently active.
+     * Observed via MutationObserver on document.documentElement[data-color-scheme].
+     * Available to all tags via `self.annotation.store.darkMode`.
+     */
+    darkMode: document.documentElement.getAttribute("data-color-scheme") === "dark",
   }))
   .views((self) => ({
     get events() {
@@ -262,6 +268,7 @@ export default types
   }))
   .actions((self) => {
     let appControls;
+    let darkModeObserver;
 
     function setAppControls(controls) {
       appControls = controls;
@@ -274,6 +281,11 @@ export default types
     function renderApp() {
       appControls?.render();
     }
+
+    function setDarkMode(value) {
+      self.darkMode = value;
+    }
+
     /**
      * Update settings display state
      */
@@ -344,6 +356,16 @@ export default types
       window.Htx = self;
 
       self.attachHotkeys();
+
+      // Observe the data-color-scheme attribute on <html> to keep darkMode in sync.
+      // This is the ground truth set by ThemeToggle and works across React provider boundaries.
+      const el = document.documentElement;
+
+      self.setDarkMode(el.getAttribute("data-color-scheme") === "dark");
+      darkModeObserver = new MutationObserver(() => {
+        self.setDarkMode(el.getAttribute("data-color-scheme") === "dark");
+      });
+      darkModeObserver.observe(el, { attributes: true, attributeFilter: ["data-color-scheme"] });
 
       getEnv(self).events.invoke("labelStudioLoad", self);
     }
@@ -1039,6 +1061,7 @@ export default types
 
     return {
       setFlags,
+      setDarkMode,
       addInterface,
       hasInterface,
       toggleInterface,
@@ -1083,6 +1106,8 @@ export default types
       incrementQueuePosition,
       beforeDestroy() {
         ToolsManager.removeAllTools();
+        darkModeObserver?.disconnect();
+        darkModeObserver = null;
         appControls = null;
       },
 
