@@ -1,4 +1,4 @@
-export { camelCase } from "@humansignal/core";
+import { camelCase } from "@humansignal/core";
 
 export const formDataToJPO = (formData: FormData) => {
   if (formData instanceof FormData) {
