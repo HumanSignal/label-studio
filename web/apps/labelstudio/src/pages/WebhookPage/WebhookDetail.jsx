@@ -1,6 +1,5 @@
 import { IconCross, IconPlus } from "@humansignal/icons";
 import { Button, Typography } from "@humansignal/ui";
-import cloneDeep from "lodash/cloneDeep";
 import { useEffect, useState } from "react";
 import { Form, Input, Label, Toggle } from "../../components/Form";
 import { useAPI } from "../../providers/ApiProvider";
@@ -257,13 +256,13 @@ const WebhookDetail = ({ webhook, webhooksInfo, fetchWebhooks, onBack, onSelectA
     ]);
   };
   const onHeaderRemove = (index) => {
-    const newHeaders = cloneDeep(headers);
+    const newHeaders = structuredClone(headers);
 
     newHeaders.splice(index, 1);
     setHeaders(newHeaders);
   };
   const onHeaderChange = (aim, event, index) => {
-    const newHeaders = cloneDeep(headers);
+    const newHeaders = structuredClone(headers);
 
     if (aim === "key") {
       newHeaders[index].key = event.target.value;

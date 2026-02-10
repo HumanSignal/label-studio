@@ -1,4 +1,4 @@
-import throttle from "lodash/throttle";
+import { throttle } from "@humansignal/core";
 import { destroy, detach, flow, getEnv, getParent, getRoot, isAlive, onSnapshot, types } from "mobx-state-tree";
 import { ff } from "@humansignal/core";
 import { errorBuilder } from "../../core/DataValidator/ConfigValidator";

@@ -18,7 +18,7 @@ import { TemplatesList } from "./TemplatesList";
 import tags from "@humansignal/core/lib/utils/schema/tags.json";
 import { UnsavedChanges } from "./UnsavedChanges";
 import { Checkbox, CodeEditor, Select } from "@humansignal/ui";
-import snakeCase from "lodash/snakeCase";
+import { snakeCase } from "@humansignal/core";
 import { useConfigResizer } from "./useConfigResizer";
 import { EditorResizer } from "./EditorResizer";
 

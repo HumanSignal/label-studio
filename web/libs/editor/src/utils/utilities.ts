@@ -1,7 +1,9 @@
+import { camelCase, snakeCase } from "@humansignal/core";
 import { formatDistanceToNow } from "date-fns";
 import { destroy, detach } from "mobx-state-tree";
-import camelCase from "lodash/camelCase";
-import snakeCase from "lodash/snakeCase";
+
+// Re-export for consumers that import from utils/utilities
+export { camelCase, snakeCase };
 
 /**
  * Internal helper to check if parameter is a string

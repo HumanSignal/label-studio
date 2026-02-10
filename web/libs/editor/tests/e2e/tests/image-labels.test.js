@@ -1,5 +1,5 @@
 const assert = require("assert");
-const { kebabCase } = require("lodash");
+const { kebabCase } = require("@humansignal/core");
 
 Feature("Images' labels type matching");
 
