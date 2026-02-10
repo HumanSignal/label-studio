@@ -8,10 +8,10 @@ import { CustomJSON } from "../types";
 import {
   FF_DEV_2536,
   FF_DISABLE_GLOBAL_USER_FETCHING,
-  FF_FIT_720_LAZY_LOAD_ANNOTATIONS,
   FF_LOPS_E_3,
   isFF,
 } from "../../utils/feature-flags";
+import { isActive, FF_FIT_720_LAZY_LOAD_ANNOTATIONS } from "@humansignal/core/lib/utils/feature-flags";
 
 const SIMILARITY_UPPER_LIMIT_PRECISION = 1000;
 const fileAttributes = types.model({
@@ -169,7 +169,7 @@ export const create = (columns) => {
         }
         // FIT-720: Lazy load annotations - use stubs for both label stream and quick view modes
         // Hydration happens in lsf-sdk.js when the annotation is selected
-        if (isFF(FF_FIT_720_LAZY_LOAD_ANNOTATIONS)) {
+        if (isActive(FF_FIT_720_LAZY_LOAD_ANNOTATIONS)) {
           taskParams.annotations_stub = true;
         }
 
