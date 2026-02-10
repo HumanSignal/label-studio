@@ -1,6 +1,6 @@
 # Lodash → Vanilla JS Replacements
 
-All replacement functions live in **@humansignal/core**. Prefer: `import { uniqBy, throttle, debounce, clamp, get, isMatch, camelCase, snakeCase, kebabCase, capitalize } from "@humansignal/core"`. Inline equivalents below are for reference only.
+All replacement functions live in **@humansignal/core**. Prefer: `import { uniqBy, throttle, debounce, clamp, get, isMatch, camelCase, snakeCase, kebabCase, capitalize, startCase } from "@humansignal/core"`. Inline equivalents below are for reference only.
 
 ## uniqBy(arr, key)
 
@@ -109,9 +109,23 @@ function capitalize(str) {
 }
 ```
 
+## startCase(str)
+
+Converts to Start Case (e.g. "foo-bar" → "Foo Bar"). **Prefer**: `import { startCase } from "@humansignal/core"`.
+
+```javascript
+function startCase(str) {
+  return String(str)
+    .split(/[\s_-]+/)
+    .filter(Boolean)
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+    .join(" ");
+}
+```
+
 ## clamp(num, lower, upper)
 
-**Prefer**: `import { clamp } from "../utils/utilities";` (libs/editor: `utils/utilities.ts`).
+**Prefer**: `import { clamp } from "@humansignal/core"`.
 
 Otherwise inline:
 

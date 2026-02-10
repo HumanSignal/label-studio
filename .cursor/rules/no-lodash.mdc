@@ -11,11 +11,11 @@ Do NOT import or use lodash in this codebase. All lodash functions have vanilla 
 
 1. STOP — do not add any `import ... from "lodash/..."` or `require("lodash...")`
 2. Use **@humansignal/core** for all replacements — all lodash-replacement helpers live there.
-3. Import from core: `import { debounce, throttle, clamp, camelCase, snakeCase, kebabCase, capitalize, uniqBy, get, isMatch } from "@humansignal/core"`
+3. Import from core: `import { debounce, throttle, clamp, camelCase, snakeCase, kebabCase, capitalize, startCase, uniqBy, get, isMatch } from "@humansignal/core"`
 4. For cloneDeep use native `structuredClone(obj)`.
 
 ## Quick reference (all from @humansignal/core except cloneDeep)
 
 - uniqBy, throttle, debounce, clamp, get, isMatch: @humansignal/core
-- camelCase, snakeCase, kebabCase, capitalize: @humansignal/core
+- camelCase, snakeCase, kebabCase, capitalize, startCase: @humansignal/core
 - cloneDeep(obj): structuredClone(obj) (native)

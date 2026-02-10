@@ -35,6 +35,17 @@ export function capitalize(str: string): string {
 }
 
 /**
+ * Convert string to Start Case (e.g. "foo-bar" → "Foo Bar"). Vanilla replacement for lodash/startCase.
+ */
+export function startCase(str: string): string {
+  return String(str)
+    .split(/[\s_-]+/)
+    .filter(Boolean)
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+    .join(" ");
+}
+
+/**
  * Convert string to PascalCase (StudlyCase)
  * This is essentially camelCase with the first letter capitalized
  */
