@@ -18,13 +18,13 @@ export function uniqBy<T>(arr: T[], key: keyof T | string): T[] {
 
 /**
  * throttle(fn, wait, options) - Invokes fn at most once per wait ms.
- * Supports leading/trailing and .cancel() like lodash.
+ * Supports leading/trailing, .cancel() and .flush() like lodash.
  */
 export function throttle<T extends (...args: any[]) => any>(
   fn: T,
   wait: number,
   options: { leading?: boolean; trailing?: boolean } = {},
-): T & { cancel: () => void } {
+): T & { cancel: () => void; flush: () => void } {
   const { leading = true, trailing = true } = options;
   let last = 0;
   let timeout: ReturnType<typeof setTimeout> | null = null;
@@ -33,7 +33,10 @@ export function throttle<T extends (...args: any[]) => any>(
 
   function invoke(): void {
     last = Date.now();
-    timeout = null;
+    if (timeout) {
+      clearTimeout(timeout);
+      timeout = null;
+    }
     const args = lastArgs;
     const ctx = lastThis;
     lastArgs = null;
@@ -74,7 +77,13 @@ export function throttle<T extends (...args: any[]) => any>(
     lastThis = null;
   };
 
-  return throttled as T & { cancel: () => void };
+  throttled.flush = (): void => {
+    if (timeout) {
+      invoke();
+    }
+  };
+
+  return throttled as T & { cancel: () => void; flush: () => void };
 }
 
 /**
