@@ -14,7 +14,7 @@ You can use it to bring an external application that you have already created, o
 Importantly, this allows you to continue leveraging Label Studio's annotation management, review workflows, and data export capabilities.
 
 !!! error Enterprise
-    This tag is only available for Label Studio Enterprise users.
+    This tag is only available for Label Studio Enterprise users. For more information, see [Programmable & Embeddable Interfaces](https://humansignal.com/programmable-ui/).
 
 ## Parameters
 

@@ -24,7 +24,7 @@ The labeling interface provides a full-featured spreadsheet experience with capa
 !!! error Enterprise
     This template and the `ReactCode` tag can only be used in Label Studio Enterprise.
 
-    For more information, including simplified code examples, see [ReactCode](/tags/reactcode).
+    For more information, see [Programmable & Embeddable Interfaces](https://humansignal.com/programmable-ui/).
 
 ## Labeling configuration
 
