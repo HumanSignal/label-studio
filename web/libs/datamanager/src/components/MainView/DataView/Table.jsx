@@ -51,6 +51,9 @@ const injector = inject(({ store }) => {
     project: store.project ?? {},
     hasFilters: (currentView?.filtersApplied ?? 0) > 0,
     canLabel: totalTasks > 0 && foundTasks > 0,
+    // LSE-specific callbacks
+    onReviewTask: store.SDK?.onReviewTask,
+    onViewAnalytics: store.SDK?.onViewAnalytics,
   };
 
   return props;
@@ -385,8 +388,8 @@ export const DataView = injector(
             col.original.resetWidth();
           }}
           onDensityChange={setDensity}
-          onReviewTask={props.onReviewTask}
-          onViewAnalytics={props.onViewAnalytics}
+          onReviewTask={onReviewTask}
+          onViewAnalytics={onViewAnalytics}
         />
       ) : (
         <GridView

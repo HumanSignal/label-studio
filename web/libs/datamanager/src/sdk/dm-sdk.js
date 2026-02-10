@@ -191,6 +191,10 @@ export class DataManager {
 
     Object.assign(this.tabControls, config.tabControls ?? {});
 
+    // Store LSE-specific callbacks
+    this.onReviewTask = config.onReviewTask;
+    this.onViewAnalytics = config.onViewAnalytics;
+
     this.updateActions(config.actions);
 
     this.type = config.type ?? "dm";

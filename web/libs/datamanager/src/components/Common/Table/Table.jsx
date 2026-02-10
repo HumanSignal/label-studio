@@ -632,7 +632,7 @@ const innerElementType = forwardRef(({ children, ...rest }, ref) => {
 // Context menu portal component with smart positioning
 const ContextMenuPortal = memo(({ contextMenu, view, onReviewTask, onViewAnalytics, onClose }) => {
   const menuRef = useRef(null);
-  
+
   // Helper to calculate position with given dimensions
   const calculatePosition = useCallback((width, height) => {
     const viewportWidth = window.innerWidth;

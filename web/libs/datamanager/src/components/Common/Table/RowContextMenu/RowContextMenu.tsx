@@ -172,7 +172,8 @@ export const RowContextMenu: FC<RowContextMenuProps> = ({
   // Check if cell content can be copied
   const canCopyCellContent = column && column.id && !excludedColumns.includes(column.id) && cellValue != null;
 
-  // Check if annotators exist
+  // Check if task has annotators (for View Annotator Performance)
+  // Use annotators array which only contains actual annotators, not predictions
   const hasAnnotators = row.annotators && row.annotators.length > 0;
 
   return (

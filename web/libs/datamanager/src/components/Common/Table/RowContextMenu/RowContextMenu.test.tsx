@@ -8,36 +8,54 @@ jest.mock("mobx-state-tree", () => ({
   getRoot: jest.fn(),
 }));
 
-// Mock Menu component from editor
-jest.mock("@humansignal/editor", () => ({
-  Menu: ({ children, className, closeDropdownOnItemClick, onClick }: any) => (
-    <div
-      data-testid="menu"
-      className={className}
-      data-close-on-click={closeDropdownOnItemClick}
-      onClick={onClick}
-    >
-      {children}
-    </div>
+// Mock Menu component from local path
+jest.mock("../../Menu/Menu", () => ({
+  Menu: Object.assign(
+    ({ children, className, closeDropdownOnItemClick, onClick }: any) => (
+      <div
+        data-testid="menu"
+        className={className}
+        data-close-on-click={closeDropdownOnItemClick}
+        onClick={onClick}
+      >
+        {children}
+      </div>
+    ),
+    {
+      Item: ({ children, onClick, "data-testid": testId }: any) => (
+        <button type="button" onClick={onClick} data-testid={testId}>
+          {children}
+        </button>
+      ),
+      Divider: () => <hr data-testid="menu-divider" />,
+    }
   ),
 }));
 
-// Add Menu.Item, Menu.Divider to the mock
-const MenuMock = require("@humansignal/editor").Menu;
-MenuMock.Item = ({ children, onClick, "data-testid": testId }: any) => (
-  <button type="button" onClick={onClick} data-testid={testId}>
-    {children}
-  </button>
-);
-MenuMock.Divider = () => <hr data-testid="menu-divider" />;
+// Mock modal from local path
+const mockModal = jest.fn();
+jest.mock("../../Modal/Modal", () => ({
+  get modal() {
+    return mockModal;
+  },
+}));
 
 // Mock UI components
 const mockShowToast = jest.fn();
+const mockUseToast = jest.fn();
 jest.mock("@humansignal/ui", () => ({
-  modal: jest.fn(),
-  useToast: () => ({
-    show: mockShowToast,
+  Dropdown: ({ children, inline, visible, animated }: any) => (
+    <div data-testid="dropdown" data-inline={inline} data-visible={visible} data-animated={animated}>
+      {children}
+    </div>
+  ),
+  useDropdown: () => ({
+    close: jest.fn(),
+    isOpen: true,
   }),
+  get useToast() {
+    return mockUseToast;
+  },
 }));
 
 // Mock TaskSourceViewer
@@ -78,6 +96,7 @@ describe("RowContextMenu Component", () => {
     id: 123,
     task_id: 123,
     source: JSON.stringify({ data: { text: "Sample task" } }),
+    data: { text: "Sample task" },
     annotators: [1, 2],
   };
 
@@ -100,6 +119,7 @@ describe("RowContextMenu Component", () => {
   const mockOnClose = jest.fn();
   const mockOnReviewTask = jest.fn();
   const mockOnViewAnalytics = jest.fn();
+  const mockClipboardWriteText = jest.fn().mockResolvedValue(undefined);
 
   const defaultProps = {
     row: mockRow,
@@ -110,11 +130,29 @@ describe("RowContextMenu Component", () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    // Setup clipboard mock
-    Object.assign(navigator, {
-      clipboard: {
-        writeText: jest.fn().mockResolvedValue(undefined),
+    // Reset useToast mock to default behavior
+    mockUseToast.mockReturnValue({
+      show: mockShowToast,
+    });
+    // Setup getRoot mock to return mockView with SDK.invoke
+    const { getRoot } = require("mobx-state-tree");
+    getRoot.mockReturnValue({
+      ...mockView,
+      SDK: {
+        ...mockView.SDK,
+        invoke: jest.fn(),
       },
+      startLabelStream: jest.fn(),
+      startLabeling: jest.fn(),
+    });
+    // Setup clipboard mock
+    mockClipboardWriteText.mockClear();
+    Object.defineProperty(navigator, "clipboard", {
+      value: {
+        writeText: mockClipboardWriteText,
+      },
+      writable: true,
+      configurable: true,
     });
   });
 
@@ -141,13 +179,13 @@ describe("RowContextMenu Component", () => {
       expect(screen.queryByTestId("menu-item-review-task")).not.toBeInTheDocument();
     });
 
-    it("should render view analytics item when onViewAnalytics is provided and annotators exist", () => {
+    it("should render view analytics item when onViewAnalytics is provided", () => {
       render(<RowContextMenu {...defaultProps} onViewAnalytics={mockOnViewAnalytics} />);
 
       expect(screen.getByTestId("menu-item-view-analytics")).toBeInTheDocument();
     });
 
-    it("should not render view analytics item when annotators are missing", () => {
+    it("should render view analytics item even when annotators are missing", () => {
       const rowWithoutAnnotators = { ...mockRow, annotators: [] };
 
       render(
@@ -158,7 +196,7 @@ describe("RowContextMenu Component", () => {
         />,
       );
 
-      expect(screen.queryByTestId("menu-item-view-analytics")).not.toBeInTheDocument();
+      expect(screen.getByTestId("menu-item-view-analytics")).toBeInTheDocument();
     });
 
     it("should not render copy cell content when column is not provided", () => {
@@ -470,7 +508,7 @@ describe("RowContextMenu Component", () => {
         />,
       );
 
-      expect(screen.queryByTestId("menu-item-view-analytics")).not.toBeInTheDocument();
+      expect(screen.getByTestId("menu-item-view-analytics")).toBeInTheDocument();
     });
 
     it("should handle empty annotators array", () => {
@@ -484,7 +522,7 @@ describe("RowContextMenu Component", () => {
         />,
       );
 
-      expect(screen.queryByTestId("menu-item-view-analytics")).not.toBeInTheDocument();
+      expect(screen.getByTestId("menu-item-view-analytics")).toBeInTheDocument();
     });
   });
 });
