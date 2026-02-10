@@ -205,7 +205,9 @@ const VirtualizedGrid = observer(({ store, annotations, root }) => {
 
   const select = useCallback(
     (c) => {
-      c.type === "annotation" ? store.selectAnnotation(c.id) : store.selectPrediction(c.id);
+      c.type === "annotation"
+        ? store.selectAnnotation(c.id, { exitViewAll: true })
+        : store.selectPrediction(c.id, { exitViewAll: true });
     },
     [store],
   );
