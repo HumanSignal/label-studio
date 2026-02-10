@@ -36,6 +36,7 @@ export const Menu = forwardRef(
       <MenuContext.Provider value={contextValue}>
         <ul
           ref={ref}
+          role="menu"
           className={cn("menu").mod({ size, collapsed }).mix(className).toClassName()}
           style={style}
           onClick={clickHandler}

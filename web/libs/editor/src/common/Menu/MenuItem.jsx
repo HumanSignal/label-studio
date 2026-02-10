@@ -44,6 +44,7 @@ export const MenuItem = ({
   );
 
   const linkAttributes = {
+    role: "menuitem",
     className: rootClass
       .mod({
         active: isActive || active,
