@@ -206,16 +206,16 @@ export const DropdownTrigger = forwardRef<DropdownRef, DropdownTriggerProps>(
       if (triggerMode === "contextmenu") {
         const handleContextMenuOutside = (e: MouseEvent) => {
           if (!dropdownRef.current?.visible) return;
-          
+
           const target = e.target as HTMLElement;
           // Don't close if the context menu is on our own trigger
           if (triggerRef.current?.contains?.(target)) return;
-          
+
           dropdownRef.current?.close?.();
         };
-        
+
         document.addEventListener("contextmenu", handleContextMenuOutside, { capture: true });
-        
+
         return () => {
           document.removeEventListener("click", handleClick, { capture: true });
           document.removeEventListener("contextmenu", handleContextMenuOutside, { capture: true });

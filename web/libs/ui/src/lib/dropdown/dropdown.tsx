@@ -22,7 +22,6 @@ import "./dropdown.scss";
 
 let zIndexCounter = 0;
 
-
 export interface DropdownRef {
   dropdown: HTMLElement;
   visible: boolean;
@@ -150,22 +149,22 @@ const DropdownComponent = forwardRef<DropdownRef, DropdownProps>(
         const rect = dropdownEl.getBoundingClientRect();
         const viewportWidth = window.innerWidth;
         const viewportHeight = window.innerHeight;
-        
+
         let left = cursorPosition.x;
         let top = cursorPosition.y;
-        
+
         // Adjust if menu would go off right edge
         if (left + rect.width > viewportWidth) {
           left = Math.max(0, viewportWidth - rect.width - 10);
         }
-        
+
         // Adjust if menu would go off bottom edge
         if (top + rect.height > viewportHeight) {
           top = Math.max(0, viewportHeight - rect.height - 10);
         }
-        
+
         setOffset({ left, top });
-        
+
         if (props.constrainHeight) {
           const availableHeight = viewportHeight - top - 10;
           setMaxHeight(Math.min(availableHeight, rect.height));
@@ -191,7 +190,14 @@ const DropdownComponent = forwardRef<DropdownRef, DropdownProps>(
       if (props.constrainHeight && result.maxHeight) {
         setMaxHeight(result.maxHeight);
       }
-    }, [triggerRef, minIndex, props.alignment, props.constrainHeight, props.openUpwardForShortViewport, cursorPosition]);
+    }, [
+      triggerRef,
+      minIndex,
+      props.alignment,
+      props.constrainHeight,
+      props.openUpwardForShortViewport,
+      cursorPosition,
+    ]);
 
     const performAnimation = useCallback(
       async (visible = false, disableAnimation?: boolean) => {
@@ -285,7 +291,11 @@ const DropdownComponent = forwardRef<DropdownRef, DropdownProps>(
       // - Anchor positioning is not supported, OR
       // - constrainHeight is enabled (we need maxHeight calculation), OR
       // - Using cursor positioning (requires JS positioning)
-      if (!isInline && visibility === "before-appear" && (!supportsAnchorPositioning || props.constrainHeight || cursorPosition)) {
+      if (
+        !isInline &&
+        visibility === "before-appear" &&
+        (!supportsAnchorPositioning || props.constrainHeight || cursorPosition)
+      ) {
         calculatePosition();
       }
     }, [visibility, calculatePosition, isInline, supportsAnchorPositioning, props.constrainHeight, cursorPosition]);

@@ -22,13 +22,7 @@ export interface RowContextMenuProps {
   onClose: () => void;
 }
 
-export const RowContextMenu: FC<RowContextMenuProps> = ({
-  row,
-  column,
-  view,
-  onViewAnalytics,
-  onClose,
-}) => {
+export const RowContextMenu: FC<RowContextMenuProps> = ({ row, column, view, onViewAnalytics, onClose }) => {
   // Columns that should not have copy cell content option
   const excludedColumns = [
     "select",

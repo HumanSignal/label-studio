@@ -1,4 +1,4 @@
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import { render, screen, fireEvent } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import "@testing-library/jest-dom";
 import { TableRow } from "./TableRow";
@@ -20,11 +20,7 @@ jest.mock("@humansignal/ui", () => ({
     }
 
     return (
-      <div
-        data-testid="dropdown-trigger"
-        data-trigger-mode={triggerMode}
-        {...props}
-      >
+      <div data-testid="dropdown-trigger" data-trigger-mode={triggerMode} {...props}>
         {children}
         <div data-testid="dropdown-content">{content}</div>
       </div>
@@ -39,18 +35,10 @@ jest.mock("../RowContextMenu/RowContextMenu", () => ({
       <div data-testid="menu-row-id">{row.id}</div>
       <div data-testid="menu-column-id">{column?.id || "no-column"}</div>
       <div data-testid="menu-view">{view ? "view-present" : "no-view"}</div>
-      <button
-        type="button"
-        onClick={() => onReviewTask?.(row)}
-        data-testid="menu-review-callback"
-      >
+      <button type="button" onClick={() => onReviewTask?.(row)} data-testid="menu-review-callback">
         Review
       </button>
-      <button
-        type="button"
-        onClick={() => onViewAnalytics?.(row)}
-        data-testid="menu-analytics-callback"
-      >
+      <button type="button" onClick={() => onViewAnalytics?.(row)} data-testid="menu-analytics-callback">
         Analytics
       </button>
       <button type="button" onClick={onClose} data-testid="menu-close">
@@ -159,7 +147,7 @@ describe("TableRow - Context Menu Integration", () => {
     return render(
       <TableContext.Provider value={contextValue}>
         <TableRow {...defaultProps} {...props} />
-      </TableContext.Provider>
+      </TableContext.Provider>,
     );
   };
 
@@ -482,7 +470,7 @@ describe("TableRow - Context Menu Integration", () => {
       render(
         <TableContext.Provider value={emptyContext}>
           <TableRow {...defaultProps} />
-        </TableContext.Provider>
+        </TableContext.Provider>,
       );
 
       // Should render without errors
@@ -519,7 +507,7 @@ describe("TableRow - Context Menu Integration", () => {
       render(
         <TableContext.Provider value={customContext}>
           <TableRow {...defaultProps} />
-        </TableContext.Provider>
+        </TableContext.Provider>,
       );
 
       expect(screen.getByTestId("custom-cell")).toBeInTheDocument();

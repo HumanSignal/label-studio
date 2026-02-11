@@ -67,7 +67,7 @@ export const Table = observer(
     const [toolbarVisible, setToolbarVisible] = useState(true);
     // Track last clicked row ID for shift-click range selection
     const lastClickedId = useRef(null);
-    
+
     // Global context menu state
     const [contextMenu, setContextMenu] = useState(null);
     // Maintain hover appearance on row while its context menu is open for better visual feedback
@@ -226,12 +226,12 @@ export const Table = observer(
     const handleContextMenu = useCallback((e, row) => {
       e.preventDefault();
       e.stopPropagation();
-      
+
       // Find which column was clicked (actual class: lsf-table__cell)
       const cell = e.target.closest(".lsf-table__cell");
       const cellIndex = cell ? Array.from(cell.parentElement.children).indexOf(cell) : -1;
       const column = cellIndex >= 0 ? columnsRef.current[cellIndex] : null;
-      
+
       setContextMenu({
         x: e.clientX,
         y: e.clientY,
@@ -246,28 +246,28 @@ export const Table = observer(
 
       const handleClose = (e) => {
         // Don't close if clicking inside the menu
-        if (e.target.closest('[data-context-menu]')) return;
+        if (e.target.closest("[data-context-menu]")) return;
         setContextMenu(null);
       };
 
       const handleEscape = (e) => {
-        if (e.key === 'Escape') {
+        if (e.key === "Escape") {
           setContextMenu(null);
         }
       };
 
       // Use capture phase and add slight delay to prevent immediate closing
       const timerId = setTimeout(() => {
-        document.addEventListener('click', handleClose, true);
-        document.addEventListener('contextmenu', handleClose, true);
-        document.addEventListener('keydown', handleEscape);
+        document.addEventListener("click", handleClose, true);
+        document.addEventListener("contextmenu", handleClose, true);
+        document.addEventListener("keydown", handleEscape);
       }, 0);
 
       return () => {
         clearTimeout(timerId);
-        document.removeEventListener('click', handleClose, true);
-        document.removeEventListener('contextmenu', handleClose, true);
-        document.removeEventListener('keydown', handleEscape);
+        document.removeEventListener("click", handleClose, true);
+        document.removeEventListener("contextmenu", handleClose, true);
+        document.removeEventListener("keydown", handleEscape);
       };
     }, [contextMenu]);
 
@@ -337,22 +337,22 @@ export const Table = observer(
         const isEven = dataIndex % 2 === 0;
 
         if (isQuickView) {
-        return (
-          <TableRow
-            key={row.id}
-            data={row}
-            even={isEven}
-            onClick={(row, e) => props.onRowClick(row, e)}
-            stopInteractions={stopInteractions}
-            wrapperStyle={{ ...style, height: props.rowHeight }}
-            style={{
-              height: props.rowHeight,
-              width: props.fitContent ? "fit-content" : "auto",
-            }}
-            decoration={Decoration}
-            onContextMenu={handleContextMenu}
-          />
-        );
+          return (
+            <TableRow
+              key={row.id}
+              data={row}
+              even={isEven}
+              onClick={(row, e) => props.onRowClick(row, e)}
+              stopInteractions={stopInteractions}
+              wrapperStyle={{ ...style, height: props.rowHeight }}
+              style={{
+                height: props.rowHeight,
+                width: props.fitContent ? "fit-content" : "auto",
+              }}
+              decoration={Decoration}
+              onContextMenu={handleContextMenu}
+            />
+          );
         }
 
         // Invert for visual consistency in Regular mode: we want odd rows (2nd, 4th, etc.) to have background
@@ -476,16 +476,18 @@ export const Table = observer(
             </StickyList>
           </TableContext.Provider>
         </div>
-        {contextMenu && typeof document !== 'undefined' && createPortal(
-          <ContextMenuPortal
-            contextMenu={contextMenu}
-            view={view}
-            onReviewTask={onReviewTask}
-            onViewAnalytics={onViewAnalytics}
-            onClose={() => setContextMenu(null)}
-          />,
-          document.body
-        )}
+        {contextMenu &&
+          typeof document !== "undefined" &&
+          createPortal(
+            <ContextMenuPortal
+              contextMenu={contextMenu}
+              view={view}
+              onReviewTask={onReviewTask}
+              onViewAnalytics={onViewAnalytics}
+              onClose={() => setContextMenu(null)}
+            />,
+            document.body,
+          )}
       </>
     );
   },
@@ -637,26 +639,29 @@ const ContextMenuPortal = memo(({ contextMenu, view, onReviewTask, onViewAnalyti
   const menuRef = useRef(null);
 
   // Helper to calculate position with given dimensions
-  const calculatePosition = useCallback((width, height) => {
-    const viewportWidth = window.innerWidth;
-    const viewportHeight = window.innerHeight;
-    
-    let x = contextMenu.x;
-    let y = contextMenu.y;
-    
-    // Adjust if would go off right edge
-    if (x + width > viewportWidth) {
-      x = Math.max(10, viewportWidth - width - 10);
-    }
-    
-    // Adjust if would go off bottom edge
-    if (y + height > viewportHeight) {
-      y = Math.max(10, viewportHeight - height - 10);
-    }
-    
-    return { x, y };
-  }, [contextMenu.x, contextMenu.y]);
-  
+  const calculatePosition = useCallback(
+    (width, height) => {
+      const viewportWidth = window.innerWidth;
+      const viewportHeight = window.innerHeight;
+
+      let x = contextMenu.x;
+      let y = contextMenu.y;
+
+      // Adjust if would go off right edge
+      if (x + width > viewportWidth) {
+        x = Math.max(10, viewportWidth - width - 10);
+      }
+
+      // Adjust if would go off bottom edge
+      if (y + height > viewportHeight) {
+        y = Math.max(10, viewportHeight - height - 10);
+      }
+
+      return { x, y };
+    },
+    [contextMenu.x, contextMenu.y],
+  );
+
   // Calculate initial position with estimated dimensions
   const [position, setPosition] = useState(() => calculatePosition(250, 300));
 
@@ -683,7 +688,7 @@ const ContextMenuPortal = memo(({ contextMenu, view, onReviewTask, onViewAnalyti
       ref={menuRef}
       data-context-menu
       style={{
-        position: 'fixed',
+        position: "fixed",
         left: `${position.x}px`,
         top: `${position.y}px`,
         zIndex: 10000,
