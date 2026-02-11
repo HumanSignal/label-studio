@@ -71,14 +71,7 @@ async function fetchUserById(userId: number): Promise<UserData | null> {
 export function isUserComplete(user: any): boolean {
   if (!user) return false;
   // Support both camelCase (MST UserExtended) and snake_case (API response)
-  return !!(
-    user.firstName ||
-    user.lastName ||
-    user.first_name ||
-    user.last_name ||
-    user.username ||
-    user.email
-  );
+  return !!(user.firstName || user.lastName || user.first_name || user.last_name || user.username || user.email);
 }
 
 interface UseResolveUserOptions {
