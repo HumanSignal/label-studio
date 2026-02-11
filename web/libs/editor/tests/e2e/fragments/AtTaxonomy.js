@@ -93,14 +93,18 @@ class Taxonomy {
   /**
    * Locate a tree item by its visible text.
    *
-   * - NewTaxonomy: items are .ant-select-tree-treenode in a portal dropdown
+   * - NewTaxonomy: items are .ant-select-tree-treenode in a portal dropdown.
+   *   Uses exact text match (normalize-space(.)='text') to avoid substring issues
+   *   (e.g. "Four" matching "Four to seven" with contains()).
    * - Legacy: items have CSS module class taxonomy__item inside the root
    */
   locateItemByText(itemText) {
     if (this._legacy) {
       return this.locate(this.legacyItem).withDescendant(`.//label[text()='${itemText}']`);
     }
-    return this.locateInDropdown(this.treeNode).withDescendant(locate(this.treeTitle).withText(itemText));
+    // Exact text match via XPath to prevent substring matching (e.g. "Four" in "Four to seven")
+    const exactTitleXpath = `.//*[contains(concat(' ', normalize-space(@class), ' '), ' ant-select-tree-title ')][normalize-space(.)='${itemText}']`;
+    return this.locateInDropdown(this.treeNode).withDescendant(exactTitleXpath);
   }
 
   /**
@@ -216,17 +220,20 @@ class Taxonomy {
   /**
    * Click a tree item to toggle its selection.
    *
-   * - NewTaxonomy: TreeSelect uses treeCheckable + treeCheckStrictly. In Ant Design,
-   *   only clicking the CHECKBOX triggers onCheck (mapped to onChange). Clicking the
-   *   content wrapper only triggers onSelect which is not handled. So we must click
-   *   the .ant-select-tree-checkbox element specifically.
+   * - NewTaxonomy: rc-tree-select maps both onCheck (checkbox click) and onSelect
+   *   (content-wrapper click) to the same onInternalSelect handler. Clicking the
+   *   title text is the most reliable approach — the click bubbles to the content
+   *   wrapper which fires onSelectorClick → onInternalSelect → onChange.
+   *   We use an exact-match XPath for the title to avoid "Four" matching "Four to seven".
    * - Legacy: clicking the item element (which contains the checkbox) works.
    */
   clickItemByText(itemText) {
     if (this._legacy) {
       this.clickItem(this.locateItemByText(itemText));
     } else {
-      I.click(locate(this.treeCheckbox).inside(this.locateItemByText(itemText)));
+      // Click the title text directly — bubbles to the content wrapper's onSelectorClick
+      const exactTitleXpath = `.//*[contains(concat(' ', normalize-space(@class), ' '), ' ant-select-tree-title ')][normalize-space(.)='${itemText}']`;
+      I.click(locate(exactTitleXpath).inside(locate(this.dropdown)));
     }
   }
 
