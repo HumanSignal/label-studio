@@ -13,6 +13,7 @@ class Taxonomy {
   treeNode = ".ant-select-tree-treenode";
   treeSwitcher = ".ant-select-tree-switcher";
   treeTitle = ".ant-select-tree-title";
+  treeCheckbox = ".ant-select-tree-checkbox";
 
   // Search input in dropdown (NewTaxonomy)
   search = '[data-testid="taxonomy-search"]';
@@ -33,26 +34,16 @@ class Taxonomy {
   _legacy = false;
 
   /**
-   * Backward-compatible property: returns the appropriate item selector.
-   * Some tests access AtTaxonomy.item directly to construct custom locators.
+   * Dynamic properties that change with legacy mode.
+   * Initialized to NewTaxonomy values (the default).
+   * Updated by setLegacy().
+   *
+   * Using explicit properties instead of getters to avoid potential
+   * issues with CodeceptJS's module injection system.
    */
-  get item() {
-    return this._legacy ? this.legacyItem : this.treeNode;
-  }
-
-  /**
-   * Backward-compatible property: returns the appropriate group/switcher selector.
-   */
-  get group() {
-    return this._legacy ? this.legacyGroup : this.treeSwitcher;
-  }
-
-  /**
-   * Backward-compatible property: returns the appropriate selected list selector.
-   */
-  get selectedList() {
-    return this._legacy ? this.legacySelectedList : ".ant-select-selection-overflow";
-  }
+  item = ".ant-select-tree-treenode";
+  group = ".ant-select-tree-switcher";
+  selectedList = ".ant-select-selection-overflow";
 
   constructor(config = {}) {
     if (config.index) {
@@ -70,6 +61,10 @@ class Taxonomy {
    */
   setLegacy(value) {
     this._legacy = !!value;
+    // Update dynamic properties
+    this.item = this._legacy ? this.legacyItem : this.treeNode;
+    this.group = this._legacy ? this.legacyGroup : this.treeSwitcher;
+    this.selectedList = this._legacy ? this.legacySelectedList : ".ant-select-selection-overflow";
   }
 
   locateTaxonomy() {
@@ -218,8 +213,21 @@ class Taxonomy {
     I.click(itemLocator);
   }
 
+  /**
+   * Click a tree item to toggle its selection.
+   *
+   * - NewTaxonomy: TreeSelect uses treeCheckable + treeCheckStrictly. In Ant Design,
+   *   only clicking the CHECKBOX triggers onCheck (mapped to onChange). Clicking the
+   *   content wrapper only triggers onSelect which is not handled. So we must click
+   *   the .ant-select-tree-checkbox element specifically.
+   * - Legacy: clicking the item element (which contains the checkbox) works.
+   */
   clickItemByText(itemText) {
-    this.clickItem(this.locateItemByText(itemText));
+    if (this._legacy) {
+      this.clickItem(this.locateItemByText(itemText));
+    } else {
+      I.click(locate(this.treeCheckbox).inside(this.locateItemByText(itemText)));
+    }
   }
 
   // ----- Legacy-only methods (require legacy="true" in config) -----

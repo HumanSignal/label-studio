@@ -48,9 +48,12 @@ examples.forEach((example) => {
 
       Asserts.notDeepEqualWithTolerance(result, restored, 1);
       for (let i = result.length; i--; ) {
+        // Omit from_name, label fields, and original_length (audio duration depends on loading timing)
+        const omitKeys = (val, key) => key === "from_name" || key === "original_length" || isLabels(val, key);
+
         Asserts.deepEqualWithTolerance(
-          Helpers.omitBy(result[i], (val, key) => key === "from_name" || isLabels(val, key)),
-          Helpers.omitBy(restored[i], (val, key) => key === "from_name" || isLabels(val, key)),
+          Helpers.omitBy(result[i], omitKeys),
+          Helpers.omitBy(restored[i], omitKeys),
           1,
         );
       }
@@ -132,7 +135,14 @@ const MULTIPLE_TYPE = "multiple";
     const restored = await LabelStudio.serialize();
 
     Asserts.notDeepEqualWithTolerance(result[0], restored[0], 1);
-    Asserts.deepEqualWithTolerance(Helpers.omitBy(result[0], isLabels), Helpers.omitBy(restored[0], isLabels), 1);
+    // Omit label-type fields and original_length (audio duration depends on loading timing)
+    const omitLabelsAndAudioMeta = (val, key) => isLabels(val, key) || key === "original_length";
+
+    Asserts.deepEqualWithTolerance(
+      Helpers.omitBy(result[0], omitLabelsAndAudioMeta),
+      Helpers.omitBy(restored[0], omitLabelsAndAudioMeta),
+      1,
+    );
     assert.strictEqual(restored[0].value.labels.length, 0);
     await clickLabelWithLengthExpection(2, 1, 1);
     switch (type) {
