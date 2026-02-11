@@ -242,9 +242,7 @@ const waitForImageSrc = (expectedSrc) => {
       const actualSrc = imageObject?.currentImageEntity?.src;
 
       reject(
-        new Error(
-          `waitForImageSrc: Timed out after 10s. Expected "${expectedSrc}" but current src is "${actualSrc}"`,
-        ),
+        new Error(`waitForImageSrc: Timed out after 10s. Expected "${expectedSrc}" but current src is "${actualSrc}"`),
       );
     }, 10000);
 
