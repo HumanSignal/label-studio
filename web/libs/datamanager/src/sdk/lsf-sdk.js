@@ -1155,21 +1155,40 @@ export class LSFWrapper {
   onEntityCreate = (...args) => this.datamanager.invoke("onEntityCreate", ...args);
   onEntityDelete = (...args) => this.datamanager.invoke("onEntityDelete", ...args);
   _selectAnnotationTimeout = null;
+  _debouncedFirstOldSelection = undefined;
   onSelectAnnotation = (prevAnnotation, nextAnnotation, options) => {
+    // NOTE on parameter naming: LSF fires selectAnnotation(newAnnotation, oldAnnotation).
+    // Despite the names here, prevAnnotation = the NEWLY selected annotation,
+    // nextAnnotation = the PREVIOUSLY selected annotation (before this selection).
     if (window.APP_SETTINGS.read_only_quick_view_enabled && !this.labelStream) {
       prevAnnotation?.setEditable(false);
     }
 
     // FIT-720: Debounce selectAnnotation callbacks during batch selection (init)
-    // During init, selectAnnotation fires for ALL annotations in rapid succession
-    // This debounce ensures only the final selection triggers the callback
+    // During init, selectAnnotation fires for ALL annotations in rapid succession.
+    // This debounce ensures only the final selection triggers the callback.
     if (isFF(FF_FIT_720_LAZY_LOAD_ANNOTATIONS)) {
       if (this._selectAnnotationTimeout) {
         clearTimeout(this._selectAnnotationTimeout);
+        // Keep nextAnnotation (the "old" selection) from the FIRST call in the batch.
+        // After resetAnnotationStore + initializeStore, the first selectAnnotation fires
+        // with oldSelection=null (nothing was selected before). Subsequent calls during
+        // init have oldSelection=someOtherInitAnnotation. The DataManager's history
+        // handler compares new vs old annotation pk to decide whether to refetch.
+        // If we use the last call's old selection (which may equal the new selection
+        // when re-selecting the same annotation), the handler thinks nothing changed
+        // and skips the history fetch. Preserving the first old=null ensures the
+        // handler sees a genuine annotation change and fetches history.
+      } else {
+        this._debouncedFirstOldSelection = nextAnnotation;
       }
       this._selectAnnotationTimeout = setTimeout(() => {
         this._selectAnnotationTimeout = null;
-        this._invokeSelectAnnotation(prevAnnotation, nextAnnotation, options);
+        const firstOld = this._debouncedFirstOldSelection;
+        this._debouncedFirstOldSelection = undefined;
+        // prevAnnotation from last call = the final newly selected annotation (correct)
+        // firstOld = the selection state before the batch started (null after reset)
+        this._invokeSelectAnnotation(prevAnnotation, firstOld, options);
       }, 0);
       return;
     }
@@ -1178,6 +1197,17 @@ export class LSFWrapper {
   };
 
   _invokeSelectAnnotation = async (prevAnnotation, nextAnnotation, options) => {
+    // Invoke the DataManager callback first so that history fetch can start immediately.
+    // The history endpoint only needs the annotation pk (available on stubs).
+    // Hydration (which fetches full annotation data) runs in parallel afterwards.
+    if (nextAnnotation?.history?.undoIdx) {
+      this.saveDraft(nextAnnotation).then(() => {
+        this.datamanager.invoke("onSelectAnnotation", prevAnnotation, nextAnnotation, options, this);
+      });
+    } else {
+      this.datamanager.invoke("onSelectAnnotation", prevAnnotation, nextAnnotation, options, this);
+    }
+
     // FIT-720: Hydrate stub annotations when selected
     // IMPORTANT: Use the CURRENTLY SELECTED annotation, not the one from the callback
     // The debounce may have caused the callback annotation to be stale
@@ -1186,14 +1216,6 @@ export class LSFWrapper {
       if (currentSelected?.pk) {
         await this._hydrateStubAnnotation(currentSelected);
       }
-    }
-
-    if (nextAnnotation?.history?.undoIdx) {
-      this.saveDraft(nextAnnotation).then(() => {
-        this.datamanager.invoke("onSelectAnnotation", prevAnnotation, nextAnnotation, options, this);
-      });
-    } else {
-      this.datamanager.invoke("onSelectAnnotation", prevAnnotation, nextAnnotation, options, this);
     }
   };
 
