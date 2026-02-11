@@ -16,7 +16,7 @@ const createMockDropdownElement = () => {
 
 // Mock the dropdown component to avoid complex portal rendering in tests
 jest.mock("./dropdown", () => ({
-  Dropdown: ({ children, onToggle, ref }: any) => {
+  Dropdown: ({ children, ref }: any) => {
     // Simulate dropdown ref API
     if (ref) {
       const mockRef: any = {
@@ -45,7 +45,7 @@ describe("DropdownTrigger - Context Menu Mode", () => {
     it("should render successfully with default props", () => {
       render(
         <DropdownTrigger content={<div>Menu Content</div>}>
-          <button>Trigger</button>
+          <button type="button">Trigger</button>
         </DropdownTrigger>,
       );
 
@@ -55,7 +55,7 @@ describe("DropdownTrigger - Context Menu Mode", () => {
     it("should render dropdown content when provided", () => {
       render(
         <DropdownTrigger content={<div>Menu Content</div>}>
-          <button>Trigger</button>
+          <button type="button">Trigger</button>
         </DropdownTrigger>,
       );
 
@@ -70,7 +70,9 @@ describe("DropdownTrigger - Context Menu Mode", () => {
         const dropdownRef = useRef<DropdownRef>(null);
         return (
           <DropdownTrigger content={<div>Menu</div>} dropdown={dropdownRef}>
-            <button data-testid="trigger-button">Click Me</button>
+            <button type="button" data-testid="trigger-button">
+              Click Me
+            </button>
           </DropdownTrigger>
         );
       };
@@ -89,7 +91,9 @@ describe("DropdownTrigger - Context Menu Mode", () => {
         const dropdownRef = useRef<DropdownRef>(null);
         return (
           <DropdownTrigger content={<div>Menu</div>} dropdown={dropdownRef}>
-            <button data-testid="trigger-button">Click Me</button>
+            <button type="button" data-testid="trigger-button">
+              Click Me
+            </button>
           </DropdownTrigger>
         );
       };
@@ -118,7 +122,9 @@ describe("DropdownTrigger - Context Menu Mode", () => {
         const dropdownRef = useRef<DropdownRef>(null);
         return (
           <DropdownTrigger content={<div>Menu</div>} dropdown={dropdownRef} triggerMode="contextmenu">
-            <button data-testid="trigger-button">Right Click Me</button>
+            <button type="button" data-testid="trigger-button">
+              Right Click Me
+            </button>
           </DropdownTrigger>
         );
       };
@@ -144,7 +150,9 @@ describe("DropdownTrigger - Context Menu Mode", () => {
         const dropdownRef = useRef<DropdownRef>(null);
         return (
           <DropdownTrigger content={<div>Menu</div>} dropdown={dropdownRef} triggerMode="contextmenu">
-            <button data-testid="trigger-button">Right Click Me</button>
+            <button type="button" data-testid="trigger-button">
+              Right Click Me
+            </button>
           </DropdownTrigger>
         );
       };
@@ -178,7 +186,9 @@ describe("DropdownTrigger - Context Menu Mode", () => {
             triggerMode="contextmenu"
             positionAtCursor={true}
           >
-            <button data-testid="trigger-button">Right Click Me</button>
+            <button type="button" data-testid="trigger-button">
+              Right Click Me
+            </button>
           </DropdownTrigger>
         );
       };
@@ -212,7 +222,9 @@ describe("DropdownTrigger - Context Menu Mode", () => {
             triggerMode="contextmenu"
             positionAtCursor={false}
           >
-            <button data-testid="trigger-button">Right Click Me</button>
+            <button type="button" data-testid="trigger-button">
+              Right Click Me
+            </button>
           </DropdownTrigger>
         );
       };
@@ -238,7 +250,9 @@ describe("DropdownTrigger - Context Menu Mode", () => {
         const dropdownRef = useRef<DropdownRef>(null);
         return (
           <DropdownTrigger content={<div>Menu</div>} dropdown={dropdownRef} triggerMode="contextmenu" disabled={true}>
-            <button data-testid="trigger-button">Right Click Me</button>
+            <button type="button" data-testid="trigger-button">
+              Right Click Me
+            </button>
           </DropdownTrigger>
         );
       };
@@ -264,7 +278,9 @@ describe("DropdownTrigger - Context Menu Mode", () => {
         const dropdownRef = useRef<DropdownRef>(null);
         return (
           <DropdownTrigger content={<div>Menu</div>} dropdown={dropdownRef} triggerMode="contextmenu">
-            <button data-testid="trigger-button">Right Click Me</button>
+            <button type="button" data-testid="trigger-button">
+              Right Click Me
+            </button>
           </DropdownTrigger>
         );
       };
@@ -285,7 +301,9 @@ describe("DropdownTrigger - Context Menu Mode", () => {
         const dropdownRef = useRef<DropdownRef>(null);
         return (
           <DropdownTrigger content={<div>Menu</div>} dropdown={dropdownRef} triggerMode="contextmenu" toggle={true}>
-            <button data-testid="trigger-button">Right Click Me</button>
+            <button type="button" data-testid="trigger-button">
+              Right Click Me
+            </button>
           </DropdownTrigger>
         );
       };
@@ -310,7 +328,9 @@ describe("DropdownTrigger - Context Menu Mode", () => {
         const dropdownRef = useRef<DropdownRef>(null);
         return (
           <DropdownTrigger content={<div>Menu</div>} dropdown={dropdownRef} triggerMode="contextmenu" toggle={false}>
-            <button data-testid="trigger-button">Right Click Me</button>
+            <button type="button" data-testid="trigger-button">
+              Right Click Me
+            </button>
           </DropdownTrigger>
         );
       };
@@ -342,7 +362,9 @@ describe("DropdownTrigger - Context Menu Mode", () => {
             triggerMode="contextmenu"
             positionAtCursor={true}
           >
-            <button data-testid="trigger-button">Right Click Me</button>
+            <button type="button" data-testid="trigger-button">
+              Right Click Me
+            </button>
           </DropdownTrigger>
         );
       };
@@ -376,7 +398,9 @@ describe("DropdownTrigger - Context Menu Mode", () => {
             triggerMode="contextmenu"
             positionAtCursor={false}
           >
-            <button data-testid="trigger-button">Right Click Me</button>
+            <button type="button" data-testid="trigger-button">
+              Right Click Me
+            </button>
           </DropdownTrigger>
         );
       };
@@ -402,7 +426,7 @@ describe("DropdownTrigger - Context Menu Mode", () => {
     it("should apply dataTestId to dropdown when provided", () => {
       render(
         <DropdownTrigger content={<div>Menu</div>} dataTestId="custom-dropdown">
-          <button>Trigger</button>
+          <button type="button">Trigger</button>
         </DropdownTrigger>,
       );
 
@@ -423,7 +447,9 @@ describe("DropdownTrigger - Context Menu Mode", () => {
               triggerMode="contextmenu"
               closeOnClickOutside={true}
             >
-              <button data-testid="trigger-button">Right Click Me</button>
+              <button type="button" data-testid="trigger-button">
+                Right Click Me
+              </button>
             </DropdownTrigger>
             <div data-testid="outside-element">Outside</div>
           </>
@@ -447,7 +473,9 @@ describe("DropdownTrigger - Context Menu Mode", () => {
               triggerMode="contextmenu"
               closeOnClickOutside={false}
             >
-              <button data-testid="trigger-button">Right Click Me</button>
+              <button type="button" data-testid="trigger-button">
+                Right Click Me
+              </button>
             </DropdownTrigger>
             <div data-testid="outside-element">Outside</div>
           </>
@@ -465,7 +493,9 @@ describe("DropdownTrigger - Context Menu Mode", () => {
     it("should apply custom className to trigger", () => {
       render(
         <DropdownTrigger content={<div>Menu</div>} className="custom-trigger-class">
-          <button data-testid="trigger-button">Trigger</button>
+          <button type="button" data-testid="trigger-button">
+            Trigger
+          </button>
         </DropdownTrigger>,
       );
 

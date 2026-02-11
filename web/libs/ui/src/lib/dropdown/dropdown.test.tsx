@@ -9,7 +9,7 @@ jest.mock("./dropdown.scss", () => ({}));
 
 // Mock the alignment utility
 jest.mock("@humansignal/core/lib/utils/dom", () => ({
-  alignElements: jest.fn((parent, dropdown, alignment, offset, constrainHeight, openUpward) => ({
+  alignElements: jest.fn(() => ({
     left: 100,
     top: 200,
     maxHeight: 500,
@@ -18,7 +18,7 @@ jest.mock("@humansignal/core/lib/utils/dom", () => ({
 
 // Mock the transition utility
 jest.mock("@humansignal/core/lib/utils/transition", () => ({
-  aroundTransition: jest.fn((element, callbacks) => {
+  aroundTransition: jest.fn((_element, callbacks) => {
     callbacks.beforeTransition?.();
     callbacks.transition?.();
     callbacks.afterTransition?.();
@@ -301,7 +301,7 @@ describe("Dropdown - Cursor Position Support", () => {
         );
       };
 
-      const { rerender } = render(<TestComponent />);
+      render(<TestComponent />);
 
       // Get the ref and toggle
       const dropdown = screen.getByText("Content").parentElement;
