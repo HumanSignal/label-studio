@@ -171,8 +171,12 @@ class ImageCacheManager {
             return;
           }
 
-          // Validate content type is an image
-          if (blob.type && !blob.type.startsWith("image/")) {
+          // When Content-Type is generic (e.g. binary/octet-stream, application/octet-stream)
+          // or missing, we still attempt to load the image since browsers detect format
+          // by magic bytes. S3 objects uploaded without explicit Content-Type often have
+          // binary/octet-stream but are valid images. Only reject known non-image types.
+          const isGenericType = !blob.type || blob.type.includes("octet-stream");
+          if (!isGenericType && !blob.type.startsWith("image/")) {
             reject(new ImageCacheError(`Invalid content type for image: ${blob.type} (url: ${url})`));
             return;
           }
