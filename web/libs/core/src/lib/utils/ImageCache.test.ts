@@ -32,8 +32,8 @@ function mockXHRWithContentType(contentType: string) {
       status: 200,
       response: blob,
       open: jest.fn(),
-      send: jest.fn(function () {
-        setTimeout(() => listeners["load"]?.(new Event("load")), 0);
+      send: jest.fn(() => {
+        setTimeout(() => listeners.load?.(new Event("load")), 0);
       }),
       addEventListener: jest.fn((event: string, handler: Function) => {
         listeners[event] = handler;
@@ -86,9 +86,7 @@ describe("ImageCache content type validation", () => {
   it("should reject text/html content type", async () => {
     const restore = mockXHRWithContentType("text/html");
     try {
-      await expect(imageCache.load("https://example.com/page.html")).rejects.toThrow(
-        "Invalid content type for image",
-      );
+      await expect(imageCache.load("https://example.com/page.html")).rejects.toThrow("Invalid content type for image");
     } finally {
       restore();
     }
@@ -100,9 +98,7 @@ describe("ImageCache content type validation", () => {
   it("should reject application/json content type", async () => {
     const restore = mockXHRWithContentType("application/json");
     try {
-      await expect(imageCache.load("https://example.com/data.json")).rejects.toThrow(
-        "Invalid content type for image",
-      );
+      await expect(imageCache.load("https://example.com/data.json")).rejects.toThrow("Invalid content type for image");
     } finally {
       restore();
     }

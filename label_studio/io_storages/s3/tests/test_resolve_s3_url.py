@@ -21,7 +21,13 @@ class TestResolveS3UrlContentType(unittest.TestCase):
         resolve_s3_url('s3://bucket/path/image.jpg', self.mock_client, presign=True)
 
         call_args = self.mock_client.generate_presigned_url.call_args
-        params = call_args[1]['Params'] if 'Params' in call_args[1] else call_args[0][1] if len(call_args[0]) > 1 else call_args[1].get('Params')
+        params = (
+            call_args[1]['Params']
+            if 'Params' in call_args[1]
+            else call_args[0][1]
+            if len(call_args[0]) > 1
+            else call_args[1].get('Params')
+        )
         assert params['ResponseContentType'] == 'image/jpeg'
 
     def test_png_gets_response_content_type(self):
