@@ -82,6 +82,20 @@ module.exports = {
     return this._stageBBox?.y ?? 0;
   },
 
+  /**
+   * Assert that the currently displayed image matches the expected source URL.
+   * Polls until the image entity's original src matches AND the image is fully
+   * rendered on the Konva canvas. Handles navigation timing automatically.
+   *
+   * Use this instead of I.seeElement("img[src=...]") — the <img> tag uses a blob URL
+   * and is clipped to 1px, while the actual image lives on the Konva canvas.
+   *
+   * @param {string} expectedSrc — the original image URL (e.g. "/public/files/images/foo.jpg")
+   */
+  async seeCurrentImageSrc(expectedSrc) {
+    await I.executeScript(Helpers.waitForImageSrc, expectedSrc);
+  },
+
   async waitForImage() {
     I.say("Waiting for image to be loaded");
     // Wait for any download progress indicator to disappear

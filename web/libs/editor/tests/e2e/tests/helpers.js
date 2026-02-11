@@ -219,6 +219,57 @@ const waitForImage = () => {
 };
 
 /**
+ * Get the original src of the currently displayed image entity.
+ * Returns the original URL (not the blob URL), or undefined if no image is loaded.
+ */
+const currentImageSrc = () => {
+  const imageObject = window.Htx?.annotationStore?.selected?.objects?.find((o) => o.type === "image");
+
+  return imageObject?.currentImageEntity?.src;
+};
+
+/**
+ * Wait until the current image entity matches the expected src AND is fully loaded
+ * and rendered on the Konva canvas. Handles navigation timing — if the entity hasn't
+ * changed yet, it will keep polling until it matches.
+ *
+ * @param {string} expectedSrc — the original image URL to wait for
+ */
+const waitForImageSrc = (expectedSrc) => {
+  return new Promise((resolve, reject) => {
+    const timeout = setTimeout(() => {
+      const imageObject = window.Htx?.annotationStore?.selected?.objects?.find((o) => o.type === "image");
+      const actualSrc = imageObject?.currentImageEntity?.src;
+
+      reject(
+        new Error(
+          `waitForImageSrc: Timed out after 10s. Expected "${expectedSrc}" but current src is "${actualSrc}"`,
+        ),
+      );
+    }, 10000);
+
+    const check = () => {
+      const imageObject = window.Htx?.annotationStore?.selected?.objects?.find((o) => o.type === "image");
+      const imageEntity = imageObject?.currentImageEntity;
+
+      if (imageEntity?.src === expectedSrc && imageObject?.imageIsLoaded) {
+        const stageRef = imageObject.stageRef;
+
+        if (stageRef && stageRef.find("Image").length > 0) {
+          clearTimeout(timeout);
+          setTimeout(resolve, 32);
+          return;
+        }
+      }
+
+      requestAnimationFrame(check);
+    };
+
+    check();
+  });
+};
+
+/**
  * Wait for all audio on the page to be loaded
  */
 const waitForAudio = async () => {
@@ -1036,4 +1087,7 @@ module.exports = {
   doDrawingAction,
   createRandomWithSeed,
   createRandomIntWithSeed,
+
+  currentImageSrc,
+  waitForImageSrc,
 };
