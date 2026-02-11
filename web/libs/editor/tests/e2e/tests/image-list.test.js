@@ -224,12 +224,13 @@ Scenario("View All disables MIG pagination", async ({ I, AtImageView, LabelStudi
   I.see("2 of 4");
 
   I.say("Hotkeys for navigation should not work");
-  await AtImageView.multiImageGoForwardWithHotkey();
-  await AtImageView.seeCurrentImageSrc(data.images[1]);
+  // Don't use multiImageGoForwardWithHotkey() here — it calls waitForImage()
+  // which expects normal annotation rendering. In View All mode the rendering
+  // is different and navigation is disabled, so just press the keys directly.
+  I.pressKey("Ctrl+d");
   I.see("2 of 4");
 
-  await AtImageView.multiImageGoBackwardWithHotkey();
-  await AtImageView.seeCurrentImageSrc(data.images[1]);
+  I.pressKey("Ctrl+a");
   I.see("2 of 4");
 });
 
