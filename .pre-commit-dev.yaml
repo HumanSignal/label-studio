@@ -19,6 +19,12 @@ repos:
         files: ^web/.*
   - repo: local
     hooks:
+      - id: biome-check
+        name: biome-check
+        entry: bash -c 'cd web && yarn biome check . --diagnostic-level=error'
+        language: system
+        pass_filenames: false
+        files: ^web/.*
       - id: stylelint
         name: stylelint
         entry: bash -c 'cd web && npx stylelint **/*.scss --fix'
