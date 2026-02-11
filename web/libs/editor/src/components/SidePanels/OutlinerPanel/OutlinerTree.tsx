@@ -487,7 +487,7 @@ const RegionControls: FC<RegionControlsProps> = injector(
     }, [entity, type, regions]);
 
     const onToggleHidden = useCallback(() => {
-      if (type?.includes("region") || type?.includes("range")) {
+      if (type?.includes("region") || type?.includes("range") || type?.includes("reactcode")) {
         entity.toggleHidden();
       } else if (!type || type.includes("label")) {
         regionStore.setHiddenByLabel(!hidden, entity);
