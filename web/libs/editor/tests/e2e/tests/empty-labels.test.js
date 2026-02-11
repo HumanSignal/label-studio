@@ -51,11 +51,7 @@ examples.forEach((example) => {
         // Omit from_name, label fields, and original_length (audio duration depends on loading timing)
         const omitKeys = (val, key) => key === "from_name" || key === "original_length" || isLabels(val, key);
 
-        Asserts.deepEqualWithTolerance(
-          Helpers.omitBy(result[i], omitKeys),
-          Helpers.omitBy(restored[i], omitKeys),
-          1,
-        );
+        Asserts.deepEqualWithTolerance(Helpers.omitBy(result[i], omitKeys), Helpers.omitBy(restored[i], omitKeys), 1);
       }
     }
   });
