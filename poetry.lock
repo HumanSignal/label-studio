@@ -915,21 +915,6 @@ toml = ">=0.10.2"
 test = ["coverage (>=7.2.7)", "django-add-default-value (>=0.4.0)", "mysqlclient (>=2.1.1)", "psycopg2 (>=2.9.6)", "tox (>=4.6.3)"]
 
 [[package]]
-name = "django-model-utils"
-version = "4.1.1"
-description = "Django model mixins and utilities"
-optional = false
-python-versions = "*"
-groups = ["main"]
-files = [
-    {file = "django-model-utils-4.1.1.tar.gz", hash = "sha256:eb5dd05ef7d7ce6bc79cae54ea7c4a221f6f81e2aad7722933aee66489e7264b"},
-    {file = "django_model_utils-4.1.1-py3-none-any.whl", hash = "sha256:ef7c440024e797796a3811432abdd2be8b5225ae64ef346f8bfc6de7d8e5d73c"},
-]
-
-[package.dependencies]
-Django = ">=2.0.1"
-
-[[package]]
 name = "django-ranged-fileresponse"
 version = "0.1.2"
 description = "Modified Django FileResponse that adds Content-Range headers."
@@ -5163,4 +5148,4 @@ uwsgi = ["pyuwsgi", "uwsgitop"]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.10,<4"
-content-hash = "0a49ff798675e8dde78e82d28974757303be838dc034f731feb1811a2b90cb9f"
+content-hash = "e833d0943d75256965117d47620cc08ab0bb0ae24c137b0bcb03f38a0093025b"
