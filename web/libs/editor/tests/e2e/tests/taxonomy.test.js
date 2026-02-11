@@ -17,9 +17,11 @@ Scenario("Lines overlap", async ({ I, LabelStudio, AtTaxonomy }) => {
   AtTaxonomy.setLegacy(true);
 
   async function checkOverlapAndGap(text1, text2) {
-    // Wait for elements to be present in the DOM before grabbing their bounding rects
-    const locator1 = AtTaxonomy.locate(AtTaxonomy.item).find("label").withText(text1);
-    const locator2 = AtTaxonomy.locate(AtTaxonomy.item).find("label").withText(text2);
+    // Wait for elements to be present in the DOM before grabbing their bounding rects.
+    // Use legacyItem directly — this function only runs with legacy="true" configs,
+    // and the dynamic `item` property may not propagate through the DI proxy.
+    const locator1 = AtTaxonomy.locate(AtTaxonomy.legacyItem).find("label").withText(text1);
+    const locator2 = AtTaxonomy.locate(AtTaxonomy.legacyItem).find("label").withText(text2);
 
     await I.waitForElement(locator1, 5);
     await I.waitForElement(locator2, 5);
