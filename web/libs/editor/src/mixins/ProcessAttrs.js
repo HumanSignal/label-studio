@@ -47,7 +47,7 @@ const ProcessAttrsMixin = types
 
       const { type, options } = parseTypeAndOption(self.resolver);
 
-      if (!Object.prototype.hasOwnProperty.call(resolvers, type)) {
+      if (!Object.hasOwn(resolvers, type)) {
         console.error(`Resolver "${type ?? self.resolver}" looks unfamiliar`);
         return value;
       }

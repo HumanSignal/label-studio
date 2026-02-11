@@ -72,7 +72,7 @@ export class AudioDecoder extends BaseAudioDecoder {
     // This is a shared promise which will be observed by all instances of the same source
     this.decodingPromise = new Promise((resolve) => (this.decodingResolve = resolve as any));
 
-    let splitChannels: SplitChannel | undefined = undefined;
+    let splitChannels: SplitChannel | undefined;
 
     try {
       // Set the worker instance and resolve the decoder promise

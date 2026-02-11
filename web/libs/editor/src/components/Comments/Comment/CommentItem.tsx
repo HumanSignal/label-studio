@@ -42,11 +42,7 @@ interface CommentItemProps {
     setHighlighted: (value: boolean) => {};
     _commentRef: React.Ref<HTMLElement>;
   };
-  listComments: ({
-    suppressClearComments,
-  }: {
-    suppressClearComments: boolean;
-  }) => void;
+  listComments: ({ suppressClearComments }: { suppressClearComments: boolean }) => void;
   classificationsItems: any;
 }
 

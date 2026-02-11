@@ -134,8 +134,8 @@ export async function generateSampleTaskFromConfig(config: string): Promise<{
   }
 
   // Try to find a root-level comment with a JSON object
-  let userData: Record<string, any> | undefined = undefined;
-  let userAnnotation: any = undefined;
+  let userData: Record<string, any> | undefined;
+  let userAnnotation: any;
   const root = xml.documentElement;
   if (root) {
     for (let i = 0; i < root.childNodes.length; i++) {
