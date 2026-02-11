@@ -42,8 +42,13 @@ export const ImageView = {
       }
     });
 
-    // Use internal model state as the source of truth — imageIsLoaded is the exact flag
-    // that controls whether <EntireStage> (Konva canvas) is rendered in ImageView
+    // Wait for the FULL image loading pipeline:
+    //   1. imageIsLoaded = true  → <EntireStage> renders (Konva Stage + canvas in DOM)
+    //   2. stageRef exists       → Stage component has mounted
+    //   3. Konva Image node      → <ImageLayer> reuses item.imageRef (the already-loaded
+    //                               <img> element) and renders <KonvaImage> synchronously.
+    //
+    // We still poll for the Konva Image node to account for React's render cycle.
     cy.window().then((win) => {
       return new Cypress.Promise((resolve) => {
         const check = () => {
@@ -52,8 +57,14 @@ export const ImageView = {
           );
 
           if (imageObject?.imageIsLoaded) {
-            resolve();
-            return;
+            const stageRef = imageObject.stageRef;
+
+            // stageRef.find('Image') returns Konva Image nodes rendered by <ImageLayer>.
+            // If at least one exists, the image is fully painted on the canvas.
+            if (stageRef && stageRef.find("Image").length > 0) {
+              resolve();
+              return;
+            }
           }
 
           setTimeout(check, 16);
@@ -61,11 +72,6 @@ export const ImageView = {
 
         check();
       });
-    });
-
-    // Confirm the image element is present and has valid dimensions
-    this.image.should("be.visible").and((img) => {
-      return expect((img[0] as HTMLImageElement).naturalWidth).to.be.greaterThan(0);
     });
 
     // Confirm the Konva canvas is rendered and visible

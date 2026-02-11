@@ -175,9 +175,18 @@ const createAddEventListenerScript = (eventName, callback) => {
 };
 
 /**
- * Wait for the main Image object to be fully loaded and the canvas to be ready.
- * Uses the internal MST store's `imageIsLoaded` state as the source of truth,
- * which gates whether the Konva stage/canvas renders at all.
+ * Wait for the main Image object to be fully loaded and the Konva canvas to have
+ * the image actually rendered.
+ *
+ * The loading pipeline is:
+ *   1. ImageEntity downloads data → `downloaded = true`
+ *   2. <img> tag loads → `imageLoaded = true` → `imageIsLoaded = true`
+ *   3. `imageIsLoaded` gates <EntireStage> → Konva Stage + canvas appear in the DOM
+ *   4. <ImageLayer> reuses the already-loaded <img> element (item.imageRef) and
+ *      renders <KonvaImage> synchronously — no redundant Image() load.
+ *
+ * We verify that the Konva stage contains an Image node, which confirms that
+ * the full render pipeline (including React's commit phase) has completed.
  */
 const waitForImage = () => {
   return new Promise((resolve, reject) => {
@@ -186,17 +195,17 @@ const waitForImage = () => {
     }, 10000);
 
     const check = () => {
-      // Use the internal model state — this is the exact flag that controls
-      // whether <EntireStage> (Konva canvas) is rendered in ImageView
       const imageObject = window.Htx?.annotationStore?.selected?.objects?.find((o) => o.type === "image");
 
       if (imageObject?.imageIsLoaded) {
-        // Additionally confirm the canvas is in the DOM
-        const canvas = document.querySelector(".konvajs-content canvas");
+        const stageRef = imageObject.stageRef;
 
-        if (canvas) {
+        // stageRef is the Konva Stage instance — it exists once <EntireStage> has mounted.
+        // stageRef.find('Image') returns Konva Image nodes rendered by <ImageLayer>.
+        // If it finds at least one, the image is fully painted on the canvas.
+        if (stageRef && stageRef.find("Image").length > 0) {
           clearTimeout(timeout);
-          // Small delay to let Konva finish its initial render
+          // Let Konva finish its current render cycle (batch draw)
           setTimeout(resolve, 32);
           return;
         }

@@ -1247,23 +1247,14 @@ const EntireStage = observer(
 const ImageLayer = observer(({ item }) => {
   const imageEntity = item.currentImageEntity;
   const konvaImageRef = useRef();
-  const [loadedImage, setLoadedImage] = useState(null);
 
-  // Load image with proper CORS and load event
-  useEffect(() => {
-    if (imageEntity?.downloaded && imageEntity.currentSrc) {
-      const img = new window.Image();
-      img.crossOrigin = "anonymous";
-      img.src = imageEntity.currentSrc;
-      img.width = imageEntity.naturalWidth;
-      img.height = imageEntity.naturalHeight;
-      img.onload = () => {
-        setLoadedImage(img);
-      };
-    } else {
-      setLoadedImage(null);
-    }
-  }, [imageEntity?.downloaded, imageEntity?.currentSrc]);
+  // Reuse the <img> DOM element that <ImageRenderer> already loaded.
+  // item.imageRef is set via item.setImageRef() in ImageView's render.
+  // imageEntity.imageLoaded (observable) is true once the <img> onload fires,
+  // and imageIsLoaded gates <EntireStage> — so by the time this component renders,
+  // item.imageRef is guaranteed to point to a fully-loaded HTMLImageElement.
+  // This eliminates the redundant Image() load that previously happened here.
+  const loadedImage = imageEntity?.imageLoaded ? item.imageRef : null;
 
   const { width, height } = useMemo(() => {
     return {
