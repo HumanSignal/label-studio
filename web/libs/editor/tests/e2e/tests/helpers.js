@@ -175,19 +175,37 @@ const createAddEventListenerScript = (eventName, callback) => {
 };
 
 /**
- * Wait for the main Image object to be loaded
+ * Wait for the main Image object to be fully loaded and the canvas to be ready.
+ * Uses the internal MST store's `imageIsLoaded` state as the source of truth,
+ * which gates whether the Konva stage/canvas renders at all.
  */
 const waitForImage = () => {
   return new Promise((resolve, reject) => {
-    const img = document.querySelector("[alt=LS]");
+    const timeout = setTimeout(() => {
+      reject(new Error("waitForImage: Timed out after 10s waiting for image to load"));
+    }, 10000);
 
-    if (!img || img.complete) return resolve();
-    // this should be rewritten to isReady when it is ready
-    img.onload = () => {
-      setTimeout(resolve, 100);
+    const check = () => {
+      // Use the internal model state — this is the exact flag that controls
+      // whether <EntireStage> (Konva canvas) is rendered in ImageView
+      const imageObject = window.Htx?.annotationStore?.selected?.objects?.find((o) => o.type === "image");
+
+      if (imageObject?.imageIsLoaded) {
+        // Additionally confirm the canvas is in the DOM
+        const canvas = document.querySelector(".konvajs-content canvas");
+
+        if (canvas) {
+          clearTimeout(timeout);
+          // Small delay to let Konva finish its initial render
+          setTimeout(resolve, 32);
+          return;
+        }
+      }
+
+      requestAnimationFrame(check);
     };
-    // if image is not loaded in 10 seconds, reject
-    setTimeout(reject, 10000);
+
+    check();
   });
 };
 

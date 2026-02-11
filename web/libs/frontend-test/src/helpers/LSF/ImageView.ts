@@ -34,10 +34,41 @@ export const ImageView = {
   },
   waitForImage() {
     cy.log("Make sure that the image is visible and loaded");
+
+    // Wait for any download progress indicator to disappear first
+    cy.get("body").then(($body) => {
+      if ($body.find(".lsf-image-progress").length > 0) {
+        cy.get(".lsf-image-progress", { timeout: 30000 }).should("not.exist");
+      }
+    });
+
+    // Use internal model state as the source of truth — imageIsLoaded is the exact flag
+    // that controls whether <EntireStage> (Konva canvas) is rendered in ImageView
+    cy.window().then((win) => {
+      return new Cypress.Promise((resolve) => {
+        const check = () => {
+          const imageObject = (win as any).Htx?.annotationStore?.selected?.objects?.find(
+            (o: any) => o.type === "image",
+          );
+
+          if (imageObject?.imageIsLoaded) {
+            resolve();
+            return;
+          }
+
+          setTimeout(check, 16);
+        };
+
+        check();
+      });
+    });
+
+    // Confirm the image element is present and has valid dimensions
     this.image.should("be.visible").and((img) => {
       return expect((img[0] as HTMLImageElement).naturalWidth).to.be.greaterThan(0);
     });
 
+    // Confirm the Konva canvas is rendered and visible
     this.drawingArea.get("canvas").should("be.visible");
   },
   /**

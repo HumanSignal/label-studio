@@ -52,6 +52,10 @@ module.exports = {
 
   async lookForStage() {
     await I.scrollPageToTop();
+    // Wait for the image to be fully loaded (model state + canvas ready)
+    // before trying to grab the stage bounding box
+    await I.executeScript(Helpers.waitForImage);
+    I.waitForVisible("canvas", 10);
 
     this._stageBBox = await this.grabStageBBox();
   },
@@ -80,8 +84,11 @@ module.exports = {
 
   async waitForImage() {
     I.say("Waiting for image to be loaded");
+    // Wait for any download progress indicator to disappear
+    I.waitForInvisible(".lsf-image-progress", 30);
+    // Wait for internal model state to confirm image is loaded and canvas is ready
     await I.executeScript(Helpers.waitForImage);
-    I.waitForVisible("canvas", 5);
+    I.waitForVisible("canvas", 10);
   },
 
   async getNaturalSize() {
