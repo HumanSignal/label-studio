@@ -317,7 +317,7 @@ export class LSFWrapper {
       // for preload it's good to always load the first one
       const annotation = task.annotations[0];
 
-      this.selectTask(task, annotation?.id, true);
+      await this.selectTask(task, annotation?.id, true);
     }
 
     return false;
@@ -353,7 +353,7 @@ export class LSFWrapper {
       });
 
       // Add new data from received task
-      if (newTask) this.selectTask(newTask, annotationID, fromHistory);
+      if (newTask) await this.selectTask(newTask, annotationID, fromHistory);
     };
 
     if (isFF(FF_DEV_2887) && this.lsf?.commentStore?.hasUnsaved) {
@@ -375,7 +375,7 @@ export class LSFWrapper {
     this.datamanager.invoke("navigate", "projects");
   }
 
-  selectTask(task, annotationID, fromHistory = false) {
+  async selectTask(task, annotationID, fromHistory = false) {
     const needsAnnotationsMerge = task && this.task?.id === task.id;
     const annotations = needsAnnotationsMerge ? [...this.annotations] : [];
 
@@ -387,7 +387,7 @@ export class LSFWrapper {
 
     this.loadUserLabels();
 
-    this.setLSFTask(task, annotationID, fromHistory);
+    await this.setLSFTask(task, annotationID, fromHistory);
   }
 
   async setLSFTask(task, annotationID, fromHistory, selectPrediction = false) {
