@@ -49,15 +49,17 @@ const CellRenderer = observer(({ col: colInput, data, decoration, cellViews }) =
 
 export const TableRow = observer(
   ({ data, even, style, wrapperStyle, onClick, stopInteractions, decoration, onContextMenu }) => {
-    const { columns, cellViews } = React.useContext(TableContext);
+    const { columns, cellViews, contextMenuRowId } = React.useContext(TableContext);
     const rowWrapperCN = tableCN.elem("row-wrapper");
     const tableRowCN = cn("table-row");
+    const hasContextMenuOpen = contextMenuRowId === data.id;
     const mods = {
       even,
       selected: data.isSelected,
       highlighted: data.isHighlighted,
       loading: data.isLoading,
       disabled: stopInteractions,
+      "context-menu-open": hasContextMenuOpen,
     };
 
     return (

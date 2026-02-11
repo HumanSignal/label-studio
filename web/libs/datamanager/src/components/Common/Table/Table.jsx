@@ -70,6 +70,8 @@ export const Table = observer(
     
     // Global context menu state
     const [contextMenu, setContextMenu] = useState(null);
+    // Maintain hover appearance on row while its context menu is open for better visual feedback
+    const contextMenuRowId = contextMenu?.row?.id ?? null;
 
     // Reset virtualizer cache when rowHeight changes
     useEffect(() => {
@@ -273,6 +275,7 @@ export const Table = observer(
       columns,
       data,
       cellViews,
+      contextMenuRowId,
     };
 
     const headerHeight = 43;

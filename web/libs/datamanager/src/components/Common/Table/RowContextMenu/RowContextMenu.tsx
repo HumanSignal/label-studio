@@ -16,8 +16,6 @@ export interface RowContextMenuProps {
   column?: any;
   /** DataManager view store for navigation */
   view: any;
-  /** LSE-only callback for reviewing tasks */
-  onReviewTask?: (row: any) => void;
   /** LSE-only callback for viewing analytics */
   onViewAnalytics?: (row: any) => void;
   /** Callback when menu closes */
@@ -28,7 +26,6 @@ export const RowContextMenu: FC<RowContextMenuProps> = ({
   row,
   column,
   view,
-  onReviewTask,
   onViewAnalytics,
   onClose,
 }) => {
@@ -67,27 +64,13 @@ export const RowContextMenu: FC<RowContextMenuProps> = ({
     [view],
   );
 
-  // 1. Label task - Navigate to labeling stream
-  const handleLabelTask = useCallback(() => {
-    (getRoot(view) as any).startLabelStream();
-    onClose();
-  }, [view, onClose]);
-
-  // 2. Review task (LSE-only)
-  const handleReviewTask = useCallback(() => {
-    if (onReviewTask) {
-      onReviewTask(row);
-      onClose();
-    }
-  }, [row, onReviewTask, onClose]);
-
-  // 3. Compare all annotations
+  // 1. Compare all annotations
   const handleCompareAnnotations = useCallback(() => {
     (getRoot(view) as any).startLabeling(row, { interface: "annotations:view-all" });
     onClose();
   }, [row, view, onClose]);
 
-  // 4. Copy cell content
+  // 2. Copy cell content
   const handleCopyCellContent = useCallback(async () => {
     if (!cellValue) {
       showToast("No content to copy", "error");
@@ -103,13 +86,13 @@ export const RowContextMenu: FC<RowContextMenuProps> = ({
       const taskId = row.id ?? row.task_id;
       const columnName = column?.title || column?.alias || "content";
       showToast(`Copied "${columnName}" for Task ${taskId} to clipboard`, "info");
-    } catch (error) {
+    } catch {
       showToast("Failed to copy to clipboard", "error");
     }
     onClose();
   }, [cellValue, column, row, onClose, showToast]);
 
-  // 5. Copy task ID
+  // 3. Copy task ID
   const handleCopyTaskId = useCallback(async () => {
     const taskId = row.id ?? row.task_id;
 
@@ -122,13 +105,13 @@ export const RowContextMenu: FC<RowContextMenuProps> = ({
     try {
       await navigator.clipboard.writeText(String(taskId));
       showToast(`Copied Task ID ${taskId} to clipboard`, "info");
-    } catch (error) {
+    } catch {
       showToast("Failed to copy to clipboard", "error");
     }
     onClose();
   }, [row, onClose, showToast]);
 
-  // 6. View task source
+  // 4. View task source
   const handleViewTaskSource = useCallback(() => {
     const taskId = row.id ?? row.task_id;
 
@@ -161,7 +144,7 @@ export const RowContextMenu: FC<RowContextMenuProps> = ({
     onClose();
   }, [row, view, onClose]);
 
-  // 7. View annotator performance (LSE-only)
+  // 5. View annotator performance (LSE-only)
   const handleViewAnalytics = useCallback(() => {
     if (onViewAnalytics) {
       onViewAnalytics(row);
@@ -179,16 +162,6 @@ export const RowContextMenu: FC<RowContextMenuProps> = ({
   return (
     <Dropdown inline visible={true} animated={false}>
       <Menu className={styles.menu} closeDropdownOnItemClick={true}>
-        <Menu.Item onClick={handleLabelTask} data-testid="menu-item-label-task">
-          Label Task
-        </Menu.Item>
-
-        {onReviewTask && (
-          <Menu.Item onClick={handleReviewTask} data-testid="menu-item-review-task">
-            Review Task
-          </Menu.Item>
-        )}
-
         <Menu.Item onClick={handleCompareAnnotations} data-testid="menu-item-compare-annotations">
           Compare All Annotations
         </Menu.Item>
