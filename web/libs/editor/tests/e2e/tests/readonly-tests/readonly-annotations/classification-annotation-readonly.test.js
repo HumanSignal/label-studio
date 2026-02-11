@@ -62,11 +62,12 @@ Data(imageExamples).Scenario("Classification Readonly Annotations", async ({ I, 
    * Checking the Taxonomy input
    */
   I.say("Checking the Taxonomy input");
-  I.click(".htx-taxonomy span");
+  I.click(".htx-taxonomy");
   I.seeElement(".htx-taxonomy input:disabled");
 
   I.say("Checking selected values");
-  I.dontSee({ css: ".htx-taxonomy-selected input[type=button]" });
+  // In NewTaxonomy disabled mode, selected items don't have remove buttons
+  I.dontSeeElement(locate(".ant-select-selection-item-remove").inside(locate(".htx-taxonomy")));
 
   I.say("Try selecting anyways");
   I.see("Choice 2.1", ".htx-taxonomy");
