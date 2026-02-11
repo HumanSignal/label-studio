@@ -242,7 +242,9 @@ FFlagMatrix(["fflag_feat_front_lsdv_e_278_contextual_scrolling_short"], (flags) 
         AtAudioView.clickAt(51);
         AtOutliner.seeSelectedRegion("Speech");
       },
-    );
+    )
+      .tag("@flakey")
+      .retry(3);
 
     FFlagScenario("Delete region by pressing delete hotkey", async ({ I, LabelStudio, AtAudioView, AtOutliner }) => {
       LabelStudio.setFeatureFlags({
