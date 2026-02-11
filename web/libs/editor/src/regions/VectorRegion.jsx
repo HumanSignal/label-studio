@@ -164,6 +164,10 @@ const Model = types
           return { enabled: 6, disabled: 4 };
       }
     },
+    // Point style: "circle" or "rectangle"
+    get pointStyle() {
+      return self.control?.pointstyle ?? "circle";
+    },
     get disabled() {
       const tool = self.parent?.getToolsManager().findSelectedTool();
       return (tool?.disabled ?? false) || self.isReadOnly() || (!self.selected && !self.isDrawing);
@@ -232,9 +236,11 @@ const Model = types
         vector?.selectPointsByIds(selectedPoints);
       },
 
-      _selectArea(additiveMode = false) {
+      _selectArea(additiveMode = false, preserveTransformMode = false) {
         const annotation = self.annotation;
-        self.setTransformMode(false);
+        if (!preserveTransformMode) {
+          self.setTransformMode(false);
+        }
         if (!annotation) return;
 
         if (additiveMode) {
@@ -254,30 +260,38 @@ const Model = types
         self._highlighted = val;
       },
 
-      updateCursor(isHovered = false) {
-        const stage = self.parent?.stageRef;
-        if (!stage) return;
-        const style = stage.container().style;
-
-        if (isHovered) {
-          if (self.annotation.isLinkingMode) {
-            style.cursor = "crosshair";
-          } else {
-            style.cursor = "pointer";
-          }
-          return;
-        }
-
-        const selectedTool = self.parent?.getToolsManager().findSelectedTool();
-        if (!selectedTool || !selectedTool.updateCursor) {
-          style.cursor = "default";
-        } else {
-          selectedTool.updateCursor();
-        }
-      },
-
       isReadOnly() {
         return self.readonly || self.annotation?.isReadOnly();
+      },
+
+      /**
+       * Check if mouse pointer is currently over the vector shape
+       * Used by ImageView to determine cursor state
+       * For closed shapes, this checks both the path and the filled area inside
+       */
+      isHovered() {
+        if (!self.vectorRef || !self.parent?.stageRef) {
+          return false;
+        }
+
+        const stage = self.parent.stageRef;
+        const pointerPos = stage.getPointerPosition();
+
+        if (!pointerPos) {
+          return false;
+        }
+
+        // Use KonvaVector's hit testing method
+        // This method already checks:
+        // 1. If hovering over vertices
+        // 2. If hovering near path segments (within hitRadius)
+        // 3. If hovering inside closed polygons (for filled areas)
+        if (typeof self.vectorRef.isPointOverShape === "function") {
+          const isHovered = self.vectorRef.isPointOverShape(pointerPos.x, pointerPos.y);
+          return isHovered;
+        }
+
+        return false;
       },
 
       /**
@@ -435,14 +449,22 @@ const Model = types
        * This ensures transform mode is reset whether selecting by clicking on the shape
        * or selecting from the sidebar/outliner
        */
-      selectRegion() {
+      selectRegion(preserveTransformMode = false) {
         // Reset transform mode when region is selected (from sidebar or elsewhere)
-        self.setTransformMode(false);
+        // unless preserveTransformMode is true
+        if (!preserveTransformMode) {
+          self.setTransformMode(false);
+        }
         // Call parent selectRegion to handle scrolling
         self.scrollToRegion();
       },
 
       addPoint(x, y) {
+        // Don't allow adding points when region is locked or readonly
+        if (self.locked || self.isReadOnly()) {
+          return null;
+        }
+
         const image = self.parent.currentImageEntity;
         const width = image.naturalWidth;
         const height = image.naturalHeight;
@@ -470,6 +492,10 @@ const Model = types
       // Uses KonvaVector startPoint to start drawing
       // This will only initiate point drawing, but won't create actual point
       startPoint(x, y) {
+        // Don't allow adding points when region is locked or readonly
+        if (self.locked || self.isReadOnly()) {
+          return;
+        }
         self.vectorRef.startPoint(x, y);
       },
 
@@ -479,6 +505,10 @@ const Model = types
       //
       // This method is designed to create Bezier curve
       updatePoint(x, y) {
+        // Don't allow modifying points when region is locked or readonly
+        if (self.locked || self.isReadOnly()) {
+          return;
+        }
         self.vectorRef.updatePoint(x, y);
       },
 
@@ -486,6 +516,10 @@ const Model = types
       //
       // Will create a new point if it was started but never updated (regular click)
       commitPoint(x, y) {
+        // Don't allow adding points when region is locked or readonly
+        if (self.locked || self.isReadOnly()) {
+          return;
+        }
         self.vectorRef?.commitPoint(x, y);
       },
 
@@ -595,7 +629,8 @@ const HtxVectorView = observer(({ item, suggestion }) => {
   const { x: offsetX, y: offsetY } = item.parent?.layerZoomScalePosition ?? { x: 0, y: 0 };
   const disabled = item.disabled || suggestion || store.annotationStore.selected.isLinkingMode;
   const selected = !disabled; // Invert disabled to selected for KonvaVector
-  const isDisabled = item.locked; // Completely disable all interactions when locked
+  // Completely disable all interactions when locked, readonly (e.g., in View All mode), or Pan tool is active
+  const isDisabled = item.locked || item.isReadOnly() || item.parent?.getSkipInteractions();
 
   // Wait for stage to be properly initialized
   if (!item.parent?.stageWidth || !item.parent?.stageHeight) {
@@ -615,7 +650,6 @@ const HtxVectorView = observer(({ item, suggestion }) => {
           isMultiRegionSelected={item.object?.selectedRegions?.length > 1}
           disableGhostLine={disableGhostLine}
           onFinish={(e) => {
-            console.log("on finish");
             if (disabled) return;
             e.evt.stopPropagation();
             e.evt.preventDefault();
@@ -626,126 +660,6 @@ const HtxVectorView = observer(({ item, suggestion }) => {
           }}
           onTransformEnd={(e) => {
             item.parent.annotation.history.unfreeze();
-
-            // Handle case where event might be undefined (e.g., from onTransformationEnd)
-            if (!e || !e.target || !e.currentTarget) return;
-
-            // Only process if this is actually a transform event on the Group
-            // Shape dragging doesn't transform the Group, so we should skip it
-            if (e.target !== e.currentTarget) return;
-
-            const t = e.target;
-            const dx = t.getAttr("x", 0);
-            const dy = t.getAttr("y", 0);
-            const scaleX = t.getAttr("scaleX", 1);
-            const scaleY = t.getAttr("scaleY", 1);
-            const rotation = t.getAttr("rotation", 0);
-
-            // Only apply transformation if there's actually a meaningful change
-            // This prevents applying stale transform values from previous operations
-            // Shape dragging doesn't transform the Group, so dx/dy should be 0
-            const hasTranslation = Math.abs(dx) > 0.001 || Math.abs(dy) > 0.001;
-            const hasScale = Math.abs(scaleX - 1) > 0.001 || Math.abs(scaleY - 1) > 0.001;
-            const hasRotation = Math.abs(rotation) > 0.001;
-
-            if (!hasTranslation && !hasScale && !hasRotation) {
-              // No meaningful transformation - just reset and return
-              // This handles the case where onTransformEnd is called after shape dragging
-              t.setAttr("x", 0);
-              t.setAttr("y", 0);
-              t.setAttr("scaleX", 1);
-              t.setAttr("scaleY", 1);
-              t.setAttr("rotation", 0);
-              return;
-            }
-
-            // Reset transform attributes
-            t.setAttr("x", 0);
-            t.setAttr("y", 0);
-            t.setAttr("scaleX", 1);
-            t.setAttr("scaleY", 1);
-            t.setAttr("rotation", 0);
-
-            // Apply transformation to all points using KonvaVector methods
-            if (item.vectorRef) {
-              // Apply the transformation exactly as Konva did:
-              // 1. Scale around origin (0,0)
-              // 2. Rotate around origin (0,0)
-              // 3. Translate by (dx, dy)
-              // Don't pass centerX/centerY - transform around origin
-              const radians = rotation * (Math.PI / 180);
-              const cos = Math.cos(radians);
-              const sin = Math.sin(radians);
-
-              const imageWidth = image?.naturalWidth ?? 0;
-              const imageHeight = image?.naturalHeight ?? 0;
-              const pixelSnapping = item.control?.snap === "pixel";
-
-              // Helper function to snap to pixel if enabled
-              const snapToPixel = (point) => {
-                if (!pixelSnapping) return point;
-                return {
-                  x: Math.round(point.x),
-                  y: Math.round(point.y),
-                };
-              };
-
-              const transformedVertices = item.vertices.map((point) => {
-                // Step 1: Scale
-                const x = point.x * scaleX;
-                const y = point.y * scaleY;
-
-                // Step 2: Rotate
-                const rx = x * cos - y * sin;
-                const ry = x * sin + y * cos;
-
-                // Step 3: Translate and clamp to image bounds
-                const translatedPos = {
-                  x: Math.max(0, Math.min(imageWidth, rx + dx)),
-                  y: Math.max(0, Math.min(imageHeight, ry + dy)),
-                };
-
-                // Apply pixel snapping if enabled
-                const snappedPos = snapToPixel(translatedPos);
-
-                const result = {
-                  ...point,
-                  x: snappedPos.x,
-                  y: snappedPos.y,
-                };
-
-                // Transform control points if bezier
-                if (point.isBezier) {
-                  if (point.controlPoint1) {
-                    const cp1x = point.controlPoint1.x * scaleX;
-                    const cp1y = point.controlPoint1.y * scaleY;
-                    const cp1rx = cp1x * cos - cp1y * sin;
-                    const cp1ry = cp1x * sin + cp1y * cos;
-                    const cp1Translated = {
-                      x: Math.max(0, Math.min(imageWidth, cp1rx + dx)),
-                      y: Math.max(0, Math.min(imageHeight, cp1ry + dy)),
-                    };
-                    result.controlPoint1 = snapToPixel(cp1Translated);
-                  }
-                  if (point.controlPoint2) {
-                    const cp2x = point.controlPoint2.x * scaleX;
-                    const cp2y = point.controlPoint2.y * scaleY;
-                    const cp2rx = cp2x * cos - cp2y * sin;
-                    const cp2ry = cp2x * sin + cp2y * cos;
-                    const cp2Translated = {
-                      x: Math.max(0, Math.min(imageWidth, cp2rx + dx)),
-                      y: Math.max(0, Math.min(imageHeight, cp2ry + dy)),
-                    };
-                    result.controlPoint2 = snapToPixel(cp2Translated);
-                  }
-                }
-
-                return result;
-              });
-
-              // Update the points
-              item.updatePointsFromKonvaVector(transformedVertices);
-            }
           }}
           onPointsChange={(points) => {
             item.updatePointsFromKonvaVector(points);
@@ -780,6 +694,13 @@ const HtxVectorView = observer(({ item, suggestion }) => {
 
             e.cancelBubble = true;
 
+            // If another region is being drawn, complete the drawing first
+            const tm = item.parent.getToolsManager();
+            const tool = tm.findSelectedTool();
+            if (tool?.currentArea && tool.currentArea !== item && tool.complete) {
+              tool.complete();
+            }
+
             // Allow selection regardless of whether the path is closed
             // The Selection tool will handle multi-selection logic
             if (store.annotationStore.selected.isLinkingMode) {
@@ -800,12 +721,6 @@ const HtxVectorView = observer(({ item, suggestion }) => {
               item.setHighlight(false);
             }
             item.updateCursor();
-          }}
-          onDblClick={(e) => {
-            e.evt.stopImmediatePropagation();
-            e.evt.stopPropagation();
-            e.evt.preventDefault();
-            item.toggleTransformMode();
           }}
           closed={item.closed}
           width={stageWidth}
@@ -835,6 +750,7 @@ const HtxVectorView = observer(({ item, suggestion }) => {
           pointStroke={item.selected ? "#ff0000" : regionStyles.strokeColor}
           pointStrokeSelected="#ff6b35"
           pointStrokeWidth={item.selected ? 2 : 1}
+          pointStyle={item.pointStyle}
           disableInternalPointAddition={true}
         />
 

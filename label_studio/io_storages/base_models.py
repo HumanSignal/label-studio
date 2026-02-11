@@ -805,7 +805,7 @@ class ExportStorage(Storage, ProjectStorageMixin):
             # Updating progress in thread requires coordinating on count and db writes, so just
             # batching to keep it simpler.
             for annotation_batch in _batched(
-                iterate_queryset(Annotation.objects.filter(project=self.project), chunk_size=chunk_size),
+                iterate_queryset(annotations, chunk_size=chunk_size),
                 chunk_size,
             ):
                 futures = []
@@ -840,13 +840,13 @@ class ExportStorage(Storage, ProjectStorageMixin):
             export_sync_fn = export_sync_background
 
         if redis_connected():
-            queue = django_rq.get_queue('low')
             if not self.info_set_queued():
                 return
-            sync_job = queue.enqueue(
+            sync_job = start_job_async_or_sync(
                 export_sync_fn,
                 self.__class__,
                 self.id,
+                queue_name='low',
                 job_timeout=settings.RQ_LONG_JOB_TIMEOUT,
                 project_id=self.project.id,
                 organization_id=self.project.organization.id,

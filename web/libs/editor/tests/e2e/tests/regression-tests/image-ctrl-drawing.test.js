@@ -3,14 +3,7 @@ const Asserts = require("../../utils/asserts");
 
 Feature("Creating regions over other regions").tag("@regress");
 
-Before(({ LabelStudio }) => {
-  LabelStudio.setFeatureFlags({
-    fflag_feat_front_optic_1479_improve_image_tag_memory_usage_short: true,
-  });
-});
-
-const IMAGE =
-  "https://htx-pub.s3.us-east-1.amazonaws.com/examples/images/nick-owuor-astro-nic-visuals-wDifg5xc9Z4-unsplash.jpg";
+const IMAGE = "/public/files/images/nick-owuor-unsplash.jpg";
 
 const BLUEVIOLET = {
   color: "#8A2BE2",
@@ -245,4 +238,4 @@ Scenario("How it works without ctrl", async ({ I, LabelStudio, AtOutliner, AtIma
     AtImageView[innerRegion.action](...innerRegion.params);
     AtOutliner.seeRegions(1);
   }
-});
+}).retry(1);

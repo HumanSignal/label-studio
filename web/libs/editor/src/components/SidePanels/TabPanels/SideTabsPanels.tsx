@@ -56,6 +56,7 @@ const SideTabsPanelsComponent: FC<SidePanelsProps> = ({
   panelsHidden,
   children,
   showComments,
+  showCustomTab,
   focusTab,
 }) => {
   const snapThreshold = 5;
@@ -69,7 +70,7 @@ const SideTabsPanelsComponent: FC<SidePanelsProps> = ({
   const [initialized, setInitialized] = useState(false);
   const rootRef = useRef<HTMLDivElement>();
   const [snap, setSnap] = useState<DropSide | Side | undefined>();
-  const initialState = useMemo(() => restorePanel(showComments), [showComments]);
+  const initialState = useMemo(() => restorePanel(showComments, showCustomTab), [showComments, showCustomTab]);
   const [panelData, setPanelData] = useState<Record<string, PanelBBox>>(initialState.panelData);
   const [collapsedSide, setCollapsedSide] = useState(initialState.collapsedSide);
   const [breakPointActiveTab, setBreakPointActiveTab] = useState(0);

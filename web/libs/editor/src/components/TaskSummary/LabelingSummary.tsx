@@ -7,20 +7,34 @@ import { cnm, IconSparks, Userpic } from "@humansignal/ui";
 import type { MSTAnnotation, MSTResult, RawResult } from "../../stores/types";
 import { AggregationTableRow } from "./Aggregation";
 import { Chip } from "./Chip";
-import { renderers } from "./labelings";
+import { renderers, jsonPathToTitle } from "./labelings";
 import { ResizeHandler } from "./ResizeHandler";
 import type { AnnotationSummary, ControlTag, RendererType } from "./types";
+
+/**
+ * Get display name for a control column header.
+ * For reactcode controls, converts JSONPath to readable title.
+ */
+const getControlDisplayName = (control: ControlTag): string => {
+  if (control.type === "reactcode") {
+    return jsonPathToTitle(control.name);
+  }
+  return control.name;
+};
 
 type Props = {
   annotations: MSTAnnotation[];
   controls: ControlTag[];
   onSelect: (entity: AnnotationSummary) => void;
   hideInfo: boolean;
+  taskId?: number | string;
 };
 
 const cellFn = (control: ControlTag, render: RendererType) => (props: { row: Row<AnnotationSummary> }) => {
   const annotation = props.row.original;
-  const results = annotation.results.filter((result) => result.from_name === control.name);
+  // For reactcode controls, results are associated with the tag name (to_name), not the JSONPath (name)
+  const filterKey = control.type === "reactcode" ? control.to_name : control.name;
+  const results = annotation.results.filter((result) => result.from_name === filterKey);
   const content = !results.length ? (
     <span className="text-neutral-content-subtler text-sm">—</span>
   ) : (
@@ -44,7 +58,7 @@ const convertPredictionResult = (result: MSTResult) => {
 
 const columnHelper = createColumnHelper<AnnotationSummary>();
 
-export const LabelingSummary = ({ hideInfo, annotations: all, controls, onSelect }: Props) => {
+export const LabelingSummary = ({ hideInfo, annotations: all, controls, onSelect, taskId }: Props) => {
   const currentUser = window.APP_SETTINGS?.user;
   const [columnWidths, setColumnWidths] = useState<Record<string, number>>({});
   const tableRef = useRef<HTMLTableElement>(null);
@@ -92,7 +106,7 @@ export const LabelingSummary = ({ hideInfo, annotations: all, controls, onSelect
         id: control.name,
         header: () => (
           <div>
-            <span className="font-semibold text-sm pb-small">{control.name}</span>
+            <span className="font-semibold text-sm pb-small">{getControlDisplayName(control)}</span>
             <Chip prefix={control.per_region ? "per-region " : ""} className="px-small ml-2">
               {control.type}
             </Chip>
@@ -149,6 +163,12 @@ export const LabelingSummary = ({ hideInfo, annotations: all, controls, onSelect
     },
   });
 
+  // We can't calculate aggregation for reactcode controls for now, so we hide it if there are no other tags
+  const hideAggregation = useMemo(() => {
+    if (controls.length === 0) return true;
+    return controls.every((control) => control.type === "reactcode");
+  }, [controls]);
+
   return (
     <div className="mb-base">
       <div className="overflow-x-auto pb-tight">
@@ -165,7 +185,7 @@ export const LabelingSummary = ({ hideInfo, annotations: all, controls, onSelect
           {/* Sticky Header */}
           <thead className="sticky top-0 z-10">
             {table.getHeaderGroups().map((headerGroup) => (
-              <tr key={headerGroup.id} className="border-b border-neutral-border">
+              <tr key={headerGroup.id}>
                 {headerGroup.headers.map((header, index) => (
                   <th
                     key={header.id}
@@ -178,6 +198,7 @@ export const LabelingSummary = ({ hideInfo, annotations: all, controls, onSelect
                       zIndex: index === 0 ? 20 : 1,
                     }}
                     className={cnm(
+                      hideAggregation ? "border-b border-neutral-border" : "",
                       "px-4 py-2.5 text-left whitespace-nowrap font-semibold text-sm bg-neutral-surface-subtle",
                       index === 0 && "border-r border-neutral-border bg-neutral-surface",
                     )}
@@ -193,11 +214,14 @@ export const LabelingSummary = ({ hideInfo, annotations: all, controls, onSelect
           </thead>
           <tbody>
             {/* Distribution/Aggregation Row */}
-            <AggregationTableRow
-              headers={table.getHeaderGroups()[0]?.headers ?? []}
-              controls={controls}
-              annotations={annotations}
-            />
+            {!hideAggregation && (
+              <AggregationTableRow
+                headers={table.getHeaderGroups()[0]?.headers ?? []}
+                controls={controls}
+                annotations={annotations}
+                taskId={taskId}
+              />
+            )}
             {/* Annotation Rows */}
             {table.getRowModel().rows.map((row, rowIndex) => (
               <tr key={row.id} className="group">
@@ -214,12 +238,10 @@ export const LabelingSummary = ({ hideInfo, annotations: all, controls, onSelect
                         left: isSticky ? 0 : "auto",
                         width: cell.column.getSize(),
                         zIndex: isSticky ? 10 : "auto",
-                        // @todo fix with proper tailwind classes
-                        backgroundColor: isEvenRow ? undefined : "white",
                       }}
                       className={cnm(
                         "px-4 py-2.5 align-top overflow-hidden transition-colors",
-                        isEvenRow ? "bg-neutral-surface" : "bg-white",
+                        isEvenRow ? "bg-neutral-surface" : "bg-neutral-background",
                         "group-hover:bg-neutral-surface-subtle",
                         !isLastRow && "border-b border-neutral-border-subtle",
                         isSticky && "border-r border-neutral-border",

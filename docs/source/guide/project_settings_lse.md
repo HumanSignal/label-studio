@@ -563,6 +563,9 @@ Note that in certain situations, this may be exceeded. For example, if there are
 
 Also note that only annotations created by distinct users count towards the overlap. For example, if the overlap is `2` and a user creates and submits two annotations on a single task (which can be done in Quick View), the overlap threshold will not be reached until another user submits an annotation. 
 
+!!! note
+    Setting annotations per task above 20 may impact loading performance in the Data Manager.
+
 </td>
 </tr>
 <tr>
@@ -792,6 +795,8 @@ Select the [metric](stats#Available-agreement-metrics) that should determine tas
 <td>
 
 **Assign additional annotator**
+
+<span class="badge"></span>
 </td>
 <td>
 Enable this option to automatically assign an additional annotator to any tasks that have a low agreement score. 
@@ -806,6 +811,8 @@ Note that to see this setting, the project must be set up with [automatic task a
 <td>
 
 **Agreement threshold**
+
+<span class="badge"></span>
 </td>
 <td>
 
@@ -817,6 +824,8 @@ Enter the agreement score that a task must meet before it can be considered comp
 <td>
 
 **Maximum additional annotators**
+
+<span class="badge"></span>
 </td>
 <td>
 

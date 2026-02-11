@@ -14,12 +14,17 @@ $gap: 30px;
 
   grid-auto-flow: column;
   grid-column-gap: $gap;
-  margin: 0 30px;
+  margin: 0 var(--spacing-wider);
+  padding: 0 var(--spacing-tight) var(--spacing-base) var(--spacing-tight);
   overflow: auto;
   position: relative;
+
+  &:has([data-virtualized="true"]) {
+    display: block;
+  }
 }
 
-.grid > div > h4 {
+.grid>div>h4 {
   cursor: pointer;
 }
 
@@ -27,29 +32,77 @@ $gap: 30px;
   position: relative;
   flex-grow: 1;
   min-width: 0; // famous flex hack to prevent block from growing enormously
+  margin-top: var(--spacing-tight);
+
+  &::before,
+  &::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    height: 100%;
+    width: var(--spacing-tighter);
+    z-index: 1;
+    pointer-events: none;
+  }
+
+  &::before {
+    left: 30px;
+    background: linear-gradient(to right, rgba(var(--color-neutral-background-raw) / 100%), rgba(var(--color-neutral-background-raw) / 0%));
+  }
+
+  &::after {
+    right: 30px;
+    background: linear-gradient(to left, rgba(var(--color-neutral-background-raw) / 100%), rgba(var(--color-neutral-background-raw) / 0%));
+  }
 }
 
-.container > button {
+.containerVirtualized {
+  position: relative;
+  flex-grow: 1;
+  min-width: 0;
+  height: calc(100vh - 200px); // Account for header/tabs
+  min-height: 400px;
+}
+
+.container>button,
+.containerVirtualized>button {
   position: absolute;
   top: 0;
   width: $gap;
   height: 100%;
+  z-index: 10;
+
+  & span>span {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  svg {
+    width: 16px;
+    height: 16px;
+  }
 
   &:hover {
-    background: var(--sand_200);
+    background: var(--color-primary-emphasis-subtle);
   }
 }
 
-.container > button.left {
+.container>button.left,
+.containerVirtualized>button.left {
   left: 0;
 }
 
-.container > button.right {
+.container>button.right,
+.containerVirtualized>button.right {
   right: 0;
 }
 
-.grid > div:global(.hover) {
-  background: #eee;
+.grid>div:global(.hover) {
+  background: var(--color-primary-emphasis-subtle);
 
   h4 {
     color: var(--primary_link);
@@ -57,7 +110,7 @@ $gap: 30px;
 }
 
 /* don't let the empty blocks to break the nice grid */
-.grid > div:empty {
+.grid>div:empty {
   display: none;
 }
 

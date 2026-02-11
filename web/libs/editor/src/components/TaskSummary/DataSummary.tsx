@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import { flexRender, getCoreRowModel, useReactTable, createColumnHelper } from "@tanstack/react-table";
-import { cnm } from "@humansignal/ui";
+import { JsonViewer } from "@humansignal/ui";
 import { Chip } from "./Chip";
 import { ResizeHandler } from "./ResizeHandler";
 import type { ObjectTypes } from "./types";
@@ -40,18 +40,19 @@ export const DataSummary = ({ data_types }: { data_types: ObjectTypes }) => {
             return <video src={value} controls className="w-full" />;
           }
 
-          // List: [{ id: <id>, body: text, title: text }, ...]
-          // Paragraphs: [{ <nameKey>: name, <textKey>: text }, ...]
-          if (Array.isArray(value)) {
-            return <div className="whitespace-pre-wrap">{JSON.stringify(value, null, 2)}</div>;
-          }
-
-          // Timeseries: <channel name>: [array of values]
-          // Table: <key>: <value>
-          if (typeof value === "object") {
-            return Object.entries(value)
-              .map(([key, value]) => `${key}: ${String(value).substring(0, 300)}`)
-              .join("\n");
+          // Arrays: List, Paragraphs, Timeseries values
+          // Objects: Table, JSON-like structures with nested dictionaries
+          if (typeof value === "object" && value !== null) {
+            return (
+              <JsonViewer
+                data={value}
+                showSearch={false}
+                showFilters={false}
+                showCopyButton={false}
+                minHeight={100}
+                maxHeight={300}
+              />
+            );
           }
 
           return value;
@@ -76,48 +77,40 @@ export const DataSummary = ({ data_types }: { data_types: ObjectTypes }) => {
 
   return (
     <div className="overflow-x-auto pb-tight mb-base">
-      <div className="border border-neutral-border rounded-small border-collapse overflow-hidden w-max">
-        <div>
-          {table.getHeaderGroups().map((headerGroup) => (
-            <div
-              key={headerGroup.id}
-              className={cnm(
-                "flex [&>*]:flex-shrink-0 [&>*]:px-4 [&>*]:py-2 bg-neutral-surface",
-                "[&>*]:overflow-hidden [&>*]:text-ellipsis [&>*]:text-left [&>*]:whitespace-nowrap",
-              )}
-            >
-              {headerGroup.headers.map((header) => (
-                <div
-                  key={header.id}
-                  style={{
-                    width: header.getSize(),
-                    position: "relative",
-                  }}
-                >
-                  {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
-                  <ResizeHandler header={header} />
-                </div>
-              ))}
-            </div>
-          ))}
-        </div>
-        <div>
-          {table.getRowModel().rows.map((row) => (
-            <div
-              key={row.id}
-              className={cnm(
-                "flex [&>*]:flex-shrink-0 even:bg-neutral-surface [&_td]:align-top [&>*]:px-4 [&>*]:py-2",
-                "[&>*]:overflow-hidden [&>*]:text-ellipsis",
-              )}
-            >
-              {row.getVisibleCells().map((cell) => (
-                <div key={cell.id} style={{ width: cell.column.getSize() }}>
-                  {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                </div>
-              ))}
-            </div>
-          ))}
-        </div>
+      <div className="border border-neutral-border rounded-small overflow-hidden">
+        <table className="w-full">
+          <thead className="bg-neutral-surface">
+            {table.getHeaderGroups().map((headerGroup) => (
+              <tr key={headerGroup.id}>
+                {headerGroup.headers.map((header) => (
+                  <th
+                    key={header.id}
+                    className="px-4 py-2 overflow-hidden text-ellipsis text-left whitespace-nowrap font-normal relative"
+                    style={{ minWidth: header.getSize() }}
+                  >
+                    {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
+                    <ResizeHandler header={header} />
+                  </th>
+                ))}
+              </tr>
+            ))}
+          </thead>
+          <tbody>
+            {table.getRowModel().rows.map((row) => (
+              <tr key={row.id} className="even:bg-neutral-surface">
+                {row.getVisibleCells().map((cell) => (
+                  <td
+                    key={cell.id}
+                    className="px-4 py-2 overflow-hidden text-ellipsis align-top"
+                    style={{ minWidth: cell.column.getSize() }}
+                  >
+                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                  </td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
     </div>
   );

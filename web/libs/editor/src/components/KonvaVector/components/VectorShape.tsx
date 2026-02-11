@@ -1,5 +1,5 @@
-import type React from "react";
-import { Path } from "react-konva";
+import React, { useRef } from "react";
+import { Path, Shape } from "react-konva";
 import type { BezierPoint } from "../types";
 import chroma from "chroma-js";
 import type { KonvaEventObject } from "konva/lib/Node";
@@ -223,6 +223,9 @@ export const VectorShape: React.FC<VectorShapeProps> = ({
 }) => {
   if (segments.length === 0) return null;
 
+  // Track hover state to prevent rapid toggling
+  const hoverTimeoutRef = useRef<{ [key: number]: NodeJS.Timeout | null }>({});
+
   const effectiveZoom = transform.zoom * fitScale;
 
   // For skeleton mode, render each segment as a separate line to avoid path ordering issues
@@ -298,6 +301,80 @@ export const VectorShape: React.FC<VectorShapeProps> = ({
         // Apply opacity only to fill color using chroma.js
         const fillWithOpacity = allowClose && isPathClosed && fill ? chroma(fill).alpha(opacity).css() : undefined;
 
+        // For closed polygons, render both Path (for stroke) and Shape (for fill area events)
+        // When closed, only Shape fires mouse events to avoid conflicts
+        if (allowClose && isPathClosed && fillWithOpacity) {
+          return (
+            <React.Fragment key={`path-group-${index}`}>
+              {/* Path element for the stroke and visual fill - NO mouse events when closed */}
+              <Path
+                key={`path-${index}`}
+                data={pathData}
+                stroke={stroke}
+                strokeWidth={strokeWidth}
+                strokeScaleEnabled={false}
+                fill={fillWithOpacity}
+                hitStrokeWidth={20}
+                onClick={onClick}
+                // Don't attach onMouseEnter/onMouseLeave - Shape handles all events when closed
+                onMouseDown={onMouseDown}
+                onMouseMove={onMouseMove}
+                onMouseUp={onMouseUp}
+              />
+              {/* Shape element for the fill area - rendered on top to capture ALL mouse events when closed */}
+              {/* This Shape is invisible but uses hitFunc to detect mouse events over the entire fill area */}
+              <Shape
+                key={`fill-shape-${index}`}
+                sceneFunc={(ctx, shape) => {
+                  // Don't render anything visually - Path already renders the fill
+                  // This Shape is only for capturing mouse events over the fill area
+                }}
+                hitFunc={(ctx, shape) => {
+                  // Use the same path for hit detection - this ensures mouse events work over the entire fill area
+                  const path2D = new Path2D(pathData);
+                  ctx.fill(path2D);
+                  ctx.fillShape(shape);
+                }}
+                onClick={onClick}
+                onMouseEnter={(e) => {
+                  console.log("🔵 Shape onMouseEnter fired - fill area hovered", {
+                    target: e.target?.getClassName(),
+                    currentTarget: e.currentTarget?.getClassName(),
+                    pointerPos: e.target?.getStage()?.getPointerPosition(),
+                    pathData: `${pathData.substring(0, 50)}...`,
+                  });
+                  // Clear any pending leave timeout
+                  if (hoverTimeoutRef.current[index]) {
+                    clearTimeout(hoverTimeoutRef.current[index]);
+                    hoverTimeoutRef.current[index] = null;
+                  }
+                  onMouseEnter?.(e);
+                }}
+                onMouseLeave={(e) => {
+                  console.log("🔴 Shape onMouseLeave fired - left fill area", {
+                    target: e.target?.getClassName(),
+                    currentTarget: e.currentTarget?.getClassName(),
+                    pointerPos: e.target?.getStage()?.getPointerPosition(),
+                    relatedTarget: e.evt.relatedTarget,
+                  });
+                  // Add a small delay to prevent rapid toggling
+                  // This helps when moving between Path stroke and Shape fill
+                  hoverTimeoutRef.current[index] = setTimeout(() => {
+                    hoverTimeoutRef.current[index] = null;
+                    onMouseLeave?.(e);
+                  }, 50);
+                }}
+                onMouseDown={onMouseDown}
+                onMouseMove={onMouseMove}
+                onMouseUp={onMouseUp}
+                listening={true}
+              />
+            </React.Fragment>
+          );
+        }
+
+        // For open paths (not closable OR closable but not closed yet), use Path element directly
+        // Path handles all mouse events in this case
         return (
           <Path
             key={`path-${index}`}

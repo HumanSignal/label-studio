@@ -1,10 +1,21 @@
-import { FF_DEV_1752, FF_DEV_2186, FF_DEV_2887, FF_DEV_3034, FF_LSDV_4620_3_ML, isFF } from "../utils/feature-flags";
+import { Button } from "@humansignal/ui";
+import {
+  FF_DEV_1752,
+  FF_DEV_2186,
+  FF_DEV_2887,
+  FF_DEV_3034,
+  FF_LSDV_4620_3_ML,
+  FF_FIT_1304_STRICT_OVERLAP,
+  isFF,
+} from "../utils/feature-flags";
+import { isActive, FF_FIT_720_LAZY_LOAD_ANNOTATIONS } from "@humansignal/core/lib/utils/feature-flags";
 import { isDefined } from "../utils/utils";
 import { Modal } from "../components/Common/Modal/Modal";
 import { CommentsSdk } from "./comments-sdk";
 // import { LSFHistory } from "./lsf-history";
 import { annotationToServer, taskToLSFormat } from "./lsf-utils";
 import { when } from "mobx";
+import { imageCache } from "@humansignal/core";
 
 const DEFAULT_INTERFACES = [
   "basic",
@@ -32,13 +43,24 @@ const resolveLabelStudio = () => {
 };
 
 // Returns true to suppress (swallow) the error, false to bubble to global handler.
-// We allow 403 PAUSED to bubble so the app-level ApiProvider can show the paused modal
-const errorHandlerAllowPaused = (result) => {
+// We allow certain errors to bubble so the app-level ApiProvider can show modals:
+// - 403 PAUSED: User is paused in the project
+// - 400 OVERLAP_REACHED: Annotation overlap limit has been reached (only when feature flag is enabled)
+const errorHandlerAllowSpecialErrors = (result) => {
   const isPaused =
     result?.status === 403 &&
     typeof result?.response === "object" &&
     result?.response?.display_context?.reason === "PAUSED";
-  return !isPaused;
+
+  // Only handle OVERLAP_REACHED when feature flag is enabled
+  const isOverlapReached =
+    isFF(FF_FIT_1304_STRICT_OVERLAP) &&
+    result?.status === 400 &&
+    typeof result?.response === "object" &&
+    result?.response?.display_context?.reason === "OVERLAP_REACHED";
+
+  // Return false to allow these errors to bubble up to the global handler
+  return !(isPaused || isOverlapReached);
 };
 
 // Support portal URL constants used to construct error reporting links
@@ -46,6 +68,10 @@ const errorHandlerAllowPaused = (result) => {
 // for better error tracking and customer support
 export const SUPPORT_URL = "https://support.humansignal.com/hc/en-us/requests/new";
 export const SUPPORT_URL_REQUEST_ID_PARAM = "tf_37934448633869"; // request_id field ID in ZD
+
+// Toast ID for overlap reached message - used to dismiss this specific toast
+// without affecting other toasts like "Annotation Saved"
+const OVERLAP_TOAST_ID = "overlap-reached-toast";
 
 export class LSFWrapper {
   /** @type {HTMLElement} */
@@ -105,6 +131,16 @@ export class LSFWrapper {
     this.initialAnnotation = annotation;
     this.interfacesModifier = interfacesModifier;
     this.isInteractivePreannotations = isInteractivePreannotations ?? false;
+
+    // Listen for overlap error modal events (only when feature flag is enabled)
+    if (isFF(FF_FIT_1304_STRICT_OVERLAP)) {
+      this.handleOverlapNextTask = () => this.loadTask();
+      this.handleOverlapCloseTask = () => this.closeTask();
+      this.handleOverlapExitStream = () => this.exitStream();
+      window.addEventListener("overlap-error-next-task", this.handleOverlapNextTask);
+      window.addEventListener("overlap-error-close-task", this.handleOverlapCloseTask);
+      window.addEventListener("overlap-error-exit-stream", this.handleOverlapExitStream);
+    }
 
     let interfaces = [...DEFAULT_INTERFACES];
 
@@ -343,6 +379,10 @@ export class LSFWrapper {
   setLSFTask(task, annotationID, fromHistory, selectPrediction = false) {
     if (!this.lsf) return;
 
+    if (isFF(FF_FIT_1304_STRICT_OVERLAP)) {
+      this.dismissOverlapToast();
+    }
+
     const hasChangedTasks = this.lsf?.task?.id !== task?.id && task?.id;
 
     this.setLoading(true, hasChangedTasks);
@@ -383,10 +423,74 @@ export class LSFWrapper {
     // undefined or true for backward compatibility
     this.lsf.toggleInterface("postpone", this.task.allow_postpone !== false);
     this.lsf.toggleInterface("topbar:task-counter", true);
+
+    if (isFF(FF_FIT_1304_STRICT_OVERLAP)) {
+      // Handle strict task overlap - disable submission controls when overlap is reached
+      // Only process when feature flag is enabled
+      const overlapReached = this.task.overlap_reached === true;
+      this.overlapReached = overlapReached;
+      this.overlapReachedMessage =
+        this.task.overlap_reached_message ||
+        "Annotation overlap has been reached for this task. Your draft is preserved but cannot be submitted.";
+
+      // Set overlap state on LSF store - this will disable buttons with tooltips
+      this.lsf.setFlags({
+        overlapReached,
+        overlapReachedMessage: this.overlapReachedMessage,
+      });
+    } else {
+      this.overlapReached = false;
+      this.overlapReachedMessage = "";
+    }
+
     this.lsf.assignTask(task);
     this.lsf.initializeStore(lsfTask);
     this.setAnnotation(annotationID, fromHistory || isRejectedQueue, selectPrediction);
     this.setLoading(false);
+
+    if (isFF(FF_FIT_1304_STRICT_OVERLAP) && this.overlapReached) {
+      // Show informational message if overlap is reached (only when feature flag is enabled)
+      this.showOverlapReachedMessage();
+    }
+  }
+
+  /**
+   * Show informational message when overlap is reached
+   * @private
+   */
+  showOverlapReachedMessage() {
+    // Use info toast to communicate the overlap status
+    // This is informational, not an error, so we use a neutral tone
+    // Use a specific ID so we can dismiss this toast without affecting others
+    this.datamanager.invoke("toast", {
+      id: OVERLAP_TOAST_ID,
+      message: (
+        <div className="flex items-center justify-between">
+          <span>{this.overlapReachedMessage}</span>
+          <Button
+            onClick={() => {
+              this.datamanager.invoke("toast:dismiss", { id: OVERLAP_TOAST_ID });
+              this.handleOverlapNextTask();
+            }}
+            className="ml-4"
+            size="small"
+            look="outlined"
+          >
+            Next Task
+          </Button>
+        </div>
+      ),
+      type: "info",
+      duration: -1,
+    });
+  }
+
+  /**
+   * Dismiss the overlap reached toast if it's showing
+   * @private
+   */
+  dismissOverlapToast() {
+    this.datamanager.invoke("toast:dismiss", { id: OVERLAP_TOAST_ID });
   }
 
   /** @private */
@@ -597,6 +701,28 @@ export class LSFWrapper {
     if (status === 200 || status === 201) {
       this.datamanager.invoke("toast", { message: successMessage, type: "info" });
     } else if (status !== undefined) {
+      // Skip toast for errors that are handled by global modal handlers via display_context
+      // These errors bubble up to ApiProvider which shows appropriate modals
+      // Note: display_context is in result.response for API error responses
+      const displayReason = result?.response?.display_context?.reason;
+      const isPausedError = displayReason === "PAUSED";
+      const isOverlapError = isFF(FF_FIT_1304_STRICT_OVERLAP) && displayReason === "OVERLAP_REACHED";
+      if (isPausedError || isOverlapError) {
+        // Also update local state for overlap reached (only when feature flag is enabled)
+        if (isOverlapError) {
+          this.overlapReached = true;
+          this.overlapReachedMessage =
+            result?.response?.detail ||
+            "Annotation overlap has been reached for this task. Your draft is preserved but cannot be submitted.";
+          // Set overlap state on LSF store - this will disable buttons with tooltips
+          this.lsf.setFlags({
+            overlapReached: true,
+            overlapReachedMessage: this.overlapReachedMessage,
+          });
+        }
+        return;
+      }
+
       const requestId = result?.$meta?.headers?.get("x-ls-request-id");
       const supportUrl = requestId ? `${SUPPORT_URL}?${SUPPORT_URL_REQUEST_ID_PARAM}=${requestId}` : SUPPORT_URL;
 
@@ -623,6 +749,12 @@ export class LSFWrapper {
 
   /** @private */
   onSubmitAnnotation = async () => {
+    // Prevent submission if overlap is reached (only when feature flag is enabled)
+    if (isFF(FF_FIT_1304_STRICT_OVERLAP) && this.overlapReached) {
+      this.showOverlapReachedMessage();
+      return;
+    }
+
     const exitStream = this.shouldExitStream();
     const loadNext = exitStream ? false : this.shouldLoadNext();
     const result = await this.submitCurrentAnnotation(
@@ -633,7 +765,7 @@ export class LSFWrapper {
           { taskID },
           { body },
           // errors are displayed by "toast" event - we don't want to show blocking modal
-          { errorHandler: errorHandlerAllowPaused },
+          { errorHandler: errorHandlerAllowSpecialErrors },
         );
       },
       false,
@@ -667,7 +799,7 @@ export class LSFWrapper {
           body: serializedAnnotation,
         },
         // errors are displayed by "toast" event - we don't want to show blocking modal
-        { errorHandler: errorHandlerAllowPaused },
+        { errorHandler: errorHandlerAllowSpecialErrors },
       );
     });
     const status = result?.$meta?.status;
@@ -804,6 +936,12 @@ export class LSFWrapper {
   };
 
   onSkipTask = async (_, { comment } = {}) => {
+    // Prevent skipping if overlap is reached (only when feature flag is enabled)
+    if (isFF(FF_FIT_1304_STRICT_OVERLAP) && this.overlapReached) {
+      this.showOverlapReachedMessage();
+      return;
+    }
+
     // Manager roles that can force-skip unskippable tasks (OW=Owner, AD=Admin, MA=Manager)
     const MANAGER_ROLES = ["OW", "AD", "MA"];
     const task = this.task;
@@ -814,7 +952,9 @@ export class LSFWrapper {
     const canSkip = !skipDisabled || hasForceSkipPermission;
     if (!canSkip) {
       console.warn("Task cannot be skipped: allow_skip is false and user lacks manager role");
-      this.showOperationToast(400, null, "This task cannot be skipped", { error: "Task cannot be skipped" });
+      this.showOperationToast(400, null, "This task cannot be skipped", {
+        error: "Task cannot be skipped",
+      });
       return;
     }
     const result = await this.submitCurrentAnnotation(
@@ -832,7 +972,7 @@ export class LSFWrapper {
           id === undefined ? "submitAnnotation" : "updateAnnotation",
           params,
           options,
-          { errorHandler: errorHandlerAllowPaused },
+          { errorHandler: errorHandlerAllowSpecialErrors },
         );
       },
       true,
@@ -1082,8 +1222,30 @@ export class LSFWrapper {
   }
 
   destroy() {
+    // Clean up overlap error event listeners and dismiss toast (only when feature flag is enabled)
+    if (isFF(FF_FIT_1304_STRICT_OVERLAP)) {
+      window.removeEventListener("overlap-error-next-task", this.handleOverlapNextTask);
+      window.removeEventListener("overlap-error-close-task", this.handleOverlapCloseTask);
+      window.removeEventListener("overlap-error-exit-stream", this.handleOverlapExitStream);
+      // Dismiss the overlap toast if it's showing - this ensures the toast doesn't
+      // persist after leaving the labeling interface
+      this.dismissOverlapToast();
+    }
+
+    if (isActive(FF_FIT_720_LAZY_LOAD_ANNOTATIONS)) {
+      imageCache?.forceClear?.();
+    }
+
     this.lsfInstance?.destroy?.();
     this.lsfInstance = null;
+  }
+
+  /**
+   * Close the current task panel (for DataManager context)
+   */
+  closeTask() {
+    // Invoke the data manager's close task action
+    this.datamanager.invoke("closeTask");
   }
 
   get taskID() {

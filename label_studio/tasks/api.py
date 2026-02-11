@@ -2,6 +2,7 @@
 
 import logging
 
+from core.feature_flags import flag_set
 from core.mixins import GetParentObjectMixin
 from core.permissions import ViewClassPermission, all_permissions
 from core.utils.common import is_community
@@ -303,10 +304,18 @@ class TaskAPI(generics.RetrieveUpdateDestroyAPIView):
         )
 
     def get_retrieve_serializer_context(self, request):
+        """Build serializer context for task retrieval.
+
+        The resolve_uri parameter controls whether storage URLs (e.g., s3://bucket/file.jpg)
+        are converted to proxy URLs (/tasks/<id>/resolve/?fileuri=...). This is useful for:
+        - resolve_uri=True (default): URLs are proxied through Label Studio for security
+        - resolve_uri=False: Original storage URLs are preserved, useful for debugging
+          or when users need to see the actual source paths in task preview
+        """
         fields = ['drafts', 'predictions', 'annotations']
 
         return {
-            'resolve_uri': True,
+            'resolve_uri': bool_from_request(request.GET, 'resolve_uri', True),
             'predictions': 'predictions' in fields,
             'annotations': 'annotations' in fields,
             'drafts': 'drafts' in fields,
@@ -355,6 +364,27 @@ class TaskAPI(generics.RetrieveUpdateDestroyAPIView):
             )
         )
 
+    def get_object(self):
+        """
+        Override to check permissions on a lightweight task first.
+
+        This avoids executing the expensive PreparedTaskManager query
+        when the user doesn't have permission to access the task.
+        """
+        task_id = self.kwargs.get('pk')
+
+        # First check permissions using a lightweight query
+        # select_related('project') avoids extra query when permission check accesses task.project
+        lean_task = generics.get_object_or_404(
+            Task.objects.filter(project__organization=self.request.user.active_organization).select_related('project'),
+            pk=task_id,
+        )
+        self.check_object_permissions(self.request, lean_task)
+
+        # Now fetch full task with heavy queryset (prefetches, annotations, etc.)
+        queryset = self.filter_queryset(self.get_queryset())
+        return generics.get_object_or_404(queryset, pk=task_id)
+
     def get_serializer_class(self):
         # GET => task + annotations + predictions + drafts
         if self.request.method == 'GET':
@@ -374,6 +404,162 @@ class TaskAPI(generics.RetrieveUpdateDestroyAPIView):
     @extend_schema(exclude=True)
     def put(self, request, *args, **kwargs):
         return super(TaskAPI, self).put(request, *args, **kwargs)
+
+
+@method_decorator(
+    name='get',
+    decorator=extend_schema(
+        tags=['Tasks'],
+        summary='Get task label distribution',
+        description='Get aggregated label distribution across all annotations for a task. '
+        'Returns counts of each label value grouped by control tag. '
+        'This is an efficient endpoint that avoids N+1 queries.',
+        responses={
+            '200': OpenApiResponse(
+                description='Label distribution data',
+                examples=[
+                    OpenApiExample(
+                        name='response',
+                        value={
+                            'total_annotations': 100,
+                            'distributions': {
+                                'label': {
+                                    'type': 'rectanglelabels',
+                                    'labels': {'Car': 45, 'Person': 30, 'Dog': 25},
+                                },
+                            },
+                        },
+                        media_type='application/json',
+                    )
+                ],
+            )
+        },
+        extensions={
+            'x-fern-audiences': ['internal'],
+        },
+    ),
+)
+class TaskAgreementAPI(generics.RetrieveAPIView):
+    """
+    Efficient endpoint for getting label distribution without fetching all annotations.
+
+    This endpoint aggregates annotation results at the database level to avoid N+1 queries.
+    It returns pre-computed label counts for the Distribution row in the Summary view.
+    """
+
+    permission_required = ViewClassPermission(GET=all_permissions.tasks_view)
+    queryset = Task.objects.all()
+
+    def get(self, request, pk):
+        # This endpoint is gated by feature flag
+        if not flag_set('fflag_fix_all_fit_720_lazy_load_annotations', user=request.user):
+            raise PermissionDenied('Feature not enabled')
+
+        try:
+            task = Task.objects.get(pk=pk)
+        except Task.DoesNotExist:
+            return Response({'error': 'Task not found'}, status=404)
+
+        # Check project access using LSO's native permission check
+        if not task.project.has_permission(request.user):
+            raise PermissionDenied('You do not have permission to view this task')
+
+        # Get all annotations for this task with their results in a single query
+        annotations = Annotation.objects.filter(
+            task=task,
+            was_cancelled=False,
+        ).values_list('result', flat=True)
+
+        total_annotations = len(annotations)
+        distributions = {}
+
+        def merge_result_into_distributions(result):
+            """Merge a single result (list of labeling items) into distributions in place."""
+            if not result or not isinstance(result, list):
+                return
+            for item in result:
+                if not isinstance(item, dict):
+                    continue
+                from_name = item.get('from_name', '')
+                result_type = item.get('type', '')
+                value = item.get('value', {})
+
+                if from_name not in distributions:
+                    distributions[from_name] = {
+                        'type': result_type,
+                        'labels': {},
+                        'values': [],
+                    }
+
+                if result_type.endswith('labels'):
+                    labels = value.get(result_type, [])
+                    if isinstance(labels, list):
+                        for label in labels:
+                            if label not in distributions[from_name]['labels']:
+                                distributions[from_name]['labels'][label] = 0
+                            distributions[from_name]['labels'][label] += 1
+
+                elif result_type == 'choices':
+                    choices = value.get('choices', [])
+                    if isinstance(choices, list):
+                        for choice in choices:
+                            if choice not in distributions[from_name]['labels']:
+                                distributions[from_name]['labels'][choice] = 0
+                            distributions[from_name]['labels'][choice] += 1
+
+                elif result_type == 'rating':
+                    rating = value.get('rating')
+                    if rating is not None:
+                        distributions[from_name]['values'].append(rating)
+
+                elif result_type == 'number':
+                    number = value.get('number')
+                    if number is not None:
+                        distributions[from_name]['values'].append(number)
+
+                elif result_type == 'taxonomy':
+                    taxonomy = value.get('taxonomy', [])
+                    if isinstance(taxonomy, list):
+                        for path in taxonomy:
+                            if isinstance(path, list) and path:
+                                leaf = path[-1]
+                                if leaf not in distributions[from_name]['labels']:
+                                    distributions[from_name]['labels'][leaf] = 0
+                                distributions[from_name]['labels'][leaf] += 1
+
+                elif result_type == 'pairwise':
+                    selected = value.get('selected')
+                    if selected:
+                        if selected not in distributions[from_name]['labels']:
+                            distributions[from_name]['labels'][selected] = 0
+                        distributions[from_name]['labels'][selected] += 1
+
+        # Process annotation results
+        for result in annotations:
+            merge_result_into_distributions(result)
+
+        # Include prediction results in distribution counts so aggregate matches
+        # client-side (develop / FF off). total_annotations stays annotation count only.
+        predictions = Prediction.objects.filter(task=task).values_list('result', flat=True)
+        for result in predictions:
+            # Prediction.result can be list (same as annotation) or dict
+            if isinstance(result, list):
+                merge_result_into_distributions(result)
+
+        # Post-process: calculate averages for numeric types
+        for from_name, dist in distributions.items():
+            if dist['values']:
+                dist['average'] = sum(dist['values']) / len(dist['values'])
+                dist['count'] = len(dist['values'])
+            # Remove raw values from response to keep it lightweight
+            del dist['values']
+
+        return Response(
+            {
+                'total_annotations': total_annotations,
+                'distributions': distributions,
+            }
+        )
 
 
 @method_decorator(

@@ -25,13 +25,15 @@ import "../../tags/Custom";
  */
 import { Space } from "../../common/Space/Space";
 import { Button } from "@humansignal/ui";
+import { isStarterCloudPlan } from "@humansignal/core";
 import { cn } from "../../utils/bem";
-import { isSelfServe } from "../../utils/billing";
 import { FF_BULK_ANNOTATION, FF_DEV_3873, FF_LSDV_4620_3_ML, FF_SIMPLE_INIT, isFF } from "../../utils/feature-flags";
 import { sanitizeHtml } from "../../utils/html";
 import { reactCleaner } from "../../utils/reactCleaner";
 import { guidGenerator } from "../../utils/unique";
 import { isDefined, sortAnnotations } from "../../utils/utilities";
+import { QueryClientProvider } from "@tanstack/react-query";
+import { queryClient } from "@humansignal/core/lib/utils/query-client";
 import { ToastProvider, ToastViewport } from "@humansignal/ui/lib/toast/toast";
 
 /**
@@ -52,6 +54,21 @@ import { ViewAll } from "./ViewAll";
  * Styles
  */
 import "./App.scss";
+
+/**
+ * Check if annotation has any tag that should be rendered in sidebar
+ * Used to conditionally show the custom tab in the side panel
+ * @returns {boolean|string} - false or the title of the tab that should be rendered in sidebar
+ */
+const hasTagInSidebar = (annotation) => {
+  if (!annotation?.names) return false;
+  for (const tag of annotation.names.values()) {
+    if (tag.renderInSidebar) {
+      return tag.sidebar;
+    }
+  }
+  return false;
+};
 
 /**
  * App
@@ -233,7 +250,7 @@ class App extends Component {
       </div>
     );
 
-    const isBulkMode = isFF(FF_BULK_ANNOTATION) && !isSelfServe() && store.hasInterface("annotation:bulk");
+    const isBulkMode = isFF(FF_BULK_ANNOTATION) && !isStarterCloudPlan() && store.hasInterface("annotation:bulk");
     const newUIEnabled = isFF(FF_DEV_3873);
 
     return (
@@ -241,72 +258,78 @@ class App extends Component {
         className={cn("editor").mod({ fullscreen: settings.fullscreen }).toClassName()}
         ref={isFF(FF_LSDV_4620_3_ML) ? reactCleaner(this) : null}
       >
-        <Settings store={store} />
-        <Provider store={store}>
-          <ToastProvider>
-            {newUIEnabled ? (
-              <InstructionsModal
-                visible={store.showingDescription}
-                onCancel={() => store.toggleDescription()}
-                title={store.hasInterface("review") ? "Review Instructions" : "Labeling Instructions"}
-              >
-                {store.description}
-              </InstructionsModal>
-            ) : (
-              <>
-                {store.showingDescription && (
-                  <div className="p-base mb-base">
-                    {/* biome-ignore lint/security/noDangerouslySetInnerHtml: we need html here and it's sanitized */}
-                    <div dangerouslySetInnerHTML={{ __html: sanitizeHtml(store.description) }} />
-                  </div>
-                )}
-              </>
-            )}
-
-            {isDefined(store) && store.hasInterface("topbar") && <TopBar store={store} />}
-            <div
-              className={cn("wrapper")
-                .mod({
-                  viewAll: viewingAll,
-                  bsp: settings.effectiveBottomSidePanel,
-                  showingBottomBar: newUIEnabled,
-                })
-                .toClassName()}
-            >
+        <QueryClientProvider client={queryClient}>
+          <Settings store={store} />
+          <Provider store={store}>
+            <ToastProvider>
               {newUIEnabled ? (
-                isBulkMode || !store.hasInterface("side-column") ? (
-                  <>
-                    {mainContent}
-                    {store.hasInterface("topbar") && <BottomBar store={store} />}
-                  </>
+                <InstructionsModal
+                  visible={store.showingDescription}
+                  onCancel={() => store.toggleDescription()}
+                  title={store.hasInterface("review") ? "Review Instructions" : "Labeling Instructions"}
+                >
+                  {store.description}
+                </InstructionsModal>
+              ) : (
+                <>
+                  {store.showingDescription && (
+                    <div className="p-base mb-base">
+                      {/* biome-ignore lint/security/noDangerouslySetInnerHtml: we need html here and it's sanitized */}
+                      <div dangerouslySetInnerHTML={{ __html: sanitizeHtml(store.description) }} />
+                    </div>
+                  )}
+                </>
+              )}
+
+              {isDefined(store) && store.hasInterface("topbar") && <TopBar store={store} />}
+              <div
+                className={cn("wrapper")
+                  .mod({
+                    viewAll: viewingAll,
+                    bsp: settings.effectiveBottomSidePanel,
+                    showingBottomBar: newUIEnabled,
+                  })
+                  .toClassName()}
+              >
+                {newUIEnabled ? (
+                  isBulkMode || !store.hasInterface("side-column") ? (
+                    <>
+                      {mainContent}
+                      {store.hasInterface("topbar") && <BottomBar store={store} />}
+                    </>
+                  ) : (
+                    <SideTabsPanels
+                      panelsHidden={viewingAll}
+                      currentEntity={as.selectedHistory ?? as.selected}
+                      regions={as.selected.regionStore}
+                      showComments={store.hasInterface("annotations:comments")}
+                      showCustomTab={hasTagInSidebar(as.selected)}
+                      focusTab={store.commentStore.tooltipMessage ? "comments" : null}
+                    >
+                      {mainContent}
+                      {store.hasInterface("topbar") && <BottomBar store={store} />}
+                    </SideTabsPanels>
+                  )
+                ) : isBulkMode || !store.hasInterface("side-column") ? (
+                  mainContent
                 ) : (
-                  <SideTabsPanels
+                  <SidePanels
                     panelsHidden={viewingAll}
                     currentEntity={as.selectedHistory ?? as.selected}
                     regions={as.selected.regionStore}
                     showComments={store.hasInterface("annotations:comments")}
+                    showCustomTab={hasTagInSidebar(as.selected)}
                     focusTab={store.commentStore.tooltipMessage ? "comments" : null}
                   >
                     {mainContent}
-                    {store.hasInterface("topbar") && <BottomBar store={store} />}
-                  </SideTabsPanels>
-                )
-              ) : isBulkMode || !store.hasInterface("side-column") ? (
-                mainContent
-              ) : (
-                <SidePanels
-                  panelsHidden={viewingAll}
-                  currentEntity={as.selectedHistory ?? as.selected}
-                  regions={as.selected.regionStore}
-                >
-                  {mainContent}
-                </SidePanels>
-              )}
-            </div>
-            <ToastViewport />
-          </ToastProvider>
-        </Provider>
-        {store.hasInterface("debug") && <Debug store={store} />}
+                  </SidePanels>
+                )}
+              </div>
+              <ToastViewport />
+            </ToastProvider>
+          </Provider>
+          {store.hasInterface("debug") && <Debug store={store} />}
+        </QueryClientProvider>
       </div>
     );
   }

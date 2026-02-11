@@ -33,3 +33,29 @@
   font-weight: 500;
   cursor: default;
 }
+
+.compact {
+  .label {
+    padding: 2px 3px;
+  }
+}
+
+.ghost {
+  background: none;
+  height: auto;
+  border-radius: 0;
+
+  .label {
+    margin: 0;
+    background: none;
+    border-radius: 0;
+    padding: 0;
+    color: var(--color-accent-persimmon-base);
+  }
+
+  .icon {
+    path {
+      fill: var(--color-accent-persimmon-base);
+    }
+  }
+}

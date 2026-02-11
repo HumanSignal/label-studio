@@ -57,13 +57,18 @@ def _get_first_unlocked(tasks_query: QuerySet[Task], user) -> Union[Task, None]:
             logger.debug('Task with id {} locked'.format(task_id))
 
 
-def _try_ground_truth(tasks: QuerySet[Task], project: Project, user: User) -> Union[Task, None]:
-    """Returns task from ground truth set"""
+def _try_onboarding_ground_truth(tasks: QuerySet[Task], project: Project, user: User) -> Union[Task, None]:
+    """Returns task from ground truth set for onboarding. Continuous GT flows through regular ordering."""
+    # Check if user is in onboarding window - return early if not
+    if not should_attempt_ground_truth_first(user, project):
+        return None
+
     not_solved_tasks_with_ground_truths = _annotate_has_ground_truths(tasks).filter(has_ground_truths=True)
     if not_solved_tasks_with_ground_truths.exists():
         if project.sampling == project.SEQUENCE:
             return _get_first_unlocked(not_solved_tasks_with_ground_truths, user)
         return _get_random_unlocked(not_solved_tasks_with_ground_truths, user)
+    return None
 
 
 def _try_tasks_with_overlap(tasks: QuerySet[Task]) -> Tuple[Union[Task, None], QuerySet[Task]]:
@@ -82,7 +87,7 @@ def _try_breadth_first(tasks: QuerySet[Task], user: User, project: Project) -> U
         # When annotator evaluation is enabled, ground truth tasks accumulate overlap regardless of the maximum annotations setting.
         # If we include them, they will eventually be front-loaded by the breadth first logic.
         # So we exclude them from the candidates.
-        # Onboarding tasks are served by _try_ground_truth.
+        # Onboarding tasks are served by _try_onboarding_ground_truth.
         # When no in progress tasks are found by breadth first, the next step in the pipeline will serve the remaining GT tasks.
         tasks = _annotate_has_ground_truths(tasks)
         tasks = tasks.filter(has_ground_truths=False)
@@ -152,6 +157,39 @@ def _try_uncertainty_sampling(
     return next_task
 
 
+def _should_include_gt_tasks(user: User, project: Project) -> bool:
+    """
+    Check if GT tasks should be included in the task pool for this user.
+
+    Returns True if user hasn't reached their GT limit (onboarding + continuous tasks).
+    """
+    if not project.annotator_evaluation_enabled:
+        return False
+
+    lse_project = getattr(project, 'lse_project', None)
+    if not lse_project:
+        return False
+
+    onboarding_tasks = getattr(lse_project, 'annotator_evaluation_onboarding_tasks', 0)
+    continuous_tasks = getattr(lse_project, 'annotator_evaluation_continuous_tasks', 0)
+    total_gt_limit = onboarding_tasks + continuous_tasks
+
+    if total_gt_limit == 0:
+        return False
+
+    # Count GT tasks user has completed
+    gt_task_ids = Task.objects.filter(project=project, annotations__ground_truth=True).values_list('pk', flat=True)
+
+    user_gt_completed = (
+        Annotation.objects.filter(project=project, completed_by=user, was_cancelled=False, task_id__in=gt_task_ids)
+        .values('task_id')
+        .distinct()
+        .count()
+    )
+
+    return user_gt_completed < total_gt_limit
+
+
 def _annotate_has_ground_truths(tasks: QuerySet[Task]) -> QuerySet[Task]:
     ground_truth = Annotation.objects.filter(task=OuterRef('pk'), ground_truth=True)
     return tasks.annotate(has_ground_truths=Exists(ground_truth))
@@ -163,7 +201,6 @@ def get_not_solved_tasks_qs(
     prepared_tasks: QuerySet[Task],
     assigned_flag: Union[bool, None],
     queue_info: str,
-    attempt_gt_first: bool,
 ) -> Tuple[QuerySet[Task], List[int], str, bool]:
     user_solved_tasks_array = user.annotations.filter(project=project, task__isnull=False)
     user_solved_tasks_array = user_solved_tasks_array.distinct().values_list('task__pk', flat=True)
@@ -176,10 +213,12 @@ def get_not_solved_tasks_qs(
         not_solved_tasks = not_solved_tasks.exclude(pk__in=user_postponed_tasks)
 
     prioritized_on_agreement = False
-    # if annotator is assigned for tasks, he must solve it regardless of is_labeled=True
+    include_gt = _should_include_gt_tasks(user, project)
+
+    # if annotator is assigned for tasks, they must solve it regardless of is_labeled=True
     if not assigned_flag:
         # low agreement strategy for auto-assigned annotators:
-        # Include tasks that have been completed if their agreement is not at threshold if threshold setting is set
+        # Include tasks that have been completed if their agreement is not at threshold
         lse_project = getattr(project, 'lse_project', None)
         if (
             lse_project
@@ -195,10 +234,9 @@ def get_not_solved_tasks_qs(
             )
             capacity_pred = Q(annotators__lt=F('overlap') + (lse_project.max_additional_annotators_assignable or 0))
 
-            if project.annotator_evaluation_enabled:
-                # Include ground truth tasks in the query if annotator evaluation is enabled
+            if include_gt:
                 qs = _annotate_has_ground_truths(qs)
-                # Keep all GT tasks + apply low-agreement+capacity to the rest.
+                # Include GT tasks + apply low-agreement+capacity to the rest.
                 not_solved_tasks = qs.filter(Q(has_ground_truths=True) | (low_agreement_pred & capacity_pred))
             else:
                 not_solved_tasks = qs.filter(low_agreement_pred & capacity_pred)
@@ -207,15 +245,12 @@ def get_not_solved_tasks_qs(
 
         # otherwise, filtering out completed tasks is sufficient
         else:
-            if not attempt_gt_first:
-                # Outside of onboarding window
-                if project.annotator_evaluation_enabled:
-                    # Include ground truth tasks in the query if outside of onboarding window and annotator evaluation is enabled
-                    not_solved_tasks = _annotate_has_ground_truths(not_solved_tasks)
-                    not_solved_tasks = not_solved_tasks.filter(Q(is_labeled=False) | Q(has_ground_truths=True))
-                else:
-                    # Ignore tasks that are already labeled when outside of onboarding window and annotator evaluation is not enabled
-                    not_solved_tasks = not_solved_tasks.filter(is_labeled=False)
+            if include_gt:
+                # Include GT tasks + is labeled=False
+                not_solved_tasks = _annotate_has_ground_truths(not_solved_tasks)
+                not_solved_tasks = not_solved_tasks.filter(Q(is_labeled=False) | Q(has_ground_truths=True))
+            else:
+                not_solved_tasks = not_solved_tasks.filter(is_labeled=False)
 
     if not flag_set('fflag_fix_back_lsdv_4523_show_overlap_first_order_27022023_short'):
         # show tasks with overlap > 1 first (unless tasks are already prioritized on agreement)
@@ -224,6 +259,38 @@ def get_not_solved_tasks_qs(
             logger.debug(f'User={user} tries overlap first from prepared tasks')
             _, not_solved_tasks = _try_tasks_with_overlap(not_solved_tasks)
             queue_info += (' & ' if queue_info else '') + 'Show overlap first'
+
+    # Strict task overlap enforcement: filter out tasks where overlap is already reached
+    # This prevents NEW annotators/reviewers from getting tasks that are already at their annotation limit
+    # Note: Only applies to annotators and reviewers - managers and admins can access all tasks
+    # Note: Postponed tasks are NOT filtered here - they are served with overlap_reached flag
+    # so users can see their work and understand why they can't submit
+    if flag_set('fflag_feat_all_fit_1304_strict_overlap', user=user) and not assigned_flag:
+        lse_project = getattr(project, 'lse_project', None)
+        is_restricted_role = getattr(user, 'is_annotator', False) or getattr(user, 'is_reviewer', False)
+        if lse_project and getattr(lse_project, 'strict_task_overlap', False) and is_restricted_role:
+            # Calculate effective overlap limit
+            # When agreement_threshold is set, allow additional annotators up to max_additional_annotators_assignable
+            max_additional = 0
+            if lse_project.agreement_threshold is not None:
+                max_additional = lse_project.max_additional_annotators_assignable or 0
+
+            # Exclude tasks where distinct annotator count >= effective overlap
+            # Ground truth annotations don't count toward overlap
+            tasks_at_overlap = (
+                Task.objects.filter(project=project)
+                .annotate(
+                    distinct_annotators=Count(
+                        'annotations__completed_by',
+                        filter=Q(annotations__was_cancelled=False, annotations__ground_truth=False),
+                        distinct=True,
+                    )
+                )
+                .filter(distinct_annotators__gte=F('overlap') + max_additional)
+                .values_list('pk', flat=True)
+            )
+
+            not_solved_tasks = not_solved_tasks.exclude(pk__in=tasks_at_overlap)
 
     return not_solved_tasks, user_solved_tasks_array, queue_info, prioritized_on_agreement
 
@@ -245,7 +312,6 @@ def get_next_task_without_dm_queue(
     not_solved_tasks: QuerySet,
     assigned_flag: Union[bool, None],
     prioritized_low_agreement: bool,
-    attempt_gt_first: bool,
 ) -> Tuple[Union[Task, None], bool, str]:
     next_task = None
     use_task_lock = True
@@ -267,11 +333,11 @@ def get_next_task_without_dm_queue(
             queue_info += (' & ' if queue_info else '') + 'Task lock'
 
     # Ground truth: attempt to label ground truth tasks in onboarding window
-    if not next_task and attempt_gt_first:
+    if not next_task:
         logger.debug(f'User={user} tries ground truth from prepared tasks')
-        next_task = _try_ground_truth(not_solved_tasks, project, user)
+        next_task = _try_onboarding_ground_truth(not_solved_tasks, project, user)
         if next_task:
-            queue_info += (' & ' if queue_info else '') + 'Ground truth queue'
+            queue_info += (' & ' if queue_info else '') + 'Onboarding ground truth queue'
 
     # Low agreement strategy: reassign this annotator to low agreement tasks
     if not next_task and prioritized_low_agreement:
@@ -379,16 +445,13 @@ def get_next_task(
         use_task_lock = True
         queue_info = ''
 
-        # Ground truth: label GT first only during onboarding window for user (gated by onboarding task number)
-        attempt_gt_first = should_attempt_ground_truth_first(user, project)
-
         not_solved_tasks, user_solved_tasks_array, queue_info, prioritized_low_agreement = get_not_solved_tasks_qs(
-            user, project, prepared_tasks, assigned_flag, queue_info, attempt_gt_first
+            user, project, prepared_tasks, assigned_flag, queue_info
         )
 
         if not dm_queue:
             next_task, use_task_lock, queue_info = get_next_task_without_dm_queue(
-                user, project, not_solved_tasks, assigned_flag, prioritized_low_agreement, attempt_gt_first
+                user, project, not_solved_tasks, assigned_flag, prioritized_low_agreement
             )
 
         if flag_set('fflag_fix_back_lsdv_4523_show_overlap_first_order_27022023_short'):

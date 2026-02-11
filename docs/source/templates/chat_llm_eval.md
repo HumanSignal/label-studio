@@ -1,5 +1,5 @@
 ---
-title: Fine-Tune an Agent with an LLM
+title: Fine-Tune an Agent with an LLM 🔒
 type: templates
 category: LLM Fine-tuning
 cat: llm-fine-tuning

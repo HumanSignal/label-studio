@@ -1,0 +1,320 @@
+.jsonViewer {
+  // Component-level tokens
+  --json-viewer-container-background: var(--color-neutral-surface-inset);
+  --json-viewer-background: transparent;
+  --json-viewer-collection-background: transparent;
+  --json-viewer-input-background: var(--color-neutral-background);
+  --json-viewer-button-hover-background: var(--color-primary-emphasis-subtle);
+  
+  // Color tokens for JSON values
+  --json-viewer-color-edit: var(--color-primary-content);
+  --json-viewer-color-copy: var(--color-primary-content);
+  --json-viewer-color-add: var(--color-primary-content);
+  --json-viewer-color-delete: var(--color-negative-content);
+  --json-viewer-color-brackets: var(--color-accent-sand-bold);
+  --json-viewer-color-keys: var(--color-primary-content);
+  --json-viewer-color-string: var(--color-accent-kale-bold);
+  --json-viewer-color-number: var(--color-accent-blueberry-bold);
+  --json-viewer-color-collection-count: var(--color-neutral-content-subtlest);
+  --json-viewer-color-boolean: var(--color-accent-canteloupe-bold);
+  --json-viewer-color-null: var(--color-accent-persimmon-bold);
+  --json-viewer-copy-pulse: var(--color-primary-content);
+  --json-viewer-accordion-icon: var(--color-accent-plum-base);
+
+  width: 100%;
+  height: 100%;
+  gap: var(--spacing-tight);
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: stretch;
+  flex: 1;
+}
+
+.controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-base);
+}
+
+.leftControls {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-base);
+  flex: 1 1 auto;
+  flex-wrap: wrap;
+}
+
+.filterLabel {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-tightest);
+  color: var(--color-neutral-content-subtle);
+  font-size: var(--font-size-small);
+  font-weight: var(--font-weight-medium);
+  letter-spacing: 0.05em;
+}
+
+.filterIcon {
+  color: var(--color-neutral-content-subtler);
+}
+
+.filterLabelText {
+  color: var(--color-neutral-content-subtler);
+}
+
+.searchWrapper {
+  position: relative;
+  width: 220px;
+  max-width: 100%;
+}
+
+.searchIcon {
+  position: absolute;
+  left: var(--spacing-tight);
+  top: 50%;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-neutral-content-subtlest);
+  pointer-events: none;
+  transform: translateY(-50%);
+}
+
+.searchClear {
+  position: absolute;
+  top: 50%;
+  right: var(--spacing-tighter);
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  border: none;
+  padding: 0;
+  color: var(--color-primary-content);
+  transition: color 80ms ease;
+  transform: translateY(-50%);
+
+  &:hover {
+    color: var(--color-primary-content-hover);
+  }
+
+  svg {
+    width: 20px;
+    height: 20px;
+  }
+}
+
+.searchInput {
+  width: 100%;
+  height: 32px;
+  padding: 0 var(--spacing-wide) 0 var(--spacing-wider);
+  background: var(--color-neutral-background);
+  border: 1px solid var(--color-neutral-border);
+  border-radius: 5px;
+  color: var(--color-neutral-content);
+  font-size: var(--font-size-body-small);
+  line-height: var(--line-height-body-small);
+  box-sizing: border-box;
+  transition: box-shadow 180ms ease-out;
+  
+  &:not(:disabled):hover {
+    border-color: var(--color-neutral-border-bold);
+  }
+  
+  &:not(:disabled):active {
+    border-color: var(--color-neutral-border-bolder);
+  }
+  
+  &:focus {
+    outline: none;
+    box-shadow: 0 0 0 4px var(--color-primary-focus-outline), inset 0 -1px 0 rgb(0 0 0 / 10%), inset 0 0 0 1px rgb(0 0 0 / 15%), inset 0 0 0 1px var(--color-primary-surface-content-subtle);
+    border-color: var(--color-neutral-border-bold);
+  }
+  
+  &::placeholder {
+    color: var(--color-neutral-content-subtler);
+  }
+}
+
+.filters {
+  display: flex;
+  gap: var(--spacing-tighter);
+  align-items: center;
+
+  button {
+    border-radius: var(--corner-radius-large);
+    min-width: 48px;
+  }
+}
+
+.copyButton {
+  position: absolute;
+  top: var(--spacing-tight);
+  right: var(--spacing-tight);
+  z-index: 1;
+  padding: 0 !important;
+}
+
+.jsonEditorContainer {
+  position: relative;
+  border-radius: var(--corner-radius-small);
+  overflow: auto;
+  height: 100%;
+  flex: 1 1 auto;
+
+  &.inset {
+    background-color: var(--json-viewer-container-background);
+    border: 1px solid var(--color-neutral-border);
+    box-shadow: inset 0 2px 8px rgba(var(--color-neutral-shadow-raw) / 12%);
+  }
+
+  // Override json-edit-react styles to match Label Studio theme
+  :global {
+    .jer-container {
+      background-color: var(--json-viewer-background);
+      font-family: var(--font-family-mono);
+      font-size: var(--font-size-smaller);
+      line-height: 1.6;
+    }
+    
+    // Override button styles
+    .jer-button {
+      transition: background-color 150ms ease;
+      
+      &:hover {
+        background-color: var(--json-viewer-button-hover-background);
+      }
+      
+      &:focus {
+        outline: 2px solid var(--color-primary-border);
+        outline-offset: 2px;
+      }
+    }
+    
+    // Override input styles
+    .jer-input {
+      background: var(--json-viewer-input-background);
+      border: 1px solid var(--color-neutral-border);
+      color: var(--color-neutral-content);
+      border-radius: var(--corner-radius-small);
+      padding: var(--spacing-tight) var(--spacing-base);
+      transition: border-color 150ms ease;
+      
+      &:hover {
+        border-color: var(--color-primary-border-subtle);
+      }
+      
+      &:focus {
+        outline: none;
+        border-color: var(--color-primary-border);
+        box-shadow: 0 0 0 1px var(--color-primary-border);
+      }
+    }
+    
+    // Override collection/object/array backgrounds
+    .jer-collection {
+      background-color: var(--json-viewer-collection-background);
+      border-radius: var(--corner-radius-small);
+    }
+
+    .jer-editor-container {
+      background: transparent;
+    }
+    
+    // Override key-value pair spacing
+    .jer-key-value-pair {
+      padding: var(--spacing-tighter) 0;
+    }
+
+    .jer-collection-item-count {
+      color: var(--json-viewer-color-collection-count) !important;
+    }
+
+    // Override JSON value colors
+    // Using !important to ensure our theme overrides the default
+    // Using multiple selectors to increase specificity for Storybook compatibility
+    .jer-value-string,
+    .jer-value-string span,
+    .jer-value-string div {
+      color: var(--json-viewer-color-string) !important;
+    }
+
+    .jer-value-number,
+    .jer-value-number span,
+    .jer-value-number div {
+      color: var(--json-viewer-color-number) !important;
+    }
+
+    .jer-value-boolean,
+    .jer-value-boolean span,
+    .jer-value-boolean div {
+      color: var(--json-viewer-color-boolean) !important;
+    }
+
+    .jer-value-null,
+    .jer-value-null span,
+    .jer-value-null div {
+      color: var(--json-viewer-color-null) !important;
+    }
+
+    .jer-value-main-row {
+      align-items: flex-start;
+    }
+
+    // Override key colors
+    .jer-key-text,
+    .jer-key-text span,
+    .jer-key-text div {
+      color: var(--json-viewer-color-keys) !important;
+    }
+
+    // Override bracket colors
+    .jer-brackets,
+    .jer-brackets span,
+    .jer-brackets div {
+      color: var(--json-viewer-color-brackets) !important;
+    }
+
+    // Override edit buttons
+    .jer-edit-buttons .jer-copy-pulse {
+      color: var(--json-viewer-color-copy) !important;
+      width: 32px;
+      height: 32px;
+      align-items: center;
+      justify-content: center;
+      display: flex;
+      transform: none;
+      border-radius: var(--corner-radius-smaller);
+      transition: background-color 150ms ease-out, color 150ms ease-out, opacity 150ms ease-out;
+
+      &::after {
+        display: none;
+      }
+
+      svg {
+        width: 20px;
+        height: 20px;
+      }
+
+      &:hover {
+        transform: none;
+        background-color: var(--json-viewer-button-hover-background);
+        opacity: 1 !important;
+      }
+    }
+
+    .jer-copy-pulse svg {
+      color: var(--json-viewer-copy-pulse) !important;
+    }
+
+    .jer-accordion-icon svg {
+      color: var(--json-viewer-accordion-icon) !important;
+    }
+  }
+}

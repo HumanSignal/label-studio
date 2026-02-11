@@ -26,7 +26,8 @@ const Tabs = ({
 const tabsListVariants = cva("inline-flex items-center", {
   variants: {
     variant: {
-      default: "justify-center h-10 bg-neutral-surface p-1 gap-1 border border-neutral-border rounded-smaller",
+      default:
+        "justify-center h-auto bg-neutral-surface p-tighter gap-tighter border border-neutral-border rounded-small",
       flat: "w-full h-auto border-b border-neutral-border",
     },
   },
@@ -49,7 +50,7 @@ const tabsTriggerVariants = cva(
     variants: {
       variant: {
         default:
-          "h-8 px-tight rounded-smaller data-[state=active]:bg-primary-background data-[state=active]:text-primary-content data-[state=active]:shadow-sm data-[state=inactive]:text-neutral-content-subtle data-[state=inactive]:hover:text-neutral-content",
+          "h-auto py-tightest px-base rounded-smaller text-label-small data-[state=active]:bg-neutral-surface-hover data-[state=active]:text-neutral-content data-[state=active]:shadow-[0_1px_0_rgba(var(--color-neutral-shadow-raw)/0.1),0_5px_10px_rgba(var(--color-neutral-shadow-raw)/0.1)] data-[state=inactive]:text-neutral-content-subtler data-[state=inactive]:hover:text-neutral-content-subtle",
         flat: "py-tight px-base -mb-px border-b-2 border-transparent data-[state=active]:border-primary-border data-[state=active]:text-primary-content data-[state=inactive]:text-neutral-content-subtle data-[state=inactive]:hover:text-neutral-content",
       },
     },

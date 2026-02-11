@@ -38,13 +38,13 @@ Label Studio is available to everyone as open source software (Label Studio Comm
   <tr>
     <td><b>Role-based workflows</b><br/><a href="https://docs.humansignal.com/guide/project_settings_lse#Annotation">Role-based automated workflows for annotators and reviewers.</a></td>
     <td style="text-align:center">❌</td>
-    <td style="text-align:center">✅</td>
+    <td style="text-align:center">Limited</td>
     <td style="text-align:center">✅</td>
   </tr>
   <tr>
     <td><b>Role-based access control</b><br/><a href="https://docs.humansignal.com/guide/admin_roles">Role-based access control into workspaces and projects: Admin, Manager, Reviewer, and Annotator.</a></td>
     <td style="text-align:center">❌</td>
-    <td style="text-align:center">✅</td>
+    <td style="text-align:center">Limited</td>
     <td style="text-align:center">✅</td>
   </tr>
   <tr>
@@ -140,13 +140,13 @@ Label Studio is available to everyone as open source software (Label Studio Comm
   <tr>
     <td><b>Project-level roles</b><br/><a href="https://docs.humansignal.com/guide/project_settings_lse#Members">Annotator and Reviewer can be assigned to Annotator/Reviewer roles at a per-project level. </a></td>
     <td style="text-align:center">❌</td>
-    <td style="text-align:center">✅</td>
+    <td style="text-align:center">Limited</td>
     <td style="text-align:center">✅</td>
   </tr>
   <tr>
     <td><b>Project-level user settings</b><br/><a href="https://docs.humansignal.com/guide/project_settings_lse#Annotation">Multiple configuration options for how Annotators and Reviewers interact with tasks and what information they can see.</a></td>
     <td style="text-align:center">❌</td>
-    <td style="text-align:center">✅</td>
+    <td style="text-align:center">Limited</td>
     <td style="text-align:center">✅</td>
   </tr>
 
@@ -179,6 +179,12 @@ Label Studio is available to everyone as open source software (Label Studio Comm
   </tr>
    <tr>
     <td colspan="4" style="text-align:center"><b>Customization & Development</b></td>
+  </tr>
+ <tr>
+    <td><b>Programmable & embeddable interfaces</b><br/><a href="https://docs.humansignal.com/tags/reactcode">Build fully customized labeling and evaluation interfaces with React. Embed into your own applications.</a></td>
+    <td style="text-align:center">❌</td>
+    <td style="text-align:center">❌</td>
+    <td style="text-align:center">✅</td>
   </tr>
   <tr>
     <td><b>Tag library</b><br/><a href="/tags">Use our tag library to customize the labeling interface by modifying pre-built templates or by building your own templates.</a></td>
@@ -279,19 +285,25 @@ Label Studio is available to everyone as open source software (Label Studio Comm
   <tr>
     <td><b>Assign reviewers</b><br/><a href="https://docs.humansignal.com/guide/quality.html">Assign reviewers to review, fix and update annotations.</a></td>
     <td style="text-align:center">❌</td>
-    <td style="text-align:center">✅</td>
+    <td style="text-align:center">❌</td>
     <td style="text-align:center">✅</td>
   </tr>
   <tr>
     <td><b>Automatic task reassignment</b><br/><a href="https://docs.humansignal.com/guide/quality.html">Reassign tasks with low agreement scores to new annotators.</a></td>
     <td style="text-align:center">❌</td>
+    <td style="text-align:center">❌</td>
+    <td style="text-align:center">✅</td>
+  </tr>
+  <tr>
+    <td><b>Agreement metrics</b><br/><a href="https://docs.humansignal.com/guide/stats.html">Define how annotator consensus is calculated using pre-defined agreement metrics.</a></td>
+    <td style="text-align:center">❌</td>
     <td style="text-align:center">✅</td>
     <td style="text-align:center">✅</td>
   </tr>
   <tr>
-    <td><b>Agreement metrics</b><br/><a href="https://docs.humansignal.com/guide/stats.html">Define how annotator consensus is calculated. You can choose from pre-defined metrics or customize your own.</a></td>
+    <td><b>Custom agreement metrics</b><br/><a href="https://docs.humansignal.com/guide/custom_metric.html">Write your own custom agreement metric.</a></td>
     <td style="text-align:center">❌</td>
-    <td style="text-align:center">✅</td>
+    <td style="text-align:center">❌</td>
     <td style="text-align:center">✅</td>
   </tr>
   <tr>

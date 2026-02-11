@@ -95,6 +95,11 @@ jobs:
           script: |
             const { repo, owner } = context.repo;
             const actor = process.env.ACTOR;
+            if (actor === 'cursor[bot]' || actor === 'claude[bot]') {
+              console.log(`Bypassing membership check for ${actor} GitHub App`);
+              core.setOutput("membership", "active");
+              return;
+            }
             const { data: membership } = await github.rest.orgs.getMembershipForUser({
               org: owner,
               username: actor,

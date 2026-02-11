@@ -31,6 +31,7 @@ class DataManagerAction(TypedDict):
     hidden: Optional[bool]
     disabled: Optional[Callable]
     disabled_reason: Optional[str]
+    enterprise_badge: Optional[bool]
 
 
 def check_action_permission(user, action, project):
@@ -82,6 +83,10 @@ def get_all_actions(user, project):
         disabled_generator = action.get('disabled')
         if callable(disabled_generator):
             action['disabled'] = disabled_generator(user, project)
+
+        enterprise_badge_generator = action.get('enterprise_badge')
+        if callable(enterprise_badge_generator):
+            action['enterprise_badge'] = enterprise_badge_generator(user, project)
 
     return actions
 

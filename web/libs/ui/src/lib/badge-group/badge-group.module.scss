@@ -1,0 +1,18 @@
+.container {
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
+  flex-wrap: nowrap;
+  flex: 1 1 auto;
+  display: flex;
+  gap: var(--spacing-tighter);
+
+  > * {
+    flex-shrink: 0;
+  }
+}
+
+.wrap {
+  flex-wrap: wrap;
+  overflow: visible;
+}

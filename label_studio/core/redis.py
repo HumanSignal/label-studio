@@ -182,16 +182,17 @@ def start_job_async_or_sync(job, *args, in_seconds=0, **kwargs):
         if isinstance(retry, int):
             retry = Retry(max=retry)
 
+    on_failure = kwargs.pop('on_failure', None)
+
     if redis:
         # Async execution with Redis - wrap job for context management
         try:
             context_data = _capture_context()
 
-            if context_data:
-                meta = kwargs.get('meta', {})
-                # Store context data in job meta for worker access
-                meta.update(context_data)
-                kwargs['meta'] = meta
+            meta = kwargs.get('meta', {})
+            # Store context data in job meta for worker access
+            meta.update(context_data)
+            kwargs['meta'] = meta
         except Exception:
             logger.info(f'Failed to capture context for job {job.__name__} on queue {queue_name}')
 
@@ -212,11 +213,10 @@ def start_job_async_or_sync(job, *args, in_seconds=0, **kwargs):
             job_timeout=job_timeout,
             failure_ttl=settings.RQ_FAILED_JOB_TTL,
             retry=retry,
+            on_failure=on_failure,
         )
         return job
     else:
-        on_failure = kwargs.pop('on_failure', None)
-
         try:
             result = job(*args, **kwargs)
             return result

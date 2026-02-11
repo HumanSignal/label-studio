@@ -806,7 +806,7 @@ export default observer(
       }
 
       if (!e.evt.ctrlKey && !e.evt.shiftKey && !this.mouseDown) {
-        const allowedTypes = /bitmask|vector/;
+        const allowedTypes = /bitmask/;
         const tool = item.getToolsManager().findSelectedTool();
 
         if (item.regs.some((r) => r.isDrawing)) return;

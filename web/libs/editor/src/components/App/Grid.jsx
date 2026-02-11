@@ -1,11 +1,15 @@
 /**
- * @deprecated this file is not used; App/ViewAll is used instead
+ * Grid component for Compare view - renders annotation panels side-by-side
+ * Added virtualization support for large annotation counts
  */
 
-import React, { Component } from "react";
+import React, { Component, useCallback, useMemo, useRef, useState } from "react";
 import { Spin } from "antd";
-import { Button } from "@humansignal/ui";
+import { Button, Tooltip } from "@humansignal/ui";
 import { LeftCircleOutlined, RightCircleOutlined } from "@ant-design/icons";
+import { FixedSizeList as List } from "react-window";
+import AutoSizer from "react-virtualized-auto-sizer";
+import { observer } from "mobx-react";
 import styles from "./Grid.module.scss";
 import { EntityTab } from "../AnnotationTabs/AnnotationTabs";
 import { observe } from "mobx";
@@ -13,7 +17,12 @@ import Konva from "konva";
 import { Annotation } from "./Annotation";
 import { isDefined } from "../../utils/utilities";
 import { FF_DEV_3391, isFF } from "../../utils/feature-flags";
+import { isActive, FF_FIT_720_LAZY_LOAD_ANNOTATIONS } from "@humansignal/core/lib/utils/feature-flags";
 import { moveStylesBetweenHeadTags } from "../../utils/html";
+
+const PANEL_WIDTH = 500; // Width of each annotation panel (approximately 50% of typical viewport)
+const PANEL_GAP = 30; // Gap between panels (matches $gap in Grid.module.scss)
+const VIRTUALIZATION_THRESHOLD = 10; // Only virtualize if more than this many annotations
 
 /***** DON'T TRY THIS AT HOME *****/
 /*
@@ -52,7 +61,155 @@ class Item extends Component {
   }
 }
 
-export default class Grid extends Component {
+const VirtualizedAnnotationPanel = observer(({ annotation, root, style, onSelect }) => {
+  return (
+    <div style={{ ...style, paddingRight: PANEL_GAP }}>
+      <div id={`c-${annotation.id}`} style={{ position: "relative", height: "100%" }}>
+        <EntityTab
+          entity={annotation}
+          onClick={() => onSelect(annotation)}
+          prediction={annotation.type === "prediction"}
+          bordered={false}
+          style={{ height: 44 }}
+        />
+        <Annotation root={root} annotation={annotation} />
+      </div>
+    </div>
+  );
+});
+
+const VirtualizedGrid = observer(({ store, annotations, root }) => {
+  const listRef = useRef(null);
+  const [containerWidth, setContainerWidth] = useState(0);
+
+  // Filter visible annotations
+  const visibleAnnotations = useMemo(() => annotations.filter((c) => !c.hidden), [annotations]);
+
+  // Calculate panel width based on container (aim for ~50% width, min PANEL_WIDTH)
+  const panelWidth = useMemo(() => {
+    if (containerWidth > 0) {
+      const halfWidth = Math.floor((containerWidth - PANEL_GAP) / 2);
+      return Math.max(halfWidth, PANEL_WIDTH);
+    }
+    return PANEL_WIDTH;
+  }, [containerWidth]);
+
+  const totalWidth = visibleAnnotations.length * (panelWidth + PANEL_GAP);
+  const [scrollOffset, setScrollOffset] = useState(0);
+
+  // Navigation states
+  const isLeftDisabled = scrollOffset <= 0;
+  const isRightDisabled = scrollOffset >= totalWidth - containerWidth;
+  const showControls = totalWidth > containerWidth;
+
+  const handleScroll = useCallback(({ scrollOffset: newOffset }) => {
+    setScrollOffset(newOffset);
+  }, []);
+
+  const scrollLeft = useCallback(() => {
+    if (listRef.current) {
+      const newOffset = Math.max(0, scrollOffset - panelWidth - PANEL_GAP);
+      listRef.current.scrollTo(newOffset);
+    }
+  }, [scrollOffset, panelWidth]);
+
+  const scrollRight = useCallback(() => {
+    if (listRef.current) {
+      const maxOffset = totalWidth - containerWidth;
+      const newOffset = Math.min(maxOffset, scrollOffset + panelWidth + PANEL_GAP);
+      listRef.current.scrollTo(newOffset);
+    }
+  }, [scrollOffset, containerWidth, totalWidth, panelWidth]);
+
+  const select = useCallback(
+    (c) => {
+      c.type === "annotation"
+        ? store.selectAnnotation(c.id, { exitViewAll: true })
+        : store.selectPrediction(c.id, { exitViewAll: true });
+    },
+    [store],
+  );
+
+  // Item data for virtualized list
+  const itemData = useMemo(
+    () => ({
+      annotations: visibleAnnotations,
+      root,
+      onSelect: select,
+    }),
+    [visibleAnnotations, root, select],
+  );
+
+  // Row renderer
+  const renderPanel = useCallback(({ index, style, data }) => {
+    const annotation = data.annotations[index];
+    return (
+      <VirtualizedAnnotationPanel
+        key={annotation.id}
+        annotation={annotation}
+        root={data.root}
+        style={style}
+        onSelect={data.onSelect}
+      />
+    );
+  }, []);
+
+  return (
+    <div className={styles.containerVirtualized}>
+      <div className={styles.grid} style={{ overflow: "hidden", height: "100%" }}>
+        <AutoSizer>
+          {({ width, height }) => {
+            if (width !== containerWidth) {
+              setContainerWidth(width);
+            }
+            return (
+              <List
+                ref={listRef}
+                layout="horizontal"
+                height={height}
+                width={width}
+                itemCount={visibleAnnotations.length}
+                itemSize={panelWidth + PANEL_GAP}
+                itemData={itemData}
+                onScroll={handleScroll}
+                overscanCount={2}
+              >
+                {renderPanel}
+              </List>
+            );
+          }}
+        </AutoSizer>
+      </div>
+      {showControls && (
+        <>
+          <Button
+            size="small"
+            look="string"
+            onClick={scrollLeft}
+            className={styles.left}
+            aria-label="Move left"
+            disabled={isLeftDisabled}
+          >
+            <LeftCircleOutlined />
+          </Button>
+          <Button
+            size="small"
+            look="string"
+            onClick={scrollRight}
+            className={styles.right}
+            aria-label="Move right"
+            disabled={isRightDisabled}
+          >
+            <RightCircleOutlined />
+          </Button>
+        </>
+      )}
+    </div>
+  );
+});
+
+// Original Grid class component (used when FF is off or few annotations)
+class GridClassComponent extends Component {
   state = {
     item: 0,
     loaded: new Set(),
@@ -160,7 +317,9 @@ export default class Grid extends Component {
   select = (c) => {
     const { store } = this.props;
 
-    c.type === "annotation" ? store.selectAnnotation(c.id) : store.selectPrediction(c.id);
+    c.type === "annotation"
+      ? store.selectAnnotation(c.id, { exitViewAll: true })
+      : store.selectPrediction(c.id, { exitViewAll: true });
   };
 
   render() {
@@ -176,13 +335,17 @@ export default class Grid extends Component {
             .filter((c) => !c.hidden)
             .map((c) => (
               <div id={`c-${c.id}`} key={`anno-${c.id}`} style={{ position: "relative" }}>
-                <EntityTab
-                  entity={c}
-                  onClick={() => this.select(c)}
-                  prediction={c.type === "prediction"}
-                  bordered={false}
-                  style={{ height: 44 }}
-                />
+                <Tooltip title="Open Annotation Tab">
+                  <div>
+                    <EntityTab
+                      entity={c}
+                      onClick={() => this.select(c)}
+                      prediction={c.type === "prediction"}
+                      bordered={false}
+                      style={{ height: 44 }}
+                    />
+                  </div>
+                </Tooltip>
                 {isFF(FF_DEV_3391) ? (
                   <Annotation root={this.props.root} annotation={c} />
                 ) : (
@@ -226,4 +389,17 @@ export default class Grid extends Component {
       </div>
     );
   }
+}
+
+export default function Grid(props) {
+  const { annotations } = props;
+  const visibleCount = annotations.filter((c) => !c.hidden).length;
+
+  const shouldVirtualize = isActive(FF_FIT_720_LAZY_LOAD_ANNOTATIONS) && visibleCount > VIRTUALIZATION_THRESHOLD;
+
+  if (shouldVirtualize) {
+    return <VirtualizedGrid {...props} />;
+  }
+
+  return <GridClassComponent {...props} />;
 }

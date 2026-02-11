@@ -86,6 +86,8 @@ export type DataTableProps<T extends DataShape> = {
   dataTestId?: string;
   /** Controlled active row ID - when provided, controls which row is active */
   activeRowId?: string;
+  /** Custom function to extract row ID from row data - useful when row.id is not the primary identifier */
+  getRowId?: (row: T[number], index: number) => string;
 };
 
 /**
@@ -177,8 +179,13 @@ export const DataTable = <T extends DataShape>(props: DataTableProps<T>) => {
       // Determine if sorting is enabled for this column
       const columnSortingEnabled = enableSorting && col.enableSorting === true;
 
-      // Preserve original header - extract string if it's a string
-      const originalHeader = typeof col.header === "string" ? col.header : undefined;
+      // Preserve original header - extract string or call function to get React node
+      const originalHeader =
+        typeof col.header === "string"
+          ? col.header
+          : typeof col.header === "function"
+            ? col.header({} as any) // Call the function to get the React node
+            : undefined;
 
       // Wrap all headers with unified Header component
       return {
@@ -350,12 +357,14 @@ export const DataTable = <T extends DataShape>(props: DataTableProps<T>) => {
         ? (row) => isRowSelectable(row) // If isRowSelectable is provided, enable selection based on the function
         : true
       : undefined,
-    getRowId: (row, index) => {
-      // Use id if available, otherwise fall back to index
-      // Note: 'row' parameter is the row data object itself, not a Row object
-      const rowId = (row as any)?.id;
-      return rowId !== undefined ? String(rowId) : String(index);
-    },
+    getRowId:
+      props.getRowId ||
+      ((row, index) => {
+        // Use id if available, otherwise fall back to index
+        // Note: 'row' parameter is the row data object itself, not a Row object
+        const rowId = (row as any)?.id;
+        return rowId !== undefined ? String(rowId) : String(index);
+      }),
     columnResizeMode: "onChange",
     enableSorting: enableSorting,
     getCoreRowModel: getCoreRowModel(),
@@ -725,12 +734,19 @@ export const Header = <T,>({
     return null;
   }
 
+  // Check if headerLabel is a string to wrap with Typography, or a React node to render directly
+  const isStringHeader = typeof headerLabel === "string";
+
   const headerContent = (
     <div className={cn(styles.headerContent, help && "gap-tighter")}>
       <div className="flex items-center gap-2">
-        <Typography variant="label" size="small" className={cn(isSorted && styles.headerTextSorted)}>
-          {headerLabel}
-        </Typography>
+        {isStringHeader ? (
+          <Typography variant="label" size="small" className={cn(isSorted && styles.headerTextSorted)}>
+            {headerLabel}
+          </Typography>
+        ) : (
+          headerLabel
+        )}
         {help && (
           <Tooltip title={help} alignment="top-center">
             <IconInfoOutline width={18} height={18} className="text-neutral-content-subtler cursor-help shrink-0" />

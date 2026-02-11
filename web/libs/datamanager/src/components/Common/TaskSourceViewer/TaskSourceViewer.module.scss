@@ -1,0 +1,15 @@
+.taskSourceView {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-base);
+  width: 100%;
+
+  // Fixed height prevents modal from resizing when switching Code/Interactive views
+  // that leads to accidental clicks outside and unexpecteddd modal closing
+  height: 600px;
+}
+
+.viewContent {
+  flex: 1;
+  min-height: 0;
+}

@@ -15,6 +15,7 @@ const Select = ({
   ghost,
   size = "medium",
   defaultValue,
+  contentClassName,
   ...props
 }) => {
   const rootClass = cn("form-select");
@@ -45,6 +46,7 @@ const Select = ({
             triggerClassName={rootClass.elem("list").toString()}
             options={options?.toJSON ? options.toJSON() : options}
             size={size}
+            contentClassName={contentClassName}
           />
         );
       }}
