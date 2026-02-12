@@ -1,4 +1,4 @@
-import { get } from "@humansignal/core/src/lib/utils/lodash-replacements";
+import { get } from "@humansignal/core/lib/utils/lodash-replacements";
 import { escapeHtml, isString } from "./utilities";
 
 /**

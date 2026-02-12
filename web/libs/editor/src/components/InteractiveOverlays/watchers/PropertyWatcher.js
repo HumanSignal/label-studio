@@ -1,5 +1,5 @@
 import { observe } from "mobx";
-import { debounce } from "@humansignal/core/src/lib/utils/debounce";
+import { debounce } from "@humansignal/core/lib/utils/debounce";
 
 export const createPropertyWatcher = (props) => {
   return class {
