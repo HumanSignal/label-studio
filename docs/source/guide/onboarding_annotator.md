@@ -3,8 +3,8 @@ title: How to Annotate in Label Studio
 short: Annotator onboarding
 type: guide
 tier: enterprise
-order: 33
-order_enterprise: 33
+order: 463
+order_enterprise: 463
 parent: "onboarding"
 parent_enterprise: "onboarding"
 ---
@@ -111,59 +111,59 @@ Exact standards would be discussed during onboarding.  During that time, your le
 
    ![Screenshot](/images/onboarding/annotator-11.png)
 
-## Best Practices of Good Annotating
+## Annotator Best Practices
 
-1. **Keep your project protocols on the side for easy reference.**
+#### Keep your project protocols on the side for easy reference
 
-   Keep your project protocols nearby for easy reference.  
-     
-   Whether you print them out or keep them open on a second screen, having a “cheat sheet” of project steps and key notes is useful for both newcomers and experienced annotators.  
-     
-   For those starting out, this makes it easier to follow the correct steps—especially when the workflow is nuanced or easy to misinterpret.  
-     
-   For more experienced annotators, it reduces the need to flip back and forth when a detail is forgotten and helps preserve mental bandwidth during challenging tasks or longer shifts.
+Keep your project protocols nearby for easy reference.  
 
-2. **Research every minute detail, even ones that “sound right.”**
+Whether you print them out or keep them open on a second screen, having a "cheat sheet" of project steps and key notes is useful for both newcomers and experienced annotators.  
 
-   Especially for tasks with lengthy or nuanced responses, models may hallucinate.  Pre-annotations, or model derived answers, that seem accurate to a layperson may contain even small errors. As datasets become more complex, annotators should likewise be more meticulous. Inaccuracies may be amplified if a model trains on it, causing major setbacks to the models as a whole.
+For those starting out, this makes it easier to follow the correct steps—especially when the workflow is nuanced or easy to misinterpret.  
 
-3. **Proactively check analytics.**
+For more experienced annotators, it reduces the need to flip back and forth when a detail is forgotten and helps preserve mental bandwidth during challenging tasks or longer shifts.
 
-   Project standards should be announced during your onboarding. In the case of pivots, expectations also need to be adjusted.  During these instances, your team lead or project’s point of contact would normally convey how many tasks should be done during an allotted period of time, the average time to be spent on each task, target vs average grading per task, and more.
+#### Research every minute detail, even ones that "sound right"
 
-   Keep an eye out for these stats as they would allow you to self-monitor success rate and gauge where you may stand, in terms of project ideals. Additionally, recognizing where you may be falling short would inform you on where to improve.
+Especially for tasks with lengthy or nuanced responses, models may hallucinate.  Pre-annotations, or model derived answers, that seem accurate to a layperson may contain even small errors. As datasets become more complex, annotators should likewise be more meticulous. Inaccuracies may be amplified if a model trains on it, causing major setbacks to the models as a whole.
 
-4. **Pace yourself.**
+#### Proactively check analytics
 
-   Empowered by your stats, make sure you keep cadence to meet the “ideal” analytics.  Treat your time and energy as a non-renewable resource. Mental exhaustion and the urge to rush to complete a task both can contribute to an increase in mistakes.
+Project standards should be announced during your onboarding. In the case of pivots, expectations also need to be adjusted.  During these instances, your team lead or project's point of contact would normally convey how many tasks should be done during an allotted period of time, the average time to be spent on each task, target vs average grading per task, and more.
 
-5. **When possible, tackle the hardest/longest tasks at the beginning of the day.**
+Keep an eye out for these stats as they would allow you to self-monitor success rate and gauge where you may stand, in terms of project ideals. Additionally, recognizing where you may be falling short would inform you on where to improve.
 
-   Some projects allow you to review your assigned tasks prior to working on them. If so, consider focusing your energy on the ones that take the most time and energy when you begin your work. This would allow you to more easily focus on complex tasks when you have less mental fatigue, resulting in potentially less careless errors. Of course, prior to doing this, consult your team lead to ensure this is allowable within the project protocol.
+#### Pace yourself
 
-6. **Track when your productivity dips, and how to get back on track.**
+Empowered by your stats, make sure you keep cadence to meet the "ideal" analytics.  Treat your time and energy as a non-renewable resource. Mental exhaustion and the urge to rush to complete a task both can contribute to an increase in mistakes.
 
-   Depending on the project, how you work may fluctuate.  It may not necessarily always be the morning in which you are churning out the most annotations; it can be right after your coffee break or right before lunch. When that happens, experiment with different methods on how to get yourself back into the groove.
+#### When possible, tackle the hardest/longest tasks at the beginning of the day
 
-   For some, saving “easier” tasks for these dips can be helpful, while pausing in the middle of a task for a stretch break enables others to jump right back in, quickly referring to their detailed notes to get back on track for the paused work.
+Some projects allow you to review your assigned tasks prior to working on them. If so, consider focusing your energy on the ones that take the most time and energy when you begin your work. This would allow you to more easily focus on complex tasks when you have less mental fatigue, resulting in potentially less careless errors. Of course, prior to doing this, consult your team lead to ensure this is allowable within the project protocol.
 
-7. **Know when to flag something to a lead.**
+#### Track when your productivity dips, and how to get back on track
 
-   If you hit a glitch, you don’t always need to message your lead immediately. First, capture a few details so they can troubleshoot quickly: what you were doing, what happened, the task ID, and a screenshot (if possible). Issues are much easier to fix when they’re clearly documented and reproducible.
+Depending on the project, how you work may fluctuate.  It may not necessarily always be the morning in which you are churning out the most annotations; it can be right after your coffee break or right before lunch. When that happens, experiment with different methods on how to get yourself back into the groove.
 
-   The same applies to feedback and scoring. If something looks confusing or incorrect, note whether it seems like a one-time hiccup or a pattern across multiple tasks. Either way, bring it up, especially if it affects your scores or performance metrics. Recurring issues should be escalated sooner, since they may impact the whole project.
+For some, saving "easier" tasks for these dips can be helpful, while pausing in the middle of a task for a stretch break enables others to jump right back in, quickly referring to their detailed notes to get back on track for the paused work.
 
-8. **Document strategies that improve your efficiency.**
+#### Know when to flag something to a lead
 
-   As you become comfortable in your project’s protocols, note what types of methods work best for you.  There may be some tips that can be found in the documentation but they may not always be what is most efficient for you or for every task.  
+If you hit a glitch, you don't always need to message your lead immediately. First, capture a few details so they can troubleshoot quickly: what you were doing, what happened, the task ID, and a screenshot (if possible). Issues are much easier to fix when they're clearly documented and reproducible.
 
-   Log which research techniques or websites have been dependable for tasks you fact-check.  This can serve as a “cheat sheet” you can click through, saving time from having to look for your resource each time you need it.
+The same applies to feedback and scoring. If something looks confusing or incorrect, note whether it seems like a one-time hiccup or a pattern across multiple tasks. Either way, bring it up, especially if it affects your scores or performance metrics. Recurring issues should be escalated sooner, since they may impact the whole project.
 
-9. **Build relationships with those who are more experienced or score higher than you.** 
+#### Document strategies that improve your efficiency
 
-   Whenever possible, connect with teammates who have more experience or consistently strong results. Many are happy to share practical tips that don’t always make it into project documentation.
+As you become comfortable in your project's protocols, note what types of methods work best for you.  There may be some tips that can be found in the documentation but they may not always be what is most efficient for you or for every task.  
 
-   Experienced annotators have had time to refine their workflow and improve both speed and quality. Learning their approaches can help you build your own toolkit faster.
+Log which research techniques or websites have been dependable for tasks you fact-check.  This can serve as a "cheat sheet" you can click through, saving time from having to look for your resource each time you need it.
 
-   It also helps to have trusted peers you can sanity-check with, especially if those teammates also serve as reviewers.
+#### Build relationships with those who are more experienced or score higher than you
+
+Whenever possible, connect with teammates who have more experience or consistently strong results. Many are happy to share practical tips that don't always make it into project documentation.
+
+Experienced annotators have had time to refine their workflow and improve both speed and quality. Learning their approaches can help you build your own toolkit faster.
+
+It also helps to have trusted peers you can sanity-check with, especially if those teammates also serve as reviewers.
 

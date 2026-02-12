@@ -3,8 +3,8 @@ title: How to Review Tasks in Label Studio
 short: Reviewer onboarding
 type: guide
 tier: enterprise
-order: 34
-order_enterprise: 34
+order: 466
+order_enterprise: 466
 parent: "onboarding"
 parent_enterprise: "onboarding"
 ---
@@ -113,59 +113,58 @@ Take screenshots and see if you can replicate the same issue on multiple tasks. 
 
 If you notice a specific annotator is having repetitive issues, you should likewise log any past instances, so that your lead can handle the situation with all relevant information in hand.
 
-## Best Practices of Good Reviewing 
+## Reviewer Best Practices
 
-1. **Approach every task as you would as an annotator.**
+#### Approach every task as you would as an annotator
 
-   Though reviewing involves a different flow than an annotator, you should still evaluate the task as you would if you were annotating it from scratch. This means evaluating every statement of fact provided in a LLM response and verifying that the original annotator did, indeed, check for any hallucinations.  
+Though reviewing involves a different flow than an annotator, you should still evaluate the task as you would if you were annotating it from scratch. This means evaluating every statement of fact provided in a LLM response and verifying that the original annotator did, indeed, check for any hallucinations.  
 
-   Do NOT assume that, just because a task is a certain length or the previous worker has an SME in the topic, there were no mistakes made or issues overlooked.  In fact, you should be even more mindful as it is now your job to catch errors.  Human error occurs even to the best team members, whether due to oversight or fatigue. 
+Do NOT assume that, just because a task is a certain length or the previous worker has an SME in the topic, there were no mistakes made or issues overlooked.  In fact, you should be even more mindful as it is now your job to catch errors.  Human error occurs even to the best team members, whether due to oversight or fatigue.
 
-2. **Regularly refresh yourself on documentation for reviewing.**  
-   (especially if you’ve been a reviewer for a long time)
+#### Regularly refresh yourself on documentation for reviewing (especially if you've been a reviewer for a long time)
 
-   Just as you would as an annotator, keeping a copy of the project protocols next to you would make it easier to work. Usually team leads provide a separate set of instructions and documents to reviewers, as the workflow may vary, especially if the project involves edits or sendbacks.
+Just as you would as an annotator, keeping a copy of the project protocols next to you would make it easier to work. Usually team leads provide a separate set of instructions and documents to reviewers, as the workflow may vary, especially if the project involves edits or sendbacks.
 
-   Another reason you may want to regularly check the doc is when updates accompany project pivots. Your lead would likely update it with any shifts in instructions that may accompany the pivot, and it would serve as a reminder to not fall back into old workflows, even if accidentally.
+Another reason you may want to regularly check the doc is when updates accompany project pivots. Your lead would likely update it with any shifts in instructions that may accompany the pivot, and it would serve as a reminder to not fall back into old workflows, even if accidentally.
 
-3. **Do not assume that everyone approaches a task the same as you.**
+#### Do not assume that everyone approaches a task the same as you
 
-   Especially when the original annotator is still correct and all of the information in a task’s response is validated, do not penalize them for proceeding in a different way.  If the conclusion is still the same as yours, it does not detract from the quality of work.  In fact, modelsLLMs benefit from being provided with multiple ways to reach the same answer.  
+Especially when the original annotator is still correct and all of the information in a task's response is validated, do not penalize them for proceeding in a different way.  If the conclusion is still the same as yours, it does not detract from the quality of work.  In fact, modelsLLMs benefit from being provided with multiple ways to reach the same answer.  
 
-   The main exception to this rule is if a protocol is absolutely mandated by the higher ups (normally due to wanting to test out a specific logic process), but your lead would inform you of these cases.
+The main exception to this rule is if a protocol is absolutely mandated by the higher ups (normally due to wanting to test out a specific logic process), but your lead would inform you of these cases.
 
-4. **Investigate if/when you see trends and log them.**
+#### Investigate if/when you see trends and log them
 
-   It is important to differentiate between a once-off error and a recurring issue.  While mistakes you’d encounter would likely tend to be human error (e.g. incorrect labeling, missed factuality checks, etc.,), it is possible for glitches to affect the data annotations themselves, from either a bug in the platform or an issue with the data set.  If it is not a consistent tech issue, be sure to log it for future reference and surface it with your team when you see it again.
+It is important to differentiate between a once-off error and a recurring issue.  While mistakes you'd encounter would likely tend to be human error (e.g. incorrect labeling, missed factuality checks, etc.,), it is possible for glitches to affect the data annotations themselves, from either a bug in the platform or an issue with the data set.  If it is not a consistent tech issue, be sure to log it for future reference and surface it with your team when you see it again.
 
-   Another possible trend can be annotators’ recurring misunderstanding of a new guideline. In this case, consult with other reviewers and congregate the proper information so you can jointly bring this up to your lead.
+Another possible trend can be annotators' recurring misunderstanding of a new guideline. In this case, consult with other reviewers and congregate the proper information so you can jointly bring this up to your lead.
 
-   Positive patterns should also be logged, like project scoring averages steadily increasing, as these factoids are helpful for team morale. Your lead may not always notice these as quickly, given they may be focused on other analytics at the time, but observed improvements would also be appreciated.
+Positive patterns should also be logged, like project scoring averages steadily increasing, as these factoids are helpful for team morale. Your lead may not always notice these as quickly, given they may be focused on other analytics at the time, but observed improvements would also be appreciated.
 
-5. **Identify possible gaps in documentation.**
+#### Identify possible gaps in documentation
 
-   While onboarding and protocol documents should provide the whole of the flow and instruction of the project, it is possible that there may be issues that higher-ups may not have foreseen. With an increase in complex queries for most data sets, nuance is often introduced, and can not necessarily be evaluated in a binary function.
+While onboarding and protocol documents should provide the whole of the flow and instruction of the project, it is possible that there may be issues that higher-ups may not have foreseen. With an increase in complex queries for most data sets, nuance is often introduced, and can not necessarily be evaluated in a binary function.
 
-   For example, if a prompt mentions “a handful of ideas,” there is a level of subjectivity introduced due to the usage of a word that has no direct denotation of numerical value.  Different data workers may interpret “handful” in a variety of ways. At this point, the lead would need to make an overall ruling; without it, reviewers may grade similar tasks inconsistently, causing confusion amongst the annotators. Letting a scenario like this go until your lead does an audit would cause more work for everyone.
+For example, if a prompt mentions "a handful of ideas," there is a level of subjectivity introduced due to the usage of a word that has no direct denotation of numerical value.  Different data workers may interpret "handful" in a variety of ways. At this point, the lead would need to make an overall ruling; without it, reviewers may grade similar tasks inconsistently, causing confusion amongst the annotators. Letting a scenario like this go until your lead does an audit would cause more work for everyone.
 
-6. **Where possible, offer yourself as a resource.**
+#### Where possible, offer yourself as a resource
 
-   After you have settled in your reviewer duties, take initiative to answer questions for new team members, or offer to help spearhead upskill trainings or learning sessions. Being collaborative helps share project knowledge across the team and ensures that all members (annotators and reviewers) are consistent. 
+After you have settled in your reviewer duties, take initiative to answer questions for new team members, or offer to help spearhead upskill trainings or learning sessions. Being collaborative helps share project knowledge across the team and ensures that all members (annotators and reviewers) are consistent. 
 
-   This would show your lead that you’re a team player and potentially ready for more interesting work or responsibilities. Assisting in making sure all annotators and reviewers are equally trained would have an additional side effect of making your work easier.
+This would show your lead that you're a team player and potentially ready for more interesting work or responsibilities. Assisting in making sure all annotators and reviewers are equally trained would have an additional side effect of making your work easier.
 
-7. **Provide helpful, applicable feedback specific to each task.**
+#### Provide helpful, applicable feedback specific to each task
 
-   Especially in the beginning of a project or when a new wave is onboarded, be detailed in what aspects need to be fixed, and why. It is a learning process and these types of comments foster improvement.
+Especially in the beginning of a project or when a new wave is onboarded, be detailed in what aspects need to be fixed, and why. It is a learning process and these types of comments foster improvement.
 
-8. **Be mindful of how your reviews may affect individual morale.**
+#### Be mindful of how your reviews may affect individual morale
 
-   Though leads should mainly focus on this, reviewers have a portion of responsibility here too.  Motivated team members make for more efficient workers, which would also likely reduce the amount of errors per task.  
+Though leads should mainly focus on this, reviewers have a portion of responsibility here too.  Motivated team members make for more efficient workers, which would also likely reduce the amount of errors per task.  
 
-   Constructive criticism is necessary when errors are made, but framing it kindly (or even just neutrally) would reduce team discouragement and friction. Feedback is meant to improve the model as a whole, so, while annotators should learn to avoid taking it personally, reviewers should also take care in their language.
+Constructive criticism is necessary when errors are made, but framing it kindly (or even just neutrally) would reduce team discouragement and friction. Feedback is meant to improve the model as a whole, so, while annotators should learn to avoid taking it personally, reviewers should also take care in their language.
 
-9. **Know when/if to ask your Lead to be cycled back into annotators.** 
+#### Know when/if to ask your Lead to be cycled back into annotators
 
-   Keep in mind that reviewing and annotating are two different workflows, so it is imperative to not perceive one flow to be “higher” or “more important” than the other.  Some workers have skills more suited for annotation, preferring it as the only work they have to worry about is their own tasks and research. If you find that you do not enjoy reviewing as much as annotating, feel free to let your lead know.
+Keep in mind that reviewing and annotating are two different workflows, so it is imperative to not perceive one flow to be "higher" or "more important" than the other.  Some workers have skills more suited for annotation, preferring it as the only work they have to worry about is their own tasks and research. If you find that you do not enjoy reviewing as much as annotating, feel free to let your lead know.
 
-   If you’re feeling burn-out from constant reviewing, you can request to be temporarily put back into the annotating pool, as a difference in workflow may help “reset” how you work.
+If you're feeling burn-out from constant reviewing, you can request to be temporarily put back into the annotating pool, as a difference in workflow may help "reset" how you work.
