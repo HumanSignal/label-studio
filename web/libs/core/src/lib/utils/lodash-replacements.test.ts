@@ -50,7 +50,7 @@ describe("clamp", () => {
   });
 
   it("handles NaN in number", () => {
-    expect(clamp(NaN, 0, 10)).toBeNaN();
+    expect(clamp(Number.NaN, 0, 10)).toBeNaN();
   });
 });
 
@@ -114,8 +114,15 @@ describe("isMatch", () => {
 
 describe("uniqBy", () => {
   it("removes duplicates by iteratee key", () => {
-    const arr = [{ id: 1, name: "a" }, { id: 2, name: "b" }, { id: 1, name: "c" }];
-    expect(uniqBy(arr, "id")).toEqual([{ id: 1, name: "a" }, { id: 2, name: "b" }]);
+    const arr = [
+      { id: 1, name: "a" },
+      { id: 2, name: "b" },
+      { id: 1, name: "c" },
+    ];
+    expect(uniqBy(arr, "id")).toEqual([
+      { id: 1, name: "a" },
+      { id: 2, name: "b" },
+    ]);
   });
 
   it("removes duplicates by iteratee function", () => {
