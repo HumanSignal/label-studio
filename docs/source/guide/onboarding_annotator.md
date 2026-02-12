@@ -3,10 +3,11 @@ title: How to Annotate in Label Studio
 short: Annotator onboarding
 type: guide
 tier: enterprise
-order: 463
-order_enterprise: 463
+order: 503
+order_enterprise: 503
 parent: "onboarding"
 parent_enterprise: "onboarding"
+section: "Onboarding"
 ---
 
 Welcome to the Label Studio platform!  

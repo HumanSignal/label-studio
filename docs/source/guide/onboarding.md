@@ -4,7 +4,8 @@ short: Onboarding guides by role
 type: guide
 tier: enterprise
 order: 0
-order_enterprise: 461
+order_enterprise: 500
+section: "Onboarding"
 ---
 
 These onboarding guides will help you get started with your role on the platform.

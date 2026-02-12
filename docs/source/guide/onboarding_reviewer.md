@@ -3,10 +3,11 @@ title: How to Review Tasks in Label Studio
 short: Reviewer onboarding
 type: guide
 tier: enterprise
-order: 466
-order_enterprise: 466
+order: 504
+order_enterprise: 504
 parent: "onboarding"
 parent_enterprise: "onboarding"
+section: "Onboarding"
 ---
 
 Welcome to the reviewer tier! 
