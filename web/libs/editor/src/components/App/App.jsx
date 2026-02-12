@@ -303,6 +303,7 @@ class App extends Component {
                       currentEntity={as.selectedHistory ?? as.selected}
                       regions={as.selected.regionStore}
                       showComments={store.hasInterface("annotations:comments")}
+                      showCustomTab={hasTagInSidebar(as.selected)}
                       focusTab={store.commentStore.tooltipMessage ? "comments" : null}
                     >
                       {mainContent}

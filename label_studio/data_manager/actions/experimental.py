@@ -165,6 +165,10 @@ def add_data_field(project, queryset, **kwargs):
     value = request.data.get('value')
     size = queryset.count()
 
+    # Save a task ID before the update, because queryset filters may no longer
+    # match after we modify the data field (e.g. changing the filtered column value).
+    first_task_id = queryset.values_list('id', flat=True).first()
+
     cast = {'String': str, 'Number': float, 'Expression': str}
     assert value_type in cast.keys()
     value = cast[value_type](value)
@@ -192,7 +196,13 @@ def add_data_field(project, queryset, **kwargs):
                 )
             )
 
-    project.summary.update_data_columns([queryset.first()])
+    # Fetch the task by saved ID since the original queryset filters
+    # may no longer match after the data field was modified.
+    if first_task_id is not None:
+        first_task = Task.objects.filter(id=first_task_id).first()
+        if first_task is not None:
+            project.summary.update_data_columns([first_task])
+
     return {'response_code': 200, 'detail': f'Updated {size} tasks'}
 
 

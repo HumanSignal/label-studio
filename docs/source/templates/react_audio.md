@@ -1,8 +1,8 @@
 ---
-title: Multi-Channel Audio Transcription
+title: Multi-Channel Audio Transcription 🔒
 type: templates
 category: Programmable Interfaces
-order: 753
+order: 353
 is_new: t
 meta_title: Template for multi-channel audio transcription
 meta_description: Template that uses a custom UI to visualize and transcribe multiple audio channels 
@@ -22,7 +22,7 @@ The example labeling configuration creates a split-screen interface with:
 !!! error Enterprise
     This template and the `ReactCode` tag can only be used in Label Studio Enterprise.
 
-    For more information, including simplified code examples, see [ReactCode](/tags/reactcode).
+    For more information, see [Programmable & Embeddable Interfaces](https://humansignal.com/programmable-ui/). 
 
 ## Labeling configuration
 

@@ -1,5 +1,5 @@
 ---
-title: Fine-tune an Agent without an LLM
+title: Fine-tune an Agent without an LLM 🔒
 type: templates
 category: Chat
 cat: Chat
