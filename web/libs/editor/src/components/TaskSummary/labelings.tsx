@@ -1,5 +1,5 @@
 import { JSONPath } from "jsonpath-plus";
-import { capitalize } from "@humansignal/core";
+import { capitalize } from "@humansignal/core/src/lib/utils/string";
 import type { RawResult } from "../../stores/types";
 import { Chip } from "./Chip";
 import type { RendererType } from "./types";

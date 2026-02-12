@@ -1,4 +1,4 @@
-import { clamp } from "@humansignal/core";
+import { clamp } from "@humansignal/core/src/lib/utils/lodash-replacements";
 import { type FC, type ReactElement, useCallback, useRef } from "react";
 import { cn } from "../../utils/bem";
 import type { TimelineMinimapProps } from "./Types";
