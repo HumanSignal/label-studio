@@ -38,11 +38,7 @@ export const RowContextMenu: FC<RowContextMenuProps> = ({
     "show-source",
     "tasks:id", // ID has its own "Copy task ID" option
     "tasks:annotators", // Annotated by
-    "tasks:reviewers", // Reviewed by
-    "tasks:reviewed", // Reviewed
     "tasks:draft_exists", // Drafts
-    "tasks:ground_truth", // Ground Truth
-    "tasks:allow_skip", // Allow Skip
   ];
 
   // Get the actual cell value for copying (must be declared before callbacks that use it)
