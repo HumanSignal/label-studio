@@ -74,14 +74,12 @@ class TaxonomyHelper {
     if (this.isLegacy) {
       return this.dropdown.contains(this.selectors.item, text).scrollIntoView();
     }
-    // For NewTaxonomy (Ant Design TreeSelect with treeCheckable + treeCheckStrictly),
-    // only clicking the *checkbox* toggles the checked state and fires onChange.
-    // Clicking the title fires onSelect which is not wired up.
-    // So: locate the tree node by its title text, then target the checkbox.
-    return this.dropdown
-      .contains(".ant-select-tree-title", text)
-      .closest(".ant-select-tree-treenode")
-      .find(".ant-select-tree-checkbox");
+    // In rc-tree-select with treeCheckable, both onSelect (clicking title) and
+    // onCheck (clicking checkbox) map to the same onInternalSelect handler.
+    // So clicking the title text triggers selection just like clicking the checkbox.
+    // Returning the title element also makes .trigger("mouseover") work for tooltips,
+    // since Ant Design's <Tooltip> wraps the title content in NewTaxonomy.
+    return this.dropdown.contains(".ant-select-tree-title", text);
   }
 
   hasSelected(text: string) {
@@ -109,13 +107,14 @@ class TaxonomyHelper {
       this.input.filter(this.selectors.closed).click();
     } else {
       // Must click .ant-select-selector (not the outer .htx-taxonomy wrapper)
-      // because Ant Design TreeSelect's open/close handler lives on the selector
-      // element — events bubble UP, so clicking the parent wrapper never reaches it.
+      // because Ant Design TreeSelect's open/close handler lives on the selector.
+      // force:true is needed because a previously-closed taxonomy's dropdown portal
+      // (containing a search input) can linger in the DOM and overlap the selector.
       this.input
         .filter(this.selectors.closed)
         .find(".ant-select-selector")
         .scrollIntoView()
-        .click();
+        .click({ force: true });
     }
   }
 
@@ -127,7 +126,7 @@ class TaxonomyHelper {
         .filter(this.selectors.open)
         .find(".ant-select-selector")
         .scrollIntoView()
-        .click();
+        .click({ force: true });
     }
   }
 }
