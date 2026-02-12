@@ -35,14 +35,14 @@
     border-radius: var(--corner-radius-smaller);
     align-items: center;
     box-sizing: border-box;
-    color: var(--color-neutral-content-subtler);
+    color: var(--color-neutral-content);
     font-size: 14px;
     white-space: nowrap;
     user-select: none;
     transition: background-color 150ms ease-out, color 150ms ease-out;
 
     &[disabled] {
-      color: var(--color-neutral-content-subtlest) !important;
+      color: var(--color-neutral-content-subtlest);
 
       &:hover {
         background-color: transparent !important;
@@ -57,11 +57,14 @@
     }
 
     &-icon {
-      margin-right: 10px;
+      margin-right: var(--spacing-tight);
+      color: var(--color-neutral-content-subtler);
       object-fit: contain;
       display: flex;
       align-items: center;
       justify-content: center;
+      width: 20px;
+      height: 20px;
     }
 
     &:not(.menu-dm__item_look_danger, [disabled]):hover {
@@ -86,6 +89,10 @@
     &_look {
       &_danger {
         color: var(--color-negative-content);
+
+        &-icon {
+          color: var(--color-negative-icon);
+        }
 
         &:hover {
           color: var(--color-neutral-content);

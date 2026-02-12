@@ -5,7 +5,7 @@ import { useSDK } from "../../../providers/SDKProvider";
 import { isDefined } from "../../../utils/utils";
 import { Icon } from "../Icon/Icon";
 import { modal } from "../Modal/Modal";
-import { IconCode, IconChevronDown } from "@humansignal/icons";
+import { IconBraces, IconChevronDown } from "@humansignal/icons";
 import { AutoSizerTable, Button } from "@humansignal/ui";
 import "./Table.scss";
 import { TableCheckboxCell } from "./TableCheckbox";
@@ -55,6 +55,7 @@ export const Table = observer(
     onReviewTask,
     onViewAnalytics,
     onViewReviewerAnalytics,
+    RowContextMenuComponent,
     ...props
   }) => {
     const colOrderKey = "dm:columnorder";
@@ -203,7 +204,7 @@ export const Table = observer(
                 ),
               });
             }}
-            leading={<Icon icon={IconCode} />}
+            leading={<Icon icon={IconBraces} />}
             tooltip="Show task source"
           />
         );
@@ -486,6 +487,7 @@ export const Table = observer(
               onReviewTask={onReviewTask}
               onViewAnalytics={onViewAnalytics}
               onViewReviewerAnalytics={onViewReviewerAnalytics}
+              RowContextMenuComponent={RowContextMenuComponent}
               onClose={() => setContextMenu(null)}
             />,
             document.body,
@@ -638,9 +640,11 @@ const innerElementType = forwardRef(({ children, ...rest }, ref) => {
 
 // Context menu portal component - positioning now handled by Dropdown component
 const ContextMenuPortal = memo(
-  ({ contextMenu, view, onReviewTask, onViewAnalytics, onViewReviewerAnalytics, onClose }) => {
+  ({ contextMenu, view, onReviewTask, onViewAnalytics, onViewReviewerAnalytics, onClose, RowContextMenuComponent }) => {
+    const MenuComponent = RowContextMenuComponent || RowContextMenu;
+
     return (
-      <RowContextMenu
+      <MenuComponent
         row={contextMenu.row}
         column={contextMenu.column}
         view={view}
