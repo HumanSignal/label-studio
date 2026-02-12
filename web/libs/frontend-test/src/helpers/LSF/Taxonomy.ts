@@ -71,7 +71,14 @@ class TaxonomyHelper {
   }
 
   findItem(text: string) {
-    return this.dropdown.contains(this.selectors.item, text).scrollIntoView();
+    if (this.isLegacy) {
+      return this.dropdown.contains(this.selectors.item, text).scrollIntoView();
+    }
+    // For NewTaxonomy (Ant Design TreeSelect), we must click the title text
+    // directly — clicking the .ant-select-tree-treenode container doesn't
+    // reliably toggle the checkbox. The title click bubbles to the onSelect
+    // handler which correctly updates the checked state.
+    return this.dropdown.contains(".ant-select-tree-title", text).scrollIntoView();
   }
 
   hasSelected(text: string) {
