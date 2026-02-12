@@ -637,17 +637,19 @@ const innerElementType = forwardRef(({ children, ...rest }, ref) => {
 });
 
 // Context menu portal component - positioning now handled by Dropdown component
-const ContextMenuPortal = memo(({ contextMenu, view, onReviewTask, onViewAnalytics, onViewReviewerAnalytics, onClose }) => {
-  return (
-    <RowContextMenu
-      row={contextMenu.row}
-      column={contextMenu.column}
-      view={view}
-      onReviewTask={onReviewTask}
-      onViewAnalytics={onViewAnalytics}
-      onViewReviewerAnalytics={onViewReviewerAnalytics}
-      cursorPosition={{ x: contextMenu.x, y: contextMenu.y }}
-      onClose={onClose}
-    />
-  );
-});
+const ContextMenuPortal = memo(
+  ({ contextMenu, view, onReviewTask, onViewAnalytics, onViewReviewerAnalytics, onClose }) => {
+    return (
+      <RowContextMenu
+        row={contextMenu.row}
+        column={contextMenu.column}
+        view={view}
+        onReviewTask={onReviewTask}
+        onViewAnalytics={onViewAnalytics}
+        onViewReviewerAnalytics={onViewReviewerAnalytics}
+        cursorPosition={{ x: contextMenu.x, y: contextMenu.y }}
+        onClose={onClose}
+      />
+    );
+  },
+);
