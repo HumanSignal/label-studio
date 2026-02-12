@@ -108,10 +108,14 @@ class TaxonomyHelper {
     if (this.isLegacy) {
       this.input.filter(this.selectors.closed).click();
     } else {
-      // scrollIntoView is required because force:true skips auto-scrolling,
-      // and force:true is needed because the dropdown portal's search input
-      // can overlap the TreeSelect container (known Ant Design z-index issue).
-      this.input.filter(this.selectors.closed).scrollIntoView().click({ force: true });
+      // Must click .ant-select-selector (not the outer .htx-taxonomy wrapper)
+      // because Ant Design TreeSelect's open/close handler lives on the selector
+      // element — events bubble UP, so clicking the parent wrapper never reaches it.
+      this.input
+        .filter(this.selectors.closed)
+        .find(".ant-select-selector")
+        .scrollIntoView()
+        .click();
     }
   }
 
@@ -119,7 +123,11 @@ class TaxonomyHelper {
     if (this.isLegacy) {
       this.input.filter(this.selectors.open).click();
     } else {
-      this.input.filter(this.selectors.open).scrollIntoView().click({ force: true });
+      this.input
+        .filter(this.selectors.open)
+        .find(".ant-select-selector")
+        .scrollIntoView()
+        .click();
     }
   }
 }
