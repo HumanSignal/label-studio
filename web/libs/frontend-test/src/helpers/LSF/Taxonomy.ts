@@ -110,11 +110,7 @@ class TaxonomyHelper {
       // because Ant Design TreeSelect's open/close handler lives on the selector.
       // force:true is needed because a previously-closed taxonomy's dropdown portal
       // (containing a search input) can linger in the DOM and overlap the selector.
-      this.input
-        .filter(this.selectors.closed)
-        .find(".ant-select-selector")
-        .scrollIntoView()
-        .click({ force: true });
+      this.input.filter(this.selectors.closed).find(".ant-select-selector").scrollIntoView().click({ force: true });
     }
   }
 
@@ -122,11 +118,7 @@ class TaxonomyHelper {
     if (this.isLegacy) {
       this.input.filter(this.selectors.open).click();
     } else {
-      this.input
-        .filter(this.selectors.open)
-        .find(".ant-select-selector")
-        .scrollIntoView()
-        .click({ force: true });
+      this.input.filter(this.selectors.open).find(".ant-select-selector").scrollIntoView().click({ force: true });
     }
   }
 }
