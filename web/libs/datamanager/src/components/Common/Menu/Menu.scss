@@ -44,6 +44,10 @@
     &[disabled] {
       color: var(--color-neutral-content-subtlest);
 
+      svg {
+        color: var(--color-neutral-content-subtlest) !important;
+      }
+
       &:hover {
         background-color: transparent !important;
         color: var(--color-neutral-content-subtlest) !important;
