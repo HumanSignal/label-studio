@@ -1,5 +1,6 @@
 import base64
 import logging
+import mimetypes
 import time
 from typing import Union
 from urllib.parse import unquote
@@ -245,6 +246,13 @@ class ResolveStorageUriAPIMixin:
                     {'error': 'Storage stream failed while proxying data', 'detail': 'Stream is None'},
                     status=status.HTTP_424_FAILED_DEPENDENCY,
                 )
+
+            # Detect content type from URI file extension as a safety net for all storage types
+            # when the storage returns a generic type like binary/octet-stream or application/octet-stream
+            if not content_type or 'octet-stream' in content_type:
+                guessed_type, _ = mimetypes.guess_type(uri)
+                if guessed_type:
+                    content_type = guessed_type
 
             # Create time-limited stream
             time_limited_stream = self.time_limited_chunker(stream)
