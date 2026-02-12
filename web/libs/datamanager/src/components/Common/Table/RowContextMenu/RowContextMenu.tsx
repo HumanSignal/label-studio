@@ -24,7 +24,14 @@ export interface RowContextMenuProps {
   onClose: () => void;
 }
 
-export const RowContextMenu: FC<RowContextMenuProps> = ({ row, column, view, onViewAnalytics, cursorPosition, onClose }) => {
+export const RowContextMenu: FC<RowContextMenuProps> = ({
+  row,
+  column,
+  view,
+  onViewAnalytics,
+  cursorPosition,
+  onClose,
+}) => {
   // Columns that should not have copy cell content option
   const excludedColumns = [
     "select",
@@ -45,18 +52,16 @@ export const RowContextMenu: FC<RowContextMenuProps> = ({ row, column, view, onV
   const cellValue = column
     ? (() => {
         // Try to get the raw value from the original field (e.g., "tasks:annotations_results" -> "annotations_results")
-        const fieldName = column.id?.includes(':') ? column.id.split(':')[1] : column.id;
+        const fieldName = column.id?.includes(":") ? column.id.split(":")[1] : column.id;
         const rawValue = row[fieldName];
-        
+
         // If we have a raw value and it's different from what the accessor returns, use the raw value
         if (rawValue !== undefined && rawValue !== null) {
           return rawValue;
         }
-        
+
         // Otherwise fall back to the accessor/getProperty
-        return typeof column.accessor === "function"
-          ? column.accessor(row)
-          : getProperty(row, column.id);
+        return typeof column.accessor === "function" ? column.accessor(row) : getProperty(row, column.id);
       })()
     : null;
 
@@ -91,29 +96,29 @@ export const RowContextMenu: FC<RowContextMenuProps> = ({ row, column, view, onV
     try {
       // For annotations_results and predictions_results, fetch full data from API if truncated
       // The backend's GroupConcat has a max length that truncates long results
-      const fieldName = column?.id?.includes(':') ? column.id.split(':')[1] : column?.id;
-      const isAnnotationsOrPredictions = fieldName === 'annotations_results' || fieldName === 'predictions_results';
-      
+      const fieldName = column?.id?.includes(":") ? column.id.split(":")[1] : column?.id;
+      const isAnnotationsOrPredictions = fieldName === "annotations_results" || fieldName === "predictions_results";
+
       let textToCopy = typeof cellValue === "string" ? cellValue : String(cellValue);
 
       // If annotations/predictions appear truncated, fetch full data from API
-      if (isAnnotationsOrPredictions && textToCopy.length > 0 && !textToCopy.endsWith(']')) {
+      if (isAnnotationsOrPredictions && textToCopy.length > 0 && !textToCopy.endsWith("]")) {
         const taskId = row.id ?? row.task_id;
         const root = getRoot(view) as any;
-        
+
         if (root?.apiCall) {
           try {
-            const fullTask = await root.apiCall('task', { taskID: taskId });
-            
-            if (fieldName === 'annotations_results' && fullTask.annotations) {
+            const fullTask = await root.apiCall("task", { taskID: taskId });
+
+            if (fieldName === "annotations_results" && fullTask.annotations) {
               const results = fullTask.annotations.map((ann: any) => JSON.stringify(ann.result));
-              textToCopy = `[${results.join(', ')}]`;
-            } else if (fieldName === 'predictions_results' && fullTask.predictions) {
+              textToCopy = `[${results.join(", ")}]`;
+            } else if (fieldName === "predictions_results" && fullTask.predictions) {
               const results = fullTask.predictions.map((pred: any) => JSON.stringify(pred.result));
-              textToCopy = `[${results.join(', ')}]`;
+              textToCopy = `[${results.join(", ")}]`;
             }
           } catch (error) {
-            console.warn('[RowContextMenu] Failed to fetch full task data:', error);
+            console.warn("[RowContextMenu] Failed to fetch full task data:", error);
           }
         }
       }
@@ -201,64 +206,56 @@ export const RowContextMenu: FC<RowContextMenuProps> = ({ row, column, view, onV
 
   // Create context value with cursor position for proper positioning
   // Don't provide triggerRef so Dropdown knows to use cursor positioning
-  const contextValue = useMemo(
-    () => {
-      return cursorPosition
-        ? {
-            triggerRef: { current: undefined },
-            dropdown: dropdownRef,
-            minIndex: 10000,
-            cursorPosition,
-            hasTarget: () => false,
-            addChild: () => {},
-            removeChild: () => {},
-            open: () => {},
-            close: () => {},
-          }
-        : null;
-    },
-    [cursorPosition],
-  );
+  const contextValue = useMemo(() => {
+    return cursorPosition
+      ? {
+          triggerRef: { current: undefined },
+          dropdown: dropdownRef,
+          minIndex: 10000,
+          cursorPosition,
+          hasTarget: () => false,
+          addChild: () => {},
+          removeChild: () => {},
+          open: () => {},
+          close: () => {},
+        }
+      : null;
+  }, [cursorPosition]);
 
   return (
     <DropdownContext.Provider value={contextValue}>
-      <Dropdown 
-        visible={true} 
-        animated={true} 
-        constrainHeight={true}
-        dataAttributes={{ "data-context-menu": "" }}
-      >
+      <Dropdown visible={true} animated={true} constrainHeight={true} dataAttributes={{ "data-context-menu": "" }}>
         <Menu className={styles.menu} closeDropdownOnItemClick={true}>
-        <Menu.Item onClick={handleCompareAnnotations} data-testid="menu-item-compare-annotations">
-          Compare All Annotations
-        </Menu.Item>
-
-        <Menu.Divider />
-
-        {canCopyCellContent && (
-          <Menu.Item onClick={handleCopyCellContent} data-testid="menu-item-copy-cell">
-            Copy Cell Contents
+          <Menu.Item onClick={handleCompareAnnotations} data-testid="menu-item-compare-annotations">
+            Compare All Annotations
           </Menu.Item>
-        )}
 
-        <Menu.Item onClick={handleCopyTaskId} data-testid="menu-item-copy-task-id">
-          Copy Task ID
-        </Menu.Item>
+          <Menu.Divider />
 
-        <Menu.Item onClick={handleViewTaskSource} data-testid="menu-item-view-source">
-          View Task Source
-        </Menu.Item>
-
-        {onViewAnalytics && hasAnnotators && (
-          <>
-            <Menu.Divider />
-            <Menu.Item onClick={handleViewAnalytics} data-testid="menu-item-view-analytics">
-              View Annotator Performance
+          {canCopyCellContent && (
+            <Menu.Item onClick={handleCopyCellContent} data-testid="menu-item-copy-cell">
+              Copy Cell Contents
             </Menu.Item>
-          </>
-        )}
-      </Menu>
-    </Dropdown>
+          )}
+
+          <Menu.Item onClick={handleCopyTaskId} data-testid="menu-item-copy-task-id">
+            Copy Task ID
+          </Menu.Item>
+
+          <Menu.Item onClick={handleViewTaskSource} data-testid="menu-item-view-source">
+            View Task Source
+          </Menu.Item>
+
+          {onViewAnalytics && hasAnnotators && (
+            <>
+              <Menu.Divider />
+              <Menu.Item onClick={handleViewAnalytics} data-testid="menu-item-view-analytics">
+                View Annotator Performance
+              </Menu.Item>
+            </>
+          )}
+        </Menu>
+      </Dropdown>
     </DropdownContext.Provider>
   );
 };
