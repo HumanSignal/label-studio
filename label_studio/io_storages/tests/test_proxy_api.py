@@ -112,6 +112,117 @@ class TestResolveStorageUriAPIMixin(unittest.TestCase):
         result = self.mixin.redirect_to_presign_url('fileuri', self.task, 'Task')
         assert result.status_code == status.HTTP_404_NOT_FOUND
 
+    def test_proxy_data_from_storage_content_type_fallback_for_octet_stream(self):
+        """Test that proxy detects correct content type from URI when storage returns octet-stream.
+
+        S3 objects uploaded without explicit Content-Type often have binary/octet-stream.
+        The proxy should detect the correct type from the URI file extension.
+        """
+        mock_storage = MagicMock()
+        mock_stream = MagicMock()
+        mock_metadata = {
+            'StatusCode': 200,
+            'ContentLength': 1000,
+            'LastModified': datetime.now(),
+            'ETag': '"abcdef123456"',
+        }
+        # Storage returns binary/octet-stream (common S3 default for missing Content-Type)
+        mock_storage.get_bytes_stream.return_value = (mock_stream, 'binary/octet-stream', mock_metadata)
+        mock_project = MagicMock()
+
+        with patch('io_storages.proxy_api.StreamingHttpResponse') as mock_response_class, patch(
+            'io_storages.proxy_api.settings'
+        ) as mock_settings:
+            mock_settings.RESOLVER_PROXY_MAX_RANGE_SIZE = 1024 * 1024
+            mock_settings.RESOLVER_PROXY_BUFFER_SIZE = 8192
+            mock_settings.RESOLVER_PROXY_CACHE_TIMEOUT = 3600
+            mock_settings.RESOLVER_PROXY_TIMEOUT = 20
+            mock_settings.RESOLVER_PROXY_ENABLE_ETAG_CACHE = False
+
+            mock_response = MagicMock()
+            mock_response.headers = {}
+            mock_response_class.return_value = mock_response
+            self.request.headers = {}
+
+            # URI with .jpg extension - should be detected as image/jpeg
+            self.mixin.proxy_data_from_storage(self.request, 's3://bucket/photo.jpg', mock_project, mock_storage)
+
+            # Verify StreamingHttpResponse was called with image/jpeg, not binary/octet-stream
+            call_args, call_kwargs = mock_response_class.call_args
+            assert call_kwargs.get('content_type') == 'image/jpeg' or (
+                len(call_args) > 1 and call_args[1] == 'image/jpeg'
+            ), f'Expected content_type=image/jpeg, got: args={call_args}, kwargs={call_kwargs}'
+
+    def test_proxy_data_from_storage_content_type_fallback_for_application_octet_stream(self):
+        """Test fallback for application/octet-stream (another generic type)."""
+        mock_storage = MagicMock()
+        mock_stream = MagicMock()
+        mock_metadata = {
+            'StatusCode': 200,
+            'ContentLength': 5000,
+            'LastModified': datetime.now(),
+            'ETag': '"xyz789"',
+        }
+        mock_storage.get_bytes_stream.return_value = (mock_stream, 'application/octet-stream', mock_metadata)
+        mock_project = MagicMock()
+
+        with patch('io_storages.proxy_api.StreamingHttpResponse') as mock_response_class, patch(
+            'io_storages.proxy_api.settings'
+        ) as mock_settings:
+            mock_settings.RESOLVER_PROXY_MAX_RANGE_SIZE = 1024 * 1024
+            mock_settings.RESOLVER_PROXY_BUFFER_SIZE = 8192
+            mock_settings.RESOLVER_PROXY_CACHE_TIMEOUT = 3600
+            mock_settings.RESOLVER_PROXY_TIMEOUT = 20
+            mock_settings.RESOLVER_PROXY_ENABLE_ETAG_CACHE = False
+
+            mock_response = MagicMock()
+            mock_response.headers = {}
+            mock_response_class.return_value = mock_response
+            self.request.headers = {}
+
+            self.mixin.proxy_data_from_storage(self.request, 's3://bucket/video.mp4', mock_project, mock_storage)
+
+            call_args, call_kwargs = mock_response_class.call_args
+            assert call_kwargs.get('content_type') == 'video/mp4' or (
+                len(call_args) > 1 and call_args[1] == 'video/mp4'
+            ), f'Expected content_type=video/mp4, got: args={call_args}, kwargs={call_kwargs}'
+
+    def test_proxy_data_from_storage_preserves_correct_content_type(self):
+        """When storage returns a proper content type, it should not be overridden."""
+        mock_storage = MagicMock()
+        mock_stream = MagicMock()
+        mock_metadata = {
+            'StatusCode': 200,
+            'ContentLength': 1000,
+            'LastModified': datetime.now(),
+            'ETag': '"test"',
+        }
+        # Storage returns correct content type
+        mock_storage.get_bytes_stream.return_value = (mock_stream, 'image/webp', mock_metadata)
+        mock_project = MagicMock()
+
+        with patch('io_storages.proxy_api.StreamingHttpResponse') as mock_response_class, patch(
+            'io_storages.proxy_api.settings'
+        ) as mock_settings:
+            mock_settings.RESOLVER_PROXY_MAX_RANGE_SIZE = 1024 * 1024
+            mock_settings.RESOLVER_PROXY_BUFFER_SIZE = 8192
+            mock_settings.RESOLVER_PROXY_CACHE_TIMEOUT = 3600
+            mock_settings.RESOLVER_PROXY_TIMEOUT = 20
+            mock_settings.RESOLVER_PROXY_ENABLE_ETAG_CACHE = False
+
+            mock_response = MagicMock()
+            mock_response.headers = {}
+            mock_response_class.return_value = mock_response
+            self.request.headers = {}
+
+            self.mixin.proxy_data_from_storage(self.request, 's3://bucket/photo.jpg', mock_project, mock_storage)
+
+            # Should preserve the original image/webp, not override with image/jpeg
+            call_args, call_kwargs = mock_response_class.call_args
+            assert call_kwargs.get('content_type') == 'image/webp' or (
+                len(call_args) > 1 and call_args[1] == 'image/webp'
+            ), f'Expected content_type=image/webp, got: args={call_args}, kwargs={call_kwargs}'
+
     def test_proxy_data_from_storage_success(self):
         mock_storage = MagicMock()
         # Ensure get_bytes_stream returns a three-tuple, metadata can be empty initially
