@@ -3,7 +3,27 @@ class TaxonomyHelper {
     return ".taxonomy";
   }
 
-  public selectors = {
+  /**
+   * Whether the fragment is operating in legacy mode.
+   * NewTaxonomy (Ant Design TreeSelect) is the default since the FF_TAXONOMY_ASYNC
+   * flag was removed. Set isLegacy = true only when the config uses legacy="true".
+   */
+  public isLegacy: boolean;
+
+  /**
+   * Active selectors — set based on isLegacy in the constructor.
+   */
+  public selectors: {
+    root: string;
+    selected: string;
+    input: string;
+    dropdown: string;
+    item: string;
+    open: string;
+    closed: string;
+  };
+
+  private _legacySelectors = {
     root: this._baseRootSelector,
     selected: ".htx-taxonomy-selected",
     input: ".htx-taxonomy",
@@ -13,22 +33,24 @@ class TaxonomyHelper {
     closed: ':not([class*="taxonomy_open--"])',
   };
 
-  private _new_selectors = {
+  private _newSelectors = {
     root: this._baseRootSelector,
+    // .ant-select-selector is the clickable area showing selected items
     selected: ".ant-select-selector",
+    // .htx-taxonomy is the className set on TreeSelect
     input: ".htx-taxonomy",
-    dropdown: ".ant-select-dropdown",
+    // .htx-taxonomy-dropdown is the popupClassName set on TreeSelect (portal)
+    dropdown: ".htx-taxonomy-dropdown",
+    // Ant Design tree node inside the dropdown portal
     item: ".ant-select-tree-treenode",
     open: ".ant-select-open",
     closed: ":not(.ant-select-open)",
   };
 
-  public isNew = false;
-
-  constructor(rootSelector, isNew = false) {
-    if (isNew) this.selectors = this._new_selectors;
+  constructor(rootSelector: string, isLegacy = false) {
+    this.isLegacy = isLegacy;
+    this.selectors = isLegacy ? { ...this._legacySelectors } : { ...this._newSelectors };
     this.selectors.root = rootSelector.replace(/^\&/, this._baseRootSelector);
-    this.isNew = isNew;
   }
 
   get root() {
@@ -42,29 +64,48 @@ class TaxonomyHelper {
   get input() {
     return this.root.find(this.selectors.input);
   }
+
   get dropdown() {
-    return this.isNew ? cy.get(this.selectors.dropdown) : this.root.find(this.selectors.dropdown);
+    // NewTaxonomy renders its dropdown in a portal appended to <body>
+    return this.isLegacy ? this.root.find(this.selectors.dropdown) : cy.get(this.selectors.dropdown);
   }
-  findItem(text) {
+
+  findItem(text: string) {
     return this.dropdown.contains(this.selectors.item, text).scrollIntoView();
   }
-  hasSelected(text) {
-    return this.selected.contains("div", text).should("exist");
+
+  hasSelected(text: string) {
+    if (this.isLegacy) {
+      return this.selected.contains("div", text).should("exist");
+    }
+    // NewTaxonomy: selected items are rendered as
+    //   <span class="ant-select-selection-item">
+    //     <span class="ant-select-selection-item-content">Choice 1</span>
+    //   </span>
+    return this.root.find(".ant-select-selection-item-content").contains(text).should("exist");
   }
-  hasNoSelected(text) {
-    return this.selected.contains("div", text).should("not.exist");
+
+  hasNoSelected(text: string) {
+    if (this.isLegacy) {
+      return this.selected.contains("div", text).should("not.exist");
+    }
+    // For NewTaxonomy, check that no selection item contains the text.
+    // Use the selector within root to scope appropriately.
+    return this.root.find(".ant-select-selection-item-content").should("not.contain.text", text);
   }
+
   open() {
     this.input.filter(this.selectors.closed).click();
   }
+
   close() {
     this.input.filter(this.selectors.open).click();
   }
 }
 
 const Taxonomy = new TaxonomyHelper("&:eq(0)");
-const useTaxonomy = (rootSelector: string, isNew = false) => {
-  return new TaxonomyHelper(rootSelector, isNew);
+const useTaxonomy = (rootSelector: string, isLegacy = false) => {
+  return new TaxonomyHelper(rootSelector, isLegacy);
 };
 
 export { Taxonomy, useTaxonomy };
