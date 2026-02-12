@@ -105,11 +105,13 @@ class TaxonomyHelper {
   }
 
   open() {
-    this.input.filter(this.selectors.closed).click();
+    // For NewTaxonomy the dropdown is a portal whose search input can
+    // overlap the TreeSelect container, so we need force:true.
+    this.input.filter(this.selectors.closed).click(this.isLegacy ? undefined : { force: true });
   }
 
   close() {
-    this.input.filter(this.selectors.open).click();
+    this.input.filter(this.selectors.open).click(this.isLegacy ? undefined : { force: true });
   }
 }
 
