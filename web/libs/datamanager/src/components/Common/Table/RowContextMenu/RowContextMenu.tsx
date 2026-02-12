@@ -196,6 +196,8 @@ export const RowContextMenu: FC<RowContextMenuProps> = ({
   // Check if task has annotators (for View Annotator Performance)
   // Use annotators array which only contains actual annotators, not predictions
   const hasAnnotators = row.annotators && row.annotators.length > 0;
+  const annotatorCount = row.annotators?.length ?? 0;
+  const annotatorLabel = annotatorCount === 1 ? "Annotator" : "Annotators";
 
   // Create dropdown ref for context
   const dropdownRef = useRef(null);
@@ -250,7 +252,7 @@ export const RowContextMenu: FC<RowContextMenuProps> = ({
             <>
               <Menu.Divider />
               <Menu.Item onClick={handleViewAnalytics} data-testid="menu-item-view-analytics" icon={<IconUserStats />}>
-                View Annotator Performance
+                View {annotatorLabel} Performance
               </Menu.Item>
             </>
           )}
