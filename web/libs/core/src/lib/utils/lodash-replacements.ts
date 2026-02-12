@@ -48,7 +48,7 @@ export function throttle<T extends (...args: any[]) => any>(
 // ─────────────────────────────────────────────────────────────────────────────
 
 function baseClamp(number: number, lower: number | undefined, upper: number | undefined): number {
-  if (number === number) {
+  if (!Number.isNaN(number)) {
     if (upper !== undefined) {
       number = number <= upper ? number : upper;
     }
@@ -70,11 +70,11 @@ export function clamp(number: number, lower?: number, upper?: number): number {
   }
   if (upper !== undefined) {
     upper = Number(upper);
-    upper = upper === upper ? upper : 0;
+    upper = Number.isNaN(upper) ? 0 : upper;
   }
   if (lower !== undefined) {
     lower = Number(lower);
-    lower = lower === lower ? lower : 0;
+    lower = Number.isNaN(lower) ? 0 : lower;
   }
   return baseClamp(Number(number), lower, upper);
 }
@@ -155,7 +155,7 @@ export function get(object: unknown, path: string | string[], defaultValue?: unk
 // ─────────────────────────────────────────────────────────────────────────────
 
 function isStrictComparable(value: unknown): boolean {
-  return value === value && !isObject(value);
+  return !(typeof value === "number" && Number.isNaN(value)) && !isObject(value);
 }
 
 type MatchDatum = [string, unknown, boolean];
@@ -186,8 +186,9 @@ function baseIsEqualDeep(objValue: unknown, srcValue: unknown, seen?: Map<unknow
   // Primitive type checks
   if (typeof objValue !== "object" && typeof srcValue !== "object") return objValue === srcValue;
 
-  // NaN check
-  if (objValue !== objValue && srcValue !== srcValue) return true;
+  // NaN check: both values are NaN → treat as equal
+  if (typeof objValue === "number" && Number.isNaN(objValue) && typeof srcValue === "number" && Number.isNaN(srcValue))
+    return true;
 
   // Circular reference tracking
   if (!seen) seen = new Map();
