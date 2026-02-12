@@ -192,7 +192,6 @@ export class DataManager {
     Object.assign(this.tabControls, config.tabControls ?? {});
 
     // Store LSE-specific callbacks and components
-    this.onReviewTask = config.onReviewTask;
     this.onViewAnalytics = config.onViewAnalytics;
     this.onViewReviewerAnalytics = config.onViewReviewerAnalytics;
     this.RowContextMenuComponent = config.RowContextMenuComponent;

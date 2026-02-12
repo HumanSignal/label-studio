@@ -52,7 +52,6 @@ const injector = inject(({ store }) => {
     hasFilters: (currentView?.filtersApplied ?? 0) > 0,
     canLabel: totalTasks > 0 && foundTasks > 0,
     // LSE-specific callbacks and components
-    onReviewTask: store.SDK?.onReviewTask,
     onViewAnalytics: store.SDK?.onViewAnalytics,
     onViewReviewerAnalytics: store.SDK?.onViewReviewerAnalytics,
     RowContextMenuComponent: store.SDK?.RowContextMenuComponent,
@@ -80,7 +79,6 @@ export const DataView = injector(
     project,
     hasFilters,
     canLabel,
-    onReviewTask,
     onViewAnalytics,
     onViewReviewerAnalytics,
     RowContextMenuComponent,
@@ -392,7 +390,6 @@ export const DataView = injector(
             col.original.resetWidth();
           }}
           onDensityChange={setDensity}
-          onReviewTask={onReviewTask}
           onViewAnalytics={onViewAnalytics}
           onViewReviewerAnalytics={onViewReviewerAnalytics}
           RowContextMenuComponent={RowContextMenuComponent}

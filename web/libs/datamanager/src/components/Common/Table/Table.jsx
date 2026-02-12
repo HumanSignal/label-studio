@@ -52,7 +52,6 @@ export const Table = observer(
     headerExtra,
     onDensityChange,
     onRangeSelect,
-    onReviewTask,
     onViewAnalytics,
     onViewReviewerAnalytics,
     RowContextMenuComponent,
@@ -484,7 +483,6 @@ export const Table = observer(
             <ContextMenuPortal
               contextMenu={contextMenu}
               view={view}
-              onReviewTask={onReviewTask}
               onViewAnalytics={onViewAnalytics}
               onViewReviewerAnalytics={onViewReviewerAnalytics}
               RowContextMenuComponent={RowContextMenuComponent}
@@ -640,7 +638,7 @@ const innerElementType = forwardRef(({ children, ...rest }, ref) => {
 
 // Context menu portal component - positioning now handled by Dropdown component
 const ContextMenuPortal = memo(
-  ({ contextMenu, view, onReviewTask, onViewAnalytics, onViewReviewerAnalytics, onClose, RowContextMenuComponent }) => {
+  ({ contextMenu, view, onViewAnalytics, onViewReviewerAnalytics, onClose, RowContextMenuComponent }) => {
     const MenuComponent = RowContextMenuComponent || RowContextMenu;
 
     return (
@@ -648,7 +646,6 @@ const ContextMenuPortal = memo(
         row={contextMenu.row}
         column={contextMenu.column}
         view={view}
-        onReviewTask={onReviewTask}
         onViewAnalytics={onViewAnalytics}
         onViewReviewerAnalytics={onViewReviewerAnalytics}
         cursorPosition={{ x: contextMenu.x, y: contextMenu.y }}
