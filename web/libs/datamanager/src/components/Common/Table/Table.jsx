@@ -54,6 +54,7 @@ export const Table = observer(
     onRangeSelect,
     onReviewTask,
     onViewAnalytics,
+    onViewReviewerAnalytics,
     ...props
   }) => {
     const colOrderKey = "dm:columnorder";
@@ -484,6 +485,7 @@ export const Table = observer(
               view={view}
               onReviewTask={onReviewTask}
               onViewAnalytics={onViewAnalytics}
+              onViewReviewerAnalytics={onViewReviewerAnalytics}
               onClose={() => setContextMenu(null)}
             />,
             document.body,
@@ -635,7 +637,7 @@ const innerElementType = forwardRef(({ children, ...rest }, ref) => {
 });
 
 // Context menu portal component - positioning now handled by Dropdown component
-const ContextMenuPortal = memo(({ contextMenu, view, onReviewTask, onViewAnalytics, onClose }) => {
+const ContextMenuPortal = memo(({ contextMenu, view, onReviewTask, onViewAnalytics, onViewReviewerAnalytics, onClose }) => {
   return (
     <RowContextMenu
       row={contextMenu.row}
@@ -643,6 +645,7 @@ const ContextMenuPortal = memo(({ contextMenu, view, onReviewTask, onViewAnalyti
       view={view}
       onReviewTask={onReviewTask}
       onViewAnalytics={onViewAnalytics}
+      onViewReviewerAnalytics={onViewReviewerAnalytics}
       cursorPosition={{ x: contextMenu.x, y: contextMenu.y }}
       onClose={onClose}
     />
