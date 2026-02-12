@@ -47,6 +47,8 @@ export interface DropdownProps {
   dropdownClassName?: string;
   /** Data-testid attribute for testing */
   dataTestId?: string;
+  /** Custom data attributes for the dropdown element */
+  dataAttributes?: Record<string, string>;
   /** Custom styles for dropdown element */
   style?: CSSProperties;
   /** Dropdown content */
@@ -167,7 +169,12 @@ const DropdownComponent = forwardRef<DropdownRef, DropdownProps>(
 
         if (props.constrainHeight) {
           const availableHeight = viewportHeight - top - 10;
-          setMaxHeight(Math.min(availableHeight, rect.height));
+          // Only set maxHeight if menu would actually overflow
+          if (rect.height > availableHeight) {
+            setMaxHeight(availableHeight);
+          } else {
+            setMaxHeight(undefined);
+          }
         }
         return;
       }
@@ -293,7 +300,7 @@ const DropdownComponent = forwardRef<DropdownRef, DropdownProps>(
       // - Using cursor positioning (requires JS positioning)
       if (
         !isInline &&
-        visibility === "before-appear" &&
+        (visibility === "before-appear" || (visibility === "visible" && cursorPosition)) &&
         (!supportsAnchorPositioning || props.constrainHeight || cursorPosition)
       ) {
         calculatePosition();
@@ -406,19 +413,27 @@ const DropdownComponent = forwardRef<DropdownRef, DropdownProps>(
         anchorStyles.positionTryFallbacks = fallbacks.join(", ");
       }
 
-      return {
+      const styles = {
         // Apply anchor positioning styles OR JS-calculated offset for fallback
         ...(useAnchor ? anchorStyles : (offset ?? {})),
+        // When not using anchor positioning with cursor, ensure fixed positioning
+        ...(!useAnchor && cursorPosition
+          ? {
+              position: "fixed",
+              positionAnchor: "none",
+              positionTryFallbacks: "none",
+            }
+          : {}),
         zIndex: (minIndex ?? 0) + dropdownZIndex,
         // Apply width sync if enabled (only for fallback when anchor positioning is not used)
         ...(!useAnchor && props.syncWidth && triggerWidth ? { width: triggerWidth, minWidth: triggerWidth } : {}),
-        // Apply height constraint when enabled
-        // Always apply maxHeight for constrainHeight since CSS can't do dynamic calculations
-        // Subtract 8px for bottom padding when constrainHeight is enabled
-        ...(props.constrainHeight && maxHeight ? { maxHeight: maxHeight - 8 } : {}),
+        // Apply height constraint when enabled (only when menu would overflow)
+        ...(props.constrainHeight && maxHeight ? { maxHeight } : {}),
         // props.style last so it can override positioning if needed
         ...(props.style ?? {}),
       };
+
+      return styles;
     }, [
       props.style,
       props.alignment,
@@ -431,6 +446,7 @@ const DropdownComponent = forwardRef<DropdownRef, DropdownProps>(
       triggerWidth,
       props.constrainHeight,
       maxHeight,
+      cursorPosition,
     ]);
 
     // Only render content when dropdown has been opened at least once
@@ -441,6 +457,7 @@ const DropdownComponent = forwardRef<DropdownRef, DropdownProps>(
       <div
         ref={dropdown as any}
         data-testid={props.dataTestId}
+        {...(props.dataAttributes || {})}
         className={rootName
           .mod({
             "sync-width": props.syncWidth,

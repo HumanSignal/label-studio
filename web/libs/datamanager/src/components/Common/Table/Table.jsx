@@ -634,74 +634,17 @@ const innerElementType = forwardRef(({ children, ...rest }, ref) => {
   );
 });
 
-// Context menu portal component with smart positioning
+// Context menu portal component - positioning now handled by Dropdown component
 const ContextMenuPortal = memo(({ contextMenu, view, onReviewTask, onViewAnalytics, onClose }) => {
-  const menuRef = useRef(null);
-
-  // Helper to calculate position with given dimensions
-  const calculatePosition = useCallback(
-    (width, height) => {
-      const viewportWidth = window.innerWidth;
-      const viewportHeight = window.innerHeight;
-
-      let x = contextMenu.x;
-      let y = contextMenu.y;
-
-      // Adjust if would go off right edge
-      if (x + width > viewportWidth) {
-        x = Math.max(10, viewportWidth - width - 10);
-      }
-
-      // Adjust if would go off bottom edge
-      if (y + height > viewportHeight) {
-        y = Math.max(10, viewportHeight - height - 10);
-      }
-
-      return { x, y };
-    },
-    [contextMenu.x, contextMenu.y],
-  );
-
-  // Calculate initial position with estimated dimensions
-  const [position, setPosition] = useState(() => calculatePosition(250, 300));
-
-  // Reset position when context menu location changes
-  useEffect(() => {
-    setPosition(calculatePosition(250, 300));
-  }, [contextMenu.x, contextMenu.y, calculatePosition]);
-
-  // Refine position once we have actual dimensions
-  useEffect(() => {
-    if (!menuRef.current) return;
-
-    const menuRect = menuRef.current.getBoundingClientRect();
-    const newPosition = calculatePosition(menuRect.width, menuRect.height);
-
-    // Only update if position changed
-    if (newPosition.x !== position.x || newPosition.y !== position.y) {
-      setPosition(newPosition);
-    }
-  }, [contextMenu.x, contextMenu.y, position.x, position.y, calculatePosition]);
-
   return (
-    <div
-      ref={menuRef}
-      data-context-menu
-      style={{
-        position: "fixed",
-        left: `${position.x}px`,
-        top: `${position.y}px`,
-        zIndex: 10000,
-      }}
-    >
-      <RowContextMenu
-        row={contextMenu.row}
-        column={contextMenu.column}
-        view={view}
-        onReviewTask={onReviewTask}
-        onViewAnalytics={onViewAnalytics}
-        onClose={onClose}
-      />
-    </div>
+    <RowContextMenu
+      row={contextMenu.row}
+      column={contextMenu.column}
+      view={view}
+      onReviewTask={onReviewTask}
+      onViewAnalytics={onViewAnalytics}
+      cursorPosition={{ x: contextMenu.x, y: contextMenu.y }}
+      onClose={onClose}
+    />
   );
 });

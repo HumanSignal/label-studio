@@ -1,6 +1,6 @@
-import { type FC, useCallback } from "react";
+import { type FC, useCallback, useMemo, useRef } from "react";
 import { getRoot } from "mobx-state-tree";
-import { Dropdown } from "@humansignal/ui";
+import { Dropdown, DropdownContext } from "@humansignal/ui";
 // @ts-expect-error - Menu is from JS module
 import { Menu } from "../../Menu/Menu";
 import { modal } from "../../Modal/Modal";
@@ -18,11 +18,13 @@ export interface RowContextMenuProps {
   view: any;
   /** LSE-only callback for viewing analytics */
   onViewAnalytics?: (row: any) => void;
+  /** Cursor position for context menu (x, y coordinates) */
+  cursorPosition?: { x: number; y: number };
   /** Callback when menu closes */
   onClose: () => void;
 }
 
-export const RowContextMenu: FC<RowContextMenuProps> = ({ row, column, view, onViewAnalytics, onClose }) => {
+export const RowContextMenu: FC<RowContextMenuProps> = ({ row, column, view, onViewAnalytics, cursorPosition, onClose }) => {
   // Columns that should not have copy cell content option
   const excludedColumns = [
     "select",
@@ -37,11 +39,25 @@ export const RowContextMenu: FC<RowContextMenuProps> = ({ row, column, view, onV
   ];
 
   // Get the actual cell value for copying (must be declared before callbacks that use it)
-  // Use the column's accessor function if available, otherwise try getProperty
+  // For copying, we want the raw data, not the formatted/truncated display value
+  // First try to get the raw value from the row data using the column's original field
+  // If that's not available, fall back to the accessor function or getProperty
   const cellValue = column
-    ? typeof column.accessor === "function"
-      ? column.accessor(row)
-      : getProperty(row, column.id)
+    ? (() => {
+        // Try to get the raw value from the original field (e.g., "tasks:annotations_results" -> "annotations_results")
+        const fieldName = column.id?.includes(':') ? column.id.split(':')[1] : column.id;
+        const rawValue = row[fieldName];
+        
+        // If we have a raw value and it's different from what the accessor returns, use the raw value
+        if (rawValue !== undefined && rawValue !== null) {
+          return rawValue;
+        }
+        
+        // Otherwise fall back to the accessor/getProperty
+        return typeof column.accessor === "function"
+          ? column.accessor(row)
+          : getProperty(row, column.id);
+      })()
     : null;
 
   // Helper to show toast notifications via DataManager
@@ -73,8 +89,35 @@ export const RowContextMenu: FC<RowContextMenuProps> = ({ row, column, view, onV
     }
 
     try {
-      // Convert value to string for copying
-      const textToCopy = typeof cellValue === "string" ? cellValue : String(cellValue);
+      // For annotations_results and predictions_results, fetch full data from API if truncated
+      // The backend's GroupConcat has a max length that truncates long results
+      const fieldName = column?.id?.includes(':') ? column.id.split(':')[1] : column?.id;
+      const isAnnotationsOrPredictions = fieldName === 'annotations_results' || fieldName === 'predictions_results';
+      
+      let textToCopy = typeof cellValue === "string" ? cellValue : String(cellValue);
+
+      // If annotations/predictions appear truncated, fetch full data from API
+      if (isAnnotationsOrPredictions && textToCopy.length > 0 && !textToCopy.endsWith(']')) {
+        const taskId = row.id ?? row.task_id;
+        const root = getRoot(view) as any;
+        
+        if (root?.apiCall) {
+          try {
+            const fullTask = await root.apiCall('task', { taskID: taskId });
+            
+            if (fieldName === 'annotations_results' && fullTask.annotations) {
+              const results = fullTask.annotations.map((ann: any) => JSON.stringify(ann.result));
+              textToCopy = `[${results.join(', ')}]`;
+            } else if (fieldName === 'predictions_results' && fullTask.predictions) {
+              const results = fullTask.predictions.map((pred: any) => JSON.stringify(pred.result));
+              textToCopy = `[${results.join(', ')}]`;
+            }
+          } catch (error) {
+            console.warn('[RowContextMenu] Failed to fetch full task data:', error);
+          }
+        }
+      }
+
       await navigator.clipboard.writeText(textToCopy);
 
       const taskId = row.id ?? row.task_id;
@@ -84,7 +127,7 @@ export const RowContextMenu: FC<RowContextMenuProps> = ({ row, column, view, onV
       showToast("Failed to copy to clipboard", "error");
     }
     onClose();
-  }, [cellValue, column, row, onClose, showToast]);
+  }, [cellValue, column, row, onClose, showToast, view]);
 
   // 3. Copy task ID
   const handleCopyTaskId = useCallback(async () => {
@@ -153,9 +196,39 @@ export const RowContextMenu: FC<RowContextMenuProps> = ({ row, column, view, onV
   // Use annotators array which only contains actual annotators, not predictions
   const hasAnnotators = row.annotators && row.annotators.length > 0;
 
+  // Create dropdown ref for context
+  const dropdownRef = useRef(null);
+
+  // Create context value with cursor position for proper positioning
+  // Don't provide triggerRef so Dropdown knows to use cursor positioning
+  const contextValue = useMemo(
+    () => {
+      return cursorPosition
+        ? {
+            triggerRef: { current: undefined },
+            dropdown: dropdownRef,
+            minIndex: 10000,
+            cursorPosition,
+            hasTarget: () => false,
+            addChild: () => {},
+            removeChild: () => {},
+            open: () => {},
+            close: () => {},
+          }
+        : null;
+    },
+    [cursorPosition],
+  );
+
   return (
-    <Dropdown inline visible={true} animated={false}>
-      <Menu className={styles.menu} closeDropdownOnItemClick={true}>
+    <DropdownContext.Provider value={contextValue}>
+      <Dropdown 
+        visible={true} 
+        animated={true} 
+        constrainHeight={true}
+        dataAttributes={{ "data-context-menu": "" }}
+      >
+        <Menu className={styles.menu} closeDropdownOnItemClick={true}>
         <Menu.Item onClick={handleCompareAnnotations} data-testid="menu-item-compare-annotations">
           Compare All Annotations
         </Menu.Item>
@@ -186,5 +259,6 @@ export const RowContextMenu: FC<RowContextMenuProps> = ({ row, column, view, onV
         )}
       </Menu>
     </Dropdown>
+    </DropdownContext.Provider>
   );
 };
