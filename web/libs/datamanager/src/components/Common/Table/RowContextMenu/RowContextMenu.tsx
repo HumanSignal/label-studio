@@ -222,7 +222,11 @@ export const RowContextMenu: FC<RowContextMenuProps> = ({
     <DropdownContext.Provider value={contextValue}>
       <Dropdown visible={true} animated={true} constrainHeight={true} dataAttributes={{ "data-context-menu": "" }}>
         <Menu className={styles.menu} closeDropdownOnItemClick={true}>
-          <Menu.Item onClick={handleCompareAnnotations} data-testid="menu-item-compare-annotations" icon={<IconViewAll />}>
+          <Menu.Item
+            onClick={handleCompareAnnotations}
+            data-testid="menu-item-compare-annotations"
+            icon={<IconViewAll />}
+          >
             Compare All Annotations
           </Menu.Item>
 
