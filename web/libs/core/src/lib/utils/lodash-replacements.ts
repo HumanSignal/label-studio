@@ -22,7 +22,10 @@ export function throttle<T extends (...args: any[]) => any>(
   func: T,
   wait?: number,
   options?: { leading?: boolean; trailing?: boolean },
-): ((...args: Parameters<T>) => ReturnType<T> | undefined) & { cancel: () => void; flush: () => ReturnType<T> | undefined } {
+): ((...args: Parameters<T>) => ReturnType<T> | undefined) & {
+  cancel: () => void;
+  flush: () => ReturnType<T> | undefined;
+} {
   let leading = true;
   let trailing = true;
 
@@ -81,8 +84,7 @@ export function clamp(number: number, lower?: number, upper?: number): number {
 // ─────────────────────────────────────────────────────────────────────────────
 
 /** Used to match property names within property paths. */
-const rePropName =
-  /[^.[\]]+|\[(?:(-?\d+(?:\.\d+)?)|(["'])((?:(?!\2)[^\\]|\\.)*?)\2)\]|(?=(?:\.|\[\])(?:\.|\[\]|$))/g;
+const rePropName = /[^.[\]]+|\[(?:(-?\d+(?:\.\d+)?)|(["'])((?:(?!\2)[^\\]|\\.)*?)\2)\]|(?=(?:\.|\[\])(?:\.|\[\]|$))/g;
 
 /** Used to match backslashes in property paths. */
 const reEscapeChar = /\\(\\)?/g;
@@ -100,11 +102,7 @@ function isKey(value: unknown, object?: unknown): boolean {
     return true;
   }
   const strValue = String(value);
-  return (
-    reIsPlainProp.test(strValue) ||
-    !reIsDeepProp.test(strValue) ||
-    (object != null && strValue in Object(object))
-  );
+  return reIsPlainProp.test(strValue) || !reIsDeepProp.test(strValue) || (object != null && strValue in Object(object));
 }
 
 function stringToPath(string: string): string[] {
@@ -212,11 +210,7 @@ function baseIsEqualDeep(objValue: unknown, srcValue: unknown, seen?: Map<unknow
   const srcKeys = Object.keys(srcValue as Record<string, unknown>);
   for (const key of srcKeys) {
     if (
-      !baseIsEqualDeep(
-        (objValue as Record<string, unknown>)[key],
-        (srcValue as Record<string, unknown>)[key],
-        seen,
-      )
+      !baseIsEqualDeep((objValue as Record<string, unknown>)[key], (srcValue as Record<string, unknown>)[key], seen)
     ) {
       return false;
     }
@@ -235,7 +229,7 @@ export function isMatch(object: unknown, source: unknown): boolean {
   if (object == null || !isObject(source)) return false;
 
   const matchData = getMatchData(source as Record<string, unknown>);
-  let length = matchData.length;
+  const length = matchData.length;
 
   // Quick bail: check all strict-comparable values first
   const obj = Object(object) as Record<string, unknown>;

@@ -20,7 +20,10 @@ export function debounce<T extends (...args: any[]) => any>(
   func: T,
   wait?: number,
   options?: DebounceOptions,
-): ((...args: Parameters<T>) => ReturnType<T> | undefined) & { cancel: () => void; flush: () => ReturnType<T> | undefined } {
+): ((...args: Parameters<T>) => ReturnType<T> | undefined) & {
+  cancel: () => void;
+  flush: () => ReturnType<T> | undefined;
+} {
   let lastArgs: Parameters<T> | undefined;
   let lastThis: unknown;
   let maxWait: number | undefined;
