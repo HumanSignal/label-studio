@@ -1,6 +1,6 @@
 import { type FC, useCallback, useMemo, useRef } from "react";
 import { getRoot } from "mobx-state-tree";
-import { Dropdown, DropdownContext } from "@humansignal/ui";
+import { Dropdown, DropdownContext, IconViewAll, IconCopyOutline, IconBraces, IconUserStats } from "@humansignal/ui";
 // @ts-expect-error - Menu is from JS module
 import { Menu } from "../../Menu/Menu";
 import { modal } from "../../Modal/Modal";
@@ -222,30 +222,30 @@ export const RowContextMenu: FC<RowContextMenuProps> = ({
     <DropdownContext.Provider value={contextValue}>
       <Dropdown visible={true} animated={true} constrainHeight={true} dataAttributes={{ "data-context-menu": "" }}>
         <Menu className={styles.menu} closeDropdownOnItemClick={true}>
-          <Menu.Item onClick={handleCompareAnnotations} data-testid="menu-item-compare-annotations">
+          <Menu.Item onClick={handleCompareAnnotations} data-testid="menu-item-compare-annotations" icon={<IconViewAll />}>
             Compare All Annotations
           </Menu.Item>
 
           <Menu.Divider />
 
           {canCopyCellContent && (
-            <Menu.Item onClick={handleCopyCellContent} data-testid="menu-item-copy-cell">
+            <Menu.Item onClick={handleCopyCellContent} data-testid="menu-item-copy-cell" icon={<IconCopyOutline />}>
               Copy Cell Contents
             </Menu.Item>
           )}
 
-          <Menu.Item onClick={handleCopyTaskId} data-testid="menu-item-copy-task-id">
+          <Menu.Item onClick={handleCopyTaskId} data-testid="menu-item-copy-task-id" icon={<IconCopyOutline />}>
             Copy Task ID
           </Menu.Item>
 
-          <Menu.Item onClick={handleViewTaskSource} data-testid="menu-item-view-source">
+          <Menu.Item onClick={handleViewTaskSource} data-testid="menu-item-view-source" icon={<IconBraces />}>
             View Task Source
           </Menu.Item>
 
           {onViewAnalytics && hasAnnotators && (
             <>
               <Menu.Divider />
-              <Menu.Item onClick={handleViewAnalytics} data-testid="menu-item-view-analytics">
+              <Menu.Item onClick={handleViewAnalytics} data-testid="menu-item-view-analytics" icon={<IconUserStats />}>
                 View Annotator Performance
               </Menu.Item>
             </>
