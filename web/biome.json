@@ -1,15 +1,15 @@
 {
   "$schema": "https://biomejs.dev/schemas/2.0.6/schema.json",
   "files": {
+    "maxSize": 3670016,
     "ignore": [
-      "**/node_modules",
-      "**/dist",
-      "**/tsconfig*",
-      "**/libs/editor/examples/**/*.json",
-      "**/libs/editor/src/examples/**/annotations/1.json",
-      "**/apps/labelstudio-e2e"
-    ],
-    "maxSize": 3670016
+      "node_modules",
+      "dist",
+      "tsconfig*",
+      "libs/editor/examples/**/*.json",
+      "libs/editor/src/examples/**/annotations/1.json",
+      "apps/labelstudio-e2e"
+    ]
   },
   "vcs": {
     "enabled": true,
