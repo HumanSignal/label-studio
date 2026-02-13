@@ -1,6 +1,6 @@
 /**
  * Tests for string utilities (camelCase, snakeCase, kebabCase, capitalize, startCase).
- * Ensures behavior remains consistent with lodash for drop-in compatibility.
+ * Validates the es-toolkit/compat re-exports behave as expected.
  */
 
 import { camelCase, capitalize, kebabCase, snakeCase, startCase } from "./string";

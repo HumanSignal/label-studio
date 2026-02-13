@@ -73,6 +73,7 @@
     "date-fns": "^2.20.1",
     "deep-equal": "^2.0.5",
     "emoji-regex": "^7.0.3",
+    "es-toolkit": "^1.44.0",
     "fft.js": "^4.0.4",
     "history": "^4.10.1",
     "html-react-parser": "^1.2.4",
