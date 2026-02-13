@@ -665,6 +665,112 @@ Use the `EmptyState` component with icon, title, description, and actions:
 />
 ```
 
+### Modal Patterns
+
+**Footer Actions**:
+- All call-to-action buttons, including navigational buttons, should be placed in the modal's footer
+- Default alignment: right
+- Exception: "Previous" navigation buttons should be aligned to the left
+- This creates clear separation between content and actions
+
+**Button Visual Hierarchy**:
+- When buttons are aligned to the right: visual hierarchy flows right to left (primary action rightmost)
+- When buttons are aligned to the left: visual hierarchy flows left to right (primary action leftmost)
+- Example (right-aligned): [Cancel] [Save Changes]
+- Example (left-aligned with navigation): [Previous] ... [Next]
+
+**Destructive Actions**:
+- Always require confirmation for destructive actions
+- For high-impact destructive actions (e.g., deleting a project with significant data loss):
+  - Require additional validation beyond simple confirmation
+  - Ask user to type a specific word or the entity name (when names are simple)
+  - Example: "Type DELETE to confirm" or "Type the project name to confirm deletion"
+
+**Modal Stacking**:
+- Avoid displaying modals over modals wherever possible
+- If unavoidable, ensure clear visual hierarchy and proper focus management
+- Consider alternative patterns like multi-step modals or drawer components
+
+**Examples**:
+
+```tsx
+// ✅ Correct - right-aligned footer with proper hierarchy
+<Modal>
+  <Modal.Header>Edit Project Settings</Modal.Header>
+  <Modal.Body>
+    {/* Form content */}
+  </Modal.Body>
+  <Modal.Footer align="right">
+    <Button variant="neutral" look="outlined">Cancel</Button>
+    <Button variant="primary" look="filled">Save Changes</Button>
+  </Modal.Footer>
+</Modal>
+
+// ✅ Correct - navigation with left-aligned Previous
+<Modal>
+  <Modal.Header>Setup Wizard - Step 2 of 3</Modal.Header>
+  <Modal.Body>
+    {/* Step content */}
+  </Modal.Body>
+  <Modal.Footer>
+    <div className="flex justify-between w-full">
+      <Button variant="neutral" look="outlined">Previous</Button>
+      <Button variant="primary" look="filled">Next</Button>
+    </div>
+  </Modal.Footer>
+</Modal>
+
+// ✅ Correct - destructive action with validation
+<Modal>
+  <Modal.Header>Delete Project</Modal.Header>
+  <Modal.Body>
+    <Message variant="negative">
+      This action cannot be undone. All tasks, annotations, and settings will be permanently deleted.
+    </Message>
+    <Input
+      label='Type "DELETE" to confirm'
+      value={confirmText}
+      onChange={setConfirmText}
+      placeholder="DELETE"
+    />
+  </Modal.Body>
+  <Modal.Footer align="right">
+    <Button variant="neutral" look="outlined">Cancel</Button>
+    <Button 
+      variant="negative" 
+      look="filled"
+      disabled={confirmText !== 'DELETE'}
+    >
+      Delete Project
+    </Button>
+  </Modal.Footer>
+</Modal>
+
+// ❌ Wrong - actions in modal body
+<Modal>
+  <Modal.Header>Edit Settings</Modal.Header>
+  <Modal.Body>
+    {/* Form content */}
+    <div className="flex gap-tight">
+      <Button>Cancel</Button>
+      <Button>Save</Button>
+    </div>
+  </Modal.Body>
+</Modal>
+
+// ❌ Wrong - destructive action without validation
+<Modal>
+  <Modal.Header>Delete Project</Modal.Header>
+  <Modal.Body>
+    Are you sure you want to delete this project?
+  </Modal.Body>
+  <Modal.Footer align="right">
+    <Button variant="neutral">Cancel</Button>
+    <Button variant="negative">Delete</Button>
+  </Modal.Footer>
+</Modal>
+```
+
 ---
 
 ## Component Reuse & Best Practices

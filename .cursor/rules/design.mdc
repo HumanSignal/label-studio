@@ -274,6 +274,14 @@ export const Primary: Story = {
 **Size Variants**: smaller, small, medium, large
 **Look Variants**: filled, outlined, string
 
+**Modal Patterns**:
+- CTAs and navigation buttons in modal footer (default: right-aligned)
+- "Previous" navigation buttons: left-aligned
+- Button hierarchy: right-aligned = right-to-left, left-aligned = left-to-right
+- Destructive actions: require confirmation
+- High-impact destructive actions: require typing validation (DELETE, entity name)
+- Avoid modal-over-modal stacking
+
 ## Anti-Patterns
 
 **Tokens & Styling**:
