@@ -3662,7 +3662,7 @@
     },
     "fflag_feat_utc_563_randomize_overlap_cohort": {
       "key": "fflag_feat_utc_563_randomize_overlap_cohort",
-      "on": false,
+      "on": true,
       "prerequisites": [],
       "targets": [],
       "contextTargets": [],
@@ -3684,7 +3684,7 @@
       "trackEvents": false,
       "trackEventsFallthrough": false,
       "debugEventsUntilDate": null,
-      "version": 2,
+      "version": 3,
       "deleted": false
     },
     "fflag_feature_all_optic_1421_cold_start_v2": {

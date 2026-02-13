@@ -1,16 +1,15 @@
 {
-  "$schema": "https://biomejs.dev/schemas/1.9.4/schema.json",
-  "organizeImports": {
-    "enabled": false
-  },
+  "$schema": "https://biomejs.dev/schemas/2.0.6/schema.json",
+  "assist": { "actions": { "source": { "organizeImports": "off" } } },
   "files": {
-    "ignore": [
-      "node_modules/**",
-      "dist/**",
-      "**/tsconfig*",
-      "libs/editor/examples/**/*.json",
-      "libs/editor/src/examples/**/annotations/1.json",
-      "apps/labelstudio-e2e/**"
+    "includes": [
+      "**",
+      "!**/node_modules/**",
+      "!**/dist/**",
+      "!**/tsconfig*",
+      "!**/libs/editor/examples/**/*.json",
+      "!**/libs/editor/src/examples/**/annotations/1.json",
+      "!**/apps/labelstudio-e2e/**"
     ],
     "maxSize": 3670016
   },
@@ -40,7 +39,11 @@
       "a11y": {
         "noAutofocus": "off",
         "useKeyWithClickEvents": "off",
-        "noLabelWithoutControl": "off"
+        "noLabelWithoutControl": "off",
+        "noStaticElementInteractions": "off",
+        "useAriaPropsSupportedByRole": "off",
+        "useAriaPropsForRole": "off",
+        "useSemanticElements": "off"
       },
       "suspicious": {
         "noExplicitAny": "off",
@@ -64,6 +67,7 @@
         "useExhaustiveDependencies": "off",
         "noChildrenProp": "off",
         "useJsxKeyInIterable": "off",
+        "useHookAtTopLevel": "off",
         "noUnusedImports": {
           "level": "warn"
         },
@@ -79,7 +83,15 @@
         "noNonNullAssertion": "off",
         "useDefaultParameterLast": "off",
         "useNodejsImportProtocol": "off",
-        "noParameterAssign": "off"
+        "noParameterAssign": "off",
+        "useAsConstAssertion": "error",
+        "useEnumInitializers": "error",
+        "useSelfClosingElements": "error",
+        "useSingleVarDeclarator": "error",
+        "noUnusedTemplateLiteral": "error",
+        "useNumberNamespace": "error",
+        "noInferrableTypes": "error",
+        "noUselessElse": "error"
       },
       "nursery": {},
       "security": {

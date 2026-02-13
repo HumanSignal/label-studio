@@ -275,7 +275,7 @@ export function stringToColor(str) {
  * @param {number} alpha from 0 to 1
  */
 export function rgbaChangeAlpha(rgba, alpha) {
-  return rgba.replace(/[\d\.]+\)$/g, `${alpha})`); // eslint-disable-line no-useless-escape
+  return rgba.replace(/[\d.]+\)$/g, `${alpha})`); // eslint-disable-line no-useless-escape
 }
 
 // given number from 0.00 to 1.00 return a color from red to green

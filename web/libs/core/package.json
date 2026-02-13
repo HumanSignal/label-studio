@@ -5,5 +5,8 @@
   "private": true,
   "dependencies": {},
   "main": "src/index.ts",
-  "files": ["src/lib", "src/pages"]
+  "files": [
+    "src/lib",
+    "src/pages"
+  ]
 }
