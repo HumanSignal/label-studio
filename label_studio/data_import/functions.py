@@ -12,6 +12,7 @@ from label_studio_sdk.label_interface import LabelInterface
 from projects.models import ProjectImport, ProjectReimport, ProjectSummary
 from rest_framework.exceptions import ValidationError
 from tasks.models import Task
+from tasks.serializers import sanitize_prediction_import_payload
 from users.models import User
 from webhooks.models import WebhookAction
 from webhooks.utils import emit_webhooks_for_instance
@@ -71,6 +72,7 @@ def async_import_background(
             if 'predictions' in task:
                 for j, prediction in enumerate(task['predictions']):
                     try:
+                        prediction = sanitize_prediction_import_payload(prediction)
                         validation_errors_list = li.validate_prediction(prediction, return_errors=True)
                         if validation_errors_list:
                             for error in validation_errors_list:
@@ -451,6 +453,7 @@ def _async_import_background_streaming(project_import, user):
                     if 'predictions' in task:
                         for j, prediction in enumerate(task['predictions']):
                             try:
+                                prediction = sanitize_prediction_import_payload(prediction)
                                 validation_errors_list = li.validate_prediction(prediction, return_errors=True)
                                 if validation_errors_list:
                                     for error in validation_errors_list:
