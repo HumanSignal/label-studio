@@ -96,9 +96,9 @@ Example:
 - Buttons: `Button`, `Checkbox`, `Toggle`
 - Layout: `Card`, `Drawer`, `EmptyState`, `CollapsiblePanel`
 - Overlays: `Modal`, `Popover`, `Dropdown`, `Tooltip`
-- Display: `Badge`, `Typography`, `DataTable`, `Skeleton`
+- Display: `Badge`, `Typography`, `DataTable`
 - Forms: `Select`, `Label`, `TagAutocomplete`, `DateRangePicker`
-- Feedback: `Message` (use for info boxes), `Toast`, `Spinner`
+- Feedback: `Message` (use for info boxes), `Toast`, `Spinner`, `Skeleton`
 - Navigation: `Tabs`, `Accordion`, `Pagination`
 
 **Imports**:
@@ -301,5 +301,3 @@ export const Primary: Story = {
 - `frontend-unit-tests.mdc` - Testing patterns
 
 **Full Documentation**: See `DESIGN.md` in repository root
-
-**Design Language**: https://humansignal.notion.site/Design-language-fe3a39ecfa794507b2f7e62cbb5636c8
