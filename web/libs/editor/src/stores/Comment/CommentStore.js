@@ -174,6 +174,25 @@ export const CommentStore = types
       self.addedCommentThisSession = isAddedCommentThisSession;
     }
 
+    /**
+     * Recalculate and update the current annotation's comment_count and
+     * unresolved_comment_count based on the local comments array.
+     * This keeps the annotation tab icons in sync without requiring a
+     * full task reload.
+     */
+    function updateAnnotationCommentCounts() {
+      const annotation = self.annotation;
+
+      if (!annotation) return;
+
+      const activeComments = self.comments.filter((c) => !c.isDeleted);
+      const total = activeComments.length;
+      const unresolved = activeComments.filter((c) => !c.isResolved).length;
+
+      annotation.setCommentCount(total);
+      annotation.setUnresolvedCommentCount(unresolved);
+    }
+
     function replaceId(id, newComment) {
       const comments = self.comments;
 
@@ -278,6 +297,7 @@ export const CommentStore = types
       // @todo setComments?
       self.comments.unshift(comment);
       self.setAddedCommentThisSession(true);
+      self.updateAnnotationCommentCounts();
       if (self.canPersist) {
         try {
           const [newComment] = yield self.sdk.invoke("comments:create", comment);
@@ -289,6 +309,7 @@ export const CommentStore = types
           }
         } catch (err) {
           self.removeCommentById(now);
+          self.updateAnnotationCommentCounts();
           throw err;
         } finally {
           self.setLoading(null);
@@ -412,6 +433,7 @@ export const CommentStore = types
       setInputRef,
       setLoading,
       setTooltipMessage,
+      updateAnnotationCommentCounts,
       replaceId,
       removeCommentById,
       persistQueuedComments,
