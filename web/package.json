@@ -5,6 +5,7 @@
   "scripts": {
     "ui:serve": "nx storybook storybook",
     "ui:test:component": "nx test-component ui",
+    "biome": "biome",
     "lint": "biome check --write .",
     "lint-scss": "yarn stylelint '**/*.scss' --fix",
     "ls:dev": "nx run labelstudio:serve:development",
