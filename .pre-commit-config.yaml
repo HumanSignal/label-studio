@@ -14,7 +14,7 @@ repos:
     hooks:
       - id: biome-check
         name: biome-check
-        entry: bash -c 'cd web && yarn biome check . --diagnostic-level=error'
+        entry: bash -c 'cd web && yarn biome lint . --diagnostic-level=error'
         language: system
         pass_filenames: false
         files: ^web/.*
