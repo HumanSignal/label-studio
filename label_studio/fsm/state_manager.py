@@ -101,9 +101,9 @@ class StateManager:
 
     @classmethod
     def _is_fsm_enabled(cls, user='auto') -> bool:
-        if user == 'auto':
-            user = CurrentContext.get_user()
         """Check if FSM feature is enabled via feature flag."""
+        if user is None or user == 'auto':
+            return CurrentContext.is_fsm_enabled()
         return flag_set('fflag_feat_fit_568_finite_state_management', user=user)
 
     @classmethod
