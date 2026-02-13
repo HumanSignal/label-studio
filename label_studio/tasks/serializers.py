@@ -568,6 +568,14 @@ class BaseTaskSerializerBulk(serializers.ListSerializer):
                     validation_errors.append(f'Task {i}, prediction {j}: Prediction must be a dictionary')
                     continue
 
+                # Strip FSM state field from predictions before validation
+                # Exported data may include 'state' which is not a valid prediction field
+                ff_user = self.project.organization.created_by
+                if flag_set('fflag_feat_fit_568_finite_state_management', user=ff_user) and flag_set(
+                    'fflag_feat_fit_710_fsm_state_fields', user=ff_user
+                ):
+                    prediction.pop('state', None)
+
                 # Validate prediction only when project label config is not default
                 if should_validate:
                     try:
