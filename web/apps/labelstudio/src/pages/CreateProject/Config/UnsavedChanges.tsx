@@ -44,8 +44,7 @@ export const unsavedChangesModal = ({
   body = "Would you like to save them before leaving?",
   ...props
 }: UnsavedChangesModalProps) => {
-  // biome-ignore lint/style/useConst: modalInstance is used before assignment in saveAndLeave
-  let modalInstance: any;
+  let modalInstance: any = undefined;
   const saveAndLeave = async () => {
     await onSave?.();
     modalInstance?.close();
