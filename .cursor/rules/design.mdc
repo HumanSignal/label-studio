@@ -163,6 +163,17 @@ import { cn } from '@humansignal/core';
 }
 ```
 
+**Canvas Elements**:
+- For canvas/JS rendering that can't use CSS variables, use `getTokenColor` utility
+- Converts semantic tokens to actual colors at runtime and 
+- Maintains design system consistency and dark mode
+
+Example:
+```tsx
+import { getTokenColor } from '@humansignal/ui';
+ctx.fillStyle = getTokenColor('--color-primary-surface');
+```
+
 **Values**:
 - ❌ Never hard-code colors, spacing, typography
 - ✅ Use rem for dimensions when possible (px acceptable when necessary)

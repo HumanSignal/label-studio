@@ -493,6 +493,19 @@ Always create component tokens that reference semantic tokens:
 }
 ```
 
+**Canvas Elements and JavaScript-Based Rendering**:
+
+For canvas elements and JavaScript-based rendering that cannot use CSS variables, use the `getTokenColor` utility to apply semantic token colors. The utility converts semantic token names to actual color values at runtime.
+
+```tsx
+import { getTokenColor } from '@humansignal/ui';
+
+// Canvas rendering
+const ctx = canvas.getContext('2d');
+ctx.fillStyle = getTokenColor('--color-primary-surface');
+ctx.strokeStyle = getTokenColor('--color-neutral-border');
+```
+
 ---
 
 ## Component Development
