@@ -10,18 +10,11 @@ repos:
     rev: v0.9.1
     hooks:
       - id: blue
-  - repo: https://github.com/biomejs/pre-commit
-    rev: "v0.1.0"
-    hooks:
-      - id: biome-check
-        args: [ --config-path, ./web, --diagnostic-level=error ]
-        additional_dependencies: [ "@biomejs/biome@2.0.6" ]
-        files: ^web/.*
   - repo: local
     hooks:
       - id: biome-check
         name: biome-check
-        entry: bash -c 'cd web && yarn biome check . --diagnostic-level=error'
+        entry: bash -c 'cd web && yarn biome check . --write --diagnostic-level=error'
         language: system
         pass_filenames: false
         files: ^web/.*
