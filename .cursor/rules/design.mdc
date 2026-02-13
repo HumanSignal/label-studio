@@ -27,8 +27,8 @@ This rule provides guidance for creating user interfaces consistent with the Hum
 
 **Key Guidelines**:
 - Use active voice and contractions
-- Title Case for headings, buttons, input labels and navigational items
-- Sentence casing for radio buttons, toggles and checkboxes and all other copy elements
+- Title Case for buttons and navigational items
+- Sentence case for headings, input labels, controls, and all other copy elements
 - Clear, helpful error messages
 - Action verbs for buttons
 - Descriptive link text

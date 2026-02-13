@@ -1,7 +1,5 @@
 # Label Studio Design System
 
-This document provides comprehensive guidance for creating user interfaces that are consistent with the HumanSignal design language. It ensures all UI components follow our brand principles, accessibility standards, and technical implementation patterns.
-
 ## Table of Contents
 
 - [Brand & Design Principles](#brand--design-principles)
@@ -20,22 +18,9 @@ This document provides comprehensive guidance for creating user interfaces that 
 
 ## Brand & Design Principles
 
-### Mission
+**Personality**: Human, optimistic, lighthearted, reliable, adaptable, fine-crafting.
 
-Our mission is to solve human problems and enhance human ability through user-centered design. By making data labeling easier and more efficient, we unlock the potential of AI systems through high-quality training data, accelerate innovation cycles, and empower teams to build more accurate and effective machine learning models.
-
-### Design Principles
-
-At the core of our application's design are principles that guide us in creating a product that is trustworthy, transparent, holistic, and predictive:
-
-- **Solving human problems and enhancing human ability**: We strive to create an application that empowers users to do their work better and more efficiently.
-- **Trustworthiness and transparency**: We aim to be honest, transparent, and accountable in our design decisions.
-- **Learning and predicting human behavior**: We want to create an application that can learn from user behavior and predict what users need next.
-- **Holistic design**: Our application considers the entire user experience and aims to create a consistent and seamless experience across all features and functions.
-
-### Personality
-
-Our personality is **human, optimistic, lighthearted, reliable, adaptable/resilient, and fine-crafting**. We aim for our users to feel at ease and enjoy using our application.
+**Design Principles**: Solve human problems, enhance human ability, trustworthy, transparent, holistic, predictive.
 
 ---
 
@@ -43,19 +28,9 @@ Our personality is **human, optimistic, lighthearted, reliable, adaptable/resili
 
 ### Voice and Tone
 
-**Voice** (brand identity):
 - Conversational, open, clear, and practical
-- Users should feel like they're having a conversation with a friendly and helpful assistant
-
-**Tone** (character):
 - Informal, optimistic, positive, and friendly
 - Users should feel encouraged and motivated
-
-**Examples**:
-- ✅ "Hi there! Let's get started by labeling some images. Are you ready?"
-- ❌ "Please proceed to label some images."
-- ✅ "Great job! Keep up the good work!"
-- ❌ "Your progress is satisfactory."
 
 ### Writing Style
 
@@ -86,108 +61,43 @@ Our personality is **human, optimistic, lighthearted, reliable, adaptable/resili
 
 ### Vocabulary
 
-Key terms used consistently throughout the application:
-
-**General Terms**:
-- **Project**: A collection of tasks and annotations organized around a specific goal
-- **Dataset**: A collection of data items to be labeled or annotated
-- **Task**: A single unit of work requiring annotation or labeling
-- **Annotation**: The information added to a data item through labeling
-- **Label**: A classification or tag applied to a data item
-- **Tag**: A keyword or term assigned to a data item for organization
-
-**Labeling-Specific Terms**:
-- **Bounding Box**: A rectangular annotation outlining an object
-- **Polygon**: A multi-point annotation defining the exact shape of an object
-- **Region**: An annotation defining the precise area of an object or entity
-- **Classification**: Assigning a category or class to an entire data item, discrete portions within it, or specific annotated regions
-- **Metadata**: Additional properties, information, or context assigned to annotations or data items
-- **Confidence**: A measure of certainty in an annotation or prediction
-- **Review**: The process of checking and validating annotations
-- **Consensus**: Agreement between multiple annotators, including models, on the same task
+For domain terminology (Project, Task, Annotation, etc.), see `terminology.mdc` cursor rule.
 
 ---
 
 ## Accessibility Standards
 
-We follow **WCAG 2.1 Level AA** compliance. All components must adhere to the four main principles:
+**WCAG 2.1 Level AA** compliance required.
 
-### 1. Perceivable
+### Critical Requirements
 
-Information and user interface components must be presentable to users in ways they can perceive.
+**Keyboard Navigation**:
+- ✅ All interactive elements must be keyboard accessible
+- ✅ Proper tab order through interface
+- ✅ Visible focus indicators (minimum 3:1 contrast ratio)
+- ✅ Support ESC, Enter, Space, Arrow keys
+- ✅ No focus traps (except modals)
+- ✅ Focus returns to appropriate location after modal/dialog closes
 
-**Requirements**:
-- All images have appropriate alt text
-- Videos include captions
-- Interface can be zoomed up to 200% without loss of content
-- Color is never used as the only means of conveying information
-- Text maintains a minimum contrast ratio of 4.5:1
+**Visual**:
+- Minimum 4.5:1 text contrast ratio
+- Color never used as sole means of conveying information
+- Interface zoomable to 200% without content loss
+- Alt text for all images
 
-### 2. Operable
-
-User interface components and navigation must be operable by all users.
-
-**Requirements**:
-- ✅ **All interactive elements must be keyboard accessible**
-- ✅ **Proper tab order through the interface**
-- ✅ **Visible focus indicators** (minimum 3:1 contrast ratio)
-- ✅ Support standard keyboard shortcuts (ESC, Enter, Space, Arrow keys)
-- ✅ No focus traps (except intentional like modals)
-- No flashing content
-- Consistent navigation throughout the application
-- Skip links provided for screen reader users
-
-### 3. Understandable
-
-Information and the operation of the user interface must be understandable.
-
-**Requirements**:
-- Clear, simple language used throughout
-- Navigation and interactive elements behave consistently
-- Error messages are clear and suggest corrections
-- Labels and instructions provided for all form elements
-
-### 4. Robust
-
-Content must be robust enough to be interpreted by assistive technologies.
-
-**Requirements**:
-- Semantic HTML used throughout
-- ARIA attributes used appropriately when needed
-- Regular testing with screen readers and assistive technologies
-
-### Keyboard Navigation
-
-**Focus Management**:
-- Clear, high-contrast focus indicators on all interactive elements
-- Logical focus order following visual layout
-- Focus returns to appropriate location after modal/dialog closes
-- Skip links for screen reader users
-
-**Implementation**:
-- Tab order follows the visual layout
-- Focus states clearly visible on all interactive elements
-- Custom focus management for complex components (tabs, dropdowns)
-- Focus moves predictably through the interface
-
-### Screen Reader Support
-
-- ARIA live regions for dynamic content updates
+**Structure**:
+- Semantic HTML throughout
+- ARIA attributes when needed
 - Proper heading hierarchy (H1 → H2 → H3)
-- Form labels associated with inputs via `for` attribute or wrapping
+- Form labels associated with inputs
 - Error messages linked to fields via `aria-describedby`
+- ARIA live regions for dynamic content
 
 ---
 
 ## Design Tokens
 
-Design tokens are the foundation of our design system. They ensure consistency, enable dark mode, and make the UI maintainable.
-
-### Token Location
-
-All tokens are defined in: `web/libs/ui/src/tokens/tokens.scss`
-
-### Semantic vs Numeric Tokens
+**Location**: `web/libs/ui/src/tokens/tokens.scss`
 
 **Always use semantic tokens** instead of numeric values:
 
@@ -233,35 +143,11 @@ All tokens are defined in: `web/libs/ui/src/tokens/tokens.scss`
 --color-negative-icon
 ```
 
-**Accent Colors for Neutral Elements**:
-
-For elements like tags, charts, or categories without positive/negative connotation:
-
-| State | Text Color | Background Color |
-|-------|-----------|------------------|
-| **Default** | `-bold` | `-subtlest` |
-| **Hover** | `-bold` | `-subtle` |
-| **Active** | `-subtlest` | `-base` |
-| **Charts** | N/A | `-base` |
-
-Example:
-```scss
-// Tag with blueberry accent
-.tag-default {
-  color: var(--color-accent-blueberry-bold);
-  background: var(--color-accent-blueberry-subtlest);
-}
-
-.tag-hover {
-  color: var(--color-accent-blueberry-bold);
-  background: var(--color-accent-blueberry-subtle);
-}
-
-.tag-active {
-  color: var(--color-accent-blueberry-subtlest);
-  background: var(--color-accent-blueberry-base);
-}
-```
+**Accent Colors** (tags, charts, categories):
+- Default: `-bold` text, `-subtlest` bg
+- Hover: `-bold` text, `-subtle` bg
+- Active: `-subtlest` text, `-base` bg
+- Charts: `-base` bg
 
 ### Spacing Tokens
 
@@ -289,21 +175,8 @@ Example:
 
 ### Dark Mode
 
-Dark mode is automatic when using semantic tokens. The system switches token values based on the `[data-color-scheme="dark"]` attribute.
+Automatic when using semantic tokens. Never use hard-coded colors, numeric tokens (grape-600), or inline color styles.
 
-**Never use**:
-- Hard-coded color values
-- Numeric color tokens (grape-600, sand-100)
-- Inline styles for colors
-
-### Token Regeneration
-
-To update tokens from Figma:
-
-1. Export from Figma using the "Figma Variable Exporter" plugin
-2. Replace contents of `web/design-tokens.json`
-3. Run: `cd web/ && yarn design-tokens`
-4. Run: `make fmt-all` (from project root)
 
 ---
 
@@ -317,57 +190,13 @@ All shared UI components are in the `@humansignal/ui` package:
 
 ### Component Discovery
 
-**Storybook** provides interactive documentation for all components:
+Run Storybook: `yarn nx storybook storybook` (port 4400)
 
-```bash
-# Run Storybook (port 4400)
-yarn nx storybook storybook
-```
+### Key Components
 
-Browse components, see all variants, and view implementation examples.
+`Button`, `Checkbox`, `Toggle`, `Card`, `Drawer`, `EmptyState`, `Modal`, `Badge`, `Tag`, `Message`, `Tooltip`, `Input`, `Select`, `Textarea`, `Radio`, `Tabs`, `Accordion`, `Pagination`, `DataTable`, `Spinner`
 
-### Component Categories
-
-**Buttons & Actions**:
-- `Button` - Primary interactive element
-- `Checkbox` - Selection control
-- `Toggle` - Binary state switch
-
-**Layout & Containers**:
-- `Card` - Content container
-- `Drawer` - Side panel
-- `EmptyState` - Empty state placeholder
-- `CollapsiblePanel` - Expandable section
-- `Callout` - Highlighted information box
-
-**Overlays & Dialogs**:
-- `Modal` - Dialog overlay
-- `Popover` - Floating content
-- `Dropdown` - Menu overlay
-- `Tooltip` - Contextual hint
-
-**Data Display**:
-- `Badge` - Status indicator
-- `BadgeGroup` - Collection of badges
-- `Typography` - Text formatting
-- `DataTable` - Tabular data
-- `Skeleton` - Loading placeholder
-
-**Forms & Inputs**:
-- `Select` - Dropdown selection
-- `Label` - Form label
-- `TagAutocomplete` - Tag input with suggestions
-- `DateRangePicker` - Date selection
-
-**Feedback**:
-- `Message` - Informational box (use this for all informational messages)
-- `Toast` - Temporary notification
-- `Spinner` - Loading indicator
-
-**Navigation**:
-- `Tabs` - Tab navigation
-- `Accordion` - Collapsible sections
-- `Pagination` - Page navigation
+**Critical**: Always use `Message` component for informational boxes. Always use `EmptyState` for empty states.
 
 ### Import Patterns
 
@@ -384,15 +213,7 @@ import { cn } from '@humansignal/core';
 
 ### shadcn/ui Integration
 
-Some components are built on shadcn/ui primitives. **Always import via `@humansignal/ui`**, never directly from `web/libs/ui/src/shad`.
-
-```tsx
-// ✅ Correct
-import { Badge, Tabs } from '@humansignal/ui';
-
-// ❌ Wrong
-import { Badge } from '@humansignal/ui/src/shad/components/ui/badge';
-```
+Some components built on shadcn/ui. Always import via `@humansignal/ui`, never from `/src/shad/`.
 
 ---
 
@@ -400,374 +221,97 @@ import { Badge } from '@humansignal/ui/src/shad/components/ui/badge';
 
 ### Tailwind CSS
 
-See `tailwind.mdc` for complete guidelines. Key points:
+See `tailwind.mdc` for complete guidelines.
 
-**Use Semantic Utilities**:
-```tsx
-// ✅ Correct
-<div className="p-tight bg-primary-surface text-body-medium">
+**Use semantic utilities**: `p-tight`, `bg-primary-surface`, `text-body-medium` (not `p-200`, `bg-grape-600`, `text-16`)
 
-// ❌ Wrong
-<div className="p-200 bg-grape-600 text-16">
-```
-
-**Responsive Design**:
-- Use mobile-first approach
-- Apply responsive utilities: `sm:`, `md:`, `lg:`
-- Test at different viewport widths
-
-```tsx
-<div className="flex flex-col md:flex-row gap-tight md:gap-base">
-```
+**Responsive**: `sm:`, `md:`, `lg:` utilities
 
 ### SCSS Modules
 
-For custom component styles, use SCSS modules co-located with components.
+Co-locate `.module.scss` with components.
 
-**File Structure**:
-```
-button/
-  button.tsx
-  button.module.scss  // ← SCSS module
-  button.stories.tsx
-  button.test.tsx
-```
-
-**Pattern: CSS Custom Properties for Variants**:
-
+**Component Tokens Pattern**:
 ```scss
-// button.module.scss
 .base {
-  // Define component tokens
   --background-color: var(--color-primary-surface);
   --text-color: var(--color-primary-surface-content);
-  --border-color: var(--color-primary-border);
-  
   background-color: var(--background-color);
   color: var(--text-color);
-  border: 1px solid var(--border-color);
-  
-  &:hover {
-    --background-color: var(--color-primary-surface-hover);
-  }
 }
 
-// Variant classes override tokens
 .variant-neutral {
   --background-color: var(--color-neutral-surface);
   --text-color: var(--color-neutral-content);
-  --border-color: var(--color-neutral-border);
-}
-
-.variant-negative {
-  --background-color: var(--color-negative-surface);
-  --text-color: var(--color-negative-surface-content);
-  --border-color: var(--color-negative-border);
 }
 ```
 
-**Using Tailwind in SCSS**:
-```scss
-.container {
-  @apply flex items-center gap-tight;
-  @apply bg-neutral-surface rounded-small;
-}
-```
+**Tailwind in SCSS**: `@apply flex items-center gap-tight;`
 
-**Component-Specific Tokens**:
+**Canvas Elements**:
 
-Always create component tokens that reference semantic tokens:
-
-```scss
-.my-component {
-  // Component tokens → Semantic tokens
-  --component-background: var(--color-neutral-surface);
-  --component-text: var(--color-neutral-content);
-  --component-spacing: var(--spacing-tight);
-  --component-radius: var(--corner-radius-small);
-  
-  background: var(--component-background);
-  color: var(--component-text);
-  padding: var(--component-spacing);
-  border-radius: var(--component-radius);
-}
-```
-
-**Canvas Elements and JavaScript-Based Rendering**:
-
-For canvas elements and JavaScript-based rendering that cannot use CSS variables, use the `getTokenColor` utility to apply semantic token colors. The utility converts semantic token names to actual color values at runtime.
+For canvas/JS rendering that cannot use CSS variables, use `getTokenColor`:
 
 ```tsx
 import { getTokenColor } from '@humansignal/ui';
-
-// Canvas rendering
-const ctx = canvas.getContext('2d');
 ctx.fillStyle = getTokenColor('--color-primary-surface');
-ctx.strokeStyle = getTokenColor('--color-neutral-border');
 ```
 
 ---
 
 ## Component Development
 
-See `react.mdc` for complete React patterns. Key points:
+See `react.mdc` for complete React patterns.
 
 ### File Structure
 
-**For `@humansignal/ui` components** (kebab-case):
-```
-button/
-  button.tsx
-  button.module.scss
-  button.stories.tsx
-  button.test.tsx
-  index.ts
-```
-
-**For application components** (PascalCase acceptable):
-```
-DataManager/
-  DataManager.tsx
-  DataManager.module.scss
-  DataManager.test.tsx
-```
-
-### Component Pattern
-
-```tsx
-// button.tsx
-import { forwardRef } from 'react';
-import styles from './button.module.scss';
-import { cn } from '@humansignal/core';
-
-export interface ButtonProps {
-  variant?: 'primary' | 'neutral' | 'negative';
-  size?: 'small' | 'medium';
-  disabled?: boolean;
-  children: React.ReactNode;
-}
-
-export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ variant = 'primary', size = 'medium', disabled, children, ...props }, ref) => {
-    return (
-      <button
-        ref={ref}
-        disabled={disabled}
-        className={cn(
-          styles.base,
-          styles[`variant-${variant}`],
-          styles[`size-${size}`],
-        )}
-        {...props}
-      >
-        {children}
-      </button>
-    );
-  }
-);
-
-Button.displayName = 'Button';
-```
-
-### Storybook Stories
-
-Every component must have Storybook stories:
-
-```tsx
-// button.stories.tsx
-import type { Meta, StoryObj } from '@storybook/react';
-import { Button } from './button';
-
-const meta: Meta<typeof Button> = {
-  component: Button,
-  title: 'UI/Button',
-  argTypes: {
-    variant: { control: 'select' },
-    size: { control: 'select' },
-    disabled: { control: 'boolean' },
-  },
-};
-
-export default meta;
-type Story = StoryObj<typeof Button>;
-
-export const Primary: Story = {
-  args: {
-    children: 'Primary Button',
-    variant: 'primary',
-  },
-};
-
-export const Disabled: Story = {
-  args: {
-    children: 'Disabled Button',
-    disabled: true,
-  },
-};
-```
+- `@humansignal/ui` components: kebab-case (`button.tsx`, `empty-state.tsx`)
+- Application components: PascalCase acceptable (`DataManager.tsx`)
+- Co-locate: `.tsx`, `.module.scss`, `.stories.tsx`, `.test.tsx`
+- Every component must have Storybook stories
 
 ---
 
 ## Common Patterns
 
-### State Variants
+### Component Variants
 
-- **primary**: Brand/primary actions
-- **neutral**: Secondary actions
-- **positive**: Success states
-- **negative**: Error/destructive actions
-- **warning**: Warning states
-- **gradient**: Special AI/premium features
-
-### Size Variants
-
-- **smaller**: Compact UI (height: 24px)
-- **small**: Dense UI (height: 32px)
-- **medium**: Default (height: 40px)
-- **large**: Prominent (height: 48px+)
-
-### Look Variants
-
-- **filled**: Solid background (default)
-- **outlined**: Border only
-- **string**: Text only (no background/border)
+**State**: `primary`, `neutral`, `positive`, `negative`, `warning`, `gradient`
+**Size**: `smaller` (24px), `small` (32px), `medium` (40px), `large` (48px+)
+**Look**: `filled` (solid), `outlined` (border), `string` (text only)
 
 ### Disabled States
 
-Always use `neutral-content-subtlest` for disabled text:
-
-```tsx
-<button disabled className="text-neutral-content-subtlest">
-  Disabled Button
-</button>
-```
+Use `neutral-content-subtlest` for disabled text: `<button disabled className="text-neutral-content-subtlest">`
 
 ### Loading States
 
-Use the `waiting` prop or `Spinner` component:
-
-```tsx
-<Button waiting={isLoading}>Save Changes</Button>
-```
+Use `waiting` prop: `<Button waiting={isLoading}>Save</Button>`
 
 ### Empty States
 
-Use the `EmptyState` component with icon, title, description, and actions:
-
+Always use `EmptyState` with icon, title, description, actions:
 ```tsx
-<EmptyState
-  variant="neutral"
-  size="large"
-  icon={<IconInbox />}
-  title="No tasks yet"
-  description="Create your first task to get started"
-  actions={<Button>Create Task</Button>}
-/>
+<EmptyState icon={<IconInbox />} title="No tasks yet" description="..." actions={<Button>Create</Button>} />
 ```
 
 ### Modal Patterns
 
-**Footer Actions**:
-- All call-to-action buttons, including navigational buttons, should be placed in the modal's footer
-- Default alignment: right
-- Exception: "Previous" navigation buttons should be aligned to the left
-- This creates clear separation between content and actions
+**Footer Actions**: All CTAs and navigation buttons in footer (default: right-aligned; "Previous" buttons: left-aligned)
 
-**Button Visual Hierarchy**:
-- Follow the general button hierarchy guidelines (see "Button Hierarchy" section)
-- Right-aligned footer (default): `[Cancel] [Save Changes]`
-- Left-aligned with navigation: `[Previous] ... [Next]`
+**Button Visual Hierarchy**: See "Button Hierarchy" section.
 
-**Destructive Actions**:
-- Always require confirmation for destructive actions
-- For high-impact destructive actions (e.g., deleting a project with significant data loss):
-  - Require additional validation beyond simple confirmation
-  - Ask user to type a specific word or the entity name (when names are simple)
-  - Example: "Type DELETE to confirm" or "Type the project name to confirm deletion"
+**Destructive Actions**: Require confirmation. High-impact actions require typing validation ("DELETE" or entity name).
 
-**Modal Stacking**:
-- Avoid displaying modals over modals wherever possible
-- If unavoidable, ensure clear visual hierarchy and proper focus management
-- Consider alternative patterns like multi-step modals or drawer components
-
-**Examples**:
+**Modal Stacking**: Avoid modal-over-modal. Use multi-step modals or drawers instead.
 
 ```tsx
-// ✅ Correct - right-aligned footer with proper hierarchy
-<Modal>
-  <Modal.Header>Edit Project Settings</Modal.Header>
-  <Modal.Body>
-    {/* Form content */}
-  </Modal.Body>
-  <Modal.Footer align="right">
-    <Button variant="neutral" look="outlined">Cancel</Button>
-    <Button variant="primary" look="filled">Save Changes</Button>
-  </Modal.Footer>
-</Modal>
+// Right-aligned footer (default)
+<Modal.Footer align="right">
+  <Button variant="neutral" look="outlined">Cancel</Button>
+  <Button variant="primary" look="filled">Save Changes</Button>
+</Modal.Footer>
 
-// ✅ Correct - navigation with left-aligned Previous
-<Modal>
-  <Modal.Header>Setup Wizard - Step 2 of 3</Modal.Header>
-  <Modal.Body>
-    {/* Step content */}
-  </Modal.Body>
-  <Modal.Footer>
-    <div className="flex justify-between w-full">
-      <Button variant="neutral" look="outlined">Previous</Button>
-      <Button variant="primary" look="filled">Next</Button>
-    </div>
-  </Modal.Footer>
-</Modal>
-
-// ✅ Correct - destructive action with validation
-<Modal>
-  <Modal.Header>Delete Project</Modal.Header>
-  <Modal.Body>
-    <Message variant="negative">
-      This action cannot be undone. All tasks, annotations, and settings will be permanently deleted.
-    </Message>
-    <Input
-      label='Type "DELETE" to confirm'
-      value={confirmText}
-      onChange={setConfirmText}
-      placeholder="DELETE"
-    />
-  </Modal.Body>
-  <Modal.Footer align="right">
-    <Button variant="neutral" look="outlined">Cancel</Button>
-    <Button 
-      variant="negative" 
-      look="filled"
-      disabled={confirmText !== 'DELETE'}
-    >
-      Delete Project
-    </Button>
-  </Modal.Footer>
-</Modal>
-
-// ❌ Wrong - actions in modal body
-<Modal>
-  <Modal.Header>Edit Settings</Modal.Header>
-  <Modal.Body>
-    {/* Form content */}
-    <div className="flex gap-tight">
-      <Button>Cancel</Button>
-      <Button>Save</Button>
-    </div>
-  </Modal.Body>
-</Modal>
-
-// ❌ Wrong - destructive action without validation
-<Modal>
-  <Modal.Header>Delete Project</Modal.Header>
-  <Modal.Body>
-    Are you sure you want to delete this project?
-  </Modal.Body>
-  <Modal.Footer align="right">
-    <Button variant="neutral">Cancel</Button>
-    <Button variant="negative">Delete</Button>
-  </Modal.Footer>
-</Modal>
 ```
 
 ---
@@ -776,308 +320,104 @@ Use the `EmptyState` component with icon, title, description, and actions:
 
 ### Component Selection
 
-**Before creating a new component**:
-1. ✅ Check if a comparable component exists in `@humansignal/ui`
-2. ✅ Browse Storybook to see all available components
-3. ✅ Check if existing components can be composed to achieve your goal
+Before creating new components, check `@humansignal/ui` and Storybook.
 
-**Common Replacements**:
-- ❌ Don't use `<button>` → ✅ Use `<Button>` from `@humansignal/ui`
-- ❌ Don't create custom info boxes → ✅ Use `<Message>` component
-- ❌ Don't create custom tooltips → ✅ Use `<Tooltip>` component
-- ❌ Don't create custom modals → ✅ Use `<Modal>` component
+**Always use existing**:
+- `<Button>` not `<button>`
+- `<Message>` for info boxes
+- `<Tooltip>` for tooltips
+- `<Modal>` for modals
+- `<EmptyState>` for empty states
 
 ### Naming Conventions
 
-- **Components in `@humansignal/ui`**: kebab-case files (`button.tsx`, `empty-state.tsx`)
-- **Components outside `@humansignal/ui`**: PascalCase is acceptable (`DataManager.tsx`)
-- **Props interfaces**: `ComponentNameProps` (`ButtonProps`, `EmptyStateProps`)
+- `@humansignal/ui`: kebab-case (`button.tsx`)
+- Application components: PascalCase ok (`DataManager.tsx`)
+- Props: `ComponentNameProps`
 
 ### Values & Tokens
 
-**Never hard-code values**:
-```tsx
-// ❌ Wrong - hard-coded values
-<div style={{ color: '#4C5FA9', padding: '8px', fontSize: '16px' }}>
+Never hard-code values. Use semantic tokens: `text-primary-content p-tight text-body-medium`
 
-// ✅ Correct - semantic tokens
-<div className="text-primary-content p-tight text-body-medium">
-```
-
-**Create component tokens**:
+Create component tokens:
 ```scss
-.my-component {
-  // Component tokens reference semantic tokens
+.component {
   --component-bg: var(--color-neutral-surface);
-  --component-spacing: var(--spacing-tight);
-  --component-text: var(--color-neutral-content);
+  background: var(--component-bg);
 }
 ```
 
-**Use rem for dimensions**:
-```scss
-// ✅ Preferred
-.container {
-  width: 20rem;
-  max-width: 60rem;
-}
-
-// ⚠️ Acceptable when necessary
-.fixed-size {
-  width: 320px;
-}
-```
+Prefer `rem` for dimensions, `px` acceptable when necessary.
 
 ### Button Hierarchy
 
-**Only ONE primary/filled button per screen**:
+**One primary/filled button per screen** (single CTA).
 
-```tsx
-// ✅ Correct - single primary CTA
-<div>
-  <Button variant="primary" look="filled">Save Changes</Button>
-  <Button variant="neutral" look="outlined">Cancel</Button>
-  <Button variant="neutral" look="outlined">Preview</Button>
-</div>
-
-// ❌ Wrong - multiple primary buttons
-<div>
-  <Button variant="primary" look="filled">Save</Button>
-  <Button variant="primary" look="filled">Publish</Button>
-</div>
-```
-
-This creates clear visual hierarchy and guides user attention to the main action.
-
-**Visual Hierarchy by Alignment**:
-- When buttons are aligned to the right: visual hierarchy flows right to left (primary action rightmost)
-- When buttons are aligned to the left: visual hierarchy flows left to right (primary action leftmost)
-- This applies to all button groups: modals, forms, toolbars, and page-level actions
-- Examples:
-  - Right-aligned: `[Cancel] [Save Changes]` (Save is primary, rightmost)
-  - Left-aligned: `[Save Changes] [Cancel]` (Save is primary, leftmost)
+**Visual hierarchy by alignment**:
+- Right-aligned: right-to-left (primary rightmost): `[Cancel] [Save]`
+- Left-aligned: left-to-right (primary leftmost): `[Next] [Skip]`
 
 ### Responsive Design
 
-**Ensure layouts adapt to smaller screens**:
+Ensure layouts adapt: `flex-col md:flex-row`, `p-tight md:p-base`, `text-title-medium md:text-headline-small`
 
-```tsx
-// ✅ Responsive layout
-<div className="flex flex-col md:flex-row gap-tight">
-  <div className="w-full md:w-1/2">Content</div>
-  <div className="w-full md:w-1/2">Sidebar</div>
-</div>
-
-// ✅ Responsive spacing
-<div className="p-tight md:p-base lg:p-wide">
-
-// ✅ Responsive typography
-<h1 className="text-title-medium md:text-headline-small">
-```
-
-**Test at different viewports**:
-- Mobile: 375px - 767px
-- Tablet: 768px - 1023px
-- Desktop: 1024px+
 
 ### Saving Settings
 
-**Use explicit Save buttons for settings and configuration changes** instead of auto-saving on every interaction.
+Use explicit Save buttons for settings/configuration (not auto-save).
 
-This provides users with:
-- Control over when changes are applied
-- Prevention of unintended changes
-- Clear feedback about unsaved state
-- Ability to review changes before committing
+Exceptions: draft content, preferences, immediate toggles.
 
-```tsx
-// ✅ Correct - explicit save pattern
-<form>
-  <Input label="Project name" value={name} onChange={setName} />
-  <Select label="Default view" value={view} onChange={setView} />
-  
-  <div className="flex gap-tight">
-    <Button variant="primary" look="filled" type="submit">
-      Save Changes
-    </Button>
-    <Button variant="neutral" look="outlined" onClick={handleCancel}>
-      Cancel
-    </Button>
-  </div>
-</form>
 
-// ❌ Wrong - auto-saving on every change
-<form>
-  <Input 
-    label="Project name" 
-    value={name} 
-    onChange={(val) => {
-      setName(val);
-      autoSave(); // Don't do this
-    }} 
-  />
-</form>
-```
-
-**Exceptions**: Auto-save is acceptable for:
-- Draft content (e.g., annotation work in progress)
-- User preferences that don't affect data integrity
-- Toggles with immediate, reversible effects
-
-### Empty States
-
-**Always use the `EmptyState` component** when there is no data to display or when searches return no results.
-
-Empty states should include:
-- Icon that represents the empty context
-- Clear title explaining what's missing
-- Description providing context or guidance
-- Appropriate actions to resolve the empty state
-
-```tsx
-// ✅ Correct - using EmptyState component
-<EmptyState
-  variant="neutral"
-  size="large"
-  icon={<IconInbox />}
-  title="No tasks yet"
-  description="Create your first task to get started with labeling"
-  actions={<Button variant="primary">Create Task</Button>}
-/>
-
-// ✅ Correct - empty search results
-<EmptyState
-  variant="neutral"
-  size="medium"
-  icon={<IconSearch />}
-  title="No results found"
-  description="Try adjusting your search terms or filters"
-  actions={<Button variant="neutral" look="outlined">Clear Filters</Button>}
-/>
-
-// ❌ Wrong - plain text for empty state
-<div>
-  <p>No tasks available</p>
-</div>
-
-// ❌ Wrong - missing guidance
-<EmptyState
-  icon={<IconInbox />}
-  title="No tasks"
-/>
-```
-
-**Use cases**:
-- Empty lists or tables
-- No search results
-- Initial states before data is added
-- Filtered views with no matching items
-- Deleted or cleared content areas
 
 ---
 
 ## Anti-Patterns to Avoid
 
-### Tokens & Styling
-
-- ❌ Using numeric tokens: `p-200`, `text-16`, `bg-grape-600`
-- ❌ Hard-coded values: `color: #4C5FA9`, `padding: 8px`
-- ❌ Inline styles for theming (breaks dark mode)
-- ❌ Non-semantic color values
-- ❌ Default Tailwind classes not in token system
-- ❌ BEM-style class naming
-
-### Components
-
-- ❌ Creating new components when comparable ones exist
-- ❌ Using `<button>` instead of `<Button>` component
-- ❌ Importing from `web/libs/ui/src/shad` directly
-- ❌ Skipping Storybook stories
-- ❌ More than one primary/filled button per screen
-
-### Accessibility
-
-- ❌ Ignoring keyboard navigation
+- ❌ Numeric tokens (`p-200`, `bg-grape-600`)
+- ❌ Hard-coded values (`color: #4C5FA9`)
+- ❌ Inline styles (breaks dark mode)
+- ❌ Creating components when comparable exist
+- ❌ Using `<button>` not `<Button>`
+- ❌ Importing from `/src/shad/` directly
+- ❌ Multiple primary/filled buttons per screen
+- ❌ Missing keyboard navigation
 - ❌ Missing focus indicators
-- ❌ Using color alone to convey information
-- ❌ Insufficient contrast ratios (< 4.5:1)
+- ❌ Color alone for information
+- ❌ Insufficient contrast (< 4.5:1)
 - ❌ Non-semantic HTML
-- ❌ Missing alt text on images
-- ❌ Non-keyboard-accessible interactive elements
-
-### Code Quality
-
-- ❌ Custom CSS when Tailwind utilities exist
-- ❌ Fixed pixel units when rem is more appropriate
 - ❌ Non-responsive layouts
-- ❌ Not following established file structure
-- ❌ Inconsistent naming conventions
 
 ---
 
 ## Quick Reference
 
-### Key Files & Locations
+### Key Files
 
-- **Component library**: `web/libs/ui/src/lib/`
-- **Design tokens**: `web/libs/ui/src/tokens/tokens.scss`
-- **Icons**: `@humansignal/icons` (from `web/libs/ui/src/assets/icons/`)
-- **Storybook**: Run `yarn nx storybook storybook` (port 4400)
-- **Token generation**: `cd web/ && yarn design-tokens`
+- Components: `web/libs/ui/src/lib/`
+- Tokens: `web/libs/ui/src/tokens/tokens.scss`
+- Icons: `@humansignal/icons`
+- Storybook: `yarn nx storybook storybook`
 
 ### Related Documentation
 
-- **React patterns**: See `react.mdc` for component structure, hooks, state management
-- **Tailwind usage**: See `tailwind.mdc` for utility classes and responsive design
-- **TypeScript**: See `typescript.mdc` for type conventions
-- **Testing**: See `frontend-unit-tests.mdc` for testing patterns
-
-### Design Language
-
-Full design language documentation: https://humansignal.notion.site/Design-language-fe3a39ecfa794507b2f7e62cbb5636c8
+- `react.mdc` - Component structure, hooks, state management
+- `tailwind.mdc` - Utility classes, responsive design
+- `typescript.mdc` - Type conventions
+- `frontend-unit-tests.mdc` - Testing patterns
+- `terminology.mdc` - Domain terminology
 
 ### Common Imports
 
 ```tsx
-// UI Components
-import { Button, Badge, Message, EmptyState } from '@humansignal/ui';
-
-// Icons
-import { IconCheck, IconCross, IconInfo } from '@humansignal/icons';
-
-// Utilities
+import { Button, Message, EmptyState } from '@humansignal/ui';
+import { IconCheck } from '@humansignal/icons';
 import { cn } from '@humansignal/core';
 ```
 
 ### Token Examples
 
-```tsx
-// Spacing
-className="p-tight m-base gap-wide"
-
-// Typography
-className="text-body-medium text-label-small"
-
-// Colors
-className="bg-primary-surface text-neutral-content border-neutral-border"
-
-// Disabled text
-className="text-neutral-content-subtlest"
-```
+`p-tight`, `m-base`, `gap-wide`, `text-body-medium`, `bg-primary-surface`, `text-neutral-content`, `text-neutral-content-subtlest` (disabled)
 
 ---
 
-## Summary
-
-This design system ensures:
-
-- ✅ Consistent visual design across all UI components
-- ✅ WCAG 2.1 AA accessibility compliance
-- ✅ Dark mode compatibility by default
-- ✅ Efficient component discovery and reuse
-- ✅ Clear content guidelines and brand voice
-- ✅ Cohesive user experience
-- ✅ Reduced design debt
-- ✅ Faster development with established patterns
-
-When in doubt, check existing components in Storybook, refer to the related cursor rules, and follow the semantic token system.
