@@ -1,4 +1,6 @@
-import { useEffect, useRef, type RefObject } from "react";
+import { useEffect, useRef, useState, type RefObject } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { queryClient } from "../lib/utils/query-client";
 
 interface UserData {
   id: number;
@@ -11,57 +13,20 @@ interface UserData {
   phone?: string;
 }
 
-/**
- * Module-level cache for user fetch results.
- * Maps userId -> full user data object.
- * Shared across all consumers so repeated user IDs
- * only trigger a single API call.
- */
-const userCache = new Map<number, UserData>();
+/** Query key factory for user-detail queries. */
+export const userKeys = {
+  all: ["users"] as const,
+  detail: (id: number) => ["users", id] as const,
+};
 
 /**
- * Module-level map of in-flight fetch promises.
- * Prevents duplicate concurrent requests for the same user ID.
+ * Fetch a single user by ID from the API.
+ * Throws on failure so TanStack Query can handle retries and error state.
  */
-const pendingFetches = new Map<number, Promise<UserData | null>>();
-
-/**
- * Tracks user IDs that have already been resolved (fetched and enriched),
- * so we don't set up observers or fetch again on re-renders.
- */
-const resolvedUserIds = new Set<number>();
-
-/**
- * Fetch a single user by ID from the API, with deduplication.
- * Returns the user data or null on failure.
- */
-async function fetchUserById(userId: number): Promise<UserData | null> {
-  // Return cached result if available
-  if (userCache.has(userId)) {
-    return userCache.get(userId)!;
-  }
-
-  // Deduplicate in-flight requests
-  if (pendingFetches.has(userId)) {
-    return pendingFetches.get(userId)!;
-  }
-
-  const fetchPromise = (async () => {
-    try {
-      const response = await fetch(`/api/users/${userId}`);
-      if (!response.ok) return null;
-      const data: UserData = await response.json();
-      userCache.set(userId, data);
-      return data;
-    } catch {
-      return null;
-    } finally {
-      pendingFetches.delete(userId);
-    }
-  })();
-
-  pendingFetches.set(userId, fetchPromise);
-  return fetchPromise;
+async function fetchUserById(userId: number): Promise<UserData> {
+  const response = await fetch(`/api/users/${userId}`);
+  if (!response.ok) throw new Error(`Failed to fetch user ${userId}`);
+  return response.json();
 }
 
 /**
@@ -74,6 +39,35 @@ export function isUserComplete(user: any): boolean {
   return !!(user.firstName || user.lastName || user.first_name || user.last_name || user.username || user.email);
 }
 
+/**
+ * Tracks whether a DOM element has entered the viewport.
+ * Once the element is observed as intersecting, the hook returns `true`
+ * and disconnects the observer (one-shot).
+ */
+function useInView(elementRef: RefObject<HTMLElement | undefined>): boolean {
+  const [isInView, setIsInView] = useState(false);
+
+  useEffect(() => {
+    const element = elementRef.current;
+    if (!element || isInView) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0]?.isIntersecting) {
+          setIsInView(true);
+          observer.disconnect();
+        }
+      },
+      { threshold: 0 },
+    );
+
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, [elementRef, isInView]);
+
+  return isInView;
+}
+
 interface UseResolveUserOptions {
   /** The user object to check (may be incomplete, with only an `id`). */
   user: any;
@@ -84,90 +78,57 @@ interface UseResolveUserOptions {
 }
 
 /**
- * Hook to lazily resolve incomplete user data.
+ * Hook to lazily resolve incomplete user data using TanStack Query.
  *
  * When a user object only has an ID (no name/email), this hook uses an
  * IntersectionObserver to detect when the target element enters the viewport,
  * then fetches the full user from `/api/users/:id` and invokes `onUserResolved`.
  *
- * Results are cached at the module level so that if multiple components
- * reference the same user, only one API call is made.
+ * Caching and request deduplication are handled by TanStack Query's built-in
+ * cache, so multiple components referencing the same user only trigger one
+ * API call.
  */
 export function useResolveUser({ user, onUserResolved, elementRef }: UseResolveUserOptions) {
-  const observerRef = useRef<IntersectionObserver | null>(null);
   // Keep a stable reference to the callback to avoid re-running the effect
   const onResolvedRef = useRef(onUserResolved);
   onResolvedRef.current = onUserResolved;
 
+  // Track whether we've already notified the consumer for this user ID
+  const hasResolvedRef = useRef(false);
+
+  const isInView = useInView(elementRef);
+  const userId = user?.id;
+  const needsResolving = typeof userId === "number" && !isUserComplete(user);
+
+  // Reset the resolved flag when the user ID changes
   useEffect(() => {
-    const userId = user?.id;
+    hasResolvedRef.current = false;
+  }, [userId]);
 
-    // Nothing to resolve if there's no numeric user ID
-    if (!userId || typeof userId !== "number") return;
+  const { data } = useQuery({
+    queryKey: userKeys.detail(userId!),
+    queryFn: () => fetchUserById(userId!),
+    enabled: needsResolving && isInView && typeof userId === "number",
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    retry: 1,
+  });
 
-    // Skip if already resolved globally
-    if (resolvedUserIds.has(userId)) return;
-
-    // If user already has complete data, mark as resolved
-    if (isUserComplete(user)) {
-      resolvedUserIds.add(userId);
-      return;
-    }
-
-    // Check if the cache already has this user (e.g. fetched by another component)
-    const cached = userCache.get(userId);
-    if (cached) {
+  // Notify the consumer once when user data is resolved
+  useEffect(() => {
+    if (data && !hasResolvedRef.current) {
+      hasResolvedRef.current = true;
       try {
-        onResolvedRef.current(cached);
+        onResolvedRef.current(data);
       } catch {
-        // Consumer callback may fail if store is not ready
+        // Consumer callback may fail if store was destroyed
       }
-      resolvedUserIds.add(userId);
-      return;
     }
-
-    // Set up IntersectionObserver to fetch when element comes into view
-    const element = elementRef.current;
-    if (!element) return;
-
-    observerRef.current = new IntersectionObserver(
-      (entries) => {
-        const entry = entries[0];
-        if (entry?.isIntersecting) {
-          // Stop observing once triggered
-          observerRef.current?.disconnect();
-          observerRef.current = null;
-
-          // Fetch the user data
-          fetchUserById(userId).then((userData) => {
-            if (userData) {
-              try {
-                onResolvedRef.current(userData);
-              } catch {
-                // Consumer callback may fail if store was destroyed
-              }
-            }
-            resolvedUserIds.add(userId);
-          });
-        }
-      },
-      { threshold: 0 },
-    );
-
-    observerRef.current.observe(element);
-
-    return () => {
-      observerRef.current?.disconnect();
-      observerRef.current = null;
-    };
-  }, [user, elementRef]);
+  }, [data]);
 }
 
 /**
  * Clear the user cache. Useful for testing or when switching contexts.
  */
 export function clearUserCache() {
-  userCache.clear();
-  pendingFetches.clear();
-  resolvedUserIds.clear();
+  queryClient.removeQueries(userKeys.all);
 }
