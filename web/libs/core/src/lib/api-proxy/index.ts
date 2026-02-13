@@ -477,7 +477,7 @@ export class APIProxy<T extends {}> {
     settings: Exclude<EndpointConfig, string>,
   ) {
     return new Promise<Response>(async (resolve) => {
-      let response: Record<string, any> | undefined = undefined;
+      let response: Record<string, any> | undefined;
       let ok = true;
 
       try {
