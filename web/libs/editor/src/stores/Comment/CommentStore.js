@@ -25,6 +25,12 @@ export const CommentStore = types
      * It should be removed in case we start to use separate comment stores per annotation.
      */
     commentsKey: null,
+    /**
+     * FIT-720: Track the annotation ID for which a listComments fetch is currently in-flight.
+     * Used to deduplicate concurrent listComments calls (e.g. prefetch on annotation selection
+     * + Comments tab useEffect firing for the same annotation).
+     */
+    _fetchingCommentsForAnnotation: null,
   }))
   .views((self) => ({
     get store() {
@@ -354,10 +360,20 @@ export const CommentStore = types
     }
 
     const listComments = flow(function* ({ mounted = { current: true }, suppressClearComments } = {}) {
-      if (!suppressClearComments) self.setComments([]);
       if (!self.draftId && !self.annotationId) return;
 
+      // FIT-720: Deduplicate concurrent listComments calls for the same annotation.
+      // This prevents double API calls when both the prefetch (on annotation selection)
+      // and the Comments tab useEffect trigger listComments for the same annotation.
+      const fetchKey = self.annotationId ?? self.draftId;
+      if (fetchKey && self._fetchingCommentsForAnnotation === fetchKey) {
+        return;
+      }
+
+      if (!suppressClearComments) self.setComments([]);
+
       try {
+        self._fetchingCommentsForAnnotation = fetchKey;
         if (mounted.current) {
           self.setLoading("list");
         }
@@ -375,6 +391,9 @@ export const CommentStore = types
       } catch (err) {
         console.error(err);
       } finally {
+        if (fetchKey === self._fetchingCommentsForAnnotation) {
+          self._fetchingCommentsForAnnotation = null;
+        }
         if (mounted.current) {
           self.setLoading(null);
         }

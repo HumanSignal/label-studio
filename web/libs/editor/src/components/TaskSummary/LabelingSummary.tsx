@@ -36,15 +36,7 @@ type Props = {
 
 // FIT-720: Observable cell component that reads directly from MST annotation
 const ObservableCell = observer(
-  ({
-    annotation,
-    control,
-    render,
-  }: {
-    annotation: AnnotationSummary;
-    control: ControlTag;
-    render: RendererType;
-  }) => {
+  ({ annotation, control, render }: { annotation: AnnotationSummary; control: ControlTag; render: RendererType }) => {
     // Read directly from MST annotation if available (for MobX reactivity)
     const mstAnnotation = annotation._mstAnnotation;
     const isPrediction = mstAnnotation?.type === "prediction" || annotation.type === "prediction";

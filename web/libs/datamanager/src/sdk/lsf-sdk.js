@@ -1214,6 +1214,12 @@ export class LSFWrapper {
     if (isFF(FF_FIT_720_LAZY_LOAD_ANNOTATIONS)) {
       const currentSelected = this.lsf?.annotationStore?.selected;
       if (currentSelected?.pk) {
+        // Prefetch comments on annotation selection so region comment indicators
+        // are visible immediately, without waiting for the Comments tab to be opened.
+        // Deduplication in CommentStore.listComments prevents redundant API calls
+        // if the Comments tab is already open and triggers its own fetch.
+        this.lsf?.commentStore?.listComments({ suppressClearComments: false });
+
         await this._hydrateStubAnnotation(currentSelected);
       }
     }
