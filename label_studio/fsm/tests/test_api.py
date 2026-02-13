@@ -20,6 +20,7 @@ class FSMEntityHistoryAPITests(APITestCase):
         ProjectState.objects.all().delete()   # Clean everything just in case
 
         cls.task = TaskFactory(project=cls.project)
+        cls.task_no_annotations = TaskFactory(project=cls.project)
         TaskState.objects.all().delete()   # Clean everything just in case
 
         cls.annotation = AnnotationFactory(task=cls.task, completed_by=cls.user)
@@ -137,12 +138,15 @@ class FSMEntityHistoryAPITests(APITestCase):
         assert response.status_code == 404
 
     def test_empty_task_history(self):
+        # Use task with no annotations so FSM sync cannot create a task_completed record
         self.client.force_authenticate(user=self.user)
-        response = self.client.get(f'/api/fsm/entities/task/{self.task.id}/history')
+        response = self.client.get(f'/api/fsm/entities/task/{self.task_no_annotations.id}/history')
         assert response.status_code == 200
         assert response.json()['results'] == []
 
     def test_task_history(self):
+        # Ensure only our 3 state records exist (clear any created by prior tests / FSM sync)
+        TaskState.objects.filter(task=self.task).delete()
         state_1 = TaskStateFactory(task=self.task, state=TaskStateChoices.CREATED)
         state_1.created_at = state_1.created_at - timedelta(seconds=10)
         state_1.save()
