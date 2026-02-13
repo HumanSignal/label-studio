@@ -710,12 +710,12 @@ function resolveColor(value, variables, asCssVariable = true) {
     if (asCssVariable) {
       // Remove 'primitive' from CSS variable references
       if (reference.startsWith("@primitives.$color")) {
-        return `var(--color-${reference.replace("@primitives.$color.", "").replace(/[$\.]/g, "-").substring(1)})`;
+        return `var(--color-${reference.replace("@primitives.$color.", "").replace(/[$.]/g, "-").substring(1)})`;
       }
       return `var(--color-${reference
         .replace("@primitives.", "")
         .replace("$color.", "")
-        .replace(/[$\.]/g, "-")
+        .replace(/[$.]/g, "-")
         .substring(1)})`;
     }
 
@@ -727,9 +727,9 @@ function resolveColor(value, variables, asCssVariable = true) {
       } else {
         // If we can't resolve, return the CSS variable equivalent
         if (reference.startsWith("@primitives.$color")) {
-          return `var(--color-${reference.replace("@primitives.$color.", "").replace(/[$\.]/g, "-").substring(1)})`;
+          return `var(--color-${reference.replace("@primitives.$color.", "").replace(/[$.]/g, "-").substring(1)})`;
         }
-        return `var(--color-${reference.replace(/[@$\.]/g, "-").substring(1)})`;
+        return `var(--color-${reference.replace(/[@$.]/g, "-").substring(1)})`;
       }
     }
 

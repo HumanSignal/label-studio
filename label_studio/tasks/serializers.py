@@ -1,6 +1,7 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license."""
 
 import logging
+from collections.abc import MutableMapping
 
 import ujson as json
 from core.current_request import CurrentContext, get_current_request
@@ -30,6 +31,14 @@ from users.models import User
 from users.serializers import UserSerializer
 
 logger = logging.getLogger(__name__)
+
+
+def sanitize_prediction_import_payload(prediction):
+    """Drop only FSM `state` from prediction import payloads."""
+    if not isinstance(prediction, MutableMapping):
+        return prediction
+    prediction.pop('state', None)
+    return prediction
 
 
 class PredictionQuerySerializer(serializers.Serializer):
@@ -515,6 +524,7 @@ class BaseTaskSerializerBulk(serializers.ListSerializer):
                 # Validate prediction only when project label config is not default
                 if should_validate:
                     try:
+                        prediction = sanitize_prediction_import_payload(prediction)
                         li = LabelInterface(self.project.label_config) if should_validate else None
                         validation_errors_list = li.validate_prediction(prediction, return_errors=True)
 

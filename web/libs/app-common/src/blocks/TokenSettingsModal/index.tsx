@@ -6,13 +6,7 @@ import { useAtomValue } from "jotai";
 import { queryClientAtom } from "jotai-tanstack-query";
 import { type ChangeEvent, useState } from "react";
 
-export const TokenSettingsModal = ({
-  showTTL,
-  onSaved,
-}: {
-  showTTL?: boolean;
-  onSaved?: () => void;
-}) => {
+export const TokenSettingsModal = ({ showTTL, onSaved }: { showTTL?: boolean; onSaved?: () => void }) => {
   const settings = useAtomValue(settingsAtom);
   if (!settings.isSuccess || settings.isError || "error" in settings.data) {
     return <div>Error loading settings.</div>;

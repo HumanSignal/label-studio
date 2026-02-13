@@ -33,6 +33,7 @@ from rest_framework.settings import api_settings
 from rest_framework.views import APIView
 from tasks.functions import update_tasks_counters
 from tasks.models import Prediction, Task
+from tasks.serializers import sanitize_prediction_import_payload
 from users.models import User
 from webhooks.models import WebhookAction
 from webhooks.utils import emit_webhooks_for_instance
@@ -537,6 +538,7 @@ class ImportPredictionsAPI(generics.CreateAPIView):
             # Build predictions for this batch
             batch_predictions = []
             for item in batch_items:
+                item = sanitize_prediction_import_payload(item)
                 task_id = item.get('task')
 
                 if task_id not in existing_task_ids:
@@ -586,6 +588,7 @@ class ImportPredictionsAPI(generics.CreateAPIView):
         predictions = []
 
         for i, item in enumerate(self.request.data):
+            item = sanitize_prediction_import_payload(item)
             # Validate task ID
             if item.get('task') not in tasks_ids:
                 if flag_set('fflag_feat_utc_210_prediction_validation_15082025', user='auto'):
