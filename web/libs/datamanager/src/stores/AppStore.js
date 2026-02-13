@@ -187,7 +187,7 @@ export const AppStore = types
       self.toolbar = toolbarString;
     },
 
-    setTask: flow(function* ({ taskID, annotationID, pushState }) {
+    setTask: flow(function* ({ taskID, annotationID, pushState, interface: interfaceOption }) {
       if (pushState !== false) {
         History.navigate({
           task: taskID,
@@ -261,6 +261,14 @@ export const AppStore = types
             currentAnn?.regionStore?.setRegionVisible(regionIDFromUrl);
             // Select the region so outliner details are visible
             currentAnn?.regionStore?.selectRegionByID(regionIDFromUrl);
+          }
+
+          // Enable viewingAll mode if interface option is "annotations:view-all"
+          if (interfaceOption === "annotations:view-all" && annotationStore) {
+            if (!annotationStore.viewingAll) {
+              annotationStore.toggleViewingAllAnnotations();
+            }
+            // Don't set the tab - let it use whatever was last selected
           }
         } else {
           console.error("LSF not initialized properly");
@@ -343,6 +351,7 @@ export const AppStore = types
         if (item?.id && !item.isSelected) {
           const labelingParams = {
             pushState: options?.pushState,
+            interface: options?.interface,
           };
 
           if (isDefined(item.task_id)) {
