@@ -1,4 +1,4 @@
-import { toStudlyCaps } from "@humansignal/core";
+import { pascalCase } from "@humansignal/core";
 
 export { Agreement } from "./Agreement/Agreement";
 export { AgreementSelected } from "./AgreementSelected";
@@ -21,7 +21,7 @@ export { ProjectCell as Project } from "./ProjectCell";
 export { TaskState } from "./TaskState";
 
 export function normalizeCellAlias(alias) {
-  // remove trailing separators to make `toStudlyCaps` safe
+  // remove trailing separators to make `pascalCase` safe
   const safeAlias = alias.replace(/[-_\s]+$/g, "");
 
   // Treat dimension agreement columns like the built-in agreement column
@@ -30,5 +30,5 @@ export function normalizeCellAlias(alias) {
     return "Agreement";
   }
 
-  return toStudlyCaps(safeAlias);
+  return pascalCase(safeAlias);
 }

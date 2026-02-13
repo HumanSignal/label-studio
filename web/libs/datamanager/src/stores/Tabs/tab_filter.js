@@ -3,7 +3,7 @@ import * as CellViews from "../../components/CellViews";
 import { normalizeCellAlias } from "../../components/CellViews";
 import * as Filters from "../../components/Filters/types";
 import { allowedFilterOperations } from "../../components/Filters/types/Utility";
-import { debounce } from "../../utils/debounce";
+import { debounce } from "@humansignal/core/lib/utils/debounce";
 import { isBlank, isDefined } from "../../utils/utils";
 import { FilterValueRange, FilterValueType, TabFilterType } from "./tab_filter_type";
 

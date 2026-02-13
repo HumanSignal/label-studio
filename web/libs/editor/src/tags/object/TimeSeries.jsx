@@ -2,7 +2,7 @@ import React from "react";
 import * as d3 from "d3";
 import { inject, observer } from "mobx-react";
 import { getEnv, getRoot, getType, types, isAlive } from "mobx-state-tree";
-import throttle from "lodash/throttle";
+import { throttle } from "@humansignal/core/lib/utils/lodash-replacements";
 import { Spin } from "antd";
 
 import ObjectBase from "./Base";

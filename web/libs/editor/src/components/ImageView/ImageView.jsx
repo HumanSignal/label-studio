@@ -17,7 +17,7 @@ import { ImageViewProvider } from "./ImageViewContext";
 import { Hotkey } from "../../core/Hotkey";
 import { useObserver } from "mobx-react";
 import ResizeObserver from "../../utils/resize-observer";
-import { debounce } from "../../utils/debounce";
+import { debounce } from "@humansignal/core/lib/utils/debounce";
 import Constants from "../../core/Constants";
 import { fixRectToFit, mapKonvaBrightness } from "../../utils/image";
 import { FF_DEV_1442, FF_DEV_3077, FF_LSDV_4583_6, FF_LSDV_4930, FF_ZOOM_OPTIM, isFF } from "../../utils/feature-flags";

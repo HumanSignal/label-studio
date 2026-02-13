@@ -42,7 +42,7 @@
 import { inject, observer } from "mobx-react";
 import { destroy } from "mobx-state-tree";
 import { unmountComponentAtNode } from "react-dom";
-import camelCase from "lodash/camelCase";
+import { camelCase } from "@humansignal/core/lib/utils/string";
 import { instruments } from "../components/DataManager/Toolbar/instruments";
 import { APIProxy } from "../utils/api-proxy";
 import { objectToMap } from "../utils/helpers";
