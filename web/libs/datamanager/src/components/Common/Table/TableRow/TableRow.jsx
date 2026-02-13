@@ -68,8 +68,9 @@ export const TableRow = observer(
         style={wrapperStyle}
         onClick={(e) => onClick?.(data, e)}
         onContextMenu={(e) => onContextMenu?.(e, data)}
+        data-testid="table-row-wrapper"
       >
-        <div className={tableRowCN.toString()} style={style} data-leave={true}>
+        <div className={tableRowCN.toString()} style={style} data-leave={true} data-testid="table-row">
           {columns.map((col) => {
             return <CellRenderer key={col.id} col={col} data={data} cellViews={cellViews} decoration={decoration} />;
           })}
