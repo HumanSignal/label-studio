@@ -2,6 +2,7 @@ from datetime import timedelta
 from unittest.mock import patch
 from urllib.parse import quote
 
+from core.current_request import CurrentContext
 from fsm.state_choices import AnnotationStateChoices, ProjectStateChoices, TaskStateChoices
 from fsm.state_manager import get_state_manager
 from fsm.state_models import AnnotationState, ProjectState, TaskState
@@ -23,6 +24,13 @@ class FSMEntityHistoryAPITests(APITestCase):
 
         cls.annotation = AnnotationFactory(task=cls.task, completed_by=cls.user)
         AnnotationState.objects.all().delete()   # Clean everything just in case
+
+    def setUp(self):
+        CurrentContext.set_user(self.user)
+
+    def tearDown(self):
+        CurrentContext.clear()
+        super().tearDown()
 
     def test_invalid_entity_name(self):
         self.client.force_authenticate(user=self.user)
@@ -267,10 +275,14 @@ class FSMEntityTransitionAPITests(APITestCase):
 
     def setUp(self):
         self.client.force_authenticate(user=self.user)
+        CurrentContext.set_user(self.user)
         self.StateManager = get_state_manager()
 
-    @patch('fsm.state_manager.flag_set', return_value=True)
-    def test_success_task_manual_transition(self, _mock_flag):
+    def tearDown(self):
+        CurrentContext.clear()
+        super().tearDown()
+
+    def test_success_task_manual_transition(self):
         response = self.client.post(
             f'/api/fsm/entities/task/{self.task.id}/transition/',
             data={'transition_name': 'task_completed', 'transition_data': {'reason': 'test complete'}},
@@ -282,12 +294,12 @@ class FSMEntityTransitionAPITests(APITestCase):
         assert data['new_state'] == TaskStateChoices.COMPLETED
         assert data['state_record']['triggered_by']['id'] == self.user.id
 
-        # Ensure a state record exists
+        # Ensure a state record exists (re-set context; request_finished clears it)
+        CurrentContext.set_user(self.user)
         current_state = self.StateManager.get_current_state_value(self.task)
         assert current_state == TaskStateChoices.COMPLETED
 
-    @patch('fsm.state_manager.flag_set', return_value=True)
-    def test_success_project_manual_transition(self, _mock_flag):
+    def test_success_project_manual_transition(self):
         response = self.client.post(
             f'/api/fsm/entities/project/{self.project.id}/transition/',
             data={'transition_name': 'project_in_progress'},
@@ -299,8 +311,7 @@ class FSMEntityTransitionAPITests(APITestCase):
         assert data['new_state'] == ProjectStateChoices.IN_PROGRESS
         assert data['state_record']['triggered_by']['id'] == self.user.id
 
-    @patch('fsm.state_manager.flag_set', return_value=True)
-    def test_request_body_validation_missing_transition_name(self, _mock_flag):
+    def test_request_body_validation_missing_transition_name(self):
         response = self.client.post(
             f'/api/fsm/entities/task/{self.task.id}/transition/',
             data={},
@@ -312,8 +323,7 @@ class FSMEntityTransitionAPITests(APITestCase):
         assert 'validation_errors' in body
         assert 'transition_name' in body['validation_errors']
 
-    @patch('fsm.state_manager.flag_set', return_value=True)
-    def test_returns_detailed_error_messages_on_failed_transition(self, _mock_flag):
+    def test_returns_detailed_error_messages_on_failed_transition(self):
         # Use an unknown transition to trigger a detailed validation error response
         response = self.client.post(
             f'/api/fsm/entities/task/{self.task.id}/transition/',
@@ -324,8 +334,7 @@ class FSMEntityTransitionAPITests(APITestCase):
         body = response.json()
         assert 'detail' in body
 
-    @patch('fsm.state_manager.flag_set', return_value=True)
-    def test_cannot_trigger_auto_triggered_transitions_manually(self, _mock_flag):
+    def test_cannot_trigger_auto_triggered_transitions_manually(self):
         # 'annotation_created' is auto-triggered on create
         response = self.client.post(
             f'/api/fsm/entities/annotation/{self.annotation.id}/transition/',
@@ -338,8 +347,7 @@ class FSMEntityTransitionAPITests(APITestCase):
         assert 'validation_errors' in body
         assert 'transition_name' in body['validation_errors']
 
-    @patch('fsm.state_manager.flag_set', return_value=True)
-    def test_audit_trail_captures_triggered_by(self, _mock_flag):
+    def test_audit_trail_captures_triggered_by(self):
         response = self.client.post(
             f'/api/fsm/entities/project/{self.project.id}/transition/',
             data={'transition_name': 'project_in_progress'},
@@ -349,8 +357,7 @@ class FSMEntityTransitionAPITests(APITestCase):
         body = response.json()
         assert body['state_record']['triggered_by']['id'] == self.user.id
 
-    @patch('fsm.state_manager.flag_set', return_value=True)
-    def test_unknown_transition_returns_400(self, _mock_flag):
+    def test_unknown_transition_returns_400(self):
         response = self.client.post(
             f'/api/fsm/entities/task/{self.task.id}/transition/',
             data={'transition_name': 'does_not_exist', 'transition_data': {}},
@@ -364,8 +371,8 @@ class FSMEntityTransitionAPITests(APITestCase):
 class LsoFSMEntityTransitionAPITests(FSMEntityTransitionAPITests, APITestCase):
     """Tests for LSO only that should not be inherited in LSE"""
 
-    @patch('fsm.state_manager.flag_set', return_value=False)
-    def test_feature_flag_respected_no_state_record_created(self, _mock_flag):
+    @patch('fsm.state_manager.CurrentContext.is_fsm_enabled', return_value=False)
+    def test_feature_flag_respected_no_state_record_created(self, _mock_is_fsm_enabled):
         """LSE State manager infers missing states, LSO does not"""
         # Execute a manual transition with FSM disabled
         response = self.client.post(
