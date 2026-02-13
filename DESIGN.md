@@ -190,13 +190,11 @@ All shared UI components are in the `@humansignal/ui` package:
 
 ### Component Discovery
 
-Run Storybook: `yarn nx storybook storybook` (port 4400)
+Browse available components in `@humansignal/ui`:
+- **Source**: `web/libs/ui/src/lib/`
+- **Storybook**: Run `yarn nx storybook storybook` (port 4400)
 
-### Key Components
-
-`Button`, `Checkbox`, `Toggle`, `Card`, `Drawer`, `EmptyState`, `Modal`, `Badge`, `Tag`, `Message`, `Tooltip`, `Input`, `Select`, `Textarea`, `Radio`, `Tabs`, `Accordion`, `Pagination`, `DataTable`, `Spinner`
-
-**Critical**: Always use `Message` component for informational boxes. Always use `EmptyState` for empty states.
+**Critical**: Always check `@humansignal/ui` before creating new components. Use `Message` for informational boxes, `EmptyState` for empty states, `Button` instead of `<button>`.
 
 ### Import Patterns
 
