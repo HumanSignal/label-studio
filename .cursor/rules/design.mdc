@@ -244,6 +244,11 @@ export const Primary: Story = {
 
 ⚠️ **Only ONE primary/filled button per screen** (main CTA)
 
+**Visual hierarchy**:
+- Right-aligned buttons: right-to-left (primary → secondary)
+- Left-aligned buttons: left-to-right (primary → secondary)
+- Applies to all button groups (modals, forms, toolbars)
+
 ```tsx
 // ✅ Correct
 <Button variant="primary" look="filled">Save</Button>
@@ -277,7 +282,7 @@ export const Primary: Story = {
 **Modal Patterns**:
 - CTAs and navigation buttons in modal footer (default: right-aligned)
 - "Previous" navigation buttons: left-aligned
-- Button hierarchy: right-aligned = right-to-left, left-aligned = left-to-right
+- Button hierarchy: see Button Hierarchy section (right-aligned = right-to-left, left-aligned = left-to-right)
 - Destructive actions: require confirmation
 - High-impact destructive actions: require typing validation (DELETE, entity name)
 - Avoid modal-over-modal stacking

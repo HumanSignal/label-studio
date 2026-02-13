@@ -674,10 +674,9 @@ Use the `EmptyState` component with icon, title, description, and actions:
 - This creates clear separation between content and actions
 
 **Button Visual Hierarchy**:
-- When buttons are aligned to the right: visual hierarchy flows right to left (primary action rightmost)
-- When buttons are aligned to the left: visual hierarchy flows left to right (primary action leftmost)
-- Example (right-aligned): [Cancel] [Save Changes]
-- Example (left-aligned with navigation): [Previous] ... [Next]
+- Follow the general button hierarchy guidelines (see "Button Hierarchy" section)
+- Right-aligned footer (default): `[Cancel] [Save Changes]`
+- Left-aligned with navigation: `[Previous] ... [Next]`
 
 **Destructive Actions**:
 - Always require confirmation for destructive actions
@@ -849,6 +848,14 @@ Use the `EmptyState` component with icon, title, description, and actions:
 ```
 
 This creates clear visual hierarchy and guides user attention to the main action.
+
+**Visual Hierarchy by Alignment**:
+- When buttons are aligned to the right: visual hierarchy flows right to left (primary action rightmost)
+- When buttons are aligned to the left: visual hierarchy flows left to right (primary action leftmost)
+- This applies to all button groups: modals, forms, toolbars, and page-level actions
+- Examples:
+  - Right-aligned: `[Cancel] [Save Changes]` (Save is primary, rightmost)
+  - Left-aligned: `[Save Changes] [Cancel]` (Save is primary, leftmost)
 
 ### Responsive Design
 
