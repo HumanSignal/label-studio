@@ -16,7 +16,7 @@ Do NOT import or use lodash in this codebase. Utilities are provided by **es-too
 ## Import paths (subpath imports)
 
 - **debounce:** `import { debounce } from "@humansignal/core/lib/utils/debounce"`
-- **String utils** (camelCase, snakeCase, kebabCase, capitalize, startCase): `import { camelCase, snakeCase, kebabCase, capitalize, startCase } from "@humansignal/core/lib/utils/string"`
+- **String utils** (camelCase, snakeCase, kebabCase, capitalize, startCase, pascalCase): `import { camelCase, snakeCase, kebabCase, capitalize, startCase, pascalCase } from "@humansignal/core/lib/utils/string"`
 - **Other utilities** (throttle, clamp, get, isMatch, uniqBy): `import { throttle, clamp, get, isMatch, uniqBy } from "@humansignal/core/lib/utils/lodash-replacements"`
 
 ## Quick reference
@@ -25,7 +25,7 @@ Do NOT import or use lodash in this codebase. Utilities are provided by **es-too
 |------|-------------|
 | debounce | `@humansignal/core/lib/utils/debounce` |
 | throttle, clamp, get, isMatch, uniqBy | `@humansignal/core/lib/utils/lodash-replacements` |
-| camelCase, snakeCase, kebabCase, capitalize, startCase | `@humansignal/core/lib/utils/string` |
+| camelCase, snakeCase, kebabCase, capitalize, startCase, pascalCase | `@humansignal/core/lib/utils/string` |
 | cloneDeep(obj) | `structuredClone(obj)` (native) |
 
 ## Adding new utilities
