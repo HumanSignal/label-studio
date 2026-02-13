@@ -27,7 +27,7 @@ class TaxonomyHelper {
 
   constructor(rootSelector, isNew = false) {
     if (isNew) this.selectors = this._new_selectors;
-    this.selectors.root = rootSelector.replace(/^\&/, this._baseRootSelector);
+    this.selectors.root = rootSelector.replace(/^&/, this._baseRootSelector);
     this.isNew = isNew;
   }
 

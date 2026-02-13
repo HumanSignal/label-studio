@@ -46,7 +46,11 @@ export const AggregationCell = ({
   control,
   annotations,
   isExpanded,
-}: { control: ControlTag; annotations: AnnotationSummary[]; isExpanded: boolean }) => {
+}: {
+  control: ControlTag;
+  annotations: AnnotationSummary[];
+  isExpanded: boolean;
+}) => {
   const allResults = annotations.flatMap((ann) => ann.results.filter((r) => r.from_name === control.name));
   // Exclude predictions for percentage denominator to match backend TaskAgreementAPI
   const totalAnnotations = annotations.filter((a) => a.type === "annotation").length;

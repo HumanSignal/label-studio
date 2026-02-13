@@ -82,12 +82,7 @@ export const Tour: React.FC<TourProps> = ({ name, autoStart = false, delay = 0, 
    * - Dynamic step content based on application state
    */
   const handleTourCallback = useCallback(
-    (data: {
-      action: string;
-      index: number;
-      type: string;
-      status: string;
-    }) => {
+    (data: { action: string; index: number; type: string; status: string }) => {
       const { action, index, type, status } = data;
 
       // tour ends when

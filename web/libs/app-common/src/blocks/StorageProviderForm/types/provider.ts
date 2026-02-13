@@ -107,7 +107,7 @@ export function extractDefaultValues(fields: (FieldDefinition | MessageDefinitio
     if (field.type === "message") return;
 
     // Check if the field has a default value
-    if (Object.prototype.hasOwnProperty.call(field, "defaultValue") && field.defaultValue !== undefined) {
+    if (Object.hasOwn(field, "defaultValue") && field.defaultValue !== undefined) {
       const customDefault = typeof field.defaultValue === "function" ? field.defaultValue() : field.defaultValue;
       defaultValues[field.name] = customDefault;
       return;
@@ -117,7 +117,7 @@ export function extractDefaultValues(fields: (FieldDefinition | MessageDefinitio
     try {
       // Try to get the default value from the schema by accessing the internal structure
       const schemaAny = field.schema as any;
-      let defaultValue = undefined;
+      let defaultValue;
 
       // Check different possible locations for default values in Zod schemas
       if (schemaAny._def?.defaultValue !== undefined) {

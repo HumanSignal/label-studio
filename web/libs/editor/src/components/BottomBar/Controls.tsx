@@ -201,13 +201,7 @@ export const Controls = controlsInjector<{ annotation: MSTAnnotation }>(
 
       const useExitOption = !isDisabled && isNotQuickView;
 
-      const SubmitOption = ({
-        isUpdate,
-        onClickMethod,
-      }: {
-        isUpdate: boolean;
-        onClickMethod: () => any;
-      }) => {
+      const SubmitOption = ({ isUpdate, onClickMethod }: { isUpdate: boolean; onClickMethod: () => any }) => {
         return (
           <div className="p-tighter rounded">
             <Button

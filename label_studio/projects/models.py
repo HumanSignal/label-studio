@@ -6,6 +6,7 @@ from typing import Any, Mapping, Optional
 
 from annoying.fields import AutoOneToOneField
 from core.current_request import CurrentContext
+from core.feature_flags import flag_set
 from core.label_config import (
     check_control_in_config_by_regex,
     check_toname_in_config_by_regex,
@@ -576,17 +577,24 @@ class Project(ProjectMixin, FsmHistoryStateModel):
                 all_project_tasks.filter(id__in=ids), overlap=max_annotations, is_labeled=True
             )
             # order other tasks by count(annotations)
-            tasks_with_min_annotations = (
-                tasks_with_min_annotations.annotate(anno=Count('annotations')).order_by('-anno').distinct()
-            )
+            tasks_with_min_annotations = tasks_with_min_annotations.annotate(annotation_count=Count('annotations'))
+            if flag_set('fflag_feat_utc_563_randomize_overlap_cohort', user='auto'):
+                # Randomize within tie groups so cohort selection isn't deterministic.
+                # If there are many tasks with the same annotation count, their order is random.
+                tasks_with_min_annotations = tasks_with_min_annotations.order_by('-annotation_count', '?')
+            else:
+                tasks_with_min_annotations = tasks_with_min_annotations.order_by('-annotation_count').distinct()
+
+            # Materialize the full ID list once to ensure consistent ordering across slices, instead of slicing twice with random ordering.
+            all_min_ids = list(tasks_with_min_annotations.values_list('id', flat=True))
+            cohort_ids = all_min_ids[:left_must_tasks]
+            remaining_ids = all_min_ids[left_must_tasks:]
+
             # assign overlap depending on annotation count
             # assign max_annotations and update is_labeled
-            ids = list(tasks_with_min_annotations[:left_must_tasks].values_list('id', flat=True))
-            self._batch_update_with_retry(all_project_tasks.filter(id__in=ids), overlap=max_annotations)
+            self._batch_update_with_retry(all_project_tasks.filter(id__in=cohort_ids), overlap=max_annotations)
             # assign 1 to left
-            ids = list(tasks_with_min_annotations[left_must_tasks:].values_list('id', flat=True))
-            min_tasks_to_update = all_project_tasks.filter(id__in=ids)
-            self._batch_update_with_retry(min_tasks_to_update, overlap=1)
+            self._batch_update_with_retry(all_project_tasks.filter(id__in=remaining_ids), overlap=1)
         else:
             ids = list(tasks_with_max_annotations.values_list('id', flat=True))
             self._batch_update_with_retry(all_project_tasks.filter(id__in=ids), overlap=max_annotations)

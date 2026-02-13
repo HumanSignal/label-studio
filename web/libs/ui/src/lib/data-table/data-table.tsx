@@ -719,7 +719,7 @@ export const Header = <T,>({
   help,
 }: HeaderProps<T>) => {
   // Get header label - use originalHeader if provided, otherwise try to extract from columnDef
-  let headerLabel: string | React.ReactNode = undefined;
+  let headerLabel: string | React.ReactNode;
   if (originalHeader !== undefined) {
     headerLabel = originalHeader;
   } else {

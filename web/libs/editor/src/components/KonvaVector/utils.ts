@@ -100,7 +100,7 @@ export const isBezierPoint = (point: PointInput): point is BezierPoint => {
  * @throws Error if point format is invalid
  */
 export const normalizePoints = (points: PointInput[]): BezierPoint[] => {
-  let lastPointId: string | undefined = undefined;
+  let lastPointId: string | undefined;
 
   return points.map((point, index) => {
     if (isSimplePoint(point)) {

@@ -8,7 +8,14 @@ export const BitmaskDrawing = {
     y,
     brushSize = 10,
     eraserMode = false,
-  }: { ctx: CanvasRenderingContext2D; x: number; y: number; brushSize: number; color: string; eraserMode: boolean }): {
+  }: {
+    ctx: CanvasRenderingContext2D;
+    x: number;
+    y: number;
+    brushSize: number;
+    color: string;
+    eraserMode: boolean;
+  }): {
     x: number;
     y: number;
   } {
