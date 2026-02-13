@@ -8,6 +8,5 @@ export {
   fetchAnnotation,
   invalidateAnnotationCache,
   invalidateDistributionCache,
-  setEditorQueryClient,
   type AnnotationData,
 } from "./useAnnotationQuery";

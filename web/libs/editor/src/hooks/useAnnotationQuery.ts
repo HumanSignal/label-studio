@@ -2,9 +2,17 @@
  * FIT-720: Shared annotation fetching hook using TanStack Query
  *
  * Provides caching, deduplication, and invalidation for annotation fetches.
+ * Cache invalidation utilities (invalidateAnnotationCache, invalidateDistributionCache)
+ * live in @humansignal/core/lib/utils/annotation-cache and are re-exported from this module.
  */
 import { useQueryClient, useQuery } from "@tanstack/react-query";
 import { useCallback } from "react";
+import { annotationKeys } from "@humansignal/core/lib/utils/annotation-cache";
+
+// Re-export annotationKeys so existing consumers don't break
+export { annotationKeys };
+// Re-export cache invalidation functions from core
+export { invalidateAnnotationCache, invalidateDistributionCache } from "@humansignal/core/lib/utils/annotation-cache";
 
 // Type for annotation API response
 export type AnnotationData = {
@@ -15,12 +23,6 @@ export type AnnotationData = {
   completed_by?: any;
   ground_truth?: boolean;
   [key: string]: any;
-};
-
-// Query key factory for consistent key generation
-export const annotationKeys = {
-  all: ["annotations"] as const,
-  detail: (id: number | string) => ["annotations", id] as const,
 };
 
 /**
@@ -171,50 +173,3 @@ export const useAnnotationFetcher = () => {
  * Use this in non-component code (like MST actions)
  */
 export { useQueryClient };
-
-/**
- * FIT-720: Global reference to the editor's QueryClient
- * Set by the App component on mount, used for invalidation from non-React code
- */
-let editorQueryClientRef: ReturnType<typeof useQueryClient> | null = null;
-
-/**
- * Set the global query client reference (called by App component)
- */
-export const setEditorQueryClient = (client: ReturnType<typeof useQueryClient>) => {
-  editorQueryClientRef = client;
-};
-
-/**
- * Invalidate annotation cache from anywhere (even outside React)
- * Call this after an annotation is updated/submitted
- */
-export const invalidateAnnotationCache = (annotationId?: number | string) => {
-  if (!editorQueryClientRef) {
-    return;
-  }
-
-  if (annotationId) {
-    editorQueryClientRef.invalidateQueries({ queryKey: annotationKeys.detail(annotationId) });
-  } else {
-    // Invalidate all annotations
-    editorQueryClientRef.invalidateQueries({ queryKey: annotationKeys.all });
-  }
-};
-
-/**
- * Invalidate distribution cache for a task
- * Call this after annotations are added/removed/updated for a task
- */
-export const invalidateDistributionCache = (taskId?: number | string) => {
-  if (!editorQueryClientRef) {
-    return;
-  }
-
-  if (taskId) {
-    editorQueryClientRef.invalidateQueries({ queryKey: ["task-distribution", taskId] });
-  } else {
-    // Invalidate all distributions
-    editorQueryClientRef.invalidateQueries({ queryKey: ["task-distribution"] });
-  }
-};

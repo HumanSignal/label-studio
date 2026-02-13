@@ -16,20 +16,7 @@ import { CommentsSdk } from "./comments-sdk";
 import { annotationToServer, taskToLSFormat } from "./lsf-utils";
 import { when } from "mobx";
 import { imageCache } from "@humansignal/core";
-
-// FIT-720: Import cache invalidation functions
-let invalidateAnnotationCache = null;
-let invalidateDistributionCache = null;
-
-// Dynamically import from editor to avoid circular dependency
-// This is safe because the functions will be available when the app is fully loaded
-try {
-  const editorHooks = require("@humansignal/editor/src/hooks/useAnnotationQuery");
-  invalidateAnnotationCache = editorHooks.invalidateAnnotationCache;
-  invalidateDistributionCache = editorHooks.invalidateDistributionCache;
-} catch {
-  // Editor hooks not available, invalidation will be skipped
-}
+import { invalidateAnnotationCache, invalidateDistributionCache } from "@humansignal/core/lib/utils/annotation-cache";
 
 const DEFAULT_INTERFACES = [
   "basic",
@@ -856,10 +843,10 @@ export class LSFWrapper {
     if (status < 400) {
       // Invalidate specific annotation if ID is in result
       if (result?.id) {
-        invalidateAnnotationCache?.(result.id);
+        invalidateAnnotationCache(result.id);
       }
       // Invalidate distribution for the task
-      invalidateDistributionCache?.(this.task?.id);
+      invalidateDistributionCache(this.task?.id);
     }
 
     if (exitStream) return this.exitStream();
@@ -897,8 +884,8 @@ export class LSFWrapper {
 
     // FIT-720: Invalidate annotation cache after successful update
     if (status < 400 && annotation.pk) {
-      invalidateAnnotationCache?.(annotation.pk);
-      invalidateDistributionCache?.(task.id);
+      invalidateAnnotationCache(annotation.pk);
+      invalidateDistributionCache(task.id);
     }
 
     if (exitStream) return this.exitStream();

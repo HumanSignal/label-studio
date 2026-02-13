@@ -35,7 +35,6 @@ import { guidGenerator } from "../../utils/unique";
 import { isDefined, sortAnnotations } from "../../utils/utilities";
 import { queryClient } from "@humansignal/core/lib/utils/query-client";
 import { ToastProvider, ToastViewport } from "@humansignal/ui/lib/toast/toast";
-import { setEditorQueryClient } from "../../hooks/useAnnotationQuery";
 
 /**
  * Components
@@ -78,8 +77,6 @@ class App extends Component {
   relationsRef = React.createRef();
 
   componentDidMount() {
-    setEditorQueryClient(queryClient);
-
     // Hack to activate app hotkeys
     window.blur();
     document.body.focus();
