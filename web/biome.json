@@ -1,15 +1,17 @@
 {
   "$schema": "https://biomejs.dev/schemas/2.0.6/schema.json",
+  "assist": { "actions": { "source": { "organizeImports": "off" } } },
   "files": {
-    "maxSize": 3670016,
-    "ignore": [
-      "node_modules",
-      "dist",
-      "tsconfig*",
-      "libs/editor/examples/**/*.json",
-      "libs/editor/src/examples/**/annotations/1.json",
-      "apps/labelstudio-e2e"
-    ]
+    "includes": [
+      "**",
+      "!**/node_modules/**",
+      "!**/dist/**",
+      "!**/tsconfig*",
+      "!**/libs/editor/examples/**/*.json",
+      "!**/libs/editor/src/examples/**/annotations/1.json",
+      "!**/apps/labelstudio-e2e/**"
+    ],
+    "maxSize": 3670016
   },
   "vcs": {
     "enabled": true,
@@ -38,6 +40,8 @@
         "noAutofocus": "off",
         "useKeyWithClickEvents": "off",
         "noLabelWithoutControl": "off",
+        "noStaticElementInteractions": "off",
+        "useAriaPropsSupportedByRole": "off",
         "useAriaPropsForRole": "off",
         "useSemanticElements": "off"
       },
