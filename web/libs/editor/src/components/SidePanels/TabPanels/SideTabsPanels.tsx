@@ -198,7 +198,7 @@ const SideTabsPanelsComponent: FC<SidePanelsProps> = ({
       const panelLeftHit = left <= targetLeftWidth;
       const topHit = top <= snapThreshold;
       const bottomHit = bottom >= parentHeight - snapThreshold;
-      let snap: DropSide | undefined = undefined;
+      let snap: DropSide | undefined;
 
       if (!collapsedSideRef.current?.[Side.left] && panelLeftHit) {
         if (left <= snapThreshold) snap = DropSide.left;

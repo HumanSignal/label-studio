@@ -4,7 +4,11 @@ export const SkeletonLine = ({
   lineCount = 1,
   width = "60%",
   height = "16px",
-}: { lineCount?: number; width?: string; height?: string }) => {
+}: {
+  lineCount?: number;
+  width?: string;
+  height?: string;
+}) => {
   const rows = [];
 
   for (let i = 0; i < lineCount; i++) {

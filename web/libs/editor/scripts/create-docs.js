@@ -131,7 +131,7 @@ function processTemplate(t) {
       })(),
     )
     // force adding new lines before footnote definitions
-    .replace(/(?<![\r\n])([\r\n])(\[\^[^\[]+\]:)/gm, "$1$1$2");
+    .replace(/(?<![\r\n])([\r\n])(\[\^[^[]+\]:)/gm, "$1$1$2");
 
   return str;
 }

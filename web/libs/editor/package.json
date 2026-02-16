@@ -17,7 +17,6 @@
     "insert-after": "^0.1.4",
     "keymaster": "^1.6.2",
     "konva": "^8.1.3",
-    "lodash": "4.17.23",
     "mobx": "^5.15.4",
     "mobx-react": "^6",
     "mobx-react-lite": "2.2.2",

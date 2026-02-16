@@ -179,7 +179,7 @@ function getHints(cm: any, options: CMHintOptions) {
       const atName = before.match(/([^\s\u00a0=<>"']+)=$/);
       const atValues = atName?.[1] ? attrs[atName[1]]?.type : undefined;
 
-      if (!atName || !Object.prototype.hasOwnProperty.call(attrs, atName[1])) return;
+      if (!atName || !Object.hasOwn(attrs, atName[1])) return;
       if (!atValues || !Array.isArray(atValues)) return;
       if (token.type === "string") {
         prefix = token.string;

@@ -1,4 +1,4 @@
-import { debounce } from "../../utils/debounce";
+import { debounce } from "@humansignal/core/lib/utils/debounce";
 import { wrapArray } from "../../utils/utilities";
 import { Geometry } from "./Geometry";
 import { RelationShape } from "./RelationShape";

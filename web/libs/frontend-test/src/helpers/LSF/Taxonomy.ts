@@ -50,7 +50,7 @@ class TaxonomyHelper {
   constructor(rootSelector: string, isLegacy = false) {
     this.isLegacy = isLegacy;
     this.selectors = isLegacy ? { ...this._legacySelectors } : { ...this._newSelectors };
-    this.selectors.root = rootSelector.replace(/^\&/, this._baseRootSelector);
+    this.selectors.root = rootSelector.replace(/^&/, this._baseRootSelector);
   }
 
   get root() {

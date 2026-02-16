@@ -1,4 +1,4 @@
-import camelCase from "lodash/camelCase";
+import { camelCase } from "@humansignal/core/lib/utils/string";
 
 export const formDataToJPO = (formData: FormData) => {
   if (formData instanceof FormData) {
@@ -110,10 +110,10 @@ export const hasProperties = (obj: AnyObject, properties: string[], all?: boolea
 
   return all
     ? properties.reduce((res, prop) => {
-        return res && Object.prototype.hasOwnProperty.call(obj, prop);
+        return res && Object.hasOwn(obj, prop);
       }, true)
     : properties.findIndex((prop) => {
-        return Object.prototype.hasOwnProperty.call(obj, prop);
+        return Object.hasOwn(obj, prop);
       }) >= 0;
 };
 

@@ -1,5 +1,5 @@
 import { useHotkeys } from "react-hotkeys-hook";
-import { toStudlyCaps } from "@humansignal/core";
+import { pascalCase } from "@humansignal/core";
 import { keymap } from "./keymap";
 
 export type Hotkey = {
@@ -16,7 +16,7 @@ const readableShortcut = (shortcut: string | null | undefined) => {
 
   return shortcut
     .split("+")
-    .map((str) => toStudlyCaps(str))
+    .map((str) => pascalCase(str))
     .join(" + ");
 };
 

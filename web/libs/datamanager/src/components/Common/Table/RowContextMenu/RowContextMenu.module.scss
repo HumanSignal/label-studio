@@ -1,0 +1,15 @@
+.contextMenu {
+  position: fixed;
+  z-index: 10000;
+  min-width: 200px;
+  max-width: 300px;
+  
+  // Ensure menu doesn't get clipped
+  &[data-adjust-left] {
+    transform: translateX(-100%);
+  }
+  
+  &[data-adjust-top] {
+    transform: translateY(-100%);
+  }
+}

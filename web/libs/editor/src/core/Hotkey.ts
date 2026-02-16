@@ -406,7 +406,7 @@ export const Hotkey = (namespace = "global", description = "Hotkeys") => {
         if (prefix) comb = `${prefix}+${combs[i]}`;
         else comb = combs[i];
 
-        if (!{}.hasOwnProperty.call(_hotkeys_map, comb)) return comb;
+        if (!Object.hasOwn(_hotkeys_map, comb)) return comb;
       }
 
       return null;
