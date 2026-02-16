@@ -185,7 +185,7 @@ jobs:
           images: ${{ env.IMAGE_NAME }}
 
       - name: Build and Push Release Ubuntu Docker image (${{ matrix.platform }})
-        uses: docker/build-push-action@v6.18.0
+        uses: docker/build-push-action@v6.19.2
         id: docker_build
         with:
           context: ${{ steps.release_dockerfile.outputs.release_dir }}
