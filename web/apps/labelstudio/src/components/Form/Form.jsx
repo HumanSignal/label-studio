@@ -3,7 +3,7 @@ import { shallowEqualObjects } from "shallow-equal";
 import { ApiProvider } from "../../providers/ApiProvider";
 import { MultiProvider } from "../../providers/MultiProvider";
 import { cn } from "../../utils/bem";
-import { debounce } from "../../utils/debounce";
+import { debounce } from "@humansignal/core/lib/utils/debounce";
 import { isDefined, objectClean } from "../../utils/helpers";
 import { Button } from "@humansignal/ui";
 import { Oneof } from "../Oneof/Oneof";

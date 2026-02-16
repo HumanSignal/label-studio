@@ -6,6 +6,8 @@ export * from "./lib/utils/analytics";
 export * from "./lib/utils/urlJSON";
 export * from "./lib/utils/helpers";
 export * from "./lib/utils/string";
+export * from "./lib/utils/debounce";
+export * from "./lib/utils/lodash-replacements";
 export * from "./lib/utils/bem";
 export * from "./lib/utils/visitedProjects";
 export * from "./lib/utils/billing";

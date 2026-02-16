@@ -544,6 +544,9 @@ class Project(ProjectMixin, FsmHistoryStateModel):
 
         if tasks_number_changed:
             # FSM: Recalculate project state after task deletion or import
+            # Set user from project when missing (e.g. when called from async worker)
+            if CurrentContext.get_user() is None and self.created_by_id:
+                CurrentContext.set_user(self.created_by)
             if CurrentContext.is_fsm_enabled():
                 user = CurrentContext.get_user()
                 update_project_state_after_task_change(self, user=user)

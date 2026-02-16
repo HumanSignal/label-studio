@@ -1,4 +1,4 @@
-import camelCase from "lodash/camelCase";
+import { camelCase } from "@humansignal/core/lib/utils/string";
 
 export const formDataToJPO = (formData: FormData) => {
   if (formData instanceof FormData) {
