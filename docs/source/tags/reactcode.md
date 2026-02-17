@@ -21,9 +21,9 @@ Importantly, this allows you to continue leveraging Label Studio's annotation ma
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
 | name | string | — | Unique identifier for the tag (required) |
-| [toName] | string | — | If this is a [self-referencing tags ](#Self-referencing-tag), this parameter is required and should match `name` |
+| [toName] | string | — | If this is a [self-referencing tag](#Self-referencing-tag), this parameter is required and should match `name` |
 | [data] | string | — | The [task data](#Data-parameter), e.g., `data="$image"` or `data="$text"` |
-| [src] | string | — | URL to an external JavaScript file containing the React component code. Use this as an [alternative to inline code](#Using-the-src-attribute) |
+| [src] | string | — | URL to an external JavaScript file containing the React component code. Use this as an alternative to inline code. [See more below](#Using-the-src-attribute) |
 | [inputs] | string | — | Defines the JSON schema for the input data (`data`)  |
 | [outputs] | string | — | Defines the JSON schema for the [output](#Using-the-outputs-parameter)  |
 | [style] | string | — | Inline styles or CSS string for the iframe container  |
