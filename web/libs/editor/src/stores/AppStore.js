@@ -2,7 +2,7 @@
 
 import { destroy, detach, flow, getEnv, getParent, getSnapshot, isRoot, types, walk } from "mobx-state-tree";
 
-import uniqBy from "lodash/uniqBy";
+import { uniqBy } from "@humansignal/core/lib/utils/lodash-replacements";
 import InfoModal from "../components/Infomodal/Infomodal";
 import { Hotkey } from "../core/Hotkey";
 import { destroy as destroySharedStore } from "../mixins/SharedChoiceStore/mixin";

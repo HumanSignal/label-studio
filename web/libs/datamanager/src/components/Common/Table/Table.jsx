@@ -1,16 +1,18 @@
 import { observer } from "mobx-react";
-import { createContext, forwardRef, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { createContext, forwardRef, memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { useSDK } from "../../../providers/SDKProvider";
 import { isDefined } from "../../../utils/utils";
 import { Icon } from "../Icon/Icon";
 import { modal } from "../Modal/Modal";
-import { IconCode, IconChevronDown } from "@humansignal/icons";
+import { IconBraces, IconChevronDown } from "@humansignal/icons";
 import { AutoSizerTable, Button } from "@humansignal/ui";
 import "./Table.scss";
 import { TableCheckboxCell } from "./TableCheckbox";
 import { tableCN, TableContext } from "./TableContext";
 import { TableHead } from "./TableHead/TableHead";
 import { TableRow } from "./TableRow/TableRow";
+import { RowContextMenu } from "./RowContextMenu";
 import { prepareColumns } from "./utils";
 import { cn } from "../../../utils/bem";
 import { FieldsButton } from "../FieldsButton";
@@ -50,6 +52,9 @@ export const Table = observer(
     headerExtra,
     onDensityChange,
     onRangeSelect,
+    onViewAnalytics,
+    onViewReviewerAnalytics,
+    RowContextMenuComponent,
     ...props
   }) => {
     const colOrderKey = "dm:columnorder";
@@ -63,6 +68,11 @@ export const Table = observer(
     const [toolbarVisible, setToolbarVisible] = useState(true);
     // Track last clicked row ID for shift-click range selection
     const lastClickedId = useRef(null);
+
+    // Global context menu state
+    const [contextMenu, setContextMenu] = useState(null);
+    // Maintain hover appearance on row while its context menu is open for better visual feedback
+    const contextMenuRowId = contextMenu?.row?.id ?? null;
 
     // Reset virtualizer cache when rowHeight changes
     useEffect(() => {
@@ -193,7 +203,7 @@ export const Table = observer(
                 ),
               });
             }}
-            leading={<Icon icon={IconCode} />}
+            leading={<Icon icon={IconBraces} />}
             tooltip="Show task source"
           />
         );
@@ -209,10 +219,64 @@ export const Table = observer(
       localStorage.setItem(colOrderKey, JSON.stringify(colOrder));
     }, [colOrder]);
 
+    // Store columns in a ref to avoid recreating handleContextMenu
+    const columnsRef = useRef(columns);
+    columnsRef.current = columns;
+
+    // Handle context menu - defined after columns are initialized
+    const handleContextMenu = useCallback((e, row) => {
+      e.preventDefault();
+      e.stopPropagation();
+
+      // Find which column was clicked (actual class: lsf-table__cell)
+      const cell = e.target.closest(".lsf-table__cell");
+      const cellIndex = cell ? Array.from(cell.parentElement.children).indexOf(cell) : -1;
+      const column = cellIndex >= 0 ? columnsRef.current[cellIndex] : null;
+
+      setContextMenu({
+        x: e.clientX,
+        y: e.clientY,
+        row,
+        column,
+      });
+    }, []); // Empty deps - stable callback
+
+    // Close context menu on click outside or escape
+    useEffect(() => {
+      if (!contextMenu) return;
+
+      const handleClose = (e) => {
+        // Don't close if clicking inside the menu
+        if (e.target.closest("[data-context-menu]")) return;
+        setContextMenu(null);
+      };
+
+      const handleEscape = (e) => {
+        if (e.key === "Escape") {
+          setContextMenu(null);
+        }
+      };
+
+      // Use capture phase and add slight delay to prevent immediate closing
+      const timerId = setTimeout(() => {
+        document.addEventListener("click", handleClose, true);
+        document.addEventListener("contextmenu", handleClose, true);
+        document.addEventListener("keydown", handleEscape);
+      }, 0);
+
+      return () => {
+        clearTimeout(timerId);
+        document.removeEventListener("click", handleClose, true);
+        document.removeEventListener("contextmenu", handleClose, true);
+        document.removeEventListener("keydown", handleEscape);
+      };
+    }, [contextMenu]);
+
     const contextValue = {
       columns,
       data,
       cellViews,
+      contextMenuRowId,
     };
 
     const headerHeight = 43;
@@ -287,6 +351,7 @@ export const Table = observer(
                 width: props.fitContent ? "fit-content" : "auto",
               }}
               decoration={Decoration}
+              onContextMenu={handleContextMenu}
             />
           );
         }
@@ -307,6 +372,7 @@ export const Table = observer(
               width: props.fitContent ? "fit-content" : "auto",
             }}
             decoration={Decoration}
+            onContextMenu={handleContextMenu}
           />
         );
       },
@@ -321,6 +387,8 @@ export const Table = observer(
         view.selected.list,
         view.selected.all,
         isQuickView,
+        Decoration,
+        handleContextMenu,
       ],
     );
 
@@ -381,33 +449,48 @@ export const Table = observer(
     );
 
     return (
-      <div ref={tableWrapper} className={tableCN.mod({ fit: props.fitToContent }).toString()}>
-        {isQuickView && renderTableToolbar()}
-        <TableContext.Provider value={contextValue}>
-          <StickyList
-            ref={listRef}
-            overscanCount={10}
-            itemHeight={props.rowHeight}
-            totalCount={props.total}
-            itemCount={data.length + 1}
-            itemKey={itemKey}
-            innerElementType={innerElementType}
-            stickyItems={[0]}
-            stickyItemsHeight={[headerHeight]}
-            stickyComponent={renderTableHeader}
-            initialScrollOffset={initialScrollOffset}
-            isItemLoaded={isItemLoaded}
-            loadMore={props.loadMore}
-            toolbarHeight={toolbarHeight}
-            headerHeight={headerHeight}
-            isQuickView={isQuickView}
-            onScroll={handleScroll}
-            toolbarVisible={toolbarVisible}
-          >
-            {renderRow}
-          </StickyList>
-        </TableContext.Provider>
-      </div>
+      <>
+        <div ref={tableWrapper} className={tableCN.mod({ fit: props.fitToContent }).toString()}>
+          {isQuickView && renderTableToolbar()}
+          <TableContext.Provider value={contextValue}>
+            <StickyList
+              ref={listRef}
+              overscanCount={10}
+              itemHeight={props.rowHeight}
+              totalCount={props.total}
+              itemCount={data.length + 1}
+              itemKey={itemKey}
+              innerElementType={innerElementType}
+              stickyItems={[0]}
+              stickyItemsHeight={[headerHeight]}
+              stickyComponent={renderTableHeader}
+              initialScrollOffset={initialScrollOffset}
+              isItemLoaded={isItemLoaded}
+              loadMore={props.loadMore}
+              toolbarHeight={toolbarHeight}
+              headerHeight={headerHeight}
+              isQuickView={isQuickView}
+              onScroll={handleScroll}
+              toolbarVisible={toolbarVisible}
+            >
+              {renderRow}
+            </StickyList>
+          </TableContext.Provider>
+        </div>
+        {contextMenu &&
+          typeof document !== "undefined" &&
+          createPortal(
+            <ContextMenuPortal
+              contextMenu={contextMenu}
+              view={view}
+              onViewAnalytics={onViewAnalytics}
+              onViewReviewerAnalytics={onViewReviewerAnalytics}
+              RowContextMenuComponent={RowContextMenuComponent}
+              onClose={() => setContextMenu(null)}
+            />,
+            document.body,
+          )}
+      </>
     );
   },
 );
@@ -552,3 +635,22 @@ const innerElementType = forwardRef(({ children, ...rest }, ref) => {
     </StickyListContext.Consumer>
   );
 });
+
+// Context menu portal component - positioning now handled by Dropdown component
+const ContextMenuPortal = memo(
+  ({ contextMenu, view, onViewAnalytics, onViewReviewerAnalytics, onClose, RowContextMenuComponent }) => {
+    const MenuComponent = RowContextMenuComponent || RowContextMenu;
+
+    return (
+      <MenuComponent
+        row={contextMenu.row}
+        column={contextMenu.column}
+        view={view}
+        onViewAnalytics={onViewAnalytics}
+        onViewReviewerAnalytics={onViewReviewerAnalytics}
+        cursorPosition={{ x: contextMenu.x, y: contextMenu.y }}
+        onClose={onClose}
+      />
+    );
+  },
+);

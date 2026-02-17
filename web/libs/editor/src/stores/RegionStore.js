@@ -3,7 +3,7 @@ import { destroy, detach, getEnv, getParent, onPatch, types } from "mobx-state-t
 import { Hotkey } from "../core/Hotkey";
 import { isDefined } from "../utils/utilities";
 import { AllRegionsType } from "../regions";
-import { debounce } from "../utils/debounce";
+import { debounce } from "@humansignal/core/lib/utils/debounce";
 import Tree, { TRAVERSE_STOP } from "../core/Tree";
 import { FF_DEV_2755, isFF } from "../utils/feature-flags";
 

@@ -1,6 +1,6 @@
 import { flow, getEnv, getParent, getRoot, getSnapshot, types } from "mobx-state-tree";
 import { when } from "mobx";
-import uniqBy from "lodash/uniqBy";
+import { uniqBy } from "@humansignal/core/lib/utils/lodash-replacements";
 import Utils from "../../utils";
 import { snakeizeKeys } from "../../utils/utilities";
 import { parseCommentClassificationConfig } from "../../utils/commentClassification";

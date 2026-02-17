@@ -42,6 +42,7 @@ export { ReactComponent as IconBoundingBox } from "./bounding-box.svg";
 export { ReactComponent as IconBrightnessTool } from "./brightness-tool.svg";
 export { ReactComponent as IconBrushTool } from "./brush-tool.svg";
 export { ReactComponent as IconBrushToolSmart } from "./brush-tool-smart.svg";
+export { ReactComponent as IconBraces } from "./braces.svg";
 export { ReactComponent as IconBubbleSpike } from "./bubble-spike.svg";
 export { ReactComponent as IconBubbleSpikeAlt } from "./bubble-spike-alt.svg";
 export { ReactComponent as IconBulb } from "./bulb.svg";
@@ -277,6 +278,7 @@ export { ReactComponent as IconUploadOutline } from "./cloud-upload-outline.svg"
 export { ReactComponent as IconUserEdit } from "./user-edit.svg";
 export { ReactComponent as IconCloudCustom } from "./cloud-custom.svg";
 export { ReactComponent as IconUserAdd } from "./user-add.svg";
+export { ReactComponent as IconUserStats } from "./user-stats.svg";
 export { ReactComponent as IconVertexAI } from "./vertexai.svg";
 export { ReactComponent as IconViewAll } from "./view-all.svg";
 export { ReactComponent as IconVisa } from "./visa.svg";

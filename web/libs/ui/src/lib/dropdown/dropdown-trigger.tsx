@@ -38,6 +38,10 @@ interface DropdownTriggerProps extends DropdownProps {
   isChildValid?: (element: HTMLElement) => boolean;
   /** Children elements (trigger element) */
   children?: React.ReactNode;
+  /** Trigger mode: 'click' (default) or 'contextmenu' */
+  triggerMode?: "click" | "contextmenu";
+  /** For contextmenu mode: position at cursor instead of trigger */
+  positionAtCursor?: boolean;
 }
 
 export const DropdownTrigger = forwardRef<DropdownRef, DropdownTriggerProps>(
@@ -51,6 +55,8 @@ export const DropdownTrigger = forwardRef<DropdownRef, DropdownTriggerProps>(
       disabled = false,
       isChildValid = () => false,
       dropdown,
+      triggerMode = "click",
+      positionAtCursor = false,
       ...props
     },
     ref,
@@ -59,6 +65,7 @@ export const DropdownTrigger = forwardRef<DropdownRef, DropdownTriggerProps>(
     const triggerEL = Children.only(children);
     const childset = useRef(new Set<DropdownContextValue>());
     const [isOpen, setIsOpen] = useState(false);
+    const [cursorPosition, setCursorPosition] = useState<{ x: number; y: number } | null>(null);
 
     // Assign a unique z-index for this dropdown
     const minIndex = useMemo(() => 1000 + zIndexCounter++, []);
@@ -124,17 +131,50 @@ export const DropdownTrigger = forwardRef<DropdownRef, DropdownTriggerProps>(
       [dropdownRef, disabled, toggle],
     );
 
+    const handleContextMenu = useCallback(
+      (e: any) => {
+        if (disabled) return;
+        e.preventDefault();
+        e.stopPropagation();
+
+        // Close dropdown if it's already open (for re-opening at new position)
+        if (dropdownRef.current?.visible) {
+          dropdownRef.current.close();
+        }
+
+        // Store cursor position if positionAtCursor is enabled
+        if (positionAtCursor) {
+          setCursorPosition({ x: e.clientX, y: e.clientY });
+        }
+
+        if (toggle === false) {
+          return dropdownRef?.current?.open();
+        }
+
+        dropdownRef?.current?.toggle();
+      },
+      [disabled, toggle, dropdownRef, positionAtCursor],
+    );
+
     const cloneProps = useMemo(() => {
-      return {
+      const baseProps = {
         ...(triggerEL as any).props,
         tag,
         key: "dd-trigger",
         ref: (el: HTMLElement) => {
           triggerRef.current = triggerRef.current ?? el;
         },
-        onClickCapture: handleToggle,
       };
-    }, [triggerEL, triggerRef, handleToggle, tag]);
+
+      // Add appropriate event handler based on trigger mode
+      if (triggerMode === "contextmenu") {
+        baseProps.onContextMenu = handleContextMenu;
+      } else {
+        baseProps.onClickCapture = handleToggle;
+      }
+
+      return baseProps;
+    }, [triggerEL, triggerRef, handleToggle, handleContextMenu, triggerMode, tag]);
 
     const triggerClone = useMemo(() => {
       return cloneElement(triggerEL as any, cloneProps);
@@ -162,16 +202,37 @@ export const DropdownTrigger = forwardRef<DropdownRef, DropdownTriggerProps>(
 
       document.addEventListener("click", handleClick, { capture: true });
 
+      // For context menu mode, also close on contextmenu events outside this dropdown
+      if (triggerMode === "contextmenu") {
+        const handleContextMenuOutside = (e: MouseEvent) => {
+          if (!dropdownRef.current?.visible) return;
+
+          const target = e.target as HTMLElement;
+          // Don't close if the context menu is on our own trigger
+          if (triggerRef.current?.contains?.(target)) return;
+
+          dropdownRef.current?.close?.();
+        };
+
+        document.addEventListener("contextmenu", handleContextMenuOutside, { capture: true });
+
+        return () => {
+          document.removeEventListener("click", handleClick, { capture: true });
+          document.removeEventListener("contextmenu", handleContextMenuOutside, { capture: true });
+        };
+      }
+
       return () => {
         document.removeEventListener("click", handleClick, { capture: true });
       };
-    }, [handleClick, isOpen, content]);
+    }, [handleClick, isOpen, content, triggerMode, dropdownRef, triggerRef]);
 
     const contextValue = useMemo((): DropdownContextValue => {
       return {
         minIndex,
         triggerRef,
         dropdown: dropdownRef,
+        cursorPosition: positionAtCursor ? cursorPosition : null,
         hasTarget: (target: HTMLElement) => {
           // Inline the function to avoid dependency issues
           const triggerClicked = triggerRef.current?.contains?.(target);
@@ -193,7 +254,7 @@ export const DropdownTrigger = forwardRef<DropdownRef, DropdownTriggerProps>(
         open: () => dropdownRef?.current?.open?.(),
         close: () => dropdownRef?.current?.close?.(),
       };
-    }, [triggerRef, dropdownRef, minIndex, isChildValid]);
+    }, [triggerRef, dropdownRef, minIndex, isChildValid, positionAtCursor, cursorPosition]);
 
     useEffect(() => {
       if (!parentDropdown) return;

@@ -137,6 +137,8 @@ When setting a reservation time, you should aim to allow a little above the max 
     
     Two annotators begin working on a task and it takes them both 15 minutes to complete, but your reservation time is 10 minutes. This means that after 10 minutes, another annotator can also begin working on that task - resulting in 3 annotations on the task rather than 2 (your minimum annotator overlap).
 
+    You can help avoid this by selecting **Enforce strict overlap** under [**Quality > Overlap of Annotations**](#overlap).
+
 </dd>
 
 <dt id="annotating-options">Annotation Options</dt>
@@ -600,7 +602,23 @@ If you want half of the tasks to be annotated by at least 3 people:
 
 If your overlap enforcement is less than 100% (meaning that only some tasks require multiple annotators), then the tasks that *do* require multiple annotations are shown first. <br /><br />If your overlap is 100%, then this setting has no effect.
 
-Note that if enabled, this setting supersedes what you specified under [**Annotations > Task Ordering Method**](#task-ordering)
+Note that if enabled, this setting supersedes what you specified under [**Annotations > Task Ordering Method**](#task-ordering).
+
+</td>
+</tr>
+<tr>
+<td>
+
+**Enforce strict overlap limit** 
+</td>
+<td>
+
+This setting strictly enforces your **Annotations per task** limit.<br /><br />If you do not enable this setting, you may see tasks where the number of annotations exceed your **Annotations per task** limit. This typically happens when you set a low [task reservation time](#lock-tasks), meaning that task locks expire before annotators submit their tasks. This allows other annotators to access and then submit the task, potentially resulting in an excess of annotations.<br /><br />
+
+When enabled, if an annotator tries to submit a task after the limit has been reached, they will receive an error message stating **Annotation Overlap Reached**. Their draft will be saved but they will be unable to submit. <br /><br />
+
+Note that enforcement only applies when the user submitting the annotation is in the Annotator role. All other roles are exempt. 
+
 
 </td>
 </tr>
@@ -699,9 +717,11 @@ Set this counter to zero if you want to skip onboarding and only use continuous 
 </td>
 <td>
 
-Annotators are presented with tasks in the order that is configured under [**Task Ordering Method**](#task-ordering). 
+Annotators are presented with ground truth tasks in the order that is configured under [**Task Ordering Method**](#task-ordering). 
 
-To have all ground truths presented as part of continuous evaluation, set the **Onboarding evaluation** counter to zero. You can also use a combination of both, so that annotators see a subset of ground truths immediately, and then are presented the remaining ground truths periodically as they progress through the project (depending on your task ordering method). 
+To have all ground truths presented as part of continuous evaluation, set the **Onboarding evaluation** counter to zero and set this number equal to the number of ground truth tasks in your project. 
+
+You can also use a combination of both, so that annotators see a subset of ground truths immediately, and then are presented the remaining ground truths periodically as they progress through the project (depending on your task ordering method). 
 
 </td>
 </tr>
