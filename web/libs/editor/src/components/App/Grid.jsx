@@ -3,7 +3,7 @@
  * Added virtualization support for large annotation counts
  */
 
-import React, { Component, useCallback, useMemo, useRef, useState } from "react";
+import React, { Component, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Spin } from "antd";
 import { Button, Tooltip } from "@humansignal/ui";
 import { LeftCircleOutlined, RightCircleOutlined } from "@ant-design/icons";
@@ -17,9 +17,11 @@ import Konva from "konva";
 import { Annotation } from "./Annotation";
 import { isDefined } from "../../utils/utilities";
 import { FF_DEV_3391, isFF } from "../../utils/feature-flags";
-import { isActive, FF_FIT_720_LAZY_LOAD_ANNOTATIONS } from "@humansignal/core/lib/utils/feature-flags";
+import { FF_FIT_720_LAZY_LOAD_ANNOTATIONS } from "@humansignal/core/lib/utils/feature-flags";
 import { moveStylesBetweenHeadTags } from "../../utils/html";
+import { useAnnotationFetcher } from "../../hooks/useAnnotationQuery";
 
+// FIT-720: Virtualization constants for Compare view
 const PANEL_WIDTH = 500; // Width of each annotation panel (approximately 50% of typical viewport)
 const PANEL_GAP = 30; // Gap between panels (matches $gap in Grid.module.scss)
 const VIRTUALIZATION_THRESHOLD = 10; // Only virtualize if more than this many annotations
@@ -61,7 +63,18 @@ class Item extends Component {
   }
 }
 
-const VirtualizedAnnotationPanel = observer(({ annotation, root, style, onSelect }) => {
+// FIT-720: Virtualized annotation panel with lazy hydration
+const VirtualizedAnnotationPanel = observer(({ annotation, root, style, onSelect, isHydrating }) => {
+  // Check if annotation has regions - either from original load (versions.result) or from hydration (areas)
+  const versionsResult = annotation.versions?.result;
+  const hasVersionsResult = Array.isArray(versionsResult) && versionsResult.length > 0;
+  // Force MobX to track areas by accessing the regions getter (which iterates areas)
+  const regions = annotation.regions;
+  const hasRegions = regions && regions.length > 0;
+  // Annotation is a stub if it has no data and is not user-generated
+  // After hydration, hasRegions will be true (deserializeResults populates regions)
+  const isStub = !hasVersionsResult && !hasRegions && annotation.pk && !annotation.userGenerate;
+
   return (
     <div style={{ ...style, paddingRight: PANEL_GAP }}>
       <div id={`c-${annotation.id}`} style={{ position: "relative", height: "100%" }}>
@@ -72,15 +85,84 @@ const VirtualizedAnnotationPanel = observer(({ annotation, root, style, onSelect
           bordered={false}
           style={{ height: 44 }}
         />
-        <Annotation root={root} annotation={annotation} />
+        {isStub || isHydrating ? (
+          <div
+            style={{
+              position: "absolute",
+              top: 44,
+              left: 0,
+              width: "100%",
+              height: "calc(100% - 44px)",
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              justifyContent: "center",
+              background: "var(--color-neutral-surface)",
+            }}
+          >
+            <Spin size="large" />
+            <span style={{ marginTop: 12, color: "#999" }}>
+              {isHydrating ? "Loading annotation..." : "Waiting to load..."}
+            </span>
+          </div>
+        ) : (
+          <Annotation root={root} annotation={annotation} />
+        )}
       </div>
     </div>
   );
 });
 
+// FIT-720: Virtualized Grid component
 const VirtualizedGrid = observer(({ store, annotations, root }) => {
   const listRef = useRef(null);
+  const [hydratingIds, setHydratingIds] = useState(new Set());
   const [containerWidth, setContainerWidth] = useState(0);
+  const initialHydrationDone = useRef(false);
+  // Track annotations that have been successfully hydrated to avoid re-hydrating
+  const hydratedIds = useRef(new Set());
+  // Debounce timer for scroll-based hydration
+  const scrollHydrationTimer = useRef(null);
+
+  // FIT-720: Use TanStack Query for annotation fetching
+  const { fetchAnnotationCached, getCachedAnnotation } = useAnnotationFetcher();
+
+  // FIT-720: On mount, initialize hydratedIds with annotations that already have data
+  // This handles the case where user navigated away and came back
+  useEffect(() => {
+    if (!isFF(FF_FIT_720_LAZY_LOAD_ANNOTATIONS)) return;
+
+    annotations.forEach((annotation) => {
+      if (!annotation.pk || annotation.type === "prediction" || annotation.userGenerate) return;
+
+      const id = annotation.pk;
+
+      // Check if annotation already has data in MST
+      const versionsResult = annotation.versions?.result;
+      const hasDataInMST = Array.isArray(versionsResult) && versionsResult.length > 0;
+      const regions = annotation.regions;
+      const hasRegions = regions && regions.length > 0;
+
+      if (hasDataInMST || hasRegions) {
+        // This annotation was previously hydrated or has data
+        hydratedIds.current.add(annotation.id);
+        return;
+      }
+
+      // Check if we have cached data in TanStack Query
+      const cachedData = getCachedAnnotation(id);
+      if (cachedData?.result !== undefined) {
+        // Restore data from cache to MST annotation
+        annotation.history?.freeze?.();
+        annotation.deserializeResults?.(cachedData.result);
+        annotation.updateObjects?.();
+        annotation.history?.safeUnfreeze?.();
+        annotation.reinitHistory?.();
+        // Track as hydrated (don't directly modify MST model - causes protection errors)
+        hydratedIds.current.add(annotation.id);
+      }
+    });
+  }, []); // Only run once on mount
 
   // Filter visible annotations
   const visibleAnnotations = useMemo(() => annotations.filter((c) => !c.hidden), [annotations]);
@@ -119,7 +201,7 @@ const VirtualizedGrid = observer(({ store, annotations, root }) => {
       const newOffset = Math.min(maxOffset, scrollOffset + panelWidth + PANEL_GAP);
       listRef.current.scrollTo(newOffset);
     }
-  }, [scrollOffset, containerWidth, totalWidth, panelWidth]);
+  }, [scrollOffset, panelWidth, totalWidth, containerWidth]);
 
   const select = useCallback(
     (c) => {
@@ -130,14 +212,169 @@ const VirtualizedGrid = observer(({ store, annotations, root }) => {
     [store],
   );
 
+  // FIT-720: Hydrate annotations that come into view using TanStack Query
+  const hydrateAnnotation = useCallback(
+    async (annotation) => {
+      const annotationPk = annotation.pk || annotation.id;
+      const annotationId = annotation.id;
+
+      setHydratingIds((prev) => new Set([...prev, annotationId]));
+
+      try {
+        // Access the root store to get the SDK
+        const rootStore = store.store;
+        const sdk = rootStore?.SDK;
+
+        let fullAnnotation = null;
+
+        if (sdk?.ensureAnnotationLoaded) {
+          // Try the SDK method (works for labelStream)
+          await sdk.ensureAnnotationLoaded(annotationPk);
+          return; // SDK method handles everything
+        }
+
+        if (sdk?.datamanager?.store?.taskStore?.loadAnnotation) {
+          // Fallback: directly load annotation via taskStore
+          fullAnnotation = await sdk.datamanager.store.taskStore.loadAnnotation(annotationPk);
+        } else {
+          // Use TanStack Query for caching and deduplication
+          fullAnnotation = await fetchAnnotationCached(annotationPk);
+        }
+
+        if (fullAnnotation && !fullAnnotation.error && fullAnnotation.result) {
+          // IMPORTANT: Re-fetch the annotation from the store after async operation
+          // The original reference might be stale (user navigated, scrolled, etc.)
+          // which causes MST "object is protected" errors
+          const freshAnnotation = annotations.find((a) => a.id === annotationId);
+          if (!freshAnnotation) {
+            // Annotation no longer exists in the store
+            return;
+          }
+
+          // Check if annotation is still valid and not already hydrated
+          const versionsResult = freshAnnotation.versions?.result;
+          const hasVersionsResult = Array.isArray(versionsResult) && versionsResult.length > 0;
+          const regions = freshAnnotation.regions;
+          const hasRegions = regions && regions.length > 0;
+
+          if (hasVersionsResult || hasRegions) {
+            // Already hydrated (possibly by another code path)
+            hydratedIds.current.add(annotationId);
+            return;
+          }
+
+          // Hydrate the annotation with the loaded result
+          freshAnnotation.history?.freeze?.();
+          freshAnnotation.deserializeResults?.(fullAnnotation.result);
+
+          // Critical: updateObjects() is required to render visual regions after deserializing
+          freshAnnotation.updateObjects?.();
+
+          // Unfreeze history
+          freshAnnotation.history?.safeUnfreeze?.();
+
+          // reinitHistory cancels autosave and sets initial values so the hydration
+          // isn't treated as a user modification (prevents unwanted draft creation)
+          freshAnnotation.reinitHistory?.();
+
+          // Mark as successfully hydrated to avoid re-hydrating
+          // Note: Don't directly modify MST model (is_stub) - it causes protection errors
+          hydratedIds.current.add(annotationId);
+        } else {
+          // Even if no results, mark as hydrated to avoid repeated attempts
+          hydratedIds.current.add(annotationId);
+        }
+      } catch (error) {
+        // Silently ignore cancellation errors - they're expected when scrolling
+        if (error?.name === "CancelledError" || error?.revert === true) {
+          return;
+        }
+      } finally {
+        setHydratingIds((prev) => {
+          const next = new Set(prev);
+          next.delete(annotationId);
+          return next;
+        });
+      }
+    },
+    [store, fetchAnnotationCached, annotations],
+  );
+
+  // FIT-720: Handle items rendered - hydrate visible stubs (debounced to avoid hammering on scroll)
+  const onItemsRendered = useCallback(
+    ({ visibleStartIndex, visibleStopIndex }) => {
+      // Clear any pending hydration check
+      if (scrollHydrationTimer.current) {
+        clearTimeout(scrollHydrationTimer.current);
+      }
+
+      // Debounce hydration checks to avoid triggering on every scroll frame
+      scrollHydrationTimer.current = setTimeout(() => {
+        for (let i = visibleStartIndex; i <= visibleStopIndex; i++) {
+          const annotation = visibleAnnotations[i];
+          if (!annotation) continue;
+
+          // Skip if already hydrated or currently hydrating
+          if (hydratedIds.current.has(annotation.id) || hydratingIds.has(annotation.id)) {
+            continue;
+          }
+
+          // Use consistent stub detection: check versions.result (source of truth)
+          const versionsResult = annotation.versions?.result;
+          const hasVersionsResult = Array.isArray(versionsResult) && versionsResult.length > 0;
+          const regions = annotation.regions;
+          const hasRegions = regions && regions.length > 0;
+          const isStub = !hasVersionsResult && !hasRegions && annotation.pk && !annotation.userGenerate;
+
+          if (isStub) {
+            hydrateAnnotation(annotation);
+          }
+        }
+      }, 150); // Debounce for 150ms to avoid rapid-fire hydration
+    },
+    [visibleAnnotations, hydratingIds, hydrateAnnotation],
+  );
+
+  // FIT-720: Initial hydration on mount - hydrate first visible annotations
+  useEffect(() => {
+    // Only run once when containerWidth becomes non-zero
+    if (initialHydrationDone.current || visibleAnnotations.length === 0 || containerWidth === 0) return;
+
+    initialHydrationDone.current = true;
+
+    // Calculate how many panels fit in the viewport
+    const visibleCount = Math.ceil(containerWidth / (panelWidth + PANEL_GAP)) + 1;
+    const initialVisibleCount = Math.min(visibleCount, visibleAnnotations.length);
+
+    for (let i = 0; i < initialVisibleCount; i++) {
+      const annotation = visibleAnnotations[i];
+      if (!annotation) continue;
+
+      // Skip if already hydrated
+      if (hydratedIds.current.has(annotation.id)) continue;
+
+      // Use consistent stub detection: check versions.result (source of truth)
+      const versionsResult = annotation.versions?.result;
+      const hasVersionsResult = Array.isArray(versionsResult) && versionsResult.length > 0;
+      const regions = annotation.regions;
+      const hasRegions = regions && regions.length > 0;
+      const isStub = !hasVersionsResult && !hasRegions && annotation.pk && !annotation.userGenerate;
+
+      if (isStub) {
+        hydrateAnnotation(annotation);
+      }
+    }
+  }, [containerWidth, visibleAnnotations, panelWidth, hydrateAnnotation]);
+
   // Item data for virtualized list
   const itemData = useMemo(
     () => ({
       annotations: visibleAnnotations,
       root,
       onSelect: select,
+      hydratingIds,
     }),
-    [visibleAnnotations, root, select],
+    [visibleAnnotations, root, select, hydratingIds],
   );
 
   // Row renderer
@@ -150,6 +387,7 @@ const VirtualizedGrid = observer(({ store, annotations, root }) => {
         root={data.root}
         style={style}
         onSelect={data.onSelect}
+        isHydrating={data.hydratingIds.has(annotation.id)}
       />
     );
   }, []);
@@ -172,6 +410,7 @@ const VirtualizedGrid = observer(({ store, annotations, root }) => {
                 itemSize={panelWidth + PANEL_GAP}
                 itemData={itemData}
                 onScroll={handleScroll}
+                onItemsRendered={onItemsRendered}
                 overscanCount={2}
               >
                 {renderPanel}
@@ -391,11 +630,13 @@ class GridClassComponent extends Component {
   }
 }
 
+// FIT-720: Grid wrapper that chooses virtualized or original based on FF and annotation count
 export default function Grid(props) {
   const { annotations } = props;
   const visibleCount = annotations.filter((c) => !c.hidden).length;
 
-  const shouldVirtualize = isActive(FF_FIT_720_LAZY_LOAD_ANNOTATIONS) && visibleCount > VIRTUALIZATION_THRESHOLD;
+  // FIT-720: Use virtualization when FF is enabled AND there are many annotations
+  const shouldVirtualize = isFF(FF_FIT_720_LAZY_LOAD_ANNOTATIONS) && visibleCount > VIRTUALIZATION_THRESHOLD;
 
   if (shouldVirtualize) {
     return <VirtualizedGrid {...props} />;

@@ -12,6 +12,7 @@ export * from "./lib/utils/bem";
 export * from "./lib/utils/visitedProjects";
 export * from "./lib/utils/billing";
 export * from "./hooks/useAbortController";
+export * from "./hooks/useResolveUser";
 export * from "./lib/hooks/useCopyText";
 export * from "./hooks/usePageTitle";
 
@@ -40,3 +41,10 @@ export { ff };
 
 // Image cache for shared use across editor and datamanager
 export { imageCache } from "./lib/utils/ImageCache";
+
+// Annotation cache invalidation for shared use across editor and datamanager
+export {
+  annotationKeys,
+  invalidateAnnotationCache,
+  invalidateDistributionCache,
+} from "./lib/utils/annotation-cache";

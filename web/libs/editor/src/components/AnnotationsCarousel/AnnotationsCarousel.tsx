@@ -133,6 +133,27 @@ export const AnnotationsCarousel = observer(({ store, annotationStore }: Annotat
     }
   }, [annotationStore.selected?.id, sortedEntities, shouldVirtualize]);
 
+  // Non-virtualized: scroll carousel to bring selected annotation tab into view
+  useEffect(() => {
+    if (shouldVirtualize) return;
+    if (!carouselRef.current || !containerRef.current || !annotationStore.selected) return;
+
+    const selectedId = annotationStore.selected.pk ?? annotationStore.selected.id;
+    const selectedEl = carouselRef.current.querySelector(`[data-annotation-id="${selectedId}"]`);
+    if (!selectedEl) return;
+
+    const containerWidth = containerRef.current.clientWidth;
+    const elLeft = (selectedEl as HTMLElement).offsetLeft;
+    const elWidth = (selectedEl as HTMLElement).offsetWidth;
+    const carouselWidth = carouselRef.current.clientWidth;
+
+    // Center the selected tab in the container, clamped to valid scroll range
+    const targetPosition = elLeft - (containerWidth - elWidth) / 2;
+    const maxPosition = Math.max(0, carouselWidth - containerWidth);
+    const newPosition = clamp(targetPosition, 0, maxPosition);
+    setCurrentPosition(newPosition);
+  }, [annotationStore.selected?.id, shouldVirtualize]);
+
   useEffect(() => {
     const newEntities = [];
 
