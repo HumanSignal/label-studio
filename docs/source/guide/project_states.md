@@ -98,6 +98,8 @@ stateDiagram-v2
 
     <img src="/images/project/state-history.png" style="max-width: 450px" alt="Screenshot">
 
+    Note that state history tracking did not start until it was implemented for your organization. For most Label Studio Cloud organizations, this was some time in February 2026. 
+
 ## Additional notes
 
 ### Project settings and states
