@@ -603,13 +603,6 @@ class ImportPredictionsAPI(generics.CreateAPIView):
                         f'from project {project} tasks'
                     )
 
-            # Strip FSM state field from predictions before validation
-            # Exported data may include 'state' which is not a valid prediction field
-            if flag_set('fflag_feat_fit_568_finite_state_management', user=self.request.user) and flag_set(
-                'fflag_feat_fit_710_fsm_state_fields', user=self.request.user
-            ):
-                item.pop('state', None)
-
             # Validate prediction using LabelInterface only
             try:
                 validation_errors_list = li.validate_prediction(item, return_errors=True)
