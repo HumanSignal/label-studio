@@ -98,7 +98,7 @@ stateDiagram-v2
 
     <img src="/images/project/state-history.png" style="max-width: 450px" alt="Screenshot">
 
-    Note that state history tracking did not start until state management was implemented for your organization. For most Label Studio Cloud organizations, state management was implemented in February 2026. 
+    Note that state change history tracking did not start until state management was implemented for your organization. For most Label Studio Cloud organizations, state management was implemented in February 2026. 
 
 ## Additional notes
 
