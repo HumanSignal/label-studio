@@ -7,13 +7,13 @@ type MouseInteractionOptions = Partial<TriggerOptions & ObjectLike & MouseEvent>
 export const ImageView = {
   get image() {
     cy.log("Get main image");
-    return cy.get("img[alt=LS]");
+    return cy.get("img[alt=image]");
   },
   get root() {
     return this.image.closest(".lsf-object");
   },
   get drawingFrame() {
-    return this.image.closest('[class^="frame--"]');
+    return this.image.closest(".lsf-image");
   },
   get drawingArea() {
     cy.log("Get Konva.js root");
@@ -34,10 +34,47 @@ export const ImageView = {
   },
   waitForImage() {
     cy.log("Make sure that the image is visible and loaded");
-    this.image.should("be.visible").and((img) => {
-      return expect((img[0] as HTMLImageElement).naturalWidth).to.be.greaterThan(0);
+
+    // Wait for any download progress indicator to disappear first
+    cy.get("body").then(($body) => {
+      if ($body.find(".lsf-image-progress").length > 0) {
+        cy.get(".lsf-image-progress", { timeout: 30000 }).should("not.exist");
+      }
     });
 
+    // Wait for the FULL image loading pipeline:
+    //   1. imageIsLoaded = true  → <EntireStage> renders (Konva Stage + canvas in DOM)
+    //   2. stageRef exists       → Stage component has mounted
+    //   3. Konva Image node      → <ImageLayer> reuses item.imageRef (the already-loaded
+    //                               <img> element) and renders <KonvaImage> synchronously.
+    //
+    // We still poll for the Konva Image node to account for React's render cycle.
+    cy.window().then((win) => {
+      return new Cypress.Promise((resolve) => {
+        const check = () => {
+          const imageObject = (win as any).Htx?.annotationStore?.selected?.objects?.find(
+            (o: any) => o.type === "image",
+          );
+
+          if (imageObject?.imageIsLoaded) {
+            const stageRef = imageObject.stageRef;
+
+            // stageRef.find('Image') returns Konva Image nodes rendered by <ImageLayer>.
+            // If at least one exists, the image is fully painted on the canvas.
+            if (stageRef && stageRef.find("Image").length > 0) {
+              resolve();
+              return;
+            }
+          }
+
+          setTimeout(check, 16);
+        };
+
+        check();
+      });
+    });
+
+    // Confirm the Konva canvas is rendered and visible
     this.drawingArea.get("canvas").should("be.visible");
   },
   /**

@@ -19,7 +19,7 @@ import SelectedChoiceMixin from "../../../mixins/SelectedChoiceMixin";
 import { SharedStoreMixin } from "../../../mixins/SharedChoiceStore/mixin";
 import VisibilityMixin from "../../../mixins/Visibility";
 import { parseValue } from "../../../utils/data";
-import { FF_LSDV_4583, FF_TAXONOMY_ASYNC, FF_TAXONOMY_LABELING, isFF } from "../../../utils/feature-flags";
+import { FF_LSDV_4583, FF_TAXONOMY_LABELING, isFF } from "../../../utils/feature-flags";
 import ControlBase from "../Base";
 import ClassificationBase from "../ClassificationBase";
 
@@ -260,7 +260,7 @@ const Model = types
     },
 
     get isLoadedByApi() {
-      return isFF(FF_TAXONOMY_ASYNC) && !!self.apiurl;
+      return !!self.apiurl;
     },
 
     get items() {
@@ -583,9 +583,7 @@ const TaxonomyModel = types.compose(
 
 const HtxTaxonomy = observer(({ item }) => {
   // literal "taxonomy" class name is for external styling
-  const className = [styles.taxonomy, "taxonomy", isFF(FF_TAXONOMY_ASYNC) ? styles.taxonomy__new : ""]
-    .filter(Boolean)
-    .join(" ");
+  const className = [styles.taxonomy, "taxonomy", styles.taxonomy__new].filter(Boolean).join(" ");
   const visibleStyle = item.perRegionVisible() && item.isVisible ? {} : { display: "none" };
   const options = {
     showFullPath: item.showfullpath,
@@ -604,7 +602,7 @@ const HtxTaxonomy = observer(({ item }) => {
   // they are indicated by loading icon on the item itself
   const firstLoad = item.isLoadedByApi ? !item.items.length : true;
 
-  if (item.loading && isFF(FF_TAXONOMY_ASYNC) && firstLoad) {
+  if (item.loading && firstLoad) {
     return (
       <div className={className} style={visibleStyle}>
         <div className={styles.taxonomy__loading}>
@@ -616,7 +614,7 @@ const HtxTaxonomy = observer(({ item }) => {
 
   return (
     <div className={className} style={visibleStyle} ref={item.elementRef}>
-      {isFF(FF_TAXONOMY_ASYNC) && !item.legacy ? (
+      {!item.legacy ? (
         <NewTaxonomy
           items={item.items}
           selected={item.selectedItems}

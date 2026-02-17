@@ -22,4 +22,17 @@ export class BoundingBoxUtils {
 
     return xEqual && yEqual && widthEqual && heightEqual;
   }
+
+  /**
+   * Check if inner bounding box is contained within outer bounding box (within tolerance)
+   * This allows the inner box to be smaller but must not extend beyond the outer box
+   */
+  static isContainedIn(inner: BoundingBox, outer: BoundingBox, tolerance = 2): boolean {
+    const leftOk = inner.x >= outer.x - tolerance;
+    const topOk = inner.y >= outer.y - tolerance;
+    const rightOk = inner.x + inner.width <= outer.x + outer.width + tolerance;
+    const bottomOk = inner.y + inner.height <= outer.y + outer.height + tolerance;
+
+    return leftOk && topOk && rightOk && bottomOk;
+  }
 }

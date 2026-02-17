@@ -11,6 +11,12 @@ const config = `
 const ZOOM = 10;
 const EPSILON = 0.01;
 
+Before(async ({ LabelStudio }) => {
+  LabelStudio.setFeatureFlags({
+    fflag_feat_front_optic_1479_improve_image_tag_memory_usage_short: true,
+  });
+});
+
 Scenario("Image displaying precision.", async ({ I, LabelStudio, AtImageView, AtOutliner }) => {
   const params = {
     config,
@@ -21,10 +27,11 @@ Scenario("Image displaying precision.", async ({ I, LabelStudio, AtImageView, At
 
   LabelStudio.init(params);
   LabelStudio.waitForObjectsReady();
+  I.waitForInvisible(".lsf-image-progress", 30);
   AtOutliner.seeRegions(0);
 
   const { imageTransform } = await I.executeScript(async () => {
-    const img = window.document.querySelector('[alt="LS"]');
+    const img = window.document.querySelector('[alt="image"]');
     const { transform: imageTransform } = window.getComputedStyle(img);
 
     return {
@@ -42,7 +49,7 @@ Scenario("Image displaying precision.", async ({ I, LabelStudio, AtImageView, At
 
   const { fullStageHeight, imageHeight } = await I.executeScript(async () => {
     const stage = window.Konva.stages[0];
-    const img = window.document.querySelector('[alt="LS"]');
+    const img = window.document.querySelector('[alt="image"]');
     const fullStageHeight = stage.height() * stage.scaleY();
     const imageHeight = img.height;
 

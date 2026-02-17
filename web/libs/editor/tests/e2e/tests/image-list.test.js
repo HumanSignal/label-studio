@@ -94,6 +94,7 @@ const result = [
 Before(async ({ LabelStudio }) => {
   LabelStudio.setFeatureFlags({
     fflag_feat_front_lsdv_4583_multi_image_segmentation_short: true,
+    fflag_feat_front_optic_1479_improve_image_tag_memory_usage_short: true,
   });
 });
 
@@ -110,7 +111,7 @@ Scenario("Image list rendering", async ({ I, LabelStudio, AtImageView }) => {
   LabelStudio.waitForObjectsReady();
   await AtImageView.lookForStage();
 
-  I.seeElement(`img[src="${data.images[0]}"]`);
+  await AtImageView.seeCurrentImageSrc(data.images[0]);
 });
 
 Scenario("Image list with page navigation", async ({ I, AtImageView, LabelStudio }) => {
@@ -130,7 +131,7 @@ Scenario("Image list with page navigation", async ({ I, AtImageView, LabelStudio
   await AtImageView.lookForStage();
 
   I.say("Loading first image");
-  I.seeElement(`img[src="${data.images[0]}"]`);
+  await AtImageView.seeCurrentImageSrc(data.images[0]);
 
   I.say("Pagination is visible");
   I.seeElement(".lsf-pagination");
@@ -142,12 +143,12 @@ Scenario("Image list with page navigation", async ({ I, AtImageView, LabelStudio
   I.click(nextPageButton);
 
   I.say("Loading second image");
-  I.seeElement(`img[src="${data.images[1]}"]`);
+  await AtImageView.seeCurrentImageSrc(data.images[1]);
   I.see("2 of 4");
 
   I.say("Clicking on the previous page");
   I.click(prevPageButton);
-  I.seeElement(`img[src="${data.images[0]}"]`);
+  await AtImageView.seeCurrentImageSrc(data.images[0]);
   I.see("1 of 4");
 });
 
@@ -165,7 +166,7 @@ Scenario("Image list with hotkey navigation", async ({ I, AtImageView, LabelStud
   await AtImageView.lookForStage();
 
   I.say("Loading first image");
-  I.seeElement(`img[src="${data.images[0]}"]`);
+  await AtImageView.seeCurrentImageSrc(data.images[0]);
 
   I.say("Pagination is visible");
   I.seeElement(".lsf-pagination");
@@ -176,11 +177,11 @@ Scenario("Image list with hotkey navigation", async ({ I, AtImageView, LabelStud
   await AtImageView.multiImageGoForwardWithHotkey();
 
   I.say("Loading second image");
-  I.seeElement(`img[src="${data.images[1]}"]`);
+  await AtImageView.seeCurrentImageSrc(data.images[1]);
   I.see("2 of 4");
 
   await AtImageView.multiImageGoBackwardWithHotkey();
-  I.seeElement(`img[src="${data.images[0]}"]`);
+  await AtImageView.seeCurrentImageSrc(data.images[0]);
   I.see("1 of 4");
 });
 
@@ -211,7 +212,7 @@ Scenario("View All disables MIG pagination", async ({ I, AtImageView, LabelStudi
 
   I.say("Move to next page to have a changed state");
   I.click(locate(nextSelector));
-  I.seeElement(`img[src="${data.images[1]}"]`);
+  await AtImageView.seeCurrentImageSrc(data.images[1]);
   I.see("2 of 4");
 
   I.say("Enable View All mode");
@@ -223,12 +224,13 @@ Scenario("View All disables MIG pagination", async ({ I, AtImageView, LabelStudi
   I.see("2 of 4");
 
   I.say("Hotkeys for navigation should not work");
-  await AtImageView.multiImageGoForwardWithHotkey();
-  I.seeElement(`img[src="${data.images[1]}"]`);
+  // Don't use multiImageGoForwardWithHotkey() here — it calls waitForImage()
+  // which expects normal annotation rendering. In View All mode the rendering
+  // is different and navigation is disabled, so just press the keys directly.
+  I.pressKey("Ctrl+d");
   I.see("2 of 4");
 
-  await AtImageView.multiImageGoBackwardWithHotkey();
-  I.seeElement(`img[src="${data.images[1]}"]`);
+  I.pressKey("Ctrl+a");
   I.see("2 of 4");
 });
 
@@ -269,7 +271,7 @@ Scenario("Image list exports correct data", async ({ I, LabelStudio, AtImageView
 
   LabelStudio.waitForObjectsReady();
   await AtImageView.lookForStage();
-  I.seeElement(`img[src="${data.images[1]}"]`);
+  await AtImageView.seeCurrentImageSrc(data.images[1]);
 
   await LabelStudio.resultsNotChanged(result);
 });

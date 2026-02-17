@@ -6,9 +6,6 @@ export const FF_DEV_1284 = "fflag_fix_front_dev_1284_auto_detect_undo_281022_sho
 
 export const FF_DEV_1442 = "ff_front_dev_1442_unselect_shape_on_click_outside_080622_short";
 
-// User labels for Taxonomy
-export const FF_DEV_1536 = "ff_front_dev_1536_taxonomy_user_labels_150222_long";
-
 export const FF_DEV_2669 = "ff_front_dev_2669_paragraph_author_filter_210622_short";
 
 // Change the rotate tool from bbox
@@ -53,11 +50,6 @@ export const FF_LSDV_3028 = "fflag_feat_front_lsdv_3028_audio_v3_multichannel_de
  * Multi-image segmentation support via `valueList`
  */
 export const FF_LSDV_4583 = "feat_front_lsdv_4583_multi_image_segmentation_short";
-
-/**
- * Enables new way of preloading/cacheing images
- */
-export const FF_LSDV_4583_6 = "fflag_feat_front_lsdv_4583_6_images_preloading_short";
 
 /**
  * Fixing issues related to selection tool functional (selecting hidden regions, onClick in Konva, interaction with regions inside selection area)

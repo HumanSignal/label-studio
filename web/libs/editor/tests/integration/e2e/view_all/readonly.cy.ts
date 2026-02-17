@@ -1,5 +1,5 @@
 import { AudioView, Choices, LabelStudio, Rating, Taxonomy, ToolBar } from "@humansignal/frontend-test/helpers/LSF";
-import { FF_DEV_3391, FF_TAXONOMY_ASYNC } from "../../../../src/utils/feature-flags";
+import { FF_DEV_3391 } from "../../../../src/utils/feature-flags";
 import {
   audioConfig,
   audioData,
@@ -15,7 +15,6 @@ import {
 beforeEach(() => {
   LabelStudio.addFeatureFlagsOnPageLoad({
     [FF_DEV_3391]: true,
-    [FF_TAXONOMY_ASYNC]: true,
   });
 });
 

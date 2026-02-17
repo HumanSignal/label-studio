@@ -106,6 +106,12 @@ shapes.forEach(({ shape, props = "", action, regions }) => {
   shapesTable.add([shape, props, action, regions]);
 });
 
+Before(async ({ LabelStudio }) => {
+  LabelStudio.setFeatureFlags({
+    fflag_feat_front_optic_1479_improve_image_tag_memory_usage_short: true,
+  });
+});
+
 Data(shapesTable).Scenario(
   "Simple rotation",
   async ({ I, LabelStudio, AtImageView, AtOutliner, AtPanels, current }) => {
@@ -121,6 +127,8 @@ Data(shapesTable).Scenario(
     LabelStudio.init(params);
     AtDetailsPanel.collapsePanel();
     LabelStudio.waitForObjectsReady();
+    await AtImageView.lookForStage();
+    I.waitForInvisible(".lsf-image-progress", 30);
     AtOutliner.seeRegions(0);
     const canvasSize = await AtImageView.getCanvasSize();
 
@@ -163,6 +171,8 @@ Data(shapesTable).Scenario("Rotate zoomed", async ({ I, LabelStudio, AtImageView
   LabelStudio.init(params);
   AtDetailsPanel.collapsePanel();
   LabelStudio.waitForObjectsReady();
+  await AtImageView.lookForStage();
+  I.waitForInvisible(".lsf-image-progress", 30);
   AtOutliner.seeRegions(0);
   const canvasSize = await AtImageView.getCanvasSize();
 
@@ -217,6 +227,8 @@ Data(windowSizesTable).Scenario(
       AtDetailsPanel.collapsePanel();
     }
     LabelStudio.waitForObjectsReady();
+    await AtImageView.lookForStage();
+    I.waitForInvisible(".lsf-image-progress", 30);
     AtOutliner.seeRegions(0);
     const canvasSize = await AtImageView.getCanvasSize();
     const imageSize = await AtImageView.getImageFrameSize();
@@ -226,8 +238,7 @@ Data(windowSizesTable).Scenario(
     assert(Math.abs(canvasSize.height - imageSize.height) < 1);
     for (const rotate of rotationQueue) {
       I.click(locate(`[aria-label='rotate-${rotate}']`));
-      // Just checking that we see image, to get some time for rotating to be finished and correctly rendered
-      I.seeElement('[alt="LS"]');
+      // Wait for rotating to be finished and correctly rendered
       I.waitTicks(2);
       const rotatedCanvasSize = await AtImageView.getCanvasSize();
       const rotatedImageSize = await AtImageView.getImageFrameSize();
@@ -330,6 +341,8 @@ Data(layoutVariations).Scenario(
     LabelStudio.init(params);
     AtDetailsPanel.collapsePanel();
     LabelStudio.waitForObjectsReady();
+    await AtImageView.lookForStage();
+    I.waitForInvisible(".lsf-image-progress", 30);
     AtOutliner.seeRegions(1);
 
     I.click(locate("[aria-label='rotate-right']"));

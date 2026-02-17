@@ -19,7 +19,6 @@ import { UserExtended } from "./UserStore";
 import { UserLabels } from "./UserLabels";
 import {
   FF_CUSTOM_SCRIPT,
-  FF_DEV_1536,
   FF_LSDV_4620_3_ML,
   FF_LSDV_4998,
   FF_REVIEWER_FLOW,
@@ -168,7 +167,7 @@ export default types
 
     users: types.optional(types.array(UserExtended), []),
 
-    userLabels: isFF(FF_DEV_1536) ? types.optional(UserLabels, { controls: {} }) : types.undefined,
+    userLabels: types.optional(UserLabels, { controls: {} }),
 
     queueTotal: types.optional(types.number, 0),
 

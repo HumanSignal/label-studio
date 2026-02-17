@@ -137,6 +137,8 @@ DataStore.Scenario(
     LabelStudio.init(params);
     AtDetailsPanel.collapsePanel();
     LabelStudio.waitForObjectsReady();
+    await AtImageView.lookForStage();
+    I.waitForInvisible(".lsf-image-progress", 30);
     AtOutliner.seeRegions(0);
     const canvasSize = await AtImageView.getCanvasSize();
     const size = Math.min(canvasSize.width, canvasSize.height);
@@ -179,9 +181,10 @@ DataStore.Scenario(
 
       LabelStudio.init(params);
       LabelStudio.waitForObjectsReady();
+      await AtImageView.lookForStage();
+      I.waitForInvisible(".lsf-image-progress", 30);
       AtOutliner.seeRegions(0);
       I.click(toolSelector);
-      await AtImageView.lookForStage();
       I.say(`${shape}: Drawing.`);
 
       regions.forEach((region, idx) => {

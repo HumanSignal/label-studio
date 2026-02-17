@@ -1,4 +1,4 @@
-import { LabelStudio } from "@humansignal/frontend-test/helpers/LSF";
+import { ImageView, LabelStudio } from "@humansignal/frontend-test/helpers/LSF";
 import { allLabelsEmptyConfig, allLabelsEmptyData, resultWithNotExistedLabels } from "../../data/config/empty-labels";
 
 describe("Empty labels", () => {
@@ -10,6 +10,9 @@ describe("Empty labels", () => {
       .init();
 
     LabelStudio.waitForObjectsReady();
+    // Brush region serialization (Region2RLE) needs the Konva stage to be mounted.
+    // waitForObjectsReady only checks image file loading, not stage mounting.
+    ImageView.waitForImage();
 
     LabelStudio.serialize().then((results) => {
       const length = results.length;
