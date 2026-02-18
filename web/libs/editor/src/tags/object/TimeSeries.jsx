@@ -24,6 +24,7 @@ import PersistentStateMixin from "../../mixins/PersistentState";
 import { SyncableMixin } from "../../mixins/Syncable";
 import { parseCSV, parseValue, tryToParseJSON } from "../../utils/data";
 import { fixMobxObserve } from "../../utils/utilities";
+import { Hotkey } from "../../core/Hotkey";
 
 import "./TimeSeries/MultiChannel";
 import "./TimeSeries/Channel";
@@ -193,6 +194,30 @@ const Model = types
 
     get channels() {
       return Object.values(self.channelsMap);
+    },
+
+    get filteredOverviewChannels() {
+      const allKeys = Object.keys(self.channelsMap);
+
+      if (self.overviewchannels) {
+        // Infer headers from dataObj if headers array is not set
+        let headers = self.headers;
+        if ((!headers || headers.length === 0) && self.dataObj) {
+          headers = Object.keys(self.dataObj);
+        }
+
+        const channels = self.overviewchannels
+          .toLowerCase()
+          .split(",")
+          .map((name) => {
+            const trimmed = name.trim();
+            return /^\d+$/.test(trimmed) && headers ? headers[Number(trimmed)]?.toLowerCase() : trimmed;
+          })
+          .filter((ch) => ch && allKeys.includes(ch));
+
+        if (channels.length) return channels;
+      }
+      return allKeys;
     },
 
     parseTime(time) {
@@ -542,6 +567,39 @@ const Model = types
      */
     setCursor(time) {
       self.cursorTime = time;
+    },
+
+    /**
+     * Pan the visible time range by a fraction of the current view width.
+     * Positive fraction pans right (forward in time), negative pans left (back).
+     * When a region is selected, this is a no-op so region hotkeys can handle the keys.
+     * @param {number} fraction - Fraction of view width to shift (e.g. 0.1 = 10%)
+     */
+    panView(fraction) {
+      // Skip if a TimeSeries region is selected — let region grow/shrink hotkeys handle the key
+      if (self.regs.some((r) => r.selected)) return;
+
+      if (!self.brushRange?.length || self.brushRange.length !== 2) return;
+      if (!self.keysRange?.length || self.keysRange.length !== 2) return;
+
+      const [minKey, maxKey] = self.keysRange;
+      const viewWidth = self.brushRange[1] - self.brushRange[0];
+      const shift = viewWidth * fraction;
+
+      let newStart = self.brushRange[0] + shift;
+      let newEnd = self.brushRange[1] + shift;
+
+      // Clamp to data bounds while preserving view width
+      if (newStart < minKey) {
+        newStart = minKey;
+        newEnd = minKey + viewWidth;
+      }
+      if (newEnd > maxKey) {
+        newEnd = maxKey;
+        newStart = maxKey - viewWidth;
+      }
+
+      self.updateTR([newStart, newEnd], self.scale + 0.0001);
     },
 
     /**
@@ -1121,17 +1179,7 @@ const Overview = observer(({ item, data, series }) => {
   const { margin, keyColumn: idX } = item;
   const width = Math.max(fullWidth - margin.left - margin.right, 0);
   // const data = store.task.dataObj;
-  let keys = Object.keys(item.channelsMap);
-
-  if (item.overviewchannels) {
-    const channels = item.overviewchannels
-      .toLowerCase()
-      .split(",")
-      .map((name) => (/^\d+$/.test(name) ? item.headers[name] : name))
-      .filter((ch) => keys.includes(ch));
-
-    if (channels.length) keys = channels;
-  }
+  const keys = item.filteredOverviewChannels;
   // const series = data[idX];
   const minRegionWidth = 2;
 
@@ -1349,13 +1397,13 @@ const Overview = observer(({ item, data, series }) => {
         .attr("viewBox", [0, 0, width + margin.left + margin.right, focusHeight + margin.bottom]);
 
       gChannels.current.selectAll("path").remove();
-      for (const key of Object.keys(item.channelsMap)) drawPath(key);
+      for (const key of keys) drawPath(key);
 
       drawAxis();
       // gb.current.selectAll("*").remove();
       gb.current.call(brush).call(brush.move, item.brushRange.map(x));
     }
-  }, [width, node]);
+  }, [width, node, keys]);
 
   // redraw overview on zoom
   React.useEffect(() => {
@@ -1415,6 +1463,9 @@ const Overview = observer(({ item, data, series }) => {
   return <div className="htx-timeseries-overview" ref={ref} />;
 });
 
+const PAN_SMALL = 0.1; // 10% of view width
+const PAN_LARGE = 0.5; // 50% of view width
+
 const HtxTimeSeriesViewRTS = ({ item }) => {
   const ref = React.createRef();
 
@@ -1436,6 +1487,22 @@ const HtxTimeSeriesViewRTS = ({ item }) => {
       };
     }
   }, [item, ref]);
+
+  // Register keyboard hotkeys for panning the time series view
+  React.useEffect(() => {
+    if (!item?.brushRange?.length) return;
+
+    const hotkeys = Hotkey("TimeSeries Navigation", "Time Series Navigation");
+
+    hotkeys.addNamed("ts:pan-left", () => item.panView(-PAN_SMALL));
+    hotkeys.addNamed("ts:pan-right", () => item.panView(PAN_SMALL));
+    hotkeys.addNamed("ts:pan-left-large", () => item.panView(-PAN_LARGE));
+    hotkeys.addNamed("ts:pan-right-large", () => item.panView(PAN_LARGE));
+
+    return () => {
+      hotkeys.unbindAll();
+    };
+  }, [item, item?.brushRange?.length]);
 
   // the last thing updated during initialisation
   if (!item?.brushRange?.length || !item.data)
