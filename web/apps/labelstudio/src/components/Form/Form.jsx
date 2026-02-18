@@ -74,7 +74,7 @@ export default class Form extends React.Component {
       <MultiProvider providers={providers}>
         <form
           ref={this.formElement}
-          className={cn("form")}
+          className={cn("form").toClassName()}
           action={this.props.action}
           onSubmit={this.onFormSubmitted}
           onChange={this.onFormChanged}

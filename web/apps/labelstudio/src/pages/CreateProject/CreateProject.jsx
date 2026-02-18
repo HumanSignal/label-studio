@@ -20,7 +20,7 @@ import { createURL } from "../../components/HeidiTips/utils";
 const ProjectName = ({ name, setName, onSaveName, onSubmit, error, description, setDescription, show = true }) =>
   !show ? null : (
     <form
-      className={cn("project-name")}
+      className={cn("project-name").toClassName()}
       onSubmit={(e) => {
         e.preventDefault();
         onSubmit();

@@ -62,7 +62,7 @@ const VersionCard = ({ version, selected, onSelect, editable, onDelete }) => {
           {version.model_version}
           {version.model_version === "undefined" && (
             <Tooltip title="Model version is undefined. Likely means that model_version field was missing when predictions were imported.">
-              <IconInfoOutline className={cn("help-icon")} width="14" height="14" />
+              <IconInfoOutline className={cn("help-icon").toClassName()} width="14" height="14" />
             </Tooltip>
           )}
         </div>

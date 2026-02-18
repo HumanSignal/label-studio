@@ -18,7 +18,7 @@ DescriptionList.Item = ({ retmClassName, descriptionClassName, term, description
         {term}{" "}
         {help ? (
           <Tooltip style={{ whiteSpace: "pre-wrap" }} title={help}>
-            <IconInfoOutline className={cn("help-icon")} width="14" height="14" />
+            <IconInfoOutline className={cn("help-icon").toClassName()} width="14" height="14" />
           </Tooltip>
         ) : (
           ""

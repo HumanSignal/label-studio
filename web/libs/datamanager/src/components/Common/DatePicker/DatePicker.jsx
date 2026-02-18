@@ -99,7 +99,7 @@ export const DatePicker = ({
   });
 
   return (
-    <div className={cn("datepicker")}>
+    <div className={cn("datepicker").toClassName()}>
       <Dropdown.Trigger
         ref={dropdownRef}
         toggle={false}

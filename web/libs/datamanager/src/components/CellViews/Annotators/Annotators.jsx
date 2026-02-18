@@ -43,7 +43,7 @@ export const Annotators = (cell) => {
   }, [column.alias, task?.annotators_count, task?.reviewers_count, task?.comment_authors_count]);
 
   return (
-    <div className={annotatorsCN.toString()}>
+    <div className={annotatorsCN.toClassName()}>
       {userList.map((item, index) => {
         const user = item.user ?? item;
         const { annotated, reviewed, review } = item;
@@ -55,7 +55,7 @@ export const Annotators = (cell) => {
         return (
           <div
             key={`user-${user.id}-${index}`}
-            className={annotatorsCN.elem("item").toString()}
+            className={annotatorsCN.elem("item").toClassName()}
             onClick={(e) => {
               e.preventDefault();
               e.stopPropagation();
@@ -68,7 +68,7 @@ export const Annotators = (cell) => {
                 faded={userpicIsFaded}
                 badge={{
                   bottomRight: review && (
-                    <div className={clsx(userPickBadge.toString(), userPickBadge.mod({ [review]: true }).toString())}>
+                    <div className={clsx(userPickBadge.toClassName(), userPickBadge.mod({ [review]: true }).toClassName())}>
                       {review === "rejected" ? <IconCrossAlt /> : <IconCheckAlt />}
                     </div>
                   ),
@@ -80,7 +80,7 @@ export const Annotators = (cell) => {
       })}
       {extraCount > 0 && (
         <div
-          className={annotatorsCN.elem("item").toString()}
+          className={annotatorsCN.elem("item").toClassName()}
           onClick={(e) => {
             e.preventDefault();
             e.stopPropagation();

@@ -191,9 +191,9 @@ export const Menubar = ({ enabled, defaultOpened, defaultPinned, children, onSid
                 {showNewsletterDot && (
                   <>
                     <Menu.Divider />
-                    <Menu.Item className={cn("newsletter-menu-item")} href={pages.AccountSettingsPage.path}>
+                    <Menu.Item className={cn("newsletter-menu-item").toClassName()} href={pages.AccountSettingsPage.path}>
                       <span>Please check new notification settings in the Account & Settings page</span>
-                      <span className={cn("newsletter-menu-badge")} />
+                      <span className={cn("newsletter-menu-badge").toClassName()} />
                     </Menu.Item>
                   </>
                 )}

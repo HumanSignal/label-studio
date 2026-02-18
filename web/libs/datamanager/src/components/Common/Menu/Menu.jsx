@@ -35,7 +35,7 @@ export const Menu = React.forwardRef(
       <MenuContext.Provider value={{ selected }}>
         <ul
           ref={ref}
-          className={clsx(menuCN.toString(), menuCN.mod({ size, collapsed }).toString(), className)}
+          className={clsx(menuCN.toClassName(), menuCN.mod({ size, collapsed }).toClassName(), className)}
           style={style}
           onClick={clickHandler}
         >

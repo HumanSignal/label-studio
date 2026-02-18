@@ -70,7 +70,7 @@ export default class Form extends Component {
       <MultiProvider providers={providers}>
         <form
           ref={this.formElement}
-          className={cn("form-dm")}
+          className={cn("form-dm").toClassName()}
           action={this.props.action}
           onSubmit={this.onFormSubmitted}
           onChange={this.onFormChanged}
@@ -474,7 +474,7 @@ Form.Builder = forwardRef(
     };
 
     const renderColumns = (columns) => {
-      const columnClassName = cn("form-dm").elem("column").toString();
+      const columnClassName = cn("form-dm").elem("column").toClassName();
       return columns.map((col, index) => (
         <div className={columnClassName} key={index} style={{ width: col.width }}>
           {renderFields(col.fields)}
