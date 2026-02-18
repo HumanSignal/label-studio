@@ -27,10 +27,6 @@ const _Tool = types
         if (poly && poly.closed) return null;
         if (poly === undefined) return null;
         if (poly && poly.type !== "polygonregion") return null;
-        // Ensure the polygon belongs to the current annotation.
-        // When switching annotations (e.g. submit then create new), currentArea
-        // may still reference a polygon from the previous annotation.
-        if (poly && self.annotation && poly.annotation !== self.annotation) return null;
 
         return poly;
       },
@@ -114,12 +110,6 @@ const _Tool = types
       },
 
       startDrawing(x, y) {
-        // Clean up stale reference from a previous annotation if needed
-        if (self.currentArea && isAlive(self.currentArea) && self.annotation && self.currentArea.annotation !== self.annotation) {
-          self.stopListening();
-          self.currentArea = null;
-        }
-
         const point = self.control?.getSnappedPoint({ x, y });
 
         self.mode = "drawing";
