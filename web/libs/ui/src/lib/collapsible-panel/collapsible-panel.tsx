@@ -103,10 +103,7 @@ export const CollapsiblePanel = ({
           aria-expanded={isExpanded}
           data-testid="collapsible-panel-toggle"
         >
-          <IconChevronDown
-            size={16}
-            className={cn("transition-transform duration-150 ease-out", isExpanded ? "rotate-0" : "-rotate-90")}
-          />
+          <IconChevronDown size={16} className={cn("transition-transform duration-150", !isExpanded && "-rotate-90")} />
         </Button>
 
         <div className="flex-1 flex items-center gap-2 truncate" data-testid="collapsible-panel-title">

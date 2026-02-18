@@ -87,9 +87,9 @@ const SelectedItemsGroup = ({
         disabled={hasNoItems}
         style={{ cursor: hasNoItems ? "default" : "pointer" }}
       >
-        {/* Caret icon - rotates from right-pointing (-90deg) to down-pointing (0deg) */}
+        {/* Caret icon */}
         <IconChevronDown
-          className={clsx(styles.selectedItemsCaret, expanded && styles.selectedItemsCaretExpanded)}
+          className={clsx(styles.selectedItemsCaret, !expanded && styles.selectedItemsCaretCollapsed)}
           aria-hidden="true"
           style={{ opacity: hasNoItems ? 0.3 : 1 }}
         />
