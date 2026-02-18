@@ -1,5 +1,5 @@
 ---
-title: Project and Task State Management
+title: Project and task state management
 short: Project and task states
 type: guide
 tier: enterprise
