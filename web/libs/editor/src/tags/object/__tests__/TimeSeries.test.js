@@ -3,6 +3,8 @@ import * as d3 from "d3";
 import { types } from "mobx-state-tree";
 import { mockFF } from "../../../../__mocks__/global";
 import { TimeSeriesModel } from "../TimeSeries";
+// Import Channel to ensure Registry is initialized
+import "../TimeSeries/Channel";
 
 const ff = mockFF();
 
@@ -496,6 +498,278 @@ describe("TimeSeries playback", () => {
     expect(model.cursorTime).toBe(52);
     expect(model.isPlaying).toBe(true);
     expect(global.requestAnimationFrame).toHaveBeenCalledWith(model.playbackLoop);
+  });
+});
+
+describe("TimeSeries overviewChannels filtering", () => {
+  it("should return all channels when overviewChannels is not set", () => {
+    const model = TimeSeriesModel.create(
+      {
+        name: "timeseries",
+        value: "$timeseries",
+        valuetype: "json",
+        timecolumn: "time",
+        overviewchannels: "",
+        children: [
+          { type: "channel", column: "channel1" },
+          { type: "channel", column: "channel2" },
+          { type: "channel", column: "channel3" },
+        ],
+      },
+      mockEnv,
+    );
+
+    const store = MockStore.create({ timeseries: model }, mockEnv);
+    model.setColumnNames(["time", "channel1", "channel2", "channel3"]);
+
+    const filtered = model.filteredOverviewChannels;
+
+    expect(filtered).toEqual(["channel1", "channel2", "channel3"]);
+    expect(filtered.length).toBe(3);
+  });
+
+  it("should filter channels by name when overviewChannels is set", () => {
+    const model = TimeSeriesModel.create(
+      {
+        name: "timeseries",
+        value: "$timeseries",
+        valuetype: "json",
+        timecolumn: "time",
+        overviewchannels: "channel1,channel3",
+        children: [
+          { type: "channel", column: "channel1" },
+          { type: "channel", column: "channel2" },
+          { type: "channel", column: "channel3" },
+        ],
+      },
+      mockEnv,
+    );
+
+    const store = MockStore.create({ timeseries: model }, mockEnv);
+    model.setColumnNames(["time", "channel1", "channel2", "channel3"]);
+
+    const filtered = model.filteredOverviewChannels;
+
+    expect(filtered).toEqual(["channel1", "channel3"]);
+    expect(filtered.length).toBe(2);
+    expect(filtered).not.toContain("channel2");
+  });
+
+  it("should filter channels by numeric index when overviewChannels uses indices", () => {
+    const model = TimeSeriesModel.create(
+      {
+        name: "timeseries",
+        value: "$timeseries",
+        valuetype: "json",
+        timecolumn: "time",
+        overviewchannels: "1,3",
+        children: [
+          { type: "channel", column: "velocity" },
+          { type: "channel", column: "acceleration" },
+          { type: "channel", column: "temperature" },
+        ],
+      },
+      mockEnv,
+    );
+
+    const store = MockStore.create({ timeseries: model }, mockEnv);
+    // Headers array: [0: "time", 1: "velocity", 2: "acceleration", 3: "temperature"]
+    model.setColumnNames(["time", "velocity", "acceleration", "temperature"]);
+
+    const filtered = model.filteredOverviewChannels;
+
+    // Should map index 1 -> "velocity", index 3 -> "temperature"
+    expect(filtered).toEqual(["velocity", "temperature"]);
+    expect(filtered.length).toBe(2);
+    expect(filtered).not.toContain("acceleration");
+  });
+
+  it("should handle case-insensitive channel names", () => {
+    const model = TimeSeriesModel.create(
+      {
+        name: "timeseries",
+        value: "$timeseries",
+        valuetype: "json",
+        timecolumn: "time",
+        overviewchannels: "VELOCITY,Acceleration",
+        children: [
+          { type: "channel", column: "velocity" },
+          { type: "channel", column: "acceleration" },
+          { type: "channel", column: "temperature" },
+        ],
+      },
+      mockEnv,
+    );
+
+    const store = MockStore.create({ timeseries: model }, mockEnv);
+    model.setColumnNames(["time", "velocity", "acceleration", "temperature"]);
+
+    const filtered = model.filteredOverviewChannels;
+
+    expect(filtered).toEqual(["velocity", "acceleration"]);
+    expect(filtered.length).toBe(2);
+  });
+
+  it("should handle whitespace in overviewChannels", () => {
+    const model = TimeSeriesModel.create(
+      {
+        name: "timeseries",
+        value: "$timeseries",
+        valuetype: "json",
+        timecolumn: "time",
+        overviewchannels: " channel1 , channel2 ",
+        children: [
+          { type: "channel", column: "channel1" },
+          { type: "channel", column: "channel2" },
+          { type: "channel", column: "channel3" },
+        ],
+      },
+      mockEnv,
+    );
+
+    const store = MockStore.create({ timeseries: model }, mockEnv);
+    model.setColumnNames(["time", "channel1", "channel2", "channel3"]);
+
+    const filtered = model.filteredOverviewChannels;
+
+    expect(filtered).toEqual(["channel1", "channel2"]);
+    expect(filtered.length).toBe(2);
+  });
+
+  it("should filter out invalid channel names", () => {
+    const model = TimeSeriesModel.create(
+      {
+        name: "timeseries",
+        value: "$timeseries",
+        valuetype: "json",
+        timecolumn: "time",
+        overviewchannels: "channel1,invalidChannel,channel2",
+        children: [
+          { type: "channel", column: "channel1" },
+          { type: "channel", column: "channel2" },
+          { type: "channel", column: "channel3" },
+        ],
+      },
+      mockEnv,
+    );
+
+    const store = MockStore.create({ timeseries: model }, mockEnv);
+    model.setColumnNames(["time", "channel1", "channel2", "channel3"]);
+
+    const filtered = model.filteredOverviewChannels;
+
+    // Should only include valid channels
+    expect(filtered).toEqual(["channel1", "channel2"]);
+    expect(filtered.length).toBe(2);
+    expect(filtered).not.toContain("invalidChannel");
+    expect(filtered).not.toContain("channel3");
+  });
+
+  it("should return all channels when all specified channels are invalid", () => {
+    const model = TimeSeriesModel.create(
+      {
+        name: "timeseries",
+        value: "$timeseries",
+        valuetype: "json",
+        timecolumn: "time",
+        overviewchannels: "invalid1,invalid2",
+        children: [
+          { type: "channel", column: "channel1" },
+          { type: "channel", column: "channel2" },
+        ],
+      },
+      mockEnv,
+    );
+
+    const store = MockStore.create({ timeseries: model }, mockEnv);
+    model.setColumnNames(["time", "channel1", "channel2"]);
+
+    const filtered = model.filteredOverviewChannels;
+
+    // When all channels are invalid, should return all channels (fallback behavior)
+    expect(filtered).toEqual(["channel1", "channel2"]);
+  });
+
+  it("should handle single channel in overviewChannels", () => {
+    const model = TimeSeriesModel.create(
+      {
+        name: "timeseries",
+        value: "$timeseries",
+        valuetype: "json",
+        timecolumn: "time",
+        overviewchannels: "channel2",
+        children: [
+          { type: "channel", column: "channel1" },
+          { type: "channel", column: "channel2" },
+          { type: "channel", column: "channel3" },
+        ],
+      },
+      mockEnv,
+    );
+
+    const store = MockStore.create({ timeseries: model }, mockEnv);
+    model.setColumnNames(["time", "channel1", "channel2", "channel3"]);
+
+    const filtered = model.filteredOverviewChannels;
+
+    expect(filtered).toEqual(["channel2"]);
+    expect(filtered.length).toBe(1);
+  });
+
+  it("should handle mixed numeric indices and channel names", () => {
+    const model = TimeSeriesModel.create(
+      {
+        name: "timeseries",
+        value: "$timeseries",
+        valuetype: "json",
+        timecolumn: "time",
+        overviewchannels: "1,channel3",
+        children: [
+          { type: "channel", column: "velocity" },
+          { type: "channel", column: "acceleration" },
+          { type: "channel", column: "channel3" },
+        ],
+      },
+      mockEnv,
+    );
+
+    const store = MockStore.create({ timeseries: model }, mockEnv);
+    // Headers: [0: "time", 1: "velocity", 2: "acceleration", 3: "channel3"]
+    model.setColumnNames(["time", "velocity", "acceleration", "channel3"]);
+
+    const filtered = model.filteredOverviewChannels;
+
+    // Index 1 maps to "velocity", "channel3" is used directly
+    expect(filtered).toEqual(["velocity", "channel3"]);
+    expect(filtered.length).toBe(2);
+  });
+
+  it("should handle headless CSV with numeric column indices", () => {
+    const model = TimeSeriesModel.create(
+      {
+        name: "timeseries",
+        value: "$timeseries",
+        valuetype: "json",
+        timecolumn: "0",
+        overviewchannels: "1,2",
+        children: [
+          { type: "channel", column: "1" },
+          { type: "channel", column: "2" },
+          { type: "channel", column: "3" },
+        ],
+      },
+      mockEnv,
+    );
+
+    const store = MockStore.create({ timeseries: model }, mockEnv);
+    // Headless CSV: headers are numeric strings ["0", "1", "2", "3"]
+    model.setColumnNames(["0", "1", "2", "3"]);
+
+    const filtered = model.filteredOverviewChannels;
+
+    // For headless CSV, numeric indices map to header names
+    expect(filtered).toEqual(["1", "2"]);
+    expect(filtered.length).toBe(2);
   });
 });
 
