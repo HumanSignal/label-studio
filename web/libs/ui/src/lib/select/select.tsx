@@ -89,7 +89,7 @@ const SelectedItemsGroup = ({
       >
         {/* Caret icon */}
         <IconChevronDown
-          className={cn(styles.selectedItemsCaret, "transition-transform duration-200", !expanded && "-rotate-90")}
+          className={cn(styles.selectedItemsCaret, "transition-transform ease-out duration-200", !expanded && "-rotate-90")}
           aria-hidden="true"
           style={{ opacity: hasNoItems ? 0.3 : 1 }}
         />
