@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from "@testing-library/react";
+import { render, screen, waitFor, act } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import "@testing-library/jest-dom";
 import { TaskSourceViewer } from "./TaskSourceViewer";
@@ -262,7 +262,7 @@ describe("TaskSourceViewer Component", () => {
   });
 
   describe("Loading State", () => {
-    it("should show initial content while loading then update", async () => {
+    it("should show skeleton while loading then update to code view", async () => {
       // Create a promise that doesn't resolve immediately
       let resolvePromise: (value: any) => void;
       const mockOnTaskLoad = jest.fn().mockImplementation(
@@ -274,13 +274,15 @@ describe("TaskSourceViewer Component", () => {
 
       render(<TaskSourceViewer {...defaultProps} onTaskLoad={mockOnTaskLoad} />);
 
-      // Should show initial content from props
-      expect(screen.getByTestId("code-view")).toBeInTheDocument();
+      // While loading, code-view is not shown (skeleton is shown instead)
+      expect(screen.queryByTestId("code-view")).not.toBeInTheDocument();
 
-      // Resolve the promise with new data
-      resolvePromise!(mockTaskData);
+      // Resolve the promise with new data (wrap in act to avoid state-update warning)
+      await act(async () => {
+        resolvePromise!(mockTaskData);
+      });
 
-      // Wait for content to be updated
+      // Wait for content to be updated and code view to appear
       await waitFor(() => {
         expect(screen.getByTestId("code-view")).toHaveTextContent("s3://bucket/image.jpg");
       });

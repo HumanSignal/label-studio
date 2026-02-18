@@ -240,7 +240,8 @@ export const Tabs = (
                   setBreakPointActiveTab={props.setBreakPointActiveTab}
                 >
                   <div className={cn("tabs").elem("content").toClassName()}>
-                    <Component key={`${view.title}-${index}-ghost`} {...props} name={"outliner"} />
+                    {/* FIT-720: Pass isActive={false} for ghost/preview components to prevent eager loading */}
+                    <Component key={`${view.title}-${index}-ghost`} {...props} name={"outliner"} isActive={false} />
                   </div>
                 </Tab>
               </div>
@@ -276,7 +277,8 @@ export const Tabs = (
         </div>
         {!props.bottomCollapsed && (
           <div className={cn("tabs").elem("contents").toClassName()} style={{ overflow: "auto" }}>
-            {ActiveComponent && <ActiveComponent {...props} />}
+            {/* FIT-720: Pass isActive={true} for the active component to enable data fetching */}
+            {ActiveComponent && <ActiveComponent {...props} isActive={true} />}
           </div>
         )}
       </div>

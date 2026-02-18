@@ -4,7 +4,7 @@ import {
   singleChannelConfig,
   heavyDatasetForDisplacement,
 } from "../../data/timeseries/charts-displaying";
-import { TWO_FRAMES_TIMEOUT } from "../utils/constants";
+import { TWO_FRAMES_TIMEOUT, CANVAS_STABILIZATION_TIMEOUT } from "../utils/constants";
 
 describe("TimeSeries charts displaying - MultiChannel", () => {
   it("should not displace charts while navigating", () => {
@@ -81,7 +81,7 @@ describe("TimeSeries charts displaying - MultiChannel", () => {
     // Zoom to maximum level to make displacement more visible
     cy.log("Zooming to maximum level to test X-axis displacement");
     TimeSeries.zoomToMaximum();
-    cy.wait(TWO_FRAMES_TIMEOUT); // Allow zoom to complete
+    cy.wait(CANVAS_STABILIZATION_TIMEOUT); // Allow zoom to complete — max zoom on 200K points needs more than 2 frames
 
     const checkChartsAlignment = () => {
       // Verify charts stay within plot area boundaries (especially X-axis)
@@ -105,25 +105,25 @@ describe("TimeSeries charts displaying - MultiChannel", () => {
     // Test window resize behavior for 800x600
     cy.log("Testing window resize to 800x600 - checking for X-axis displacement");
     cy.viewport(800, 600);
-    cy.wait(TWO_FRAMES_TIMEOUT); // Allow resize handler to execute
+    cy.wait(CANVAS_STABILIZATION_TIMEOUT); // Allow resize handler to execute — at max zoom, SVG re-render of 200K points needs extra time
     checkChartsAlignment();
 
     // Test window resize behavior for 1200x800
     cy.log("Testing window resize to 1200x800 - checking for X-axis displacement");
     cy.viewport(1200, 800);
-    cy.wait(TWO_FRAMES_TIMEOUT); // Allow resize handler to execute
+    cy.wait(CANVAS_STABILIZATION_TIMEOUT); // Allow resize handler to execute
     checkChartsAlignment();
 
     // Test window resize behavior for 1400x900
     cy.log("Testing window resize to 1400x900 - checking for X-axis displacement");
     cy.viewport(1400, 900);
-    cy.wait(TWO_FRAMES_TIMEOUT); // Allow resize handler to execute
+    cy.wait(CANVAS_STABILIZATION_TIMEOUT); // Allow resize handler to execute
     checkChartsAlignment();
 
     // Test extreme narrow window to stress-test X-axis alignment
     cy.log("Testing narrow window (600x800) - stress test for X-axis displacement");
     cy.viewport(600, 800);
-    cy.wait(TWO_FRAMES_TIMEOUT); // Allow resize handler to execute
+    cy.wait(CANVAS_STABILIZATION_TIMEOUT); // Allow resize handler to execute
     checkChartsAlignment();
   });
 });
@@ -202,7 +202,7 @@ describe("TimeSeries charts displaying - Single Channel", () => {
     // Zoom to maximum level to make displacement more visible
     cy.log("Zooming to maximum level to test X-axis displacement");
     TimeSeries.zoomToMaximum();
-    cy.wait(TWO_FRAMES_TIMEOUT); // Allow zoom to complete
+    cy.wait(CANVAS_STABILIZATION_TIMEOUT); // Allow zoom to complete — max zoom on 200K points needs more than 2 frames
 
     const checkChartsAlignment = () => {
       // Verify charts stay within plot area boundaries (especially X-axis)
@@ -226,25 +226,25 @@ describe("TimeSeries charts displaying - Single Channel", () => {
     // Test window resize behavior for 800x600
     cy.log("Testing window resize to 800x600 - checking for X-axis displacement");
     cy.viewport(800, 600);
-    cy.wait(TWO_FRAMES_TIMEOUT); // Allow resize handler to execute
+    cy.wait(CANVAS_STABILIZATION_TIMEOUT); // Allow resize handler to execute — at max zoom, SVG re-render of 200K points needs extra time
     checkChartsAlignment();
 
     // Test window resize behavior for 1200x800
     cy.log("Testing window resize to 1200x800 - checking for X-axis displacement");
     cy.viewport(1200, 800);
-    cy.wait(TWO_FRAMES_TIMEOUT); // Allow resize handler to execute
+    cy.wait(CANVAS_STABILIZATION_TIMEOUT); // Allow resize handler to execute
     checkChartsAlignment();
 
     // Test window resize behavior for 1400x900
     cy.log("Testing window resize to 1400x900 - checking for X-axis displacement");
     cy.viewport(1400, 900);
-    cy.wait(TWO_FRAMES_TIMEOUT); // Allow resize handler to execute
+    cy.wait(CANVAS_STABILIZATION_TIMEOUT); // Allow resize handler to execute
     checkChartsAlignment();
 
     // Test extreme narrow window to stress-test X-axis alignment
     cy.log("Testing narrow window (600x800) - stress test for X-axis displacement");
     cy.viewport(600, 800);
-    cy.wait(TWO_FRAMES_TIMEOUT); // Allow resize handler to execute
+    cy.wait(CANVAS_STABILIZATION_TIMEOUT); // Allow resize handler to execute
     checkChartsAlignment();
   });
 });

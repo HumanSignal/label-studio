@@ -194,17 +194,6 @@ export const chunks = <T extends any[]>(source: T, chunkSize: number): T[][] => 
   return result;
 };
 
-export const userDisplayName = (user: Record<string, string> = {}) => {
-  const { firstName, lastName } = user;
-
-  return firstName || lastName
-    ? [firstName, lastName]
-        .filter((n) => !!n)
-        .join(" ")
-        .trim()
-    : user.username || user.email;
-};
-
 /**
  * This name supposed to be username, but most likely it's first_name and last_name
  * @param {string} createdBy string like "[<name> ]<email>, <id>"

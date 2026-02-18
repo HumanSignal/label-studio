@@ -55,6 +55,7 @@ export const JsonViewer: FC<JsonViewerProps> = ({
   maxHeight = 500,
   fontSize = "inherit",
   stringTruncate,
+  collapse: initialCollapse,
   // Styling
   className = "",
   inset = false,
@@ -72,7 +73,7 @@ export const JsonViewer: FC<JsonViewerProps> = ({
     storageKey ? localStorage.getItem(`${storageKey}:filter`) : null,
   );
 
-  const [collapseDepth, setCollapseDepth] = useState<number | boolean>(false);
+  const [collapseDepth, setCollapseDepth] = useState<number | boolean>(initialCollapse ?? false);
   const [resetKey, setResetKey] = useState(0);
 
   // Combine built-in "All" filter with custom filters
@@ -140,11 +141,12 @@ export const JsonViewer: FC<JsonViewerProps> = ({
         return filterId;
       });
 
-      // Always expand all nodes when a filter is applied so filtered results are visible
-      setCollapseDepth(Number.POSITIVE_INFINITY);
+      // Expand nodes so filtered results are visible, but limit depth to avoid
+      // freezing with large datasets (e.g. 1000+ annotations)
+      setCollapseDepth(initialCollapse ?? Number.POSITIVE_INFINITY);
       setResetKey((prev) => prev + 1);
     },
-    [storageKey],
+    [storageKey, initialCollapse],
   );
 
   const handleResetFilters = useCallback(() => {

@@ -314,11 +314,17 @@ class TaskAPI(generics.RetrieveUpdateDestroyAPIView):
         """
         fields = ['drafts', 'predictions', 'annotations']
 
+        # Lazy load annotations behind feature flag (FIT-720)
+        annotations_stub = False
+        if flag_set('fflag_fix_all_fit_720_lazy_load_annotations', user=request.user):
+            annotations_stub = bool_from_request(request.GET, 'annotations_stub', False)
+
         return {
             'resolve_uri': bool_from_request(request.GET, 'resolve_uri', True),
             'predictions': 'predictions' in fields,
             'annotations': 'annotations' in fields,
             'drafts': 'drafts' in fields,
+            'annotations_stub': annotations_stub,
             'request': request,
         }
 
@@ -334,9 +340,11 @@ class TaskAPI(generics.RetrieveUpdateDestroyAPIView):
             # refresh task from db with prefetches
             self.task = self.get_object()
 
-        serializer = self.get_serializer_class()(
-            self.task, many=False, context=context, expand=['annotations.completed_by']
-        )
+        # Don't use expand for annotations when using stub mode (FIT-720)
+        # The expand mechanism would override get_annotations and use AnnotationSerializer
+        # instead of AnnotationStubSerializer
+        expand = [] if context.get('annotations_stub') else ['annotations.completed_by']
+        serializer = self.get_serializer_class()(self.task, many=False, context=context, expand=expand)
         data = serializer.data
         return Response(data)
 
