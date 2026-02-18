@@ -36,6 +36,7 @@ import { isFF } from "../../utils/feature-flags";
 // @ts-ignore
 import { confirm } from "../../common/Modal/Modal";
 import { type ContextMenuAction, ContextMenu, type MenuActionOnClick } from "../ContextMenu";
+import { useResolveUser, isUserComplete } from "@humansignal/core/hooks/useResolveUser";
 import "./AnnotationButton.scss";
 
 // Constants for name truncation
@@ -582,13 +583,13 @@ export const AnnotationButton = observer(
     const iconSize = 32;
     // Guard entity property access - use safe defaults if entity is not alive
     const isPrediction = entityIsAlive ? entity.type === "prediction" : false;
-    const username = entityIsAlive
-      ? userDisplayName(
-          entity.user ?? {
-            firstName: entity.createdBy || "Admin",
-          },
-        )
-      : "Unknown";
+    // Use entity.user if it has meaningful display data (name/email); otherwise
+    // fall back to createdBy (which comes from created_username in stub annotations).
+    const resolvedUser =
+      entityIsAlive && entity.user && isUserComplete(entity.user)
+        ? entity.user
+        : { firstName: entityIsAlive ? entity.createdBy || "Admin" : "Unknown" };
+    const username = entityIsAlive ? userDisplayName(resolvedUser) : "Unknown";
     const [isGroundTruth, setIsGroundTruth] = useState<boolean>();
     const isDraft = entityIsAlive && !isPrediction && !isDefined(entity.pk);
     const isDraftSaved = entityIsAlive && !isPrediction && entity.draftId > 0;
@@ -607,6 +608,15 @@ export const AnnotationButton = observer(
     const [isTooltipOpen, setTooltipOpen] = useState(false);
     const [tooltipPosition, setTooltipPosition] = useState<{ top: number; left: number } | undefined>(undefined);
     const [isContextMenuOpen, setContextMenuOpen] = useState(false);
+
+    // Lazily resolve incomplete user data when the button comes into view.
+    // When annotations are loaded as stubs, entity.user may only have an ID
+    // (no name/email), so this fetches the full user and updates the MST store.
+    const enrichUser = useCallback(
+      (userData: any) => annotationStore?.store?.enrichUsers?.([userData]),
+      [annotationStore],
+    );
+    useResolveUser({ user: entity?.user, onUserResolved: enrichUser, elementRef: buttonRef });
 
     if (infoIsHidden && entityIsAlive) {
       // this data can be missing in tests, but we don't have `infoIsHidden` there, so hiding logic like this
@@ -960,7 +970,7 @@ export const AnnotationButton = observer(
               // @ts-expect-error - block attribute for Selenium test compatibility
               block="lsf-annotation-button"
               username={isPrediction ? entity.createdBy : null}
-              user={hiddenUser ?? entity.user ?? { email: entity.createdBy }}
+              user={hiddenUser ?? (isUserComplete(entity.user) ? entity.user : { email: entity.createdBy })}
               size={24}
               badge={
                 reviewBadge

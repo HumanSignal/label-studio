@@ -95,7 +95,7 @@ jobs:
           images: ${{ env.IMAGE_NAME }}
 
       - name: Push Docker image (${{ matrix.platform }})
-        uses: docker/build-push-action@v6.18.0
+        uses: docker/build-push-action@v6.19.2
         id: docker_build_and_push
         with:
           context: .

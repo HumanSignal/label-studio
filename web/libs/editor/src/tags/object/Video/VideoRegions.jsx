@@ -1,5 +1,5 @@
 import chroma from "chroma-js";
-import clamp from "lodash/clamp";
+import { clamp } from "@humansignal/core/lib/utils/lodash-replacements";
 import { observer } from "mobx-react";
 import { getParentOfType } from "mobx-state-tree";
 import { useCallback, useEffect, useMemo, useState } from "react";

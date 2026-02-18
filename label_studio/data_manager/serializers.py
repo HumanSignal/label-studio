@@ -16,6 +16,7 @@ from tasks.models import Task
 from tasks.serializers import (
     AnnotationDraftSerializer,
     AnnotationSerializer,
+    AnnotationStubSerializer,
     PredictionSerializer,
     TaskSerializer,
 )
@@ -439,7 +440,7 @@ class DataManagerTaskSerializer(TaskSerializer):
     """Data Manager Task Serializer with FSM state support."""
 
     predictions = PredictionsDMFieldSerializer(required=False, read_only=True)
-    annotations = AnnotationsDMFieldSerializer(required=False, many=True, default=[], read_only=True)
+    annotations = serializers.SerializerMethodField(required=False, read_only=True)
     drafts = AnnotationDraftDMFieldSerializer(required=False, read_only=True)
     annotators = AnnotatorsDMFieldSerializer(required=False, read_only=True)
 
@@ -514,6 +515,35 @@ class DataManagerTaskSerializer(TaskSerializer):
 
     def get_predictions(self, task):
         return PredictionSerializer(task.predictions, many=True, default=[], read_only=True).data
+
+    def get_annotations(self, task):
+        """Return annotations for the task.
+
+        If annotations_stub=True is in context (via feature flag
+        fflag_fix_all_fit_720_lazy_load_annotations), returns lightweight
+        annotation stubs without result data for improved performance.
+        """
+        if not self.context.get('annotations'):
+            return []
+
+        annotations = task.annotations.all()
+
+        # Use stub serializer if requested (feature flag checked at API level)
+        if self.context.get('annotations_stub'):
+            return AnnotationStubSerializer(
+                annotations,
+                many=True,
+                read_only=True,
+                context=self.context,
+                expand=['completed_by'],
+            ).data
+
+        return AnnotationsDMFieldSerializer(
+            annotations,
+            many=True,
+            read_only=True,
+            context=self.context,
+        ).data
 
     @staticmethod
     def get_file_upload(task):

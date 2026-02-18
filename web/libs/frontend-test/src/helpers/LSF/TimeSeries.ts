@@ -244,10 +244,10 @@ class TimeSeriesHelper {
     return this;
   }
 
-  // Verify that chart client bounding boxes align with their clip-path containers
+  // Verify that chart client bounding boxes stay within their clip-path containers
   // Only checks odd-indexed paths (1st, 3rd, 5th, etc.) in each clip-path container group
   verifyChartBoundingBoxAlignment() {
-    cy.log("Verifying chart client bounding boxes align with clip-path containers (odd-indexed paths only)");
+    cy.log("Verifying chart client bounding boxes are contained within clip-path containers (odd-indexed paths only)");
 
     // Get all clip-path containers and check odd-indexed paths in each
     this.channelSvg.find("[clip-path]").each(($clipContainer) => {
@@ -276,9 +276,11 @@ class TimeSeriesHelper {
           `Clip parent client rect: x=${clipParentClientRect.x.toFixed(2)}, y=${clipParentClientRect.y.toFixed(2)}, width=${clipParentClientRect.width.toFixed(2)}, height=${clipParentClientRect.height.toFixed(2)}`,
         );
 
-        // Check that client bounding boxes are equal (path should fill its clip-path container)
-        const isAligned = BoundingBoxUtils.isEqual(pathClientRect, clipParentClientRect, 2);
-        expect(isAligned, `Path ${i + 1} client bounding box should align with its clip-path container`).to.be.true;
+        // Check that path bounding box is contained within clip-path container (path should not extend beyond)
+        // At maximum zoom, the path might not fill the entire container, but it should stay within bounds
+        const isContained = BoundingBoxUtils.isContainedIn(pathClientRect, clipParentClientRect, 2);
+        expect(isContained, `Path ${i + 1} client bounding box should be contained within its clip-path container`).to
+          .be.true;
       }
     });
 

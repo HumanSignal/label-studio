@@ -1,6 +1,6 @@
 import { flow, getEnv, getParent, getRoot, getSnapshot, types } from "mobx-state-tree";
 import { when } from "mobx";
-import uniqBy from "lodash/uniqBy";
+import { uniqBy } from "@humansignal/core/lib/utils/lodash-replacements";
 import Utils from "../../utils";
 import { snakeizeKeys } from "../../utils/utilities";
 import { parseCommentClassificationConfig } from "../../utils/commentClassification";
@@ -25,6 +25,12 @@ export const CommentStore = types
      * It should be removed in case we start to use separate comment stores per annotation.
      */
     commentsKey: null,
+    /**
+     * FIT-720: Track the annotation ID for which a listComments fetch is currently in-flight.
+     * Used to deduplicate concurrent listComments calls (e.g. prefetch on annotation selection
+     * + Comments tab useEffect firing for the same annotation).
+     */
+    _fetchingCommentsForAnnotation: null,
   }))
   .views((self) => ({
     get store() {
@@ -168,6 +174,25 @@ export const CommentStore = types
       self.addedCommentThisSession = isAddedCommentThisSession;
     }
 
+    /**
+     * Recalculate and update the current annotation's comment_count and
+     * unresolved_comment_count based on the local comments array.
+     * This keeps the annotation tab icons in sync without requiring a
+     * full task reload.
+     */
+    function updateAnnotationCommentCounts() {
+      const annotation = self.annotation;
+
+      if (!annotation) return;
+
+      const activeComments = self.comments.filter((c) => !c.isDeleted);
+      const total = activeComments.length;
+      const unresolved = activeComments.filter((c) => !c.isResolved).length;
+
+      annotation.setCommentCount(total);
+      annotation.setUnresolvedCommentCount(unresolved);
+    }
+
     function replaceId(id, newComment) {
       const comments = self.comments;
 
@@ -272,6 +297,7 @@ export const CommentStore = types
       // @todo setComments?
       self.comments.unshift(comment);
       self.setAddedCommentThisSession(true);
+      self.updateAnnotationCommentCounts();
       if (self.canPersist) {
         try {
           const [newComment] = yield self.sdk.invoke("comments:create", comment);
@@ -283,6 +309,7 @@ export const CommentStore = types
           }
         } catch (err) {
           self.removeCommentById(now);
+          self.updateAnnotationCommentCounts();
           throw err;
         } finally {
           self.setLoading(null);
@@ -354,10 +381,20 @@ export const CommentStore = types
     }
 
     const listComments = flow(function* ({ mounted = { current: true }, suppressClearComments } = {}) {
-      if (!suppressClearComments) self.setComments([]);
       if (!self.draftId && !self.annotationId) return;
 
+      // FIT-720: Deduplicate concurrent listComments calls for the same annotation.
+      // This prevents double API calls when both the prefetch (on annotation selection)
+      // and the Comments tab useEffect trigger listComments for the same annotation.
+      const fetchKey = self.annotationId ?? self.draftId;
+      if (fetchKey && self._fetchingCommentsForAnnotation === fetchKey) {
+        return;
+      }
+
+      if (!suppressClearComments) self.setComments([]);
+
       try {
+        self._fetchingCommentsForAnnotation = fetchKey;
         if (mounted.current) {
           self.setLoading("list");
         }
@@ -375,6 +412,9 @@ export const CommentStore = types
       } catch (err) {
         console.error(err);
       } finally {
+        if (fetchKey === self._fetchingCommentsForAnnotation) {
+          self._fetchingCommentsForAnnotation = null;
+        }
         if (mounted.current) {
           self.setLoading(null);
         }
@@ -393,6 +433,7 @@ export const CommentStore = types
       setInputRef,
       setLoading,
       setTooltipMessage,
+      updateAnnotationCommentCounts,
       replaceId,
       removeCommentById,
       persistQueuedComments,

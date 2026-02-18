@@ -40,6 +40,9 @@ export interface JsonViewerProps {
   fontSize?: string | number;
   /** Number of characters before truncating strings (click to expand) */
   stringTruncate?: number;
+  /** Initial collapse depth. Collections deeper than this are collapsed on mount.
+   *  e.g., 2 = expand root + first level, collapse everything deeper. Default: no forced collapse. */
+  collapse?: number | boolean;
 
   // Styling
   /** Additional CSS classes */

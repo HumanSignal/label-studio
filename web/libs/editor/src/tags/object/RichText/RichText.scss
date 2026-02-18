@@ -2,15 +2,9 @@
   position: relative;
 
   &__container {
-    overflow: auto;
+    overflow: unset;
     font-size: 16px;
-    line-height: 26px;
-
-    &_canResizeSpans {
-      overflow: unset;
-      font-size: 16px;
-      line-height: 20px;
-    }
+    line-height: 20px;
   }
 
   &__orig-container {

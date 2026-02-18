@@ -25,11 +25,19 @@ For information on setting up a project, see [Create and configure projects](set
 
 <div class="enterprise-only">
 
-![Screenshot of the Data Manager](/images/project/dm-community.png)
+![Screenshot of the Data Manager](/images/project/dm-enterprise.png)
 
 </div>
 
 In Label Studio Community Edition, the data manager is the default view for your data. In Label Studio Enterprise, click **Data Manager** to open and view the data manager page. Every row in the data manager represents a labeling task in your dataset.
+
+<div class="enterprise-only">
+
+## Task states
+
+Each task progresses through a series of states as you take actions on it. For more information, see [Project and Task State Management](project_states). 
+
+</div>
 
 ## Filter or sort project data
 

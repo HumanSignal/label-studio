@@ -45,6 +45,22 @@
   "ts:shrink-right-large": {
     "key": "shift+alt+right"
   },
+  "ts:pan-left": {
+    "key": "left",
+    "description": "Pan time series view to the left"
+  },
+  "ts:pan-right": {
+    "key": "right",
+    "description": "Pan time series view to the right"
+  },
+  "ts:pan-left-large": {
+    "key": "shift+left",
+    "description": "Pan time series view to the left (large step)"
+  },
+  "ts:pan-right-large": {
+    "key": "shift+right",
+    "description": "Pan time series view to the right (large step)"
+  },
   "annotation:submit": {
     "key": "ctrl+enter",
     "mac": "command+enter",

@@ -2,6 +2,34 @@
 require("jest-fetch-mock").enableMocks();
 require("@testing-library/jest-dom");
 
+// Ensure APP_SETTINGS and feature_flags exist for isFF() and other feature flag checks
+if (typeof window !== "undefined") {
+  window.APP_SETTINGS = window.APP_SETTINGS ?? {};
+  window.APP_SETTINGS.feature_flags = window.APP_SETTINGS.feature_flags ?? {};
+  window.APP_SETTINGS.feature_flags_default_value = window.APP_SETTINGS.feature_flags_default_value ?? false;
+}
+
+// Mock IntersectionObserver (not implemented in jsdom) - used by FIT-720 lazy loading
+class IntersectionObserverMock {
+  constructor(callback, options) {
+    this.callback = callback;
+    this.options = options;
+    this.observedElements = [];
+  }
+
+  observe(element) {
+    this.observedElements.push(element);
+    // Immediately call callback with isIntersecting: true so lazy-loaded content triggers
+    this.callback([{ target: element, isIntersecting: true, intersectionRatio: 1 }], this);
+  }
+
+  unobserve() {}
+  disconnect() {
+    this.observedElements = [];
+  }
+}
+window.IntersectionObserver = IntersectionObserverMock;
+
 // Mock HTMLMediaElement data and methods not implemented by jsdom.
 window.HTMLMediaElement.prototype._mock = {
   paused: true,
