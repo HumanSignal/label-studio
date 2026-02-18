@@ -46,8 +46,10 @@ Scenario("Dnd at the outliner after switching annotations", async ({ I, LabelStu
     config: CONFIG,
     data: { text: TEXT },
   });
-
-  AtOutliner.seeRegions(10);
+  LabelStudio.waitForObjectsReady();
+  I.waitTicks(2);
+  I.waitForFunction(() => (window.Htx?.annotationStore?.selected?.regions?.length ?? 0) >= 10, 10);
+  I.waitTicks(2);
 
   I.say("Check that drag and drop interaction works");
   await AtOutliner.dragAndDropRegion(7, 3);
@@ -55,7 +57,9 @@ Scenario("Dnd at the outliner after switching annotations", async ({ I, LabelStu
   I.say("Switch annotation");
   I.click(locate(".lsf-annotation-button").at(2));
   I.waitTicks(5);
-  AtOutliner.seeRegions(10);
+  LabelStudio.waitForObjectsReady();
+  I.waitForFunction(() => (window.Htx?.annotationStore?.selected?.regions?.length ?? 0) >= 10, 10);
+  I.waitTicks(2);
 
   I.say("Check that we still able to drag and drop regions");
   await AtOutliner.dragAndDropRegion(7, 3);

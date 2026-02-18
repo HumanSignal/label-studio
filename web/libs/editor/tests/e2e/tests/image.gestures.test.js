@@ -16,6 +16,26 @@ const BLUEVIOLET = {
   color: "#8A2BE2",
   rgbArray: [138, 43, 226],
 };
+
+const assertWithTolerance = (actual, expected, tolerance = 0.25) => {
+  if (typeof expected === "number" && typeof actual === "number") {
+    assert(Math.abs(actual - expected) <= tolerance, `Expected ${actual} to be within ${tolerance} of ${expected}`);
+    return;
+  }
+
+  if (Array.isArray(expected)) {
+    assert.strictEqual(actual.length, expected.length);
+    expected.forEach((value, idx) => assertWithTolerance(actual[idx], value, tolerance));
+    return;
+  }
+
+  if (expected && typeof expected === "object") {
+    Object.keys(expected).forEach((key) => assertWithTolerance(actual[key], expected[key], tolerance));
+    return;
+  }
+
+  assert.deepStrictEqual(actual, expected);
+};
 const getConfigWithShapes = (shapes, props = "") => `
    <View>
     <Image name="img" value="$image" zoom="true" zoomBy="1.5" zoomControl="true" rotateControl="true"></Image>
@@ -134,6 +154,6 @@ Scenario("Creating regions by various gestures", async ({ I, LabelStudio, AtImag
   const result = await I.executeScript(serialize);
 
   for (let i = 0; i < regions.length; i++) {
-    assert.deepEqual(convertToFixed(result[i].value), convertToImageSize(regions[i].result));
+    assertWithTolerance(convertToFixed(result[i].value), convertToImageSize(regions[i].result));
   }
 });

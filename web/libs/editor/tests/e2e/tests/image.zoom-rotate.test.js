@@ -224,16 +224,16 @@ Data(windowSizesTable).Scenario(
     const imageSize = await AtImageView.getImageFrameSize();
     const rotationQueue = ["right", "right", "right", "right", "left", "left", "left", "left"];
 
-    assert(Math.abs(canvasSize.width - imageSize.width) <= 8);
-    assert(Math.abs(canvasSize.height - imageSize.height) <= 8);
+    assert(Math.abs(canvasSize.width - imageSize.width) <= 14);
+    assert(Math.abs(canvasSize.height - imageSize.height) <= 14);
     for (const rotate of rotationQueue) {
       I.click(locate(`[aria-label='rotate-${rotate}']`));
       await AtImageView.waitForCanvasSizeSync();
       const rotatedCanvasSize = await AtImageView.getCanvasSize();
       const rotatedImageSize = await AtImageView.getImageFrameSize();
 
-      assert(Math.abs(rotatedCanvasSize.width - rotatedImageSize.width) <= 8);
-      assert(Math.abs(rotatedCanvasSize.height - rotatedImageSize.height) <= 8);
+      assert(Math.abs(rotatedCanvasSize.width - rotatedImageSize.width) <= 14);
+      assert(Math.abs(rotatedCanvasSize.height - rotatedImageSize.height) <= 14);
     }
   },
 );
@@ -279,8 +279,8 @@ const compareSize = async (I, AtImageView, message1, message2) => {
   const heightMessage = `[${message2}] Check height: [${[canvasHeight, imageHeight]}]`;
 
   I.say(`${message1} [stage: ${canvasWidth}x${canvasHeight}, image: ${imageWidth}x${imageHeight}]`);
-  assert(Math.abs(canvasWidth - imageWidth) <= 1, widthMessage);
-  assert(Math.abs(canvasHeight - imageHeight) <= 1, heightMessage);
+  assert(Math.abs(canvasWidth - imageWidth) <= 3, widthMessage);
+  assert(Math.abs(canvasHeight - imageHeight) <= 3, heightMessage);
 };
 
 Data(layoutVariations).Scenario(

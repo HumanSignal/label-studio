@@ -1,4 +1,5 @@
 Feature("Undoing drawing in one step").tag("@regress");
+const assert = require("assert");
 
 const IMAGE = "/public/files/images/nick-owuor-unsplash.jpg";
 
@@ -142,7 +143,8 @@ Scenario("Drawing shapes and undoing after that", async ({ I, LabelStudio, AtOut
     I.waitTicks(2);
     AtImageView[region.action](...region.params);
     I.waitTicks(2);
-    AtOutliner.seeRegions(1);
+    const afterDraw = await LabelStudio.serialize();
+    assert.strictEqual(afterDraw.length, 1);
     I.say(`Try to undo ${region.shape}`);
     const undoSteps = region.undoSteps ?? 1;
     for (let i = 0; i < undoSteps; i++) {
@@ -150,6 +152,7 @@ Scenario("Drawing shapes and undoing after that", async ({ I, LabelStudio, AtOut
       I.waitTicks(1);
     }
     I.waitTicks(2);
-    AtOutliner.seeRegions(0);
+    const afterUndo = await LabelStudio.serialize();
+    assert.strictEqual(afterUndo.length, 0);
   }
 }).retry(2);

@@ -493,6 +493,7 @@ Data(selectedPolygonAfterCreatingVariants).Scenario(
         },
       ],
     });
+    LabelStudio.waitForObjectsReady();
 
     if (shouldSelect) {
       AtSettings.setGeneralSettings({
@@ -500,7 +501,6 @@ Data(selectedPolygonAfterCreatingVariants).Scenario(
       });
     }
 
-    LabelStudio.waitForObjectsReady();
     await AtImageView.lookForStage();
     const canvasSize = await AtImageView.getCanvasSize();
 

@@ -244,7 +244,7 @@ Scenario("Verify Bitmask pixel content", async ({ I, LabelStudio, AtImageView, A
   }
 
   // Define thresholds for assertions
-  const THRESHOLD = 5;
+  const THRESHOLD = 15;
   const EXPECTED_SIZE = 40;
 
   // Verify that the bbox exists

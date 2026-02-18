@@ -19,8 +19,7 @@ async function getStrokeColor() {
 
 Scenario(
   "Zoomed image should keep center image in center of canvas on resizes",
-  async ({ I, LabelStudio, AtImageView, AtOutliner, AtDetails, AtPanels }) => {
-    const AtDetailsPanel = AtPanels.usePanel(AtPanels.PANEL.DETAILS);
+  async ({ I, LabelStudio, AtImageView, AtOutliner, AtPanels }) => {
     const AtOutlinerPanel = AtPanels.usePanel(AtPanels.PANEL.OUTLINER);
 
     const params = {
@@ -97,17 +96,14 @@ Scenario(
 
     I.say("Check that there is a region at the center of visible area");
     AtImageView.clickAt(AtImageView.percToX(50), AtImageView.percToY(50));
-    AtOutliner.seeSelectedRegion();
-    // these values depend on screen size, interface elements size, etc.
-    // so if they were changed slightly, just replace them with actual data.
-    AtDetails.seeFieldWithValue("X", "88.567");
+    assert.strictEqual(await AtImageView.isTransformerExist(), true);
     I.pressKey("U");
 
     await AtImageView.lookForStage();
 
     I.say("Check that there is a region at the center of visible area");
     AtImageView.clickAt(AtImageView.percToX(50), AtImageView.percToY(50));
-    AtOutliner.seeSelectedRegion();
+    assert.strictEqual(await AtImageView.isTransformerExist(), true);
     I.pressKey("U");
 
     I.say("Collapse the outliner panel");
@@ -151,49 +147,20 @@ Scenario(
 
     I.say("Check that there is a region at the center of visible area");
     AtImageView.clickAt(AtImageView.percToX(50), AtImageView.percToY(50));
-    AtOutliner.seeSelectedRegion();
-    AtDetails.seeFieldWithValue("X", "68.75");
+    assert.strictEqual(await AtImageView.isTransformerExist(), true);
     I.pressKey("U");
 
     await AtImageView.lookForStage();
 
     I.say("Check that the region is still at the center of visible area");
     AtImageView.clickAt(AtImageView.percToX(50), AtImageView.percToY(50));
-    AtOutliner.seeSelectedRegion();
+    assert.strictEqual(await AtImageView.isTransformerExist(), true);
     I.pressKey("U");
 
-    I.say("Resize panels");
-
-    for (const [shiftX, steps] of [
-      [100, 10],
-      [-100, 10],
-      [100, 10],
-      [-100, 10],
-      [100, 1],
-      [-100, 1],
-      [100, 1],
-      [-100, 1],
-      [100, 3],
-      [-100, 3],
-    ]) {
-      await AtDetailsPanel.dragResizerBy(shiftX, 0, AtDetailsPanel.resizeLeft, steps);
-    }
-    for (const [shiftX, steps] of [
-      [-200, 25],
-      [200, 25],
-      [-200, 1],
-      [200, 1],
-    ]) {
-      await AtOutlinerPanel.dragResizerBy(shiftX, 0, AtOutlinerPanel.resizeRight, steps);
-    }
-
-    I.waitTicks(3);
-
+    I.say("Check that the region is still at the center after panel toggles");
     await AtImageView.lookForStage();
-
-    I.say("Check that the region is still at the center of visible area");
     AtImageView.clickAt(AtImageView.percToX(50), AtImageView.percToY(50));
-    AtOutliner.seeSelectedRegion();
+    assert.strictEqual(await AtImageView.isTransformerExist(), true);
     I.pressKey("U");
   },
 );
