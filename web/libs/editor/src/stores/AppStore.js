@@ -19,7 +19,6 @@ import { UserExtended } from "./UserStore";
 import { UserLabels } from "./UserLabels";
 import {
   FF_CUSTOM_SCRIPT,
-  FF_DEV_1536,
   FF_LSDV_4620_3_ML,
   FF_LSDV_4998,
   FF_REVIEWER_FLOW,
@@ -168,7 +167,7 @@ export default types
 
     users: types.optional(types.array(UserExtended), []),
 
-    userLabels: isFF(FF_DEV_1536) ? types.optional(UserLabels, { controls: {} }) : types.undefined,
+    userLabels: types.optional(UserLabels, { controls: {} }),
 
     queueTotal: types.optional(types.number, 0),
 
@@ -850,6 +849,25 @@ export default types
         if (isFF(FF_LSDV_4620_3_ML) && !appControls?.isRendered()) {
           appControls?.render();
         }
+      }
+
+      // Ensure users referenced by annotations exist in the users store
+      // before annotations are created. This prevents MST reference resolution errors
+      // when annotation.user references a user ID not yet present in the store
+      // (e.g. in review stream where annotators' user data isn't pre-loaded).
+      const allItems = [...(completions ?? []), ...(annotations ?? [])];
+      const userStubs = allItems
+        .map((item) => {
+          const userRef = item.user ?? item.completed_by;
+
+          if (typeof userRef === "number") return { id: userRef };
+          if (userRef && typeof userRef === "object" && userRef.id) return userRef;
+          return null;
+        })
+        .filter(Boolean);
+
+      if (userStubs.length) {
+        self.enrichUsers(userStubs);
       }
 
       // goal here is to deserialize everything fast and select only first annotation

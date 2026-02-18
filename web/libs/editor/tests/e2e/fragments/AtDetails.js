@@ -84,6 +84,10 @@ module.exports = {
   },
   clickMeta() {
     I.click(this.locateMeta());
+    // After clicking the meta div, React replaces it with a <textarea> for editing.
+    // Wait for the textarea to appear and receive focus so that subsequent keystrokes
+    // are directed to the correct element.
+    I.waitForVisible(`textarea${this._metaField}`, 5);
   },
   seeLabel(text) {
     I.seeElement(this.locateLabel(text));

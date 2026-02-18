@@ -134,6 +134,7 @@ export const Comment = CommentBase.named("Comment")
           id: self.id,
           is_resolved: self.isResolved,
         });
+        getRoot(self).commentStore.updateAnnotationCommentCounts();
       } catch (err) {
         self.isResolved = !self.isResolved;
         throw err;
@@ -215,6 +216,7 @@ export const Comment = CommentBase.named("Comment")
 
       self.setDeleted(true);
       self.setConfirmMode(false);
+      getRoot(self).commentStore.updateAnnotationCommentCounts();
     });
 
     const scrollIntoView = () => {

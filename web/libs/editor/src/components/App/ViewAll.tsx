@@ -1,4 +1,3 @@
-import { ff } from "@humansignal/core";
 import { usePersistentState } from "@humansignal/core/lib/hooks/usePersistentState";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@humansignal/ui/lib/tabs";
 import type { MSTAnnotation, MSTStore } from "../../stores/types";
@@ -16,7 +15,7 @@ export const ViewAll = ({ store: annotationStore, annotations, root }: Props) =>
   const [tab, setTab] = usePersistentState<"summary" | "compare">("view-all-tab", "summary");
   const SummaryComponent = ff.isActive(ff.FF_UTC_554_AGREEMENT_V2_IN_TASK_SUMMARY_VIEW) ? TaskSummaryV2 : TaskSummary;
 
-  if (annotationStore.store.hasInterface("annotations:summary") && ff.isActive(ff.FF_SUMMARY)) {
+  if (annotationStore.store.hasInterface("annotations:summary")) {
     return (
       <div className="px-base pt-tighter mt-base">
         <Tabs variant="default" value={tab} onValueChange={(value) => setTab(value as "summary" | "compare")}>

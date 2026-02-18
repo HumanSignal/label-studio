@@ -67,6 +67,9 @@ export const APIConfig = {
     /** Single annotation */
     annotation: "/tasks/:taskID/annotations/:id",
 
+    /** Fetch single annotation by ID (for lazy loading) */
+    fetchAnnotation: "/../annotations/:annotationID",
+
     /** Presign url */
     presignUrlForTask: "/../../tasks/:taskID/presign",
 

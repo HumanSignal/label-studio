@@ -77,9 +77,6 @@ class ToolsManager {
       const findme = new RegExp(`^.*?#${name}.*$`);
 
       if (Object.keys(this.tools).some((entry) => findme.test(entry))) {
-        console.log(
-          `Ignoring duplicate tool ${name} because it matches removeDuplicatesNamed ${removeDuplicatesNamed}`,
-        );
         return;
       }
     }

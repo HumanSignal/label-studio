@@ -3,18 +3,25 @@ const assert = require("assert");
 // @TODO: Check why i do not see this `Feature` in tests in CI
 Feature("Taxonomy");
 
-Before(({ LabelStudio }) => {
-  LabelStudio.setFeatureFlags({
-    fflag_feat_front_lsdv_5451_async_taxonomy_110823_short: false,
-    ff_front_dev_1536_taxonomy_user_labels_150222_long: true,
-  });
+Before(({ LabelStudio, AtTaxonomy }) => {
+  LabelStudio.setFeatureFlags({});
+  // Reset to NewTaxonomy mode (default). Tests needing legacy="true"
+  // should call AtTaxonomy.setLegacy(true) at the start of the scenario.
+  AtTaxonomy.setLegacy(false);
 });
 
 Scenario("Lines overlap", async ({ I, LabelStudio, AtTaxonomy }) => {
+  // This test measures bounding boxes of tree items using legacy Taxonomy selectors
+  // (CSS module classes + <label> elements). NewTaxonomy uses Ant Design's TreeSelect
+  // which has a completely different DOM structure. Use legacy for this layout test.
+  AtTaxonomy.setLegacy(true);
+
   async function checkOverlapAndGap(text1, text2) {
-    // Wait for elements to be present in the DOM before grabbing their bounding rects
-    const locator1 = AtTaxonomy.locate(AtTaxonomy.item).find("label").withText(text1);
-    const locator2 = AtTaxonomy.locate(AtTaxonomy.item).find("label").withText(text2);
+    // Wait for elements to be present in the DOM before grabbing their bounding rects.
+    // Use legacyItem directly — this function only runs with legacy="true" configs,
+    // and the dynamic `item` property may not propagate through the DI proxy.
+    const locator1 = AtTaxonomy.locate(AtTaxonomy.legacyItem).find("label").withText(text1);
+    const locator2 = AtTaxonomy.locate(AtTaxonomy.legacyItem).find("label").withText(text2);
 
     await I.waitForElement(locator1, 5);
     await I.waitForElement(locator2, 5);
@@ -48,7 +55,7 @@ Scenario("Lines overlap", async ({ I, LabelStudio, AtTaxonomy }) => {
     config: `
 <View>
   <Text name="text" value="$text"/>
-  <Taxonomy name="taxonomy" toName="text">
+  <Taxonomy name="taxonomy" toName="text" legacy="true">
     <Choice value="target group">
       <Choice value="london london london london london london london" />
       <Choice value="long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long line"/>
@@ -72,7 +79,7 @@ Scenario("Lines overlap", async ({ I, LabelStudio, AtTaxonomy }) => {
     config: `
 <View>
   <Text name="text" value="$text"/>
-  <Taxonomy name="taxonomy" toName="text">
+  <Taxonomy name="taxonomy" toName="text" legacy="true">
     <Choice value="target group">
       <Choice value="london london london london london london london" />
       <Choice value="long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long line"/>
@@ -95,7 +102,7 @@ Scenario("Lines overlap", async ({ I, LabelStudio, AtTaxonomy }) => {
     config: `
 <View>
   <Text name="text" value="$text"/>
-  <Taxonomy name="taxonomy" toName="text">
+  <Taxonomy name="taxonomy" toName="text" legacy="true">
     <Choice value="target group">
       <Choice value="super long line ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ..."/>
       <Choice value="enough long line ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... ..."/>
@@ -116,11 +123,15 @@ Scenario("Lines overlap", async ({ I, LabelStudio, AtTaxonomy }) => {
 }).retry(3);
 
 Scenario("Add custom items", async ({ I, LabelStudio, AtTaxonomy }) => {
+  // This test uses addNewItem/addItemInside/deleteItem which require
+  // the legacy Taxonomy component (NewTaxonomy doesn't support user labels yet).
+  AtTaxonomy.setLegacy(true);
+
   const params = {
     config: `
 <View>
   <Text name="text" value="$text"/>
-  <Taxonomy name="taxonomy" toName="text">
+  <Taxonomy name="taxonomy" toName="text" legacy="true">
     <Choice value="a">
       <Choice value="ab"/>
       <Choice value="ac"/>
@@ -339,12 +350,17 @@ Scenario.skip("Taxonomy read only in history", async ({ I, LabelStudio, AtTaxono
 });
 
 Scenario("Taxonomy readonly result", async ({ I, LabelStudio, AtTaxonomy }) => {
+  // The old Taxonomy allows opening the dropdown in readonly mode (items are disabled).
+  // NewTaxonomy's disabled TreeSelect prevents opening the dropdown entirely.
+  // Use legacy so the test can verify tree items are visible but not editable.
+  AtTaxonomy.setLegacy(true);
+
   I.amOnPage("/");
   LabelStudio.init({
     config: `
 <View>
   <Text name="text" value="$text"/>
-  <Taxonomy name="taxonomy" toName="text">
+  <Taxonomy name="taxonomy" toName="text" legacy="true">
     <Choice value="a">
         <Choice value="ab" />
     </Choice>
