@@ -2,7 +2,6 @@ import { observer } from "mobx-react";
 import { isAlive } from "mobx-state-tree";
 import type React from "react";
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { useMounted } from "../../common/Utils/useMounted";
 import { LINK_COMMENT_MODE } from "../../stores/Annotation/LinkingModes";
 import ResizeObserver from "../../utils/resize-observer";
 import { guidGenerator } from "../../utils/unique";
@@ -166,23 +165,15 @@ const CommentsOverlayInner = observer(({ annotation, commentStore }: CommentsOve
   const rootRef = useRef<SVGSVGElement>();
   const [uniqKey, forceUpdate] = useState<any>(guidGenerator());
 
-  const mounted = useMounted();
-
-  const loadComments = async () => {
-    await commentStore.listComments({ mounted, suppressClearComments: commentStore.isRelevantList });
-  };
-
-  useEffect(() => {
-    loadComments();
-    // id is internal id,
-    // always different for different annotations, even empty ones;
-    // remain the same when user submit draft, so no unneeded calls.
-  }, [commentStore.annotation?.id]);
+  // FIT-720: CommentsOverlay no longer fetches comments eagerly.
+  // The Comments panel will load comments when the user clicks on the comments tab.
+  // CommentsOverlay just renders markers for whatever comments are already loaded.
+  // This prevents duplicate/early requests.
 
   const resizeObserver: ResizeObserver = useMemo(() => {
     let requestId: number;
 
-    return new ResizeObserver((entities) => {
+    return new ResizeObserver((_entries) => {
       cancelAnimationFrame(requestId);
       requestId = requestAnimationFrame(() => {
         forceUpdate(guidGenerator());

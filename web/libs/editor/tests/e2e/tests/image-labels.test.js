@@ -1,5 +1,13 @@
 const assert = require("assert");
-const { kebabCase } = require("lodash");
+
+// Inline kebabCase since @humansignal/core is a workspace package
+// unavailable in the CodeceptJS e2e test runner's node_modules
+function kebabCase(str) {
+  return str
+    .replace(/([a-z0-9])([A-Z])/g, "$1-$2")
+    .replace(/[\s_]+/g, "-")
+    .toLowerCase();
+}
 
 Feature("Images' labels type matching");
 
@@ -129,6 +137,8 @@ DataStore.Scenario(
     LabelStudio.init(params);
     AtDetailsPanel.collapsePanel();
     LabelStudio.waitForObjectsReady();
+    await AtImageView.lookForStage();
+    I.waitForInvisible(".lsf-image-progress", 30);
     AtOutliner.seeRegions(0);
     const canvasSize = await AtImageView.getCanvasSize();
     const size = Math.min(canvasSize.width, canvasSize.height);
@@ -171,9 +181,10 @@ DataStore.Scenario(
 
       LabelStudio.init(params);
       LabelStudio.waitForObjectsReady();
+      await AtImageView.lookForStage();
+      I.waitForInvisible(".lsf-image-progress", 30);
       AtOutliner.seeRegions(0);
       I.click(toolSelector);
-      await AtImageView.lookForStage();
       I.say(`${shape}: Drawing.`);
 
       regions.forEach((region, idx) => {

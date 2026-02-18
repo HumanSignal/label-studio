@@ -1,7 +1,6 @@
 import { formatDistanceToNow } from "date-fns";
 import { destroy, detach } from "mobx-state-tree";
-import camelCase from "lodash/camelCase";
-import snakeCase from "lodash/snakeCase";
+import { camelCase, snakeCase } from "@humansignal/core/lib/utils/string";
 
 /**
  * Internal helper to check if parameter is a string
@@ -193,17 +192,6 @@ export const chunks = <T extends any[]>(source: T, chunkSize: number): T[][] => 
   }
 
   return result;
-};
-
-export const userDisplayName = (user: Record<string, string> = {}) => {
-  const { firstName, lastName } = user;
-
-  return firstName || lastName
-    ? [firstName, lastName]
-        .filter((n) => !!n)
-        .join(" ")
-        .trim()
-    : user.username || user.email;
 };
 
 /**

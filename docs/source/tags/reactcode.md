@@ -21,8 +21,9 @@ Importantly, this allows you to continue leveraging Label Studio's annotation ma
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
 | name | string | — | Unique identifier for the tag (required) |
-| [toName] | string | — | If this is a [self-referencing tags ](#Self-referencing-tag), this parameter is required and should match `name` |
+| [toName] | string | — | If this is a [self-referencing tag](#Self-referencing-tag), this parameter is required and should match `name` |
 | [data] | string | — | The [task data](#Data-parameter), e.g., `data="$image"` or `data="$text"` |
+| [src] | string | — | URL to an external JavaScript file containing the React component code. Use this as an alternative to inline code. [See more below](#Using-the-src-attribute) |
 | [inputs] | string | — | Defines the JSON schema for the input data (`data`)  |
 | [outputs] | string | — | Defines the JSON schema for the [output](#Using-the-outputs-parameter)  |
 | [style] | string | — | Inline styles or CSS string for the iframe container  |
@@ -66,7 +67,37 @@ function MyComponent({ React, addRegion, regions, data }) {
 }
 ```
 
+### Using the `src` attribute
 
+By default, you write your React component code inline, directly inside the `<ReactCode>` tag (typically wrapped in a [CDATA section](#CDATA-wrapper)). The `src` attribute provides an alternative approach: instead of embedding the code in the labeling configuration, you can host it at an external URL and reference it.
+
+This works similarly to how a `<script src="...">` tag loads JavaScript from an external file in HTML.
+
+```xml
+<!-- Instead of inline code... -->
+<ReactCode name="custom" toName="custom" data="$myData">
+  <![CDATA[
+  function MyComponent({ React, addRegion, regions, data }) {
+    // ... your code here
+  }
+  ]]>
+</ReactCode>
+
+<!-- ...you can reference an external file -->
+<ReactCode name="custom" toName="custom" data="$myData" src="https://example.com/my-component.js" />
+```
+
+The external JavaScript file should export a function component with the same signature as inline code (receiving `React`, `addRegion`, `regions`, `data`, and `viewState` as props).
+
+**When to use `src`:**
+
+- Your component code is large or complex and difficult to manage inside XML
+- You want to version and maintain your UI code in a separate repository
+- You want to reuse the same component across multiple labeling projects
+- You prefer developing in a standard IDE workflow (edit, deploy, reference)
+
+!!! note
+    When the `src` attribute is provided, any inline code inside the `<ReactCode>` tag is ignored. The component is loaded entirely from the external URL.
 
 ## React usage notes
 

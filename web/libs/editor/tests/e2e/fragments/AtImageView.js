@@ -5,7 +5,7 @@ const Helpers = require("../tests/helpers");
 
 module.exports = {
   _stageSelector: ".konvajs-content",
-  _stageFrameSelector: '[class^="frame--"]',
+  _stageFrameSelector: ".lsf-image",
   _stageBBox: null,
 
   _toolBarSelector: ".lsf-toolbar",
@@ -52,6 +52,10 @@ module.exports = {
 
   async lookForStage() {
     await I.scrollPageToTop();
+    // Wait for the image to be fully loaded (model state + canvas ready)
+    // before trying to grab the stage bounding box
+    await I.executeScript(Helpers.waitForImage);
+    I.waitForVisible("canvas", 10);
 
     this._stageBBox = await this.grabStageBBox();
   },
@@ -78,10 +82,27 @@ module.exports = {
     return this._stageBBox?.y ?? 0;
   },
 
+  /**
+   * Assert that the currently displayed image matches the expected source URL.
+   * Polls until the image entity's original src matches AND the image is fully
+   * rendered on the Konva canvas. Handles navigation timing automatically.
+   *
+   * Use this instead of I.seeElement("img[src=...]") — the <img> tag uses a blob URL
+   * and is clipped to 1px, while the actual image lives on the Konva canvas.
+   *
+   * @param {string} expectedSrc — the original image URL (e.g. "/public/files/images/foo.jpg")
+   */
+  async seeCurrentImageSrc(expectedSrc) {
+    await I.executeScript(Helpers.waitForImageSrc, expectedSrc);
+  },
+
   async waitForImage() {
     I.say("Waiting for image to be loaded");
+    // Wait for any download progress indicator to disappear
+    I.waitForInvisible(".lsf-image-progress", 30);
+    // Wait for internal model state to confirm image is loaded and canvas is ready
     await I.executeScript(Helpers.waitForImage);
-    I.waitForVisible("canvas", 5);
+    I.waitForVisible("canvas", 10);
   },
 
   async getNaturalSize() {

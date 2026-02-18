@@ -1,4 +1,4 @@
-/* global describe, test, expect */
+/* global describe, test, expect, beforeEach, afterEach */
 import { msToHMS, prettyDate } from "../date";
 
 describe("Helper function prettyDate", () => {
@@ -8,36 +8,37 @@ describe("Helper function prettyDate", () => {
     expect(prettyDate(123)).toBeUndefined();
   });
 
-  test("Yesterday", () => {
-    const today = new Date();
-    const testing = new Date(Date.UTC(today.getFullYear(), today.getMonth(), today.getDate()));
-    const resultDate = new Date(testing.setDate(testing.getDate() - 1));
+  describe("relative dates (with fixed now)", () => {
+    const fixedNow = new Date("2025-02-10T12:00:00.000Z");
 
-    expect(prettyDate(resultDate.toISOString())).toBe("Yesterday");
-  });
+    beforeEach(() => {
+      jest.useFakeTimers();
+      jest.setSystemTime(fixedNow);
+    });
 
-  test("2 days ago", () => {
-    const today = new Date();
-    const testing = new Date(Date.UTC(today.getFullYear(), today.getMonth(), today.getDate()));
-    const resultDate = new Date(testing.setDate(testing.getDate() - 2));
+    afterEach(() => {
+      jest.useRealTimers();
+    });
 
-    expect(prettyDate(resultDate.toISOString())).toBe("2 days ago");
-  });
+    test("Yesterday", () => {
+      const resultDate = new Date("2025-02-09T12:00:00.000Z");
+      expect(prettyDate(resultDate.toISOString())).toBe("Yesterday");
+    });
 
-  test("2 weeks ago", () => {
-    const today = new Date();
-    const testing = new Date(Date.UTC(today.getFullYear(), today.getMonth(), today.getDate()));
-    const resultDate = new Date(testing.setDate(testing.getDate() - 14));
+    test("2 days ago", () => {
+      const resultDate = new Date("2025-02-08T12:00:00.000Z");
+      expect(prettyDate(resultDate.toISOString())).toBe("2 days ago");
+    });
 
-    expect(prettyDate(resultDate.toISOString())).toBe("2 weeks ago");
-  });
+    test("2 weeks ago", () => {
+      const resultDate = new Date("2025-01-27T12:00:00.000Z");
+      expect(prettyDate(resultDate.toISOString())).toBe("2 weeks ago");
+    });
 
-  test("100 days ago", () => {
-    const today = new Date();
-    const testing = new Date(Date.UTC(today.getFullYear(), today.getMonth(), today.getDate()));
-    const resultDate = new Date(testing.setDate(testing.getDate() - 100));
-
-    expect(prettyDate(resultDate.toISOString())).toBe("100 days ago");
+    test("100 days ago", () => {
+      const resultDate = new Date("2024-11-02T12:00:00.000Z");
+      expect(prettyDate(resultDate.toISOString())).toBe("100 days ago");
+    });
   });
 });
 

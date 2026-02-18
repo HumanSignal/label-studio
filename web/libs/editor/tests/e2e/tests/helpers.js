@@ -175,19 +175,95 @@ const createAddEventListenerScript = (eventName, callback) => {
 };
 
 /**
- * Wait for the main Image object to be loaded
+ * Wait for the main Image object to be fully loaded and the Konva canvas to have
+ * the image actually rendered.
+ *
+ * The loading pipeline is:
+ *   1. ImageEntity downloads data → `downloaded = true`
+ *   2. <img> tag loads → `imageLoaded = true` → `imageIsLoaded = true`
+ *   3. `imageIsLoaded` gates <EntireStage> → Konva Stage + canvas appear in the DOM
+ *   4. <ImageLayer> reuses the already-loaded <img> element (item.imageRef) and
+ *      renders <KonvaImage> synchronously — no redundant Image() load.
+ *
+ * We verify that the Konva stage contains an Image node, which confirms that
+ * the full render pipeline (including React's commit phase) has completed.
  */
 const waitForImage = () => {
   return new Promise((resolve, reject) => {
-    const img = document.querySelector("[alt=LS]");
+    const timeout = setTimeout(() => {
+      reject(new Error("waitForImage: Timed out after 10s waiting for image to load"));
+    }, 10000);
 
-    if (!img || img.complete) return resolve();
-    // this should be rewritten to isReady when it is ready
-    img.onload = () => {
-      setTimeout(resolve, 100);
+    const check = () => {
+      const imageObject = window.Htx?.annotationStore?.selected?.objects?.find((o) => o.type === "image");
+
+      if (imageObject?.imageIsLoaded) {
+        const stageRef = imageObject.stageRef;
+
+        // stageRef is the Konva Stage instance — it exists once <EntireStage> has mounted.
+        // stageRef.find('Image') returns Konva Image nodes rendered by <ImageLayer>.
+        // If it finds at least one, the image is fully painted on the canvas.
+        if (stageRef && stageRef.find("Image").length > 0) {
+          clearTimeout(timeout);
+          // Let Konva finish its current render cycle (batch draw)
+          setTimeout(resolve, 32);
+          return;
+        }
+      }
+
+      requestAnimationFrame(check);
     };
-    // if image is not loaded in 10 seconds, reject
-    setTimeout(reject, 10000);
+
+    check();
+  });
+};
+
+/**
+ * Get the original src of the currently displayed image entity.
+ * Returns the original URL (not the blob URL), or undefined if no image is loaded.
+ */
+const currentImageSrc = () => {
+  const imageObject = window.Htx?.annotationStore?.selected?.objects?.find((o) => o.type === "image");
+
+  return imageObject?.currentImageEntity?.src;
+};
+
+/**
+ * Wait until the current image entity matches the expected src AND is fully loaded
+ * and rendered on the Konva canvas. Handles navigation timing — if the entity hasn't
+ * changed yet, it will keep polling until it matches.
+ *
+ * @param {string} expectedSrc — the original image URL to wait for
+ */
+const waitForImageSrc = (expectedSrc) => {
+  return new Promise((resolve, reject) => {
+    const timeout = setTimeout(() => {
+      const imageObject = window.Htx?.annotationStore?.selected?.objects?.find((o) => o.type === "image");
+      const actualSrc = imageObject?.currentImageEntity?.src;
+
+      reject(
+        new Error(`waitForImageSrc: Timed out after 10s. Expected "${expectedSrc}" but current src is "${actualSrc}"`),
+      );
+    }, 10000);
+
+    const check = () => {
+      const imageObject = window.Htx?.annotationStore?.selected?.objects?.find((o) => o.type === "image");
+      const imageEntity = imageObject?.currentImageEntity;
+
+      if (imageEntity?.src === expectedSrc && imageObject?.imageIsLoaded) {
+        const stageRef = imageObject.stageRef;
+
+        if (stageRef && stageRef.find("Image").length > 0) {
+          clearTimeout(timeout);
+          setTimeout(resolve, 32);
+          return;
+        }
+      }
+
+      requestAnimationFrame(check);
+    };
+
+    check();
   });
 };
 
@@ -635,7 +711,7 @@ const getCanvasSize = () => {
   };
 };
 const getImageSize = () => {
-  const image = window.document.querySelector('img[alt="LS"]');
+  const image = window.document.querySelector('img[alt="image"]');
   const clientRect = image.getBoundingClientRect();
 
   return {
@@ -644,7 +720,7 @@ const getImageSize = () => {
   };
 };
 const getImageFrameSize = () => {
-  const image = window.document.querySelector('img[alt="LS"]').parentElement;
+  const image = window.document.querySelector('img[alt="image"]').parentElement;
   const clientRect = image.getBoundingClientRect();
 
   return {
@@ -1009,4 +1085,7 @@ module.exports = {
   doDrawingAction,
   createRandomWithSeed,
   createRandomIntWithSeed,
+
+  currentImageSrc,
+  waitForImageSrc,
 };

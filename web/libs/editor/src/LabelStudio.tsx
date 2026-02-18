@@ -2,7 +2,7 @@ import { configure } from "mobx";
 import { destroy } from "mobx-state-tree";
 import { render, unmountComponentAtNode } from "react-dom";
 import { createRoot } from "react-dom/client";
-import camelCase from "lodash/camelCase";
+import { camelCase } from "@humansignal/core/lib/utils/string";
 import { LabelStudio as LabelStudioReact } from "./Component";
 import App from "./components/App/App";
 import { configureStore } from "./configureStore";

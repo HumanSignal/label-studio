@@ -47,25 +47,35 @@ const CellRenderer = observer(({ col: colInput, data, decoration, cellViews }) =
   );
 });
 
-export const TableRow = observer(({ data, even, style, wrapperStyle, onClick, stopInteractions, decoration }) => {
-  const { columns, cellViews } = React.useContext(TableContext);
-  const rowWrapperCN = tableCN.elem("row-wrapper");
-  const tableRowCN = cn("table-row");
-  const mods = {
-    even,
-    selected: data.isSelected,
-    highlighted: data.isHighlighted,
-    loading: data.isLoading,
-    disabled: stopInteractions,
-  };
+export const TableRow = observer(
+  ({ data, even, style, wrapperStyle, onClick, stopInteractions, decoration, onContextMenu }) => {
+    const { columns, cellViews, contextMenuRowId } = React.useContext(TableContext);
+    const rowWrapperCN = tableCN.elem("row-wrapper");
+    const tableRowCN = cn("table-row");
+    const hasContextMenuOpen = contextMenuRowId === data.id;
+    const mods = {
+      even,
+      selected: data.isSelected,
+      highlighted: data.isHighlighted,
+      loading: data.isLoading,
+      disabled: stopInteractions,
+      "context-menu-open": hasContextMenuOpen,
+    };
 
-  return (
-    <div className={rowWrapperCN.mod(mods).toString()} style={wrapperStyle} onClick={(e) => onClick?.(data, e)}>
-      <div className={tableRowCN.toString()} style={style} data-leave={true}>
-        {columns.map((col) => {
-          return <CellRenderer key={col.id} col={col} data={data} cellViews={cellViews} decoration={decoration} />;
-        })}
+    return (
+      <div
+        className={rowWrapperCN.mod(mods).toString()}
+        style={wrapperStyle}
+        onClick={(e) => onClick?.(data, e)}
+        onContextMenu={(e) => onContextMenu?.(e, data)}
+        data-testid="table-row-wrapper"
+      >
+        <div className={tableRowCN.toString()} style={style} data-leave={true} data-testid="table-row">
+          {columns.map((col) => {
+            return <CellRenderer key={col.id} col={col} data={data} cellViews={cellViews} decoration={decoration} />;
+          })}
+        </div>
       </div>
-    </div>
-  );
-});
+    );
+  },
+);

@@ -137,7 +137,8 @@
       background-color: var(--color-primary-emphasis);
     }
 
-    &:not(.table__row_wrapper_selected):hover {
+    &:not(.table__row-wrapper_selected):hover,
+    &_context-menu-open:not(.table__row-wrapper_selected) {
       background-color: var(--color-primary-emphasis-subtle);
     }
   }

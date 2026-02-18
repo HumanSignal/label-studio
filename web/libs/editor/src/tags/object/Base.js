@@ -1,5 +1,5 @@
 import { types } from "mobx-state-tree";
-import isMatch from "lodash/isMatch";
+import { isMatch } from "@humansignal/core/lib/utils/lodash-replacements";
 import InfoModal from "../../components/Infomodal/Infomodal";
 import { AnnotationMixin } from "../../mixins/AnnotationMixin";
 import { FF_DEV_3391, isFF } from "../../utils/feature-flags";

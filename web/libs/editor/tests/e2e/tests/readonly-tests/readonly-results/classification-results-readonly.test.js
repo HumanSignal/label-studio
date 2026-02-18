@@ -59,14 +59,17 @@ Data(imageExamples).Scenario("Classification Readonly Results", async ({ I, curr
    * Checking the Taxonomy input
    */
   I.say("Checking the Taxonomy input");
-  I.click("Click to add...", ".htx-taxonomy");
+  // Click the taxonomy container — in readonly/disabled mode, the dropdown won't open.
+  // Note: "Click to add..." can't be used as a text selector due to dots causing CSS parsing errors.
+  I.click(".htx-taxonomy");
   I.seeElement(".htx-taxonomy input:disabled");
 
   I.say("Checking selected values");
-  I.dontSee({ css: ".htx-taxonomy-selected input[type=button]" });
+  // In NewTaxonomy disabled mode, selected items don't have remove buttons
+  I.dontSeeElement(locate(".ant-select-selection-item-remove").inside(locate(".htx-taxonomy")));
 
-  I.say("Try selecting anyways");
-  I.see("Choice 1", ".htx-taxonomy");
+  I.say("Selected value is displayed");
+  I.see("Choice 2.1", ".htx-taxonomy");
 
   I.say("Results are equal after editing attempt");
   await LabelStudio.resultsNotChanged(result);

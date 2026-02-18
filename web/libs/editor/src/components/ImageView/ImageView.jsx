@@ -17,10 +17,10 @@ import { ImageViewProvider } from "./ImageViewContext";
 import { Hotkey } from "../../core/Hotkey";
 import { useObserver } from "mobx-react";
 import ResizeObserver from "../../utils/resize-observer";
-import { debounce } from "../../utils/debounce";
+import { debounce } from "@humansignal/core/lib/utils/debounce";
 import Constants from "../../core/Constants";
 import { fixRectToFit, mapKonvaBrightness } from "../../utils/image";
-import { FF_DEV_1442, FF_DEV_3077, FF_LSDV_4583_6, FF_LSDV_4930, FF_ZOOM_OPTIM, isFF } from "../../utils/feature-flags";
+import { FF_DEV_1442, FF_LSDV_4930, FF_ZOOM_OPTIM, isFF } from "../../utils/feature-flags";
 import { Pagination } from "../../common/Pagination/Pagination";
 import { Image } from "./Image";
 
@@ -1051,9 +1051,9 @@ export default observer(
 
       if (paginationEnabled) wrapperClasses.push(styles.withPagination);
 
-      const [toolsReady, stageLoading] = isFF(FF_LSDV_4583_6) ? [true, false] : [item.hasTools, item.stageWidth <= 1];
+      const [toolsReady, stageLoading] = [true, false];
 
-      const imageIsLoaded = item.imageIsLoaded || !isFF(FF_LSDV_4583_6);
+      const imageIsLoaded = item.imageIsLoaded;
       const isViewingAll = store.annotationStore.viewingAll;
 
       return (
@@ -1097,40 +1097,18 @@ export default observer(
               style={{ width: "100%", marginTop: item.fillerHeight }}
             />
 
-            {isFF(FF_LSDV_4583_6) ? (
-              <Image
-                ref={(ref) => {
-                  item.setImageRef(ref);
-                  this.imageRef.current = ref;
-                }}
-                usedValue={item.usedValue}
-                imageEntity={item.currentImageEntity}
-                imageTransform={item.imageTransform}
-                updateImageSize={item.updateImageSize}
-                size={item.canvasSize}
-                overlay={<CanvasOverlay item={item} />}
-              />
-            ) : (
-              <div className={[styles.frame, ...imagePositionClassnames].join(" ")} style={item.canvasSize}>
-                <img
-                  ref={(ref) => {
-                    item.setImageRef(ref);
-                    this.imageRef.current = ref;
-                  }}
-                  loading={isFF(FF_DEV_3077) && !item.lazyoff ? "lazy" : "false"}
-                  style={item.imageTransform}
-                  src={item.currentSrc}
-                  onLoad={(e) => {
-                    item.updateImageSize(e);
-                    item.currentImageEntity.setImageLoaded(true);
-                  }}
-                  onError={this.handleError}
-                  crossOrigin={item.imageCrossOrigin}
-                  alt="LS"
-                />
-                <CanvasOverlay item={item} />
-              </div>
-            )}
+            <Image
+              ref={(ref) => {
+                item.setImageRef(ref);
+                this.imageRef.current = ref;
+              }}
+              usedValue={item.usedValue}
+              imageEntity={item.currentImageEntity}
+              imageTransform={item.imageTransform}
+              updateImageSize={item.updateImageSize}
+              size={item.canvasSize}
+              overlay={<CanvasOverlay item={item} />}
+            />
             {/* @todo this is dirty hack; rewrite to proper async waiting for data to load */}
             {stageLoading || !toolsReady ? (
               <div className={styles.loading}>
@@ -1269,23 +1247,14 @@ const EntireStage = observer(
 const ImageLayer = observer(({ item }) => {
   const imageEntity = item.currentImageEntity;
   const konvaImageRef = useRef();
-  const [loadedImage, setLoadedImage] = useState(null);
 
-  // Load image with proper CORS and load event
-  useEffect(() => {
-    if (imageEntity?.downloaded && imageEntity.currentSrc) {
-      const img = new window.Image();
-      img.crossOrigin = "anonymous";
-      img.src = imageEntity.currentSrc;
-      img.width = imageEntity.naturalWidth;
-      img.height = imageEntity.naturalHeight;
-      img.onload = () => {
-        setLoadedImage(img);
-      };
-    } else {
-      setLoadedImage(null);
-    }
-  }, [imageEntity?.downloaded, imageEntity?.currentSrc]);
+  // Reuse the <img> DOM element that <ImageRenderer> already loaded.
+  // item.imageRef is set via item.setImageRef() in ImageView's render.
+  // imageEntity.imageLoaded (observable) is true once the <img> onload fires,
+  // and imageIsLoaded gates <EntireStage> — so by the time this component renders,
+  // item.imageRef is guaranteed to point to a fully-loaded HTMLImageElement.
+  // This eliminates the redundant Image() load that previously happened here.
+  const loadedImage = imageEntity?.imageLoaded ? item.imageRef : null;
 
   const { width, height } = useMemo(() => {
     return {

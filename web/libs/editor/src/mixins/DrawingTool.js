@@ -1,7 +1,7 @@
 import { types } from "mobx-state-tree";
 
 import Utils from "../utils";
-import throttle from "lodash/throttle";
+import { throttle } from "@humansignal/core/lib/utils/lodash-replacements";
 import { MIN_SIZE } from "../tools/Base";
 import { FF_DEV_3391, isFF } from "../utils/feature-flags";
 import { ff } from "@humansignal/core";

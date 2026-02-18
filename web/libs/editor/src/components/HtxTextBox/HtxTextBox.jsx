@@ -1,7 +1,7 @@
 import React from "react";
 import { IconPencil, IconTrashAlt, IconCheck } from "@humansignal/icons";
 import { Button, Tooltip, Typography } from "@humansignal/ui";
-import throttle from "lodash/throttle";
+import { throttle } from "@humansignal/core/lib/utils/lodash-replacements";
 import { cn } from "../../utils/bem";
 
 // used for correct auto-height calculation

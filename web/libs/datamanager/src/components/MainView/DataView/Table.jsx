@@ -51,6 +51,10 @@ const injector = inject(({ store }) => {
     project: store.project ?? {},
     hasFilters: (currentView?.filtersApplied ?? 0) > 0,
     canLabel: totalTasks > 0 && foundTasks > 0,
+    // LSE-specific callbacks and components
+    onViewAnalytics: store.SDK?.onViewAnalytics,
+    onViewReviewerAnalytics: store.SDK?.onViewReviewerAnalytics,
+    RowContextMenuComponent: store.SDK?.RowContextMenuComponent,
   };
 
   return props;
@@ -75,6 +79,9 @@ export const DataView = injector(
     project,
     hasFilters,
     canLabel,
+    onViewAnalytics,
+    onViewReviewerAnalytics,
+    RowContextMenuComponent,
     ...props
   }) => {
     const [datasetStatusID, setDatasetStatusID] = useState(store.SDK.dataset?.status?.id);
@@ -383,6 +390,9 @@ export const DataView = injector(
             col.original.resetWidth();
           }}
           onDensityChange={setDensity}
+          onViewAnalytics={onViewAnalytics}
+          onViewReviewerAnalytics={onViewReviewerAnalytics}
+          RowContextMenuComponent={RowContextMenuComponent}
         />
       ) : (
         <GridView
