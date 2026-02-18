@@ -105,7 +105,7 @@ export const CollapsiblePanel = ({
         >
           <IconChevronDown
             size={16}
-            className={cn("transition-transform duration-200", !isExpanded && "-rotate-90")}
+            className={cn("transition-transform ease-out duration-200", !isExpanded && "-rotate-90")}
           />
         </Button>
 
