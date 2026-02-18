@@ -236,3 +236,305 @@ Scenario("TimeSeries with optimized data", async ({ I, LabelStudio, AtTimeSeries
     lastTimestamp = timestamp;
   }
 });
+
+Feature("TimeSeries overviewChannels filtering");
+
+Scenario("Overview should show only specified channels when overviewChannels is set", async ({ I, LabelStudio }) => {
+  const config = `
+<View>
+  <Header value="TimeSeries overviewChannels test"/>
+  <TimeSeriesLabels name="label" toName="ts">
+    <Label value="Event"></Label>
+  </TimeSeriesLabels>
+  <TimeSeries name="ts" value="$timeseries" valueType="json" timeColumn="time" overviewChannels="channel1,channel3">
+    <Channel column="channel1" strokeColor="#1f77b4" legend="Channel 1" />
+    <Channel column="channel2" strokeColor="#ff7f0e" legend="Channel 2" />
+    <Channel column="channel3" strokeColor="#2ca02c" legend="Channel 3" />
+  </TimeSeries>
+</View>
+`;
+
+  const data = {
+    timeseries: {
+      time: [0, 1, 2, 3, 4, 5],
+      channel1: [10, 20, 30, 40, 50, 60],
+      channel2: [15, 25, 35, 45, 55, 65],
+      channel3: [5, 15, 25, 35, 45, 55],
+    },
+  };
+
+  const params = {
+    annotations: [{ id: "test", result: [] }],
+    config: config,
+    data: data,
+  };
+
+  await I.amOnPage("/");
+  LabelStudio.init(params);
+  I.waitForVisible(".htx-timeseries", 5);
+  I.dontSeeElement(locate(".lsf-errors"));
+
+  // Count channel paths in the overview
+  const channelCount = await I.executeScript(() => {
+    const overview = document.querySelector(".htx-timeseries-overview");
+    if (!overview) return 0;
+    const svg = overview.querySelector("svg");
+    if (!svg) return 0;
+    const channelsGroup = svg.querySelector(".channels");
+    if (!channelsGroup) return 0;
+    return channelsGroup.querySelectorAll("path.channel").length;
+  });
+
+  // Should only show 2 channels (channel1 and channel3), not channel2
+  assert.equal(channelCount, 2, `Expected 2 channels in overview, but found ${channelCount}`);
+});
+
+Scenario("Overview should show all channels when overviewChannels is not set", async ({ I, LabelStudio }) => {
+  const config = `
+<View>
+  <Header value="TimeSeries overviewChannels test"/>
+  <TimeSeriesLabels name="label" toName="ts">
+    <Label value="Event"></Label>
+  </TimeSeriesLabels>
+  <TimeSeries name="ts" value="$timeseries" valueType="json" timeColumn="time">
+    <Channel column="channel1" strokeColor="#1f77b4" legend="Channel 1" />
+    <Channel column="channel2" strokeColor="#ff7f0e" legend="Channel 2" />
+    <Channel column="channel3" strokeColor="#2ca02c" legend="Channel 3" />
+  </TimeSeries>
+</View>
+`;
+
+  const data = {
+    timeseries: {
+      time: [0, 1, 2, 3, 4, 5],
+      channel1: [10, 20, 30, 40, 50, 60],
+      channel2: [15, 25, 35, 45, 55, 65],
+      channel3: [5, 15, 25, 35, 45, 55],
+    },
+  };
+
+  const params = {
+    annotations: [{ id: "test", result: [] }],
+    config: config,
+    data: data,
+  };
+
+  await I.amOnPage("/");
+  LabelStudio.init(params);
+  I.waitForVisible(".htx-timeseries", 5);
+  I.dontSeeElement(locate(".lsf-errors"));
+
+  // Count channel paths in the overview
+  const channelCount = await I.executeScript(() => {
+    const overview = document.querySelector(".htx-timeseries-overview");
+    if (!overview) return 0;
+    const svg = overview.querySelector("svg");
+    if (!svg) return 0;
+    const channelsGroup = svg.querySelector(".channels");
+    if (!channelsGroup) return 0;
+    return channelsGroup.querySelectorAll("path.channel").length;
+  });
+
+  // Should show all 3 channels when overviewChannels is not set
+  assert.equal(channelCount, 3, `Expected 3 channels in overview, but found ${channelCount}`);
+});
+
+Scenario("Overview should filter channels by numeric index", async ({ I, LabelStudio }) => {
+  const config = `
+<View>
+  <Header value="TimeSeries overviewChannels numeric index test"/>
+  <TimeSeriesLabels name="label" toName="ts">
+    <Label value="Event"></Label>
+  </TimeSeriesLabels>
+  <TimeSeries name="ts" value="$timeseries" valueType="json" timeColumn="time" overviewChannels="1,3">
+    <Channel column="velocity" strokeColor="#1f77b4" legend="Velocity" />
+    <Channel column="acceleration" strokeColor="#ff7f0e" legend="Acceleration" />
+    <Channel column="temperature" strokeColor="#2ca02c" legend="Temperature" />
+  </TimeSeries>
+</View>
+`;
+
+  const data = {
+    timeseries: {
+      time: [0, 1, 2, 3, 4, 5],
+      velocity: [10, 20, 30, 40, 50, 60],
+      acceleration: [15, 25, 35, 45, 55, 65],
+      temperature: [5, 15, 25, 35, 45, 55],
+    },
+  };
+
+  const params = {
+    annotations: [{ id: "test", result: [] }],
+    config: config,
+    data: data,
+  };
+
+  await I.amOnPage("/");
+  LabelStudio.init(params);
+  I.waitForVisible(".htx-timeseries", 5);
+  I.dontSeeElement(locate(".lsf-errors"));
+
+  // Count channel paths in the overview
+  const channelCount = await I.executeScript(() => {
+    const overview = document.querySelector(".htx-timeseries-overview");
+    if (!overview) return 0;
+    const svg = overview.querySelector("svg");
+    if (!svg) return 0;
+    const channelsGroup = svg.querySelector(".channels");
+    if (!channelsGroup) return 0;
+    return channelsGroup.querySelectorAll("path.channel").length;
+  });
+
+  // Should only show 2 channels (velocity at index 1, temperature at index 3), not acceleration
+  assert.equal(channelCount, 2, `Expected 2 channels in overview, but found ${channelCount}`);
+});
+
+Scenario("Overview should handle case-insensitive channel names", async ({ I, LabelStudio }) => {
+  const config = `
+<View>
+  <Header value="TimeSeries overviewChannels case-insensitive test"/>
+  <TimeSeriesLabels name="label" toName="ts">
+    <Label value="Event"></Label>
+  </TimeSeriesLabels>
+  <TimeSeries name="ts" value="$timeseries" valueType="json" timeColumn="time" overviewChannels="VELOCITY,Acceleration">
+    <Channel column="velocity" strokeColor="#1f77b4" legend="Velocity" />
+    <Channel column="acceleration" strokeColor="#ff7f0e" legend="Acceleration" />
+    <Channel column="temperature" strokeColor="#2ca02c" legend="Temperature" />
+  </TimeSeries>
+</View>
+`;
+
+  const data = {
+    timeseries: {
+      time: [0, 1, 2, 3, 4, 5],
+      velocity: [10, 20, 30, 40, 50, 60],
+      acceleration: [15, 25, 35, 45, 55, 65],
+      temperature: [5, 15, 25, 35, 45, 55],
+    },
+  };
+
+  const params = {
+    annotations: [{ id: "test", result: [] }],
+    config: config,
+    data: data,
+  };
+
+  await I.amOnPage("/");
+  LabelStudio.init(params);
+  I.waitForVisible(".htx-timeseries", 5);
+  I.dontSeeElement(locate(".lsf-errors"));
+
+  // Count channel paths in the overview
+  const channelCount = await I.executeScript(() => {
+    const overview = document.querySelector(".htx-timeseries-overview");
+    if (!overview) return 0;
+    const svg = overview.querySelector("svg");
+    if (!svg) return 0;
+    const channelsGroup = svg.querySelector(".channels");
+    if (!channelsGroup) return 0;
+    return channelsGroup.querySelectorAll("path.channel").length;
+  });
+
+  // Should show 2 channels (velocity and acceleration) despite case differences
+  assert.equal(channelCount, 2, `Expected 2 channels in overview, but found ${channelCount}`);
+});
+
+Scenario("Overview should handle single channel in overviewChannels", async ({ I, LabelStudio }) => {
+  const config = `
+<View>
+  <Header value="TimeSeries overviewChannels single channel test"/>
+  <TimeSeriesLabels name="label" toName="ts">
+    <Label value="Event"></Label>
+  </TimeSeriesLabels>
+  <TimeSeries name="ts" value="$timeseries" valueType="json" timeColumn="time" overviewChannels="channel2">
+    <Channel column="channel1" strokeColor="#1f77b4" legend="Channel 1" />
+    <Channel column="channel2" strokeColor="#ff7f0e" legend="Channel 2" />
+    <Channel column="channel3" strokeColor="#2ca02c" legend="Channel 3" />
+  </TimeSeries>
+</View>
+`;
+
+  const data = {
+    timeseries: {
+      time: [0, 1, 2, 3, 4, 5],
+      channel1: [10, 20, 30, 40, 50, 60],
+      channel2: [15, 25, 35, 45, 55, 65],
+      channel3: [5, 15, 25, 35, 45, 55],
+    },
+  };
+
+  const params = {
+    annotations: [{ id: "test", result: [] }],
+    config: config,
+    data: data,
+  };
+
+  await I.amOnPage("/");
+  LabelStudio.init(params);
+  I.waitForVisible(".htx-timeseries", 5);
+  I.dontSeeElement(locate(".lsf-errors"));
+
+  // Count channel paths in the overview
+  const channelCount = await I.executeScript(() => {
+    const overview = document.querySelector(".htx-timeseries-overview");
+    if (!overview) return 0;
+    const svg = overview.querySelector("svg");
+    if (!svg) return 0;
+    const channelsGroup = svg.querySelector(".channels");
+    if (!channelsGroup) return 0;
+    return channelsGroup.querySelectorAll("path.channel").length;
+  });
+
+  // Should show only 1 channel (channel2)
+  assert.equal(channelCount, 1, `Expected 1 channel in overview, but found ${channelCount}`);
+});
+
+Scenario("Overview should filter out invalid channel names", async ({ I, LabelStudio }) => {
+  const config = `
+<View>
+  <Header value="TimeSeries overviewChannels invalid names test"/>
+  <TimeSeriesLabels name="label" toName="ts">
+    <Label value="Event"></Label>
+  </TimeSeriesLabels>
+  <TimeSeries name="ts" value="$timeseries" valueType="json" timeColumn="time" overviewChannels="channel1,invalidChannel,channel3">
+    <Channel column="channel1" strokeColor="#1f77b4" legend="Channel 1" />
+    <Channel column="channel2" strokeColor="#ff7f0e" legend="Channel 2" />
+    <Channel column="channel3" strokeColor="#2ca02c" legend="Channel 3" />
+  </TimeSeries>
+</View>
+`;
+
+  const data = {
+    timeseries: {
+      time: [0, 1, 2, 3, 4, 5],
+      channel1: [10, 20, 30, 40, 50, 60],
+      channel2: [15, 25, 35, 45, 55, 65],
+      channel3: [5, 15, 25, 35, 45, 55],
+    },
+  };
+
+  const params = {
+    annotations: [{ id: "test", result: [] }],
+    config: config,
+    data: data,
+  };
+
+  await I.amOnPage("/");
+  LabelStudio.init(params);
+  I.waitForVisible(".htx-timeseries", 5);
+  I.dontSeeElement(locate(".lsf-errors"));
+
+  // Count channel paths in the overview
+  const channelCount = await I.executeScript(() => {
+    const overview = document.querySelector(".htx-timeseries-overview");
+    if (!overview) return 0;
+    const svg = overview.querySelector("svg");
+    if (!svg) return 0;
+    const channelsGroup = svg.querySelector(".channels");
+    if (!channelsGroup) return 0;
+    return channelsGroup.querySelectorAll("path.channel").length;
+  });
+
+  // Should show only 2 valid channels (channel1 and channel3), invalidChannel should be filtered out
+  assert.equal(channelCount, 2, `Expected 2 channels in overview, but found ${channelCount}`);
+});

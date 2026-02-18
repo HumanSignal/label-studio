@@ -2341,6 +2341,73 @@ code.hljs {
   display: none;
 }
 
+/* Match page font */
+pre code svg[id^="mermaid-"] {
+  font-family: var(--font-family-secondary) !important;
+}
+
+/* Thicker arrows */
+svg[id^="mermaid-"] .transition {
+  stroke-width: 1.5 !important;
+}
+
+/* Thicker arrowheads */
+[id^="mermaid-"] svg marker path {
+  stroke-width: 3px;
+}
+
+svg[id^="mermaid-"] .edgeLabel .label rect {
+  fill: white !important;
+  opacity: 1 !important;
+}
+
+/* White background for transition labels (stroke trick) */
+svg[id^="mermaid-"] .label div .edgeLabel {
+  padding: 3px;
+}
+
+svg[id^="mermaid-"] .neutral.node rect {
+  fill:#F9F8F6 !important;
+  stroke:#E1DED5 !important;
+  stroke-width:3 !important;
+  padding:5px
+}
+
+svg[id^="mermaid-"] .grape.node rect {
+  fill:#D4DBFB !important;
+  stroke:#99ABF5 !important;
+  stroke-width:3 !important;
+  padding:5px
+}
+
+svg[id^="mermaid-"] .plum.node rect {
+  fill:#F7D6F2 !important;
+  stroke:#E995DC !important;
+  stroke-width:3 !important;
+  padding:5px
+}
+
+svg[id^="mermaid-"] .cantaloupe.node rect {
+  fill:#FFE4D0 !important;
+  stroke:#FFB882 !important;
+  stroke-width:3 !important;
+  padding:5px
+}
+
+svg[id^="mermaid-"] .kale.node rect {
+  fill:#D4F1EB !important;
+  stroke:#57B7AB !important;
+  stroke-width:3 !important;
+  padding:5px
+}
+
+svg[id^="mermaid-"] .persimmon.node rect {
+  fill:rgb(255 214 205) !important;
+  stroke:rgb(255 159 137) !important;
+  stroke-width:3 !important;
+  padding:5px
+}
+
 /****************************
   Playground
 ****************************/

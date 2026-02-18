@@ -41,6 +41,11 @@ export const useShortcut = (
   useHotkeys(
     shortcut,
     () => {
+      // Yield to editor (LSF) hotkeys when the labeling panel is active.
+      // The flag is set by Label.jsx when labeling starts and toggled via
+      // pointerdown tracking so clicks on the DM table re-enable DM shortcuts.
+      if (document.body.dataset.lsfLabeling === "true") return;
+
       callback();
     },
     {
