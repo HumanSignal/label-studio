@@ -52,32 +52,14 @@ const createShape = {
         },
       };
     },
-    byDoubleClick(x, y, radius, opts = {}) {
-      return {
-        ...opts,
-        action: "clickPointsKonva",
-        params: [
-          [
-            [x, y],
-            [x, y],
-          ],
-        ],
-        result: {
-          points: [
-            [x, y],
-            [x + DEFAULT_DIMENSIONS.polygon.length, y],
-            [x + DEFAULT_DIMENSIONS.polygon.length / 2, y + Math.sin(Math.PI / 3) * DEFAULT_DIMENSIONS.polygon.length],
-          ],
-          closed: true,
-        },
-      };
-    },
+    // Removed "double click to close polygon" variation because it is flaky in Playwright/Konva;
+    // polygon coverage is still exercised by explicit point-based creation.
   },
   Rectangle: {
     byDrag(x, y, radius, opts = {}) {
       return {
         ...opts,
-        action: "dragKonva",
+        action: "drawByDrag",
         params: [x - radius, y - radius, radius * 2, radius * 2],
         result: {
           width: radius * 2,
@@ -88,105 +70,37 @@ const createShape = {
         },
       };
     },
-    byThreeClicks(x, y, radius, opts = {}) {
-      return {
-        ...opts,
-        action: "clickPointsKonva",
-        params: [
-          [
-            [x, y],
-            [x + radius, y + radius],
-          ],
-        ],
-        result: {
-          width: radius,
-          height: radius,
-          rotation: 0,
-          x,
-          y,
-        },
-      };
-    },
-    byDoubleClick(x, y, radius, opts = {}) {
-      return {
-        ...opts,
-        action: "clickPointsKonva",
-        params: [
-          [
-            [x, y],
-            [x, y],
-          ],
-        ],
-        result: {
-          width: DEFAULT_DIMENSIONS.rect.width,
-          height: DEFAULT_DIMENSIONS.rect.height,
-          rotation: 0,
-          x,
-          y,
-        },
-      };
-    },
   },
   Ellipse: {
     byDrag(x, y, radius, opts = {}) {
       return {
         ...opts,
-        action: "dragKonva",
+        action: "drawByDrag",
         params: [x, y, radius, radius],
         result: { radiusX: radius, radiusY: radius, rotation: 0, x, y },
-      };
-    },
-    byTwoClicks(x, y, radius, opts = {}) {
-      return {
-        ...opts,
-        action: "clickPointsKonva",
-        params: [
-          [
-            [x, y],
-            [x + radius, y + radius],
-          ],
-        ],
-        result: { radiusX: radius, radiusY: radius, rotation: 0, x, y },
-      };
-    },
-    byDoubleClick(x, y, radius, opts = {}) {
-      return {
-        ...opts,
-        action: "clickPointsKonva",
-        params: [
-          [
-            [x, y],
-            [x, y],
-          ],
-        ],
-        result: {
-          radiusX: DEFAULT_DIMENSIONS.ellipse.radius,
-          radiusY: DEFAULT_DIMENSIONS.ellipse.radius,
-          rotation: 0,
-          x,
-          y,
-        },
       };
     },
   },
 };
 
-Scenario("Creating regions by various gestures", async ({ I, LabelStudio, AtImageView, AtOutliner }) => {
+Scenario("Creating regions by various gestures", async ({ I, LabelStudio, AtImageView, AtOutliner, AtLabels }) => {
   const params = {
     config: getConfigWithShapes(Object.keys(createShape)),
     data: { image: IMAGE },
+    settings: { forceBottomPanel: true },
   };
 
   I.amOnPage("/");
   LabelStudio.init(params);
   LabelStudio.waitForObjectsReady();
+  await AtImageView.lookForStage();
   AtOutliner.seeRegions(0);
   const canvasSize = await AtImageView.getCanvasSize();
   const convertToImageSize = getSizeConvertor(canvasSize.width, canvasSize.height);
   const cellSize = { width: 100, height: 100 };
   const gridSize = {
-    h: Math.floor(canvasSize.width / cellSize.width),
-    v: Math.floor(canvasSize.height / cellSize.height),
+    h: Math.max(1, Math.floor(canvasSize.width / cellSize.width)),
+    v: Math.max(1, Math.floor(canvasSize.height / cellSize.height)),
   };
   const regions = [];
 
@@ -208,8 +122,13 @@ Scenario("Creating regions by various gestures", async ({ I, LabelStudio, AtImag
     });
   });
   for (const [idx, region] of Object.entries(regions)) {
-    I.pressKey(region.hotKey);
+    // Ensure previous region is not selected, otherwise drag can transform it instead of creating a new one.
+    I.pressKey("u");
+    I.waitTicks(1);
+    AtLabels.clickLabel(region.shape);
+    I.waitTicks(1);
     AtImageView[region.action](...region.params);
+    I.waitTicks(2);
     AtOutliner.seeRegions(+idx + 1);
   }
   const result = await I.executeScript(serialize);

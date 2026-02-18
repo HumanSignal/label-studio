@@ -36,6 +36,7 @@ Scenario("Make a duplicate of annotation with preselected choices", async ({ I, 
 
   I.amOnPage("/");
   LabelStudio.init(params);
+  LabelStudio.waitForObjectsReady();
   // Duplicate the current annotation via the store API
   await I.executeScript(() => {
     const cs = window.Htx.annotationStore;
@@ -84,6 +85,7 @@ Scenario("Make a duplicate of empty annotation with preselected choices", async 
 
   I.amOnPage("/");
   LabelStudio.init(params);
+  LabelStudio.waitForObjectsReady();
   // Duplicate the current annotation via the store API
   await I.executeScript(() => {
     const cs = window.Htx.annotationStore;

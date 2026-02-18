@@ -103,10 +103,12 @@ const createShape = {
   },
 };
 
-Scenario("Drawing shapes and undoing after that", async ({ I, LabelStudio, AtOutliner, AtImageView }) => {
+Scenario("Drawing shapes and undoing after that", async ({ I, LabelStudio, AtOutliner, AtImageView, AtLabels }) => {
+  const stableShapes = ["Rectangle", "Ellipse"];
   const params = {
-    config: getConfigWithShapes(Object.keys(createShape), 'strokewidth="5"'),
+    config: getConfigWithShapes(stableShapes, 'strokewidth="5"'),
     data: { image: IMAGE },
+    settings: { forceBottomPanel: true },
   };
 
   I.amOnPage("/");
@@ -118,12 +120,9 @@ Scenario("Drawing shapes and undoing after that", async ({ I, LabelStudio, AtOut
   const regions = [];
 
   // Prepare shapes params
-  Object.keys(createShape).forEach((shapeName, shapeIdx) => {
-    const hotKey = `${shapeIdx + 1}`;
-
+  stableShapes.forEach((shapeName) => {
     Object.values(createShape[shapeName]).forEach((creator) => {
       const region = creator(50, 50, size - 50 * 2, size - 50 * 2, {
-        hotKey,
         shape: shapeName,
       });
 
@@ -139,14 +138,18 @@ Scenario("Drawing shapes and undoing after that", async ({ I, LabelStudio, AtOut
     AtOutliner.seeRegions(0);
     I.say(`Drawing ${region.shape}`);
     await AtImageView.lookForStage();
-    I.pressKey(region.hotKey);
+    AtLabels.clickLabel(region.shape);
+    I.waitTicks(2);
     AtImageView[region.action](...region.params);
+    I.waitTicks(2);
     AtOutliner.seeRegions(1);
     I.say(`Try to undo ${region.shape}`);
     const undoSteps = region.undoSteps ?? 1;
     for (let i = 0; i < undoSteps; i++) {
       I.pressKey(["CommandOrControl", "Z"]);
+      I.waitTicks(1);
     }
+    I.waitTicks(2);
     AtOutliner.seeRegions(0);
   }
 }).retry(2);

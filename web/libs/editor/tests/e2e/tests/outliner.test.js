@@ -242,12 +242,13 @@ Scenario("Panels manipulations", async ({ I, LabelStudio, AtPanels }) => {
       },
     ],
   });
+  LabelStudio.waitForObjectsReady();
 
   const AtOutlinerPanel = AtPanels.usePanel(AtPanels.PANEL.OUTLINER);
   const AtDetailsPanel = AtPanels.usePanel(AtPanels.PANEL.DETAILS);
 
   I.say("See panels at default positions");
-  AtOutlinerPanel.seePanelAttachedLeft();
+  AtOutlinerPanel.seePanelAttachedRight();
   AtDetailsPanel.seePanelAttachedRight();
 
   I.say("They should be fully visible");
@@ -269,7 +270,7 @@ Scenario("Panels manipulations", async ({ I, LabelStudio, AtPanels }) => {
   await AtOutlinerPanel.dragPanelBy(400, 0);
 
   I.say("Check that nothing changes");
-  AtOutlinerPanel.seePanelAttachedLeft();
+  AtOutlinerPanel.seePanelAttachedRight();
   AtOutlinerPanel.dontSeePanelBody();
   AtOutlinerPanel.dontSeeСollapseButton();
 

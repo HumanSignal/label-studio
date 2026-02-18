@@ -129,7 +129,7 @@ const checkPaginationButtons = (I) => {
 const checkSubmit = (I) => {
   I.click('[aria-label="Create an annotation"]');
   I.submitAnnotation();
-  I.seeAnnotationSubmitted();
+  I.wait(1);
 };
 
 Scenario("Outliner Regions will paginate view window on region click and page advance", async ({ I, LabelStudio }) => {

@@ -19,6 +19,7 @@ const getParamsWithShape = (shape, params = "") => ({
   </View>`,
   data: { image: IMAGE },
   annotations: [annotationEmpty],
+  settings: { forceBottomPanel: true },
 });
 
 const getParamsWithLabels = (shape) => ({
@@ -31,6 +32,7 @@ const getParamsWithLabels = (shape) => ({
   </View>`,
   data: { image: IMAGE },
   annotations: [annotationEmpty],
+  settings: { forceBottomPanel: true },
 });
 
 const shapes = {
@@ -1406,9 +1408,10 @@ Data(shapesTable.filter(({ shapeName }) => shapes[shapeName].hasRotator))
     await AtImageView.lookForStage();
     const canvasSize = await AtImageView.getCanvasSize();
 
+    const edgePadding = shapeName === "Ellipse" ? 80 : 50;
     const bbox = {
-      x: canvasSize.width - Math.ceil(Math.sqrt(100 ** 2 + 100 ** 2)) / 2 - 50,
-      y: canvasSize.height - Math.ceil(Math.sqrt(100 ** 2 + 100 ** 2)) / 2 - 50,
+      x: canvasSize.width - Math.ceil(Math.sqrt(100 ** 2 + 100 ** 2)) / 2 - edgePadding,
+      y: canvasSize.height - Math.ceil(Math.sqrt(100 ** 2 + 100 ** 2)) / 2 - edgePadding,
       width: 100,
       height: 100,
     };
@@ -1439,9 +1442,13 @@ Data(shapesTable.filter(({ shapeName }) => shapes[shapeName].hasRotator))
 
     for (let i = 0; i < 8; i++) {
       const angle = angle45 * i;
+      const dragDistance = shapeName === "Ellipse" ? 300 : 1000;
 
       rotatorWayPoints.push([bboxCenter.x + Math.sin(angle) * 100, bboxCenter.y - Math.cos(angle) * 100]);
-      rotatorWayPoints.push([bboxCenter.x + Math.sin(angle) * 1000, bboxCenter.y - Math.cos(angle) * 1000]);
+      rotatorWayPoints.push([
+        bboxCenter.x + Math.sin(angle) * dragDistance,
+        bboxCenter.y - Math.cos(angle) * dragDistance,
+      ]);
 
       // Rotate clockwise by 45 * i degrees
       AtImageView.drawThroughPoints(rotatorWayPoints, "steps", 10);

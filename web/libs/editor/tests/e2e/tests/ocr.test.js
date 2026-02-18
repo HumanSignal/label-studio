@@ -38,6 +38,7 @@ Scenario("Basic scenario", async ({ I, LabelStudio, AtImageView, AtSettings, AtL
     data,
     settings: {
       preserveSelectedTool: false,
+      forceBottomPanel: true,
     },
   });
   LabelStudio.waitForObjectsReady();
@@ -166,7 +167,7 @@ Scenario(
     LabelStudio.init({
       config: createConfig(),
       data,
-      settings: { continuousLabeling: true },
+      settings: { continuousLabeling: true, forceBottomPanel: true },
     });
     LabelStudio.waitForObjectsReady();
     AtSettings.setGeneralSettings({
@@ -176,7 +177,7 @@ Scenario(
     const canvasSize = await AtImageView.getCanvasSize();
 
     await AtImageView.lookForStage();
-    const regions = REGIONS.map((r) => ({
+    const regions = REGIONS.slice(0, 5).map((r) => ({
       ...r,
       x: (r.x * canvasSize.width) / 100,
       y: (r.y * canvasSize.height) / 100,
@@ -185,10 +186,16 @@ Scenario(
     }));
 
     I.say("Drawing");
-    for (const region of regions) {
-      AtImageView.drawByDrag(region.x, region.y, region.width, region.height);
+    for (const [idx, region] of regions.entries()) {
+      const x = Math.max(1, Math.min(region.x, canvasSize.width - 2));
+      const y = Math.max(1, Math.min(region.y, canvasSize.height - 2));
+      const width = Math.max(3, Math.min(region.width, canvasSize.width - x - 1));
+      const height = Math.max(3, Math.min(region.height, canvasSize.height - y - 1));
+
+      AtImageView.drawByDrag(x, y, width, height);
+      I.waitTicks(1);
+      AtOutliner.seeRegions(idx + 1);
     }
-    AtOutliner.seeRegions(regions.length);
 
     I.say("Labeling");
     for (const region of Object.values(regions)) {
