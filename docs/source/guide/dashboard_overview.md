@@ -43,7 +43,7 @@ For example, say you select a date range of 2 days: Monday and Tuesday. If an an
 
 ## Tasks and project states
 
-For more information about the states referenced in the Overview dashboard, see [Project and task states](project_states). 
+For more information about the states referenced in the Overview dashboard, see [Project and task state management](project_states). 
 
 !!! note
 
