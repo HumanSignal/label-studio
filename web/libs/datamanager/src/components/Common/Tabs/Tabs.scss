@@ -102,6 +102,7 @@
       background-color: var(--color-neutral-background);
       box-shadow: -1px 0 0 var(--color-neutral-border) inset, 1px 0 0 var(--color-neutral-border) inset, 0 1px 0 var(--color-neutral-border) inset;
       opacity: 1;
+      font-weight: var(--font-weight-medium);
 
       &:hover {
         background-color: var(--color-neutral-background);
