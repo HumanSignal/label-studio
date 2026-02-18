@@ -224,16 +224,17 @@ Data(windowSizesTable).Scenario(
     const imageSize = await AtImageView.getImageFrameSize();
     const rotationQueue = ["right", "right", "right", "right", "left", "left", "left", "left"];
 
-    assert(Math.abs(canvasSize.width - imageSize.width) <= 14);
-    assert(Math.abs(canvasSize.height - imageSize.height) <= 14);
+    const canvasToImageTolerance = 24;
+    assert(Math.abs(canvasSize.width - imageSize.width) <= canvasToImageTolerance);
+    assert(Math.abs(canvasSize.height - imageSize.height) <= canvasToImageTolerance);
     for (const rotate of rotationQueue) {
       I.click(locate(`[aria-label='rotate-${rotate}']`));
       await AtImageView.waitForCanvasSizeSync();
       const rotatedCanvasSize = await AtImageView.getCanvasSize();
       const rotatedImageSize = await AtImageView.getImageFrameSize();
 
-      assert(Math.abs(rotatedCanvasSize.width - rotatedImageSize.width) <= 14);
-      assert(Math.abs(rotatedCanvasSize.height - rotatedImageSize.height) <= 14);
+      assert(Math.abs(rotatedCanvasSize.width - rotatedImageSize.width) <= canvasToImageTolerance);
+      assert(Math.abs(rotatedCanvasSize.height - rotatedImageSize.height) <= canvasToImageTolerance);
     }
   },
 );

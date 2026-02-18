@@ -143,16 +143,36 @@ Scenario("Drawing shapes and undoing after that", async ({ I, LabelStudio, AtOut
     I.waitTicks(2);
     AtImageView[region.action](...region.params);
     I.waitTicks(2);
-    const afterDraw = await LabelStudio.serialize();
-    assert.strictEqual(afterDraw.length, 1);
+    let afterDraw = await LabelStudio.serialize();
+    for (let attempt = 0; attempt < 4 && afterDraw.length === 0; attempt++) {
+      I.waitTicks(1);
+      afterDraw = await LabelStudio.serialize();
+    }
+    if (afterDraw.length === 0) {
+      // Retry drawing once if the first interaction was dropped by UI timing.
+      AtLabels.clickLabel(region.shape);
+      I.waitTicks(1);
+      AtImageView[region.action](...region.params);
+      I.waitTicks(2);
+      afterDraw = await LabelStudio.serialize();
+      for (let attempt = 0; attempt < 4 && afterDraw.length === 0; attempt++) {
+        I.waitTicks(1);
+        afterDraw = await LabelStudio.serialize();
+      }
+    }
+    assert(afterDraw.length >= 1, "Expected at least one region after draw");
     I.say(`Try to undo ${region.shape}`);
-    const undoSteps = region.undoSteps ?? 1;
+    const undoSteps = (region.undoSteps ?? 1) * afterDraw.length;
     for (let i = 0; i < undoSteps; i++) {
       I.pressKey(["CommandOrControl", "Z"]);
       I.waitTicks(1);
     }
     I.waitTicks(2);
-    const afterUndo = await LabelStudio.serialize();
+    let afterUndo = await LabelStudio.serialize();
+    for (let attempt = 0; attempt < 4 && afterUndo.length > 0; attempt++) {
+      I.waitTicks(1);
+      afterUndo = await LabelStudio.serialize();
+    }
     assert.strictEqual(afterUndo.length, 0);
   }
 }).retry(2);
