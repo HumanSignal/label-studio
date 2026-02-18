@@ -365,12 +365,12 @@ const ValidationRenderer = ({ validation }) => {
   return (
     <div className={rootClass}>
       {Array.from(validation).map(([name, result]) => (
-        <div key={name} className={rootClass.elem("group")} onClick={() => result.field.focus()}>
-          <div className={rootClass.elem("field")}>{result.label}</div>
+        <div key={name} className={rootClass.elem("group").toClassName()} onClick={() => result.field.focus()}>
+          <div className={rootClass.elem("field").toClassName()}>{result.label}</div>
 
-          <div className={rootClass.elem("messages")}>
+          <div className={rootClass.elem("messages").toClassName()}>
             {result.messages.map((message, i) => (
-              <div key={`${name}-${i}`} className={rootClass.elem("message")}>
+              <div key={`${name}-${i}`} className={rootClass.elem("message").toClassName()}>
                 {message}
               </div>
             ))}
@@ -390,7 +390,7 @@ Form.Row = ({ columnCount, rowGap, children, style, spread = false }) => {
   if (rowGap) styles["--row-gap"] = rowGap;
 
   return (
-    <div className={cn("form-dm").elem("row").mod({ spread })} style={{ ...(style ?? {}), ...styles }}>
+    <div className={cn("form-dm").elem("row").mod({ spread }).toClassName()} style={{ ...(style ?? {}), ...styles }}>
       {children}
     </div>
   );
@@ -553,8 +553,8 @@ Form.Actions = ({ children, valid, extra, size }) => {
   const rootClass = cn("form-dm");
 
   return (
-    <div className={rootClass.elem("submit").mod({ size })}>
-      <div className={rootClass.elem("info").mod({ valid })}>{extra}</div>
+    <div className={rootClass.elem("submit").mod({ size }).toClassName()}>
+      <div className={rootClass.elem("info").mod({ valid }).toClassName()}>{extra}</div>
 
       <Space>{children}</Space>
     </div>

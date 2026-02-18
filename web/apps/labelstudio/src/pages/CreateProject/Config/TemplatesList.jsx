@@ -33,7 +33,7 @@ const TemplatesInGroup = ({ templates, group, onSelectRecipe, isEdition }) => {
           <li
             key={recipe.title}
             onClick={() => !isDisabled && onSelectRecipe(recipe)}
-            className={listClass.elem("template").mod({ disabled: isDisabled })}
+            className={listClass.elem("template").mod({ disabled: isDisabled }).toClassName()}
             title={isDisabled ? "Enterprise feature - Available in Label Studio Enterprise" : ""}
           >
             <img src={recipe.image} alt={""} />
@@ -71,7 +71,7 @@ export const TemplatesList = ({ selectedGroup, selectedRecipe, onCustomTemplate,
 
   return (
     <div className={listClass}>
-      <aside className={listClass.elem("sidebar")}>
+      <aside className={listClass.elem("sidebar").toClassName()}>
         <ul>
           {groups.map((group) => (
             <li
@@ -80,7 +80,7 @@ export const TemplatesList = ({ selectedGroup, selectedRecipe, onCustomTemplate,
               className={listClass.elem("group").mod({
                 active: selected === group,
                 selected: selectedRecipe?.group === group,
-              })}
+              }).toClassName()}
             >
               {group}
               <Arrow />
@@ -109,7 +109,7 @@ export const TemplatesList = ({ selectedGroup, selectedRecipe, onCustomTemplate,
         />
       </main>
       <footer className="flex items-center justify-center gap-1">
-        <IconInfo className={listClass.elem("info-icon")} width="20" height="20" />
+        <IconInfo className={listClass.elem("info-icon").toClassName()} width="20" height="20" />
         <span>
           See the documentation to{" "}
           <a href="https://labelstud.io/guide" target="_blank" rel="noreferrer">

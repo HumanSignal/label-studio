@@ -18,8 +18,8 @@ export const Columns = ({ children, count, size, gap }) => {
 
 Columns.Column = ({ title, children }) => {
   return (
-    <div className={cn("columns").elem("item")}>
-      <div className={cn("columns").elem("title")}>{title}</div>
+    <div className={cn("columns").elem("item").toClassName()}>
+      <div className={cn("columns").elem("title").toClassName()}>{title}</div>
       {children}
     </div>
   );
