@@ -663,6 +663,8 @@ const Configurator = ({
                       "' '": completeIfInTag,
                       "'='": completeIfInTag,
                       "Ctrl-Space": "autocomplete",
+                      "Ctrl-F": "findPersistent",
+                      "Cmd-F": "findPersistent",
                     },
                     hintOptions: { schemaInfo: tags },
                   }}
