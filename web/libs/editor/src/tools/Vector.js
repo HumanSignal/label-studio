@@ -26,6 +26,10 @@ const _Tool = types
         if (poly && poly.closed) return null;
         if (poly === undefined) return null;
         if (poly && poly.type !== "vectorregion") return null;
+        // Ensure the region belongs to the current annotation.
+        // When switching annotations, currentArea may still reference
+        // a region from the previous annotation.
+        if (poly && self.annotation && poly.annotation !== self.annotation) return null;
 
         return poly;
       },
