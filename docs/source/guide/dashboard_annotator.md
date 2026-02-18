@@ -76,7 +76,7 @@ The **Annotations** tab shows information related to a user's annotation perform
 
 The metrics are calculated from the following data:
 
-* `last_action` -- The last action taken on an annotation. This can can be submitted, updated, fixed and accepted, accepted, rejected. 
+* `last_action` -- The last action taken on an annotation. This can be submitted, updated, fixed and accepted, accepted, rejected. 
 * `submitted_or_reviewed` -- Annotations that have a last action matching those listed above.
 * `lead_times` -- The time spent with annotations that have a last action matching those listed above. Lead time includes idle time and is cumulative across multiple sessions. 
 

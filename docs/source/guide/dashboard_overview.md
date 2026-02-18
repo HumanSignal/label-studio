@@ -20,8 +20,8 @@ The **Analytics > Overview** page is a centralized starting point to explore per
 | User role | Access restrictions |
 |-----------|---------------------|
 | **Owner** and **Admin** | Can view the **Overview** dashboard and filter for all workspaces and projects. |
-| **Manager** | Can view the **Overview** dashboard and filter for all workspaces and projects, but can only view metrics for workspaces or projects in which they are a member.  |
-| **Reviewer** and **Annotator** | Cannot access the **Overview** dashboard. <br/><br/>When they open **Analytics**, they are redirected to the Member Performance dashboard, where can only see their own annotation and review history. |
+| **Manager** | Can view the **Overview** dashboard, but can only filter for and view workspaces or projects in which they are a member.  |
+| **Reviewer** and **Annotator** | Cannot access the **Overview** dashboard. <br/><br/>When they open **Analytics**, they are redirected to the [Member Performance dashboard](dashboard_annotator), where they can only see their own annotation and review history. |
 
 ## Filtering
 
@@ -62,14 +62,14 @@ At the top of the Overview dashboard, summary cards show aggregate metrics for t
 | **Total Done Tasks** | Total number of tasks in the [**Done** state](project_states#Task-states) across the selected projects. |
 | **Total Tasks Annotated** | Total number of tasks that have the required annotations completed across all selected projects. This includes tasks in the [**Done** state, **Needs Review** state, and the **In Review** state](project_states#Task-states). |
 | **Total Annotations Submitted** | Total number of annotations submitted across all selected projects. This includes annotations that have been submitted or updated, whether or not they have been reviewed. |
-| **Total Time Spent** | Total time spent annotating (lead time) and reviewing across all selected projects. |
+| **Total Time Spent** | Total time spent annotating (lead time) and reviewing across all selected projects. <br/><br/> The lead time is the time spent on annotations in which the last action was one of the following: **Submit**, **Update**, **Fix + Accept**, **Accept**, **Reject**. <br/><br/>Lead time includes idle time and is cumulative across multiple sessions. |
 
 
 ## Project progress charts
 
 The Overview dashboard includes charts that break down metrics over the selected time period. 
 
-Dates on the charts are based on when the annotation or review was completed, not when it was started.
+Dates for annotations and reviews are based on when they were completed, not when they were started.
 
 ![Screenshot Overview dashboard](/images/analytics/overview-charts.png)
 
@@ -77,8 +77,8 @@ Dates on the charts are based on when the annotation or review was completed, no
 | Chart | Description |
 |-------|--------------|
 | **Task Progress** | Shows how tasks move through [states](project_states#Task-states) over the selected period of time.|
-| **Annotations Submitted vs Accepted** | Shows submitted annotations and accepted annotations over time, with an acceptance rate line. Helps you see volume and review outcomes by date. |
-| **Time Spent** | Shows time spent annotating and reviewing over time. Includes total time in the period and average time per annotation. |
+| **Annotations Submitted vs Accepted** | Shows submitted annotations and accepted annotations over time, with an acceptance score line. Note that accepted annotations includes annotations that were fixed and then accepted. |
+| **Time Spent** | Shows time spent annotating and reviewing over time. Includes total time in the period and average time per submitted annotation. |
 
 
 ## Project Progress table
