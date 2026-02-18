@@ -131,19 +131,30 @@
     }
   }
 
-  &_size_small &__item {
-    height: 24px;
-    font-size: 14px;
-    padding: 0 10px;
+  &_size_small {
+    li:not(.menu-dm__divider) {
+      padding: 0;
+    }
+    
+    &__item {
+      height: 24px;
+      font-size: 14px;
+      padding: 0 var(--spacing-tight);
+    }
   }
+
 
   &_collapsed {
     padding: var(--spacing-tighter);
 
     .menu-dm__item {
       padding: var(--spacing-tightest) var(--spacing-tight);
-    }
 
+      label {
+        margin: 0;
+        max-height: 18px;
+      }
+    }
   }
 }
 
