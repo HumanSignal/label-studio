@@ -170,7 +170,9 @@ export const TabsItem = observer(
     const tabLabel = virtual ? `${currentTitle} (unsaved)` : currentTitle;
 
     return (
-      <div className={tabsCN.elem("item").mod({ active, virtual, menuOpen: isMenuOpen, edit: renameMode }).toClassName()}>
+      <div
+        className={tabsCN.elem("item").mod({ active, virtual, menuOpen: isMenuOpen, edit: renameMode }).toClassName()}
+      >
         {!renameMode && (
           <div className={tabsCN.elem("item-drag").toClassName()} aria-hidden="true">
             <IconDragIndicator className="w-4 h-4" />

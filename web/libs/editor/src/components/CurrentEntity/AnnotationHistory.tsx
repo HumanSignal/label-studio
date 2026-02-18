@@ -144,7 +144,9 @@ const AnnotationHistoryComponent: FC<any> = ({
     return (
       <div className={cn("annotation-history").mod({ inline, empty: true }).toClassName()}>
         {sectionHeader && (
-          <div className={`${cn("annotation-history").elem("section-head").toClassName()} sr-only`}>{sectionHeader}</div>
+          <div className={`${cn("annotation-history").elem("section-head").toClassName()} sr-only`}>
+            {sectionHeader}
+          </div>
         )}
         {renderEmptyState ? renderEmptyState() : defaultEmptyState}
       </div>

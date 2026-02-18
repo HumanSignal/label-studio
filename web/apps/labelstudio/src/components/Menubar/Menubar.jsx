@@ -191,7 +191,10 @@ export const Menubar = ({ enabled, defaultOpened, defaultPinned, children, onSid
                 {showNewsletterDot && (
                   <>
                     <Menu.Divider />
-                    <Menu.Item className={cn("newsletter-menu-item").toClassName()} href={pages.AccountSettingsPage.path}>
+                    <Menu.Item
+                      className={cn("newsletter-menu-item").toClassName()}
+                      href={pages.AccountSettingsPage.path}
+                    >
                       <span>Please check new notification settings in the Account & Settings page</span>
                       <span className={cn("newsletter-menu-badge").toClassName()} />
                     </Menu.Item>
@@ -209,7 +212,7 @@ export const Menubar = ({ enabled, defaultOpened, defaultPinned, children, onSid
       )}
 
       <VersionProvider>
-          <div className={contentClass.elem("body").toClassName()}>
+        <div className={contentClass.elem("body").toClassName()}>
           {enabled && (
             <Dropdown
               ref={menuDropdownRef}
@@ -267,7 +270,12 @@ export const Menubar = ({ enabled, defaultOpened, defaultPinned, children, onSid
           )}
 
           <MenubarContext.Provider value={providerValue}>
-            <div className={contentClass.elem("content").mod({ withSidebar: sidebarPinned && sidebarOpened }).toClassName()}>
+            <div
+              className={contentClass
+                .elem("content")
+                .mod({ withSidebar: sidebarPinned && sidebarOpened })
+                .toClassName()}
+            >
               {children}
             </div>
           </MenubarContext.Provider>

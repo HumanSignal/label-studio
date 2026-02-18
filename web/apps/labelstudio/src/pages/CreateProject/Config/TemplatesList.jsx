@@ -77,10 +77,13 @@ export const TemplatesList = ({ selectedGroup, selectedRecipe, onCustomTemplate,
             <li
               key={group}
               onClick={() => onSelectGroup(group)}
-              className={listClass.elem("group").mod({
-                active: selected === group,
-                selected: selectedRecipe?.group === group,
-              }).toClassName()}
+              className={listClass
+                .elem("group")
+                .mod({
+                  active: selected === group,
+                  selected: selectedRecipe?.group === group,
+                })
+                .toClassName()}
             >
               {group}
               <Arrow />

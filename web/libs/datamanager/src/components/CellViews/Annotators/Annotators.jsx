@@ -68,7 +68,9 @@ export const Annotators = (cell) => {
                 faded={userpicIsFaded}
                 badge={{
                   bottomRight: review && (
-                    <div className={clsx(userPickBadge.toClassName(), userPickBadge.mod({ [review]: true }).toClassName())}>
+                    <div
+                      className={clsx(userPickBadge.toClassName(), userPickBadge.mod({ [review]: true }).toClassName())}
+                    >
                       {review === "rejected" ? <IconCrossAlt /> : <IconCheckAlt />}
                     </div>
                   ),

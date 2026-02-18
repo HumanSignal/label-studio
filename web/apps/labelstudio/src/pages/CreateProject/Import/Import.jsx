@@ -402,7 +402,10 @@ export const ImportPage = ({
           <SampleDatasetSelect samples={samples} sample={sample} onSampleApplied={onSampleDatasetSelect} />
         )}
         <div
-          className={importClass.elem("csv-handling").mod({ highlighted: highlightCsvHandling, hidden: !csvHandling }).toClassName()}
+          className={importClass
+            .elem("csv-handling")
+            .mod({ highlighted: highlightCsvHandling, hidden: !csvHandling })
+            .toClassName()}
         >
           <span>Treat CSV/TSV as</span>
           <label>
@@ -596,7 +599,9 @@ export const ImportPage = ({
                               </Tooltip>
                             </td>
                             <td>
-                              <span className={importClass.elem("file-status").mod({ uploading: true }).toClassName()} />
+                              <span
+                                className={importClass.elem("file-status").mod({ uploading: true }).toClassName()}
+                              />
                             </td>
                             <td className={importClass.elem("file-size").toClassName()}>&nbsp;</td>
                           </tr>
