@@ -128,7 +128,7 @@
 }
 
 .selectedItemsCaret {
-  transition: opacity 150ms ease-out;
+  transition: opacity 150ms ease-out, transform 200ms ease-out;
 }
 
 .selectedItemsContent {
