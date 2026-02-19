@@ -9,7 +9,7 @@ const Input = forwardRef(({ label, className, required, labelProps, ghost, waiti
 
   const input = useMemo(() => {
     return waiting ? (
-      <div className={rootClass.elem("spinner")} />
+      <div className={rootClass.elem("spinner").toClassName()} />
     ) : (
       <input {...props} ref={ref} className={classList} />
     );

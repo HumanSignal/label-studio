@@ -1,0 +1,11 @@
+`className={$expr}` where {
+  $expr <: `$obj.$method($args)`,
+  $method <: or {
+    `elem`,
+    `mod`,
+    `mix`,
+    `block`
+  },
+  ! $expr <: contains `$any.toClassName()`,
+  register_diagnostic(span=$expr, message="BEM className should end with .toClassName()", severity="error")
+}

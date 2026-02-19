@@ -283,9 +283,9 @@ export const Table = observer(
 
     const renderTableToolbar = useCallback(() => {
       return (
-        <div className={cn("table-toolbar").mod({ visible: toolbarVisible }).toString()}>
+        <div className={cn("table-toolbar").mod({ visible: toolbarVisible }).toClassName()}>
           <FieldsButton
-            className={cn("table-toolbar").elem("customize-button").toString()}
+            className={cn("table-toolbar").elem("customize-button").toClassName()}
             wrapper={FieldsButton.Checkbox}
             title={"Columns"}
             size="small"
@@ -450,7 +450,7 @@ export const Table = observer(
 
     return (
       <>
-        <div ref={tableWrapper} className={tableCN.mod({ fit: props.fitToContent }).toString()}>
+        <div ref={tableWrapper} className={tableCN.mod({ fit: props.fitToContent }).toClassName()}>
           {isQuickView && renderTableToolbar()}
           <TableContext.Provider value={contextValue}>
             <StickyList
@@ -581,7 +581,7 @@ const StickyList = observer(
           itemData={itemData}
           itemSize={itemSize}
           initialScrollOffset={initialScrollOffset}
-          className={tableCN.elem("auto-size").mod({ "quick-view": isQuickView }).toString()}
+          className={tableCN.elem("auto-size").mod({ "quick-view": isQuickView }).toClassName()}
           onScroll={onScroll}
           heightAdjustment={heightAdjustment}
           {...rest}
@@ -611,7 +611,7 @@ const innerElementType = forwardRef(({ children, ...rest }, ref) => {
           <div ref={ref} {...rest}>
             {stickyItems.map((index) => (
               <StickyComponent
-                className={tableCN.elem("sticky-header").toString()}
+                className={tableCN.elem("sticky-header").toClassName()}
                 key={index}
                 index={index}
                 style={{
@@ -624,7 +624,7 @@ const innerElementType = forwardRef(({ children, ...rest }, ref) => {
             {isQuickView ? (
               <>
                 {toolbar}
-                <div className={tableCN.elem("body-rows").toString()}>{bodyRows}</div>
+                <div className={tableCN.elem("body-rows").toClassName()}>{bodyRows}</div>
               </>
             ) : (
               children

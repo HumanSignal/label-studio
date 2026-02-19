@@ -80,7 +80,7 @@ export const FilterOperation = observer(({ filter, field, operator, value, disab
 
   return Input ? (
     <>
-      <div className={columnClass.mix("operation").toString()}>
+      <div className={columnClass.mix("operation").toClassName()}>
         <FilterDropdown
           placeholder="Condition"
           value={filter.operator}
@@ -89,7 +89,7 @@ export const FilterOperation = observer(({ filter, field, operator, value, disab
           onChange={onOperatorSelected}
         />
       </div>
-      <div className={columnClass.mix("value").toString()}>
+      <div className={columnClass.mix("value").toClassName()}>
         <Input
           {...field}
           key={`${filter.filter.id}-${filter.filter.currentType}`}
