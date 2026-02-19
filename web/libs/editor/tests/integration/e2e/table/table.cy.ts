@@ -52,4 +52,17 @@ describe("Table", () => {
     cy.contains(".ant-table-tbody td", "2").should("be.visible");
     cy.contains(".ant-table-tbody td", '{"nested":true}').should("be.visible");
   });
+
+  it("supports table-linked classification submission", () => {
+    LabelStudio.params().config(objectTableConfig).data(objectTableData).withResult([]).init();
+    LabelStudio.waitForObjectsReady();
+
+    cy.contains("label", "Correct").click();
+
+    LabelStudio.serialize().then((result) => {
+      expect(result).to.have.length(1);
+      expect(result[0].type).to.equal("choices");
+      expect(result[0].value.choices).to.deep.equal(["Correct"]);
+    });
+  });
 });
