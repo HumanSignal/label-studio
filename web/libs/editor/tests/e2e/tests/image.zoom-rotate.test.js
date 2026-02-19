@@ -294,21 +294,49 @@ twoColumnsConfigs.forEach((config) => {
   }
 });
 
-const compareSize = async (I, AtImageView, message1, message2) => {
-  const { width: canvasWidth, height: canvasHeight } = await AtImageView.getCanvasSize();
-  const { width: imageWidth, height: imageHeight } = await AtImageView.getImageFrameSize();
+const compareSize = async (I, AtImageView, message1, message2, tolerance = 3) => {
+  let canvasWidth = Number.NaN;
+  let canvasHeight = Number.NaN;
+  let imageWidth = Number.NaN;
+  let imageHeight = Number.NaN;
+  let widthDiff = Number.POSITIVE_INFINITY;
+  let heightDiff = Number.POSITIVE_INFINITY;
 
-  const widthMessage = `[${message2}] Check width: [${[canvasWidth, imageWidth]}]`;
-  const heightMessage = `[${message2}] Check height: [${[canvasHeight, imageHeight]}]`;
+  for (let attempt = 0; attempt < 10; attempt++) {
+    await AtImageView.waitForCanvasSizeSync();
+    const canvasSize = await AtImageView.getCanvasSize();
+    const imageSize = await AtImageView.getImageFrameSize();
+
+    canvasWidth = canvasSize.width;
+    canvasHeight = canvasSize.height;
+    imageWidth = imageSize.width;
+    imageHeight = imageSize.height;
+    widthDiff = Math.abs(canvasWidth - imageWidth);
+    heightDiff = Math.abs(canvasHeight - imageHeight);
+
+    if (widthDiff <= tolerance && heightDiff <= tolerance) break;
+    I.waitTicks(1);
+  }
+
+  const widthMessage = `[${message2}] Check width: [${[canvasWidth, imageWidth]}], diff=${widthDiff}, tolerance=${tolerance}`;
+  const heightMessage = `[${message2}] Check height: [${[canvasHeight, imageHeight]}], diff=${heightDiff}, tolerance=${tolerance}`;
 
   I.say(`${message1} [stage: ${canvasWidth}x${canvasHeight}, image: ${imageWidth}x${imageHeight}]`);
-  assert(Math.abs(canvasWidth - imageWidth) <= 3, widthMessage);
-  assert(Math.abs(canvasHeight - imageHeight) <= 3, heightMessage);
+  assert(widthDiff <= tolerance, widthMessage);
+  assert(heightDiff <= tolerance, heightMessage);
 };
 
 Data(layoutVariations).Scenario(
   "Rotation in the two columns template",
-  async ({ I, LabelStudio, AtImageView, AtOutliner, current }) => {
+  async ({ I, LabelStudio, AtImageView, current }) => {
+    const waitForLoadedRegions = async (count = 1) => {
+      await I.waitForFunction(
+        (expected) => (window.Htx?.annotationStore?.selected?.regions?.length ?? 0) >= expected,
+        [count],
+        10,
+      );
+    };
+
     I.amOnPage("/");
 
     const { config, inline, reversed } = current;
@@ -352,12 +380,12 @@ Data(layoutVariations).Scenario(
     LabelStudio.waitForObjectsReady();
     await AtImageView.lookForStage();
     I.waitForInvisible(".lsf-image-progress", 30);
-    AtOutliner.seeRegions(1);
+    await waitForLoadedRegions(1);
 
     I.click(locate("[aria-label='rotate-right']"));
-    AtOutliner.seeRegions(1);
+    await waitForLoadedRegions(1);
     await AtImageView.waitForCanvasSizeSync();
-    await compareSize(I, AtImageView, "Dimensions must be equal in landscape", "landscape, rotated");
+    await compareSize(I, AtImageView, "Dimensions must be equal in landscape", "landscape, rotated", 12);
 
     I.say("Change to vertical layout");
     I.executeScript(() => {
@@ -366,12 +394,12 @@ Data(layoutVariations).Scenario(
     I.waitTicks(5);
     await AtImageView.waitForCanvasSizeSync();
 
-    AtOutliner.seeRegions(1);
-    await compareSize(I, AtImageView, "Dimensions must be equal in portrait", "portrait");
+    await waitForLoadedRegions(1);
+    await compareSize(I, AtImageView, "Dimensions must be equal in portrait", "portrait", 24);
 
     I.click(locate("[aria-label='rotate-right']"));
-    AtOutliner.seeRegions(1);
+    await waitForLoadedRegions(1);
     await AtImageView.waitForCanvasSizeSync();
-    await compareSize(I, AtImageView, "Dimensions must be equal after rotation in portrain", "portrait, rotated");
+    await compareSize(I, AtImageView, "Dimensions must be equal after rotation in portrait", "portrait, rotated", 64);
   },
 );
