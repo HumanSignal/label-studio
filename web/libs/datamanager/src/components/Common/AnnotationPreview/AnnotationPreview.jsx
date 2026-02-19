@@ -1,9 +1,8 @@
 import { inject, observer } from "mobx-react";
 import React from "react";
 import { taskToLSFormat } from "../../../sdk/lsf-utils";
-import { cn } from "../../../utils/bem";
 import { Spinner } from "../Spinner";
-import "./AnnotationPreview.scss";
+import styles from "./AnnotationPreview.module.scss";
 
 const imgDefaultProps = { crossOrigin: "anonymous" };
 
@@ -132,7 +131,7 @@ export const AnnotationPreview = injector(
         height={props.height}
       />
     ) : (
-      <div className={cn("annotation-preview").toClassName()} width={props.width} height={props.height}>
+      <div className={styles["annotation-preview"]} width={props.width} height={props.height}>
         <Spinner
           size={props.size ?? "default"}
           style={{
