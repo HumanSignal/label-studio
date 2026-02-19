@@ -1,9 +1,8 @@
 import { inject } from "mobx-react";
 import { IconChevronLeft } from "@humansignal/icons";
-import { cn } from "../../../utils/bem";
 import { Button } from "@humansignal/ui";
 import { Filters } from "../Filters";
-import "./FilterSidebar.scss";
+import styles from "./FilterSidebar.module.scss";
 
 const sidebarInjector = inject(({ store }) => {
   const viewsStore = store.viewsStore;
@@ -17,9 +16,9 @@ const sidebarInjector = inject(({ store }) => {
 
 export const FiltersSidebar = sidebarInjector(({ viewsStore, sidebarEnabled, sidebarVisible }) => {
   return sidebarEnabled && sidebarVisible ? (
-    <div className={cn("filters-sidebar").toClassName()}>
-      <div className={cn("filters-sidebar").elem("header").toClassName()}>
-        <div className={cn("filters-sidebar").elem("extra").toClassName()}>
+    <div className={styles["filters-sidebar"]}>
+      <div className={`${styles["filters-sidebar"]} ${styles["filters-sidebar__header"]}`}>
+        <div className={`${styles["filters-sidebar"]} ${styles["filters-sidebar__extra"]}`}>
           <Button
             look="string"
             onClick={() => viewsStore.collapseFilters()}
@@ -28,7 +27,7 @@ export const FiltersSidebar = sidebarInjector(({ viewsStore, sidebarEnabled, sid
           >
             <IconChevronLeft width={24} height={24} />
           </Button>
-          <div className={cn("filters-sidebar").elem("title").toClassName()}>Filters</div>
+          <div className={`${styles["filters-sidebar"]} ${styles["filters-sidebar__title"]}`}>Filters</div>
         </div>
       </div>
       <Filters sidebar={true} />
