@@ -29,13 +29,22 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
         with:
-          ref: ${{ inputs.ref }}
+          ref: ${{ inputs.head_sha }}
 
       - name: Setup frontend environment
         uses: ./.github/actions/setup-frontend-environment
         with:
           node-version: "${{ env.NODE }}"
           directory: "${{ env.FRONTEND_MONOREPO_DIR }}"
+
+      # Nx db cache ties artifacts to machine ID; restored cache from other runners is not used.
+      - name: Cache Nx
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.FRONTEND_MONOREPO_DIR }}/.nx/cache
+          key: nx-v2-${{ runner.os }}-${{ env.NODE }}-${{ hashFiles('web/package.json', 'web/yarn.lock') }}
+          restore-keys: |
+            nx-v2-${{ runner.os }}-${{ env.NODE }}-
 
       - name: Run tests
         working-directory: ${{ env.FRONTEND_MONOREPO_DIR }}

@@ -2,7 +2,7 @@ const assert = require("assert");
 
 Feature("Preselected choices");
 
-Scenario("Make a duplicate of annotation with preselected choices", async ({ I, LabelStudio, AtTopbar }) => {
+Scenario("Make a duplicate of annotation with preselected choices", async ({ I, LabelStudio }) => {
   const params = {
     config: `
 <View>
@@ -36,8 +36,16 @@ Scenario("Make a duplicate of annotation with preselected choices", async ({ I, 
 
   I.amOnPage("/");
   LabelStudio.init(params);
-  // Try to create copy of current annotation
-  AtTopbar.click('[aria-label="Copy Annotation"]');
+  LabelStudio.waitForObjectsReady();
+  // Duplicate the current annotation via the store API
+  await I.executeScript(() => {
+    const cs = window.Htx.annotationStore;
+    const entity = cs.selected;
+    const c = cs.addAnnotationFromPrediction(entity);
+
+    cs.selectAnnotation(c.id);
+  });
+  I.waitTicks(5);
   const duplicateResult = await LabelStudio.serialize();
 
   // Make sure there are no results other than the copied ones
@@ -45,8 +53,8 @@ Scenario("Make a duplicate of annotation with preselected choices", async ({ I, 
   assert.deepStrictEqual(duplicateResult[0].value.choices, ["Option 2"]);
 
   // Create new annotation
-  I.click('[aria-label="Annotations List Toggle"]');
-  I.click('[aria-label="Create Annotation"]');
+  I.click('[aria-label="Create an annotation"]');
+  I.waitTicks(5);
   const annotationWithPresetValues = await LabelStudio.serialize();
 
   // Check that there is only the result come from selecting by default
@@ -54,7 +62,7 @@ Scenario("Make a duplicate of annotation with preselected choices", async ({ I, 
   assert.deepStrictEqual(annotationWithPresetValues[0].value.choices, ["Option 1"]);
 });
 
-Scenario("Make a duplicate of empty annotation with preselected choices", async ({ I, LabelStudio, AtTopbar }) => {
+Scenario("Make a duplicate of empty annotation with preselected choices", async ({ I, LabelStudio }) => {
   const params = {
     config: `
 <View>
@@ -77,16 +85,24 @@ Scenario("Make a duplicate of empty annotation with preselected choices", async 
 
   I.amOnPage("/");
   LabelStudio.init(params);
-  // Try to create copy of current annotation
-  AtTopbar.click('[aria-label="Copy Annotation"]');
+  LabelStudio.waitForObjectsReady();
+  // Duplicate the current annotation via the store API
+  await I.executeScript(() => {
+    const cs = window.Htx.annotationStore;
+    const entity = cs.selected;
+    const c = cs.addAnnotationFromPrediction(entity);
+
+    cs.selectAnnotation(c.id);
+  });
+  I.waitTicks(5);
   const duplicateResult = await LabelStudio.serialize();
 
   // Make sure there are no preselected results
   assert.deepStrictEqual(duplicateResult.length, 0);
 
   // Create new annotation
-  I.click('[aria-label="Annotations List Toggle"]');
-  I.click('[aria-label="Create Annotation"]');
+  I.click('[aria-label="Create an annotation"]');
+  I.waitTicks(5);
   const annotationWithPresetValues = await LabelStudio.serialize();
 
   // Check that there is only the result come from selecting by default

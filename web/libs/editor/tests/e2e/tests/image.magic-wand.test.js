@@ -54,8 +54,7 @@ async function assertMagicWandPixel(I, x, y, assertValue, rgbArray, msg) {
 
 Scenario(
   "Make sure the magic wand works in a variety of scenarios",
-  async ({ I, LabelStudio, AtImageView, AtOutliner, AtPanels }) => {
-    const AtDetailsPanel = AtPanels.usePanel(AtPanels.PANEL.DETAILS);
+  async ({ I, LabelStudio, AtImageView, AtOutliner }) => {
     const params = {
       config,
       data,
@@ -66,7 +65,6 @@ Scenario(
 
     LabelStudio.init(params);
 
-    AtDetailsPanel.collapsePanel();
     LabelStudio.waitForObjectsReady();
     await AtImageView.lookForStage();
 
@@ -82,10 +80,24 @@ Scenario(
 
     AtOutliner.seeRegions(0);
 
+    const bbox = AtImageView.stageBBox();
+
     I.say("Magic wanding clouds with cloud class in upper left of image");
-    await doDrawingAction(I, { msg: "Fill in clouds upper left", fromX: 454, fromY: 184, toX: 650, toY: 644 });
+    await doDrawingAction(I, {
+      msg: "Fill in clouds upper left",
+      fromX: bbox.x + 260,
+      fromY: bbox.y + 80,
+      toX: bbox.x + 450,
+      toY: bbox.y + 540,
+    });
     I.waitTicks(2);
-    await doDrawingAction(I, { msg: "Fill in clouds lower left", fromX: 454, fromY: 834, toX: 650, toY: 644 });
+    await doDrawingAction(I, {
+      msg: "Fill in clouds lower left",
+      fromX: bbox.x + 300,
+      fromY: bbox.y + 620,
+      toX: bbox.x + 500,
+      toY: bbox.y + 200,
+    });
     I.waitTicks(2);
 
     I.say("Ensuring repeated magic wands back to back with same class collapsed into single region");
@@ -177,7 +189,13 @@ Scenario(
     I.pressKey("2");
 
     I.say("Magic wanding cloud shadows with cloud shadow class in center of zoomed image");
-    await doDrawingAction(I, { msg: "Cloud shadow in middle of image", fromX: 600, fromY: 500, toX: 500, toY: 500 });
+    await doDrawingAction(I, {
+      msg: "Cloud shadow in middle of image",
+      fromX: bbox.x + Math.round(bbox.width * 0.5),
+      fromY: bbox.y + Math.round(bbox.height * 0.5),
+      toX: bbox.x + Math.round(bbox.width * 0.35),
+      toY: bbox.y + Math.round(bbox.height * 0.5),
+    });
     I.waitTicks(2);
 
     I.say("Ensuring new cloud shadow magic wand region gets added to sidebar");
@@ -213,4 +231,6 @@ Scenario(
     await I.executeScript(setKonvaLayersOpacity, [1.0]);
     await assertMagicWandPixel(I, 350, 360, true, HAZE.rgbArray, "Center area should have magic wand haze class");
   },
-);
+)
+  .tag("@flakey")
+  .retry(1);

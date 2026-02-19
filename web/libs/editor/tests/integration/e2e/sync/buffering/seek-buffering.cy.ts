@@ -86,7 +86,7 @@ describe("Sync Buffering: Seek Buffering Tests", suiteConfig, () => {
       Paragraphs.hasMediaPlaying();
     });
 
-    it.skip("should handle seek buffering from video timeline", () => {
+    it("should handle seek buffering from video timeline", () => {
       LabelStudio.params()
         .config(videoAudioParagraphsConfig)
         .data(videoAudioParagraphsData)
@@ -95,6 +95,7 @@ describe("Sync Buffering: Seek Buffering Tests", suiteConfig, () => {
 
       LabelStudio.waitForObjectsReady();
       AudioView.isReady();
+      Paragraphs.mediaElement.should("exist");
 
       // Setup network delay
       const delayedNetwork = Network.createControlledDelay("/public/files/opossum_intro.webm", "audioSeek");
@@ -102,7 +103,7 @@ describe("Sync Buffering: Seek Buffering Tests", suiteConfig, () => {
       // Perform seek operation
       cy.log("Performing seek operation with slow network");
       VideoView.clickAtTimelineRelative(0.3);
-
+      cy.wait(TWO_FRAMES_TIMEOUT);
       VideoView.playButton.click();
 
       AudioView.hasBuffering();

@@ -120,7 +120,7 @@ const DataStore = Data(Object.keys(createShape));
 
 DataStore.Scenario(
   "Preventing applying labels of mismatch types",
-  async ({ I, LabelStudio, AtImageView, AtOutliner, AtLabels, AtPanels, current }) => {
+  async ({ I, LabelStudio, AtImageView, AtOutliner, AtLabels, current }) => {
     const shape = current;
     const config = createConfig({
       shapes: [shape],
@@ -131,14 +131,11 @@ DataStore.Scenario(
       config,
       data: { image: IMAGE },
     };
-    const AtDetailsPanel = AtPanels.usePanel(AtPanels.PANEL.DETAILS);
 
     I.amOnPage("/");
     LabelStudio.init(params);
-    AtDetailsPanel.collapsePanel();
     LabelStudio.waitForObjectsReady();
     await AtImageView.lookForStage();
-    I.waitForInvisible(".lsf-image-progress", 30);
     AtOutliner.seeRegions(0);
     const canvasSize = await AtImageView.getCanvasSize();
     const size = Math.min(canvasSize.width, canvasSize.height);

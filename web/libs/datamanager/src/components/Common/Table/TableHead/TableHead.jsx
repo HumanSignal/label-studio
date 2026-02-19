@@ -13,7 +13,6 @@ import { TableContext, tableCN } from "../TableContext";
 import { cn } from "../../../../utils/bem";
 import { getStyle } from "../utils";
 import "./TableHead.scss";
-import { FF_DEV_3873, isFF } from "../../../../utils/feature-flags";
 import { getRoot } from "mobx-state-tree";
 import { AgreementSelected } from "../../../CellViews/AgreementSelected";
 import { IconChevronDown } from "@humansignal/icons";
@@ -265,7 +264,7 @@ export const TableHead = observer(
           ref={ref}
           style={{
             ...style,
-            height: isFF(FF_DEV_3873) && 42,
+            height: 42,
           }}
           onDragOver={useCallback(
             (e) => {

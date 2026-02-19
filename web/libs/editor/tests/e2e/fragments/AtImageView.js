@@ -5,7 +5,7 @@ const Helpers = require("../tests/helpers");
 
 module.exports = {
   _stageSelector: ".konvajs-content",
-  _stageFrameSelector: ".lsf-image",
+  _stageFrameSelector: ".konvajs-content",
   _stageBBox: null,
 
   _toolBarSelector: ".lsf-toolbar",
@@ -127,6 +127,10 @@ module.exports = {
     const sizes = await I.executeScript(Helpers.getImageFrameSize);
 
     return sizes;
+  },
+
+  async waitForCanvasSizeSync() {
+    await I.executeScript(Helpers.waitForCanvasSizeSync);
   },
 
   setZoom(scale, x, y) {
