@@ -106,6 +106,7 @@ const createShape = {
 
 Scenario("Drawing shapes and undoing after that", async ({ I, LabelStudio, AtOutliner, AtImageView, AtLabels }) => {
   const stableShapes = ["Rectangle", "Ellipse"];
+  const DRAW_BBOX = { x: 60, y: 60, width: 180, height: 180 };
   const params = {
     config: getConfigWithShapes(stableShapes, 'strokewidth="5"'),
     data: { image: IMAGE },
@@ -116,14 +117,12 @@ Scenario("Drawing shapes and undoing after that", async ({ I, LabelStudio, AtOut
   LabelStudio.init(params);
   LabelStudio.waitForObjectsReady();
   AtOutliner.seeRegions(0);
-  const canvasSize = await AtImageView.getCanvasSize();
-  const size = Math.min(canvasSize.width, canvasSize.height);
   const regions = [];
 
   // Prepare shapes params
   stableShapes.forEach((shapeName) => {
     Object.values(createShape[shapeName]).forEach((creator) => {
-      const region = creator(50, 50, size - 50 * 2, size - 50 * 2, {
+      const region = creator(DRAW_BBOX.x, DRAW_BBOX.y, DRAW_BBOX.width, DRAW_BBOX.height, {
         shape: shapeName,
       });
 
@@ -140,29 +139,32 @@ Scenario("Drawing shapes and undoing after that", async ({ I, LabelStudio, AtOut
     I.say(`Drawing ${region.shape}`);
     await AtImageView.lookForStage();
     AtLabels.clickLabel(region.shape);
+    AtLabels.seeSelectedLabel(region.shape);
     I.waitTicks(2);
     AtImageView[region.action](...region.params);
     I.waitTicks(2);
-    let afterDraw = await LabelStudio.serialize();
-    for (let attempt = 0; attempt < 4 && afterDraw.length === 0; attempt++) {
+    let afterDrawCount = await I.executeScript(() => window.Htx?.annotationStore?.selected?.regions?.length ?? 0);
+    for (let attempt = 0; attempt < 4 && afterDrawCount === 0; attempt++) {
       I.waitTicks(1);
-      afterDraw = await LabelStudio.serialize();
+      afterDrawCount = await I.executeScript(() => window.Htx?.annotationStore?.selected?.regions?.length ?? 0);
     }
-    if (afterDraw.length === 0) {
+    if (afterDrawCount === 0) {
       // Retry drawing once if the first interaction was dropped by UI timing.
+      await AtImageView.lookForStage();
       AtLabels.clickLabel(region.shape);
+      AtLabels.seeSelectedLabel(region.shape);
       I.waitTicks(1);
       AtImageView[region.action](...region.params);
       I.waitTicks(2);
-      afterDraw = await LabelStudio.serialize();
-      for (let attempt = 0; attempt < 4 && afterDraw.length === 0; attempt++) {
+      afterDrawCount = await I.executeScript(() => window.Htx?.annotationStore?.selected?.regions?.length ?? 0);
+      for (let attempt = 0; attempt < 4 && afterDrawCount === 0; attempt++) {
         I.waitTicks(1);
-        afterDraw = await LabelStudio.serialize();
+        afterDrawCount = await I.executeScript(() => window.Htx?.annotationStore?.selected?.regions?.length ?? 0);
       }
     }
-    assert(afterDraw.length >= 1, "Expected at least one region after draw");
+    assert(afterDrawCount >= 1, "Expected at least one region after draw");
     I.say(`Try to undo ${region.shape}`);
-    const undoSteps = (region.undoSteps ?? 1) * afterDraw.length;
+    const undoSteps = (region.undoSteps ?? 1) * afterDrawCount;
     for (let i = 0; i < undoSteps; i++) {
       I.pressKey(["CommandOrControl", "Z"]);
       I.waitTicks(1);
