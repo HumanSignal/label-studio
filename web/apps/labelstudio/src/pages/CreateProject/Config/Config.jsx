@@ -48,8 +48,8 @@ const AdaptivePreview = React.memo(({ config, hasPendingUpdate, onUpdatePreview,
 
   if (showManualUpdateBanner) {
     return (
-      <div className={configClass.elem("preview-container")}>
-        <div className={configClass.elem("preview-info-banner")}>
+      <div className={configClass.elem("preview-container").toClassName()}>
+        <div className={configClass.elem("preview-info-banner").toClassName()}>
           <IconInfoOutline width={16} height={16} />
           <span>{LARGE_CONFIG_MESSAGE}</span>
           <Button size="small" onClick={onUpdatePreview} waiting={isUpdating} disabled={isUpdating}>
@@ -65,7 +65,7 @@ const AdaptivePreview = React.memo(({ config, hasPendingUpdate, onUpdatePreview,
 });
 
 const EmptyConfigPlaceholder = () => (
-  <div className={configClass.elem("empty-config")}>
+  <div className={configClass.elem("empty-config").toClassName()}>
     <p>Your labeling configuration is empty. It is required to label your data.</p>
     <p>
       Start from one of our predefined templates or create your own config on the Code panel. The labeling config is
@@ -95,7 +95,7 @@ const Label = ({ label, template, color }) => {
         <label style={{ background: color }}>
           <Input
             type="color"
-            className={configClass.elem("label-color")}
+            className={configClass.elem("label-color").toClassName()}
             value={colorNames[color] || color}
             onChange={(e) => template.changeLabel(label, { background: e.target.value })}
           />
@@ -136,8 +136,8 @@ const ConfigureControl = ({ control, template }) => {
   };
 
   return (
-    <div className={configClass.elem("labels")}>
-      <form className={configClass.elem("add-labels")} action="">
+    <div className={configClass.elem("labels").toClassName()}>
+      <form className={configClass.elem("add-labels").toClassName()} action="">
         <h4>{tagname === "Choices" ? "Add choices" : "Add label names"}</h4>
         <span>Use new line as a separator to add multiple labels</span>
         <textarea
@@ -153,7 +153,7 @@ const ConfigureControl = ({ control, template }) => {
           Add
         </Button>
       </form>
-      <div className={configClass.elem("current-labels")}>
+      <div className={configClass.elem("current-labels").toClassName()}>
         <h3>
           {tagname === "Choices" ? "Choices" : "Labels"} ({control.children.length})
         </h3>
@@ -259,10 +259,10 @@ const ConfigureSettings = ({ template }) => {
   if (!items.filter(Boolean).length) return null;
 
   return (
-    <ul className={configClass.elem("settings")}>
+    <ul className={configClass.elem("settings").toClassName()}>
       <li>
         <h4>Configure settings</h4>
-        <ul className={configClass.elem("object-settings")}>{items}</ul>
+        <ul className={configClass.elem("object-settings").toClassName()}>{items}</ul>
       </li>
     </ul>
   );
@@ -356,13 +356,15 @@ const ConfigureColumns = ({ columns, template }) => {
   if (!template.objects.length) return null;
 
   return (
-    <div className={configClass.elem("object")}>
+    <div className={configClass.elem("object").toClassName()}>
       <h4>Configure data</h4>
       {template.objects.length > 1 && columns?.length > 0 && columns.length < template.objects.length && (
-        <p className={configClass.elem("object-error")}>This template requires more data then you have for now</p>
+        <p className={configClass.elem("object-error").toClassName()}>
+          This template requires more data then you have for now
+        </p>
       )}
       {columns?.length === 0 && (
-        <p className={configClass.elem("object-error")}>
+        <p className={configClass.elem("object-error").toClassName()}>
           To select which field(s) to label you need to upload the data. Alternatively, you can provide it using Code
           mode.
         </p>
@@ -608,7 +610,7 @@ const Configurator = ({
   );
 
   const extra = (
-    <p className={configClass.elem("tags-link")}>
+    <p className={configClass.elem("tags-link").toClassName()}>
       Configure the labeling interface with tags.&nbsp;
       <a href="https://labelstud.io/tags/" target="_blank" rel="noreferrer">
         See all tags
@@ -641,7 +643,7 @@ const Configurator = ({
             </Button>
             <ToggleItems items={{ code: "Code", visual: "Visual" }} active={configure} onSelect={onSelect} />
           </header>
-          <div className={configClass.elem("editor")}>
+          <div className={configClass.elem("editor").toClassName()}>
             {configure === "code" && (
               <div className={cnm(configClass.elem("code").toClassName(), configure !== "code" ? "!hidden" : "")}>
                 <CodeEditor

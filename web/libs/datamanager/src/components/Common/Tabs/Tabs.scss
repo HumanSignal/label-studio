@@ -7,6 +7,19 @@
   background: var(--color-neutral-surface-inset);
   padding: 2px 0 0 2px;
 
+  &::after {
+    content: "";
+    display: block;
+    height: 24px;
+    position: absolute;
+    top: 12px;
+    left: 0;
+    right: 0;
+    z-index: 0;
+    pointer-events: none;
+    background: linear-gradient(to top, rgba(var(--color-neutral-shadow-raw) / 8%), transparent);
+  }
+
   &-content {
     &__draggable {
       align-items: center;
@@ -27,7 +40,8 @@
     display: flex;
     min-width: 0;
     align-items: center;
-    gap: 2px;
+    gap: var(--spacing-tightest);
+    z-index: 1;
   }
 
   &__item {
@@ -40,7 +54,8 @@
     box-shadow: -1px 0 0 var(--color-neutral-border) inset, 1px 0 0 var(--color-neutral-border) inset, 0 1px 0 var(--color-neutral-border-subtle) inset, 0 -1px 0 var(--color-neutral-border) inset;
     border-top-left-radius: var(--corner-radius-small);
     border-top-right-radius: var(--corner-radius-small);
-    transition: background-color 150ms ease-out;
+    transition: background-color 150ms ease-out, opacity 150ms ease-out, border-color 150ms ease-out;
+    opacity: 0.7;
 
     & .tabs-dm__item-right {
       right: calc(var(--spacing-tightest) * -1);
@@ -60,6 +75,7 @@
       background-color: var(--color-primary-emphasis-subtle);
       box-shadow: -1px 0 0 var(--color-primary-border-subtler) inset, 1px 0 0 var(--color-primary-border-subtler) inset, 0 1px 0 var(--color-primary-border-subtler) inset, 0 -1px 0 var(--color-neutral-border) inset;
       color: var(--color-neutral-content);
+      opacity: 1;
 
       & .tabs-dm__item-right {
         opacity: 1;
@@ -85,6 +101,8 @@
       cursor: default;
       background-color: var(--color-neutral-background);
       box-shadow: -1px 0 0 var(--color-neutral-border) inset, 1px 0 0 var(--color-neutral-border) inset, 0 1px 0 var(--color-neutral-border) inset;
+      opacity: 1;
+      font-weight: var(--font-weight-medium);
 
       &:hover {
         background-color: var(--color-neutral-background);
