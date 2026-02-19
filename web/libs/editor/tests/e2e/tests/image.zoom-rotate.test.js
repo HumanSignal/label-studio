@@ -226,8 +226,8 @@ Data(windowSizesTable).Scenario(
 
     const canvasToImageTolerance = 36;
     const waitForCanvasImageSync = async (stage) => {
-      let widthDiff = Infinity;
-      let heightDiff = Infinity;
+      let widthDiff = Number.POSITIVE_INFINITY;
+      let heightDiff = Number.POSITIVE_INFINITY;
 
       for (let attempt = 0; attempt < 8; attempt++) {
         await AtImageView.waitForCanvasSizeSync();
