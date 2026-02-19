@@ -7,6 +7,7 @@ import {
   textareaConfigWithValueAndRows,
   textareaConfigWithMaxSubmissions,
   textareaConfigWithValueAndMaxSubmissions,
+  textareaConfigWithSkipDuplicates,
   textareaResultsPerRegion,
 } from "../../data/control_tags/textarea";
 import { FF_LEAD_TIME } from "../../../../src/utils/feature-flags";
@@ -343,6 +344,21 @@ describe("Control Tags - TextArea - Auto-submit on Annotation Submit", () => {
       expect(result[0].value.text).to.deep.eq(["First existing text", "Second existing text"]);
       // Ensure pre-filled text was not added
       expect(result[0].value.text).to.not.include("Pre-filled text");
+    });
+  });
+});
+
+describe("Control Tags - TextArea - Duplicate prevention", () => {
+  it("should skip duplicate submissions when skipDuplicates is enabled", () => {
+    LabelStudio.params().config(textareaConfigWithSkipDuplicates).data(simpleData).withResult([]).init();
+
+    Textarea.type("Same text{enter}");
+    Textarea.type("Same text{enter}");
+    Textarea.input.click({ force: true }).type("Different text{enter}", { force: true });
+
+    LabelStudio.serialize().then((result) => {
+      expect(result).to.have.length(1);
+      expect(result[0].value.text).to.deep.equal(["Same text", "Different text"]);
     });
   });
 });

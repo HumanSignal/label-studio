@@ -54,3 +54,8 @@ export const textareaConfigWithValueAndMaxSubmissions = `<View>
   <Text name="text"/>
   <TextArea name="desc" toName="text" value="Pre-filled text" maxSubmissions="2" />
 </View>`;
+
+export const textareaConfigWithSkipDuplicates = `<View>
+  <Text name="text"/>
+  <TextArea name="desc" toName="text" skipDuplicates="true" />
+</View>`;
