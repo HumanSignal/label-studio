@@ -1,5 +1,6 @@
 {
   "$schema": "https://biomejs.dev/schemas/2.0.6/schema.json",
+  "plugins": ["./tools/biome/plugins/cn-to-classname.grit"],
   "assist": { "actions": { "source": { "organizeImports": "off" } } },
   "files": {
     "includes": [

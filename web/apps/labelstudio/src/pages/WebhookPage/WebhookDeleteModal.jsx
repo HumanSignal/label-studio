@@ -12,7 +12,7 @@ export const WebhookDeleteModal = ({ onDelete }) => {
       const rootClass = cn("webhook-delete-modal");
       return (
         <div className={rootClass}>
-          <div className={rootClass.elem("modal-text")}>
+          <div className={rootClass.elem("modal-text").toClassName()}>
             Are you sure you want to delete the webhook? This action cannot be undone.
           </div>
         </div>

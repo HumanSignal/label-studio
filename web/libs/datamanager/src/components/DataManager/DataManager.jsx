@@ -90,7 +90,7 @@ const TabsSwitch = switchInjector(
           <Draggable key={tab.key} draggableId={tab.key} index={index}>
             {(provided, snapshot) => (
               <div
-                className={tabContentCN.elem("draggable").toString()}
+                className={tabContentCN.elem("draggable").toClassName()}
                 ref={provided.innerRef}
                 {...provided.draggableProps}
                 {...provided.dragHandleProps}
@@ -127,8 +127,8 @@ const TabsSwitch = switchInjector(
 
 export const DataManager = injector(({ shrinkWidth }) => {
   return (
-    <div className={tabContentCN.toString()}>
-      <div className={tabContentCN.elem("tab").mod({ shrink: shrinkWidth }).toString()}>
+    <div className={tabContentCN.toClassName()}>
+      <div className={tabContentCN.elem("tab").mod({ shrink: shrinkWidth }).toClassName()}>
         <Interface name="tabs">
           <TabsSwitch />
         </Interface>
