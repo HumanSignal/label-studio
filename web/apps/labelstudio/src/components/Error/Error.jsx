@@ -1,11 +1,10 @@
 import { Fragment, useCallback, useMemo, useState } from "react";
 import sanitizeHtml from "sanitize-html";
 import { IconSlack } from "@humansignal/icons";
-import { cn } from "../../utils/bem";
 import { absoluteURL, copyText } from "../../utils/helpers";
 import { Button } from "@humansignal/ui";
 import { Space } from "../Space/Space";
-import "./Error.scss";
+import styles from "./Error.module.scss";
 
 const SLACK_INVITE_URL = "https://slack.labelstud.io/?source=product-error-msg";
 
@@ -34,21 +33,23 @@ export const ErrorWrapper = ({
   }, [preparedStackTrace]);
 
   return (
-    <div className={cn("error-message").toClassName()}>
+    <div className={styles["error-message"]}>
       {!minimal && possum !== false && (
         <img
-          className={cn("error-message").elem("heidi").toClassName()}
+          className={`${styles["error-message"]} ${styles["error-message__heidi"]}`}
           src={absoluteURL("/static/images/opossum_broken.svg")}
           height="111"
           alt="Heidi's down"
         />
       )}
 
-      {!minimal && title && <div className={cn("error-message").elem("title").toClassName()}>{title}</div>}
+      {!minimal && title && (
+        <div className={`${styles["error-message"]} ${styles["error-message__title"]}`}>{title}</div>
+      )}
 
       {!minimal && message && (
         <div
-          className={cn("error-message").elem("detail").toClassName()}
+          className={`${styles["error-message"]} ${styles["error-message__detail"]}`}
           dangerouslySetInnerHTML={{
             __html: sanitizeHtml(String(message)),
           }}
@@ -57,7 +58,7 @@ export const ErrorWrapper = ({
 
       {!minimal && preparedStackTrace && (
         <div
-          className={cn("error-message").elem("stracktrace").toClassName()}
+          className={`${styles["error-message"]} ${styles["error-message__stracktrace"]}`}
           dangerouslySetInnerHTML={{
             __html: sanitizeHtml(preparedStackTrace.replace(/(\n)/g, "<br>")),
           }}
@@ -65,13 +66,13 @@ export const ErrorWrapper = ({
       )}
 
       {validation?.length > 0 && (
-        <ul className={cn("error-message").elem("validation").toClassName()}>
+        <ul className={`${styles["error-message"]} ${styles["error-message__validation"]}`}>
           {validation.map(([field, errors]) => (
             <Fragment key={field}>
               {[].concat(errors).map((err, i) => (
                 <li
                   key={i}
-                  className={cn("error-message").elem("message").toClassName()}
+                  className={`${styles["error-message"]} ${styles["error-message__message"]}`}
                   dangerouslySetInnerHTML={{ __html: sanitizeHtml(err) }}
                 />
               ))}
@@ -81,7 +82,7 @@ export const ErrorWrapper = ({
       )}
 
       {!minimal && (version || errorId) && (
-        <div className={cn("error-message").elem("version").toClassName()}>
+        <div className={`${styles["error-message"]} ${styles["error-message__version"]}`}>
           <Space>
             {version && `Version: ${version}`}
             {errorId && `Error ID: ${errorId}`}
@@ -90,14 +91,9 @@ export const ErrorWrapper = ({
       )}
 
       {!minimal && (
-        <div className={cn("error-message").elem("actions").toClassName()}>
+        <div className={`${styles["error-message"]} ${styles["error-message__actions"]}`}>
           <Space spread>
-            <Button
-              className={cn("error-message").elem("action-slack").toClassName()}
-              target="_blank"
-              icon={<IconSlack />}
-              href={SLACK_INVITE_URL}
-            >
+            <Button className={styles["error-message"]} target="_blank" icon={<IconSlack />} href={SLACK_INVITE_URL}>
               Ask on Slack
             </Button>
 
