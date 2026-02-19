@@ -114,6 +114,114 @@ You can use:
 - **Inline styles**: Via the `style` prop in `React.createElement()`
 - **External CSS**: Load via CDN in your component
 
+## Regions API
+
+Your React component receives these props from Label Studio:
+
+- **`React`**: React library with hooks (useState, useEffect, useRef, etc.)
+- **`addRegion`**: Function to create new regions
+- **`regions`**: Array of all existing regions for this tag
+- **`data`**: The task data referenced in the `data` parameter
+- **`viewState`**: Object containing current view/UI state information
+
+#### `addRegion(value, extraData = {})`
+
+Creates a new region with your custom value.
+
+**Parameters:**
+- `value`: JSON-serializable payload (required)
+- `extraData`: Optional object with:
+  - `displayText`: Human-readable text displayed in the region label
+
+**Returns:** The created region object
+
+**Example:**
+```javascript
+const region = addRegion(
+  { index: 1, labels: { category: "Food" } },
+  { displayText: "Row 1: Food" }
+);
+```
+
+#### `regions` 
+
+Array of all regions for this tag. Each region has:
+
+- **`region.value`**: Your JSON-serializable payload
+- **`region.id`**: Unique region identifier
+- **`region.update(value)`**: Replace the region's value
+- **`region.delete()`**: Remove the region
+
+**Example:**
+```javascript
+// Read all regions
+regions.forEach(region => {
+  console.log(region.value);
+});
+
+// Update a region
+region.update({ ...region.value, status: 'updated' });
+
+// Delete a region
+region.delete();
+```
+
+#### `viewState`
+
+Object containing current view/UI state information for conditional rendering.
+
+**Properties:**
+- **`currentScreen`**: `"quick_view" | "side_by_side" | "label_stream" | "review_stream"` - Current screen context
+  - `"review_stream"`: Review mode (reviewer interface)
+  - `"label_stream"`: Label stream mode (annotator streaming)
+  - `"side_by_side"`: View all annotations mode (comparing annotations)
+  - `"quick_view"`: Single task view (default)
+- **`darkMode`**: `boolean` - Whether the application is currently in dark mode
+
+**Example:**
+```javascript
+function MyComponent({ React, addRegion, regions, data, viewState }) {
+  const { currentScreen, darkMode } = viewState;
+  
+  // Conditional rendering based on screen
+  const isReviewing = currentScreen === "review_stream";
+  
+  // Apply dark mode styles
+  const containerStyle = {
+    backgroundColor: darkMode ? '#1a1a1a' : '#ffffff',
+    color: darkMode ? '#e5e5e5' : '#333333',
+  };
+  
+  return React.createElement('div', { style: containerStyle },
+    isReviewing && React.createElement('p', null, 'Review Mode Active'),
+    // ... rest of component
+  );
+}
+```
+
+## Output format for regions
+
+Regions created with `ReactCode` follow Label Studio's standard format:
+
+```json
+{
+  "id": "7ZP46bpbNX",
+  "from_name": "custom",
+  "to_name": "custom",
+  "type": "reactcode",
+  "origin": "manual",
+  "value": {
+    "reactcode": {
+      "index": 1,
+      "labels": {
+        "category": "Food"
+      }
+    }
+  }
+}
+```
+
+The `value.reactcode` property contains whatever data you passed to `addRegion()`.
 
 ## External app mode (`src`)
 
@@ -125,7 +233,7 @@ Instead of writing inline React code, you can load a full standalone web applica
 </View>
 ```
 
-The `src` value supports task data interpolation (e.g. `src="$app_url"` resolves from task data), or it can be a static URL.
+The `src` value can be a static URL or it can be a variable read from task data (e.g. `src="$app_url"`).
 
 ### When to use `src` mode
 
@@ -168,7 +276,7 @@ Your app runs inside an iframe. Label Studio communicates with it via `postMessa
 | `addRegion` | `tag`, `value`, `extraData?` | Create a new region |
 | `updateRegion` | `tag`, `id`, `value` | Update an existing region's value |
 | `deleteRegion` | `tag`, `id` | Delete a region |
-| `selectRegions` | `tag`, `ids` | Select regions in Label Studio's outliner |
+| `selectRegions` | `tag`, `ids` | Select regions in Label Studio's labeling interface |
 
 !!! warning Important
     All outgoing messages must include `tag` (received during `init`). Label Studio uses it to route messages to the correct ReactCode instance.
@@ -181,7 +289,7 @@ Your app runs inside an iframe. Label Studio communicates with it via `postMessa
   {
     id: "abc123",
     value: { /* your custom payload */ },
-    selected: false,    // selected in outliner
+    selected: false,    // selected in the labeling interface
     hidden: false,      // hidden via eye icon
     locked: false,      // locked via lock icon
     origin: "manual",   // "manual" | "prediction" | "prediction-changed"
@@ -199,7 +307,7 @@ Your app runs inside an iframe. Label Studio communicates with it via `postMessa
 
 **`extraData` in `addRegion`** (optional):
 ```javascript
-{ displayText: "Human-readable label for the outliner" }
+{ displayText: "Human-readable label for the labeling interface" }
 ```
 
 ### Minimal `src` app template
@@ -321,115 +429,6 @@ When Label Studio sends a `regions` update, your app must reconcile its visual s
 ### Handling task and annotation switches
 
 When a user switches tasks or annotations, Label Studio may send an `update` message instead of destroying and recreating the iframe. Your app must handle this by reinitializing its state with the new data and regions. Always handle both `init` and `update` message types.
-
-## Regions API
-
-Your React component receives these props from Label Studio:
-
-- **`React`**: React library with hooks (useState, useEffect, useRef, etc.)
-- **`addRegion`**: Function to create new regions
-- **`regions`**: Array of all existing regions for this tag
-- **`data`**: The task data referenced in the `data` parameter
-- **`viewState`**: Object containing current view/UI state information
-
-#### `addRegion(value, extraData = {})`
-
-Creates a new region with your custom value.
-
-**Parameters:**
-- `value`: JSON-serializable payload (required)
-- `extraData`: Optional object with:
-  - `displayText`: Human-readable text displayed in the region label
-
-**Returns:** The created region object
-
-**Example:**
-```javascript
-const region = addRegion(
-  { index: 1, labels: { category: "Food" } },
-  { displayText: "Row 1: Food" }
-);
-```
-
-#### `regions` 
-
-Array of all regions for this tag. Each region has:
-
-- **`region.value`**: Your JSON-serializable payload
-- **`region.id`**: Unique region identifier
-- **`region.update(value)`**: Replace the region's value
-- **`region.delete()`**: Remove the region
-
-**Example:**
-```javascript
-// Read all regions
-regions.forEach(region => {
-  console.log(region.value);
-});
-
-// Update a region
-region.update({ ...region.value, status: 'updated' });
-
-// Delete a region
-region.delete();
-```
-
-#### `viewState`
-
-Object containing current view/UI state information for conditional rendering.
-
-**Properties:**
-- **`currentScreen`**: `"quick_view" | "side_by_side" | "label_stream" | "review_stream"` - Current screen context
-  - `"review_stream"`: Review mode (reviewer interface)
-  - `"label_stream"`: Label stream mode (annotator streaming)
-  - `"side_by_side"`: View all annotations mode (comparing annotations)
-  - `"quick_view"`: Single task view (default)
-- **`darkMode`**: `boolean` - Whether the application is currently in dark mode
-
-**Example:**
-```javascript
-function MyComponent({ React, addRegion, regions, data, viewState }) {
-  const { currentScreen, darkMode } = viewState;
-  
-  // Conditional rendering based on screen
-  const isReviewing = currentScreen === "review_stream";
-  
-  // Apply dark mode styles
-  const containerStyle = {
-    backgroundColor: darkMode ? '#1a1a1a' : '#ffffff',
-    color: darkMode ? '#e5e5e5' : '#333333',
-  };
-  
-  return React.createElement('div', { style: containerStyle },
-    isReviewing && React.createElement('p', null, 'Review Mode Active'),
-    // ... rest of component
-  );
-}
-```
-
-## Output format for regions
-
-Regions created with `ReactCode` follow Label Studio's standard format:
-
-```json
-{
-  "id": "7ZP46bpbNX",
-  "from_name": "custom",
-  "to_name": "custom",
-  "type": "reactcode",
-  "origin": "manual",
-  "value": {
-    "reactcode": {
-      "index": 1,
-      "labels": {
-        "category": "Food"
-      }
-    }
-  }
-}
-```
-
-The `value.reactcode` property contains whatever data you passed to `addRegion()`.
 
 ## Using the `outputs` parameter 
 
