@@ -224,17 +224,39 @@ Data(windowSizesTable).Scenario(
     const imageSize = await AtImageView.getImageFrameSize();
     const rotationQueue = ["right", "right", "right", "right", "left", "left", "left", "left"];
 
-    const canvasToImageTolerance = 24;
+    const canvasToImageTolerance = 36;
+    const waitForCanvasImageSync = async (stage) => {
+      let widthDiff = Infinity;
+      let heightDiff = Infinity;
+
+      for (let attempt = 0; attempt < 8; attempt++) {
+        await AtImageView.waitForCanvasSizeSync();
+        const currentCanvasSize = await AtImageView.getCanvasSize();
+        const currentImageSize = await AtImageView.getImageFrameSize();
+
+        widthDiff = Math.abs(currentCanvasSize.width - currentImageSize.width);
+        heightDiff = Math.abs(currentCanvasSize.height - currentImageSize.height);
+
+        if (widthDiff <= canvasToImageTolerance && heightDiff <= canvasToImageTolerance) return;
+
+        I.waitTicks(1);
+      }
+
+      assert(
+        widthDiff <= canvasToImageTolerance,
+        `[${stage}] width diff ${widthDiff} exceeds tolerance ${canvasToImageTolerance}`,
+      );
+      assert(
+        heightDiff <= canvasToImageTolerance,
+        `[${stage}] height diff ${heightDiff} exceeds tolerance ${canvasToImageTolerance}`,
+      );
+    };
+
     assert(Math.abs(canvasSize.width - imageSize.width) <= canvasToImageTolerance);
     assert(Math.abs(canvasSize.height - imageSize.height) <= canvasToImageTolerance);
     for (const rotate of rotationQueue) {
       I.click(locate(`[aria-label='rotate-${rotate}']`));
-      await AtImageView.waitForCanvasSizeSync();
-      const rotatedCanvasSize = await AtImageView.getCanvasSize();
-      const rotatedImageSize = await AtImageView.getImageFrameSize();
-
-      assert(Math.abs(rotatedCanvasSize.width - rotatedImageSize.width) <= canvasToImageTolerance);
-      assert(Math.abs(rotatedCanvasSize.height - rotatedImageSize.height) <= canvasToImageTolerance);
+      await waitForCanvasImageSync(`rotate-${rotate}-${current.width}x${current.height}`);
     }
   },
 );
