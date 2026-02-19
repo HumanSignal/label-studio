@@ -233,6 +233,16 @@ const DrawingTool = types
         self.annotation.history.unfreeze();
         self.mode = "viewing";
       },
+      /**
+       * Release the tool's in-progress drawing state without touching the
+       * region itself (it belongs to the outgoing annotation). Called by
+       * ToolsManager during annotation switches.
+       */
+      resetBeforeAnnotationSwitch() {
+        self.stopListening?.();
+        self.currentArea = null;
+        self.mode = "viewing";
+      },
     };
   });
 
