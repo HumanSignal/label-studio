@@ -1,9 +1,11 @@
-import { LabelStudio, Taxonomy, Tooltip } from "@humansignal/frontend-test/helpers/LSF/index";
+import { LabelStudio, Taxonomy, Tooltip, useTaxonomy } from "@humansignal/frontend-test/helpers/LSF/index";
 import {
   dynamicTaxonomyConfig,
   taxonomyDataWithSimilarAliases,
   dataWithPrediction,
   simpleData,
+  legacyTaxonomyConfig,
+  legacyTaxonomyResult,
   taxonomyConfig,
   taxonomyConfigWithMaxUsages,
   taxonomyResultWithSimilarAliases,
@@ -17,6 +19,20 @@ describe("Control Tags - Taxonomy", () => {
       .find(".ant-select-tree-switcher")
       .first()
       .click({ force: true });
+  };
+
+  const expandLegacyTreeNode = (title: string) => {
+    cy.contains('[class^="taxonomy__item"] label', title)
+      .closest('[class^="taxonomy__item"]')
+      .find('[class^="taxonomy__grouping"]')
+      .click({ force: true });
+  };
+
+  const selectLegacyTreeNode = (title: string) => {
+    cy.contains('[class^="taxonomy__item"] label', title)
+      .closest('[class^="taxonomy__item"]')
+      .find("input.item")
+      .check({ force: true });
   };
 
   it("should show hint for <Choice />", () => {
@@ -92,6 +108,29 @@ describe("Control Tags - Taxonomy", () => {
     LabelStudio.serialize().then((result) => {
       expect(result).to.have.length(1);
       expect(result[0].value.taxonomy).to.deep.equal(taxonomyResultWithAlias.value.taxonomy);
+    });
+  });
+
+  it("supports legacy taxonomy nested selection and search deterministically", () => {
+    const legacyTaxonomy = useTaxonomy("&:eq(0)", true);
+
+    LabelStudio.params().config(legacyTaxonomyConfig).data(simpleData).withResult([]).init();
+
+    legacyTaxonomy.open();
+    expandLegacyTreeNode("Book 1");
+    expandLegacyTreeNode("Chapter 2");
+    selectLegacyTreeNode("Section 2.1");
+
+    cy.get('[name="taxonomy__search"]').type("Section 2.2");
+    selectLegacyTreeNode("Section 2.2");
+    legacyTaxonomy.close();
+
+    LabelStudio.serialize().then((result) => {
+      expect(result).to.have.length(1);
+      expect(result[0].from_name).to.equal(legacyTaxonomyResult.from_name);
+      expect(result[0].to_name).to.equal(legacyTaxonomyResult.to_name);
+      expect(result[0].type).to.equal(legacyTaxonomyResult.type);
+      expect(result[0].value.taxonomy).to.deep.equal(legacyTaxonomyResult.value.taxonomy);
     });
   });
 });
