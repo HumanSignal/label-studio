@@ -7,7 +7,6 @@ import { modal } from "../../Modal/Modal";
 import { TaskSourceViewer } from "../../TaskSourceViewer";
 // @ts-expect-error - utils is JS module
 import { getProperty } from "../utils";
-import styles from "./RowContextMenu.module.scss";
 
 export interface RowContextMenuProps {
   /** Task data object */
@@ -223,7 +222,7 @@ export const RowContextMenu: FC<RowContextMenuProps> = ({
   return (
     <DropdownContext.Provider value={contextValue}>
       <Dropdown visible={true} animated={true} constrainHeight={true} dataAttributes={{ "data-context-menu": "" }}>
-        <Menu className={styles.menu} closeDropdownOnItemClick={true}>
+        <Menu closeDropdownOnItemClick={true} className="row-context-menu">
           <Menu.Item
             onClick={handleCompareAnnotations}
             data-testid="menu-item-compare-annotations"
