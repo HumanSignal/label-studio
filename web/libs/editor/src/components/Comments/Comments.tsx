@@ -66,8 +66,7 @@ export const Comments: FC<{
     // remain the same when user submit draft, so no unneeded calls.
   }, [commentStore.annotation?.id, isActive, lazyLoadEnabled]);
 
-  // FIT-720: Show skeleton loader while fetching comments (only when lazy loading enabled)
-  const isLoading = lazyLoadEnabled && commentStore.isListLoading;
+  const isLoading = lazyLoadEnabled && commentStore.isListLoading && !!commentStore.annotation;
 
   useEffect(() => {
     const confirmCommentsLoss = (e: any) => {
