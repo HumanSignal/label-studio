@@ -56,4 +56,30 @@ describe("Image segmentation - Tools - Bitmask", () => {
       });
     });
   });
+
+  it("adds multiple bitmask strokes into a single region deterministically", () => {
+    LabelStudio.params().config(bitmaskConfig).data(bitmaskImageData).withResult([]).init();
+    LabelStudio.waitForObjectsReady();
+    ImageView.waitForImage();
+
+    selectBitmaskTool();
+    Labels.select("Test");
+    ImageView.drawRectRelative(0.25, 0.25, 0.12, 0.12);
+    Sidebar.hasRegions(1);
+
+    LabelStudio.serialize().then((firstResult) => {
+      const before = firstResult[0]?.value.imageDataURL ?? JSON.stringify(firstResult[0]?.value.rle ?? []);
+
+      // Draw another stroke while the same bitmask region is selected.
+      ImageView.drawRectRelative(0.5, 0.45, 0.14, 0.1);
+      Sidebar.hasRegions(1);
+
+      LabelStudio.serialize().then((secondResult) => {
+        const after = secondResult[0]?.value.imageDataURL ?? JSON.stringify(secondResult[0]?.value.rle ?? []);
+
+        expect(secondResult).to.have.length(1);
+        expect(after).to.not.equal(before);
+      });
+    });
+  });
 });

@@ -45,4 +45,24 @@ describe("Image segmentation - Tools - MagicWand", () => {
     Hotkeys.redo();
     Sidebar.hasRegions(1);
   });
+
+  it("keeps magic-wand tool stable when clicking already active tool button", () => {
+    LabelStudio.params().config(magicWandConfig).data(magicWandData).withResult([]).init();
+    LabelStudio.waitForObjectsReady();
+    ImageView.waitForImage();
+
+    selectMagicWandTool();
+    ImageView.toolBar.find('[aria-label="magicwand"]').click().should("have.class", "lsf-tool_active");
+
+    Labels.select("Shadow");
+    ImageView.clickAtRelative(0.45, 0.2);
+    Sidebar.hasRegions(1);
+
+    LabelStudio.serialize().then((result) => {
+      const labelsPayload = result.find((entry) => Array.isArray(entry.value.labels));
+
+      expect(labelsPayload).to.exist;
+      expect(labelsPayload?.value.labels).to.deep.equal(["Shadow"]);
+    });
+  });
 });
