@@ -184,3 +184,15 @@ export const legacyTaxonomyResult = {
     taxonomy: [["Book 1", "Chapter 2", "Section 2.1"], ["Book 1", "Chapter 2", "Section 2.2"]],
   },
 };
+
+export const legacyDynamicTaxonomyConfig = `<View>
+  <Text name="text" value="$text"/>
+  <Taxonomy name="legacy_choices" toName="text" value="$items" legacy="true" showFullPath="true"/>
+</View>`;
+
+export const legacyLargeTaxonomyData = {
+  text: "Large taxonomy test task",
+  items: Array.from({ length: 80 }, (_, index) => ({
+    value: `Item ${index + 1}`,
+  })),
+};

@@ -5,6 +5,8 @@ import {
   dataWithPrediction,
   simpleData,
   legacyTaxonomyConfig,
+  legacyDynamicTaxonomyConfig,
+  legacyLargeTaxonomyData,
   legacyTaxonomyResult,
   taxonomyConfig,
   taxonomyConfigWithMaxUsages,
@@ -131,6 +133,49 @@ describe("Control Tags - Taxonomy", () => {
       expect(result[0].to_name).to.equal(legacyTaxonomyResult.to_name);
       expect(result[0].type).to.equal(legacyTaxonomyResult.type);
       expect(result[0].value.taxonomy).to.deep.equal(legacyTaxonomyResult.value.taxonomy);
+    });
+  });
+
+  it("supports deterministic keyboard navigation in legacy taxonomy", () => {
+    const legacyTaxonomy = useTaxonomy("&:eq(0)", true);
+
+    LabelStudio.params().config(legacyTaxonomyConfig).data(simpleData).withResult([]).init();
+    legacyTaxonomy.open();
+
+    cy.get("body").trigger("keydown", { key: "ArrowDown", shiftKey: true });
+    cy.focused().should("have.attr", "name", "taxonomy__search");
+
+    cy.get('[name="taxonomy__search"]').type("Section 2.1");
+    cy.get('[class^="taxonomy__item"] input.item:not([disabled])').first().focus().should("have.class", "item");
+    cy.get("body").trigger("keydown", { key: "ArrowRight" });
+    cy.focused().should("have.attr", "name", "taxonomy__search");
+
+    selectLegacyTreeNode("Section 2.1");
+    cy.get("body").trigger("keydown", { key: "Escape" });
+    cy.get('[class^="taxonomy__dropdown"]').should("not.be.visible");
+
+    LabelStudio.serialize().then((result) => {
+      expect(result).to.have.length(1);
+      expect(result[0].value.taxonomy).to.deep.equal([["Book 1", "Chapter 2", "Section 2.1"]]);
+    });
+  });
+
+  it("handles legacy large-tree filtering deterministically", () => {
+    const legacyTaxonomy = useTaxonomy("&:eq(0)", true);
+
+    LabelStudio.params().config(legacyDynamicTaxonomyConfig).data(legacyLargeTaxonomyData).withResult([]).init();
+    legacyTaxonomy.open();
+
+    cy.get('[name="taxonomy__search"]').type("no-such-item");
+    cy.get('[class^="taxonomy__item"]').should("not.exist");
+
+    cy.get('[name="taxonomy__search"]').clear().type("Item 79");
+    selectLegacyTreeNode("Item 79");
+    legacyTaxonomy.close();
+
+    LabelStudio.serialize().then((result) => {
+      expect(result).to.have.length(1);
+      expect(result[0].value.taxonomy).to.deep.equal([["Item 79"]]);
     });
   });
 });
