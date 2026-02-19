@@ -1,6 +1,5 @@
 import React from "react";
-import { cn } from "../../utils/bem";
-import "./Columns.scss";
+import styles from "./Columns.module.scss";
 
 export const Columns = ({ children, count, size, gap }) => {
   /**@type {import('react').RefObject<HTMLElement>} */
@@ -13,13 +12,13 @@ export const Columns = ({ children, count, size, gap }) => {
     "--column-gap": gap,
   };
 
-  return <div ref={ref} className={cn("columns").toClassName()} style={style} children={children} />;
+  return <div ref={ref} className={styles["columns"]} style={style} children={children} />;
 };
 
 Columns.Column = ({ title, children }) => {
   return (
-    <div className={cn("columns").elem("item").toClassName()}>
-      <div className={cn("columns").elem("title").toClassName()}>{title}</div>
+    <div className={styles["columns"]}>
+      <div className={`${styles["columns"]} ${styles["columns__title"]}`}>{title}</div>
       {children}
     </div>
   );
