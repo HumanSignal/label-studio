@@ -44,7 +44,7 @@ export const unsavedChangesModal = ({
   body = "Would you like to save them before leaving?",
   ...props
 }: UnsavedChangesModalProps) => {
-  let modalInstance: any = undefined;
+  let modalInstance: any;
   const saveAndLeave = async () => {
     await onSave?.();
     modalInstance?.close();
