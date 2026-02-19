@@ -23,6 +23,11 @@ export const create = (columns) => {
         });
       }
 
+      // No task when e.g. 403 (paused) or error response
+      if (!remoteTask?.id) {
+        return null;
+      }
+
       annotationID = annotationID ?? remoteTask.id;
 
       const annotation = self.updateItem(annotationID, {

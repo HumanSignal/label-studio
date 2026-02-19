@@ -197,6 +197,11 @@ export const create = (columns) => {
           return null;
         }
 
+        // No task when e.g. 403 (paused) or error response — avoid using taskData below
+        if (taskData?.$meta?.status === 403 || !taskData?.id) {
+          return null;
+        }
+
         const labelStreamModeChanged =
           self.selected && self.selected.assigned_task !== taskData.assigned_task && taskData.assigned_task === false;
 
@@ -213,7 +218,7 @@ export const create = (columns) => {
           const selectedAnnotationID = getRoot(self).annotationStore.selected?.id;
           if (task && selectedAnnotationID) {
             console.log(
-              `[LABEL STREAM] ${task.queue}, task ${task.id}, project ${getRoot(self)?.SDK?.project?.id}, user ${getRoot(self).LSF.lsf.user.id}${selectedAnnotationID ? `, annotation ${selectedAnnotationID}` : ""}`,
+              `[LABEL STREAM] ${task?.queue ?? ""}, task ${task?.id}, project ${getRoot(self)?.SDK?.project?.id}, user ${getRoot(self).LSF?.lsf?.user?.id ?? ""}${selectedAnnotationID ? `, annotation ${selectedAnnotationID}` : ""}`,
             );
           }
         }
