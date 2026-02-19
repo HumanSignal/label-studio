@@ -51,7 +51,7 @@ jobs:
 
       - name: Build editor (production)
         working-directory: ${{ env.FRONTEND_MONOREPO_DIR }}
-        run: MODE=standalone yarn nx run editor:build:production
+        run: BABEL_ENV=test MODE=standalone yarn nx run editor:build:production
 
       - name: Upload editor build
         uses: actions/upload-artifact@v4
