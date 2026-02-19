@@ -78,10 +78,10 @@ Data in Label Studio is stored in one or two places, depending on your deploymen
 
 
 !!! info Tip
-    There are several advanced security options for AWS and GCP storage, including:
-    * [Application Default Credentials for GCP](storage#Application-Default-Credentials-for-enhanced-security-for-GCS) (on-prem only)
-    * [IP filtering for GCP storage](storage#IP-filtering-for-enhanced-security-for-GCS)
-    * [IP filtering and VPN for S3](storage#IP-Filtering-and-VPN-for-Enhanced-Security-for-S3-Storage)
+    There are several advanced security options for AWS and GCP storage, including: 
+    * [Application Default Credentials for GCP](storage_gcp#Application-Default-Credentials-for-enhanced-security-for-GCS) (on-prem only)
+    * [IP filtering for GCP storage](storage_gcp#IP-filtering-for-enhanced-security-for-GCS)
+    * [IP filtering and VPN for S3](storage_s3#IP-filtering-and-VPN-for-enhanced-security-for-S3-storage)
 
 ### Secure database access
 
