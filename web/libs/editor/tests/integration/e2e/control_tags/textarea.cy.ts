@@ -1,4 +1,4 @@
-import { LabelStudio, Sidebar, Textarea, ToolBar } from "@humansignal/frontend-test/helpers/LSF";
+import { LabelStudio, Modals, Sidebar, Textarea, ToolBar } from "@humansignal/frontend-test/helpers/LSF";
 import {
   simpleData,
   textareaConfigPerRegion,
@@ -8,6 +8,10 @@ import {
   textareaConfigWithMaxSubmissions,
   textareaConfigWithValueAndMaxSubmissions,
   textareaConfigWithSkipDuplicates,
+  textareaPerRegionRegionListConfig,
+  textareaPerRegionRegionListData,
+  textareaPerRegionRegionListResult,
+  textareaSkipDuplicatesError,
   textareaResultsPerRegion,
 } from "../../data/control_tags/textarea";
 import { FF_LEAD_TIME } from "../../../../src/utils/feature-flags";
@@ -359,6 +363,46 @@ describe("Control Tags - TextArea - Duplicate prevention", () => {
     LabelStudio.serialize().then((result) => {
       expect(result).to.have.length(1);
       expect(result[0].value.text).to.deep.equal(["Same text", "Different text"]);
+    });
+  });
+
+  it("supports deterministic edit/delete in per-region region-list mode", () => {
+    LabelStudio.params()
+      .config(textareaPerRegionRegionListConfig)
+      .data(textareaPerRegionRegionListData)
+      .withResult(textareaPerRegionRegionListResult)
+      .init();
+
+    Sidebar.findRegionByIndex(0).click();
+
+    cy.get('[data-testid="textarea-region-form"] [data-testid="textarea-region-input"]')
+      .click({ force: true })
+      .type('The "H1" Header{enter}', { force: true });
+    cy.get('[data-testid="textarea-region-form"] [data-testid="textarea-region-input"]')
+      .click({ force: true })
+      .type("Wrong text{enter}", { force: true });
+
+    cy.get('[data-testid="textarea-region-item"]').should("have.length", 2);
+    cy.get('[data-testid="textarea-region-item"]')
+      .eq(1)
+      .find('[data-testid="textarea-region-input"]')
+      .clear()
+      .type('The "H1" Header{enter}', { force: true });
+    Modals.hasWarning(textareaSkipDuplicatesError);
+    cy.contains(".ant-modal.ant-modal-confirm-warning button", "OK").click();
+
+    cy.get('[data-testid="textarea-region-item"]')
+      .eq(1)
+      .find('[data-testid="textarea-region-input"]')
+      .clear()
+      .type("Corrected text{enter}", { force: true });
+    Modals.hasNoWarnings();
+
+    LabelStudio.serialize().then((result) => {
+      const textareaResult = result.find((item) => item.type === "textarea" && item.from_name === "ocr");
+
+      expect(textareaResult).to.exist;
+      expect(textareaResult.value.text).to.deep.equal(['The "H1" Header', "Corrected text"]);
     });
   });
 });
