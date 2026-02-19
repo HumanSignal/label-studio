@@ -77,7 +77,7 @@ Dates for annotations and reviews are based on when they were completed, not whe
 | Chart | Description |
 |-------|--------------|
 | **Task Progress** | Shows how tasks move through [states](project_states#Task-states) over the selected period of time.|
-| **Annotations Submitted vs Accepted** | Shows submitted annotations and accepted annotations over time, with an acceptance score line. Note that accepted annotations includes annotations that were fixed and then accepted. |
+| **Annotations Submitted vs Accepted** | Shows submitted annotations and accepted annotations over time, with an acceptance score line (the acceptance score is the number of accepted annotations divided by the number of annotations reviewed). Note that accepted annotations includes annotations that were fixed and then accepted. |
 | **Time Spent** | Shows time spent annotating and reviewing over time. Includes total time in the period and average time per submitted annotation. |
 
 
@@ -103,4 +103,4 @@ The **Project Progress** table display detailed metrics for each project.
 | **Total Time Spent** | Total time spent annotating and reviewing annotations. |
 | **Avg Time / Annotation** | Average time spent per submitted annotation. Includes both annotation and review times. |
 | **Avg Agreement Score** | Average agreement Score across all tasks which have received the required number of annotations. |
-| **Acceptance Score** | Total number of annotations accepted divided by number of annotations reviewed. |
+| **Acceptance Score** | Total number of accepted annotations divided by the number of annotations that have been reviewed. |
