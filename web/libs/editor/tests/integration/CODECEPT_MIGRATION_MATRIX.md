@@ -1,6 +1,6 @@
-# CodeceptJS -> Cypress Migration Matrix
+# Legacy E2E -> Cypress Migration Matrix
 
-This document tracks the replacement of `web/libs/editor/tests/e2e` (CodeceptJS) by
+This document tracks the replacement of the removed legacy LSF e2e suite by
 `web/libs/editor/tests/integration/e2e` (Cypress).
 
 Status legend:
