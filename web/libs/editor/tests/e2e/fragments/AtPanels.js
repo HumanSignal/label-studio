@@ -25,6 +25,8 @@ class Panel {
   expandButton = '[class*="__toggle"][data-tooltip*="Expand"]';
   collapseGroupButton = '[class*="__toggle"][data-tooltip*="Collapse Group"]';
   expandGroupButton = '[class*="__toggle"][data-tooltip*="Expand Group"]';
+  tabsRightCollapseButton = '.lsf-tabs-panel_alignment_right [data-tooltip="Collapse"]';
+  tabsRightExpandButton = '.lsf-tabs-panel_alignment_right [data-tooltip="Expand"]';
 
   resizeTopLeft = '[data-resize="top-left"]';
   resizeTopRight = '[data-resize="top-right"]';
@@ -54,8 +56,8 @@ class Panel {
     const { legacy, tabs } = this.panelSelectors();
 
     return {
-      collapse: `${legacy} ${this.collapseButton}, ${tabs} ${this.collapseButton}, ${tabs} ${this.collapseGroupButton}`,
-      expand: `${legacy} ${this.expandButton}, ${tabs} ${this.expandButton}, ${tabs} ${this.expandGroupButton}`,
+      collapse: `${legacy} ${this.collapseButton}, ${tabs} ${this.collapseButton}, ${tabs} ${this.collapseGroupButton}, ${this.tabsRightCollapseButton}`,
+      expand: `${legacy} ${this.expandButton}, ${tabs} ${this.expandButton}, ${tabs} ${this.expandGroupButton}, ${this.tabsRightExpandButton}`,
     };
   }
   scopedSelector(legacySelector, tabsSelector = legacySelector) {
@@ -105,6 +107,17 @@ class Panel {
 
     I.executeScript(
       ({ legacySelector, panelId, collapseSelector, collapseGroupSelector }) => {
+        const tabsHeader = panelId ? document.getElementById(panelId) : null;
+        const tabsRoot = tabsHeader?.closest(".lsf-tabs-panel");
+        const scopedRightCollapseButton = tabsRoot?.matches(".lsf-tabs-panel_alignment_right")
+          ? tabsRoot.querySelector('[data-tooltip="Collapse"]')
+          : null;
+
+        if (scopedRightCollapseButton) {
+          scopedRightCollapseButton.click();
+          return;
+        }
+
         const roots = [];
         const legacyRoot = document.querySelector(legacySelector);
 
@@ -141,6 +154,17 @@ class Panel {
 
     I.executeScript(
       ({ legacySelector, panelId, expandSelector, expandGroupSelector, legacyHeaderSelector }) => {
+        const tabsHeader = panelId ? document.getElementById(panelId) : null;
+        const tabsRoot = tabsHeader?.closest(".lsf-tabs-panel");
+        const scopedRightExpandButton = tabsRoot?.matches(".lsf-tabs-panel_alignment_right")
+          ? tabsRoot.querySelector('[data-tooltip="Expand"]')
+          : null;
+
+        if (scopedRightExpandButton) {
+          scopedRightExpandButton.click();
+          return;
+        }
+
         const roots = [];
         const legacyRoot = document.querySelector(legacySelector);
 
