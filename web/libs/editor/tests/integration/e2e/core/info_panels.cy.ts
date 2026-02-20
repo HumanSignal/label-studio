@@ -112,23 +112,24 @@ describe("Label Studio UI info panels", () => {
   describe("Codecov: selection-tools (word granularity)", () => {
     const configWordGranularity = `<View>
   <Labels name="lbl" toName="text">
-    <Label value="Word" />
+    <Label value="Word1" />
+    <Label value="Word2" />
   </Labels>
-  <RichText name="text" value="$text" granularity="word" />
+  <Text name="text" value="$text" inline="true" granularity="word" />
 </View>`;
 
     it("creates region when selecting text with word granularity (trimSelection, applyTextGranularity)", () => {
       LabelStudio.init({
         config: configWordGranularity,
         task: {
-          annotations: [],
+          annotations: [{ id: 1, result: [] }],
           predictions: [],
           id: 1,
           data: { text: "Hello world test" },
         },
       });
 
-      Labels.select("Word");
+      Labels.select("Word1");
       RichText.selectText("world");
       RichText.hasRegionWithText("world");
     });
