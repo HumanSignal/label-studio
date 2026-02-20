@@ -15,6 +15,7 @@ import { CommentsSdk } from "./comments-sdk";
 // import { LSFHistory } from "./lsf-history";
 import { annotationToServer, taskToLSFormat } from "./lsf-utils";
 import { when } from "mobx";
+import { isAlive } from "mobx-state-tree";
 import { imageCache } from "@humansignal/core";
 import { invalidateAnnotationCache, invalidateDistributionCache } from "@humansignal/core/lib/utils/annotation-cache";
 
@@ -526,6 +527,10 @@ export class LSFWrapper {
           // Annotation no longer exists in the store
           return fullAnnotation;
         }
+        if (!isAlive(lsfAnnotation) || !isAlive(lsfAnnotation.trackedState)) {
+          // Annotation node was detached while hydration request was in-flight
+          return fullAnnotation;
+        }
 
         // Check if already hydrated while we were fetching
         const versionsResult = lsfAnnotation.versions?.result;
@@ -538,6 +543,7 @@ export class LSFWrapper {
         }
 
         if (fullAnnotation.result) {
+          if (!isAlive(lsfAnnotation) || !isAlive(lsfAnnotation.trackedState)) return fullAnnotation;
           lsfAnnotation.history.freeze();
           lsfAnnotation.deserializeResults(fullAnnotation.result);
           // Critical: updateObjects() is required to render visual regions after deserializing
@@ -1245,6 +1251,10 @@ export class LSFWrapper {
           // Annotation no longer exists in the store
           return;
         }
+        if (!isAlive(freshAnnotation) || !isAlive(freshAnnotation.trackedState)) {
+          // Annotation node was detached while hydration request was in-flight
+          return;
+        }
 
         // Check if annotation was already hydrated while we were fetching
         const freshVersionsResult = freshAnnotation.versions?.result;
@@ -1260,6 +1270,7 @@ export class LSFWrapper {
         freshAnnotation.history?.freeze?.();
 
         // Deserialize the results into the annotation
+        if (!isAlive(freshAnnotation) || !isAlive(freshAnnotation.trackedState)) return;
         freshAnnotation.deserializeResults(fullAnnotation.result);
 
         // Critical: updateObjects() MUST be called to render visual regions after deserializing
