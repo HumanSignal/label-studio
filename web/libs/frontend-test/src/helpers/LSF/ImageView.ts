@@ -227,6 +227,13 @@ export const ImageView = {
     cy.get("body").type("{ctrl}{-}");
   },
 
+  zoomInByButton() {
+    this.toolBar.find('[aria-label="zoom-in"]').should("be.visible").click();
+  },
+  zoomOutByButton() {
+    this.toolBar.find('[aria-label="zoom-out"]').should("be.visible").click();
+  },
+
   selectRectangleToolByButton() {
     this.toolBar
       .find('[aria-label="rectangle-tool"]')

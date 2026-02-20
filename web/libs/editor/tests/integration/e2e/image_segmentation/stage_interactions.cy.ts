@@ -158,4 +158,30 @@ describe("Image Segmentation Stage Interactions", () => {
     ImageView.drawRectRelative(0.8, 0.4, 0.1, 0.2);
     Sidebar.hasRegions(2);
   });
+
+  describe("Rotate and Zoom toolbar (Codecov: tools/Rotate.jsx, tools/Zoom.jsx)", () => {
+    it("should rotate image left and right via toolbar buttons", () => {
+      LabelStudio.params().config(imageToolsConfig).data(imageData).withResult([]).init();
+      LabelStudio.waitForObjectsReady();
+      ImageView.waitForImage();
+
+      ImageView.rotateLeft();
+      ImageView.rotateRight();
+      ImageView.rotateRight();
+      ImageView.rotateLeft();
+      // Image still visible after rotations
+      ImageView.drawingArea.get("canvas").should("be.visible");
+    });
+
+    it("should zoom in and out via toolbar buttons", () => {
+      LabelStudio.params().config(imageToolsConfig).data(imageData).withResult([]).init();
+      LabelStudio.waitForObjectsReady();
+      ImageView.waitForImage();
+
+      ImageView.zoomInByButton();
+      ImageView.zoomInByButton();
+      ImageView.zoomOutByButton();
+      ImageView.drawingArea.get("canvas").should("be.visible");
+    });
+  });
 });
