@@ -82,4 +82,34 @@ describe("Image segmentation - Tools - Bitmask", () => {
       });
     });
   });
+
+  it("applies bitmask size shortcuts while keeping deterministic single-region behavior", () => {
+    LabelStudio.params().config(bitmaskConfig).data(bitmaskImageData).withResult([]).init();
+    LabelStudio.waitForObjectsReady();
+    ImageView.waitForImage();
+
+    selectBitmaskTool();
+    Labels.select("Test");
+    ImageView.drawRectRelative(0.2, 0.2, 0.08, 0.08);
+    Sidebar.hasRegions(1);
+
+    LabelStudio.serialize().then((firstResult) => {
+      const firstPayload = firstResult[0]?.value.imageDataURL ?? JSON.stringify(firstResult[0]?.value.rle ?? []);
+
+      cy.get("body").type("]");
+      ImageView.drawRectRelative(0.35, 0.35, 0.08, 0.08);
+      Sidebar.hasRegions(1);
+
+      cy.get("body").type("[");
+      ImageView.drawRectRelative(0.5, 0.5, 0.08, 0.08);
+      Sidebar.hasRegions(1);
+
+      LabelStudio.serialize().then((finalResult) => {
+        const finalPayload = finalResult[0]?.value.imageDataURL ?? JSON.stringify(finalResult[0]?.value.rle ?? []);
+
+        expect(finalResult).to.have.length(1);
+        expect(finalPayload).to.not.equal(firstPayload);
+      });
+    });
+  });
 });

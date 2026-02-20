@@ -65,4 +65,32 @@ describe("Image segmentation - Tools - MagicWand", () => {
       expect(labelsPayload?.value.labels).to.deep.equal(["Shadow"]);
     });
   });
+
+  it("supports multi-label magic-wand workflow with zoom and region relabeling", () => {
+    LabelStudio.params().config(magicWandConfig).data(magicWandData).withResult([]).init();
+    LabelStudio.waitForObjectsReady();
+    ImageView.waitForImage();
+
+    selectMagicWandTool();
+    Labels.select("Cloud");
+    ImageView.clickAtRelative(0.35, 0.15);
+    Sidebar.hasRegions(1);
+
+    cy.get('button[aria-label="zoom-in"]').click().click().click();
+    Hotkeys.unselectAllRegions();
+    Labels.select("Shadow");
+    ImageView.clickAtRelative(0.78, 0.78);
+    cy.get(".lsf-tree__node:not(.lsf-tree__node_type_footer) .lsf-tree-node-content-wrapper").its("length").should("be.gte", 1);
+
+    Sidebar.findRegionByIndex(0).click();
+    Labels.select("Shadow");
+    cy.get(".lsf-tree__node:not(.lsf-tree__node_type_footer) .lsf-tree-node-content-wrapper").its("length").should("be.gte", 1);
+
+    LabelStudio.serialize().then((result) => {
+      const labelEntries = result.filter((entry) => Array.isArray(entry.value.labels));
+
+      expect(labelEntries.length).to.be.greaterThan(0);
+      expect(labelEntries.some((entry) => entry.value.labels.includes("Shadow"))).to.equal(true);
+    });
+  });
 });

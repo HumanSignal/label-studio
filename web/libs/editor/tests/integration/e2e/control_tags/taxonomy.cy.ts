@@ -15,6 +15,12 @@ import {
 } from "../../data/control_tags/taxonomy";
 
 describe("Control Tags - Taxonomy", () => {
+  const legacyItemLabel = (title: string) =>
+    cy
+      .get('[class^="taxonomy__item"] label')
+      .filter((_, element) => element.textContent?.trim() === title)
+      .first();
+
   const expandTreeNode = (title: string) => {
     cy.contains(".htx-taxonomy-dropdown .ant-select-tree-title", title)
       .closest(".ant-select-tree-treenode")
@@ -24,14 +30,14 @@ describe("Control Tags - Taxonomy", () => {
   };
 
   const expandLegacyTreeNode = (title: string) => {
-    cy.contains('[class^="taxonomy__item"] label', title)
+    legacyItemLabel(title)
       .closest('[class^="taxonomy__item"]')
       .find('[class^="taxonomy__grouping"]')
       .click({ force: true });
   };
 
   const selectLegacyTreeNode = (title: string) => {
-    cy.contains('[class^="taxonomy__item"] label', title)
+    legacyItemLabel(title)
       .closest('[class^="taxonomy__item"]')
       .find("input.item")
       .check({ force: true });
@@ -177,5 +183,65 @@ describe("Control Tags - Taxonomy", () => {
       expect(result).to.have.length(1);
       expect(result[0].value.taxonomy).to.deep.equal([["Item 79"]]);
     });
+  });
+
+  it("supports adding, nesting, and deleting legacy custom taxonomy items", () => {
+    const legacyTaxonomy = useTaxonomy("&:eq(0)", true);
+
+    LabelStudio.params()
+      .config(`
+        <View>
+          <Text name="text" value="$text"/>
+          <Taxonomy name="taxonomy" toName="text" legacy="true">
+            <Choice value="a">
+              <Choice value="ab"/>
+              <Choice value="ac"/>
+            </Choice>
+            <Choice value="b">
+              <Choice value="ba"/>
+              <Choice value="bc">
+                <Choice value="bca"/>
+                <Choice value="bcb"/>
+              </Choice>
+            </Choice>
+          </Taxonomy>
+        </View>
+      `)
+      .data({ text: "Simple text" })
+      .withResult([])
+      .init();
+
+    legacyTaxonomy.open();
+    cy.contains('[class^="taxonomy__add"] button', "Add").click();
+    cy.get('[name="taxonomy__add"]').type("c{enter}");
+    cy.contains('[class^="taxonomy__item"] label', "c").should("exist");
+
+    expandLegacyTreeNode("b");
+    cy.contains('[class^="taxonomy__item"] label', "ba")
+      .closest('[class^="taxonomy__item"]')
+      .within(() => {
+        cy.contains("div", "...").click({ force: true });
+      });
+    cy.contains(".ant-dropdown-menu-item", "Add Inside").click();
+    cy.get('[name="taxonomy__add"]').type("baa{enter}");
+    cy.contains('[class^="taxonomy__item"] label', "baa").should("exist");
+
+    selectLegacyTreeNode("a");
+    selectLegacyTreeNode("c");
+    selectLegacyTreeNode("baa");
+
+    LabelStudio.serialize().then((result) => {
+      expect(result).to.have.length(1);
+      expect(result[0].from_name).to.equal("taxonomy");
+      expect(result[0].value.taxonomy).to.have.deep.members([["a"], ["b", "ba", "baa"], ["c"]]);
+    });
+
+    legacyItemLabel("c")
+      .closest('[class^="taxonomy__item"]')
+      .within(() => {
+        cy.contains("div", "...").click({ force: true });
+      });
+    cy.contains(".ant-dropdown-menu-item", "Delete").click();
+    cy.get('[class^="taxonomy__item"] label').filter((_, element) => element.textContent?.trim() === "c").should("not.exist");
   });
 });
