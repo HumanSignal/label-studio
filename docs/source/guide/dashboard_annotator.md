@@ -80,6 +80,9 @@ The metrics are calculated from the following data:
 * `submitted_or_reviewed` -- Annotations that have a last action matching those listed above.
 * `lead_times` -- The time spent with annotations that have a last action matching those listed above. Lead time includes idle time and is cumulative across multiple sessions. 
 
+!!! note
+    A dash (`--`) appears when there is no data. A zero (`0`) appears when there is data available and the value is zero.
+
 ### Annotation performance summaries
 
 | Metric | Calculation | Description | 
@@ -127,6 +130,9 @@ Keep in mind that all metrics in the table, including task assignments, are [fil
 ## Reviews
 
 The **Reviews** tab shows information related to a user's activity reviewing other users' annotations.
+
+!!! note
+    A dash (`--`) appears when there is no data. A zero (`0`) appears when there is data available and the value is zero.
 
 ### Review performance summaries
 

@@ -56,6 +56,9 @@ For more information about the states referenced in the Overview dashboard, see 
 
 At the top of the Overview dashboard, summary cards show aggregate metrics for the selected date range and workspaces or projects.
 
+!!! note
+    A dash (`--`) appears when there is no data. A zero (`0`) appears when there is data available and the value is zero.
+
 
 | Metric | Description |
 |--------|--------------|
@@ -81,11 +84,14 @@ Dates for annotations and reviews are based on when they were completed, not whe
 | **Time Spent** | Shows time spent annotating and reviewing over time. Includes total time in the period and average time per submitted annotation. |
 
 
-## Project Progress table
+## Project progress table
 
 The **Project Progress** table display detailed metrics for each project. 
 
 ![Screenshot Overview dashboard](/images/analytics/overview-table.png)
+
+!!! note
+    A dash (`--`) appears when there is no data. A zero (`0`) appears when there is data available and the value is zero.
 
 | Column | Description |
 |--------|--------------|

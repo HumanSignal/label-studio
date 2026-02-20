@@ -10,6 +10,9 @@ section: "Create & Manage Projects"
 
 Project and tasks move through a series of states as they progress from their initial created state to completion. 
 
+!!! note
+    Note that state change history tracking did not start until state management was implemented for your organization. For most Label Studio Cloud organizations, state management was implemented in February 2026. 
+
 ## Project states
 
 ![Screenshot of project states](/images/project/project-states.png)
@@ -98,7 +101,6 @@ stateDiagram-v2
 
     <img src="/images/project/state-history.png" style="max-width: 450px" alt="Screenshot">
 
-    Note that state change history tracking did not start until state management was implemented for your organization. For most Label Studio Cloud organizations, state management was implemented in February 2026. 
 
 ## Additional notes
 
