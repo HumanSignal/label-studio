@@ -10,12 +10,7 @@ beforeEach(() => {
 
 describe("View All - Compare / Grid (Codecov: Grid.jsx, Toolbar.jsx)", () => {
   it("renders Compare view (Grid) with multiple annotations", () => {
-    LabelStudio.params()
-      .config(ratingConfig)
-      .data(textData)
-      .withResult(ratingResult)
-      .withResult(ratingResult)
-      .init();
+    LabelStudio.params().config(ratingConfig).data(textData).withResult(ratingResult).withResult(ratingResult).init();
 
     ToolBar.viewAllBtn.click();
 
