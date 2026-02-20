@@ -117,4 +117,17 @@ describe("Image segmentation - Tools - Bitmask", () => {
       });
     });
   });
+
+  it("keeps bitmask tool active when clicking an already active tool button", () => {
+    LabelStudio.params().config(bitmaskConfig).data(bitmaskImageData).withResult([]).init();
+    LabelStudio.waitForObjectsReady();
+    ImageView.waitForImage();
+
+    selectBitmaskTool();
+    ImageView.toolBar.find('[aria-label="bitmask-tool"]').click().should("have.class", "lsf-tool_active");
+
+    Labels.select("Test");
+    ImageView.drawRectRelative(0.25, 0.25, 0.08, 0.08);
+    Sidebar.hasRegions(1);
+  });
 });
