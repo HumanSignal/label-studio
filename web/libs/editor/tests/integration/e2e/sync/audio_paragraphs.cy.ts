@@ -1,4 +1,5 @@
 import { AudioView, LabelStudio } from "@humansignal/frontend-test/helpers/LSF";
+import { FF_DEV_2669 } from "../../../../src/utils/feature-flags";
 
 const config = `
 <View>
@@ -144,6 +145,27 @@ describe("Sync: Audio Paragraphs", () => {
 
     // expect uncaught exception for fast play/pause
     cy.on("uncaught:exception", () => false);
+  });
+
+  describe("Author filter (Codecov: AuthorFilter.jsx)", () => {
+    beforeEach(() => {
+      LabelStudio.addFeatureFlagsOnPageLoad({
+        ff_front_dev_2715_audio_3_280722_short: true,
+        fflag_feat_front_lsdv_e_278_contextual_scrolling_short: true,
+        [FF_DEV_2669]: true,
+      });
+    });
+
+    it("shows author filter and filters by author when selected", () => {
+      LabelStudio.params().config(config).data(data).withResult([]).init();
+      LabelStudio.waitForObjectsReady();
+      AudioView.isReady();
+
+      cy.contains("Show all authors").should("be.visible").click();
+      cy.contains("Mia Wallace").should("be.visible").click();
+      cy.get("body").click(0, 0);
+      cy.contains("Show all authors").should("be.visible");
+    });
   });
 
   it("Play/pause is synced between audio and paragraphs when interacting with audio interface", () => {

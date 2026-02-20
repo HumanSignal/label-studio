@@ -5,7 +5,7 @@ import { LabelStudio } from "@humansignal/frontend-test/helpers/LSF";
  * TreeValidation renders when annotationStore.validation has errors (e.g. invalid config).
  */
 describe("Tree validation (Codecov: TreeValidation)", () => {
-  it("shows validation errors when config has invalid toName reference", () => {
+  it("shows validation errors when config has invalid toName reference (ERR_TAG_NOT_FOUND)", () => {
     LabelStudio.params()
       .config(
         `
@@ -18,6 +18,27 @@ describe("Tree validation (Codecov: TreeValidation)", () => {
 `,
       )
       .data({ image: "/public/files/example.jpg" })
+      .withResult([])
+      .init();
+
+    cy.get(".lsf-errors").should("be.visible");
+    cy.get(".lsf-errors").invoke("text").should("not.be.empty");
+    cy.get(".lsf-errors").invoke("text").should("include", "img");
+  });
+
+  it("shows validation errors when toName references wrong tag type (ERR_TAG_UNSUPPORTED)", () => {
+    LabelStudio.params()
+      .config(
+        `
+<View>
+  <Text name="txt" value="$text" />
+  <RectangleLabels name="tag" toName="txt" fillOpacity="0.5" strokeWidth="5">
+    <Label value="A" />
+  </RectangleLabels>
+</View>
+`,
+      )
+      .data({ text: "Hello" })
       .withResult([])
       .init();
 

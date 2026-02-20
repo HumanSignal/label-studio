@@ -177,6 +177,27 @@ describe("Image Segmentation Stage Interactions", () => {
       ImageView.drawingArea.get("canvas").should("be.visible");
     });
 
+    it("should rotate image via keyboard shortcuts (alt+ArrowLeft, alt+ArrowRight)", () => {
+      LabelStudio.params().config(imageToolsConfigWithRotate).data(imageData).withResult([]).init();
+      LabelStudio.waitForObjectsReady();
+      ImageView.waitForImage();
+
+      cy.get("body").focus().trigger("keydown", { key: "ArrowLeft", altKey: true });
+      cy.get("body").focus().trigger("keydown", { key: "ArrowRight", altKey: true });
+      ImageView.drawingArea.get("canvas").should("be.visible");
+    });
+
+    it("should allow drawing after rotate", () => {
+      LabelStudio.params().config(imageToolsConfigWithRotate).data(imageData).withResult([]).init();
+      LabelStudio.waitForObjectsReady();
+      ImageView.waitForImage();
+
+      ImageView.rotateRight();
+      ImageView.selectRectangleToolByButton();
+      ImageView.drawRectRelative(0.2, 0.2, 0.3, 0.3);
+      Sidebar.hasRegions(1);
+    });
+
     it("should zoom in and out via toolbar buttons", () => {
       LabelStudio.params().config(imageToolsConfig).data(imageData).withResult([]).init();
       LabelStudio.waitForObjectsReady();
