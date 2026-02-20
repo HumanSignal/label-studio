@@ -983,29 +983,6 @@ An interface that displays an image and allows adding metadata annotations:
 -->
 ```
 
-### External app: Map markers (src mode)
-
-A Leaflet + OpenStreetMap map where clicking adds markers stored as regions. Uses vanilla JS (no React). The app is loaded via `src`:
-
-```xml
-<View>
-  <ReactCode name="map" src="http://localhost:3000/index.html" style='{"height":"600px"}' />
-</View>
-```
-
-Task data: `{ "lat": 51.505, "lon": -0.09, "zoom": 13 }`
-
-Region value: `{ "lat": number, "lon": number, "text": string }`
-
-Features:
-- Click map to add marker via `addRegion`
-- Click marker to edit text via `updateRegion`
-- Selection syncs with Label Studio outliner via `selectRegions`
-- Pans to marker when selected from the outliner
-- Dark mode support
-
-See the full implementation in the repository: `web/apps/labelstudio/src/tags/ReactCode/examples/src-maps/index.html`
-
 ## Troubleshooting
 
 **Code not rendering**
