@@ -184,15 +184,17 @@ Label Studio Enterprise supports a limited set of SCIM user attributes for provi
 
 ### Configure Microsoft Entra ID provisioning
 
-1. In the Azure portal, navigate to your enterprise application and open **Provisioning**.
-2. Set the **Tenant URL** to `https://<LABEL_STUDIO_BASE_URL>/scim/v2/`.
-3. Set the **Secret Token** to the Bearer token from the Label Studio owner's account profile.
-4. Under **Mappings**, open **Provision Microsoft Entra ID Users**.
-5. Remove all attribute mappings except the supported ones listed above. Keep:
+1. In the [Microsoft Entra admin center](https://entra.microsoft.com), select **Enterprise apps** in the left menu.
+2. Select your enterprise application.
+3. Select **Provisioning** in the left menu.
+4. Set the **Tenant URL** to `https://<LABEL_STUDIO_BASE_URL>/scim/v2/`.
+5. Set the **Secret Token** to the Bearer token from the Label Studio owner's account profile.
+6. Under **Mappings**, open **Provision Microsoft Entra ID Users**.
+7. Remove all attribute mappings except the supported ones listed above. Keep:
     * `emails[type eq "work"].value` → `userPrincipalName`
     * `userName` → `userPrincipalName`
     * `active` → `Switch([IsSoftDeleted], , "False", "True", "True", "False")`
     * `name.givenName` → `givenName`
     * `name.familyName` → `surname`
-6. Under **Mappings**, open **Provision Microsoft Entra ID Groups** and ensure it is enabled if you want to use group-based role assignment.
-7. For group provisioning, configure SCIM group settings in Label Studio (see [Set up group mapping](#set-up-group-mapping) above).
+8. Under **Mappings**, open **Provision Microsoft Entra ID Groups** and ensure it is enabled if you want to use group-based role assignment.
+9. For group provisioning, configure SCIM group settings in Label Studio (see [Set up group mapping](#set-up-group-mapping) above).
