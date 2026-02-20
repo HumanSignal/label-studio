@@ -1278,12 +1278,12 @@ export class LSFWrapper {
   };
 
   onNextTask = async (nextTaskId, nextAnnotationId) => {
-    this.saveDraft();
-    this.loadTask(nextTaskId, nextAnnotationId, true);
+    await this.saveDraft();
+    await this.loadTask(nextTaskId, nextAnnotationId, true);
   };
   onPrevTask = async (prevTaskId, prevAnnotationId) => {
-    this.saveDraft();
-    this.loadTask(prevTaskId, prevAnnotationId, true);
+    await this.saveDraft();
+    await this.loadTask(prevTaskId, prevAnnotationId, true);
   };
   async submitCurrentAnnotation(eventName, submit, includeId = false, loadNext = true) {
     const { taskID, currentAnnotation } = this;

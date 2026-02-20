@@ -170,12 +170,24 @@ export const create = (columns) => {
 
         const taskData = yield self.root.apiCall("task", taskParams);
 
-        if (taskData.status === 404) {
+        const taskStatusCode =
+          taskData?.status ??
+          taskData?.$meta?.status ??
+          taskData?.status_code ??
+          taskData?.response?.status ??
+          taskData?.response?.status_code;
+
+        if (taskStatusCode === 404) {
           self.finishLoading(taskID);
           getRoot(self).SDK.invoke("crash", {
             error: `Task ID: ${taskID} does not exist or is no longer available`,
             redirect: true,
           });
+          return null;
+        }
+
+        if (!taskData || taskData.error) {
+          self.finishLoading(taskID);
           return null;
         }
         const task = self.applyTaskSnapshot(taskData, taskID);
