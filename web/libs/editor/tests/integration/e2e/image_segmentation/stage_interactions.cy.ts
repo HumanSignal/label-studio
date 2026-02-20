@@ -1,6 +1,10 @@
 import { ImageView, LabelStudio, Sidebar } from "@humansignal/frontend-test/helpers/LSF";
 import { Hotkeys } from "@humansignal/frontend-test/helpers/LSF/Hotkeys";
-import { imageData, imageToolsConfig } from "../../data/image_segmentation/stage_interactions";
+import {
+  imageData,
+  imageToolsConfig,
+  imageToolsConfigWithRotate,
+} from "../../data/image_segmentation/stage_interactions";
 
 beforeEach(() => {
   LabelStudio.addFeatureFlagsOnPageLoad({
@@ -161,7 +165,11 @@ describe("Image Segmentation Stage Interactions", () => {
 
   describe("Rotate and Zoom toolbar (Codecov: tools/Rotate.jsx, tools/Zoom.jsx)", () => {
     it("should rotate image left and right via toolbar buttons", () => {
-      LabelStudio.params().config(imageToolsConfig).data(imageData).withResult([]).init();
+      LabelStudio.params()
+        .config(imageToolsConfigWithRotate)
+        .data(imageData)
+        .withResult([])
+        .init();
       LabelStudio.waitForObjectsReady();
       ImageView.waitForImage();
 
