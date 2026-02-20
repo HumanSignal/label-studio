@@ -157,3 +157,45 @@ To unassign a group from the application, follow the steps for [Unassigning the 
 
 <i>Check this video tutorial to remove a user and group.</i>
 <iframe width="560" height="315" src="https://www.youtube.com/embed/vMA0TLhHGYE" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
+## Set up SCIM with Microsoft Entra ID (Azure AD)
+
+Label Studio Enterprise supports SCIM provisioning with Microsoft Entra ID (formerly Azure AD). The setup is similar to Okta, but requires specific attribute mapping configuration.
+
+### Supported user attributes
+
+Label Studio Enterprise supports a limited set of SCIM user attributes for provisioning. When configuring attribute mappings in Microsoft Entra ID, only include the attributes listed below.
+
+| SCIM Attribute | Description | Required |
+|---|---|---|
+| `emails[type eq "work"].value` | User's email address (primary identifier) | Yes |
+| `userName` | Username (mapped to email in Label Studio) | Yes |
+| `active` | Whether the user is active | Yes |
+| `name.givenName` | User's first name | No |
+| `name.familyName` | User's last name | No |
+
+!!! warning "Unsupported attributes cause provisioning errors"
+    Mapping attributes that Label Studio does not support will result in **HTTP 501 (Not Implemented)** errors during SCIM provisioning. You must remove the following default Microsoft Entra ID attribute mappings:
+    
+    * `displayName`
+    * `preferredLanguage`
+    * `name.formatted`
+    * `externalId`
+    * `urn:ietf:params:scim:schemas:extension:enterprise:2.0:User:employeeNumber`
+    * `urn:ietf:params:scim:schemas:extension:enterprise:2.0:User:department`
+    * `urn:ietf:params:scim:schemas:extension:enterprise:2.0:User:manager`
+
+### Configure Microsoft Entra ID provisioning
+
+1. In the Azure portal, navigate to your enterprise application and open **Provisioning**.
+2. Set the **Tenant URL** to `https://<LABEL_STUDIO_BASE_URL>/scim/v2/`.
+3. Set the **Secret Token** to the Bearer token from the Label Studio owner's account profile.
+4. Under **Mappings**, open **Provision Microsoft Entra ID Users**.
+5. Remove all attribute mappings except the supported ones listed above. Keep:
+    * `emails[type eq "work"].value` → `userPrincipalName`
+    * `userName` → `userPrincipalName`
+    * `active` → `Switch([IsSoftDeleted], , "False", "True", "True", "False")`
+    * `name.givenName` → `givenName`
+    * `name.familyName` → `surname`
+6. Under **Mappings**, open **Provision Microsoft Entra ID Groups** and ensure it is enabled if you want to use group-based role assignment.
+7. For group provisioning, configure SCIM group settings in Label Studio (see [Set up group mapping](#set-up-group-mapping) above).
