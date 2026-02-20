@@ -1,4 +1,4 @@
-import { mapKonvaBrightness } from "../image";
+import { mapKonvaBrightness, reverseCoordinates, fixRectToFit } from "../image";
 
 describe("mapKonvaBrightness", () => {
   describe("linear range (0% - 100%)", () => {
@@ -42,5 +42,44 @@ describe("mapKonvaBrightness", () => {
     it("returns maximum value 0.8 at 400%", () => {
       expect(mapKonvaBrightness(400)).toBeCloseTo(0.8, 4);
     });
+  });
+});
+
+describe("reverseCoordinates", () => {
+  it("normalizes so x1 <= x2 and y1 <= y2", () => {
+    const r = reverseCoordinates({ x: 10, y: 20 }, { x: 5, y: 15 });
+    expect(r.x1).toBe(5);
+    expect(r.y1).toBe(15);
+    expect(r.x2).toBe(10);
+    expect(r.y2).toBe(20);
+  });
+  it("swaps when first point is right/below second", () => {
+    const r = reverseCoordinates({ x: 5, y: 15 }, { x: 10, y: 20 });
+    expect(r.x1).toBe(5);
+    expect(r.y1).toBe(15);
+    expect(r.x2).toBe(10);
+    expect(r.y2).toBe(20);
+  });
+});
+
+describe("fixRectToFit", () => {
+  it("clips rect that extends past stage right/bottom", () => {
+    const rect = { x: 0, y: 0, width: 150, height: 120 };
+    const result = fixRectToFit(rect, 100, 100);
+    expect(result.width).toBe(100);
+    expect(result.height).toBe(100);
+  });
+  it("clips rect with negative x/y", () => {
+    const rect = { x: -10, y: -5, width: 50, height: 50 };
+    const result = fixRectToFit(rect, 100, 100);
+    expect(result.x).toBe(0);
+    expect(result.y).toBe(0);
+    expect(result.width).toBe(40);
+    expect(result.height).toBe(45);
+  });
+  it("returns rect unchanged when already inside", () => {
+    const rect = { x: 10, y: 10, width: 50, height: 50 };
+    const result = fixRectToFit(rect, 100, 100);
+    expect(result).toEqual({ ...rect, x: 10, y: 10, width: 50, height: 50 });
   });
 });

@@ -1,5 +1,24 @@
 /* global it, describe, expect, test */
-import { emailFromCreatedBy, toArray, getUrl, isString, isStringEmpty, isStringJSON, toTimeString } from "../utilities";
+import {
+  emailFromCreatedBy,
+  toArray,
+  getUrl,
+  isString,
+  isStringEmpty,
+  isStringJSON,
+  toTimeString,
+  isValidObjectURL,
+  flatten,
+  hashCode,
+  escapeHtml,
+  clamp,
+  isDefined,
+  isArraysEqual,
+  chunks,
+  minMax,
+  humanDateDiff,
+  sortAnnotations,
+} from "../utilities";
 
 describe("Helper function emailFromCreatedBy", () => {
   expect(emailFromCreatedBy("abc@def.com, 12")).toBe("abc@def.com");
@@ -104,5 +123,124 @@ describe("Helper function getUrl", () => {
 describe("Helper function toTimeString", () => {
   test("Correct", () => {
     expect(toTimeString(5000)).toBe("00:00:05");
+  });
+});
+
+describe("isValidObjectURL", () => {
+  it("returns true for https URL", () => {
+    expect(isValidObjectURL("https://example.com")).toBe(true);
+  });
+  it("returns true for http URL", () => {
+    expect(isValidObjectURL("http://example.com")).toBe(true);
+  });
+  it("returns false for non-string", () => {
+    expect(isValidObjectURL(123)).toBe(false);
+  });
+  it("returns true for relative path when relative=true", () => {
+    expect(isValidObjectURL("/path", true)).toBe(true);
+  });
+  it("returns false for relative path when relative=false", () => {
+    expect(isValidObjectURL("/path", false)).toBe(false);
+  });
+});
+
+describe("flatten", () => {
+  it("flattens nested arrays", () => {
+    expect(flatten([1, [2, 3], [4, [5, 6]]])).toEqual([1, 2, 3, 4, 5, 6]);
+  });
+  it("returns empty for empty array", () => {
+    expect(flatten([])).toEqual([]);
+  });
+});
+
+describe("hashCode", () => {
+  it("returns string of number", () => {
+    expect(hashCode("")).toBe("0");
+    expect(typeof hashCode("hello")).toBe("string");
+    expect(hashCode("a")).not.toBe(hashCode("b"));
+  });
+});
+
+describe("escapeHtml", () => {
+  it("escapes & < > \" '", () => {
+    expect(escapeHtml("a&b")).toBe("a&amp;b");
+    expect(escapeHtml("<script>")).toBe("&lt;script&gt;");
+    expect(escapeHtml('"x"')).toBe("&quot;x&quot;");
+  });
+  it("handles null/undefined as empty string", () => {
+    expect(escapeHtml(null)).toBe("");
+    expect(escapeHtml(undefined)).toBe("");
+  });
+});
+
+describe("clamp", () => {
+  it("clamps value between min and max", () => {
+    expect(clamp(5, 0, 10)).toBe(5);
+    expect(clamp(-1, 0, 10)).toBe(0);
+    expect(clamp(11, 0, 10)).toBe(10);
+  });
+});
+
+describe("isDefined", () => {
+  it("returns false for null and undefined", () => {
+    expect(isDefined(null)).toBe(false);
+    expect(isDefined(undefined)).toBe(false);
+  });
+  it("returns true for other values", () => {
+    expect(isDefined(0)).toBe(true);
+    expect(isDefined("")).toBe(true);
+    expect(isDefined(false)).toBe(true);
+  });
+});
+
+describe("isArraysEqual", () => {
+  it("returns true for equal arrays", () => {
+    expect(isArraysEqual([1, 2], [1, 2])).toBe(true);
+  });
+  it("returns false for different order", () => {
+    expect(isArraysEqual([1, 2], [2, 1])).toBe(false);
+  });
+  it("returns false for different length", () => {
+    expect(isArraysEqual([1], [1, 2])).toBe(false);
+  });
+});
+
+describe("chunks", () => {
+  it("splits array into chunks", () => {
+    expect(chunks([1, 2, 3, 4, 5], 2)).toEqual([[1, 2], [3, 4], [5]]);
+  });
+  it("returns empty for empty array", () => {
+    expect(chunks([], 2)).toEqual([]);
+  });
+});
+
+describe("minMax", () => {
+  it("returns [min, max] of numbers", () => {
+    expect(minMax([3, 1, 2])).toEqual([1, 3]);
+  });
+  it("handles single element", () => {
+    expect(minMax([42])).toEqual([42, 42]);
+  });
+});
+
+describe("humanDateDiff", () => {
+  it("returns string for date", () => {
+    const d = new Date();
+    d.setMinutes(d.getMinutes() - 2);
+    expect(humanDateDiff(d.getTime())).toMatch(/\d+\s+(minute|second)s?\s+ago|just now/);
+  });
+});
+
+describe("sortAnnotations", () => {
+  it("sorts by createdDate latest first", () => {
+    const list = [
+      { id: "a", createdDate: "2020-01-01" },
+      { id: "b", createdDate: "2020-01-03" },
+      { id: "c", createdDate: "2020-01-02" },
+    ];
+    const result = sortAnnotations([...list]);
+    expect(result[0].id).toBe("b");
+    expect(result[1].id).toBe("c");
+    expect(result[2].id).toBe("a");
   });
 });
