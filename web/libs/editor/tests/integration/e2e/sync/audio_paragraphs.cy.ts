@@ -467,4 +467,41 @@ describe("Sync: Audio Paragraphs", () => {
       });
     });
   });
+
+  describe("Paragraphs AuthorFilter (FF_DEV_2669 on, Codecov: AuthorFilter)", () => {
+    beforeEach(() => {
+      LabelStudio.addFeatureFlagsOnPageLoad({
+        ff_front_dev_2715_audio_3_280722_short: true,
+        ff_front_dev_2669_paragraph_author_filter_210622_short: true,
+        fflag_feat_front_lsdv_e_278_contextual_scrolling_short: false,
+        fflag_feat_front_bros_199_enable_select_all_in_ner_phrase_short: false,
+      });
+    });
+
+    it("shows AuthorFilter and filters by author when FF_DEV_2669 is on", () => {
+      LabelStudio.params().config(configWithScroll).data(data).withResult(annotations).init();
+
+      LabelStudio.waitForObjectsReady();
+      AudioView.isReady();
+
+      cy.contains("Show all authors").should("be.visible").click();
+      cy.get("body").contains("Mia Wallace").click();
+      cy.get('[data-testid="phrase:0"]').should("exist").and("contain.text", "Dont you hate that?");
+    });
+
+    it("clears filter when Show all authors is selected", () => {
+      LabelStudio.params().config(configWithScroll).data(data).withResult(annotations).init();
+
+      LabelStudio.waitForObjectsReady();
+      AudioView.isReady();
+
+      cy.contains("Show all authors").click();
+      cy.get("body").contains("Mia Wallace").click();
+      cy.get('[data-testid="phrase:0"]').should("exist");
+      cy.get("[class*='authorFilter']").first().click();
+      cy.get("body").contains("Show all authors").click();
+      cy.get('[data-testid="phrase:0"]').should("exist").and("contain.text", "Dont you hate that?");
+      cy.get('[data-testid="phrase:1"]').should("exist").and("contain.text", "Hate what?");
+    });
+  });
 });
