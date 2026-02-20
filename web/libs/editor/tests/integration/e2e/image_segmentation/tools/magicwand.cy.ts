@@ -121,4 +121,34 @@ describe("Image segmentation - Tools - MagicWand", () => {
       });
     });
   });
+
+  it("supports drag-threshold magic-wand drawing deterministically", () => {
+    LabelStudio.params().config(magicWandConfig).data(magicWandData).withResult([]).init();
+    LabelStudio.waitForObjectsReady();
+    ImageView.waitForImage();
+
+    selectMagicWandTool();
+    Labels.select("Cloud");
+    ImageView.drawRectRelative(0.35, 0.15, 0.22, 0.28);
+    Sidebar.hasRegions(1);
+
+    LabelStudio.serialize().then((result) => {
+      const regionPayload = result.find((entry) => Array.isArray(entry.value.rle));
+
+      expect(regionPayload).to.exist;
+      expect(regionPayload?.value.rle.length ?? 0).to.be.greaterThan(0);
+    });
+  });
+
+  it("creates stable magic-wand results after zooming out", () => {
+    LabelStudio.params().config(magicWandConfig).data(magicWandData).withResult([]).init();
+    LabelStudio.waitForObjectsReady();
+    ImageView.waitForImage();
+
+    cy.get('button[aria-label="zoom-out"]').click().click().click();
+    selectMagicWandTool();
+    Labels.select("Cloud");
+    ImageView.clickAtRelative(0.35, 0.15);
+    Sidebar.hasRegions(1);
+  });
 });

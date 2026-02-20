@@ -45,6 +45,11 @@ export const textareaConfigWithValueAndRows = `<View>
   <TextArea name="desc" toName="text" value="Pre-filled text" rows="3" />
 </View>`;
 
+export const textareaConfigWithRowsAndMaxSubmissions = `<View>
+  <Text name="text"/>
+  <TextArea name="desc" toName="text" rows="3" maxSubmissions="2" />
+</View>`;
+
 export const textareaConfigWithMaxSubmissions = `<View>
   <Text name="text"/>
   <TextArea name="desc" toName="text" maxSubmissions="2" />

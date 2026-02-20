@@ -5,6 +5,7 @@ import {
   textareaConfigSimple,
   textareaConfigWithValue,
   textareaConfigWithValueAndRows,
+  textareaConfigWithRowsAndMaxSubmissions,
   textareaConfigWithMaxSubmissions,
   textareaConfigWithValueAndMaxSubmissions,
   textareaConfigWithSkipDuplicates,
@@ -133,6 +134,18 @@ describe("Control Tags - TextArea - Pre-filled Value", () => {
 
     // The submitted text should appear as a region
     Textarea.hasValue("Pre-filled text");
+  });
+
+  it("should display deterministic character and submission counters for multi-row textarea", () => {
+    LabelStudio.params().config(textareaConfigWithRowsAndMaxSubmissions).data(simpleData).withResult([]).init();
+
+    Textarea.input.type("abc");
+    cy.get('[data-testid="textarea-character-count"]').should("contain.text", "3 characters");
+    cy.get('[data-testid="textarea-submission-count"]').should("contain.text", "0 / 2 submissions");
+
+    cy.get('[data-testid="textarea-add-button"]').click();
+    Textarea.hasValue("abc");
+    cy.get('[data-testid="textarea-submission-count"]').should("contain.text", "1 / 2 submission");
   });
 
   it("should allow adding new text after submitting pre-filled value", () => {
@@ -404,5 +417,19 @@ describe("Control Tags - TextArea - Duplicate prevention", () => {
       expect(textareaResult).to.exist;
       expect(textareaResult.value.text).to.deep.equal(['The "H1" Header', "Corrected text"]);
     });
+  });
+
+  it("supports deterministic model shortcut insertion and focus return", () => {
+    LabelStudio.params().config(textareaConfigSimple).data(simpleData).withResult([]).init();
+
+    Textarea.input.click().type("Base");
+    cy.window().then((win) => {
+      const model = win.Htx.annotationStore.selected.names.get("desc");
+
+      model.onShortcut(" + Shortcut");
+      model.returnFocus();
+    });
+
+    Textarea.input.should("have.value", "Base + Shortcut");
   });
 });
