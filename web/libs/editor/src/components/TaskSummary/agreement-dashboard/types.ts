@@ -9,8 +9,8 @@
 // API Response Types
 // ---------------------------------------------------------------------------
 
-/** Full response from GET /api/tasks/{task_id}/agreement/ */
-export interface TaskAgreementResponse {
+/** Full response from GET /api/tasks/{task_id}/summary/ */
+export interface TaskSummaryResponse {
   /** OSS base fields */
   total_annotations: number;
   distributions: Record<string, DistributionEntry>;
@@ -54,7 +54,7 @@ export interface TaskAgreementResult {
   annotator_ids: number[];
   /** Per-annotation metadata aligned with annotator_ids (optional) */
   annotations_meta?: AnnotationMeta[];
-  /** Added by LseTaskAgreementAPI: dimension_id -> metadata */
+  /** Added by LseTaskSummaryAPI: dimension_id -> metadata */
   dimension_meta: Record<number, DimensionMeta>;
 }
 

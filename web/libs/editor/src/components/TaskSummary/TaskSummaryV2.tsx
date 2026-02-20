@@ -26,7 +26,7 @@ import { AnnotatorsDimensionsTable } from "./agreement-dashboard/annotators-dime
 import { AgreementHeatmap } from "./agreement-dashboard/agreement-heatmap";
 import { DistributionViewer } from "./agreement-dashboard/distribution-viewer";
 import { ColumnPicker } from "./agreement-dashboard/column-picker";
-import { useAgreementData } from "./agreement-dashboard/use-agreement-data";
+import { useTaskSummaryData } from "./agreement-dashboard/use-task-summary-data";
 import type { AgreementMethod, ConflictFilter, PanelId } from "./agreement-dashboard/types";
 import { PANEL_IDS } from "./agreement-dashboard/types";
 
@@ -187,7 +187,7 @@ const TaskSummary = ({ annotations: all, store: annotationStore }: TaskSummaryPr
   // Fetch and derive agreement data
   // ---------------------------------------------------------------------------
 
-  const agreementData = useAgreementData({
+  const agreementData = useTaskSummaryData({
     taskId: task?.id,
     method,
     conflictFilter,

@@ -576,9 +576,9 @@
         "decorators": ""
     },
     {
-        "url": "/api/tasks/<int:pk>/agreement/",
-        "module": "tasks.api.TaskAgreementAPI",
-        "name": "tasks:api:task-agreement",
+        "url": "/api/tasks/<int:pk>/summary/",
+        "module": "tasks.api.TaskSummaryAPI",
+        "name": "tasks:api:task-summary",
         "decorators": ""
     },
     {

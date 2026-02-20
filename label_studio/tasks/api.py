@@ -418,8 +418,9 @@ class TaskAPI(generics.RetrieveUpdateDestroyAPIView):
     name='get',
     decorator=extend_schema(
         tags=['Tasks'],
-        summary='Get task label distribution',
-        description='Get aggregated label distribution across all annotations for a task. '
+        summary='Get task summary',
+        description='Get the task summary payload including aggregated label distribution '
+        'across all annotations and (in LSE) per-dimension agreement scores. '
         'Returns counts of each label value grouped by control tag. '
         'This is an efficient endpoint that avoids N+1 queries.',
         responses={
@@ -447,12 +448,13 @@ class TaskAPI(generics.RetrieveUpdateDestroyAPIView):
         },
     ),
 )
-class TaskAgreementAPI(generics.RetrieveAPIView):
+class TaskSummaryAPI(generics.RetrieveAPIView):
     """
-    Efficient endpoint for getting label distribution without fetching all annotations.
+    Efficient endpoint that produces the full payload for the task summary panel.
 
-    This endpoint aggregates annotation results at the database level to avoid N+1 queries.
-    It returns pre-computed label counts for the Distribution row in the Summary view.
+    Aggregates annotation results at the database level to avoid N+1 queries.
+    Returns pre-computed label counts for the Distribution row and (in LSE)
+    per-dimension agreement scores.
     """
 
     permission_required = ViewClassPermission(GET=all_permissions.tasks_view)
