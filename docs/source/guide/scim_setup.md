@@ -175,15 +175,12 @@ Label Studio Enterprise supports a limited set of SCIM user attributes for provi
 | `name.familyName` | User's last name | No |
 
 !!! warning "Unsupported attributes cause provisioning errors"
-    Mapping attributes that Label Studio does not support will result in **HTTP 501 (Not Implemented)** errors during SCIM provisioning. You must remove the following default Microsoft Entra ID attribute mappings:
+    Mapping attributes that Label Studio does not support will result in **HTTP 501 (Not Implemented)** errors during SCIM provisioning. You must remove all excess Microsoft Entra ID attribute mappings like these:
     
     * `displayName`
     * `preferredLanguage`
     * `name.formatted`
     * `externalId`
-    * `urn:ietf:params:scim:schemas:extension:enterprise:2.0:User:employeeNumber`
-    * `urn:ietf:params:scim:schemas:extension:enterprise:2.0:User:department`
-    * `urn:ietf:params:scim:schemas:extension:enterprise:2.0:User:manager`
 
 ### Configure Microsoft Entra ID provisioning
 
