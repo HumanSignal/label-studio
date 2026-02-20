@@ -538,7 +538,12 @@ export class LSFWrapper {
         }
 
         if (fullAnnotation.result) {
-          this.lsf?.annotationStore?.hydrateAnnotationResults?.(annotationPk, fullAnnotation.result);
+          lsfAnnotation.history.freeze();
+          lsfAnnotation.deserializeResults(fullAnnotation.result);
+          // Critical: updateObjects() is required to render visual regions after deserializing
+          lsfAnnotation.updateObjects();
+          lsfAnnotation.history.safeUnfreeze();
+          lsfAnnotation.history.reinit();
         }
 
         return fullAnnotation;
@@ -1251,7 +1256,21 @@ export class LSFWrapper {
           return;
         }
 
-        this.lsf?.annotationStore?.hydrateAnnotationResults?.(annotationPk, fullAnnotation.result);
+        // Freeze history to prevent undo/redo issues during hydration
+        freshAnnotation.history?.freeze?.();
+
+        // Deserialize the results into the annotation
+        freshAnnotation.deserializeResults(fullAnnotation.result);
+
+        // Critical: updateObjects() MUST be called to render visual regions after deserializing
+        freshAnnotation.updateObjects?.();
+
+        // Unfreeze history
+        freshAnnotation.history?.safeUnfreeze?.();
+
+        // reinitHistory cancels autosave and sets initial values so LSF knows this is the base state
+        // This prevents the hydration from being treated as a user modification
+        freshAnnotation.reinitHistory?.();
       }
     } catch {
       // Failed to hydrate annotation - will show stub state
