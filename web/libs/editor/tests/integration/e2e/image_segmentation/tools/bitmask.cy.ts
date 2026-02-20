@@ -2,24 +2,12 @@ import { ImageView, LabelStudio, Labels, Sidebar } from "@humansignal/frontend-t
 import { bitmaskConfig, bitmaskImageData } from "../../../data/image_segmentation/tools/bitmask";
 
 describe("Image segmentation - Tools - Bitmask", () => {
-  const selectBitmaskTool = () => {
-    ImageView.toolBar
-      .find('[aria-label="bitmask-tool"]')
-      .should("be.visible")
-      .click()
-      .should("have.class", "lsf-tool_active");
-  };
-
-  const selectEraserTool = () => {
-    ImageView.toolBar.find('[aria-label="eraser"]').should("be.visible").click();
-  };
-
   it("creates a bitmask region with serializable pixel payload", () => {
     LabelStudio.params().config(bitmaskConfig).data(bitmaskImageData).withResult([]).init();
     LabelStudio.waitForObjectsReady();
     ImageView.waitForImage();
 
-    selectBitmaskTool();
+    ImageView.selectBitmaskToolByButton();
     Labels.select("Test");
 
     ImageView.drawRectRelative(0.2, 0.2, 0.2, 0.2);
@@ -41,7 +29,7 @@ describe("Image segmentation - Tools - Bitmask", () => {
     LabelStudio.waitForObjectsReady();
     ImageView.waitForImage();
 
-    selectBitmaskTool();
+    ImageView.selectBitmaskToolByButton();
     Labels.select("Test");
     ImageView.drawRectRelative(0.2, 0.2, 0.3, 0.3);
     Sidebar.hasRegions(1);
@@ -50,7 +38,7 @@ describe("Image segmentation - Tools - Bitmask", () => {
       expect(result).to.have.length(1);
       const before = result[0].value.imageDataURL ?? JSON.stringify(result[0].value.rle ?? []);
 
-      selectEraserTool();
+      ImageView.selectEraserToolByButton();
       ImageView.drawRectRelative(0.3, 0.3, 0.15, 0.15);
       Sidebar.hasRegions(1);
 
@@ -67,7 +55,7 @@ describe("Image segmentation - Tools - Bitmask", () => {
     LabelStudio.waitForObjectsReady();
     ImageView.waitForImage();
 
-    selectBitmaskTool();
+    ImageView.selectBitmaskToolByButton();
     Labels.select("Test");
     ImageView.drawRectRelative(0.25, 0.25, 0.12, 0.12);
     Sidebar.hasRegions(1);
@@ -93,7 +81,7 @@ describe("Image segmentation - Tools - Bitmask", () => {
     LabelStudio.waitForObjectsReady();
     ImageView.waitForImage();
 
-    selectBitmaskTool();
+    ImageView.selectBitmaskToolByButton();
     Labels.select("Test");
     ImageView.drawRectRelative(0.2, 0.2, 0.08, 0.08);
     Sidebar.hasRegions(1);
@@ -123,7 +111,7 @@ describe("Image segmentation - Tools - Bitmask", () => {
     LabelStudio.waitForObjectsReady();
     ImageView.waitForImage();
 
-    selectBitmaskTool();
+    ImageView.selectBitmaskToolByButton();
     ImageView.toolBar.find('[aria-label="bitmask-tool"]').click().should("have.class", "lsf-tool_active");
 
     Labels.select("Test");
@@ -137,12 +125,12 @@ describe("Image segmentation - Tools - Bitmask", () => {
       LabelStudio.waitForObjectsReady();
       ImageView.waitForImage();
 
-      selectBitmaskTool();
+      ImageView.selectBitmaskToolByButton();
       Labels.select("Test");
       ImageView.drawRectRelative(0.2, 0.2, 0.2, 0.2);
       Sidebar.hasRegions(1);
 
-      selectEraserTool();
+      ImageView.selectEraserToolByButton();
       ImageView.toolBar.find('[aria-label="eraser"]').should("have.class", "lsf-tool_active");
     });
 
@@ -151,12 +139,12 @@ describe("Image segmentation - Tools - Bitmask", () => {
       LabelStudio.waitForObjectsReady();
       ImageView.waitForImage();
 
-      selectBitmaskTool();
+      ImageView.selectBitmaskToolByButton();
       Labels.select("Test");
       ImageView.drawRectRelative(0.2, 0.2, 0.3, 0.3);
       Sidebar.hasRegions(1);
 
-      selectEraserTool();
+      ImageView.selectEraserToolByButton();
       cy.get("body").type("]");
       cy.get("body").type("[");
       ImageView.drawRectRelative(0.35, 0.35, 0.1, 0.1);

@@ -16,7 +16,70 @@ import {
   fixRange,
   captureSelection,
   applyTextGranularity,
+  trimSelection,
 } from "../selection-tools";
+
+/**
+ * Mock Selection that implements collapse + modify("extend", "forward"|"backward", "character")
+ * so trimSelectionLeft/trimSelectionRight can run and terminate.
+ */
+function createMockSelection(doc, textNode, startOffset, endOffset) {
+  const range = doc.createRange();
+  range.setStart(textNode, startOffset);
+  range.setEnd(textNode, endOffset);
+  const len = textNode.length;
+  const initialStart = { container: range.startContainer, offset: range.startOffset };
+  const initialEnd = { container: range.endContainer, offset: range.endOffset };
+
+  return {
+    _range: range,
+    _initialStart: initialStart,
+    _initialEnd: initialEnd,
+    rangeCount: 1,
+    isCollapsed: startOffset === endOffset,
+    getRangeAt() {
+      return this._range;
+    },
+    removeAllRanges() {
+      this._range = null;
+    },
+    addRange(r) {
+      this._range = r;
+    },
+    collapse(container, offset) {
+      this._range = doc.createRange();
+      this._range.setStart(container, offset);
+      this._range.setEnd(container, offset);
+    },
+    modify(type, direction, unit) {
+      if (!this._range) return;
+      if (type === "extend" && unit === "character") {
+        const { startContainer, startOffset, endContainer, endOffset } = this._range;
+        if (direction === "forward" && endContainer === textNode && endOffset < len) {
+          this._range.setEnd(endContainer, endOffset + 1);
+        } else if (direction === "backward" && startContainer === textNode && startOffset > 0) {
+          this._range.setEnd(startContainer, startOffset);
+          this._range.setStart(startContainer, startOffset - 1);
+        }
+        return;
+      }
+      if (type === "move" && this._initialStart && this._initialEnd) {
+        if (direction === "backward") {
+          this._range = doc.createRange();
+          this._range.setStart(this._initialStart.container, this._initialStart.offset);
+          this._range.setEnd(this._initialStart.container, this._initialStart.offset);
+        } else if (direction === "forward") {
+          this._range = doc.createRange();
+          this._range.setStart(this._initialEnd.container, this._initialEnd.offset);
+          this._range.setEnd(this._initialEnd.container, this._initialEnd.offset);
+        }
+      }
+    },
+    toString() {
+      return this._range ? this._range.toString() : "";
+    },
+  };
+}
 
 describe("selection-tools", () => {
   describe("isTextNode", () => {
@@ -207,7 +270,7 @@ describe("selection-tools", () => {
       const doc = document.implementation.createHTMLDocument("");
       const text = doc.createTextNode("café"); // é is one code point, possibly 2 UTF-16 chars
       const result = charsToCodePoints({ node: text, position: 4 });
-      expect(result.position).toBe([... "café"].length);
+      expect(result.position).toBe([..."café"].length);
     });
   });
 
@@ -303,6 +366,34 @@ describe("selection-tools", () => {
     });
   });
 
+  describe("trimSelection", () => {
+    it("trims leading and trailing spaces using Selection.modify(extend, character)", () => {
+      const doc = document.implementation.createHTMLDocument("");
+      const root = doc.createElement("div");
+      const text = doc.createTextNode("  ab  ");
+      root.appendChild(text);
+      const sel = createMockSelection(doc, text, 0, 6);
+      trimSelection(sel);
+      const r = sel.getRangeAt(0);
+      expect(r.startContainer).toBe(text);
+      expect(r.startOffset).toBe(2);
+      expect(r.endContainer).toBe(text);
+      expect(r.endOffset).toBe(4);
+    });
+
+    it("leaves range unchanged when no leading/trailing space", () => {
+      const doc = document.implementation.createHTMLDocument("");
+      const root = doc.createElement("div");
+      const text = doc.createTextNode("ab");
+      root.appendChild(text);
+      const sel = createMockSelection(doc, text, 0, 2);
+      trimSelection(sel);
+      const r = sel.getRangeAt(0);
+      expect(r.startOffset).toBe(0);
+      expect(r.endOffset).toBe(2);
+    });
+  });
+
   describe("applyTextGranularity", () => {
     it("returns early when selection has no modify (e.g. jsdom)", () => {
       const doc = document.implementation.createHTMLDocument("");
@@ -354,6 +445,41 @@ describe("selection-tools", () => {
       expect(() => applyTextGranularity(sel, "word")).not.toThrow();
       expect(consoleSpy).toHaveBeenCalled();
       consoleSpy.mockRestore();
+    });
+
+    it("expands to word boundary via findBoundarySelection when selection has modify(move)", () => {
+      const doc = document.implementation.createHTMLDocument("");
+      const root = doc.createElement("div");
+      const text = doc.createTextNode("hello world");
+      root.appendChild(text);
+      const sel = createMockSelection(doc, text, 0, 5);
+      expect(() => applyTextGranularity(sel, "word")).not.toThrow();
+      const r = sel.getRangeAt(0);
+      expect(r).toBeDefined();
+      expect(r.startContainer).toBe(text);
+      expect(r.endContainer).toBe(text);
+    });
+
+    it("expands to sentence boundary via closestBoundarySelection when granularity is sentence", () => {
+      const doc = document.implementation.createHTMLDocument("");
+      const root = doc.createElement("div");
+      const text = doc.createTextNode("First sentence. Second.");
+      root.appendChild(text);
+      const sel = createMockSelection(doc, text, 0, 15);
+      expect(() => applyTextGranularity(sel, "sentence")).not.toThrow();
+      const r = sel.getRangeAt(0);
+      expect(r).toBeDefined();
+    });
+
+    it("expands to paragraph boundary when granularity is paragraph", () => {
+      const doc = document.implementation.createHTMLDocument("");
+      const root = doc.createElement("div");
+      const text = doc.createTextNode("One paragraph.");
+      root.appendChild(text);
+      const sel = createMockSelection(doc, text, 0, 5);
+      expect(() => applyTextGranularity(sel, "paragraph")).not.toThrow();
+      const r = sel.getRangeAt(0);
+      expect(r).toBeDefined();
     });
   });
 
@@ -432,6 +558,22 @@ describe("selection-tools", () => {
       expect(beforeCleanup).toHaveBeenCalledTimes(1);
       sel.removeAllRanges();
       document.body.removeChild(root);
+    });
+
+    it("invokes callback with word granularity after trimSelection and applyTextGranularity", () => {
+      const doc = document.implementation.createHTMLDocument("");
+      const root = doc.createElement("div");
+      const text = doc.createTextNode("hello world");
+      root.appendChild(text);
+      doc.body.appendChild(root);
+      const sel = createMockSelection(doc, text, 0, 5);
+      const win = { getSelection: () => sel };
+      const callback = jest.fn();
+      captureSelection(callback, { granularity: "word", window: win });
+      expect(callback).toHaveBeenCalledTimes(1);
+      expect(callback.mock.calls[0][0].selectionText).toBeDefined();
+      expect(callback.mock.calls[0][0].range).toBeDefined();
+      doc.body.removeChild(root);
     });
   });
 

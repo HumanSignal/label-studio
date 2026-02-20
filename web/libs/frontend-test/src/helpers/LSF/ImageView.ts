@@ -266,6 +266,18 @@ export const ImageView = {
     this.toolBar.find('[aria-label="brush-tool"]').should("be.visible").click().should("have.class", "lsf-tool_active");
   },
 
+  selectBitmaskToolByButton() {
+    this.toolBar
+      .find('[aria-label="bitmask-tool"]')
+      .should("be.visible")
+      .click()
+      .should("have.class", "lsf-tool_active");
+  },
+
+  selectEraserToolByButton() {
+    this.toolBar.find('[aria-label="eraser"]').should("be.visible").click();
+  },
+
   selectMoveToolByButton() {
     this.toolBar.find('[aria-label="move-tool"]').should("be.visible").click().should("have.class", "lsf-tool_active");
   },
