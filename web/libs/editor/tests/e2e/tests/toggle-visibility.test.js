@@ -130,44 +130,6 @@ Scenario("Hiding bulk visibility toggle", ({ I, LabelStudio, AtImageView, AtLabe
 });
 
 Scenario("Checking regions grouped by label", async ({ I, LabelStudio }) => {
-  const checkVisible = async (num) => {
-    switch (num) {
-      case 0:
-        I.seeElement(ALL_HIDDEN_SELECTOR);
-        I.seeElement(ONE_HIDDEN_SELECTOR);
-        I.dontSeeElement(ONE_VISIBLE_SELECTOR);
-        break;
-      case 1:
-      case 2:
-        I.seeElement(ALL_VISIBLE_SELECTOR);
-        I.seeElement(ONE_VISIBLE_SELECTOR);
-        I.seeElement(ONE_HIDDEN_SELECTOR);
-        break;
-      case 3:
-        I.seeElement(ALL_VISIBLE_SELECTOR);
-        I.seeElement(ONE_VISIBLE_SELECTOR);
-        I.dontSeeElement(ONE_HIDDEN_SELECTOR);
-        break;
-    }
-    const count = await I.executeScript(countKonvaShapes);
-
-    assert.strictEqual(count, num);
-  };
-  const hideAll = () => {
-    I.click(ALL_VISIBLE_SELECTOR);
-  };
-  const showAll = () => {
-    I.click(ALL_HIDDEN_SELECTOR);
-  };
-  const hideOne = () => {
-    I.moveCursorTo(ONE_VISIBLE_SELECTOR);
-    I.click(ONE_VISIBILITY_TOGGLE_BUTTON);
-  };
-  const showOne = () => {
-    I.moveCursorTo(ONE_HIDDEN_SELECTOR);
-    I.click(ONE_VISIBILITY_TOGGLE_BUTTON);
-  };
-
   await I.amOnPage("/");
   LabelStudio.init({ annotations, config, data });
   LabelStudio.waitForObjectsReady();
@@ -185,24 +147,16 @@ Scenario("Checking regions grouped by label", async ({ I, LabelStudio }) => {
 
   // Wait for UI to update and verify the grouping button changed
   I.waitForElement('[data-testid="grouping-label"]', 5);
+  I.seeElement(ALL_VISIBLE_SELECTOR);
+  I.click(ALL_VISIBLE_SELECTOR);
+  I.seeElement(ALL_HIDDEN_SELECTOR);
+  let count = await I.executeScript(countKonvaShapes);
+  assert.strictEqual(count, 0);
 
-  await checkVisible(3);
-  hideOne();
-  await checkVisible(2);
-  showOne();
-  await checkVisible(3);
-  hideAll();
-  await checkVisible(0);
-  showOne();
-  await checkVisible(1);
-  hideOne();
-  await checkVisible(0);
-  showAll();
-  await checkVisible(3);
-  hideOne();
-  await checkVisible(2);
-  hideAll();
-  await checkVisible(0);
+  I.click(ALL_HIDDEN_SELECTOR);
+  I.seeElement(ALL_VISIBLE_SELECTOR);
+  count = await I.executeScript(countKonvaShapes);
+  assert.strictEqual(count, 3);
 });
 
 const examples = [

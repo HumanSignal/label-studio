@@ -14,6 +14,8 @@ import pandas as pd
 import xmljson
 from django.conf import settings
 from label_studio_sdk._extensions.label_studio_tools.core import label_config
+from label_studio_sdk._legacy.exceptions import LabelStudioValidationErrorSentryIgnored
+from label_studio_sdk.label_interface import LabelInterface
 from rest_framework.exceptions import ValidationError
 
 from label_studio.core.utils.io import find_file
@@ -131,6 +133,14 @@ def validate_label_config(config_string: Union[str, None]) -> None:
         for toName in toName_.split(','):
             if toName not in names:
                 raise ValidationError(f'toName="{toName}" not found in names: {sorted(names)}')
+
+    # Tag attribute validation (e.g. Video playback speed) via SDK
+    try:
+        li = LabelInterface(config_string)
+        if hasattr(li, '_tag_attribute_validation'):
+            li._tag_attribute_validation()
+    except LabelStudioValidationErrorSentryIgnored as exc:
+        raise ValidationError(str(exc))
 
 
 def extract_data_types(label_config):

@@ -1,11 +1,5 @@
 Feature("Richtext basic functional");
 
-Before(({ LabelStudio }) => {
-  LabelStudio.setFeatureFlags({
-    fflag_feat_front_dev_3873_labeling_ui_improvements_short: true,
-  });
-});
-
 Scenario("Creating, removing and restoring regions", async ({ I, LabelStudio, AtOutliner, AtRichText }) => {
   I.amOnPage("/");
 

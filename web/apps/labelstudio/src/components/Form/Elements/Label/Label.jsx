@@ -48,21 +48,21 @@ const Label = ({
     tagName,
     rootProps,
     <>
-      <div className={rootClass.elem("text")}>
-        <div className={rootClass.elem("content")}>
-          <div className={rootClass.elem("label")}>
+      <div className={rootClass.elem("text").toClassName()}>
+        <div className={rootClass.elem("content").toClassName()}>
+          <div className={rootClass.elem("label").toClassName()}>
             <span>{text}</span>
             {tooltip && (
-              <div className={rootClass.elem("tooltip")}>
+              <div className={rootClass.elem("tooltip").toClassName()}>
                 <Tooltip title={tooltip}>{tooltipIcon ? tooltipIcon : <IconInfoOutline />}</Tooltip>
               </div>
             )}
           </div>
-          {description && <div className={rootClass.elem("description")}>{description}</div>}
+          {description && <div className={rootClass.elem("description").toClassName()}>{description}</div>}
         </div>
       </div>
-      <div className={rootClass.elem("field")}>{children}</div>
-      {footer && <div className={rootClass.elem("footer")}>{footer}</div>}
+      <div className={rootClass.elem("field").toClassName()}>{children}</div>
+      {footer && <div className={rootClass.elem("footer").toClassName()}>{footer}</div>}
     </>,
   );
 };

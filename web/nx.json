@@ -1,15 +1,9 @@
 {
   "$schema": "./node_modules/nx/schemas/nx-schema.json",
-  "tasksRunnerOptions": {
-    "default": {
-      "options": {
-        "cacheableOperations": ["build-storybook", "version"]
-      }
-    }
-  },
   "targetDefaults": {
     "build": {
-      "inputs": ["production", "^production"]
+      "cache": true,
+      "inputs": ["production", "^production", "{workspaceRoot}/webpack.config.js"]
     },
     "e2e": {
       "inputs": ["default", "^production"]
@@ -38,7 +32,9 @@
       "!{projectRoot}/.storybook/**/*",
       "!{projectRoot}/tsconfig.storybook.json",
       "!{projectRoot}/.eslintrc.json",
-      "!{projectRoot}/eslint.config.js"
+      "!{projectRoot}/eslint.config.js",
+      "!{projectRoot}/**/node_modules",
+      "!{workspaceRoot}/node_modules"
     ],
     "sharedGlobals": ["{workspaceRoot}/babel.config.json"]
   },

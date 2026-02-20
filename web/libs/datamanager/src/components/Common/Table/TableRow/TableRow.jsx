@@ -15,7 +15,7 @@ const CellRenderer = observer(({ col: colInput, data, decoration, cellViews }) =
     const { headerClassName: _, cellClassName, ...rest } = col;
 
     return (
-      <span className={tableCN.elem("cell").mix(cellClassName).toString()} {...rest} key={id}>
+      <span className={tableCN.elem("cell").mix(cellClassName).toClassName()} {...rest} key={id}>
         <Cell data={data} />
       </span>
     );
@@ -32,7 +32,7 @@ const CellRenderer = observer(({ col: colInput, data, decoration, cellViews }) =
   const cellIsLoading = isFF(FF_LOPS_E_3) && data.loading === colInput.alias;
 
   return (
-    <div className={tableCN.elem("cell").toString()}>
+    <div className={tableCN.elem("cell").toClassName()}>
       <div
         style={{
           ...(style ?? {}),
@@ -64,13 +64,13 @@ export const TableRow = observer(
 
     return (
       <div
-        className={rowWrapperCN.mod(mods).toString()}
+        className={rowWrapperCN.mod(mods).toClassName()}
         style={wrapperStyle}
         onClick={(e) => onClick?.(data, e)}
         onContextMenu={(e) => onContextMenu?.(e, data)}
         data-testid="table-row-wrapper"
       >
-        <div className={tableRowCN.toString()} style={style} data-leave={true} data-testid="table-row">
+        <div className={tableRowCN.toClassName()} style={style} data-leave={true} data-testid="table-row">
           {columns.map((col) => {
             return <CellRenderer key={col.id} col={col} data={data} cellViews={cellViews} decoration={decoration} />;
           })}

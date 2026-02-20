@@ -144,8 +144,8 @@ FieldsButton.Checkbox = observer(({ column, children, disabled, enterpriseBadge 
   const shouldDisable = disabled;
 
   return (
-    <div style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between", gap: "8px" }}>
-      <div style={{ flex: 1, minWidth: 0, overflow: "hidden" }}>
+    <div className="w-full flex items-center justify-between gap-tight">
+      <div className="flex-1 flex items-center min-w-0 overflow-hidden">
         <Checkbox size="small" checked={!column.is_hidden} onChange={column.toggleVisibility} disabled={shouldDisable}>
           {children}
         </Checkbox>

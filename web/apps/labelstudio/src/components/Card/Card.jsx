@@ -8,15 +8,15 @@ export const Card = ({ header, extra, children, style }) => {
   return (
     <div className={rootClass} style={style}>
       {(header || extra) && (
-        <div className={rootClass.elem("header")}>
+        <div className={rootClass.elem("header").toClassName()}>
           <Tooltip title={header}>
             <div className="line-clamp-1">{header}</div>
           </Tooltip>
 
-          {extra && <div className={rootClass.elem("header-extra")}>{extra}</div>}
+          {extra && <div className={rootClass.elem("header-extra").toClassName()}>{extra}</div>}
         </div>
       )}
-      <div className={rootClass.elem("content")}>{children}</div>
+      <div className={rootClass.elem("content").toClassName()}>{children}</div>
     </div>
   );
 };

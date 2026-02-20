@@ -8,6 +8,7 @@
     "build": {
       "executor": "@nx/webpack:webpack",
       "defaultConfiguration": "production",
+      "outputs": ["{options.outputPath}"],
       "options": {
         "compiler": "babel",
         "webpackConfig": "webpack.config.js",
@@ -55,6 +56,13 @@
         "development": {
           "buildTarget": "editor:build"
         }
+      }
+    },
+    "serve-static": {
+      "executor": "@nx/web:file-server",
+      "options": {
+        "buildTarget": "editor:build:production",
+        "port": 3000
       }
     },
     "unit": {

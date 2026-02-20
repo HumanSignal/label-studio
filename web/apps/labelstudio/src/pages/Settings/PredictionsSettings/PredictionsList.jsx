@@ -58,20 +58,20 @@ const VersionCard = ({ version, selected, onSelect, editable, onDelete }) => {
   return (
     <div className={rootClass.toClassName()}>
       <div>
-        <div className={rootClass.elem("title")}>
+        <div className={rootClass.elem("title").toClassName()}>
           {version.model_version}
           {version.model_version === "undefined" && (
             <Tooltip title="Model version is undefined. Likely means that model_version field was missing when predictions were imported.">
-              <IconInfoOutline className={cn("help-icon")} width="14" height="14" />
+              <IconInfoOutline className={cn("help-icon").toClassName()} width="14" height="14" />
             </Tooltip>
           )}
         </div>
-        <div className={rootClass.elem("meta")}>
-          <div className={rootClass.elem("group")}>
+        <div className={rootClass.elem("meta").toClassName()}>
+          <div className={rootClass.elem("group").toClassName()}>
             <IconPredictions />
             &nbsp;{version.count}
           </div>
-          <div className={rootClass.elem("group")}>
+          <div className={rootClass.elem("group").toClassName()}>
             Last prediction created&nbsp;
             <Tooltip title={format(parseISO(version.latest), "yyyy-MM-dd HH:mm:ss")}>
               <span>
@@ -83,7 +83,7 @@ const VersionCard = ({ version, selected, onSelect, editable, onDelete }) => {
           </div>
         </div>
       </div>
-      <div className={rootClass.elem("menu")}>
+      <div className={rootClass.elem("menu").toClassName()}>
         <Dropdown.Trigger
           align="right"
           content={

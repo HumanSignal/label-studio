@@ -48,9 +48,10 @@ jest.mock("../../../../utils/bem", () => ({
 
       return {
         toString: () => finalClass,
+        toClassName: () => finalClass,
         elem: (elem) => createCN(`${name}__${elem}`),
         mod: (newMods) => createCN(fullName, { ...mods, ...newMods }),
-        mix: (...mixins) => createCN(fullName, mods),
+        mix: (..._mixins) => createCN(fullName, mods),
       };
     };
     return createCN(name);

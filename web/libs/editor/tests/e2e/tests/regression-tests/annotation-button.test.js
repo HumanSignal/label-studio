@@ -3,10 +3,6 @@ const assert = require("assert");
 Feature("Annotation button").tag("@regres");
 
 Scenario("Annotation button should keep border width on hover", async ({ I, LabelStudio }) => {
-  LabelStudio.setFeatureFlags({
-    fflag_feat_front_dev_3873_labeling_ui_improvements_short: true,
-  });
-
   I.amOnPage("/");
   LabelStudio.init({
     config: `<View>
