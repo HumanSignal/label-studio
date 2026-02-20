@@ -93,4 +93,32 @@ describe("Image segmentation - Tools - MagicWand", () => {
       expect(labelEntries.some((entry) => entry.value.labels.includes("Shadow"))).to.equal(true);
     });
   });
+
+  it("creates a fresh magic-wand region after undo without stale cache reuse", () => {
+    LabelStudio.params().config(magicWandConfig).data(magicWandData).withResult([]).init();
+    LabelStudio.waitForObjectsReady();
+    ImageView.waitForImage();
+
+    selectMagicWandTool();
+    Labels.select("Cloud");
+    ImageView.clickAtRelative(0.3, 0.14);
+    Sidebar.hasRegions(1);
+
+    LabelStudio.serialize().then((beforeUndo) => {
+      const before = beforeUndo.find((entry) => Array.isArray(entry.value.rle));
+      expect(before).to.exist;
+
+      Hotkeys.undo();
+      Sidebar.hasRegions(0);
+
+      ImageView.clickAtRelative(0.72, 0.68);
+      Sidebar.hasRegions(1);
+
+      LabelStudio.serialize().then((afterRedoPath) => {
+        const after = afterRedoPath.find((entry) => Array.isArray(entry.value.rle));
+        expect(after).to.exist;
+        expect(after?.id).to.not.equal(before?.id);
+      });
+    });
+  });
 });

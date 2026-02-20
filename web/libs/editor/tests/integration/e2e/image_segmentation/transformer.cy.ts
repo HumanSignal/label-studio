@@ -4,7 +4,7 @@ import {
   simpleRectangleConfig,
   simpleRectangleResult,
 } from "../../data/image_segmentation/tools/selection-tool";
-import { FF_DEV_2671 } from "../../../../src/utils/feature-flags";
+import { FF_DEV_2671, FF_ZOOM_OPTIM } from "../../../../src/utils/feature-flags";
 
 describe("Image Segmentation - Transformer interactions", () => {
   it("keeps rectangle coordinates within image bounds when dragging near edges", () => {
@@ -77,6 +77,47 @@ describe("Image Segmentation - Transformer interactions", () => {
         expect(after?.value.x).to.not.equal(before?.value.x);
         expect(after?.value.y).to.not.equal(before?.value.y);
       });
+    });
+  });
+
+  it("reattaches transformer after deselecting and reselecting a region", () => {
+    LabelStudio.params().config(simpleRectangleConfig).data(simpleImageData).withResult(simpleRectangleResult).init();
+    ImageView.waitForImage();
+
+    ImageView.selectMoveToolByButton();
+    ImageView.clickAtRelative(0.5, 0.5);
+    Sidebar.hasSelectedRegions(1);
+
+    ImageView.clickAtRelative(0.05, 0.05);
+    Sidebar.hasSelectedRegions(0);
+
+    ImageView.clickAtRelative(0.5, 0.5);
+    Sidebar.hasSelectedRegions(1);
+  });
+
+  it("keeps transformed rectangle bounded with zoom optimization enabled", () => {
+    LabelStudio.addFeatureFlagsOnPageLoad({
+      [FF_ZOOM_OPTIM]: true,
+    });
+
+    LabelStudio.params().config(simpleRectangleConfig).data(simpleImageData).withResult(simpleRectangleResult).init();
+    ImageView.waitForImage();
+
+    cy.get('button[aria-label="zoom-in"]').click().click().click();
+
+    ImageView.selectMoveToolByButton();
+    ImageView.clickAtRelative(0.5, 0.5);
+    Sidebar.hasSelectedRegions(1);
+    ImageView.drawRectRelative(0.65, 0.65, 0.2, 0.2);
+
+    LabelStudio.serialize().then((result) => {
+      const region = result.find((r) => r.type === "rectangle");
+
+      expect(region).to.exist;
+      expect((region?.value.x ?? 0) + (region?.value.width ?? 0)).to.be.at.most(100);
+      expect((region?.value.y ?? 0) + (region?.value.height ?? 0)).to.be.at.most(100);
+      expect(region?.value.x ?? 0).to.be.at.least(0);
+      expect(region?.value.y ?? 0).to.be.at.least(0);
     });
   });
 });
