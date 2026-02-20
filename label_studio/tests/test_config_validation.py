@@ -9,7 +9,9 @@ import os
 import pytest
 import yaml
 from core.label_config import parse_config, parse_config_to_json, validate_label_config
+from django.test import TestCase
 from projects.models import Project
+from rest_framework.exceptions import ValidationError
 
 from label_studio.tests.utils import make_annotation, make_prediction, make_task, project_id  # noqa
 
@@ -220,3 +222,83 @@ def test_label_config_versions(business_client, project_id):
         )
         logger.warning(f'Test: {test_name}')
         assert response.status_code == test_content['status_code']
+
+
+# Tag attribute validation: validate_label_config calls SDK _tag_attribute_validation
+# and surfaces failures as ValidationError with descriptive messages.
+
+
+class TestValidateLabelConfigTagAttributeValidation(TestCase):
+    """
+    validate_label_config() invokes the SDK's _tag_attribute_validation (per-tag
+    attribute checks). These tests ensure that integration: when all tags pass
+    validation we succeed; when any tag's validate_config() returns errors we
+    get ValidationError with the error messages propagated.
+    """
+
+    # Configs used as concrete examples (currently Video is the only tag with validate_config).
+    CONFIG_VALID_TAG_ATTRS = """
+<View>
+  <Video name="video" value="$video" framerate="25" defaultPlaybackSpeed="2" minPlaybackSpeed="0.5"/>
+  <VideoRectangle name="box" toName="video" />
+</View>
+"""
+
+    CONFIG_NO_TAG_SPECIFIC_ATTRS = """
+<View>
+  <Video name="video" value="$video"/>
+  <VideoRectangle name="box" toName="video" />
+</View>
+"""
+
+    CONFIG_TAG_ATTR_VALIDATION_FAILS_1 = """
+<View>
+  <Video name="video" value="$video" defaultPlaybackSpeed="15"/>
+  <VideoRectangle name="box" toName="video" />
+</View>
+"""
+
+    CONFIG_TAG_ATTR_VALIDATION_FAILS_2 = """
+<View>
+  <Video name="video" value="$video" defaultPlaybackSpeed="5" minPlaybackSpeed="10"/>
+  <VideoRectangle name="box" toName="video" />
+</View>
+"""
+
+    def test_tag_attribute_validation_passes_when_all_tags_valid(self):
+        """
+        When every object tag's validate_config() returns no errors,
+        validate_label_config completes without raising.
+        """
+        validate_label_config(self.CONFIG_VALID_TAG_ATTRS)
+
+    def test_tag_attribute_validation_passes_when_tags_have_no_attrs_to_validate(self):
+        """
+        When config has object tags that do not define attribute validation
+        (or have no attributes to validate), validate_label_config completes without raising.
+        """
+        validate_label_config(self.CONFIG_NO_TAG_SPECIFIC_ATTRS)
+
+    def test_tag_attribute_validation_failure_raises_with_descriptive_message(self):
+        """
+        When a tag's validate_config() returns errors, validate_label_config
+        raises ValidationError and the exception message includes the tag identifier
+        and the validation failure detail (so _tag_attribute_validation is invoked and
+        its errors are propagated).
+        """
+        with self.assertRaises(ValidationError) as ctx:
+            validate_label_config(self.CONFIG_TAG_ATTR_VALIDATION_FAILS_1)
+        msg = str(ctx.exception)
+        assert 'video' in msg.lower()
+        assert '15' in msg
+
+    def test_tag_attribute_validation_failure_raises_with_cross_attr_message(self):
+        """
+        When a tag's validate_config() returns errors (e.g. cross-attribute constraint),
+        validate_label_config raises ValidationError and the message describes the constraint.
+        """
+        with self.assertRaises(ValidationError) as ctx:
+            validate_label_config(self.CONFIG_TAG_ATTR_VALIDATION_FAILS_2)
+        msg = str(ctx.exception)
+        assert 'video' in msg.lower()
+        assert 'must not exceed' in msg or 'exceed' in msg

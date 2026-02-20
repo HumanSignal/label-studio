@@ -32,6 +32,7 @@ def remove_duplicates(project, queryset, **kwargs):
         project,
         queryset,
         organization_id=project.organization_id,
+        queue_name='high',
     )
     return {'response_code': 200}
 

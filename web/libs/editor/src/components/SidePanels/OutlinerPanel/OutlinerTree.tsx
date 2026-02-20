@@ -18,7 +18,7 @@ import {
 import Registry from "../../../core/Registry";
 import { PER_REGION_MODES } from "../../../mixins/PerRegionModes";
 import { cn } from "../../../utils/bem";
-import { FF_DEV_2755, FF_DEV_3873, isFF } from "../../../utils/feature-flags";
+import { FF_DEV_2755, isFF } from "../../../utils/feature-flags";
 import { flatten, isDefined, isMacOS } from "../../../utils/utilities";
 import { NodeIcon } from "../../Node/Node";
 import { LockButton } from "../Components/LockButton";
@@ -509,35 +509,18 @@ const RegionControls: FC<RegionControlsProps> = injector(
 
     return (
       <div
-        className={cn("outliner-item")
-          .elem("controls")
-          .mod({ withControls: hasControls, newUI: isFF(FF_DEV_3873) })
-          .toClassName()}
+        className={cn("outliner-item").elem("controls").mod({ withControls: hasControls, newUI: true }).toClassName()}
       >
-        {isFF(FF_DEV_3873) ? (
-          <Tooltip title={"Confidence Score"}>
-            <div className={cn("outliner-item").elem("control-wrapper").toClassName()}>
-              <div className={cn("outliner-item").elem("control").mod({ type: "predict" }).toClassName()}>
-                {item?.origin === "prediction" && <IconSparks style={{ width: 18, height: 18 }} />}
-              </div>
-              <div className={cn("outliner-item").elem("control").mod({ type: "score" }).toClassName()}>
-                {isDefined(item?.score) && item.score.toFixed(2)}
-              </div>
-            </div>
-          </Tooltip>
-        ) : (
-          <>
-            <div className={cn("outliner-item").elem("control").mod({ type: "score" }).toClassName()}>
-              {isDefined(item?.score) && item.score.toFixed(2)}
-            </div>
-            <div className={cn("outliner-item").elem("control").mod({ type: "dirty" }).toClassName()}>
-              {/* dirtyness is not implemented yet */}
-            </div>
+        <Tooltip title={"Confidence Score"}>
+          <div className={cn("outliner-item").elem("control-wrapper").toClassName()}>
             <div className={cn("outliner-item").elem("control").mod({ type: "predict" }).toClassName()}>
               {item?.origin === "prediction" && <IconSparks style={{ width: 18, height: 18 }} />}
             </div>
-          </>
-        )}
+            <div className={cn("outliner-item").elem("control").mod({ type: "score" }).toClassName()}>
+              {isDefined(item?.score) && item.score.toFixed(2)}
+            </div>
+          </div>
+        </Tooltip>
         <div className={cn("outliner-item").elem("wrapper").toClassName()}>
           {store.hasInterface("annotations:copy-link") && isDefined(item?.annotation?.pk) && (
             <div className={cn("outliner-item").elem("control").mod({ type: "menu" }).toClassName()}>
@@ -557,28 +540,18 @@ const RegionControls: FC<RegionControlsProps> = injector(
             />
           </div>
           <div className={cn("outliner-item").elem("control").mod({ type: "visibility" }).toClassName()}>
-            {isFF(FF_DEV_3873) ? (
-              <RegionControlButton
-                variant="neutral"
-                look="string"
-                onClick={onToggleHidden}
-                style={hidden ? undefined : { display: "none" }}
-              >
-                {hidden ? (
-                  <IconEyeClosed style={{ width: 20, height: 20 }} />
-                ) : (
-                  <IconEyeOpened style={{ width: 20, height: 20 }} />
-                )}
-              </RegionControlButton>
-            ) : (
-              <RegionControlButton variant="neutral" look="string" onClick={onToggleHidden}>
-                {hidden ? (
-                  <IconEyeClosed style={{ width: 20, height: 20 }} />
-                ) : (
-                  <IconEyeOpened style={{ width: 20, height: 20 }} />
-                )}
-              </RegionControlButton>
-            )}
+            <RegionControlButton
+              variant="neutral"
+              look="string"
+              onClick={onToggleHidden}
+              style={hidden ? undefined : { display: "none" }}
+            >
+              {hidden ? (
+                <IconEyeClosed style={{ width: 20, height: 20 }} />
+              ) : (
+                <IconEyeOpened style={{ width: 20, height: 20 }} />
+              )}
+            </RegionControlButton>
           </div>
           {hasControls && (
             <div className={cn("outliner-item").elem("control").mod({ type: "visibility" }).toClassName()}>

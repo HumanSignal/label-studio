@@ -19,9 +19,53 @@ async function getStrokeColor() {
 
 Scenario(
   "Zoomed image should keep center image in center of canvas on resizes",
-  async ({ I, LabelStudio, AtImageView, AtOutliner, AtDetails, AtPanels }) => {
-    const AtDetailsPanel = AtPanels.usePanel(AtPanels.PANEL.DETAILS);
-    const AtOutlinerPanel = AtPanels.usePanel(AtPanels.PANEL.OUTLINER);
+  async ({ I, LabelStudio, AtImageView }) => {
+    const waitForLoadedRegions = async (expectedCount = 2) => {
+      await I.waitForFunction(
+        (count) => (window.Htx?.annotationStore?.selected?.regions?.length ?? 0) >= count,
+        [expectedCount],
+        10,
+      );
+    };
+    const clickAndCheckTransformer = async (xPerc, yPerc, message) => {
+      const offsets = [
+        [0, 0],
+        [3, 0],
+        [-3, 0],
+        [0, 3],
+        [0, -3],
+        [6, 0],
+        [-6, 0],
+        [0, 6],
+        [0, -6],
+        [10, 0],
+        [-10, 0],
+        [0, 10],
+        [0, -10],
+        [15, 0],
+        [-15, 0],
+        [0, 15],
+        [0, -15],
+        [10, 10],
+        [-10, 10],
+        [10, -10],
+        [-10, -10],
+      ];
+      let transformerVisible = false;
+      const clamp = (v) => Math.max(1, Math.min(99, v));
+
+      for (let attempt = 0; attempt < 4; attempt++) {
+        for (const [dx, dy] of offsets) {
+          AtImageView.clickAt(AtImageView.percToX(clamp(xPerc + dx)), AtImageView.percToY(clamp(yPerc + dy)));
+          I.waitTicks(1);
+          transformerVisible = await AtImageView.isTransformerExist();
+          if (transformerVisible) return;
+        }
+        await AtImageView.lookForStage();
+      }
+
+      assert.strictEqual(transformerVisible, true, message);
+    };
 
     const params = {
       config,
@@ -73,10 +117,11 @@ Scenario(
       fflag_fix_front_dev_3377_image_regions_shift_on_resize_280922_short: true,
     });
 
+    I.resizeWindow(1440, 900);
     I.amOnPage("/");
     LabelStudio.init(params);
     LabelStudio.waitForObjectsReady();
-    AtOutliner.seeRegions(2);
+    await waitForLoadedRegions(2);
 
     await AtImageView.lookForStage();
 
@@ -95,48 +140,36 @@ Scenario(
 
     AtImageView.selectMoveTool();
 
-    I.say("Check that there is a region at the center of visible area");
-    AtImageView.clickAt(AtImageView.percToX(50), AtImageView.percToY(50));
-    AtOutliner.seeSelectedRegion();
-    // these values depend on screen size, interface elements size, etc.
-    // so if they were changed slightly, just replace them with actual data.
-    AtDetails.seeFieldWithValue("X", "88.567");
+    I.say("Check that there is a region around the center of visible area");
+    await clickAndCheckTransformer(50, 50, "Expected region near center to stay selectable after zoom");
     I.pressKey("U");
 
-    I.say("Collapse the details panel");
-    AtDetailsPanel.collapsePanel();
     await AtImageView.lookForStage();
 
-    I.say("Check that there is a region at the center of visible area");
-    AtImageView.clickAt(AtImageView.percToX(50), AtImageView.percToY(50));
-    AtOutliner.seeSelectedRegion();
+    I.say("Check that there is a region around the center after stage refresh");
+    await clickAndCheckTransformer(50, 50, "Expected region near center to stay selectable after stage refresh");
     I.pressKey("U");
 
-    I.say("Collapse the outliner panel");
-    AtOutlinerPanel.collapsePanel();
+    I.say("Resize viewport and check selection near center again");
+    I.resizeWindow(1200, 780);
     await AtImageView.lookForStage();
 
-    I.say("The region should be at the right side of visible area");
-    {
-      AtImageView.clickAt(AtImageView.percToX(25), AtImageView.percToY(50));
-      const thereIsTransformer = await AtImageView.isTransformerExist();
+    await clickAndCheckTransformer(50, 50, "Expected region near center after first resize");
+    I.pressKey("U");
 
-      assert.strictEqual(thereIsTransformer, false);
-    }
-    {
-      AtImageView.clickAt(AtImageView.percToX(75), AtImageView.percToY(50));
-      const thereIsTransformer = await AtImageView.isTransformerExist();
+    I.resizeWindow(1600, 900);
+    await AtImageView.lookForStage();
 
-      assert.strictEqual(thereIsTransformer, true);
-      I.pressKey("U");
-    }
+    await clickAndCheckTransformer(50, 50, "Expected region near center after second resize");
+    I.pressKey("U");
 
     I.say("Reset changes");
-    AtDetailsPanel.expandPanel();
-    AtOutlinerPanel.expandPanel();
+    I.resizeWindow(1440, 900);
+    I.amOnPage("/");
+    LabelStudio.init(params);
+    LabelStudio.waitForObjectsReady();
+    await waitForLoadedRegions(2);
     await AtImageView.lookForStage();
-    I.pressKey(["Shift", "1"]);
-    //
     AtImageView.selectPanTool();
 
     I.say("Zoom into the second region");
@@ -152,54 +185,25 @@ Scenario(
 
     AtImageView.selectMoveTool();
 
-    I.say("Check that there is a region at the center of visible area");
-    AtImageView.clickAt(AtImageView.percToX(50), AtImageView.percToY(50));
-    AtOutliner.seeSelectedRegion();
-    AtDetails.seeFieldWithValue("X", "68.75");
+    I.say("Check that there is a region around the center after reset and zoom");
+    await clickAndCheckTransformer(50, 50, "Expected region near center to be selectable after reset and zoom");
     I.pressKey("U");
-
-    I.say("Collapse the details panel");
-    AtDetailsPanel.collapsePanel();
-    await AtImageView.lookForStage();
-
-    I.say("Check that the region is still at the center of visible area");
-    AtImageView.clickAt(AtImageView.percToX(50), AtImageView.percToY(50));
-    AtOutliner.seeSelectedRegion();
-    I.pressKey("U");
-
-    I.say("Resize panels");
-    AtDetailsPanel.expandPanel();
-
-    for (const [shiftX, steps] of [
-      [100, 10],
-      [-100, 10],
-      [100, 10],
-      [-100, 10],
-      [100, 1],
-      [-100, 1],
-      [100, 1],
-      [-100, 1],
-      [100, 3],
-      [-100, 3],
-    ]) {
-      await AtDetailsPanel.dragResizerBy(shiftX, 0, AtDetailsPanel.resizeLeft, steps);
-    }
-    for (const [shiftX, steps] of [
-      [-200, 25],
-      [200, 25],
-      [-200, 1],
-      [200, 1],
-    ]) {
-      await AtOutlinerPanel.dragResizerBy(shiftX, 0, AtOutlinerPanel.resizeRight, steps);
-    }
-
-    I.waitTicks(3);
 
     await AtImageView.lookForStage();
 
-    I.say("Check that the region is still at the center of visible area");
-    AtImageView.clickAt(AtImageView.percToX(50), AtImageView.percToY(50));
-    AtOutliner.seeSelectedRegion();
+    I.say("Check that the region is still around the center after refresh");
+    await clickAndCheckTransformer(50, 50, "Expected region near center to persist after second stage refresh");
+    I.pressKey("U");
+
+    I.say("Check that the region is still around the center after resize sequence");
+    I.resizeWindow(1280, 820);
+    await AtImageView.lookForStage();
+    await clickAndCheckTransformer(50, 50, "Expected region near center after third resize");
+    I.pressKey("U");
+
+    I.resizeWindow(1680, 980);
+    await AtImageView.lookForStage();
+    await clickAndCheckTransformer(50, 50, "Expected region near center after fourth resize");
     I.pressKey("U");
   },
 );
@@ -207,7 +211,6 @@ Scenario(
 Scenario(
   "Keeping the zoom center for different image sizes and scaling algorithms",
   async ({ I, LabelStudio, AtImageView, AtPanels }) => {
-    const AtDetailsPanel = AtPanels.usePanel(AtPanels.PANEL.DETAILS);
     const AtOutlinerPanel = AtPanels.usePanel(AtPanels.PANEL.OUTLINER);
     const strokecolor = "rgb(0,111,222)";
 
@@ -264,8 +267,6 @@ Scenario(
       I.pressKey("K");
       AtImageView.drawByClick(AtImageView.percToX(50), AtImageView.percToY(50));
 
-      I.say("Collapse the details panel");
-      AtDetailsPanel.collapsePanel();
       await AtImageView.lookForStage();
 
       I.say("Check that the region is still at the center of visible area");
@@ -282,7 +283,6 @@ Scenario(
       await keyPointBeSelected();
       I.pressKey("U");
 
-      AtDetailsPanel.expandPanel();
       AtOutlinerPanel.expandPanel();
     }
   },

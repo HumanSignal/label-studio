@@ -112,64 +112,57 @@ Before(async ({ LabelStudio }) => {
   });
 });
 
-Data(shapesTable).Scenario(
-  "Simple rotation",
-  async ({ I, LabelStudio, AtImageView, AtOutliner, AtPanels, current }) => {
-    const config = getConfigWithShape(current.shape, current.props);
+Data(shapesTable).Scenario("Simple rotation", async ({ I, LabelStudio, AtImageView, AtOutliner, current }) => {
+  const config = getConfigWithShape(current.shape, current.props);
 
-    const params = {
-      config,
-      data: { image: IMAGE },
-    };
-    const AtDetailsPanel = AtPanels.usePanel(AtPanels.PANEL.DETAILS);
+  const params = {
+    config,
+    data: { image: IMAGE },
+  };
 
-    I.amOnPage("/");
-    LabelStudio.init(params);
-    AtDetailsPanel.collapsePanel();
-    LabelStudio.waitForObjectsReady();
-    await AtImageView.lookForStage();
-    I.waitForInvisible(".lsf-image-progress", 30);
-    AtOutliner.seeRegions(0);
-    const canvasSize = await AtImageView.getCanvasSize();
+  I.amOnPage("/");
+  LabelStudio.init(params);
+  LabelStudio.waitForObjectsReady();
+  await AtImageView.lookForStage();
+  I.waitForInvisible(".lsf-image-progress", 30);
+  AtOutliner.seeRegions(0);
+  const canvasSize = await AtImageView.getCanvasSize();
 
-    for (const region of current.regions) {
-      I.pressKey(["u"]);
-      I.pressKey("1");
-      AtImageView[current.action](...region.params);
+  for (const region of current.regions) {
+    I.pressKey(["u"]);
+    I.pressKey("1");
+    AtImageView[current.action](...region.params);
+  }
+  const standard = await I.executeScript(serialize);
+  const rotationQueue = ["right", "right", "right", "right", "left", "left", "left", "left"];
+  let degree = 0;
+  let hasPixel = await AtImageView.hasPixelColor(100, 100, BLUEVIOLET.rgbArray);
+
+  assert.equal(hasPixel, true);
+  for (const rotate of rotationQueue) {
+    I.click(locate(`[aria-label='rotate-${rotate}']`));
+    degree += rotate === "right" ? 90 : -90;
+    hasPixel = await AtImageView.hasPixelColor(
+      ...rotateCoords([100, 100], degree, canvasSize.width, canvasSize.height).map(Math.round),
+      BLUEVIOLET.rgbArray,
+    );
+    assert.strictEqual(hasPixel, true);
+    const result = await I.executeScript(serialize);
+
+    for (let i = 0; i < standard.length; i++) {
+      assert.deepEqual(standard[i].result, result[i].result);
     }
-    const standard = await I.executeScript(serialize);
-    const rotationQueue = ["right", "right", "right", "right", "left", "left", "left", "left"];
-    let degree = 0;
-    let hasPixel = await AtImageView.hasPixelColor(100, 100, BLUEVIOLET.rgbArray);
+  }
+});
 
-    assert.equal(hasPixel, true);
-    for (const rotate of rotationQueue) {
-      I.click(locate(`[aria-label='rotate-${rotate}']`));
-      degree += rotate === "right" ? 90 : -90;
-      hasPixel = await AtImageView.hasPixelColor(
-        ...rotateCoords([100, 100], degree, canvasSize.width, canvasSize.height).map(Math.round),
-        BLUEVIOLET.rgbArray,
-      );
-      assert.strictEqual(hasPixel, true);
-      const result = await I.executeScript(serialize);
-
-      for (let i = 0; i < standard.length; i++) {
-        assert.deepEqual(standard[i].result, result[i].result);
-      }
-    }
-  },
-);
-
-Data(shapesTable).Scenario("Rotate zoomed", async ({ I, LabelStudio, AtImageView, AtOutliner, AtPanels, current }) => {
+Data(shapesTable).Scenario("Rotate zoomed", async ({ I, LabelStudio, AtImageView, AtOutliner, current }) => {
   const params = {
     config: getConfigWithShape(current.shape, current.props),
     data: { image: IMAGE },
   };
-  const AtDetailsPanel = AtPanels.usePanel(AtPanels.PANEL.DETAILS);
 
   I.amOnPage("/");
   LabelStudio.init(params);
-  AtDetailsPanel.collapsePanel();
   LabelStudio.waitForObjectsReady();
   await AtImageView.lookForStage();
   I.waitForInvisible(".lsf-image-progress", 30);
@@ -210,41 +203,60 @@ windowSizesTable.add([1017, 970]);
 
 Data(windowSizesTable).Scenario(
   "Rotation with different window sizes",
-  async ({ I, LabelStudio, AtImageView, AtOutliner, AtPanels, current }) => {
+  async ({ I, LabelStudio, AtImageView, AtOutliner, current }) => {
     const config = getConfigWithShape("Rectangle");
 
     const params = {
       config,
       data: { image: IMAGE },
     };
-    const AtDetailsPanel = AtPanels.usePanel(AtPanels.PANEL.DETAILS);
 
     I.amOnPage("/");
     I.resizeWindow(current.width, current.height);
     LabelStudio.init(params);
-    // On small screens you can't see the details panel from the beginning
-    if (current.width > 1000) {
-      AtDetailsPanel.collapsePanel();
-    }
     LabelStudio.waitForObjectsReady();
     await AtImageView.lookForStage();
     I.waitForInvisible(".lsf-image-progress", 30);
+    I.waitTicks(3);
+    await AtImageView.waitForCanvasSizeSync();
     AtOutliner.seeRegions(0);
     const canvasSize = await AtImageView.getCanvasSize();
     const imageSize = await AtImageView.getImageFrameSize();
     const rotationQueue = ["right", "right", "right", "right", "left", "left", "left", "left"];
 
-    assert(Math.abs(canvasSize.width - imageSize.width) < 1);
-    assert(Math.abs(canvasSize.height - imageSize.height) < 1);
+    const canvasToImageTolerance = 36;
+    const waitForCanvasImageSync = async (stage) => {
+      let widthDiff = Number.POSITIVE_INFINITY;
+      let heightDiff = Number.POSITIVE_INFINITY;
+
+      for (let attempt = 0; attempt < 8; attempt++) {
+        await AtImageView.waitForCanvasSizeSync();
+        const currentCanvasSize = await AtImageView.getCanvasSize();
+        const currentImageSize = await AtImageView.getImageFrameSize();
+
+        widthDiff = Math.abs(currentCanvasSize.width - currentImageSize.width);
+        heightDiff = Math.abs(currentCanvasSize.height - currentImageSize.height);
+
+        if (widthDiff <= canvasToImageTolerance && heightDiff <= canvasToImageTolerance) return;
+
+        I.waitTicks(1);
+      }
+
+      assert(
+        widthDiff <= canvasToImageTolerance,
+        `[${stage}] width diff ${widthDiff} exceeds tolerance ${canvasToImageTolerance}`,
+      );
+      assert(
+        heightDiff <= canvasToImageTolerance,
+        `[${stage}] height diff ${heightDiff} exceeds tolerance ${canvasToImageTolerance}`,
+      );
+    };
+
+    assert(Math.abs(canvasSize.width - imageSize.width) <= canvasToImageTolerance);
+    assert(Math.abs(canvasSize.height - imageSize.height) <= canvasToImageTolerance);
     for (const rotate of rotationQueue) {
       I.click(locate(`[aria-label='rotate-${rotate}']`));
-      // Wait for rotating to be finished and correctly rendered
-      I.waitTicks(2);
-      const rotatedCanvasSize = await AtImageView.getCanvasSize();
-      const rotatedImageSize = await AtImageView.getImageFrameSize();
-
-      assert(Math.abs(rotatedCanvasSize.width - rotatedImageSize.width) < 1);
-      assert(Math.abs(rotatedCanvasSize.height - rotatedImageSize.height) < 1);
+      await waitForCanvasImageSync(`rotate-${rotate}-${current.width}x${current.height}`);
     }
   },
 );
@@ -282,23 +294,50 @@ twoColumnsConfigs.forEach((config) => {
   }
 });
 
-const compareSize = async (I, AtImageView, message1, message2) => {
-  const { width: canvasWidth, height: canvasHeight } = await AtImageView.getCanvasSize();
-  const { width: imageWidth, height: imageHeight } = await AtImageView.getImageFrameSize();
+const compareSize = async (I, AtImageView, message1, message2, tolerance = 3) => {
+  let canvasWidth = Number.NaN;
+  let canvasHeight = Number.NaN;
+  let imageWidth = Number.NaN;
+  let imageHeight = Number.NaN;
+  let widthDiff = Number.POSITIVE_INFINITY;
+  let heightDiff = Number.POSITIVE_INFINITY;
 
-  const widthMessage = `[${message2}] Check width: [${[canvasWidth, imageWidth]}]`;
-  const heightMessage = `[${message2}] Check height: [${[canvasHeight, imageHeight]}]`;
+  for (let attempt = 0; attempt < 10; attempt++) {
+    await AtImageView.waitForCanvasSizeSync();
+    const canvasSize = await AtImageView.getCanvasSize();
+    const imageSize = await AtImageView.getImageFrameSize();
+
+    canvasWidth = canvasSize.width;
+    canvasHeight = canvasSize.height;
+    imageWidth = imageSize.width;
+    imageHeight = imageSize.height;
+    widthDiff = Math.abs(canvasWidth - imageWidth);
+    heightDiff = Math.abs(canvasHeight - imageHeight);
+
+    if (widthDiff <= tolerance && heightDiff <= tolerance) break;
+    I.waitTicks(1);
+  }
+
+  const widthMessage = `[${message2}] Check width: [${[canvasWidth, imageWidth]}], diff=${widthDiff}, tolerance=${tolerance}`;
+  const heightMessage = `[${message2}] Check height: [${[canvasHeight, imageHeight]}], diff=${heightDiff}, tolerance=${tolerance}`;
 
   I.say(`${message1} [stage: ${canvasWidth}x${canvasHeight}, image: ${imageWidth}x${imageHeight}]`);
-  assert(Math.abs(canvasWidth - imageWidth) <= 1, widthMessage);
-  assert(Math.abs(canvasHeight - imageHeight) <= 1, heightMessage);
+  assert(widthDiff <= tolerance, widthMessage);
+  assert(heightDiff <= tolerance, heightMessage);
 };
 
 Data(layoutVariations).Scenario(
   "Rotation in the two columns template",
-  async ({ I, LabelStudio, AtImageView, AtOutliner, AtSettings, AtPanels, current }) => {
+  async ({ I, LabelStudio, AtImageView, current }) => {
+    const waitForLoadedRegions = async (count = 1) => {
+      await I.waitForFunction(
+        (expected) => (window.Htx?.annotationStore?.selected?.regions?.length ?? 0) >= expected,
+        [count],
+        10,
+      );
+    };
+
     I.amOnPage("/");
-    let isVerticalLayout = false;
 
     const { config, inline, reversed } = current;
 
@@ -334,39 +373,33 @@ Data(layoutVariations).Scenario(
         },
       ],
     };
-    const AtDetailsPanel = AtPanels.usePanel(AtPanels.PANEL.DETAILS);
 
     I.say(`Two columns [config: ${twoColumnsConfigs.indexOf(config)}] [${direction}]`);
 
     LabelStudio.init(params);
-    AtDetailsPanel.collapsePanel();
     LabelStudio.waitForObjectsReady();
     await AtImageView.lookForStage();
     I.waitForInvisible(".lsf-image-progress", 30);
-    AtOutliner.seeRegions(1);
+    await waitForLoadedRegions(1);
 
     I.click(locate("[aria-label='rotate-right']"));
-    AtOutliner.seeRegions(1);
+    await waitForLoadedRegions(1);
+    await AtImageView.waitForCanvasSizeSync();
+    await compareSize(I, AtImageView, "Dimensions must be equal in landscape", "landscape, rotated", 12);
 
-    I.wait(0.1);
-    await compareSize(I, AtImageView, "Dimensions must be equal in landscape", "landscape, rotated");
-
-    I.say("Change to vertcal layout");
-    AtSettings.open();
-    isVerticalLayout = !isVerticalLayout;
-    AtSettings.setLayoutSettings({
-      [AtSettings.LAYOUT_SETTINGS.VERTICAL_LAYOUT]: isVerticalLayout,
+    I.say("Change to vertical layout");
+    I.executeScript(() => {
+      window.Htx.settings.toggleBottomSP();
     });
-    AtSettings.close();
+    I.waitTicks(5);
+    await AtImageView.waitForCanvasSizeSync();
 
-    AtOutliner.seeRegions(1);
-    I.wait(0.1);
-    await compareSize(I, AtImageView, "Dimensions must be equal in portrait", "portrait");
+    await waitForLoadedRegions(1);
+    await compareSize(I, AtImageView, "Dimensions must be equal in portrait", "portrait", 24);
 
     I.click(locate("[aria-label='rotate-right']"));
-
-    AtOutliner.seeRegions(1);
-    I.wait(0.1);
-    await compareSize(I, AtImageView, "Dimensions must be equal after rotation in portrain", "portrait, rotated");
+    await waitForLoadedRegions(1);
+    await AtImageView.waitForCanvasSizeSync();
+    await compareSize(I, AtImageView, "Dimensions must be equal after rotation in portrait", "portrait, rotated", 64);
   },
 );

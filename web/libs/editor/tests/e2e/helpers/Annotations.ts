@@ -25,8 +25,8 @@ class Annotations extends Helper {
   }
 
   async seeAnnotationSubmitted() {
+    await this._playwright.waitForVisible(this._locateButton("Update"), 10);
     await this._playwright.dontSeeElement(this._locateButton("Submit"));
-    await this._playwright.seeElement(this._locateButton("Update"));
   }
 }
 

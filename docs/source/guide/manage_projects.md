@@ -30,6 +30,12 @@ Use the search box in the upper right. You can search by project name.
 
 The project search allows partial and case-insensitive matches.  
 
+## Project states
+
+Project states are reflected on the project page and in the top bar when viewing a project. For example, **Ready to Publish**, **Annotating**, **Done**. 
+
+For more information about project states, see [Project and Task State Management](project_states). 
+
 
 ## Create a project template
 
@@ -71,7 +77,8 @@ To duplicate a project:
 
 1. Click the overflow menu for the project and select **Duplicate project**:
 
-    ![Screenshot of project menu](/images/project/project_menu_lse.png)
+    <img src="/images/project/project_menu_lse.png" style="max-width: 500px" alt="Screenshot">
+
 2. Select the workspace in which you want the new project to be located. 
 3. Enter a new name and (optionally) a description for the project.
 4. Select whether you only want to duplicate project settings (including the labeling configuration), or if you also want to include tasks. 
@@ -90,7 +97,7 @@ You may need to refresh the page before you can see the new project.
 
 To pin a project, click the overflow menu for the project and select **Pin project**:
 
-![Screenshot of project menu](/images/project/project_menu_lse.png)
+<img src="/images/project/project_menu_lse.png" style="max-width: 500px" alt="Screenshot">
 
 Pinned projects are pinned to the top of the Projects page. 
 

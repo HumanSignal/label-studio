@@ -177,7 +177,9 @@ def emit_webhooks_for_instance(organization, project, action, instance=None):
         if not webhooks.exists():
             return
     if flag_set('fflag_fix_back_lsdv_4604_excess_sql_queries_in_api_short'):
-        start_job_async_or_sync(emit_webhooks_for_instance_sync, organization, project, action, instance)
+        start_job_async_or_sync(
+            emit_webhooks_for_instance_sync, organization, project, action, instance, queue_name='low'
+        )
     else:
         emit_webhooks_for_instance_sync(organization, project, action, instance)
 
@@ -189,7 +191,7 @@ def emit_webhooks(organization, project, action, payload):
     Will run all selected webhooks in an RQ worker.
     """
     if flag_set('fflag_fix_back_lsdv_4604_excess_sql_queries_in_api_short'):
-        start_job_async_or_sync(emit_webhooks_sync, organization, project, action, payload)
+        start_job_async_or_sync(emit_webhooks_sync, organization, project, action, payload, queue_name='low')
     else:
         emit_webhooks_sync(organization, project, action, payload)
 

@@ -381,7 +381,11 @@ export const CommentStore = types
     }
 
     const listComments = flow(function* ({ mounted = { current: true }, suppressClearComments } = {}) {
-      if (!self.draftId && !self.annotationId) return;
+      if (!self.draftId && !self.annotationId) {
+        if (!suppressClearComments) self.setComments([]);
+        if (mounted.current) self.setLoading(null);
+        return;
+      }
 
       // FIT-720: Deduplicate concurrent listComments calls for the same annotation.
       // This prevents double API calls when both the prefetch (on annotation selection)

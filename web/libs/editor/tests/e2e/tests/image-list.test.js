@@ -199,11 +199,6 @@ Scenario("View All disables MIG pagination", async ({ I, AtImageView, LabelStudi
   const prevSelector = ".lsf-pagination__btn_arrow-left";
   const nextSelector = ".lsf-pagination__btn_arrow-right";
 
-  // FFs for a proper interface with View All button
-  LabelStudio.setFeatureFlags({
-    fflag_feat_front_dev_3873_labeling_ui_improvements_short: true,
-  });
-
   I.amOnPage("/");
   LabelStudio.init(params);
 
@@ -290,7 +285,14 @@ Scenario("Regions are not changes when duplicating an annotation", async ({ I, L
   await AtImageView.lookForStage();
 
   I.say("Attempting to duplicate an annotaion");
-  I.click('[aria-label="Copy Annotation"]');
+  await I.executeScript(() => {
+    const cs = window.Htx.annotationStore;
+    const entity = cs.selected;
+    const c = cs.addAnnotationFromPrediction(entity);
+
+    cs.selectAnnotation(c.id);
+  });
+  I.waitTicks(5);
 
   LabelStudio.waitForObjectsReady();
   await AtImageView.lookForStage();
@@ -299,7 +301,7 @@ Scenario("Regions are not changes when duplicating an annotation", async ({ I, L
   await LabelStudio.resultsNotChanged(result);
 });
 
-Scenario("No errors during brush export in MIG", async ({ I, LabelStudio, AtImageView, AtLabels, AtPanels }) => {
+Scenario("No errors during brush export in MIG", async ({ I, LabelStudio, AtImageView, AtLabels }) => {
   const params = {
     config: brushConfig,
     data,
@@ -313,11 +315,9 @@ Scenario("No errors during brush export in MIG", async ({ I, LabelStudio, AtImag
     [40, 20],
     [20, 20],
   ];
-  const AtDetailsPanel = AtPanels.usePanel(AtPanels.PANEL.DETAILS);
 
   I.amOnPage("/");
   LabelStudio.init(params);
-  AtDetailsPanel.collapsePanel();
 
   LabelStudio.waitForObjectsReady();
   await AtImageView.lookForStage();

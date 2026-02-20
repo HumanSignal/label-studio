@@ -15,6 +15,7 @@
     "ls:e2e": "nx run labelstudio-e2e:e2e",
     "lsf:watch": "nx run editor:build:development --watch",
     "lsf:serve": "NODE_ENV=development FRONTEND_HOSTNAME=http://localhost:3000 MODE=standalone nx run editor:serve:development",
+    "lsf:serve-static": "MODE=standalone nx run editor:serve-static",
     "lsf:e2e": "cd libs/editor/tests/e2e && yarn test",
     "lsf:e2e:slow": "DEFAULT_CPU_THROTTLING=100 yarn lsf:e2e",
     "lsf:e2e:parallel": "cd libs/editor/tests/e2e && yarn test:parallel",

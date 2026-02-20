@@ -43,11 +43,9 @@ Set up Label Studio Enterprise as a Service Provider (SP) with your Identity Pro
 
 The details will vary depending on your IdP, but in general you will complete the following steps:
 
-###### From Label Studio:
+#### From Label Studio:
 
-1. Click the menu in the upper left and select **Organization**. 
-
-    ![Screenshot of Organization in the Label Studio menu](/images/general/menu_organization.png)
+1. Go to the **Organization** page. 
     
     If you do not see the option to select **Organization**, you are not logged in with the appropriate role. 
 2. Select **SSO & SAML** in the upper right. 
@@ -58,7 +56,7 @@ The details will vary depending on your IdP, but in general you will complete th
     * **Login URL**---This is the URL that users will use to log in to Label Studio. 
     * **Logout URL**---This is the URL used to redirect users after successfully logging out of Label Studio.
 
-###### From your IdP:
+#### From your IdP:
 
 1. Paste the URLs copied from Label Studio in the appropriate location. 
 2. Generate a metadata XML file, or a URL that specifies the metadata for the IdP.
@@ -66,12 +64,12 @@ The details will vary depending on your IdP, but in general you will complete th
 
 **The default attribute names are:**
 
-    | Data | Default Attribute |
-    | --- | --- |
-    | Email address | Email |
-    | First or given name | FirstName |
-    | Last or family name | LastName |
-    | Group name | Groups | 
+| Data | Default Attribute |
+| --- | --- |
+| Email address | Email |
+| First or given name | FirstName |
+| Last or family name | LastName |
+| Group name | Groups | 
 
 !!! note Note
     Different Identity Providers use different attribute names. Label Studio provides **presets** in the SSO & SAML settings page to quickly configure the correct attribute mappings for popular IdPs. You can also manually configure custom attribute names if your IdP uses different values.
@@ -100,7 +98,7 @@ If your Entra ID is configured with default claim URIs, use:
 
 
 
-###### From Label Studio:
+#### From Label Studio:
 
 1. Return to the SSO & SAML page. 
 2. Upload the metadata XML file or specify the metadata URL.  
@@ -146,4 +144,6 @@ Setting these options disables the Label Studio API and UI options to assign rol
     
     If requested, we can also disable the common login option for your organization. When disabled, users can only use the SSO login fields and the common login  option is disabled completely. 
 
+### Login page URL
 
+You can also set the `LOGIN_PAGE_URL` environment variable to redirect the login page to the specified URL.   

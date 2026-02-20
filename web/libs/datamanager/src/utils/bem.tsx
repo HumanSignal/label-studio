@@ -1,5 +1,1 @@
-export {
-  cnb as cn,
-  type CN,
-  type CNTagName,
-} from "@humansignal/core/lib/utils/bem";
+export { cnb as cn, type CN } from "@humansignal/core/lib/utils/bem";

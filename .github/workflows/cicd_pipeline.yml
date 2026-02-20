@@ -58,8 +58,7 @@ jobs:
             frontend:
               - 'web/**'
               - '.github/workflows/tests-yarn-unit.yml'
-              - '.github/workflows/tests-yarn-integration.yml'
-              - '.github/workflows/tests-yarn-e2e.yml'
+              - '.github/workflows/tests-yarn-lsf.yml'
             docker:
               - 'label_studio/**'
               - 'web/**'
@@ -501,22 +500,12 @@ jobs:
       head_sha: ${{ github.event.pull_request.head.sha || github.event.after }}
     secrets: inherit
 
-  tests-yarn-integration:
+  tests-yarn-lsf:
     name: "Tests"
     needs:
       - changed_files
     if: needs.changed_files.outputs.frontend == 'true'
-    uses: ./.github/workflows/tests-yarn-integration.yml
-    with:
-      head_sha: ${{ github.event.pull_request.head.sha || github.event.after }}
-    secrets: inherit
-
-  tests-yarn-e2e:
-    name: "Tests"
-    needs:
-      - changed_files
-    if: needs.changed_files.outputs.frontend == 'true'
-    uses: ./.github/workflows/tests-yarn-e2e.yml
+    uses: ./.github/workflows/tests-yarn-lsf.yml
     with:
       head_sha: ${{ github.event.pull_request.head.sha || github.event.after }}
     secrets: inherit
@@ -535,15 +524,14 @@ jobs:
       - migrations
       - build-docker
       - tests-yarn-unit
-      - tests-yarn-integration
-      - tests-yarn-e2e
+      - tests-yarn-lsf
       - cursor-review
     runs-on: ubuntu-latest
     steps:
       - name: Decide whether the needed jobs succeeded or failed
         uses: re-actors/alls-green@release/v1
         with:
-          allowed-skips: gitleaks, bandit, ruff, blue, biome, stylelint, pytest, migrations, conda-test, build-docker, tests-yarn-unit, tests-yarn-integration, tests-yarn-e2e, cursor-review
+          allowed-skips: gitleaks, bandit, ruff, blue, biome, stylelint, pytest, migrations, conda-test, build-docker, tests-yarn-unit, tests-yarn-lsf, cursor-review
           allowed-failures: |
             [
               "gitleaks",

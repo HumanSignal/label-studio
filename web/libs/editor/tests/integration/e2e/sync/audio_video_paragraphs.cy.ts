@@ -182,10 +182,8 @@ describe("Sync: Video Paragraphs", () => {
       });
     });
 
-    // Get more time to ckeck play/pause before the end of the file
+    // Get more time to check play/pause before the end of the file
     AudioView.clickAt(100, 0);
-    // @TODO: This wait allows "Play" click to have an effect. That's not for sure, but most probably there is a real problem with `sync` window that prevents using seek and play without a delay.
-    cy.wait(1000);
     AudioView.waitForStableState();
 
     AudioView.playButton.click();
@@ -230,10 +228,8 @@ describe("Sync: Video Paragraphs", () => {
       });
     });
 
-    // Let it play for a short time at 1.5x speed, then change back
-    cy.then(() => {
-      return new Cypress.Promise((resolve) => setTimeout(resolve, 100));
-    });
+    // Let playback state settle before changing speed back
+    AudioView.waitForStableState();
     AudioView.setPlaybackSpeedInput(1, true); // true = check both audio and video
 
     cy.log("Changing playback speed to 1x for audio, video and paragraph audio during playback");

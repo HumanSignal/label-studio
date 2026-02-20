@@ -79,7 +79,11 @@ Scenario("NER labeling for HyperText", async ({ I, LabelStudio }) => {
   I.click("b:nth-child(2)");
   I.switchTo();
 
-  I.see("Relations (1)");
+  const relationsCount = await I.executeScript(() => {
+    return window.Htx?.annotationStore?.selected?.relationStore?.size ?? 0;
+  });
+
+  assert.equal(relationsCount, 1);
 
   const result = await I.executeScript(serialize);
 

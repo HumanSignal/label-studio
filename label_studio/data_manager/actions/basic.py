@@ -46,7 +46,7 @@ def delete_tasks(project, queryset, **kwargs):
     queryset.update(project=None)
     # delete all project tasks
     if count == project_count:
-        start_job_async_or_sync(Task.delete_tasks_without_signals_from_task_ids, tasks_ids_list)
+        start_job_async_or_sync(Task.delete_tasks_without_signals_from_task_ids, tasks_ids_list, queue_name='low')
         logger.info(f'calling reset project_id={project.id} delete_tasks()')
         project.summary.reset()
 
