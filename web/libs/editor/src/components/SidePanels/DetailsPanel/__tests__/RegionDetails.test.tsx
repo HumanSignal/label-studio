@@ -1,4 +1,4 @@
-import { render } from "@testing-library/react";
+import { render, fireEvent } from "@testing-library/react";
 import { ResultItem, RegionDetailsMain, RegionDetailsMeta } from "../RegionDetails";
 
 jest.mock("../RegionEditor", () => ({
@@ -88,6 +88,42 @@ describe("RegionDetails", () => {
       const textarea = container.querySelector("textarea");
       expect(textarea).toBeInTheDocument();
       expect(textarea).toHaveValue("Edit me");
+    });
+
+    it("calls saveMeta and cancelEditMode on blur", () => {
+      const setMetaText = jest.fn();
+      const cancelEditMode = jest.fn();
+      const region = { meta: { text: "Meta" }, setMetaText };
+      const { container } = render(
+        <RegionDetailsMeta
+          region={region}
+          editMode={true}
+          cancelEditMode={cancelEditMode}
+          enterEditMode={jest.fn()}
+        />,
+      );
+      const textarea = container.querySelector("textarea");
+      fireEvent.blur(textarea as HTMLTextAreaElement);
+      expect(setMetaText).toHaveBeenCalledWith("Meta");
+      expect(cancelEditMode).toHaveBeenCalled();
+    });
+
+    it("calls saveMeta and cancelEditMode on Enter key", () => {
+      const setMetaText = jest.fn();
+      const cancelEditMode = jest.fn();
+      const region = { meta: { text: "Meta" }, setMetaText };
+      const { container } = render(
+        <RegionDetailsMeta
+          region={region}
+          editMode={true}
+          cancelEditMode={cancelEditMode}
+          enterEditMode={jest.fn()}
+        />,
+      );
+      const textarea = container.querySelector("textarea");
+      fireEvent.keyDown(textarea as HTMLTextAreaElement, { key: "Enter", shiftKey: false });
+      expect(setMetaText).toHaveBeenCalledWith("Meta");
+      expect(cancelEditMode).toHaveBeenCalled();
     });
   });
 });
