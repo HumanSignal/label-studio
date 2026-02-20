@@ -566,6 +566,24 @@ const AnnotationStoreModel = types
       return c;
     }
 
+    function hydrateAnnotationResults(annotationPk, results) {
+      const annotation = self.annotations.find((item) => String(item.pk) === String(annotationPk));
+      if (!annotation || !Array.isArray(results) || results.length === 0) return false;
+
+      const hasVersionsResult = Array.isArray(annotation.versions?.result) && annotation.versions.result.length > 0;
+      const hasRegions = annotation.areas?.size > 0;
+
+      if (hasVersionsResult || hasRegions) return true;
+
+      annotation.history.freeze();
+      annotation.deserializeResults(results);
+      annotation.updateObjects();
+      annotation.history.safeUnfreeze();
+      annotation.reinitHistory();
+
+      return true;
+    }
+
     /** ERRORS HANDLING */
     const handleErrors = (errors) => {
       self.addErrors(errors);
@@ -624,6 +642,7 @@ const AnnotationStoreModel = types
       addAnnotation,
       createAnnotation,
       addAnnotationFromPrediction,
+      hydrateAnnotationResults,
       addHistory,
       clearHistory,
       selectHistory,
