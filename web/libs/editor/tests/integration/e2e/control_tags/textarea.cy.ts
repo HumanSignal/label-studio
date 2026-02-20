@@ -477,4 +477,27 @@ describe("Control Tags - TextArea - Duplicate prevention", () => {
 
     Textarea.input.should("have.value", "Keep this text ignored");
   });
+
+  it("covers deterministic duplicate guard in addTextToResult and remove success path", () => {
+    LabelStudio.params().config(textareaConfigWithSkipDuplicates).data(simpleData).withResult([]).init();
+
+    Textarea.type("Same text{enter}");
+    Textarea.hasValue("Same text");
+
+    cy.window().then((win) => {
+      const model = win.Htx.annotationStore.selected.names.get("desc");
+      const result = model.result;
+
+      expect(result.mainValue.toJSON()).to.deep.equal(["Same text"]);
+      model.addTextToResult("Same text", result);
+      expect(result.mainValue.toJSON()).to.deep.equal(["Same text"]);
+
+      const firstRegion = model.regions[0];
+      model.remove(firstRegion);
+    });
+
+    LabelStudio.serialize().then((result) => {
+      expect(result).to.have.length(0);
+    });
+  });
 });
