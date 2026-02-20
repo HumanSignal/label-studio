@@ -200,10 +200,10 @@ const OutlinerInnerTreeComponent: FC<OutlinerInnerTreeProps> = observer(({ regio
 
 const useDataTree = ({ regions, rootClass, footer }: any) => {
   const processor = useCallback((item: any, idx, _false, _null, _onClick) => {
-    const { id, type, hidden, isDrawing, locked, incomplete } = item ?? {};
+    const { id, type, hidden, locked } = item ?? {};
     const style = item?.background ?? item?.getOneColor?.();
     const color = chroma(style ?? "#666").alpha(1);
-    const mods: Record<string, any> = { hidden, type, isDrawing: isDrawing || incomplete };
+    const mods: Record<string, any> = { hidden, type };
 
     const label = <RegionLabel item={item} />;
 
@@ -409,8 +409,10 @@ const RootTitle: FC<any> = observer(
       [collapsed],
     );
 
+    const incomplete = item?.incomplete;
+
     return (
-      <div className={cn("outliner-item").toClassName()}>
+      <div className={cn("outliner-item").mod({ incomplete }).toClassName()}>
         <div className={cn("outliner-item").elem("content").toClassName()}>
           {!props.isGroup && <div className={cn("outliner-item").elem("index").toClassName()}>{props.idx + 1}</div>}
           <div className={cn("outliner-item").elem("title").toClassName()}>
@@ -418,7 +420,7 @@ const RootTitle: FC<any> = observer(
             {item?.text && (
               <div className={cn("outliner-item").elem("text").toClassName()}>{item.text.replace(/\\n/g, "\n")}</div>
             )}
-            {(item?.isDrawing || item?.incomplete) && (
+            {incomplete && (
               <span className={cn("outliner-item").elem("incomplete").toClassName()}>
                 <Tooltip title={`Incomplete ${item.type?.replace("region", "") ?? "region"}`}>
                   <IconWarning />
