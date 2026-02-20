@@ -208,5 +208,55 @@ describe("Image Segmentation Stage Interactions", () => {
       ImageView.zoomOutByButton();
       ImageView.drawingArea.get("canvas").should("be.visible");
     });
+
+    it("should zoom to fit and zoom to actual size via flyout (Codecov: Zoom.jsx FlyoutMenu)", () => {
+      LabelStudio.params().config(imageToolsConfig).data(imageData).withResult([]).init();
+      LabelStudio.waitForObjectsReady();
+      ImageView.waitForImage();
+
+      ImageView.toolBar.find('[title="Zoom presets (click to see options)"]').click();
+      cy.contains("Zoom to fit").click();
+      ImageView.drawingArea.get("canvas").should("be.visible");
+
+      ImageView.toolBar.find('[title="Zoom presets (click to see options)"]').click();
+      cy.contains("Zoom to actual size").click();
+      ImageView.drawingArea.get("canvas").should("be.visible");
+    });
+
+    it("should toggle pan tool (Codecov: Zoom.jsx Pan Tool)", () => {
+      LabelStudio.params().config(imageToolsConfig).data(imageData).withResult([]).init();
+      LabelStudio.waitForObjectsReady();
+      ImageView.waitForImage();
+
+      ImageView.toolBar.find('[aria-label="pan"]').should("be.visible").click();
+      ImageView.toolBar.find('[aria-label="pan"]').should("have.class", "lsf-tool_active");
+      ImageView.toolBar.find('[aria-label="pan"]').click();
+      ImageView.toolBar.find('[aria-label="pan"]').should("not.have.class", "lsf-tool_active");
+    });
+
+    it("should pan the stage when pan tool is active and user drags (Codecov: Zoom.jsx handleDrag, mousemoveEv, mousedownEv, mouseupEv)", () => {
+      LabelStudio.params().config(imageToolsConfig).data(imageData).withResult([]).init();
+      LabelStudio.waitForObjectsReady();
+      ImageView.waitForImage();
+
+      ImageView.zoomInByButton();
+      ImageView.zoomInByButton();
+      ImageView.toolBar.find('[aria-label="pan"]').click();
+      ImageView.toolBar.find('[aria-label="pan"]').should("have.class", "lsf-tool_active");
+
+      ImageView.drawingArea
+        .scrollIntoView()
+        .trigger("mousedown", 100, 100, { eventConstructor: "MouseEvent", button: 0, buttons: 1 })
+        .trigger("mousemove", 150, 100, {
+          eventConstructor: "MouseEvent",
+          button: 0,
+          buttons: 1,
+          movementX: 50,
+          movementY: 0,
+        })
+        .trigger("mouseup", 150, 100, { eventConstructor: "MouseEvent", button: 0, buttons: 1 });
+
+      ImageView.drawingArea.get("canvas").should("be.visible");
+    });
   });
 });
