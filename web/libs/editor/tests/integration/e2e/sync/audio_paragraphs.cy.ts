@@ -448,4 +448,23 @@ describe("Sync: Audio Paragraphs", () => {
       expect($el[0].scrollTop).to.be.greaterThan(190);
     });
   });
+
+  describe("Paragraphs layout and phrases (Codecov: Paragraphs/HtmlParagraphs, ParagraphsRegion)", () => {
+    it("should render dialogue layout with all phrases and play from first phrase", () => {
+      LabelStudio.params().config(configWithScroll).data(data).withResult(annotations).init();
+
+      LabelStudio.waitForObjectsReady();
+      AudioView.isReady();
+
+      // All dialogue phrases from data are present
+      cy.get('[data-testid="phrase:0"]').should("exist").and("contain.text", "Dont you hate that?");
+      cy.get('[data-testid="phrase:1"]').should("exist").and("contain.text", "Hate what?");
+      // Play from first phrase and confirm playback
+      cy.get('[data-testid="phrase:0"]').siblings('button[aria-label="play"]').click();
+      AudioView.waitForPlayState(true, 8000, false);
+      cy.get("audio").then(([audio]) => {
+        expect((audio as HTMLAudioElement).paused).to.equal(false);
+      });
+    });
+  });
 });
