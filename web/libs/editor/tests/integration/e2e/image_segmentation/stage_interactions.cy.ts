@@ -165,11 +165,7 @@ describe("Image Segmentation Stage Interactions", () => {
 
   describe("Rotate and Zoom toolbar (Codecov: tools/Rotate.jsx, tools/Zoom.jsx)", () => {
     it("should rotate image left and right via toolbar buttons", () => {
-      LabelStudio.params()
-        .config(imageToolsConfigWithRotate)
-        .data(imageData)
-        .withResult([])
-        .init();
+      LabelStudio.params().config(imageToolsConfigWithRotate).data(imageData).withResult([]).init();
       LabelStudio.waitForObjectsReady();
       ImageView.waitForImage();
 

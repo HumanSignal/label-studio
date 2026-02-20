@@ -100,12 +100,7 @@ describe("Bottom bar", () => {
 
   describe("Edit history (Codecov: HistoryActions.jsx)", () => {
     it("shows undo/redo/reset and undoes then redoes a choice", () => {
-      LabelStudio.params()
-        .config(choicesConfig)
-        .data(simpleData)
-        .withResult([])
-        .withInterface("edit-history")
-        .init();
+      LabelStudio.params().config(choicesConfig).data(simpleData).withResult([]).withInterface("edit-history").init();
 
       LabelStudio.waitForObjectsReady();
       cy.get('[data-testid="bottombar-undo-button"]').should("be.visible").and("be.disabled");
@@ -129,12 +124,7 @@ describe("Bottom bar", () => {
     });
 
     it("reset reverts all changes", () => {
-      LabelStudio.params()
-        .config(choicesConfig)
-        .data(simpleData)
-        .withResult([])
-        .withInterface("edit-history")
-        .init();
+      LabelStudio.params().config(choicesConfig).data(simpleData).withResult([]).withInterface("edit-history").init();
 
       LabelStudio.waitForObjectsReady();
       Choices.findChoice("Choice 1").click();

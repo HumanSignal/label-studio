@@ -10,7 +10,7 @@ type MouseInteractionOptions = Partial<TriggerOptions & ObjectLike & MouseEvent>
 class AudioViewHelper extends withMedia(
   class implements ViewWithMedia {
     get _baseRootSelector() {
-      return ".lsf-audio-tag";
+      return "[class*='audio-tag']";
     }
 
     _rootSelector: string;
@@ -40,22 +40,22 @@ class AudioViewHelper extends withMedia(
     }
 
     get timelineControls() {
-      return this.root.find(".lsf-timeline-controls");
+      return this.root.find("[class*='timeline-controls']");
     }
 
     get currentTimebox() {
-      return this.timelineControls.find('[data-testid="timebox-current-time"] > .lsf-time-box__input-time');
+      return this.timelineControls.find("[data-testid='timebox-current-time']").find("input");
     }
 
     get endTimebox() {
-      return this.timelineControls.find('[data-testid="timebox-end-time"] > .lsf-time-box__input-time');
+      return this.timelineControls.find("[data-testid='timebox-end-time']").find("input");
     }
 
     get configButton() {
-      return this.timelineControls.find(".lsf-audio-config > [aria-label='Audio settings']");
+      return this.timelineControls.find("[class*='audio-config'] [aria-label='Audio settings']");
     }
     get volumeButton() {
-      return this.timelineControls.find(".lsf-audio-control > .lsf-button");
+      return this.timelineControls.find("[class*='audio-control'] button");
     }
 
     get loadingBar() {
@@ -71,47 +71,51 @@ class AudioViewHelper extends withMedia(
     }
 
     get volumeSlider() {
-      return this.root.find(".lsf-audio-slider__range");
+      return cy.get("[class*='audio-control__modal'] [class*='audio-slider__range']");
     }
 
     get volumeInput() {
-      return this.root.find(".lsf-audio-slider__input");
+      return cy.get("[class*='audio-control__modal'] [class*='audio-slider__input']");
     }
 
     get muteButton() {
-      return this.root.find(".lsf-audio-control__mute-button");
+      return cy.get("[class*='audio-control__modal'] [class*='audio-control__mute-button']");
     }
 
     get playbackSpeedSlider() {
-      return cy.get(
-        ".lsf-audio-config__modal > .lsf-audio-config__scroll-content > .lsf-audio-slider:nth-child(2) .lsf-audio-slider__range",
-      );
+      return cy
+        .get("[class*='audio-config__modal'] [class*='audio-config__scroll-content'] [class*='audio-slider']")
+        .first()
+        .find("[class*='audio-slider__range']");
     }
 
     get playbackSpeedInput() {
-      return cy.get(
-        ".lsf-audio-config__modal > .lsf-audio-config__scroll-content > .lsf-audio-slider:nth-child(2) .lsf-audio-slider__input",
-      );
+      return cy
+        .get("[class*='audio-config__modal'] [class*='audio-config__scroll-content'] [class*='audio-slider']")
+        .first()
+        .find("[class*='audio-slider__input']");
     }
 
     get amplitudeSlider() {
-      return cy.get(
-        ".lsf-audio-config__modal > .lsf-audio-config__scroll-content > .lsf-audio-slider:nth-child(3) .lsf-audio-slider__range",
-      );
+      return cy
+        .get("[class*='audio-config__modal'] [class*='audio-config__scroll-content'] [class*='audio-slider']")
+        .eq(1)
+        .find("[class*='audio-slider__range']");
     }
 
     get amplitudeInput() {
-      return cy.get(
-        ".lsf-audio-config__modal > .lsf-audio-config__scroll-content > .lsf-audio-slider:nth-child(3) .lsf-audio-slider__input",
-      );
+      return cy
+        .get("[class*='audio-config__modal'] [class*='audio-config__scroll-content'] [class*='audio-slider']")
+        .eq(1)
+        .find("[class*='audio-slider__input']");
     }
 
     get hideTimelineButton() {
-      return this.root.get(".lsf-audio-config__buttons > .lsf-audio-config__menu-button:nth-child(1)");
+      return this.root.get("[class*='audio-config__buttons'] [class*='audio-config__menu-button']:nth-child(1)");
     }
 
     get hideWaveformButton() {
-      return this.root.get(".lsf-audio-config__buttons > .lsf-audio-config__menu-button:nth-child(2)");
+      return this.root.get("[class*='audio-config__buttons'] [class*='audio-config__menu-button']:nth-child(2)");
     }
 
     isReady() {
@@ -159,12 +163,12 @@ class AudioViewHelper extends withMedia(
 
     toggleControlsMenu() {
       this.volumeButton.click();
-      cy.wait(100);
+      // cy.get("[class*='audio-control__modal']").should("be.visible");
     }
 
     toggleSettingsMenu() {
       this.configButton.click();
-      cy.wait(100);
+      // cy.get("[class*='audio-config__modal']").should("be.visible");
     }
 
     setVolumeInput(value: number) {
