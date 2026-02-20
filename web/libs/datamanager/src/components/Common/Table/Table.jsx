@@ -204,7 +204,7 @@ export const Table = observer(
               });
             }}
             leading={<Icon icon={IconBraces} />}
-            tooltip="Show task source"
+            tooltip="View Task Source"
           />
         );
       },
@@ -640,12 +640,15 @@ const innerElementType = forwardRef(({ children, ...rest }, ref) => {
 const ContextMenuPortal = memo(
   ({ contextMenu, view, onViewAnalytics, onViewReviewerAnalytics, onClose, RowContextMenuComponent }) => {
     const MenuComponent = RowContextMenuComponent || RowContextMenu;
+    const { api, type } = useSDK();
 
     return (
       <MenuComponent
         row={contextMenu.row}
         column={contextMenu.column}
         view={view}
+        api={api}
+        sdkType={type}
         onViewAnalytics={onViewAnalytics}
         onViewReviewerAnalytics={onViewReviewerAnalytics}
         cursorPosition={{ x: contextMenu.x, y: contextMenu.y }}
