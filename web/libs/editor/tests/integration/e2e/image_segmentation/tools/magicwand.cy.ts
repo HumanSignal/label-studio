@@ -220,5 +220,4 @@ describe("Image segmentation - Tools - MagicWand", () => {
 
     expect(Array.from(broadMask.data).some((value) => value === 1)).to.equal(true);
   });
-
 });
