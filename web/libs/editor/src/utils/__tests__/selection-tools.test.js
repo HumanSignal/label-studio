@@ -14,6 +14,8 @@ import {
   fixCodePointsInRange,
   rangeToGlobalOffset,
   fixRange,
+  captureSelection,
+  applyTextGranularity,
 } from "../selection-tools";
 
 describe("selection-tools", () => {
@@ -106,6 +108,18 @@ describe("selection-tools", () => {
       const t = doc.createTextNode("x");
       root.appendChild(t);
       expect(findNodesBetween(t, t, root)).toEqual([t]);
+    });
+
+    it("returns only nodes from start to end of tree when start is after end in document order", () => {
+      const doc = document.implementation.createHTMLDocument("");
+      const root = doc.createElement("div");
+      const t1 = doc.createTextNode("a");
+      const t2 = doc.createTextNode("b");
+      root.appendChild(t1);
+      root.appendChild(t2);
+      const nodes = findNodesBetween(t2, t1, root);
+      expect(nodes).toContain(t2);
+      expect(nodes).not.toContain(t1);
     });
   });
 
@@ -226,6 +240,23 @@ describe("selection-tools", () => {
       expect(start).toBe(0);
       expect(end).toBe(5);
     });
+
+    it("counts across multiple text nodes and BR", () => {
+      const doc = document.implementation.createHTMLDocument("");
+      const root = doc.createElement("div");
+      const t1 = doc.createTextNode("ab");
+      const br = doc.createElement("br");
+      const t2 = doc.createTextNode("c");
+      root.appendChild(t1);
+      root.appendChild(br);
+      root.appendChild(t2);
+      const range = doc.createRange();
+      range.setStart(t1, 1);
+      range.setEnd(t2, 1);
+      const [start, end] = rangeToGlobalOffset(range, root);
+      expect(start).toBe(1);
+      expect(end).toBe(4);
+    });
   });
 
   describe("fixRange", () => {
@@ -242,6 +273,204 @@ describe("selection-tools", () => {
       expect(range.startContainer).toBe(text);
       expect(range.startOffset).toBe(1);
       expect(range.endOffset).toBe(4);
+    });
+
+    it("resolves element start/end containers to text nodes", () => {
+      const doc = document.implementation.createHTMLDocument("");
+      const root = doc.createElement("div");
+      const t1 = doc.createTextNode("a");
+      const t2 = doc.createTextNode("b");
+      root.appendChild(t1);
+      root.appendChild(t2);
+      const range = doc.createRange();
+      range.setStart(root, 0);
+      range.setEnd(root, 1);
+      const result = fixRange(range);
+      expect(result).toBe(range);
+      expect(range.startContainer).toBe(t1);
+      expect(range.startOffset).toBe(0);
+      expect(range.endContainer).toBe(t2);
+      expect(range.endOffset).toBe(1);
+    });
+
+    it("returns null when start resolves to no text node", () => {
+      const doc = document.implementation.createHTMLDocument("");
+      const root = doc.createElement("div");
+      const range = doc.createRange();
+      range.setStart(root, 0);
+      range.setEnd(root, 0);
+      expect(fixRange(range)).toBe(null);
+    });
+  });
+
+  describe("applyTextGranularity", () => {
+    it("returns early when selection has no modify (e.g. jsdom)", () => {
+      const doc = document.implementation.createHTMLDocument("");
+      const root = doc.createElement("div");
+      const text = doc.createTextNode("hello");
+      root.appendChild(text);
+      const range = doc.createRange();
+      range.setStart(text, 0);
+      range.setEnd(text, 5);
+      const sel = { getRangeAt: () => range, rangeCount: 1, isCollapsed: false };
+      expect(() => applyTextGranularity(sel, "word")).not.toThrow();
+    });
+
+    it("returns early when granularity is null or symbol", () => {
+      const doc = document.implementation.createHTMLDocument("");
+      const text = doc.createTextNode("x");
+      const range = doc.createRange();
+      range.setStart(text, 0);
+      range.setEnd(text, 1);
+      const sel = { getRangeAt: () => range, rangeCount: 1 };
+      applyTextGranularity(sel, null);
+      applyTextGranularity(sel, "symbol");
+    });
+
+    it("handles unknown granularity (default branch)", () => {
+      const doc = document.implementation.createHTMLDocument("");
+      const text = doc.createTextNode("x");
+      const range = doc.createRange();
+      range.setStart(text, 0);
+      range.setEnd(text, 1);
+      const sel = { getRangeAt: () => range, rangeCount: 1, modify: () => {} };
+      expect(() => applyTextGranularity(sel, "character")).not.toThrow();
+    });
+
+    it("catches when boundarySelection throws (e.g. unsupported browser)", () => {
+      const consoleSpy = jest.spyOn(console, "warn").mockImplementation(() => {});
+      const doc = document.implementation.createHTMLDocument("");
+      const text = doc.createTextNode("word");
+      const range = doc.createRange();
+      range.setStart(text, 0);
+      range.setEnd(text, 4);
+      const sel = {
+        getRangeAt: () => range,
+        rangeCount: 1,
+        modify: () => {
+          throw new Error("not supported");
+        },
+      };
+      expect(() => applyTextGranularity(sel, "word")).not.toThrow();
+      expect(consoleSpy).toHaveBeenCalled();
+      consoleSpy.mockRestore();
+    });
+  });
+
+  describe("highlightRangePart (re-wrap existing highlight)", () => {
+    it("re-wraps when container is fully selected and parent already has highlight class", () => {
+      const doc = document.implementation.createHTMLDocument("");
+      const root = doc.createElement("div");
+      const span = doc.createElement("span");
+      span.classList.add("hl");
+      const text = doc.createTextNode("x");
+      span.appendChild(text);
+      root.appendChild(span);
+      const result = highlightRangePart(text, 0, 1, ["hl"]);
+      expect(result.tagName).toBe("SPAN");
+      expect(result.classList.contains("hl")).toBe(true);
+      expect(result.textContent).toBe("x");
+      expect(root.childNodes.length).toBe(1);
+      expect(root.contains(result)).toBe(true);
+    });
+  });
+
+  describe("captureSelection", () => {
+    it("invokes callback with selectionText and range when selection is not collapsed (symbol granularity)", () => {
+      const root = document.createElement("div");
+      const text = document.createTextNode("hello");
+      root.appendChild(text);
+      document.body.appendChild(root);
+      const range = document.createRange();
+      range.setStart(text, 0);
+      range.setEnd(text, 5);
+      const sel = window.getSelection();
+      sel.removeAllRanges();
+      sel.addRange(range);
+      const callback = jest.fn();
+      captureSelection(callback, { granularity: "symbol", window });
+      expect(callback).toHaveBeenCalledTimes(1);
+      expect(callback.mock.calls[0][0]).toMatchObject({ selectionText: "hello" });
+      expect(callback.mock.calls[0][0].range).toBeDefined();
+      sel.removeAllRanges();
+      document.body.removeChild(root);
+    });
+
+    it("does not invoke callback when selection is collapsed", () => {
+      const root = document.createElement("div");
+      const text = document.createTextNode("x");
+      root.appendChild(text);
+      document.body.appendChild(root);
+      const range = document.createRange();
+      range.setStart(text, 0);
+      range.collapse(true);
+      const sel = window.getSelection();
+      sel.removeAllRanges();
+      sel.addRange(range);
+      const callback = jest.fn();
+      captureSelection(callback, { window });
+      expect(callback).not.toHaveBeenCalled();
+      sel.removeAllRanges();
+      document.body.removeChild(root);
+    });
+
+    it("calls beforeCleanup when provided", () => {
+      const root = document.createElement("div");
+      const text = document.createTextNode("hi");
+      root.appendChild(text);
+      document.body.appendChild(root);
+      const range = document.createRange();
+      range.setStart(text, 0);
+      range.setEnd(text, 2);
+      const sel = window.getSelection();
+      sel.removeAllRanges();
+      sel.addRange(range);
+      const callback = jest.fn();
+      const beforeCleanup = jest.fn();
+      captureSelection(callback, { granularity: "symbol", window, beforeCleanup });
+      expect(callback).toHaveBeenCalledTimes(1);
+      expect(beforeCleanup).toHaveBeenCalledTimes(1);
+      sel.removeAllRanges();
+      document.body.removeChild(root);
+    });
+  });
+
+  describe("isSelectionContainsSpan", () => {
+    it("returns false when selection does not contain the span", () => {
+      const root = document.createElement("div");
+      const span = document.createElement("span");
+      const text = document.createTextNode("one two");
+      span.appendChild(text);
+      root.appendChild(span);
+      const otherSpan = document.createElement("span");
+      otherSpan.appendChild(document.createTextNode("other"));
+      root.appendChild(otherSpan);
+      document.body.appendChild(root);
+      const range = document.createRange();
+      range.setStart(text, 0);
+      range.setEnd(text, 3);
+      const sel = window.getSelection();
+      sel.removeAllRanges();
+      sel.addRange(range);
+      expect(isSelectionContainsSpan(otherSpan)).toBe(false);
+      sel.removeAllRanges();
+      document.body.removeChild(root);
+    });
+
+    it("returns true when selection fully contains the span", () => {
+      const span = document.createElement("span");
+      const text = document.createTextNode("inside");
+      span.appendChild(text);
+      document.body.appendChild(span);
+      const range = document.createRange();
+      range.setStart(text, 0);
+      range.setEnd(text, 6);
+      const sel = window.getSelection();
+      sel.removeAllRanges();
+      sel.addRange(range);
+      expect(isSelectionContainsSpan(span)).toBe(true);
+      sel.removeAllRanges();
+      document.body.removeChild(span);
     });
   });
 });

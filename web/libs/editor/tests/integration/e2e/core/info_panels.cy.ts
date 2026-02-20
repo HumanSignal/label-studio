@@ -91,4 +91,29 @@ describe("Label Studio UI info panels", () => {
       cy.get("[class$=control_type_score]").should("have.text", "0.89");
     });
   });
+
+  describe("Codecov: selection-tools (word granularity)", () => {
+    const configWordGranularity = `<View>
+  <Labels name="lbl" toName="text">
+    <Label value="Word" />
+  </Labels>
+  <RichText name="text" value="$text" granularity="word" />
+</View>`;
+
+    it("creates region when selecting text with word granularity (trimSelection, applyTextGranularity)", () => {
+      LabelStudio.init({
+        config: configWordGranularity,
+        task: {
+          annotations: [],
+          predictions: [],
+          id: 1,
+          data: { text: "Hello world test" },
+        },
+      });
+
+      Labels.select("Word");
+      RichText.selectText("world");
+      RichText.hasRegionWithText("world");
+    });
+  });
 });
