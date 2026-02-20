@@ -80,4 +80,30 @@ describe("trim", () => {
     expect(result.bbox).toHaveProperty("height");
     expect(result).toHaveProperty("canvas");
   });
+
+  test("returns canvas and bbox when canvas is fully transparent", () => {
+    const canvas = document.createElement("canvas");
+    canvas.width = 10;
+    canvas.height = 10;
+    const result = Canvas.trim(canvas);
+    expect(result).toHaveProperty("bbox");
+    expect(result).toHaveProperty("canvas");
+    expect(result.canvas).toBe(canvas);
+  });
+
+  test("returns fallback when getImageData throws (catch branch)", () => {
+    const fakeCanvas = {
+      width: 10,
+      height: 10,
+      getContext: () => ({
+        getImageData: () => {
+          throw new Error("mock throw");
+        },
+      }),
+    };
+    const result = Canvas.trim(fakeCanvas);
+    expect(result).toHaveProperty("bbox");
+    expect(result).toHaveProperty("canvas");
+    expect(result.canvas).toBeTruthy();
+  });
 });
