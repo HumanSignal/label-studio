@@ -159,7 +159,6 @@ export const taxonomyResultWithAlias = {
   from_name: "choices",
 };
 
-
 export const legacyTaxonomyConfig = `<View>
   <Text name="text" value="$text"/>
   <Taxonomy name="legacy_choices" toName="text" legacy="true" leafsOnly="true" showFullPath="true">
@@ -181,7 +180,10 @@ export const legacyTaxonomyResult = {
   to_name: "text",
   type: "taxonomy",
   value: {
-    taxonomy: [["Book 1", "Chapter 2", "Section 2.1"], ["Book 1", "Chapter 2", "Section 2.2"]],
+    taxonomy: [
+      ["Book 1", "Chapter 2", "Section 2.1"],
+      ["Book 1", "Chapter 2", "Section 2.2"],
+    ],
   },
 };
 

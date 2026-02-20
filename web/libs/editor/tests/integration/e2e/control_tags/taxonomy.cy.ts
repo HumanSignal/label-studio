@@ -37,10 +37,7 @@ describe("Control Tags - Taxonomy", () => {
   };
 
   const selectLegacyTreeNode = (title: string) => {
-    legacyItemLabel(title)
-      .closest('[class^="taxonomy__item"]')
-      .find("input.item")
-      .check({ force: true });
+    legacyItemLabel(title).closest('[class^="taxonomy__item"]').find("input.item").check({ force: true });
   };
 
   it("should show hint for <Choice />", () => {
@@ -242,6 +239,8 @@ describe("Control Tags - Taxonomy", () => {
         cy.contains("div", "...").click({ force: true });
       });
     cy.contains(".ant-dropdown-menu-item", "Delete").click();
-    cy.get('[class^="taxonomy__item"] label').filter((_, element) => element.textContent?.trim() === "c").should("not.exist");
+    cy.get('[class^="taxonomy__item"] label')
+      .filter((_, element) => element.textContent?.trim() === "c")
+      .should("not.exist");
   });
 });

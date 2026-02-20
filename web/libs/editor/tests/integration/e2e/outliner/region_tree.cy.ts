@@ -2,7 +2,8 @@ import { LabelStudio, Sidebar } from "@humansignal/frontend-test/helpers/LSF";
 
 describe("Outliner - Regions tree", () => {
   const text = "a".repeat(30);
-  const config = '<View><Text name="text" value="$text"/><Labels name="labels" toName="text"><Label value="Label_1" /></Labels></View>';
+  const config =
+    '<View><Text name="text" value="$text"/><Labels name="labels" toName="text"><Label value="Label_1" /></Labels></View>';
   const result = text.split("").map((val, idx) => {
     return {
       value: {

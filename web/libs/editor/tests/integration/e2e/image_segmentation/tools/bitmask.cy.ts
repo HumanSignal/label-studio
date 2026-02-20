@@ -3,7 +3,11 @@ import { bitmaskConfig, bitmaskImageData } from "../../../data/image_segmentatio
 
 describe("Image segmentation - Tools - Bitmask", () => {
   const selectBitmaskTool = () => {
-    ImageView.toolBar.find('[aria-label="bitmask-tool"]').should("be.visible").click().should("have.class", "lsf-tool_active");
+    ImageView.toolBar
+      .find('[aria-label="bitmask-tool"]')
+      .should("be.visible")
+      .click()
+      .should("have.class", "lsf-tool_active");
   };
 
   const selectEraserTool = () => {
@@ -24,7 +28,8 @@ describe("Image segmentation - Tools - Bitmask", () => {
     LabelStudio.serialize().then((result) => {
       expect(result).to.have.length(1);
       const payload = result[0].value;
-      const hasImageData = typeof payload.imageDataURL === "string" && payload.imageDataURL.startsWith("data:image/png;base64,");
+      const hasImageData =
+        typeof payload.imageDataURL === "string" && payload.imageDataURL.startsWith("data:image/png;base64,");
       const hasRle = Array.isArray(payload.rle) && payload.rle.length > 0;
 
       expect(hasImageData || hasRle).to.equal(true);

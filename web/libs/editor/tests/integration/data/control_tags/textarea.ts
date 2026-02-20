@@ -65,7 +65,6 @@ export const textareaConfigWithSkipDuplicates = `<View>
   <TextArea name="desc" toName="text" skipDuplicates="true" />
 </View>`;
 
-
 export const textareaSkipDuplicatesError = "There is already an entry with that text. Please enter unique text.";
 
 export const textareaPerRegionRegionListData = {

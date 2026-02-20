@@ -120,5 +120,4 @@ describe("Image Segmentation - Transformer interactions", () => {
       expect(region?.value.y ?? 0).to.be.at.least(0);
     });
   });
-
 });

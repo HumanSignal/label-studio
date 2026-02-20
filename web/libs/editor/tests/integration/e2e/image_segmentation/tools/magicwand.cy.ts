@@ -3,7 +3,11 @@ import { magicWandConfig, magicWandData } from "../../../data/image_segmentation
 
 describe("Image segmentation - Tools - MagicWand", () => {
   const selectMagicWandTool = () => {
-    ImageView.toolBar.find('[aria-label="magicwand"]').should("be.visible").click().should("have.class", "lsf-tool_active");
+    ImageView.toolBar
+      .find('[aria-label="magicwand"]')
+      .should("be.visible")
+      .click()
+      .should("have.class", "lsf-tool_active");
   };
 
   it("creates a labeled magic-wand region and serializes mask payload", () => {
@@ -80,11 +84,15 @@ describe("Image segmentation - Tools - MagicWand", () => {
     Hotkeys.unselectAllRegions();
     Labels.select("Shadow");
     ImageView.clickAtRelative(0.78, 0.78);
-    cy.get(".lsf-tree__node:not(.lsf-tree__node_type_footer) .lsf-tree-node-content-wrapper").its("length").should("be.gte", 1);
+    cy.get(".lsf-tree__node:not(.lsf-tree__node_type_footer) .lsf-tree-node-content-wrapper")
+      .its("length")
+      .should("be.gte", 1);
 
     Sidebar.findRegionByIndex(0).click();
     Labels.select("Shadow");
-    cy.get(".lsf-tree__node:not(.lsf-tree__node_type_footer) .lsf-tree-node-content-wrapper").its("length").should("be.gte", 1);
+    cy.get(".lsf-tree__node:not(.lsf-tree__node_type_footer) .lsf-tree-node-content-wrapper")
+      .its("length")
+      .should("be.gte", 1);
 
     LabelStudio.serialize().then((result) => {
       const labelEntries = result.filter((entry) => Array.isArray(entry.value.labels));
