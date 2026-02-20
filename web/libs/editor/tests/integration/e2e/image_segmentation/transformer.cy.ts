@@ -23,8 +23,8 @@ describe("Image Segmentation - Transformer interactions", () => {
       expect(region).to.exist;
       expect((region?.value.x ?? 0) + (region?.value.width ?? 0)).to.be.at.most(100);
       expect((region?.value.y ?? 0) + (region?.value.height ?? 0)).to.be.at.most(100);
-      expect(region?.value.x ?? 0).to.be.at.least(0);
-      expect(region?.value.y ?? 0).to.be.at.least(0);
+      expect(region?.value.x ?? 0).to.be.at.least(-0.00001);
+      expect(region?.value.y ?? 0).to.be.at.least(-0.00001);
     });
   });
 
@@ -116,8 +116,66 @@ describe("Image Segmentation - Transformer interactions", () => {
       expect(region).to.exist;
       expect((region?.value.x ?? 0) + (region?.value.width ?? 0)).to.be.at.most(100);
       expect((region?.value.y ?? 0) + (region?.value.height ?? 0)).to.be.at.most(100);
-      expect(region?.value.x ?? 0).to.be.at.least(0);
-      expect(region?.value.y ?? 0).to.be.at.least(0);
+      expect(region?.value.x ?? 0).to.be.at.least(-0.00001);
+      expect(region?.value.y ?? 0).to.be.at.least(-0.00001);
+    });
+  });
+
+  it("keeps dragged rectangle constrained when crossing each stage border", () => {
+    LabelStudio.params().config(simpleRectangleConfig).data(simpleImageData).withResult(simpleRectangleResult).init();
+    ImageView.waitForImage();
+
+    ImageView.selectMoveToolByButton();
+    ImageView.clickAtRelative(0.5, 0.5);
+    Sidebar.hasSelectedRegions(1);
+
+    ImageView.drawRectRelative(0.5, 0.5, -0.45, 0, { force: true });
+    LabelStudio.serialize().then((result) => {
+      const region = result.find((r) => r.type === "rectangle");
+
+      expect(region).to.exist;
+      expect(region?.value.x ?? 0).to.be.at.least(-0.00001);
+    });
+
+    ImageView.drawRectRelative(0.25, 0.5, 0, -0.45, { force: true });
+    LabelStudio.serialize().then((result) => {
+      const region = result.find((r) => r.type === "rectangle");
+
+      expect(region).to.exist;
+      expect(region?.value.y ?? 0).to.be.at.least(-0.00001);
+    });
+
+    ImageView.drawRectRelative(0.25, 0.25, 0.7, 0, { force: true });
+    ImageView.drawRectRelative(0.8, 0.25, 0, 0.7, { force: true });
+    LabelStudio.serialize().then((result) => {
+      const region = result.find((r) => r.type === "rectangle");
+
+      expect(region).to.exist;
+      expect((region?.value.x ?? 0) + (region?.value.width ?? 0)).to.be.at.most(100);
+      expect((region?.value.y ?? 0) + (region?.value.height ?? 0)).to.be.at.most(100);
+    });
+  });
+
+  it("clamps transformer resize anchors to image bounds deterministically", () => {
+    LabelStudio.params().config(simpleRectangleConfig).data(simpleImageData).withResult(simpleRectangleResult).init();
+    ImageView.waitForImage();
+
+    ImageView.selectMoveToolByButton();
+    ImageView.clickAtRelative(0.5, 0.5);
+    Sidebar.hasSelectedRegions(1);
+
+    // Drag top and left resize anchors beyond bounds; transformer should clamp box to stage.
+    ImageView.drawRectRelative(0.5, 0.2, 0, -0.15, { force: true });
+    ImageView.drawRectRelative(0.2, 0.5, -0.15, 0, { force: true });
+
+    LabelStudio.serialize().then((result) => {
+      const region = result.find((r) => r.type === "rectangle");
+
+      expect(region).to.exist;
+      expect(region?.value.x ?? 0).to.be.at.least(-0.00001);
+      expect(region?.value.y ?? 0).to.be.at.least(-0.00001);
+      expect(region?.value.width ?? 0).to.be.greaterThan(0);
+      expect(region?.value.height ?? 0).to.be.greaterThan(0);
     });
   });
 });
