@@ -50,13 +50,13 @@ isProject: false
 
 **Gap to Phase 1 gate:** Lines need +5.6 pts to reach 60%. Do not move to Phase 2 until overall ≥ 60% and plan files at ≥ 85% (or out of scope).
 
-**Latest check:** Per-file state below was generated with `node web/libs/editor/scripts/coverage-cypress-per-file.js` (from `web/`). Re-run that after a full integration with `COLLECT_COVERAGE=true` to refresh.
+**Latest check:** Per-file state below uses the per-file workflow only (unit coverage + merge script). Do **not** run the full integration suite for per-file checks.
 
 ## Per-file coverage: Unit vs Cypress vs Merged (plan files only)
 
 **Remaining to achieve via Cypress:** The "Gap to 85%" is what’s left to close to hit the per-file target. Prefer **Cypress** for UI/flow-heavy code and **unit tests** for pure utils (e.g. `utils/utilities.ts`, `utils/data.js`, `configureStore.js`). Files already at or above 85% merged need no extra work.
 
-*To refresh: (1) Unit: from label-studio `web/`, `npx nx run editor:unit --coverage` → `web/coverage/coverage-final.json`. (2) Cypress: `COLLECT_COVERAGE=true yarn nx run editor:integration`, then in `web/libs/editor`: `npx nyc report --temp-dir=.nyc_output --reporter=json` → `coverage-final.json`. (3) From label-studio repo: `node web/libs/editor/scripts/coverage-unit-vs-cypress.js` to regenerate the table below.*
+**Per-file checks only (no full suite):** (1) Unit: from `web/`, `npx nx run editor:unit --codeCoverage=true` → `web/coverage/coverage-final.json`. (2) Merge: from `web/`, `node libs/editor/scripts/coverage-unit-vs-cypress.js` (Cypress uses existing `libs/editor/coverage-final.json` from CI or a separate run).
 
 
 | File                                                   | Unit % | Cypress % | Merged % | Gap to 85% |
@@ -68,9 +68,9 @@ isProject: false
 | `mixins/Normalization.ts`                              | 100%   | 33.3%     | 100%     | —          |
 | `components/BottomBar/HistoryActions.jsx`              | 0%     | 100%      | 100%     | —          |
 | `tools/Zoom.jsx`                                       | 80.5%  | 34.1%     | 90.2%    | —          |
-| `mixins/SelectedChoiceMixin.js`                        | 4%     | 40%       | 40%      | 45.0%      |
+| `mixins/SelectedChoiceMixin.js`                        | 100%   | 40%       | 100%     | —          |
 | `components/Toolbar/Toolbar.jsx`                       | 4.7%   | 55.8%     | 55.8%    | 29.2%      |
-| `utils/selection-tools.js`                             | 65.3%  | 30.2%     | 65.3%    | 19.7%      |
+| `utils/selection-tools.js`                             | 90.2%  | 30.2%     | 90.2%    | —          |
 | `regions/TimeSeriesRegion.js`                          | 0%     | 39%       | 39%      | 46.0%      |
 | `utils/image.js`                                       | 25.4%  | 63.2%     | 67.5%    | 17.5%      |
 | `components/SidePanels/DetailsPanel/RegionDetails.tsx` | 14.9%  | 68.1%     | 68.1%    | 16.9%      |
@@ -90,23 +90,23 @@ isProject: false
 Files that still need tests to reach 85% merged (or to get any Cypress coverage):
 
 
-| Priority | File                                                   | Gap   | Note                                                                                     |
-| -------- | ------------------------------------------------------ | ----- | ---------------------------------------------------------------------------------------- |
-| 1        | `mixins/Normalization.ts`                              | —     | Done (100% merged).                                                                      |
-| 2        | `tools/Zoom.jsx`                                       | —     | Done (90.2% merged).                                                                     |
-| 3        | `utils/selection-tools.js`                             | 19.7% | Unit 65.3%; Cypress word-granularity test added; run Cypress+coverage to refresh merged. |
-| 4        | `mixins/SelectedChoiceMixin.js`                        | 45%   | Choice/taxonomy Cypress                                                                  |
-| 5        | `regions/TimeSeriesRegion.js`                          | 46%   | Timeseries Cypress                                                                       |
-| 6        | `components/Toolbar/Toolbar.jsx`                       | 29.2% | Toolbar Cypress                                                                          |
-| 7        | `mixins/Regions.js`                                    | 22.7% | Region-heavy Cypress                                                                     |
-| 8        | `tags/object/Paragraphs/AuthorFilter.jsx`              | 21%   | Paragraphs/author filter Cypress                                                         |
-| 9        | `utils/canvas.js`                                      | 19.3% | Canvas/drawing Cypress                                                                   |
-| 10       | `utils/image.js`                                       | 17.5% | Image utils Cypress                                                                      |
-| 11       | `components/SidePanels/DetailsPanel/RegionDetails.tsx` | 16.9% | Region details panel Cypress                                                             |
-| 12       | `tags/control/Polygon.js`                              | 14.4% | Polygon tool Cypress                                                                     |
-| 13       | `tags/object/PagedView.jsx`                            | 2.6%  | Near target; small Cypress bump                                                          |
-| 14       | `utils/data.js`                                        | 5.8%  | Prefer unit tests                                                                        |
-| 15       | `utils/utilities.ts`                                   | 1.5%  | Near target; prefer unit                                                                 |
+| Priority | File                                                   | Gap   | Note                                                                                                                                                                      |
+| -------- | ------------------------------------------------------ | ----- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1        | `mixins/Normalization.ts`                              | —     | Done (100% merged).                                                                                                                                                       |
+| 2        | `tools/Zoom.jsx`                                       | —     | Done (90.2% merged).                                                                                                                                                      |
+| 3        | `utils/selection-tools.js`                             | —     | Done (90.2% merged). Unit tests: trimSelection (mock Selection), applyTextGranularity word/sentence/paragraph (mock with modify move), captureSelection word granularity. |
+| 4        | `mixins/SelectedChoiceMixin.js`                        | —     | Done (100% merged). Unit tests for findSelectedChoice, selectedChoicesMatch, hasChoiceSelectionSimple, hasChoiceSelection.                                                |
+| 5        | `regions/TimeSeriesRegion.js`                          | 46%   | Timeseries Cypress                                                                                                                                                        |
+| 6        | `components/Toolbar/Toolbar.jsx`                       | 29.2% | Toolbar Cypress                                                                                                                                                           |
+| 7        | `mixins/Regions.js`                                    | 22.7% | Region-heavy Cypress                                                                                                                                                      |
+| 8        | `tags/object/Paragraphs/AuthorFilter.jsx`              | 21%   | Paragraphs/author filter Cypress                                                                                                                                          |
+| 9        | `utils/canvas.js`                                      | 19.3% | Canvas/drawing Cypress                                                                                                                                                    |
+| 10       | `utils/image.js`                                       | 17.5% | Image utils Cypress                                                                                                                                                       |
+| 11       | `components/SidePanels/DetailsPanel/RegionDetails.tsx` | 16.9% | Region details panel Cypress                                                                                                                                              |
+| 12       | `tags/control/Polygon.js`                              | 14.4% | Polygon tool Cypress                                                                                                                                                      |
+| 13       | `tags/object/PagedView.jsx`                            | 2.6%  | Near target; small Cypress bump                                                                                                                                           |
+| 14       | `utils/data.js`                                        | 5.8%  | Prefer unit tests                                                                                                                                                         |
+| 15       | `utils/utilities.ts`                                   | 1.5%  | Near target; prefer unit                                                                                                                                                  |
 
 
 **Already at or above 85% (no action):** Rotate.jsx, TreeValidation.jsx, HistoryActions.jsx, UserStore.js, messages.jsx, configureStore.js, env/production.js, **Normalization.ts**, **Zoom.jsx**.
