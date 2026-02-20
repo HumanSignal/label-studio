@@ -214,14 +214,24 @@ const _Tool = types
         if (!currentArea || !currentArea.closable) return;
 
         disposers.push(
-          observe(currentArea, "closed", () => {
-            if (self.getCurrentArea()?.closed) self.finishDrawing();
-          }, true),
+          observe(
+            currentArea,
+            "closed",
+            () => {
+              if (self.getCurrentArea()?.closed) self.finishDrawing();
+            },
+            true,
+          ),
         );
         disposers.push(
-          observe(currentArea, "finished", () => {
-            if (self.getCurrentArea()?.finished) self.finishDrawing();
-          }, true),
+          observe(
+            currentArea,
+            "finished",
+            () => {
+              if (self.getCurrentArea()?.finished) self.finishDrawing();
+            },
+            true,
+          ),
         );
       },
 
