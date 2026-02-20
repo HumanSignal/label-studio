@@ -7,8 +7,6 @@ import { modal } from "../../Modal/Modal";
 import { TaskSourceViewer } from "../../TaskSourceViewer";
 // @ts-expect-error - utils is JS module
 import { getProperty } from "../utils";
-// @ts-expect-error - feature-flags is JS module
-import { FF_LOPS_E_3, isFF } from "../../../../utils/feature-flags";
 
 export interface RowContextMenuProps {
   /** Task data object */
@@ -171,9 +169,6 @@ export const RowContextMenu: FC<RowContextMenuProps> = ({
     const taskId = taskData.id;
 
     const onTaskLoad = async (options: any = {}) => {
-      if (isFF(FF_LOPS_E_3) && sdkType === "DE") {
-        return new Promise((resolve) => resolve(taskData));
-      }
       const response = await api.task({
         taskID: taskId,
         resolve_uri: options.resolveUri ?? false,
