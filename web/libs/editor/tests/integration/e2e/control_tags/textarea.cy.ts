@@ -500,4 +500,30 @@ describe("Control Tags - TextArea - Duplicate prevention", () => {
       expect(result).to.have.length(0);
     });
   });
+
+  it("covers deterministic TextArea model serialization and sync utility actions", () => {
+    LabelStudio.params().config(textareaConfigSimple).data(simpleData).withResult([]).init();
+
+    Textarea.type("Alpha{enter}");
+    Textarea.hasValue("Alpha");
+
+    cy.window().then((win) => {
+      const model = win.Htx.annotationStore.selected.names.get("desc");
+      const serializable = model.getSerializableValue();
+
+      expect(serializable.text).to.deep.equal(["Alpha"]);
+
+      model.setValue("Beta");
+      model.beforeSend();
+      expect(model.result.mainValue.toJSON()).to.deep.equal(["Alpha", "Beta"]);
+
+      model.needsUpdate();
+      expect(model.regions).to.have.length(2);
+    });
+
+    LabelStudio.serialize().then((result) => {
+      expect(result).to.have.length(1);
+      expect(result[0].value.text).to.deep.equal(["Alpha", "Beta"]);
+    });
+  });
 });
