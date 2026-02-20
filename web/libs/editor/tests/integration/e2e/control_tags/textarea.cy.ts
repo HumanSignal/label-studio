@@ -432,4 +432,49 @@ describe("Control Tags - TextArea - Duplicate prevention", () => {
 
     Textarea.input.should("have.value", "Base + Shortcut");
   });
+
+  it("handles shortcut fallback paths deterministically for single-line and multi-line textarea", () => {
+    LabelStudio.params().config(textareaConfigSimple).data(simpleData).withResult([]).init();
+
+    cy.window().then((win) => {
+      const model = win.Htx.annotationStore.selected.names.get("desc");
+
+      model.setLastFocusedElement(null);
+      model.onShortcut("Single");
+      model.onShortcut(" line");
+      model.returnFocus();
+    });
+
+    Textarea.input.should("have.value", "Single line");
+
+    LabelStudio.params().config(textareaConfigWithRowsAndMaxSubmissions).data(simpleData).withResult([]).init();
+
+    cy.window().then((win) => {
+      const model = win.Htx.annotationStore.selected.names.get("desc");
+
+      model.setLastFocusedElement(null);
+      model.onShortcut("Multi");
+      model.onShortcut(" line");
+    });
+
+    Textarea.input.should("have.value", "Multi line");
+  });
+
+  it("keeps shortcut and remove guards deterministic for unavailable elements and missing regions", () => {
+    LabelStudio.params().config(textareaConfigSimple).data(simpleData).withResult([]).init();
+
+    Textarea.input.type("Keep this text");
+    Textarea.input.should("have.value", "Keep this text");
+
+    cy.window().then((win) => {
+      const model = win.Htx.annotationStore.selected.names.get("desc");
+      const detached = document.createElement("textarea");
+
+      model.setLastFocusedElement(detached);
+      model.onShortcut(" ignored");
+      model.remove({ pid: "missing-region" });
+    });
+
+    Textarea.input.should("have.value", "Keep this text ignored");
+  });
 });
