@@ -116,6 +116,27 @@ describe("Control Tags - Taxonomy", () => {
     });
   });
 
+  it("deterministically toggles static taxonomy selection on and off", () => {
+    LabelStudio.params().config(taxonomyConfig).data(simpleData).withResult([]).init();
+
+    Taxonomy.open();
+    Taxonomy.clickItem("Choice 2");
+    Taxonomy.close();
+
+    LabelStudio.serialize().then((result) => {
+      expect(result).to.have.length(1);
+      expect(result[0].value.taxonomy).to.deep.equal([["C2"]]);
+    });
+
+    Taxonomy.open();
+    Taxonomy.clickItem("Choice 2");
+    Taxonomy.close();
+
+    LabelStudio.serialize().then((result) => {
+      expect(result).to.have.length(0);
+    });
+  });
+
   it("supports legacy taxonomy nested selection and search deterministically", () => {
     const legacyTaxonomy = useTaxonomy("&:eq(0)", true);
 
