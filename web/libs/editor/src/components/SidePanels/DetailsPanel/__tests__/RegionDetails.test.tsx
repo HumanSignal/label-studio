@@ -95,12 +95,7 @@ describe("RegionDetails", () => {
       const cancelEditMode = jest.fn();
       const region = { meta: { text: "Meta" }, setMetaText };
       const { container } = render(
-        <RegionDetailsMeta
-          region={region}
-          editMode={true}
-          cancelEditMode={cancelEditMode}
-          enterEditMode={jest.fn()}
-        />,
+        <RegionDetailsMeta region={region} editMode={true} cancelEditMode={cancelEditMode} enterEditMode={jest.fn()} />,
       );
       const textarea = container.querySelector("textarea");
       fireEvent.blur(textarea as HTMLTextAreaElement);
@@ -113,12 +108,7 @@ describe("RegionDetails", () => {
       const cancelEditMode = jest.fn();
       const region = { meta: { text: "Meta" }, setMetaText };
       const { container } = render(
-        <RegionDetailsMeta
-          region={region}
-          editMode={true}
-          cancelEditMode={cancelEditMode}
-          enterEditMode={jest.fn()}
-        />,
+        <RegionDetailsMeta region={region} editMode={true} cancelEditMode={cancelEditMode} enterEditMode={jest.fn()} />,
       );
       const textarea = container.querySelector("textarea");
       fireEvent.keyDown(textarea as HTMLTextAreaElement, { key: "Enter", shiftKey: false });

@@ -166,8 +166,7 @@ describe("Image Segmentation Stage Interactions", () => {
   describe("Rotate and Zoom toolbar (Codecov: tools/Rotate.jsx, tools/Zoom.jsx)", () => {
     it("should rotate image left and right via toolbar buttons", () => {
       LabelStudio.params().config(imageToolsConfigWithRotate).data(imageData).withResult([]).init();
-      LabelStudio.waitForObjectsReady();
-      ImageView.waitForImage();
+      LabelStudio.waitForImageReady();
 
       ImageView.rotateLeft();
       ImageView.rotateRight();
@@ -179,8 +178,7 @@ describe("Image Segmentation Stage Interactions", () => {
 
     it("should rotate image via keyboard shortcuts (alt+ArrowLeft, alt+ArrowRight)", () => {
       LabelStudio.params().config(imageToolsConfigWithRotate).data(imageData).withResult([]).init();
-      LabelStudio.waitForObjectsReady();
-      ImageView.waitForImage();
+      LabelStudio.waitForImageReady();
 
       cy.get("body").focus().trigger("keydown", { key: "ArrowLeft", altKey: true });
       cy.get("body").focus().trigger("keydown", { key: "ArrowRight", altKey: true });
@@ -189,8 +187,7 @@ describe("Image Segmentation Stage Interactions", () => {
 
     it("should allow drawing after rotate", () => {
       LabelStudio.params().config(imageToolsConfigWithRotate).data(imageData).withResult([]).init();
-      LabelStudio.waitForObjectsReady();
-      ImageView.waitForImage();
+      LabelStudio.waitForImageReady();
 
       ImageView.rotateRight();
       ImageView.selectRectangleToolByButton();
@@ -200,8 +197,7 @@ describe("Image Segmentation Stage Interactions", () => {
 
     it("should zoom in and out via toolbar buttons", () => {
       LabelStudio.params().config(imageToolsConfig).data(imageData).withResult([]).init();
-      LabelStudio.waitForObjectsReady();
-      ImageView.waitForImage();
+      LabelStudio.waitForImageReady();
 
       ImageView.zoomInByButton();
       ImageView.zoomInByButton();
@@ -211,8 +207,7 @@ describe("Image Segmentation Stage Interactions", () => {
 
     it("should zoom to fit and zoom to actual size via flyout (Codecov: Zoom.jsx FlyoutMenu)", () => {
       LabelStudio.params().config(imageToolsConfig).data(imageData).withResult([]).init();
-      LabelStudio.waitForObjectsReady();
-      ImageView.waitForImage();
+      LabelStudio.waitForImageReady();
 
       ImageView.toolBar.find('[title="Zoom presets (click to see options)"]').click();
       cy.contains("Zoom to fit").click();
@@ -225,8 +220,7 @@ describe("Image Segmentation Stage Interactions", () => {
 
     it("should toggle pan tool (Codecov: Zoom.jsx Pan Tool)", () => {
       LabelStudio.params().config(imageToolsConfig).data(imageData).withResult([]).init();
-      LabelStudio.waitForObjectsReady();
-      ImageView.waitForImage();
+      LabelStudio.waitForImageReady();
 
       ImageView.toolBar.find('[aria-label="pan"]').should("be.visible").click();
       ImageView.toolBar.find('[aria-label="pan"]').should("have.class", "lsf-tool_active");
@@ -236,8 +230,7 @@ describe("Image Segmentation Stage Interactions", () => {
 
     it("should pan the stage when pan tool is active and user drags (Codecov: Zoom.jsx handleDrag, mousemoveEv, mousedownEv, mouseupEv)", () => {
       LabelStudio.params().config(imageToolsConfig).data(imageData).withResult([]).init();
-      LabelStudio.waitForObjectsReady();
-      ImageView.waitForImage();
+      LabelStudio.waitForImageReady();
 
       ImageView.zoomInByButton();
       ImageView.zoomInByButton();

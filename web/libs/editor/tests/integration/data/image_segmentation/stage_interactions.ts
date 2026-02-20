@@ -17,7 +17,8 @@ export const imageToolsConfigWithRotate = `<View>
     <Brush name="brush" toName="image" />
 </View>`;
 
+import { IMAGE_URL_SAMPLE } from "../shared-assets";
+
 export const imageData = {
-  image:
-    "https://htx-pub.s3.us-east-1.amazonaws.com/examples/images/nick-owuor-astro-nic-visuals-wDifg5xc9Z4-unsplash.jpg",
+  image: IMAGE_URL_SAMPLE,
 };

@@ -59,10 +59,14 @@ jobs:
           path: ${{ env.FRONTEND_MONOREPO_DIR }}/dist/libs/editor
 
   cypress:
-    name: "Cypress"
+    name: "Cypress (${{ matrix.chunk }})"
     needs: build-editor
     runs-on: ubuntu-latest
     timeout-minutes: 25
+    strategy:
+      fail-fast: false
+      matrix:
+        chunk: [core, image_segmentation, rest]
     steps:
       - uses: hmarr/debug-action@v3.0.0
 
@@ -141,28 +145,77 @@ jobs:
             echo "Root and CSS are served correctly."
           fi
 
-      - name: Run Cypress
+      - name: Run Cypress (chunk ${{ matrix.chunk }})
         working-directory: ${{ env.FRONTEND_MONOREPO_DIR }}
-        run: COLLECT_COVERAGE=1 npx nx run editor:integration
+        run: |
+          if [ "${{ matrix.chunk }}" = "core" ]; then
+            SPEC="libs/editor/tests/integration/e2e/core/**/*.cy.ts"
+          elif [ "${{ matrix.chunk }}" = "image_segmentation" ]; then
+            SPEC="libs/editor/tests/integration/e2e/image_segmentation/**/*.cy.ts"
+          else
+            SPEC="libs/editor/tests/integration/e2e/control_tags/**/*.cy.ts,libs/editor/tests/integration/e2e/audio/**/*.cy.ts,libs/editor/tests/integration/e2e/video/**/*.cy.ts,libs/editor/tests/integration/e2e/timeseries/**/*.cy.ts,libs/editor/tests/integration/e2e/sync/**/*.cy.ts,libs/editor/tests/integration/e2e/relations/**/*.cy.ts,libs/editor/tests/integration/e2e/outliner/**/*.cy.ts,libs/editor/tests/integration/e2e/view_all/**/*.cy.ts,libs/editor/tests/integration/e2e/config/**/*.cy.ts,libs/editor/tests/integration/e2e/linking_modes/**/*.cy.ts,libs/editor/tests/integration/e2e/bulk_mode/**/*.cy.ts,libs/editor/tests/integration/e2e/ner/**/*.cy.ts,libs/editor/tests/integration/e2e/table/**/*.cy.ts,libs/editor/tests/integration/e2e/visual_tags/**/*.cy.ts,libs/editor/tests/integration/e2e/labels/**/*.cy.ts,libs/editor/tests/integration/e2e/drafts/**/*.cy.ts"
+          fi
+          COLLECT_COVERAGE=1 npx nx run editor:integration -- --spec "$SPEC"
 
-      - name: Upload coverage
+      - name: Upload coverage chunk
+        if: always()
+        working-directory: ${{ env.FRONTEND_MONOREPO_DIR }}
+        run: |
+          mkdir -p coverage-chunks
+          cp libs/editor/.nyc_output/out.json coverage-chunks/${{ matrix.chunk }}.json 2>/dev/null || touch coverage-chunks/${{ matrix.chunk }}.json
+      - name: Upload coverage artifact
         uses: actions/upload-artifact@v6
         if: always()
         with:
-          name: cypress-coverage
-          path: ${{ env.FRONTEND_MONOREPO_DIR }}/libs/editor/coverage
+          name: cypress-coverage-${{ matrix.chunk }}
+          path: ${{ env.FRONTEND_MONOREPO_DIR }}/coverage-chunks/${{ matrix.chunk }}.json
 
       - name: Upload test results and screenshots
         uses: actions/upload-artifact@v6
         if: always()
         with:
-          name: cypress-output
+          name: cypress-output-${{ matrix.chunk }}
           path: |
             ${{ env.FRONTEND_MONOREPO_DIR }}/dist/cypress/libs/frontend-test/src/screenshots
             ${{ env.FRONTEND_MONOREPO_DIR }}/dist/cypress/libs/frontend-test/src/videos
 
+      - name: Kill server
+        if: always()
+        continue-on-error: true
+        run: kill -9 "${{ steps.run-server.outputs.pid }}" 2>/dev/null || true
+
+  merge-coverage:
+    name: "Merge coverage and upload to Codecov"
+    needs: cypress
+    runs-on: ubuntu-latest
+    if: always() && needs.cypress.result != 'failure'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ inputs.head_sha }}
+
+      - name: Setup frontend environment
+        uses: ./.github/actions/setup-frontend-environment
+        with:
+          node-version: "${{ env.NODE }}"
+          directory: "${{ env.FRONTEND_MONOREPO_DIR }}"
+
+      - name: Download all coverage chunks
+        uses: actions/download-artifact@v6
+        with:
+          pattern: cypress-coverage-*
+          path: ${{ env.FRONTEND_MONOREPO_DIR }}
+          merge-multiple: true
+
+      - name: Merge coverage
+        working-directory: ${{ env.FRONTEND_MONOREPO_DIR }}
+        run: |
+          mkdir -p libs/editor/.nyc_output
+          node scripts/merge-cypress-coverage.js --chunks-dir coverage-chunks --out libs/editor/.nyc_output/out.json
+
       - name: Upload coverage to Codecov
-        if: ${{ always() && github.event.pull_request.head.repo.fork == false && github.event.pull_request.user.login != 'dependabot[bot]' }}
+        if: github.event.pull_request.head.repo.fork == false && github.event.pull_request.user.login != 'dependabot[bot]'
         uses: codecov/codecov-action@v5
         with:
           name: lsf-integration
@@ -171,9 +224,4 @@ jobs:
           token: ${{ secrets.CODECOV_TOKEN }}
           verbose: true
           fail_ci_if_error: false
-
-      - name: Kill server
-        if: always()
-        continue-on-error: true
-        run: kill -9 "${{ steps.run-server.outputs.pid }}" 2>/dev/null || true
 

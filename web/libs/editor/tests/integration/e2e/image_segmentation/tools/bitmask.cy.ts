@@ -4,8 +4,7 @@ import { bitmaskConfig, bitmaskImageData } from "../../../data/image_segmentatio
 describe("Image segmentation - Tools - Bitmask", () => {
   it("creates a bitmask region with serializable pixel payload", () => {
     LabelStudio.params().config(bitmaskConfig).data(bitmaskImageData).withResult([]).init();
-    LabelStudio.waitForObjectsReady();
-    ImageView.waitForImage();
+    LabelStudio.waitForImageReady();
 
     ImageView.selectBitmaskToolByButton();
     Labels.select("Test");
@@ -26,8 +25,7 @@ describe("Image segmentation - Tools - Bitmask", () => {
 
   it("supports erasing part of a bitmask without creating a second region", () => {
     LabelStudio.params().config(bitmaskConfig).data(bitmaskImageData).withResult([]).init();
-    LabelStudio.waitForObjectsReady();
-    ImageView.waitForImage();
+    LabelStudio.waitForImageReady();
 
     ImageView.selectBitmaskToolByButton();
     Labels.select("Test");
@@ -52,8 +50,7 @@ describe("Image segmentation - Tools - Bitmask", () => {
 
   it("adds multiple bitmask strokes into a single region deterministically", () => {
     LabelStudio.params().config(bitmaskConfig).data(bitmaskImageData).withResult([]).init();
-    LabelStudio.waitForObjectsReady();
-    ImageView.waitForImage();
+    LabelStudio.waitForImageReady();
 
     ImageView.selectBitmaskToolByButton();
     Labels.select("Test");
@@ -78,8 +75,7 @@ describe("Image segmentation - Tools - Bitmask", () => {
 
   it("applies bitmask size shortcuts while keeping deterministic single-region behavior", () => {
     LabelStudio.params().config(bitmaskConfig).data(bitmaskImageData).withResult([]).init();
-    LabelStudio.waitForObjectsReady();
-    ImageView.waitForImage();
+    LabelStudio.waitForImageReady();
 
     ImageView.selectBitmaskToolByButton();
     Labels.select("Test");
@@ -108,8 +104,7 @@ describe("Image segmentation - Tools - Bitmask", () => {
 
   it("keeps bitmask tool active when clicking an already active tool button", () => {
     LabelStudio.params().config(bitmaskConfig).data(bitmaskImageData).withResult([]).init();
-    LabelStudio.waitForObjectsReady();
-    ImageView.waitForImage();
+    LabelStudio.waitForImageReady();
 
     ImageView.selectBitmaskToolByButton();
     ImageView.toolBar.find('[aria-label="bitmask-tool"]').click().should("have.class", "lsf-tool_active");
@@ -122,8 +117,7 @@ describe("Image segmentation - Tools - Bitmask", () => {
   describe("Eraser tool (Codecov: tools/Erase.jsx)", () => {
     it("selects eraser and shows active state", () => {
       LabelStudio.params().config(bitmaskConfig).data(bitmaskImageData).withResult([]).init();
-      LabelStudio.waitForObjectsReady();
-      ImageView.waitForImage();
+      LabelStudio.waitForImageReady();
 
       ImageView.selectBitmaskToolByButton();
       Labels.select("Test");
@@ -136,8 +130,7 @@ describe("Image segmentation - Tools - Bitmask", () => {
 
     it("eraser size shortcuts then erase modifies region", () => {
       LabelStudio.params().config(bitmaskConfig).data(bitmaskImageData).withResult([]).init();
-      LabelStudio.waitForObjectsReady();
-      ImageView.waitForImage();
+      LabelStudio.waitForImageReady();
 
       ImageView.selectBitmaskToolByButton();
       Labels.select("Test");

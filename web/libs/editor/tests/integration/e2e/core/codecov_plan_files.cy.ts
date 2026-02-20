@@ -9,8 +9,7 @@ import { singleChannelConfig, heavyDatasetForDisplacement } from "../../data/tim
 describe("Codecov: Toolbar.jsx", () => {
   it("toolbar renders and tool switches run when switching rectangle, polygon, brush", () => {
     LabelStudio.params().config(imageToolsConfig).data(imageData).withResult([]).init();
-    LabelStudio.waitForObjectsReady();
-    ImageView.waitForImage();
+    LabelStudio.waitForImageReady();
 
     ImageView.selectRectangleToolByButton();
     ImageView.selectPolygonToolByButton();
@@ -28,8 +27,7 @@ describe("Codecov: Toolbar.jsx", () => {
 describe("Codecov: Polygon.js", () => {
   it("draws polygon and exercises Polygon model/hotkeys", () => {
     LabelStudio.params().config(imageToolsConfig).data(imageData).withResult([]).init();
-    LabelStudio.waitForObjectsReady();
-    ImageView.waitForImage();
+    LabelStudio.waitForImageReady();
 
     ImageView.selectPolygonToolByButton();
     ImageView.drawPolygonRelative(
@@ -53,8 +51,7 @@ describe("Codecov: Polygon.js", () => {
 describe("Codecov: canvas.js (brush)", () => {
   it("brush tool selected and draw exercises canvas labelToSVG / brush path", () => {
     LabelStudio.params().config(imageToolsConfig).data(imageData).withResult([]).init();
-    LabelStudio.waitForObjectsReady();
-    ImageView.waitForImage();
+    LabelStudio.waitForImageReady();
 
     ImageView.selectBrushToolByButton();
     ImageView.drawRectRelative(0.3, 0.3, 0.1, 0.1);

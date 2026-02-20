@@ -13,8 +13,7 @@ describe("Image segmentation - Tools - MagicWand", () => {
 
   it("creates a labeled magic-wand region and serializes mask payload", () => {
     LabelStudio.params().config(magicWandConfig).data(magicWandData).withResult([]).init();
-    LabelStudio.waitForObjectsReady();
-    ImageView.waitForImage();
+    LabelStudio.waitForImageReady();
 
     selectMagicWandTool();
     Labels.select("Cloud");
@@ -36,8 +35,7 @@ describe("Image segmentation - Tools - MagicWand", () => {
 
   it("supports undo and redo after magic-wand region creation", () => {
     LabelStudio.params().config(magicWandConfig).data(magicWandData).withResult([]).init();
-    LabelStudio.waitForObjectsReady();
-    ImageView.waitForImage();
+    LabelStudio.waitForImageReady();
 
     selectMagicWandTool();
     Labels.select("Cloud");
@@ -53,8 +51,7 @@ describe("Image segmentation - Tools - MagicWand", () => {
 
   it("keeps magic-wand tool stable when clicking already active tool button", () => {
     LabelStudio.params().config(magicWandConfig).data(magicWandData).withResult([]).init();
-    LabelStudio.waitForObjectsReady();
-    ImageView.waitForImage();
+    LabelStudio.waitForImageReady();
 
     selectMagicWandTool();
     ImageView.toolBar.find('[aria-label="magicwand"]').click().should("have.class", "lsf-tool_active");
@@ -73,8 +70,7 @@ describe("Image segmentation - Tools - MagicWand", () => {
 
   it("supports multi-label magic-wand workflow with zoom and region relabeling", () => {
     LabelStudio.params().config(magicWandConfig).data(magicWandData).withResult([]).init();
-    LabelStudio.waitForObjectsReady();
-    ImageView.waitForImage();
+    LabelStudio.waitForImageReady();
 
     selectMagicWandTool();
     Labels.select("Cloud");
@@ -105,8 +101,7 @@ describe("Image segmentation - Tools - MagicWand", () => {
 
   it("creates a fresh magic-wand region after undo without stale cache reuse", () => {
     LabelStudio.params().config(magicWandConfig).data(magicWandData).withResult([]).init();
-    LabelStudio.waitForObjectsReady();
-    ImageView.waitForImage();
+    LabelStudio.waitForImageReady();
 
     selectMagicWandTool();
     Labels.select("Cloud");
@@ -133,8 +128,7 @@ describe("Image segmentation - Tools - MagicWand", () => {
 
   it("supports drag-threshold magic-wand drawing deterministically", () => {
     LabelStudio.params().config(magicWandConfig).data(magicWandData).withResult([]).init();
-    LabelStudio.waitForObjectsReady();
-    ImageView.waitForImage();
+    LabelStudio.waitForImageReady();
 
     selectMagicWandTool();
     Labels.select("Cloud");
@@ -151,8 +145,7 @@ describe("Image segmentation - Tools - MagicWand", () => {
 
   it("supports mostly-vertical drag-threshold adjustments deterministically", () => {
     LabelStudio.params().config(magicWandConfig).data(magicWandData).withResult([]).init();
-    LabelStudio.waitForObjectsReady();
-    ImageView.waitForImage();
+    LabelStudio.waitForImageReady();
 
     selectMagicWandTool();
     Labels.select("Cloud");
@@ -171,8 +164,7 @@ describe("Image segmentation - Tools - MagicWand", () => {
 
   it("creates stable magic-wand results after zooming out", () => {
     LabelStudio.params().config(magicWandConfig).data(magicWandData).withResult([]).init();
-    LabelStudio.waitForObjectsReady();
-    ImageView.waitForImage();
+    LabelStudio.waitForImageReady();
 
     cy.get('button[aria-label="zoom-out"]').click().click().click();
     selectMagicWandTool();
