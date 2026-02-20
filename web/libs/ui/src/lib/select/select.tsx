@@ -16,7 +16,7 @@ import { isDefined } from "@humansignal/core/lib/utils/helpers";
 import { IconChevron, IconChevronDown } from "@humansignal/icons";
 import clsx from "clsx";
 import styles from "./select.module.scss";
-import { cnm } from "../../utils/utils";
+import { cn, cnm } from "../../utils/utils";
 import { VariableSizeList } from "react-window";
 import InfiniteLoader from "react-window-infinite-loader";
 
@@ -88,19 +88,15 @@ const SelectedItemsGroup = ({
         style={{ cursor: hasNoItems ? "default" : "pointer" }}
       >
         {/* Caret icon */}
-        {expanded ? (
-          <IconChevron
-            className={styles.selectedItemsCaret}
-            aria-hidden="true"
-            style={{ opacity: hasNoItems ? 0.3 : 1 }}
-          />
-        ) : (
-          <IconChevronDown
-            className={styles.selectedItemsCaret}
-            aria-hidden="true"
-            style={{ opacity: hasNoItems ? 0.3 : 1 }}
-          />
-        )}
+        <IconChevronDown
+          className={cn(
+            styles.selectedItemsCaret,
+            "transition-transform ease-out duration-200",
+            !expanded && "-rotate-90",
+          )}
+          aria-hidden="true"
+          style={{ opacity: hasNoItems ? 0.3 : 1 }}
+        />
 
         {/* Deselect all checkbox */}
         <Checkbox

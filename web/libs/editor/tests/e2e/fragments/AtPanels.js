@@ -7,20 +7,26 @@ const { I } = inject();
  */
 class Panel {
   container = ".lsf-sidepanels";
-  root = ".lsf-panel";
-  detached = ".lsf-panel_detached";
-  aligmentLeft = ".lsf-panel_alignment_left";
-  aligmentRight = ".lsf-panel_alignment_right";
+  root = ".lsf-panel, .lsf-tabs-panel";
+  detached = ".lsf-panel_detached, .lsf-tabs-panel_detached";
+  aligmentLeft = ".lsf-panel_alignment_left, .lsf-tabs-panel_alignment_left";
+  aligmentRight = ".lsf-panel_alignment_right, .lsf-tabs-panel_alignment_right";
   header = ".lsf-panel__header";
+  tabsHeader = ".lsf-tabs-panel__header";
   body = ".lsf-panel__body";
+  tabsBody = ".lsf-tabs-panel__body";
   title = ".lsf-panel__title";
 
   leftZone = ".lsf-sidepanels__wrapper_align_left";
   rightZone = ".lsf-sidepanels__wrapper_align_right";
 
-  collapsingToggle = ".lsf-panel__toggle";
-  collapseButton = `${this.collapsingToggle}[data-tooltip*="Collapse"]`;
-  expandButton = `${this.collapsingToggle}[data-tooltip*="Expand"]`;
+  collapsingToggle = '[class*="__toggle"]';
+  collapseButton = '[class*="__toggle"][data-tooltip*="Collapse"]';
+  expandButton = '[class*="__toggle"][data-tooltip*="Expand"]';
+  collapseGroupButton = '[class*="__toggle"][data-tooltip*="Collapse Group"]';
+  expandGroupButton = '[class*="__toggle"][data-tooltip*="Expand Group"]';
+  tabsRightCollapseButton = '.lsf-tabs-panel_alignment_right [data-tooltip="Collapse"]';
+  tabsRightExpandButton = '.lsf-tabs-panel_alignment_right [data-tooltip="Expand"]';
 
   resizeTopLeft = '[data-resize="top-left"]';
   resizeTopRight = '[data-resize="top-right"]';
@@ -32,10 +38,37 @@ class Panel {
   resizeRight = '[data-resize="right"]';
 
   constructor(selector) {
-    this.root = selector ? `${this.root}${selector}` : this.root;
+    this.selector = selector;
+  }
+  panelIdBySelector() {
+    if (this.selector === ".lsf-outliner") return "regions-relations";
+    if (this.selector === ".lsf-details") return "info-history";
+    return null;
+  }
+  panelSelectors() {
+    const panelId = this.panelIdBySelector();
+    const legacy = this.selector ? `.lsf-panel${this.selector}` : ".lsf-panel";
+    const tabs = panelId ? `.lsf-tabs-panel:has(.lsf-tabs-panel__header#${panelId})` : ".lsf-tabs-panel";
+
+    return { legacy, tabs };
+  }
+  toggleSelectors() {
+    const { legacy, tabs } = this.panelSelectors();
+
+    return {
+      collapse: `${legacy} ${this.collapseButton}, ${tabs} ${this.collapseButton}, ${tabs} ${this.collapseGroupButton}, ${this.tabsRightCollapseButton}`,
+      expand: `${legacy} ${this.expandButton}, ${tabs} ${this.expandButton}, ${tabs} ${this.expandGroupButton}, ${this.tabsRightExpandButton}`,
+    };
+  }
+  scopedSelector(legacySelector, tabsSelector = legacySelector) {
+    const { legacy, tabs } = this.panelSelectors();
+
+    return `${legacy} ${legacySelector}, ${tabs} ${tabsSelector}`;
   }
   locatePanel(stateSelector = "") {
-    return locate(this.root + stateSelector);
+    const { legacy, tabs } = this.panelSelectors();
+
+    return locate(`${legacy}${stateSelector}, ${tabs}${stateSelector}`);
   }
   locate(locator) {
     return locator ? locate(locator).inside(this.locatePanel()) : this.locatePanel();
@@ -44,42 +77,168 @@ class Panel {
     I.seeElement(this.locatePanel());
   }
   seePanelAttachedLeft() {
-    I.seeElement(this.locatePanel(`${this.aligmentLeft}:not(${this.detached})`).inside(this.leftZone));
+    const { legacy, tabs } = this.panelSelectors();
+
+    I.seeElement(
+      `${this.leftZone} ${legacy}.lsf-panel_alignment_left:not(.lsf-panel_detached), ${this.leftZone} ${tabs}.lsf-tabs-panel_alignment_left:not(.lsf-tabs-panel_detached)`,
+    );
   }
   seePanelAttachedRight() {
-    I.seeElement(this.locatePanel(`${this.aligmentRight}:not(${this.detached})`).inside(this.rightZone));
+    const { legacy, tabs } = this.panelSelectors();
+
+    I.seeElement(
+      `${this.rightZone} ${legacy}.lsf-panel_alignment_right:not(.lsf-panel_detached), ${this.rightZone} ${tabs}.lsf-tabs-panel_alignment_right:not(.lsf-tabs-panel_detached)`,
+    );
   }
   seePanelDetached() {
-    I.seeElement(this.locatePanel(this.detached));
+    const { legacy, tabs } = this.panelSelectors();
+
+    I.seeElement(`${legacy}.lsf-panel_detached, ${tabs}.lsf-tabs-panel_detached`);
   }
   seePanelBody() {
-    I.seeElement(this.locate(this.body));
+    I.seeElement(this.scopedSelector(this.body, this.tabsBody));
   }
   dontSeePanelBody() {
-    I.dontSeeElement(this.locate(this.body));
+    I.dontSeeElement(this.scopedSelector(this.body, this.tabsBody));
   }
   collapsePanel() {
-    I.click(this.locate(this.collapsingToggle));
+    const panelId = this.panelIdBySelector();
+    const { legacy } = this.panelSelectors();
+
+    I.executeScript(
+      ({ legacySelector, panelId, collapseSelector, collapseGroupSelector }) => {
+        const tabsHeader = panelId ? document.getElementById(panelId) : null;
+        const tabsRoot = tabsHeader?.closest(".lsf-tabs-panel");
+        const scopedRightCollapseButton = tabsRoot?.matches(".lsf-tabs-panel_alignment_right")
+          ? tabsRoot.querySelector('[data-tooltip="Collapse"]')
+          : null;
+
+        if (scopedRightCollapseButton) {
+          scopedRightCollapseButton.click();
+          return;
+        }
+
+        const roots = [];
+        const legacyRoot = document.querySelector(legacySelector);
+
+        if (legacyRoot) roots.push(legacyRoot);
+        if (panelId) {
+          const tabsHeader = document.getElementById(panelId);
+          const tabsRoot = tabsHeader?.closest(".lsf-tabs-panel");
+
+          if (tabsRoot) roots.push(tabsRoot);
+        }
+
+        for (const root of roots) {
+          const collapseButton = root.querySelector(collapseSelector) || root.querySelector(collapseGroupSelector);
+
+          if (collapseButton) {
+            collapseButton.click();
+            return;
+          }
+        }
+      },
+      {
+        legacySelector: legacy,
+        panelId,
+        collapseSelector: this.collapseButton,
+        collapseGroupSelector: this.collapseGroupButton,
+      },
+    );
     // Allow some tags to rerender and get new sizes before we can continue testing things
     I.wait(1);
   }
   expandPanel() {
-    I.click(this.locate(this.header));
+    const panelId = this.panelIdBySelector();
+    const { legacy } = this.panelSelectors();
+
+    I.executeScript(
+      ({ legacySelector, panelId, expandSelector, expandGroupSelector, legacyHeaderSelector }) => {
+        const tabsHeader = panelId ? document.getElementById(panelId) : null;
+        const tabsRoot = tabsHeader?.closest(".lsf-tabs-panel");
+        const scopedRightExpandButton = tabsRoot?.matches(".lsf-tabs-panel_alignment_right")
+          ? tabsRoot.querySelector('[data-tooltip="Expand"]')
+          : null;
+
+        if (scopedRightExpandButton) {
+          scopedRightExpandButton.click();
+          return;
+        }
+
+        const roots = [];
+        const legacyRoot = document.querySelector(legacySelector);
+
+        if (legacyRoot) roots.push(legacyRoot);
+        if (panelId) {
+          const tabsHeader = document.getElementById(panelId);
+          const tabsRoot = tabsHeader?.closest(".lsf-tabs-panel");
+
+          if (tabsRoot) roots.push(tabsRoot);
+        }
+
+        for (const root of roots) {
+          const expandButton = root.querySelector(expandSelector) || root.querySelector(expandGroupSelector);
+
+          if (expandButton) {
+            expandButton.click();
+            return;
+          }
+        }
+
+        // Fallback click on panel header if explicit expand button is absent.
+        const fallbackHeader = document.querySelector(legacyHeaderSelector) || document.getElementById(panelId);
+        fallbackHeader?.click();
+      },
+      {
+        legacySelector: legacy,
+        panelId,
+        expandSelector: this.expandButton,
+        expandGroupSelector: this.expandGroupButton,
+        legacyHeaderSelector: `${legacy} ${this.header}`,
+      },
+    );
   }
   seeExpandButton() {
-    I.seeElement(this.locate(this.expandButton));
+    I.dontSeeElement(this.scopedSelector(this.body, this.tabsBody));
   }
   dontSeeExpandButton() {
-    I.dontSeeElement(this.locate(this.expandButton));
+    I.dontSeeElement(this.scopedSelector(this.expandButton));
   }
   seeСollapseButton() {
-    I.seeElement(this.locate(this.collapseButton));
+    I.seeElement(this.scopedSelector(this.collapseButton));
   }
   dontSeeСollapseButton() {
-    I.dontSeeElement(this.locate(this.collapseButton));
+    I.dontSeeElement(this.scopedSelector(this.collapseButton));
   }
   async grabHeaderBbox(elementSize) {
-    return I.grabElementBoundingRect(this.locate(this.header), elementSize);
+    const panelId = this.panelIdBySelector();
+    const { legacy } = this.panelSelectors();
+    const bbox = await I.executeScript(
+      ({ legacySelector, panelId }) => {
+        const legacyRoot = document.querySelector(legacySelector);
+        const tabsHeader = panelId ? document.getElementById(panelId) : null;
+        const tabsRoot = tabsHeader?.closest(".lsf-tabs-panel");
+        const header =
+          legacyRoot?.querySelector(".lsf-panel__header") ?? tabsRoot?.querySelector(".lsf-tabs-panel__header");
+        const target = header ?? legacyRoot ?? tabsRoot ?? document.querySelector(".lsf-sidepanels");
+
+        if (!target) return null;
+
+        const rect = target.getBoundingClientRect();
+
+        return {
+          x: rect.x,
+          y: rect.y,
+          width: rect.width,
+          height: rect.height,
+        };
+      },
+      { legacySelector: legacy, panelId },
+    );
+
+    if (!bbox) return null;
+
+    return elementSize ? bbox[elementSize] : bbox;
   }
   async grabPanelBbox(elementSize) {
     return I.grabElementBoundingRect(this.locatePanel(), elementSize);
@@ -89,6 +248,7 @@ class Panel {
   }
   async dragPanelBy(shiftX, shiftY, steps = 1) {
     const fromBbox = await this.grabHeaderBbox();
+    if (!fromBbox) return;
     const fromPoint = centerOfBbox(fromBbox);
     const toPoint = {
       x: fromPoint.x + shiftX,
@@ -99,6 +259,7 @@ class Panel {
   }
   async dragPanelTo(x, y, steps = 1) {
     const fromBbox = await this.grabHeaderBbox();
+    if (!fromBbox) return;
     const fromPoint = centerOfBbox(fromBbox);
     const toPoint = {
       x,
@@ -109,6 +270,7 @@ class Panel {
   }
   async dragPanelToElement(locator, steps = 1) {
     const fromBbox = await this.grabHeaderBbox();
+    if (!fromBbox) return;
     const toBbox = await I.grabElementBoundingRect(locator);
     const fromPoint = centerOfBbox(fromBbox);
     const toPoint = centerOfBbox(toBbox);
@@ -123,7 +285,7 @@ class Panel {
   }
 
   async dragResizerBy(shiftX, shiftY, resizerSelector, steps = 1) {
-    const fromBbox = await I.grabElementBoundingRect(this.locate(resizerSelector));
+    const fromBbox = await I.grabElementBoundingRect(this.scopedSelector(resizerSelector));
     const fromPoint = centerOfBbox(fromBbox);
     const toPoint = {
       x: fromPoint.x + shiftX,

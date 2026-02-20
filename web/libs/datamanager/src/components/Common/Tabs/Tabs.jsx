@@ -44,13 +44,13 @@ export const Tabs = ({
 
   return (
     <TabsContext.Provider value={contextValue}>
-      <div className={tabsCN.toString()}>
-        <div className={tabsCN.elem("list").toString()} role="tablist">
+      <div className={tabsCN.toClassName()}>
+        <div className={tabsCN.elem("list").toClassName()} role="tablist">
           <DragDropContext onDragEnd={onDragEnd}>
             <Droppable droppableId="droppable" direction="horizontal">
               {(provided) => (
                 <div
-                  className={tabsCN.elem("droppable").toString()}
+                  className={tabsCN.elem("droppable").toClassName()}
                   ref={provided.innerRef}
                   {...provided.droppableProps}
                 >
@@ -63,7 +63,7 @@ export const Tabs = ({
           {allowedActions.add !== false && (
             <Tooltip title="Open New Tab">
               <Button
-                className={tabsCN.elem("add").toString()}
+                className={tabsCN.elem("add").toClassName()}
                 size="smaller"
                 look="outline"
                 variant="neutral"
@@ -76,7 +76,7 @@ export const Tabs = ({
             </Tooltip>
           )}
         </div>
-        <div className={tabsCN.elem("extra").toString()}>{tabBarExtraContent}</div>
+        <div className={tabsCN.elem("extra").toClassName()}>{tabBarExtraContent}</div>
       </div>
     </TabsContext.Provider>
   );
@@ -170,9 +170,11 @@ export const TabsItem = observer(
     const tabLabel = virtual ? `${currentTitle} (unsaved)` : currentTitle;
 
     return (
-      <div className={tabsCN.elem("item").mod({ active, virtual, menuOpen: isMenuOpen, edit: renameMode }).toString()}>
+      <div
+        className={tabsCN.elem("item").mod({ active, virtual, menuOpen: isMenuOpen, edit: renameMode }).toClassName()}
+      >
         {!renameMode && (
-          <div className={tabsCN.elem("item-drag").toString()} aria-hidden="true">
+          <div className={tabsCN.elem("item-drag").toClassName()} aria-hidden="true">
             <IconDragIndicator className="w-4 h-4" />
           </div>
         )}
@@ -182,7 +184,7 @@ export const TabsItem = observer(
             .mod({
               edit: renameMode,
             })
-            .toString()}
+            .toClassName()}
           role="tab"
           aria-selected={active}
           aria-label={tabLabel}
@@ -217,7 +219,7 @@ export const TabsItem = observer(
             </span>
           )}
         </div>
-        <div className={tabsCN.elem("item-right").toString()}>
+        <div className={tabsCN.elem("item-right").toClassName()}>
           {showMenu && (
             <Dropdown.Trigger
               align="bottom-left"
@@ -244,7 +246,7 @@ export const TabsItem = observer(
                 />
               }
             >
-              <div className={tabsCN.elem("item-right-button").toString()}>
+              <div className={tabsCN.elem("item-right-button").toClassName()}>
                 <Button look="outline" size="smaller" variant="neutral" aria-label="Tab options">
                   <IconEllipsisVertical className="w-4 h-4" aria-hidden="true" />
                 </Button>

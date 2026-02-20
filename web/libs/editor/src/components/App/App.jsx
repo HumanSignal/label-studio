@@ -28,8 +28,7 @@ import { Space } from "../../common/Space/Space";
 import { Button } from "@humansignal/ui";
 import { isStarterCloudPlan } from "@humansignal/core";
 import { cn } from "../../utils/bem";
-import { FF_BULK_ANNOTATION, FF_DEV_3873, FF_LSDV_4620_3_ML, FF_SIMPLE_INIT, isFF } from "../../utils/feature-flags";
-import { sanitizeHtml } from "../../utils/html";
+import { FF_BULK_ANNOTATION, FF_LSDV_4620_3_ML, FF_SIMPLE_INIT, isFF } from "../../utils/feature-flags";
 import { reactCleaner } from "../../utils/reactCleaner";
 import { guidGenerator } from "../../utils/unique";
 import { isDefined, sortAnnotations } from "../../utils/utilities";
@@ -45,7 +44,6 @@ import Debug from "../Debug";
 import { InstructionsModal } from "../InstructionsModal/InstructionsModal";
 import { RelationsOverlay } from "../InteractiveOverlays/RelationsOverlay";
 import Settings from "../Settings/Settings";
-import { SidePanels } from "../SidePanels/SidePanels";
 import { SideTabsPanels } from "../SidePanels/TabPanels/SideTabsPanels";
 import { TopBar } from "../TopBar/TopBar";
 import { ViewAll } from "./ViewAll";
@@ -140,9 +138,6 @@ class App extends Component {
         <div className={cn("main-view").elem("annotation").toClassName()}>
           <TreeValidation errors={this.props.store.annotationStore.validation} />
         </div>
-        {!isFF(FF_DEV_3873) && store.hasInterface("infobar") && (
-          <div className={cn("main-view").elem("infobar").toClassName()}>Task #{store.task.id}</div>
-        )}
       </div>
     );
   }
@@ -167,7 +162,6 @@ class App extends Component {
           {this.renderRelations(as.selected)}
           {this.renderCommentsOverlay(as.selected)}
         </div>
-        {!isFF(FF_DEV_3873) && getRoot(as).hasInterface("infobar") && this._renderInfobar(as)}
       </div>
     );
   }
@@ -251,8 +245,6 @@ class App extends Component {
     );
 
     const isBulkMode = isFF(FF_BULK_ANNOTATION) && !isStarterCloudPlan() && store.hasInterface("annotation:bulk");
-    const newUIEnabled = isFF(FF_DEV_3873);
-
     return (
       <div
         className={cn("editor").mod({ fullscreen: settings.fullscreen }).toClassName()}
@@ -262,24 +254,13 @@ class App extends Component {
           <Settings store={store} />
           <Provider store={store}>
             <ToastProvider>
-              {newUIEnabled ? (
-                <InstructionsModal
-                  visible={store.showingDescription}
-                  onCancel={() => store.toggleDescription()}
-                  title={store.hasInterface("review") ? "Review Instructions" : "Labeling Instructions"}
-                >
-                  {store.description}
-                </InstructionsModal>
-              ) : (
-                <>
-                  {store.showingDescription && (
-                    <div className="p-base mb-base">
-                      {/* biome-ignore lint/security/noDangerouslySetInnerHtml: we need html here and it's sanitized */}
-                      <div dangerouslySetInnerHTML={{ __html: sanitizeHtml(store.description) }} />
-                    </div>
-                  )}
-                </>
-              )}
+              <InstructionsModal
+                visible={store.showingDescription}
+                onCancel={() => store.toggleDescription()}
+                title={store.hasInterface("review") ? "Review Instructions" : "Labeling Instructions"}
+              >
+                {store.description}
+              </InstructionsModal>
 
               {isDefined(store) && store.hasInterface("topbar") && <TopBar store={store} />}
               <div
@@ -287,33 +268,17 @@ class App extends Component {
                   .mod({
                     viewAll: viewingAll,
                     bsp: settings.effectiveBottomSidePanel,
-                    showingBottomBar: newUIEnabled,
+                    showingBottomBar: true,
                   })
                   .toClassName()}
               >
-                {newUIEnabled ? (
-                  isBulkMode || !store.hasInterface("side-column") ? (
-                    <>
-                      {mainContent}
-                      {store.hasInterface("topbar") && <BottomBar store={store} />}
-                    </>
-                  ) : (
-                    <SideTabsPanels
-                      panelsHidden={viewingAll}
-                      currentEntity={as.selectedHistory ?? as.selected}
-                      regions={as.selected.regionStore}
-                      showComments={store.hasInterface("annotations:comments")}
-                      showCustomTab={hasTagInSidebar(as.selected)}
-                      focusTab={store.commentStore.tooltipMessage ? "comments" : null}
-                    >
-                      {mainContent}
-                      {store.hasInterface("topbar") && <BottomBar store={store} />}
-                    </SideTabsPanels>
-                  )
-                ) : isBulkMode || !store.hasInterface("side-column") ? (
-                  mainContent
+                {isBulkMode || !store.hasInterface("side-column") ? (
+                  <>
+                    {mainContent}
+                    {store.hasInterface("topbar") && <BottomBar store={store} />}
+                  </>
                 ) : (
-                  <SidePanels
+                  <SideTabsPanels
                     panelsHidden={viewingAll}
                     currentEntity={as.selectedHistory ?? as.selected}
                     regions={as.selected.regionStore}
@@ -322,7 +287,8 @@ class App extends Component {
                     focusTab={store.commentStore.tooltipMessage ? "comments" : null}
                   >
                     {mainContent}
-                  </SidePanels>
+                    {store.hasInterface("topbar") && <BottomBar store={store} />}
+                  </SideTabsPanels>
                 )}
               </div>
               <ToastViewport />

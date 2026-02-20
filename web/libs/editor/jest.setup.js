@@ -2,33 +2,69 @@
 require("jest-fetch-mock").enableMocks();
 require("@testing-library/jest-dom");
 
-// Ensure APP_SETTINGS and feature_flags exist for isFF() and other feature flag checks
-if (typeof window !== "undefined") {
-  window.APP_SETTINGS = window.APP_SETTINGS ?? {};
-  window.APP_SETTINGS.feature_flags = window.APP_SETTINGS.feature_flags ?? {};
-  window.APP_SETTINGS.feature_flags_default_value = window.APP_SETTINGS.feature_flags_default_value ?? false;
-}
-
-// Mock IntersectionObserver (not implemented in jsdom) - used by FIT-720 lazy loading
-class IntersectionObserverMock {
-  constructor(callback, options) {
-    this.callback = callback;
-    this.options = options;
-    this.observedElements = [];
-  }
-
-  observe(element) {
-    this.observedElements.push(element);
-    // Immediately call callback with isIntersecting: true so lazy-loaded content triggers
-    this.callback([{ target: element, isIntersecting: true, intersectionRatio: 1 }], this);
-  }
-
+// ResizeObserver is not in JSDOM; required by many layout components.
+global.ResizeObserver = class ResizeObserver {
+  observe() {}
   unobserve() {}
-  disconnect() {
-    this.observedElements = [];
+  disconnect() {}
+};
+
+// IntersectionObserver is not in JSDOM; required by visibility/lazy-load logic.
+global.IntersectionObserver = class IntersectionObserver {
+  constructor(callback) {
+    this.callback = callback;
   }
-}
-window.IntersectionObserver = IntersectionObserverMock;
+  observe() {}
+  unobserve() {}
+  disconnect() {}
+};
+
+// matchMedia is not in JSDOM; required by responsive hooks and Konva.
+Object.defineProperty(window, "matchMedia", {
+  writable: true,
+  value: jest.fn().mockImplementation((query) => ({
+    matches: false,
+    media: query,
+    onchange: null,
+    addListener: jest.fn(),
+    removeListener: jest.fn(),
+    addEventListener: jest.fn(),
+    removeEventListener: jest.fn(),
+    dispatchEvent: jest.fn(),
+  })),
+});
+
+// Canvas 2D context is not fully implemented in JSDOM; required by Konva/canvas usage.
+HTMLCanvasElement.prototype.getContext = jest.fn().mockImplementation((contextType) => {
+  if (contextType === "2d") {
+    return {
+      fillRect: jest.fn(),
+      clearRect: jest.fn(),
+      getImageData: jest.fn(() => ({ data: new Array(4) })),
+      putImageData: jest.fn(),
+      createImageData: jest.fn(() => []),
+      setTransform: jest.fn(),
+      drawImage: jest.fn(),
+      save: jest.fn(),
+      restore: jest.fn(),
+      beginPath: jest.fn(),
+      moveTo: jest.fn(),
+      lineTo: jest.fn(),
+      closePath: jest.fn(),
+      stroke: jest.fn(),
+      translate: jest.fn(),
+      scale: jest.fn(),
+      rotate: jest.fn(),
+      arc: jest.fn(),
+      fill: jest.fn(),
+      measureText: jest.fn(() => ({ width: 0 })),
+      transform: jest.fn(),
+      rect: jest.fn(),
+      clip: jest.fn(),
+    };
+  }
+  return null;
+});
 
 // Mock HTMLMediaElement data and methods not implemented by jsdom.
 window.HTMLMediaElement.prototype._mock = {

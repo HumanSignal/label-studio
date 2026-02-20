@@ -63,13 +63,13 @@ const BackendCard = ({ backend, onStartTrain, onEdit, onDelete, onTestRequest })
 
   return (
     <div className={rootClass.toClassName()}>
-      <div className={rootClass.elem("title-container")}>
+      <div className={rootClass.elem("title-container").toClassName()}>
         <div>
           <BackendState backend={backend} />
-          <div className={rootClass.elem("title")}>{backend.title}</div>
+          <div className={rootClass.elem("title").toClassName()}>{backend.title}</div>
         </div>
 
-        <div className={rootClass.elem("menu")}>
+        <div className={rootClass.elem("menu").toClassName()}>
           <Dropdown.Trigger
             align="right"
             content={
@@ -91,9 +91,9 @@ const BackendCard = ({ backend, onStartTrain, onEdit, onDelete, onTestRequest })
         </div>
       </div>
 
-      <div className={rootClass.elem("meta")}>
-        <div className={rootClass.elem("group")}>{truncate(backend.url, 20, 10, "...")}</div>
-        <div className={rootClass.elem("group")}>
+      <div className={rootClass.elem("meta").toClassName()}>
+        <div className={rootClass.elem("group").toClassName()}>{truncate(backend.url, 20, 10, "...")}</div>
+        <div className={rootClass.elem("group").toClassName()}>
           <Tooltip title={format(parseISO(backend.created_at), "yyyy-MM-dd HH:mm:ss")}>
             <span>
               Created&nbsp;
@@ -112,9 +112,9 @@ const BackendState = ({ backend }) => {
   const { state } = backend;
 
   return (
-    <div className={cn("ml").elem("status")}>
-      <span className={cn("ml").elem("indicator").mod({ state })} />
-      <Oneof value={state} className={cn("ml").elem("status-label")}>
+    <div className={cn("ml").elem("status").toClassName()}>
+      <span className={cn("ml").elem("indicator").mod({ state }).toClassName()} />
+      <Oneof value={state} className={cn("ml").elem("status-label").toClassName()}>
         <span case="DI">Disconnected</span>
         <span case="CO">Connected</span>
         <span case="ER">Error</span>

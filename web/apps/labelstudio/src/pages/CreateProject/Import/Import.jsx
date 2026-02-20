@@ -107,7 +107,7 @@ const Upload = ({ children, sendFiles }) => {
   return (
     <div
       id="holder"
-      className={dropzoneClass.mod({ hovered })}
+      className={dropzoneClass.mod({ hovered }).toClassName()}
       ref={dropzoneRef}
       onDragStart={onHover}
       onDragOver={onHover}
@@ -131,7 +131,7 @@ const ErrorMessage = ({ error }) => {
   if (Array.isArray(extra)) extra = extra.join("; ");
 
   return (
-    <div className={importClass.elem("error")}>
+    <div className={importClass.elem("error").toClassName()}>
       <IconErrorAlt width="24" height="24" />
       {error.id && `[${error.id}] `}
       {error.detail || error.message}
@@ -373,7 +373,7 @@ export const ImportPage = ({
 
   return (
     <div className={importClass}>
-      {highlightCsvHandling && <div className={importClass.elem("csv-splash")} />}
+      {highlightCsvHandling && <div className={importClass.elem("csv-splash").toClassName()} />}
       <input id="file-input" type="file" name="file" multiple onChange={onUpload} style={{ display: "none" }} />
 
       <header className="flex gap-4">
@@ -402,7 +402,10 @@ export const ImportPage = ({
           <SampleDatasetSelect samples={samples} sample={sample} onSampleApplied={onSampleDatasetSelect} />
         )}
         <div
-          className={importClass.elem("csv-handling").mod({ highlighted: highlightCsvHandling, hidden: !csvHandling })}
+          className={importClass
+            .elem("csv-handling")
+            .mod({ highlighted: highlightCsvHandling, hidden: !csvHandling })
+            .toClassName()}
         >
           <span>Treat CSV/TSV as</span>
           <label>
@@ -412,7 +415,7 @@ export const ImportPage = ({
             <input {...csvProps} value="ts" checked={csvHandling === "ts"} /> Time Series or Whole Text File
           </label>
         </div>
-        <div className={importClass.elem("status")}>
+        <div className={importClass.elem("status").toClassName()}>
           {files.uploaded.length ? `${files.uploaded.length} files uploaded` : ""}
         </div>
       </header>
@@ -430,7 +433,7 @@ export const ImportPage = ({
               <div className="flex gap-4 justify-center items-start w-full h-full">
                 <label htmlFor="file-input" className="w-full h-full">
                   <div className={`${dropzoneClass.elem("content")} w-full`}>
-                    <IconFileUpload height="64" className={dropzoneClass.elem("icon")} />
+                    <IconFileUpload height="64" className={dropzoneClass.elem("icon").toClassName()} />
                     <header>
                       Drag & drop files here
                       <br />
@@ -557,7 +560,7 @@ export const ImportPage = ({
                             key={file.file}
                             className={newlyUploadedFiles.has(file.id) ? importClass.elem("upload-flash") : ""}
                           >
-                            <td className={importClass.elem("file-name")}>
+                            <td className={importClass.elem("file-name").toClassName()}>
                               <Tooltip title={file.file}>
                                 <Typography variant="body" size="small" className="truncate">
                                   {truncatedFilename}
@@ -565,9 +568,9 @@ export const ImportPage = ({
                               </Tooltip>
                             </td>
                             <td>
-                              <span className={importClass.elem("file-status")} />
+                              <span className={importClass.elem("file-status").toClassName()} />
                             </td>
-                            <td className={importClass.elem("file-size")}>
+                            <td className={importClass.elem("file-size").toClassName()}>
                               <Typography
                                 variant="body"
                                 size="smaller"
@@ -588,7 +591,7 @@ export const ImportPage = ({
                         );
                         return (
                           <tr key={`${idx}-${file.name}`}>
-                            <td className={importClass.elem("file-name")}>
+                            <td className={importClass.elem("file-name").toClassName()}>
                               <Tooltip title={file.name}>
                                 <Typography variant="body" size="small" className="truncate">
                                   {truncatedFilename}
@@ -596,9 +599,11 @@ export const ImportPage = ({
                               </Tooltip>
                             </td>
                             <td>
-                              <span className={importClass.elem("file-status").mod({ uploading: true })} />
+                              <span
+                                className={importClass.elem("file-status").mod({ uploading: true }).toClassName()}
+                              />
                             </td>
-                            <td className={importClass.elem("file-size")}>&nbsp;</td>
+                            <td className={importClass.elem("file-size").toClassName()}>&nbsp;</td>
                           </tr>
                         );
                       })}
@@ -618,7 +623,7 @@ export const ImportPage = ({
                     flushContent
                   >
                     {sampleConfig.data ? (
-                      <div className={importClass.elem("code-wrapper")}>
+                      <div className={importClass.elem("code-wrapper").toClassName()}>
                         <CodeBlock
                           title="Expected Input Preview"
                           code={sampleConfig?.data ?? ""}

@@ -99,7 +99,7 @@ function convertParamsToPixels(params, canvasSize, key = "width") {
 
 Data(shapesTable).Scenario(
   "Selecting after creation",
-  async ({ I, AtImageView, AtOutliner, Labels, Regions, LabelStudio, current }) => {
+  async ({ I, AtImageView, AtOutliner, Labels, Regions, LabelStudio, AtSettings, current }) => {
     const params = {
       config: getConfigWithShape(current.shape, current.props),
       data: { image: IMAGE },
@@ -107,9 +107,11 @@ Data(shapesTable).Scenario(
 
     I.amOnPage("/");
     LabelStudio.init(params);
-    LabelStudio.enableSetting("Select regions after creating");
-
     LabelStudio.waitForObjectsReady();
+    AtSettings.setGeneralSettings({
+      [AtSettings.GENERAL_SETTINGS.AUTO_SELECT_REGION]: true,
+    });
+
     AtOutliner.seeRegions(0);
     await AtImageView.lookForStage();
     const canvasSize = await AtImageView.getCanvasSize();

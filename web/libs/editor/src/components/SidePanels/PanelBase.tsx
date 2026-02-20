@@ -12,7 +12,7 @@ import { cn } from "../../utils/bem";
 import { IconArrowLeft, IconArrowRight, IconOutlinerCollapse, IconOutlinerExpand } from "@humansignal/icons";
 
 import "./PanelBase.scss";
-import type { PanelType } from "./SidePanels";
+import type { PanelType } from "./TabPanels/types";
 import { useDrag } from "../../hooks/useDrag";
 import { clamp, isDefined } from "../../utils/utilities";
 import { DEFAULT_PANEL_HEIGHT, DEFAULT_PANEL_WIDTH, PANEL_HEADER_HEIGHT_PADDED } from "./constants";

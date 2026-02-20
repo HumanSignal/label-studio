@@ -29,7 +29,7 @@ export const DraftPanel = observer(({ item }) => {
           size="smaller"
           look="string"
           onClick={() => item.toggleDraft()}
-          className={panel.elem("toggle")}
+          className={panel.elem("toggle").toClassName()}
           aria-label="Toggle draft mode"
         >
           {item.draftSelected ? "draft" : "original"}

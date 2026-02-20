@@ -20,7 +20,7 @@ import { createURL } from "../../components/HeidiTips/utils";
 const ProjectName = ({ name, setName, onSaveName, onSubmit, error, description, setDescription, show = true }) =>
   !show ? null : (
     <form
-      className={cn("project-name")}
+      className={cn("project-name").toClassName()}
       onSubmit={(e) => {
         e.preventDefault();
         onSubmit();
@@ -117,8 +117,8 @@ export const CreateProject = ({ onClose }) => {
   const rootClass = cn("create-project");
   const tabClass = rootClass.elem("tab");
   const steps = {
-    name: <span className={tabClass.mod({ disabled: !!error })}>Project Name</span>,
-    import: <span className={tabClass.mod({ disabled: uploadDisabled })}>Data Import</span>,
+    name: <span className={tabClass.mod({ disabled: !!error }).toClassName()}>Project Name</span>,
+    import: <span className={tabClass.mod({ disabled: uploadDisabled }).toClassName()}>Data Import</span>,
     config: "Labeling Setup",
   };
 

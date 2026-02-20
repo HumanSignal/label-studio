@@ -1,14 +1,9 @@
 import { Labels, LabelStudio } from "@humansignal/frontend-test/helpers/LSF";
 import { RichText } from "@humansignal/frontend-test/helpers/LSF/RichText";
-import { FF_DEV_3873 } from "libs/editor/src/utils/feature-flags";
 import { configSimple, dataSimple, resultSimple } from "../../data/core/info_panels";
 
 describe("Label Studio UI info panels", () => {
   it("Open every panel and interact with regions", () => {
-    LabelStudio.setFeatureFlagsOnPageLoad({
-      [FF_DEV_3873]: true,
-    });
-
     LabelStudio.init({
       config: configSimple,
       task: {
@@ -31,8 +26,6 @@ describe("Label Studio UI info panels", () => {
     // Change regions grouping by openining dropdown; it will be closed automatically
     cy.contains("Manual").click();
     cy.contains("Group by Label").should("be.visible");
-    // waiting for dropdown to be fully visible
-    // @todo better options?
     cy.wait(200);
     cy.contains("Group by Label").click();
     cy.get("[class$=lsf-outliner-item__title").contains("Word1").should("be.visible");

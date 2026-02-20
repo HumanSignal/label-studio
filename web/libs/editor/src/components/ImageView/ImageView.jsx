@@ -1247,14 +1247,32 @@ const EntireStage = observer(
 const ImageLayer = observer(({ item }) => {
   const imageEntity = item.currentImageEntity;
   const konvaImageRef = useRef();
+  const currentSrc = imageEntity?.currentSrc;
+  const [loadedImage, setLoadedImage] = useState(null);
 
-  // Reuse the <img> DOM element that <ImageRenderer> already loaded.
-  // item.imageRef is set via item.setImageRef() in ImageView's render.
-  // imageEntity.imageLoaded (observable) is true once the <img> onload fires,
-  // and imageIsLoaded gates <EntireStage> — so by the time this component renders,
-  // item.imageRef is guaranteed to point to a fully-loaded HTMLImageElement.
-  // This eliminates the redundant Image() load that previously happened here.
-  const loadedImage = imageEntity?.imageLoaded ? item.imageRef : null;
+  useEffect(() => {
+    if (!imageEntity?.downloaded || !currentSrc) {
+      setLoadedImage(null);
+      return;
+    }
+
+    let cancelled = false;
+    const img = new window.Image();
+
+    if (item.imageCrossOrigin) img.crossOrigin = item.imageCrossOrigin;
+
+    img.onload = () => {
+      if (!cancelled) setLoadedImage(img);
+    };
+    img.onerror = () => {
+      if (!cancelled) setLoadedImage(null);
+    };
+    img.src = currentSrc;
+
+    return () => {
+      cancelled = true;
+    };
+  }, [imageEntity?.downloaded, currentSrc, item.imageCrossOrigin]);
 
   const { width, height } = useMemo(() => {
     return {
@@ -1269,17 +1287,32 @@ const ImageLayer = observer(({ item }) => {
   useEffect(() => {
     const node = konvaImageRef.current;
     if (node && loadedImage) {
-      node.cache({ pixelRatio: 1 });
-      node.filters([Konva.Filters.Brighten, Konva.Filters.Contrast]);
-      node.brightness(brightness);
-      node.contrast(contrast);
+      try {
+        // Force Konva cache reset and redraw when source/filters change.
+        node.clearCache();
+        node.cache({ pixelRatio: 1 });
+        node.filters([Konva.Filters.Brighten, Konva.Filters.Contrast]);
+        node.brightness(brightness);
+        node.contrast(contrast);
+      } catch {
+        // Fallback to plain image draw if cache/filter pipeline fails.
+        node.clearCache();
+        node.filters([]);
+      }
       node.getLayer()?.batchDraw();
     }
-  }, [loadedImage, brightness, contrast]);
+  }, [loadedImage, brightness, contrast, currentSrc]);
 
   return loadedImage ? (
     <Layer imageSmoothingEnabled={item.smoothingEnabled} scale={{ x: item.stageZoom, y: item.stageZoom }}>
-      <KonvaImage ref={konvaImageRef} image={loadedImage} width={width} height={height} listening={false} />
+      <KonvaImage
+        key={currentSrc ?? "image-source"}
+        ref={konvaImageRef}
+        image={loadedImage}
+        width={width}
+        height={height}
+        listening={false}
+      />
     </Layer>
   ) : null;
 });

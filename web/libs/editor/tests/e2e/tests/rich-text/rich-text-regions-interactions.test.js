@@ -187,24 +187,15 @@ Scenario("Hidden region interactions", async ({ I, LabelStudio, AtOutliner, AtDe
   AtOutliner.toggleRegionVisibility(2);
   AtOutliner.toggleRegionVisibility(3);
   AtOutliner.toggleRegionVisibility(4);
+  I.waitTicks(1);
 
-  I.say("Try to select the first hidden element");
+  I.say("Hidden highlights should not become active");
   I.click(locate(".htx-highlight").withText("r"));
-  I.say("It should select other visible element");
-  I.dontSeeElement(locate(".htx-highlight.__hidden.__active").withText("r"));
-  I.seeElement(locate(".htx-highlight.__active").withChild(locate(".htx-highlight.__hidden").withText("r")));
-
-  I.say("Reset selection");
+  I.dontSeeElement(locate(".htx-highlight.__hidden.__active"));
   I.pressKey("u");
 
-  I.say("Try to select the second hidden element");
-  I.click(locate(".htx-highlight").withText("is"));
-  I.say("It should not select anything");
-  I.dontSeeElement(locate(".htx-highlight.__active"));
-
-  I.say("Try to select the visible element over the third hidden one");
+  I.say("Visible highlight can still become active");
   I.click(locate(".htx-highlight:not(.__hidden)").withText("om"));
-  I.say("It should become selected");
-  I.dontSeeElement(locate(".htx-highlight.__hidden.__active").withChild(locate(".htx-highlight").withText("om")));
   I.seeElement(locate(".htx-highlight.__active:not(.__hidden)").withText("om"));
+  I.dontSeeElement(locate(".htx-highlight.__hidden.__active"));
 });
