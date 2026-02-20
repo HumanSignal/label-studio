@@ -49,4 +49,35 @@ describe("Helper function labelToSVG", () => {
   test("No label & score", () => {
     expect(Canvas.labelToSVG({})).toBe(svgs.empty);
   });
+
+  test("label with score null uses cache key without score", () => {
+    const out1 = Canvas.labelToSVG({ label: "L", score: null });
+    const out2 = Canvas.labelToSVG({ label: "L", score: null });
+    expect(out1).toBe(out2);
+  });
+});
+
+describe("createBrushSizeCircleCursor", () => {
+  test("returns cursor CSS string with data URL and hotspot", () => {
+    const result = Canvas.createBrushSizeCircleCursor(24);
+    expect(result).toMatch(/^url\('/);
+    expect(result).toContain(",");
+    expect(result).toContain("auto");
+  });
+});
+
+describe("trim", () => {
+  test("returns bbox and canvas from canvas with opaque pixels", () => {
+    const canvas = document.createElement("canvas");
+    canvas.width = 10;
+    canvas.height = 10;
+    const ctx = canvas.getContext("2d");
+    ctx.fillStyle = "rgba(1,1,1,1)";
+    ctx.fillRect(2, 2, 4, 4);
+    const result = Canvas.trim(canvas);
+    expect(result).toHaveProperty("bbox");
+    expect(result.bbox).toHaveProperty("width");
+    expect(result.bbox).toHaveProperty("height");
+    expect(result).toHaveProperty("canvas");
+  });
 });

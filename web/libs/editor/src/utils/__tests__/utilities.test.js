@@ -14,10 +14,16 @@ import {
   clamp,
   isDefined,
   isArraysEqual,
+  wrapArray,
   chunks,
   minMax,
   humanDateDiff,
   sortAnnotations,
+  findClosestParent,
+  camelizeKeys,
+  snakeizeKeys,
+  destroyMSTObject,
+  fixMobxObserve,
 } from "../utilities";
 
 describe("Helper function emailFromCreatedBy", () => {
@@ -124,6 +130,10 @@ describe("Helper function toTimeString", () => {
   test("Correct", () => {
     expect(toTimeString(5000)).toBe("00:00:05");
   });
+  test("returns undefined when not a number", () => {
+    expect(toTimeString("5000")).toBeUndefined();
+    expect(toTimeString(undefined)).toBeUndefined();
+  });
 });
 
 describe("isValidObjectURL", () => {
@@ -229,6 +239,13 @@ describe("humanDateDiff", () => {
     d.setMinutes(d.getMinutes() - 2);
     expect(humanDateDiff(d.getTime())).toMatch(/\d+\s+(minute|second)s?\s+ago|just now/);
   });
+  it("returns a string (e.g. just now or N minutes ago)", () => {
+    const d = new Date();
+    d.setSeconds(d.getSeconds() - 5);
+    const result = humanDateDiff(d.getTime());
+    expect(typeof result).toBe("string");
+    expect(result.length).toBeGreaterThan(0);
+  });
 });
 
 describe("sortAnnotations", () => {
@@ -242,5 +259,74 @@ describe("sortAnnotations", () => {
     expect(result[0].id).toBe("b");
     expect(result[1].id).toBe("c");
     expect(result[2].id).toBe("a");
+  });
+});
+
+describe("wrapArray", () => {
+  it("wraps value in array", () => {
+    expect(wrapArray(1)).toEqual([1]);
+    expect(wrapArray("x")).toEqual(["x"]);
+  });
+  it("concats array into single array", () => {
+    expect(wrapArray([1, 2])).toEqual([1, 2]);
+  });
+});
+
+describe("findClosestParent", () => {
+  it("returns first parent matching predicate", () => {
+    const child = { parent: null };
+    const mid = { parent: null };
+    const root = { parent: null };
+    child.parent = mid;
+    mid.parent = root;
+    const pred = (el) => el === root;
+    expect(findClosestParent(child, pred)).toBe(root);
+  });
+  it("returns null when no parent matches", () => {
+    const child = { parent: null };
+    child.parent = { parent: null };
+    expect(findClosestParent(child, () => false)).toBeNull();
+  });
+  it("uses custom parentGetter", () => {
+    const el = { next: { next: null } };
+    el.next.next = el;
+    const result = findClosestParent(
+      el,
+      (e) => e.next?.next === el,
+      (e) => e.next,
+    );
+    expect(result).toEqual(el.next);
+  });
+});
+
+describe("camelizeKeys", () => {
+  it("converts object keys to camelCase", () => {
+    expect(camelizeKeys({ foo_bar: 1 })).toEqual({ fooBar: 1 });
+  });
+  it("recurses into nested objects", () => {
+    expect(camelizeKeys({ one_two: { three_four: 1 } })).toEqual({ oneTwo: { threeFour: 1 } });
+  });
+});
+
+describe("snakeizeKeys", () => {
+  it("converts object keys to snake_case", () => {
+    expect(snakeizeKeys({ fooBar: 1 })).toEqual({ foo_bar: 1 });
+  });
+  it("recurses into nested objects", () => {
+    expect(snakeizeKeys({ oneTwo: { threeFour: 1 } })).toEqual({ one_two: { three_four: 1 } });
+  });
+});
+
+describe("destroyMSTObject", () => {
+  it("does nothing when object is falsy", () => {
+    expect(() => destroyMSTObject(null)).not.toThrow();
+    expect(() => destroyMSTObject(undefined)).not.toThrow();
+  });
+});
+
+describe("fixMobxObserve", () => {
+  it("is a no-op that accepts any args", () => {
+    expect(() => fixMobxObserve()).not.toThrow();
+    expect(() => fixMobxObserve(1, 2, 3)).not.toThrow();
   });
 });

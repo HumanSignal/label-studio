@@ -90,6 +90,23 @@ describe("Label Studio UI info panels", () => {
       cy.get("[data-testid='detailed-region']").should("be.visible");
       cy.get("[class$=control_type_score]").should("have.text", "0.89");
     });
+
+    it("shows ResultItem content (rating, text) in region details", () => {
+      LabelStudio.init({
+        config: configSimple,
+        task: {
+          annotations: [{ id: 1, result: [resultSimple] }],
+          predictions: [],
+          id: 1,
+          data: dataSimple,
+        },
+      });
+
+      cy.get("#Regions-draggable").click();
+      cy.get(".lsf-outliner-item").first().click();
+      cy.get("[data-testid='detailed-region']").should("be.visible");
+      cy.get("[data-testid='detailed-region']").contains("Word1").should("be.visible");
+    });
   });
 
   describe("Codecov: selection-tools (word granularity)", () => {
