@@ -1,5 +1,6 @@
 import { Hotkeys, ImageView, LabelStudio, Labels, Sidebar } from "@humansignal/frontend-test/helpers/LSF";
 import { magicWandConfig, magicWandData } from "../../../data/image_segmentation/tools/magicwand";
+import { drawMask } from "../../../../../src/utils/magic-wand";
 
 describe("Image segmentation - Tools - MagicWand", () => {
   const selectMagicWandTool = () => {
@@ -148,6 +149,26 @@ describe("Image segmentation - Tools - MagicWand", () => {
     });
   });
 
+  it("supports mostly-vertical drag-threshold adjustments deterministically", () => {
+    LabelStudio.params().config(magicWandConfig).data(magicWandData).withResult([]).init();
+    LabelStudio.waitForObjectsReady();
+    ImageView.waitForImage();
+
+    selectMagicWandTool();
+    Labels.select("Cloud");
+
+    // Keep horizontal delta small and vertical delta large to exercise an alternate threshold path.
+    ImageView.drawRectRelative(0.42, 0.18, 0.02, 0.32);
+    Sidebar.hasRegions(1);
+
+    LabelStudio.serialize().then((result) => {
+      const regionPayload = result.find((entry) => Array.isArray(entry.value.rle));
+
+      expect(regionPayload).to.exist;
+      expect(regionPayload?.value.rle.length ?? 0).to.be.greaterThan(0);
+    });
+  });
+
   it("creates stable magic-wand results after zooming out", () => {
     LabelStudio.params().config(magicWandConfig).data(magicWandData).withResult([]).init();
     LabelStudio.waitForObjectsReady();
@@ -159,4 +180,45 @@ describe("Image segmentation - Tools - MagicWand", () => {
     ImageView.clickAtRelative(0.35, 0.15);
     Sidebar.hasRegions(1);
   });
+
+  it("covers drawMask utility edge paths deterministically", () => {
+    const width = 6;
+    const height = 6;
+    const data = new Uint8ClampedArray(width * height * 4);
+
+    for (let y = 0; y < height; y++) {
+      for (let x = 0; x < width; x++) {
+        const i = (y * width + x) * 4;
+        data[i] = x * 20;
+        data[i + 1] = y * 20;
+        data[i + 2] = 120;
+        data[i + 3] = 255;
+      }
+    }
+
+    const imageData = { data } as ImageData;
+    const canvas = document.createElement("canvas");
+    canvas.width = width;
+    canvas.height = height;
+    const ctx = canvas.getContext("2d");
+
+    expect(ctx).to.exist;
+    if (!ctx) throw new Error("Canvas context is required for drawMask utility test");
+
+    const mask = drawMask(imageData, ctx, width, height, 2, 2, 35, "#00ff00", 1, 2, false);
+    expect(mask).to.exist;
+    if (!mask) throw new Error("Expected drawMask to produce a mask");
+
+    expect(mask.bounds.minX).to.be.at.least(0);
+    expect(mask.bounds.minY).to.be.at.least(0);
+    expect(mask.bounds.maxX).to.be.at.most(width - 1);
+    expect(mask.bounds.maxY).to.be.at.most(height - 1);
+
+    const broadMask = drawMask(imageData, ctx, width, height, 0, 0, 255, "#00ff00", 1, 4, false);
+    expect(broadMask).to.exist;
+    if (!broadMask) throw new Error("Expected broad drawMask to produce a mask");
+
+    expect(Array.from(broadMask.data).some((value) => value === 1)).to.equal(true);
+  });
+
 });
