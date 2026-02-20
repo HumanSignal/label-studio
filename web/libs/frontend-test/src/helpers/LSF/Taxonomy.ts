@@ -81,7 +81,10 @@ class TaxonomyHelper {
     // since Ant Design's <Tooltip> wraps the title content in NewTaxonomy.
     return this.dropdown.contains(".ant-select-tree-title", text);
   }
-
+  /** Click a taxonomy item (uses force: true so it works when dropdown is partially covered by BottomBar). */
+  clickItem(text: string) {
+    return this.findItem(text).click({ force: true });
+  }
   hasSelected(text: string) {
     if (this.isLegacy) {
       return this.selected.contains("div", text).should("exist");

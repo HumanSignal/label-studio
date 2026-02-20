@@ -493,16 +493,14 @@ Data(selectedPolygonAfterCreatingVariants).Scenario(
         },
       ],
     });
+    LabelStudio.waitForObjectsReady();
 
     if (shouldSelect) {
-      AtSettings.open();
       AtSettings.setGeneralSettings({
         [AtSettings.GENERAL_SETTINGS.AUTO_SELECT_REGION]: shouldSelect,
       });
-      AtSettings.close();
     }
 
-    LabelStudio.waitForObjectsReady();
     await AtImageView.lookForStage();
     const canvasSize = await AtImageView.getCanvasSize();
 

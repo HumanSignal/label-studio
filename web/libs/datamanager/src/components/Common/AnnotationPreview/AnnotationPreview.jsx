@@ -132,7 +132,7 @@ export const AnnotationPreview = injector(
         height={props.height}
       />
     ) : (
-      <div className={cn("annotation-preview").toString()} width={props.width} height={props.height}>
+      <div className={cn("annotation-preview").toClassName()} width={props.width} height={props.height}>
         <Spinner
           size={props.size ?? "default"}
           style={{

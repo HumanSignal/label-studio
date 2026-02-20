@@ -12,10 +12,14 @@ describe("Classification - single image - Taxonomy", () => {
     ImageView.waitForImage();
 
     Taxonomy.open();
-    Taxonomy.findItem("Choice 2").click();
+    Taxonomy.clickItem("Choice 2");
     Taxonomy.close();
 
+    // Wait for selection to be reflected in the UI before asserting on serialized result
+    Taxonomy.hasSelected("Choice 2");
+
     LabelStudio.serialize().then((result) => {
+      expect(result).to.have.length(1);
       expect(result[0]).not.to.haveOwnProperty("item_index");
     });
   });

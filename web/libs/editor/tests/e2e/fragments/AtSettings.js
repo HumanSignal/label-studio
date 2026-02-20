@@ -1,5 +1,10 @@
 const { I } = inject();
 
+const SETTING_TO_PROP = {
+  "Show labels inside the regions": "showLabels",
+  "Select regions after creating": "selectAfterCreate",
+};
+
 module.exports = {
   GENERAL_SETTINGS: {
     SHOW_LABELS: "Show labels inside the regions",
@@ -23,29 +28,36 @@ module.exports = {
     I.waitToHide(this._modalLocator);
     I.waitTicks(3);
   },
-  _setSettings(settings = {}) {
-    for (const [setting, value] of Object.entries(settings)) {
-      if (value) {
-        I.dontSeeCheckboxIsChecked(setting);
-        I.checkOption(setting);
-        I.seeCheckboxIsChecked(setting);
-      } else {
-        I.seeCheckboxIsChecked(setting);
-        I.uncheckOption(setting);
-        I.dontSeeCheckboxIsChecked(setting);
-      }
-    }
-  },
-  goToTab(tabName) {
-    I.click(this._tabLocator.withText(tabName));
-    I.seeElement(this._activeTabLocator.withText(tabName));
-  },
   setGeneralSettings(settings = {}) {
-    this.goToTab("General");
-    this._setSettings(settings);
+    const toggles = {};
+
+    for (const [settingLabel, value] of Object.entries(settings)) {
+      const prop = SETTING_TO_PROP[settingLabel];
+
+      if (!prop) throw new Error(`Unknown setting: "${settingLabel}"`);
+      toggles[prop] = value;
+    }
+    I.executeScript((toggles) => {
+      const settings = window.Htx.settings;
+
+      for (const [prop, desired] of Object.entries(toggles)) {
+        if (Boolean(settings[prop]) !== Boolean(desired)) {
+          const eventName = "toggle" + prop.charAt(0).toUpperCase() + prop.slice(1);
+
+          settings[eventName]();
+        }
+      }
+    }, toggles);
   },
   setLayoutSettings(settings = {}) {
-    this.goToTab("Layout");
-    this._setSettings(settings);
+    if (settings[this.LAYOUT_SETTINGS.VERTICAL_LAYOUT] !== undefined) {
+      I.executeScript((shouldBeBottom) => {
+        const isBottom = window.Htx.settings.bottomSidePanel;
+
+        if (Boolean(isBottom) !== Boolean(shouldBeBottom)) {
+          window.Htx.settings.toggleBottomSP();
+        }
+      }, settings[this.LAYOUT_SETTINGS.VERTICAL_LAYOUT]);
+    }
   },
 };

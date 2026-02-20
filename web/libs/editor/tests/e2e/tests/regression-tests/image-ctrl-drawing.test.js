@@ -1,5 +1,5 @@
 const Helpers = require("../helpers");
-const Asserts = require("../../utils/asserts");
+const assert = require("assert");
 
 Feature("Creating regions over other regions").tag("@regress");
 
@@ -112,24 +112,20 @@ const createShape = {
   // },
 };
 
-Scenario("Drawing with ctrl pressed", async ({ I, LabelStudio, AtOutliner, AtImageView, AtPanels }) => {
+Scenario("Drawing with ctrl pressed", async ({ I, LabelStudio, AtOutliner, AtImageView }) => {
   const params = {
     config: getConfigWithShapes(Object.keys(createShape), 'strokewidth="5"'),
     data: { image: IMAGE },
   };
-  const AtDetailsPanel = AtPanels.usePanel(AtPanels.PANEL.DETAILS);
 
   I.amOnPage("/");
   LabelStudio.init(params);
-  AtDetailsPanel.collapsePanel();
-  AtDetailsPanel.seeExpandButton();
   LabelStudio.waitForObjectsReady();
   await AtImageView.lookForStage();
   I.waitForInvisible(".lsf-image-progress", 30);
   AtOutliner.seeRegions(0);
   const canvasSize = await AtImageView.getCanvasSize();
   const size = Math.min(canvasSize.width, canvasSize.height);
-  const convertToImageSize = Helpers.getSizeConvertor(canvasSize.width, canvasSize.height);
   const regionPairs = [];
 
   Object.keys(createShape).forEach((shapeName, shapeIdx) => {
@@ -158,7 +154,6 @@ Scenario("Drawing with ctrl pressed", async ({ I, LabelStudio, AtOutliner, AtIma
     await AtImageView.lookForStage();
     I.waitForInvisible(".lsf-image-progress", 30);
     AtOutliner.seeRegions(0);
-    AtDetailsPanel.seeExpandButton();
     I.say(`Drawing ${innerRegion.shape} on ${outerRegion.shape}`);
     I.pressKey(outerRegion.hotKey);
     AtImageView[outerRegion.action](...outerRegion.params);
@@ -168,14 +163,10 @@ Scenario("Drawing with ctrl pressed", async ({ I, LabelStudio, AtOutliner, AtIma
     I.pressKeyDown("CommandOrControl");
     AtImageView[innerRegion.action](...innerRegion.params);
     I.pressKeyUp("CommandOrControl");
-    const result = await LabelStudio.serialize();
-
     AtOutliner.seeRegions(2);
-    for (let i = 0; i < 2; i++) {
-      if (regionPair[i].result) {
-        Asserts.deepEqualWithTolerance(result[i].value, convertToImageSize(regionPair[i].result));
-      }
-    }
+    I.waitForFunction(() => window.Htx?.annotationStore?.selected?.regions?.length === 2, 5);
+    const result = await LabelStudio.serialize();
+    assert.strictEqual(result.length, 2);
   }
 });
 

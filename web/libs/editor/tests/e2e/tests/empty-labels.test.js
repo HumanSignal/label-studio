@@ -58,7 +58,7 @@ examples.forEach((example) => {
 
   // For classifications that scenario does not make sense
   if (title.includes("Classifications,")) return;
-  Scenario(`Nonexistent from_name -> ${title}`, async ({ I, LabelStudio, AtTopbar, AtOutliner }) => {
+  Scenario(`Nonexistent from_name -> ${title}`, async ({ I, LabelStudio, AtOutliner }) => {
     const params = { annotations: [{ id: "test", result }], data };
     const configTree = Utils.parseXml(config);
 
@@ -70,7 +70,7 @@ examples.forEach((example) => {
 
     I.amOnPage("/");
     LabelStudio.init(params);
-    AtTopbar.see("Update");
+    I.seeElement('[data-testid="bottombar-update-button"]');
     AtOutliner.dontSeeRegions(regionsCount);
     AtOutliner.dontSeeRegions();
   });
@@ -173,8 +173,7 @@ const MULTIPLE_TYPE = "multiple";
   });
 });
 
-Scenario("Consistency of empty labels", async ({ I, LabelStudio, AtOutliner, AtImageView, AtLabels, AtPanels }) => {
-  const AtDetailsPanel = AtPanels.usePanel(AtPanels.PANEL.DETAILS);
+Scenario("Consistency of empty labels", async ({ I, LabelStudio, AtOutliner, AtImageView, AtLabels }) => {
   const { config, data } = require("../examples/image-bboxes");
   const params = { annotations: [{ id: "test", result: [] }], data };
   const configTree = Utils.parseXml(config);
@@ -186,17 +185,11 @@ Scenario("Consistency of empty labels", async ({ I, LabelStudio, AtOutliner, AtI
   });
   params.config = Utils.renderXml(configTree);
 
-  LabelStudio.setFeatureFlags({
-    fflag_feat_front_optic_1479_improve_image_tag_memory_usage_short: true,
-  });
-
   I.amOnPage("/");
   LabelStudio.init(params);
-  AtDetailsPanel.collapsePanel();
   AtOutliner.seeRegions(0);
   LabelStudio.waitForObjectsReady();
   await AtImageView.lookForStage();
-  I.waitForInvisible(".lsf-image-progress", 30);
   AtLabels.clickLabel("1");
   AtImageView.dragKonva(200, 200, 100, 100);
   const shapesNum = await AtImageView.countKonvaShapes();

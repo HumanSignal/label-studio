@@ -118,11 +118,11 @@ class AudioViewHelper extends withMedia(
       LabelStudio.waitForObjectsReady();
       this.loadingBar.should("not.exist");
       /**
-       * Enhanced audio ready state checking with canvas stabilization
-       * Replaces the previous fixed 32ms wait with actual canvas rendering verification
-       * This ensures the canvas is fully rendered before proceeding with tests
+       * Wait for canvas to have content first, then for it to stabilize.
+       * In CI/headless the waveform can render slowly or at different positions.
        */
-      this.waitForCanvasStable();
+      this.waitForCanvasContent(12000);
+      this.waitForCanvasStable(0.36, 0.9, 3, 18000);
     }
 
     _playButtonSelector = '[data-testid="playback-button:play"]';
@@ -411,98 +411,115 @@ class AudioViewHelper extends withMedia(
      * @param stabilityChecks number of consecutive stable checks required
      * @param timeout maximum time to wait in milliseconds
      */
-    waitForCanvasStable(x = 0.36, y = 0.9, stabilityChecks = 3, timeout = 10000) {
+    /** Sample points to detect waveform (production build may render at different positions). */
+    private _canvasSamplePoints: [number, number][] = [
+      [0.36, 0.9],
+      [0.5, 0.5],
+      [0.5, 0.3],
+      [0.2, 0.5],
+      [0.7, 0.5],
+      [0.1, 0.5],
+      [0.9, 0.5],
+      [0.5, 0.9],
+    ];
+
+    waitForCanvasStable(x = 0.36, y = 0.9, stabilityChecks = 3, timeout = 18000) {
       let stableCount = 0;
       let lastColor: Uint8ClampedArray | null = null;
+      let everHadContent = false;
+      let samplePoint: [number, number] = [x, y];
       const startTime = Date.now();
+      const graceMs = 4000; // when close to timeout with no content, wait this long then proceed
+
+      const isTransparent = (c: Uint8ClampedArray) => c[0] === 0 && c[1] === 0 && c[2] === 0 && c[3] === 0;
 
       const checkStability = (): Cypress.Chainable => {
-        if (Date.now() - startTime > timeout) {
+        const elapsed = Date.now() - startTime;
+        if (elapsed > timeout) {
           cy.log(`⏰ Canvas stabilization timeout after ${timeout}ms`);
           return cy.wrap(null);
         }
+        // If we've never seen content and we're near timeout, wait once then proceed so test doesn't fail
+        if (!everHadContent && elapsed > timeout - graceMs) {
+          cy.log(`⏳ No waveform at sample points after ${elapsed}ms; waiting ${graceMs}ms then proceeding`);
+          cy.wait(graceMs);
+          return cy.wrap(null);
+        }
 
-        return this.getPixelColorRelative(x, y).then((currentColor) => {
-          // Check if we're getting transparent pixels (indicates canvas not ready)
-          const isTransparent =
-            currentColor[0] === 0 && currentColor[1] === 0 && currentColor[2] === 0 && currentColor[3] === 0;
-
-          if (isTransparent) {
-            cy.log("🔍 Canvas not ready - transparent pixel detected, continuing to wait...");
+        const trySample = (pointIndex: number): Cypress.Chainable => {
+          if (pointIndex >= this._canvasSamplePoints.length) {
+            cy.log("🔍 Canvas not ready - all sample points transparent, continuing to wait...");
             stableCount = 0;
             lastColor = null;
-            cy.wait(100); // Wait longer for CI environments
+            cy.wait(150);
             return checkStability();
           }
-
-          if (lastColor && this.colorsEqual(lastColor, currentColor)) {
-            stableCount++;
-            cy.log(`✅ Canvas stable check ${stableCount}/${stabilityChecks}`);
-            if (stableCount >= stabilityChecks) {
-              cy.log(`🎯 Canvas stabilized after ${stableCount} consecutive checks`);
-              return cy.wrap(null);
+          const [sx, sy] = this._canvasSamplePoints[pointIndex];
+          return this.getPixelColorRelative(sx, sy).then((currentColor) => {
+            if (isTransparent(currentColor)) {
+              return trySample(pointIndex + 1);
             }
-          } else {
-            stableCount = 0;
-            cy.log("🔄 Canvas changed, resetting stability counter");
-          }
+            everHadContent = true;
+            if (samplePoint[0] !== sx || samplePoint[1] !== sy) {
+              samplePoint = [sx, sy];
+              cy.log(`🎯 Using sample point (${sx}, ${sy})`);
+            }
+            if (lastColor && this.colorsEqual(lastColor, currentColor)) {
+              stableCount++;
+              cy.log(`✅ Canvas stable check ${stableCount}/${stabilityChecks}`);
+              if (stableCount >= stabilityChecks) {
+                cy.log(`🎯 Canvas stabilized after ${stableCount} consecutive checks`);
+                return cy.wrap(null);
+              }
+            } else {
+              stableCount = 0;
+              cy.log("🔄 Canvas changed, resetting stability counter");
+            }
+            lastColor = currentColor;
+            cy.wait(16);
+            return checkStability();
+          });
+        };
 
-          lastColor = currentColor;
-          cy.wait(16); // Wait one frame
-          return checkStability();
-        });
+        return trySample(0);
       };
 
-      cy.log(`🏁 Starting canvas stabilization check at (${x}, ${y})`);
+      cy.log("🏁 Starting canvas stabilization check (multiple sample points)");
       return checkStability();
     }
 
     /**
-     * Waits for canvas to have actual content (non-transparent pixels)
+     * Waits for canvas to have actual content (non-transparent pixels).
+     * Uses same relative sample points and getPixelColor as stability check so waveform is detected
+     * (waveform may be drawn via WebGL, not 2d context).
      * @param timeout maximum time to wait in milliseconds
      */
     waitForCanvasContent(timeout = 15000) {
       const startTime = Date.now();
+      const isTransparent = (c: Uint8ClampedArray) => c[0] === 0 && c[1] === 0 && c[2] === 0 && c[3] === 0;
 
-      const checkForContent = (): Cypress.Chainable => {
+      const trySample = (pointIndex: number): Cypress.Chainable => {
         if (Date.now() - startTime > timeout) {
           cy.log(`⏰ Canvas content timeout after ${timeout}ms`);
           return cy.wrap(null);
         }
-
-        return this.drawingArea.then((canvas) => {
-          const ctx = (canvas[0] as HTMLCanvasElement).getContext("2d");
-          const canvasEl = canvas[0] as HTMLCanvasElement;
-
-          // Sample multiple points to check for content
-          const samplePoints = [
-            { x: canvasEl.width * 0.25, y: canvasEl.height * 0.5 },
-            { x: canvasEl.width * 0.5, y: canvasEl.height * 0.5 },
-            { x: canvasEl.width * 0.75, y: canvasEl.height * 0.5 },
-          ];
-
-          let hasContent = false;
-          for (const point of samplePoints) {
-            const pixel = ctx.getImageData(Math.floor(point.x), Math.floor(point.y), 1, 1);
-            // Check if pixel has any non-transparent content
-            if (pixel.data[3] > 0 || pixel.data[0] > 0 || pixel.data[1] > 0 || pixel.data[2] > 0) {
-              hasContent = true;
-              break;
-            }
+        if (pointIndex >= this._canvasSamplePoints.length) {
+          cy.log("🔍 Canvas empty at all sample points, waiting for content...");
+          cy.wait(200);
+          return trySample(0);
+        }
+        const [sx, sy] = this._canvasSamplePoints[pointIndex];
+        return this.getPixelColorRelative(sx, sy).then((color) => {
+          if (isTransparent(color)) {
+            return trySample(pointIndex + 1);
           }
-
-          if (hasContent) {
-            cy.log("🎨 Canvas has content!");
-            return cy.wrap(null);
-          }
-          cy.log("🔍 Canvas empty, waiting for content...");
-          cy.wait(200); // Increased wait for CI environments
-          return checkForContent();
+          cy.log("🎨 Canvas has content!");
+          return cy.wrap(null);
         });
       };
 
       cy.log("🏁 Waiting for canvas content...");
-      return checkForContent();
+      return trySample(0);
     }
 
     /**

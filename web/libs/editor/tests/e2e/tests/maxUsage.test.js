@@ -119,11 +119,10 @@ const maxUsageDataTable = new DataTable(["maxUsage"]);
 
 Data(maxUsageImageToolsDataTable).Scenario(
   "Max usages of separated labels in ImageView on region creating",
-  async ({ I, LabelStudio, AtImageView, AtOutliner, AtPanels, Modals, current }) => {
+  async ({ I, LabelStudio, AtImageView, AtOutliner, Modals, current }) => {
     const { maxUsage, shapeName } = current;
     const shape = shapes[shapeName];
     const annotations = [];
-    const AtDetailsPanel = AtPanels.usePanel(AtPanels.PANEL.DETAILS);
 
     for (let k = 0; k < maxUsage; k++) {
       annotations.push({
@@ -153,7 +152,6 @@ Data(maxUsageImageToolsDataTable).Scenario(
         },
       ],
     });
-    AtDetailsPanel.collapsePanel();
     LabelStudio.waitForObjectsReady();
     await AtImageView.lookForStage();
     AtOutliner.seeRegions(maxUsage);
@@ -168,10 +166,9 @@ Data(maxUsageImageToolsDataTable).Scenario(
 
 Data(maxUsageImageToolsDataTable).Scenario(
   "Max usages of labels in ImageView on region creating",
-  async ({ I, LabelStudio, AtImageView, AtOutliner, AtPanels, Modals, current }) => {
+  async ({ I, LabelStudio, AtImageView, AtOutliner, Modals, current }) => {
     const { maxUsage, shapeName } = current;
     const shape = shapes[shapeName];
-    const AtDetailsPanel = AtPanels.usePanel(AtPanels.PANEL.DETAILS);
 
     I.amOnPage("/");
     LabelStudio.init({
@@ -180,7 +177,6 @@ Data(maxUsageImageToolsDataTable).Scenario(
         image: IMAGE,
       },
     });
-    AtDetailsPanel.collapsePanel();
 
     LabelStudio.waitForObjectsReady();
     await AtImageView.lookForStage();

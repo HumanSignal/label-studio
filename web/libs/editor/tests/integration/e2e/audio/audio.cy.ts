@@ -1,6 +1,12 @@
 import { AudioView, LabelStudio } from "@humansignal/frontend-test/helpers/LSF";
 
 describe("Audio", () => {
+  // Lock viewport so canvas size matches baseline snapshots (avoids size-mismatch failures).
+  // To refresh baselines after UI/canvas changes: CYPRESS_updateSnapshots=true (writes to dist/cypress/.../snapshots).
+  beforeEach(() => {
+    cy.viewport(2560, 1440);
+  });
+
   it("Renders audio with merged channels by default", () => {
     LabelStudio.params()
       .config(

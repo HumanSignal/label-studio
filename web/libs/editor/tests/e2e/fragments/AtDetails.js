@@ -1,3 +1,5 @@
+const assert = require("assert");
+
 const { I } = inject();
 
 /**
@@ -5,7 +7,7 @@ const { I } = inject();
  * like region labels, editable fields, meta info, etc.
  */
 module.exports = {
-  _rootSelector: ".lsf-details",
+  _rootSelector: ".lsf-info",
   _labelSelector: ".lsf-detailed-region .lsf-labels-list span",
   _textSelector: ".lsf-region-meta__content_type_text",
   _editMetaSelector: '[aria-label="Edit region\'s meta"]',
@@ -115,7 +117,11 @@ module.exports = {
     I.click(this.locate('[aria-label="Delete selected region"]'));
   },
 
-  seeRelations(count) {
-    I.seeElement(this.locate(this._sectionHeadSelector).withText(`Relations (${count})`));
+  async seeRelations(count) {
+    const actual = await I.executeScript(() => {
+      return window.Htx?.annotationStore?.selected?.relationStore?.size ?? 0;
+    });
+
+    assert.equal(actual, count, `Expected ${count} relations but found ${actual}`);
   },
 };
