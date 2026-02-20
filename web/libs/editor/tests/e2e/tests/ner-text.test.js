@@ -82,7 +82,7 @@ const newResult = {
   value: { start: 233, end: 237, text: "come", labels: ["Words"] },
 };
 
-Scenario("NERText", async ({ I, LabelStudio, AtOutliner, AtTopbar }) => {
+Scenario("NERText", async ({ I, LabelStudio, AtOutliner }) => {
   const params = {
     annotations: [{ id: "TestCmpl", result: results }],
     config: configSimple,
@@ -103,8 +103,7 @@ Scenario("NERText", async ({ I, LabelStudio, AtOutliner, AtTopbar }) => {
   assert.deepEqual(result, results);
 
   // Create a new annotation to create the same result from scratch
-  I.click('[aria-label="Annotations List Toggle"]');
-  I.click('[aria-label="Create Annotation"]');
+  I.click('[aria-label="Create an annotation"]');
 
   I.pressKey("2");
   I.executeScript(selectText, {
@@ -119,8 +118,11 @@ Scenario("NERText", async ({ I, LabelStudio, AtOutliner, AtTopbar }) => {
   assert.deepEqual(result, [newResult]);
 
   // delete this new annotation
-  AtTopbar.clickAria("Delete");
-  I.click("Proceed"); // approve
+  await I.executeScript(() => {
+    const cs = window.Htx.annotationStore;
+
+    cs.deleteAnnotation(cs.selected);
+  });
 
   I.pressKey("1");
   I.executeScript(selectText, {
@@ -143,7 +145,11 @@ Scenario("NERText", async ({ I, LabelStudio, AtOutliner, AtTopbar }) => {
   I.wait(1);
   I.click(locate(".htx-highlight").withText("come"));
 
-  I.see("Relations (1)");
+  const relationsCount = await I.executeScript(() => {
+    return window.Htx?.annotationStore?.selected?.relationStore?.size ?? 0;
+  });
+
+  assert.equal(relationsCount, 1);
 
   result = await I.executeScript(serialize);
   assert.equal(result.length, 4);
@@ -268,10 +274,6 @@ Scenario("NER Text regions in Outliner", async ({ I, LabelStudio }) => {
   };
 
   I.amOnPage("/");
-  // enabling both flags for New UI, but will work with Outliner one only as well
-  LabelStudio.setFeatureFlags({
-    fflag_feat_front_dev_3873_labeling_ui_improvements_short: true,
-  });
   LabelStudio.init(params);
 
   I.waitForElement(".lsf-richtext__line", 60);

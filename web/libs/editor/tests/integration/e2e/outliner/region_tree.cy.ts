@@ -1,13 +1,6 @@
 import { LabelStudio, Sidebar } from "@humansignal/frontend-test/helpers/LSF";
-import { FF_DEV_3873 } from "../../../../src/utils/feature-flags";
 
 describe("Outliner - Regions tree", () => {
-  beforeEach(() => {
-    LabelStudio.addFeatureFlagsOnPageLoad({
-      [FF_DEV_3873]: true,
-    });
-  });
-
   it("shouldn't show all of the regions at the regions list due to virtualization", () => {
     const text = "a".repeat(30);
     const result = text.split("").map((val, idx) => {

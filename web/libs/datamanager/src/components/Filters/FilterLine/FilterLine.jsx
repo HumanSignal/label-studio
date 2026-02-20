@@ -29,9 +29,9 @@ export const FilterLine = observer(({ filter, availableFilters, index, view, sid
   if (sidebar) {
     // Sidebar layout uses grid structure like main layout
     return (
-      <div className={cn("filterLine").mod({ hasChild: !!childFilter })}>
+      <div className={cn("filterLine").mod({ hasChild: !!childFilter }).toClassName()}>
         {/* Main filter row */}
-        <div className={cn("filterLine").elem("column").mix("conjunction")}>
+        <div className={cn("filterLine").elem("column").mix("conjunction").toClassName()}>
           {index === 0 ? (
             <span style={{ fontSize: 12, paddingRight: 5 }}>Where</span>
           ) : (
@@ -39,7 +39,7 @@ export const FilterLine = observer(({ filter, availableFilters, index, view, sid
           )}
         </div>
 
-        <div className={cn("filterLine").elem("column").mix("field")}>
+        <div className={cn("filterLine").elem("column").mix("field").toClassName()}>
           <FilterDropdown
             placeholder="Column"
             defaultValue={filter.filter.id}
@@ -56,7 +56,7 @@ export const FilterLine = observer(({ filter, availableFilters, index, view, sid
               const showEnterpriseBadge = filter.field.enterprise_badge;
               return (
                 <div
-                  className={cn("filterLine").elem("selector")}
+                  className={cn("filterLine").elem("selector").toClassName()}
                   style={{ display: "flex", alignItems: "center", gap: "8px" }}
                 >
                   <span>{filter.field.title}</span>
@@ -83,7 +83,7 @@ export const FilterLine = observer(({ filter, availableFilters, index, view, sid
 
         {/* Column 5: Remove button - only show if no child filter, otherwise empty space */}
         {!childFilter ? (
-          <div className={cn("filterLine").elem("remove")}>
+          <div className={cn("filterLine").elem("remove").toClassName()}>
             <Button
               look="string"
               size="small"
@@ -96,19 +96,19 @@ export const FilterLine = observer(({ filter, availableFilters, index, view, sid
             />
           </div>
         ) : (
-          <div className={cn("filterLine").elem("remove")} />
+          <div className={cn("filterLine").elem("remove").toClassName()} />
         )}
 
         {/* Child filter row */}
         {childFilter && (
           <>
             {/* Column 1: Conjunction */}
-            <div className={cn("filterLine").elem("column").mix("conjunction")}>
+            <div className={cn("filterLine").elem("column").mix("conjunction").toClassName()}>
               <span style={{ fontSize: 12, paddingRight: 5 }}>and</span>
             </div>
 
             {/* Column 2: Field */}
-            <div className={cn("filterLine").elem("column").mix("field child-field")}>
+            <div className={cn("filterLine").elem("column").mix("field child-field").toClassName()}>
               <FilterDropdown
                 placeholder={childFilter.field.title}
                 value={childFilter.field.title}
@@ -129,7 +129,7 @@ export const FilterLine = observer(({ filter, availableFilters, index, view, sid
             />
 
             {/* Column 5: Remove */}
-            <div className={cn("filterLine").elem("remove")}>
+            <div className={cn("filterLine").elem("remove").toClassName()}>
               <Button
                 look="danger"
                 size="smaller"
@@ -148,8 +148,8 @@ export const FilterLine = observer(({ filter, availableFilters, index, view, sid
 
   // Main layout uses parent grid structure - render children as direct grid items
   return (
-    <div className={cn("filterLine").mod({ hasChild: !!childFilter })}>
-      <div className={cn("filterLine").elem("column").mix("conjunction")}>
+    <div className={cn("filterLine").mod({ hasChild: !!childFilter }).toClassName()}>
+      <div className={cn("filterLine").elem("column").mix("conjunction").toClassName()}>
         {index === 0 ? (
           <span style={{ fontSize: 12, paddingRight: 5 }}>Where</span>
         ) : (
@@ -157,7 +157,7 @@ export const FilterLine = observer(({ filter, availableFilters, index, view, sid
         )}
       </div>
 
-      <div className={cn("filterLine").elem("column").mix("field")}>
+      <div className={cn("filterLine").elem("column").mix("field").toClassName()}>
         <FilterDropdown
           placeholder="Column"
           defaultValue={filter.filter.id}
@@ -176,7 +176,7 @@ export const FilterLine = observer(({ filter, availableFilters, index, view, sid
             const showEnterpriseBadge = filter.field.enterprise_badge;
             return (
               <div
-                className={cn("filterLine").elem("selector")}
+                className={cn("filterLine").elem("selector").toClassName()}
                 style={{ display: "flex", alignItems: "center", gap: "8px" }}
               >
                 <span>{filter.field.title}</span>
@@ -203,7 +203,7 @@ export const FilterLine = observer(({ filter, availableFilters, index, view, sid
 
       {/* Only show remove button if there's no child filter, or show it on the last column of the main filter */}
       {!childFilter && (
-        <div className={cn("filterLine").elem("remove")}>
+        <div className={cn("filterLine").elem("remove").toClassName()}>
           <Button
             look="string"
             size="small"
@@ -221,13 +221,13 @@ export const FilterLine = observer(({ filter, availableFilters, index, view, sid
       {childFilter && (
         <>
           {/* Empty column to maintain grid alignment for main filter row */}
-          <div className={cn("filterLine").elem("remove")} />
+          <div className={cn("filterLine").elem("remove").toClassName()} />
 
-          <div className={cn("filterLine").elem("column").mix("conjunction")}>
+          <div className={cn("filterLine").elem("column").mix("conjunction").toClassName()}>
             <span style={{ fontSize: 12, paddingRight: 5 }}>and</span>
           </div>
 
-          <div className={cn("filterLine").elem("column").mix("field child-field")}>
+          <div className={cn("filterLine").elem("column").mix("field child-field").toClassName()}>
             <FilterDropdown
               placeholder={childFilter.field.title}
               value={childFilter.field.title}
@@ -246,7 +246,7 @@ export const FilterLine = observer(({ filter, availableFilters, index, view, sid
           />
 
           {/* Show remove button on child filter row - removes the entire filter group */}
-          <div className={cn("filterLine").elem("remove")}>
+          <div className={cn("filterLine").elem("remove").toClassName()}>
             <Button
               look="string"
               size="small"

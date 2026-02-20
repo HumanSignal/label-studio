@@ -90,8 +90,9 @@ describe("Bottom bar", () => {
     ToolBar.controlButtons.eq(0).should("have.text", "Custom save");
 
     ToolBar.controlButtons.eq(0).click();
-    cy.wait(100).then(() => {
-      resolve();
+    // Resolve after click is processed so the listener can complete (deterministic: next microtask)
+    cy.then(() => {
+      queueMicrotask(() => (resolve as () => void)());
     });
     ToolBar.controlButtons.eq(0).should("have.text", "Custom update");
   });

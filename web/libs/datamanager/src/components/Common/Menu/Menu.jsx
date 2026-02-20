@@ -35,7 +35,7 @@ export const Menu = React.forwardRef(
       <MenuContext.Provider value={{ selected }}>
         <ul
           ref={ref}
-          className={clsx(menuCN.toString(), menuCN.mod({ size, collapsed }).toString(), className)}
+          className={clsx(menuCN.toClassName(), menuCN.mod({ size, collapsed }).toClassName(), className)}
           style={style}
           onClick={clickHandler}
         >
@@ -69,9 +69,9 @@ Menu.Group = ({ children, title, className, style }) => {
   const rootClass = cn("menu-group-dm");
 
   return (
-    <li className={rootClass.mix(className)} style={style}>
-      <div className={rootClass.elem("title")}>{title}</div>
-      <ul className={rootClass.elem("list")}>{children}</ul>
+    <li className={rootClass.mix(className).toClassName()} style={style}>
+      <div className={rootClass.elem("title").toClassName()}>{title}</div>
+      <ul className={rootClass.elem("list").toClassName()}>{children}</ul>
     </li>
   );
 };

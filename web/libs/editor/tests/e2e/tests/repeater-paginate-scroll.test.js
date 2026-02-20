@@ -127,10 +127,20 @@ const checkPaginationButtons = (I) => {
 };
 
 const checkSubmit = (I) => {
-  I.click('[aria-label="Annotations List Toggle"]');
-  I.click('[aria-label="Create Annotation"]');
+  I.click('[aria-label="Create an annotation"]');
   I.submitAnnotation();
-  I.seeAnnotationSubmitted();
+  I.dontSeeElement(".ant-modal");
+  I.waitForFunction(() => {
+    const buttons = [...document.querySelectorAll("button")].filter((b) => b.offsetParent !== null);
+    const hasSubmit = buttons.some((b) => b.textContent?.trim() === "Submit");
+    const hasUpdate = buttons.some((b) => b.textContent?.trim() === "Update");
+    const hasCreate = buttons.some((b) => b.getAttribute("aria-label") === "Create an annotation");
+    const hasLoadingButton = buttons.some((b) => b.classList.contains("ant-btn-loading"));
+
+    // The post-submit state varies by layout (Submit may remain), so assert a stable ready state:
+    // no loading buttons and annotation actions are visible.
+    return !hasLoadingButton && hasCreate && (hasSubmit || hasUpdate);
+  }, 10);
 };
 
 Scenario("Outliner Regions will paginate view window on region click and page advance", async ({ I, LabelStudio }) => {

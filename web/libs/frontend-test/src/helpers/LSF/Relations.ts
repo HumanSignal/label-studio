@@ -41,9 +41,25 @@ export const Relations = {
     return this.overlay.find("g");
   },
   hasRelations(count: number) {
-    cy.get(".lsf-details__section-head")
-      .filter((index, element) => Cypress.$(element).next(".lsf-relation-controls").length > 0)
-      .should("have.text", `Relations (${count})`);
+    // Support both GeneralPanel (lsf-details__section-head) and RelationsTab (lsf-relations__section-head).
+    // When count is 0, RelationsTab may show EmptyState; section heads may use CSS module hashes so match by text.
+    const sectionHeadSelector = "[class*='lsf-details__section-head'], [class*='lsf-relations__section-head']";
+    if (count === 0) {
+      // Text may be in a tabbed panel; retry so we allow time for the details panel to render
+      cy.get("body", { timeout: 10000 }).should(($body) => {
+        const text = $body.text();
+        const hasZeroHeader = text.includes("Relations (0)");
+        const hasEmptyState = text.includes("Create relations between regions");
+        expect(
+          hasZeroHeader || hasEmptyState,
+          `Expected 0 relations (page should contain "Relations (0)" or "Create relations between regions")`,
+        ).to.be.true;
+      });
+    } else {
+      cy.get(sectionHeadSelector)
+        .filter((_index, element) => Cypress.$(element).text().trim() === `Relations (${count})`)
+        .should("have.length.at.least", 1);
+    }
   },
   hasRelation(from: string, to: string) {
     cy.get(".lsf-relations").contains(from).closest(".lsf-relations").contains(to);

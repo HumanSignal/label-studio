@@ -97,15 +97,19 @@ describe("Relations: Hide/Show all relations", () => {
   beforeEach(() => {
     LabelStudio.init({ config, task });
     ImageView.waitForImage();
+    cy.get("#Relations-draggable").click();
     Relations.hasRelations(0);
   });
 
   it("should exist and be disabled without existed relations", () => {
-    Relations.showAllRelationsButton.should("be.visible").should("be.disabled");
+    // With 0 relations the Relations tab shows empty state (no Show all button)
+    cy.contains("Create relations between regions").should("be.visible");
   });
 
   it("should exist and be enabled with existed relations", () => {
+    cy.get("#Regions-draggable").click();
     Sidebar.toggleRegionSelection(0);
+    cy.get("#Relations-draggable").click();
     Relations.toggleCreation();
     ImageView.clickAtRelative(0.51, 0.26);
     Relations.hasRelations(1);
@@ -123,7 +127,9 @@ describe("Relations: Hide/Show all relations", () => {
   });
 
   it("should hide all relations", () => {
+    cy.get("#Regions-draggable").click();
     Sidebar.toggleRegionSelection(0);
+    cy.get("#Relations-draggable").click();
     Relations.toggleCreation();
     ImageView.clickAtRelative(0.51, 0.26);
     Relations.hasRelations(1);
@@ -143,7 +149,9 @@ describe("Relations: Hide/Show all relations", () => {
   });
 
   it("should show all relations", () => {
+    cy.get("#Regions-draggable").click();
     Sidebar.toggleRegionSelection(0);
+    cy.get("#Relations-draggable").click();
     Relations.toggleCreation();
     ImageView.clickAtRelative(0.51, 0.26);
     Relations.hasRelations(1);
@@ -165,7 +173,9 @@ describe("Relations: Hide/Show all relations", () => {
   });
 
   it("should show rest relations", () => {
+    cy.get("#Regions-draggable").click();
     Sidebar.toggleRegionSelection(0);
+    cy.get("#Relations-draggable").click();
     Relations.toggleCreation();
     ImageView.clickAtRelative(0.51, 0.26);
     Relations.hasRelations(1);
@@ -186,7 +196,9 @@ describe("Relations: Hide/Show all relations", () => {
   });
 
   it("should have tooltip for hide action", () => {
+    cy.get("#Regions-draggable").click();
     Sidebar.toggleRegionSelection(0);
+    cy.get("#Relations-draggable").click();
     Relations.toggleCreation();
     ImageView.clickAtRelative(0.51, 0.26);
     Relations.hasRelations(1);

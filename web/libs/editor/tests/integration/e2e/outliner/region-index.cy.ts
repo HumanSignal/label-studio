@@ -1,5 +1,4 @@
 import { Labels, LabelStudio, Relations, Sidebar } from "@humansignal/frontend-test/helpers/LSF";
-import { FF_DEV_3873 } from "../../../../src/utils/feature-flags";
 import {
   labelStudio_settings,
   panelState,
@@ -11,11 +10,6 @@ import { RichText } from "@humansignal/frontend-test/helpers/LSF/RichText";
 import { Hotkeys } from "@humansignal/frontend-test/helpers/LSF/Hotkeys";
 
 describe("Region Index", () => {
-  beforeEach(() => {
-    LabelStudio.addFeatureFlagsOnPageLoad({
-      [FF_DEV_3873]: true,
-    });
-  });
   it("should be visible at the outliner", () => {
     LabelStudio.params().config(simpleConfig).data(simpleData).withResult(resultWithRelations).init();
     LabelStudio.waitForObjectsReady();

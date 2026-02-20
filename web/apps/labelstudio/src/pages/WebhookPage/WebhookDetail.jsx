@@ -191,7 +191,7 @@ const WebhookForm = ({
             Delete Webhook
           </Button>
         )}
-        <div className={rootClass.elem("status")}>
+        <div className={rootClass.elem("status").toClassName()}>
           <Form.Indicator />
         </div>
         <Button
@@ -205,7 +205,7 @@ const WebhookForm = ({
           Cancel
         </Button>
         <Button
-          className={rootClass.elem("save-button")}
+          className={rootClass.elem("save-button").toClassName()}
           aria-label={webhook === null ? "Add Webhook" : "Save Changes"}
         >
           {webhook === null ? "Add Webhook" : "Save Changes"}

@@ -1,13 +1,6 @@
 import { LabelStudio } from "@humansignal/frontend-test/helpers/LSF";
-import { FF_DEV_3873 } from "../../../../src/utils/feature-flags";
 
 describe("Annotation ID", () => {
-  beforeEach(() => {
-    LabelStudio.addFeatureFlagsOnPageLoad({
-      [FF_DEV_3873]: true,
-    });
-  });
-
   it("should have data-annotation-id attribute on all annotation buttons", () => {
     // Initialize with multiple annotations to test with different IDs
     LabelStudio.init({

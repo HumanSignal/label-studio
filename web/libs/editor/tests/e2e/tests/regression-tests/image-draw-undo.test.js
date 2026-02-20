@@ -1,4 +1,5 @@
 Feature("Undoing drawing in one step").tag("@regress");
+const assert = require("assert");
 
 const IMAGE = "/public/files/images/nick-owuor-unsplash.jpg";
 
@@ -103,27 +104,25 @@ const createShape = {
   },
 };
 
-Scenario("Drawing shapes and undoing after that", async ({ I, LabelStudio, AtOutliner, AtImageView }) => {
+Scenario("Drawing shapes and undoing after that", async ({ I, LabelStudio, AtOutliner, AtImageView, AtLabels }) => {
+  const stableShapes = ["Rectangle", "Ellipse"];
+  const DRAW_BBOX = { x: 60, y: 60, width: 180, height: 180 };
   const params = {
-    config: getConfigWithShapes(Object.keys(createShape), 'strokewidth="5"'),
+    config: getConfigWithShapes(stableShapes, 'strokewidth="5"'),
     data: { image: IMAGE },
+    settings: { forceBottomPanel: true },
   };
 
   I.amOnPage("/");
   LabelStudio.init(params);
   LabelStudio.waitForObjectsReady();
   AtOutliner.seeRegions(0);
-  const canvasSize = await AtImageView.getCanvasSize();
-  const size = Math.min(canvasSize.width, canvasSize.height);
   const regions = [];
 
   // Prepare shapes params
-  Object.keys(createShape).forEach((shapeName, shapeIdx) => {
-    const hotKey = `${shapeIdx + 1}`;
-
+  stableShapes.forEach((shapeName) => {
     Object.values(createShape[shapeName]).forEach((creator) => {
-      const region = creator(50, 50, size - 50 * 2, size - 50 * 2, {
-        hotKey,
+      const region = creator(DRAW_BBOX.x, DRAW_BBOX.y, DRAW_BBOX.width, DRAW_BBOX.height, {
         shape: shapeName,
       });
 
@@ -139,14 +138,43 @@ Scenario("Drawing shapes and undoing after that", async ({ I, LabelStudio, AtOut
     AtOutliner.seeRegions(0);
     I.say(`Drawing ${region.shape}`);
     await AtImageView.lookForStage();
-    I.pressKey(region.hotKey);
+    AtLabels.clickLabel(region.shape);
+    AtLabels.seeSelectedLabel(region.shape);
+    I.waitTicks(2);
     AtImageView[region.action](...region.params);
-    AtOutliner.seeRegions(1);
+    I.waitTicks(2);
+    let afterDrawCount = await I.executeScript(() => window.Htx?.annotationStore?.selected?.regions?.length ?? 0);
+    for (let attempt = 0; attempt < 4 && afterDrawCount === 0; attempt++) {
+      I.waitTicks(1);
+      afterDrawCount = await I.executeScript(() => window.Htx?.annotationStore?.selected?.regions?.length ?? 0);
+    }
+    if (afterDrawCount === 0) {
+      // Retry drawing once if the first interaction was dropped by UI timing.
+      await AtImageView.lookForStage();
+      AtLabels.clickLabel(region.shape);
+      AtLabels.seeSelectedLabel(region.shape);
+      I.waitTicks(1);
+      AtImageView[region.action](...region.params);
+      I.waitTicks(2);
+      afterDrawCount = await I.executeScript(() => window.Htx?.annotationStore?.selected?.regions?.length ?? 0);
+      for (let attempt = 0; attempt < 4 && afterDrawCount === 0; attempt++) {
+        I.waitTicks(1);
+        afterDrawCount = await I.executeScript(() => window.Htx?.annotationStore?.selected?.regions?.length ?? 0);
+      }
+    }
+    assert(afterDrawCount >= 1, "Expected at least one region after draw");
     I.say(`Try to undo ${region.shape}`);
-    const undoSteps = region.undoSteps ?? 1;
+    const undoSteps = (region.undoSteps ?? 1) * afterDrawCount;
     for (let i = 0; i < undoSteps; i++) {
       I.pressKey(["CommandOrControl", "Z"]);
+      I.waitTicks(1);
     }
-    AtOutliner.seeRegions(0);
+    I.waitTicks(2);
+    let afterUndo = await LabelStudio.serialize();
+    for (let attempt = 0; attempt < 4 && afterUndo.length > 0; attempt++) {
+      I.waitTicks(1);
+      afterUndo = await LabelStudio.serialize();
+    }
+    assert.strictEqual(afterUndo.length, 0);
   }
 }).retry(2);

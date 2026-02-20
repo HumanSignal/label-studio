@@ -40,11 +40,6 @@ export const FF_DEV_3377 = "fflag_fix_front_dev_3377_image_regions_shift_on_resi
 export const FF_DEV_3391 = "fflag_fix_front_dev_3391_interactive_view_all";
 
 /**
- * Fixing "Auto Detect" tool undo functionality and bugs with skipNextUndoState.
- * @link https://app.launchdarkly.com/default/production/features/fflag_fix_front_dev_1284_auto_detect_undo_281022_short
- */
-export const FF_DEV_3873 = "fflag_feat_front_dev_3873_labeling_ui_improvements_short";
-/**
  * Label stream ablation experiment for solving overlap issue
  * @link https://app.launchdarkly.com/default/production/features/fflag_fix_back_dev_4174_overlap_issue_experiments_10012023_short
  */

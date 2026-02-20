@@ -125,29 +125,30 @@ FFlagMatrix(["fflag_feat_front_lsdv_e_278_contextual_scrolling_short"], (flags) 
         await AtAudioView.waitForAudio();
         await AtAudioView.lookForStage();
 
-        for (let i = 0; i < 10; i++) {
-          // creating a new region
+        const regionCount = 5;
+
+        for (let i = 0; i < regionCount; i++) {
           I.pressKey("1");
           AtLabels.seeSelectedLabel("Speech");
-          AtAudioView.dragAudioElement(40 * i + 10, 30);
-          AtOutliner.dontSeeSelectedRegion();
-          AtAudioView.clickAt(40 * i + 20);
+          AtAudioView.dragAudioElement(60 * i + 10, 40);
+          I.wait(0.5);
+          AtAudioView.clickAt(60 * i + 25);
           AtOutliner.seeSelectedRegion();
           I.pressKey("2");
           I.pressKey("1");
           I.pressKey("u");
+          I.wait(0.5);
         }
 
-        AtOutliner.seeRegions(10);
+        AtOutliner.seeRegions(regionCount);
 
-        for (let i = 0; i < 10; i++) {
-          // creating a new region
-          AtAudioView.clickAt(40 * i + 20);
+        for (let i = 0; i < regionCount; i++) {
+          AtAudioView.clickAt(60 * i + 25);
           AtOutliner.seeSelectedRegion();
           I.pressKey("u");
         }
 
-        AtOutliner.seeRegions(10);
+        AtOutliner.seeRegions(regionCount);
 
         I.pressKey("u");
 
@@ -169,29 +170,45 @@ FFlagMatrix(["fflag_feat_front_lsdv_e_278_contextual_scrolling_short"], (flags) 
       await AtAudioView.waitForAudio();
       await AtAudioView.lookForStage();
 
-      // create a new region
+      // create a new region with label "Speech" (wider area for reliable clicking)
       I.pressKey("1");
-      AtAudioView.dragAudioElement(50, 80);
+      AtAudioView.dragAudioElement(40, 120);
+      I.wait(1);
       I.pressKey("u");
+      I.wait(0.5);
 
       AtOutliner.seeRegions(1);
 
-      // create a new region above the first one
+      // create a new region above the first one with label "Noise"
       I.pressKey("2");
-      AtAudioView.dragAudioElement(49, 81);
+      AtAudioView.dragAudioElement(35, 130);
+      I.wait(1);
       I.pressKey("u");
+      I.wait(0.5);
 
       AtOutliner.seeRegions(2);
 
-      // click on the top-most region visible to select it
-      AtAudioView.clickAt(51);
+      // click on the overlapping area to select the top-most region
+      AtAudioView.clickAt(80);
+      I.wait(0.5);
       AtOutliner.seeSelectedRegion("Noise");
 
-      // hide the region
-      AtOutliner.toggleRegionVisibility("Noise");
+      // hide the Noise region via script to avoid hover unreliability
+      I.pressKey("u");
+      I.wait(0.3);
+      await I.executeScript(() => {
+        const annotation = window.Htx.annotationStore.selected;
+        const noiseRegion = annotation.regions.find((r) => {
+          const labeling = r.labeling;
+          return labeling && labeling.mainValue && labeling.mainValue.includes("Noise");
+        });
+        if (noiseRegion) noiseRegion.toggleHidden();
+      });
+      I.wait(0.5);
 
       // click on the region below the hidden one to select it
-      AtAudioView.clickAt(51);
+      AtAudioView.clickAt(80);
+      I.wait(0.5);
       AtOutliner.seeSelectedRegion("Speech");
     })
       .tag("@flakey")

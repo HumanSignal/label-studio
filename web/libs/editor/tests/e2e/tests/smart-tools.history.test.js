@@ -561,8 +561,7 @@ Scenario("Undo regions auto-annotated from predictions", async ({ I, LabelStudio
 
 Scenario(
   "Undo if there are no regions auto-annotated from predictions",
-  async ({ I, LabelStudio, AtImageView, AtOutliner, AtPanels }) => {
-    const AtDetailsPanel = AtPanels.usePanel(AtPanels.PANEL.DETAILS);
+  async ({ I, LabelStudio, AtImageView, AtOutliner }) => {
     I.amOnPage("/");
     LabelStudio.init({
       config: createRectangleConfig({
@@ -583,7 +582,6 @@ Scenario(
     LabelStudio.setFeatureFlags({
       fflag_fix_front_dev_1284_auto_detect_undo_281022_short: true,
     });
-    AtDetailsPanel.collapsePanel();
     LabelStudio.waitForObjectsReady();
     AtOutliner.seeRegions(0);
     await AtImageView.lookForStage();

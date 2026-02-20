@@ -197,7 +197,7 @@ export const DangerZone = () => {
   );
 
   return (
-    <div className={cn("simple-settings")}>
+    <div className={cn("simple-settings").toClassName()}>
       <Typography variant="headline" size="medium" className="mb-tighter">
         Danger Zone
       </Typography>
@@ -214,7 +214,7 @@ export const DangerZone = () => {
 
             return (
               btn.disabled !== true && (
-                <div className={cn("settings-wrapper")} key={btn.type}>
+                <div className={cn("settings-wrapper").toClassName()} key={btn.type}>
                   <Typography variant="title" size="large">
                     {btn.label}
                   </Typography>
