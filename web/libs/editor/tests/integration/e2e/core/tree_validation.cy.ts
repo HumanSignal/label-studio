@@ -45,4 +45,24 @@ describe("Tree validation (Codecov: TreeValidation)", () => {
     cy.get(".lsf-errors").should("be.visible");
     cy.get(".lsf-errors").invoke("text").should("not.be.empty");
   });
+
+  it("shows validation errors when attribute has invalid type (ERR_BAD_TYPE)", () => {
+    LabelStudio.params()
+      .config(
+        `
+<View>
+  <Image name="img" value="$image" />
+  <RectangleLabels name="tag" toName="img" fillOpacity="-1" strokeWidth="5">
+    <Label value="A" />
+  </RectangleLabels>
+</View>
+`,
+      )
+      .data({ image: "/public/files/example.jpg" })
+      .withResult([])
+      .init();
+
+    cy.get(".lsf-errors").should("be.visible");
+    cy.get(".lsf-errors").invoke("text").should("not.be.empty");
+  });
 });

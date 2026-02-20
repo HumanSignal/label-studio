@@ -130,4 +130,41 @@ describe("Image segmentation - Tools - Bitmask", () => {
     ImageView.drawRectRelative(0.25, 0.25, 0.08, 0.08);
     Sidebar.hasRegions(1);
   });
+
+  describe("Eraser tool (Codecov: tools/Erase.jsx)", () => {
+    it("selects eraser and shows active state", () => {
+      LabelStudio.params().config(bitmaskConfig).data(bitmaskImageData).withResult([]).init();
+      LabelStudio.waitForObjectsReady();
+      ImageView.waitForImage();
+
+      selectBitmaskTool();
+      Labels.select("Test");
+      ImageView.drawRectRelative(0.2, 0.2, 0.2, 0.2);
+      Sidebar.hasRegions(1);
+
+      selectEraserTool();
+      ImageView.toolBar.find('[aria-label="eraser"]').should("have.class", "lsf-tool_active");
+    });
+
+    it("eraser size shortcuts then erase modifies region", () => {
+      LabelStudio.params().config(bitmaskConfig).data(bitmaskImageData).withResult([]).init();
+      LabelStudio.waitForObjectsReady();
+      ImageView.waitForImage();
+
+      selectBitmaskTool();
+      Labels.select("Test");
+      ImageView.drawRectRelative(0.2, 0.2, 0.3, 0.3);
+      Sidebar.hasRegions(1);
+
+      selectEraserTool();
+      cy.get("body").type("]");
+      cy.get("body").type("[");
+      ImageView.drawRectRelative(0.35, 0.35, 0.1, 0.1);
+      Sidebar.hasRegions(1);
+      LabelStudio.serialize().then((result) => {
+        expect(result).to.have.length(1);
+        expect(result[0].value).to.exist;
+      });
+    });
+  });
 });

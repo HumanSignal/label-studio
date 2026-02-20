@@ -134,5 +134,19 @@ describe("Bottom bar", () => {
         expect(choices).to.deep.equal([]);
       });
     });
+
+    it("redo is disabled after a new action following undo", () => {
+      LabelStudio.params().config(choicesConfig).data(simpleData).withResult([]).withInterface("edit-history").init();
+
+      LabelStudio.waitForObjectsReady();
+      Choices.findChoice("Choice 2").click();
+      cy.get('[data-testid="bottombar-undo-button"]').click();
+      cy.get('[data-testid="bottombar-redo-button"]').should("not.be.disabled");
+      Choices.findChoice("Choice 1").click();
+      cy.get('[data-testid="bottombar-redo-button"]').should("be.disabled");
+      LabelStudio.serialize().then((serialized) => {
+        expect(serialized?.[0]?.value?.choices).to.include("Choice 1");
+      });
+    });
   });
 });
