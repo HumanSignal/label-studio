@@ -2013,6 +2013,9 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
 
       if (indicesToDelete.length === 0) return;
 
+      // Don't allow deleting all points — must keep at least one to avoid an empty region
+      if (indicesToDelete.length >= initialPoints.length) return;
+
       // Create a set of deleted point IDs for quick lookup
       const deletedPointIds = new Set(pointIds);
 
