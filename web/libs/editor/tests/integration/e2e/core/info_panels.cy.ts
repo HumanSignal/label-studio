@@ -72,4 +72,23 @@ describe("Label Studio UI info panels", () => {
     // And draft panel just appeared in a history
     cy.get("[class$=history-item_selected]").find("[data-reason='Draft']").should("be.visible");
   });
+
+  describe("Codecov: RegionDetails.tsx", () => {
+    it("shows region details content when a region is selected", () => {
+      LabelStudio.init({
+        config: configSimple,
+        task: {
+          annotations: [{ id: 1, result: [resultSimple] }],
+          predictions: [],
+          id: 1,
+          data: dataSimple,
+        },
+      });
+
+      cy.get("#Regions-draggable").click();
+      cy.get(".lsf-outliner-item").first().click();
+      cy.get("[data-testid='detailed-region']").should("be.visible");
+      cy.get("[class$=control_type_score]").should("have.text", "0.89");
+    });
+  });
 });
