@@ -58,15 +58,40 @@ jobs:
           name: editor-build
           path: ${{ env.FRONTEND_MONOREPO_DIR }}/dist/libs/editor
 
+  prepare-chunks:
+    name: "Prepare Cypress chunks"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ inputs.head_sha }}
+
+      - name: Setup frontend environment
+        uses: ./.github/actions/setup-frontend-environment
+        with:
+          node-version: "${{ env.NODE }}"
+          directory: "${{ env.FRONTEND_MONOREPO_DIR }}"
+
+      - name: Discover specs and build chunk matrix
+        id: chunks
+        working-directory: ${{ env.FRONTEND_MONOREPO_DIR }}
+        run: |
+          json=$(node scripts/cypress-spec-chunks.js --chunks 2)
+          echo "matrix<<MATRIX_EOF" >> $GITHUB_OUTPUT
+          echo "$json" >> $GITHUB_OUTPUT
+          echo "MATRIX_EOF" >> $GITHUB_OUTPUT
+    outputs:
+      matrix: ${{ steps.chunks.outputs.matrix }}
+
   cypress:
     name: "Cypress (${{ matrix.chunk }})"
-    needs: build-editor
+    needs: [build-editor, prepare-chunks]
     runs-on: ubuntu-latest
     timeout-minutes: 25
     strategy:
       fail-fast: false
-      matrix:
-        chunk: [core, image_segmentation, rest]
+      matrix: ${{ fromJson(needs.prepare-chunks.outputs.matrix) }}
     steps:
       - uses: hmarr/debug-action@v3.0.0
 
@@ -147,15 +172,7 @@ jobs:
 
       - name: Run Cypress (chunk ${{ matrix.chunk }})
         working-directory: ${{ env.FRONTEND_MONOREPO_DIR }}
-        run: |
-          if [ "${{ matrix.chunk }}" = "core" ]; then
-            SPEC="libs/editor/tests/integration/e2e/core/**/*.cy.ts"
-          elif [ "${{ matrix.chunk }}" = "image_segmentation" ]; then
-            SPEC="libs/editor/tests/integration/e2e/image_segmentation/**/*.cy.ts"
-          else
-            SPEC="libs/editor/tests/integration/e2e/control_tags/**/*.cy.ts,libs/editor/tests/integration/e2e/audio/**/*.cy.ts,libs/editor/tests/integration/e2e/video/**/*.cy.ts,libs/editor/tests/integration/e2e/timeseries/**/*.cy.ts,libs/editor/tests/integration/e2e/sync/**/*.cy.ts,libs/editor/tests/integration/e2e/relations/**/*.cy.ts,libs/editor/tests/integration/e2e/outliner/**/*.cy.ts,libs/editor/tests/integration/e2e/view_all/**/*.cy.ts,libs/editor/tests/integration/e2e/config/**/*.cy.ts,libs/editor/tests/integration/e2e/linking_modes/**/*.cy.ts,libs/editor/tests/integration/e2e/bulk_mode/**/*.cy.ts,libs/editor/tests/integration/e2e/ner/**/*.cy.ts,libs/editor/tests/integration/e2e/table/**/*.cy.ts,libs/editor/tests/integration/e2e/visual_tags/**/*.cy.ts,libs/editor/tests/integration/e2e/labels/**/*.cy.ts,libs/editor/tests/integration/e2e/drafts/**/*.cy.ts"
-          fi
-          COLLECT_COVERAGE=1 npx nx run editor:integration -- --spec "$SPEC"
+        run: COLLECT_COVERAGE=1 npx nx run editor:integration -- --spec "${{ matrix.specs }}"
 
       - name: Upload coverage chunk
         if: always()
@@ -201,12 +218,22 @@ jobs:
           node-version: "${{ env.NODE }}"
           directory: "${{ env.FRONTEND_MONOREPO_DIR }}"
 
+      # Download to workspace root so artifact paths like web/coverage-chunks/core.json
+      # extract to web/coverage-chunks/ (merge step runs with working-directory: web).
       - name: Download all coverage chunks
         uses: actions/download-artifact@v6
         with:
           pattern: cypress-coverage-*
-          path: ${{ env.FRONTEND_MONOREPO_DIR }}
+          path: .
           merge-multiple: true
+
+      # If artifacts flattened to workspace root (chunk_*.json), place them in web/coverage-chunks
+      - name: Ensure coverage chunks in expected dir
+        run: |
+          mkdir -p ${{ env.FRONTEND_MONOREPO_DIR }}/coverage-chunks
+          for f in chunk_*.json; do
+            [ -f "$f" ] && mv "$f" ${{ env.FRONTEND_MONOREPO_DIR }}/coverage-chunks/
+          done
 
       - name: Merge coverage
         working-directory: ${{ env.FRONTEND_MONOREPO_DIR }}
