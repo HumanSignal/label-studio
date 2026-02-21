@@ -13,13 +13,13 @@ todos:
     status: cancelled
   - id: stabilize-test-helpers
     content: Refactor repeated deterministic interaction logic into shared LSF helpers and reuse across specs.
-    status: pending
+    status: completed
   - id: normalize-fixture-layout
     content: Standardize integration test data modules to reduce duplication and simplify future coverage additions.
     status: completed
   - id: parallelize-full-suite-safely
     content: Introduce grouped parallel Cypress execution with merged coverage and parity gate enforcement.
-    status: pending
+    status: completed
 isProject: false
 ---
 
@@ -57,6 +57,8 @@ isProject: false
 **Remaining to achieve via Cypress:** The "Gap to 85%" is what’s left to close to hit the per-file target. Prefer **Cypress** for UI/flow-heavy code and **unit tests** for pure utils (e.g. `utils/utilities.ts`, `utils/data.js`, `configureStore.js`). Files already at or above 85% merged need no extra work.
 
 **Per-file checks only (no full suite):** (1) Unit: from `web/`, `npx nx run editor:unit --codeCoverage=true` → `web/coverage/coverage-final.json`. (2) Merge: from `web/`, `node libs/editor/scripts/coverage-unit-vs-cypress.js` (Cypress uses existing `libs/editor/coverage-final.json` from CI or a separate run).
+
+**Iterate using frontend-coverage-goals skill (LSE):** (1) Run chunk(s): `node .claude/skills/frontend-coverage-goals/scripts/coverage-cypress-chunk.js --lso-root ../label-studio --chunk core` (and e.g. `--chunk timeseries`). (2) Optional merge: `node scripts/coverage-cypress-merge.js --chunks-dir ../label-studio/web/coverage-chunks --out ../label-studio/web/coverage-chunks/merged.json`. (3) Metrics + recommend: `node scripts/coverage-metrics.js --cypress <chunk or merged>.json --unit ../label-studio/web/coverage/coverage-final.json --files "path1 path2 ..." --src-root libs/editor/src --target 85 | node scripts/coverage-recommend.js`. (4) For each file with `recommended !== "done"`, add the suggested test type. (5) Re-run unit, chunk(s), and metrics to verify.
 
 
 | File                                                   | Unit % | Cypress % | Merged % | Gap to 85% |
@@ -104,12 +106,14 @@ Files that still need tests to reach 85% merged (or to get any Cypress coverage)
 | 10       | `utils/image.js`                                       | 17.5% | Image utils Cypress                                                                                                                                                       |
 | 11       | `components/SidePanels/DetailsPanel/RegionDetails.tsx` | 16.9% | Region details panel Cypress                                                                                                                                              |
 | 12       | `tags/control/Polygon.js`                              | 14.4% | Polygon tool Cypress                                                                                                                                                      |
-| 13       | `tags/object/PagedView.jsx`                            | 2.6%  | Near target; small Cypress bump                                                                                                                                           |
-| 14       | `utils/data.js`                                        | 5.8%  | Prefer unit tests                                                                                                                                                         |
-| 15       | `utils/utilities.ts`                                   | 1.5%  | Near target; prefer unit                                                                                                                                                  |
+| 13       | `tags/object/PagedView.jsx`                            | —     | Done (86.5% merged). repeater_paged.cy.ts: getStoredPageSize, updateQueryPage, repeater hotkeys.                                                                          |
+| 14       | `utils/data.js`                                        | —     | Done (94.3% merged).                                                                                                                                                      |
+| 15       | `utils/utilities.ts`                                   | —     | Done (90.6% merged).                                                                                                                                                      |
 
 
-**Already at or above 85% (no action):** Rotate.jsx, TreeValidation.jsx, HistoryActions.jsx, UserStore.js, messages.jsx, configureStore.js, env/production.js, **Normalization.ts**, **Zoom.jsx**.
+**Remaining 5 files below 85% (use skill: run merged cypress + unit, then metrics + recommend):** `regions/TimeSeriesRegion.js` (39%), `components/Toolbar/Toolbar.jsx` (58.1%), `mixins/Regions.js` (62.3%), `utils/canvas.js` (76%), `tags/control/Polygon.js` (70.6%). Next: add Cypress for TimeSeries/Toolbar/Regions/Polygon per recommend; add unit for canvas (mock toDataURL if needed).
+
+**Already at or above 85% (no action):** Rotate.jsx, TreeValidation.jsx, HistoryActions.jsx, UserStore.js, messages.jsx, configureStore.js, env/production.js, Normalization.ts, Zoom.jsx, Paragraphs/AuthorFilter, image.js, RegionDetails.tsx, PagedView.jsx, data.js, utilities.ts.
 
 ## Coverage gap: develop vs current integration (e2e + integration combined)
 

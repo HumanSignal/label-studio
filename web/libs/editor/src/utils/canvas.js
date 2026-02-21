@@ -112,8 +112,8 @@ function setMaskPixelColors(ctx, data, nw, nh, color, numChannels) {
   let y;
   const sourceNumChannels = numChannels; // Could be 1-channel mask or RGBA mask.
 
-  for (y = 0; y <= nh; y++) {
-    for (x = 0; x <= nw; x++) {
+  for (y = 0; y < nh; y++) {
+    for (x = 0; x < nw; x++) {
       // The source is UInt8, while the target is UInt32.
       // This means indexing the source should be multiplied by the number
       // of channels, while for the target every 32-bit entry contains the full

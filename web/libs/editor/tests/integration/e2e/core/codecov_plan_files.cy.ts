@@ -18,6 +18,17 @@ describe("Codecov: Toolbar.jsx", () => {
 
     Sidebar.hasNoRegions();
   });
+
+  it("toolbar renders all tool groups and ellipse, keypoint tools are selectable", () => {
+    LabelStudio.params().config(imageToolsConfig).data(imageData).withResult([]).init();
+    LabelStudio.waitForImageReady();
+
+    ImageView.selectEllipseToolByButton();
+    ImageView.selectKeypointToolByButton();
+    ImageView.selectRectangleToolByButton();
+
+    Sidebar.hasNoRegions();
+  });
 });
 
 /**
@@ -42,6 +53,32 @@ describe("Codecov: Polygon.js", () => {
 
     Sidebar.hasRegions(1);
   });
+
+  it("draws two polygons (multi-polygon path)", () => {
+    LabelStudio.params().config(imageToolsConfig).data(imageData).withResult([]).init();
+    LabelStudio.waitForImageReady();
+
+    ImageView.selectPolygonToolByButton();
+    ImageView.drawPolygonRelative(
+      [
+        [0.15, 0.15],
+        [0.35, 0.15],
+        [0.35, 0.35],
+        [0.15, 0.35],
+      ],
+      true,
+    );
+    ImageView.drawPolygonRelative(
+      [
+        [0.55, 0.55],
+        [0.75, 0.55],
+        [0.75, 0.75],
+        [0.55, 0.75],
+      ],
+      true,
+    );
+    Sidebar.hasRegions(2);
+  });
 });
 
 /**
@@ -62,7 +99,7 @@ describe("Codecov: canvas.js (brush)", () => {
 
 /**
  * Codecov: regions/TimeSeriesRegion.js
- * Drawing a timeseries region exercises TimeSeriesRegion.
+ * Drawing and selecting timeseries regions exercises TimeSeriesRegion (selectRegion, hotkeys).
  */
 describe("Codecov: TimeSeriesRegion.js", () => {
   it("draws a TimeSeries region", () => {
@@ -75,5 +112,20 @@ describe("Codecov: TimeSeriesRegion.js", () => {
     TimeSeries.drawRegionRelative(0.2, 0.5);
 
     Sidebar.hasRegions(1);
+  });
+
+  it("selects drawn TimeSeries region via outliner (selectRegion, hotkeys)", () => {
+    LabelStudio.params().config(singleChannelConfig).data(heavyDatasetForDisplacement).withResult([]).init();
+
+    LabelStudio.waitForObjectsReady();
+    TimeSeries.waitForReady();
+
+    Labels.select("Peak");
+    TimeSeries.drawRegionRelative(0.25, 0.55);
+    Sidebar.hasRegions(1);
+
+    cy.get("#Regions-draggable").click();
+    cy.get(".lsf-outliner-item").first().click();
+    cy.get("[data-testid='detailed-region']").should("be.visible");
   });
 });

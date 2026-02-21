@@ -79,4 +79,46 @@ describe("Repeater (PagedView) pagination", () => {
     cy.get(paginationRoot).invoke("text").should("include", "1 of 3");
     cy.contains("Page one text").should("be.visible");
   });
+
+  it("restores page size from localStorage (getStoredPageSize)", () => {
+    LabelStudio.params()
+      .config(repeaterPagedConfig)
+      .data(repeaterPagedData)
+      .withResult([])
+      .withLocalStorageItem("pages:repeater", "2")
+      .init();
+
+    cy.contains("Page one text").should("be.visible");
+    cy.contains("Page two text").should("be.visible");
+    cy.get(paginationRoot).invoke("text").should("include", "1 of 2");
+  });
+
+  it("updates URL with view_page param when navigating (updateQueryPage)", () => {
+    LabelStudio.params().config(repeaterPagedConfig).data(repeaterPagedData).withResult([]).init();
+
+    cy.contains("Page one text").should("be.visible");
+    cy.location("search").should("not.include", "view_page");
+
+    cy.get(nextPageBtn).click();
+    cy.location("search").should("include", "view_page=2");
+    cy.contains("Page two text").should("be.visible");
+
+    cy.get(prevPageBtn).click();
+    cy.location("search").should("not.include", "view_page");
+  });
+
+  it("navigates next/previous page via repeater hotkeys (repeater:next-page, repeater:previous-page)", () => {
+    LabelStudio.params().config(repeaterPagedConfig).data(repeaterPagedData).withResult([]).init();
+
+    cy.contains("Page one text").should("be.visible");
+    cy.get(paginationRoot).invoke("text").should("include", "1 of 3");
+
+    cy.get("body").type("{alt}{rightarrow}");
+    cy.get(paginationRoot).invoke("text").should("include", "2 of 3");
+    cy.contains("Page two text").should("be.visible");
+
+    cy.get("body").type("{alt}{leftarrow}");
+    cy.get(paginationRoot).invoke("text").should("include", "1 of 3");
+    cy.contains("Page one text").should("be.visible");
+  });
 });
