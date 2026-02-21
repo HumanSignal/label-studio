@@ -141,3 +141,47 @@ describe("mask2DataURL", () => {
     jest.restoreAllMocks();
   });
 });
+
+describe("maskDataURL2Image", () => {
+  test("resolves with image after processing mask data URL (mocked canvas/img)", async () => {
+    const putImageData = jest.fn();
+    const getImageData = jest.fn().mockReturnValue({
+      data: new Uint8ClampedArray(16),
+    });
+    const toDataURL = jest.fn().mockReturnValue("data:image/png;base64,out");
+    const canvasStub = {
+      width: 2,
+      height: 2,
+      getContext: () => ({
+        getImageData,
+        putImageData,
+        drawImage: jest.fn(),
+      }),
+      toDataURL,
+    };
+    let storedOnload;
+    const imgStub = {
+      set onload(fn) {
+        storedOnload = fn;
+      },
+      set src(_value) {
+        if (storedOnload) setTimeout(storedOnload, 0);
+      },
+      width: 2,
+      height: 2,
+    };
+    const origCreateElement = document.createElement.bind(document);
+    jest.spyOn(document, "createElement").mockImplementation((tag) => {
+      if (tag === "canvas") return canvasStub;
+      if (tag === "img") return imgStub;
+      return origCreateElement(tag);
+    });
+
+    const result = await Canvas.maskDataURL2Image("data:image/png;base64,stub", { color: "#00ff00" });
+
+    expect(result).toBe(imgStub);
+    expect(putImageData).toHaveBeenCalled();
+    expect(toDataURL).toHaveBeenCalled();
+    jest.restoreAllMocks();
+  });
+});

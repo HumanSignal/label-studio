@@ -105,6 +105,30 @@ describe("Codecov: Polygon.js", () => {
     );
     Sidebar.hasRegions(1);
   });
+
+  it("polygon redo while drawing (polygon:redo hotkey)", () => {
+    LabelStudio.params().config(imageToolsConfig).data(imageData).withResult([]).init();
+    LabelStudio.waitForImageReady();
+
+    ImageView.selectPolygonToolByButton();
+    ImageView.drawPolygonRelative(
+      [
+        [0.2, 0.2],
+        [0.35, 0.2],
+      ],
+      false,
+    );
+    Hotkeys.undo();
+    Hotkeys.redo();
+    ImageView.drawPolygonRelative(
+      [
+        [0.35, 0.35],
+        [0.2, 0.2],
+      ],
+      true,
+    );
+    Sidebar.hasRegions(1);
+  });
 });
 
 /**
