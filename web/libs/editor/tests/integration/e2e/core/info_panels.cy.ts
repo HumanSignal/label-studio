@@ -1,4 +1,4 @@
-import { Labels, LabelStudio } from "@humansignal/frontend-test/helpers/LSF";
+import { Hotkeys, Labels, LabelStudio, Sidebar } from "@humansignal/frontend-test/helpers/LSF";
 import { RichText } from "@humansignal/frontend-test/helpers/LSF/RichText";
 import { configSimple, dataSimple, resultSimple } from "../../data/core/info_panels";
 
@@ -132,6 +132,30 @@ describe("Label Studio UI info panels", () => {
       Labels.select("Word1");
       RichText.selectText("world");
       RichText.hasRegionWithText("world");
+    });
+  });
+
+  describe("Codecov: mixins/Regions.js (delete region)", () => {
+    it("deletes selected region via hotkey (Backspace)", () => {
+      LabelStudio.init({
+        config: configSimple,
+        task: {
+          annotations: [{ id: 1, result: [] }],
+          predictions: [],
+          id: 1,
+          data: dataSimple,
+        },
+      });
+
+      Labels.select("Word1");
+      RichText.selectText("text");
+      RichText.hasRegionWithText("text");
+      Sidebar.hasRegions(1);
+
+      cy.get("#Regions-draggable").click();
+      Sidebar.findRegionByIndex(0).click();
+      Hotkeys.deleteRegion();
+      Sidebar.hasNoRegions();
     });
   });
 });
