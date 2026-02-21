@@ -2,7 +2,7 @@ import { Choices, LabelStudio } from "@humansignal/frontend-test/helpers/LSF";
 import { repeaterConfig, repeaterPagedConfig, repeaterPagedData } from "../../data/core/repeater_paged";
 
 /**
- * Codecov: core/Tree.tsx Repeater branch (type=repeater, non-pagination path).
+ * Repeater (type=repeater, no pagination).
  */
 describe("Repeater (no pagination)", () => {
   it("renders all repeater items and serializes choices", () => {
@@ -21,7 +21,7 @@ describe("Repeater (no pagination)", () => {
 });
 
 /**
- * Codecov: tags/object/PagedView.jsx, common/Pagination/Pagination.tsx.
+ * Repeater with mode="pagination" (PagedView).
  * Repeater with mode="pagination" renders PagedView and Pagination (editor BEM prefix: lsf-).
  */
 describe("Repeater (PagedView) pagination", () => {

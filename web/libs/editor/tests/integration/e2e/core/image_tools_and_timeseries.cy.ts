@@ -2,12 +2,8 @@ import { Hotkeys, ImageView, LabelStudio, Sidebar, Labels, TimeSeries } from "@h
 import { imageData, imageToolsConfig } from "../../data/image_segmentation/stage_interactions";
 import { singleChannelConfig, heavyDatasetForDisplacement } from "../../data/timeseries/charts-displaying";
 
-/**
- * Codecov: components/Toolbar/Toolbar.jsx
- * Exercises toolbar by switching between image tools (rectangle, polygon, brush).
- */
-describe("Codecov: Toolbar.jsx", () => {
-  it("toolbar renders and tool switches run when switching rectangle, polygon, brush", () => {
+describe("Image toolbar tool switching", () => {
+  it("switches between rectangle, polygon, and brush tools", () => {
     LabelStudio.params().config(imageToolsConfig).data(imageData).withResult([]).init();
     LabelStudio.waitForImageReady();
 
@@ -19,7 +15,7 @@ describe("Codecov: Toolbar.jsx", () => {
     Sidebar.hasNoRegions();
   });
 
-  it("toolbar renders all tool groups and ellipse, keypoint tools are selectable", () => {
+  it("switches between ellipse and keypoint tools", () => {
     LabelStudio.params().config(imageToolsConfig).data(imageData).withResult([]).init();
     LabelStudio.waitForImageReady();
 
@@ -31,12 +27,8 @@ describe("Codecov: Toolbar.jsx", () => {
   });
 });
 
-/**
- * Codecov: tags/control/Polygon.js
- * Polygon tool and hotkeys path when drawing a polygon.
- */
-describe("Codecov: Polygon.js", () => {
-  it("draws polygon and exercises Polygon model/hotkeys", () => {
+describe("Polygon tool", () => {
+  it("draws a closed polygon", () => {
     LabelStudio.params().config(imageToolsConfig).data(imageData).withResult([]).init();
     LabelStudio.waitForImageReady();
 
@@ -54,7 +46,7 @@ describe("Codecov: Polygon.js", () => {
     Sidebar.hasRegions(1);
   });
 
-  it("draws two polygons (multi-polygon path)", () => {
+  it("draws two polygons", () => {
     LabelStudio.params().config(imageToolsConfig).data(imageData).withResult([]).init();
     LabelStudio.waitForImageReady();
 
@@ -80,12 +72,11 @@ describe("Codecov: Polygon.js", () => {
     Sidebar.hasRegions(2);
   });
 
-  it("polygon undo while drawing (polygon:undo hotkey)", () => {
+  it("undo last point while drawing polygon", () => {
     LabelStudio.params().config(imageToolsConfig).data(imageData).withResult([]).init();
     LabelStudio.waitForImageReady();
 
     ImageView.selectPolygonToolByButton();
-    // Draw 3 points then undo the third, then redraw third + fourth and close
     ImageView.drawPolygonRelative(
       [
         [0.15, 0.15],
@@ -106,7 +97,7 @@ describe("Codecov: Polygon.js", () => {
     Sidebar.hasRegions(1);
   });
 
-  it("polygon redo while drawing (polygon:redo hotkey)", () => {
+  it("redo point after undo while drawing polygon", () => {
     LabelStudio.params().config(imageToolsConfig).data(imageData).withResult([]).init();
     LabelStudio.waitForImageReady();
 
@@ -131,12 +122,8 @@ describe("Codecov: Polygon.js", () => {
   });
 });
 
-/**
- * Codecov: utils/canvas.js (brush path uses labelToSVG, RLE, etc.)
- * Selecting brush tool and drawing exercises canvas utilities.
- */
-describe("Codecov: canvas.js (brush)", () => {
-  it("brush tool selected and draw exercises canvas labelToSVG / brush path", () => {
+describe("Brush tool", () => {
+  it("draws a brush region on image", () => {
     LabelStudio.params().config(imageToolsConfig).data(imageData).withResult([]).init();
     LabelStudio.waitForImageReady();
 
@@ -147,11 +134,7 @@ describe("Codecov: canvas.js (brush)", () => {
   });
 });
 
-/**
- * Codecov: regions/TimeSeriesRegion.js
- * Drawing and selecting timeseries regions exercises TimeSeriesRegion (selectRegion, hotkeys).
- */
-describe("Codecov: TimeSeriesRegion.js", () => {
+describe("TimeSeries region drawing and selection", () => {
   it("draws a TimeSeries region", () => {
     LabelStudio.params().config(singleChannelConfig).data(heavyDatasetForDisplacement).withResult([]).init();
 
@@ -164,7 +147,7 @@ describe("Codecov: TimeSeriesRegion.js", () => {
     Sidebar.hasRegions(1);
   });
 
-  it("selects drawn TimeSeries region via outliner (selectRegion, hotkeys)", () => {
+  it("selects drawn TimeSeries region via outliner and shows details", () => {
     LabelStudio.params().config(singleChannelConfig).data(heavyDatasetForDisplacement).withResult([]).init();
 
     LabelStudio.waitForObjectsReady();

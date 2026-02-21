@@ -35,7 +35,7 @@ describe("Control Tags - Choice", () => {
       Tooltip.hasText("A hint for Choice 2");
     });
 
-    it("Codecov: Choice.jsx layout=select - select option and serialize", () => {
+    it("select layout: select option and serialize", () => {
       LabelStudio.params().config(choicesSelectLayoutConfig).data(simpleData).withResult([]).init();
 
       Choices.toggleSelect();

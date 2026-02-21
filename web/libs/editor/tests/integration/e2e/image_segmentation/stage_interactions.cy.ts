@@ -163,7 +163,7 @@ describe("Image Segmentation Stage Interactions", () => {
     Sidebar.hasRegions(2);
   });
 
-  describe("Rotate and Zoom toolbar (Codecov: tools/Rotate.jsx, tools/Zoom.jsx)", () => {
+  describe("Rotate and Zoom toolbar", () => {
     it("should rotate image left and right via toolbar buttons", () => {
       LabelStudio.params().config(imageToolsConfigWithRotate).data(imageData).withResult([]).init();
       LabelStudio.waitForImageReady();
@@ -205,7 +205,7 @@ describe("Image Segmentation Stage Interactions", () => {
       ImageView.drawingArea.get("canvas").should("be.visible");
     });
 
-    it("should zoom to fit and zoom to actual size via flyout (Codecov: Zoom.jsx FlyoutMenu)", () => {
+    it("should zoom to fit and zoom to actual size via flyout", () => {
       LabelStudio.params().config(imageToolsConfig).data(imageData).withResult([]).init();
       LabelStudio.waitForImageReady();
 
@@ -218,7 +218,7 @@ describe("Image Segmentation Stage Interactions", () => {
       ImageView.drawingArea.get("canvas").should("be.visible");
     });
 
-    it("should toggle pan tool (Codecov: Zoom.jsx Pan Tool)", () => {
+    it("should toggle pan tool", () => {
       LabelStudio.params().config(imageToolsConfig).data(imageData).withResult([]).init();
       LabelStudio.waitForImageReady();
 
@@ -228,7 +228,7 @@ describe("Image Segmentation Stage Interactions", () => {
       ImageView.toolBar.find('[aria-label="pan"]').should("not.have.class", "lsf-tool_active");
     });
 
-    it("should pan the stage when pan tool is active and user drags (Codecov: Zoom.jsx handleDrag, mousemoveEv, mousedownEv, mouseupEv)", () => {
+    it("should pan the stage when pan tool is active and user drags", () => {
       LabelStudio.params().config(imageToolsConfig).data(imageData).withResult([]).init();
       LabelStudio.waitForImageReady();
 

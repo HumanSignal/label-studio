@@ -7,7 +7,7 @@ Fixtures for Cypress integration specs. Structure mirrors `e2e/` (e.g. `data/cor
 - Export config strings as `*Config` (e.g. `repeaterPagedConfig`, `choicesConfig`).
 - Export task data objects as `*Data` (e.g. `repeaterPagedData`, `imageData`).
 - Export annotation/result arrays as `*Result` or `*Annotations` when needed.
-- Add a short JSDoc comment for configs that target specific coverage (e.g. Codecov).
+- Add a short JSDoc comment for configs when they enable a specific feature under test.
 
 **Shared data:**
 

@@ -1,5 +1,5 @@
 /**
- * Repeater (no pagination) for Codecov: core/Tree.tsx repeater branch.
+ * Repeater (no pagination).
  */
 export const repeaterConfig = `
 <View>
@@ -18,7 +18,7 @@ export const repeaterConfig = `
 `;
 
 /**
- * Repeater with mode="pagination" (PagedView) for Codecov: tags/object/PagedView.jsx, common/Pagination.
+ * Repeater with mode="pagination" (PagedView).
  */
 export const repeaterPagedConfig = `
 <View>

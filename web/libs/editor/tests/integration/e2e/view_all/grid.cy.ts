@@ -8,7 +8,7 @@ beforeEach(() => {
   });
 });
 
-describe("View All - Compare / Grid (Codecov: Grid.jsx, Toolbar.jsx)", () => {
+describe("View All - Compare / Grid", () => {
   it("renders Compare view (Grid) with multiple annotations", () => {
     LabelStudio.params().config(ratingConfig).data(textData).withResult(ratingResult).withResult(ratingResult).init();
 

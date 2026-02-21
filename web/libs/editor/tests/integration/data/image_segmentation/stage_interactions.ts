@@ -7,7 +7,7 @@ export const imageToolsConfig = `<View>
     <Brush name="brush" toName="image" />
 </View>`;
 
-/** Image config with rotate control enabled (for Rotate.jsx coverage). */
+/** Image config with rotate control enabled. */
 export const imageToolsConfigWithRotate = `<View>
     <Image name="image" value="$image" rotatecontrol="true" />
     <Rectangle name="rect" toName="image" />

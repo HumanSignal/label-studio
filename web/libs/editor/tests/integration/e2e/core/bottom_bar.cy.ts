@@ -98,7 +98,7 @@ describe("Bottom bar", () => {
     ToolBar.controlButtons.eq(0).should("have.text", "Custom update");
   });
 
-  describe("Edit history (Codecov: HistoryActions.jsx)", () => {
+  describe("Edit history", () => {
     it("shows undo/redo/reset and undoes then redoes a choice", () => {
       LabelStudio.params().config(choicesConfig).data(simpleData).withResult([]).withInterface("edit-history").init();
 

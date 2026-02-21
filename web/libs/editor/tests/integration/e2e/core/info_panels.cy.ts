@@ -73,7 +73,7 @@ describe("Label Studio UI info panels", () => {
     cy.get("[class$=history-item_selected]").find("[data-reason='Draft']").should("be.visible");
   });
 
-  describe("Codecov: RegionDetails.tsx", () => {
+  describe("Region details panel", () => {
     it("shows region details content when a region is selected", () => {
       LabelStudio.init({
         config: configSimple,
@@ -109,7 +109,7 @@ describe("Label Studio UI info panels", () => {
     });
   });
 
-  describe("Codecov: selection-tools (word granularity)", () => {
+  describe("Text selection with word granularity", () => {
     const configWordGranularity = `<View>
   <Labels name="lbl" toName="text">
     <Label value="Word1" />
@@ -118,7 +118,7 @@ describe("Label Studio UI info panels", () => {
   <Text name="text" value="$text" inline="true" granularity="word" />
 </View>`;
 
-    it("creates region when selecting text with word granularity (trimSelection, applyTextGranularity)", () => {
+    it("creates region when selecting text with word granularity", () => {
       LabelStudio.init({
         config: configWordGranularity,
         task: {
@@ -135,8 +135,8 @@ describe("Label Studio UI info panels", () => {
     });
   });
 
-  describe("Codecov: mixins/Regions.js (delete region)", () => {
-    it("deletes selected region via hotkey (Backspace)", () => {
+  describe("Delete region via hotkey", () => {
+    it("deletes selected region via Backspace when selected from outliner", () => {
       LabelStudio.init({
         config: configSimple,
         task: {

@@ -172,7 +172,7 @@ describe("MultiChannel", () => {
       });
   });
 
-  describe("Codecov: TimeSeriesRegion", () => {
+  describe("TimeSeries region creation", () => {
     it("creates a timeseries region and serializes", () => {
       LabelStudio.params().config(multiChannwlCnfig).data(multiChannelSampleData).withResult([]).init();
 

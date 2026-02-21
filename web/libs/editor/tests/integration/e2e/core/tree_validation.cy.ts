@@ -1,10 +1,9 @@
 import { LabelStudio } from "@humansignal/frontend-test/helpers/LSF";
 
 /**
- * Codecov: TreeValidation.jsx, ConfigValidator.
  * TreeValidation renders when annotationStore.validation has errors (e.g. invalid config).
  */
-describe("Tree validation (Codecov: TreeValidation)", () => {
+describe("Tree validation", () => {
   it("shows validation errors when config has invalid toName reference (ERR_TAG_NOT_FOUND)", () => {
     LabelStudio.params()
       .config(

@@ -27,7 +27,7 @@ const configWithMultipleRegions = `
   </View>
 `;
 
-// Codecov: Label.jsx maxUsages - single label with maxUsages=1 shows warning when used twice
+// Label with maxUsages=1 shows warning when used more than once
 const configLabelMaxUsages = `
   <View>
     <Image name="img" value="$image"></Image>
@@ -165,8 +165,8 @@ describe("Image Regions scenario", () => {
     cy.get(".lsf-outliner-item").contains("No label").should("have.css", "color", "rgb(102, 102, 102)");
   });
 
-  describe("Codecov: Label.jsx maxUsages", () => {
-    it("shows warning when Label with maxUsages=1 is applied to a second region", () => {
+  describe("Label maxUsages", () => {
+    it("shows warning when label with maxUsages=1 is applied to a second region", () => {
       LabelStudio.params().config(configLabelMaxUsages).data({ image }).withResult([]).init();
 
       ImageView.waitForImage();

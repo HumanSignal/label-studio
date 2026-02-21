@@ -147,7 +147,7 @@ describe("Sync: Audio Paragraphs", () => {
     cy.on("uncaught:exception", () => false);
   });
 
-  describe("Author filter (Codecov: AuthorFilter.jsx)", () => {
+  describe("Author filter", () => {
     beforeEach(() => {
       LabelStudio.addFeatureFlagsOnPageLoad({
         ff_front_dev_2715_audio_3_280722_short: true,
@@ -472,7 +472,7 @@ describe("Sync: Audio Paragraphs", () => {
     });
   });
 
-  describe("Paragraphs layout and phrases (Codecov: Paragraphs/HtmlParagraphs, ParagraphsRegion)", () => {
+  describe("Paragraphs layout and phrases", () => {
     it("should render dialogue layout with all phrases and play from first phrase", () => {
       LabelStudio.params().config(configWithScroll).data(data).withResult(annotations).init();
 
@@ -491,7 +491,7 @@ describe("Sync: Audio Paragraphs", () => {
     });
   });
 
-  describe("Paragraphs AuthorFilter (FF_DEV_2669 on, Codecov: AuthorFilter)", () => {
+  describe("Paragraphs AuthorFilter (FF_DEV_2669 on)", () => {
     beforeEach(() => {
       LabelStudio.addFeatureFlagsOnPageLoad({
         ff_front_dev_2715_audio_3_280722_short: true,

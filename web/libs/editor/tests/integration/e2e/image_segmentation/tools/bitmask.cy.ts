@@ -114,7 +114,7 @@ describe("Image segmentation - Tools - Bitmask", () => {
     Sidebar.hasRegions(1);
   });
 
-  describe("Eraser tool (Codecov: tools/Erase.jsx)", () => {
+  describe("Eraser tool", () => {
     it("selects eraser and shows active state", () => {
       LabelStudio.params().config(bitmaskConfig).data(bitmaskImageData).withResult([]).init();
       LabelStudio.waitForImageReady();

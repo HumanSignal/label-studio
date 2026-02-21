@@ -49,7 +49,7 @@ describe("Audio", () => {
     AudioView.toMatchImageSnapshot(AudioView.drawingArea, { threshold: 0.4 });
   });
 
-  describe("Timeline controls (Codecov: AudioControl, Timeline Controls)", () => {
+  describe("Timeline controls", () => {
     beforeEach(() => {
       LabelStudio.params()
         .config(
