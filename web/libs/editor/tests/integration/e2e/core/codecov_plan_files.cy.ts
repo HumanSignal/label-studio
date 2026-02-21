@@ -1,4 +1,4 @@
-import { ImageView, LabelStudio, Sidebar, Labels, TimeSeries } from "@humansignal/frontend-test/helpers/LSF";
+import { Hotkeys, ImageView, LabelStudio, Sidebar, Labels, TimeSeries } from "@humansignal/frontend-test/helpers/LSF";
 import { imageData, imageToolsConfig } from "../../data/image_segmentation/stage_interactions";
 import { singleChannelConfig, heavyDatasetForDisplacement } from "../../data/timeseries/charts-displaying";
 
@@ -78,6 +78,32 @@ describe("Codecov: Polygon.js", () => {
       true,
     );
     Sidebar.hasRegions(2);
+  });
+
+  it("polygon undo while drawing (polygon:undo hotkey)", () => {
+    LabelStudio.params().config(imageToolsConfig).data(imageData).withResult([]).init();
+    LabelStudio.waitForImageReady();
+
+    ImageView.selectPolygonToolByButton();
+    // Draw 3 points then undo the third, then redraw third + fourth and close
+    ImageView.drawPolygonRelative(
+      [
+        [0.15, 0.15],
+        [0.35, 0.15],
+        [0.35, 0.35],
+      ],
+      false,
+    );
+    Hotkeys.undo();
+    ImageView.drawPolygonRelative(
+      [
+        [0.35, 0.35],
+        [0.55, 0.55],
+        [0.15, 0.15],
+      ],
+      true,
+    );
+    Sidebar.hasRegions(1);
   });
 });
 

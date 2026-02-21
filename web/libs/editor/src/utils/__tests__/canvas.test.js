@@ -107,3 +107,37 @@ describe("trim", () => {
     expect(result.canvas).toBeTruthy();
   });
 });
+
+describe("mask2DataURL", () => {
+  test("returns data URL from single-channel mask (mocked canvas.toDataURL)", () => {
+    const singleChannel = new Uint8ClampedArray(4);
+    singleChannel[0] = 255;
+    singleChannel[3] = 255;
+    const putImageData = jest.fn();
+    const getImageData = jest.fn().mockReturnValue({
+      data: new Uint8ClampedArray(16),
+    });
+    const toDataURL = jest.fn().mockReturnValue("data:image/png;base64,stub");
+    const canvas = {
+      width: 2,
+      height: 2,
+      getContext: () => ({
+        getImageData,
+        putImageData,
+      }),
+      toDataURL,
+    };
+    const origCreateElement = document.createElement.bind(document);
+    jest
+      .spyOn(document, "createElement")
+      .mockImplementation((tag) => (tag === "canvas" ? canvas : origCreateElement(tag)));
+
+    const url = Canvas.mask2DataURL(singleChannel, 2, 2, "#ff0000");
+
+    expect(toDataURL).toHaveBeenCalled();
+    expect(url).toBe("data:image/png;base64,stub");
+    expect(putImageData).toHaveBeenCalled();
+
+    jest.restoreAllMocks();
+  });
+});
