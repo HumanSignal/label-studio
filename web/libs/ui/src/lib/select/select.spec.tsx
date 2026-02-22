@@ -23,6 +23,11 @@ jest.mock("./select.module.scss", () => ({
   sizeLarge: "sizeLarge",
   selectLoading: "selectLoading",
   valueInput: "valueInput",
+  selectedItemsGroup: "selectedItemsGroup",
+  selectedItemsHeader: "selectedItemsHeader",
+  selectedItemsCaret: "selectedItemsCaret",
+  selectedItemsTitle: "selectedItemsTitle",
+  selectedItemsContent: "selectedItemsContent",
 }));
 
 // Mock react-window and react-window-infinite-loader to capture props
@@ -350,6 +355,209 @@ describe("Select Component", () => {
 
       const trigger = screen.getByRole("button");
       expect(trigger).toBeDisabled();
+    });
+  });
+
+  describe("Label and description", () => {
+    it("renders with label and description when provided", () => {
+      render(
+        <Select options={["A", "B"] as any} placeholder="Pick" label="Choose one" description="Optional helper text" />,
+      );
+      expect(screen.getByText("Choose one")).toBeInTheDocument();
+      expect(screen.getByText("Optional helper text")).toBeInTheDocument();
+    });
+  });
+
+  describe("SelectedItemsGroup (multiple + searchable + virtual list)", () => {
+    it("shows selected items group when multiple selections exist", async () => {
+      render(
+        <Select
+          options={["Apple", "Banana", "Cherry"] as any}
+          placeholder="Select"
+          multiple={true}
+          searchable={true}
+          isVirtualList={true}
+        />,
+      );
+      fireEvent.click(screen.getByRole("button"));
+      await waitFor(() => expect(screen.getByText("Apple")).toBeInTheDocument());
+      fireEvent.click(screen.getByText("Apple"));
+      fireEvent.click(screen.getByText("Banana"));
+      await waitFor(() => {
+        expect(screen.getByText("Selected items")).toBeInTheDocument();
+        expect(screen.getByText("2")).toBeInTheDocument(); // badge count
+      });
+    });
+
+    it("deselects item from selected group when clicking option", async () => {
+      const onChange = jest.fn();
+      render(
+        <Select
+          options={["Apple", "Banana"] as any}
+          placeholder="Select"
+          multiple={true}
+          searchable={true}
+          isVirtualList={true}
+          onChange={onChange}
+        />,
+      );
+      fireEvent.click(screen.getByRole("button"));
+      await waitFor(() => expect(screen.getByText("Apple")).toBeInTheDocument());
+      fireEvent.click(screen.getByText("Apple"));
+      fireEvent.click(screen.getByText("Banana"));
+      await waitFor(() => expect(screen.getByText("Selected items")).toBeInTheDocument());
+      // Click header to expand selected group, then click Apple in the list to deselect
+      const header = screen.getByRole("button", { name: /Selected items group/i });
+      fireEvent.click(header);
+      await waitFor(() => expect(screen.getByTestId("select-option-Apple")).toBeInTheDocument());
+      fireEvent.click(screen.getByTestId("select-option-Apple"));
+      expect(onChange).toHaveBeenCalled();
+    });
+
+    it("shows No items selected when expanded and empty", async () => {
+      render(
+        <Select
+          options={["Apple", "Banana"] as any}
+          placeholder="Select"
+          multiple={true}
+          searchable={true}
+          isVirtualList={true}
+          alwaysShowSelectedGroup={true}
+        />,
+      );
+      fireEvent.click(screen.getByRole("button"));
+      await waitFor(() => expect(screen.getByText("Selected items")).toBeInTheDocument());
+      const header = screen.getByRole("button", { name: /Selected items group/i });
+      fireEvent.click(header);
+      await waitFor(() => expect(screen.getByText("No items selected")).toBeInTheDocument());
+    });
+  });
+
+  describe("Search and callbacks", () => {
+    it("calls onSearch when search input changes", async () => {
+      const onSearch = jest.fn();
+      render(
+        <Select options={["Apple", "Banana"] as any} placeholder="Select" searchable={true} onSearch={onSearch} />,
+      );
+      fireEvent.click(screen.getByRole("button"));
+      const searchInput = screen.getByTestId("select-search-field");
+      fireEvent.change(searchInput, { target: { value: "App" } });
+      await waitFor(() => expect(onSearch).toHaveBeenCalledWith("App"));
+    });
+
+    it("uses custom searchFilter when provided", async () => {
+      const searchFilter = jest.fn((option: any, q: string) => {
+        const label = option?.label ?? option;
+        return String(label).toLowerCase().startsWith(q.toLowerCase());
+      });
+      render(
+        <Select
+          options={["Apple", "Apricot", "Banana"] as any}
+          placeholder="Select"
+          searchable={true}
+          searchFilter={searchFilter}
+        />,
+      );
+      fireEvent.click(screen.getByRole("button"));
+      const searchInput = screen.getByTestId("select-search-field");
+      fireEvent.change(searchInput, { target: { value: "Ap" } });
+      await waitFor(() => expect(searchFilter).toHaveBeenCalled());
+    });
+  });
+
+  describe("Open/close callbacks", () => {
+    it("calls onOpen when dropdown opens and onClose when option selected (single)", async () => {
+      const onOpen = jest.fn();
+      const onClose = jest.fn();
+      render(<Select options={["Apple", "Banana"] as any} placeholder="Select" onOpen={onOpen} onClose={onClose} />);
+      fireEvent.click(screen.getByRole("button"));
+      await waitFor(() => expect(onOpen).toHaveBeenCalled());
+      fireEvent.click(screen.getByText("Apple"));
+      await waitFor(() => expect(onClose).toHaveBeenCalled());
+    });
+  });
+
+  describe("renderSelected and selectFirstIfEmpty", () => {
+    it("uses renderSelected when provided", async () => {
+      const renderSelected = jest.fn((selected: any[], placeholder: string) =>
+        selected.length ? selected.map((s) => s?.label ?? s).join(", ") : placeholder,
+      );
+      render(<Select options={["Apple", "Banana"] as any} placeholder="Pick one" renderSelected={renderSelected} />);
+      expect(renderSelected).toHaveBeenCalled();
+      fireEvent.click(screen.getByRole("button"));
+      await waitFor(() => expect(screen.getByText("Apple")).toBeInTheDocument());
+      fireEvent.click(screen.getByText("Apple"));
+      await waitFor(() => expect(renderSelected).toHaveBeenCalledWith(expect.any(Array), "Pick one"));
+    });
+
+    it("selects first option when selectFirstIfEmpty and no value", () => {
+      const onChange = jest.fn();
+      render(
+        <Select
+          options={[{ value: "a", label: "Option A" }] as any}
+          placeholder="Select"
+          selectFirstIfEmpty={true}
+          onChange={onChange}
+        />,
+      );
+      expect(screen.getByText("Option A")).toBeInTheDocument();
+    });
+  });
+
+  describe("Loading and trigger attributes", () => {
+    it("shows Loading when isLoading", async () => {
+      render(<Select options={["A", "B"] as any} placeholder="Select" isLoading={true} />);
+      fireEvent.click(screen.getByRole("button"));
+      await waitFor(() => expect(screen.getByText("Loading...")).toBeInTheDocument());
+    });
+
+    it("applies data-testid from props when provided", () => {
+      render(<Select options={["A"] as any} placeholder="Select" dataTestid="my-select" />);
+      expect(screen.getByTestId("my-select")).toBeInTheDocument();
+    });
+  });
+
+  describe("Option keyboard navigation", () => {
+    it("selects option on Enter key", async () => {
+      const onChange = jest.fn();
+      render(<Select options={["Apple", "Banana"] as any} placeholder="Select" onChange={onChange} />);
+      fireEvent.click(screen.getByRole("button"));
+      await waitFor(() => expect(screen.getByText("Apple")).toBeInTheDocument());
+      const option = screen.getByTestId("select-option-Apple");
+      option.focus();
+      fireEvent.keyDown(option, { key: "Enter" });
+      expect(onChange).toHaveBeenCalledWith("Apple");
+    });
+
+    it("selects option on Space key", async () => {
+      const onChange = jest.fn();
+      render(<Select options={["Banana"] as any} placeholder="Select" onChange={onChange} />);
+      fireEvent.click(screen.getByRole("button"));
+      await waitFor(() => expect(screen.getByText("Banana")).toBeInTheDocument());
+      const option = screen.getByTestId("select-option-Banana");
+      option.focus();
+      fireEvent.keyDown(option, { key: " " });
+      expect(onChange).toHaveBeenCalledWith("Banana");
+    });
+  });
+
+  describe("Group option with multiple", () => {
+    it("toggles all children when clicking group header in multiple mode", async () => {
+      const onChange = jest.fn();
+      const options = [
+        {
+          label: "Fruits",
+          children: [
+            { value: "a", label: "Apple" },
+            { value: "b", label: "Banana" },
+          ],
+        },
+      ];
+      render(<Select options={options as any} placeholder="Select" multiple={true} onChange={onChange} />);
+      fireEvent.click(screen.getByRole("button"));
+      await waitFor(() => expect(screen.getByText("Fruits")).toBeInTheDocument());
+      fireEvent.click(screen.getByText("Fruits"));
+      expect(onChange).toHaveBeenCalled();
     });
   });
 });
