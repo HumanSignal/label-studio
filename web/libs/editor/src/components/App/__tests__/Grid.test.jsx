@@ -20,6 +20,7 @@ jest.mock("../../AnnotationTabs/AnnotationTabs", () => ({
       onClick={() => onClick?.()}
       onKeyDown={(e) => e.key === "Enter" && onClick?.()}
       role="tab"
+      tabIndex={0}
     >
       {entity?.id}
     </div>
