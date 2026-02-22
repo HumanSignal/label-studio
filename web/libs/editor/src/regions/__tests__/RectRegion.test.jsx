@@ -33,8 +33,7 @@ jest.mock("../../components/ImageView/ImageViewContext", () => ({
 }));
 
 jest.mock("../RegionWrapper", () => ({
-  RegionWrapper: ({ children }) =>
-    require("react").createElement("div", { "data-testid": "region-wrapper" }, children),
+  RegionWrapper: ({ children }) => require("react").createElement("div", { "data-testid": "region-wrapper" }, children),
 }));
 
 jest.mock("../../components/ImageView/LabelOnRegion", () => ({
@@ -61,11 +60,11 @@ jest.mock("../../tags/object/Image", () => {
     ImageModel: types
       .model("ImageModel", { id: types.identifier })
       .volatile(() => ({
-    whRatio: 1,
-    zoomedPixelSize: { x: 1, y: 1 },
-    stageRef: { container: () => ({ style: {} }) },
-    getSkipInteractions: () => false,
-  }))
+        whRatio: 1,
+        zoomedPixelSize: { x: 1, y: 1 },
+        stageRef: { container: () => ({ style: {} }) },
+        getSkipInteractions: () => false,
+      }))
       .views(() => ({
         get naturalWidth() {
           return 100;
