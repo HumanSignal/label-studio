@@ -277,6 +277,13 @@ describe("KonvaRegion mixin", () => {
       region.setHidden(true);
       expect(region.supportsTransform).toBe(false);
     });
+
+    it("supportsTransform is false when isReadOnly returns true", () => {
+      const { region } = createStore({ isReadOnly: () => true });
+      region.setHidden(false);
+      region.setSupportsTransform(true);
+      expect(region.supportsTransform).toBe(false);
+    });
   });
 
   describe("actions", () => {
@@ -427,6 +434,122 @@ describe("KonvaRegion mixin", () => {
       viewport.scrollBy = jest.fn();
       region.scrollToRegion();
       expect(viewport.scrollBy).not.toHaveBeenCalled();
+    });
+
+    it("scrollToRegion scrolls down when region is above viewport (overTop < 0, enough hidden)", () => {
+      const canvas = document.createElement("canvas");
+      canvas.getBoundingClientRect = () => ({ top: 50, bottom: 400, left: 0, right: 400 });
+      Object.defineProperty(canvas, "clientHeight", { value: 350, configurable: true });
+      const viewport = document.createElement("div");
+      viewport.className = "lsf-main-content";
+      viewport.getBoundingClientRect = () => ({ top: 100, bottom: 300, left: 0, right: 400 });
+      Object.defineProperty(viewport, "scrollTop", { value: 0, configurable: true });
+      Object.defineProperty(viewport, "clientHeight", { value: 200, configurable: true });
+      viewport.appendChild(canvas);
+
+      const RegionWithBbox = types.compose(TestRegion).views((_self) => ({
+        get bboxCoords() {
+          return { left: 0, top: 0, right: 40, bottom: 80 };
+        },
+      }));
+      const StoreWithBbox = types
+        .model({ region: types.maybe(RegionWithBbox) })
+        .views((self) => ({
+          get annotationStore() {
+            return self._annotationForTest != null
+              ? { selected: self._annotationForTest, selectedHistory: null }
+              : null;
+          },
+          get stageWidth() {
+            return 100;
+          },
+          get stageHeight() {
+            return 100;
+          },
+        }))
+        .volatile(() => ({
+          _annotationForTest: null,
+          internalToCanvasX: (x) => x,
+          internalToCanvasY: (y) => y,
+          stageRef: null,
+          getToolsManager: () => ({ findSelectedTool: () => null }),
+          naturalWidth: 100,
+          naturalHeight: 100,
+        }))
+        .actions((self) => ({
+          setAnnotationStore(store) {
+            self._annotationForTest = store?.selected ?? null;
+          },
+        }));
+      const ann = mockAnnotation();
+      ann.areas = new Map();
+      const root = StoreWithBbox.create({ region: {} });
+      root.setAnnotationStore({ selected: ann, selectedHistory: null });
+      ann.areas.set(root.region.id, true);
+      const region = root.region;
+      region.setObject({ zoomScale: 1 });
+      region.setShapeRef({ parent: { canvas: { _canvas: canvas } } });
+      viewport.scrollBy = jest.fn();
+      region.scrollToRegion();
+      expect(viewport.scrollBy).toHaveBeenCalledWith({ top: -50, left: 0, behavior: "smooth" });
+    });
+
+    it("scrollToRegion scrolls up when region is below viewport (overBottom < 0, enough hidden)", () => {
+      const canvas = document.createElement("canvas");
+      canvas.getBoundingClientRect = () => ({ top: 0, bottom: 400, left: 0, right: 400 });
+      Object.defineProperty(canvas, "clientHeight", { value: 400, configurable: true });
+      const viewport = document.createElement("div");
+      viewport.className = "lsf-main-content";
+      viewport.getBoundingClientRect = () => ({ top: 0, bottom: 200, left: 0, right: 400 });
+      Object.defineProperty(viewport, "scrollTop", { value: 0, configurable: true });
+      Object.defineProperty(viewport, "clientHeight", { value: 200, configurable: true });
+      viewport.appendChild(canvas);
+
+      const RegionWithBbox = types.compose(TestRegion).views((_self) => ({
+        get bboxCoords() {
+          return { left: 0, top: 250, right: 40, bottom: 350 };
+        },
+      }));
+      const StoreWithBbox = types
+        .model({ region: types.maybe(RegionWithBbox) })
+        .views((self) => ({
+          get annotationStore() {
+            return self._annotationForTest != null
+              ? { selected: self._annotationForTest, selectedHistory: null }
+              : null;
+          },
+          get stageWidth() {
+            return 100;
+          },
+          get stageHeight() {
+            return 100;
+          },
+        }))
+        .volatile(() => ({
+          _annotationForTest: null,
+          internalToCanvasX: (x) => x,
+          internalToCanvasY: (y) => y,
+          stageRef: null,
+          getToolsManager: () => ({ findSelectedTool: () => null }),
+          naturalWidth: 100,
+          naturalHeight: 100,
+        }))
+        .actions((self) => ({
+          setAnnotationStore(store) {
+            self._annotationForTest = store?.selected ?? null;
+          },
+        }));
+      const ann = mockAnnotation();
+      ann.areas = new Map();
+      const root = StoreWithBbox.create({ region: {} });
+      root.setAnnotationStore({ selected: ann, selectedHistory: null });
+      ann.areas.set(root.region.id, true);
+      const region = root.region;
+      region.setObject({ zoomScale: 1 });
+      region.setShapeRef({ parent: { canvas: { _canvas: canvas } } });
+      viewport.scrollBy = jest.fn();
+      region.scrollToRegion();
+      expect(viewport.scrollBy).toHaveBeenCalledWith({ top: 186, left: 0, behavior: "smooth" });
     });
 
     it("deleteRegion enables selected tool and calls super deleteRegion", () => {
