@@ -132,6 +132,19 @@ describe("Brush tool", () => {
 
     Sidebar.hasRegions(1);
   });
+
+  it("clicks on drawn brush region after switching to rectangle tool", () => {
+    LabelStudio.params().config(imageToolsConfig).data(imageData).withResult([]).init();
+    LabelStudio.waitForImageReady();
+
+    ImageView.selectBrushToolByButton();
+    ImageView.drawRectRelative(0.35, 0.35, 0.2, 0.2);
+    Sidebar.hasRegions(1);
+
+    ImageView.selectRectangleToolByButton();
+    ImageView.clickAtStageRelative(0.45, 0.45);
+    Sidebar.hasRegions(1);
+  });
 });
 
 describe("TimeSeries region drawing and selection", () => {
