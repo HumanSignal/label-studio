@@ -78,6 +78,31 @@ describe("Image segmentation - Tools - Selection tool", () => {
       Sidebar.hasSelectedRegions(1);
     });
 
+    it("Should move keypoint region by dragging", () => {
+      LabelStudio.params().config(simplePointConfig).data(simpleImageData).withResult(simplePointResult).init();
+
+      ImageView.waitForImage();
+      ImageView.selectMoveToolByButton();
+      ImageView.clickAtRelative(0.5, 0.5);
+      Sidebar.hasSelectedRegions(1);
+
+      LabelStudio.serialize().then((beforeResult) => {
+        const before = beforeResult.find((r) => r.type === "keypoint");
+        expect(before).to.exist;
+        expect(before?.value.x).to.equal(50);
+        expect(before?.value.y).to.equal(50);
+
+        ImageView.drawRectRelative(0.5, 0.5, 0.15, 0.1);
+
+        LabelStudio.serialize().then((afterResult) => {
+          const after = afterResult.find((r) => r.type === "keypoint");
+          expect(after).to.exist;
+          expect(after?.value.x).to.not.equal(before?.value.x);
+          expect(after?.value.y).to.not.equal(before?.value.y);
+        });
+      });
+    });
+
     it("Should not select hidden region by click", () => {
       LabelStudio.params().config(simpleRectangleConfig).data(simpleImageData).withResult(simpleRectangleResult).init();
 

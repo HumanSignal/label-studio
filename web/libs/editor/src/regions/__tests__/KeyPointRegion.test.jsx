@@ -5,7 +5,8 @@
 import { types } from "mobx-state-tree";
 
 // Avoid pulling in full Image tag (circular deps / heavy union) in unit tests.
-// AreaMixin makes region.parent === region.object (the image), so image must provide createSerializedResult.
+// AreaMixin makes region.parent === region.object (the image), so image must provide createSerializedResult
+// and internalToCanvasX/Y for region canvas getters.
 jest.mock("../../tags/object/Image", () => {
   const { types } = require("mobx-state-tree");
   return {
@@ -17,6 +18,12 @@ jest.mock("../../tags/object/Image", () => {
           original_height: 100,
           image_rotation: 0,
         };
+      },
+      internalToCanvasX(v) {
+        return v * 2;
+      },
+      internalToCanvasY(v) {
+        return v * 2;
       },
     })),
   };
@@ -86,6 +93,18 @@ describe("KeyPointRegion", () => {
       const result = region.serialize();
       expect(result.value).toEqual({ x: 50, y: 50, width: 10 });
       expect(result.original_width).toBe(100);
+    });
+
+    it("serialize does not add is_positive or labels when not dynamic", () => {
+      const result = region.serialize();
+      expect(result.is_positive).toBeUndefined();
+      expect(result.value.labels).toBeUndefined();
+    });
+
+    it("canvasX, canvasY, canvasWidth delegate to parent internalToCanvas methods", () => {
+      expect(region.canvasX).toBe(100);
+      expect(region.canvasY).toBe(100);
+      expect(region.canvasWidth).toBe(20);
     });
   });
 
