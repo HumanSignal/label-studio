@@ -77,7 +77,7 @@ jobs:
         id: chunks
         working-directory: ${{ env.FRONTEND_MONOREPO_DIR }}
         run: |
-          json=$(node scripts/cypress-spec-chunks.js --chunks 2)
+          json=$(node scripts/cypress-spec-chunks.js --chunks 4)
           echo "matrix<<MATRIX_EOF" >> $GITHUB_OUTPUT
           echo "$json" >> $GITHUB_OUTPUT
           echo "MATRIX_EOF" >> $GITHUB_OUTPUT
