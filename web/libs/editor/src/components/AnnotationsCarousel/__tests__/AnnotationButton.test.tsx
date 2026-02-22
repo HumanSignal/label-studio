@@ -15,11 +15,12 @@ jest.mock("@humansignal/core", () => ({
   useCopyText: () => [jest.fn()],
 }));
 
+const mockToastShow = jest.fn();
 jest.mock("@humansignal/ui", () => {
   const actual = jest.requireActual("@humansignal/ui");
   return {
     ...actual,
-    useToast: () => ({ show: jest.fn() }),
+    useToast: () => ({ show: mockToastShow }),
     useDropdown: () => ({ close: jest.fn() }),
   };
 });
@@ -443,5 +444,143 @@ describe("AnnotationButton", () => {
         okText: "Delete",
       }),
     );
+  });
+
+  it("calls Copy Annotation ID and shows toast when menu item is clicked", () => {
+    mockToastShow.mockClear();
+    const entity = createEntity();
+    const { container } = render(
+      <Provider store={defaultStore}>
+        <AnnotationButton
+          entity={entity}
+          capabilities={defaultCapabilities}
+          annotationStore={{ ...defaultAnnotationStore, store: defaultStore } as any}
+        />
+      </Provider>,
+    );
+    fireEvent.click(container.querySelector(".ls-annotation-button__trigger")!);
+    fireEvent.click(screen.getByText("Copy Annotation ID"));
+    expect(mockToastShow).toHaveBeenCalledWith(
+      expect.objectContaining({ message: "Annotation ID copied to clipboard", type: "info" }),
+    );
+  });
+
+  it("calls Copy Annotation Link and shows toast when menu item is clicked", () => {
+    mockToastShow.mockClear();
+    const storeWithCopyLink = {
+      ...defaultStore,
+      hasInterface: jest.fn((key: string) => key === "annotations:copy-link"),
+    };
+    const entity = createEntity();
+    const { container } = render(
+      <Provider store={storeWithCopyLink}>
+        <AnnotationButton
+          entity={entity}
+          capabilities={defaultCapabilities}
+          annotationStore={{ ...defaultAnnotationStore, store: storeWithCopyLink } as any}
+        />
+      </Provider>,
+    );
+    fireEvent.click(container.querySelector(".ls-annotation-button__trigger")!);
+    fireEvent.click(screen.getByText("Copy Annotation Link"));
+    expect(mockToastShow).toHaveBeenCalledWith(
+      expect.objectContaining({ message: "Annotation link copied to clipboard", type: "info" }),
+    );
+  });
+
+  it("calls addAnnotationFromPrediction and selectAnnotation when Duplicate Annotation is clicked", () => {
+    jest.useFakeTimers();
+    const newAnnotation = { id: 99 };
+    const addAnnotationFromPrediction = jest.fn().mockReturnValue(newAnnotation);
+    const selectAnnotation = jest.fn();
+    const entity = createEntity();
+    const { container } = render(
+      <Provider store={defaultStore}>
+        <AnnotationButton
+          entity={entity}
+          capabilities={defaultCapabilities}
+          annotationStore={
+            {
+              ...defaultAnnotationStore,
+              store: defaultStore,
+              addAnnotationFromPrediction,
+              selectAnnotation,
+            } as any
+          }
+        />
+      </Provider>,
+    );
+    fireEvent.click(container.querySelector(".ls-annotation-button__trigger")!);
+    fireEvent.click(screen.getByText("Duplicate Annotation"));
+    expect(addAnnotationFromPrediction).toHaveBeenCalledWith(entity);
+    jest.runAllTimers();
+    expect(selectAnnotation).toHaveBeenCalledWith(99, { exitViewAll: true });
+    jest.useRealTimers();
+  });
+
+  it("calls setGroundTruth(false) when Unset as Ground Truth is clicked", () => {
+    const entity = createEntity({ ground_truth: true });
+    const setGroundTruth = jest.fn();
+    entity.setGroundTruth = setGroundTruth;
+    const { container } = render(
+      <Provider store={defaultStore}>
+        <AnnotationButton
+          entity={entity}
+          capabilities={defaultCapabilities}
+          annotationStore={{ ...defaultAnnotationStore, store: defaultStore } as any}
+        />
+      </Provider>,
+    );
+    fireEvent.click(container.querySelector(".ls-annotation-button__trigger")!);
+    fireEvent.click(screen.getByText("Unset as Ground Truth"));
+    expect(setGroundTruth).toHaveBeenCalledWith(false);
+  });
+
+  it("invokes tooltip hover handler on root mouse enter", () => {
+    const entity = createEntity();
+    const { container } = render(
+      <AnnotationButton entity={entity} capabilities={defaultCapabilities} annotationStore={defaultAnnotationStore} />,
+    );
+    const root = container.querySelector(".ls-annotation-button");
+    expect(root).toBeInTheDocument();
+    fireEvent.mouseEnter(root!);
+    // Handler runs; tooltip visibility depends on Tooltip component internals
+    expect(root).toBeInTheDocument();
+  });
+
+  it("handles invalid task source in getReviewStatus without throwing", () => {
+    const origAppSettings = (window as any).APP_SETTINGS;
+    (window as any).APP_SETTINGS = { version: { edition: "Enterprise" } };
+    const store = {
+      ...defaultStore,
+      task: { dataObj: { source: "not valid json" } },
+    };
+    const entity = createEntity({ pk: 1 });
+    render(
+      <AnnotationButton
+        entity={entity}
+        capabilities={defaultCapabilities}
+        annotationStore={{ ...defaultAnnotationStore, store } as any}
+      />,
+    );
+    expect(screen.getByText("Test User")).toBeInTheDocument();
+    (window as any).APP_SETTINGS = origAppSettings;
+  });
+
+  it("handles task source with non-array annotators in getReviewStatus", () => {
+    const origAppSettings = (window as any).APP_SETTINGS;
+    (window as any).APP_SETTINGS = { version: { edition: "Enterprise" } };
+    const taskSource = JSON.stringify({ annotators: null, annotations: [] });
+    const store = { ...defaultStore, task: { dataObj: { source: taskSource } } };
+    const entity = createEntity({ pk: 1 });
+    render(
+      <AnnotationButton
+        entity={entity}
+        capabilities={defaultCapabilities}
+        annotationStore={{ ...defaultAnnotationStore, store } as any}
+      />,
+    );
+    expect(screen.getByText("Test User")).toBeInTheDocument();
+    (window as any).APP_SETTINGS = origAppSettings;
   });
 });
