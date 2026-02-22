@@ -2,7 +2,15 @@
  * Unit tests for Player (lib/AudioUltra/Controls/Player.ts).
  * Player is abstract; we test it via Html5Player with mocks.
  */
+import { ff } from "@humansignal/core";
 import { Html5Player } from "../Html5Player";
+
+jest.mock("@humansignal/core", () => ({
+  ff: {
+    isActive: jest.fn().mockReturnValue(false),
+    FF_SYNCED_BUFFERING: "FF_SYNCED_BUFFERING",
+  },
+}));
 
 function createMockWaveform(overrides: Record<string, unknown> = {}) {
   return {
@@ -141,6 +149,35 @@ describe("Player (via Html5Player)", () => {
       player.muted = true;
       expect(wf.invoke).not.toHaveBeenCalled();
     });
+
+    it("Html5Player mute() sets audio.el.muted = true when el present", () => {
+      const wf = createMockWaveform() as any;
+      const audio = createMockAudio() as any;
+      const player = new Html5Player(wf);
+      player.init(audio);
+      player.volume = 0.8;
+      player.mute();
+      expect(audio.el.muted).toBe(true);
+    });
+
+    it("Html5Player unmute() sets audio.el.muted = false when el present", () => {
+      const wf = createMockWaveform() as any;
+      const audio = createMockAudio() as any;
+      const player = new Html5Player(wf);
+      player.init(audio);
+      player.muted = true;
+      player.unmute();
+      expect(audio.el.muted).toBe(false);
+    });
+
+    it("Html5Player adjustVolume() sets audio.el.volume when el present", () => {
+      const wf = createMockWaveform() as any;
+      const audio = createMockAudio() as any;
+      const player = new Html5Player(wf);
+      player.init(audio);
+      player.volume = 0.6;
+      expect(audio.el.volume).toBe(0.6);
+    });
   });
 
   describe("rate", () => {
@@ -150,6 +187,27 @@ describe("Player (via Html5Player)", () => {
       player.rate = 1.5;
       expect(player.rate).toBe(1.5);
       expect(wf.invoke).toHaveBeenCalledWith("rateChanged", [1.5]);
+    });
+
+    it("Html5Player rate getter restores audio.el.playbackRate when it differs from _rate", () => {
+      const wf = createMockWaveform() as any;
+      const audio = createMockAudio() as any;
+      const player = new Html5Player(wf);
+      player.init(audio);
+      (player as any)._rate = 2;
+      audio.el.playbackRate = 0.5;
+      expect(player.rate).toBe(2);
+      expect(audio.el.playbackRate).toBe(2);
+    });
+
+    it("Html5Player rate setter updates audio.el.playbackRate when changed", () => {
+      const wf = createMockWaveform() as any;
+      const audio = createMockAudio() as any;
+      const player = new Html5Player(wf);
+      player.init(audio);
+      player.rate = 1.25;
+      expect(audio.el.playbackRate).toBe(1.25);
+      expect(wf.invoke).toHaveBeenCalledWith("rateChanged", [1.25]);
     });
   });
 
@@ -178,6 +236,25 @@ describe("Player (via Html5Player)", () => {
       expect(audio.on).toHaveBeenCalledWith("canplay", expect.any(Function));
       expect(audio.on).toHaveBeenCalledWith("waiting", expect.any(Function));
     });
+
+    it("Html5Player registers resetSource, play and pause on audio.el when present", () => {
+      const wf = createMockWaveform() as any;
+      const audio = createMockAudio() as any;
+      const player = new Html5Player(wf);
+      player.init(audio);
+      expect(audio.on).toHaveBeenCalledWith("resetSource", expect.any(Function));
+      expect(audio.el.addEventListener).toHaveBeenCalledWith("play", expect.any(Function));
+      expect(audio.el.addEventListener).toHaveBeenCalledWith("pause", expect.any(Function));
+    });
+
+    it("Html5Player init returns early when audio has no el", () => {
+      const wf = createMockWaveform() as any;
+      const audio = createMockAudio({ el: null }) as any;
+      const player = new Html5Player(wf);
+      player.init(audio);
+      expect(audio.on).not.toHaveBeenCalledWith("resetSource", expect.any(Function));
+      expect(audio.el).toBeNull();
+    });
   });
 
   describe("seek", () => {
@@ -191,6 +268,16 @@ describe("Player (via Html5Player)", () => {
       player.seek(-1);
       expect(player.currentTime).toBe(0);
     });
+
+    it("Html5Player updateCurrentSourceTime sets audio.el.currentTime when time changes", () => {
+      const wf = createMockWaveform() as any;
+      const audio = createMockAudio({ duration: 10 }) as any;
+      const player = new Html5Player(wf);
+      player.init(audio);
+      player.seek(5);
+      expect(player.currentTime).toBe(5);
+      expect(audio.el.currentTime).toBe(5);
+    });
   });
 
   describe("seekSilent", () => {
@@ -203,6 +290,26 @@ describe("Player (via Html5Player)", () => {
       player.seekSilent(4);
       expect(player.currentTime).toBe(4);
       expect((player as any).ended).toBe(false);
+    });
+  });
+
+  describe("playAudio (Html5Player)", () => {
+    it("returns early when no audio or no audio.el", () => {
+      const wf = createMockWaveform() as any;
+      const player = new Html5Player(wf);
+      (player as any).playAudio(0);
+      expect(player.playing).toBe(false);
+    });
+
+    it("sets audio.el.currentTime and adds ended listener when playing", () => {
+      const wf = createMockWaveform() as any;
+      const audio = createMockAudio() as any;
+      const player = new Html5Player(wf);
+      player.init(audio);
+      (player as any).time = 3;
+      (player as any).playAudio(2);
+      expect(audio.el.currentTime).toBe(3);
+      expect(audio.el.addEventListener).toHaveBeenCalledWith("ended", expect.any(Function));
     });
   });
 
@@ -449,6 +556,29 @@ describe("Player (via Html5Player)", () => {
       const result = (player as any).disconnectSource();
       expect(result).toBe(false);
     });
+
+    it("Html5Player canPause() returns false when audio.el.paused is true", () => {
+      const wf = createMockWaveform() as any;
+      const audio = createMockAudio() as any;
+      audio.el.paused = true;
+      const player = new Html5Player(wf);
+      player.init(audio);
+      (player as any).hasPlayed = true;
+      expect((player as any).canPause()).toBe(false);
+    });
+
+    it("Html5Player disconnectSource() removes ended listener from audio.el when super returns true", () => {
+      const wf = createMockWaveform() as any;
+      const audio = createMockAudio() as any;
+      const player = new Html5Player(wf);
+      player.init(audio);
+      (player as any).playAudio(0);
+      (player as any).connected = true;
+      (player as any).hasPlayed = true;
+      const handleEnded = (player as any).handleEnded;
+      (player as any).disconnectSource();
+      expect(audio.el.removeEventListener).toHaveBeenCalledWith("ended", handleEnded);
+    });
   });
 
   describe("handleEnded and updateCurrentTime(forceEnd)", () => {
@@ -475,6 +605,45 @@ describe("Player (via Html5Player)", () => {
       (player as any).time = 7;
       (player as any).playSource(2, 4);
       expect(player.currentTime).toBe(2);
+    });
+  });
+
+  describe("Html5Player handleResetSource", () => {
+    it("calls audio.el.load() and play() when ff is inactive and was playing", async () => {
+      (ff.isActive as jest.Mock).mockReturnValue(false);
+      const wf = createMockWaveform() as any;
+      const audio = createMockAudio() as any;
+      audio.el.load = jest.fn();
+      const player = new Html5Player(wf);
+      player.init(audio);
+      (player as any).playing = true;
+      const resetSourceCb = audio.on.mock.calls.find((c: string[]) => c[0] === "resetSource")?.[1];
+      await resetSourceCb?.();
+      expect(audio.el.load).toHaveBeenCalled();
+      expect(player.playing).toBe(true);
+    });
+
+    it("does not call audio.el.load() when ff FF_SYNCED_BUFFERING is active", async () => {
+      (ff.isActive as jest.Mock).mockImplementation((flag: string) => flag === "FF_SYNCED_BUFFERING");
+      const wf = createMockWaveform() as any;
+      const audio = createMockAudio() as any;
+      audio.el.load = jest.fn();
+      const player = new Html5Player(wf);
+      player.init(audio);
+      (player as any).playing = true;
+      const resetSourceCb = audio.on.mock.calls.find((c: string[]) => c[0] === "resetSource")?.[1];
+      await resetSourceCb?.();
+      expect(audio.el.load).not.toHaveBeenCalled();
+      (ff.isActive as jest.Mock).mockReturnValue(false);
+    });
+
+    it("returns early when audio has no el", async () => {
+      (ff.isActive as jest.Mock).mockReturnValue(false);
+      const wf = createMockWaveform() as any;
+      const player = new Html5Player(wf);
+      (player as any).audio = { el: null };
+      await (player as any).handleResetSource();
+      expect((player as any).audio.el).toBeNull();
     });
   });
 });
