@@ -1,3 +1,9 @@
+jest.mock("../../../utils/feature-flags", () => ({
+  isFF: () => false,
+  FF_DEV_3391: "fflag_fix_front_dev_3391_interactive_view_all",
+  FF_SIMPLE_INIT: "fflag_fix_front_leap_443_select_annotation_once",
+}));
+
 jest.mock("../../../core/Hotkey", () => {
   const addNamed = jest.fn();
   const removeNamed = jest.fn();
@@ -18,12 +24,14 @@ jest.mock("../../../tools/Manager", () => ({
 
 let PolygonModel;
 let Store;
+let HotkeyMock;
 
 beforeAll(() => {
   jest.resetModules();
   const { types } = require("mobx-state-tree");
   const Polygon = require("../Polygon");
   PolygonModel = Polygon.PolygonModel;
+  HotkeyMock = require("../../../core/Hotkey").Hotkey;
 
   const MockImage = types.model("MockImage", {
     name: types.string,
@@ -93,5 +101,38 @@ describe("Polygon tag", () => {
     expect(polygon.snap).toBe("none");
     expect(polygon.pointsize).toBe("small");
     expect(polygon.pointstyle).toBe("circle");
+  });
+
+  it("registers polygon undo/redo hotkeys on create", () => {
+    Store.create({
+      annotationStore: {
+        selected: {
+          names: {
+            "img-1": { name: "img-1" },
+            poly: { name: "poly", toname: "img-1" },
+          },
+        },
+      },
+    });
+    expect(HotkeyMock._testInstance.addNamed).toHaveBeenCalledWith("polygon:undo", expect.any(Function));
+    expect(HotkeyMock._testInstance.addNamed).toHaveBeenCalledWith("polygon:redo", expect.any(Function));
+  });
+
+  it("disposeHotkeys unregisters polygon undo and redo hotkeys", () => {
+    const store = Store.create({
+      annotationStore: {
+        selected: {
+          names: {
+            "img-1": { name: "img-1" },
+            poly: { name: "poly", toname: "img-1" },
+          },
+        },
+      },
+    });
+    const polygon = store.annotationStore.selected.names.get("poly");
+    HotkeyMock._testInstance.removeNamed.mockClear();
+    polygon.disposeHotkeys();
+    expect(HotkeyMock._testInstance.removeNamed).toHaveBeenCalledWith("polygon:undo");
+    expect(HotkeyMock._testInstance.removeNamed).toHaveBeenCalledWith("polygon:redo");
   });
 });
