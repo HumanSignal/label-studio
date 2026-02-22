@@ -49,6 +49,9 @@ jest.mock("react-konva", () => {
     Group: ({ children, ...p }) => React.createElement("div", { "data-testid": "konva-group", ...p }, children),
     Image: (p) => {
       const { hitFunc, image, sceneFunc, ...rest } = p;
+      if (hitFunc && image) {
+        hitFunc(mockCtx, { colorKey: "#ff0000" });
+      }
       return React.createElement("div", { "data-testid": "konva-image", ...rest });
     },
     Shape: (p) => {
@@ -188,6 +191,42 @@ describe("BrushRegion", () => {
       region.endPath();
       const bbox = region.bboxCoordsCanvas;
       expect(bbox).toEqual({ left: 10, top: 10, right: 50, bottom: 50 });
+    });
+
+    it("bboxCoordsCanvas returns bbox from imageData when imageData is set", () => {
+      Geometry.getImageDataBBox.mockReturnValue({ x: 10, y: 20, width: 40, height: 30 });
+      const mockRef = {
+        canvas: { _canvas: { style: {} }, width: 100, height: 100 },
+        toCanvas: jest.fn().mockReturnValue({
+          getContext: () => ({
+            getImageData: () => ({ data: new Uint8ClampedArray(4 * 100 * 100), width: 100, height: 100 }),
+          }),
+        }),
+      };
+      region.setLayerRef(mockRef);
+      region.cacheImageData();
+      expect(region.imageData).not.toBeNull();
+      const bbox = region.bboxCoordsCanvas;
+      expect(Geometry.getImageDataBBox).toHaveBeenCalled();
+      expect(bbox).not.toBeNull();
+      expect(bbox.left).toBeDefined();
+      expect(bbox.top).toBeDefined();
+      expect(bbox.right).toBeDefined();
+      expect(bbox.bottom).toBeDefined();
+    });
+
+    it("bboxCoordsCanvas returns null when imageData is set but getImageDataBBox returns null", () => {
+      Geometry.getImageDataBBox.mockReturnValue(null);
+      const mockRef = {
+        canvas: { _canvas: { style: {} }, width: 1, height: 1 },
+        toCanvas: jest.fn().mockReturnValue({
+          getContext: () => ({ getImageData: () => ({ data: new Uint8ClampedArray(4), width: 1, height: 1 }) }),
+        }),
+      };
+      region.setLayerRef(mockRef);
+      region.cacheImageData();
+      const bbox = region.bboxCoordsCanvas;
+      expect(bbox).toBeNull();
     });
   });
 
@@ -347,6 +386,121 @@ describe("BrushRegion", () => {
       region.cacheImageData();
       expect(region.imageData).toBeNull();
     });
+
+    it("cacheImageData sets imageData from layerRef.toCanvas when layerRef exists", () => {
+      const getImageData = jest.fn().mockReturnValue({ data: new Uint8ClampedArray(400), width: 10, height: 10 });
+      const mockRef = {
+        canvas: { _canvas: { style: {} }, width: 10, height: 10 },
+        toCanvas: jest.fn().mockReturnValue({ getContext: () => ({ getImageData }) }),
+      };
+      region.setLayerRef(mockRef);
+      region.cacheImageData();
+      expect(region.imageData).not.toBeNull();
+      expect(region.imageData.width).toBe(10);
+      expect(region.imageData.height).toBe(10);
+      expect(getImageData).toHaveBeenCalledWith(0, 0, 10, 10);
+    });
+  });
+
+  describe("preDraw", () => {
+    it("preDraw does nothing when layerRef is not set", () => {
+      region.beginPath({ type: "add", strokeWidth: 25 });
+      expect(() => region.preDraw(5, 5)).not.toThrow();
+    });
+
+    it("preDraw draws with layerRef and uses ctx when FF_ZOOM_OPTIM is false", () => {
+      const featureFlags = require("../../utils/feature-flags");
+      featureFlags.isFF.mockReturnValue(false);
+      const ctx = {
+        save: jest.fn(),
+        restore: jest.fn(),
+        beginPath: jest.fn(),
+        moveTo: jest.fn(),
+        lineTo: jest.fn(),
+        rect: jest.fn(),
+        clip: jest.fn(),
+        lineCap: "",
+        lineJoin: "",
+        lineWidth: 0,
+        strokeStyle: "",
+        globalCompositeOperation: "",
+        stroke: jest.fn(),
+      };
+      const mockRef = {
+        canvas: { _canvas: { style: {} }, context: ctx, width: 100, height: 100 },
+      };
+      region.setLayerRef(mockRef);
+      region.beginPath({ type: "add", strokeWidth: 25 });
+      region.preDraw(10, 20);
+      expect(ctx.save).toHaveBeenCalled();
+      expect(ctx.moveTo).toHaveBeenCalledWith(10, 20);
+      expect(ctx.lineTo).toHaveBeenCalled();
+      expect(ctx.stroke).toHaveBeenCalled();
+      expect(ctx.restore).toHaveBeenCalled();
+      featureFlags.isFF.mockReturnValue(false);
+    });
+
+    it("preDraw uses clip rect when FF_ZOOM_OPTIM is true", () => {
+      const featureFlags = require("../../utils/feature-flags");
+      featureFlags.isFF.mockReturnValue(true);
+      const ctx = {
+        save: jest.fn(),
+        restore: jest.fn(),
+        beginPath: jest.fn(),
+        moveTo: jest.fn(),
+        lineTo: jest.fn(),
+        rect: jest.fn(),
+        clip: jest.fn(),
+        lineCap: "",
+        lineJoin: "",
+        lineWidth: 0,
+        strokeStyle: "",
+        globalCompositeOperation: "",
+        stroke: jest.fn(),
+      };
+      const mockRef = {
+        canvas: { _canvas: { style: {} }, context: ctx, width: 100, height: 100 },
+      };
+      region.setLayerRef(mockRef);
+      region.beginPath({ type: "add", strokeWidth: 25 });
+      region.preDraw(5, 5);
+      expect(ctx.rect).toHaveBeenCalled();
+      expect(ctx.clip).toHaveBeenCalled();
+      featureFlags.isFF.mockReturnValue(false);
+    });
+
+    it("preDraw uses cachedPoints when multiple points added", () => {
+      const featureFlags = require("../../utils/feature-flags");
+      featureFlags.isFF.mockReturnValue(false);
+      const ctx = {
+        save: jest.fn(),
+        restore: jest.fn(),
+        beginPath: jest.fn(),
+        moveTo: jest.fn(),
+        lineTo: jest.fn(),
+        rect: jest.fn(),
+        clip: jest.fn(),
+        lineCap: "",
+        lineJoin: "",
+        lineWidth: 0,
+        strokeStyle: "",
+        globalCompositeOperation: "",
+        stroke: jest.fn(),
+      };
+      const mockRef = {
+        canvas: { _canvas: { style: {} }, context: ctx, width: 100, height: 100 },
+      };
+      region.setLayerRef(mockRef);
+      region.beginPath({ type: "add", strokeWidth: 25 });
+      region.addPoint(1, 1);
+      region.addPoint(2, 2);
+      region.addPoint(3, 3);
+      region.addPoint(4, 4);
+      region.addPoint(5, 5);
+      expect(ctx.moveTo).toHaveBeenCalled();
+      expect(ctx.lineTo).toHaveBeenCalled();
+      featureFlags.isFF.mockReturnValue(false);
+    });
   });
 
   describe("Points (from beginPath)", () => {
@@ -460,6 +614,29 @@ describe("BrushRegion", () => {
       }).not.toThrow();
     });
 
+    it("calls setHighlight and updateCursor when isLinkingMode and mouseOver/mouseOut", () => {
+      const linkingRoot = TestRoot.create({
+        annotationStore: { selected: { ...createMockAnnotation(), isLinkingMode: true } },
+        settings: { showLabels: false },
+        image: { id: "img1" },
+        region: { id: "br4", pid: "p4", object: "img1", touches: [] },
+      });
+      linkingRoot.image.setAnnotation(linkingRoot.annotationStore.selected);
+      const setHighlightSpy = jest.spyOn(linkingRoot.region, "setHighlight");
+      const { getAllByTestId } = render(
+        <ImageViewContext.Provider value={{ suggestion: null }}>
+          <HtxBrush item={linkingRoot.region} />
+        </ImageViewContext.Provider>,
+      );
+      const groups = getAllByTestId("konva-group");
+      const segmentationGroup = groups.find((g) => g.getAttribute("name") === "segmentation") ?? groups[0];
+      fireEvent.mouseOver(segmentationGroup);
+      expect(setHighlightSpy).toHaveBeenCalledWith(true);
+      fireEvent.mouseOut(segmentationGroup);
+      expect(setHighlightSpy).toHaveBeenCalledWith(false);
+      setHighlightSpy.mockRestore();
+    });
+
     it("handles Group onMouseDown when isLinkingMode without throwing", () => {
       const linkingRoot = TestRoot.create({
         annotationStore: { selected: { ...createMockAnnotation(), isLinkingMode: true } },
@@ -476,6 +653,60 @@ describe("BrushRegion", () => {
       const groups = getAllByTestId("konva-group");
       const segmentationGroup = groups.find((g) => g.getAttribute("name") === "segmentation") ?? groups[0];
       expect(() => fireEvent.mouseDown(segmentationGroup)).not.toThrow();
+    });
+
+    it("renders Image with imageHitFunc when image loads from maskDataURL", async () => {
+      region.endUpdatedMaskDataURL("data:image/png;base64,hit");
+      mockBrushImageRef = null;
+      render(
+        <ImageViewContext.Provider value={{ suggestion: null }}>
+          <HtxBrush item={region} />
+        </ImageViewContext.Provider>,
+      );
+      await waitFor(() => expect(mockBrushImageRef).not.toBeNull());
+      if (mockBrushImageRef && typeof mockBrushImageRef.onload === "function") mockBrushImageRef.onload();
+      await waitFor(() => {
+        expect(mockCtx.drawImage).toHaveBeenCalled();
+        expect(mockCtx.getImageData).toHaveBeenCalled();
+        expect(mockCtx.putImageData).toHaveBeenCalled();
+      });
+    });
+
+    it("renders with eraser touch without throwing", () => {
+      region.beginPath({ type: "eraser", strokeWidth: 25 });
+      region.addPoint(0, 0);
+      region.addPoint(10, 10);
+      region.endPath();
+      expect(() =>
+        render(
+          <ImageViewContext.Provider value={{ suggestion: null }}>
+            <HtxBrush item={region} />
+          </ImageViewContext.Provider>,
+        ),
+      ).not.toThrow();
+    });
+
+    it("Group onClick calls setHighlight(false) and onClickRegion when not linking and MoveTool", () => {
+      const mst = require("mobx-state-tree");
+      const origGetType = mst.getType;
+      mst.getType = jest.fn().mockReturnValue({ name: "MoveTool" });
+      const mockGetToolsManager = jest.fn().mockReturnValue({ findSelectedTool: () => ({}) });
+      jest.spyOn(root.image, "getToolsManager").mockImplementation(mockGetToolsManager);
+      const setHighlightSpy = jest.spyOn(region, "setHighlight");
+      const onClickRegionSpy = jest.spyOn(region, "onClickRegion").mockImplementation(() => {});
+      const { getAllByTestId } = render(
+        <ImageViewContext.Provider value={{ suggestion: null }}>
+          <HtxBrush item={region} />
+        </ImageViewContext.Provider>,
+      );
+      const groups = getAllByTestId("konva-group");
+      const segmentationGroup = groups.find((g) => g.getAttribute("name") === "segmentation") ?? groups[0];
+      fireEvent.click(segmentationGroup);
+      expect(setHighlightSpy).toHaveBeenCalledWith(false);
+      expect(onClickRegionSpy).toHaveBeenCalled();
+      setHighlightSpy.mockRestore();
+      onClickRegionSpy.mockRestore();
+      mst.getType = origGetType;
     });
   });
 });
