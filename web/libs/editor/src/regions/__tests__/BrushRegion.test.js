@@ -1,0 +1,356 @@
+/**
+ * Unit tests for BrushRegion (regions/BrushRegion.jsx).
+ * Covers BrushRegionModel views (parent, colorParts, strokeColor, touchesLength,
+ * bboxCoordsCanvas, bboxCoords) and actions (serialize, beginPath, endPath,
+ * setScale, updateImageSize, endUpdatedMaskDataURL, convertToImage, etc.).
+ */
+
+import { types } from "mobx-state-tree";
+
+jest.mock("../../utils/canvas", () => ({
+  Region2RLE: jest.fn(),
+  RLE2Region: jest.fn(() => ({ onload: null, src: "" })),
+  maskDataURL2Image: jest.fn(() => Promise.resolve({ onload: () => {}, width: 100, height: 100 })),
+}));
+
+jest.mock("../../components/InteractiveOverlays/Geometry", () => ({
+  Geometry: {
+    getImageDataBBox: jest.fn(() => ({ x: 0, y: 0, width: 50, height: 50 })),
+  },
+}));
+
+jest.mock("../../utils/feature-flags", () => ({
+  isFF: jest.fn(() => false),
+  FF_ZOOM_OPTIM: "ff_zoom_optim",
+}));
+
+const Canvas = require("../../utils/canvas");
+const { Geometry } = require("../../components/InteractiveOverlays/Geometry");
+
+function createMockAnnotation(overrides = {}) {
+  return {
+    pauseAutosave: jest.fn(),
+    startAutosave: jest.fn(),
+    autosave: jest.fn(),
+    isReadOnly: () => false,
+    ...overrides,
+  };
+}
+
+const MockImageModel = types
+  .model("MockImageModel", {
+    id: types.identifier,
+    name: types.optional(types.string, "image"),
+  })
+  .volatile(() => ({
+    naturalWidth: 100,
+    naturalHeight: 100,
+    stageWidth: 100,
+    stageHeight: 100,
+    stageScale: 1,
+    stageRef: {},
+    alignmentOffset: { x: 0, y: 0 },
+    zoomingPositionX: 0,
+    zoomingPositionY: 0,
+    zoomScale: 1,
+    containerWidth: 100,
+    containerHeight: 100,
+    canvasSize: { width: 100, height: 100 },
+    zoomOriginalCoords: ([x, y]) => [x, y],
+    canvasToInternalX: (v) => v,
+    canvasToInternalY: (v) => v,
+    createSerializedResult: (region, value) => ({ value, original_width: 100, original_height: 100 }),
+    getSkipInteractions: () => false,
+    getToolsManager: () => ({ findSelectedTool: () => null }),
+    supportSuggestions: false,
+    findImageEntity: () => null,
+    annotation: null,
+    drawingRegion: null,
+  }))
+  .actions((self) => ({
+    setAnnotation(ann) {
+      self.annotation = ann;
+    },
+    setStageSize(w, h) {
+      self.stageWidth = w;
+      self.stageHeight = h;
+    },
+  }));
+
+jest.mock("../../tags/object/Image", () => ({
+  ImageModel: MockImageModel,
+}));
+
+const { BrushRegionModel } = require("../BrushRegion");
+
+describe("BrushRegion", () => {
+  let root;
+  let region;
+  let mockAnnotation;
+
+  const TestRoot = types.model("TestRoot", {
+    annotationStore: types.optional(
+      types.model({
+        selected: types.frozen(),
+      }),
+      { selected: null },
+    ),
+    image: types.optional(MockImageModel, { id: "img1" }),
+    region: types.optional(BrushRegionModel, {
+      id: "br1",
+      pid: "p1",
+      object: "img1",
+      touches: [],
+    }),
+  });
+
+  beforeEach(() => {
+    mockAnnotation = createMockAnnotation();
+    root = TestRoot.create({
+      annotationStore: { selected: mockAnnotation },
+      image: { id: "img1" },
+      region: { id: "br1", pid: "p1", object: "img1", touches: [] },
+    });
+    root.image.setAnnotation(mockAnnotation);
+    region = root.region;
+    jest.clearAllMocks();
+  });
+
+  describe("BrushRegionModel views", () => {
+    it("parent returns object when alive", () => {
+      expect(region.parent).toBe(root.image);
+    });
+
+    it("touchesLength returns touches length", () => {
+      expect(region.touchesLength).toBe(0);
+    });
+
+    it("strokeColor returns hex from style or defaultStyle", () => {
+      expect(region.strokeColor).toBeDefined();
+      expect(typeof region.strokeColor).toBe("string");
+    });
+
+    it("bboxCoordsCanvas returns bbox from first touch points when no imageData", () => {
+      region.beginPath({ type: "add", strokeWidth: 25 });
+      region.addPoint(10, 10);
+      region.addPoint(50, 10);
+      region.addPoint(50, 50);
+      region.addPoint(10, 50);
+      region.endPath();
+      const bbox = region.bboxCoordsCanvas;
+      expect(bbox).toEqual({ left: 10, top: 10, right: 50, bottom: 50 });
+    });
+  });
+
+  describe("serialize", () => {
+    it("returns result from parent.createSerializedResult with fast option when rle present", () => {
+      const rootWithRle = TestRoot.create({
+        annotationStore: { selected: mockAnnotation },
+        image: { id: "img1" },
+        region: { id: "br2", pid: "p2", object: "img1", touches: [], rle: [1, 2, 3] },
+      });
+      rootWithRle.image.setAnnotation(mockAnnotation);
+      const result = rootWithRle.region.serialize({ fast: true });
+      expect(result).toBeDefined();
+      expect(result.value.format).toBe("rle");
+      expect(result.value.rle).toEqual([1, 2, 3]);
+    });
+
+    it("serialize(fast: true) includes touches and maskDataURL when set", () => {
+      region.beginPath({ type: "add", strokeWidth: 25 });
+      region.addPoint(0, 0);
+      region.addPoint(10, 10);
+      region.endPath();
+      region.endUpdatedMaskDataURL("data:image/png;base64,abc");
+      const result = region.serialize({ fast: true });
+      expect(result.value.touches).toBeDefined();
+      expect(result.value.maskDataURL).toBe("data:image/png;base64,abc");
+    });
+
+    it("serialize() without fast returns null when Region2RLE returns empty", () => {
+      Canvas.Region2RLE.mockReturnValue(null);
+      const result = region.serialize();
+      expect(result).toBeNull();
+    });
+
+    it("serialize() without fast returns createSerializedResult when Region2RLE returns non-empty", () => {
+      Canvas.Region2RLE.mockReturnValue(new Uint8Array([1, 2, 3]));
+      region.beginPath({ type: "add", strokeWidth: 25 });
+      region.addPoint(0, 0);
+      region.addPoint(10, 10);
+      region.endPath();
+      const result = region.serialize();
+      expect(result).toBeDefined();
+      expect(result.value.rle).toEqual([1, 2, 3]);
+    });
+  });
+
+  describe("actions", () => {
+    it("setScale updates scaleX and scaleY", () => {
+      region.setScale(2, 3);
+      expect(region.scaleX).toBe(2);
+      expect(region.scaleY).toBe(3);
+    });
+
+    it("updateMaskImage sets maskImage src when maskDataURL present", () => {
+      region.updateMaskImage();
+      region.endUpdatedMaskDataURL("data:image/png;base64,x");
+      region.updateMaskImage();
+      expect(region.getMaskImage()).toBeDefined();
+    });
+
+    it("beginPath calls annotation.pauseAutosave and returns Points instance", () => {
+      const pathPoints = region.beginPath({ type: "add", strokeWidth: 25 });
+      expect(mockAnnotation.pauseAutosave).toHaveBeenCalled();
+      expect(pathPoints).toBeDefined();
+      expect(pathPoints.type).toBe("add");
+    });
+
+    it("beginPath with type eraser returns Points with type eraser", () => {
+      const pathPoints = region.beginPath({ type: "eraser", strokeWidth: 30 });
+      expect(pathPoints.type).toBe("eraser");
+    });
+
+    it("endPath calls startAutosave, pushes touch and sets currentTouch", () => {
+      const pathPoints = region.beginPath({ type: "add", strokeWidth: 25 });
+      region.addPoint(0, 0);
+      region.addPoint(10, 10);
+      region.endPath();
+      expect(mockAnnotation.startAutosave).toHaveBeenCalled();
+      expect(region.touches.length).toBe(1);
+      expect(region.currentTouch).toBe(pathPoints);
+    });
+
+    it("endPath with only two points duplicates to form a line", () => {
+      region.beginPath({ type: "add", strokeWidth: 25 });
+      region.addPoint(0, 0);
+      region.addPoint(10, 10);
+      region.endPath();
+      expect(region.touches.length).toBe(1);
+      expect(region.touches[0].points.length).toBe(4);
+    });
+
+    it("endUpdatedMaskDataURL sets maskDataURL and calls startAutosave", () => {
+      region.endUpdatedMaskDataURL("data:image/png;base64,xyz");
+      expect(region.maskDataURL).toBe("data:image/png;base64,xyz");
+      expect(mockAnnotation.startAutosave).toHaveBeenCalled();
+    });
+
+    it("updateImageSize updates touches when stage size > 1", () => {
+      region.beginPath({ type: "add", strokeWidth: 25 });
+      region.addPoint(0, 0);
+      region.addPoint(10, 10);
+      region.endPath();
+      const initialUpdate = region.needsUpdate;
+      region.updateImageSize(100, 100, 100, 100);
+      expect(region.needsUpdate).toBe(initialUpdate + 1);
+    });
+
+    it("updateImageSize does nothing when stage width or height <= 1", () => {
+      root.image.setStageSize(1, 1);
+      const initialUpdate = region.needsUpdate;
+      region.updateImageSize(1, 1, 1, 1);
+      expect(region.needsUpdate).toBe(initialUpdate);
+    });
+
+    it("convertToImage clears touches and sets rle when touches exist", () => {
+      Canvas.Region2RLE.mockReturnValue(new Uint8Array([5, 6, 7]));
+      region.beginPath({ type: "add", strokeWidth: 25 });
+      region.addPoint(0, 0);
+      region.addPoint(10, 10);
+      region.endPath();
+      expect(region.touches.length).toBe(1);
+      region.convertToImage();
+      expect(region.touches.length).toBe(0);
+      expect(region.rle).toEqual([5, 6, 7]);
+    });
+
+    it("convertToImage does nothing when touches empty", () => {
+      region.convertToImage();
+      expect(region.touches.length).toBe(0);
+      expect(region.rle).toBeUndefined();
+    });
+
+    it("prepareCoords returns parent.zoomOriginalCoords result", () => {
+      const result = region.prepareCoords([10, 20]);
+      expect(result).toEqual([10, 20]);
+    });
+
+    it("convertPointsToMask is a no-op", () => {
+      expect(() => region.convertPointsToMask()).not.toThrow();
+    });
+
+    it("setLayerRef sets layerRef and canvas opacity when ref provided", () => {
+      const mockLayer = {
+        canvas: { _canvas: { style: {} } },
+      };
+      region.setLayerRef(mockLayer);
+      expect(region.layerRef).toBe(mockLayer);
+      expect(mockLayer.canvas._canvas.style.opacity).toBe(region.opacity);
+    });
+
+    it("setLayerRef does nothing when ref is falsy", () => {
+      region.setLayerRef(null);
+      expect(region.layerRef).toBeUndefined();
+    });
+
+    it("cacheImageData sets imageData to null when no layerRef", () => {
+      region.cacheImageData();
+      expect(region.imageData).toBeNull();
+    });
+  });
+
+  describe("Points (from beginPath)", () => {
+    it("setType toggles eraser type", () => {
+      region.beginPath({ type: "add", strokeWidth: 25 });
+      region.addPoint(0, 0);
+      region.addPoint(10, 10);
+      region.endPath();
+      const stroke = region.touches[0];
+      expect(stroke.compositeOperation).toBe("source-over");
+      stroke.setType("eraser");
+      expect(stroke.type).toBe("eraser");
+      expect(stroke.compositeOperation).toBe("destination-out");
+    });
+
+    it("rescale returns points scaled by destW/origW", () => {
+      region.beginPath({ type: "add", strokeWidth: 25 });
+      region.addPoint(10, 20);
+      region.addPoint(30, 40);
+      region.endPath();
+      const stroke = region.touches[0];
+      const rescaled = stroke.rescale(100, 100, 200);
+      expect(rescaled).toEqual([
+        stroke.points[0] * 2,
+        stroke.points[1] * 2,
+        stroke.points[2] * 2,
+        stroke.points[3] * 2,
+      ]);
+    });
+
+    it("scaledStrokeWidth returns strokeWidth scaled by destW/origW", () => {
+      region.beginPath({ type: "add", strokeWidth: 25 });
+      region.addPoint(0, 0);
+      region.addPoint(10, 10);
+      region.endPath();
+      const stroke = region.touches[0];
+      const w = stroke.scaledStrokeWidth(100, 100, 200);
+      expect(w).toBe(stroke.strokeWidth * 2);
+    });
+  });
+
+  describe("bboxCoords", () => {
+    it("returns bbox with exact coords from touch points", () => {
+      region.beginPath({ type: "add", strokeWidth: 25 });
+      region.addPoint(5, 5);
+      region.addPoint(15, 15);
+      region.endPath();
+      const bbox = region.bboxCoords;
+      expect(bbox).not.toBeNull();
+      expect(bbox.left).toBe(5);
+      expect(bbox.top).toBe(5);
+      expect(bbox.right).toBe(15);
+      expect(bbox.bottom).toBe(15);
+    });
+  });
+});
