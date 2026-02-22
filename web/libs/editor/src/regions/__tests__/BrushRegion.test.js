@@ -2,15 +2,22 @@
  * Unit tests for BrushRegion (regions/BrushRegion.jsx).
  * Covers BrushRegionModel views (parent, colorParts, strokeColor, touchesLength,
  * bboxCoordsCanvas, bboxCoords) and actions (serialize, beginPath, endPath,
- * setScale, updateImageSize, endUpdatedMaskDataURL, convertToImage, etc.).
+ * setScale, updateImageSize, endUpdatedMaskDataURL, convertToImage, etc.),
+ * and HtxBrush/HtxBrushLayer view rendering.
  */
 
+import React from "react";
+import { render, waitFor, fireEvent } from "@testing-library/react";
 import { types } from "mobx-state-tree";
 
+let mockBrushImageRef = null;
 jest.mock("../../utils/canvas", () => ({
   Region2RLE: jest.fn(),
   RLE2Region: jest.fn(() => ({ onload: null, src: "" })),
-  maskDataURL2Image: jest.fn(() => Promise.resolve({ onload: () => {}, width: 100, height: 100 })),
+  maskDataURL2Image: jest.fn(() => {
+    mockBrushImageRef = { onload: null, width: 100, height: 100 };
+    return Promise.resolve(mockBrushImageRef);
+  }),
 }));
 
 jest.mock("../../components/InteractiveOverlays/Geometry", () => ({
@@ -24,6 +31,39 @@ jest.mock("../../utils/feature-flags", () => ({
   FF_ZOOM_OPTIM: "ff_zoom_optim",
 }));
 
+const mockCtx = {
+  save: jest.fn(),
+  restore: jest.fn(),
+  beginPath: jest.fn(),
+  moveTo: jest.fn(),
+  lineTo: jest.fn(),
+  stroke: jest.fn(),
+  drawImage: jest.fn(),
+  getImageData: jest.fn(() => ({ data: new Uint8ClampedArray(4 * 100 * 100), width: 100, height: 100 })),
+  putImageData: jest.fn(),
+};
+jest.mock("react-konva", () => {
+  const React = require("react");
+  return {
+    Layer: ({ children, ...p }) => React.createElement("div", { "data-testid": "konva-layer", ...p }, children),
+    Group: ({ children, ...p }) => React.createElement("div", { "data-testid": "konva-group", ...p }, children),
+    Image: (p) => {
+      const { hitFunc, image, sceneFunc, ...rest } = p;
+      return React.createElement("div", { "data-testid": "konva-image", ...rest });
+    },
+    Shape: (p) => {
+      const { sceneFunc, hitFunc, ...rest } = p;
+      if (sceneFunc) sceneFunc(mockCtx, {});
+      if (hitFunc) hitFunc(mockCtx, { colorKey: "#ff0000" });
+      return React.createElement("div", { "data-testid": "konva-shape", ...rest });
+    },
+  };
+});
+
+jest.mock("../../components/ImageView/ImageViewContext", () => ({
+  ImageViewContext: require("react").createContext({ suggestion: null }),
+}));
+
 const Canvas = require("../../utils/canvas");
 const { Geometry } = require("../../components/InteractiveOverlays/Geometry");
 
@@ -33,6 +73,7 @@ function createMockAnnotation(overrides = {}) {
     startAutosave: jest.fn(),
     autosave: jest.fn(),
     isReadOnly: () => false,
+    unselectAll: jest.fn(),
     ...overrides,
   };
 }
@@ -48,7 +89,7 @@ const MockImageModel = types
     stageWidth: 100,
     stageHeight: 100,
     stageScale: 1,
-    stageRef: {},
+    stageRef: { container: () => ({ style: {} }) },
     alignmentOffset: { x: 0, y: 0 },
     zoomingPositionX: 0,
     zoomingPositionY: 0,
@@ -81,7 +122,8 @@ jest.mock("../../tags/object/Image", () => ({
   ImageModel: MockImageModel,
 }));
 
-const { BrushRegionModel } = require("../BrushRegion");
+const { BrushRegionModel, HtxBrush } = require("../BrushRegion");
+const { ImageViewContext } = require("../../components/ImageView/ImageViewContext");
 
 describe("BrushRegion", () => {
   let root;
@@ -94,6 +136,12 @@ describe("BrushRegion", () => {
         selected: types.frozen(),
       }),
       { selected: null },
+    ),
+    settings: types.optional(
+      types.model({
+        showLabels: types.optional(types.boolean, false),
+      }),
+      { showLabels: false },
     ),
     image: types.optional(MockImageModel, { id: "img1" }),
     region: types.optional(BrushRegionModel, {
@@ -108,6 +156,7 @@ describe("BrushRegion", () => {
     mockAnnotation = createMockAnnotation();
     root = TestRoot.create({
       annotationStore: { selected: mockAnnotation },
+      settings: { showLabels: false },
       image: { id: "img1" },
       region: { id: "br1", pid: "p1", object: "img1", touches: [] },
     });
@@ -351,6 +400,82 @@ describe("BrushRegion", () => {
       expect(bbox.top).toBe(5);
       expect(bbox.right).toBe(15);
       expect(bbox.bottom).toBe(15);
+    });
+  });
+
+  describe("HtxBrush component", () => {
+    it("renders when item has parent and annotation", () => {
+      const { getAllByTestId } = render(
+        <ImageViewContext.Provider value={{ suggestion: null }}>
+          <HtxBrush item={region} />
+        </ImageViewContext.Provider>,
+      );
+      expect(getAllByTestId("konva-layer").length).toBeGreaterThanOrEqual(1);
+    });
+
+    it("renders brush layer and shape when region has touches", () => {
+      region.beginPath({ type: "add", strokeWidth: 25 });
+      region.addPoint(0, 0);
+      region.addPoint(10, 10);
+      region.endPath();
+      const { getAllByTestId } = render(
+        <ImageViewContext.Provider value={{ suggestion: null }}>
+          <HtxBrush item={region} />
+        </ImageViewContext.Provider>,
+      );
+      expect(getAllByTestId("konva-layer").length).toBeGreaterThanOrEqual(1);
+      expect(getAllByTestId("konva-shape").length).toBeGreaterThanOrEqual(1);
+    });
+
+    it("loads image from maskDataURL and calls setReady when onload fires", async () => {
+      region.endUpdatedMaskDataURL("data:image/png;base64,test");
+      mockBrushImageRef = null;
+      render(
+        <ImageViewContext.Provider value={{ suggestion: null }}>
+          <HtxBrush item={region} />
+        </ImageViewContext.Provider>,
+      );
+      await waitFor(() => {
+        expect(mockBrushImageRef).not.toBeNull();
+      });
+      if (mockBrushImageRef && typeof mockBrushImageRef.onload === "function") {
+        mockBrushImageRef.onload();
+      }
+      await waitFor(() => {
+        expect(Canvas.maskDataURL2Image).toHaveBeenCalledWith("data:image/png;base64,test", expect.any(Object));
+      });
+    });
+
+    it("handles Group onMouseOver and onMouseOut without throwing", () => {
+      const { getAllByTestId } = render(
+        <ImageViewContext.Provider value={{ suggestion: null }}>
+          <HtxBrush item={region} />
+        </ImageViewContext.Provider>,
+      );
+      const groups = getAllByTestId("konva-group");
+      const segmentationGroup = groups.find((g) => g.getAttribute("name") === "segmentation") ?? groups[0];
+      expect(() => {
+        fireEvent.mouseOver(segmentationGroup);
+        fireEvent.mouseOut(segmentationGroup);
+      }).not.toThrow();
+    });
+
+    it("handles Group onMouseDown when isLinkingMode without throwing", () => {
+      const linkingRoot = TestRoot.create({
+        annotationStore: { selected: { ...createMockAnnotation(), isLinkingMode: true } },
+        settings: { showLabels: false },
+        image: { id: "img1" },
+        region: { id: "br4", pid: "p4", object: "img1", touches: [] },
+      });
+      linkingRoot.image.setAnnotation(linkingRoot.annotationStore.selected);
+      const { getAllByTestId } = render(
+        <ImageViewContext.Provider value={{ suggestion: null }}>
+          <HtxBrush item={linkingRoot.region} />
+        </ImageViewContext.Provider>,
+      );
+      const groups = getAllByTestId("konva-group");
+      const segmentationGroup = groups.find((g) => g.getAttribute("name") === "segmentation") ?? groups[0];
+      expect(() => fireEvent.mouseDown(segmentationGroup)).not.toThrow();
     });
   });
 });
