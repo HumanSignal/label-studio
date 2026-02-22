@@ -115,7 +115,9 @@ describe("Rect3Point tool", () => {
     ImageView.clickAtRelative(0.1, 0.5);
     ImageView.clickAtRelative(0.8, 0.5);
 
-    ImageView.canvasShouldChange("canvas", 0);
+    // Brief wait for canvas to repaint to reduce screenshot-comparison flakiness
+    cy.wait(200);
+    ImageView.canvasShouldChange("canvas", 0.001);
   });
   it("Should draw by dblclick at the target point", () => {
     LabelStudio.params().config(rect3Config).data(simpleImageData).withResult([]).init();
