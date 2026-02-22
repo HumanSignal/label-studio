@@ -2,7 +2,7 @@
  * Unit tests for KeyPointRegion (model views and region type predicate).
  * View coverage is largely from Cypress; these tests cover model logic.
  */
-import { types } from "mobx-state-tree";
+import { applySnapshot, getSnapshot, types } from "mobx-state-tree";
 
 // Avoid pulling in full Image tag (circular deps / heavy union) in unit tests.
 // AreaMixin makes region.parent === region.object (the image), so image must provide createSerializedResult
@@ -105,6 +105,23 @@ describe("KeyPointRegion", () => {
       expect(region.canvasX).toBe(100);
       expect(region.canvasY).toBe(100);
       expect(region.canvasWidth).toBe(20);
+    });
+
+    it("updateImageSize is a no-op", () => {
+      expect(() => region.updateImageSize()).not.toThrow();
+    });
+
+    it("serialize adds is_positive and value.labels when dynamic is true", () => {
+      applySnapshot(region, { ...getSnapshot(region), dynamic: true });
+      const result = region.serialize();
+      expect(result.is_positive).toBe(true);
+      expect(result.value.labels).toEqual([]);
+    });
+
+    it("serialize sets is_positive false when dynamic and negative are true", () => {
+      applySnapshot(region, { ...getSnapshot(region), dynamic: true, negative: true });
+      const result = region.serialize();
+      expect(result.is_positive).toBe(false);
     });
   });
 
