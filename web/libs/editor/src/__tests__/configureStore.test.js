@@ -7,6 +7,7 @@ const mockGetData = jest.fn((task) => (task?.data ? { ...task, data: JSON.string
 const mockGetState = jest.fn(() => ({}));
 const mockRootElement = jest.fn(() => ({}));
 const mockConfigureApplication = jest.fn(() => ({}));
+const mockGetExample = jest.fn();
 
 jest.mock("../env/production", () => ({
   __esModule: true,
@@ -15,7 +16,9 @@ jest.mock("../env/production", () => ({
     getState: mockGetState,
     rootElement: mockRootElement,
     configureApplication: mockConfigureApplication,
-    getExample: undefined,
+    get getExample() {
+      return mockGetExample();
+    },
   },
 }));
 
@@ -26,7 +29,9 @@ jest.mock("../env/development", () => ({
     getState: mockGetState,
     rootElement: mockRootElement,
     configureApplication: mockConfigureApplication,
-    getExample: undefined,
+    get getExample() {
+      return mockGetExample();
+    },
   },
 }));
 
@@ -109,6 +114,40 @@ describe("configureStore", () => {
         hydrated: true,
         users: [],
         annotationHistory: [],
+      }),
+    );
+  });
+
+  it("calls env.getExample when config is missing and getExample is defined", async () => {
+    const exampleTask = { id: 99, data: { x: 1 } };
+    const exampleConfig = '<View><Text name="t"/></View>';
+    mockGetExample.mockReturnValue(() => Promise.resolve({ task: exampleTask, config: exampleConfig }));
+    const { configureStore } = await import("../configureStore");
+    await configureStore({});
+    expect(mockGetExample).toHaveBeenCalled();
+    expect(mockCreate).toHaveBeenCalled();
+    const [params] = mockCreate.mock.calls[0];
+    expect(params.config).toBe(exampleConfig);
+    expect(params.task).toEqual(exampleTask);
+    mockGetExample.mockReturnValue(undefined);
+  });
+
+  it("passes hydrated, users, and annotationHistory to initializeStore", async () => {
+    const users = [{ id: 1, username: "u" }];
+    const history = [{ annotationId: 1 }];
+    const { configureStore } = await import("../configureStore");
+    await configureStore({
+      config: "<View></View>",
+      task: { id: 1 },
+      hydrated: false,
+      users,
+      history,
+    });
+    expect(mockInitializeStore).toHaveBeenCalledWith(
+      expect.objectContaining({
+        hydrated: false,
+        users,
+        annotationHistory: history,
       }),
     );
   });
