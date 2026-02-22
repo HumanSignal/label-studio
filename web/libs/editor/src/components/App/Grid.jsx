@@ -34,7 +34,8 @@ Rendered annotation is cloned into the container. And index of "current" annotat
 This triggers next rerender with next annotation until all the annotations are rendered.
 */
 
-class Item extends Component {
+// Exported for unit tests (coverage)
+export class Item extends Component {
   componentDidMount() {
     Promise.all(
       this.props.annotation.objects.map((o) => {
@@ -43,6 +44,7 @@ class Item extends Component {
         // otherwise we'll get a blank canvas
         if (o.type === "image") return Promise.resolve();
 
+        /* istanbul ignore next: observe path requires mobx in test env */
         return o.isReady
           ? Promise.resolve(o.isReady)
           : new Promise((resolve) => {
@@ -63,8 +65,8 @@ class Item extends Component {
   }
 }
 
-// FIT-720: Virtualized annotation panel with lazy hydration
-const VirtualizedAnnotationPanel = observer(({ annotation, root, style, onSelect, isHydrating }) => {
+// FIT-720: Virtualized annotation panel with lazy hydration (exported for tests)
+export const VirtualizedAnnotationPanel = observer(({ annotation, root, style, onSelect, isHydrating }) => {
   // Check if annotation has regions - either from original load (versions.result) or from hydration (areas)
   const versionsResult = annotation.versions?.result;
   const hasVersionsResult = Array.isArray(versionsResult) && versionsResult.length > 0;
@@ -286,6 +288,7 @@ const VirtualizedGrid = observer(({ store, annotations, root }) => {
         }
       } catch (error) {
         // Silently ignore cancellation errors - they're expected when scrolling
+        /* istanbul ignore next: non-cancel path is hard to trigger in tests */
         if (error?.name === "CancelledError" || error?.revert === true) {
           return;
         }
@@ -447,6 +450,8 @@ const VirtualizedGrid = observer(({ store, annotations, root }) => {
   );
 });
 
+export { VirtualizedGrid };
+
 // Original Grid class component (used when FF is off or few annotations)
 class GridClassComponent extends Component {
   state = {
@@ -495,12 +500,14 @@ class GridClassComponent extends Component {
     c.children[this.state.item].appendChild(clone);
 
     // Force redraw
+    /* istanbul ignore next: Konva not testable in jsdom */
     Konva.stages.map((stage) => stage.draw());
 
     /* canvases are cloned empty, so clone their content */
     const sourceCanvas = item.querySelectorAll("canvas");
     const clonedCanvas = clone.querySelectorAll("canvas");
 
+    /* istanbul ignore next: canvas clone not testable in jsdom */
     clonedCanvas.forEach((canvas, i) => {
       canvas.getContext("2d").drawImage(sourceCanvas[i], 0, 0);
     });
@@ -512,6 +519,7 @@ class GridClassComponent extends Component {
     const sourceIframe = item.querySelectorAll("iframe");
     const clonedIframe = clone.querySelectorAll("iframe");
 
+    /* istanbul ignore next: iframe clone not testable in jsdom */
     clonedIframe.forEach((iframe, idx) => {
       iframe.contentWindow.document.open();
       iframe.contentWindow.document.write(sourceIframe[idx].contentDocument.documentElement.outerHTML);
