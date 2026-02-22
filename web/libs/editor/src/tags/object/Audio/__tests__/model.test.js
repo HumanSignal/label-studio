@@ -63,6 +63,9 @@ jest.mock("mobx-state-tree", () => {
       if (node === mockLabelsState) {
         return { name: "LabelsModel" };
       }
+      if (node && typeof node === "object" && "selectedValues" in node) {
+        return { name: "LabelsModel" };
+      }
       return actual.getType(node);
     },
   };
@@ -356,6 +359,17 @@ describe("Audio model", () => {
       expect(() => node.clearRegionMappings()).not.toThrow();
     });
 
+    it("clearRegionMappings calls setWSRegion(null) on each reg", () => {
+      const node = createAudioNode();
+      const setWSRegion = jest.fn();
+      const reg = { _ws_region: {}, setWSRegion };
+      reg.object = node;
+      mockRegionStore.regions = [reg];
+      node.clearRegionMappings();
+      expect(setWSRegion).toHaveBeenCalledWith(null);
+      mockRegionStore.regions = [];
+    });
+
     it("onReady calls setReady(true)", () => {
       const node = createAudioNode();
       node.onReady();
@@ -583,6 +597,215 @@ describe("Audio model", () => {
       node.checkReady();
       expect(node.onReady).not.toHaveBeenCalled();
       raf.mockRestore();
+    });
+  });
+
+  describe("handleSyncSeek error path", () => {
+    it("catches when setCurrentTime throws", () => {
+      const node = createAudioNode();
+      const syncCursor = jest.fn();
+      node.onLoad({
+        loaded: true,
+        setCurrentTime: jest.fn(() => {
+          throw new Error("seek failed");
+        }),
+        syncCursor,
+      });
+      const logSpy = jest.spyOn(console, "log").mockImplementation(() => {});
+      expect(() => node.handleSyncSeek({ time: 5 })).not.toThrow();
+      expect(logSpy).toHaveBeenCalled();
+      logSpy.mockRestore();
+    });
+  });
+
+  describe("createWsRegion and updateWsRegion", () => {
+    it("createWsRegion adds region via _ws and sets WS region on region", () => {
+      const node = createAudioNode();
+      const addRegion = jest.fn(() => ({ id: "ws-1" }));
+      node.onLoad({ addRegion });
+      const setWSRegion = jest.fn();
+      const mockReg = {
+        _ws_region: null,
+        labels: ["L1"],
+        wsRegionOptions: () => ({ start: 0, end: 1 }),
+        setWSRegion,
+      };
+      node.createWsRegion(mockReg);
+      expect(addRegion).toHaveBeenCalledWith(expect.objectContaining({ start: 0, end: 1, labels: ["L1"] }), false);
+      expect(setWSRegion).toHaveBeenCalledWith({ id: "ws-1" });
+    });
+
+    it("createWsRegion omits labels when region.labels is empty", () => {
+      const node = createAudioNode();
+      const addRegion = jest.fn(() => ({}));
+      node.onLoad({ addRegion });
+      const mockReg = {
+        labels: [],
+        wsRegionOptions: () => ({ start: 0, end: 1 }),
+        setWSRegion: jest.fn(),
+      };
+      node.createWsRegion(mockReg);
+      expect(addRegion).toHaveBeenCalledWith(expect.objectContaining({ start: 0, end: 1 }), false);
+      expect(addRegion.mock.calls[0][0].labels).toBeUndefined();
+    });
+
+    it("updateWsRegion updates region via _ws", () => {
+      const node = createAudioNode();
+      const updateRegion = jest.fn();
+      node.onLoad({ updateRegion });
+      const mockReg = {
+        _ws_region: { id: "ws-1" },
+        labels: ["L1"],
+        wsRegionOptions: () => ({ id: "ws-1", start: 0, end: 2 }),
+      };
+      node.updateWsRegion(mockReg);
+      expect(updateRegion).toHaveBeenCalledWith(expect.objectContaining({ id: "ws-1", start: 0, end: 2 }), false);
+    });
+  });
+
+  describe("handleNewRegions", () => {
+    it("calls updateWsRegion for regs with _ws_region and createWsRegion for others", () => {
+      const node = createAudioNode();
+      node.onLoad({ addRegion: jest.fn(() => ({})), updateRegion: jest.fn() });
+      const regWithWs = {
+        _ws_region: { id: "w1" },
+        wsRegionOptions: () => ({}),
+        setWSRegion: jest.fn(),
+      };
+      const regWithoutWs = {
+        _ws_region: null,
+        labels: [],
+        wsRegionOptions: () => ({ start: 0, end: 1 }),
+        setWSRegion: jest.fn(),
+      };
+      regWithWs.object = node;
+      regWithoutWs.object = node;
+      mockRegionStore.regions = [regWithWs, regWithoutWs];
+      node.handleNewRegions();
+      expect(node._ws.updateRegion).toHaveBeenCalled();
+      expect(node._ws.addRegion).toHaveBeenCalled();
+      mockRegionStore.regions = [];
+    });
+  });
+
+  describe("updateRegion", () => {
+    it("calls onUpdateEnd on found region", () => {
+      const node = createAudioNode();
+      const onUpdateEnd = jest.fn();
+      const reg = { _ws_region: { id: "wr1" }, onUpdateEnd };
+      reg.object = node;
+      mockRegionStore.regions = [reg];
+      const result = node.updateRegion({ id: "wr1" });
+      expect(result).toBe(reg);
+      expect(onUpdateEnd).toHaveBeenCalled();
+      mockRegionStore.regions = [];
+    });
+  });
+
+  describe("findRegionByWsRegion", () => {
+    it("returns region when _ws_region.id matches", () => {
+      const node = createAudioNode();
+      const reg = { _ws_region: { id: "match-id" } };
+      reg.object = node;
+      mockRegionStore.regions = [reg];
+      expect(node.findRegionByWsRegion({ id: "match-id" })).toBe(reg);
+      mockRegionStore.regions = [];
+    });
+  });
+
+  describe("handleSync with _ws loaded", () => {
+    it("calls handleSyncSeek with time when data has time", () => {
+      const node = createAudioNode();
+      const setCurrentTime = jest.fn();
+      node.onLoad({
+        loaded: true,
+        playing: false,
+        play: jest.fn(),
+        setCurrentTime,
+        syncCursor: jest.fn(),
+      });
+      node.handleSync({ time: 3, playing: true }, "seek");
+      expect(setCurrentTime).toHaveBeenCalledWith(3, true);
+    });
+
+    it("sets wasPlayingBeforeBuffering for play/pause events", () => {
+      const node = createAudioNode();
+      node.onLoad({ loaded: true, playing: false, play: jest.fn() });
+      node.handleSync({ playing: true }, "play");
+      expect(node.wasPlayingBeforeBuffering).toBe(true);
+      node.handleSync({ playing: false }, "pause");
+      expect(node.wasPlayingBeforeBuffering).toBe(false);
+    });
+  });
+
+  describe("triggerSyncPlay and triggerSyncPause", () => {
+    it("triggerSyncPlay sets wasPlayingBeforeBuffering and calls handleSyncPlay and triggerSync", () => {
+      const node = createAudioNode();
+      const play = jest.fn();
+      node.onLoad({ play });
+      node.syncSend = jest.fn();
+      node.triggerSyncPlay();
+      expect(node.wasPlayingBeforeBuffering).toBe(true);
+      expect(play).toHaveBeenCalled();
+      expect(node.syncSend).toHaveBeenCalledWith(expect.objectContaining({ playing: true }), "play");
+    });
+
+    it("triggerSyncPause sets wasPlayingBeforeBuffering false and calls handleSyncPause and triggerSync", () => {
+      const node = createAudioNode();
+      const pause = jest.fn();
+      node.onLoad({ pause });
+      node.syncSend = jest.fn();
+      node.triggerSyncPause();
+      expect(node.wasPlayingBeforeBuffering).toBe(false);
+      expect(pause).toHaveBeenCalled();
+      expect(node.syncSend).toHaveBeenCalledWith(expect.objectContaining({ playing: false }), "pause");
+    });
+  });
+
+  describe("registerSyncHandlers", () => {
+    it("registers play, pause, seek, speed handlers", () => {
+      const node = createAudioNode();
+      node.registerSyncHandlers();
+      expect(node.syncHandlers.get("play")).toBe(node.handleSync);
+      expect(node.syncHandlers.get("pause")).toBe(node.handleSync);
+      expect(node.syncHandlers.get("seek")).toBe(node.handleSync);
+      expect(node.syncHandlers.get("speed")).toBe(node.handleSyncSpeed);
+    });
+  });
+
+  describe("handleBuffering", () => {
+    it("is no-op when isSyncedBuffering is false (module constant)", () => {
+      const node = createAudioNode();
+      node.onLoad({ pause: jest.fn() });
+      node.triggerSyncBuffering = jest.fn();
+      node.handleBuffering(true);
+      expect(node.triggerSyncBuffering).not.toHaveBeenCalled();
+    });
+  });
+
+  describe("addRegion with FF_MULTIPLE_LABELS_REGIONS", () => {
+    it("calls createResult with rest when FF_MULTIPLE_LABELS_REGIONS is on", () => {
+      const ff = require("@humansignal/core").ff;
+      ff.isActive.mockImplementation((flag) => flag === "FF_MULTIPLE_LABELS_REGIONS");
+      const secondState = { ...mockLabelsState, selectedValues: () => ["L2"] };
+      mockToNames.set("audio", [mockLabelsState, secondState]);
+      const node = createAudioNode();
+      mockAnnotation.createResult.mockReturnValue({
+        setWSRegion: jest.fn(),
+        updateColor: jest.fn(),
+      });
+      const wsRegion = { id: "seg-1", isRegion: false, convertToRegion: jest.fn((labels) => ({ id: "r1", labels })) };
+      node.addRegion(wsRegion);
+      expect(mockAnnotation.createResult).toHaveBeenCalledWith(
+        wsRegion,
+        expect.any(Object),
+        mockLabelsState,
+        node,
+        false,
+        expect.any(Array),
+      );
+      mockToNames.set("audio", []);
+      ff.isActive.mockReturnValue(false);
     });
   });
 });
