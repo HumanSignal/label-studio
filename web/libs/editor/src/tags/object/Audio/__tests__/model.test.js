@@ -808,4 +808,50 @@ describe("Audio model", () => {
       ff.isActive.mockReturnValue(false);
     });
   });
+
+  describe("addRegion with no states and wsRegion not a region", () => {
+    it("returns undefined when getAvailableStates is empty and wsRegion.isRegion is false", () => {
+      const node = createAudioNode();
+      const wsRegion = { id: "seg-1", isRegion: false };
+      const result = node.addRegion(wsRegion);
+      expect(result).toBeUndefined();
+      expect(mockAnnotation.createResult).not.toHaveBeenCalled();
+    });
+  });
+
+  describe("handleSyncBuffering", () => {
+    it("handleSyncBuffering pauses and sets wasPlaying when data.buffering is true", () => {
+      const node = createAudioNode();
+      const pause = jest.fn();
+      node.onLoad({ pause });
+      node.handleSyncBuffering({ playing: true, buffering: true });
+      expect(node.wasPlayingBeforeBuffering).toBe(true);
+      expect(pause).toHaveBeenCalled();
+    });
+
+    it("handleSyncBuffering calls play when !isBuffering && !data.buffering && playing", () => {
+      const node = createAudioNode();
+      const play = jest.fn();
+      node.onLoad({ play });
+      node.handleSyncBuffering({ playing: true, buffering: false });
+      expect(play).toHaveBeenCalled();
+    });
+  });
+
+  describe("handleSync with time", () => {
+    it("calls handleSyncSeek with time when _ws is loaded", () => {
+      const node = createAudioNode();
+      const setCurrentTime = jest.fn();
+      const syncCursor = jest.fn();
+      node.onLoad({
+        loaded: true,
+        playing: false,
+        play: jest.fn(),
+        setCurrentTime,
+        syncCursor,
+      });
+      node.handleSync({ time: 7, playing: false }, "seek");
+      expect(setCurrentTime).toHaveBeenCalledWith(7, true);
+    });
+  });
 });
