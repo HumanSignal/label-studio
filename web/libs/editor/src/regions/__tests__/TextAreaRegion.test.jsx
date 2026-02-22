@@ -232,5 +232,23 @@ describe("TextAreaRegion", () => {
       container.dispatchEvent(new MouseEvent("mouseout", { bubbles: true }));
       expect(region._highlighted).toBe(false);
     });
+
+    it("applies selected class when region is selected", () => {
+      const root = createRoot();
+      const region = getRegion(root);
+      region.selectRegion();
+      render(<HtxTextAreaRegion item={region} onFocus={jest.fn()} />);
+      expect(screen.getByTestId("textarea-region")).toBeInTheDocument();
+      expect(region.selected).toBe(true);
+    });
+
+    it("applies highlighted class when region is highlighted", () => {
+      const root = createRoot();
+      const region = getRegion(root);
+      region.setHighlight(true);
+      render(<HtxTextAreaRegion item={region} onFocus={jest.fn()} />);
+      expect(screen.getByTestId("textarea-region")).toBeInTheDocument();
+      expect(region._highlighted).toBe(true);
+    });
   });
 });
