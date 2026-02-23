@@ -8,9 +8,11 @@
 
 import { imageCache } from "./ImageCache";
 
-// Mock URL.createObjectURL / revokeObjectURL (not available in jsdom)
-const mockBlobUrl = "blob:http://localhost/mock-blob-url";
-global.URL.createObjectURL = jest.fn(() => mockBlobUrl);
+// Mock URL.createObjectURL / revokeObjectURL (not available in jsdom).
+// Use a counter so each blob URL is unique; otherwise forceClear() revokes the same URL
+// and later tests see it in revokedUrls and get() returns undefined.
+let blobUrlCounter = 0;
+global.URL.createObjectURL = jest.fn(() => `blob:http://localhost/mock-${++blobUrlCounter}`);
 global.URL.revokeObjectURL = jest.fn();
 
 // Minimal valid image data (> 100 bytes to pass minBlobSize check)
@@ -114,7 +116,7 @@ describe("ImageCache content type validation", () => {
     const restore = mockXHRWithContentType("binary/octet-stream");
     try {
       const result = await imageCache.load("https://s3.amazonaws.com/bucket/image.jpg");
-      expect(result.blobUrl).toBe(mockBlobUrl);
+      expect(result.blobUrl).toMatch(/^blob:http:\/\/localhost\/mock-\d+$/);
       expect(result.naturalWidth).toBe(100);
     } finally {
       restore();
@@ -129,7 +131,7 @@ describe("ImageCache content type validation", () => {
     const restore = mockXHRWithContentType("application/octet-stream");
     try {
       const result = await imageCache.load("https://s3.amazonaws.com/bucket/photo.png");
-      expect(result.blobUrl).toBe(mockBlobUrl);
+      expect(result.blobUrl).toMatch(/^blob:http:\/\/localhost\/mock-\d+$/);
     } finally {
       restore();
     }
@@ -143,7 +145,7 @@ describe("ImageCache content type validation", () => {
     const restore = mockXHRWithContentType("");
     try {
       const result = await imageCache.load("https://storage.example.com/img.tiff");
-      expect(result.blobUrl).toBe(mockBlobUrl);
+      expect(result.blobUrl).toMatch(/^blob:http:\/\/localhost\/mock-\d+$/);
     } finally {
       restore();
     }
@@ -156,7 +158,7 @@ describe("ImageCache content type validation", () => {
     const restore = mockXHRWithContentType("image/jpeg");
     try {
       const result = await imageCache.load("https://example.com/photo.jpg");
-      expect(result.blobUrl).toBe(mockBlobUrl);
+      expect(result.blobUrl).toMatch(/^blob:http:\/\/localhost\/mock-\d+$/);
       expect(result.naturalWidth).toBe(100);
       expect(result.naturalHeight).toBe(100);
     } finally {
@@ -171,7 +173,128 @@ describe("ImageCache content type validation", () => {
     const restore = mockXHRWithContentType("image/png");
     try {
       const result = await imageCache.load("https://example.com/screenshot.png");
-      expect(result.blobUrl).toBe(mockBlobUrl);
+      expect(result.blobUrl).toMatch(/^blob:http:\/\/localhost\/mock-\d+$/);
+    } finally {
+      restore();
+    }
+  });
+
+  /**
+   * Reject empty or too-small blob (minBlobSize check).
+   */
+  it("should reject blob smaller than minBlobSize", async () => {
+    const smallBlob = new Blob([new Uint8Array(50)], { type: "image/png" });
+    const originalXHR = global.XMLHttpRequest;
+    let loadHandler: (() => void) | null = null;
+    (global as any).XMLHttpRequest = jest.fn().mockImplementation(function (this: any) {
+      const xhr = {
+        responseType: "",
+        readyState: 4,
+        status: 200,
+        response: smallBlob,
+        open: jest.fn(),
+        send: jest.fn(() => {
+          setTimeout(() => {
+            if (loadHandler) loadHandler();
+          }, 0);
+        }),
+        addEventListener: jest.fn((event: string, handler: Function) => {
+          if (event === "load") loadHandler = handler as () => void;
+        }),
+      };
+      return xhr;
+    });
+    try {
+      await expect(imageCache.load("https://example.com/tiny.png")).rejects.toThrow("Empty or invalid image data");
+    } finally {
+      global.XMLHttpRequest = originalXHR;
+    }
+  });
+});
+
+describe("ImageCache get, refs, and cache lifecycle", () => {
+  beforeEach(() => {
+    imageCache.forceClear();
+    jest.clearAllMocks();
+  });
+
+  it("get returns undefined when url not in cache", () => {
+    expect(imageCache.get("https://example.com/not-cached.png")).toBeUndefined();
+  });
+
+  it("isLoading returns false when not loading", () => {
+    expect(imageCache.isLoading("https://example.com/any.png")).toBe(false);
+  });
+
+  it("getPendingLoad returns undefined when not loading", () => {
+    expect(imageCache.getPendingLoad("https://example.com/any.png")).toBeUndefined();
+  });
+
+  it("addRef and releaseRef update refCount on cached entry", async () => {
+    const restore = mockXHRWithContentType("image/png");
+    try {
+      const result = await imageCache.load("https://example.com/ref-test.png");
+      expect(result.refCount).toBe(0);
+      imageCache.addRef("https://example.com/ref-test.png");
+      const cached = imageCache.get("https://example.com/ref-test.png");
+      expect(cached?.refCount).toBe(1);
+      imageCache.addRef("https://example.com/ref-test.png");
+      expect(imageCache.get("https://example.com/ref-test.png")?.refCount).toBe(2);
+      imageCache.releaseRef("https://example.com/ref-test.png");
+      imageCache.releaseRef("https://example.com/ref-test.png");
+      expect(imageCache.get("https://example.com/ref-test.png")?.refCount).toBe(0);
+    } finally {
+      restore();
+    }
+  });
+
+  it("forceRemove removes entry and revokes blob", async () => {
+    const restore = mockXHRWithContentType("image/png");
+    try {
+      await imageCache.load("https://example.com/force-remove.png");
+      expect(imageCache.get("https://example.com/force-remove.png")).toBeDefined();
+      imageCache.forceRemove("https://example.com/force-remove.png");
+      expect(imageCache.get("https://example.com/force-remove.png")).toBeUndefined();
+      expect(URL.revokeObjectURL).toHaveBeenCalled();
+    } finally {
+      restore();
+    }
+  });
+
+  it("forceClear clears cache and pending loads", async () => {
+    const restore = mockXHRWithContentType("image/png");
+    try {
+      await imageCache.load("https://example.com/clear1.png");
+      imageCache.forceClear();
+      expect(imageCache.get("https://example.com/clear1.png")).toBeUndefined();
+    } finally {
+      restore();
+    }
+  });
+
+  it("load returns cached result and calls onProgress(1)", async () => {
+    const restore = mockXHRWithContentType("image/png");
+    const onProgress = jest.fn();
+    try {
+      await imageCache.load("https://example.com/cached.png", undefined, onProgress);
+      onProgress.mockClear();
+      const result = await imageCache.load("https://example.com/cached.png", undefined, onProgress);
+      expect(result.blobUrl).toMatch(/^blob:http:\/\/localhost\/mock-\d+$/);
+      expect(onProgress).toHaveBeenCalledWith(1);
+    } finally {
+      restore();
+    }
+  });
+
+  it("load deduplicates concurrent loads for same url", async () => {
+    const restore = mockXHRWithContentType("image/png");
+    try {
+      const [a, b] = await Promise.all([
+        imageCache.load("https://example.com/same.png"),
+        imageCache.load("https://example.com/same.png"),
+      ]);
+      expect(a).toBe(b);
+      expect(imageCache.isLoading("https://example.com/same.png")).toBe(false);
     } finally {
       restore();
     }
