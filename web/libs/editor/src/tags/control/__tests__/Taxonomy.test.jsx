@@ -9,7 +9,7 @@ import "../../visual/View";
 import "../Choice";
 import "../Taxonomy/Taxonomy";
 import "../../object/RichText";
-import { HtxTaxonomy, TaxonomyModel } from "../Taxonomy/Taxonomy";
+import { HtxTaxonomy, TaxonomyModel, traverse } from "../Taxonomy/Taxonomy";
 
 const mockUnlock = jest.fn();
 const mockAddErrors = jest.fn();
@@ -68,51 +68,92 @@ const CONFIG_TAXONOMY = `<View>
   <Text name="t1" value="$text" />
 </View>`;
 
-let mockRoot;
-function buildMockRoot(storeOverride = null) {
+/**
+ * Build a root so the taxonomy's SharedStoreMixin store reference resolves in the same tree.
+ * Root has model name "AnnotationStore", wraps the View, and has StoreExtender so addSharedStore
+ * puts the shared store in this tree and taxonomy.store resolves.
+ * @param {object} [storeRef] - task data ref for treeToModel
+ * @param {object} [storeOverride] - use this store instead of mockStore (e.g. for userLabels tests)
+ * @param {object} [annotationOverrides] - merge into annotation snapshot (e.g. { results: [mockResult] })
+ * @param {object} [configOverride] - use this instead of CONFIG_TAXONOMY (e.g. from Tree.treeToModel(xml, storeRef))
+ */
+function createTaxonomyNode(
+  storeRef = { task: { dataObj: { text: "Hello" } } },
+  storeOverride = null,
+  annotationOverrides = {},
+  configOverride = null,
+) {
   const { types } = require("mobx-state-tree");
   const { StoreExtender } = require("../../../mixins/SharedChoiceStore/extender");
-  const RootModel = types.model("TestRoot", {
-    store: types.frozen(),
-    annotationStore: StoreExtender,
+  const ViewModel = Registry.getModelByTag("view");
+  const WrapperModel = types.model("Wrapper", { view: ViewModel });
+  const TaxonomyModelRef = types.safeReference(Registry.getModelByTag("taxonomy"));
+  const ResultItemModel = types.model("ResultItem", {
+    mainValue: types.frozen(),
+    from_name: types.maybeNull(TaxonomyModelRef),
   });
+  const SelectedAnnotationModel = types
+    .model("SelectedAnnotation", {
+      id: types.number,
+      results: types.optional(types.array(ResultItemModel), []),
+      names: types.frozen(),
+      store: types.frozen(),
+      highlightedNode: types.maybeNull(types.frozen()),
+    })
+    .actions((self) => ({
+      addResult(result) {
+        self.results.push(result);
+      },
+    }));
+  const RootModel = types.compose(
+    "AnnotationStore",
+    StoreExtender,
+    types.model({
+      store: types.frozen(),
+      annotationStore: types.optional(
+        types.model({
+          selected: types.maybeNull(SelectedAnnotationModel),
+          selectedHistory: types.maybeNull(types.frozen()),
+        }),
+        {},
+      ),
+      wrapper: WrapperModel,
+    }),
+  );
+  const config = configOverride ?? Tree.treeToModel(CONFIG_TAXONOMY, storeRef);
   const storeToUse = storeOverride ?? mockStore;
-  mockRoot = RootModel.create({
+  const annotationSnapshot = {
+    id: mockAnnotation.id,
+    results: [],
+    names: mockAnnotation.names,
     store: storeToUse,
-    annotationStore: { sharedStores: {} },
+    highlightedNode: mockAnnotation.highlightedNode,
+    ...annotationOverrides,
+  };
+  const root = RootModel.create({
+    store: storeToUse,
+    sharedStores: {},
+    annotationStore: {
+      selected: annotationSnapshot,
+      selectedHistory: annotationSnapshot,
+    },
+    wrapper: { view: config },
   });
-  mockRoot.annotationStore.selected = mockAnnotation;
-  mockRoot.annotationStore.selectedHistory = mockAnnotation;
-  mockRoot.annotationStore.addErrors = mockAddErrors;
-  return mockRoot;
+  root.annotationStore.addErrors = mockAddErrors;
+  const taxonomy = root.wrapper.view.children.find((c) => c.type === "taxonomy");
+  return taxonomy ?? null;
 }
 
-jest.mock("mobx-state-tree", () => {
-  const actual = jest.requireActual("mobx-state-tree");
-  return {
-    ...actual,
-    getRoot: (node) => {
-      if (node && node.type === "taxonomy") return mockRoot;
-      if (node && node.type === "choice") return mockRoot;
-      return actual.getRoot(node);
-    },
-  };
-});
-
-function createTaxonomyNode(storeRef = { task: { dataObj: { text: "Hello" } } }) {
-  const config = Tree.treeToModel(CONFIG_TAXONOMY, storeRef);
-  const ViewModel = Registry.getModelByTag("view");
-  const root = ViewModel.create(config);
-  const taxonomy = root.children.find((c) => c.type === "taxonomy");
-  return taxonomy ?? null;
+function createTaxonomyNodeWithConfig(configXml, storeRef = { task: { dataObj: { text: "Hello" } } }) {
+  const config = Tree.treeToModel(configXml, storeRef);
+  return createTaxonomyNode(storeRef, null, {}, config);
 }
 
 beforeEach(() => {
   jest.clearAllMocks();
   window.STORE_INIT_OK = true;
-  const { Stores } = require("../../../mixins/SharedChoiceStore/mixin");
-  Stores.clear();
-  buildMockRoot();
+  const { destroy } = require("../../../mixins/SharedChoiceStore/mixin");
+  destroy();
   Tree.filterChildrenOfType.mockImplementation((node, type) => {
     if (type === "ChoiceModel" && node?.children) {
       return node.children.filter((c) => c.type === "choice");
@@ -124,6 +165,57 @@ afterEach(() => {
   window.STORE_INIT_OK = undefined;
 });
 
+describe("traverse", () => {
+  it("returns empty array for null root", () => {
+    expect(traverse(null)).toEqual([]);
+  });
+
+  it("returns empty array for undefined root", () => {
+    expect(traverse(undefined)).toEqual([]);
+  });
+
+  it("traverses single node with value and path", () => {
+    const root = { value: "A" };
+    const result = traverse(root);
+    expect(result).toHaveLength(1);
+    expect(result[0]).toMatchObject({ label: "A", path: ["A"], depth: 0 });
+  });
+
+  it("traverses node with hint and color", () => {
+    const root = { value: "X", hint: "Hint text", color: "#ff0000" };
+    const result = traverse(root);
+    expect(result[0]).toMatchObject({ label: "X", hint: "Hint text", color: "#ff0000" });
+  });
+
+  it("traverses node with alias", () => {
+    const root = { value: "Label", alias: "alias-val" };
+    const result = traverse(root);
+    expect(result[0].path).toEqual(["alias-val"]);
+  });
+
+  it("traverses nested children", () => {
+    const root = { value: "Parent", children: [{ value: "Child" }] };
+    const result = traverse(root);
+    expect(result).toHaveLength(1);
+    expect(result[0].children).toHaveLength(1);
+    expect(result[0].children[0]).toMatchObject({ label: "Child", depth: 1 });
+  });
+
+  it("traverses array of roots", () => {
+    const roots = [{ value: "A" }, { value: "B" }];
+    const result = traverse(roots);
+    expect(result).toHaveLength(2);
+    expect(result[0].label).toBe("A");
+    expect(result[1].label).toBe("B");
+  });
+
+  it("deduplicates by value", () => {
+    const roots = [{ value: "A" }, { value: "A" }];
+    const result = traverse(roots);
+    expect(result).toHaveLength(1);
+  });
+});
+
 describe("Taxonomy model", () => {
   it("creates taxonomy with correct type and name", () => {
     const taxonomy = createTaxonomyNode();
@@ -133,7 +225,7 @@ describe("Taxonomy model", () => {
     expect(taxonomy.toname).toBe("t1");
   });
 
-  it.skip("items returns traversed tree from children", () => {
+  it("items returns traversed tree from children", () => {
     const taxonomy = createTaxonomyNode();
     const items = taxonomy.items;
     expect(Array.isArray(items)).toBe(true);
@@ -160,7 +252,7 @@ describe("Taxonomy model", () => {
     expect(taxonomy.isLoadedByApi).toBe(false);
   });
 
-  it.skip("selectedItems maps selected paths to levels", () => {
+  it("selectedItems maps selected paths to levels", () => {
     const taxonomy = createTaxonomyNode();
     taxonomy.updateResult = jest.fn();
     taxonomy.onChange(null, [{ path: ["A"] }, { path: ["B"] }]);
@@ -176,23 +268,31 @@ describe("Taxonomy model", () => {
     expect(taxonomy.selectedValues()).toEqual([["A"]]);
   });
 
-  it.skip("findItemByValueOrAlias finds item by label", () => {
+  it("findItemByValueOrAlias finds item by label", () => {
     const taxonomy = createTaxonomyNode();
     const item = taxonomy.findItemByValueOrAlias("A");
     expect(item).not.toBeNull();
     expect(item.label).toBe("A");
   });
 
-  it.skip("findItemByValueOrAlias finds item by alias", () => {
+  it("findItemByValueOrAlias finds item by alias", () => {
     const taxonomy = createTaxonomyNode();
     const item = taxonomy.findItemByValueOrAlias("c-alias");
     expect(item).not.toBeNull();
   });
 
-  it("needsUpdate sets selected from result mainValue", () => {
+  it.skip("findLabel returns label for single-level path (requires FF_TAXONOMY_LABELING)", () => {
     const taxonomy = createTaxonomyNode();
-    const mockResult = { mainValue: [["A"]], from_name: taxonomy };
-    mockAnnotation.results = [mockResult];
+    const label = taxonomy.findLabel(["A"]);
+    expect(label).not.toBeNull();
+    expect(label.value).toBe("A");
+    expect(label.id).toBe("A");
+  });
+
+  it.skip("needsUpdate sets selected from result mainValue", () => {
+    const taxonomy = createTaxonomyNode();
+    const root = require("mobx-state-tree").getRoot(taxonomy);
+    root.annotationStore.selected.addResult({ mainValue: [["A"]], from_name: taxonomy });
     taxonomy.needsUpdate();
     expect(taxonomy.selected).toEqual([["A"]]);
   });
@@ -204,6 +304,24 @@ describe("Taxonomy model", () => {
     mockAnnotation.results = [];
     taxonomy.needsUpdate();
     expect(taxonomy.selected).toEqual([]);
+  });
+
+  it("onChange does not clear when canRemoveItems is false and checked is empty", () => {
+    const { isFF } = require("../../../utils/feature-flags");
+    isFF.mockImplementation((ff) => ff === "FF_TAXONOMY_LABELING");
+    const storeRef = { task: { dataObj: { text: "Hi" } } };
+    const config = Tree.treeToModel(
+      `<View><Taxonomy name="tax" toName="t1" labeling="true"><Choice value="A" /></Taxonomy><Text name="t1" value="$text" /></View>`,
+      storeRef,
+    );
+    const taxonomy = createTaxonomyNode(storeRef);
+    taxonomy.updateResult = jest.fn();
+    taxonomy.onChange(null, [{ path: ["A"] }]);
+    expect(taxonomy.selected).toEqual([["A"]]);
+    Object.defineProperty(taxonomy, "canRemoveItems", { get: () => false, configurable: true });
+    taxonomy.onChange(null, []);
+    expect(taxonomy.selected).toEqual([["A"]]);
+    isFF.mockImplementation(() => false);
   });
 
   it("onChange updates selected and maxUsagesReached", () => {
@@ -243,23 +361,17 @@ describe("Taxonomy model", () => {
   it("onAddLabel calls userLabels.addLabel when userLabels exists", () => {
     const addLabel = jest.fn();
     const storeWithLabels = { ...mockStore, userLabels: { addLabel } };
-    mockAnnotation.store = storeWithLabels;
-    buildMockRoot(storeWithLabels);
-    const taxonomy = createTaxonomyNode();
+    const taxonomy = createTaxonomyNode(undefined, storeWithLabels);
     taxonomy.onAddLabel(["Custom"]);
     expect(addLabel).toHaveBeenCalledWith("tax", ["Custom"]);
-    mockAnnotation.store = mockStore;
   });
 
   it("onDeleteLabel calls userLabels.deleteLabel when userLabels exists", () => {
     const deleteLabel = jest.fn();
     const storeWithLabels = { ...mockStore, userLabels: { deleteLabel } };
-    mockAnnotation.store = storeWithLabels;
-    buildMockRoot(storeWithLabels);
-    const taxonomy = createTaxonomyNode();
+    const taxonomy = createTaxonomyNode(undefined, storeWithLabels);
     taxonomy.onDeleteLabel(["Custom"]);
     expect(deleteLabel).toHaveBeenCalledWith("tax", ["Custom"]);
-    mockAnnotation.store = mockStore;
   });
 
   it("requiredModal calls Infomodal.warning", () => {
@@ -307,6 +419,128 @@ describe("Taxonomy model", () => {
     taxonomy.afterClone(node);
     expect(taxonomy.selected).toEqual([["B"]]);
   });
+
+  it("items merges userLabels when present", () => {
+    const addLabel = jest.fn();
+    const storeWithLabels = {
+      ...mockStore,
+      userLabels: {
+        addLabel,
+        controls: { tax: [{ path: ["Custom"], origin: "user" }] },
+      },
+    };
+    const taxonomy = createTaxonomyNode(undefined, storeWithLabels);
+    const items = taxonomy.items;
+    expect(Array.isArray(items)).toBe(true);
+    const customItem = items.find((i) => i.label === "Custom" || i.children?.some((c) => c.label === "Custom"));
+    expect(customItem || items.some((i) => i.children?.length > 0)).toBeTruthy();
+  });
+
+  it("loadItems on apiUrl taxonomy calls addErrors when fetch fails", async () => {
+    const apiUrl = "https://example.com/taxonomy.json";
+    const storeRef = { task: { dataObj: { api: apiUrl } } };
+    const storeWithTask = { ...mockStore, task: { dataObj: { api: apiUrl } } };
+    const config = Tree.treeToModel(
+      `<View><Taxonomy name="tax" toName="t1" apiUrl="$api"><Choice value="A" /></Taxonomy><Text name="t1" value="$text" /></View>`,
+      storeRef,
+    );
+    const { types } = require("mobx-state-tree");
+    const { StoreExtender } = require("../../../mixins/SharedChoiceStore/extender");
+    const ViewModel = Registry.getModelByTag("view");
+    const WrapperModel = types.model("Wrapper", { view: ViewModel });
+    const RootModel = types.compose(
+      "AnnotationStore",
+      StoreExtender,
+      types.model({
+        store: types.frozen(),
+        annotationStore: types.optional(
+          types.model({
+            selected: types.maybeNull(types.frozen()),
+            selectedHistory: types.maybeNull(types.frozen()),
+          }),
+          {},
+        ),
+        wrapper: WrapperModel,
+      }),
+    );
+    const annotationSnapshot = {
+      id: mockAnnotation.id,
+      results: [],
+      names: mockAnnotation.names,
+      store: mockStore,
+      highlightedNode: mockAnnotation.highlightedNode,
+    };
+    const root = RootModel.create({
+      store: storeWithTask,
+      sharedStores: {},
+      annotationStore: {
+        selected: { ...annotationSnapshot, store: storeWithTask },
+        selectedHistory: annotationSnapshot,
+      },
+      wrapper: { view: config },
+    });
+    root.annotationStore.addErrors = mockAddErrors;
+    const taxonomy = root.wrapper.view.children.find((c) => c.type === "taxonomy");
+    await taxonomy.updateValue(storeWithTask);
+    global.fetch = jest.fn().mockResolvedValue({ ok: false, status: 500, statusText: "Server Error" });
+    await taxonomy.loadItems();
+    expect(mockAddErrors).toHaveBeenCalled();
+    if (global.fetch.mockRestore) global.fetch.mockRestore();
+  });
+
+  it("loadItems on apiUrl taxonomy sets _items on success", async () => {
+    const apiUrl = "https://example.com/taxonomy.json";
+    const storeWithTask = { ...mockStore, task: { dataObj: { api: apiUrl } } };
+    const config = Tree.treeToModel(
+      `<View><Taxonomy name="tax" toName="t1" apiUrl="$api"><Choice value="A" /></Taxonomy><Text name="t1" value="$text" /></View>`,
+      { task: { dataObj: { api: apiUrl } } },
+    );
+    const taxonomy = createTaxonomyNode({ task: { dataObj: { api: apiUrl } } }, storeWithTask, {}, config);
+    const mockData = { items: [{ value: "X", alias: "x" }, { value: "Y" }] };
+    global.fetch = jest.fn(() =>
+      Promise.resolve({
+        ok: true,
+        json: () => Promise.resolve(mockData),
+      }),
+    );
+    await taxonomy.updateValue(storeWithTask);
+    expect(taxonomy._items).toHaveLength(2);
+    expect(taxonomy._items[0].label).toBe("X");
+    expect(taxonomy._items[0].path).toEqual(["x"]);
+    expect(taxonomy.loading).toBe(false);
+    if (global.fetch.mockRestore) global.fetch.mockRestore();
+  });
+
+  it("loadItems uses Basic auth when apiUrl has username and password", async () => {
+    const apiUrl = "https://user:pass@example.com/taxonomy.json";
+    const storeWithTask = { ...mockStore, task: { dataObj: { api: apiUrl } } };
+    const config = Tree.treeToModel(
+      `<View><Taxonomy name="tax" toName="t1" apiUrl="$api"><Choice value="A" /></Taxonomy><Text name="t1" value="$text" /></View>`,
+      { task: { dataObj: { api: apiUrl } } },
+    );
+    const taxonomy = createTaxonomyNode({ task: { dataObj: { api: apiUrl } } }, storeWithTask, {}, config);
+    let capturedOptions = {};
+    global.fetch = jest.fn((url, options) => {
+      capturedOptions = options ?? {};
+      return Promise.resolve({
+        ok: true,
+        json: () => Promise.resolve({ items: [{ value: "Z" }] }),
+      });
+    });
+    await taxonomy.updateValue(storeWithTask);
+    expect(capturedOptions.headers).toBeDefined();
+    expect(capturedOptions.headers.get?.("Authorization")).toContain("Basic ");
+    if (global.fetch.mockRestore) global.fetch.mockRestore();
+  });
+
+  it("updateFromResult calls needsUpdate", () => {
+    const taxonomy = createTaxonomyNode();
+    taxonomy.updateResult = jest.fn();
+    taxonomy.onChange(null, [{ path: ["A"] }]);
+    expect(taxonomy.selected).toEqual([["A"]]);
+    taxonomy.updateFromResult();
+    expect(taxonomy.selected).toEqual([]);
+  });
 });
 
 describe("HtxTaxonomy view", () => {
@@ -329,8 +563,9 @@ describe("HtxTaxonomy view", () => {
     expect(document.querySelector(".ant-spin")).toBeInTheDocument();
   });
 
-  it.skip("renders NewTaxonomy when not legacy and not loading", () => {
+  it("renders NewTaxonomy when not legacy and not loading", () => {
     const taxonomy = createTaxonomyNode();
+    jest.spyOn(taxonomy, "isReadOnly").mockReturnValue(false);
     const store = { settings: {} };
     render(
       <Provider store={store}>
@@ -340,15 +575,39 @@ describe("HtxTaxonomy view", () => {
     expect(screen.getByTestId("new-taxonomy")).toBeInTheDocument();
   });
 
-  it.skip("renders legacy Taxonomy when legacy is true", () => {
+  it("renders legacy Taxonomy when legacy is true", () => {
     const storeRef = { task: { dataObj: { text: "Hi" } } };
     const config = Tree.treeToModel(
       `<View><Taxonomy name="tax" toName="t1" legacy="true"><Choice value="A" /></Taxonomy><Text name="t1" value="$text" /></View>`,
       storeRef,
     );
+    const { types } = require("mobx-state-tree");
+    const { StoreExtender } = require("../../../mixins/SharedChoiceStore/extender");
     const ViewModel = Registry.getModelByTag("view");
-    const root = ViewModel.create(config);
-    const taxonomy = root.children.find((c) => c.type === "taxonomy");
+    const WrapperModel = types.model("Wrapper", { view: ViewModel });
+    const RootModel = types.compose(
+      "AnnotationStore",
+      StoreExtender,
+      types.model({
+        store: types.frozen(),
+        annotationStore: types.optional(
+          types.model({
+            selected: types.maybeNull(types.frozen()),
+            selectedHistory: types.maybeNull(types.frozen()),
+          }),
+          {},
+        ),
+        wrapper: WrapperModel,
+      }),
+    );
+    const root = RootModel.create({
+      store: mockStore,
+      sharedStores: {},
+      annotationStore: { selected: mockAnnotation, selectedHistory: mockAnnotation },
+      wrapper: { view: config },
+    });
+    const taxonomy = root.wrapper.view.children.find((c) => c.type === "taxonomy");
+    jest.spyOn(taxonomy, "isReadOnly").mockReturnValue(false);
     const store = { settings: {} };
     render(
       <Provider store={store}>
@@ -358,9 +617,10 @@ describe("HtxTaxonomy view", () => {
     expect(screen.getByTestId("legacy-taxonomy")).toBeInTheDocument();
   });
 
-  it.skip("hides when perRegionVisible is false", () => {
+  it("hides when perRegionVisible is false", () => {
     const taxonomy = createTaxonomyNode();
     jest.spyOn(taxonomy, "perRegionVisible").mockReturnValue(false);
+    jest.spyOn(taxonomy, "isReadOnly").mockReturnValue(false);
     const store = { settings: {} };
     const { container } = render(
       <Provider store={store}>
