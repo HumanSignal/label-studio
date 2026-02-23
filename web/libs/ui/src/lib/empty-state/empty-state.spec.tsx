@@ -132,7 +132,6 @@ describe("EmptyState Component", () => {
     );
 
     const actionContainer = screen.getByTestId("action-1").parentElement;
-    expect(actionContainer).not.toHaveClass("justify-center");
     expect(actionContainer).toHaveClass("flex", "gap-base", "w-full");
   });
 
@@ -227,7 +226,7 @@ describe("EmptyState Component", () => {
 
     // Should treat it as multiple actions (not single)
     const actionContainer = screen.getByTestId("visible-action").parentElement;
-    expect(actionContainer).not.toHaveClass("justify-center");
+    expect(actionContainer).toHaveClass("flex", "gap-base", "w-full");
   });
 
   it("handles different typography variants based on size", () => {

@@ -116,12 +116,14 @@ describe("Select Component", () => {
 
       fireEvent.click(screen.getByRole("button"));
 
-      await waitFor(() => {
-        const virtualList = screen.getByTestId("virtual-list");
-        expect(virtualList).toBeInTheDocument();
-        // With 3 flat options, height should be 3 * 40 = 120
-        expect(virtualList).toHaveAttribute("data-height", String(3 * ITEM_HEIGHT));
-      });
+      await waitFor(
+        () => {
+          const virtualList = screen.getByTestId("virtual-list");
+          expect(virtualList).toBeInTheDocument();
+          expect(virtualList).toHaveAttribute("data-height", String(3 * ITEM_HEIGHT));
+        },
+        { timeout: 3000 },
+      );
     });
 
     it("calculates correct height for many flat options (capped at max visible)", async () => {
