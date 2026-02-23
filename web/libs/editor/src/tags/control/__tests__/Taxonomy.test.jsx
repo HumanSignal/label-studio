@@ -281,6 +281,14 @@ describe("Taxonomy model", () => {
     expect(item).not.toBeNull();
   });
 
+  it.skip("findLabel returns label for single-level path (requires FF_TAXONOMY_LABELING)", () => {
+    const taxonomy = createTaxonomyNode();
+    const label = taxonomy.findLabel(["A"]);
+    expect(label).not.toBeNull();
+    expect(label.value).toBe("A");
+    expect(label.id).toBe("A");
+  });
+
   it.skip("needsUpdate sets selected from result mainValue", () => {
     const taxonomy = createTaxonomyNode();
     const root = require("mobx-state-tree").getRoot(taxonomy);
@@ -478,6 +486,60 @@ describe("Taxonomy model", () => {
     await taxonomy.loadItems();
     expect(mockAddErrors).toHaveBeenCalled();
     if (global.fetch.mockRestore) global.fetch.mockRestore();
+  });
+
+  it("loadItems on apiUrl taxonomy sets _items on success", async () => {
+    const apiUrl = "https://example.com/taxonomy.json";
+    const storeWithTask = { ...mockStore, task: { dataObj: { api: apiUrl } } };
+    const config = Tree.treeToModel(
+      `<View><Taxonomy name="tax" toName="t1" apiUrl="$api"><Choice value="A" /></Taxonomy><Text name="t1" value="$text" /></View>`,
+      { task: { dataObj: { api: apiUrl } } },
+    );
+    const taxonomy = createTaxonomyNode({ task: { dataObj: { api: apiUrl } } }, storeWithTask, {}, config);
+    const mockData = { items: [{ value: "X", alias: "x" }, { value: "Y" }] };
+    global.fetch = jest.fn(() =>
+      Promise.resolve({
+        ok: true,
+        json: () => Promise.resolve(mockData),
+      }),
+    );
+    await taxonomy.updateValue(storeWithTask);
+    expect(taxonomy._items).toHaveLength(2);
+    expect(taxonomy._items[0].label).toBe("X");
+    expect(taxonomy._items[0].path).toEqual(["x"]);
+    expect(taxonomy.loading).toBe(false);
+    if (global.fetch.mockRestore) global.fetch.mockRestore();
+  });
+
+  it("loadItems uses Basic auth when apiUrl has username and password", async () => {
+    const apiUrl = "https://user:pass@example.com/taxonomy.json";
+    const storeWithTask = { ...mockStore, task: { dataObj: { api: apiUrl } } };
+    const config = Tree.treeToModel(
+      `<View><Taxonomy name="tax" toName="t1" apiUrl="$api"><Choice value="A" /></Taxonomy><Text name="t1" value="$text" /></View>`,
+      { task: { dataObj: { api: apiUrl } } },
+    );
+    const taxonomy = createTaxonomyNode({ task: { dataObj: { api: apiUrl } } }, storeWithTask, {}, config);
+    let capturedOptions = {};
+    global.fetch = jest.fn((url, options) => {
+      capturedOptions = options ?? {};
+      return Promise.resolve({
+        ok: true,
+        json: () => Promise.resolve({ items: [{ value: "Z" }] }),
+      });
+    });
+    await taxonomy.updateValue(storeWithTask);
+    expect(capturedOptions.headers).toBeDefined();
+    expect(capturedOptions.headers.get?.("Authorization")).toContain("Basic ");
+    if (global.fetch.mockRestore) global.fetch.mockRestore();
+  });
+
+  it("updateFromResult calls needsUpdate", () => {
+    const taxonomy = createTaxonomyNode();
+    taxonomy.updateResult = jest.fn();
+    taxonomy.onChange(null, [{ path: ["A"] }]);
+    expect(taxonomy.selected).toEqual([["A"]]);
+    taxonomy.updateFromResult();
+    expect(taxonomy.selected).toEqual([]);
   });
 });
 
