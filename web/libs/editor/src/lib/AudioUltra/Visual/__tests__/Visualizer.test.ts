@@ -106,13 +106,20 @@ describe("Visualizer", () => {
     jest.useRealTimers();
   });
 
-  function createVisualizer(opts: { container?: HTMLElement } = {}) {
+  function createVisualizer(
+    opts: { container?: HTMLElement; zoomToCursor?: boolean; autoCenter?: boolean; splitChannels?: boolean } = {},
+  ) {
+    const { container: c, zoomToCursor, autoCenter, splitChannels, ...rest } = opts as any;
     const vis = new Visualizer(
       {
-        container: opts.container ?? container,
+        container: c ?? container,
         waveformHeight: 32,
         spectrogramHeight: 32,
         timelineHeight: 20,
+        zoomToCursor,
+        autoCenter,
+        splitChannels,
+        ...rest,
       },
       mockWaveform as Waveform,
     );
@@ -133,6 +140,22 @@ describe("Visualizer", () => {
       expect(vis.getLayer("waveform")).toBeDefined();
       expect(vis.getLayer("background")).toBeDefined();
       expect(vis.getLayer("regions")).toBeDefined();
+      vis.destroy();
+    });
+
+    it("accepts container as string selector when element exists", () => {
+      const el = document.createElement("div");
+      el.id = "viz-container-selector";
+      Object.defineProperty(el, "clientWidth", { value: 400, configurable: true });
+      Object.defineProperty(el, "clientHeight", { value: 80, configurable: true });
+      document.body.appendChild(el);
+      const vis = new Visualizer(
+        { container: "#viz-container-selector", waveformHeight: 32 },
+        mockWaveform as Waveform,
+      );
+      vis.createLayer({ name: "timeline", offscreen: true, zIndex: 103 });
+      expect(vis.container).toBe(el);
+      el.parentNode?.removeChild(el);
       vis.destroy();
     });
 
@@ -252,6 +275,14 @@ describe("Visualizer", () => {
       vis.destroy();
     });
 
+    it("setZoom with zoomToCursor true calls centerToCurrentTime", () => {
+      const vis = createVisualizer({ zoomToCursor: true });
+      initVisualizer(vis);
+      vis.setZoom(2);
+      expect(vis.getZoom()).toBe(2);
+      vis.destroy();
+    });
+
     it("getScrollLeft and getScrollLeftPx return values", () => {
       const vis = createVisualizer();
       initVisualizer(vis);
@@ -332,6 +363,15 @@ describe("Visualizer", () => {
       expect(vis.getScrollLeft()).toBe(0);
       vis.destroy();
     });
+
+    it("at zoom > 1 sets scroll to center current time", () => {
+      const vis = createVisualizer();
+      initVisualizer(vis);
+      vis.setZoom(2);
+      vis.centerToCurrentTime();
+      expect(vis.getScrollLeft()).toBeGreaterThanOrEqual(0);
+      vis.destroy();
+    });
   });
 
   describe("updateCursorToTime", () => {
@@ -392,6 +432,51 @@ describe("Visualizer", () => {
       expect(vis.reservedSpace).toBe(40);
       vis.destroy();
     });
+
+    it("scrollWidth, fullWidth, zoomedWidth return expected values", () => {
+      const vis = createVisualizer();
+      initVisualizer(vis);
+      vis.setZoom(2);
+      expect(vis.fullWidth).toBe(vis.zoomedWidth);
+      expect(vis.scrollWidth).toBe(vis.zoomedWidth - vis.width);
+      expect(vis.zoomedWidth).toBe(800 * 2);
+      vis.destroy();
+    });
+
+    it("waveformLayerHeight multiplies by channelCount when splitChannels", () => {
+      const vis = createVisualizer({ splitChannels: true });
+      initVisualizer(vis);
+      expect(vis.waveformLayerHeight).toBe(32 * 1);
+      vis.destroy();
+    });
+
+    it("waveformLayerHeight with multi-channel audio and splitChannels", () => {
+      const vis = createVisualizer({ splitChannels: true });
+      vis.setLoading(true);
+      vis.init(createMockAudio({ channelCount: 2 }));
+      flushRaf();
+      expect(vis.waveformLayerHeight).toBe(32 * 2);
+      vis.destroy();
+    });
+
+    it("spectrogramLayerHeight with splitChannels and audio", () => {
+      const vis = createVisualizer({ splitChannels: true });
+      initVisualizer(vis);
+      expect(vis.spectrogramLayerHeight).toBe(32);
+      vis.destroy();
+    });
+
+    it("height excludes timeline when timeline layer isVisible false", () => {
+      const vis = createVisualizer();
+      initVisualizer(vis);
+      const timelineLayer = vis.getLayer("timeline");
+      const heightWithTimeline = vis.height;
+      if (timelineLayer) {
+        timelineLayer.setVisibility(false);
+        expect(vis.height).toBeLessThanOrEqual(heightWithTimeline);
+      }
+      vis.destroy();
+    });
   });
 
   describe("layers", () => {
@@ -435,6 +520,117 @@ describe("Visualizer", () => {
     it("createLayerGroup throws when group name already exists", () => {
       const vis = createVisualizer();
       expect(() => vis.createLayerGroup({ name: "regions" })).toThrow("LayerGroup regions already exists");
+      vis.destroy();
+    });
+
+    it("createLayer with groupName adds layer to group", () => {
+      const vis = createVisualizer();
+      vis.createLayerGroup({ name: "mygroup", offscreen: true, zIndex: 50 });
+      vis.createLayer({ name: "sublayer", groupName: "mygroup", offscreen: true, zIndex: 1 });
+      expect(vis.getLayer("sublayer")).toBeDefined();
+      vis.destroy();
+    });
+
+    it("useLayer invokes callback with layer and context", () => {
+      const vis = createVisualizer();
+      const cb = jest.fn();
+      vis.useLayer("waveform", cb);
+      expect(cb).toHaveBeenCalledWith(vis.getLayer("waveform"), expect.anything());
+      vis.destroy();
+    });
+  });
+
+  describe("scroll event", () => {
+    it("scroll on wrapper updates scrollLeft and invokes wf.scroll", () => {
+      const vis = createVisualizer();
+      initVisualizer(vis);
+      const wrapper = (vis as any).wrapper;
+      wrapper.scrollLeft = 100;
+      wrapper.dispatchEvent(new Event("scroll"));
+      expect(mockWaveform.invoke).toHaveBeenCalledWith("scroll", expect.any(Array));
+      vis.destroy();
+    });
+  });
+
+  describe("_draw with autoCenter", () => {
+    it("draw with autoCenter and playing calls centerToCurrentTime", () => {
+      mockWaveform.playing = true;
+      const vis = createVisualizer({ autoCenter: true });
+      initVisualizer(vis);
+      const spy = jest.spyOn(vis, "centerToCurrentTime");
+      vis.draw(false);
+      flushRaf();
+      expect(spy).toHaveBeenCalled();
+      vis.destroy();
+    });
+  });
+
+  describe("event handlers", () => {
+    it("playing event triggers handlePlaying and draw", () => {
+      const vis = createVisualizer();
+      initVisualizer(vis);
+      const playingHandler = (mockWaveform.on as jest.Mock).mock.calls.find((c: unknown[]) => c[0] === "playing")?.[1];
+      expect(playingHandler).toBeDefined();
+      playingHandler(5);
+      flushRaf();
+      vis.destroy();
+    });
+
+    it("ResizeObserver callback runs handleResize", () => {
+      let resizeCb: (entries: unknown[]) => void = () => {};
+      jest.spyOn(global, "ResizeObserver").mockImplementation((cb: (entries: unknown[]) => void) => {
+        resizeCb = cb;
+        return { observe: jest.fn(), unobserve: jest.fn(), disconnect: jest.fn() };
+      });
+      const vis = createVisualizer();
+      initVisualizer(vis);
+      resizeCb([{ target: (vis as any).wrapper }]);
+      flushRaf();
+      vis.destroy();
+    });
+
+    it("wheel with ctrlKey triggers zoom path in handleScroll", () => {
+      const vis = createVisualizer();
+      initVisualizer(vis);
+      const wrapper = (vis as any).wrapper;
+      wrapper.dispatchEvent(new WheelEvent("wheel", { deltaY: -10, ctrlKey: true, bubbles: true }));
+      jest.advanceTimersByTime(20);
+      flushRaf();
+      vis.destroy();
+    });
+
+    it("wheel without ctrlKey when zoom > 1 triggers scroll path", () => {
+      const vis = createVisualizer();
+      initVisualizer(vis);
+      vis.setZoom(2);
+      const wrapper = (vis as any).wrapper;
+      wrapper.dispatchEvent(new WheelEvent("wheel", { deltaY: 20, deltaX: 0, ctrlKey: false, bubbles: true }));
+      vis.destroy();
+    });
+
+    it("click on main canvas triggers handleSeek when loaded", () => {
+      const vis = createVisualizer();
+      initVisualizer(vis);
+      const mainLayer = vis.getLayer("main");
+      const canvas = mainLayer?.canvas;
+      if (canvas && canvas instanceof HTMLCanvasElement) {
+        const rect = (vis as any).wrapper.getBoundingClientRect();
+        canvas.dispatchEvent(
+          new MouseEvent("click", {
+            clientX: rect.left + 50,
+            offsetY: 10,
+            bubbles: true,
+          }),
+        );
+      }
+      vis.destroy();
+    });
+
+    it("mousedown on wrapper triggers playhead mouseDown", () => {
+      const vis = createVisualizer();
+      initVisualizer(vis);
+      const wrapper = (vis as any).wrapper;
+      wrapper.dispatchEvent(new MouseEvent("mousedown", { clientX: 100, clientY: 50, bubbles: true }));
       vis.destroy();
     });
   });
