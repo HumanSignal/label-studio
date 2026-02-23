@@ -39,7 +39,7 @@ jobs:
 
       # Nx db cache ties artifacts to machine ID; restored cache from other runners is not used.
       - name: Cache Nx
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: ${{ env.FRONTEND_MONOREPO_DIR }}/.nx/cache
           key: nx-v2-${{ runner.os }}-${{ env.NODE }}-${{ hashFiles('web/package.json', 'web/yarn.lock') }}

@@ -42,7 +42,7 @@ jobs:
       # Nx cache is restored/saved here. With Nx's db cache, artifacts from other runners are not used
       # (machine ID mismatch). For shared CI cache, use Nx Cloud (Nx Replay) instead.
       - name: Cache Nx
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: ${{ env.FRONTEND_MONOREPO_DIR }}/.nx/cache
           key: nx-v2-lsf-${{ runner.os }}-${{ env.NODE }}-${{ hashFiles('web/package.json', 'web/yarn.lock') }}
@@ -86,7 +86,7 @@ jobs:
           directory: "${{ env.FRONTEND_MONOREPO_DIR }}"
 
       - name: Cache Cypress binary
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         id: cypress-binary
         with:
           path: ~/.cache/Cypress
