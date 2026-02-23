@@ -34,11 +34,48 @@ export interface GroundTruthPayload {
 // ---------------------------------------------------------------------------
 
 /**
+ * Maps a lowercased control tag type to the key used inside the annotation
+ * `result[].value` object. Tag types not listed here fall through to use
+ * the tag type itself as the key (the else branch).
+ */
+const TAG_TYPE_VALUE_KEYS: Record<string, string> = {
+  choices: "choices",
+  choice: "choices",
+  taxonomy: "taxonomy",
+  rating: "rating",
+  number: "number",
+};
+
+/**
+ * Value wrappers per tag type. "choices" wraps in an array, "taxonomy"
+ * wraps in a nested array, numeric types coerce to Number.
+ */
+function wrapValueForTagType(tagType: string, rawValue: string | number | boolean | null): unknown {
+  switch (TAG_TYPE_VALUE_KEYS[tagType] ?? tagType) {
+    case "choices":
+      return [String(rawValue)];
+    case "taxonomy":
+      return [[String(rawValue)]];
+    case "rating":
+    case "number":
+      return Number(rawValue);
+    default:
+      return rawValue;
+  }
+}
+
+/**
  * Build the annotation `result` array for the ground truth annotation.
  *
- * Strategy: deep-clone the first annotation's result, then for every
- * resolved ground truth cell, find result items where `from_name`
- * matches the dimension's name and replace the value.
+ * Strategy: deep-clone the first real annotation's result (as a structural
+ * template), then for every resolved ground truth cell, find result items
+ * whose `from_name` matches the dimension's name and overwrite their value
+ * with the GT cell's value wrapped for the correct tag type.
+ *
+ * @param annotations - All annotations from the summary API (used to pick a template).
+ * @param cells       - Resolved ground truth cells to apply.
+ * @param dimensions  - Dimension metadata (maps cell.dimensionId -> controlTag/name).
+ * @returns A new `result` array suitable for POST /api/tasks/{id}/annotations/.
  */
 function buildGroundTruthResult(
   annotations: SummaryAnnotation[],
@@ -53,32 +90,23 @@ function buildGroundTruthResult(
 
   const result: RawResult[] = JSON.parse(JSON.stringify(templateResult));
 
-  const dimMap = new Map<number, DimensionInfo>();
+  const dimensionById = new Map<number, DimensionInfo>();
   for (const dim of dimensions) {
-    dimMap.set(dim.dimensionId, dim);
+    dimensionById.set(dim.dimensionId, dim);
   }
 
   for (const cell of cells) {
-    const dim = dimMap.get(cell.dimensionId);
+    const dim = dimensionById.get(cell.dimensionId);
     if (!dim || !dim.isCategorical) continue;
 
     const fromName = dim.name;
     const tagType = dim.controlTag.toLowerCase();
+    const valueKey = TAG_TYPE_VALUE_KEYS[tagType] ?? tagType;
+    const wrappedValue = wrapValueForTagType(tagType, cell.value);
 
     for (const item of result) {
       if (item.from_name !== fromName) continue;
-
-      if (tagType === "choices" || tagType === "choice") {
-        item.value = { ...item.value, choices: [String(cell.value)] };
-      } else if (tagType === "taxonomy") {
-        item.value = { ...item.value, taxonomy: [[String(cell.value)]] };
-      } else if (tagType === "rating") {
-        item.value = { ...item.value, rating: Number(cell.value) };
-      } else if (tagType === "number") {
-        item.value = { ...item.value, number: Number(cell.value) };
-      } else {
-        item.value = { ...item.value, [tagType]: cell.value };
-      }
+      item.value = { ...item.value, [valueKey]: wrappedValue };
     }
   }
 
@@ -190,7 +218,7 @@ export function openCommitGroundTruthDialog({
   });
 
   confirm({
-    title: "Create Ground Truth" as unknown as string,
+    title: "Create Ground Truth",
     body: (
       <DialogBody
         summary={summary}

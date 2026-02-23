@@ -13,22 +13,19 @@ import { useMemo } from "react";
 import { flexRender, getCoreRowModel, useReactTable, createColumnHelper } from "@tanstack/react-table";
 import { cnm, Tooltip, Userpic } from "@humansignal/ui";
 import { IconAnnotationGroundTruth, IconCheckAlt, IconCrossAlt } from "@humansignal/icons";
-import { computeMajorityVote } from "./agreement-utils";
+import { computeMajorityVote, formatMetricType } from "./agreement-utils";
 import { GroundTruthRow } from "./ground-truth-row";
 import { ResizeHandler } from "../ResizeHandler";
 import type { AnnotatorInfo, DimensionInfo, DimensionScore, GroundTruthCell, GroundTruthSource, MajorityVoteResult, SummaryAnnotation } from "./types";
 import type { ValueCount } from "./use-ground-truth";
 
 // ---------------------------------------------------------------------------
-// Helpers
+// Review badge styling constants
 // ---------------------------------------------------------------------------
 
-function formatMetricType(metricType: string): string {
-  return metricType
-    .split("_")
-    .map((w) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
-    .join(" ");
-}
+const REVIEW_BADGE_SIZE = 10;
+const REVIEW_BADGE_BORDER_RADIUS = 2;
+const REVIEW_BADGE_OFFSET = "translate(2px, 2px)";
 
 // ---------------------------------------------------------------------------
 // Table row type (annotator rows only — special rows rendered manually)
@@ -213,18 +210,18 @@ export const AnnotatorsDimensionsTable = ({
             const reviewBadge = lastReview ? (
               <div
                 style={{
-                  width: 10,
-                  height: 10,
+                  width: REVIEW_BADGE_SIZE,
+                  height: REVIEW_BADGE_SIZE,
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  borderRadius: 2,
+                  borderRadius: REVIEW_BADGE_BORDER_RADIUS,
                   color: "var(--color-neutral-background)",
                   backgroundColor: lastReview.accepted
                     ? "var(--color-accent-kale-base)"
                     : "var(--color-accent-persimmon-base)",
                   boxShadow: "0 0 0 2px var(--color-neutral-background)",
-                  transform: "translate(2px, 2px)",
+                  transform: REVIEW_BADGE_OFFSET,
                 }}
               >
                 {lastReview.accepted ? <IconCheckAlt /> : <IconCrossAlt />}

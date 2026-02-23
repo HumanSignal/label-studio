@@ -14,9 +14,6 @@ import { userDisplayName } from "@humansignal/core";
 import {
   buildDimensionInfoList,
   buildDimensionScores,
-  computeHeatmapMatrix,
-  computeRowAverages,
-  computeGrandAverage,
   countConflicts,
   isPerfectAgreement,
 } from "./agreement-utils";
@@ -37,6 +34,14 @@ import type {
 // Fetcher
 // ---------------------------------------------------------------------------
 
+/**
+ * Fetch the full task summary payload from the backend.
+ *
+ * @param taskId - Database ID of the task to fetch.
+ * @returns Parsed TaskSummaryResponse including annotations, distributions,
+ *          and (in LSE) dimension agreement data.
+ * @throws Error when the HTTP response is not OK.
+ */
 const fetchTaskSummary = async (taskId: number | string): Promise<TaskSummaryResponse> => {
   const response = await fetch(`/api/tasks/${taskId}/summary/`);
   if (!response.ok) {
@@ -49,10 +54,31 @@ const fetchTaskSummary = async (taskId: number | string): Promise<TaskSummaryRes
 // Type guard
 // ---------------------------------------------------------------------------
 
+/**
+ * Narrow the agreement field from the API response: it is either a full
+ * TaskAgreementResult (LSE with dimensions) or an empty object (OSS / no dims).
+ */
 function isTaskAgreementResult(
   value: TaskAgreementResult | Record<string, never>,
 ): value is TaskAgreementResult {
   return "dimension_results" in value && "aggregation" in value && "annotator_ids" in value;
+}
+
+// ---------------------------------------------------------------------------
+// Adapter: SummaryUser -> userDisplayName input
+// ---------------------------------------------------------------------------
+
+/**
+ * Convert a SummaryUser to the shape that `userDisplayName` from
+ * `@humansignal/core` expects (Record<string, string>).
+ */
+function toUserDisplayInput(user: SummaryUser): Record<string, string> {
+  return {
+    id: String(user.id),
+    email: user.email,
+    first_name: user.first_name,
+    last_name: user.last_name,
+  };
 }
 
 // ---------------------------------------------------------------------------
@@ -68,8 +94,8 @@ interface UseTaskSummaryDataOptions {
 }
 
 export interface AgreementData {
-  /** Raw API response */
-  raw: TaskSummaryResponse | undefined;
+  /** Full API response (undefined while loading). */
+  apiResponse: TaskSummaryResponse | undefined;
   /** Task metadata from the API */
   task: TaskMeta | undefined;
   /** Per-annotation data from the API (plain JSON, no MST) */
@@ -88,12 +114,6 @@ export interface AgreementData {
    *  Built from annotation_ids + summaryAnnotations so the table can access
    *  ground_truth, reviews, etc. without a separate annotations_meta. */
   annotationForRow: (SummaryAnnotation | null)[];
-  /** N×N heatmap matrix aggregated across all dimensions */
-  heatmapMatrix: number[][];
-  /** Row marginal averages for the heatmap */
-  heatmapRowAverages: number[];
-  /** Grand average for the heatmap */
-  heatmapGrandAverage: number;
   /** Per-dimension scores for the bar chart, sorted ascending */
   dimensionScores: DimensionScore[];
   /** Overall agreement score for the selected method */
@@ -120,7 +140,7 @@ export function useTaskSummaryData({
   const currentUser = window.APP_SETTINGS?.user;
 
   const {
-    data: raw,
+    data: apiResponse,
     isLoading,
     error,
   } = useQuery({
@@ -131,15 +151,14 @@ export function useTaskSummaryData({
     gcTime: 5 * 60 * 1000,
   });
 
-  const task = raw?.task;
-  const summaryAnnotations = raw?.annotations ?? [];
+  const task = apiResponse?.task;
+  const summaryAnnotations = apiResponse?.annotations ?? [];
 
   const agreementResult = useMemo<TaskAgreementResult | null>(() => {
-    if (!raw?.agreement || !isTaskAgreementResult(raw.agreement)) return null;
-    return raw.agreement;
-  }, [raw]);
+    if (!apiResponse?.agreement || !isTaskAgreementResult(apiResponse.agreement)) return null;
+    return apiResponse.agreement;
+  }, [apiResponse]);
 
-  // Resolve annotator IDs to display info from the API annotations
   const annotators = useMemo<AnnotatorInfo[]>(() => {
     if (!agreementResult) return [];
 
@@ -157,7 +176,7 @@ export function useTaskSummaryData({
       if (hideInfo) {
         displayName = currentUser?.id === id ? "Me" : `User ${index + 1}`;
       } else if (user) {
-        displayName = userDisplayName(user as unknown as Record<string, string>);
+        displayName = userDisplayName(toUserDisplayInput(user));
       } else {
         displayName = `Annotator ${id}`;
       }
@@ -166,22 +185,20 @@ export function useTaskSummaryData({
         id,
         index,
         displayName,
-        user: user ? (user as unknown as Record<string, unknown>) : null,
+        user: user ? { id: user.id, email: user.email, first_name: user.first_name, last_name: user.last_name } : null,
       };
     });
   }, [agreementResult, summaryAnnotations, hideInfo, currentUser]);
 
-  // Build per-row annotation lookup aligned with annotator_ids/annotation_ids
   const annotationForRow = useMemo<(SummaryAnnotation | null)[]>(() => {
     if (!agreementResult?.annotation_ids) return [];
-    const annMap = new Map<number, SummaryAnnotation>();
+    const annotationById = new Map<number, SummaryAnnotation>();
     for (const ann of summaryAnnotations) {
-      annMap.set(ann.id, ann);
+      annotationById.set(ann.id, ann);
     }
-    return agreementResult.annotation_ids.map((id) => annMap.get(id) ?? null);
+    return agreementResult.annotation_ids.map((id) => annotationById.get(id) ?? null);
   }, [agreementResult, summaryAnnotations]);
 
-  // Build dimension info
   const dimensions = useMemo<DimensionInfo[]>(() => {
     if (!agreementResult) return [];
     return buildDimensionInfoList(agreementResult);
@@ -192,7 +209,6 @@ export function useTaskSummaryData({
     [dimensions],
   );
 
-  // Apply column selection mode + hide-unanimous filter
   const filteredDimensions = useMemo(() => {
     let filtered: DimensionInfo[];
     if (conflictFilter === "custom") {
@@ -208,22 +224,11 @@ export function useTaskSummaryData({
     return filtered;
   }, [dimensions, categoricalDimensions, conflictFilter, visibleColumnIds]);
 
-  // Heatmap data
-  const heatmapMatrix = useMemo(
-    () => (agreementResult ? computeHeatmapMatrix(agreementResult.dimension_results, method) : []),
-    [agreementResult, method],
-  );
-
-  const heatmapRowAverages = useMemo(() => computeRowAverages(heatmapMatrix), [heatmapMatrix]);
-  const heatmapGrandAverage = useMemo(() => computeGrandAverage(heatmapMatrix), [heatmapMatrix]);
-
-  // Per-dimension scores for bar chart
   const dimensionScores = useMemo(
     () => (agreementResult ? buildDimensionScores(agreementResult, method) : []),
     [agreementResult, method],
   );
 
-  // Overall agreement
   const overallAgreement = useMemo(() => {
     if (!agreementResult) return null;
     return method === "pairwise"
@@ -231,13 +236,11 @@ export function useTaskSummaryData({
       : agreementResult.aggregation.consensus_agreement;
   }, [agreementResult, method]);
 
-  // Conflict count
   const conflictCount = useMemo(
     () => (agreementResult ? countConflicts(agreementResult.aggregation, method) : 0),
     [agreementResult, method],
   );
 
-  // IDs of dimensions with imperfect agreement (used to drive "Conflicts Only" selection)
   const conflictingDimensionIds = useMemo(
     () => dimensionScores.filter((d) => !isPerfectAgreement(d.score)).map((d) => d.dimensionId),
     [dimensionScores],
@@ -249,7 +252,7 @@ export function useTaskSummaryData({
     agreementResult.annotator_ids.length > 0;
 
   return {
-    raw,
+    apiResponse,
     task,
     summaryAnnotations,
     agreementResult,
@@ -258,9 +261,6 @@ export function useTaskSummaryData({
     filteredDimensions,
     annotators,
     annotationForRow,
-    heatmapMatrix,
-    heatmapRowAverages,
-    heatmapGrandAverage,
     dimensionScores,
     overallAgreement,
     conflictCount,

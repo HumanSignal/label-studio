@@ -27,13 +27,19 @@ import type {
 // Serialization helpers (Map is not JSON-serializable)
 // ---------------------------------------------------------------------------
 
-type SerializedCell = GroundTruthCell;
-
-function cellsToArray(cells: Map<number, GroundTruthCell>): SerializedCell[] {
+/**
+ * Convert a Map of ground truth cells to a plain array for JSON serialization.
+ * Used when persisting state to localStorage.
+ */
+function serializeGroundTruthCells(cells: Map<number, GroundTruthCell>): GroundTruthCell[] {
   return [...cells.values()];
 }
 
-function arrayToCells(arr: SerializedCell[]): Map<number, GroundTruthCell> {
+/**
+ * Reconstruct a Map of ground truth cells from a serialized array.
+ * Inverse of `serializeGroundTruthCells`.
+ */
+function deserializeGroundTruthCells(arr: GroundTruthCell[]): Map<number, GroundTruthCell> {
   const map = new Map<number, GroundTruthCell>();
   for (const cell of arr) {
     map.set(cell.dimensionId, cell);
@@ -50,7 +56,12 @@ export interface ValueCount {
   count: number;
 }
 
-/** Compute unique value counts for a categorical dimension. */
+/**
+ * Compute unique value counts for a categorical dimension's annotator values.
+ *
+ * @param values - Per-annotator values from a DimensionInfo (null entries skipped).
+ * @returns Sorted array of {value, count} pairs, descending by count.
+ */
 export function computeValueCounts(
   values: (string | number | boolean | null)[] | null,
 ): ValueCount[] {
@@ -149,19 +160,19 @@ export function useGroundTruth({
     false,
   );
 
-  const [serializedCells, setSerializedCells] = useLocalStorage<SerializedCell[]>(
+  const [serializedCells, setSerializedCells] = useLocalStorage<GroundTruthCell[]>(
     `ground_truth_cells_${taskId ?? "unknown"}`,
     [],
   );
 
-  const cells = useMemo(() => arrayToCells(serializedCells), [serializedCells]);
+  const cells = useMemo(() => deserializeGroundTruthCells(serializedCells), [serializedCells]);
 
   const updateCells = useCallback(
     (updater: (prev: Map<number, GroundTruthCell>) => Map<number, GroundTruthCell>) => {
-      setSerializedCells((prev: SerializedCell[]) => {
-        const prevMap = arrayToCells(prev);
+      setSerializedCells((prev: GroundTruthCell[]) => {
+        const prevMap = deserializeGroundTruthCells(prev);
         const nextMap = updater(prevMap);
-        return cellsToArray(nextMap);
+        return serializeGroundTruthCells(nextMap);
       });
     },
     [setSerializedCells],

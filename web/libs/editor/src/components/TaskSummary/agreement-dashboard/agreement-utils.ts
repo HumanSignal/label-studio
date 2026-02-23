@@ -8,7 +8,6 @@
 import type {
   AggregationResult,
   AgreementMethod,
-  DimensionMatchResult,
   DimensionInfo,
   DimensionMeta,
   DimensionScore,
@@ -55,28 +54,6 @@ export function getAgreementTextColor(score: number): string {
   if (score < LOW_THRESHOLD) return "text-negative-content";
   if (score < MEDIUM_THRESHOLD) return "text-warning-content";
   return "text-positive-content";
-}
-
-/**
- * Returns a CSS style object for interpolating heatmap cell colors.
- * Uses a 3-stop gradient: persimmon (0) -> canteloupe (0.5) -> kale (1.0).
- */
-export function getHeatmapCellStyle(score: number): Record<string, string> {
-  // Clamp to [0, 1]
-  const s = Math.max(0, Math.min(1, score));
-  // Map score to opacity on the appropriate semantic color
-  if (s < 0.5) {
-    // Blend from persimmon to canteloupe
-    const t = s / 0.5;
-    return {
-      backgroundColor: `color-mix(in srgb, var(--color-negative-surface) ${Math.round((1 - t) * 100)}%, var(--color-warning-surface) ${Math.round(t * 100)}%)`,
-    };
-  }
-  // Blend from canteloupe to kale
-  const t = (s - 0.5) / 0.5;
-  return {
-    backgroundColor: `color-mix(in srgb, var(--color-warning-surface) ${Math.round((1 - t) * 100)}%, var(--color-positive-surface) ${Math.round(t * 100)}%)`,
-  };
 }
 
 // ---------------------------------------------------------------------------
@@ -145,119 +122,6 @@ export function countConflicts(
 }
 
 // ---------------------------------------------------------------------------
-// Heatmap Matrix Aggregation
-// ---------------------------------------------------------------------------
-
-/**
- * Aggregate per-dimension score matrices into a single N×N pairwise matrix.
- *
- * For "pairwise" method: average the raw scores matrices.
- * For "consensus" method: for each pair (i,j), compute the fraction of
- * dimensions where both annotators match the majority vote.
- */
-export function computeHeatmapMatrix(
-  dimensionResults: DimensionMatchResult[],
-  method: AgreementMethod,
-): number[][] {
-  if (dimensionResults.length === 0) return [];
-
-  const n = dimensionResults[0].scores.length;
-  if (n === 0) return [];
-
-  if (method === "pairwise") {
-    // Average all dimension score matrices element-wise
-    const matrix = Array.from({ length: n }, () => Array(n).fill(0));
-    for (const dr of dimensionResults) {
-      for (let i = 0; i < n; i++) {
-        for (let j = 0; j < n; j++) {
-          matrix[i][j] += dr.scores[i][j];
-        }
-      }
-    }
-    const count = dimensionResults.length;
-    for (let i = 0; i < n; i++) {
-      for (let j = 0; j < n; j++) {
-        matrix[i][j] /= count;
-      }
-    }
-    return matrix;
-  }
-
-  // Consensus: for each pair, count how many dimensions both match majority
-  const matrix = Array.from({ length: n }, () => Array(n).fill(0));
-  let dimCount = 0;
-
-  for (const dr of dimensionResults) {
-    if (!dr.dimension_values) {
-      // For non-categorical, fall back to pairwise scores
-      for (let i = 0; i < n; i++) {
-        for (let j = 0; j < n; j++) {
-          matrix[i][j] += dr.scores[i][j];
-        }
-      }
-    } else {
-      const majority = computeMajorityVote(dr.dimension_values);
-      for (let i = 0; i < n; i++) {
-        for (let j = 0; j < n; j++) {
-          const iMatch = dr.dimension_values[i] === majority.value;
-          const jMatch = dr.dimension_values[j] === majority.value;
-          matrix[i][j] += iMatch && jMatch ? 1 : 0;
-        }
-      }
-    }
-    dimCount++;
-  }
-
-  if (dimCount > 0) {
-    for (let i = 0; i < n; i++) {
-      for (let j = 0; j < n; j++) {
-        matrix[i][j] /= dimCount;
-      }
-    }
-  }
-
-  return matrix;
-}
-
-/**
- * Compute row marginal averages (excluding diagonal) from an N×N matrix.
- */
-export function computeRowAverages(matrix: number[][]): number[] {
-  const n = matrix.length;
-  if (n <= 1) return matrix.length === 1 ? [1.0] : [];
-
-  return matrix.map((row, i) => {
-    let sum = 0;
-    let count = 0;
-    for (let j = 0; j < n; j++) {
-      if (i !== j) {
-        sum += row[j];
-        count++;
-      }
-    }
-    return count > 0 ? sum / count : 1.0;
-  });
-}
-
-/**
- * Compute the grand average (excluding diagonal) from an N×N matrix.
- */
-export function computeGrandAverage(matrix: number[][]): number {
-  const n = matrix.length;
-  if (n <= 1) return 1.0;
-
-  let sum = 0;
-  let count = 0;
-  for (let i = 0; i < n; i++) {
-    for (let j = i + 1; j < n; j++) {
-      sum += matrix[i][j];
-      count++;
-    }
-  }
-  return count > 0 ? sum / count : 1.0;
-}
-
-// ---------------------------------------------------------------------------
 // Dimension Info Helpers
 // ---------------------------------------------------------------------------
 
@@ -288,6 +152,21 @@ export function buildDimensionInfoList(
       labels: meta.labels,
     };
   });
+}
+
+// ---------------------------------------------------------------------------
+// Formatting Helpers
+// ---------------------------------------------------------------------------
+
+/**
+ * Convert a snake_case metric type string to Title Case for display.
+ * E.g. "cohens_kappa" -> "Cohens Kappa".
+ */
+export function formatMetricType(metricType: string): string {
+  return metricType
+    .split("_")
+    .map((w) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
+    .join(" ");
 }
 
 /**

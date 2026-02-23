@@ -44,13 +44,18 @@ export interface SummaryUser {
   last_name: string;
 }
 
-/** A single labeling result item as returned by the API */
+/**
+ * A single labeling result item as returned by the API.
+ *
+ * The four known fields (from_name, to_name, type, value) cover the
+ * standard annotation result shape. Additional fields (e.g. id, origin)
+ * may be present but are not accessed by the agreement dashboard.
+ */
 export interface RawResult {
   from_name: string;
   to_name: string;
   type: string;
   value: Record<string, unknown>;
-  [key: string]: unknown;
 }
 
 export interface DistributionEntry {
@@ -120,30 +125,6 @@ export interface DimensionMeta {
 export type AgreementMethod = "consensus" | "pairwise";
 
 export type ConflictFilter = "all" | "all_dimensions" | "custom";
-
-export const PANEL_IDS = [
-  "annotators_table",
-  "agreement_heatmap",
-  "distribution_viewer",
-] as const;
-
-export type PanelId = (typeof PANEL_IDS)[number];
-
-export const PANEL_LABELS: Record<PanelId, string> = {
-  annotators_table: "Annotators × Dimensions Table",
-  agreement_heatmap: "Agreement Heatmap Matrix",
-  distribution_viewer: "Distribution & Majority Vote",
-};
-
-/** Column configuration persisted per task */
-export interface ColumnConfig {
-  /** Ordered list of dimension IDs to display */
-  order: number[];
-  /** Set of visible dimension IDs */
-  visible: number[];
-  /** Set of pinned dimension IDs */
-  pinned: number[];
-}
 
 // ---------------------------------------------------------------------------
 // Derived Data Types (used by components)

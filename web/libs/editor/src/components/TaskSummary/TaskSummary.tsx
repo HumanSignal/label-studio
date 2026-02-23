@@ -1,9 +1,9 @@
-import type { MSTAnnotation, MSTControlTag, MSTStore } from "../../stores/types";
+import type { MSTAnnotation, MSTStore } from "../../stores/types";
 import { DataSummary } from "./DataSummary";
 import { LabelingSummary } from "./LabelingSummary";
 import { NumbersSummary } from "./NumbersSummary";
-import type { ControlTag, ObjectTagEntry, ObjectTypes } from "./types";
-import { getLabelColors, sortControls } from "./utils";
+import type { ObjectTypes } from "./types";
+import { buildControlsList, buildObjectDataTypes } from "./utils";
 
 type TaskSummaryProps = {
   annotations: MSTAnnotation[];
@@ -29,57 +29,8 @@ const TaskSummary = ({ annotations: all, store: annotationStore }: TaskSummaryPr
     }
   };
 
-  const controlTags: [string, MSTControlTag][] = allTags.filter(([_, control]) => control.isControlTag) as [
-    string,
-    MSTControlTag,
-  ][];
-  const controlsList: ControlTag[] = controlTags.map(([name, control]) => ({
-    name,
-    type: control.type,
-    to_name: control.toname,
-    label_attrs: getLabelColors(control),
-    per_region: !!control.perregion,
-  }));
-
-  // Add pseudo-controls for ReactCode dimensions
-  // ReactCode tags are object tags that can have dimensions defined via outputs schema
-  const reactcodeTags = allTags.filter(([_, tag]) => tag.type === "reactcode") as [string, any][];
-  for (const [tagName, tag] of reactcodeTags) {
-    const dimensions: string[] = tag.dimensions ?? [];
-    for (const dimension of dimensions) {
-      controlsList.push({
-        name: dimension, // JSONPath used to extract value
-        type: "reactcode",
-        to_name: tagName, // Reference to the ReactCode tag
-        label_attrs: {},
-        per_region: false,
-      });
-    }
-  }
-  // place all controls with the same to_name together
-  const grouped = Object.groupBy(controlsList, (control) => control.to_name);
-  // show global classifications first, then labels, then per-regions
-  const controls = Object.entries(grouped).flatMap(([_, controls]) => sortControls(controls ?? []));
-
-  const objectTags: ObjectTagEntry[] = allTags.filter(
-    ([_, tag]) => tag.isObjectTag && (tag.value.includes("$") || tag.loadedData),
-  ) as ObjectTagEntry[];
-  const dataTypes: ObjectTypes = Object.fromEntries(
-    objectTags.map(([name, object]) => [
-      name,
-      // most of tags has `updateValue()` method which resolves `value` and stores it in `_value`
-      // Image tag uses `parsedValue` instead of `_value`
-      // Pdf tag uses `_url` instead of `_value`
-      // TimeSeries tag uses `dataObj` instead of `_value`, it's always an object {<channel name>: [array of values]}
-      // for other tags with complex logic (like TimeSeries) we use `value` for now, which is not ideal
-      {
-        type: object.type,
-        value:
-          // @ts-expect-error parsedValue, dataObj and _url are very specific and not added to types
-          object.loadedData ?? object.parsedValue ?? object.dataObj ?? object._url ?? object._value ?? object.value,
-      },
-    ]),
-  );
+  const controls = buildControlsList(allTags);
+  const dataTypes: ObjectTypes = buildObjectDataTypes(allTags);
 
   const values = [
     // if agreement is unavailable for current user it's undefined

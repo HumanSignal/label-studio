@@ -91,7 +91,7 @@ export function openAutoReviewDialog({
   const annotationCount = acceptCount + rejectCount;
 
   confirm({
-    title: "Auto-review Annotations" as unknown as string,
+    title: "Auto-review Annotations",
     body: (
       <DialogBody
         annotationCount={annotationCount}

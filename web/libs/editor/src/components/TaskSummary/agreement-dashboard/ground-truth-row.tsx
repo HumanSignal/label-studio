@@ -123,13 +123,13 @@ const GroundTruthCellComponent = ({ dimension, cell, options, onSetCell, onClear
     <Select
       options={selectOptions}
       value={isResolved ? String(cell.value) : undefined}
-      onChange={handleChange as any}
+      onChange={handleChange as (value: unknown) => void}
       placeholder="Select"
       searchable
       searchPlaceholder="Search values"
       triggerClassName="!bg-transparent !border-none !shadow-none !px-0 !py-0 !h-auto !min-h-0 !w-auto !gap-tightest !text-label-small [&>svg]:!w-3 [&>svg]:!h-3"
       contentClassName="min-w-[160px]"
-      renderSelected={(selectedOptions?: any[], placeholder?: string) => {
+      renderSelected={(selectedOptions?, placeholder?: string) => {
         if (!isResolved || !selectedOptions?.length) {
           return (
             <span className="text-neutral-content-subtler text-label-small cursor-pointer">

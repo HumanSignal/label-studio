@@ -1,7 +1,7 @@
 import Constants from "../../core/Constants";
 import type { MSTControlTag } from "../../stores/types";
 import { contrastColor, convertToRGBA } from "../../utils/colors";
-import type { ControlTag, LabelColors, LabelCounts } from "./types";
+import type { ControlTag, LabelColors, LabelCounts, ObjectTagEntry, ObjectTypes } from "./types";
 
 const defaultLabelColor = Constants.LABEL_BACKGROUND;
 
@@ -131,3 +131,67 @@ export const sortControls = (controls: ControlTag[]) => {
     return 0;
   });
 };
+
+/**
+ * Build the sorted list of ControlTag descriptors from raw MST tag entries.
+ *
+ * Includes real control tags, plus pseudo-controls synthesized from ReactCode
+ * dimensions. Groups by `to_name` and sorts within each group using
+ * `sortControls` (global classifications first, then labels, then per-region).
+ *
+ * @param allTags - spread of `annotationStore.names` (array of [name, tag] tuples)
+ */
+export function buildControlsList(allTags: [string, any][]): ControlTag[] {
+  const controlTags = allTags.filter(([_, control]) => control.isControlTag) as [string, MSTControlTag][];
+  const controlsList: ControlTag[] = controlTags.map(([name, control]) => ({
+    name,
+    type: control.type,
+    to_name: control.toname,
+    label_attrs: getLabelColors(control),
+    per_region: !!control.perregion,
+  }));
+
+  const reactcodeTags = allTags.filter(([_, tag]) => tag.type === "reactcode") as [string, any][];
+  for (const [tagName, tag] of reactcodeTags) {
+    const dimensions: string[] = tag.dimensions ?? [];
+    for (const dimension of dimensions) {
+      controlsList.push({
+        name: dimension,
+        type: "reactcode",
+        to_name: tagName,
+        label_attrs: {},
+        per_region: false,
+      });
+    }
+  }
+
+  const controlsByObjectTag = Object.groupBy(controlsList, (control) => control.to_name);
+  return Object.entries(controlsByObjectTag).flatMap(([_, controls]) => sortControls(controls ?? []));
+}
+
+/**
+ * Build the ObjectTypes map from raw MST tag entries for DataSummary rendering.
+ *
+ * Extracts object tags that have data bindings (value contains "$") or
+ * pre-loaded data, and resolves each tag's display value through the
+ * MST value resolution chain.
+ *
+ * @param allTags - spread of `annotationStore.names` (array of [name, tag] tuples)
+ */
+export function buildObjectDataTypes(allTags: [string, any][]): ObjectTypes {
+  const objectTags: ObjectTagEntry[] = allTags.filter(
+    ([_, tag]) => tag.isObjectTag && (tag.value.includes("$") || tag.loadedData),
+  ) as ObjectTagEntry[];
+
+  return Object.fromEntries(
+    objectTags.map(([name, object]) => [
+      name,
+      {
+        type: object.type,
+        value:
+          // @ts-expect-error parsedValue, dataObj and _url are very specific and not added to types
+          object.loadedData ?? object.parsedValue ?? object.dataObj ?? object._url ?? object._value ?? object.value,
+      },
+    ]),
+  );
+}

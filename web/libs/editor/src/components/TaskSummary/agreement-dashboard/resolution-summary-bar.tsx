@@ -30,6 +30,14 @@ interface ResolutionSummaryBarProps {
 // Main Component
 // ---------------------------------------------------------------------------
 
+/**
+ * Horizontal bar showing ground truth resolution progress and action buttons.
+ *
+ * Renders a progress bar, an "Auto-accept Majority Vote" button, a "Create
+ * Ground Truth" button (disabled until all dimensions are resolved or when
+ * a GT annotation already exists), and an "Auto-Review" button (enabled only
+ * when a GT annotation exists).
+ */
 export const ResolutionSummaryBar = ({
   resolvedCount,
   totalCount,

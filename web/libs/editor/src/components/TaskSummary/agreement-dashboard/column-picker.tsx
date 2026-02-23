@@ -68,8 +68,11 @@ export const ColumnPicker = ({
   }, [visibleColumnIds, conflictingDimensionIds]);
 
   const handleChange = useCallback(
-    (selectedValues: any) => {
-      onVisibleColumnsChange((selectedValues as string[]).map(Number));
+    // ASSUMPTION: Select's onChange provides the selected string[] in multi mode,
+    // but its TypeScript overload exposes a union with ChangeEvent. Cast is required.
+    (selectedValues: string | string[] | unknown) => {
+      const values = Array.isArray(selectedValues) ? selectedValues : [String(selectedValues)];
+      onVisibleColumnsChange(values.map(Number));
     },
     [onVisibleColumnsChange],
   );
@@ -141,7 +144,7 @@ export const ColumnPicker = ({
       {/* Columns multi-select */}
       <Select
         options={options}
-        value={stringValue as any}
+        value={stringValue}
         multiple
         searchable
         searchPlaceholder="Search columns"
