@@ -63,6 +63,9 @@ const BaseWithVolatiles = types
     setHidden(v) {
       self.hidden = v;
     },
+    setUpdateAppearenceFromState(fn) {
+      self.updateAppearenceFromState = fn;
+    },
   }))
   .views((self) => ({
     get annotation() {
@@ -705,6 +708,20 @@ describe("AreaMixin", () => {
       expect(area.results[0].to_name).toBe(object);
       expect(area.results[0].type).toBe("rectanglelabels");
       expect(area.results[0].value).toEqual({ labels: ["L1"] });
+    });
+
+    it("calls updateAppearenceFromState after setValue when set", () => {
+      const { area } = createStore();
+      const updateAppearenceFromState = jest.fn();
+      area.setUpdateAppearenceFromState(updateAppearenceFromState);
+      const tag = {
+        holdsState: true,
+        resultType: "rectanglelabels",
+        valueType: "labels",
+        selectedValues: () => ["L1"],
+      };
+      area.setValue(tag);
+      expect(updateAppearenceFromState).toHaveBeenCalled();
     });
   });
 });
