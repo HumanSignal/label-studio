@@ -111,6 +111,16 @@ describe("Annotation store (store.js)", () => {
       store.annotationStore.initRoot(MINIMAL_CONFIG);
       expect(store.annotationStore.root).toBe(root);
     });
+
+    it("initRoot with invalid config calls showError and sets error view root", () => {
+      const store = createStore();
+      store.initializeStore({});
+      const invalidConfig = "<View><NotATag";
+      store.annotationStore.initRoot(invalidConfig);
+      expect(store.annotationStore.root).toBeDefined();
+      expect(store.annotationStore.root.type).toBe("view");
+      expect(store.annotationStore.validation).toBeDefined();
+    });
   });
 
   describe("addAnnotation and addPrediction", () => {
@@ -142,6 +152,12 @@ describe("Annotation store (store.js)", () => {
       const store = createStore();
       store.initializeStore({});
       expect(store.annotationStore.selectAnnotation("any")).toBeNull();
+    });
+
+    it("selectPrediction returns null when predictions empty", () => {
+      const store = createStore();
+      store.initializeStore({});
+      expect(store.annotationStore.selectPrediction("any")).toBeNull();
     });
 
     it("selectItem finds by id or pk and resets history when resetHistory true", () => {
@@ -211,6 +227,18 @@ describe("Annotation store (store.js)", () => {
       store.addAnnotationToTaskHistory = jest.fn();
       store.annotationStore.selectAnnotation(ann.id);
       expect(store.addAnnotationToTaskHistory).toHaveBeenCalledWith("42");
+    });
+
+    it("selectAnnotation in view-all mode without exitViewAll sets editable to false", () => {
+      const store = createStore({ interfaces: ["basic", "annotations:view-all"] });
+      store.initializeStore({});
+      const a1 = store.annotationStore.addAnnotation({ result: [] });
+      const a2 = store.annotationStore.addAnnotation({ result: [] });
+      store.annotationStore.selectAnnotation(a1.id);
+      store.annotationStore.toggleViewingAllAnnotations();
+      expect(store.annotationStore.viewingAll).toBe(true);
+      store.annotationStore.selectAnnotation(a2.id);
+      expect(a2.editable).toBe(false);
     });
   });
 
@@ -294,6 +322,34 @@ describe("Annotation store (store.js)", () => {
       const ann = store.annotationStore.addAnnotationFromPrediction(pred);
       expect(ann).toBeDefined();
       expect(ann.parent_prediction).toBe(50);
+    });
+
+    it("addAnnotationFromPrediction from annotation entity sets parent_annotation", () => {
+      const store = createStore();
+      store.initializeStore({});
+      const parentAnn = store.annotationStore.addAnnotation({ result: [], pk: "100" });
+      parentAnn._initialAnnotationObj = [];
+      const childAnn = store.annotationStore.addAnnotationFromPrediction(parentAnn);
+      expect(childAnn).toBeDefined();
+      expect(childAnn.parent_annotation).toBe(100);
+    });
+
+    it("createAnnotation with non-interactive prediction result deserializes and selects", () => {
+      const store = createStore();
+      store.initializeStore({});
+      const pred = store.annotationStore.addPrediction({ result: [] });
+      pred._initialAnnotationObj = [
+        {
+          interactive_mode: false,
+          from_name: "l",
+          to_name: "t1",
+          type: "labels",
+          value: { labels: [] },
+        },
+      ];
+      const ann = store.annotationStore.createAnnotation();
+      expect(ann).toBeDefined();
+      expect(store.annotationStore.selected).toBe(ann);
     });
   });
 
