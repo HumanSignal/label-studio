@@ -1334,4 +1334,579 @@ describe("TimeSeries persistentValues, dataSlices, and panView no-op", () => {
   });
 });
 
+describe("TimeSeries dataObj parse failure and updateValue errors", () => {
+  it("dataObj throws when timeformat cannot parse first values", () => {
+    const model = TimeSeriesModel.create(
+      {
+        name: "timeseries",
+        value: "$timeseries",
+        timecolumn: "time",
+        timeformat: "%Y-%m-%d",
+        children: [],
+      },
+      mockEnv,
+    );
+    model.setData({
+      time: ["not-a-date", "also-invalid", "2020-01-03"],
+      value: [1, 2, 3],
+    });
+    expect(() => model.dataObj).toThrow(/timeColumn.*cannot be parsed|timeFormat/);
+  });
+
+  it("updateValue calls addErrors when keyColumn not in data", async () => {
+    const model = TimeSeriesModel.create(
+      {
+        name: "timeseries",
+        value: "$timeseries",
+        timecolumn: "missingColumn",
+        children: [],
+      },
+      mockEnv,
+    );
+    const store = MockStore.create({ timeseries: model }, mockEnv);
+    model.setData({ otherColumn: [1, 2, 3] });
+    await model.updateValue(store);
+    expect(store.annotationStore.addErrors).toHaveBeenCalled();
+    const callArg = store.annotationStore.addErrors.mock.calls[0][0][0];
+    expect(callArg.value || callArg.message || "").toMatch(/missingColumn|undefined/);
+  });
+
+  it("updateValue calls addErrors when dataObj getter throws", async () => {
+    const model = TimeSeriesModel.create(
+      {
+        name: "timeseries",
+        value: "$timeseries",
+        timecolumn: "time",
+        timeformat: "",
+        children: [],
+      },
+      mockEnv,
+    );
+    const store = MockStore.create({ timeseries: model }, mockEnv);
+    model.setData({ time: ["a", "b"], value: [1, 2] });
+    await model.updateValue(store);
+    expect(store.annotationStore.addErrors).toHaveBeenCalled();
+  });
+});
+
+describe("TimeSeries preloadValue", () => {
+  it("preloadValue with valuetype json uses parseValue and setData", async () => {
+    const model = TimeSeriesModel.create(
+      {
+        name: "timeseries",
+        value: "$data",
+        valuetype: "json",
+        timecolumn: "time",
+        children: [],
+      },
+      mockEnv,
+    );
+    const store = MockStore.create({ timeseries: model }, mockEnv);
+    store.task.dataObj = { data: { time: [0, 10, 20], value: [1, 2, 3] } };
+    await model.preloadValue(store);
+    expect(model.valueLoaded).toBe(true);
+    expect(model.data).toEqual({ time: [0, 10, 20], value: [1, 2, 3] });
+  });
+
+  it("preloadValue with valuetype url and no value calls addErrors", async () => {
+    const model = TimeSeriesModel.create(
+      {
+        name: "timeseries",
+        value: "",
+        valuetype: "url",
+        timecolumn: "time",
+        children: [],
+      },
+      mockEnv,
+    );
+    const store = MockStore.create({ timeseries: model }, mockEnv);
+    await model.preloadValue(store);
+    expect(store.annotationStore.addErrors).toHaveBeenCalledWith(
+      expect.arrayContaining([
+        expect.objectContaining({
+          value: expect.stringContaining("value"),
+        }),
+      ]),
+    );
+  });
+
+  it("preloadValue with valuetype url and url not string calls addErrors", async () => {
+    const model = TimeSeriesModel.create(
+      {
+        name: "timeseries",
+        value: "$missing",
+        valuetype: "url",
+        timecolumn: "time",
+        children: [],
+      },
+      mockEnv,
+    );
+    const store = MockStore.create({ timeseries: model }, mockEnv);
+    store.task.dataObj = {};
+    await model.preloadValue(store);
+    expect(store.annotationStore.addErrors).toHaveBeenCalled();
+  });
+});
+
+describe("TimeSeries _handlePause isDate and playbackLoop minKey", () => {
+  it("_handlePause converts time with isDate (ms to relative)", () => {
+    const model = TimeSeriesModel.create(
+      {
+        name: "timeseries",
+        value: "$timeseries",
+        timecolumn: "time",
+        timeformat: "%Y-%m-%d",
+        children: [],
+      },
+      mockEnv,
+    );
+    model.setData({
+      time: ["2020-01-01", "2020-01-02", "2020-01-03"],
+      value: [1, 2, 3],
+    });
+    model.setColumnNames(["time", "value"]);
+    model.updateCanvasWidth(1000);
+    const baseTime = model.keysRange[0];
+    model.updateTR([baseTime, baseTime + 86400000 * 2]);
+    model.registerSyncHandlers();
+    model._handlePlay({ time: 0, speed: 1 });
+    model._handlePause({ time: 86400 });
+    expect(model.isPlaying).toBe(false);
+    expect(model.seekTo).toBe(baseTime + 86400000);
+  });
+
+  it("playbackLoop stops at minKey when target is before start", () => {
+    const model = TimeSeriesModel.create(
+      {
+        name: "timeseries",
+        value: "$timeseries",
+        timecolumn: "time",
+        children: [],
+      },
+      mockEnv,
+    );
+    model.setData({ time: [0, 50, 100], value: [1, 2, 3] });
+    model.setColumnNames(["time", "value"]);
+    model.updateCanvasWidth(1000);
+    model.updateTR([0, 100]);
+    model.registerSyncHandlers();
+    jest.spyOn(performance, "now").mockImplementation(() => 0);
+    model._handlePlay({ time: -10, speed: 1 });
+    jest.spyOn(performance, "now").mockImplementation(() => 5000);
+    model.playbackLoop();
+    expect(model.isPlaying).toBe(false);
+    expect(model.cursorTime).toBe(0);
+  });
+});
+
+describe("TimeSeries emitSeekSync and plotClickHandler", () => {
+  it("emitSeekSync runs when sync set and not playing", () => {
+    const model = TimeSeriesModel.create(
+      {
+        name: "timeseries",
+        value: "$timeseries",
+        sync: "video1",
+        timecolumn: "time",
+        children: [],
+      },
+      mockEnv,
+    );
+    model.setData({ time: [0, 50, 100], value: [1, 2, 3] });
+    model.setSuppressSync(false);
+    model.updateTR([10, 90]);
+    expect(model.centerTime).toBe(50);
+    expect(model.sync).toBe("video1");
+    expect(model.isPlaying).toBe(false);
+    expect(() => model.emitSeekSync()).not.toThrow();
+  });
+
+  it("plotClickHandler updates cursor when click inside view", () => {
+    const model = TimeSeriesModel.create(
+      {
+        name: "timeseries",
+        value: "$timeseries",
+        sync: "video1",
+        timecolumn: "time",
+        children: [],
+      },
+      mockEnv,
+    );
+    model.setData({ time: [0, 25, 50, 75, 100], value: [1, 2, 3, 4, 5] });
+    model.updateCanvasWidth(1000);
+    model.updateTR([0, 100]);
+    model.plotClickHandler(50);
+    expect(model.cursorTime).toBe(50);
+  });
+
+  it("plotClickHandler recenters view when click outside", () => {
+    const model = TimeSeriesModel.create(
+      {
+        name: "timeseries",
+        value: "$timeseries",
+        sync: "video1",
+        timecolumn: "time",
+        children: [],
+      },
+      mockEnv,
+    );
+    model.setData({ time: [0, 50, 100], value: [1, 2, 3] });
+    model.updateCanvasWidth(1000);
+    model.updateTR([0, 30]);
+    model.plotClickHandler(80);
+    expect(model.brushRange[0]).toBeLessThanOrEqual(80);
+    expect(model.brushRange[1]).toBeGreaterThanOrEqual(80);
+  });
+});
+
+describe("TimeSeries _updateViewForTime and regionsTimeRanges", () => {
+  it("_updateViewForTime is no-op for null or non-finite time", () => {
+    const model = TimeSeriesModel.create(
+      {
+        name: "timeseries",
+        value: "$timeseries",
+        timecolumn: "time",
+        children: [],
+      },
+      mockEnv,
+    );
+    model.setData({ time: [0, 100], value: [1, 2] });
+    model.updateCanvasWidth(800);
+    model.updateTR([10, 90]);
+    model._updateViewForTime(null);
+    model._updateViewForTime(Number.NaN);
+    expect(model.brushRange).toEqual([10, 90]);
+  });
+
+  it("regionsTimeRanges returns empty when no regions", () => {
+    const model = TimeSeriesModel.create(
+      {
+        name: "timeseries",
+        value: "$timeseries",
+        timecolumn: "time",
+        children: [],
+      },
+      mockEnv,
+    );
+    expect(model.regionsTimeRanges).toEqual([]);
+  });
+});
+
+describe("TimeSeries formatDuration with isDate", () => {
+  it("formatDuration uses d3.utcFormat when format and isDate", () => {
+    const model = TimeSeriesModel.create(
+      {
+        name: "timeseries",
+        value: "$timeseries",
+        timecolumn: "time",
+        timeformat: "%Y-%m-%d",
+        durationdisplayformat: "%M:%S",
+        children: [],
+      },
+      mockEnv,
+    );
+    const result = model.formatDuration(new Date("2020-01-01T00:01:30.000Z").getTime());
+    expect(typeof result).toBe("string");
+    expect(result.length).toBeGreaterThan(0);
+  });
+});
+
+describe("TimeSeries _handleSeek when isPlaying", () => {
+  it("_handleSeek restarts playback loop when already playing", () => {
+    const model = TimeSeriesModel.create(
+      {
+        name: "timeseries",
+        value: "$timeseries",
+        timecolumn: "time",
+        children: [],
+      },
+      mockEnv,
+    );
+    model.setData({ time: [0, 50, 100], value: [1, 2, 3] });
+    model.setColumnNames(["time", "value"]);
+    model.updateCanvasWidth(1000);
+    model.updateTR([0, 100]);
+    model.registerSyncHandlers();
+    model._handlePlay({ time: 25, speed: 1 });
+    expect(model.isPlaying).toBe(true);
+    model._handleSeek({ time: 60 });
+    expect(model.playStartPosition).toBe(60);
+    expect(model.isPlaying).toBe(true);
+  });
+});
+
+describe("TimeSeries panView clamp and plotClickHandler when playing", () => {
+  it("panView clamps to minKey when panning left past start", () => {
+    const model = TimeSeriesModel.create(
+      {
+        name: "timeseries",
+        value: "$timeseries",
+        timecolumn: "time",
+        children: [],
+      },
+      mockEnv,
+    );
+    model.setData({ time: [0, 25, 50, 75, 100], value: [1, 2, 3, 4, 5] });
+    model.updateCanvasWidth(800);
+    model.updateTR([10, 30]);
+    model.panView(-1);
+    expect(model.brushRange[0]).toBe(0);
+    expect(model.brushRange[1]).toBe(20);
+  });
+
+  it("panView clamps to maxKey when panning right past end", () => {
+    const model = TimeSeriesModel.create(
+      {
+        name: "timeseries",
+        value: "$timeseries",
+        timecolumn: "time",
+        children: [],
+      },
+      mockEnv,
+    );
+    model.setData({ time: [0, 25, 50, 75, 100], value: [1, 2, 3, 4, 5] });
+    model.updateCanvasWidth(800);
+    model.updateTR([70, 90]);
+    model.panView(1);
+    expect(model.brushRange[1]).toBe(100);
+    expect(model.brushRange[0]).toBe(80);
+  });
+
+  it("plotClickHandler calls restartPlaybackFromTime when isPlaying", () => {
+    const model = TimeSeriesModel.create(
+      {
+        name: "timeseries",
+        value: "$timeseries",
+        sync: "video1",
+        timecolumn: "time",
+        children: [],
+      },
+      mockEnv,
+    );
+    model.setData({ time: [0, 50, 100], value: [1, 2, 3] });
+    model.updateCanvasWidth(1000);
+    model.updateTR([0, 100]);
+    model._handlePlay({ time: 25, speed: 1 });
+    model.plotClickHandler(60);
+    expect(model.playStartPosition).toBe(60);
+  });
+});
+
+describe("TimeSeries keysRange empty and dataHash null", () => {
+  it("keysRange returns empty when key column has no values", () => {
+    const model = TimeSeriesModel.create(
+      {
+        name: "timeseries",
+        value: "$timeseries",
+        timecolumn: "",
+        children: [],
+      },
+      mockEnv,
+    );
+    model.setData({ value: [] });
+    expect(model.keysRange).toEqual([]);
+  });
+
+  it("dataHash returns null when dataObj is null", () => {
+    const model = TimeSeriesModel.create(
+      {
+        name: "timeseries",
+        value: "$timeseries",
+        timecolumn: "time",
+        children: [],
+      },
+      mockEnv,
+    );
+    expect(model.dataHash).toBeNull();
+  });
+});
+
+describe("TimeSeries setZoomedRange setScale updateView and parseTimeFn", () => {
+  it("setZoomedRange and setScale update volatiles", () => {
+    const model = TimeSeriesModel.create(
+      {
+        name: "timeseries",
+        value: "$timeseries",
+        timecolumn: "time",
+        children: [],
+      },
+      mockEnv,
+    );
+    model.setZoomedRange(100);
+    model.setScale(2);
+    expect(model.zoomedRange).toBe(100);
+    expect(model.scale).toBe(2);
+  });
+
+  it("updateView increments _needsUpdate", () => {
+    const model = TimeSeriesModel.create(
+      {
+        name: "timeseries",
+        value: "$timeseries",
+        timecolumn: "time",
+        children: [],
+      },
+      mockEnv,
+    );
+    const before = model._needsUpdate;
+    model.updateView();
+    expect(model._needsUpdate).toBe(before + 1);
+  });
+
+  it("parseTimeFn returns Number when no timeformat", () => {
+    const model = TimeSeriesModel.create(
+      {
+        name: "timeseries",
+        value: "$timeseries",
+        timecolumn: "time",
+        children: [],
+      },
+      mockEnv,
+    );
+    expect(model.parseTimeFn).toBe(Number);
+  });
+
+  it("parseTimeFn returns parser when timeformat and timecolumn set", () => {
+    const model = TimeSeriesModel.create(
+      {
+        name: "timeseries",
+        value: "$timeseries",
+        timecolumn: "time",
+        timeformat: "%Y-%m-%d",
+        children: [],
+      },
+      mockEnv,
+    );
+    expect(typeof model.parseTimeFn).toBe("function");
+    expect(model.parseTimeFn("2020-01-01")).toBeInstanceOf(Date);
+  });
+});
+
+describe("TimeSeries _updateViewForTime edge cases", () => {
+  it("_updateViewForTime is no-op when canvasWidth is 0", () => {
+    const model = TimeSeriesModel.create(
+      {
+        name: "timeseries",
+        value: "$timeseries",
+        timecolumn: "time",
+        children: [],
+      },
+      mockEnv,
+    );
+    model.setData({ time: [0, 100], value: [1, 2] });
+    model.updateCanvasWidth(0);
+    model.updateTR([10, 90]);
+    model._updateViewForTime(50);
+    expect(model.brushRange).toEqual([10, 90]);
+  });
+
+  it("_updateViewForTime recenters view when time maps to left edge", () => {
+    const model = TimeSeriesModel.create(
+      {
+        name: "timeseries",
+        value: "$timeseries",
+        timecolumn: "time",
+        children: [],
+      },
+      mockEnv,
+    );
+    model.setData({ time: [0, 100], value: Array(101).fill(0) });
+    model.updateCanvasWidth(100);
+    model.updateTR([0, 100]);
+    model._updateViewForTime(5);
+    expect(model.seekTo).toBe(5);
+    expect(model.cursorTime).toBe(5);
+  });
+});
+
+describe("TimeSeries defaultOverviewWidth fallback and parseTime number", () => {
+  it("defaultOverviewWidth uses default when overviewwidth has no %", () => {
+    const model = TimeSeriesModel.create(
+      {
+        name: "timeseries",
+        value: "$timeseries",
+        timecolumn: "time",
+        overviewwidth: "50",
+        children: [],
+      },
+      mockEnv,
+    );
+    expect(model.defaultOverviewWidth).toEqual([0, 0.25]);
+  });
+
+  it("parseTime returns number when parseTimeFn is Number", () => {
+    const model = TimeSeriesModel.create(
+      {
+        name: "timeseries",
+        value: "$timeseries",
+        timecolumn: "time",
+        children: [],
+      },
+      mockEnv,
+    );
+    expect(model.parseTime(42)).toBe(42);
+  });
+});
+
+describe("TimeSeries filteredOverviewChannels infers headers from dataObj", () => {
+  it("filteredOverviewChannels uses dataObj keys as headers when headers not set", () => {
+    const model = TimeSeriesModel.create(
+      {
+        name: "timeseries",
+        value: "$timeseries",
+        valuetype: "json",
+        timecolumn: "0",
+        overviewchannels: "1",
+        children: [
+          { type: "channel", column: "1" },
+          { type: "channel", column: "2" },
+        ],
+      },
+      mockEnv,
+    );
+    model.setData({ 0: [0, 1], 1: [10, 20], 2: [100, 200] });
+    const filtered = model.filteredOverviewChannels;
+    expect(filtered).toContain("1");
+  });
+});
+
+describe("TimeSeries isNotReady and _handlePlay cancelAnimationFrame", () => {
+  it("isNotReady is true when canvasWidth is 0", () => {
+    const model = TimeSeriesModel.create(
+      {
+        name: "timeseries",
+        value: "$timeseries",
+        timecolumn: "time",
+        children: [],
+      },
+      mockEnv,
+    );
+    model.setData({ time: [0, 100], value: [1, 2] });
+    model.updateTR([10, 90]);
+    expect(model.isNotReady).toBe(true);
+  });
+
+  it("_handlePlay cancels previous animation frame when called again", () => {
+    const cancelSpy = jest.spyOn(global, "cancelAnimationFrame").mockImplementation(() => {});
+    const model = TimeSeriesModel.create(
+      {
+        name: "timeseries",
+        value: "$timeseries",
+        timecolumn: "time",
+        children: [],
+      },
+      mockEnv,
+    );
+    model.setData({ time: [0, 50, 100], value: [1, 2, 3] });
+    model.setColumnNames(["time", "value"]);
+    model.updateCanvasWidth(1000);
+    model.updateTR([0, 100]);
+    model.registerSyncHandlers();
+    model._handlePlay({ time: 10, speed: 1 });
+    const frameId = model.animationFrameId;
+    model._handlePlay({ time: 20, speed: 1 });
+    expect(cancelSpy).toHaveBeenCalledWith(frameId);
+    cancelSpy.mockRestore();
+  });
+});
+
 ff.reset();
