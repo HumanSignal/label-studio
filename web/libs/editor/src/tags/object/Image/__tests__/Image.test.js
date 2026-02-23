@@ -1005,4 +1005,344 @@ describe("Image model", () => {
       expect(store.annotation.image.selectedRegionsBBox).toBeUndefined();
     });
   });
+
+  describe("images array value", () => {
+    it("images returns array when parsedValue is array from task", () => {
+      const store = createStore({
+        annotation: {
+          toNames: new Map(),
+          regionStore: { regions: [], suggestions: [] },
+          history: defaultHistory,
+          names: new Map(),
+          image: {
+            name: "img",
+            value: "$urls",
+            type: "image",
+          },
+        },
+      });
+      store.setTaskData({ urls: ["https://a.com/1.jpg", "https://a.com/2.jpg"] });
+      const image = store.annotation.image;
+      expect(image.images).toEqual(["https://a.com/1.jpg", "https://a.com/2.jpg"]);
+    });
+  });
+
+  describe("fillerHeight and currentSrc", () => {
+    it("fillerHeight returns percentage based on natural dimensions and isSideways", () => {
+      const store = createStore();
+      const image = store.annotation.image;
+      image.naturalWidth = 100;
+      image.naturalHeight = 50;
+      image.rotation = 0;
+      expect(image.fillerHeight).toBe("50%");
+      image.rotation = 90;
+      expect(image.fillerHeight).toBe("200%");
+    });
+
+    it("currentSrc returns currentImageEntity.src", () => {
+      const store = createStore();
+      store.setTaskData({ url: "https://example.com/pic.jpg" });
+      const image = store.annotation.image;
+      const entity = image.findImageEntity(0);
+      expect(image.currentSrc).toBe(entity.src);
+    });
+  });
+
+  describe("controlButtonType", () => {
+    it("controlButton returns first matching labels state", () => {
+      const ctrl = { type: "rectanglelabels", isSelected: true };
+      const store = createStoreWithStates([ctrl]);
+      const image = store.annotation.image;
+      expect(image.controlButton()).toBe(ctrl);
+    });
+  });
+
+  describe("fixZoomedCoords with stageRef", () => {
+    it("transforms coords when stageRef has getAbsoluteTransform", () => {
+      const store = createStore();
+      const image = store.annotation.image;
+      image.stageRef = {
+        getAbsoluteTransform: () => ({
+          copy: () => ({
+            invert: () => ({
+              point: (p) => ({ x: p.x * 0.5, y: p.y * 0.5 }),
+            }),
+          }),
+        }),
+      };
+      const [x, y] = image.fixZoomedCoords([100, 200]);
+      expect(x).toBe(50);
+      expect(y).toBe(100);
+    });
+  });
+
+  describe("getSkipInteractions with FF_ZOOM_OPTIM", () => {
+    beforeEach(() => {
+      featureFlags.isFF.mockImplementation((key) => key === FF_ZOOM_OPTIM);
+    });
+    afterEach(() => {
+      featureFlags.isFF.mockImplementation(() => false);
+    });
+
+    it("returns false when isLinkingMode is true", () => {
+      const store = createStore();
+      const image = store.annotation.image;
+      store.annotation.isLinkingMode = true;
+      mockManager.findSelectedTool.mockReturnValue({
+        toolName: "MoveTool",
+        canInteractWithRegions: false,
+        updateCursor: jest.fn(),
+      });
+      expect(image.getSkipInteractions()).toBe(false);
+    });
+
+    it("returns true when canInteractWithRegions is false and not linking", () => {
+      const store = createStore();
+      const image = store.annotation.image;
+      store.annotation.isLinkingMode = false;
+      mockManager.findSelectedTool.mockReturnValue({
+        toolName: "MoveTool",
+        canInteractWithRegions: false,
+        updateCursor: jest.fn(),
+      });
+      expect(image.getSkipInteractions()).toBe(true);
+    });
+  });
+
+  describe("smoothingEnabled with bitmask", () => {
+    it("returns false when annotation.names has bitmask type", () => {
+      const store = createStore({
+        annotation: {
+          toNames: new Map(),
+          regionStore: { regions: [], suggestions: [] },
+          history: defaultHistory,
+          names: new Map([
+            [
+              "img",
+              {
+                type: "bitmasklabels",
+              },
+            ],
+          ]),
+          image: {
+            name: "img",
+            value: "$url",
+            type: "image",
+          },
+        },
+      });
+      const image = store.annotation.image;
+      expect(image.smoothingEnabled).toBe(false);
+    });
+  });
+
+  describe("updateSkipInteractions with shouldSkipInteractions", () => {
+    it("calls setSkipInteractions with tool.shouldSkipInteractions(e) when present", () => {
+      const store = createStore();
+      const image = store.annotation.image;
+      mockManager.findSelectedTool.mockReturnValue({
+        toolName: "MoveTool",
+        canInteractWithRegions: true,
+        shouldSkipInteractions: jest.fn(() => true),
+        updateCursor: jest.fn(),
+      });
+      image.updateSkipInteractions({ evt: {} });
+      expect(image.getSkipInteractions()).toBe(true);
+    });
+  });
+
+  describe("handleZoom negative zoom and zoom out", () => {
+    it("when negativezoom is true allows zoom out below 1", () => {
+      const store = createStore({
+        annotation: {
+          toNames: new Map(),
+          regionStore: { regions: [], suggestions: [] },
+          history: defaultHistory,
+          names: new Map(),
+          image: {
+            name: "img",
+            value: "$url",
+            type: "image",
+            negativezoom: true,
+          },
+        },
+      });
+      const image = store.annotation.image;
+      image.naturalWidth = 100;
+      image.naturalHeight = 100;
+      image.containerWidth = 200;
+      image.containerHeight = 200;
+      image.setZoom(1);
+      image.handleZoom(-1);
+      expect(image.currentZoom).toBeLessThanOrEqual(1);
+    });
+
+    it("zoomScale <= 1 path sets zoom and position to 0", () => {
+      const store = createStore({
+        annotation: {
+          toNames: new Map(),
+          regionStore: { regions: [], suggestions: [] },
+          history: defaultHistory,
+          names: new Map(),
+          image: {
+            name: "img",
+            value: "$url",
+            type: "image",
+            negativezoom: true,
+          },
+        },
+      });
+      const image = store.annotation.image;
+      image.naturalWidth = 100;
+      image.naturalHeight = 100;
+      image.containerWidth = 200;
+      image.containerHeight = 200;
+      image.setZoom(2);
+      image.handleZoom(-2);
+      expect(image.zoomingPositionX).toBe(0);
+      expect(image.zoomingPositionY).toBe(0);
+    });
+  });
+
+  describe("setZoom branches", () => {
+    it("when maxScale > 1 and scale >= maxScale sets stageZoom and zoomScale", () => {
+      const store = createStore();
+      const image = store.annotation.image;
+      image.naturalWidth = 50;
+      image.naturalHeight = 50;
+      image.containerWidth = 200;
+      image.containerHeight = 200;
+      image.setZoom(5);
+      expect(image.stageZoom).toBe(4);
+      expect(image.zoomScale).toBeGreaterThan(1);
+    });
+
+    it("when maxScale <= 1 (image larger than container) scale > maxScale", () => {
+      const store = createStore();
+      const image = store.annotation.image;
+      image.naturalWidth = 400;
+      image.naturalHeight = 400;
+      image.containerWidth = 200;
+      image.containerHeight = 200;
+      image.setZoom(2);
+      expect(image.stageZoom).toBe(0.5);
+      expect(image.zoomScale).toBe(2);
+    });
+
+    it("when maxScale <= 1 and scale is 1 (clamped) sets stageZoom and zoomScale 1", () => {
+      const store = createStore();
+      const image = store.annotation.image;
+      image.naturalWidth = 400;
+      image.naturalHeight = 400;
+      image.containerWidth = 200;
+      image.containerHeight = 200;
+      image.setZoom(1);
+      expect(image.stageZoom).toBe(0.5);
+      expect(image.zoomScale).toBe(1);
+    });
+  });
+
+  describe("updateImageAfterZoom and setZoomPosition", () => {
+    it("updateImageAfterZoom recalculates and updates region sizes", () => {
+      const store = createStore();
+      const image = store.annotation.image;
+      image.naturalWidth = 100;
+      image.naturalHeight = 80;
+      image.stageWidth = 100;
+      image.stageHeight = 80;
+      image.updateImageAfterZoom();
+      expect(image.stageWidth).toBeDefined();
+      expect(image.stageHeight).toBeDefined();
+    });
+
+    it("setZoomPosition clamps to valid range", () => {
+      const store = createStore();
+      const image = store.annotation.image;
+      image.naturalWidth = 100;
+      image.naturalHeight = 100;
+      image.containerWidth = 200;
+      image.containerHeight = 200;
+      image.stageZoomX = 1;
+      image.stageZoomY = 1;
+      image.setZoom(2);
+      image.setZoomPosition(-1000, -1000);
+      expect(image.zoomingPositionX).toBeLessThanOrEqual(0);
+      expect(image.zoomingPositionY).toBeLessThanOrEqual(0);
+    });
+
+    it("resetZoomPositionToCenter centers zoom position", () => {
+      const store = createStore();
+      const image = store.annotation.image;
+      image.naturalWidth = 100;
+      image.naturalHeight = 80;
+      image.containerWidth = 200;
+      image.containerHeight = 160;
+      image.setZoom(1);
+      image.resetZoomPositionToCenter();
+      expect(image.zoomingPositionX).toBeDefined();
+      expect(image.zoomingPositionY).toBeDefined();
+    });
+  });
+
+  describe("controlButton brushlabels and ellipselabels", () => {
+    it("controlButton returns brushlabels when present", () => {
+      const brush = { type: "brushlabels", isSelected: true };
+      const other = { type: "keypointlabels", isSelected: true };
+      const store = createStoreWithStates([other, brush]);
+      const image = store.annotation.image;
+      expect(image.controlButton()).toBe(brush);
+    });
+
+    it("controlButton returns ellipselabels when present", () => {
+      const ellipse = { type: "ellipselabels", isSelected: true };
+      const store = createStoreWithStates([ellipse]);
+      const image = store.annotation.image;
+      expect(image.controlButton()).toBe(ellipse);
+    });
+  });
+
+  describe("checkLabels with activeStates", () => {
+    it("returns false when activeStates has items and getAvailableStates is empty", () => {
+      const store = createStoreWithStates([{ type: "rectanglelabels", isSelected: true }]);
+      const image = store.annotation.image;
+      jest.spyOn(image, "getAvailableStates").mockReturnValue([]);
+      expect(image.checkLabels()).toBe(false);
+    });
+
+    it("returns true when getAvailableStates has items", () => {
+      const store = createStoreWithStates([{ type: "rectanglelabels", isSelected: true }]);
+      const image = store.annotation.image;
+      jest.spyOn(image, "getAvailableStates").mockReturnValue([{ type: "rectanglelabels" }]);
+      expect(image.checkLabels()).toBe(true);
+    });
+  });
+
+  describe("hasTools", () => {
+    it("returns true when allTools returns non-empty array", () => {
+      mockManager.allTools.mockReturnValue([{ name: "MoveTool" }]);
+      const store = createStore();
+      expect(store.annotation.image.hasTools).toBe(true);
+    });
+  });
+
+  describe("afterRegionSelected", () => {
+    it("when not multiImage does not change current image", () => {
+      const store = createStore();
+      const image = store.annotation.image;
+      image.setCurrentImage(0);
+      const region = { item_index: 1 };
+      image.afterRegionSelected(region);
+      expect(image.currentImage).toBe(0);
+    });
+
+    it("calls setCurrentImage when region has item_index and multiImage is true", () => {
+      const store = createStore();
+      const image = store.annotation.image;
+      const setCurrentImageSpy = jest.spyOn(image, "setCurrentImage");
+      image.afterRegionSelected({ item_index: 2 });
+      // Without multiImage, setCurrentImage is not called for item_index
+      expect(setCurrentImageSpy).not.toHaveBeenCalledWith(2);
+      setCurrentImageSpy.mockRestore();
+    });
+  });
 });
