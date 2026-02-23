@@ -59,6 +59,8 @@ jest.mock("@humansignal/core", () => ({
 
 import { ImageModel } from "../Image";
 import { SNAP_TO_PIXEL_MODE } from "../../../../components/ImageView/Image";
+import * as featureFlags from "../../../../utils/feature-flags";
+import { FF_ZOOM_OPTIM } from "../../../../utils/feature-flags";
 
 const defaultHistory = {
   freeze: () => {},
@@ -83,6 +85,7 @@ const MockAnnotation = types
   .actions((self) => ({
     addRegion: jest.fn(),
     reinitHistory: jest.fn(),
+    unselectAll: jest.fn(),
   }));
 
 const Root = types
@@ -685,6 +688,321 @@ describe("Image model", () => {
       const out = fn({ x: 10, y: 20 });
       expect(out).toHaveProperty("x");
       expect(out).toHaveProperty("y");
+    });
+  });
+
+  describe("viewPortBBoxCoords", () => {
+    it("returns bbox with left, top, right, bottom, width, height", () => {
+      const store = createStore();
+      const image = store.annotation.image;
+      image.zoomScale = 1;
+      image.zoomingPositionX = 0;
+      image.zoomingPositionY = 0;
+      image.stageWidth = 100;
+      image.stageHeight = 80;
+      image.naturalWidth = 100;
+      image.naturalHeight = 80;
+      image.stageZoomX = 1;
+      image.stageZoomY = 1;
+      const bbox = image.viewPortBBoxCoords;
+      expect(bbox).toHaveProperty("left");
+      expect(bbox).toHaveProperty("top");
+      expect(bbox).toHaveProperty("right");
+      expect(bbox).toHaveProperty("bottom");
+      expect(bbox).toHaveProperty("width");
+      expect(bbox).toHaveProperty("height");
+    });
+
+    it("rotates offsets when rotation is 90", () => {
+      const store = createStore();
+      const image = store.annotation.image;
+      image.zoomScale = 1;
+      image.zoomingPositionX = 0;
+      image.zoomingPositionY = 0;
+      image.stageWidth = 100;
+      image.stageHeight = 80;
+      image.rotation = 90;
+      image.naturalWidth = 100;
+      image.naturalHeight = 80;
+      image.stageZoomX = 1;
+      image.stageZoomY = 1;
+      const bbox = image.viewPortBBoxCoords;
+      expect(bbox).toHaveProperty("width");
+      expect(bbox).toHaveProperty("height");
+      expect(bbox.width).toBeLessThanOrEqual(100);
+      expect(bbox.height).toBeLessThanOrEqual(100);
+    });
+  });
+
+  describe("imageTransform", () => {
+    it("includes translate3d when zoomScale !== 1", () => {
+      const store = createStore();
+      const image = store.annotation.image;
+      image.zoomScale = 1.5;
+      image.zoomingPositionX = 10;
+      image.zoomingPositionY = 20;
+      image.stageWidth = 100;
+      image.stageHeight = 80;
+      const style = image.imageTransform;
+      expect(style.transform).toContain("translate3d(10px,20px");
+    });
+
+    it("includes rotate and translate when rotation is set", () => {
+      const store = createStore();
+      const image = store.annotation.image;
+      image.rotation = 90;
+      image.stageWidth = 100;
+      image.stageHeight = 80;
+      image.zoomScale = 1;
+      const style = image.imageTransform;
+      expect(style.transform).toContain("rotate(90deg)");
+      expect(style.filter).toContain("brightness");
+    });
+  });
+
+  describe("alignmentOffset when FF_ZOOM_OPTIM", () => {
+    beforeEach(() => {
+      featureFlags.isFF.mockImplementation((key) => key === FF_ZOOM_OPTIM);
+    });
+    afterEach(() => {
+      featureFlags.isFF.mockImplementation(() => false);
+    });
+
+    it("returns center offset for horizontalalignment center", () => {
+      const store = createStore({
+        annotation: {
+          toNames: new Map(),
+          regionStore: { regions: [], suggestions: [] },
+          history: defaultHistory,
+          names: new Map(),
+          image: {
+            name: "img",
+            value: "$url",
+            type: "image",
+            horizontalalignment: "center",
+            verticalalignment: "top",
+          },
+        },
+      });
+      const image = store.annotation.image;
+      image.containerWidth = 200;
+      image.containerHeight = 150;
+      image.naturalWidth = 100;
+      image.naturalHeight = 80;
+      image.stageZoomX = 1;
+      image.stageZoomY = 1;
+      const offset = image.alignmentOffset;
+      expect(offset.x).toBe((200 - 100) / 2);
+      expect(offset.y).toBe(0);
+    });
+
+    it("returns right/bottom offset for horizontalalignment right and verticalalignment bottom", () => {
+      const store = createStore({
+        annotation: {
+          toNames: new Map(),
+          regionStore: { regions: [], suggestions: [] },
+          history: defaultHistory,
+          names: new Map(),
+          image: {
+            name: "img",
+            value: "$url",
+            type: "image",
+            horizontalalignment: "right",
+            verticalalignment: "bottom",
+          },
+        },
+      });
+      const image = store.annotation.image;
+      image.containerWidth = 200;
+      image.containerHeight = 150;
+      image.naturalWidth = 100;
+      image.naturalHeight = 80;
+      image.stageZoomX = 1;
+      image.stageZoomY = 1;
+      const offset = image.alignmentOffset;
+      expect(offset.x).toBe(100);
+      expect(offset.y).toBe(70);
+    });
+  });
+
+  describe("activeStates", () => {
+    it("filters states by isSelected and type includes labels", () => {
+      const store = createStoreWithStates([
+        { type: "rectanglelabels", isSelected: true },
+        { type: "keypointlabels", isSelected: false },
+      ]);
+      const image = store.annotation.image;
+      expect(image.activeStates()).toHaveLength(1);
+      expect(image.activeStates()[0].type).toBe("rectanglelabels");
+    });
+  });
+
+  describe("selectedRegions and suggestions", () => {
+    it("selectedRegions returns empty when regs empty", () => {
+      const store = createStore();
+      expect(store.annotation.image.selectedRegions).toEqual([]);
+    });
+
+    it("suggestions returns empty when no regionStore suggestions", () => {
+      const store = createStore();
+      expect(store.annotation.image.suggestions).toEqual([]);
+    });
+
+    it("regionsInSelectionArea and selectedShape return empty/undefined when no regs", () => {
+      const store = createStore();
+      expect(store.annotation.image.regionsInSelectionArea).toEqual([]);
+      expect(store.annotation.image.selectedShape).toBeUndefined();
+    });
+  });
+
+  describe("useTransformer", () => {
+    it("returns true when findSelectedTool returns useTransformer true", () => {
+      mockManager.findSelectedTool.mockReturnValueOnce({
+        useTransformer: true,
+        canInteractWithRegions: true,
+        toolName: "MoveTool",
+        updateCursor: jest.fn(),
+      });
+      const store = createStore();
+      expect(store.annotation.image.useTransformer).toBe(true);
+    });
+  });
+
+  describe("getSkipInteractions and setSkipInteractions", () => {
+    it("getSkipInteractions returns true when tool is ZoomPanTool", () => {
+      mockManager.findSelectedTool.mockReturnValueOnce({
+        toolName: "ZoomPanTool",
+        useTransformer: false,
+        canInteractWithRegions: true,
+        updateCursor: jest.fn(),
+      });
+      const store = createStore();
+      expect(store.annotation.image.getSkipInteractions()).toBe(true);
+    });
+
+    it("setSkipInteractions and updateSkipInteractions update skip state", () => {
+      const store = createStore();
+      const image = store.annotation.image;
+      image.setSkipInteractions(true);
+      expect(image.getSkipInteractions()).toBe(true);
+      image.updateSkipInteractions({ evt: { metaKey: true } });
+      expect(image.getSkipInteractions()).toBe(true);
+      image.updateSkipInteractions({ evt: {} });
+      expect(image.getSkipInteractions()).toBe(false);
+    });
+  });
+
+  describe("smoothingEnabled", () => {
+    it("returns self.smoothing when annotation.names is empty", () => {
+      const store = createStore();
+      const image = store.annotation.image;
+      expect(image.smoothingEnabled).toBe(image.smoothing);
+    });
+  });
+
+  describe("rotate", () => {
+    it("updates rotation by -90 and recalculates zoom position", () => {
+      const store = createStore();
+      const image = store.annotation.image;
+      image.naturalWidth = 100;
+      image.naturalHeight = 80;
+      image.containerWidth = 200;
+      image.containerHeight = 160;
+      image.stageWidth = 100;
+      image.stageHeight = 80;
+      image.stageRatio = 1.25;
+      image.rotation = 0;
+      image.zoomingPositionX = 0;
+      image.zoomingPositionY = 0;
+      image.rotate(-90);
+      expect(image.rotation).toBe(270);
+    });
+
+    it("updates rotation by 90", () => {
+      const store = createStore();
+      const image = store.annotation.image;
+      image.naturalWidth = 100;
+      image.naturalHeight = 80;
+      image.containerWidth = 200;
+      image.containerHeight = 160;
+      image.stageWidth = 100;
+      image.stageHeight = 80;
+      image.stageRatio = 1.25;
+      image.rotation = 0;
+      image.zoomingPositionX = 0;
+      image.zoomingPositionY = 0;
+      image.rotate(90);
+      expect(image.rotation).toBe(90);
+    });
+  });
+
+  describe("setRefs", () => {
+    it("setImageRef setContainerRef setStageRef setOverlayRef do not throw", () => {
+      const store = createStore();
+      const image = store.annotation.image;
+      expect(() => image.setImageRef({})).not.toThrow();
+      expect(() => image.setContainerRef({ offsetWidth: 100, offsetHeight: 80 })).not.toThrow();
+      expect(() => image.setStageRef({ getAbsoluteTransform: () => ({}) })).not.toThrow();
+      expect(() => image.setOverlayRef({})).not.toThrow();
+    });
+  });
+
+  describe("onResize", () => {
+    it("calls _updateImageSize and sets sizeUpdated", () => {
+      const store = createStore();
+      const image = store.annotation.image;
+      const entity = image.findImageEntity(0);
+      entity.setNaturalWidth(100);
+      entity.setNaturalHeight(80);
+      image.onResize(200, 160, false);
+      expect(image.sizeUpdated).toBe(true);
+      expect(image.containerWidth).toBe(200);
+      expect(image.containerHeight).toBe(160);
+    });
+  });
+
+  describe("checkLabels", () => {
+    it("returns true when no label states", () => {
+      const store = createStoreWithStates([]);
+      expect(store.annotation.image.checkLabels()).toBe(true);
+    });
+  });
+
+  describe("event", () => {
+    it("calls getToolsManager().event with converted coords", () => {
+      const store = createStore();
+      const image = store.annotation.image;
+      image.stageRef = null;
+      image.event("click", { evt: { type: "click" } }, 50, 60);
+      expect(mockManager.event).toHaveBeenCalledWith(
+        "click",
+        expect.any(Object),
+        expect.any(Number),
+        expect.any(Number),
+        expect.any(Number),
+        expect.any(Number),
+      );
+    });
+  });
+
+  describe("handleZoom zoom to point", () => {
+    it("zooms to point when zoomScale > 1", () => {
+      const store = createStore();
+      const image = store.annotation.image;
+      image.naturalWidth = 100;
+      image.naturalHeight = 100;
+      image.containerWidth = 200;
+      image.containerHeight = 200;
+      image.setZoom(2);
+      image.handleZoom(2.5, { x: 100, y: 100 }, false);
+      expect(image.currentZoom).toBeGreaterThan(2);
+    });
+  });
+
+  describe("selectedRegionsBBox", () => {
+    it("returns undefined when no selected regions", () => {
+      const store = createStore();
+      expect(store.annotation.image.selectedRegionsBBox).toBeUndefined();
     });
   });
 });
