@@ -23,11 +23,12 @@ Importantly, this allows you to continue leveraging Label Studio's annotation ma
 | name | string | — | Unique identifier for the tag (required) |
 | [toName] | string | — | If this is a [self-referencing tag](#Self-referencing-tag), this parameter is required and should match `name` |
 | [data] | string | — | The [task data](#Data-parameter), e.g., `data="$image"` or `data="$text"` |
-| [src] | string | — | URL to an external JavaScript file containing the React component code. Use this as an alternative to inline code. [See more below](#Using-the-src-attribute) |
 | [inputs] | string | — | Defines the JSON schema for the input data (`data`)  |
 | [outputs] | string | — | Defines the JSON schema for the [output](#Using-the-outputs-parameter)  |
+| [src] | string | — | URL to an external app to load inside the iframe (see [External app mode](#External-app-mode-src)). Supports task data interpolation, e.g. `src="$app_url"` |
 | [style] | string | — | Inline styles or CSS string for the iframe container  |
 | [classname] | string | — | Additional CSS classes for the wrapper  |
+| [allow] | string | — | iframe permissions policy, e.g. `allow="microphone *; camera *"` |
 
 ## ReactCode tag usage notes
 
@@ -67,37 +68,7 @@ function MyComponent({ React, addRegion, regions, data }) {
 }
 ```
 
-### Using the `src` attribute
 
-By default, you write your React component code inline, directly inside the `<ReactCode>` tag (typically wrapped in a [CDATA section](#CDATA-wrapper)). The `src` attribute provides an alternative approach: instead of embedding the code in the labeling configuration, you can host it at an external URL and reference it.
-
-This works similarly to how a `<script src="...">` tag loads JavaScript from an external file in HTML.
-
-```xml
-<!-- Instead of inline code... -->
-<ReactCode name="custom" toName="custom" data="$myData">
-  <![CDATA[
-  function MyComponent({ React, addRegion, regions, data }) {
-    // ... your code here
-  }
-  ]]>
-</ReactCode>
-
-<!-- ...you can reference an external file -->
-<ReactCode name="custom" toName="custom" data="$myData" src="https://example.com/my-component.js" />
-```
-
-The external JavaScript file should export a function component with the same signature as inline code (receiving `React`, `addRegion`, `regions`, `data`, and `viewState` as props).
-
-**When to use `src`:**
-
-- Your component code is large or complex and difficult to manage inside XML
-- You want to version and maintain your UI code in a separate repository
-- You want to reuse the same component across multiple labeling projects
-- You prefer developing in a standard IDE workflow (edit, deploy, reference)
-
-!!! note
-    When the `src` attribute is provided, any inline code inside the `<ReactCode>` tag is ignored. The component is loaded entirely from the external URL.
 
 ## React usage notes
 
@@ -142,7 +113,6 @@ You can use:
 - **Tailwind CSS classes**: Pre-loaded in the iframe
 - **Inline styles**: Via the `style` prop in `React.createElement()`
 - **External CSS**: Load via CDN in your component
-
 
 ## Regions API
 
@@ -252,6 +222,213 @@ Regions created with `ReactCode` follow Label Studio's standard format:
 ```
 
 The `value.reactcode` property contains whatever data you passed to `addRegion()`.
+
+## External app mode (`src`)
+
+Instead of writing inline React code, you can load a full standalone web application via the `src` parameter. The app can use any framework, build system, or libraries — it is not limited to React. It communicates with Label Studio via `window.postMessage()`.
+
+```xml
+<View>
+  <ReactCode name="map" src="http://localhost:3000/index.html" style='{"height":"600px"}' />
+</View>
+```
+
+The `src` value can be a static URL or it can be a variable read from task data (e.g. `src="$app_url"`).
+
+### When to use `src` mode
+
+| Criteria | Inline code | External `src` |
+|---|---|---|
+| Setup complexity | Zero — just XML | App must be hosted by URL |
+| Framework | React only (no JSX) | Anything (React, Vue, vanilla JS, etc.) |
+| Build tools | None | Optional (Vite, webpack, etc.) |
+| Dependencies | Loaded dynamically via CDN | Loaded however you want |
+| Best for | Forms, tables, simple UIs | Maps, canvases, complex visualizations |
+| Debugging | Harder (eval-based code) | Standard browser devtools |
+| Versioning | No built-in versioning; maintain by updating XML config | Easier to manage versions with your standard development tools (e.g., Git) |
+
+### Communication protocol
+
+Your app runs inside an iframe. Label Studio communicates with it via `postMessage()`. The lifecycle is:
+
+1. Label Studio creates the iframe with your URL
+2. Your app loads and sends `{ type: "ready" }` to the parent
+3. Label Studio responds with `{ type: "init", tag, data, regions, viewState }`
+4. Your app renders the UI using the received data and regions
+5. Ongoing bidirectional messages keep regions and view state in sync
+
+#### Messages from Label Studio to your app
+
+| Message | Fields | When sent |
+|---|---|---|
+| `init` | `tag`, `data`, `code`*, `regions`, `viewState` | After your app sends `ready` |
+| `update` | `tag`, `data?`, `regions?`, `viewState?` | Task or annotation switch (pooled iframe reuse) |
+| `regions` | `tag`, `regions` | Regions changed (add/remove/select/update) |
+| `viewState` | `tag`, `viewState` | Dark mode toggle, screen context change |
+
+\* `code` is an empty string in `src` mode — ignore it.
+
+#### Messages from your app to Label Studio
+
+| Message | Fields | Purpose |
+|---|---|---|
+| `ready` | _(none)_ | Signals the app is loaded, triggers `init` |
+| `addRegion` | `tag`, `value`, `extraData?` | Create a new region |
+| `updateRegion` | `tag`, `id`, `value` | Update an existing region's value |
+| `deleteRegion` | `tag`, `id` | Delete a region |
+| `selectRegions` | `tag`, `ids` | Select regions in Label Studio's labeling interface |
+
+!!! warning Important
+    All outgoing messages must include `tag` (received during `init`). Label Studio uses it to route messages to the correct ReactCode instance.
+
+#### Data shapes
+
+**`regions` array** (received from Label Studio):
+```javascript
+[
+  {
+    id: "abc123",
+    value: { /* your custom payload */ },
+    selected: false,    // selected in the labeling interface
+    hidden: false,      // hidden via eye icon
+    locked: false,      // locked via lock icon
+    origin: "manual",   // "manual" | "prediction" | "prediction-changed"
+  }
+]
+```
+
+**`viewState` object**:
+```javascript
+{
+  currentScreen: "quick_view",  // "quick_view" | "label_stream" | "review_stream" | "side_by_side"
+  darkMode: false,
+}
+```
+
+**`extraData` in `addRegion`** (optional):
+```javascript
+{ displayText: "Human-readable label for the labeling interface" }
+```
+
+### Minimal `src` app template
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ReactCode src app</title>
+</head>
+<body>
+  <div id="app">Loading…</div>
+
+  <script>
+    let tagName = null;
+    let regions = [];
+
+    function post(msg) {
+      window.parent.postMessage({ ...msg, tag: tagName }, "*");
+    }
+
+    window.addEventListener("message", (e) => {
+      if (tagName && e.data.tag && e.data.tag !== tagName) return;
+
+      switch (e.data.type) {
+        case "init":
+          tagName = e.data.tag;
+          initApp(e.data.data, e.data.regions, e.data.viewState);
+          break;
+        case "update":
+          if (e.data.data !== undefined) updateData(e.data.data);
+          if (e.data.regions) reconcileRegions(e.data.regions);
+          if (e.data.viewState) updateViewState(e.data.viewState);
+          break;
+        case "regions":
+          reconcileRegions(e.data.regions);
+          break;
+        case "viewState":
+          updateViewState(e.data.viewState);
+          break;
+      }
+    });
+
+    function initApp(data, initialRegions, viewState) {
+      if (!data) return;  // data can be null during pool warm-up
+      // Initialize your app with task data, render existing regions
+    }
+    function updateData(data) { /* handle new task data */ }
+    function reconcileRegions(newRegions) {
+      regions = newRegions;
+      // Reconcile your visual elements with the new regions array
+    }
+    function updateViewState(viewState) { /* e.g. toggle dark mode */ }
+
+    // Signal readiness — triggers init from Label Studio
+    window.parent.postMessage({ type: "ready" }, "*");
+  </script>
+</body>
+</html>
+```
+
+### Handling null `data`
+
+During initialization (and especially with iframe pooling), `data` may be `null` briefly before the real task data arrives. Your app should guard against this:
+
+```javascript
+function initApp(data, initialRegions, viewState) {
+  if (!data) return;  // wait for real data
+  // ... set up your app
+}
+```
+
+### Testing locally
+
+During development, you need to make your local app accessible to Label Studio (which runs on HTTPS). A local `http://localhost` URL won't work because browsers block HTTP iframes inside HTTPS pages (mixed content).
+
+**Step 1: Serve your app locally**
+
+```bash
+# From your app directory
+npx serve -l 3000
+```
+
+Alternatives: `python3 -m http.server 3000`, `npx http-server -p 3000`, or any dev server (Vite, webpack-dev-server).
+
+**Step 2: Expose it via an HTTPS tunnel**
+
+```bash
+# In another terminal
+ngrok http 3000
+```
+
+ngrok outputs a public HTTPS URL like `https://abc123.ngrok-free.app`. Use that in your config:
+
+```xml
+<ReactCode name="myapp" src="https://abc123.ngrok-free.app/index.html" style='{"height":"600px"}' />
+```
+
+Alternatives to ngrok: `cloudflared tunnel --url http://localhost:3000` (Cloudflare Tunnel, no account needed), `npx localtunnel --port 3000`.
+
+!!! note
+    For production, deploy your app to any static hosting (Vercel, Netlify, S3, GitHub Pages, etc.) and use the permanent HTTPS URL.
+
+### Region reconciliation
+
+When Label Studio sends a `regions` update, your app must reconcile its visual state. This is the most important pattern for `src` apps:
+
+1. **Remove** visuals for regions no longer in the array (deleted)
+2. **Hide** visuals for regions with `hidden: true`
+3. **Create** visuals for new region IDs
+4. **Update** position/value for existing regions that changed
+5. **Focus/highlight** regions with `selected: true`
+
+!!! warning Important
+    Never modify local state optimistically when adding regions. Always post `addRegion` to the parent and wait for the `regions` update. Label Studio assigns the region ID and is the source of truth.
+
+### Handling task and annotation switches
+
+When a user switches tasks or annotations, Label Studio may send an `update` message instead of destroying and recreating the iframe. Your app must handle this by reinitializing its state with the new data and regions. Always handle both `init` and `update` message types.
 
 ## Using the `outputs` parameter 
 
