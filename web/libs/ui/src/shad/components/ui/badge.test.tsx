@@ -59,6 +59,8 @@ describe("badgeVariants", () => {
   it("returns variant-specific classes", () => {
     expect(badgeVariants({ variant: "secondary" })).toMatch(/secondary/);
     expect(badgeVariants({ variant: "success" })).toMatch(/positive|success/);
+    expect(badgeVariants({ variant: "warning" })).toMatch(/warning/);
+    expect(badgeVariants({ variant: "info" })).toMatch(/primary|accent-grape|info/);
     expect(badgeVariants({ variant: "outline" })).toMatch(/outline|neutral/);
     expect(badgeVariants({ variant: "beta" })).toMatch(/plum|beta/);
   });
