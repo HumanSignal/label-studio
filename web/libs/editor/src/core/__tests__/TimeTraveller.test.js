@@ -120,9 +120,30 @@ describe("TimeTraveller", () => {
       root.timeTraveller.safeUnfreeze("k");
       expect(root.timeTraveller.isFrozen).toBe(false);
     });
+
+    it("unfreeze then addUndoState appends (replace flag was reset)", () => {
+      const { root, store } = createRoot();
+      root.timeTraveller.freeze("k");
+      root.timeTraveller.unfreeze("k");
+      addHistoryStates(root.timeTraveller, [{ value: 1 }, { value: 2 }]);
+      root.timeTraveller.undo();
+      root.timeTraveller.setReplaceNextUndoState(true);
+      root.timeTraveller.addUndoState({ value: 99 });
+      expect(root.timeTraveller.history.length).toBe(2);
+      root.timeTraveller.set(1);
+      expect(store.value).toBe(99);
+    });
   });
 
   describe("setSkipNextUndoState / setReplaceNextUndoState", () => {
+    it("setSkipNextUndoState(false) allows next addUndoState to record", () => {
+      const { root, store } = createRoot();
+      addHistoryStates(root.timeTraveller, [{ value: 1 }]);
+      root.timeTraveller.setSkipNextUndoState(false);
+      applySnapshot(store, { value: 2 });
+      expect(root.timeTraveller.history.length).toBe(3);
+    });
+
     it("setSkipNextUndoState prevents next addUndoState from recording", () => {
       const { root, store } = createRoot();
       addHistoryStates(root.timeTraveller, [{ value: 1 }]);
@@ -153,6 +174,14 @@ describe("TimeTraveller", () => {
       root.timeTraveller.recordNow();
       expect(root.timeTraveller.history.length).toBe(before + 1);
     });
+
+    it("recordNow updates lastAdditionTime", () => {
+      const { root, store } = createRoot();
+      const before = root.timeTraveller.lastAdditionTime.getTime();
+      applySnapshot(store, { value: 1 });
+      root.timeTraveller.recordNow();
+      expect(root.timeTraveller.lastAdditionTime.getTime()).toBeGreaterThanOrEqual(before);
+    });
   });
 
   describe("onUpdate", () => {
@@ -179,6 +208,15 @@ describe("TimeTraveller", () => {
       expect(root.timeTraveller.history.length).toBe(len);
       root.timeTraveller.unfreeze("k");
     });
+
+    it("when not frozen and not skip appends and updates undoIdx and lastAdditionTime", () => {
+      const { root, store } = createRoot();
+      const beforeTime = root.timeTraveller.lastAdditionTime.getTime();
+      root.timeTraveller.addUndoState({ value: 1 });
+      expect(root.timeTraveller.history.length).toBe(2);
+      expect(root.timeTraveller.undoIdx).toBe(1);
+      expect(root.timeTraveller.lastAdditionTime.getTime()).toBeGreaterThanOrEqual(beforeTime);
+    });
   });
 
   describe("reinit", () => {
@@ -192,6 +230,15 @@ describe("TimeTraveller", () => {
       expect(root.timeTraveller.undoIdx).toBe(0);
       expect(root.timeTraveller.createdIdx).toBe(0);
       expect(handler).toHaveBeenCalledWith(true);
+    });
+
+    it("reinit(false) calls handlers with force false", () => {
+      const { root } = createRoot();
+      addHistoryStates(root.timeTraveller, [{ value: 1 }]);
+      const handler = jest.fn();
+      root.timeTraveller.onUpdate(handler);
+      root.timeTraveller.reinit(false);
+      expect(handler).toHaveBeenCalledWith(false);
     });
   });
 
@@ -210,6 +257,22 @@ describe("TimeTraveller", () => {
       const tt = TimeTraveller.create({}, env);
       expect(tt.history.length).toBe(1);
       expect(tt.createdIdx).toBe(0);
+    });
+
+    it("uses targetPath with resolvePath when targetPath is set", () => {
+      const RootWithPath = types.model("RootWithPath", {
+        store: TargetStore,
+        timeTraveller: TimeTraveller,
+      });
+      const root = RootWithPath.create({
+        store: { value: 0 },
+        timeTraveller: { targetPath: "../store" },
+      });
+      expect(root.timeTraveller.history.length).toBe(1);
+      expect(root.timeTraveller.createdIdx).toBe(0);
+      addHistoryStates(root.timeTraveller, [{ value: 1 }]);
+      root.timeTraveller.undo();
+      expect(root.store.value).toBe(0);
     });
   });
 
