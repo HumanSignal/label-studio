@@ -661,7 +661,9 @@ export const AppStore = types
       }
       // We don't want to show errors when loading data in polling mode
       // we will just allow it to try again later
-      if (result.error && result.status !== 404 && !signal.aborted && params.interaction !== "timer") {
+      const resultStatusCode =
+        result?.status ?? result?.$meta?.status ?? result?.response?.status ?? result?.response?.status_code;
+      if (result.error && resultStatusCode !== 404 && !signal.aborted && params.interaction !== "timer") {
         if (options?.errorHandler?.(result)) {
           return result;
         }
