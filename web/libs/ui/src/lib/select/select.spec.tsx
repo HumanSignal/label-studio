@@ -560,4 +560,252 @@ describe("Select Component", () => {
       expect(onChange).toHaveBeenCalled();
     });
   });
+
+  describe("SelectedItemsGroup disabled and deselect all", () => {
+    it("does not deselect when clicking option in selected group if disabled", async () => {
+      const onChange = jest.fn();
+      render(
+        <Select
+          options={["Apple", "Banana"] as any}
+          placeholder="Select"
+          multiple={true}
+          searchable={true}
+          isVirtualList={true}
+          disabled={true}
+          onChange={onChange}
+        />,
+      );
+      fireEvent.click(screen.getByRole("button"));
+      await waitFor(() => expect(screen.getByText("Apple")).toBeInTheDocument());
+      fireEvent.click(screen.getByText("Apple"));
+      fireEvent.click(screen.getByText("Banana"));
+      expect(onChange).not.toHaveBeenCalled();
+    });
+
+    it("deselects all when clicking deselect all checkbox in selected group", async () => {
+      const onChange = jest.fn();
+      render(
+        <Select
+          options={["Apple", "Banana", "Cherry"] as any}
+          placeholder="Select"
+          multiple={true}
+          searchable={true}
+          isVirtualList={true}
+          onChange={onChange}
+        />,
+      );
+      fireEvent.click(screen.getByRole("button"));
+      await waitFor(() => expect(screen.getByText("Apple")).toBeInTheDocument());
+      fireEvent.click(screen.getByText("Apple"));
+      fireEvent.click(screen.getByText("Banana"));
+      await waitFor(() => expect(screen.getByText("Selected items")).toBeInTheDocument());
+      const deselectAllCheckbox = screen.getByRole("checkbox", { name: /Deselect all items/i });
+      fireEvent.click(deselectAllCheckbox);
+      expect(onChange).toHaveBeenCalled();
+    });
+
+    it("collapses selected group when all items are deselected", async () => {
+      const onChange = jest.fn();
+      render(
+        <Select
+          options={["Apple", "Banana"] as any}
+          placeholder="Select"
+          multiple={true}
+          searchable={true}
+          isVirtualList={true}
+          onChange={onChange}
+        />,
+      );
+      fireEvent.click(screen.getByRole("button"));
+      await waitFor(() => expect(screen.getByText("Apple")).toBeInTheDocument());
+      fireEvent.click(screen.getByText("Apple"));
+      fireEvent.click(screen.getByText("Banana"));
+      await waitFor(() => expect(screen.getByText("Selected items")).toBeInTheDocument());
+      fireEvent.click(screen.getByRole("button", { name: /Selected items group/i }));
+      await waitFor(() => expect(screen.getByTestId("select-option-Apple")).toBeInTheDocument());
+      fireEvent.click(screen.getByTestId("select-option-Apple"));
+      fireEvent.click(screen.getByTestId("select-option-Banana"));
+      await waitFor(() => {
+        expect(screen.getByRole("button", { name: /Selected items group/i })).toHaveAttribute("aria-expanded", "false");
+      });
+    });
+  });
+
+  describe("Controlled value (externalValue)", () => {
+    it("syncs to external value when value prop changes", async () => {
+      const { rerender } = render(
+        <Select options={["Apple", "Banana", "Cherry"] as any} placeholder="Select" value="Apple" />,
+      );
+      expect(screen.getByText("Apple")).toBeInTheDocument();
+      rerender(<Select options={["Apple", "Banana", "Cherry"] as any} placeholder="Select" value="Banana" />);
+      await waitFor(() => expect(screen.getByText("Banana")).toBeInTheDocument());
+    });
+
+    it("syncs to external value object with value key", () => {
+      render(
+        <Select
+          options={["Apple", "Banana"] as any}
+          placeholder="Select"
+          value={{ value: "Apple", label: "Apple" } as any}
+        />,
+      );
+      expect(screen.getByText("Apple")).toBeInTheDocument();
+    });
+  });
+
+  describe("defaultSearchValue and open/close", () => {
+    it("restores defaultSearchValue when opening and resets when closing", async () => {
+      const onSearch = jest.fn();
+      render(
+        <Select
+          options={["Apple", "Banana"] as any}
+          placeholder="Select"
+          searchable={true}
+          defaultSearchValue="Ap"
+          onSearch={onSearch}
+        />,
+      );
+      fireEvent.click(screen.getByRole("button"));
+      await waitFor(() => expect(onSearch).toHaveBeenCalledWith("Ap"));
+      const searchInput = screen.getByTestId("select-search-field");
+      expect((searchInput as HTMLInputElement).value).toBe("Ap");
+      fireEvent.click(screen.getByText("Apple"));
+      fireEvent.click(screen.getByRole("button"));
+      await waitFor(() => {
+        expect((screen.getByTestId("select-search-field") as HTMLInputElement).value).toBe("");
+      });
+    });
+  });
+
+  describe("Option keyboard ArrowDown and ArrowUp", () => {
+    it("moves focus to next option on ArrowDown", async () => {
+      render(<Select options={["Apple", "Banana", "Cherry"] as any} placeholder="Select" />);
+      fireEvent.click(screen.getByRole("button"));
+      await waitFor(() => expect(screen.getByText("Apple")).toBeInTheDocument());
+      const first = screen.getByTestId("select-option-Apple");
+      first.focus();
+      fireEvent.keyDown(first, { key: "ArrowDown" });
+      expect(document.activeElement).toBe(screen.getByTestId("select-option-Banana"));
+    });
+
+    it("moves focus to previous option on ArrowUp", async () => {
+      render(<Select options={["Apple", "Banana", "Cherry"] as any} placeholder="Select" />);
+      fireEvent.click(screen.getByRole("button"));
+      await waitFor(() => expect(screen.getByText("Banana")).toBeInTheDocument());
+      const second = screen.getByTestId("select-option-Banana");
+      second.focus();
+      fireEvent.keyDown(second, { key: "ArrowUp" });
+      expect(document.activeElement).toBe(screen.getByTestId("select-option-Apple"));
+    });
+  });
+
+  describe("Single select with grouped options", () => {
+    it("renders group label as non-interactive header when not multiple", async () => {
+      const options = [
+        {
+          label: "Fruits",
+          children: [
+            { value: "a", label: "Apple" },
+            { value: "b", label: "Banana" },
+          ],
+        },
+      ];
+      render(<Select options={options as any} placeholder="Select" />);
+      fireEvent.click(screen.getByRole("button"));
+      await waitFor(() => expect(screen.getByText("Fruits")).toBeInTheDocument());
+      expect(screen.getByText("Fruits").tagName).toBe("DIV");
+    });
+  });
+
+  describe("selectedValueRenderer", () => {
+    it("uses selectedValueRenderer for each selected option in display", async () => {
+      const selectedValueRenderer = jest.fn((option: any) => (
+        <span data-testid="custom-label">{option?.label ?? option}</span>
+      ));
+      render(
+        <Select
+          options={["Apple", "Banana"] as any}
+          placeholder="Pick"
+          selectedValueRenderer={selectedValueRenderer as any}
+        />,
+      );
+      fireEvent.click(screen.getByRole("button"));
+      await waitFor(() => expect(screen.getByText("Apple")).toBeInTheDocument());
+      fireEvent.click(screen.getByText("Apple"));
+      expect(selectedValueRenderer).toHaveBeenCalled();
+      expect(screen.getByTestId("custom-label")).toBeInTheDocument();
+      expect(screen.getByTestId("custom-label").textContent).toBe("Apple");
+    });
+  });
+
+  describe("Trigger size and props", () => {
+    it("applies size small to trigger", () => {
+      render(<Select options={["A"] as any} placeholder="Select" size="small" />);
+      const trigger = screen.getByRole("button");
+      expect(trigger).toHaveClass("sizeSmall");
+    });
+
+    it("applies size large to trigger", () => {
+      render(<Select options={["A"] as any} placeholder="Select" size="large" />);
+      const trigger = screen.getByRole("button");
+      expect(trigger).toHaveClass("sizeLarge");
+    });
+
+    it("spreads triggerProps onto trigger", () => {
+      render(<Select options={["A"] as any} placeholder="Select" triggerProps={{ "data-foo": "bar" }} />);
+      expect(screen.getByRole("button").getAttribute("data-foo")).toBe("bar");
+    });
+  });
+
+  describe("Header", () => {
+    it("renders custom header when props.header provided", async () => {
+      render(
+        <Select
+          options={["Apple", "Banana"] as any}
+          placeholder="Select"
+          header={<div data-testid="custom-header">Custom header</div>}
+        />,
+      );
+      fireEvent.click(screen.getByRole("button"));
+      await waitFor(() => expect(screen.getByTestId("custom-header")).toBeInTheDocument());
+      expect(screen.getByText("Custom header")).toBeInTheDocument();
+    });
+  });
+
+  describe("searchFilter with empty query", () => {
+    it("calls custom searchFilter even with empty query when searchFilter provided", async () => {
+      const searchFilter = jest.fn(() => true);
+      render(
+        <Select
+          options={["Apple", "Banana"] as any}
+          placeholder="Select"
+          searchable={true}
+          searchFilter={searchFilter}
+        />,
+      );
+      fireEvent.click(screen.getByRole("button"));
+      await waitFor(() => expect(searchFilter).toHaveBeenCalled());
+    });
+  });
+
+  describe("onChange when disabled", () => {
+    it("does not call onChange when selecting and component is disabled", async () => {
+      const onChange = jest.fn();
+      render(<Select options={["Apple", "Banana"] as any} placeholder="Select" disabled={true} onChange={onChange} />);
+      const trigger = screen.getByRole("button");
+      expect(trigger).toBeDisabled();
+    });
+  });
+
+  describe("Native select and form", () => {
+    it("renders hidden native select with name and value for form submission", async () => {
+      render(<Select options={["Apple", "Banana"] as any} placeholder="Select" name="fruit" />);
+      fireEvent.click(screen.getByRole("button"));
+      await waitFor(() => expect(screen.getByText("Apple")).toBeInTheDocument());
+      fireEvent.click(screen.getByText("Apple"));
+      const nativeSelect = document.querySelector("select");
+      expect(nativeSelect).toBeInTheDocument();
+      expect(nativeSelect?.getAttribute("name")).toBe("fruit");
+    });
+  });
 });
