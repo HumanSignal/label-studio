@@ -15,9 +15,13 @@ jest.mock("keymaster", () => {
 
 import "../../tags/visual/View";
 import "../../tags/object/RichText";
+import "../../tags/object/Image/Image.js";
+import "../../tags/control/Rectangle.js";
 import AppStore from "../AppStore";
 
 const MINIMAL_CONFIG = `<View><Text name="t1" value="$text" /></View>`;
+
+const CONFIG_IMAGE_RECT = '<View><Image name="img" value="$img" /><Rectangle name="rect" toName="img" /></View>';
 
 const createTestEnv = () => ({
   events: {
@@ -47,6 +51,61 @@ function createStoreWithAnnotation(annotationSnapshot = {}) {
     result: [],
     ...annotationSnapshot,
   });
+  return { store, annotation: ann, env };
+}
+
+function createStoreWithOneRectRegion() {
+  const env = createTestEnv();
+  const task = {
+    id: 1,
+    data: JSON.stringify({ img: "https://example.com/img.jpg" }),
+  };
+  const store = AppStore.create(
+    {
+      config: CONFIG_IMAGE_RECT,
+      task,
+      interfaces: ["basic"],
+    },
+    env,
+  );
+  store.initializeStore({});
+  const rectResult = [
+    {
+      from_name: "rect",
+      to_name: "img",
+      type: "rectangle",
+      value: { x: 0, y: 0, width: 20, height: 20 },
+    },
+  ];
+  const ann = store.annotationStore.addAnnotation({ result: rectResult });
+  ann.deserializeResults(ann.versions.result);
+  return { store, annotation: ann, env };
+}
+
+function createStoreWithOneRectRegionViaInit() {
+  const env = createTestEnv();
+  const task = {
+    id: 1,
+    data: JSON.stringify({ img: "https://example.com/img.jpg" }),
+  };
+  const store = AppStore.create(
+    {
+      config: CONFIG_IMAGE_RECT,
+      task,
+      interfaces: ["basic"],
+    },
+    env,
+  );
+  const rectResult = [
+    {
+      from_name: "rect",
+      to_name: "img",
+      type: "rectangle",
+      value: { x: 0, y: 0, width: 20, height: 20 },
+    },
+  ];
+  store.initializeStore({ annotations: [{ result: rectResult }] });
+  const ann = store.annotationStore.selected;
   return { store, annotation: ann, env };
 }
 
@@ -358,6 +417,201 @@ describe("RegionStore", () => {
       const { annotation } = createStoreWithAnnotation();
       annotation.regionStore.clearSelection();
       expect(annotation.regionStore.selection.size).toBe(0);
+    });
+  });
+
+  describe("with one region", () => {
+    it("regions returns one area after deserializeResults", () => {
+      const { annotation } = createStoreWithOneRectRegion();
+      expect(annotation.regionStore.regions).toHaveLength(1);
+    });
+
+    it("sortedRegions returns one region", () => {
+      const { annotation } = createStoreWithOneRectRegion();
+      expect(annotation.regionStore.sortedRegions).toHaveLength(1);
+    });
+
+    it("regionIndexMap has one entry", () => {
+      const { annotation } = createStoreWithOneRectRegion();
+      const region = annotation.regionStore.regions[0];
+      const map = annotation.regionStore.regionIndexMap;
+      expect(Object.keys(map)).toHaveLength(1);
+      expect(map[region.id]).toBe(1);
+    });
+
+    it("selectNext selects first region when none selected", () => {
+      const { annotation } = createStoreWithOneRectRegion();
+      annotation.selectArea = jest.fn();
+      annotation.regionStore.selectNext();
+      expect(annotation.selectArea).toHaveBeenCalledWith(annotation.regionStore.regions[0]);
+    });
+
+    it("asTree returns one node with enrich", () => {
+      const { annotation } = createStoreWithOneRectRegion();
+      const enrich = (el, idx) => ({ id: el?.id ?? `e${idx}` });
+      const tree = annotation.regionStore.asTree(enrich);
+      expect(tree).toHaveLength(1);
+      expect(tree[0].item).toBe(annotation.regionStore.regions[0]);
+      expect(tree[0].isArea).toBe(true);
+    });
+
+    it("findRegion returns region by id", () => {
+      const { annotation } = createStoreWithOneRectRegion();
+      const region = annotation.regionStore.regions[0];
+      expect(annotation.regionStore.findRegion(region.id)).toBe(region);
+    });
+
+    it("filterByParentID returns regions with parentID", () => {
+      const { annotation } = createStoreWithOneRectRegion();
+      const region = annotation.regionStore.regions[0];
+      const withParent = annotation.regionStore.filterByParentID(region.parentID ?? "");
+      expect(Array.isArray(withParent)).toBe(true);
+    });
+
+    it("isAllHidden is false when region is not hidden", () => {
+      const { annotation } = createStoreWithOneRectRegion();
+      expect(annotation.regionStore.isAllHidden).toBe(false);
+    });
+
+    it("toggleVisibility toggles region hidden state", () => {
+      const { annotation } = createStoreWithOneRectRegion();
+      const region = annotation.regionStore.regions[0];
+      const wasHidden = region.hidden;
+      annotation.regionStore.toggleVisibility();
+      expect(region.hidden).toBe(!wasHidden);
+    });
+
+    it("setSort by score then date changes sort", () => {
+      const { annotation } = createStoreWithOneRectRegion();
+      annotation.regionStore.setSort("score");
+      expect(annotation.regionStore.sort).toBe("score");
+      annotation.regionStore.setSort("date");
+      expect(annotation.regionStore.sort).toBe("date");
+    });
+
+    it("setFilteredRegions with same length clears filter", () => {
+      const { annotation } = createStoreWithOneRectRegion();
+      annotation.updateAppearenceFromState = jest.fn();
+      const regions = annotation.regionStore.regions;
+      annotation.regionStore.setFilteredRegions(regions);
+      expect(annotation.regionStore.filter).toBe(null);
+      expect(annotation.updateAppearenceFromState).toHaveBeenCalled();
+    });
+
+    it("asLabelsTree with one region returns no-label group", () => {
+      const { annotation } = createStoreWithOneRectRegion();
+      const enrich = (el, idx, isGroup) => ({ id: isGroup ? `g${idx}` : `r${idx}` });
+      const tree = annotation.regionStore.asLabelsTree(enrich);
+      expect(tree.length).toBeGreaterThanOrEqual(1);
+      expect(tree.some((n) => n.isGroup)).toBe(true);
+    });
+
+    it("asTypeTree with one region returns type group", () => {
+      const { annotation } = createStoreWithOneRectRegion();
+      const enrich = (el, idx, isGroup) => ({ id: isGroup ? `g${idx}` : `r${idx}` });
+      const tree = annotation.regionStore.asTypeTree(enrich);
+      expect(tree).toHaveLength(1);
+      expect(tree[0].isGroup).toBe(true);
+      expect(tree[0].children).toHaveLength(1);
+      expect(tree[0].children[0].item).toBe(annotation.regionStore.regions[0]);
+    });
+
+    it("sortedRegions with mediaStartTime sort returns regions", () => {
+      const { annotation } = createStoreWithOneRectRegion();
+      annotation.regionStore.setSort("mediaStartTime");
+      const sorted = annotation.regionStore.sortedRegions;
+      expect(sorted).toHaveLength(1);
+      expect(sorted[0]).toBe(annotation.regionStore.regions[0]);
+    });
+
+    it("sortedRegions with score sort uses region score", () => {
+      const { annotation } = createStoreWithOneRectRegion();
+      annotation.regionStore.setSort("score");
+      expect(annotation.regionStore.sortedRegions).toHaveLength(1);
+    });
+
+    it("setHiddenByTool toggles hidden for matching type", () => {
+      const { annotation } = createStoreWithOneRectRegion();
+      const region = annotation.regionStore.regions[0];
+      const wasHidden = region.hidden;
+      annotation.regionStore.setHiddenByTool(!wasHidden, { type: "rectangleregion" });
+      expect(region.hidden).toBe(!wasHidden);
+    });
+
+    it("sortedRegions with sortOrder desc returns one region", () => {
+      const { annotation } = createStoreWithOneRectRegion();
+      annotation.regionStore.setSort("date");
+      const orderAfterFirst = annotation.regionStore.sortOrder;
+      annotation.regionStore.toggleSortOrder();
+      expect(annotation.regionStore.sortOrder).toBe(orderAfterFirst === "asc" ? "desc" : "asc");
+      expect(annotation.regionStore.sortedRegions).toHaveLength(1);
+    });
+
+    it("selection.drawingSelect and drawingUnselect work with real region", () => {
+      const { annotation } = createStoreWithOneRectRegion();
+      const region = annotation.regionStore.regions[0];
+      annotation.regionStore.selection.drawingSelect(region);
+      expect(annotation.regionStore.selection.drawingSelected.size).toBe(1);
+      annotation.regionStore.selection.drawingUnselect();
+      expect(annotation.regionStore.selection.drawingSelected.size).toBe(0);
+    });
+
+    it("selection.keys and selection.list reflect selected", () => {
+      const { annotation } = createStoreWithOneRectRegion();
+      expect(annotation.regionStore.selection.keys).toEqual([]);
+      expect(annotation.regionStore.selection.list).toEqual([]);
+    });
+
+    it("setHiddenByLabel does not throw when region has no labeling", () => {
+      const { annotation } = createStoreWithOneRectRegion();
+      const mockLabel = { id: "l1" };
+      expect(() => annotation.regionStore.setHiddenByLabel(true, mockLabel)).not.toThrow();
+    });
+
+    it("setRegionVisible reveals target and hides others", () => {
+      const { annotation } = createStoreWithOneRectRegion();
+      const region = annotation.regionStore.regions[0];
+      const normalizedId = annotation.regionStore.normalizeRegionID(region.id);
+      annotation.regionStore.setRegionVisible(normalizedId);
+      expect(region.hidden).toBe(false);
+    });
+
+    it("via init: regions and highlight work when annotation selected at init", () => {
+      const { annotation } = createStoreWithOneRectRegionViaInit();
+      expect(annotation.regionStore.regions).toHaveLength(1);
+      const region = annotation.regionStore.regions[0];
+      annotation.regionStore.highlight(region);
+      expect(annotation.regionStore.selection.highlighted).toBe(region);
+      expect(annotation.regionStore.hasSelection).toBe(true);
+    });
+
+    it("via init: toggleSelection selects and unselects region", () => {
+      const { annotation } = createStoreWithOneRectRegionViaInit();
+      const region = annotation.regionStore.regions[0];
+      annotation.regionStore.toggleSelection(region, true);
+      expect(annotation.regionStore.isSelected(region)).toBe(true);
+      annotation.regionStore.toggleSelection(region, false);
+      expect(annotation.regionStore.isSelected(region)).toBe(false);
+    });
+
+    it("via init: selectRegionByID and selectRegionsByIds select region", () => {
+      const { annotation } = createStoreWithOneRectRegionViaInit();
+      const region = annotation.regionStore.regions[0];
+      annotation.regionStore.selectRegionByID(region.id);
+      expect(annotation.regionStore.isSelected(region)).toBe(true);
+      annotation.regionStore.clearSelection();
+      annotation.regionStore.selectRegionsByIds([region.id]);
+      expect(annotation.regionStore.isSelected(region)).toBe(true);
+    });
+
+    it("via init: clearSelection clears selected region", () => {
+      const { annotation } = createStoreWithOneRectRegionViaInit();
+      const region = annotation.regionStore.regions[0];
+      annotation.regionStore.highlight(region);
+      expect(annotation.regionStore.selection.size).toBe(1);
+      annotation.regionStore.clearSelection();
+      expect(annotation.regionStore.selection.size).toBe(0);
+      expect(annotation.regionStore.hasSelection).toBe(false);
     });
   });
 });
