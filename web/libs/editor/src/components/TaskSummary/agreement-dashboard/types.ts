@@ -11,12 +11,46 @@
 
 /** Full response from GET /api/tasks/{task_id}/summary/ */
 export interface TaskSummaryResponse {
-  /** OSS base fields */
+  task: TaskMeta;
   total_annotations: number;
+  total_predictions: number;
+  annotations: SummaryAnnotation[];
   distributions: Record<string, DistributionEntry>;
 
   /** LSE extension: dimension agreement (empty object when unavailable) */
   agreement: TaskAgreementResult | Record<string, never>;
+}
+
+export interface TaskMeta {
+  id: number;
+  agreement: number | null;
+}
+
+export interface SummaryAnnotation {
+  id: number;
+  type: "annotation" | "prediction";
+  user: SummaryUser | null;
+  result: RawResult[];
+  ground_truth: boolean;
+  lead_time: number | null;
+  reviews: { accepted: boolean }[];
+  comments: { text: string | null; region_ref: Record<string, unknown> | null; classifications: unknown[] | null }[];
+}
+
+export interface SummaryUser {
+  id: number;
+  email: string;
+  first_name: string;
+  last_name: string;
+}
+
+/** A single labeling result item as returned by the API */
+export interface RawResult {
+  from_name: string;
+  to_name: string;
+  type: string;
+  value: Record<string, unknown>;
+  [key: string]: unknown;
 }
 
 export interface DistributionEntry {
@@ -26,34 +60,15 @@ export interface DistributionEntry {
   count?: number;
 }
 
-/** Lightweight review info attached to an annotation */
-export interface AnnotationReviewMeta {
-  accepted: boolean;
-}
-
-/** Lightweight comment summary attached to an annotation */
-export interface AnnotationCommentMeta {
-  text: string | null;
-  region_ref: Record<string, unknown> | null;
-  classifications: unknown[] | null;
-}
-
-/** Per-annotation metadata (excludes heavy result/history fields) */
-export interface AnnotationMeta {
-  id: number;
-  ground_truth: boolean;
-  lead_time: number | null;
-  reviews: AnnotationReviewMeta[];
-  comments: AnnotationCommentMeta[];
-}
-
 /** Serialized from dimensions.pipeline.types.TaskAgreementResult */
 export interface TaskAgreementResult {
   dimension_results: DimensionMatchResult[];
   aggregation: AggregationResult;
   annotator_ids: number[];
-  /** Per-annotation metadata aligned with annotator_ids (optional) */
-  annotations_meta?: AnnotationMeta[];
+  /** Annotation database IDs aligned with annotator_ids. Used to look up
+   *  the full SummaryAnnotation (with reviews, ground_truth, etc.) from
+   *  the top-level annotations list. */
+  annotation_ids?: number[];
   /** Added by LseTaskSummaryAPI: dimension_id -> metadata */
   dimension_meta: Record<number, DimensionMeta>;
 }
@@ -94,6 +109,8 @@ export interface DimensionMeta {
   /** Whether this dimension produces categorical (primitive/scalar) values.
    *  Determined server-side from the control_tag type. */
   is_categorical: boolean;
+  /** All available labels defined in the labeling config for categorical dims. */
+  labels?: string[];
 }
 
 // ---------------------------------------------------------------------------
@@ -144,6 +161,8 @@ export interface DimensionInfo {
   values: (string | number | boolean | null)[] | null;
   /** N×N scores matrix */
   scores: number[][];
+  /** All available labels defined in the labeling config (only for categorical) */
+  labels?: string[];
 }
 
 /** Annotator info resolved from annotations prop */
@@ -185,4 +204,13 @@ export interface GroundTruthCell {
   dimensionId: number;
   value: string | number | boolean | null;
   source: GroundTruthSource;
+}
+
+/** An existing ground truth annotation detected from the summary API */
+export interface ExistingGroundTruth {
+  annotationId: number;
+  annotatorIndex: number;
+  /** User ID of the annotator who completed the GT annotation. */
+  completedBy: number | null;
+  cells: Map<number, GroundTruthCell>;
 }

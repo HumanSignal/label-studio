@@ -239,7 +239,10 @@ class TestTaskSummaryAPI(APITestCase):
         data = response.json()
 
         assert data['total_annotations'] == 0
+        assert data['total_predictions'] == 0
         assert data['distributions'] == {}
+        assert data['annotations'] == []
+        assert data['task']['id'] == self.task.id
 
     @pytest.mark.usefixtures('fflag_fix_all_fit_720_lazy_load_annotations_on')
     def test_summary_endpoint_with_labels(self):

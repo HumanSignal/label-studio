@@ -425,12 +425,23 @@ class TaskAPI(generics.RetrieveUpdateDestroyAPIView):
         'This is an efficient endpoint that avoids N+1 queries.',
         responses={
             '200': OpenApiResponse(
-                description='Label distribution data',
+                description='Task summary payload',
                 examples=[
                     OpenApiExample(
                         name='response',
                         value={
-                            'total_annotations': 100,
+                            'task': {'id': 42, 'agreement': 85.5},
+                            'total_annotations': 2,
+                            'total_predictions': 1,
+                            'annotations': [
+                                {
+                                    'id': 123,
+                                    'type': 'annotation',
+                                    'user': {'id': 10, 'email': 'user@example.com',
+                                             'first_name': 'Alice', 'last_name': 'Smith'},
+                                    'result': [],
+                                },
+                            ],
                             'distributions': {
                                 'label': {
                                     'type': 'rectanglelabels',
@@ -474,13 +485,16 @@ class TaskSummaryAPI(generics.RetrieveAPIView):
         if not task.project.has_permission(request.user):
             raise PermissionDenied('You do not have permission to view this task')
 
-        # Get all annotations for this task with their results in a single query
-        annotations = Annotation.objects.filter(
-            task=task,
-            was_cancelled=False,
-        ).values_list('result', flat=True)
+        # Fetch annotations with user info for the summary panel
+        annotation_objs = list(
+            Annotation.objects.filter(task=task, was_cancelled=False)
+            .select_related('completed_by')
+            .only('id', 'result', 'ground_truth', 'lead_time',
+                  'completed_by__id', 'completed_by__email',
+                  'completed_by__first_name', 'completed_by__last_name')
+        )
 
-        total_annotations = len(annotations)
+        total_annotations = len(annotation_objs)
         distributions = {}
 
         def merge_result_into_distributions(result):
@@ -544,15 +558,14 @@ class TaskSummaryAPI(generics.RetrieveAPIView):
                             distributions[from_name]['labels'][selected] = 0
                         distributions[from_name]['labels'][selected] += 1
 
-        # Process annotation results
-        for result in annotations:
-            merge_result_into_distributions(result)
+        for ann in annotation_objs:
+            merge_result_into_distributions(ann.result)
 
         # Include prediction results in distribution counts so aggregate matches
         # client-side (develop / FF off). total_annotations stays annotation count only.
         predictions = Prediction.objects.filter(task=task).values_list('result', flat=True)
+        total_predictions = len(predictions)
         for result in predictions:
-            # Prediction.result can be list (same as annotation) or dict
             if isinstance(result, list):
                 merge_result_into_distributions(result)
 
@@ -561,12 +574,41 @@ class TaskSummaryAPI(generics.RetrieveAPIView):
             if dist['values']:
                 dist['average'] = sum(dist['values']) / len(dist['values'])
                 dist['count'] = len(dist['values'])
-            # Remove raw values from response to keep it lightweight
             del dist['values']
+
+        def _serialize_user(user):
+            if user is None:
+                return None
+            return {
+                'id': user.id,
+                'email': user.email,
+                'first_name': user.first_name,
+                'last_name': user.last_name,
+            }
+
+        annotations_list = [
+            {
+                'id': ann.id,
+                'type': 'annotation',
+                'user': _serialize_user(ann.completed_by),
+                'result': ann.result or [],
+                'ground_truth': ann.ground_truth,
+                'lead_time': ann.lead_time,
+                'reviews': [],
+                'comments': [],
+            }
+            for ann in annotation_objs
+        ]
 
         return Response(
             {
+                'task': {
+                    'id': task.id,
+                    'agreement': getattr(task, 'agreement', None),
+                },
                 'total_annotations': total_annotations,
+                'total_predictions': total_predictions,
+                'annotations': annotations_list,
                 'distributions': distributions,
             }
         )

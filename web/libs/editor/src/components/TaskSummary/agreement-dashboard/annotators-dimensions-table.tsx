@@ -10,12 +10,33 @@
  */
 
 import { useMemo } from "react";
+import { flexRender, getCoreRowModel, useReactTable, createColumnHelper } from "@tanstack/react-table";
 import { cnm, Tooltip, Userpic } from "@humansignal/ui";
 import { IconAnnotationGroundTruth, IconCheckAlt, IconCrossAlt } from "@humansignal/icons";
-import { computeMajorityVote, isConflict } from "./agreement-utils";
+import { computeMajorityVote } from "./agreement-utils";
 import { GroundTruthRow } from "./ground-truth-row";
-import type { AnnotationMeta, AnnotatorInfo, DimensionInfo, DimensionScore, GroundTruthCell, GroundTruthSource, MajorityVoteResult } from "./types";
+import { ResizeHandler } from "../ResizeHandler";
+import type { AnnotatorInfo, DimensionInfo, DimensionScore, GroundTruthCell, GroundTruthSource, MajorityVoteResult, SummaryAnnotation } from "./types";
 import type { ValueCount } from "./use-ground-truth";
+
+// ---------------------------------------------------------------------------
+// Helpers
+// ---------------------------------------------------------------------------
+
+function formatMetricType(metricType: string): string {
+  return metricType
+    .split("_")
+    .map((w) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
+    .join(" ");
+}
+
+// ---------------------------------------------------------------------------
+// Table row type (annotator rows only — special rows rendered manually)
+// ---------------------------------------------------------------------------
+
+interface AnnotatorRow {
+  annotator: AnnotatorInfo;
+}
 
 // ---------------------------------------------------------------------------
 // Props
@@ -24,8 +45,9 @@ import type { ValueCount } from "./use-ground-truth";
 interface AnnotatorsDimensionsTableProps {
   dimensions: DimensionInfo[];
   annotators: AnnotatorInfo[];
-  /** Optional per-annotation metadata aligned with annotators (ground truth, review, comments) */
-  annotationsMeta?: AnnotationMeta[];
+  /** Per-row annotation data aligned with annotators (by index). Provides
+   *  ground_truth, reviews, comments, and the annotation ID for click handling. */
+  annotationForRow?: (SummaryAnnotation | null)[];
   /** Called when a row is clicked with the annotation's database ID (pk) */
   onAnnotationClick?: (annotationId: number) => void;
   /** Optional per-dimension scores to render as agreement bars under the table */
@@ -36,6 +58,16 @@ interface AnnotatorsDimensionsTableProps {
   groundTruthValueCounts?: Map<number, ValueCount[]>;
   onSetGroundTruthCell?: (dimensionId: number, value: string | number | boolean | null, source?: GroundTruthSource) => void;
   onClearGroundTruthCell?: (dimensionId: number) => void;
+  /** When set, the annotator at this index is excluded from regular rows
+   *  (used to hide a ground_truth annotation that is shown in the GT row instead). */
+  excludeAnnotatorIndex?: number;
+  /** Display name of the annotator who completed the existing GT annotation. */
+  groundTruthAnnotatorName?: string;
+  /** Pre-computed cells from an existing GT annotation — used to show a
+   *  read-only GT row when Ground Truth Mode is off. */
+  existingGtCells?: Map<number, GroundTruthCell>;
+  /** Whether the GT row represents a saved annotation or an unsaved draft. */
+  groundTruthStatus?: "draft" | "saved";
 }
 
 // ---------------------------------------------------------------------------
@@ -45,7 +77,7 @@ interface AnnotatorsDimensionsTableProps {
 export const AnnotatorsDimensionsTable = ({
   dimensions,
   annotators,
-  annotationsMeta,
+  annotationForRow,
   onAnnotationClick,
   dimensionScores,
   groundTruthActive,
@@ -53,8 +85,11 @@ export const AnnotatorsDimensionsTable = ({
   groundTruthValueCounts,
   onSetGroundTruthCell,
   onClearGroundTruthCell,
+  excludeAnnotatorIndex,
+  groundTruthAnnotatorName,
+  existingGtCells,
+  groundTruthStatus,
 }: AnnotatorsDimensionsTableProps) => {
-  // Build a lookup from dimensionId -> score for the footer bars
   const scoreMap = useMemo(() => {
     if (!dimensionScores) return null;
     const map = new Map<number, number>();
@@ -63,7 +98,15 @@ export const AnnotatorsDimensionsTable = ({
     }
     return map;
   }, [dimensionScores]);
-  // Pre-compute majority vote for each dimension
+
+  const displayAnnotators = useMemo(
+    () =>
+      excludeAnnotatorIndex !== undefined
+        ? annotators.filter((a) => a.index !== excludeAnnotatorIndex)
+        : annotators,
+    [annotators, excludeAnnotatorIndex],
+  );
+
   const majorityVotes = useMemo<Map<number, MajorityVoteResult>>(() => {
     const map = new Map<number, MajorityVoteResult>();
     for (const dim of dimensions) {
@@ -73,6 +116,56 @@ export const AnnotatorsDimensionsTable = ({
     }
     return map;
   }, [dimensions]);
+
+  // ---------------------------------------------------------------------------
+  // TanStack Table — columns + resize
+  // ---------------------------------------------------------------------------
+
+  const tableData = useMemo<AnnotatorRow[]>(
+    () => displayAnnotators.map((annotator) => ({ annotator })),
+    [displayAnnotators],
+  );
+
+  const columns = useMemo(() => {
+    const helper = createColumnHelper<AnnotatorRow>();
+    return [
+      helper.display({
+        id: "annotator",
+        header: "Annotator",
+        size: 180,
+        minSize: 160,
+      }),
+      ...dimensions.map((dim) =>
+        helper.display({
+          id: `dim-${dim.dimensionId}`,
+          header: () => (
+            <div className="flex items-center gap-tight">
+              <span>{dim.name}</span>
+              {dim.controlTag && (
+                <span className="bg-primary-background text-primary-content rounded px-tight h-5 flex items-center justify-center border border-primary-border-subtler text-label-smallest font-normal">
+                  {dim.controlTag}
+                </span>
+              )}
+            </div>
+          ),
+          size: 160,
+          minSize: 120,
+        }),
+      ),
+    ];
+  }, [dimensions]);
+
+  const table = useReactTable({
+    data: tableData,
+    columns,
+    getCoreRowModel: getCoreRowModel(),
+    columnResizeMode: "onChange",
+    enableColumnResizing: true,
+    defaultColumn: { minSize: 120 },
+  });
+
+  /** Returns the current rendered size of a column by its ID. */
+  const getColSize = (id: string): number => table.getColumn(id)?.getSize() ?? 120;
 
   if (dimensions.length === 0 || annotators.length === 0) {
     return (
@@ -91,40 +184,31 @@ export const AnnotatorsDimensionsTable = ({
       >
         {/* Header */}
         <thead className="sticky top-0 z-10">
-          <tr>
-            {/* Annotator column header */}
-            <th
-              className="px-4 py-2.5 text-left whitespace-nowrap font-semibold text-label-small bg-neutral-surface border-b border-r border-neutral-border sticky left-0 z-20"
-              style={{ minWidth: 160 }}
-            >
-              Annotator
-            </th>
-            {/* Dimension column headers */}
-            {dimensions.map((dim) => (
-              <th
-                key={dim.dimensionId}
-                className="px-4 py-2.5 text-left whitespace-nowrap font-semibold text-label-small bg-neutral-surface border-b border-neutral-border"
-                style={{ minWidth: 120 }}
-              >
-                <div className="flex items-center gap-tight">
-                  <span>{dim.name}</span>
-                  {dim.controlTag && (
-                    <span className="bg-primary-background text-primary-content rounded px-tight h-5 flex items-center justify-center border border-primary-border-subtler text-label-smallest font-normal">
-                      {dim.controlTag}
-                    </span>
+          {table.getHeaderGroups().map((headerGroup) => (
+            <tr key={headerGroup.id}>
+              {headerGroup.headers.map((header, i) => (
+                <th
+                  key={header.id}
+                  className={cnm(
+                    "px-4 py-2.5 text-left whitespace-nowrap font-semibold text-label-small bg-neutral-surface border-b border-neutral-border relative",
+                    i === 0 && "border-r sticky left-0 z-20",
                   )}
-                </div>
-              </th>
-            ))}
-          </tr>
+                  style={{ minWidth: header.getSize() }}
+                >
+                  {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
+                  <ResizeHandler header={header} />
+                </th>
+              ))}
+            </tr>
+          ))}
         </thead>
 
         <tbody>
           {/* Annotator rows */}
-          {annotators.map((annotator, rowIndex) => {
+          {displayAnnotators.map((annotator, rowIndex) => {
             const isEvenRow = rowIndex % 2 === 0;
-            const meta = annotationsMeta?.[annotator.index];
-            const lastReview = meta?.reviews?.length ? meta.reviews[meta.reviews.length - 1] : null;
+            const ann = annotationForRow?.[annotator.index];
+            const lastReview = ann?.reviews?.length ? ann.reviews[ann.reviews.length - 1] : null;
 
             const reviewBadge = lastReview ? (
               <div
@@ -147,13 +231,13 @@ export const AnnotatorsDimensionsTable = ({
               </div>
             ) : null;
 
-            const isClickable = !!(meta?.id && onAnnotationClick);
+            const isClickable = !!(ann?.id && onAnnotationClick);
 
             return (
               <tr
                 key={annotator.id}
                 className={cnm("group", isClickable && "cursor-pointer")}
-                onClick={isClickable ? () => onAnnotationClick(meta.id) : undefined}
+                onClick={isClickable ? () => onAnnotationClick(ann.id) : undefined}
               >
                 {/* Annotator name cell */}
                 <td
@@ -161,9 +245,9 @@ export const AnnotatorsDimensionsTable = ({
                     "px-4 py-2.5 align-middle border-r border-neutral-border sticky left-0 z-10",
                     isEvenRow ? "bg-neutral-surface" : "bg-neutral-background",
                     "group-hover:bg-neutral-surface-hover",
-                    rowIndex < annotators.length - 1 && "border-b border-neutral-border-subtle",
+                    rowIndex < displayAnnotators.length - 1 && "border-b border-neutral-border-subtle",
                   )}
-                  style={{ minWidth: 160 }}
+                  style={{ minWidth: getColSize("annotator") }}
                 >
                   <div className="flex gap-tight items-center">
                     <Userpic
@@ -171,7 +255,7 @@ export const AnnotatorsDimensionsTable = ({
                       badge={reviewBadge ? { bottomRight: reviewBadge } : undefined}
                     />
                     <span className="text-label-small font-medium flex-1 truncate">{annotator.displayName}</span>
-                    {meta?.ground_truth && (
+                    {ann?.ground_truth && (
                       <Tooltip title="Ground Truth">
                         <span className="flex-shrink-0" style={{ color: "var(--canteloupe_400)" }}>
                           <IconAnnotationGroundTruth />
@@ -183,7 +267,6 @@ export const AnnotatorsDimensionsTable = ({
 
                 {/* Value cells */}
                 {dimensions.map((dim) => {
-                  // Non-categorical dimensions have no displayable per-annotator values
                   if (!dim.isCategorical) {
                     return (
                       <td
@@ -192,8 +275,9 @@ export const AnnotatorsDimensionsTable = ({
                           "px-4 py-2.5 align-middle text-label-small text-neutral-content-subtler italic transition-colors",
                           isEvenRow ? "bg-neutral-surface" : "bg-neutral-background",
                           "group-hover:bg-neutral-surface-hover",
-                          rowIndex < annotators.length - 1 && "border-b border-neutral-border-subtle",
+                          rowIndex < displayAnnotators.length - 1 && "border-b border-neutral-border-subtle",
                         )}
+                        style={{ minWidth: getColSize(`dim-${dim.dimensionId}`) }}
                       >
                         N/A
                       </td>
@@ -201,9 +285,22 @@ export const AnnotatorsDimensionsTable = ({
                   }
 
                   const value = dim.values?.[annotator.index] ?? null;
+                  const gtCell = groundTruthCells?.get(dim.dimensionId);
                   const majority = majorityVotes.get(dim.dimensionId);
-                  const conflict = majority ? isConflict(value, majority) : false;
+
+                  const referenceValue = gtCell ? gtCell.value : majority?.value ?? null;
+                  const conflict = referenceValue !== null
+                    ? (value === null || String(value) !== String(referenceValue))
+                    : false;
                   const displayValue = value !== null ? String(value) : "—";
+
+                  const conflictTooltip = conflict
+                    ? gtCell
+                      ? `Ground truth: ${String(gtCell.value)}. This annotator chose: ${displayValue}`
+                      : majority
+                        ? `Majority: ${String(majority.value)} (${majority.count}/${majority.total}). This annotator chose: ${displayValue}`
+                        : undefined
+                    : undefined;
 
                   return (
                     <td
@@ -212,18 +309,13 @@ export const AnnotatorsDimensionsTable = ({
                         "px-4 py-2.5 align-middle text-label-small transition-colors",
                         isEvenRow ? "bg-neutral-surface" : "bg-neutral-background",
                         "group-hover:bg-neutral-surface-hover",
-                        rowIndex < annotators.length - 1 && "border-b border-neutral-border-subtle",
-                        conflict
-                          ? "bg-negative-background text-negative-content border-negative-border-subtle"
-                          : value !== null
-                            ? "bg-positive-background text-positive-content"
-                            : "",
+                        rowIndex < displayAnnotators.length - 1 && "border-b border-neutral-border-subtle",
+                        conflict && "bg-negative-background text-negative-content border-negative-border-subtle",
                       )}
+                      style={{ minWidth: getColSize(`dim-${dim.dimensionId}`) }}
                     >
-                      {conflict && majority ? (
-                        <Tooltip
-                          title={`Majority: ${String(majority.value)} (${majority.count}/${majority.total}). This annotator chose: ${displayValue}`}
-                        >
+                      {conflictTooltip ? (
+                        <Tooltip title={conflictTooltip}>
                           <span className="cursor-default">{displayValue}</span>
                         </Tooltip>
                       ) : (
@@ -236,14 +328,16 @@ export const AnnotatorsDimensionsTable = ({
             );
           })}
 
-          {/* Per-dimension agreement bars */}
+          {/* Per-dimension annotator agreement scores */}
           {scoreMap && (
             <tr>
               <td
                 className="px-4 py-2 align-middle text-label-small font-semibold text-neutral-content bg-neutral-background border-t-2 border-r border-neutral-border-bold sticky left-0 z-10"
-                style={{ minWidth: 160 }}
+                style={{ minWidth: getColSize("annotator") }}
               >
-                Agreement
+                <Tooltip title="Inter-annotator agreement (excludes the ground truth annotation)">
+                  <span className="cursor-default">Annotator Agreement</span>
+                </Tooltip>
               </td>
               {dimensions.map((dim) => {
                 const score = scoreMap.get(dim.dimensionId);
@@ -252,29 +346,29 @@ export const AnnotatorsDimensionsTable = ({
                     <td
                       key={dim.dimensionId}
                       className="px-4 py-2 align-middle text-label-small bg-neutral-background border-t-2 border-neutral-border-bold text-neutral-content-subtler italic"
+                      style={{ minWidth: getColSize(`dim-${dim.dimensionId}`) }}
                     >
                       —
                     </td>
                   );
                 }
-                const pct = (score * 100).toFixed(0);
+                const pct = score * 100;
+                const colorClass =
+                  pct < 60 ? "text-negative-content"
+                    : pct < 80 ? "text-warning-content"
+                      : "text-positive-content";
+                const metricLabel = formatMetricType(dim.metricType);
+                const cellTooltip = `${dim.name}: ${pct.toFixed(1)}% — ${metricLabel} agreement between ${displayAnnotators.length} annotators`;
                 return (
                   <td
                     key={dim.dimensionId}
                     className="px-4 py-2 align-middle bg-neutral-background border-t-2 border-neutral-border-bold"
+                    style={{ minWidth: getColSize(`dim-${dim.dimensionId}`) }}
                   >
-                    <Tooltip title={`${dim.name}: ${(score * 100).toFixed(1)}% agreement`}>
-                      <div className="relative w-full h-5 rounded-smallest overflow-hidden bg-negative-background">
-                        {/* Green fill for agreement portion */}
-                        <div
-                          className="absolute inset-y-0 left-0 bg-positive-background transition-all"
-                          style={{ width: `${score * 100}%` }}
-                        />
-                        {/* Percentage label centered inside the bar */}
-                        <span className="absolute inset-0 flex items-center justify-center text-label-smallest font-semibold text-neutral-content">
-                          {pct}%
-                        </span>
-                      </div>
+                    <Tooltip title={cellTooltip}>
+                      <span className={cnm("text-label-small font-semibold cursor-default", colorClass)}>
+                        {pct.toFixed(0)}%
+                      </span>
                     </Tooltip>
                   </td>
                 );
@@ -286,19 +380,19 @@ export const AnnotatorsDimensionsTable = ({
           <tr>
             <td
               className="px-4 py-2.5 align-middle font-semibold text-label-small bg-neutral-surface border-t border-r border-neutral-border sticky left-0 z-10"
-              style={{ minWidth: 160 }}
+              style={{ minWidth: getColSize("annotator") }}
             >
               <Tooltip title="Most common answer across all annotators, including conflicts and empty responses">
                 <span className="cursor-default">Majority Vote</span>
               </Tooltip>
             </td>
             {dimensions.map((dim) => {
-              // Non-categorical dimensions don't have majority vote
               if (!dim.isCategorical) {
                 return (
                   <td
                     key={dim.dimensionId}
                     className="px-4 py-2.5 align-middle text-label-small bg-neutral-surface border-t border-neutral-border text-neutral-content-subtler italic"
+                    style={{ minWidth: getColSize(`dim-${dim.dimensionId}`) }}
                   >
                     N/A
                   </td>
@@ -311,6 +405,7 @@ export const AnnotatorsDimensionsTable = ({
                   <td
                     key={dim.dimensionId}
                     className="px-4 py-2.5 align-middle text-label-small bg-neutral-surface border-t border-neutral-border text-neutral-content-subtler"
+                    style={{ minWidth: getColSize(`dim-${dim.dimensionId}`) }}
                   >
                     —
                   </td>
@@ -321,6 +416,7 @@ export const AnnotatorsDimensionsTable = ({
                 <td
                   key={dim.dimensionId}
                   className="px-4 py-2.5 align-middle text-label-small font-semibold bg-neutral-surface border-t border-neutral-border"
+                  style={{ minWidth: getColSize(`dim-${dim.dimensionId}`) }}
                 >
                   <div className="flex items-center gap-tight">
                     <span>{String(majority.value)}</span>
@@ -336,16 +432,32 @@ export const AnnotatorsDimensionsTable = ({
             })}
           </tr>
 
-          {/* Ground Truth row (only in Ground Truth Mode) */}
-          {groundTruthActive && groundTruthCells && groundTruthValueCounts && onSetGroundTruthCell && onClearGroundTruthCell && (
+          {/* Ground Truth row — editable in GT mode, read-only when a GT annotation exists */}
+          {groundTruthActive && groundTruthCells && groundTruthValueCounts && onSetGroundTruthCell && onClearGroundTruthCell ? (
             <GroundTruthRow
               dimensions={dimensions}
               cells={groundTruthCells}
               valueCounts={groundTruthValueCounts}
               onSetCell={onSetGroundTruthCell}
               onClearCell={onClearGroundTruthCell}
+              annotatorName={groundTruthAnnotatorName}
+              status={groundTruthStatus}
+              readOnly={groundTruthStatus === "saved"}
+              getColSize={getColSize}
             />
-          )}
+          ) : existingGtCells && existingGtCells.size > 0 ? (
+            <GroundTruthRow
+              dimensions={dimensions}
+              cells={existingGtCells}
+              valueCounts={new Map()}
+              onSetCell={() => {}}
+              onClearCell={() => {}}
+              annotatorName={groundTruthAnnotatorName}
+              readOnly
+              status="saved"
+              getColSize={getColSize}
+            />
+          ) : null}
         </tbody>
       </table>
     </div>

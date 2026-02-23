@@ -285,6 +285,7 @@ export function buildDimensionInfoList(
       isCategorical: meta.is_categorical,
       values: dr.dimension_values,
       scores: dr.scores,
+      labels: meta.labels,
     };
   });
 }

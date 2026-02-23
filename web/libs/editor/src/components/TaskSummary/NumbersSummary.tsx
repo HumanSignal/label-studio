@@ -1,5 +1,5 @@
 import { Tooltip } from "@humansignal/ui";
-import { IconInfoOutline } from "@humansignal/icons";
+import { IconQuestionOutline } from "@humansignal/icons";
 
 type CardProps = {
   title: string;
@@ -9,16 +9,16 @@ type CardProps = {
 
 const Card = ({ title, value, info }: CardProps) => {
   return (
-    <div className="flex-1 border border-neutral-border rounded-small p-base bg-neutral-surface">
-      <div className="flex flex-row gap-tighter items-center text-xs font-semibold text-neutral-content-subtle uppercase tracking-wide mb-2">
+    <div className="flex-1 flex flex-col justify-between border border-neutral-border rounded-small px-base py-tight bg-neutral-background min-h-[104px] hover:bg-primary-emphasis-subtle hover:border-primary-border-subtlest transition-colors">
+      <div className="flex flex-row gap-tight items-center text-body-small font-medium text-neutral-content-subtler">
         {title}
         {info && (
-          <Tooltip title={info}>
-            <IconInfoOutline size={12} style={{ width: 16, height: 16 }} className="text-neutral-content-subtler" />
+          <Tooltip title={info} style={{ width: "300px", maxWidth: "none" }} interactive>
+            <IconQuestionOutline style={{ opacity: 0.5 }} width={14} height={14} />
           </Tooltip>
         )}
       </div>
-      <div className="text-headline-large font-bold text-neutral-content">{value}</div>
+      <div className="text-headline-large font-semibold text-neutral-content">{value}</div>
     </div>
   );
 };

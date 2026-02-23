@@ -306,7 +306,10 @@ class TestTaskSummaryAPI(APITestCase):
         assert response.status_code == 200
         data = response.json()
         assert data['total_annotations'] == 0
+        assert data['total_predictions'] == 0
         assert data['distributions'] == {}
+        assert data['annotations'] == []
+        assert data['task']['id'] == task.id
 
     @patch('tasks.api.flag_set')
     def test_distribution_with_rectanglelabels(self, mock_flag_set):
@@ -617,4 +620,5 @@ class TestTaskSummaryAPI(APITestCase):
         assert response.status_code == 200
         data = response.json()
         assert data['total_annotations'] == 1
+        assert data['total_predictions'] == 1
         assert data['distributions']['label']['labels'] == {'Car': 3}

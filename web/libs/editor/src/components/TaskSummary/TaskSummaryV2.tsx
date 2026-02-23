@@ -10,8 +10,7 @@
  * build ground truth annotations from the dashboard.
  */
 
-import { useCallback, useEffect, useMemo, type ReactNode } from "react";
-import { Toggle, Tooltip } from "@humansignal/ui";
+import { useCallback, useMemo } from "react";
 import type { MSTAnnotation, MSTControlTag, MSTStore } from "../../stores/types";
 import { DataSummary } from "./DataSummary";
 import { LabelingSummary } from "./LabelingSummary";
@@ -27,16 +26,16 @@ import { AgreementHeatmap } from "./agreement-dashboard/agreement-heatmap";
 import { DistributionViewer } from "./agreement-dashboard/distribution-viewer";
 import { ColumnPicker } from "./agreement-dashboard/column-picker";
 import { useTaskSummaryData } from "./agreement-dashboard/use-task-summary-data";
-import type { AgreementMethod, ConflictFilter, PanelId } from "./agreement-dashboard/types";
+import type { AgreementMethod, ExistingGroundTruth, GroundTruthCell, PanelId } from "./agreement-dashboard/types";
 import { PANEL_IDS } from "./agreement-dashboard/types";
 
 // Ground Truth Mode components
 import { useGroundTruth } from "./agreement-dashboard/use-ground-truth";
 import { ResolutionSummaryBar } from "./agreement-dashboard/resolution-summary-bar";
 import { openCommitGroundTruthDialog, commitGroundTruth } from "./agreement-dashboard/commit-ground-truth-dialog";
+import { openAutoReviewDialog } from "./agreement-dashboard/auto-review-dialog";
 
-// Task Data Dock (resizable panel above table in Ground Truth Mode)
-import { TaskDataDock } from "./task-data-dock";
+import { CollapsiblePanel } from "@humansignal/ui";
 
 // ---------------------------------------------------------------------------
 // Props (same as OSS)
@@ -70,26 +69,16 @@ const DashboardSkeleton = () => (
 );
 
 // ---------------------------------------------------------------------------
-// Fade-in wrapper for elements that appear on mode toggle
-// ---------------------------------------------------------------------------
-
-const FadeIn = ({ children, duration = 200 }: { children: ReactNode; duration?: number }) => (
-  <div style={{ animation: `fadeIn ${duration}ms ease-out` }}>
-    <style>{`@keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }`}</style>
-    {children}
-  </div>
-);
-
-// ---------------------------------------------------------------------------
 // Main Component
 // ---------------------------------------------------------------------------
 
 const TaskSummary = ({ annotations: all, store: annotationStore }: TaskSummaryProps) => {
-  const task = annotationStore.store.task;
+  const mstTask = annotationStore.store.task;
   const hideInfo = annotationStore.store.hasInterface("annotations:hide-info");
 
-  // skip unsubmitted drafts
-  const annotations = all.filter((a) => a.pk);
+  // MST annotations — kept only for navigation (pk -> MST id mapping)
+  // and the LabelingSummary fallback path
+  const mstAnnotations = all.filter((a) => a.pk);
   const allTags = [...annotationStore.names];
 
   // Annotation selection callback (for OSS fallback)
@@ -101,18 +90,18 @@ const TaskSummary = ({ annotations: all, store: annotationStore }: TaskSummaryPr
     }
   };
 
-  // Navigate to a specific annotation by its database pk
+  // Navigate to a specific annotation by its database pk (uses MST for navigation)
   const handleAnnotationClick = useCallback(
     (annotationPk: number) => {
-      const match = annotations.find((a) => String(a.pk) === String(annotationPk));
+      const match = mstAnnotations.find((a) => String(a.pk) === String(annotationPk));
       if (match) {
         annotationStore.selectAnnotation(match.id, { exitViewAll: true });
       }
     },
-    [annotations, annotationStore],
+    [mstAnnotations, annotationStore],
   );
 
-  // Build control tags (same as OSS)
+  // Build control tags for LabelingSummary fallback (same as OSS)
   const controlTags: [string, MSTControlTag][] = allTags.filter(([_, control]) => control.isControlTag) as [
     string,
     MSTControlTag,
@@ -162,20 +151,16 @@ const TaskSummary = ({ annotations: all, store: annotationStore }: TaskSummaryPr
   // Dashboard state (persisted in localStorage)
   // ---------------------------------------------------------------------------
 
+  // Use MST task id for initial hook call; once API responds, agreementData.task
+  // becomes the source of truth for task metadata.
+  const taskId = mstTask?.id;
+
   const [method, setMethod] = useLocalStorage<AgreementMethod>(
     "annotation_dashboard_agreement_method",
     "consensus",
   );
-  const [conflictFilter, setConflictFilter] = useLocalStorage<ConflictFilter>(
-    "annotation_dashboard_conflict_filter",
-    "all",
-  );
-  const [conflictsOnly, setConflictsOnly] = useLocalStorage<boolean>(
-    "annotation_dashboard_conflicts_only",
-    false,
-  );
   const [visibleColumnIds, setVisibleColumnIds] = useLocalStorage<number[] | null>(
-    `annotation_dashboard_columns_${task?.id}`,
+    `annotation_dashboard_columns_${taskId}`,
     null,
   );
   const [visiblePanels, setVisiblePanels] = useLocalStorage<PanelId[]>(
@@ -184,32 +169,16 @@ const TaskSummary = ({ annotations: all, store: annotationStore }: TaskSummaryPr
   );
 
   // ---------------------------------------------------------------------------
-  // Fetch and derive agreement data
+  // Fetch and derive agreement data (all read-only data comes from the API)
   // ---------------------------------------------------------------------------
 
   const agreementData = useTaskSummaryData({
-    taskId: task?.id,
+    taskId,
     method,
-    conflictFilter,
-    conflictsOnly,
+    conflictFilter: "custom",
     visibleColumnIds,
-    annotations,
     hideInfo,
   });
-
-  const nonCategoricalDimensions = useMemo(
-    () => agreementData.dimensions.filter((d) => !d.isCategorical),
-    [agreementData.dimensions],
-  );
-  const hasNonCategoricalDimensions = nonCategoricalDimensions.length > 0;
-
-  // "All dimensions" only makes sense when there are non-categorical dimensions.
-  // If persisted state points to it but there are no non-categorical dims, normalize.
-  useEffect(() => {
-    if (!hasNonCategoricalDimensions && conflictFilter === "all_dimensions") {
-      setConflictFilter("all");
-    }
-  }, [hasNonCategoricalDimensions, conflictFilter, setConflictFilter]);
 
   // Initialize visible columns to all categorical dimensions when first loaded
   const effectiveVisibleColumnIds = useMemo(() => {
@@ -222,56 +191,154 @@ const TaskSummary = ({ annotations: all, store: annotationStore }: TaskSummaryPr
   // ---------------------------------------------------------------------------
 
   const groundTruth = useGroundTruth({
-    taskId: task?.id,
-    dimensions: agreementData.filteredDimensions,
+    taskId,
+    dimensions: agreementData.categoricalDimensions,
     dimensionScores: agreementData.dimensionScores,
     annotators: agreementData.annotators,
   });
 
-  const groundTruthDisabledReason = useMemo(() => {
-    if (!hasNonCategoricalDimensions) {
-      return null;
+  // ---- Existing GT annotation detection ----
+  // Always detect an existing ground_truth annotation so we can pre-populate
+  // cells and preserve existing values unless explicitly overridden by the user.
+  const existingGtAnnotationIndex = useMemo(() => {
+    if (!agreementData.annotationForRow?.length) return undefined;
+    const idx = agreementData.annotationForRow.findIndex((a) => a?.ground_truth === true);
+    return idx >= 0 ? idx : undefined;
+  }, [agreementData.annotationForRow]);
+
+  const hasExistingGt = existingGtAnnotationIndex !== undefined;
+
+  const existingGtAnnotatorName = hasExistingGt
+    ? agreementData.annotators[existingGtAnnotationIndex]?.displayName
+    : undefined;
+
+  const existingGtCells = useMemo<Map<number, GroundTruthCell>>(() => {
+    const map = new Map<number, GroundTruthCell>();
+    if (existingGtAnnotationIndex === undefined) return map;
+    for (const dim of agreementData.categoricalDimensions) {
+      if (dim.values) {
+        const value = dim.values[existingGtAnnotationIndex];
+        if (value !== null && value !== undefined) {
+          map.set(dim.dimensionId, { dimensionId: dim.dimensionId, value, source: "manual" });
+        }
+      }
     }
+    return map;
+  }, [existingGtAnnotationIndex, agreementData.categoricalDimensions]);
 
-    const listed = nonCategoricalDimensions
-      .slice(0, 3)
-      .map((d) => `${d.name} (${d.controlTag || "unknown"})`)
-      .join(", ");
-    const suffix = nonCategoricalDimensions.length > 3 ? ", ..." : "";
-
-    return `Ground Truth Mode is only available for categorical dimensions. Current config includes non-categorical dimensions: ${listed}${suffix}`;
-  }, [hasNonCategoricalDimensions, nonCategoricalDimensions]);
-
-  // Auto-disable Ground Truth Mode if non-categorical dimensions are present.
-  useEffect(() => {
-    if (hasNonCategoricalDimensions && groundTruth.isActive) {
-      groundTruth.actions.toggleActive();
+  // Effective cells: existing GT annotation as base, user overrides (localStorage) on top
+  const effectiveGtCells = useMemo(() => {
+    if (!hasExistingGt) return groundTruth.cells;
+    const merged = new Map(existingGtCells);
+    for (const [dimId, cell] of groundTruth.cells) {
+      merged.set(dimId, cell);
     }
-  }, [hasNonCategoricalDimensions, groundTruth.isActive, groundTruth.actions]);
-  const isGroundTruthActive = !hasNonCategoricalDimensions && groundTruth.isActive;
+    return merged;
+  }, [hasExistingGt, existingGtCells, groundTruth.cells]);
+
+  const effectiveResolvedCount = useMemo(() => {
+    if (!hasExistingGt) return groundTruth.resolvedCount;
+    let count = 0;
+    for (const dim of agreementData.categoricalDimensions) {
+      if (effectiveGtCells.has(dim.dimensionId)) count++;
+    }
+    return count;
+  }, [hasExistingGt, groundTruth.resolvedCount, agreementData.categoricalDimensions, effectiveGtCells]);
+
+  const effectiveProgress = groundTruth.totalCount > 0 ? effectiveResolvedCount / groundTruth.totalCount : 0;
+  const effectiveIsComplete = groundTruth.totalCount > 0 && effectiveResolvedCount === groundTruth.totalCount;
+
+  const effectiveSummary = useMemo(() => {
+    if (!hasExistingGt) return groundTruth.summary;
+    let autoUnanimous = 0;
+    let autoMajority = 0;
+    let manual = 0;
+    for (const cell of effectiveGtCells.values()) {
+      switch (cell.source) {
+        case "auto_unanimous":
+          autoUnanimous++;
+          break;
+        case "auto_majority":
+          autoMajority++;
+          break;
+        case "manual":
+          manual++;
+          break;
+      }
+    }
+    return { autoUnanimous, autoMajority, manual, total: effectiveResolvedCount };
+  }, [hasExistingGt, groundTruth.summary, effectiveGtCells, effectiveResolvedCount]);
+
+  // "saved" = GT annotation exists with no local overrides
+  // "draft" = user has made local edits that aren't committed yet
+  // undefined = fresh empty state, no badge needed
+  const groundTruthStatus: "draft" | "saved" | undefined = useMemo(() => {
+    if (hasExistingGt && groundTruth.cells.size > 0) return "draft";
+    if (hasExistingGt) return "saved";
+    if (groundTruth.cells.size > 0) return "draft";
+    return undefined;
+  }, [hasExistingGt, groundTruth.cells.size]);
+
+  const handleAcceptAllMajority = useCallback(() => {
+    for (const dim of agreementData.categoricalDimensions) {
+      const majority = groundTruth.majorityVotes.get(dim.dimensionId);
+      if (majority && majority.value !== null) {
+        groundTruth.actions.setCell(dim.dimensionId, majority.value, "auto_majority");
+      }
+    }
+  }, [agreementData.categoricalDimensions, groundTruth.majorityVotes, groundTruth.actions]);
 
   const handleCreateGroundTruth = useCallback(() => {
-    if (!task?.id) return;
+    if (!taskId) return;
     openCommitGroundTruthDialog({
-      taskId: task.id,
-      cells: groundTruth.cells,
-      summary: groundTruth.summary,
-      annotations,
+      taskId,
+      cells: effectiveGtCells,
+      summary: effectiveSummary,
+      annotations: agreementData.summaryAnnotations,
       dimensions: agreementData.filteredDimensions,
       annotators: agreementData.annotators,
       onCommit: (payload) => {
         commitGroundTruth(payload, (newAnnotationId) => {
           groundTruth.actions.clearOnCommit();
-          // Exit "Compare All" mode (persisted in localStorage) so the reload opens in single-annotation view
           window.localStorage.setItem("annotation-store-viewing-all", "false");
-          // Reload the page so the DM re-fetches the task with the new annotation
           window.location.reload();
         }).catch((err) => {
           console.error("[Ground Truth] Commit failed:", err);
         });
       },
     });
-  }, [task?.id, groundTruth.cells, groundTruth.summary, groundTruth.actions, annotations, agreementData.filteredDimensions, agreementData.annotators]);
+  }, [taskId, effectiveGtCells, effectiveSummary, groundTruth.actions, agreementData.summaryAnnotations, agreementData.filteredDimensions, agreementData.annotators]);
+
+  const existingGtObject = useMemo<ExistingGroundTruth | null>(() => {
+    if (existingGtAnnotationIndex === undefined) return null;
+    const ann = agreementData.annotationForRow?.[existingGtAnnotationIndex];
+    if (!ann) return null;
+    return {
+      annotationId: ann.id,
+      annotatorIndex: existingGtAnnotationIndex,
+      completedBy: ann.user?.id ?? null,
+      cells: existingGtCells,
+    };
+  }, [existingGtAnnotationIndex, agreementData.annotationForRow, existingGtCells]);
+
+  const handleAutoReview = useCallback(() => {
+    if (!taskId || !existingGtObject) return;
+    openAutoReviewDialog({
+      taskId,
+      existingGt: existingGtObject,
+      annotations: mstAnnotations,
+      // Must use all categorical dimensions, never the UI-filtered subset.
+      // Column visibility is a display preference; hidden mismatches are still real.
+      dimensions: agreementData.categoricalDimensions,
+      // annotation_ids maps each position i to a unique annotation DB ID,
+      // letting the comparison logic avoid user-ID collisions (same user
+      // can appear multiple times in the agreement arrays).
+      annotationIds: agreementData.agreementResult?.annotation_ids ?? [],
+      onCommit: () => {
+        window.location.reload();
+      },
+    });
+  }, [taskId, existingGtObject, mstAnnotations, agreementData.categoricalDimensions, agreementData.agreementResult]);
 
   // ---------------------------------------------------------------------------
   // NumbersSummary values
@@ -280,30 +347,30 @@ const TaskSummary = ({ annotations: all, store: annotationStore }: TaskSummaryPr
   const summaryValues = useMemo(() => {
     const vals: { title: string; value: number | string; info: string }[] = [];
 
-    // Use agreement from the dashboard data when available, otherwise fall back to task.agreement
+    // Use agreement from the dashboard data when available, otherwise fall back to the API task.agreement
     if (agreementData.overallAgreement !== null) {
       vals.push({
         title: `Agreement (${method})`,
         value: `${(agreementData.overallAgreement * 100).toFixed(1)}%`,
         info: `Overall ${method} agreement across all dimensions`,
       });
-    } else if (typeof task?.agreement === "number") {
+    } else if (typeof agreementData.task?.agreement === "number") {
       vals.push({
         title: "Agreement",
-        value: `${Math.round(task.agreement * 100) / 100}%`,
+        value: `${Math.round(agreementData.task.agreement * 100) / 100}%`,
         info: "Overall agreement over all submitted annotations",
       });
     }
 
     vals.push({
       title: "Annotations",
-      value: annotations.filter((a) => a.type === "annotation").length,
+      value: agreementData.raw?.total_annotations ?? 0,
       info: "Number of submitted annotations. Table shows only submitted results, not current drafts.",
     });
 
     vals.push({
       title: "Predictions",
-      value: annotations.filter((a) => a.type === "prediction").length,
+      value: agreementData.raw?.total_predictions ?? 0,
       info: "Number of predictions. They are not included in the agreement calculation.",
     });
 
@@ -316,7 +383,7 @@ const TaskSummary = ({ annotations: all, store: annotationStore }: TaskSummaryPr
     }
 
     return vals;
-  }, [agreementData, method, task, annotations]);
+  }, [agreementData, method]);
 
   // ---------------------------------------------------------------------------
   // Panel visibility helpers
@@ -330,11 +397,8 @@ const TaskSummary = ({ annotations: all, store: annotationStore }: TaskSummaryPr
 
   return (
     <div>
-      {/* Header: Title + Numbers */}
-      <div className="mb-base">
-        <div className="flex items-center justify-between mt-base mb-tight">
-          <h2 className="text-headline-small font-semibold text-neutral-content">Task Summary</h2>
-        </div>
+      {/* Header: Numbers */}
+      <div className="mt-base mb-base">
         <NumbersSummary values={summaryValues} />
       </div>
 
@@ -353,72 +417,46 @@ const TaskSummary = ({ annotations: all, store: annotationStore }: TaskSummaryPr
 
           {/* Annotators × Dimensions Table (always visible) */}
           <section className="mb-base">
-            <div className="flex items-center justify-between mb-tight">
-              <Tooltip
-                title={
-                  groundTruthDisabledReason
-                  ?? (groundTruth.isActive
-                    ? "Exit Ground Truth Mode"
-                    : "Adjudicate and create ground truth annotations")
-                }
-              >
-                <span>
-                  <Toggle
-                    label="Ground Truth Mode"
-                    checked={isGroundTruthActive}
-                    onChange={() => {
-                      if (!hasNonCategoricalDimensions) {
-                        groundTruth.actions.toggleActive();
-                      }
-                    }}
-                    disabled={hasNonCategoricalDimensions}
-                  />
-                </span>
-              </Tooltip>
+            <div className="flex items-center justify-end mb-tight">
               <ColumnPicker
                 totalDimensionCount={agreementData.dimensions.length}
                 shownCount={agreementData.filteredDimensions.length}
                 allDimensions={agreementData.dimensions}
                 visibleColumnIds={effectiveVisibleColumnIds}
                 onVisibleColumnsChange={setVisibleColumnIds}
-                conflictFilter={conflictFilter}
-                onConflictFilterChange={setConflictFilter}
-                conflictsOnly={conflictsOnly}
-                onConflictsOnlyChange={setConflictsOnly}
-                hasNonCategoricalDimensions={hasNonCategoricalDimensions}
+                conflictingDimensionIds={agreementData.conflictingDimensionIds}
+                hasGroundTruth={hasExistingGt || groundTruth.cells.size > 0}
               />
             </div>
 
               <AnnotatorsDimensionsTable
                 dimensions={agreementData.filteredDimensions}
                 annotators={agreementData.annotators}
-                annotationsMeta={agreementData.agreementResult?.annotations_meta ?? undefined}
+                annotationForRow={agreementData.annotationForRow}
                 onAnnotationClick={handleAnnotationClick}
                 dimensionScores={agreementData.dimensionScores}
-                groundTruthActive={isGroundTruthActive}
-                groundTruthCells={groundTruth.cells}
+                groundTruthActive
+                groundTruthCells={effectiveGtCells}
                 groundTruthValueCounts={groundTruth.valueCounts}
                 onSetGroundTruthCell={groundTruth.actions.setCell}
                 onClearGroundTruthCell={groundTruth.actions.clearCell}
+                excludeAnnotatorIndex={existingGtAnnotationIndex}
+                groundTruthAnnotatorName={existingGtAnnotatorName}
+                existingGtCells={hasExistingGt ? existingGtCells : undefined}
+                groundTruthStatus={groundTruthStatus}
               />
 
-              {/* Resolution Summary Bar (Ground Truth Mode only) — below the table */}
-              {isGroundTruthActive && (
-                <FadeIn>
-                  <ResolutionSummaryBar
-                    resolvedCount={groundTruth.resolvedCount}
-                    totalCount={groundTruth.totalCount}
-                    progress={groundTruth.progress}
-                    unanimousCount={groundTruth.unanimousCount}
-                    isComplete={groundTruth.isComplete}
-                    summary={groundTruth.summary}
-                    getMajorityCandidates={groundTruth.getMajorityCandidates}
-                    onAutoAcceptUnanimous={groundTruth.actions.autoAcceptUnanimous}
-                    onAutoAcceptMajority={groundTruth.actions.autoAcceptMajority}
-                    onCreateGroundTruth={handleCreateGroundTruth}
-                  />
-                </FadeIn>
-              )}
+              <ResolutionSummaryBar
+                resolvedCount={effectiveResolvedCount}
+                totalCount={groundTruth.totalCount}
+                progress={effectiveProgress}
+                isComplete={effectiveIsComplete}
+                summary={effectiveSummary}
+                hasExistingGt={hasExistingGt}
+                onAcceptAllMajority={handleAcceptAllMajority}
+                onCreateGroundTruth={handleCreateGroundTruth}
+                onAutoReview={handleAutoReview}
+              />
             </section>
 
 
@@ -465,14 +503,14 @@ const TaskSummary = ({ annotations: all, store: annotationStore }: TaskSummaryPr
           )} */}
         </div>
       ) : (
-        /* OSS Fallback: LabelingSummary when no agreement data */
+        /* OSS Fallback: LabelingSummary when no agreement data (uses MST annotations) */
         <div className="mb-relaxed">
           <LabelingSummary
-            annotations={annotations}
+            annotations={mstAnnotations}
             controls={controls}
             onSelect={onSelect}
             hideInfo={hideInfo}
-            taskId={task?.id}
+            taskId={taskId}
           />
         </div>
       )}
@@ -485,11 +523,19 @@ const TaskSummary = ({ annotations: all, store: annotationStore }: TaskSummaryPr
         </div>
       )}
 
-      {/* Task Data Dock (collapsible, at the bottom) */}
+      {/* Task Data (collapsible, at the bottom) */}
       {agreementData.hasAgreementData && (
-        <TaskDataDock isEmpty={Object.keys(dataTypes).length === 0} dataTypes={dataTypes}>
-          <DataSummary data_types={dataTypes} />
-        </TaskDataDock>
+        <CollapsiblePanel title="Task Data" defaultExpanded={false} className="mb-base">
+          {Object.keys(dataTypes).length === 0 ? (
+            <div className="flex items-center justify-center py-relaxed text-neutral-content-subtle text-body-medium">
+              No task data available
+            </div>
+          ) : (
+            <div className="p-base">
+              <DataSummary data_types={dataTypes} />
+            </div>
+          )}
+        </CollapsiblePanel>
       )}
     </div>
   );
