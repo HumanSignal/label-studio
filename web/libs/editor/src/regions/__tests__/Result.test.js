@@ -7,8 +7,9 @@
  */
 import { types } from "mobx-state-tree";
 
+const mockIsFF = jest.fn(() => false);
 jest.mock("../../utils/feature-flags", () => ({
-  isFF: jest.fn(() => false),
+  isFF: (...args) => mockIsFF(...args),
   FF_LSDV_4583: "ff_lsdv_4583",
 }));
 
@@ -37,6 +38,7 @@ jest.mock("../../core/Registry", () => {
       strokewidth: t.maybeNull(t.number),
       fillopacity: t.maybeNull(t.number),
       opacity: t.maybeNull(t.number),
+      emptyLabel: t.optional(t.frozen(), () => null),
     })
     .views((self) => ({
       get findLabel() {
@@ -79,6 +81,7 @@ const MinimalArea = types
     id: types.identifier,
     results: types.array(Result),
     parentID: types.maybeNull(types.string),
+    item_index: types.optional(types.maybeNull(types.number), null),
   })
   .views((self) => ({
     get cleanId() {
@@ -93,6 +96,9 @@ const MinimalArea = types
     get origin() {
       return "manual";
     },
+    hasLabel() {
+      return false;
+    },
   }))
   .actions((self) => ({
     isReadOnly() {
@@ -103,9 +109,15 @@ const MinimalArea = types
     },
   }));
 
-const MinimalAnnotation = types.model("MinimalAnnotation", {
-  areas: types.array(MinimalArea),
-});
+const MinimalAnnotation = types
+  .model("MinimalAnnotation", {
+    areas: types.array(MinimalArea),
+  })
+  .views((self) => ({
+    get results() {
+      return self.areas.flatMap((a) => a.results);
+    },
+  }));
 
 const AnnotationStore = types.model("AnnotationStore", {
   selected: types.maybeNull(MinimalAnnotation),
@@ -117,7 +129,7 @@ const Root = types.model("Root", {
   annotationStore: types.optional(AnnotationStore, { selected: null }),
 });
 
-function createTree(resultSnapshot = {}, controlSnapshot = {}) {
+function createTree(resultSnapshot = {}, controlSnapshot = {}, areaSnapshot = {}, objectSnapshot = {}) {
   const defaultResult = {
     from_name: "c1",
     to_name: "o1",
@@ -130,13 +142,14 @@ function createTree(resultSnapshot = {}, controlSnapshot = {}) {
     id: "a1",
     results: [defaultResult],
     parentID: null,
+    ...areaSnapshot,
   };
   const annotation = {
     areas: [area],
   };
   return Root.create({
     control: { id: "c1", ...controlSnapshot },
-    object: { id: "o1" },
+    object: { id: "o1", ...objectSnapshot },
     annotationStore: { selected: annotation },
   });
 }
@@ -246,6 +259,13 @@ describe("Result", () => {
       const result = root.annotationStore.selected.areas[0].results[0];
       expect(result.mergeMainValue(123)).toBeNull();
     });
+
+    it("calls value.toJSON() when value has toJSON in mergeMainValue", () => {
+      const root = createTree({ value: { labels: ["A", "B"] } });
+      const result = root.annotationStore.selected.areas[0].results[0];
+      const valueWithToJSON = { toJSON: () => ["A", "B"] };
+      expect(result.mergeMainValue(valueWithToJSON)).toEqual(["A", "B"]);
+    });
   });
 
   describe("selectedLabels", () => {
@@ -262,6 +282,17 @@ describe("Result", () => {
       const result = root.annotationStore.selected.areas[0].results[0];
       expect(result.selectedLabels).toEqual([]);
     });
+
+    it("returns findLabel(null) when allowempty and mainValue length 0", () => {
+      const root = createTreeWithControl({ allowempty: true });
+      const result = root.annotationStore.selected.areas[0].results[0];
+      result.setValue([]);
+      const labels = result.selectedLabels;
+      expect(labels).toBeDefined();
+      const arr = Array.isArray(labels) ? labels : [labels];
+      expect(arr).toHaveLength(1);
+      expect(arr[0].background).toBe("#ccc");
+    });
   });
 
   describe("canBeSubmitted", () => {
@@ -273,6 +304,18 @@ describe("Result", () => {
 
     it("returns true when perregion and whenlabelvalue unset", () => {
       const root = createTreeWithControl({ perregion: true });
+      const result = root.annotationStore.selected.areas[0].results[0];
+      expect(result.canBeSubmitted).toBe(true);
+    });
+
+    it("returns false when perregion and whenlabelvalue set and area.hasLabel returns false", () => {
+      const root = createTreeWithControl({ perregion: true, whenlabelvalue: "NeedThis" });
+      const result = root.annotationStore.selected.areas[0].results[0];
+      expect(result.canBeSubmitted).toBe(false);
+    });
+
+    it("returns !isChoiceSelected() when visiblewhen is choice-unselected", () => {
+      const root = createTreeWithControl({ visiblewhen: "choice-unselected" });
       const result = root.annotationStore.selected.areas[0].results[0];
       expect(result.canBeSubmitted).toBe(true);
     });
@@ -309,6 +352,41 @@ describe("Result", () => {
         fillcolor: null,
         fillopacity: null,
         opacity: null,
+      });
+    });
+
+    it("style returns object when tag has background and parent has strokewidth/fillopacity/opacity", () => {
+      const root = createTreeWithControl({
+        strokewidth: 2,
+        fillopacity: 0.8,
+        opacity: 1,
+        fillcolor: "#f00",
+        strokecolor: "#00f",
+      });
+      const result = root.annotationStore.selected.areas[0].results[0];
+      expect(result.style).toEqual({
+        strokecolor: "#f00",
+        strokewidth: 2,
+        fillcolor: "#f00",
+        fillopacity: 0.8,
+        opacity: 1,
+      });
+    });
+
+    it("emptyStyle returns object when from_name.emptyLabel has background and parent", () => {
+      const root = createTreeWithControl({
+        emptyLabel: {
+          background: "#eee",
+          parent: { strokewidth: 1, fillopacity: 0.5, opacity: 1, strokecolor: "#000", fillcolor: "#ccc" },
+        },
+      });
+      const result = root.annotationStore.selected.areas[0].results[0];
+      expect(result.emptyStyle).toEqual({
+        strokecolor: "#eee",
+        strokewidth: 1,
+        fillcolor: "#eee",
+        fillopacity: 0.5,
+        opacity: 1,
       });
     });
 
@@ -362,7 +440,7 @@ describe("Result", () => {
   });
 
   describe("serialize", () => {
-    it("returns null when canBeSubmitted is false and area serializes", () => {
+    it("returns serialized data when canBeSubmitted is true and area serializes", () => {
       const root = createTree();
       const result = root.annotationStore.selected.areas[0].results[0];
       const data = result.serialize();
@@ -372,6 +450,74 @@ describe("Result", () => {
       expect(data.to_name).toBe("o1");
       expect(data.type).toBe("rectanglelabels");
       expect(data.value).toEqual({ labels: ["L1"] });
+    });
+
+    it("returns null when canBeSubmitted is false", () => {
+      const root = createTreeWithControl({ perregion: true, whenlabelvalue: "NeedThis" });
+      const result = root.annotationStore.selected.areas[0].results[0];
+      expect(result.canBeSubmitted).toBe(false);
+      expect(result.serialize()).toBeNull();
+    });
+
+    it("returns null when area.serialize returns null", () => {
+      const AreaNullSerialize = types
+        .model("AreaNullSerialize", {
+          id: types.identifier,
+          results: types.array(Result),
+          parentID: types.maybeNull(types.string),
+        })
+        .views((self) => ({
+          get cleanId() {
+            return self.id.replace(/#.*/, "");
+          },
+          get meta() {
+            return {};
+          },
+          get labels() {
+            return [];
+          },
+          get origin() {
+            return "manual";
+          },
+          hasLabel() {
+            return false;
+          },
+        }))
+        .actions(() => ({
+          isReadOnly() {
+            return false;
+          },
+          serialize() {
+            return null;
+          },
+        }));
+      const RootNullArea = types.model("RootNullArea", {
+        control: MinimalControl,
+        object: MinimalObject,
+        annotationStore: types.optional(
+          types.model({ selected: types.maybeNull(types.model("AnnNull", { areas: types.array(AreaNullSerialize) })) }),
+          { selected: null },
+        ),
+      });
+      const root = RootNullArea.create({
+        control: { id: "c1" },
+        object: { id: "o1" },
+        annotationStore: {
+          selected: {
+            areas: [
+              {
+                id: "a1",
+                results: [
+                  { from_name: "c1", to_name: "o1", type: "rectanglelabels", value: { labels: ["L1"] }, meta: {} },
+                ],
+                parentID: null,
+              },
+            ],
+          },
+        },
+      });
+      const result = root.annotationStore.selected.areas[0].results[0];
+      expect(result.serialize()).toBeNull();
     });
 
     it("includes score when set", () => {
@@ -476,6 +622,158 @@ describe("Result", () => {
       const result = root.annotationStore.selected.areas[0].results[0];
       const data = result.serialize();
       expect(data.meta).toEqual(expect.objectContaining({ lead_time: 1, areaMeta: 1 }));
+    });
+
+    it("returns null when to_name.mergeLabelsAndResults and type is labels", () => {
+      const root = createTree({ type: "labels", value: { labels: ["L1"] } }, {}, {}, { mergeLabelsAndResults: true });
+      const result = root.annotationStore.selected.areas[0].results[0];
+      expect(result.serialize()).toBeNull();
+    });
+
+    it("adds area.labels to data.value when to_name.mergeLabelsAndResults and type not labels and area has labels", () => {
+      const AreaWithLabels = types
+        .model("AreaWithLabels", {
+          id: types.identifier,
+          results: types.array(Result),
+          parentID: types.maybeNull(types.string),
+          labels: types.optional(types.array(types.string), []),
+        })
+        .views((self) => ({
+          get cleanId() {
+            return self.id.replace(/#.*/, "");
+          },
+          get meta() {
+            return {};
+          },
+          get origin() {
+            return "manual";
+          },
+          hasLabel() {
+            return false;
+          },
+        }))
+        .actions(() => ({
+          isReadOnly() {
+            return false;
+          },
+          serialize() {
+            return { value: {} };
+          },
+        }));
+      const RootMerge = types.model("RootMerge", {
+        control: MinimalControl,
+        object: MinimalObject,
+        annotationStore: types.optional(
+          types.model({ selected: types.maybeNull(types.model("AnnMerge", { areas: types.array(AreaWithLabels) })) }),
+          { selected: null },
+        ),
+      });
+      const root = RootMerge.create({
+        control: { id: "c1" },
+        object: { id: "o1", mergeLabelsAndResults: true },
+        annotationStore: {
+          selected: {
+            areas: [
+              {
+                id: "a1",
+                results: [
+                  {
+                    from_name: "c1",
+                    to_name: "o1",
+                    type: "textarea",
+                    value: { textarea: ["hi"] },
+                    meta: {},
+                  },
+                ],
+                labels: ["AreaLabel1"],
+              },
+            ],
+          },
+        },
+      });
+      const result = root.annotationStore.selected.areas[0].results[0];
+      const data = result.serialize();
+      expect(data).not.toBeNull();
+      expect(data.value.labels).toEqual(["AreaLabel1"]);
+    });
+
+    it("includes parentID when area.parentID is set", () => {
+      const root = createTree({}, {}, { parentID: "pid-123#suffix" });
+      const result = root.annotationStore.selected.areas[0].results[0];
+      const data = result.serialize();
+      expect(data.parentID).toBe("pid-123");
+    });
+
+    it("includes item_index when isFF(FF_LSDV_4583) and area.item_index is set", () => {
+      mockIsFF.mockImplementation((flag) => flag === "ff_lsdv_4583");
+      const root = createTree({}, {}, { item_index: 2 });
+      const result = root.annotationStore.selected.areas[0].results[0];
+      const data = result.serialize();
+      expect(data.item_index).toBe(2);
+      mockIsFF.mockReturnValue(false);
+    });
+
+    it("initializes data.value when area.serialize returns object without value", () => {
+      const AreaNoValue = types
+        .model("AreaNoValue", {
+          id: types.identifier,
+          results: types.array(Result),
+          parentID: types.maybeNull(types.string),
+        })
+        .views((self) => ({
+          get cleanId() {
+            return self.id.replace(/#.*/, "");
+          },
+          get meta() {
+            return {};
+          },
+          get labels() {
+            return [];
+          },
+          get origin() {
+            return "manual";
+          },
+          hasLabel() {
+            return false;
+          },
+        }))
+        .actions(() => ({
+          isReadOnly() {
+            return false;
+          },
+          serialize() {
+            return {};
+          },
+        }));
+      const RootNoValue = types.model("RootNoValue", {
+        control: MinimalControl,
+        object: MinimalObject,
+        annotationStore: types.optional(
+          types.model({ selected: types.maybeNull(types.model("AnnNoValue", { areas: types.array(AreaNoValue) })) }),
+          { selected: null },
+        ),
+      });
+      const root = RootNoValue.create({
+        control: { id: "c1" },
+        object: { id: "o1" },
+        annotationStore: {
+          selected: {
+            areas: [
+              {
+                id: "a1",
+                results: [
+                  { from_name: "c1", to_name: "o1", type: "rectanglelabels", value: { labels: ["L1"] }, meta: {} },
+                ],
+                parentID: null,
+              },
+            ],
+          },
+        },
+      });
+      const result = root.annotationStore.selected.areas[0].results[0];
+      const data = result.serialize();
+      expect(data).not.toBeNull();
+      expect(data.value).toEqual({ labels: ["L1"] });
     });
   });
 });
