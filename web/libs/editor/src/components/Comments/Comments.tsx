@@ -35,14 +35,22 @@ export const Comments: FC<{
   const lazyLoadEnabled = isFF(FF_FIT_720_LAZY_LOAD_ANNOTATIONS);
 
   const loadComments = async () => {
+    // Capture the current annotation id before the async call.
+    // The store tree can be replaced while awaiting, so avoid reading
+    // commentStore.annotation after await.
+    const annotationId = commentStore.annotation?.id;
+
     // It prevents blinking on opening comments tab for the same annotation when comments are already there
     const listCommentsOptions: any = { mounted, suppressClearComments: commentStore.isRelevantList };
     await commentStore.listComments(listCommentsOptions);
+
+    if (!mounted.current) return;
+
     if (!isFF(FF_DEV_3034)) {
       commentStore.restoreCommentsFromCache(cacheKey);
     }
     // Track that we loaded comments for this annotation (FIT-720)
-    lastLoadedAnnotationId.current = commentStore.annotation?.id;
+    lastLoadedAnnotationId.current = annotationId ?? null;
   };
 
   useEffect(() => {

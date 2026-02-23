@@ -21,6 +21,10 @@
       border-radius: var(--corner-radius-small);
     }
 
+    :global(.CodeMirror.dialog-opened) {
+      padding-top: 38px;
+    }
+
     :global(.CodeMirror-lines) {
       padding: var(--spacing-tight) 0;
     }

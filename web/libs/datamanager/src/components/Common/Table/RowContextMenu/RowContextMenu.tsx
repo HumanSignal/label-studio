@@ -15,6 +15,10 @@ export interface RowContextMenuProps {
   column?: any;
   /** DataManager view store for navigation */
   view: any;
+  /** API object from useSDK hook */
+  api?: any;
+  /** SDK type (e.g., "DE" for Data Explorer) */
+  sdkType?: string;
   /** LSE-only callback for viewing analytics */
   onViewAnalytics?: (row: any) => void;
   /** Cursor position for context menu (x, y coordinates) */
@@ -27,6 +31,8 @@ export const RowContextMenu: FC<RowContextMenuProps> = ({
   row,
   column,
   view,
+  api,
+  sdkType,
   onViewAnalytics,
   cursorPosition,
   onClose,
@@ -150,10 +156,17 @@ export const RowContextMenu: FC<RowContextMenuProps> = ({
 
   // 4. View task source
   const handleViewTaskSource = useCallback(() => {
-    const taskId = row.id ?? row.task_id;
+    // Parse and structure task data the same way as the show-source button
+    let taskData = JSON.parse(row.source ?? "{}");
 
-    // Get API from view
-    const api = (view as any).api;
+    taskData = {
+      id: taskData?.id,
+      data: taskData?.data,
+      annotations: taskData?.annotations,
+      predictions: taskData?.predictions,
+    };
+
+    const taskId = taskData.id;
 
     const onTaskLoad = async (options: any = {}) => {
       const response = await api.task({
@@ -163,23 +176,26 @@ export const RowContextMenu: FC<RowContextMenuProps> = ({
       return response ?? {};
     };
 
-    const taskData = row.source ? JSON.parse(row.source) : row;
-
-    modal({
+    const modalInstance = modal({
       title: `Source for task ${taskId}`,
       style: { width: 900 },
+      header: null, // Will be set by renderToggle
       body: (
         <TaskSourceViewer
           content={taskData}
           onTaskLoad={onTaskLoad}
-          sdkType={(view as any).SDK?.type}
+          sdkType={sdkType}
           storageKey="dm:tasksource"
+          renderToggle={(toggle) => {
+            // Update modal header with toggle
+            modalInstance?.update({ header: toggle });
+          }}
         />
       ),
     });
 
     onClose();
-  }, [row, view, onClose]);
+  }, [row, api, sdkType, onClose]);
 
   // 5. View annotator performance (LSE-only)
   const handleViewAnalytics = useCallback(() => {
