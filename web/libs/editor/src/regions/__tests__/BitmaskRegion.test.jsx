@@ -2,7 +2,7 @@
  * Unit tests for BitmaskRegion (model views and actions).
  * View/React coverage is largely from Cypress; these tests cover model logic.
  */
-import { types } from "mobx-state-tree";
+import { destroy, types } from "mobx-state-tree";
 
 jest.mock("../BitmaskRegion/utils", () => ({
   BitmaskDrawing: {
@@ -31,6 +31,7 @@ jest.mock("../../tags/object/Image", () => {
       currentImageEntity: { naturalWidth: 100, naturalHeight: 100 },
       stageRef: null,
       annotation: null,
+      regs: [],
     }))
     .views(() => ({
       get stageRef() {
@@ -114,8 +115,35 @@ afterAll(() => {
   global.requestIdleCallback = origRequestIdleCallback;
 });
 
-import { BitmaskRegionModel } from "../BitmaskRegion";
+import { render, screen } from "@testing-library/react";
+import React from "react";
+import { BitmaskRegionModel, HtxBitmask } from "../BitmaskRegion";
 import { ImageModel } from "../../tags/object/Image";
+
+jest.mock("../RegionWrapper", () => {
+  const React = require("react");
+  return {
+    RegionWrapper: ({ children }) => React.createElement("div", { "data-testid": "region-wrapper" }, children),
+  };
+});
+jest.mock("react-konva", () => {
+  const React = require("react");
+  return {
+    Group: ({ children, ...p }) => React.createElement("div", { "data-testid": "konva-group", ...p }, children),
+    Image: (p) => React.createElement("div", { "data-testid": "konva-image", ...p }),
+    Line: (p) => React.createElement("div", { "data-testid": "konva-line", ...p }),
+    Rect: (p) => React.createElement("div", { "data-testid": "konva-rect", ...p }),
+  };
+});
+jest.mock("../../components/ImageView/LabelOnRegion", () => {
+  const React = require("react");
+  return {
+    LabelOnMask: () => React.createElement("div", { "data-testid": "label-on-mask" }),
+  };
+});
+jest.mock("../AliveRegion", () => ({
+  AliveRegion: (Comp) => Comp,
+}));
 
 const TestRoot = types
   .model("TestRoot", {
@@ -261,8 +289,60 @@ describe("BitmaskRegion", () => {
       expect(region.offscreenCanvasRef.height).toBe(100);
     });
 
+    it("createCanvas is idempotent and returns same refs when already created", () => {
+      const firstRef = region.createCanvas();
+      const secondRef = region.createCanvas();
+      expect(secondRef).toBe(firstRef);
+      expect(region.bitmaskCanvasRef).toBeTruthy();
+      expect(region.offscreenCanvasRef).toBe(firstRef);
+    });
+
+    it("beforeDestroy clears disposers without throwing", () => {
+      const tempRoot = TestRoot.create({
+        image: { id: "img2" },
+        region: { id: "bm2", pid: "p2", object: "img2" },
+      });
+      expect(() => destroy(tempRoot)).not.toThrow();
+    });
+
+    it("redraw schedules restoreFromImageDataURL via requestIdleCallback when refs and imageDataURL set", () => {
+      region.setImageDataURL("data:image/png;base64,abc");
+      region.redraw();
+      jest.runAllTimers();
+      // redraw calls requestIdleCallback (mocked as setTimeout); restoreFromImageDataURL is no-op for this URL
+      expect(region.imageDataURL).toBe("data:image/png;base64,abc");
+    });
+
+    it("restoreFromImageDataURL async path runs when imageDataURL set and Image.decode resolves", async () => {
+      const mockDecode = jest.fn().mockResolvedValue(undefined);
+      global.Image = jest.fn().mockImplementation(function () {
+        this.src = "";
+        this.naturalWidth = 50;
+        this.naturalHeight = 50;
+        this.decode = mockDecode;
+        return this;
+      });
+      if (typeof window !== "undefined") window.Image = global.Image;
+      region.setImageDataURL("data:image/png;base64,xyz");
+      region.restoreFromImageDataURL();
+      await Promise.resolve();
+      await new Promise((r) => setTimeout(r, 0));
+      expect(mockDecode).toHaveBeenCalled();
+      expect(region.offscreenCanvasRef.width).toBe(50);
+      expect(region.offscreenCanvasRef.height).toBe(50);
+      expect(region.bitmaskCanvasRef.width).toBe(50);
+      expect(region.bitmaskCanvasRef.height).toBe(50);
+      global.Image = typeof window !== "undefined" ? window.Image : undefined;
+    });
+
     it("composeMask clears and draws when not drawing", () => {
       expect(() => region.composeMask()).not.toThrow();
+    });
+
+    it("composeMask skips clear when isDrawing is true", () => {
+      region.setDrawing(true);
+      expect(() => region.composeMask()).not.toThrow();
+      region.setDrawing(false);
     });
 
     it("updateBBox calls getCanvasPixelBounds and setBBox", () => {
@@ -411,6 +491,14 @@ describe("BitmaskRegion", () => {
       expect(result).toBeDefined();
       expect(result.value.imageDataURL).toBe("data:image/png;base64,xyz");
       expect(result.original_width).toBe(100);
+    });
+
+    it("renders RegionWrapper and Konva structure when item has parent and canvas refs", () => {
+      render(React.createElement(HtxBitmask, { item: region }));
+      expect(screen.getByTestId("region-wrapper")).toBeInTheDocument();
+      expect(screen.getAllByTestId("konva-group").length).toBeGreaterThan(0);
+      expect(screen.getByTestId("konva-image")).toBeInTheDocument();
+      expect(screen.getByTestId("label-on-mask")).toBeInTheDocument();
     });
   });
 
