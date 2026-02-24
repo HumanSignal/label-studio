@@ -74,16 +74,7 @@ function normalizeVariant(variant: string): string {
 
 export const Badge = forwardRef<HTMLDivElement, BadgeProps>(
   (
-    {
-      variant = "grape",
-      style = "filled",
-      shape = "square",
-      size = "medium",
-      children,
-      className,
-      cssStyle,
-      ...props
-    },
+    { variant = "grape", style = "filled", shape = "square", size = "medium", children, className, cssStyle, ...props },
     ref,
   ) => {
     const normalizedVariant = normalizeVariant(variant);
@@ -113,9 +104,7 @@ export const Badge = forwardRef<HTMLDivElement, BadgeProps>(
       >
         {isGradient ? (
           <div className={styles["badge-content"]}>
-            {shouldShowIcon && (
-              <IconSpark className={styles.icon} />
-            )}
+            {shouldShowIcon && <IconSpark className={styles.icon} />}
             {hasChildren && children}
           </div>
         ) : (

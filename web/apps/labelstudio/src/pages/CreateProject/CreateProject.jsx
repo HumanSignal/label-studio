@@ -59,7 +59,9 @@ const ProjectName = ({ name, setName, onSaveName, onSubmit, error, description, 
         <div className="w-full flex flex-col gap-2">
           <label>
             Workspace
-            <Badge variant="gradient" className="ml-2">Enterprise</Badge>
+            <Badge variant="gradient" className="ml-2">
+              Enterprise
+            </Badge>
           </label>
           <Select placeholder="Select an option" disabled options={[]} triggerClassName="!flex-1" />
           <Typography size="small" className="mt-tight mb-wider">

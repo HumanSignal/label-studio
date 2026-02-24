@@ -3,7 +3,7 @@ import { Badge } from "../badge/badge";
 
 /**
  * @deprecated EnterpriseBadge is deprecated. Use Badge with variant="gradient" instead.
- * 
+ *
  * Migration guide:
  * - <EnterpriseBadge /> → <Badge variant="gradient">Enterprise</Badge>
  * - <EnterpriseBadge ghost /> → <Badge variant="gradient" style="ghost">Enterprise</Badge>
@@ -24,12 +24,12 @@ export const EnterpriseBadge: FC<EnterpriseBadgeProps> = ({ className, filled, c
   // Map props to Badge props
   const style = filled ? "filled" : ghost ? "ghost" : "filled";
   const size = compact ? "small" : "default"; // Map compact to small
-  
+
   // If compact and no children, show icon-only
   if (compact) {
     return <Badge variant="gradient" style={style} size={size} className={className} />;
   }
-  
+
   return (
     <Badge variant="gradient" style={style} size={size} className={className}>
       Enterprise

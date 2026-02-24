@@ -39,7 +39,11 @@ const TemplatesInGroup = ({ templates, group, onSelectRecipe, isEdition }) => {
             <img src={recipe.image} alt={""} />
             <div className="flex flex-col items-center w-full">
               <h3 className="flex flex-1 justify-center text-center w-full">{recipe.title}</h3>
-              {isEnterpriseTemplate && isCommunityEdition && <Badge variant="gradient" className="mb-base">Enterprise</Badge>}
+              {isEnterpriseTemplate && isCommunityEdition && (
+                <Badge variant="gradient" className="mb-base">
+                  Enterprise
+                </Badge>
+              )}
             </div>
           </li>
         );

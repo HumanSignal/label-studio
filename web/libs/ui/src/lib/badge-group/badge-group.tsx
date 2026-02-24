@@ -47,7 +47,19 @@ export interface BadgeGroupProps {
  * ```
  */
 export const BadgeGroup = forwardRef<HTMLDivElement, BadgeGroupProps>(
-  ({ items, variant = "primary", shape = "square", style, size, className, "data-testid": dataTestId, truncate = true }, ref) => {
+  (
+    {
+      items,
+      variant = "primary",
+      shape = "square",
+      style,
+      size,
+      className,
+      "data-testid": dataTestId,
+      truncate = true,
+    },
+    ref,
+  ) => {
     const containerRef = useRef<HTMLDivElement>(null);
     const mergedRef = ref || containerRef;
     const [recalcTrigger, setRecalcTrigger] = useState(0);
