@@ -29,7 +29,7 @@ Konva.showWarnings = false;
 const hotkeys = Hotkey("Image");
 const imgDefaultProps = { crossOrigin: "anonymous" };
 
-const splitRegions = (regions) => {
+export const splitRegions = (regions) => {
   const brushRegions = [];
   const shapeRegions = [];
   const bitmaskRegions = [];
@@ -1450,7 +1450,7 @@ const StageContent = observer(({ item, store, state, crosshairRef }) => {
         />
       )}
 
-      {tool && tool.toolName.match(/bitmask/i) && <CursorLayer item={item} tool={tool} />}
+      {tool && tool.toolName?.match(/bitmask/i) && <CursorLayer item={item} tool={tool} />}
     </>
   );
 });

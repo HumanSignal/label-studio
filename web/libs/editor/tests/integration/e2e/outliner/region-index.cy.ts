@@ -162,10 +162,16 @@ describe("Region Index", () => {
 
     RichText.findRegionWithLabel("2:Label 2").trigger("click");
     Hotkeys.deleteRegion();
+    RichText.hasRegionWithLabel("1:Label 1");
+    RichText.hasRegionWithLabel("2:Label 3");
 
-    cy.wait(1);
     Hotkeys.undo();
-    cy.wait(1);
+    RichText.hasRegionWithLabel("1:Label 1");
+    RichText.hasRegionWithLabel("2:Label 2");
+    RichText.hasRegionWithLabel("3:Label 3");
+
     Hotkeys.redo();
+    RichText.hasRegionWithLabel("1:Label 1");
+    RichText.hasRegionWithLabel("2:Label 3");
   });
 });

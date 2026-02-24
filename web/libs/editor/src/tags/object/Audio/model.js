@@ -131,7 +131,7 @@ export const AudioModel = types.compose(
     .model("AudioModel", {
       type: "audio",
       _value: types.optional(types.string, ""),
-      regions: types.array(AudioRegionModel),
+      regions: types.array(types.late(() => AudioRegionModel)),
     })
     .volatile(() => ({
       errors: [],

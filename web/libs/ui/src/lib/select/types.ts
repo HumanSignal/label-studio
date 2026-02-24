@@ -88,7 +88,10 @@ export type SelectProps<T, A extends SelectOption<T>[]> = {
   itemCount?: number;
   onClose?: () => void;
   onOpen?: () => void;
+  /** Controlled open state. When provided, the dropdown open/close state is driven externally. */
+  open?: boolean;
   alwaysShowSelectedGroup?: boolean;
+  onSelectAllClick?: () => void;
 } & SelectVirtualizedProps &
   Omit<React.SelectHTMLAttributes<HTMLSelectElement>, "value" | "placeholder">;
 

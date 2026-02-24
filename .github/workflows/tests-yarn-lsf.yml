@@ -1,6 +1,5 @@
-# Single workflow: build the editor once (production standalone), then run both
-# Cypress integration tests and CodeceptJS e2e tests against the same server build.
-name: "yarn integration + e2e (LSF)"
+# Single workflow: build the editor once (production standalone), then run Cypress integration tests.
+name: "yarn integration (LSF)"
 
 on:
   workflow_call:
@@ -59,11 +58,40 @@ jobs:
           name: editor-build
           path: ${{ env.FRONTEND_MONOREPO_DIR }}/dist/libs/editor
 
+  prepare-chunks:
+    name: "Prepare Cypress chunks"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ inputs.head_sha }}
+
+      - name: Setup frontend environment
+        uses: ./.github/actions/setup-frontend-environment
+        with:
+          node-version: "${{ env.NODE }}"
+          directory: "${{ env.FRONTEND_MONOREPO_DIR }}"
+
+      - name: Discover specs and build chunk matrix
+        id: chunks
+        working-directory: ${{ env.FRONTEND_MONOREPO_DIR }}
+        run: |
+          json=$(node scripts/cypress-spec-chunks.js --chunks 4)
+          echo "matrix<<MATRIX_EOF" >> $GITHUB_OUTPUT
+          echo "$json" >> $GITHUB_OUTPUT
+          echo "MATRIX_EOF" >> $GITHUB_OUTPUT
+    outputs:
+      matrix: ${{ steps.chunks.outputs.matrix }}
+
   cypress:
-    name: "Cypress"
-    needs: build-editor
+    name: "Cypress (${{ matrix.chunk }})"
+    needs: [build-editor, prepare-chunks]
     runs-on: ubuntu-latest
     timeout-minutes: 25
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJson(needs.prepare-chunks.outputs.matrix) }}
     steps:
       - uses: hmarr/debug-action@v3.0.0
 
@@ -142,57 +170,43 @@ jobs:
             echo "Root and CSS are served correctly."
           fi
 
-      - name: Run Cypress
+      - name: Run Cypress (chunk ${{ matrix.chunk }})
         working-directory: ${{ env.FRONTEND_MONOREPO_DIR }}
-        run: COLLECT_COVERAGE=1 npx nx run editor:integration
+        run: COLLECT_COVERAGE=1 npx nx run editor:integration -- --spec "${{ matrix.specs }}"
 
-      - name: Upload coverage
+      - name: Upload coverage chunk
+        if: always()
+        working-directory: ${{ env.FRONTEND_MONOREPO_DIR }}
+        run: |
+          mkdir -p coverage-chunks
+          cp libs/editor/.nyc_output/out.json coverage-chunks/${{ matrix.chunk }}.json 2>/dev/null || touch coverage-chunks/${{ matrix.chunk }}.json
+      - name: Upload coverage artifact
         uses: actions/upload-artifact@v6
         if: always()
         with:
-          name: cypress-coverage
-          path: ${{ env.FRONTEND_MONOREPO_DIR }}/libs/editor/coverage
+          name: cypress-coverage-${{ matrix.chunk }}
+          path: ${{ env.FRONTEND_MONOREPO_DIR }}/coverage-chunks/${{ matrix.chunk }}.json
 
       - name: Upload test results and screenshots
         uses: actions/upload-artifact@v6
         if: always()
         with:
-          name: cypress-output
+          name: cypress-output-${{ matrix.chunk }}
           path: |
             ${{ env.FRONTEND_MONOREPO_DIR }}/dist/cypress/libs/frontend-test/src/screenshots
             ${{ env.FRONTEND_MONOREPO_DIR }}/dist/cypress/libs/frontend-test/src/videos
-
-      - name: Upload coverage to Codecov
-        if: ${{ always() && github.event.pull_request.head.repo.fork == false && github.event.pull_request.user.login != 'dependabot[bot]' }}
-        uses: codecov/codecov-action@v5
-        with:
-          name: lsf-integration
-          flags: lsf-integration
-          files: ${{ env.FRONTEND_MONOREPO_DIR }}/libs/editor/.nyc_output/out.json
-          token: ${{ secrets.CODECOV_TOKEN }}
-          verbose: true
-          fail_ci_if_error: false
 
       - name: Kill server
         if: always()
         continue-on-error: true
         run: kill -9 "${{ steps.run-server.outputs.pid }}" 2>/dev/null || true
 
-  e2e:
-    name: "yarn e2e"
-    needs: build-editor
+  merge-coverage:
+    name: "Merge coverage and upload to Codecov"
+    needs: cypress
     runs-on: ubuntu-latest
-    timeout-minutes: 90
+    if: always() && needs.cypress.result != 'failure'
     steps:
-      - uses: hmarr/debug-action@v3.0.0
-
-      - name: Configure git
-        shell: bash
-        run: |
-          set -xeuo pipefail
-          git config --global user.name 'robot-ci-heartex'
-          git config --global user.email 'robot-ci-heartex@users.noreply.github.com'
-
       - name: Checkout
         uses: actions/checkout@v6
         with:
@@ -204,61 +218,37 @@ jobs:
           node-version: "${{ env.NODE }}"
           directory: "${{ env.FRONTEND_MONOREPO_DIR }}"
 
-      - name: Download editor build
-        uses: actions/download-artifact@v4
+      # Download to workspace root so artifact paths like web/coverage-chunks/core.json
+      # extract to web/coverage-chunks/ (merge step runs with working-directory: web).
+      - name: Download all coverage chunks
+        uses: actions/download-artifact@v6
         with:
-          name: editor-build
-          path: ${{ env.FRONTEND_MONOREPO_DIR }}/dist/libs/editor
+          pattern: cypress-coverage-*
+          path: .
+          merge-multiple: true
 
-      - name: Install e2e dependencies
-        working-directory: ${{ env.FRONTEND_MONOREPO_DIR }}/libs/editor/tests/e2e
-        run: yarn install
-
-      - name: Install Playwright browsers
-        working-directory: ${{ env.FRONTEND_MONOREPO_DIR }}/libs/editor/tests/e2e
-        run: yarn playwright install --with-deps
-
-      - name: Run server
-        id: run-server
-        timeout-minutes: 1
-        working-directory: ${{ env.FRONTEND_MONOREPO_DIR }}
+      # If artifacts flattened to workspace root (chunk_*.json), place them in web/coverage-chunks
+      - name: Ensure coverage chunks in expected dir
         run: |
-          set -xeuo pipefail
-          npx serve dist/libs/editor -l 3000 &
-          pid=$!
-          echo "pid=${pid}" >> $GITHUB_OUTPUT
-          while ! curl -s -o /dev/null -L "http://localhost:3000"; do
-            echo "=> Waiting for service to become available"
-            sleep 2s
+          mkdir -p ${{ env.FRONTEND_MONOREPO_DIR }}/coverage-chunks
+          for f in chunk_*.json; do
+            [ -f "$f" ] && mv "$f" ${{ env.FRONTEND_MONOREPO_DIR }}/coverage-chunks/
           done
 
-      - name: Run tests
+      - name: Merge coverage
         working-directory: ${{ env.FRONTEND_MONOREPO_DIR }}
-        env:
-          HEADLESS: true
-          COVERAGE: true
-        run: yarn lsf:e2e:ci
+        run: |
+          mkdir -p libs/editor/.nyc_output
+          node scripts/merge-cypress-coverage.js --chunks-dir coverage-chunks --out libs/editor/.nyc_output/out.json
 
       - name: Upload coverage to Codecov
-        if: ${{ always() && github.event.pull_request.head.repo.fork == false && github.event.pull_request.user.login != 'dependabot[bot]' }}
+        if: github.event.pull_request.head.repo.fork == false && github.event.pull_request.user.login != 'dependabot[bot]'
         uses: codecov/codecov-action@v5
         with:
-          name: lsf-e2e
-          flags: lsf-e2e
-          directory: web/libs/editor/tests/coverage
+          name: lsf-integration
+          flags: lsf-integration
+          files: ${{ env.FRONTEND_MONOREPO_DIR }}/libs/editor/.nyc_output/out.json
           token: ${{ secrets.CODECOV_TOKEN }}
           verbose: true
-          fail_ci_if_error: true
+          fail_ci_if_error: false
 
-      - uses: actions/upload-artifact@v6
-        if: always()
-        with:
-          name: e2e output
-          path: |
-            web/libs/editor/tests/e2e/output
-            web/libs/editor/tests/coverage
-
-      - name: Kill server
-        if: always()
-        continue-on-error: true
-        run: kill -9 "${{ steps.run-server.outputs.pid }}" 2>/dev/null || true

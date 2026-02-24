@@ -637,4 +637,4 @@ const HtxPolygon = AliveRegion(HtxPolygonView);
 Registry.addTag("polygonregion", PolygonRegionModel, HtxPolygon);
 Registry.addRegionType(PolygonRegionModel, "image", (value) => !!value.points);
 
-export { PolygonRegionModel, HtxPolygon };
+export { PolygonRegionModel, HtxPolygon, getAnchorPoint, getFlattenedPoints, moveHoverAnchor, removeHoverAnchor };
