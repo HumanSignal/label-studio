@@ -249,6 +249,89 @@ def data_examples(mode):
     return _DATA_EXAMPLES[mode]
 
 
+def generate_sample_from_json_schema(schema):
+    """
+    Generate sample data from a JSON schema.
+
+    Args:
+        schema: JSON schema dict or string defining the expected data structure
+
+    Returns:
+        Sample data matching the schema structure
+    """
+    if isinstance(schema, str):
+        try:
+            schema = json.loads(schema)
+        except json.JSONDecodeError:
+            return None
+
+    if not schema or not isinstance(schema, dict):
+        return None
+
+    # Handle case where schema is just properties without explicit type
+    if 'type' not in schema and 'properties' in schema:
+        schema = {'type': 'object', 'properties': schema['properties']}
+
+    schema_type = schema.get('type')
+
+    if schema_type == 'object':
+        result = {}
+        properties = schema.get('properties', {})
+        for prop_name, prop_schema in properties.items():
+            result[prop_name] = generate_sample_from_json_schema(prop_schema)
+        return result
+
+    elif schema_type == 'array':
+        items_schema = schema.get('items', {})
+        # Generate 2-3 sample items for arrays
+        sample_item = generate_sample_from_json_schema(items_schema)
+        if sample_item is not None:
+            return [sample_item, sample_item]
+        return []
+
+    elif schema_type == 'string':
+        # Check for format hints
+        fmt = schema.get('format', '')
+        enum_values = schema.get('enum')
+        if enum_values:
+            return enum_values[0]
+        if fmt == 'date':
+            return '2024-01-15'
+        elif fmt == 'date-time':
+            return '2024-01-15T10:30:00Z'
+        elif fmt == 'email':
+            return 'sample@example.com'
+        elif fmt == 'uri' or fmt == 'url':
+            return 'https://example.com/sample'
+        # Use title or description as hint for sample value
+        title = schema.get('title', '')
+        description = schema.get('description', '')
+        if title:
+            return f'Sample {title}'
+        elif description:
+            return f'Sample: {description[:50]}'
+        return 'Sample text value'
+
+    elif schema_type == 'number':
+        minimum = schema.get('minimum', 0)
+        maximum = schema.get('maximum', 100)
+        return (minimum + maximum) / 2
+
+    elif schema_type == 'integer':
+        minimum = schema.get('minimum', 0)
+        maximum = schema.get('maximum', 100)
+        return int((minimum + maximum) / 2)
+
+    elif schema_type == 'boolean':
+        return True
+
+    elif schema_type == 'null':
+        return None
+
+    # Fallback for unknown types
+    return 'Sample value'
+
+
 def generate_sample_task_without_check(label_config, mode='upload', secure_mode=False):
     """Generate sample task only"""
     # load config
@@ -360,6 +443,34 @@ def generate_sample_task_without_check(label_config, mode='upload', secure_mode=
 
             # remove unused "images[{{idx}}].url"
             task.pop(value, None)
+
+    # Handle ReactCode and CustomInterface tags with inputs schema
+    reactcode_tags = xml.findall('.//ReactCode') + xml.findall('.//CustomInterface')
+    for tag in reactcode_tags:
+        inputs_schema = tag.get('inputs')
+        if not inputs_schema:
+            continue
+
+        # Generate sample data from the inputs JSON schema
+        sample_data = generate_sample_from_json_schema(inputs_schema)
+        if sample_data is None:
+            continue
+
+        # Check if data attribute is set (e.g., data="$myData")
+        data_attr = tag.get('data', '').strip()
+
+        if data_attr.startswith('$'):
+            # If data attribute is set, put sample data under that field name
+            field_name = data_attr[1:]
+            if field_name and field_name not in task:
+                task[field_name] = sample_data
+        elif not data_attr:
+            # If data attribute is not set, ReactCode uses the whole task data
+            # Merge sample data at root level (don't overwrite existing fields)
+            if isinstance(sample_data, dict):
+                for key, value in sample_data.items():
+                    if key not in task:
+                        task[key] = value
 
     return task
 

@@ -10,7 +10,7 @@ const SAMPLE_VIDEO_EMBED = `<video src='${SAMPLE_VIDEO}' width=100% controls></v
 const SAMPLE_HTML =
   '<div style="max-width: 750px"><div style="clear: both"><div style="float: right; display: inline-block; border: 1px solid #F2F3F4; background-color: #F8F9F9; border-radius: 5px; padding: 7px; margin: 10px 0;"><p><b>Jules</b>: No no, Mr. Wolfe, it\'s not like that. Your help is definitely appreciated.</p></div></div><div style="clear: both"><div style="float: right; display: inline-block; border: 1px solid #F2F3F4; background-color: #F8F9F9; border-radius: 5px; padding: 7px; margin: 10px 0;"><p><b>Vincent</b>: Look, Mr. Wolfe, I respect you. I just don\'t like people barking orders at me, that\'s all.</p></div></div><div style="clear: both"><div style="display: inline-block; border: 1px solid #D5F5E3; background-color: #EAFAF1; border-radius: 5px; padding: 7px; margin: 10px 0;"><p><b>The Wolf</b>: If I\'m curt with you, it\'s because time is a factor. I think fast, I talk fast, and I need you two guys to act fast if you want to get out of this. So pretty please, with sugar on top, clean the car.</p></div></div></div>';
 const SAMPLE_WEBSITE = "<a href='https://labelstud.io'>https://labelstud.io</a>";
-const SAMPLE_PDF_EMBED = "<embed src='https://app.heartex.ai/static/samples/sample.pdf' width='100%' height='600px'/>";
+const SAMPLE_PDF_EMBED = "https://app.heartex.ai/static/samples/sample.pdf";
 const SAMPLE_WEBSITE_EMBED = "<iframe src='https://labelstud.io' width='100%' height='600px'/>";
 const SAMPLE_CSV = "https://app.heartex.ai/samples/time-series.csv";
 const SAMPLE_OCR_IMAGE = "https://htx-pub.s3.amazonaws.com/demo/ocr/example.jpg";
@@ -117,6 +117,97 @@ const formatTime = (time: number | string, timeFormat = "") => {
 
   return format(new Date(time));
 };
+
+// Generate sample data from a JSON schema
+function generateSampleFromJsonSchema(schema: any): any {
+  if (typeof schema === "string") {
+    try {
+      schema = JSON.parse(schema);
+    } catch (e) {
+      return null;
+    }
+  }
+
+  if (!schema || typeof schema !== "object") {
+    return null;
+  }
+
+  // Handle case where schema is just properties without explicit type
+  if (!("type" in schema) && "properties" in schema) {
+    schema = { type: "object", properties: schema.properties };
+  }
+
+  const schemaType = schema.type;
+
+  if (schemaType === "object") {
+    const result: Record<string, any> = {};
+    const properties = schema.properties || {};
+    for (const [propName, propSchema] of Object.entries(properties)) {
+      result[propName] = generateSampleFromJsonSchema(propSchema);
+    }
+    return result;
+  }
+
+  if (schemaType === "array") {
+    const itemsSchema = schema.items || {};
+    const sampleItem = generateSampleFromJsonSchema(itemsSchema);
+    if (sampleItem !== null) {
+      return [sampleItem, sampleItem];
+    }
+    return [];
+  }
+
+  if (schemaType === "string") {
+    const fmt = schema.format || "";
+    const enumValues = schema.enum;
+    if (enumValues) {
+      return enumValues[0];
+    }
+    if (fmt === "date") {
+      return "2024-01-15";
+    }
+    if (fmt === "date-time") {
+      return "2024-01-15T10:30:00Z";
+    }
+    if (fmt === "email") {
+      return "sample@example.com";
+    }
+    if (fmt === "uri" || fmt === "url") {
+      return "https://example.com/sample";
+    }
+    const title = schema.title || "";
+    const description = schema.description || "";
+    if (title) {
+      return `Sample ${title}`;
+    }
+    if (description) {
+      return `Sample: ${description.slice(0, 50)}`;
+    }
+    return "Sample text value";
+  }
+
+  if (schemaType === "number") {
+    const minimum = schema.minimum ?? 0;
+    const maximum = schema.maximum ?? 100;
+    return (minimum + maximum) / 2;
+  }
+
+  if (schemaType === "integer") {
+    const minimum = schema.minimum ?? 0;
+    const maximum = schema.maximum ?? 100;
+    return Math.floor((minimum + maximum) / 2);
+  }
+
+  if (schemaType === "boolean") {
+    return true;
+  }
+
+  if (schemaType === "null") {
+    return null;
+  }
+
+  return "Sample value";
+}
 
 // Utility to generate a sample task from a Label Studio XML config
 export async function generateSampleTaskFromConfig(config: string): Promise<{
@@ -422,6 +513,38 @@ export async function generateSampleTaskFromConfig(config: string): Promise<{
         }
       } else {
         data[key] = `Sample value for ${key}`;
+      }
+    }
+  });
+
+  // Handle ReactCode and CustomInterface tags with inputs schema
+  const reactCodeTags = Array.from(xml.querySelectorAll("ReactCode, CustomInterface"));
+  reactCodeTags.forEach((node) => {
+    const inputsSchema = node.getAttribute("inputs");
+    if (!inputsSchema) return;
+
+    // Generate sample data from the inputs JSON schema
+    const sampleData = generateSampleFromJsonSchema(inputsSchema);
+    if (sampleData === null) return;
+
+    // Check if data attribute is set (e.g., data="$myData")
+    const dataAttr = (node.getAttribute("data") || "").trim();
+
+    if (dataAttr.startsWith("$")) {
+      // If data attribute is set, put sample data under that field name
+      const fieldName = dataAttr.slice(1);
+      if (fieldName && data[fieldName] === undefined) {
+        data[fieldName] = sampleData;
+      }
+    } else if (!dataAttr) {
+      // If data attribute is not set, ReactCode uses the whole task data
+      // Merge sample data at root level (don't overwrite existing fields)
+      if (typeof sampleData === "object" && sampleData !== null && !Array.isArray(sampleData)) {
+        for (const [key, value] of Object.entries(sampleData)) {
+          if (data[key] === undefined) {
+            data[key] = value;
+          }
+        }
       }
     }
   });

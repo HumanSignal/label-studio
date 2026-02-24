@@ -3,10 +3,184 @@ from unittest.mock import patch
 
 import projects.api
 import pytest
+from core.label_config import generate_sample_from_json_schema, generate_sample_task_without_check
 from django.test import TestCase
 from django.urls import reverse
 from projects.tests.factories import ProjectFactory
 from rest_framework.test import APIClient
+
+
+class TestGenerateSampleFromJsonSchema:
+    """Tests for generate_sample_from_json_schema function"""
+
+    def test_string_type(self):
+        schema = {'type': 'string'}
+        result = generate_sample_from_json_schema(schema)
+        assert result == 'Sample text value'
+
+    def test_string_with_format_email(self):
+        schema = {'type': 'string', 'format': 'email'}
+        result = generate_sample_from_json_schema(schema)
+        assert result == 'sample@example.com'
+
+    def test_string_with_format_date(self):
+        schema = {'type': 'string', 'format': 'date'}
+        result = generate_sample_from_json_schema(schema)
+        assert result == '2024-01-15'
+
+    def test_string_with_enum(self):
+        schema = {'type': 'string', 'enum': ['active', 'inactive', 'pending']}
+        result = generate_sample_from_json_schema(schema)
+        assert result == 'active'
+
+    def test_integer_type(self):
+        schema = {'type': 'integer'}
+        result = generate_sample_from_json_schema(schema)
+        assert result == 50
+
+    def test_integer_with_min_max(self):
+        schema = {'type': 'integer', 'minimum': 10, 'maximum': 20}
+        result = generate_sample_from_json_schema(schema)
+        assert result == 15
+
+    def test_number_type(self):
+        schema = {'type': 'number'}
+        result = generate_sample_from_json_schema(schema)
+        assert result == 50.0
+
+    def test_boolean_type(self):
+        schema = {'type': 'boolean'}
+        result = generate_sample_from_json_schema(schema)
+        assert result is True
+
+    def test_object_type(self):
+        schema = {
+            'type': 'object',
+            'properties': {'name': {'type': 'string'}, 'age': {'type': 'integer'}},
+        }
+        result = generate_sample_from_json_schema(schema)
+        assert result == {'name': 'Sample text value', 'age': 50}
+
+    def test_nested_object(self):
+        schema = {
+            'type': 'object',
+            'properties': {'user': {'type': 'object', 'properties': {'email': {'type': 'string', 'format': 'email'}}}},
+        }
+        result = generate_sample_from_json_schema(schema)
+        assert result == {'user': {'email': 'sample@example.com'}}
+
+    def test_array_type(self):
+        schema = {'type': 'array', 'items': {'type': 'string'}}
+        result = generate_sample_from_json_schema(schema)
+        assert result == ['Sample text value', 'Sample text value']
+
+    def test_array_of_objects(self):
+        schema = {
+            'type': 'array',
+            'items': {'type': 'object', 'properties': {'id': {'type': 'integer'}, 'label': {'type': 'string'}}},
+        }
+        result = generate_sample_from_json_schema(schema)
+        assert len(result) == 2
+        assert result[0] == {'id': 50, 'label': 'Sample text value'}
+
+    def test_shorthand_properties(self):
+        # Schema without explicit type but with properties
+        schema = {'properties': {'name': {'type': 'string'}}}
+        result = generate_sample_from_json_schema(schema)
+        assert result == {'name': 'Sample text value'}
+
+    def test_string_schema(self):
+        # Schema as JSON string
+        schema_str = '{"type": "object", "properties": {"name": {"type": "string"}}}'
+        result = generate_sample_from_json_schema(schema_str)
+        assert result == {'name': 'Sample text value'}
+
+    def test_invalid_json_string(self):
+        result = generate_sample_from_json_schema('not valid json')
+        assert result is None
+
+    def test_empty_schema(self):
+        result = generate_sample_from_json_schema({})
+        assert result is None
+
+    def test_none_schema(self):
+        result = generate_sample_from_json_schema(None)
+        assert result is None
+
+
+class TestGenerateSampleTaskWithReactCode:
+    """Tests for ReactCode tag handling in generate_sample_task_without_check"""
+
+    def test_reactcode_with_data_attribute(self):
+        label_config = '''
+        <View>
+          <ReactCode name="custom" data="$myData" inputs='{"type": "object", "properties": {"name": {"type": "string"}, "age": {"type": "integer"}}}' />
+        </View>
+        '''
+        result = generate_sample_task_without_check(label_config)
+        assert 'myData' in result
+        assert result['myData'] == {'name': 'Sample text value', 'age': 50}
+
+    def test_reactcode_without_data_attribute(self):
+        # When data attribute is not set, sample data should be merged at root level
+        label_config = '''
+        <View>
+          <ReactCode name="custom" inputs='{"type": "object", "properties": {"title": {"type": "string"}, "count": {"type": "number"}}}' />
+        </View>
+        '''
+        result = generate_sample_task_without_check(label_config)
+        assert 'title' in result
+        assert 'count' in result
+        assert result['title'] == 'Sample text value'
+        assert result['count'] == 50.0
+
+    def test_reactcode_with_existing_fields(self):
+        # ReactCode should not overwrite existing fields from other tags
+        label_config = '''
+        <View>
+          <Text name="text" value="$title"/>
+          <ReactCode name="custom" inputs='{"type": "object", "properties": {"title": {"type": "string"}, "extra": {"type": "boolean"}}}' />
+        </View>
+        '''
+        result = generate_sample_task_without_check(label_config)
+        # title should come from Text tag
+        assert 'title' in result
+        assert result['title'] != 'Sample text value'  # From Text tag, not ReactCode
+        # extra should come from ReactCode
+        assert result['extra'] is True
+
+    def test_custominterface_with_inputs(self):
+        label_config = '''
+        <View>
+          <CustomInterface name="custom" data="$content" inputs='{"type": "object", "properties": {"message": {"type": "string"}}}' />
+        </View>
+        '''
+        result = generate_sample_task_without_check(label_config)
+        assert 'content' in result
+        assert result['content'] == {'message': 'Sample text value'}
+
+    def test_reactcode_without_inputs(self):
+        # ReactCode without inputs schema should not affect task data
+        label_config = '''
+        <View>
+          <Text name="text" value="$text"/>
+          <ReactCode name="custom" data="$myData" />
+        </View>
+        '''
+        result = generate_sample_task_without_check(label_config)
+        assert 'text' in result
+        assert 'myData' not in result
+
+    def test_reactcode_with_complex_nested_schema(self):
+        label_config = '''
+        <View>
+          <ReactCode name="custom" data="$formData" inputs='{"type": "object", "properties": {"user": {"type": "object", "properties": {"email": {"type": "string", "format": "email"}, "verified": {"type": "boolean"}}}, "items": {"type": "array", "items": {"type": "string"}}}}' />
+        </View>
+        '''
+        result = generate_sample_task_without_check(label_config)
+        assert 'formData' in result
+        assert result['formData']['user'] == {'email': 'sample@example.com', 'verified': True}
+        assert result['formData']['items'] == ['Sample text value', 'Sample text value']
 
 
 @pytest.mark.django_db
