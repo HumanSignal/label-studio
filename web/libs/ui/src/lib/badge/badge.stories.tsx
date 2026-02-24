@@ -53,7 +53,6 @@ export default meta;
 type Story = StoryObj<typeof Badge>;
 
 /**
- * Default Badge
  *
  * Default grape badge - when no variant is specified, defaults to grape.
  */
@@ -64,9 +63,15 @@ export const Default: Story = {
 };
 
 /**
- * Semantic Variants
  *
  * Overview of semantic variant mappings that map to accent colors.
+ *
+ * - **Primary** = Default color for most badges
+ * - **Neutral** = Only use when a muted badge is needed
+ * - **Negative** = Use to outline False boolean values or to highlight number of issues
+ * - **Positive** = Use to outline True boolean values, completed states
+ * - **Warning** = Use to highlight number of warnings
+ * - **Beta** = Use to highlight beta features, in conjunction with solid style and rounded borders
  */
 export const SemanticVariants: Story = {
   render: () => {
@@ -74,30 +79,39 @@ export const SemanticVariants: Story = {
       <div className="flex flex-col gap-4">
         <div>
           <p className="text-sm text-neutral-content-subtle mb-2">Primary → Grape:</p>
+          <p className="text-xs text-neutral-content-subtler mb-2">Default color for most badges.</p>
           <div className="flex flex-wrap gap-3">
             <Badge variant="primary">Primary</Badge>
           </div>
         </div>
         <div>
           <p className="text-sm text-neutral-content-subtle mb-2">Neutral → Sand:</p>
+          <p className="text-xs text-neutral-content-subtler mb-2">Only use when a muted badge is needed.</p>
           <div className="flex flex-wrap gap-3">
             <Badge variant="neutral">Neutral</Badge>
           </div>
         </div>
         <div>
           <p className="text-sm text-neutral-content-subtle mb-2">Negative → Persimmon:</p>
+          <p className="text-xs text-neutral-content-subtler mb-2">
+            Use to outline False boolean values or to highlight number of issues.
+          </p>
           <div className="flex flex-wrap gap-3">
             <Badge variant="negative">Negative</Badge>
           </div>
         </div>
         <div>
           <p className="text-sm text-neutral-content-subtle mb-2">Positive → Kale:</p>
+          <p className="text-xs text-neutral-content-subtler mb-2">
+            Use to outline True boolean values, completed states.
+          </p>
           <div className="flex flex-wrap gap-3">
             <Badge variant="positive">Positive</Badge>
           </div>
         </div>
         <div>
           <p className="text-sm text-neutral-content-subtle mb-2">Warning → Canteloupe:</p>
+          <p className="text-xs text-neutral-content-subtler mb-2">Use to highlight number of warnings.</p>
           <div className="flex flex-wrap gap-3">
             <Badge variant="warning">Warning</Badge>
             <Badge variant="caution">Caution</Badge>
@@ -105,6 +119,9 @@ export const SemanticVariants: Story = {
         </div>
         <div>
           <p className="text-sm text-neutral-content-subtle mb-2">Beta → Plum:</p>
+          <p className="text-xs text-neutral-content-subtler mb-2">
+            Use to highlight beta features, in conjunction with solid style and rounded borders.
+          </p>
           <div className="flex flex-wrap gap-3">
             <Badge variant="beta">Beta</Badge>
           </div>
@@ -115,7 +132,6 @@ export const SemanticVariants: Story = {
 };
 
 /**
- * Direct Accent Colors
  *
  * Use accent colors directly when tags don't have an associated semantic sentiment.
  */
@@ -141,7 +157,6 @@ export const AccentColors: Story = {
 };
 
 /**
- * Style Variants
  *
  * Badges support four styles: filled (default), outline, ghost, and solid.
  */
@@ -223,7 +238,6 @@ export const StyleVariants: Story = {
 };
 
 /**
- * Shape Variants
  *
  * Badges support two shapes: square (default) and rounded.
  *
@@ -270,9 +284,8 @@ export const ShapeVariants: Story = {
 };
 
 /**
- * Size Variants
  *
- * Badges support two sizes: medium (default) and small. Small should be used sparingly, only when real estate is minimal.
+ * Badges support two sizes: medium (default) and small. Small should be used sparingly, only when real estate is minimal—e.g. inside input fields, dropdowns, or beside field labels.
  */
 export const SizeVariants: Story = {
   render: () => {
@@ -294,6 +307,9 @@ export const SizeVariants: Story = {
         </div>
         <div>
           <p className="text-sm text-neutral-content-subtle mb-2">Small (use sparingly):</p>
+          <p className="text-xs text-neutral-content-subtler mb-2">
+            Use when real estate is minimal, e.g. inside input fields, dropdowns, or beside field labels.
+          </p>
           <div className="flex flex-wrap gap-3">
             <Badge variant="grape" size="small">
               Small
@@ -312,7 +328,6 @@ export const SizeVariants: Story = {
 };
 
 /**
- * Gradient Variant
  *
  * Special gradient variant with IconSpark icon. Automatically includes icon.
  */
@@ -370,84 +385,26 @@ export const GradientVariant: Story = {
 };
 
 /**
- * Status Badges
  *
- * Common use case: showing different statuses.
- */
-export const StatusBadges: Story = {
-  render: () => {
-    return (
-      <div className="flex flex-col gap-4 max-w-md">
-        <div className="flex items-center justify-between p-3 border border-neutral-border rounded">
-          <span className="text-sm">Active Project</span>
-          <Badge variant="success">Active</Badge>
-        </div>
-        <div className="flex items-center justify-between p-3 border border-neutral-border rounded">
-          <span className="text-sm">Pending Review</span>
-          <Badge variant="neutral">Pending</Badge>
-        </div>
-        <div className="flex items-center justify-between p-3 border border-neutral-border rounded">
-          <span className="text-sm">Failed Task</span>
-          <Badge variant="error">Failed</Badge>
-        </div>
-        <div className="flex items-center justify-between p-3 border border-neutral-border rounded">
-          <span className="text-sm">Draft</span>
-          <Badge variant="neutral" style="outline">
-            Draft
-          </Badge>
-        </div>
-      </div>
-    );
-  },
-};
-
-/**
- * All Combinations
- *
- * Comprehensive showcase of all variant combinations.
- */
-export const AllCombinations: Story = {
-  render: () => {
-    const variants = ["grape", "kale", "persimmon", "canteloupe", "plum"] as const;
-    const styles = ["filled", "outline", "ghost", "solid"] as const;
-    const shapes = ["rounded", "square"] as const;
-
-    return (
-      <div className="flex flex-col gap-6">
-        {variants.map((variant) => (
-          <div key={variant}>
-            <p className="text-sm font-medium text-neutral-content mb-3 capitalize">{variant}:</p>
-            <div className="flex flex-col gap-3">
-              {styles.map((style) => (
-                <div key={style} className="flex flex-wrap gap-3">
-                  {shapes.map((shape) => (
-                    <Badge key={shape} variant={variant} style={style} shape={shape}>
-                      {variant} {style} {shape}
-                    </Badge>
-                  ))}
-                </div>
-              ))}
-            </div>
-          </div>
-        ))}
-      </div>
-    );
-  },
-};
-
-/**
- * In Context
- *
- * Real-world example showing badges in a user list using DataTable.
+ * Real-world example showing badges in a user list using DataTable. Status badges use: Annotating (grape), Reviewing (plum), Skipped (persimmon), Pending (neutral), Needs Review (canteloupe).
  */
 export const InContext: Story = {
   render: () => {
     const users = [
-      { name: "John Doe", email: "john@example.com", role: "Admin", status: "Active", verified: true },
-      { name: "Jane Smith", email: "jane@example.com", role: "Reviewer", status: "Active", verified: true },
-      { name: "Bob Johnson", email: "bob@example.com", role: "Annotator", status: "Inactive", verified: false },
-      { name: "Alice Brown", email: "alice@example.com", role: "Manager", status: "Active", verified: true },
+      { name: "John Doe", email: "john@example.com", role: "Admin", status: "Annotating", verified: true },
+      { name: "Jane Smith", email: "jane@example.com", role: "Reviewer", status: "Reviewing", verified: true },
+      { name: "Bob Johnson", email: "bob@example.com", role: "Annotator", status: "Skipped", verified: false },
+      { name: "Alice Brown", email: "alice@example.com", role: "Manager", status: "Pending", verified: true },
+      { name: "Carol White", email: "carol@example.com", role: "Annotator", status: "Needs Review", verified: true },
     ];
+
+    const statusVariant: Record<string, "grape" | "plum" | "persimmon" | "neutral" | "canteloupe"> = {
+      Annotating: "grape",
+      Reviewing: "plum",
+      Skipped: "persimmon",
+      Pending: "neutral",
+      "Needs Review": "canteloupe",
+    };
 
     const columns: ColumnDef<(typeof users)[number]>[] = [
       {
@@ -490,7 +447,7 @@ export const InContext: Story = {
         header: "Status",
         accessorFn: (row) => row.status,
         cell: ({ row }) => (
-          <Badge variant={row.original.status === "Active" ? "positive" : "neutral"} style="filled" shape="rounded">
+          <Badge variant={statusVariant[row.original.status] ?? "neutral"} shape="rounded">
             {row.original.status}
           </Badge>
         ),
