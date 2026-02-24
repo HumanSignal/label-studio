@@ -34,6 +34,18 @@ describe("Control Tags - Choice", () => {
       Choices.findOption("Choice 2").trigger("mouseover", { force: true });
       Tooltip.hasText("A hint for Choice 2");
     });
+
+    it("select layout: select option and serialize", () => {
+      LabelStudio.params().config(choicesSelectLayoutConfig).data(simpleData).withResult([]).init();
+
+      Choices.toggleSelect();
+      Choices.findOption("Choice 2").click();
+      Choices.toggleSelect();
+      LabelStudio.serialize().then((result) => {
+        expect(result).to.have.lengthOf(1);
+        expect(result[0].value.choices).to.include("Choice 2");
+      });
+    });
   });
 
   describe("New version", () => {
