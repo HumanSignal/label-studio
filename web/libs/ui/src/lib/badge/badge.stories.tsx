@@ -1,5 +1,8 @@
 import type { Meta, StoryObj } from "@storybook/react";
+import type { ColumnDef } from "@tanstack/react-table";
 import { Badge } from "./badge";
+import { DataTable } from "../data-table";
+import { Typography } from "../typography/typography";
 
 const meta: Meta<typeof Badge> = {
   component: Badge,
@@ -7,11 +10,40 @@ const meta: Meta<typeof Badge> = {
   argTypes: {
     variant: {
       control: "select",
-      options: ["default", "secondary", "destructive", "info", "outline", "beta"],
+      options: [
+        "primary",
+        "neutral",
+        "negative",
+        "positive",
+        "warning",
+        "gradient",
+        "grape",
+        "blueberry",
+        "kale",
+        "kiwi",
+        "mango",
+        "canteloupe",
+        "persimmon",
+        "plum",
+        "fig",
+        "sand",
+      ],
+      // Note: Other variants (default, secondary, destructive, error, info, success, caution, beta, enterprise)
+      // are still supported as hidden fallbacks for backwards compatibility
+    },
+    style: {
+      control: "select",
+      options: ["filled", "outline", "ghost", "solid"],
     },
     shape: {
       control: "select",
-      options: ["rounded", "squared"],
+      options: ["rounded", "square"],
+      // Note: "squared" is still supported as a hidden fallback for backwards compatibility
+    },
+    size: {
+      control: "select",
+      options: ["medium", "small"],
+      // Note: "default" and "compact" are still supported as hidden fallbacks for backwards compatibility
     },
   },
 };
@@ -22,92 +54,306 @@ type Story = StoryObj<typeof Badge>;
 /**
  * Default Badge
  *
- * Primary blue badge - use for highlighting important information.
+ * Default grape badge - when no variant is specified, defaults to grape.
  */
 export const Default: Story = {
   args: {
     children: "Default",
-    variant: "default",
   },
 };
 
 /**
- * All Variants
+ * Semantic Variants
  *
- * Overview of all available badge variants.
+ * Overview of semantic variant mappings that map to accent colors.
  */
-export const AllVariants: Story = {
+export const SemanticVariants: Story = {
   render: () => {
     return (
-      <div className="flex flex-wrap gap-3">
-        <Badge variant="default">Default</Badge>
-        <Badge variant="secondary">Secondary</Badge>
-        <Badge variant="destructive">Destructive</Badge>
-        <Badge variant="info">Info</Badge>
-        <Badge variant="outline">Outline</Badge>
-        <Badge variant="beta">Beta</Badge>
+      <div className="flex flex-col gap-4">
+        <div>
+          <p className="text-sm text-neutral-content-subtle mb-2">Primary → Grape:</p>
+          <div className="flex flex-wrap gap-3">
+            <Badge variant="primary">Primary</Badge>
+          </div>
+        </div>
+        <div>
+          <p className="text-sm text-neutral-content-subtle mb-2">Neutral → Sand:</p>
+          <div className="flex flex-wrap gap-3">
+            <Badge variant="neutral">Neutral</Badge>
+          </div>
+        </div>
+        <div>
+          <p className="text-sm text-neutral-content-subtle mb-2">Negative → Persimmon:</p>
+          <div className="flex flex-wrap gap-3">
+            <Badge variant="negative">Negative</Badge>
+          </div>
+        </div>
+        <div>
+          <p className="text-sm text-neutral-content-subtle mb-2">Positive → Kale:</p>
+          <div className="flex flex-wrap gap-3">
+            <Badge variant="positive">Positive</Badge>
+          </div>
+        </div>
+        <div>
+          <p className="text-sm text-neutral-content-subtle mb-2">Warning → Canteloupe:</p>
+          <div className="flex flex-wrap gap-3">
+            <Badge variant="warning">Warning</Badge>
+            <Badge variant="caution">Caution</Badge>
+          </div>
+        </div>
+        <div>
+          <p className="text-sm text-neutral-content-subtle mb-2">Beta → Plum:</p>
+          <div className="flex flex-wrap gap-3">
+            <Badge variant="beta">Beta</Badge>
+          </div>
+        </div>
       </div>
     );
   },
 };
 
 /**
- * Secondary Badge
+ * Direct Accent Colors
  *
- * Neutral gray badge - use for general status or tags.
+ * Use accent colors directly when tags don't have an associated semantic sentiment.
  */
-export const Secondary: Story = {
-  args: {
-    children: "Secondary",
-    variant: "secondary",
+export const AccentColors: Story = {
+  render: () => {
+    return (
+      <div className="flex flex-col gap-4">
+        <div className="flex flex-wrap gap-3">
+          <Badge variant="grape">Grape</Badge>
+          <Badge variant="blueberry">Blueberry</Badge>
+          <Badge variant="kale">Kale</Badge>
+          <Badge variant="kiwi">Kiwi</Badge>
+          <Badge variant="mango">Mango</Badge>
+          <Badge variant="canteloupe">Canteloupe</Badge>
+          <Badge variant="persimmon">Persimmon</Badge>
+          <Badge variant="plum">Plum</Badge>
+          <Badge variant="fig">Fig</Badge>
+          <Badge variant="sand">Sand</Badge>
+        </div>
+      </div>
+    );
   },
 };
 
 /**
- * Destructive Badge
+ * Style Variants
  *
- * Red badge - use for errors, warnings, or critical states.
+ * Badges support four styles: filled (default), outline, ghost, and solid.
  */
-export const Destructive: Story = {
-  args: {
-    children: "Error",
-    variant: "destructive",
+export const StyleVariants: Story = {
+  render: () => {
+    return (
+      <div className="flex flex-col gap-4">
+        <div>
+          <p className="text-sm text-neutral-content-subtle mb-2">Filled (default):</p>
+          <div className="flex flex-wrap gap-3">
+            <Badge variant="grape" style="filled">
+              Grape
+            </Badge>
+            <Badge variant="kale" style="filled">
+              Kale
+            </Badge>
+            <Badge variant="persimmon" style="filled">
+              Persimmon
+            </Badge>
+            <Badge variant="canteloupe" style="filled">
+              Canteloupe
+            </Badge>
+          </div>
+        </div>
+        <div>
+          <p className="text-sm text-neutral-content-subtle mb-2">Outline:</p>
+          <div className="flex flex-wrap gap-3">
+            <Badge variant="grape" style="outline">
+              Grape
+            </Badge>
+            <Badge variant="kale" style="outline">
+              Kale
+            </Badge>
+            <Badge variant="persimmon" style="outline">
+              Persimmon
+            </Badge>
+            <Badge variant="canteloupe" style="outline">
+              Canteloupe
+            </Badge>
+          </div>
+        </div>
+        <div>
+          <p className="text-sm text-neutral-content-subtle mb-2">Ghost:</p>
+          <div className="flex flex-wrap gap-3">
+            <Badge variant="grape" style="ghost">
+              Grape
+            </Badge>
+            <Badge variant="kale" style="ghost">
+              Kale
+            </Badge>
+            <Badge variant="persimmon" style="ghost">
+              Persimmon
+            </Badge>
+            <Badge variant="canteloupe" style="ghost">
+              Canteloupe
+            </Badge>
+          </div>
+        </div>
+        <div>
+          <p className="text-sm text-neutral-content-subtle mb-2">Solid:</p>
+          <div className="flex flex-wrap gap-3">
+            <Badge variant="grape" style="solid">
+              Grape
+            </Badge>
+            <Badge variant="kale" style="solid">
+              Kale
+            </Badge>
+            <Badge variant="persimmon" style="solid">
+              Persimmon
+            </Badge>
+            <Badge variant="canteloupe" style="solid">
+              Canteloupe
+            </Badge>
+          </div>
+        </div>
+      </div>
+    );
   },
 };
 
 /**
- * Info Badge
+ * Shape Variants
  *
- * Purple/grape badge - use for informational content.
+ * Badges support two shapes: square (default) and rounded.
+ *
+ * - **Rounded**: Use for status badges, such as project, task, annotation status badges and calling out beta features.
+ * - **Square**: Use to outline data types, boolean values in table cells, counts in menu items, fields, or dropdowns.
  */
-export const Info: Story = {
-  args: {
-    children: "Information",
-    variant: "info",
+export const ShapeVariants: Story = {
+  render: () => {
+    return (
+      <div className="flex flex-col gap-4">
+        <div>
+          <p className="text-sm text-neutral-content-subtle mb-2">Square (default):</p>
+          <p className="text-xs text-neutral-content-subtler mb-2">
+            Use to outline data "types", counts in menu items, fields, or dropdowns.
+          </p>
+          <div className="flex flex-wrap gap-3">
+            <Badge variant="grape">Square</Badge>
+            <Badge variant="grape" shape="square">
+              Square
+            </Badge>
+            <Badge variant="persimmon">Square</Badge>
+          </div>
+        </div>
+        <div>
+          <p className="text-sm text-neutral-content-subtle mb-2">Rounded:</p>
+          <p className="text-xs text-neutral-content-subtler mb-2">
+            Use for status badges, such as project, task, and annotation status badges.
+          </p>
+          <div className="flex flex-wrap gap-3">
+            <Badge variant="grape" shape="rounded">
+              Rounded
+            </Badge>
+            <Badge variant="kale" shape="rounded">
+              Rounded
+            </Badge>
+            <Badge variant="persimmon" shape="rounded">
+              Rounded
+            </Badge>
+          </div>
+        </div>
+      </div>
+    );
   },
 };
 
 /**
- * Outline Badge
+ * Size Variants
  *
- * Outlined badge with no background - use for subtle emphasis.
+ * Badges support two sizes: medium (default) and small. Small should be used sparingly, only when real estate is minimal.
  */
-export const Outline: Story = {
-  args: {
-    children: "Outline",
-    variant: "outline",
+export const SizeVariants: Story = {
+  render: () => {
+    return (
+      <div className="flex flex-col gap-4">
+        <div>
+          <p className="text-sm text-neutral-content-subtle mb-2">Medium (default):</p>
+          <div className="flex flex-wrap gap-3">
+            <Badge variant="grape" size="medium">
+              Medium Size
+            </Badge>
+            <Badge variant="kale" size="medium">
+              Medium Size
+            </Badge>
+            <Badge variant="persimmon" size="medium">
+              Medium Size
+            </Badge>
+          </div>
+        </div>
+        <div>
+          <p className="text-sm text-neutral-content-subtle mb-2">Small (use sparingly):</p>
+          <div className="flex flex-wrap gap-3">
+            <Badge variant="grape" size="small">
+              Small
+            </Badge>
+            <Badge variant="kale" size="small">
+              Small
+            </Badge>
+            <Badge variant="persimmon" size="small">
+              Small
+            </Badge>
+          </div>
+        </div>
+      </div>
+    );
   },
 };
 
 /**
- * Beta Badge
+ * Gradient Variant
  *
- * Plum-colored badge - use for beta features or experimental functionality.
+ * Special gradient variant with IconSpark icon. Automatically includes icon.
  */
-export const Beta: Story = {
-  args: {
-    children: "Beta",
-    variant: "beta",
+export const GradientVariant: Story = {
+  render: () => {
+    return (
+      <div className="flex flex-col gap-4">
+        <div>
+          <p className="text-sm text-neutral-content-subtle mb-2">With label:</p>
+          <div className="flex flex-wrap gap-3">
+            <Badge variant="gradient">Enterprise</Badge>
+            <Badge variant="gradient" style="filled">
+              Enterprise
+            </Badge>
+            <Badge variant="gradient" style="ghost">
+              Enterprise
+            </Badge>
+            <Badge variant="gradient" style="solid">
+              Enterprise
+            </Badge>
+          </div>
+        </div>
+        <div>
+          <p className="text-sm text-neutral-content-subtle mb-2">Icon-only (no children):</p>
+          <div className="flex flex-wrap gap-3">
+            <Badge variant="gradient" />
+            <Badge variant="gradient" style="filled" />
+            <Badge variant="gradient" style="ghost" />
+            <Badge variant="gradient" style="solid" />
+          </div>
+        </div>
+        <div>
+          <p className="text-sm text-neutral-content-subtle mb-2">Small size:</p>
+          <div className="flex flex-wrap gap-3">
+            <Badge variant="gradient" size="small">
+              Enterprise
+            </Badge>
+            <Badge variant="gradient" size="small" />
+          </div>
+        </div>
+      </div>
+    );
   },
 };
 
@@ -122,19 +368,21 @@ export const StatusBadges: Story = {
       <div className="flex flex-col gap-4 max-w-md">
         <div className="flex items-center justify-between p-3 border border-neutral-border rounded">
           <span className="text-sm">Active Project</span>
-          <Badge variant="default">Active</Badge>
+          <Badge variant="success">Active</Badge>
         </div>
         <div className="flex items-center justify-between p-3 border border-neutral-border rounded">
           <span className="text-sm">Pending Review</span>
-          <Badge variant="secondary">Pending</Badge>
+          <Badge variant="neutral">Pending</Badge>
         </div>
         <div className="flex items-center justify-between p-3 border border-neutral-border rounded">
           <span className="text-sm">Failed Task</span>
-          <Badge variant="destructive">Failed</Badge>
+          <Badge variant="error">Failed</Badge>
         </div>
         <div className="flex items-center justify-between p-3 border border-neutral-border rounded">
           <span className="text-sm">Draft</span>
-          <Badge variant="outline">Draft</Badge>
+          <Badge variant="neutral" style="outline">
+            Draft
+          </Badge>
         </div>
       </div>
     );
@@ -142,192 +390,34 @@ export const StatusBadges: Story = {
 };
 
 /**
- * Role Badges
+ * All Combinations
  *
- * Common use case: displaying user roles.
+ * Comprehensive showcase of all variant combinations.
  */
-export const RoleBadges: Story = {
+export const AllCombinations: Story = {
   render: () => {
-    return (
-      <div className="flex flex-col gap-3">
-        <div className="flex items-center gap-3">
-          <div className="w-32 text-sm text-neutral-content-subtle">Admin User</div>
-          <Badge variant="destructive">Admin</Badge>
-        </div>
-        <div className="flex items-center gap-3">
-          <div className="w-32 text-sm text-neutral-content-subtle">Editor User</div>
-          <Badge variant="default">Editor</Badge>
-        </div>
-        <div className="flex items-center gap-3">
-          <div className="w-32 text-sm text-neutral-content-subtle">Viewer User</div>
-          <Badge variant="secondary">Viewer</Badge>
-        </div>
-        <div className="flex items-center gap-3">
-          <div className="w-32 text-sm text-neutral-content-subtle">Guest User</div>
-          <Badge variant="outline">Guest</Badge>
-        </div>
-      </div>
-    );
-  },
-};
+    const variants = ["grape", "kale", "persimmon", "canteloupe", "plum"] as const;
+    const styles = ["filled", "outline", "ghost", "solid"] as const;
+    const shapes = ["rounded", "square"] as const;
 
-/**
- * Feature Badges
- *
- * Common use case: marking features as new, beta, or experimental.
- */
-export const FeatureBadges: Story = {
-  render: () => {
     return (
-      <div className="flex flex-col gap-4">
-        <div className="flex items-center gap-2">
-          <span className="text-sm">AI-Powered Annotations</span>
-          <Badge variant="beta">Beta</Badge>
-        </div>
-        <div className="flex items-center gap-2">
-          <span className="text-sm">Advanced Filters</span>
-          <Badge variant="info">New</Badge>
-        </div>
-        <div className="flex items-center gap-2">
-          <span className="text-sm">Team Collaboration</span>
-          <Badge variant="default">Pro</Badge>
-        </div>
-      </div>
-    );
-  },
-};
-
-/**
- * Badge with Numbers
- *
- * Common use case: displaying counts or quantities.
- */
-export const WithNumbers: Story = {
-  render: () => {
-    return (
-      <div className="flex flex-wrap gap-3">
-        <Badge variant="default">3</Badge>
-        <Badge variant="secondary">12</Badge>
-        <Badge variant="destructive">5 errors</Badge>
-        <Badge variant="info">24 new</Badge>
-        <Badge variant="outline">99+</Badge>
-      </div>
-    );
-  },
-};
-
-/**
- * Badge Group
- *
- * Multiple badges together - common for tags or categories.
- */
-export const BadgeGroup: Story = {
-  render: () => {
-    return (
-      <div className="max-w-md">
-        <p className="text-sm text-neutral-content-subtle mb-2">Project Tags:</p>
-        <div className="flex flex-wrap gap-2">
-          <Badge variant="secondary">Machine Learning</Badge>
-          <Badge variant="secondary">Computer Vision</Badge>
-          <Badge variant="secondary">Image Classification</Badge>
-          <Badge variant="secondary">Medical</Badge>
-          <Badge variant="secondary">Research</Badge>
-        </div>
-      </div>
-    );
-  },
-};
-
-/**
- * Interactive Badges
- *
- * Badges can be clickable when needed.
- */
-export const Interactive: Story = {
-  render: () => {
-    return (
-      <div className="flex flex-wrap gap-3">
-        <Badge variant="default" className="cursor-pointer hover:opacity-80" onClick={() => alert("Badge clicked!")}>
-          Clickable
-        </Badge>
-        <Badge variant="secondary" className="cursor-pointer hover:opacity-80" onClick={() => alert("Tag clicked!")}>
-          Tag
-        </Badge>
-        <Badge
-          variant="outline"
-          className="cursor-pointer hover:bg-neutral-surface"
-          onClick={() => alert("Category clicked!")}
-        >
-          Category
-        </Badge>
-      </div>
-    );
-  },
-};
-
-/**
- * Badge Shapes
- *
- * Badges support two shapes: rounded (default) and squared.
- */
-export const Shapes: Story = {
-  render: () => {
-    return (
-      <div className="flex flex-col gap-4">
-        <div>
-          <p className="text-sm text-neutral-content-subtle mb-2">Rounded (default):</p>
-          <div className="flex flex-wrap gap-3">
-            <Badge variant="default" shape="rounded">
-              Rounded Default
-            </Badge>
-            <Badge variant="secondary" shape="rounded">
-              Rounded Secondary
-            </Badge>
-            <Badge variant="outline" shape="rounded">
-              Rounded Outline
-            </Badge>
+      <div className="flex flex-col gap-6">
+        {variants.map((variant) => (
+          <div key={variant}>
+            <p className="text-sm font-medium text-neutral-content mb-3 capitalize">{variant}:</p>
+            <div className="flex flex-col gap-3">
+              {styles.map((style) => (
+                <div key={style} className="flex flex-wrap gap-3">
+                  {shapes.map((shape) => (
+                    <Badge key={shape} variant={variant} style={style} shape={shape}>
+                      {variant} {style} {shape}
+                    </Badge>
+                  ))}
+                </div>
+              ))}
+            </div>
           </div>
-        </div>
-        <div>
-          <p className="text-sm text-neutral-content-subtle mb-2">Squared:</p>
-          <div className="flex flex-wrap gap-3">
-            <Badge variant="default" shape="squared">
-              Squared Default
-            </Badge>
-            <Badge variant="secondary" shape="squared">
-              Squared Secondary
-            </Badge>
-            <Badge variant="outline" shape="squared">
-              Squared Outline
-            </Badge>
-          </div>
-        </div>
-      </div>
-    );
-  },
-};
-
-/**
- * Custom Styled Badges
- *
- * Badges can be customized with additional classes.
- */
-export const CustomStyled: Story = {
-  render: () => {
-    return (
-      <div className="flex flex-wrap gap-3">
-        <Badge variant="default" className="text-base px-4 py-1">
-          Large Badge
-        </Badge>
-        <Badge variant="secondary" className="text-[10px] px-2 py-0">
-          Tiny Badge
-        </Badge>
-        <Badge variant="info" shape="squared">
-          Squared Badge
-        </Badge>
-        <Badge variant="beta" className="uppercase tracking-wider">
-          Uppercase
-        </Badge>
+        ))}
       </div>
     );
   },
@@ -336,41 +426,75 @@ export const CustomStyled: Story = {
 /**
  * In Context
  *
- * Real-world example showing badges in a user list.
+ * Real-world example showing badges in a user list using DataTable.
  */
 export const InContext: Story = {
   render: () => {
     const users = [
-      { name: "John Doe", email: "john@example.com", role: "admin", status: "active" },
-      { name: "Jane Smith", email: "jane@example.com", role: "editor", status: "active" },
-      { name: "Bob Johnson", email: "bob@example.com", role: "viewer", status: "inactive" },
-      { name: "Alice Brown", email: "alice@example.com", role: "editor", status: "active" },
+      { name: "John Doe", email: "john@example.com", role: "Admin", status: "Active", verified: true },
+      { name: "Jane Smith", email: "jane@example.com", role: "Reviewer", status: "Active", verified: true },
+      { name: "Bob Johnson", email: "bob@example.com", role: "Annotator", status: "Inactive", verified: false },
+      { name: "Alice Brown", email: "alice@example.com", role: "Manager", status: "Active", verified: true },
     ];
 
-    return (
-      <div className="border border-neutral-border rounded-lg overflow-hidden">
-        <div className="bg-neutral-surface px-4 py-3 border-b border-neutral-border">
-          <h3 className="font-medium">Team Members</h3>
-        </div>
-        <div className="divide-y divide-neutral-border">
-          {users.map((user) => (
-            <div key={user.email} className="px-4 py-3 flex items-center justify-between">
-              <div>
-                <p className="font-medium text-sm">{user.name}</p>
-                <p className="text-xs text-neutral-content-subtle">{user.email}</p>
-              </div>
-              <div className="flex items-center gap-2">
-                <Badge
-                  variant={user.role === "admin" ? "destructive" : user.role === "editor" ? "default" : "secondary"}
-                >
-                  {user.role}
-                </Badge>
-                <Badge variant={user.status === "active" ? "default" : "outline"}>{user.status}</Badge>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    );
+    const columns: ColumnDef<(typeof users)[number]>[] = [
+      {
+        id: "name",
+        header: "Name",
+        accessorFn: (row) => row.name,
+        cell: ({ row }) => (
+          <div>
+            <Typography variant="body" size="small" className="font-medium">
+              {row.original.name}
+            </Typography>
+            <Typography variant="body" size="smaller" className="text-neutral-content-subtle">
+              {row.original.email}
+            </Typography>
+          </div>
+        ),
+      },
+      {
+        id: "role",
+        header: "Role",
+        accessorFn: (row) => row.role,
+        cell: ({ row }) => (
+          <Badge
+            variant={
+              row.original.role === "Admin"
+                ? "persimmon"
+                : row.original.role === "Annotator"
+                  ? "grape"
+                  : row.original.role === "Reviewer"
+                    ? "canteloupe"
+                    : "neutral"
+            }
+          >
+            {row.original.role}
+          </Badge>
+        ),
+      },
+      {
+        id: "status",
+        header: "Status",
+        accessorFn: (row) => row.status,
+        cell: ({ row }) => (
+          <Badge variant={row.original.status === "Active" ? "positive" : "neutral"} style="filled" shape="rounded">
+            {row.original.status}
+          </Badge>
+        ),
+      },
+      {
+        id: "verified",
+        header: "Verified",
+        accessorFn: (row) => row.verified,
+        cell: ({ row }) => (
+          <Badge variant={row.original.verified ? "positive" : "negative"}>
+            {row.original.verified ? "True" : "False"}
+          </Badge>
+        ),
+      },
+    ];
+
+    return <DataTable data={users} columns={columns} />;
   },
 };
