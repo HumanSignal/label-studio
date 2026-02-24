@@ -66,7 +66,9 @@ export function StateChip({
     return (
       <Tooltip title={description || label}>
         <span>
-          <Badge className={className}>{label}</Badge>
+          <Badge className={className} shape="rounded">
+            {label}
+          </Badge>
         </span>
       </Tooltip>
     );
@@ -83,7 +85,9 @@ export function StateChip({
       type="button"
       title="Click to view history"
     >
-      <Badge className={className}>{label}</Badge>
+      <Badge className={className} style="solid" shape="rounded">
+        {label}
+      </Badge>
     </button>
   );
 
