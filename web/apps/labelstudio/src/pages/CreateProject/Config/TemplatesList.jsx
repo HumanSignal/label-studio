@@ -4,7 +4,7 @@ import { useAPI } from "../../../providers/ApiProvider";
 import { cn } from "../../../utils/bem";
 import "./Config.scss";
 import { IconInfo } from "@humansignal/icons";
-import { Button, EnterpriseBadge } from "@humansignal/ui";
+import { Button, Badge } from "@humansignal/ui";
 
 const listClass = cn("templates-list");
 
@@ -39,7 +39,7 @@ const TemplatesInGroup = ({ templates, group, onSelectRecipe, isEdition }) => {
             <img src={recipe.image} alt={""} />
             <div className="flex flex-col items-center w-full">
               <h3 className="flex flex-1 justify-center text-center w-full">{recipe.title}</h3>
-              {isEnterpriseTemplate && isCommunityEdition && <EnterpriseBadge className="mb-base" />}
+              {isEnterpriseTemplate && isCommunityEdition && <Badge variant="gradient" className="mb-base">Enterprise</Badge>}
             </div>
           </li>
         );
