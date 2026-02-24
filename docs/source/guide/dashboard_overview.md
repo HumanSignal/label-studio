@@ -98,11 +98,11 @@ The **Project Progress** table display detailed metrics for each project.
 | **Workspace** | The workspace that contains the project. |
 | **Project** | The project name. Click to open the project dashboard. |
 | **Task Count** | Number of tasks in the project. This includes every task and is not date filtered. |
-| **Initial** | Number of tasks in the [**Initial** state](project_states#Task-states). |
-| **Annotating** | Number of tasks in the [**Annotating** state](project_states#Task-states). |
-| **Needs Review** | Number of tasks in the [**Needs Review** state](project_states#Task-states). |
-| **In Review** | Number of tasks in the [**In Review** state](project_states#Task-states). |
-| **Done** | Number of tasks in the [**Done** state](project_states#Task-states). |
+| **Tasks (Initial)** | Number of tasks in the [**Initial** state](project_states#Task-states). |
+| **Tasks (Annotating)** | Number of tasks in the [**Annotating** state](project_states#Task-states). |
+| **Tasks (Needs Review)** | Number of tasks in the [**Needs Review** state](project_states#Task-states). |
+| **Tasks (In Review)** | Number of tasks in the [**In Review** state](project_states#Task-states). |
+| **Tasks (Done)** | Number of tasks in the [**Done** state](project_states#Task-states). |
 | **Tasks Annotated** | Total number of tasks that have each received the required number of annotations during the selected date range. This includes tasks in the **Done** state, **Needs Review** state, and the **In Review** state. |
 | **Annotations Submitted** | Number of annotations submitted (includes those updated and/or reviewed). |
 | **Annotations Accepted** | Annotations accepted or fixed and then accepted. |
