@@ -53,7 +53,6 @@ To start the development server with HMR:
 - **Label Studio Frontend (Editor):**
     - `yarn lsf:watch`: Continuously build the frontend editor.
     - `yarn lsf:serve`: Run the frontend editor standalone.
-    - `yarn lsf:e2e`: Run end-to-end tests for the frontend editor.
     - `yarn lsf:integration`: Run integration tests for the frontend editor.
     - `yarn lsf:unit`: Run unit tests for the frontend editor.
 - **Datamanager**

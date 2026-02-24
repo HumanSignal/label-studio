@@ -1027,3 +1027,4 @@ class HtxParagraphsView extends Component {
 }
 
 export const HtxParagraphs = inject("store")(observer(HtxParagraphsView));
+export { HtxParagraphsView };

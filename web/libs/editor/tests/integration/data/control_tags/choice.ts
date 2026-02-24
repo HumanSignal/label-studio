@@ -1,3 +1,4 @@
+/** Shared text data for choice configs. */
 export const simpleData = {
   text: "This text exists for no reason",
 };

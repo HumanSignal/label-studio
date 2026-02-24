@@ -181,3 +181,39 @@ export const simplePointResult = [
     origin: "manual",
   },
 ];
+
+/** Config and task for keypoint + KeyPointLabels used in linking-mode E2E (KeyPointRegion isLinkingMode paths). */
+export const keypointLabelsLinkingConfig = `
+<View>
+  <Image name="img" value="$image" />
+  <KeyPoint name="kp" toName="img" />
+  <KeyPointLabels name="tag" toName="img">
+    <Label value="A" />
+    <Label value="B" />
+  </KeyPointLabels>
+</View>`;
+
+export const keypointLabelsLinkingResult = [
+  {
+    id: "kp_1",
+    original_width: 2242,
+    original_height: 2802,
+    image_rotation: 0,
+    value: { x: 30, y: 30, width: 0.5, keypointlabels: ["A"] },
+    from_name: "tag",
+    to_name: "img",
+    type: "keypointlabels",
+    origin: "manual",
+  },
+  {
+    id: "kp_2",
+    original_width: 2242,
+    original_height: 2802,
+    image_rotation: 0,
+    value: { x: 60, y: 60, width: 0.5, keypointlabels: ["B"] },
+    from_name: "tag",
+    to_name: "img",
+    type: "keypointlabels",
+    origin: "manual",
+  },
+];

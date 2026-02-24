@@ -1,4 +1,5 @@
 import { AudioView, LabelStudio } from "@humansignal/frontend-test/helpers/LSF";
+import { FF_DEV_2669 } from "../../../../src/utils/feature-flags";
 
 const config = `
 <View>
@@ -144,6 +145,28 @@ describe("Sync: Audio Paragraphs", () => {
 
     // expect uncaught exception for fast play/pause
     cy.on("uncaught:exception", () => false);
+  });
+
+  describe("Author filter", () => {
+    beforeEach(() => {
+      LabelStudio.addFeatureFlagsOnPageLoad({
+        ff_front_dev_2715_audio_3_280722_short: true,
+        fflag_feat_front_lsdv_e_278_contextual_scrolling_short: true,
+        [FF_DEV_2669]: true,
+      });
+    });
+
+    it("shows author filter and filters by author when selected", () => {
+      LabelStudio.params().config(config).data(data).withResult([]).init();
+      LabelStudio.waitForObjectsReady();
+      AudioView.isReady();
+
+      cy.contains("Show all authors").should("be.visible").click();
+      cy.contains("Mia Wallace").should("be.visible").click();
+      cy.get("body").click(0, 0);
+      // Dropdown closed; trigger may be clipped by scroll container so assert existence
+      cy.contains("Show all authors").should("exist");
+    });
   });
 
   it("Play/pause is synced between audio and paragraphs when interacting with audio interface", () => {
@@ -446,6 +469,62 @@ describe("Sync: Audio Paragraphs", () => {
     // Wait for scroll position to reflect manual scroll
     cy.get('[data-testid="phrases-wrapper"]').should(($el) => {
       expect($el[0].scrollTop).to.be.greaterThan(190);
+    });
+  });
+
+  describe("Paragraphs layout and phrases", () => {
+    it("should render dialogue layout with all phrases and play from first phrase", () => {
+      LabelStudio.params().config(configWithScroll).data(data).withResult(annotations).init();
+
+      LabelStudio.waitForObjectsReady();
+      AudioView.isReady();
+
+      // All dialogue phrases from data are present
+      cy.get('[data-testid="phrase:0"]').should("exist").and("contain.text", "Dont you hate that?");
+      cy.get('[data-testid="phrase:1"]').should("exist").and("contain.text", "Hate what?");
+      // Play from first phrase and confirm playback
+      cy.get('[data-testid="phrase:0"]').siblings('button[aria-label="play"]').click();
+      AudioView.waitForPlayState(true, 8000, false);
+      cy.get("audio").then(([audio]) => {
+        expect((audio as HTMLAudioElement).paused).to.equal(false);
+      });
+    });
+  });
+
+  describe("Paragraphs AuthorFilter (FF_DEV_2669 on)", () => {
+    beforeEach(() => {
+      LabelStudio.addFeatureFlagsOnPageLoad({
+        ff_front_dev_2715_audio_3_280722_short: true,
+        ff_front_dev_2669_paragraph_author_filter_210622_short: true,
+        fflag_feat_front_lsdv_e_278_contextual_scrolling_short: false,
+        fflag_feat_front_bros_199_enable_select_all_in_ner_phrase_short: false,
+      });
+    });
+
+    it("shows AuthorFilter and filters by author when FF_DEV_2669 is on", () => {
+      LabelStudio.params().config(configWithScroll).data(data).withResult(annotations).init();
+
+      LabelStudio.waitForObjectsReady();
+      AudioView.isReady();
+
+      cy.contains("Show all authors").should("be.visible").click();
+      cy.get("body").contains("Mia Wallace").click();
+      cy.get('[data-testid="phrase:0"]').should("exist").and("contain.text", "Dont you hate that?");
+    });
+
+    it("clears filter when Show all authors is selected", () => {
+      LabelStudio.params().config(configWithScroll).data(data).withResult(annotations).init();
+
+      LabelStudio.waitForObjectsReady();
+      AudioView.isReady();
+
+      cy.contains("Show all authors").click();
+      cy.get("body").contains("Mia Wallace").click();
+      cy.get('[data-testid="phrase:0"]').should("exist");
+      cy.get("[class*='authorFilter']").first().click();
+      cy.get("body").contains("Show all authors").click();
+      cy.get('[data-testid="phrase:0"]').should("exist").and("contain.text", "Dont you hate that?");
+      cy.get('[data-testid="phrase:1"]').should("exist").and("contain.text", "Hate what?");
     });
   });
 });

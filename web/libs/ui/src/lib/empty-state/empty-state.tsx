@@ -107,6 +107,16 @@ export interface EmptyStateProps extends React.HTMLAttributes<HTMLDivElement> {
    * to reference the title element for accessibility.
    */
   "aria-label"?: string;
+
+  /**
+   * Optional ID for the title element (accessibility).
+   */
+  titleId?: string;
+
+  /**
+   * Optional ID for the description element (accessibility).
+   */
+  descriptionId?: string;
 }
 
 /**
@@ -211,6 +221,8 @@ export const EmptyState = forwardRef<HTMLDivElement, EmptyStateProps>(
       additionalContent,
       footer,
       className,
+      titleId: titleIdProp,
+      descriptionId: descriptionIdProp,
       "data-testid": testId,
       "aria-label": ariaLabel,
       ...rest
@@ -228,9 +240,9 @@ export const EmptyState = forwardRef<HTMLDivElement, EmptyStateProps>(
     const titleConfig = titleVariants[size];
     const descriptionConfig = descriptionVariants[size];
 
-    // Generate unique IDs for accessibility
-    const titleElementId = `empty-state-title-${Math.random().toString(36).slice(2, 11)}`;
-    const descriptionElementId = `empty-state-desc-${Math.random().toString(36).slice(2, 11)}`;
+    // Use provided IDs or generate unique IDs for accessibility
+    const titleElementId = titleIdProp ?? `empty-state-title-${Math.random().toString(36).slice(2, 11)}`;
+    const descriptionElementId = descriptionIdProp ?? `empty-state-desc-${Math.random().toString(36).slice(2, 11)}`;
 
     // Calculate action layout
     const actionLayout = actions

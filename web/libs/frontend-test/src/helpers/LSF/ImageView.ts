@@ -227,6 +227,13 @@ export const ImageView = {
     cy.get("body").type("{ctrl}{-}");
   },
 
+  zoomInByButton() {
+    this.toolBar.find('[aria-label="zoom-in"]').should("be.visible").click();
+  },
+  zoomOutByButton() {
+    this.toolBar.find('[aria-label="zoom-out"]').should("be.visible").click();
+  },
+
   selectRectangleToolByButton() {
     this.toolBar
       .find('[aria-label="rectangle-tool"]')
@@ -257,6 +264,18 @@ export const ImageView = {
 
   selectBrushToolByButton() {
     this.toolBar.find('[aria-label="brush-tool"]').should("be.visible").click().should("have.class", "lsf-tool_active");
+  },
+
+  selectBitmaskToolByButton() {
+    this.toolBar
+      .find('[aria-label="bitmask-tool"]')
+      .should("be.visible")
+      .click()
+      .should("have.class", "lsf-tool_active");
+  },
+
+  selectEraserToolByButton() {
+    this.toolBar.find('[aria-label="eraser"]').should("be.visible").click();
   },
 
   selectMoveToolByButton() {

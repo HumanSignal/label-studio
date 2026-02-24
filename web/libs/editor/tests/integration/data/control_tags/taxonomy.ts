@@ -158,3 +158,43 @@ export const taxonomyResultWithAlias = {
   to_name: "text",
   from_name: "choices",
 };
+
+export const legacyTaxonomyConfig = `<View>
+  <Text name="text" value="$text"/>
+  <Taxonomy name="legacy_choices" toName="text" legacy="true" leafsOnly="true" showFullPath="true">
+    <Choice value="Book 1">
+      <Choice value="Chapter 1" />
+      <Choice value="Chapter 2">
+        <Choice value="Section 2.1" />
+        <Choice value="Section 2.2" />
+      </Choice>
+    </Choice>
+    <Choice value="Book 2">
+      <Choice value="Chapter 1" />
+    </Choice>
+  </Taxonomy>
+</View>`;
+
+export const legacyTaxonomyResult = {
+  from_name: "legacy_choices",
+  to_name: "text",
+  type: "taxonomy",
+  value: {
+    taxonomy: [
+      ["Book 1", "Chapter 2", "Section 2.1"],
+      ["Book 1", "Chapter 2", "Section 2.2"],
+    ],
+  },
+};
+
+export const legacyDynamicTaxonomyConfig = `<View>
+  <Text name="text" value="$text"/>
+  <Taxonomy name="legacy_choices" toName="text" value="$items" legacy="true" showFullPath="true"/>
+</View>`;
+
+export const legacyLargeTaxonomyData = {
+  text: "Large taxonomy test task",
+  items: Array.from({ length: 80 }, (_, index) => ({
+    value: `Item ${index + 1}`,
+  })),
+};
