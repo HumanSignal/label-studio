@@ -247,6 +247,7 @@ export const Select = forwardRef(
       footer,
       alwaysShowSelectedGroup = false,
       onSelectAllClick,
+      open: controlledOpen,
       ...props
     }: SelectProps<T, A>,
     _ref: ForwardedRef<HTMLSelectElement>,
@@ -264,7 +265,8 @@ export const Select = forwardRef(
     } else if (Array.isArray(initialValue)) {
       initialValue = initialValue[0];
     }
-    const [isOpen, setIsOpen] = useState<boolean>(false);
+    const [internalIsOpen, setInternalIsOpen] = useState<boolean>(false);
+    const isOpen = controlledOpen !== undefined ? controlledOpen : internalIsOpen;
     const [selectedGroupExpanded, setSelectedGroupExpanded] = useState<boolean>(false);
     const [value, setValue] = useState<any>(initialValue);
 
@@ -322,7 +324,7 @@ export const Select = forwardRef(
           setValue(val);
         }
         if (!multiple) {
-          setIsOpen(false);
+          setInternalIsOpen(false);
           onClose?.();
         }
         props?.onChange?.(valueRef.current);
@@ -516,7 +518,7 @@ export const Select = forwardRef(
       <Popover
         open={isOpen}
         onOpenChange={(_isOpen) => {
-          setIsOpen(_isOpen);
+          setInternalIsOpen(_isOpen);
           _isOpen ? onOpen?.() : onClose?.();
         }}
       >
@@ -644,7 +646,7 @@ export const Select = forwardRef(
                     renderedOptions
                   )}
                 </CommandGroup>
-                {footer && <div className="px-base py-tight border-t border-neutral-border">{footer}</div>}
+                {footer && <div className="p-tight border-t border-neutral-border flex">{footer}</div>}
               </CommandList>
             </Command>
           )}
