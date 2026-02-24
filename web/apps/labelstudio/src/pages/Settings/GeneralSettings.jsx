@@ -1,4 +1,5 @@
 import { Badge, Select, Typography, Tooltip } from "@humansignal/ui";
+import { IconSpark } from "@humansignal/icons";
 import { useCallback, useContext } from "react";
 import { Button } from "@humansignal/ui";
 import { Form, Input, TextArea } from "../../components/Form";
@@ -37,7 +38,7 @@ export const GeneralSettings = () => {
                 <div className={cn("workspace-placeholder").toClassName()}>
                   <div className={cn("workspace-placeholder").elem("badge-wrapper").toClassName()}>
                     <div className={cn("workspace-placeholder").elem("title").toClassName()}>Workspace</div>
-                    <Badge variant="gradient" size="small" className="ml-2">
+                    <Badge variant="gradient" icon={<IconSpark />} size="small" className="ml-2">
                       Enterprise
                     </Badge>
                   </div>
@@ -86,7 +87,13 @@ export const GeneralSettings = () => {
                       <>
                         Uncertainty sampling{" "}
                         <Tooltip title="Available on Label Studio Enterprise">
-                          <Badge variant="enterprise" size="small" style="ghost" className="ml-tightest" />
+                          <Badge
+                            variant="enterprise"
+                            icon={<IconSpark />}
+                            size="small"
+                            style="ghost"
+                            className="ml-tightest"
+                          />
                         </Tooltip>
                       </>
                     }

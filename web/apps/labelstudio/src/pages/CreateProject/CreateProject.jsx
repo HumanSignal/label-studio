@@ -1,4 +1,5 @@
 import { Badge, Select, Typography } from "@humansignal/ui";
+import { IconSpark } from "@humansignal/icons";
 import React from "react";
 import { useHistory } from "react-router";
 import { ToggleItems } from "../../components";
@@ -59,7 +60,7 @@ const ProjectName = ({ name, setName, onSaveName, onSubmit, error, description, 
         <div className="w-full flex flex-col gap-2">
           <label>
             Workspace
-            <Badge variant="gradient" className="ml-2">
+            <Badge variant="gradient" icon={<IconSpark />} className="ml-2">
               Enterprise
             </Badge>
           </label>

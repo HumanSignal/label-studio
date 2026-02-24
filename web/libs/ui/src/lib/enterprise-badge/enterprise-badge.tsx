@@ -1,14 +1,15 @@
 import type { FC } from "react";
+import { IconSpark } from "../../assets/icons";
 import { Badge } from "../badge/badge";
 
 /**
  * @deprecated EnterpriseBadge is deprecated. Use Badge with variant="gradient" instead.
  *
  * Migration guide:
- * - <EnterpriseBadge /> → <Badge variant="gradient">Enterprise</Badge>
- * - <EnterpriseBadge ghost /> → <Badge variant="gradient" style="ghost">Enterprise</Badge>
- * - <EnterpriseBadge filled /> → <Badge variant="gradient" style="filled">Enterprise</Badge>
- * - <EnterpriseBadge compact /> → <Badge variant="gradient" size="small" /> (icon-only, "compact" also works for backwards compatibility)
+ * - <EnterpriseBadge /> → <Badge variant="gradient" icon={<IconSpark />}>Enterprise</Badge>
+ * - <EnterpriseBadge ghost /> → <Badge variant="gradient" icon={<IconSpark />} style="ghost">Enterprise</Badge>
+ * - <EnterpriseBadge filled /> → <Badge variant="gradient" icon={<IconSpark />} style="filled">Enterprise</Badge>
+ * - <EnterpriseBadge compact /> → <Badge variant="gradient" icon={<IconSpark />} size="small" /> (icon-only)
  */
 export interface EnterpriseBadgeProps {
   className?: string;
@@ -27,11 +28,11 @@ export const EnterpriseBadge: FC<EnterpriseBadgeProps> = ({ className, filled, c
 
   // If compact and no children, show icon-only
   if (compact) {
-    return <Badge variant="gradient" style={style} size={size} className={className} />;
+    return <Badge variant="gradient" icon={<IconSpark />} style={style} size={size} className={className} />;
   }
 
   return (
-    <Badge variant="gradient" style={style} size={size} className={className}>
+    <Badge variant="gradient" icon={<IconSpark />} style={style} size={size} className={className}>
       Enterprise
     </Badge>
   );

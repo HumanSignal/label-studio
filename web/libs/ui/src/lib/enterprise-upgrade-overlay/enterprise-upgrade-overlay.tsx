@@ -1,7 +1,8 @@
 import { forwardRef, type ReactNode } from "react";
+import { IconSpark } from "../../assets/icons";
 import { cn } from "../../utils/utils";
-import { Button } from "../button/button";
 import { Badge } from "../badge/badge";
+import { Button } from "../button/button";
 import { Typography } from "../typography/typography";
 import styles from "./enterprise-upgrade-overlay.module.scss";
 
@@ -111,7 +112,7 @@ export const EnterpriseUpgradeOverlay = forwardRef<HTMLDivElement, EnterpriseUpg
         <div className={styles.container}>
           <div className={styles.content}>
             <div className={styles.badge}>
-              <Badge variant="gradient" style="filled">
+              <Badge variant="gradient" icon={<IconSpark />} style="filled">
                 Enterprise
               </Badge>
             </div>
