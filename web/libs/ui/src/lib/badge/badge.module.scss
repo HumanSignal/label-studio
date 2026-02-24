@@ -98,7 +98,7 @@
 
 .variant-sand {
   background: var(--color-accent-sand-subtlest);
-  border-color: var(--color-neutral-border);
+  border-color: var(--color-accent-sand-subtle);
   color: var(--color-accent-sand-bold);
 }
 
@@ -216,53 +216,53 @@
   border: none !important;
   
   &.variant-grape {
-    background: var(--color-accent-grape-base);
-    color: var(--color-accent-grape-subtlest);
+    background: var(--color-accent-grape-subtle);
+    color: var(--color-accent-grape-dark);
   }
   
   &.variant-blueberry {
-    background: var(--color-accent-blueberry-base);
-    color: var(--color-accent-blueberry-subtlest);
+    background: var(--color-accent-blueberry-subtle);
+    color: var(--color-accent-blueberry-dark);
   }
   
   &.variant-kale {
-    background: var(--color-accent-kale-base);
-    color: var(--color-accent-kale-subtlest);
+    background: var(--color-accent-kale-subtle);
+    color: var(--color-accent-kale-dark);
   }
   
   &.variant-kiwi {
-    background: var(--color-accent-kiwi-base);
-    color: var(--color-accent-kiwi-subtlest);
+    background: var(--color-accent-kiwi-subtle);
+    color: var(--color-accent-kiwi-dark);
   }
   
   &.variant-mango {
-    background: var(--color-accent-mango-base);
-    color: var(--color-accent-mango-subtlest);
+    background: var(--color-accent-mango-subtle);
+    color: var(--color-accent-mango-dark);
   }
   
   &.variant-canteloupe {
-    background: var(--color-accent-canteloupe-base);
-    color: var(--color-accent-canteloupe-subtlest);
+    background: var(--color-accent-canteloupe-subtle);
+    color: var(--color-accent-canteloupe-dark);
   }
   
   &.variant-persimmon {
-    background: var(--color-accent-persimmon-base);
-    color: var(--color-accent-persimmon-subtlest);
+    background: var(--color-accent-persimmon-subtle);
+    color: var(--color-accent-persimmon-dark);
   }
   
   &.variant-plum {
-    background: var(--color-accent-plum-base);
-    color: var(--color-accent-plum-subtlest);
+    background: var(--color-accent-plum-subtle);
+    color: var(--color-accent-plum-dark);
   }
   
   &.variant-fig {
-    background: var(--color-accent-fig-base);
-    color: var(--color-accent-fig-subtlest);
+    background: var(--color-accent-fig-subtle);
+    color: var(--color-accent-fig-dark);
   }
   
   &.variant-sand {
-    background: var(--color-accent-sand-base);
-    color: var(--color-accent-sand-subtlest);
+    background: var(--color-accent-sand-subtle);
+    color: var(--color-accent-sand-dark);
   }
 }
 
@@ -296,7 +296,6 @@
   .badge-content {
     margin: 1px;
     background: none;
-    color: var(--color-neutral-on-dark-content);
     border-radius: calc(var(--corner-radius-smaller) - 1px); // Default squared shape
     font-size: var(--font-size-label-smaller);
     padding: 0 var(--spacing-tighter) 0 var(--spacing-tighter);
@@ -309,23 +308,25 @@
     cursor: default;
   }
   
+  .badge-text {
+    background: linear-gradient(109deg, var(--color-accent-canteloupe-base) 0%, var(--color-accent-persimmon-base) 51.56%, var(--color-accent-plum-base) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  
   .icon {
-    path {
-      fill: var(--color-neutral-on-dark-content);
-    }
+    // Default: use SVG gradient (no fill override)
   }
   
   &.style-filled {
     .badge-content {
       background: linear-gradient(135deg, var(--color-accent-canteloupe-subtlest) 0%, var(--color-accent-persimmon-subtlest) 50%, var(--color-accent-plum-subtlest) 100%);
-      color: var(--color-accent-persimmon-base);
       height: calc(100% - 2px);
     }
     
     .icon {
-      path {
-        fill: var(--color-accent-persimmon-base);
-      }
+      // Use SVG gradient (no fill override)
     }
     
     // Shape variants for filled style
@@ -345,14 +346,11 @@
   &.style-outline {
     .badge-content {
       background: var(--color-neutral-background);
-      color: var(--color-accent-persimmon-base);
       height: calc(100% - 2px);
     }
     
     .icon {
-      path {
-        fill: var(--color-accent-persimmon-base);
-      }
+      // Use SVG gradient (no fill override)
     }
     
     // Shape variants for outline style
@@ -373,8 +371,15 @@
     .badge-content {
       border: none;
       background: none;
-      color: var(--color-neutral-on-dark-content);
       height: calc(100% - 2px);
+    }
+    
+    .badge-text {
+      background: none;
+      -webkit-background-clip: unset;
+      background-clip: unset;
+      -webkit-text-fill-color: unset;
+      color: var(--color-neutral-on-dark-content);
     }
     
     .icon {
@@ -422,14 +427,11 @@
       background: none;
       border-radius: 0;
       padding: 0;
-      color: var(--color-accent-persimmon-base);
       height: 100%;
     }
     
     .icon {
-      path {
-        fill: var(--color-accent-persimmon-base);
-      }
+      // Use SVG gradient (no fill override)
     }
   }
   

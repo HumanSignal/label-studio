@@ -1,5 +1,4 @@
 import { forwardRef } from "react";
-import { IconSpark } from "../../assets/icons";
 import { cn } from "../../utils/utils";
 import styles from "./badge.module.scss";
 
@@ -66,6 +65,8 @@ export interface BadgeProps extends Omit<React.HTMLAttributes<HTMLDivElement>, "
   children?: React.ReactNode;
   // Allow inline CSS styles via a separate prop
   cssStyle?: React.CSSProperties;
+  /** When provided, renders before children. For gradient (Enterprise) badges, pass e.g. icon={<IconSpark />} to show the spark icon. */
+  icon?: React.ReactNode;
 }
 
 function normalizeVariant(variant: string): string {
@@ -74,7 +75,17 @@ function normalizeVariant(variant: string): string {
 
 export const Badge = forwardRef<HTMLDivElement, BadgeProps>(
   (
-    { variant = "grape", style = "filled", shape = "square", size = "medium", children, className, cssStyle, ...props },
+    {
+      variant = "grape",
+      style = "filled",
+      shape = "square",
+      size = "medium",
+      children,
+      className,
+      cssStyle,
+      icon,
+      ...props
+    },
     ref,
   ) => {
     const normalizedVariant = normalizeVariant(variant);
@@ -82,10 +93,8 @@ export const Badge = forwardRef<HTMLDivElement, BadgeProps>(
     const normalizedSize = size === "compact" ? "small" : size === "default" ? "medium" : size;
     const isGradient = normalizedVariant === "gradient";
     const hasChildren = children != null && children !== "";
-    const isIconOnly = isGradient && !hasChildren;
-
-    // For gradient variant, always include icon
-    const shouldShowIcon = isGradient;
+    const hasIcon = icon != null;
+    const isIconOnly = isGradient && hasIcon && !hasChildren;
 
     return (
       <div
@@ -104,11 +113,14 @@ export const Badge = forwardRef<HTMLDivElement, BadgeProps>(
       >
         {isGradient ? (
           <div className={styles["badge-content"]}>
-            {shouldShowIcon && <IconSpark className={styles.icon} />}
-            {hasChildren && children}
+            {hasIcon && <span className={styles.icon}>{icon}</span>}
+            {hasChildren && <span className={styles["badge-text"]}>{children}</span>}
           </div>
         ) : (
-          children
+          <>
+            {hasIcon && <span className={styles.icon}>{icon}</span>}
+            {children}
+          </>
         )}
       </div>
     );
