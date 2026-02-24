@@ -1,4 +1,4 @@
-import { Tag } from "../Common/Tag/Tag";
+import { Badge } from "@humansignal/ui";
 
 const parseBoolean = (value) => {
   if ([true, 1, "true", "1", "yes"].includes(value) || !!value === true) {
@@ -11,10 +11,18 @@ export const BooleanCell = (column) => {
   const boolValue = parseBoolean(column.value);
 
   if (boolValue === true) {
-    return <Tag color="#80c70d">true</Tag>;
+    return (
+      <Badge variant="positive" shape="square">
+        True
+      </Badge>
+    );
   }
   if (boolValue === false) {
-    return <Tag color="#de3301">false</Tag>;
+    return (
+      <Badge variant="negative" shape="square">
+        False
+      </Badge>
+    );
   }
 
   return null;
