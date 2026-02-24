@@ -311,7 +311,6 @@
   .badge-text {
     background: linear-gradient(109deg, var(--color-accent-canteloupe-base) 0%, var(--color-accent-persimmon-base) 51.56%, var(--color-accent-plum-base) 100%);
     background-clip: text;
-    background-clip: text;
     -webkit-text-fill-color: transparent;
   }
   
@@ -376,7 +375,6 @@
     
     .badge-text {
       background: none;
-      background-clip: unset;
       background-clip: unset;
       -webkit-text-fill-color: unset;
       color: var(--color-neutral-on-dark-content);
