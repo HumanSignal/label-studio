@@ -60,7 +60,7 @@ const ProjectName = ({ name, setName, onSaveName, onSubmit, error, description, 
         <div className="w-full flex flex-col gap-2">
           <label>
             Workspace
-            <Badge variant="gradient" icon={<IconSpark />} className="ml-2">
+            <Badge variant="gradient" icon={<IconSpark />} className="ml-tight">
               Enterprise
             </Badge>
           </label>
