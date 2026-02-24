@@ -242,7 +242,7 @@ const FormatInfo = ({ availableFormats, selected, onClick }) => {
                   }
 
                   return (
-                    <Badge key={index} variant={variant} style="filled" size="small" shape="square">
+                    <Badge key={index} variant={variant} size="small">
                       {tag}
                     </Badge>
                   );
