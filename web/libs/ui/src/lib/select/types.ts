@@ -59,6 +59,8 @@ export type SelectProps<T, A extends SelectOption<T>[]> = {
   autoSelectFirst?: boolean;
   searchable?: boolean;
   searchPlaceholder?: string;
+  /** Initial value for the search input field. Useful for restoring a previous search state. */
+  defaultSearchValue?: string;
   ref?: React.Ref<HTMLSelectElement>;
   selectedValueRenderer?: FC<{ option: A[number]; index: number }>;
   optionRenderer?: FC<{ option: A[number]; index: number }>;
@@ -68,6 +70,7 @@ export type SelectProps<T, A extends SelectOption<T>[]> = {
   onChange?: (value: any) => void | false;
   setValue?: (value: ExtractOption<A>) => void;
   header?: string | FC | JSX.Element;
+  footer?: ReactNode;
   multiple?: boolean;
   disabled?: boolean;
   triggerProps?: any;
@@ -85,6 +88,7 @@ export type SelectProps<T, A extends SelectOption<T>[]> = {
   itemCount?: number;
   onClose?: () => void;
   onOpen?: () => void;
+  alwaysShowSelectedGroup?: boolean;
 } & SelectVirtualizedProps &
   Omit<React.SelectHTMLAttributes<HTMLSelectElement>, "value" | "placeholder">;
 

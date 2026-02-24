@@ -554,8 +554,8 @@ export const VideoCanvas = memo(
 
     useEffect(() => {
       let isLoaded = false;
-      let loadTimeout: ReturnType<typeof setTimeout> | undefined = undefined;
-      let timeout: ReturnType<typeof setTimeout> | undefined = undefined;
+      let loadTimeout: ReturnType<typeof setTimeout> | undefined;
+      let timeout: ReturnType<typeof setTimeout> | undefined;
 
       const checkVideoLoaded = () => {
         if (isLoaded) return;

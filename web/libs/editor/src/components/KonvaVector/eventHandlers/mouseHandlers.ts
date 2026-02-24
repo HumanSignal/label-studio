@@ -10,6 +10,7 @@ import {
 import { deletePoint } from "../pointManagement";
 import { handlePointSelection, shouldClosePathOnPointClick, isActivePointEligibleForClosing } from "./pointSelection";
 import type { EventHandlerProps } from "./types";
+import type { BezierPoint } from "../types";
 import { HIT_RADIUS } from "../constants";
 import {
   continueBezierDrag,
@@ -1057,6 +1058,35 @@ export function createClickHandler(props: EventHandlerProps, handledSelectionInM
   };
 }
 
+/**
+ * Find all endpoint indices based on path structure (prevPointId relationships)
+ * In non-skeleton mode, endpoints are:
+ * 1. Points with no prevPointId (starting points)
+ * 2. Points that are not referenced by any other point's prevPointId (ending points)
+ */
+function getEndpointIndices(points: BezierPoint[]): Set<number> {
+  const endpointIndices = new Set<number>();
+
+  // Create a set of all point IDs that are referenced as prevPointId
+  const referencedPointIds = new Set<string>();
+  points.forEach((point) => {
+    if (point.prevPointId) {
+      referencedPointIds.add(point.prevPointId);
+    }
+  });
+
+  // Find endpoints:
+  // 1. Points with no prevPointId (starting points)
+  // 2. Points that are not referenced by any other point (ending points)
+  points.forEach((point, index) => {
+    if (!point.prevPointId || !referencedPointIds.has(point.id)) {
+      endpointIndices.add(index);
+    }
+  });
+
+  return endpointIndices;
+}
+
 // Helper function to select a point by index
 export function handlePointSelectionFromIndex(
   pointIndex: number,
@@ -1092,16 +1122,27 @@ export function handlePointSelectionFromIndex(
   // For now, just do single selection since we don't have access to modifier keys in mouse up
   // Multi-selection will be handled by the existing point selection logic in mouse down
 
+  // Non-skeleton mode: only allow selecting endpoints (based on path structure)
+  if (!props.skeletonEnabled) {
+    // Find all endpoint indices based on path structure
+    const endpointIndices = getEndpointIndices(props.initialPoints);
+    if (!endpointIndices.has(pointIndex)) {
+      // Don't allow selecting non-endpoint points in non-skeleton mode
+      return;
+    }
+  }
+
   // Use tracker for global selection management
   const tracker = VectorSelectionTracker.getInstance();
   tracker.selectPoints(props.instanceId || "unknown", new Set([pointIndex]));
 
-  // Update activePointId for skeleton mode - set the selected point as the active point
+  // Update activePointId - set the selected point as the active point
   if (pointIndex >= 0 && pointIndex < props.initialPoints.length) {
     const selectedPoint = props.initialPoints[pointIndex];
     // In skeleton mode, always update the active point when selecting a point
-    // This ensures onFinish only fires for the currently selected point
-    if (props.skeletonEnabled) {
+    // In non-skeleton mode, update activePointId when selecting an endpoint
+    // This ensures onFinish only fires for the currently selected point and allows drawing continuation
+    if (props.skeletonEnabled || getEndpointIndices(props.initialPoints).has(pointIndex)) {
       props.setActivePointId?.(selectedPoint.id);
     }
   }

@@ -6,6 +6,7 @@ beforeEach(() => {
     console.log("Setting feature flags", CURRENT_FLAGS);
     Object.assign(win, {
       DISABLE_DEFAULT_LSF_INIT: true,
+      __LSF_INTEGRATION_TEST__: true,
       APP_SETTINGS: {
         ...(win.APP_SETTINGS ?? {}),
         feature_flags: CURRENT_FLAGS,

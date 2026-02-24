@@ -9,8 +9,10 @@ require("dotenv").config({
   path: path.resolve(__dirname, "../.env"),
 });
 
-const MiniCssExtractPlugin = require("mini-css-extract-plugin");
-const { EnvironmentPlugin, DefinePlugin, ProgressPlugin, optimize } = require("webpack");
+// Import webpack plugins from the same webpack version that @nx/webpack uses for compilation,
+// to avoid version mismatches between the root webpack and the NX-bundled webpack.
+const nxWebpack = require("@nx/webpack/node_modules/webpack");
+const { EnvironmentPlugin, DefinePlugin } = nxWebpack;
 const TerserPlugin = require("terser-webpack-plugin");
 const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
 
@@ -36,7 +38,6 @@ const BUILD = {
 };
 
 const plugins = [
-  new MiniCssExtractPlugin(),
   new DefinePlugin({
     "process.env.CSS_PREFIX": JSON.stringify(css_prefix),
   }),
@@ -83,6 +84,9 @@ module.exports = composePlugins(
   }),
   withReact({ svgr: true }),
   (config) => {
+    // Remove the extension alias as this conflicts with the nx/webpack v21 changes
+    delete config.resolve.extensionAlias;
+
     // LS entrypoint
     if (!process.env.MODE?.startsWith("standalone")) {
       config.entry = {

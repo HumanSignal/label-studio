@@ -188,20 +188,26 @@ const Model = types
       else if (framerate < 1) self.framerate = String(1 / framerate);
       else self.framerate = String(framerate);
 
-      // normalize playback speed parameters
+      // normalize playback speed parameters (must match backend/SDK limits)
+      const MIN_PLAYBACK_SPEED = 0.05;
+      const MIN_DEFAULT_PLAYBACK_SPEED = 0.25;
+      const DEFAULT_PLAYBACK_SPEED = 1;
+      const MAX_PLAYBACK_SPEED = 10;
       const data = self.store.task?.dataObj;
       const defaultPlaybackSpeed = Number(parseValue(String(self.defaultplaybackspeed), data));
       const minPlaybackSpeed = Number(parseValue(String(self.minplaybackspeed), data));
 
       // validate and set minPlaybackSpeed
       self.minplaybackspeed =
-        !minPlaybackSpeed || isNaN(minPlaybackSpeed) || minPlaybackSpeed < 0.05 ? 0.25 : minPlaybackSpeed;
+        !minPlaybackSpeed || isNaN(minPlaybackSpeed) || minPlaybackSpeed < MIN_PLAYBACK_SPEED
+          ? MIN_DEFAULT_PLAYBACK_SPEED
+          : Math.min(minPlaybackSpeed, MAX_PLAYBACK_SPEED);
 
       // validate and set defaultPlaybackSpeed
       self.defaultplaybackspeed =
-        !defaultPlaybackSpeed || isNaN(defaultPlaybackSpeed) || defaultPlaybackSpeed < 0.05
-          ? 1
-          : Math.max(defaultPlaybackSpeed, self.minplaybackspeed);
+        !defaultPlaybackSpeed || isNaN(defaultPlaybackSpeed) || defaultPlaybackSpeed < MIN_PLAYBACK_SPEED
+          ? DEFAULT_PLAYBACK_SPEED
+          : Math.min(Math.max(defaultPlaybackSpeed, self.minplaybackspeed), MAX_PLAYBACK_SPEED);
 
       // set initial speed to defaultPlaybackSpeed
       self.speed = self.defaultplaybackspeed;

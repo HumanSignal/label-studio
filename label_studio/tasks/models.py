@@ -13,7 +13,7 @@ from urllib.parse import urljoin
 
 import ujson as json
 from core.bulk_update_utils import bulk_update
-from core.current_request import get_current_request
+from core.current_request import CurrentContext, get_current_request
 from core.feature_flags import flag_set
 from core.label_config import SINGLE_VALUED_TAGS
 from core.redis import start_job_async_or_sync
@@ -1550,6 +1550,9 @@ def bulk_update_stats_project_tasks(tasks, project=None):
             first_task = Task.objects.get(id=task_ids[0])
             project = first_task.project
 
+        # Set user context so FSM checks work when this runs in an async worker
+        if project.created_by_id:
+            CurrentContext.set_user(project.created_by)
         bulk_update_is_labeled(task_ids, project)
     else:
         return deprecated_bulk_update_stats_project_tasks(tasks, project)

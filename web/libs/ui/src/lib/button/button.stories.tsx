@@ -1,6 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react";
-import { Button, buttonVariant } from "./button";
-import { IconAnnotationGroundTruth, IconCrossAlt } from "@humansignal/icons";
+import { Button, ButtonGroup, buttonVariant } from "./button";
+import { IconAnnotationGroundTruth, IconCrossAlt, IconChevronDown } from "@humansignal/icons";
+import { Dropdown } from "../dropdown";
+import { Space } from "../space/space";
+import { Typography } from "../typography/typography";
 
 const meta: Meta<typeof Button> = {
   component: Button,
@@ -188,13 +191,12 @@ export const StyledLink: Story = {
   },
 };
 
-export const WithSecondaryAction = {
+export const WithSecondaryAction: Story = {
   args: {
     children: "Link with button style",
   },
   render({ children, ...props }) {
     return (
-      // biome-ignore lint: We don't need a real link here
       <Button
         {...props}
         waiting={props.waiting ?? true}
@@ -215,6 +217,99 @@ export const WithTooltipAndDisabledState: Story = {
         <Button {...props} className="w-48" leading={<IconAnnotationGroundTruth />} disabled tooltip="Tooltip text">
           With Tooltip
         </Button>
+      </div>
+    );
+  },
+};
+
+export const WithButtonGroup: Story = {
+  render: (props) => {
+    return (
+      <div className="flex flex-col gap-wider">
+        <div>
+          <Typography variant="title" size="large" className="mb-tight">
+            Button Group - Collapsed (default)
+          </Typography>
+          <Typography variant="body" size="medium" className="text-secondary mb-comfortable">
+            Buttons are visually connected with shared borders
+          </Typography>
+          <ButtonGroup>
+            <Button {...props} size="small" variant="primary" look="filled">
+              Label All Tasks
+            </Button>
+            <Dropdown.Trigger
+              alignment="bottom-right"
+              content={
+                <Space direction="vertical" className="bg-neutral-background p-tight rounded">
+                  <Button align="left" look="string" size="small">
+                    Label tasks as displayed
+                  </Button>
+                  <Button align="left" look="string" size="small">
+                    Skip all tasks
+                  </Button>
+                </Space>
+              }
+            >
+              <Button size="small" variant="primary" look="filled" aria-label="Toggle label options">
+                <IconChevronDown />
+              </Button>
+            </Dropdown.Trigger>
+          </ButtonGroup>
+        </div>
+
+        <div>
+          <Typography variant="title" size="large" className="mb-tight">
+            Button Group - Not Collapsed
+          </Typography>
+          <Typography variant="body" size="medium" className="text-secondary mb-comfortable">
+            Buttons maintain their individual styling with spacing between them
+          </Typography>
+          <ButtonGroup collapsed={false}>
+            <Button {...props} size="small" variant="primary" look="outlined">
+              Save
+            </Button>
+            <Button {...props} size="small" variant="neutral" look="outlined">
+              Cancel
+            </Button>
+          </ButtonGroup>
+        </div>
+
+        <div>
+          <Typography variant="title" size="large" className="mb-tight">
+            Multiple Button Group Examples
+          </Typography>
+          <Typography variant="body" size="medium" className="text-secondary mb-comfortable">
+            Various combinations of button groups
+          </Typography>
+          <div className="flex flex-wrap gap-comfortable">
+            <ButtonGroup>
+              <Button {...props} size="small" variant="neutral" look="outlined">
+                Previous
+              </Button>
+              <Button {...props} size="small" variant="neutral" look="outlined">
+                1
+              </Button>
+              <Button {...props} size="small" variant="neutral" look="outlined">
+                2
+              </Button>
+              <Button {...props} size="small" variant="neutral" look="outlined">
+                3
+              </Button>
+              <Button {...props} size="small" variant="neutral" look="outlined">
+                Next
+              </Button>
+            </ButtonGroup>
+
+            <ButtonGroup>
+              <Button {...props} size="small" variant="neutral" look="outlined" leading={<IconAnnotationGroundTruth />}>
+                Edit
+              </Button>
+              <Button {...props} size="small" variant="neutral" look="outlined" leading={<IconCrossAlt />}>
+                Delete
+              </Button>
+            </ButtonGroup>
+          </div>
+        </div>
       </div>
     );
   },

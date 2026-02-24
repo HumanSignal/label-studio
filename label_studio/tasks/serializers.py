@@ -1,6 +1,7 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license."""
 
 import logging
+from collections.abc import MutableMapping
 
 import ujson as json
 from core.current_request import CurrentContext, get_current_request
@@ -30,6 +31,14 @@ from users.models import User
 from users.serializers import UserSerializer
 
 logger = logging.getLogger(__name__)
+
+
+def sanitize_prediction_import_payload(prediction):
+    """Drop only FSM `state` from prediction import payloads."""
+    if not isinstance(prediction, MutableMapping):
+        return prediction
+    prediction.pop('state', None)
+    return prediction
 
 
 class PredictionQuerySerializer(serializers.Serializer):
@@ -195,6 +204,62 @@ class AnnotationSerializer(FlexFieldsModelSerializer):
         model = Annotation
         exclude = ['prediction', 'result_count']
         expandable_fields = {'completed_by': (CompletedByDMSerializer,)}
+
+
+class AnnotationStubSerializer(FlexFieldsModelSerializer):
+    """
+    Lightweight Annotation Serializer for lazy loading.
+
+    Returns only minimal metadata needed for annotation list display.
+    Used when fflag_fix_all_fit_720_lazy_load_annotations is enabled
+    to improve performance for tasks with many annotations.
+
+    Fields included:
+    - id: for selection and hydration
+    - created_username: for display in annotation list
+    - created_ago: for display in annotation list (relative time string)
+    - created_at: for TimeAgo component (actual timestamp)
+    - completed_by: user id for avatar lookup
+    - ground_truth: for showing star indicator
+    - was_cancelled: for skip queue / cancel-skip button display
+    - is_stub: signals frontend to fetch full data on selection
+    """
+
+    created_username = serializers.SerializerMethodField(default='', read_only=True, help_text='Username string')
+    created_ago = serializers.CharField(default='', read_only=True, help_text='Time delta from creation time')
+    completed_by = serializers.PrimaryKeyRelatedField(required=False, queryset=User.objects.all())
+    # Mark this as a stub so frontend knows to fetch full data on selection
+    is_stub = serializers.SerializerMethodField(read_only=True)
+
+    def get_created_username(self, annotation) -> str:
+        user = annotation.completed_by
+        if not user:
+            return ''
+
+        name = user.first_name
+        if len(user.last_name):
+            name = name + ' ' + user.last_name
+
+        name += f' {user.email}, {user.id}'
+        return name
+
+    def get_is_stub(self, annotation) -> bool:
+        return True
+
+    class Meta:
+        model = Annotation
+        # Minimal fields for annotation list display only
+        # ground_truth, created_at, and was_cancelled are simple model fields (no extra query)
+        fields = [
+            'id',
+            'created_username',
+            'created_ago',
+            'created_at',
+            'completed_by',
+            'ground_truth',
+            'was_cancelled',
+            'is_stub',
+        ]
 
 
 class TaskSimpleSerializer(ModelSerializer):
@@ -512,9 +577,18 @@ class BaseTaskSerializerBulk(serializers.ListSerializer):
                     validation_errors.append(f'Task {i}, prediction {j}: Prediction must be a dictionary')
                     continue
 
+                # Strip FSM state field from predictions before validation
+                # Exported data may include 'state' which is not a valid prediction field
+                ff_user = self.project.organization.created_by
+                if flag_set('fflag_feat_fit_568_finite_state_management', user=ff_user) and flag_set(
+                    'fflag_feat_fit_710_fsm_state_fields', user=ff_user
+                ):
+                    prediction.pop('state', None)
+
                 # Validate prediction only when project label config is not default
                 if should_validate:
                     try:
+                        prediction = sanitize_prediction_import_payload(prediction)
                         li = LabelInterface(self.project.label_config) if should_validate else None
                         validation_errors_list = li.validate_prediction(prediction, return_errors=True)
 
@@ -871,11 +945,24 @@ class NextTaskSerializer(TaskWithAnnotationsAndPredictionsAndDraftsSerializer):
     def get_annotations(self, task):
         result = []
         if self.context.get('annotations', False):
-            annotations = super().get_annotations(task)
+            # Support lazy loading of annotations (FIT-720)
+            # When annotations_stub is True, return lightweight stubs without result field
+            use_stub = self.context.get('annotations_stub', False)
             user = self.context['request'].user
-            for annotation in annotations:
-                if annotation.get('completed_by') == user.id:
-                    result.append(annotation)
+
+            if use_stub:
+                # Get annotations queryset and filter by user
+                annotations = task.annotations
+                if user.is_annotator:
+                    annotations = annotations.filter(completed_by=user)
+                else:
+                    annotations = annotations.filter(completed_by=user)
+                return AnnotationStubSerializer(annotations, many=True, read_only=True, context=self.context).data
+            else:
+                annotations = super().get_annotations(task)
+                for annotation in annotations:
+                    if annotation.get('completed_by') == user.id:
+                        result.append(annotation)
         return result
 
 

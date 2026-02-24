@@ -1,5 +1,5 @@
 import { type FC, type FocusEvent, type MutableRefObject, type RefObject, useCallback, useEffect, useRef } from "react";
-import debounce from "lodash/debounce";
+import { debounce } from "@humansignal/core/lib/utils/debounce";
 import { cn } from "../../utils/bem";
 import { isMacOS } from "../../utils/utilities";
 
@@ -171,6 +171,8 @@ export const TextArea: FC<TextAreaProps> = ({
       rows={autoGrowRef.current.rows}
       onChange={onChange}
       onInput={onInput}
+      aria-label="TextArea Input"
+      data-testid="textarea-input"
       {...props}
     />
   );

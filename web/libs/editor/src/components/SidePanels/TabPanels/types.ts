@@ -19,11 +19,19 @@ export type TabProps = {
   setActiveTab: EventHandlers["setActiveTab"];
   checkSnap: EventHandlers["checkSnap"];
 };
+
+// Shared with PanelBase (outliner/details panel names)
+export type PanelType = "outliner" | "details";
+
+// false: don't show the tab; string: show tab with given title
+export type ShowCustomTab = false | string;
+
 export interface SidePanelsProps {
   panelsHidden: boolean;
   store: any;
   currentEntity: any;
   showComments: boolean;
+  showCustomTab: ShowCustomTab;
   focusTab: string;
 }
 

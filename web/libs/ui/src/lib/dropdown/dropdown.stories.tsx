@@ -64,13 +64,7 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 // Sample dropdown content using semantic tokens - styled like Select component
-const MenuContent = ({
-  items = 3,
-  fullWidth = false,
-}: {
-  items?: number;
-  fullWidth?: boolean;
-}) => (
+const MenuContent = ({ items = 3, fullWidth = false }: { items?: number; fullWidth?: boolean }) => (
   <div className={`p-tight flex flex-col gap-tightest ${fullWidth ? "w-full" : "w-max"}`}>
     {Array.from({ length: items }, (_, i) => (
       <button

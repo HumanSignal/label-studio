@@ -16,6 +16,10 @@ Need a hand with customizing our templates? Check out [our documentation on the 
 
 <a class="button" href="index.html">See all templates!</a>
 
+## Enterprise-only templates
+
+Templates with the lock emoji 🔒 next to their name are only available for Label Studio Enterprise users. 
+
 ## Template components
 
 Templates use tags to do the following:

@@ -14,7 +14,7 @@ export const Space = ({
 }) => {
   return (
     <div
-      className={cn("space-dm").mod({ direction, size, spread, stretch, align }).mix(className)}
+      className={cn("space-dm").mod({ direction, size, spread, stretch, align }).mix(className).toClassName()}
       style={style}
       {...rest}
     >

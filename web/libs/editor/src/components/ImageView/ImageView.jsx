@@ -17,10 +17,10 @@ import { ImageViewProvider } from "./ImageViewContext";
 import { Hotkey } from "../../core/Hotkey";
 import { useObserver } from "mobx-react";
 import ResizeObserver from "../../utils/resize-observer";
-import { debounce } from "../../utils/debounce";
+import { debounce } from "@humansignal/core/lib/utils/debounce";
 import Constants from "../../core/Constants";
 import { fixRectToFit, mapKonvaBrightness } from "../../utils/image";
-import { FF_DEV_1442, FF_DEV_3077, FF_LSDV_4583_6, FF_LSDV_4930, FF_ZOOM_OPTIM, isFF } from "../../utils/feature-flags";
+import { FF_DEV_1442, FF_LSDV_4930, FF_ZOOM_OPTIM, isFF } from "../../utils/feature-flags";
 import { Pagination } from "../../common/Pagination/Pagination";
 import { Image } from "./Image";
 
@@ -29,7 +29,7 @@ Konva.showWarnings = false;
 const hotkeys = Hotkey("Image");
 const imgDefaultProps = { crossOrigin: "anonymous" };
 
-const splitRegions = (regions) => {
+export const splitRegions = (regions) => {
   const brushRegions = [];
   const shapeRegions = [];
   const bitmaskRegions = [];
@@ -806,7 +806,7 @@ export default observer(
       }
 
       if (!e.evt.ctrlKey && !e.evt.shiftKey && !this.mouseDown) {
-        const allowedTypes = /bitmask|vector/;
+        const allowedTypes = /bitmask/;
         const tool = item.getToolsManager().findSelectedTool();
 
         if (item.regs.some((r) => r.isDrawing)) return;
@@ -1051,9 +1051,9 @@ export default observer(
 
       if (paginationEnabled) wrapperClasses.push(styles.withPagination);
 
-      const [toolsReady, stageLoading] = isFF(FF_LSDV_4583_6) ? [true, false] : [item.hasTools, item.stageWidth <= 1];
+      const [toolsReady, stageLoading] = [true, false];
 
-      const imageIsLoaded = item.imageIsLoaded || !isFF(FF_LSDV_4583_6);
+      const imageIsLoaded = item.imageIsLoaded;
       const isViewingAll = store.annotationStore.viewingAll;
 
       return (
@@ -1097,40 +1097,18 @@ export default observer(
               style={{ width: "100%", marginTop: item.fillerHeight }}
             />
 
-            {isFF(FF_LSDV_4583_6) ? (
-              <Image
-                ref={(ref) => {
-                  item.setImageRef(ref);
-                  this.imageRef.current = ref;
-                }}
-                usedValue={item.usedValue}
-                imageEntity={item.currentImageEntity}
-                imageTransform={item.imageTransform}
-                updateImageSize={item.updateImageSize}
-                size={item.canvasSize}
-                overlay={<CanvasOverlay item={item} />}
-              />
-            ) : (
-              <div className={[styles.frame, ...imagePositionClassnames].join(" ")} style={item.canvasSize}>
-                <img
-                  ref={(ref) => {
-                    item.setImageRef(ref);
-                    this.imageRef.current = ref;
-                  }}
-                  loading={isFF(FF_DEV_3077) && !item.lazyoff ? "lazy" : "false"}
-                  style={item.imageTransform}
-                  src={item.currentSrc}
-                  onLoad={(e) => {
-                    item.updateImageSize(e);
-                    item.currentImageEntity.setImageLoaded(true);
-                  }}
-                  onError={this.handleError}
-                  crossOrigin={item.imageCrossOrigin}
-                  alt="LS"
-                />
-                <CanvasOverlay item={item} />
-              </div>
-            )}
+            <Image
+              ref={(ref) => {
+                item.setImageRef(ref);
+                this.imageRef.current = ref;
+              }}
+              usedValue={item.usedValue}
+              imageEntity={item.currentImageEntity}
+              imageTransform={item.imageTransform}
+              updateImageSize={item.updateImageSize}
+              size={item.canvasSize}
+              overlay={<CanvasOverlay item={item} />}
+            />
             {/* @todo this is dirty hack; rewrite to proper async waiting for data to load */}
             {stageLoading || !toolsReady ? (
               <div className={styles.loading}>
@@ -1269,23 +1247,32 @@ const EntireStage = observer(
 const ImageLayer = observer(({ item }) => {
   const imageEntity = item.currentImageEntity;
   const konvaImageRef = useRef();
+  const currentSrc = imageEntity?.currentSrc;
   const [loadedImage, setLoadedImage] = useState(null);
 
-  // Load image with proper CORS and load event
   useEffect(() => {
-    if (imageEntity?.downloaded && imageEntity.currentSrc) {
-      const img = new window.Image();
-      img.crossOrigin = "anonymous";
-      img.src = imageEntity.currentSrc;
-      img.width = imageEntity.naturalWidth;
-      img.height = imageEntity.naturalHeight;
-      img.onload = () => {
-        setLoadedImage(img);
-      };
-    } else {
+    if (!imageEntity?.downloaded || !currentSrc) {
       setLoadedImage(null);
+      return;
     }
-  }, [imageEntity?.downloaded, imageEntity?.currentSrc]);
+
+    let cancelled = false;
+    const img = new window.Image();
+
+    if (item.imageCrossOrigin) img.crossOrigin = item.imageCrossOrigin;
+
+    img.onload = () => {
+      if (!cancelled) setLoadedImage(img);
+    };
+    img.onerror = () => {
+      if (!cancelled) setLoadedImage(null);
+    };
+    img.src = currentSrc;
+
+    return () => {
+      cancelled = true;
+    };
+  }, [imageEntity?.downloaded, currentSrc, item.imageCrossOrigin]);
 
   const { width, height } = useMemo(() => {
     return {
@@ -1300,17 +1287,32 @@ const ImageLayer = observer(({ item }) => {
   useEffect(() => {
     const node = konvaImageRef.current;
     if (node && loadedImage) {
-      node.cache({ pixelRatio: 1 });
-      node.filters([Konva.Filters.Brighten, Konva.Filters.Contrast]);
-      node.brightness(brightness);
-      node.contrast(contrast);
+      try {
+        // Force Konva cache reset and redraw when source/filters change.
+        node.clearCache();
+        node.cache({ pixelRatio: 1 });
+        node.filters([Konva.Filters.Brighten, Konva.Filters.Contrast]);
+        node.brightness(brightness);
+        node.contrast(contrast);
+      } catch {
+        // Fallback to plain image draw if cache/filter pipeline fails.
+        node.clearCache();
+        node.filters([]);
+      }
       node.getLayer()?.batchDraw();
     }
-  }, [loadedImage, brightness, contrast]);
+  }, [loadedImage, brightness, contrast, currentSrc]);
 
   return loadedImage ? (
     <Layer imageSmoothingEnabled={item.smoothingEnabled} scale={{ x: item.stageZoom, y: item.stageZoom }}>
-      <KonvaImage ref={konvaImageRef} image={loadedImage} width={width} height={height} listening={false} />
+      <KonvaImage
+        key={currentSrc ?? "image-source"}
+        ref={konvaImageRef}
+        image={loadedImage}
+        width={width}
+        height={height}
+        listening={false}
+      />
     </Layer>
   ) : null;
 });
@@ -1448,7 +1450,7 @@ const StageContent = observer(({ item, store, state, crosshairRef }) => {
         />
       )}
 
-      {tool && tool.toolName.match(/bitmask/i) && <CursorLayer item={item} tool={tool} />}
+      {tool && tool.toolName?.match(/bitmask/i) && <CursorLayer item={item} tool={tool} />}
     </>
   );
 });

@@ -1,7 +1,7 @@
 import { types } from "mobx-state-tree";
 
 import Utils from "../utils";
-import throttle from "lodash/throttle";
+import { throttle } from "@humansignal/core/lib/utils/lodash-replacements";
 import { MIN_SIZE } from "../tools/Base";
 import { FF_DEV_3391, isFF } from "../utils/feature-flags";
 import { ff } from "@humansignal/core";
@@ -231,6 +231,16 @@ const DrawingTool = types
       _resetState() {
         self.annotation.setIsDrawing(false);
         self.annotation.history.unfreeze();
+        self.mode = "viewing";
+      },
+      /**
+       * Release the tool's in-progress drawing state without touching the
+       * region itself (it belongs to the outgoing annotation). Called by
+       * ToolsManager during annotation switches.
+       */
+      resetBeforeAnnotationSwitch() {
+        self.stopListening?.();
+        self.currentArea = null;
         self.mode = "viewing";
       },
     };

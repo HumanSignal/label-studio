@@ -1,5 +1,5 @@
 ---
-title: Chatbot Evaluation
+title: Chatbot Evaluation 🔒
 type: templates
 category: Chat
 cat: Chat

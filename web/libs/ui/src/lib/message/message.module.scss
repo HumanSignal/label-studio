@@ -1,0 +1,112 @@
+/* Message Base Styles */
+.base {
+  @apply flex items-start gap-tight rounded-small border;
+}
+
+/* Size Styles */
+
+/* Medium Size - Default */
+.size-medium {
+  @apply p-base;
+
+  .body {
+    @apply gap-base;
+  }
+
+  .close {
+    @apply max-h-6 max-w-6;
+  }
+}
+
+/* Small Size - Compact */
+.size-small {
+  @apply p-tight;
+
+  .title {
+    @apply text-label-small;
+  }
+
+  .body {
+    @apply gap-tight text-body-small;
+  }
+
+  .close {
+    @apply max-h-5 max-w-5;
+  }
+}
+
+/* Icon Container */
+.icon {
+  @apply flex items-center justify-center rounded flex-shrink-0;
+}
+
+/* Content Container */
+.content {
+  @apply flex-1 flex flex-col gap-tight;
+}
+
+/* Title */
+.title {
+  @apply font-medium;
+}
+
+/* Body */
+.body {
+  @apply text-neutral-content flex flex-col gap-tight;
+}
+
+/* Close Button */
+.close {
+  @apply flex-shrink-0;
+}
+
+.icon svg {
+  color: inherit;
+}
+
+/* Variant Styles */
+
+/* Primary Variant - Blue theme */
+.variant-primary {
+  @apply bg-primary-background border-primary-border-subtle;
+
+  .icon svg {
+    @apply text-primary-icon;
+  }
+}
+
+/* Neutral Variant - Gray theme */
+.variant-neutral {
+  @apply bg-neutral-background border-neutral-border;
+
+  .icon svg {
+    @apply text-neutral-icon;
+  }
+}
+
+/* Negative Variant - Red theme */
+.variant-negative {
+  @apply bg-negative-background border-negative-border-subtle;
+
+  .icon svg {
+    @apply text-negative-icon;
+  }
+}
+
+/* Positive Variant - Green theme */
+.variant-positive {
+  @apply bg-positive-background border-positive-border-subtle;
+
+  .icon svg {
+    @apply text-positive-icon;
+  }
+}
+
+/* Warning Variant - Orange/Yellow theme */
+.variant-warning {
+  @apply bg-warning-background border-warning-border-subtle;
+
+  .icon svg {
+    @apply text-warning-icon;
+  }
+}

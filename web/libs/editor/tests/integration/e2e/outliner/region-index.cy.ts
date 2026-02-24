@@ -1,5 +1,4 @@
 import { Labels, LabelStudio, Relations, Sidebar } from "@humansignal/frontend-test/helpers/LSF";
-import { FF_DEV_3873 } from "../../../../src/utils/feature-flags";
 import {
   labelStudio_settings,
   panelState,
@@ -11,11 +10,6 @@ import { RichText } from "@humansignal/frontend-test/helpers/LSF/RichText";
 import { Hotkeys } from "@humansignal/frontend-test/helpers/LSF/Hotkeys";
 
 describe("Region Index", () => {
-  beforeEach(() => {
-    LabelStudio.addFeatureFlagsOnPageLoad({
-      [FF_DEV_3873]: true,
-    });
-  });
   it("should be visible at the outliner", () => {
     LabelStudio.params().config(simpleConfig).data(simpleData).withResult(resultWithRelations).init();
     LabelStudio.waitForObjectsReady();
@@ -168,10 +162,16 @@ describe("Region Index", () => {
 
     RichText.findRegionWithLabel("2:Label 2").trigger("click");
     Hotkeys.deleteRegion();
+    RichText.hasRegionWithLabel("1:Label 1");
+    RichText.hasRegionWithLabel("2:Label 3");
 
-    cy.wait(1);
     Hotkeys.undo();
-    cy.wait(1);
+    RichText.hasRegionWithLabel("1:Label 1");
+    RichText.hasRegionWithLabel("2:Label 2");
+    RichText.hasRegionWithLabel("3:Label 3");
+
     Hotkeys.redo();
+    RichText.hasRegionWithLabel("1:Label 1");
+    RichText.hasRegionWithLabel("2:Label 3");
   });
 });

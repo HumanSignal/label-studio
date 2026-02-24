@@ -16,14 +16,7 @@ import { RectRegionModel } from "../../../regions/RectRegion";
 import * as Tools from "../../../tools";
 import ToolsManager from "../../../tools/Manager";
 import { parseValue } from "../../../utils/data";
-import {
-  FF_DEV_3377,
-  FF_DEV_3391,
-  FF_LSDV_4583,
-  FF_LSDV_4583_6,
-  FF_ZOOM_OPTIM,
-  isFF,
-} from "../../../utils/feature-flags";
+import { FF_DEV_3377, FF_DEV_3391, FF_LSDV_4583, FF_ZOOM_OPTIM, isFF } from "../../../utils/feature-flags";
 import { guidGenerator } from "../../../utils/unique";
 import { clamp, isDefined } from "../../../utils/utilities";
 import ObjectBase from "../Base";
@@ -174,13 +167,15 @@ const Model = types
     mode: types.optional(types.enumeration(["drawing", "viewing", "brush", "eraser"]), "viewing"),
 
     regions: types.array(
-      types.union(
-        BrushRegionModel,
-        RectRegionModel,
-        EllipseRegionModel,
-        PolygonRegionModel,
-        VectorRegionModel,
-        KeyPointRegionModel,
+      types.late(() =>
+        types.union(
+          BrushRegionModel,
+          RectRegionModel,
+          EllipseRegionModel,
+          PolygonRegionModel,
+          VectorRegionModel,
+          KeyPointRegionModel,
+        ),
       ),
       [],
     ),
@@ -793,7 +788,7 @@ const Model = types
 
       self.currentImage = index;
       self.currentImageEntity = self.findImageEntity(index);
-      if (isFF(FF_LSDV_4583_6)) self.preloadImages();
+      self.preloadImages();
     },
 
     preloadImages() {

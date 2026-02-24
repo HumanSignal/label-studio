@@ -1,5 +1,6 @@
 import { fixLSParams } from "@humansignal/frontend-test/helpers/utils/fixLSParams";
 import { expect } from "chai";
+import { ImageView } from "./ImageView";
 
 type LSParams = Record<string, any>;
 
@@ -280,6 +281,15 @@ export const LabelStudio = {
   },
 
   /**
+   * Wait for objects ready and then for the image view (image loaded and Konva canvas).
+   * Use in image-based specs to avoid repeating waitForObjectsReady + ImageView.waitForImage.
+   */
+  waitForImageReady() {
+    this.waitForObjectsReady();
+    ImageView.waitForImage();
+  },
+
+  /**
    * Set feature flags on navigation
    */
   setFeatureFlagsOnPageLoad(flags: Record<string, boolean>) {
@@ -289,12 +299,20 @@ export const LabelStudio = {
   },
 
   /**
-   * Add new settings to previously set feature flags on navigation
+   * Add new settings to previously set feature flags on navigation.
+   * Sets both FEATURE_FLAGS and APP_SETTINGS.feature_flags so that @humansignal/core
+   * (which reads APP_SETTINGS.feature_flags at module load time) sees the flags.
    */
   addFeatureFlagsOnPageLoad(flags: Record<string, boolean>) {
     Cypress.on("window:before:load", (win) => {
       win.FEATURE_FLAGS = {
         ...(win.FEATURE_FLAGS || {}),
+        ...flags,
+      };
+      win.APP_SETTINGS = win.APP_SETTINGS ?? {};
+      win.APP_SETTINGS.feature_flags = {
+        ...(win.APP_SETTINGS.feature_flags ?? {}),
+        ...(win.FEATURE_FLAGS ?? {}),
         ...flags,
       };
     });

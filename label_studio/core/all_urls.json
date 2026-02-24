@@ -576,6 +576,12 @@
         "decorators": ""
     },
     {
+        "url": "/api/tasks/<int:pk>/agreement/",
+        "module": "tasks.api.TaskAgreementAPI",
+        "name": "tasks:api:task-agreement",
+        "decorators": ""
+    },
+    {
         "url": "/api/annotations/<int:pk>/",
         "module": "tasks.api.AnnotationAPI",
         "name": "tasks:api-annotations:annotation-detail",

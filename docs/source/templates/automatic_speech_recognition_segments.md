@@ -12,6 +12,11 @@ meta_description: Template for audio transcription for automatic speech recognit
 
 Listen to an audio file and segment it, then transcribe the contents of each segment in natural language, performing speech recognition using segments.
 
+!!! error Enterprise
+    If you're managing more complex or high-volume audio labeling projects, Label Studio Enterprise includes an advanced audio transcription interface built to support faster, more precise annotation at scale.
+
+    See our new [Multi-Channel Audio Transcription](react_audio) template and learn more in [A New Audio Transcription UI for Speed and Quality at Scale](https://humansignal.com/blog/building-a-better-ui-for-audio-transcription-at-scale/) (blog post).
+
 ## Interactive Template Preview
 
 <div id="main-preview"></div>

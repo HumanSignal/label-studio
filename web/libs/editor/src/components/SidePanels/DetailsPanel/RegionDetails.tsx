@@ -3,7 +3,7 @@ import { type FC, useEffect, useMemo, useRef } from "react";
 import { cn } from "../../../utils/bem";
 import { RegionEditor } from "./RegionEditor";
 import "./RegionDetails.scss";
-import { Typography } from "@humansignal/ui";
+import { JsonViewer, Typography } from "@humansignal/ui";
 
 const TextResult: FC<{ mainValue: string[] }> = observer(({ mainValue }) => {
   return (
@@ -34,6 +34,19 @@ const ChoicesResult: FC<{ mainValue: string[] }> = observer(({ mainValue }) => {
 
 const RatingResult: FC<{ mainValue: string[] }> = observer(({ mainValue }) => {
   return <span>{mainValue}</span>;
+});
+
+const ReactCodeResult: FC<{ mainValue: unknown }> = observer(({ mainValue }) => {
+  return (
+    <JsonViewer
+      data={mainValue}
+      showSearch={false}
+      showFilters={false}
+      showCopyButton={false}
+      minHeight={100}
+      maxHeight={300}
+    />
+  );
 });
 
 export const ResultItem: FC<{ result: any }> = observer(({ result }) => {
@@ -82,6 +95,15 @@ export const ResultItem: FC<{ result: any }> = observer(({ result }) => {
           <Typography size="small">Taxonomy: </Typography>
           <div className={cn("region-meta").elem("value").toClassName()}>
             <ChoicesResult mainValue={mainValue.map((v: string[]) => v.join("/"))} />
+          </div>
+        </div>
+      );
+    }
+    if (type === "reactcode") {
+      return (
+        <div className={cn("region-meta").elem("result").toClassName()}>
+          <div className={cn("region-meta").elem("value").toClassName()}>
+            <ReactCodeResult mainValue={mainValue} />
           </div>
         </div>
       );

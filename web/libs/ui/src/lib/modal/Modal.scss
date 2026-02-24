@@ -55,6 +55,13 @@
         }
     }
 
+    &__header-content {
+        display: flex;
+        align-items: center;
+        margin-left: auto;
+        margin-right: var(--spacing-base);
+    }
+
     &__title {
         margin: 0;
         margin-right: auto;

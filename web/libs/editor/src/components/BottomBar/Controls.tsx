@@ -13,7 +13,7 @@ import { IconBan, IconChevronDown } from "@humansignal/icons";
 import { Dropdown } from "@humansignal/ui";
 import type { CustomButtonType } from "../../stores/CustomButton";
 import { cn } from "../../utils/bem";
-import { FF_REVIEWER_FLOW, isFF } from "../../utils/feature-flags";
+import { FF_REVIEWER_FLOW, FF_FIT_1304_STRICT_OVERLAP, isFF } from "../../utils/feature-flags";
 import { isDefined, toArray } from "../../utils/utilities";
 import {
   AcceptButton,
@@ -195,17 +195,13 @@ export const Controls = controlsInjector<{ annotation: MSTAnnotation }>(
         buttons.push(<SkipButton key="skip" disabled={disabled} store={store} onSkipWithComment={onSkipWithComment} />);
       }
 
-      const isDisabled = disabled || submitDisabled;
+      // Also disable when overlap is reached (only when feature flag is enabled)
+      const overlapDisabled = isFF(FF_FIT_1304_STRICT_OVERLAP) && store.overlapReached === true;
+      const isDisabled = disabled || submitDisabled || overlapDisabled;
 
       const useExitOption = !isDisabled && isNotQuickView;
 
-      const SubmitOption = ({
-        isUpdate,
-        onClickMethod,
-      }: {
-        isUpdate: boolean;
-        onClickMethod: () => any;
-      }) => {
+      const SubmitOption = ({ isUpdate, onClickMethod }: { isUpdate: boolean; onClickMethod: () => any }) => {
         return (
           <div className="p-tighter rounded">
             <Button
@@ -241,7 +237,11 @@ export const Controls = controlsInjector<{ annotation: MSTAnnotation }>(
       };
 
       if (userGenerate || (store.explore && !userGenerate && store.hasInterface("submit"))) {
-        const title = submitDisabled ? EMPTY_SUBMIT_TOOLTIP : "Save results: [ Ctrl+Enter ]";
+        const title = overlapDisabled
+          ? store.overlapReachedMessage
+          : submitDisabled
+            ? EMPTY_SUBMIT_TOOLTIP
+            : "Save results: [ Ctrl+Enter ]";
 
         buttons.push(
           <ButtonTooltip key="submit" title={title}>
@@ -291,8 +291,13 @@ export const Controls = controlsInjector<{ annotation: MSTAnnotation }>(
         // no changes were made over previously submitted version — no drafts, no pending changes
         const noChanges = isFF(FF_REVIEWER_FLOW) && !history.canUndo && !annotation.draftId;
         const isUpdateDisabled = isDisabled || noChanges;
+        const updateTitle = overlapDisabled
+          ? store.overlapReachedMessage
+          : noChanges
+            ? "No changes were made"
+            : "Update this task: [ Ctrl+Enter ]";
         const button = (
-          <ButtonTooltip key="update" title={noChanges ? "No changes were made" : "Update this task: [ Ctrl+Enter ]"}>
+          <ButtonTooltip key="update" title={updateTitle}>
             <ButtonGroup>
               <Button
                 aria-label="submit"

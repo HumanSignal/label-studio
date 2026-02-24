@@ -86,6 +86,8 @@ export type DataTableProps<T extends DataShape> = {
   dataTestId?: string;
   /** Controlled active row ID - when provided, controls which row is active */
   activeRowId?: string;
+  /** Custom function to extract row ID from row data - useful when row.id is not the primary identifier */
+  getRowId?: (row: T[number], index: number) => string;
 };
 
 /**
@@ -355,12 +357,14 @@ export const DataTable = <T extends DataShape>(props: DataTableProps<T>) => {
         ? (row) => isRowSelectable(row) // If isRowSelectable is provided, enable selection based on the function
         : true
       : undefined,
-    getRowId: (row, index) => {
-      // Use id if available, otherwise fall back to index
-      // Note: 'row' parameter is the row data object itself, not a Row object
-      const rowId = (row as any)?.id;
-      return rowId !== undefined ? String(rowId) : String(index);
-    },
+    getRowId:
+      props.getRowId ||
+      ((row, index) => {
+        // Use id if available, otherwise fall back to index
+        // Note: 'row' parameter is the row data object itself, not a Row object
+        const rowId = (row as any)?.id;
+        return rowId !== undefined ? String(rowId) : String(index);
+      }),
     columnResizeMode: "onChange",
     enableSorting: enableSorting,
     getCoreRowModel: getCoreRowModel(),
@@ -715,7 +719,7 @@ export const Header = <T,>({
   help,
 }: HeaderProps<T>) => {
   // Get header label - use originalHeader if provided, otherwise try to extract from columnDef
-  let headerLabel: string | React.ReactNode = undefined;
+  let headerLabel: string | React.ReactNode;
   if (originalHeader !== undefined) {
     headerLabel = originalHeader;
   } else {
