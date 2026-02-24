@@ -8,7 +8,7 @@
   font-size: var(--font-size-body-smaller);
   font-weight: var(--font-weight-medium);
   line-height: var(--line-height-label-smaller);
-  transition: background-color 150s ease-out, border-color 150s ease-out, color 150s ease-out;
+  transition: background-color 150ms ease-out, border-color 150ms ease-out, color 150ms ease-out;
   cursor: default;
   white-space: nowrap;
   border-radius: var(--corner-radius-smaller);
