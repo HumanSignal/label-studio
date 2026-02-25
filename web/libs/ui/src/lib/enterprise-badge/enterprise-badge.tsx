@@ -3,7 +3,7 @@ import { IconSpark } from "../../assets/icons";
 import { Badge } from "../badge/badge";
 
 /**
- * @deprecated EnterpriseBadge is deprecated. Use Badge with variant="gradient" instead.
+ * @deprecated EnterpriseBadge is deprecated. Use Badge with `variant="gradient" icon={<IconSpark />}` instead.
  *
  * Migration guide:
  * - <EnterpriseBadge /> → <Badge variant="gradient" icon={<IconSpark />}>Enterprise</Badge>
