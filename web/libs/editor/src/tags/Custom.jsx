@@ -28,8 +28,8 @@ if (!APP_SETTINGS?.billing?.enterprise && !Registry.models.custominterface) {
   const CustomComponentWrapper = observer(({ item }) => {
     return (
       <div className="py-base">
-        <EnterpriseBadge />{" "}
-        <Code>{item.type === "custominterface" ? "CustomInterface" : "React"}</Code> tag is only available in{" "}
+        <EnterpriseBadge /> <Code>{item.type === "custominterface" ? "CustomInterface" : "React"}</Code> tag is only
+        available in{" "}
         <a className="no-go" href={ENTERPRISE_URL} target="_blank" rel="noreferrer">
           Enterprise
         </a>
