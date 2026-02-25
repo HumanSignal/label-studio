@@ -262,7 +262,7 @@ class AnnotationStubSerializer(FlexFieldsModelSerializer):
         ]
 
 
-class TaskSimpleSerializer(ModelSerializer):
+class TaskSimpleSerializer(FlexFieldsModelSerializer):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['annotations'] = AnnotationSerializer(many=True, default=[], context=self.context, read_only=True)
