@@ -123,14 +123,14 @@ export const DataView = injector(
 
       if (parent) {
         children.push(
-          <Badge key="column-type" variant="primary" size="small" shape="square">
+          <Badge key="column-type" size="small">
             {original?.readableType ?? parent.title}
           </Badge>,
         );
       } else if (typeof original?.alias === "string" && original.alias.startsWith("dimension_agreement__")) {
         // Show a short tag for per-dimension agreement columns (root columns, no parent)
         children.push(
-          <Badge key="column-type" variant="primary" size="small" shape="square">
+          <Badge key="column-type" size="small">
             {original.readableType}
           </Badge>,
         );

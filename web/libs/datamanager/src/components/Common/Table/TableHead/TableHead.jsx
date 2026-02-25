@@ -40,9 +40,7 @@ const DropdownWrapper = observer(({ column, cellViews, children, onChange }) => 
             return (
               <Menu.Item key={type} onClick={() => onChange?.(column, type)}>
                 <Space>
-                  <Badge variant="primary" size="small" shape="square">
-                    {ViewColumnTypeShort(type)}
-                  </Badge>
+                  <Badge size="small">{ViewColumnTypeShort(type)}</Badge>
                   {ViewColumnTypeName(type)}
                 </Space>
               </Menu.Item>
