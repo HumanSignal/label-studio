@@ -276,7 +276,7 @@ export const TableHead = observer(
                     return isGreaterThanPos;
                   });
 
-                  colRefs.current[draggedCol].style.setProperty("--scale", "");
+                  colRefs.current[draggedCol]?.style?.setProperty("--scale", "");
 
                   states.setDraggedCol(null);
                   curColumns.splice(newIndex, 0, col);

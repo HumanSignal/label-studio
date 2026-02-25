@@ -72,7 +72,7 @@ Agreement.HeaderCell = ({ agreementFilters, onSave, children }) => {
       variant="neutral"
       size="small"
       onClick={() => sdk.invoke("AgreementHeaderClick", { agreementFilters, onSave })}
-      className="flex items-center justify-between gap-tight w-full cursor-auto"
+      className="flex items-center justify-between gap-tight w-full cursor-pointer overflow-hidden"
     >
       {children}
       <Tooltip title="Adjust calculation and display of all agreement columns">
