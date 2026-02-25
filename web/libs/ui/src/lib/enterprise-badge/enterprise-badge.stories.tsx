@@ -24,9 +24,7 @@ export default meta;
 type Story = StoryObj<typeof EnterpriseBadge>;
 
 export const Default: Story = {
-  args: {
-    children: "Enterprise",
-  },
+  args: {},
 };
 
 export const WithLabel: Story = {
@@ -59,6 +57,7 @@ export const Solid: Story = {
 
 export const IconOnlyAndGhost: Story = {
   args: {
+    children: "",
     style: "ghost",
   },
 };
@@ -72,6 +71,7 @@ export const Small: Story = {
 
 export const IconOnlySmall: Story = {
   args: {
+    children: "",
     size: "small",
   },
 };

@@ -9,12 +9,15 @@ export type EnterpriseBadgeProps = Omit<BadgeProps, "variant" | "icon"> & {
 
 /**
  * Enterprise badge: a thin wrapper around Badge that always uses variant="gradient"
- * and defaults to IconSpark. All other Badge props (style, shape, size, children, etc.) are passed through.
+ * and defaults to IconSpark and children "Enterprise". Omit children or pass empty for icon-only.
  */
 export const EnterpriseBadge = forwardRef<HTMLDivElement, EnterpriseBadgeProps>(
-  ({ icon = <IconSpark />, ...props }, ref) => {
+  ({ icon = <IconSpark />, children, ...props }, ref) => {
+    const label = children === undefined ? "Enterprise" : children;
     return (
-      <Badge ref={ref} variant="gradient" icon={icon} {...props} />
+      <Badge ref={ref} variant="gradient" icon={icon} {...props}>
+        {label}
+      </Badge>
     );
   },
 );
