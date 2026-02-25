@@ -23,6 +23,7 @@ import type {
   ConflictFilter,
   DimensionInfo,
   DimensionScore,
+  GroundTruthInferenceResponse,
   SummaryAnnotation,
   SummaryUser,
   TaskAgreementResult,
@@ -46,6 +47,26 @@ const fetchTaskSummary = async (taskId: number | string): Promise<TaskSummaryRes
   const response = await fetch(`/api/tasks/${taskId}/summary/`);
   if (!response.ok) {
     throw new Error(`Failed to fetch task summary: ${response.status}`);
+  }
+  return response.json();
+};
+
+/**
+ * Fetch ground-truth inference for a task (all annotators).
+ *
+ * @param taskId - Database ID of the task.
+ * @returns Parsed GroundTruthInferenceResponse with per-dimension inferred values.
+ * @throws Error when the HTTP response is not OK.
+ */
+const fetchGroundTruthInference = async (
+  taskId: number | string,
+): Promise<GroundTruthInferenceResponse> => {
+  const response = await fetch(`/api/tasks/${taskId}/ground-truth-inference/`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+  });
+  if (!response.ok) {
+    throw new Error(`Failed to fetch ground truth inference: ${response.status}`);
   }
   return response.json();
 };
@@ -87,7 +108,6 @@ function toUserDisplayInput(user: SummaryUser): Record<string, string> {
 
 interface UseTaskSummaryDataOptions {
   taskId: number | string | undefined;
-  method: AgreementMethod;
   conflictFilter: ConflictFilter;
   visibleColumnIds: number[] | null;
   hideInfo: boolean;
@@ -102,10 +122,14 @@ export interface AgreementData {
   summaryAnnotations: SummaryAnnotation[];
   /** Parsed agreement result (null when not available) */
   agreementResult: TaskAgreementResult | null;
+  /** Agreement methodology from the project configuration ("consensus" or "pairwise"). */
+  agreementMethodology: AgreementMethod;
   /** Enriched dimension info list */
   dimensions: DimensionInfo[];
   /** Only categorical dimensions */
   categoricalDimensions: DimensionInfo[];
+  /** Only non-categorical dimensions */
+  nonCategoricalDimensions: DimensionInfo[];
   /** Filtered dimensions based on conflict filter + column visibility */
   filteredDimensions: DimensionInfo[];
   /** Annotator info resolved from API annotations */
@@ -122,6 +146,14 @@ export interface AgreementData {
   conflictCount: number;
   /** IDs of dimensions that have imperfect agreement (conflicts) */
   conflictingDimensionIds: number[];
+  /** Ground-truth values from the API: dimension_id -> value.
+   *  When a saved GT annotation exists these are extracted values;
+   *  otherwise they are inferred via majority vote / metric strategy. */
+  inferredValues: Map<number, unknown>;
+  /** Status from the GT inference API: "saved" or "suggested". */
+  gtInferenceStatus: "saved" | "suggested" | undefined;
+  /** Display name of the user who completed the saved GT annotation (from the GT inference API). */
+  gtCompletedByName: string | undefined;
   /** Loading state */
   isLoading: boolean;
   /** Error state */
@@ -132,7 +164,6 @@ export interface AgreementData {
 
 export function useTaskSummaryData({
   taskId,
-  method,
   conflictFilter,
   visibleColumnIds,
   hideInfo,
@@ -149,7 +180,38 @@ export function useTaskSummaryData({
     enabled: !!taskId,
     staleTime: 30_000,
     gcTime: 5 * 60 * 1000,
+    refetchOnMount: "always",
   });
+
+  const { data: gtInferenceResponse } = useQuery({
+    queryKey: ["task-gt-inference", taskId],
+    queryFn: () => fetchGroundTruthInference(taskId!),
+    enabled: !!taskId,
+    staleTime: 30_000,
+    gcTime: 5 * 60 * 1000,
+    refetchOnMount: "always",
+  });
+
+  const inferredValues = useMemo<Map<number, unknown>>(() => {
+    const map = new Map<number, unknown>();
+    if (!gtInferenceResponse?.dimensions) return map;
+    for (const [dimIdStr, entry] of Object.entries(gtInferenceResponse.dimensions)) {
+      map.set(Number(dimIdStr), entry.value);
+    }
+    return map;
+  }, [gtInferenceResponse]);
+
+  const gtInferenceStatus = gtInferenceResponse?.status;
+
+  const gtCompletedByName = useMemo(() => {
+    const user = gtInferenceResponse?.completed_by;
+    if (!user) return undefined;
+    return userDisplayName(
+      Object.fromEntries(
+        Object.entries(user).map(([k, v]) => [k, String(v ?? "")]),
+      ),
+    );
+  }, [gtInferenceResponse?.completed_by]);
 
   const task = apiResponse?.task;
   const summaryAnnotations = apiResponse?.annotations ?? [];
@@ -158,6 +220,8 @@ export function useTaskSummaryData({
     if (!apiResponse?.agreement || !isTaskAgreementResult(apiResponse.agreement)) return null;
     return apiResponse.agreement;
   }, [apiResponse]);
+
+  const agreementMethodology: AgreementMethod = agreementResult?.agreement_methodology ?? "pairwise";
 
   const annotators = useMemo<AnnotatorInfo[]>(() => {
     if (!agreementResult) return [];
@@ -209,6 +273,11 @@ export function useTaskSummaryData({
     [dimensions],
   );
 
+  const nonCategoricalDimensions = useMemo(
+    () => dimensions.filter((d) => !d.isCategorical),
+    [dimensions],
+  );
+
   const filteredDimensions = useMemo(() => {
     let filtered: DimensionInfo[];
     if (conflictFilter === "custom") {
@@ -225,20 +294,20 @@ export function useTaskSummaryData({
   }, [dimensions, categoricalDimensions, conflictFilter, visibleColumnIds]);
 
   const dimensionScores = useMemo(
-    () => (agreementResult ? buildDimensionScores(agreementResult, method) : []),
-    [agreementResult, method],
+    () => (agreementResult ? buildDimensionScores(agreementResult, agreementMethodology) : []),
+    [agreementResult, agreementMethodology],
   );
 
   const overallAgreement = useMemo(() => {
     if (!agreementResult) return null;
-    return method === "pairwise"
+    return agreementMethodology === "pairwise"
       ? agreementResult.aggregation.pairwise_agreement
       : agreementResult.aggregation.consensus_agreement;
-  }, [agreementResult, method]);
+  }, [agreementResult, agreementMethodology]);
 
   const conflictCount = useMemo(
-    () => (agreementResult ? countConflicts(agreementResult.aggregation, method) : 0),
-    [agreementResult, method],
+    () => (agreementResult ? countConflicts(agreementResult.aggregation, agreementMethodology) : 0),
+    [agreementResult, agreementMethodology],
   );
 
   const conflictingDimensionIds = useMemo(
@@ -256,8 +325,10 @@ export function useTaskSummaryData({
     task,
     summaryAnnotations,
     agreementResult,
+    agreementMethodology,
     dimensions,
     categoricalDimensions,
+    nonCategoricalDimensions,
     filteredDimensions,
     annotators,
     annotationForRow,
@@ -265,6 +336,9 @@ export function useTaskSummaryData({
     overallAgreement,
     conflictCount,
     conflictingDimensionIds,
+    inferredValues,
+    gtInferenceStatus,
+    gtCompletedByName,
     isLoading,
     error: error as Error | null,
     hasAgreementData,

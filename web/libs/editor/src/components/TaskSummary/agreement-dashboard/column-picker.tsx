@@ -4,11 +4,13 @@
  * The trigger button shows "Columns (X of Y)" with an animated chevron.
  * The dropdown contains:
  *   1. **All Columns** checkbox — selects / deselects every dimension at once.
- *   2. **Conflicts Only** checkbox — selects only dimensions with imperfect
+ *   2. **Categoricals Only** checkbox — selects only categorical dimensions.
+ *      Only shown when non-categorical dimensions are present.
+ *   3. **Conflicts Only** checkbox — selects only dimensions with imperfect
  *      agreement. Automatically unchecks when the user changes any individual
  *      column selection.
- *   3. A search input to filter column names.
- *   4. Per-column checkboxes, immediately applied.
+ *   4. A search input to filter column names.
+ *   5. Per-column checkboxes, immediately applied.
  */
 
 import { useCallback, useMemo } from "react";
@@ -30,8 +32,8 @@ interface ColumnPickerProps {
   onVisibleColumnsChange: (ids: number[]) => void;
   /** IDs of dimensions that have imperfect agreement scores */
   conflictingDimensionIds: number[];
-  /** When true, the conflict legend reads "ground truth"; otherwise "majority vote" */
-  hasGroundTruth: boolean;
+  /** Whether any non-categorical dimensions exist — shows the "Categoricals Only" filter when true */
+  hasNonCategoricalDimensions?: boolean;
 }
 
 // ---------------------------------------------------------------------------
@@ -45,7 +47,7 @@ export const ColumnPicker = ({
   visibleColumnIds,
   onVisibleColumnsChange,
   conflictingDimensionIds,
-  hasGroundTruth,
+  hasNonCategoricalDimensions,
 }: ColumnPickerProps) => {
   const options = useMemo(
     () =>
@@ -59,6 +61,26 @@ export const ColumnPicker = ({
   const stringValue = useMemo(() => visibleColumnIds.map(String), [visibleColumnIds]);
 
   const allSelected = allDimensions.length > 0 && visibleColumnIds.length === allDimensions.length;
+
+  const categoricalDimensionIds = useMemo(
+    () => allDimensions.filter((d) => d.isCategorical).map((d) => d.dimensionId),
+    [allDimensions],
+  );
+
+  // "Categoricals Only" is active when visibleColumnIds exactly matches categorical dimension IDs
+  const categoricalsOnlyActive = useMemo(() => {
+    if (categoricalDimensionIds.length === 0 || visibleColumnIds.length !== categoricalDimensionIds.length) return false;
+    const catSet = new Set(categoricalDimensionIds);
+    return visibleColumnIds.every((id) => catSet.has(id));
+  }, [visibleColumnIds, categoricalDimensionIds]);
+
+  const handleCategoricalsOnlyToggle = useCallback(() => {
+    if (categoricalsOnlyActive) {
+      onVisibleColumnsChange(allDimensions.map((d) => d.dimensionId));
+    } else {
+      onVisibleColumnsChange(categoricalDimensionIds);
+    }
+  }, [categoricalsOnlyActive, allDimensions, categoricalDimensionIds, onVisibleColumnsChange]);
 
   // "Conflicts Only" is active when visibleColumnIds exactly matches conflictingDimensionIds
   const conflictsOnlyActive = useMemo(() => {
@@ -109,6 +131,21 @@ export const ColumnPicker = ({
           </div>
         </div>
 
+        {/* Categoricals Only — only shown when non-categorical dimensions are present */}
+        {hasNonCategoricalDimensions && (
+          <Tooltip title="Show only categorical dimensions (editable in ground truth mode)">
+            <div
+              className="rounded-4 text-neutral-content-subtle overflow-hidden p-1 outline-none cursor-pointer"
+              onClick={handleCategoricalsOnlyToggle}
+            >
+              <div className="flex gap-2 w-full pl-2 pr-4 py-1 hover:bg-primary-emphasis-subtle rounded-4 duration-150 ease-out">
+                <Checkbox tabIndex={-1} checked={categoricalsOnlyActive} readOnly />
+                <div className="w-full min-w-0 truncate">Categoricals Only</div>
+              </div>
+            </div>
+          </Tooltip>
+        )}
+
         {/* Conflicts Only — only shown when there are conflicting dimensions */}
         {conflictingDimensionIds.length > 0 && (
           <Tooltip title="Show only columns where annotators disagree">
@@ -125,17 +162,19 @@ export const ColumnPicker = ({
         )}
       </div>
     ),
-    [allSelected, handleSelectAllToggle, conflictsOnlyActive, handleConflictsOnlyToggle, conflictingDimensionIds.length],
+    [
+      allSelected, handleSelectAllToggle,
+      hasNonCategoricalDimensions, categoricalsOnlyActive, handleCategoricalsOnlyToggle,
+      conflictsOnlyActive, handleConflictsOnlyToggle, conflictingDimensionIds.length,
+    ],
   );
 
   return (
     <div className="flex items-center gap-tight">
-      {/* Conflict legend — text changes based on whether a ground truth annotation exists */}
+      {/* Conflict legend — circle outline matches chip font color (negative-content) */}
       <span className="inline-flex items-center gap-tighter text-label-small text-neutral-content-subtle leading-none">
-        <span className="inline-block w-2.5 h-2.5 rounded-full bg-negative-background border shrink-0" style={{ borderColor: "var(--color-negative-content)" }} />
-        <span className="whitespace-nowrap min-w-[11rem]">
-          Conflicts with {hasGroundTruth ? "ground truth" : "majority vote"}
-        </span>
+        <span className="inline-block w-2.5 h-2.5 rounded-full border border-negative-content bg-transparent shrink-0" />
+        <span className="whitespace-nowrap min-w-[11rem]">Conflicts with ground truth</span>
       </span>
 
       {/* Separator */}

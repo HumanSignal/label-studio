@@ -2,21 +2,20 @@
  * Annotators × Dimensions Table (§3)
  *
  * Primary comparison view showing what each annotator chose for every
- * dimension, highlights disagreements, and includes a pinned Majority Vote
- * summary row. Supports both categorical and non-categorical dimensions
- * (non-categorical dimensions display "—" for values and N/A for majority vote).
- *
- * V1: Read-only — no click, sort, or drag interactions.
+ * dimension, highlights disagreements, and includes an always-visible
+ * Ground Truth row prefilled from the inference API. Non-categorical
+ * dimensions display "—" when no values are present.
  */
 
 import { useMemo } from "react";
 import { flexRender, getCoreRowModel, useReactTable, createColumnHelper } from "@tanstack/react-table";
 import { cnm, Tooltip, Userpic } from "@humansignal/ui";
 import { IconAnnotationGroundTruth, IconCheckAlt, IconCrossAlt } from "@humansignal/icons";
-import { computeMajorityVote, formatMetricType } from "./agreement-utils";
+import { formatMetricType } from "./agreement-utils";
 import { GroundTruthRow } from "./ground-truth-row";
 import { ResizeHandler } from "../ResizeHandler";
-import type { AnnotatorInfo, DimensionInfo, DimensionScore, GroundTruthCell, GroundTruthSource, MajorityVoteResult, SummaryAnnotation } from "./types";
+import { valueToChipStrings, ValueChips } from "./value-chips";
+import type { AnnotatorInfo, DimensionInfo, DimensionScore, GroundTruthCell, GroundTruthSource, SummaryAnnotation } from "./types";
 import type { ValueCount } from "./use-ground-truth";
 
 // ---------------------------------------------------------------------------
@@ -49,22 +48,35 @@ interface AnnotatorsDimensionsTableProps {
   onAnnotationClick?: (annotationId: number) => void;
   /** Optional per-dimension scores to render as agreement bars under the table */
   dimensionScores?: DimensionScore[];
-  /** Ground Truth Mode props (all optional — table works without them) */
-  groundTruthActive?: boolean;
+  /** Backend-inferred ground-truth values: dimension_id -> inferred value.
+   *  Used for conflict highlighting in annotator value cells. */
+  inferredValues?: Map<number, unknown>;
+  /** Effective GT cells (merged from inferred + existing GT + local edits). */
   groundTruthCells?: Map<number, GroundTruthCell>;
   groundTruthValueCounts?: Map<number, ValueCount[]>;
-  onSetGroundTruthCell?: (dimensionId: number, value: string | number | boolean | null, source?: GroundTruthSource) => void;
+  onSetGroundTruthCell?: (
+    dimensionId: number,
+    value: string | number | boolean | null | (string | number | boolean)[],
+    source?: GroundTruthSource,
+  ) => void;
   onClearGroundTruthCell?: (dimensionId: number) => void;
   /** When set, the annotator at this index is excluded from regular rows
    *  (used to hide a ground_truth annotation that is shown in the GT row instead). */
   excludeAnnotatorIndex?: number;
   /** Display name of the annotator who completed the existing GT annotation. */
   groundTruthAnnotatorName?: string;
-  /** Pre-computed cells from an existing GT annotation — used to show a
-   *  read-only GT row when Ground Truth Mode is off. */
-  existingGtCells?: Map<number, GroundTruthCell>;
-  /** Whether the GT row represents a saved annotation or an unsaved draft. */
-  groundTruthStatus?: "draft" | "saved";
+  /** Current state of the GT row: suggested, draft, saved, or undefined. */
+  groundTruthStatus?: "draft" | "saved" | "suggested";
+  /** Whether the GT row should be read-only (no editable selects). */
+  groundTruthReadOnly?: boolean;
+  /** Whether the GT row should appear visually disabled (reduced opacity). */
+  groundTruthDisabled?: boolean;
+  /** Agreement methodology label for score tooltips ("consensus" or "pairwise"). */
+  agreementMethodology?: string;
+  /** When status is "draft", called from the Draft badge to revert to suggested values. */
+  onRevertToSuggestion?: () => void;
+  /** When status is "draft", called from the Draft badge to clear all values. */
+  onClearAllValues?: () => void;
 }
 
 // ---------------------------------------------------------------------------
@@ -77,15 +89,19 @@ export const AnnotatorsDimensionsTable = ({
   annotationForRow,
   onAnnotationClick,
   dimensionScores,
-  groundTruthActive,
+  inferredValues,
   groundTruthCells,
   groundTruthValueCounts,
   onSetGroundTruthCell,
   onClearGroundTruthCell,
   excludeAnnotatorIndex,
   groundTruthAnnotatorName,
-  existingGtCells,
   groundTruthStatus,
+  groundTruthReadOnly,
+  groundTruthDisabled,
+  agreementMethodology,
+  onRevertToSuggestion,
+  onClearAllValues,
 }: AnnotatorsDimensionsTableProps) => {
   const scoreMap = useMemo(() => {
     if (!dimensionScores) return null;
@@ -103,16 +119,6 @@ export const AnnotatorsDimensionsTable = ({
         : annotators,
     [annotators, excludeAnnotatorIndex],
   );
-
-  const majorityVotes = useMemo<Map<number, MajorityVoteResult>>(() => {
-    const map = new Map<number, MajorityVoteResult>();
-    for (const dim of dimensions) {
-      if (dim.values) {
-        map.set(dim.dimensionId, computeMajorityVote(dim.values));
-      }
-    }
-    return map;
-  }, [dimensions]);
 
   // ---------------------------------------------------------------------------
   // TanStack Table — columns + resize
@@ -164,10 +170,10 @@ export const AnnotatorsDimensionsTable = ({
   /** Returns the current rendered size of a column by its ID. */
   const getColSize = (id: string): number => table.getColumn(id)?.getSize() ?? 120;
 
-  if (dimensions.length === 0 || annotators.length === 0) {
+  if (annotators.length === 0) {
     return (
       <div className="text-neutral-content-subtle text-label-small italic p-base">
-        No dimensions available for comparison.
+        No annotations available for comparison.
       </div>
     );
   }
@@ -233,18 +239,19 @@ export const AnnotatorsDimensionsTable = ({
             return (
               <tr
                 key={annotator.id}
-                className={cnm("group", isClickable && "cursor-pointer")}
-                onClick={isClickable ? () => onAnnotationClick(ann.id) : undefined}
+                className="group"
               >
-                {/* Annotator name cell */}
+                {/* Annotator name cell — click navigates to the annotation */}
                 <td
                   className={cnm(
                     "px-4 py-2.5 align-middle border-r border-neutral-border sticky left-0 z-10",
                     isEvenRow ? "bg-neutral-surface" : "bg-neutral-background",
                     "group-hover:bg-neutral-surface-hover",
                     rowIndex < displayAnnotators.length - 1 && "border-b border-neutral-border-subtle",
+                    isClickable && "cursor-pointer",
                   )}
                   style={{ minWidth: getColSize("annotator") }}
+                  onClick={isClickable ? () => onAnnotationClick(ann.id) : undefined}
                 >
                   <div className="flex gap-tight items-center">
                     <Userpic
@@ -264,40 +271,36 @@ export const AnnotatorsDimensionsTable = ({
 
                 {/* Value cells */}
                 {dimensions.map((dim) => {
-                  if (!dim.isCategorical) {
-                    return (
-                      <td
-                        key={dim.dimensionId}
-                        className={cnm(
-                          "px-4 py-2.5 align-middle text-label-small text-neutral-content-subtler italic transition-colors",
-                          isEvenRow ? "bg-neutral-surface" : "bg-neutral-background",
-                          "group-hover:bg-neutral-surface-hover",
-                          rowIndex < displayAnnotators.length - 1 && "border-b border-neutral-border-subtle",
-                        )}
-                        style={{ minWidth: getColSize(`dim-${dim.dimensionId}`) }}
-                      >
-                        N/A
-                      </td>
-                    );
-                  }
-
                   const value = dim.values?.[annotator.index] ?? null;
-                  const gtCell = groundTruthCells?.get(dim.dimensionId);
-                  const majority = majorityVotes.get(dim.dimensionId);
 
-                  const referenceValue = gtCell ? gtCell.value : majority?.value ?? null;
-                  const conflict = referenceValue !== null
-                    ? (value === null || String(value) !== String(referenceValue))
-                    : false;
-                  const displayValue = value !== null ? String(value) : "—";
+                  // Conflict detection: only for categorical dims with a saved GT cell.
+                  // Inferred values are not used — they are a suggestion, not ground truth.
+                  const gtCell = dim.isCategorical ? groundTruthCells?.get(dim.dimensionId) : undefined;
+                  const gtChipStrings = gtCell ? (valueToChipStrings(gtCell.value) ?? []) : null;
+                  const chipStrings = valueToChipStrings(value);
 
-                  const conflictTooltip = conflict
-                    ? gtCell
-                      ? `Ground truth: ${String(gtCell.value)}. This annotator chose: ${displayValue}`
-                      : majority
-                        ? `Majority: ${String(majority.value)} (${majority.count}/${majority.total}). This annotator chose: ${displayValue}`
-                        : undefined
+                  // Labels present in the annotator's value but absent from the GT set.
+                  const conflictingLabels: ReadonlySet<string> | undefined = (() => {
+                    if (gtChipStrings === null || chipStrings === null) return undefined;
+                    const gtSet = new Set(gtChipStrings);
+                    const differing = chipStrings.filter((s) => !gtSet.has(s));
+                    return differing.length > 0 ? new Set(differing) : undefined;
+                  })();
+
+                  const hasConflict = conflictingLabels !== undefined && conflictingLabels.size > 0;
+
+                  const displaySummary = chipStrings?.length ? chipStrings.join(", ") : "—";
+                  const conflictTooltip = hasConflict && gtCell
+                    ? `Ground truth: ${gtChipStrings?.join(", ") ?? "—"}. This annotator chose: ${displaySummary}`
                     : undefined;
+
+                  const chips = (
+                    <ValueChips
+                      value={value}
+                      className={conflictTooltip ? "flex flex-wrap gap-1 cursor-default" : undefined}
+                      conflictingLabels={conflictingLabels}
+                    />
+                  );
 
                   return (
                     <td
@@ -307,16 +310,13 @@ export const AnnotatorsDimensionsTable = ({
                         isEvenRow ? "bg-neutral-surface" : "bg-neutral-background",
                         "group-hover:bg-neutral-surface-hover",
                         rowIndex < displayAnnotators.length - 1 && "border-b border-neutral-border-subtle",
-                        conflict && "bg-negative-background text-negative-content border-negative-border-subtle",
                       )}
                       style={{ minWidth: getColSize(`dim-${dim.dimensionId}`) }}
                     >
                       {conflictTooltip ? (
-                        <Tooltip title={conflictTooltip}>
-                          <span className="cursor-default">{displayValue}</span>
-                        </Tooltip>
+                        <Tooltip title={conflictTooltip}>{chips}</Tooltip>
                       ) : (
-                        <span>{displayValue}</span>
+                        chips
                       )}
                     </td>
                   );
@@ -329,7 +329,7 @@ export const AnnotatorsDimensionsTable = ({
           {scoreMap && (
             <tr>
               <td
-                className="px-4 py-2 align-middle text-label-small font-semibold text-neutral-content bg-neutral-background border-t-2 border-r border-neutral-border-bold sticky left-0 z-10"
+                className="px-4 py-2.5 align-middle text-label-small font-semibold text-neutral-content bg-neutral-background border-t-2 border-r border-neutral-border-bold sticky left-0 z-10"
                 style={{ minWidth: getColSize("annotator") }}
               >
                 <Tooltip title="Inter-annotator agreement (excludes the ground truth annotation)">
@@ -342,7 +342,7 @@ export const AnnotatorsDimensionsTable = ({
                   return (
                     <td
                       key={dim.dimensionId}
-                      className="px-4 py-2 align-middle text-label-small bg-neutral-background border-t-2 border-neutral-border-bold text-neutral-content-subtler italic"
+                      className="px-4 py-2.5 align-middle text-label-small bg-neutral-background border-t-2 border-neutral-border-bold text-neutral-content-subtler italic"
                       style={{ minWidth: getColSize(`dim-${dim.dimensionId}`) }}
                     >
                       —
@@ -355,11 +355,12 @@ export const AnnotatorsDimensionsTable = ({
                     : pct < 80 ? "text-warning-content"
                       : "text-positive-content";
                 const metricLabel = formatMetricType(dim.metricType);
-                const cellTooltip = `${dim.name}: ${pct.toFixed(1)}% — ${metricLabel} agreement between ${displayAnnotators.length} annotators`;
+                const methodologyLabel = agreementMethodology === "consensus" ? "Consensus" : "Pairwise";
+                const cellTooltip = `${methodologyLabel} ${metricLabel} between ${displayAnnotators.length} annotators`;
                 return (
                   <td
                     key={dim.dimensionId}
-                    className="px-4 py-2 align-middle bg-neutral-background border-t-2 border-neutral-border-bold"
+                    className="px-4 py-2.5 align-middle bg-neutral-background border-t-2 border-neutral-border-bold"
                     style={{ minWidth: getColSize(`dim-${dim.dimensionId}`) }}
                   >
                     <Tooltip title={cellTooltip}>
@@ -373,88 +374,23 @@ export const AnnotatorsDimensionsTable = ({
             </tr>
           )}
 
-          {/* Majority Vote row */}
-          <tr>
-            <td
-              className="px-4 py-2.5 align-middle font-semibold text-label-small bg-neutral-surface border-t border-r border-neutral-border sticky left-0 z-10"
-              style={{ minWidth: getColSize("annotator") }}
-            >
-              <Tooltip title="Most common answer across all annotators, including conflicts and empty responses">
-                <span className="cursor-default">Majority Vote</span>
-              </Tooltip>
-            </td>
-            {dimensions.map((dim) => {
-              if (!dim.isCategorical) {
-                return (
-                  <td
-                    key={dim.dimensionId}
-                    className="px-4 py-2.5 align-middle text-label-small bg-neutral-surface border-t border-neutral-border text-neutral-content-subtler italic"
-                    style={{ minWidth: getColSize(`dim-${dim.dimensionId}`) }}
-                  >
-                    N/A
-                  </td>
-                );
-              }
-
-              const majority = majorityVotes.get(dim.dimensionId);
-              if (!majority || majority.value === null) {
-                return (
-                  <td
-                    key={dim.dimensionId}
-                    className="px-4 py-2.5 align-middle text-label-small bg-neutral-surface border-t border-neutral-border text-neutral-content-subtler"
-                    style={{ minWidth: getColSize(`dim-${dim.dimensionId}`) }}
-                  >
-                    —
-                  </td>
-                );
-              }
-
-              return (
-                <td
-                  key={dim.dimensionId}
-                  className="px-4 py-2.5 align-middle text-label-small font-semibold bg-neutral-surface border-t border-neutral-border"
-                  style={{ minWidth: getColSize(`dim-${dim.dimensionId}`) }}
-                >
-                  <div className="flex items-center gap-tight">
-                    <span>{String(majority.value)}</span>
-                    <span className="text-neutral-content-subtle font-normal">
-                      ({majority.count}/{majority.total})
-                    </span>
-                    {majority.isTie && (
-                      <span className="text-warning-content text-label-small font-bold">Tie</span>
-                    )}
-                  </div>
-                </td>
-              );
-            })}
-          </tr>
-
-          {/* Ground Truth row — editable in GT mode, read-only when a GT annotation exists */}
-          {groundTruthActive && groundTruthCells && groundTruthValueCounts && onSetGroundTruthCell && onClearGroundTruthCell ? (
+          {/* Ground Truth row — always visible, prefilled from inference API */}
+          {groundTruthCells && onSetGroundTruthCell && onClearGroundTruthCell && (
             <GroundTruthRow
               dimensions={dimensions}
               cells={groundTruthCells}
-              valueCounts={groundTruthValueCounts}
+              valueCounts={groundTruthValueCounts ?? new Map()}
               onSetCell={onSetGroundTruthCell}
               onClearCell={onClearGroundTruthCell}
               annotatorName={groundTruthAnnotatorName}
               status={groundTruthStatus}
-              readOnly={groundTruthStatus === "saved"}
+              readOnly={groundTruthReadOnly}
               getColSize={getColSize}
+              onRevertToSuggestion={onRevertToSuggestion}
+              onClearAllValues={onClearAllValues}
+              disabled={groundTruthDisabled}
             />
-          ) : existingGtCells && existingGtCells.size > 0 ? (
-            <GroundTruthRow
-              dimensions={dimensions}
-              cells={existingGtCells}
-              valueCounts={new Map()}
-              onSetCell={() => {}}
-              onClearCell={() => {}}
-              annotatorName={groundTruthAnnotatorName}
-              readOnly
-              status="saved"
-              getColSize={getColSize}
-            />
-          ) : null}
+          )}
         </tbody>
       </table>
     </div>

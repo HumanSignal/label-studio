@@ -76,6 +76,8 @@ export interface TaskAgreementResult {
   annotation_ids?: number[];
   /** Added by LseTaskSummaryAPI: dimension_id -> metadata */
   dimension_meta: Record<number, DimensionMeta>;
+  /** Agreement methodology configured for the project ("consensus" or "pairwise"). */
+  agreement_methodology?: AgreementMethod;
 }
 
 /** Per-dimension pairwise matching scores */
@@ -116,6 +118,8 @@ export interface DimensionMeta {
   is_categorical: boolean;
   /** All available labels defined in the labeling config for categorical dims. */
   labels?: string[];
+  /** Whether the control allows multiple selected values (e.g. Choices multiple, Taxonomy). */
+  allow_multiselect?: boolean;
 }
 
 // ---------------------------------------------------------------------------
@@ -144,6 +148,8 @@ export interface DimensionInfo {
   scores: number[][];
   /** All available labels defined in the labeling config (only for categorical) */
   labels?: string[];
+  /** Whether the dimension allows multiple selected values. */
+  allowMultiselect?: boolean;
 }
 
 /** Annotator info resolved from annotations prop */
@@ -183,7 +189,8 @@ export type GroundTruthSource = "auto_unanimous" | "auto_majority" | "manual";
 /** A single resolved ground truth value for one dimension */
 export interface GroundTruthCell {
   dimensionId: number;
-  value: string | number | boolean | null;
+  /** Single value for single-select; array for multiselect dimensions. */
+  value: string | number | boolean | null | (string | number | boolean)[];
   source: GroundTruthSource;
 }
 
@@ -194,4 +201,21 @@ export interface ExistingGroundTruth {
   /** User ID of the annotator who completed the GT annotation. */
   completedBy: number | null;
   cells: Map<number, GroundTruthCell>;
+}
+
+// ---------------------------------------------------------------------------
+// Ground Truth Inference API Types
+// ---------------------------------------------------------------------------
+
+/** Response from POST /api/tasks/{task_id}/ground-truth-inference/ */
+export interface GroundTruthInferenceResponse {
+  task_id: number;
+  /** dimension_id (as string key) -> ground-truth value and metadata */
+  dimensions: Record<string, { name: string; value: unknown; metric_type: string }>;
+  annotator_ids: number[];
+  /** "saved" when values come from an existing GT annotation;
+   *  "suggested" when values are inferred via majority vote / metric strategy. */
+  status: "saved" | "suggested";
+  /** User who completed the saved GT annotation (only present when status is "saved"). */
+  completed_by?: { id: number; email?: string; first_name?: string; last_name?: string } | null;
 }

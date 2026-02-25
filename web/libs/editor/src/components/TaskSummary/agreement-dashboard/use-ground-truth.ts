@@ -84,9 +84,16 @@ export interface GroundTruthActions {
   toggleActive: () => void;
   autoAcceptUnanimous: () => void;
   autoAcceptMajority: (threshold: number, selectedDimIds?: number[]) => void;
-  setCell: (dimensionId: number, value: string | number | boolean | null, source?: GroundTruthSource) => void;
+  setCell: (
+    dimensionId: number,
+    value: string | number | boolean | null | (string | number | boolean)[],
+    source?: GroundTruthSource,
+  ) => void;
   clearCell: (dimensionId: number) => void;
+  /** Clear all local cells so effective state falls back to inferred/saved. */
   reset: () => void;
+  /** Set all categorical dimensions to empty (null) in local state. */
+  clearAllCells: () => void;
   clearOnCommit: () => void;
 }
 
@@ -367,7 +374,11 @@ export function useGroundTruth({
   );
 
   const setCell = useCallback(
-    (dimensionId: number, value: string | number | boolean | null, source: GroundTruthSource = "manual") => {
+    (
+      dimensionId: number,
+      value: string | number | boolean | null | (string | number | boolean)[],
+      source: GroundTruthSource = "manual",
+    ) => {
       updateCells((prev) => {
         const next = new Map(prev);
         next.set(dimensionId, { dimensionId, value, source });
@@ -381,7 +392,7 @@ export function useGroundTruth({
     (dimensionId: number) => {
       updateCells((prev) => {
         const next = new Map(prev);
-        next.delete(dimensionId);
+        next.set(dimensionId, { dimensionId, value: null, source: "manual" });
         return next;
       });
     },
@@ -391,6 +402,16 @@ export function useGroundTruth({
   const reset = useCallback(() => {
     setSerializedCells([]);
   }, [setSerializedCells]);
+
+  const clearAllCells = useCallback(() => {
+    updateCells((prev) => {
+      const next = new Map(prev);
+      for (const dim of categoricalDimensions) {
+        next.set(dim.dimensionId, { dimensionId: dim.dimensionId, value: null, source: "manual" });
+      }
+      return next;
+    });
+  }, [categoricalDimensions, updateCells]);
 
   const clearOnCommit = useCallback(() => {
     setSerializedCells([]);
@@ -420,6 +441,7 @@ export function useGroundTruth({
       setCell,
       clearCell,
       reset,
+      clearAllCells,
       clearOnCommit,
     },
   };

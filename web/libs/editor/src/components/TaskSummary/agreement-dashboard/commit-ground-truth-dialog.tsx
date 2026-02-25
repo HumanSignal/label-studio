@@ -49,16 +49,29 @@ const TAG_TYPE_VALUE_KEYS: Record<string, string> = {
 /**
  * Value wrappers per tag type. "choices" wraps in an array, "taxonomy"
  * wraps in a nested array, numeric types coerce to Number.
+ * For multiselect, rawValue may be an array of primitives (choices) or paths (taxonomy).
  */
-function wrapValueForTagType(tagType: string, rawValue: string | number | boolean | null): unknown {
-  switch (TAG_TYPE_VALUE_KEYS[tagType] ?? tagType) {
+function wrapValueForTagType(
+  tagType: string,
+  rawValue: string | number | boolean | null | (string | number | boolean)[],
+): unknown {
+  const key = TAG_TYPE_VALUE_KEYS[tagType] ?? tagType;
+  const isArray = Array.isArray(rawValue);
+
+  switch (key) {
     case "choices":
-      return [String(rawValue)];
+      return isArray ? rawValue.map(String) : [String(rawValue)];
     case "taxonomy":
+      if (isArray) {
+        const first = rawValue[0];
+        return typeof first === "object" && first !== null && Array.isArray(first)
+          ? (rawValue as string[][])
+          : (rawValue as (string | number | boolean)[]).map((v) => [String(v)]);
+      }
       return [[String(rawValue)]];
     case "rating":
     case "number":
-      return Number(rawValue);
+      return isArray ? Number((rawValue as (string | number | boolean)[])[0]) : Number(rawValue);
     default:
       return rawValue;
   }
@@ -96,6 +109,7 @@ function buildGroundTruthResult(
   }
 
   for (const cell of cells) {
+    if (cell.value === null || cell.value === undefined) continue;
     const dim = dimensionById.get(cell.dimensionId);
     if (!dim || !dim.isCategorical) continue;
 

@@ -27,16 +27,15 @@ import { useLocalStorage } from "@/utils/hooks";
 import { AnnotatorsDimensionsTable } from "./agreement-dashboard/annotators-dimensions-table";
 import { ColumnPicker } from "./agreement-dashboard/column-picker";
 import { useTaskSummaryData } from "./agreement-dashboard/use-task-summary-data";
-import type { AgreementMethod } from "./agreement-dashboard/types";
 
 // Ground Truth Mode
 import { useGroundTruth } from "./agreement-dashboard/use-ground-truth";
 import { useEffectiveGroundTruth } from "./agreement-dashboard/use-effective-ground-truth";
-import { ResolutionSummaryBar } from "./agreement-dashboard/resolution-summary-bar";
+import { TaskSummaryControlPanel } from "./agreement-dashboard/task-summary-control-panel";
 import { openCommitGroundTruthDialog, commitGroundTruth } from "./agreement-dashboard/commit-ground-truth-dialog";
 import { openAutoReviewDialog } from "./agreement-dashboard/auto-review-dialog";
 
-import { CollapsiblePanel } from "@humansignal/ui";
+import { CollapsiblePanel, Message } from "@humansignal/ui";
 
 // ---------------------------------------------------------------------------
 // Props (same as OSS TaskSummary)
@@ -104,10 +103,11 @@ const TaskSummary = ({ annotations: allAnnotations, store: annotationStore }: Ta
 
   const taskId = storeTask?.id;
 
-  const [method, setMethod] = useLocalStorage<AgreementMethod>(
-    "annotation_dashboard_agreement_method",
-    "consensus",
+  const [taskDataExpanded, setTaskDataExpanded] = useLocalStorage<boolean>(
+    "annotation_dashboard_task_data_expanded",
+    false,
   );
+
   const [visibleColumnIds, setVisibleColumnIds] = useLocalStorage<number[] | null>(
     `annotation_dashboard_columns_${taskId}`,
     null,
@@ -119,16 +119,30 @@ const TaskSummary = ({ annotations: allAnnotations, store: annotationStore }: Ta
 
   const agreementData = useTaskSummaryData({
     taskId,
-    method,
     conflictFilter: "custom",
     visibleColumnIds,
     hideInfo,
   });
 
+  const method = agreementData.agreementMethodology;
+
   const effectiveVisibleColumnIds = useMemo(() => {
     if (visibleColumnIds !== null) return visibleColumnIds;
     return agreementData.categoricalDimensions.map((d) => d.dimensionId);
   }, [visibleColumnIds, agreementData.categoricalDimensions]);
+
+  // ---------------------------------------------------------------------------
+  // Non-categorical dimension detection
+  // ---------------------------------------------------------------------------
+
+  const hasNonCategoricalDimensions = agreementData.nonCategoricalDimensions.length > 0;
+
+  const nonCategoricalDimensionNames = useMemo(() => {
+    const names = agreementData.nonCategoricalDimensions.map((d) => d.name);
+    const shown = names.slice(0, 3);
+    const remaining = names.length - shown.length;
+    return remaining > 0 ? `${shown.join(", ")} (+${remaining} more)` : shown.join(", ");
+  }, [agreementData.nonCategoricalDimensions]);
 
   // ---------------------------------------------------------------------------
   // Ground Truth Mode
@@ -145,7 +159,6 @@ const TaskSummary = ({ annotations: allAnnotations, store: annotationStore }: Ta
     existingGtAnnotationIndex,
     hasExistingGt,
     existingGtAnnotatorName,
-    existingGtCells,
     effectiveGtCells,
     effectiveResolvedCount,
     effectiveProgress,
@@ -153,20 +166,21 @@ const TaskSummary = ({ annotations: allAnnotations, store: annotationStore }: Ta
     effectiveSummary,
     existingGtObject,
     groundTruthStatus,
-  } = useEffectiveGroundTruth({ agreementData, groundTruth });
+  } = useEffectiveGroundTruth({ agreementData, groundTruth, hasNonCategoricalDimensions });
+
+  const gtReadOnly = hasExistingGt || hasNonCategoricalDimensions;
 
   // ---------------------------------------------------------------------------
   // Ground Truth actions
   // ---------------------------------------------------------------------------
 
-  const handleAcceptAllMajority = useCallback(() => {
-    for (const dim of agreementData.categoricalDimensions) {
-      const majority = groundTruth.majorityVotes.get(dim.dimensionId);
-      if (majority && majority.value !== null) {
-        groundTruth.actions.setCell(dim.dimensionId, majority.value, "auto_majority");
-      }
-    }
-  }, [agreementData.categoricalDimensions, groundTruth.majorityVotes, groundTruth.actions]);
+  const handleRevertToSuggestion = useCallback(() => {
+    groundTruth.actions.reset();
+  }, [groundTruth.actions]);
+
+  const handleClearAllValues = useCallback(() => {
+    groundTruth.actions.clearAllCells();
+  }, [groundTruth.actions]);
 
   const handleCreateGroundTruth = useCallback(() => {
     if (!taskId) return;
@@ -269,16 +283,23 @@ const TaskSummary = ({ annotations: allAnnotations, store: annotationStore }: Ta
       ) : agreementData.hasAgreementData ? (
         <div className="mb-relaxed">
           <section className="mb-base">
-            <div className="flex items-center justify-end mb-tight">
-              <ColumnPicker
-                totalDimensionCount={agreementData.dimensions.length}
-                shownCount={agreementData.filteredDimensions.length}
-                allDimensions={agreementData.dimensions}
-                visibleColumnIds={effectiveVisibleColumnIds}
-                onVisibleColumnsChange={setVisibleColumnIds}
-                conflictingDimensionIds={agreementData.conflictingDimensionIds}
-                hasGroundTruth={hasExistingGt || groundTruth.cells.size > 0}
-              />
+            <div className="flex items-center mb-tight gap-tight">
+              {hasNonCategoricalDimensions && (
+                <Message variant="info" size="small">
+                  Non-categoricals: {nonCategoricalDimensionNames}. Adjudication is not available on this screen.
+                </Message>
+              )}
+              <div className="ml-auto flex items-center shrink-0">
+                <ColumnPicker
+                  totalDimensionCount={agreementData.dimensions.length}
+                  shownCount={agreementData.filteredDimensions.length}
+                  allDimensions={agreementData.dimensions}
+                  visibleColumnIds={effectiveVisibleColumnIds}
+                  onVisibleColumnsChange={setVisibleColumnIds}
+                  conflictingDimensionIds={agreementData.conflictingDimensionIds}
+                  hasNonCategoricalDimensions={hasNonCategoricalDimensions}
+                />
+              </div>
             </div>
 
             <AnnotatorsDimensionsTable
@@ -287,25 +308,25 @@ const TaskSummary = ({ annotations: allAnnotations, store: annotationStore }: Ta
               annotationForRow={agreementData.annotationForRow}
               onAnnotationClick={handleAnnotationClick}
               dimensionScores={agreementData.dimensionScores}
-              groundTruthActive
+              inferredValues={agreementData.inferredValues}
               groundTruthCells={effectiveGtCells}
               groundTruthValueCounts={groundTruth.valueCounts}
               onSetGroundTruthCell={groundTruth.actions.setCell}
               onClearGroundTruthCell={groundTruth.actions.clearCell}
               excludeAnnotatorIndex={existingGtAnnotationIndex}
               groundTruthAnnotatorName={existingGtAnnotatorName}
-              existingGtCells={hasExistingGt ? existingGtCells : undefined}
               groundTruthStatus={groundTruthStatus}
+              groundTruthReadOnly={gtReadOnly}
+              groundTruthDisabled={hasNonCategoricalDimensions && !hasExistingGt}
+              agreementMethodology={method}
+              onRevertToSuggestion={handleRevertToSuggestion}
+              onClearAllValues={handleClearAllValues}
             />
 
-            <ResolutionSummaryBar
-              resolvedCount={effectiveResolvedCount}
-              totalCount={groundTruth.totalCount}
-              progress={effectiveProgress}
+            <TaskSummaryControlPanel
               isComplete={effectiveIsComplete}
-              summary={effectiveSummary}
               hasExistingGt={hasExistingGt}
-              onAcceptAllMajority={handleAcceptAllMajority}
+              hasNonCategoricalDimensions={hasNonCategoricalDimensions}
               onCreateGroundTruth={handleCreateGroundTruth}
               onAutoReview={handleAutoReview}
             />
@@ -331,7 +352,7 @@ const TaskSummary = ({ annotations: allAnnotations, store: annotationStore }: Ta
       )}
 
       {agreementData.hasAgreementData && (
-        <CollapsiblePanel title="Task Data" defaultExpanded={false} className="mb-base">
+        <CollapsiblePanel title="Task Data" expanded={taskDataExpanded} onExpandedChange={setTaskDataExpanded} className="mb-base">
           {Object.keys(dataTypes).length === 0 ? (
             <div className="flex items-center justify-center py-relaxed text-neutral-content-subtle text-body-medium">
               No task data available

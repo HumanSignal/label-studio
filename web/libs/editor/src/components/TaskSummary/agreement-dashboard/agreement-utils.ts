@@ -150,6 +150,7 @@ export function buildDimensionInfoList(
       values: dr.dimension_values,
       scores: dr.scores,
       labels: meta.labels,
+      allowMultiselect: meta.allow_multiselect ?? false,
     };
   });
 }
