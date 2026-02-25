@@ -138,9 +138,7 @@ export const DataView = injector(
 
       // Add Badge when enterprise badge is set
       if (original.enterprise_badge) {
-        children.push(
-          <EnterpriseBadge key="enterprise-badge" size="small" className="ml-tightest" children="" />,
-        );
+        children.push(<EnterpriseBadge key="enterprise-badge" size="small" className="ml-tightest" children="" />);
       }
 
       if (help && decoration?.help !== false) {

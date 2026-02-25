@@ -97,9 +97,7 @@ const ActionButton = ({ action, parentRef, store, formRef }) => {
       >
         <div className={cn("actionButton").elem("title").toClassName()}>
           {action.title}
-          {action.enterprise_badge && (
-            <EnterpriseBadge className="ml-tightest" style="ghost" />
-          )}
+          {action.enterprise_badge && <EnterpriseBadge className="ml-tightest" style="ghost" />}
         </div>
         {hasChildren ? <IconChevronRight className={cn("actionButton").elem("icon").toClassName()} /> : null}
       </div>
