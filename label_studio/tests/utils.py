@@ -15,7 +15,6 @@ import pytest
 import requests
 import requests_mock
 import ujson as json
-from box import Box
 from core.feature_flags import flag_set
 from data_export.models import ConvertedFormat, Export
 from django.apps import apps
@@ -464,13 +463,11 @@ def os_independent_path(_, path, add_tempdir=False):
         os_independent_path = tempdir / os_independent_path
 
     os_independent_path_parent = os_independent_path.parent
-    return Box(
-        {
-            'os_independent_path': str(os_independent_path),
-            'os_independent_path_parent': str(os_independent_path_parent),
-            'os_independent_path_tmpdir': str(Path(tempfile.gettempdir())),
-        }
-    )
+    return {
+        'os_independent_path': str(os_independent_path),
+        'os_independent_path_parent': str(os_independent_path_parent),
+        'os_independent_path_tmpdir': str(Path(tempfile.gettempdir())),
+    }
 
 
 def verify_docs(response):
@@ -490,7 +487,7 @@ def save_export_file_path(response):
     export_id = response.json().get('id')
     export = Export.objects.get(id=export_id)
     file_path = export.file.path
-    return Box({'file_path': file_path})
+    return {'file_path': file_path}
 
 
 def save_convert_file_path(response, export_id=None):
@@ -503,9 +500,9 @@ def save_convert_file_path(response, export_id=None):
     os.listdir(dir_path)
     try:
         file_path = converted.file.path
-        return Box({'convert_file_path': file_path})
+        return {'convert_file_path': file_path}
     except ValueError:
-        return Box({'convert_file_path': None})
+        return {'convert_file_path': None}
 
 
 def file_exists_in_storage(response, exists=True, file_path=None):
