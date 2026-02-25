@@ -15,6 +15,7 @@ export * from "./lib/code-editor/code-editor";
 export * from "./lib/collapsible-panel";
 export * from "./lib/dropdown";
 export * from "./lib/empty-state/empty-state";
+export * from "./lib/enterprise-badge/enterprise-badge";
 export * from "./lib/enterprise-upgrade-overlay/enterprise-upgrade-overlay";
 export * from "./lib/json-viewer";
 export * from "./lib/label/label";
