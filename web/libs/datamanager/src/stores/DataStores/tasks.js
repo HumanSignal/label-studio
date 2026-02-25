@@ -137,16 +137,16 @@ export const create = (columns) => {
   })
     .actions((self) => ({
       loadTaskHistory: flow(function* (props) {
-        let taskHistory = yield self.root.apiCall("taskHistory", props);
+        const taskHistory = yield self.root.apiCall("taskHistory", props);
 
-        taskHistory = taskHistory.map((task) => {
-          return {
-            taskId: task.taskId,
-            annotationId: task.annotationId?.toString(),
-          };
-        });
+        if (!Array.isArray(taskHistory)) {
+          return [];
+        }
 
-        return taskHistory;
+        return taskHistory.map((task) => ({
+          taskId: task.taskId,
+          annotationId: task.annotationId?.toString(),
+        }));
       }),
       loadTask: flow(function* (taskID, { select = true } = {}) {
         if (!isDefined(taskID)) {
@@ -202,10 +202,20 @@ export const create = (columns) => {
       loadNextTask: flow(function* ({ select = true } = {}) {
         const taskData = yield self.root.invokeAction("next_task", {
           reload: false,
+          errorHandler: (result) => {
+            const displayReason = result?.response?.display_context?.reason;
+            return displayReason === "PAUSED" || displayReason === "OVERLAP_REACHED";
+          },
         });
 
         if (taskData?.$meta?.status === 404) {
           getRoot(self).SDK.invoke("labelStreamFinished");
+          return null;
+        }
+
+        const responseStatus = taskData?.$meta?.status;
+
+        if (!taskData || taskData.error || (responseStatus && responseStatus >= 400)) {
           return null;
         }
 
