@@ -2,8 +2,7 @@ import { observer, useLocalStore } from "mobx-react";
 import { toJS } from "mobx";
 import React, { forwardRef, useCallback, useEffect, useRef } from "react";
 import { ViewColumnType, ViewColumnTypeName, ViewColumnTypeShort } from "../../../../stores/Tabs/tab_column";
-import { Button } from "@humansignal/ui";
-import { Dropdown } from "@humansignal/ui";
+import { Button, Dropdown } from "@humansignal/ui";
 import { Menu } from "../../Menu/Menu";
 import { Resizer } from "../../Resizer/Resizer";
 import { Space } from "../../Space/Space";
@@ -14,8 +13,7 @@ import { cn } from "../../../../utils/bem";
 import { getStyle } from "../utils";
 import "./TableHead.scss";
 import { getRoot } from "mobx-state-tree";
-import { AgreementSelected } from "../../../CellViews/AgreementSelected";
-import { IconChevronDown } from "@humansignal/icons";
+import { Agreement } from "../../../CellViews/Agreement/Agreement";
 import { isActive, FF_AGREEMENT_FILTERED } from "@humansignal/core/lib/utils/feature-flags";
 
 const tableHeadCN = cn("table-head");
@@ -66,49 +64,19 @@ const DropdownWrapper = observer(({ column, cellViews, children, onChange }) => 
   );
 });
 
-const AgreementSelectedWrapper = observer(({ column, children }) => {
-  // TODO: make this more generic as a LSE component table header cell
+const AgreementWrapper = observer(({ column, children }) => {
   const root = getRoot(column.original);
   const selectedView = root.viewsStore.selected;
   const agreementFilters = selectedView.agreement_selected;
-  const ref = useRef(null);
-  const closeHandler = () => {
-    ref.current?.close();
-  };
-  const onSave = (agreementFilters) => {
-    selectedView.setAgreementFilters(agreementFilters);
-    closeHandler();
+  const onSave = (filters) => {
+    selectedView.setAgreementFilters(filters);
     return selectedView.save();
   };
 
   return (
-    <Dropdown.Trigger
-      ref={ref}
-      content={
-        <AgreementSelected.HeaderCell
-          agreementFilters={agreementFilters}
-          onSave={onSave}
-          align="left"
-          onClose={closeHandler}
-        />
-      }
-    >
-      <Button
-        look="outlined"
-        variant="neutral"
-        size="small"
-        trailing={<IconChevronDown />}
-        align="left"
-        style={{
-          minWidth: 200,
-          paddingLeft: "0.5rem",
-          flexGrow: 1,
-          width: "100%",
-        }}
-      >
-        {children}
-      </Button>
-    </Dropdown.Trigger>
+    <Agreement.HeaderCell agreementFilters={agreementFilters} onSave={onSave}>
+      {children}
+    </Agreement.HeaderCell>
   );
 });
 
@@ -144,6 +112,11 @@ const ColumnRenderer = observer(
     const content = Decoration?.content ? Decoration.content(column) : column.title;
     const style = getStyle(cellViews, column, Decoration);
 
+    const isAgreementColumn =
+      isActive(FF_AGREEMENT_FILTERED) &&
+      (column.original?.alias === "agreement" ||
+        (typeof column.original?.alias === "string" && column.original.alias.startsWith("dimension_agreement__")));
+
     const headContent = (
       <>
         <TableCellContent mod={{ canOrder, disabled: stopInteractions }} mix="th-content">
@@ -154,8 +127,6 @@ const ColumnRenderer = observer(
       </>
     );
 
-    const isAgreementSelected = isActive(FF_AGREEMENT_FILTERED) && column.type === "AgreementSelected";
-
     return (
       <TableCell data-id={id} mix="th">
         <Resizer
@@ -164,7 +135,7 @@ const ColumnRenderer = observer(
             display: "flex",
             alignItems: "center",
             justifyContent: style.justifyContent ?? "space-between",
-            overflow: isAgreementSelected ? "visible" : "hidden",
+            overflow: isAgreementColumn ? "visible" : "hidden",
           }}
           initialWidth={style.width ?? 150}
           minWidth={style.minWidth ?? 30}
@@ -175,8 +146,8 @@ const ColumnRenderer = observer(
             <DropdownWrapper column={column} cellViews={cellViews} onChange={onTypeChange}>
               {headContent}
             </DropdownWrapper>
-          ) : isAgreementSelected ? (
-            <AgreementSelectedWrapper column={column}>{headContent}</AgreementSelectedWrapper>
+          ) : isAgreementColumn ? (
+            <AgreementWrapper column={column}>{headContent}</AgreementWrapper>
           ) : (
             headContent
           )}

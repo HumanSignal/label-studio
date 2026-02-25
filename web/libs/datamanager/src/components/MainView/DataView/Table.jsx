@@ -161,7 +161,12 @@ export const DataView = injector(
         children.push(<EnterpriseBadge key="enterprise-badge" className="ml-2" compact />);
       }
 
-      if (help && decoration?.help !== false) {
+      const isAgreementColumn =
+        typeof original?.alias === "string" &&
+        (original.alias === "agreement" || original.alias.startsWith("dimension_agreement__"));
+
+      // Agreement columns get an IconSettings button via Agreement.HeaderCell — skip the help icon
+      if (help && decoration?.help !== false && !isAgreementColumn) {
         children.push(
           <Tooltip key="help-tooltip" title={help}>
             <Icon icon={IconQuestionOutline} style={{ opacity: 0.5 }} />
