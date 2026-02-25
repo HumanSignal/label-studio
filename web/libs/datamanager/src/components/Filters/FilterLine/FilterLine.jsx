@@ -181,7 +181,7 @@ export const FilterLine = observer(({ filter, availableFilters, index, view, sid
                 <span>{filter.field.title}</span>
                 {showEnterpriseBadge && <Badge variant="gradient" icon={<IconSpark />} style="ghost" />}
                 {filter.field.parent && (
-                  <Badge variant="primary" size="small" shape="square" className="ml-tightest">
+                  <Badge size="small" className="ml-tightest">
                     {filter.field.parent.title}
                   </Badge>
                 )}
