@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import type { ColumnDef } from "@tanstack/react-table";
-import { IconSpark } from "../../assets/icons";
 import { Badge } from "./badge";
+import { EnterpriseBadge } from "../enterprise-badge/enterprise-badge";
 import { DataTable } from "../data-table";
 import { Typography } from "../typography/typography";
 
@@ -329,59 +329,45 @@ export const SizeVariants: Story = {
 
 /**
  *
- * Special gradient variant with IconSpark icon. Automatically includes icon.
+ * Use EnterpriseBadge for gradient (Enterprise) badges. Shown with label, styles, icon-only, and text-only.
  */
 export const GradientVariant: Story = {
-  render: () => {
-    return (
-      <div className="flex flex-col gap-4">
-        <div>
-          <p className="text-sm text-neutral-content-subtle mb-2">With icon and label:</p>
-          <div className="flex flex-wrap gap-3">
-            <Badge variant="gradient" icon={<IconSpark />}>
-              Enterprise
-            </Badge>
-            <Badge variant="gradient" icon={<IconSpark />} style="filled">
-              Enterprise
-            </Badge>
-            <Badge variant="gradient" icon={<IconSpark />} style="ghost">
-              Enterprise
-            </Badge>
-            <Badge variant="gradient" icon={<IconSpark />} style="solid">
-              Enterprise
-            </Badge>
-          </div>
-        </div>
-        <div>
-          <p className="text-sm text-neutral-content-subtle mb-2">Text only (no icon):</p>
-          <div className="flex flex-wrap gap-3">
-            <Badge variant="gradient">Enterprise</Badge>
-            <Badge variant="gradient" style="filled">
-              Enterprise
-            </Badge>
-          </div>
-        </div>
-        <div>
-          <p className="text-sm text-neutral-content-subtle mb-2">Icon-only (no children):</p>
-          <div className="flex flex-wrap gap-3">
-            <Badge variant="gradient" icon={<IconSpark />} />
-            <Badge variant="gradient" icon={<IconSpark />} style="filled" />
-            <Badge variant="gradient" icon={<IconSpark />} style="ghost" />
-            <Badge variant="gradient" icon={<IconSpark />} style="solid" />
-          </div>
-        </div>
-        <div>
-          <p className="text-sm text-neutral-content-subtle mb-2">Small size:</p>
-          <div className="flex flex-wrap gap-3">
-            <Badge variant="gradient" icon={<IconSpark />} size="small">
-              Enterprise
-            </Badge>
-            <Badge variant="gradient" icon={<IconSpark />} size="small" />
-          </div>
+  render: () => (
+    <div className="flex flex-col gap-4">
+      <div>
+        <p className="text-sm text-neutral-content-subtle mb-2">With icon and label (default):</p>
+        <div className="flex flex-wrap gap-3">
+          <EnterpriseBadge />
+          <EnterpriseBadge style="filled" />
+          <EnterpriseBadge style="ghost" />
+          <EnterpriseBadge style="solid" />
         </div>
       </div>
-    );
-  },
+      <div>
+        <p className="text-sm text-neutral-content-subtle mb-2">Text only (no icon):</p>
+        <div className="flex flex-wrap gap-3">
+          <EnterpriseBadge icon={null} />
+          <EnterpriseBadge icon={null} style="filled" />
+        </div>
+      </div>
+      <div>
+        <p className="text-sm text-neutral-content-subtle mb-2">Icon-only:</p>
+        <div className="flex flex-wrap gap-3">
+          <EnterpriseBadge children="" />
+          <EnterpriseBadge style="filled" children="" />
+          <EnterpriseBadge style="ghost" children="" />
+          <EnterpriseBadge style="solid" children="" />
+        </div>
+      </div>
+      <div>
+        <p className="text-sm text-neutral-content-subtle mb-2">Small size:</p>
+        <div className="flex flex-wrap gap-3">
+          <EnterpriseBadge size="small" />
+          <EnterpriseBadge size="small" children="" />
+        </div>
+      </div>
+    </div>
+  ),
 };
 
 /**

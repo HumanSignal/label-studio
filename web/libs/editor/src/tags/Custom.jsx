@@ -3,8 +3,7 @@
 
 import { types } from "mobx-state-tree";
 import { observer } from "mobx-react";
-import { Badge } from "@humansignal/ui";
-import { IconSpark } from "@humansignal/icons";
+import { EnterpriseBadge } from "@humansignal/ui";
 import Registry from "../core/Registry";
 import ControlBase from "./control/Base";
 
@@ -29,9 +28,7 @@ if (!APP_SETTINGS?.billing?.enterprise && !Registry.models.custominterface) {
   const CustomComponentWrapper = observer(({ item }) => {
     return (
       <div className="py-base">
-        <Badge variant="gradient" icon={<IconSpark />}>
-          Enterprise
-        </Badge>{" "}
+        <EnterpriseBadge />{" "}
         <Code>{item.type === "custominterface" ? "CustomInterface" : "React"}</Code> tag is only available in{" "}
         <a className="no-go" href={ENTERPRISE_URL} target="_blank" rel="noreferrer">
           Enterprise

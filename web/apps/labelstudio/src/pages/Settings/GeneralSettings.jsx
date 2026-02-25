@@ -1,5 +1,4 @@
-import { Badge, Select, Typography, Tooltip } from "@humansignal/ui";
-import { IconSpark } from "@humansignal/icons";
+import { Badge, Select, Typography, Tooltip, EnterpriseBadge } from "@humansignal/ui";
 import { useCallback, useContext } from "react";
 import { Button } from "@humansignal/ui";
 import { Form, Input, TextArea } from "../../components/Form";
@@ -38,9 +37,7 @@ export const GeneralSettings = () => {
                 <div className={cn("workspace-placeholder").toClassName()}>
                   <div className={cn("workspace-placeholder").elem("badge-wrapper").toClassName()}>
                     <div className={cn("workspace-placeholder").elem("title").toClassName()}>Workspace</div>
-                    <Badge variant="gradient" icon={<IconSpark />} size="small" className="ml-2">
-                      Enterprise
-                    </Badge>
+                    <EnterpriseBadge size="small" className="ml-2" />
                   </div>
                   <Select placeholder="Select an option" disabled options={[]} />
                   <Typography size="small" className="my-tight">

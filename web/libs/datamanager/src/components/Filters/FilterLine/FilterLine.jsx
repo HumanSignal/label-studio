@@ -1,7 +1,7 @@
 import { observer } from "mobx-react";
 import { cn } from "../../../utils/bem";
-import { Button, Badge } from "@humansignal/ui";
-import { IconClose, IconSpark } from "@humansignal/icons";
+import { Button, Badge, EnterpriseBadge } from "@humansignal/ui";
+import { IconClose } from "@humansignal/icons";
 import { FilterDropdown } from "../FilterDropdown";
 import "./FilterLine.scss";
 import { FilterOperation } from "./FilterOperation";
@@ -59,7 +59,7 @@ export const FilterLine = observer(({ filter, availableFilters, index, view, sid
                   style={{ display: "flex", alignItems: "center", gap: "8px" }}
                 >
                   <span>{filter.field.title}</span>
-                  {showEnterpriseBadge && <Badge variant="gradient" icon={<IconSpark />} style="ghost" />}
+                  {showEnterpriseBadge && <EnterpriseBadge style="ghost" />}
                   {filter.field.parent && (
                     <Badge size="small" className="ml-tightest">
                       {filter.field.parent.title}
@@ -179,7 +179,7 @@ export const FilterLine = observer(({ filter, availableFilters, index, view, sid
                 style={{ display: "flex", alignItems: "center", gap: "8px" }}
               >
                 <span>{filter.field.title}</span>
-                {showEnterpriseBadge && <Badge variant="gradient" icon={<IconSpark />} style="ghost" />}
+                {showEnterpriseBadge && <EnterpriseBadge style="ghost" />}
                 {filter.field.parent && (
                   <Badge size="small" className="ml-tightest">
                     {filter.field.parent.title}

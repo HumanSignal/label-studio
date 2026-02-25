@@ -1,5 +1,4 @@
-import { Badge, Select, Typography } from "@humansignal/ui";
-import { IconSpark } from "@humansignal/icons";
+import { EnterpriseBadge, Select, Typography } from "@humansignal/ui";
 import React from "react";
 import { useHistory } from "react-router";
 import { ToggleItems } from "../../components";
@@ -60,9 +59,7 @@ const ProjectName = ({ name, setName, onSaveName, onSubmit, error, description, 
         <div className="w-full flex flex-col gap-2">
           <label>
             Workspace
-            <Badge variant="gradient" icon={<IconSpark />} className="ml-tight">
-              Enterprise
-            </Badge>
+            <EnterpriseBadge className="ml-tight" />
           </label>
           <Select placeholder="Select an option" disabled options={[]} triggerClassName="!flex-1" />
           <Typography size="small" className="mt-tight mb-wider">

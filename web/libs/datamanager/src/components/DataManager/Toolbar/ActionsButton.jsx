@@ -1,5 +1,5 @@
-import { IconChevronDown, IconChevronRight, IconTrash, IconSpark } from "@humansignal/icons";
-import { Button, Spinner, Badge } from "@humansignal/ui";
+import { IconChevronDown, IconChevronRight, IconTrash } from "@humansignal/icons";
+import { Button, Spinner, Badge, EnterpriseBadge } from "@humansignal/ui";
 import { inject, observer } from "mobx-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useActions } from "../../../hooks/useActions";
@@ -98,7 +98,7 @@ const ActionButton = ({ action, parentRef, store, formRef }) => {
         <div className={cn("actionButton").elem("title").toClassName()}>
           {action.title}
           {action.enterprise_badge && (
-            <Badge variant="gradient" className="ml-tightest" style="ghost" icon={<IconSpark />} />
+            <EnterpriseBadge className="ml-tightest" style="ghost" />
           )}
         </div>
         {hasChildren ? <IconChevronRight className={cn("actionButton").elem("icon").toClassName()} /> : null}
@@ -150,7 +150,7 @@ const ActionButton = ({ action, parentRef, store, formRef }) => {
     >
       <span className="flex items-center justify-between gap-base w-full">
         {action.title}
-        {action.enterprise_badge && <Badge variant="gradient" style="ghost" />}
+        {action.enterprise_badge && <EnterpriseBadge style="ghost" children="" />}
       </span>
     </Menu.Item>
   );
