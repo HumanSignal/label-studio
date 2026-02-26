@@ -19,14 +19,14 @@ Use with the following data types: image.
 |------------------------------|-------------|
 | **Add points**               | Click on empty space. |
 | **Add points to path segments** | Press <code>Shift</code> while clicking on a segment that is between two points. |
-| **End or exit the path**     | Press <code>Esc</code> or click on the last point you added to the path. |
+| **End or exit the path**     | Press <code>Esc</code> or double-click on the last point you added to the path. |
 | **Move points**              | Simply click a point and drag to reposition. |
 | **Delete points**            | Press <code>Alt</code> or <code>Option</code> and click on an existing point. |
 
 !!! note
     <span id="region-note">Several options require you to complete the path and then re-select it as a region.</span> 
     
-    The easiest way to handle this is to enable Select region after creating it in your labeling settings (found below the labeling interface in the labeling stream and Quick View). 
+    The easiest way to handle this is to enable **Select region after creating it** in your labeling settings (found below the labeling interface in the labeling stream and Quick View). 
     
     You can also first exit the path and then reselect it by clicking on a segment within the path or by clicking it under the **Regions** panel. 
 
@@ -39,11 +39,15 @@ Use with the following data types: image.
 
 With multi-select, you can drag multiple points to reposition or resize them. 
 
-![Screenshot](/images/tags/vector-multi.png)
+<video style="max-width: 600px;" class="gif-border" autoplay loop muted>
+      <source src="/images/tags/vector-move.mp4">
+</video>
 
 | Action                   | Instruction |
 |---------------------------|-------------|
 | **Select multiple points** | <ul><li>To select all points in the path, press <code>Cmd</code> or <code>Ctrl</code> and then click any point in the path.</li><li>To select individual points in a path, first select the path as a region (<a href="#region-note">see the note above</a>). Then press <code>Cmd</code> or <code>Ctrl</code> as you click points.</li></ul> |
+| **Select multiple paths** | Use the move tool (the arrow) to click and drag multiple paths/shapes. |
+| **Resize multiple paths** | Use the move tool (the arrow) to select multiple paths and then click and drag points in the selection box |
 | **Clear selection**       | Click on any point or press <code>Esc</code>. | 
 
 ### Closed paths
@@ -54,8 +58,8 @@ You can create closed paths to create polygon shapes. To create closed paths, us
 
 | Action                 | Instruction                                                                 |
 |-------------------------|-----------------------------------------------------------------------------|
+| **Close the path**   | Double-click on your final point. This automatically adds a segment between your first point and final point.      |
 | **Break closed path**   | Press `Alt` or `Option` and click on a vector segment in a closed path to reopen it.  Click on a point to delete the point.      |
-
 
 ### Skeleton
 
