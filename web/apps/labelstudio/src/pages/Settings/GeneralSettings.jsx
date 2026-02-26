@@ -1,6 +1,6 @@
-import { Badge, Select, Typography, Tooltip, EnterpriseBadge } from "@humansignal/ui";
+import { Badge, Button, Select, Typography, Tooltip, EnterpriseBadge } from "@humansignal/ui";
 import { useCallback, useContext } from "react";
-import { Button } from "@humansignal/ui";
+import { IconSpark } from "@humansignal/icons";
 import { Form, Input, TextArea } from "../../components/Form";
 import { RadioGroup } from "../../components/Form/Elements/RadioGroup/RadioGroup";
 import { ProjectContext } from "../../providers/ProjectProvider";
