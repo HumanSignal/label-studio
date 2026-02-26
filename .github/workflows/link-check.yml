@@ -54,8 +54,8 @@ jobs:
         run: |
           linkchecker \
             -f /tmp/linkcheckerrc \
-            --threads 2 \
-            --timeout 30 \
+            --threads 1 \
+            --timeout 60 \
             --no-status \
             --no-robots \
             --ignore-url="/api" \
@@ -68,8 +68,8 @@ jobs:
         run: |
           linkchecker \
             -f /tmp/linkcheckerrc \
-            --threads 2 \
-            --timeout 30 \
+            --threads 1 \
+            --timeout 60 \
             --no-status \
             --no-robots \
             --ignore-url="/api" \
