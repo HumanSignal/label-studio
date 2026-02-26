@@ -34,6 +34,8 @@ interface ColumnPickerProps {
   conflictingDimensionIds: number[];
   /** Whether any non-categorical dimensions exist — shows the "Categoricals Only" filter when true */
   hasNonCategoricalDimensions?: boolean;
+  /** Whether a saved ground truth annotation exists for this task */
+  hasExistingGt?: boolean;
 }
 
 // ---------------------------------------------------------------------------
@@ -48,6 +50,7 @@ export const ColumnPicker = ({
   onVisibleColumnsChange,
   conflictingDimensionIds,
   hasNonCategoricalDimensions,
+  hasExistingGt,
 }: ColumnPickerProps) => {
   const options = useMemo(
     () =>
@@ -132,7 +135,8 @@ export const ColumnPicker = ({
         </div>
 
         {/* Categoricals Only — only shown when non-categorical dimensions are present */}
-        {hasNonCategoricalDimensions && (
+        {/* TODO: re-enable when ready */}
+        {/* {hasNonCategoricalDimensions && (
           <Tooltip title="Show only categorical dimensions (editable in ground truth mode)">
             <div
               className="rounded-4 text-neutral-content-subtle overflow-hidden p-1 outline-none cursor-pointer"
@@ -140,14 +144,15 @@ export const ColumnPicker = ({
             >
               <div className="flex gap-2 w-full pl-2 pr-4 py-1 hover:bg-primary-emphasis-subtle rounded-4 duration-150 ease-out">
                 <Checkbox tabIndex={-1} checked={categoricalsOnlyActive} readOnly />
-                <div className="w-full min-w-0 truncate">Categoricals Only</div>
+                <div className="w-full min-w-0 truncate">Supported types only</div>
               </div>
             </div>
           </Tooltip>
-        )}
+        )} */}
 
         {/* Conflicts Only — only shown when there are conflicting dimensions */}
-        {conflictingDimensionIds.length > 0 && (
+        {/* TODO: re-enable when ready */}
+        {/* {conflictingDimensionIds.length > 0 && (
           <Tooltip title="Show only columns where annotators disagree">
             <div
               className="rounded-4 text-neutral-content-subtle overflow-hidden p-1 outline-none cursor-pointer"
@@ -159,7 +164,7 @@ export const ColumnPicker = ({
               </div>
             </div>
           </Tooltip>
-        )}
+        )} */}
       </div>
     ),
     [
@@ -174,7 +179,7 @@ export const ColumnPicker = ({
       {/* Conflict legend — circle outline matches chip font color (negative-content) */}
       <span className="inline-flex items-center gap-tighter text-label-small text-neutral-content-subtle leading-none">
         <span className="inline-block w-2.5 h-2.5 rounded-full border border-negative-content bg-transparent shrink-0" />
-        <span className="whitespace-nowrap min-w-[11rem]">Conflicts with ground truth</span>
+        <span className="whitespace-nowrap min-w-[11rem]">{hasExistingGt ? "Conflicts with ground truth" : "Conflicts with most common answer"}</span>
       </span>
 
       {/* Separator */}

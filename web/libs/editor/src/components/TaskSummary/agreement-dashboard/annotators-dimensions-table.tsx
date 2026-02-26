@@ -7,15 +7,16 @@
  * dimensions display "—" when no values are present.
  */
 
+import type { ReactNode } from "react";
 import { useMemo } from "react";
 import { flexRender, getCoreRowModel, useReactTable, createColumnHelper } from "@tanstack/react-table";
 import { cnm, Tooltip, Userpic } from "@humansignal/ui";
 import { IconAnnotationGroundTruth, IconCheckAlt, IconCrossAlt } from "@humansignal/icons";
 import { formatMetricType } from "./agreement-utils";
-import { GroundTruthRow } from "./ground-truth-row";
+import { GroundTruthRow, MajorityVoteRow } from "./ground-truth-row";
 import { ResizeHandler } from "../ResizeHandler";
 import { valueToChipStrings, ValueChips } from "./value-chips";
-import type { AnnotatorInfo, DimensionInfo, DimensionScore, GroundTruthCell, GroundTruthSource, SummaryAnnotation } from "./types";
+import type { AnnotatorInfo, DimensionInfo, DimensionScore, GroundTruthCell, GroundTruthSource, MajorityVoteResult, SummaryAnnotation } from "./types";
 import type { ValueCount } from "./use-ground-truth";
 
 // ---------------------------------------------------------------------------
@@ -77,6 +78,21 @@ interface AnnotatorsDimensionsTableProps {
   onRevertToSuggestion?: () => void;
   /** When status is "draft", called from the Draft badge to clear all values. */
   onClearAllValues?: () => void;
+  /** Majority vote values per dimension (for the Majority Vote row). */
+  majorityVotes?: Map<number, MajorityVoteResult>;
+  /** Number of conflicts to display in the GT row "suggested" CTA. */
+  conflictCount?: number;
+  /** Current user display name for the GT row "suggested" subtitle. */
+  currentUserName?: string;
+  /** Called when user clicks "Use majority vote" in the GT row suggested state. */
+  onUseMajorityVote?: () => void;
+  /** Called when user clicks "Select values manually" in the GT row suggested state. */
+  onSelectManually?: () => void;
+  /** Control panel rendered in the table footer. */
+  footer?: ReactNode;
+  /** Per-dimension label colors from the labeling config: dimension name -> label_attrs.
+   *  Passed to ValueChips so label-count chips render with colored thick borders. */
+  dimensionLabelColors?: Map<string, Record<string, { background?: string; border?: string; color?: string }>>;
 }
 
 // ---------------------------------------------------------------------------
@@ -102,6 +118,13 @@ export const AnnotatorsDimensionsTable = ({
   agreementMethodology,
   onRevertToSuggestion,
   onClearAllValues,
+  majorityVotes,
+  conflictCount,
+  currentUserName,
+  onUseMajorityVote,
+  onSelectManually,
+  footer,
+  dimensionLabelColors,
 }: AnnotatorsDimensionsTableProps) => {
   const scoreMap = useMemo(() => {
     if (!dimensionScores) return null;
@@ -179,9 +202,10 @@ export const AnnotatorsDimensionsTable = ({
   }
 
   return (
-    <div className="overflow-x-auto">
+    <div className="border border-neutral-border rounded-small overflow-hidden">
+      <div className="overflow-x-auto">
       <table
-        className="border border-neutral-border rounded-small w-full"
+        className="w-full"
         style={{ borderCollapse: "separate", borderSpacing: 0 }}
         aria-label={`Annotators × Dimensions comparison table with ${annotators.length} annotators and ${dimensions.length} dimensions`}
       >
@@ -299,6 +323,7 @@ export const AnnotatorsDimensionsTable = ({
                       value={value}
                       className={conflictTooltip ? "flex flex-wrap gap-1 cursor-default" : undefined}
                       conflictingLabels={conflictingLabels}
+                      labelColors={dimensionLabelColors?.get(dim.name)}
                     />
                   );
 
@@ -374,7 +399,18 @@ export const AnnotatorsDimensionsTable = ({
             </tr>
           )}
 
-          {/* Ground Truth row — always visible, prefilled from inference API */}
+          {/* Majority Vote row — read-only inferred values with counts */}
+          {inferredValues && majorityVotes && (
+            <MajorityVoteRow
+              dimensions={dimensions}
+              inferredValues={inferredValues}
+              majorityVotes={majorityVotes}
+              getColSize={getColSize}
+              dimensionLabelColors={dimensionLabelColors}
+            />
+          )}
+
+          {/* Ground Truth row — always visible */}
           {groundTruthCells && onSetGroundTruthCell && onClearGroundTruthCell && (
             <GroundTruthRow
               dimensions={dimensions}
@@ -389,10 +425,18 @@ export const AnnotatorsDimensionsTable = ({
               onRevertToSuggestion={onRevertToSuggestion}
               onClearAllValues={onClearAllValues}
               disabled={groundTruthDisabled}
+              conflictCount={conflictCount}
+              currentUserName={currentUserName}
+              onUseMajorityVote={onUseMajorityVote}
+              onSelectManually={onSelectManually}
+              dimensionLabelColors={dimensionLabelColors}
             />
           )}
         </tbody>
+
       </table>
+      </div>
+      {footer}
     </div>
   );
 };

@@ -6,6 +6,11 @@
  * and renders them with the same styling as the annotators × dimensions table.
  */
 
+import { Chip } from "../Chip";
+
+/** Fallback border for the thick left edge when no labelColors are provided. */
+const DEFAULT_CHIP_BORDER = "var(--color-neutral-border)";
+
 /** Flatten a nested array to a single level of strings (for joining inside one chip). */
 function flattenToStrings(arr: unknown[]): string[] {
   const out: string[] = [];
@@ -93,7 +98,7 @@ export function chipStringsEqualOrderIndependent(a: string[] | null, b: string[]
 /**
  * Normalize a dimension value to an array of strings for chip display (one string per chip).
  * - Scalar → one chip.
- * - Label-count map → `"Label ×N"` per entry.
+ * - Label-count map → `"N×Label"` per entry.
  * - Top-level array: one chip per element; nested lists are joined with " / " into a single chip.
  * Returns null for empty/absent.
  */
@@ -103,7 +108,7 @@ export function valueToChipStrings(value: unknown): string[] | null {
   if (isLabelCountMap(value)) {
     const entries = Object.entries(value as Record<string, { count: number }>);
     if (entries.length === 0) return null;
-    return entries.map(([label, { count }]) => `${label || "—"} ×${count}`);
+    return entries.map(([label, { count }]) => `${count}×${label || "—"}`);
   }
 
   if (typeof value === "string" || typeof value === "number" || typeof value === "boolean") {
@@ -125,7 +130,7 @@ export function valueToChipStrings(value: unknown): string[] | null {
 }
 
 export const VALUE_CHIP_CLASS =
-  "inline-flex items-center rounded-full border px-2 py-0.5 text-label-small font-medium text-neutral-content-bold bg-neutral-surface border-neutral-border-subtle";
+  "inline-flex items-center whitespace-nowrap rounded-4 border px-2 py-0.5 text-label-small font-medium text-neutral-content-bold bg-neutral-surface border-neutral-border-subtle";
 
 interface ValueChipsProps {
   value: unknown;
@@ -138,20 +143,27 @@ interface ValueChipsProps {
    * (text-negative-content). Takes precedence over chipClassName for those chips.
    */
   conflictingLabels?: ReadonlySet<string>;
+  /**
+   * Per-label color configuration (background, border, color) from label_attrs.
+   * When provided, label-count chips render with the Chip component and colored
+   * thick left border matching the LabelsRenderer in LabelingSummary.
+   */
+  labelColors?: Record<string, { background?: string; border?: string; color?: string }>;
 }
 
 /**
- * Renders a dimension value as the same chips used in the annotators × dimensions table.
- * Use for consistency in the Majority Vote row, Ground Truth row, and tooltips.
+ * Renders a dimension value as chips used in the agreement dashboard.
  *
- * For label-count maps the count is shown as a grayed-out superscript next to
- * the label name so that the label itself keeps the same style as plain chips.
+ * For label-count maps (spatial dimensions) the count is rendered as a bold
+ * prefix with a × separator and thick left border, matching the LabelsRenderer
+ * in LabelingSummary. Plain values use the standard VALUE_CHIP_CLASS styling.
  */
 export function ValueChips({
   value,
   className = "flex flex-wrap gap-1",
   chipClassName,
   conflictingLabels,
+  labelColors,
 }: ValueChipsProps) {
   const chips = valueToChipData(value);
   const defaultChipClass = chipClassName ? `${VALUE_CHIP_CLASS} ${chipClassName}` : VALUE_CHIP_CLASS;
@@ -169,15 +181,26 @@ export function ValueChips({
     <div className={className}>
       {chips.map((chip, i) => {
         const isConflicting = conflictingLabels?.has(chip.label) ?? false;
+
+        if (chip.count !== undefined) {
+          const colors = labelColors?.[chip.label] ?? { border: DEFAULT_CHIP_BORDER };
+          return (
+            <Chip
+              key={i}
+              prefix={chip.count}
+              colors={colors}
+              thickBorder
+              className={isConflicting ? "text-negative-content" : chipClassName}
+            >
+              {chip.label}
+            </Chip>
+          );
+        }
+
         const chipClass = isConflicting ? conflictChipClass : defaultChipClass;
         return (
           <span key={i} className={chipClass}>
             {chip.label}
-            {chip.count !== undefined && (
-              <sup className="text-neutral-content-subtler font-normal ml-0.5">
-                {chip.count}
-              </sup>
-            )}
           </span>
         );
       })}

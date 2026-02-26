@@ -94,6 +94,8 @@ export interface GroundTruthActions {
   reset: () => void;
   /** Set all categorical dimensions to empty (null) in local state. */
   clearAllCells: () => void;
+  /** Prefill all categorical cells from an inferred-values map (e.g. API majority vote). */
+  prefillFromInferred: (inferredMap: Map<number, unknown>) => void;
   clearOnCommit: () => void;
 }
 
@@ -413,6 +415,26 @@ export function useGroundTruth({
     });
   }, [categoricalDimensions, updateCells]);
 
+  const prefillFromInferred = useCallback(
+    (inferredMap: Map<number, unknown>) => {
+      updateCells(() => {
+        const next = new Map<number, GroundTruthCell>();
+        for (const dim of categoricalDimensions) {
+          const value = inferredMap.get(dim.dimensionId);
+          if (value !== null && value !== undefined) {
+            next.set(dim.dimensionId, {
+              dimensionId: dim.dimensionId,
+              value: value as string | number | boolean | null | (string | number | boolean)[],
+              source: "auto_majority",
+            });
+          }
+        }
+        return next;
+      });
+    },
+    [categoricalDimensions, updateCells],
+  );
+
   const clearOnCommit = useCallback(() => {
     setSerializedCells([]);
     setIsActive(false);
@@ -442,6 +464,7 @@ export function useGroundTruth({
       clearCell,
       reset,
       clearAllCells,
+      prefillFromInferred,
       clearOnCommit,
     },
   };

@@ -11,45 +11,71 @@
  */
 
 import { confirm } from "@humansignal/ui/lib/modal";
+import { cnm, Userpic } from "@humansignal/ui";
 import { IconWarning } from "@humansignal/icons";
 import { computeReviewDecisions } from "./annotation-review-logic";
-import type { DimensionInfo, ExistingGroundTruth } from "./types";
+import type { AnnotatorInfo, DimensionInfo, ExistingGroundTruth } from "./types";
 import type { MSTAnnotation } from "../../../stores/types";
+
+// ---------------------------------------------------------------------------
+// Per-annotator decision (for the dialog body)
+// ---------------------------------------------------------------------------
+
+interface AnnotatorDecision {
+  displayName: string;
+  user: Record<string, unknown> | null;
+  accepted: boolean;
+}
 
 // ---------------------------------------------------------------------------
 // Dialog body
 // ---------------------------------------------------------------------------
 
 interface DialogBodyProps {
-  annotationCount: number;
+  annotatorDecisions: AnnotatorDecision[];
   acceptCount: number;
   rejectCount: number;
 }
 
-const DialogBody = ({ annotationCount, acceptCount, rejectCount }: DialogBodyProps) => (
+const DialogBody = ({ annotatorDecisions, acceptCount, rejectCount }: DialogBodyProps) => (
   <div className="space-y-base">
-    <div className="rounded-small border border-neutral-border p-base bg-neutral-surface-subtle">
-      <div className="text-label-small font-semibold text-neutral-content mb-tight">
-        Review summary for {annotationCount} annotation{annotationCount !== 1 ? "s" : ""}:
-      </div>
-      <ul className="space-y-tighter text-label-small text-neutral-content">
-        <li className="flex items-center gap-tight">
-          <span className="w-2 h-2 rounded-full bg-positive-content inline-block flex-shrink-0" />
-          {acceptCount} annotation{acceptCount !== 1 ? "s" : ""} will be <strong>accepted</strong> (match ground truth)
-        </li>
-        <li className="flex items-center gap-tight">
-          <span className="w-2 h-2 rounded-full bg-negative-content inline-block flex-shrink-0" />
-          {rejectCount} annotation{rejectCount !== 1 ? "s" : ""} will be <strong>rejected</strong> (differ from ground truth)
-        </li>
-      </ul>
+    <p className="text-label-small text-neutral-content-subtle">
+      Matching annotations accepted, non-matching rejected.
+    </p>
+
+    <div className="rounded-small border border-neutral-border overflow-hidden">
+      {annotatorDecisions.map((d, i) => (
+        <div
+          key={i}
+          className={cnm(
+            "flex items-center gap-tight px-base py-tight",
+            i < annotatorDecisions.length - 1 && "border-b border-neutral-border-subtle",
+          )}
+        >
+          <Userpic user={d.user} />
+          <span className="text-label-small font-medium flex-1 truncate">{d.displayName}</span>
+          <span
+            className={cnm(
+              "text-label-small font-semibold",
+              d.accepted ? "text-positive-content" : "text-negative-content",
+            )}
+          >
+            {d.accepted ? "Accept" : "Reject"}
+          </span>
+        </div>
+      ))}
     </div>
 
-    <div className="text-label-small text-neutral-content-subtle space-y-tighter">
-      <p className="flex items-center gap-tight">
-        <IconWarning width={16} height={16} className="text-warning-content flex-shrink-0" />
-        This will create a review for each annotation. This action cannot be undone.
-      </p>
+    <div className="rounded-small bg-positive-background p-tight text-label-small text-neutral-content">
+      Creates <strong>{annotatorDecisions.length} review{annotatorDecisions.length !== 1 ? "s" : ""}</strong>:{" "}
+      <span className="text-positive-content">{acceptCount} accepted</span>,{" "}
+      <span className="text-negative-content">{rejectCount} rejected</span>
     </div>
+
+    <p className="flex items-center gap-tight text-label-small text-neutral-content-subtle">
+      <IconWarning width={16} height={16} className="text-warning-content flex-shrink-0" />
+      This action cannot be undone.
+    </p>
   </div>
 );
 
@@ -67,6 +93,8 @@ interface OpenAutoReviewDialogOptions {
   /** annotation_ids from the agreement API result, parallel to annotator_ids.
    *  Used to map annotation pk → position index for dimension_values lookup. */
   annotationIds: number[];
+  /** Annotator info aligned with annotator_ids, used to render per-annotator rows. */
+  annotators: AnnotatorInfo[];
   onCommit: () => void;
 }
 
@@ -75,31 +103,44 @@ export function openAutoReviewDialog({
   annotations,
   dimensions,
   annotationIds,
+  annotators,
   onCommit,
 }: OpenAutoReviewDialogOptions): void {
   const submittedAnnotations = annotations.filter((a) => a.type === "annotation" && a.pk);
 
   const decisions = computeReviewDecisions(submittedAnnotations, existingGt, dimensions, annotationIds);
 
-  let acceptCount = 0;
-  let rejectCount = 0;
-  for (const accepted of decisions.values()) {
-    if (accepted) acceptCount++;
-    else rejectCount++;
+  const pkToAnnotator = new Map<number, AnnotatorInfo>();
+  for (const annotator of annotators) {
+    const pk = annotationIds[annotator.index];
+    if (pk != null) pkToAnnotator.set(pk, annotator);
   }
 
-  const annotationCount = acceptCount + rejectCount;
+  let acceptCount = 0;
+  let rejectCount = 0;
+  const annotatorDecisions: AnnotatorDecision[] = [];
+
+  for (const [pk, accepted] of decisions.entries()) {
+    if (accepted) acceptCount++;
+    else rejectCount++;
+    const annotator = pkToAnnotator.get(pk);
+    annotatorDecisions.push({
+      displayName: annotator?.displayName ?? `Annotation #${pk}`,
+      user: annotator?.user ?? null,
+      accepted,
+    });
+  }
 
   confirm({
-    title: "Auto-review Annotations",
+    title: "Review annotations against ground truth",
     body: (
       <DialogBody
-        annotationCount={annotationCount}
+        annotatorDecisions={annotatorDecisions}
         acceptCount={acceptCount}
         rejectCount={rejectCount}
       />
     ),
-    okText: `Review ${annotationCount} Annotation${annotationCount !== 1 ? "s" : ""}`,
+    okText: "Apply reviews",
     cancelText: "Cancel",
     onOk: () => {
       commitAutoReview({ decisions })

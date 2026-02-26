@@ -1,9 +1,10 @@
 /**
  * Task Summary Control Panel.
  *
- * Compact toolbar for agreement dashboard actions: Create Ground Truth and
- * Auto-Review. Height matches CollapsiblePanel header. Revert/clear actions
- * are available via the Draft badge dropdown in the GT row.
+ * State-driven toolbar rendered as the table footer:
+ * - "suggested" / undefined: not rendered (CTAs live in the GT row)
+ * - "draft": progress text + Cancel + Save Ground Truth
+ * - "saved": Auto-Review button only
  */
 
 import { cnm, Tooltip } from "@humansignal/ui";
@@ -13,11 +14,14 @@ import { cnm, Tooltip } from "@humansignal/ui";
 // ---------------------------------------------------------------------------
 
 export interface TaskSummaryControlPanelProps {
-  /** Whether all categorical dimensions have a value (inferred or set). */
+  groundTruthStatus: "draft" | "saved" | "suggested" | undefined;
   isComplete: boolean;
+  resolvedCount: number;
+  totalCount: number;
   hasExistingGt: boolean;
   hasNonCategoricalDimensions?: boolean;
-  onCreateGroundTruth: () => void;
+  onSaveGroundTruth: () => void;
+  onCancel: () => void;
   onAutoReview: () => void;
 }
 
@@ -26,57 +30,92 @@ export interface TaskSummaryControlPanelProps {
 // ---------------------------------------------------------------------------
 
 export const TaskSummaryControlPanel = ({
+  groundTruthStatus,
   isComplete,
+  resolvedCount,
+  totalCount,
   hasExistingGt,
   hasNonCategoricalDimensions,
-  onCreateGroundTruth,
+  onSaveGroundTruth,
+  onCancel,
   onAutoReview,
 }: TaskSummaryControlPanelProps) => {
-  const createDisabled = hasNonCategoricalDimensions || !isComplete || hasExistingGt;
-  const createTooltip = hasExistingGt
-    ? "Ground truth annotation already exists"
-    : hasNonCategoricalDimensions
-      ? "This task has non-categorical dimensions. Go to the labeling screen to create ground truth there."
-      : !isComplete
-        ? "Resolve all dimensions first"
-        : "Create the ground truth annotation";
+  if (!groundTruthStatus || groundTruthStatus === "suggested") {
+    return null;
+  }
 
-  const reviewTooltip = hasExistingGt
-    ? "Accept or reject annotations based on ground truth match"
-    : "Create a ground truth annotation first";
+  if (groundTruthStatus === "saved") {
+    const reviewTooltip = hasExistingGt
+      ? "Accept or reject annotations based on ground truth match"
+      : "Create a ground truth annotation first";
+
+    return (
+      <div className="flex items-center gap-2 px-base py-tight border-t border-neutral-border bg-neutral-surface">
+        <div className="flex items-center gap-2 ml-auto">
+          <Tooltip title={reviewTooltip}>
+            <button
+              type="button"
+              disabled={!hasExistingGt}
+              onClick={onAutoReview}
+              className={cnm(
+                "px-base py-tighter rounded-small text-label-small font-semibold border transition-colors cursor-pointer min-w-[168px]",
+                hasExistingGt
+                  ? "bg-primary-surface text-primary-surface-content border-transparent hover:opacity-90"
+                  : "bg-neutral-surface border-neutral-border text-neutral-content-subtlest cursor-not-allowed",
+              )}
+            >
+              Bulk Review against Ground Truth
+            </button>
+          </Tooltip>
+        </div>
+      </div>
+    );
+  }
+
+  // "draft" state
+  const saveDisabled = hasNonCategoricalDimensions || !isComplete;
+  const saveTooltip = hasNonCategoricalDimensions
+    ? "Only Choices and Rating are supported here. Go to the labeling screen to create ground truth."
+    : !isComplete
+      ? "Resolve all values first"
+      : "Save the ground truth annotation";
+
+  const progress = totalCount > 0 ? resolvedCount / totalCount : 0;
 
   return (
-    <div className="flex items-center gap-2 px-base py-tight mt-tight rounded-md border border-neutral-border bg-neutral-surface">
+    <div className="flex items-center gap-2 px-base py-tight border-t border-neutral-border bg-neutral-background">
+      <div className="flex items-center gap-tight flex-shrink-0">
+        <div className="relative w-[120px] h-2 rounded-full overflow-hidden bg-neutral-surface border border-neutral-border">
+          <div
+            className="absolute inset-y-0 left-0 bg-positive-surface-hover transition-all duration-300 rounded-full"
+            style={{ width: `${progress * 100}%` }}
+          />
+        </div>
+        <span className="text-label-smallest font-semibold text-neutral-content whitespace-nowrap">
+          {resolvedCount} / {totalCount} values resolved
+        </span>
+      </div>
       <div className="flex items-center gap-2 ml-auto">
-        <Tooltip title={createTooltip}>
+        <button
+          type="button"
+          onClick={onCancel}
+          className="px-base py-tighter rounded-small text-label-small font-semibold border border-neutral-border bg-neutral-surface text-neutral-content hover:bg-neutral-surface-hover transition-colors cursor-pointer min-w-[100px]"
+        >
+          Cancel
+        </button>
+        <Tooltip title={saveTooltip}>
           <button
             type="button"
-            disabled={createDisabled}
-            onClick={onCreateGroundTruth}
+            disabled={saveDisabled}
+            onClick={onSaveGroundTruth}
             className={cnm(
               "px-base py-tighter rounded-small text-label-small font-semibold border transition-colors cursor-pointer min-w-[168px]",
-              !createDisabled
+              !saveDisabled
                 ? "bg-primary-surface text-primary-surface-content border-transparent hover:opacity-90"
                 : "bg-neutral-surface border-neutral-border text-neutral-content-subtlest cursor-not-allowed",
             )}
           >
-            Create Ground Truth
-          </button>
-        </Tooltip>
-
-        <Tooltip title={reviewTooltip}>
-          <button
-            type="button"
-            disabled={!hasExistingGt}
-            onClick={onAutoReview}
-            className={cnm(
-              "px-base py-tighter rounded-small text-label-small font-semibold border transition-colors cursor-pointer min-w-[168px]",
-              hasExistingGt
-                ? "bg-primary-surface text-primary-surface-content border-transparent hover:opacity-90"
-                : "bg-neutral-surface border-neutral-border text-neutral-content-subtlest cursor-not-allowed",
-            )}
-          >
-            Auto-Review
+            Save Ground Truth
           </button>
         </Tooltip>
       </div>

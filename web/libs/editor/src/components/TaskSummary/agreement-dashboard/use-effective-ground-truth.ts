@@ -142,16 +142,37 @@ export function useEffectiveGroundTruth({
   }, [hasNonCategoricalDimensions, groundTruth.cells.size, agreementData.gtInferenceStatus, apiCells.size]);
 
   const existingGtObject = useMemo<ExistingGroundTruth | null>(() => {
-    if (existingGtAnnotationIndex === undefined) return null;
-    const ann = agreementData.annotationForRow?.[existingGtAnnotationIndex];
-    if (!ann) return null;
-    return {
-      annotationId: ann.id,
-      annotatorIndex: existingGtAnnotationIndex,
-      completedBy: ann.user?.id ?? null,
-      cells: apiCells,
-    };
-  }, [existingGtAnnotationIndex, agreementData.annotationForRow, apiCells]);
+    // Case 1: GT annotation is in the agreement arrays
+    if (existingGtAnnotationIndex !== undefined) {
+      const ann = agreementData.annotationForRow?.[existingGtAnnotationIndex];
+      if (ann) {
+        return {
+          annotationId: ann.id,
+          annotatorIndex: existingGtAnnotationIndex,
+          completedBy: ann.user?.id ?? null,
+          cells: apiCells,
+        };
+      }
+    }
+
+    // Case 2: GT annotation exists (per inference API) but is not in the
+    // agreement arrays — the backend excludes the GT from the agreement
+    // computation since it's the reference, not a participant. Look it up
+    // in the full summaryAnnotations list instead.
+    if (hasExistingGt) {
+      const gtAnn = agreementData.summaryAnnotations.find((a) => a.ground_truth === true);
+      if (gtAnn) {
+        return {
+          annotationId: gtAnn.id,
+          annotatorIndex: -1,
+          completedBy: gtAnn.user?.id ?? null,
+          cells: apiCells,
+        };
+      }
+    }
+
+    return null;
+  }, [existingGtAnnotationIndex, agreementData.annotationForRow, apiCells, hasExistingGt, agreementData.summaryAnnotations]);
 
   return {
     existingGtAnnotationIndex,

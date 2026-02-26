@@ -1,18 +1,27 @@
 /**
  * Ground Truth Row — interactive adjudication row in the Annotators × Dimensions table.
  *
- * Always visible at the bottom of the table, prefilled from the inference API.
- * Each categorical cell is an editable Select; non-categorical cells show a
- * read-only dash with a tooltip explaining they are not editable here.
+ * Always visible at the bottom of the table. In the "suggested" state it
+ * renders CTA buttons instead of values; in "draft" state it shows editable
+ * selectors; in "saved" state it shows read-only values.
+ *
+ * Also exports `MajorityVoteRow` — a read-only row that displays the
+ * inferred majority vote values with annotator counts.
  */
 
 import { useCallback, useMemo, useRef } from "react";
 import { cnm, Tooltip, Select, Badge, Button, Dropdown } from "@humansignal/ui";
 import type { DropdownRef } from "@humansignal/ui";
 import { IconAnnotationGroundTruth } from "@humansignal/icons";
-import type { DimensionInfo, GroundTruthCell, GroundTruthSource } from "./types";
+import type { DimensionInfo, GroundTruthCell, GroundTruthSource, MajorityVoteResult } from "./types";
 import type { ValueCount } from "./use-ground-truth";
-import { ValueChips } from "./value-chips";
+import { ValueChips, VALUE_CHIP_CLASS } from "./value-chips";
+
+// ---------------------------------------------------------------------------
+// Shared type for per-dimension label colors passed through from the config
+// ---------------------------------------------------------------------------
+
+type DimensionLabelColors = Map<string, Record<string, { background?: string; border?: string; color?: string }>>;
 
 // ---------------------------------------------------------------------------
 // Props
@@ -44,6 +53,16 @@ interface GroundTruthRowProps {
   onClearAllValues?: () => void;
   /** When true, the entire row appears visually disabled (reduced opacity, no pointer events). */
   disabled?: boolean;
+  /** Number of dimensions with imperfect agreement (shown in "suggested" CTA). */
+  conflictCount?: number;
+  /** Display name/email of the current user (shown in "suggested" subtitle). */
+  currentUserName?: string;
+  /** Called when the user clicks "Use majority vote" in the suggested state. */
+  onUseMajorityVote?: () => void;
+  /** Called when the user clicks "Select values manually" in the suggested state. */
+  onSelectManually?: () => void;
+  /** Per-dimension label colors: dimension name -> label_attrs. */
+  dimensionLabelColors?: DimensionLabelColors;
 }
 
 // ---------------------------------------------------------------------------
@@ -61,9 +80,10 @@ interface GroundTruthCellComponentProps {
   onClearCell: () => void;
   readOnly?: boolean;
   colSize?: number;
+  labelColors?: Record<string, { background?: string; border?: string; color?: string }>;
 }
 
-const GroundTruthCellComponent = ({ dimension, cell, options, onSetCell, onClearCell, readOnly, colSize }: GroundTruthCellComponentProps) => {
+const GroundTruthCellComponent = ({ dimension, cell, options, onSetCell, onClearCell, readOnly, colSize, labelColors }: GroundTruthCellComponentProps) => {
   // Build Select-compatible options from backend labels only (dimension.labels).
   // When no config labels exist, fall back to observed values. Counts from
   // valueCounts are shown when available.
@@ -109,7 +129,7 @@ const GroundTruthCellComponent = ({ dimension, cell, options, onSetCell, onClear
         className="px-4 py-2.5 align-middle text-label-small text-neutral-content-subtlest italic border-t-2 border-neutral-border-bold bg-neutral-surface"
         style={colSize ? { minWidth: colSize } : undefined}
       >
-        <Tooltip title="Non-categorical dimension — not available for adjudication in the dashboard">
+        <Tooltip title={`${dimension.controlTag} can't be used for most common answer`}>
           <span className="cursor-default">N/A</span>
         </Tooltip>
       </td>
@@ -122,7 +142,7 @@ const GroundTruthCellComponent = ({ dimension, cell, options, onSetCell, onClear
         className="px-4 py-2.5 align-middle text-label-small border-t-2 border-neutral-border-bold bg-neutral-surface"
         style={colSize ? { minWidth: colSize } : undefined}
       >
-        <ValueChips value={cell?.value} />
+        <ValueChips value={cell?.value} labelColors={labelColors} />
       </td>
     );
   }
@@ -163,6 +183,7 @@ const GroundTruthCellComponent = ({ dimension, cell, options, onSetCell, onClear
             value={cell.value}
             className="flex flex-wrap gap-1"
             chipClassName="text-positive-content"
+            labelColors={labelColors}
           />
         );
       }}
@@ -192,6 +213,75 @@ const GroundTruthCellComponent = ({ dimension, cell, options, onSetCell, onClear
     </td>
   );
 };
+
+// ---------------------------------------------------------------------------
+// Majority Vote Row (read-only)
+// ---------------------------------------------------------------------------
+
+interface MajorityVoteRowProps {
+  dimensions: DimensionInfo[];
+  inferredValues: Map<number, unknown>;
+  majorityVotes: Map<number, MajorityVoteResult>;
+  getColSize?: (id: string) => number;
+  dimensionLabelColors?: DimensionLabelColors;
+}
+
+export const MajorityVoteRow = ({
+  dimensions,
+  inferredValues,
+  majorityVotes,
+  getColSize,
+  dimensionLabelColors,
+}: MajorityVoteRowProps) => (
+  <tr>
+    <td
+      className="px-4 py-2.5 align-middle text-label-small font-semibold text-neutral-content bg-neutral-background border-t border-r border-neutral-border sticky left-0 z-10"
+      style={{ minWidth: getColSize?.("annotator") ?? 160 }}
+    >
+      Most Common Answer
+    </td>
+    {dimensions.map((dim) => {
+      if (!dim.isCategorical) {
+        return (
+          <td
+            key={dim.dimensionId}
+            className="px-4 py-2.5 align-middle text-label-small text-neutral-content-subtlest italic bg-neutral-background border-t border-neutral-border"
+            style={{ minWidth: getColSize?.(`dim-${dim.dimensionId}`) }}
+          >
+            <Tooltip title={`${dim.controlTag} can't be used for most common answer`}>
+              <span className="cursor-default">N/A</span>
+            </Tooltip>
+          </td>
+        );
+      }
+
+      const value = inferredValues.get(dim.dimensionId);
+      const mv = majorityVotes.get(dim.dimensionId);
+      const countLabel = mv ? `(${mv.count}/${mv.total})` : null;
+
+      return (
+        <td
+          key={dim.dimensionId}
+          className="px-4 py-2.5 align-middle text-label-small bg-neutral-background border-t border-neutral-border"
+          style={{ minWidth: getColSize?.(`dim-${dim.dimensionId}`) }}
+        >
+          {value !== null && value !== undefined ? (
+            <div className="flex flex-wrap items-center gap-1">
+              <ValueChips value={value} className="flex flex-wrap gap-1" labelColors={dimensionLabelColors?.get(dim.name)} />
+              {countLabel && (
+                <span className="text-neutral-content-subtler text-label-smallest font-normal">
+                  {countLabel}
+                </span>
+              )}
+            </div>
+          ) : (
+            <span className={cnm(VALUE_CHIP_CLASS, "text-neutral-content-subtler")}>—</span>
+          )}
+        </td>
+      );
+    })}
+  </tr>
+);
 
 // ---------------------------------------------------------------------------
 // Main Row Component
@@ -243,8 +333,63 @@ export const GroundTruthRow = ({
   onRevertToSuggestion,
   onClearAllValues,
   disabled,
+  conflictCount,
+  currentUserName,
+  onUseMajorityVote,
+  onSelectManually,
+  dimensionLabelColors,
 }: GroundTruthRowProps) => {
   const draftDropdownRef = useRef<DropdownRef | null>(null);
+
+  // "suggested" state: show CTA buttons instead of per-dimension cells
+  if (status === "suggested") {
+    return (
+      <tr style={{ animation: "fadeInRow 200ms ease-out" }}>
+        <style>{`@keyframes fadeInRow { from { opacity: 0; } to { opacity: 1; } }`}</style>
+        <td
+          className="px-4 py-2.5 align-middle text-label-small border-t-2 border-r border-neutral-border-bold sticky left-0 z-10 bg-neutral-surface text-neutral-content"
+          style={{ minWidth: getColSize?.("annotator") ?? 160 }}
+        >
+          <div className="flex items-center gap-tighter font-medium">
+            <IconAnnotationGroundTruth width={16} height={16} style={{ flexShrink: 0, color: "var(--canteloupe_400)" }} />
+            <span>Ground Truth</span>
+          </div>
+        </td>
+        <td
+          colSpan={dimensions.length}
+          className="px-4 py-2.5 align-middle border-t-2 border-neutral-border-bold bg-neutral-surface"
+        >
+          <div className="flex items-center gap-base flex-wrap">
+            <span className="text-label-small text-neutral-content">
+              {conflictCount ?? 0} conflict{(conflictCount ?? 0) !== 1 ? "s" : ""} to resolve
+            </span>
+            <div className="flex items-center gap-tight">
+              <button
+                type="button"
+                className="px-base py-tighter rounded-small text-label-small font-semibold border border-transparent bg-primary-surface text-primary-surface-content hover:opacity-90 transition-opacity cursor-pointer"
+                onClick={onUseMajorityVote}
+              >
+                Use most common answer
+              </button>
+              <span className="text-label-small text-neutral-content-subtler">or</span>
+              <button
+                type="button"
+                className="px-base py-tighter rounded-small text-label-small font-semibold border border-transparent bg-primary-surface text-primary-surface-content hover:opacity-90 transition-opacity cursor-pointer"
+                onClick={onSelectManually}
+              >
+                Select values manually
+              </button>
+            </div>
+          </div>
+          {currentUserName && (
+            <div className="text-label-smallest text-neutral-content-subtler mt-tightest">
+              This will create a new annotation as <span className="font-medium">{currentUserName}</span>
+            </div>
+          )}
+        </td>
+      </tr>
+    );
+  }
 
   return (
     <tr className={disabled ? "opacity-50 pointer-events-none" : undefined} style={{ animation: "fadeInRow 200ms ease-out" }}>
@@ -266,32 +411,27 @@ export const GroundTruthRow = ({
               </div>
             )}
           </div>
-          {status && (
-            status === "draft" && onRevertToSuggestion && onClearAllValues ? (
-              <Dropdown.Trigger
-                ref={draftDropdownRef}
-                alignment="bottom-right"
-                content={
-                  <DraftBadgeMenu
-                    onRevertToSuggestion={onRevertToSuggestion}
-                    onClearAllValues={onClearAllValues}
-                    onClose={() => draftDropdownRef.current?.close?.()}
-                  />
-                }
-              >
-                <Badge variant="warning" shape="squared" className="cursor-pointer">
-                  Draft
-                </Badge>
-              </Dropdown.Trigger>
-            ) : (
-              <Badge
-                variant={status === "draft" ? "warning" : status === "saved" ? "success" : "info"}
-                shape="squared"
-              >
-                {status.charAt(0).toUpperCase() + status.slice(1)}
+          {status === "draft" && onRevertToSuggestion && onClearAllValues ? (
+            <Dropdown.Trigger
+              ref={draftDropdownRef}
+              alignment="bottom-right"
+              content={
+                <DraftBadgeMenu
+                  onRevertToSuggestion={onRevertToSuggestion}
+                  onClearAllValues={onClearAllValues}
+                  onClose={() => draftDropdownRef.current?.close?.()}
+                />
+              }
+            >
+              <Badge variant="warning" shape="squared" className="cursor-pointer">
+                draft
               </Badge>
-            )
-          )}
+            </Dropdown.Trigger>
+          ) : status === "draft" ? (
+            <Badge variant="warning" shape="squared">draft</Badge>
+          ) : status === "saved" ? (
+            <Badge variant="success" shape="squared">Saved</Badge>
+          ) : null}
         </div>
       </td>
 
@@ -310,6 +450,7 @@ export const GroundTruthRow = ({
             onClearCell={() => onClearCell(dim.dimensionId)}
             readOnly={readOnly}
             colSize={getColSize?.(`dim-${dim.dimensionId}`)}
+            labelColors={dimensionLabelColors?.get(dim.name)}
           />
         );
       })}

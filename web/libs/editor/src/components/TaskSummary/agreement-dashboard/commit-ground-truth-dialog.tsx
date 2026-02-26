@@ -159,7 +159,7 @@ const DialogBody = ({ summary, reviewerName }: DialogBodyProps) => (
         {summary.manual > 0 && (
           <li className="flex items-center gap-tight">
             <span className="w-2 h-2 rounded-full bg-primary-content inline-block flex-shrink-0" />
-            {summary.manual} manually adjudicated
+            {summary.manual} manually resolved
           </li>
         )}
       </ul>
@@ -174,10 +174,6 @@ const DialogBody = ({ summary, reviewerName }: DialogBodyProps) => (
       <div className="flex items-center gap-tight">
         <span className="font-semibold text-neutral-content">Annotator:</span>
         <span>{reviewerName}</span>
-      </div>
-      <div className="flex items-center gap-tight">
-        <span className="font-semibold text-neutral-content">Method:</span>
-        <span>Consensus-based with manual review</span>
       </div>
     </div>
   </div>

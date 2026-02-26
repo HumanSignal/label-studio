@@ -19,7 +19,7 @@ import type { MSTAnnotation, MSTStore } from "../../stores/types";
 import { DataSummary } from "./DataSummary";
 import { LabelingSummary } from "./LabelingSummary";
 import { NumbersSummary } from "./NumbersSummary";
-import type { ObjectTypes } from "./types";
+import type { LabelColors, ObjectTypes } from "./types";
 import { buildControlsList, buildObjectDataTypes } from "./utils";
 import { useLocalStorage } from "@/utils/hooks";
 
@@ -35,7 +35,7 @@ import { TaskSummaryControlPanel } from "./agreement-dashboard/task-summary-cont
 import { openCommitGroundTruthDialog, commitGroundTruth } from "./agreement-dashboard/commit-ground-truth-dialog";
 import { openAutoReviewDialog } from "./agreement-dashboard/auto-review-dialog";
 
-import { CollapsiblePanel, Message } from "@humansignal/ui";
+import { CollapsiblePanel } from "@humansignal/ui";
 
 // ---------------------------------------------------------------------------
 // Props (same as OSS TaskSummary)
@@ -97,6 +97,17 @@ const TaskSummary = ({ annotations: allAnnotations, store: annotationStore }: Ta
   const controls = buildControlsList(allTags);
   const dataTypes: ObjectTypes = buildObjectDataTypes(allTags);
 
+  // Label colors keyed by control name (= dimension name) for the agreement dashboard
+  const dimensionLabelColors = useMemo(() => {
+    const map = new Map<string, Record<string, LabelColors>>();
+    for (const control of controls) {
+      if (Object.keys(control.label_attrs).length > 0) {
+        map.set(control.name, control.label_attrs);
+      }
+    }
+    return map;
+  }, [controls]);
+
   // ---------------------------------------------------------------------------
   // Dashboard state (persisted in localStorage)
   // ---------------------------------------------------------------------------
@@ -137,13 +148,6 @@ const TaskSummary = ({ annotations: allAnnotations, store: annotationStore }: Ta
 
   const hasNonCategoricalDimensions = agreementData.nonCategoricalDimensions.length > 0;
 
-  const nonCategoricalDimensionNames = useMemo(() => {
-    const names = agreementData.nonCategoricalDimensions.map((d) => d.name);
-    const shown = names.slice(0, 3);
-    const remaining = names.length - shown.length;
-    return remaining > 0 ? `${shown.join(", ")} (+${remaining} more)` : shown.join(", ");
-  }, [agreementData.nonCategoricalDimensions]);
-
   // ---------------------------------------------------------------------------
   // Ground Truth Mode
   // ---------------------------------------------------------------------------
@@ -182,7 +186,19 @@ const TaskSummary = ({ annotations: allAnnotations, store: annotationStore }: Ta
     groundTruth.actions.clearAllCells();
   }, [groundTruth.actions]);
 
-  const handleCreateGroundTruth = useCallback(() => {
+  const handleUseMajorityVote = useCallback(() => {
+    groundTruth.actions.prefillFromInferred(agreementData.inferredValues);
+  }, [groundTruth.actions, agreementData.inferredValues]);
+
+  const handleSelectManually = useCallback(() => {
+    groundTruth.actions.clearAllCells();
+  }, [groundTruth.actions]);
+
+  const handleCancel = useCallback(() => {
+    groundTruth.actions.reset();
+  }, [groundTruth.actions]);
+
+  const handleSaveGroundTruth = useCallback(() => {
     if (!taskId) return;
     openCommitGroundTruthDialog({
       taskId,
@@ -216,11 +232,23 @@ const TaskSummary = ({ annotations: allAnnotations, store: annotationStore }: Ta
       // letting the comparison logic avoid user-ID collisions (same user
       // can appear multiple times in the agreement arrays).
       annotationIds: agreementData.agreementResult?.annotation_ids ?? [],
+      annotators: agreementData.annotators,
       onCommit: () => {
         window.location.reload();
       },
     });
-  }, [taskId, existingGtObject, navigableAnnotations, agreementData.categoricalDimensions, agreementData.agreementResult]);
+  }, [taskId, existingGtObject, navigableAnnotations, agreementData.categoricalDimensions, agreementData.agreementResult, agreementData.annotators]);
+
+  // ---------------------------------------------------------------------------
+  // Current user display name (for GT row subtitle)
+  // ---------------------------------------------------------------------------
+
+  const currentUserName = useMemo(() => {
+    const user = window.APP_SETTINGS?.user;
+    if (!user) return undefined;
+    const parts = [user.first_name, user.last_name].filter(Boolean);
+    return parts.length > 0 ? parts.join(" ") : user.email ?? undefined;
+  }, []);
 
   // ---------------------------------------------------------------------------
   // NumbersSummary cards
@@ -284,11 +312,6 @@ const TaskSummary = ({ annotations: allAnnotations, store: annotationStore }: Ta
         <div className="mb-relaxed">
           <section className="mb-base">
             <div className="flex items-center mb-tight gap-tight">
-              {hasNonCategoricalDimensions && (
-                <Message variant="info" size="small">
-                  Non-categoricals: {nonCategoricalDimensionNames}. Adjudication is not available on this screen.
-                </Message>
-              )}
               <div className="ml-auto flex items-center shrink-0">
                 <ColumnPicker
                   totalDimensionCount={agreementData.dimensions.length}
@@ -298,6 +321,7 @@ const TaskSummary = ({ annotations: allAnnotations, store: annotationStore }: Ta
                   onVisibleColumnsChange={setVisibleColumnIds}
                   conflictingDimensionIds={agreementData.conflictingDimensionIds}
                   hasNonCategoricalDimensions={hasNonCategoricalDimensions}
+                  hasExistingGt={hasExistingGt}
                 />
               </div>
             </div>
@@ -305,11 +329,12 @@ const TaskSummary = ({ annotations: allAnnotations, store: annotationStore }: Ta
             <AnnotatorsDimensionsTable
               dimensions={agreementData.filteredDimensions}
               annotators={agreementData.annotators}
+              dimensionLabelColors={dimensionLabelColors}
               annotationForRow={agreementData.annotationForRow}
               onAnnotationClick={handleAnnotationClick}
               dimensionScores={agreementData.dimensionScores}
               inferredValues={agreementData.inferredValues}
-              groundTruthCells={effectiveGtCells}
+              groundTruthCells={hasNonCategoricalDimensions && !hasExistingGt ? undefined : effectiveGtCells}
               groundTruthValueCounts={groundTruth.valueCounts}
               onSetGroundTruthCell={groundTruth.actions.setCell}
               onClearGroundTruthCell={groundTruth.actions.clearCell}
@@ -321,14 +346,26 @@ const TaskSummary = ({ annotations: allAnnotations, store: annotationStore }: Ta
               agreementMethodology={method}
               onRevertToSuggestion={handleRevertToSuggestion}
               onClearAllValues={handleClearAllValues}
-            />
-
-            <TaskSummaryControlPanel
-              isComplete={effectiveIsComplete}
-              hasExistingGt={hasExistingGt}
-              hasNonCategoricalDimensions={hasNonCategoricalDimensions}
-              onCreateGroundTruth={handleCreateGroundTruth}
-              onAutoReview={handleAutoReview}
+              majorityVotes={groundTruth.majorityVotes}
+              conflictCount={agreementData.conflictCount}
+              currentUserName={currentUserName}
+              onUseMajorityVote={handleUseMajorityVote}
+              onSelectManually={handleSelectManually}
+              footer={
+                groundTruthStatus === "draft" || groundTruthStatus === "saved" ? (
+                  <TaskSummaryControlPanel
+                    groundTruthStatus={groundTruthStatus}
+                    isComplete={effectiveIsComplete}
+                    resolvedCount={effectiveResolvedCount}
+                    totalCount={groundTruth.totalCount}
+                    hasExistingGt={hasExistingGt}
+                    hasNonCategoricalDimensions={hasNonCategoricalDimensions}
+                    onSaveGroundTruth={handleSaveGroundTruth}
+                    onCancel={handleCancel}
+                    onAutoReview={handleAutoReview}
+                  />
+                ) : undefined
+              }
             />
           </section>
         </div>
