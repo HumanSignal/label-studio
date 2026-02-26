@@ -78,9 +78,6 @@ export const EditorResizer: React.FC<EditorResizerProps> = ({
   );
 
   return (
-    <div
-      className={clsx(styles.handle, { [styles.handleResizing]: isResizing })}
-      onPointerDown={handlePointerDown}
-    />
+    <div className={clsx(styles.handle, { [styles.handleResizing]: isResizing })} onPointerDown={handlePointerDown} />
   );
 };
