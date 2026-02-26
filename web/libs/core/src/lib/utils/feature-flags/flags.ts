@@ -117,3 +117,9 @@ export const FF_PREVIEW_PERFORMANCE = "fflag_fix_all_fit_287_preview_performance
  * @link https://app.launchdarkly.com/default/production/features/fflag_fix_all_fit_720_lazy_load_annotations
  */
 export const FF_FIT_720_LAZY_LOAD_ANNOTATIONS = "fflag_fix_all_fit_720_lazy_load_annotations";
+
+/**
+ * Analytics Label Distribution page
+ */
+export const FF_FIT_1443_ANALYTICS_LABEL_DISTRIBUTION_PAGE =
+  "fflag_feat_all_fit_1443_analytics_label_distribution_page";
