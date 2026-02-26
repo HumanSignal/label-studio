@@ -202,10 +202,6 @@ export const create = (columns) => {
       loadNextTask: flow(function* ({ select = true } = {}) {
         const taskData = yield self.root.invokeAction("next_task", {
           reload: false,
-          errorHandler: (result) => {
-            const displayReason = result?.response?.display_context?.reason;
-            return displayReason === "PAUSED" || displayReason === "OVERLAP_REACHED";
-          },
         });
 
         if (taskData?.$meta?.status === 404) {
