@@ -339,15 +339,20 @@ const VirtualizedGrid = observer(({ store, annotations, root }) => {
   );
 
   // FIT-720: Initial hydration on mount - hydrate first visible annotations
+  // When annotation count is small (e.g. compare-all with 2), hydrate ALL stubs so the second
+  // panel loads reliably (react-window may report only one visible item initially).
   useEffect(() => {
     // Only run once when containerWidth becomes non-zero
     if (initialHydrationDone.current || visibleAnnotations.length === 0 || containerWidth === 0) return;
 
     initialHydrationDone.current = true;
 
-    // Calculate how many panels fit in the viewport
+    // For small counts, hydrate all to fix "second annotation not loading" in compare-all
     const visibleCount = Math.ceil(containerWidth / (panelWidth + PANEL_GAP)) + 1;
-    const initialVisibleCount = Math.min(visibleCount, visibleAnnotations.length);
+    const initialVisibleCount =
+      visibleAnnotations.length <= VIRTUALIZATION_THRESHOLD
+        ? visibleAnnotations.length
+        : Math.min(visibleCount, visibleAnnotations.length);
 
     for (let i = 0; i < initialVisibleCount; i++) {
       const annotation = visibleAnnotations[i];
@@ -640,11 +645,10 @@ class GridClassComponent extends Component {
 
 // FIT-720: Grid wrapper that chooses virtualized or original based on FF and annotation count
 export default function Grid(props) {
-  const { annotations } = props;
-  const visibleCount = annotations.filter((c) => !c.hidden).length;
-
-  // FIT-720: Use virtualization when FF is enabled AND there are many annotations
-  const shouldVirtualize = isFF(FF_FIT_720_LAZY_LOAD_ANNOTATIONS) && visibleCount > VIRTUALIZATION_THRESHOLD;
+  // FIT-720: Use VirtualizedGrid when FF is on so stub hydration runs (fixes compare-all with
+  // 2 annotations where the second panel would never load in GridClassComponent).
+  // Virtualization (react-window) is still only a win when we have many annotations.
+  const shouldVirtualize = isFF(FF_FIT_720_LAZY_LOAD_ANNOTATIONS);
 
   if (shouldVirtualize) {
     return <VirtualizedGrid {...props} />;
