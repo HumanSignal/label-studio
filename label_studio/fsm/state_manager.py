@@ -355,7 +355,7 @@ class StateManager:
                     state=new_state,
                     previous_state=current_state,
                     transition_name=transition_name,
-                    triggered_by=user,
+                    triggered_by=user if getattr(user, 'is_authenticated', False) else None,
                     context_data=context or {},
                     reason=reason,
                     organization_id=organization_id,
