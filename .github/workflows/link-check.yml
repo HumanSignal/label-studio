@@ -10,22 +10,37 @@ on:
   workflow_dispatch:
 
 jobs:
-  wait_for_netlify:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Wait for Netlify deploy preview to complete
-        run: echo "Netlify deploy preview has passed"
-        if: ${{ contains(github.event.pull_request.head.repo.status.contexts, 'netlify') }}
-
   check_links:
     runs-on: ubuntu-latest
-    needs: wait_for_netlify
     env:
       DEPLOY_PREVIEW_LS: https://deploy-preview-${{ github.event.pull_request.number }}--label-studio-docs-new-theme.netlify.app
       DEPLOY_PREVIEW_HS: https://deploy-preview-${{ github.event.pull_request.number }}--heartex-docs.netlify.app
     steps:
       - name: Checkout code
         uses: actions/checkout@v6
+
+      - name: Wait for Netlify deploy preview
+        if: ${{ contains(github.event.pull_request.head.repo.status.contexts, 'netlify') }}
+        run: echo "Netlify deploy preview context found"
+
+      - name: Wait for deploy previews to be ready
+        run: |
+          for url in "$DEPLOY_PREVIEW_LS" "$DEPLOY_PREVIEW_HS"; do
+            echo "Waiting for $url ..."
+            for i in $(seq 1 30); do
+              status=$(curl -s -o /dev/null -w '%{http_code}' --max-time 10 "$url" || echo "000")
+              if [ "$status" = "200" ] || [ "$status" = "301" ] || [ "$status" = "302" ]; then
+                echo "Ready ($status) after $((i * 10))s"
+                break
+              fi
+              echo "  Attempt $i: status $status, retrying in 10s..."
+              sleep 10
+            done
+            if [ "$status" != "200" ] && [ "$status" != "301" ] && [ "$status" != "302" ]; then
+              echo "Deploy preview not ready after 5 minutes: $url"
+              exit 1
+            fi
+          done
 
       - name: Install linkchecker
         run: pip install linkchecker
@@ -43,6 +58,7 @@ jobs:
             -f /tmp/linkcheckerrc \
             --threads 2 \
             --timeout 30 \
+            --no-status \
             --no-robots \
             --ignore-url="/api" \
             --ignore-url="^mailto:" \
@@ -56,6 +72,7 @@ jobs:
             -f /tmp/linkcheckerrc \
             --threads 2 \
             --timeout 30 \
+            --no-status \
             --no-robots \
             --ignore-url="/api" \
             --ignore-url="^mailto:" \
