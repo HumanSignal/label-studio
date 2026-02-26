@@ -1,4 +1,4 @@
-import { EnterpriseBadge, Select, Typography } from "@humansignal/ui";
+import { Badge, Select, Typography, Tooltip, EnterpriseBadge } from "@humansignal/ui";
 import { useCallback, useContext } from "react";
 import { Button } from "@humansignal/ui";
 import { Form, Input, TextArea } from "../../components/Form";
@@ -37,7 +37,7 @@ export const GeneralSettings = () => {
                 <div className={cn("workspace-placeholder").toClassName()}>
                   <div className={cn("workspace-placeholder").elem("badge-wrapper").toClassName()}>
                     <div className={cn("workspace-placeholder").elem("title").toClassName()}>Workspace</div>
-                    <EnterpriseBadge className="ml-2" />
+                    <EnterpriseBadge size="small" className="ml-2" />
                   </div>
                   <Select placeholder="Select an option" disabled options={[]} />
                   <Typography size="small" className="my-tight">
@@ -82,7 +82,16 @@ export const GeneralSettings = () => {
                     value=""
                     label={
                       <>
-                        Uncertainty sampling <EnterpriseBadge className="ml-2" />
+                        Uncertainty sampling{" "}
+                        <Tooltip title="Available on Label Studio Enterprise">
+                          <Badge
+                            variant="enterprise"
+                            icon={<IconSpark />}
+                            size="small"
+                            style="ghost"
+                            className="ml-tightest"
+                          />
+                        </Tooltip>
                       </>
                     }
                     disabled

@@ -1,4 +1,4 @@
-import { Button, Checkbox, Dropdown, EnterpriseBadge } from "@humansignal/ui";
+import { Button, Checkbox, Dropdown, Badge } from "@humansignal/ui";
 import { inject, observer } from "mobx-react";
 import React from "react";
 import { cn } from "../../utils/bem";
@@ -26,7 +26,7 @@ const FieldsMenu = observer(({ columns, WrapperComponent, onClick, onReset, sele
         ) : (
           <span className="flex items-center justify-between w-full gap-base">
             {titleContent}
-            {enterpriseBadge && <EnterpriseBadge ghost />}
+            {enterpriseBadge && <Badge variant="gradient" style="ghost" />}
           </span>
         )}
       </Menu.Item>
@@ -152,7 +152,7 @@ FieldsButton.Checkbox = observer(({ column, children, disabled, enterpriseBadge 
       </div>
       {enterpriseBadge && (
         <div style={{ flexShrink: 0 }}>
-          <EnterpriseBadge ghost />
+          <Badge variant="gradient" style="ghost" />
         </div>
       )}
     </div>
