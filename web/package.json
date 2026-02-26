@@ -110,7 +110,7 @@
     "sanitize-html": "^2.14.0",
     "shadcn": "^2.1.8",
     "simplify-js": "^1.2.4",
-    "storybook": "^9.1.17",
+    "storybook": "^9.1.19",
     "sucrase": "^3.35.0",
     "tailwind-merge": "^2.6.0",
     "webfft": "^1.0.3",
