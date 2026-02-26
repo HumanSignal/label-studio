@@ -24,7 +24,6 @@ import { useAnnotationFetcher } from "../../hooks/useAnnotationQuery";
 // FIT-720: Virtualization constants for Compare view
 const PANEL_WIDTH = 500; // Width of each annotation panel (approximately 50% of typical viewport)
 const PANEL_GAP = 30; // Gap between panels (matches $gap in Grid.module.scss)
-const VIRTUALIZATION_THRESHOLD = 10; // Only virtualize if more than this many annotations
 
 /***** DON'T TRY THIS AT HOME *****/
 /*
@@ -339,20 +338,14 @@ const VirtualizedGrid = observer(({ store, annotations, root }) => {
   );
 
   // FIT-720: Initial hydration on mount - hydrate first visible annotations
-  // When annotation count is small (e.g. compare-all with 2), hydrate ALL stubs so the second
-  // panel loads reliably (react-window may report only one visible item initially).
   useEffect(() => {
     // Only run once when containerWidth becomes non-zero
     if (initialHydrationDone.current || visibleAnnotations.length === 0 || containerWidth === 0) return;
 
     initialHydrationDone.current = true;
 
-    // For small counts, hydrate all to fix "second annotation not loading" in compare-all
     const visibleCount = Math.ceil(containerWidth / (panelWidth + PANEL_GAP)) + 1;
-    const initialVisibleCount =
-      visibleAnnotations.length <= VIRTUALIZATION_THRESHOLD
-        ? visibleAnnotations.length
-        : Math.min(visibleCount, visibleAnnotations.length);
+    const initialVisibleCount = Math.min(visibleCount, visibleAnnotations.length);
 
     for (let i = 0; i < initialVisibleCount; i++) {
       const annotation = visibleAnnotations[i];
