@@ -1,12 +1,20 @@
 import { observer } from "mobx-react";
+import { useMemo } from "react";
 import { cn } from "../../../utils/bem";
-import { Button, EnterpriseBadge } from "@humansignal/ui";
+import { Button, Select } from "@humansignal/ui";
 import { IconClose } from "@humansignal/icons";
-import { Tag } from "../../Common/Tag/Tag";
 import { FilterDropdown } from "../FilterDropdown";
 import "./FilterLine.scss";
 import { FilterOperation } from "./FilterOperation";
 import { Icon } from "../../Common/Icon/Icon";
+import {
+  COLUMN_VALUE_PREFIX,
+  ColumnPickerOptionContent,
+  filtersToPickerGroups,
+  pickerGroupsToFlatOptions,
+  searchFilterByLabel,
+  stripColumnPrefix,
+} from "../../Common/ColumnPickerList";
 
 const Conjunction = observer(({ index, view }) => {
   return (
@@ -23,7 +31,37 @@ const Conjunction = observer(({ index, view }) => {
   );
 });
 
-export const FilterLine = observer(({ filter, availableFilters, index, view, sidebar, dropdownClassName }) => {
+/**
+ * Column picker for a single filter row.
+ * Uses core Select with groupBy and optionRenderer (same as Columns picker).
+ */
+const FilterColumnPicker = observer(({ filter, availableFilters }) => {
+  const groups = useMemo(() => filtersToPickerGroups(availableFilters), [availableFilters]);
+  const flatOptions = useMemo(() => pickerGroupsToFlatOptions(groups), [groups]);
+  const label = filter.field?.title || "Column";
+  const value = filter.filter.id ? COLUMN_VALUE_PREFIX + filter.filter.id : null;
+
+  return (
+    <Select
+      options={flatOptions}
+      value={value}
+      onChange={(newValue) => filter.setFilterDelayed(stripColumnPrefix(newValue))}
+      searchable
+      searchPlaceholder="Search columns"
+      searchFilter={searchFilterByLabel}
+      groupBy="group"
+      optionRenderer={ColumnPickerOptionContent}
+      placeholder={label}
+      size="small"
+      disabled={filter.field.disabled}
+      triggerProps={{
+        style: { minWidth: 80 },
+      }}
+    />
+  );
+});
+
+export const FilterLine = observer(({ filter, availableFilters, index, view, sidebar }) => {
   const childFilter = filter.child_filter;
 
   if (sidebar) {
@@ -40,37 +78,7 @@ export const FilterLine = observer(({ filter, availableFilters, index, view, sid
         </div>
 
         <div className={cn("filterLine").elem("column").mix("field").toClassName()}>
-          <FilterDropdown
-            placeholder="Column"
-            defaultValue={filter.filter.id}
-            items={availableFilters}
-            dropdownClassName={dropdownClassName}
-            searchFilter={(option, query) => {
-              const original = option?.original ?? option;
-              const title = original?.field?.title ?? original?.title ?? "";
-              const parentTitle = original?.field?.parent?.title ?? "";
-              return `${title} ${parentTitle}`.toLowerCase().includes(query.toLowerCase());
-            }}
-            onChange={(value) => filter.setFilterDelayed(value)}
-            optionRender={({ item: { original: filter } }) => {
-              const showEnterpriseBadge = filter.field.enterprise_badge;
-              return (
-                <div
-                  className={cn("filterLine").elem("selector").toClassName()}
-                  style={{ display: "flex", alignItems: "center", gap: "8px" }}
-                >
-                  <span>{filter.field.title}</span>
-                  {showEnterpriseBadge && <EnterpriseBadge ghost />}
-                  {filter.field.parent && (
-                    <Tag size="small" className="filters-data-tag" color="#1d91e4" style={{ marginLeft: 7 }}>
-                      {filter.field.parent.title}
-                    </Tag>
-                  )}
-                </div>
-              );
-            }}
-            disabled={filter.field.disabled}
-          />
+          <FilterColumnPicker filter={filter} availableFilters={availableFilters} />
         </div>
 
         <FilterOperation
@@ -107,14 +115,14 @@ export const FilterLine = observer(({ filter, availableFilters, index, view, sid
               <span style={{ fontSize: 12, paddingRight: 5 }}>and</span>
             </div>
 
-            {/* Column 2: Field */}
+            {/* Column 2: Field — disabled, just shows the linked column name */}
             <div className={cn("filterLine").elem("column").mix("field child-field").toClassName()}>
               <FilterDropdown
                 placeholder={childFilter.field.title}
                 value={childFilter.field.title}
                 items={[{ value: childFilter.field.title, label: childFilter.field.title }]}
                 disabled={true}
-                onChange={() => {}} // No-op since it's disabled
+                onChange={() => {}}
                 style={{ minWidth: "80px" }}
               />
             </div>
@@ -158,39 +166,7 @@ export const FilterLine = observer(({ filter, availableFilters, index, view, sid
       </div>
 
       <div className={cn("filterLine").elem("column").mix("field").toClassName()}>
-        <FilterDropdown
-          placeholder="Column"
-          defaultValue={filter.filter.id}
-          items={availableFilters}
-          width={80}
-          dropdownWidth={170}
-          dropdownClassName={dropdownClassName}
-          searchFilter={(option, query) => {
-            const original = option?.original ?? option;
-            const title = original?.field?.title ?? original?.title ?? "";
-            const parentTitle = original?.field?.parent?.title ?? "";
-            return `${title} ${parentTitle}`.toLowerCase().includes(query.toLowerCase());
-          }}
-          onChange={(value) => filter.setFilterDelayed(value)}
-          optionRender={({ item: { original: filter } }) => {
-            const showEnterpriseBadge = filter.field.enterprise_badge;
-            return (
-              <div
-                className={cn("filterLine").elem("selector").toClassName()}
-                style={{ display: "flex", alignItems: "center", gap: "8px" }}
-              >
-                <span>{filter.field.title}</span>
-                {showEnterpriseBadge && <EnterpriseBadge ghost />}
-                {filter.field.parent && (
-                  <Tag size="small" className="filters-data-tag" color="#1d91e4" style={{ marginLeft: 7 }}>
-                    {filter.field.parent.title}
-                  </Tag>
-                )}
-              </div>
-            );
-          }}
-          disabled={filter.field.disabled}
-        />
+        <FilterColumnPicker filter={filter} availableFilters={availableFilters} />
       </div>
 
       <FilterOperation
@@ -227,13 +203,14 @@ export const FilterLine = observer(({ filter, availableFilters, index, view, sid
             <span style={{ fontSize: 12, paddingRight: 5 }}>and</span>
           </div>
 
+          {/* Disabled field showing the linked column name */}
           <div className={cn("filterLine").elem("column").mix("field child-field").toClassName()}>
             <FilterDropdown
               placeholder={childFilter.field.title}
               value={childFilter.field.title}
               items={[{ value: childFilter.field.title, label: childFilter.field.title }]}
               disabled={true}
-              onChange={() => {}} // No-op since it's disabled
+              onChange={() => {}}
             />
           </div>
 

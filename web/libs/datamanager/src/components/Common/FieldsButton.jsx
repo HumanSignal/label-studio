@@ -1,8 +1,15 @@
-import { Button, Checkbox, Dropdown, EnterpriseBadge } from "@humansignal/ui";
+import { Select, Tooltip } from "@humansignal/ui";
 import { inject, observer } from "mobx-react";
-import React from "react";
+import { useCallback, useMemo } from "react";
+import { flushSync } from "react-dom";
 import { cn } from "../../utils/bem";
-import { Menu } from "./Menu/Menu";
+import {
+  COLUMN_VALUE_PREFIX,
+  ColumnPickerOptionContent,
+  columnsToPickerGroups,
+  pickerGroupsToFlatOptions,
+  searchFilterByLabel,
+} from "./ColumnPickerList";
 
 const injector = inject(({ store }) => {
   return {
@@ -10,145 +17,103 @@ const injector = inject(({ store }) => {
   };
 });
 
-const FieldsMenu = observer(({ columns, WrapperComponent, onClick, onReset, selected, resetTitle }) => {
-  const MenuItem = (col, onClick) => {
-    const enterpriseBadge = col.enterprise_badge ?? col.original?.enterprise_badge;
-    const shouldDisable = col.disabled || enterpriseBadge;
-
-    const titleContent = <span>{col.title}</span>;
-
-    return (
-      <Menu.Item key={col.key} name={col.key} onClick={onClick} disabled={shouldDisable}>
-        {WrapperComponent && col.wra !== false ? (
-          <WrapperComponent column={col} disabled={shouldDisable} enterpriseBadge={enterpriseBadge}>
-            {titleContent}
-          </WrapperComponent>
-        ) : (
-          <span className="flex items-center justify-between w-full gap-base">
-            {titleContent}
-            {enterpriseBadge && <EnterpriseBadge ghost />}
-          </span>
-        )}
-      </Menu.Item>
-    );
-  };
-
-  return (
-    <Menu size="small" selectedKeys={selected ? [selected] : ["none"]} closeDropdownOnItemClick={false}>
-      {onReset &&
-        MenuItem(
-          {
-            key: "none",
-            title: resetTitle ?? "Default",
-            wrap: false,
-          },
-          onReset,
-        )}
-
-      {columns.map((col) => {
-        if (col.children) {
-          return (
-            <Menu.Group key={col.key} title={col.title}>
-              {col.children.map((col) => MenuItem(col, () => onClick?.(col)))}
-            </Menu.Group>
-          );
-        }
-        if (!col.parent) {
-          return MenuItem(col, () => onClick?.(col));
-        }
-
-        return null;
-      })}
-    </Menu>
-  );
-});
-
+/**
+ * Columns picker button (multi-select). Used by toolbar and Table quick view.
+ * Single-select pickers (Order By, Filter column) use Select directly.
+ */
 export const FieldsButton = injector(
-  ({
-    columns,
-    size,
-    style,
-    wrapper,
-    title,
-    icon,
-    className,
-    trailingIcon,
-    onClick,
-    onReset,
-    resetTitle,
-    filter,
-    selected,
-    tooltip,
-    tooltipTheme = "dark",
-    openUpwardForShortViewport = true,
-    "data-testid": dataTestId,
-  }) => {
-    const content = [];
-
-    if (title) content.push(<React.Fragment key="f-button-title">{title}</React.Fragment>);
-
-    const renderButton = () => {
-      return (
-        <Button
-          variant="neutral"
-          size="small"
-          look="outlined"
-          leading={icon}
-          trailing={trailingIcon}
-          data-testid={dataTestId}
-        >
-          {content.length ? content : null}
-        </Button>
+  observer(
+    ({ columns, size, title, icon, filter, tooltip, multiSelect = true, className, "data-testid": dataTestId }) => {
+      const groups = useMemo(
+        () => columnsToPickerGroups(columns, filter),
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+        [columns, filter],
       );
-    };
 
-    return (
-      <Dropdown.Trigger
-        content={
-          <FieldsMenu
-            columns={filter ? columns.filter(filter) : columns}
-            WrapperComponent={wrapper}
-            onClick={onClick}
-            size={size}
-            onReset={onReset}
-            selected={selected}
-            resetTitle={resetTitle}
-          />
-        }
-        style={{ maxHeight: 280, overflow: "auto" }}
-        openUpwardForShortViewport={openUpwardForShortViewport}
-      >
-        {tooltip ? (
-          <div className={`${cn("field-button").toClassName()} h-[40px] flex items-center`} style={{ zIndex: 1000 }}>
-            <Button
-              tooltip={tooltip}
-              variant="neutral"
-              size={size}
-              look="outlined"
-              leading={icon}
-              trailing={trailingIcon}
-              data-testid={dataTestId}
-            >
-              {content.length ? content : null}
-            </Button>
-          </div>
-        ) : (
-          renderButton()
-        )}
-      </Dropdown.Trigger>
-    );
-  },
+      const flatOptions = useMemo(() => pickerGroupsToFlatOptions(groups), [groups]);
+      const value = useMemo(
+        () => columns.filter((c) => !c.is_hidden).map((c) => COLUMN_VALUE_PREFIX + c.key),
+        [columns],
+      );
+
+      const handleChange = useCallback(
+        (newValue) => {
+          const selectedSet = new Set(newValue ?? []);
+          flushSync(() => {
+            for (const opt of flatOptions) {
+              const col = opt.original;
+              if (!col?.toggleVisibility) continue;
+              const shouldBeVisible = selectedSet.has(opt.value);
+              const isVisible = !col.is_hidden;
+              if (shouldBeVisible !== isVisible) {
+                col.toggleVisibility();
+              }
+            }
+          });
+        },
+        [flatOptions],
+      );
+
+      const selectTrigger = (
+        <Select
+          options={flatOptions}
+          value={value}
+          onChange={handleChange}
+          multiple
+          searchable
+          searchPlaceholder="Search columns"
+          searchFilter={searchFilterByLabel}
+          groupBy="group"
+          optionRenderer={ColumnPickerOptionContent}
+          renderSelected={() =>
+            icon ? (
+              <>
+                {icon} {title}
+              </>
+            ) : (
+              title
+            )
+          }
+          placeholder={title}
+          dataTestid={dataTestId}
+          triggerClassName={className}
+          triggerProps={{
+            style: {
+              height: 32,
+              minWidth: 110,
+              color: "var(--color-neutral-content)",
+              fontSize: "var(--font-size-14)",
+              fontWeight: "var(--font-weight-medium)",
+            },
+          }}
+        />
+      );
+
+      return tooltip ? (
+        <div className={`${cn("field-button").toClassName()} h-[40px] flex items-center`} style={{ zIndex: 1000 }}>
+          <Tooltip title={tooltip}>{selectTrigger}</Tooltip>
+        </div>
+      ) : (
+        selectTrigger
+      );
+    },
+  ),
 );
 
+// Kept for backward compatibility — no longer used internally but may be
+// referenced by external consumers.
 FieldsButton.Checkbox = observer(({ column, children, disabled, enterpriseBadge }) => {
-  const shouldDisable = disabled;
-
   return (
     <div className="w-full flex items-center justify-between gap-tight">
       <div className="flex-1 flex items-center min-w-0 overflow-hidden">
-        <Checkbox size="small" checked={!column.is_hidden} onChange={column.toggleVisibility} disabled={shouldDisable}>
-          {children}
-        </Checkbox>
+        <input
+          type="checkbox"
+          size="small"
+          checked={!column.is_hidden}
+          onChange={column.toggleVisibility}
+          disabled={disabled}
+        />
+        {children}
       </div>
       {enterpriseBadge && (
         <div style={{ flexShrink: 0 }}>

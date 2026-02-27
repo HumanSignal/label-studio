@@ -1,5 +1,4 @@
 import { inject } from "mobx-react";
-import React from "react";
 import { cn } from "../../utils/bem";
 import { Button } from "@humansignal/ui";
 import { FilterLine } from "./FilterLine/FilterLine";
@@ -16,38 +15,6 @@ const injector = inject(({ store }) => ({
 export const Filters = injector(({ views, currentView, filters }) => {
   const { sidebarEnabled } = views;
 
-  const fields = React.useMemo(
-    () =>
-      currentView.availableFilters.reduce((res, filter) => {
-        const target = filter.field.target;
-        const groupTitle = target
-          .split("_")
-          .map((s) =>
-            s
-              .split("")
-              .map((c, i) => (i === 0 ? c.toUpperCase() : c))
-              .join(""),
-          )
-          .join(" ");
-
-        const group = res[target] ?? {
-          id: target,
-          title: groupTitle,
-          options: [],
-        };
-
-        group.options.push({
-          value: filter.id,
-          title: filter.field.title,
-          original: filter,
-          disabled: filter.field.disabled,
-        });
-
-        return { ...res, [target]: group };
-      }, {}),
-    [currentView.availableFilters],
-  );
-
   return (
     <div className={cn("filters").mod({ sidebar: sidebarEnabled }).toClassName()}>
       <div className={cn("filters").elem("list").mod({ withFilters: !!filters.length }).toClassName()}>
@@ -60,8 +27,7 @@ export const Filters = injector(({ views, currentView, filters }) => {
               sidebar={sidebarEnabled}
               value={filter.currentValue}
               key={`${filter.filter.id}-${i}`}
-              availableFilters={Object.values(fields)}
-              dropdownClassName={cn("filters").elem("selector").toClassName()}
+              availableFilters={currentView.availableFilters}
             />
           ))
         ) : (
