@@ -2,54 +2,78 @@ name: Check for broken links
 
 on:
   pull_request:
-    branches: ["develop"]
-    types: [synchronize, opened]
+    branches: [ "develop" ]
+    types: [ synchronize, opened ]
     paths:
       - "docs/**"
       - ".github/workflows/link-check.yml"
   workflow_dispatch:
 
 jobs:
-  wait_for_netlify:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Wait for Netlify deploy preview to complete
-        run: echo "Netlify deploy preview has passed"
-        if: ${{ contains(github.event.pull_request.head.repo.status.contexts, 'netlify') }}
-
   check_links:
     runs-on: ubuntu-latest
-    needs: wait_for_netlify
+    env:
+      DEPLOY_PREVIEW_LS: https://deploy-preview-${{ github.event.pull_request.number }}--label-studio-docs-new-theme.netlify.app
+      DEPLOY_PREVIEW_HS: https://deploy-preview-${{ github.event.pull_request.number }}--heartex-docs.netlify.app
     steps:
       - name: Checkout code
         uses: actions/checkout@v6
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v6
-        with:
-          node-version: "20"
+      - name: Install linkchecker
+        run: pip install linkchecker
 
-      - name: Install dependencies
-        run: npm install broken-link-checker
-
-      - name: Run broken-link-checker and fail on broken links for Label Studio Docs
+      - name: Wait for Netlify to deploy current commit
+        env:
+          GH_TOKEN: "${{ github.token }}"
+          SHA: "${{ github.event.pull_request.head.sha }}"
         run: |
-          npx blc https://deploy-preview-${{ github.event.pull_request.number }}--label-studio-docs-new-theme.netlify.app -roef --exclude "/api" --filter-level 0
-          exit_code=$?  # Capture the exit code
-          echo "Exit code: $exit_code"  # Print the exit code
-
-          if [ $exit_code -ne 0 ]; then
-            echo "Broken links found!"
+          echo "Waiting for Netlify deploy on commit $SHA ..."
+          for i in $(seq 1 60); do
+            netlify_state=$(gh api "repos/${{ github.repository }}/commits/$SHA/status" \
+              --jq '.statuses[] | select(.context | test("netlify"; "i")) | .state' 2>/dev/null | head -1)
+            if [ "$netlify_state" = "success" ]; then
+              echo "Netlify deploy succeeded after $((i * 10))s"
+              break
+            fi
+            echo "  Attempt $i: state=$netlify_state, retrying in 10s..."
+            sleep 10
+          done
+          if [ "$netlify_state" != "success" ]; then
+            echo "Netlify deploy not ready after 10 minutes"
             exit 1
           fi
 
-      - name: Run broken-link-checker and fail on broken links for Human Signal Docs
+      - name: Create linkchecker config
         run: |
-          npx blc https://deploy-preview-${{ github.event.pull_request.number }}--heartex-docs.netlify.app -roef --exclude "/api" --filter-level 0
-          exit_code=$?  # Capture the exit code
-          echo "Exit code: $exit_code"  # Print the exit code
+          cat > /tmp/linkcheckerrc <<'LCEOF'
+          [filtering]
+          ignorewarnings=http-redirected
+          LCEOF
 
-          if [ $exit_code -ne 0 ]; then
-            echo "Broken links found!"
-            exit 1
-          fi
+      - name: Check links for Label Studio Docs
+        run: |
+          linkchecker \
+            -f /tmp/linkcheckerrc \
+            --threads 1 \
+            --timeout 60 \
+            --no-status \
+            --no-robots \
+            --ignore-url="/api" \
+            --ignore-url="^mailto:" \
+            --ignore-url="^javascript:" \
+            --ignore-url="\.(png|jpg|jpeg|gif|svg|ico|webp|mp4|webm|ogg|pdf|zip|gz|css|js|woff2?|ttf|eot)$" \
+            "$DEPLOY_PREVIEW_LS"
+
+      - name: Check links for Human Signal Docs
+        run: |
+          linkchecker \
+            -f /tmp/linkcheckerrc \
+            --threads 1 \
+            --timeout 60 \
+            --no-status \
+            --no-robots \
+            --ignore-url="/api" \
+            --ignore-url="^mailto:" \
+            --ignore-url="^javascript:" \
+            --ignore-url="\.(png|jpg|jpeg|gif|svg|ico|webp|mp4|webm|ogg|pdf|zip|gz|css|js|woff2?|ttf|eot)$" \
+            "$DEPLOY_PREVIEW_HS"
