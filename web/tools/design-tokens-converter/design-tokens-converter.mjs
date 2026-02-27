@@ -445,8 +445,7 @@ function processTokenCollection(collectionKey, subCollectionKey) {
         // they are not valid CSS font-weight. Use --font-style-normal / --font-style-italic instead.
         const isFontWeightItalicVariant =
           subCollectionKey === "font-weight" &&
-          (name.endsWith("-italic") ||
-            (!isNumber && typeof value === "string" && !value.startsWith("{")));
+          (name.endsWith("-italic") || (!isNumber && typeof value === "string" && !value.startsWith("{")));
         if (isFontWeightItalicVariant) {
           continue;
         }
