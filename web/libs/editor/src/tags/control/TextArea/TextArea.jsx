@@ -6,6 +6,7 @@ import { destroy, isAlive, types } from "mobx-state-tree";
 import { IconPlus } from "@humansignal/icons";
 
 import InfoModal from "../../../components/Infomodal/Infomodal";
+import { MarkdownEditor } from "../../../components/MarkdownEditor/MarkdownEditor";
 import Registry from "../../../core/Registry";
 import Tree from "../../../core/Tree";
 import Types from "../../../core/Types";
@@ -75,7 +76,8 @@ const { TextArea } = Input;
  * @param {boolean=} [showSubmitButton]    - Determine whether to show or hide the **Add** button. By default it's hidden if `rows="1"`, and it's visible if there are more than 1 row
  * @param {boolean} [perRegion]            - Use this tag to label regions instead of whole objects
  * @param {boolean} [perItem]              - Use this tag to label items inside objects instead of whole objects
- */
+ * @param {boolean=} [markdown=false]      - Enable Markdown editor mode with syntax highlighting and preview 
+*/
 const TagAttrs = types.model({
   toname: types.maybeNull(types.string),
   allowsubmit: types.optional(types.boolean, true),
@@ -88,6 +90,7 @@ const TagAttrs = types.model({
   editable: types.optional(types.boolean, false),
   transcription: false,
   skipduplicates: types.optional(types.boolean, false),
+  markdown: types.optional(types.boolean, false),
 });
 
 const Model = types
@@ -414,7 +417,25 @@ const HtxTextArea = observer(({ item }) => {
           data-testid="textarea-form"
         >
           <Form.Item style={itemStyle}>
-            {rows === 1 ? (
+            {item.markdown ? (
+              <MarkdownEditor
+                value={item._value}
+                onChange={(value) => {
+                  if (!item.annotation.isReadOnly()) {
+                    item.setValue(value);
+                  }
+                }}
+                onSubmit={() => {
+                  if (item.allowsubmit && item._value && !item.annotation.isReadOnly()) {
+                    item.addText(item._value);
+                    item.setValue("");
+                  }
+                }}
+                placeholder={item.placeholder}
+                readOnly={item.isReadOnly()}
+                rows={rows}
+              />
+            ) : rows === 1 ? (
               <Input {...props} aria-label="TextArea Input" data-testid="textarea-input" />
             ) : (
               <TextArea {...props} aria-label="TextArea Input" data-testid="textarea-input" />
