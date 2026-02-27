@@ -18,11 +18,7 @@ import {
 describe("Control Tags - TextArea - Markdown Editor", () => {
   describe("TC-MD-001: Basic Rendering", () => {
     it("should render MarkdownEditor when markdown=true", () => {
-      LabelStudio.params()
-        .config(textareaConfigWithMarkdown)
-        .data(simpleData)
-        .withResult([])
-        .init();
+      LabelStudio.params().config(textareaConfigWithMarkdown).data(simpleData).withResult([]).init();
 
       // CodeMirror editor should exist (Markdown editor uses CodeMirror)
       Textarea.editor.should("exist");
@@ -32,11 +28,7 @@ describe("Control Tags - TextArea - Markdown Editor", () => {
     });
 
     it("should render MarkdownEditor with pre-filled value", () => {
-      LabelStudio.params()
-        .config(textareaConfigWithMarkdownAndValue)
-        .data(simpleData)
-        .withResult([])
-        .init();
+      LabelStudio.params().config(textareaConfigWithMarkdownAndValue).data(simpleData).withResult([]).init();
 
       // The editor should contain the pre-filled markdown value
       Textarea.editor.should("contain", "Bold");
@@ -46,11 +38,7 @@ describe("Control Tags - TextArea - Markdown Editor", () => {
 
   describe("TC-MD-002: Edit and Submit", () => {
     it("should allow typing markdown content and submit on Shift+Enter", () => {
-      LabelStudio.params()
-        .config(textareaConfigWithMarkdown)
-        .data(simpleData)
-        .withResult([])
-        .init();
+      LabelStudio.params().config(textareaConfigWithMarkdown).data(simpleData).withResult([]).init();
 
       // Type markdown content and submit with Shift+Enter
       Textarea.typeMarkdown("**Bold text**{shift+enter}");
@@ -66,11 +54,7 @@ describe("Control Tags - TextArea - Markdown Editor", () => {
     });
 
     it("should handle various markdown syntax", () => {
-      LabelStudio.params()
-        .config(textareaConfigWithMarkdown)
-        .data(simpleData)
-        .withResult([])
-        .init();
+      LabelStudio.params().config(textareaConfigWithMarkdown).data(simpleData).withResult([]).init();
 
       // Type various markdown syntax
       Textarea.typeMarkdown("# Heading{shift+enter}");
@@ -84,11 +68,7 @@ describe("Control Tags - TextArea - Markdown Editor", () => {
     });
 
     it("should add new text after submitting pre-filled value", () => {
-      LabelStudio.params()
-        .config(textareaConfigWithMarkdownAndValue)
-        .data(simpleData)
-        .withResult([])
-        .init();
+      LabelStudio.params().config(textareaConfigWithMarkdownAndValue).data(simpleData).withResult([]).init();
 
       // Submit pre-filled value with Shift+Enter
       Textarea.typeMarkdown("{shift+enter}");
@@ -103,11 +83,7 @@ describe("Control Tags - TextArea - Markdown Editor", () => {
 
   describe("TC-MD-003: Split View Mode", () => {
     beforeEach(() => {
-      LabelStudio.params()
-        .config(textareaConfigWithMarkdown)
-        .data(simpleData)
-        .withResult([])
-        .init();
+      LabelStudio.params().config(textareaConfigWithMarkdown).data(simpleData).withResult([]).init();
     });
 
     it("should toggle between Edit and Split modes", () => {
@@ -191,11 +167,7 @@ describe("Control Tags - TextArea - Markdown Editor", () => {
         },
       ];
 
-      LabelStudio.params()
-        .config(textareaConfigWithMarkdown)
-        .data(simpleData)
-        .withResult(multipleResults)
-        .init();
+      LabelStudio.params().config(textareaConfigWithMarkdown).data(simpleData).withResult(multipleResults).init();
 
       // All three entries should be visible
       Textarea.hasValue("First");
@@ -206,11 +178,7 @@ describe("Control Tags - TextArea - Markdown Editor", () => {
 
   describe("TC-MD-005: Serialization and Auto-submit", () => {
     it("should serialize markdown content with syntax preserved", () => {
-      LabelStudio.params()
-        .config(textareaConfigWithMarkdown)
-        .data(simpleData)
-        .withResult([])
-        .init();
+      LabelStudio.params().config(textareaConfigWithMarkdown).data(simpleData).withResult([]).init();
 
       // Type markdown content and submit with Shift+Enter
       Textarea.typeMarkdown("**Bold** *italic* text{shift+enter}");
@@ -222,11 +190,7 @@ describe("Control Tags - TextArea - Markdown Editor", () => {
     });
 
     it("should auto-submit on annotation submission", () => {
-      LabelStudio.params()
-        .config(textareaConfigWithMarkdown)
-        .data(simpleData)
-        .withResult([])
-        .init();
+      LabelStudio.params().config(textareaConfigWithMarkdown).data(simpleData).withResult([]).init();
 
       // Type text but don't press Enter
       Textarea.typeMarkdown("Auto-submit text");
@@ -264,11 +228,7 @@ describe("Control Tags - TextArea - Markdown Editor", () => {
 
   describe("TC-MD-006: Character and Word Count", () => {
     it("should display character and word counts", () => {
-      LabelStudio.params()
-        .config(textareaConfigWithMarkdown)
-        .data(simpleData)
-        .withResult([])
-        .init();
+      LabelStudio.params().config(textareaConfigWithMarkdown).data(simpleData).withResult([]).init();
 
       // Stats should exist
       Textarea.stats.should("exist");
@@ -286,11 +246,7 @@ describe("Control Tags - TextArea - Markdown Editor", () => {
     });
 
     it("should update counts in real-time", () => {
-      LabelStudio.params()
-        .config(textareaConfigWithMarkdown)
-        .data(simpleData)
-        .withResult([])
-        .init();
+      LabelStudio.params().config(textareaConfigWithMarkdown).data(simpleData).withResult([]).init();
 
       // Type a word
       Textarea.typeMarkdown("Test");

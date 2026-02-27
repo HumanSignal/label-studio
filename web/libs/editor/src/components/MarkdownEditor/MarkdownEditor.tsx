@@ -1,7 +1,7 @@
 import { type FC, useMemo, useState } from "react";
 import { Button } from "@humansignal/ui";
 import { Controlled as CodeMirrorControlled } from "react-codemirror2";
-import CodeMirror from "codemirror";
+import type CodeMirror from "codemirror";
 
 import "codemirror/mode/markdown/markdown";
 import "codemirror/addon/display/placeholder";
@@ -70,10 +70,7 @@ export const MarkdownEditor: FC<MarkdownEditorProps> = ({
   };
 
   return (
-    <div
-      className={styles.markdownEditor}
-      style={{ ["--markdown-editor-min-height" as any]: `${minHeight}px` }}
-    >
+    <div className={styles.markdownEditor} style={{ ["--markdown-editor-min-height" as any]: `${minHeight}px` }}>
       <div className={styles.markdownEditor__tabs}>
         <Button
           type="button"
@@ -102,11 +99,7 @@ export const MarkdownEditor: FC<MarkdownEditorProps> = ({
         {isSplitMode ? (
           <>
             <div className={styles.markdownEditor__editor}>
-              <CodeMirrorControlled
-                value={value}
-                options={codeMirrorOptions}
-                onBeforeChange={handleEditorChange}
-              />
+              <CodeMirrorControlled value={value} options={codeMirrorOptions} onBeforeChange={handleEditorChange} />
             </div>
             <div className={styles.markdownEditor__preview}>
               {value.trim() ? (
@@ -120,11 +113,7 @@ export const MarkdownEditor: FC<MarkdownEditorProps> = ({
           </>
         ) : (
           <div className={styles.markdownEditor__editor}>
-            <CodeMirrorControlled
-              value={value}
-              options={codeMirrorOptions}
-              onBeforeChange={handleEditorChange}
-            />
+            <CodeMirrorControlled value={value} options={codeMirrorOptions} onBeforeChange={handleEditorChange} />
           </div>
         )}
       </div>
