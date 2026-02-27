@@ -24,7 +24,6 @@ import { useAnnotationFetcher } from "../../hooks/useAnnotationQuery";
 // FIT-720: Virtualization constants for Compare view
 const PANEL_WIDTH = 500; // Width of each annotation panel (approximately 50% of typical viewport)
 const PANEL_GAP = 30; // Gap between panels (matches $gap in Grid.module.scss)
-const VIRTUALIZATION_THRESHOLD = 10; // Only virtualize if more than this many annotations
 
 /***** DON'T TRY THIS AT HOME *****/
 /*
@@ -345,7 +344,6 @@ const VirtualizedGrid = observer(({ store, annotations, root }) => {
 
     initialHydrationDone.current = true;
 
-    // Calculate how many panels fit in the viewport
     const visibleCount = Math.ceil(containerWidth / (panelWidth + PANEL_GAP)) + 1;
     const initialVisibleCount = Math.min(visibleCount, visibleAnnotations.length);
 
@@ -640,11 +638,10 @@ class GridClassComponent extends Component {
 
 // FIT-720: Grid wrapper that chooses virtualized or original based on FF and annotation count
 export default function Grid(props) {
-  const { annotations } = props;
-  const visibleCount = annotations.filter((c) => !c.hidden).length;
-
-  // FIT-720: Use virtualization when FF is enabled AND there are many annotations
-  const shouldVirtualize = isFF(FF_FIT_720_LAZY_LOAD_ANNOTATIONS) && visibleCount > VIRTUALIZATION_THRESHOLD;
+  // FIT-720: Use VirtualizedGrid when FF is on so stub hydration runs (fixes compare-all with
+  // 2 annotations where the second panel would never load in GridClassComponent).
+  // Virtualization (react-window) is still only a win when we have many annotations.
+  const shouldVirtualize = isFF(FF_FIT_720_LAZY_LOAD_ANNOTATIONS);
 
   if (shouldVirtualize) {
     return <VirtualizedGrid {...props} />;
