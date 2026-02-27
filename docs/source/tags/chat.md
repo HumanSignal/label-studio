@@ -223,3 +223,4 @@ See the following example:
 - [Chatbot Evaluation](/templates/chatbot)
 - [Red-Teaming in Chat](/templates/chat_red_team)
 - [Evaluate Production Conversations for RLHF](/templates/chat_rlhf)
+- [This page does not exist](/guide/this_page_does_not_exist)
