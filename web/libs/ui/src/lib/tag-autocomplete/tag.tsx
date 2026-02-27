@@ -1,6 +1,6 @@
 import { forwardRef, type KeyboardEvent, type MouseEvent } from "react";
 import { IconClose } from "@humansignal/icons";
-import { Badge } from "../../shad/components/ui/badge";
+import { Badge } from "@humansignal/ui";
 import { cnm } from "../../utils/utils";
 import styles from "./tag-autocomplete.module.scss";
 
@@ -36,8 +36,6 @@ export const Tag = forwardRef<HTMLDivElement, TagProps>(
     return (
       <Badge
         ref={ref}
-        variant="info"
-        shape="squared"
         tabIndex={disabled ? -1 : tabIndex}
         className={cnm(
           "gap-1 max-w-[150px] flex-shrink-0 group focus:ring-0 focus:ring-offset-0",

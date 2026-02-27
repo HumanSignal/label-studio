@@ -11,6 +11,7 @@
   transition: background-color 150ms ease-out, border-color 150ms ease-out, color 150ms ease-out;
   white-space: nowrap;
   border-radius: var(--corner-radius-smaller);
+  letter-spacing: var(--letter-spacing-base);
   
   // Base padding
   padding: 0 var(--spacing-tight);
@@ -20,6 +21,7 @@
   background: var(--color-neutral-surface);
   border-color: var(--color-neutral-border);
   color: var(--color-neutral-content);
+
 }
 
 // Shape variants
@@ -37,10 +39,15 @@
   padding: 0 var(--spacing-tighter);
   font-size: var(--font-size-label-smaller);
   height: 18px;
+  letter-spacing: var(--letter-spacing-wider);
 
-  .icon svg {
-    width: 12px;
-    height: 12px;
+  .icon {
+    margin-right: var(--spacing-tightest);
+
+    svg {
+      width: 12px;
+      height: 12px;
+    }
   }
 }
 

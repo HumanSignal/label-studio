@@ -1,7 +1,6 @@
 import { SampleDatasetSelect } from "@humansignal/app-common/blocks/SampleDatasetSelect/SampleDatasetSelect";
 import { ff, formatFileSize } from "@humansignal/core";
 import { IconCode, IconErrorAlt, IconFileUpload, IconInfoOutline, IconTrash, IconUpload } from "@humansignal/icons";
-import { Badge } from "@humansignal/shad/components/ui/badge";
 import { cn as scn } from "@humansignal/shad/utils";
 import { useAtomValue } from "jotai";
 import Input from "libs/datamanager/src/components/Common/Input/Input";
@@ -11,7 +10,7 @@ import { cn } from "../../../utils/bem";
 import { unique } from "../../../utils/helpers";
 import { sampleDatasetAtom } from "../utils/atoms";
 import "./Import.scss";
-import { Button, CodeBlock, SimpleCard, Spinner, Tooltip, Typography } from "@humansignal/ui";
+import { Button, CodeBlock, SimpleCard, Spinner, Tooltip, Typography, Badge } from "@humansignal/ui";
 import truncate from "truncate-middle";
 import samples from "./samples.json";
 import { importFiles } from "./utils";
@@ -535,9 +534,7 @@ export const ImportPage = ({
                           <td>
                             <div className="flex items-center gap-2">
                               {sample.title}
-                              <Badge variant="info" className="h-5 text-xs rounded-sm">
-                                Sample
-                              </Badge>
+                              <Badge>Sample</Badge>
                             </div>
                           </td>
                           <td>{sample.description}</td>
