@@ -1548,20 +1548,20 @@
               "figmaId": "VariableID:3139:42829",
               "modes": {
                 "light": "{@primitives.$color.$grape.900}",
-                "dark": "{@primitives.$color.$grape.300}"
+                "dark": "{@primitives.$color.$grape.200}"
               }
             }
           },
           "bold": {
             "$type": "color",
-            "$value": "{@primitives.$color.$grape.600}",
+            "$value": "{@primitives.$color.$grape.700}",
             "$description": "",
             "$variable_metadata": {
               "name": "color/accent/grape/bold",
               "figmaId": "VariableID:3131:41217",
               "modes": {
-                "light": "{@primitives.$color.$grape.600}",
-                "dark": "{@primitives.$color.$grape.500}"
+                "light": "{@primitives.$color.$grape.700}",
+                "dark": "{@primitives.$color.$grape.400}"
               }
             }
           },
@@ -1580,10 +1580,23 @@
           },
           "subtle": {
             "$type": "color",
-            "$value": "{@primitives.$color.$grape.100}",
+            "$value": "{@primitives.$color.$grape.200}",
             "$description": "",
             "$variable_metadata": {
               "name": "color/accent/grape/subtle",
+              "figmaId": "VariableID:5091:536",
+              "modes": {
+                "light": "{@primitives.$color.$grape.200}",
+                "dark": "{@primitives.$color.$grape.800}"
+              }
+            }
+          },
+          "subtler": {
+            "$type": "color",
+            "$value": "{@primitives.$color.$grape.100}",
+            "$description": "",
+            "$variable_metadata": {
+              "name": "color/accent/grape/subtler",
               "figmaId": "VariableID:3227:25844",
               "modes": {
                 "light": "{@primitives.$color.$grape.100}",
@@ -1615,20 +1628,20 @@
               "figmaId": "VariableID:3216:2612",
               "modes": {
                 "light": "{@primitives.$color.$blueberry.900}",
-                "dark": "{@primitives.$color.$blueberry.300}"
+                "dark": "{@primitives.$color.$blueberry.200}"
               }
             }
           },
           "bold": {
             "$type": "color",
-            "$value": "{@primitives.$color.$blueberry.600}",
+            "$value": "{@primitives.$color.$blueberry.700}",
             "$description": "",
             "$variable_metadata": {
               "name": "color/accent/blueberry/bold",
               "figmaId": "VariableID:3216:2613",
               "modes": {
-                "light": "{@primitives.$color.$blueberry.600}",
-                "dark": "{@primitives.$color.$blueberry.500}"
+                "light": "{@primitives.$color.$blueberry.700}",
+                "dark": "{@primitives.$color.$blueberry.400}"
               }
             }
           },
@@ -1647,10 +1660,23 @@
           },
           "subtle": {
             "$type": "color",
-            "$value": "{@primitives.$color.$blueberry.100}",
+            "$value": "{@primitives.$color.$blueberry.200}",
             "$description": "",
             "$variable_metadata": {
               "name": "color/accent/blueberry/subtle",
+              "figmaId": "VariableID:5091:537",
+              "modes": {
+                "light": "{@primitives.$color.$blueberry.200}",
+                "dark": "{@primitives.$color.$blueberry.800}"
+              }
+            }
+          },
+          "subtler": {
+            "$type": "color",
+            "$value": "{@primitives.$color.$blueberry.100}",
+            "$description": "",
+            "$variable_metadata": {
+              "name": "color/accent/blueberry/subtler",
               "figmaId": "VariableID:3227:25843",
               "modes": {
                 "light": "{@primitives.$color.$blueberry.100}",
@@ -1682,20 +1708,20 @@
               "figmaId": "VariableID:3139:42832",
               "modes": {
                 "light": "{@primitives.$color.$kale.900}",
-                "dark": "{@primitives.$color.$kale.300}"
+                "dark": "{@primitives.$color.$kale.200}"
               }
             }
           },
           "bold": {
             "$type": "color",
-            "$value": "{@primitives.$color.$kale.600}",
+            "$value": "{@primitives.$color.$kale.700}",
             "$description": "",
             "$variable_metadata": {
               "name": "color/accent/kale/bold",
               "figmaId": "VariableID:3137:42582",
               "modes": {
-                "light": "{@primitives.$color.$kale.600}",
-                "dark": "{@primitives.$color.$kale.500}"
+                "light": "{@primitives.$color.$kale.700}",
+                "dark": "{@primitives.$color.$kale.400}"
               }
             }
           },
@@ -1714,10 +1740,23 @@
           },
           "subtle": {
             "$type": "color",
-            "$value": "{@primitives.$color.$kale.100}",
+            "$value": "{@primitives.$color.$kale.200}",
             "$description": "",
             "$variable_metadata": {
               "name": "color/accent/kale/subtle",
+              "figmaId": "VariableID:5091:538",
+              "modes": {
+                "light": "{@primitives.$color.$kale.200}",
+                "dark": "{@primitives.$color.$kale.800}"
+              }
+            }
+          },
+          "subtler": {
+            "$type": "color",
+            "$value": "{@primitives.$color.$kale.100}",
+            "$description": "",
+            "$variable_metadata": {
+              "name": "color/accent/kale/subtler",
               "figmaId": "VariableID:3227:25842",
               "modes": {
                 "light": "{@primitives.$color.$kale.100}",
@@ -1749,20 +1788,20 @@
               "figmaId": "VariableID:3207:27271",
               "modes": {
                 "light": "{@primitives.$color.$kiwi.900}",
-                "dark": "{@primitives.$color.$kiwi.300}"
+                "dark": "{@primitives.$color.$kiwi.200}"
               }
             }
           },
           "bold": {
             "$type": "color",
-            "$value": "{@primitives.$color.$kiwi.600}",
+            "$value": "{@primitives.$color.$kiwi.700}",
             "$description": "",
             "$variable_metadata": {
               "name": "color/accent/kiwi/bold",
               "figmaId": "VariableID:3207:27269",
               "modes": {
-                "light": "{@primitives.$color.$kiwi.600}",
-                "dark": "{@primitives.$color.$kiwi.500}"
+                "light": "{@primitives.$color.$kiwi.700}",
+                "dark": "{@primitives.$color.$kiwi.400}"
               }
             }
           },
@@ -1781,10 +1820,23 @@
           },
           "subtle": {
             "$type": "color",
-            "$value": "{@primitives.$color.$kiwi.100}",
+            "$value": "{@primitives.$color.$kiwi.200}",
             "$description": "",
             "$variable_metadata": {
               "name": "color/accent/kiwi/subtle",
+              "figmaId": "VariableID:5091:539",
+              "modes": {
+                "light": "{@primitives.$color.$kiwi.200}",
+                "dark": "{@primitives.$color.$kiwi.800}"
+              }
+            }
+          },
+          "subtler": {
+            "$type": "color",
+            "$value": "{@primitives.$color.$kiwi.100}",
+            "$description": "",
+            "$variable_metadata": {
+              "name": "color/accent/kiwi/subtler",
               "figmaId": "VariableID:3227:25841",
               "modes": {
                 "light": "{@primitives.$color.$kiwi.100}",
@@ -1816,20 +1868,20 @@
               "figmaId": "VariableID:3207:27275",
               "modes": {
                 "light": "{@primitives.$color.$mango.900}",
-                "dark": "{@primitives.$color.$mango.300}"
+                "dark": "{@primitives.$color.$mango.200}"
               }
             }
           },
           "bold": {
             "$type": "color",
-            "$value": "{@primitives.$color.$mango.600}",
+            "$value": "{@primitives.$color.$mango.700}",
             "$description": "",
             "$variable_metadata": {
               "name": "color/accent/mango/bold",
               "figmaId": "VariableID:3207:27272",
               "modes": {
-                "light": "{@primitives.$color.$mango.600}",
-                "dark": "{@primitives.$color.$mango.500}"
+                "light": "{@primitives.$color.$mango.700}",
+                "dark": "{@primitives.$color.$mango.400}"
               }
             }
           },
@@ -1848,10 +1900,23 @@
           },
           "subtle": {
             "$type": "color",
-            "$value": "{@primitives.$color.$mango.100}",
+            "$value": "{@primitives.$color.$mango.200}",
             "$description": "",
             "$variable_metadata": {
               "name": "color/accent/mango/subtle",
+              "figmaId": "VariableID:5091:540",
+              "modes": {
+                "light": "{@primitives.$color.$mango.200}",
+                "dark": "{@primitives.$color.$mango.800}"
+              }
+            }
+          },
+          "subtler": {
+            "$type": "color",
+            "$value": "{@primitives.$color.$mango.100}",
+            "$description": "",
+            "$variable_metadata": {
+              "name": "color/accent/mango/subtler",
               "figmaId": "VariableID:3227:25840",
               "modes": {
                 "light": "{@primitives.$color.$mango.100}",
@@ -1883,20 +1948,20 @@
               "figmaId": "VariableID:3139:42831",
               "modes": {
                 "light": "{@primitives.$color.$canteloupe.900}",
-                "dark": "{@primitives.$color.$canteloupe.300}"
+                "dark": "{@primitives.$color.$canteloupe.200}"
               }
             }
           },
           "bold": {
             "$type": "color",
-            "$value": "{@primitives.$color.$canteloupe.600}",
+            "$value": "{@primitives.$color.$canteloupe.700}",
             "$description": "",
             "$variable_metadata": {
               "name": "color/accent/canteloupe/bold",
               "figmaId": "VariableID:3137:42580",
               "modes": {
-                "light": "{@primitives.$color.$canteloupe.600}",
-                "dark": "{@primitives.$color.$canteloupe.500}"
+                "light": "{@primitives.$color.$canteloupe.700}",
+                "dark": "{@primitives.$color.$canteloupe.400}"
               }
             }
           },
@@ -1915,11 +1980,24 @@
           },
           "subtle": {
             "$type": "color",
-            "$value": "{@primitives.$color.$canteloupe.100}",
+            "$value": "{@primitives.$color.$canteloupe.200}",
             "$description": "",
             "$variable_metadata": {
               "name": "color/accent/canteloupe/subtle",
               "figmaId": "VariableID:3227:25839",
+              "modes": {
+                "light": "{@primitives.$color.$canteloupe.200}",
+                "dark": "{@primitives.$color.$canteloupe.800}"
+              }
+            }
+          },
+          "subtler": {
+            "$type": "color",
+            "$value": "{@primitives.$color.$canteloupe.100}",
+            "$description": "",
+            "$variable_metadata": {
+              "name": "color/accent/canteloupe/subtler",
+              "figmaId": "VariableID:5091:541",
               "modes": {
                 "light": "{@primitives.$color.$canteloupe.100}",
                 "dark": "{@primitives.$color.$canteloupe.900}"
@@ -1950,20 +2028,20 @@
               "figmaId": "VariableID:3139:42830",
               "modes": {
                 "light": "{@primitives.$color.$persimmon.900}",
-                "dark": "{@primitives.$color.$persimmon.300}"
+                "dark": "{@primitives.$color.$persimmon.200}"
               }
             }
           },
           "bold": {
             "$type": "color",
-            "$value": "{@primitives.$color.$persimmon.600}",
+            "$value": "{@primitives.$color.$persimmon.700}",
             "$description": "",
             "$variable_metadata": {
               "name": "color/accent/persimmon/bold",
               "figmaId": "VariableID:3137:42578",
               "modes": {
-                "light": "{@primitives.$color.$persimmon.600}",
-                "dark": "{@primitives.$color.$persimmon.500}"
+                "light": "{@primitives.$color.$persimmon.700}",
+                "dark": "{@primitives.$color.$persimmon.400}"
               }
             }
           },
@@ -1982,10 +2060,23 @@
           },
           "subtle": {
             "$type": "color",
-            "$value": "{@primitives.$color.$persimmon.100}",
+            "$value": "{@primitives.$color.$persimmon.200}",
             "$description": "",
             "$variable_metadata": {
               "name": "color/accent/persimmon/subtle",
+              "figmaId": "VariableID:5091:1735",
+              "modes": {
+                "light": "{@primitives.$color.$persimmon.200}",
+                "dark": "{@primitives.$color.$persimmon.800}"
+              }
+            }
+          },
+          "subtler": {
+            "$type": "color",
+            "$value": "{@primitives.$color.$persimmon.100}",
+            "$description": "",
+            "$variable_metadata": {
+              "name": "color/accent/persimmon/subtler",
               "figmaId": "VariableID:3227:25838",
               "modes": {
                 "light": "{@primitives.$color.$persimmon.100}",
@@ -2017,20 +2108,20 @@
               "figmaId": "VariableID:3139:42833",
               "modes": {
                 "light": "{@primitives.$color.$plum.900}",
-                "dark": "{@primitives.$color.$plum.300}"
+                "dark": "{@primitives.$color.$plum.200}"
               }
             }
           },
           "bold": {
             "$type": "color",
-            "$value": "{@primitives.$color.$plum.600}",
+            "$value": "{@primitives.$color.$plum.700}",
             "$description": "",
             "$variable_metadata": {
               "name": "color/accent/plum/bold",
               "figmaId": "VariableID:3137:42576",
               "modes": {
-                "light": "{@primitives.$color.$plum.600}",
-                "dark": "{@primitives.$color.$plum.500}"
+                "light": "{@primitives.$color.$plum.700}",
+                "dark": "{@primitives.$color.$plum.400}"
               }
             }
           },
@@ -2049,10 +2140,23 @@
           },
           "subtle": {
             "$type": "color",
-            "$value": "{@primitives.$color.$plum.100}",
+            "$value": "{@primitives.$color.$plum.200}",
             "$description": "",
             "$variable_metadata": {
               "name": "color/accent/plum/subtle",
+              "figmaId": "VariableID:5091:1736",
+              "modes": {
+                "light": "{@primitives.$color.$plum.200}",
+                "dark": "{@primitives.$color.$plum.800}"
+              }
+            }
+          },
+          "subtler": {
+            "$type": "color",
+            "$value": "{@primitives.$color.$plum.100}",
+            "$description": "",
+            "$variable_metadata": {
+              "name": "color/accent/plum/subtler",
               "figmaId": "VariableID:3227:25837",
               "modes": {
                 "light": "{@primitives.$color.$plum.100}",
@@ -2084,20 +2188,20 @@
               "figmaId": "VariableID:3207:27278",
               "modes": {
                 "light": "{@primitives.$color.$fig.900}",
-                "dark": "{@primitives.$color.$fig.300}"
+                "dark": "{@primitives.$color.$fig.200}"
               }
             }
           },
           "bold": {
             "$type": "color",
-            "$value": "{@primitives.$color.$fig.600}",
+            "$value": "{@primitives.$color.$fig.700}",
             "$description": "",
             "$variable_metadata": {
               "name": "color/accent/fig/bold",
               "figmaId": "VariableID:3207:27276",
               "modes": {
-                "light": "{@primitives.$color.$fig.600}",
-                "dark": "{@primitives.$color.$fig.500}"
+                "light": "{@primitives.$color.$fig.700}",
+                "dark": "{@primitives.$color.$fig.400}"
               }
             }
           },
@@ -2116,10 +2220,23 @@
           },
           "subtle": {
             "$type": "color",
-            "$value": "{@primitives.$color.$fig.100}",
+            "$value": "{@primitives.$color.$fig.200}",
             "$description": "",
             "$variable_metadata": {
               "name": "color/accent/fig/subtle",
+              "figmaId": "VariableID:5091:1737",
+              "modes": {
+                "light": "{@primitives.$color.$fig.200}",
+                "dark": "{@primitives.$color.$fig.800}"
+              }
+            }
+          },
+          "subtler": {
+            "$type": "color",
+            "$value": "{@primitives.$color.$fig.100}",
+            "$description": "",
+            "$variable_metadata": {
+              "name": "color/accent/fig/subtler",
               "figmaId": "VariableID:3227:25836",
               "modes": {
                 "light": "{@primitives.$color.$fig.100}",
@@ -2151,20 +2268,20 @@
               "figmaId": "VariableID:3333:43247",
               "modes": {
                 "light": "{@primitives.$color.$sand.900}",
-                "dark": "{@primitives.$color.$sand.300}"
+                "dark": "{@primitives.$color.$sand.200}"
               }
             }
           },
           "bold": {
             "$type": "color",
-            "$value": "{@primitives.$color.$sand.600}",
+            "$value": "{@primitives.$color.$sand.700}",
             "$description": "",
             "$variable_metadata": {
               "name": "color/accent/sand/bold",
               "figmaId": "VariableID:3333:43248",
               "modes": {
-                "light": "{@primitives.$color.$sand.600}",
-                "dark": "{@primitives.$color.$sand.500}"
+                "light": "{@primitives.$color.$sand.700}",
+                "dark": "{@primitives.$color.$sand.400}"
               }
             }
           },
@@ -2183,14 +2300,27 @@
           },
           "subtle": {
             "$type": "color",
-            "$value": "{@primitives.$color.$sand.100}",
+            "$value": "{@primitives.$color.$sand.300}",
             "$description": "",
             "$variable_metadata": {
               "name": "color/accent/sand/subtle",
               "figmaId": "VariableID:3333:43249",
               "modes": {
+                "light": "{@primitives.$color.$sand.300}",
+                "dark": "{@primitives.$color.$sand.700}"
+              }
+            }
+          },
+          "subtler": {
+            "$type": "color",
+            "$value": "{@primitives.$color.$sand.100}",
+            "$description": "",
+            "$variable_metadata": {
+              "name": "color/accent/sand/subtler",
+              "figmaId": "VariableID:5091:1738",
+              "modes": {
                 "light": "{@primitives.$color.$sand.100}",
-                "dark": "{@primitives.$color.$sand.900}"
+                "dark": "{@primitives.$color.$sand.800}"
               }
             }
           },
@@ -5720,6 +5850,92 @@
         }
       }
     },
+    "$letter-spacing": {
+      "densest": {
+        "$type": "number",
+        "$value": "{@primitives.$typography.$letter-spacing.-20}",
+        "$description": "",
+        "$variable_metadata": {
+          "name": "letter-spacing/densest",
+          "figmaId": "VariableID:3139:42815",
+          "modes": {
+            "default": "{@primitives.$typography.$letter-spacing.-20}"
+          }
+        }
+      },
+      "denser": {
+        "$type": "number",
+        "$value": "{@primitives.$typography.$letter-spacing.-15}",
+        "$description": "",
+        "$variable_metadata": {
+          "name": "letter-spacing/denser",
+          "figmaId": "VariableID:3139:42817",
+          "modes": {
+            "default": "{@primitives.$typography.$letter-spacing.-15}"
+          }
+        }
+      },
+      "dense": {
+        "$type": "number",
+        "$value": "{@primitives.$typography.$letter-spacing.-10}",
+        "$description": "",
+        "$variable_metadata": {
+          "name": "letter-spacing/dense",
+          "figmaId": "VariableID:3139:42818",
+          "modes": {
+            "default": "{@primitives.$typography.$letter-spacing.-10}"
+          }
+        }
+      },
+      "base": {
+        "$type": "number",
+        "$value": "{@primitives.$typography.$letter-spacing.0}",
+        "$description": "",
+        "$variable_metadata": {
+          "name": "letter-spacing/base",
+          "figmaId": "VariableID:3139:42819",
+          "modes": {
+            "default": "{@primitives.$typography.$letter-spacing.0}"
+          }
+        }
+      },
+      "wide": {
+        "$type": "number",
+        "$value": "{@primitives.$typography.$letter-spacing.15}",
+        "$description": "",
+        "$variable_metadata": {
+          "name": "letter-spacing/wide",
+          "figmaId": "VariableID:3139:42820",
+          "modes": {
+            "default": "{@primitives.$typography.$letter-spacing.15}"
+          }
+        }
+      },
+      "wider": {
+        "$type": "number",
+        "$value": "{@primitives.$typography.$letter-spacing.25}",
+        "$description": "",
+        "$variable_metadata": {
+          "name": "letter-spacing/wider",
+          "figmaId": "VariableID:3139:42821",
+          "modes": {
+            "default": "{@primitives.$typography.$letter-spacing.25}"
+          }
+        }
+      },
+      "widest": {
+        "$type": "number",
+        "$value": "{@primitives.$typography.$letter-spacing.50}",
+        "$description": "",
+        "$variable_metadata": {
+          "name": "letter-spacing/widest",
+          "figmaId": "VariableID:3139:42822",
+          "modes": {
+            "default": "{@primitives.$typography.$letter-spacing.50}"
+          }
+        }
+      }
+    },
     "$paragraph-spacing": {
       "none": {
         "$type": "number",
@@ -5814,92 +6030,6 @@
           "figmaId": "VariableID:3141:42836",
           "modes": {
             "default": "{@sizing.$spacing.widest}"
-          }
-        }
-      }
-    },
-    "$letter-spacing": {
-      "densest": {
-        "$type": "number",
-        "$value": "{@primitives.$typography.$letter-spacing.-20}",
-        "$description": "",
-        "$variable_metadata": {
-          "name": "letter-spacing/densest",
-          "figmaId": "VariableID:3139:42815",
-          "modes": {
-            "default": "{@primitives.$typography.$letter-spacing.-20}"
-          }
-        }
-      },
-      "denser": {
-        "$type": "number",
-        "$value": "{@primitives.$typography.$letter-spacing.-15}",
-        "$description": "",
-        "$variable_metadata": {
-          "name": "letter-spacing/denser",
-          "figmaId": "VariableID:3139:42817",
-          "modes": {
-            "default": "{@primitives.$typography.$letter-spacing.-15}"
-          }
-        }
-      },
-      "dense": {
-        "$type": "number",
-        "$value": "{@primitives.$typography.$letter-spacing.-10}",
-        "$description": "",
-        "$variable_metadata": {
-          "name": "letter-spacing/dense",
-          "figmaId": "VariableID:3139:42818",
-          "modes": {
-            "default": "{@primitives.$typography.$letter-spacing.-10}"
-          }
-        }
-      },
-      "base": {
-        "$type": "number",
-        "$value": "{@primitives.$typography.$letter-spacing.0}",
-        "$description": "",
-        "$variable_metadata": {
-          "name": "letter-spacing/base",
-          "figmaId": "VariableID:3139:42819",
-          "modes": {
-            "default": "{@primitives.$typography.$letter-spacing.0}"
-          }
-        }
-      },
-      "wide": {
-        "$type": "number",
-        "$value": "{@primitives.$typography.$letter-spacing.15}",
-        "$description": "",
-        "$variable_metadata": {
-          "name": "letter-spacing/wide",
-          "figmaId": "VariableID:3139:42820",
-          "modes": {
-            "default": "{@primitives.$typography.$letter-spacing.15}"
-          }
-        }
-      },
-      "wider": {
-        "$type": "number",
-        "$value": "{@primitives.$typography.$letter-spacing.25}",
-        "$description": "",
-        "$variable_metadata": {
-          "name": "letter-spacing/wider",
-          "figmaId": "VariableID:3139:42821",
-          "modes": {
-            "default": "{@primitives.$typography.$letter-spacing.25}"
-          }
-        }
-      },
-      "widest": {
-        "$type": "number",
-        "$value": "{@primitives.$typography.$letter-spacing.50}",
-        "$description": "",
-        "$variable_metadata": {
-          "name": "letter-spacing/widest",
-          "figmaId": "VariableID:3139:42822",
-          "modes": {
-            "default": "{@primitives.$typography.$letter-spacing.50}"
           }
         }
       }

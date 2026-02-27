@@ -253,7 +253,7 @@ describe("Grid", () => {
     expect(screen.getByLabelText("Move right")).toBeInTheDocument();
   });
 
-  it("renders GridClassComponent when FIT_720 on but annotations <= 10 (line 645)", () => {
+  it("renders VirtualizedGrid when FIT_720 on (including compare-all with few annotations)", () => {
     mockIsFF.mockImplementation((flag) => flag === FF_DEV_3391 || flag === FF_FIT_720_LAZY_LOAD_ANNOTATIONS);
     const annotations = Array.from({ length: 5 }, (_, i) => createAnnotation({ id: `a${i}`, pk: i + 1 }));
     const store = createStore({ selected: { selected: annotations[0] } });

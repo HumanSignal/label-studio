@@ -55,6 +55,7 @@ export interface StateMetadata {
 /**
  * Tailwind CSS classes for each state type.
  * Using semantic design tokens for maintainable theming.
+ * @deprecated Prefer getStateVariant() and Badge variant prop for new code.
  */
 const STATE_TYPE_STYLES: Record<StateType, string> = {
   [StateType.INITIAL]: "bg-neutral-emphasis border-neutral-border text-neutral-content",
@@ -62,6 +63,17 @@ const STATE_TYPE_STYLES: Record<StateType, string> = {
   [StateType.ATTENTION]: "bg-warning-emphasis border-warning-border-subtlest text-warning-content",
   [StateType.VERIFICATION]: "bg-accent-plum-subtle border-accent-plum-subtle text-accent-plum-bold",
   [StateType.TERMINAL]: "bg-positive-emphasis border-positive-border-subtlest text-positive-content",
+};
+
+/**
+ * Badge variant for each state type (for use with @humansignal/ui Badge).
+ */
+const STATE_TYPE_VARIANTS: Record<StateType, string> = {
+  [StateType.INITIAL]: "sand",
+  [StateType.IN_PROGRESS]: "grape",
+  [StateType.ATTENTION]: "canteloupe",
+  [StateType.VERIFICATION]: "plum",
+  [StateType.TERMINAL]: "kale",
 };
 
 /**
@@ -153,10 +165,23 @@ class StateRegistry {
    *
    * @param state - State constant
    * @returns Space-separated Tailwind class names
+   * @deprecated Prefer getStateVariant() and Badge variant prop.
    */
   getStyleClasses(state: string): string {
     const stateType = this.getType(state);
     return STATE_TYPE_STYLES[stateType];
+  }
+
+  /**
+   * Get the Badge variant for a state's visual styling.
+   * Use this with StateChip / Badge variant prop instead of className.
+   *
+   * @param state - State constant
+   * @returns Badge variant string (e.g. "sand", "grape", "canteloupe", "kale", "plum")
+   */
+  getVariant(state: string): string {
+    const stateType = this.getType(state);
+    return STATE_TYPE_VARIANTS[stateType];
   }
 
   /**
@@ -287,9 +312,20 @@ stateRegistry.registerBatch({
  *
  * @param state - State constant (e.g., 'CREATED', 'IN_PROGRESS')
  * @returns Space-separated Tailwind class names
+ * @deprecated Prefer getStateVariant() and Badge variant prop.
  */
 export function getStateColorClass(state: string): string {
   return stateRegistry.getStyleClasses(state);
+}
+
+/**
+ * Get the Badge variant for a state (for use with StateChip / Badge).
+ *
+ * @param state - State constant (e.g., 'CREATED', 'COMPLETED')
+ * @returns Badge variant string
+ */
+export function getStateVariant(state: string): string {
+  return stateRegistry.getVariant(state);
 }
 
 /**

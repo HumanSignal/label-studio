@@ -1,8 +1,7 @@
 import { observer } from "mobx-react";
 import { cn } from "../../../utils/bem";
-import { Button, EnterpriseBadge } from "@humansignal/ui";
+import { Button, Badge, EnterpriseBadge } from "@humansignal/ui";
 import { IconClose } from "@humansignal/icons";
-import { Tag } from "../../Common/Tag/Tag";
 import { FilterDropdown } from "../FilterDropdown";
 import "./FilterLine.scss";
 import { FilterOperation } from "./FilterOperation";
@@ -60,11 +59,11 @@ export const FilterLine = observer(({ filter, availableFilters, index, view, sid
                   style={{ display: "flex", alignItems: "center", gap: "8px" }}
                 >
                   <span>{filter.field.title}</span>
-                  {showEnterpriseBadge && <EnterpriseBadge ghost />}
+                  {showEnterpriseBadge && <EnterpriseBadge style="ghost" />}
                   {filter.field.parent && (
-                    <Tag size="small" className="filters-data-tag" color="#1d91e4" style={{ marginLeft: 7 }}>
+                    <Badge size="small" className="ml-tightest">
                       {filter.field.parent.title}
-                    </Tag>
+                    </Badge>
                   )}
                 </div>
               );
@@ -180,11 +179,11 @@ export const FilterLine = observer(({ filter, availableFilters, index, view, sid
                 style={{ display: "flex", alignItems: "center", gap: "8px" }}
               >
                 <span>{filter.field.title}</span>
-                {showEnterpriseBadge && <EnterpriseBadge ghost />}
+                {showEnterpriseBadge && <EnterpriseBadge style="ghost" />}
                 {filter.field.parent && (
-                  <Tag size="small" className="filters-data-tag" color="#1d91e4" style={{ marginLeft: 7 }}>
+                  <Badge size="small" className="ml-tightest">
                     {filter.field.parent.title}
-                  </Tag>
+                  </Badge>
                 )}
               </div>
             );

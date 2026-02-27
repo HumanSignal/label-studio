@@ -30,7 +30,9 @@ export const accountSettingsSections = (settings: AuthTokenSettings, permissions
       title: (
         <div className="flex items-center gap-tight">
           <span>Hotkeys</span>
-          <Badge variant="beta">Beta</Badge>
+          <Badge variant="beta" style="solid" shape="rounded">
+            Beta
+          </Badge>
         </div>
       ),
       id: "hotkeys",

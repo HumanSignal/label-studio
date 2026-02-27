@@ -4,7 +4,7 @@
 
 import { useState } from "react";
 import { StateChip } from "@humansignal/ui";
-import { getStateColorClass, formatStateName, getStateDescription } from "./utils";
+import { formatStateName, getStateDescription, getStateVariant } from "./utils";
 import { StateHistoryPopoverContent } from "./state-history-popover-content";
 
 export interface ProjectStateChipProps {
@@ -35,7 +35,7 @@ export function ProjectStateChip({ state, projectId, interactive = true, descrip
 
   const label = formatStateName(state);
   const defaultDescription = getStateDescription(state, "project");
-  const colorClasses = getStateColorClass(state);
+  const variant = getStateVariant(state);
 
   const popoverContent = projectId ? (
     <StateHistoryPopoverContent
@@ -50,7 +50,7 @@ export function ProjectStateChip({ state, projectId, interactive = true, descrip
     <StateChip
       label={label}
       description={description ?? defaultDescription}
-      className={colorClasses}
+      variant={variant}
       interactive={interactive && !!projectId}
       popoverContent={popoverContent}
       open={open}

@@ -1,6 +1,5 @@
 import { forwardRef, useRef, useEffect, useState } from "react";
-import { Badge } from "../badge/badge";
-import type { BadgeProps } from "../../shadcn";
+import { Badge, type BadgeProps } from "../badge/badge";
 import { useBadgeOverflow } from "./useBadgeOverflow";
 import styles from "./badge-group.module.scss";
 import clsx from "clsx";
@@ -13,10 +12,14 @@ export interface BadgeGroupItem {
 export interface BadgeGroupProps {
   /** Array of items to display as badges */
   items: BadgeGroupItem[];
-  /** Badge variant (default: "info") */
+  /** Badge variant (default: "primary") */
   variant?: BadgeProps["variant"];
-  /** Badge shape (default: "squared") */
+  /** Badge shape (default: "square") */
   shape?: BadgeProps["shape"];
+  /** Badge style (default: "filled") */
+  style?: BadgeProps["style"];
+  /** Badge size (default: "medium") */
+  size?: BadgeProps["size"];
   /** Additional CSS class for the container */
   className?: string;
   /** Test ID for testing */
@@ -38,13 +41,25 @@ export interface BadgeGroupProps {
  *     { id: 1, label: "Tag 1" },
  *     { id: 2, label: "Tag 2" }
  *   ]}
- *   variant="info"
- *   shape="squared"
+ *   variant="primary"
+ *   shape="square"
  * />
  * ```
  */
 export const BadgeGroup = forwardRef<HTMLDivElement, BadgeGroupProps>(
-  ({ items, variant = "info", shape = "squared", className, "data-testid": dataTestId, truncate = true }, ref) => {
+  (
+    {
+      items,
+      variant = "primary",
+      shape = "square",
+      style,
+      size,
+      className,
+      "data-testid": dataTestId,
+      truncate = true,
+    },
+    ref,
+  ) => {
     const containerRef = useRef<HTMLDivElement>(null);
     const mergedRef = ref || containerRef;
     const [recalcTrigger, setRecalcTrigger] = useState(0);
@@ -83,7 +98,9 @@ export const BadgeGroup = forwardRef<HTMLDivElement, BadgeGroupProps>(
               key={item.id}
               variant={variant}
               shape={shape}
-              style={shouldHide ? { visibility: "hidden", position: "absolute" } : undefined}
+              style={style}
+              size={size}
+              className={shouldHide ? "invisible absolute" : undefined}
             >
               {item.label}
             </Badge>
@@ -91,7 +108,7 @@ export const BadgeGroup = forwardRef<HTMLDivElement, BadgeGroupProps>(
         })}
         {/* Show +n badge if truncate is enabled and there are hidden badges */}
         {truncate && visibleBadgeCount !== null && visibleBadgeCount < items.length && (
-          <Badge variant={variant} shape={shape} data-overflow-badge="true">
+          <Badge variant={variant} shape={shape} style={style} size={size} data-overflow-badge="true">
             +{items.length - visibleBadgeCount}
           </Badge>
         )}

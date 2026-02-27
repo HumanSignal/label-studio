@@ -1,5 +1,5 @@
 import { IconQuestionOutline } from "@humansignal/icons";
-import { Tooltip, EnterpriseBadge } from "@humansignal/ui";
+import { Tooltip, Badge, EnterpriseBadge } from "@humansignal/ui";
 import { inject } from "mobx-react";
 import { getRoot } from "mobx-state-tree";
 import { useCallback, useMemo } from "react";
@@ -10,7 +10,6 @@ import * as CellViews from "../../CellViews";
 import { Icon } from "../../Common/Icon/Icon";
 import { Spinner } from "../../Common/Spinner";
 import { Table } from "../../Common/Table/Table";
-import { Tag } from "../../Common/Tag/Tag";
 import { GridView } from "../GridView/GridView";
 import "./Table.scss";
 import { Button } from "@humansignal/ui";
@@ -124,41 +123,22 @@ export const DataView = injector(
 
       if (parent) {
         children.push(
-          <Tag
-            key="column-type"
-            color="blue"
-            style={{
-              fontWeight: "500",
-              fontSize: 14,
-              cursor: "pointer",
-              width: 45,
-              padding: 0,
-            }}
-          >
+          <Badge key="column-type" size="small">
             {original?.readableType ?? parent.title}
-          </Tag>,
+          </Badge>,
         );
       } else if (typeof original?.alias === "string" && original.alias.startsWith("dimension_agreement__")) {
         // Show a short tag for per-dimension agreement columns (root columns, no parent)
         children.push(
-          <Tag
-            key="column-type"
-            color="blue"
-            style={{
-              fontWeight: "500",
-              fontSize: 14,
-              cursor: "pointer",
-              padding: "0 6px",
-            }}
-          >
+          <Badge key="column-type" size="small">
             {original.readableType}
-          </Tag>,
+          </Badge>,
         );
       }
 
-      // Add EnterpriseBadge when enterprise badge is set
+      // Add Badge when enterprise badge is set
       if (original.enterprise_badge) {
-        children.push(<EnterpriseBadge key="enterprise-badge" className="ml-2" compact />);
+        children.push(<EnterpriseBadge key="enterprise-badge" size="small" className="ml-tightest" children="" />);
       }
 
       if (help && decoration?.help !== false) {

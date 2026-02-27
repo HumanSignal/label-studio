@@ -7,7 +7,7 @@ import { Dropdown } from "@humansignal/ui";
 import { Menu } from "../../Menu/Menu";
 import { Resizer } from "../../Resizer/Resizer";
 import { Space } from "../../Space/Space";
-import { Tag } from "../../Tag/Tag";
+import { Badge } from "@humansignal/ui";
 import { TableCell, TableCellContent } from "../TableCell/TableCell";
 import { TableContext, tableCN } from "../TableContext";
 import { cn } from "../../../../utils/bem";
@@ -40,17 +40,7 @@ const DropdownWrapper = observer(({ column, cellViews, children, onChange }) => 
             return (
               <Menu.Item key={type} onClick={() => onChange?.(column, type)}>
                 <Space>
-                  <Tag
-                    size="small"
-                    style={{
-                      width: 45,
-                      textAlign: "center",
-                      cursor: "pointer",
-                      fontSize: 14,
-                    }}
-                  >
-                    {ViewColumnTypeShort(type)}
-                  </Tag>
+                  <Badge size="small">{ViewColumnTypeShort(type)}</Badge>
                   {ViewColumnTypeName(type)}
                 </Space>
               </Menu.Item>
