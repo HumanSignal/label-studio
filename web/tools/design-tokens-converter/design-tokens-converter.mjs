@@ -52,6 +52,42 @@ function convertToRem(value) {
   return `${remValue}rem`;
 }
 
+/** CSS generic font families that must not be quoted (per CSS spec) */
+const CSS_GENERIC_FONT_FAMILIES = new Set([
+  "serif",
+  "sans-serif",
+  "monospace",
+  "system-ui",
+  "ui-serif",
+  "ui-sans-serif",
+  "ui-monospace",
+  "ui-rounded",
+]);
+
+/**
+ * Format a comma-separated font-family value for CSS: specific font names get double quotes,
+ * generic/system fonts (e.g. monospace, sans-serif) stay unquoted.
+ * @param {string} value - Comma-separated font family list from design tokens
+ * @returns {string} - CSS-ready font-family value
+ */
+function formatFontFamilyForCss(value) {
+  if (typeof value !== "string" || !value.trim()) {
+    return value;
+  }
+  const parts = value
+    .split(",")
+    .map((s) => s.trim())
+    .filter(Boolean);
+  const formatted = parts.map((part) => {
+    const lower = part.toLowerCase();
+    if (CSS_GENERIC_FONT_FAMILIES.has(lower)) {
+      return part;
+    }
+    return `"${part}"`;
+  });
+  return formatted.join(", ");
+}
+
 /**
  * Process design variables and extract tokens
  * @param {Object} variables - The design variables object
@@ -253,9 +289,10 @@ function processPrimitiveTypography(typographyObj, result) {
         const name = key.replace("$", "");
         const value = typographyObj["$font-family"][key].$value;
         const cssVarName = `--font-family-${name}`;
+        const cssValue = formatFontFamilyForCss(value);
 
         // Add to CSS variables
-        result.cssVariables.light.push(`${cssVarName}: "${value}";`);
+        result.cssVariables.light.push(`${cssVarName}: ${cssValue};`);
 
         // Add to JavaScript tokens
         if (!result.jsTokens.typography.fontFamily) {
@@ -405,12 +442,24 @@ function processTokenCollection(collectionKey, subCollectionKey) {
           } else {
             // Otherwise, try to resolve the value normally
             resolvedValue = resolveReference(value, variables);
-            result.cssVariables.light.push(`${cssVarName}: ${isNumber ? convertToRem(resolvedValue) : resolvedValue};`);
+            const cssValue =
+              subCollectionKey === "font-family" && typeof resolvedValue === "string"
+                ? formatFontFamilyForCss(resolvedValue)
+                : isNumber
+                  ? convertToRem(resolvedValue)
+                  : resolvedValue;
+            result.cssVariables.light.push(`${cssVarName}: ${cssValue};`);
           }
         } else {
           // Not a reference, use directly
           resolvedValue = value;
-          result.cssVariables.light.push(`${cssVarName}: ${resolvedValue};`);
+          const cssValue =
+            subCollectionKey === "font-family" && typeof resolvedValue === "string"
+              ? formatFontFamilyForCss(resolvedValue)
+              : isNumber
+                ? convertToRem(resolvedValue)
+                : resolvedValue;
+          result.cssVariables.light.push(`${cssVarName}: ${cssValue};`);
         }
 
         // Add to JavaScript tokens
