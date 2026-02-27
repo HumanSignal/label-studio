@@ -9,17 +9,40 @@ meta_description: Configure persistent storage with Label Studio hosted in the c
 section: "Install & Setup"
 ---
 
-If you host Label Studio in the cloud, you want to set up persistent storage for uploaded task data, user images, and more in the same cloud service as your deployment.
+Set up persistent storage so that uploaded task data, user images, and other media are kept across restarts and available to all Label Studio components.
 
 !!! note
-    By default, Label Studio leaves the serving of uploaded media to nginx, so to have persistent storage work correctly, you need nginx alongside Label Studio. This is the recommended configuration as it helps offload the Label Studio server.
+    By default, Label Studio uses nginx to serve uploaded media. For persistent storage to work correctly, run nginx alongside Label Studio. This is the recommended setup and reduces load on the Label Studio server.
 
-    However, if you are using a basic setup without nginx, you can set `USE_NGINX_FOR_UPLOADS=false` and `USE_NGINX_FOR_EXPORT_DOWNLOADS=false`. In this case, all serving will be handled by Label Studio. This configuration is not recommended because it will overload the uwsgi workers and can lead to a total Label Studio outage if users attempt to work with large files.
+    If you use a minimal setup without nginx, you can set `USE_NGINX_FOR_UPLOADS=false` and `USE_NGINX_FOR_EXPORT_DOWNLOADS=false`. In that case, Label Studio serves all uploads and exports. This is not recommended: it increases load on the uwsgi workers and can cause outages when users work with large files.
 
-Follow the steps relevant for your deployment. If you use Docker Compose, select the cloud service you want to use as persistent storage:
-* [Set up Amazon S3](#Set-up-Amazon-S3) for Label Studio deployments in Amazon Web Services (AWS).
-* [Set up Google Cloud Storage (GCS)](#Set-up-Google-Cloud-Storage) for Label Studio deployments in Google Cloud Platform.
-* [Set up Microsoft Azure Storage](#Set-up-Microsoft-Azure-Storage) for Label Studio deployments in Microsoft Azure.
+Choose one of the following according to your deployment:
+
+* **[Kubernetes with a PVC](#Set-up-Kubernetes-PVC)** — Use a Persistent Volume Claim (ReadWriteMany) for on-cluster storage.
+* **[Amazon S3](#Set-up-Amazon-S3)** — For AWS or Docker Compose.
+* **[Google Cloud Storage (GCS)](#Set-up-Google-Cloud-Storage)** — For Google Cloud or Docker Compose.
+* **[Microsoft Azure Storage](#Set-up-Microsoft-Azure-Storage)** — For Azure or Docker Compose.
+
+## Set up Kubernetes PVC
+
+When you deploy Label Studio on Kubernetes, you can use a Persistent Volume Claim (PVC) for persistent storage instead of cloud object storage. The PVC **must** support **ReadWriteMany** access mode so that multiple pods (for example, the app and rqworker) can read and write the same volume.
+
+Configure persistence in your `ls-values.yaml` using the `persistence.config.volume` section and set `accessModes` to `ReadWriteMany`:
+
+```yaml
+global:
+  persistence:
+    enabled: true
+    type: volume
+    config:
+      volume:
+        size: 50Gi
+        accessModes:
+          - ReadWriteMany
+```
+
+!!! note
+    Your cluster must provide a StorageClass or default storage that supports `ReadWriteMany` (for example, NFS, EFS, Azure Files, or other network-backed storage). Standard block storage (e.g. many default cloud disks) typically supports only ReadWriteOnce and is not suitable when multiple pods need to mount the same PVC.
 
 ## Set up Amazon S3
 
