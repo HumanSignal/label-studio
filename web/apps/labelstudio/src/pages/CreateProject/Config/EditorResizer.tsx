@@ -11,6 +11,8 @@ interface EditorResizerProps {
     minEditorWidth: number;
     maxEditorWidth: number;
   };
+  /** When true, no resize range is available (e.g. container at minimum width). Disables the handle to prevent twitching. */
+  disabled?: boolean;
 }
 
 const calculateEditorWidth = (
@@ -32,11 +34,13 @@ export const EditorResizer: React.FC<EditorResizerProps> = ({
   editorWidthPixels,
   onResize,
   constraints,
+  disabled = false,
 }) => {
   const [isResizing, setIsResizing] = useState(false);
 
   const handlePointerDown = useCallback(
     (evt: React.PointerEvent) => {
+      if (disabled) return;
       evt.stopPropagation();
       evt.preventDefault();
 
@@ -74,10 +78,18 @@ export const EditorResizer: React.FC<EditorResizerProps> = ({
       document.body.style.cursor = "col-resize";
       setIsResizing(true);
     },
-    [containerRef, editorWidthPixels, onResize, constraints],
+    [containerRef, editorWidthPixels, onResize, constraints, disabled],
   );
 
   return (
-    <div className={clsx(styles.handle, { [styles.handleResizing]: isResizing })} onPointerDown={handlePointerDown} />
+    <div
+      className={clsx(styles.handle, {
+        [styles.handleResizing]: isResizing,
+        [styles.handleDisabled]: disabled,
+      })}
+      onPointerDown={handlePointerDown}
+      aria-disabled={disabled}
+      title={disabled ? undefined : "Drag to resize"}
+    />
   );
 };
