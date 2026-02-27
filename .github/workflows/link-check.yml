@@ -2,8 +2,8 @@ name: Check for broken links
 
 on:
   pull_request:
-    branches: ["develop"]
-    types: [synchronize, opened]
+    branches: [ "develop" ]
+    types: [ synchronize, opened ]
     paths:
       - "docs/**"
       - ".github/workflows/link-check.yml"
@@ -19,11 +19,14 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v6
 
+      - name: Install linkchecker
+        run: pip install linkchecker
+
       - name: Wait for Netlify to deploy current commit
         env:
-          GH_TOKEN: ${{ github.token }}
+          GH_TOKEN: ""${{ github.token }}"
+          SHA: "${{ github.event.pull_request.head.sha }}"
         run: |
-          SHA="${{ github.event.pull_request.head.sha }}"
           echo "Waiting for Netlify deploy on commit $SHA ..."
           for i in $(seq 1 60); do
             netlify_state=$(gh api "repos/${{ github.repository }}/commits/$SHA/status" \
@@ -39,9 +42,6 @@ jobs:
             echo "Netlify deploy not ready after 10 minutes"
             exit 1
           fi
-
-      - name: Install linkchecker
-        run: pip install linkchecker
 
       - name: Create linkchecker config
         run: |
