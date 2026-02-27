@@ -479,7 +479,7 @@ const RegionControls: FC<RegionControlsProps> = injector(
     const { regions: regionStore } = useContext(OutlinerContext);
 
     const hidden = useMemo(() => {
-      if (type?.includes("region") || type?.includes("range")) {
+      if (type?.includes("region") || type?.includes("range") || type?.includes("reactcode")) {
         return entity.hidden;
       }
       if ((!type || type.includes("label") || type?.includes("tool")) && regions) {
