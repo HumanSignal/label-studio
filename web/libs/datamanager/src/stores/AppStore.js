@@ -1,4 +1,5 @@
 import { destroy, flow, types } from "mobx-state-tree";
+import { runInAction } from "mobx";
 import { Modal } from "../components/Common/Modal/Modal";
 import { FF_DEV_2887, FF_DISABLE_GLOBAL_USER_FETCHING, FF_LOPS_E_3, isFF } from "../utils/feature-flags";
 import { History } from "../utils/history";
@@ -211,17 +212,22 @@ export const AppStore = types
 
       self.setLoadingData(true);
 
+      // Yield to browser so loading indicator paints before heavy store operations
+      yield new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+
       if (self.mode === "labelstream") {
         yield self.taskStore.loadNextTask({
           select: !!taskID && !!annotationID,
         });
       }
 
-      if (annotationID !== undefined) {
-        self.annotationStore.setSelected(annotationID);
-      } else {
-        self.taskStore.setSelected(taskID);
-      }
+      runInAction(() => {
+        if (annotationID !== undefined) {
+          self.annotationStore.setSelected(annotationID);
+        } else {
+          self.taskStore.setSelected(taskID);
+        }
+      });
 
       const taskPromise = self.taskStore.loadTask(taskID, {
         select: !!taskID && !!annotationID,

@@ -14,10 +14,15 @@ import { Modal } from "../components/Common/Modal/Modal";
 import { CommentsSdk } from "./comments-sdk";
 // import { LSFHistory } from "./lsf-history";
 import { annotationToServer, taskToLSFormat } from "./lsf-utils";
-import { when } from "mobx";
+import { when, runInAction } from "mobx";
 import { isAlive } from "mobx-state-tree";
 import { imageCache } from "@humansignal/core";
 import { invalidateAnnotationCache, invalidateDistributionCache } from "@humansignal/core/lib/utils/annotation-cache";
+
+const waitForPaint = () =>
+  new Promise((resolve) => {
+    requestAnimationFrame(() => requestAnimationFrame(resolve));
+  });
 
 const DEFAULT_INTERFACES = [
   "basic",
@@ -388,10 +393,16 @@ export class LSFWrapper {
     const hasChangedTasks = this.lsf?.task?.id !== task?.id && task?.id;
 
     this.setLoading(true, hasChangedTasks);
+
+    // Let the browser paint the loading indicator before heavy store operations
+    await waitForPaint();
+
+    if (!this.lsf) return;
+
+    // Pure data preparation (no MobX mutations)
     const lsfTask = taskToLSFormat(task);
     const isRejectedQueue = isDefined(task.default_selected_annotation);
     const taskList = this.datamanager.store.taskStore.list;
-    // annotations are set in LSF only and order in DM only, so combine them
     const taskHistory = taskList
       .map((task) => this.taskHistory.find((item) => item.taskId === task.id))
       .filter(Boolean);
@@ -411,47 +422,42 @@ export class LSFWrapper {
       annotationID = task.default_selected_annotation;
     }
 
-    if (hasChangedTasks) {
-      this.lsf.resetState();
-    } else {
-      this.lsf.resetAnnotationStore();
-    }
+    // Batch all MST store mutations into a single MobX transaction so reactions
+    // fire only once instead of cascading after each individual action.
+    runInAction(() => {
+      if (hasChangedTasks) {
+        this.lsf.resetState();
+      } else {
+        this.lsf.resetAnnotationStore();
+      }
 
-    // Initial idea to show counter for Manual assignment only
-    // But currently we decided to hide it for any stream
-    // const distribution = this.project.assignment_settings.label_stream_task_distribution;
-    // const isManuallyAssigned = distribution === "assigned_only";
+      this.lsf.toggleInterface("postpone", this.task.allow_postpone !== false);
+      this.lsf.toggleInterface("topbar:task-counter", true);
 
-    // undefined or true for backward compatibility
-    this.lsf.toggleInterface("postpone", this.task.allow_postpone !== false);
-    this.lsf.toggleInterface("topbar:task-counter", true);
+      if (isFF(FF_FIT_1304_STRICT_OVERLAP)) {
+        const overlapReached = this.task.overlap_reached === true;
+        this.overlapReached = overlapReached;
+        this.overlapReachedMessage =
+          this.task.overlap_reached_message ||
+          "Annotation overlap has been reached for this task. Your draft is preserved but cannot be submitted.";
 
-    if (isFF(FF_FIT_1304_STRICT_OVERLAP)) {
-      // Handle strict task overlap - disable submission controls when overlap is reached
-      // Only process when feature flag is enabled
-      const overlapReached = this.task.overlap_reached === true;
-      this.overlapReached = overlapReached;
-      this.overlapReachedMessage =
-        this.task.overlap_reached_message ||
-        "Annotation overlap has been reached for this task. Your draft is preserved but cannot be submitted.";
+        this.lsf.setFlags({
+          overlapReached,
+          overlapReachedMessage: this.overlapReachedMessage,
+        });
+      } else {
+        this.overlapReached = false;
+        this.overlapReachedMessage = "";
+      }
 
-      // Set overlap state on LSF store - this will disable buttons with tooltips
-      this.lsf.setFlags({
-        overlapReached,
-        overlapReachedMessage: this.overlapReachedMessage,
-      });
-    } else {
-      this.overlapReached = false;
-      this.overlapReachedMessage = "";
-    }
+      this.lsf.assignTask(task);
+      this.lsf.initializeStore(lsfTask);
+    });
 
-    this.lsf.assignTask(task);
-    this.lsf.initializeStore(lsfTask);
     await this.setAnnotation(annotationID, fromHistory || isRejectedQueue, selectPrediction);
     this.setLoading(false);
 
     if (isFF(FF_FIT_1304_STRICT_OVERLAP) && this.overlapReached) {
-      // Show informational message if overlap is reached (only when feature flag is enabled)
       this.showOverlapReachedMessage();
     }
   }
