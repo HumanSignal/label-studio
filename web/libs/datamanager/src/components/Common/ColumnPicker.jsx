@@ -1,5 +1,6 @@
-import { Badge } from "@humansignal/ui";
+import { Badge, Select } from "@humansignal/ui";
 import { IconSpark } from "@humansignal/icons";
+import { useCallback, useMemo } from "react";
 
 // ── Adapters ─────────────────────────────────────────────────────────────────
 
@@ -117,7 +118,7 @@ function toTabColumnItem(col) {
 }
 
 /** Prefix for Select option values to avoid cmdk substring collisions (e.g. "id" vs "annotations.id") */
-const COLUMN_VALUE_PREFIX = "col:";
+export const COLUMN_VALUE_PREFIX = "col:";
 
 /**
  * Flatten ColumnPickerGroup[] to flat options for core Select with groupBy.
@@ -147,8 +148,6 @@ export function pickerGroupsToFlatOptions(groups, groupByField = "group") {
   return result;
 }
 
-export { COLUMN_VALUE_PREFIX };
-
 /** Strip COLUMN_VALUE_PREFIX from a value (for use in onChange handlers) */
 export function stripColumnPrefix(v) {
   return typeof v === "string" && v.startsWith(COLUMN_VALUE_PREFIX) ? v.slice(COLUMN_VALUE_PREFIX.length) : v;
@@ -166,11 +165,10 @@ export const searchFilterByLabel = (option, queryString) => {
   return label.includes(q) || readableType.includes(q);
 };
 
-// ── Option renderer for core Select ───────────────────────────────────────────
+// ── Option renderer ───────────────────────────────────────────────────────────
 
 /**
- * Option content for core Select optionRenderer: title + icon/tag + EnterpriseBadge.
- * Used when Select provides its own Checkbox (multi-select).
+ * Option content for ColumnPicker: title + icon/tag + EnterpriseBadge.
  */
 export const ColumnPickerOptionContent = ({ option }) => {
   const { enterpriseBadge, icon, readableType, label } = option ?? {};
@@ -195,3 +193,95 @@ export const ColumnPickerOptionContent = ({ option }) => {
     </span>
   );
 };
+
+// ── Unified component ─────────────────────────────────────────────────────────
+
+const MEDIUM_TRIGGER_STYLE = {
+  height: 32,
+  color: "var(--color-neutral-content)",
+  fontSize: "var(--font-size-14)",
+  fontWeight: "var(--font-weight-medium)",
+};
+
+/**
+ * Unified column/filter picker built on core Select.
+ *
+ * Pass raw data via `columns` (+ optional `columnFilter`) or `availableFilters`.
+ * ColumnPicker handles grouping, option flattening, and key prefix encoding internally.
+ * `value` and `onChange` use plain unprefixed keys.
+ *
+ * Use `multiple` for the columns visibility picker (FieldsButton).
+ * Use single-select (default) for ordering and filter pickers.
+ */
+export function ColumnPicker({
+  // Data source — pass one of these two
+  columns,          // TabColumn[] for column pickers
+  columnFilter,     // optional (col) => bool predicate to filter columns
+  availableFilters, // for filter pickers
+
+  // Plain unprefixed keys
+  value,
+  onChange,
+
+  multiple = false,
+  size = "medium",
+  disabled,
+  placeholder,
+  renderSelected,
+  triggerProps,
+  triggerClassName,
+  dataTestid,
+}) {
+  const groups = useMemo(() => {
+    if (columns) return columnsToPickerGroups(columns, columnFilter);
+    if (availableFilters) return filtersToPickerGroups(availableFilters);
+    return [];
+    // columnFilter is intentionally omitted from deps — callers must pass a stable reference
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [columns, availableFilters]);
+
+  const flatOptions = useMemo(() => pickerGroupsToFlatOptions(groups), [groups]);
+
+  const encodedValue = useMemo(() => {
+    if (value == null) return value;
+    if (Array.isArray(value)) return value.map((v) => COLUMN_VALUE_PREFIX + v);
+    return COLUMN_VALUE_PREFIX + value;
+  }, [value]);
+
+  const handleChange = useCallback(
+    (newValue) => {
+      if (!onChange) return;
+      if (newValue == null) return onChange(newValue);
+      if (Array.isArray(newValue)) return onChange(newValue.map(stripColumnPrefix));
+      return onChange(stripColumnPrefix(newValue));
+    },
+    [onChange],
+  );
+
+  return (
+    <Select
+      options={flatOptions}
+      value={encodedValue}
+      onChange={handleChange}
+      multiple={multiple}
+      searchable
+      searchPlaceholder="Search columns"
+      searchFilter={searchFilterByLabel}
+      groupBy="group"
+      optionRenderer={ColumnPickerOptionContent}
+      renderSelected={renderSelected}
+      placeholder={placeholder}
+      size={size}
+      disabled={disabled}
+      dataTestid={dataTestid}
+      triggerClassName={triggerClassName}
+      triggerProps={{
+        ...triggerProps,
+        style: {
+          ...(size === "medium" && MEDIUM_TRIGGER_STYLE),
+          ...triggerProps?.style,
+        },
+      }}
+    />
+  );
+}

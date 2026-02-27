@@ -1,16 +1,9 @@
-import { Select, Tooltip } from "@humansignal/ui";
-import { Badge } from "@humansignal/ui";
+import { Badge, Tooltip } from "@humansignal/ui";
 import { inject, observer } from "mobx-react";
 import { useCallback, useMemo } from "react";
 import { flushSync } from "react-dom";
 import { cn } from "../../utils/bem";
-import {
-  COLUMN_VALUE_PREFIX,
-  ColumnPickerOptionContent,
-  columnsToPickerGroups,
-  pickerGroupsToFlatOptions,
-  searchFilterByLabel,
-} from "./ColumnPickerList";
+import { ColumnPicker } from "./ColumnPicker";
 
 const injector = inject(({ store }) => {
   return {
@@ -19,53 +12,40 @@ const injector = inject(({ store }) => {
 });
 
 /**
- * Columns picker button (multi-select). Used by toolbar and Table quick view.
- * Single-select pickers (Order By, Filter column) use Select directly.
+ * Columns visibility picker (multi-select). Used by toolbar and Table quick view.
+ * Single-select pickers (Order By, Filter column) use ColumnPicker directly.
  */
 export const FieldsButton = injector(
   observer(
-    ({ columns, size, title, icon, filter, tooltip, multiSelect = true, className, "data-testid": dataTestId }) => {
-      const groups = useMemo(
-        () => columnsToPickerGroups(columns, filter),
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-        [columns, filter],
-      );
-
-      const flatOptions = useMemo(() => pickerGroupsToFlatOptions(groups), [groups]);
+    ({ columns, title, icon, filter, tooltip, className, "data-testid": dataTestId }) => {
       const value = useMemo(
-        () => columns.filter((c) => !c.is_hidden).map((c) => COLUMN_VALUE_PREFIX + c.key),
+        () => columns.filter((c) => !c.is_hidden).map((c) => c.key),
         [columns],
       );
 
       const handleChange = useCallback(
-        (newValue) => {
-          const selectedSet = new Set(newValue ?? []);
+        (keys) => {
+          const selectedSet = new Set(keys ?? []);
           flushSync(() => {
-            for (const opt of flatOptions) {
-              const col = opt.original;
-              if (!col?.toggleVisibility) continue;
-              const shouldBeVisible = selectedSet.has(opt.value);
+            for (const col of columns) {
+              if (!col.toggleVisibility) continue;
+              const shouldBeVisible = selectedSet.has(col.key);
               const isVisible = !col.is_hidden;
-              if (shouldBeVisible !== isVisible) {
-                col.toggleVisibility();
-              }
+              if (shouldBeVisible !== isVisible) col.toggleVisibility();
             }
           });
         },
-        [flatOptions],
+        [columns],
       );
 
-      const selectTrigger = (
-        <Select
-          options={flatOptions}
+      const picker = (
+        <ColumnPicker
+          columns={columns}
+          columnFilter={filter}
           value={value}
           onChange={handleChange}
           multiple
-          searchable
-          searchPlaceholder="Search columns"
-          searchFilter={searchFilterByLabel}
-          groupBy="group"
-          optionRenderer={ColumnPickerOptionContent}
+          placeholder={title}
           renderSelected={() =>
             icon ? (
               <>
@@ -75,16 +55,11 @@ export const FieldsButton = injector(
               title
             )
           }
-          placeholder={title}
           dataTestid={dataTestId}
           triggerClassName={className}
           triggerProps={{
             style: {
-              height: 32,
               minWidth: 110,
-              color: "var(--color-neutral-content)",
-              fontSize: "var(--font-size-14)",
-              fontWeight: "var(--font-weight-medium)",
             },
           }}
         />
@@ -92,10 +67,10 @@ export const FieldsButton = injector(
 
       return tooltip ? (
         <div className={`${cn("field-button").toClassName()} h-[40px] flex items-center`} style={{ zIndex: 1000 }}>
-          <Tooltip title={tooltip}>{selectTrigger}</Tooltip>
+          <Tooltip title={tooltip}>{picker}</Tooltip>
         </div>
       ) : (
-        selectTrigger
+        picker
       );
     },
   ),

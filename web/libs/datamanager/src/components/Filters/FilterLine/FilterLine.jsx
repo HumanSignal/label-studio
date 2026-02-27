@@ -1,20 +1,12 @@
 import { observer } from "mobx-react";
-import { useMemo } from "react";
 import { cn } from "../../../utils/bem";
-import { Button, Select } from "@humansignal/ui";
+import { Button } from "@humansignal/ui";
 import { IconClose } from "@humansignal/icons";
 import { FilterDropdown } from "../FilterDropdown";
 import "./FilterLine.scss";
 import { FilterOperation } from "./FilterOperation";
 import { Icon } from "../../Common/Icon/Icon";
-import {
-  COLUMN_VALUE_PREFIX,
-  ColumnPickerOptionContent,
-  filtersToPickerGroups,
-  pickerGroupsToFlatOptions,
-  searchFilterByLabel,
-  stripColumnPrefix,
-} from "../../Common/ColumnPickerList";
+import { ColumnPicker } from "../../Common/ColumnPicker";
 
 const Conjunction = observer(({ index, view }) => {
   return (
@@ -36,22 +28,12 @@ const Conjunction = observer(({ index, view }) => {
  * Uses core Select with groupBy and optionRenderer (same as Columns picker).
  */
 const FilterColumnPicker = observer(({ filter, availableFilters }) => {
-  const groups = useMemo(() => filtersToPickerGroups(availableFilters), [availableFilters]);
-  const flatOptions = useMemo(() => pickerGroupsToFlatOptions(groups), [groups]);
-  const label = filter.field?.title || "Column";
-  const value = filter.filter.id ? COLUMN_VALUE_PREFIX + filter.filter.id : null;
-
   return (
-    <Select
-      options={flatOptions}
-      value={value}
-      onChange={(newValue) => filter.setFilterDelayed(stripColumnPrefix(newValue))}
-      searchable
-      searchPlaceholder="Search columns"
-      searchFilter={searchFilterByLabel}
-      groupBy="group"
-      optionRenderer={ColumnPickerOptionContent}
-      placeholder={label}
+    <ColumnPicker
+      availableFilters={availableFilters}
+      value={filter.filter.id ?? null}
+      onChange={(id) => filter.setFilterDelayed(id)}
+      placeholder={filter.field?.title || "Column"}
       size="small"
       disabled={filter.field.disabled}
       triggerProps={{
