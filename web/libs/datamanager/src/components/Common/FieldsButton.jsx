@@ -1,4 +1,5 @@
 import { Select, Tooltip } from "@humansignal/ui";
+import { Badge } from "@humansignal/ui";
 import { inject, observer } from "mobx-react";
 import { useCallback, useMemo } from "react";
 import { flushSync } from "react-dom";
@@ -117,7 +118,7 @@ FieldsButton.Checkbox = observer(({ column, children, disabled, enterpriseBadge 
       </div>
       {enterpriseBadge && (
         <div style={{ flexShrink: 0 }}>
-          <EnterpriseBadge ghost />
+          <Badge variant="gradient" style="ghost" />
         </div>
       )}
     </div>

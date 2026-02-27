@@ -2167,7 +2167,7 @@ optional = false
 python-versions = ">=3.10,<4"
 groups = ["main"]
 files = [
-    {file = "8711e39064b9d4280499d878a9160c9f8197d311.zip", hash = "sha256:ead2d3885b6be4f88b3eb25eb3fa87ea1c4b7ae9bf4523b609407dbc0ffb091d"},
+    {file = "2321865c82b384f7a2983d5aed8984b75db4033c.zip", hash = "sha256:caab72d2f936f54cce25da5f9f5def4d199b21d9f3b4b94426b38016342fb56f"},
 ]
 
 [package.dependencies]
@@ -2195,7 +2195,7 @@ xmljson = "0.2.1"
 
 [package.source]
 type = "url"
-url = "https://github.com/HumanSignal/label-studio-sdk/archive/8711e39064b9d4280499d878a9160c9f8197d311.zip"
+url = "https://github.com/HumanSignal/label-studio-sdk/archive/2321865c82b384f7a2983d5aed8984b75db4033c.zip"
 
 [[package]]
 name = "launchdarkly-server-sdk"
@@ -2621,14 +2621,14 @@ files = [
 
 [[package]]
 name = "nltk"
-version = "3.9.1"
+version = "3.9.3"
 description = "Natural Language Toolkit"
 optional = false
-python-versions = ">=3.8"
+python-versions = ">=3.10"
 groups = ["main"]
 files = [
-    {file = "nltk-3.9.1-py3-none-any.whl", hash = "sha256:4fa26829c5b00715afe3061398a8989dc643b92ce7dd93fb4585a70930d168a1"},
-    {file = "nltk-3.9.1.tar.gz", hash = "sha256:87d127bd3de4bd89a4f81265e5fa59cb1b199b27440175370f7417d2bc7ae868"},
+    {file = "nltk-3.9.3-py3-none-any.whl", hash = "sha256:60b3db6e9995b3dd976b1f0fa7dec22069b2677e759c28eb69b62ddd44870522"},
+    {file = "nltk-3.9.3.tar.gz", hash = "sha256:cb5945d6424a98d694c2b9a0264519fab4363711065a46aa0ae7a2195b92e71f"},
 ]
 
 [package.dependencies]
@@ -5138,4 +5138,4 @@ uwsgi = ["pyuwsgi", "uwsgitop"]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.10,<4"
-content-hash = "f607789d587785eb1d7c4d19810b7dd67fb7eee805417a8d2fdbb54d1b142c39"
+content-hash = "223f8d2e9e8002a8e671b4571e3a76118dc812bb3df30fac3f8203c5bb06e03c"

@@ -71,6 +71,9 @@ def make_sql_migration(
     mig_key = migration_name
 
     def forwards(apps, schema_editor):  # noqa: ARG001
+        # Early return for linter to not actually run code
+        if getattr(schema_editor, 'collect_sql', False) is True:
+            return
         if schema_editor.connection.vendor == 'sqlite' and not apply_on_sqlite:
             logger.info('Skipping migration for SQLite (apply_on_sqlite=False)')
             return
@@ -92,6 +95,9 @@ def make_sql_migration(
             )
 
     def backwards(apps, schema_editor):  # noqa: ARG001
+        # Early return for linter to not actually run code
+        if getattr(schema_editor, 'collect_sql', False) is True:
+            return
         start_job_async_or_sync(
             execute_sql_job,
             migration_name=mig_key,
