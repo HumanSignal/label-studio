@@ -16,64 +16,59 @@ const injector = inject(({ store }) => {
  * Single-select pickers (Order By, Filter column) use ColumnPicker directly.
  */
 export const FieldsButton = injector(
-  observer(
-    ({ columns, title, icon, filter, tooltip, className, "data-testid": dataTestId }) => {
-      const value = useMemo(
-        () => columns.filter((c) => !c.is_hidden).map((c) => c.key),
-        [columns],
-      );
+  observer(({ columns, title, icon, filter, tooltip, className, "data-testid": dataTestId }) => {
+    const value = useMemo(() => columns.filter((c) => !c.is_hidden).map((c) => c.key), [columns]);
 
-      const handleChange = useCallback(
-        (keys) => {
-          const selectedSet = new Set(keys ?? []);
-          flushSync(() => {
-            for (const col of columns) {
-              if (!col.toggleVisibility) continue;
-              const shouldBeVisible = selectedSet.has(col.key);
-              const isVisible = !col.is_hidden;
-              if (shouldBeVisible !== isVisible) col.toggleVisibility();
-            }
-          });
-        },
-        [columns],
-      );
-
-      const picker = (
-        <ColumnPicker
-          columns={columns}
-          columnFilter={filter}
-          value={value}
-          onChange={handleChange}
-          multiple
-          placeholder={title}
-          renderSelected={() =>
-            icon ? (
-              <>
-                {icon} {title}
-              </>
-            ) : (
-              title
-            )
+    const handleChange = useCallback(
+      (keys) => {
+        const selectedSet = new Set(keys ?? []);
+        flushSync(() => {
+          for (const col of columns) {
+            if (!col.toggleVisibility) continue;
+            const shouldBeVisible = selectedSet.has(col.key);
+            const isVisible = !col.is_hidden;
+            if (shouldBeVisible !== isVisible) col.toggleVisibility();
           }
-          dataTestid={dataTestId}
-          triggerClassName={className}
-          triggerProps={{
-            style: {
-              minWidth: 110,
-            },
-          }}
-        />
-      );
+        });
+      },
+      [columns],
+    );
 
-      return tooltip ? (
-        <div className={`${cn("field-button").toClassName()} h-[40px] flex items-center`} style={{ zIndex: 1000 }}>
-          <Tooltip title={tooltip}>{picker}</Tooltip>
-        </div>
-      ) : (
-        picker
-      );
-    },
-  ),
+    const picker = (
+      <ColumnPicker
+        columns={columns}
+        columnFilter={filter}
+        value={value}
+        onChange={handleChange}
+        multiple
+        placeholder={title}
+        renderSelected={() =>
+          icon ? (
+            <>
+              {icon} {title}
+            </>
+          ) : (
+            title
+          )
+        }
+        dataTestid={dataTestId}
+        triggerClassName={className}
+        triggerProps={{
+          style: {
+            minWidth: 110,
+          },
+        }}
+      />
+    );
+
+    return tooltip ? (
+      <div className={`${cn("field-button").toClassName()} h-[40px] flex items-center`} style={{ zIndex: 1000 }}>
+        <Tooltip title={tooltip}>{picker}</Tooltip>
+      </div>
+    ) : (
+      picker
+    );
+  }),
 );
 
 // Kept for backward compatibility — no longer used internally but may be

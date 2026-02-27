@@ -215,8 +215,8 @@ const MEDIUM_TRIGGER_STYLE = {
  */
 export function ColumnPicker({
   // Data source — pass one of these two
-  columns,          // TabColumn[] for column pickers
-  columnFilter,     // optional (col) => bool predicate to filter columns
+  columns, // TabColumn[] for column pickers
+  columnFilter, // optional (col) => bool predicate to filter columns
   availableFilters, // for filter pickers
 
   // Plain unprefixed keys
