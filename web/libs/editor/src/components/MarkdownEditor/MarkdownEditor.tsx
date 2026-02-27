@@ -47,7 +47,51 @@ export const MarkdownEditor: FC<MarkdownEditorProps> = ({
 
   const isSplitMode = viewMode === "split";
 
-  // Build CodeMirror options with Shift+Enter handling via extraKeys
+  // Helper: wrap selection with markdown syntax
+  const wrapSelection = (cm: CodeMirror.Editor, prefix: string, suffix = prefix) => {
+    const selection = cm.getSelection();
+    const doc = cm.getDoc();
+    if (selection) {
+      cm.replaceSelection(`${prefix}${selection}${suffix}`);
+    } else {
+      const cursor = doc.getCursor();
+      doc.replaceRange(`${prefix}${suffix}`, cursor);
+      doc.setCursor({ line: cursor.line, ch: cursor.ch + prefix.length });
+    }
+    cm.focus();
+  };
+
+  // Helper: insert link
+  const insertLink = (cm: CodeMirror.Editor) => {
+    const linkText = cm.getSelection() || "text";
+    cm.replaceSelection(`[${linkText}](url)`);
+    const cursor = cm.getCursor();
+    cm.setSelection({ line: cursor.line, ch: cursor.ch - 4 }, { line: cursor.line, ch: cursor.ch - 1 });
+    cm.focus();
+  };
+
+  // Helper: toggle comment
+  const toggleComment = (cm: CodeMirror.Editor) => {
+    const selection = cm.getSelection();
+    if (selection) {
+      const isCommented = selection.startsWith("<!-- ") && selection.endsWith(" -->");
+      cm.replaceSelection(isCommented ? selection.slice(5, -4) : `<!-- ${selection} -->`);
+    } else {
+      const doc = cm.getDoc();
+      const cursor = doc.getCursor();
+      const line = doc.getLine(cursor.line);
+      const trimmed = line.trim();
+      const isCommented = trimmed.startsWith("<!-- ") && trimmed.endsWith(" -->");
+      const indent = line.match(/^\s*/)?.[0] || "";
+      const newLine = isCommented
+        ? line.replace(/^\s*<!--\s/, "").replace(/\s-->$/, "")
+        : `${indent}<!-- ${trimmed} -->`;
+      doc.replaceRange(newLine, { line: cursor.line, ch: 0 }, { line: cursor.line, ch: line.length });
+    }
+    cm.focus();
+  };
+
+  // Build CodeMirror options with keyboard shortcuts
   const codeMirrorOptions = {
     mode: "markdown" as const,
     theme: "default" as const,
@@ -55,18 +99,29 @@ export const MarkdownEditor: FC<MarkdownEditorProps> = ({
     lineWrapping: true,
     readOnly,
     placeholder,
-    extraKeys: onSubmit
-      ? {
-          "Shift-Enter": (cm: CodeMirror.Editor) => {
-            // Get current value and trim trailing newline
-            const trimmedValue = cm.getValue().replace(/\n$/, "");
-            if (trimmedValue) {
-              onChange(trimmedValue);
-              onSubmit();
-            }
-          },
-        }
-      : {},
+    extraKeys: {
+      ...(onSubmit
+        ? {
+            "Shift-Enter": (cm: CodeMirror.Editor) => {
+              const trimmedValue = cm.getValue().replace(/\n$/, "");
+              if (trimmedValue) {
+                onChange(trimmedValue);
+                onSubmit();
+              }
+            },
+          }
+        : {}),
+      "Ctrl-B": (cm: CodeMirror.Editor) => wrapSelection(cm, "**"),
+      "Cmd-B": (cm: CodeMirror.Editor) => wrapSelection(cm, "**"),
+      "Ctrl-I": (cm: CodeMirror.Editor) => wrapSelection(cm, "*"),
+      "Cmd-I": (cm: CodeMirror.Editor) => wrapSelection(cm, "*"),
+      "Ctrl-`": (cm: CodeMirror.Editor) => wrapSelection(cm, "`"),
+      "Cmd-`": (cm: CodeMirror.Editor) => wrapSelection(cm, "`"),
+      "Ctrl-K": insertLink,
+      "Cmd-K": insertLink,
+      "Ctrl-/": toggleComment,
+      "Cmd-/": toggleComment,
+    },
   };
 
   return (

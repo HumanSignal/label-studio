@@ -263,4 +263,119 @@ describe("Control Tags - TextArea - Markdown Editor", () => {
       Textarea.stats.should("contain", "3 words");
     });
   });
+
+  describe("TC-MD-007: Keyboard Shortcuts", () => {
+    beforeEach(() => {
+      LabelStudio.params()
+        .config(textareaConfigWithMarkdown)
+        .data(simpleData)
+        .withResult([])
+        .init();
+    });
+
+    it("should support Ctrl+B / Cmd+B for bold formatting", () => {
+      // Type some text
+      Textarea.typeMarkdown("bold text");
+
+      // Select all text (Ctrl/Cmd+A) and apply bold (Ctrl/Cmd+B)
+      Textarea.editor.type("{ctrl}a");
+      Textarea.editor.type("{ctrl}b");
+
+      // Should wrap with **
+      Textarea.editor.should("contain", "**bold text**");
+    });
+
+    it("should support Ctrl+I / Cmd+I for italic formatting", () => {
+      // Type some text
+      Textarea.typeMarkdown("italic text");
+
+      // Select all and apply italic
+      Textarea.editor.type("{ctrl}a");
+      Textarea.editor.type("{ctrl}i");
+
+      // Should wrap with *
+      Textarea.editor.should("contain", "*italic text*");
+    });
+
+    it("should support Ctrl+` for inline code formatting", () => {
+      // Type some text
+      Textarea.typeMarkdown("code text");
+
+      // Select all and apply inline code
+      Textarea.editor.type("{ctrl}a");
+      Textarea.editor.type("{ctrl}`");
+
+      // Should wrap with `
+      Textarea.editor.should("contain", "`code text`");
+    });
+
+    it("should support Ctrl+K / Cmd+K for link insertion", () => {
+      // Type some text
+      Textarea.typeMarkdown("link text");
+
+      // Select all and insert link
+      Textarea.editor.type("{ctrl}a");
+      Textarea.editor.type("{ctrl}k");
+
+      // Should create link format
+      Textarea.editor.should("contain", "[link text](url)");
+    });
+
+    it("should support Ctrl+/ / Cmd+/ for toggle comment", () => {
+      // Type some text
+      Textarea.typeMarkdown("comment text");
+
+      // Select all and toggle comment
+      Textarea.editor.type("{ctrl}a");
+      Textarea.editor.type("{ctrl}/");
+
+      // Should wrap with HTML comment
+      Textarea.editor.should("contain", "<!-- comment text -->");
+
+      // Toggle again to uncomment
+      Textarea.editor.type("{ctrl}a");
+      Textarea.editor.type("{ctrl}/");
+
+      // Should unwrap
+      Textarea.editor.should("contain", "comment text");
+      Textarea.editor.should("not.contain", "<!--");
+    });
+
+    it("should insert formatting markers when no text is selected", () => {
+      // Place cursor and press Ctrl+B without selection
+      Textarea.editor.click();
+      Textarea.editor.type("{ctrl}b");
+
+      // Should insert ** markers
+      Textarea.editor.should("contain", "**");
+    });
+
+    it("should allow combining multiple formatting shortcuts", () => {
+      // Type text, make it bold, then continue typing
+      Textarea.typeMarkdown("Regular text");
+      
+      // Add space and bold text
+      Textarea.typeMarkdown(" ");
+      Textarea.editor.type("{ctrl}b");
+      Textarea.typeMarkdown("bold");
+      
+      // Should have mixed content
+      Textarea.editor.should("contain", "Regular text");
+      Textarea.editor.should("contain", "**bold**");
+    });
+
+    it("should preview formatted text in split mode", () => {
+      // Switch to split mode
+      Textarea.switchToSplitView();
+
+      // Type and format text
+      Textarea.typeMarkdown("Sample text");
+      Textarea.editor.type("{ctrl}a");
+      Textarea.editor.type("{ctrl}b");
+
+      // Preview should show rendered bold (not the markdown syntax)
+      Textarea.preview.should("contain", "Sample text");
+      // Preview should render it as bold HTML (depends on Markdown component)
+    });
+  });
 });

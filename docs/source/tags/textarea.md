@@ -110,7 +110,10 @@ You can enable a markdown editor for rich text formatting with syntax highlighti
 - **Syntax Highlighting**: Markdown syntax is highlighted in the editor
 - **Live Preview**: Toggle between "Edit" and "Split" modes for side-by-side preview
 - **Keyboard Shortcuts**:
-  - `Shift+Enter`: Submit current content
+  - `Ctrl/Cmd+B`: Bold - Wrap selection with `**text**`
+  - `Ctrl/Cmd+I`: Italic - Wrap selection with `*text*`
+  - `Ctrl/Cmd+K`: Link - Insert `[text](url)` format
+  - `Ctrl/Cmd+\``: Inline code - Wrap selection with `` `code` ``
   - `Ctrl/Cmd+Z`: Undo
   - `Ctrl/Cmd+Shift+Z`: Redo
   - `Ctrl/Cmd+F`: Find
