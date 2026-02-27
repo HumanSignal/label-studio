@@ -87,3 +87,47 @@ For that you should note the following:
   <TextArea name="text-area-2" toName="text2" rows="3" />
 </View>
 ```
+
+### Markdown Editor
+
+You can enable a markdown editor for rich text formatting with syntax highlighting and live preview. When `markdown="true"`, the editor uses CodeMirror with Markdown syntax highlighting and includes a split-view mode for real-time preview.
+
+```html
+<View>
+  <Text name="text" value="$text"/>
+  <TextArea
+    name="edited_content"
+    toName="text"
+    markdown="true"
+    editable="true"
+    placeholder="Edit markdown content..."
+  />
+</View>
+```
+
+#### Markdown Editor Features
+
+- **Syntax Highlighting**: Markdown syntax is highlighted in the editor
+- **Live Preview**: Toggle between "Edit" and "Split" modes for side-by-side preview
+- **Keyboard Shortcuts**:
+  - `Shift+Enter`: Submit current content
+  - `Ctrl/Cmd+Z`: Undo
+  - `Ctrl/Cmd+Shift+Z`: Redo
+  - `Ctrl/Cmd+F`: Find
+  - `Ctrl/Cmd+/`: Toggle comment
+- **Stats Display**: Character and word counts update in real-time
+
+#### Parameters
+
+The `TextArea` tag accepts the following parameters related to markdown editing:
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `markdown` | `boolean` | `false` | Enable markdown editor mode with syntax highlighting and preview |
+| `rows` | `number` | `10` | Number of rows for the editor (minimum 3) |
+| `placeholder` | `string` | `"Enter markdown text..."` | Placeholder text shown when editor is empty |
+
+#### Related
+
+- [Markdown View tag](../tags/markdown): For displaying rendered markdown content
+- [Text tag](../tags/text): For displaying text data
