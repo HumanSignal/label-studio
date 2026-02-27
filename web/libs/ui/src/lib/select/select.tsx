@@ -215,6 +215,7 @@ export const Select = forwardRef(
       selectFirstIfEmpty,
       renderSelected,
       isVirtualList = false,
+      virtualListMaxVisible,
       loadMore,
       pageSize = VARIABLE_LIST_PAGE_SIZE,
       page = 1,
@@ -532,7 +533,7 @@ export const Select = forwardRef(
                 label="Select an option"
                 className={cnm({
                   "shadow-inner shadow-neutral-surface-inset border-t border-neutral-border shadow-": searchable,
-                  "max-h-none": footer !== undefined,
+                  "max-h-none": footer !== undefined || isVirtualList,
                 })}
               >
                 {/* Selected Items Group - Only for multiple + searchable + virtual lists */}
@@ -577,7 +578,7 @@ export const Select = forwardRef(
                         // Calculate height based on actual item count from flatOptions
                         // When searching, _options is filtered and flat; when not searching, _options === options (all items)
                         const actualItemCount = searchable && query.trim() ? _options.length : flatOptions.length;
-                        const maxVisibleItems = VARIABLE_LIST_COUNT_RENDERED;
+                        const maxVisibleItems = virtualListMaxVisible ?? VARIABLE_LIST_COUNT_RENDERED;
                         const listHeight = Math.min(actualItemCount, maxVisibleItems) * VARIABLE_LIST_ITEM_HEIGHT;
 
                         return (

@@ -82,6 +82,8 @@ export type SelectProps<T, A extends SelectOption<T>[]> = {
   selectFirstIfEmpty?: boolean;
   renderSelected?: (selectedOptions?: A[number][], placeholder?: string) => React.ReactNode | string;
   isVirtualList?: boolean;
+  /** Max visible items in the virtual list before scrolling (default: 5) */
+  virtualListMaxVisible?: number;
   loadMore?: () => void;
   pageSize?: number;
   page?: number;

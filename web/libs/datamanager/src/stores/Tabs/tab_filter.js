@@ -127,32 +127,34 @@ export const TabFilter = types
       }
     },
 
+    /**
+     * Switch this filter to a different column (non-recent path).
+     * Tries to preserve the previous operator and value when the new column type
+     * supports the same operator; otherwise resets both to defaults.
+     * This minimizes user input loss when exploring different columns.
+     */
     setFilter(value, save = true) {
       if (!isDefined(value)) return;
 
       self.view.clearChildFilter(self);
 
-      const previousFilterType = self.filter.currentType;
-      const previousFilter = self.filter;
+      const prevOperator = self.operator;
+      const prevValue = self.value;
 
       self.filter = value;
 
-      const typeChanged = previousFilterType !== self.filter.currentType;
-      const filterChanged = previousFilter !== self.filter;
+      self.view.applyChildFilter(self);
+      self.markUnsaved();
 
-      if (typeChanged || filterChanged) {
-        self.view.applyChildFilter(self);
+      const newOperators = self.component;
+      const operatorStillValid = prevOperator && newOperators.some((op) => op.key === prevOperator);
 
-        self.markUnsaved();
-      }
-
-      if (typeChanged) {
+      if (operatorStillValid) {
+        self.operator = prevOperator;
+        self.value = prevValue;
+      } else {
+        self.operator = newOperators[0].key;
         self.setDefaultValue();
-        self.setOperator(self.component[0].key);
-      }
-
-      if (filterChanged) {
-        self.setValue(null);
       }
 
       if (save) self.saved();
@@ -160,6 +162,38 @@ export const TabFilter = types
 
     setFilterDelayed(value) {
       self.setFilter(value, false);
+      self.saveDelayed();
+    },
+
+    /**
+     * Restore a filter from a "Recent" selection, applying the stored column + operator + value.
+     * Unlike setFilter(), this does NOT try to carry over the previous filter's state —
+     * it directly applies the saved state from localStorage.
+     * Falls back to defaults if the stored operator is no longer valid for the column type
+     * (e.g. column type was changed in the labeling config since the entry was saved).
+     */
+    setFilterFromRecent(filterTypeId, operator, value) {
+      if (!isDefined(filterTypeId)) return;
+
+      self.view.clearChildFilter(self);
+      self.filter = filterTypeId;
+      self.view.applyChildFilter(self);
+      self.markUnsaved();
+
+      const newOperators = self.component;
+
+      if (operator && newOperators.some((op) => op.key === operator)) {
+        self.operator = operator;
+      } else {
+        self.operator = newOperators[0].key;
+      }
+
+      if (value !== undefined && value !== null) {
+        self.setValue(value);
+      } else {
+        self.setDefaultValue();
+      }
+
       self.saveDelayed();
     },
 

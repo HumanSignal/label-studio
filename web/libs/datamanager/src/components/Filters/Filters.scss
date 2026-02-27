@@ -27,6 +27,7 @@
 
   &__actions {
     display: flex;
+    align-items: center;
     margin-top: var(--spacing-base);
     padding: 0 var(--spacing-tight) var(--spacing-tight);
     justify-content: space-between;
@@ -38,6 +39,12 @@
         border: 1px solid var(--color-neutral-border);
       }
     }
+  }
+
+  &__actions-right {
+    display: flex;
+    align-items: center;
+    gap: 2px;
   }
 
   &__empty {
@@ -79,4 +86,12 @@
 
 :global(.filter-dropdown-content) {
   min-width: 270px !important;
+  width: max-content;
+  max-width: min(500px, 90vw);
+
+  // Decorative items (headers, separators) should not show a "not-allowed" cursor
+  [data-disabled] {
+    cursor: default;
+    opacity: 1;
+  }
 }
