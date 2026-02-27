@@ -55,11 +55,6 @@ function filterFieldOptionRender({ item }) {
           borderTop: "1px solid var(--color-neutral-border)",
           margin: "0 -8px",
           width: "calc(100% + 16px)",
-          height: 0,
-          position: "relative",
-          top: "-10px",
-          cursor: "default",
-          pointerEvents: "none",
         }}
       />
     );
@@ -73,13 +68,8 @@ function filterFieldOptionRender({ item }) {
           fontWeight: 600,
           color: "var(--color-neutral-content-subtler)",
           textTransform: "uppercase",
-          letterSpacing: "0.5px",
-          cursor: "default",
-          pointerEvents: "none",
-          display: "flex",
-          alignItems: "flex-end",
-          height: "100%",
-          paddingBottom: 4,
+          letterSpacing: "1px",
+          lineHeight: "22px",
         }}
       >
         {original?.field?.title ?? original?.title ?? "Recent"}

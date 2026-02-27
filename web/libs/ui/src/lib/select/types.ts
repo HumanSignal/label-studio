@@ -6,6 +6,8 @@ export type SelectOptionData<T = any> = {
   hidden?: boolean;
   disabled?: boolean;
   children?: SelectOptionData<T>[];
+  /** Custom row height (px) for virtual-list mode; defaults to VARIABLE_LIST_ITEM_HEIGHT (40). */
+  height?: number;
 };
 
 export enum SelectSize {

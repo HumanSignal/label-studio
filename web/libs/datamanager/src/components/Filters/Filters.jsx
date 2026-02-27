@@ -3,7 +3,7 @@ import React from "react";
 import { cn } from "../../utils/bem";
 import { Button } from "@humansignal/ui";
 import { FilterLine } from "./FilterLine/FilterLine";
-import { IconChevronRight, IconPlus, IconCopyOutline, IconClipboardCheck } from "@humansignal/icons";
+import { IconChevronRight, IconPlus, IconCopyOutline, IconClipboardCheck, IconUndo } from "@humansignal/icons";
 import { getRecentFilterFields, addRecentFilterField, updateRecentFilterField } from "./filter-recents";
 import "./Filters.scss";
 
@@ -20,6 +20,7 @@ export const Filters = injector(({ store, views, currentView, filters, projectId
   const [recentFieldIds, setRecentFieldIds] = React.useState(() => getRecentFilterFields(projectId));
   const [copyFeedback, setCopyFeedback] = React.useState(false);
   const [pasteFeedback, setPasteFeedback] = React.useState(false);
+  const [prePasteSnapshot, setPrePasteSnapshot] = React.useState(null);
 
   // Saves the departing column to recents AND moves it to the top of the list.
   // Called when the user switches to a non-recent column — the departing column
@@ -101,18 +102,21 @@ export const Filters = injector(({ store, views, currentView, filters, projectId
           title: "Recent",
           original: { _isHeader: true, field: { title: "Recent" } },
           disabled: true,
+          height: 36,
         };
         const separator = {
           value: "__recent_separator__",
           title: "",
           original: { _isSeparator: true, field: { title: "" } },
           disabled: true,
+          height: 8,
         };
         const allFieldsHeader = {
           value: "__all_fields_header__",
           title: "All fields",
           original: { _isHeader: true, field: { title: "All fields" } },
           disabled: true,
+          height: 36,
         };
         return [recentHeader, ...recentOptions, separator, allFieldsHeader, ...groupValues];
       }
@@ -163,15 +167,24 @@ export const Filters = injector(({ store, views, currentView, filters, projectId
       return;
     }
 
+    const beforePaste = currentView.allFiltersSnapshot;
+
     const result = currentView.importFilters(snapshot);
     if (result === false) {
       showToast("No matching filter columns found in this project. Filters may be from a different project.");
       return;
     }
 
+    setPrePasteSnapshot(beforePaste);
     setPasteFeedback(true);
     setTimeout(() => setPasteFeedback(false), 1500);
   }, [currentView, showToast]);
+
+  const handleUndoPaste = React.useCallback(() => {
+    if (!prePasteSnapshot) return;
+    currentView.importFilters(prePasteSnapshot);
+    setPrePasteSnapshot(null);
+  }, [currentView, prePasteSnapshot]);
 
   return (
     <div className={cn("filters").mod({ sidebar: sidebarEnabled }).toClassName()}>
@@ -227,6 +240,18 @@ export const Filters = injector(({ store, views, currentView, filters, projectId
           >
             <IconClipboardCheck className="!w-4 !h-4" />
           </Button>
+
+          {prePasteSnapshot && (
+            <Button
+              size="small"
+              look="string"
+              tooltip="Undo paste — restore previous filters"
+              onClick={handleUndoPaste}
+              aria-label="Undo paste"
+            >
+              <IconUndo className="!w-4 !h-4" />
+            </Button>
+          )}
 
           {!sidebarEnabled ? (
             <Button

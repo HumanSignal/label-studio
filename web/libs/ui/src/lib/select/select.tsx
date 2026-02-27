@@ -575,17 +575,23 @@ export const Select = forwardRef(
                         onItemsRendered: (params: any) => void;
                         ref: any;
                       }) => {
-                        // Calculate height based on actual item count from flatOptions
-                        // When searching, _options is filtered and flat; when not searching, _options === options (all items)
                         const actualItemCount = searchable && query.trim() ? _options.length : flatOptions.length;
                         const maxVisibleItems = virtualListMaxVisible ?? VARIABLE_LIST_COUNT_RENDERED;
-                        const listHeight = Math.min(actualItemCount, maxVisibleItems) * VARIABLE_LIST_ITEM_HEIGHT;
+
+                        const getItemHeight = (index: number) =>
+                          (_options[index] as any)?.height ?? VARIABLE_LIST_ITEM_HEIGHT;
+
+                        const visibleCount = Math.min(actualItemCount, maxVisibleItems);
+                        let listHeight = 0;
+                        for (let i = 0; i < visibleCount; i++) {
+                          listHeight += getItemHeight(i);
+                        }
 
                         return (
                           <VariableSizeList
                             key="virtual-list"
                             itemData={renderedOptions}
-                            itemSize={() => VARIABLE_LIST_ITEM_HEIGHT}
+                            itemSize={getItemHeight}
                             itemCount={renderedOptions.length}
                             height={listHeight}
                             // width={VARIABLE_LIST_WIDTH}

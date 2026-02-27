@@ -89,9 +89,12 @@
   width: max-content;
   max-width: min(500px, 90vw);
 
-  // Decorative items (headers, separators) should not show a "not-allowed" cursor
+  // cmdk sets pointer-events:none on [data-disabled], which causes the
+  // cursor to fall through to the parent and show "not-allowed".
+  // Override both so decorative items (headers, separators) show a normal cursor.
   [data-disabled] {
-    cursor: default;
+    pointer-events: auto !important;
+    cursor: default !important;
     opacity: 1;
   }
 }
