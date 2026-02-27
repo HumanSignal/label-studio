@@ -35,41 +35,41 @@ export const EditorResizer: React.FC<EditorResizerProps> = ({
 }) => {
   const [isResizing, setIsResizing] = useState(false);
 
-  const handleMouseDown = useCallback(
-    (evt: React.MouseEvent) => {
+  const handlePointerDown = useCallback(
+    (evt: React.PointerEvent) => {
       evt.stopPropagation();
       evt.preventDefault();
 
       const container = containerRef.current;
       if (!container) return;
 
+      const handleEl = evt.currentTarget as HTMLElement;
+      handleEl.setPointerCapture(evt.pointerId);
+
       const initialX = evt.pageX;
       const initialWidth = editorWidthPixels;
-      let newWidth = editorWidthPixels;
 
-      const onMouseMove = (e: MouseEvent) => {
-        newWidth = calculateEditorWidth(
+      const onPointerMove = (e: PointerEvent) => {
+        const newWidth = calculateEditorWidth(
           initialWidth,
           initialX,
           e.pageX,
           constraints.minEditorWidth,
           constraints.maxEditorWidth,
         );
-
         onResize(newWidth);
       };
 
-      const onMouseUp = () => {
-        document.removeEventListener("mousemove", onMouseMove);
-        document.removeEventListener("mouseup", onMouseUp);
+      const onPointerUp = () => {
+        handleEl.removeEventListener("pointermove", onPointerMove);
+        handleEl.removeEventListener("pointerup", onPointerUp);
         document.body.style.removeProperty("user-select");
         document.body.style.removeProperty("cursor");
-
         setIsResizing(false);
       };
 
-      document.addEventListener("mousemove", onMouseMove);
-      document.addEventListener("mouseup", onMouseUp);
+      handleEl.addEventListener("pointermove", onPointerMove);
+      handleEl.addEventListener("pointerup", onPointerUp);
       document.body.style.userSelect = "none";
       document.body.style.cursor = "col-resize";
       setIsResizing(true);
@@ -77,5 +77,7 @@ export const EditorResizer: React.FC<EditorResizerProps> = ({
     [containerRef, editorWidthPixels, onResize, constraints],
   );
 
-  return <div className={clsx(styles.handle, { [styles.handleResizing]: isResizing })} onMouseDown={handleMouseDown} />;
+  return (
+    <div className={clsx(styles.handle, { [styles.handleResizing]: isResizing })} onPointerDown={handlePointerDown} />
+  );
 };

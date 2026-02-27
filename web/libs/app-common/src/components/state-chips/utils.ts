@@ -10,6 +10,7 @@ export {
   stateRegistry,
   StateType,
   getStateColorClass,
+  getStateVariant,
   formatStateName,
   getStateDescription,
   getStateType,

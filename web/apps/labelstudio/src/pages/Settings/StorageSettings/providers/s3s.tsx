@@ -1,4 +1,4 @@
-import { EnterpriseBadge, IconSpark } from "@humansignal/ui";
+import { Badge, IconSpark } from "@humansignal/ui";
 import { Alert, AlertTitle, AlertDescription } from "@humansignal/shad/components/ui/alert";
 import { IconCloudProviderS3 } from "@humansignal/icons";
 import type { ProviderConfig } from "@humansignal/app-common/blocks/StorageProviderForm/types/provider";
@@ -9,7 +9,7 @@ const s3sProvider: ProviderConfig = {
   description: "Configure your AWS S3 connection using IAM role access for enhanced security (proxy only)",
   icon: IconCloudProviderS3,
   disabled: true,
-  badge: <EnterpriseBadge />,
+  badge: <Badge variant="gradient">Enterprise</Badge>,
   fields: [
     {
       name: "enterprise_info",

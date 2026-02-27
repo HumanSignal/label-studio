@@ -12,66 +12,62 @@ parent: "admin_auth"
 parent_enterprise: "admin_auth"
 ---
 
-System for Cross-domain Identity Management (SCIM) is a popular protocol to manage access for services and applications across an organization. This guide helps to set up SCIM integration to manage access to Label Studio Enterprise in your organization. 
+System for Cross-domain Identity Management (SCIM) is a popular protocol to manage access for services and applications across an organization. 
 
-Using SCIM provider, you can manage access to Label Studio Enterprise workspaces, grant roles to individual users and groups.
+Using a SCIM provider, you can manage access to Label Studio Enterprise workspaces, and grant roles to individual users and groups.
 
 ## Requirements
 
-SCIM interacts with your SSO integration. 
+Label Studio Enterprise uses the SCIM Version 2.0 standard. 
+
+Label Studio Enterprise follows [SCIM RFC 5741](https://datatracker.ietf.org/doc/html/rfc7644#section-3.2) and can be integrated with any access management services that support the standard.
+
+For more information on SCIM workflows, see [How SCIM works with Label Studio Enterprise](scim_workflow). 
+
+## Prerequisites
+
+* SCIM interacts with your SSO integration. Before you begin, you must have SSO already configured. If you do not have SSO set up yet, then follow [Set up SSO](auth_setup.html).
 
 !!! note
     Okta or similar SSO providers have SCIM integration based on SSO.
 
+* You will need to provide a [Legacy token](access_tokens#Legacy-tokens), and it must be associated with the Owner role of your organization.  
 
-!!! attention "important"
-    If you do not have SSO set up yet, then follow [Set up SSO](auth_setup.html).
-
-
-!!! attention "important"
-    Only owner's access token can be used for SCIM Identity Provider.
-
-
-Label Studio Enterprise uses SCIM Version 2.0 standard. As an example, this page uses integration with [Okta](https://www.okta.com/integrate/). However, Label Studio Enterprise follows [SCIM RFC 5741](https://datatracker.ietf.org/doc/html/rfc7644#section-3.2) and can be integrated with any access management services that support the standard.
-
-For more information on how SCIM workflows, see [How SCIM works with Label Studio Enterprise](scim_workflow). 
-
-## Set up SCIM integration
-
-<i>Check this video tutorial about SCIM and Okta setup.</i>
+## Set up SCIM integration with Okta
 
 !!! attention "important"
     This video demonstrates the use of `userName` in the 'Unique Identifier Field for Users' field. It is essential to use `email` as the unique identifier instead of `userName`; otherwise, SCIM will not function correctly with users who were created prior to the SCIM integration.
 
 <iframe width="560" height="315" src="https://www.youtube.com/embed/MA3de3gu18A" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 
-To manage access to Label Studio Enterprise, add the application to your SCIM provider (Okta). Okta uses Bearer (request header should be `Authorization: Bearer <token>`) token to interact with REST API endpoints of the application to provision and deprovision access.
+To manage access to Label Studio Enterprise, add the application to your SCIM provider (Okta). 
 
-### Add Label Studio Enterprise (if not complete)
+Okta uses a Bearer (request header should be `Authorization: Bearer <token>`) token to interact with REST API endpoints of the application to provision and deprovision access.
 
-1. Navigate to **Applications → Applications** in Okta. Click  **Create App Integration**. 
-2. Select **SAML 2.0**. Fill App name (for example, _Label Studio Enterprise_).
-3. On the next step **Configure SAML** set up SAML integration following the instructions to [Set up SSO guide](auth_setup.html).
+### Add Label Studio Enterprise as an application (if not complete)
+
+1. Navigate to **Applications > Applications** in Okta. Click  **Create App Integration**. 
+2. Select **SAML 2.0**. Enter an app name (for example, _Label Studio Enterprise_).
+3. Under **Configure SAML**, set up the SAML integration following the steps outlined in [Set up SSO guide](auth_setup.html).
 4. Make sure Label Studio Enterprise appears in the list of active applications.
 
 ### Enable SCIM provisioning
 
-1. Navigate to **Applications → Applications** in Okta. 
+1. Navigate to **Applications > Applications** in Okta. 
 2. Select **Label Studio Enterprise**.
-3. Go to **General** tab and check **Enable SCIM provisioning**.
-4. Switch to **Provisioning** tab. 
+3. Select the **General** tab and select **Enable SCIM provisioning**.
+4. Select the **Provisioning** tab. 
 5. Select **Integration** in the left menu. 
 6. Click **Edit** in the right corner.
 
-Fill in the fields:
- - **SCIM connector base URL**: `https://<LABEL_STUDIO_BASE_URL>/scim/v2/` where `<LABEL_STUDIO_BASE_URL>` is the base URL of your Label Studio Enterprise instance.
- - **Unique identifier field for users**: Use `email`. Label Studio Enterprise uses email as user identifier in this field.
- - **Supported provisioning actions**: Select the following items:
-   - Import New Users and Profile Updates
-   - Push New Users
-   - Push Profile Updates
-   - Push Groups
- - **HTTP Header → `Authorization: Bearer <token>`**: Put the Bearer token from the LSE owner's account profile. In case of Label Studio `Token` and `Bearer` are the same tokens. However, it's important to use `Bearer` instead of `Token` in the request header. 
+Complete the following fields:
+
+| Field | Value/Description |
+|-------|-------------------|
+| **SCIM connector base URL** | `https://<LABEL_STUDIO_BASE_URL>/scim/v2/` where `<LABEL_STUDIO_BASE_URL>` is the base URL of your Label Studio Enterprise instance. |
+| **Unique identifier field for users** | Use `email`. Label Studio Enterprise uses email as user identifier in this field. |
+| **Supported provisioning actions** | Select the following items:<br>- Import New Users and Profile Updates<br>- Push New Users<br>- Push Profile Updates<br>- Push Groups |
+| **HTTP Header → `Authorization: Bearer <token>`** | Enter the [Legacy token](access_tokens#Legacy-tokens) associated with the Owner account in Label Studio. <br />For Label Studio, `Token` and `Bearer` are the same tokens. However, it's important to use `Bearer` instead of `Token` in the request header. | 
 
 ### SCIM settings and application triggers
 
@@ -81,7 +77,7 @@ Fill in the fields:
    - Update User Attributes
    - Deactivate Users
 
-## Assign the application to a single user
+### Assign the application to a single user
 
 You can assign the application on both the **user** page and **application** page.
 
@@ -92,24 +88,21 @@ You can assign the application on both the **user** page and **application** pag
 
 After you click **Done**, Okta will send the requests to create users accordingly in the Label Studio Enterprise.
 
-## Unassigning the application for users
+### Unassigning the application for users
 
 1. On the application page navigate to **Assignments** tab.
 2. Select **People** in the left menu.
 3. Click the delete cross against the user you would like to unassign.
 4. Confirm the unassignment.
 
-## Assign the application to a group
+### Assign the application to a group
 
 The most convenient way to manage access to the application is via groups. You can assign Label Studio to groups and manage the groups in Okta. The changes will be propagated to the application.
 
-### Set up group mapping
+### Set up group mapping in Label Studio
 
 1. In Label Studio, click the menu in the upper left and select **Organization**. 
 
-    ![Screenshot of Organization in the Label Studio menu](/images/general/menu_organization.png)
-    
-    If you do not see the option to select **Organization**, you are not logged in with the appropriate role. 
 2. Select **SCIM** in the upper right. 
 3. Update roles and workspaces mapping. Ensure the group name you enter is the same as the group name being sent by your SCIM provider. 
 
@@ -124,8 +117,6 @@ The most convenient way to manage access to the application is via groups. You c
         You can map a group to different roles across multiple projects. You can also map multiple groups to the same roles and the same projects. For more information on roles, see [Roles in Label Studio Enterprise](admin_roles). 
     
         If you select **Inherit**, the group will inherit the role set above under **Organization Roles to Groups Mapping.** If the group is inheriting the Not Activated role, the users are mapped to the project, but they are not actually assigned to the project until the group is synced (meaning that the user authenticates first). 
-
-
 
 ### Assign a group to the application
 
@@ -145,7 +136,7 @@ After saving the group assignment, the update will be queued and sent to Label S
 3. Find the group you would like to sync to Label Studio. 
 4. 4. Choose either **Create Group** or **Link Group**, if you already have a workplace with the same name as specified on the **SCIM** >> **Settings** page.
 
-## Unassigning the application for groups
+### Unassigning the application for groups
 
 To unassign a group from the application, follow the steps for [Unassigning the application for users](#Unassigning-the-application-for-users).
 
@@ -157,3 +148,48 @@ To unassign a group from the application, follow the steps for [Unassigning the 
 
 <i>Check this video tutorial to remove a user and group.</i>
 <iframe width="560" height="315" src="https://www.youtube.com/embed/vMA0TLhHGYE" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
+## Set up SCIM with Microsoft Entra ID (Azure AD)
+
+Label Studio Enterprise supports SCIM provisioning with Microsoft Entra ID (formerly Azure AD). The setup is similar to Okta, but requires specific attribute mapping configuration.
+
+### Supported user attributes
+
+Label Studio Enterprise supports a limited set of SCIM user attributes for provisioning. When configuring attribute mappings in Microsoft Entra ID, only include the attributes listed below.
+
+| SCIM Attribute | Description | Required |
+|---|---|---|
+| `emails[type eq "work"].value` | User's email address (primary identifier) | Yes |
+| `userName` | Username (mapped to email in Label Studio) | Yes |
+| `active` | Whether the user is active | Yes |
+| `name.givenName` | User's first name | No |
+| `name.familyName` | User's last name | No |
+
+!!! warning "Unsupported attributes cause provisioning errors"
+    Mapping attributes that Label Studio does not support will result in **HTTP 501 (Not Implemented)** errors during SCIM provisioning. You must remove all excess Microsoft Entra ID attribute mappings like these:
+    
+    * `displayName`
+    * `preferredLanguage`
+    * `name.formatted`
+    * `externalId`
+
+### Configure Microsoft Entra ID provisioning
+
+1. In the [Microsoft Entra admin center](https://entra.microsoft.com), select **Enterprise apps** in the left menu.
+2. Select your enterprise application.
+3. Select **Provisioning** in the left menu.
+4. Set the **Tenant URL** to `https://<LABEL_STUDIO_BASE_URL>/scim/v2/`.
+5. Set the **Secret Token** to the [Legacy token](access_tokens#Legacy-tokens) associated with the Owner account in Label Studio. 
+
+    This must be the Legacy token, not the Personal Access Token. It must also be associated with the user in the Owner role. 
+6. Under **Mappings**, open **Provision Microsoft Entra ID Users**.
+7. Remove all attribute mappings except the supported ones listed above. 
+
+    Keep:
+    * `emails[type eq "work"].value` → `userPrincipalName`
+    * `userName` → `userPrincipalName`
+    * `active` → `Switch([IsSoftDeleted], , "False", "True", "True", "False")`
+    * `name.givenName` → `givenName`
+    * `name.familyName` → `surname`
+8. Under **Mappings**, open **Provision Microsoft Entra ID Groups** and ensure it is enabled if you want to use group-based role assignment.
+9. For group provisioning, configure SCIM group settings in Label Studio (see [Set up group mapping](#set-up-group-mapping) above).

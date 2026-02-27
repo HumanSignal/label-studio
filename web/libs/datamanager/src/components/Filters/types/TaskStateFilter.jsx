@@ -1,18 +1,22 @@
 import { observer } from "mobx-react";
 import { Select, Badge } from "@humansignal/ui";
-import { stateRegistry, formatStateName, getStateColorClass } from "@humansignal/app-common";
+import { stateRegistry, formatStateName, getStateVariant } from "@humansignal/app-common";
 import { useMemo } from "react";
 
 const BaseInput = observer(({ value, onChange, placeholder }) => {
   const options = useMemo(() => {
     return stateRegistry.getStatesByEntityType("task").map((state) => {
       const textLabel = formatStateName(state);
-      const colorClasses = getStateColorClass(state);
+      const variant = getStateVariant(state);
 
       return {
         value: state,
         textLabel,
-        label: <Badge className={colorClasses}>{textLabel}</Badge>,
+        label: (
+          <Badge variant={variant} shape="rounded">
+            {textLabel}
+          </Badge>
+        ),
       };
     });
   }, []);
@@ -31,9 +35,11 @@ const BaseInput = observer(({ value, onChange, placeholder }) => {
       selectedValueRenderer={(option) => {
         if (!option) return null;
 
-        const colorClasses = getStateColorClass(option.value);
-
-        return <Badge className={`${colorClasses} h-[18px] text-[12px]`}>{option.textLabel}</Badge>;
+        return (
+          <Badge variant={getStateVariant(option.value)} shape="rounded" size="small">
+            {option.textLabel}
+          </Badge>
+        );
       }}
       size="small"
       triggerClassName="min-w-[100px]"

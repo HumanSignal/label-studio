@@ -1,7 +1,7 @@
 import { forwardRef, type ReactNode } from "react";
 import { cn } from "../../utils/utils";
-import { Button } from "../button/button";
 import { EnterpriseBadge } from "../enterprise-badge/enterprise-badge";
+import { Button } from "../button/button";
 import { Typography } from "../typography/typography";
 import styles from "./enterprise-upgrade-overlay.module.scss";
 
@@ -111,7 +111,7 @@ export const EnterpriseUpgradeOverlay = forwardRef<HTMLDivElement, EnterpriseUpg
         <div className={styles.container}>
           <div className={styles.content}>
             <div className={styles.badge}>
-              <EnterpriseBadge filled />
+              <EnterpriseBadge style="filled" />
             </div>
 
             <Typography variant="headline" size="medium" className={styles.title}>

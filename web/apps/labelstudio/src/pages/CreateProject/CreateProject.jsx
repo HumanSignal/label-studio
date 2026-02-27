@@ -59,7 +59,7 @@ const ProjectName = ({ name, setName, onSaveName, onSubmit, error, description, 
         <div className="w-full flex flex-col gap-2">
           <label>
             Workspace
-            <EnterpriseBadge className="ml-2" />
+            <EnterpriseBadge className="ml-tight" />
           </label>
           <Select placeholder="Select an option" disabled options={[]} triggerClassName="!flex-1" />
           <Typography size="small" className="mt-tight mb-wider">

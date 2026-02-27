@@ -209,6 +209,7 @@ const designTokens = {
         bold: "var(--color-accent-grape-bold)",
         base: "var(--color-accent-grape-base)",
         subtle: "var(--color-accent-grape-subtle)",
+        subtler: "var(--color-accent-grape-subtler)",
         subtlest: "var(--color-accent-grape-subtlest)",
       },
       blueberry: {
@@ -216,6 +217,7 @@ const designTokens = {
         bold: "var(--color-accent-blueberry-bold)",
         base: "var(--color-accent-blueberry-base)",
         subtle: "var(--color-accent-blueberry-subtle)",
+        subtler: "var(--color-accent-blueberry-subtler)",
         subtlest: "var(--color-accent-blueberry-subtlest)",
       },
       kale: {
@@ -223,6 +225,7 @@ const designTokens = {
         bold: "var(--color-accent-kale-bold)",
         base: "var(--color-accent-kale-base)",
         subtle: "var(--color-accent-kale-subtle)",
+        subtler: "var(--color-accent-kale-subtler)",
         subtlest: "var(--color-accent-kale-subtlest)",
       },
       kiwi: {
@@ -230,6 +233,7 @@ const designTokens = {
         bold: "var(--color-accent-kiwi-bold)",
         base: "var(--color-accent-kiwi-base)",
         subtle: "var(--color-accent-kiwi-subtle)",
+        subtler: "var(--color-accent-kiwi-subtler)",
         subtlest: "var(--color-accent-kiwi-subtlest)",
       },
       mango: {
@@ -237,6 +241,7 @@ const designTokens = {
         bold: "var(--color-accent-mango-bold)",
         base: "var(--color-accent-mango-base)",
         subtle: "var(--color-accent-mango-subtle)",
+        subtler: "var(--color-accent-mango-subtler)",
         subtlest: "var(--color-accent-mango-subtlest)",
       },
       canteloupe: {
@@ -244,6 +249,7 @@ const designTokens = {
         bold: "var(--color-accent-canteloupe-bold)",
         base: "var(--color-accent-canteloupe-base)",
         subtle: "var(--color-accent-canteloupe-subtle)",
+        subtler: "var(--color-accent-canteloupe-subtler)",
         subtlest: "var(--color-accent-canteloupe-subtlest)",
       },
       persimmon: {
@@ -251,6 +257,7 @@ const designTokens = {
         bold: "var(--color-accent-persimmon-bold)",
         base: "var(--color-accent-persimmon-base)",
         subtle: "var(--color-accent-persimmon-subtle)",
+        subtler: "var(--color-accent-persimmon-subtler)",
         subtlest: "var(--color-accent-persimmon-subtlest)",
       },
       plum: {
@@ -258,6 +265,7 @@ const designTokens = {
         bold: "var(--color-accent-plum-bold)",
         base: "var(--color-accent-plum-base)",
         subtle: "var(--color-accent-plum-subtle)",
+        subtler: "var(--color-accent-plum-subtler)",
         subtlest: "var(--color-accent-plum-subtlest)",
       },
       fig: {
@@ -265,6 +273,7 @@ const designTokens = {
         bold: "var(--color-accent-fig-bold)",
         base: "var(--color-accent-fig-base)",
         subtle: "var(--color-accent-fig-subtle)",
+        subtler: "var(--color-accent-fig-subtler)",
         subtlest: "var(--color-accent-fig-subtlest)",
       },
       sand: {
@@ -272,6 +281,7 @@ const designTokens = {
         bold: "var(--color-accent-sand-bold)",
         base: "var(--color-accent-sand-base)",
         subtle: "var(--color-accent-sand-subtle)",
+        subtler: "var(--color-accent-sand-subtler)",
         subtlest: "var(--color-accent-sand-subtlest)",
       },
     },

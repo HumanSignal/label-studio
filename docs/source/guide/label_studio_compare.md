@@ -48,6 +48,12 @@ Label Studio is available to everyone as open source software (Label Studio Comm
     <td style="text-align:center">✅</td>
   </tr>
   <tr>
+    <td><b>Customizable permissions</b><br/><a href="https://docs.humansignal.com/guide/admin_permissions">Fine-grained control over which roles can execute specific actions, such as inviting members, managing cloud storage, deleting tasks, and more.</a></td>
+    <td style="text-align:center">❌</td>
+    <td style="text-align:center">❌</td>
+    <td style="text-align:center">✅</td>
+  </tr>
+  <tr>
     <td colspan="4" style="text-align:center"><b>Data Management</b></td>
   </tr>
   <tr>
