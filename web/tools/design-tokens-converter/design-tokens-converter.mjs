@@ -305,6 +305,19 @@ function processPrimitiveTypography(typographyObj, result) {
       }
     }
   }
+
+  // Font-style shorthand (normal / italic). Figma exports font-weight "italic" variants as
+  // non-numeric values (e.g. "Medium Italic"); we skip those and use CSS font-style instead.
+  result.cssVariables.light.push("--font-style-normal: normal;");
+  result.cssVariables.light.push("--font-style-italic: italic;");
+  if (!result.jsTokens.typography.fontStyle) {
+    result.jsTokens.typography.fontStyle = {};
+  }
+  if (!result.jsTokens.typography.fontStyle.primitive) {
+    result.jsTokens.typography.fontStyle.primitive = {};
+  }
+  result.jsTokens.typography.fontStyle.primitive.normal = "var(--font-style-normal)";
+  result.jsTokens.typography.fontStyle.primitive.italic = "var(--font-style-italic)";
 }
 
 /**
@@ -427,6 +440,16 @@ function processTokenCollection(collectionKey, subCollectionKey) {
         const name = key.replace("$", "");
         const value = tokenCollection[key].$value;
         const cssVarName = `--${parentKey}-${name}`;
+
+        // Skip font-weight tokens that are Figma "italic" style variants (e.g. "Light Italic");
+        // they are not valid CSS font-weight. Use --font-style-normal / --font-style-italic instead.
+        const isFontWeightItalicVariant =
+          subCollectionKey === "font-weight" &&
+          (name.endsWith("-italic") ||
+            (!isNumber && typeof value === "string" && !value.startsWith("{")));
+        if (isFontWeightItalicVariant) {
+          continue;
+        }
 
         let resolvedValue;
         if (typeof value === "string" && value.startsWith("{") && value.endsWith("}")) {
