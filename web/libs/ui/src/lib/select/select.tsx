@@ -481,7 +481,9 @@ export const Select = forwardRef(
           if (group.groupKey !== null) {
             elements.push(
               <div key={`group-header-${group.groupKey}-${groupIdx}`} className={styles.groupHeader}>
-                {group.groupKey}
+                <Typography variant="label" size="smaller">
+                  {group.groupKey}
+                </Typography>
               </div>,
             );
           }

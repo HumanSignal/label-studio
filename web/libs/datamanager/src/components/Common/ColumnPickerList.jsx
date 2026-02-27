@@ -4,24 +4,12 @@ import { IconSpark } from "@humansignal/icons";
 // ── Adapters ─────────────────────────────────────────────────────────────────
 
 /**
- * Returns true for the aggregate agreement column and all per-dimension
- * agreement columns, which are grouped together under a synthetic "Agreement"
- * section.  Detection is alias-based so no parent/children wiring is needed
- * on the MST model (keeping existing column IDs and filter/sort behaviour intact).
- */
-function isAgreementColumn(col) {
-  const alias = col.alias ?? "";
-  return alias === "agreement" || alias.startsWith("dimension_agreement__");
-}
-
-/**
  * Convert targetColumns (TabColumn[] from store.currentView.targetColumns)
  * to the normalized group format for pickerGroupsToFlatOptions.
  *
  * Columns with `children` become labeled groups via the standard MST hierarchy
- * (Data, Annotations, …).  Agreement and its per-dimension columns are grouped
- * by alias pattern so their column IDs and table behaviour are unchanged.
- * Remaining root columns (no parent, no children) form the un-titled leading group.
+ * (Data, Annotations, Agreement when dimensions enabled, …).  Remaining root
+ * columns (no parent, no children) form the un-titled leading group.
  *
  * @param {TabColumn[]} columns
  * @param {function} [filterFn] - optional predicate applied to parent columns and
@@ -30,7 +18,6 @@ function isAgreementColumn(col) {
  */
 export function columnsToPickerGroups(columns, filterFn) {
   const rootItems = [];
-  const agreementItems = [];
   const groups = new Map(); // parentKey → {key, title, items[]}
 
   for (const col of columns) {
@@ -46,11 +33,6 @@ export function columnsToPickerGroups(columns, filterFn) {
       }
     } else if (col.parent) {
       // Child of a parent-with-children: rendered through the parent branch above.
-    } else if (isAgreementColumn(col)) {
-      // Aggregate + per-dimension agreement columns → synthetic Agreement group.
-      if (!filterFn || filterFn(col)) {
-        agreementItems.push(toTabColumnItem(col));
-      }
     } else {
       // Plain root leaf column.
       if (!filterFn || filterFn(col)) {
@@ -62,9 +44,6 @@ export function columnsToPickerGroups(columns, filterFn) {
   const result = [];
   if (rootItems.length) {
     result.push({ key: "__root__", title: null, items: rootItems });
-  }
-  if (agreementItems.length) {
-    result.push({ key: "__agreement__", title: "Agreement", items: agreementItems });
   }
   result.push(...groups.values());
   return result;
@@ -83,7 +62,6 @@ export function columnsToPickerGroups(columns, filterFn) {
  */
 export function filtersToPickerGroups(availableFilters) {
   const rootItems = [];
-  const agreementItems = [];
   const groups = new Map(); // parent column key → {key, title, items[]}
 
   for (const filter of availableFilters) {
@@ -98,9 +76,7 @@ export function filtersToPickerGroups(availableFilters) {
       original: filter,
     };
 
-    if (isAgreementColumn(field)) {
-      agreementItems.push(item);
-    } else if (field.parent) {
+    if (field.parent) {
       const parentKey = field.parent.key;
       if (!groups.has(parentKey)) {
         groups.set(parentKey, { key: parentKey, title: field.parent.title, items: [] });
@@ -115,20 +91,16 @@ export function filtersToPickerGroups(availableFilters) {
   if (rootItems.length) {
     result.push({ key: "__root__", title: null, items: rootItems });
   }
-  if (agreementItems.length) {
-    result.push({ key: "__agreement__", title: "Agreement", items: agreementItems });
-  }
   result.push(...groups.values());
   return result;
 }
 
 /**
- * Show a type badge only for columns that belong to a named group (parent
- * exists) and are NOT agreement-dimension columns.  Root columns and
- * per-dimension agreement sub-columns carry no meaningful type label.
+ * Show a type badge only for columns that belong to a named group (parent exists).
+ * Root columns carry no meaningful type label.
  */
 function shouldShowBadge(col) {
-  return !!col.parent && col.readableType !== "agreement";
+  return !!col.parent;
 }
 
 function toTabColumnItem(col) {
