@@ -1,7 +1,7 @@
 import { inject } from "mobx-react";
 import { observer } from "mobx-react-lite";
 import { useCallback, useEffect, useMemo, useRef } from "react";
-import { IconGearNewUI } from "@humansignal/icons";
+import { IconGearNewUI, IconChevronLeft } from "@humansignal/icons";
 import { cn } from "../../utils/bem";
 import { Button } from "@humansignal/ui";
 import { FieldsButton } from "../Common/FieldsButton";
