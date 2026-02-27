@@ -1,5 +1,5 @@
-import { EnterpriseBadge } from "@humansignal/ui";
-import { Tag } from "./Tag/Tag";
+import { Badge } from "@humansignal/ui";
+import { IconSpark } from "@humansignal/icons";
 
 // ── Adapters ─────────────────────────────────────────────────────────────────
 
@@ -205,15 +205,19 @@ export const ColumnPickerOptionContent = ({ option }) => {
   const badge = icon ? (
     <div className="w-5 h-5 flex items-center justify-center flex-shrink-0">{icon}</div>
   ) : readableType ? (
-    <Tag size="small" color="#888">
+    <Badge size="small" variant="primary">
       {readableType}
-    </Tag>
+    </Badge>
   ) : null;
   return (
     <span className="flex items-center justify-between w-full gap-base">
       <span>{label}</span>
       <div className="flex items-center gap-tight flex-shrink-0 pointer-events-none">
-        {enterpriseBadge && <EnterpriseBadge ghost />}
+        {enterpriseBadge && (
+          <Badge variant="gradient" style="ghost" icon={<IconSpark />}>
+            Enterprise
+          </Badge>
+        )}
         {badge}
       </div>
     </span>
