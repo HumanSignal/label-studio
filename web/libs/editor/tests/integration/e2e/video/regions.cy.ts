@@ -1,6 +1,5 @@
 import { Labels, LabelStudio, Sidebar, VideoView } from "@humansignal/frontend-test/helpers/LSF/index";
 import { simpleVideoConfig, simpleVideoData, simpleVideoResult } from "../../data/video_segmentation/regions";
-import { TWO_FRAMES_TIMEOUT } from "../utils/constants";
 
 // This test suite has exhibited flakiness in CI environments, so we are using retries
 // while we work on improving CI stability for visual comparisons.
@@ -29,21 +28,16 @@ describe("Video segmentation", suiteConfig, () => {
     LabelStudio.params().config(simpleVideoConfig).data(simpleVideoData).withResult([]).init();
     LabelStudio.waitForObjectsReady();
 
-    // Wait for video and regions to be fully loaded
-    cy.wait(TWO_FRAMES_TIMEOUT);
-
+    VideoView.waitForStableState();
     Sidebar.hasNoRegions();
 
-    // Wait for video to be fully loaded and stable
     VideoView.captureCanvas("canvas");
 
     Labels.select("Label 2");
     VideoView.drawRectRelative(0.2, 0.2, 0.6, 0.6);
 
-    // Ensure drawing operations are complete before comparison
-    cy.wait(1000);
-
     Sidebar.hasRegions(1);
+    VideoView.waitForStableState();
 
     VideoView.canvasShouldChange("canvas", 0);
   });
@@ -91,7 +85,7 @@ describe("Video segmentation", suiteConfig, () => {
     VideoView.waitForFrame(4); // Wait for frame 4
     Sidebar.hasSelectedRegions(1);
 
-    cy.wait(1000);
+    VideoView.waitForStableState();
 
     VideoView.canvasShouldNotChange("canvas", 0);
   });

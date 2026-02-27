@@ -137,16 +137,16 @@ export const create = (columns) => {
   })
     .actions((self) => ({
       loadTaskHistory: flow(function* (props) {
-        let taskHistory = yield self.root.apiCall("taskHistory", props);
+        const taskHistory = yield self.root.apiCall("taskHistory", props);
 
-        taskHistory = taskHistory.map((task) => {
-          return {
-            taskId: task.taskId,
-            annotationId: task.annotationId?.toString(),
-          };
-        });
+        if (!Array.isArray(taskHistory)) {
+          return [];
+        }
 
-        return taskHistory;
+        return taskHistory.map((task) => ({
+          taskId: task.taskId,
+          annotationId: task.annotationId?.toString(),
+        }));
       }),
       loadTask: flow(function* (taskID, { select = true } = {}) {
         if (!isDefined(taskID)) {
@@ -170,12 +170,24 @@ export const create = (columns) => {
 
         const taskData = yield self.root.apiCall("task", taskParams);
 
-        if (taskData.status === 404) {
+        const taskStatusCode =
+          taskData?.status ??
+          taskData?.$meta?.status ??
+          taskData?.status_code ??
+          taskData?.response?.status ??
+          taskData?.response?.status_code;
+
+        if (taskStatusCode === 404) {
           self.finishLoading(taskID);
           getRoot(self).SDK.invoke("crash", {
             error: `Task ID: ${taskID} does not exist or is no longer available`,
             redirect: true,
           });
+          return null;
+        }
+
+        if (!taskData || taskData.error) {
+          self.finishLoading(taskID);
           return null;
         }
         const task = self.applyTaskSnapshot(taskData, taskID);
@@ -194,6 +206,12 @@ export const create = (columns) => {
 
         if (taskData?.$meta?.status === 404) {
           getRoot(self).SDK.invoke("labelStreamFinished");
+          return null;
+        }
+
+        const responseStatus = taskData?.$meta?.status;
+
+        if (!taskData || taskData.error || (responseStatus && responseStatus >= 400)) {
           return null;
         }
 

@@ -20,8 +20,8 @@ export const RadioGroup = ({ size, value, defaultValue, onChange, children, ...p
         defaultValue,
       }}
     >
-      <div className={cn("radio-group").mod({ size })} style={props.style}>
-        <div className={cn("radio-group").elem("buttons")}>{children}</div>
+      <div className={cn("radio-group").mod({ size }).toClassName()} style={props.style}>
+        <div className={cn("radio-group").elem("buttons").toClassName()}>{children}</div>
       </div>
     </RadioContext.Provider>
   );
@@ -32,9 +32,9 @@ const RadioButton = ({ value, disabled, children }) => {
   const checked = value === currentValue;
 
   return (
-    <label className={cn("radio-group").elem("button").mod({ checked, disabled })}>
+    <label className={cn("radio-group").elem("button").mod({ checked, disabled }).toClassName()}>
       <input
-        className={cn("radio-group").elem("input")}
+        className={cn("radio-group").elem("input").toClassName()}
         type="radio"
         value={value}
         checked={value === currentValue}

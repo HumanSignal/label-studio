@@ -181,6 +181,9 @@ export const deletePoint = (
 ) => {
   if (index < 0 || index >= initialPoints.length) return;
 
+  // Don't allow deleting the last remaining point — it would leave an empty region
+  if (initialPoints.length <= 1) return;
+
   const deletedPoint = initialPoints[index];
   const newPoints = [...initialPoints];
   newPoints.splice(index, 1);

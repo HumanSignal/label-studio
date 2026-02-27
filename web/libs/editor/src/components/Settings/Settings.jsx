@@ -12,7 +12,6 @@ import EditorSettings from "../../core/settings/editorsettings";
 import * as TagSettings from "./TagSettings";
 import { IconClose } from "@humansignal/icons";
 import { Checkbox, Toggle } from "@humansignal/ui";
-import { FF_DEV_3873, isFF } from "../../utils/feature-flags";
 import { ff } from "@humansignal/core";
 
 const HotkeysDescription = () => {
@@ -63,23 +62,21 @@ const HotkeysDescription = () => {
   );
 };
 
-const newUI = isFF(FF_DEV_3873) ? { newUI: true } : {};
+const newUI = { newUI: true };
 
 const editorSettingsKeys = Object.keys(EditorSettings).filter((key) => {
   const flag = EditorSettings[key].flag;
   return flag ? ff.isActive(flag) : true;
 });
 
-if (isFF(FF_DEV_3873)) {
-  const enableTooltipsIndex = editorSettingsKeys.findIndex((key) => key === "enableTooltips");
-  const enableLabelTooltipsIndex = editorSettingsKeys.findIndex((key) => key === "enableLabelTooltips");
+const enableTooltipsIndex = editorSettingsKeys.findIndex((key) => key === "enableTooltips");
+const enableLabelTooltipsIndex = editorSettingsKeys.findIndex((key) => key === "enableLabelTooltips");
 
-  // swap these in the array
-  const tmp = editorSettingsKeys[enableTooltipsIndex];
+// swap these in the array (new UI order)
+const tmp = editorSettingsKeys[enableTooltipsIndex];
 
-  editorSettingsKeys[enableTooltipsIndex] = editorSettingsKeys[enableLabelTooltipsIndex];
-  editorSettingsKeys[enableLabelTooltipsIndex] = tmp;
-}
+editorSettingsKeys[enableTooltipsIndex] = editorSettingsKeys[enableLabelTooltipsIndex];
+editorSettingsKeys[enableLabelTooltipsIndex] = tmp;
 
 const SettingsTag = ({ children }) => {
   return <div className={cn("settings-tag").toClassName()}>{children}</div>;
@@ -91,38 +88,25 @@ const GeneralSettings = observer(({ store }) => {
       {editorSettingsKeys.map((obj, index) => {
         return (
           <label className={cn("settings").elem("field").toClassName()} key={index}>
-            {isFF(FF_DEV_3873) ? (
-              <>
-                <div className={cn("settings__label").toClassName()}>
-                  <div className={cn("settings__label").elem("title").toClassName()}>
-                    {EditorSettings[obj].newUI.title}
-                    {EditorSettings[obj].newUI.tags?.split(",").map((tag) => (
-                      <SettingsTag key={tag}>{tag}</SettingsTag>
-                    ))}
-                  </div>
-                  <div className={cn("settings__label").elem("description").toClassName()}>
-                    {EditorSettings[obj].newUI.description}
-                  </div>
+            <>
+              <div className={cn("settings__label").toClassName()}>
+                <div className={cn("settings__label").elem("title").toClassName()}>
+                  {EditorSettings[obj].newUI.title}
+                  {EditorSettings[obj].newUI.tags?.split(",").map((tag) => (
+                    <SettingsTag key={tag}>{tag}</SettingsTag>
+                  ))}
                 </div>
-                <Toggle
-                  key={index}
-                  checked={store.settings[obj]}
-                  onChange={store.settings[EditorSettings[obj].onChangeEvent]}
-                  description={EditorSettings[obj].description}
-                />
-              </>
-            ) : (
-              <>
-                <Checkbox
-                  key={index}
-                  checked={store.settings[obj]}
-                  onChange={store.settings[EditorSettings[obj].onChangeEvent]}
-                >
-                  {EditorSettings[obj].description}
-                </Checkbox>
-                <br />
-              </>
-            )}
+                <div className={cn("settings__label").elem("description").toClassName()}>
+                  {EditorSettings[obj].newUI.description}
+                </div>
+              </div>
+              <Toggle
+                key={index}
+                checked={store.settings[obj]}
+                onChange={store.settings[EditorSettings[obj].onChangeEvent]}
+                description={EditorSettings[obj].description}
+              />
+            </>
           </label>
         );
       })}
@@ -196,23 +180,13 @@ const Settings = {
   Hotkeys: { name: "Hotkeys", component: HotkeysDescription },
 };
 
-if (!isFF(FF_DEV_3873)) {
-  Settings.Layout = { name: "Layout", component: LayoutSettings };
-}
-
 const DEFAULT_ACTIVE = Object.keys(Settings)[0];
 
-const DEFAULT_MODAL_SETTINGS = isFF(FF_DEV_3873)
-  ? {
-      name: "settings-modal",
-      title: "Labeling Interface Settings",
-      closeIcon: <IconClose />,
-    }
-  : {
-      name: "settings-modal-old",
-      title: "Settings",
-      bodyStyle: { paddingTop: "0" },
-    };
+const DEFAULT_MODAL_SETTINGS = {
+  name: "settings-modal",
+  title: "Labeling Interface Settings",
+  closeIcon: <IconClose />,
+};
 
 export default observer(({ store }) => {
   const availableSettings = useMemo(() => {

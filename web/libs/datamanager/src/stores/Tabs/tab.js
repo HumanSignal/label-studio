@@ -13,6 +13,8 @@ import { FF_ANNOTATION_RESULTS_FILTERING, isFF } from "../../utils/feature-flags
 const THRESHOLD_MIN = 0;
 const THRESHOLD_MIN_DIFF = 0.001;
 
+import { validateFilterSnapshot } from "./filter_snapshot_utils";
+
 export const Tab = types
   .model("View", {
     id: StringOrNumberID,
@@ -518,15 +520,10 @@ export const Tab = types
      * @returns {boolean} false if no valid filters could be imported
      */
     importFilters(snapshot) {
-      if (!snapshot || typeof snapshot !== "object") return false;
-      const { conjunction, items } = snapshot;
+      const validItems = validateFilterSnapshot(snapshot, self.availableFilters);
+      if (!validItems) return false;
 
-      if (!Array.isArray(items)) return false;
-
-      const availableIds = new Set(self.availableFilters.map((f) => f.id));
-      const validItems = items.filter((item) => item?.filter && availableIds.has(item.filter));
-
-      if (validItems.length === 0) return false;
+      const { conjunction } = snapshot;
 
       // Destroy existing filters before importing
       while (self.filters.length > 0) {

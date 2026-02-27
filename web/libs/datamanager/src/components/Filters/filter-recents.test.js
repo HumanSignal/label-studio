@@ -62,10 +62,7 @@ describe("filter-recents", () => {
     it("filters out invalid entries", () => {
       localStorage.setItem(storageKey, JSON.stringify([null, 123, { id: "valid" }, "str"]));
       const result = getRecentFilterFields(projectId);
-      expect(result).toEqual([
-        { id: "valid" },
-        { id: "str", operator: null, value: null },
-      ]);
+      expect(result).toEqual([{ id: "valid" }, { id: "str", operator: null, value: null }]);
     });
   });
 

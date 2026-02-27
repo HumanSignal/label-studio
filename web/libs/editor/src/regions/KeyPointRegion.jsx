@@ -66,10 +66,11 @@ const Model = types
   }))
   .actions((self) => ({
     setPosition(x, y) {
-      const point = self.control?.getSnappedPoint({
+      const internal = {
         x: self.parent.canvasToInternalX(x),
         y: self.parent.canvasToInternalY(y),
-      });
+      };
+      const point = self.control?.getSnappedPoint(internal) ?? internal;
 
       self.x = point.x;
       self.y = point.y;

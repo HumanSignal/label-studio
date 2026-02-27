@@ -20,6 +20,9 @@ export type TabProps = {
   checkSnap: EventHandlers["checkSnap"];
 };
 
+// Shared with PanelBase (outliner/details panel names)
+export type PanelType = "outliner" | "details";
+
 // false: don't show the tab; string: show tab with given title
 export type ShowCustomTab = false | string;
 

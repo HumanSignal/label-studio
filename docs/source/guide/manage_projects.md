@@ -64,11 +64,11 @@ When you duplicate a project, you can copy the following:
 
 * Labeling configuration
 * Most project settings
+* Project membership settings
 * Project tasks or uploaded data (optionally)
 
 Duplication does not include:
 
-* Project membership settings 
 * Task assignments
 * Completed annotations
 * External storage settings

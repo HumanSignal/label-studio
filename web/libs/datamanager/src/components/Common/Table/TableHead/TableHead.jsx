@@ -7,13 +7,12 @@ import { Dropdown } from "@humansignal/ui";
 import { Menu } from "../../Menu/Menu";
 import { Resizer } from "../../Resizer/Resizer";
 import { Space } from "../../Space/Space";
-import { Tag } from "../../Tag/Tag";
+import { Badge } from "@humansignal/ui";
 import { TableCell, TableCellContent } from "../TableCell/TableCell";
 import { TableContext, tableCN } from "../TableContext";
 import { cn } from "../../../../utils/bem";
 import { getStyle } from "../utils";
 import "./TableHead.scss";
-import { FF_DEV_3873, isFF } from "../../../../utils/feature-flags";
 import { getRoot } from "mobx-state-tree";
 import { AgreementSelected } from "../../../CellViews/AgreementSelected";
 import { IconChevronDown } from "@humansignal/icons";
@@ -41,17 +40,7 @@ const DropdownWrapper = observer(({ column, cellViews, children, onChange }) => 
             return (
               <Menu.Item key={type} onClick={() => onChange?.(column, type)}>
                 <Space>
-                  <Tag
-                    size="small"
-                    style={{
-                      width: 45,
-                      textAlign: "center",
-                      cursor: "pointer",
-                      fontSize: 14,
-                    }}
-                  >
-                    {ViewColumnTypeShort(type)}
-                  </Tag>
+                  <Badge size="small">{ViewColumnTypeShort(type)}</Badge>
                   {ViewColumnTypeName(type)}
                 </Space>
               </Menu.Item>
@@ -131,7 +120,7 @@ const ColumnRenderer = observer(
       const { cellClassName: _, headerClassName, ...rest } = column;
 
       return (
-        <div {...rest} className={tableCN.elem("cell").mix(["th", headerClassName]).toString()} key={id}>
+        <div {...rest} className={tableCN.elem("cell").mix(["th", headerClassName]).toClassName()} key={id}>
           <Header />
         </div>
       );
@@ -151,7 +140,7 @@ const ColumnRenderer = observer(
           {content}
         </TableCellContent>
 
-        {extra && <span className={tableHeadCN.elem("column-extra").toString()}>{extra}</span>}
+        {extra && <span className={tableHeadCN.elem("column-extra").toClassName()}>{extra}</span>}
       </>
     );
 
@@ -261,11 +250,11 @@ export const TableHead = observer(
 
       return (
         <div
-          className={tableHeadCN.mod({ droppable: true }).mix("horizontal-shadow").toString()}
+          className={tableHeadCN.mod({ droppable: true }).mix("horizontal-shadow").toClassName()}
           ref={ref}
           style={{
             ...style,
-            height: isFF(FF_DEV_3873) && 42,
+            height: 42,
           }}
           onDragOver={useCallback(
             (e) => {
@@ -280,7 +269,7 @@ export const TableHead = observer(
           {columns.map((col) => {
             return (
               <span
-                className={tableHeadCN.elem("draggable").toString()}
+                className={tableHeadCN.elem("draggable").toClassName()}
                 draggable={true}
                 ref={(ele) => (colRefs.current[col.id] = ele)}
                 key={col.id}
@@ -331,7 +320,7 @@ export const TableHead = observer(
               </span>
             );
           })}
-          <span className={tableHeadCN.elem("extra").toString()}>{extra}</span>
+          <span className={tableHeadCN.elem("extra").toClassName()}>{extra}</span>
         </div>
       );
     },

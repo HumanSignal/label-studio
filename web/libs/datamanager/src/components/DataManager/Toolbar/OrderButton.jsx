@@ -1,5 +1,5 @@
 import { IconSortDown, IconSortUp } from "@humansignal/icons";
-import { Button, ButtonGroup, EnterpriseBadge } from "@humansignal/ui";
+import { Button, ButtonGroup, Badge } from "@humansignal/ui";
 import { inject } from "mobx-react";
 import { FieldsButton } from "../../Common/FieldsButton";
 import { Space } from "../../Common/Space/Space";
@@ -33,7 +33,7 @@ export const OrderButton = injector(({ size, ordering, view, ...rest }) => {
               {children}
 
               <div className="flex items-center gap-tight">
-                {enterpriseBadge && <EnterpriseBadge ghost />}
+                {enterpriseBadge && <Badge variant="gradient" style="ghost" />}
                 {column?.icon && <div className="w-6 h-6 flex items-center justify-center">{column.icon}</div>}
               </div>
             </Space>

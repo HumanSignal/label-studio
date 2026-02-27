@@ -27,6 +27,32 @@ const labelStudioTheme = {
   },
 };
 
+const fallbackNodeMatch = (nodeData: any, searchTerm: string): boolean => {
+  const normalizedTerm = searchTerm.toLowerCase();
+  const nodeKey = typeof nodeData?.key === "string" ? nodeData.key.toLowerCase() : "";
+
+  if (nodeKey.includes(normalizedTerm)) {
+    return true;
+  }
+
+  if (Array.isArray(nodeData?.path)) {
+    const hasPathMatch = nodeData.path.some((segment: string | number) =>
+      String(segment).toLowerCase().includes(normalizedTerm),
+    );
+
+    if (hasPathMatch) {
+      return true;
+    }
+  }
+
+  const nodeValue = nodeData?.value;
+  if (typeof nodeValue === "string" || typeof nodeValue === "number" || typeof nodeValue === "boolean") {
+    return String(nodeValue).toLowerCase().includes(normalizedTerm);
+  }
+
+  return false;
+};
+
 /**
  * JsonViewer - An interactive JSON viewer component
  *
@@ -119,7 +145,7 @@ export const JsonViewer: FC<JsonViewerProps> = ({
       }
       // Also apply search if there's search text
       if (searchTerm) {
-        return matchNode(nodeData, searchTerm);
+        return matchNode(nodeData, searchTerm) || fallbackNodeMatch(nodeData, searchTerm);
       }
       return true;
     };

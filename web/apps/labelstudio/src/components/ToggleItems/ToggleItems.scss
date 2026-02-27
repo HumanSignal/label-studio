@@ -23,7 +23,7 @@
     cursor: pointer;
     color: var(--color-neutral-content-subtler);
     border-radius: 4px;
-    padding: 2px 16px;
+    padding: var(--spacing-tightest) var(--spacing-tight);
     flex-grow: 1;
     text-align: center;
 

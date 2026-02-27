@@ -75,6 +75,60 @@ from = "/*"
 to = "/404.html"
 status = 404
 
+[[redirects]]
+from = "/storage#Amazon-S3"
+to = "/storage_s3"
+status = 301
+force = true
+
+[[redirects]]
+from = "/storage#Set-up-an-S3-connection-with-IAM-role-access"
+to = "/storage_s3#Amazon-S3-with-IAM-role"
+status = 301
+force = true
+
+[[redirects]]
+from = "/storage#Google-Cloud-Storage"
+to = "/storage_gcp"
+status = 301
+force = true
+
+[[redirects]]
+from = "/storage#Google-Cloud-Storage-with-Workload-Identity-Federation-WIF"
+to = "/storage_gcp#Google-Cloud-Storage-with-Workload-Identity-Federation-WIF"
+status = 301
+force = true
+
+[[redirects]]
+from = "/storage#Microsoft-Azure-Blob-storage"
+to = "/storage_azure"
+status = 301
+force = true
+
+[[redirects]]
+from = "/storage#Azure-Blob-Storage-with-Service-Principal-authentication"
+to = "/storage_azure#Azure-blob-storage-with-Service-Principal"
+status = 301
+force = true
+
+[[redirects]]
+from = "/storage#Redis-database"
+to = "/storage_redis"
+status = 301
+force = true
+
+[[redirects]]
+from = "/storage#Local-storage"
+to = "/storage_local"
+status = 301
+force = true
+
+[[redirects]]
+from = "/storage#Databricks-Files-UC-Volumes"
+to = "/storage_databricks"
+status = 301
+force = true
+
 [dev]
 command = "yarn start"
 targetPort = 4000

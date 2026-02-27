@@ -1,4 +1,4 @@
-import { LabelStudio, TimeSeries } from "@humansignal/frontend-test/helpers/LSF";
+import { LabelStudio, TimeSeries, Labels, Sidebar } from "@humansignal/frontend-test/helpers/LSF";
 import { multiChannelSampleData, multiChannwlCnfig } from "../../data/timeseries/multichannel";
 import { TWO_FRAMES_TIMEOUT } from "../utils/constants";
 
@@ -170,5 +170,24 @@ describe("MultiChannel", () => {
             expect(firstPointB_X, `Mismatch! A: ${firstPointA_X}, B: ${firstPointB_X}`).to.be.closeTo(firstPointA_X, 1);
           });
       });
+  });
+
+  describe("TimeSeries region creation", () => {
+    it("creates a timeseries region and serializes", () => {
+      LabelStudio.params().config(multiChannwlCnfig).data(multiChannelSampleData).withResult([]).init();
+
+      LabelStudio.waitForObjectsReady();
+      TimeSeries.waitForReady();
+
+      Labels.select("Run");
+      TimeSeries.drawRegionRelative(0.1, 0.3);
+      Sidebar.hasRegions(1);
+
+      LabelStudio.serialize().then((results) => {
+        expect(results).to.have.lengthOf(1);
+        expect(results[0].value).to.have.property("timeserieslabels");
+        expect(results[0].value.timeserieslabels).to.include("Run");
+      });
+    });
   });
 });

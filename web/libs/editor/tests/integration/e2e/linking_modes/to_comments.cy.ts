@@ -35,6 +35,8 @@ describe("Linking modes: To comments", () => {
       win.Htx.annotationStore.selected.addLinkedRegion(region);
       win.Htx.annotationStore.selected.stopLinkingMode();
       cy.get("@setRegionLink").should("be.calledOnce");
+      // Open Relations panel so "Relations (0)" or empty state is visible
+      cy.get("#Relations-draggable").click();
       Relations.hasRelations(0);
     });
   });

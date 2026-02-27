@@ -13,13 +13,13 @@ export const Columns = ({ children, count, size, gap }) => {
     "--column-gap": gap,
   };
 
-  return <div ref={ref} className={cn("columns")} style={style} children={children} />;
+  return <div ref={ref} className={cn("columns").toClassName()} style={style} children={children} />;
 };
 
 Columns.Column = ({ title, children }) => {
   return (
-    <div className={cn("columns").elem("item")}>
-      <div className={cn("columns").elem("title")}>{title}</div>
+    <div className={cn("columns").elem("item").toClassName()}>
+      <div className={cn("columns").elem("title").toClassName()}>{title}</div>
       {children}
     </div>
   );

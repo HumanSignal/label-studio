@@ -140,10 +140,10 @@ export const Preview = ({ config, data, error, loading, project }) => {
   }, []);
 
   return (
-    <div className={configClass.elem("preview")}>
+    <div className={configClass.elem("preview").toClassName()}>
       <h3>Preview</h3>
       {error && (
-        <div className={configClass.elem("preview-error")}>
+        <div className={configClass.elem("preview-error").toClassName()}>
           <h2>
             {error.detail} {error.id}
           </h2>
@@ -159,7 +159,7 @@ export const Preview = ({ config, data, error, loading, project }) => {
         </div>
       )}
       {!data && loading && <Spinner style={{ width: "100%", height: "50vh" }} />}
-      <div id="label-studio" className={configClass.elem("preview-ui")} ref={rootRef} />
+      <div id="label-studio" className={configClass.elem("preview-ui").toClassName()} ref={rootRef} />
     </div>
   );
 };

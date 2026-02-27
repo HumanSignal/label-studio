@@ -145,12 +145,12 @@ export const Menubar = ({ enabled, defaultOpened, defaultPinned, children, onSid
           </Dropdown.Trigger>
 
           <div className={menubarContext}>
-            <LeftContextMenu className={contextItem.mod({ left: true })} />
-            <RightContextMenu className={contextItem.mod({ right: true })} />
+            <LeftContextMenu className={contextItem.mod({ left: true }).toClassName()} />
+            <RightContextMenu className={contextItem.mod({ right: true }).toClassName()} />
           </div>
 
-          <div className={menubarClass.elem("hotkeys")}>
-            <div className={menubarClass.elem("hotkeys-button")}>
+          <div className={menubarClass.elem("hotkeys").toClassName()}>
+            <div className={menubarClass.elem("hotkeys-button").toClassName()}>
               <Button
                 variant="neutral"
                 look="outlined"
@@ -191,25 +191,28 @@ export const Menubar = ({ enabled, defaultOpened, defaultPinned, children, onSid
                 {showNewsletterDot && (
                   <>
                     <Menu.Divider />
-                    <Menu.Item className={cn("newsletter-menu-item")} href={pages.AccountSettingsPage.path}>
+                    <Menu.Item
+                      className={cn("newsletter-menu-item").toClassName()}
+                      href={pages.AccountSettingsPage.path}
+                    >
                       <span>Please check new notification settings in the Account & Settings page</span>
-                      <span className={cn("newsletter-menu-badge")} />
+                      <span className={cn("newsletter-menu-badge").toClassName()} />
                     </Menu.Item>
                   </>
                 )}
               </Menu>
             }
           >
-            <div title={user?.email} className={menubarClass.elem("user")}>
+            <div title={user?.email} className={menubarClass.elem("user").toClassName()}>
               <Userpic user={user} isInProgress={isLoading} />
-              {showNewsletterDot && <div className={menubarClass.elem("userpic-badge")} />}
+              {showNewsletterDot && <div className={menubarClass.elem("userpic-badge").toClassName()} />}
             </div>
           </Dropdown.Trigger>
         </div>
       )}
 
       <VersionProvider>
-        <div className={contentClass.elem("body")}>
+        <div className={contentClass.elem("body").toClassName()}>
           {enabled && (
             <Dropdown
               ref={menuDropdownRef}
@@ -256,7 +259,7 @@ export const Menubar = ({ enabled, defaultOpened, defaultPinned, children, onSid
 
                 <Menu.Item
                   icon={<IconPin />}
-                  className={sidebarClass.elem("pin")}
+                  className={sidebarClass.elem("pin").toClassName()}
                   onClick={sidebarPin}
                   active={sidebarPinned}
                 >
@@ -267,7 +270,12 @@ export const Menubar = ({ enabled, defaultOpened, defaultPinned, children, onSid
           )}
 
           <MenubarContext.Provider value={providerValue}>
-            <div className={contentClass.elem("content").mod({ withSidebar: sidebarPinned && sidebarOpened })}>
+            <div
+              className={contentClass
+                .elem("content")
+                .mod({ withSidebar: sidebarPinned && sidebarOpened })
+                .toClassName()}
+            >
               {children}
             </div>
           </MenubarContext.Provider>

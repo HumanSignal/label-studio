@@ -642,4 +642,4 @@ const HtxTaxonomy = observer(({ item }) => {
 
 Registry.addTag("taxonomy", TaxonomyModel, HtxTaxonomy);
 
-export { HtxTaxonomy, TaxonomyModel, TagAttrs };
+export { HtxTaxonomy, TaxonomyModel, TagAttrs, traverse };

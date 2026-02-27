@@ -115,6 +115,10 @@
     &_isDrawing {
       border-color: var(--incomplete-warning-color, var(--canteloupe_400));
     }
+
+    &:has(.outliner-item_incomplete) {
+      border-color: var(--incomplete-warning-color, var(--canteloupe_400));
+    }
   }
 }
 
