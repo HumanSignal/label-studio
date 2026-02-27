@@ -1,4 +1,4 @@
-import { Badge, IconSpark } from "@humansignal/ui";
+import { EnterpriseBadge, IconSpark } from "@humansignal/ui";
 import { Alert, AlertTitle, AlertDescription } from "@humansignal/shad/components/ui/alert";
 import { IconCloudProviderAzure } from "@humansignal/icons";
 import type { ProviderConfig } from "@humansignal/app-common/blocks/StorageProviderForm/types/provider";
@@ -10,7 +10,7 @@ const azureSpiProvider: ProviderConfig = {
     "Configure your Azure Blob Storage connection using Service Principal authentication for enhanced security (proxy only)",
   icon: IconCloudProviderAzure,
   disabled: true,
-  badge: <Badge variant="gradient">Enterprise</Badge>,
+  badge: <EnterpriseBadge />,
   fields: [
     {
       name: "enterprise_info",
