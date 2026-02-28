@@ -424,6 +424,10 @@ export class LSFWrapper {
 
     // Batch all MST store mutations into a single MobX transaction so reactions
     // fire only once instead of cascading after each individual action.
+    // For non-labelstream, annotation selection is included in the same batch
+    // to avoid a second reaction cascade. setAnnotation is declared async but
+    // has no await calls in the non-labelstream path, so its synchronous body
+    // executes within this transaction.
     runInAction(() => {
       if (hasChangedTasks) {
         this.lsf.resetState();
@@ -452,9 +456,15 @@ export class LSFWrapper {
 
       this.lsf.assignTask(task);
       this.lsf.initializeStore(lsfTask);
+
+      if (!this.labelStream) {
+        this.setAnnotation(annotationID, fromHistory || isRejectedQueue, selectPrediction);
+      }
     });
 
-    await this.setAnnotation(annotationID, fromHistory || isRejectedQueue, selectPrediction);
+    if (this.labelStream) {
+      await this.setAnnotation(annotationID, fromHistory || isRejectedQueue, selectPrediction);
+    }
     this.setLoading(false);
 
     if (isFF(FF_FIT_1304_STRICT_OVERLAP) && this.overlapReached) {
