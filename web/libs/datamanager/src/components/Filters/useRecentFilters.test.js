@@ -122,10 +122,7 @@ describe("useRecentFilters", () => {
   });
 
   it("decorative items have correct heights", () => {
-    localStorage.setItem(
-      storageKey,
-      JSON.stringify([{ id: "filter:tasks:image", operator: "equal", value: "x" }]),
-    );
+    localStorage.setItem(storageKey, JSON.stringify([{ id: "filter:tasks:image", operator: "equal", value: "x" }]));
 
     const { result } = renderHook(() => useRecentFilters(projectId, availableFilters));
 
