@@ -198,9 +198,7 @@ class ImageCacheManager {
       return;
     }
     const next = this.loadQueue.shift()!;
-    this.runLoad(next.url, next.crossOrigin, next.onProgress)
-      .then(next.resolve)
-      .catch(next.reject);
+    this.runLoad(next.url, next.crossOrigin, next.onProgress).then(next.resolve).catch(next.reject);
   }
 
   private async loadImage(
