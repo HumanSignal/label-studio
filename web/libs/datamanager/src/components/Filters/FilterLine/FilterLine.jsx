@@ -1,4 +1,3 @@
-import React from "react";
 import { observer } from "mobx-react";
 import { cn } from "../../../utils/bem";
 import { Button, Badge, EnterpriseBadge } from "@humansignal/ui";
@@ -76,35 +75,43 @@ function filterFieldOptionRender({ item }) {
 }
 
 /**
+ * Handle column selection in the filter dropdown.
+ * Saves the departing column's state to recents, then applies the new column.
+ *
+ * - Recent target → save departing in-place (no reorder) + restore stored state
+ * - Non-recent target → save departing to front (reorder) + smart carry-over
+ */
+function handleColumnChange(filter, availableFilters, selectedValue, onSaveOnSwitch, onSaveInPlace) {
+  const selected = findSelectedOption(availableFilters, selectedValue);
+  const departingId = filter.filter.id;
+  const departingOperator = filter.operator;
+  const departingValue = filter.value;
+
+  if (selected?._isRecent) {
+    onSaveInPlace?.(departingId, departingOperator, departingValue);
+    filter.setFilterFromRecent(selectedValue, selected._recentOperator, selected._recentValue);
+  } else {
+    onSaveOnSwitch?.(departingId, departingOperator, departingValue);
+    filter.setFilterDelayed(selectedValue);
+  }
+}
+
+/**
  * A single filter row: column selector + operator + value input + delete button.
  *
  * Column switch behavior depends on whether the target is a "Recent" item:
- *  - Recent item → restore full state (column, operator, value) from the stored entry
- *    via setFilterFromRecent, and silently update the departing column's state in-place
- *    (onFieldUpdate) so it stays fresh without reordering the recents list.
- *  - Non-recent item → save the departing column to recents at the top of the list
- *    (onFieldSelect), then apply the new column with smart operator/value carry-over
- *    via setFilterDelayed.
+ *  - Recent item -> restore full state (column, operator, value) from the stored entry
+ *    via setFilterFromRecent; save departing column in-place (no reorder).
+ *  - Non-recent item -> save departing column to front of recents (reorder);
+ *    apply new column with smart operator/value carry-over via setFilterDelayed.
+ *
+ * There is NO useEffect auto-saver here. Recents are saved only at explicit,
+ * well-defined moments (column switch in onChange) to avoid race conditions
+ * between React re-renders and MobX state transitions.
  */
 export const FilterLine = observer(
-  ({ filter, availableFilters, index, view, sidebar, dropdownClassName, onFieldSelect, onFieldUpdate }) => {
+  ({ filter, availableFilters, index, view, sidebar, dropdownClassName, onSaveOnSwitch, onSaveInPlace }) => {
     const childFilter = filter.child_filter;
-
-    // Keep the recents entry up-to-date whenever the filter has a valid state.
-    // This ensures columns that are never "switched away from" (e.g. the user sets
-    // a value and then deletes the filter) still appear in the "Recent" section.
-    // Uses onFieldUpdate (no reorder) — the entry is created at the end if new,
-    // or updated in-place if it already exists.
-    const filterId = filter.filter?.id;
-    const filterOperator = filter.operator;
-    const filterValue = filter.value;
-    const isValid = filter.isValidFilter;
-
-    React.useEffect(() => {
-      if (filterId && filterOperator && isValid) {
-        onFieldUpdate?.(filterId, filterOperator, filterValue);
-      }
-    }, [filterId, filterOperator, filterValue, isValid, onFieldUpdate]);
 
     if (sidebar) {
       return (
@@ -124,16 +131,9 @@ export const FilterLine = observer(
               items={availableFilters}
               dropdownClassName={dropdownClassName}
               searchFilter={filterFieldSearchHandler}
-              onChange={(selectedValue) => {
-                const selected = findSelectedOption(availableFilters, selectedValue);
-                if (selected?._isRecent) {
-                  onFieldUpdate?.(filter.filter.id, filter.operator, filter.value);
-                  filter.setFilterFromRecent(selectedValue, selected._recentOperator, selected._recentValue);
-                } else {
-                  onFieldSelect?.(filter.filter.id, filter.operator, filter.value);
-                  filter.setFilterDelayed(selectedValue);
-                }
-              }}
+              onChange={(selectedValue) =>
+                handleColumnChange(filter, availableFilters, selectedValue, onSaveOnSwitch, onSaveInPlace)
+              }
               optionRender={filterFieldOptionRender}
               disabled={filter.field.disabled}
             />
@@ -225,16 +225,9 @@ export const FilterLine = observer(
             dropdownWidth={170}
             dropdownClassName={dropdownClassName}
             searchFilter={filterFieldSearchHandler}
-            onChange={(selectedValue) => {
-              const selected = findSelectedOption(availableFilters, selectedValue);
-              if (selected?._isRecent) {
-                onFieldUpdate?.(filter.filter.id, filter.operator, filter.value);
-                filter.setFilterFromRecent(selectedValue, selected._recentOperator, selected._recentValue);
-              } else {
-                onFieldSelect?.(filter.filter.id, filter.operator, filter.value);
-                filter.setFilterDelayed(selectedValue);
-              }
-            }}
+            onChange={(selectedValue) =>
+              handleColumnChange(filter, availableFilters, selectedValue, onSaveOnSwitch, onSaveInPlace)
+            }
             optionRender={filterFieldOptionRender}
             disabled={filter.field.disabled}
           />

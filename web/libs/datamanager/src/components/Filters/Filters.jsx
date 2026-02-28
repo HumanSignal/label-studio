@@ -4,7 +4,7 @@ import { cn } from "../../utils/bem";
 import { Button } from "@humansignal/ui";
 import { FilterLine } from "./FilterLine/FilterLine";
 import { IconChevronRight, IconPlus, IconCopyOutline, IconClipboardCheck, IconUndo } from "@humansignal/icons";
-import { getRecentFilterFields, addRecentFilterField, updateRecentFilterField } from "./filter-recents";
+import { useRecentFilters } from "./useRecentFilters";
 import "./Filters.scss";
 
 const injector = inject(({ store }) => ({
@@ -17,116 +17,11 @@ const injector = inject(({ store }) => ({
 
 export const Filters = injector(({ store, views, currentView, filters, projectId }) => {
   const { sidebarEnabled } = views;
-  const [recentFieldIds, setRecentFieldIds] = React.useState(() => getRecentFilterFields(projectId));
+  const { fields, saveOnSwitch, saveInPlace } = useRecentFilters(projectId, currentView.availableFilters);
   const [copyFeedback, setCopyFeedback] = React.useState(false);
   const [pasteFeedback, setPasteFeedback] = React.useState(false);
   const [prePasteSnapshot, setPrePasteSnapshot] = React.useState(null);
 
-  // Saves the departing column to recents AND moves it to the top of the list.
-  // Called when the user switches to a non-recent column — the departing column
-  // becomes the most recently used one.
-  const handleFieldSelect = React.useCallback(
-    (filterTypeId, operator, value) => {
-      addRecentFilterField(projectId, filterTypeId, operator, value);
-      setRecentFieldIds(getRecentFilterFields(projectId));
-    },
-    [projectId],
-  );
-
-  // Saves the departing column's latest state WITHOUT reordering the recents list.
-  // Called when the user picks a recent column — we need to persist the current
-  // column's operator/value, but switching to a recent item should not reshuffle
-  // the list the user just interacted with.
-  const handleFieldUpdate = React.useCallback(
-    (filterTypeId, operator, value) => {
-      updateRecentFilterField(projectId, filterTypeId, operator, value);
-      setRecentFieldIds(getRecentFilterFields(projectId));
-    },
-    [projectId],
-  );
-
-  // Build the dropdown options list: "Recent" header + recent items + separator + grouped columns.
-  // Recent items carry _recentOperator/_recentValue so FilterLine can fully restore the state.
-  const fields = React.useMemo(() => {
-    const groups = currentView.availableFilters.reduce((res, filter) => {
-      const target = filter.field.target;
-      const groupTitle = target
-        .split("_")
-        .map((s) =>
-          s
-            .split("")
-            .map((c, i) => (i === 0 ? c.toUpperCase() : c))
-            .join(""),
-        )
-        .join(" ");
-
-      const group = res[target] ?? {
-        id: target,
-        title: groupTitle,
-        options: [],
-      };
-
-      group.options.push({
-        value: filter.id,
-        title: filter.field.title,
-        original: filter,
-        disabled: filter.field.disabled,
-      });
-
-      return { ...res, [target]: group };
-    }, {});
-
-    const groupValues = Object.values(groups);
-
-    if (recentFieldIds.length > 0) {
-      const allFiltersById = new Map(currentView.availableFilters.map((f) => [f.id, f]));
-      const recentOptions = recentFieldIds
-        .map((entry) => {
-          const filter = allFiltersById.get(entry.id);
-          return filter ? { entry, filter } : null;
-        })
-        .filter(Boolean)
-        .map(({ entry, filter }) => ({
-          value: filter.id,
-          title: filter.field.title,
-          original: filter,
-          disabled: filter.field.disabled,
-          _isRecent: true,
-          _recentOperator: entry.operator,
-          _recentValue: entry.value,
-        }));
-
-      if (recentOptions.length > 0) {
-        const recentHeader = {
-          value: "__recent_header__",
-          title: "Recent",
-          original: { _isHeader: true, field: { title: "Recent" } },
-          disabled: true,
-          height: 36,
-        };
-        const separator = {
-          value: "__recent_separator__",
-          title: "",
-          original: { _isSeparator: true, field: { title: "" } },
-          disabled: true,
-          height: 8,
-        };
-        const allFieldsHeader = {
-          value: "__all_fields_header__",
-          title: "All fields",
-          original: { _isHeader: true, field: { title: "All fields" } },
-          disabled: true,
-          height: 36,
-        };
-        return [recentHeader, ...recentOptions, separator, allFieldsHeader, ...groupValues];
-      }
-    }
-
-    return groupValues;
-  }, [currentView.availableFilters, recentFieldIds]);
-
-  // Copy/paste handlers use allFiltersSnapshot (includes empty filters)
-  // so the user can transfer filter configs between projects or to the SDK.
   const handleCopyFilters = React.useCallback(async () => {
     try {
       const snapshot = currentView.allFiltersSnapshot;
@@ -200,8 +95,8 @@ export const Filters = injector(({ store, views, currentView, filters, projectId
               key={`${filter.filter.id}-${i}`}
               availableFilters={fields}
               dropdownClassName={cn("filters").elem("selector").toClassName()}
-              onFieldSelect={handleFieldSelect}
-              onFieldUpdate={handleFieldUpdate}
+              onSaveOnSwitch={saveOnSwitch}
+              onSaveInPlace={saveInPlace}
             />
           ))
         ) : (
