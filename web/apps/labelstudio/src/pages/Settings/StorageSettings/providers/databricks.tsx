@@ -1,4 +1,4 @@
-import { Badge, IconSpark } from "@humansignal/ui";
+import { EnterpriseBadge, IconSpark } from "@humansignal/ui";
 import { Alert, AlertTitle, AlertDescription } from "@humansignal/shad/components/ui/alert";
 import { IconCloudProviderDatabricks } from "@humansignal/icons";
 import type { ProviderConfig } from "@humansignal/app-common/blocks/StorageProviderForm/types/provider";
@@ -9,7 +9,7 @@ const databricksProvider: ProviderConfig = {
   description: "Configure your Databricks Unity Catalog Volumes connection with all required settings (proxy only)",
   icon: IconCloudProviderDatabricks,
   disabled: true,
-  badge: <Badge variant="gradient">Enterprise</Badge>,
+  badge: <EnterpriseBadge />,
   fields: [
     {
       name: "enterprise_info",

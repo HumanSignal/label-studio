@@ -67,23 +67,19 @@ export const useConfigResizer = ({ projectId, containerWidth }) => {
         const item = window.localStorage.getItem(currentKey);
         if (item) {
           const parsedValue = JSON.parse(item);
-          // Check if stored width + left menu width exceeds screen width
-          const leftSideExceedsScreen = parsedValue + LEFT_MENU_WIDTH > window.innerWidth;
-          // Check if right column would be too small (only if containerWidth is available)
-          const rightColumnTooSmall =
-            containerWidth !== undefined && containerWidth - parsedValue - COLUMN_GAP < MIN_PREVIEW_WIDTH;
-          // Reset to default if either condition is true
-          if (leftSideExceedsScreen || rightColumnTooSmall) {
-            setEditorWidthPixelsInternal(DEFAULT_EDITOR_WIDTH);
-          } else {
-            setEditorWidthPixelsInternal(parsedValue);
-          }
+          // Clamp to valid range instead of resetting to default so user preference (e.g. smaller editor) is preserved
+          const minEditor = MIN_EDITOR_WIDTH;
+          const maxEditor =
+            containerWidth !== undefined
+              ? Math.max(minEditor, containerWidth - MIN_PREVIEW_WIDTH - COLUMN_GAP)
+              : DEFAULT_EDITOR_WIDTH * 2;
+          const maxAllowed = Math.min(maxEditor, window.innerWidth - LEFT_MENU_WIDTH);
+          const clamped = Math.max(minEditor, Math.min(maxAllowed, parsedValue));
+          setEditorWidthPixelsInternal(clamped);
         } else {
-          // No stored value for this key, use default
           setEditorWidthPixelsInternal(DEFAULT_EDITOR_WIDTH);
         }
       } catch {
-        // Error reading, use default
         setEditorWidthPixelsInternal(DEFAULT_EDITOR_WIDTH);
       }
       prevStorageKeyRef.current = currentKey;
@@ -165,33 +161,34 @@ export const useConfigResizer = ({ projectId, containerWidth }) => {
     prevContainerWidthRef.current = containerWidth;
   }, [containerWidth, constraints.minEditorWidth, constraints.maxEditorWidth, editorWidthPixels]);
 
-  // Reset width when window resizes and current width exceeds screen size or right column is too small
-  // This ensures the resizer remains visible and usable when screen size decreases
+  // Clamp width when current value is out of bounds (window resize or container change)
+  // We clamp to the valid range instead of resetting to default so the user can still
+  // make the editor column smaller by dragging when the screen is small.
   useEffect(() => {
-    const checkAndReset = () => {
-      // Check if current width + left menu width exceeds screen width
-      const leftSideExceedsScreen = editorWidthPixels + LEFT_MENU_WIDTH > window.innerWidth;
+    const checkAndClamp = () => {
+      if (
+        constraints.minEditorWidth === undefined ||
+        constraints.maxEditorWidth === undefined ||
+        containerWidth === undefined
+      ) {
+        return;
+      }
 
-      // Check if right column (preview) width is less than minimum
-      // Right column width = containerWidth - editorWidthPixels - COLUMN_GAP
-      const rightColumnTooSmall =
-        containerWidth !== undefined && containerWidth - editorWidthPixels - COLUMN_GAP < MIN_PREVIEW_WIDTH;
+      const maxAllowed = Math.min(constraints.maxEditorWidth, window.innerWidth - LEFT_MENU_WIDTH);
+      const clampedWidth = Math.max(constraints.minEditorWidth, Math.min(maxAllowed, editorWidthPixels));
 
-      // Reset to default if either condition is true
-      if (leftSideExceedsScreen || rightColumnTooSmall) {
-        setEditorWidthPixelsInternal(DEFAULT_EDITOR_WIDTH);
+      if (clampedWidth !== editorWidthPixels) {
+        setEditorWidthPixelsInternal(clampedWidth);
       }
     };
 
-    // Check immediately when dependencies change
-    checkAndReset();
+    checkAndClamp();
 
-    // Also listen to window resize events
-    window.addEventListener("resize", checkAndReset);
+    window.addEventListener("resize", checkAndClamp);
     return () => {
-      window.removeEventListener("resize", checkAndReset);
+      window.removeEventListener("resize", checkAndClamp);
     };
-  }, [editorWidthPixels, containerWidth]);
+  }, [editorWidthPixels, containerWidth, constraints.minEditorWidth, constraints.maxEditorWidth]);
 
   // Wrapped setter that automatically clamps values to valid constraints
   // This ensures all width updates respect min/max bounds

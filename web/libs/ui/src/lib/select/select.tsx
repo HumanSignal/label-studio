@@ -123,9 +123,7 @@ const SelectedItemsGroup = ({
           {/* Title with counter badge inline */}
           <div className={styles.selectedItemsTitle}>
             <Typography variant="body">Selected items</Typography>
-            <Badge variant="info" shape="squared">
-              {selectedOptions.length}
-            </Badge>
+            <Badge>{selectedOptions.length}</Badge>
           </div>
         </button>
 

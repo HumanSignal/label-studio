@@ -549,17 +549,16 @@ const designTokens = {
       base: "var(--font-family-base)",
       mono: "var(--font-family-mono)",
     },
+    fontStyle: {
+      normal: "var(--font-style-normal)",
+      italic: "var(--font-style-italic)",
+    },
     fontWeight: {
       light: "var(--font-weight-light)",
-      "light-italic": "var(--font-weight-light-italic)",
       regular: "var(--font-weight-regular)",
-      "regular-italic": "var(--font-weight-regular-italic)",
       medium: "var(--font-weight-medium)",
-      "medium-italic": "var(--font-weight-medium-italic)",
       semibold: "var(--font-weight-semibold)",
-      "semibold-italic": "var(--font-weight-semibold-italic)",
       bold: "var(--font-weight-bold)",
-      "bold-italic": "var(--font-weight-bold-italic)",
     },
   },
   cornerRadius: {

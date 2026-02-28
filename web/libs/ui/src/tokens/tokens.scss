@@ -471,7 +471,9 @@
   --letter-spacing--15: -0.0094rem;
   --letter-spacing--10: -0.0063rem;
   --font-family-base: "Figtree";
-  --font-family-mono: "IBM Plex Mono,monospace";
+  --font-family-mono: "IBM Plex Mono", monospace;
+  --font-style-normal: normal;
+  --font-style-italic: italic;
   --corner-radius-0: var(--spacing-0);
   --corner-radius-2: var(--spacing-50);
   --corner-radius-4: var(--spacing-100);
@@ -531,15 +533,10 @@
   --font-size-display-medium: var(--font-size-56);
   --font-size-display-large: var(--font-size-64);
   --font-weight-light: 300;
-  --font-weight-light-italic: light italic;
   --font-weight-regular: 400;
-  --font-weight-regular-italic: italic;
   --font-weight-medium: 500;
-  --font-weight-medium-italic: medium italic;
   --font-weight-semibold: 600;
-  --font-weight-semibold-italic: semibold italic;
   --font-weight-bold: 700;
-  --font-weight-bold-italic: bold italic;
   --line-height-auto: auto;
   --line-height-body-smallest: var(--line-height-12);
   --line-height-body-smaller: var(--line-height-16);

@@ -711,6 +711,7 @@ const Configurator = ({
             editorWidthPixels={editorWidthPixels}
             onResize={setEditorWidthPixels}
             constraints={constraints}
+            disabled={constraints.minEditorWidth >= constraints.maxEditorWidth}
           />
           <AdaptivePreview
             config={configToDisplay}

@@ -11,6 +11,7 @@
   transition: background-color 150ms ease-out, border-color 150ms ease-out, color 150ms ease-out;
   white-space: nowrap;
   border-radius: var(--corner-radius-smaller);
+  letter-spacing: var(--letter-spacing-base);
   
   // Base padding
   padding: 0 var(--spacing-tight);
@@ -20,6 +21,7 @@
   background: var(--color-neutral-surface);
   border-color: var(--color-neutral-border);
   color: var(--color-neutral-content);
+
 }
 
 // Shape variants
@@ -37,6 +39,16 @@
   padding: 0 var(--spacing-tighter);
   font-size: var(--font-size-label-smaller);
   height: 18px;
+  letter-spacing: var(--letter-spacing-wider);
+
+  .icon {
+    margin-right: var(--spacing-tightest);
+
+    svg {
+      width: 12px;
+      height: 12px;
+    }
+  }
 }
 
 // Style variants for accent colors
@@ -312,19 +324,11 @@
     background-clip: text;
     -webkit-text-fill-color: transparent;
   }
-  
-  .icon {
-    // Default: use SVG gradient (no fill override)
-  }
-  
+
   &.style-filled {
     .badge-content {
       background: linear-gradient(135deg, var(--color-accent-canteloupe-subtlest) 0%, var(--color-accent-persimmon-subtlest) 50%, var(--color-accent-plum-subtlest) 100%);
       height: calc(100% - 2px);
-    }
-    
-    .icon {
-      // Use SVG gradient (no fill override)
     }
     
     // Shape variants for filled style
@@ -345,10 +349,6 @@
     .badge-content {
       background: var(--color-neutral-background);
       height: calc(100% - 2px);
-    }
-    
-    .icon {
-      // Use SVG gradient (no fill override)
     }
     
     // Shape variants for outline style
@@ -426,10 +426,6 @@
       padding: 0;
       height: 100%;
     }
-    
-    .icon {
-      // Use SVG gradient (no fill override)
-    }
   }
   
   &.size-small,
@@ -438,11 +434,6 @@
       font-size: var(--font-size-label-smallest);
       padding: var(--spacing-tightest);
       letter-spacing: var(--letter-spacing-wider);
-    }
-
-    .icon {
-      width: 12px;
-      height: 12px;
     }
   }
   
@@ -457,4 +448,9 @@
   display: inline-flex;
   align-items: center;
   flex-shrink: 0;
+
+  svg {
+    width: 14px;
+    height: 14px;
+  }
 }

@@ -111,7 +111,7 @@ export const EnterpriseUpgradeOverlay = forwardRef<HTMLDivElement, EnterpriseUpg
         <div className={styles.container}>
           <div className={styles.content}>
             <div className={styles.badge}>
-              <EnterpriseBadge style="filled" />
+              <EnterpriseBadge />
             </div>
 
             <Typography variant="headline" size="medium" className={styles.title}>

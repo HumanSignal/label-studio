@@ -6,6 +6,57 @@ const camelCase = (str) => {
   return str.replace(/-([a-z])/g, (g) => g[1].toUpperCase());
 };
 
+/** Check if a string is a valid JS identifier (for unquoted object key). */
+const isValidJsIdentifier = (key) => {
+  if (typeof key !== "string" || key.length === 0) return false;
+  if (!/^[a-zA-Z_$][a-zA-Z0-9_$]*$/.test(key)) return false;
+  return true;
+};
+
+/** Check if key is a numeric string that can be emitted as numeric literal (no leading zeros). */
+const isNumericLiteralKey = (key) => {
+  if (typeof key !== "string" || key.length === 0) return false;
+  return /^\d+$/.test(key) && key === String(Number(key));
+};
+
+/**
+ * Serialize object to JavaScript object literal string with unquoted keys where valid,
+ * so output matches Biome's preferred style (no unnecessary quotes).
+ * @param {unknown} obj - Value to serialize
+ * @param {number} indent - Current indent level (spaces)
+ * @returns {string} - JS literal string
+ */
+function serializeToJsLiteral(obj, indent = 0) {
+  const pad = " ".repeat(indent);
+  const padInner = " ".repeat(indent + 2);
+  if (obj === null) return "null";
+  if (typeof obj === "boolean") return obj ? "true" : "false";
+  if (typeof obj === "number") return Object.isFinite(obj) ? String(obj) : "null";
+  if (typeof obj === "string") return JSON.stringify(obj);
+  if (Array.isArray(obj)) {
+    if (obj.length === 0) return "[]";
+    const lines = obj.map((v) => `${padInner}${serializeToJsLiteral(v, indent + 2)},`);
+    return `[\n${lines.join("\n")}\n${pad}]`;
+  }
+  if (typeof obj === "object") {
+    const entries = Object.entries(obj);
+    if (entries.length === 0) return "{}";
+    const lines = entries.map(([k, v]) => {
+      let keyStr;
+      if (isNumericLiteralKey(k)) {
+        keyStr = String(Number(k));
+      } else if (isValidJsIdentifier(k)) {
+        keyStr = k;
+      } else {
+        keyStr = JSON.stringify(k);
+      }
+      return `${padInner}${keyStr}: ${serializeToJsLiteral(v, indent + 2).trimStart()},`;
+    });
+    return `{\n${lines.join("\n")}\n${pad}}`;
+  }
+  return "undefined";
+}
+
 // Get current file directory for resolving paths
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -50,6 +101,42 @@ function convertToRem(value) {
     return remValue;
   }
   return `${remValue}rem`;
+}
+
+/** CSS generic font families that must not be quoted (per CSS spec) */
+const CSS_GENERIC_FONT_FAMILIES = new Set([
+  "serif",
+  "sans-serif",
+  "monospace",
+  "system-ui",
+  "ui-serif",
+  "ui-sans-serif",
+  "ui-monospace",
+  "ui-rounded",
+]);
+
+/**
+ * Format a comma-separated font-family value for CSS: specific font names get double quotes,
+ * generic/system fonts (e.g. monospace, sans-serif) stay unquoted.
+ * @param {string} value - Comma-separated font family list from design tokens
+ * @returns {string} - CSS-ready font-family value
+ */
+function formatFontFamilyForCss(value) {
+  if (typeof value !== "string" || !value.trim()) {
+    return value;
+  }
+  const parts = value
+    .split(",")
+    .map((s) => s.trim())
+    .filter(Boolean);
+  const formatted = parts.map((part) => {
+    const lower = part.toLowerCase();
+    if (CSS_GENERIC_FONT_FAMILIES.has(lower)) {
+      return part;
+    }
+    return `"${part}"`;
+  });
+  return formatted.join(", ");
 }
 
 /**
@@ -253,9 +340,10 @@ function processPrimitiveTypography(typographyObj, result) {
         const name = key.replace("$", "");
         const value = typographyObj["$font-family"][key].$value;
         const cssVarName = `--font-family-${name}`;
+        const cssValue = formatFontFamilyForCss(value);
 
         // Add to CSS variables
-        result.cssVariables.light.push(`${cssVarName}: "${value}";`);
+        result.cssVariables.light.push(`${cssVarName}: ${cssValue};`);
 
         // Add to JavaScript tokens
         if (!result.jsTokens.typography.fontFamily) {
@@ -268,6 +356,19 @@ function processPrimitiveTypography(typographyObj, result) {
       }
     }
   }
+
+  // Font-style shorthand (normal / italic). Figma exports font-weight "italic" variants as
+  // non-numeric values (e.g. "Medium Italic"); we skip those and use CSS font-style instead.
+  result.cssVariables.light.push("--font-style-normal: normal;");
+  result.cssVariables.light.push("--font-style-italic: italic;");
+  if (!result.jsTokens.typography.fontStyle) {
+    result.jsTokens.typography.fontStyle = {};
+  }
+  if (!result.jsTokens.typography.fontStyle.primitive) {
+    result.jsTokens.typography.fontStyle.primitive = {};
+  }
+  result.jsTokens.typography.fontStyle.primitive.normal = "var(--font-style-normal)";
+  result.jsTokens.typography.fontStyle.primitive.italic = "var(--font-style-italic)";
 }
 
 /**
@@ -391,6 +492,15 @@ function processTokenCollection(collectionKey, subCollectionKey) {
         const value = tokenCollection[key].$value;
         const cssVarName = `--${parentKey}-${name}`;
 
+        // Skip font-weight tokens that are Figma "italic" style variants (e.g. "Light Italic");
+        // they are not valid CSS font-weight. Use --font-style-normal / --font-style-italic instead.
+        const isFontWeightItalicVariant =
+          subCollectionKey === "font-weight" &&
+          (name.endsWith("-italic") || (!isNumber && typeof value === "string" && !value.startsWith("{")));
+        if (isFontWeightItalicVariant) {
+          continue;
+        }
+
         let resolvedValue;
         if (typeof value === "string" && value.startsWith("{") && value.endsWith("}")) {
           const reference = value.substring(1, value.length - 1);
@@ -405,12 +515,24 @@ function processTokenCollection(collectionKey, subCollectionKey) {
           } else {
             // Otherwise, try to resolve the value normally
             resolvedValue = resolveReference(value, variables);
-            result.cssVariables.light.push(`${cssVarName}: ${isNumber ? convertToRem(resolvedValue) : resolvedValue};`);
+            const cssValue =
+              subCollectionKey === "font-family" && typeof resolvedValue === "string"
+                ? formatFontFamilyForCss(resolvedValue)
+                : isNumber
+                  ? convertToRem(resolvedValue)
+                  : resolvedValue;
+            result.cssVariables.light.push(`${cssVarName}: ${cssValue};`);
           }
         } else {
           // Not a reference, use directly
           resolvedValue = value;
-          result.cssVariables.light.push(`${cssVarName}: ${resolvedValue};`);
+          const cssValue =
+            subCollectionKey === "font-family" && typeof resolvedValue === "string"
+              ? formatFontFamilyForCss(resolvedValue)
+              : isNumber
+                ? convertToRem(resolvedValue)
+                : resolvedValue;
+          result.cssVariables.light.push(`${cssVarName}: ${cssValue};`);
         }
 
         // Add to JavaScript tokens
@@ -950,10 +1072,11 @@ function mergePrimitiveValues(values) {
  * @returns {string} - The JS content
  */
 function generateJsContent(jsTokens) {
+  const literalStr = serializeToJsLiteral(processJsTokens(jsTokens), 0);
   const content = `// This file is generated by the design-tokens-converter tool.
 // Do not edit this file directly. Edit design-tokens.json instead.
 
-const designTokens = ${JSON.stringify(processJsTokens(jsTokens), null, 2)};
+const designTokens = ${literalStr};
 
 module.exports = designTokens;
 `;
