@@ -196,7 +196,7 @@ const HtxVideoView = ({ item, store }) => {
   );
 
   const supportsRegions = useMemo(() => {
-    return isDefined(item?.videoControl);
+    return isDefined(item?.videoControl) || isDefined(item?.videoVectorControl);
   }, [item]);
 
   const supportsTimelineRegions = useMemo(() => {

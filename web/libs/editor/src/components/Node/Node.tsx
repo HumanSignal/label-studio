@@ -92,6 +92,13 @@ const NodeViews: Record<string, NodeViewProps> = {
     getContent: (node) => <span style={{ color: "#5a5a5a" }}>from {node.sequence[0]?.frame} frame</span>,
   },
 
+  VideoVectorRegionModel: {
+    name: "Video Vector",
+    icon: IconPolygonTool,
+    altIcon: IconPolygonToolSmart,
+    getContent: (node) => <span style={{ color: "#5a5a5a" }}>from {node.sequence[0]?.frame} frame</span>,
+  },
+
   PolygonRegionModel: {
     name: "Polygon",
     icon: IconPolygonTool,

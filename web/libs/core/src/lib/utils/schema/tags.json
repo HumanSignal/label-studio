@@ -2901,6 +2901,201 @@
       }
     }
   },
+  "VideoVector": {
+    "name": "VideoVector",
+    "description": "VideoVector tag brings vector annotation capabilities to videos. It works in combination with the `<Video/>` and the `<Labels/>` tags. Supports bezier curves, closable paths, and skeleton mode with keyframe-based interpolation across video frames.\n\nUse with the following data types: video",
+    "attrs": {
+      "name": {
+        "name": "name",
+        "description": "Name of the element",
+        "type": "string",
+        "required": true
+      },
+      "toName": {
+        "name": "toName",
+        "description": "Name of the element to control (video)",
+        "type": "string",
+        "required": true
+      },
+      "opacity": {
+        "name": "opacity",
+        "description": "Opacity of vector",
+        "type": "number",
+        "required": false,
+        "default": 0.2
+      },
+      "fillColor": {
+        "name": "fillColor",
+        "description": "Vector fill color in hexadecimal or HTML color name",
+        "type": "string",
+        "required": false,
+        "default": "transparent"
+      },
+      "strokeColor": {
+        "name": "strokeColor",
+        "description": "Stroke color in hexadecimal",
+        "type": "string",
+        "required": false,
+        "default": "#f48a42"
+      },
+      "strokeWidth": {
+        "name": "strokeWidth",
+        "description": "Width of stroke",
+        "type": "number",
+        "required": false,
+        "default": 2
+      },
+      "snap": {
+        "name": "snap",
+        "description": "Snap vector to pixels",
+        "type": ["pixel", "none"],
+        "required": false,
+        "default": "none"
+      },
+      "closable": {
+        "name": "closable",
+        "description": "Allow closed shapes",
+        "type": ["true", "false"],
+        "required": false,
+        "default": false
+      },
+      "curves": {
+        "name": "curves",
+        "description": "Allow Bezier curves",
+        "type": ["true", "false"],
+        "required": false,
+        "default": false
+      },
+      "skeleton": {
+        "name": "skeleton",
+        "description": "Enables skeleton mode to allow branch paths",
+        "type": ["true", "false"],
+        "required": false,
+        "default": false
+      },
+      "minPoints": {
+        "name": "minPoints",
+        "description": "Minimum allowed number of points",
+        "type": ["number", "none"],
+        "required": false,
+        "default": "none"
+      },
+      "maxPoints": {
+        "name": "maxPoints",
+        "description": "Maximum allowed number of points",
+        "type": ["number", "none"],
+        "required": false,
+        "default": "none"
+      }
+    }
+  },
+  "VideoVectorLabels": {
+    "name": "VideoVectorLabels",
+    "description": "The VideoVectorLabels tag creates labeled vectors on video frames. Combines VideoVector and Labels into one tag for convenient vector annotation with keyframe-based interpolation.\n\nUse with the following data types: video",
+    "attrs": {
+      "name": {
+        "name": "name",
+        "description": "Name of tag",
+        "type": "string",
+        "required": true
+      },
+      "toName": {
+        "name": "toName",
+        "description": "Name of video to label",
+        "type": "string",
+        "required": true
+      },
+      "choice": {
+        "name": "choice",
+        "description": "Configure whether you can select one or multiple labels",
+        "type": ["single", "multiple"],
+        "required": false,
+        "default": "single"
+      },
+      "maxUsages": {
+        "name": "maxUsages",
+        "description": "Maximum number of times a label can be used per task",
+        "type": "number",
+        "required": false
+      },
+      "showInline": {
+        "name": "showInline",
+        "description": "Show labels in the same visual line",
+        "type": ["true", "false"],
+        "required": false,
+        "default": true
+      },
+      "opacity": {
+        "name": "opacity",
+        "description": "Opacity of vector",
+        "type": "number",
+        "required": false,
+        "default": 0.2
+      },
+      "fillColor": {
+        "name": "fillColor",
+        "description": "Vector fill color in hexadecimal",
+        "type": "string",
+        "required": false
+      },
+      "strokeColor": {
+        "name": "strokeColor",
+        "description": "Stroke color in hexadecimal",
+        "type": "string",
+        "required": false
+      },
+      "strokeWidth": {
+        "name": "strokeWidth",
+        "description": "Width of stroke",
+        "type": "number",
+        "required": false,
+        "default": 2
+      },
+      "snap": {
+        "name": "snap",
+        "description": "Snap vector to pixels",
+        "type": ["pixel", "none"],
+        "required": false,
+        "default": "none"
+      },
+      "closable": {
+        "name": "closable",
+        "description": "Allow closed shapes",
+        "type": ["true", "false"],
+        "required": false,
+        "default": false
+      },
+      "curves": {
+        "name": "curves",
+        "description": "Allow Bezier curves",
+        "type": ["true", "false"],
+        "required": false,
+        "default": false
+      },
+      "skeleton": {
+        "name": "skeleton",
+        "description": "Enables skeleton mode to allow branch paths",
+        "type": ["true", "false"],
+        "required": false,
+        "default": false
+      },
+      "minPoints": {
+        "name": "minPoints",
+        "description": "Minimum allowed number of points",
+        "type": ["number", "none"],
+        "required": false,
+        "default": "none"
+      },
+      "maxPoints": {
+        "name": "maxPoints",
+        "description": "Maximum allowed number of points",
+        "type": ["number", "none"],
+        "required": false,
+        "default": "none"
+      }
+    },
+    "children": ["Label", "Header", "View", "HyperText"]
+  },
   "Collapse": {
     "name": "Collapse",
     "description": "Collapse tag, a content area which can be collapsed and expanded.",
@@ -3164,6 +3359,8 @@
       "Vector",
       "VectorLabels",
       "VideoRectangle",
+      "VideoVector",
+      "VideoVectorLabels",
       "Collapse",
       "Filter",
       "Header",

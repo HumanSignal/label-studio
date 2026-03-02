@@ -8,7 +8,9 @@ import Constants from "../../../core/Constants";
 import { Annotation } from "../../../stores/Annotation/Annotation";
 import { fixMobxObserve } from "../../../utils/utilities";
 import { Rectangle } from "./Rectangle";
+import { VideoVectorShape } from "./VideoVector";
 import { createBoundingBoxGetter, createOnDragMoveHandler } from "./TransformTools";
+import ToolsManager from "../../../tools/Manager";
 
 export const MIN_SIZE = 5;
 
@@ -137,21 +139,50 @@ const VideoRegionsPure = ({
     };
   };
 
+  const getVectorTool = useCallback(() => {
+    try {
+      const manager = ToolsManager.getInstance({ name: item.name });
+      const selected = manager?.findSelectedTool();
+      const drawing = manager?.findDrawingTool();
+
+      if (drawing?.toolName === "VideoVectorTool") return drawing;
+      if (selected?.toolName === "VideoVectorTool") return selected;
+    } catch {
+      // No tool manager available
+    }
+    return null;
+  }, [item.name]);
+
   const handleMouseDown = (e) => {
     if (e.target !== stageRef.current || item.annotation?.isReadOnly()) return;
 
     const { x, y } = limitCoordinates(normalizeMouseOffsets(e.evt.offsetX, e.evt.offsetY));
-
     const isInBounds = inBounds(x, y);
 
-    if (isInBounds) {
-      item.annotation.unselectAreas();
-      setNewRegion({ x, y, width: 0, height: 0 });
-      setDrawingMode(true);
+    if (!isInBounds) return;
+
+    const vectorTool = getVectorTool();
+
+    if (vectorTool) {
+      vectorTool.event("mousedown", e.evt, [x, y]);
+      return;
     }
+
+    item.annotation.unselectAreas();
+    setNewRegion({ x, y, width: 0, height: 0 });
+    setDrawingMode(true);
   };
 
   const handleMouseMove = (e) => {
+    const vectorTool = getVectorTool();
+
+    if (vectorTool?.isDrawing) {
+      const { x, y } = limitCoordinates(normalizeMouseOffsets(e.evt.offsetX, e.evt.offsetY));
+
+      vectorTool.event("mousemove", e.evt, [x, y]);
+      return;
+    }
+
     if (!isDrawing || item.annotation?.isReadOnly()) return false;
 
     const { x, y } = limitCoordinates(normalizeMouseOffsets(e.evt.offsetX, e.evt.offsetY));
@@ -164,6 +195,15 @@ const VideoRegionsPure = ({
   };
 
   const handleMouseUp = (e) => {
+    const vectorTool = getVectorTool();
+
+    if (vectorTool?.isDrawing) {
+      const { x, y } = limitCoordinates(normalizeMouseOffsets(e.evt.offsetX, e.evt.offsetY));
+
+      vectorTool.event("mouseup", e.evt, [x, y]);
+      return;
+    }
+
     if (!isDrawing || item.annotation?.isReadOnly()) return false;
 
     const { x, y } = limitCoordinates(normalizeMouseOffsets(e.evt.offsetX, e.evt.offsetY));
@@ -175,6 +215,19 @@ const VideoRegionsPure = ({
     }
     setDrawingMode(false);
   };
+
+  const handleClick = useCallback(
+    (e) => {
+      const vectorTool = getVectorTool();
+
+      if (vectorTool) {
+        const { x, y } = limitCoordinates(normalizeMouseOffsets(e.evt.offsetX, e.evt.offsetY));
+
+        vectorTool.event("click", e.evt, [x, y]);
+      }
+    },
+    [getVectorTool, limitCoordinates, normalizeMouseOffsets],
+  );
 
   const initTransform = (tr) => {
     if (!tr) return;
@@ -193,6 +246,7 @@ const VideoRegionsPure = ({
         onMouseDown: handleMouseDown,
         onMouseMove: handleMouseMove,
         onMouseUp: handleMouseUp,
+        onClick: handleClick,
       }
     : {};
 
@@ -268,32 +322,44 @@ const RegionsLayer = observer(
 );
 
 const Shape = observer(({ id, reg, item, stageRef, currentFrame, ...props }) => {
-  // Use currentFrame prop to ensure we get the latest frame value during fast scrubbing
-  // Since item.frame is volatile, React state (currentFrame) ensures proper updates
   const frame = currentFrame ?? item.frame;
   const box = reg.getShape(frame);
 
-  return (
-    reg.isInLifespan(frame) &&
-    box && (
-      <Rectangle
+  if (!reg.isInLifespan(frame) || !box) return null;
+
+  const handleClick = (e) => {
+    const annotation = getParentOfType(reg, Annotation);
+
+    if (annotation && annotation.isLinkingMode) {
+      stageRef.current.container().style.cursor = Constants.DEFAULT_CURSOR;
+    }
+
+    reg.setHighlight(false);
+    reg.onClickRegion(e);
+  };
+
+  if (reg.type === "videovectorregion") {
+    return (
+      <VideoVectorShape
         id={id}
         reg={reg}
         box={box}
         frame={frame}
-        onClick={(e) => {
-          const annotation = getParentOfType(reg, Annotation);
-
-          if (annotation && annotation.isLinkingMode) {
-            stageRef.current.container().style.cursor = Constants.DEFAULT_CURSOR;
-          }
-
-          reg.setHighlight(false);
-          reg.onClickRegion(e);
-        }}
+        onClick={handleClick}
         {...props}
       />
-    )
+    );
+  }
+
+  return (
+    <Rectangle
+      id={id}
+      reg={reg}
+      box={box}
+      frame={frame}
+      onClick={handleClick}
+      {...props}
+    />
   );
 });
 
