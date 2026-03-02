@@ -264,7 +264,14 @@ class GCSExportStorage(GCSStorageMixin, ExportStorage):
         GCSExportStorageLink.create(annotation, self)
 
 
-def async_export_annotation_to_gcs_storages(annotation):
+def async_export_annotation_to_gcs_storages(annotation: 'Annotation | int'):
+    if isinstance(annotation, int):
+        try:
+            annotation = Annotation.objects.get(pk=annotation)
+        except Annotation.DoesNotExist:
+            logger.info(f'Annotation {annotation} no longer exists, skipping GCS export')
+            return
+
     project = annotation.project
     if hasattr(project, 'io_storages_gcsexportstorages'):
         for storage in project.io_storages_gcsexportstorages.all():
@@ -276,7 +283,7 @@ def async_export_annotation_to_gcs_storages(annotation):
 def export_annotation_to_gcs_storages(sender, instance, **kwargs):
     storages = getattr(instance.project, 'io_storages_gcsexportstorages', None)
     if storages and storages.exists():  # avoid excess jobs in rq
-        start_job_async_or_sync(async_export_annotation_to_gcs_storages, instance)
+        start_job_async_or_sync(async_export_annotation_to_gcs_storages, instance.pk)
 
 
 class GCSImportStorageLink(ImportStorageLink):
