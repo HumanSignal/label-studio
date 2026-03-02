@@ -82,7 +82,7 @@ class FSMEntityHistoryFilterSet(FilterSet):
         extensions={
             'x-fern-sdk-group-name': 'fsm',
             'x-fern-sdk-method-name': 'state_history',
-            'x-fern-audiences': ['public'],
+            'x-fern-audiences': ['internal'],
             'x-fern-pagination': {
                 'offset': '$request.page',
                 'results': '$response.results',
@@ -129,7 +129,7 @@ class FSMEntityHistoryAPI(FSMAPIMixin, generics.ListAPIView):
         extensions={
             'x-fern-sdk-group-name': 'fsm',
             'x-fern-sdk-method-name': 'execute_transition',
-            'x-fern-audiences': ['public'],
+            'x-fern-audiences': ['internal'],
         },
     ),
 )
