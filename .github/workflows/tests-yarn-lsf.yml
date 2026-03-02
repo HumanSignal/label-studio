@@ -53,7 +53,7 @@ jobs:
         run: BABEL_ENV=test MODE=standalone yarn nx run editor:build:production
 
       - name: Upload editor build
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: editor-build
           path: ${{ env.FRONTEND_MONOREPO_DIR }}/dist/libs/editor
@@ -181,14 +181,14 @@ jobs:
           mkdir -p coverage-chunks
           cp libs/editor/.nyc_output/out.json coverage-chunks/${{ matrix.chunk }}.json 2>/dev/null || touch coverage-chunks/${{ matrix.chunk }}.json
       - name: Upload coverage artifact
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         if: always()
         with:
           name: cypress-coverage-${{ matrix.chunk }}
           path: ${{ env.FRONTEND_MONOREPO_DIR }}/coverage-chunks/${{ matrix.chunk }}.json
 
       - name: Upload test results and screenshots
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         if: always()
         with:
           name: cypress-output-${{ matrix.chunk }}
