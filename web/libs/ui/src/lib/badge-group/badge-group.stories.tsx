@@ -113,8 +113,6 @@ export const ResponsiveDemo: Story = {
               { id: 4, label: "Vue" },
               { id: 5, label: "Angular" },
             ]}
-            variant="info"
-            shape="squared"
           />
         </div>
       </div>
@@ -131,8 +129,6 @@ export const ResponsiveDemo: Story = {
               { id: 4, label: "Vue" },
               { id: 5, label: "Angular" },
             ]}
-            variant="info"
-            shape="squared"
           />
         </div>
       </div>
@@ -149,8 +145,6 @@ export const ResponsiveDemo: Story = {
               { id: 4, label: "Vue" },
               { id: 5, label: "Angular" },
             ]}
-            variant="info"
-            shape="squared"
           />
         </div>
       </div>
@@ -204,7 +198,7 @@ export const InTableCell: Story = {
         header: "Tags",
         accessorKey: "tags",
         minSize: 300,
-        cell: ({ row }: any) => <BadgeGroup items={row.original.tags} variant="info" shape="squared" />,
+        cell: ({ row }: any) => <BadgeGroup items={row.original.tags} />,
       },
     ];
 
@@ -236,7 +230,7 @@ export const WithShowAllButton: Story = {
           When not truncated: badges wrap to multiple lines
         </Typography>
         <div className="flex flex-col gap-tight">
-          <BadgeGroup items={tags} variant="info" shape="squared" truncate={!showAll} />
+          <BadgeGroup items={tags} truncate={!showAll} />
           {tags.length > 0 && (
             <button
               type="button"

@@ -223,8 +223,6 @@ export const MultipleWithBadges: Story = {
                     label: opt?.label ?? opt?.value ?? opt,
                   })) ?? []
                 }
-                variant="info"
-                shape="squared"
               />
             );
           }}

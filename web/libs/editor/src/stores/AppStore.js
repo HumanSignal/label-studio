@@ -25,8 +25,6 @@ import {
   FF_SIMPLE_INIT,
   isFF,
 } from "../utils/feature-flags";
-import { imageCache } from "@humansignal/core";
-import { isActive, FF_FIT_720_LAZY_LOAD_ANNOTATIONS } from "@humansignal/core/lib/utils/feature-flags";
 import { CommentStore } from "./Comment/CommentStore";
 import { CustomButton } from "./CustomButton";
 
@@ -814,11 +812,10 @@ export default types
         destroy(oldAnnotationStore);
       }
 
-      // forceClear() revokes all blob URLs regardless of reference count
-      // This is safe here because we're destroying the annotation store anyway
-      if (isActive(FF_FIT_720_LAZY_LOAD_ANNOTATIONS)) {
-        imageCache.forceClear();
-      }
+      // Do NOT forceClear the image cache on task switch. Destroyed ImageEntities
+      // already call releaseRef(), so old entries have refCount 0. Keeping them
+      // allows instant load when switching back to a previously viewed task.
+      // Cache evicts automatically when it exceeds maxSize (100).
 
       self.annotationStore = AnnotationStore.create({ annotations: [] });
       self.initialized = false;

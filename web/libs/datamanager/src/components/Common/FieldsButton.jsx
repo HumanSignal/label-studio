@@ -1,4 +1,4 @@
-import { Badge, Tooltip } from "@humansignal/ui";
+import { EnterpriseBadge, Tooltip } from "@humansignal/ui";
 import { inject, observer } from "mobx-react";
 import { useCallback, useMemo } from "react";
 import { flushSync } from "react-dom";
@@ -15,6 +15,7 @@ const injector = inject(({ store }) => {
  * Columns visibility picker (multi-select). Used by toolbar and Table quick view.
  * Single-select pickers (Order By, Filter column) use ColumnPicker directly.
  */
+
 export const FieldsButton = injector(
   observer(({ columns, title, icon, filter, tooltip, className, "data-testid": dataTestId }) => {
     const value = useMemo(() => columns.filter((c) => !c.is_hidden).map((c) => c.key), [columns]);
@@ -88,7 +89,7 @@ FieldsButton.Checkbox = observer(({ column, children, disabled, enterpriseBadge 
       </div>
       {enterpriseBadge && (
         <div style={{ flexShrink: 0 }}>
-          <Badge variant="gradient" style="ghost" />
+          <EnterpriseBadge style="ghost" />
         </div>
       )}
     </div>

@@ -93,7 +93,7 @@ export const CustomLabel: Story = {
 export const AllStyles: Story = {
   render: () => (
     <div className="flex flex-wrap gap-3 items-center">
-      <EnterpriseBadge style="filled">Enterprise</EnterpriseBadge>
+      <EnterpriseBadge>Enterprise</EnterpriseBadge>
       <EnterpriseBadge style="outline">Enterprise</EnterpriseBadge>
       <EnterpriseBadge style="ghost">Enterprise</EnterpriseBadge>
       <EnterpriseBadge style="solid">Enterprise</EnterpriseBadge>
