@@ -2903,7 +2903,7 @@
   },
   "VideoVector": {
     "name": "VideoVector",
-    "description": "VideoVector tag brings vector annotation capabilities to videos. It works in combination with the `<Video/>` and the `<Labels/>` tags. Supports bezier curves, closable paths, and skeleton mode with keyframe-based interpolation across video frames.\n\nUse with the following data types: video",
+    "description": "VideoVector tag brings vector annotation capabilities to videos.\nIt works in combination with the `<Video/>` and the `<Labels/>` tags.\nSupports bezier curves, closable paths, and skeleton mode with\nkeyframe-based interpolation across video frames.\n\nUse with the following data types: video",
     "attrs": {
       "name": {
         "name": "name",
@@ -2922,7 +2922,7 @@
         "description": "Opacity of vector",
         "type": "number",
         "required": false,
-        "default": 0.2
+        "default": 0.6
       },
       "fillColor": {
         "name": "fillColor",
@@ -2943,14 +2943,7 @@
         "description": "Width of stroke",
         "type": "number",
         "required": false,
-        "default": 2
-      },
-      "snap": {
-        "name": "snap",
-        "description": "Snap vector to pixels",
-        "type": ["pixel", "none"],
-        "required": false,
-        "default": "none"
+        "default": 3
       },
       "closable": {
         "name": "closable",
@@ -2986,12 +2979,19 @@
         "type": ["number", "none"],
         "required": false,
         "default": "none"
+      },
+      "snap": {
+        "name": "snap",
+        "description": "Snap vector to image pixels",
+        "type": ["pixel", "none"],
+        "required": false,
+        "default": "none"
       }
     }
   },
   "VideoVectorLabels": {
     "name": "VideoVectorLabels",
-    "description": "The VideoVectorLabels tag creates labeled vectors on video frames. Combines VideoVector and Labels into one tag for convenient vector annotation with keyframe-based interpolation.\n\nUse with the following data types: video",
+    "description": "The `VideoVectorLabels` tag creates labeled vectors on video frames.\nCombines VideoVector and Labels into one tag for convenient vector annotation.\n\nUse with the following data types: video.",
     "attrs": {
       "name": {
         "name": "name",
@@ -3049,14 +3049,7 @@
         "description": "Width of stroke",
         "type": "number",
         "required": false,
-        "default": 2
-      },
-      "snap": {
-        "name": "snap",
-        "description": "Snap vector to pixels",
-        "type": ["pixel", "none"],
-        "required": false,
-        "default": "none"
+        "default": 1
       },
       "closable": {
         "name": "closable",
@@ -3074,7 +3067,7 @@
       },
       "skeleton": {
         "name": "skeleton",
-        "description": "Enables skeleton mode to allow branch paths",
+        "description": "Enables skeleton mode",
         "type": ["true", "false"],
         "required": false,
         "default": false
@@ -3093,8 +3086,7 @@
         "required": false,
         "default": "none"
       }
-    },
-    "children": ["Label", "Header", "View", "HyperText"]
+    }
   },
   "Collapse": {
     "name": "Collapse",
