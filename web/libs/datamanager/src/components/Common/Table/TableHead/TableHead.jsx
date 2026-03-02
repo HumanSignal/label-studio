@@ -132,7 +132,7 @@ const ColumnRenderer = observer(
           onResizeFinished={(width) => onResize?.(column, width)}
           onReset={() => onReset?.(column)}
         >
-          {!isDE && column.parent ? (
+          {!isDE && column.parent && !isAgreementColumn ? (
             <DropdownWrapper column={column} cellViews={cellViews} onChange={onTypeChange}>
               {headContent}
             </DropdownWrapper>

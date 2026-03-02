@@ -121,7 +121,7 @@ export const DataView = injector(
     const columnHeaderExtra = useCallback(({ parent, original, help }, decoration) => {
       const children = [];
 
-      if (parent) {
+      if (parent && original?.alias !== "agreement") {
         children.push(
           <Badge key="column-type" size="small">
             {original?.readableType ?? parent.title}

@@ -101,7 +101,7 @@ export function filtersToPickerGroups(availableFilters) {
  * Root columns carry no meaningful type label.
  */
 function shouldShowBadge(col) {
-  return !!col.parent;
+  return !!col.parent && col.alias !== "agreement";
 }
 
 function toTabColumnItem(col) {
