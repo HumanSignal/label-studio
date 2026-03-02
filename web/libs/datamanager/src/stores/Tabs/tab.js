@@ -436,8 +436,10 @@ export const Tab = types
 
       self.filters.push(filter);
 
+      // Immediately materialize child filter for the default column, if any
       self.applyChildFilter(filter);
 
+      // Copy operator from previous filter if the column types match
       if (lastFilter && filter.filter.currentType === lastFilter.filter.currentType && lastFilter.operator) {
         filter.setOperator(lastFilter.operator);
       }

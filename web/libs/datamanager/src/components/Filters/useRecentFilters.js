@@ -1,6 +1,10 @@
 import React from "react";
 import { getRecentFilterFields, addRecentFilterField, updateRecentFilterField } from "./filter-recents";
 
+/** Prefix used to make recent option values unique so the Select component
+ *  does not highlight them — only the "All Fields" copy should show as selected. */
+export const RECENT_VALUE_PREFIX = "__recent:";
+
 /**
  * Hook that owns the full "Recent filter fields" lifecycle:
  *  - Reads recents from localStorage on mount
@@ -82,7 +86,7 @@ export function useRecentFilters(projectId, availableFilters) {
         })
         .filter(Boolean)
         .map(({ entry, filter }) => ({
-          value: filter.id,
+          value: RECENT_VALUE_PREFIX + filter.id,
           title: filter.field.title,
           original: filter,
           disabled: filter.field.disabled,
@@ -97,23 +101,16 @@ export function useRecentFilters(projectId, availableFilters) {
           title: "Recent",
           original: { _isHeader: true, field: { title: "Recent" } },
           disabled: true,
-          height: 36,
-        };
-        const separator = {
-          value: "__recent_separator__",
-          title: "",
-          original: { _isSeparator: true, field: { title: "" } },
-          disabled: true,
-          height: 8,
+          height: 34,
         };
         const allFieldsHeader = {
           value: "__all_fields_header__",
           title: "All fields",
           original: { _isHeader: true, field: { title: "All fields" } },
           disabled: true,
-          height: 36,
+          height: 34,
         };
-        return [recentHeader, ...recentOptions, separator, allFieldsHeader, ...groupValues];
+        return [recentHeader, ...recentOptions, allFieldsHeader, ...groupValues];
       }
     }
 

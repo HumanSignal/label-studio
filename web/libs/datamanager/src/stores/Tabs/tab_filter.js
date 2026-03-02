@@ -6,6 +6,7 @@ import { allowedFilterOperations } from "../../components/Filters/types/Utility"
 import { debounce } from "@humansignal/core/lib/utils/debounce";
 import { isBlank, isDefined } from "../../utils/utils";
 import { FilterValueRange, FilterValueType, TabFilterType } from "./tab_filter_type";
+import { resolveFilterTransition } from "./filter_snapshot_utils";
 
 const operatorNames = Array.from(new Set([].concat(...Object.values(Filters).map((f) => f.map((op) => op.key)))));
 
@@ -129,9 +130,11 @@ export const TabFilter = types
 
     /**
      * Switch this filter to a different column (non-recent path).
-     * Tries to preserve the previous operator and value when the new column type
-     * supports the same operator; otherwise resets both to defaults.
-     * This minimizes user input loss when exploring different columns.
+     * Preserves operator when compatible. Preserves value only when the type
+     * is unchanged AND the new column has no schema (free-form input).
+     * Schema-bound columns (List, etc.) have column-specific dropdown values
+     * that must not leak across columns.
+     * @see resolveFilterTransition for the full decision matrix
      */
     setFilter(value, save = true) {
       if (!isDefined(value)) return;
@@ -140,21 +143,27 @@ export const TabFilter = types
 
       const prevOperator = self.operator;
       const prevValue = self.value;
+      const prevType = self.filter.currentType;
 
       self.filter = value;
 
       self.view.applyChildFilter(self);
       self.markUnsaved();
 
-      const newOperators = self.component;
-      const operatorStillValid = prevOperator && newOperators.some((op) => op.key === prevOperator);
+      const result = resolveFilterTransition({
+        prevType,
+        prevOperator,
+        prevValue,
+        newType: self.filter.currentType,
+        newOperators: self.component,
+        newSchema: self.filter.schema,
+      });
 
-      if (operatorStillValid) {
-        self.operator = prevOperator;
-        self.value = prevValue;
-      } else {
-        self.operator = newOperators[0].key;
+      self.operator = result.operator;
+      if (result.valueReset) {
         self.setDefaultValue();
+      } else {
+        self.value = result.value;
       }
 
       if (save) self.saved();

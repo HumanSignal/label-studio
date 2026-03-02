@@ -29,10 +29,10 @@ export function filterFieldSearchHandler(option, query) {
 /**
  * Find the full option object for a selected value.
  * Searches both flat items (recent entries at the top) and grouped items (options arrays).
- * Recent items are placed before groups, so they are found first — this is important
- * because the same filter ID exists in both "Recent" and the normal group list.
+ * Recent items use a prefixed value ("__recent:<id>") to avoid highlighting in the
+ * Select component, so this function matches them correctly.
  * @param {Array} availableFilters – the full list of dropdown items (flat + grouped)
- * @param {string} selectedValue   – the value to find
+ * @param {string} selectedValue   – the value to find (may include the recent prefix)
  * @returns {object|null} the matching option, or null
  */
 export function findSelectedOption(availableFilters, selectedValue) {

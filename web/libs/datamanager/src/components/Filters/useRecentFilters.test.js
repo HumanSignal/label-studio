@@ -1,5 +1,5 @@
 import { renderHook, act } from "@testing-library/react";
-import { useRecentFilters } from "./useRecentFilters";
+import { useRecentFilters, RECENT_VALUE_PREFIX } from "./useRecentFilters";
 
 const projectId = 99;
 const storageKey = `dm:recentFilterFields:${projectId}`;
@@ -40,9 +40,8 @@ describe("useRecentFilters", () => {
 
     const values = result.current.fields.map((f) => f.value ?? f.title);
     expect(values[0]).toBe("__recent_header__");
-    expect(values[1]).toBe("filter:tasks:image");
-    expect(values[2]).toBe("__recent_separator__");
-    expect(values[3]).toBe("__all_fields_header__");
+    expect(values[1]).toBe(RECENT_VALUE_PREFIX + "filter:tasks:image");
+    expect(values[2]).toBe("__all_fields_header__");
   });
 
   it("recent items carry _recentOperator and _recentValue", () => {
@@ -67,7 +66,7 @@ describe("useRecentFilters", () => {
 
     const recentItems = result.current.fields.filter((f) => f._isRecent);
     expect(recentItems).toHaveLength(1);
-    expect(recentItems[0].value).toBe("filter:tasks:created_at");
+    expect(recentItems[0].value).toBe(RECENT_VALUE_PREFIX + "filter:tasks:created_at");
     expect(recentItems[0]._recentOperator).toBe("greater");
     expect(recentItems[0]._recentValue).toBe("2025-01-01");
   });
@@ -88,8 +87,8 @@ describe("useRecentFilters", () => {
     });
 
     const recentItems = result.current.fields.filter((f) => f._isRecent);
-    expect(recentItems[0].value).toBe("filter:tasks:image");
-    expect(recentItems[1].value).toBe("filter:tasks:text");
+    expect(recentItems[0].value).toBe(RECENT_VALUE_PREFIX + "filter:tasks:image");
+    expect(recentItems[1].value).toBe(RECENT_VALUE_PREFIX + "filter:tasks:text");
     expect(recentItems[1]._recentOperator).toBe("regex");
     expect(recentItems[1]._recentValue).toBe("new.*");
   });
@@ -105,8 +104,8 @@ describe("useRecentFilters", () => {
     });
 
     const recentItems = result.current.fields.filter((f) => f._isRecent);
-    expect(recentItems[0].value).toBe("filter:tasks:text");
-    expect(recentItems[1].value).toBe("filter:tasks:image");
+    expect(recentItems[0].value).toBe(RECENT_VALUE_PREFIX + "filter:tasks:text");
+    expect(recentItems[1].value).toBe(RECENT_VALUE_PREFIX + "filter:tasks:image");
   });
 
   it("filters out recents that no longer exist in availableFilters", () => {
@@ -127,10 +126,8 @@ describe("useRecentFilters", () => {
     const { result } = renderHook(() => useRecentFilters(projectId, availableFilters));
 
     const header = result.current.fields.find((f) => f.value === "__recent_header__");
-    const separator = result.current.fields.find((f) => f.value === "__recent_separator__");
     const allFields = result.current.fields.find((f) => f.value === "__all_fields_header__");
-    expect(header.height).toBe(36);
-    expect(separator.height).toBe(8);
-    expect(allFields.height).toBe(36);
+    expect(header.height).toBe(34);
+    expect(allFields.height).toBe(34);
   });
 });
