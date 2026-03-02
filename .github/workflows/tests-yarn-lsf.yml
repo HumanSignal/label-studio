@@ -126,7 +126,7 @@ jobs:
         run: npx cypress install
 
       - name: Download editor build
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: editor-build
           path: ${{ env.FRONTEND_MONOREPO_DIR }}/dist/libs/editor
@@ -221,7 +221,7 @@ jobs:
       # Download to workspace root so artifact paths like web/coverage-chunks/core.json
       # extract to web/coverage-chunks/ (merge step runs with working-directory: web).
       - name: Download all coverage chunks
-        uses: actions/download-artifact@v6
+        uses: actions/download-artifact@v8
         with:
           pattern: cypress-coverage-*
           path: .
