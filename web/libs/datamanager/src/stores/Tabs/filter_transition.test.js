@@ -6,20 +6,8 @@ import { resolveFilterTransition } from "./filter_snapshot_utils";
  * transition logic — input components are not needed.
  */
 const OPERATORS = {
-  String: [
-    { key: "contains" },
-    { key: "not_contains" },
-    { key: "regex" },
-    { key: "equal" },
-    { key: "not_equal" },
-  ],
-  Image: [
-    { key: "contains" },
-    { key: "not_contains" },
-    { key: "regex" },
-    { key: "equal" },
-    { key: "not_equal" },
-  ],
+  String: [{ key: "contains" }, { key: "not_contains" }, { key: "regex" }, { key: "equal" }, { key: "not_equal" }],
+  Image: [{ key: "contains" }, { key: "not_contains" }, { key: "regex" }, { key: "equal" }, { key: "not_equal" }],
   Number: [
     { key: "equal" },
     { key: "not_equal" },
@@ -347,7 +335,12 @@ describe("resolveFilterTransition — full type×type matrix", () => {
         prevValue: ["gpt-4", "llama-3"],
         newType: "List",
         newOperators: OPERATORS.List,
-        newSchema: { items: [{ value: 1, title: "User A" }, { value: 2, title: "User B" }] },
+        newSchema: {
+          items: [
+            { value: 1, title: "User A" },
+            { value: 2, title: "User B" },
+          ],
+        },
       });
 
       expect(result.operator).toBe("not_contains");
