@@ -29,6 +29,7 @@ export const ViewColumnType = types.enumeration([
   "TimeSeries",
   "Time",
   "Unknown",
+  "AgreementSelected",
   "TaskState",
 ]);
 

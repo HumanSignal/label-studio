@@ -17,6 +17,7 @@ export { TimeCell as Time } from "./TimeCell";
 export { StringCell as Text } from "./StringCell";
 export { VideoCell as Video } from "./VideoCell";
 export { ProjectCell as Project } from "./ProjectCell";
+export { AgreementSelected } from "./AgreementSelected";
 export { TaskState } from "./TaskState";
 
 export function normalizeCellAlias(alias) {
