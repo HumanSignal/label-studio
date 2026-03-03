@@ -2832,6 +2832,13 @@
         "required": false,
         "default": false
       },
+      "curves": {
+        "name": "curves",
+        "description": "Allow Bezier curves",
+        "type": ["true", "false"],
+        "required": false,
+        "default": false
+      },
       "skeleton": {
         "name": "skeleton",
         "description": "Enables skeleton mode to allow branch paths",
@@ -2889,7 +2896,7 @@
   },
   "VideoVector": {
     "name": "VideoVector",
-    "description": "VideoVector tag brings vector annotation capabilities to videos.\nIt works in combination with the `<Video/>` and the `<Labels/>` tags.\nSupports bezier curves, closable paths, and skeleton mode with\nkeyframe-based interpolation across video frames.\n\nUse with the following data types: video",
+    "description": "VideoVector tag brings vector annotation capabilities to videos.\nIt works in combination with the `<Video/>` and the `<Labels/>` tags.\nSupports closable paths and skeleton mode with\nkeyframe-based interpolation across video frames.\n\nUse with the following data types: video",
     "attrs": {
       "name": {
         "name": "name",
@@ -2931,6 +2938,20 @@
         "required": false,
         "default": 3
       },
+      "pointSize": {
+        "name": "pointSize",
+        "description": "Size of vector handle points",
+        "type": ["small", "medium", "large"],
+        "required": false,
+        "default": "small"
+      },
+      "pointStyle": {
+        "name": "pointStyle",
+        "description": "Style of points",
+        "type": ["rectangle", "circle"],
+        "required": false,
+        "default": "circle"
+      },
       "closable": {
         "name": "closable",
         "description": "Allow closed shapes",
@@ -2965,20 +2986,6 @@
         "type": ["pixel", "none"],
         "required": false,
         "default": "none"
-      },
-      "pointSize": {
-        "name": "pointSize",
-        "description": "Size of vector handle points",
-        "type": ["small", "medium", "large"],
-        "required": false,
-        "default": "small"
-      },
-      "pointStyle": {
-        "name": "pointStyle",
-        "description": "Style of points",
-        "type": ["rectangle", "circle"],
-        "required": false,
-        "default": "circle"
       },
       "pointSizeEnabled": {
         "name": "pointSizeEnabled",
@@ -3085,34 +3092,6 @@
         "type": ["number", "none"],
         "required": false,
         "default": "none"
-      },
-      "pointSize": {
-        "name": "pointSize",
-        "description": "Size of vector handle points",
-        "type": ["small", "medium", "large"],
-        "required": false,
-        "default": "small"
-      },
-      "pointStyle": {
-        "name": "pointStyle",
-        "description": "Style of points",
-        "type": ["rectangle", "circle"],
-        "required": false,
-        "default": "circle"
-      },
-      "pointSizeEnabled": {
-        "name": "pointSizeEnabled",
-        "description": "Size of a point in pixels when shape is selected",
-        "type": "number",
-        "required": false,
-        "default": 5
-      },
-      "pointSizeDisabled": {
-        "name": "pointSizeDisabled",
-        "description": "Size of a point in pixels when shape is not selected",
-        "type": "number",
-        "required": false,
-        "default": 3
       }
     }
   },
