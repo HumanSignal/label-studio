@@ -2832,13 +2832,6 @@
         "required": false,
         "default": false
       },
-      "curves": {
-        "name": "curves",
-        "description": "Allow Bezier curves",
-        "type": ["true", "false"],
-        "required": false,
-        "default": false
-      },
       "skeleton": {
         "name": "skeleton",
         "description": "Enables skeleton mode to allow branch paths",
