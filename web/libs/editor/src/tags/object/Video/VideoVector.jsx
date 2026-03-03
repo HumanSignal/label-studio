@@ -127,10 +127,7 @@ const computeBBox = (vertices) => {
  * Renders the vector shape as a Konva Path without editing capabilities.
  */
 const SimpleVectorPath = observer(({ pixelVertices, closed, style, reg, scale, onClick, listening }) => {
-  const pathData = useMemo(
-    () => verticesToPathData(pixelVertices, closed),
-    [pixelVertices, closed],
-  );
+  const pathData = useMemo(() => verticesToPathData(pixelVertices, closed), [pixelVertices, closed]);
 
   const bbox = useMemo(() => computeBBox(pixelVertices), [pixelVertices]);
 
@@ -194,32 +191,44 @@ const InteractiveVectorEditor = observer(({ reg, pixelVertices, closed, frame, w
   const vectorRef = useRef(null);
   const { realWidth: waWidth, realHeight: waHeight, scale: waScale, x: waX, y: waY } = workingArea;
 
-  const stageTransform = useMemo(() => ({
-    zoom: 1,
-    offsetX: waX,
-    offsetY: waY,
-  }), [waX, waY]);
+  const stageTransform = useMemo(
+    () => ({
+      zoom: 1,
+      offsetX: waX,
+      offsetY: waY,
+    }),
+    [waX, waY],
+  );
 
   const pointRadius = useMemo(() => getPointRadiusFromSize(control), [control?.pointsize]);
 
-  const handleRef = useCallback((kv) => {
-    vectorRef.current = kv;
-    reg.setVectorRef(kv);
-  }, [reg]);
+  const handleRef = useCallback(
+    (kv) => {
+      vectorRef.current = kv;
+      reg.setVectorRef(kv);
+    },
+    [reg],
+  );
 
-  const handlePointsChange = useCallback((points) => {
-    const percentPoints = pixelToPercentVertices(points, waWidth, waHeight);
+  const handlePointsChange = useCallback(
+    (points) => {
+      const percentPoints = pixelToPercentVertices(points, waWidth, waHeight);
 
-    reg.updateShape({ vertices: percentPoints, closed: reg.getShape(frame)?.closed ?? false }, frame);
-  }, [reg, frame, waWidth, waHeight]);
+      reg.updateShape({ vertices: percentPoints, closed: reg.getShape(frame)?.closed ?? false }, frame);
+    },
+    [reg, frame, waWidth, waHeight],
+  );
 
-  const handlePathClosedChange = useCallback((isClosed) => {
-    const shape = reg.getShape(frame);
+  const handlePathClosedChange = useCallback(
+    (isClosed) => {
+      const shape = reg.getShape(frame);
 
-    if (shape) {
-      reg.updateShape({ vertices: shape.vertices, closed: isClosed }, frame);
-    }
-  }, [reg, frame]);
+      if (shape) {
+        reg.updateShape({ vertices: shape.vertices, closed: isClosed }, frame);
+      }
+    },
+    [reg, frame],
+  );
 
   return (
     <Group>
@@ -267,18 +276,7 @@ const InteractiveVectorEditor = observer(({ reg, pixelVertices, closed, frame, w
  * - Non-selected regions: renders a simple Konva Path (fast, updates every frame)
  * - Selected regions: mounts full KonvaVector for interactive editing
  */
-const VideoVectorPure = ({
-  id,
-  reg,
-  box,
-  frame,
-  workingArea,
-  selected,
-  draggable,
-  listening,
-  onDragMove,
-  ...rest
-}) => {
+const VideoVectorPure = ({ id, reg, box, frame, workingArea, selected, draggable, listening, onDragMove, ...rest }) => {
   const style = useRegionStyles(reg, { includeFill: true });
   const { realWidth: waWidth, realHeight: waHeight, scale: waScale } = workingArea;
 

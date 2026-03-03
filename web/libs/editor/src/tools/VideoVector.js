@@ -78,9 +78,7 @@ const _Tool = types
       const obj = self.obj;
 
       if (obj?.regs) {
-        const activeDrawing = obj.regs.find(
-          (reg) => reg.type === "videovectorregion" && reg.isDrawing && isAlive(reg),
-        );
+        const activeDrawing = obj.regs.find((reg) => reg.type === "videovectorregion" && reg.isDrawing && isAlive(reg));
 
         if (activeDrawing) return activeDrawing;
       }

@@ -70,13 +70,15 @@ const TagAttrs = types.model({
   pointsizedisabled: types.optional(types.maybeNull(types.string), "3"),
 });
 
-const ModelAttrs = types.model("VideoVectorModel", {
-  pid: types.optional(types.string, guidGenerator),
-  type: "videovector",
-  _value: types.optional(types.string, ""),
-}).volatile(() => ({
-  toolNames: ["VideoVector"],
-}));
+const ModelAttrs = types
+  .model("VideoVectorModel", {
+    pid: types.optional(types.string, guidGenerator),
+    type: "videovector",
+    _value: types.optional(types.string, ""),
+  })
+  .volatile(() => ({
+    toolNames: ["VideoVector"],
+  }));
 
 const VideoVectorModel = types.compose(
   "VideoVectorModel",

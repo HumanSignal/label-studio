@@ -348,28 +348,10 @@ const Shape = observer(({ id, reg, item, stageRef, currentFrame, ...props }) => 
   };
 
   if (reg.type === "videovectorregion") {
-    return (
-      <VideoVectorShape
-        id={id}
-        reg={reg}
-        box={box}
-        frame={frame}
-        onClick={handleClick}
-        {...props}
-      />
-    );
+    return <VideoVectorShape id={id} reg={reg} box={box} frame={frame} onClick={handleClick} {...props} />;
   }
 
-  return (
-    <Rectangle
-      id={id}
-      reg={reg}
-      box={box}
-      frame={frame}
-      onClick={handleClick}
-      {...props}
-    />
-  );
+  return <Rectangle id={id} reg={reg} box={box} frame={frame} onClick={handleClick} {...props} />;
 });
 
 export const VideoRegions = observer(VideoRegionsPure);
