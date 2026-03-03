@@ -5,12 +5,24 @@ import { useCallback, useMemo } from "react";
 // ── Adapters ─────────────────────────────────────────────────────────────────
 
 /**
+ * Returns true for any column alias that belongs to the agreement family:
+ * the main `agreement` column, the legacy `agreement_selected` column, and
+ * any dimension breakdown columns (`dimension_agreement__*`).
+ */
+function isAgreementAlias(alias) {
+  if (typeof alias !== "string") return false;
+  return alias === "agreement" || alias === "agreement_selected" || alias.startsWith("dimension_agreement__");
+}
+
+/**
  * Convert targetColumns (TabColumn[] from store.currentView.targetColumns)
  * to the normalized group format for pickerGroupsToFlatOptions.
  *
  * Columns with `children` become labeled groups via the standard MST hierarchy
- * (Data, Annotations, Agreement when dimensions enabled, …).  Remaining root
- * columns (no parent, no children) form the un-titled leading group.
+ * (Data, Annotations, …).  Agreement-family columns (agreement, agreement_selected,
+ * dimension_agreement__*) are always collected into a synthetic "Agreement" group
+ * regardless of whether the backend sends a parent.  Remaining root columns form
+ * the un-titled leading group.
  *
  * @param {TabColumn[]} columns
  * @param {function} [filterFn] - optional predicate applied to parent columns and
@@ -19,6 +31,7 @@ import { useCallback, useMemo } from "react";
  */
 export function columnsToPickerGroups(columns, filterFn) {
   const rootItems = [];
+  const agreementItems = [];
   const groups = new Map(); // parentKey → {key, title, items[]}
 
   for (const col of columns) {
@@ -34,6 +47,11 @@ export function columnsToPickerGroups(columns, filterFn) {
       }
     } else if (col.parent) {
       // Child of a parent-with-children: rendered through the parent branch above.
+    } else if (isAgreementAlias(col.alias)) {
+      // Agreement-family column → synthetic "Agreement" group.
+      if (!filterFn || filterFn(col)) {
+        agreementItems.push(toTabColumnItem(col));
+      }
     } else {
       // Plain root leaf column.
       if (!filterFn || filterFn(col)) {
@@ -45,6 +63,9 @@ export function columnsToPickerGroups(columns, filterFn) {
   const result = [];
   if (rootItems.length) {
     result.push({ key: "__root__", title: null, items: rootItems });
+  }
+  if (agreementItems.length) {
+    result.push({ key: "__agreement__", title: "Agreement", items: agreementItems });
   }
   result.push(...groups.values());
   return result;
@@ -63,6 +84,7 @@ export function columnsToPickerGroups(columns, filterFn) {
  */
 export function filtersToPickerGroups(availableFilters) {
   const rootItems = [];
+  const agreementItems = [];
   const groups = new Map(); // parent column key → {key, title, items[]}
 
   for (const filter of availableFilters) {
@@ -70,14 +92,16 @@ export function filtersToPickerGroups(availableFilters) {
     const item = {
       key: filter.id,
       title: field.title,
-      readableType: shouldShowBadge(field) ? field.readableType : undefined,
+      readableType: shouldShowBadge(field) ? (agreementBadgeLabel(field) ?? field.readableType) : undefined,
       icon: field.icon,
       enterpriseBadge: field.enterprise_badge,
       disabled: field.disabled,
       original: filter,
     };
 
-    if (field.parent) {
+    if (isAgreementAlias(field.alias)) {
+      agreementItems.push(item);
+    } else if (field.parent) {
       const parentKey = field.parent.key;
       if (!groups.has(parentKey)) {
         groups.set(parentKey, { key: parentKey, title: field.parent.title, items: [] });
@@ -92,16 +116,29 @@ export function filtersToPickerGroups(availableFilters) {
   if (rootItems.length) {
     result.push({ key: "__root__", title: null, items: rootItems });
   }
+  if (agreementItems.length) {
+    result.push({ key: "__agreement__", title: "Agreement", items: agreementItems });
+  }
   result.push(...groups.values());
   return result;
 }
 
 /**
- * Show a type badge only for columns that belong to a named group (parent exists).
- * Root columns carry no meaningful type label.
+ * Show a type badge only for columns that belong to a named group (parent exists)
+ * or for dimension agreement columns shown inside the synthetic Agreement group.
  */
 function shouldShowBadge(col) {
+  if (typeof col.alias === "string" && col.alias.startsWith("dimension_agreement__")) return true;
   return !!col.parent && col.alias !== "agreement";
+}
+
+/**
+ * For dimension agreement columns the badge label should always read "Agreement"
+ * regardless of the underlying readableType.  Returns null for all other columns.
+ */
+function agreementBadgeLabel(col) {
+  if (typeof col.alias === "string" && col.alias.startsWith("dimension_agreement__")) return "Agreement";
+  return null;
 }
 
 function toTabColumnItem(col) {
@@ -109,7 +146,7 @@ function toTabColumnItem(col) {
   return {
     key: col.key,
     title: col.title,
-    readableType: shouldShowBadge(col) ? col.readableType : undefined,
+    readableType: shouldShowBadge(col) ? (agreementBadgeLabel(col) ?? col.readableType) : undefined,
     icon: col.icon,
     enterpriseBadge,
     disabled: col.disabled || !!enterpriseBadge,
