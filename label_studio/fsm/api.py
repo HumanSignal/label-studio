@@ -75,12 +75,12 @@ class FSMEntityHistoryFilterSet(FilterSet):
 @method_decorator(
     name='get',
     decorator=extend_schema(
-        tags=['FSM'],
+        tags=['States'],
         summary='Get entity state history',
         description='Get the state history of an entity',
         parameters=filterset_to_openapi_params(FSMEntityHistoryFilterSet),
         extensions={
-            'x-fern-sdk-group-name': 'fsm',
+            'x-fern-sdk-group-name': 'states',
             'x-fern-sdk-method-name': 'state_history',
             'x-fern-audiences': ['internal'],
             'x-fern-pagination': {
@@ -121,13 +121,13 @@ class FSMEntityHistoryAPI(FSMAPIMixin, generics.ListAPIView):
 @method_decorator(
     name='post',
     decorator=extend_schema(
-        tags=['FSM'],
-        summary='Execute manual FSM transition',
+        tags=['States'],
+        summary='Execute manual state transition',
         description='Execute a registered manual transition for an entity.',
         request=FSMTransitionExecuteRequestSerializer,
         responses={200: FSMTransitionExecuteResponseSerializer},
         extensions={
-            'x-fern-sdk-group-name': 'fsm',
+            'x-fern-sdk-group-name': 'states',
             'x-fern-sdk-method-name': 'execute_transition',
             'x-fern-audiences': ['internal'],
         },
