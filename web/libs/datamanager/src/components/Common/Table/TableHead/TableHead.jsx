@@ -16,7 +16,11 @@ import { getRoot } from "mobx-state-tree";
 import { Agreement } from "../../../CellViews/Agreement/Agreement";
 import { AgreementSelected } from "../../../CellViews/AgreementSelected";
 import { IconChevronDown } from "@humansignal/icons";
-import { isActive, FF_AGREEMENT_FILTERED, FF_AGREEMENT_V2 } from "@humansignal/core/lib/utils/feature-flags";
+import {
+  isActive,
+  FF_AGREEMENT_FILTERED,
+  FF_UTC_428_CONSENSUS_CONTROL_TAG_AGREEMENT,
+} from "@humansignal/core/lib/utils/feature-flags";
 
 const tableHeadCN = cn("table-head");
 
@@ -154,12 +158,14 @@ const ColumnRenderer = observer(
 
     const isAgreementColumn =
       isActive(FF_AGREEMENT_FILTERED) &&
-      isActive(FF_AGREEMENT_V2) &&
+      isActive(FF_UTC_428_CONSENSUS_CONTROL_TAG_AGREEMENT) &&
       (column.original?.alias === "agreement" ||
         (typeof column.original?.alias === "string" && column.original.alias.startsWith("dimension_agreement__")));
 
     const isAgreementSelected =
-      isActive(FF_AGREEMENT_FILTERED) && !isActive(FF_AGREEMENT_V2) && column.type === "AgreementSelected";
+      isActive(FF_AGREEMENT_FILTERED) &&
+      !isActive(FF_UTC_428_CONSENSUS_CONTROL_TAG_AGREEMENT) &&
+      column.type === "AgreementSelected";
 
     const headContent = (
       <>

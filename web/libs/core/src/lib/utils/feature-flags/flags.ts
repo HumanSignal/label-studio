@@ -96,11 +96,11 @@ export const FF_MULTIPLE_LABELS_REGIONS = "fflag_feat_front_bros_327_multiple_la
 export const FF_AGREEMENT_FILTERED = "fflag_feat_utc_239_filterable_agreement_column_short";
 
 /**
- * Agreement v2 in task summary view — when enabled, the v2 agreement UI
- * (dimension-based calculation, new Agreement column) is shown.
- * When disabled, the legacy agreement_selected column and v1 UI are used instead.
+ * Consensus control-tag agreement (v2) — enables dimension-based agreement calculation
+ * and the v2 agreement UI (new Agreement column). When disabled, the legacy
+ * agreement_selected column and v1 UI are used instead.
  */
-export const FF_AGREEMENT_V2 = "feat_utc_554_agreement_v2_in_task_summary_view";
+export const FF_UTC_428_CONSENSUS_CONTROL_TAG_AGREEMENT = "fflag_utc_428_consensus_control_tag_agreement";
 
 /**
  * FSM State Fields
