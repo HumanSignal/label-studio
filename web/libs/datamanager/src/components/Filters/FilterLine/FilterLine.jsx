@@ -6,7 +6,7 @@ import { FilterDropdown } from "../FilterDropdown";
 import "./FilterLine.scss";
 import { FilterOperation } from "./FilterOperation";
 import { Icon } from "../../Common/Icon/Icon";
-import { ColumnPicker } from "../../Common/ColumnPicker";
+import { ColumnPicker, ColumnPickerOptionContent } from "../../Common/ColumnPicker";
 
 const Conjunction = observer(({ index, view }) => {
   return (
@@ -38,6 +38,11 @@ const FilterColumnPicker = observer(({ filter, availableFilters }) => {
       disabled={filter.field.disabled}
       triggerProps={{
         style: { minWidth: 80 },
+      }}
+      renderSelected={(selectedOptions, placeholder) => {
+        const opt = selectedOptions?.[0];
+        if (!opt) return <span>{placeholder}</span>;
+        return <ColumnPickerOptionContent option={opt} />;
       }}
     />
   );
