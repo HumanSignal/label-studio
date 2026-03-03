@@ -40,13 +40,14 @@ export const Agreement = (cell) => {
 
   const colPath = String(colId).split(":").pop() || "";
   const isDimensionAgreementColumn = colPath.startsWith("dimension_agreement__");
-  const isAgreementPopoverEnabled = basePopoverEnabled && !isDimensionAgreementColumn;
+  const dimensionId = isDimensionAgreementColumn ? Number(colPath.replace("dimension_agreement__", "")) : undefined;
+  const isAgreementPopoverEnabled = !!basePopoverEnabled;
 
   const handleClick = isAgreementPopoverEnabled
     ? (e) => {
         e.preventDefault();
         e.stopPropagation();
-        sdk.invoke("agreementCellClick", { task }, (jsx) => setContent(jsx));
+        sdk.invoke("agreementCellClick", { task, dimensionId }, (jsx) => setContent(jsx));
       }
     : undefined;
 
