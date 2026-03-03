@@ -10,7 +10,7 @@ from urllib.parse import urlparse
 
 from core.redis import start_job_async_or_sync
 from django.conf import settings
-from django.db import models
+from django.db import models, transaction
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.utils.translation import gettext_lazy as _
@@ -283,7 +283,7 @@ def async_export_annotation_to_gcs_storages(annotation: 'Annotation | int'):
 def export_annotation_to_gcs_storages(sender, instance, **kwargs):
     storages = getattr(instance.project, 'io_storages_gcsexportstorages', None)
     if storages and storages.exists():  # avoid excess jobs in rq
-        start_job_async_or_sync(async_export_annotation_to_gcs_storages, instance.pk)
+        transaction.on_commit(lambda: start_job_async_or_sync(async_export_annotation_to_gcs_storages, instance.pk))
 
 
 class GCSImportStorageLink(ImportStorageLink):
