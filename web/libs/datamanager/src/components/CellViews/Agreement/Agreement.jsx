@@ -1,7 +1,7 @@
 import { useSDK } from "../../../providers/SDKProvider";
 import { isDefined } from "../../../utils/utils";
 import { useState } from "react";
-import { Button, Popover, Tooltip } from "@humansignal/ui";
+import { Button, Popover } from "@humansignal/ui";
 import { IconSettings } from "@humansignal/icons";
 
 const LOW_AGREEMENT_SCORE = 33;
@@ -71,13 +71,12 @@ Agreement.HeaderCell = ({ agreementFilters, onSave, children }) => {
       look="outlined"
       variant="neutral"
       size="small"
+      tooltip="Adjust calculation and display of all agreement columns"
       onClick={() => sdk.invoke("AgreementHeaderClick", { agreementFilters, onSave })}
       className="flex items-center justify-between gap-tight w-full cursor-pointer overflow-hidden"
     >
       {children}
-      <Tooltip title="Adjust calculation and display of all agreement columns">
-        <IconSettings width={16} height={16} className="ml-auto" />
-      </Tooltip>
+      <IconSettings width={16} height={16} className="ml-auto" />
     </Button>
   );
 };

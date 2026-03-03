@@ -137,7 +137,7 @@ function shouldShowBadge(col) {
  * regardless of the underlying readableType.  Returns null for all other columns.
  */
 function agreementBadgeLabel(col) {
-  if (typeof col.alias === "string" && col.alias.startsWith("dimension_agreement__")) return "Agreement";
+  if (typeof col.alias === "string" && col.alias.startsWith("dimension_agreement__")) return "agreement";
   return null;
 }
 
