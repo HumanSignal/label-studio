@@ -6,6 +6,7 @@ import { allowedFilterOperations } from "../../components/Filters/types/Utility"
 import { debounce } from "@humansignal/core/lib/utils/debounce";
 import { isBlank, isDefined } from "../../utils/utils";
 import { FilterValueRange, FilterValueType, TabFilterType } from "./tab_filter_type";
+import { resolveFilterTransition } from "./filter_snapshot_utils";
 
 const operatorNames = Array.from(new Set([].concat(...Object.values(Filters).map((f) => f.map((op) => op.key)))));
 
@@ -127,32 +128,42 @@ export const TabFilter = types
       }
     },
 
+    /**
+     * Switch this filter to a different column (non-recent path).
+     * Preserves operator when compatible. Preserves value only when the type
+     * is unchanged AND the new column has no schema (free-form input).
+     * Schema-bound columns (List, etc.) have column-specific dropdown values
+     * that must not leak across columns.
+     * @see resolveFilterTransition for the full decision matrix
+     */
     setFilter(value, save = true) {
       if (!isDefined(value)) return;
 
       self.view.clearChildFilter(self);
 
-      const previousFilterType = self.filter.currentType;
-      const previousFilter = self.filter;
+      const prevOperator = self.operator;
+      const prevValue = self.value;
+      const prevType = self.filter.currentType;
 
       self.filter = value;
 
-      const typeChanged = previousFilterType !== self.filter.currentType;
-      const filterChanged = previousFilter !== self.filter;
+      self.view.applyChildFilter(self);
+      self.markUnsaved();
 
-      if (typeChanged || filterChanged) {
-        self.view.applyChildFilter(self);
+      const result = resolveFilterTransition({
+        prevType,
+        prevOperator,
+        prevValue,
+        newType: self.filter.currentType,
+        newOperators: self.component,
+        newSchema: self.filter.schema,
+      });
 
-        self.markUnsaved();
-      }
-
-      if (typeChanged) {
+      self.operator = result.operator;
+      if (result.valueReset) {
         self.setDefaultValue();
-        self.setOperator(self.component[0].key);
-      }
-
-      if (filterChanged) {
-        self.setValue(null);
+      } else {
+        self.value = result.value;
       }
 
       if (save) self.saved();
@@ -160,6 +171,38 @@ export const TabFilter = types
 
     setFilterDelayed(value) {
       self.setFilter(value, false);
+      self.saveDelayed();
+    },
+
+    /**
+     * Restore a filter from a "Recent" selection, applying the stored column + operator + value.
+     * Unlike setFilter(), this does NOT try to carry over the previous filter's state —
+     * it directly applies the saved state from localStorage.
+     * Falls back to defaults if the stored operator is no longer valid for the column type
+     * (e.g. column type was changed in the labeling config since the entry was saved).
+     */
+    setFilterFromRecent(filterTypeId, operator, value) {
+      if (!isDefined(filterTypeId)) return;
+
+      self.view.clearChildFilter(self);
+      self.filter = filterTypeId;
+      self.view.applyChildFilter(self);
+      self.markUnsaved();
+
+      const newOperators = self.component;
+
+      if (operator && newOperators.some((op) => op.key === operator)) {
+        self.operator = operator;
+      } else {
+        self.operator = newOperators[0].key;
+      }
+
+      if (value !== undefined && value !== null) {
+        self.setValue(value);
+      } else {
+        self.setDefaultValue();
+      }
+
       self.saveDelayed();
     },
 

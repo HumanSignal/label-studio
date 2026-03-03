@@ -27,6 +27,7 @@
 
   &__actions {
     display: flex;
+    align-items: center;
     margin-top: var(--spacing-base);
     padding: 0 var(--spacing-tight) var(--spacing-tight);
     justify-content: space-between;
@@ -38,6 +39,12 @@
         border: 1px solid var(--color-neutral-border);
       }
     }
+  }
+
+  &__actions-right {
+    display: flex;
+    align-items: center;
+    gap: 2px;
   }
 
   &__empty {
@@ -79,4 +86,27 @@
 
 :global(.filter-dropdown-content) {
   min-width: 270px !important;
+  width: max-content;
+  max-width: min(500px, 90vw);
+
+  // Decorative items (headers) are disabled in cmdk. Override the default
+  // disabled styles so they look like clean section labels, not grayed-out options.
+  [data-disabled] {
+    pointer-events: auto !important;
+    cursor: default !important;
+    opacity: 1;
+  }
+
+  // Suppress the hover highlight on the inner div of disabled/decorative items.
+  [data-disabled="true"] > div[data-disabled="true"] {
+    background: transparent !important;
+    cursor: default !important;
+  }
+
+  // Section headers (Recent, All fields): reduce left padding so they sit further left
+  // than list items, making section boundaries easier to spot.
+  [data-value="__recent_header__"] > div,
+  [data-value="__all_fields_header__"] > div {
+    padding-left: 8px !important;
+  }
 }

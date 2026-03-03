@@ -1,6 +1,6 @@
 [project]
 name = "label-studio"
-version = "1.23.0.dev0"
+version = "1.24.0.dev0"
 description = "Label Studio annotation tool"
 authors = [
     { name = "HumanSignal", email = "support@humansignal.com" },
