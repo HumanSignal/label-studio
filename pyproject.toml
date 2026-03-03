@@ -72,7 +72,7 @@ dependencies = [
     "tldextract (>=5.1.3)",
     "uuid-utils (>=0.11.0,<1.0.0)",
     ## HumanSignal repo dependencies :start
-    "label-studio-sdk @ https://github.com/HumanSignal/label-studio-sdk/archive/2db69fb8150ebd2c33b85e1ac2e160d5e6927dab.zip",
+    "label-studio-sdk @ https://github.com/HumanSignal/label-studio-sdk/archive/9ca3ea9b5f40a2a7f182361ef0def3b6b85104b8.zip",
     ## HumanSignal repo dependencies :end
 ]
 
