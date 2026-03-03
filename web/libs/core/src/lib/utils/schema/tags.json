@@ -2705,13 +2705,6 @@
         "required": false,
         "default": false
       },
-      "curves": {
-        "name": "curves",
-        "description": "Allow Bezier curves",
-        "type": ["true", "false"],
-        "required": false,
-        "default": false
-      },
       "skeleton": {
         "name": "skeleton",
         "description": "Enables skeleton mode to allow branch paths",
@@ -2986,6 +2979,34 @@
         "type": ["pixel", "none"],
         "required": false,
         "default": "none"
+      },
+      "pointSize": {
+        "name": "pointSize",
+        "description": "Size of vector handle points",
+        "type": ["small", "medium", "large"],
+        "required": false,
+        "default": "small"
+      },
+      "pointStyle": {
+        "name": "pointStyle",
+        "description": "Style of points",
+        "type": ["rectangle", "circle"],
+        "required": false,
+        "default": "circle"
+      },
+      "pointSizeEnabled": {
+        "name": "pointSizeEnabled",
+        "description": "Size of a point in pixels when shape is selected",
+        "type": "number",
+        "required": false,
+        "default": 5
+      },
+      "pointSizeDisabled": {
+        "name": "pointSizeDisabled",
+        "description": "Size of a point in pixels when shape is not selected",
+        "type": "number",
+        "required": false,
+        "default": 3
       }
     }
   },
@@ -3085,6 +3106,34 @@
         "type": ["number", "none"],
         "required": false,
         "default": "none"
+      },
+      "pointSize": {
+        "name": "pointSize",
+        "description": "Size of vector handle points",
+        "type": ["small", "medium", "large"],
+        "required": false,
+        "default": "small"
+      },
+      "pointStyle": {
+        "name": "pointStyle",
+        "description": "Style of points",
+        "type": ["rectangle", "circle"],
+        "required": false,
+        "default": "circle"
+      },
+      "pointSizeEnabled": {
+        "name": "pointSizeEnabled",
+        "description": "Size of a point in pixels when shape is selected",
+        "type": "number",
+        "required": false,
+        "default": 5
+      },
+      "pointSizeDisabled": {
+        "name": "pointSizeDisabled",
+        "description": "Size of a point in pixels when shape is not selected",
+        "type": "number",
+        "required": false,
+        "default": 3
       }
     }
   },

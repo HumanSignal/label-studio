@@ -18,7 +18,7 @@ import ControlBase from "./Base";
  * @example
  * <View>
  *   <Video name="video" value="$video" />
- *   <VideoVectorLabels name="labels" toName="video" closable={true} curves={true}>
+ *   <VideoVectorLabels name="labels" toName="video" closable={true}>
  *     <Label value="Road" />
  *     <Label value="Boundary" />
  *   </VideoVectorLabels>
@@ -37,7 +37,6 @@ import ControlBase from "./Base";
  * @param {string} [strokeColor] Stroke color in hexadecimal
  * @param {number} [strokeWidth=1] Width of stroke
  * @param {boolean} [closable=false] Allow closed shapes
- * @param {boolean} [curves=false] Allow Bezier curves
  * @param {boolean} [skeleton=false] Enables skeleton mode
  * @param {number|none} [minPoints=none] Minimum allowed number of points
  * @param {number|none} [maxPoints=none] Maximum allowed number of points

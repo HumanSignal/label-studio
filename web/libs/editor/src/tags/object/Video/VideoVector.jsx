@@ -161,6 +161,31 @@ const SimpleVectorPath = observer(({ pixelVertices, closed, style, reg, scale, o
   );
 });
 
+const getPointRadiusFromSize = (control) => {
+  const size = control?.pointsize ?? "small";
+
+  switch (size) {
+    case "medium":
+      return { enabled: 5, disabled: 4 };
+    case "large":
+      return { enabled: 7, disabled: 5 };
+    default:
+      return { enabled: 4, disabled: 3 };
+  }
+};
+
+const getMinPoints = (control) => {
+  const val = control?.minpoints;
+
+  return val ? Number.parseInt(val) : undefined;
+};
+
+const getMaxPoints = (control) => {
+  const val = control?.maxpoints;
+
+  return val ? Number.parseInt(val) : undefined;
+};
+
 /**
  * Full interactive vector editor for selected video vector regions.
  * Wraps KonvaVector with percent/pixel coordinate conversion.
@@ -174,6 +199,8 @@ const InteractiveVectorEditor = observer(({ reg, pixelVertices, closed, frame, w
     offsetX: waX,
     offsetY: waY,
   }), [waX, waY]);
+
+  const pointRadius = useMemo(() => getPointRadiusFromSize(control), [control?.pointsize]);
 
   const handleRef = useCallback((kv) => {
     vectorRef.current = kv;
@@ -210,14 +237,22 @@ const InteractiveVectorEditor = observer(({ reg, pixelVertices, closed, frame, w
         fitScale={waScale}
         allowClose={control?.closable ?? false}
         allowBezier={control?.curves ?? false}
+        minPoints={getMinPoints(control)}
+        maxPoints={getMaxPoints(control)}
         skeletonEnabled={control?.skeleton ?? false}
-        stroke={style.strokeColor}
+        stroke={reg.selected ? "#ff0000" : style.strokeColor}
         fill={style.fillColor ?? "transparent"}
         strokeWidth={style.strokeWidth}
         opacity={Number.parseFloat(control?.opacity || "1")}
         pixelSnapping={control?.snap === "pixel"}
         selected={true}
         disabled={reg.isReadOnly()}
+        pointRadius={pointRadius}
+        pointFill={reg.selected ? "#ffffff" : "#f8fafc"}
+        pointStroke={reg.selected ? "#ff0000" : style.strokeColor}
+        pointStrokeSelected="#ff6b35"
+        pointStrokeWidth={reg.selected ? 2 : 1}
+        pointStyle={control?.pointstyle ?? "circle"}
         disableInternalPointAddition={true}
         onPointsChange={handlePointsChange}
         onPathClosedChange={handlePathClosedChange}

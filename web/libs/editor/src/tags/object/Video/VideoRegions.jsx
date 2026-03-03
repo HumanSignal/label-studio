@@ -154,14 +154,23 @@ const VideoRegionsPure = ({
   }, [item.name]);
 
   const handleMouseDown = (e) => {
-    if (e.target !== stageRef.current || item.annotation?.isReadOnly()) return;
+    if (item.annotation?.isReadOnly()) return;
+
+    const vectorTool = getVectorTool();
+
+    if (vectorTool?.isDrawing) {
+      const { x, y } = limitCoordinates(normalizeMouseOffsets(e.evt.offsetX, e.evt.offsetY));
+
+      vectorTool.event("mousedown", e.evt, [x, y]);
+      return;
+    }
+
+    if (e.target !== stageRef.current) return;
 
     const { x, y } = limitCoordinates(normalizeMouseOffsets(e.evt.offsetX, e.evt.offsetY));
     const isInBounds = inBounds(x, y);
 
     if (!isInBounds) return;
-
-    const vectorTool = getVectorTool();
 
     if (vectorTool) {
       vectorTool.event("mousedown", e.evt, [x, y]);

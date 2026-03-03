@@ -12,7 +12,7 @@ import { customTypes } from "../../core/CustomTypes";
 /**
  * VideoVector tag brings vector annotation capabilities to videos.
  * It works in combination with the `<Video/>` and the `<Labels/>` tags.
- * Supports bezier curves, closable paths, and skeleton mode with
+ * Supports closable paths and skeleton mode with
  * keyframe-based interpolation across video frames.
  *
  * Use with the following data types: video
@@ -37,12 +37,15 @@ import { customTypes } from "../../core/CustomTypes";
  * @param {string} [fillColor=transparent] Vector fill color in hexadecimal or HTML color name
  * @param {string} [strokeColor=#f48a42] Stroke color in hexadecimal
  * @param {number} [strokeWidth=3] Width of stroke
+ * @param {small|medium|large} [pointSize=small] Size of vector handle points
+ * @param {rectangle|circle} [pointStyle=circle] Style of points
  * @param {boolean} [closable=false] Allow closed shapes
- * @param {boolean} [curves=false] Allow Bezier curves
  * @param {boolean} [skeleton=false] Enables skeleton mode to allow branch paths
  * @param {number|none} [minPoints=none] Minimum allowed number of points
  * @param {number|none} [maxPoints=none] Maximum allowed number of points
  * @param {pixel|none} [snap=none] Snap vector to image pixels
+ * @param {number} [pointSizeEnabled=5] Size of a point in pixels when shape is selected
+ * @param {number} [pointSizeDisabled=3] Size of a point in pixels when shape is not selected
  */
 const TagAttrs = types.model({
   toname: types.maybeNull(types.string),
@@ -54,6 +57,9 @@ const TagAttrs = types.model({
   strokecolor: types.optional(customTypes.color, "#f48a42"),
 
   snap: types.optional(types.string, "none"),
+
+  pointsize: types.optional(types.string, "small"),
+  pointstyle: types.optional(types.string, "circle"),
 
   closable: types.optional(types.maybeNull(types.boolean), false),
   curves: types.optional(types.maybeNull(types.boolean), false),
