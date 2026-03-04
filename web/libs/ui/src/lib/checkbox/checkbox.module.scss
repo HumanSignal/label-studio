@@ -187,9 +187,4 @@ $check-icon: "data:image/svg+xml;charset=UTF-8,%3csvg width='13' height='10' vie
       }
     }
   }
-
-  &__input:checked + &__check::before {
-    opacity: 1;
-  }
-
 }

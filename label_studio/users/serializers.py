@@ -114,7 +114,7 @@ class BaseWhoAmIUserSerializer(BaseUserSerializer):
 class UserSimpleSerializer(BaseUserSerializer):
     class Meta:
         model = User
-        fields = ('id', 'first_name', 'last_name', 'email', 'avatar')
+        fields = ('id', 'first_name', 'last_name', 'username', 'email', 'avatar')
 
 
 class HotkeysSerializer(serializers.Serializer):

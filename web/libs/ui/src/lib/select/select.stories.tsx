@@ -1,6 +1,7 @@
 import { useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import { Select } from "./select";
+import { Badge } from "../badge/badge";
 import { BadgeGroup } from "../badge-group";
 import { Button } from "../button/button";
 
@@ -259,6 +260,71 @@ export const MultipleSelectWithVirtualListAndSearch: Story = {
     options: techOptions as any[],
     placeholder: "Select technologies...",
     label: "Multiple Select with Selected Items Group",
+  },
+};
+
+/**
+ * Flat options with groupBy: options include a field (e.g. `parent`) and `groupBy="parent"` renders
+ * subtle headers above each group. Options without the field go in an ungrouped leading section.
+ */
+export const WithGroupBy: Story = {
+  args: {
+    placeholder: "Select a column",
+    searchable: true,
+    searchPlaceholder: "Search columns",
+    groupBy: "group",
+    options: [
+      { key: "id", title: "ID", value: "id" },
+      { key: "inner_id", title: "Inner ID", value: "inner_id" },
+      { key: "task_state", title: "Task State", value: "task_state" },
+      { key: "agreement", title: "Agreement", value: "agreement", group: "Agreement" },
+      { key: "dim_1", title: "Dimension 1", value: "dim_1", group: "Agreement" },
+      { key: "annot_completed", title: "Annotation Completed At", value: "annot_completed", group: "Annotations" },
+      { key: "lead_time", title: "Lead Time", value: "lead_time", group: "Annotations" },
+      { key: "summary", title: "summary", value: "summary", group: "Data", readableType: "TextArea" },
+      { key: "rating", title: "rating", value: "rating", group: "Data", readableType: "Rating" },
+      { key: "heading", title: "heading", value: "heading", group: "Data", readableType: "str" },
+      { key: "author", title: "author", value: "author", group: "Data", readableType: "str" },
+    ] as any[],
+    label: "With groupBy (single-select)",
+  },
+};
+
+export const WithGroupByMultiple: Story = {
+  args: {
+    ...WithGroupBy.args,
+    multiple: true,
+    value: ["id", "task_state"],
+    label: "With groupBy (multi-select)",
+  },
+};
+
+/**
+ * groupBy with custom option content via optionRenderer (e.g. type badges).
+ */
+export const WithGroupByAndOptionRenderer: Story = {
+  args: {
+    placeholder: "Select a column",
+    searchable: true,
+    searchPlaceholder: "Search columns",
+    groupBy: "group",
+    options: [
+      { key: "summary", title: "summary", value: "summary", group: "Data", readableType: "TextArea" },
+      { key: "rating", title: "rating", value: "rating", group: "Data", readableType: "Rating" },
+      { key: "heading", title: "heading", value: "heading", group: "Data", readableType: "str" },
+      { key: "author", title: "author", value: "author", group: "Data", readableType: "str" },
+    ] as any[],
+    optionRenderer: ({ option }) => (
+      <span className="flex w-full items-center justify-between gap-2">
+        <span>{option?.title ?? option?.label ?? option?.value}</span>
+        {option?.readableType && (
+          <Badge variant="secondary" shape="squared" className="text-[10px]">
+            {option.readableType}
+          </Badge>
+        )}
+      </span>
+    ),
+    label: "With groupBy and optionRenderer (type badges)",
   },
 };
 

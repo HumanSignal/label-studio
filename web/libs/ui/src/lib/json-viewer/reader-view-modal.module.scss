@@ -60,6 +60,7 @@
   font-size: var(--font-size-body-medium);
   line-height: var(--line-height-body-medium);
   color: var(--color-neutral-content);
+  word-wrap: break-word;
 
   // Ensure markdown content is properly styled
   :global {

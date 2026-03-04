@@ -1,7 +1,7 @@
 import { inject } from "mobx-react";
 import { observer } from "mobx-react-lite";
 import { useCallback, useEffect, useMemo, useRef } from "react";
-import { IconChevronDown, IconChevronLeft, IconGearNewUI } from "@humansignal/icons";
+import { IconGearNewUI, IconChevronLeft } from "@humansignal/icons";
 import { cn } from "../../utils/bem";
 import { Button } from "@humansignal/ui";
 import { FieldsButton } from "../Common/FieldsButton";
@@ -28,12 +28,7 @@ const LabelingHeader = ({ SDK, onClick, isExplorerMode }) => {
         )}
 
         {isExplorerMode ? (
-          <FieldsButton
-            wrapper={FieldsButton.Checkbox}
-            icon={<Icon icon={IconGearNewUI} />}
-            trailingIcon={<Icon icon={IconChevronDown} />}
-            title={"Fields"}
-          />
+          <FieldsButton multiSelect={true} icon={<Icon icon={IconGearNewUI} />} title={"Fields"} />
         ) : null}
       </Space>
     </div>

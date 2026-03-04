@@ -5,7 +5,7 @@ import { useSDK } from "../../../providers/SDKProvider";
 import { isDefined } from "../../../utils/utils";
 import { Icon } from "../Icon/Icon";
 import { modal } from "../Modal/Modal";
-import { IconBraces, IconChevronDown } from "@humansignal/icons";
+import { IconBraces } from "@humansignal/icons";
 import { AutoSizerTable, Button } from "@humansignal/ui";
 import "./Table.scss";
 import { TableCheckboxCell } from "./TableCheckbox";
@@ -285,11 +285,9 @@ export const Table = observer(
       return (
         <div className={cn("table-toolbar").mod({ visible: toolbarVisible }).toClassName()}>
           <FieldsButton
-            className={cn("table-toolbar").elem("customize-button").toClassName()}
-            wrapper={FieldsButton.Checkbox}
+            multiSelect={true}
             title={"Columns"}
             size="small"
-            trailingIcon={<Icon icon={IconChevronDown} />}
             tooltip={"Customize Columns"}
             data-testid="columns-picker-quickview"
           />

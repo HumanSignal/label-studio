@@ -24,6 +24,30 @@ const VARIABLE_LIST_ITEM_HEIGHT = 40;
 const VARIABLE_LIST_COUNT_RENDERED = 5;
 const VARIABLE_LIST_PAGE_SIZE = 20;
 
+/** Group flat options by a field. Returns [{ groupKey, items }] with ungrouped first, then groups in order of first occurrence. */
+function groupOptionsByField(options: any[], groupBy: string): { groupKey: string | null; items: any[] }[] {
+  const byKey = new Map<string | null, any[]>();
+  const order: (string | null)[] = [];
+  const seen = new Set<string | null>();
+
+  for (const opt of options) {
+    const key = typeof opt === "object" && opt !== null && groupBy in opt ? (opt[groupBy] ?? null) : null;
+    if (!seen.has(key)) {
+      seen.add(key);
+      order.push(key);
+    }
+    if (!byKey.has(key)) byKey.set(key, []);
+    byKey.get(key)!.push(opt);
+  }
+
+  // Ungrouped (null) first, then rest in order
+  const nullFirst = order.filter((k) => k === null);
+  const rest = order.filter((k) => k !== null);
+  const orderedKeys = [...nullFirst, ...rest];
+
+  return orderedKeys.map((groupKey) => ({ groupKey, items: byKey.get(groupKey) ?? [] }));
+}
+
 /**
  * Props for SelectedItemsGroup component
  */
@@ -213,6 +237,7 @@ export const Select = forwardRef(
       label,
       description,
       options = [],
+      groupBy,
       validate,
       required,
       skip,
@@ -245,6 +270,7 @@ export const Select = forwardRef(
       onOpen,
       footer,
       alwaysShowSelectedGroup = false,
+      optionRenderer,
       onSelectAllClick,
       open: controlledOpen,
       ...props
@@ -256,9 +282,6 @@ export const Select = forwardRef(
     const [query, setQuery] = useState<string>(defaultSearchValue);
     const valueRef = useRef<any>();
     let initialValue = defaultValue?.value ?? defaultValue ?? externalValue?.value ?? externalValue;
-    if (selectFirstIfEmpty && !initialValue) {
-      initialValue = options?.[0]?.value ?? options?.[0];
-    }
     if (multiple) {
       initialValue = initialValue ? (Array.isArray(initialValue) ? (initialValue ?? []) : [initialValue]) : [];
     } else if (Array.isArray(initialValue)) {
@@ -282,12 +305,16 @@ export const Select = forwardRef(
       setValue(val);
     }, [externalValue, multiple]);
 
+    const flatOptions = useMemo(() => {
+      return options.flatMap((option) => option?.children ?? option);
+    }, [options]);
+
     useEffect(() => {
-      if (valueRef.current || !selectFirstIfEmpty || !options?.[0]) return;
-      const val = options?.[0]?.value ?? options?.[0];
+      if (valueRef.current || !selectFirstIfEmpty || !flatOptions?.[0]) return;
+      const val = flatOptions?.[0]?.value ?? flatOptions?.[0];
       valueRef.current = val;
       setValue(val);
-    }, [selectFirstIfEmpty, options, multiple]);
+    }, [selectFirstIfEmpty, flatOptions, multiple]);
 
     const prevIsOpenRef = useRef(false);
     useEffect(() => {
@@ -339,30 +366,31 @@ export const Select = forwardRef(
       [props?.onChange, multiple, disabled],
     );
 
-    const flatOptions = useMemo(() => {
-      return options.flatMap((option) => option?.children ?? option);
-    }, [options]);
+    const filterHandler = useCallback((option: any, queryString: string) => {
+      const val = option?.value ?? option?.key ?? option;
+      const lab = option?.label ?? option?.title ?? option?.value ?? option?.key ?? option;
+      return (
+        lab?.toString()?.toLowerCase().includes(queryString.toLowerCase()) ||
+        val?.toString()?.toLowerCase().includes(queryString.toLowerCase())
+      );
+    }, []);
 
     const _options = useMemo(() => {
-      // If searchFilter is provided, always use it (even with empty query)
-      // This allows custom filtering logic for API-based searches
       if (searchFilter) {
         return flatOptions.filter((option) => searchFilter(option, query ?? ""));
       }
-
-      // Default behavior: no filtering when not searchable or query is empty
-      if (!searchable || !query.trim()) return options;
-
-      const filterHandler = (option: any, queryString: string) => {
-        const value = option?.value ?? option;
-        const label = option?.label ?? option?.value ?? option;
-        return (
-          label?.toString()?.toLowerCase().includes(queryString.toLowerCase()) ||
-          value?.toString()?.toLowerCase().includes(queryString.toLowerCase())
-        );
-      };
+      // When not searching: preserve options structure (for nested children) unless using groupBy
+      if (!searchable || !query.trim()) {
+        return groupBy ? flatOptions : options;
+      }
       return flatOptions.filter((option) => filterHandler(option, query));
-    }, [options, flatOptions, searchable, query, searchFilter]);
+    }, [flatOptions, options, groupBy, searchable, query, searchFilter, filterHandler]);
+
+    /** When using groupBy: filtered options grouped by field. Ungrouped first, then groups in order. */
+    const groupedOptions = useMemo((): { groupKey: string | null; items: any[] }[] | null => {
+      if (!groupBy) return null;
+      return groupOptionsByField(_options, groupBy);
+    }, [groupBy, _options]);
 
     const isSelected = useCallback(
       (val: any) => {
@@ -445,6 +473,47 @@ export const Select = forwardRef(
     }, [selectedOptions, props?.placeholder, selectedValueRenderer]);
 
     const renderedOptions = useMemo(() => {
+      if (groupedOptions) {
+        let globalIndex = 0;
+        return groupedOptions.flatMap((group, groupIdx) => {
+          const elements: React.ReactNode[] = [];
+          if (group.groupKey !== null) {
+            elements.push(
+              <div key={`group-header-${group.groupKey}-${groupIdx}`} className={styles.groupHeader}>
+                <Typography variant="label" size="smaller">
+                  {group.groupKey}
+                </Typography>
+              </div>,
+            );
+          }
+          group.items.forEach((item) => {
+            const val = typeof item === "object" && item != null ? (item.value ?? item.key ?? item) : item;
+            const lab =
+              typeof item === "object" && item != null
+                ? (item.label ?? item.title ?? item.value ?? item.key ?? item)
+                : (item ?? String(item));
+            const isOptionSelected = isSelected(val);
+            const idx = globalIndex;
+            globalIndex += 1;
+            elements.push(
+              <Option
+                key={`${val}_${idx}`}
+                value={val}
+                label={lab}
+                {...(optionRenderer && { optionRenderer, option: item, optionIndex: idx })}
+                isOptionSelected={isOptionSelected}
+                disabled={typeof item === "object" && item?.disabled}
+                style={typeof item === "object" ? item?.style : undefined}
+                multiple={multiple}
+                onSelect={() => {
+                  _onChange(val, isOptionSelected);
+                }}
+              />,
+            );
+          });
+          return elements;
+        });
+      }
       return _options.map((option, index) => {
         const optionValue = option?.value ?? option;
         const label = option?.label ?? optionValue;
@@ -482,6 +551,7 @@ export const Select = forwardRef(
                       key={`${val}_${i}`}
                       value={val}
                       label={lab}
+                      {...(optionRenderer && { optionRenderer, option: item, optionIndex: i })}
                       isOptionSelected={isChildOptionSelected}
                       disabled={item?.disabled}
                       style={item?.style}
@@ -501,6 +571,7 @@ export const Select = forwardRef(
             key={`${optionValue}_${index}`}
             value={optionValue}
             label={label}
+            {...(optionRenderer && { optionRenderer, option, optionIndex: index })}
             isOptionSelected={isOptionSelected}
             disabled={option?.disabled}
             style={option?.style}
@@ -511,7 +582,7 @@ export const Select = forwardRef(
           />
         );
       });
-    }, [_options, multiple, isSelected, _onChange]);
+    }, [_options, groupedOptions, multiple, isSelected, _onChange, optionRenderer]);
 
     const combobox = (
       <Popover
@@ -692,6 +763,9 @@ const Option = ({
   onSelect,
   multiple,
   className,
+  optionRenderer,
+  option,
+  optionIndex = 0,
 }: OptionProps) => {
   const keyDownHandler = useCallback(
     (e: any) => {
@@ -719,6 +793,7 @@ const Option = ({
     },
     [onSelect, value],
   );
+  const labelContent = optionRenderer && option ? optionRenderer({ option, index: optionIndex }) : (label ?? value);
   return (
     <CommandItem
       value={value}
@@ -778,7 +853,7 @@ const Option = ({
           />
         )}
         <div data-testid="select-option-label" className="w-full min-w-0 truncate">
-          {label}
+          {labelContent}
         </div>
       </div>
     </CommandItem>

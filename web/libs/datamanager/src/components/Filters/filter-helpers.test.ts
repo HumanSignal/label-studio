@@ -77,7 +77,7 @@ describe("findSelectedOption", () => {
 
   it("finds an item inside a group's options", () => {
     const found = findSelectedOption(groupedItems, "filter:tasks:image");
-    expect(found.title).toBe("Image");
+    expect(found?.title).toBe("Image");
   });
 
   it("returns null when no match is found", () => {
@@ -90,7 +90,7 @@ describe("findSelectedOption", () => {
       { value: "dup", title: "Flat dup", _isRecent: true },
     ];
     const found = findSelectedOption(mixed, "dup");
-    expect(found.title).toBe("Group dup");
+    expect(found?.title).toBe("Group dup");
   });
 
   it("returns the first match when recent items come before groups", () => {
@@ -99,7 +99,7 @@ describe("findSelectedOption", () => {
       { id: "g", title: "Group", options: [{ value: "dup", title: "Group dup" }] },
     ];
     const found = findSelectedOption(mixed, "dup");
-    expect(found.title).toBe("Recent dup");
+    expect(found?.title).toBe("Recent dup");
   });
 
   it("handles empty list", () => {
