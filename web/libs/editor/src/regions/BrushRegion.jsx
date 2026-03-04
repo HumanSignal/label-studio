@@ -155,7 +155,6 @@ const Model = types
     needsUpdate: 1,
     hideable: true,
     layerRef: undefined,
-    imageData: null,
   }))
   .views((self) => {
     return {
@@ -174,41 +173,24 @@ const Model = types
         return self.touches.length;
       },
       get bboxCoordsCanvas() {
-        if (!self.imageData) {
-          const points = { x: [], y: [] };
+        const points = { x: [], y: [] };
 
-          for (let i = 0; i in (self.touches?.[0]?.points ?? []); i += 2) {
-            const curX = (self.touches?.[0]?.points ?? [])[i];
-            const curY = (self.touches?.[0]?.points ?? [])[i + 1];
-
-            points.x.push(curX);
-            points.y.push(curY);
-          }
-          return {
-            left: Math.min(...points.x),
-            top: Math.min(...points.y),
-            right: Math.max(...points.x),
-            bottom: Math.max(...points.y),
-          };
+        if (self.touches && self.touches.length > 0) {
+          self.touches.forEach((touch) => {
+            for (let i = 0; i < touch.points.length; i += 2) {
+              points.x.push(touch.points[i]);
+              points.y.push(touch.points[i + 1]);
+            }
+          });
         }
-        const imageBBox = Geometry.getImageDataBBox(self.imageData.data, self.imageData.width, self.imageData.height);
 
-        if (!imageBBox) return null;
-        const {
-          stageScale: scale = 1,
-          zoomingPositionX: offsetX = 0,
-          zoomingPositionY: offsetY = 0,
-        } = self.parent || {};
+        if (points.x.length === 0) return null;
 
-        imageBBox.x = imageBBox.x / scale - offsetX / scale;
-        imageBBox.y = imageBBox.y / scale - offsetY / scale;
-        imageBBox.width = imageBBox.width / scale;
-        imageBBox.height = imageBBox.height / scale;
         return {
-          left: imageBBox.x,
-          top: imageBBox.y,
-          right: imageBBox.x + imageBBox.width,
-          bottom: imageBBox.y + imageBBox.height,
+          left: Math.min(...points.x),
+          top: Math.min(...points.y),
+          right: Math.max(...points.x),
+          bottom: Math.max(...points.y),
         };
       },
       /**
@@ -255,19 +237,7 @@ const Model = types
 
       setLayerRef(ref) {
         if (ref) {
-          ref.canvas._canvas.style.opacity = self.opacity;
           self.layerRef = ref;
-        }
-      },
-
-      cacheImageData() {
-        if (!self.layerRef) {
-          self.imageData = null;
-        } else {
-          const canvas = self.layerRef.toCanvas();
-          const ctx = canvas.getContext("2d");
-
-          self.imageData = ctx.getImageData(0, 0, self.layerRef.canvas.width, self.layerRef.canvas.height);
         }
       },
 
@@ -277,7 +247,8 @@ const Model = types
 
       preDraw(x, y) {
         if (!self.layerRef) return;
-        const layer = self.layerRef;
+        const layer = self.layerRef.getLayer();
+        if (!layer) return;
         const ctx = layer.canvas.context;
 
         ctx.save();
@@ -585,56 +556,9 @@ const HtxBrushView = ({ item, setShapeRef }) => {
 
   const { store } = item;
 
-  const highlightedImageRef = useRef(new window.Image());
   const layerRef = useRef();
-  const highlightedRef = useRef({});
-
-  highlightedRef.current.highlighted = item.highlighted;
-  highlightedRef.current.highlight = highlightedRef.current.highlighted ? highlightOptions : { shadowOpacity: 0 };
-
-  // Caching drawn brush strokes (from the rle field and from the touches field) for bounding box calculations and highlight applying
-  const drawCallback = useMemo(() => {
-    let done = false;
-
-    return async () => {
-      const { highlighted } = highlightedRef.current;
-      const layer = layerRef.current;
-      const isDrawing = item.parent?.drawingRegion === item;
-
-      if (isDrawing || !layer || done) return;
-      let highlightEl;
-
-      if (highlighted) {
-        highlightEl = layer.findOne(".highlight");
-        highlightEl.hide();
-      }
-      layer.draw();
-
-      const dataUrl = layer.canvas.toDataURL();
-
-      item.cacheImageData();
-
-      if (highlighted) {
-        highlightEl.show();
-        layer.draw();
-      }
-
-      highlightedImageRef.current.src = dataUrl;
-      done = true;
-    };
-  }, [
-    item.touches.length,
-    item.strokeColor,
-    item.parent?.stageScale,
-    store.annotationStore.selected?.id,
-    item.parent?.zoomingPositionX,
-    item.parent?.zoomingPositionY,
-    item.parent?.stageWidth,
-    item.parent?.stageHeight,
-    item.maskDataURL,
-    item.rle,
-    image,
-  ]);
+  const highlighted = item.highlighted;
+  const highlight = highlighted ? highlightOptions : { shadowOpacity: 0 };
 
   const setLayerRef = useCallback(
     (ref) => {
@@ -648,23 +572,6 @@ const HtxBrushView = ({ item, setShapeRef }) => {
   if (!item.parent) return null;
 
   const stage = item.parent?.stageRef;
-  const highlightProps = isFF(FF_ZOOM_OPTIM)
-    ? {
-        scaleX: 1 / item.parent.zoomScale,
-        scaleY: 1 / item.parent.zoomScale,
-        x: -(item.parent.zoomingPositionX + item.parent.alignmentOffset.x) / item.parent.zoomScale,
-        y: -(item.parent.zoomingPositionY + item.parent.alignmentOffset.y) / item.parent.zoomScale,
-        width: item.containerWidth,
-        height: item.containerHeight,
-      }
-    : {
-        scaleX: 1 / item.parent.stageScale,
-        scaleY: 1 / item.parent.stageScale,
-        x: -item.parent.zoomingPositionX / item.parent.stageScale,
-        y: -item.parent.zoomingPositionY / item.parent.stageScale,
-        width: item.parent.canvasSize.width,
-        height: item.parent.canvasSize.height,
-      };
   const clip = isFF(FF_ZOOM_OPTIM)
     ? {
         x: 0,
@@ -676,25 +583,20 @@ const HtxBrushView = ({ item, setShapeRef }) => {
 
   return (
     <RegionWrapper item={item}>
-      <Layer
+      <Group
         id={item.cleanId}
         ref={(ref) => {
           setLayerRef(ref);
           layerRef.current = ref;
         }}
-        onDraw={() => {
-          setTimeout(drawCallback);
-        }}
-        clearBeforeDraw={!item.isDrawing}
         visible={!item.hidden}
         clip={clip}
+        opacity={item.opacity}
       >
         <Group
           attrMy={item.needsUpdate}
           name="segmentation"
-          // onClick={e => {
-          //     e.cancelBubble = false;
-          // }}
+          {...highlight}
           onMouseDown={(e) => {
             if (store.annotationStore.selected.isLinkingMode) {
               e.cancelBubble = true;
@@ -742,31 +644,11 @@ const HtxBrushView = ({ item, setShapeRef }) => {
           <Group>
             <HtxBrushLayer store={store} item={item} pointsList={item.touches} setShapeRef={setShapeRef} />
           </Group>
-
-          {/* Highlight */}
-          <Image
-            name="highlight"
-            image={highlightedImageRef.current}
-            sceneFunc={highlightedRef.current.highlighted ? null : () => {}}
-            hitFunc={() => {}}
-            {...highlightedRef.current.highlight}
-            {...highlightProps}
-            listening={false}
-          />
         </Group>
-      </Layer>
-      <Layer
-        id={`${item.cleanId}_labels`}
-        ref={(ref) => {
-          if (ref) {
-            ref.canvas._canvas.style.opacity = item.opacity;
-          }
-        }}
-      >
-        <Group>
-          <LabelOnMask item={item} color={item.strokeColor} />
-        </Group>
-      </Layer>
+      </Group>
+      <Group id={`${item.cleanId}_labels`} opacity={item.opacity}>
+        <LabelOnMask item={item} color={item.strokeColor} />
+      </Group>
     </RegionWrapper>
   );
 };
