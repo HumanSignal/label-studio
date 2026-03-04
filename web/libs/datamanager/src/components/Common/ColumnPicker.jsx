@@ -76,7 +76,7 @@ export function columnsToPickerGroups(columns, filterFn) {
  * logic in filtersToPickerGroups and is used to build "Group > Label" prefixes
  * for items shown in the "Recent" group.
  */
-function getFilterGroupTitle(field) {
+export function getFilterGroupTitle(field) {
   if (isAgreementAlias(field.alias)) return "Agreement";
   if (field.parent) return field.parent.title;
   return "Task";
@@ -139,9 +139,11 @@ export function filtersToPickerGroups(availableFilters, recentEntries = []) {
         const filter = filtersById.get(entry.id);
         if (!filter) return null;
         const field = filter.field;
+        const rawGroup = getFilterGroupTitle(field);
         return {
           key: RECENT_COLUMN_PREFIX + filter.id,
-          title: `${getFilterGroupTitle(field)} > ${field.title}`,
+          title: field.title,
+          groupTitle: rawGroup.charAt(0).toUpperCase() + rawGroup.slice(1),
           readableType: shouldShowBadge(field) ? (agreementBadgeLabel(field) ?? field.readableType) : undefined,
           icon: field.icon,
           enterpriseBadge: field.enterprise_badge,
@@ -223,6 +225,7 @@ export function pickerGroupsToFlatOptions(groups, groupByField = "group") {
       result.push({
         value: COLUMN_VALUE_PREFIX + item.key,
         label: item.title,
+        groupTitle: item.groupTitle,
         [groupByField]: groupKey,
         readableType: item.readableType,
         icon: item.icon,
@@ -258,7 +261,7 @@ export const searchFilterByLabel = (option, queryString) => {
  * Option content for ColumnPicker: title + icon/tag + EnterpriseBadge.
  */
 export const ColumnPickerOptionContent = ({ option }) => {
-  const { enterpriseBadge, icon, readableType, label } = option ?? {};
+  const { enterpriseBadge, icon, readableType, label, groupTitle } = option ?? {};
   const badge = icon ? (
     <div className="w-5 h-5 flex items-center justify-center flex-shrink-0">{icon}</div>
   ) : readableType ? (
@@ -268,7 +271,15 @@ export const ColumnPickerOptionContent = ({ option }) => {
   ) : null;
   return (
     <span className="flex items-center justify-between w-full gap-base">
-      <span>{label}</span>
+      <span className="flex items-center gap-tighter">
+        {groupTitle && (
+          <>
+            <span className="text-neutral-content-subtler">{groupTitle}</span>
+            <span className="text-neutral-content-subtlest">{" > "}</span>
+          </>
+        )}
+        <span className="text-neutral-content">{label}</span>
+      </span>
       <div className="flex items-center gap-tight flex-shrink-0 pointer-events-none">
         {enterpriseBadge && (
           <Badge variant="gradient" style="ghost" icon={<IconSpark />}>

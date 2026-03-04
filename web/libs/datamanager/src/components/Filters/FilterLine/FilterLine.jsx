@@ -7,7 +7,12 @@ import { FilterDropdown } from "../FilterDropdown";
 import "./FilterLine.scss";
 import { FilterOperation } from "./FilterOperation";
 import { Icon } from "../../Common/Icon/Icon";
-import { ColumnPicker, ColumnPickerOptionContent, RECENT_COLUMN_PREFIX } from "../../Common/ColumnPicker";
+import {
+  ColumnPicker,
+  ColumnPickerOptionContent,
+  RECENT_COLUMN_PREFIX,
+  getFilterGroupTitle,
+} from "../../Common/ColumnPicker";
 import { filterFieldSearchHandler, findSelectedOption } from "../filter-helpers";
 import { RECENT_VALUE_PREFIX } from "../../../hooks/useRecentFilters";
 
@@ -40,14 +45,17 @@ const FilterColumnPicker = observer(({ filter, pickerFilters, recentEntries, onS
     const departingId = filter.filter.id;
     const departingOperator = filter.operator;
     const departingValue = filter.value;
+    // Only persist the departing filter if it's fully valid — prevents leaking
+    // default/auto-assigned fields that the user never intentionally configured.
+    const departingIsValid = filter.isValidFilter;
 
     if (id?.startsWith(RECENT_COLUMN_PREFIX)) {
       const realId = id.slice(RECENT_COLUMN_PREFIX.length);
       const entry = recentEntries?.find((e) => e.id === realId);
-      onSaveInPlace?.(departingId, departingOperator, departingValue);
+      if (departingIsValid) onSaveInPlace?.(departingId, departingOperator, departingValue);
       filter.setFilterFromRecent(realId, entry?.operator ?? null, entry?.value ?? null);
     } else {
-      onSaveOnSwitch?.(departingId, departingOperator, departingValue);
+      if (departingIsValid) onSaveOnSwitch?.(departingId, departingOperator, departingValue);
       filter.setFilterDelayed(id);
     }
   };
@@ -67,7 +75,10 @@ const FilterColumnPicker = observer(({ filter, pickerFilters, recentEntries, onS
       renderSelected={(selectedOptions, placeholder) => {
         const opt = selectedOptions?.[0];
         if (!opt) return <span>{placeholder}</span>;
-        return <ColumnPickerOptionContent option={opt} />;
+        const field = filter.field;
+        const rawGroup = field ? getFilterGroupTitle(field) : null;
+        const groupTitle = rawGroup ? rawGroup.charAt(0).toUpperCase() + rawGroup.slice(1) : undefined;
+        return <ColumnPickerOptionContent option={{ ...opt, groupTitle }} />;
       }}
     />
   );
