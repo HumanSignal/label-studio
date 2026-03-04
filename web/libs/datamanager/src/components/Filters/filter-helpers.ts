@@ -3,16 +3,39 @@
  * Extracted so they can be unit-tested without pulling in heavy React/MobX dependencies.
  */
 
+interface OptionOriginal {
+  _isHeader?: boolean;
+  _isSeparator?: boolean;
+  field?: {
+    title?: string;
+    parent?: { title?: string };
+  };
+  title?: string;
+}
+
+interface FilterDropdownOption {
+  original?: OptionOriginal;
+  _isRecent?: boolean;
+  value?: string;
+  [key: string]: unknown;
+}
+
+interface FilterDropdownGroup {
+  id?: string;
+  title?: string;
+  options?: FilterDropdownOption[];
+  [key: string]: unknown;
+}
+
+type FilterDropdownItem = FilterDropdownOption | FilterDropdownGroup;
+
 /**
  * Custom search handler for the column dropdown.
  * When the user starts typing, hides decorative items (header, separator)
  * and recent duplicates — only matches real column options by title.
- * @param {object} option  – the dropdown option (may have .original with _isHeader, etc.)
- * @param {string} query   – the current search string
- * @returns {boolean} true if the option should be visible
  */
-export function filterFieldSearchHandler(option, query) {
-  const original = option?.original ?? option;
+export function filterFieldSearchHandler(option: FilterDropdownOption, query: string): boolean {
+  const original = option?.original ?? (option as unknown as OptionOriginal);
 
   if (original?._isHeader || original?._isSeparator) {
     return !query;
@@ -31,17 +54,17 @@ export function filterFieldSearchHandler(option, query) {
  * Searches both flat items (recent entries at the top) and grouped items (options arrays).
  * Recent items use a prefixed value ("__recent:<id>") to avoid highlighting in the
  * Select component, so this function matches them correctly.
- * @param {Array} availableFilters – the full list of dropdown items (flat + grouped)
- * @param {string} selectedValue   – the value to find (may include the recent prefix)
- * @returns {object|null} the matching option, or null
  */
-export function findSelectedOption(availableFilters, selectedValue) {
+export function findSelectedOption(
+  availableFilters: FilterDropdownItem[],
+  selectedValue: string,
+): FilterDropdownOption | null {
   for (const item of availableFilters) {
-    if (item.options) {
+    if ("options" in item && Array.isArray(item.options)) {
       const found = item.options.find((o) => o.value === selectedValue);
       if (found) return found;
     }
-    if (item.value === selectedValue) return item;
+    if ((item as FilterDropdownOption).value === selectedValue) return item as FilterDropdownOption;
   }
   return null;
 }

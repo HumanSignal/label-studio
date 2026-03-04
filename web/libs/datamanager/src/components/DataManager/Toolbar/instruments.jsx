@@ -1,10 +1,8 @@
-import { IconChevronDown } from "@humansignal/icons";
 import { isStarterCloudPlan } from "@humansignal/core";
 import { cn } from "../../../utils/bem";
 import { ErrorBox } from "../../Common/ErrorBox";
 import { FieldsButton } from "../../Common/FieldsButton";
 import { FiltersPane } from "../../Common/FiltersPane";
-import { Icon } from "../../Common/Icon/Icon";
 import { Interface } from "../../Common/Interface";
 import { ExportButton, ImportButton } from "../../Common/SDKButtons";
 import { Tooltip } from "@humansignal/ui";
@@ -74,21 +72,8 @@ export const instruments = {
     return <DensityToggle size={size} />;
   },
   columns: ({ size }) => {
-    const iconProps = {
-      style: {
-        marginRight: 4,
-      },
-      icon: IconChevronDown,
-    };
     return (
-      <FieldsButton
-        wrapper={FieldsButton.Checkbox}
-        trailingIcon={<Icon {...iconProps} />}
-        title={"Columns"}
-        size={size}
-        style={style}
-        openUpwardForShortViewport={false}
-      />
+      <FieldsButton multiSelect={true} title={"Columns"} size={size} style={style} openUpwardForShortViewport={false} />
     );
   },
   filters: ({ size }) => {

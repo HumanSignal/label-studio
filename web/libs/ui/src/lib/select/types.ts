@@ -28,6 +28,12 @@ export type OptionProps = {
   onSelect?: () => void;
   isIndeterminate?: boolean;
   className?: string;
+  /** When provided, renders custom content instead of default label (e.g. icon, Tag, badge) */
+  optionRenderer?: FC<{ option: any; index: number }>;
+  /** Full option object passed to optionRenderer */
+  option?: any;
+  /** Index passed to optionRenderer */
+  optionIndex?: number;
 };
 
 type ExtractStructOption<T> = T extends SelectOptionData ? T["value"] : never;
@@ -43,7 +49,10 @@ export type ExtractValue<T, A extends SelectOption<T>[]> = A[number] extends { v
 export type SelectProps<T, A extends SelectOption<T>[]> = {
   label?: string;
   description?: string;
-  options: A;
+  /** Options list. */
+  options?: A;
+  /** Field name to group options by. Options with `option[groupBy]` are grouped under that value as a header; null/undefined go in an ungrouped leading section. */
+  groupBy?: string;
   value?: ExtractOption<A[number]> | null;
   defaultValue?: ExtractOption<A[number]> | null;
   validate?: any;

@@ -121,13 +121,13 @@ export const DataView = injector(
     const columnHeaderExtra = useCallback(({ parent, original, help }, decoration) => {
       const children = [];
 
-      if (parent) {
+      if (parent && original?.alias !== "agreement") {
         children.push(
           <Badge key="column-type" size="small">
             {original?.readableType ?? parent.title}
           </Badge>,
         );
-      } else if (typeof original?.alias === "string" && original.alias.startsWith("dimension_agreement__")) {
+      } else if (typeof original?.alias === "string" && original.alias.startsWith("dimension_agreement_")) {
         // Show a short tag for per-dimension agreement columns (root columns, no parent)
         children.push(
           <Badge key="column-type" size="small">
@@ -141,7 +141,12 @@ export const DataView = injector(
         children.push(<EnterpriseBadge key="enterprise-badge" size="small" className="ml-tightest" children="" />);
       }
 
-      if (help && decoration?.help !== false) {
+      const isAgreementColumn =
+        typeof original?.alias === "string" &&
+        (original.alias === "agreement" || original.alias.startsWith("dimension_agreement_"));
+
+      // Agreement columns get an IconSettings button via Agreement.HeaderCell — skip the help icon
+      if (help && decoration?.help !== false && !isAgreementColumn) {
         children.push(
           <Tooltip key="help-tooltip" title={help}>
             <Icon icon={IconQuestionOutline} style={{ opacity: 0.5 }} />

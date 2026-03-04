@@ -96,6 +96,13 @@ export const FF_MULTIPLE_LABELS_REGIONS = "fflag_feat_front_bros_327_multiple_la
 export const FF_AGREEMENT_FILTERED = "fflag_feat_utc_239_filterable_agreement_column_short";
 
 /**
+ * Consensus control-tag agreement (v2) — enables dimension-based agreement calculation
+ * and the v2 agreement UI (new Agreement column). When disabled, the legacy
+ * agreement_selected column and v1 UI are used instead.
+ */
+export const FF_UTC_428_CONSENSUS_CONTROL_TAG_AGREEMENT = "fflag_utc_428_consensus_control_tag_agreement";
+
+/**
  * FSM State Fields
  */
 export const FF_FSM_STATE_FIELDS = "fflag_feat_fit_710_fsm_state_fields";

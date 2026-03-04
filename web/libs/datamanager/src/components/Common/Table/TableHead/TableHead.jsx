@@ -2,8 +2,7 @@ import { observer, useLocalStore } from "mobx-react";
 import { toJS } from "mobx";
 import React, { forwardRef, useCallback, useEffect, useRef } from "react";
 import { ViewColumnType, ViewColumnTypeName, ViewColumnTypeShort } from "../../../../stores/Tabs/tab_column";
-import { Button } from "@humansignal/ui";
-import { Dropdown } from "@humansignal/ui";
+import { Button, Dropdown } from "@humansignal/ui";
 import { Menu } from "../../Menu/Menu";
 import { Resizer } from "../../Resizer/Resizer";
 import { Space } from "../../Space/Space";
@@ -14,9 +13,14 @@ import { cn } from "../../../../utils/bem";
 import { getStyle } from "../utils";
 import "./TableHead.scss";
 import { getRoot } from "mobx-state-tree";
+import { Agreement } from "../../../CellViews/Agreement/Agreement";
 import { AgreementSelected } from "../../../CellViews/AgreementSelected";
 import { IconChevronDown } from "@humansignal/icons";
-import { isActive, FF_AGREEMENT_FILTERED } from "@humansignal/core/lib/utils/feature-flags";
+import {
+  isActive,
+  FF_AGREEMENT_FILTERED,
+  FF_UTC_428_CONSENSUS_CONTROL_TAG_AGREEMENT,
+} from "@humansignal/core/lib/utils/feature-flags";
 
 const tableHeadCN = cn("table-head");
 
@@ -56,15 +60,33 @@ const DropdownWrapper = observer(({ column, cellViews, children, onChange }) => 
   );
 });
 
+const AgreementWrapper = observer(({ column, children }) => {
+  const root = getRoot(column.original);
+  const selectedView = root.viewsStore.selected;
+  const agreementFilters = selectedView.agreement_selected;
+  const onSave = (filters) => {
+    selectedView.setAgreementFilters(filters);
+    return selectedView.save();
+  };
+
+  return (
+    <Agreement.HeaderCell agreementFilters={agreementFilters} onSave={onSave}>
+      {children}
+    </Agreement.HeaderCell>
+  );
+});
+
 const AgreementSelectedWrapper = observer(({ column, children }) => {
   // TODO: make this more generic as a LSE component table header cell
   const root = getRoot(column.original);
   const selectedView = root.viewsStore.selected;
   const agreementFilters = selectedView.agreement_selected;
   const ref = useRef(null);
+
   const closeHandler = () => {
     ref.current?.close();
   };
+
   const onSave = (agreementFilters) => {
     selectedView.setAgreementFilters(agreementFilters);
     closeHandler();
@@ -134,6 +156,17 @@ const ColumnRenderer = observer(
     const content = Decoration?.content ? Decoration.content(column) : column.title;
     const style = getStyle(cellViews, column, Decoration);
 
+    const isAgreementColumn =
+      isActive(FF_AGREEMENT_FILTERED) &&
+      isActive(FF_UTC_428_CONSENSUS_CONTROL_TAG_AGREEMENT) &&
+      (column.original?.alias === "agreement" ||
+        (typeof column.original?.alias === "string" && column.original.alias.startsWith("dimension_agreement_")));
+
+    const isAgreementSelected =
+      isActive(FF_AGREEMENT_FILTERED) &&
+      !isActive(FF_UTC_428_CONSENSUS_CONTROL_TAG_AGREEMENT) &&
+      column.type === "AgreementSelected";
+
     const headContent = (
       <>
         <TableCellContent mod={{ canOrder, disabled: stopInteractions }} mix="th-content">
@@ -144,8 +177,6 @@ const ColumnRenderer = observer(
       </>
     );
 
-    const isAgreementSelected = isActive(FF_AGREEMENT_FILTERED) && column.type === "AgreementSelected";
-
     return (
       <TableCell data-id={id} mix="th">
         <Resizer
@@ -154,19 +185,21 @@ const ColumnRenderer = observer(
             display: "flex",
             alignItems: "center",
             justifyContent: style.justifyContent ?? "space-between",
-            overflow: isAgreementSelected ? "visible" : "hidden",
+            overflow: isAgreementSelected || isAgreementColumn ? "visible" : "hidden",
           }}
           initialWidth={style.width ?? 150}
           minWidth={style.minWidth ?? 30}
           onResizeFinished={(width) => onResize?.(column, width)}
           onReset={() => onReset?.(column)}
         >
-          {!isDE && column.parent ? (
+          {!isDE && column.parent && !isAgreementColumn && !isAgreementSelected ? (
             <DropdownWrapper column={column} cellViews={cellViews} onChange={onTypeChange}>
               {headContent}
             </DropdownWrapper>
           ) : isAgreementSelected ? (
             <AgreementSelectedWrapper column={column}>{headContent}</AgreementSelectedWrapper>
+          ) : isAgreementColumn ? (
+            <AgreementWrapper column={column}>{headContent}</AgreementWrapper>
           ) : (
             headContent
           )}
@@ -295,7 +328,7 @@ export const TableHead = observer(
                     return isGreaterThanPos;
                   });
 
-                  colRefs.current[draggedCol].style.setProperty("--scale", "");
+                  colRefs.current[draggedCol]?.style?.setProperty("--scale", "");
 
                   states.setDraggedCol(null);
                   curColumns.splice(newIndex, 0, col);

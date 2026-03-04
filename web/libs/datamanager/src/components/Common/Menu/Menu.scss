@@ -124,7 +124,7 @@
     li {
       padding: 0;
     }
-    
+
     &__item {
       font-size: var(--font-size-small);
       padding: var(--spacing-tighter) var(--spacing-tighter);
@@ -135,7 +135,7 @@
     li:not(.menu-dm__divider) {
       padding: 0;
     }
-    
+
     &__item {
       height: 24px;
       font-size: 14px;
@@ -162,7 +162,7 @@
   &__title {
     padding: 4px 10px;
     font-size: 14px;
-    color: var(--color-neutral-content-subtle);
+    color: var(--color-neutral-content-subtler);
   }
 
   &__list {

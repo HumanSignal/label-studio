@@ -14,30 +14,6 @@
     position: relative;
     transform: translateY(0);
   }
-
-  &__customize-button.table-toolbar__customize-button {
-    height: 28px;
-    width: 28px;
-    background-color: var(--color-neutral-background);
-    box-shadow: 0 2px 5px 0 var(--black_20);
-    border-radius: 4px;
-
-    &:hover {
-      border: none;
-      filter: none;
-      background: var(--color-primary-emphasis-subtle);
-
-      &__icon {
-        color: var(--color-neutral-content);
-      }
-    }
-
-    &:active {
-      color: var(--color-neutral-content);
-      background: linear-gradient(0deg, var(--black_2), var(--black_2)), #FFF;
-      box-shadow: 0 0 5px 0 var(--black_20);
-    }
-  }
 }
 
 .table {

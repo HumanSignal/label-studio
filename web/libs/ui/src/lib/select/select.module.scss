@@ -151,3 +151,14 @@
   border-top: 1px solid var(--color-neutral-border-subtler);
 }
 
+// Flat group header: subtle, non-interactive label above items
+.groupHeader {
+  padding: var(--spacing-tight);
+  padding-bottom: 0;
+  color: var(--color-neutral-content-subtler);
+  text-transform: capitalize;
+  letter-spacing: normal;
+  pointer-events: none;
+  user-select: none;
+}
+
