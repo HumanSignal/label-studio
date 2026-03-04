@@ -19,8 +19,14 @@ ARG BRANCH_OVERRIDE
 FROM --platform=${BUILDPLATFORM} node:${NODE_VERSION} AS frontend-builder
 WORKDIR /label-studio/web
 
+# Install frontend deps and build production assets so /web/dist exists for the final image
+COPY web/package.json web/yarn.lock ./
+RUN corepack enable && yarn install --frozen-lockfile
+
 COPY web .
 COPY pyproject.toml ../pyproject.toml
+
+RUN yarn build
 
 ################################ Stage: venv-builder (prepare the virtualenv)
 FROM python:${PYTHON_VERSION}-slim AS venv-builder
