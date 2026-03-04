@@ -72,6 +72,17 @@ export function columnsToPickerGroups(columns, filterFn) {
 }
 
 /**
+ * Resolve the display group title for a filter field — mirrors the grouping
+ * logic in filtersToPickerGroups and is used to build "Group > Label" prefixes
+ * for items shown in the "Recent" group.
+ */
+function getFilterGroupTitle(field) {
+  if (isAgreementAlias(field.alias)) return "Agreement";
+  if (field.parent) return field.parent.title;
+  return "Task";
+}
+
+/**
  * Convert raw availableFilters (from store.currentView.availableFilters) into
  * the normalized group format for pickerGroupsToFlatOptions.
  *
@@ -79,13 +90,20 @@ export function columnsToPickerGroups(columns, filterFn) {
  * structure used by columnsToPickerGroups — so all three pickers show identical
  * group headers (Agreement, Annotations, Data, …).
  *
+ * When `recentEntries` is provided and non-empty, a "Recent" group is prepended
+ * at the top. Each recent item's label reads "Group > Title" so users can
+ * identify it without looking at the section heading.  Items are duplicated —
+ * they still appear in their original group below.
+ *
  * @param {Array<{id: string, type: string, field: TabColumn, schema: any}>} availableFilters
+ * @param {Array<{id: string, operator: string|null, value: unknown}>} [recentEntries]
  * @returns {ColumnPickerGroup[]}
  */
-export function filtersToPickerGroups(availableFilters) {
+export function filtersToPickerGroups(availableFilters, recentEntries = []) {
   const rootItems = [];
   const agreementItems = [];
   const groups = new Map(); // parent column key → {key, title, items[]}
+  const filtersById = new Map(availableFilters.map((f) => [f.id, f]));
 
   for (const filter of availableFilters) {
     const field = filter.field;
@@ -113,8 +131,34 @@ export function filtersToPickerGroups(availableFilters) {
   }
 
   const result = [];
+
+  // "Recent" group — prepended when there are stored recent entries.
+  if (recentEntries.length > 0) {
+    const recentItems = recentEntries
+      .map((entry) => {
+        const filter = filtersById.get(entry.id);
+        if (!filter) return null;
+        const field = filter.field;
+        return {
+          key: RECENT_COLUMN_PREFIX + filter.id,
+          title: `${getFilterGroupTitle(field)} > ${field.title}`,
+          readableType: shouldShowBadge(field) ? (agreementBadgeLabel(field) ?? field.readableType) : undefined,
+          icon: field.icon,
+          enterpriseBadge: field.enterprise_badge,
+          disabled: field.disabled,
+          original: filter,
+        };
+      })
+      .filter(Boolean);
+
+    if (recentItems.length > 0) {
+      result.push({ key: "__recent__", title: "Recent", items: recentItems });
+    }
+  }
+
+  // Ungrouped root filters are labelled "Task" so they have a visible section heading.
   if (rootItems.length) {
-    result.push({ key: "__root__", title: null, items: rootItems });
+    result.push({ key: "__root__", title: "Task", items: rootItems });
   }
   if (agreementItems.length) {
     result.push({ key: "__agreement__", title: "Agreement", items: agreementItems });
@@ -156,6 +200,12 @@ function toTabColumnItem(col) {
 
 /** Prefix for Select option values to avoid cmdk substring collisions (e.g. "id" vs "annotations.id") */
 export const COLUMN_VALUE_PREFIX = "col:";
+
+/**
+ * Prefix applied to the key of items in the "Recent" group inside filtersToPickerGroups.
+ * Lets onChange handlers distinguish a recent-group click from the same item in its original group.
+ */
+export const RECENT_COLUMN_PREFIX = "__recent__:";
 
 /**
  * Flatten ColumnPickerGroup[] to flat options for core Select with groupBy.
@@ -255,6 +305,7 @@ export function ColumnPicker({
   columns, // TabColumn[] for column pickers
   columnFilter, // optional (col) => bool predicate to filter columns
   availableFilters, // for filter pickers
+  recentEntries, // optional recent entries to prepend a "Recent" group (filter pickers only)
 
   // Plain unprefixed keys
   value,
@@ -271,11 +322,11 @@ export function ColumnPicker({
 }) {
   const groups = useMemo(() => {
     if (columns) return columnsToPickerGroups(columns, columnFilter);
-    if (availableFilters) return filtersToPickerGroups(availableFilters);
+    if (availableFilters) return filtersToPickerGroups(availableFilters, recentEntries);
     return [];
     // columnFilter is intentionally omitted from deps — callers must pass a stable reference
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [columns, availableFilters]);
+  }, [columns, availableFilters, recentEntries]);
 
   const flatOptions = useMemo(() => pickerGroupsToFlatOptions(groups), [groups]);
 

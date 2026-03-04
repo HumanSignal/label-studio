@@ -4,7 +4,7 @@ import { useRecentFilters, RECENT_VALUE_PREFIX } from "./useRecentFilters";
 const projectId = 99;
 const storageKey = `dm:recentFilterFields:${projectId}`;
 
-const makeFilter = (id, title, target = "tasks") => ({
+const makeFilter = (id: string, title: string, target = "tasks") => ({
   id,
   field: { title, target, disabled: false },
 });
@@ -24,7 +24,7 @@ describe("useRecentFilters", () => {
   it("returns grouped fields when no recents exist", () => {
     const { result } = renderHook(() => useRecentFilters(projectId, availableFilters));
 
-    const groupTitles = result.current.fields.map((g) => g.title);
+    const groupTitles = (result.current.fields as Array<{ title?: string }>).map((g) => g.title);
     expect(groupTitles).toContain("Data");
     expect(groupTitles).toContain("Tasks");
     expect(groupTitles).not.toContain("Recent");
@@ -38,7 +38,7 @@ describe("useRecentFilters", () => {
 
     const { result } = renderHook(() => useRecentFilters(projectId, availableFilters));
 
-    const values = result.current.fields.map((f) => f.value ?? f.title);
+    const values = (result.current.fields as Array<{ value?: string; title?: string }>).map((f) => f.value ?? f.title);
     expect(values[0]).toBe("__recent_header__");
     expect(values[1]).toBe(RECENT_VALUE_PREFIX + "filter:tasks:image");
     expect(values[2]).toBe("__all_fields_header__");
@@ -52,9 +52,9 @@ describe("useRecentFilters", () => {
 
     const { result } = renderHook(() => useRecentFilters(projectId, availableFilters));
 
-    const recentItem = result.current.fields.find((f) => f._isRecent);
-    expect(recentItem._recentOperator).toBe("contains");
-    expect(recentItem._recentValue).toBe("dog");
+    const recentItem = (result.current.fields as Array<Record<string, unknown>>).find((f) => f._isRecent);
+    expect(recentItem?._recentOperator).toBe("contains");
+    expect(recentItem?._recentValue).toBe("dog");
   });
 
   it("saveOnSwitch adds entry to front and updates fields", () => {
@@ -64,7 +64,7 @@ describe("useRecentFilters", () => {
       result.current.saveOnSwitch("filter:tasks:created_at", "greater", "2025-01-01");
     });
 
-    const recentItems = result.current.fields.filter((f) => f._isRecent);
+    const recentItems = (result.current.fields as Array<Record<string, unknown>>).filter((f) => f._isRecent);
     expect(recentItems).toHaveLength(1);
     expect(recentItems[0].value).toBe(RECENT_VALUE_PREFIX + "filter:tasks:created_at");
     expect(recentItems[0]._recentOperator).toBe("greater");
@@ -86,7 +86,7 @@ describe("useRecentFilters", () => {
       result.current.saveInPlace("filter:tasks:text", "regex", "new.*");
     });
 
-    const recentItems = result.current.fields.filter((f) => f._isRecent);
+    const recentItems = (result.current.fields as Array<Record<string, unknown>>).filter((f) => f._isRecent);
     expect(recentItems[0].value).toBe(RECENT_VALUE_PREFIX + "filter:tasks:image");
     expect(recentItems[1].value).toBe(RECENT_VALUE_PREFIX + "filter:tasks:text");
     expect(recentItems[1]._recentOperator).toBe("regex");
@@ -103,7 +103,7 @@ describe("useRecentFilters", () => {
       result.current.saveOnSwitch("filter:tasks:text", "contains", "b");
     });
 
-    const recentItems = result.current.fields.filter((f) => f._isRecent);
+    const recentItems = (result.current.fields as Array<Record<string, unknown>>).filter((f) => f._isRecent);
     expect(recentItems[0].value).toBe(RECENT_VALUE_PREFIX + "filter:tasks:text");
     expect(recentItems[1].value).toBe(RECENT_VALUE_PREFIX + "filter:tasks:image");
   });
@@ -116,7 +116,7 @@ describe("useRecentFilters", () => {
 
     const { result } = renderHook(() => useRecentFilters(projectId, availableFilters));
 
-    const recentItems = result.current.fields.filter((f) => f._isRecent);
+    const recentItems = (result.current.fields as Array<Record<string, unknown>>).filter((f) => f._isRecent);
     expect(recentItems).toHaveLength(0);
   });
 
@@ -125,9 +125,29 @@ describe("useRecentFilters", () => {
 
     const { result } = renderHook(() => useRecentFilters(projectId, availableFilters));
 
-    const header = result.current.fields.find((f) => f.value === "__recent_header__");
-    const allFields = result.current.fields.find((f) => f.value === "__all_fields_header__");
-    expect(header.height).toBe(34);
-    expect(allFields.height).toBe(34);
+    const fields = result.current.fields as Array<Record<string, unknown>>;
+    const header = fields.find((f) => f.value === "__recent_header__");
+    const allFields = fields.find((f) => f.value === "__all_fields_header__");
+    expect(header?.height).toBe(34);
+    expect(allFields?.height).toBe(34);
+  });
+
+  it("exposes recentEntries with raw stored data", () => {
+    localStorage.setItem(
+      storageKey,
+      JSON.stringify([{ id: "filter:tasks:image", operator: "equal", value: "cat.jpg" }]),
+    );
+
+    const { result } = renderHook(() => useRecentFilters(projectId, availableFilters));
+
+    expect(result.current.recentEntries).toHaveLength(1);
+    expect(result.current.recentEntries[0].id).toBe("filter:tasks:image");
+    expect(result.current.recentEntries[0].operator).toBe("equal");
+    expect(result.current.recentEntries[0].value).toBe("cat.jpg");
+  });
+
+  it("recentEntries is empty when no recents stored", () => {
+    const { result } = renderHook(() => useRecentFilters(projectId, availableFilters));
+    expect(result.current.recentEntries).toHaveLength(0);
   });
 });

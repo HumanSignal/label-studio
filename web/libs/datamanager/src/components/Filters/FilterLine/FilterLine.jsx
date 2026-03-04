@@ -7,9 +7,9 @@ import { FilterDropdown } from "../FilterDropdown";
 import "./FilterLine.scss";
 import { FilterOperation } from "./FilterOperation";
 import { Icon } from "../../Common/Icon/Icon";
-import { ColumnPicker, ColumnPickerOptionContent } from "../../Common/ColumnPicker";
+import { ColumnPicker, ColumnPickerOptionContent, RECENT_COLUMN_PREFIX } from "../../Common/ColumnPicker";
 import { filterFieldSearchHandler, findSelectedOption } from "../filter-helpers";
-import { RECENT_VALUE_PREFIX } from "../useRecentFilters";
+import { RECENT_VALUE_PREFIX } from "../../../hooks/useRecentFilters";
 
 const RECENTS_AUTOSAVE_DELAY_MS = 500;
 
@@ -35,12 +35,29 @@ const Conjunction = observer(({ index, view }) => {
  * filtersToPickerGroups always gets {id, field, ...} objects, not the recents-grouped
  * structure that `availableFilters` (fields) uses for FilterDropdown.
  */
-const FilterColumnPicker = observer(({ filter, pickerFilters }) => {
+const FilterColumnPicker = observer(({ filter, pickerFilters, recentEntries, onSaveOnSwitch, onSaveInPlace }) => {
+  const handleChange = (id) => {
+    const departingId = filter.filter.id;
+    const departingOperator = filter.operator;
+    const departingValue = filter.value;
+
+    if (id?.startsWith(RECENT_COLUMN_PREFIX)) {
+      const realId = id.slice(RECENT_COLUMN_PREFIX.length);
+      const entry = recentEntries?.find((e) => e.id === realId);
+      onSaveInPlace?.(departingId, departingOperator, departingValue);
+      filter.setFilterFromRecent(realId, entry?.operator ?? null, entry?.value ?? null);
+    } else {
+      onSaveOnSwitch?.(departingId, departingOperator, departingValue);
+      filter.setFilterDelayed(id);
+    }
+  };
+
   return (
     <ColumnPicker
       availableFilters={pickerFilters}
+      recentEntries={recentEntries}
       value={filter.filter.id ?? null}
-      onChange={(id) => filter.setFilterDelayed(id)}
+      onChange={handleChange}
       placeholder={filter.field?.title || "Column"}
       size="small"
       disabled={filter.field.disabled}
@@ -145,6 +162,7 @@ export const FilterLine = observer(
     filter,
     availableFilters,
     pickerFilters,
+    recentEntries,
     index,
     view,
     sidebar,
@@ -285,7 +303,13 @@ export const FilterLine = observer(
         </div>
 
         <div className={cn("filterLine").elem("column").mix("field").toClassName()}>
-          <FilterColumnPicker filter={filter} pickerFilters={pickerFilters ?? availableFilters} />
+          <FilterColumnPicker
+            filter={filter}
+            pickerFilters={pickerFilters ?? availableFilters}
+            recentEntries={recentEntries}
+            onSaveOnSwitch={onSaveOnSwitch}
+            onSaveInPlace={onSaveInPlace}
+          />
         </div>
 
         <FilterOperation
