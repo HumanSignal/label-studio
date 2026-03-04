@@ -40,7 +40,7 @@ export const Agreement = (cell) => {
     "";
 
   const colPath = String(colId).split(":").pop() || "";
-  const isDimensionAgreementColumn = colPath.startsWith("dimension_agreement__");
+  const isDimensionAgreementColumn = colPath.startsWith("dimension_agreement_");
   const isAgreementPopoverEnabled = basePopoverEnabled && !isDimensionAgreementColumn;
 
   const handleClick = isAgreementPopoverEnabled

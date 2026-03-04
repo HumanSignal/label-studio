@@ -127,7 +127,7 @@ export const DataView = injector(
             {original?.readableType ?? parent.title}
           </Badge>,
         );
-      } else if (typeof original?.alias === "string" && original.alias.startsWith("dimension_agreement__")) {
+      } else if (typeof original?.alias === "string" && original.alias.startsWith("dimension_agreement_")) {
         // Show a short tag for per-dimension agreement columns (root columns, no parent)
         children.push(
           <Badge key="column-type" size="small">
@@ -143,7 +143,7 @@ export const DataView = injector(
 
       const isAgreementColumn =
         typeof original?.alias === "string" &&
-        (original.alias === "agreement" || original.alias.startsWith("dimension_agreement__"));
+        (original.alias === "agreement" || original.alias.startsWith("dimension_agreement_"));
 
       // Agreement columns get an IconSettings button via Agreement.HeaderCell — skip the help icon
       if (help && decoration?.help !== false && !isAgreementColumn) {

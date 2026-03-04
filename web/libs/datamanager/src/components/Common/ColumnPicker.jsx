@@ -7,11 +7,11 @@ import { useCallback, useMemo } from "react";
 /**
  * Returns true for any column alias that belongs to the agreement family:
  * the main `agreement` column, the legacy `agreement_selected` column, and
- * any dimension breakdown columns (`dimension_agreement__*`).
+ * any dimension breakdown columns (`dimension_agreement_*`).
  */
 function isAgreementAlias(alias) {
   if (typeof alias !== "string") return false;
-  return alias === "agreement" || alias === "agreement_selected" || alias.startsWith("dimension_agreement__");
+  return alias === "agreement" || alias === "agreement_selected" || alias.startsWith("dimension_agreement_");
 }
 
 /**
@@ -20,7 +20,7 @@ function isAgreementAlias(alias) {
  *
  * Columns with `children` become labeled groups via the standard MST hierarchy
  * (Data, Annotations, …).  Agreement-family columns (agreement, agreement_selected,
- * dimension_agreement__*) are always collected into a synthetic "Agreement" group
+ * dimension_agreement_*) are always collected into a synthetic "Agreement" group
  * regardless of whether the backend sends a parent.  Remaining root columns form
  * the un-titled leading group.
  *
@@ -128,7 +128,7 @@ export function filtersToPickerGroups(availableFilters) {
  * or for dimension agreement columns shown inside the synthetic Agreement group.
  */
 function shouldShowBadge(col) {
-  if (typeof col.alias === "string" && col.alias.startsWith("dimension_agreement__")) return true;
+  if (typeof col.alias === "string" && col.alias.startsWith("dimension_agreement_")) return true;
   return !!col.parent && col.alias !== "agreement";
 }
 
@@ -137,7 +137,7 @@ function shouldShowBadge(col) {
  * regardless of the underlying readableType.  Returns null for all other columns.
  */
 function agreementBadgeLabel(col) {
-  if (typeof col.alias === "string" && col.alias.startsWith("dimension_agreement__")) return "agreement";
+  if (typeof col.alias === "string" && col.alias.startsWith("dimension_agreement_")) return "agreement";
   return null;
 }
 
