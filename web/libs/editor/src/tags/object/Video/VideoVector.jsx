@@ -1,6 +1,6 @@
 import { observer } from "mobx-react";
-import { useCallback, useMemo, useRef } from "react";
-import { Group, Path } from "react-konva";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Group } from "react-konva";
 import { useRegionStyles } from "../../../hooks/useRegionColor";
 import { KonvaVector } from "../../../components/KonvaVector/KonvaVector";
 import { LabelOnVideoBbox } from "../../../components/ImageView/LabelOnRegion";
@@ -63,42 +63,38 @@ const pixelToPercentVertices = (vertices, waWidth, waHeight) => {
   });
 };
 
+const EPSILON = 1e-6;
+
 /**
- * Build SVG path data from vertices for simple (non-interactive) rendering.
- * Supports straight lines and cubic bezier curves.
+ * Check if two vertex arrays have the same coordinates (ignoring IDs and metadata).
+ * Used to prevent spurious keyframe creation when KonvaVector re-initializes.
  */
-const verticesToPathData = (vertices, closed) => {
-  if (!vertices || vertices.length === 0) return "";
+const verticesMatch = (a, b) => {
+  if (!a || !b || a.length !== b.length) return false;
 
-  let d = `M ${vertices[0].x} ${vertices[0].y}`;
+  for (let i = 0; i < a.length; i++) {
+    if (Math.abs(a[i].x - b[i].x) > EPSILON || Math.abs(a[i].y - b[i].y) > EPSILON) return false;
 
-  for (let i = 0; i < vertices.length; i++) {
-    const curr = vertices[i];
-    const nextIdx = (i + 1) % vertices.length;
-    const next = vertices[nextIdx];
+    const acp1 = a[i].controlPoint1;
+    const bcp1 = b[i].controlPoint1;
 
-    if (nextIdx === 0 && !closed) break;
+    if (acp1 && bcp1) {
+      if (Math.abs(acp1.x - bcp1.x) > EPSILON || Math.abs(acp1.y - bcp1.y) > EPSILON) return false;
+    } else if (acp1 !== bcp1 && (acp1 || bcp1)) {
+      return false;
+    }
 
-    if (curr.isBezier && curr.controlPoint2 && next.isBezier && next.controlPoint1) {
-      d += ` C ${curr.controlPoint2.x} ${curr.controlPoint2.y}, ${next.controlPoint1.x} ${next.controlPoint1.y}, ${next.x} ${next.y}`;
-    } else if (curr.isBezier && curr.controlPoint2) {
-      const dx = next.x - curr.x;
-      const dy = next.y - curr.y;
+    const acp2 = a[i].controlPoint2;
+    const bcp2 = b[i].controlPoint2;
 
-      d += ` C ${curr.controlPoint2.x} ${curr.controlPoint2.y}, ${next.x - dx * 0.3} ${next.y - dy * 0.3}, ${next.x} ${next.y}`;
-    } else if (next.isBezier && next.controlPoint1) {
-      const dx = next.x - curr.x;
-      const dy = next.y - curr.y;
-
-      d += ` C ${curr.x + dx * 0.3} ${curr.y + dy * 0.3}, ${next.controlPoint1.x} ${next.controlPoint1.y}, ${next.x} ${next.y}`;
-    } else {
-      d += ` L ${next.x} ${next.y}`;
+    if (acp2 && bcp2) {
+      if (Math.abs(acp2.x - bcp2.x) > EPSILON || Math.abs(acp2.y - bcp2.y) > EPSILON) return false;
+    } else if (acp2 !== bcp2 && (acp2 || bcp2)) {
+      return false;
     }
   }
 
-  if (closed) d += " Z";
-
-  return d;
+  return true;
 };
 
 /**
@@ -121,42 +117,6 @@ const computeBBox = (vertices) => {
 
   return { x: minX, y: minY, width: maxX - minX, height: maxY - minY };
 };
-
-/**
- * Simple path renderer for non-selected video vector regions.
- * Renders the vector shape as a Konva Path without editing capabilities.
- */
-const SimpleVectorPath = observer(({ pixelVertices, closed, style, reg, scale, onClick, listening }) => {
-  const pathData = useMemo(() => verticesToPathData(pixelVertices, closed), [pixelVertices, closed]);
-
-  const bbox = useMemo(() => computeBBox(pixelVertices), [pixelVertices]);
-
-  if (!pathData) return null;
-
-  return (
-    <Group>
-      <LabelOnVideoBbox
-        reg={reg}
-        box={bbox}
-        scale={scale}
-        color={style.strokeColor}
-        strokeWidth={style.strokeWidth}
-        adjacent
-      />
-      <Path
-        data={pathData}
-        fill={style.fillColor ?? "transparent"}
-        stroke={style.strokeColor}
-        strokeWidth={style.strokeWidth}
-        strokeScaleEnabled={false}
-        opacity={reg.hidden ? 0 : 1}
-        listening={listening}
-        onClick={onClick}
-        hitStrokeWidth={10}
-      />
-    </Group>
-  );
-});
 
 const getPointRadiusFromSize = (control) => {
   const size = control?.pointsize ?? "small";
@@ -184,58 +144,153 @@ const getMaxPoints = (control) => {
 };
 
 /**
- * Full interactive vector editor for selected video vector regions.
- * Wraps KonvaVector with percent/pixel coordinate conversion.
+ * VideoVector rendering component for the video overlay.
+ * Mirrors the interaction model of the image VectorRegion (VectorRegion.jsx):
+ *
+ * - `selected` on KonvaVector is true when the region is selected OR being drawn
+ *   (matching the image version's `!disabled` where disabled = !item.selected && !item.isDrawing)
+ * - `disabled` on KonvaVector is true only when region is readonly
+ * - Ghost line, control points, and group-level handlers are active only when
+ *   KonvaVector `selected` is true
+ * - Point/shape dragging for non-selected regions is handled by stage-level handlers
+ * - Deferred commit pattern prevents MobX feedback loop during drag operations
  */
-const InteractiveVectorEditor = observer(({ reg, pixelVertices, closed, frame, workingArea, style, control }) => {
+const VideoVectorPure = ({
+  id,
+  reg,
+  box,
+  frame,
+  workingArea,
+  selected,
+  draggable,
+  listening,
+  onDragMove,
+  ...rest
+}) => {
   const vectorRef = useRef(null);
+  const isDraggingRef = useRef(false);
+  const latestDragPointsRef = useRef(null);
+  const [dragPixels, setDragPixels] = useState(null);
+  const style = useRegionStyles(reg, { includeFill: true });
   const { realWidth: waWidth, realHeight: waHeight, scale: waScale, x: waX, y: waY } = workingArea;
 
-  const stageTransform = useMemo(
-    () => ({
-      zoom: 1,
-      offsetX: waX,
-      offsetY: waY,
-    }),
-    [waX, waY],
+  const storePixelVertices = useMemo(
+    () => percentToPixelVertices(box.vertices || [], waWidth, waHeight),
+    [box.vertices, waWidth, waHeight],
   );
+
+  const pixelVertices = dragPixels || storePixelVertices;
+
+  const bbox = useMemo(() => computeBBox(pixelVertices), [pixelVertices]);
+
+  const control = reg.results?.[0]?.from_name;
+
+  const stageTransform = useMemo(() => ({
+    zoom: 1,
+    offsetX: waX,
+    offsetY: waY,
+  }), [waX, waY]);
 
   const pointRadius = useMemo(() => getPointRadiusFromSize(control), [control?.pointsize]);
+  const isReadOnly = reg.isReadOnly();
 
-  const handleRef = useCallback(
-    (kv) => {
-      vectorRef.current = kv;
-      reg.setVectorRef(kv);
-    },
-    [reg],
-  );
+  // Only enable KonvaVector's internal drawing/editing mode while actively drawing.
+  // Unlike the image version, we can't rely on frequent re-renders to keep
+  // isDrawingDisabled() fresh, so we simply disable it when not drawing.
+  // Points/shape drag still work through KonvaVector's stage-level handlers.
+  const kvSelected = reg.isDrawing && !isReadOnly;
 
-  const handlePointsChange = useCallback(
-    (points) => {
-      const percentPoints = pixelToPercentVertices(points, waWidth, waHeight);
+  const handleRef = useCallback((kv) => {
+    vectorRef.current = kv;
+    reg.setVectorRef(kv);
+  }, [reg]);
 
-      reg.updateShape({ vertices: percentPoints, closed: reg.getShape(frame)?.closed ?? false }, frame);
-    },
-    [reg, frame, waWidth, waHeight],
-  );
+  const commitPoints = useCallback((points) => {
+    const percentPoints = pixelToPercentVertices(points, waWidth, waHeight);
+    const currentShape = reg.getShape(frame);
 
-  const handlePathClosedChange = useCallback(
-    (isClosed) => {
-      const shape = reg.getShape(frame);
+    if (currentShape?.vertices && verticesMatch(currentShape.vertices, percentPoints)) return;
 
-      if (shape) {
-        reg.updateShape({ vertices: shape.vertices, closed: isClosed }, frame);
-      }
-    },
-    [reg, frame],
-  );
+    reg.updateShape({ vertices: percentPoints, closed: currentShape?.closed ?? false }, frame);
+  }, [reg, frame, waWidth, waHeight]);
+
+  const handlePointsChange = useCallback((points) => {
+    if (isDraggingRef.current) {
+      latestDragPointsRef.current = points;
+      setDragPixels(points);
+      return;
+    }
+    commitPoints(points);
+  }, [commitPoints]);
+
+  const handleTransformStart = useCallback(() => {
+    isDraggingRef.current = true;
+    latestDragPointsRef.current = null;
+  }, []);
+
+  const handleTransformEnd = useCallback(() => {
+    isDraggingRef.current = false;
+    if (latestDragPointsRef.current) {
+      commitPoints(latestDragPointsRef.current);
+      latestDragPointsRef.current = null;
+    }
+  }, [commitPoints]);
+
+  // Clear local drag state once the MobX store has caught up.
+  // This avoids the flash where storePixelVertices briefly holds pre-drag
+  // positions because the MobX update hasn't propagated to `box` yet.
+  useEffect(() => {
+    if (dragPixels && !isDraggingRef.current) {
+      setDragPixels(null);
+    }
+  }, [storePixelVertices]);
+
+  const handlePathClosedChange = useCallback((isClosed) => {
+    const shape = reg.getShape(frame);
+
+    if (!shape) return;
+    if (shape.closed === isClosed) return;
+
+    reg.updateShape({ vertices: shape.vertices, closed: isClosed }, frame);
+  }, [reg, frame]);
+
+  const handleFinish = useCallback((e) => {
+    if (isReadOnly) return;
+    e.evt.stopPropagation();
+    e.evt.preventDefault();
+
+    const tool = control?.getToolsManager?.()?.findSelectedTool?.();
+
+    if (tool?.isDrawing) {
+      tool.finishDrawing();
+    }
+  }, [isReadOnly, control]);
+
+  const handleRegionClick = useCallback((e) => {
+    if (e.evt.defaultPrevented) return;
+    if (reg.isReadOnly()) return;
+    if (reg.isDrawing) return;
+    if (e.evt.altKey || e.evt.ctrlKey || e.evt.shiftKey || e.evt.metaKey) return;
+
+    e.cancelBubble = true;
+
+    const tool = control?.getToolsManager?.()?.findSelectedTool?.();
+
+    if (tool?.currentArea && tool.currentArea !== reg && tool.complete) {
+      tool.complete();
+    }
+
+    reg.setHighlight(false);
+    reg.onClickRegion(e);
+  }, [reg, control]);
 
   return (
     <Group>
       <KonvaVector
+        key={reg.id}
         ref={handleRef}
         initialPoints={Array.from(pixelVertices)}
-        closed={closed}
+        closed={box.closed}
         width={waWidth}
         height={waHeight}
         scaleX={1}
@@ -249,69 +304,45 @@ const InteractiveVectorEditor = observer(({ reg, pixelVertices, closed, frame, w
         minPoints={getMinPoints(control)}
         maxPoints={getMaxPoints(control)}
         skeletonEnabled={control?.skeleton ?? false}
-        stroke={reg.selected ? "#ff0000" : style.strokeColor}
+        stroke={selected ? "#ff0000" : style.strokeColor}
         fill={style.fillColor ?? "transparent"}
         strokeWidth={style.strokeWidth}
         opacity={Number.parseFloat(control?.opacity || "1")}
         pixelSnapping={control?.snap === "pixel"}
-        selected={true}
-        disabled={reg.isReadOnly()}
+        selected={kvSelected}
+        disabled={isReadOnly}
         pointRadius={pointRadius}
-        pointFill={reg.selected ? "#ffffff" : "#f8fafc"}
-        pointStroke={reg.selected ? "#ff0000" : style.strokeColor}
+        pointFill={selected ? "#ffffff" : "#f8fafc"}
+        pointStroke={selected ? "#ff0000" : style.strokeColor}
         pointStrokeSelected="#ff6b35"
-        pointStrokeWidth={reg.selected ? 2 : 1}
+        pointStrokeWidth={selected ? 2 : 1}
         pointStyle={control?.pointstyle ?? "circle"}
         disableInternalPointAddition={true}
+        onFinish={handleFinish}
         onPointsChange={handlePointsChange}
+        onTransformStart={handleTransformStart}
+        onTransformEnd={handleTransformEnd}
         onPathClosedChange={handlePathClosedChange}
+        onClick={handleRegionClick}
+        onMouseEnter={() => {
+          reg.setHighlight(true);
+        }}
+        onMouseLeave={() => {
+          reg.setHighlight(false);
+        }}
       />
+
+      {pixelVertices.length > 0 && (
+        <LabelOnVideoBbox
+          reg={reg}
+          box={bbox}
+          scale={waScale}
+          color={style.strokeColor}
+          strokeWidth={style.strokeWidth}
+          adjacent
+        />
+      )}
     </Group>
-  );
-});
-
-/**
- * VideoVector rendering component for the video overlay.
- *
- * - Non-selected regions: renders a simple Konva Path (fast, updates every frame)
- * - Selected regions: mounts full KonvaVector for interactive editing
- */
-const VideoVectorPure = ({ id, reg, box, frame, workingArea, selected, draggable, listening, onDragMove, ...rest }) => {
-  const style = useRegionStyles(reg, { includeFill: true });
-  const { realWidth: waWidth, realHeight: waHeight, scale: waScale } = workingArea;
-
-  const pixelVertices = useMemo(
-    () => percentToPixelVertices(box.vertices || [], waWidth, waHeight),
-    [box.vertices, waWidth, waHeight],
-  );
-
-  const control = reg.results?.[0]?.from_name;
-
-  if (selected && !reg.isReadOnly()) {
-    return (
-      <InteractiveVectorEditor
-        key={`${reg.id}-editor-${frame}`}
-        reg={reg}
-        pixelVertices={pixelVertices}
-        closed={box.closed}
-        frame={frame}
-        workingArea={workingArea}
-        style={style}
-        control={control}
-      />
-    );
-  }
-
-  return (
-    <SimpleVectorPath
-      pixelVertices={pixelVertices}
-      closed={box.closed}
-      style={style}
-      reg={reg}
-      scale={waScale}
-      listening={listening}
-      onClick={rest.onClick}
-    />
   );
 };
 
