@@ -454,13 +454,19 @@ class ImportStorage(Storage):
             else:
                 data.pop('data')
 
+        # When overlap_cohort_percentage < 100, only a subset of tasks should have
+        # overlap=maximum_annotations. Create new tasks with overlap=1 so that
+        # update_tasks_states() -> _rearrange_overlap_cohort() can assign the
+        # correct cohort after sync. When 100%, all tasks get maximum_annotations.
+        overlap = maximum_annotations if getattr(project, 'overlap_cohort_percentage', 100) >= 100 else 1
+
         with transaction.atomic():
             # Create task without skip_fsm (it's not a model field)
             task = Task(
                 data=data,
                 project=project,
-                overlap=maximum_annotations,
-                is_labeled=len(annotations) >= maximum_annotations,
+                overlap=overlap,
+                is_labeled=len(annotations) >= overlap,
                 total_predictions=len(predictions),
                 total_annotations=len(annotations) - cancelled_annotations,
                 cancelled_annotations=cancelled_annotations,

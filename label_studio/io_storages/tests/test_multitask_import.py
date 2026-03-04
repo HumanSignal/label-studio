@@ -14,6 +14,7 @@ from io_storages.utils import StorageObject, load_tasks_json
 from moto import mock_s3
 from projects.tests.factories import ProjectFactory
 from rest_framework.test import APIClient
+from tasks.models import Task
 from tests.utils import azure_client_mock, gcs_client_mock, redis_client_mock
 
 #
@@ -161,6 +162,83 @@ def test_storagelink_fields(project, common_task_data):
         assert storage_links[0].row_group is None
         assert storage_links[1].row_index == 1
         assert storage_links[1].row_group is None
+
+
+def test_storage_sync_respects_overlap_cohort_percentage(project):
+    project.maximum_annotations = 2
+    project.overlap_cohort_percentage = 10
+    project.save(update_fields=['maximum_annotations', 'overlap_cohort_percentage'])
+
+    imported_tasks = [{'data': {'text': f'Task {idx}'}} for idx in range(10)]
+
+    with mock_s3():
+        s3 = boto3.client('s3', region_name='us-east-1')
+        bucket_name = 'pytest-s3-overlap-cohort'
+        s3.create_bucket(Bucket=bucket_name)
+        s3.put_object(Bucket=bucket_name, Key='tasks.json', Body=json.dumps(imported_tasks))
+
+        storage = S3ImportStorage(
+            project=project,
+            bucket=bucket_name,
+            aws_access_key_id='example',
+            aws_secret_access_key='example',
+            use_blob_urls=False,
+            recursive_scan=True,
+        )
+        storage.save()
+
+        import mock
+
+        with mock.patch('io_storages.base_models.redis_connected', return_value=False):
+            storage.sync()
+
+    tasks = Task.objects.filter(project=project)
+    assert tasks.count() == 10
+    assert tasks.filter(overlap=2).count() == 1
+    assert tasks.filter(overlap=1).count() == 9
+
+
+def test_quality_settings_applied_after_sync_rearranges_overlap_cohort(project):
+    imported_tasks = [{'data': {'text': f'Task {idx}'}} for idx in range(10)]
+
+    with mock_s3():
+        s3 = boto3.client('s3', region_name='us-east-1')
+        bucket_name = 'pytest-s3-overlap-after-sync'
+        s3.create_bucket(Bucket=bucket_name)
+        s3.put_object(Bucket=bucket_name, Key='tasks.json', Body=json.dumps(imported_tasks))
+
+        storage = S3ImportStorage(
+            project=project,
+            bucket=bucket_name,
+            aws_access_key_id='example',
+            aws_secret_access_key='example',
+            use_blob_urls=False,
+            recursive_scan=True,
+        )
+        storage.save()
+
+        import mock
+
+        with mock.patch('io_storages.base_models.redis_connected', return_value=False):
+            storage.sync()
+
+    # Initial import with default settings should keep overlap at 1 for all tasks.
+    tasks = Task.objects.filter(project=project)
+    assert tasks.count() == 10
+    assert tasks.filter(overlap=1).count() == 10
+
+    # Simulate applying quality settings after sync.
+    project.maximum_annotations = 2
+    project.overlap_cohort_percentage = 10
+    project.save(update_fields=['maximum_annotations', 'overlap_cohort_percentage'])
+    project._update_tasks_states(
+        maximum_annotations_changed=True,
+        overlap_cohort_percentage_changed=True,
+        tasks_number_changed=False,
+    )
+
+    assert tasks.filter(overlap=2).count() == 1
+    assert tasks.filter(overlap=1).count() == 9
 
 
 #
@@ -397,3 +475,43 @@ def test_allow_skip_false_is_saved(storage):
     # Create one task via cloud import pathway
     task = S3ImportStorage.add_task(project, 1, 1, s3_storage, params, S3ImportStorageLink)
     assert task.allow_skip is False
+
+
+def test_add_task_respects_overlap_cohort_percentage():
+    """Storage sync creates tasks with overlap=1 when overlap_cohort_percentage < 100 so
+    update_tasks_states -> _rearrange_overlap_cohort can assign the correct cohort after sync.
+    """
+    task_data = {'data': {'text': 'Task for overlap test'}}
+    params = StorageObject(key='test.json', task_data=task_data)
+
+    # When overlap_cohort_percentage < 100, new tasks get overlap=1 (cohort assigned later)
+    project_partial = ProjectFactory(
+        maximum_annotations=2,
+        overlap_cohort_percentage=10,
+    )
+    s3_storage_partial = S3ImportStorage(
+        project=project_partial,
+        bucket='example',
+        aws_access_key_id='example',
+        aws_secret_access_key='example',
+        use_blob_urls=False,
+    )
+    s3_storage_partial.save()
+    task_partial = S3ImportStorage.add_task(project_partial, 2, 1, s3_storage_partial, params, S3ImportStorageLink)
+    assert task_partial.overlap == 1
+
+    # When overlap_cohort_percentage >= 100, all tasks get maximum_annotations
+    project_full = ProjectFactory(
+        maximum_annotations=2,
+        overlap_cohort_percentage=100,
+    )
+    s3_storage_full = S3ImportStorage(
+        project=project_full,
+        bucket='example2',
+        aws_access_key_id='example',
+        aws_secret_access_key='example',
+        use_blob_urls=False,
+    )
+    s3_storage_full.save()
+    task_full = S3ImportStorage.add_task(project_full, 2, 1, s3_storage_full, params, S3ImportStorageLink)
+    assert task_full.overlap == 2
