@@ -125,7 +125,6 @@ const RegionsMixin = types
       },
 
       setShapeRef(ref) {
-        if (!ref) return;
         self.shapeRef = ref;
       },
 

@@ -179,6 +179,9 @@ export class LabelStudio {
       }
       destroy(this.store);
       Hotkey.unbindAll();
+
+      window.Htx = null;
+
       if (isFF(FF_LSDV_4620_3_ML)) {
         /*
             ...

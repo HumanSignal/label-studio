@@ -23,11 +23,7 @@ import { AliveRegion } from "./AliveRegion";
 import { RegionWrapper } from "./RegionWrapper";
 
 const highlightOptions = {
-  shadowColor: "red",
-  shadowBlur: 1,
-  shadowOffsetY: 2,
-  shadowOffsetX: 2,
-  shadowOpacity: 1,
+  opacity: 1,
 };
 
 const Points = types
@@ -236,9 +232,7 @@ const Model = types
       },
 
       setLayerRef(ref) {
-        if (ref) {
-          self.layerRef = ref;
-        }
+        self.layerRef = ref;
       },
 
       prepareCoords([x, y]) {
@@ -405,12 +399,16 @@ const Model = types
           if (self.touches.length) value.touches = self.touches;
           if (self.maskDataURL) value.maskDataURL = self.maskDataURL;
         } else {
-          const rle = Canvas.Region2RLE(self, object);
+          if (self.touches.length === 0 && self.rle && self.rle.length > 0) {
+            value.rle = Array.from(self.rle);
+          } else {
+            const rle = Canvas.Region2RLE(self, object);
 
-          if (!rle || !rle.length) return null;
+            if (!rle || !rle.length) return null;
 
-          // UInt8Array serializes as object, not an array :(
-          value.rle = Array.from(rle);
+            // UInt8Array serializes as object, not an array :(
+            value.rle = Array.from(rle);
+          }
         }
 
         return self.parent.createSerializedResult(self, value);
@@ -521,44 +519,50 @@ const HtxBrushView = ({ item, setShapeRef }) => {
     item.opacity,
   ]);
 
+  const imageDataRef = useRef(null);
+
   // Drawing hit area by shape color to detect interactions inside the Konva
-  const imageHitFunc = useMemo(() => {
-    let imageData;
+  const imageHitFunc = useCallback((context, shape) => {
+    if (image) {
+      if (!imageDataRef.current) {
+        context.drawImage(image, 0, 0, item.parent.stageWidth, item.parent.stageHeight);
+        let imageData;
+        if (isFF(FF_ZOOM_OPTIM)) {
+          imageData = context.getImageData(
+            item.parent.alignmentOffset.x,
+            item.parent.alignmentOffset.y,
+            item.parent.stageWidth,
+            item.parent.stageHeight,
+          );
+        } else {
+          imageData = context.getImageData(0, 0, item.parent.stageWidth, item.parent.stageHeight);
+        }
+        const colorParts = colorToRGBAArray(shape.colorKey);
 
-    return (context, shape) => {
-      if (image) {
-        if (!imageData) {
-          context.drawImage(image, 0, 0, item.parent.stageWidth, item.parent.stageHeight);
-          if (isFF(FF_ZOOM_OPTIM)) {
-            imageData = context.getImageData(
-              item.parent.alignmentOffset.x,
-              item.parent.alignmentOffset.y,
-              item.parent.stageWidth,
-              item.parent.stageHeight,
-            );
-          } else {
-            imageData = context.getImageData(0, 0, item.parent.stageWidth, item.parent.stageHeight);
-          }
-          const colorParts = colorToRGBAArray(shape.colorKey);
-
-          for (let i = imageData.data.length / 4 - 1; i >= 0; i--) {
-            if (imageData.data[i * 4 + 3] > 0) {
-              for (let k = 0; k < 3; k++) {
-                imageData.data[i * 4 + k] = colorParts[k];
-              }
+        for (let i = imageData.data.length / 4 - 1; i >= 0; i--) {
+          if (imageData.data[i * 4 + 3] > 0) {
+            for (let k = 0; k < 3; k++) {
+              imageData.data[i * 4 + k] = colorParts[k];
             }
           }
         }
-        context.putImageData(imageData, 0, 0);
+        imageDataRef.current = imageData;
       }
-    };
+      context.putImageData(imageDataRef.current, 0, 0);
+    }
   }, [image, item.parent?.stageWidth, item.parent?.stageHeight]);
+
+  useEffect(() => {
+    // Cleanup the massive 8MB ImageData array when navigating away or unmounting
+    return () => {
+      imageDataRef.current = null;
+    };
+  }, []);
 
   const { store } = item;
 
   const layerRef = useRef();
   const highlighted = item.highlighted;
-  const highlight = highlighted ? highlightOptions : { shadowOpacity: 0 };
 
   const setLayerRef = useCallback(
     (ref) => {
@@ -591,12 +595,11 @@ const HtxBrushView = ({ item, setShapeRef }) => {
         }}
         visible={!item.hidden}
         clip={clip}
-        opacity={item.opacity}
+        opacity={highlighted ? 1 : item.opacity}
       >
         <Group
           attrMy={item.needsUpdate}
           name="segmentation"
-          {...highlight}
           onMouseDown={(e) => {
             if (store.annotationStore.selected.isLinkingMode) {
               e.cancelBubble = true;
