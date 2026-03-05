@@ -288,7 +288,7 @@ const useEventHandlers = () => {
     if (hoverTimeoutRef.current) {
       window.clearTimeout(hoverTimeoutRef.current);
     }
-    
+
     hoverTimeoutRef.current = window.setTimeout(() => {
       if (highlightedRef.current) {
         highlightedRef.current?.setHighlight(false);
