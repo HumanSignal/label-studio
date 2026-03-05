@@ -14,6 +14,7 @@ import {
   useMemo,
   useRef,
   useState,
+  memo,
 } from "react";
 import Registry from "../../../core/Registry";
 import { PER_REGION_MODES } from "../../../mixins/PerRegionModes";
@@ -221,7 +222,7 @@ const useDataTree = ({ regions, rootClass, footer }: any) => {
         "--selection-color": color.alpha(0.1).css(),
       },
       className: rootClass.elem("node").mod(mods).toClassName(),
-      title: ({ key: _key, ...data }: any) => <RootTitle {...data} />,
+      title: <MemoizedRootTitle item={item} idx={idx} isArea={true} />,
       locked,
     };
   }, []);
@@ -467,6 +468,15 @@ const RootTitle: FC<any> = observer(
     );
   },
 );
+
+const MemoizedRootTitle = memo(RootTitle, (prevProps, nextProps) => {
+  if (prevProps.item !== nextProps.item) return false;
+  if (prevProps.item?.highlighted !== nextProps.item?.highlighted) return false;
+  if (prevProps.item?.hidden !== nextProps.item?.hidden) return false;
+  if (prevProps.selected !== nextProps.selected) return false;
+  if (prevProps.idx !== nextProps.idx) return false;
+  return true;
+});
 
 interface RegionControlsProps {
   item: any;

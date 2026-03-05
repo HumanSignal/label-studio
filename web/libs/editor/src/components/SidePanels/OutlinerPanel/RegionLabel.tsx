@@ -1,10 +1,12 @@
 import { observer } from "mobx-react";
+import { memo } from "react";
 import { cn } from "../../../utils/bem";
 
 export type RegionLabelProps = {
   item: any;
 };
-export const RegionLabel = observer(({ item }: RegionLabelProps) => {
+export const RegionLabel = memo(
+  observer(({ item }: RegionLabelProps) => {
   const { type } = item ?? {};
   if (!type) {
     return "No Label";
@@ -51,4 +53,9 @@ export const RegionLabel = observer(({ item }: RegionLabelProps) => {
   if (type.includes("tool")) {
     return item.value;
   }
+}), (prevProps, nextProps) => {
+  if (prevProps.item !== nextProps.item) return false;
+  if (prevProps.item?.highlighted !== nextProps.item?.highlighted) return false;
+  if (prevProps.item?.hidden !== nextProps.item?.hidden) return false;
+  return true;
 });
