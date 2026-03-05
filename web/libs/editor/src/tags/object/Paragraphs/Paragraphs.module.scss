@@ -1,4 +1,3 @@
-$border-thin: 1px solid rgb(137 128 152 / 16%);
 
 .paragraphs {
   position: relative;
@@ -68,7 +67,7 @@ $border-thin: 1px solid rgb(137 128 152 / 16%);
   position: relative;
   overflow: hidden auto;
   counter-reset: phrase;
-  border: $border-thin;
+  border: 1px solid rgb(137 128 152 / 16%);
   padding: 8px;
 }
 

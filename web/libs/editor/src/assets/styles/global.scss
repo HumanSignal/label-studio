@@ -1,7 +1,16 @@
 @import "./antd-no-reset";
-@import "./variables";
-@import "./mixins";
-@import "./functions";
+
+/** Colors **/
+
+@keyframes waiting {
+  0% {
+    background-position: 0 0;
+  }
+
+  100% {
+    background-position: 37px 0;
+  }
+}
 
 .root {
   font-size: 14px;

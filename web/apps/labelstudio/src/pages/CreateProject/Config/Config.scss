@@ -1,5 +1,3 @@
-$scroll-width: 5px;
-
 .panel {
   display: none;
 }
@@ -38,7 +36,7 @@ $scroll-width: 5px;
   background-color: var(--color-neutral-background);
 
   &>div {
-    padding: var(--spacing-base) 24px - $scroll-width var(--spacing-base) 20px;
+    padding: var(--spacing-base) 19px var(--spacing-base) 20px;
 
     &:first-child {
       height: calc(100vh - var(--header-height));
@@ -46,7 +44,7 @@ $scroll-width: 5px;
   }
 
   &::-webkit-scrollbar {
-    width: $scroll-width;
+    width: 5px;
   }
 
   &::-webkit-scrollbar-track {
