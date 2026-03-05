@@ -9,10 +9,9 @@ require("dotenv").config({
   path: path.resolve(__dirname, "../.env"),
 });
 
-// Import webpack plugins from the same webpack version that @nx/webpack uses for compilation,
-// to avoid version mismatches between the root webpack and the NX-bundled webpack.
-const nxWebpack = require("@nx/webpack/node_modules/webpack");
-const { EnvironmentPlugin, DefinePlugin } = nxWebpack;
+// Use the project's webpack so resolution works (e.g. when @nx/webpack does not bundle webpack under node_modules).
+const webpack = require("webpack");
+const { EnvironmentPlugin, DefinePlugin } = webpack;
 const TerserPlugin = require("terser-webpack-plugin");
 const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
 
@@ -78,11 +77,11 @@ const optimizer = () => {
 module.exports = composePlugins(
   withNx({
     nx: {
-      svgr: true,
+      svgr: false,
     },
     skipTypeChecking: true,
   }),
-  withReact({ svgr: true }),
+  withReact({ svgr: false }),
   (config) => {
     // Remove the extension alias as this conflicts with the nx/webpack v21 changes
     delete config.resolve.extensionAlias;
@@ -209,31 +208,40 @@ module.exports = composePlugins(
       }
     });
 
-    config.module.rules.push(
-      {
-        test: /\.svg$/,
-        exclude: /node_modules/,
-        use: [
-          {
-            loader: "@svgr/webpack",
-            options: {
-              ref: true,
+    config.module.rules.unshift({
+      test: /\.svg$/,
+      exclude: /node_modules/,
+      oneOf: [
+        {
+          issuer: /\.[jt]sx?$/,
+          use: [
+            {
+              loader: "@svgr/webpack",
+              options: {
+                ref: true,
+                exportType: "named",
+                namedExport: "ReactComponent",
+              },
             },
-          },
-          "url-loader",
-        ],
-      },
+          ],
+        },
+        {
+          type: "asset/resource",
+        },
+      ],
+    });
+
+    config.module.rules.push(
       {
         test: /\.xml$/,
         exclude: /node_modules/,
-        loader: "url-loader",
+        type: "asset/resource",
       },
       {
         test: /\.wasm$/,
-        type: "javascript/auto",
-        loader: "file-loader",
-        options: {
-          name: "[name].[ext]",
+        type: "asset/resource",
+        generator: {
+          filename: "[name][ext]",
         },
       },
       // tailwindcss
