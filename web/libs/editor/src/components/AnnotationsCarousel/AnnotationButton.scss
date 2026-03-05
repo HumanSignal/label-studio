@@ -312,20 +312,20 @@
     margin-bottom: 8px;
     flex-wrap: wrap;
 
-    // Force light mode colors for better readability in dark mode tooltips
+    // Force light mode colors for better readability when tooltip has white background (dark theme)
     // Override the CSS variables to always use light mode values
-    --color-accent-grape-subtle: var(--color-grape-100);
+    --color-accent-grape-subtlest: var(--color-grape-100);
+    --color-accent-grape-subtle: var(--color-grape-200);
     --color-accent-grape-bold: var(--color-grape-700);
-    --color-accent-kale-subtle: var(--color-kale-100);
+    --color-accent-kale-subtlest: var(--color-kale-100);
+    --color-accent-kale-subtle: var(--color-kale-200);
     --color-accent-kale-bold: var(--color-kale-700);
-    --color-accent-canteloupe-subtle: var(--color-canteloupe-100);
+    --color-accent-canteloupe-subtlest: var(--color-canteloupe-100);
+    --color-accent-canteloupe-subtle: var(--color-canteloupe-200);
     --color-accent-canteloupe-bold: var(--color-canteloupe-700);
-    --color-accent-persimmon-subtle: var(--color-persimmon-100);
+    --color-accent-persimmon-subtlest: var(--color-persimmon-100);
+    --color-accent-persimmon-subtle: var(--color-persimmon-200);
     --color-accent-persimmon-bold: var(--color-persimmon-700);
-  }
-
-  &__tooltipStatusBadge {
-    display: inline-block;
   }
 
   &__tooltipContainerTitle {
