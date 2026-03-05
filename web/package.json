@@ -248,6 +248,15 @@
     "on-headers": "1.1.0",
     "form-data": "4.0.4",
     "qs": ">=6.14.1",
-    "stylus": "npm:empty-npm-package@1.0.0"
+    "stylus": "npm:empty-npm-package@1.0.0",
+    "rollup": ">=4.59.0",
+    "@isaacs/brace-expansion": ">=5.0.1",
+    "immutable": ">=5.1.5",
+    "axios": ">=1.13.5",
+    "lodash": ">=4.17.23",
+    "serialize-javascript": ">=7.0.3",
+    "minimatch": ">=9.0.7",
+    "svgo": ">=3.3.3",
+    "ajv": ">=8.18.0"
   }
 }
