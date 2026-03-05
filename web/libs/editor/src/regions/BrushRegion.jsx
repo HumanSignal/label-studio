@@ -232,7 +232,9 @@ const Model = types
       },
 
       setLayerRef(ref) {
-        self.layerRef = ref;
+        if (ref) {
+          self.layerRef = ref;
+        }
       },
 
       prepareCoords([x, y]) {
