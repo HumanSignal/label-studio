@@ -276,15 +276,26 @@ const useEventHandlers = () => {
 
   // see onScroll for explanation
   const highlightedRef = useRef<any>();
+  const hoverTimeoutRef = useRef<number>();
+
   const onMouseEnter = useCallback(({ node }: any) => {
-    if (highlightedRef.current) {
-      highlightedRef.current?.setHighlight(false);
+    if (hoverTimeoutRef.current) {
+      window.clearTimeout(hoverTimeoutRef.current);
     }
-    node.item?.setHighlight(true);
-    highlightedRef.current = node.item;
+    
+    hoverTimeoutRef.current = window.setTimeout(() => {
+      if (highlightedRef.current) {
+        highlightedRef.current?.setHighlight(false);
+      }
+      node.item?.setHighlight(true);
+      highlightedRef.current = node.item;
+    }, 50);
   }, []);
 
   const onMouseLeave = useCallback(({ node }: any) => {
+    if (hoverTimeoutRef.current) {
+      window.clearTimeout(hoverTimeoutRef.current);
+    }
     node?.item?.setHighlight(false);
     if (highlightedRef.current !== node?.item) {
       highlightedRef.current?.setHighlight(false);
