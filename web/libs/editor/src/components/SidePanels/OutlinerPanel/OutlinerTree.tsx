@@ -199,6 +199,11 @@ const OutlinerInnerTreeComponent: FC<OutlinerInnerTreeProps> = observer(({ regio
   );
 });
 
+const titleRenderer = (nodeData: any) => {
+  const { key: _key, ...data } = nodeData;
+  return <MemoizedRootTitle {...data} />;
+};
+
 const useDataTree = ({ regions, rootClass, footer }: any) => {
   const processor = useCallback((item: any, idx, _false, _null, _onClick) => {
     const { id, type, hidden, locked } = item ?? {};
@@ -222,7 +227,7 @@ const useDataTree = ({ regions, rootClass, footer }: any) => {
         "--selection-color": color.alpha(0.1).css(),
       },
       className: rootClass.elem("node").mod(mods).toClassName(),
-      title: <MemoizedRootTitle item={item} idx={idx} isArea={true} />,
+      title: titleRenderer,
       locked,
     };
   }, []);
@@ -475,6 +480,8 @@ const MemoizedRootTitle = memo(RootTitle, (prevProps, nextProps) => {
   if (prevProps.item?.hidden !== nextProps.item?.hidden) return false;
   if (prevProps.selected !== nextProps.selected) return false;
   if (prevProps.idx !== nextProps.idx) return false;
+  if (prevProps.isArea !== nextProps.isArea) return false;
+  if (prevProps.isGroup !== nextProps.isGroup) return false;
   return true;
 });
 

@@ -57,8 +57,8 @@ export const splitRegions = (regions) => {
   };
 };
 
-const Region = memo(({ region, showSelected = false }) => {
-  return useObserver(() => Tree.renderItem(region, region.annotation, true));
+const Region = observer(({ region, showSelected = false }) => {
+  return Tree.renderItem(region, region.annotation, true);
 });
 
 const RegionsLayer = memo(({ regions, name, useLayers, showSelected = false, smoothing = true }) => {
