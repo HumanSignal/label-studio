@@ -204,7 +204,7 @@
     align-items: center;
     border-radius: var(--corner-radius-small);
 
-    span {
+    & span {
       border: 1px solid transparent;
     }
 
@@ -221,7 +221,7 @@
       padding-left: var(--spacing-tight);
       padding-right: var(--spacing-tight);
 
-      input {
+      & input {
         height: 24px;
         font-size: 14px;
         padding-left: var(--spacing-tight);

@@ -54,7 +54,7 @@
       }
     }
 
-    input, textarea {
+    & input, textarea {
       background-color: var(--color-neutral-background);
       padding: var(--spacing-tight) var(--spacing-widest) var(--spacing-tight) var(--spacing-base);
       font-size: var(--font-size-body-small);
@@ -82,7 +82,7 @@
     opacity: 0;
     transition: transform 150ms ease-out, opacity 150ms ease-out;
 
-    button {
+    & button {
       pointer-events: auto;
     }
   }

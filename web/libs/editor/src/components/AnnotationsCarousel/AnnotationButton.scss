@@ -239,7 +239,7 @@
     transition: opacity 150ms ease-out, background-color 150ms ease-out, right 150ms ease-out;
     box-shadow: 2px 0 6px rgb(var(--color-neutral-shadow-raw) / 8%), 1px 0 2px rgb(var(--color-neutral-shadow-raw) / 8%);
 
-    svg {
+    & svg {
       width: 20px;
       height: 20px;
       transform-origin: center;
@@ -252,7 +252,7 @@
       background: var(--color-primary-emphasis);
       border-color: var(--color-primary-border-subtler);
 
-      svg {
+      & svg {
         color: var(--color-neutral-content);
       }
     }
@@ -393,7 +393,7 @@
     &_updated {
       background-color: var(--color-primary-content);
 
-      svg {
+      & svg {
         display: block;
       }
     }
