@@ -270,8 +270,7 @@ function AnnotationButtonTooltip({
     return badges;
   }, [statusBadge, isSkipped, isGroundTruth]);
 
-  const isRenderable =
-    tooltipData.length > 0 || !!displayUsername || tooltipBadges.length > 0 || !!annotationId;
+  const isRenderable = tooltipData.length > 0 || !!displayUsername || tooltipBadges.length > 0 || !!annotationId;
 
   if (!isRenderable) {
     return null;
@@ -293,7 +292,7 @@ function AnnotationButtonTooltip({
         left: `${position.left}px`,
       }}
     >
-      {(tooltipBadges.length > 0) && (
+      {tooltipBadges.length > 0 && (
         <div className={cn("annotation-button").elem("tooltipBadges").toClassName()}>
           {tooltipBadges.map(({ label, variant }) => (
             <Badge key={label} variant={variant} shape="rounded">
