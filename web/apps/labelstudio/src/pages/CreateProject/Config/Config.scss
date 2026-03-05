@@ -70,7 +70,7 @@ $scroll-width: 5px;
   &__sidebar {
     padding: var(--spacing-base) var(--spacing-tight) var(--spacing-base) var(--spacing-wider);
 
-    h3:not(:first-child) {
+    & h3:not(:first-child) {
       margin-top: var(--spacing-wide);
     }
 
@@ -85,7 +85,7 @@ $scroll-width: 5px;
       text-align: left;
     }
 
-    ul {
+    & ul {
       padding: 0;
       list-style: none;
       display: flex;
@@ -116,7 +116,7 @@ $scroll-width: 5px;
       cursor: default;
     }
 
-    svg {
+    & svg {
       margin-left: auto;
       padding-left: 16px;
       width: 24px;
@@ -124,13 +124,13 @@ $scroll-width: 5px;
     }
   }
 
-  main {
+  & main {
     position: relative;
     flex-grow: 1;
     overflow-y: auto;
     height: 100%;
 
-    ul {
+    & ul {
       display: grid;
       padding: 0;
       margin: 16px 8px;
@@ -181,7 +181,7 @@ $scroll-width: 5px;
       transform: translateY(-1px); // Subtle lift effect
     }
 
-    h3 {
+    & h3 {
       margin: 0;
       padding: 12px;
       font-size: 14px;
@@ -190,7 +190,7 @@ $scroll-width: 5px;
       color: var(--color-neutral-content);
     }
 
-    img {
+    & img {
       width: 100%;
       object-fit: cover;
       border-radius: 8px 8px 0 0;
@@ -198,7 +198,7 @@ $scroll-width: 5px;
     }
   }
 
-  footer,
+  & footer,
   .modal__footer {
     grid-column: 1 / span 2;
     padding: 16px 32px;
@@ -316,7 +316,7 @@ $scroll-width: 5px;
     color: var(--color-neutral-content);
   }
 
-  a {
+  & a {
     color: var(--color-primary-content);
 
     &:hover {
@@ -326,8 +326,8 @@ $scroll-width: 5px;
     }
   }
 
-  input,
-  select {
+  & input,
+  & select {
     flex: 1;
     min-width: 160px;
     padding: 4px 8px;
@@ -339,7 +339,7 @@ $scroll-width: 5px;
 }
 
 .wizard .configure__object {
-  h4 {
+  & h4 {
     margin-bottom: 8px;
     color: var(--color-neutral-content);
   }
@@ -352,7 +352,7 @@ $scroll-width: 5px;
     gap: var(--spacing-tight);
     color: var(--color-neutral-content-subtler);
 
-    button {
+    & button {
       min-width: 160px;
       flex: 1;
     }
@@ -369,7 +369,7 @@ $scroll-width: 5px;
     color: var(--color-negative-content);
   }
 
-  input {
+  & input {
     margin-left: 8px;
   }
 }
@@ -397,11 +397,11 @@ $scroll-width: 5px;
   flex: 1;
   min-width: 300px;
 
-  span {
+  & span {
     color: var(--color-neutral-content-subtler);
   }
 
-  textarea {
+  & textarea {
     flex-grow: 1;
     margin: 8px 0;
     border-color: var(--color-neutral-border);
@@ -426,7 +426,7 @@ $scroll-width: 5px;
   margin-right: 8px;
   min-width: 225px;
 
-  h3 {
+  & h3 {
     font-size: 16px;
     padding-bottom: var(--spacing-tighter);
     color: var(--color-neutral-content);
@@ -454,16 +454,16 @@ $scroll-width: 5px;
     }
 
     &_choice {
-      label {
+      & label {
         display: none;
       }
 
-      span {
+      & span {
         background: var(--color-neutral-background);
       }
     }
 
-    label {
+    & label {
       width: 0;
       cursor: pointer;
 
@@ -526,11 +526,11 @@ $scroll-width: 5px;
     &:hover {
       background: var(--color-neutral-surface);
 
-      label::before {
+      & label::before {
         border-radius: 0;
       }
 
-      label::after {
+      & label::after {
         width: 12px;
         left: -12px;
       }
@@ -548,26 +548,26 @@ $scroll-width: 5px;
 .wizard ul.configure__settings {
   padding: 0;
 
-  ul {
+  & ul {
     padding: 0;
   }
 
-  li {
+  & li {
     list-style: none;
     margin: 8px 0 0 8px;
   }
 
-  label {
+  & label {
     cursor: pointer;
     color: var(--color-neutral-content-subtler);
   }
 
-  input[type="checkbox"] {
+  & input[type="checkbox"] {
     margin-right: 8px;
   }
 
-  input[type="text"],
-  select {
+  & input[type="text"],
+  & select {
     font: inherit;
     line-height: 1.2em;
     padding: 4px 8px;
@@ -586,13 +586,13 @@ $scroll-width: 5px;
   color: var(--color-neutral-content);
   height: 100%;
 
-  h3 {
+  & h3 {
     padding: var(--spacing-tight) 0;
     font-size: 16px;
     color: var(--color-neutral-content);
   }
 
-  iframe {
+  & iframe {
     display: block;
     min-width: 100%;
     min-height: 100%;
@@ -616,7 +616,7 @@ $scroll-width: 5px;
     margin-bottom: 16px;
     white-space: pre-line;
 
-    h2 {
+    & h2 {
       font-size: 16px;
     }
   }
@@ -660,11 +660,11 @@ $scroll-width: 5px;
   font-size: 13px;
   line-height: 1.4;
 
-  svg {
+  & svg {
     flex-shrink: 0;
   }
 
-  button {
+  & button {
     margin-left: auto;
     flex-shrink: 0;
   }

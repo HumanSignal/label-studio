@@ -11,7 +11,7 @@
     margin-left: 5px;
     align-items: center;
 
-    svg {
+    & svg {
       width: 20px;
       height: 17px;
       fill: var(--incomplete-warning-color, var(--persimmon_400));
@@ -37,7 +37,7 @@
     height: 24px;
     margin-right: 5px;
 
-    svg {
+    & svg {
       width: 24px;
       height: 24px;
     }

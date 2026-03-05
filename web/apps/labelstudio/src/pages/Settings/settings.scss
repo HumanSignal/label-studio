@@ -97,7 +97,7 @@
   line-height: 16px;
   letter-spacing: 0.4px;
 
-  a {
+  & a {
     color: var(--color-primary-surface-content);
     font-size: 12px;
     font-style: normal;
@@ -115,11 +115,11 @@
   display: flex;
   align-items: flex-start;
 
-  p {
+  & p {
     padding: 0;
     margin: 0;
 
-    a {
+    & a {
       color: var(--color-primary-surface-content);
       font-size: 14px;
       font-style: normal;
@@ -137,7 +137,7 @@
     margin-top: 5px;
   }
 
-  input {
+  & input {
     margin-top: 5px;
   }
 

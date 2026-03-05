@@ -99,7 +99,7 @@
     overflow: hidden;
     height: 0;
 
-    img {
+    & img {
       max-width: unset;
     }
   }
@@ -121,7 +121,7 @@
     z-index: 100;
   }
 
-  img {
+  & img {
     position: absolute;
     top: 0;
   }
@@ -143,7 +143,7 @@
   width: 100%;
   padding-bottom: 8px; // for scroll
 
-  img {
+  & img {
     cursor: pointer;
     margin-right: 4px;
     border: 4px solid transparent;

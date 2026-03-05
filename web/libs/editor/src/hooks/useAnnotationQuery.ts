@@ -36,6 +36,11 @@ export const fetchAnnotation = async (id: number | string): Promise<AnnotationDa
   return response.json();
 };
 
+/** Wrapper to prevent caching lexical scopes in React Query */
+const fetchAnnotationQueryFn = ({ queryKey }: any) => {
+  return fetchAnnotation(queryKey[2] as string | number);
+};
+
 /**
  * Hook for fetching a single annotation with TanStack Query
  * Use this when you want reactive data that auto-updates
@@ -43,7 +48,7 @@ export const fetchAnnotation = async (id: number | string): Promise<AnnotationDa
 export const useAnnotation = (id: number | string | undefined, options?: { enabled?: boolean }) => {
   return useQuery({
     queryKey: annotationKeys.detail(id!),
-    queryFn: () => fetchAnnotation(id!),
+    queryFn: fetchAnnotationQueryFn,
     enabled: !!id && options?.enabled !== false,
     staleTime: 30000, // 30 seconds
     gcTime: 5 * 60 * 1000, // 5 minutes
@@ -79,7 +84,7 @@ export const useAnnotationFetcher = () => {
         // It also deduplicates concurrent requests automatically
         return await queryClient.ensureQueryData({
           queryKey: annotationKeys.detail(id),
-          queryFn: () => fetchAnnotation(id),
+          queryFn: fetchAnnotationQueryFn,
           staleTime: 30000,
           gcTime: 5 * 60 * 1000,
         });
@@ -101,7 +106,7 @@ export const useAnnotationFetcher = () => {
     (id: number | string) => {
       queryClient.prefetchQuery({
         queryKey: annotationKeys.detail(id),
-        queryFn: () => fetchAnnotation(id),
+        queryFn: fetchAnnotationQueryFn,
         staleTime: 30000,
         gcTime: 5 * 60 * 1000,
       });

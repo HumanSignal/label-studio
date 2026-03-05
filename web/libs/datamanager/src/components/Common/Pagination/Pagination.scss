@@ -168,7 +168,7 @@
       width: 70px;
     }
 
-    input {
+    & input {
       width: 100%;
       height: calc(100% - 2px);
       border: none;
@@ -190,7 +190,7 @@
     font-size: var(--font-size);
     line-height: var(--line-height);
 
-    span {
+    & span {
       font-weight: normal;
       opacity: 0.4;
     }

@@ -34,7 +34,7 @@
       transform: translateY(2px);
     }
 
-    svg {
+    & svg {
       width: 20px;
       height: 20px;
     }
@@ -68,7 +68,7 @@
     color: var(--icon-color);
     flex-grow: 0;
 
-    svg {
+    & svg {
       width: 24px;
       height: 24px;
     }

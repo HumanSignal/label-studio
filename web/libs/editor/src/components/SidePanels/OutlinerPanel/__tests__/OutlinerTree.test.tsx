@@ -468,7 +468,7 @@ describe("OutlinerTree", () => {
     });
     const wrapper = container.querySelector(".dm-tree-node-content-wrapper")!;
     fireEvent.mouseEnter(wrapper);
-    expect(setHighlight).toHaveBeenCalledWith(true);
+    await waitFor(() => expect(setHighlight).toHaveBeenCalledWith(true));
     fireEvent.mouseLeave(wrapper);
     expect(setHighlight).toHaveBeenCalledWith(false);
   });
@@ -489,9 +489,12 @@ describe("OutlinerTree", () => {
     });
     const wrappers = container.querySelectorAll(".dm-tree-node-content-wrapper");
     fireEvent.mouseEnter(wrappers[0]);
+    await waitFor(() => expect(setHighlight1).toHaveBeenCalledWith(true));
     fireEvent.mouseEnter(wrappers[1]);
-    expect(setHighlight1).toHaveBeenCalledWith(false);
-    expect(setHighlight2).toHaveBeenCalledWith(true);
+    await waitFor(() => {
+      expect(setHighlight1).toHaveBeenCalledWith(false);
+      expect(setHighlight2).toHaveBeenCalledWith(true);
+    });
   });
 
   it("renders OCR section when item has perRegionDescControls", async () => {

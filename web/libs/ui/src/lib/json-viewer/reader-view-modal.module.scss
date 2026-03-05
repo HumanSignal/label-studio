@@ -64,12 +64,12 @@
 
   // Ensure markdown content is properly styled
   :global {
-    h1,
-    h2,
-    h3,
-    h4,
-    h5,
-    h6 {
+    & h1,
+    & h2,
+    & h3,
+    & h4,
+    & h5,
+    & h6 {
       margin-top: var(--spacing-wide);
       margin-bottom: var(--spacing-base);
       color: var(--color-neutral-content);
@@ -79,37 +79,37 @@
       }
     }
 
-    p {
+    & p {
       margin-bottom: var(--spacing-base);
     }
 
-    ul,
-    ol {
+    & ul,
+    & ol {
       margin-bottom: var(--spacing-base);
       padding-left: var(--spacing-wider);
     }
 
-    code {
+    & code {
       background: var(--color-neutral-surface-inset);
       padding: var(--spacing-tightest) var(--spacing-tighter);
       border-radius: var(--border-radius-smallest);
       font-family: var(--font-family-monospace, monospace);
     }
 
-    pre {
+    & pre {
       background: var(--color-neutral-surface-inset);
       padding: var(--spacing-base);
       border-radius: var(--border-radius-small);
       overflow-x: auto;
       margin-bottom: var(--spacing-base);
 
-      code {
+      & code {
         background: none;
         padding: 0;
       }
     }
 
-    blockquote {
+    & blockquote {
       border-left: 4px solid var(--color-primary-border);
       padding-left: var(--spacing-base);
       margin-left: 0;
@@ -118,7 +118,7 @@
       font-style: italic;
     }
 
-    a {
+    & a {
       color: var(--color-primary-content);
       text-decoration: underline;
 
@@ -127,25 +127,25 @@
       }
     }
 
-    img {
+    & img {
       max-width: 100%;
       height: auto;
       margin: var(--spacing-base) 0;
     }
 
-    table {
+    & table {
       width: 100%;
       border-collapse: collapse;
       margin-bottom: var(--spacing-base);
 
-      th,
-      td {
+      & th,
+      & td {
         border: 1px solid var(--color-neutral-border);
         padding: var(--spacing-tight);
         text-align: left;
       }
 
-      th {
+      & th {
         background: var(--color-neutral-surface-inset);
         font-weight: var(--font-weight-semibold);
       }
@@ -161,12 +161,12 @@
 
   // Basic HTML styling
   :global {
-    h1,
-    h2,
-    h3,
-    h4,
-    h5,
-    h6 {
+    & h1,
+    & h2,
+    & h3,
+    & h4,
+    & h5,
+    & h6 {
       margin-top: var(--spacing-wide);
       margin-bottom: var(--spacing-base);
       
@@ -175,17 +175,17 @@
       }
     }
 
-    p {
+    & p {
       margin-bottom: var(--spacing-base);
     }
 
-    ul,
-    ol {
+    & ul,
+    & ol {
       margin-bottom: var(--spacing-base);
       padding-left: var(--spacing-wider);
     }
 
-    a {
+    & a {
       color: var(--color-primary-content);
       text-decoration: underline;
 
@@ -194,45 +194,45 @@
       }
     }
 
-    img {
+    & img {
       max-width: 100%;
       height: auto;
       margin: var(--spacing-base) 0;
     }
 
-    table {
+    & table {
       width: 100%;
       border-collapse: collapse;
       margin-bottom: var(--spacing-base);
 
-      th,
-      td {
+      & th,
+      & td {
         border: 1px solid var(--color-neutral-border);
         padding: var(--spacing-tight);
         text-align: left;
       }
 
-      th {
+      & th {
         background: var(--color-neutral-surface-inset);
         font-weight: var(--font-weight-semibold);
       }
     }
 
-    code {
+    & code {
       background: var(--color-neutral-surface-inset);
       padding: var(--spacing-tightest) var(--spacing-tighter);
       border-radius: var(--border-radius-smallest);
       font-family: var(--font-family-monospace, monospace);
     }
 
-    pre {
+    & pre {
       background: var(--color-neutral-surface-inset);
       padding: var(--spacing-base);
       border-radius: var(--border-radius-small);
       overflow-x: auto;
       margin-bottom: var(--spacing-base);
 
-      code {
+      & code {
         background: none;
         padding: 0;
       }

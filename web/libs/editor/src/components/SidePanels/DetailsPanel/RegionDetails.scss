@@ -67,7 +67,7 @@
     transition-timing-function: ease;
 
     &:hover {
-      textarea {
+      & textarea {
         border-color: var(--color-neutral-border);
         background-color: var(--color-neutral-background);
       }
@@ -104,7 +104,7 @@
     order: 0;
     flex-grow: 1;
 
-    svg {
+    & svg {
       width: 20px;
       height: 17px;
       fill: var(--incomplete-warning-color, var(--color-warning-icon));
@@ -147,7 +147,7 @@
   }
 
   &__value {
-    p {
+    & p {
       padding: 0;
       margin-bottom: 4px;
 

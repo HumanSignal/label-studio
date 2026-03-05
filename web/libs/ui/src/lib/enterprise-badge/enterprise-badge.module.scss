@@ -13,7 +13,7 @@
   }
 
   .icon {
-    path {
+    & path {
       fill: var(--color-neutral-on-dark-content);
     }
   }
@@ -54,7 +54,7 @@
   }
 
   .icon {
-    path {
+    & path {
       fill: var(--color-accent-persimmon-base);
     }
   }
