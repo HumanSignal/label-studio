@@ -31,6 +31,11 @@ const fetchDistribution = async (taskId: number | string): Promise<DistributionD
   return response.json();
 };
 
+/** Wrapper to prevent caching lexical scopes in React Query */
+const fetchTaskAgreement = async ({ queryKey }: any): Promise<DistributionData> => {
+  return fetchDistribution(queryKey[1] as string | number);
+};
+
 const resultValue = (result: RawResult) => {
   if (result.type === "textarea") {
     return result.value.text;
@@ -302,7 +307,7 @@ export const AggregationTableRow = ({
     error,
   } = useQuery({
     queryKey: ["task-agreement", taskId],
-    queryFn: () => fetchDistribution(taskId!),
+    queryFn: fetchTaskAgreement,
     enabled: useApiData && !!taskId,
     staleTime: 30000, // Consider data fresh for 30 seconds
     gcTime: 5 * 60 * 1000, // Keep in cache for 5 minutes (formerly cacheTime)

@@ -522,35 +522,38 @@ const HtxBrushView = ({ item, setShapeRef }) => {
   const imageDataRef = useRef(null);
 
   // Drawing hit area by shape color to detect interactions inside the Konva
-  const imageHitFunc = useCallback((context, shape) => {
-    if (image) {
-      if (!imageDataRef.current) {
-        context.drawImage(image, 0, 0, item.parent.stageWidth, item.parent.stageHeight);
-        let imageData;
-        if (isFF(FF_ZOOM_OPTIM)) {
-          imageData = context.getImageData(
-            item.parent.alignmentOffset.x,
-            item.parent.alignmentOffset.y,
-            item.parent.stageWidth,
-            item.parent.stageHeight,
-          );
-        } else {
-          imageData = context.getImageData(0, 0, item.parent.stageWidth, item.parent.stageHeight);
-        }
-        const colorParts = colorToRGBAArray(shape.colorKey);
+  const imageHitFunc = useCallback(
+    (context, shape) => {
+      if (image) {
+        if (!imageDataRef.current) {
+          context.drawImage(image, 0, 0, item.parent.stageWidth, item.parent.stageHeight);
+          let imageData;
+          if (isFF(FF_ZOOM_OPTIM)) {
+            imageData = context.getImageData(
+              item.parent.alignmentOffset.x,
+              item.parent.alignmentOffset.y,
+              item.parent.stageWidth,
+              item.parent.stageHeight,
+            );
+          } else {
+            imageData = context.getImageData(0, 0, item.parent.stageWidth, item.parent.stageHeight);
+          }
+          const colorParts = colorToRGBAArray(shape.colorKey);
 
-        for (let i = imageData.data.length / 4 - 1; i >= 0; i--) {
-          if (imageData.data[i * 4 + 3] > 0) {
-            for (let k = 0; k < 3; k++) {
-              imageData.data[i * 4 + k] = colorParts[k];
+          for (let i = imageData.data.length / 4 - 1; i >= 0; i--) {
+            if (imageData.data[i * 4 + 3] > 0) {
+              for (let k = 0; k < 3; k++) {
+                imageData.data[i * 4 + k] = colorParts[k];
+              }
             }
           }
+          imageDataRef.current = imageData;
         }
-        imageDataRef.current = imageData;
+        context.putImageData(imageDataRef.current, 0, 0);
       }
-      context.putImageData(imageDataRef.current, 0, 0);
-    }
-  }, [image, item.parent?.stageWidth, item.parent?.stageHeight]);
+    },
+    [image, item.parent?.stageWidth, item.parent?.stageHeight],
+  );
 
   useEffect(() => {
     // Cleanup the massive 8MB ImageData array when navigating away or unmounting
