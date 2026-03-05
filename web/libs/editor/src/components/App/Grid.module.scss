@@ -2,6 +2,8 @@
 @import "../../assets/styles/global";
 
 .grid {
+  --grid-gap: 30px;
+
   flex-grow: 1;
   display: grid;
   grid-auto-columns: calc(50% - 15px);
@@ -11,7 +13,7 @@
   }
 
   grid-auto-flow: column;
-  grid-column-gap: 30px;
+  grid-column-gap: var(--grid-gap);
   margin: 0 var(--spacing-wider);
   padding: 0 var(--spacing-tight) var(--spacing-base) var(--spacing-tight);
   overflow: auto;
@@ -66,7 +68,7 @@
 .containerVirtualized>button {
   position: absolute;
   top: 0;
-  width: 30px;
+  width: var(--grid-gap);
   height: 100%;
   z-index: 10;
 
