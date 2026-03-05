@@ -1,19 +1,17 @@
 /* Grid (View All mode) */
 @import "../../assets/styles/global";
 
-$gap: 30px;
-
 .grid {
   flex-grow: 1;
   display: grid;
   grid-auto-columns: calc(50% - 15px);
 
-  @include respond("tablet") {
+  @media (width <= 1200px) {
     grid-auto-columns: 100%;
   }
 
   grid-auto-flow: column;
-  grid-column-gap: $gap;
+  grid-column-gap: 30px;
   margin: 0 var(--spacing-wider);
   padding: 0 var(--spacing-tight) var(--spacing-base) var(--spacing-tight);
   overflow: auto;
@@ -68,7 +66,7 @@ $gap: 30px;
 .containerVirtualized>button {
   position: absolute;
   top: 0;
-  width: $gap;
+  width: 30px;
   height: 100%;
   z-index: 10;
 

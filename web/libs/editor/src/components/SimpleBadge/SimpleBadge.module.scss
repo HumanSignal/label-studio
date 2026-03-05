@@ -1,10 +1,8 @@
-$size: 20px;
-
 .badge {
-  height: $size;
-  min-width: $size;
-  border-radius: $size / 2;
-  line-height: $size;
+  height: 20px;
+  min-width: 20px;
+  border-radius: 10px;
+  line-height: 20px;
   padding: 0 6px;
   flex-shrink: 0;
   font-size: 12px;
