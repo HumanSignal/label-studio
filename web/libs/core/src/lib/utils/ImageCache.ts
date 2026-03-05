@@ -50,8 +50,8 @@ class ImageCacheManager {
 
   // Cache for 30 minutes by default
   private readonly maxAge = 30 * 60 * 1000;
-  // Maximum cache size (100 images)
-  private readonly maxSize = 100;
+  // Maximum cache size (10 images to prevent large memory overheads, see FIT-1493)
+  private readonly maxSize = 10;
   // Minimum blob size in bytes (reject empty blobs)
   private readonly minBlobSize = 100;
 
