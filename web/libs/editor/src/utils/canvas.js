@@ -293,7 +293,7 @@ function Region2RLE(region) {
 
   !isVisible && layer.show();
   // hide labels on regions and show them later
-  layer.findOne(".highlight").hide();
+  layer.findOne(".highlight")?.hide();
 
   const width = stage.getWidth();
   const height = stage.getHeight();
