@@ -233,6 +233,7 @@
     "yargs": "^17.7.1"
   },
   "resolutions": {
+    "test-exclude": "8.0.0",
     "@module-federation/dts-plugin": ">=0.18.0",
     "@radix-ui/react-slot": "1.2.3",
     "d3-color": "3.1.0",
@@ -256,7 +257,6 @@
     "lodash": ">=4.17.23",
     "serialize-javascript": ">=7.0.3",
     "minimatch": ">=10.2.3",
-    "svgo": ">=3.3.3",
-    "ajv": ">=8.18.0"
+    "svgo": ">=3.3.3"
   }
 }
