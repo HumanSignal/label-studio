@@ -255,7 +255,7 @@
     "axios": ">=1.13.5",
     "lodash": ">=4.17.23",
     "serialize-javascript": ">=7.0.3",
-    "minimatch": ">=9.0.7",
+    "minimatch": ">=10.2.3",
     "svgo": ">=3.3.3",
     "ajv": ">=8.18.0"
   }
