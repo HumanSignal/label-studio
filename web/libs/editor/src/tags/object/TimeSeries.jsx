@@ -712,11 +712,17 @@ const Model = types
       const dataObj = store.task.dataObj;
 
       if (self.valuetype !== "url") {
-        if (self.value) {
-          self.setData(parseValue(self.value, dataObj));
-        } else {
-          self.setData(dataObj);
+        let val = self.value ? parseValue(self.value, dataObj) : dataObj;
+
+        if (typeof val === "string") {
+          try {
+            val = JSON.parse(val);
+          } catch (e) {
+            // handle error if it's not valid JSON
+          }
         }
+
+        self.setData(val);
         return;
       }
 
