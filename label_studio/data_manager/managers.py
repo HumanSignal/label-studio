@@ -1,5 +1,5 @@
-"""This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
-"""
+"""This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license."""
+
 import logging
 import re
 from datetime import datetime
@@ -141,7 +141,6 @@ def get_fields_for_evaluation(prepare_params, user, skip_regular=True):
 
 def apply_ordering(queryset, ordering, project, request, view_data=None):
     if ordering:
-
         preprocess_field_name = load_func(settings.PREPROCESS_FIELD_NAME)
         raw_field_name = ordering[0]
         numeric_ordering = False

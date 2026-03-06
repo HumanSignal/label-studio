@@ -3,6 +3,7 @@
 This file tests the TaskPagination class optimizations that prevent
 loading heavy task.data fields during pagination.
 """
+
 from unittest.mock import MagicMock, patch
 
 from data_manager.api import TaskPagination

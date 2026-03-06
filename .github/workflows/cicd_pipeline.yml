@@ -131,15 +131,6 @@ jobs:
     with:
       head_sha: ${{ github.event.pull_request.head.sha || github.event.after }}
 
-  blue:
-    name: "Linter"
-    needs:
-      - changed_files
-    if: needs.changed_files.outputs.src == 'true'
-    uses: ./.github/workflows/blue.yml
-    with:
-      head_sha: ${{ github.event.pull_request.head.sha || github.event.after }}
-
   biome:
     name: "Linter"
     needs:
@@ -517,7 +508,6 @@ jobs:
       - gitleaks
       - bandit
       - ruff
-      - blue
       - biome
       - stylelint
       - pytest
@@ -531,7 +521,7 @@ jobs:
       - name: Decide whether the needed jobs succeeded or failed
         uses: re-actors/alls-green@release/v1
         with:
-          allowed-skips: gitleaks, bandit, ruff, blue, biome, stylelint, pytest, migrations, conda-test, build-docker, tests-yarn-unit, tests-yarn-lsf, cursor-review
+          allowed-skips: gitleaks, bandit, ruff, biome, stylelint, pytest, migrations, conda-test, build-docker, tests-yarn-unit, tests-yarn-lsf, cursor-review
           allowed-failures: |
             [
               "gitleaks",

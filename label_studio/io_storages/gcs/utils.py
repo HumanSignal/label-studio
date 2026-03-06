@@ -42,7 +42,6 @@ class GCS(object):
         google_application_credentials: Optional[Union[str, dict]] = None,
         bucket_name: Optional[str] = None,
     ) -> gcs.Bucket:
-
         client = cls.get_client(
             google_project_id=google_project_id, google_application_credentials=google_application_credentials
         )
@@ -62,7 +61,6 @@ class GCS(object):
         cache_key = google_application_credentials
 
         if cache_key not in GCS._client_cache:
-
             # use credentials from LS Cloud Storage settings
             if google_application_credentials:
                 if isinstance(google_application_credentials, str):

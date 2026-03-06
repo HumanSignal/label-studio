@@ -1,5 +1,5 @@
-"""This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
-"""
+"""This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license."""
+
 import json
 import logging
 from typing import Any, Mapping, Optional
@@ -1383,7 +1383,6 @@ class ProjectOnboarding(models.Model):
 
 
 class LabelStreamHistory(models.Model):
-
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='histories', help_text='User ID'
     )
@@ -1395,7 +1394,6 @@ class LabelStreamHistory(models.Model):
 
 
 class ProjectMember(models.Model):
-
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='project_memberships', help_text='User ID'
     )
@@ -1406,7 +1404,6 @@ class ProjectMember(models.Model):
 
 
 class ProjectSummary(models.Model):
-
     project = AutoOneToOneField(Project, primary_key=True, on_delete=models.CASCADE, related_name='summary')
     created_at = models.DateTimeField(_('created at'), auto_now_add=True, help_text='Creation time')
 

@@ -1,4 +1,5 @@
 """Pytest fixtures for tasks tests."""
+
 import pytest
 from core.feature_flags import flag_set as original_flag_set
 

@@ -1,5 +1,5 @@
-"""This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
-"""
+"""This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license."""
+
 import logging
 
 from core.feature_flags import flag_set
@@ -79,9 +79,7 @@ _ml_backend_schema = {
     ```bash
     curl -X POST -H 'Content-type: application/json' {host}/api/ml -H 'Authorization: Token abc123'\\
     --data '{{"url": "http://localhost:9090", "project": {{project_id}}}}' 
-    """.format(
-            host=(settings.HOSTNAME or 'https://localhost:8080')
-        ),
+    """.format(host=(settings.HOSTNAME or 'https://localhost:8080')),
         request={
             'application/json': _ml_backend_schema,
         },
@@ -102,9 +100,7 @@ _ml_backend_schema = {
     Use the following cURL command:
     ```bash
     curl {host}/api/ml?project={{project_id}} -H 'Authorization: Token abc123'
-    """.format(
-            host=(settings.HOSTNAME or 'https://localhost:8080')
-        ),
+    """.format(host=(settings.HOSTNAME or 'https://localhost:8080')),
         parameters=[
             OpenApiParameter(name='project', type=OpenApiTypes.INT, location='query', description='Project ID'),
         ],
@@ -159,9 +155,7 @@ class MLBackendListAPI(generics.ListCreateAPIView):
     ```bash
     curl -X PATCH -H 'Content-type: application/json' {host}/api/ml/{{ml_backend_ID}} -H 'Authorization: Token abc123'\\
     --data '{{"url": "http://localhost:9091"}}' 
-    """.format(
-            host=(settings.HOSTNAME or 'https://localhost:8080')
-        ),
+    """.format(host=(settings.HOSTNAME or 'https://localhost:8080')),
         request={
             'application/json': _ml_backend_schema,
         },
@@ -182,9 +176,7 @@ class MLBackendListAPI(generics.ListCreateAPIView):
     following cURL command:
     ```bash
     curl {host}/api/ml/{{ml_backend_ID}} -H 'Authorization: Token abc123'
-    """.format(
-            host=(settings.HOSTNAME or 'https://localhost:8080')
-        ),
+    """.format(host=(settings.HOSTNAME or 'https://localhost:8080')),
         request=None,
         extensions={
             'x-fern-sdk-group-name': 'ml',
@@ -203,9 +195,7 @@ class MLBackendListAPI(generics.ListCreateAPIView):
     following cURL command:
     ```bash
     curl -X DELETE {host}/api/ml/{{ml_backend_ID}} -H 'Authorization: Token abc123'
-    """.format(
-            host=(settings.HOSTNAME or 'https://localhost:8080')
-        ),
+    """.format(host=(settings.HOSTNAME or 'https://localhost:8080')),
         request=None,
         extensions={
             'x-fern-sdk-group-name': 'ml',
@@ -280,7 +270,6 @@ class MLBackendDetailAPI(generics.RetrieveUpdateDestroyAPIView):
     ),
 )
 class MLBackendTrainAPI(APIView):
-
     permission_required = all_permissions.projects_change
 
     def post(self, request, *args, **kwargs):

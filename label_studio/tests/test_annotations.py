@@ -1,5 +1,5 @@
-"""This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
-"""
+"""This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license."""
+
 import json
 
 import pytest
@@ -80,7 +80,6 @@ def test_create_annotation(
 
 @pytest.mark.django_db
 def test_create_annotation_with_ground_truth(caplog, any_client, configured_project_min_annotations_1):
-
     task = Task.objects.first()
     client_is_annotator = _client_is_annotator(any_client)
     if client_is_annotator:

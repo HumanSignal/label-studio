@@ -28,7 +28,6 @@ logger = logging.getLogger(__name__)
 
 class FSMAPIMixin:
     def get_permission_required(self):
-
         entity_name = self.kwargs['entity_name']
         permission = self.permission_map.get(entity_name)
         if not permission:
@@ -95,7 +94,7 @@ class FSMEntityHistoryAPI(FSMAPIMixin, generics.ListAPIView):
     pagination_class = FSMEntityHistoryPagination
     filter_backends = [DjangoFilterBackend, OrderingFilter]
     filterset_class = FSMEntityHistoryFilterSet
-    ordering_fields = ['id']   # Only allow ordering by id
+    ordering_fields = ['id']  # Only allow ordering by id
 
     permission_map = {
         'task': all_permissions.tasks_view,

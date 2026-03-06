@@ -117,7 +117,7 @@ When submitting pull requests for code changes, please use the following standar
 - Use semantic variable naming.
 - Prefer functions that do a limited number of things.
 - Prefer loose coupling.
-- Follow all linting standards enforced by QA. We use `[ruff](https://beta.ruff.rs/docs/)` for linting, `[blue](https://github.com/grantjenks/blue)` for styling, and are in the process of adding `[mypy](https://github.com/python/mypy)` for static typing. All of these will eventually be enforced on CI. Please type hint all new code!
+- Follow all linting standards enforced by QA. We use `[ruff](https://beta.ruff.rs/docs/)` for linting and styling, and are in the process of adding `[mypy](https://github.com/python/mypy)` for static typing. All of these will eventually be enforced on CI. Please type hint all new code!
 - Prefer smaller patches. As a rough guideline, limit the lines changed to around 400. Open multiple PRs for larger changes.
 
 ### Testing
