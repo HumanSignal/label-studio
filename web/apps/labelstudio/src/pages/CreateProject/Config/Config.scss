@@ -29,6 +29,8 @@
 }
 
 .wizard .configure__container {
+  --scroll-width: 5px;
+
   display: grid;
   position: relative;
   padding: 0;
@@ -36,7 +38,7 @@
   background-color: var(--color-neutral-background);
 
   &>div {
-    padding: var(--spacing-base) 19px var(--spacing-base) 20px;
+    padding: var(--spacing-base) calc(24px - var(--scroll-width)) var(--spacing-base) 20px;
 
     &:first-child {
       height: calc(100vh - var(--header-height));
@@ -44,7 +46,7 @@
   }
 
   &::-webkit-scrollbar {
-    width: 5px;
+    width: var(--scroll-width);
   }
 
   &::-webkit-scrollbar-track {

@@ -11,7 +11,7 @@
   }
 
   grid-auto-flow: column;
-  grid-column-gap: 30px;
+  grid-column-gap: var(--grid-gap);
   margin: 0 var(--spacing-wider);
   padding: 0 var(--spacing-tight) var(--spacing-base) var(--spacing-tight);
   overflow: auto;
@@ -24,6 +24,11 @@
 
 .grid>div>h4 {
   cursor: pointer;
+}
+
+.container,
+.containerVirtualized {
+  --grid-gap: 30px;
 }
 
 .container {
@@ -66,7 +71,7 @@
 .containerVirtualized>button {
   position: absolute;
   top: 0;
-  width: 30px;
+  width: var(--grid-gap);
   height: 100%;
   z-index: 10;
 
