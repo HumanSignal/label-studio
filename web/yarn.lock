@@ -9768,11 +9768,11 @@ expect@30.2.0, expect@^30.0.0:
     jest-util "30.2.0"
 
 express-rate-limit@^8.2.1:
-  version "8.2.1"
-  resolved "https://registry.yarnpkg.com/express-rate-limit/-/express-rate-limit-8.2.1.tgz#ec75fdfe280ecddd762b8da8784c61bae47d7f7f"
-  integrity sha512-PCZEIEIxqwhzw4KF0n7QF4QqruVTcF73O5kFKUnGOyjbCCgizBBiFaYpd/fnBLUMPw/BWw9OsiN7GgrNYr7j6g==
+  version "8.3.0"
+  resolved "https://registry.yarnpkg.com/express-rate-limit/-/express-rate-limit-8.3.0.tgz#0ed00d3af24bcf74930d884a78595a96b0a9838c"
+  integrity sha512-KJzBawY6fB9FiZGdE/0aftepZ91YlaGIrV8vgblRM3J8X+dHx/aiowJWwkx6LIGyuqGiANsjSwwrbb8mifOJ4Q==
   dependencies:
-    ip-address "10.0.1"
+    ip-address "10.1.0"
 
 express@^4.21.2, express@^4.22.1:
   version "4.22.1"
@@ -11386,10 +11386,10 @@ invariant@^2.2.2:
   dependencies:
     loose-envify "^1.0.0"
 
-ip-address@10.0.1:
-  version "10.0.1"
-  resolved "https://registry.yarnpkg.com/ip-address/-/ip-address-10.0.1.tgz#a8180b783ce7788777d796286d61bce4276818ed"
-  integrity sha512-NWv9YLW4PoW2B7xtzaS3NCot75m6nK7Icdv0o3lfMceJVRfSoQwqD4wEH5rLwoKJwUiZ/rfpiVBhnaF0FK4HoA==
+ip-address@10.1.0:
+  version "10.1.0"
+  resolved "https://registry.yarnpkg.com/ip-address/-/ip-address-10.1.0.tgz#d8dcffb34d0e02eb241427444a6e23f5b0595aa4"
+  integrity sha512-XXADHxXmvT9+CRxhXg56LJovE+bmWnEWB78LB83VZTprKTmaC5QfruXocxzTZ2Kl0DNwKuBdlIhjL8LeY8Sf8Q==
 
 ipaddr.js@1.9.1:
   version "1.9.1"
