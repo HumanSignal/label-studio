@@ -1,5 +1,5 @@
-"""This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
-"""
+"""This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license."""
+
 import logging
 import os
 import uuid
@@ -428,17 +428,21 @@ def _old_vs_new_data_keys_inconsistency_message(new_data_keys, old_data_keys, cu
         return ''
     elif new_data_keys_list == settings.DATA_UNDEFINED_NAME:
         return (
-            common_prefix + 'uploading a single file {0} '
-            'clashes with data key(s) found from other files:\n"{1}"'.format(current_file, old_data_keys_list)
+            common_prefix
+            + 'uploading a single file {0} ' 'clashes with data key(s) found from other files:\n"{1}"'.format(
+                current_file, old_data_keys_list
+            )
         )
     elif old_data_keys_list == settings.DATA_UNDEFINED_NAME:
         return (
-            common_prefix + 'uploading tabular data from {0} with data key(s) {1}, '
+            common_prefix
+            + 'uploading tabular data from {0} with data key(s) {1}, '
             'clashes with other raw binary files (images, audios, etc.)'.format(current_file, new_data_keys_list)
         )
     else:
         return (
-            common_prefix + 'uploading tabular data from "{0}" with data key(s) "{1}", '
+            common_prefix
+            + 'uploading tabular data from "{0}" with data key(s) "{1}", '
             'clashes with data key(s) found from other files:\n"{2}"'.format(
                 current_file, new_data_keys_list, old_data_keys_list
             )

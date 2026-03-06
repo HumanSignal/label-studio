@@ -89,8 +89,36 @@ uwsgi = ['pyuwsgi (==2.0.28.post1)', 'uwsgitop (==0.12)']
 # Assume Python 3.10 at a minimum
 target-version = "py310"
 
-# Same as Blue.
 line-length = 119
+
+# Exclude a variety of commonly ignored directories.
+exclude = [
+    ".bzr",
+    ".direnv",
+    ".eggs",
+    ".git",
+    ".github",
+    ".git-rewrite",
+    ".hg",
+    ".mypy_cache",
+    ".nox",
+    ".pants.d",
+    ".pytype",
+    ".ruff_cache",
+    ".svn",
+    ".tox",
+    ".venv",
+    "__pypackages__",
+    "__pycache__",
+    "_build",
+    "buck-out",
+    "build",
+    "dist",
+    "node_modules",
+    "venv",
+    "**/migrations/*.py",
+    "scripts",
+]
 
 [tool.ruff.lint]
 # Enable the pycodestyle (`E`) and Pyflakes (`F`) rules by default.
@@ -109,37 +137,9 @@ ignore = [
     "E402", # ignores: Module level import not at top of file.  (isort takes care of this and if not, there is usually a good reason)
 ]
 
-
-
 # Allow autofix for all enabled rules (when `--fix`) is provided.
 fixable = ["ALL"]
 unfixable = []
-
-# Exclude a variety of commonly ignored directories.
-exclude = [
-    ".bzr",
-    ".direnv",
-    ".eggs",
-    ".git",
-    ".git-rewrite",
-    ".hg",
-    ".mypy_cache",
-    ".nox",
-    ".pants.d",
-    ".pytype",
-    ".ruff_cache",
-    ".svn",
-    ".tox",
-    ".venv",
-    "__pypackages__",
-    "_build",
-    "buck-out",
-    "build",
-    "dist",
-    "node_modules",
-    "venv",
-    "**/migrations/*.py",
-]
 
 # Allow unused variables when underscore-prefixed.
 dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
@@ -150,44 +150,8 @@ dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
 "**/settings/label_studio.py" = ["F405"]
 "test*.py" = ["F811"]
 
-
-[tool.blue]
-
-line-length = 119
-
-include = 'label_studio/.*\.py$'
-
-# Exclude a variety of commonly ignored directories, as well as all migrations files.
-force-exclude = '''
-/(
-    \.bzr
-  | \.direnv
-  | \.eggs
-  | \.git
-  | \.github
-  | \.git-rewrite
-  | \.hg
-  | \.mypy_cache
-  | \.nox
-  | \.pants.d
-  | \.pytype
-  | \.ruff_cache
-  | \.svn
-  | \.tox
-  | \.venv
-  | \.hg
-  | _build
-  | buck-out
-  | build
-  | dist
-  | node_modules
-  | migrations
-  | venv
-  | __pycache__
-)/
-'''
-
-target-version = ['py310']
+[tool.ruff.format]
+quote-style = "single"
 
 [tool.poetry]
 

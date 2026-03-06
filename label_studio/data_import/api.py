@@ -1,5 +1,5 @@
-"""This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
-"""
+"""This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license."""
+
 import json
 import logging
 import mimetypes
@@ -240,9 +240,7 @@ task_create_response_scheme = {
             ```
 
             <br>
-        """.format(
-            host=(settings.HOSTNAME or 'https://localhost:8080')
-        ),
+        """.format(host=(settings.HOSTNAME or 'https://localhost:8080')),
         request=ImportApiSerializer(many=True),
         extensions={
             'x-fern-sdk-group-name': 'projects',
@@ -373,7 +371,6 @@ class ImportAPI(generics.CreateAPIView):
 
     @timeit
     def async_import(self, request, project, preannotated_from_fields, commit_to_project, return_task_ids):
-
         project_import = ProjectImport.objects.create(
             project=project,
             preannotated_from_fields=preannotated_from_fields,
@@ -701,7 +698,6 @@ class ReImportAPI(ImportAPI):
         )
 
     def async_reimport(self, project, file_upload_ids, files_as_tasks_list, organization_id):
-
         project_reimport = ProjectReimport.objects.create(
             project=project, file_upload_ids=file_upload_ids, files_as_tasks_list=files_as_tasks_list
         )

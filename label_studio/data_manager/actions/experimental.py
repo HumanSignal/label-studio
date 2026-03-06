@@ -1,5 +1,4 @@
-"""This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
-"""
+"""This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license."""
 
 import logging
 import random
@@ -96,7 +95,6 @@ def rename_labels(project, queryset, **kwargs):
             if sub.get('from_name', None) == control_tag and old_label_name in sub.get('value', {}).get(
                 label_type, []
             ):
-
                 new_labels = []
                 for label in sub['value'][label_type]:
                     if label == old_label_name:
@@ -177,7 +175,6 @@ def add_data_field(project, queryset, **kwargs):
         add_expression(queryset, size, value, value_name)
 
     else:
-
         # sqlite
         if settings.DJANGO_DB == settings.DJANGO_DB_SQLITE:
             tasks = list(queryset.only('data'))

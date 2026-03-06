@@ -1,4 +1,5 @@
 """Tests for projects.models (Project model and related logic)."""
+
 from django.test import TestCase
 from projects.tests.factories import ProjectFactory
 from tasks.models import Task

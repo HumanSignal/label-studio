@@ -1,5 +1,5 @@
-"""This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
-"""
+"""This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license."""
+
 import logging
 from typing import Dict, List
 
@@ -427,7 +427,6 @@ class MLBackend(models.Model):
 
 
 class MLBackendPredictionJob(models.Model):
-
     job_id = models.CharField(max_length=128)
     ml_backend = models.ForeignKey(MLBackend, related_name='prediction_jobs', on_delete=models.CASCADE)
     model_version = models.TextField(
@@ -442,7 +441,6 @@ class MLBackendPredictionJob(models.Model):
 
 
 class MLBackendTrainJob(models.Model):
-
     job_id = models.CharField(max_length=128)
     ml_backend = models.ForeignKey(MLBackend, related_name='train_jobs', on_delete=models.CASCADE)
     model_version = models.TextField(

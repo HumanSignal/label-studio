@@ -1,5 +1,5 @@
-"""This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
-"""
+"""This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license."""
+
 import json
 
 import pytest
@@ -45,7 +45,6 @@ from tests.utils import make_annotation, make_annotator, make_prediction, make_t
 )
 @pytest.mark.django_db
 def test_views_ordering(ordering, element_index, undefined, business_client, project_id):
-
     payload = dict(
         project=project_id,
         data={'test': 1, 'ordering': ordering},

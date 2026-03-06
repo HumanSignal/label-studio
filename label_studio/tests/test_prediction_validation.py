@@ -189,7 +189,7 @@ class TestPredictionValidation:
                 'predictions': [
                     {
                         'score': 0.95,
-                        'model_version': 'v1.0'
+                        'model_version': 'v1.0',
                         # Missing 'result' field
                     }
                 ],

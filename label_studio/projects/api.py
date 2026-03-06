@@ -123,9 +123,7 @@ class ProjectFilterSet(FilterSet):
     ```bash
     curl -X GET {}/api/projects/ -H 'Authorization: Token abc123'
     ```
-    """.format(
-            settings.HOSTNAME or 'https://localhost:8080'
-        ),
+    """.format(settings.HOSTNAME or 'https://localhost:8080'),
         parameters=[
             *serializer_to_openapi_params(GetFieldsSerializer),
             *filterset_to_openapi_params(ProjectFilterSet),
@@ -153,9 +151,7 @@ class ProjectFilterSet(FilterSet):
     curl -H Content-Type:application/json -H 'Authorization: Token abc123' -X POST '{}/api/projects' \
     --data '{{"title": "My project", "label_config": "<View></View>"}}'
     ```
-    """.format(
-            settings.HOSTNAME or 'https://localhost:8080'
-        ),
+    """.format(settings.HOSTNAME or 'https://localhost:8080'),
         request=ProjectSerializer,
         extensions={
             'x-fern-sdk-group-name': 'projects',
@@ -708,9 +704,7 @@ class ProjectReimportAPI(generics.RetrieveAPIView):
             ```bash
             curl -X GET {}/api/projects/{{id}}/tasks/?page=1&page_size=10 -H 'Authorization: Token abc123'
             ```
-        """.format(
-            settings.HOSTNAME or 'https://localhost:8080'
-        ),
+        """.format(settings.HOSTNAME or 'https://localhost:8080'),
         parameters=[
             OpenApiParameter(
                 name='id',
