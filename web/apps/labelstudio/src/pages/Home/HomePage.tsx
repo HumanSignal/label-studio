@@ -139,7 +139,7 @@ export const HomePage: Page = () => {
               Welcome 👋
             </Typography>
             <Typography size="small" className="text-neutral-content-subtler">
-              Let's get you started.
+              Hot reload test: tweak text and save to see live refresh.
             </Typography>
           </div>
           <div className="flex justify-start gap-4">

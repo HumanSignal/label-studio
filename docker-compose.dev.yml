@@ -1,0 +1,39 @@
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.development
+      target: backend-dev
+      args:
+        - INCLUDE_DEV=true
+    env_file:
+      - .env
+    environment:
+      - WATCHFILES_FORCE_POLLING=true
+    command: sh -c "poetry run python label_studio/manage.py migrate && poetry run python label_studio/manage.py runserver 0.0.0.0:8080"
+    volumes:
+      - ./label_studio:/label-studio/label_studio
+      - ./deploy:/label-studio/deploy
+    ports:
+      - "8080:8080"
+
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.development
+      target: frontend-dev
+      args:
+        - INCLUDE_DEV=true
+    environment:
+      - CHOKIDAR_USEPOLLING=1
+      - WATCHPACK_POLLING=true
+      - NX_DAEMON=false
+      - FRONTEND_HMR=true
+      - FRONTEND_HOSTNAME=http://localhost:3000
+      - DJANGO_HOSTNAME=http://backend:8080
+    command: yarn dev --host 0.0.0.0 --port 3000
+    volumes:
+      - ./web:/label-studio/web
+      - /label-studio/web/node_modules
+    ports:
+      - "3000:3000"
