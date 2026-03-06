@@ -1,7 +1,7 @@
 import React from "react";
 import { observer } from "mobx-react";
 import { cn } from "../../../utils/bem";
-import { Button } from "@humansignal/ui";
+import { Button, Badge } from "@humansignal/ui";
 import { IconClose } from "@humansignal/icons";
 import { FilterDropdown } from "../FilterDropdown";
 import "./FilterLine.scss";
