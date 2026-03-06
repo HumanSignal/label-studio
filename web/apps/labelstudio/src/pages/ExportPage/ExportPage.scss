@@ -3,7 +3,7 @@
     display: grid;
     grid-auto-flow: rows;
 
-    a {
+    & a {
       color: var(--color-primary-content);
       text-decoration: underline;
       font-size: 14px;
@@ -71,7 +71,7 @@
     color: var(--color-neutral-content-subtle);
     line-height: 1.5;
 
-    a {
+    & a {
       color: var(--color-primary-content);
       text-decoration: none;
       border-bottom: 1px solid transparent;
@@ -130,7 +130,7 @@
     list-style: none;
     color: var(--color-neutral-content-subtle);
 
-    li {
+    & li {
       margin: 0 0 14px;
       padding-left: 0;
 
@@ -197,7 +197,7 @@
       border-radius: 4px 0 0 4px;
     }
 
-    code {
+    & code {
       font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
       font-size: 12px;
       color: var(--color-neutral-content-subtle);
@@ -254,7 +254,7 @@
     align-items: center;
     gap: 6px;
 
-    a {
+    & a {
       color: var(--color-primary-content);
       text-decoration: none;
       font-weight: 400;

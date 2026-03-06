@@ -30,13 +30,13 @@ body {
     margin: 32px auto;
   }
 
-  h1 {
+  & h1 {
     text-transform: uppercase;
     text-align: center;
     font-size: 20px;
   }
 
-  h2 {
+  & h2 {
     font-size: 20px;
     color: var(--color-negative-content);
   }
@@ -64,7 +64,7 @@ body {
     display: flex;
     align-items: center;
 
-    img {
+    & img {
       height: 16px;
       width: 16px;
       margin-right: 8px;

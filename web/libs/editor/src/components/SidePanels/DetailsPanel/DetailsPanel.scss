@@ -37,7 +37,7 @@
         @apply sr-only;
       }
 
-      span {
+      & span {
         color: var(--color-neutral-content-subtler);
         font-weight: normal;
       }

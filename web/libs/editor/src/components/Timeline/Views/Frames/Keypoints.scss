@@ -119,7 +119,7 @@
   background: var(--color-neutral-background);
   box-shadow: 0 1px 0 rgb(0 0 0 / 10%), 0 0 0 1px rgb(0 0 0 / 15%);
 
-  svg {
+  & svg {
     width: 18px;
     height: 18px;
   }

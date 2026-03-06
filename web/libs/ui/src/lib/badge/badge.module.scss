@@ -44,7 +44,7 @@
   .icon {
     margin-right: var(--spacing-tightest);
 
-    svg {
+    & svg {
       width: 12px;
       height: 12px;
     }
@@ -380,7 +380,7 @@
     }
     
     .icon {
-      path {
+      & path {
         fill: var(--color-neutral-on-dark-content);
       }
     }
@@ -449,7 +449,7 @@
   align-items: center;
   flex-shrink: 0;
 
-  svg {
+  & svg {
     width: 14px;
     height: 14px;
   }

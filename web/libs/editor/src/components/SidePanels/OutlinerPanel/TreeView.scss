@@ -68,7 +68,7 @@
     justify-content: center;
     color: var(--icon-color);
 
-    svg {
+    & svg {
       width: 24px;
       height: 24px;
     }
@@ -178,7 +178,7 @@
     margin-left: 5px;
     align-items: center;
 
-    svg {
+    & svg {
       width: 20px;
       height: 17px;
       fill: var(--incomplete-warning-color, #FA8C16);

@@ -43,7 +43,7 @@
 
       --icon-color: var(--color-neutral-icon);
 
-      svg {
+      & svg {
         transform: rotate(180deg);
       }
     }
@@ -176,7 +176,7 @@
       }
     }
 
-    svg {
+    & svg {
       display: block;
       height: 12px;
     }

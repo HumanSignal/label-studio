@@ -30,7 +30,7 @@
   flex-wrap: wrap;
   min-height: 28px; // 24px button + 4px margin
 
-  div {
+  & div {
     margin: 0 2px 4px 0;
     background: hsl(0deg 0% 95%);
     padding: 0; // all the right space should be a clickable button, so no padding
@@ -38,12 +38,12 @@
     display: flex;
     align-items: center;
 
-    span {
+    & span {
       padding-inline: 8px;
     }
   }
 
-  input[type="button"] {
+  & input[type="button"] {
     border: none;
     background: none;
     cursor: pointer;
@@ -71,7 +71,7 @@
   border: 1px solid var(--color-neutral-border);
   box-shadow: 0 4px 10px rgb(0 0 0 / 12%);
 
-  input[type="checkbox"] {
+  & input[type="checkbox"] {
     margin-right: 4px;
     font-size: 20px;
     line-height: 30px;
@@ -159,7 +159,7 @@
   pointer-events: all;
   font-family: var(--font-mono);
 
-  svg {
+  & svg {
     transition: transform 0.1s; // visible rotation of arrow
   }
 

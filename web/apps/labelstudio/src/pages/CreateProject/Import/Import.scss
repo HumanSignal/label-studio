@@ -46,7 +46,7 @@
     gap: var(--spacing-tight);
   }
 
-  button {
+  & button {
     line-height: 1em;
   }
 
@@ -65,7 +65,7 @@
   &__url-form {
     display: flex;
 
-    input {
+    & input {
       border: 1px solid var(--color-neutral-border);
       background: var(--color-neutral-background);
       color: var(--color-neutral-content);
@@ -83,7 +83,7 @@
       }
     }
 
-    button {
+    & button {
       margin-left: -1px;
       border-radius: 0 var(--corner-radius-smaller) var(--corner-radius-smaller) 0;
     }
@@ -110,23 +110,23 @@
     background-attachment: local, scroll;
   }
 
-  table {
+  & table {
     table-layout: fixed;
     
-    tr {
+    & tr {
       border-bottom: 2px solid var(--color-neutral-background);
       background-color: transparent;
 
-      td:nth-child(2) {
+      & td:nth-child(2) {
         width: 136px;
       }
     }
 
-    tr:nth-child(odd) {
+    & tr:nth-child(odd) {
       background: var(--color-neutral-emphasis-subtle);
     }
 
-    td {
+    & td {
       padding: var(--spacing-tight) var(--spacing-tight);
     }
   }
@@ -213,7 +213,7 @@
       border-radius: 8px;
     }
 
-    label {
+    & label {
       margin-left: 8px;
       cursor: pointer;
     }
@@ -238,7 +238,7 @@
   position: relative;
   display: flex;
 
-  a {
+  & a {
     color: var(--color-primary-content);
 
     &:hover {
@@ -281,7 +281,7 @@
     color: var(--color-primary-icon);
   }
 
-  label {
+  & label {
     display: flex;
     justify-content: center;
   }
@@ -303,30 +303,30 @@
       margin-top: 32px;
     }
 
-    header {
+    & header {
       font-size: 24px;
       line-height: 32px;
       text-align: center;
       color: var(--color-neutral-content);
     }
 
-    dl {
+    & dl {
       display: grid;
       grid-template: auto / auto auto;
       font-size: 14px;
       line-height: 24px;
       gap: 0 30px;
 
-      dt {
+      & dt {
         color: var(--color-neutral-content);
       }
 
-      dd {
+      & dd {
         font-weight: normal;
       }
 
       dt:last-of-type,
-      dd:last-of-type {
+      & dd:last-of-type {
         margin-top: 20px;
       }
     }

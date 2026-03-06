@@ -48,15 +48,15 @@
   }
 
   &__hotkeys-button {
-      button {
-        svg {
+      & button {
+        & svg {
           width: 20px;
           height: 20px;
           color: var(--color-neutral-content-subtler);
         }
 
         &:hover {
-          svg {
+          & svg {
             color: var(--color-neutral-icon);
           }
         }

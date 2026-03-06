@@ -14,6 +14,7 @@ import {
   useMemo,
   useRef,
   useState,
+  memo,
 } from "react";
 import Registry from "../../../core/Registry";
 import { PER_REGION_MODES } from "../../../mixins/PerRegionModes";
@@ -198,6 +199,11 @@ const OutlinerInnerTreeComponent: FC<OutlinerInnerTreeProps> = observer(({ regio
   );
 });
 
+const titleRenderer = (nodeData: any) => {
+  const { key: _key, ...data } = nodeData;
+  return <MemoizedRootTitle {...data} />;
+};
+
 const useDataTree = ({ regions, rootClass, footer }: any) => {
   const processor = useCallback((item: any, idx, _false, _null, _onClick) => {
     const { id, type, hidden, locked } = item ?? {};
@@ -221,7 +227,7 @@ const useDataTree = ({ regions, rootClass, footer }: any) => {
         "--selection-color": color.alpha(0.1).css(),
       },
       className: rootClass.elem("node").mod(mods).toClassName(),
-      title: ({ key: _key, ...data }: any) => <RootTitle {...data} />,
+      title: titleRenderer,
       locked,
     };
   }, []);
@@ -276,15 +282,26 @@ const useEventHandlers = () => {
 
   // see onScroll for explanation
   const highlightedRef = useRef<any>();
+  const hoverTimeoutRef = useRef<number>();
+
   const onMouseEnter = useCallback(({ node }: any) => {
-    if (highlightedRef.current) {
-      highlightedRef.current?.setHighlight(false);
+    if (hoverTimeoutRef.current) {
+      window.clearTimeout(hoverTimeoutRef.current);
     }
-    node.item?.setHighlight(true);
-    highlightedRef.current = node.item;
+
+    hoverTimeoutRef.current = window.setTimeout(() => {
+      if (highlightedRef.current) {
+        highlightedRef.current?.setHighlight(false);
+      }
+      node.item?.setHighlight(true);
+      highlightedRef.current = node.item;
+    }, 50);
   }, []);
 
   const onMouseLeave = useCallback(({ node }: any) => {
+    if (hoverTimeoutRef.current) {
+      window.clearTimeout(hoverTimeoutRef.current);
+    }
     node?.item?.setHighlight(false);
     if (highlightedRef.current !== node?.item) {
       highlightedRef.current?.setHighlight(false);
@@ -456,6 +473,17 @@ const RootTitle: FC<any> = observer(
     );
   },
 );
+
+const MemoizedRootTitle = memo(RootTitle, (prevProps, nextProps) => {
+  if (prevProps.item !== nextProps.item) return false;
+  if (prevProps.item?.highlighted !== nextProps.item?.highlighted) return false;
+  if (prevProps.item?.hidden !== nextProps.item?.hidden) return false;
+  if (prevProps.selected !== nextProps.selected) return false;
+  if (prevProps.idx !== nextProps.idx) return false;
+  if (prevProps.isArea !== nextProps.isArea) return false;
+  if (prevProps.isGroup !== nextProps.isGroup) return false;
+  return true;
+});
 
 interface RegionControlsProps {
   item: any;

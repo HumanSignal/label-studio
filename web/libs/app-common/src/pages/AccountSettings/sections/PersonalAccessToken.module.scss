@@ -9,7 +9,7 @@
 .label {
   @apply mb-[8px];
 
-  span {
+  & span {
     @apply p-0;
   }
 }

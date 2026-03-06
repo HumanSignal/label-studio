@@ -1,14 +1,20 @@
 import React from "react";
 import { observer } from "mobx-react";
 import { cn } from "../../../utils/bem";
-import { Button, Badge, EnterpriseBadge } from "@humansignal/ui";
+import { Button } from "@humansignal/ui";
 import { IconClose } from "@humansignal/icons";
 import { FilterDropdown } from "../FilterDropdown";
 import "./FilterLine.scss";
 import { FilterOperation } from "./FilterOperation";
 import { Icon } from "../../Common/Icon/Icon";
+import {
+  ColumnPicker,
+  ColumnPickerOptionContent,
+  RECENT_COLUMN_PREFIX,
+  getFilterGroupTitle,
+} from "../../Common/ColumnPicker";
 import { filterFieldSearchHandler, findSelectedOption } from "../filter-helpers";
-import { RECENT_VALUE_PREFIX } from "../useRecentFilters";
+import { RECENT_VALUE_PREFIX } from "../../../hooks/useRecentFilters";
 
 const RECENTS_AUTOSAVE_DELAY_MS = 500;
 
@@ -23,6 +29,57 @@ const Conjunction = observer(({ index, view }) => {
       value={view.conjunction}
       style={{ textAlign: "right" }}
       onChange={(value) => view.setConjunction(value)}
+    />
+  );
+});
+
+/**
+ * Column picker for a single filter row (main layout).
+ * Uses core Select with groupBy, optionRenderer, and badge shown in the closed trigger.
+ * Receives `pickerFilters` — the plain flat currentView.availableFilters list — so that
+ * filtersToPickerGroups always gets {id, field, ...} objects, not the recents-grouped
+ * structure that `availableFilters` (fields) uses for FilterDropdown.
+ */
+const FilterColumnPicker = observer(({ filter, pickerFilters, recentEntries, onSaveOnSwitch, onSaveInPlace }) => {
+  const handleChange = (id) => {
+    const departingId = filter.filter.id;
+    const departingOperator = filter.operator;
+    const departingValue = filter.value;
+    // Only persist the departing filter if it's fully valid — prevents leaking
+    // default/auto-assigned fields that the user never intentionally configured.
+    const departingIsValid = filter.isValidFilter;
+
+    if (id?.startsWith(RECENT_COLUMN_PREFIX)) {
+      const realId = id.slice(RECENT_COLUMN_PREFIX.length);
+      const entry = recentEntries?.find((e) => e.id === realId);
+      if (departingIsValid) onSaveInPlace?.(departingId, departingOperator, departingValue);
+      filter.setFilterFromRecent(realId, entry?.operator ?? null, entry?.value ?? null);
+    } else {
+      if (departingIsValid) onSaveOnSwitch?.(departingId, departingOperator, departingValue);
+      filter.setFilterDelayed(id);
+    }
+  };
+
+  return (
+    <ColumnPicker
+      availableFilters={pickerFilters}
+      recentEntries={recentEntries}
+      value={filter.filter.id ?? null}
+      onChange={handleChange}
+      placeholder={filter.field?.title || "Column"}
+      size="small"
+      disabled={filter.field.disabled}
+      triggerProps={{
+        style: { minWidth: 80 },
+      }}
+      renderSelected={(selectedOptions, placeholder) => {
+        const opt = selectedOptions?.[0];
+        if (!opt) return <span>{placeholder}</span>;
+        const field = filter.field;
+        const rawGroup = field ? getFilterGroupTitle(field) : null;
+        const groupTitle = rawGroup ? rawGroup.charAt(0).toUpperCase() + rawGroup.slice(1) : undefined;
+        return <ColumnPickerOptionContent option={{ ...opt, groupTitle }} />;
+      }}
     />
   );
 });
@@ -107,17 +164,26 @@ function handleColumnChange(filter, availableFilters, selectedValue, onSaveOnSwi
  *    via setFilterFromRecent; save departing column in-place (no reorder).
  *  - Non-recent item -> save departing column to front of recents (reorder);
  *    apply new column with smart operator/value carry-over via setFilterDelayed.
+ *
+ * Main layout uses ColumnPicker (with badge-in-trigger support).
+ * Sidebar layout uses FilterDropdown (with recents + custom option renderer).
  */
 export const FilterLine = observer(
-  ({ filter, availableFilters, index, view, sidebar, dropdownClassName, onSaveOnSwitch, onSaveInPlace }) => {
+  ({
+    filter,
+    availableFilters,
+    pickerFilters,
+    recentEntries,
+    index,
+    view,
+    sidebar,
+    dropdownClassName,
+    onSaveOnSwitch,
+    onSaveInPlace,
+  }) => {
     const childFilter = filter.child_filter;
 
     // Debounced auto-save: persist current filter state to recents after it settles.
-    // Uses saveOnSwitch (adds to front) so the filter appears in recents even when
-    // the list is already full. saveInPlace would silently drop new entries when
-    // the list has 3 items because it appends to the end, which gets sliced off.
-    // The 500ms delay ensures MobX state transitions have fully committed,
-    // avoiding the race condition that an immediate useEffect would cause.
     const saveTimerRef = React.useRef(null);
     const filterId = filter.filter?.id;
     const filterOperator = filter.operator;
@@ -197,7 +263,7 @@ export const FilterLine = observer(
                 <span style={{ fontSize: 12, paddingRight: 5 }}>and</span>
               </div>
 
-              {/* Field */}
+              {/* Field — disabled, just shows the linked column name */}
               <div className={cn("filterLine").elem("column").mix("field child-field").toClassName()}>
                 <FilterDropdown
                   placeholder={childFilter.field.title}
@@ -248,19 +314,12 @@ export const FilterLine = observer(
         </div>
 
         <div className={cn("filterLine").elem("column").mix("field").toClassName()}>
-          <FilterDropdown
-            placeholder="Column"
-            defaultValue={filter.filter.id}
-            items={availableFilters}
-            width={80}
-            dropdownWidth={170}
-            dropdownClassName={dropdownClassName}
-            searchFilter={filterFieldSearchHandler}
-            onChange={(selectedValue) =>
-              handleColumnChange(filter, availableFilters, selectedValue, onSaveOnSwitch, onSaveInPlace)
-            }
-            optionRender={filterFieldOptionRender}
-            disabled={filter.field.disabled}
+          <FilterColumnPicker
+            filter={filter}
+            pickerFilters={pickerFilters ?? availableFilters}
+            recentEntries={recentEntries}
+            onSaveOnSwitch={onSaveOnSwitch}
+            onSaveInPlace={onSaveInPlace}
           />
         </div>
 

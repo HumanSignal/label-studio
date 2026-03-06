@@ -28,7 +28,7 @@
     &_active {
       color: var(--canteloupe_400);
 
-      path {
+      & path {
         fill-opacity: 1;
         stroke-opacity: 1;
       }

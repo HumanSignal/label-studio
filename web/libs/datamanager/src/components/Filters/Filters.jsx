@@ -1,10 +1,10 @@
-import { inject } from "mobx-react";
 import React from "react";
+import { inject } from "mobx-react";
 import { cn } from "../../utils/bem";
 import { Button } from "@humansignal/ui";
 import { FilterLine } from "./FilterLine/FilterLine";
 import { IconChevronRight, IconPlus, IconCopyOutline, IconClipboardCheck, IconUndo } from "@humansignal/icons";
-import { useRecentFilters } from "./useRecentFilters";
+import { useRecentFilters } from "../../hooks/useRecentFilters";
 import "./Filters.scss";
 
 const injector = inject(({ store }) => ({
@@ -17,7 +17,10 @@ const injector = inject(({ store }) => ({
 
 export const Filters = injector(({ store, views, currentView, filters, projectId }) => {
   const { sidebarEnabled } = views;
-  const { fields, saveOnSwitch, saveInPlace } = useRecentFilters(projectId, currentView.availableFilters);
+  const { fields, recentEntries, saveOnSwitch, saveInPlace } = useRecentFilters(
+    projectId,
+    currentView.availableFilters,
+  );
   const [copyFeedback, setCopyFeedback] = React.useState(false);
   const [pasteFeedback, setPasteFeedback] = React.useState(false);
   const [prePasteSnapshot, setPrePasteSnapshot] = React.useState(null);
@@ -94,6 +97,8 @@ export const Filters = injector(({ store, views, currentView, filters, projectId
               value={filter.currentValue}
               key={`${filter.filter.id}-${i}`}
               availableFilters={fields}
+              pickerFilters={currentView.availableFilters}
+              recentEntries={recentEntries}
               dropdownClassName={cn("filters").elem("selector").toClassName()}
               onSaveOnSwitch={saveOnSwitch}
               onSaveInPlace={saveInPlace}

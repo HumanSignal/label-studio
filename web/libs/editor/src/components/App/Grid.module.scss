@@ -81,7 +81,7 @@ $gap: 30px;
     justify-content: center;
   }
 
-  svg {
+  & svg {
     width: 16px;
     height: 16px;
   }
@@ -104,7 +104,7 @@ $gap: 30px;
 .grid>div:global(.hover) {
   background: var(--color-primary-emphasis-subtle);
 
-  h4 {
+  & h4 {
     color: var(--primary_link);
   }
 }

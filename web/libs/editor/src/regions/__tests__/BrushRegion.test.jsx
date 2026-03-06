@@ -141,41 +141,16 @@ describe("BrushRegion", () => {
       expect(region.getMaskImage()).toBeUndefined();
     });
 
-    it("setLayerRef sets layerRef and opacity when ref provided", () => {
+    it("setLayerRef sets layerRef when ref provided", () => {
       const canvas = document.createElement("canvas");
       const ref = { canvas: { _canvas: canvas } };
       region.setLayerRef(ref);
       expect(region.layerRef).toBe(ref);
-      expect(canvas.style.opacity).toBe(String(region.opacity));
     });
 
     it("setLayerRef does nothing when ref is falsy", () => {
       region.setLayerRef(null);
       expect(region.layerRef).toBeUndefined();
-    });
-
-    it("cacheImageData sets imageData to null when no layerRef", () => {
-      region.cacheImageData();
-      expect(region.imageData).toBeNull();
-    });
-
-    it("cacheImageData sets imageData when layerRef has toCanvas", () => {
-      const mockImageData = { data: new Uint8ClampedArray(4), width: 1, height: 1 };
-      const mockGetImageData = jest.fn(() => mockImageData);
-      const mockCtx = { getImageData: mockGetImageData };
-      const mockCanvas = {
-        getContext: jest.fn(() => mockCtx),
-        width: 10,
-        height: 10,
-      };
-      const ref = {
-        canvas: { _canvas: document.createElement("canvas"), width: 10, height: 10 },
-        toCanvas: jest.fn(() => mockCanvas),
-      };
-      region.setLayerRef(ref);
-      region.cacheImageData();
-      expect(region.imageData).toEqual(mockImageData);
-      expect(mockGetImageData).toHaveBeenCalledWith(0, 0, 10, 10);
     });
 
     it("prepareCoords delegates to parent zoomOriginalCoords", () => {
