@@ -1101,6 +1101,7 @@ const Model = types
 
     emitSeekSync() {
       if (!isAlive(self)) return;
+      if (!self.syncManager) return; // Wait until initialized
       if (self.suppressSync) return;
 
       const centerTime = self.centerTime; // centerTime is in NATIVE units (ms if isDate, else seconds/indices)
