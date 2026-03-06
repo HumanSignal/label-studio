@@ -6,11 +6,11 @@
   background: var(--color-primary-surface-content);
   border-radius: 5px;
 
-  a {
+  & a {
     display: flex;
   }
 
-  a:visited {
+  & a:visited {
     color: var(--primary_link);
   }
 
@@ -19,7 +19,7 @@
     padding-top: 1px;
     color: var(--primary_link);
 
-    img {
+    & img {
       width: 20px;
       height: 20px;
       margin: 0 auto;

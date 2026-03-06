@@ -57,8 +57,8 @@ export const splitRegions = (regions) => {
   };
 };
 
-const Region = memo(({ region, showSelected = false }) => {
-  return useObserver(() => Tree.renderItem(region, region.annotation, true));
+const Region = observer(({ region, showSelected = false }) => {
+  return Tree.renderItem(region, region.annotation, true);
 });
 
 const RegionsLayer = memo(({ regions, name, useLayers, showSelected = false, smoothing = true }) => {
@@ -100,8 +100,7 @@ const DrawingRegion = observer(({ item }) => {
   if (!drawingRegion) return null;
   if (item.multiImage && item.currentImage !== drawingRegion.item_index) return null;
 
-  const isBrush = drawingRegion.type === "brushregion";
-  const Wrapper = drawingRegion && isBrush ? Fragment : Layer;
+  const Wrapper = Layer;
 
   return (
     <Wrapper imageSmoothingEnabled={item.smoothingEnabled}>
@@ -280,7 +279,7 @@ const SelectedRegions = observer(({ item, selectedRegions }) => {
     <>
       {isFF(FF_LSDV_4930) ? null : <TransformerBack item={item} />}
       {brushRegions.length > 0 && (
-        <Regions key="brushes" name="brushes" regions={brushRegions} useLayers={false} showSelected chankSize={0} />
+        <Regions key="brushes" name="brushes" regions={brushRegions} useLayers={true} showSelected chankSize={0} />
       )}
 
       {shapeRegions.length > 0 && (
@@ -987,6 +986,8 @@ export default observer(
     componentWillUnmount() {
       this.detachObserver();
       window.removeEventListener("resize", this.onResize);
+      window.removeEventListener("mousemove", this.handleGlobalMouseMove);
+      window.removeEventListener("mouseup", this.handleGlobalMouseUp);
 
       hotkeys.removeDescription("shift");
     }
@@ -1422,7 +1423,7 @@ const StageContent = observer(({ item, store, state, crosshairRef }) => {
       {isFF(FF_LSDV_4930) ? <TransformerBack item={item} /> : null}
 
       {renderableRegions.map(([groupName, list]) => {
-        const useLayers = groupName.match(/brush/i) === null;
+        const useLayers = true;
         const isSuggestion = groupName.match("suggested") !== null;
 
         return list.length > 0 ? (

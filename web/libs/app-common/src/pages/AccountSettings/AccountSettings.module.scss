@@ -9,7 +9,7 @@
     gap: var(--spacing-wide);
     max-width: 660px;
 
-    h1 {
+    & h1 {
       font-size: var(--font-size-header, 28px);
       margin: 0;
     }

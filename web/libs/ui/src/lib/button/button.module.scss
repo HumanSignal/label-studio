@@ -479,21 +479,21 @@
   &.button-group-collapsed {
     @apply gap-0;
 
-  button:not(:first-child) {
+  & button:not(:first-child) {
     border-left: none;
   }
 
-    button:first-child:not(:only-child) {
+    & button:first-child:not(:only-child) {
       border-top-right-radius: 0;
       border-bottom-right-radius: 0;
     }
 
-    button:last-child:not(:only-child) {
+    & button:last-child:not(:only-child) {
       border-top-left-radius: 0;
       border-bottom-left-radius: 0;
     }
 
-    button:not(:first-child, :last-child) {
+    & button:not(:first-child, :last-child) {
       border-radius: 0;
     }
   }

@@ -16,7 +16,7 @@
     line-height: 140%;
     white-space: pre-line;  // enable \n support in description texts
 
-    a {
+    & a {
       color: var(--color-primary-content);
       text-decoration: underline;
 
@@ -35,7 +35,7 @@
     white-space: pre-line;  // enable \n support in footer texts
     margin-top: var(--spacing-tightest);
 
-    a {
+    & a {
       color: var(--color-primary-content);
       text-decoration: underline;
 
@@ -67,7 +67,7 @@
     color: var(--color-primary-content);
     margin-left: 4px;
 
-    svg {
+    & svg {
       height: 100%;
       width: 100%;
       fill: var(--color-neutral-icon);
@@ -171,7 +171,7 @@
   }
 
   &_placement_right.label-ls_withDescription &__field {
-    input[type="radio"] {
+    & input[type="radio"] {
       margin: 4px 0 0;
     }
   }

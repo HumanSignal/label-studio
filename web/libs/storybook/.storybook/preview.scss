@@ -39,27 +39,27 @@ body {
   .docblock-argstable {
     color: var(--color-neutral-content) !important;
 
-    thead,
-    tbody,
-    tr,
-    th,
-    td {
+    & thead,
+    & tbody,
+    & tr,
+    & th,
+    & td {
       color: var(--color-neutral-content) !important;
       background-color: var(--color-neutral-background) !important;
       border-color: var(--color-neutral-border) !important;
     }
 
     // Table header styling
-    th {
+    & th {
       color: var(--color-neutral-content-subtle) !important;
     }
 
     // Property names and descriptions
-    td {
+    & td {
 
-      span,
-      p,
-      div {
+      & span,
+      & p,
+      & div {
         color: var(--color-neutral-content) !important;
       }
     }
@@ -69,18 +69,18 @@ body {
   .sbdocs-content {
     color: var(--color-neutral-content) !important;
 
-    p,
-    span,
-    div,
-    li,
-    code {
+    & p,
+    & span,
+    & div,
+    & li,
+    & code {
       color: inherit !important;
     }
   }
 
   // Code blocks - ensure text is readable on dark backgrounds
-  code,
-  pre {
+  & code,
+  & pre {
     background-color: var(--color-neutral-surface) !important;
     color: var(--color-neutral-content) !important;
   }
@@ -166,10 +166,10 @@ body {
     background-color: var(--color-neutral-surface) !important;
     border-color: var(--color-neutral-border) !important;
 
-    button {
+    & button {
       color: var(--color-neutral-content) !important;
 
-      svg {
+      & svg {
         fill: currentColor !important;
       }
     }

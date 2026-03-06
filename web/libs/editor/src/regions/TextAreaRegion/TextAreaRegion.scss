@@ -40,7 +40,7 @@
   gap: var(--spacing-tight);
 
   // fix antd styles to resize textarea container and fix paddings
-  div[class~="ant-typography-edit-content"] {
+  & div[class~="ant-typography-edit-content"] {
     flex-grow: 1;
     left: -1px;
     padding: 0;
@@ -49,7 +49,7 @@
     background-color: var(--color-neutral-surface);
     border-color: var(--color-neutral-border);
 
-    textarea {
+    & textarea {
       // the same as in .mark, its padding set to 0
       padding: var(--spacing-tight) var(--spacing-base);
     }

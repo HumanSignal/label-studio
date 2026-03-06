@@ -110,7 +110,7 @@
 [data-color-scheme="dark"] {
   --shadow-intensity: 2;
 
-  input[type="date"] {
+  & input[type="date"] {
     color-scheme: dark;
   }
 }

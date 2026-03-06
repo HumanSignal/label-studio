@@ -177,17 +177,13 @@ export class LabelStudio {
          */
         this.store.selfDestroy();
       }
+
+      window.Htx = null;
       destroy(this.store);
       Hotkey.unbindAll();
-      if (isFF(FF_LSDV_4620_3_ML)) {
-        /*
-            ...
-            as well as nulling all these this.store
-         */
-        this.store = null;
-        this.destroy = null;
-        LabelStudio.instances.delete(this);
-      }
+      this.store = null;
+      this.destroy = null;
+      LabelStudio.instances.delete(this);
     };
   }
 

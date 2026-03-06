@@ -25,7 +25,7 @@ import "../../tags/Custom";
  * Utils and common components
  */
 import { Space } from "../../common/Space/Space";
-import { Button } from "@humansignal/ui";
+import { Button, EmptyState, IconCheck } from "@humansignal/ui";
 import { isStarterCloudPlan } from "@humansignal/core";
 import { cn } from "../../utils/bem";
 import { FF_BULK_ANNOTATION, FF_LSDV_4620_3_ML, FF_SIMPLE_INIT, isFF } from "../../utils/feature-flags";
@@ -81,22 +81,35 @@ class App extends Component {
   }
 
   renderSuccess() {
+    const messages = getEnv(this.props.store).messages;
     return (
       <div className={cn("editor").toClassName()}>
-        <Result status="success" title={getEnv(this.props.store).messages.DONE} />
+        <EmptyState
+          variant="positive"
+          icon={<IconCheck />}
+          title={messages.DONE}
+          description="Your annotation has been submitted."
+        />
       </div>
     );
   }
 
   renderNoAnnotation() {
+    const messages = getEnv(this.props.store).messages;
     return (
       <div className={cn("editor").toClassName()}>
-        <Result status="success" title={getEnv(this.props.store).messages.NO_COMP_LEFT} />
+        <EmptyState
+          variant="positive"
+          icon={<IconCheck />}
+          title={messages.NO_COMP_LEFT}
+          description="You've viewed all annotations for this task."
+        />
       </div>
     );
   }
 
   renderNothingToLabel(store) {
+    const messages = getEnv(this.props.store).messages;
     return (
       <div
         className={cn("editor").toClassName()}
@@ -108,18 +121,25 @@ class App extends Component {
           paddingBottom: "30vh",
         }}
       >
-        <Result status="success" title={getEnv(this.props.store).messages.NO_NEXT_TASK} />
-        <div className={cn("sub__result").toClassName()}>All tasks in the queue have been completed</div>
-        {store.taskHistory.length > 0 && (
-          <Button
-            onClick={(e) => store.prevTask(e, true)}
-            variant="neutral"
-            className="mx-0 my-4"
-            aria-label="Previous task"
-          >
-            Go to Previous Task
-          </Button>
-        )}
+        <EmptyState
+          variant="positive"
+          icon={<IconCheck />}
+          title={messages.NO_NEXT_TASK}
+          description="All tasks in the queue have been completed"
+          actions={
+            store.taskHistory.length > 0 ? (
+              <Button
+                onClick={(e) => store.prevTask(e, true)}
+                variant="primary"
+                aria-label="Previous task"
+                data-testid="editor-empty-queue-previous-task"
+              >
+                Go to Previous Task
+              </Button>
+            ) : undefined
+          }
+          data-testid="editor-empty-queue"
+        />
       </div>
     );
   }
@@ -132,7 +152,7 @@ class App extends Component {
     );
   }
 
-  renderConfigValidationException(store) {
+  renderConfigValidationException(_store) {
     return (
       <div className={cn("main-view").toClassName()}>
         <div className={cn("main-view").elem("annotation").toClassName()}>

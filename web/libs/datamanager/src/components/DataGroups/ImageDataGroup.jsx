@@ -16,7 +16,7 @@ export const ImageDataGroup = (column) => {
 
   return original.total_annotations === 0 || !root.showPreviews ? (
     <div className={cn("grid-image-wrapper").toClassName()}>
-      <img src={value} width="auto" style={{ height: imageHeight }} alt="" />
+      <img src={value} width="auto" style={{ height: imageHeight }} alt="" loading="lazy" />
     </div>
   ) : (
     <AnnotationPreview

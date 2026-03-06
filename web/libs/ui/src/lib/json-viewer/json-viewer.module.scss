@@ -104,7 +104,7 @@
     color: var(--color-primary-content-hover);
   }
 
-  svg {
+  & svg {
     width: 20px;
     height: 20px;
   }
@@ -147,7 +147,7 @@
   gap: var(--spacing-tighter);
   align-items: center;
 
-  button {
+  & button {
     border-radius: var(--corner-radius-large);
     min-width: 48px;
   }
@@ -297,7 +297,7 @@
         display: none;
       }
 
-      svg {
+      & svg {
         width: 20px;
         height: 20px;
       }
