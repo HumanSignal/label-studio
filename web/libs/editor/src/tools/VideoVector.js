@@ -263,6 +263,14 @@ const _Tool = types
         }
       },
 
+      complete() {
+        if (!self.isDrawing) return;
+        const verts = self.currentArea?.sequence?.[0]?.vertices;
+
+        if (verts?.length > 2) self.finishDrawing();
+        else self.cleanupUncloseableShape();
+      },
+
       cleanupUncloseableShape() {
         const { currentArea } = self;
 
@@ -273,6 +281,7 @@ const _Tool = types
         self.annotation?.setIsDrawing(false);
 
         if (currentArea && isAlive(currentArea)) {
+          currentArea.setDrawing(false);
           currentArea.deleteRegion();
         }
       },

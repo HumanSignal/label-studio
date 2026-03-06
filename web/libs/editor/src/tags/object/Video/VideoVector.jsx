@@ -1,5 +1,5 @@
 import { observer } from "mobx-react";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import { Group } from "react-konva";
 import { useRegionStyles } from "../../../hooks/useRegionColor";
 import { KonvaVector } from "../../../components/KonvaVector/KonvaVector";
@@ -145,15 +145,15 @@ const getMaxPoints = (control) => {
 
 /**
  * VideoVector rendering component for the video overlay.
- * Mirrors the interaction model of the image VectorRegion (VectorRegion.jsx):
  *
- * - `selected` on KonvaVector is true when the region is selected OR being drawn
- *   (matching the image version's `!disabled` where disabled = !item.selected && !item.isDrawing)
- * - `disabled` on KonvaVector is true only when region is readonly
- * - Ghost line, control points, and group-level handlers are active only when
- *   KonvaVector `selected` is true
- * - Point/shape dragging for non-selected regions is handled by stage-level handlers
- * - Deferred commit pattern prevents MobX feedback loop during drag operations
+ * Unlike the image VectorRegion (which stores pixel coords directly), the video
+ * version must convert between percent (MobX store) and pixels (KonvaVector).
+ * Writing to MobX during every drag frame causes re-renders that interfere with
+ * KonvaVector's internal drag state. So we defer MobX writes until drag ends.
+ *
+ * To prevent the "shape disappears on drag end" bug, lastCommittedRef caches the
+ * exact pixel values KonvaVector gave us so that the pixel→percent→pixel roundtrip
+ * doesn't cause KonvaVector to re-initialize (its arePointsEqual uses strict ===).
  */
 const VideoVectorPure = ({
   id,
@@ -169,8 +169,18 @@ const VideoVectorPure = ({
 }) => {
   const vectorRef = useRef(null);
   const isDraggingRef = useRef(false);
-  const latestDragPointsRef = useRef(null);
+  const latestDragPixelsRef = useRef(null);
+  // Local state for real-time visual feedback during drag.
+  // KonvaVector's shape drag does NOT update its own internal state — it relies
+  // on the parent feeding points back via initialPoints. MobX observer re-renders
+  // are too slow for that, so we use local React state for immediate re-renders.
   const [dragPixels, setDragPixels] = useState(null);
+  // Cache exact pixel↔percent pair to avoid float drift on commit.
+  // When dragPixels is cleared after drag end, this ref ensures pixelVertices
+  // returns bit-identical values so KonvaVector's arePointsEqual (strict ===)
+  // doesn't trigger a re-initialization / disappearance.
+  const lastCommittedRef = useRef(null);
+
   const style = useRegionStyles(reg, { includeFill: true });
   const { realWidth: waWidth, realHeight: waHeight, scale: waScale, x: waX, y: waY } = workingArea;
 
@@ -179,7 +189,16 @@ const VideoVectorPure = ({
     [box.vertices, waWidth, waHeight],
   );
 
-  const pixelVertices = dragPixels || storePixelVertices;
+  let pixelVertices;
+
+  if (dragPixels) {
+    pixelVertices = dragPixels;
+  } else if (lastCommittedRef.current && box.vertices && verticesMatch(box.vertices, lastCommittedRef.current.percent)) {
+    pixelVertices = lastCommittedRef.current.pixels;
+  } else {
+    pixelVertices = storePixelVertices;
+    lastCommittedRef.current = null;
+  }
 
   const bbox = useMemo(() => computeBBox(pixelVertices), [pixelVertices]);
 
@@ -194,10 +213,6 @@ const VideoVectorPure = ({
   const pointRadius = useMemo(() => getPointRadiusFromSize(control), [control?.pointsize]);
   const isReadOnly = reg.isReadOnly();
 
-  // Only enable KonvaVector's internal drawing/editing mode while actively drawing.
-  // Unlike the image version, we can't rely on frequent re-renders to keep
-  // isDrawingDisabled() fresh, so we simply disable it when not drawing.
-  // Points/shape drag still work through KonvaVector's stage-level handlers.
   const kvSelected = reg.isDrawing && !isReadOnly;
 
   const handleRef = useCallback((kv) => {
@@ -211,12 +226,13 @@ const VideoVectorPure = ({
 
     if (currentShape?.vertices && verticesMatch(currentShape.vertices, percentPoints)) return;
 
+    lastCommittedRef.current = { percent: percentPoints, pixels: points };
     reg.updateShape({ vertices: percentPoints, closed: currentShape?.closed ?? false }, frame);
   }, [reg, frame, waWidth, waHeight]);
 
   const handlePointsChange = useCallback((points) => {
     if (isDraggingRef.current) {
-      latestDragPointsRef.current = points;
+      latestDragPixelsRef.current = points;
       setDragPixels(points);
       return;
     }
@@ -225,25 +241,19 @@ const VideoVectorPure = ({
 
   const handleTransformStart = useCallback(() => {
     isDraggingRef.current = true;
-    latestDragPointsRef.current = null;
-  }, []);
+    latestDragPixelsRef.current = null;
+    reg.annotation?.history?.freeze?.();
+  }, [reg]);
 
   const handleTransformEnd = useCallback(() => {
     isDraggingRef.current = false;
-    if (latestDragPointsRef.current) {
-      commitPoints(latestDragPointsRef.current);
-      latestDragPointsRef.current = null;
+    if (latestDragPixelsRef.current) {
+      commitPoints(latestDragPixelsRef.current);
+      latestDragPixelsRef.current = null;
     }
-  }, [commitPoints]);
-
-  // Clear local drag state once the MobX store has caught up.
-  // This avoids the flash where storePixelVertices briefly holds pre-drag
-  // positions because the MobX update hasn't propagated to `box` yet.
-  useEffect(() => {
-    if (dragPixels && !isDraggingRef.current) {
-      setDragPixels(null);
-    }
-  }, [storePixelVertices]);
+    setDragPixels(null);
+    reg.annotation?.history?.unfreeze?.();
+  }, [commitPoints, reg]);
 
   const handlePathClosedChange = useCallback((isClosed) => {
     const shape = reg.getShape(frame);
