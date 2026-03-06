@@ -8,9 +8,7 @@ import { ViewToggle, type ViewMode } from "./ViewToggle";
 export type { ViewMode };
 
 /** Build project-scoped localStorage key for JSON viewer search and filter state. Returns undefined when projectId is missing. */
-export function getTaskSourceViewerStorageKey(
-  projectId: string | number | null | undefined,
-): string | undefined {
+export function getTaskSourceViewerStorageKey(projectId: string | number | null | undefined): string | undefined {
   if (projectId == null || projectId === "") return undefined;
   return `dm:tasksource:${projectId}`;
 }
@@ -84,8 +82,8 @@ export const TaskSourceViewer: FC<TaskSourceViewerProps> = ({
   const [loading, setLoading] = useState(true);
 
   // View mode (Code/Interactive) — global key so preference is shared across projects
-  const [view, setView] = useState<ViewMode>(() =>
-    (localStorage.getItem(`${TASK_SOURCE_VIEWER_GLOBAL_KEY}:view`) as ViewMode) || "code",
+  const [view, setView] = useState<ViewMode>(
+    () => (localStorage.getItem(`${TASK_SOURCE_VIEWER_GLOBAL_KEY}:view`) as ViewMode) || "code",
   );
 
   // Resolve URIs — per project when storageKey is set (same key as JSON viewer search/filters)
