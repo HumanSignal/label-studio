@@ -6,7 +6,7 @@
   display: grid;
   grid-auto-columns: calc(50% - 15px);
 
-  @media (width <= 1200px) {
+  @media (width <= 1200px) { /* compact desktop */
     grid-auto-columns: 100%;
   }
 

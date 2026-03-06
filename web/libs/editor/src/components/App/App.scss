@@ -30,7 +30,7 @@ body {
   }
 }
 
-@media (width <= 760px) {
+@media (width <= 760px) { /* phone */
   .editor {
     width: 300px;
     min-width: 300px;
@@ -129,7 +129,7 @@ body {
   background-color: var(--color-neutral-background);
   border-left: 1px solid var(--color-neutral-border);
 
-  @media (width <= 760px) {
+  @media (width <= 760px) { /* phone */
     margin-left: 0;
     margin-top: 20px;
   }

@@ -121,3 +121,4 @@ libs/datamanager/.cache
 dist
 .cursor/rules/nx-rules.mdc
 .github/instructions/nx.instructions.md
+.scss-snapshots/
