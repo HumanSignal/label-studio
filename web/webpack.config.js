@@ -208,8 +208,26 @@ module.exports = composePlugins(
       }
     });
 
-    config.module.rules.unshift({
-      test: /\.svg$/,
+    // Force local @humansignal icon SVGs through svgr regardless of issuer.
+    const humansignalIconsSvgRule = {
+      test: /libs[\\/]ui[\\/]src[\\/]assets[\\/]icons[\\/].*\.svg(\?.*)?$/,
+      use: [
+        {
+          loader: "@svgr/webpack",
+          options: {
+            ref: true,
+            exportType: "named",
+            namedExport: "ReactComponent",
+            svgo: false,
+          },
+        },
+        path.resolve(__dirname, "tools/loaders/svg-source-loader.cjs"),
+      ],
+    };
+    config.module.rules.unshift(humansignalIconsSvgRule);
+
+    const svgRule = {
+      test: /\.svg(\?.*)?$/,
       exclude: /node_modules/,
       oneOf: [
         {
@@ -221,14 +239,39 @@ module.exports = composePlugins(
                 ref: true,
                 exportType: "named",
                 namedExport: "ReactComponent",
+                svgo: false, // avoid parse errors with resolved svgo >=3.3.3
               },
             },
+            path.resolve(__dirname, "tools/loaders/svg-source-loader.cjs"),
           ],
         },
         {
           type: "asset/resource",
         },
       ],
+    };
+    config.module.rules.unshift(svgRule);
+
+    // Ensure no other webpack rules process .svg and override svgr output
+    const isOurSvgRule = (rule) => rule === svgRule || rule === humansignalIconsSvgRule;
+    const addSvgExclude = (rule) => {
+      if (!rule || isOurSvgRule(rule)) return;
+      const testString = rule.test?.toString?.() ?? "";
+      if (!testString.includes("svg")) return;
+      const svgExclude = /\.svg(\?.*)?$/;
+      if (!rule.exclude) {
+        rule.exclude = svgExclude;
+      } else if (Array.isArray(rule.exclude)) {
+        rule.exclude = [...rule.exclude, svgExclude];
+      } else {
+        rule.exclude = [rule.exclude, svgExclude];
+      }
+    };
+    config.module.rules.forEach((rule) => {
+      addSvgExclude(rule);
+      if (Array.isArray(rule.oneOf)) {
+        rule.oneOf.forEach(addSvgExclude);
+      }
     });
 
     config.module.rules.push(
@@ -269,12 +312,16 @@ module.exports = composePlugins(
     }
 
     config.resolve.alias = {
+      ...(config.resolve.alias ?? {}),
       // Common dependencies across at least two sub-packages
       react: path.resolve(__dirname, "node_modules/react"),
       "react-dom": path.resolve(__dirname, "node_modules/react-dom"),
       "react-joyride": path.resolve(__dirname, "node_modules/react-joyride"),
       "@humansignal/ui": path.resolve(__dirname, "libs/ui"),
       "@humansignal/core": path.resolve(__dirname, "libs/core"),
+      "@humansignal/icons$": path.resolve(__dirname, "libs/ui/src/assets/icons/index.ts"),
+      "@humansignal/shad": path.resolve(__dirname, "libs/ui/src/shad"),
+      "@humansignal/ui/lib": path.resolve(__dirname, "libs/ui/src/lib"),
     };
 
     return merge(config, {

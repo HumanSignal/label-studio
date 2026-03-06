@@ -258,6 +258,8 @@
     "minimatch": ">=10.2.3",
     "svgo": ">=3.3.3",
     "ajv": ">=8.18.0",
+    "ajv-keywords": "^5.1.0",
+    "schema-utils": "^4.3.0",
     "webpack": "5.104.1",
     "@tootallnate/once": "3.0.1"
   }
