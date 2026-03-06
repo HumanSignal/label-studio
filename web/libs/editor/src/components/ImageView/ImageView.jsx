@@ -1272,6 +1272,7 @@ const ImageLayer = observer(({ item }) => {
 
     return () => {
       cancelled = true;
+      img.src = ""; // Defensively immediately clear source to abandon decode and trigger GC
     };
   }, [imageEntity?.downloaded, currentSrc, item.imageCrossOrigin]);
 
