@@ -1,2 +1,2 @@
-export { TaskSourceViewer } from "./TaskSourceViewer";
+export { TaskSourceViewer, getTaskSourceViewerStorageKey } from "./TaskSourceViewer";
 export type { TaskSourceViewerProps } from "./TaskSourceViewer";
