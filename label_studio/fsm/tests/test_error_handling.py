@@ -517,7 +517,9 @@ class EdgeCasesAndErrorHandlingTests(TestCase):
 
         # Test context property edge cases
         empty_context = TransitionContext(
-            entity=self.mock_entity, current_state='', target_state='PROCESSED'  # Empty string state
+            entity=self.mock_entity,
+            current_state='',
+            target_state='PROCESSED',  # Empty string state
         )
 
         # Empty string should be considered "has state"
@@ -601,7 +603,7 @@ class EdgeCasesAndErrorHandlingTests(TestCase):
         runtime_errors = [r for r in error_results if r['error_type'] == 'RuntimeError']
 
         assert len(validation_errors) == 5  # Even worker IDs
-        assert len(runtime_errors) == 5     # Odd worker IDs
+        assert len(runtime_errors) == 5  # Odd worker IDs
 
     def test_resource_cleanup_after_errors(self):
         """

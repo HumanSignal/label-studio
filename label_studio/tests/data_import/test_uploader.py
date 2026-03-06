@@ -69,9 +69,10 @@ class TestUploader:
             mock_response.raw._connection.sock.getpeername.return_value = ('127.0.0.1', 8080)
 
             # Patch the requests.get call in the data_import.uploader module
-            with mock.patch('core.utils.io.requests.get', return_value=mock_response), pytest.raises(
-                ValidationError
-            ) as e:
+            with (
+                mock.patch('core.utils.io.requests.get', return_value=mock_response),
+                pytest.raises(ValidationError) as e,
+            ):
                 load_tasks(request, project)
             assert 'URL resolves to a reserved network address (block: 127.0.0.0/8)' in str(e.value)
 
@@ -85,16 +86,18 @@ class TestUploader:
             mock_response.raw._connection.sock.getpeername.return_value = ('1.2.3.4', 8080)
 
             # Patch the requests.get call in the data_import.uploader module
-            with mock.patch('core.utils.io.requests.get', return_value=mock_response), pytest.raises(
-                ValidationError
-            ) as e:
+            with (
+                mock.patch('core.utils.io.requests.get', return_value=mock_response),
+                pytest.raises(ValidationError) as e,
+            ):
                 load_tasks(request, project)
             assert 'URL resolves to a reserved network address (block: 1.2.3.4)' in str(e.value)
 
             mock_response.raw._connection.sock.getpeername.return_value = ('198.51.100.0', 8080)
-            with mock.patch('core.utils.io.requests.get', return_value=mock_response), pytest.raises(
-                ValidationError
-            ) as e:
+            with (
+                mock.patch('core.utils.io.requests.get', return_value=mock_response),
+                pytest.raises(ValidationError) as e,
+            ):
                 load_tasks(request, project)
             assert 'URL resolves to a reserved network address (block: 198.51.100.0/24)' in str(e.value)
 
@@ -109,16 +112,18 @@ class TestUploader:
             mock_response.raw._connection.sock.getpeername.return_value = ('1.2.3.4', 8080)
 
             # Patch the requests.get call in the data_import.uploader module
-            with mock.patch('core.utils.io.requests.get', return_value=mock_response), pytest.raises(
-                ValidationError
-            ) as e:
+            with (
+                mock.patch('core.utils.io.requests.get', return_value=mock_response),
+                pytest.raises(ValidationError) as e,
+            ):
                 load_tasks(request, project)
             assert 'URL resolves to a reserved network address (block: 1.2.3.4)' in str(e.value)
 
             mock_response.raw._connection.sock.getpeername.return_value = ('198.51.100.0', 8080)
-            with mock.patch('core.utils.io.requests.get', return_value=mock_response), pytest.raises(
-                ValidationError
-            ) as e:
+            with (
+                mock.patch('core.utils.io.requests.get', return_value=mock_response),
+                pytest.raises(ValidationError) as e,
+            ):
                 load_tasks(request, project)
             # Verify that the error is NOT an SSRF block (IP validation passed)
             assert 'URL resolves to a reserved network address' not in str(e.value)
@@ -182,7 +187,9 @@ class TestTasksFromUrl:
         """Test that valid extension doesn't raise an error"""
         # Create mock response with redirect to a file with valid extension
         mock_response = self.create_mock_response(
-            url='https://example.com/data.json', content_length='1000', content=b'{"test": "data"}'  # Redirected URL
+            url='https://example.com/data.json',
+            content_length='1000',
+            content=b'{"test": "data"}',  # Redirected URL
         )
         mock_ssrf_safe_get.return_value = mock_response
 

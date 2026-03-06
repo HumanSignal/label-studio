@@ -1,5 +1,5 @@
-"""This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
-"""
+"""This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license."""
+
 import hashlib
 import logging
 import os
@@ -151,7 +151,7 @@ class DataExport(object):
         # prepare for saving
         now = datetime.now()
         data = json.dumps(tasks, ensure_ascii=False)
-        md5 = hashlib.md5(json.dumps(data).encode('utf-8')).hexdigest()   # nosec
+        md5 = hashlib.md5(json.dumps(data).encode('utf-8')).hexdigest()  # nosec
         name = 'project-' + str(project.id) + '-at-' + now.strftime('%Y-%m-%d-%H-%M') + f'-{md5[0:8]}'
 
         input_json = DataExport.save_export_files(project, now, get_args, data, md5, name)

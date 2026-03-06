@@ -39,7 +39,7 @@ class ExportMixin:
         return self.project.has_permission(user)
 
     def get_default_title(self):
-        return f"{self.project.title.replace(' ', '-')}-at-{dateformat.format(timezone.now(), 'Y-m-d-H-i')}"
+        return f'{self.project.title.replace(" ", "-")}-at-{dateformat.format(timezone.now(), "Y-m-d-H-i")}'
 
     def _get_filtered_tasks(self, tasks, task_filter_options=None):
         """
@@ -234,7 +234,7 @@ class ExportMixin:
             for ids in batch(task_ids, BATCH_SIZE):
                 i += 1
                 tasks = list(self.get_task_queryset(ids, annotation_filter_options))
-                logger.debug(f'Batch: {i*BATCH_SIZE}')
+                logger.debug(f'Batch: {i * BATCH_SIZE}')
                 if isinstance(task_filter_options, dict) and task_filter_options.get('only_with_annotations'):
                     tasks = [task for task in tasks if task.annotations.exists()]
 
@@ -259,7 +259,7 @@ class ExportMixin:
 
     @staticmethod
     def eval_md5(file):
-        md5_object = hashlib.md5()   # nosec
+        md5_object = hashlib.md5()  # nosec
         block_size = 128 * md5_object.block_size
         chunk = file.read(block_size)
         while chunk:
@@ -342,10 +342,7 @@ class ExportMixin:
 
     def convert_file(self, to_format, download_resources=False, hostname=None):
         logger.info(
-            (
-                'Starting export conversion: export_id=%s project_id=%s '
-                'to_format=%s download_resources=%s hostname=%s'
-            ),
+            ('Starting export conversion: export_id=%s project_id=%s to_format=%s download_resources=%s hostname=%s'),
             self.id,
             self.project_id,
             to_format,

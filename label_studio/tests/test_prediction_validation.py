@@ -189,7 +189,7 @@ class TestPredictionValidation:
                 'predictions': [
                     {
                         'score': 0.95,
-                        'model_version': 'v1.0'
+                        'model_version': 'v1.0',
                         # Missing 'result' field
                     }
                 ],
@@ -863,12 +863,12 @@ class TestPredictionValidation:
         final_prediction_count = Prediction.objects.filter(project=self.project).count()
 
         assert final_task_count == initial_task_count, 'Tasks should not be saved when prediction validation fails'
-        assert (
-            final_annotation_count == initial_annotation_count
-        ), 'Annotations should not be saved when prediction validation fails'
-        assert (
-            final_prediction_count == initial_prediction_count
-        ), 'Predictions should not be saved when prediction validation fails'
+        assert final_annotation_count == initial_annotation_count, (
+            'Annotations should not be saved when prediction validation fails'
+        )
+        assert final_prediction_count == initial_prediction_count, (
+            'Predictions should not be saved when prediction validation fails'
+        )
 
         # Verify the error message contains details about the validation failure
         error_message = str(exc_info.value.detail['predictions'][0])

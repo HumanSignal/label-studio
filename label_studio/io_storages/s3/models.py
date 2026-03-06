@@ -1,5 +1,4 @@
-"""This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
-"""
+"""This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license."""
 
 import json
 import logging
@@ -178,7 +177,6 @@ class S3StorageMixin(models.Model):
 
 
 class S3ImportStorageBase(S3StorageMixin, ImportStorage):
-
     url_scheme = 's3'
 
     presign = models.BooleanField(_('presign'), default=True, help_text='Generate presigned URLs')

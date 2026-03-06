@@ -34,7 +34,6 @@ def test_delete_project(django_live_url, business_client):
 
 
 def test_list_projects_with_params(django_live_url, business_client):
-
     ls = LabelStudio(base_url=django_live_url, api_key=business_client.api_key)
     ls.projects.create(title='Project 1', label_config=LABEL_CONFIG_AND_TASKS['label_config'])
     ls.projects.create(title='Project 2', label_config=LABEL_CONFIG_AND_TASKS['label_config'])

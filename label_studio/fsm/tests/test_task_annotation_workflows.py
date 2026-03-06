@@ -103,7 +103,6 @@ class TestTaskCreationWorkflows:
             self.assert_created_task_state(task.id)
 
     def _setup_test_task_with_annotations_import(self, ls, project_id):
-
         task_with_annotation_json = """
         {
           "data": {"text": "Labeled task"},

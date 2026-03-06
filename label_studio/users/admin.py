@@ -1,5 +1,5 @@
-"""This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
-"""
+"""This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license."""
+
 from core.models import AsyncMigrationStatus
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
@@ -12,7 +12,6 @@ from users.models import User
 
 
 class UserAdminShort(UserAdmin):
-
     add_fieldsets = ((None, {'fields': ('email', 'password1', 'password2')}),)
 
     def __init__(self, *args, **kwargs):

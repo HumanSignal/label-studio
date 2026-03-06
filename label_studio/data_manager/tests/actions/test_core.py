@@ -14,5 +14,5 @@ class TestCheckActionPermission(TestCase):
         }
         assert check_action_permission(user, action, project) is True
 
-        anon_user = AnonymousUser()   # Unauthenticated user
+        anon_user = AnonymousUser()  # Unauthenticated user
         assert check_action_permission(anon_user, action, project) is False
