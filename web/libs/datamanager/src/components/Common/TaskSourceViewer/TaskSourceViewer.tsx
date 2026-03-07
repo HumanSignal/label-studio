@@ -7,6 +7,15 @@ import { ViewToggle, type ViewMode } from "./ViewToggle";
 
 export type { ViewMode };
 
+/** Build project-scoped localStorage key for JSON viewer search and filter state. Returns undefined when projectId is missing. */
+export function getTaskSourceViewerStorageKey(projectId: string | number | null | undefined): string | undefined {
+  if (projectId == null || projectId === "") return undefined;
+  return `dm:tasksource:${projectId}`;
+}
+
+/** Global key for view mode (Code/Interactive) only — shared across all projects. */
+const TASK_SOURCE_VIEWER_GLOBAL_KEY = "dm:tasksource";
+
 /** Options passed to onTaskLoad callback */
 export interface TaskLoadOptions {
   /** Whether to resolve storage URIs to proxy URLs (default: false) */
@@ -20,7 +29,7 @@ export interface TaskSourceViewerProps {
   onTaskLoad: (options?: TaskLoadOptions) => Promise<any>;
   /** SDK type (e.g., "DE" for Data Explorer) */
   sdkType?: string;
-  /** Storage key for localStorage persistence */
+  /** Storage key for project-scoped persistence (JSON viewer search/filters and Resolve URIs). View mode stays global. */
   storageKey?: string;
   /** Render toggle in external location (e.g., modal header) */
   renderToggle?: (toggle: React.ReactNode) => void;
@@ -64,7 +73,7 @@ export const TaskSourceViewer: FC<TaskSourceViewerProps> = ({
   content,
   onTaskLoad,
   sdkType,
-  storageKey = "dm:tasksource",
+  storageKey,
   renderToggle,
 }) => {
   const isInteractiveViewerEnabled = isFF(FF_INTERACTIVE_JSON_VIEWER);
@@ -72,27 +81,20 @@ export const TaskSourceViewer: FC<TaskSourceViewerProps> = ({
   const [taskData, setTaskData] = useState(content);
   const [loading, setLoading] = useState(true);
 
-  // Manage view state internally
-  const [view, setView] = useState<ViewMode>(() =>
-    storageKey ? (localStorage.getItem(`${storageKey}:view`) as ViewMode) || "code" : "code",
+  // View mode (Code/Interactive) — global key so preference is shared across projects
+  const [view, setView] = useState<ViewMode>(
+    () => (localStorage.getItem(`${TASK_SOURCE_VIEWER_GLOBAL_KEY}:view`) as ViewMode) || "code",
   );
 
-  // Manage resolve URIs state - default OFF to show original storage URIs
+  // Resolve URIs — per project when storageKey is set (same key as JSON viewer search/filters)
   const [resolveUrls, setResolveUrls] = useState<boolean>(() =>
     storageKey ? localStorage.getItem(`${storageKey}:resolveUrls`) === "true" : false,
   );
 
-  const handleViewChange = useCallback(
-    (newView: ViewMode) => {
-      setView(newView);
-
-      // Save to localStorage
-      if (storageKey) {
-        localStorage.setItem(`${storageKey}:view`, newView);
-      }
-    },
-    [storageKey],
-  );
+  const handleViewChange = useCallback((newView: ViewMode) => {
+    setView(newView);
+    localStorage.setItem(`${TASK_SOURCE_VIEWER_GLOBAL_KEY}:view`, newView);
+  }, []);
 
   // Load full task data
   useEffect(() => {
