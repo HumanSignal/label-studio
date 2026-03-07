@@ -1,17 +1,13 @@
-%settings-title {
+/* Shared settings title styles */
+.settings__title,
+.settings_newUI .settings__label__title,
+.settings-modal :global(.ant-tabs-tab .ant-tabs-tab-btn) {
   font-size: 16px;
   font-weight: 500;
   line-height: 24px;
   letter-spacing: 0.15px;
   text-align: left;
   font-family: var(--font-sans);
-  color: var(--color-neutral-content);
-}
-
-
-.settings__title {
-  @extend %settings-title;
-
   color: var(--color-neutral-content);
 }
 
@@ -37,8 +33,6 @@
     flex: 1;
 
     &__title {
-      @extend %settings-title;
-
       align-items: center;
       display: flex;
       gap: 8px;
@@ -103,8 +97,6 @@
   }
 
   :global(.ant-tabs-tab .ant-tabs-tab-btn) {
-    @extend %settings-title;
-
     text-shadow: none;
   }
 
