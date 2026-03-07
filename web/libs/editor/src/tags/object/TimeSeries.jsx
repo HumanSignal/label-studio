@@ -129,6 +129,7 @@ const Model = types
     playStartPosition: null,
     animationFrameId: null,
     playbackSpeed: 1,
+    initialRange: null,
     // Cursor position in native units (same units as keysRange). Used for visual playhead.
     cursorTime: null,
     // Suppress sync while user drags overview
@@ -671,10 +672,14 @@ const Model = types
     },
 
     updateTR(tr, scale = 1) {
-      if (tr === null) return;
+      if (!isAlive(self) || tr === null || tr.length !== 2) return;
 
       self.initialRange = tr;
-      self.brushRange = tr;
+      if (self.brushRange) {
+        self.brushRange.replace(tr);
+      } else {
+        self.brushRange = tr;
+      }
       self.setZoomedRange(tr[1] - tr[0]);
       self.setScale(scale);
       self.updateView();
@@ -804,7 +809,7 @@ const Model = types
         if (!isAlive(self)) return;
         self.setData(data);
         self.setColumnNames(headers);
-        self.updateValue(store);
+        yield self.updateValue(store);
       } catch (e) {
         const message = `Problems with parsing CSV: ${e?.message || e}<br>URL: ${url}`;
 
@@ -819,12 +824,16 @@ const Model = types
         if (!self.dataObj) {
           yield self.preloadValue(store);
         }
+        if (!isAlive(self)) return;
         data = self.dataObj;
       } catch (e) {
+        if (!isAlive(self)) return;
         store.annotationStore.addErrors([errorBuilder.generalError(e.message)]);
         return;
       }
       if (!data) return;
+      if (!isAlive(self)) return;
+
       const times = data[self.keyColumn];
 
       if (!times) {
@@ -836,8 +845,10 @@ const Model = types
         store.annotationStore.addErrors([errorBuilder.generalError(message)]);
         return;
       }
+
       // if current view already restored by PersistentState
       if (self.brushRange?.length) return;
+      if (!isAlive(self)) return;
 
       // Calculate initial brush range ensuring minimum points are visible
       const boundaries = self.calculateInitialBrushRange(times);
@@ -1521,12 +1532,13 @@ const HtxTimeSeriesViewRTS = ({ item }) => {
   }, [item, item?.brushRange?.length]);
 
   // the last thing updated during initialisation
-  if (!item?.brushRange?.length || !item.data)
+  if (!item?.brushRange?.length || !item.data) {
     return (
       <div style={{ textAlign: "center", height: 100 }}>
         <Spin size="large" delay={300} />
       </div>
     );
+  }
 
   return (
     <div ref={ref} className="htx-timeseries">
