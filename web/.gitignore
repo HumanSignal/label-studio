@@ -36,6 +36,9 @@ testem.log
 /typings
 .nx/
 migrations.json
+.claude
+.claude/
+/.claude
 
 # System Files
 .DS_Store

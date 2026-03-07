@@ -1,4 +1,5 @@
 export const DEFAULT_PANEL_WIDTH = 320;
+export const DEFAULT_PANEL_MIN_WIDTH = 180;
 export const DEFAULT_PANEL_HEIGHT = 300;
 export const DEFAULT_PANEL_MAX_WIDTH = 500;
 export const DEFAULT_PANEL_MAX_HEIGHT = 500;

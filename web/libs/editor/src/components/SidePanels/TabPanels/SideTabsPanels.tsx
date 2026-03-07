@@ -8,6 +8,7 @@ import {
   DEFAULT_PANEL_HEIGHT,
   DEFAULT_PANEL_MAX_HEIGHT,
   DEFAULT_PANEL_MAX_WIDTH,
+  DEFAULT_PANEL_MIN_WIDTH,
   DEFAULT_PANEL_WIDTH,
   PANEL_HEADER_HEIGHT,
 } from "../constants";
@@ -315,7 +316,7 @@ const SideTabsPanelsComponent: FC<SidePanelsProps> = ({
             storedLeft: undefined,
             storedTop: undefined,
             maxHeight,
-            width: clamp(w, DEFAULT_PANEL_WIDTH, panelMaxWidth),
+            width: clamp(w, DEFAULT_PANEL_MIN_WIDTH, panelMaxWidth),
             height: panelData[panelKey].detached
               ? clamp(h, DEFAULT_PANEL_HEIGHT, DEFAULT_PANEL_MAX_HEIGHT)
               : panelData[panelKey].height,
@@ -504,14 +505,14 @@ const SideTabsPanelsComponent: FC<SidePanelsProps> = ({
         viewportSize.current.width = clientWidth ?? 0;
         viewportSize.current.height = clientHeight ?? 0;
         setViewportSizeMatch(checkContentFit());
-        setPanelMaxWidth(rootRef.current.clientWidth * 0.4);
+        setPanelMaxWidth(rootRef.current.clientWidth * 0.6);
       });
     });
 
     if (root) {
       observer.observe(root);
       setViewportSizeMatch(checkContentFit());
-      setPanelMaxWidth(root.clientWidth * 0.4);
+      setPanelMaxWidth(root.clientWidth * 0.6);
       setInitialized(true);
     }
 
