@@ -1,5 +1,5 @@
-"""This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
-"""
+"""This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license."""
+
 import types
 
 import pytest
@@ -178,7 +178,6 @@ def test_start_browser():
 )
 @pytest.mark.django_db
 def test_core_validate_upload_url(url, block_local_urls, raises_exc):
-
     if raises_exc is None:
         assert validate_upload_url(url, block_local_urls=block_local_urls) is None
         return

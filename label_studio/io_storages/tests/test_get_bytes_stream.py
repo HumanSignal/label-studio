@@ -145,7 +145,7 @@ class TestS3StorageMixinGetBytesStream(unittest.TestCase):
         max_range_size = self.mock_settings.RESOLVER_PROXY_MAX_RANGE_SIZE
         large_start = 1000
         large_end = large_start + max_range_size + 1000  # Exceeds limit
-        adjusted_end = large_start + max_range_size - 1   # What we expect after adjustment
+        adjusted_end = large_start + max_range_size - 1  # What we expect after adjustment
 
         # Set up mock get_object response
         self.mock_client.get_object.return_value = {
@@ -493,7 +493,7 @@ class TestAzureBlobStorageMixinGetBytesStream(unittest.TestCase):
         expected_max_range = self.mock_settings.RESOLVER_PROXY_MAX_RANGE_SIZE
         mock_blob_client.download_blob.assert_called_with(offset=0, length=expected_max_range)
         self.assertEqual(metadata['ContentLength'], expected_max_range)
-        self.assertEqual(metadata['ContentRange'], f'bytes 0-{expected_max_range-1}/{file_size}')
+        self.assertEqual(metadata['ContentRange'], f'bytes 0-{expected_max_range - 1}/{file_size}')
         self.assertEqual(metadata['StatusCode'], 206)
 
         # Verify the chunks can be streamed

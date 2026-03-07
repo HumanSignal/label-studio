@@ -1,5 +1,5 @@
-"""This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
-"""
+"""This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license."""
+
 from __future__ import unicode_literals
 
 import calendar
@@ -738,7 +738,7 @@ def timeit(func):
         start = time.time()
         result = func(*args, **kwargs)
         end = time.time()
-        logging.debug(f'{func.__name__} execution time: {end-start} seconds')
+        logging.debug(f'{func.__name__} execution time: {end - start} seconds')
         return result
 
     return wrapper

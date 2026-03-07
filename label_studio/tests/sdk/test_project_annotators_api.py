@@ -42,4 +42,4 @@ def test_project_annotators_sdk(django_live_url, business_client):
     returned_ids = [u.id for u in resp]
     assert sorted(returned_ids) == sorted([business_client.user.id, u2.id])
     assert returned_ids == sorted(returned_ids)
-    assert u3.id not in returned_ids   # no annotations created for this user
+    assert u3.id not in returned_ids  # no annotations created for this user

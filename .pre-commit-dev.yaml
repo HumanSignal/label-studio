@@ -6,10 +6,8 @@ repos:
       # Run the linter.
       - id: ruff-check
         args: [ --fix ]
-  - repo: https://github.com/grantjenks/blue
-    rev: v0.9.1
-    hooks:
-      - id: blue
+      # Run the formatter.
+      - id: ruff-format
   - repo: local
     hooks:
       - id: biome-check

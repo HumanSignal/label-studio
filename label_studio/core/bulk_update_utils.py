@@ -1,5 +1,5 @@
-"""This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
-"""
+"""This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license."""
+
 """
 Main module with the bulk_update function.
 """
@@ -54,7 +54,6 @@ def grouper(iterable, size):
 
 
 def validate_fields(meta, fields):
-
     fields = frozenset(fields)
     field_names = set()
 
@@ -68,11 +67,10 @@ def validate_fields(meta, fields):
     non_model_fields = fields.difference(field_names)
 
     if non_model_fields:
-        raise TypeError('These fields are not present in ' 'current meta: {}'.format(', '.join(non_model_fields)))
+        raise TypeError('These fields are not present in current meta: {}'.format(', '.join(non_model_fields)))
 
 
 def get_fields(update_fields, exclude_fields, meta, obj=None):
-
     deferred_fields = set()
 
     if update_fields is not None:
@@ -142,13 +140,11 @@ def bulk_update(
 
     lenpks = 0
     for objs_batch in grouper(objs, batch_size):
-
         pks = []
         parameters = defaultdict(list)
         placeholders = defaultdict(list)
 
         for obj in objs_batch:
-
             pk_value, _ = _as_sql(obj, pk_field, query, compiler, connection)
             pks.append(pk_value)
 

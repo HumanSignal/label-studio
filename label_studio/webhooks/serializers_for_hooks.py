@@ -12,7 +12,6 @@ class OnlyIDWebhookSerializer(serializers.Serializer):
 
 
 class ProjectWebhookSerializer(serializers.ModelSerializer):
-
     task_number = serializers.IntegerField(read_only=True)
     finished_task_number = serializers.IntegerField(read_only=True)
     total_predictions_number = serializers.IntegerField(read_only=True)
