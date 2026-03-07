@@ -85,8 +85,8 @@
   }
 
   :global(.htx-highlight) {
-    // resize handles around selected region,
-    // they look like popsicles, normal one at the beginning, upside down one at the end
+    /* resize handles around selected region, */
+    /* they look like popsicles, normal one at the beginning, upside down one at the end */
     area {
       position: absolute;
       width: 1px;

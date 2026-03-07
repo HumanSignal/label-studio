@@ -1,5 +1,5 @@
-// Badge component styles
-// Uses semantic design tokens for colors, spacing, and typography
+/* Badge component styles */
+/* Uses semantic design tokens for colors, spacing, and typography */
 
 .badge {
   display: inline-flex;
@@ -13,18 +13,18 @@
   border-radius: var(--corner-radius-smaller);
   letter-spacing: var(--letter-spacing-base);
   
-  // Base padding
+  /* Base padding */
   padding: 0 var(--spacing-tight);
   height: 22px;
   
-  // Base colors (will be overridden by variants)
+  /* Base colors (will be overridden by variants) */
   background: var(--color-neutral-surface);
   border-color: var(--color-neutral-border);
   color: var(--color-neutral-content);
 
 }
 
-// Shape variants
+/* Shape variants */
 .shape-rounded {
   border-radius: var(--corner-radius-large);
 }
@@ -33,7 +33,7 @@
   border-radius: var(--corner-radius-smaller);
 }
 
-// Size variants
+/* Size variants */
 .size-small,
 .size-compact {
   padding: 0 var(--spacing-tighter);
@@ -51,8 +51,8 @@
   }
 }
 
-// Style variants for accent colors
-// Filled style (default)
+/* Style variants for accent colors */
+/* Filled style (default) */
 .variant-grape {
   background: var(--color-accent-grape-subtlest);
   border-color: var(--color-accent-grape-subtle);
@@ -113,7 +113,7 @@
   color: var(--color-accent-sand-bold);
 }
 
-// Outline style
+/* Outline style */
 .style-outline {
   &.variant-grape {
     background: transparent;
@@ -176,7 +176,7 @@
   }
 }
 
-// Ghost style
+/* Ghost style */
 .style-ghost {
   background: none !important;
   border: none !important;
@@ -222,7 +222,7 @@
   }
 }
 
-// Solid style
+/* Solid style */
 .style-solid {
   border: none !important;
   
@@ -277,17 +277,17 @@
   }
 }
 
-// Gradient variant (special handling)
+/* Gradient variant (special handling) */
 .variant-gradient {
   display: inline-block;
-  border-radius: var(--corner-radius-smaller); // Default squared shape
+  border-radius: var(--corner-radius-smaller); /* Default squared shape */
   background: linear-gradient(135deg, var(--color-accent-canteloupe-base) 0%, var(--color-accent-persimmon-base) 50%, var(--color-accent-plum-base) 100%);
   vertical-align: middle;
   height: 20px;
   padding: 0;
   border: none;
   
-  // Shape variants for gradient
+  /* Shape variants for gradient */
   &.shape-rounded {
     border-radius: var(--corner-radius-large);
     
@@ -307,7 +307,7 @@
   .badge-content {
     margin: 1px;
     background: none;
-    border-radius: calc(var(--corner-radius-smaller) - 1px); // Default squared shape
+    border-radius: calc(var(--corner-radius-smaller) - 1px); /* Default squared shape */
     font-size: var(--font-size-label-smaller);
     padding: 0 var(--spacing-tighter) 0 var(--spacing-tighter);
     display: flex;
@@ -331,7 +331,7 @@
       height: calc(100% - 2px);
     }
     
-    // Shape variants for filled style
+    /* Shape variants for filled style */
     &.shape-rounded {
       .badge-content {
         border-radius: calc(var(--corner-radius-large) - 1px);
@@ -351,7 +351,7 @@
       height: calc(100% - 2px);
     }
     
-    // Shape variants for outline style
+    /* Shape variants for outline style */
     &.shape-rounded {
       .badge-content {
         border-radius: calc(var(--corner-radius-large) - 1px);
@@ -385,7 +385,7 @@
       }
     }
     
-    // Shape variants for solid style
+    /* Shape variants for solid style */
     &.shape-rounded {
       .badge-content {
         border-radius: calc(var(--corner-radius-large) - 1px);

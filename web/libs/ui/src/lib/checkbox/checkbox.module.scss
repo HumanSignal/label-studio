@@ -28,14 +28,14 @@
   position: relative;
 
 
-  // &:hover {
-  //   box-shadow: none;
-  //   &__box {
-  //     background-color: var(--checkbox-hover-background-color, var(--checkbox-default-hover-background-color));
-  //     color: var(--checkbox-hover-color, var(--checkbox-default-hover-color));
-  //     border-color: var(--checkbox-hover-border-color, var(--checkbox-default-hover-border-color));
-  //   }
-  // }
+  /* &:hover { */
+  /*   box-shadow: none; */
+  /*   &__box { */
+  /*     background-color: var(--checkbox-hover-background-color, var(--checkbox-default-hover-background-color)); */
+  /*     color: var(--checkbox-hover-color, var(--checkbox-default-hover-color)); */
+  /*     border-color: var(--checkbox-hover-border-color, var(--checkbox-default-hover-border-color)); */
+  /*   } */
+  /* } */
 
   &_disabled {
     cursor: not-allowed !important;

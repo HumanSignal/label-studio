@@ -21,7 +21,7 @@
   overflow-y: auto;
 
   [data-rbd-droppable-id] {
-    // to spread column to the full height
+    /* to spread column to the full height */
     flex: 1;
   }
 
@@ -38,7 +38,7 @@
     }
 
     & h3 {
-      font-size: 1.5rem; // Special case to override the too restrictive and generalistic Config.scss
+      font-size: 1.5rem; /* Special case to override the too restrictive and generalistic Config.scss */
     }
   }
 }
