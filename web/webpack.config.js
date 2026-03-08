@@ -43,6 +43,11 @@ const plugins = [
   new EnvironmentPlugin(LOCAL_ENV),
 ];
 
+if (process.env.MODE === "standalone") {
+  // @ts-ignore
+  plugins.push(new webpack.optimize.LimitChunkCountPlugin({ maxChunks: 1 }));
+}
+
 const optimizer = () => {
   const result = {
     minimize: true,
