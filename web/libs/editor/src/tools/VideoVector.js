@@ -289,7 +289,7 @@ const _Tool = types
         }
       },
 
-      _finishDrawing() {
+      _finishDrawing({ skipAfterCreate = false } = {}) {
         if (!self.currentArea) return;
         self.currentArea.setDrawing(false);
         self.currentArea.notifyDrawingFinished?.();
@@ -302,13 +302,14 @@ const _Tool = types
         down = false;
         self.stopListening();
 
-        if (currentArea && !currentArea.incomplete) {
+        if (!skipAfterCreate && currentArea && !currentArea.incomplete) {
           self.annotation?.afterCreateResult?.(currentArea, control);
         }
       },
 
       complete() {
-        self._finishDrawing();
+        self._finishDrawing({ skipAfterCreate: true });
+        self.annotation?.unselectAll();
       },
 
       cleanupUncloseableShape() {
