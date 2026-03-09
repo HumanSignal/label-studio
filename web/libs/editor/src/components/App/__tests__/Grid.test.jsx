@@ -699,4 +699,23 @@ describe("Grid", () => {
 
     expect(screen.getByLabelText("Move right")).toBeInTheDocument();
   });
+
+  it("VirtualizedGrid sets annotations to non-editable on mount", () => {
+    mockIsFF.mockReturnValue(true);
+    const ann = {
+      ...createAnnotation({ id: "a1", pk: 1 }),
+      setEditable: jest.fn(),
+    };
+    const annotations = [ann];
+    const store = createStore({ selected: { selected: annotations[0] } });
+    const root = {};
+
+    render(
+      <Provider store={store}>
+        <VirtualizedGrid store={store} annotations={annotations} root={root} />
+      </Provider>,
+    );
+
+    expect(ann.setEditable).toHaveBeenCalledWith(false);
+  });
 });

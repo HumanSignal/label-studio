@@ -134,6 +134,9 @@ const VirtualizedGrid = observer(({ store, annotations, root }) => {
     if (!isFF(FF_FIT_720_LAZY_LOAD_ANNOTATIONS)) return;
 
     annotations.forEach((annotation) => {
+      // Mark as read-only since Compare All mode should not allow edits
+      annotation.setEditable?.(false);
+
       if (!annotation.pk || annotation.type === "prediction" || annotation.userGenerate) return;
 
       const id = annotation.pk;
@@ -277,6 +280,9 @@ const VirtualizedGrid = observer(({ store, annotations, root }) => {
           // reinitHistory cancels autosave and sets initial values so the hydration
           // isn't treated as a user modification (prevents unwanted draft creation)
           freshAnnotation.reinitHistory?.();
+
+          // Mark as read-only since Compare All mode should not allow edits
+          freshAnnotation.setEditable?.(false);
 
           // Mark as successfully hydrated to avoid re-hydrating
           // Note: Don't directly modify MST model (is_stub) - it causes protection errors
