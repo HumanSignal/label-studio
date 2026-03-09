@@ -231,6 +231,7 @@ const _Tool = types
         }
 
         self.annotation?.unselectAreas?.();
+        down = true;
         self.startDrawing(x, y);
       },
 
