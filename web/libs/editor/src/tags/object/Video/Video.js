@@ -451,8 +451,8 @@ const Model = types
 
         const activeStates = self.activeStates();
         const area = ff.isActive(ff.FF_MULTIPLE_LABELS_REGIONS)
-          ? self.annotation.createResult({ sequence }, {}, control, self, false, activeStates)
-          : self.annotation.createResult({ sequence }, {}, control, self, false);
+          ? self.annotation.createResult({ sequence }, {}, control, self, true, activeStates)
+          : self.annotation.createResult({ sequence }, {}, control, self, true);
 
         if (!ff.isActive(ff.FF_MULTIPLE_LABELS_REGIONS)) {
           for (const tag of self.activeStates()) {

@@ -90,6 +90,43 @@ const Model = types
     getVisibility() {
       return true;
     },
+
+    get control() {
+      return self.results.find((result) => result.from_name.tools)?.from_name;
+    },
+    get closable() {
+      return self.control?.closable ?? false;
+    },
+    get minPoints() {
+      const min = self.control?.minpoints;
+      return min ? Number.parseInt(min) : undefined;
+    },
+    get maxPoints() {
+      const max = self.control?.maxpoints;
+      return max ? Number.parseInt(max) : undefined;
+    },
+    get vertices() {
+      const kf = self.sequence[0];
+      return kf?.vertices ?? [];
+    },
+    get closed() {
+      const kf = self.sequence[0];
+      return kf?.closed ?? false;
+    },
+    get atMaxLength() {
+      return self.maxPoints && self.vertices.length === self.maxPoints;
+    },
+    get incomplete() {
+      if (self.atMaxLength) return false;
+      const notClosed = self.closable === true && self.closed === false;
+      const notFinished = self.minPoints && self.vertices.length < self.minPoints;
+      return notClosed || notFinished;
+    },
+    get finished() {
+      if (self.closable) return !self.incomplete;
+      if (self.atMaxLength) return true;
+      return false;
+    },
   }))
   .actions((self) => ({
     setVectorRef(ref) {

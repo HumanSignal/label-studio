@@ -66,7 +66,7 @@ export const RegionItem: FC<RegionItemProps> = observer(
             <MainDetails region={region} />
           </div>
         )}
-        {region.isDrawing && (
+        {region.incomplete && (
           <div className={cn("detailed-region").elem("warning").toClassName()}>
             <IconWarning />
             <div className={cn("detailed-region").elem("warning-text").toClassName()}>

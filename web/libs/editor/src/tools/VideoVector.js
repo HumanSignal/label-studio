@@ -123,10 +123,8 @@ const _Tool = types
       handleToolSwitch() {
         self.stopListening();
         if (self.currentArea?.isDrawing) {
-          const verts = self.currentArea?.sequence?.[0]?.vertices;
-
-          if (verts?.length > 2) self.finishDrawing();
-          else self.cleanupUncloseableShape();
+          if (self.currentArea?.incomplete) self.deleteRegion();
+          else self._finishDrawing();
         }
       },
 
@@ -142,7 +140,18 @@ const _Tool = types
             () => {
               const shape = self.currentArea?.getShape(self.obj.frame);
 
-              if (shape?.closed) self.finishDrawing();
+              if (shape?.closed) self._finishDrawing();
+            },
+            false,
+          ),
+        );
+
+        disposers.push(
+          observe(
+            currentArea,
+            "finished",
+            () => {
+              if (self.currentArea?.finished) self.finishDrawing();
             },
             false,
           ),
@@ -254,6 +263,7 @@ const _Tool = types
               self.currentArea?.startPoint(x, y);
               self.currentArea?.commitPoint(x, y);
               self.annotation?.history?.unfreeze();
+              self.finishDrawing();
             });
           }
         }
@@ -261,7 +271,7 @@ const _Tool = types
 
       dblclickEv() {
         if (self.isDrawing) {
-          self.finishDrawing();
+          self._finishDrawing();
         }
       },
 
@@ -274,6 +284,12 @@ const _Tool = types
       },
 
       finishDrawing() {
+        if (self.currentArea?.finished) {
+          self._finishDrawing();
+        }
+      },
+
+      _finishDrawing() {
         if (!self.currentArea) return;
         self.currentArea.setDrawing(false);
         self.currentArea.notifyDrawingFinished?.();
@@ -292,14 +308,16 @@ const _Tool = types
       },
 
       complete() {
-        if (!self.isDrawing) return;
-        const verts = self.currentArea?.sequence?.[0]?.vertices;
-
-        if (verts?.length > 2) self.finishDrawing();
-        else self.cleanupUncloseableShape();
+        self._finishDrawing();
       },
 
       cleanupUncloseableShape() {
+        if (self.currentArea?.incomplete) {
+          self.deleteRegion();
+        }
+      },
+
+      deleteRegion() {
         const { currentArea } = self;
 
         self.currentArea = null;
