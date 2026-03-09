@@ -4,6 +4,7 @@ import { Group } from "react-konva";
 import { useRegionStyles } from "../../../hooks/useRegionColor";
 import { KonvaVector } from "../../../components/KonvaVector/KonvaVector";
 import { LabelOnVideoBbox } from "../../../components/ImageView/LabelOnRegion";
+import ToolsManager from "../../../tools/Manager";
 
 /**
  * Convert vertices from percent (0-100) to pixel coords using working area dimensions.
@@ -213,7 +214,15 @@ const VideoVectorPure = ({
   const pointRadius = useMemo(() => getPointRadiusFromSize(control), [control?.pointsize]);
   const isReadOnly = reg.isReadOnly();
 
-  const kvSelected = reg.isDrawing && !isReadOnly;
+  // Match image VectorRegion's disabled/selected detection pattern exactly:
+  //   model:  disabled = (tool?.disabled) || isReadOnly || (!selected && !isDrawing)
+  //   view:   kvSelected = !disabled,  kvDisabled = isReadOnly
+  const objectTag = reg.object;
+  const manager = objectTag ? ToolsManager.getInstance({ name: objectTag.name }) : null;
+  const selectedTool = manager?.findSelectedTool?.();
+  const toolDisabled = selectedTool?.disabled ?? false;
+  const kvDisabled = toolDisabled || isReadOnly || (!selected && !reg.isDrawing);
+  const kvSelected = !kvDisabled;
 
   const handleRef = useCallback((kv) => {
     vectorRef.current = kv;
@@ -269,12 +278,18 @@ const VideoVectorPure = ({
     e.evt.stopPropagation();
     e.evt.preventDefault();
 
-    const tool = control?.getToolsManager?.()?.findSelectedTool?.();
+    const objTag = reg.object;
 
-    if (tool?.isDrawing) {
-      tool.finishDrawing();
+    if (!objTag) return;
+
+    const mgr = ToolsManager.getInstance({ name: objTag.name });
+    const tool = mgr?.findSelectedTool?.();
+
+    if (tool?.currentArea) {
+      tool.commitDrawingRegion?.();
     }
-  }, [isReadOnly, control]);
+    tool?.complete?.();
+  }, [isReadOnly, reg]);
 
   const handleRegionClick = useCallback((e) => {
     if (e.evt.defaultPrevented) return;
@@ -284,7 +299,9 @@ const VideoVectorPure = ({
 
     e.cancelBubble = true;
 
-    const tool = control?.getToolsManager?.()?.findSelectedTool?.();
+    const objTag = reg.object;
+    const mgr = objTag ? ToolsManager.getInstance({ name: objTag.name }) : null;
+    const tool = mgr?.findSelectedTool?.();
 
     if (tool?.currentArea && tool.currentArea !== reg && tool.complete) {
       tool.complete();
@@ -292,7 +309,7 @@ const VideoVectorPure = ({
 
     reg.setHighlight(false);
     reg.onClickRegion(e);
-  }, [reg, control]);
+  }, [reg]);
 
   return (
     <Group>
@@ -328,6 +345,7 @@ const VideoVectorPure = ({
         pointStrokeWidth={selected ? 2 : 1}
         pointStyle={control?.pointstyle ?? "circle"}
         disableInternalPointAddition={true}
+        disableGhostLine={!reg.isDrawing}
         onFinish={handleFinish}
         onPointsChange={handlePointsChange}
         onTransformStart={handleTransformStart}
