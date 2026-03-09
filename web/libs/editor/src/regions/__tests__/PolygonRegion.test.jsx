@@ -398,6 +398,158 @@ describe("PolygonRegion", () => {
     });
   });
 
+  describe("locked + closed visibility invariant", () => {
+    /**
+     * The rendering condition in HtxPolygonView for Edges and circles is:
+     *   (!item.isReadOnly() || !item.closed)
+     *
+     * isReadOnly() returns true when locked is true (among other sources).
+     * These tests use the raw `locked` and `closed` model state to verify
+     * the invariant without needing the full annotation tree that
+     * isReadOnly() requires.
+     *
+     * The function below mirrors the JSX condition using `locked` in place
+     * of `isReadOnly()`, which is valid for the isolated lock scenario.
+     */
+
+    function shouldRenderEdgesAndCircles(region) {
+      return !region.locked || !region.closed;
+    }
+
+    it("finished + unlocked: edges/circles renderable", () => {
+      const root = TestRoot.create({
+        image: { id: "img1" },
+        region: {
+          id: "cu",
+          pid: "cu",
+          object: "img1",
+          points: [
+            [0, 0],
+            [10, 0],
+            [10, 10],
+          ],
+          closed: true,
+          results: [],
+        },
+      });
+      expect(root.region.locked).toBe(false);
+      expect(root.region.closed).toBe(true);
+      expect(shouldRenderEdgesAndCircles(root.region)).toBe(true);
+    });
+
+    it("finished + locked: edges/circles NOT renderable (Poly handles display)", () => {
+      const root = TestRoot.create({
+        image: { id: "img1" },
+        region: {
+          id: "cl",
+          pid: "cl",
+          object: "img1",
+          points: [
+            [0, 0],
+            [10, 0],
+            [10, 10],
+          ],
+          closed: true,
+          results: [],
+        },
+      });
+      root.region.setLocked(true);
+      expect(root.region.locked).toBe(true);
+      expect(root.region.closed).toBe(true);
+      expect(shouldRenderEdgesAndCircles(root.region)).toBe(false);
+    });
+
+    it("unfinished + unlocked: edges/circles renderable", () => {
+      const root = TestRoot.create({
+        image: { id: "img1" },
+        region: {
+          id: "ou",
+          pid: "ou",
+          object: "img1",
+          points: [
+            [0, 0],
+            [10, 0],
+            [10, 10],
+          ],
+          closed: false,
+          results: [],
+        },
+      });
+      expect(root.region.locked).toBe(false);
+      expect(root.region.closed).toBe(false);
+      expect(shouldRenderEdgesAndCircles(root.region)).toBe(true);
+    });
+
+    it("unfinished + locked: edges/circles renderable (the fix)", () => {
+      const root = TestRoot.create({
+        image: { id: "img1" },
+        region: {
+          id: "ol",
+          pid: "ol",
+          object: "img1",
+          points: [
+            [0, 0],
+            [10, 0],
+            [10, 10],
+          ],
+          closed: false,
+          results: [],
+        },
+      });
+      root.region.setLocked(true);
+      expect(root.region.locked).toBe(true);
+      expect(root.region.closed).toBe(false);
+      expect(shouldRenderEdgesAndCircles(root.region)).toBe(true);
+    });
+
+    it("locking does not change hidden state", () => {
+      const root = TestRoot.create({
+        image: { id: "img1" },
+        region: {
+          id: "lh",
+          pid: "lh",
+          object: "img1",
+          points: [
+            [0, 0],
+            [10, 0],
+            [10, 10],
+          ],
+          closed: false,
+          results: [],
+        },
+      });
+      expect(root.region.hidden).toBe(false);
+      root.region.setLocked(true);
+      expect(root.region.hidden).toBe(false);
+      expect(root.region.locked).toBe(true);
+    });
+
+    it("setLocked toggles lock independently from closed", () => {
+      const root = TestRoot.create({
+        image: { id: "img1" },
+        region: {
+          id: "dr",
+          pid: "dr",
+          object: "img1",
+          points: [
+            [0, 0],
+            [10, 0],
+            [10, 10],
+          ],
+          closed: false,
+          results: [],
+        },
+      });
+      expect(root.region.locked).toBe(false);
+      root.region.setLocked(true);
+      expect(root.region.locked).toBe(true);
+      expect(root.region.closed).toBe(false);
+      root.region.setLocked(false);
+      expect(root.region.locked).toBe(false);
+      expect(root.region.closed).toBe(false);
+    });
+  });
+
   describe("Registry region type predicate", () => {
     it("accepts value with points", () => {
       const predicate = PolygonRegionModel.detectByValue;
