@@ -158,7 +158,7 @@ const VideoRegionsPure = ({
 
     const vectorTool = getVectorTool();
 
-    if (vectorTool?.isDrawing) {
+    if (vectorTool?.isDrawing || vectorTool?.canResumeDrawing) {
       const { x, y } = limitCoordinates(normalizeMouseOffsets(e.evt.offsetX, e.evt.offsetY));
 
       vectorTool.event("mousedown", e.evt, [x, y]);

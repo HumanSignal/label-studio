@@ -36,6 +36,7 @@ const resultTypes = [
   "rating",
   "pairwise",
   "videorectangle",
+  "videovector",
   "videovectorlabels",
   "ranker",
 ];

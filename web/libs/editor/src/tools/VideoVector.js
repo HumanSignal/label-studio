@@ -56,6 +56,18 @@ const _Tool = types
       return !self.isDrawing && !self.annotation?.isReadOnly();
     },
 
+    get canResumeDrawing() {
+      if (self.isDrawing) return false;
+      const obj = self.obj;
+      const frame = obj?.currentFrame ?? obj?.frame;
+
+      return !!obj?.regs?.find((reg) => {
+        if (reg.type !== "videovectorregion" || !reg.selected || !isAlive(reg)) return false;
+        const shape = reg.getShape?.(frame);
+        return shape && !shape.closed && shape.vertices?.length > 0;
+      });
+    },
+
     getActiveVector() {
       const area = self.currentArea;
 
