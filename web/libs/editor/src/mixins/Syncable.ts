@@ -207,14 +207,16 @@ const SyncableMixin = types
 
     syncSend(data: SyncData, event: SyncEvent) {
       if (!self.sync) return;
-      const notSuppressed = self.syncManager!.sync(data, event, self.name);
+      if (!self.syncManager) return; // Wait until initialized
+
+      const notSuppressed = self.syncManager.sync(data, event, self.name);
 
       if (notSuppressed && event === "play") {
         // Only Audio has volume controls, so Audio should not be muted,
         // while other synced tags should be muted, otherwise volume can't be controlled.
         // But if there are no Audio tags in group, the tag triggered sync
         // should be the main tag with volume active, and others should be muted.
-        self.syncMuted(self.type !== "audio" && self.syncManager!.audioTags > 0);
+        self.syncMuted(self.type !== "audio" && self.syncManager.audioTags > 0);
       }
     },
 
@@ -232,7 +234,7 @@ const SyncableMixin = types
     },
 
     destroy() {
-      self.syncManager!.unregister(self as Instance<typeof SyncableMixin>);
+      self.syncManager?.unregister(self as Instance<typeof SyncableMixin>);
     },
   }));
 
