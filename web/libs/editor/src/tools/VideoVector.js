@@ -207,28 +207,34 @@ const _Tool = types
       mousedownEv(ev, [x, y]) {
         if (self.mode === "drawing") {
           down = true;
-          self.currentArea?.startPoint(x, y);
+          initialCursorPosition = { x, y };
           return;
         }
-        down = true;
         self.startDrawing(x, y);
       },
 
-      mousemoveEv(_, [x, y]) {
-        if (!self.isDrawing) return;
-        if (down && self.checkDistance(x, y)) {
-          self.currentArea?.updatePoint(x, y);
-        }
+      mousemoveEv() {
+        // Point creation is deferred to mouseup (click-vs-drag detection).
+        // Ghost line is managed by KonvaVector internally.
       },
 
       mouseupEv(_, [x, y]) {
         if (!self.isDrawing) return;
+        if (!down) return;
         down = false;
 
-        setTimeout(() => {
-          self.currentArea?.commitPoint(x, y);
-          self.annotation?.history?.unfreeze();
-        });
+        if (initialCursorPosition) {
+          const dx = Math.abs(x - initialCursorPosition.x);
+          const dy = Math.abs(y - initialCursorPosition.y);
+
+          if (dx < 5 && dy < 5) {
+            setTimeout(() => {
+              self.currentArea?.startPoint(x, y);
+              self.currentArea?.commitPoint(x, y);
+              self.annotation?.history?.unfreeze();
+            });
+          }
+        }
       },
 
       dblclickEv() {
@@ -284,6 +290,18 @@ const _Tool = types
           currentArea.setDrawing(false);
           currentArea.deleteRegion();
         }
+      },
+
+      resumeDrawing(area) {
+        if (self.isDrawing) return;
+        if (!area || !isAlive(area)) return;
+
+        self.currentArea = area;
+        self.mode = "drawing";
+        area.setDrawing(true);
+        self.annotation?.setIsDrawing(true);
+
+        self.listenForClose();
       },
 
       setSelected(selected) {

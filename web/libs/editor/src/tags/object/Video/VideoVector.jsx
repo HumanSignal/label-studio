@@ -307,9 +307,16 @@ const VideoVectorPure = ({
       tool.complete();
     }
 
+    const currentShape = reg.getShape(frame);
+
+    if (currentShape && !currentShape.closed && currentShape.vertices?.length > 0 && tool?.resumeDrawing) {
+      tool.resumeDrawing(reg);
+      return;
+    }
+
     reg.setHighlight(false);
     reg.onClickRegion(e);
-  }, [reg]);
+  }, [reg, frame]);
 
   return (
     <Group>

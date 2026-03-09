@@ -851,6 +851,12 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
       return true;
     }
 
+    // When point creation is externally managed AND ghost line is disabled,
+    // the shape is in "selected but not drawing" mode — disable drawing.
+    if (disableInternalPointAddition && disableGhostLine) {
+      return true;
+    }
+
     // Dynamically check control point hover
     if (cursorPositionRef.current && initialPoints.length > 0) {
       const scale = transform.zoom * fitScale;
