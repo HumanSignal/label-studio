@@ -173,9 +173,6 @@ const VideoRegionsPure = ({
     if (!isInBounds) return;
 
     if (vectorTool) {
-      if (item.annotation?.selectedRegions?.length > 0) {
-        item.annotation.unselectAreas();
-      }
       vectorTool.event("mousedown", e.evt, [x, y]);
       return;
     }

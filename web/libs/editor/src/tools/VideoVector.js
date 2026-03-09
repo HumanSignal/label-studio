@@ -210,6 +210,27 @@ const _Tool = types
           initialCursorPosition = { x, y };
           return;
         }
+
+        const obj = self.obj;
+        const frame = obj?.currentFrame;
+        const selectedUnclosed = obj?.regs?.find((reg) => {
+          if (reg.type !== "videovectorregion" || !reg.selected || !isAlive(reg)) return false;
+          const shape = reg.getShape(frame);
+          return shape && !shape.closed && shape.vertices?.length > 0;
+        });
+
+        if (selectedUnclosed) {
+          self.currentArea = selectedUnclosed;
+          self.mode = "drawing";
+          selectedUnclosed.setDrawing(true);
+          self.annotation?.setIsDrawing(true);
+          self.listenForClose();
+          down = true;
+          initialCursorPosition = { x, y };
+          return;
+        }
+
+        self.annotation?.unselectAreas?.();
         self.startDrawing(x, y);
       },
 
@@ -290,18 +311,6 @@ const _Tool = types
           currentArea.setDrawing(false);
           currentArea.deleteRegion();
         }
-      },
-
-      resumeDrawing(area) {
-        if (self.isDrawing) return;
-        if (!area || !isAlive(area)) return;
-
-        self.currentArea = area;
-        self.mode = "drawing";
-        area.setDrawing(true);
-        self.annotation?.setIsDrawing(true);
-
-        self.listenForClose();
       },
 
       setSelected(selected) {
