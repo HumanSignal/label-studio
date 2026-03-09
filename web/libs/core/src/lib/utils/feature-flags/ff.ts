@@ -1,6 +1,6 @@
 import { FF_NEW_STORAGES, FF_THEME_TOGGLE } from "./flags";
 
-const FEATURE_FLAGS = window.APP_SETTINGS?.feature_flags || {};
+const FEATURE_FLAGS = (window as any).APP_SETTINGS?.feature_flags || {};
 
 // TODO: remove the override + if statement once LSE and LSO start building
 // react the same way and `fflag_fix_front_lsdv_4620_memory_leaks_100723_short` is removed
@@ -19,12 +19,14 @@ const FLAGS_OVERRIDE: Record<string, boolean> = {
  * Checks if the Feature Flag is active or not.
  */
 export const isActive = (id: string) => {
-  const defaultValue = window.APP_SETTINGS?.feature_flags_default_value === true;
+  const defaultValue = (window as any).APP_SETTINGS?.feature_flags_default_value === true;
   const isSentryOSS =
-    window?.APP_SETTINGS?.sentry_environment === "opensource" || process.env.NODE_ENV === "development";
+    (window as any)?.APP_SETTINGS?.sentry_environment === "opensource" || process.env.NODE_ENV === "development";
 
   if (isSentryOSS && id in FLAGS_OVERRIDE) return FLAGS_OVERRIDE[id];
-  if (id in FEATURE_FLAGS) return FEATURE_FLAGS[id] ?? defaultValue;
+
+  const featureFlags = (window as any).APP_SETTINGS?.feature_flags || {};
+  if (id in featureFlags) return featureFlags[id] ?? defaultValue;
 
   return defaultValue;
 };
@@ -47,10 +49,10 @@ export const isFlagEnabled = (id: string, flagList: Record<string, boolean>, def
 export function isFF(id: string) {
   // TODO: remove the override + if statement once LSE and LSO start building react the same way and fflag_fix_front_lsdv_4620_memory_leaks_100723_short is removed
   const override: Record<string, boolean> = FLAGS_OVERRIDE;
-  if (window?.APP_SETTINGS?.sentry_environment === "opensource" && id in override) {
+  if ((window as any)?.APP_SETTINGS?.sentry_environment === "opensource" && id in override) {
     return override[id];
   }
-  return isFlagEnabled(id, FEATURE_FLAGS, window.APP_SETTINGS?.feature_flags_default_value === true);
+  return isFlagEnabled(id, FEATURE_FLAGS, (window as any).APP_SETTINGS?.feature_flags_default_value === true);
 }
 
 export * from "./flags";
