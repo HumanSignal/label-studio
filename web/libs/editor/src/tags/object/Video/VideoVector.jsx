@@ -1,5 +1,5 @@
 import { observer } from "mobx-react";
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Group } from "react-konva";
 import { useRegionStyles } from "../../../hooks/useRegionColor";
 import { KonvaVector } from "../../../components/KonvaVector/KonvaVector";
@@ -260,9 +260,23 @@ const VideoVectorPure = ({
       commitPoints(latestDragPixelsRef.current);
       latestDragPixelsRef.current = null;
     }
-    setDragPixels(null);
+    // Don't clear dragPixels here — wait for MobX to propagate the committed
+    // values first. Clearing immediately causes a race where React re-renders
+    // with dragPixels=null but box.vertices still has the OLD values, making
+    // the shape snap back to its pre-drag position.
     reg.annotation?.history?.unfreeze?.();
   }, [commitPoints, reg]);
+
+  // Clear dragPixels once MobX store has propagated the committed values.
+  // This avoids the race where clearing dragPixels immediately in handleTransformEnd
+  // causes the shape to flash to old positions before MobX observer re-renders.
+  useEffect(() => {
+    if (dragPixels && !isDraggingRef.current && lastCommittedRef.current) {
+      if (box.vertices && verticesMatch(box.vertices, lastCommittedRef.current.percent)) {
+        setDragPixels(null);
+      }
+    }
+  }, [dragPixels, box.vertices]);
 
   const handlePathClosedChange = useCallback((isClosed) => {
     const shape = reg.getShape(frame);
