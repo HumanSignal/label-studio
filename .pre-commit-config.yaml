@@ -19,7 +19,7 @@ repos:
         files: ^web/.*
       - id: stylelint
         name: stylelint
-        entry: bash -c 'cd web && npx stylelint **/*.scss --fix'
+        entry: bash -c 'cd web && npx stylelint **/*.css --fix'
         language: node
-        types: [ scss ]
-        files: ^.*\.scss$
+        types: [ css ]
+        files: ^.*\.css$

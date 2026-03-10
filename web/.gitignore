@@ -26,7 +26,6 @@ dist
 !.vscode/extensions.json
 
 # misc
-/.sass-cache
 /connect.lock
 /coverage
 /libpeerconnection.log
@@ -121,4 +120,3 @@ libs/datamanager/.cache
 dist
 .cursor/rules/nx-rules.mdc
 .github/instructions/nx.instructions.md
-.scss-snapshots/

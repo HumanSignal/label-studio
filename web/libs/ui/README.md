@@ -32,7 +32,7 @@ This will automatically generate a scaffold of the following:
 
 `./src/lib/button/`
 - `button.tsx`
-- `button.module.scss`
+- `button.module.css`
 - `button.stories.tsx`
 - `button.spec.tsx`
 
