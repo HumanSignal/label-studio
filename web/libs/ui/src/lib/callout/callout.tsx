@@ -1,6 +1,6 @@
 import clsx from "clsx";
 import type { HTMLAttributes, PropsWithChildren } from "react";
-import styles from "./callout.module.scss";
+import styles from "./callout.module.css";
 
 export const CalloutVariants = {
   warning: clsx(styles.variantWarning),

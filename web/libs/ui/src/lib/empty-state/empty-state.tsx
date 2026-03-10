@@ -1,7 +1,7 @@
 import React, { type ReactNode, forwardRef } from "react";
 import { cn } from "../../utils/utils";
 import { Typography } from "../typography/typography";
-import styles from "./empty-state.module.scss";
+import styles from "./empty-state.module.css";
 
 // Size configuration
 const sizes = {

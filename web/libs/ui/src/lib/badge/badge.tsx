@@ -2,7 +2,7 @@ import { forwardRef, useEffect, useRef, useState } from "react";
 import { IconClose } from "@humansignal/icons";
 import { cn } from "../../utils/utils";
 import { Tooltip } from "../Tooltip/Tooltip";
-import styles from "./badge.module.scss";
+import styles from "./badge.module.css";
 
 // Variant mapping: semantic names -> accent colors
 const VARIANT_MAP: Record<string, string> = {

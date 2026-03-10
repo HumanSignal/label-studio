@@ -1,5 +1,5 @@
 import { clsx } from "clsx";
-import styles from "./MultiStateToggle.module.scss";
+import styles from "./MultiStateToggle.module.css";
 import { useMemo } from "react";
 
 export interface MultiStateToggleOption {

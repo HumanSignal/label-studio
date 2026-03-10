@@ -1,2 +1,2 @@
 export * from "./ContextMenu";
-export { default as contextMenuStyles } from "./ContextMenu.module.scss";
+export { default as contextMenuStyles } from "./ContextMenu.module.css";

@@ -4,7 +4,7 @@ import { DragDropContext, type DropResult } from "react-beautiful-dnd";
 import Column from "./Column";
 import type { NewBoardData } from "./createData";
 
-import styles from "./Ranker.module.scss";
+import styles from "./Ranker.module.css";
 
 interface BoardProps {
   inputData: NewBoardData;

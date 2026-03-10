@@ -7,7 +7,7 @@ import ImageGrid from "../ImageGrid/ImageGrid";
 import ImageTransformer from "../ImageTransformer/ImageTransformer";
 import ObjectTag from "../../components/Tags/Object";
 import Tree from "../../core/Tree";
-import styles from "./ImageView.module.scss";
+import styles from "./ImageView.module.css";
 import { errorBuilder } from "../../core/DataValidator/ConfigValidator";
 import { chunks, findClosestParent } from "../../utils/utilities";
 import Konva from "konva";

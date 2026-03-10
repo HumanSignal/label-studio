@@ -2,7 +2,7 @@ import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@huma
 import { useMemo, isValidElement } from "react";
 import { Redirect, Route, Switch, useParams, useRouteMatch } from "react-router-dom";
 import { useUpdatePageTitle, createTitleFromSegments } from "@humansignal/core";
-import styles from "./AccountSettings.module.scss";
+import styles from "./AccountSettings.module.css";
 import { accountSettingsSections } from "./sections";
 import { HotkeysHeaderButtons } from "./sections/Hotkeys";
 import clsx from "clsx";

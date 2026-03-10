@@ -2,7 +2,7 @@ import { type ChangeEvent, type FC, useEffect, useMemo, useState, useCallback } 
 import { JsonViewer, type FilterConfig, Toggle } from "@humansignal/ui";
 import { FF_LOPS_E_3, FF_INTERACTIVE_JSON_VIEWER, isFF } from "../../../utils/feature-flags";
 import { CodeView } from "./CodeView";
-import styles from "./TaskSourceViewer.module.scss";
+import styles from "./TaskSourceViewer.module.css";
 import { ViewToggle, type ViewMode } from "./ViewToggle";
 
 export type { ViewMode };

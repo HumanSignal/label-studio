@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import clsx from "clsx";
 import { Dropdown, useDropdown } from "@humansignal/ui";
 import { IconEllipsisVertical } from "@humansignal/icons";
-import styles from "./ContextMenu.module.scss";
+import styles from "./ContextMenu.module.css";
 
 export interface ContextMenuContext {
   dropdown: ReturnType<typeof useDropdown>;

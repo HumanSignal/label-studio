@@ -7,7 +7,7 @@ import Range from "./Range";
 import { HtxTextNode } from "./Node";
 import UrlNode from "./UrlNode";
 import EmojiNode from "./EmojiNode";
-import styles from "./TextHighlight.module.scss";
+import styles from "./TextHighlight.module.css";
 
 class TextHighlight extends Component {
   constructor() {
