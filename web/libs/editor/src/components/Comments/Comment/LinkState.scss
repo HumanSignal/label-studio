@@ -29,7 +29,7 @@
     .link-state_display & {
       color: var(--color-primary-icon);
 
-      // align linked region icon with the rest
+      /* align linked region icon with the rest */
       align-self: flex-start;
       transform: translateY(2px);
     }
@@ -44,7 +44,7 @@
 .link-state-region {
   display: flex;
   flex-flow: row nowrap;
-  align-items: flex-start; // text can be multiline
+  align-items: flex-start; /* text can be multiline */
   gap: 4px;
   font-size: 1em;
   line-height: 1.2em;
@@ -77,7 +77,7 @@
   &__index {
     width: 18px;
     height: 18px;
-    margin-top: 3px; // to align with 24px icon
+    margin-top: 3px; /* to align with 24px icon */
     display: flex;
     font-size: 9px;
     color: var(--color-neutral-content);
@@ -94,16 +94,16 @@
     flex: 1;
     color: var(--color-neutral-content);
     min-width: 0;
-    margin-top: 3px; // to align with icon and index
+    margin-top: 3px; /* to align with icon and index */
 
-    /// text-overflow for multiline texts
-    /// @see https://stackoverflow.com/a/41137262/308527
+    /* / text-overflow for multiline texts */
+    /* / @see https://stackoverflow.com/a/41137262/308527 */
     display: -webkit-box;
     -webkit-line-clamp: 3;
     -webkit-box-orient: vertical;
     overflow: hidden;
 
-    // reset style from parent to densify text
+    /* reset style from parent to densify text */
     white-space: normal;
 
     * {
@@ -119,8 +119,8 @@
     & div {
       overflow: hidden;
 
-      //// @todo disabled for now to allow multiline texts
-      // white-space: nowrap;
+      /* // @todo disabled for now to allow multiline texts */
+      /* white-space: nowrap; */
       text-overflow: ellipsis;
     }
 

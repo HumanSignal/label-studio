@@ -85,25 +85,17 @@
   }
 
   :global(.htx-highlight) {
-    // resize handles around selected region,
-    // they look like popsicles, normal one at the beginning, upside down one at the end
+    /* resize handles around selected region, */
+    /* they look like popsicles, normal one at the beginning, upside down one at the end */
     area {
-      $handle-radius: 3px;
-      $hitbox-width: 2px;
-
       position: absolute;
       width: 1px;
-
-      // line-height of the text
       height: 1.25em;
-
-      // hitbox
-      padding: 0 $hitbox-width;
+      padding: 0 2px;
       cursor: col-resize;
       box-sizing: content-box;
-      margin-left: -$hitbox-width - 1px;
+      margin-left: -3px;
 
-      // popsicle stick
       &::before {
         position: absolute;
         content: '';
@@ -117,27 +109,25 @@
         left: 0;
       }
 
-      // popsicle sphere
       &::after {
         content: '';
         position: absolute;
-        width: $handle-radius * 2 + 1px;
-        height: $handle-radius * 2 + 1px;
+        width: 7px;
+        height: 7px;
         background: var(--color-primary-content-subtle);
-        top: -($handle-radius * 2 + 1px);
-        left: $hitbox-width - $handle-radius;
+        top: -7px;
+        left: -1px;
         z-index: 100;
         border-radius: 2px;
       }
 
       &:global(.__resize_right) {
-        // area at the end placed a little off for some reason
-        margin-left: -$hitbox-width;
+        margin-left: -2px;
       }
 
       &:global(.__resize_right)::after {
         top: unset;
-        bottom: -($handle-radius * 2 + 1px);
+        bottom: -7px;
       }
 
       &:hover::after {

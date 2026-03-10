@@ -1,4 +1,3 @@
-$border-thin: 1px solid rgb(137 128 152 / 16%);
 
 .paragraphs {
   position: relative;
@@ -39,7 +38,7 @@ $border-thin: 1px solid rgb(137 128 152 / 16%);
 }
 
 .text {
-  // should contain some style to be added to element
+  /* should contain some style to be added to element */
   zoom: 1;
 }
 
@@ -59,7 +58,7 @@ $border-thin: 1px solid rgb(137 128 152 / 16%);
 }
 
 .dialoguetext {
-  // should contain some style to be added to element
+  /* should contain some style to be added to element */
   zoom: 1;
   cursor: text;
 }
@@ -68,7 +67,7 @@ $border-thin: 1px solid rgb(137 128 152 / 16%);
   position: relative;
   overflow: hidden auto;
   counter-reset: phrase;
-  border: $border-thin;
+  border: 1px solid rgb(137 128 152 / 16%);
   padding: 8px;
 }
 
@@ -182,36 +181,36 @@ $border-thin: 1px solid rgb(137 128 152 / 16%);
 }
 
 
-// .playNewUi {
-//   user-select: none;
-//   cursor: pointer;
-//   position: absolute;
+/* .playNewUi { */
+/*   user-select: none; */
+/*   cursor: pointer; */
+/*   position: absolute; */
 
-//   margin-top: -0.3em;
-//   font-size: inherit;
-//   z-index: 1; // Ensure it's above other elements
+/*   margin-top: -0.3em; */
+/*   font-size: inherit; */
+/*   z-index: 1; // Ensure it's above other elements */
 
-//   &:hover, &:active, &:focus {
-//     background: none;
-//   }
-// }
+/*   &:hover, &:active, &:focus { */
+/*     background: none; */
+/*   } */
+/* } */
 
 .play {
   user-select: none;
   position: absolute;
-  left: -32px; // Position in the left margin space
-  top: 50%; // Center vertically relative to phrase container
-  transform: translateY(-50%); // Perfect vertical centering
+  left: -32px; /* Position in the left margin space */
+  top: 50%; /* Center vertically relative to phrase container */
+  transform: translateY(-50%); /* Perfect vertical centering */
   font-size: inherit;
-  z-index: 1; // Ensure it's above other elements
+  z-index: 1; /* Ensure it's above other elements */
   margin-right: 5px;
 
-  // highlight play/pause buttons on interactions
+  /* highlight play/pause buttons on interactions */
   &:active path {
     fill: #1890ff;
   }
 
-  // only the circle of play button highlighted
+  /* only the circle of play button highlighted */
   &:focus path:first-child {
     fill: #1890ff;
   }
@@ -222,15 +221,15 @@ $border-thin: 1px solid rgb(137 128 152 / 16%);
   cursor: pointer;
   position: absolute;
   right: 5px;
-  top: 50%; // Center vertically
-  transform: translateY(-50%); // Perfect vertical centering
+  top: 50%; /* Center vertically */
+  transform: translateY(-50%); /* Perfect vertical centering */
   font-size: inherit;
 
   &:hover, &:active, &:focus {
     background: none;
   }
 
-  // Match the play button interaction styles
+  /* Match the play button interaction styles */
   &:active path {
     fill: #1890ff;
   }
@@ -285,12 +284,12 @@ $border-thin: 1px solid rgb(137 128 152 / 16%);
     padding: 8px 12px;
   }
 
-  // Only add extra padding when select all button is present
+  /* Only add extra padding when select all button is present */
   &.withSelectAllButton {
-    padding-right: 40px; // Space for select all button on right
+    padding-right: 40px; /* Space for select all button on right */
 
     &:not(.collapsed) {
-      padding-right: 50px; // More space for select all button on right when not collapsed
+      padding-right: 50px; /* More space for select all button on right when not collapsed */
     }
   }
 
