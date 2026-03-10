@@ -19,7 +19,7 @@ const config: StorybookConfig = {
       const isScss = testString.includes("scss") || testString.includes("sass");
 
       if (isCss && !isScss) {
-        rule.exclude = [/tailwind\.css/, /\.prefix\.css$/];
+        rule.exclude = /tailwind\.css/;
       }
 
       if (isScss && rule.oneOf) {
@@ -56,12 +56,15 @@ const config: StorybookConfig = {
           }
         });
 
-        rule.test = /\.(prefix\.css|scss|sass)$/;
+        rule.test = /\.(prefix\.css|css|scss|sass)$/;
         for (const oneOfRule of rule.oneOf) {
           if (oneOfRule.test) {
             const innerTest = oneOfRule.test.toString();
             if (innerTest.match(/scss|sass/) && !innerTest.includes("module")) {
               oneOfRule.test = /\.(prefix\.css|scss|sass)$/;
+            }
+            if (/^\/\\\.css\$\/$/.test(innerTest)) {
+              oneOfRule.exclude = /\.prefix\.css$/;
             }
           }
         }
