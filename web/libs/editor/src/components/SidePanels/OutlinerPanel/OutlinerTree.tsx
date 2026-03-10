@@ -405,7 +405,6 @@ const RootTitle: FC<any> = observer(
     isArea,
     ...props
   }) => {
-    const hovered = item?.highlighted;
     const [collapsed, setCollapsed] = useState(false);
 
     const controls = useMemo(() => {

@@ -17,11 +17,7 @@ function toggleRegionLock(idx: number) {
 
 describe("Outliner - Polygon lock/hide controls for unfinished polygons", () => {
   it("should not show lock button for unfinished polygons", () => {
-    LabelStudio.params()
-      .config(polygonConfig)
-      .data(imageData)
-      .withResult(unfinishedPolygonResult)
-      .init();
+    LabelStudio.params().config(polygonConfig).data(imageData).withResult(unfinishedPolygonResult).init();
 
     LabelStudio.waitForObjectsReady();
     ImageView.waitForImage();
@@ -46,11 +42,7 @@ describe("Outliner - Polygon lock/hide controls for unfinished polygons", () => 
   });
 
   it("should not show hide button for unfinished polygons", () => {
-    LabelStudio.params()
-      .config(polygonConfig)
-      .data(imageData)
-      .withResult(unfinishedPolygonResult)
-      .init();
+    LabelStudio.params().config(polygonConfig).data(imageData).withResult(unfinishedPolygonResult).init();
 
     LabelStudio.waitForObjectsReady();
     ImageView.waitForImage();
@@ -66,11 +58,7 @@ describe("Outliner - Polygon lock/hide controls for unfinished polygons", () => 
   });
 
   it("should show lock and hide buttons for finished polygons", () => {
-    LabelStudio.params()
-      .config(polygonConfig)
-      .data(imageData)
-      .withResult(closedPolygonResult)
-      .init();
+    LabelStudio.params().config(polygonConfig).data(imageData).withResult(closedPolygonResult).init();
 
     LabelStudio.waitForObjectsReady();
     ImageView.waitForImage();

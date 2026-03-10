@@ -23,8 +23,8 @@ jest.mock("../../tags/object/Image", () => {
           return 100;
         },
       }))
-      .actions((self) => ({
-        createSerializedResult(region, value) {
+      .actions(() => ({
+        createSerializedResult(_region, value) {
           return {
             value: { ...value },
             original_width: 100,
@@ -62,7 +62,7 @@ const TestRoot = types
       results: [],
     }),
   })
-  .views((self) => ({
+  .views(() => ({
     get canvasToInternalX() {
       return (x) => x;
     },
@@ -73,8 +73,8 @@ const TestRoot = types
       return () => false;
     },
   }))
-  .actions((self) => ({
-    createSerializedResult(region, value) {
+  .actions(() => ({
+    createSerializedResult(_region, value) {
       return {
         value: { ...value },
         original_width: 100,
