@@ -462,15 +462,30 @@ Hotkey.Tooltip = inject("store")(
 
       if (enabled) {
         shortcut.split(",").forEach((combination: string) => {
-          const keys = combination.split("+").map((key: string) =>
-            createElement(
-              "kbd",
-              {
-                className: cn("hotkey").elem("key").toClassName(),
-              },
-              key,
-            ),
-          );
+          const keyParts = combination.split("+");
+          const keys: JSX.Element[] = [];
+
+          keyParts.forEach((key: string, i: number) => {
+            if (i > 0) {
+              keys.push(
+                createElement(
+                  "span",
+                  { className: cn("key-group").elem("separator").toClassName(), key: `sep-${i}` },
+                  "+",
+                ),
+              );
+            }
+            keys.push(
+              createElement(
+                "kbd",
+                {
+                  className: cn("key-group").elem("key").toClassName(),
+                  key: `key-${i}`,
+                },
+                key,
+              ),
+            );
+          });
 
           hotkeys.push(
             createElement(
