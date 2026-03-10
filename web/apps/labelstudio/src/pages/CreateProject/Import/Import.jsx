@@ -161,6 +161,17 @@ export const ImportPage = ({
   const sampleConfig = useAtomValue(sampleDatasetAtom);
 
   const processFiles = (state, action) => {
+    if (action.reset) {
+      return { uploaded: [], uploading: [], ids: [] };
+    }
+    if (action.setList !== undefined) {
+      const list = action.setList ?? [];
+      return {
+        ...state,
+        uploaded: list,
+        ids: list.map((f) => f.id),
+      };
+    }
     if (action.sending) {
       return { ...state, uploading: [...action.sending, ...state.uploading] };
     }
@@ -178,8 +189,6 @@ export const ImportPage = ({
     }
     if (action.ids) {
       const ids = unique([...state.ids, ...action.ids]);
-
-      onFileListUpdate?.(ids);
       return { ...state, ids };
     }
     return state;
@@ -192,23 +201,20 @@ export const ImportPage = ({
   });
   const showList = Boolean(files.uploaded?.length || files.uploading?.length || sample);
 
+  useEffect(() => {
+    onFileListUpdate?.(files.ids);
+  }, [files.ids, onFileListUpdate]);
+
   const loadFilesList = useCallback(
     async (file_upload_ids) => {
-      const query = {};
-
-      if (file_upload_ids) {
-        // should be stringified array "[1,2]"
-        query.ids = JSON.stringify(file_upload_ids);
-      }
+      const query = {
+        ids: file_upload_ids?.length ? JSON.stringify(file_upload_ids) : "[]",
+      };
       const files = await api.callApi("fileUploads", {
         params: { pk: project.id, ...query },
       });
 
-      dispatch({ uploaded: files ?? [] });
-
-      if (files?.length) {
-        dispatch({ ids: files.map((f) => f.id) });
-      }
+      dispatch({ setList: files ?? [] });
       return files;
     },
     [project?.id],
@@ -349,6 +355,7 @@ export const ImportPage = ({
 
   useEffect(() => {
     if (project?.id !== undefined) {
+      dispatch({ reset: true });
       loadFilesList().then((files) => {
         if (csvHandling) return;
         // empirical guess on start if we have some possible tasks list/structured data problem

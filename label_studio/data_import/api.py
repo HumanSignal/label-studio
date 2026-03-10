@@ -818,10 +818,15 @@ class FileUploadListAPI(generics.mixins.ListModelMixin, generics.mixins.DestroyM
         # If requested in regular import, only queried IDs are returned to avoid showing previously imported
         ids = json.loads(self.request.query_params.get('ids', '[]'))
         logger.debug(f'File Upload IDs found: {ids}')
+        if not ids:
+            # Explicit empty queryset so reopened import modal never shows previously imported files
+            return FileUpload.objects.none()
         return FileUpload.objects.filter(project_id=project.id, id__in=ids, user=self.request.user)
 
     def get(self, request, *args, **kwargs):
-        return self.list(request, *args, **kwargs)
+        response = self.list(request, *args, **kwargs)
+        response['Cache-Control'] = 'no-store'
+        return response
 
     def delete(self, request, *args, **kwargs):
         project = generics.get_object_or_404(Project.objects.for_user(self.request.user), pk=self.kwargs['pk'])
