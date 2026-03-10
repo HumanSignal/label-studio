@@ -15,8 +15,8 @@ function toggleRegionLock(idx: number) {
     .click({ force: true });
 }
 
-describe("Outliner - Polygon lock isolation", () => {
-  it("should keep an unfinished polygon visible on the canvas when locked", () => {
+describe("Outliner - Polygon lock/hide controls for unfinished polygons", () => {
+  it("should not show lock button for unfinished polygons", () => {
     LabelStudio.params()
       .config(polygonConfig)
       .data(imageData)
@@ -27,47 +27,45 @@ describe("Outliner - Polygon lock isolation", () => {
     ImageView.waitForImage();
     Sidebar.hasRegions(1);
 
-    cy.log("Capture canvas before locking the unfinished polygon");
-    ImageView.capture("before_lock_unfinished");
-
-    cy.log("Lock the unfinished polygon region");
-    toggleRegionLock(0);
-
-    cy.log("The canvas should NOT change because the polygon should stay visible");
-    ImageView.drawingArea.compareScreenshot("before_lock_unfinished", "shouldNotChange", {
-      threshold: 0.05,
-    });
-  });
-
-  it("should not mark an unfinished polygon as hidden when locking", () => {
-    LabelStudio.params()
-      .config(polygonConfig)
-      .data(imageData)
-      .withResult(unfinishedPolygonResult)
-      .init();
-
-    LabelStudio.waitForObjectsReady();
-    ImageView.waitForImage();
-    Sidebar.hasRegions(1);
-
-    cy.log("Lock the unfinished polygon region");
-    toggleRegionLock(0);
-
-    cy.log("Verify the region is NOT hidden in the sidebar");
-    Sidebar.hasHiddenRegion(0);
-
-    cy.log("Verify the region model is locked but not hidden");
+    cy.log("Verify the unfinished polygon is in incomplete state");
     cy.window().then((win: any) => {
       const annotation = win.Htx.annotationStore.selected;
       const region = annotation.regions[0];
 
-      expect(region.locked).to.equal(true);
-      expect(region.hidden).to.equal(false);
       expect(region.closed).to.equal(false);
+      expect(region.incomplete).to.equal(true);
     });
+
+    cy.log("Lock button should not be present for unfinished polygon");
+    Sidebar.regions
+      .eq(0)
+      .trigger("mouseover")
+      .find(".lsf-outliner-item__controls")
+      .find(".lsf-outliner-item__control_type_lock button")
+      .should("not.exist");
   });
 
-  it("should correctly hide a finished polygon when locked (unchanged behaviour)", () => {
+  it("should not show hide button for unfinished polygons", () => {
+    LabelStudio.params()
+      .config(polygonConfig)
+      .data(imageData)
+      .withResult(unfinishedPolygonResult)
+      .init();
+
+    LabelStudio.waitForObjectsReady();
+    ImageView.waitForImage();
+    Sidebar.hasRegions(1);
+
+    cy.log("Hide button should not be present for unfinished polygon");
+    Sidebar.regions
+      .eq(0)
+      .trigger("mouseover")
+      .find(".lsf-outliner-item__controls")
+      .find(".lsf-outliner-item__control_type_visibility button")
+      .should("not.exist");
+  });
+
+  it("should show lock and hide buttons for finished polygons", () => {
     LabelStudio.params()
       .config(polygonConfig)
       .data(imageData)
@@ -78,7 +76,7 @@ describe("Outliner - Polygon lock isolation", () => {
     ImageView.waitForImage();
     Sidebar.hasRegions(1);
 
-    cy.log("Verify the finished polygon model state before locking");
+    cy.log("Verify the finished polygon model state");
     cy.window().then((win: any) => {
       const annotation = win.Htx.annotationStore.selected;
       const region = annotation.regions[0];
@@ -86,12 +84,21 @@ describe("Outliner - Polygon lock isolation", () => {
       expect(region.locked).to.equal(false);
       expect(region.hidden).to.equal(false);
       expect(region.closed).to.equal(true);
+      expect(region.incomplete).to.equal(false);
     });
+
+    cy.log("Lock button should be present for finished polygon");
+    Sidebar.regions
+      .eq(0)
+      .trigger("mouseover")
+      .find(".lsf-outliner-item__controls")
+      .find(".lsf-outliner-item__control_type_lock button")
+      .should("exist");
 
     cy.log("Lock the finished polygon region");
     toggleRegionLock(0);
 
-    cy.log("Finished polygon should still be locked and not hidden");
+    cy.log("Finished polygon should be locked and not hidden");
     cy.window().then((win: any) => {
       const annotation = win.Htx.annotationStore.selected;
       const region = annotation.regions[0];
@@ -100,7 +107,5 @@ describe("Outliner - Polygon lock isolation", () => {
       expect(region.hidden).to.equal(false);
       expect(region.closed).to.equal(true);
     });
-
-    Sidebar.hasHiddenRegion(0);
   });
 });

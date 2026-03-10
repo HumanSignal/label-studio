@@ -626,8 +626,8 @@ const HtxPolygonView = ({ item, setShapeRef }) => {
           draggable={!item.isReadOnly() && item.inSelection && item.parent?.selectedRegions?.length > 1}
         />
       ) : null}
-      {item.points && (!item.isReadOnly() || !item.closed) ? <Edges item={item} regionStyles={regionStyles} /> : null}
-      {item.points && (!item.isReadOnly() || !item.closed) ? renderCircles(item.points) : null}
+      {item.points && !item.isReadOnly() ? <Edges item={item} regionStyles={regionStyles} /> : null}
+      {item.points && !item.isReadOnly() ? renderCircles(item.points) : null}
     </Group>
   );
 };
