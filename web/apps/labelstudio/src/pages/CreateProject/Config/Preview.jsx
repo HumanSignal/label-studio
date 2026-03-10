@@ -25,6 +25,7 @@ export const Preview = ({ config, data, error, loading, project }) => {
   const [storeReady, setStoreReady] = useState(false);
   const lsf = useRef(null);
   const rootRef = useRef();
+  const mountedRef = useRef(true);
   const api = useAPI();
   const projectRef = useRef(project);
   projectRef.current = project;
@@ -68,14 +69,16 @@ export const Preview = ({ config, data, error, loading, project }) => {
   }, [config]);
 
   const initLabelStudio = useCallback(async (config, task) => {
-    // wait for dependencies to load, the promise is resolved only once
-    // and is started when the component is mounted for the first time
     await loadDependencies();
 
     if (lsf.current || !task.data) return;
 
+    // Resolve root by id so we don't pass null after remounts; getElementById finds the current DOM node
+    const rootEl = document.getElementById("label-studio") ?? rootRef.current;
+    if (!rootEl) return;
+
     try {
-      lsf.current = new window.LabelStudio(rootRef.current, {
+      lsf.current = new window.LabelStudio(rootEl, {
         config,
         task,
         interfaces: ["side-column"],
@@ -104,35 +107,36 @@ export const Preview = ({ config, data, error, loading, project }) => {
 
   useEffect(() => {
     const opacity = loading || error ? 0.6 : 1;
-    // to avoid rerenders and data loss we do it this way
-
-    document.getElementById("label-studio").style.opacity = opacity;
+    const el = document.getElementById("label-studio");
+    if (el) el.style.opacity = opacity;
   }, [loading, error]);
 
   useEffect(() => {
+    mountedRef.current = true;
     initLabelStudio(currentConfig, currentTask).then(() => {
-      if (storeReady && lsf.current?.store) {
-        const store = lsf.current.store;
+      if (!mountedRef.current || !lsf.current?.store) return;
+      const store = lsf.current.store;
 
-        store.resetState();
-        store.assignTask(currentTask);
-        store.assignConfig(currentConfig);
-        store.initializeStore(currentTask);
+      store.resetState();
+      store.assignTask(currentTask);
+      store.assignConfig(currentConfig);
+      store.initializeStore(currentTask);
 
-        const c = store.annotationStore.addAnnotation({
-          userGenerate: true,
-        });
+      const c = store.annotationStore.addAnnotation({
+        userGenerate: true,
+      });
 
-        store.annotationStore.selectAnnotation(c.id);
-        console.log("LSF updated");
-      }
+      store.annotationStore.selectAnnotation(c.id);
     });
+    return () => {
+      mountedRef.current = false;
+    };
   }, [currentConfig, currentTask, storeReady]);
 
   useEffect(() => {
     return () => {
+      mountedRef.current = false;
       if (lsf.current) {
-        console.info("Destroying LSF");
         lsf.current.destroy();
         lsf.current = null;
       }

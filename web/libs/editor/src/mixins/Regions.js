@@ -152,6 +152,7 @@ const RegionsMixin = types
       },
 
       setLocked(locked) {
+        if (self.incomplete === true) return;
         if (locked instanceof Function) {
           self.locked = locked(self.locked);
         } else {
@@ -232,6 +233,10 @@ const RegionsMixin = types
       },
 
       toggleHidden(e, isFiltered = false) {
+        if (self.incomplete === true) {
+          e && e.stopPropagation();
+          return;
+        }
         if (!isFiltered) self.filtered = false;
         self.hidden = !self.hidden;
         e && e.stopPropagation();

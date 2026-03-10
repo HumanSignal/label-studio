@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState, useRef } from "react";
 import CM from "codemirror";
-import { Button, cnm } from "@humansignal/ui";
+import { Button, cnm, Typography } from "@humansignal/ui";
 import { IconTrash, IconInfoOutline } from "@humansignal/icons";
 import { ToggleItems } from "../../../components";
 import { Form, Input } from "../../../components/Form";
@@ -11,7 +11,7 @@ import { FF_UNSAVED_CHANGES, isFF } from "../../../utils/feature-flags";
 import { colorNames } from "./colors";
 import "./Config.scss";
 import { Preview } from "./Preview";
-import { ff, LARGE_CONFIG_MESSAGE, LARGE_CONFIG_TAG_THRESHOLD, countConfigTags } from "@humansignal/core";
+import { LARGE_CONFIG_MESSAGE, LARGE_CONFIG_TAG_THRESHOLD, countConfigTags } from "@humansignal/core";
 import { DEFAULT_COLUMN, EMPTY_CONFIG, isEmptyConfig, Template } from "./Template";
 import { TemplatesList } from "./TemplatesList";
 
@@ -29,40 +29,42 @@ const configClass = cn("configure");
  * AdaptivePreview - Shows manual update banner for large configs,
  * normal auto-updating preview for smaller configs.
  *
- * When FF_PREVIEW_PERFORMANCE is enabled and config has >= 200 tags,
- * shows a banner with "Update Preview" button instead of auto-updating.
+ * When config has >= 200 tags, shows a banner with "Update Preview" button
+ * instead of auto-updating (avoids slow re-renders on every keystroke).
  *
- * Controlled by FF_PREVIEW_PERFORMANCE feature flag.
+ * Uses editorConfig when provided to detect large pasted content immediately.
  *
  * Wrapped in React.memo to prevent unnecessary re-renders when parent re-renders.
  */
-const AdaptivePreview = React.memo(({ config, hasPendingUpdate, onUpdatePreview, isUpdating, ...previewProps }) => {
-  const isFeatureEnabled = ff.isActive(ff.FF_PREVIEW_PERFORMANCE);
+const AdaptivePreview = React.memo(
+  ({ config, editorConfig, hasPendingUpdate, onUpdatePreview, isUpdating, previewKey, ...previewProps }) => {
+    // Use editor config for tag count when provided so banner appears as soon as user pastes large content
+    const configForTagCount = editorConfig !== undefined ? editorConfig : config;
+    const tagCount = useMemo(() => countConfigTags(configForTagCount || ""), [configForTagCount]);
+    const isLargeConfig = tagCount >= LARGE_CONFIG_TAG_THRESHOLD;
 
-  // Memoize tag count calculation to avoid re-computing on every render
-  const tagCount = useMemo(() => countConfigTags(config || ""), [config]);
-  const isLargeConfig = tagCount >= LARGE_CONFIG_TAG_THRESHOLD;
+    const showManualUpdateBanner = isLargeConfig;
 
-  // Only show manual update banner when FF is ON and config is large and there are pending updates
-  const showManualUpdateBanner = isFeatureEnabled && isLargeConfig && hasPendingUpdate;
+    const previewKeyProp = previewKey !== undefined ? previewKey : config;
 
-  if (showManualUpdateBanner) {
-    return (
-      <div className={configClass.elem("preview-container").toClassName()}>
-        <div className={configClass.elem("preview-info-banner").toClassName()}>
-          <IconInfoOutline width={16} height={16} />
-          <span>{LARGE_CONFIG_MESSAGE}</span>
-          <Button size="small" onClick={onUpdatePreview} waiting={isUpdating} disabled={isUpdating}>
-            {isUpdating ? "Updating..." : "Update Preview"}
-          </Button>
+    if (showManualUpdateBanner) {
+      return (
+        <div className={configClass.elem("preview-container").toClassName()}>
+          <div className={configClass.elem("preview-info-banner").toClassName()}>
+            <IconInfoOutline width={16} height={16} />
+            <span>{LARGE_CONFIG_MESSAGE}</span>
+            <Button size="small" onClick={onUpdatePreview} waiting={isUpdating} disabled={isUpdating}>
+              {isUpdating ? "Updating..." : "Update Preview"}
+            </Button>
+          </div>
+          <Preview key={previewKeyProp} config={config} {...previewProps} />
         </div>
-        <Preview config={config} {...previewProps} />
-      </div>
-    );
-  }
+      );
+    }
 
-  return <Preview config={config} {...previewProps} />;
-});
+    return <Preview key={previewKeyProp} config={config} {...previewProps} />;
+  },
+);
 
 const EmptyConfigPlaceholder = () => (
   <div className={configClass.elem("empty-config").toClassName()}>
@@ -444,10 +446,11 @@ const Configurator = ({
   const [hasPendingChanges, setHasPendingChanges] = React.useState(false);
   // Track the last config that was successfully validated and displayed
   const lastValidatedConfig = React.useRef(null);
+  // Increment when configToDisplay changes so Preview remounts and LSF initializes with new config (avoids stale/empty main area)
+  const [previewKey, setPreviewKey] = React.useState(0);
 
   const debounceTimer = React.useRef();
   const api = useAPI();
-  const isFeatureEnabled = ff.isActive(ff.FF_PREVIEW_PERFORMANCE);
 
   React.useEffect(() => {
     const tagCount = countConfigTags(config);
@@ -455,10 +458,8 @@ const Configurator = ({
     const hasCompletedFirstValidation = lastValidatedConfig.current !== null;
 
     // Always validate if we haven't completed the first validation yet
-    // This ensures the preview shows something on first load
     if (!hasCompletedFirstValidation) {
-      // Enter manual mode for large configs, but still do the initial validation
-      if (isLargeConfig && isFeatureEnabled) {
+      if (isLargeConfig) {
         setManualUpdateMode(true);
       }
       debounceTimer.current = window.setTimeout(() => {
@@ -467,39 +468,44 @@ const Configurator = ({
       return () => window.clearTimeout(debounceTimer.current);
     }
 
-    // After first validation: if we're in manual mode, just mark pending changes
+    // After first validation: if we're in manual mode, either update (when config became small) or mark pending
     if (manualUpdateMode) {
+      if (!isLargeConfig) {
+        setManualUpdateMode(false);
+        setHasPendingChanges(false);
+        debounceTimer.current = window.setTimeout(() => {
+          setConfigToCheck(config);
+        }, 300);
+        return () => window.clearTimeout(debounceTimer.current);
+      }
       setHasPendingChanges(true);
       return;
     }
 
-    // Enter manual mode for large configs when feature flag is enabled
-    if (isLargeConfig && isFeatureEnabled) {
+    // Enter manual mode for large configs (no auto-update; user clicks "Update Preview")
+    if (isLargeConfig) {
       setManualUpdateMode(true);
       setHasPendingChanges(true);
       return;
     }
 
-    // Normal debounced auto-update for small configs or when feature flag is off
+    // Normal debounced auto-update for small configs
     debounceTimer.current = window.setTimeout(() => {
       setConfigToCheck(config);
     }, 300);
 
     return () => window.clearTimeout(debounceTimer.current);
-  }, [config, manualUpdateMode, isFeatureEnabled]);
+  }, [config, manualUpdateMode]);
 
   // Handler for manual preview update (used for large configs)
   const handleManualUpdate = React.useCallback(() => {
-    // Check if we should stay in manual mode after this update
     const tagCount = countConfigTags(config);
     const isLargeConfig = tagCount >= LARGE_CONFIG_TAG_THRESHOLD;
 
-    // If still large, stay in manual mode but clear pending changes
-    // If now small, exit manual mode
-    setManualUpdateMode(isLargeConfig && isFeatureEnabled);
+    setManualUpdateMode(isLargeConfig);
     setHasPendingChanges(false);
     setConfigToCheck(config);
-  }, [config, isFeatureEnabled]);
+  }, [config]);
 
   React.useEffect(() => {
     const validate = async () => {
@@ -532,6 +538,7 @@ const Configurator = ({
       if (sample && !sample.error) {
         setData(sample.sample_task);
         setConfigToDisplay(configToCheck);
+        setPreviewKey((k) => k + 1);
         // Track that we've completed a successful validation
         lastValidatedConfig.current = configToCheck;
       } else {
@@ -608,6 +615,9 @@ const Configurator = ({
     () => parserError || error || (configure === "code" && warning) || null,
     [parserError, error, configure, warning],
   );
+
+  // When validating a different config, show placeholder to avoid race: old preview + spinners / empty state
+  const showUpdatingPlaceholder = loading && configToCheck != null && configToCheck !== configToDisplay;
 
   const extra = (
     <p className={configClass.elem("tags-link").toClassName()}>
@@ -713,16 +723,29 @@ const Configurator = ({
             constraints={constraints}
             disabled={constraints.minEditorWidth >= constraints.maxEditorWidth}
           />
-          <AdaptivePreview
-            config={configToDisplay}
-            data={data}
-            project={project}
-            loading={loading}
-            error={previewError}
-            hasPendingUpdate={manualUpdateMode}
-            onUpdatePreview={handleManualUpdate}
-            isUpdating={loading}
-          />
+          {showUpdatingPlaceholder ? (
+            <div
+              className={configClass.elem("preview-container").toClassName()}
+              data-testid="preview-updating-placeholder"
+            >
+              <div className={configClass.elem("preview-updating").toClassName()}>
+                <Typography color="secondary">Updating preview…</Typography>
+              </div>
+            </div>
+          ) : (
+            <AdaptivePreview
+              config={configToDisplay}
+              editorConfig={config}
+              data={data}
+              project={project}
+              loading={loading}
+              error={previewError}
+              hasPendingUpdate={manualUpdateMode}
+              onUpdatePreview={handleManualUpdate}
+              isUpdating={loading}
+              previewKey={previewKey}
+            />
+          )}
         </div>
       </div>
     </div>
