@@ -1,7 +1,16 @@
 @import "./antd-no-reset";
-@import "./variables";
-@import "./mixins";
-@import "./functions";
+
+/** Colors **/
+
+@keyframes waiting {
+  0% {
+    background-position: 0 0;
+  }
+
+  100% {
+    background-position: 37px 0;
+  }
+}
 
 .root {
   font-size: 14px;
@@ -42,31 +51,31 @@
   padding: 2px;
 }
 
-// .htx-no-highlight {
-//     display: none;
-// }
+/* .htx-no-highlight { */
+/*     display: none; */
+/* } */
 
 .htx-no-label::after {
   display: none;
 }
 
 .htx-highlight {
-  // border: 1px dashed #00aeff;
+  /* border: 1px dashed #00aeff; */
 }
 
 .htx-highlight-last {
-  // position: relative;
+  /* position: relative; */
 }
 
 .htx-highlight-last::after {
   margin-left: 2px;
 
-  // top: -0.3em;
-  // margin-right: 2px;
-  // position: relative;
-  // color: #1f104d;
-  // font-size: 75%;
-  // font-weight: bold;
+  /* top: -0.3em; */
+  /* margin-right: 2px; */
+  /* position: relative; */
+  /* color: #1f104d; */
+  /* font-size: 75%; */
+  /* font-weight: bold; */
 }
 
 .htx-yoyo::after {
@@ -98,8 +107,8 @@
   cursor: pointer;
 }
 
-// when node is disabled (when leafsOnly enabled) allow to collapse it by click anywhere
-// achieve this with enormously growing button to the right covering all the text
+/* when node is disabled (when leafsOnly enabled) allow to collapse it by click anywhere */
+/* achieve this with enormously growing button to the right covering all the text */
 .react-dropdown-tree-select .node.disabled > .toggle {
   padding-right: 100%;
   margin-right: -100%;
@@ -152,7 +161,7 @@
     outline: none;
   }
   
-  // /* slider thumb */
+  /* slider thumb */
   &[type="range"]::-webkit-slider-thumb {
     appearance: none;
     margin-top: 0;

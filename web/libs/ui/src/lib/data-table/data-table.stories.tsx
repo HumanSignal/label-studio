@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { DataTable } from "./data-table";
 import type { ColumnDef, SortingState } from "@tanstack/react-table";
 import type { ExtendedDataTableColumnDef } from "./data-table";
@@ -532,6 +532,181 @@ export const ConditionalRowSelection: Story = {
           rowSelection={rowSelection}
           onRowSelectionChange={setRowSelection}
           isRowSelectable={(row) => row.original.status === "active"}
+        />
+      </div>
+    );
+  },
+};
+
+/**
+ * Server-Side (Manual) Sorting
+ *
+ * Use `manualSorting={true}` whenever column accessors return object values instead of
+ * primitives — a common pattern when a column's display value is nested inside a related
+ * object (e.g. `created_by: { first_name, last_name }`).
+ *
+ * Without it, TanStack picks its `basic` sort comparator for object values.
+ * `basic` uses `a === b ? 0 : a > b ? 1 : -1`. For two *different* object references
+ * whose `toString()` both resolve to `"[object Object]"`:
+ *   - `a === b` → false (different references)
+ *   - `a > b`   → false (equal string coercion)
+ *   → always returns -1 — a comparator that violates transitivity.
+ * V8's TimSort with this inconsistent comparator ends up **reversing** the array,
+ * so the server's correctly-sorted response appears in the opposite order on screen.
+ *
+ * With `manualSorting={true}`, TanStack skips `getSortedRowModel` entirely and renders
+ * rows in the exact order they were received — preserving the server's sort.
+ *
+ * Toggle the checkbox in the story to see the reversal in action.
+ */
+export const WithManualSorting: Story = {
+  render: () => {
+    type Tag = {
+      id: number;
+      label: string;
+      member_count: number;
+      created_by: { id: number; first_name: string; last_name: string };
+    };
+
+    const allTags: Tag[] = [
+      {
+        id: 1,
+        label: "lang:english",
+        member_count: 5,
+        created_by: { id: 10, first_name: "Alice", last_name: "Anderson" },
+      },
+      {
+        id: 2,
+        label: "lang:spanish",
+        member_count: 3,
+        created_by: { id: 10, first_name: "Alice", last_name: "Anderson" },
+      },
+      {
+        id: 3,
+        label: "skill:backend",
+        member_count: 8,
+        created_by: { id: 20, first_name: "Charlie", last_name: "Chen" },
+      },
+      {
+        id: 4,
+        label: "skill:frontend",
+        member_count: 6,
+        created_by: { id: 20, first_name: "Charlie", last_name: "Chen" },
+      },
+      {
+        id: 5,
+        label: "skill:devops",
+        member_count: 2,
+        created_by: { id: 30, first_name: "Nathan", last_name: "Shelley" },
+      },
+      { id: 6, label: "team:alpha", member_count: 10, created_by: { id: 40, first_name: "Ted", last_name: "Lasso" } },
+      { id: 7, label: "team:beta", member_count: 4, created_by: { id: 40, first_name: "Ted", last_name: "Lasso" } },
+    ];
+
+    const [sorting, setSorting] = useState<SortingState>([{ id: "label", desc: false }]);
+    const [useManualSorting, setUseManualSorting] = useState(true);
+
+    // Simulates what a server-side API would return: data sorted by the requested field.
+    const serverSortedData = useMemo(() => {
+      if (sorting.length === 0) return allTags;
+      const { id, desc } = sorting[0];
+
+      return [...allTags].sort((a, b) => {
+        let aVal: string | number;
+        let bVal: string | number;
+
+        if (id === "label") {
+          aVal = a.label;
+          bVal = b.label;
+        } else if (id === "member_count") {
+          aVal = a.member_count;
+          bVal = b.member_count;
+        } else if (id === "created_by__first_name") {
+          aVal = `${a.created_by.first_name} ${a.created_by.last_name}`;
+          bVal = `${b.created_by.first_name} ${b.created_by.last_name}`;
+        } else {
+          return 0;
+        }
+
+        if (aVal < bVal) return desc ? 1 : -1;
+        if (aVal > bVal) return desc ? -1 : 1;
+        return a.id - b.id;
+      });
+    }, [sorting]);
+
+    const columns = useMemo<ColumnDef<Tag>[]>(
+      () => [
+        {
+          id: "label",
+          accessorKey: "label",
+          header: "Label",
+          size: 180,
+          enableSorting: true,
+        },
+        {
+          id: "member_count",
+          accessorKey: "member_count",
+          header: "Members",
+          size: 100,
+          enableSorting: true,
+        },
+        {
+          id: "created_by__first_name",
+          accessorKey: "created_by", // returns an object — this is what triggers the bug
+          header: "Created By",
+          size: 180,
+          enableSorting: true,
+          cell: ({ row }) => {
+            const u = row.original.created_by;
+            return `${u.first_name} ${u.last_name}`;
+          },
+        },
+      ],
+      [],
+    );
+
+    const sortLabel = sorting.length > 0 ? `${sorting[0].id} (${sorting[0].desc ? "desc" : "asc"})` : "none";
+    const serverOrder = serverSortedData.map((t) => `${t.created_by.first_name} ${t.created_by.last_name}`);
+
+    return (
+      <div className="flex flex-col gap-4">
+        <div className="p-4 bg-neutral-surface rounded-md flex flex-col gap-3">
+          <div className="flex items-center justify-between">
+            <p className="text-sm font-medium text-neutral-content">Active sort: {sortLabel}</p>
+            <label className="flex items-center gap-2 text-sm text-neutral-content cursor-pointer select-none">
+              <input
+                type="checkbox"
+                checked={useManualSorting}
+                onChange={(e) => setUseManualSorting(e.target.checked)}
+              />
+              <code className="text-xs bg-neutral-surface-raised px-1 rounded">manualSorting</code>
+            </label>
+          </div>
+          <p className="text-xs text-neutral-content-subtle">
+            Server-returned order:{" "}
+            <span className="font-mono">
+              [
+              {serverOrder
+                .map((n, i) => (i > 0 && serverOrder[i - 1] === n ? null : n))
+                .filter(Boolean)
+                .join(", ")}
+              ]
+            </span>
+          </p>
+          {!useManualSorting && (
+            <p className="text-xs text-warning-content bg-warning-background border border-warning-border rounded px-2 py-1">
+              ⚠ manualSorting is OFF — TanStack's <code>basic</code> comparator reverses object-valued columns. Click
+              "Created By" to see the "Created By" column appear in the wrong order.
+            </p>
+          )}
+        </div>
+        <DataTable
+          data={serverSortedData}
+          columns={columns}
+          enableSorting
+          manualSorting={useManualSorting}
+          sorting={sorting}
+          onSortingChange={(updater) => setSorting((prev) => (typeof updater === "function" ? updater(prev) : updater))}
         />
       </div>
     );

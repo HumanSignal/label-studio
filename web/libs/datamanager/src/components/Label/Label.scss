@@ -1,4 +1,12 @@
-@import "../../styles/waiting";
+@keyframes waiting {
+  0% {
+    background-position: 0 0;
+  }
+
+  100% {
+    background-position: 37px 0;
+  }
+}
 
 .label-view {
   height: 100%;
@@ -17,8 +25,13 @@
     border-radius: 4px;
     transform: translate(-50%, -50%);
     box-shadow: 0 5px 20px var(--black_20);
+    background-image: repeating-linear-gradient(-63.43deg, rgb(255 255 255 / 20%) 1px, var(--color-primary-surface) 2px, var(--color-primary-surface) 6px, rgb(255 255 255 / 20%) 7px, rgb(255 255 255 / 20%) 12px);
+    background-color: #fff;
+    background-size: 37px 100%;
 
-    @include waiting(var(--color-primary-surface));
+    &_animated {
+      animation: waiting 1s linear infinite;
+    }
   }
 
   &__header {

@@ -3,7 +3,7 @@
 
   font-family: var(--font-sans);
 
-  // Let parent control height; we grow until constrained
+  /* Let parent control height; we grow until constrained */
   max-height: 100%;
 }
 
@@ -25,7 +25,7 @@
   min-width: 0;
   height: 32px;
 
-  // Add divider between header cells (except first, pinned, and noDivider)
+  /* Add divider between header cells (except first, pinned, and noDivider) */
   &:not(:first-child, .headCellPinned, .headCellNoDivider)::after {
     content: "";
     display: block;
@@ -146,7 +146,7 @@
     @apply min-w-0 truncate;
   }
 
-  // Style for disabled checkboxes in data table
+  /* Style for disabled checkboxes in data table */
   :global(.checkbox_disabled) {
     opacity: 0.5;
     cursor: not-allowed;

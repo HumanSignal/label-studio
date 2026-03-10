@@ -10,7 +10,7 @@
 }
 
 .container {
-  // Gradient border effect using padding + background + pseudo-element
+  /* Gradient border effect using padding + background + pseudo-element */
   padding: 2px;
   background: linear-gradient(109.47deg, var(--color-accent-canteloupe-base) 0%, var(--color-accent-persimmon-base) 50%, var(--color-accent-plum-base) 100%);
   border-radius: 12px;
@@ -19,7 +19,7 @@
   position: relative;
   transform: translateY(-3rem);
 
-  // Inner content container with actual background
+  /* Inner content container with actual background */
   &::before {
     content: "";
     position: absolute;
@@ -30,7 +30,7 @@
     z-index: 0;
   }
 
-  // All children need to be above the pseudo-element
+  /* All children need to be above the pseudo-element */
   > * {
     position: relative;
     z-index: 1;
@@ -51,12 +51,12 @@
 }
 
 .title {
-  // Typography component handles font styles
+  /* Typography component handles font styles */
   margin: 0;
 }
 
 .description {
-  // Typography component handles font styles
+  /* Typography component handles font styles */
   max-width: 600px;
   margin: 0;
 }

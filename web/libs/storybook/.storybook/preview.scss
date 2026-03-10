@@ -14,7 +14,7 @@ body {
   background-color: var(--color-neutral-background) !important;
 }
 
-// Undo tailwind reset for the Docs pages
+/* Undo tailwind reset for the Docs pages */
 #storybook-docs .sbdocs-content h1:not(.sbdocs-preview *),
 #storybook-docs .sbdocs-content h2:not(.sbdocs-preview *),
 #storybook-docs .sbdocs-content h3:not(.sbdocs-preview *),
@@ -25,17 +25,17 @@ body {
 }
 
 
-// Within Doc Pages apply the theme colors only to the preview blocks
+/* Within Doc Pages apply the theme colors only to the preview blocks */
 .sbdocs-preview {
   background-color: var(--color-neutral-background) !important;
   color: var(--color-neutral-content) !important;
   border: 1px solid var(--color-neutral-border) !important;
 }
 
-// Style Storybook docs UI elements for dark mode support
+/* Style Storybook docs UI elements for dark mode support */
 #storybook-docs {
 
-  // Args table (props documentation)
+  /* Args table (props documentation) */
   .docblock-argstable {
     color: var(--color-neutral-content) !important;
 
@@ -49,12 +49,12 @@ body {
       border-color: var(--color-neutral-border) !important;
     }
 
-    // Table header styling
+    /* Table header styling */
     & th {
       color: var(--color-neutral-content-subtle) !important;
     }
 
-    // Property names and descriptions
+    /* Property names and descriptions */
     & td {
 
       & span,
@@ -65,7 +65,7 @@ body {
     }
   }
 
-  // General content area
+  /* General content area */
   .sbdocs-content {
     color: var(--color-neutral-content) !important;
 
@@ -78,34 +78,34 @@ body {
     }
   }
 
-  // Code blocks - ensure text is readable on dark backgrounds
+  /* Code blocks - ensure text is readable on dark backgrounds */
   & code,
   & pre {
     background-color: var(--color-neutral-surface) !important;
     color: var(--color-neutral-content) !important;
   }
 
-  // Inline code in args table (type annotations, default values)
+  /* Inline code in args table (type annotations, default values) */
   .docblock-argstable code,
   .docblock-argstable span[class*="css-"] {
     color: var(--color-neutral-content) !important;
   }
 
-  // Type signature chips (e.g., "(element: HTMLElement) => boolean")
+  /* Type signature chips (e.g., "(element: HTMLElement) => boolean") */
   .docblock-argstable td div[class*="css-"]>span[class*="css-"] {
     background-color: var(--color-neutral-surface) !important;
     color: var(--color-neutral-content) !important;
     border: none !important;
   }
 
-  // Default value chips (e.g., "false", "true")
+  /* Default value chips (e.g., "false", "true") */
   .docblock-argstable td>span[class*="css-"] {
     background-color: var(--color-neutral-surface) !important;
     color: var(--color-neutral-content) !important;
     border: none !important;
   }
 
-  // Form controls in args table (selects, inputs, toggles)
+  /* Form controls in args table (selects, inputs, toggles) */
   .docblock-argstable select,
   .docblock-argstable textarea,
   .docblock-argstable input:not([role="switch"]) {
@@ -115,7 +115,7 @@ body {
   }
 
 
-  // Toggle switches (label with for starting with "control-")
+  /* Toggle switches (label with for starting with "control-") */
   .docblock-argstable label[for^="control-"] {
     background: var(--color-neutral-background) !important;
     border: 1px solid var(--color-neutral-border) !important;
@@ -123,13 +123,13 @@ body {
 
   .docblock-argstable input[role="switch"] {
 
-    // Toggle text labels (False/True)
+    /* Toggle text labels (False/True) */
     &~span[aria-hidden="true"] {
       color: var(--color-neutral-content) !important;
       background-color: var(--color-neutral-background) !important;
     }
 
-    // Checked state - use primary color
+    /* Checked state - use primary color */
     &:checked {
       &~span:last-of-type {
         background-color: var(--color-primary-background) !important;
@@ -145,7 +145,7 @@ body {
     }
   }
 
-  // Buttons (Set boolean, Set string, Set object, etc.)
+  /* Buttons (Set boolean, Set string, Set object, etc.) */
   .docblock-argstable button {
     background-color: var(--color-neutral-surface) !important;
     color: var(--color-neutral-content) !important;
@@ -153,7 +153,7 @@ body {
     box-shadow: var(--color-neutral-border) 0px 0px 0px 1px inset !important;
   }
 
-  // Show code / Hide code toggle buttons
+  /* Show code / Hide code toggle buttons */
   .docblock-code-toggle {
     border-radius: 0 !important;
     background-color: var(--color-neutral-surface) !important;
@@ -161,7 +161,7 @@ body {
     border-color: var(--color-neutral-border) !important;
   }
 
-  // Preview toolbar (zoom controls, etc.)
+  /* Preview toolbar (zoom controls, etc.) */
   .sbdocs-preview .sb-bar {
     background-color: var(--color-neutral-surface) !important;
     border-color: var(--color-neutral-border) !important;
