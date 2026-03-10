@@ -96,4 +96,70 @@ describe("Outliner - Polygon lock/hide controls for unfinished polygons", () => 
       expect(region.closed).to.equal(true);
     });
   });
+
+  it("should not lock unfinished polygon via hotkey", () => {
+    LabelStudio.params().config(polygonConfig).data(imageData).withResult(unfinishedPolygonResult).init();
+
+    LabelStudio.waitForObjectsReady();
+    ImageView.waitForImage();
+    Sidebar.hasRegions(1);
+
+    cy.log("Select the unfinished polygon");
+    Sidebar.regions.eq(0).click();
+
+    cy.log("Verify unfinished polygon is selected");
+    cy.window().then((win: any) => {
+      const annotation = win.Htx.annotationStore.selected;
+      const region = annotation.regions[0];
+
+      expect(region.selected).to.equal(true);
+      expect(region.closed).to.equal(false);
+      expect(region.incomplete).to.equal(true);
+      expect(region.locked).to.equal(false);
+    });
+
+    cy.log("Press lock hotkey (Ctrl+L)");
+    cy.get("body").type("{ctrl}l");
+
+    cy.log("Unfinished polygon should remain unlocked");
+    cy.window().then((win: any) => {
+      const annotation = win.Htx.annotationStore.selected;
+      const region = annotation.regions[0];
+
+      expect(region.locked).to.equal(false);
+    });
+  });
+
+  it("should not hide unfinished polygon via hotkey", () => {
+    LabelStudio.params().config(polygonConfig).data(imageData).withResult(unfinishedPolygonResult).init();
+
+    LabelStudio.waitForObjectsReady();
+    ImageView.waitForImage();
+    Sidebar.hasRegions(1);
+
+    cy.log("Select the unfinished polygon");
+    Sidebar.regions.eq(0).click();
+
+    cy.log("Verify unfinished polygon is selected and visible");
+    cy.window().then((win: any) => {
+      const annotation = win.Htx.annotationStore.selected;
+      const region = annotation.regions[0];
+
+      expect(region.selected).to.equal(true);
+      expect(region.closed).to.equal(false);
+      expect(region.incomplete).to.equal(true);
+      expect(region.hidden).to.equal(false);
+    });
+
+    cy.log("Press hide hotkey (Ctrl+H)");
+    cy.get("body").type("{ctrl}h");
+
+    cy.log("Unfinished polygon should remain visible");
+    cy.window().then((win: any) => {
+      const annotation = win.Htx.annotationStore.selected;
+      const region = annotation.regions[0];
+
+      expect(region.hidden).to.equal(false);
+    });
+  });
 });
