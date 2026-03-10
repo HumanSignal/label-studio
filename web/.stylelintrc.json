@@ -1,18 +1,16 @@
 {
-  "extends": ["stylelint-config-tailwindcss/scss", "stylelint-config-standard-scss"],
+  "extends": ["stylelint-config-tailwindcss", "stylelint-config-standard"],
   "rules": {
     "selector-class-pattern": null,
     "custom-property-pattern": null,
     "no-descending-specificity": null,
-    "scss/no-global-function-names": null,
-    "scss/function-no-unknown": null,
     "selector-pseudo-class-no-unknown": [
       true,
       {
         "ignorePseudoClasses": ["global"]
       }
     ],
-    "scss/at-rule-no-unknown": [
+    "at-rule-no-unknown": [
       true,
       {
         "ignoreAtRules": ["position-try"]
@@ -27,7 +25,7 @@
     "function-no-unknown": [
       true,
       {
-        "ignoreFunctions": ["anchor-size", "anchor", "map-get", "unquote"]
+        "ignoreFunctions": ["anchor-size", "anchor"]
       }
     ],
     "declaration-block-no-redundant-longhand-properties": [

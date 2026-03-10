@@ -18,18 +18,23 @@ const config: StorybookConfig = {
       const isCss = testString.includes("\\.css");
       const isScss = testString.includes("scss") || testString.includes("sass");
 
-      if (isCss) {
-        rule.exclude = /tailwind\.css/;
+      if (isCss && !isScss) {
+        rule.exclude = [/tailwind\.css/, /\.prefix\.css$/];
       }
 
-      // Apply BEM class prefixing to non-module SCSS files
       if (isScss && rule.oneOf) {
+        for (const oneOfRule of rule.oneOf) {
+          if (oneOfRule.use && Array.isArray(oneOfRule.use)) {
+            oneOfRule.use = oneOfRule.use.filter(
+              (use: any) => !(use.loader && use.loader.includes("sass-loader")),
+            );
+          }
+        }
+
         const scssRules = rule.oneOf.filter((r: any) => {
           if (!r.use) return false;
           const testString = r.test?.toString() ?? "";
-          // Skip CSS modules and node_modules
           if (testString.match(/module/) || r.exclude?.toString().includes("node_modules")) return false;
-          // Target rules with css-loader
           return (
             testString.match(/scss|sass/) &&
             Array.isArray(r.use) &&
@@ -44,13 +49,22 @@ const config: StorybookConfig = {
             cssLoader.options.modules = {
               localIdentName: `${css_prefix}[local]`,
               getLocalIdent(ctx: any, _ident: any, className: string) {
-                // Skip prefixing for Storybook preview styles (targets Storybook DOM classes)
                 if (ctx.resourcePath?.includes("preview.prefix.css")) return className;
                 if (className.includes("ant")) return className;
               },
             };
           }
         });
+
+        rule.test = /\.(prefix\.css|scss|sass)$/;
+        for (const oneOfRule of rule.oneOf) {
+          if (oneOfRule.test) {
+            const innerTest = oneOfRule.test.toString();
+            if (innerTest.match(/scss|sass/) && !innerTest.includes("module")) {
+              oneOfRule.test = /\.(prefix\.css|scss|sass)$/;
+            }
+          }
+        }
       }
     }
 

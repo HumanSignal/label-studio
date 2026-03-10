@@ -7,7 +7,7 @@
     "ui:test:component": "nx test-component ui",
     "biome": "biome",
     "lint": "biome check --write .",
-    "lint-scss": "yarn stylelint '**/*.scss' --fix",
+    "lint-css": "yarn stylelint '**/*.css' --fix",
     "ls:dev": "nx run labelstudio:serve:development",
     "ls:watch": "nx run labelstudio:build:development --watch",
     "ls:build": "nx run labelstudio:build:production",

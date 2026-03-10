@@ -64,7 +64,7 @@
       {
         "name": "typescript-plugin-css-modules",
         "options": {
-          "customMatcher": "\\.module\\.scss$",
+          "customMatcher": "\\.module\\.css$",
           "classnameTransform": "asIs"
         }
       }

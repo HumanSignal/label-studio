@@ -33,4 +33,4 @@ jobs:
       - name: Run stylelint
         working-directory: ${{ env.FRONTEND_MONOREPO_DIR }}
         run: |
-          yarn stylelint "**/*.scss"
+          yarn stylelint "**/*.css"
