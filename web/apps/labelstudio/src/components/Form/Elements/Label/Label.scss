@@ -14,7 +14,7 @@
     color: var(--color-neutral-content-subtler);
     font-weight: 400;
     line-height: 140%;
-    white-space: pre-line;  // enable \n support in description texts
+    white-space: pre-line; /* enable \n support in description texts */
 
     & a {
       color: var(--color-primary-content);
@@ -32,7 +32,7 @@
     color: var(--color-neutral-content-subtler);
     font-weight: 400;
     line-height: 140%;
-    white-space: pre-line;  // enable \n support in footer texts
+    white-space: pre-line; /* enable \n support in footer texts */
     margin-top: var(--spacing-tightest);
 
     & a {
@@ -54,7 +54,7 @@
     display: flex;
     align-items: center;
     gap: 4px;
-    white-space: pre-line;  // enable \n support in label texts
+    white-space: pre-line; /* enable \n support in label texts */
     margin-bottom: var(--spacing-tightest);
   }
 

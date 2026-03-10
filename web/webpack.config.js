@@ -203,6 +203,16 @@ module.exports = composePlugins(
         });
       }
 
+      if (isScss && rule.oneOf) {
+        rule.oneOf.forEach((oneOfRule) => {
+          if (oneOfRule.use) {
+            oneOfRule.use = oneOfRule.use.filter(
+              (use) => !(use.loader && use.loader.includes("sass-loader")),
+            );
+          }
+        });
+      }
+
       if (testString.includes(".css")) {
         rule.exclude = /tailwind\.css/;
       }

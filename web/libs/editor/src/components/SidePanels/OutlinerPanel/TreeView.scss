@@ -91,8 +91,8 @@
 
     .labels-list {
       display: inline;
-      line-height: 1.2; // make it dense for multiline labels
-      padding: 2px 0; // + add a little padding so it won't be too close to the item edges
+      line-height: 1.2; /* make it dense for multiline labels */
+      padding: 2px 0; /* + add a little padding so it won't be too close to the item edges */
       overflow: hidden;
       text-overflow: ellipsis;
     }
@@ -144,7 +144,7 @@
     display: flex;
     flex: none;
     font-size: 9px;
-    color: var(--color-sand-000); // TODO: Revisit this with a css variable that can be calculated against --text-color for a dynamically high contrast value.
+    color: var(--color-sand-000); /* TODO: Revisit this with a css variable that can be calculated against --text-color for a dynamically high contrast value. */
     text-align: center;
     align-items: center;
     border-radius: 4px;
