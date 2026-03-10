@@ -670,6 +670,15 @@ $scroll-width: 5px;
   }
 }
 
+.wizard .configure__preview-updating {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  padding: var(--spacing-wide);
+  min-height: 200px;
+}
+
 div[class^="App_menu"]>div {
   width: 100%;
 }

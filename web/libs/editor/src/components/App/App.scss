@@ -91,6 +91,9 @@ body {
 }
 
 .key-group {
+  display: inline-flex;
+  align-items: center;
+
   &__key {
     padding: 0 4px;
     height: 16px;
