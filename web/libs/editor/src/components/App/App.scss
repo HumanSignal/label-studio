@@ -109,9 +109,10 @@ body {
   }
 
   &__separator {
-    margin: 0 2px;
-    font-size: 10px;
-    opacity: 0.6;
+    margin: 0 3px;
+    font-size: 12px;
+    font-weight: bold;
+    opacity: 0.9;
   }
 
   & + & {
