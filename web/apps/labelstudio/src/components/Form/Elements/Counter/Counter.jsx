@@ -3,7 +3,7 @@ import { cn } from "../../../../utils/bem";
 import { Oneof } from "../../../Oneof/Oneof";
 import { FormField } from "../../FormField";
 import { default as Label } from "../Label/Label";
-import "./Counter.scss";
+import "./Counter.prefix.css";
 import { IconMinus, IconPlus } from "@humansignal/icons";
 
 const allowedKeys = ["ArrowUp", "ArrowDown", "Backspace", "Delete", /[0-9]/];

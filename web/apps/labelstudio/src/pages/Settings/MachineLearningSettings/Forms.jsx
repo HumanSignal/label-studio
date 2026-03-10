@@ -3,7 +3,7 @@ import { Button } from "@humansignal/ui";
 import { ErrorWrapper } from "../../../components/Error/Error";
 import { InlineError } from "../../../components/Error/InlineError";
 import { Form, Input, Select, TextArea, Toggle } from "../../../components/Form";
-import "./MachineLearningSettings.scss";
+import "./MachineLearningSettings.prefix.css";
 
 const CustomBackendForm = ({ action, backend, project, onSubmit }) => {
   const [selectedAuthMethod, setAuthMethod] = useState("NONE");

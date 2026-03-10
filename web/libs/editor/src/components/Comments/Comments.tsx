@@ -9,7 +9,7 @@ import { useMounted } from "../../common/Utils/useMounted";
 import { FF_DEV_3034, isFF } from "../../utils/feature-flags";
 import { FF_FIT_720_LAZY_LOAD_ANNOTATIONS } from "@humansignal/core/lib/utils/feature-flags";
 
-import "./Comments.scss";
+import "./Comments.prefix.css";
 
 // FIT-720: Skeleton loader for comments while fetching
 const CommentsLoadingSkeleton: FC = () => (

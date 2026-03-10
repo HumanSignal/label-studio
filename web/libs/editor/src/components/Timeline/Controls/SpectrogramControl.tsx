@@ -6,7 +6,7 @@ import { Range } from "../../../common/Range/Range";
 import { IconInfoConfig, IconWarningCircleFilled } from "@humansignal/icons";
 import { TimelineContext } from "../Context";
 import { Slider } from "./Slider";
-import "./SpectrogramControl.scss";
+import "./SpectrogramControl.prefix.css";
 import colormap from "colormap";
 
 // Define Scale Options Type

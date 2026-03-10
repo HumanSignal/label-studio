@@ -5,7 +5,7 @@ import { FF_BULK_ANNOTATION, isFF } from "../../utils/feature-flags";
 import { Actions } from "./Actions";
 import { Controls } from "./Controls";
 import { CurrentTask } from "./CurrentTask";
-import "./BottomBar.scss";
+import "./BottomBar.prefix.css";
 
 export const BottomBar = observer(({ store }) => {
   const annotationStore = store.annotationStore;

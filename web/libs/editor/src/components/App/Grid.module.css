@@ -1,5 +1,5 @@
 /* Grid (View All mode) */
-@import "../../assets/styles/global.scss";
+@import "../../assets/styles/global.prefix.css";
 
 .grid {
   flex-grow: 1;

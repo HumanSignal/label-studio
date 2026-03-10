@@ -8,7 +8,7 @@ import { FF_BULK_ANNOTATION, isFF } from "../../utils/feature-flags";
 import { AnnotationsCarousel } from "../AnnotationsCarousel/AnnotationsCarousel";
 import { ViewAllToggle } from "../AnnotationsCarousel/ViewAllToggle";
 
-import "./TopBar.scss";
+import "./TopBar.prefix.css";
 
 export const TopBar = observer(({ store }) => {
   const annotationStore = store.annotationStore;

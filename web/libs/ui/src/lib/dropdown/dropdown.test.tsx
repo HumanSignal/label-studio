@@ -5,7 +5,7 @@ import { Dropdown, type DropdownRef } from "./dropdown";
 import { DropdownContext, type DropdownContextValue } from "./dropdown-context";
 
 // Mock the SCSS module
-jest.mock("./dropdown.scss", () => ({}));
+jest.mock("./dropdown.prefix.css", () => ({}));
 
 // Mock the alignment utility
 jest.mock("@humansignal/core/lib/utils/dom", () => ({

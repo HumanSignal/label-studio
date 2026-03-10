@@ -23,7 +23,7 @@ import { queryClient } from "@humansignal/core/lib/utils/query-client";
 import { RootPage } from "./RootPage";
 import { ff } from "@humansignal/core";
 import "@humansignal/ui/src/tailwind.css";
-import "./App.scss";
+import "./App.prefix.css";
 import { AuthProvider } from "@humansignal/core/providers/AuthProvider";
 
 const baseURL = new URL(APP_SETTINGS.hostname || location.origin);

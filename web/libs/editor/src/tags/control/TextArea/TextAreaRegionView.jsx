@@ -10,7 +10,7 @@ import Registry from "../../../core/Registry";
 import { PER_REGION_MODES } from "../../../mixins/PerRegion";
 import { cn } from "../../../utils/bem";
 
-import "./TextArea.scss";
+import "./TextArea.prefix.css";
 
 const { TextArea } = Input;
 

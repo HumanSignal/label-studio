@@ -4,7 +4,7 @@ import { Tooltip } from "@humansignal/ui";
 import { IconInfoConfig } from "@humansignal/icons";
 import { cn } from "../../../utils/bem";
 
-import "./Slider.scss";
+import "./Slider.prefix.css";
 
 export interface SliderProps {
   description?: string;

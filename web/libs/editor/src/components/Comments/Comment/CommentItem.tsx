@@ -15,7 +15,7 @@ import { CommentsContext } from "./CommentsList";
 import { NewTaxonomy as Taxonomy, type TaxonomyPath } from "../../../components/NewTaxonomy/NewTaxonomy";
 import { taxonomyPathsToSelectedItems, COMMENT_TAXONOMY_OPTIONS } from "../../../utils/commentClassification";
 
-import "./CommentItem.scss";
+import "./CommentItem.prefix.css";
 import { LinkState } from "./LinkState";
 
 interface CommentItemProps {

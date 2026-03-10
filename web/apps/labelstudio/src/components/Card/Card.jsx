@@ -1,6 +1,6 @@
 import { cn } from "../../utils/bem";
 import { Tooltip } from "@humansignal/ui";
-import "./Card.scss";
+import "./Card.prefix.css";
 
 export const Card = ({ header, extra, children, style }) => {
   const rootClass = cn("card");

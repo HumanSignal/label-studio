@@ -9,7 +9,7 @@ import { cn } from "../../../utils/bem";
 import { Palette } from "../../../utils/colors";
 import { FF_UNSAVED_CHANGES, isFF } from "../../../utils/feature-flags";
 import { colorNames } from "./colors";
-import "./Config.scss";
+import "./Config.prefix.css";
 import { Preview } from "./Preview";
 import { LARGE_CONFIG_MESSAGE, LARGE_CONFIG_TAG_THRESHOLD, countConfigTags } from "@humansignal/core";
 import { DEFAULT_COLUMN, EMPTY_CONFIG, isEmptyConfig, Template } from "./Template";

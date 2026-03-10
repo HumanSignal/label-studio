@@ -38,7 +38,7 @@
     }
 
     & h3 {
-      font-size: 1.5rem; /* Special case to override the too restrictive and generalistic Config.scss */
+      font-size: 1.5rem; /* Special case to override the too restrictive and generalistic Config.prefix.css */
     }
   }
 }

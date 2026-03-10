@@ -2,7 +2,7 @@ import { observer } from "mobx-react";
 import { IconStar, IconStarOutline } from "@humansignal/icons";
 import { Button, Tooltip } from "@humansignal/ui";
 import { cn } from "../../utils/bem";
-import "./GroundTruth.scss";
+import "./GroundTruth.prefix.css";
 
 export const GroundTruth = observer(({ entity, disabled = false, size = "md" }) => {
   const title = entity.ground_truth ? "Unset this result as a ground truth" : "Set this result as a ground truth";

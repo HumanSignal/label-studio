@@ -11,7 +11,7 @@ import { TableCell, TableCellContent } from "../TableCell/TableCell";
 import { TableContext, tableCN } from "../TableContext";
 import { cn } from "../../../../utils/bem";
 import { getStyle } from "../utils";
-import "./TableHead.scss";
+import "./TableHead.prefix.css";
 import { getRoot } from "mobx-state-tree";
 import { Agreement } from "../../../CellViews/Agreement/Agreement";
 import { AgreementSelected } from "../../../CellViews/AgreementSelected";

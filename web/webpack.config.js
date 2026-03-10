@@ -211,10 +211,36 @@ module.exports = composePlugins(
             );
           }
         });
+
+        rule.test = /\.(prefix\.css|scss|sass)$/;
+        rule.oneOf.forEach((oneOfRule) => {
+          if (oneOfRule.test) {
+            const innerTest = oneOfRule.test.toString();
+            if (innerTest.match(/scss|sass/) && !innerTest.includes("module")) {
+              oneOfRule.test = /\.(prefix\.css|scss|sass)$/;
+            }
+          }
+        });
       }
 
-      if (testString.includes(".css")) {
-        rule.exclude = /tailwind\.css/;
+      if (testString.includes(".css") && !isScss) {
+        rule.exclude = [/tailwind\.css/, /\.prefix\.css$/];
+
+        if (rule.oneOf) {
+          rule.oneOf.forEach((oneOfRule) => {
+            if (oneOfRule.use) {
+              const cssLoader = oneOfRule.use.find((use) => use.loader?.includes("css-loader"));
+              if (cssLoader?.options) {
+                cssLoader.options.modules = {
+                  ...(cssLoader.options.modules || {}),
+                  auto: true,
+                  namedExport: false,
+                  localIdentName: "[local]--[hash:base64:5]",
+                };
+              }
+            }
+          });
+        }
       }
     });
 

@@ -4,7 +4,7 @@ import { cn } from "../../../utils/bem";
 import { Button, Badge } from "@humansignal/ui";
 import { IconClose } from "@humansignal/icons";
 import { FilterDropdown } from "../FilterDropdown";
-import "./FilterLine.scss";
+import "./FilterLine.prefix.css";
 import { FilterOperation } from "./FilterOperation";
 import { Icon } from "../../Common/Icon/Icon";
 import {

@@ -8,7 +8,7 @@ import type { ActionRefValue } from "../../../common/TextArea/TextArea";
 import { cn } from "../../../utils/bem";
 
 import { LinkState } from "./LinkState";
-import "./CommentForm.scss";
+import "./CommentForm.prefix.css";
 import { NewTaxonomy as Taxonomy, type TaxonomyPath } from "../../../components/NewTaxonomy/NewTaxonomy";
 import { CommentFormButtons } from "./CommentFormButtons";
 import { taxonomyPathsToSelectedItems, COMMENT_TAXONOMY_OPTIONS } from "../../../utils/commentClassification";

@@ -45,7 +45,7 @@ const config: StorybookConfig = {
               localIdentName: `${css_prefix}[local]`,
               getLocalIdent(ctx: any, _ident: any, className: string) {
                 // Skip prefixing for Storybook preview styles (targets Storybook DOM classes)
-                if (ctx.resourcePath?.includes("preview.scss")) return className;
+                if (ctx.resourcePath?.includes("preview.prefix.css")) return className;
                 if (className.includes("ant")) return className;
               },
             };

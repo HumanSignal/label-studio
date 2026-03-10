@@ -6,7 +6,7 @@ import { IconConfig } from "@humansignal/ui";
 import { TimelineContext } from "../../../components/Timeline/Context";
 import { ControlButton } from "../../../components/Timeline/Controls";
 import { Slider } from "../../../components/Timeline/Controls/Slider";
-import "./ConfigControl.scss";
+import "./ConfigControl.prefix.css";
 import { SpectrogramConfig } from "./SpectrogramConfig";
 import type { Waveform } from "../Waveform";
 import type { MutableRefObject } from "react";

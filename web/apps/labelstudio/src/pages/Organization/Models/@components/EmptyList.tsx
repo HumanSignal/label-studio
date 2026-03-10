@@ -1,7 +1,7 @@
 import { Button } from "@humansignal/ui";
 import { cn } from "apps/labelstudio/src/utils/bem";
 import type { FC } from "react";
-import "./EmptyList.scss";
+import "./EmptyList.prefix.css";
 import { HeidiAi } from "apps/labelstudio/src/assets/images";
 
 export const EmptyList: FC = () => {
