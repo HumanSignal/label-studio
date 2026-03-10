@@ -6,7 +6,7 @@ type: guide
 order: 0
 order_enterprise: 372
 meta_title: Manage user accounts
-meta_description: How to assign users to roles, delete users, deactivate users
+meta_description: How to assign users to roles, delete users, tag users, and deactivate users
 section: "Manage Your Organization"
 parent: "manage_users"
 parent_enterprise: "manage_users"
