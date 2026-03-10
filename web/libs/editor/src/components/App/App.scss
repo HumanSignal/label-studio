@@ -91,6 +91,9 @@ body {
 }
 
 .key-group {
+  display: inline-flex;
+  align-items: center;
+
   &__key {
     padding: 0 4px;
     height: 16px;
@@ -105,8 +108,10 @@ body {
     box-shadow: 0 0 0 1px rgb(0 0 0 / 10%), 0 1px 0 rgb(0 0 0 / 8%);
   }
 
-  &__key + &__key {
-    margin-left: 4px;
+  &__separator {
+    margin: 0 2px;
+    font-size: 10px;
+    opacity: 0.6;
   }
 
   & + & {
