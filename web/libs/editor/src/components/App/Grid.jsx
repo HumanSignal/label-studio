@@ -270,9 +270,7 @@ const VirtualizedGrid = observer(({ store, annotations, root }) => {
           freshAnnotation.deserializeResults?.(fullAnnotation.result);
 
           // Ensure dynamically hydrated annotation is strictly read-only when viewing all (Compare All)
-          if (store.annotationStore.viewingAll) {
-            freshAnnotation.setEditable?.(false);
-          }
+          freshAnnotation.setEditable?.(false);
 
           // Critical: updateObjects() is required to render visual regions after deserializing
           freshAnnotation.updateObjects?.();
