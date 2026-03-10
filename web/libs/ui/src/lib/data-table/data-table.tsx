@@ -64,6 +64,8 @@ export type DataTableProps<T extends DataShape> = {
   sorting?: SortingState;
   onSortingChange?: (updater: SortingState | ((old: SortingState) => SortingState)) => void;
   enableSorting?: boolean; // Global enable/disable sorting
+  /** When true, sorting is handled server-side. Bypasses TanStack's getSortedRowModel so data is displayed in the exact order received. Required when column accessors return objects (not primitive values), as TanStack's 'basic' comparator produces inconsistent results for objects with identical string representations. */
+  manualSorting?: boolean;
   // Empty state props
   /** Empty state configuration when no data is available */
   emptyState?: {
@@ -108,6 +110,7 @@ export const DataTable = <T extends DataShape>(props: DataTableProps<T>) => {
     sorting: controlledSorting,
     onSortingChange: controlledOnSortingChange,
     enableSorting = true,
+    manualSorting = false,
     isRowSelectable,
     onSelectAllChange,
     invertedSelectionEnabled,
@@ -367,6 +370,7 @@ export const DataTable = <T extends DataShape>(props: DataTableProps<T>) => {
       }),
     columnResizeMode: "onChange",
     enableSorting: enableSorting,
+    manualSorting,
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
   });
