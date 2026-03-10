@@ -18,7 +18,7 @@ import { cn } from "../../../utils/bem";
 import { FieldsButton } from "../FieldsButton";
 import { FF_LOPS_E_3, isFF } from "../../../utils/feature-flags";
 import { DensityToggle } from "../../DataManager/Toolbar/DensityToggle";
-import { TaskSourceViewer } from "../TaskSourceViewer";
+import { TaskSourceViewer, getTaskSourceViewerStorageKey } from "../TaskSourceViewer";
 
 const Decorator = (decoration) => {
   return {
@@ -62,7 +62,7 @@ export const Table = observer(
     const [colOrder, setColOrder] = useState(JSON.parse(localStorage.getItem(colOrderKey)) ?? {});
     const listRef = useRef();
     const Decoration = useMemo(() => Decorator(decoration), [decoration]);
-    const { api, type } = useSDK();
+    const { api, type, projectId } = useSDK();
     const toolbarHeight = 41;
     const isQuickView = view.root.isLabeling;
     const [toolbarVisible, setToolbarVisible] = useState(true);
@@ -194,7 +194,7 @@ export const Table = observer(
                     content={out}
                     onTaskLoad={onTaskLoad}
                     sdkType={type}
-                    storageKey="dm:tasksource"
+                    storageKey={getTaskSourceViewerStorageKey(projectId)}
                     renderToggle={(toggle) => {
                       // Update modal header with toggle
                       modalInstance?.update({ header: toggle });
@@ -638,7 +638,7 @@ const innerElementType = forwardRef(({ children, ...rest }, ref) => {
 const ContextMenuPortal = memo(
   ({ contextMenu, view, onViewAnalytics, onViewReviewerAnalytics, onClose, RowContextMenuComponent }) => {
     const MenuComponent = RowContextMenuComponent || RowContextMenu;
-    const { api, type } = useSDK();
+    const { api, type, projectId } = useSDK();
 
     return (
       <MenuComponent
@@ -647,6 +647,7 @@ const ContextMenuPortal = memo(
         view={view}
         api={api}
         sdkType={type}
+        projectId={projectId}
         onViewAnalytics={onViewAnalytics}
         onViewReviewerAnalytics={onViewReviewerAnalytics}
         cursorPosition={{ x: contextMenu.x, y: contextMenu.y }}

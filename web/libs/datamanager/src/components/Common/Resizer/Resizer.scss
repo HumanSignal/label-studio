@@ -17,7 +17,6 @@
     right: 0;
     cursor: ew-resize;
     z-index: 100;
-    width: var(--handle-interactive-size);
 
     &::before {
       width: var(--handle-size);

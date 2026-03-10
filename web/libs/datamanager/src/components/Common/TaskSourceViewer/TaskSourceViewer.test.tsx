@@ -67,6 +67,8 @@ jest.mock("./TaskSourceViewer.module.scss", () => ({
 }));
 
 describe("TaskSourceViewer Component", () => {
+  // View uses global key; resolveUrls and JSON viewer use project-scoped key (storageKey prop)
+  const GLOBAL_STORAGE_KEY = "dm:tasksource";
   const mockTaskData = {
     id: 123,
     data: {
@@ -133,7 +135,7 @@ describe("TaskSourceViewer Component", () => {
     });
 
     it("should show resolve URI toggle in JsonViewer toolbar for interactive view", async () => {
-      localStorage.setItem("test:tasksource:view", "interactive");
+      localStorage.setItem(`${GLOBAL_STORAGE_KEY}:view`, "interactive");
 
       render(<TaskSourceViewer {...defaultProps} />);
 
@@ -145,7 +147,7 @@ describe("TaskSourceViewer Component", () => {
     });
 
     it("should reload task data when resolve URIs toggle changes", async () => {
-      localStorage.setItem("test:tasksource:view", "interactive");
+      localStorage.setItem(`${GLOBAL_STORAGE_KEY}:view`, "interactive");
       const user = userEvent.setup();
       const mockOnTaskLoad = jest.fn().mockResolvedValue(mockTaskData);
 
@@ -166,7 +168,7 @@ describe("TaskSourceViewer Component", () => {
     });
 
     it("should save resolve URIs preference to localStorage", async () => {
-      localStorage.setItem("test:tasksource:view", "interactive");
+      localStorage.setItem(`${GLOBAL_STORAGE_KEY}:view`, "interactive");
       const user = userEvent.setup();
 
       render(<TaskSourceViewer {...defaultProps} />);
@@ -193,7 +195,7 @@ describe("TaskSourceViewer Component", () => {
     });
 
     it("should respect stored view preference from localStorage", async () => {
-      localStorage.setItem("test:tasksource:view", "interactive");
+      localStorage.setItem(`${GLOBAL_STORAGE_KEY}:view`, "interactive");
 
       render(<TaskSourceViewer {...defaultProps} />);
 
@@ -237,7 +239,7 @@ describe("TaskSourceViewer Component", () => {
       capturedOnViewChange!("interactive");
 
       await waitFor(() => {
-        expect(localStorage.getItem("test:tasksource:view")).toBe("interactive");
+        expect(localStorage.getItem(`${GLOBAL_STORAGE_KEY}:view`)).toBe("interactive");
         expect(screen.getByTestId("json-viewer")).toBeInTheDocument();
       });
     });
