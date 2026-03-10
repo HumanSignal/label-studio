@@ -2,6 +2,7 @@
 
 import logging
 
+from core.utils.common import load_func
 from django.conf import settings
 from django.db import models
 from django.db.models import Q
@@ -199,6 +200,7 @@ class ModelRun(models.Model):
         """
         predictions = Prediction.objects.filter(model_run=self.id)
         prediction_ids = [p.id for p in predictions]
+        task_ids = list({p.task_id for p in predictions})
         # to delete all dependencies where predictions are foreign keys.
         Annotation.objects.filter(parent_prediction__in=prediction_ids).update(parent_prediction=None)
         try:
@@ -224,6 +226,11 @@ class ModelRun(models.Model):
         # remove predictions from db
         predictions._raw_delete(predictions.db)
         failed_predictions._raw_delete(failed_predictions.db)
+
+        # Trigger postprocessing when predictions are deleted
+        postprocess = load_func(settings.DELETE_PREDICTIONS_POSTPROCESS)
+        if postprocess is not None:
+            postprocess(self.project, task_ids)
 
     def delete(self, *args, **kwargs):
         """

@@ -1,6 +1,6 @@
-// Tag Autocomplete Component Styles
+/* Tag Autocomplete Component Styles */
 
-// Trigger (input-like container)
+/* Trigger (input-like container) */
 .trigger {
   display: flex;
   align-items: center;
@@ -36,7 +36,7 @@
   opacity: 0.6;
 }
 
-// Tags container (multiline, with wrapping)
+/* Tags container (multiline, with wrapping) */
 .tagsContainer {
   display: flex;
   flex-wrap: wrap;
@@ -46,16 +46,16 @@
   min-width: 0;
 }
 
-// Tag focused state (for keyboard navigation)
+/* Tag focused state (for keyboard navigation) */
 .tagFocused {
   outline: none !important;
   border-color: var(--color-primary-border-subtle) !important;
 
-  // Remove the ring offset so it looks like a border
+  /* Remove the ring offset so it looks like a border */
   box-shadow: none !important;
 }
 
-// Input field
+/* Input field */
 .input {
   flex: 1;
   min-width: 60px;
@@ -76,7 +76,7 @@
   }
 }
 
-// Dropdown content
+/* Dropdown content */
 .loadingContainer {
   display: flex;
   align-items: center;
@@ -84,14 +84,14 @@
   padding: 8px;
 }
 
-// Text highlighting in options
+/* Text highlighting in options */
 .highlight {
   background: transparent;
   font-weight: 600;
   color: inherit;
 }
 
-// Create option styling
+/* Create option styling */
 .createOptionWithBorder {
   border-top: 1px solid var(--color-neutral-border);
   margin-top: 0.25rem;
@@ -105,7 +105,7 @@
   color: var(--color-neutral-content-subtle);
 }
 
-// Hidden select for form integration
+/* Hidden select for form integration */
 .hiddenSelect {
   position: absolute;
   width: 1px;

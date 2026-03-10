@@ -82,29 +82,29 @@
   align-items: center;
 }
 
-// Note: Dropdown padding is now controlled via triggerProps in FilterDropdown component
+/* Note: Dropdown padding is now controlled via triggerProps in FilterDropdown component */
 
 :global(.filter-dropdown-content) {
   min-width: 270px !important;
   width: max-content;
   max-width: min(500px, 90vw);
 
-  // Decorative items (headers) are disabled in cmdk. Override the default
-  // disabled styles so they look like clean section labels, not grayed-out options.
+  /* Decorative items (headers) are disabled in cmdk. Override the default */
+  /* disabled styles so they look like clean section labels, not grayed-out options. */
   [data-disabled] {
     pointer-events: auto !important;
     cursor: default !important;
     opacity: 1;
   }
 
-  // Suppress the hover highlight on the inner div of disabled/decorative items.
+  /* Suppress the hover highlight on the inner div of disabled/decorative items. */
   [data-disabled="true"] > div[data-disabled="true"] {
     background: transparent !important;
     cursor: default !important;
   }
 
-  // Section headers (Recent, All fields): reduce left padding so they sit further left
-  // than list items, making section boundaries easier to spot.
+  /* Section headers (Recent, All fields): reduce left padding so they sit further left */
+  /* than list items, making section boundaries easier to spot. */
   [data-value="__recent_header__"] > div,
   [data-value="__all_fields_header__"] > div {
     padding-left: 8px !important;

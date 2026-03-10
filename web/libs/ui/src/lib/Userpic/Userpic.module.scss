@@ -23,8 +23,8 @@
     position: absolute;
     border-radius: 100%;
 
-    // Firefox displays weird empty box extending viewport's width (img shouldn't render ::before at all!)
-    // this is a hack to prevent it from rendering
+    /* Firefox displays weird empty box extending viewport's width (img shouldn't render ::before at all!) */
+    /* this is a hack to prevent it from rendering */
     &::before {
       content: none;
       display: none;

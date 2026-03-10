@@ -1,12 +1,12 @@
 .jsonViewer {
-  // Component-level tokens
+  /* Component-level tokens */
   --json-viewer-container-background: var(--color-neutral-surface-inset);
   --json-viewer-background: transparent;
   --json-viewer-collection-background: transparent;
   --json-viewer-input-background: var(--color-neutral-background);
   --json-viewer-button-hover-background: var(--color-primary-emphasis-subtle);
   
-  // Color tokens for JSON values
+  /* Color tokens for JSON values */
   --json-viewer-color-edit: var(--color-primary-content);
   --json-viewer-color-copy: var(--color-primary-content);
   --json-viewer-color-add: var(--color-primary-content);
@@ -174,7 +174,7 @@
     box-shadow: inset 0 2px 8px rgba(var(--color-neutral-shadow-raw) / 12%);
   }
 
-  // Override json-edit-react styles to match Label Studio theme
+  /* Override json-edit-react styles to match Label Studio theme */
   :global {
     .jer-container {
       background-color: var(--json-viewer-background);
@@ -183,7 +183,7 @@
       line-height: 1.6;
     }
     
-    // Override button styles
+    /* Override button styles */
     .jer-button {
       transition: background-color 150ms ease;
       
@@ -197,7 +197,7 @@
       }
     }
     
-    // Override input styles
+    /* Override input styles */
     .jer-input {
       background: var(--json-viewer-input-background);
       border: 1px solid var(--color-neutral-border);
@@ -217,7 +217,7 @@
       }
     }
     
-    // Override collection/object/array backgrounds
+    /* Override collection/object/array backgrounds */
     .jer-collection {
       background-color: var(--json-viewer-collection-background);
       border-radius: var(--corner-radius-small);
@@ -227,7 +227,7 @@
       background: transparent;
     }
     
-    // Override key-value pair spacing
+    /* Override key-value pair spacing */
     .jer-key-value-pair {
       padding: var(--spacing-tighter) 0;
     }
@@ -236,9 +236,9 @@
       color: var(--json-viewer-color-collection-count) !important;
     }
 
-    // Override JSON value colors
-    // Using !important to ensure our theme overrides the default
-    // Using multiple selectors to increase specificity for Storybook compatibility
+    /* Override JSON value colors */
+    /* Using !important to ensure our theme overrides the default */
+    /* Using multiple selectors to increase specificity for Storybook compatibility */
     .jer-value-string,
     .jer-value-string span,
     .jer-value-string div {
@@ -267,21 +267,21 @@
       align-items: flex-start;
     }
 
-    // Override key colors
+    /* Override key colors */
     .jer-key-text,
     .jer-key-text span,
     .jer-key-text div {
       color: var(--json-viewer-color-keys) !important;
     }
 
-    // Override bracket colors
+    /* Override bracket colors */
     .jer-brackets,
     .jer-brackets span,
     .jer-brackets div {
       color: var(--json-viewer-color-brackets) !important;
     }
 
-    // Override edit buttons
+    /* Override edit buttons */
     .jer-edit-buttons .jer-copy-pulse {
       color: var(--json-viewer-color-copy) !important;
       width: 32px;

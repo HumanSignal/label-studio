@@ -1,5 +1,3 @@
-$scroll-width: 5px;
-
 .panel {
   display: none;
 }
@@ -31,6 +29,8 @@ $scroll-width: 5px;
 }
 
 .wizard .configure__container {
+  --scroll-width: 5px;
+
   display: grid;
   position: relative;
   padding: 0;
@@ -38,7 +38,7 @@ $scroll-width: 5px;
   background-color: var(--color-neutral-background);
 
   &>div {
-    padding: var(--spacing-base) 24px - $scroll-width var(--spacing-base) 20px;
+    padding: var(--spacing-base) calc(24px - var(--scroll-width)) var(--spacing-base) 20px;
 
     &:first-child {
       height: calc(100vh - var(--header-height));
@@ -46,7 +46,7 @@ $scroll-width: 5px;
   }
 
   &::-webkit-scrollbar {
-    width: $scroll-width;
+    width: var(--scroll-width);
   }
 
   &::-webkit-scrollbar-track {
@@ -54,7 +54,7 @@ $scroll-width: 5px;
   }
 }
 
-// Apply max-height only in Create Project wizard context (not in Labeling Settings)
+/* Apply max-height only in Create Project wizard context (not in Labeling Settings) */
 .create-project .wizard .configure__container>div {
   --create-project-header-height: 73px;
   --create-project-modal-padding: calc(var(--spacing-widest) * 2);
@@ -137,12 +137,12 @@ $scroll-width: 5px;
       grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
       gap: var(--spacing-wide);
 
-      // Better space utilization on larger screens
-      @media (width >=1200px) {
+      /* Better space utilization on larger screens */
+      @media (width >=1200px) { /* desktop */
         grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
       }
 
-      @media (width >=1600px) {
+      @media (width >=1600px) { /* wide desktop */
         grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
       }
     }
@@ -160,7 +160,7 @@ $scroll-width: 5px;
     background: var(--color-neutral-background);
     box-shadow: 0 4px 8px 0 rgb(var(--color-neutral-shadow-raw) / 8%);
 
-    // Smooth transitions for hover/focus interactions
+    /* Smooth transitions for hover/focus interactions */
     transition:
       transform 0.2s ease-in-out,
       border-color 0.15s ease-in-out,
@@ -178,7 +178,7 @@ $scroll-width: 5px;
       border: 1px solid var(--color-primary-border);
       box-shadow: 0 0 0 4px var(--color-primary-focus-outline);
       background: var(--color-primary-background);
-      transform: translateY(-1px); // Subtle lift effect
+      transform: translateY(-1px); /* Subtle lift effect */
     }
 
     & h3 {

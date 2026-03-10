@@ -52,7 +52,7 @@
   }
 }
 
-/// VARIANTS
+/* / VARIANTS */
 .variant-primary {
   --background-color: var(--color-primary-surface);
   --border-color: var(--color-primary-border-bold);
@@ -305,7 +305,7 @@
   }
 }
 
-  /// VARIANT LOOK
+  /* / VARIANT LOOK */
 .look-outlined {
   &:not(:disabled),
   &.waiting {
@@ -365,7 +365,7 @@
   }
 }
 
-/// SIZES
+/* / SIZES */
 
 .size-medium {
   @apply p-tight text-label-medium h-1000;
@@ -404,7 +404,7 @@
   }
 }
 
-/// STATES
+/* / STATES */
 .waiting {
   --background-image: repeating-linear-gradient(
       -63.43deg,
@@ -446,7 +446,7 @@
   }
 }
 
-/// ALIGN
+/* / ALIGN */
 .align-default {
   & > span {
     @apply justify-center;

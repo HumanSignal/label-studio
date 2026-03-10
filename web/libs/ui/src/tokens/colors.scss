@@ -1,8 +1,8 @@
-// Legacy colors
-// TODO: Remove these once we've converted all the components to use the new colors
-//       which are defined in the `tokens.scss` file
+/* Legacy colors */
+/* TODO: Remove these once we've converted all the components to use the new colors */
+/*       which are defined in the `tokens.scss` file */
 :root {
-  // Deprecated: [DO NOT USE]
+  /* Deprecated: [DO NOT USE] */
   --black-raw: 0 0 0;
   --white-raw: 255 255 255;
   --accent_color-raw: 86 111 207;
