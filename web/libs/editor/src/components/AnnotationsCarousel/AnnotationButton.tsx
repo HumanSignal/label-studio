@@ -459,6 +459,7 @@ const AnnotationButtonContextMenu = injector(
             onClick: copyAnnotationIdHandler,
             icon: <IconClipboardCheck width={20} height={20} />,
             enabled: !isDraft,
+            dataTestId: "annotation-button-menu-copy-id",
           },
           {
             label: `${isGroundTruth ? "Unset " : "Set "} as Ground Truth`,
@@ -469,30 +470,35 @@ const AnnotationButtonContextMenu = injector(
               <IconStarOutline width={iconSize} height={iconSize} />
             ),
             enabled: showGroundTruth,
+            dataTestId: "annotation-button-menu-set-ground-truth",
           },
           {
             label: isPrediction ? "Duplicate as Annotation" : "Duplicate Annotation",
             onClick: duplicateAnnotation,
             icon: <IconDuplicate width={20} height={20} />,
             enabled: showDuplicateAnnotation,
+            dataTestId: "annotation-button-menu-duplicate",
           },
           {
             label: isPrediction ? "Copy Prediction Link" : "Copy Annotation Link",
             onClick: linkAnnotation,
             icon: <IconLink />,
             enabled: !isDraft && store.hasInterface("annotations:copy-link"),
+            dataTestId: "annotation-button-menu-copy-link",
           },
           {
             label: "Open Performance Dashboard",
             onClick: openPerformanceDashboard,
             icon: <IconAnalytics width={20} height={20} />,
             enabled: isLSE && hasProjectId && !isDraft && !isPrediction,
+            dataTestId: "annotation-button-menu-performance-dashboard",
           },
           {
             label: "Compare All Annotations",
             onClick: showOtherAnnotations,
             icon: <IconViewAll width={20} height={20} />,
             enabled: true,
+            dataTestId: "annotation-button-menu-compare-all",
           },
           {
             label: isPrediction ? "Delete Prediction" : "Delete Annotation",
@@ -503,6 +509,7 @@ const AnnotationButtonContextMenu = injector(
             enabled: isPrediction
               ? Boolean((capabilities as { enablePredictionDelete?: boolean }).enablePredictionDelete)
               : capabilities.enableAnnotationDelete,
+            dataTestId: "annotation-button-menu-delete",
           },
         ],
         [
@@ -1052,6 +1059,7 @@ export const AnnotationButton = observer(
           >
             <div
               className={cn("annotation-button").elem("trigger").toClassName()}
+              data-testid="annotation-button-overflow-trigger"
               onMouseEnter={handleTriggerEnter}
               onClick={(e) => e.stopPropagation()}
             >

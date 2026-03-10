@@ -404,7 +404,7 @@ describe("AnnotationButton", () => {
   it("calls toggleViewingAllAnnotations when Compare All Annotations is clicked", () => {
     const entity = createEntity();
     const toggleViewingAllAnnotations = jest.fn();
-    const { container } = render(
+    render(
       <Provider store={defaultStore}>
         <AnnotationButton
           entity={entity}
@@ -419,7 +419,7 @@ describe("AnnotationButton", () => {
         />
       </Provider>,
     );
-    fireEvent.click(container.querySelector(".ls-annotation-button__trigger")!);
+    fireEvent.click(screen.getByTestId("annotation-button-overflow-trigger"));
     fireEvent.click(screen.getByText("Compare All Annotations"));
     expect(toggleViewingAllAnnotations).toHaveBeenCalled();
   });
@@ -534,6 +534,146 @@ describe("AnnotationButton", () => {
     fireEvent.click(container.querySelector(".ls-annotation-button__trigger")!);
     fireEvent.click(screen.getByText("Unset as Ground Truth"));
     expect(setGroundTruth).toHaveBeenCalledWith(false);
+  });
+
+  describe("annotation button menu with prediction entity", () => {
+    const predictionCapabilities = {
+      ...defaultCapabilities,
+      enablePredictionDelete: true,
+    } as const;
+
+    it("opens context menu for prediction and shows Copy Prediction ID", () => {
+      const entity = createEntity({ type: "prediction", pk: 1 });
+      render(
+        <Provider store={defaultStore}>
+          <AnnotationButton
+            entity={entity}
+            capabilities={predictionCapabilities}
+            annotationStore={{ ...defaultAnnotationStore, store: defaultStore } as any}
+          />
+        </Provider>,
+      );
+      fireEvent.click(screen.getByTestId("annotation-button-overflow-trigger"));
+      expect(screen.getByText("Copy Prediction ID")).toBeInTheDocument();
+    });
+
+    it("calls Copy Prediction ID and shows toast when menu item is clicked for prediction", () => {
+      mockToastShow.mockClear();
+      const entity = createEntity({ type: "prediction", pk: 1 });
+      render(
+        <Provider store={defaultStore}>
+          <AnnotationButton
+            entity={entity}
+            capabilities={predictionCapabilities}
+            annotationStore={{ ...defaultAnnotationStore, store: defaultStore } as any}
+          />
+        </Provider>,
+      );
+      fireEvent.click(screen.getByTestId("annotation-button-overflow-trigger"));
+      fireEvent.click(screen.getByText("Copy Prediction ID"));
+      expect(mockToastShow).toHaveBeenCalledWith(
+        expect.objectContaining({ message: "Prediction ID copied to clipboard", type: "info" }),
+      );
+    });
+
+    it("calls addAnnotationFromPrediction and selectAnnotation when Duplicate as Annotation is clicked for prediction", () => {
+      jest.useFakeTimers();
+      const newAnnotation = { id: 99 };
+      const addAnnotationFromPrediction = jest.fn().mockReturnValue(newAnnotation);
+      const selectAnnotation = jest.fn();
+      const entity = createEntity({ type: "prediction", pk: 1 });
+      render(
+        <Provider store={defaultStore}>
+          <AnnotationButton
+            entity={entity}
+            capabilities={predictionCapabilities}
+            annotationStore={
+              {
+                ...defaultAnnotationStore,
+                store: defaultStore,
+                addAnnotationFromPrediction,
+                selectAnnotation,
+              } as any
+            }
+          />
+        </Provider>,
+      );
+      fireEvent.click(screen.getByTestId("annotation-button-overflow-trigger"));
+      fireEvent.click(screen.getByText("Duplicate as Annotation"));
+      expect(addAnnotationFromPrediction).toHaveBeenCalledWith(entity);
+      jest.runAllTimers();
+      expect(selectAnnotation).toHaveBeenCalledWith(99, { exitViewAll: true });
+      jest.useRealTimers();
+    });
+
+    it("shows Copy Prediction Link when store has annotations:copy-link for prediction", () => {
+      const storeWithCopyLink = {
+        ...defaultStore,
+        hasInterface: jest.fn((key: string) => key === "annotations:copy-link"),
+      };
+      const entity = createEntity({ type: "prediction", pk: 1 });
+      render(
+        <Provider store={storeWithCopyLink}>
+          <AnnotationButton
+            entity={entity}
+            capabilities={predictionCapabilities}
+            annotationStore={
+              {
+                ...defaultAnnotationStore,
+                store: storeWithCopyLink,
+              } as any
+            }
+          />
+        </Provider>,
+      );
+      fireEvent.click(screen.getByTestId("annotation-button-overflow-trigger"));
+      expect(screen.getByText("Copy Prediction Link")).toBeInTheDocument();
+    });
+
+    it("calls Copy Prediction Link and shows toast when menu item is clicked for prediction", () => {
+      mockToastShow.mockClear();
+      const storeWithCopyLink = {
+        ...defaultStore,
+        hasInterface: jest.fn((key: string) => key === "annotations:copy-link"),
+      };
+      const entity = createEntity({ type: "prediction", pk: 1 });
+      render(
+        <Provider store={storeWithCopyLink}>
+          <AnnotationButton
+            entity={entity}
+            capabilities={predictionCapabilities}
+            annotationStore={{ ...defaultAnnotationStore, store: storeWithCopyLink } as any}
+          />
+        </Provider>,
+      );
+      fireEvent.click(screen.getByTestId("annotation-button-overflow-trigger"));
+      fireEvent.click(screen.getByText("Copy Prediction Link"));
+      expect(mockToastShow).toHaveBeenCalledWith(
+        expect.objectContaining({ message: "Prediction link copied to clipboard", type: "info" }),
+      );
+    });
+
+    it("opens delete confirmation when Delete Prediction is clicked", () => {
+      const confirm = jest.requireMock("../../../common/Modal/Modal").confirm;
+      const entity = createEntity({ type: "prediction", pk: 1 });
+      render(
+        <Provider store={defaultStore}>
+          <AnnotationButton
+            entity={entity}
+            capabilities={predictionCapabilities}
+            annotationStore={{ ...defaultAnnotationStore, store: defaultStore } as any}
+          />
+        </Provider>,
+      );
+      fireEvent.click(screen.getByTestId("annotation-button-overflow-trigger"));
+      fireEvent.click(screen.getByText("Delete Prediction"));
+      expect(confirm).toHaveBeenCalledWith(
+        expect.objectContaining({
+          title: "Delete prediction?",
+          okText: "Delete",
+        }),
+      );
+    });
   });
 
   it("invokes tooltip hover handler on root mouse enter", () => {
