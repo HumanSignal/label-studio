@@ -80,12 +80,12 @@ export const Resizer = ({
       className={[styles.root, variant === "quickview" && styles.quickview, className].filter(Boolean).join(" ")}
       style={{ width }}
     >
-      <div style={style ?? {}}>
-        {children}
-      </div>
+      <div style={style ?? {}}>{children}</div>
 
       <div
-        className={[styles.handle, showResizerLine !== false && isResizing && styles.handleResizing].filter(Boolean).join(" ")}
+        className={[styles.handle, showResizerLine !== false && isResizing && styles.handleResizing]
+          .filter(Boolean)
+          .join(" ")}
         ref={resizeHandler}
         style={handleStyle}
         onPointerDown={handleResize}
