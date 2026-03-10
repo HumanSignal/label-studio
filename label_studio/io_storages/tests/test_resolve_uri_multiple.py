@@ -3,6 +3,7 @@ import base64
 import pytest
 from io_storages.gcs.models import GCSImportStorage
 from io_storages.s3.models import S3ImportStorage
+from io_storages.azure_blob.models import AzureBlobImportStorage
 from projects.models import Project
 from tasks.models import Task
 
@@ -42,3 +43,20 @@ def test_resolve_multiple_uris_in_task_data(mocker):
     assert 's3://s3-bucket' not in html2
     assert 'gs://gcs-bucket' not in html2
     assert html2.count('/api/storages/proxy') == 2
+    
+    # Test 3: Multiple URIs including Azure
+    AzureBlobImportStorage.objects.create(project=project, container='azure-container')
+    
+    # Clear the cached property on the project so it picks up the new storage
+    if 'get_all_import_storage_objects' in project.__dict__:
+        del project.__dict__['get_all_import_storage_objects']
+
+    task3 = Task.objects.create(
+        project=project, data={'html': "<img src='s3://s3-bucket/5.jpg'> <img src='azure-blob://azure-container/6.jpg'>"}
+    )
+    resolved_data3 = task3.resolve_uri(task3.data, project)
+    
+    html3 = resolved_data3['html']
+    assert 's3://s3-bucket' not in html3
+    assert 'azure-blob://azure-container' not in html3
+    assert html3.count('/api/storages/proxy') == 2
