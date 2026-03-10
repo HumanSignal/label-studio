@@ -83,7 +83,6 @@ function createStore(overrides = {}) {
     _selectItem: jest.fn(),
     _unselectAll: jest.fn(),
     store: {},
-    annotationStore: { viewingAll: false },
     ...overrides,
   };
 }
