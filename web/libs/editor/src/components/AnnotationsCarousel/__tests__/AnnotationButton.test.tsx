@@ -401,7 +401,7 @@ describe("AnnotationButton", () => {
     expect(setGroundTruth).toHaveBeenCalledWith(true);
   });
 
-  it("calls toggleViewingAllAnnotations when Show Other Annotations is clicked", () => {
+  it("calls toggleViewingAllAnnotations when Compare All Annotations is clicked", () => {
     const entity = createEntity();
     const toggleViewingAllAnnotations = jest.fn();
     const { container } = render(
@@ -420,7 +420,7 @@ describe("AnnotationButton", () => {
       </Provider>,
     );
     fireEvent.click(container.querySelector(".ls-annotation-button__trigger")!);
-    fireEvent.click(screen.getByText("Show Other Annotations"));
+    fireEvent.click(screen.getByText("Compare All Annotations"));
     expect(toggleViewingAllAnnotations).toHaveBeenCalled();
   });
 
