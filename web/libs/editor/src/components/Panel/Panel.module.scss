@@ -4,14 +4,14 @@
   display: flex;
   justify-content: space-between;
 
-  @include respond("phone") {
+  @media (width <= 760px) { /* phone */
     flex-direction: column;
   }
 }
 
 .block {
   &__controls {
-    @include respond("phone") {
+    @media (width <= 760px) { /* phone */
       width: 100%;
     }
   }
@@ -27,7 +27,7 @@
       margin-right: 0;
     }
 
-    @include respond("phone") {
+    @media (width <= 760px) { /* phone */
       margin: 0 2px;
       margin-bottom: 10px;
     }

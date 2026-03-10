@@ -1,7 +1,7 @@
 .readerViewModal {
   background: blue;
 
-  // Ensure modal takes full screen
+  /* Ensure modal takes full screen */
   :global(.lsf-modal-ls__wrapper) {
     width: 100vw;
     height: 100vh;
@@ -11,7 +11,7 @@
     background: red;
   }
 
-  // Center the tabs in the header
+  /* Center the tabs in the header */
   :global(.lsf-modal-ls__header) {
     display: flex;
     align-items: center;
@@ -62,7 +62,7 @@
   color: var(--color-neutral-content);
   word-wrap: break-word;
 
-  // Ensure markdown content is properly styled
+  /* Ensure markdown content is properly styled */
   :global {
     & h1,
     & h2,
@@ -159,7 +159,7 @@
   color: var(--color-neutral-content);
   word-wrap: break-word;
 
-  // Basic HTML styling
+  /* Basic HTML styling */
   :global {
     & h1,
     & h2,

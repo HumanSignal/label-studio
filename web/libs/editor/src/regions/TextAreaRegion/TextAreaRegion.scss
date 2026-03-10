@@ -39,7 +39,7 @@
   align-items: center;
   gap: var(--spacing-tight);
 
-  // fix antd styles to resize textarea container and fix paddings
+  /* fix antd styles to resize textarea container and fix paddings */
   & div[class~="ant-typography-edit-content"] {
     flex-grow: 1;
     left: -1px;
@@ -50,7 +50,7 @@
     border-color: var(--color-neutral-border);
 
     & textarea {
-      // the same as in .mark, its padding set to 0
+      /* the same as in .mark, its padding set to 0 */
       padding: var(--spacing-tight) var(--spacing-base);
     }
   }

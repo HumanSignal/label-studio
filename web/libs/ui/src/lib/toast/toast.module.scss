@@ -157,7 +157,7 @@
   }
 
   &_info {
-    // Always maintain a dark background for info toasts
+    /* Always maintain a dark background for info toasts */
     --text-color: var(--color-sand-100);
     --background-color: var(--color-sand-900);
     --border-color: var(--color-sand-700);

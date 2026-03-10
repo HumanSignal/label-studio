@@ -510,12 +510,14 @@ const _Annotation = types
 
     lockSelectedRegions() {
       for (const region of self.selectedRegions) {
+        if (region.incomplete === true) continue;
         region.setLocked(!region.locked);
       }
     },
 
     hideSelectedRegions() {
       for (const region of self.selectedRegions) {
+        if (region.incomplete === true) continue;
         region.toggleHidden();
       }
     },

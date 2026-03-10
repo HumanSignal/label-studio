@@ -11,13 +11,20 @@
   }
 
   &_columnCount {
-    @for $i from 1 to 15 {
-      &_#{ $i } {
-        & .grid-view__cell:nth-child(#{$i}n) {
-          padding-right: 0;
-        }
-      }
-    }
+    &_1 { & .grid-view__cell:nth-child(1n) { padding-right: 0; } }
+    &_2 { & .grid-view__cell:nth-child(2n) { padding-right: 0; } }
+    &_3 { & .grid-view__cell:nth-child(3n) { padding-right: 0; } }
+    &_4 { & .grid-view__cell:nth-child(4n) { padding-right: 0; } }
+    &_5 { & .grid-view__cell:nth-child(5n) { padding-right: 0; } }
+    &_6 { & .grid-view__cell:nth-child(6n) { padding-right: 0; } }
+    &_7 { & .grid-view__cell:nth-child(7n) { padding-right: 0; } }
+    &_8 { & .grid-view__cell:nth-child(8n) { padding-right: 0; } }
+    &_9 { & .grid-view__cell:nth-child(9n) { padding-right: 0; } }
+    &_10 { & .grid-view__cell:nth-child(10n) { padding-right: 0; } }
+    &_11 { & .grid-view__cell:nth-child(11n) { padding-right: 0; } }
+    &_12 { & .grid-view__cell:nth-child(12n) { padding-right: 0; } }
+    &_13 { & .grid-view__cell:nth-child(13n) { padding-right: 0; } }
+    &_14 { & .grid-view__cell:nth-child(14n) { padding-right: 0; } }
   }
 
   &__cell {
