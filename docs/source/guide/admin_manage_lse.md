@@ -61,7 +61,7 @@ You can tag organization members with metadata.
 
 ### Bulk tag members
 
-To bulk apply member tags, go to the Organization tag and click **Tag Members**. 
+To bulk apply member tags, go to the Organization page and click **Tag Members**. 
 
 From here you can upload a CSV with the following format:
 
