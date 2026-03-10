@@ -466,15 +466,6 @@ Hotkey.Tooltip = inject("store")(
           const keys: JSX.Element[] = [];
 
           keyParts.forEach((key: string, i: number) => {
-            if (i > 0) {
-              keys.push(
-                createElement(
-                  "span",
-                  { className: cn("key-group").elem("separator").toClassName(), key: `sep-${i}` },
-                  "+",
-                ),
-              );
-            }
             keys.push(
               createElement(
                 "kbd",

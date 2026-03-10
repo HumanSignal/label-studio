@@ -108,11 +108,8 @@ body {
     box-shadow: 0 0 0 1px rgb(0 0 0 / 10%), 0 1px 0 rgb(0 0 0 / 8%);
   }
 
-  &__separator {
-    margin: 0 3px;
-    font-size: 12px;
-    font-weight: bold;
-    opacity: 0.9;
+  &__key + &__key {
+    margin-left: 4px;
   }
 
   & + & {
