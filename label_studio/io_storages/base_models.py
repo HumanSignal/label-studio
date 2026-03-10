@@ -396,10 +396,16 @@ class ImportStorage(Storage):
 
                 from io_storages.utils import uri_regex
 
-                uri_regex_prepared = uri_regex.format(self.url_scheme)
-                matches = list(re.finditer(uri_regex_prepared, uri))
+                extracted_uris = []
+                # Check for direct URL string first (e.g. "s3://bucket/test.jpg" without quotes)
+                # This matches the legacy `get_uri_via_regex` behavior for single string fields
+                if uri.lower().strip().startswith(self.url_scheme + '://') and ' ' not in uri.strip():
+                    extracted_uris.append(uri.strip())
+                else:
+                    uri_regex_prepared = uri_regex.format(self.url_scheme)
+                    extracted_uris.extend([match.group('uri') for match in re.finditer(uri_regex_prepared, uri)])
 
-                if not matches:
+                if not extracted_uris:
                     return uri
 
                 if task is None:
@@ -409,8 +415,7 @@ class ImportStorage(Storage):
                 resolved_uri = uri
                 replaced = set()
 
-                for match in matches:
-                    extracted_uri = match.group('uri')
+                for extracted_uri in extracted_uris:
                     if extracted_uri in replaced:
                         continue
 
