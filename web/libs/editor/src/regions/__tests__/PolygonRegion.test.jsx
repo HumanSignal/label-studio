@@ -480,7 +480,7 @@ describe("PolygonRegion", () => {
       expect(shouldRenderEdgesAndCircles(root.region)).toBe(true);
     });
 
-    it("setLocked toggles lock independently from closed", () => {
+    it("setLocked toggles lock for finished polygons", () => {
       const root = TestRoot.create({
         image: { id: "img1" },
         region: {
@@ -492,17 +492,37 @@ describe("PolygonRegion", () => {
             [10, 0],
             [10, 10],
           ],
-          closed: false,
+          closed: true,
           results: [],
         },
       });
       expect(root.region.locked).toBe(false);
       root.region.setLocked(true);
       expect(root.region.locked).toBe(true);
-      expect(root.region.closed).toBe(false);
       root.region.setLocked(false);
       expect(root.region.locked).toBe(false);
-      expect(root.region.closed).toBe(false);
+    });
+
+    it("setLocked does nothing for incomplete polygons", () => {
+      const root = TestRoot.create({
+        image: { id: "img1" },
+        region: {
+          id: "incomp",
+          pid: "incomp",
+          object: "img1",
+          points: [
+            [0, 0],
+            [10, 0],
+            [10, 10],
+          ],
+          closed: false,
+          results: [],
+        },
+      });
+      expect(root.region.incomplete).toBe(true);
+      expect(root.region.locked).toBe(false);
+      root.region.setLocked(true);
+      expect(root.region.locked).toBe(false);
     });
   });
 
