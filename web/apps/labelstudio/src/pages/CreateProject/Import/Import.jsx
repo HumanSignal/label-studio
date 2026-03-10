@@ -166,6 +166,13 @@ export const ImportPage = ({
     }
     if (action.setList !== undefined) {
       const list = action.setList ?? [];
+      if (action.merge) {
+        return {
+          ...state,
+          uploaded: unique([...state.uploaded, ...list], (a, b) => a.id === b.id),
+          ids: unique([...state.ids, ...list.map((f) => f.id)]),
+        };
+      }
       return {
         ...state,
         uploaded: list,
@@ -214,7 +221,8 @@ export const ImportPage = ({
         params: { pk: project.id, ...query },
       });
 
-      dispatch({ setList: files ?? [] });
+      const merge = Boolean(file_upload_ids?.length);
+      dispatch({ setList: files ?? [], merge });
       return files;
     },
     [project?.id],
