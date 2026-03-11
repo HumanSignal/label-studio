@@ -351,7 +351,9 @@ class ConcurrencyTests(TransactionTestCase):
             local_transitions = []
             for i in range(transitions_per_thread):
                 transition = ConcurrencyTestTransition(
-                    thread_id=thread_id, shared_counter=i, sleep_duration=0.001  # Small delay to increase contention
+                    thread_id=thread_id,
+                    shared_counter=i,
+                    sleep_duration=0.001,  # Small delay to increase contention
                 )
                 local_transitions.append(transition)
             return local_transitions

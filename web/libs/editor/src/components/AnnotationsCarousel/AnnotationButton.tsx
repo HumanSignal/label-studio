@@ -148,20 +148,6 @@ const injector = inject(({ store }) => {
 
 const hoverIntentDelay = 300;
 
-// Helper function to create badge style objects with consistent CSS variable pattern
-// Note: CSS variables are overridden in SCSS to always use light mode values for tooltip badges
-const createBadgeStyle = (label: string, colorName: string) => ({
-  label,
-  backgroundColor: `var(--color-accent-${colorName}-subtle)`,
-  color: `var(--color-accent-${colorName}-bold)`,
-});
-
-// Helper function to get just the CSS variable style properties
-const getBadgeColors = (colorName: string) => ({
-  backgroundColor: `var(--color-accent-${colorName}-subtle)`,
-  color: `var(--color-accent-${colorName}-bold)`,
-});
-
 function AnnotationButtonTooltip({
   displayUsername,
   isDraft,
@@ -209,24 +195,24 @@ function AnnotationButtonTooltip({
     // Check for both ephemeral drafts (isDraft) and saved drafts (isDraftSaved)
     // Exception: If Draft AND Skipped, show both Draft and Skipped
     if (isDraft || isDraftSaved) {
-      return createBadgeStyle("Draft", "grape");
+      return { label: "Draft", variant: "primary" as const };
     }
     if (acceptedState) {
       switch (acceptedState) {
         case "accepted":
-          return createBadgeStyle("Accepted", "kale");
+          return { label: "Accepted", variant: "positive" as const };
         case "rejected":
-          return createBadgeStyle("Rejected", "persimmon");
+          return { label: "Rejected", variant: "negative" as const };
         case "fixed":
         case "fixed_and_accepted":
-          return createBadgeStyle("Fixed", "canteloupe");
+          return { label: "Fixed", variant: "warning" as const };
         default:
           break;
       }
     }
     // Exception: If Submitted AND Skipped, only show Skipped (don't show Submitted)
     if (isSubmitted && !isSkipped) {
-      return createBadgeStyle("Submitted", "kale");
+      return { label: "Submitted", variant: "positive" as const };
     }
 
     return null;
@@ -276,8 +262,15 @@ function AnnotationButtonTooltip({
     return rows;
   }, [annotationId, isPrediction, predictionScore, lastUpdated, formatDate]);
 
-  const isRenderable =
-    tooltipData.length > 0 || !!displayUsername || !!statusBadge || !!isSkipped || !!isGroundTruth || !!annotationId;
+  const tooltipBadges = useMemo(() => {
+    const badges: Array<{ label: string; variant: "primary" | "positive" | "negative" | "warning" }> = [];
+    if (statusBadge) badges.push(statusBadge);
+    if (isSkipped) badges.push({ label: "Skipped", variant: "negative" });
+    if (isGroundTruth) badges.push({ label: "Ground Truth", variant: "warning" });
+    return badges;
+  }, [statusBadge, isSkipped, isGroundTruth]);
+
+  const isRenderable = tooltipData.length > 0 || !!displayUsername || tooltipBadges.length > 0 || !!annotationId;
 
   if (!isRenderable) {
     return null;
@@ -299,45 +292,13 @@ function AnnotationButtonTooltip({
         left: `${position.left}px`,
       }}
     >
-      {(statusBadge || isSkipped || isGroundTruth) && (
+      {tooltipBadges.length > 0 && (
         <div className={cn("annotation-button").elem("tooltipBadges").toClassName()}>
-          {/* Draft/Submitted badges shown first */}
-          {statusBadge && (
-            <Badge
-              className={cn("annotation-button").elem("tooltipStatusBadge").toClassName()}
-              style={{
-                backgroundColor: statusBadge.backgroundColor,
-                color: statusBadge.color,
-                border: "none",
-              }}
-            >
-              {statusBadge.label}
+          {tooltipBadges.map(({ label, variant }) => (
+            <Badge key={label} variant={variant} shape="rounded">
+              {label}
             </Badge>
-          )}
-          {/* Skipped badge shown after Draft/Submitted */}
-          {isSkipped && (
-            <Badge
-              className={cn("annotation-button").elem("tooltipStatusBadge").toClassName()}
-              style={{
-                ...getBadgeColors("persimmon"),
-                border: "none",
-              }}
-            >
-              Skipped
-            </Badge>
-          )}
-          {/* Ground Truth badge shown last */}
-          {isGroundTruth && (
-            <Badge
-              className={cn("annotation-button").elem("tooltipStatusBadge").toClassName()}
-              style={{
-                ...getBadgeColors("canteloupe"),
-                border: "none",
-              }}
-            >
-              Ground Truth
-            </Badge>
-          )}
+          ))}
         </div>
       )}
       {displayUsername && (

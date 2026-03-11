@@ -39,7 +39,7 @@ class UserProductTour(models.Model):
         max_length=32,
         choices=ProductTourState.choices,
         default=ProductTourState.READY,
-        help_text=f'Current state of the tour for this user. Available options: {", ".join(f"{k} ({v})" for k,v in ProductTourState.choices)}',
+        help_text=f'Current state of the tour for this user. Available options: {", ".join(f"{k} ({v})" for k, v in ProductTourState.choices)}',
     )
 
     interaction_data = models.JSONField(

@@ -1,5 +1,4 @@
-"""This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
-"""
+"""This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license."""
 
 from typing import TypedDict
 
@@ -107,7 +106,7 @@ class OrganizationMemberSerializer(DynamicFieldsMixin, serializers.ModelSerializ
             return None
         organization = self.context.get('organization')
         projects = Project.objects.filter(created_by=member.user, organization=organization).values('id', 'title')
-        projects = projects[:100]   # Limit to 100 projects
+        projects = projects[:100]  # Limit to 100 projects
         return [
             {
                 'id': project['id'],
@@ -125,7 +124,7 @@ class OrganizationMemberSerializer(DynamicFieldsMixin, serializers.ModelSerializ
             .values('project__id', 'project__title')
             .distinct()
         )
-        annotations = annotations[:100]   # Limit to 100 projects
+        annotations = annotations[:100]  # Limit to 100 projects
         return [
             {
                 'id': annotation['project__id'],

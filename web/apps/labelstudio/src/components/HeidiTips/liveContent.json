@@ -237,7 +237,7 @@
       }
     },
     {
-      "title": "Behind the benchmark",
+      "title": "Behind the TestMark",
       "description": "Learn how Legalbenchmarks.ai built and scaled a benchmark for practical contract drafting tasks using LLM-as-a-judge and human review in Label Studio Enterprise.",
       "link": {
         "label": "Learn more",

@@ -13,6 +13,5 @@ export default {
     "^rehype-raw$": "<rootDir>/../editor/__mocks__/rehype-raw.ts",
     "\\.(css|less|scss|sass)$": "identity-obj-proxy",
     "\\.(gif|ttf|eot|svg|png)$": "<rootDir>/__mocks__/fileMock.js",
-    "!!url-loader!": "<rootDir>/__mocks__/fileMock.js",
   },
 };

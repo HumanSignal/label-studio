@@ -1,5 +1,5 @@
-"""This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
-"""
+"""This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license."""
+
 import json
 
 import pytest
@@ -159,7 +159,6 @@ def test_predictions(
     use_ground_truth,
     mocker,
 ):
-
     # create project with predefined task set
     project = make_project(project_config, business_client.user)
 

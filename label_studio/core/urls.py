@@ -15,6 +15,7 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+
 from core import views
 from core.utils.static_serve import serve
 from django.conf import settings
@@ -87,9 +88,11 @@ urlpatterns = [
     # Again for legacy reasons, docs/api?format=openapi redirects to docs/api/schema/json/
     path(
         'docs/api/',
-        lambda request: HttpResponseRedirect('/docs/api/schema/json/')
-        if request.GET.get('format') == 'openapi'
-        else HttpResponseRedirect('/docs/api/schema/redoc/'),
+        lambda request: (
+            HttpResponseRedirect('/docs/api/schema/json/')
+            if request.GET.get('format') == 'openapi'
+            else HttpResponseRedirect('/docs/api/schema/redoc/')
+        ),
         name='docs-api',
     ),
     path(

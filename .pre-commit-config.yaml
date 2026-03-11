@@ -1,15 +1,14 @@
 default_stages: [ pre-push ]
 repos:
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.14.9
+    rev: v0.15.1
     hooks:
+      # Run the linter.
       - id: ruff-check
-        args: [ --fix ]
-  - repo: https://github.com/grantjenks/blue
-    rev: v0.9.1
-    hooks:
-      - id: blue
-        args: [ --check, --diff, --color ]
+        args: [ --no-fix, --show-fixes ]
+      # Run the formatter.
+      - id: ruff-format
+        args: [ --check, --diff ]
   - repo: local
     hooks:
       - id: biome-check

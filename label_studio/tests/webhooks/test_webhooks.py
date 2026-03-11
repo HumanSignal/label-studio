@@ -221,7 +221,6 @@ def test_webhooks_for_tasks_import(configured_project, business_client, organiza
 # ANNOTATION CREATE/UPDATE/DELETE
 @pytest.mark.django_db
 def test_webhooks_for_annotation(configured_project, business_client, organization_webhook):
-
     webhook = organization_webhook
     task = configured_project.tasks.all().first()
     # CREATE

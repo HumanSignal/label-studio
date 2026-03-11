@@ -9,10 +9,9 @@ require("dotenv").config({
   path: path.resolve(__dirname, "../.env"),
 });
 
-// Import webpack plugins from the same webpack version that @nx/webpack uses for compilation,
-// to avoid version mismatches between the root webpack and the NX-bundled webpack.
-const nxWebpack = require("@nx/webpack/node_modules/webpack");
-const { EnvironmentPlugin, DefinePlugin } = nxWebpack;
+// Use the project's webpack so resolution works (e.g. when @nx/webpack does not bundle webpack under node_modules).
+const webpack = require("webpack");
+const { EnvironmentPlugin, DefinePlugin } = webpack;
 const TerserPlugin = require("terser-webpack-plugin");
 const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
 
@@ -78,11 +77,11 @@ const optimizer = () => {
 module.exports = composePlugins(
   withNx({
     nx: {
-      svgr: true,
+      svgr: false,
     },
     skipTypeChecking: true,
   }),
-  withReact({ svgr: true }),
+  withReact({ svgr: false }),
   (config) => {
     // Remove the extension alias as this conflicts with the nx/webpack v21 changes
     delete config.resolve.extensionAlias;
@@ -209,31 +208,83 @@ module.exports = composePlugins(
       }
     });
 
-    config.module.rules.push(
-      {
-        test: /\.svg$/,
-        exclude: /node_modules/,
-        use: [
-          {
-            loader: "@svgr/webpack",
-            options: {
-              ref: true,
-            },
+    // Force local @humansignal icon SVGs through svgr regardless of issuer.
+    const humansignalIconsSvgRule = {
+      test: /libs[\\/]ui[\\/]src[\\/]assets[\\/]icons[\\/].*\.svg(\?.*)?$/,
+      use: [
+        {
+          loader: "@svgr/webpack",
+          options: {
+            ref: true,
+            exportType: "named",
+            namedExport: "ReactComponent",
+            svgo: false,
           },
-          "url-loader",
-        ],
-      },
+        },
+        path.resolve(__dirname, "tools/loaders/svg-source-loader.cjs"),
+      ],
+    };
+    config.module.rules.unshift(humansignalIconsSvgRule);
+
+    const svgRule = {
+      test: /\.svg(\?.*)?$/,
+      exclude: /node_modules/,
+      oneOf: [
+        {
+          issuer: /\.[jt]sx?$/,
+          use: [
+            {
+              loader: "@svgr/webpack",
+              options: {
+                ref: true,
+                exportType: "named",
+                namedExport: "ReactComponent",
+                svgo: false, // avoid parse errors with resolved svgo >=3.3.3
+              },
+            },
+            path.resolve(__dirname, "tools/loaders/svg-source-loader.cjs"),
+          ],
+        },
+        {
+          type: "asset/resource",
+        },
+      ],
+    };
+    config.module.rules.unshift(svgRule);
+
+    // Ensure no other webpack rules process .svg and override svgr output
+    const isOurSvgRule = (rule) => rule === svgRule || rule === humansignalIconsSvgRule;
+    const addSvgExclude = (rule) => {
+      if (!rule || isOurSvgRule(rule)) return;
+      const testString = rule.test?.toString?.() ?? "";
+      if (!testString.includes("svg")) return;
+      const svgExclude = /\.svg(\?.*)?$/;
+      if (!rule.exclude) {
+        rule.exclude = svgExclude;
+      } else if (Array.isArray(rule.exclude)) {
+        rule.exclude = [...rule.exclude, svgExclude];
+      } else {
+        rule.exclude = [rule.exclude, svgExclude];
+      }
+    };
+    config.module.rules.forEach((rule) => {
+      addSvgExclude(rule);
+      if (Array.isArray(rule.oneOf)) {
+        rule.oneOf.forEach(addSvgExclude);
+      }
+    });
+
+    config.module.rules.push(
       {
         test: /\.xml$/,
         exclude: /node_modules/,
-        loader: "url-loader",
+        type: "asset/resource",
       },
       {
         test: /\.wasm$/,
-        type: "javascript/auto",
-        loader: "file-loader",
-        options: {
-          name: "[name].[ext]",
+        type: "asset/resource",
+        generator: {
+          filename: "[name][ext]",
         },
       },
       // tailwindcss
@@ -261,12 +312,16 @@ module.exports = composePlugins(
     }
 
     config.resolve.alias = {
+      ...(config.resolve.alias ?? {}),
       // Common dependencies across at least two sub-packages
       react: path.resolve(__dirname, "node_modules/react"),
       "react-dom": path.resolve(__dirname, "node_modules/react-dom"),
       "react-joyride": path.resolve(__dirname, "node_modules/react-joyride"),
       "@humansignal/ui": path.resolve(__dirname, "libs/ui"),
       "@humansignal/core": path.resolve(__dirname, "libs/core"),
+      "@humansignal/icons$": path.resolve(__dirname, "libs/ui/src/assets/icons/index.ts"),
+      "@humansignal/shad": path.resolve(__dirname, "libs/ui/src/shad"),
+      "@humansignal/ui/lib": path.resolve(__dirname, "libs/ui/src/lib"),
     };
 
     return merge(config, {

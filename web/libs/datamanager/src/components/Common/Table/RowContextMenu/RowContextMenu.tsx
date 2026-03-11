@@ -4,7 +4,7 @@ import { Dropdown, DropdownContext, IconViewAll, IconCopyOutline, IconBraces, Ic
 // @ts-expect-error - Menu is from JS module
 import { Menu } from "../../Menu/Menu";
 import { modal } from "../../Modal/Modal";
-import { TaskSourceViewer } from "../../TaskSourceViewer";
+import { TaskSourceViewer, getTaskSourceViewerStorageKey } from "../../TaskSourceViewer";
 // @ts-expect-error - utils is JS module
 import { getProperty } from "../utils";
 
@@ -25,6 +25,8 @@ export interface RowContextMenuProps {
   cursorPosition?: { x: number; y: number };
   /** Callback when menu closes */
   onClose: () => void;
+  /** Optional project ID for project-scoped TaskSourceViewer storage */
+  projectId?: string | number | null;
 }
 
 export const RowContextMenu: FC<RowContextMenuProps> = ({
@@ -36,6 +38,7 @@ export const RowContextMenu: FC<RowContextMenuProps> = ({
   onViewAnalytics,
   cursorPosition,
   onClose,
+  projectId,
 }) => {
   // Columns that should not have copy cell content option
   const excludedColumns = [
@@ -185,7 +188,7 @@ export const RowContextMenu: FC<RowContextMenuProps> = ({
           content={taskData}
           onTaskLoad={onTaskLoad}
           sdkType={sdkType}
-          storageKey="dm:tasksource"
+          storageKey={getTaskSourceViewerStorageKey(projectId)}
           renderToggle={(toggle) => {
             // Update modal header with toggle
             modalInstance?.update({ header: toggle });
@@ -195,7 +198,7 @@ export const RowContextMenu: FC<RowContextMenuProps> = ({
     });
 
     onClose();
-  }, [row, api, sdkType, onClose]);
+  }, [row, api, sdkType, onClose, projectId]);
 
   // 5. View annotator performance (LSE-only)
   const handleViewAnalytics = useCallback(() => {

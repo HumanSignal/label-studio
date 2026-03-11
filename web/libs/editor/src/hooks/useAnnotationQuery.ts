@@ -38,7 +38,7 @@ export const fetchAnnotation = async (id: number | string): Promise<AnnotationDa
 
 /** Wrapper to prevent caching lexical scopes in React Query */
 const fetchAnnotationQueryFn = ({ queryKey }: any) => {
-  return fetchAnnotation(queryKey[2] as string | number);
+  return fetchAnnotation(queryKey[1] as string | number);
 };
 
 /**
@@ -51,7 +51,7 @@ export const useAnnotation = (id: number | string | undefined, options?: { enabl
     queryFn: fetchAnnotationQueryFn,
     enabled: !!id && options?.enabled !== false,
     staleTime: 30000, // 30 seconds
-    gcTime: 5 * 60 * 1000, // 5 minutes
+    cacheTime: 5 * 60 * 1000, // 5 minutes
   });
 };
 
@@ -80,13 +80,13 @@ export const useAnnotationFetcher = () => {
   const fetchAnnotationCached = useCallback(
     async (id: number | string): Promise<AnnotationData | null> => {
       try {
-        // ensureQueryData returns cached data if fresh, otherwise fetches
+        // fetchQuery returns cached data if fresh, otherwise fetches
         // It also deduplicates concurrent requests automatically
-        return await queryClient.ensureQueryData({
+        return await queryClient.fetchQuery({
           queryKey: annotationKeys.detail(id),
           queryFn: fetchAnnotationQueryFn,
           staleTime: 30000,
-          gcTime: 5 * 60 * 1000,
+          cacheTime: 5 * 60 * 1000,
         });
       } catch (error: any) {
         // Silently ignore cancellation errors - they're expected when scrolling
@@ -108,7 +108,7 @@ export const useAnnotationFetcher = () => {
         queryKey: annotationKeys.detail(id),
         queryFn: fetchAnnotationQueryFn,
         staleTime: 30000,
-        gcTime: 5 * 60 * 1000,
+        cacheTime: 5 * 60 * 1000,
       });
     },
     [queryClient],
