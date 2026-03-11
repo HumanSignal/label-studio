@@ -204,10 +204,6 @@ const AnnotationHistoryComponent: FC<any> = ({
                   getEnv(store).events.invoke("hydrateHistoryItem", historyPk, (fullItem: any) => {
                     if (fullItem && store.hydrateHistoryItem) {
                       store.hydrateHistoryItem(historyPk, fullItem);
-                      const hydrated = annotationStore.history.find(
-                        (h: any) => h.pk != null && Number(h.pk) === Number(historyPk),
-                      );
-                      if (hydrated) annotationStore.selectHistory(hydrated);
                     }
                   });
                 } else {
