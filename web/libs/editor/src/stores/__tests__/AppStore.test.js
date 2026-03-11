@@ -673,6 +673,63 @@ describe("AppStore", () => {
     });
   });
 
+  describe("FIT-720 stub/hydrate: history item pk and hydrateHistoryItem", () => {
+    it("preserves numeric pk from API in history items so hydrate can use it", () => {
+      const store = createStore();
+      store.initializeStore({
+        annotations: [{ id: "a1", pk: 100, result: [] }],
+      });
+      const historyRowId = 46597;
+      store.setHistory([
+        {
+          id: historyRowId,
+          annotation_id: 100,
+          action: "submitted",
+          result: [],
+          is_stub: true,
+        },
+      ]);
+      expect(store.annotationStore.history.length).toBe(1);
+      const first = store.annotationStore.history[0];
+      expect(Number(first.pk)).toBe(historyRowId);
+    });
+
+    it("hydrateHistoryItem finds item by pk (not MST id) and hydrates then selects", () => {
+      const store = createStore();
+      store.initializeStore({
+        annotations: [{ id: "a1", pk: 100, result: [] }],
+      });
+      const historyRowId = 46597;
+      store.setHistory([
+        {
+          id: historyRowId,
+          annotation_id: 100,
+          action: "submitted",
+          result: [],
+          is_stub: true,
+        },
+      ]);
+      expect(store.annotationStore.history.length).toBe(1);
+      const fullItem = {
+        id: historyRowId,
+        annotation_id: 100,
+        action: "submitted",
+        result: [
+          {
+            value: { choices: ["neg"] },
+            from_name: "label",
+            to_name: "text",
+            type: "choices",
+          },
+        ],
+      };
+      store.hydrateHistoryItem(historyRowId, fullItem);
+      expect(store.annotationStore.selectedHistory).toBe(store.annotationStore.history[0]);
+      expect(store.annotationStore.selectedHistory.pk).toBeDefined();
+      expect(Number(store.annotationStore.selectedHistory.pk)).toBe(historyRowId);
+    });
+  });
+
   describe("version volatile", () => {
     it("exposes version from LSF_VERSION or default", () => {
       const store = createStore();

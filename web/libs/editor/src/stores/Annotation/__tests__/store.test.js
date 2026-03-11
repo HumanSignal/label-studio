@@ -173,6 +173,24 @@ describe("Annotation store (store.js)", () => {
       expect(store.annotationStore.history.length).toBe(0);
     });
 
+    it("FIT-720: addHistory preserves numeric pk from API (HistoryItem preProcessSnapshot)", () => {
+      const store = createStore();
+      store.initializeStore({
+        annotations: [{ id: "a1", pk: 100, result: [] }],
+      });
+      store.annotationStore.selectAnnotation(store.annotationStore.annotations[0].id);
+      const historyRowId = 46597;
+      store.annotationStore.addHistory({
+        id: historyRowId,
+        annotation_id: 100,
+        action: "submitted",
+        result: [],
+        is_stub: true,
+      });
+      expect(store.annotationStore.history.length).toBe(1);
+      expect(Number(store.annotationStore.history[0].pk)).toBe(historyRowId);
+    });
+
     it("addAnnotation when root not set initializes root from store config", () => {
       const store = createStore();
       expect(store.annotationStore.root).toBeUndefined();
