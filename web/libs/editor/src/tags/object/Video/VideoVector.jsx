@@ -221,7 +221,7 @@ const VideoVectorPure = ({
   const manager = objectTag ? ToolsManager.getInstance({ name: objectTag.name }) : null;
   const selectedTool = manager?.findSelectedTool?.();
   const toolDisabled = selectedTool?.disabled ?? false;
-  const kvDisabled = toolDisabled || isReadOnly || (!selected && !reg.isDrawing);
+  const kvDisabled = toolDisabled || isReadOnly || !listening || (!selected && !reg.isDrawing);
   const kvSelected = !kvDisabled;
 
   const handleRef = useCallback((kv) => {
@@ -326,7 +326,7 @@ const VideoVectorPure = ({
   }, [reg, frame]);
 
   return (
-    <Group>
+    <Group listening={listening} opacity={reg.hidden ? 0 : 1}>
       <KonvaVector
         key={reg.id}
         ref={handleRef}
@@ -341,7 +341,7 @@ const VideoVectorPure = ({
         transform={stageTransform}
         fitScale={waScale}
         allowClose={control?.closable ?? false}
-        allowBezier={control?.curves ?? false}
+        allowBezier={false}
         minPoints={getMinPoints(control)}
         maxPoints={getMaxPoints(control)}
         skeletonEnabled={control?.skeleton ?? false}

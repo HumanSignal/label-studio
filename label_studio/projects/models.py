@@ -1511,7 +1511,7 @@ class ProjectSummary(models.Model):
     def _get_labels(self, result):
         result_type = result.get('type')
         # DEV-1990 Workaround for Video labels as there are no labels in VideoRectangle tag
-        if result_type in ['videorectangle', 'videovectorregion']:
+        if result_type in ['videorectangle', 'videovector']:
             result_type = 'labels'
         result_value = result['value'].get(result_type)
         if not result_value or not isinstance(result_value, list) or result_type == 'text':

@@ -33,10 +33,10 @@ import { customTypes } from "../../core/CustomTypes";
  * @meta_description Customize Label Studio with the VideoVector tag for vector annotation on video frames.
  * @param {string} name Name of the element
  * @param {string} toName Name of the element to control (video)
- * @param {number} [opacity=0.6] Opacity of vector
- * @param {string} [fillColor=transparent] Vector fill color in hexadecimal or HTML color name
+ * @param {number} [opacity=0.2] Opacity of vector
+ * @param {string} [fillColor=#f48a42] Vector fill color in hexadecimal or HTML color name
  * @param {string} [strokeColor=#f48a42] Stroke color in hexadecimal
- * @param {number} [strokeWidth=3] Width of stroke
+ * @param {number} [strokeWidth=2] Width of stroke
  * @param {small|medium|large} [pointSize=small] Size of vector handle points
  * @param {rectangle|circle} [pointStyle=circle] Style of points
  * @param {boolean} [closable=false] Allow closed shapes
@@ -62,7 +62,6 @@ const TagAttrs = types.model({
   pointstyle: types.optional(types.string, "circle"),
 
   closable: types.optional(types.maybeNull(types.boolean), false),
-  curves: types.optional(types.maybeNull(types.boolean), false),
   minpoints: types.optional(types.maybeNull(types.string), null),
   maxpoints: types.optional(types.maybeNull(types.string), null),
   skeleton: types.optional(types.maybeNull(types.boolean), false),

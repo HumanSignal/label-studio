@@ -2915,14 +2915,14 @@
         "description": "Opacity of vector",
         "type": "number",
         "required": false,
-        "default": 0.6
+        "default": 0.2
       },
       "fillColor": {
         "name": "fillColor",
         "description": "Vector fill color in hexadecimal or HTML color name",
         "type": "string",
         "required": false,
-        "default": "transparent"
+        "default": "#f48a42"
       },
       "strokeColor": {
         "name": "strokeColor",
@@ -2936,7 +2936,7 @@
         "description": "Width of stroke",
         "type": "number",
         "required": false,
-        "default": 3
+        "default": 2
       },
       "pointSize": {
         "name": "pointSize",
