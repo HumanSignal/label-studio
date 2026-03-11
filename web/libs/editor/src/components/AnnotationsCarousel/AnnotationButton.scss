@@ -271,7 +271,7 @@
     transition: opacity 150ms ease-out;
   }
 
-  // Badge styles - matching Annotators component (global styles)
+  /* Badge styles - matching Annotators component (global styles) */
 
 
 
@@ -312,8 +312,8 @@
     margin-bottom: 8px;
     flex-wrap: wrap;
 
-    // Force light mode colors for better readability when tooltip has white background (dark theme)
-    // Override the CSS variables to always use light mode values
+    /* Force light mode colors for better readability when tooltip has white background (dark theme) */
+    /* Override the CSS variables to always use light mode values */
     --color-accent-grape-subtlest: var(--color-grape-100);
     --color-accent-grape-subtle: var(--color-grape-200);
     --color-accent-grape-bold: var(--color-grape-700);

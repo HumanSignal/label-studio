@@ -405,7 +405,6 @@ const RootTitle: FC<any> = observer(
     isArea,
     ...props
   }) => {
-    const hovered = item?.highlighted;
     const [collapsed, setCollapsed] = useState(false);
 
     const controls = useMemo(() => {
@@ -557,32 +556,36 @@ const RegionControls: FC<RegionControlsProps> = injector(
               <RegionContextMenu item={item} />
             </div>
           )}
-          <div className={cn("outliner-item").elem("control").mod({ type: "lock" }).toClassName()}>
-            <LockButton
-              item={item}
-              annotation={item?.annotation}
-              hovered={hovered}
-              locked={item?.locked}
-              onClick={onToggleLocked}
-              variant="neutral"
-              look="string"
-              tooltip={item?.locked ? "Unlock Region" : "Lock Region"}
-            />
-          </div>
-          <div className={cn("outliner-item").elem("control").mod({ type: "visibility" }).toClassName()}>
-            <RegionControlButton
-              variant="neutral"
-              look="string"
-              onClick={onToggleHidden}
-              style={hidden ? undefined : { display: "none" }}
-            >
-              {hidden ? (
-                <IconEyeClosed style={{ width: 20, height: 20 }} />
-              ) : (
-                <IconEyeOpened style={{ width: 20, height: 20 }} />
-              )}
-            </RegionControlButton>
-          </div>
+          {!item?.incomplete && (
+            <div className={cn("outliner-item").elem("control").mod({ type: "lock" }).toClassName()}>
+              <LockButton
+                item={item}
+                annotation={item?.annotation}
+                hovered={hovered}
+                locked={item?.locked}
+                onClick={onToggleLocked}
+                variant="neutral"
+                look="string"
+                tooltip={item?.locked ? "Unlock Region" : "Lock Region"}
+              />
+            </div>
+          )}
+          {!item?.incomplete && (
+            <div className={cn("outliner-item").elem("control").mod({ type: "visibility" }).toClassName()}>
+              <RegionControlButton
+                variant="neutral"
+                look="string"
+                onClick={onToggleHidden}
+                style={hidden ? undefined : { display: "none" }}
+              >
+                {hidden ? (
+                  <IconEyeClosed style={{ width: 20, height: 20 }} />
+                ) : (
+                  <IconEyeOpened style={{ width: 20, height: 20 }} />
+                )}
+              </RegionControlButton>
+            </div>
+          )}
           {hasControls && (
             <div className={cn("outliner-item").elem("control").mod({ type: "visibility" }).toClassName()}>
               <RegionControlButton variant="neutral" look="string" onClick={onToggleCollapsed}>

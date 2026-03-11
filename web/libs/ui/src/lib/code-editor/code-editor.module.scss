@@ -131,7 +131,7 @@
   border: 1px solid var(--color-neutral-border);
   box-shadow: 0 2px 4px rgba(var(--color-neutral-shadow-raw) / calc( 30% * var(--shadow-intensity))), 0 4px 16px rgba(var(--color-neutral-shadow-raw) / calc( 15% * var(--shadow-intensity)));
 
-  // Create Project modal has z-index: 10000, so we have to overrule it
+  /* Create Project modal has z-index: 10000, so we have to overrule it */
   z-index: 11000;
   max-width: 600px;
 }
