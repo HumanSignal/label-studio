@@ -53,7 +53,6 @@ const OutlinerTreeComponent: FC<OutlinerTreeProps> = ({ regions, footer }) => {
     regions,
     rootClass,
     footer,
-    // that's a trick to have a dependency that causes recalculating of tree data on grouping mode change
     // it's for rerender OutlinerTreeComponent
     grouping: regions.group,
   });
@@ -481,6 +480,14 @@ const MemoizedRootTitle = memo(RootTitle, (prevProps, nextProps) => {
   if (prevProps.idx !== nextProps.idx) return false;
   if (prevProps.isArea !== nextProps.isArea) return false;
   if (prevProps.isGroup !== nextProps.isGroup) return false;
+  // Re-render group when any child's hidden state changes so hide/show icon stays in sync
+  if (nextProps.isGroup && nextProps.children && prevProps.children) {
+    if (prevProps.children.length !== nextProps.children.length) return false;
+    const childHiddenChanged = prevProps.children.some(
+      (c, i) => (nextProps.children?.[i]?.hidden ?? null) !== (c?.hidden ?? null),
+    );
+    if (childHiddenChanged) return false;
+  }
   return true;
 });
 
@@ -507,13 +514,13 @@ const RegionControls: FC<RegionControlsProps> = injector(
 
     const hidden = useMemo(() => {
       if (type?.includes("region") || type?.includes("range") || type?.includes("reactcode")) {
-        return entity.hidden;
+        return entity?.hidden;
       }
       if ((!type || type.includes("label") || type?.includes("tool")) && regions) {
-        return Object.values(regions).every(({ hidden }) => hidden);
+        return Object.values(regions).every(({ hidden: h }) => h);
       }
       return false;
-    }, [entity, type, regions]);
+    }, [entity?.hidden, type, regions]);
 
     const onToggleHidden = useCallback(() => {
       if (type?.includes("region") || type?.includes("range") || type?.includes("reactcode")) {
@@ -576,7 +583,8 @@ const RegionControls: FC<RegionControlsProps> = injector(
                 variant="neutral"
                 look="string"
                 onClick={onToggleHidden}
-                style={hidden ? undefined : { display: "none" }}
+                aria-label={hidden ? "Show" : "Hide"}
+                title={hidden ? "Show" : "Hide"}
               >
                 {hidden ? (
                   <IconEyeClosed style={{ width: 20, height: 20 }} />

@@ -389,27 +389,53 @@ class ImportStorage(Storage):
                 resolved[key] = result if result else uri[key]
             return resolved
 
-        # string: process one url
+        # string: process url(s)
         elif isinstance(uri, str) and self.url_scheme in uri:
             try:
-                # extract uri first from task data
-                extracted_uri, _ = get_uri_via_regex(uri, prefixes=(self.url_scheme,))
-                if not self.can_resolve_url(extracted_uri):
-                    logger.debug(f'No storage info found for URI={uri}')
-                    return
+                import re
+
+                from io_storages.utils import uri_regex
+
+                extracted_uris = []
+                # Check for direct URL string first (e.g. "s3://bucket/test.jpg" without quotes)
+                # This matches the legacy `get_uri_via_regex` behavior for single string fields
+                if uri.lower().strip().startswith(self.url_scheme + '://') and ' ' not in uri.strip():
+                    extracted_uris.append(uri.strip())
+                else:
+                    uri_regex_prepared = uri_regex.format(self.url_scheme)
+                    extracted_uris.extend([match.group('uri') for match in re.finditer(uri_regex_prepared, uri)])
+
+                if not extracted_uris:
+                    return uri
 
                 if task is None:
                     logger.error(f'Task is required to resolve URI={uri}', exc_info=True)
                     raise ValueError(f'Task is required to resolve URI={uri}')
 
-                proxy_url = urljoin(
-                    settings.HOSTNAME,
-                    reverse('storages:task-storage-data-resolve', kwargs={'task_id': task.id})
-                    + f'?fileuri={base64.urlsafe_b64encode(extracted_uri.encode()).decode()}',
-                )
-                return uri.replace(extracted_uri, proxy_url)
+                resolved_uri = uri
+                replaced = set()
+
+                for extracted_uri in extracted_uris:
+                    if extracted_uri in replaced:
+                        continue
+
+                    if not self.can_resolve_url(extracted_uri):
+                        logger.debug(f'No storage info found for URI={extracted_uri}')
+                        continue
+
+                    proxy_url = urljoin(
+                        settings.HOSTNAME,
+                        reverse('storages:task-storage-data-resolve', kwargs={'task_id': task.id})
+                        + f'?fileuri={base64.urlsafe_b64encode(extracted_uri.encode()).decode()}',
+                    )
+                    resolved_uri = resolved_uri.replace(extracted_uri, proxy_url)
+                    replaced.add(extracted_uri)
+
+                return resolved_uri
             except Exception:
                 logger.info(f"Can't resolve URI={uri}", exc_info=True)
+
+        return uri
 
     def _scan_and_create_links_v2(self):
         # Async job execution for batch of objects:
