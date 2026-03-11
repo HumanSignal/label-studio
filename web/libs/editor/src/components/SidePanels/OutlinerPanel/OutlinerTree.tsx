@@ -61,7 +61,7 @@ const OutlinerTreeComponent: FC<OutlinerTreeProps> = observer(({ regions, footer
 
   return (
     <OutlinerContext.Provider value={{ regions }}>
-      <OutlinerInnerTreeComponent regions={regions} regionsTree={regionsTree} visibilityKey={visibilityKey} />
+      <OutlinerInnerTreeComponent regions={regions} regionsTree={regionsTree} />
     </OutlinerContext.Provider>
   );
 });
@@ -69,139 +69,136 @@ const OutlinerTreeComponent: FC<OutlinerTreeProps> = observer(({ regions, footer
 interface OutlinerInnerTreeProps {
   regions: any;
   regionsTree: any[];
-  visibilityKey?: string;
 }
 
 const iconGetter = ({ entity }: any) => <NodeIconComponent node={entity} />;
 const switcherIconGetter = ({ isLeaf }: any) => <SwitcherIcon isLeaf={isLeaf} />;
-const OutlinerInnerTreeComponent: FC<OutlinerInnerTreeProps> = observer(
-  ({ regions, regionsTree, visibilityKey = "" }) => {
-    const blockRef = useRef<HTMLElement>();
-    const [height, setHeight] = useState(0);
-    let resizeObserver: ResizeObserver | null = useMemo(() => {
-      let lastHeight = 0;
+const OutlinerInnerTreeComponent: FC<OutlinerInnerTreeProps> = observer(({ regions, regionsTree }) => {
+  const blockRef = useRef<HTMLElement>();
+  const [height, setHeight] = useState(0);
+  let resizeObserver: ResizeObserver | null = useMemo(() => {
+    let lastHeight = 0;
 
-      return new ResizeObserver((entities) => {
-        requestAnimationFrame(() => {
-          if (!entities?.[0]?.contentRect || entities?.[0]?.contentRect?.height === lastHeight) {
-            return;
-          }
-          lastHeight = entities?.[0]?.contentRect?.height || 1;
+    return new ResizeObserver((entities) => {
+      requestAnimationFrame(() => {
+        if (!entities?.[0]?.contentRect || entities?.[0]?.contentRect?.height === lastHeight) {
+          return;
+        }
+        lastHeight = entities?.[0]?.contentRect?.height || 1;
 
-          // ensure the component is still mounted
-          if (blockRef.current) {
-            setHeight(lastHeight);
-          }
-        });
+        // ensure the component is still mounted
+        if (blockRef.current) {
+          setHeight(lastHeight);
+        }
       });
-    }, []);
+    });
+  }, []);
 
-    useEffect(() => {
-      return () => {
-        resizeObserver?.disconnect();
-        resizeObserver = null;
-      };
-    }, []);
-    const setRef = useCallback((ref) => {
-      if (ref) {
-        resizeObserver?.observe(ref);
-      } else if (blockRef.current) {
-        resizeObserver?.unobserve(blockRef.current);
-      }
-      blockRef.current = ref;
-      setHeight(ref?.clientHeight || 1);
-    }, []);
-    const eventHandlers = useEventHandlers();
-    const selectedKeys = regions.selection.keys;
-    const rootClass = cn("tree");
-    let expandedKeys;
-    let onExpand;
-    // It works only for 'label' mode yet.
-    // To enable this feature at other group modes, it needs to set correct pos at regionsTree for these modes
-    // It also doesn't work with nesting level more than 1
-    const isPersistCollapseEnabled = isFF(FF_DEV_2755) && regions.group === "label";
-
-    if (isFF(FF_DEV_2755)) {
-      const [collapsedPos, setCollapsedPos] = useState(
-        localStorage
-          .getItem(localStoreName)
-          ?.split?.(",")
-          ?.filter((pos) => !!pos) ?? [],
-      );
-
-      const updateLocalStorage = (collapsedPos: Array<string>) => {
-        localStorage.setItem(localStoreName, collapsedPos.join(","));
-      };
-
-      const collapse = (pos: string) => {
-        const newCollapsedPos = [...collapsedPos, pos];
-
-        setCollapsedPos(newCollapsedPos);
-        updateLocalStorage(newCollapsedPos);
-      };
-
-      const expand = (pos: string) => {
-        const newCollapsedPos = collapsedPos.filter((cPos) => cPos !== pos);
-
-        setCollapsedPos(newCollapsedPos);
-        updateLocalStorage(newCollapsedPos);
-      };
-
-      expandedKeys =
-        regionsTree.filter((item: any) => !collapsedPos.includes(item.pos)).map((item: any) => item.key) ?? [];
-
-      onExpand = (
-        _internalExpandedKeys: Key[],
-        {
-          node,
-        }: {
-          node: EventDataNode;
-        },
-      ): void => {
-        const region = regionsTree.find((region: any) => region.key === node.key);
-
-        if (!region) return;
-
-        // pos is equal to label name
-        const pos = region.pos;
-
-        collapsedPos.includes(pos) ? expand(pos) : collapse(pos);
-      };
+  useEffect(() => {
+    return () => {
+      resizeObserver?.disconnect();
+      resizeObserver = null;
+    };
+  }, []);
+  const setRef = useCallback((ref) => {
+    if (ref) {
+      resizeObserver?.observe(ref);
+    } else if (blockRef.current) {
+      resizeObserver?.unobserve(blockRef.current);
     }
+    blockRef.current = ref;
+    setHeight(ref?.clientHeight || 1);
+  }, []);
+  const eventHandlers = useEventHandlers();
+  const selectedKeys = regions.selection.keys;
+  const rootClass = cn("tree");
+  let expandedKeys;
+  let onExpand;
+  // It works only for 'label' mode yet.
+  // To enable this feature at other group modes, it needs to set correct pos at regionsTree for these modes
+  // It also doesn't work with nesting level more than 1
+  const isPersistCollapseEnabled = isFF(FF_DEV_2755) && regions.group === "label";
 
-    return (
-      <div className={cn("outliner-tree").toClassName()} ref={setRef}>
-        {!!height && (
-          <Tree
-            key={`${regions.group}-${visibilityKey}`}
-            draggable={regions.group === "manual"}
-            multiple
-            defaultExpandAll
-            defaultExpandParent={!isPersistCollapseEnabled}
-            autoExpandParent
-            checkable={false}
-            prefixCls={rootClass.toClassName()}
-            className={rootClass.toClassName()}
-            treeData={regionsTree}
-            selectedKeys={selectedKeys}
-            icon={iconGetter}
-            switcherIcon={switcherIconGetter}
-            virtual
-            itemHeight={MIN_REGIONS_TREE_ROW_HEIGHT}
-            height={height}
-            {...eventHandlers}
-            {...(isPersistCollapseEnabled
-              ? {
-                  expandedKeys,
-                  onExpand,
-                }
-              : {})}
-          />
-        )}
-      </div>
+  if (isFF(FF_DEV_2755)) {
+    const [collapsedPos, setCollapsedPos] = useState(
+      localStorage
+        .getItem(localStoreName)
+        ?.split?.(",")
+        ?.filter((pos) => !!pos) ?? [],
     );
-  },
-);
+
+    const updateLocalStorage = (collapsedPos: Array<string>) => {
+      localStorage.setItem(localStoreName, collapsedPos.join(","));
+    };
+
+    const collapse = (pos: string) => {
+      const newCollapsedPos = [...collapsedPos, pos];
+
+      setCollapsedPos(newCollapsedPos);
+      updateLocalStorage(newCollapsedPos);
+    };
+
+    const expand = (pos: string) => {
+      const newCollapsedPos = collapsedPos.filter((cPos) => cPos !== pos);
+
+      setCollapsedPos(newCollapsedPos);
+      updateLocalStorage(newCollapsedPos);
+    };
+
+    expandedKeys =
+      regionsTree.filter((item: any) => !collapsedPos.includes(item.pos)).map((item: any) => item.key) ?? [];
+
+    onExpand = (
+      _internalExpandedKeys: Key[],
+      {
+        node,
+      }: {
+        node: EventDataNode;
+      },
+    ): void => {
+      const region = regionsTree.find((region: any) => region.key === node.key);
+
+      if (!region) return;
+
+      // pos is equal to label name
+      const pos = region.pos;
+
+      collapsedPos.includes(pos) ? expand(pos) : collapse(pos);
+    };
+  }
+
+  return (
+    <div className={cn("outliner-tree").toClassName()} ref={setRef}>
+      {!!height && (
+        <Tree
+          key={regions.group}
+          draggable={regions.group === "manual"}
+          multiple
+          defaultExpandAll
+          defaultExpandParent={!isPersistCollapseEnabled}
+          autoExpandParent
+          checkable={false}
+          prefixCls={rootClass.toClassName()}
+          className={rootClass.toClassName()}
+          treeData={regionsTree}
+          selectedKeys={selectedKeys}
+          icon={iconGetter}
+          switcherIcon={switcherIconGetter}
+          virtual
+          itemHeight={MIN_REGIONS_TREE_ROW_HEIGHT}
+          height={height}
+          {...eventHandlers}
+          {...(isPersistCollapseEnabled
+            ? {
+                expandedKeys,
+                onExpand,
+              }
+            : {})}
+        />
+      )}
+    </div>
+  );
+});
 
 const titleRenderer = (nodeData: any) => {
   const { key: _key, ...data } = nodeData;
