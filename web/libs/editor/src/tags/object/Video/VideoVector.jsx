@@ -156,18 +156,7 @@ const getMaxPoints = (control) => {
  * exact pixel values KonvaVector gave us so that the pixel→percent→pixel roundtrip
  * doesn't cause KonvaVector to re-initialize (its arePointsEqual uses strict ===).
  */
-const VideoVectorPure = ({
-  id,
-  reg,
-  box,
-  frame,
-  workingArea,
-  selected,
-  draggable,
-  listening,
-  onDragMove,
-  ...rest
-}) => {
+const VideoVectorPure = ({ id, reg, box, frame, workingArea, selected, draggable, listening, onDragMove, ...rest }) => {
   const vectorRef = useRef(null);
   const isDraggingRef = useRef(false);
   const latestDragPixelsRef = useRef(null);
@@ -194,7 +183,11 @@ const VideoVectorPure = ({
 
   if (dragPixels) {
     pixelVertices = dragPixels;
-  } else if (lastCommittedRef.current && box.vertices && verticesMatch(box.vertices, lastCommittedRef.current.percent)) {
+  } else if (
+    lastCommittedRef.current &&
+    box.vertices &&
+    verticesMatch(box.vertices, lastCommittedRef.current.percent)
+  ) {
     pixelVertices = lastCommittedRef.current.pixels;
   } else {
     pixelVertices = storePixelVertices;
@@ -205,11 +198,14 @@ const VideoVectorPure = ({
 
   const control = reg.results?.[0]?.from_name;
 
-  const stageTransform = useMemo(() => ({
-    zoom: 1,
-    offsetX: waX,
-    offsetY: waY,
-  }), [waX, waY]);
+  const stageTransform = useMemo(
+    () => ({
+      zoom: 1,
+      offsetX: waX,
+      offsetY: waY,
+    }),
+    [waX, waY],
+  );
 
   const pointRadius = useMemo(() => getPointRadiusFromSize(control), [control?.pointsize]);
   const isReadOnly = reg.isReadOnly();
@@ -224,29 +220,38 @@ const VideoVectorPure = ({
   const kvDisabled = toolDisabled || isReadOnly || !listening || (!selected && !reg.isDrawing);
   const kvSelected = !kvDisabled;
 
-  const handleRef = useCallback((kv) => {
-    vectorRef.current = kv;
-    reg.setVectorRef(kv);
-  }, [reg]);
+  const handleRef = useCallback(
+    (kv) => {
+      vectorRef.current = kv;
+      reg.setVectorRef(kv);
+    },
+    [reg],
+  );
 
-  const commitPoints = useCallback((points) => {
-    const percentPoints = pixelToPercentVertices(points, waWidth, waHeight);
-    const currentShape = reg.getShape(frame);
+  const commitPoints = useCallback(
+    (points) => {
+      const percentPoints = pixelToPercentVertices(points, waWidth, waHeight);
+      const currentShape = reg.getShape(frame);
 
-    if (currentShape?.vertices && verticesMatch(currentShape.vertices, percentPoints)) return;
+      if (currentShape?.vertices && verticesMatch(currentShape.vertices, percentPoints)) return;
 
-    lastCommittedRef.current = { percent: percentPoints, pixels: points };
-    reg.updateShape({ vertices: percentPoints, closed: currentShape?.closed ?? false }, frame);
-  }, [reg, frame, waWidth, waHeight]);
+      lastCommittedRef.current = { percent: percentPoints, pixels: points };
+      reg.updateShape({ vertices: percentPoints, closed: currentShape?.closed ?? false }, frame);
+    },
+    [reg, frame, waWidth, waHeight],
+  );
 
-  const handlePointsChange = useCallback((points) => {
-    if (isDraggingRef.current) {
-      latestDragPixelsRef.current = points;
-      setDragPixels(points);
-      return;
-    }
-    commitPoints(points);
-  }, [commitPoints]);
+  const handlePointsChange = useCallback(
+    (points) => {
+      if (isDraggingRef.current) {
+        latestDragPixelsRef.current = points;
+        setDragPixels(points);
+        return;
+      }
+      commitPoints(points);
+    },
+    [commitPoints],
+  );
 
   const handleTransformStart = useCallback(() => {
     isDraggingRef.current = true;
@@ -278,52 +283,61 @@ const VideoVectorPure = ({
     }
   }, [dragPixels, box.vertices]);
 
-  const handlePathClosedChange = useCallback((isClosed) => {
-    const shape = reg.getShape(frame);
+  const handlePathClosedChange = useCallback(
+    (isClosed) => {
+      const shape = reg.getShape(frame);
 
-    if (!shape) return;
-    if (shape.closed === isClosed) return;
+      if (!shape) return;
+      if (shape.closed === isClosed) return;
 
-    reg.updateShape({ vertices: shape.vertices, closed: isClosed }, frame);
-  }, [reg, frame]);
+      reg.updateShape({ vertices: shape.vertices, closed: isClosed }, frame);
+    },
+    [reg, frame],
+  );
 
-  const handleFinish = useCallback((e) => {
-    if (isReadOnly) return;
-    e.evt.stopPropagation();
-    e.evt.preventDefault();
+  const handleFinish = useCallback(
+    (e) => {
+      if (isReadOnly) return;
+      e.evt.stopPropagation();
+      e.evt.preventDefault();
 
-    const objTag = reg.object;
+      const objTag = reg.object;
 
-    if (!objTag) return;
+      if (!objTag) return;
 
-    const mgr = ToolsManager.getInstance({ name: objTag.name });
-    const tool = mgr?.findSelectedTool?.();
+      const mgr = ToolsManager.getInstance({ name: objTag.name });
+      const tool = mgr?.findSelectedTool?.();
 
-    if (tool?.currentArea) {
-      tool.commitDrawingRegion?.();
-    }
-    tool?.complete?.();
-  }, [isReadOnly, reg]);
+      if (tool?.currentArea) {
+        tool.commitDrawingRegion?.();
+      }
+      tool?.complete?.();
+    },
+    [isReadOnly, reg],
+  );
 
-  const handleRegionClick = useCallback((e) => {
-    if (e.evt.defaultPrevented) return;
-    if (reg.isReadOnly()) return;
-    if (reg.isDrawing) return;
-    if (e.evt.altKey || e.evt.ctrlKey || e.evt.shiftKey || e.evt.metaKey) return;
+  const handleRegionClick = useCallback(
+    (e) => {
+      if (e.evt.defaultPrevented) return;
+      if (reg.isReadOnly()) return;
+      if (reg.isDrawing) return;
+      if (e.evt.altKey || e.evt.ctrlKey || e.evt.shiftKey || e.evt.metaKey) return;
 
-    e.cancelBubble = true;
+      e.cancelBubble = true;
 
-    const objTag = reg.object;
-    const mgr = objTag ? ToolsManager.getInstance({ name: objTag.name }) : null;
-    const tool = mgr?.findSelectedTool?.();
+      const objTag = reg.object;
+      const mgr = objTag ? ToolsManager.getInstance({ name: objTag.name }) : null;
+      const tool = mgr?.findSelectedTool?.();
 
-    if (tool?.currentArea && tool.currentArea !== reg && tool.complete) {
-      tool.complete();
-    }
+      if (tool?.currentArea && tool.currentArea !== reg && tool.complete) {
+        tool.complete();
+      }
 
-    reg.setHighlight(false);
-    reg.onClickRegion(e);
-  }, [reg, frame]);
+      reg.setHighlight(false);
+      reg.onClickRegion(e);
+    },
+    [reg, frame],
+  );
 
   return (
     <Group listening={listening} opacity={reg.hidden ? 0 : 1}>
