@@ -808,6 +808,7 @@ const Option = ({
       className={clsx(
         className,
         [
+          "w-full",
           "rounded-4",
           "text-neutral-content-subtle",
           "overflow-hidden",
