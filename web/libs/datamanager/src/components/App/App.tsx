@@ -49,7 +49,7 @@ interface AppComponentProps {
  */
 const AppComponent: React.FC<AppComponentProps> = ({ app }) => {
   const rootCN = cn("root");
-  const rootClassName = rootCN.mod({ mode: app.SDK.mode }).toString();
+  const rootClassName = rootCN.mod({ mode: app.SDK.mode }).toClassName();
 
   return (
     <ErrorBoundary>
@@ -59,14 +59,14 @@ const AppComponent: React.FC<AppComponentProps> = ({ app }) => {
             <SDKProvider sdk={app.SDK}>
               <div className={rootClassName}>
                 {app.crashed ? (
-                  <div className={clsx(rootCN.toString(), rootClassName)}>
-                    <span className={rootCN.elem("header").toString()}>Oops...</span>
-                    <span className={rootCN.elem("description").toString()}>
+                  <div className={clsx(rootCN.toClassName(), rootClassName)}>
+                    <span className={rootCN.elem("header").toClassName()}>Oops...</span>
+                    <span className={rootCN.elem("description").toClassName()}>
                       Project has been deleted or not yet created.
                     </span>
                   </div>
                 ) : app.loading ? (
-                  <div className={cn("app-loader").toString()}>
+                  <div className={cn("app-loader").toClassName()}>
                     <Spinner size="large" />
                   </div>
                 ) : app.isLabeling ? (
@@ -74,7 +74,7 @@ const AppComponent: React.FC<AppComponentProps> = ({ app }) => {
                 ) : (
                   <DataManager />
                 )}
-                <div className={cn("offscreen").toString()} />
+                <div className={cn("offscreen").toClassName()} />
               </div>
             </SDKProvider>
           </Provider>

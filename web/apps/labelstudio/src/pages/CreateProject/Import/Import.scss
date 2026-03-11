@@ -1,34 +1,3 @@
-// Custom scrollbar styling mixin
-@mixin custom-scrollbar {
-  scrollbar-color: var(--color-neutral-border-bold) transparent;
-  scrollbar-width: thin;
-
-  &::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
-    background-color: var(--color-neutral-surface);
-  }
-
-  &::-webkit-scrollbar-track {
-    background: var(--color-neutral-surface);
-    border-radius: 3px;
-  }
-
-  &::-webkit-scrollbar-thumb {
-    background: var(--color-neutral-border-bold);
-    border-radius: 3px;
-    transition: background-color 0.2s ease;
-
-    &:hover {
-      background: var(--color-neutral-border-boldest);
-    }
-  }
-
-  &::-webkit-scrollbar-corner {
-    background: var(--color-neutral-surface);
-  }
-}
-
 .upload_page {
   flex: 1;
   min-height: 0;
@@ -46,7 +15,7 @@
     gap: var(--spacing-tight);
   }
 
-  button {
+  & button {
     line-height: 1em;
   }
 
@@ -65,7 +34,7 @@
   &__url-form {
     display: flex;
 
-    input {
+    & input {
       border: 1px solid var(--color-neutral-border);
       background: var(--color-neutral-background);
       color: var(--color-neutral-content);
@@ -83,7 +52,7 @@
       }
     }
 
-    button {
+    & button {
       margin-left: -1px;
       border-radius: 0 var(--corner-radius-smaller) var(--corner-radius-smaller) 0;
     }
@@ -98,9 +67,39 @@
     font-weight: 500;
   }
 
-  &>main {
-    @include custom-scrollbar;
+  /* Shared custom scrollbar styles */
+  &>main,
+  &__code-wrapper>div {
+    scrollbar-color: var(--color-neutral-border-bold) transparent;
+    scrollbar-width: thin;
 
+    &::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+      background-color: var(--color-neutral-surface);
+    }
+
+    &::-webkit-scrollbar-track {
+      background: var(--color-neutral-surface);
+      border-radius: 3px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: var(--color-neutral-border-bold);
+      border-radius: 3px;
+      transition: background-color 0.2s ease;
+
+      &:hover {
+        background: var(--color-neutral-border-boldest);
+      }
+    }
+
+    &::-webkit-scrollbar-corner {
+      background: var(--color-neutral-surface);
+    }
+  }
+
+  &>main {
     flex: 1;
     overflow-y: auto;
     background: linear-gradient(var(--color-neutral-background) 30%, rgb(255 255 255 / 0%)), linear-gradient(rgb(0 0 0 / 10%), var(--color-neutral-background) 100%);
@@ -110,23 +109,23 @@
     background-attachment: local, scroll;
   }
 
-  table {
+  & table {
     table-layout: fixed;
     
-    tr {
+    & tr {
       border-bottom: 2px solid var(--color-neutral-background);
       background-color: transparent;
 
-      td:nth-child(2) {
+      & td:nth-child(2) {
         width: 136px;
       }
     }
 
-    tr:nth-child(odd) {
+    & tr:nth-child(odd) {
       background: var(--color-neutral-emphasis-subtle);
     }
 
-    td {
+    & td {
       padding: var(--spacing-tight) var(--spacing-tight);
     }
   }
@@ -181,8 +180,6 @@
     height: calc(100% - var(--spacing-tight));
 
     &>div {
-      @include custom-scrollbar;
-
       height: 100%;
       overflow-y: auto;
       font-size: var(--font-size-14);
@@ -213,7 +210,7 @@
       border-radius: 8px;
     }
 
-    label {
+    & label {
       margin-left: 8px;
       cursor: pointer;
     }
@@ -238,7 +235,7 @@
   position: relative;
   display: flex;
 
-  a {
+  & a {
     color: var(--color-primary-content);
 
     &:hover {
@@ -281,7 +278,7 @@
     color: var(--color-primary-icon);
   }
 
-  label {
+  & label {
     display: flex;
     justify-content: center;
   }
@@ -303,30 +300,30 @@
       margin-top: 32px;
     }
 
-    header {
+    & header {
       font-size: 24px;
       line-height: 32px;
       text-align: center;
       color: var(--color-neutral-content);
     }
 
-    dl {
+    & dl {
       display: grid;
       grid-template: auto / auto auto;
       font-size: 14px;
       line-height: 24px;
       gap: 0 30px;
 
-      dt {
+      & dt {
         color: var(--color-neutral-content);
       }
 
-      dd {
+      & dd {
         font-weight: normal;
       }
 
       dt:last-of-type,
-      dd:last-of-type {
+      & dd:last-of-type {
         margin-top: 20px;
       }
     }

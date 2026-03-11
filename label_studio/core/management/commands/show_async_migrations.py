@@ -14,7 +14,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         org = options['organization']
-        logger.debug(f"===> AsyncMigrationStatus for Organization {org if org > -1 else 'ALL'}")
+        logger.debug(f'===> AsyncMigrationStatus for Organization {org if org > -1 else "ALL"}')
         if org == -1:
             migrations = AsyncMigrationStatus.objects.all().order_by('project_id')
         else:
@@ -23,4 +23,4 @@ class Command(BaseCommand):
         for m in migrations:
             logger.debug(f'{m.name} \t {m.created_at} \t Project <{m.project}> \t {m.status} \t {m.meta}')
 
-        logger.debug(f"===> AsyncMigrationStatus for Organization {org if org > -1 else 'ALL'} printed")
+        logger.debug(f'===> AsyncMigrationStatus for Organization {org if org > -1 else "ALL"} printed')

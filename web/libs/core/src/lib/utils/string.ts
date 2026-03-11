@@ -1,11 +1,7 @@
-import camelCase from "lodash/camelCase";
-
 /**
- * Convert string to PascalCase (StudlyCase)
- * This is essentially camelCase with the first letter capitalized
- * This is the only utility we need since lodash doesn't provide PascalCase
+ * Re-exports of lodash-compatible string utilities from es-toolkit.
+ * Uses es-toolkit/compat for exact lodash behavior (e.g. startCase preserves uppercase words).
  */
-export const toStudlyCaps = (str: string): string => {
-  const camelCased = camelCase(str);
-  return camelCased.charAt(0).toUpperCase() + camelCased.slice(1);
-};
+
+export { camelCase, capitalize, kebabCase, snakeCase, startCase } from "es-toolkit/compat";
+export { pascalCase } from "es-toolkit/string";

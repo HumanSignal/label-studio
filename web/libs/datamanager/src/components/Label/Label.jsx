@@ -1,7 +1,7 @@
 import { inject } from "mobx-react";
 import { observer } from "mobx-react-lite";
 import { useCallback, useEffect, useMemo, useRef } from "react";
-import { IconChevronDown, IconChevronLeft, IconGearNewUI } from "@humansignal/icons";
+import { IconGearNewUI, IconChevronLeft } from "@humansignal/icons";
 import { cn } from "../../utils/bem";
 import { Button } from "@humansignal/ui";
 import { FieldsButton } from "../Common/FieldsButton";
@@ -28,12 +28,7 @@ const LabelingHeader = ({ SDK, onClick, isExplorerMode }) => {
         )}
 
         {isExplorerMode ? (
-          <FieldsButton
-            wrapper={FieldsButton.Checkbox}
-            icon={<Icon icon={IconGearNewUI} />}
-            trailingIcon={<Icon icon={IconChevronDown} />}
-            title={"Fields"}
-          />
+          <FieldsButton multiSelect={true} icon={<Icon icon={IconGearNewUI} />} title={"Fields"} />
         ) : null}
       </Space>
     </div>
@@ -62,12 +57,16 @@ export const Labeling = injector(
     }, []);
 
     const closeLabeling = useCallback(() => {
+      delete document.body.dataset.lsfLabeling;
       store.closeLabeling();
     }, [store]);
 
     const initLabeling = useCallback(() => {
       if (!SDK.lsf) SDK.initLSF(lsfRef.current);
       SDK.startLabeling();
+      // Signal that labeling is active so DM shortcuts yield to editor hotkeys.
+      // This is read by useShortcut() in hotkeys.ts.
+      document.body.dataset.lsfLabeling = "true";
     }, []);
 
     useEffect(() => {
@@ -85,7 +84,44 @@ export const Labeling = injector(
     }, []);
 
     useEffect(() => {
-      return () => SDK.destroyLSF();
+      return () => {
+        SDK.destroyLSF();
+        delete document.body.dataset.lsfLabeling;
+      };
+    }, []);
+
+    // Track which panel the user last interacted with via a data attribute
+    // on document.body. When the attribute is "true", DM shortcuts (shift+left
+    // to close labeling, etc.) yield so that editor hotkeys (TimeSeries pan,
+    // region grow) take priority. Clicking on the DM table clears the flag
+    // so DM shortcuts resume working.
+    //
+    // This replaces a focus-based approach that couldn't work because clicking
+    // on canvas/SVG elements never moves document.activeElement away from body.
+    useEffect(() => {
+      const container = lsfRef.current;
+      if (!container) return;
+
+      const handleContainerPointerDown = () => {
+        document.body.dataset.lsfLabeling = "true";
+      };
+
+      // When the user clicks outside the LSF container (e.g. the DM table),
+      // clear the flag so DM shortcuts work again.
+      const handleDocumentPointerDown = (e) => {
+        if (!container.contains(e.target)) {
+          document.body.dataset.lsfLabeling = "false";
+        }
+      };
+
+      container.addEventListener("pointerdown", handleContainerPointerDown);
+      document.addEventListener("pointerdown", handleDocumentPointerDown);
+
+      return () => {
+        container.removeEventListener("pointerdown", handleContainerPointerDown);
+        document.removeEventListener("pointerdown", handleDocumentPointerDown);
+        delete document.body.dataset.lsfLabeling;
+      };
     }, []);
 
     const onResize = useCallback((width) => {

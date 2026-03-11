@@ -59,10 +59,10 @@ export const StorageCard = ({ rootClass, target, storage, onEditStorage, onDelet
       <StorageSummary
         target={target}
         storage={storageData}
-        className={rootClass.elem("summary")}
+        className={rootClass.elem("summary").toClassName()}
         storageTypes={storageTypes}
       />
-      <div className={rootClass.elem("sync")}>
+      <div className={rootClass.elem("sync").toClassName()}>
         <div className="mt-base">
           <Button
             look="outlined"
@@ -74,7 +74,7 @@ export const StorageCard = ({ rootClass, target, storage, onEditStorage, onDelet
             Sync Storage
           </Button>
           {notSyncedYet && (
-            <div className={rootClass.elem("sync-count")}>
+            <div className={rootClass.elem("sync-count").toClassName()}>
               Syncing may take some time, please refresh the page to see the current status.
             </div>
           )}

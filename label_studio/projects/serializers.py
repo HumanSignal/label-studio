@@ -1,9 +1,9 @@
-"""This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
-"""
+"""This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license."""
+
 import bleach
 from constants import SAFE_HTML_ATTRIBUTES, SAFE_HTML_TAGS
 from django.db.models import Q
-from drf_spectacular.utils import extend_schema_serializer
+from drf_spectacular.utils import extend_schema_field, extend_schema_serializer
 from fsm.serializer_fields import FSMStateField
 from label_studio_sdk.label_interface import LabelInterface
 from label_studio_sdk.label_interface.control_tags import (
@@ -37,6 +37,16 @@ from tasks.models import Task
 from users.serializers import UserSimpleSerializer
 
 
+@extend_schema_field({'type': 'object', 'additionalProperties': True})
+class OpenApiObjectJSONField(serializers.JSONField):
+    """
+    A JSON field that is always rendered as a generic OpenAPI object.
+
+    drf-spectacular may otherwise produce a schema with only metadata (e.g. nullable/readOnly/description)
+    and omit `type`/`$ref`, which breaks some OpenAPI doc renderers.
+    """
+
+
 class CreatedByFromContext:
     requires_context = True
 
@@ -54,8 +64,7 @@ class ProjectSerializer(FlexFieldsModelSerializer):
     total_annotations_number = serializers.IntegerField(
         default=None,
         read_only=True,
-        help_text='Total annotations number in project including '
-        'skipped_annotations_number and ground_truth_number.',
+        help_text='Total annotations number in project including skipped_annotations_number and ground_truth_number.',
     )
     total_predictions_number = serializers.IntegerField(
         default=None,
@@ -84,7 +93,10 @@ class ProjectSerializer(FlexFieldsModelSerializer):
 
     created_by = UserSimpleSerializer(default=CreatedByFromContext(), help_text='Project owner')
 
-    parsed_label_config = serializers.JSONField(
+    control_weights = OpenApiObjectJSONField(
+        required=False, allow_null=True, help_text='Dict of weights for each control tag in metric calculation.'
+    )
+    parsed_label_config = OpenApiObjectJSONField(
         default=None, read_only=True, help_text='JSON-formatted labeling configuration'
     )
     start_training_on_annotation_update = SerializerMethodField(

@@ -8,6 +8,8 @@ export default {
   },
   moduleFileExtensions: ["ts", "tsx", "js", "jsx"],
   moduleNameMapper: {
+    "^react-markdown$": "<rootDir>/../../libs/editor/__mocks__/react-markdown.tsx",
+    "^rehype-raw$": "<rootDir>/../../libs/editor/__mocks__/rehype-raw.ts",
     "^apps/playground/(.*)$": "<rootDir>/$1",
   },
   coverageDirectory: "../../coverage/apps/playground",

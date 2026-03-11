@@ -22,4 +22,15 @@
     width: var(--handle-size-hover);
     background-color: var(--color-primary-border-subtle);
   }
+
+  &.handleDisabled {
+    width: 1px;
+    cursor: default;
+    pointer-events: none;
+
+    &:hover {
+      width: 1px;
+      background-color: var(--color-neutral-border);
+    }
+  }
 }

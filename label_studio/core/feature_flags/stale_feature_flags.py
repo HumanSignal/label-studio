@@ -91,7 +91,6 @@ STALE_FEATURE_FLAGS = {
     'fflag_fix_back_plt_816_recalculate_stats_batch_15072025_short': True,
     'fflag_fix_back_plt_825_rate_limiter_debug_14072025_short': False,
     'fflag_fix_back_plt_804_check_file_extension_11072025_short': True,
-    'fflag_fix_back_plt_819_per_org_rate_limiter_09072025_short': True,
     'fflag_fix_back_plt_811_finished_task_number_01072025_short': True,
     'fflag_fix_back_plt_807_batch_size_26062025_short': True,
     'fflag_fix_back_plt_802_update_is_labeled_20062025_short': True,

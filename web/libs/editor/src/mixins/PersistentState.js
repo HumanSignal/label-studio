@@ -41,6 +41,10 @@ const PersistentStateMixin = types
       const values = stored.values || {};
 
       for (const key of Object.keys(values)) {
+        // Prevent restoring empty arrays that wipe out freshly loaded data
+        if (Array.isArray(values[key]) && values[key].length === 0) {
+          continue;
+        }
         self[key] = values[key];
       }
     },

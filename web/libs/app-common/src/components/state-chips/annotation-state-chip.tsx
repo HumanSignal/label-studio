@@ -4,7 +4,7 @@
 
 import { useState } from "react";
 import { StateChip } from "@humansignal/ui";
-import { getStateColorClass, formatStateName, getStateDescription } from "./utils";
+import { formatStateName, getStateDescription, getStateVariant } from "./utils";
 import { StateHistoryPopoverContent } from "./state-history-popover-content";
 
 export interface AnnotationStateChipProps {
@@ -29,7 +29,7 @@ export function AnnotationStateChip({ state, annotationId, interactive = true }:
 
   const label = formatStateName(state);
   const description = getStateDescription(state, "annotation");
-  const colorClasses = getStateColorClass(state);
+  const variant = getStateVariant(state);
 
   const popoverContent = annotationId ? (
     <StateHistoryPopoverContent
@@ -44,7 +44,7 @@ export function AnnotationStateChip({ state, annotationId, interactive = true }:
     <StateChip
       label={label}
       description={description}
-      className={colorClasses}
+      variant={variant}
       interactive={interactive && !!annotationId}
       popoverContent={popoverContent}
       open={open}

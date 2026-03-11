@@ -29,22 +29,36 @@ runs:
       shell: bash
       run: npm install -g "yarn@${VERSION}"
 
+    - name: Cache node_modules
+      uses: actions/cache@v4
+      id: node-modules-cache
+      with:
+        path: |
+          ${{ inputs.directory }}/node_modules
+          !${{ inputs.directory }}/node_modules/.cache
+        key: ${{ runner.os }}-node-${{ inputs.node-version }}-node-modules-v3-${{ hashFiles('web/yarn.lock') }}
+
     - name: Get yarn cache directory path
+      if: steps.node-modules-cache.outputs.cache-hit != 'true'
       id: yarn-cache-dir-path
       shell: bash
       run: echo "dir=$(yarn cache dir)" >> $GITHUB_OUTPUT
 
     - name: Configure yarn cache
+      if: steps.node-modules-cache.outputs.cache-hit != 'true'
       uses: actions/cache@v4
       with:
         path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
-        key: ${{ runner.os }}-node-${{ inputs.node-version }}-${{ hashFiles('**/yarn.lock') }}
-
-    - name: Print Yarn cache size
-      shell: bash
-      run: du -d 0 -h ${{ steps.yarn-cache-dir-path.outputs.dir }}
+        key: ${{ runner.os }}-node-${{ inputs.node-version }}-yarn-v1-${{ hashFiles('web/yarn.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-node-${{ inputs.node-version }}-yarn-v1-
 
     - name: Install yarn dependencies
+      if: steps.node-modules-cache.outputs.cache-hit != 'true'
       working-directory: "${{ inputs.directory }}"
       shell: bash
       run: yarn install --frozen-lockfile
+
+    - name: Print node_modules size
+      shell: bash
+      run: du -d 0 -h ${{ inputs.directory }}/node_modules

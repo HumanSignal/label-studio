@@ -36,6 +36,7 @@ import { isFF } from "../../utils/feature-flags";
 // @ts-ignore
 import { confirm } from "../../common/Modal/Modal";
 import { type ContextMenuAction, ContextMenu, type MenuActionOnClick } from "../ContextMenu";
+import { useResolveUser, isUserComplete } from "@humansignal/core/hooks/useResolveUser";
 import "./AnnotationButton.scss";
 
 // Constants for name truncation
@@ -147,20 +148,6 @@ const injector = inject(({ store }) => {
 
 const hoverIntentDelay = 300;
 
-// Helper function to create badge style objects with consistent CSS variable pattern
-// Note: CSS variables are overridden in SCSS to always use light mode values for tooltip badges
-const createBadgeStyle = (label: string, colorName: string) => ({
-  label,
-  backgroundColor: `var(--color-accent-${colorName}-subtle)`,
-  color: `var(--color-accent-${colorName}-bold)`,
-});
-
-// Helper function to get just the CSS variable style properties
-const getBadgeColors = (colorName: string) => ({
-  backgroundColor: `var(--color-accent-${colorName}-subtle)`,
-  color: `var(--color-accent-${colorName}-bold)`,
-});
-
 function AnnotationButtonTooltip({
   displayUsername,
   isDraft,
@@ -208,24 +195,24 @@ function AnnotationButtonTooltip({
     // Check for both ephemeral drafts (isDraft) and saved drafts (isDraftSaved)
     // Exception: If Draft AND Skipped, show both Draft and Skipped
     if (isDraft || isDraftSaved) {
-      return createBadgeStyle("Draft", "grape");
+      return { label: "Draft", variant: "primary" as const };
     }
     if (acceptedState) {
       switch (acceptedState) {
         case "accepted":
-          return createBadgeStyle("Accepted", "kale");
+          return { label: "Accepted", variant: "positive" as const };
         case "rejected":
-          return createBadgeStyle("Rejected", "persimmon");
+          return { label: "Rejected", variant: "negative" as const };
         case "fixed":
         case "fixed_and_accepted":
-          return createBadgeStyle("Fixed", "canteloupe");
+          return { label: "Fixed", variant: "warning" as const };
         default:
           break;
       }
     }
     // Exception: If Submitted AND Skipped, only show Skipped (don't show Submitted)
     if (isSubmitted && !isSkipped) {
-      return createBadgeStyle("Submitted", "kale");
+      return { label: "Submitted", variant: "positive" as const };
     }
 
     return null;
@@ -275,8 +262,15 @@ function AnnotationButtonTooltip({
     return rows;
   }, [annotationId, isPrediction, predictionScore, lastUpdated, formatDate]);
 
-  const isRenderable =
-    tooltipData.length > 0 || !!displayUsername || !!statusBadge || !!isSkipped || !!isGroundTruth || !!annotationId;
+  const tooltipBadges = useMemo(() => {
+    const badges: Array<{ label: string; variant: "primary" | "positive" | "negative" | "warning" }> = [];
+    if (statusBadge) badges.push(statusBadge);
+    if (isSkipped) badges.push({ label: "Skipped", variant: "negative" });
+    if (isGroundTruth) badges.push({ label: "Ground Truth", variant: "warning" });
+    return badges;
+  }, [statusBadge, isSkipped, isGroundTruth]);
+
+  const isRenderable = tooltipData.length > 0 || !!displayUsername || tooltipBadges.length > 0 || !!annotationId;
 
   if (!isRenderable) {
     return null;
@@ -298,45 +292,13 @@ function AnnotationButtonTooltip({
         left: `${position.left}px`,
       }}
     >
-      {(statusBadge || isSkipped || isGroundTruth) && (
+      {tooltipBadges.length > 0 && (
         <div className={cn("annotation-button").elem("tooltipBadges").toClassName()}>
-          {/* Draft/Submitted badges shown first */}
-          {statusBadge && (
-            <Badge
-              className={cn("annotation-button").elem("tooltipStatusBadge").toClassName()}
-              style={{
-                backgroundColor: statusBadge.backgroundColor,
-                color: statusBadge.color,
-                border: "none",
-              }}
-            >
-              {statusBadge.label}
+          {tooltipBadges.map(({ label, variant }) => (
+            <Badge key={label} variant={variant} shape="rounded">
+              {label}
             </Badge>
-          )}
-          {/* Skipped badge shown after Draft/Submitted */}
-          {isSkipped && (
-            <Badge
-              className={cn("annotation-button").elem("tooltipStatusBadge").toClassName()}
-              style={{
-                ...getBadgeColors("persimmon"),
-                border: "none",
-              }}
-            >
-              Skipped
-            </Badge>
-          )}
-          {/* Ground Truth badge shown last */}
-          {isGroundTruth && (
-            <Badge
-              className={cn("annotation-button").elem("tooltipStatusBadge").toClassName()}
-              style={{
-                ...getBadgeColors("canteloupe"),
-                border: "none",
-              }}
-            >
-              Ground Truth
-            </Badge>
-          )}
+          ))}
         </div>
       )}
       {displayUsername && (
@@ -582,13 +544,13 @@ export const AnnotationButton = observer(
     const iconSize = 32;
     // Guard entity property access - use safe defaults if entity is not alive
     const isPrediction = entityIsAlive ? entity.type === "prediction" : false;
-    const username = entityIsAlive
-      ? userDisplayName(
-          entity.user ?? {
-            firstName: entity.createdBy || "Admin",
-          },
-        )
-      : "Unknown";
+    // Use entity.user if it has meaningful display data (name/email); otherwise
+    // fall back to createdBy (which comes from created_username in stub annotations).
+    const resolvedUser =
+      entityIsAlive && entity.user && isUserComplete(entity.user)
+        ? entity.user
+        : { firstName: entityIsAlive ? entity.createdBy || "Admin" : "Unknown" };
+    const username = entityIsAlive ? userDisplayName(resolvedUser) : "Unknown";
     const [isGroundTruth, setIsGroundTruth] = useState<boolean>();
     const isDraft = entityIsAlive && !isPrediction && !isDefined(entity.pk);
     const isDraftSaved = entityIsAlive && !isPrediction && entity.draftId > 0;
@@ -607,6 +569,15 @@ export const AnnotationButton = observer(
     const [isTooltipOpen, setTooltipOpen] = useState(false);
     const [tooltipPosition, setTooltipPosition] = useState<{ top: number; left: number } | undefined>(undefined);
     const [isContextMenuOpen, setContextMenuOpen] = useState(false);
+
+    // Lazily resolve incomplete user data when the button comes into view.
+    // When annotations are loaded as stubs, entity.user may only have an ID
+    // (no name/email), so this fetches the full user and updates the MST store.
+    const enrichUser = useCallback(
+      (userData: any) => annotationStore?.store?.enrichUsers?.([userData]),
+      [annotationStore],
+    );
+    useResolveUser({ user: entity?.user, onUserResolved: enrichUser, elementRef: buttonRef });
 
     if (infoIsHidden && entityIsAlive) {
       // this data can be missing in tests, but we don't have `infoIsHidden` there, so hiding logic like this
@@ -960,7 +931,7 @@ export const AnnotationButton = observer(
               // @ts-expect-error - block attribute for Selenium test compatibility
               block="lsf-annotation-button"
               username={isPrediction ? entity.createdBy : null}
-              user={hiddenUser ?? entity.user ?? { email: entity.createdBy }}
+              user={hiddenUser ?? (isUserComplete(entity.user) ? entity.user : { email: entity.createdBy })}
               size={24}
               badge={
                 reviewBadge

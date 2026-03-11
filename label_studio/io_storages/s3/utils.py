@@ -1,8 +1,9 @@
-"""This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
-"""
+"""This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license."""
+
 import base64
 import fnmatch
 import logging
+import mimetypes
 import re
 from urllib.parse import urlparse
 
@@ -55,9 +56,17 @@ def resolve_s3_url(url, client, presign=True, expires_in=3600):
 
     # Otherwise try to generate presigned url
     try:
-        presigned_url = client.generate_presigned_url(
-            ClientMethod='get_object', Params={'Bucket': bucket_name, 'Key': key}, ExpiresIn=expires_in
-        )
+        params = {'Bucket': bucket_name, 'Key': key}
+
+        # Override response Content-Type based on file extension so that S3 returns
+        # the correct MIME type even if the object was uploaded without one.
+        # Without this, S3 may return binary/octet-stream which causes browsers
+        # to download files instead of displaying them inline (e.g. images, audio, video).
+        content_type, _ = mimetypes.guess_type(key)
+        if content_type:
+            params['ResponseContentType'] = content_type
+
+        presigned_url = client.generate_presigned_url(ClientMethod='get_object', Params=params, ExpiresIn=expires_in)
     except ClientError as exc:
         logger.warning(f"Can't generate presigned URL. Reason: {exc}")
         return url

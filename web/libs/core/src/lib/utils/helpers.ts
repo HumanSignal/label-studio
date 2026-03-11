@@ -33,7 +33,7 @@ export const userDisplayName = (user: Record<string, string> = {}) => {
         .filter((n) => !!n)
         .join(" ")
         .trim()
-    : username || email;
+    : username || email || "";
 };
 
 export const copyText = async (text: string) => {

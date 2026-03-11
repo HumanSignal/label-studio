@@ -26,6 +26,11 @@ export type AnnotationSummary = {
   results: RawResult[];
   createdBy: string;
   user: any;
+  // FIT-720: Lazy loading fields
+  _isStub?: boolean;
+  _isHydrating?: boolean;
+  _isHydrated?: boolean;
+  _mstAnnotation?: any; // Reference to original MST annotation for MobX reactivity
 };
 
 export type ObjectTagEntry = [string, MSTObjectTag | MSTTagImage];

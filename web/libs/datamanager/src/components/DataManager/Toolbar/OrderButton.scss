@@ -1,0 +1,6 @@
+.orderButton {
+  /* Hide the caret icon when Select is used in ButtonGroup */
+  & button[data-testid^="select-trigger"] > svg {
+    display: none;
+  }
+}

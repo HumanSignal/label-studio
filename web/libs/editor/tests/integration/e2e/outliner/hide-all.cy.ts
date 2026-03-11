@@ -83,9 +83,8 @@ describe("Outliner - Hide all regions", () => {
 
       expect(annID).to.equal("10");
 
-      // Move to the annotation tab specified by param
-      cy.get('[class="lsf-annotations-list__toggle"]').click();
-      cy.get('[class="lsf-annotations-list__entity-id"]').contains("10").click();
+      // Move to the annotation tab specified by param (AnnotationsCarousel uses data-annotation-id)
+      cy.get('[data-annotation-id="10"]').click();
 
       annotations[1].regionStore.setRegionVisible(window.LSF_CONFIG.region);
     });
@@ -112,8 +111,8 @@ describe("Outliner - Hide all regions", () => {
       window.Htx.annotationStore.annotations[1].regionStore.setRegionVisible(window.LSF_CONFIG.region);
     });
 
-    // Validate the annotation tab
-    cy.get('[class="lsf-annotations-list__entity-id"]').should("contain.text", "20");
+    // Validate the annotation tab (AnnotationsCarousel shows annotation 20)
+    cy.get('[data-annotation-id="20"]').should("be.visible");
 
     Sidebar.hasRegions(3);
     Sidebar.hasHiddenRegion(0);

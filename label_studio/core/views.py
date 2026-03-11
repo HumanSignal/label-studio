@@ -1,5 +1,5 @@
-"""This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
-"""
+"""This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license."""
+
 import io
 import json
 import logging
@@ -32,7 +32,6 @@ def main(request):
     user = request.user
 
     if user.is_authenticated:
-
         if user.active_organization is None and 'organization_pk' not in request.session:
             logout(request)
             return redirect(reverse('user-login'))

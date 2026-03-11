@@ -8,7 +8,7 @@ import { Checkbox, cnm } from "@humansignal/ui";
 import { Space } from "../../Common/Space/Space";
 import { getProperty, prepareColumns } from "../../Common/Table/utils";
 import * as DataGroups from "../../DataGroups";
-import { FF_GRID_PREVIEW, FF_LOPS_E_3, isFF } from "../../../utils/feature-flags";
+import { FF_LOPS_E_3, isFF } from "../../../utils/feature-flags";
 import { SkeletonLoader } from "../../Common/SkeletonLoader";
 import { GridViewContext, GridViewProvider } from "./GridPreview";
 import "./GridView.scss";
@@ -96,7 +96,7 @@ export const GridCell = observer(({ view, selected, row, fields, onClick, column
 
   const handleBodyClick = useCallback(
     (e) => {
-      if (!isFF(FF_GRID_PREVIEW) || !imageField) return;
+      if (!imageField) return;
       e.stopPropagation();
       setCurrentTaskId(row.id);
     },

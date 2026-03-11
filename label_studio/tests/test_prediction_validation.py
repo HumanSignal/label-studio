@@ -15,12 +15,14 @@ It covers various validation scenarios including:
 from unittest.mock import patch
 
 import pytest
+from data_import.api import ImportPredictionsAPI
 from data_import.functions import reformat_predictions
 from data_import.serializers import ImportApiSerializer
 from django.contrib.auth import get_user_model
 from organizations.tests.factories import OrganizationFactory
 from projects.tests.factories import ProjectFactory
 from rest_framework.exceptions import ValidationError
+from rest_framework.test import APIRequestFactory, force_authenticate
 from tasks.models import Annotation, Prediction, Task
 from tasks.tests.factories import TaskFactory
 from users.tests.factories import UserFactory
@@ -95,6 +97,90 @@ class TestPredictionValidation:
         assert prediction.score == 0.95
         assert prediction.model_version == 'v1.0'
 
+    @patch('tasks.serializers.flag_set', return_value=True)
+    @patch('tasks.serializers.LabelInterface')
+    def test_import_tasks_sanitizes_prediction_before_validation(self, mock_li_cls, _mock_flag_set):
+        """ImportApiSerializer must strip export-only keys before validate_prediction()."""
+        mock_li = mock_li_cls.return_value
+
+        def _validate_prediction(payload, return_errors=True):
+            if 'state' in payload:
+                return ['Unexpected field: state']
+            return []
+
+        mock_li.validate_prediction.side_effect = _validate_prediction
+        tasks = [
+            {
+                'data': {'text': 'Sanitize before validate'},
+                'predictions': [
+                    {
+                        'state': 'CREATED',
+                        'id': 111,
+                        'result': [
+                            {
+                                'from_name': 'sentiment',
+                                'to_name': 'text',
+                                'type': 'choices',
+                                'value': {'choices': ['positive']},
+                            }
+                        ],
+                        'score': 0.9,
+                        'model_version': 'mv-sanitize',
+                    }
+                ],
+            }
+        ]
+
+        serializer = ImportApiSerializer(data=tasks, many=True, context={'project': self.project})
+        assert serializer.is_valid(), serializer.errors
+        created_tasks = serializer.save(project_id=self.project.id)
+        assert len(created_tasks) == 1
+
+    @patch(
+        'data_import.api.flag_set',
+        side_effect=lambda flag_name, user='auto', **kwargs: (
+            flag_name == 'fflag_feat_utc_210_prediction_validation_15082025'
+        ),
+    )
+    @patch('data_import.api.LabelInterface')
+    def test_import_predictions_endpoint_sanitizes_payload_before_validation(self, mock_li_cls, _mock_flag_set):
+        """Bulk import API should sanitize payload before LabelInterface.validate_prediction()."""
+        mock_li = mock_li_cls.return_value
+
+        def _validate_prediction(payload, return_errors=True):
+            if 'state' in payload:
+                return ['Unexpected field: state']
+            return []
+
+        mock_li.validate_prediction.side_effect = _validate_prediction
+        request_factory = APIRequestFactory()
+        payload = [
+            {
+                'state': 'CREATED',
+                'id': 222,
+                'result': [
+                    {
+                        'from_name': 'sentiment',
+                        'to_name': 'text',
+                        'type': 'choices',
+                        'value': {'choices': ['neutral']},
+                    }
+                ],
+                'score': 0.5,
+                'model_version': 'mv-sanitize-endpoint',
+                'task': self.task.id,
+            }
+        ]
+        request = request_factory.post(
+            f'/api/projects/{self.project.id}/import/predictions',
+            data=payload,
+            format='json',
+        )
+        force_authenticate(request, user=self.user)
+        response = ImportPredictionsAPI.as_view()(request, pk=self.project.id)
+        assert response.status_code == 201
+        assert response.data['created'] == 1
+
     def test_invalid_prediction_missing_result(self):
         """Test validation fails when prediction is missing result field."""
         tasks = [
@@ -103,7 +189,7 @@ class TestPredictionValidation:
                 'predictions': [
                     {
                         'score': 0.95,
-                        'model_version': 'v1.0'
+                        'model_version': 'v1.0',
                         # Missing 'result' field
                     }
                 ],
@@ -777,12 +863,12 @@ class TestPredictionValidation:
         final_prediction_count = Prediction.objects.filter(project=self.project).count()
 
         assert final_task_count == initial_task_count, 'Tasks should not be saved when prediction validation fails'
-        assert (
-            final_annotation_count == initial_annotation_count
-        ), 'Annotations should not be saved when prediction validation fails'
-        assert (
-            final_prediction_count == initial_prediction_count
-        ), 'Predictions should not be saved when prediction validation fails'
+        assert final_annotation_count == initial_annotation_count, (
+            'Annotations should not be saved when prediction validation fails'
+        )
+        assert final_prediction_count == initial_prediction_count, (
+            'Predictions should not be saved when prediction validation fails'
+        )
 
         # Verify the error message contains details about the validation failure
         error_message = str(exc_info.value.detail['predictions'][0])

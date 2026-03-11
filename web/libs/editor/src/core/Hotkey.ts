@@ -406,7 +406,7 @@ export const Hotkey = (namespace = "global", description = "Hotkeys") => {
         if (prefix) comb = `${prefix}+${combs[i]}`;
         else comb = combs[i];
 
-        if (!{}.hasOwnProperty.call(_hotkeys_map, comb)) return comb;
+        if (!Object.hasOwn(_hotkeys_map, comb)) return comb;
       }
 
       return null;
@@ -462,15 +462,21 @@ Hotkey.Tooltip = inject("store")(
 
       if (enabled) {
         shortcut.split(",").forEach((combination: string) => {
-          const keys = combination.split("+").map((key: string) =>
-            createElement(
-              "kbd",
-              {
-                className: cn("hotkey").elem("key").toClassName(),
-              },
-              key,
-            ),
-          );
+          const keyParts = combination.split("+");
+          const keys: JSX.Element[] = [];
+
+          keyParts.forEach((key: string, i: number) => {
+            keys.push(
+              createElement(
+                "kbd",
+                {
+                  className: cn("key-group").elem("key").toClassName(),
+                  key: `key-${i}`,
+                },
+                key,
+              ),
+            );
+          });
 
           hotkeys.push(
             createElement(

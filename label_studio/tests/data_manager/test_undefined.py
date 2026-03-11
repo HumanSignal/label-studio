@@ -1,5 +1,5 @@
-"""This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
-"""
+"""This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license."""
+
 import json
 
 import pytest
@@ -122,7 +122,7 @@ def test_views_filters_with_undefined(business_client, project_id):
     assert set(summary.common_data_columns) == {
         task_data_field_name,
         'extra',
-    }, f"Expected {[task_data_field_name, 'extra']}, got {summary.common_data_columns}"
+    }, f'Expected {[task_data_field_name, "extra"]}, got {summary.common_data_columns}'
 
     # Step 14: Filter by "image" with "photo" should return task 1 and task 2
     # The filter is already set to 'photo' for 'data.image' from previous steps

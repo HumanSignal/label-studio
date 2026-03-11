@@ -78,10 +78,12 @@ export const Sidebar = {
     regionFinder(selectorOrIndex).click({ [metaModifier]: withModifier });
   },
   collapseDetailsRightPanel() {
-    cy.get(".lsf-sidepanels__wrapper_align_right .lsf-panel__toggle").should("be.visible").click();
+    // New UI (SideTabsPanels): right-aligned panel has collapse toggle with Collapse tooltip
+    cy.get('.lsf-tabs-panel_alignment_right [data-tooltip="Collapse"]').should("be.visible").first().click();
   },
   expandDetailsRightPanel() {
-    cy.get(".lsf-sidepanels__wrapper_align_right .lsf-panel__header").should("be.visible").click();
+    // New UI (SideTabsPanels): click the right-aligned panel header to expand when collapsed
+    cy.get(".lsf-tabs-panel_alignment_right .lsf-tabs-panel__header").should("be.visible").first().click();
   },
   assertRegionHidden(idx: number, id: string, shouldBeHidden: boolean) {
     const expectation = shouldBeHidden ? "have.class" : "not.have.class";

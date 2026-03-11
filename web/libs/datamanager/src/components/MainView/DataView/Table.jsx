@@ -1,5 +1,5 @@
 import { IconQuestionOutline } from "@humansignal/icons";
-import { Tooltip, EnterpriseBadge } from "@humansignal/ui";
+import { Tooltip, Badge, EnterpriseBadge } from "@humansignal/ui";
 import { inject } from "mobx-react";
 import { getRoot } from "mobx-state-tree";
 import { useCallback, useMemo } from "react";
@@ -10,7 +10,6 @@ import * as CellViews from "../../CellViews";
 import { Icon } from "../../Common/Icon/Icon";
 import { Spinner } from "../../Common/Spinner";
 import { Table } from "../../Common/Table/Table";
-import { Tag } from "../../Common/Tag/Tag";
 import { GridView } from "../GridView/GridView";
 import "./Table.scss";
 import { Button } from "@humansignal/ui";
@@ -51,6 +50,10 @@ const injector = inject(({ store }) => {
     project: store.project ?? {},
     hasFilters: (currentView?.filtersApplied ?? 0) > 0,
     canLabel: totalTasks > 0 && foundTasks > 0,
+    // LSE-specific callbacks and components
+    onViewAnalytics: store.SDK?.onViewAnalytics,
+    onViewReviewerAnalytics: store.SDK?.onViewReviewerAnalytics,
+    RowContextMenuComponent: store.SDK?.RowContextMenuComponent,
   };
 
   return props;
@@ -75,6 +78,9 @@ export const DataView = injector(
     project,
     hasFilters,
     canLabel,
+    onViewAnalytics,
+    onViewReviewerAnalytics,
+    RowContextMenuComponent,
     ...props
   }) => {
     const [datasetStatusID, setDatasetStatusID] = useState(store.SDK.dataset?.status?.id);
@@ -115,46 +121,32 @@ export const DataView = injector(
     const columnHeaderExtra = useCallback(({ parent, original, help }, decoration) => {
       const children = [];
 
-      if (parent) {
+      if (parent && original?.alias !== "agreement") {
         children.push(
-          <Tag
-            key="column-type"
-            color="blue"
-            style={{
-              fontWeight: "500",
-              fontSize: 14,
-              cursor: "pointer",
-              width: 45,
-              padding: 0,
-            }}
-          >
+          <Badge key="column-type" size="small">
             {original?.readableType ?? parent.title}
-          </Tag>,
+          </Badge>,
         );
-      } else if (typeof original?.alias === "string" && original.alias.startsWith("dimension_agreement__")) {
+      } else if (typeof original?.alias === "string" && original.alias.startsWith("dimension_agreement_")) {
         // Show a short tag for per-dimension agreement columns (root columns, no parent)
         children.push(
-          <Tag
-            key="column-type"
-            color="blue"
-            style={{
-              fontWeight: "500",
-              fontSize: 14,
-              cursor: "pointer",
-              padding: "0 6px",
-            }}
-          >
+          <Badge key="column-type" size="small">
             {original.readableType}
-          </Tag>,
+          </Badge>,
         );
       }
 
-      // Add EnterpriseBadge when enterprise badge is set
+      // Add Badge when enterprise badge is set
       if (original.enterprise_badge) {
-        children.push(<EnterpriseBadge key="enterprise-badge" className="ml-2" compact />);
+        children.push(<EnterpriseBadge key="enterprise-badge" size="small" className="ml-tightest" children="" />);
       }
 
-      if (help && decoration?.help !== false) {
+      const isAgreementColumn =
+        typeof original?.alias === "string" &&
+        (original.alias === "agreement" || original.alias.startsWith("dimension_agreement_"));
+
+      // Agreement columns get an IconSettings button via Agreement.HeaderCell — skip the help icon
+      if (help && decoration?.help !== false && !isAgreementColumn) {
         children.push(
           <Tooltip key="help-tooltip" title={help}>
             <Icon icon={IconQuestionOutline} style={{ opacity: 0.5 }} />
@@ -383,6 +375,9 @@ export const DataView = injector(
             col.original.resetWidth();
           }}
           onDensityChange={setDensity}
+          onViewAnalytics={onViewAnalytics}
+          onViewReviewerAnalytics={onViewReviewerAnalytics}
+          RowContextMenuComponent={RowContextMenuComponent}
         />
       ) : (
         <GridView

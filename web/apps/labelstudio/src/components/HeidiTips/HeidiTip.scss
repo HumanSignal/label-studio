@@ -53,8 +53,8 @@
     pointer-events: none;
     color: var(--color-neutral-border);
 
-    svg {
-      path.spike-stroke {
+    & svg {
+      & path.spike-stroke {
         color: red;
       }
 

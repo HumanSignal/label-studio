@@ -1,5 +1,6 @@
-import { types, getParent } from "mobx-state-tree";
+import { types, getParent, addDisposer } from "mobx-state-tree";
 import { FileLoader } from "../../../utils/FileLoader";
+import { imageCache } from "@humansignal/core";
 import { clamp } from "../../../utils/utilities";
 import { FF_IMAGE_MEMORY_USAGE, isFF } from "../../../utils/feature-flags";
 
@@ -65,6 +66,12 @@ export const ImageEntity = types
     currentSrc: undefined,
     /** Is image loaded using `<img/>` tag and cached by the browser */
     imageLoaded: false,
+    /** Track if we've attempted a retry after error */
+    _retryAttempted: false,
+    /** Track the original URL for error recovery */
+    _originalUrl: undefined,
+    /** Track if we've added a cache reference (to avoid double-release) */
+    _hasCacheRef: false,
   }))
   .views((self) => ({
     get parent() {
@@ -79,63 +86,98 @@ export const ImageEntity = types
     preload() {
       if (self.ensurePreloaded() || !self.src) return;
 
-      if (isFF(FF_IMAGE_MEMORY_USAGE)) {
+      // Store original URL for error recovery
+      self._originalUrl = self.src;
+
+      const crossOrigin = self.imageCrossOrigin;
+
+      // Check if already cached in global cache
+      const cached = imageCache.get(self.src);
+      if (cached) {
+        self.markAsLoaded(cached.blobUrl, { addCacheRef: true });
+        return;
+      }
+
+      // Check if currently loading (deduplication)
+      if (imageCache.isLoading(self.src)) {
         self.setDownloading(true);
-        new Promise((resolve) => {
-          const img = new Image();
-          // Get from the image tag
-          const crossOrigin = self.imageCrossOrigin;
-          if (crossOrigin) img.crossOrigin = crossOrigin;
-          img.onload = () => {
-            self.setCurrentSrc(self.src);
-            self.setDownloaded(true);
-            self.setProgress(1);
-            self.setDownloading(false);
-            self.setImageLoaded(true);
-            resolve();
-          };
-          img.onerror = () => {
-            self.setError(true);
-            self.setDownloading(false);
-            resolve();
-          };
-          img.src = self.src;
-        });
+        imageCache
+          .getPendingLoad(self.src)
+          ?.then((result) => {
+            self.markAsLoaded(result.blobUrl, { addCacheRef: true });
+          })
+          .catch(() => {
+            self.markAsFailed();
+          });
         return;
       }
 
       self.setDownloading(true);
-      fileLoader
-        .download(self.src, (_t, _l, progress) => {
+
+      // Use the global cache for loading
+      imageCache
+        .load(self.src, crossOrigin, (progress) => {
           self.setProgress(progress);
         })
-        .then((url) => {
-          self.setDownloaded(true);
-          self.setDownloading(false);
-          self.setCurrentSrc(url);
+        .then((result) => {
+          self.markAsLoaded(result.blobUrl, { addCacheRef: true });
         })
         .catch(() => {
-          self.setDownloading(false);
-          self.setError(true);
+          // Fallback to old behavior if global cache fails
+          if (isFF(FF_IMAGE_MEMORY_USAGE)) {
+            const img = new Image();
+            if (crossOrigin) img.crossOrigin = crossOrigin;
+            img.onload = () => {
+              self.markAsLoaded(self.src);
+            };
+            img.onerror = () => {
+              self.markAsFailed();
+            };
+            img.src = self.src;
+          } else {
+            fileLoader
+              .download(self.src, (_t, _l, progress) => {
+                self.setProgress(progress);
+              })
+              .then((url) => {
+                self.markAsLoaded(url);
+              })
+              .catch(() => {
+                self.markAsFailed();
+              });
+          }
         });
     },
 
     ensurePreloaded() {
+      const cached = imageCache.get(self.src);
+      if (cached) {
+        self.markAsLoaded(cached.blobUrl, { addCacheRef: true });
+        return true;
+      }
+
       if (isFF(FF_IMAGE_MEMORY_USAGE)) return self.currentSrc !== undefined;
 
       if (fileLoader.isError(self.src)) {
-        self.setDownloading(false);
-        self.setError(true);
+        self.markAsFailed();
         return true;
       }
       if (fileLoader.isPreloaded(self.src)) {
-        self.setDownloading(false);
-        self.setDownloaded(true);
-        self.setProgress(1);
-        self.setCurrentSrc(fileLoader.getPreloadedURL(self.src));
+        self.markAsLoaded(fileLoader.getPreloadedURL(self.src));
         return true;
       }
       return false;
+    },
+
+    /**
+     * Release the reference to the cached image
+     * Should be called when the component unmounts or switches images
+     */
+    releaseImage() {
+      if (self.src && self._hasCacheRef) {
+        imageCache.releaseRef(self.src);
+        self._hasCacheRef = false;
+      }
     },
 
     setImageLoaded(value) {
@@ -158,8 +200,73 @@ export const ImageEntity = types
       self.currentSrc = src;
     },
 
-    setError() {
-      self.error = true;
+    /**
+     * Set error state and attempt recovery if not already retried
+     * @param {boolean} value - Whether to set error state
+     */
+    setError(value = true) {
+      if (value) {
+        // Always reset imageLoaded when setting error
+        self.setImageLoaded(false);
+
+        if (!self._retryAttempted && self._originalUrl) {
+          // Attempt recovery: force re-fetch from original URL
+          self._retryAttempted = true;
+          self.error = false;
+
+          // Remove potentially corrupt cache entry
+          imageCache.forceRemove(self.src);
+
+          // Re-attempt load
+          self.setDownloading(true);
+          self.setDownloaded(false);
+          self.setCurrentSrc(undefined);
+
+          const crossOrigin = self.imageCrossOrigin;
+
+          imageCache
+            .load(self.src, crossOrigin, (progress) => {
+              self.setProgress(progress);
+            })
+            .then((result) => {
+              self.markAsLoaded(result.blobUrl, { addCacheRef: true });
+            })
+            .catch(() => {
+              // Final failure - set error state (async-safe via action)
+              self.markAsFailed();
+            });
+          return;
+        }
+      }
+      self.error = value;
+    },
+
+    /**
+     * Mark image as successfully loaded with the given source URL
+     * Consolidates the common pattern of setting download state after successful load
+     * @param {string} src - The source URL (blob URL or original URL)
+     * @param {Object} options - Optional configuration
+     * @param {boolean} options.addCacheRef - Whether to add a reference to the image cache
+     */
+    markAsLoaded(src, { addCacheRef = false } = {}) {
+      if (addCacheRef && !self._hasCacheRef) {
+        imageCache.addRef(self.src);
+        self._hasCacheRef = true;
+      }
+      self.setCurrentSrc(src);
+      self.setDownloaded(true);
+      self.setProgress(1);
+      self.setDownloading(false);
+      // Note: imageLoaded is NOT set here - wait for the actual <img> onLoad event
+    },
+
+    /**
+     * Mark image as failed to load
+     * Consolidates the common error handling pattern
+     */
+    markAsFailed() {
+      self.setError(true);
+      self.setDownloading(false);
     },
   }))
   .actions((self) => ({
@@ -229,5 +336,15 @@ export const ImageEntity = types
 
     setContrastGrade(grade) {
       self.contrastGrade = grade;
+    },
+  }))
+  .actions((self) => ({
+    /**
+     * Register cleanup to release cache reference when this entity is destroyed
+     */
+    afterCreate() {
+      addDisposer(self, () => {
+        self.releaseImage();
+      });
     },
   }));

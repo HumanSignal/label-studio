@@ -15,6 +15,7 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+
 from core import views
 from core.utils.static_serve import serve
 from django.conf import settings
@@ -54,10 +55,6 @@ urlpatterns = [
             'manifest_asset_prefix': 'react-app',
         },
     ),
-    re_path(
-        r'^static/fonts/roboto/roboto.css$',
-        views.static_file_with_host_resolver('fonts/roboto/roboto.css', content_type='text/css'),
-    ),
     re_path(r'^static/(?P<path>.*)$', serve, kwargs={'document_root': settings.STATIC_ROOT, 'show_indexes': True}),
     re_path(r'^', include('organizations.urls')),
     re_path(r'^', include('projects.urls')),
@@ -87,9 +84,11 @@ urlpatterns = [
     # Again for legacy reasons, docs/api?format=openapi redirects to docs/api/schema/json/
     path(
         'docs/api/',
-        lambda request: HttpResponseRedirect('/docs/api/schema/json/')
-        if request.GET.get('format') == 'openapi'
-        else HttpResponseRedirect('/docs/api/schema/redoc/'),
+        lambda request: (
+            HttpResponseRedirect('/docs/api/schema/json/')
+            if request.GET.get('format') == 'openapi'
+            else HttpResponseRedirect('/docs/api/schema/redoc/')
+        ),
         name='docs-api',
     ),
     path(

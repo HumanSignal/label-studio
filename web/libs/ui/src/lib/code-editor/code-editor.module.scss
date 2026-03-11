@@ -4,7 +4,7 @@
   height: 100%;
   width: 100%;
 
-  textarea,
+  & textarea,
   :global(.react-codemirror2) {
     height: 100%;
     width: 100%;
@@ -19,6 +19,10 @@
       background: var(--color-neutral-background);
       color: var(--color-neutral-content-subtle);
       border-radius: var(--corner-radius-small);
+    }
+
+    :global(.CodeMirror.dialog-opened) {
+      padding-top: 38px;
     }
 
     :global(.CodeMirror-lines) {
@@ -95,6 +99,21 @@
       color: var(--color-accent-sand-bold);
     }
 
+    :global(.cm-atom),
+    :global(.cm-meta) {
+      color: var(--color-accent-blueberry-bolder);
+    }
+
+    :global(.cm-variable),
+    :global(.cm-variable-2) {
+      color: var(--color-neutral-content);
+    }
+
+    :global(.cm-variable-3),
+    :global(.cm-type) {
+      color: var(--color-accent-kale-bolder);
+    }
+
     :global(.CodeMirror-gutters) {
       background-color: var(--color-neutral-surface-inset);
       color: var(--color-neutral-content-subtlest);
@@ -112,8 +131,9 @@
   border: 1px solid var(--color-neutral-border);
   box-shadow: 0 2px 4px rgba(var(--color-neutral-shadow-raw) / calc( 30% * var(--shadow-intensity))), 0 4px 16px rgba(var(--color-neutral-shadow-raw) / calc( 15% * var(--shadow-intensity)));
 
-  // Create Project modal has z-index: 10000, so we have to overrule it
+  /* Create Project modal has z-index: 10000, so we have to overrule it */
   z-index: 11000;
+  max-width: 600px;
 }
 
 :global(.CodeMirror-hints .CodeMirror-hint) {

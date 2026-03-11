@@ -179,16 +179,24 @@ export function handleDrawingModeClick(e: KonvaEventObject<MouseEvent>, props: E
 
   // Only add new points if path is not closed and we haven't reached max points
   if (!props.isPathClosed && props.canAddMorePoints?.()) {
-    // In skeleton mode, explicitly pass the activePointId as prevPointId
-    // to ensure the new point connects to the selected point
+    // In skeleton mode or non-skeleton mode with activePointId, explicitly pass the activePointId as prevPointId
+    // to ensure the new point connects to the selected point (first or last in non-skeleton mode)
     const addPointOptions: any = {
       x: snappedPos.x,
       y: snappedPos.y,
       type: PointType.REGULAR,
     };
 
-    if (props.skeletonEnabled && props.activePointId) {
+    // Always use activePointId if available (works for both skeleton and non-skeleton mode)
+    // In skeleton mode: can be any point
+    // In non-skeleton mode: should be first or last point
+    // This ensures drawing continues from the selected endpoint
+    if (props.activePointId) {
       addPointOptions.prevPointId = props.activePointId;
+    } else if (!props.skeletonEnabled && props.initialPoints.length > 0) {
+      // Fallback for non-skeleton mode: use last point if activePointId is not set
+      // This handles the case where no point is explicitly selected
+      addPointOptions.prevPointId = props.initialPoints[props.initialPoints.length - 1].id;
     }
 
     // Use the unified addPoint function

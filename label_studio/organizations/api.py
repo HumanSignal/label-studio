@@ -1,5 +1,5 @@
-"""This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
-"""
+"""This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license."""
+
 import logging
 
 from core.feature_flags import flag_set
@@ -207,7 +207,7 @@ class OrganizationMemberListAPI(generics.ListAPIView):
             return org.members.prefetch_related('user__om_through').order_by('user__username')
 
     def list(self, request, *args, **kwargs):
-        page = self.paginated_members   # Using cached property to avoid multiple queries
+        page = self.paginated_members  # Using cached property to avoid multiple queries
         serializer = self.get_serializer(page, many=True)
         return self.get_paginated_response(serializer.data)
 
@@ -344,7 +344,6 @@ class OrganizationMemberDetailAPI(GetParentObjectMixin, generics.RetrieveDestroy
     ),
 )
 class OrganizationAPI(generics.RetrieveUpdateAPIView):
-
     parser_classes = (JSONParser, FormParser, MultiPartParser)
     queryset = Organization.objects.all()
     permission_required = all_permissions.organizations_change

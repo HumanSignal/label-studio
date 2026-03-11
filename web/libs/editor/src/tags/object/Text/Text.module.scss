@@ -10,7 +10,7 @@
 }
 
 :global(.htx-line-numbers) {
-  span.line {
+  & span.line {
     position: relative; // to position line numbers
     display: inline-block; // for alignment and hover highlight
     min-height: 1.2em; // for styling numbers for empty lines

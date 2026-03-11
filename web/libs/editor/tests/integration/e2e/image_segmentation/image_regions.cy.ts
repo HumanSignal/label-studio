@@ -1,4 +1,4 @@
-import { ImageView, Labels, LabelStudio, Sidebar } from "@humansignal/frontend-test/helpers/LSF";
+import { ImageView, Labels, LabelStudio, Modals, Sidebar } from "@humansignal/frontend-test/helpers/LSF";
 
 const config = `
   <View>
@@ -23,6 +23,17 @@ const configWithMultipleRegions = `
     <RectangleLabels name="tag2" toName="img" allowEmpty="true" maxUsages="2" choice="multiple">
       <Label value="Planet"></Label>
       <Label value="Moonwalker" background="blue"></Label>
+    </RectangleLabels>
+  </View>
+`;
+
+// Label with maxUsages=1 shows warning when used more than once
+const configLabelMaxUsages = `
+  <View>
+    <Image name="img" value="$image"></Image>
+    <RectangleLabels name="tag" toName="img">
+      <Label value="Once" background="red" maxUsages="1"></Label>
+      <Label value="Any" background="blue"></Label>
     </RectangleLabels>
   </View>
 `;
@@ -126,6 +137,9 @@ describe("Image Regions scenario", () => {
 
     cy.get("body").focus().trigger("keydown", { altKey: true, keyCode: 72 });
 
+    // Wait for visibility state to be applied (store update + tree re-render)
+    Sidebar.hasHiddenRegion(2);
+
     regions
       .each(($el) => {
         if ($el.parent().hasClass("lsf-tree__node_hidden")) {
@@ -152,5 +166,22 @@ describe("Image Regions scenario", () => {
     Labels.select("Planet");
     cy.contains("Moonwalker 2, No label").should("exist");
     cy.get(".lsf-outliner-item").contains("No label").should("have.css", "color", "rgb(102, 102, 102)");
+  });
+
+  describe("Label maxUsages", () => {
+    it("shows warning when label with maxUsages=1 is applied to a second region", () => {
+      LabelStudio.params().config(configLabelMaxUsages).data({ image }).withResult([]).init();
+
+      ImageView.waitForImage();
+      Labels.select("Once");
+      ImageView.drawRectRelative(0.1, 0.1, 0.2, 0.2);
+      Labels.select("Any");
+      ImageView.drawRectRelative(0.5, 0.5, 0.2, 0.2);
+      Sidebar.hasRegions(2);
+
+      Sidebar.regions.eq(1).click();
+      Labels.select("Once");
+      Modals.hasWarning("You can't use Once more than 1 time(s)");
+    });
   });
 });

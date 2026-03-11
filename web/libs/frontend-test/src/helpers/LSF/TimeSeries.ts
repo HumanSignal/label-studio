@@ -11,7 +11,7 @@ class TimeSeriesHelper {
   private _rootSelector: string;
 
   constructor(rootSelector) {
-    this._rootSelector = rootSelector.replace(/^\&/, this._baseRootSelector);
+    this._rootSelector = rootSelector.replace(/^&/, this._baseRootSelector);
   }
 
   get root() {
@@ -132,7 +132,7 @@ class TimeSeriesHelper {
   verifyDataVisibleInViewport() {
     cy.log("Verifying chart data is visible in SVG viewport");
 
-    this.channelSvg.should("be.visible").then(($svgs) => {
+    this.channelSvg.should("be.visible", { timeout: 10000 }).then(($svgs) => {
       for (const $svg of $svgs) {
         const svgElement = $svg as unknown as SVGSVGElement;
         const viewBox = svgElement.viewBox.baseVal;
@@ -244,11 +244,15 @@ class TimeSeriesHelper {
     return this;
   }
 
-  // Verify that chart client bounding boxes align with their clip-path containers
+  // Verify that chart client bounding boxes stay within their clip-path containers
   // Only checks odd-indexed paths (1st, 3rd, 5th, etc.) in each clip-path container group
-  verifyChartBoundingBoxAlignment() {
+  // Optional tolerance (px): multi-channel + viewport resize may need higher tolerance (e.g. 20)
+  verifyChartBoundingBoxAlignment(tolerancePx = 2) {
     cy.log("Verifying chart client bounding boxes align with clip-path containers (odd-indexed paths only)");
 
+    this.channelSvg.should("be.visible", { timeout: 10000 });
+    // Allow layout to settle after viewport/resize (multi-channel can take longer)
+    cy.wait(200);
     // Get all clip-path containers and check odd-indexed paths in each
     this.channelSvg.find("[clip-path]").each(($clipContainer) => {
       const clipPathParent = $clipContainer[0] as unknown as SVGElement;
@@ -276,8 +280,7 @@ class TimeSeriesHelper {
           `Clip parent client rect: x=${clipParentClientRect.x.toFixed(2)}, y=${clipParentClientRect.y.toFixed(2)}, width=${clipParentClientRect.width.toFixed(2)}, height=${clipParentClientRect.height.toFixed(2)}`,
         );
 
-        // Check that client bounding boxes are equal (path should fill its clip-path container)
-        const isAligned = BoundingBoxUtils.isEqual(pathClientRect, clipParentClientRect, 2);
+        const isAligned = BoundingBoxUtils.isEqual(pathClientRect, clipParentClientRect, tolerancePx);
         expect(isAligned, `Path ${i + 1} client bounding box should align with its clip-path container`).to.be.true;
       }
     });

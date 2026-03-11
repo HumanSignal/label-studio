@@ -1,5 +1,5 @@
-"""This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
-"""
+"""This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license."""
+
 from core.permissions import all_permissions
 from core.utils.common import load_func
 from django.conf import settings
@@ -114,7 +114,7 @@ class BaseWhoAmIUserSerializer(BaseUserSerializer):
 class UserSimpleSerializer(BaseUserSerializer):
     class Meta:
         model = User
-        fields = ('id', 'first_name', 'last_name', 'email', 'avatar')
+        fields = ('id', 'first_name', 'last_name', 'username', 'email', 'avatar')
 
 
 class HotkeysSerializer(serializers.Serializer):

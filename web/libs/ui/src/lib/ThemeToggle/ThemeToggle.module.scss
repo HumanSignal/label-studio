@@ -70,7 +70,7 @@
   transition: all 600ms cubic-bezier(0.47, 0, 0.23, 1.30);
   overflow: hidden;
 
-  svg {
+  & svg {
     position: absolute;
   }
 }

@@ -38,6 +38,12 @@ def test_batch_predictions_single_prediction_per_task(django_live_url, business_
     # setup ML backend with single prediction per task
     ls.ml.create(url='http://test.ml.backend.for.sdk.com:9092', project=p.id, title='ModelSingle')
 
+    # confirm ML backend created
+    ml_backend = ls.ml.list(project=p.id)
+    assert len(ml_backend) == 1
+    assert ml_backend[0].title == 'ModelSingle'
+    assert ml_backend[0].url == 'http://test.ml.backend.for.sdk.com:9092'
+
     # batch predict tasks via actions
     ls.actions.create(
         id='retrieve_tasks_predictions',

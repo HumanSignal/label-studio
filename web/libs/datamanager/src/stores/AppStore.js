@@ -1,4 +1,5 @@
 import { destroy, flow, types } from "mobx-state-tree";
+import { runInAction } from "mobx";
 import { Modal } from "../components/Common/Modal/Modal";
 import { FF_DEV_2887, FF_DISABLE_GLOBAL_USER_FETCHING, FF_LOPS_E_3, isFF } from "../utils/feature-flags";
 import { History } from "../utils/history";
@@ -187,7 +188,7 @@ export const AppStore = types
       self.toolbar = toolbarString;
     },
 
-    setTask: flow(function* ({ taskID, annotationID, pushState }) {
+    setTask: flow(function* ({ taskID, annotationID, pushState, interface: interfaceOption }) {
       if (pushState !== false) {
         History.navigate({
           task: taskID,
@@ -211,17 +212,22 @@ export const AppStore = types
 
       self.setLoadingData(true);
 
+      // Yield to browser so loading indicator paints before heavy store operations
+      yield new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+
       if (self.mode === "labelstream") {
         yield self.taskStore.loadNextTask({
           select: !!taskID && !!annotationID,
         });
       }
 
-      if (annotationID !== undefined) {
-        self.annotationStore.setSelected(annotationID);
-      } else {
-        self.taskStore.setSelected(taskID);
-      }
+      runInAction(() => {
+        if (annotationID !== undefined) {
+          self.annotationStore.setSelected(annotationID);
+        } else {
+          self.taskStore.setSelected(taskID);
+        }
+      });
 
       const taskPromise = self.taskStore.loadTask(taskID, {
         select: !!taskID && !!annotationID,
@@ -261,6 +267,14 @@ export const AppStore = types
             currentAnn?.regionStore?.setRegionVisible(regionIDFromUrl);
             // Select the region so outliner details are visible
             currentAnn?.regionStore?.selectRegionByID(regionIDFromUrl);
+          }
+
+          // Enable viewingAll mode if interface option is "annotations:view-all"
+          if (interfaceOption === "annotations:view-all" && annotationStore) {
+            if (!annotationStore.viewingAll) {
+              annotationStore.toggleViewingAllAnnotations();
+            }
+            // Don't set the tab - let it use whatever was last selected
           }
         } else {
           console.error("LSF not initialized properly");
@@ -343,6 +357,7 @@ export const AppStore = types
         if (item?.id && !item.isSelected) {
           const labelingParams = {
             pushState: options?.pushState,
+            interface: options?.interface,
           };
 
           if (isDefined(item.task_id)) {
@@ -652,7 +667,9 @@ export const AppStore = types
       }
       // We don't want to show errors when loading data in polling mode
       // we will just allow it to try again later
-      if (result.error && result.status !== 404 && !signal.aborted && params.interaction !== "timer") {
+      const resultStatusCode =
+        result?.status ?? result?.$meta?.status ?? result?.response?.status ?? result?.response?.status_code;
+      if (result.error && resultStatusCode !== 404 && !signal.aborted && params.interaction !== "timer") {
         if (options?.errorHandler?.(result)) {
           return result;
         }

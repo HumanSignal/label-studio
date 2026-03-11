@@ -1,10 +1,28 @@
-import { FF_DEV_1752, FF_DEV_2186, FF_DEV_2887, FF_DEV_3034, FF_LSDV_4620_3_ML, isFF } from "../utils/feature-flags";
+import { Button } from "@humansignal/ui";
+import {
+  FF_DEV_1752,
+  FF_DEV_2186,
+  FF_DEV_2887,
+  FF_DEV_3034,
+  FF_LSDV_4620_3_ML,
+  FF_FIT_1304_STRICT_OVERLAP,
+  isFF,
+} from "../utils/feature-flags";
+import { isActive, FF_FIT_720_LAZY_LOAD_ANNOTATIONS } from "@humansignal/core/lib/utils/feature-flags";
 import { isDefined } from "../utils/utils";
 import { Modal } from "../components/Common/Modal/Modal";
 import { CommentsSdk } from "./comments-sdk";
 // import { LSFHistory } from "./lsf-history";
 import { annotationToServer, taskToLSFormat } from "./lsf-utils";
-import { when } from "mobx";
+import { when, runInAction } from "mobx";
+import { isAlive } from "mobx-state-tree";
+import { imageCache } from "@humansignal/core";
+import { invalidateAnnotationCache, invalidateDistributionCache } from "@humansignal/core/lib/utils/annotation-cache";
+
+const waitForPaint = () =>
+  new Promise((resolve) => {
+    requestAnimationFrame(() => requestAnimationFrame(resolve));
+  });
 
 const DEFAULT_INTERFACES = [
   "basic",
@@ -32,13 +50,24 @@ const resolveLabelStudio = () => {
 };
 
 // Returns true to suppress (swallow) the error, false to bubble to global handler.
-// We allow 403 PAUSED to bubble so the app-level ApiProvider can show the paused modal
-const errorHandlerAllowPaused = (result) => {
+// We allow certain errors to bubble so the app-level ApiProvider can show modals:
+// - 403 PAUSED: User is paused in the project
+// - 400 OVERLAP_REACHED: Annotation overlap limit has been reached (only when feature flag is enabled)
+const errorHandlerAllowSpecialErrors = (result) => {
   const isPaused =
     result?.status === 403 &&
     typeof result?.response === "object" &&
     result?.response?.display_context?.reason === "PAUSED";
-  return !isPaused;
+
+  // Only handle OVERLAP_REACHED when feature flag is enabled
+  const isOverlapReached =
+    isFF(FF_FIT_1304_STRICT_OVERLAP) &&
+    result?.status === 400 &&
+    typeof result?.response === "object" &&
+    result?.response?.display_context?.reason === "OVERLAP_REACHED";
+
+  // Return false to allow these errors to bubble up to the global handler
+  return !(isPaused || isOverlapReached);
 };
 
 // Support portal URL constants used to construct error reporting links
@@ -46,6 +75,10 @@ const errorHandlerAllowPaused = (result) => {
 // for better error tracking and customer support
 export const SUPPORT_URL = "https://support.humansignal.com/hc/en-us/requests/new";
 export const SUPPORT_URL_REQUEST_ID_PARAM = "tf_37934448633869"; // request_id field ID in ZD
+
+// Toast ID for overlap reached message - used to dismiss this specific toast
+// without affecting other toasts like "Annotation Saved"
+const OVERLAP_TOAST_ID = "overlap-reached-toast";
 
 export class LSFWrapper {
   /** @type {HTMLElement} */
@@ -105,6 +138,16 @@ export class LSFWrapper {
     this.initialAnnotation = annotation;
     this.interfacesModifier = interfacesModifier;
     this.isInteractivePreannotations = isInteractivePreannotations ?? false;
+
+    // Listen for overlap error modal events (only when feature flag is enabled)
+    if (isFF(FF_FIT_1304_STRICT_OVERLAP)) {
+      this.handleOverlapNextTask = () => this.loadTask();
+      this.handleOverlapCloseTask = () => this.closeTask();
+      this.handleOverlapExitStream = () => this.exitStream();
+      window.addEventListener("overlap-error-next-task", this.handleOverlapNextTask);
+      window.addEventListener("overlap-error-close-task", this.handleOverlapCloseTask);
+      window.addEventListener("overlap-error-exit-stream", this.handleOverlapExitStream);
+    }
 
     let interfaces = [...DEFAULT_INTERFACES];
 
@@ -267,7 +310,7 @@ export class LSFWrapper {
       // for preload it's good to always load the first one
       const annotation = task.annotations[0];
 
-      this.selectTask(task, annotation?.id, true);
+      await this.selectTask(task, annotation?.id, true);
     }
 
     return false;
@@ -303,7 +346,7 @@ export class LSFWrapper {
       });
 
       // Add new data from received task
-      if (newTask) this.selectTask(newTask, annotationID, fromHistory);
+      if (newTask) await this.selectTask(newTask, annotationID, fromHistory);
     };
 
     if (isFF(FF_DEV_2887) && this.lsf?.commentStore?.hasUnsaved) {
@@ -325,7 +368,7 @@ export class LSFWrapper {
     this.datamanager.invoke("navigate", "projects");
   }
 
-  selectTask(task, annotationID, fromHistory = false) {
+  async selectTask(task, annotationID, fromHistory = false) {
     const needsAnnotationsMerge = task && this.task?.id === task.id;
     const annotations = needsAnnotationsMerge ? [...this.annotations] : [];
 
@@ -337,19 +380,29 @@ export class LSFWrapper {
 
     this.loadUserLabels();
 
-    this.setLSFTask(task, annotationID, fromHistory);
+    await this.setLSFTask(task, annotationID, fromHistory);
   }
 
-  setLSFTask(task, annotationID, fromHistory, selectPrediction = false) {
+  async setLSFTask(task, annotationID, fromHistory, selectPrediction = false) {
     if (!this.lsf) return;
+
+    if (isFF(FF_FIT_1304_STRICT_OVERLAP)) {
+      this.dismissOverlapToast();
+    }
 
     const hasChangedTasks = this.lsf?.task?.id !== task?.id && task?.id;
 
     this.setLoading(true, hasChangedTasks);
+
+    // Let the browser paint the loading indicator before heavy store operations
+    await waitForPaint();
+
+    if (!this.lsf) return;
+
+    // Pure data preparation (no MobX mutations)
     const lsfTask = taskToLSFormat(task);
     const isRejectedQueue = isDefined(task.default_selected_annotation);
     const taskList = this.datamanager.store.taskStore.list;
-    // annotations are set in LSF only and order in DM only, so combine them
     const taskHistory = taskList
       .map((task) => this.taskHistory.find((item) => item.taskId === task.id))
       .filter(Boolean);
@@ -369,28 +422,153 @@ export class LSFWrapper {
       annotationID = task.default_selected_annotation;
     }
 
-    if (hasChangedTasks) {
-      this.lsf.resetState();
-    } else {
-      this.lsf.resetAnnotationStore();
+    // Batch all MST store mutations into a single MobX transaction so reactions
+    // fire only once instead of cascading after each individual action.
+    runInAction(() => {
+      if (hasChangedTasks) {
+        this.lsf.resetState();
+      } else {
+        this.lsf.resetAnnotationStore();
+      }
+
+      this.lsf.toggleInterface("postpone", this.task.allow_postpone !== false);
+      this.lsf.toggleInterface("topbar:task-counter", true);
+
+      if (isFF(FF_FIT_1304_STRICT_OVERLAP)) {
+        const overlapReached = this.task.overlap_reached === true;
+        this.overlapReached = overlapReached;
+        this.overlapReachedMessage =
+          this.task.overlap_reached_message ||
+          "Annotation overlap has been reached for this task. Your draft is preserved but cannot be submitted.";
+
+        this.lsf.setFlags({
+          overlapReached,
+          overlapReachedMessage: this.overlapReachedMessage,
+        });
+      } else {
+        this.overlapReached = false;
+        this.overlapReachedMessage = "";
+      }
+
+      this.lsf.assignTask(task);
+      this.lsf.initializeStore(lsfTask);
+    });
+
+    await this.setAnnotation(annotationID, fromHistory || isRejectedQueue, selectPrediction);
+    this.setLoading(false);
+
+    if (isFF(FF_FIT_1304_STRICT_OVERLAP) && this.overlapReached) {
+      this.showOverlapReachedMessage();
+    }
+  }
+
+  /**
+   * Show informational message when overlap is reached
+   * @private
+   */
+  showOverlapReachedMessage() {
+    // Use info toast to communicate the overlap status
+    // This is informational, not an error, so we use a neutral tone
+    // Use a specific ID so we can dismiss this toast without affecting others
+    this.datamanager.invoke("toast", {
+      id: OVERLAP_TOAST_ID,
+      message: (
+        <div className="flex items-center justify-between">
+          <span>{this.overlapReachedMessage}</span>
+          <Button
+            onClick={() => {
+              this.datamanager.invoke("toast:dismiss", { id: OVERLAP_TOAST_ID });
+              this.handleOverlapNextTask();
+            }}
+            className="ml-4"
+            size="small"
+            look="outlined"
+          >
+            Next Task
+          </Button>
+        </div>
+      ),
+      type: "info",
+      duration: -1,
+    });
+  }
+
+  /**
+   * Dismiss the overlap reached toast if it's showing
+   * @private
+   */
+  dismissOverlapToast() {
+    this.datamanager.invoke("toast:dismiss", { id: OVERLAP_TOAST_ID });
+  }
+
+  /**
+   * Ensure annotation is fully loaded (for lazy loading - FIT-720)
+   * If the annotation is a stub, fetch the full annotation data from the server.
+   * @param {string} annotationPk - The annotation pk to load
+   * @returns {Promise<Object|null>} The full annotation data or null if not a stub
+   * @private
+   */
+  async ensureAnnotationLoaded(annotationPk) {
+    if (!isFF(FF_FIT_720_LAZY_LOAD_ANNOTATIONS) || !this.labelStream) {
+      return null;
     }
 
-    // Initial idea to show counter for Manual assignment only
-    // But currently we decided to hide it for any stream
-    // const distribution = this.project.assignment_settings.label_stream_task_distribution;
-    // const isManuallyAssigned = distribution === "assigned_only";
+    // Check if this annotation is a stub in the original task data
+    const taskAnnotation = this.task?.annotations?.find((a) => String(a.id) === String(annotationPk));
+    if (!taskAnnotation?.is_stub) {
+      return null;
+    }
 
-    // undefined or true for backward compatibility
-    this.lsf.toggleInterface("postpone", this.task.allow_postpone !== false);
-    this.lsf.toggleInterface("topbar:task-counter", true);
-    this.lsf.assignTask(task);
-    this.lsf.initializeStore(lsfTask);
-    this.setAnnotation(annotationID, fromHistory || isRejectedQueue, selectPrediction);
-    this.setLoading(false);
+    // Fetch full annotation from backend
+    try {
+      const taskStore = this.datamanager.store.taskStore;
+      const fullAnnotation = await taskStore.loadAnnotation(annotationPk);
+
+      if (fullAnnotation && !fullAnnotation.error) {
+        // IMPORTANT: Re-fetch the annotation from the store after async operation
+        // The original reference might be stale (user navigated, scrolled, etc.)
+        // which causes MST "object is protected" errors
+        const lsfAnnotation = this.annotations.find((a) => String(a.pk) === String(annotationPk));
+        if (!lsfAnnotation) {
+          // Annotation no longer exists in the store
+          return fullAnnotation;
+        }
+        if (!isAlive(lsfAnnotation) || !isAlive(lsfAnnotation.trackedState)) {
+          // Annotation node was detached while hydration request was in-flight
+          return fullAnnotation;
+        }
+
+        // Check if already hydrated while we were fetching
+        const versionsResult = lsfAnnotation.versions?.result;
+        const hasVersionsResult = Array.isArray(versionsResult) && versionsResult.length > 0;
+        const hasRegions = lsfAnnotation.areas?.size > 0;
+
+        if (hasVersionsResult || hasRegions) {
+          // Already hydrated
+          return fullAnnotation;
+        }
+
+        if (fullAnnotation.result) {
+          if (!isAlive(lsfAnnotation) || !isAlive(lsfAnnotation.trackedState)) return fullAnnotation;
+          lsfAnnotation.history.freeze();
+          lsfAnnotation.deserializeResults(fullAnnotation.result);
+          // Critical: updateObjects() is required to render visual regions after deserializing
+          lsfAnnotation.updateObjects();
+          lsfAnnotation.history.safeUnfreeze();
+          lsfAnnotation.history.reinit();
+        }
+
+        return fullAnnotation;
+      }
+    } catch {
+      // Failed to load annotation - will retry on next attempt
+    }
+
+    return null;
   }
 
   /** @private */
-  setAnnotation(annotationID, selectAnnotation = false, selectPrediction = false) {
+  async setAnnotation(annotationID, selectAnnotation = false, selectPrediction = false) {
     const id = annotationID ? annotationID.toString() : null;
     const { annotationStore: cs } = this.lsf;
     let annotation;
@@ -447,6 +625,8 @@ export class LSFWrapper {
         // not submitted draft, most likely from previous labeling session
         annotation = first;
       } else if (isDefined(annotationID) && selectAnnotation) {
+        // Lazy load annotation if it's a stub (FIT-720)
+        await this.ensureAnnotationLoaded(annotationID);
         annotation = this.annotations.find(({ pk }) => pk === annotationID);
       } else if (showPredictions && this.predictions.length > 0 && !this.isInteractivePreannotations) {
         annotation = cs.addAnnotationFromPrediction(this.predictions[0]);
@@ -588,7 +768,7 @@ export class LSFWrapper {
       const annotationID =
         this.initialAnnotation?.pk ?? this.task.lastAnnotation?.pk ?? this.task.lastAnnotation?.id ?? "auto";
 
-      this.setAnnotation(annotationID);
+      await this.setAnnotation(annotationID);
     }
   };
 
@@ -597,6 +777,28 @@ export class LSFWrapper {
     if (status === 200 || status === 201) {
       this.datamanager.invoke("toast", { message: successMessage, type: "info" });
     } else if (status !== undefined) {
+      // Skip toast for errors that are handled by global modal handlers via display_context
+      // These errors bubble up to ApiProvider which shows appropriate modals
+      // Note: display_context is in result.response for API error responses
+      const displayReason = result?.response?.display_context?.reason;
+      const isPausedError = displayReason === "PAUSED";
+      const isOverlapError = isFF(FF_FIT_1304_STRICT_OVERLAP) && displayReason === "OVERLAP_REACHED";
+      if (isPausedError || isOverlapError) {
+        // Also update local state for overlap reached (only when feature flag is enabled)
+        if (isOverlapError) {
+          this.overlapReached = true;
+          this.overlapReachedMessage =
+            result?.response?.detail ||
+            "Annotation overlap has been reached for this task. Your draft is preserved but cannot be submitted.";
+          // Set overlap state on LSF store - this will disable buttons with tooltips
+          this.lsf.setFlags({
+            overlapReached: true,
+            overlapReachedMessage: this.overlapReachedMessage,
+          });
+        }
+        return;
+      }
+
       const requestId = result?.$meta?.headers?.get("x-ls-request-id");
       const supportUrl = requestId ? `${SUPPORT_URL}?${SUPPORT_URL_REQUEST_ID_PARAM}=${requestId}` : SUPPORT_URL;
 
@@ -623,6 +825,12 @@ export class LSFWrapper {
 
   /** @private */
   onSubmitAnnotation = async () => {
+    // Prevent submission if overlap is reached (only when feature flag is enabled)
+    if (isFF(FF_FIT_1304_STRICT_OVERLAP) && this.overlapReached) {
+      this.showOverlapReachedMessage();
+      return;
+    }
+
     const exitStream = this.shouldExitStream();
     const loadNext = exitStream ? false : this.shouldLoadNext();
     const result = await this.submitCurrentAnnotation(
@@ -633,7 +841,7 @@ export class LSFWrapper {
           { taskID },
           { body },
           // errors are displayed by "toast" event - we don't want to show blocking modal
-          { errorHandler: errorHandlerAllowPaused },
+          { errorHandler: errorHandlerAllowSpecialErrors },
         );
       },
       false,
@@ -642,6 +850,16 @@ export class LSFWrapper {
     const status = result?.$meta?.status;
 
     this.showOperationToast(status, "Annotation saved successfully", "Annotation is not saved", result);
+
+    // FIT-720: Invalidate caches after successful submit
+    if (status < 400) {
+      // Invalidate specific annotation if ID is in result
+      if (result?.id) {
+        invalidateAnnotationCache(result.id);
+      }
+      // Invalidate distribution for the task
+      invalidateDistributionCache(this.task?.id);
+    }
 
     if (exitStream) return this.exitStream();
   };
@@ -667,7 +885,7 @@ export class LSFWrapper {
           body: serializedAnnotation,
         },
         // errors are displayed by "toast" event - we don't want to show blocking modal
-        { errorHandler: errorHandlerAllowPaused },
+        { errorHandler: errorHandlerAllowSpecialErrors },
       );
     });
     const status = result?.$meta?.status;
@@ -675,6 +893,12 @@ export class LSFWrapper {
     this.showOperationToast(status, "Annotation updated successfully", "Annotation is not updated", result);
 
     this.datamanager.invoke("updateAnnotation", ls, annotation, result);
+
+    // FIT-720: Invalidate annotation cache after successful update
+    if (status < 400 && annotation.pk) {
+      invalidateAnnotationCache(annotation.pk);
+      invalidateDistributionCache(task.id);
+    }
 
     if (exitStream) return this.exitStream();
 
@@ -730,7 +954,7 @@ export class LSFWrapper {
       const lastAnnotation = this.annotations[this.annotations.length - 1] ?? {};
       const annotationID = lastAnnotation.pk ?? undefined;
 
-      this.setAnnotation(annotationID);
+      await this.setAnnotation(annotationID);
     }
   };
 
@@ -762,7 +986,7 @@ export class LSFWrapper {
     }
   };
 
-  onSubmitDraft = async (studio, annotation, params = {}) => {
+  onSubmitDraft = async (_studio, annotation, params = {}) => {
     // It should be preserved as soon as possible because each `await` will allow it to be changed
     const taskId = this.task.id;
     const annotationDoesntExist = !annotation.pk;
@@ -804,6 +1028,12 @@ export class LSFWrapper {
   };
 
   onSkipTask = async (_, { comment } = {}) => {
+    // Prevent skipping if overlap is reached (only when feature flag is enabled)
+    if (isFF(FF_FIT_1304_STRICT_OVERLAP) && this.overlapReached) {
+      this.showOverlapReachedMessage();
+      return;
+    }
+
     // Manager roles that can force-skip unskippable tasks (OW=Owner, AD=Admin, MA=Manager)
     const MANAGER_ROLES = ["OW", "AD", "MA"];
     const task = this.task;
@@ -814,7 +1044,9 @@ export class LSFWrapper {
     const canSkip = !skipDisabled || hasForceSkipPermission;
     if (!canSkip) {
       console.warn("Task cannot be skipped: allow_skip is false and user lacks manager role");
-      this.showOperationToast(400, null, "This task cannot be skipped", { error: "Task cannot be skipped" });
+      this.showOperationToast(400, null, "This task cannot be skipped", {
+        error: "Task cannot be skipped",
+      });
       return;
     }
     const result = await this.submitCurrentAnnotation(
@@ -832,7 +1064,7 @@ export class LSFWrapper {
           id === undefined ? "submitAnnotation" : "updateAnnotation",
           params,
           options,
-          { errorHandler: errorHandlerAllowPaused },
+          { errorHandler: errorHandlerAllowSpecialErrors },
         );
       },
       true,
@@ -921,10 +1153,52 @@ export class LSFWrapper {
   // Proxy events that are unused by DM integration
   onEntityCreate = (...args) => this.datamanager.invoke("onEntityCreate", ...args);
   onEntityDelete = (...args) => this.datamanager.invoke("onEntityDelete", ...args);
+  _selectAnnotationTimeout = null;
+  _debouncedFirstOldSelection = undefined;
   onSelectAnnotation = (prevAnnotation, nextAnnotation, options) => {
+    // NOTE on parameter naming: LSF fires selectAnnotation(newAnnotation, oldAnnotation).
+    // Despite the names here, prevAnnotation = the NEWLY selected annotation,
+    // nextAnnotation = the PREVIOUSLY selected annotation (before this selection).
     if (window.APP_SETTINGS.read_only_quick_view_enabled && !this.labelStream) {
       prevAnnotation?.setEditable(false);
     }
+
+    // FIT-720: Debounce selectAnnotation callbacks during batch selection (init)
+    // During init, selectAnnotation fires for ALL annotations in rapid succession.
+    // This debounce ensures only the final selection triggers the callback.
+    if (isFF(FF_FIT_720_LAZY_LOAD_ANNOTATIONS)) {
+      if (this._selectAnnotationTimeout) {
+        clearTimeout(this._selectAnnotationTimeout);
+        // Keep nextAnnotation (the "old" selection) from the FIRST call in the batch.
+        // After resetAnnotationStore + initializeStore, the first selectAnnotation fires
+        // with oldSelection=null (nothing was selected before). Subsequent calls during
+        // init have oldSelection=someOtherInitAnnotation. The DataManager's history
+        // handler compares new vs old annotation pk to decide whether to refetch.
+        // If we use the last call's old selection (which may equal the new selection
+        // when re-selecting the same annotation), the handler thinks nothing changed
+        // and skips the history fetch. Preserving the first old=null ensures the
+        // handler sees a genuine annotation change and fetches history.
+      } else {
+        this._debouncedFirstOldSelection = nextAnnotation;
+      }
+      this._selectAnnotationTimeout = setTimeout(() => {
+        this._selectAnnotationTimeout = null;
+        const firstOld = this._debouncedFirstOldSelection;
+        this._debouncedFirstOldSelection = undefined;
+        // prevAnnotation from last call = the final newly selected annotation (correct)
+        // firstOld = the selection state before the batch started (null after reset)
+        this._invokeSelectAnnotation(prevAnnotation, firstOld, options);
+      }, 0);
+      return;
+    }
+
+    this._invokeSelectAnnotation(prevAnnotation, nextAnnotation, options);
+  };
+
+  _invokeSelectAnnotation = async (prevAnnotation, nextAnnotation, options) => {
+    // Invoke the DataManager callback first so that history fetch can start immediately.
+    // The history endpoint only needs the annotation pk (available on stubs).
+    // Hydration (which fetches full annotation data) runs in parallel afterwards.
     if (nextAnnotation?.history?.undoIdx) {
       this.saveDraft(nextAnnotation).then(() => {
         this.datamanager.invoke("onSelectAnnotation", prevAnnotation, nextAnnotation, options, this);
@@ -932,15 +1206,101 @@ export class LSFWrapper {
     } else {
       this.datamanager.invoke("onSelectAnnotation", prevAnnotation, nextAnnotation, options, this);
     }
+
+    // FIT-720: Hydrate stub annotations when selected
+    // IMPORTANT: Use the CURRENTLY SELECTED annotation, not the one from the callback
+    // The debounce may have caused the callback annotation to be stale
+    if (isFF(FF_FIT_720_LAZY_LOAD_ANNOTATIONS)) {
+      const currentSelected = this.lsf?.annotationStore?.selected;
+      if (currentSelected?.pk) {
+        // Prefetch comments on annotation selection so region comment indicators
+        // are visible immediately, without waiting for the Comments tab to be opened.
+        // Deduplication in CommentStore.listComments prevents redundant API calls
+        // if the Comments tab is already open and triggers its own fetch.
+        this.lsf?.commentStore?.listComments({ suppressClearComments: false });
+
+        await this._hydrateStubAnnotation(currentSelected);
+      }
+    }
+  };
+
+  // FIT-720: Hydrate a stub annotation by fetching full data from API
+  _hydrateStubAnnotation = async (annotation) => {
+    // Check if annotation is a stub (no regions/results)
+    // Stubs have empty results - check via the areas map which holds deserialized regions
+    const hasRegions = annotation.areas?.size > 0;
+    const isUserGenerated = annotation.userGenerate && !annotation.sentUserGenerate;
+
+    // Also check versions.result to see if the annotation was loaded with actual results
+    const versionsResult = annotation.versions?.result;
+    const hasVersionsResult = Array.isArray(versionsResult) && versionsResult.length > 0;
+
+    // Skip if already hydrated or is a new user-generated annotation
+    // Use versionsResult as the source of truth - if it has data, the annotation is already hydrated
+    if (hasVersionsResult || isUserGenerated) {
+      return;
+    }
+
+    const annotationPk = annotation.pk;
+
+    try {
+      const fullAnnotation = await this.datamanager.apiCall("fetchAnnotation", {
+        annotationID: annotationPk,
+      });
+
+      if (fullAnnotation?.result && !fullAnnotation.error) {
+        // IMPORTANT: Re-fetch the annotation from the store after async operation
+        // The original reference might be stale (user navigated, scrolled, etc.)
+        // which causes MST "object is protected" errors
+        const freshAnnotation = this.annotations.find((a) => String(a.pk) === String(annotationPk));
+        if (!freshAnnotation) {
+          // Annotation no longer exists in the store
+          return;
+        }
+        if (!isAlive(freshAnnotation) || !isAlive(freshAnnotation.trackedState)) {
+          // Annotation node was detached while hydration request was in-flight
+          return;
+        }
+
+        // Check if annotation was already hydrated while we were fetching
+        const freshVersionsResult = freshAnnotation.versions?.result;
+        const freshHasVersionsResult = Array.isArray(freshVersionsResult) && freshVersionsResult.length > 0;
+        const freshHasRegions = freshAnnotation.areas?.size > 0;
+
+        if (freshHasVersionsResult || freshHasRegions) {
+          // Already hydrated (possibly by another code path)
+          return;
+        }
+
+        // Freeze history to prevent undo/redo issues during hydration
+        freshAnnotation.history?.freeze?.();
+
+        // Deserialize the results into the annotation
+        if (!isAlive(freshAnnotation) || !isAlive(freshAnnotation.trackedState)) return;
+        freshAnnotation.deserializeResults(fullAnnotation.result);
+
+        // Critical: updateObjects() MUST be called to render visual regions after deserializing
+        freshAnnotation.updateObjects?.();
+
+        // Unfreeze history
+        freshAnnotation.history?.safeUnfreeze?.();
+
+        // reinitHistory cancels autosave and sets initial values so LSF knows this is the base state
+        // This prevents the hydration from being treated as a user modification
+        freshAnnotation.reinitHistory?.();
+      }
+    } catch {
+      // Failed to hydrate annotation - will show stub state
+    }
   };
 
   onNextTask = async (nextTaskId, nextAnnotationId) => {
-    this.saveDraft();
-    this.loadTask(nextTaskId, nextAnnotationId, true);
+    await this.saveDraft();
+    await this.loadTask(nextTaskId, nextAnnotationId, true);
   };
   onPrevTask = async (prevTaskId, prevAnnotationId) => {
-    this.saveDraft();
-    this.loadTask(prevTaskId, prevAnnotationId, true);
+    await this.saveDraft();
+    await this.loadTask(prevTaskId, prevAnnotationId, true);
   };
   async submitCurrentAnnotation(eventName, submit, includeId = false, loadNext = true) {
     const { taskID, currentAnnotation } = this;
@@ -1082,8 +1442,30 @@ export class LSFWrapper {
   }
 
   destroy() {
+    // Clean up overlap error event listeners and dismiss toast (only when feature flag is enabled)
+    if (isFF(FF_FIT_1304_STRICT_OVERLAP)) {
+      window.removeEventListener("overlap-error-next-task", this.handleOverlapNextTask);
+      window.removeEventListener("overlap-error-close-task", this.handleOverlapCloseTask);
+      window.removeEventListener("overlap-error-exit-stream", this.handleOverlapExitStream);
+      // Dismiss the overlap toast if it's showing - this ensures the toast doesn't
+      // persist after leaving the labeling interface
+      this.dismissOverlapToast();
+    }
+
+    if (isActive(FF_FIT_720_LAZY_LOAD_ANNOTATIONS)) {
+      imageCache?.forceClear?.();
+    }
+
     this.lsfInstance?.destroy?.();
     this.lsfInstance = null;
+  }
+
+  /**
+   * Close the current task panel (for DataManager context)
+   */
+  closeTask() {
+    // Invoke the data manager's close task action
+    this.datamanager.invoke("closeTask");
   }
 
   get taskID() {

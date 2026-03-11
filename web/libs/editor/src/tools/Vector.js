@@ -214,10 +214,24 @@ const _Tool = types
         if (!currentArea || !currentArea.closable) return;
 
         disposers.push(
-          observe(currentArea, "closed", ({ newValue }) => newValue.storedValue && self.finishDrawing(), true),
+          observe(
+            currentArea,
+            "closed",
+            () => {
+              if (self.getCurrentArea()?.closed) self.finishDrawing();
+            },
+            true,
+          ),
         );
         disposers.push(
-          observe(currentArea, "finished", ({ newValue }) => newValue.storedValue && self.finishDrawing(), true),
+          observe(
+            currentArea,
+            "finished",
+            () => {
+              if (self.getCurrentArea()?.finished) self.finishDrawing();
+            },
+            true,
+          ),
         );
       },
 
@@ -342,7 +356,10 @@ const _Tool = types
         self.mode = "viewing";
         self.currentArea = null;
         self.stopListening();
-        self.annotation.afterCreateResult(currentArea, control);
+        // For incomplete vector regions, don't trigger selectAfterCreate behavior
+        if (!currentArea.incomplete) {
+          self.annotation.afterCreateResult(currentArea, control);
+        }
       },
 
       setDrawing(drawing) {

@@ -162,7 +162,7 @@
       min-width: 70px;
     }
 
-    input {
+    & input {
       width: 100%;
       height: calc(100% - 2px);
       border: none;
@@ -184,7 +184,7 @@
     font-size: var(--font-size);
     line-height: var(--line-height);
 
-    span {
+    & span {
       font-weight: normal;
       opacity: 0.4;
     }
@@ -193,7 +193,7 @@
   &_disabled &__page-indicator {
     opacity: 0.4;
 
-    span {
+    & span {
       opacity: 1;
     }
   }
@@ -213,7 +213,7 @@
     }
   }
 
-  select {
+  & select {
     height: 40px;
     min-height: 40px;
     font-size: 16px;

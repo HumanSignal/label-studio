@@ -1,6 +1,6 @@
 [project]
 name = "label-studio"
-version = "1.23.0.dev0"
+version = "1.24.0.dev0"
 description = "Label Studio annotation tool"
 authors = [
     { name = "HumanSignal", email = "support@humansignal.com" },
@@ -30,7 +30,6 @@ dependencies = [
     "django-debug-toolbar (==3.2.1)",
     "django-environ (==0.10.0)",
     "django-filter (==24.3)",
-    "django-model-utils (==4.1.1)",
     "django-rq (>=3.1,<3.2)",
     "django-cors-headers (==4.7.0)",
     "django-extensions (==3.2.3)",
@@ -41,7 +40,6 @@ dependencies = [
     "drf-flex-fields (==0.9.5)",
     "drf-spectacular (==0.28.0)",
     "drf-generators (==0.3.0)",
-    "lockfile (>=0.12.0)",
     "lxml[html-clean] (>=4.9.4)",
     "defusedxml (>=0.7.1)",
     "numpy (>=2.2.6,<3.0.0)",
@@ -74,7 +72,7 @@ dependencies = [
     "tldextract (>=5.1.3)",
     "uuid-utils (>=0.11.0,<1.0.0)",
     ## HumanSignal repo dependencies :start
-    "label-studio-sdk @ https://github.com/HumanSignal/label-studio-sdk/archive/ec54cbaa1feca107a2437b6cd0861c3941af7922.zip",
+    "label-studio-sdk @ https://github.com/HumanSignal/label-studio-sdk/archive/ec391f8c3335e18758d3d3170887555d3f5ff325.zip",
     ## HumanSignal repo dependencies :end
 ]
 
@@ -91,8 +89,36 @@ uwsgi = ['pyuwsgi (==2.0.28.post1)', 'uwsgitop (==0.12)']
 # Assume Python 3.10 at a minimum
 target-version = "py310"
 
-# Same as Blue.
 line-length = 119
+
+# Exclude a variety of commonly ignored directories.
+exclude = [
+    ".bzr",
+    ".direnv",
+    ".eggs",
+    ".git",
+    ".github",
+    ".git-rewrite",
+    ".hg",
+    ".mypy_cache",
+    ".nox",
+    ".pants.d",
+    ".pytype",
+    ".ruff_cache",
+    ".svn",
+    ".tox",
+    ".venv",
+    "__pypackages__",
+    "__pycache__",
+    "_build",
+    "buck-out",
+    "build",
+    "dist",
+    "node_modules",
+    "venv",
+    "**/migrations/*.py",
+    "scripts",
+]
 
 [tool.ruff.lint]
 # Enable the pycodestyle (`E`) and Pyflakes (`F`) rules by default.
@@ -111,37 +137,9 @@ ignore = [
     "E402", # ignores: Module level import not at top of file.  (isort takes care of this and if not, there is usually a good reason)
 ]
 
-
-
 # Allow autofix for all enabled rules (when `--fix`) is provided.
 fixable = ["ALL"]
 unfixable = []
-
-# Exclude a variety of commonly ignored directories.
-exclude = [
-    ".bzr",
-    ".direnv",
-    ".eggs",
-    ".git",
-    ".git-rewrite",
-    ".hg",
-    ".mypy_cache",
-    ".nox",
-    ".pants.d",
-    ".pytype",
-    ".ruff_cache",
-    ".svn",
-    ".tox",
-    ".venv",
-    "__pypackages__",
-    "_build",
-    "buck-out",
-    "build",
-    "dist",
-    "node_modules",
-    "venv",
-    "**/migrations/*.py",
-]
 
 # Allow unused variables when underscore-prefixed.
 dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
@@ -152,44 +150,8 @@ dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
 "**/settings/label_studio.py" = ["F405"]
 "test*.py" = ["F811"]
 
-
-[tool.blue]
-
-line-length = 119
-
-include = 'label_studio/.*\.py$'
-
-# Exclude a variety of commonly ignored directories, as well as all migrations files.
-force-exclude = '''
-/(
-    \.bzr
-  | \.direnv
-  | \.eggs
-  | \.git
-  | \.github
-  | \.git-rewrite
-  | \.hg
-  | \.mypy_cache
-  | \.nox
-  | \.pants.d
-  | \.pytype
-  | \.ruff_cache
-  | \.svn
-  | \.tox
-  | \.venv
-  | \.hg
-  | _build
-  | buck-out
-  | build
-  | dist
-  | node_modules
-  | migrations
-  | venv
-  | __pycache__
-)/
-'''
-
-target-version = ['py310']
+[tool.ruff.format]
+quote-style = "single"
 
 [tool.poetry]
 

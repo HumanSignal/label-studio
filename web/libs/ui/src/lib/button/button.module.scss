@@ -52,7 +52,7 @@
   }
 }
 
-/// VARIANTS
+/* / VARIANTS */
 .variant-primary {
   --background-color: var(--color-primary-surface);
   --border-color: var(--color-primary-border-bold);
@@ -305,7 +305,7 @@
   }
 }
 
-  /// VARIANT LOOK
+  /* / VARIANT LOOK */
 .look-outlined {
   &:not(:disabled),
   &.waiting {
@@ -365,7 +365,7 @@
   }
 }
 
-/// SIZES
+/* / SIZES */
 
 .size-medium {
   @apply p-tight text-label-medium h-1000;
@@ -404,7 +404,7 @@
   }
 }
 
-/// STATES
+/* / STATES */
 .waiting {
   --background-image: repeating-linear-gradient(
       -63.43deg,
@@ -446,7 +446,7 @@
   }
 }
 
-/// ALIGN
+/* / ALIGN */
 .align-default {
   & > span {
     @apply justify-center;
@@ -479,21 +479,21 @@
   &.button-group-collapsed {
     @apply gap-0;
 
-  button:not(:first-child) {
+  & button:not(:first-child) {
     border-left: none;
   }
 
-    button:first-child:not(:only-child) {
+    & button:first-child:not(:only-child) {
       border-top-right-radius: 0;
       border-bottom-right-radius: 0;
     }
 
-    button:last-child:not(:only-child) {
+    & button:last-child:not(:only-child) {
       border-top-left-radius: 0;
       border-bottom-left-radius: 0;
     }
 
-    button:not(:first-child, :last-child) {
+    & button:not(:first-child, :last-child) {
       border-radius: 0;
     }
   }

@@ -1,0 +1,47 @@
+.taskSourceView {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-base);
+  width: 100%;
+
+  /* Fixed height prevents modal from resizing when switching Code/Interactive views */
+  /* that leads to accidental clicks outside and unexpecteddd modal closing */
+  height: 600px;
+}
+
+.viewContent {
+  flex: 1;
+  min-height: 0;
+}
+
+.skeletonContainer {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-tight);
+  padding: var(--spacing-loose);
+  height: 100%;
+  background: var(--color-neutral-surface-inset);
+  border-radius: var(--corner-radius-small);
+  border: 1px solid var(--color-neutral-border);
+}
+
+.skeletonLine {
+  height: 14px;
+  border-radius: 4px;
+  background: var(--color-neutral-border);
+  animation: shimmer 1.3s ease infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    opacity: 0.4;
+  }
+
+  50% {
+    opacity: 0.7;
+  }
+
+  100% {
+    opacity: 0.4;
+  }
+}

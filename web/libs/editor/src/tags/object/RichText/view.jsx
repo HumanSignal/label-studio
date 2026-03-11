@@ -1,5 +1,4 @@
 import { LoadingOutlined } from "@ant-design/icons";
-import * as ff from "@humansignal/core/lib/utils/feature-flags/ff";
 import { observe } from "mobx";
 import { inject, observer } from "mobx-react";
 import { isAlive } from "mobx-state-tree";
@@ -562,11 +561,7 @@ class RichTextPieceView extends Component {
         <ObjectTag item={item} className={cn("richtext").toClassName()}>
           <div
             key="root"
-            className={cn("richtext")
-              .elem("container")
-              .mod({ canResizeSpans: ff.isActive(ff.FF_ADJUSTABLE_SPANS) })
-              .mix("htx-richtext")
-              .toClassName()}
+            className={cn("richtext").elem("container").mix("htx-richtext").toClassName()}
             ref={(el) => {
               item.mountNodeRef.current = el;
               el && this.markObjectAsLoaded();

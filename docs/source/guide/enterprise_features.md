@@ -260,7 +260,7 @@ The [project dashboard](https://docs.humansignal.com/guide/dashboard_project) pr
 
 Organization owners and administrators can view individual [annotator dashboards](https://docs.humansignal.com/guide/dashboard_annotator) to analyze task counts, average annotation times, review turnaround, and performance scoring. These dashboards help in managing resources, identifying top performers, and tracking quality without building custom analytics tools.
 
-![Screenshot of annotator dashboard](/images/project/annotator_dashboard.png)
+![Screenshot of annotator dashboard](/images/analytics/member-perf.png) 
 
 ## Project Management
 

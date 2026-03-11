@@ -34,6 +34,16 @@ class ToolsManager {
     INSTANCES.clear();
   }
 
+  /**
+   * Reset any active drawing across all tool managers.
+   * Called during annotation switching to properly clean up multi-click drawing
+   * tools (Polygon, Vector) that may have an in-progress drawing on the outgoing
+   * annotation. This is the annotation-switch counterpart of handleToolSwitch.
+   */
+  static resetActiveDrawings() {
+    INSTANCES.forEach((manager) => manager.resetActiveDrawing());
+  }
+
   constructor({ name } = {}) {
     this.name = name;
     this.tools = {};
@@ -77,9 +87,6 @@ class ToolsManager {
       const findme = new RegExp(`^.*?#${name}.*$`);
 
       if (Object.keys(this.tools).some((entry) => findme.test(entry))) {
-        console.log(
-          `Ignoring duplicate tool ${name} because it matches removeDuplicatesNamed ${removeDuplicatesNamed}`,
-        );
         return;
       }
     }
@@ -178,6 +185,20 @@ class ToolsManager {
 
   findDrawingTool() {
     return Object.values(this.tools).find((t) => t.isDrawing);
+  }
+
+  /**
+   * Release the active drawing tool's in-progress state without modifying the
+   * region itself (the region may already be submitted). Delegates to the
+   * tool's own MST action so that MST-protected properties are modified
+   * correctly.
+   */
+  resetActiveDrawing() {
+    const drawingTool = this.findDrawingTool();
+
+    if (drawingTool?.currentArea) {
+      drawingTool.resetBeforeAnnotationSwitch();
+    }
   }
 
   event(name, ev, ...args) {

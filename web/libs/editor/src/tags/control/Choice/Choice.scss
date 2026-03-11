@@ -18,11 +18,6 @@
     line-height: 40px;
   }
 
-  @at-root #{selector-append(&,_leaf,&,_hidden)},
-  #{selector-append(&,_notLeaf,&,_hidden)} {
-    display: none;
-  }
-
   &__item {
     display: flex;
     flex-flow: row nowrap;
@@ -66,6 +61,18 @@
       display: none;
     }
   }
+}
+
+/* Hide leaf and notLeaf choices when marked hidden */
+.choice_leaf.choice_layout_leaf.choice_leaf.choice_layout_hidden,
+.choice_leaf.choice_layout_leaf.choice_hidden,
+.choice_leaf.choice_leaf.choice_layout_hidden,
+.choice_leaf.choice_hidden,
+.choice_leaf.choice_layout_notLeaf.choice_leaf.choice_layout_hidden,
+.choice_leaf.choice_layout_notLeaf.choice_hidden,
+.choice_notLeaf.choice_leaf.choice_layout_hidden,
+.choice_notLeaf.choice_hidden {
+  display: none;
 }
 
 body :global(.ant-checkbox-wrapper) {

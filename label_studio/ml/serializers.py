@@ -1,7 +1,8 @@
-"""This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
-"""
+"""This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license."""
+
 from core.utils.io import validate_upload_url
 from django.conf import settings
+from drf_spectacular.utils import extend_schema_field
 from ml.models import MLBackend, MLBackendAuth
 from rest_framework import serializers
 
@@ -15,6 +16,7 @@ class MLBackendSerializer(serializers.ModelSerializer):
     basic_auth_pass = serializers.CharField(write_only=True, required=False, allow_null=True, allow_blank=True)
     basic_auth_pass_is_set = serializers.SerializerMethodField()
 
+    @extend_schema_field(bool)
     def get_basic_auth_pass_is_set(self, obj):
         return bool(obj.basic_auth_pass)
 
