@@ -305,40 +305,42 @@ export const Controls = controlsInjector<{ annotation: MSTAnnotation }>(
               ? "No changes were made"
               : "Update this task: [ Ctrl+Enter ]";
         const button = (
-          <ButtonTooltip key="update" title={updateTitle} className="whitespace-nowrap">
-            <ButtonGroup>
-              <Button
-                aria-label="submit"
-                name="submit"
-                className="w-[150px]"
-                disabled={isUpdateDisabled}
-                onClick={async (event) => {
-                  if ((event.target as HTMLButtonElement).classList.contains(dropdownTrigger)) return;
-                  const selected = store.annotationStore?.selected;
+          <ButtonTooltip key="update" title={updateTitle} className="whitespace-nowrap max-w-none">
+            <div className={cn("controls").elem("tooltip-wrapper").toClassName()}>
+              <ButtonGroup>
+                <Button
+                  aria-label="submit"
+                  name="submit"
+                  className="w-[150px]"
+                  disabled={isUpdateDisabled}
+                  onClick={async (event) => {
+                    if ((event.target as HTMLButtonElement).classList.contains(dropdownTrigger)) return;
+                    const selected = store.annotationStore?.selected;
 
-                  selected?.submissionInProgress();
-                  await store.commentStore.commentFormSubmit();
-                  store.updateAnnotation();
-                }}
-                data-testid="bottombar-update-button"
-              >
-                {isUpdate ? "Update" : "Submit"}
-              </Button>
-              {useExitOption ? (
-                <Dropdown.Trigger
-                  alignment="top-right"
-                  content={<SubmitOption onClickMethod={store.updateAnnotation} isUpdate={isUpdate} />}
+                    selected?.submissionInProgress();
+                    await store.commentStore.commentFormSubmit();
+                    store.updateAnnotation();
+                  }}
+                  data-testid="bottombar-update-button"
                 >
-                  <Button
-                    disabled={isUpdateDisabled}
-                    aria-label="Update annotation"
-                    data-testid="bottombar-update-dropdown"
+                  {isUpdate ? "Update" : "Submit"}
+                </Button>
+                {useExitOption ? (
+                  <Dropdown.Trigger
+                    alignment="top-right"
+                    content={<SubmitOption onClickMethod={store.updateAnnotation} isUpdate={isUpdate} />}
                   >
-                    <IconChevronDown />
-                  </Button>
-                </Dropdown.Trigger>
-              ) : null}
-            </ButtonGroup>
+                    <Button
+                      disabled={isUpdateDisabled}
+                      aria-label="Update annotation"
+                      data-testid="bottombar-update-dropdown"
+                    >
+                      <IconChevronDown />
+                    </Button>
+                  </Dropdown.Trigger>
+                ) : null}
+              </ButtonGroup>
+            </div>
           </ButtonTooltip>
         );
 
