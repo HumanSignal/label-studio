@@ -201,19 +201,15 @@ const AnnotationHistoryComponent: FC<any> = ({
                   // item.pk is the numeric history row id (preserved in HistoryItem preProcessSnapshot); item.id is the MST guid.
                   const historyPk = item.pk;
                   if (historyPk == null) return;
-                  getEnv(store).events.invoke(
-                    "hydrateHistoryItem",
-                    historyPk,
-                    (fullItem: any) => {
-                      if (fullItem && store.hydrateHistoryItem) {
-                        store.hydrateHistoryItem(historyPk, fullItem);
-                        const hydrated = annotationStore.history.find(
-                          (h: any) => h.pk != null && Number(h.pk) === Number(historyPk),
-                        );
-                        if (hydrated) annotationStore.selectHistory(hydrated);
-                      }
-                    },
-                  );
+                  getEnv(store).events.invoke("hydrateHistoryItem", historyPk, (fullItem: any) => {
+                    if (fullItem && store.hydrateHistoryItem) {
+                      store.hydrateHistoryItem(historyPk, fullItem);
+                      const hydrated = annotationStore.history.find(
+                        (h: any) => h.pk != null && Number(h.pk) === Number(historyPk),
+                      );
+                      if (hydrated) annotationStore.selectHistory(hydrated);
+                    }
+                  });
                 } else {
                   annotationStore.selectHistory(item);
                 }
