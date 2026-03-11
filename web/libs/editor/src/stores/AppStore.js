@@ -368,6 +368,7 @@ export default types
           if (annotationStore.viewingAll) return;
           if (isUpdateDisabled) return;
           if (entity.isReadOnly()) return;
+          if (entity.hasIncompleteRegions) return;
 
           entity?.submissionInProgress();
 
