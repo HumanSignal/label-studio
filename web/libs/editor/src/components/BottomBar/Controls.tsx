@@ -44,7 +44,9 @@ type ControlButtonProps = {
 };
 
 export const EMPTY_SUBMIT_TOOLTIP = "Empty annotations denied in this project";
-export const INCOMPLETE_REGION_TOOLTIP = "Complete all regions before submitting";
+export const INCOMPLETE_SUBMIT_TOOLTIP = "Complete all regions before\nsubmitting";
+export const INCOMPLETE_UPDATE_TOOLTIP = "Complete all regions before\nupdating";
+export const INCOMPLETE_ACCEPT_TOOLTIP = "Complete all regions before\naccepting";
 
 /**
  * Custom action button component, rendering buttons from store.customButtons
@@ -240,7 +242,7 @@ export const Controls = controlsInjector<{ annotation: MSTAnnotation }>(
 
       if (userGenerate || (store.explore && !userGenerate && store.hasInterface("submit"))) {
         const title = hasIncompleteRegions
-          ? INCOMPLETE_REGION_TOOLTIP
+          ? INCOMPLETE_SUBMIT_TOOLTIP
           : overlapDisabled
             ? store.overlapReachedMessage
             : submitDisabled
@@ -296,7 +298,7 @@ export const Controls = controlsInjector<{ annotation: MSTAnnotation }>(
         const noChanges = isFF(FF_REVIEWER_FLOW) && !history.canUndo && !annotation.draftId;
         const isUpdateDisabled = isDisabled || noChanges;
         const updateTitle = hasIncompleteRegions
-          ? INCOMPLETE_REGION_TOOLTIP
+          ? INCOMPLETE_UPDATE_TOOLTIP
           : overlapDisabled
             ? store.overlapReachedMessage
             : noChanges
@@ -310,6 +312,7 @@ export const Controls = controlsInjector<{ annotation: MSTAnnotation }>(
                 name="submit"
                 className="w-[150px]"
                 disabled={isUpdateDisabled}
+                tooltip={updateTitle}
                 onClick={async (event) => {
                   if ((event.target as HTMLButtonElement).classList.contains(dropdownTrigger)) return;
                   const selected = store.annotationStore?.selected;

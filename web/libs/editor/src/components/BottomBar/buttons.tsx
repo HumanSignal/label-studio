@@ -11,6 +11,7 @@ import { Tooltip, Button } from "@humansignal/ui";
 import { IconInfoOutline } from "@humansignal/icons";
 import type { MSTStore } from "../../stores/types";
 import { FF_FIT_1304_STRICT_OVERLAP, isFF } from "../../utils/feature-flags";
+import { INCOMPLETE_ACCEPT_TOOLTIP } from "./Controls";
 
 type MixedInParams = {
   store: MSTStore;
@@ -56,9 +57,7 @@ export const AcceptButton = memo(
     const hasChanges = history.canUndo || annotation.versions.draft;
     const hasIncompleteRegions = annotation.hasIncompletePolygons;
     const isDisabled = disabled || hasIncompleteRegions;
-    const tooltip = hasIncompleteRegions
-      ? "Complete all regions before accepting"
-      : "Accept annotation: [ Ctrl+Enter ]";
+    const tooltip = hasIncompleteRegions ? INCOMPLETE_ACCEPT_TOOLTIP : "Accept annotation: [ Ctrl+Enter ]";
 
     return (
       <Button
