@@ -250,7 +250,7 @@ export const Controls = controlsInjector<{ annotation: MSTAnnotation }>(
               : "Save results: [ Ctrl+Enter ]";
 
         buttons.push(
-          <ButtonTooltip key="submit" title={title}>
+          <ButtonTooltip key="submit" title={title} className="whitespace-nowrap">
             <div className={cn("controls").elem("tooltip-wrapper").toClassName()}>
               <ButtonGroup>
                 <Button
@@ -305,14 +305,13 @@ export const Controls = controlsInjector<{ annotation: MSTAnnotation }>(
               ? "No changes were made"
               : "Update this task: [ Ctrl+Enter ]";
         const button = (
-          <ButtonTooltip key="update" title={updateTitle}>
+          <ButtonTooltip key="update" title={updateTitle} className="whitespace-nowrap">
             <ButtonGroup>
               <Button
                 aria-label="submit"
                 name="submit"
                 className="w-[150px]"
                 disabled={isUpdateDisabled}
-                tooltip={updateTitle}
                 onClick={async (event) => {
                   if ((event.target as HTMLButtonElement).classList.contains(dropdownTrigger)) return;
                   const selected = store.annotationStore?.selected;

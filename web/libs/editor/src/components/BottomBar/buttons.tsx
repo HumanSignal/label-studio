@@ -32,12 +32,13 @@ export function controlsInjector<T extends {}>(fn: (props: T & MixedInParams) =>
 type ButtonTooltipProps = {
   title: string;
   children: JSX.Element;
+  className?: string;
 };
 
 export const ButtonTooltip = controlsInjector<ButtonTooltipProps>(
-  observer(({ store, title, children }) => {
+  observer(({ store, title, children, className }) => {
     return (
-      <Tooltip title={title} disabled={!store.settings.enableTooltips}>
+      <Tooltip title={title} disabled={!store.settings.enableTooltips} className={className}>
         {children}
       </Tooltip>
     );
@@ -60,20 +61,25 @@ export const AcceptButton = memo(
     const tooltip = hasIncompleteRegions ? INCOMPLETE_ACCEPT_TOOLTIP : "Accept annotation: [ Ctrl+Enter ]";
 
     return (
-      <Button
-        key="accept"
-        tooltip={tooltip}
-        aria-label="accept-annotation"
-        disabled={isDisabled}
-        onClick={async () => {
-          annotation.submissionInProgress();
-          await store.commentStore.commentFormSubmit();
-          store.acceptAnnotation();
-        }}
-        data-testid="bottombar-accept-button"
+      <Tooltip
+        title={tooltip}
+        disabled={!store.settings.enableTooltips}
+        className="whitespace-nowrap"
       >
-        {hasChanges ? "Fix + Accept" : "Accept"}
-      </Button>
+        <Button
+          key="accept"
+          aria-label="accept-annotation"
+          disabled={isDisabled}
+          onClick={async () => {
+            annotation.submissionInProgress();
+            await store.commentStore.commentFormSubmit();
+            store.acceptAnnotation();
+          }}
+          data-testid="bottombar-accept-button"
+        >
+          {hasChanges ? "Fix + Accept" : "Accept"}
+        </Button>
+      </Tooltip>
     );
   }),
 );
