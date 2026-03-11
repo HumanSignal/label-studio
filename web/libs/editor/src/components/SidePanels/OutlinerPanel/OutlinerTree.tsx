@@ -522,7 +522,7 @@ const RegionControls: FC<RegionControlsProps> = injector(
         return Object.values(regions).every(({ hidden: h }) => h);
       }
       return false;
-    }, [entity, entity?.hidden, type, regions]);
+    }, [entity?.hidden, type, regions]);
 
     const onToggleHidden = useCallback(() => {
       if (type?.includes("region") || type?.includes("range") || type?.includes("reactcode")) {
