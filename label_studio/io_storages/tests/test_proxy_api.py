@@ -112,15 +112,130 @@ class TestResolveStorageUriAPIMixin(unittest.TestCase):
         result = self.mixin.redirect_to_presign_url('fileuri', self.task, 'Task')
         assert result.status_code == status.HTTP_404_NOT_FOUND
 
+    def test_proxy_data_from_storage_content_type_fallback_for_octet_stream(self):
+        """Test that proxy detects correct content type from URI when storage returns octet-stream.
+
+        S3 objects uploaded without explicit Content-Type often have binary/octet-stream.
+        The proxy should detect the correct type from the URI file extension.
+        """
+        mock_storage = MagicMock()
+        mock_stream = MagicMock()
+        mock_metadata = {
+            'StatusCode': 200,
+            'ContentLength': 1000,
+            'LastModified': datetime.now(),
+            'ETag': '"abcdef123456"',
+        }
+        # Storage returns binary/octet-stream (common S3 default for missing Content-Type)
+        mock_storage.get_bytes_stream.return_value = (mock_stream, 'binary/octet-stream', mock_metadata)
+        mock_project = MagicMock()
+
+        with (
+            patch('io_storages.proxy_api.StreamingHttpResponse') as mock_response_class,
+            patch('io_storages.proxy_api.settings') as mock_settings,
+        ):
+            mock_settings.RESOLVER_PROXY_MAX_RANGE_SIZE = 1024 * 1024
+            mock_settings.RESOLVER_PROXY_BUFFER_SIZE = 8192
+            mock_settings.RESOLVER_PROXY_CACHE_TIMEOUT = 3600
+            mock_settings.RESOLVER_PROXY_TIMEOUT = 20
+            mock_settings.RESOLVER_PROXY_ENABLE_ETAG_CACHE = False
+
+            mock_response = MagicMock()
+            mock_response.headers = {}
+            mock_response_class.return_value = mock_response
+            self.request.headers = {}
+
+            # URI with .jpg extension - should be detected as image/jpeg
+            self.mixin.proxy_data_from_storage(self.request, 's3://bucket/photo.jpg', mock_project, mock_storage)
+
+            # Verify StreamingHttpResponse was called with image/jpeg, not binary/octet-stream
+            call_args, call_kwargs = mock_response_class.call_args
+            assert call_kwargs.get('content_type') == 'image/jpeg' or (
+                len(call_args) > 1 and call_args[1] == 'image/jpeg'
+            ), f'Expected content_type=image/jpeg, got: args={call_args}, kwargs={call_kwargs}'
+
+    def test_proxy_data_from_storage_content_type_fallback_for_application_octet_stream(self):
+        """Test fallback for application/octet-stream (another generic type)."""
+        mock_storage = MagicMock()
+        mock_stream = MagicMock()
+        mock_metadata = {
+            'StatusCode': 200,
+            'ContentLength': 5000,
+            'LastModified': datetime.now(),
+            'ETag': '"xyz789"',
+        }
+        mock_storage.get_bytes_stream.return_value = (mock_stream, 'application/octet-stream', mock_metadata)
+        mock_project = MagicMock()
+
+        with (
+            patch('io_storages.proxy_api.StreamingHttpResponse') as mock_response_class,
+            patch('io_storages.proxy_api.settings') as mock_settings,
+        ):
+            mock_settings.RESOLVER_PROXY_MAX_RANGE_SIZE = 1024 * 1024
+            mock_settings.RESOLVER_PROXY_BUFFER_SIZE = 8192
+            mock_settings.RESOLVER_PROXY_CACHE_TIMEOUT = 3600
+            mock_settings.RESOLVER_PROXY_TIMEOUT = 20
+            mock_settings.RESOLVER_PROXY_ENABLE_ETAG_CACHE = False
+
+            mock_response = MagicMock()
+            mock_response.headers = {}
+            mock_response_class.return_value = mock_response
+            self.request.headers = {}
+
+            self.mixin.proxy_data_from_storage(self.request, 's3://bucket/video.mp4', mock_project, mock_storage)
+
+            call_args, call_kwargs = mock_response_class.call_args
+            assert call_kwargs.get('content_type') == 'video/mp4' or (
+                len(call_args) > 1 and call_args[1] == 'video/mp4'
+            ), f'Expected content_type=video/mp4, got: args={call_args}, kwargs={call_kwargs}'
+
+    def test_proxy_data_from_storage_preserves_correct_content_type(self):
+        """When storage returns a proper content type, it should not be overridden."""
+        mock_storage = MagicMock()
+        mock_stream = MagicMock()
+        mock_metadata = {
+            'StatusCode': 200,
+            'ContentLength': 1000,
+            'LastModified': datetime.now(),
+            'ETag': '"test"',
+        }
+        # Storage returns correct content type
+        mock_storage.get_bytes_stream.return_value = (mock_stream, 'image/webp', mock_metadata)
+        mock_project = MagicMock()
+
+        with (
+            patch('io_storages.proxy_api.StreamingHttpResponse') as mock_response_class,
+            patch('io_storages.proxy_api.settings') as mock_settings,
+        ):
+            mock_settings.RESOLVER_PROXY_MAX_RANGE_SIZE = 1024 * 1024
+            mock_settings.RESOLVER_PROXY_BUFFER_SIZE = 8192
+            mock_settings.RESOLVER_PROXY_CACHE_TIMEOUT = 3600
+            mock_settings.RESOLVER_PROXY_TIMEOUT = 20
+            mock_settings.RESOLVER_PROXY_ENABLE_ETAG_CACHE = False
+
+            mock_response = MagicMock()
+            mock_response.headers = {}
+            mock_response_class.return_value = mock_response
+            self.request.headers = {}
+
+            self.mixin.proxy_data_from_storage(self.request, 's3://bucket/photo.jpg', mock_project, mock_storage)
+
+            # Should preserve the original image/webp, not override with image/jpeg
+            call_args, call_kwargs = mock_response_class.call_args
+            assert call_kwargs.get('content_type') == 'image/webp' or (
+                len(call_args) > 1 and call_args[1] == 'image/webp'
+            ), f'Expected content_type=image/webp, got: args={call_args}, kwargs={call_kwargs}'
+
     def test_proxy_data_from_storage_success(self):
         mock_storage = MagicMock()
         # Ensure get_bytes_stream returns a three-tuple, metadata can be empty initially
         mock_storage.get_bytes_stream.return_value = (io.BytesIO(b'test data'), 'image/jpeg', {})
         mock_project = MagicMock()
 
-        with patch('io_storages.proxy_api.StreamingHttpResponse') as mock_response_class, patch(
-            'io_storages.proxy_api.settings'
-        ) as mock_settings:
+        with (
+            patch('io_storages.proxy_api.StreamingHttpResponse') as mock_response_class,
+            patch('io_storages.proxy_api.settings') as mock_settings,
+        ):
             # Configure mock settings
             mock_settings.RESOLVER_PROXY_MAX_RANGE_SIZE = 1024 * 1024  # 1MB
             mock_settings.RESOLVER_PROXY_BUFFER_SIZE = 8192
@@ -265,9 +380,10 @@ class TestResolveStorageUriAPIMixin(unittest.TestCase):
         """Test override_range_header with header probe formats"""
         # Test bytes=0-
         self.request.headers = {'Range': 'bytes=0-'}
-        with patch('io_storages.proxy_api.settings') as mock_settings, patch(
-            'io_storages.proxy_api.parse_range'
-        ) as mock_parse_range:
+        with (
+            patch('io_storages.proxy_api.settings') as mock_settings,
+            patch('io_storages.proxy_api.parse_range') as mock_parse_range,
+        ):
             mock_settings.RESOLVER_PROXY_MAX_RANGE_SIZE = 1024 * 1024
             # Mock the parse_range function to return a known value
             mock_parse_range.return_value = (0, '')
@@ -277,9 +393,10 @@ class TestResolveStorageUriAPIMixin(unittest.TestCase):
 
         # Test bytes=0-0
         self.request.headers = {'Range': 'bytes=0-0'}
-        with patch('io_storages.proxy_api.settings') as mock_settings, patch(
-            'io_storages.proxy_api.parse_range'
-        ) as mock_parse_range:
+        with (
+            patch('io_storages.proxy_api.settings') as mock_settings,
+            patch('io_storages.proxy_api.parse_range') as mock_parse_range,
+        ):
             mock_settings.RESOLVER_PROXY_MAX_RANGE_SIZE = 1024 * 1024
             # Mock the parse_range function to return a known value
             mock_parse_range.return_value = (0, 0)
@@ -291,37 +408,40 @@ class TestResolveStorageUriAPIMixin(unittest.TestCase):
         """Test override_range_header with a start position but no end"""
         # Case: bytes=100-
         self.request.headers = {'Range': 'bytes=100-'}
-        with patch('io_storages.proxy_api.settings') as mock_settings, patch(
-            'io_storages.proxy_api.parse_range'
-        ) as mock_parse_range:
+        with (
+            patch('io_storages.proxy_api.settings') as mock_settings,
+            patch('io_storages.proxy_api.parse_range') as mock_parse_range,
+        ):
             mock_settings.RESOLVER_PROXY_MAX_RANGE_SIZE = 1024 * 1024  # 1MB
             # Mock the parse_range function to return a known value
             mock_parse_range.return_value = (100, '')
 
             result = self.mixin.override_range_header(self.request)
             # Should add MAX_RANGE_SIZE to start
-            assert result == f'bytes=100-{100 + 1024*1024}'
+            assert result == f'bytes=100-{100 + 1024 * 1024}'
 
         # Case: bytes=100-0 (treated like bytes=100-)
         self.request.headers = {'Range': 'bytes=100-0'}
-        with patch('io_storages.proxy_api.settings') as mock_settings, patch(
-            'io_storages.proxy_api.parse_range'
-        ) as mock_parse_range:
+        with (
+            patch('io_storages.proxy_api.settings') as mock_settings,
+            patch('io_storages.proxy_api.parse_range') as mock_parse_range,
+        ):
             mock_settings.RESOLVER_PROXY_MAX_RANGE_SIZE = 1024 * 1024  # 1MB
             # Mock the parse_range function to return a known value
             mock_parse_range.return_value = (100, 0)
 
             result = self.mixin.override_range_header(self.request)
             # Should add MAX_RANGE_SIZE to start
-            assert result == f'bytes=100-{100 + 1024*1024}'
+            assert result == f'bytes=100-{100 + 1024 * 1024}'
 
     def test_override_range_header_start_and_end(self):
         """Test override_range_header with start and end positions"""
         # Case: Range within limit
         self.request.headers = {'Range': 'bytes=100-5000'}
-        with patch('io_storages.proxy_api.settings') as mock_settings, patch(
-            'io_storages.proxy_api.parse_range'
-        ) as mock_parse_range:
+        with (
+            patch('io_storages.proxy_api.settings') as mock_settings,
+            patch('io_storages.proxy_api.parse_range') as mock_parse_range,
+        ):
             mock_settings.RESOLVER_PROXY_MAX_RANGE_SIZE = 10000  # 10KB
             # Mock the parse_range function to return a known value
             mock_parse_range.return_value = (100, 5000)
@@ -332,9 +452,10 @@ class TestResolveStorageUriAPIMixin(unittest.TestCase):
 
         # Case: Range exceeding limit
         self.request.headers = {'Range': 'bytes=100-20000'}
-        with patch('io_storages.proxy_api.settings') as mock_settings, patch(
-            'io_storages.proxy_api.parse_range'
-        ) as mock_parse_range:
+        with (
+            patch('io_storages.proxy_api.settings') as mock_settings,
+            patch('io_storages.proxy_api.parse_range') as mock_parse_range,
+        ):
             mock_settings.RESOLVER_PROXY_MAX_RANGE_SIZE = 10000  # 10KB
             # Mock the parse_range function to return a known value
             mock_parse_range.return_value = (100, 20000)
@@ -346,9 +467,10 @@ class TestResolveStorageUriAPIMixin(unittest.TestCase):
     def test_override_range_header_negative_start(self):
         """Test override_range_header with negative start position"""
         self.request.headers = {'Range': 'bytes=-1024'}
-        with patch('io_storages.proxy_api.settings') as mock_settings, patch(
-            'io_storages.proxy_api.parse_range'
-        ) as mock_parse_range:
+        with (
+            patch('io_storages.proxy_api.settings') as mock_settings,
+            patch('io_storages.proxy_api.parse_range') as mock_parse_range,
+        ):
             mock_settings.RESOLVER_PROXY_MAX_RANGE_SIZE = 10000  # 10KB
             # Mock the parse_range function to return a negative start
             mock_parse_range.return_value = (-1024, None)
@@ -360,9 +482,10 @@ class TestResolveStorageUriAPIMixin(unittest.TestCase):
     def test_override_range_header_unsupported_format(self):
         """Test override_range_header with unsupported range format"""
         self.request.headers = {'Range': 'invalid-range-format'}
-        with patch('io_storages.proxy_api.settings') as mock_settings, patch(
-            'io_storages.proxy_api.parse_range'
-        ) as mock_parse_range:
+        with (
+            patch('io_storages.proxy_api.settings') as mock_settings,
+            patch('io_storages.proxy_api.parse_range') as mock_parse_range,
+        ):
             mock_settings.RESOLVER_PROXY_MAX_RANGE_SIZE = 10000  # 10KB
             # Mock parse_range to simulate failure with invalid format
             mock_parse_range.return_value = (0, None)

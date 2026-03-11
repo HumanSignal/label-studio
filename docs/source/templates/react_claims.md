@@ -1,8 +1,8 @@
 ---
-title: Agentic Tracing for Claims
+title: Agentic Tracing for Claims 🔒
 type: templates
 category: Programmable Interfaces
-order: 756
+order: 356
 is_new: t
 meta_title: Template for agentic tracing
 meta_description: Template that uses a custom UI to trace agentic responses to insurance claims  
@@ -28,7 +28,7 @@ Users can then label each step using custom ontologies (single-select dropdowns 
 !!! error Enterprise
     This template and the `ReactCode` tag can only be used in Label Studio Enterprise.
 
-    For more information, including simplified code examples, see [ReactCode](/tags/reactcode).
+    For more information, see [Programmable & Embeddable Interfaces](https://humansignal.com/programmable-ui/).
 
 ## Labeling configuration
 

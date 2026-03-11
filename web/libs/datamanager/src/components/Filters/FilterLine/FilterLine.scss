@@ -2,7 +2,7 @@
   position: relative;
   width: 100%;
 
-  // Apply the same grid layout as the parent filters container
+  /* Apply the same grid layout as the parent filters container */
   display: grid;
   grid-template-columns: 80px minmax(120px, max-content) minmax(100px, max-content) 1fr 24px;
   grid-gap: var(--spacing-tightest);

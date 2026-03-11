@@ -111,7 +111,7 @@
     top: -1px;
     left: 0;
     width: 100%;
-    height: 8px;
+    height: 10px;
     border-top-style: solid;
     border-top-width: 2px;
     border-top-left-radius: var(--corner-radius-small);
@@ -239,7 +239,7 @@
     transition: opacity 150ms ease-out, background-color 150ms ease-out, right 150ms ease-out;
     box-shadow: 2px 0 6px rgb(var(--color-neutral-shadow-raw) / 8%), 1px 0 2px rgb(var(--color-neutral-shadow-raw) / 8%);
 
-    svg {
+    & svg {
       width: 20px;
       height: 20px;
       transform-origin: center;
@@ -252,7 +252,7 @@
       background: var(--color-primary-emphasis);
       border-color: var(--color-primary-border-subtler);
 
-      svg {
+      & svg {
         color: var(--color-neutral-content);
       }
     }
@@ -271,7 +271,7 @@
     transition: opacity 150ms ease-out;
   }
 
-  // Badge styles - matching Annotators component (global styles)
+  /* Badge styles - matching Annotators component (global styles) */
 
 
 
@@ -312,20 +312,20 @@
     margin-bottom: 8px;
     flex-wrap: wrap;
 
-    // Force light mode colors for better readability in dark mode tooltips
-    // Override the CSS variables to always use light mode values
-    --color-accent-grape-subtle: var(--color-grape-100);
+    /* Force light mode colors for better readability when tooltip has white background (dark theme) */
+    /* Override the CSS variables to always use light mode values */
+    --color-accent-grape-subtlest: var(--color-grape-100);
+    --color-accent-grape-subtle: var(--color-grape-200);
     --color-accent-grape-bold: var(--color-grape-700);
-    --color-accent-kale-subtle: var(--color-kale-100);
+    --color-accent-kale-subtlest: var(--color-kale-100);
+    --color-accent-kale-subtle: var(--color-kale-200);
     --color-accent-kale-bold: var(--color-kale-700);
-    --color-accent-canteloupe-subtle: var(--color-canteloupe-100);
+    --color-accent-canteloupe-subtlest: var(--color-canteloupe-100);
+    --color-accent-canteloupe-subtle: var(--color-canteloupe-200);
     --color-accent-canteloupe-bold: var(--color-canteloupe-700);
-    --color-accent-persimmon-subtle: var(--color-persimmon-100);
+    --color-accent-persimmon-subtlest: var(--color-persimmon-100);
+    --color-accent-persimmon-subtle: var(--color-persimmon-200);
     --color-accent-persimmon-bold: var(--color-persimmon-700);
-  }
-
-  &__tooltipStatusBadge {
-    display: inline-block;
   }
 
   &__tooltipContainerTitle {
@@ -393,7 +393,7 @@
     &_updated {
       background-color: var(--color-primary-content);
 
-      svg {
+      & svg {
         display: block;
       }
     }

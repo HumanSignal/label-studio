@@ -37,11 +37,14 @@ interface ChipProps extends PropsWithChildren {
  * Supports various styling options including colors, borders, and prefixes for counts/percentages.
  */
 export const Chip = ({ children, prefix, colors, style, thickBorder = false, className }: ChipProps) => {
+  // Treat black text color as "use theme default" so it works in both light and dark mode
+  const textColor = colors?.color && colors.color !== "rgb(0,0,0)" ? colors.color : undefined;
+
   const combinedStyles: CSSProperties = {
     ...style,
     ...(colors?.background && { background: colors.background }),
     ...(colors?.border && { borderColor: colors.border }),
-    ...(colors?.color && { color: colors.color }),
+    ...(textColor && { color: textColor }),
     ...(thickBorder && colors?.border && { borderLeft: `3px solid ${colors.border}` }),
   };
   const isPercentage = typeof prefix === "string" && prefix.endsWith("%");
@@ -53,9 +56,9 @@ export const Chip = ({ children, prefix, colors, style, thickBorder = false, cla
       className={cnm(
         "inline-flex items-center whitespace-nowrap rounded-4 px-2 py-0.5",
         "text-xs border",
-        !colors?.background && "bg-neutral-surface-subtle",
+        !colors?.background && "bg-neutral-surface-active",
         !colors?.border && "border-neutral-border",
-        !colors?.color && "text-neutral-content",
+        !textColor && "text-neutral-content",
         className,
       )}
       style={combinedStyles}

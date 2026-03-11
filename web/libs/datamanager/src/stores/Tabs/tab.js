@@ -13,6 +13,8 @@ import { FF_ANNOTATION_RESULTS_FILTERING, isFF } from "../../utils/feature-flags
 const THRESHOLD_MIN = 0;
 const THRESHOLD_MIN_DIFF = 0.001;
 
+import { validateFilterSnapshot } from "./filter_snapshot_utils";
+
 export const Tab = types
   .model("View", {
     id: StringOrNumberID,
@@ -182,6 +184,29 @@ export const Tab = types
       return {
         conjunction: self.conjunction,
         items: self.serializedFilters,
+      };
+    },
+
+    /**
+     * Snapshot of ALL filters (including empty/invalid ones).
+     * Used by the "Copy filters" button — unlike filterSnapshot which only includes
+     * valid filters, this captures the full state so the user can paste it back
+     * and continue editing.
+     */
+    get allFiltersSnapshot() {
+      const serialize = (filterModel) => {
+        const item = {
+          ...getSnapshot(filterModel),
+          type: filterModel.filter.currentType,
+        };
+        if (item.child_filter) {
+          item.child_filter = filterModel.child_filter ? serialize(filterModel.child_filter) : null;
+        }
+        return item;
+      };
+      return {
+        conjunction: self.conjunction,
+        items: self.filters.map((el) => serialize(el)),
       };
     },
 
@@ -396,8 +421,14 @@ export const Tab = types
       }
     },
 
+    /**
+     * Add a new filter row.
+     * Copies the column and operator from the last existing filter to reduce
+     * repetitive re-selection when the user adds multiple filters for the same column.
+     */
     createFilter() {
-      const filterType = self.availableFilters[0];
+      const lastFilter = self.filters.length > 0 ? self.filters[self.filters.length - 1] : null;
+      const filterType = lastFilter?.filter ?? self.availableFilters[0];
       const filter = TabFilter.create({
         filter: filterType,
         view: self.id,
@@ -407,6 +438,11 @@ export const Tab = types
 
       // Immediately materialize child filter for the default column, if any
       self.applyChildFilter(filter);
+
+      // Copy operator from previous filter if the column types match
+      if (lastFilter && filter.filter.currentType === lastFilter.filter.currentType && lastFilter.operator) {
+        filter.setOperator(lastFilter.operator);
+      }
 
       if (filter.isValidFilter) self.save();
     },
@@ -476,6 +512,48 @@ export const Tab = types
         destroy(filter);
         self.save();
       }
+    },
+
+    /**
+     * Replace all current filters with those from a pasted snapshot.
+     * Validates each item against available columns — columns that don't exist
+     * in the current project are silently skipped.
+     * @param {{ conjunction: string, items: Array }} snapshot
+     * @returns {boolean} false if no valid filters could be imported
+     */
+    importFilters(snapshot) {
+      const validItems = validateFilterSnapshot(snapshot, self.availableFilters);
+      if (!validItems) return false;
+
+      const { conjunction } = snapshot;
+
+      // Destroy existing filters before importing
+      while (self.filters.length > 0) {
+        const f = self.filters[self.filters.length - 1];
+        self.filters.splice(self.filters.length - 1, 1);
+        destroy(f);
+      }
+
+      if (conjunction === "and" || conjunction === "or") {
+        self.conjunction = conjunction;
+      }
+
+      for (const item of validItems) {
+        try {
+          const filter = TabFilter.create({
+            filter: item.filter,
+            operator: item.operator ?? null,
+            value: item.value ?? null,
+          });
+          self.filters.push(filter);
+          self.applyChildFilter(filter);
+        } catch (e) {
+          console.warn("importFilters: failed to create filter for", item.filter, e);
+        }
+      }
+
+      self.save();
+      return true;
     },
 
     afterAttach() {

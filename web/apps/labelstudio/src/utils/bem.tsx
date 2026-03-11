@@ -1,1 +1,1 @@
-export { cnb as cn, BemWithSpecificContext } from "@humansignal/core/lib/utils/bem";
+export { cnb as cn, type CN } from "@humansignal/core/lib/utils/bem";

@@ -1,22 +1,24 @@
 import { observer } from "mobx-react";
-import { createContext, forwardRef, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { createContext, forwardRef, memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { useSDK } from "../../../providers/SDKProvider";
 import { isDefined } from "../../../utils/utils";
 import { Icon } from "../Icon/Icon";
 import { modal } from "../Modal/Modal";
-import { IconCode, IconCopyOutline, IconChevronDown } from "@humansignal/icons";
-import { AutoSizerTable, Tooltip, Button } from "@humansignal/ui";
-import { useCopyText } from "@humansignal/core";
+import { IconBraces } from "@humansignal/icons";
+import { AutoSizerTable, Button } from "@humansignal/ui";
 import "./Table.scss";
 import { TableCheckboxCell } from "./TableCheckbox";
 import { tableCN, TableContext } from "./TableContext";
 import { TableHead } from "./TableHead/TableHead";
 import { TableRow } from "./TableRow/TableRow";
+import { RowContextMenu } from "./RowContextMenu";
 import { prepareColumns } from "./utils";
 import { cn } from "../../../utils/bem";
 import { FieldsButton } from "../FieldsButton";
 import { FF_LOPS_E_3, isFF } from "../../../utils/feature-flags";
 import { DensityToggle } from "../../DataManager/Toolbar/DensityToggle";
+import { TaskSourceViewer, getTaskSourceViewerStorageKey } from "../TaskSourceViewer";
 
 const Decorator = (decoration) => {
   return {
@@ -50,6 +52,9 @@ export const Table = observer(
     headerExtra,
     onDensityChange,
     onRangeSelect,
+    onViewAnalytics,
+    onViewReviewerAnalytics,
+    RowContextMenuComponent,
     ...props
   }) => {
     const colOrderKey = "dm:columnorder";
@@ -57,12 +62,17 @@ export const Table = observer(
     const [colOrder, setColOrder] = useState(JSON.parse(localStorage.getItem(colOrderKey)) ?? {});
     const listRef = useRef();
     const Decoration = useMemo(() => Decorator(decoration), [decoration]);
-    const { api, type } = useSDK();
+    const { api, type, projectId } = useSDK();
     const toolbarHeight = 41;
     const isQuickView = view.root.isLabeling;
     const [toolbarVisible, setToolbarVisible] = useState(true);
     // Track last clicked row ID for shift-click range selection
     const lastClickedId = useRef(null);
+
+    // Global context menu state
+    const [contextMenu, setContextMenu] = useState(null);
+    // Maintain hover appearance on row while its context menu is open for better visual feedback
+    const contextMenuRowId = contextMenu?.row?.id ?? null;
 
     // Reset virtualizer cache when rowHeight changes
     useEffect(() => {
@@ -158,11 +168,14 @@ export const Table = observer(
           predictions: out?.predictions,
         };
 
-        const onTaskLoad = async () => {
+        const onTaskLoad = async (options = {}) => {
           if (isFF(FF_LOPS_E_3) && type === "DE") {
             return new Promise((resolve) => resolve(out));
           }
-          const response = await api.task({ taskID: out.id });
+          const response = await api.task({
+            taskID: out.id,
+            resolve_uri: options.resolveUri ?? false,
+          });
 
           return response ?? {};
         };
@@ -172,14 +185,26 @@ export const Table = observer(
             look="string"
             className="w-6 h-6 p-0 text-primary-content hover:text-primary-content-hover"
             onClick={() => {
-              modal({
+              const modalInstance = modal({
                 title: `Source for task ${out?.id}`,
-                style: { width: 800 },
-                body: <TaskSourceView content={out} onTaskLoad={onTaskLoad} sdkType={type} />,
+                style: { width: 900 },
+                header: null, // Will be set by renderToggle
+                body: (
+                  <TaskSourceViewer
+                    content={out}
+                    onTaskLoad={onTaskLoad}
+                    sdkType={type}
+                    storageKey={getTaskSourceViewerStorageKey(projectId)}
+                    renderToggle={(toggle) => {
+                      // Update modal header with toggle
+                      modalInstance?.update({ header: toggle });
+                    }}
+                  />
+                ),
               });
             }}
-            leading={<Icon icon={IconCode} />}
-            tooltip="Show task source"
+            leading={<Icon icon={IconBraces} />}
+            tooltip="View Task Source"
           />
         );
       },
@@ -194,23 +219,75 @@ export const Table = observer(
       localStorage.setItem(colOrderKey, JSON.stringify(colOrder));
     }, [colOrder]);
 
+    // Store columns in a ref to avoid recreating handleContextMenu
+    const columnsRef = useRef(columns);
+    columnsRef.current = columns;
+
+    // Handle context menu - defined after columns are initialized
+    const handleContextMenu = useCallback((e, row) => {
+      e.preventDefault();
+      e.stopPropagation();
+
+      // Find which column was clicked (actual class: lsf-table__cell)
+      const cell = e.target.closest(".lsf-table__cell");
+      const cellIndex = cell ? Array.from(cell.parentElement.children).indexOf(cell) : -1;
+      const column = cellIndex >= 0 ? columnsRef.current[cellIndex] : null;
+
+      setContextMenu({
+        x: e.clientX,
+        y: e.clientY,
+        row,
+        column,
+      });
+    }, []); // Empty deps - stable callback
+
+    // Close context menu on click outside or escape
+    useEffect(() => {
+      if (!contextMenu) return;
+
+      const handleClose = (e) => {
+        // Don't close if clicking inside the menu
+        if (e.target.closest("[data-context-menu]")) return;
+        setContextMenu(null);
+      };
+
+      const handleEscape = (e) => {
+        if (e.key === "Escape") {
+          setContextMenu(null);
+        }
+      };
+
+      // Use capture phase and add slight delay to prevent immediate closing
+      const timerId = setTimeout(() => {
+        document.addEventListener("click", handleClose, true);
+        document.addEventListener("contextmenu", handleClose, true);
+        document.addEventListener("keydown", handleEscape);
+      }, 0);
+
+      return () => {
+        clearTimeout(timerId);
+        document.removeEventListener("click", handleClose, true);
+        document.removeEventListener("contextmenu", handleClose, true);
+        document.removeEventListener("keydown", handleEscape);
+      };
+    }, [contextMenu]);
+
     const contextValue = {
       columns,
       data,
       cellViews,
+      contextMenuRowId,
     };
 
     const headerHeight = 43;
 
     const renderTableToolbar = useCallback(() => {
       return (
-        <div className={cn("table-toolbar").mod({ visible: toolbarVisible }).toString()}>
+        <div className={cn("table-toolbar").mod({ visible: toolbarVisible }).toClassName()}>
           <FieldsButton
-            className={cn("table-toolbar").elem("customize-button").toString()}
-            wrapper={FieldsButton.Checkbox}
+            multiSelect={true}
             title={"Columns"}
             size="small"
-            trailingIcon={<Icon icon={IconChevronDown} />}
             tooltip={"Customize Columns"}
             data-testid="columns-picker-quickview"
           />
@@ -272,6 +349,7 @@ export const Table = observer(
                 width: props.fitContent ? "fit-content" : "auto",
               }}
               decoration={Decoration}
+              onContextMenu={handleContextMenu}
             />
           );
         }
@@ -292,6 +370,7 @@ export const Table = observer(
               width: props.fitContent ? "fit-content" : "auto",
             }}
             decoration={Decoration}
+            onContextMenu={handleContextMenu}
           />
         );
       },
@@ -306,6 +385,8 @@ export const Table = observer(
         view.selected.list,
         view.selected.all,
         isQuickView,
+        Decoration,
+        handleContextMenu,
       ],
     );
 
@@ -366,33 +447,48 @@ export const Table = observer(
     );
 
     return (
-      <div ref={tableWrapper} className={tableCN.mod({ fit: props.fitToContent }).toString()}>
-        {isQuickView && renderTableToolbar()}
-        <TableContext.Provider value={contextValue}>
-          <StickyList
-            ref={listRef}
-            overscanCount={10}
-            itemHeight={props.rowHeight}
-            totalCount={props.total}
-            itemCount={data.length + 1}
-            itemKey={itemKey}
-            innerElementType={innerElementType}
-            stickyItems={[0]}
-            stickyItemsHeight={[headerHeight]}
-            stickyComponent={renderTableHeader}
-            initialScrollOffset={initialScrollOffset}
-            isItemLoaded={isItemLoaded}
-            loadMore={props.loadMore}
-            toolbarHeight={toolbarHeight}
-            headerHeight={headerHeight}
-            isQuickView={isQuickView}
-            onScroll={handleScroll}
-            toolbarVisible={toolbarVisible}
-          >
-            {renderRow}
-          </StickyList>
-        </TableContext.Provider>
-      </div>
+      <>
+        <div ref={tableWrapper} className={tableCN.mod({ fit: props.fitToContent }).toClassName()}>
+          {isQuickView && renderTableToolbar()}
+          <TableContext.Provider value={contextValue}>
+            <StickyList
+              ref={listRef}
+              overscanCount={10}
+              itemHeight={props.rowHeight}
+              totalCount={props.total}
+              itemCount={data.length + 1}
+              itemKey={itemKey}
+              innerElementType={innerElementType}
+              stickyItems={[0]}
+              stickyItemsHeight={[headerHeight]}
+              stickyComponent={renderTableHeader}
+              initialScrollOffset={initialScrollOffset}
+              isItemLoaded={isItemLoaded}
+              loadMore={props.loadMore}
+              toolbarHeight={toolbarHeight}
+              headerHeight={headerHeight}
+              isQuickView={isQuickView}
+              onScroll={handleScroll}
+              toolbarVisible={toolbarVisible}
+            >
+              {renderRow}
+            </StickyList>
+          </TableContext.Provider>
+        </div>
+        {contextMenu &&
+          typeof document !== "undefined" &&
+          createPortal(
+            <ContextMenuPortal
+              contextMenu={contextMenu}
+              view={view}
+              onViewAnalytics={onViewAnalytics}
+              onViewReviewerAnalytics={onViewReviewerAnalytics}
+              RowContextMenuComponent={RowContextMenuComponent}
+              onClose={() => setContextMenu(null)}
+            />,
+            document.body,
+          )}
+      </>
     );
   },
 );
@@ -483,7 +579,7 @@ const StickyList = observer(
           itemData={itemData}
           itemSize={itemSize}
           initialScrollOffset={initialScrollOffset}
-          className={tableCN.elem("auto-size").mod({ "quick-view": isQuickView }).toString()}
+          className={tableCN.elem("auto-size").mod({ "quick-view": isQuickView }).toClassName()}
           onScroll={onScroll}
           heightAdjustment={heightAdjustment}
           {...rest}
@@ -513,7 +609,7 @@ const innerElementType = forwardRef(({ children, ...rest }, ref) => {
           <div ref={ref} {...rest}>
             {stickyItems.map((index) => (
               <StickyComponent
-                className={tableCN.elem("sticky-header").toString()}
+                className={tableCN.elem("sticky-header").toClassName()}
                 key={index}
                 index={index}
                 style={{
@@ -526,7 +622,7 @@ const innerElementType = forwardRef(({ children, ...rest }, ref) => {
             {isQuickView ? (
               <>
                 {toolbar}
-                <div className={tableCN.elem("body-rows").toString()}>{bodyRows}</div>
+                <div className={tableCN.elem("body-rows").toClassName()}>{bodyRows}</div>
               </>
             ) : (
               children
@@ -538,61 +634,25 @@ const innerElementType = forwardRef(({ children, ...rest }, ref) => {
   );
 });
 
-const TaskSourceView = ({ content, onTaskLoad, sdkType }) => {
-  const [source, setSource] = useState(content);
+// Context menu portal component - positioning now handled by Dropdown component
+const ContextMenuPortal = memo(
+  ({ contextMenu, view, onViewAnalytics, onViewReviewerAnalytics, onClose, RowContextMenuComponent }) => {
+    const MenuComponent = RowContextMenuComponent || RowContextMenu;
+    const { api, type, projectId } = useSDK();
 
-  useEffect(() => {
-    onTaskLoad().then((response) => {
-      const formatted = {
-        id: response.id,
-        data: response.data,
-      };
-
-      if (sdkType !== "DE") {
-        formatted.annotations = response.annotations ?? [];
-        formatted.predictions = response.predictions ?? [];
-      }
-      if (response.state) {
-        formatted.state = response.state;
-      }
-      setSource(formatted);
-    });
-  }, []);
-
-  const jsonString = useMemo(() => {
-    return source ? JSON.stringify(source, null, 2) : "";
-  }, [source]);
-
-  const [handleCopy, copied] = useCopyText({ defaultText: jsonString });
-
-  return (
-    <div
-      className="bg-neutral-surface rounded-small font-mono text-body-small leading-body-small overflow-auto max-h-[500px]"
-      style={{ position: "relative" }}
-    >
-      <div style={{ padding: "16px", paddingTop: "16px" }}>
-        <Tooltip title={copied ? "Copied!" : "Copy JSON"}>
-          <Button
-            look="string"
-            variant="neutral"
-            style={{
-              position: "absolute",
-              top: "8px",
-              right: "8px",
-              width: 32,
-              height: 32,
-              padding: 0,
-              zIndex: 10,
-              color: "var(--color-neutral-content-subtle)",
-            }}
-            onClick={() => handleCopy()}
-            leading={<Icon icon={IconCopyOutline} style={{ color: "var(--color-neutral-content-subtle)" }} />}
-          />
-        </Tooltip>
-        <pre className="m-0 whitespace-pre-wrap break-words max-w-full" style={{ marginRight: "40px" }}>
-          {jsonString}
-        </pre>
-      </div>
-    </div>
-  );
-};
+    return (
+      <MenuComponent
+        row={contextMenu.row}
+        column={contextMenu.column}
+        view={view}
+        api={api}
+        sdkType={type}
+        projectId={projectId}
+        onViewAnalytics={onViewAnalytics}
+        onViewReviewerAnalytics={onViewReviewerAnalytics}
+        cursorPosition={{ x: contextMenu.x, y: contextMenu.y }}
+        onClose={onClose}
+      />
+    );
+  },
+);

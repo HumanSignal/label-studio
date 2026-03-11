@@ -42,11 +42,8 @@ jest.mock("mobx-state-tree", () => ({
 // Mock the required dependencies
 jest.mock("react-virtualized-auto-sizer", () => ({
   __esModule: true,
-  default: ({
-    children,
-  }: {
-    children: (size: { width: number; height: number }) => React.ReactNode;
-  }) => children({ width: 1000, height: 800 }),
+  default: ({ children }: { children: (size: { width: number; height: number }) => React.ReactNode }) =>
+    children({ width: 1000, height: 800 }),
 }));
 
 jest.mock("react-window", () => {
@@ -68,11 +65,7 @@ jest.mock("react-window", () => {
           style,
           ...props
         }: {
-          children: (props: {
-            rowIndex: number;
-            columnIndex: number;
-            style: React.CSSProperties;
-          }) => React.ReactNode;
+          children: (props: { rowIndex: number; columnIndex: number; style: React.CSSProperties }) => React.ReactNode;
           width?: number;
           height?: number;
           rowHeight?: number;
@@ -108,10 +101,7 @@ jest.mock("react-window-infinite-loader", () => ({
   default: ({
     children,
   }: {
-    children: (props: {
-      onItemsRendered: () => void;
-      ref: React.RefObject<unknown>;
-    }) => React.ReactNode;
+    children: (props: { onItemsRendered: () => void; ref: React.RefObject<unknown> }) => React.ReactNode;
   }) => children({ onItemsRendered: jest.fn(), ref: jest.fn() }),
 }));
 

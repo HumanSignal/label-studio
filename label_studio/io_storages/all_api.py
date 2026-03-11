@@ -1,5 +1,5 @@
-"""This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
-"""
+"""This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license."""
+
 import logging
 
 from core.permissions import all_permissions
@@ -162,7 +162,6 @@ class AllImportStorageListAPI(generics.ListAPIView):
     ),
 )
 class AllExportStorageListAPI(generics.ListAPIView):
-
     parser_classes = (JSONParser, FormParser, MultiPartParser)
     permission_required = all_permissions.storages_view
 

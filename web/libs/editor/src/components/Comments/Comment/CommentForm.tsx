@@ -6,7 +6,6 @@ import { CommentBase } from "../../../stores/Comment/Comment";
 import { TextArea } from "../../../common/TextArea/TextArea";
 import type { ActionRefValue } from "../../../common/TextArea/TextArea";
 import { cn } from "../../../utils/bem";
-import { FF_DEV_3873, isFF } from "../../../utils/feature-flags";
 
 import { LinkState } from "./LinkState";
 import "./CommentForm.scss";
@@ -96,17 +95,11 @@ export const CommentForm: FC<CommentFormProps> = observer(({ commentStore, annot
   );
 
   useEffect(() => {
-    if (!isFF(FF_DEV_3873)) {
-      commentStore.setAddedCommentThisSession(false);
-      clearTooltipMessage();
-    }
     return () => clearTooltipMessage();
   }, []);
 
   useEffect(() => {
-    if (isFF(FF_DEV_3873)) {
-      commentStore.tooltipMessage && actionRef.current?.el?.current?.focus({ preventScroll: true });
-    }
+    commentStore.tooltipMessage && actionRef.current?.el?.current?.focus({ preventScroll: true });
   }, [commentStore.tooltipMessage]);
 
   useEffect(() => {

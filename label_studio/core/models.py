@@ -54,10 +54,10 @@ class DeletedRow(models.Model):
     Useful for using as backup for deleted rows, in case we need to restore them.
     """
 
-    model = models.CharField(max_length=1024)   # tasks.task, projects.project, etc.
-    row_id = models.IntegerField(null=True)   # primary key of the deleted row. task.id, project.id, etc.
-    data = JSONField(null=True, blank=True)   # serialized json of the deleted row.
-    reason = models.TextField(null=True, blank=True)   # reason for deletion.
+    model = models.CharField(max_length=1024)  # tasks.task, projects.project, etc.
+    row_id = models.IntegerField(null=True)  # primary key of the deleted row. task.id, project.id, etc.
+    data = JSONField(null=True, blank=True)  # serialized json of the deleted row.
+    reason = models.TextField(null=True, blank=True)  # reason for deletion.
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

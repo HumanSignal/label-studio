@@ -1,5 +1,5 @@
 ---
-title: OCR Labeling for PDFs
+title: OCR Labeling for PDFs 🔒
 type: templates
 category: Computer Vision
 cat: computer-vision
@@ -17,7 +17,7 @@ Each region stores normalized coordinates, rotation, and a page index, making ou
 Ideal for document intelligence, QA on OCR output, and structured data capture workflows. 
 
 !!! error Enterprise
-    This template can only be used with in Label Studio Enterprise.
+    This template requires the `OcrLabels` tag, which can only be used in Label Studio Enterprise.
 
 ![Screenshot](/images/templates-misc/pdf-opossum.png)
 

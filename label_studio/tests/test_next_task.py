@@ -1,5 +1,5 @@
-"""This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
-"""
+"""This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license."""
+
 import json
 import time
 from unittest import mock
@@ -144,9 +144,9 @@ def test_next_task(business_client, any_client, project_config, tasks, status_co
         for response_key, expected_value_set in expected_response_value_set.items():
             if expected_value_set == 'uncompleted_task_ids':
                 expected_value_set = uncompleted_task_ids
-            assert (
-                rdata[response_key] in expected_value_set
-            ), f'Failed on response {rdata}: expecting value set "{expected_value_set}" for key "{response_key}"'
+            assert rdata[response_key] in expected_value_set, (
+                f'Failed on response {rdata}: expecting value set "{expected_value_set}" for key "{response_key}"'
+            )
 
 
 @pytest.mark.parametrize(
@@ -460,7 +460,6 @@ def test_next_task_with_active_learning(
     status_code,
     prelabeling_result,
 ):
-
     project = make_project(project_config, business_client.user, use_ml_backend=False)
     if _client_is_annotator(any_client):
         invite_client_to_project(any_client, project)
@@ -1238,9 +1237,9 @@ def test_with_bad_annotation_result(business_client):
     make_async_annotation_submit(anns[0])
     # TODO: measuring response time is not a good way to do that,
     #  but dunno how to emulate async requests or timeouts for Django test client
-    assert (
-        time.time() - t
-    ) < 1, 'Time of annotation.submit() increases - that might be caused by redundant computations over the rest of the tasks - check that only a single task is affected by /api/tasks/<task_id>/annotations'
+    assert (time.time() - t) < 1, (
+        'Time of annotation.submit() increases - that might be caused by redundant computations over the rest of the tasks - check that only a single task is affected by /api/tasks/<task_id>/annotations'
+    )
 
     assert uncompleted_task.has_lock()  # Task has lock since it has annotation
 
@@ -1411,7 +1410,6 @@ class TestTryBreadthFirst(TestCase):
         assert result == task_3_gt
 
     def test_returns_none_when_no_tasks_with_annotations_and_evaluation_enabled(self):
-
         task_gt = TaskFactory(project=self.project_with_eval)
         AnnotationFactory(task=task_gt, ground_truth=True)
 

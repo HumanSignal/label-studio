@@ -67,13 +67,13 @@ def batch_update_with_retry(queryset, batch_size=500, max_retries=3, **update_fi
                     wait_time = 0.1 * (2**retry_count)  # Exponential backoff
                     logger.warning(
                         f'Deadlock detected, retry {retry_count}/{max_retries} '
-                        f'for batch {i}-{i+len(batch_ids)}. Waiting {wait_time}s...'
+                        f'for batch {i}-{i + len(batch_ids)}. Waiting {wait_time}s...'
                     )
                     time.sleep(wait_time)
                 else:
                     raise
         else:
-            logger.error(f'Failed to update batch after {max_retries} retries. ' f'Batch: {i}-{i+len(batch_ids)}')
+            logger.error(f'Failed to update batch after {max_retries} retries. Batch: {i}-{i + len(batch_ids)}')
             raise last_error
 
 

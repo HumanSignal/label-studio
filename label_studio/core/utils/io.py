@@ -1,5 +1,5 @@
-"""This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
-"""
+"""This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license."""
+
 import glob
 import importlib
 import io
@@ -264,7 +264,7 @@ def ssrf_safe_get(url, *args, **kwargs):
     validate_upload_url(url, block_local_urls=settings.SSRF_PROTECTION_ENABLED)
     # Reason for #nosec: url has been validated as SSRF safe by the
     # validation check above.
-    response = requests.get(url, *args, **kwargs)   # nosec
+    response = requests.get(url, *args, **kwargs)  # nosec
 
     # second check for SSRF for prevent redirect and dns rebinding attacks
     if settings.SSRF_PROTECTION_ENABLED:

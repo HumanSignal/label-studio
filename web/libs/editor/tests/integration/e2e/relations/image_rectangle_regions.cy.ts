@@ -101,9 +101,9 @@ describe("Relations: Image Rectangle Regions", () => {
     });
 
     ImageView.waitForImage();
-
+    cy.get("#Relations-draggable").click();
     Relations.hasRelations(0);
-
+    cy.get("#Regions-draggable").click();
     // Select the first region
     Sidebar.toggleRegionSelection(0);
 
@@ -114,6 +114,7 @@ describe("Relations: Image Rectangle Regions", () => {
     ImageView.clickAtRelative(0.51, 0.26);
 
     // Check that the region is created in the relations panel
+    cy.get("#Relations-draggable").click();
     Relations.hasRelations(1);
     Relations.hasRelation("Moonwalker", "Moonwalker 2");
 
@@ -148,9 +149,9 @@ describe("Relations: Image Rectangle Regions", () => {
     });
 
     ImageView.waitForImage();
-
+    cy.get("#Relations-draggable").click();
     Relations.hasRelations(0);
-
+    cy.get("#Regions-draggable").click();
     // With the relations action button not visible
     Sidebar.collapseDetailsRightPanel();
 
@@ -165,13 +166,13 @@ describe("Relations: Image Rectangle Regions", () => {
 
     // Check that the region is created in the relations panel
     Sidebar.expandDetailsRightPanel();
+    cy.get("#Relations-draggable").click();
     Relations.hasRelations(1);
     Relations.hasRelation("Moonwalker", "Moonwalker 2");
 
-    // Reslect the first region and create a relation with the third region
+    // Reslect the first region and create a relation with the third region (use hotkey; panel may not show button)
     ImageView.clickAtRelative(0.51, 0.06);
-
-    Relations.toggleCreation();
+    Relations.toggleCreationWithHotkey();
 
     // Select the third region
     ImageView.clickAtRelative(0.51, 0.46);
@@ -182,8 +183,7 @@ describe("Relations: Image Rectangle Regions", () => {
 
     // Create a relation between the last region and the first
     ImageView.clickAtRelative(0.51, 0.66);
-
-    Relations.toggleCreation();
+    Relations.toggleCreationWithHotkey();
 
     ImageView.clickAtRelative(0.51, 0.06);
 

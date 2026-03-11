@@ -2,7 +2,7 @@ import { observer } from "mobx-react";
 import { getRoot } from "mobx-state-tree";
 import { useCallback, useMemo } from "react";
 import { cn } from "../../../utils/bem";
-import { debounce } from "../../../utils/debounce";
+import { debounce } from "@humansignal/core/lib/utils/debounce";
 import { FilterDropdown } from "../FilterDropdown";
 import * as FilterInputs from "../types";
 import { allowedFilterOperations } from "../types/Utility";
@@ -80,7 +80,7 @@ export const FilterOperation = observer(({ filter, field, operator, value, disab
 
   return Input ? (
     <>
-      <div className={columnClass.mix("operation").toString()}>
+      <div className={columnClass.mix("operation").toClassName()}>
         <FilterDropdown
           placeholder="Condition"
           value={filter.operator}
@@ -89,7 +89,7 @@ export const FilterOperation = observer(({ filter, field, operator, value, disab
           onChange={onOperatorSelected}
         />
       </div>
-      <div className={columnClass.mix("value").toString()}>
+      <div className={columnClass.mix("value").toClassName()}>
         <Input
           {...field}
           key={`${filter.filter.id}-${filter.filter.currentType}`}

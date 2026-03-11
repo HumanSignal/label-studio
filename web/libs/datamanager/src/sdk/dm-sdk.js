@@ -42,10 +42,9 @@
 import { inject, observer } from "mobx-react";
 import { destroy } from "mobx-state-tree";
 import { unmountComponentAtNode } from "react-dom";
-import camelCase from "lodash/camelCase";
+import { camelCase } from "@humansignal/core/lib/utils/string";
 import { instruments } from "../components/DataManager/Toolbar/instruments";
 import { APIProxy } from "../utils/api-proxy";
-import { FF_LSDV_4620_3_ML, isFF } from "../utils/feature-flags";
 import { objectToMap } from "../utils/helpers";
 import { serializeJsonForUrl, deserializeJsonFromUrl } from "@humansignal/core";
 import { isDefined } from "../utils/utils";
@@ -191,6 +190,11 @@ export class DataManager {
     );
 
     Object.assign(this.tabControls, config.tabControls ?? {});
+
+    // Store LSE-specific callbacks and components
+    this.onViewAnalytics = config.onViewAnalytics;
+    this.onViewReviewerAnalytics = config.onViewReviewerAnalytics;
+    this.RowContextMenuComponent = config.RowContextMenuComponent;
 
     this.updateActions(config.actions);
 
@@ -453,9 +457,7 @@ export class DataManager {
   }
 
   destroy(detachCallbacks = true) {
-    if (isFF(FF_LSDV_4620_3_ML)) {
-      this.destroyLSF();
-    }
+    this.destroyLSF();
     unmountComponentAtNode(this.root);
 
     if (this.store) {

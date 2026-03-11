@@ -199,6 +199,8 @@ export interface KonvaVectorProps {
   pointStrokeSelected?: string;
   /** Point stroke width (default: 2) */
   pointStrokeWidth?: number;
+  /** Point style - "circle" or "rectangle" (default: "circle") */
+  pointStyle?: "circle" | "rectangle";
   /** Mouse down event handler */
   onMouseDown?: (e: KonvaEventObject<MouseEvent>) => void;
   /** Mouse move event handler */

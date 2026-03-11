@@ -34,30 +34,13 @@
 
 .row {
   display: flex;
-  margin-bottom: var(--spacing-base);
+  margin-bottom: var(--spacing-tight);
   flex-wrap: nowrap;
   align-items: center;
   gap: var(--spacing-tight);
 
-  .button {
-    display: flex;
-    flex: 0 0 32px;
-
-    &:hover {
-      background-color: var(--color-neutral-surface);
-    }
-
-    &_look {
-      &_danger {
-        &:hover {
-          background-color: var(--color-negative-emphasis-subtle);
-        }
-      }
-    }
-  }
-
-  // fix antd styles to resize textarea container and fix paddings
-  div[class~="ant-typography-edit-content"] {
+  /* fix antd styles to resize textarea container and fix paddings */
+  & div[class~="ant-typography-edit-content"] {
     flex-grow: 1;
     left: -1px;
     padding: 0;
@@ -66,8 +49,8 @@
     background-color: var(--color-neutral-surface);
     border-color: var(--color-neutral-border);
 
-    textarea {
-      // the same as in .mark, its padding set to 0
+    & textarea {
+      /* the same as in .mark, its padding set to 0 */
       padding: var(--spacing-tight) var(--spacing-base);
     }
   }
@@ -88,5 +71,4 @@
   border-color: var(--color-neutral-border-bold);
   box-shadow: 0 0 0 4px var(--color-primary-focus-outline);
 }
-
 

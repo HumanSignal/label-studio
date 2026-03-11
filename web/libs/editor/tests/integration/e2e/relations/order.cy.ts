@@ -97,15 +97,19 @@ describe("Relations: Sort Order all relations", () => {
   beforeEach(() => {
     LabelStudio.init({ config, task });
     ImageView.waitForImage();
+    cy.get("#Relations-draggable").click();
     Relations.hasRelations(0);
   });
 
   it("should exist and be disabled without existed relations", () => {
-    Relations.ascendingOrderRelationButton.should("be.visible").should("be.disabled");
+    // With 0 relations the Relations tab shows empty state (no order button)
+    cy.contains("Create relations between regions").should("be.visible");
   });
 
   it("should exist and be enabled with existed relations", () => {
+    cy.get("#Regions-draggable").click();
     Sidebar.toggleRegionSelection(0);
+    cy.get("#Relations-draggable").click();
     Relations.toggleCreation();
     ImageView.clickAtRelative(0.51, 0.26);
     Relations.hasRelations(1);
@@ -123,7 +127,9 @@ describe("Relations: Sort Order all relations", () => {
   });
 
   it("should sort relations in ascending order and descending order", () => {
+    cy.get("#Regions-draggable").click();
     Sidebar.toggleRegionSelection(0);
+    cy.get("#Relations-draggable").click();
     Relations.toggleCreation();
     ImageView.clickAtRelative(0.51, 0.26);
     Relations.hasRelations(1);
@@ -163,7 +169,9 @@ describe("Relations: Sort Order all relations", () => {
   });
 
   it("should have tooltip for ascending action", () => {
+    cy.get("#Regions-draggable").click();
     Sidebar.toggleRegionSelection(0);
+    cy.get("#Relations-draggable").click();
     Relations.toggleCreation();
     ImageView.clickAtRelative(0.51, 0.26);
     Relations.hasRelations(1);

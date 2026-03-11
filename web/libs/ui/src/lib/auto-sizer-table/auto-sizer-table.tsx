@@ -49,7 +49,10 @@ export const AutoSizerTable = forwardRef<VariableSizeList, AutoSizerTableProps>(
               {({
                 onItemsRendered,
                 ref: infiniteLoaderRef,
-              }: { onItemsRendered: (params: { startIndex: number; stopIndex: number }) => void; ref: any }) => {
+              }: {
+                onItemsRendered: (params: { startIndex: number; stopIndex: number }) => void;
+                ref: any;
+              }) => {
                 return (
                   <VariableSizeList
                     ref={infiniteLoaderRef}

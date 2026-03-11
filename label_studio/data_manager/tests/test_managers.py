@@ -3,6 +3,7 @@
 This file tests the core functionality of the excluded_fields_for_evaluation
 feature that optimizes task API performance by excluding expensive fields.
 """
+
 from unittest.mock import Mock, patch
 
 from django.test import TestCase
@@ -336,10 +337,10 @@ class TestGetQuerysetParameterPassing(TestCase):
         mock_prepare_params.request = Mock()
 
         # This should not raise any errors
-        with patch.object(manager, 'only_filtered') as mock_only_filtered, patch.object(
-            manager, 'annotate_queryset'
-        ) as mock_annotate:
-
+        with (
+            patch.object(manager, 'only_filtered') as mock_only_filtered,
+            patch.object(manager, 'annotate_queryset') as mock_annotate,
+        ):
             mock_queryset = Mock()
             mock_only_filtered.return_value = mock_queryset
             mock_annotate.return_value = mock_queryset
@@ -379,10 +380,10 @@ class TestGetQuerysetParameterPassing(TestCase):
         mock_prepare_params.project = 1
         mock_prepare_params.request = Mock()
 
-        with patch.object(manager, 'only_filtered') as mock_only_filtered, patch.object(
-            manager, 'annotate_queryset'
-        ) as mock_annotate:
-
+        with (
+            patch.object(manager, 'only_filtered') as mock_only_filtered,
+            patch.object(manager, 'annotate_queryset') as mock_annotate,
+        ):
             mock_queryset = Mock()
             mock_only_filtered.return_value = mock_queryset
             mock_annotate.return_value = mock_queryset

@@ -1,5 +1,5 @@
-"""This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
-"""
+"""This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license."""
+
 import io
 
 import pytest
@@ -32,7 +32,7 @@ def test_svg_upload_sanitize(setup_project_dialog):
 
     actual = FileUpload.objects.filter(id=r.data['file_upload_ids'][0]).last().file.read()
 
-    assert len(''.join(actual.decode('UTF-8').split())) > 100   # confirm not empty
+    assert len(''.join(actual.decode('UTF-8').split())) > 100  # confirm not empty
 
     assert ''.join(expected.split()) == ''.join(actual.decode('UTF-8').split())
 

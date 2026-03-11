@@ -59,6 +59,7 @@ export const FilterDropdown = observer(
         triggerClassName="whitespace-nowrap"
         searchFilter={searchFilter}
         isVirtualList={true}
+        virtualListMaxVisible={8}
         contentClassName={`${dropdownClassName || ""} filter-dropdown-content`.trim()}
       />
     );

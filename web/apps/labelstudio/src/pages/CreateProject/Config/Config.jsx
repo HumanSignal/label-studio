@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState, useRef } from "react";
 import CM from "codemirror";
-import { Button, cnm } from "@humansignal/ui";
-import { IconTrash } from "@humansignal/icons";
+import { Button, cnm, Typography } from "@humansignal/ui";
+import { IconTrash, IconInfoOutline } from "@humansignal/icons";
 import { ToggleItems } from "../../../components";
 import { Form, Input } from "../../../components/Form";
 import { useAPI } from "../../../providers/ApiProvider";
@@ -11,21 +11,63 @@ import { FF_UNSAVED_CHANGES, isFF } from "../../../utils/feature-flags";
 import { colorNames } from "./colors";
 import "./Config.scss";
 import { Preview } from "./Preview";
+import { LARGE_CONFIG_MESSAGE, LARGE_CONFIG_TAG_THRESHOLD, countConfigTags } from "@humansignal/core";
 import { DEFAULT_COLUMN, EMPTY_CONFIG, isEmptyConfig, Template } from "./Template";
 import { TemplatesList } from "./TemplatesList";
 
 import tags from "@humansignal/core/lib/utils/schema/tags.json";
 import { UnsavedChanges } from "./UnsavedChanges";
 import { Checkbox, CodeEditor, Select } from "@humansignal/ui";
-import snakeCase from "lodash/snakeCase";
+import { snakeCase } from "@humansignal/core";
 import { useConfigResizer } from "./useConfigResizer";
 import { EditorResizer } from "./EditorResizer";
 
 const wizardClass = cn("wizard");
 const configClass = cn("configure");
 
+/**
+ * AdaptivePreview - Shows manual update banner for large configs,
+ * normal auto-updating preview for smaller configs.
+ *
+ * When config has >= 200 tags, shows a banner with "Update Preview" button
+ * instead of auto-updating (avoids slow re-renders on every keystroke).
+ *
+ * Uses editorConfig when provided to detect large pasted content immediately.
+ *
+ * Wrapped in React.memo to prevent unnecessary re-renders when parent re-renders.
+ */
+const AdaptivePreview = React.memo(
+  ({ config, editorConfig, hasPendingUpdate, onUpdatePreview, isUpdating, previewKey, ...previewProps }) => {
+    // Use editor config for tag count when provided so banner appears as soon as user pastes large content
+    const configForTagCount = editorConfig !== undefined ? editorConfig : config;
+    const tagCount = useMemo(() => countConfigTags(configForTagCount || ""), [configForTagCount]);
+    const isLargeConfig = tagCount >= LARGE_CONFIG_TAG_THRESHOLD;
+
+    const showManualUpdateBanner = isLargeConfig;
+
+    const previewKeyProp = previewKey !== undefined ? previewKey : config;
+
+    if (showManualUpdateBanner) {
+      return (
+        <div className={configClass.elem("preview-container").toClassName()}>
+          <div className={configClass.elem("preview-info-banner").toClassName()}>
+            <IconInfoOutline width={16} height={16} />
+            <span>{LARGE_CONFIG_MESSAGE}</span>
+            <Button size="small" onClick={onUpdatePreview} waiting={isUpdating} disabled={isUpdating}>
+              {isUpdating ? "Updating..." : "Update Preview"}
+            </Button>
+          </div>
+          <Preview key={previewKeyProp} config={config} {...previewProps} />
+        </div>
+      );
+    }
+
+    return <Preview key={previewKeyProp} config={config} {...previewProps} />;
+  },
+);
+
 const EmptyConfigPlaceholder = () => (
-  <div className={configClass.elem("empty-config")}>
+  <div className={configClass.elem("empty-config").toClassName()}>
     <p>Your labeling configuration is empty. It is required to label your data.</p>
     <p>
       Start from one of our predefined templates or create your own config on the Code panel. The labeling config is
@@ -55,7 +97,7 @@ const Label = ({ label, template, color }) => {
         <label style={{ background: color }}>
           <Input
             type="color"
-            className={configClass.elem("label-color")}
+            className={configClass.elem("label-color").toClassName()}
             value={colorNames[color] || color}
             onChange={(e) => template.changeLabel(label, { background: e.target.value })}
           />
@@ -96,8 +138,8 @@ const ConfigureControl = ({ control, template }) => {
   };
 
   return (
-    <div className={configClass.elem("labels")}>
-      <form className={configClass.elem("add-labels")} action="">
+    <div className={configClass.elem("labels").toClassName()}>
+      <form className={configClass.elem("add-labels").toClassName()} action="">
         <h4>{tagname === "Choices" ? "Add choices" : "Add label names"}</h4>
         <span>Use new line as a separator to add multiple labels</span>
         <textarea
@@ -113,7 +155,7 @@ const ConfigureControl = ({ control, template }) => {
           Add
         </Button>
       </form>
-      <div className={configClass.elem("current-labels")}>
+      <div className={configClass.elem("current-labels").toClassName()}>
         <h3>
           {tagname === "Choices" ? "Choices" : "Labels"} ({control.children.length})
         </h3>
@@ -219,10 +261,10 @@ const ConfigureSettings = ({ template }) => {
   if (!items.filter(Boolean).length) return null;
 
   return (
-    <ul className={configClass.elem("settings")}>
+    <ul className={configClass.elem("settings").toClassName()}>
       <li>
         <h4>Configure settings</h4>
-        <ul className={configClass.elem("object-settings")}>{items}</ul>
+        <ul className={configClass.elem("object-settings").toClassName()}>{items}</ul>
       </li>
     </ul>
   );
@@ -316,13 +358,15 @@ const ConfigureColumns = ({ columns, template }) => {
   if (!template.objects.length) return null;
 
   return (
-    <div className={configClass.elem("object")}>
+    <div className={configClass.elem("object").toClassName()}>
       <h4>Configure data</h4>
       {template.objects.length > 1 && columns?.length > 0 && columns.length < template.objects.length && (
-        <p className={configClass.elem("object-error")}>This template requires more data then you have for now</p>
+        <p className={configClass.elem("object-error").toClassName()}>
+          This template requires more data then you have for now
+        </p>
       )}
       {columns?.length === 0 && (
-        <p className={configClass.elem("object-error")}>
+        <p className={configClass.elem("object-error").toClassName()}>
           To select which field(s) to label you need to upload the data. Alternatively, you can provide it using Code
           mode.
         </p>
@@ -395,14 +439,72 @@ const Configurator = ({
   const [loading, setLoading] = useState(false);
   // and only with them we'll update config in preview
   const [configToDisplay, setConfigToDisplay] = React.useState(config);
+  // Track if we're in manual update mode (for large configs)
+  // Once enabled, stays enabled until user clicks "Update Preview"
+  const [manualUpdateMode, setManualUpdateMode] = React.useState(false);
+  // Track if config has changed since last preview update
+  const [hasPendingChanges, setHasPendingChanges] = React.useState(false);
+  // Track the last config that was successfully validated and displayed
+  const lastValidatedConfig = React.useRef(null);
+  // Increment when configToDisplay changes so Preview remounts and LSF initializes with new config (avoids stale/empty main area)
+  const [previewKey, setPreviewKey] = React.useState(0);
 
   const debounceTimer = React.useRef();
   const api = useAPI();
 
   React.useEffect(() => {
-    // config may change during init, so wait for that, but for a very short time only
-    debounceTimer.current = window.setTimeout(() => setConfigToCheck(config), configToCheck ? 500 : 30);
+    const tagCount = countConfigTags(config);
+    const isLargeConfig = tagCount >= LARGE_CONFIG_TAG_THRESHOLD;
+    const hasCompletedFirstValidation = lastValidatedConfig.current !== null;
+
+    // Always validate if we haven't completed the first validation yet
+    if (!hasCompletedFirstValidation) {
+      if (isLargeConfig) {
+        setManualUpdateMode(true);
+      }
+      debounceTimer.current = window.setTimeout(() => {
+        setConfigToCheck(config);
+      }, 300);
+      return () => window.clearTimeout(debounceTimer.current);
+    }
+
+    // After first validation: if we're in manual mode, either update (when config became small) or mark pending
+    if (manualUpdateMode) {
+      if (!isLargeConfig) {
+        setManualUpdateMode(false);
+        setHasPendingChanges(false);
+        debounceTimer.current = window.setTimeout(() => {
+          setConfigToCheck(config);
+        }, 300);
+        return () => window.clearTimeout(debounceTimer.current);
+      }
+      setHasPendingChanges(true);
+      return;
+    }
+
+    // Enter manual mode for large configs (no auto-update; user clicks "Update Preview")
+    if (isLargeConfig) {
+      setManualUpdateMode(true);
+      setHasPendingChanges(true);
+      return;
+    }
+
+    // Normal debounced auto-update for small configs
+    debounceTimer.current = window.setTimeout(() => {
+      setConfigToCheck(config);
+    }, 300);
+
     return () => window.clearTimeout(debounceTimer.current);
+  }, [config, manualUpdateMode]);
+
+  // Handler for manual preview update (used for large configs)
+  const handleManualUpdate = React.useCallback(() => {
+    const tagCount = countConfigTags(config);
+    const isLargeConfig = tagCount >= LARGE_CONFIG_TAG_THRESHOLD;
+
+    setManualUpdateMode(isLargeConfig);
+    setHasPendingChanges(false);
+    setConfigToCheck(config);
   }, [config]);
 
   React.useEffect(() => {
@@ -436,6 +538,9 @@ const Configurator = ({
       if (sample && !sample.error) {
         setData(sample.sample_task);
         setConfigToDisplay(configToCheck);
+        setPreviewKey((k) => k + 1);
+        // Track that we've completed a successful validation
+        lastValidatedConfig.current = configToCheck;
       } else {
         // @todo validation can be done in this place,
         // @todo but for now it's extremely slow in /sample-task endpoint
@@ -505,8 +610,17 @@ const Configurator = ({
     });
   }
 
+  // Memoize error to prevent AdaptivePreview re-renders when error hasn't changed
+  const previewError = useMemo(
+    () => parserError || error || (configure === "code" && warning) || null,
+    [parserError, error, configure, warning],
+  );
+
+  // When validating a different config, show placeholder to avoid race: old preview + spinners / empty state
+  const showUpdatingPlaceholder = loading && configToCheck != null && configToCheck !== configToDisplay;
+
   const extra = (
-    <p className={configClass.elem("tags-link")}>
+    <p className={configClass.elem("tags-link").toClassName()}>
       Configure the labeling interface with tags.&nbsp;
       <a href="https://labelstud.io/tags/" target="_blank" rel="noreferrer">
         See all tags
@@ -539,7 +653,7 @@ const Configurator = ({
             </Button>
             <ToggleItems items={{ code: "Code", visual: "Visual" }} active={configure} onSelect={onSelect} />
           </header>
-          <div className={configClass.elem("editor")}>
+          <div className={configClass.elem("editor").toClassName()}>
             {configure === "code" && (
               <div className={cnm(configClass.elem("code").toClassName(), configure !== "code" ? "!hidden" : "")}>
                 <CodeEditor
@@ -561,6 +675,8 @@ const Configurator = ({
                       "' '": completeIfInTag,
                       "'='": completeIfInTag,
                       "Ctrl-Space": "autocomplete",
+                      "Ctrl-F": "findPersistent",
+                      "Cmd-F": "findPersistent",
                     },
                     hintOptions: { schemaInfo: tags },
                   }}
@@ -605,14 +721,31 @@ const Configurator = ({
             editorWidthPixels={editorWidthPixels}
             onResize={setEditorWidthPixels}
             constraints={constraints}
+            disabled={constraints.minEditorWidth >= constraints.maxEditorWidth}
           />
-          <Preview
-            config={configToDisplay}
-            data={data}
-            project={project}
-            loading={loading}
-            error={parserError || error || (configure === "code" && warning)}
-          />
+          {showUpdatingPlaceholder ? (
+            <div
+              className={configClass.elem("preview-container").toClassName()}
+              data-testid="preview-updating-placeholder"
+            >
+              <div className={configClass.elem("preview-updating").toClassName()}>
+                <Typography color="secondary">Updating preview…</Typography>
+              </div>
+            </div>
+          ) : (
+            <AdaptivePreview
+              config={configToDisplay}
+              editorConfig={config}
+              data={data}
+              project={project}
+              loading={loading}
+              error={previewError}
+              hasPendingUpdate={manualUpdateMode}
+              onUpdatePreview={handleManualUpdate}
+              isUpdating={loading}
+              previewKey={previewKey}
+            />
+          )}
         </div>
       </div>
     </div>
@@ -646,20 +779,24 @@ export const ConfigPage = ({
   );
 
   const setConfig = React.useCallback(
-    (config) => {
-      _setConfig(config);
-      onUpdate(config);
+    (newConfig) => {
+      _setConfig(newConfig);
+      onUpdate(newConfig);
     },
     [_setConfig, onUpdate],
   );
 
+  // setTemplate - handles both config state and Template object creation
   const setTemplate = React.useCallback(
-    (config) => {
-      const tpl = new Template({ config });
-
-      tpl.onConfigUpdate = setConfig;
-      setConfig(config);
-      setCurrentTemplate(tpl);
+    (newConfig) => {
+      setConfig(newConfig);
+      try {
+        const tpl = new Template({ config: newConfig });
+        tpl.onConfigUpdate = setConfig;
+        setCurrentTemplate(tpl);
+      } catch (e) {
+        console.error("Template parsing error:", e);
+      }
     },
     [setConfig, setCurrentTemplate],
   );

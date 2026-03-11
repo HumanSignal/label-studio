@@ -47,6 +47,8 @@ export interface DropdownProps {
   dropdownClassName?: string;
   /** Data-testid attribute for testing */
   dataTestId?: string;
+  /** Custom data attributes for the dropdown element */
+  dataAttributes?: Record<string, string>;
   /** Custom styles for dropdown element */
   style?: CSSProperties;
   /** Dropdown content */
@@ -71,7 +73,7 @@ const DropdownComponent = forwardRef<DropdownRef, DropdownProps>(
     const rootName = cn("dropdown");
 
     const dropdown = useRef<HTMLElement>();
-    const { triggerRef, minIndex } = useContext(DropdownContext) ?? {};
+    const { triggerRef, minIndex, cursorPosition } = useContext(DropdownContext) ?? {};
     const isInline = triggerRef === undefined;
 
     const { children } = props;
@@ -101,8 +103,9 @@ const DropdownComponent = forwardRef<DropdownRef, DropdownProps>(
 
     // Determine if anchor positioning should be used
     // Only enable when browser supports it AND there's a trigger element to anchor to
+    // AND we're not using cursor positioning (which requires JS positioning)
     const hasTrigger = triggerRef?.current != null;
-    const isAnchorEnabled = supportsAnchorPositioning && hasTrigger;
+    const isAnchorEnabled = supportsAnchorPositioning && hasTrigger && !cursorPosition;
 
     // Set anchor-name on trigger element for CSS anchor positioning
     useEffect(() => {
@@ -142,7 +145,43 @@ const DropdownComponent = forwardRef<DropdownRef, DropdownProps>(
 
     const calculatePosition = useCallback(() => {
       const dropdownEl = dropdown.current!;
+
+      // For cursor positioning, place menu directly at cursor with smart boundary detection
+      if (cursorPosition) {
+        const rect = dropdownEl.getBoundingClientRect();
+        const viewportWidth = window.innerWidth;
+        const viewportHeight = window.innerHeight;
+
+        let left = cursorPosition.x;
+        let top = cursorPosition.y;
+
+        // Adjust if menu would go off right edge
+        if (left + rect.width > viewportWidth) {
+          left = Math.max(0, viewportWidth - rect.width - 10);
+        }
+
+        // Adjust if menu would go off bottom edge
+        if (top + rect.height > viewportHeight) {
+          top = Math.max(0, viewportHeight - rect.height - 10);
+        }
+
+        setOffset({ left, top });
+
+        if (props.constrainHeight) {
+          const availableHeight = viewportHeight - top - 10;
+          // Only set maxHeight if menu would actually overflow
+          if (rect.height > availableHeight) {
+            setMaxHeight(availableHeight);
+          } else {
+            setMaxHeight(undefined);
+          }
+        }
+        return;
+      }
+
+      // Use trigger element positioning for non-cursor modes
       const parent = (triggerRef?.current ?? dropdownEl.parentNode) as HTMLElement;
+
       const result = alignElements(
         parent!,
         dropdownEl,
@@ -158,7 +197,14 @@ const DropdownComponent = forwardRef<DropdownRef, DropdownProps>(
       if (props.constrainHeight && result.maxHeight) {
         setMaxHeight(result.maxHeight);
       }
-    }, [triggerRef, minIndex, props.alignment, props.constrainHeight, props.openUpwardForShortViewport]);
+    }, [
+      triggerRef,
+      minIndex,
+      props.alignment,
+      props.constrainHeight,
+      props.openUpwardForShortViewport,
+      cursorPosition,
+    ]);
 
     const performAnimation = useCallback(
       async (visible = false, disableAnimation?: boolean) => {
@@ -203,7 +249,6 @@ const DropdownComponent = forwardRef<DropdownRef, DropdownProps>(
 
         if (currentVisible !== newState) {
           props.onToggle?.(newState);
-          const animStart = performance.now();
           await performAnimation(newState, disableAnimation);
           setVisible(newState);
           props.onVisibilityChanged?.(newState);
@@ -249,12 +294,18 @@ const DropdownComponent = forwardRef<DropdownRef, DropdownProps>(
     }, [visible]);
 
     useEffect(() => {
-      // Calculate position if anchor positioning is not supported
-      // OR if constrainHeight is enabled (we need maxHeight calculation)
-      if (!isInline && visibility === "before-appear" && (!supportsAnchorPositioning || props.constrainHeight)) {
+      // Calculate position if:
+      // - Anchor positioning is not supported, OR
+      // - constrainHeight is enabled (we need maxHeight calculation), OR
+      // - Using cursor positioning (requires JS positioning)
+      if (
+        !isInline &&
+        (visibility === "before-appear" || (visibility === "visible" && cursorPosition)) &&
+        (!supportsAnchorPositioning || props.constrainHeight || cursorPosition)
+      ) {
         calculatePosition();
       }
-    }, [visibility, calculatePosition, isInline, supportsAnchorPositioning, props.constrainHeight]);
+    }, [visibility, calculatePosition, isInline, supportsAnchorPositioning, props.constrainHeight, cursorPosition]);
 
     useEffect(() => {
       if (props.enabled === false) performAnimation(false);
@@ -362,19 +413,27 @@ const DropdownComponent = forwardRef<DropdownRef, DropdownProps>(
         anchorStyles.positionTryFallbacks = fallbacks.join(", ");
       }
 
-      return {
+      const styles = {
         // Apply anchor positioning styles OR JS-calculated offset for fallback
         ...(useAnchor ? anchorStyles : (offset ?? {})),
+        // When not using anchor positioning with cursor, ensure fixed positioning
+        ...(!useAnchor && cursorPosition
+          ? {
+              position: "fixed",
+              positionAnchor: "none",
+              positionTryFallbacks: "none",
+            }
+          : {}),
         zIndex: (minIndex ?? 0) + dropdownZIndex,
         // Apply width sync if enabled (only for fallback when anchor positioning is not used)
         ...(!useAnchor && props.syncWidth && triggerWidth ? { width: triggerWidth, minWidth: triggerWidth } : {}),
-        // Apply height constraint when enabled
-        // Always apply maxHeight for constrainHeight since CSS can't do dynamic calculations
-        // Subtract 8px for bottom padding when constrainHeight is enabled
-        ...(props.constrainHeight && maxHeight ? { maxHeight: maxHeight - 8 } : {}),
+        // Apply height constraint when enabled (only when menu would overflow)
+        ...(props.constrainHeight && maxHeight ? { maxHeight } : {}),
         // props.style last so it can override positioning if needed
         ...(props.style ?? {}),
       };
+
+      return styles;
     }, [
       props.style,
       props.alignment,
@@ -387,6 +446,7 @@ const DropdownComponent = forwardRef<DropdownRef, DropdownProps>(
       triggerWidth,
       props.constrainHeight,
       maxHeight,
+      cursorPosition,
     ]);
 
     // Only render content when dropdown has been opened at least once
@@ -397,6 +457,7 @@ const DropdownComponent = forwardRef<DropdownRef, DropdownProps>(
       <div
         ref={dropdown as any}
         data-testid={props.dataTestId}
+        {...(props.dataAttributes || {})}
         className={rootName
           .mod({
             "sync-width": props.syncWidth,

@@ -1,7 +1,7 @@
 import { getEnv, getSnapshot, getType, types } from "mobx-state-tree";
 import { observer } from "mobx-react";
 import { Tool } from "../components/Toolbar/Tool";
-import kebabCase from "lodash/kebabCase";
+import { kebabCase } from "@humansignal/core/lib/utils/string";
 
 const ToolView = observer(({ item }) => {
   return (

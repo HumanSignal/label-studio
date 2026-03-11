@@ -1,5 +1,5 @@
-"""This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
-"""
+"""This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license."""
+
 import logging
 import os
 from copy import deepcopy
@@ -13,7 +13,6 @@ logger = logging.getLogger(__name__)
 
 
 class JSONStorage(BaseStorage):
-
     description = 'JSON task file'
 
     def __init__(self, **kwargs):
@@ -86,7 +85,6 @@ def already_exists_error(what, path):
 
 
 class DirJSONsStorage(BaseStorage):
-
     description = 'Directory with JSON task files'
 
     def __init__(self, **kwargs):
@@ -160,7 +158,6 @@ class DirJSONsStorage(BaseStorage):
 
 
 class TasksJSONStorage(JSONStorage):
-
     form = BaseForm
     description = 'Local [loading tasks from "tasks.json" file]'
 
@@ -171,7 +168,6 @@ class TasksJSONStorage(JSONStorage):
 
 
 class ExternalTasksJSONStorage(CloudStorage):
-
     form = BaseForm
     description = 'Local [loading tasks from "tasks.json" file]'
 
@@ -276,7 +272,6 @@ class ExternalTasksJSONStorage(CloudStorage):
 
 
 class AnnotationsDirStorage(DirJSONsStorage):
-
     form = BaseForm
     description = 'Local [annotations are in "annotations" directory]'
 

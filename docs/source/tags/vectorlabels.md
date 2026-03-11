@@ -1,6 +1,6 @@
 ---
-title: VectorLabels - Beta 🧪
-short: VectorLabels 🧪
+title: VectorLabels
+short: VectorLabels
 type: tags
 order: 433
 meta_title: Vector Label Tag for Labeling Vectors in Images
@@ -19,14 +19,16 @@ Use with the following data types: image.
 |------------------------------|-------------|
 | **Add points**               | Click on empty space. |
 | **Add points to path segments** | Press <code>Shift</code> while clicking on a segment that is between two points. |
-| **End or exit the path**     | Press <code>Esc</code> or click on the last point you added to the path. |
-| **Move points**              | <ul><li>If you are actively creating the path, simply backtrack and click a point and drag to reposition.</li><li>If you have already exited the path, first select it again and then click an existing point to drag.</li></ul> |
+| **End or exit the path**     | Press <code>Esc</code> or double-click on the last point you added to the path. |
+| **Move points**              | Simply click a point and drag to reposition. |
 | **Delete points**            | Press <code>Alt</code> or <code>Option</code> and click on an existing point. |
 
 !!! note
     <span id="region-note">Several options require you to complete the path and then re-select it as a region.</span> 
     
-    To do this, you must first exit the path and then reselect it by clicking on a segment within the path or by clicking it under the **Regions** panel. 
+    The easiest way to handle this is to enable **Select region after creating it** in your labeling settings (found below the labeling interface in the labeling stream and Quick View). 
+    
+    You can also first exit the path and then reselect it by clicking on a segment within the path or by clicking it under the **Regions** panel. 
 
     Selected paths are highlighted red. For this reason, you should avoid red when choosing label colors for your vector paths.
 
@@ -35,30 +37,18 @@ Use with the following data types: image.
 
 ### Multi-select
 
-With multi-select, you can drag multiple points to reposition or rotate them. 
+With multi-select, you can drag multiple points to reposition or resize them. 
 
-![Screenshot](/images/tags/vector-multi.png)
+<video style="max-width: 600px;" class="gif-border" autoplay loop muted>
+      <source src="/images/tags/vector-move.mp4">
+</video>
 
 | Action                   | Instruction |
 |---------------------------|-------------|
 | **Select multiple points** | <ul><li>To select all points in the path, press <code>Cmd</code> or <code>Ctrl</code> and then click any point in the path.</li><li>To select individual points in a path, first select the path as a region (<a href="#region-note">see the note above</a>). Then press <code>Cmd</code> or <code>Ctrl</code> as you click points.</li></ul> |
-| **Transform selection**   | Use transformer handles for rotation, scaling, and translation |
+| **Select multiple paths** | Use the move tool (the arrow) to click and drag multiple paths/shapes. |
+| **Resize multiple paths** | Use the move tool (the arrow) to select multiple paths and then click and drag points in the selection box |
 | **Clear selection**       | Click on any point or press <code>Esc</code>. | 
-
-
-### Bézier curves
-
-To use Bezier curves, you must enable them using the `curves="true"` parameter in your labeling configuration. Control points are shown when editing bezier points.
-
-![Screenshot](/images/tags/vector-bezier.png)
-
-| Action                 | Instruction                                                                 |
-|-------------------------|-----------------------------------------------------------------------------|
-| **Create a curve**      | As you click to add a point, hold while dragging your cursor.               |
-| **Create a new curve point** | Press `Shift` while dragging a control point.                          |
-| **Adjust a curve**      | First exit the path and then [re-select it as a region](#region-note). Then you can click and drag control points. |
-| **Convert a point to a curve**| Press `Shift` and click the point once. |
-| **Asymmetric curves**   | By default, the control points move in sync. To create asymmetric curves (only move one control point), press `Alt` or `Option` before clicking the control point. |
 
 ### Closed paths
 
@@ -68,8 +58,8 @@ You can create closed paths to create polygon shapes. To create closed paths, us
 
 | Action                 | Instruction                                                                 |
 |-------------------------|-----------------------------------------------------------------------------|
-| **Break closed path**   | Press `Alt` or `Option` and click on a segment in a closed path to reopen it.       |
-
+| **Close the path**   | Double-click on your final point. This automatically adds a segment between your first point and final point.      |
+| **Break closed path**   | Press `Alt` or `Option` and click on a vector segment in a closed path to reopen it.  Click on a point to delete the point.      |
 
 ### Skeleton
 
@@ -94,7 +84,7 @@ When enabled, new points connect to the active point and not the last added poin
 </View>
 ```
 
-### Polygon with Bezier support
+### Closed polygon 
 
 ```html
 <View>
@@ -103,7 +93,6 @@ When enabled, new points connect to the active point and not the last added poin
    name="polygons"
    toName="image"
    closable="true"
-   curves="true"
    minPoints="3"
    maxPoints="20"
  >
@@ -123,7 +112,6 @@ When enabled, new points connect to the active point and not the last added poin
    toName="image"
    skeleton="true"
    closable="false"
-   curves="true"
  >
    <Label value="Tree" />
    <Label value="Branch" />
@@ -141,7 +129,6 @@ When enabled, new points connect to the active point and not the last added poin
    name="keypoints"
    toName="image"
    closable="false"
-   curves="false"
    minPoints="1"
    maxPoints="1"
  >
@@ -152,7 +139,7 @@ When enabled, new points connect to the active point and not the last added poin
 </View>
 ```
 
-### Constrained drawing
+### Point-constrained drawing
 
 ```html
 <View>
@@ -161,8 +148,6 @@ When enabled, new points connect to the active point and not the last added poin
    name="constrained"
    toName="image"
    closable="true"
-   curves="true"
-   constraintoBounds="true"
    snap="pixel"
    minPoints="4"
    maxPoints="12"

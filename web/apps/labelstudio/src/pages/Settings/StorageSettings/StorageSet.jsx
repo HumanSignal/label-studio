@@ -125,7 +125,7 @@ export const StorageSet = forwardRef(
 
     return (
       <Columns.Column title={title}>
-        <div className={rootClass.elem("controls")}>
+        <div className={rootClass.elem("controls").toClassName()}>
           <Button
             onClick={() => showStorageFormModal()}
             disabled={loading}
@@ -138,7 +138,7 @@ export const StorageSet = forwardRef(
         </div>
 
         {loading && !loaded ? (
-          <div className={rootClass.elem("empty")}>
+          <div className={rootClass.elem("empty").toClassName()}>
             <Spinner size={32} />
           </div>
         ) : storagesLoaded && storages.length === 0 ? null : (

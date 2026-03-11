@@ -15,7 +15,7 @@
   }
 
   &.invalid {
-    input {
+    & input {
       color: var(--color-negative-content);
     }
   }

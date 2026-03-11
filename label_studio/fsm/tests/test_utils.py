@@ -69,7 +69,7 @@ class TestUUID7Utils(TestCase):
         time_diff_after = abs((extracted_timestamp - after).total_seconds())
 
         assert time_diff_before < 1.0  # Within 1 second of before
-        assert time_diff_after < 1.0   # Within 1 second of after
+        assert time_diff_after < 1.0  # Within 1 second of after
 
     def test_uuid7_from_timestamp(self):
         """Test creating UUID7 from specific timestamp"""
@@ -121,7 +121,7 @@ class TestUUID7Utils(TestCase):
         time_diff_after = abs((end_extracted - after_call).total_seconds())
 
         assert time_diff_before < 1.0  # Within 1 second of before_call
-        assert time_diff_after < 1.0   # Within 1 second of after_call
+        assert time_diff_after < 1.0  # Within 1 second of after_call
 
     def test_validate_uuid7_with_other_versions(self):
         """Test UUID7 validation with other UUID versions"""

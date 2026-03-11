@@ -1,5 +1,4 @@
 import hashlib
-import io
 import json
 import logging
 import pathlib
@@ -40,7 +39,7 @@ class ExportMixin:
         return self.project.has_permission(user)
 
     def get_default_title(self):
-        return f"{self.project.title.replace(' ', '-')}-at-{dateformat.format(timezone.now(), 'Y-m-d-H-i')}"
+        return f'{self.project.title.replace(" ", "-")}-at-{dateformat.format(timezone.now(), "Y-m-d-H-i")}'
 
     def _get_filtered_tasks(self, tasks, task_filter_options=None):
         """
@@ -235,7 +234,7 @@ class ExportMixin:
             for ids in batch(task_ids, BATCH_SIZE):
                 i += 1
                 tasks = list(self.get_task_queryset(ids, annotation_filter_options))
-                logger.debug(f'Batch: {i*BATCH_SIZE}')
+                logger.debug(f'Batch: {i * BATCH_SIZE}')
                 if isinstance(task_filter_options, dict) and task_filter_options.get('only_with_annotations'):
                     tasks = [task for task in tasks if task.annotations.exists()]
 
@@ -260,7 +259,7 @@ class ExportMixin:
 
     @staticmethod
     def eval_md5(file):
-        md5_object = hashlib.md5()   # nosec
+        md5_object = hashlib.md5()  # nosec
         block_size = 128 * md5_object.block_size
         chunk = file.read(block_size)
         while chunk:
@@ -342,6 +341,14 @@ class ExportMixin:
             )
 
     def convert_file(self, to_format, download_resources=False, hostname=None):
+        logger.info(
+            ('Starting export conversion: export_id=%s project_id=%s to_format=%s download_resources=%s hostname=%s'),
+            self.id,
+            self.project_id,
+            to_format,
+            download_resources,
+            hostname,
+        )
         with get_temp_dir() as tmp_dir:
             OUT = 'out'
             out_dir = pathlib.Path(tmp_dir) / OUT
@@ -359,30 +366,77 @@ class ExportMixin:
             input_name = pathlib.Path(self.file.name).name
             input_file_path = pathlib.Path(tmp_dir) / input_name
 
-            with open(input_file_path, 'wb') as file_:
-                file_.write(self.file.open().read())
+            logger.info(
+                'Staging export input for conversion: export_id=%s input_name=%s input_path=%s',
+                self.id,
+                input_name,
+                input_file_path,
+            )
+            with self.file.open() as file_in, open(input_file_path, 'wb') as file_out:
+                shutil.copyfileobj(file_in, file_out)
+            logger.info(
+                'Input staged for conversion: export_id=%s input_size_bytes=%s',
+                self.id,
+                input_file_path.stat().st_size,
+            )
 
+            logger.info(
+                'Running converter: export_id=%s to_format=%s output_dir=%s',
+                self.id,
+                to_format,
+                out_dir,
+            )
             converter.convert(input_file_path, out_dir, to_format, is_dir=False)
+            logger.info('Converter finished: export_id=%s to_format=%s', self.id, to_format)
 
             files = get_all_files_from_dir(out_dir)
             dirs = get_all_dirs_from_dir(out_dir)
+            logger.info(
+                'Conversion output discovered: export_id=%s files=%s dirs=%s',
+                self.id,
+                len(files),
+                len(dirs),
+            )
 
             if len(files) == 0 and len(dirs) == 0:
+                logger.info('Conversion has no output: export_id=%s to_format=%s', self.id, to_format)
                 return None
             elif len(files) == 1 and len(dirs) == 0:
                 output_file = files[0]
                 filename = pathlib.Path(input_name).stem + pathlib.Path(output_file).suffix
+                output_kind = 'single_file'
             else:
                 shutil.make_archive(out_dir, 'zip', out_dir)
                 output_file = pathlib.Path(tmp_dir) / (str(out_dir.stem) + '.zip')
                 filename = pathlib.Path(input_name).stem + '.zip'
+                output_kind = 'zip_archive'
 
-            # TODO(jo): can we avoid the `f.read()` here?
+            logger.info(
+                (
+                    'Streaming conversion output to temporary file: export_id=%s output_kind=%s '
+                    'output_file=%s output_size_bytes=%s final_name=%s'
+                ),
+                self.id,
+                output_kind,
+                output_file,
+                pathlib.Path(output_file).stat().st_size,
+                filename,
+            )
+            result_file = tempfile.NamedTemporaryFile(
+                suffix=pathlib.Path(filename).suffix,
+                dir=settings.FILE_UPLOAD_TEMP_DIR,
+            )
             with open(output_file, mode='rb') as f:
-                return File(
-                    io.BytesIO(f.read()),
-                    name=filename,
-                )
+                shutil.copyfileobj(f, result_file)
+            result_size = result_file.tell()
+            result_file.seek(0)
+            logger.info(
+                'Conversion file ready: export_id=%s filename=%s size_bytes=%s',
+                self.id,
+                filename,
+                result_size,
+            )
+            return File(result_file, name=filename)
 
 
 def export_background(

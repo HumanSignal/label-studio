@@ -16,11 +16,11 @@
   max-width: 300px;
   line-height: 16px;
 
-  p {
+  & p {
     margin-bottom: 4px;
   }
 
-  p:last-child {
+  & p:last-child {
     margin-bottom: 0;
   }
 }

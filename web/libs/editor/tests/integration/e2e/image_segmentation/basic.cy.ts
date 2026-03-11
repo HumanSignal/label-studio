@@ -56,6 +56,8 @@ describe("Basic Image scenario", () => {
     ImageView.drawRect(20, 20, 100, 100);
 
     Sidebar.hasRegions(1);
-    ImageView.canvasShouldChange("canvas", 0);
+    // Brief wait for canvas to repaint to reduce screenshot-comparison flakiness
+    cy.wait(200);
+    ImageView.canvasShouldChange("canvas", 0.001);
   });
 });

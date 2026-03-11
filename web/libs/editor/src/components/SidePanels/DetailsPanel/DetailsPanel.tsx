@@ -156,6 +156,18 @@ const InfoTab: FC<any> = inject("store")(
   }),
 );
 
+/**
+ * Custom panel - a placeholder for rendering custom content via React portals.
+ * Used by ReactCode tag with sidebar=true to render iframe content in the side panel.
+ */
+const CustomTab: FC<any> = function CustomTab(): JSX.Element {
+  return (
+    <div className={cn("custom").toClassName()}>
+      <div id="react-code-sidebar-portal" className={cn("custom").elem("section-tab").toClassName()} />
+    </div>
+  );
+};
+
 const GeneralPanel: FC<any> = inject("store")(
   observer(function GeneralPanel({ store, currentEntity }: any): JSX.Element {
     const { relationStore } = currentEntity;
@@ -220,5 +232,6 @@ export const Comments = CommentsTab;
 export const History = HistoryTab;
 export const Relations = RelationsTab;
 export const Info = InfoTab;
+export const Custom = CustomTab;
 export const Details = observer(DetailsComponent);
 export const DetailsPanel = observer(DetailsPanelComponent);

@@ -1,8 +1,8 @@
 import React from "react";
 import * as d3 from "d3";
 import { inject, observer } from "mobx-react";
-import { getEnv, getRoot, getType, types, isAlive } from "mobx-state-tree";
-import throttle from "lodash/throttle";
+import { getEnv, getRoot, getType, types, isAlive, flow } from "mobx-state-tree";
+import { throttle } from "@humansignal/core/lib/utils/lodash-replacements";
 import { Spin } from "antd";
 
 import ObjectBase from "./Base";
@@ -24,6 +24,7 @@ import PersistentStateMixin from "../../mixins/PersistentState";
 import { SyncableMixin } from "../../mixins/Syncable";
 import { parseCSV, parseValue, tryToParseJSON } from "../../utils/data";
 import { fixMobxObserve } from "../../utils/utilities";
+import { Hotkey } from "../../core/Hotkey";
 
 import "./TimeSeries/MultiChannel";
 import "./TimeSeries/Channel";
@@ -102,7 +103,14 @@ const Model = types
     children: Types.unionArray(["channel", "timeseriesoverview", "view", "hypertext", "multichannel"]),
 
     width: 840,
-    margin: types.frozen({ top: 20, right: 20, bottom: 30, left: 50, min: 10, max: 10 }),
+    margin: types.frozen({
+      top: 20,
+      right: 20,
+      bottom: 30,
+      left: 50,
+      min: 10,
+      max: 10,
+    }),
     brushRange: types.array(types.number),
 
     // _value: types.optional(types.string, ""),
@@ -121,6 +129,7 @@ const Model = types
     playStartPosition: null,
     animationFrameId: null,
     playbackSpeed: 1,
+    initialRange: null,
     // Cursor position in native units (same units as keysRange). Used for visual playhead.
     cursorTime: null,
     // Suppress sync while user drags overview
@@ -193,6 +202,30 @@ const Model = types
 
     get channels() {
       return Object.values(self.channelsMap);
+    },
+
+    get filteredOverviewChannels() {
+      const allKeys = Object.keys(self.channelsMap);
+
+      if (self.overviewchannels) {
+        // Infer headers from dataObj if headers array is not set
+        let headers = self.headers;
+        if ((!headers || headers.length === 0) && self.dataObj) {
+          headers = Object.keys(self.dataObj);
+        }
+
+        const channels = self.overviewchannels
+          .toLowerCase()
+          .split(",")
+          .map((name) => {
+            const trimmed = name.trim();
+            return /^\d+$/.test(trimmed) && headers ? headers[Number(trimmed)]?.toLowerCase() : trimmed;
+          })
+          .filter((ch) => ch && allKeys.includes(ch));
+
+        if (channels.length) return channels;
+      }
+      return allKeys;
     },
 
     parseTime(time) {
@@ -545,6 +578,39 @@ const Model = types
     },
 
     /**
+     * Pan the visible time range by a fraction of the current view width.
+     * Positive fraction pans right (forward in time), negative pans left (back).
+     * When a region is selected, this is a no-op so region hotkeys can handle the keys.
+     * @param {number} fraction - Fraction of view width to shift (e.g. 0.1 = 10%)
+     */
+    panView(fraction) {
+      // Skip if a TimeSeries region is selected — let region grow/shrink hotkeys handle the key
+      if (self.regs.some((r) => r.selected)) return;
+
+      if (!self.brushRange?.length || self.brushRange.length !== 2) return;
+      if (!self.keysRange?.length || self.keysRange.length !== 2) return;
+
+      const [minKey, maxKey] = self.keysRange;
+      const viewWidth = self.brushRange[1] - self.brushRange[0];
+      const shift = viewWidth * fraction;
+
+      let newStart = self.brushRange[0] + shift;
+      let newEnd = self.brushRange[1] + shift;
+
+      // Clamp to data bounds while preserving view width
+      if (newStart < minKey) {
+        newStart = minKey;
+        newEnd = minKey + viewWidth;
+      }
+      if (newEnd > maxKey) {
+        newEnd = maxKey;
+        newStart = maxKey - viewWidth;
+      }
+
+      self.updateTR([newStart, newEnd], self.scale + 0.0001);
+    },
+
+    /**
      * Restart playback from a specific time position
      * @param {number} time - The time in native units to restart playback from
      */
@@ -606,10 +672,14 @@ const Model = types
     },
 
     updateTR(tr, scale = 1) {
-      if (tr === null) return;
+      if (!isAlive(self) || tr === null || tr.length !== 2) return;
 
       self.initialRange = tr;
-      self.brushRange = tr;
+      if (self.brushRange) {
+        self.brushRange.replace(tr);
+      } else {
+        self.brushRange = tr;
+      }
       self.setZoomedRange(tr[1] - tr[0]);
       self.setScale(scale);
       self.updateView();
@@ -650,7 +720,7 @@ const Model = types
       needUpdate && self.updateView();
     },
 
-    async preloadValue(store) {
+    preloadValue: flow(function* (store) {
       const dataObj = store.task.dataObj;
 
       if (self.valuetype !== "url") {
@@ -659,6 +729,7 @@ const Model = types
         } else {
           self.setData(dataObj);
         }
+
         return;
       }
 
@@ -681,7 +752,7 @@ const Model = types
       let res;
 
       try {
-        res = await fetch(url);
+        res = yield fetch(url);
         if (!res.ok) {
           if (res.status === 400) {
             store.annotationStore.addErrors([
@@ -696,13 +767,13 @@ const Model = types
           }
           throw new Error(`${res.status} ${res.statusText}`);
         }
-        text = await res.text();
+        text = yield res.text();
       } catch (e) {
         let error = e;
 
         if (!res) {
           try {
-            res = await fetch(url, { mode: "no-cors" });
+            res = yield fetch(url, { mode: "no-cors" });
             if (!res.ok && res.status === 0) cors = true;
           } catch (e) {
             error = e;
@@ -722,7 +793,14 @@ const Model = types
           let separator = self.sep;
 
           if (separator?.length > 1) {
-            const aliases = { tab: "\t", "\\t": "\t", space: " ", auto: "auto", comma: ",", dot: "." };
+            const aliases = {
+              tab: "\t",
+              "\\t": "\t",
+              space: " ",
+              auto: "auto",
+              comma: ",",
+              dot: ".",
+            };
 
             separator = aliases[separator] || separator[0];
           }
@@ -731,27 +809,31 @@ const Model = types
         if (!isAlive(self)) return;
         self.setData(data);
         self.setColumnNames(headers);
-        self.updateValue(store);
+        yield self.updateValue(store);
       } catch (e) {
         const message = `Problems with parsing CSV: ${e?.message || e}<br>URL: ${url}`;
 
         store.annotationStore.addErrors([errorBuilder.generalError(message)]);
       }
-    },
+    }),
 
-    async updateValue(store) {
+    updateValue: flow(function* (store) {
       let data;
 
       try {
         if (!self.dataObj) {
-          await self.preloadValue(store);
+          yield self.preloadValue(store);
         }
+        if (!isAlive(self)) return;
         data = self.dataObj;
       } catch (e) {
+        if (!isAlive(self)) return;
         store.annotationStore.addErrors([errorBuilder.generalError(e.message)]);
         return;
       }
       if (!data) return;
+      if (!isAlive(self)) return;
+
       const times = data[self.keyColumn];
 
       if (!times) {
@@ -763,13 +845,15 @@ const Model = types
         store.annotationStore.addErrors([errorBuilder.generalError(message)]);
         return;
       }
+
       // if current view already restored by PersistentState
       if (self.brushRange?.length) return;
+      if (!isAlive(self)) return;
 
       // Calculate initial brush range ensuring minimum points are visible
       const boundaries = self.calculateInitialBrushRange(times);
       self.updateTR(boundaries);
-    },
+    }),
 
     onHotKey() {},
 
@@ -1028,6 +1112,7 @@ const Model = types
 
     emitSeekSync() {
       if (!isAlive(self)) return;
+      if (!self.syncManager) return; // Wait until initialized
       if (self.suppressSync) return;
 
       const centerTime = self.centerTime; // centerTime is in NATIVE units (ms if isDate, else seconds/indices)
@@ -1121,17 +1206,7 @@ const Overview = observer(({ item, data, series }) => {
   const { margin, keyColumn: idX } = item;
   const width = Math.max(fullWidth - margin.left - margin.right, 0);
   // const data = store.task.dataObj;
-  let keys = Object.keys(item.channelsMap);
-
-  if (item.overviewchannels) {
-    const channels = item.overviewchannels
-      .toLowerCase()
-      .split(",")
-      .map((name) => (/^\d+$/.test(name) ? item.headers[name] : name))
-      .filter((ch) => keys.includes(ch));
-
-    if (channels.length) keys = channels;
-  }
+  const keys = item.filteredOverviewChannels;
   // const series = data[idX];
   const minRegionWidth = 2;
 
@@ -1349,13 +1424,13 @@ const Overview = observer(({ item, data, series }) => {
         .attr("viewBox", [0, 0, width + margin.left + margin.right, focusHeight + margin.bottom]);
 
       gChannels.current.selectAll("path").remove();
-      for (const key of Object.keys(item.channelsMap)) drawPath(key);
+      for (const key of keys) drawPath(key);
 
       drawAxis();
       // gb.current.selectAll("*").remove();
       gb.current.call(brush).call(brush.move, item.brushRange.map(x));
     }
-  }, [width, node]);
+  }, [width, node, keys]);
 
   // redraw overview on zoom
   React.useEffect(() => {
@@ -1415,6 +1490,9 @@ const Overview = observer(({ item, data, series }) => {
   return <div className="htx-timeseries-overview" ref={ref} />;
 });
 
+const PAN_SMALL = 0.1; // 10% of view width
+const PAN_LARGE = 0.5; // 50% of view width
+
 const HtxTimeSeriesViewRTS = ({ item }) => {
   const ref = React.createRef();
 
@@ -1437,13 +1515,30 @@ const HtxTimeSeriesViewRTS = ({ item }) => {
     }
   }, [item, ref]);
 
+  // Register keyboard hotkeys for panning the time series view
+  React.useEffect(() => {
+    if (!item?.brushRange?.length) return;
+
+    const hotkeys = Hotkey("TimeSeries Navigation", "Time Series Navigation");
+
+    hotkeys.addNamed("ts:pan-left", () => item.panView(-PAN_SMALL));
+    hotkeys.addNamed("ts:pan-right", () => item.panView(PAN_SMALL));
+    hotkeys.addNamed("ts:pan-left-large", () => item.panView(-PAN_LARGE));
+    hotkeys.addNamed("ts:pan-right-large", () => item.panView(PAN_LARGE));
+
+    return () => {
+      hotkeys.unbindAll();
+    };
+  }, [item, item?.brushRange?.length]);
+
   // the last thing updated during initialisation
-  if (!item?.brushRange?.length || !item.data)
+  if (!item?.brushRange?.length || !item.data) {
     return (
       <div style={{ textAlign: "center", height: 100 }}>
         <Spin size="large" delay={300} />
       </div>
     );
+  }
 
   return (
     <div ref={ref} className="htx-timeseries">

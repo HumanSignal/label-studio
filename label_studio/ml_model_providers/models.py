@@ -1,5 +1,5 @@
-"""This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
-"""
+"""This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license."""
+
 import logging
 from typing import List
 
@@ -28,7 +28,6 @@ class ModelProviderConnectionScopes(models.TextChoices):
 
 
 class ModelProviderConnection(models.Model):
-
     provider = models.CharField(max_length=255, choices=ModelProviders.choices, default=ModelProviders.OPENAI)
 
     api_key = models.TextField(_('api_key'), null=True, blank=True, help_text='Model provider API key')

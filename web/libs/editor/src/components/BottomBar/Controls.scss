@@ -72,7 +72,7 @@
         justify-content: space-between;
       }
 
-      span {
+      & span {
         width: 100%;
       }
 
@@ -85,7 +85,7 @@
         align-self: stretch;
         border-left: 1px solid rgb(255 255 255 / 16%);
 
-        div {
+        & div {
           width: 100%;
           height: 100%;
           display: flex;
@@ -93,7 +93,7 @@
           justify-content: center;
         }
 
-        svg {
+        & svg {
           pointer-events: none;
           transform: rotate(180deg) scale(1.1);
         }
@@ -107,7 +107,7 @@
       font-weight: 500;
       font-size: 16px;
 
-      svg {
+      & svg {
         color: var(--color-negative-icon);
         margin: 0 8px 0 4px;
       }

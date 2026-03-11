@@ -64,6 +64,8 @@ export type DataTableProps<T extends DataShape> = {
   sorting?: SortingState;
   onSortingChange?: (updater: SortingState | ((old: SortingState) => SortingState)) => void;
   enableSorting?: boolean; // Global enable/disable sorting
+  /** When true, sorting is handled server-side. Bypasses TanStack's getSortedRowModel so data is displayed in the exact order received. Required when column accessors return objects (not primitive values), as TanStack's 'basic' comparator produces inconsistent results for objects with identical string representations. */
+  manualSorting?: boolean;
   // Empty state props
   /** Empty state configuration when no data is available */
   emptyState?: {
@@ -86,6 +88,8 @@ export type DataTableProps<T extends DataShape> = {
   dataTestId?: string;
   /** Controlled active row ID - when provided, controls which row is active */
   activeRowId?: string;
+  /** Custom function to extract row ID from row data - useful when row.id is not the primary identifier */
+  getRowId?: (row: T[number], index: number) => string;
 };
 
 /**
@@ -106,6 +110,7 @@ export const DataTable = <T extends DataShape>(props: DataTableProps<T>) => {
     sorting: controlledSorting,
     onSortingChange: controlledOnSortingChange,
     enableSorting = true,
+    manualSorting = false,
     isRowSelectable,
     onSelectAllChange,
     invertedSelectionEnabled,
@@ -355,14 +360,17 @@ export const DataTable = <T extends DataShape>(props: DataTableProps<T>) => {
         ? (row) => isRowSelectable(row) // If isRowSelectable is provided, enable selection based on the function
         : true
       : undefined,
-    getRowId: (row, index) => {
-      // Use id if available, otherwise fall back to index
-      // Note: 'row' parameter is the row data object itself, not a Row object
-      const rowId = (row as any)?.id;
-      return rowId !== undefined ? String(rowId) : String(index);
-    },
+    getRowId:
+      props.getRowId ||
+      ((row, index) => {
+        // Use id if available, otherwise fall back to index
+        // Note: 'row' parameter is the row data object itself, not a Row object
+        const rowId = (row as any)?.id;
+        return rowId !== undefined ? String(rowId) : String(index);
+      }),
     columnResizeMode: "onChange",
     enableSorting: enableSorting,
+    manualSorting,
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
   });
@@ -715,7 +723,7 @@ export const Header = <T,>({
   help,
 }: HeaderProps<T>) => {
   // Get header label - use originalHeader if provided, otherwise try to extract from columnDef
-  let headerLabel: string | React.ReactNode = undefined;
+  let headerLabel: string | React.ReactNode;
   if (originalHeader !== undefined) {
     headerLabel = originalHeader;
   } else {

@@ -1,4 +1,1 @@
-{
-  "fflag_feat_front_dev_3873_labeling_ui_improvements_short": true,
-  "fflag_fix_front_lsdv_4620_memory_leaks_100723_short": false
-}
+{ "fflag_fix_front_lsdv_4620_memory_leaks_100723_short": false }

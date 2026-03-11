@@ -30,6 +30,6 @@
     --scale: 1;
 
     transform: scale(var(--scale));
-    cursor: move;
+    cursor: grab;
   }
 }

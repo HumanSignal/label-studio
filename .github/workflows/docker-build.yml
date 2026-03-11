@@ -31,7 +31,7 @@ env:
   DOCKER_CLI_EXPERIMENTAL: enabled
   IMAGE_NAME: "${{ vars.DOCKERHUB_ORG }}/label-studio"
   DOCKER_IMAGE_TAG_CHECK_NAME: "Docker image tag"
-  POETRY_VERSION: 2.2.1
+  POETRY_VERSION: 2.3.2
 
 jobs:
   calculate_version:
@@ -144,7 +144,7 @@ jobs:
           images: ${{ env.IMAGE_NAME }}
 
       - name: Push Docker image (${{ matrix.platform }})
-        uses: docker/build-push-action@v6.18.0
+        uses: docker/build-push-action@v6.19.2
         id: docker_build_and_push
         with:
           context: .
@@ -257,10 +257,9 @@ jobs:
     name: "Notify Slack"
     runs-on: ubuntu-latest
     needs: [calculate_version, docker_build, create_check, merge_docker_manifest]
-    if: always() && github.event_name == 'push' && inputs.branch_name == 'develop'
+    if: failure() && github.event_name == 'push' && inputs.branch_name == 'develop'
     steps:
       - name: Notify to Slack on failure
-        if: failure()
         env:
           GITHUB_REPOSITORY: "${{ github.repository }}"
           GITHUB_RUN_ID: "${{ github.run_id }}"

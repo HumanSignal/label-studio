@@ -14,11 +14,12 @@ import {
   useMemo,
   useRef,
   useState,
+  memo,
 } from "react";
 import Registry from "../../../core/Registry";
 import { PER_REGION_MODES } from "../../../mixins/PerRegionModes";
 import { cn } from "../../../utils/bem";
-import { FF_DEV_2755, FF_DEV_3873, isFF } from "../../../utils/feature-flags";
+import { FF_DEV_2755, isFF } from "../../../utils/feature-flags";
 import { flatten, isDefined, isMacOS } from "../../../utils/utilities";
 import { NodeIcon } from "../../Node/Node";
 import { LockButton } from "../Components/LockButton";
@@ -52,7 +53,6 @@ const OutlinerTreeComponent: FC<OutlinerTreeProps> = ({ regions, footer }) => {
     regions,
     rootClass,
     footer,
-    // that's a trick to have a dependency that causes recalculating of tree data on grouping mode change
     // it's for rerender OutlinerTreeComponent
     grouping: regions.group,
   });
@@ -198,12 +198,17 @@ const OutlinerInnerTreeComponent: FC<OutlinerInnerTreeProps> = observer(({ regio
   );
 });
 
+const titleRenderer = (nodeData: any) => {
+  const { key: _key, ...data } = nodeData;
+  return <MemoizedRootTitle {...data} />;
+};
+
 const useDataTree = ({ regions, rootClass, footer }: any) => {
   const processor = useCallback((item: any, idx, _false, _null, _onClick) => {
-    const { id, type, hidden, isDrawing, locked, incomplete } = item ?? {};
+    const { id, type, hidden, locked } = item ?? {};
     const style = item?.background ?? item?.getOneColor?.();
     const color = chroma(style ?? "#666").alpha(1);
-    const mods: Record<string, any> = { hidden, type, isDrawing: isDrawing || incomplete };
+    const mods: Record<string, any> = { hidden, type };
 
     const label = <RegionLabel item={item} />;
 
@@ -221,7 +226,7 @@ const useDataTree = ({ regions, rootClass, footer }: any) => {
         "--selection-color": color.alpha(0.1).css(),
       },
       className: rootClass.elem("node").mod(mods).toClassName(),
-      title: (data: any) => <RootTitle {...data} />,
+      title: titleRenderer,
       locked,
     };
   }, []);
@@ -276,15 +281,26 @@ const useEventHandlers = () => {
 
   // see onScroll for explanation
   const highlightedRef = useRef<any>();
+  const hoverTimeoutRef = useRef<number>();
+
   const onMouseEnter = useCallback(({ node }: any) => {
-    if (highlightedRef.current) {
-      highlightedRef.current?.setHighlight(false);
+    if (hoverTimeoutRef.current) {
+      window.clearTimeout(hoverTimeoutRef.current);
     }
-    node.item?.setHighlight(true);
-    highlightedRef.current = node.item;
+
+    hoverTimeoutRef.current = window.setTimeout(() => {
+      if (highlightedRef.current) {
+        highlightedRef.current?.setHighlight(false);
+      }
+      node.item?.setHighlight(true);
+      highlightedRef.current = node.item;
+    }, 50);
   }, []);
 
   const onMouseLeave = useCallback(({ node }: any) => {
+    if (hoverTimeoutRef.current) {
+      window.clearTimeout(hoverTimeoutRef.current);
+    }
     node?.item?.setHighlight(false);
     if (highlightedRef.current !== node?.item) {
       highlightedRef.current?.setHighlight(false);
@@ -388,7 +404,6 @@ const RootTitle: FC<any> = observer(
     isArea,
     ...props
   }) => {
-    const hovered = item?.highlighted;
     const [collapsed, setCollapsed] = useState(false);
 
     const controls = useMemo(() => {
@@ -409,8 +424,10 @@ const RootTitle: FC<any> = observer(
       [collapsed],
     );
 
+    const incomplete = item?.incomplete;
+
     return (
-      <div className={cn("outliner-item").toClassName()}>
+      <div className={cn("outliner-item").mod({ incomplete }).toClassName()}>
         <div className={cn("outliner-item").elem("content").toClassName()}>
           {!props.isGroup && <div className={cn("outliner-item").elem("index").toClassName()}>{props.idx + 1}</div>}
           <div className={cn("outliner-item").elem("title").toClassName()}>
@@ -418,7 +435,7 @@ const RootTitle: FC<any> = observer(
             {item?.text && (
               <div className={cn("outliner-item").elem("text").toClassName()}>{item.text.replace(/\\n/g, "\n")}</div>
             )}
-            {(item?.isDrawing || item?.incomplete) && (
+            {incomplete && (
               <span className={cn("outliner-item").elem("incomplete").toClassName()}>
                 <Tooltip title={`Incomplete ${item.type?.replace("region", "") ?? "region"}`}>
                   <IconWarning />
@@ -455,6 +472,25 @@ const RootTitle: FC<any> = observer(
   },
 );
 
+const MemoizedRootTitle = memo(RootTitle, (prevProps, nextProps) => {
+  if (prevProps.item !== nextProps.item) return false;
+  if (prevProps.item?.highlighted !== nextProps.item?.highlighted) return false;
+  if (prevProps.item?.hidden !== nextProps.item?.hidden) return false;
+  if (prevProps.selected !== nextProps.selected) return false;
+  if (prevProps.idx !== nextProps.idx) return false;
+  if (prevProps.isArea !== nextProps.isArea) return false;
+  if (prevProps.isGroup !== nextProps.isGroup) return false;
+  // Re-render group when any child's hidden state changes so hide/show icon stays in sync
+  if (nextProps.isGroup && nextProps.children && prevProps.children) {
+    if (prevProps.children.length !== nextProps.children.length) return false;
+    const childHiddenChanged = prevProps.children.some(
+      (c, i) => (nextProps.children?.[i]?.hidden ?? null) !== (c?.hidden ?? null),
+    );
+    if (childHiddenChanged) return false;
+  }
+  return true;
+});
+
 interface RegionControlsProps {
   item: any;
   entity?: any;
@@ -477,17 +513,17 @@ const RegionControls: FC<RegionControlsProps> = injector(
     const { regions: regionStore } = useContext(OutlinerContext);
 
     const hidden = useMemo(() => {
-      if (type?.includes("region") || type?.includes("range")) {
-        return entity.hidden;
+      if (type?.includes("region") || type?.includes("range") || type?.includes("reactcode")) {
+        return entity?.hidden;
       }
       if ((!type || type.includes("label") || type?.includes("tool")) && regions) {
-        return Object.values(regions).every(({ hidden }) => hidden);
+        return Object.values(regions).every(({ hidden: h }) => h);
       }
       return false;
-    }, [entity, type, regions]);
+    }, [entity?.hidden, type, regions]);
 
     const onToggleHidden = useCallback(() => {
-      if (type?.includes("region") || type?.includes("range")) {
+      if (type?.includes("region") || type?.includes("range") || type?.includes("reactcode")) {
         entity.toggleHidden();
       } else if (!type || type.includes("label")) {
         regionStore.setHiddenByLabel(!hidden, entity);
@@ -509,60 +545,46 @@ const RegionControls: FC<RegionControlsProps> = injector(
 
     return (
       <div
-        className={cn("outliner-item")
-          .elem("controls")
-          .mod({ withControls: hasControls, newUI: isFF(FF_DEV_3873) })
-          .toClassName()}
+        className={cn("outliner-item").elem("controls").mod({ withControls: hasControls, newUI: true }).toClassName()}
       >
-        {isFF(FF_DEV_3873) ? (
-          <Tooltip title={"Confidence Score"}>
-            <div className={cn("outliner-item").elem("control-wrapper").toClassName()}>
-              <div className={cn("outliner-item").elem("control").mod({ type: "predict" }).toClassName()}>
-                {item?.origin === "prediction" && <IconSparks style={{ width: 18, height: 18 }} />}
-              </div>
-              <div className={cn("outliner-item").elem("control").mod({ type: "score" }).toClassName()}>
-                {isDefined(item?.score) && item.score.toFixed(2)}
-              </div>
-            </div>
-          </Tooltip>
-        ) : (
-          <>
-            <div className={cn("outliner-item").elem("control").mod({ type: "score" }).toClassName()}>
-              {isDefined(item?.score) && item.score.toFixed(2)}
-            </div>
-            <div className={cn("outliner-item").elem("control").mod({ type: "dirty" }).toClassName()}>
-              {/* dirtyness is not implemented yet */}
-            </div>
+        <Tooltip title={"Confidence Score"}>
+          <div className={cn("outliner-item").elem("control-wrapper").toClassName()}>
             <div className={cn("outliner-item").elem("control").mod({ type: "predict" }).toClassName()}>
               {item?.origin === "prediction" && <IconSparks style={{ width: 18, height: 18 }} />}
             </div>
-          </>
-        )}
+            <div className={cn("outliner-item").elem("control").mod({ type: "score" }).toClassName()}>
+              {isDefined(item?.score) && item.score.toFixed(2)}
+            </div>
+          </div>
+        </Tooltip>
         <div className={cn("outliner-item").elem("wrapper").toClassName()}>
           {store.hasInterface("annotations:copy-link") && isDefined(item?.annotation?.pk) && (
             <div className={cn("outliner-item").elem("control").mod({ type: "menu" }).toClassName()}>
               <RegionContextMenu item={item} />
             </div>
           )}
-          <div className={cn("outliner-item").elem("control").mod({ type: "lock" }).toClassName()}>
-            <LockButton
-              item={item}
-              annotation={item?.annotation}
-              hovered={hovered}
-              locked={item?.locked}
-              onClick={onToggleLocked}
-              variant="neutral"
-              look="string"
-              tooltip={item?.locked ? "Unlock Region" : "Lock Region"}
-            />
-          </div>
-          <div className={cn("outliner-item").elem("control").mod({ type: "visibility" }).toClassName()}>
-            {isFF(FF_DEV_3873) ? (
+          {!item?.incomplete && (
+            <div className={cn("outliner-item").elem("control").mod({ type: "lock" }).toClassName()}>
+              <LockButton
+                item={item}
+                annotation={item?.annotation}
+                hovered={hovered}
+                locked={item?.locked}
+                onClick={onToggleLocked}
+                variant="neutral"
+                look="string"
+                tooltip={item?.locked ? "Unlock Region" : "Lock Region"}
+              />
+            </div>
+          )}
+          {!item?.incomplete && (
+            <div className={cn("outliner-item").elem("control").mod({ type: "visibility" }).toClassName()}>
               <RegionControlButton
                 variant="neutral"
                 look="string"
                 onClick={onToggleHidden}
-                style={hidden ? undefined : { display: "none" }}
+                aria-label={hidden ? "Show" : "Hide"}
+                title={hidden ? "Show" : "Hide"}
               >
                 {hidden ? (
                   <IconEyeClosed style={{ width: 20, height: 20 }} />
@@ -570,16 +592,8 @@ const RegionControls: FC<RegionControlsProps> = injector(
                   <IconEyeOpened style={{ width: 20, height: 20 }} />
                 )}
               </RegionControlButton>
-            ) : (
-              <RegionControlButton variant="neutral" look="string" onClick={onToggleHidden}>
-                {hidden ? (
-                  <IconEyeClosed style={{ width: 20, height: 20 }} />
-                ) : (
-                  <IconEyeOpened style={{ width: 20, height: 20 }} />
-                )}
-              </RegionControlButton>
-            )}
-          </div>
+            </div>
+          )}
           {hasControls && (
             <div className={cn("outliner-item").elem("control").mod({ type: "visibility" }).toClassName()}>
               <RegionControlButton variant="neutral" look="string" onClick={onToggleCollapsed}>

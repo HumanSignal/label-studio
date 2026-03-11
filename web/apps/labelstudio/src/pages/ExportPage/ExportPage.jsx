@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import { useHistory } from "react-router";
-import { Button } from "@humansignal/ui";
+import { Button, Badge } from "@humansignal/ui";
 import {
   IconWarningCircleFilled,
   IconTerminal,
@@ -229,11 +229,24 @@ const FormatInfo = ({ availableFormats, selected, onClick }) => {
               {format.title}
 
               <Space size="small">
-                {format.tags?.map?.((tag, index) => (
-                  <div key={index} className={cn("formats").elem("tag").toClassName()}>
-                    {tag}
-                  </div>
-                ))}
+                {format.tags?.map?.((tag, index) => {
+                  // Map tag text to badge variant
+                  const tagLower = tag?.toLowerCase() || "";
+                  let variant = "primary";
+                  if (tagLower === "enterprise" || tagLower.includes("enterprise")) {
+                    variant = "gradient";
+                  } else if (tagLower === "beta") {
+                    variant = "plum";
+                  } else if (tagLower === "new" || tagLower.includes("new")) {
+                    variant = "positive";
+                  }
+
+                  return (
+                    <Badge key={index} variant={variant} size="small">
+                      {tag}
+                    </Badge>
+                  );
+                })}
               </Space>
             </div>
 

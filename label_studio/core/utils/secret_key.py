@@ -36,7 +36,7 @@ def generate_secret_key_if_missing(data_dir: str) -> str:
 
     try:
         with open(env_filepath, 'a') as f:
-            f.write(f'\n{env_key}={new_secret}\n')   # nosec
+            f.write(f'\n{env_key}={new_secret}\n')  # nosec
     except Exception as e:
         logger.warning(
             f'Warning: failed to write {env_key} to .env file: {e}, new key will be regenerated on every '

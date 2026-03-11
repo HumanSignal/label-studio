@@ -233,6 +233,10 @@ def _get_filter_description(filter_field: Any) -> str:
     if hasattr(filter_field, 'help_text') and filter_field.help_text:
         return str(filter_field.help_text)
 
+    # Check for help_text in extra
+    if hasattr(filter_field, 'extra') and filter_field.extra.get('help_text'):
+        return str(filter_field.extra.get('help_text'))
+
     # Check for label
     if hasattr(filter_field, 'label') and filter_field.label:
         return str(filter_field.label)

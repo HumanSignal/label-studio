@@ -1,9 +1,13 @@
 import AppStore from "./stores/AppStore";
 
-// Get environment settings
+// Get environment settings.
+// Use development env when: running in dev, or when the production build is used for integration tests (Cypress sets window.__LSF_INTEGRATION_TEST__).
 const getEnvironment = async () => {
   /* istanbul ignore next */
-  if (process.env.NODE_ENV === "development" && !process.env.BUILD_NO_SERVER) {
+  const useDevelopment =
+    (process.env.NODE_ENV === "development" && !process.env.BUILD_NO_SERVER) ||
+    (typeof window !== "undefined" && window.__LSF_INTEGRATION_TEST__);
+  if (useDevelopment) {
     return (await import("./env/development")).default;
   }
 

@@ -112,8 +112,8 @@ function setMaskPixelColors(ctx, data, nw, nh, color, numChannels) {
   let y;
   const sourceNumChannels = numChannels; // Could be 1-channel mask or RGBA mask.
 
-  for (y = 0; y <= nh; y++) {
-    for (x = 0; x <= nw; x++) {
+  for (y = 0; y < nh; y++) {
+    for (x = 0; x < nw; x++) {
       // The source is UInt8, while the target is UInt32.
       // This means indexing the source should be multiplied by the number
       // of channels, while for the target every 32-bit entry contains the full
@@ -292,8 +292,6 @@ function Region2RLE(region) {
   const isVisible = layer.visible();
 
   !isVisible && layer.show();
-  // hide labels on regions and show them later
-  layer.findOne(".highlight").hide();
 
   const width = stage.getWidth();
   const height = stage.getHeight();
@@ -326,7 +324,6 @@ function Region2RLE(region) {
   for (let i = data.data.length / 4; i--; ) {
     data.data[i * 4] = data.data[i * 4 + 1] = data.data[i * 4 + 2] = data.data[i * 4 + 3];
   }
-  layer.findOne(".highlight").show();
   stage
     .setWidth(width)
     .setHeight(height)
