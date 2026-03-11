@@ -8,6 +8,7 @@ community_author: nass600
 ipynb_repo_path: tutorials/how-to-review-langsmith-traces-with-label-studio/how_to_review_langsmith_traces_with_label_studio.ipynb
 repo_url: https://github.com/HumanSignal/awesome-label-studio-tutorials/tree/main/tutorials/how-to-review-langsmith-traces-with-label-studio
 report_bug_url: https://github.com/HumanSignal/awesome-label-studio-tutorials/issues/new
+thumbnail: /images/tutorials/tutorials-review-langsmith-traces.png
 meta_title: How to Review LangSmith Traces with Label Studio
 meta_description: Learn how to pull LangSmith LLM traces into Label Studio Enterprise and annotate them with a custom ReactCode UI.
 is_enterprise: true
