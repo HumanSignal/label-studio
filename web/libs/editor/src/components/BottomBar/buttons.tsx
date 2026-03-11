@@ -11,6 +11,7 @@ import { Tooltip, Button } from "@humansignal/ui";
 import { IconInfoOutline } from "@humansignal/icons";
 import type { MSTStore } from "../../stores/types";
 import { FF_FIT_1304_STRICT_OVERLAP, isFF } from "../../utils/feature-flags";
+import { INCOMPLETE_ACCEPT_TOOLTIP } from "./Controls";
 
 type MixedInParams = {
   store: MSTStore;
@@ -31,12 +32,13 @@ export function controlsInjector<T extends {}>(fn: (props: T & MixedInParams) =>
 type ButtonTooltipProps = {
   title: string;
   children: JSX.Element;
+  className?: string;
 };
 
 export const ButtonTooltip = controlsInjector<ButtonTooltipProps>(
-  observer(({ store, title, children }) => {
+  observer(({ store, title, children, className }) => {
     return (
-      <Tooltip title={title} disabled={!store.settings.enableTooltips}>
+      <Tooltip title={title} disabled={!store.settings.enableTooltips} className={className}>
         {children}
       </Tooltip>
     );
@@ -54,22 +56,26 @@ export const AcceptButton = memo(
     const annotation = store.annotationStore.selected;
     // changes in current sessions or saved draft
     const hasChanges = history.canUndo || annotation.versions.draft;
+    const hasIncompleteRegions = annotation.hasIncompletePolygons;
+    const isDisabled = disabled || hasIncompleteRegions;
+    const tooltip = hasIncompleteRegions ? INCOMPLETE_ACCEPT_TOOLTIP : "Accept annotation: [ Ctrl+Enter ]";
 
     return (
-      <Button
-        key="accept"
-        tooltip="Accept annotation: [ Ctrl+Enter ]"
-        aria-label="accept-annotation"
-        disabled={disabled}
-        onClick={async () => {
-          annotation.submissionInProgress();
-          await store.commentStore.commentFormSubmit();
-          store.acceptAnnotation();
-        }}
-        data-testid="bottombar-accept-button"
-      >
-        {hasChanges ? "Fix + Accept" : "Accept"}
-      </Button>
+      <Tooltip title={tooltip} disabled={!store.settings.enableTooltips} className="whitespace-nowrap max-w-none">
+        <Button
+          key="accept"
+          aria-label="accept-annotation"
+          disabled={isDisabled}
+          onClick={async () => {
+            annotation.submissionInProgress();
+            await store.commentStore.commentFormSubmit();
+            store.acceptAnnotation();
+          }}
+          data-testid="bottombar-accept-button"
+        >
+          {hasChanges ? "Fix + Accept" : "Accept"}
+        </Button>
+      </Tooltip>
     );
   }),
 );
