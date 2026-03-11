@@ -47,157 +47,161 @@ interface OutlinerTreeProps {
   footer: ReactNode;
 }
 
-const OutlinerTreeComponent: FC<OutlinerTreeProps> = ({ regions, footer }) => {
+const OutlinerTreeComponent: FC<OutlinerTreeProps> = observer(({ regions, footer }) => {
   const rootClass = cn("tree");
+  // Subscribe to each region's hidden state so tree data (and hide/show icons) rebuild when visibility changes
+  const visibilityKey = regions.regions?.map((r: any) => r.hidden).join(",") ?? "";
   const regionsTree = useDataTree({
     regions,
     rootClass,
     footer,
     // that's a trick to have a dependency that causes recalculating of tree data on grouping mode change
-    // it's for rerender OutlinerTreeComponent
     grouping: regions.group,
   });
 
   return (
     <OutlinerContext.Provider value={{ regions }}>
-      <OutlinerInnerTreeComponent regions={regions} regionsTree={regionsTree} />
+      <OutlinerInnerTreeComponent regions={regions} regionsTree={regionsTree} visibilityKey={visibilityKey} />
     </OutlinerContext.Provider>
   );
-};
+});
 
 interface OutlinerInnerTreeProps {
   regions: any;
   regionsTree: any[];
+  visibilityKey?: string;
 }
 
 const iconGetter = ({ entity }: any) => <NodeIconComponent node={entity} />;
 const switcherIconGetter = ({ isLeaf }: any) => <SwitcherIcon isLeaf={isLeaf} />;
-const OutlinerInnerTreeComponent: FC<OutlinerInnerTreeProps> = observer(({ regions, regionsTree }) => {
-  const blockRef = useRef<HTMLElement>();
-  const [height, setHeight] = useState(0);
-  let resizeObserver: ResizeObserver | null = useMemo(() => {
-    let lastHeight = 0;
+const OutlinerInnerTreeComponent: FC<OutlinerInnerTreeProps> = observer(
+  ({ regions, regionsTree, visibilityKey = "" }) => {
+    const blockRef = useRef<HTMLElement>();
+    const [height, setHeight] = useState(0);
+    let resizeObserver: ResizeObserver | null = useMemo(() => {
+      let lastHeight = 0;
 
-    return new ResizeObserver((entities) => {
-      requestAnimationFrame(() => {
-        if (!entities?.[0]?.contentRect || entities?.[0]?.contentRect?.height === lastHeight) {
-          return;
-        }
-        lastHeight = entities?.[0]?.contentRect?.height || 1;
+      return new ResizeObserver((entities) => {
+        requestAnimationFrame(() => {
+          if (!entities?.[0]?.contentRect || entities?.[0]?.contentRect?.height === lastHeight) {
+            return;
+          }
+          lastHeight = entities?.[0]?.contentRect?.height || 1;
 
-        // ensure the component is still mounted
-        if (blockRef.current) {
-          setHeight(lastHeight);
-        }
+          // ensure the component is still mounted
+          if (blockRef.current) {
+            setHeight(lastHeight);
+          }
+        });
       });
-    });
-  }, []);
+    }, []);
 
-  useEffect(() => {
-    return () => {
-      resizeObserver?.disconnect();
-      resizeObserver = null;
-    };
-  }, []);
-  const setRef = useCallback((ref) => {
-    if (ref) {
-      resizeObserver?.observe(ref);
-    } else if (blockRef.current) {
-      resizeObserver?.unobserve(blockRef.current);
+    useEffect(() => {
+      return () => {
+        resizeObserver?.disconnect();
+        resizeObserver = null;
+      };
+    }, []);
+    const setRef = useCallback((ref) => {
+      if (ref) {
+        resizeObserver?.observe(ref);
+      } else if (blockRef.current) {
+        resizeObserver?.unobserve(blockRef.current);
+      }
+      blockRef.current = ref;
+      setHeight(ref?.clientHeight || 1);
+    }, []);
+    const eventHandlers = useEventHandlers();
+    const selectedKeys = regions.selection.keys;
+    const rootClass = cn("tree");
+    let expandedKeys;
+    let onExpand;
+    // It works only for 'label' mode yet.
+    // To enable this feature at other group modes, it needs to set correct pos at regionsTree for these modes
+    // It also doesn't work with nesting level more than 1
+    const isPersistCollapseEnabled = isFF(FF_DEV_2755) && regions.group === "label";
+
+    if (isFF(FF_DEV_2755)) {
+      const [collapsedPos, setCollapsedPos] = useState(
+        localStorage
+          .getItem(localStoreName)
+          ?.split?.(",")
+          ?.filter((pos) => !!pos) ?? [],
+      );
+
+      const updateLocalStorage = (collapsedPos: Array<string>) => {
+        localStorage.setItem(localStoreName, collapsedPos.join(","));
+      };
+
+      const collapse = (pos: string) => {
+        const newCollapsedPos = [...collapsedPos, pos];
+
+        setCollapsedPos(newCollapsedPos);
+        updateLocalStorage(newCollapsedPos);
+      };
+
+      const expand = (pos: string) => {
+        const newCollapsedPos = collapsedPos.filter((cPos) => cPos !== pos);
+
+        setCollapsedPos(newCollapsedPos);
+        updateLocalStorage(newCollapsedPos);
+      };
+
+      expandedKeys =
+        regionsTree.filter((item: any) => !collapsedPos.includes(item.pos)).map((item: any) => item.key) ?? [];
+
+      onExpand = (
+        _internalExpandedKeys: Key[],
+        {
+          node,
+        }: {
+          node: EventDataNode;
+        },
+      ): void => {
+        const region = regionsTree.find((region: any) => region.key === node.key);
+
+        if (!region) return;
+
+        // pos is equal to label name
+        const pos = region.pos;
+
+        collapsedPos.includes(pos) ? expand(pos) : collapse(pos);
+      };
     }
-    blockRef.current = ref;
-    setHeight(ref?.clientHeight || 1);
-  }, []);
-  const eventHandlers = useEventHandlers();
-  const selectedKeys = regions.selection.keys;
-  const rootClass = cn("tree");
-  let expandedKeys;
-  let onExpand;
-  // It works only for 'label' mode yet.
-  // To enable this feature at other group modes, it needs to set correct pos at regionsTree for these modes
-  // It also doesn't work with nesting level more than 1
-  const isPersistCollapseEnabled = isFF(FF_DEV_2755) && regions.group === "label";
 
-  if (isFF(FF_DEV_2755)) {
-    const [collapsedPos, setCollapsedPos] = useState(
-      localStorage
-        .getItem(localStoreName)
-        ?.split?.(",")
-        ?.filter((pos) => !!pos) ?? [],
+    return (
+      <div className={cn("outliner-tree").toClassName()} ref={setRef}>
+        {!!height && (
+          <Tree
+            key={`${regions.group}-${visibilityKey}`}
+            draggable={regions.group === "manual"}
+            multiple
+            defaultExpandAll
+            defaultExpandParent={!isPersistCollapseEnabled}
+            autoExpandParent
+            checkable={false}
+            prefixCls={rootClass.toClassName()}
+            className={rootClass.toClassName()}
+            treeData={regionsTree}
+            selectedKeys={selectedKeys}
+            icon={iconGetter}
+            switcherIcon={switcherIconGetter}
+            virtual
+            itemHeight={MIN_REGIONS_TREE_ROW_HEIGHT}
+            height={height}
+            {...eventHandlers}
+            {...(isPersistCollapseEnabled
+              ? {
+                  expandedKeys,
+                  onExpand,
+                }
+              : {})}
+          />
+        )}
+      </div>
     );
-
-    const updateLocalStorage = (collapsedPos: Array<string>) => {
-      localStorage.setItem(localStoreName, collapsedPos.join(","));
-    };
-
-    const collapse = (pos: string) => {
-      const newCollapsedPos = [...collapsedPos, pos];
-
-      setCollapsedPos(newCollapsedPos);
-      updateLocalStorage(newCollapsedPos);
-    };
-
-    const expand = (pos: string) => {
-      const newCollapsedPos = collapsedPos.filter((cPos) => cPos !== pos);
-
-      setCollapsedPos(newCollapsedPos);
-      updateLocalStorage(newCollapsedPos);
-    };
-
-    expandedKeys =
-      regionsTree.filter((item: any) => !collapsedPos.includes(item.pos)).map((item: any) => item.key) ?? [];
-
-    onExpand = (
-      _internalExpandedKeys: Key[],
-      {
-        node,
-      }: {
-        node: EventDataNode;
-      },
-    ): void => {
-      const region = regionsTree.find((region: any) => region.key === node.key);
-
-      if (!region) return;
-
-      // pos is equal to label name
-      const pos = region.pos;
-
-      collapsedPos.includes(pos) ? expand(pos) : collapse(pos);
-    };
-  }
-
-  return (
-    <div className={cn("outliner-tree").toClassName()} ref={setRef}>
-      {!!height && (
-        <Tree
-          key={regions.group}
-          draggable={regions.group === "manual"}
-          multiple
-          defaultExpandAll
-          defaultExpandParent={!isPersistCollapseEnabled}
-          autoExpandParent
-          checkable={false}
-          prefixCls={rootClass.toClassName()}
-          className={rootClass.toClassName()}
-          treeData={regionsTree}
-          selectedKeys={selectedKeys}
-          icon={iconGetter}
-          switcherIcon={switcherIconGetter}
-          virtual
-          itemHeight={MIN_REGIONS_TREE_ROW_HEIGHT}
-          height={height}
-          {...eventHandlers}
-          {...(isPersistCollapseEnabled
-            ? {
-                expandedKeys,
-                onExpand,
-              }
-            : {})}
-        />
-      )}
-    </div>
-  );
-});
+  },
+);
 
 const titleRenderer = (nodeData: any) => {
   const { key: _key, ...data } = nodeData;
@@ -481,6 +485,14 @@ const MemoizedRootTitle = memo(RootTitle, (prevProps, nextProps) => {
   if (prevProps.idx !== nextProps.idx) return false;
   if (prevProps.isArea !== nextProps.isArea) return false;
   if (prevProps.isGroup !== nextProps.isGroup) return false;
+  // Re-render group when any child's hidden state changes so hide/show icon stays in sync
+  if (nextProps.isGroup && nextProps.children && prevProps.children) {
+    if (prevProps.children.length !== nextProps.children.length) return false;
+    const childHiddenChanged = prevProps.children.some(
+      (c, i) => (nextProps.children?.[i]?.hidden ?? null) !== (c?.hidden ?? null),
+    );
+    if (childHiddenChanged) return false;
+  }
   return true;
 });
 
@@ -507,13 +519,13 @@ const RegionControls: FC<RegionControlsProps> = injector(
 
     const hidden = useMemo(() => {
       if (type?.includes("region") || type?.includes("range") || type?.includes("reactcode")) {
-        return entity.hidden;
+        return entity?.hidden;
       }
       if ((!type || type.includes("label") || type?.includes("tool")) && regions) {
-        return Object.values(regions).every(({ hidden }) => hidden);
+        return Object.values(regions).every(({ hidden: h }) => h);
       }
       return false;
-    }, [entity, type, regions]);
+    }, [entity, entity?.hidden, type, regions]);
 
     const onToggleHidden = useCallback(() => {
       if (type?.includes("region") || type?.includes("range") || type?.includes("reactcode")) {
@@ -576,7 +588,8 @@ const RegionControls: FC<RegionControlsProps> = injector(
                 variant="neutral"
                 look="string"
                 onClick={onToggleHidden}
-                style={hidden ? undefined : { display: "none" }}
+                aria-label={hidden ? "Show" : "Hide"}
+                title={hidden ? "Show" : "Hide"}
               >
                 {hidden ? (
                   <IconEyeClosed style={{ width: 20, height: 20 }} />
@@ -657,4 +670,4 @@ const RegionItemDesc: FC<RegionItemOCSProps> = observer(({ item, collapsed, setC
   );
 });
 
-export const OutlinerTree = observer(OutlinerTreeComponent);
+export const OutlinerTree = OutlinerTreeComponent;
