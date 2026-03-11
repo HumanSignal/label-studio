@@ -17,7 +17,7 @@ duration: 10-15 mins
 
 ## 0. Label Studio Requirements
 
-This tutorial uses **ReactCode templates**, a feature available in **Label Studio Enterprise only**. ReactCode allows you to build fully custom React-based annotation interfaces — in this case, a 3-panel trace review UI. We recommend [creating a Starter Cloud trial](https://app.humansignal.com/user/cloud-trial?offer=d9a5&) to follow along.
+This tutorial uses **ReactCode templates**, a feature available in **Label Studio Enterprise only**. ReactCode allows you to build fully custom React-based annotation interfaces — in this case, a 3-panel trace review UI. We recommend [connecting with our team](https://humansignal.com/contact-sales/) to request a trial or to enable them in your account.
 
 After section 2, you will need a running Label Studio Enterprise instance and an API key from your account settings.
 
@@ -53,7 +53,7 @@ ANTHROPIC_API_KEY=your_anthropic_api_key
 
 **Langfuse Setup**: Visit [Langfuse Documentation](https://langfuse.com/docs) to create an account, generate an API key pair, and note your project's base URL.
 
-**Label Studio Setup**: Visit [Label Studio Documentation](https://docs.humansignal.com/) for installation instructions and how to generate an API token from your account settings.
+**Label Studio Setup**: Visit [Label Studio Documentation](https://labelstud.io/guide/access_tokens) for installation instructions and how to generate an API token from your account settings.
 
 
 ```python
