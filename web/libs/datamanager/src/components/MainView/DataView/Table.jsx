@@ -316,6 +316,14 @@ export const DataView = injector(
         isFF(FF_DEV_2536) && commonDecoration("comment_count", 60, "center"),
         isFF(FF_DEV_2536) && commonDecoration("unresolved_comment_count", 60, "center"),
         {
+          resolver: (col) => col.alias === "agreement",
+          style: { width: 130 },
+        },
+        {
+          resolver: (col) => typeof col.alias === "string" && col.alias.startsWith("dimension_agreement_"),
+          style: { width: 180 },
+        },
+        {
           resolver: (col) => col.type === "Number",
           style(col) {
             return /id/.test(col.id) ? { width: 50 } : { width: 110 };
