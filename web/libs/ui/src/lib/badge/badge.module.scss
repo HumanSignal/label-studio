@@ -454,3 +454,36 @@
     height: 14px;
   }
 }
+
+/* Text label — used when maxWidth is provided */
+.label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  display: block;
+}
+
+/* Close button */
+.closeButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  margin: 0 calc(var(--spacing-tightest) * -1) 0 var(--spacing-tightest);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  opacity: 0.7;
+  border-radius: var(--corner-radius-smallest);
+  transition: opacity 150ms ease-out;
+  flex-shrink: 0;
+
+  &:hover {
+    opacity: 1;
+  }
+
+  & svg {
+    width: 12px;
+    height: 12px;
+  }
+}

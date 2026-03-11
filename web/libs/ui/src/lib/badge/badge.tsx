@@ -1,5 +1,7 @@
-import { forwardRef } from "react";
+import { forwardRef, useEffect, useRef, useState } from "react";
+import { IconClose } from "@humansignal/icons";
 import { cn } from "../../utils/utils";
+import { Tooltip } from "../Tooltip/Tooltip";
 import styles from "./badge.module.scss";
 
 // Variant mapping: semantic names -> accent colors
@@ -67,6 +69,10 @@ export interface BadgeProps extends Omit<React.HTMLAttributes<HTMLDivElement>, "
   cssStyle?: React.CSSProperties;
   /** When provided, renders before children. For gradient (Enterprise) badges, pass e.g. icon={<IconSpark />} to show the spark icon. */
   icon?: React.ReactNode;
+  /** When provided, renders a close button and fires when clicked. */
+  onClose?: (e: React.MouseEvent<HTMLButtonElement>) => void;
+  /** Caps the text at this width, adds ellipsis truncation, and shows a tooltip only when text is actually clipped. */
+  maxWidth?: number | string;
 }
 
 function normalizeVariant(variant: string): string {
@@ -84,6 +90,8 @@ export const Badge = forwardRef<HTMLDivElement, BadgeProps>(
       className,
       cssStyle,
       icon,
+      onClose,
+      maxWidth,
       ...props
     },
     ref,
@@ -95,6 +103,32 @@ export const Badge = forwardRef<HTMLDivElement, BadgeProps>(
     const hasChildren = children != null && children !== "";
     const hasIcon = icon != null;
     const isIconOnly = isGradient && hasIcon && !hasChildren;
+
+    const textRef = useRef<HTMLSpanElement>(null);
+    const [isTruncated, setIsTruncated] = useState(false);
+
+    useEffect(() => {
+      if (!maxWidth) return;
+      const el = textRef.current;
+      if (el) {
+        setIsTruncated(el.scrollWidth > el.offsetWidth);
+      }
+    }, [maxWidth, children]);
+
+    const textContent =
+      maxWidth != null ? (
+        <Tooltip title={String(children ?? "")} disabled={!isTruncated}>
+          {/* Tooltip clones this div and may override its ref — that's fine, we don't need it */}
+          <div className="min-w-0">
+            {/* Our measurement ref lives here, safely outside Tooltip's cloneElement reach */}
+            <span ref={textRef} className={styles.label} style={{ maxWidth }}>
+              {children}
+            </span>
+          </div>
+        </Tooltip>
+      ) : (
+        children
+      );
 
     return (
       <div
@@ -119,7 +153,22 @@ export const Badge = forwardRef<HTMLDivElement, BadgeProps>(
         ) : (
           <>
             {hasIcon && <span className={styles.icon}>{icon}</span>}
-            {children}
+            {textContent}
+            {onClose && (
+              <button
+                type="button"
+                className={styles.closeButton}
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  onClose(e);
+                }}
+                aria-label="Remove"
+                tabIndex={-1}
+              >
+                <IconClose />
+              </button>
+            )}
           </>
         )}
       </div>

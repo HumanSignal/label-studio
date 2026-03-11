@@ -9,10 +9,9 @@ import React, {
 } from "react";
 import { Command, CommandEmpty, CommandGroup, CommandItem, CommandList } from "@humansignal/shad/components/ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "@humansignal/shad/components/ui/popover";
-import { Spinner } from "@humansignal/ui";
+import { Badge, Spinner } from "@humansignal/ui";
 import { IconPlus } from "@humansignal/icons";
 import { cnm } from "../../utils/utils";
-import { Tag } from "./tag";
 import { useTagAutocomplete } from "./use-tag-autocomplete";
 import type { TagAutocompleteProps, NormalizedTagOption } from "./types";
 import styles from "./tag-autocomplete.module.scss";
@@ -154,7 +153,7 @@ export const TagAutocomplete = forwardRef(
         }
 
         return (
-          <Tag
+          <Badge
             key={String(option.value)}
             ref={(el) => {
               if (el) {
@@ -163,15 +162,24 @@ export const TagAutocomplete = forwardRef(
                 tagRefs.current.delete(index);
               }
             }}
-            label={option.label}
-            onRemove={handleRemove}
-            isFocused={focusedTagIndex === index}
-            disabled={disabled}
-            className={tagClassName}
+            maxWidth={150}
+            onClose={handleRemove}
             tabIndex={focusedTagIndex === index ? 0 : -1}
+            className={cnm(
+              "flex-shrink-0 group focus:ring-0 focus:ring-offset-0",
+              {
+                [styles.tagFocused]: focusedTagIndex === index,
+                "opacity-60 cursor-not-allowed": disabled,
+              },
+              tagClassName,
+            )}
             onKeyDown={handleKeyDown}
-            dataTestid={`tag-${option.value}`}
-          />
+            data-testid={`tag-${option.value}`}
+            data-tag="true"
+            aria-label={`${option.label}, press Delete or Backspace to remove`}
+          >
+            {option.label}
+          </Badge>
         );
       },
       [renderTag, removeTag, focusedTagIndex, disabled, tagClassName, handleKeyDown, tagRefs],
