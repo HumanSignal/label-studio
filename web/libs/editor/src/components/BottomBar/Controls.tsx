@@ -44,6 +44,7 @@ type ControlButtonProps = {
 };
 
 export const EMPTY_SUBMIT_TOOLTIP = "Empty annotations denied in this project";
+export const INCOMPLETE_REGION_TOOLTIP = "Complete all regions before submitting";
 
 /**
  * Custom action button component, rendering buttons from store.customButtons
@@ -79,6 +80,7 @@ export const Controls = controlsInjector<{ annotation: MSTAnnotation }>(
     const [isInProgress, setIsInProgress] = useState(false);
     const disabled = !annotationEditable || store.isSubmitting || historySelected || isInProgress;
     const submitDisabled = store.hasInterface("annotations:deny-empty") && results.length === 0;
+    const hasIncompleteRegions = annotation.hasIncompleteRegions;
 
     /** Check all things related to comments and then call the action if all is good */
     const handleActionWithComments = useCallback(
@@ -197,7 +199,7 @@ export const Controls = controlsInjector<{ annotation: MSTAnnotation }>(
 
       // Also disable when overlap is reached (only when feature flag is enabled)
       const overlapDisabled = isFF(FF_FIT_1304_STRICT_OVERLAP) && store.overlapReached === true;
-      const isDisabled = disabled || submitDisabled || overlapDisabled;
+      const isDisabled = disabled || submitDisabled || overlapDisabled || hasIncompleteRegions;
 
       const useExitOption = !isDisabled && isNotQuickView;
 
@@ -237,11 +239,13 @@ export const Controls = controlsInjector<{ annotation: MSTAnnotation }>(
       };
 
       if (userGenerate || (store.explore && !userGenerate && store.hasInterface("submit"))) {
-        const title = overlapDisabled
-          ? store.overlapReachedMessage
-          : submitDisabled
-            ? EMPTY_SUBMIT_TOOLTIP
-            : "Save results: [ Ctrl+Enter ]";
+        const title = hasIncompleteRegions
+          ? INCOMPLETE_REGION_TOOLTIP
+          : overlapDisabled
+            ? store.overlapReachedMessage
+            : submitDisabled
+              ? EMPTY_SUBMIT_TOOLTIP
+              : "Save results: [ Ctrl+Enter ]";
 
         buttons.push(
           <ButtonTooltip key="submit" title={title}>
@@ -291,11 +295,13 @@ export const Controls = controlsInjector<{ annotation: MSTAnnotation }>(
         // no changes were made over previously submitted version — no drafts, no pending changes
         const noChanges = isFF(FF_REVIEWER_FLOW) && !history.canUndo && !annotation.draftId;
         const isUpdateDisabled = isDisabled || noChanges;
-        const updateTitle = overlapDisabled
-          ? store.overlapReachedMessage
-          : noChanges
-            ? "No changes were made"
-            : "Update this task: [ Ctrl+Enter ]";
+        const updateTitle = hasIncompleteRegions
+          ? INCOMPLETE_REGION_TOOLTIP
+          : overlapDisabled
+            ? store.overlapReachedMessage
+            : noChanges
+              ? "No changes were made"
+              : "Update this task: [ Ctrl+Enter ]";
         const button = (
           <ButtonTooltip key="update" title={updateTitle}>
             <ButtonGroup>

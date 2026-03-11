@@ -54,13 +54,18 @@ export const AcceptButton = memo(
     const annotation = store.annotationStore.selected;
     // changes in current sessions or saved draft
     const hasChanges = history.canUndo || annotation.versions.draft;
+    const hasIncompleteRegions = annotation.hasIncompleteRegions;
+    const isDisabled = disabled || hasIncompleteRegions;
+    const tooltip = hasIncompleteRegions
+      ? "Complete all regions before accepting"
+      : "Accept annotation: [ Ctrl+Enter ]";
 
     return (
       <Button
         key="accept"
-        tooltip="Accept annotation: [ Ctrl+Enter ]"
+        tooltip={tooltip}
         aria-label="accept-annotation"
-        disabled={disabled}
+        disabled={isDisabled}
         onClick={async () => {
           annotation.submissionInProgress();
           await store.commentStore.commentFormSubmit();

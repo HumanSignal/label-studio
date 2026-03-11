@@ -284,6 +284,14 @@ const _Annotation = types
       return results;
     },
 
+    get hasIncompleteRegions() {
+      if (!isAlive(self)) return false;
+      for (const area of self.areas.values()) {
+        if (area.incomplete) return true;
+      }
+      return false;
+    },
+
     get serialized() {
       // Dirty hack to force MST track changes
       self.areas.toJSON();
