@@ -54,7 +54,7 @@ export const AcceptButton = memo(
     const annotation = store.annotationStore.selected;
     // changes in current sessions or saved draft
     const hasChanges = history.canUndo || annotation.versions.draft;
-    const hasIncompleteRegions = annotation.hasIncompleteRegions;
+    const hasIncompleteRegions = annotation.hasIncompletePolygons;
     const isDisabled = disabled || hasIncompleteRegions;
     const tooltip = hasIncompleteRegions
       ? "Complete all regions before accepting"
