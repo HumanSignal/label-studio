@@ -49,13 +49,13 @@ interface OutlinerTreeProps {
 
 const OutlinerTreeComponent: FC<OutlinerTreeProps> = observer(({ regions, footer }) => {
   const rootClass = cn("tree");
-  // Subscribe to each region's hidden state so tree data (and hide/show icons) rebuild when visibility changes
-  const visibilityKey = regions.regions?.map((r: any) => r.hidden).join(",") ?? "";
+  // Subscribe to each region's hidden state so tree re-renders when visibility changes
+  regions.regions?.forEach((r: any) => void r.hidden);
   const regionsTree = useDataTree({
     regions,
     rootClass,
     footer,
-    // that's a trick to have a dependency that causes recalculating of tree data on grouping mode change
+    // it's for rerender OutlinerTreeComponent
     grouping: regions.group,
   });
 
