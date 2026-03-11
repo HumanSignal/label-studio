@@ -250,7 +250,7 @@ export const Controls = controlsInjector<{ annotation: MSTAnnotation }>(
               : "Save results: [ Ctrl+Enter ]";
 
         buttons.push(
-          <ButtonTooltip key="submit" title={title} className="whitespace-nowrap">
+          <ButtonTooltip key="submit" title={title} className="whitespace-nowrap max-w-none">
             <div className={cn("controls").elem("tooltip-wrapper").toClassName()}>
               <ButtonGroup>
                 <Button
