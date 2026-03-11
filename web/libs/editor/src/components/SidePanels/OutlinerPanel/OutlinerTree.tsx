@@ -47,7 +47,7 @@ interface OutlinerTreeProps {
   footer: ReactNode;
 }
 
-const OutlinerTreeComponent: FC<OutlinerTreeProps> = observer(({ regions, footer }) => {
+const OutlinerTreeComponent: FC<OutlinerTreeProps> = ({ regions, footer }) => {
   const rootClass = cn("tree");
   const regionsTree = useDataTree({
     regions,
@@ -62,7 +62,7 @@ const OutlinerTreeComponent: FC<OutlinerTreeProps> = observer(({ regions, footer
       <OutlinerInnerTreeComponent regions={regions} regionsTree={regionsTree} />
     </OutlinerContext.Provider>
   );
-});
+};
 
 interface OutlinerInnerTreeProps {
   regions: any;
@@ -665,4 +665,4 @@ const RegionItemDesc: FC<RegionItemOCSProps> = observer(({ item, collapsed, setC
   );
 });
 
-export const OutlinerTree = OutlinerTreeComponent;
+export const OutlinerTree = observer(OutlinerTreeComponent);
