@@ -61,11 +61,7 @@ export const AcceptButton = memo(
     const tooltip = hasIncompleteRegions ? INCOMPLETE_ACCEPT_TOOLTIP : "Accept annotation: [ Ctrl+Enter ]";
 
     return (
-      <Tooltip
-        title={tooltip}
-        disabled={!store.settings.enableTooltips}
-        className="whitespace-nowrap"
-      >
+      <Tooltip title={tooltip} disabled={!store.settings.enableTooltips} className="whitespace-nowrap">
         <Button
           key="accept"
           aria-label="accept-annotation"
