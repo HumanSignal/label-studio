@@ -49,8 +49,6 @@ interface OutlinerTreeProps {
 
 const OutlinerTreeComponent: FC<OutlinerTreeProps> = observer(({ regions, footer }) => {
   const rootClass = cn("tree");
-  // Subscribe to each region's hidden state so tree re-renders when visibility changes
-  regions.regions?.forEach((r: any) => void r.hidden);
   const regionsTree = useDataTree({
     regions,
     rootClass,
