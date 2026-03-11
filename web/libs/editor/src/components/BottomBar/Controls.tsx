@@ -44,9 +44,9 @@ type ControlButtonProps = {
 };
 
 export const EMPTY_SUBMIT_TOOLTIP = "Empty annotations denied in this project";
-export const INCOMPLETE_SUBMIT_TOOLTIP = "Complete all regions before\nsubmitting";
-export const INCOMPLETE_UPDATE_TOOLTIP = "Complete all regions before\nupdating";
-export const INCOMPLETE_ACCEPT_TOOLTIP = "Complete all regions before\naccepting";
+export const INCOMPLETE_SUBMIT_TOOLTIP = "Complete all regions before submitting";
+export const INCOMPLETE_UPDATE_TOOLTIP = "Complete all regions before updating";
+export const INCOMPLETE_ACCEPT_TOOLTIP = "Complete all regions before accepting";
 
 /**
  * Custom action button component, rendering buttons from store.customButtons
