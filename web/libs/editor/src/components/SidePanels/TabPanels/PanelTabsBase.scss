@@ -234,7 +234,7 @@
       top: calc(var(--size) / 2);
       width: var(--size);
       height: calc(100% - var(--size));
-      cursor: ew-resize;
+      cursor: col-resize;
     }
 
     &[data-resize="left"] {
@@ -327,11 +327,14 @@
       transform: translate(-50%, 0);
       height: calc(100% + var(--size));
       top: calc(var(--size) / 2 * -1);
+      display: block;
+      opacity: 0.3;
     }
 
     &:hover::before,
     &_drag::before {
       display: block;
+      opacity: 1;
     }
   }
 

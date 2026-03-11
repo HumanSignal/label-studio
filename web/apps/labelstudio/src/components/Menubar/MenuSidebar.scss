@@ -64,4 +64,33 @@
     opacity: 1;
     transform: rotate(-45deg);
   }
+
+  &__resize-handle {
+    position: fixed;
+    top: var(--header-height);
+    left: var(--menu-sidebar-width);
+    width: 6px;
+    height: calc(100vh - var(--header-height));
+    cursor: col-resize;
+    z-index: 101;
+    user-select: none;
+    transform: translateX(-50%);
+
+    &::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 2px;
+      height: 100%;
+      background: var(--color-primary-border);
+      opacity: 0.3;
+      transition: opacity 150ms ease;
+    }
+
+    &:hover::after {
+      opacity: 1;
+    }
+  }
 }
