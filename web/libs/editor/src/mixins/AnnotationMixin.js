@@ -5,7 +5,7 @@ import { FF_DEV_3391, FF_SIMPLE_INIT, isFF } from "../utils/feature-flags";
 export const AnnotationMixin = types.model("AnnotationMixin", {}).views((self) => ({
   get annotation() {
     // annotation should not be accessed before store is initialized
-    if (isFF(FF_SIMPLE_INIT) && !window.STORE_INIT_OK) {
+    if (isFF(FF_SIMPLE_INIT) && !window.STORE_INIT_OK && !isFF(FF_DEV_3391)) {
       console.error("LSF: annotation accessed before store is initialized", self);
     }
 
