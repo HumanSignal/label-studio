@@ -23,8 +23,11 @@ export const Spinner = injector(({ SDK, visible = true, ...props }) => {
   }, [props.size]);
 
   const source = Running.default;
-  // Use x2 only for large (128px) so it stays sharp; x1 is fine for small/middle
-  const imgSrc = size >= (SDK?.spinnerSize?.large ?? 128) ? source.x2 : source.x1;
+  const largeThreshold = SDK?.spinnerSize?.large ?? 128;
+  const isLarge = size >= largeThreshold;
+  // Large: always use x2 so 128px display has 128px image. Small/middle: use srcSet so browser picks by DPR.
+  const imgSrc = isLarge ? source.x2 : source.x1;
+  const imgSrcSet = isLarge ? undefined : `${source.x1} 1x, ${source.x2} 2x`;
   const imgStyles = {
     width: size,
     height: size,
@@ -42,7 +45,7 @@ export const Spinner = injector(({ SDK, visible = true, ...props }) => {
           {ExternalSpinner ? (
             <ExternalSpinner size={size} />
           ) : (
-            <img src={imgSrc} style={imgStyles} alt="opossum loader" />
+            <img src={imgSrc} srcSet={imgSrcSet} style={imgStyles} alt="opossum loader" />
           )}
         </div>
       }
