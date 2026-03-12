@@ -215,6 +215,7 @@ const _Tool = types
         self.mode = "drawing";
         area.setDrawing(true);
         self.annotation?.setIsDrawing(true);
+        self.annotation?.history?.freeze();
 
         self.listenForClose();
 
@@ -227,6 +228,7 @@ const _Tool = types
 
       mousedownEv(ev, [x, y]) {
         if (self.mode === "drawing") {
+          self.annotation?.history?.freeze();
           down = true;
           initialCursorPosition = { x, y };
           return;
@@ -246,6 +248,7 @@ const _Tool = types
           selectedUnclosed.setDrawing(true);
           self.annotation?.setIsDrawing(true);
           self.listenForClose();
+          self.annotation?.history?.freeze();
           down = true;
           initialCursorPosition = { x, y };
           return;
@@ -306,6 +309,7 @@ const _Tool = types
         self.currentArea.setDrawing(false);
         self.currentArea.notifyDrawingFinished?.();
         self.annotation?.setIsDrawing(false);
+        self.annotation?.history?.unfreeze();
 
         const { currentArea, control } = self;
 
@@ -338,6 +342,7 @@ const _Tool = types
         down = false;
         self.stopListening();
         self.annotation?.setIsDrawing(false);
+        self.annotation?.history?.unfreeze();
 
         if (currentArea && isAlive(currentArea)) {
           currentArea.setDrawing(false);
