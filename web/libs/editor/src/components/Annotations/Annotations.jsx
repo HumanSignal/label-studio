@@ -15,7 +15,7 @@ import {
 } from "@ant-design/icons";
 
 import Utils from "../../utils";
-import styles from "./Annotations.module.scss";
+import styles from "./Annotations.module.css";
 
 /** @deprecated this file is not used; DraftPanel is moved to separate component */
 

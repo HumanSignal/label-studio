@@ -15,7 +15,7 @@ import { Badge } from "../badge/badge";
 import { isDefined } from "@humansignal/core/lib/utils/helpers";
 import { IconChevron, IconChevronDown } from "@humansignal/icons";
 import clsx from "clsx";
-import styles from "./select.module.scss";
+import styles from "./select.module.css";
 import { cn, cnm } from "../../utils/utils";
 import { VariableSizeList } from "react-window";
 import InfiniteLoader from "react-window-infinite-loader";

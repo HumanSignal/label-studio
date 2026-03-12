@@ -3,7 +3,7 @@ import { Button, Tooltip } from "@humansignal/ui";
 import Utils from "../../utils";
 import { cn } from "../../utils/bem";
 
-import "./DraftPanel.scss";
+import "./DraftPanel.prefix.css";
 
 const panel = cn("draft-panel");
 

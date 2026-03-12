@@ -3,7 +3,7 @@ import { Dropdown, Menu, Slider } from "antd";
 import { Button, IconRefresh } from "@humansignal/ui";
 import { observer } from "mobx-react";
 
-import styles from "./Styles.module.scss";
+import styles from "./Styles.module.css";
 
 export default observer(
   class SliderDropDownTool extends Component {

@@ -7,7 +7,7 @@ import { Icon } from "../Icon/Icon";
 import { modal } from "../Modal/Modal";
 import { IconBraces } from "@humansignal/icons";
 import { AutoSizerTable, Button } from "@humansignal/ui";
-import "./Table.scss";
+import "./Table.prefix.css";
 import { TableCheckboxCell } from "./TableCheckbox";
 import { tableCN, TableContext } from "./TableContext";
 import { TableHead } from "./TableHead/TableHead";

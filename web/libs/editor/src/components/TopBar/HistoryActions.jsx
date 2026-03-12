@@ -2,7 +2,7 @@ import { observer } from "mobx-react";
 import { IconRedo, IconRemove, IconUndo } from "@humansignal/icons";
 import { Button } from "@humansignal/ui";
 import { cn } from "../../utils/bem";
-import "./HistoryActions.scss";
+import "./HistoryActions.prefix.css";
 
 export const EditingHistory = observer(({ entity }) => {
   const { history } = entity;

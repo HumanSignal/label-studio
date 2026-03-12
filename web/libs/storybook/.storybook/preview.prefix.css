@@ -1,4 +1,4 @@
-@import '../../ui/src/styles';
+@import '../../ui/src/styles.prefix.css';
 
 body {
   height: 100vh;

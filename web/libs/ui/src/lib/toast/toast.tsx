@@ -1,6 +1,6 @@
 import { createContext, type FC, type ReactNode, useCallback, useContext, useState } from "react";
 import * as ToastPrimitive from "@radix-ui/react-toast";
-import styles from "./toast.module.scss";
+import styles from "./toast.module.css";
 import clsx from "clsx";
 import { IconCross } from "../../assets/icons";
 import { nanoid } from "nanoid";

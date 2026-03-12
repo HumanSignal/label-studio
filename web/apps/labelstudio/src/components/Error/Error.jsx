@@ -5,7 +5,7 @@ import { cn } from "../../utils/bem";
 import { absoluteURL, copyText } from "../../utils/helpers";
 import { Button } from "@humansignal/ui";
 import { Space } from "../Space/Space";
-import "./Error.scss";
+import "./Error.prefix.css";
 
 const SLACK_INVITE_URL = "https://slack.labelstud.io/?source=product-error-msg";
 

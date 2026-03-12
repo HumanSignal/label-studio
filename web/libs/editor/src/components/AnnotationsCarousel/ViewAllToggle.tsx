@@ -2,7 +2,7 @@ import { observer } from "mobx-react";
 import { IconViewAll } from "@humansignal/icons";
 import { Typography } from "@humansignal/ui";
 import { cn } from "../../utils/bem";
-import "./ViewAllToggle.scss";
+import "./ViewAllToggle.prefix.css";
 
 interface ViewAllToggleProps {
   isActive: boolean;

@@ -86,7 +86,7 @@ const workspaceRoot = findWorkspaceRoot();
 
 // Paths
 const designVariablesPath = path.join(workspaceRoot, "design-tokens.json");
-const cssOutputPath = path.join(workspaceRoot, "libs/ui/src/tokens/tokens.scss");
+const cssOutputPath = path.join(workspaceRoot, "libs/ui/src/tokens/tokens.prefix.css");
 const jsOutputPath = path.join(workspaceRoot, "libs/ui/src/tokens/tokens.js");
 
 /**

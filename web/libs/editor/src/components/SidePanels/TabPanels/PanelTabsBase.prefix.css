@@ -1,4 +1,4 @@
-@import "../../../assets/styles/global";
+@import "../../../assets/styles/global.prefix.css";
 
 .tabs-panel {
   --header-height: 24px;

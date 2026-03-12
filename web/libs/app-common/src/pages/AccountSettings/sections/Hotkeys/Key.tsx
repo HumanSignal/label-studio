@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import styles from "./Key.module.scss";
+import styles from "./Key.module.css";
 
 // Type definitions
 interface KeyboardKeyProps {

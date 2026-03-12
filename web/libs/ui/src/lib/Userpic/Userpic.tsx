@@ -2,7 +2,7 @@ import chroma from "chroma-js";
 import { type CSSProperties, forwardRef, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { isDefined, userDisplayName } from "@humansignal/core/lib/utils/helpers";
 import { Tooltip } from "@humansignal/ui";
-import styles from "./Userpic.module.scss";
+import styles from "./Userpic.module.css";
 import clsx from "clsx";
 
 type UserpicProps = {

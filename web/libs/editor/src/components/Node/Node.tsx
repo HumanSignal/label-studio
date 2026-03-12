@@ -4,7 +4,7 @@ import { observer } from "mobx-react";
 import { ApartmentOutlined, AudioOutlined, LineChartOutlined, MessageOutlined } from "@ant-design/icons";
 
 import Registry from "../../core/Registry";
-import "./Node.scss";
+import "./Node.prefix.css";
 import {
   IconBrushTool,
   IconBrushToolSmart,

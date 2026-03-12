@@ -11,7 +11,7 @@ import {
 import { cn } from "../../utils/bem";
 import { IconArrowLeft, IconArrowRight, IconOutlinerCollapse, IconOutlinerExpand } from "@humansignal/icons";
 
-import "./PanelBase.scss";
+import "./PanelBase.prefix.css";
 import type { PanelType } from "./TabPanels/types";
 import { useDrag } from "../../hooks/useDrag";
 import { clamp, isDefined } from "../../utils/utilities";

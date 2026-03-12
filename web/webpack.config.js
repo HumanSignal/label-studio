@@ -147,65 +147,68 @@ module.exports = composePlugins(
     };
 
     config.module.rules.forEach((rule) => {
-      const testString = rule.test.toString();
-      const isScss = testString.includes("scss");
-      const isCssModule = testString.includes(".module");
+      if (!rule.oneOf || !rule.test?.toString().includes("css")) return;
 
-      if (isScss) {
-        rule.oneOf.forEach((loader) => {
-          if (loader.use) {
-            const cssLoader = loader.use.find((use) => use.loader && use.loader.includes("css-loader"));
+      rule.oneOf.forEach((oneOfRule) => {
+        if (!oneOfRule.use) return;
 
-            if (cssLoader && cssLoader.options) {
-              cssLoader.options.modules = {
-                mode: "local",
-                auto: true,
-                namedExport: false,
-                localIdentName: "[local]--[hash:base64:5]",
-              };
-            }
-          }
-        });
-      }
+        oneOfRule.use = oneOfRule.use.filter(
+          (use) => !(use.loader && /sass-loader|stylus-loader|less-loader/.test(use.loader)),
+        );
 
-      if (rule.test.toString().match(/scss|sass/) && !isCssModule) {
-        const r = rule.oneOf.filter((r) => {
-          // we don't need rules that don't have loaders
-          if (!r.use) return false;
+        const innerTest = oneOfRule.test?.toString() ?? "";
+        const cssLoader = oneOfRule.use.find((use) => use.loader?.includes("/css-loader/"));
 
-          const testString = r.test.toString();
+        if (innerTest.includes("module") && cssLoader?.options) {
+          cssLoader.options.modules = {
+            mode: "local",
+            auto: true,
+            namedExport: false,
+            localIdentName: "[local]--[hash:base64:5]",
+          };
+        }
+      });
 
-          // we also don't need css modules as these are used directly
-          // in the code and don't need prefixing
-          if (testString.match(/module|raw|antd/)) return false;
+      const insertions = [];
+      rule.oneOf.forEach((oneOfRule, idx) => {
+        if (!oneOfRule.test || !oneOfRule.use) return;
+        const t = oneOfRule.test.toString();
+        if (/^\/\\\.css\$\/$/.test(t) && oneOfRule.use.some((u) => u.loader?.includes("/css-loader/"))) {
+          insertions.push(idx);
+        }
+      });
 
-          // we only target pre-processors that has 'css-loader included'
-          return testString.match(/scss|sass/) && r.use.some((u) => u.loader && u.loader.includes("css-loader"));
-        });
-
-        r.forEach((_r) => {
-          const cssLoader = _r.use.find((use) => use.loader && use.loader.includes("css-loader"));
-
-          if (!cssLoader) return;
-
-          const isSASS = _r.use.some((use) => use.loader && use.loader.match(/sass|scss/));
-
-          if (isSASS) _r.exclude = /node_modules/;
-
-          if (cssLoader.options) {
-            cssLoader.options.modules = {
-              localIdentName: `${css_prefix}[local]`, // Customize this format
-              getLocalIdent(_ctx, _ident, className) {
-                if (className.includes("ant")) return className;
+      for (let i = insertions.length - 1; i >= 0; i--) {
+        const idx = insertions[i];
+        const template = rule.oneOf[idx];
+        const prefixUse = template.use.map((u) => {
+          if (typeof u === "string") return u;
+          if (u.loader?.includes("/css-loader/")) {
+            return {
+              ...u,
+              options: {
+                ...(u.options ?? {}),
+                modules: {
+                  localIdentName: `${css_prefix}[local]`,
+                  getLocalIdent(_ctx, _ident, className) {
+                    if (className.includes("ant")) return className;
+                  },
+                },
               },
             };
           }
+          return u;
+        });
+
+        rule.oneOf.splice(idx, 0, {
+          test: /\.prefix\.css$/,
+          include: template.include,
+          exclude: /node_modules/,
+          use: prefixUse,
         });
       }
 
-      if (testString.includes(".css")) {
-        rule.exclude = /tailwind\.css/;
-      }
+      rule.exclude = /tailwind\.css/;
     });
 
     // Force local @humansignal icon SVGs through svgr regardless of issuer.

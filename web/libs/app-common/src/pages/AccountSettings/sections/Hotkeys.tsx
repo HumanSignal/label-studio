@@ -20,7 +20,7 @@ import { KeyboardKey } from "./Hotkeys/Key";
 import type { Hotkey, Section, DirtyState, DuplicateConfirmDialog, ImportData } from "./Hotkeys/utils";
 // @ts-ignore
 import { HOTKEY_SECTIONS } from "./Hotkeys/defaults";
-import styles from "../AccountSettings.module.scss";
+import styles from "../AccountSettings.module.css";
 import { useHotkeys } from "../hooks/useHotkeys";
 
 // Type the imported defaults

@@ -58,7 +58,7 @@ jest.mock("./CodeView", () => ({
 }));
 
 // Mock styles
-jest.mock("./TaskSourceViewer.module.scss", () => ({
+jest.mock("./TaskSourceViewer.module.css", () => ({
   taskSourceView: "taskSourceView",
   viewToggleContainer: "viewToggleContainer",
   viewContent: "viewContent",

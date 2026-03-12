@@ -7,7 +7,7 @@ import Registry from "../core/Registry";
 import { TextAreaModel } from "../tags/control/TextArea/TextArea";
 import { guidGenerator } from "../core/Helpers";
 
-import styles from "./TextAreaRegion/TextAreaRegion.scss";
+import styles from "./TextAreaRegion/TextAreaRegion.prefix.css";
 import { HtxTextBox } from "../components/HtxTextBox/HtxTextBox";
 import { cn } from "../utils/bem";
 

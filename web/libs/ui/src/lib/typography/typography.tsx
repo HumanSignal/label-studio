@@ -1,7 +1,7 @@
 import type React from "react";
 import { forwardRef, useState, useEffect, useRef } from "react";
 import { cnm } from "../../utils/utils";
-import styles from "./typography.module.scss";
+import styles from "./typography.module.css";
 
 // Size constants
 const SIZES = {

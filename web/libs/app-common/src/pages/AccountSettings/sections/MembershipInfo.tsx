@@ -1,5 +1,5 @@
 import { format } from "date-fns";
-import styles from "./MembershipInfo.module.scss";
+import styles from "./MembershipInfo.module.css";
 import { useQuery } from "@tanstack/react-query";
 import { getApiInstance } from "@humansignal/core";
 import { useMemo } from "react";

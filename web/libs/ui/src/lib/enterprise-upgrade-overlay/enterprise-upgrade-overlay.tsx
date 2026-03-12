@@ -3,7 +3,7 @@ import { cn } from "../../utils/utils";
 import { EnterpriseBadge } from "../enterprise-badge/enterprise-badge";
 import { Button } from "../button/button";
 import { Typography } from "../typography/typography";
-import styles from "./enterprise-upgrade-overlay.module.scss";
+import styles from "./enterprise-upgrade-overlay.module.css";
 
 /**
  * EnterpriseUpgradeOverlay Component

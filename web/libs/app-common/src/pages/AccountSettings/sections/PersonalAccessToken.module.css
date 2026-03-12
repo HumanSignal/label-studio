@@ -1,5 +1,5 @@
 .input {
-  @apply flex-1 max-h-[40px]
+  @apply flex-1 max-h-[40px];
 }
 
 .textarea {

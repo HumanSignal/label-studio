@@ -1,7 +1,7 @@
 .taxonomy {
   border: 1px solid var(--color-neutral-border);
   border-radius: 6px;
-  padding: 4px 4px 0; // margin of last row of selected divs will work as padding
+  padding: 4px 4px 0; /* margin of last row of selected divs will work as padding */
   width: max-content;
   max-width: 100%;
   position: relative;
@@ -10,8 +10,8 @@
     display: flex;
     align-items: center;
     line-height: 30px;
-    padding: 0 4px; // 4px padding to stay on the same indent as selected
-    margin-bottom: 4px; // also replaces padding to be consistent with selected divs
+    padding: 0 4px; /* 4px padding to stay on the same indent as selected */
+    margin-bottom: 4px; /* also replaces padding to be consistent with selected divs */
     white-space: nowrap;
     cursor: pointer;
   }
@@ -28,12 +28,12 @@
 .taxonomy__selected {
   display: flex;
   flex-wrap: wrap;
-  min-height: 28px; // 24px button + 4px margin
+  min-height: 28px; /* 24px button + 4px margin */
 
   & div {
     margin: 0 2px 4px 0;
     background: hsl(0deg 0% 95%);
-    padding: 0; // all the right space should be a clickable button, so no padding
+    padding: 0; /* all the right space should be a clickable button, so no padding */
     border-radius: 4px;
     display: flex;
     align-items: center;
@@ -54,7 +54,7 @@
     font-weight: 600;
     font-size: 20px;
     color: var(--primary_link);
-    margin-left: -8px; // to align with the right edge of the text
+    margin-left: -8px; /* to align with the right edge of the text */
 
     &:hover {
       color: var(--color-negative-content);
@@ -92,7 +92,7 @@
   border-radius: 3px 3px 0 0;
   padding: 6px 16px;
   margin-bottom: 4px;
-  box-shadow: 0 -2px 0 6px var(--color-neutral-background); // white background over scrolled items
+  box-shadow: 0 -2px 0 6px var(--color-neutral-background); /* white background over scrolled items */
   position: sticky;
   top: 0;
   z-index: 1;
@@ -118,8 +118,6 @@
   padding-right: 8px;
   line-height: 2em;
 }
-
-;
 
 .taxonomy__item {
   display: flex;
@@ -160,7 +158,7 @@
   font-family: var(--font-mono);
 
   & svg {
-    transition: transform 0.1s; // visible rotation of arrow
+    transition: transform 0.1s; /* visible rotation of arrow */
   }
 
   &:not(:empty) {
@@ -178,9 +176,9 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  min-width: 40px; // 24px padding + 16px width for count/dots
+  min-width: 40px; /* 24px padding + 16px width for count/dots */
   text-align: right;
-  position: relative; // important for wide labels to not overlap counts with label
+  position: relative; /* important for wide labels to not overlap counts with label */
 
   &_actions {
     visibility: hidden;
@@ -206,7 +204,7 @@
 }
 
 .taxonomy__action {
-  zoom: 1; // something to apply this class
+  zoom: 1; /* something to apply this class */
 }
 
 .taxonomy__add__container {
@@ -214,14 +212,14 @@
 }
 
 .taxonomy__add {
-  margin-left: 27px; // chevron 24px + 3px margin
+  margin-left: 27px; /* chevron 24px + 3px margin */
   display: flex;
   align-items: center;
   opacity: 0.6;
 
   &::before {
     content: "+";
-    width: 16px; // as checkbox
+    width: 16px; /* as checkbox */
     padding: 4px 0;
     text-align: center;
     font-size: 18px;

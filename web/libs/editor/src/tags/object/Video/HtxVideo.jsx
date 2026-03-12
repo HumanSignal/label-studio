@@ -22,7 +22,7 @@ import { useToggle } from "../../../hooks/useToggle";
 import { cn } from "../../../utils/bem";
 import ResizeObserver from "../../../utils/resize-observer";
 import { clamp, isDefined } from "../../../utils/utilities";
-import "./Video.scss";
+import "./Video.prefix.css";
 import { VideoRegions } from "./VideoRegions";
 import { ff } from "@humansignal/core";
 

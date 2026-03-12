@@ -9,6 +9,6 @@
   white-space: normal;
 
   & + & {
-    margin: 0 0 16px; // in case we are in flex container, where margins don't collapse
+    margin: 0 0 16px; /* in case we are in flex container, where margins don't collapse */
   }
 }

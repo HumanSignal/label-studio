@@ -650,6 +650,7 @@ TASK_MIXIN = 'tasks.mixins.TaskMixin'
 LSE_PROJECT = None
 GET_TASKS_AGREEMENT_QUERYSET = None
 SHOULD_ATTEMPT_GROUND_TRUTH_FIRST = None
+IS_USER_IN_GT_EVALUATION_WINDOW = None
 ANNOTATION_MIXIN = 'tasks.mixins.AnnotationMixin'
 ORGANIZATION_MIXIN = 'organizations.mixins.OrganizationMixin'
 USER_MIXIN = 'users.mixins.UserMixin'
