@@ -9,7 +9,7 @@ import { useAPI } from "../../../providers/ApiProvider";
 import { cn } from "../../../utils/bem";
 import { unique } from "../../../utils/helpers";
 import { sampleDatasetAtom } from "../utils/atoms";
-import "./Import.scss";
+import "./Import.prefix.css";
 import { Button, CodeBlock, SimpleCard, Spinner, Tooltip, Typography, Badge } from "@humansignal/ui";
 import truncate from "truncate-middle";
 import samples from "./samples.json";

@@ -1,5 +1,4 @@
-"""This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
-"""
+"""This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license."""
 
 import json
 import logging
@@ -11,7 +10,7 @@ import boto3
 from core.feature_flags import flag_set
 from core.redis import start_job_async_or_sync
 from django.conf import settings
-from django.db import models
+from django.db import models, transaction
 from django.db.models.signals import post_save, pre_delete
 from django.dispatch import receiver
 from django.utils.translation import gettext_lazy as _
@@ -178,7 +177,6 @@ class S3StorageMixin(models.Model):
 
 
 class S3ImportStorageBase(S3StorageMixin, ImportStorage):
-
     url_scheme = 's3'
 
     presign = models.BooleanField(_('presign'), default=True, help_text='Generate presigned URLs')
@@ -336,7 +334,7 @@ def async_export_annotation_to_s3_storages(annotation: 'Annotation | int'):
 def export_annotation_to_s3_storages(sender, instance, **kwargs):
     storages = getattr(instance.project, 'io_storages_s3exportstorages', None)
     if storages and storages.exists():  # avoid excess jobs in rq
-        start_job_async_or_sync(async_export_annotation_to_s3_storages, instance.pk)
+        transaction.on_commit(lambda: start_job_async_or_sync(async_export_annotation_to_s3_storages, instance.pk))
 
 
 @receiver(pre_delete, sender=Annotation)

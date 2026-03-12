@@ -18,7 +18,7 @@ import {
   trimSelection,
 } from "../../../utils/selection-tools";
 import { isDefined } from "../../../utils/utilities";
-import "./RichText.scss";
+import "./RichText.prefix.css";
 
 const DBLCLICK_TIMEOUT = 450; // ms
 const DBLCLICK_RANGE = 5; // px

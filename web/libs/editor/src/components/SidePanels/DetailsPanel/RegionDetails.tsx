@@ -2,7 +2,7 @@ import { observer } from "mobx-react";
 import { type FC, useEffect, useMemo, useRef } from "react";
 import { cn } from "../../../utils/bem";
 import { RegionEditor } from "./RegionEditor";
-import "./RegionDetails.scss";
+import "./RegionDetails.prefix.css";
 import { JsonViewer, Typography } from "@humansignal/ui";
 
 const TextResult: FC<{ mainValue: string[] }> = observer(({ mainValue }) => {

@@ -1,4 +1,4 @@
-import styles from "./Card.module.scss";
+import styles from "./Card.module.css";
 import { Tooltip } from "@humansignal/ui";
 
 type CardProps = {

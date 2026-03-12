@@ -11,7 +11,7 @@ import { cn } from "../../utils/bem";
 import { userDisplayName } from "@humansignal/core";
 import { isDefined } from "../../utils/utilities";
 import { GroundTruth } from "../CurrentEntity/GroundTruth";
-import "./Annotations.scss";
+import "./Annotations.prefix.css";
 import { TimeAgo } from "../../common/TimeAgo/TimeAgo";
 import { reaction } from "mobx";
 

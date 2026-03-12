@@ -14,7 +14,7 @@ import SelectedModelMixin from "../../../mixins/SelectedModel";
 import { cn } from "../../../utils/bem";
 import ControlBase from "../Base";
 import "../Label";
-import "./Labels.scss";
+import "./Labels.prefix.css";
 
 /**
  * The `Labels` tag provides a set of labels for labeling regions in tasks for machine learning and data science projects. Use the `Labels` tag to create a set of labels that can be assigned to identified region and specify the values of labels to assign to regions.

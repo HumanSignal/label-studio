@@ -13,7 +13,7 @@ import { FF_DEV_2669, FF_DEV_2918, FF_LSDV_E_278, isFF } from "../../../utils/fe
 import messages from "../../../utils/messages";
 import { clamp, isDefined, isValidObjectURL } from "../../../utils/utilities";
 import ObjectBase from "../Base";
-import styles from "./Paragraphs.module.scss";
+import styles from "./Paragraphs.module.css";
 import { ff } from "@humansignal/core";
 
 const isSyncedBuffering = ff.isActive(ff.FF_SYNCED_BUFFERING);

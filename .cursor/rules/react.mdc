@@ -31,7 +31,7 @@ globs: **/*.jsx,**/*.tsx
   ```
   component-name/
     component-name.tsx
-    component-name.module.scss
+    component-name.module.css
     component-name.test.tsx
     index.ts
   ```
@@ -64,7 +64,7 @@ globs: **/*.jsx,**/*.tsx
 
 ## Tooling
 - Use Biome for code linting and formatting
-- Follow CSS/SCSS linting rules defined in .stylelintrc.json
+- Follow CSS linting rules defined in biome.json (css section)
 - Use TypeScript for type safety
 - Keep bundle size in check by monitoring imports
 
@@ -104,7 +104,7 @@ globs: **/*.jsx,**/*.tsx
 ## Code Organization
 - Use proper file naming conventions which is kebab-case ie. ListItem -> `list-item.tsx`
 - Prefer one component per folder, but group related components together when necessary, and ensure there is only one component per file.
-- Component folders should have a SCSS `.module.scss` with the name of the component kebab-case ie. ListItem -> `list-item.module.scss`
+- Component folders should have a CSS `.module.css` with the name of the component kebab-case ie. ListItem -> `list-item.module.css`
 - Implement proper directory structure
 - UI components live within `web/libs/ui`
 - Application components that are shared across applications such as certain page-level blocks live within `web/libs/app-common`

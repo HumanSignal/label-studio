@@ -18,7 +18,7 @@ import "codemirror/lib/codemirror.css";
 import "codemirror/addon/hint/show-hint.css";
 import "codemirror/addon/dialog/dialog.css";
 import "codemirror/addon/search/matchesonscrollbar.css";
-import styles from "./code-editor.module.scss";
+import styles from "./code-editor.module.css";
 import { cn } from "@humansignal/shad/utils";
 import { forwardRef } from "react";
 

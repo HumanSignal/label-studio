@@ -11,7 +11,7 @@ def cast_bool_from_str(value):
         elif value.lower() in ['false', 'no', 'not', 'off', '0']:
             value = False
         else:
-            raise ValueError(f'Incorrect bool value "{value}". ' f'It should be one of [1, 0, true, false, yes, no]')
+            raise ValueError(f'Incorrect bool value "{value}". It should be one of [1, 0, true, false, yes, no]')
     return value
 
 
@@ -57,7 +57,7 @@ def int_from_request(params, key, default):
     # other
     else:
         raise ValidationError(
-            {key: f'Incorrect value type in key "{key}" = "{value}". ' f'It should be digit string or integer.'}
+            {key: f'Incorrect value type in key "{key}" = "{value}". It should be digit string or integer.'}
         )
 
 
@@ -83,7 +83,7 @@ def float_from_request(params, key, default):
     # other
     else:
         raise ValidationError(
-            {key: f'Incorrect value type in key "{key}" = "{value}". ' f'It should be digit string or float.'}
+            {key: f'Incorrect value type in key "{key}" = "{value}". It should be digit string or float.'}
         )
 
 
@@ -107,7 +107,7 @@ def list_of_strings_from_request(params, key, default):
         return [value]
     else:
         raise ValidationError(
-            {key: f'Incorrect value type in key "{key}" = "{value}". ' f'It should be digit string or float.'}
+            {key: f'Incorrect value type in key "{key}" = "{value}". It should be digit string or float.'}
         )
 
 

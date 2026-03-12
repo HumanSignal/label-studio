@@ -538,6 +538,16 @@ describe("RegionStore", () => {
       expect(region.hidden).toBe(!wasHidden);
     });
 
+    it("setHiddenByTool works with By Tool group entity (type tool, value without region suffix)", () => {
+      const { annotation } = createStoreWithOneRectRegion();
+      const region = annotation.regionStore.regions[0];
+      const wasHidden = region.hidden;
+      annotation.regionStore.setHiddenByTool(!wasHidden, { type: "tool", value: "rectangle" });
+      expect(region.hidden).toBe(!wasHidden);
+      annotation.regionStore.setHiddenByTool(wasHidden, { type: "tool", value: "rectangle" });
+      expect(region.hidden).toBe(wasHidden);
+    });
+
     it("sortedRegions with sortOrder desc returns one region", () => {
       const { annotation } = createStoreWithOneRectRegion();
       annotation.regionStore.setSort("date");

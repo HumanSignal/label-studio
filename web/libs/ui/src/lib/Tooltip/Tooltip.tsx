@@ -15,7 +15,7 @@ import { type Align, alignElements } from "@humansignal/core/lib/utils/dom";
 import { isDefined } from "@humansignal/core/lib/utils/helpers";
 import { aroundTransition } from "@humansignal/core/lib/utils/transition";
 import { setRef } from "@humansignal/core/lib/utils/unwrapRef";
-import styles from "./Tooltip.module.scss";
+import styles from "./Tooltip.module.css";
 import clsx from "clsx";
 
 export type TooltipProps = PropsWithChildren<{

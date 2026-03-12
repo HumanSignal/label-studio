@@ -143,19 +143,21 @@ const RegionAction: FC<any> = observer(({ region, annotation, editMode, onEditMo
         {!region.isReadOnly() && entityButtons}
       </div>
       <div className={cn("region-actions").elem("group").mod({ align: "right" }).toClassName()}>
-        <LockButton
-          item={region}
-          annotation={region?.annotation}
-          hovered={true}
-          locked={region?.locked}
-          onClick={() => region.setLocked(!region.locked)}
-          displayedHotkey="region:lock"
-          variant="neutral"
-          look="string"
-          aria-label="Unlock Region"
-          tooltip="Unlock Region"
-        />
-        {region.hideable && (
+        {!region.incomplete && (
+          <LockButton
+            item={region}
+            annotation={region?.annotation}
+            hovered={true}
+            locked={region?.locked}
+            onClick={() => region.setLocked(!region.locked)}
+            displayedHotkey="region:lock"
+            variant="neutral"
+            look="string"
+            aria-label="Unlock Region"
+            tooltip="Unlock Region"
+          />
+        )}
+        {!region.incomplete && region.hideable && (
           <RegionActionButton
             aria-label={`${region.hidden ? "Show" : "Hide"} selected region`}
             variant="neutral"

@@ -1,7 +1,7 @@
 import { type FC, type KeyboardEvent, useCallback, useMemo, useRef, useState } from "react";
 import { Select } from "../select/select";
 import { cn } from "../../utils/utils";
-import styles from "./pagination.module.scss";
+import styles from "./pagination.module.css";
 import { IconChevronLeft, IconChevronRight, IconFastForward, IconRewind } from "@humansignal/icons";
 import { Button } from "../button/button";
 import { Typography } from "../typography/typography";

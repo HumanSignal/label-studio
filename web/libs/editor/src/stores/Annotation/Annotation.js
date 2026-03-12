@@ -284,6 +284,14 @@ const _Annotation = types
       return results;
     },
 
+    get hasIncompletePolygons() {
+      if (!isAlive(self)) return false;
+      for (const area of self.areas.values()) {
+        if (area.type === "polygonregion" && area.incomplete) return true;
+      }
+      return false;
+    },
+
     get serialized() {
       // Dirty hack to force MST track changes
       self.areas.toJSON();
@@ -510,12 +518,14 @@ const _Annotation = types
 
     lockSelectedRegions() {
       for (const region of self.selectedRegions) {
+        if (region.incomplete === true) continue;
         region.setLocked(!region.locked);
       }
     },
 
     hideSelectedRegions() {
       for (const region of self.selectedRegions) {
+        if (region.incomplete === true) continue;
         region.toggleHidden();
       }
     },

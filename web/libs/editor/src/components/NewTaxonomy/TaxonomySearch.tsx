@@ -8,7 +8,7 @@ import React, {
   useState,
 } from "react";
 
-import "./TaxonomySearch.scss";
+import "./TaxonomySearch.prefix.css";
 import { cn } from "../../utils/bem";
 import type { AntTaxonomyItem } from "./NewTaxonomy";
 import { debounce } from "@humansignal/core/lib/utils/debounce";

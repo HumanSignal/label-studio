@@ -8,7 +8,7 @@ import type { AnnotationSummary, ControlTag } from "./types";
 import { getLabelCounts } from "./utils";
 import { isActive, FF_FIT_720_LAZY_LOAD_ANNOTATIONS } from "@humansignal/core/lib/utils/feature-flags";
 
-import styles from "./TaskSummary.module.scss";
+import styles from "./TaskSummary.module.css";
 
 type DistributionData = {
   total_annotations: number;
@@ -29,6 +29,11 @@ const fetchDistribution = async (taskId: number | string): Promise<DistributionD
     throw new Error("Failed to load distribution");
   }
   return response.json();
+};
+
+/** Wrapper to prevent caching lexical scopes in React Query */
+const fetchTaskAgreement = async ({ queryKey }: any): Promise<DistributionData> => {
+  return fetchDistribution(queryKey[1] as string | number);
 };
 
 const resultValue = (result: RawResult) => {
@@ -302,10 +307,10 @@ export const AggregationTableRow = ({
     error,
   } = useQuery({
     queryKey: ["task-agreement", taskId],
-    queryFn: () => fetchDistribution(taskId!),
+    queryFn: fetchTaskAgreement,
     enabled: useApiData && !!taskId,
     staleTime: 30000, // Consider data fresh for 30 seconds
-    gcTime: 5 * 60 * 1000, // Keep in cache for 5 minutes (formerly cacheTime)
+    cacheTime: 5 * 60 * 1000, // Keep in cache for 5 minutes
   });
 
   useLayoutEffect(() => {

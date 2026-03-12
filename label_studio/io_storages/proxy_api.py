@@ -182,8 +182,8 @@ class ResolveStorageUriAPIMixin:
                 end = ''
 
             range_header = f'bytes={start}-{end}'
-            logger.debug(f'>> stream > start: {int(start)/1024/1024} MB')
-            logger.debug(f'>> stream > end: {int(end or 0)/1024/1024} MB')
+            logger.debug(f'>> stream > start: {int(start) / 1024 / 1024} MB')
+            logger.debug(f'>> stream > end: {int(end or 0) / 1024 / 1024} MB')
             logger.debug(f'>> stream > range_header: {range_header}')
 
         return range_header

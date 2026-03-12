@@ -10,7 +10,7 @@ import { ModalFooter } from "./ModalFooter";
 import { ModalHeader } from "./ModalHeader";
 import { ModalTitle } from "./ModalTitle";
 
-import "./Modal.scss";
+import "./Modal.prefix.css";
 
 const ModalContext = createContext<Modal | null>(null);
 

@@ -1,6 +1,6 @@
 import React from "react";
 import { cn } from "../../../utils/bem";
-import "./RadioGroup.scss";
+import "./RadioGroup.prefix.css";
 
 const RadioContext = React.createContext();
 

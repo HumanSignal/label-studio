@@ -1,0 +1,23 @@
+:global(.htx-taxonomy-item-color) {
+  padding: 4px;
+  border-radius: 2px;
+}
+
+/* increase specificity to override usual .ant-select-dropdown z-index */
+:global(.htx-taxonomy-dropdown.ant-select-dropdown) {
+  /* Create Project popup has 2000 in LSE and 10000 in LSO */
+  z-index: 11000;
+}
+
+/* wrap long labels for selected items */
+/* we need to increase specificity this way to override the default styles */
+:global(.htx-taxonomy.ant-select-multiple) {
+  :global(.ant-select-selection-item) {
+    height: auto;
+  }
+
+  :global(.ant-select-selection-item-content) {
+    white-space: normal;
+    word-break: break-word;
+  }
+}

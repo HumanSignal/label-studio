@@ -9,7 +9,7 @@ import { Dropdown } from "@humansignal/ui";
 import Form from "../../Common/Form/Form";
 import { Menu } from "../../Common/Menu/Menu";
 import { Modal } from "../../Common/Modal/ModalPopup";
-import "./ActionsButton.scss";
+import "./ActionsButton.prefix.css";
 
 const isFFLOPSE3 = isFF(FF_LOPS_E_3);
 const injector = inject(({ store }) => ({

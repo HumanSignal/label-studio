@@ -8,7 +8,7 @@ import { Icon } from "../../Common/Icon/Icon";
 import { Tooltip } from "@humansignal/ui";
 import { ImagePreview } from "./ImagePreview";
 
-import styles from "./GridPreview.module.scss";
+import styles from "./GridPreview.module.css";
 
 type Task = {
   id: number;

@@ -10,7 +10,7 @@ import { LeftCircleOutlined, RightCircleOutlined } from "@ant-design/icons";
 import { FixedSizeList as List } from "react-window";
 import AutoSizer from "react-virtualized-auto-sizer";
 import { observer } from "mobx-react";
-import styles from "./Grid.module.scss";
+import styles from "./Grid.module.css";
 import { EntityTab } from "../AnnotationTabs/AnnotationTabs";
 import { observe } from "mobx";
 import Konva from "konva";
@@ -23,7 +23,7 @@ import { useAnnotationFetcher } from "../../hooks/useAnnotationQuery";
 
 // FIT-720: Virtualization constants for Compare view
 const PANEL_WIDTH = 500; // Width of each annotation panel (approximately 50% of typical viewport)
-const PANEL_GAP = 30; // Gap between panels (matches $gap in Grid.module.scss)
+const PANEL_GAP = 30; // Gap between panels (matches $gap in Grid.module.css)
 
 /***** DON'T TRY THIS AT HOME *****/
 /*
@@ -156,6 +156,7 @@ const VirtualizedGrid = observer(({ store, annotations, root }) => {
         // Restore data from cache to MST annotation
         annotation.history?.freeze?.();
         annotation.deserializeResults?.(cachedData.result);
+        annotation.setEditable?.(false);
         annotation.updateObjects?.();
         annotation.history?.safeUnfreeze?.();
         annotation.reinitHistory?.();
@@ -267,6 +268,9 @@ const VirtualizedGrid = observer(({ store, annotations, root }) => {
           // Hydrate the annotation with the loaded result
           freshAnnotation.history?.freeze?.();
           freshAnnotation.deserializeResults?.(fullAnnotation.result);
+
+          // Ensure dynamically hydrated annotation is strictly read-only when viewing all (Compare All)
+          freshAnnotation.setEditable?.(false);
 
           // Critical: updateObjects() is required to render visual regions after deserializing
           freshAnnotation.updateObjects?.();

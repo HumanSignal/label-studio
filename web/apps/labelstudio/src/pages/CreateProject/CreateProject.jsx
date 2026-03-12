@@ -9,7 +9,7 @@ import { HeidiTips } from "../../components/HeidiTips/HeidiTips";
 import { useAPI } from "../../providers/ApiProvider";
 import { cn } from "../../utils/bem";
 import { ConfigPage } from "./Config/Config";
-import "./CreateProject.scss";
+import "./CreateProject.prefix.css";
 import { ImportPage } from "./Import/Import";
 import { useImportPage } from "./Import/useImportPage";
 import { useDraftProject } from "./utils/useDraftProject";

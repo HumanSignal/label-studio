@@ -1,7 +1,7 @@
 import { inject } from "mobx-react";
 import { observer } from "mobx-react-lite";
 import { useCallback, useEffect, useMemo, useRef } from "react";
-import { IconChevronDown, IconChevronLeft, IconGearNewUI } from "@humansignal/icons";
+import { IconGearNewUI, IconChevronLeft } from "@humansignal/icons";
 import { cn } from "../../utils/bem";
 import { Button } from "@humansignal/ui";
 import { FieldsButton } from "../Common/FieldsButton";
@@ -9,7 +9,7 @@ import { Icon } from "../Common/Icon/Icon";
 import { Resizer } from "../Common/Resizer/Resizer";
 import { Space } from "../Common/Space/Space";
 import { DataView } from "../MainView";
-import "./Label.scss";
+import "./Label.prefix.css";
 
 // Todo: consider renaming this file to something like LabelingWrapper as it is not a Label component
 const LabelingHeader = ({ SDK, onClick, isExplorerMode }) => {
@@ -28,12 +28,7 @@ const LabelingHeader = ({ SDK, onClick, isExplorerMode }) => {
         )}
 
         {isExplorerMode ? (
-          <FieldsButton
-            wrapper={FieldsButton.Checkbox}
-            icon={<Icon icon={IconGearNewUI} />}
-            trailingIcon={<Icon icon={IconChevronDown} />}
-            title={"Fields"}
-          />
+          <FieldsButton multiSelect={true} icon={<Icon icon={IconGearNewUI} />} title={"Fields"} />
         ) : null}
       </Space>
     </div>
@@ -146,9 +141,9 @@ export const Labeling = injector(
             <div className={cn("label-view").elem("table").toClassName()}>
               <Resizer
                 className={cn("label-view").elem("dataview").toClassName()}
+                variant="quickview"
                 minWidth={202}
                 showResizerLine={false}
-                type={"quickview"}
                 maxWidth={window.innerWidth * 0.35}
                 initialWidth={view.labelingTableWidth} // hardcoded as in main-menu-trigger
                 onResizeFinished={onResize}

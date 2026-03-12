@@ -235,7 +235,9 @@ class DjangoModelIntegrationTests(TestCase):
         mock_get_state_obj.return_value = mock_current_state
 
         assign_transition = AssignAndStartTaskTransition(
-            assignee_id=200, estimated_hours=4.5, priority='urgent'  # Different from creator
+            assignee_id=200,
+            estimated_hours=4.5,
+            priority='urgent',  # Different from creator
         )
 
         context = TransitionContext(
@@ -422,7 +424,7 @@ class DjangoModelIntegrationTests(TestCase):
 
                 if errors:
                     raise TransitionValidationError(
-                        f"Assignment validation failed: {'; '.join(errors)}",
+                        f'Assignment validation failed: {"; ".join(errors)}',
                         {
                             'validation_errors': errors,
                             'assignee_id': self.assignee_id,

@@ -2,7 +2,7 @@ import { type FormEventHandler, useCallback, useEffect, useRef, useState } from 
 import clsx from "clsx";
 import { Button, InputFile, ToastType, useToast, Userpic } from "@humansignal/ui";
 import { getApiInstance } from "@humansignal/core";
-import styles from "../AccountSettings.module.scss";
+import styles from "../AccountSettings.module.css";
 import { useAuth } from "@humansignal/core/providers/AuthProvider";
 import { atomWithMutation } from "jotai-tanstack-query";
 import { useAtomValue } from "jotai";

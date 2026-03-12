@@ -2161,13 +2161,13 @@ testing = ["pytest (>=6)", "pytest-black (>=0.3.7) ; platform_python_implementat
 
 [[package]]
 name = "label-studio-sdk"
-version = "2.0.18"
+version = "2.0.20"
 description = ""
 optional = false
 python-versions = ">=3.10,<4"
 groups = ["main"]
 files = [
-    {file = "2321865c82b384f7a2983d5aed8984b75db4033c.zip", hash = "sha256:caab72d2f936f54cce25da5f9f5def4d199b21d9f3b4b94426b38016342fb56f"},
+    {file = "ece0a2f065bba280e8962fe517abdcb8eff4e1a2.zip", hash = "sha256:bb42296a449fe69926beec1f30cee88bd0190cd6b0b432d88ed12d6f3d5b77e6"},
 ]
 
 [package.dependencies]
@@ -2180,7 +2180,7 @@ jsonschema = ">=4.23.0"
 lxml = ">=4.2.5"
 nltk = ">=3.9.1,<4.0.0"
 numpy = ">=2.2,<3.0.0"
-opencv-python-headless = ">=4.12.0,<5.0.0"
+opencv-python-headless = ">=4.12.0,<4.13"
 pandas = ">=0.24.0"
 Pillow = ">=11.3.0"
 pydantic = ">=1.9.2"
@@ -2195,7 +2195,7 @@ xmljson = "0.2.1"
 
 [package.source]
 type = "url"
-url = "https://github.com/HumanSignal/label-studio-sdk/archive/2321865c82b384f7a2983d5aed8984b75db4033c.zip"
+url = "https://github.com/HumanSignal/label-studio-sdk/archive/ece0a2f065bba280e8962fe517abdcb8eff4e1a2.zip"
 
 [[package]]
 name = "launchdarkly-server-sdk"
@@ -2381,14 +2381,14 @@ source = ["Cython (>=3.0.11)"]
 
 [[package]]
 name = "lxml-html-clean"
-version = "0.4.0"
+version = "0.4.4"
 description = "HTML cleaner from lxml project"
 optional = false
 python-versions = "*"
 groups = ["main"]
 files = [
-    {file = "lxml_html_clean-0.4.0-py3-none-any.whl", hash = "sha256:3b5aedb6c2b4b684c0fbc8d4f1b901aae0a92c1ce525de84e71cc6dd1d9d4e3d"},
-    {file = "lxml_html_clean-0.4.0.tar.gz", hash = "sha256:a8b517d3f46c19e9303eafb2a1b4b422fe724ad42ae53793637a8e5cc36ffbc1"},
+    {file = "lxml_html_clean-0.4.4-py3-none-any.whl", hash = "sha256:ce2ef506614ecb85ee1c5fe0a2aa45b06a19514ec7949e9c8f34f06925cfabcb"},
+    {file = "lxml_html_clean-0.4.4.tar.gz", hash = "sha256:58f39a9d632711202ed1d6d0b9b47a904e306c85de5761543b90e3e3f736acfb"},
 ]
 
 [package.dependencies]
@@ -5138,4 +5138,4 @@ uwsgi = ["pyuwsgi", "uwsgitop"]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.10,<4"
-content-hash = "223f8d2e9e8002a8e671b4571e3a76118dc812bb3df30fac3f8203c5bb06e03c"
+content-hash = "90bd18a0411d3ffb9d6f02c7b3cb099643de640e0ec388943be80edceeb42d87"

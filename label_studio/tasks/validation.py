@@ -1,5 +1,5 @@
-"""This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
-"""
+"""This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license."""
+
 import logging
 from functools import reduce
 from operator import getitem
@@ -61,7 +61,6 @@ class TaskValidator:
 
         # iterate over data types from project
         for data_key, data_type in project.data_types.items():
-
             # get array name in case of Repeater tag
             is_array = '[' in data_key
             data_key = data_key.split('[')[0]

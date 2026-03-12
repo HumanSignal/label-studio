@@ -1,0 +1,19 @@
+.history-buttons {
+  display: flex;
+  gap: var(--spacing-tight);
+  padding-left: var(--spacing-tight);
+
+  &__action {
+    &:disabled {
+      opacity: 0.6;
+    }
+
+    & svg {
+      display: block;
+    }
+
+    &_delete {
+      color: var(--color-negative-icon);
+    }
+  }
+}

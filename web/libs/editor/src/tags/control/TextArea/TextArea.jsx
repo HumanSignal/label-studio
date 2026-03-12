@@ -23,7 +23,7 @@ import ClassificationBase from "../ClassificationBase";
 import "./TextAreaRegionView";
 import VisibilityMixin from "../../../mixins/Visibility";
 
-import "./TextArea.scss";
+import "./TextArea.prefix.css";
 import { cn } from "../../../utils/bem";
 
 const { TextArea } = Input;

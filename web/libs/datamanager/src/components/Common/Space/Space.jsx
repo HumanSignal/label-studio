@@ -1,5 +1,5 @@
 import { cn } from "../../../utils/bem";
-import "./Space.scss";
+import "./Space.prefix.css";
 
 export const Space = ({
   direction = "horizontal",

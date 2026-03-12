@@ -14,7 +14,7 @@ import { Hotkey } from "../../core/Hotkey";
 import { useHotkey } from "../../hooks/useHotkey";
 import { cn, type CNTagName } from "../../utils/bem";
 import { isDefined } from "../../utils/utilities";
-import "./Button.scss";
+import "./Button.prefix.css";
 
 type HTMLButtonProps = Omit<ButtonHTMLAttributes<HTMLButtonElement>, "type">;
 

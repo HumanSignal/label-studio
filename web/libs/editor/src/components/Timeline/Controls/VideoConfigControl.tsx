@@ -6,7 +6,7 @@ import { Toggle } from "@humansignal/ui";
 import { IconConfig } from "@humansignal/icons";
 import { ControlButton } from "../Controls";
 import { Slider } from "./Slider";
-import styles from "./VideoConfigControl.module.scss";
+import styles from "./VideoConfigControl.module.css";
 
 const MIN_SPEED = 0.25;
 const MAX_SPEED = 10;

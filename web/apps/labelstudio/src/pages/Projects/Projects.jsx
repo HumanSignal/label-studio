@@ -12,7 +12,7 @@ import { DataManagerPage } from "../DataManager/DataManager";
 import { SettingsPage } from "../Settings";
 import { EmptyProjectsList, ProjectsList } from "./ProjectsList";
 import { useAbortController, useUpdatePageTitle } from "@humansignal/core";
-import "./Projects.scss";
+import "./Projects.prefix.css";
 
 const getCurrentPage = () => {
   const pageNumberFromURL = new URLSearchParams(location.search).get("page");

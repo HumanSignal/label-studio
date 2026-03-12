@@ -6,7 +6,7 @@ import clsx from "clsx";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { format } from "date-fns";
 import { getApiInstance, useCopyText } from "@humansignal/core";
-import styles from "./PersonalJWTToken.module.scss";
+import styles from "./PersonalJWTToken.module.css";
 import { Button } from "@humansignal/ui";
 
 /**

@@ -3,7 +3,7 @@ import sanitizeHtml from "sanitize-html";
 import { Markdown } from "../../../../editor/src/components/Markdown/Markdown";
 import { Modal } from "../modal";
 import { Tabs, TabsList, TabsTrigger } from "../tabs/tabs";
-import styles from "./reader-view-modal.module.scss";
+import styles from "./reader-view-modal.module.css";
 
 type ContentFormat = "plain" | "markdown" | "html";
 

@@ -1,6 +1,6 @@
 import { type InputHTMLAttributes, useEffect, useRef } from "react";
 import { clsx } from "clsx";
-import styles from "./checkbox.module.scss";
+import styles from "./checkbox.module.css";
 
 export interface CheckboxProps extends Omit<InputHTMLAttributes<HTMLInputElement>, "type"> {
   indeterminate?: boolean;

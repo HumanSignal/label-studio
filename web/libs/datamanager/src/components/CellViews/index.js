@@ -1,7 +1,6 @@
 import { pascalCase } from "@humansignal/core";
 
 export { Agreement } from "./Agreement/Agreement";
-export { AgreementSelected } from "./AgreementSelected";
 export {
   Annotators,
   Annotators as Reviewers,
@@ -18,6 +17,7 @@ export { TimeCell as Time } from "./TimeCell";
 export { StringCell as Text } from "./StringCell";
 export { VideoCell as Video } from "./VideoCell";
 export { ProjectCell as Project } from "./ProjectCell";
+export { AgreementSelected } from "./AgreementSelected";
 export { TaskState } from "./TaskState";
 
 export function normalizeCellAlias(alias) {
@@ -26,7 +26,7 @@ export function normalizeCellAlias(alias) {
 
   // Treat dimension agreement columns like the built-in agreement column
   // so they use the same percentage formatting and coloring.
-  if (safeAlias === "agreement" || safeAlias.startsWith("dimension_agreement__")) {
+  if (safeAlias === "agreement" || safeAlias.startsWith("dimension_agreement_")) {
     return "Agreement";
   }
 

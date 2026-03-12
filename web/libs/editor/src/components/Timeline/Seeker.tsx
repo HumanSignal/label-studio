@@ -3,7 +3,7 @@ import { type FC, type ReactElement, useCallback, useRef } from "react";
 import { cn } from "../../utils/bem";
 import type { TimelineMinimapProps } from "./Types";
 
-import "./Seeker.scss";
+import "./Seeker.prefix.css";
 
 export interface SeekerProps {
   position: number;

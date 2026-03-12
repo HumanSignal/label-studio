@@ -4,7 +4,7 @@ import { cn } from "../../../utils/bem";
 import { Comments as CommentsComponent } from "../../Comments/Comments";
 import { AnnotationHistory } from "../../CurrentEntity/AnnotationHistory";
 import { PanelBase, type PanelProps } from "../PanelBase";
-import "./DetailsPanel.scss";
+import "./DetailsPanel.prefix.css";
 import { RegionDetailsMain, RegionDetailsMeta } from "./RegionDetails";
 import { RegionItem } from "./RegionItem";
 import { Relations as RelationsComponent } from "./Relations";

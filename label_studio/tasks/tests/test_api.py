@@ -288,6 +288,7 @@ class TestTaskAgreementAPI(APITestCase):
         other_org = OrganizationFactory()
         other_project = ProjectFactory(organization=other_org)
         task = TaskFactory(project=other_project)
+
         # In OSS Project.has_permission is a stub that always returns True; patch so other_project denies access
         def has_perm(project, user):
             return project.id != other_project.id

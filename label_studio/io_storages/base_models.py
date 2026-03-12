@@ -18,7 +18,7 @@ import django_rq
 import rq
 import rq.exceptions
 from core.feature_flags import flag_set
-from core.redis import is_job_in_queue, is_job_on_worker, redis_connected, start_job_async_or_sync
+from core.redis import redis_connected, start_job_async_or_sync
 from core.utils.common import load_func
 from core.utils.iterators import iterate_queryset
 from data_export.serializers import ExportDataSerializer
@@ -389,27 +389,53 @@ class ImportStorage(Storage):
                 resolved[key] = result if result else uri[key]
             return resolved
 
-        # string: process one url
+        # string: process url(s)
         elif isinstance(uri, str) and self.url_scheme in uri:
             try:
-                # extract uri first from task data
-                extracted_uri, _ = get_uri_via_regex(uri, prefixes=(self.url_scheme,))
-                if not self.can_resolve_url(extracted_uri):
-                    logger.debug(f'No storage info found for URI={uri}')
-                    return
+                import re
+
+                from io_storages.utils import uri_regex
+
+                extracted_uris = []
+                # Check for direct URL string first (e.g. "s3://bucket/test.jpg" without quotes)
+                # This matches the legacy `get_uri_via_regex` behavior for single string fields
+                if uri.lower().strip().startswith(self.url_scheme + '://') and ' ' not in uri.strip():
+                    extracted_uris.append(uri.strip())
+                else:
+                    uri_regex_prepared = uri_regex.format(self.url_scheme)
+                    extracted_uris.extend([match.group('uri') for match in re.finditer(uri_regex_prepared, uri)])
+
+                if not extracted_uris:
+                    return uri
 
                 if task is None:
                     logger.error(f'Task is required to resolve URI={uri}', exc_info=True)
                     raise ValueError(f'Task is required to resolve URI={uri}')
 
-                proxy_url = urljoin(
-                    settings.HOSTNAME,
-                    reverse('storages:task-storage-data-resolve', kwargs={'task_id': task.id})
-                    + f'?fileuri={base64.urlsafe_b64encode(extracted_uri.encode()).decode()}',
-                )
-                return uri.replace(extracted_uri, proxy_url)
+                resolved_uri = uri
+                replaced = set()
+
+                for extracted_uri in extracted_uris:
+                    if extracted_uri in replaced:
+                        continue
+
+                    if not self.can_resolve_url(extracted_uri):
+                        logger.debug(f'No storage info found for URI={extracted_uri}')
+                        continue
+
+                    proxy_url = urljoin(
+                        settings.HOSTNAME,
+                        reverse('storages:task-storage-data-resolve', kwargs={'task_id': task.id})
+                        + f'?fileuri={base64.urlsafe_b64encode(extracted_uri.encode()).decode()}',
+                    )
+                    resolved_uri = resolved_uri.replace(extracted_uri, proxy_url)
+                    replaced.add(extracted_uri)
+
+                return resolved_uri
             except Exception:
                 logger.info(f"Can't resolve URI={uri}", exc_info=True)
+
+        return uri
 
     def _scan_and_create_links_v2(self):
         # Async job execution for batch of objects:
@@ -646,29 +672,21 @@ class ImportStorage(Storage):
 
     def sync(self):
         if redis_connected():
-            queue_name = 'low'
-            queue = django_rq.get_queue(queue_name)
-            meta = {'project': self.project.id, 'storage': self.id}
-            if not is_job_in_queue(queue, 'import_sync_background', meta=meta) and not is_job_on_worker(
-                job_id=self.last_sync_job, queue_name=queue_name
-            ):
-                if not self.info_set_queued():
-                    return
-                # Use start_job_async_or_sync to automatically capture and restore CurrentContext
-                # This ensures user_id, organization_id, and request_id are available in the worker
-                sync_job = start_job_async_or_sync(
-                    import_sync_background,
-                    self.__class__,
-                    self.id,
-                    queue_name=queue_name,
-                    meta=meta,
-                    project_id=self.project.id,
-                    organization_id=self.project.organization.id,
-                    on_failure=storage_background_failure,
-                    job_timeout=settings.RQ_LONG_JOB_TIMEOUT,
-                )
-                self.info_set_job(sync_job.id)
-                logger.info(f'Storage sync background job {sync_job.id} for storage {self} has been started')
+            if not self.info_set_queued():
+                return
+            sync_job = start_job_async_or_sync(
+                import_sync_background,
+                self.__class__,
+                self.id,
+                queue_name='low',
+                meta={'project': self.project.id, 'storage': self.id},
+                project_id=self.project.id,
+                organization_id=self.project.organization.id,
+                on_failure=storage_background_failure,
+                job_timeout=settings.RQ_LONG_JOB_TIMEOUT,
+            )
+            self.info_set_job(sync_job.id)
+            logger.info(f'Storage sync background job {sync_job.id} for storage {self} has been started')
         else:
             try:
                 logger.info(f'Start syncing storage {self}')

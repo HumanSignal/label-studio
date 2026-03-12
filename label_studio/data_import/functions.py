@@ -561,7 +561,6 @@ def _async_import_background_streaming(project_import, user):
 
 
 def async_reimport_background(reimport_id, organization_id, user, **kwargs):
-
     with transaction.atomic():
         try:
             reimport = ProjectReimport.objects.get(id=reimport_id)
