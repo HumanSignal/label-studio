@@ -968,7 +968,7 @@ export default types
     function hydrateHistoryItem(historyId, fullItem) {
       const as = self.annotationStore;
       // historyId is the numeric API id (pk); store items have id=guid and pk=numeric from createItem
-      const item = as.history.find((h) => h.pk != null && Number(h.pk) === Number(historyId));
+      const item = as.history.find((h) => h.pk && Number(h.pk) === Number(historyId));
       if (!item) return;
       item.deserializeResults(fullItem?.result ?? [], { hidden: true });
       as.selectHistory(item);
