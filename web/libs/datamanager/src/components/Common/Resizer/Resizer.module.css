@@ -1,6 +1,6 @@
-.resizer {
+.root {
   --handle-size: 2px;
-  --handle-size-hover: 3px;
+  --handle-size-hover: 4px;
   --handle-interactive-size: 8px;
 
   & button {
@@ -10,13 +10,14 @@
     }
   }
 
-  &__handle {
+  .handle {
     top: var(--spacing-tight);
     bottom: var(--spacing-tight);
     position: absolute;
     right: 0;
     cursor: ew-resize;
     z-index: 100;
+    width: var(--handle-interactive-size);
 
     &::before {
       width: var(--handle-size);
@@ -30,12 +31,18 @@
       transition: width 150ms ease-out, background-color 150ms ease-out;
     }
 
-    &:hover,
-    &_resizing {
-      &::before {
-        width: var(--handle-size-hover);
-        background-color: var(--color-primary-border-subtle);
-      }
+    &:hover::before,
+    &.handleResizing::before {
+      width: var(--handle-size-hover);
+      background-color: var(--color-primary-border-subtle);
     }
+  }
+}
+
+.quickview {
+  & > .handle {
+    top: 0;
+    bottom: 0;
+    right: -4px;
   }
 }

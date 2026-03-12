@@ -29,15 +29,22 @@ export const HistoryItem = types
        * Action associated with the history item
        */
       actionType: types.optional(types.maybeNull(types.string), null),
+
+      /**
+       * True when this item was returned as a stub (no result); frontend hydrates on click (FIT-720).
+       */
+      is_stub: types.optional(types.boolean, false),
     }),
   )
   .preProcessSnapshot((snapshot) => {
+    const numericPk = snapshot.pk && !Number.isNaN(Number(snapshot.pk)) ? snapshot.pk : null;
     return {
       ...snapshot,
-      pk: guidGenerator(),
+      pk: numericPk ?? guidGenerator(),
       user: snapshot.created_by,
       createdDate: snapshot.created_at,
       actionType: snapshot.action ?? snapshot.action_type ?? snapshot.actionType,
+      is_stub: snapshot.is_stub ?? false,
       readonly: true,
       editable: false,
     };

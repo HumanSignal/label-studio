@@ -180,6 +180,7 @@ const ColumnRenderer = observer(
     return (
       <TableCell data-id={id} mix="th">
         <Resizer
+          variant="column"
           style={{
             height: 22,
             display: "flex",
@@ -287,7 +288,7 @@ export const TableHead = observer(
           ref={ref}
           style={{
             ...style,
-            height: 42,
+            height: 40,
           }}
           onDragOver={useCallback(
             (e) => {

@@ -26,6 +26,10 @@ export interface BadgeGroupProps {
   "data-testid"?: string;
   /** Whether to truncate badges that overflow (default: true) */
   truncate?: boolean;
+  /** Called when truncation state changes (e.g. when the "+n" overflow badge appears or disappears). Use to show/hide a "Show All" button only when needed. */
+  onTruncationChange?: (isTruncated: boolean) => void;
+  /** When provided, each badge label is capped at this width with ellipsis truncation and a tooltip on hover. */
+  badgeMaxWidth?: number | string;
 }
 
 /**
@@ -57,12 +61,15 @@ export const BadgeGroup = forwardRef<HTMLDivElement, BadgeGroupProps>(
       className,
       "data-testid": dataTestId,
       truncate = true,
+      onTruncationChange,
+      badgeMaxWidth,
     },
     ref,
   ) => {
     const containerRef = useRef<HTMLDivElement>(null);
     const mergedRef = ref || containerRef;
     const [recalcTrigger, setRecalcTrigger] = useState(0);
+    const lastReportedTruncatedRef = useRef<boolean | null>(null);
 
     // Force recalculation when truncate changes to true (from false)
     useEffect(() => {
@@ -79,6 +86,16 @@ export const BadgeGroup = forwardRef<HTMLDivElement, BadgeGroupProps>(
       itemCount: items.length,
       recalcTrigger,
     });
+
+    // Notify parent when truncation state changes (for "Show All" button visibility)
+    useEffect(() => {
+      if (!onTruncationChange || items.length === 0) return;
+      const isTruncated = truncate && visibleBadgeCount !== null && visibleBadgeCount < items.length;
+      if (lastReportedTruncatedRef.current !== isTruncated) {
+        lastReportedTruncatedRef.current = isTruncated;
+        onTruncationChange(isTruncated);
+      }
+    }, [truncate, items.length, visibleBadgeCount, onTruncationChange]);
 
     if (items.length === 0) {
       return null;
@@ -100,6 +117,7 @@ export const BadgeGroup = forwardRef<HTMLDivElement, BadgeGroupProps>(
               shape={shape}
               style={style}
               size={size}
+              maxWidth={badgeMaxWidth}
               className={shouldHide ? "invisible absolute" : undefined}
             >
               {item.label}

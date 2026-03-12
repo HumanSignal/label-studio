@@ -1,4 +1,5 @@
 import { when } from "mobx";
+import { getEnv } from "mobx-state-tree";
 import { inject, observer } from "mobx-react";
 import { type FC, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import {
@@ -41,6 +42,7 @@ const injector = inject(({ store }) => {
   const selected = as?.selected;
 
   return {
+    store,
     annotationStore: as,
     selected: as?.selected,
     createdBy: selected?.user ?? { email: selected?.createdBy },
@@ -106,6 +108,7 @@ const DraftState: FC<{
 });
 
 const AnnotationHistoryComponent: FC<any> = ({
+  store,
   annotationStore,
   selectedHistory,
   history,
@@ -167,6 +170,9 @@ const AnnotationHistoryComponent: FC<any> = ({
           const isSelected = isLastItem && !selectedHistory ? !isDraftSelected : selectedHistory?.id === item.id;
           const hiddenUser = infoIsHidden ? { email: currentUser?.id === user.id ? "Me" : "User" } : null;
 
+          const isStub = !!item.is_stub;
+          const disabled = !isStub && item.results.length === 0;
+
           return (
             <HistoryItem
               key={id}
@@ -176,7 +182,7 @@ const AnnotationHistoryComponent: FC<any> = ({
               comment={item.comment}
               acceptedState={item.actionType}
               selected={isSelected}
-              disabled={item.results.length === 0}
+              disabled={disabled}
               hideInfo={infoIsHidden}
               onClick={async () => {
                 if (hasChanges) {
@@ -190,6 +196,16 @@ const AnnotationHistoryComponent: FC<any> = ({
                   annotationStore.selectHistory(null);
                   // if user clicks on last history state we should disable draft to see submitted state
                   annotation.toggleDraft(isSelected);
+                } else if (isStub) {
+                  // Stub item: host (e.g. LSE) fetches full item and calls back; then we hydrate and select.
+                  // item.pk is the numeric history row id (preserved in HistoryItem preProcessSnapshot); item.id is the MST guid.
+                  const historyPk = item.pk;
+                  if (historyPk == null) return;
+                  getEnv(store).events.invoke("hydrateHistoryItem", historyPk, (fullItem: any) => {
+                    if (fullItem && store.hydrateHistoryItem) {
+                      store.hydrateHistoryItem(historyPk, fullItem);
+                    }
+                  });
                 } else {
                   annotationStore.selectHistory(item);
                 }

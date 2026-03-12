@@ -136,11 +136,14 @@ export function useTagAutocomplete<T = string>(
       if (!isOpen && newQuery.length >= minSearchLength) {
         setIsOpen(true);
       } else if (isOpen && newQuery.length < minSearchLength) {
-        // Close dropdown if query becomes too short
-        setIsOpen(false);
+        // Close the dropdown but do NOT clear the query — calling setIsOpen(false) would
+        // invoke setQueryState("") and erase the character the user just typed/deleted.
+        setIsOpenState(false);
+        onClose?.();
+        setHighlightedOptionIndex(0);
       }
     },
-    [onSearch, isOpen, setIsOpen, minSearchLength],
+    [onSearch, isOpen, setIsOpen, minSearchLength, onClose],
   );
 
   // Select an option

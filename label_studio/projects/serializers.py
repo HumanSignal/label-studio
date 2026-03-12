@@ -47,6 +47,28 @@ class OpenApiObjectJSONField(serializers.JSONField):
     """
 
 
+class ControlTagWeightSerializer(serializers.Serializer):
+    """Weights configuration for a single control tag.
+
+    Structure: {"overall": 0.5, "type": "Choices", "labels": {"cat": 1.0, "dog": 0.0}}
+    """
+
+    overall = serializers.FloatField(
+        min_value=0.0,
+        max_value=1.0,
+        help_text='Overall weight for this control tag (0.0 to 1.0). Zero excludes the tag from agreement.',
+    )
+    type = serializers.CharField(
+        help_text='Control tag type from the labeling config (e.g. Choices, Labels, TextArea).',
+    )
+    labels = serializers.DictField(
+        child=serializers.FloatField(min_value=0.0, max_value=1.0),
+        required=False,
+        default=dict,
+        help_text='Per-label weights (0.0 to 1.0). Zero excludes the label from agreement.',
+    )
+
+
 class CreatedByFromContext:
     requires_context = True
 
@@ -93,8 +115,13 @@ class ProjectSerializer(FlexFieldsModelSerializer):
 
     created_by = UserSimpleSerializer(default=CreatedByFromContext(), help_text='Project owner')
 
-    control_weights = OpenApiObjectJSONField(
-        required=False, allow_null=True, help_text='Dict of weights for each control tag in metric calculation.'
+    control_weights = serializers.DictField(
+        child=ControlTagWeightSerializer(),
+        required=False,
+        allow_null=True,
+        help_text='Dict of weights for each control tag in metric calculation. '
+        'Keys are control tag names from the labeling config. '
+        'At least one tag must have a non-zero overall weight.',
     )
     parsed_label_config = OpenApiObjectJSONField(
         default=None, read_only=True, help_text='JSON-formatted labeling configuration'
@@ -212,6 +239,16 @@ class ProjectSerializer(FlexFieldsModelSerializer):
             except ValueError:
                 pass
         raise serializers.ValidationError('Color must be in "#RRGGBB" format')
+
+    def validate_control_weights(self, value):
+        if not value:
+            return value
+        overall_weights = [
+            tag_config.get('overall', 1.0) for tag_config in value.values() if isinstance(tag_config, dict)
+        ]
+        if overall_weights and all(w == 0 for w in overall_weights):
+            raise serializers.ValidationError('At least one tag must have a non-zero overall weight.')
+        return value
 
     class Meta:
         model = Project

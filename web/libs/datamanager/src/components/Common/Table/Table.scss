@@ -120,12 +120,11 @@
   }
 
   &__cell {
-    overflow: hidden;
     flex: 150 0 auto;
     width: fit-content;
     min-width: min-content;
     max-width: min-content;
-    padding: 10px;
+    padding: var(--spacing-tight);
     box-sizing: border-box;
     display: flex;
     align-items: center;

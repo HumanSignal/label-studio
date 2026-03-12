@@ -141,9 +141,9 @@ export const Labeling = injector(
             <div className={cn("label-view").elem("table").toClassName()}>
               <Resizer
                 className={cn("label-view").elem("dataview").toClassName()}
+                variant="quickview"
                 minWidth={202}
                 showResizerLine={false}
-                type={"quickview"}
                 maxWidth={window.innerWidth * 0.35}
                 initialWidth={view.labelingTableWidth} // hardcoded as in main-menu-trigger
                 onResizeFinished={onResize}
