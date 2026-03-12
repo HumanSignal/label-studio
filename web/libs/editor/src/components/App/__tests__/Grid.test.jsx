@@ -1,5 +1,5 @@
 import React from "react";
-import { render, screen } from "@testing-library/react";
+import { act, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { Provider } from "mobx-react";
 import Grid, { VirtualizedGrid, VirtualizedAnnotationPanel, Item } from "../Grid";
@@ -42,7 +42,7 @@ jest.mock("../../../hooks/useAnnotationQuery", () => ({
 
 jest.mock("react-virtualized-auto-sizer", () => ({
   __esModule: true,
-  default: ({ children }) => children({ width: 800, height: 400 }),
+  default: jest.fn(({ children }) => children({ width: 800, height: 400 })),
 }));
 
 jest.mock("react-window", () => {
@@ -677,6 +677,39 @@ describe("Grid", () => {
 
     jest.advanceTimersByTime(200);
     expect(screen.getByLabelText("Move right")).toBeInTheDocument();
+    jest.useRealTimers();
+  });
+
+  it("initial hydration hydrates visibleCount+1 so 3rd panel resolves (narrow viewport)", async () => {
+    jest.useFakeTimers();
+    mockFetchAnnotationCached.mockReset().mockResolvedValue({ result: [] });
+    mockIsFF.mockReturnValue(true);
+    // Narrow width (400) => visibleCount = 2; with visibleCount+1 we hydrate 3 on mount
+    const AutoSizer = require("react-virtualized-auto-sizer").default;
+    AutoSizer.mockImplementationOnce(({ children }) => children({ width: 400, height: 400 }));
+    const stubAnnotation = (id, pk) => ({
+      ...createAnnotation({ id, pk }),
+      versions: { result: [] },
+      regions: [],
+    });
+    const annotations = [stubAnnotation("a1", 1), stubAnnotation("a2", 2), stubAnnotation("a3", 3)];
+    const store = createStore({ selected: { selected: annotations[0] } });
+    const root = {};
+
+    render(
+      <Provider store={store}>
+        <VirtualizedGrid store={store} annotations={annotations} root={root} />
+      </Provider>,
+    );
+
+    await act(async () => {});
+    jest.advanceTimersByTime(100);
+    await act(async () => {});
+
+    const calledPks = mockFetchAnnotationCached.mock.calls.map((c) => c[0]);
+    expect(calledPks).toContain(3);
+    expect(calledPks.length).toBeGreaterThanOrEqual(3);
+
     jest.useRealTimers();
   });
 
