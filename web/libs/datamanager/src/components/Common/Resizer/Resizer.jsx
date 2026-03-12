@@ -1,4 +1,5 @@
 import React from "react";
+import { cnm } from "@humansignal/ui";
 import styles from "./Resizer.module.scss";
 
 const calculateWidth = (width, minWidth, maxWidth, initialX, currentX) => {
@@ -77,15 +78,13 @@ export const Resizer = ({
 
   return (
     <div
-      className={[styles.root, variant === "quickview" && styles.quickview, className].filter(Boolean).join(" ")}
+      className={cnm(styles.root, variant === "quickview" && styles.quickview, className)}
       style={{ width }}
     >
       <div style={style ?? {}}>{children}</div>
 
       <div
-        className={[styles.handle, showResizerLine !== false && isResizing && styles.handleResizing]
-          .filter(Boolean)
-          .join(" ")}
+        className={cnm(styles.handle, showResizerLine !== false && isResizing && styles.handleResizing)}
         ref={resizeHandler}
         style={handleStyle}
         onPointerDown={handleResize}
