@@ -349,7 +349,8 @@ const VirtualizedGrid = observer(({ store, annotations, root }) => {
     initialHydrationDone.current = true;
 
     const visibleCount = Math.ceil(containerWidth / (panelWidth + PANEL_GAP)) + 1;
-    const initialVisibleCount = Math.min(visibleCount, visibleAnnotations.length);
+    // Hydrate visible count + 1 so the next panel (e.g. 3rd in Compare All) is ready when needed (FIT-720 / FIT-1494)
+    const initialVisibleCount = Math.min(visibleCount + 1, visibleAnnotations.length);
 
     for (let i = 0; i < initialVisibleCount; i++) {
       const annotation = visibleAnnotations[i];
