@@ -156,7 +156,19 @@ const getMaxPoints = (control) => {
  * exact pixel values KonvaVector gave us so that the pixel→percent→pixel roundtrip
  * doesn't cause KonvaVector to re-initialize (its arePointsEqual uses strict ===).
  */
-const VideoVectorPure = ({ id, reg, box, frame, workingArea, selected, draggable, listening, onClick: onClickProp, onDragMove, ...rest }) => {
+const VideoVectorPure = ({
+  id,
+  reg,
+  box,
+  frame,
+  workingArea,
+  selected,
+  draggable,
+  listening,
+  onClick: onClickProp,
+  onDragMove,
+  ...rest
+}) => {
   const vectorRef = useRef(null);
   const isDraggingRef = useRef(false);
   const latestDragPixelsRef = useRef(null);

@@ -42,8 +42,7 @@ const TestRoot = types
     },
   }));
 
-const mkVertices = (pts) =>
-  pts.map(([x, y], i) => ({ id: `v${i}`, x, y }));
+const mkVertices = (pts) => pts.map(([x, y], i) => ({ id: `v${i}`, x, y }));
 
 const mkBezierVertices = (pts) =>
   pts.map(([x, y, cp1x, cp1y, cp2x, cp2y], i) => ({
@@ -57,7 +56,10 @@ const mkBezierVertices = (pts) =>
 describe("VideoVectorRegion", () => {
   describe("getShape — exact keyframe retrieval", () => {
     it("returns exact keyframe data when frame matches", () => {
-      const vertices = mkVertices([[10, 20], [30, 40]]);
+      const vertices = mkVertices([
+        [10, 20],
+        [30, 40],
+      ]);
       const root = TestRoot.create({
         video: { id: "vid1" },
         region: {
@@ -66,7 +68,15 @@ describe("VideoVectorRegion", () => {
           object: "vid1",
           sequence: [
             { frame: 0, enabled: true, vertices, closed: false },
-            { frame: 24, enabled: true, vertices: mkVertices([[50, 60], [70, 80]]), closed: true },
+            {
+              frame: 24,
+              enabled: true,
+              vertices: mkVertices([
+                [50, 60],
+                [70, 80],
+              ]),
+              closed: true,
+            },
           ],
         },
       });
@@ -90,9 +100,7 @@ describe("VideoVectorRegion", () => {
           id: "vvr1",
           pid: "p1",
           object: "vid1",
-          sequence: [
-            { frame: 10, enabled: true, vertices: mkVertices([[1, 2]]), closed: false },
-          ],
+          sequence: [{ frame: 10, enabled: true, vertices: mkVertices([[1, 2]]), closed: false }],
         },
       });
       expect(root.region.getShape(5)).toBeNull();
@@ -108,9 +116,7 @@ describe("VideoVectorRegion", () => {
           id: "vvr1",
           pid: "p1",
           object: "vid1",
-          sequence: [
-            { frame: 0, enabled: true, vertices, closed: true },
-          ],
+          sequence: [{ frame: 0, enabled: true, vertices, closed: true }],
         },
       });
       const shape = root.region.getShape(50);
@@ -128,8 +134,24 @@ describe("VideoVectorRegion", () => {
           pid: "p1",
           object: "vid1",
           sequence: [
-            { frame: 0, enabled: true, vertices: mkVertices([[0, 0], [100, 100]]), closed: false },
-            { frame: 10, enabled: true, vertices: mkVertices([[100, 0], [0, 100]]), closed: false },
+            {
+              frame: 0,
+              enabled: true,
+              vertices: mkVertices([
+                [0, 0],
+                [100, 100],
+              ]),
+              closed: false,
+            },
+            {
+              frame: 10,
+              enabled: true,
+              vertices: mkVertices([
+                [100, 0],
+                [0, 100],
+              ]),
+              closed: false,
+            },
           ],
         },
       });
