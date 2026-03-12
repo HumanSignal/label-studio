@@ -156,6 +156,7 @@ const VirtualizedGrid = observer(({ store, annotations, root }) => {
         // Restore data from cache to MST annotation
         annotation.history?.freeze?.();
         annotation.deserializeResults?.(cachedData.result);
+        annotation.setEditable?.(false);
         annotation.updateObjects?.();
         annotation.history?.safeUnfreeze?.();
         annotation.reinitHistory?.();
@@ -267,6 +268,9 @@ const VirtualizedGrid = observer(({ store, annotations, root }) => {
           // Hydrate the annotation with the loaded result
           freshAnnotation.history?.freeze?.();
           freshAnnotation.deserializeResults?.(fullAnnotation.result);
+
+          // Ensure dynamically hydrated annotation is strictly read-only when viewing all (Compare All)
+          freshAnnotation.setEditable?.(false);
 
           // Critical: updateObjects() is required to render visual regions after deserializing
           freshAnnotation.updateObjects?.();

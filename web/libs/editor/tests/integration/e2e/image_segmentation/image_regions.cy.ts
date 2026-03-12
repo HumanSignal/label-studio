@@ -137,6 +137,9 @@ describe("Image Regions scenario", () => {
 
     cy.get("body").focus().trigger("keydown", { altKey: true, keyCode: 72 });
 
+    // Wait for visibility state to be applied (store update + tree re-render)
+    Sidebar.hasHiddenRegion(2);
+
     regions
       .each(($el) => {
         if ($el.parent().hasClass("lsf-tree__node_hidden")) {
