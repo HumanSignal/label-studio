@@ -1,6 +1,6 @@
 ---
 title: Add a custom agreement metric to Label Studio
-short: Custom metrics  s
+short: Custom metrics
 tier: enterprise
 type: guide
 order: 0
