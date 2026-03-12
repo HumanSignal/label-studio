@@ -59,7 +59,7 @@
         "noImplicitAnyLet": "off",
         "noShadowRestrictedNames": "off",
         "useGetterReturn": "off",
-        "noDuplicateProperties": "warn",
+        "noDuplicateProperties": "error",
         "noShorthandPropertyOverrides": "warn"
       },
       "complexity": {
@@ -75,7 +75,7 @@
         "useJsxKeyInIterable": "off",
         "useHookAtTopLevel": "off",
         "noUnusedImports": {
-          "level": "warn"
+          "level": "error"
         },
         "noUnusedVariables": {
           "level": "warn"
