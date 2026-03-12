@@ -1059,7 +1059,7 @@ export const AnnotationButton = observer(
           >
             <div
               className={cn("annotation-button").elem("trigger").toClassName()}
-              data-testid="annotation-button-overflow-trigger"
+              data-testid="annotation-button-menu-trigger"
               onMouseEnter={handleTriggerEnter}
               onClick={(e) => e.stopPropagation()}
             >

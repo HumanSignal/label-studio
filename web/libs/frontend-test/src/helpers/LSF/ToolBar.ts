@@ -32,7 +32,7 @@ export const ToolBar = {
   },
 
   get annotationDropdownTrigger() {
-    return this.sectionOne.find('[data-testid="annotation-button-overflow-trigger"]');
+    return this.sectionOne.find('[data-testid="annotation-button-menu-trigger"]');
   },
 
   get dropdownMenu() {
