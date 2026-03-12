@@ -35,6 +35,7 @@ Permissions that can be configured include the following:
 | **Manage Webhooks** | Manager+ |
 | **Access Project Dashboard** | Manager+ |
 | **Access Member Performance Dashboard** | All roles |
+| **Access Project Members Dashboard** | Manager+ |
 | **Use AI Assistant** | Manager+ |
 | **Delete Tasks** | Manager+ |
 | **Reset Project Cache** | Manager+ |
