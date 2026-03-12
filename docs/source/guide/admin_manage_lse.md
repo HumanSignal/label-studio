@@ -59,7 +59,7 @@ You can also use the API:
 
 You can tag organization members with metadata. 
 
-### Bulk tag members
+### Apply member tags via CSV
 
 To bulk apply member tags, go to the Organization page and click **Tag Members**. 
 
@@ -81,9 +81,9 @@ sally@humansignal.com,"Finance, New York City"
     If you are exporting the CSV from a spreadsheet editor, make sure you check the format in a text editor before uploading. Spreadsheet editors can add unnecessary formatting. 
 
 
-### Manage tags
+### Add and delete tags
 
-To delete or manually add tags, go to **Organization > Settings > Member Tags**. 
+To delete or manually add new tags, go to **Organization > Settings > Member Tags**. 
 
 ### Manually assign tags
 
