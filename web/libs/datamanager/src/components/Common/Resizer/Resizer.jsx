@@ -77,10 +77,7 @@ export const Resizer = ({
   );
 
   return (
-    <div
-      className={cnm(styles.root, variant === "quickview" && styles.quickview, className)}
-      style={{ width }}
-    >
+    <div className={cnm(styles.root, variant === "quickview" && styles.quickview, className)} style={{ width }}>
       <div style={style ?? {}}>{children}</div>
 
       <div
