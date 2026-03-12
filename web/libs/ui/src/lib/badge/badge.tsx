@@ -76,7 +76,7 @@ export interface BadgeProps extends Omit<React.HTMLAttributes<HTMLDivElement>, "
 }
 
 function normalizeVariant(variant: string): string {
-      return VARIANT_MAP[variant] || variant
+  return VARIANT_MAP[variant] || variant;
 }
 
 export const Badge = forwardRef<HTMLDivElement, BadgeProps>(
