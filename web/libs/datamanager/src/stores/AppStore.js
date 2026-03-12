@@ -141,7 +141,6 @@ export const AppStore = types
     afterCreate() {
       networkActivity?.destroy();
       networkActivity = new ActivityObserver();
-      console.log("AppStore afterCreate", self);
     },
 
     beforeDestroy() {
