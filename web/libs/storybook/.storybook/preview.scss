@@ -65,15 +65,15 @@ body {
     }
   }
 
-  /* General content area */
+  /* General content area (docs text only; exclude elements inside story preview blocks) */
   .sbdocs-content {
     color: var(--color-neutral-content) !important;
 
-    & p,
-    & span,
-    & div,
-    & li,
-    & code {
+    & p:not(.sbdocs-preview p),
+    & span:not(.sbdocs-preview span),
+    & div:not(.sbdocs-preview div),
+    & li:not(.sbdocs-preview li),
+    & code:not(.sbdocs-preview code) {
       color: inherit !important;
     }
   }
