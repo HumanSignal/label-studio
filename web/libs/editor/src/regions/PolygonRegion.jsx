@@ -67,6 +67,9 @@ const Model = types
     get flattenedPoints() {
       return getFlattenedPoints(this.points);
     },
+    get incomplete() {
+      return !self.closed;
+    },
   }))
   .actions((self) => {
     return {

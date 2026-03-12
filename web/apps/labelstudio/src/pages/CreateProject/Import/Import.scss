@@ -1,34 +1,3 @@
-// Custom scrollbar styling mixin
-@mixin custom-scrollbar {
-  scrollbar-color: var(--color-neutral-border-bold) transparent;
-  scrollbar-width: thin;
-
-  &::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
-    background-color: var(--color-neutral-surface);
-  }
-
-  &::-webkit-scrollbar-track {
-    background: var(--color-neutral-surface);
-    border-radius: 3px;
-  }
-
-  &::-webkit-scrollbar-thumb {
-    background: var(--color-neutral-border-bold);
-    border-radius: 3px;
-    transition: background-color 0.2s ease;
-
-    &:hover {
-      background: var(--color-neutral-border-boldest);
-    }
-  }
-
-  &::-webkit-scrollbar-corner {
-    background: var(--color-neutral-surface);
-  }
-}
-
 .upload_page {
   flex: 1;
   min-height: 0;
@@ -98,9 +67,39 @@
     font-weight: 500;
   }
 
-  &>main {
-    @include custom-scrollbar;
+  /* Shared custom scrollbar styles */
+  &>main,
+  &__code-wrapper>div {
+    scrollbar-color: var(--color-neutral-border-bold) transparent;
+    scrollbar-width: thin;
 
+    &::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+      background-color: var(--color-neutral-surface);
+    }
+
+    &::-webkit-scrollbar-track {
+      background: var(--color-neutral-surface);
+      border-radius: 3px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: var(--color-neutral-border-bold);
+      border-radius: 3px;
+      transition: background-color 0.2s ease;
+
+      &:hover {
+        background: var(--color-neutral-border-boldest);
+      }
+    }
+
+    &::-webkit-scrollbar-corner {
+      background: var(--color-neutral-surface);
+    }
+  }
+
+  &>main {
     flex: 1;
     overflow-y: auto;
     background: linear-gradient(var(--color-neutral-background) 30%, rgb(255 255 255 / 0%)), linear-gradient(rgb(0 0 0 / 10%), var(--color-neutral-background) 100%);
@@ -181,8 +180,6 @@
     height: calc(100% - var(--spacing-tight));
 
     &>div {
-      @include custom-scrollbar;
-
       height: 100%;
       overflow-y: auto;
       font-size: var(--font-size-14);

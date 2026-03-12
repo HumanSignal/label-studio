@@ -4,8 +4,8 @@
   gap: var(--spacing-base);
   width: 100%;
 
-  // Fixed height prevents modal from resizing when switching Code/Interactive views
-  // that leads to accidental clicks outside and unexpecteddd modal closing
+  /* Fixed height prevents modal from resizing when switching Code/Interactive views */
+  /* that leads to accidental clicks outside and unexpecteddd modal closing */
   height: 600px;
 }
 
