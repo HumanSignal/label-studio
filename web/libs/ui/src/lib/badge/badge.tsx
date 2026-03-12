@@ -1,4 +1,4 @@
-import { forwardRef, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { forwardRef, useEffect, useRef, useState } from "react";
 import { IconClose } from "@humansignal/icons";
 import { cn } from "../../utils/utils";
 import { Tooltip } from "../Tooltip/Tooltip";
@@ -76,7 +76,7 @@ export interface BadgeProps extends Omit<React.HTMLAttributes<HTMLDivElement>, "
 }
 
 function normalizeVariant(variant: string): string {
-  return VARIANT_MAP[variant] || variant;
+      return VARIANT_MAP[variant] || variant
 }
 
 export const Badge = forwardRef<HTMLDivElement, BadgeProps>(

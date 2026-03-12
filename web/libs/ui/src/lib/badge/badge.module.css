@@ -12,7 +12,6 @@
   white-space: nowrap;
   border-radius: var(--corner-radius-smaller);
   letter-spacing: var(--letter-spacing-base);
-  display: inline-flex;
   
   /* Base padding */
   padding: 0 var(--spacing-tight);
