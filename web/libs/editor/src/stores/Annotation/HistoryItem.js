@@ -37,7 +37,7 @@ export const HistoryItem = types
     }),
   )
   .preProcessSnapshot((snapshot) => {
-    const numericPk = snapshot.pk != null && !Number.isNaN(Number(snapshot.pk)) ? snapshot.pk : null;
+    const numericPk = snapshot.pk && !Number.isNaN(Number(snapshot.pk)) ? snapshot.pk : null;
     return {
       ...snapshot,
       pk: numericPk ?? guidGenerator(),
