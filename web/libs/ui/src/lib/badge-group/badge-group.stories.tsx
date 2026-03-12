@@ -3,6 +3,7 @@ import React from "react";
 import { BadgeGroup } from "./badge-group";
 import { Typography } from "../typography/typography";
 import { DataTable } from "../data-table";
+import { Button } from "../button/button";
 
 const meta = {
   title: "UI/BadgeGroup",
@@ -206,9 +207,17 @@ export const InTableCell: Story = {
   },
 };
 
+/**
+ * **Show All / Show Less with `onTruncationChange`**
+ *
+ * Use `onTruncationChange` to know when the badge group is actually truncated (overflow "+n" visible).
+ * Only show the "Show All" button when truncated, or when expanded (to show "Show Less").
+ * This avoids showing the button when all tags fit (e.g. a single tag).
+ */
 export const WithShowAllButton: Story = {
   render: () => {
     const [showAll, setShowAll] = React.useState(false);
+    const [isTruncated, setIsTruncated] = React.useState(false);
 
     const tags = [
       { id: 1, label: "English" },
@@ -222,24 +231,58 @@ export const WithShowAllButton: Story = {
       { id: 9, label: "Finance" },
     ];
 
+    const showButton = isTruncated || showAll;
+
     return (
       <div className="w-[400px] border border-dashed border-neutral-border p-base">
         <Typography variant="body" size="small" className="mb-tight text-neutral-text-secondary">
-          When truncated: badges overflow with +n badge
+          When truncated: badges overflow with +n badge. Button appears only when truncated or when expanded.
           <br />
-          When not truncated: badges wrap to multiple lines
+          When not truncated: badges wrap to multiple lines; no button.
         </Typography>
         <div className="flex flex-col gap-tight">
-          <BadgeGroup items={tags} truncate={!showAll} />
-          {tags.length > 0 && (
-            <button
-              type="button"
-              onClick={() => setShowAll(!showAll)}
-              className="self-start px-tight py-tighter text-sm text-primary-content hover:underline"
-            >
+          <BadgeGroup items={tags} truncate={!showAll} onTruncationChange={setIsTruncated} />
+          {showButton && (
+            <Button size="small" variant="neutral" onClick={() => setShowAll(!showAll)} className="self-start">
               {showAll ? "Show Less" : "Show All"}
-            </button>
+            </Button>
           )}
+        </div>
+      </div>
+    );
+  },
+};
+
+/**
+ *
+ * When `badgeMaxWidth` is set, each badge label is capped at that width with an ellipsis. A tooltip
+ * with the full label appears on hover **only** when the text is actually clipped — short labels get
+ * no tooltip.
+ */
+export const WithBadgeMaxWidth: Story = {
+  render: () => {
+    const tags = [
+      { id: 1, label: "Short" },
+      { id: 2, label: "Engineering" },
+      { id: 3, label: "Very long label that will definitely be truncated" },
+      { id: 4, label: "Another lengthy tag name here" },
+      { id: 5, label: "Design" },
+      { id: 6, label: "Product Management" },
+    ];
+
+    return (
+      <div className="flex flex-col gap-4">
+        <div>
+          <Typography variant="body" size="small" className="mb-tight text-neutral-text-secondary">
+            Without <code>badgeMaxWidth</code> — labels expand freely:
+          </Typography>
+          <BadgeGroup items={tags} />
+        </div>
+        <div>
+          <Typography variant="body" size="small" className="mb-tight text-neutral-text-secondary">
+            With <code>badgeMaxWidth={120}</code> — long labels clip with ellipsis; hover to see the full text:
+          </Typography>
+          <BadgeGroup items={tags} badgeMaxWidth={120} />
         </div>
       </div>
     );

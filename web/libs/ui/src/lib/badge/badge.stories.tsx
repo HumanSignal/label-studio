@@ -1,3 +1,4 @@
+import { useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import type { ColumnDef } from "@tanstack/react-table";
 import { Badge } from "./badge";
@@ -451,5 +452,107 @@ export const InContext: Story = {
     ];
 
     return <DataTable data={users} columns={columns} />;
+  },
+};
+
+/**
+ *
+ * Badges can render a close button via the `onClose` prop. Clicking removes the badge from the list.
+ */
+export const Closable: Story = {
+  render: () => {
+    const [tags, setTags] = useState([
+      { id: 1, label: "Design", variant: "grape" as const },
+      { id: 2, label: "Engineering", variant: "blueberry" as const },
+      { id: 3, label: "Marketing", variant: "kale" as const },
+      { id: 4, label: "Research", variant: "canteloupe" as const },
+    ]);
+
+    const remove = (id: number) => setTags((prev) => prev.filter((t) => t.id !== id));
+
+    return (
+      <div className="flex flex-col gap-4">
+        <Typography variant="body" size="small" className="text-neutral-content-subtle">
+          Click the × button to remove a badge. When all are removed, the list is empty.
+        </Typography>
+        <div className="flex flex-wrap gap-2">
+          {tags.map((tag) => (
+            <Badge key={tag.id} variant={tag.variant} onClose={() => remove(tag.id)}>
+              {tag.label}
+            </Badge>
+          ))}
+          {tags.length === 0 && (
+            <Typography variant="body" size="small" className="text-neutral-content-subtler italic">
+              No tags
+            </Typography>
+          )}
+        </div>
+      </div>
+    );
+  },
+};
+
+/**
+ *
+ * When `maxWidth` is provided, long text is clipped with an ellipsis. A tooltip appears on hover
+ * **only** when the text is actually truncated — short labels get no tooltip.
+ */
+export const WithTruncation: Story = {
+  render: () => {
+    const labels = [
+      "Short",
+      "Medium length label",
+      "This is a very long label that will definitely be truncated",
+      "Another quite lengthy tag name here",
+      "OK",
+    ];
+
+    return (
+      <div className="flex flex-col gap-4">
+        <Typography variant="body" size="small" className="text-neutral-content-subtle">
+          Hover a truncated badge to see the full text in a tooltip. Short labels show no tooltip.
+        </Typography>
+        <div className="flex flex-wrap gap-2">
+          {labels.map((label) => (
+            <Badge key={label} variant="grape" maxWidth={120}>
+              {label}
+            </Badge>
+          ))}
+        </div>
+      </div>
+    );
+  },
+};
+
+/**
+ *
+ * Combining `maxWidth` and `onClose` produces a removable tag chip with truncation and tooltip support —
+ * the pattern used inside `TagAutocomplete` for selected values.
+ */
+export const ClosableAndTruncated: Story = {
+  render: () => {
+    const [tags, setTags] = useState([
+      { id: 1, label: "Short tag", variant: "grape" as const },
+      { id: 2, label: "A much longer tag label that gets clipped", variant: "blueberry" as const },
+      { id: 3, label: "Design system", variant: "kale" as const },
+      { id: 4, label: "Extremely verbose tag name that overflows the maximum width", variant: "plum" as const },
+    ]);
+
+    const remove = (id: number) => setTags((prev) => prev.filter((t) => t.id !== id));
+
+    return (
+      <div className="flex flex-col gap-4">
+        <Typography variant="body" size="small" className="text-neutral-content-subtle">
+          Removable tag chips with truncation at 150 px. Hover a clipped chip to read its full label.
+        </Typography>
+        <div className="flex flex-wrap gap-2">
+          {tags.map((tag) => (
+            <Badge key={tag.id} variant={tag.variant} maxWidth={150} onClose={() => remove(tag.id)}>
+              {tag.label}
+            </Badge>
+          ))}
+        </div>
+      </div>
+    );
   },
 };

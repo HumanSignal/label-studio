@@ -646,14 +646,30 @@ export default types
     },
 
     setHiddenByTool(shouldBeHidden, label) {
+      // Support both direct region type (e.g. { type: "rectangleregion" }) and
+      // By Tool group entity from asTypeTree (e.g. { type: "tool", value: "rectangle" })
+      const matchType =
+        label?.type === "tool" && label?.value != null
+          ? `${String(label.value).replace(/region$/i, "")}region`
+          : label?.type;
+
+      if (!matchType) return;
+
       self.regions.forEach((area) => {
-        if (area.hidden !== shouldBeHidden && area.type === label.type) {
+        if (area.hidden !== shouldBeHidden && area.type === matchType) {
           area.toggleHidden();
         }
       });
     },
 
     setHiddenByLabel(shouldBeHidden, label) {
+      // Match by label value/id so group hide/show works when entity is from
+      // a different region's selectedLabels (reference equality can fail)
+      const matchByValue =
+        label?.value != null && label?.id != null
+          ? (selected) => selected.some((s) => s.value === label.value && s.id === label.id)
+          : (selected) => selected.includes(label);
+
       self.regions.forEach((area) => {
         if (area.hidden !== shouldBeHidden) {
           const l = area.labeling;
@@ -661,7 +677,7 @@ export default types
           if (l) {
             const selected = l.selectedLabels;
 
-            if (selected.includes(label)) {
+            if (selected && matchByValue(selected)) {
               area.toggleHidden();
             }
           }
