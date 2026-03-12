@@ -1,6 +1,6 @@
 import React from "react";
 import { cnm } from "@humansignal/ui";
-import styles from "./Resizer.module.scss";
+import styles from "./Resizer.module.css";
 
 const calculateWidth = (width, minWidth, maxWidth, initialX, currentX) => {
   const offset = currentX - initialX;
