@@ -1,5 +1,5 @@
 import Running64 from "./Running-64.gif";
-import Running64x2 from "./Running-64@2x.gif";
+import Running64x2 from "./Running-64-2x.gif";
 
 const sizes = {
   default: {
