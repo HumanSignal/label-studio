@@ -23,10 +23,11 @@ export const Spinner = injector(({ SDK, visible = true, ...props }) => {
   }, [props.size]);
 
   const source = Running.default;
-
-  const videoStyles = {
-    width: "100%",
-    height: "100%",
+  // Use x2 only for large (128px) so it stays sharp; x1 is fine for small/middle
+  const imgSrc = size >= (SDK?.spinnerSize?.large ?? 128) ? source.x2 : source.x1;
+  const imgStyles = {
+    width: size,
+    height: size,
     objectFit: "contain",
   };
 
@@ -41,12 +42,7 @@ export const Spinner = injector(({ SDK, visible = true, ...props }) => {
           {ExternalSpinner ? (
             <ExternalSpinner size={size} />
           ) : (
-            <img
-              src={source.x1}
-              srcSet={[`${source.x1} 1x`, `${source.x2} 2x`].join(",")}
-              style={videoStyles}
-              alt="opossum loader"
-            />
+            <img src={imgSrc} style={imgStyles} alt="opossum loader" />
           )}
         </div>
       }
