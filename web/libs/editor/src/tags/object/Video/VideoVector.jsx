@@ -160,19 +160,17 @@ const VideoVectorPure = ({ id, reg, box, frame, workingArea, selected, draggable
   const vectorRef = useRef(null);
   const isDraggingRef = useRef(false);
   const latestDragPixelsRef = useRef(null);
-  // Local state for real-time visual feedback during drag.
-  // KonvaVector's shape drag does NOT update its own internal state — it relies
-  // on the parent feeding points back via initialPoints. MobX observer re-renders
-  // are too slow for that, so we use local React state for immediate re-renders.
   const [dragPixels, setDragPixels] = useState(null);
-  // Cache exact pixel↔percent pair to avoid float drift on commit.
-  // When dragPixels is cleared after drag end, this ref ensures pixelVertices
-  // returns bit-identical values so KonvaVector's arePointsEqual (strict ===)
-  // doesn't trigger a re-initialization / disappearance.
   const lastCommittedRef = useRef(null);
 
   const style = useRegionStyles(reg, { includeFill: true });
   const { realWidth: waWidth, realHeight: waHeight, scale: waScale, x: waX, y: waY } = workingArea;
+
+  // Keep a ref to the latest working area dims and frame so that callbacks
+  // reached through stale closures (KonvaVector's stage-level event handlers
+  // are set up once and never re-attached) always read fresh values.
+  const commitContextRef = useRef({ waWidth, waHeight, frame });
+  commitContextRef.current = { waWidth, waHeight, frame };
 
   const storePixelVertices = useMemo(
     () => percentToPixelVertices(box.vertices || [], waWidth, waHeight),
@@ -230,15 +228,19 @@ const VideoVectorPure = ({ id, reg, box, frame, workingArea, selected, draggable
 
   const commitPoints = useCallback(
     (points) => {
-      const percentPoints = pixelToPercentVertices(points, waWidth, waHeight);
-      const currentShape = reg.getShape(frame);
+      const { waWidth: w, waHeight: h, frame: f } = commitContextRef.current;
+
+      if (!w || !h) return;
+
+      const percentPoints = pixelToPercentVertices(points, w, h);
+      const currentShape = reg.getShape(f);
 
       if (currentShape?.vertices && verticesMatch(currentShape.vertices, percentPoints)) return;
 
       lastCommittedRef.current = { percent: percentPoints, pixels: points };
-      reg.updateShape({ vertices: percentPoints, closed: currentShape?.closed ?? false }, frame);
+      reg.updateShape({ vertices: percentPoints, closed: currentShape?.closed ?? false }, f);
     },
-    [reg, frame, waWidth, waHeight],
+    [reg],
   );
 
   const handlePointsChange = useCallback(
@@ -265,10 +267,6 @@ const VideoVectorPure = ({ id, reg, box, frame, workingArea, selected, draggable
       commitPoints(latestDragPixelsRef.current);
       latestDragPixelsRef.current = null;
     }
-    // Don't clear dragPixels here — wait for MobX to propagate the committed
-    // values first. Clearing immediately causes a race where React re-renders
-    // with dragPixels=null but box.vertices still has the OLD values, making
-    // the shape snap back to its pre-drag position.
     reg.annotation?.history?.unfreeze?.();
   }, [commitPoints, reg]);
 

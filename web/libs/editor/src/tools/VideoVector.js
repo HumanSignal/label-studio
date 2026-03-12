@@ -1,7 +1,8 @@
 import { isAlive, types } from "mobx-state-tree";
 
-import BaseTool from "./Base";
+import BaseTool, { DEFAULT_DIMENSIONS } from "./Base";
 import ToolMixin from "../mixins/Tool";
+import { MultipleClicksDrawingTool } from "../mixins/DrawingTool";
 import { NodeViews } from "../components/Node/Node";
 import { observe } from "mobx";
 import { ff } from "@humansignal/core";
@@ -10,14 +11,7 @@ const _Tool = types
   .model("VideoVectorTool", {
     group: "segmentation",
     shortcut: "tool:videovector",
-    default: true,
-    mode: types.optional(types.enumeration(["drawing", "viewing"]), "viewing"),
-    unselectRegionOnToolChange: true,
-    isDrawingTool: true,
   })
-  .volatile(() => ({
-    currentArea: null,
-  }))
   .views((self) => ({
     get tagTypes() {
       return {
@@ -34,21 +28,13 @@ const _Tool = types
       return NodeViews.VideoVectorRegionModel?.icon ?? NodeViews.VectorRegionModel?.icon;
     },
 
-    get isDrawing() {
-      return self.mode === "drawing";
+    get defaultDimensions() {
+      return DEFAULT_DIMENSIONS.vector;
     },
 
-    get annotation() {
-      return self.obj?.annotation;
-    },
-
-    isIncorrectControl() {
-      return self.tagTypes.stateTypes === self.control.type && !self.control.isSelected;
-    },
-
+    // Video object doesn't have checkLabels(); use activeStates instead
     isIncorrectLabel() {
-      const states = self.obj.activeStates?.();
-
+      const states = self.obj?.activeStates?.();
       return states && states.length === 0 && self.obj.hasStates;
     },
 
@@ -105,6 +91,7 @@ const _Tool = types
     let lastClick = { ts: 0, x: 0, y: 0 };
 
     return {
+      // Video passes [x,y] (not [x,y,canvasX,canvasY]) and should not filter shift
       event(name, ev, args) {
         if (ev.button > 0) return;
         let fn = `${name}Ev`;
@@ -170,6 +157,10 @@ const _Tool = types
         );
       },
 
+      closeCurrent() {
+        // Video vector closing is handled by listenForClose observers
+      },
+
       stopListening() {
         for (const disposer of disposers) {
           disposer();
@@ -177,9 +168,6 @@ const _Tool = types
         disposers.length = 0;
       },
 
-      /**
-       * x, y are in video PIXEL coords (from normalizeMouseOffsets in VideoRegions)
-       */
       startDrawing(x, y) {
         if (!self.canStartDrawing()) return;
 
@@ -259,10 +247,7 @@ const _Tool = types
         self.startDrawing(x, y);
       },
 
-      mousemoveEv() {
-        // Point creation is deferred to mouseup (click-vs-drag detection).
-        // Ghost line is managed by KonvaVector internally.
-      },
+      mousemoveEv() {},
 
       mouseupEv(_, [x, y]) {
         if (!self.isDrawing) return;
@@ -284,18 +269,13 @@ const _Tool = types
         }
       },
 
+      // Video uses mousedown/mouseup exclusively; disable MultipleClicksDrawingTool's click handler
+      clickEv() {},
+
       dblclickEv() {
         if (self.isDrawing) {
           self._finishDrawing();
         }
-      },
-
-      checkDistance(x, y) {
-        if (!initialCursorPosition) return false;
-        const distX = x - initialCursorPosition.x;
-        const distY = y - initialCursorPosition.y;
-
-        return Math.abs(distX) >= 5 || Math.abs(distY) >= 5;
       },
 
       finishDrawing() {
@@ -349,13 +329,9 @@ const _Tool = types
           currentArea.deleteRegion();
         }
       },
-
-      setSelected(selected) {
-        self.selected = selected;
-      },
     };
   });
 
-const VideoVector = types.compose(_Tool.name, ToolMixin, BaseTool, _Tool);
+const VideoVector = types.compose(_Tool.name, ToolMixin, BaseTool, MultipleClicksDrawingTool, _Tool);
 
 export { VideoVector };
