@@ -8,7 +8,8 @@ import { VideoRegion } from "./VideoRegion";
 
 /**
  * Interpolate a single vertex between two keyframes.
- * Lerps x, y and optionally controlPoint1/controlPoint2 for bezier curves.
+ * Linear interpolation: prev + (next - prev) * r (i.e. prev.x + (next.x - prev.x) * r).
+ * Also interpolates controlPoint1/controlPoint2 when both keyframes have them (bezier).
  */
 const interpolateVertex = (prev, next, r) => {
   const result = {

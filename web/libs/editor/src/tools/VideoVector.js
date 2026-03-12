@@ -1,6 +1,11 @@
 import { isAlive, types } from "mobx-state-tree";
 
 import BaseTool, { DEFAULT_DIMENSIONS } from "./Base";
+
+/** Max time (ms) between two clicks to treat as double-click */
+const DOUBLE_CLICK_MAX_MS = 300;
+/** Max pixel distance between two clicks to treat as same position (double-click) */
+const DOUBLE_CLICK_MAX_PIXEL_DIST = 5;
 import ToolMixin from "../mixins/Tool";
 import { MultipleClicksDrawingTool } from "../mixins/DrawingTool";
 import { NodeViews } from "../components/Node/Node";
@@ -101,7 +106,11 @@ const _Tool = types
         if (name === "click") {
           const ts = ev.timeStamp;
 
-          if (ts - lastClick.ts < 300 && Math.abs(lastClick.x - args[0]) < 5 && Math.abs(lastClick.y - args[1]) < 5) {
+          if (
+            ts - lastClick.ts < DOUBLE_CLICK_MAX_MS &&
+            Math.abs(lastClick.x - args[0]) < DOUBLE_CLICK_MAX_PIXEL_DIST &&
+            Math.abs(lastClick.y - args[1]) < DOUBLE_CLICK_MAX_PIXEL_DIST
+          ) {
             fn = `dbl${fn}`;
             if (typeof self[fn] !== "undefined") self[fn].call(self, ev, args);
           }
