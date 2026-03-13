@@ -65,54 +65,58 @@ export class Item extends Component {
 }
 
 // FIT-720: Virtualized annotation panel with lazy hydration (exported for tests)
-export const VirtualizedAnnotationPanel = observer(({ annotation, root, style, onSelect, isHydrating }) => {
-  // Check if annotation has regions - either from original load (versions.result) or from hydration (areas)
-  const versionsResult = annotation.versions?.result;
-  const hasVersionsResult = Array.isArray(versionsResult) && versionsResult.length > 0;
-  // Force MobX to track areas by accessing the regions getter (which iterates areas)
-  const regions = annotation.regions;
-  const hasRegions = regions && regions.length > 0;
-  // Annotation is a stub if it has no data and is not user-generated
-  // After hydration, hasRegions will be true (deserializeResults populates regions)
-  const isStub = !hasVersionsResult && !hasRegions && annotation.pk && !annotation.userGenerate;
+export const VirtualizedAnnotationPanel = observer(
+  ({ annotation, root, style, onSelect, isHydrating, hydratedIdsRef }) => {
+    // Check if annotation has regions - either from original load (versions.result) or from hydration (areas)
+    const versionsResult = annotation.versions?.result;
+    const hasVersionsResult = Array.isArray(versionsResult) && versionsResult.length > 0;
+    // Force MobX to track areas by accessing the regions getter (which iterates areas)
+    const regions = annotation.regions;
+    const hasRegions = regions && regions.length > 0;
+    // Annotation is a stub if it has no data and is not user-generated
+    // After hydration, hasRegions will be true (deserializeResults populates regions)
+    const isStub = !hasVersionsResult && !hasRegions && annotation.pk && !annotation.userGenerate;
+    // Already hydrated (including with empty result) — don't show "Waiting to load..."
+    const wasHydrated = hydratedIdsRef?.current?.has(annotation.id);
 
-  return (
-    <div style={{ ...style, paddingRight: PANEL_GAP }}>
-      <div id={`c-${annotation.id}`} style={{ position: "relative", height: "100%" }}>
-        <EntityTab
-          entity={annotation}
-          onClick={() => onSelect(annotation)}
-          prediction={annotation.type === "prediction"}
-          bordered={false}
-          style={{ height: 44 }}
-        />
-        {isStub || isHydrating ? (
-          <div
-            style={{
-              position: "absolute",
-              top: 44,
-              left: 0,
-              width: "100%",
-              height: "calc(100% - 44px)",
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              justifyContent: "center",
-              background: "var(--color-neutral-surface)",
-            }}
-          >
-            <Spin size="large" />
-            <span style={{ marginTop: 12, color: "#999" }}>
-              {isHydrating ? "Loading annotation..." : "Waiting to load..."}
-            </span>
-          </div>
-        ) : (
-          <Annotation root={root} annotation={annotation} />
-        )}
+    return (
+      <div style={{ ...style, paddingRight: PANEL_GAP }}>
+        <div id={`c-${annotation.id}`} style={{ position: "relative", height: "100%" }}>
+          <EntityTab
+            entity={annotation}
+            onClick={() => onSelect(annotation)}
+            prediction={annotation.type === "prediction"}
+            bordered={false}
+            style={{ height: 44 }}
+          />
+          {!wasHydrated && (isStub || isHydrating) ? (
+            <div
+              style={{
+                position: "absolute",
+                top: 44,
+                left: 0,
+                width: "100%",
+                height: "calc(100% - 44px)",
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                justifyContent: "center",
+                background: "var(--color-neutral-surface)",
+              }}
+            >
+              <Spin size="large" />
+              <span style={{ marginTop: 12, color: "#999" }}>
+                {isHydrating ? "Loading annotation..." : "Waiting to load..."}
+              </span>
+            </div>
+          ) : (
+            <Annotation root={root} annotation={annotation} />
+          )}
+        </div>
       </div>
-    </div>
-  );
-});
+    );
+  },
+);
 
 // FIT-720: Virtualized Grid component
 const VirtualizedGrid = observer(({ store, annotations, root }) => {
@@ -378,6 +382,7 @@ const VirtualizedGrid = observer(({ store, annotations, root }) => {
       root,
       onSelect: select,
       hydratingIds,
+      hydratedIdsRef: hydratedIds,
     }),
     [visibleAnnotations, root, select, hydratingIds],
   );
@@ -393,6 +398,7 @@ const VirtualizedGrid = observer(({ store, annotations, root }) => {
         style={style}
         onSelect={data.onSelect}
         isHydrating={data.hydratingIds.has(annotation.id)}
+        hydratedIdsRef={data.hydratedIdsRef}
       />
     );
   }, []);
