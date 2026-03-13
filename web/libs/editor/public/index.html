@@ -38,7 +38,7 @@
       <ul id="nav">
         <li><a href="https://labelstud.io/guide">Docs</a></li>
         <li><a class="github-button" href="https://github.com/HumanSignal/label-studio"
-           data-icon="octicon-star" data-size="large" data-show-count="true" aria-label="Star humansignal/label-studio on GitHub"><img style="width:25px;height:25px;" src="./public/images/GitHub-Mark-64px.png" height="25" /></a></li>
+           data-icon="octicon-star" data-size="large" data-show-count="true" aria-label="Star humansignal/label-studio on GitHub"><img style="width:25px;height:25px;" src="./public/images/GitHub-Mark-64px.png" height="25" alt="" /></a></li>
       </ul>
     </div>
 
@@ -46,16 +46,20 @@
       <div id="label-studio"></div>
     </div>
     <footer class="footer">
-        Made with <img style="height:16px; width:auto; display: inline-block;" src="./public/images/3nowhite.svg" height="16" /> by <a target="_blank" style="line-height: 24px;" href="https://heartex.net">Heartex</a> in San Francisco
+        Made with <img style="height:16px; width:auto; display: inline-block;" src="./public/images/3nowhite.svg" height="16" alt="Heartex" /> by <a target="_blank" style="line-height: 24px;" href="https://heartex.net">Heartex</a> in San Francisco
     </footer>
 
     <script>
       (function (d, o) {
           d.domReady = function (n, a) {
               o.addEventListener && o.addEventListener("DOMContentLoaded", function e(t) {
-                  o.removeEventListener("DOMContentLoaded", e), n.call(a || d, t)
+                  o.removeEventListener("DOMContentLoaded", e);
+                  n.call(a || d, t);
               }) || o.attachEvent && o.attachEvent("onreadystatechange", function e(t) {
-                  "complete" === o.readyState && (o.detachEvent("onreadystatechange", e), n.call(a || d, t))
+                  if ("complete" === o.readyState) {
+                    o.detachEvent("onreadystatechange", e);
+                    n.call(a || d, t);
+                  }
               })
           }
       })(window, document);

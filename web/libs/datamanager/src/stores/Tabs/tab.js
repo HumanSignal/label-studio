@@ -506,7 +506,7 @@ export const Tab = types
         self.deleteFilter(filter.child_filter);
       }
 
-      const index = self.filters.findIndex((f) => f === filter);
+      const index = self.filters.indexOf(filter);
       if (index > -1) {
         self.filters.splice(index, 1);
         destroy(filter);

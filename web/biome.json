@@ -46,7 +46,6 @@
       "a11y": {
         "noAutofocus": "off",
         "noSvgWithoutTitle": "off",
-        "useAltText": "off",
         "useButtonType": "off",
         "useKeyWithClickEvents": "off",
         "useKeyWithMouseEvents": "off",
@@ -58,6 +57,9 @@
         "useSemanticElements": "off"
       },
       "suspicious": {
+        "noUnknownAtRules": {
+          "options": { "ignore": ["tailwind", "apply", "layer", "theme", "source", "variant"] }
+        },
         "noExplicitAny": "off",
         "noAssignInExpressions": "off",
         "noGlobalIsNan": "off",
@@ -71,21 +73,16 @@
         "noShorthandPropertyOverrides": "warn",
         "useIterableCallbackReturn": "off",
         "noUselessEscapeInString": "off",
-        "noTsIgnore": "off",
-        "noUnknownAtRules": "off"
+        "noTsIgnore": "off"
       },
       "complexity": {
         "noForEach": "off",
         "noUselessFragments": "off",
-        "noUselessSwitchCase": "off",
         "useOptionalChain": "off",
         "noBannedTypes": "off",
         "useArrowFunction": "off",
         "noStaticOnlyClass": "off",
-        "noArguments": "off",
-        "noCommaOperator": "off",
-        "noImportantStyles": "off",
-        "useIndexOf": "off"
+        "noImportantStyles": "off"
       },
       "correctness": {
         "useExhaustiveDependencies": "off",
@@ -102,8 +99,7 @@
         "noUnknownPseudoClass": "off",
         "noUnknownMediaFeatureName": "warn",
         "noUnknownProperty": "warn",
-        "useParseIntRadix": "off",
-        "noUnusedPrivateClassMembers": "off"
+        "useParseIntRadix": "off"
       },
       "performance": {
         "noAccumulatingSpread": "off",

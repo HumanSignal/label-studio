@@ -1,3 +1,4 @@
+// biome-ignore-all lint/correctness/noUnusedPrivateClassMembers: AudioUltra; skip unsafe removal
 import type { ColorMapper } from "../../ColorMapper";
 import type { LRUCache } from "../../../Common/LRUCache";
 import {
@@ -213,69 +214,6 @@ export class ProgressRendererPlugin implements RendererPlugin<ProgressRendererPl
     wrapper.appendChild(text);
     wrapper.appendChild(bar);
     return wrapper;
-  }
-
-  /**
-   * Create the per-priority bars (VIEW, PRECACHE).
-   */
-  private _createPriorityBars(batchGroups: Record<string, BatchProgress[]>): HTMLElement {
-    const colorMapper = this.colorMapper;
-    const container = document.createElement("div");
-    const priorities: { key: string; color: string; label: string }[] = [
-      { key: "view", color: colorMapper.magnitudeToColor(1.0), label: this.labels?.view ?? "VIEW" },
-      { key: "precache", color: colorMapper.magnitudeToColor(0.66), label: this.labels?.precache ?? "PRECACHE" },
-    ];
-    const barBgColor = colorMapper.magnitudeToColor(0);
-    for (const { key, color, label } of priorities) {
-      const batches = batchGroups[key] || [];
-      const batchCount = batches.length;
-      let completedTasks = 0;
-      let activeTasks = 0;
-      let totalTasks = 0;
-      batches.forEach((batch) => {
-        completedTasks += batch.completedTasks;
-        activeTasks += batch.activeTasks;
-        totalTasks += batch.totalTasks;
-      });
-      // Bar and label
-      const div = document.createElement("div");
-      div.style.marginBottom = "2px";
-      div.style.fontSize = "9px";
-      // Label and badge
-      const labelSpan = document.createElement("span");
-      labelSpan.textContent = `${label}: ${completedTasks}/${totalTasks}`;
-      labelSpan.style.color = color;
-      labelSpan.style.fontWeight = "bold";
-      div.appendChild(labelSpan);
-      if (batchCount > 0) {
-        const badge = document.createElement("span");
-        badge.textContent = `  (${batchCount} batch${batchCount > 1 ? "es" : ""})`;
-        badge.style.background = "#222";
-        badge.style.color = "#fff";
-        badge.style.fontSize = "8px";
-        badge.style.borderRadius = "6px";
-        badge.style.padding = "1px 6px";
-        badge.style.marginLeft = "6px";
-        badge.style.verticalAlign = "middle";
-        div.appendChild(badge);
-      }
-      // Progress Bar (relative for priority bars)
-      div.appendChild(
-        this._createBar({
-          percent: totalTasks > 0 ? completedTasks / totalTasks : 1,
-          color,
-          bgColor: barBgColor,
-          height: 4,
-          radius: this.barRadius,
-          shadow: this.barShadow,
-          opacity: 1,
-          activePercent: totalTasks > 0 ? activeTasks / totalTasks : 0,
-          position: "relative",
-        }),
-      );
-      container.appendChild(div);
-    }
-    return container;
   }
 
   /**

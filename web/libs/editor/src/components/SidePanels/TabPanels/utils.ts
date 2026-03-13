@@ -518,7 +518,7 @@ export const resizePanelColumns = (
   if (!panelsOnSameAlignment) return state;
   const difference = height - newState[key].height;
   const visiblePanels = panelsOnSameAlignment.filter((panelKey) => newState[panelKey].visible);
-  const panelAboveKeyIndex = visiblePanels?.findIndex((visibleKey) => visibleKey === key) - 1;
+  const panelAboveKeyIndex = visiblePanels?.indexOf(key) - 1;
 
   if (panelAboveKeyIndex === undefined) return state;
 

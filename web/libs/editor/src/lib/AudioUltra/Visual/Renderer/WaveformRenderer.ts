@@ -1,3 +1,4 @@
+// biome-ignore-all lint/correctness/noUnusedPrivateClassMembers: AudioUltra; skip unsafe removal
 import type { Layer } from "../Layer";
 import { averageMinMax, clamp } from "../../Common/Utils";
 import type { Renderer, RenderContext } from "./Renderer";
@@ -32,8 +33,6 @@ export class WaveformRenderer implements Renderer<WaveformRendererConfig> {
   private readonly backgroundLayer: Layer;
   private readonly onRenderTransfer?: () => void;
   private audio?: WaveformAudio;
-  private lastRenderContext?: RenderContext;
-  private isDestroyed = false;
   private rateLimitedRenderer: RateLimitedRenderer;
 
   constructor({ layer, backgroundLayer, config, onRenderTransfer }: WaveformRendererConstructorConfig) {
