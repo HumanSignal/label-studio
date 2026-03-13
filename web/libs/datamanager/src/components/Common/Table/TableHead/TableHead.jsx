@@ -21,6 +21,7 @@ import {
   FF_AGREEMENT_FILTERED,
   FF_UTC_428_CONSENSUS_CONTROL_TAG_AGREEMENT,
 } from "@humansignal/core/lib/utils/feature-flags";
+import { isStarterCloudPlan } from "@humansignal/core";
 
 const tableHeadCN = cn("table-head");
 
@@ -158,7 +159,7 @@ const ColumnRenderer = observer(
 
     const isAgreementColumn =
       isActive(FF_AGREEMENT_FILTERED) &&
-      isActive(FF_UTC_428_CONSENSUS_CONTROL_TAG_AGREEMENT) &&
+      (isActive(FF_UTC_428_CONSENSUS_CONTROL_TAG_AGREEMENT) || isStarterCloudPlan()) &&
       (column.original?.alias === "agreement" ||
         (typeof column.original?.alias === "string" && column.original.alias.startsWith("dimension_agreement_")));
 

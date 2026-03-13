@@ -37,6 +37,18 @@
   }
 }
 
+.closeButton {
+  position: absolute;
+  top: var(--spacing-tight);
+  right: var(--spacing-tight);
+  z-index: 2;
+  color: var(--color-neutral-content-subtler);
+
+  &:hover {
+    color: var(--color-neutral-content);
+  }
+}
+
 .content {
   padding: 3rem;
   display: flex;

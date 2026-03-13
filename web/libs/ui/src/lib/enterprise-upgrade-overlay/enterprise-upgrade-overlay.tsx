@@ -1,4 +1,5 @@
 import { forwardRef, type ReactNode } from "react";
+import { IconClose } from "@humansignal/icons";
 import { cn } from "../../utils/utils";
 import { EnterpriseBadge } from "../enterprise-badge/enterprise-badge";
 import { Button } from "../button/button";
@@ -72,6 +73,8 @@ export interface EnterpriseUpgradeOverlayProps {
   onContactSales?: () => void;
   /** Callback when learn more button is clicked */
   onLearnMore?: () => void;
+  /** Callback to close/dismiss the overlay — renders a close button when provided */
+  onClose?: () => void;
   /** Custom wrapper class name */
   className?: string;
   /** Test ID for testing */
@@ -89,6 +92,7 @@ export const EnterpriseUpgradeOverlay = forwardRef<HTMLDivElement, EnterpriseUpg
       showLearnMore = true,
       onContactSales,
       onLearnMore,
+      onClose,
       className,
       "data-testid": testId,
     },
@@ -109,6 +113,18 @@ export const EnterpriseUpgradeOverlay = forwardRef<HTMLDivElement, EnterpriseUpg
     return (
       <div ref={ref} className={cn(styles.overlay, className)} data-testid={testId}>
         <div className={styles.container}>
+          {onClose && (
+            <Button
+              className={styles.closeButton}
+              look="string"
+              variant="neutral"
+              size="small"
+              onClick={onClose}
+              aria-label="Close"
+            >
+              <IconClose />
+            </Button>
+          )}
           <div className={styles.content}>
             <div className={styles.badge}>
               <EnterpriseBadge />
