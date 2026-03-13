@@ -290,6 +290,13 @@ module.exports = composePlugins(
           filename: "[name][ext]",
         },
       },
+      {
+        test: /\.(gif|png|jpe?g|webp)(\?.*)?$/,
+        type: "asset/resource",
+        generator: {
+          filename: "assets/[name]-[hash][ext]",
+        },
+      },
       // tailwindcss
       {
         test: /tailwind\.css/,

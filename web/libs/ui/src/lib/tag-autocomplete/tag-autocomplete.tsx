@@ -354,7 +354,9 @@ export const TagAutocomplete = forwardRef(
                       <div className="flex items-center gap-2 w-full px-4 py-1 hover:bg-primary-emphasis-subtle hover:cursor-pointer group-focus-within:bg-primary-emphasis-subtle group-aria-selected:bg-primary-emphasis-subtle rounded-4 duration-150 ease-out">
                         <IconPlus className={styles.createIcon} />
                         <span>
-                          Add "<strong>{query.trim()}</strong>" tag
+                          Add "
+                          <strong className="inline-block max-w-[200px] truncate align-bottom">{query.trim()}</strong>"
+                          tag
                         </span>
                       </div>
                     </CommandItem>
