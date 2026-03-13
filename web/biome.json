@@ -66,17 +66,13 @@
         "noConfusingVoidType": "off",
         "noImplicitAnyLet": "off",
         "noShadowRestrictedNames": "off",
-        "useDefaultSwitchClauseLast": "off",
         "useGetterReturn": "off",
-        "noRedeclare": "off",
         "noDuplicateProperties": "warn",
         "noShorthandPropertyOverrides": "warn",
         "useIterableCallbackReturn": "off",
         "noUselessEscapeInString": "off",
         "noTsIgnore": "off",
-        "noUnknownAtRules": "off",
-        "noDuplicateObjectKeys": "off",
-        "noNonNullAssertedOptionalChain": "off"
+        "noUnknownAtRules": "off"
       },
       "complexity": {
         "noForEach": "off",
@@ -95,8 +91,6 @@
         "useExhaustiveDependencies": "off",
         "noChildrenProp": "off",
         "useJsxKeyInIterable": "off",
-        "noUnsafeOptionalChaining": "off",
-        "noConstructorReturn": "off",
         "useHookAtTopLevel": "off",
         "noUnusedImports": {
           "level": "warn"
