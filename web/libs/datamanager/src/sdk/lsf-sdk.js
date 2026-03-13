@@ -422,8 +422,11 @@ export class LSFWrapper {
       annotationID = task.default_selected_annotation;
     }
 
-    // Batch all MST store mutations into a single MobX transaction so reactions
-    // fire only once instead of cascading after each individual action.
+    // Batch store reset and interface mutations in a single MobX transaction
+    // so reactions fire only once instead of cascading after each action.
+    // initializeStore must run OUTSIDE this batch because it calls afterReset()
+    // which re-attaches shared stores (e.g. Taxonomy). If detach() and re-attach
+    // happen in the same transaction, MST throws "already part of state tree".
     runInAction(() => {
       if (hasChangedTasks) {
         this.lsf.resetState();
@@ -451,8 +454,9 @@ export class LSFWrapper {
       }
 
       this.lsf.assignTask(task);
-      this.lsf.initializeStore(lsfTask);
     });
+
+    this.lsf.initializeStore(lsfTask);
 
     await this.setAnnotation(annotationID, fromHistory || isRejectedQueue, selectPrediction);
     this.setLoading(false);
