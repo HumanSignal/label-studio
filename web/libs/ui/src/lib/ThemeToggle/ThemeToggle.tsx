@@ -1,5 +1,5 @@
 import { clsx } from "clsx";
-import styles from "./ThemeToggle.module.scss";
+import styles from "./ThemeToggle.module.css";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { ReactComponent as Sun } from "./icons/sun.svg";
 import { ReactComponent as Moon } from "./icons/moon.svg";

@@ -7,7 +7,7 @@ import { Button, IconFileCopy, IconLaunch, Label, Typography } from "@humansigna
 import { Input, TextArea } from "apps/labelstudio/src/components/Form";
 import { atom, useAtomValue } from "jotai";
 import { atomWithMutation, atomWithQuery } from "jotai-tanstack-query";
-import styles from "./PersonalAccessToken.module.scss";
+import styles from "./PersonalAccessToken.module.css";
 
 const tokenAtom = atomWithQuery(() => ({
   queryKey: ["access-token"],

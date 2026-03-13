@@ -11,7 +11,7 @@ import { Icon } from "../../Common/Icon/Icon";
 import { Spinner } from "../../Common/Spinner";
 import { Table } from "../../Common/Table/Table";
 import { GridView } from "../GridView/GridView";
-import "./Table.scss";
+import "./Table.prefix.css";
 import { Button } from "@humansignal/ui";
 import { useEffect, useState } from "react";
 import { EmptyState } from "./empty-state";

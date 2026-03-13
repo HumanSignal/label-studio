@@ -13,7 +13,7 @@ import { guidGenerator } from "../../core/Helpers";
 import ControlBase from "./Base";
 import { AnnotationMixin } from "../../mixins/AnnotationMixin";
 import { cn } from "../../utils/bem";
-import "./Choices/Choices.scss";
+import "./Choices/Choices.prefix.css";
 
 import "./Choice";
 import DynamicChildrenMixin from "../../mixins/DynamicChildrenMixin";

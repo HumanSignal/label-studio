@@ -18,7 +18,7 @@ import { Dropdown } from "@humansignal/ui";
 import { Menu } from "../../../common/Menu/Menu";
 import { cn } from "../../../utils/bem";
 import { SidePanelsContext } from "../SidePanelsContext";
-import "./ViewControls.scss";
+import "./ViewControls.prefix.css";
 import { observer } from "mobx-react";
 
 export type GroupingOptions = "manual" | "label" | "type";

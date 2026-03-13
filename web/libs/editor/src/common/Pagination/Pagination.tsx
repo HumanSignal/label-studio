@@ -2,7 +2,7 @@ import { type ChangeEvent, type FC, forwardRef, type KeyboardEvent, useCallback,
 import { cn } from "../../utils/bem";
 import { Select } from "@humansignal/ui";
 import { WithHotkey } from "../Hotkey/WithHotkey";
-import "./Pagination.scss";
+import "./Pagination.prefix.css";
 
 interface PaginationProps {
   currentPage: number;

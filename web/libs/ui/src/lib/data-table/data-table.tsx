@@ -27,7 +27,7 @@ import { Tooltip } from "../Tooltip/Tooltip";
 import { IconSortUp, IconSortDown, IconSearch, IconInfoOutline } from "@humansignal/icons";
 import { EmptyState } from "../empty-state/empty-state";
 import { Skeleton } from "../skeleton/skeleton";
-import styles from "./data-table.module.scss";
+import styles from "./data-table.module.css";
 
 export type DataShape = Record<string, any>[];
 

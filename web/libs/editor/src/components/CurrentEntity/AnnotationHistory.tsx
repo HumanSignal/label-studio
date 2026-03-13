@@ -22,7 +22,7 @@ import { cn } from "../../utils/bem";
 import { userDisplayName } from "@humansignal/core";
 import { humanDateDiff } from "../../utils/utilities";
 import { EmptyState } from "../SidePanels/Components/EmptyState";
-import "./AnnotationHistory.scss";
+import "./AnnotationHistory.prefix.css";
 
 type HistoryItemType =
   | "prediction"

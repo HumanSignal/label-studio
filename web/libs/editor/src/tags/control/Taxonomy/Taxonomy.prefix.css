@@ -60,7 +60,8 @@ body :global(.ant-select-tree .ant-select-tree-treenode.ant-select-tree-treenode
   color: var(--color-neutral-content);
 }
 
-body :global(.ant-select-tree-switcher .ant-tree-switcher-icon, .ant-select-tree-switcher .ant-select-tree-switcher-icon) {
+body :global(.ant-select-tree-switcher .ant-tree-switcher-icon),
+body :global(.ant-select-tree-switcher .ant-select-tree-switcher-icon) {
   color: var(--color-neutral-icon);
 }
 

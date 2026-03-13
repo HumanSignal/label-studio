@@ -1,5 +1,5 @@
 /* Grid (View All mode) */
-@import "../../assets/styles/global";
+@import "../../assets/styles/global.prefix.css";
 
 .grid {
   flex-grow: 1;
@@ -34,7 +34,7 @@
 .container {
   position: relative;
   flex-grow: 1;
-  min-width: 0; // famous flex hack to prevent block from growing enormously
+  min-width: 0; /* famous flex hack to prevent block from growing enormously */
   margin-top: var(--spacing-tight);
 
   &::before,
@@ -63,7 +63,7 @@
   position: relative;
   flex-grow: 1;
   min-width: 0;
-  height: calc(100vh - 200px); // Account for header/tabs
+  height: calc(100vh - 200px); /* Account for header/tabs */
   min-height: 400px;
 }
 

@@ -12,7 +12,7 @@ import { AnnotationMixin } from "../../mixins/AnnotationMixin";
 import { TagParentMixin } from "../../mixins/TagParentMixin";
 import { FF_DEV_3391, isFF } from "../../utils/feature-flags";
 import { cn } from "../../utils/bem";
-import "./Choice/Choice.scss";
+import "./Choice/Choice.prefix.css";
 import { IconChevron } from "@humansignal/ui";
 import { HintTooltip } from "../../components/Taxonomy/Taxonomy";
 import { sanitizeHtml } from "../../utils/html";

@@ -1,7 +1,7 @@
 import { inject, observer } from "mobx-react";
 import { cn } from "../../../utils/bem";
 import { Space } from "../../Common/Space/Space";
-import "./TabPanel.scss";
+import "./TabPanel.prefix.css";
 
 const injector = inject(({ store }) => {
   return {

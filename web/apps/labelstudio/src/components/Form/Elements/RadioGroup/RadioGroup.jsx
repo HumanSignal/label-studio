@@ -2,7 +2,7 @@ import { createContext, useCallback, useContext, useEffect, useState } from "rea
 import { Label } from "..";
 import { cn } from "../../../../utils/bem";
 import { FormField } from "../../FormField";
-import "./RadioGroup.scss";
+import "./RadioGroup.prefix.css";
 
 const RadioContext = createContext();
 

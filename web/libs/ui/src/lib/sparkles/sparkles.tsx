@@ -1,7 +1,7 @@
 import React from "react";
 import { IconSparkle } from "@humansignal/icons";
 import { usePrefersReducedMotion, useRandomInterval } from "../../hooks/sparkles";
-import styles from "./sparkles.module.scss";
+import styles from "./sparkles.module.css";
 import clsx from "clsx";
 import type { SparkleAreaOptions, Sparkle } from "./types";
 import { randomPositionAvoidingCenter } from "./utils";

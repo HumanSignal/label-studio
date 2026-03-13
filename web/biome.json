@@ -26,8 +26,11 @@
     "lineWidth": 120
   },
   "css": {
+    "parser": {
+      "cssModules": true
+    },
     "linter": {
-      "enabled": false
+      "enabled": true
     },
     "formatter": {
       "enabled": false
@@ -55,7 +58,9 @@
         "noConfusingVoidType": "off",
         "noImplicitAnyLet": "off",
         "noShadowRestrictedNames": "off",
-        "useGetterReturn": "off"
+        "useGetterReturn": "off",
+        "noDuplicateProperties": "warn",
+        "noShorthandPropertyOverrides": "warn"
       },
       "complexity": {
         "noForEach": "off",
@@ -74,7 +79,11 @@
         },
         "noUnusedVariables": {
           "level": "warn"
-        }
+        },
+        "noUnknownTypeSelector": "off",
+        "noUnknownPseudoClass": "off",
+        "noUnknownMediaFeatureName": "warn",
+        "noUnknownProperty": "warn"
       },
       "performance": {
         "noAccumulatingSpread": "off",
@@ -92,7 +101,8 @@
         "noUnusedTemplateLiteral": "error",
         "useNumberNamespace": "error",
         "noInferrableTypes": "error",
-        "noUselessElse": "error"
+        "noUselessElse": "error",
+        "noDescendingSpecificity": "off"
       },
       "nursery": {},
       "security": {

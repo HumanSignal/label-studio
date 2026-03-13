@@ -7,7 +7,7 @@ import { CollapsedContext } from "./Ranker";
 import { IconChevron, IconChevronDown } from "@humansignal/icons";
 import { Button, Typography } from "@humansignal/ui";
 
-import styles from "./Ranker.module.scss";
+import styles from "./Ranker.module.css";
 
 interface ItemProps {
   item: InputItem;

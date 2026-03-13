@@ -1,5 +1,5 @@
 import { cn } from "../../utils/bem";
-import "./DescriptionList.scss";
+import "./DescriptionList.prefix.css";
 import { IconInfoOutline } from "@humansignal/icons";
 import { Tooltip } from "@humansignal/ui";
 

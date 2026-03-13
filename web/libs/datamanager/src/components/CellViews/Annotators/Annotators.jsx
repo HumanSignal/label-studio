@@ -8,7 +8,7 @@ import { Space } from "../../Common/Space/Space";
 import { IconCheckAlt, IconCrossAlt } from "@humansignal/icons";
 import { Tooltip, Userpic } from "@humansignal/ui";
 import { Common } from "../../Filters/types";
-import "./Annotators.scss";
+import "./Annotators.prefix.css";
 import { isActive, FF_DM_FILTER_MEMBERS } from "@humansignal/core/lib/utils/feature-flags";
 import { VariantSelect } from "../../Filters/types/List";
 import { UserSelect } from "../../Common/UserSelect";

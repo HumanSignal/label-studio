@@ -4,7 +4,7 @@ import { type ReactNode, useCallback, useEffect, useRef, useState } from "react"
 
 import { Tooltip } from "@humansignal/ui";
 
-import "./NewTaxonomy.scss";
+import "./NewTaxonomy.prefix.css";
 import { TaxonomySearch, type TaxonomySearchRef } from "./TaxonomySearch";
 
 export type TaxonomyPath = string[];

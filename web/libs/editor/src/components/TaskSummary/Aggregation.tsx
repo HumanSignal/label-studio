@@ -8,7 +8,7 @@ import type { AnnotationSummary, ControlTag } from "./types";
 import { getLabelCounts } from "./utils";
 import { isActive, FF_FIT_720_LAZY_LOAD_ANNOTATIONS } from "@humansignal/core/lib/utils/feature-flags";
 
-import styles from "./TaskSummary.module.scss";
+import styles from "./TaskSummary.module.css";
 
 type DistributionData = {
   total_annotations: number;

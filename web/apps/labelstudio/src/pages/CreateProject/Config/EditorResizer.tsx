@@ -1,7 +1,7 @@
 import type React from "react";
 import { useCallback, useState } from "react";
 import clsx from "clsx";
-import styles from "./EditorResizer.module.scss";
+import styles from "./EditorResizer.module.css";
 
 interface EditorResizerProps {
   containerRef: React.RefObject<HTMLDivElement>;

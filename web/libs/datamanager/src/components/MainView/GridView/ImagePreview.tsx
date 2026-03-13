@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect, type CSSProperties, useCallback } from "react";
 import { observer } from "mobx-react";
-import styles from "./GridPreview.module.scss";
+import styles from "./GridPreview.module.css";
 import { cn } from "@humansignal/ui";
 
 const MAX_ZOOM = 20;

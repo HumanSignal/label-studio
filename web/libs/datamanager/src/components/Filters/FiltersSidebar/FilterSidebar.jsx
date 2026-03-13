@@ -3,7 +3,7 @@ import { IconChevronLeft } from "@humansignal/icons";
 import { cn } from "../../../utils/bem";
 import { Button } from "@humansignal/ui";
 import { Filters } from "../Filters";
-import "./FilterSidebar.scss";
+import "./FilterSidebar.prefix.css";
 
 const sidebarInjector = inject(({ store }) => {
   const viewsStore = store.viewsStore;

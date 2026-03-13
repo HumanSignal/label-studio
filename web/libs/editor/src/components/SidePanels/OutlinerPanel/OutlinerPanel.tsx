@@ -4,7 +4,7 @@ import { cn } from "../../../utils/bem";
 import { PanelBase, type PanelProps } from "../PanelBase";
 import { OutlinerTree } from "./OutlinerTree";
 import { ViewControls } from "./ViewControls";
-import "./OutlinerPanel.scss";
+import "./OutlinerPanel.prefix.css";
 import { IconInfo } from "@humansignal/icons";
 import { IconLsLabeling } from "@humansignal/ui";
 import { EmptyState } from "../Components/EmptyState";

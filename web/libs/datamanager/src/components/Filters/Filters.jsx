@@ -5,7 +5,7 @@ import { Button } from "@humansignal/ui";
 import { FilterLine } from "./FilterLine/FilterLine";
 import { IconChevronRight, IconPlus, IconCopyOutline, IconClipboardCheck, IconUndo } from "@humansignal/icons";
 import { useRecentFilters } from "../../hooks/useRecentFilters";
-import "./Filters.scss";
+import "./Filters.prefix.css";
 
 const injector = inject(({ store }) => ({
   store,

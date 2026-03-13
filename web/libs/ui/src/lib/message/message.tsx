@@ -9,7 +9,7 @@ import {
   IconCloseCircleOutline,
   IconClose,
 } from "@humansignal/icons";
-import styles from "./message.module.scss";
+import styles from "./message.module.css";
 
 // Variant configuration
 const variants = {

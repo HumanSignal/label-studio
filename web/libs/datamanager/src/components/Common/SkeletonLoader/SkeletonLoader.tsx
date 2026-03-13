@@ -1,5 +1,5 @@
 import type { ReactChildren } from "react";
-import "./SkeletonLoader.scss";
+import "./SkeletonLoader.prefix.css";
 import { cn } from "../../../utils/bem";
 import { SkeletonLine } from "./SkeletonLine";
 import { SkeletonGap } from "./SkeletonGap";

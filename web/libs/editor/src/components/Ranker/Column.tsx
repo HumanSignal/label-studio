@@ -5,7 +5,7 @@ import Item from "./Item";
 import { CollapsedContext } from "./Ranker";
 import { StrictModeDroppable } from "./StrictModeDroppable";
 
-import styles from "./Ranker.module.scss";
+import styles from "./Ranker.module.css";
 import { Button, Typography } from "@humansignal/ui";
 import { IconChevron, IconChevronDown } from "@humansignal/icons";
 

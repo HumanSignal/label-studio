@@ -13,7 +13,7 @@ import {
   getInterfacesFromParams,
   throwUnlessXmlLike,
 } from "../../utils/query";
-import styles from "./PlaygroundApp.module.scss";
+import styles from "./PlaygroundApp.module.css";
 
 const DEFAULT_EDITOR_WIDTH_PERCENT = 50;
 const MIN_EDITOR_WIDTH_PERCENT = 20;

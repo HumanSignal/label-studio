@@ -3,7 +3,7 @@ import { forwardRef, useCallback, useMemo } from "react";
 import { cn } from "../../utils/bem";
 import messages from "../../utils/messages";
 import { ErrorMessage } from "../ErrorMessage/ErrorMessage";
-import "./Image.scss";
+import "./Image.prefix.css";
 
 /**
  * Coordinates in relative mode belong to a data domain consisting of percentages in the range from 0 to 100

@@ -1,4 +1,4 @@
-@import '../themes/default/variables';
+@import '../themes/default/variables.prefix.css';
 
 body {
   --header-height: 48px;

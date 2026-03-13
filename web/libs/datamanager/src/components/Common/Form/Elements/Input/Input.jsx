@@ -1,7 +1,7 @@
 import { cn } from "../../../../../utils/bem";
 import { FormField } from "../../FormField";
 import { default as Label } from "../Label/Label";
-import "./Input.scss";
+import "./Input.prefix.css";
 
 const Input = ({ label, className, validate, required, skip, labelProps, ghost, ...props }) => {
   const mods = {

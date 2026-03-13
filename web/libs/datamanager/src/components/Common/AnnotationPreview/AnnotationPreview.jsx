@@ -3,7 +3,7 @@ import React from "react";
 import { taskToLSFormat } from "../../../sdk/lsf-utils";
 import { cn } from "../../../utils/bem";
 import { Spinner } from "../Spinner";
-import "./AnnotationPreview.scss";
+import "./AnnotationPreview.prefix.css";
 
 const imgDefaultProps = { crossOrigin: "anonymous" };
 

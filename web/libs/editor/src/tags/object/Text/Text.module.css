@@ -4,16 +4,16 @@
   overflow-wrap: break-word;
 
   &:global(.htx-line-numbers) {
-    padding-left: 3em; // 3em for line numbers
+    padding-left: 3em; /* 3em for line numbers */
     counter-reset: line-number;
   }
 }
 
 :global(.htx-line-numbers) {
   & span.line {
-    position: relative; // to position line numbers
-    display: inline-block; // for alignment and hover highlight
-    min-height: 1.2em; // for styling numbers for empty lines
+    position: relative; /* to position line numbers */
+    display: inline-block; /* for alignment and hover highlight */
+    min-height: 1.2em; /* for styling numbers for empty lines */
     padding-left: 8px;
 
     &::before {
@@ -23,12 +23,12 @@
       top: 0;
       left: -3em;
       height: 100%;
-      min-height: 2.2em; // for straight separator even on empty lines (they have wrong height)
-      width: 3em; // for 4 digits
+      min-height: 2.2em; /* for straight separator even on empty lines (they have wrong height) */
+      width: 3em; /* for 4 digits */
       border-right: 1px solid var(--color-neutral-border);
       padding-right: 4px;
       font-size: 0.8em;
-      line-height: 2em; // = 1.6em as usual text
+      line-height: 2em; /* = 1.6em as usual text */
       text-align: right;
       z-index: 1;
     }
@@ -39,7 +39,7 @@
     }
 
     &:empty {
-      background: none; // empty lines have broken height and almost zero width, so don't highlight
+      background: none; /* empty lines have broken height and almost zero width, so don't highlight */
     }
   }
 }

@@ -6,7 +6,7 @@ import { Button } from "../button/button";
 import { Tooltip } from "../Tooltip/Tooltip";
 import type { JsonViewerProps } from "./types";
 import { ReaderViewButton } from "./reader-view-button";
-import styles from "./json-viewer.module.scss";
+import styles from "./json-viewer.module.css";
 
 // Custom Label Studio theme for json-edit-react
 // Note: Colors are applied via SCSS using :global selectors because

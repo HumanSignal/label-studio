@@ -7,7 +7,7 @@ import { findNodeAt, matchesSelector, splitBoundaries } from "../../../utils/htm
 import { patchPlayPauseMethods } from "../../../utils/patchPlayPauseMethods";
 import { isSelectionContainsSpan } from "../../../utils/selection-tools";
 import { useUpdateBuffering } from "../../../hooks/useUpdateBuffering";
-import styles from "./Paragraphs.module.scss";
+import styles from "./Paragraphs.module.css";
 import { AuthorFilter } from "./AuthorFilter";
 import { Phrases } from "./Phrases";
 import { IconHelp } from "@humansignal/icons";

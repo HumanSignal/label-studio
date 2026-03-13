@@ -15,7 +15,7 @@ import { truncateLabel } from "@humansignal/core/lib/utils/string";
 import { cnm } from "../../utils/utils";
 import { useTagAutocomplete } from "./use-tag-autocomplete";
 import type { TagAutocompleteProps, NormalizedTagOption } from "./types";
-import styles from "./tag-autocomplete.module.scss";
+import styles from "./tag-autocomplete.module.css";
 
 export const TagAutocomplete = forwardRef(
   <T = string>(props: TagAutocompleteProps<T>, ref: ForwardedRef<HTMLSelectElement>) => {

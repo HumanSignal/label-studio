@@ -1,6 +1,6 @@
 /* Legacy colors */
 /* TODO: Remove these once we've converted all the components to use the new colors */
-/*       which are defined in the `tokens.scss` file */
+/*       which are defined in the `tokens.prefix.css` file */
 :root {
   /* Deprecated: [DO NOT USE] */
   --black-raw: 0 0 0;

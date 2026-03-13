@@ -8,7 +8,7 @@ import {
   mapSelected,
   type SelectedMap,
 } from "./date-utils";
-import styles from "./calendar-picker.module.scss";
+import styles from "./calendar-picker.module.css";
 import clsx from "clsx";
 
 type CalendarPickerProps = {
