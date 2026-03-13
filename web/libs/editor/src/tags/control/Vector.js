@@ -36,7 +36,6 @@ const hotkeys = Hotkey("Vectors");
  * @param {boolean} [smartOnly]                   - Only show smart tool for interactive pre-annotations
  * @param {pixel|none} [snap=none]                - Snap vector to image pixels
  * @param {boolean} [closable=false]              - Allow closed shapes
- * @param {boolean} [curves=false]                - Allow Bezier curves
  * @param {boolean} [skeleton=false]              - Enables skeleton mode to allow branch paths
  * @param {number|none} [minPoints=none]          - Minimum allowed number of points
  * @param {number|none} [maxPoints=none]          - Maximum allowed number of points

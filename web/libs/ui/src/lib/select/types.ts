@@ -38,11 +38,12 @@ export type OptionProps = {
 
 type ExtractStructOption<T> = T extends SelectOptionData ? T["value"] : never;
 type ExtractPrimitiveOption<T> = T extends string | number ? T : never;
-export type ExtractOption<T> = T extends SelectOption<any>
-  ? T extends SelectOptionData<any>
-    ? ExtractStructOption<T>
-    : ExtractPrimitiveOption<T>
-  : never;
+export type ExtractOption<T> =
+  T extends SelectOption<any>
+    ? T extends SelectOptionData<any>
+      ? ExtractStructOption<T>
+      : ExtractPrimitiveOption<T>
+    : never;
 
 export type ExtractValue<T, A extends SelectOption<T>[]> = A[number] extends { value: infer U } ? U : A[number];
 
