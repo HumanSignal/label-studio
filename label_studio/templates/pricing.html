@@ -52,12 +52,12 @@
         </div>
       </div>
 
-      <!-- Stripe Pricing Table -->
-      <div id="pricing-table-container" style="max-width: 1200px; margin: 0 auto;">
-        <div id="pricing-table-loading" style="text-align: center; padding: 2rem;">
+      <!-- Product Pricing Cards -->
+      <div id="pricing-cards-container" style="max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem;">
+        <div id="pricing-cards-loading" style="text-align: center; padding: 2rem; grid-column: 1 / -1;">
           <p style="color: var(--sand_600);">Loading pricing information...</p>
         </div>
-        <div id="pricing-table-error" style="text-align: center; padding: 2rem; display: none;">
+        <div id="pricing-cards-error" style="text-align: center; padding: 2rem; display: none; grid-column: 1 / -1;">
           <p style="color: var(--grape_600);">Unable to load pricing information. Please <a href="{{ settings.HOSTNAME }}/billing/" style="color: var(--grape_600);">visit the billing page</a> to view available plans.</p>
         </div>
       </div>
@@ -66,83 +66,140 @@
 </div>
 
 <script>
+  // Set hostname from Django template
+  const HOSTNAME = '{{ settings.HOSTNAME }}';
+
   function toggleMobileMenu() {
     const nav = document.getElementById('landing-nav');
     nav.classList.toggle('mobile-open');
   }
 
-  // Load Stripe pricing table
+  // Global variable to track authentication status
+  let isAuthenticated = false;
+
+  // Load product pricing information
   (function() {
-    const container = document.getElementById('pricing-table-container');
-    const loadingEl = document.getElementById('pricing-table-loading');
-    const errorEl = document.getElementById('pricing-table-error');
+    const container = document.getElementById('pricing-cards-container');
+    const loadingEl = document.getElementById('pricing-cards-loading');
+    const errorEl = document.getElementById('pricing-cards-error');
 
-    // Fetch Stripe configuration
-    fetch('/api/billing/public-stripe-config/')
+    // Check authentication status
+    function checkAuthStatus() {
+      return fetch('/api/current-user/whoami', {
+        credentials: 'include'
+      })
       .then(response => {
-        if (!response.ok) {
-          throw new Error('Failed to fetch Stripe configuration');
-        }
-        return response.json();
+        isAuthenticated = response.ok;
+        return isAuthenticated;
       })
-      .then(config => {
-        if (!config.pricing_table_id || !config.publishable_key) {
-          throw new Error('Missing Stripe configuration');
-        }
-
-        // Load Stripe pricing table script if not already loaded
-        if (!document.querySelector('script[src="https://js.stripe.com/v3/pricing-table.js"]')) {
-          const script = document.createElement('script');
-          script.src = 'https://js.stripe.com/v3/pricing-table.js';
-          script.async = true;
-          script.onload = function() {
-            initializePricingTable(config);
-          };
-          script.onerror = function() {
-            showError();
-          };
-          document.head.appendChild(script);
-        } else {
-          // Script already loaded, wait a bit for custom element to be available
-          const checkInterval = setInterval(function() {
-            if (window.customElements && window.customElements.get('stripe-pricing-table')) {
-              clearInterval(checkInterval);
-              initializePricingTable(config);
-            }
-          }, 100);
-
-          // Timeout after 5 seconds
-          setTimeout(function() {
-            clearInterval(checkInterval);
-            if (!container.querySelector('stripe-pricing-table')) {
-              showError();
-            }
-          }, 5000);
-        }
-      })
-      .catch(error => {
-        console.error('Error loading pricing table:', error);
-        showError();
+      .catch(() => {
+        isAuthenticated = false;
+        return false;
       });
-
-    function initializePricingTable(config) {
-      // Hide loading message
-      loadingEl.style.display = 'none';
-
-      // Create Stripe pricing table element
-      const pricingTable = document.createElement('stripe-pricing-table');
-      pricingTable.setAttribute('pricing-table-id', config.pricing_table_id);
-      pricingTable.setAttribute('publishable-key', config.publishable_key);
-
-      // Clear container and add pricing table
-      container.innerHTML = '';
-      container.appendChild(pricingTable);
     }
+
+    // Format price amount
+    function formatPrice(amount, currency) {
+      const formatter = new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: currency.toUpperCase() || 'USD',
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0,
+      });
+      return formatter.format(amount / 100);
+    }
+
+    // Format interval
+    function formatInterval(interval, intervalCount) {
+      if (!interval) return '';
+      const count = intervalCount || 1;
+      if (count === 1) {
+        return `/${interval}`;
+      }
+      return `/${count} ${interval}s`;
+    }
+
+    // Handle subscribe button click
+    function handleSubscribe() {
+      if (isAuthenticated) {
+        window.location.href = HOSTNAME + '/billing/';
+      } else {
+        window.location.href = HOSTNAME + '/user/login/?next=' + encodeURIComponent(HOSTNAME + '/billing/');
+      }
+    }
+
+    // Render product cards
+    function renderProductCards(prices) {
+      loadingEl.style.display = 'none';
+      
+      if (!prices || prices.length === 0) {
+        showError();
+        return;
+      }
+
+      prices.forEach(price => {
+        const card = document.createElement('div');
+        card.className = 'landing-feature-card';
+        card.style.cssText = 'text-align: center; max-width: 400px; margin: 0 auto;';
+
+        const priceFormatted = formatPrice(price.amount, price.currency);
+        const intervalFormatted = formatInterval(price.interval, price.interval_count);
+        const description = price.description || '';
+
+        card.innerHTML = `
+          <h3 style="color: var(--grape_700); font-size: 2rem; margin-bottom: 0.5rem;">${escapeHtml(price.product_name)}</h3>
+          <p style="font-size: 1.5rem; font-weight: 600; margin-bottom: 1rem;">
+            ${priceFormatted}${intervalFormatted}
+          </p>
+          ${description ? `<p style="margin-bottom: 1.5rem;">${escapeHtml(description)}</p>` : ''}
+          <button onclick="handleSubscribe()" class="landing-hero-button" style="width: 100%; text-align: center; display: block; box-sizing: border-box; margin-top: 1.5rem;">
+            Subscribe
+          </button>
+        `;
+
+        container.appendChild(card);
+      });
+    }
+
+    // Escape HTML to prevent XSS
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    // Make handleSubscribe available globally
+    window.handleSubscribe = handleSubscribe;
 
     function showError() {
       loadingEl.style.display = 'none';
       errorEl.style.display = 'block';
     }
+
+    // Fetch pricing data
+    Promise.all([
+      checkAuthStatus(),
+      fetch('/api/billing/public-pricing/', {
+        credentials: 'include'
+      })
+    ])
+    .then(([authStatus, response]) => {
+      if (!response.ok) {
+        throw new Error('Failed to fetch pricing information');
+      }
+      return response.json();
+    })
+    .then(data => {
+      if (data.prices && data.prices.length > 0) {
+        renderProductCards(data.prices);
+      } else {
+        showError();
+      }
+    })
+    .catch(error => {
+      console.error('Error loading pricing information:', error);
+      showError();
+    });
   })();
 </script>
 {% endblock %}

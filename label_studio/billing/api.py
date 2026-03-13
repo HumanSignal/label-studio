@@ -101,6 +101,53 @@ class PricingTableAPI(APIView):
 
 
 @method_decorator(
+    name='get',
+    decorator=swagger_auto_schema(
+        tags=['Billing'],
+        x_fern_sdk_group_name='billing',
+        x_fern_sdk_method_name='get_public_pricing',
+        operation_summary='Get public pricing table',
+        operation_description='Fetch active pricing tables from Stripe (no authentication required).',
+        responses={200: PricingTableSerializer()},
+    ),
+)
+class PublicPricingTableAPI(APIView):
+    """Public API endpoint to fetch active pricing tables from Stripe (no authentication required)."""
+
+    permission_classes = []
+    authentication_classes = []
+
+    def get(self, request):
+        """Get active pricing tables (public access)."""
+        try:
+            # Fetch active prices from dj-stripe
+            prices = djstripe.models.Price.objects.filter(active=True).select_related('product')
+
+            price_data = []
+            for price in prices:
+                product = price.product
+                recurring = price.recurring or {}
+                price_data.append({
+                    # dj-stripe stores the Stripe object ID in the `id` field
+                    'id': price.id,
+                    'product_id': product.id,
+                    'product_name': product.name,
+                    'amount': price.unit_amount or 0,
+                    'currency': price.currency,
+                    'interval': recurring.get('interval'),
+                    'interval_count': recurring.get('interval_count', 1),
+                    'active': price.active,
+                    'description': product.description,
+                })
+
+            serializer = PricingTableSerializer({'prices': price_data})
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except Exception as e:
+            logger.exception('Error fetching public pricing table: %s', e)
+            return Response({'error': 'Failed to fetch pricing table'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@method_decorator(
     name='post',
     decorator=swagger_auto_schema(
         tags=['Billing'],
@@ -375,6 +422,65 @@ class StripeConfigAPI(APIView):
 
     permission_classes = [IsAuthenticated]
     permission_required = all_permissions.organizations_view
+
+    def get(self, request):
+        """Get Stripe configuration for authenticated user's organization."""
+        try:
+            organization = request.user.active_organization
+            if not organization:
+                return Response(
+                    {'error': 'No active organization found'}, 
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
+            # Determine publishable key based on live mode
+            if settings.STRIPE_LIVE_MODE:
+                publishable_key = settings.STRIPE_LIVE_PUBLISHABLE_KEY
+            else:
+                publishable_key = settings.STRIPE_TEST_PUBLISHABLE_KEY
+
+            # Initialize config data with default values
+            config_data = {
+                'publishable_key': publishable_key,
+                'pricing_table_id': settings.STRIPE_PRICING_TABLE_ID,
+                'customer_email': request.user.email,
+                'customer_id': None,
+                'customer_session_client_secret': None,
+            }
+
+            # Check if organization has a Stripe customer
+            try:
+                org_customer = OrganizationCustomer.objects.get(organization=organization)
+                customer = org_customer.customer
+
+                # Set customer ID
+                config_data['customer_id'] = customer.id
+
+                # Create customer session for pricing table integration
+                customer_session = stripe.CustomerSession.create(
+                    customer=customer.id,
+                    components={"pricing_table": {"enabled": True}}
+                )
+                config_data['customer_session_client_secret'] = customer_session.client_secret
+
+            except OrganizationCustomer.DoesNotExist:
+                # No customer exists yet - return config with null customer fields
+                pass
+            except stripe.error.StripeError as e:
+                logger.exception('Stripe API error creating customer session: %s', e)
+                # Return config without customer session on Stripe errors
+                # but still include customer_id if we have it
+                pass
+
+            serializer = StripeConfigSerializer(config_data)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+
+        except Exception as e:
+            logger.exception('Error fetching Stripe config: %s', e)
+            return Response(
+                {'error': 'Failed to fetch Stripe config'}, 
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
 
 
 @method_decorator(
