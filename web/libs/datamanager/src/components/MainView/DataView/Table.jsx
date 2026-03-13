@@ -1,6 +1,5 @@
 import { IconQuestionOutline, IconSettings } from "@humansignal/icons";
 import { Tooltip, Badge, EnterpriseBadge } from "@humansignal/ui";
-import { isStarterCloudPlan } from "@humansignal/core";
 import { inject } from "mobx-react";
 import { getRoot } from "mobx-state-tree";
 import { useCallback, useMemo } from "react";
@@ -145,15 +144,6 @@ export const DataView = injector(
       const isAgreementColumn =
         typeof original?.alias === "string" &&
         (original.alias === "agreement" || original.alias.startsWith("dimension_agreement_"));
-
-      // Add StarterCloud enterprise badge on the main agreement column header
-      if (original?.alias === "agreement" && isStarterCloudPlan()) {
-        children.push(
-          <EnterpriseBadge key="starter-cloud-badge" size="small" className="ml-tightest" style="ghost">
-            {""}
-          </EnterpriseBadge>,
-        );
-      }
 
       if (isAgreementColumn) {
         children.push(<IconSettings width={16} height={16} className="ml-auto" />);
@@ -331,7 +321,7 @@ export const DataView = injector(
         isFF(FF_DEV_2536) && commonDecoration("unresolved_comment_count", 60, "center"),
         {
           resolver: (col) => col.alias === "agreement",
-          style: { width: 140 },
+          style: { width: 130 },
         },
         {
           resolver: (col) => typeof col.alias === "string" && col.alias.startsWith("dimension_agreement_"),
