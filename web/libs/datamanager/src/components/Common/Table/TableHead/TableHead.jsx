@@ -84,6 +84,14 @@ const AgreementSelectedWrapper = observer(({ column, children }) => {
   const agreementFilters = selectedView.agreement_selected;
   const ref = useRef(null);
 
+  if (isStarterCloudPlan()) {
+    return (
+      <Agreement.HeaderCell agreementFilters={agreementFilters} onSave={() => {}}>
+        {children}
+      </Agreement.HeaderCell>
+    );
+  }
+
   const closeHandler = () => {
     ref.current?.close();
   };
@@ -159,7 +167,7 @@ const ColumnRenderer = observer(
 
     const isAgreementColumn =
       isActive(FF_AGREEMENT_FILTERED) &&
-      (isActive(FF_UTC_428_CONSENSUS_CONTROL_TAG_AGREEMENT) || isStarterCloudPlan()) &&
+      isActive(FF_UTC_428_CONSENSUS_CONTROL_TAG_AGREEMENT) &&
       (column.original?.alias === "agreement" ||
         (typeof column.original?.alias === "string" && column.original.alias.startsWith("dimension_agreement_")));
 
