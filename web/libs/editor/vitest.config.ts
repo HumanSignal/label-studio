@@ -39,6 +39,7 @@ export default defineProject({
     },
   },
   resolve: {
+    extensions: [".ts", ".tsx", ".js", ".jsx", ".json", ".mjs"],
     alias: [
       { find: "@humansignal/core", replacement: coreSrc },
       ...Object.entries(baseAlias).map(([find, replacement]) => ({ find, replacement })),
