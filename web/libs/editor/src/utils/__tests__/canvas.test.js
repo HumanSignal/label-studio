@@ -130,6 +130,7 @@ describe("mask2DataURL", () => {
       getContext: () => ({
         getImageData,
         putImageData,
+        drawImage: jest.fn(),
       }),
       toDataURL,
     };
@@ -210,6 +211,7 @@ describe("RLE2Region", () => {
         createImageData: () => imageData,
         putImageData,
         getImageData: () => imageData,
+        drawImage: jest.fn(),
       }),
       toDataURL,
     };
@@ -244,6 +246,7 @@ describe("RLE2Region", () => {
         createImageData: () => imageData,
         putImageData: jest.fn(),
         getImageData: () => imageData,
+        drawImage: jest.fn(),
       }),
       toDataURL: () => "data:image/png;base64,default",
     };

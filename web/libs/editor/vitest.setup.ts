@@ -4,8 +4,15 @@ import { expect, vi } from "vitest";
 
 expect.extend(matchers);
 
-// Jest compat: existing tests use jest.fn(), jest.mock(), jest.spyOn()
-(globalThis as unknown as { jest: typeof vi }).jest = vi;
+// Jest compat: existing tests use jest.fn(), jest.mock(), jest.spyOn(), jest.isolateModules()
+const jestCompat = {
+  ...vi,
+  // Vitest does not have resetModules in same way; run callback so require() is re-executed with current mocks
+  isolateModules(fn: () => void): void {
+    fn();
+  },
+};
+(globalThis as unknown as { jest: typeof jestCompat }).jest = jestCompat;
 
 // Vitest fetch mock (replaces jest-fetch-mock)
 const mockFetch = vi.fn();
@@ -74,6 +81,18 @@ HTMLCanvasElement.prototype.getContext = vi.fn().mockImplementation((contextType
   }
   return null;
 });
+
+// JSDOM does not implement toDataURL; required by canvas utils and some regions/tools.
+if (typeof HTMLCanvasElement.prototype.toDataURL === "undefined") {
+  HTMLCanvasElement.prototype.toDataURL = function () {
+    return "data:image/png;base64,stub";
+  };
+}
+
+// getComputedStyle is required by some components (e.g. HtxParagraphs); JSDOM has it but ensure it returns a usable shape.
+if (typeof window.getComputedStyle === "undefined") {
+  window.getComputedStyle = () => ({ getPropertyValue: () => "" });
+}
 
 // Mock HTMLMediaElement data and methods not implemented by jsdom.
 (window.HTMLMediaElement.prototype as unknown as { _mock: Record<string, unknown> })._mock = {

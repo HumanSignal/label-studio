@@ -3,6 +3,7 @@
  */
 import { Playhead } from "../PlayHead";
 import { rgba } from "../../Common/Color";
+import { CursorSymbol } from "../../Cursor/Cursor";
 
 function createMockVisualizer(overrides = {}) {
   return {
@@ -259,7 +260,6 @@ describe("Playhead", () => {
       const visualizer = createMockVisualizer();
       const wf = createMockWaveform();
       (wf.cursor as any).isFocused = jest.fn((id: string) => id === "playhead");
-      const CursorSymbol = require("../../Cursor/Cursor").CursorSymbol;
       const playhead = new Playhead({ x: 0 }, visualizer as any, wf as any);
       playhead.onInit();
       (playhead as any).invoke("mouseEnter");

@@ -5,10 +5,36 @@
  * addToolsFromControl, findSelectedTool, findDrawingTool, resetActiveDrawing, event,
  * reload, removeAllTools), and getters (preservedTool, root, obj, hasSelected).
  */
+import ToolsManager from "../Manager";
 
 const mockDestroy = jest.fn();
 jest.mock("mobx-state-tree", () => ({
   destroy: (...args) => mockDestroy(...args),
+  // Re-export other MST exports so Manager doesn't pull in real MST for other symbols
+  getRoot: () => null,
+  getParent: () => null,
+  getSnapshot: () => ({}),
+  types: {},
+  flow: () => () => {},
+  onSnapshot: () => () => {},
+  addMiddleware: () => () => {},
+  process: () => ({}),
+  unprotect: () => {},
+  protect: () => {},
+  isProtected: () => false,
+  applySnapshot: () => {},
+  getEnv: () => ({}),
+  clone: (n) => n,
+  getIdentifier: () => undefined,
+  getType: () => ({}),
+  tryReference: () => undefined,
+  isValidReference: () => false,
+  resolvePath: () => null,
+  resolveIdentifier: () => null,
+  recordActions: () => () => ({}),
+  recordPatches: () => () => ({}),
+  createActionTrackingMiddleware: () => () => ({}),
+  setLivelinessChecking: () => {},
 }));
 
 const mockGuid = jest.fn((n) => `guid-${n ?? 10}`);
@@ -43,17 +69,12 @@ Object.defineProperty(global, "window", {
   writable: true,
 });
 
-let ToolsManager;
-
 beforeEach(() => {
   jest.clearAllMocks();
   mockGuid.mockImplementation((n) => `guid-${n ?? 10}`);
   mockFfActive.mockReturnValue(false);
   localStorageMock.getItem.mockImplementation((key) => storage[key] ?? null);
   Object.keys(storage).forEach((k) => delete storage[k]);
-  jest.isolateModules(() => {
-    ToolsManager = require("../Manager").default;
-  });
   // Default root so obj getter does not throw when tests trigger unselectAll/selectTool
   ToolsManager.setRoot({
     annotationStore: { names: new Map(), selected: null },

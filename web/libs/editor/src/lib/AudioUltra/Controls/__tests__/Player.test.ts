@@ -2,15 +2,17 @@
  * Unit tests for Player (lib/AudioUltra/Controls/Player.ts).
  * Player is abstract; we test it via Html5Player with mocks.
  */
-import { ff } from "@humansignal/core";
+import { vi } from "vitest";
 import { Html5Player } from "../Html5Player";
 
+const mockIsActive = vi.hoisted(() => vi.fn().mockReturnValue(false));
 jest.mock("@humansignal/core", () => ({
   ff: {
-    isActive: jest.fn().mockReturnValue(false),
+    isActive: mockIsActive,
     FF_SYNCED_BUFFERING: "FF_SYNCED_BUFFERING",
   },
 }));
+import { ff } from "@humansignal/core";
 
 function createMockWaveform(overrides: Record<string, unknown> = {}) {
   return {

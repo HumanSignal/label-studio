@@ -5,6 +5,7 @@ import { baseAlias } from "../../vitest.base";
 const root = __dirname;
 const webRoot = path.join(root, "../..");
 const nodeModules = path.join(webRoot, "node_modules");
+const coreSrc = path.resolve(webRoot, "libs/core/src");
 
 export default defineProject({
   root,
@@ -39,19 +40,21 @@ export default defineProject({
   },
   resolve: {
     alias: [
+      { find: "@humansignal/core", replacement: coreSrc },
       ...Object.entries(baseAlias).map(([find, replacement]) => ({ find, replacement })),
       { find: "konva", replacement: path.join(nodeModules, "konva/konva") },
-      { find: "keymaster", replacement: path.join(nodeModules, "identity-obj-proxy") },
+      { find: "keymaster", replacement: path.join(root, "__mocks__/keymaster.js") },
       { find: "react-konva-utils", replacement: path.join(nodeModules, "identity-obj-proxy") },
       { find: "@adobe/css-tools", replacement: path.join(webRoot, "__mocks__/@adobe/css-tools.js") },
       { find: "@humansignal/ui", replacement: path.join(root, "../ui/src/index.ts") },
-      // Mock CSS and asset imports (Jest used identity-obj-proxy)
-      { find: /\.(css|svg|png|jpe?g)$/, replacement: path.join(nodeModules, "identity-obj-proxy") },
+      { find: "canvas", replacement: path.join(root, "__mocks__/canvas.js") },
+      // Stub CSS and asset imports so they resolve to a single module
+      { find: /\.(css|svg|png|jpe?g)(\?.*)?$/, replacement: path.join(root, "__mocks__/styleMock.js") },
     ],
   },
   server: {
     deps: {
-      inline: ["nanoid", "konva", "@adobe/css-tools"],
+      inline: ["nanoid", "konva", "@adobe/css-tools", "@humansignal/core"],
     },
   },
 });
