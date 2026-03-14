@@ -3,12 +3,6 @@
  */
 import { getEnv, getRoot, getParent, types } from "mobx-state-tree";
 
-jest.mock("../../utils/feature-flags", () => ({
-  isFF: () => false,
-  FF_DEV_3391: "ff_3391",
-  FF_SIMPLE_INIT: "ff_simple_init",
-}));
-
 const mockAnnotation = () => ({
   regionStore: {
     isSelected: jest.fn(() => false),

@@ -3,15 +3,8 @@
  */
 import { getParent, types } from "mobx-state-tree";
 import { guidGenerator } from "../../core/Helpers";
-
-jest.mock("../../utils/feature-flags", () => ({
-  isFF: jest.fn(() => false),
-  FF_ZOOM_OPTIM: "ff_zoom_optim",
-  FF_DEV_3391: "ff_3391",
-  FF_SIMPLE_INIT: "ff_simple_init",
-}));
-
-const featureFlags = require("../../utils/feature-flags");
+import { FF_ZOOM_OPTIM } from "../../utils/feature-flags";
+import { setFeatureFlag, clearFeatureFlag } from "@humansignal/frontend-test/feature-flag-test-setup";
 
 const mockAnnotation = () => ({
   regionStore: {
@@ -193,13 +186,13 @@ describe("KonvaRegion mixin", () => {
     });
 
     it("inViewPort returns true when FF_ZOOM_OPTIM is off", () => {
-      featureFlags.isFF.mockReturnValue(false);
+      clearFeatureFlag(FF_ZOOM_OPTIM);
       const { region } = createStore();
       expect(region.inViewPort).toBe(true);
     });
 
     it("inViewPort is false when FF_ZOOM_OPTIM is on and no object", () => {
-      featureFlags.isFF.mockReturnValue(true);
+      setFeatureFlag(FF_ZOOM_OPTIM, true);
       const RegionWithBbox = types.compose(TestRegion).views((_self) => ({
         get bboxCoords() {
           return { left: 0, top: 0, right: 10, bottom: 10 };
@@ -226,7 +219,7 @@ describe("KonvaRegion mixin", () => {
     });
 
     it("inViewPort is true when FF_ZOOM_OPTIM is on and bbox inside viewport", () => {
-      featureFlags.isFF.mockReturnValue(true);
+      setFeatureFlag(FF_ZOOM_OPTIM, true);
       const RegionWithBbox = types.compose(TestRegion).views((_self) => ({
         get bboxCoords() {
           return { left: 5, top: 5, right: 15, bottom: 15 };

@@ -1,11 +1,8 @@
 /* global describe, test, expect, jest, beforeEach */
 import { encode as rleEncode } from "@thi.ng/rle-pack";
 import Canvas from "../canvas";
-
-jest.mock("../feature-flags", () => ({
-  FF_LSDV_4583: "fflag_feat_front_lsdv_4583_multi_image_segmentation_short",
-  isFF: jest.fn(() => false),
-}));
+import { FF_LSDV_4583 } from "../feature-flags";
+import { withFeatureFlags } from "@humansignal/frontend-test/feature-flag-test-setup";
 
 const svgs = {
   simple: [
@@ -294,14 +291,8 @@ function createExportRLECanvas(nw, nh) {
 }
 
 describe("Region2RLE", () => {
-  beforeEach(() => {
-    const { isFF } = require("../feature-flags");
-    isFF.mockReturnValue(false);
-  });
-
   test("returns RLE when isFF(FF_LSDV_4583) is true (exportRLE path)", () => {
-    const { isFF } = require("../feature-flags");
-    isFF.mockImplementation((id) => id === "fflag_feat_front_lsdv_4583_multi_image_segmentation_short");
+    withFeatureFlags({ [FF_LSDV_4583]: true }, () => {
     const origCreateElement = document.createElement.bind(document);
     jest.spyOn(document, "createElement").mockImplementation((tag) => {
       if (tag === "canvas") return createExportRLECanvas(4, 4);
@@ -315,12 +306,12 @@ describe("Region2RLE", () => {
     const result = Canvas.Region2RLE(region);
     expect(result).toBeDefined();
     expect(Array.isArray(result) || typeof result === "string" || ArrayBuffer.isView(result)).toBe(true);
+    });
     jest.restoreAllMocks();
   });
 
   test("exportRLE path with existing region.rle applies decode and putImageData", () => {
-    const { isFF } = require("../feature-flags");
-    isFF.mockImplementation((id) => id === "fflag_feat_front_lsdv_4583_multi_image_segmentation_short");
+    withFeatureFlags({ [FF_LSDV_4583]: true }, () => {
     const nw = 4;
     const nh = 4;
     const raw = new Uint8Array(nw * nh * 4);
@@ -349,12 +340,12 @@ describe("Region2RLE", () => {
 
     expect(result).toBeDefined();
     expect(putImageData).toHaveBeenCalled();
+    });
     jest.restoreAllMocks();
   });
 
   test("exportRLE path with getMaskImage draws mask on canvas", () => {
-    const { isFF } = require("../feature-flags");
-    isFF.mockImplementation((id) => id === "fflag_feat_front_lsdv_4583_multi_image_segmentation_short");
+    withFeatureFlags({ [FF_LSDV_4583]: true }, () => {
     const origCreateElement = document.createElement.bind(document);
     jest.spyOn(document, "createElement").mockImplementation((tag) => {
       if (tag === "canvas") return createExportRLECanvas(4, 4);
@@ -371,12 +362,12 @@ describe("Region2RLE", () => {
     };
     const result = Canvas.Region2RLE(region);
     expect(result).toBeDefined();
+    });
     jest.restoreAllMocks();
   });
 
   test("exportRLE path with touches renders strokes and encodes", () => {
-    const { isFF } = require("../feature-flags");
-    isFF.mockImplementation((id) => id === "fflag_feat_front_lsdv_4583_multi_image_segmentation_short");
+    withFeatureFlags({ [FF_LSDV_4583]: true }, () => {
     const origCreateElement = document.createElement.bind(document);
     jest.spyOn(document, "createElement").mockImplementation((tag) => {
       if (tag === "canvas") return createExportRLECanvas(10, 10);
@@ -395,6 +386,7 @@ describe("Region2RLE", () => {
     };
     const result = Canvas.Region2RLE(region);
     expect(result).toBeDefined();
+    });
     jest.restoreAllMocks();
   });
 

@@ -2,7 +2,7 @@ import { destroy, isAlive, types } from "mobx-state-tree";
 import { defaultStyle } from "../core/Constants";
 import { guidGenerator } from "../core/Helpers";
 import Result from "../regions/Result";
-import { PER_REGION_MODES } from "./PerRegion";
+import { PER_REGION_MODES } from "./PerRegionModes.js";
 import { ReadOnlyRegionMixin } from "./ReadOnlyMixin";
 import { FF_LSDV_4930, FF_TAXONOMY_LABELING, isFF } from "../utils/feature-flags";
 

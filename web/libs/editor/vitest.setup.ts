@@ -7,12 +7,19 @@ expect.extend(matchers);
 // Jest compat: existing tests use jest.fn(), jest.mock(), jest.spyOn(), jest.isolateModules()
 const jestCompat = {
   ...vi,
-  // Vitest does not have resetModules in same way; run callback so require() is re-executed with current mocks
   isolateModules(fn: () => void): void {
     fn();
   },
+  resetModules(): void {
+    if (typeof (vi as { resetModules?: () => void }).resetModules === "function") {
+      (vi as { resetModules: () => void }).resetModules();
+    }
+  },
 };
 (globalThis as unknown as { jest: typeof jestCompat }).jest = jestCompat;
+
+// Reusable feature-flag test setup: ensures window.APP_SETTINGS.feature_flags exists so real utils/feature-flags works without mocks.
+import "@humansignal/frontend-test/feature-flag-test-setup";
 
 // Vitest fetch mock (replaces jest-fetch-mock)
 const mockFetch = vi.fn();
