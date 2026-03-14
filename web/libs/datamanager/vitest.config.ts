@@ -9,6 +9,7 @@ const labelstudioSrc = path.join(webRoot, "apps/labelstudio/src");
 
 export default defineProject({
   root,
+  server: { fs: { allow: [webRoot] } },
   test: {
     environment: "jsdom",
     globals: true,

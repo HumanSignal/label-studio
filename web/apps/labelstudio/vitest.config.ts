@@ -3,9 +3,11 @@ import { defineProject } from "vitest/config";
 import { baseAlias } from "../../vitest.base";
 
 const root = __dirname;
+const workspaceRoot = path.resolve(root, "../..");
 
 export default defineProject({
   root,
+  server: { fs: { allow: [workspaceRoot] } },
   test: {
     environment: "jsdom",
     globals: true,
