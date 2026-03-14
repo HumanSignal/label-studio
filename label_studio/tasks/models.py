@@ -441,6 +441,8 @@ class Task(TaskMixin, FsmHistoryStateModel):
             }
 
     def resolve_uri(self, task_data, project):
+        from io_storages.functions import get_storage_by_url
+
         if project.task_data_login and project.task_data_password:
             protected_data = {}
             for key, value in task_data.items():
@@ -472,23 +474,18 @@ class Task(TaskMixin, FsmHistoryStateModel):
                     continue
 
                 # project storage
-                # Let all storages attempt to resolve their respective URIs
-                for storage in storage_objects:
+                # TODO: to resolve nested lists and dicts we should improve get_storage_by_url(),
+                # Now always using get_storage_by_url to ensure the storage with the correct bucket is used
+                # As a last fallback we can use self.storage which is the storage the Task was imported from
+                storage = get_storage_by_url(task_data[field], storage_objects) or self.storage
+                if storage:
                     try:
                         resolved_uri = storage.resolve_uri(task_data[field], self)
-                        if resolved_uri:
-                            task_data[field] = resolved_uri
                     except Exception as exc:
                         logger.debug(exc, exc_info=True)
-
-                # As a last fallback we can use self.storage which is the storage the Task was imported from
-                if self.storage and self.storage not in storage_objects:
-                    try:
-                        resolved_uri = self.storage.resolve_uri(task_data[field], self)
-                        if resolved_uri:
-                            task_data[field] = resolved_uri
-                    except Exception as exc:
-                        logger.debug(exc, exc_info=True)
+                        resolved_uri = None
+                    if resolved_uri:
+                        task_data[field] = resolved_uri
             return task_data
 
     @property
