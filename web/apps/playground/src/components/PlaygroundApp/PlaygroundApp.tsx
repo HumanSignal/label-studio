@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState, useCallback } from "react";
+import React, { useEffect, useMemo, useRef, useState, useCallback } from "react";
 import type { MouseEvent } from "react";
 import { useAtomValue, useSetAtom } from "jotai";
 import { ToastProvider, ToastViewport } from "@humansignal/ui/lib/toast/toast";
