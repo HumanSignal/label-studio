@@ -170,7 +170,7 @@ export const TaskSourceViewer: FC<TaskSourceViewerProps> = ({
             storageKey={storageKey}
             toolbarExtra={
               <div style={{ marginLeft: "auto" }}>
-                <Toggle label="Resolve URIs" checked={resolveUrls} onChange={handleResolveUrlsChange} />
+                <Toggle label="Resolve URIs" checked={resolveUrls} onChange={handleResolveUrlsChange} data-testid="resolve-uri-toggle" />
               </div>
             }
           />

@@ -107,12 +107,24 @@ export const AuthProvider = memo<{ children: React.ReactNode }>(({ children }) =
   return <AuthContext.Provider value={contextValue}>{children}</AuthContext.Provider>;
 });
 
+const defaultAuthState: AuthState = {
+  user: null,
+  isLoading: false,
+  refetch: () => {},
+  update: async () => undefined,
+  permissions: makePermissionChecker([]),
+};
+
 export const useAuth = () => {
-  const ctx = useContext(AuthContext)!;
+  const ctx = useContext(AuthContext);
+
+  if (ctx === null) {
+    return defaultAuthState;
+  }
 
   return {
     user: ctx.user,
-    isLoading: ctx?.isLoading ?? false,
+    isLoading: ctx.isLoading ?? false,
     refetch: ctx.refetch,
     update: ctx.update,
     permissions: ctx.permissions,
