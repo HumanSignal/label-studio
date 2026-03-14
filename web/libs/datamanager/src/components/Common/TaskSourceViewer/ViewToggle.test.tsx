@@ -3,34 +3,6 @@ import userEvent from "@testing-library/user-event";
 import "@testing-library/jest-dom";
 import { ViewToggle } from "./ViewToggle";
 
-// Mock the UI components
-jest.mock("@humansignal/ui", () => ({
-  Tabs: ({ children, value, onValueChange }: any) => (
-    <div
-      data-testid="tabs"
-      data-value={value}
-      onClick={(e: any) => {
-        const target = e.target as HTMLElement;
-        if (target.dataset.value) {
-          onValueChange(target.dataset.value);
-        }
-      }}
-    >
-      {children}
-    </div>
-  ),
-  TabsList: ({ children, className }: any) => (
-    <div data-testid="tabs-list" className={className}>
-      {children}
-    </div>
-  ),
-  TabsTrigger: ({ children, value }: any) => (
-    <button type="button" data-testid={`tab-${value}`} data-value={value}>
-      {children}
-    </button>
-  ),
-}));
-
 describe("ViewToggle Component", () => {
   const defaultProps = {
     view: "code" as const,
@@ -45,10 +17,10 @@ describe("ViewToggle Component", () => {
     it("should render code and interactive view tabs", () => {
       render(<ViewToggle {...defaultProps} />);
 
-      expect(screen.getByTestId("tab-code")).toBeInTheDocument();
-      expect(screen.getByTestId("tab-interactive")).toBeInTheDocument();
-      expect(screen.getByTestId("tab-code")).toHaveTextContent("Code");
-      expect(screen.getByTestId("tab-interactive")).toHaveTextContent("Interactive");
+      expect(screen.getByRole("tab", { name: "Code" })).toBeInTheDocument();
+      expect(screen.getByRole("tab", { name: "Interactive" })).toBeInTheDocument();
+      expect(screen.getByRole("tab", { name: "Code" })).toHaveTextContent("Code");
+      expect(screen.getByRole("tab", { name: "Interactive" })).toHaveTextContent("Interactive");
     });
 
     it("should call onViewChange when switching view modes", async () => {
@@ -57,7 +29,7 @@ describe("ViewToggle Component", () => {
 
       render(<ViewToggle {...defaultProps} onViewChange={mockOnViewChange} />);
 
-      await user.click(screen.getByTestId("tab-interactive"));
+      await user.click(screen.getByRole("tab", { name: "Interactive" }));
 
       expect(mockOnViewChange).toHaveBeenCalledWith("interactive");
     });
@@ -65,7 +37,7 @@ describe("ViewToggle Component", () => {
     it("should reflect current view value in tabs", () => {
       render(<ViewToggle {...defaultProps} view="interactive" />);
 
-      expect(screen.getByTestId("tabs")).toHaveAttribute("data-value", "interactive");
+      expect(screen.getByRole("tab", { name: "Interactive", selected: true })).toBeInTheDocument();
     });
 
     it("should switch from interactive to code view", async () => {
@@ -74,7 +46,7 @@ describe("ViewToggle Component", () => {
 
       render(<ViewToggle view="interactive" onViewChange={mockOnViewChange} />);
 
-      await user.click(screen.getByTestId("tab-code"));
+      await user.click(screen.getByRole("tab", { name: "Code" }));
 
       expect(mockOnViewChange).toHaveBeenCalledWith("code");
     });

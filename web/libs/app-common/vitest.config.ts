@@ -2,8 +2,10 @@ import path from "node:path";
 import { defineProject } from "vitest/config";
 import { baseAlias } from "../../vitest.base";
 
-const root = __dirname;
-const uiMocks = path.join(root, "../ui/__mocks__");
+const root = path.resolve(__dirname);
+const webRoot = path.resolve(root, "../..");
+const uiMocks = path.join(webRoot, "libs/ui/__mocks__");
+const labelstudioSrc = path.join(webRoot, "apps/labelstudio/src");
 
 export default defineProject({
   root,
@@ -20,7 +22,11 @@ export default defineProject({
   },
   resolve: {
     alias: [
-      ...Object.entries(baseAlias).map(([find, replacement]) => ({ find, replacement })),
+      { find: "@humansignal/icons", replacement: path.join(uiMocks, "icons.tsx") },
+      { find: "apps/labelstudio/src", replacement: labelstudioSrc },
+      ...Object.entries(baseAlias)
+        .filter(([find]) => find !== "@humansignal/icons")
+        .map(([find, replacement]) => ({ find, replacement })),
       { find: "react-markdown", replacement: path.join(uiMocks, "react-markdown.tsx") },
       { find: "rehype-raw", replacement: path.join(uiMocks, "rehype-raw.ts") },
     ],
