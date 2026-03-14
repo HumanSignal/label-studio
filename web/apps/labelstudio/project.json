@@ -68,16 +68,16 @@
       }
     },
     "unit": {
-      "executor": "@nx/jest:jest",
+      "executor": "nx:run-commands",
       "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
       "options": {
-        "jestConfig": "apps/labelstudio/jest.config.ts",
-        "passWithNoTests": true
+        "command": "vitest run --config vitest.config.ts",
+        "cwd": "apps/labelstudio"
       },
       "configurations": {
         "ci": {
-          "ci": true,
-          "codeCoverage": true
+          "command": "vitest run --config vitest.config.ts --coverage",
+          "cwd": "apps/labelstudio"
         }
       }
     },

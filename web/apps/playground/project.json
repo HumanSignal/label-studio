@@ -71,16 +71,16 @@
       }
     },
     "unit": {
-      "executor": "@nx/jest:jest",
+      "executor": "nx:run-commands",
       "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
       "options": {
-        "jestConfig": "apps/playground/jest.config.ts",
-        "passWithNoTests": true
+        "command": "vitest run --config vitest.config.ts",
+        "cwd": "apps/playground"
       },
       "configurations": {
         "ci": {
-          "ci": true,
-          "codeCoverage": true
+          "command": "vitest run --config vitest.config.ts --coverage",
+          "cwd": "apps/playground"
         }
       }
     }

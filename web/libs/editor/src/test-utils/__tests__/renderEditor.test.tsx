@@ -3,7 +3,7 @@
  * that can replace equivalent Cypress tests (e.g. outliner region count, serialization shape).
  * See E2E_TO_CYPRESS_AUDIT.md for migration list.
  *
- * Excluded from editor unit run via jest.config.js testPathIgnorePatterns until the
+ * Excluded from editor unit run via vitest.config.ts exclude until the
  * full-app Jest environment is ready (MST model load order). Run via Cypress or a
  * dedicated integration setup in the meantime.
  */

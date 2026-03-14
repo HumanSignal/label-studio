@@ -66,16 +66,16 @@
       }
     },
     "unit": {
-      "executor": "@nx/jest:jest",
+      "executor": "nx:run-commands",
       "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
       "options": {
-        "jestConfig": "libs/editor/jest.config.js",
-        "passWithNoTests": true
+        "command": "vitest run --config vitest.config.ts",
+        "cwd": "libs/editor"
       },
       "configurations": {
         "ci": {
-          "ci": true,
-          "codeCoverage": true
+          "command": "vitest run --config vitest.config.ts --coverage",
+          "cwd": "libs/editor"
         }
       }
     },
