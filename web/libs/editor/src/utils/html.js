@@ -1,7 +1,7 @@
 import insertAfter from "insert-after";
-import * as Checkers from "./utilities";
+import * as Checkers from "./utilities.js";
 import sanitizeHTML from "sanitize-html";
-import Canvas from "./canvas";
+import Canvas from "./canvas.js";
 import { cn } from "./bem";
 
 // fast way to change labels visibility for all text regions

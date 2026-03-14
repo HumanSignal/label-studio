@@ -41,11 +41,18 @@ const ObjModel = types.model("Obj", {
   regs: types.optional(types.array(types.frozen()), []),
 });
 
-const RootModel = types.model("Root", {
-  settings: types.optional(SettingsModel, {}),
-  obj: types.optional(ObjModel, {}),
-  tool: types.optional(TestTool, {}),
-});
+const RootModel = types
+  .model("Root", {
+    settings: types.optional(SettingsModel, {}),
+    obj: types.optional(ObjModel, {}),
+    tool: types.optional(TestTool, {}),
+  })
+  .volatile(() => ({ annotationStore: undefined }))
+  .actions((self) => ({
+    setAnnotationStore(store) {
+      self.annotationStore = store;
+    },
+  }));
 
 function createManager(overrides = {}) {
   return {
@@ -330,9 +337,9 @@ describe("Tool mixin", () => {
         },
       );
       manager.root = root;
-      root.annotationStore = {
+      root.setAnnotationStore({
         selected: { names: selectedNames },
-      };
+      });
       expect(root.tool.obj).toBe(objFromSelected);
     });
 
@@ -351,9 +358,9 @@ describe("Tool mixin", () => {
         },
       );
       manager.root = root;
-      root.annotationStore = {
+      root.setAnnotationStore({
         selected: { names: selectedNames },
-      };
+      });
       expect(root.tool.control).toBe(controlFromSelected);
     });
   });

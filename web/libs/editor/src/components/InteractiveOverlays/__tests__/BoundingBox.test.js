@@ -1,20 +1,25 @@
 /**
  * Unit tests for BoundingBox (components/InteractiveOverlays/BoundingBox.js)
  */
-import { BoundingBox } from "../BoundingBox";
-import { Geometry } from "../Geometry";
+import { vi } from "vitest";
 
-jest.mock("../Geometry", () => ({
+const mockGetDOMBBox = vi.hoisted(() => vi.fn());
+const mockClampBBox = vi.hoisted(() => vi.fn((bbox) => ({ ...bbox })));
+const mockModifyBBoxCoords = vi.hoisted(() => vi.fn((bbox) => ({ ...bbox })));
+
+vi.mock("../Geometry", () => ({
   Geometry: {
-    getDOMBBox: jest.fn(),
-    clampBBox: jest.fn((bbox) => ({ ...bbox })),
-    modifyBBoxCoords: jest.fn((bbox) => ({ ...bbox })),
+    getDOMBBox: mockGetDOMBBox,
+    clampBBox: mockClampBBox,
+    modifyBBoxCoords: mockModifyBBoxCoords,
   },
 }));
 
+import { BoundingBox } from "../BoundingBox";
+
 describe("BoundingBox", () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe("class", () => {
@@ -61,15 +66,15 @@ describe("BoundingBox", () => {
 
     it("returns bbox from result (from_name) when region has from_name", () => {
       const elementRef = { current: document.createElement("div") };
-      Geometry.getDOMBBox.mockReturnValue({ x: 10, y: 20, width: 30, height: 40 });
+      mockGetDOMBBox.mockReturnValue({ x: 10, y: 20, width: 30, height: 40 });
       const region = { from_name: { elementRef } };
       const result = BoundingBox.bbox(region);
-      expect(Geometry.getDOMBBox).toHaveBeenCalledWith(elementRef.current);
+      expect(mockGetDOMBBox).toHaveBeenCalledWith(elementRef.current);
       expect(result).toEqual([{ x: 10, y: 20, width: 30, height: 40 }]);
     });
 
     it("returns default bbox for result when getDOMBBox returns null/undefined", () => {
-      Geometry.getDOMBBox.mockReturnValue(null);
+      mockGetDOMBBox.mockReturnValue(null);
       const region = { from_name: { elementRef: { current: null } } };
       const result = BoundingBox.bbox(region);
       expect(result).toEqual([{ x: 0, y: 0, width: 0, height: 0 }]);
@@ -86,11 +91,11 @@ describe("BoundingBox", () => {
 
     it("returns stage-related bbox for canvas region with parent.stageRef", () => {
       const contentEl = document.createElement("div");
-      Geometry.getDOMBBox
+      mockGetDOMBBox
         .mockReturnValueOnce({ x: 100, y: 50, width: 400, height: 300 })
         .mockReturnValueOnce({ x: 10, y: 20, width: 50, height: 30 });
-      Geometry.clampBBox.mockImplementation((bbox) => ({ ...bbox }));
-      Geometry.modifyBBoxCoords.mockImplementation((bbox) => ({ ...bbox }));
+      mockClampBBox.mockImplementation((bbox) => ({ ...bbox }));
+      mockModifyBBoxCoords.mockImplementation((bbox) => ({ ...bbox }));
 
       const region = {
         type: "rectangleregion",
@@ -110,8 +115,8 @@ describe("BoundingBox", () => {
 
     it("returns bbox for audioregion with bboxCoordsCanvas and stage", () => {
       const stageEl = document.createElement("div");
-      Geometry.getDOMBBox.mockReset();
-      Geometry.getDOMBBox.mockReturnValue({ x: 50, y: 100, width: 200, height: 80 });
+      mockGetDOMBBox.mockReset();
+      mockGetDOMBBox.mockReturnValue({ x: 50, y: 100, width: 200, height: 80 });
 
       const region = {
         type: "audioregion",
@@ -119,7 +124,7 @@ describe("BoundingBox", () => {
         parent: { stageRef: { current: stageEl } },
       };
       const result = BoundingBox.bbox(region);
-      expect(Geometry.getDOMBBox).toHaveBeenCalledWith(stageEl, true);
+      expect(mockGetDOMBBox).toHaveBeenCalledWith(stageEl, true);
       expect(result).toEqual([{ x: 60, y: 105, width: 100, height: 40 }]);
     });
 
@@ -131,21 +136,21 @@ describe("BoundingBox", () => {
 
     it("returns region bbox for textarearegion without iframe", () => {
       const regionEl = document.createElement("div");
-      Geometry.getDOMBBox.mockReturnValue([{ x: 1, y: 2, width: 10, height: 5 }]);
+      mockGetDOMBBox.mockReturnValue([{ x: 1, y: 2, width: 10, height: 5 }]);
       const region = {
         type: "textarearegion",
         getRegionElement: () => regionEl,
         parent: {},
       };
       const result = BoundingBox.bbox(region);
-      expect(Geometry.getDOMBBox).toHaveBeenCalledWith(regionEl);
+      expect(mockGetDOMBBox).toHaveBeenCalledWith(regionEl);
       expect(result).toEqual([{ x: 1, y: 2, width: 10, height: 5 }]);
     });
 
     it("returns offset bbox for textarearegion inside iframe", () => {
       const regionEl = document.createElement("div");
       const iframeEl = document.createElement("iframe");
-      Geometry.getDOMBBox
+      mockGetDOMBBox
         .mockReturnValueOnce([{ x: 5, y: 10, width: 20, height: 8 }])
         .mockReturnValueOnce({ x: 200, y: 100, width: 400, height: 300 });
       const region = {

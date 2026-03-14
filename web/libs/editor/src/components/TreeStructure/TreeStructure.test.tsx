@@ -1,4 +1,5 @@
-import type React from "react";
+import React from "react";
+import type { Ref, ReactNode } from "react";
 import { fireEvent, render, screen } from "@testing-library/react";
 import TreeStructure, { type RowItem } from "./TreeStructure";
 

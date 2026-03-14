@@ -1,14 +1,16 @@
 /**
  * Unit tests for RelationShape (components/InteractiveOverlays/RelationShape.js)
  */
-import { BoundingBox } from "../BoundingBox";
+import { vi } from "vitest";
 import { RelationShape } from "../RelationShape";
 
-jest.mock("../BoundingBox", () => ({
+const mockBbox = vi.hoisted(() => vi.fn(() => [{ x: 0, y: 0, width: 10, height: 10 }]));
+vi.mock("../BoundingBox", () => ({
   BoundingBox: {
-    bbox: jest.fn(() => [{ x: 0, y: 0, width: 10, height: 10 }]),
+    bbox: mockBbox,
   },
 }));
+import { BoundingBox } from "../BoundingBox";
 
 describe("RelationShape", () => {
   const mockElement = { getBoundingClientRect: () => ({}) };
@@ -47,7 +49,7 @@ describe("RelationShape", () => {
 
       const result = shape.boundingBox();
 
-      expect(BoundingBox.bbox).toHaveBeenCalledWith(mockElement);
+      expect(mockBbox).toHaveBeenCalledWith(mockElement);
       expect(result).toEqual([{ x: 1, y: 2, width: 3, height: 4 }]);
     });
   });

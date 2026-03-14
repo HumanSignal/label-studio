@@ -23,6 +23,13 @@ const mockAnnotation = () => ({
 
 import RegionsMixin from "../Regions";
 
+// Override Regions mixin's editable getter (which throws "Not implemented") for tests.
+const EditableOverride = types.model({}).views(() => ({
+  get editable() {
+    return true;
+  },
+}));
+
 const Base = types
   .model("RegionsTestBase", {
     selected: types.optional(types.boolean, false),
@@ -55,28 +62,36 @@ const Base = types
     },
   }));
 
-const TestRegion = types.compose(Base, RegionsMixin);
+const TestRegion = types.compose(Base, RegionsMixin, EditableOverride);
 
-function createStore(annotationOverrides = {}, regionSnapshot = {}) {
+// For the "editable throws" test we need a region without EditableOverride.
+const TestRegionWithoutEditableOverride = types.compose(Base, RegionsMixin);
+
+function createStore(annotationOverrides = {}, regionSnapshot = {}, useEditableOverride = true) {
   const annotation = { ...mockAnnotation(), ...annotationOverrides };
   annotation.areas = new Map();
 
+  const RegionType = useEditableOverride ? TestRegion : TestRegionWithoutEditableOverride;
   const store = types
     .model({
-      region: types.maybe(TestRegion),
+      region: types.maybe(RegionType),
     })
     .volatile(() => ({
       annotationStore: { selected: annotation, selectedHistory: null },
+      findImageEntity: jest.fn(() => null),
     }))
     .actions((self) => ({
       setAnnotation(ann) {
         self.annotationStore = { selected: ann, selectedHistory: null };
       },
+      setFindImageEntity(fn) {
+        self.findImageEntity = fn;
+      },
     }));
 
   const root = store.create({ region: regionSnapshot });
   const region = root.region;
-  annotation.areas.set(region.id, true);
+  if (region) annotation.areas.set(region.id, true);
   return { root, region, annotation };
 }
 
@@ -110,7 +125,7 @@ describe("Regions mixin", () => {
     });
 
     it("editable throws Not implemented", () => {
-      const { region } = createStore();
+      const { region } = createStore({}, {}, false);
       expect(() => region.editable).toThrow("Not implemented");
     });
 
@@ -144,10 +159,11 @@ describe("Regions mixin", () => {
     it("currentImageEntity uses parent.findImageEntity", () => {
       const { root, region } = createStore();
       const entity = {};
-      root.findImageEntity = jest.fn(() => entity);
+      const findImageEntity = jest.fn(() => entity);
+      root.setFindImageEntity(findImageEntity);
       region.setItemIndex(0);
       expect(region.currentImageEntity).toBe(entity);
-      expect(root.findImageEntity).toHaveBeenCalledWith(0);
+      expect(findImageEntity).toHaveBeenCalledWith(0);
     });
 
     it("getConnectedDynamicRegions filters by type, labelName, to_name", () => {

@@ -1,11 +1,13 @@
 /**
  * Unit tests for object Base (tags/object/Base.js) — ObjectBase + BaseTag + AnnotationMixin.
  */
+import { vi } from "vitest";
 import { types } from "mobx-state-tree";
 import ObjectTag from "../Base";
 import InfoModal from "../../../components/Infomodal/Infomodal";
 
-const mockUnselectAll = jest.fn();
+const mockWarning = vi.hoisted(() => vi.fn());
+const mockUnselectAll = vi.fn();
 const mockRegionStore = { regions: [] };
 const mockAnnotation = {
   regionStore: mockRegionStore,
@@ -16,14 +18,17 @@ const mockAnnotationStore = {
   selectedHistory: mockAnnotation,
 };
 
-jest.mock("../../../utils/feature-flags", () => ({
-  FF_DEV_3391: "FF_DEV_3391",
-  isFF: jest.fn(() => false),
-}));
+vi.mock("../../../utils/feature-flags", async (importOriginal) => {
+  const actual = await importOriginal();
+  return {
+    ...actual,
+    isFF: vi.fn(() => false),
+  };
+});
 
-jest.mock("../../../components/Infomodal/Infomodal", () => ({
+vi.mock("../../../components/Infomodal/Infomodal", () => ({
   __esModule: true,
-  default: { warning: jest.fn() },
+  default: { warning: mockWarning },
 }));
 
 // Extended model so we have .regions and .states()/.activeStates() (required by findRegion and getAvailableStates)
@@ -194,7 +199,7 @@ describe("Object Base (tags/object/Base.js)", () => {
       const root = RootExceeded.create({ child: { name: "x", regions: [] } });
       root.child.getAvailableStates();
       expect(setSelected).toHaveBeenCalledWith(false);
-      expect(InfoModal.warning).toHaveBeenCalledWith("You can't use L1 more than 1 time(s)");
+      expect(mockWarning).toHaveBeenCalledWith("You can't use L1 more than 1 time(s)");
       expect(mockUnselectAll).toHaveBeenCalled();
     });
   });

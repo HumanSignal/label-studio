@@ -6,6 +6,7 @@ const root = __dirname;
 const webRoot = path.join(root, "../..");
 const nodeModules = path.join(webRoot, "node_modules");
 const coreSrc = path.resolve(webRoot, "libs/core/src");
+const editorSrc = path.join(root, "src");
 
 export default defineProject({
   root,
@@ -41,6 +42,9 @@ export default defineProject({
   resolve: {
     extensions: [".ts", ".tsx", ".js", ".jsx", ".json", ".mjs"],
     alias: [
+      // Resolve paths without extension to .ts in test env (from index.js, html.js, etc.).
+      { find: path.resolve(root, "src/utils/utilities"), replacement: path.resolve(root, "src/utils/utilities.ts") },
+      { find: path.join(editorSrc, "core/Constants"), replacement: path.join(editorSrc, "core/Constants.ts") },
       { find: "@humansignal/core", replacement: coreSrc },
       ...Object.entries(baseAlias).map(([find, replacement]) => ({ find, replacement })),
       { find: "konva", replacement: path.join(nodeModules, "konva/konva") },
@@ -55,7 +59,7 @@ export default defineProject({
   },
   server: {
     deps: {
-      inline: ["nanoid", "konva", "@adobe/css-tools", "@humansignal/core"],
+      inline: ["nanoid", "konva", "@adobe/css-tools", "@humansignal/core", "react", "react-dom"],
     },
   },
 });

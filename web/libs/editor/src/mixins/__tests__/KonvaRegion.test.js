@@ -78,6 +78,12 @@ const Base = types
 const WithDeleteRegion = types.model({}).actions(() => ({
   deleteRegion() {},
 }));
+// Override Regions mixin's editable getter (which throws "Not implemented") for tests.
+const EditableOverride = types.model({}).views(() => ({
+  get editable() {
+    return true;
+  },
+}));
 // Override annotation to read from root._annotationForTest so tests pass regardless of
 // feature-flag or module-load order when run with the full editor suite.
 const AnnotationOverrideForTest = types.model({}).views((self) => ({
@@ -86,7 +92,15 @@ const AnnotationOverrideForTest = types.model({}).views((self) => ({
     return root?._annotationForTest ?? null;
   },
 }));
-const TestRegion = types.compose(Base, Regions, WithDeleteRegion, KonvaRegionMixin, AnnotationOverrideForTest);
+// Override KonvaRegionMixin's bboxCoords (which returns null) so bboxCoordsCanvas and inViewPort work.
+const BboxCoordsOverride = types.model({}).views(() => ({
+  get bboxCoords() {
+    return { left: 0, top: 0, right: 10, bottom: 10 };
+  },
+}));
+const TestRegion = types.compose(Base, Regions, EditableOverride, WithDeleteRegion, KonvaRegionMixin, BboxCoordsOverride, AnnotationOverrideForTest);
+// Region without BboxCoordsOverride for the test that asserts bboxCoords returns null.
+const TestRegionWithoutBboxOverride = types.compose(Base, Regions, EditableOverride, WithDeleteRegion, KonvaRegionMixin, AnnotationOverrideForTest);
 
 const _annotationRef = { current: null };
 
@@ -115,6 +129,7 @@ const RootModel = types
     getToolsManager: () => ({ findSelectedTool: () => null }),
     naturalWidth: 100,
     naturalHeight: 100,
+    findImageEntity: jest.fn(() => null),
   }))
   .actions((self) => ({
     setAnnotationStore(store) {
@@ -154,7 +169,39 @@ describe("KonvaRegion mixin", () => {
   describe("views", () => {
     it("bboxCoords returns null and warns when not overridden", () => {
       const warnSpy = jest.spyOn(console, "warn").mockImplementation(() => {});
-      const { region } = createStore();
+      const RootWithoutBbox = types
+        .model({ region: types.maybe(TestRegionWithoutBboxOverride) })
+        .views((self) => ({
+          get annotationStore() {
+            return self._annotationForTest != null ? { selected: self._annotationForTest, selectedHistory: null } : null;
+          },
+          get stageWidth() {
+            return self._stageWidth ?? 100;
+          },
+          get stageHeight() {
+            return self._stageHeight ?? 100;
+          },
+        }))
+        .volatile(() => ({
+          _annotationForTest: null,
+          _stageWidth: 100,
+          _stageHeight: 100,
+          internalToCanvasX: (x) => x,
+          internalToCanvasY: (y) => y,
+          stageRef: null,
+          getToolsManager: () => ({ findSelectedTool: () => null }),
+          naturalWidth: 100,
+          naturalHeight: 100,
+          findImageEntity: jest.fn(() => null),
+        }))
+        .actions((self) => ({
+          setAnnotationStore(store) {
+            self._annotationForTest = store?.selected ?? null;
+          },
+        }));
+      const root = RootWithoutBbox.create({ region: {} });
+      root.setAnnotationStore({ selected: mockAnnotation() });
+      const region = root.region;
       expect(region.bboxCoords).toBeNull();
       expect(warnSpy).toHaveBeenCalledWith("KonvaRegionMixin needs to implement bboxCoords getter in regions");
       warnSpy.mockRestore();
