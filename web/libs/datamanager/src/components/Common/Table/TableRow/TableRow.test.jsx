@@ -1,7 +1,21 @@
+import { vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import { TableRow } from "./TableRow";
 import { TableContext } from "../TableContext";
+
+// Hoist mock fns so we can use mockReturnValue in tests (same reference as in mocks)
+const { mockGetProperty, mockIsFF } = vi.hoisted(() => ({
+  mockGetProperty: vi.fn((obj, path) => {
+    const keys = path.split(".");
+    let result = obj;
+    for (const key of keys) {
+      result = result?.[key];
+    }
+    return result;
+  }),
+  mockIsFF: vi.fn(() => false),
+}));
 
 // Mock SkeletonLoader
 jest.mock("../../SkeletonLoader", () => ({
@@ -11,20 +25,13 @@ jest.mock("../../SkeletonLoader", () => ({
 // Mock feature flags
 jest.mock("../../../../utils/feature-flags", () => ({
   FF_LOPS_E_3: "fflag_feat_all_lops_e_3_short",
-  isFF: jest.fn(() => false),
+  isFF: mockIsFF,
 }));
 
 // Mock utils
 jest.mock("../utils", () => ({
-  getProperty: jest.fn((obj, path) => {
-    const keys = path.split(".");
-    let result = obj;
-    for (const key of keys) {
-      result = result?.[key];
-    }
-    return result;
-  }),
-  getStyle: jest.fn(() => ({})),
+  getProperty: mockGetProperty,
+  getStyle: vi.fn(() => ({})),
 }));
 
 // Mock normalizeCellAlias
@@ -110,8 +117,7 @@ describe("TableRow", () => {
 
   describe("Basic Rendering", () => {
     it("should render row with correct structure", () => {
-      const { getProperty } = require("../utils");
-      getProperty.mockReturnValue("test-value");
+      mockGetProperty.mockImplementation(() => "test-value");
 
       renderWithContext();
 
@@ -123,8 +129,7 @@ describe("TableRow", () => {
     });
 
     it("should render cells for each column", () => {
-      const { getProperty } = require("../utils");
-      getProperty.mockReturnValue("test-value");
+      mockGetProperty.mockImplementation(() => "test-value");
 
       const { container } = renderWithContext();
 
@@ -229,14 +234,14 @@ describe("TableRow", () => {
 
   describe("Cell Rendering", () => {
     it("should render cell values using getProperty", () => {
-      const { getProperty } = require("../utils");
-      getProperty.mockReturnValue("test-value");
-
-      renderWithContext();
+      // Use data with col1/col2 so getProperty returns values (real behavior)
+      const dataWithCols = { ...mockData, col1: "test-value", col2: "test-value" };
+      renderWithContext({ data: dataWithCols });
 
       const cellValues = screen.getAllByTestId("cell-value");
       expect(cellValues).toHaveLength(2);
       expect(cellValues[0]).toHaveTextContent("test-value");
+      expect(cellValues[1]).toHaveTextContent("test-value");
     });
 
     it("should render custom Cell component when provided", () => {
@@ -258,13 +263,19 @@ describe("TableRow", () => {
     });
 
     it("should show skeleton loader when cell is loading", () => {
-      const { isFF } = require("../../../../utils/feature-flags");
-      isFF.mockReturnValue(true);
+      // Enable feature flag via APP_SETTINGS (real isFF behavior)
+      const flagId = "fflag_feat_all_lops_e_3_datasets_short";
+      const prevFlags = window.APP_SETTINGS?.feature_flags;
+      window.APP_SETTINGS = window.APP_SETTINGS ?? {};
+      window.APP_SETTINGS.feature_flags = { ...prevFlags, [flagId]: true };
 
       const loadingData = { ...mockData, loading: "col1" };
-      renderWithContext({ data: loadingData });
+      const { container } = renderWithContext({ data: loadingData });
 
-      expect(screen.getByTestId("skeleton-loader")).toBeInTheDocument();
+      // Real SkeletonLoader uses .ls-skeletonLoader (mock uses data-testid="skeleton-loader")
+      expect(container.querySelector(".ls-skeletonLoader")).toBeInTheDocument();
+
+      window.APP_SETTINGS.feature_flags = prevFlags;
     });
   });
 
@@ -286,7 +297,7 @@ describe("TableRow", () => {
       renderWithContext({ wrapperStyle });
 
       const rowWrapper = screen.getByTestId("table-row-wrapper");
-      expect(rowWrapper).toHaveStyle(wrapperStyle);
+      expect(rowWrapper.style.backgroundColor).toBe("blue");
     });
 
     it("should apply style to table row", () => {
@@ -294,7 +305,7 @@ describe("TableRow", () => {
       renderWithContext({ style });
 
       const tableRow = screen.getByTestId("table-row");
-      expect(tableRow).toHaveStyle(style);
+      expect(tableRow.style.padding).toBe("10px");
     });
   });
 });

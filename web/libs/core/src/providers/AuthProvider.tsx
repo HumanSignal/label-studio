@@ -37,7 +37,7 @@ type AuthState = {
   permissions: AuthPermissions;
 };
 
-const AuthContext = createContext<AuthState | null>(null);
+export const AuthContext = createContext<AuthState | null>(null);
 
 const makePermissionChecker = (list?: (Ability | string)[]) => {
   const abilities = new Set<string>((list as string[]) ?? []);

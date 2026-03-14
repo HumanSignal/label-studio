@@ -1,7 +1,20 @@
+import React from "react";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import "@testing-library/jest-dom";
+import { AuthContext } from "@humansignal/core/providers/AuthProvider";
 import { EmptyState } from "./EmptyState";
+
+const authStateWithStorage = {
+  user: { id: 1, username: "testuser" },
+  isLoading: false,
+  refetch: () => {},
+  update: async () => undefined,
+  permissions: { can: () => true, canAny: () => true, canAll: () => true },
+};
+
+const renderWithAuth = (ui: React.ReactElement) =>
+  render(<AuthContext.Provider value={authStateWithStorage}>{ui}</AuthContext.Provider>);
 
 // Mock the external dependencies
 jest.mock("@humansignal/ui", () => ({
@@ -39,24 +52,6 @@ jest.mock("@humansignal/icons", () => ({
   ),
 }));
 
-jest.mock("../../../../../../editor/src/utils/docs", () => ({
-  getDocsUrl: (path: string) => `https://docs.example.com/${path}`,
-}));
-
-// Mock AuthProvider/useAuth
-jest.mock("@humansignal/core/providers/AuthProvider", () => ({
-  useAuth: () => ({
-    user: { id: 1, username: "testuser" },
-    permissions: {
-      can: (ability: string) => ability === "can_manage_storage", // Grant storage management permission by default
-    },
-    isLoading: false,
-  }),
-  ABILITY: {
-    can_manage_storage: "can_manage_storage",
-  },
-}));
-
 // Mock global window.APP_SETTINGS
 Object.defineProperty(window, "APP_SETTINGS", {
   value: { whitelabel_is_active: false },
@@ -76,7 +71,7 @@ describe("EmptyState Component", () => {
 
   describe("Basic Import Functionality", () => {
     it("should render the default import state when no role is specified", () => {
-      render(<EmptyState {...defaultProps} />);
+      renderWithAuth(<EmptyState {...defaultProps} />);
 
       // Check main title and description
       expect(screen.getByText("Import data to get your project started")).toBeInTheDocument();
@@ -95,7 +90,7 @@ describe("EmptyState Component", () => {
     });
 
     it("should render non-interactive state when canImport is false", () => {
-      render(<EmptyState {...defaultProps} canImport={false} />);
+      renderWithAuth(<EmptyState {...defaultProps} canImport={false} />);
 
       const label = screen.getByTestId("empty-state-label");
       expect(label).toHaveAttribute("aria-labelledby", "dm-empty-title");
@@ -108,7 +103,7 @@ describe("EmptyState Component", () => {
     });
 
     it("should render interactive state when canImport is true", () => {
-      render(<EmptyState {...defaultProps} canImport={true} />);
+      renderWithAuth(<EmptyState {...defaultProps} canImport={true} />);
 
       const label = screen.getByTestId("empty-state-label");
       expect(label).toHaveAttribute("aria-labelledby", "dm-empty-title");
@@ -125,7 +120,7 @@ describe("EmptyState Component", () => {
       const user = userEvent.setup();
       const mockOpenStorage = jest.fn();
 
-      render(<EmptyState {...defaultProps} onOpenSourceStorageModal={mockOpenStorage} />);
+      renderWithAuth(<EmptyState {...defaultProps} onOpenSourceStorageModal={mockOpenStorage} />);
 
       const connectButton = screen.getByTestId("dm-connect-source-storage-button");
       await user.click(connectButton);
@@ -137,7 +132,7 @@ describe("EmptyState Component", () => {
       const user = userEvent.setup();
       const mockOpenImport = jest.fn();
 
-      render(<EmptyState {...defaultProps} onOpenImportModal={mockOpenImport} />);
+      renderWithAuth(<EmptyState {...defaultProps} onOpenImportModal={mockOpenImport} />);
 
       const importButton = screen.getByTestId("dm-import-button");
       await user.click(importButton);
@@ -149,7 +144,7 @@ describe("EmptyState Component", () => {
   describe("Role-Based Empty States", () => {
     describe("Filter-based Empty State", () => {
       it("should render filter empty state when hasFilters is true", () => {
-        render(<EmptyState {...defaultProps} hasFilters={true} onClearFilters={jest.fn()} />);
+        renderWithAuth(<EmptyState {...defaultProps} hasFilters={true} onClearFilters={jest.fn()} />);
 
         expect(screen.getByText("No tasks found")).toBeInTheDocument();
         expect(screen.getByText("Try adjusting or clearing the filters to see more results")).toBeInTheDocument();
@@ -161,7 +156,7 @@ describe("EmptyState Component", () => {
         const user = userEvent.setup();
         const mockClearFilters = jest.fn();
 
-        render(<EmptyState {...defaultProps} hasFilters={true} onClearFilters={mockClearFilters} />);
+        renderWithAuth(<EmptyState {...defaultProps} hasFilters={true} onClearFilters={mockClearFilters} />);
 
         const clearButton = screen.getByTestId("dm-clear-filters-button");
         await user.click(clearButton);
@@ -172,7 +167,7 @@ describe("EmptyState Component", () => {
 
     describe("Reviewer Role", () => {
       it("should render reviewer empty state", () => {
-        render(<EmptyState {...defaultProps} userRole="REVIEWER" />);
+        renderWithAuth(<EmptyState {...defaultProps} userRole="REVIEWER" />);
 
         expect(screen.getByText("No tasks available for review or labeling")).toBeInTheDocument();
         expect(screen.getByText("Tasks imported to this project will appear here")).toBeInTheDocument();
@@ -225,7 +220,7 @@ describe("EmptyState Component", () => {
           },
         };
 
-        render(<EmptyState {...defaultProps} userRole="ANNOTATOR" project={project} />);
+        renderWithAuth(<EmptyState {...defaultProps} userRole="ANNOTATOR" project={project} />);
 
         expect(screen.getByText("No tasks available")).toBeInTheDocument();
         expect(screen.getByText("Tasks assigned to you will appear here")).toBeInTheDocument();
@@ -240,7 +235,7 @@ describe("EmptyState Component", () => {
           },
         };
 
-        render(<EmptyState {...defaultProps} userRole="ANNOTATOR" project={project} />);
+        renderWithAuth(<EmptyState {...defaultProps} userRole="ANNOTATOR" project={project} />);
 
         expect(screen.getByText("No tasks available")).toBeInTheDocument();
         expect(screen.getByText("Tasks will appear here when they become available")).toBeInTheDocument();
@@ -251,7 +246,7 @@ describe("EmptyState Component", () => {
 
   describe("Accessibility", () => {
     it("should have proper ARIA attributes", () => {
-      render(<EmptyState {...defaultProps} />);
+      renderWithAuth(<EmptyState {...defaultProps} />);
 
       const label = screen.getByTestId("empty-state-label");
       const title = screen.getByText("Import data to get your project started");
@@ -264,10 +259,10 @@ describe("EmptyState Component", () => {
     });
 
     it("should render documentation link with proper accessibility", () => {
-      render(<EmptyState {...defaultProps} />);
+      renderWithAuth(<EmptyState {...defaultProps} />);
 
       const docLink = screen.getByTestId("dm-docs-data-import-link");
-      expect(docLink).toHaveAttribute("href", "https://docs.example.com/guide/tasks");
+      expect(docLink).toHaveAttribute("href", "https://labelstud.io/guide/tasks");
       expect(docLink).toHaveAttribute("target", "_blank");
       expect(docLink).toHaveAttribute("rel", "noopener noreferrer");
 
@@ -284,7 +279,7 @@ describe("EmptyState Component", () => {
         writable: true,
       });
 
-      render(<EmptyState {...defaultProps} />);
+      renderWithAuth(<EmptyState {...defaultProps} />);
 
       expect(screen.queryByTestId("dm-docs-data-import-link")).not.toBeInTheDocument();
 
@@ -296,7 +291,7 @@ describe("EmptyState Component", () => {
     });
 
     it("should show documentation link when whitelabel is not active", () => {
-      render(<EmptyState {...defaultProps} />);
+      renderWithAuth(<EmptyState {...defaultProps} />);
 
       expect(screen.getByTestId("dm-docs-data-import-link")).toBeInTheDocument();
     });
@@ -304,7 +299,7 @@ describe("EmptyState Component", () => {
 
   describe("Storage Provider Icons", () => {
     it("should render storage provider icons with proper tooltips", () => {
-      render(<EmptyState {...defaultProps} />);
+      renderWithAuth(<EmptyState {...defaultProps} />);
 
       const iconsContainer = screen.getByTestId("dm-storage-provider-icons");
       expect(iconsContainer).toBeInTheDocument();
@@ -322,7 +317,7 @@ describe("EmptyState Component", () => {
     });
 
     it("should show storage icons in correct order", () => {
-      render(<EmptyState {...defaultProps} />);
+      renderWithAuth(<EmptyState {...defaultProps} />);
 
       const iconsContainer = screen.getByTestId("dm-storage-provider-icons");
       const iconContainers = iconsContainer.querySelectorAll("[aria-label]");
@@ -337,14 +332,14 @@ describe("EmptyState Component", () => {
 
   describe("Button States and Props", () => {
     it("should render buttons with correct text content", () => {
-      render(<EmptyState {...defaultProps} />);
+      renderWithAuth(<EmptyState {...defaultProps} />);
 
       expect(screen.getByTestId("dm-connect-source-storage-button")).toHaveTextContent("Connect Cloud Storage");
       expect(screen.getByTestId("dm-import-button")).toHaveTextContent("Import");
     });
 
     it("should render Clear Filters button with correct text", () => {
-      render(<EmptyState {...defaultProps} hasFilters={true} onClearFilters={jest.fn()} />);
+      renderWithAuth(<EmptyState {...defaultProps} hasFilters={true} onClearFilters={jest.fn()} />);
 
       expect(screen.getByTestId("dm-clear-filters-button")).toHaveTextContent("Clear Filters");
     });
@@ -356,7 +351,7 @@ describe("EmptyState Component", () => {
         },
       };
 
-      render(<EmptyState {...defaultProps} userRole="ANNOTATOR" project={project} onLabelAllTasks={jest.fn()} />);
+      renderWithAuth(<EmptyState {...defaultProps} userRole="ANNOTATOR" project={project} onLabelAllTasks={jest.fn()} />);
 
       const labelButton = screen.getByTestId("dm-label-all-tasks-button");
       expect(labelButton).toHaveTextContent("Label All Tasks");
@@ -366,7 +361,7 @@ describe("EmptyState Component", () => {
 
   describe("Edge Cases", () => {
     it("should handle missing project object gracefully", () => {
-      render(<EmptyState {...defaultProps} userRole="ANNOTATOR" />);
+      renderWithAuth(<EmptyState {...defaultProps} userRole="ANNOTATOR" />);
 
       // Should render fallback state
       expect(screen.getByText("No tasks available")).toBeInTheDocument();
@@ -376,7 +371,7 @@ describe("EmptyState Component", () => {
     it("should handle missing assignment settings gracefully", () => {
       const project = {}; // No assignment_settings
 
-      render(<EmptyState {...defaultProps} userRole="ANNOTATOR" project={project} />);
+      renderWithAuth(<EmptyState {...defaultProps} userRole="ANNOTATOR" project={project} />);
 
       // Should render fallback state
       expect(screen.getByText("No tasks available")).toBeInTheDocument();
