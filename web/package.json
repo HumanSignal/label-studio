@@ -223,6 +223,8 @@
     "yargs": "^17.7.1"
   },
   "resolutions": {
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
     "test-exclude": "8.0.0",
     "@module-federation/dts-plugin": ">=0.18.0",
     "@radix-ui/react-slot": "1.2.3",

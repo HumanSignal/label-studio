@@ -1,9 +1,9 @@
 import { decode, encode } from "@thi.ng/rle-pack";
 import chroma from "chroma-js";
-import Constants from "../core/Constants";
+import Constants from "../core/Constants.js";
 
-import * as Colors from "./colors";
-import { FF_LSDV_4583, isFF } from "./feature-flags";
+import * as Colors from "./colors.js";
+import { FF_LSDV_4583, isFF } from "./feature-flags.js";
 
 /**
  * Given a single channel UInt8 image data mask with non-zero values indicating the
@@ -52,6 +52,10 @@ function maskDataURL2Image(maskDataURL, { color = Constants.FILL_COLOR } = {}) {
       canvas.height = nh;
 
       const ctx = canvas.getContext("2d");
+      if (!ctx) {
+        resolve(img);
+        return;
+      }
 
       ctx.drawImage(img, 0, 0);
 

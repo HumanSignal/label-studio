@@ -1,6 +1,10 @@
 /* vitest setup: globals and mocks for editor unit tests */
+import React from "react";
 import * as matchers from "@testing-library/jest-dom/matchers";
 import { expect, vi } from "vitest";
+
+
+(globalThis as unknown as { React: typeof React }).React = React;
 
 expect.extend(matchers);
 

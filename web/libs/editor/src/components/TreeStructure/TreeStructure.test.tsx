@@ -1,5 +1,6 @@
 import React from "react";
 import type { Ref, ReactNode } from "react";
+import { vi } from "vitest";
 import { fireEvent, render, screen } from "@testing-library/react";
 import TreeStructure, { type RowItem } from "./TreeStructure";
 
@@ -8,8 +9,9 @@ const mockOffsetHeight = 200;
 const mockOffsetWidth = 150;
 const mockClientWidth = 150;
 
-jest.mock("react-window", () => {
-  const R = require("react");
+vi.mock("react-window", () => {
+  const R = (globalThis as unknown as { React: typeof import("react") }).React;
+  if (!R) throw new Error("react-window mock requires globalThis.React (set in vitest.setup)");
   return {
     VariableSizeList: R.forwardRef(
       (
@@ -30,20 +32,21 @@ jest.mock("react-window", () => {
         },
         ref: React.Ref<unknown>,
       ) => {
-        R.useEffect(() => {
-          if (ref && typeof ref === "object" && "current" in ref) {
-            (ref as React.MutableRefObject<unknown>).current = {
-              resetAfterIndex: mockResetAfterIndex,
-              _outerRef: {
-                firstChild: {
-                  offsetHeight: mockOffsetHeight,
-                  offsetWidth: mockOffsetWidth,
-                  clientWidth: mockClientWidth,
-                },
-              },
-            };
-          }
-        }, [ref]);
+        const mockListRef = {
+          resetAfterIndex: mockResetAfterIndex,
+          _outerRef: {
+            firstChild: {
+              offsetHeight: mockOffsetHeight,
+              offsetWidth: mockOffsetWidth,
+              clientWidth: mockClientWidth,
+            },
+          },
+        };
+        if (ref && typeof ref === "object" && "current" in ref) {
+            (ref as React.MutableRefObject<unknown>).current = mockListRef;
+        } else if (typeof ref === "function") {
+          ref(mockListRef);
+        }
         const rows = [];
         for (let i = 0; i < itemCount; i++) {
           const rowHeight = typeof itemSize === "function" ? itemSize(i) : itemSize;
@@ -59,7 +62,7 @@ jest.mock("react-window", () => {
             ),
           );
         }
-        return <div data-testid="variable-size-list">{rows}</div>;
+        return R.createElement("div", { "data-testid": "variable-size-list" }, rows);
       },
     ),
   };

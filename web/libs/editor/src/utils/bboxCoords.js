@@ -1,4 +1,4 @@
-import { minMax } from "./utilities";
+import { minMax } from "./utilities.js";
 
 /**
  * Rotate `bboxCoords` by `rotation` degrees around `pivot`

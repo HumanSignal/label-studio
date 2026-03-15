@@ -8,11 +8,42 @@ const nodeModules = path.join(webRoot, "node_modules");
 const coreSrc = path.resolve(webRoot, "libs/core/src");
 const editorSrc = path.join(root, "src");
 
+const utilitiesTs = path.resolve(root, "src/utils/utilities.ts");
+
 export default defineProject({
   root,
+  plugins: [
+    {
+      name: "resolve-editor-utilities",
+      enforce: "pre",
+      resolveId(id) {
+        let normalized = id.replace(/\\/g, "/");
+        // Match file:// URL form (used by some loaders)
+        if (normalized.startsWith("file://")) {
+          try {
+            normalized = decodeURIComponent(normalized.slice(7));
+          } catch {
+            // ignore
+          }
+        }
+        const target = path.resolve(root, "src/utils/utilities").replace(/\\/g, "/");
+        if (
+          normalized === target ||
+          normalized === "./utilities" ||
+          normalized.endsWith("/utils/utilities") ||
+          id === target ||
+          id.endsWith("/utils/utilities")
+        ) {
+          return utilitiesTs;
+        }
+        return null;
+      },
+    },
+  ],
   test: {
     environment: "jsdom",
     globals: true,
+    globalSetup: [path.join(root, "scripts/compile-utilities-for-test.mjs")],
     setupFiles: [path.join(root, "vitest.setup.ts")],
     include: ["src/**/*.test.{ts,tsx,js,jsx}"],
     exclude: [
@@ -41,9 +72,18 @@ export default defineProject({
   },
   resolve: {
     extensions: [".ts", ".tsx", ".js", ".jsx", ".json", ".mjs"],
+    dedupe: ["react", "react-dom"],
     alias: [
-      // Resolve paths without extension to .ts in test env (from index.js, html.js, etc.).
+      // Resolve utils/utilities (no extension) to .ts — must be before other aliases so index.js and mixins resolve
+      { find: "./utilities", replacement: path.resolve(root, "src/utils/utilities.ts") },
+      { find: "../utils/utilities", replacement: path.resolve(root, "src/utils/utilities.ts") },
+      { find: "utils/utilities", replacement: path.resolve(root, "src/utils/utilities.ts") },
       { find: path.resolve(root, "src/utils/utilities"), replacement: path.resolve(root, "src/utils/utilities.ts") },
+      // index.js imports "./utilities.js" — resolve to .ts so Vite transforms and resolves @humansignal/core
+      { find: path.resolve(root, "src/utils/utilities.js"), replacement: path.resolve(root, "src/utils/utilities.ts") },
+      // Single React instance so hooks and react-dom share one copy (avoids "useState of null")
+      { find: "react", replacement: path.join(webRoot, "node_modules/react/index.js") },
+      { find: "react-dom", replacement: path.join(webRoot, "node_modules/react-dom/index.js") },
       { find: path.join(editorSrc, "core/Constants"), replacement: path.join(editorSrc, "core/Constants.ts") },
       { find: "@humansignal/core", replacement: coreSrc },
       ...Object.entries(baseAlias).map(([find, replacement]) => ({ find, replacement })),
@@ -59,7 +99,7 @@ export default defineProject({
   },
   server: {
     deps: {
-      inline: ["nanoid", "konva", "@adobe/css-tools", "@humansignal/core", "react", "react-dom"],
+      inline: ["nanoid", "konva", "@adobe/css-tools", "@humansignal/core", "react", "react-dom", "react-window"],
     },
   },
 });

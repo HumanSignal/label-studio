@@ -1,6 +1,7 @@
 /**
  * Unit tests for HighlightMixin (mixins/HighlightMixin.js)
  */
+import { vi } from "vitest";
 import { getRoot, types } from "mobx-state-tree";
 
 const mockSpan = (overrides = {}) => {
@@ -20,20 +21,21 @@ const mockSpan = (overrides = {}) => {
   return span;
 };
 
-jest.mock("../../utils", () => ({
+vi.mock("../../utils", () => ({
   __esModule: true,
   default: {
     Colors: {
-      convertToRGBA: jest.fn((color, alpha) => (color ? `rgba(0,0,0,${alpha})` : "rgba(210,147,93,0.3)")),
-      contrastColor: jest.fn(() => "#fff"),
+      convertToRGBA: vi.fn((color, alpha) => (color ? `rgba(0,0,0,${alpha})` : "rgba(210,147,93,0.3)")),
+      contrastColor: vi.fn(() => "#fff"),
     },
     Selection: {
-      applySpanStyles: jest.fn(),
+      applySpanStyles: vi.fn(),
     },
   },
 }));
 
 import { HighlightMixin, STATE_CLASS_MODS } from "../HighlightMixin";
+import Utils from "../../utils";
 
 const Base = types
   .model("HighlightTestBase", {
@@ -293,7 +295,6 @@ describe("HighlightMixin", () => {
 
   describe("updateSpans", () => {
     it("calls applySpanStyles and setAttribute when _spans present", () => {
-      const Utils = require("../../utils").default;
       const { model } = getTestTree();
       const spans = [mockSpan(), mockSpan()];
       model.setSpans(spans);
@@ -536,7 +537,6 @@ describe("HighlightMixin", () => {
 
   describe("getColors", () => {
     it("uses parent.highlightcolor when set", () => {
-      const Utils = require("../../utils").default;
       const { model } = getTestTree();
       model.setParent({ highlightcolor: "#abc" });
       model.getColors();

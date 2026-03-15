@@ -2,7 +2,7 @@ import insertAfter from "insert-after";
 import * as Checkers from "./utilities.js";
 import sanitizeHTML from "sanitize-html";
 import Canvas from "./canvas.js";
-import { cn } from "./bem";
+import { cn } from "./bem.js";
 
 // fast way to change labels visibility for all text regions
 function toggleLabelsAndScores(show) {

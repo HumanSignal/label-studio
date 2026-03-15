@@ -101,10 +101,11 @@ const TreeStructure = ({
 
   const rowHeightReCalcAll = () => {
     heightAccumulator = {};
-    listRef.current.resetAfterIndex(0);
+    if (listRef.current) listRef.current.resetAfterIndex(0);
   };
 
   const containerHeightCalc = () => {
+    if (!listRef.current) return containerHeight;
     listRef.current.resetAfterIndex(0);
 
     const visibleHeight = listRef.current?._outerRef.firstChild?.offsetHeight;

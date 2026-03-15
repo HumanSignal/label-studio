@@ -1,4 +1,4 @@
-import { isDefined } from "./utilities";
+import { isDefined } from "./utilities.js";
 
 export const safeNumber = (v, fallback) => {
   const n = Number(v);

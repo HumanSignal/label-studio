@@ -1,5 +1,5 @@
 import { get } from "@humansignal/core/lib/utils/lodash-replacements";
-import { escapeHtml, isString } from "./utilities";
+import { escapeHtml, isString } from "./utilities.js";
 
 /**
  * Simple way to retrieve linked data in `value` param from task
