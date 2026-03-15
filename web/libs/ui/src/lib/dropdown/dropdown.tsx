@@ -82,6 +82,11 @@ const DropdownComponent = forwardRef<DropdownRef, DropdownProps>(
     const [visibility, setVisibility] = useState(visible ? "visible" : null);
     const [triggerWidth, setTriggerWidth] = useState<number | undefined>(undefined);
     const [maxHeight, setMaxHeight] = useState<number | undefined>(undefined);
+    const mountedRef = useRef(true);
+
+    useEffect(() => () => {
+      mountedRef.current = false;
+    }, []);
 
     // Check if browser supports CSS anchor positioning
     const supportsAnchorPositioning = useMemo(() => {
@@ -228,13 +233,13 @@ const DropdownComponent = forwardRef<DropdownRef, DropdownProps>(
 
           aroundTransition(menu, {
             transition: () => {
-              setVisibility(visible ? "appear" : "disappear");
+              if (mountedRef.current) setVisibility(visible ? "appear" : "disappear");
             },
             beforeTransition: () => {
-              setVisibility(visible ? "before-appear" : "before-disappear");
+              if (mountedRef.current) setVisibility(visible ? "before-appear" : "before-disappear");
             },
             afterTransition: () => {
-              setVisibility(visible ? "visible" : null);
+              if (mountedRef.current) setVisibility(visible ? "visible" : null);
               resolve();
             },
           });
