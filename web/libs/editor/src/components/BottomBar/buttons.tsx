@@ -11,7 +11,7 @@ import { Tooltip, Button } from "@humansignal/ui";
 import { IconInfoOutline } from "@humansignal/icons";
 import type { MSTStore } from "../../stores/types";
 import { FF_FIT_1304_STRICT_OVERLAP, isFF } from "../../utils/feature-flags";
-import { INCOMPLETE_ACCEPT_TOOLTIP } from "./Controls";
+import { INCOMPLETE_ACCEPT_TOOLTIP } from "./constants";
 
 type MixedInParams = {
   store: MSTStore;

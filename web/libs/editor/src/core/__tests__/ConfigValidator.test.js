@@ -1,4 +1,14 @@
 /* global it, expect */
+import { vi } from "vitest";
+
+// Avoid loading real Konva when Image tag is registered (ConfigValidator only needs tag names)
+vi.mock("../../components/ImageView/ImageView", () => ({
+  __esModule: true,
+  default: function ImageView() {
+    return null;
+  },
+}));
+
 import Tree from "../Tree";
 import "../../tags/object/Image";
 import "../../tags/object/RichText";

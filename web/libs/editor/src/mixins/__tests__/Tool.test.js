@@ -5,20 +5,22 @@
  * and actions (setSelected, afterUpdateSelected, event, shouldSkipInteractions, disable, enable).
  */
 
+import { vi } from "vitest";
 import { getEnv, types } from "mobx-state-tree";
 import ToolMixinComposed from "../Tool";
 
-const mockFfIsActive = jest.fn(() => false);
-jest.mock("@humansignal/core", () => ({
+const { mockFfIsActive } = vi.hoisted(() => ({
+  mockFfIsActive: vi.fn(() => false),
+}));
+vi.mock("@humansignal/core", () => ({
   ff: {
     isActive: (flag) => mockFfIsActive(flag),
   },
 }));
-
-jest.mock("../../utils/feature-flags", () => ({
-  FF_DEV_3391: "ff_3391",
-  isFF: jest.fn(() => false),
-}));
+vi.mock("../../utils/feature-flags", async (importOriginal) => {
+  const actual = await importOriginal();
+  return { ...actual, isFF: vi.fn(() => false) };
+});
 
 // Stub that provides toolName and dynamic so ToolMixin views work
 const StubTool = types.model("StubTool", {}).views((self) => ({
@@ -101,7 +103,7 @@ function createRoot(options = {}) {
 describe("Tool mixin", () => {
   beforeEach(() => {
     mockFfIsActive.mockReturnValue(false);
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     if (typeof window !== "undefined" && window.localStorage) {
       window.localStorage.clear();
     }
