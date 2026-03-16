@@ -16,7 +16,7 @@ import { useAPI } from "../../providers/ApiProvider";
 import { useFixedLocation, useParams } from "../../providers/RoutesProvider";
 import { cn } from "../../utils/bem";
 import { isDefined, copyText } from "../../utils/helpers";
-import "./ExportPage.scss";
+import "./ExportPage.prefix.css";
 
 // Community Edition exports run synchronously in a single HTTP request.
 // Large exports can exceed typical proxy timeouts, so we warn early and link to alternatives.

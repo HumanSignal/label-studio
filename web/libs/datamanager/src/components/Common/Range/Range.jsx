@@ -3,7 +3,7 @@ import { cn } from "../../../utils/bem";
 import { isDefined } from "../../../utils/utils";
 import { clamp } from "../../../utils/helpers";
 import { useValueTracker } from "../Form/Utils";
-import "./Range.scss";
+import "./Range.prefix.css";
 
 const arrayReverse = (array, reverse = false) => {
   return reverse ? [...array].reverse() : array;

@@ -127,6 +127,8 @@ const Model = types
       "pdf",
       "video",
       "videorectangle",
+      "videovector",
+      "videovectorlabels",
       "timelinelabels",
       "custominterface",
       ...Registry.customTags.map((t) => t.tag.toLowerCase()),

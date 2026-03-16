@@ -4,7 +4,7 @@ import { observer } from "mobx-react";
 import { ApartmentOutlined, AudioOutlined, LineChartOutlined, MessageOutlined } from "@ant-design/icons";
 
 import Registry from "../../core/Registry";
-import "./Node.scss";
+import "./Node.prefix.css";
 import {
   IconBrushTool,
   IconBrushToolSmart,
@@ -89,6 +89,13 @@ const NodeViews: Record<string, NodeViewProps> = {
     name: "Video Rect",
     icon: IconRectangleTool,
     altIcon: IconRectangleToolSmart,
+    getContent: (node) => <span style={{ color: "#5a5a5a" }}>from {node.sequence[0]?.frame} frame</span>,
+  },
+
+  VideoVectorRegionModel: {
+    name: "Video Vector",
+    icon: IconPolygonTool,
+    altIcon: IconPolygonToolSmart,
     getContent: (node) => <span style={{ color: "#5a5a5a" }}>from {node.sequence[0]?.frame} frame</span>,
   },
 

@@ -11,7 +11,7 @@ import { TableCell, TableCellContent } from "../TableCell/TableCell";
 import { TableContext, tableCN } from "../TableContext";
 import { cn } from "../../../../utils/bem";
 import { getStyle } from "../utils";
-import "./TableHead.scss";
+import "./TableHead.prefix.css";
 import { getRoot } from "mobx-state-tree";
 import { Agreement } from "../../../CellViews/Agreement/Agreement";
 import { AgreementSelected } from "../../../CellViews/AgreementSelected";
@@ -21,6 +21,7 @@ import {
   FF_AGREEMENT_FILTERED,
   FF_UTC_428_CONSENSUS_CONTROL_TAG_AGREEMENT,
 } from "@humansignal/core/lib/utils/feature-flags";
+import { isStarterCloudPlan } from "@humansignal/core";
 
 const tableHeadCN = cn("table-head");
 
@@ -82,6 +83,14 @@ const AgreementSelectedWrapper = observer(({ column, children }) => {
   const selectedView = root.viewsStore.selected;
   const agreementFilters = selectedView.agreement_selected;
   const ref = useRef(null);
+
+  if (isStarterCloudPlan()) {
+    return (
+      <Agreement.HeaderCell agreementFilters={agreementFilters} onSave={() => {}}>
+        {children}
+      </Agreement.HeaderCell>
+    );
+  }
 
   const closeHandler = () => {
     ref.current?.close();
@@ -180,6 +189,7 @@ const ColumnRenderer = observer(
     return (
       <TableCell data-id={id} mix="th">
         <Resizer
+          variant="column"
           style={{
             height: 22,
             display: "flex",
@@ -287,7 +297,7 @@ export const TableHead = observer(
           ref={ref}
           style={{
             ...style,
-            height: 42,
+            height: 40,
           }}
           onDragOver={useCallback(
             (e) => {

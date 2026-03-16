@@ -2175,6 +2175,33 @@
       "version": 3,
       "deleted": false
     },
+    "fflag_feat_bros_749_slack_integration": {
+      "key": "fflag_feat_bros_749_slack_integration",
+      "on": false,
+      "prerequisites": [],
+      "targets": [],
+      "contextTargets": [],
+      "rules": [],
+      "fallthrough": {
+        "variation": 0
+      },
+      "offVariation": 1,
+      "variations": [
+        true,
+        false
+      ],
+      "clientSideAvailability": {
+        "usingMobileKey": false,
+        "usingEnvironmentId": false
+      },
+      "clientSide": false,
+      "salt": "54bdd31cf1f54535a3d96615baee2398",
+      "trackEvents": false,
+      "trackEventsFallthrough": false,
+      "debugEventsUntilDate": null,
+      "version": 2,
+      "deleted": false
+    },
     "fflag_feat_bros_836_improving_sso_saml_scim": {
       "key": "fflag_feat_bros_836_improving_sso_saml_scim",
       "on": false,

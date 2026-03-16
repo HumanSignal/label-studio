@@ -3,7 +3,7 @@ import { CheckCircleOutlined, CheckOutlined } from "@ant-design/icons";
 
 import Hint from "../Hint/Hint";
 import { DraftPanel } from "../Annotations/Annotations";
-import styles from "./Controls.module.scss";
+import styles from "./Controls.module.css";
 import { Button, Tooltip } from "@humansignal/ui";
 import { IconInfoOutline } from "@humansignal/icons";
 import { cn } from "../../utils/bem";

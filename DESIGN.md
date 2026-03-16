@@ -97,7 +97,7 @@ For domain terminology (Project, Task, Annotation, etc.), see `terminology.mdc` 
 
 ## Design Tokens
 
-**Location**: `web/libs/ui/src/tokens/tokens.scss`
+**Location**: `web/libs/ui/src/tokens/tokens.prefix.css`
 
 **Always use semantic tokens** instead of numeric values:
 
@@ -118,27 +118,27 @@ For domain terminology (Project, Task, Annotation, etc.), see `terminology.mdc` 
 - **Accent**: Decorative colors (grape, blueberry, kale, kiwi, mango, canteloupe, persimmon, plum, fig, sand)
 
 **Color Token Structure**:
-```scss
-// Surface colors (for backgrounds of interactive elements)
+```css
+/* Surface colors (for backgrounds of interactive elements) */
 --color-primary-surface
 --color-primary-surface-hover
 --color-primary-surface-active
 
-// Content colors (for text)
+/* Content colors (for text) */
 --color-neutral-content
 --color-neutral-content-subtle
 --color-neutral-content-subtler
---color-neutral-content-subtlest  // Use for disabled text
+--color-neutral-content-subtlest  /* Use for disabled text */
 
-// Background colors (for page/container backgrounds)
+/* Background colors (for page/container backgrounds) */
 --color-neutral-background
 --color-primary-background
 
-// Border colors
+/* Border colors */
 --color-neutral-border
 --color-primary-border-subtle
 
-// Icon colors
+/* Icon colors */
 --color-primary-icon
 --color-negative-icon
 ```
@@ -225,12 +225,12 @@ See `tailwind.mdc` for complete guidelines.
 
 **Responsive**: `sm:`, `md:`, `lg:` utilities
 
-### SCSS Modules
+### CSS Modules
 
-Co-locate `.module.scss` with components.
+Co-locate `.module.css` with components.
 
 **Component Tokens Pattern**:
-```scss
+```css
 .base {
   --background-color: var(--color-primary-surface);
   --text-color: var(--color-primary-surface-content);
@@ -244,7 +244,7 @@ Co-locate `.module.scss` with components.
 }
 ```
 
-**Tailwind in SCSS**: `@apply flex items-center gap-tight;`
+**Tailwind in CSS**: `@apply flex items-center gap-tight;`
 
 **Canvas Elements**:
 
@@ -265,7 +265,7 @@ See `react.mdc` for complete React patterns.
 
 - `@humansignal/ui` components: kebab-case (`button.tsx`, `empty-state.tsx`)
 - Application components: PascalCase acceptable (`DataManager.tsx`)
-- Co-locate: `.tsx`, `.module.scss`, `.stories.tsx`, `.test.tsx`
+- Co-locate: `.tsx`, `.module.css`, `.stories.tsx`, `.test.tsx`
 - Every component must have Storybook stories
 
 ---
@@ -338,7 +338,7 @@ Before creating new components, check `@humansignal/ui` and Storybook.
 Never hard-code values. Use semantic tokens: `text-primary-content p-tight text-body-medium`
 
 Create component tokens:
-```scss
+```css
 .component {
   --component-bg: var(--color-neutral-surface);
   background: var(--component-bg);
@@ -393,7 +393,7 @@ Exceptions: draft content, preferences, immediate toggles.
 ### Key Files
 
 - Components: `web/libs/ui/src/lib/`
-- Tokens: `web/libs/ui/src/tokens/tokens.scss`
+- Tokens: `web/libs/ui/src/tokens/tokens.prefix.css`
 - Icons: `@humansignal/icons`
 - Storybook: `yarn nx storybook storybook`
 

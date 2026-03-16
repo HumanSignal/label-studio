@@ -961,6 +961,19 @@ export default types
       });
     }
 
+    /**
+     * Hydrate a stubbed history item with full result (FIT-720 lazy load).
+     * Called when the host fetches GET /api/annotation-history/<id>/ and passes the response.
+     */
+    function hydrateHistoryItem(historyId, fullItem) {
+      const as = self.annotationStore;
+      // historyId is the numeric API id (pk); store items have id=guid and pk=numeric from createItem
+      const item = as.history.find((h) => h.pk && Number(h.pk) === Number(historyId));
+      if (!item) return;
+      item.deserializeResults(fullItem?.result ?? [], { hidden: true });
+      as.selectHistory(item);
+    }
+
     const setAutoAnnotation = (value) => {
       self._autoAnnotation = value;
       localStorage.setItem("autoAnnotation", value);
@@ -1066,6 +1079,7 @@ export default types
       resetAnnotationStore,
       initializeStore,
       setHistory,
+      hydrateHistoryItem,
       attachHotkeys,
 
       skipTask,

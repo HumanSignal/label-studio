@@ -1,6 +1,6 @@
 import type { PropsWithChildren } from "react";
 import clsx from "clsx";
-import styles from "./label.module.scss";
+import styles from "./label.module.css";
 type LabelProps = PropsWithChildren<{
   text: string;
   required?: boolean;

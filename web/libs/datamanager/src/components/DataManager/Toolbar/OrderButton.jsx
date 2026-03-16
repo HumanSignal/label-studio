@@ -3,7 +3,7 @@ import { Button, ButtonGroup } from "@humansignal/ui";
 import { inject, observer } from "mobx-react";
 import { ColumnPicker } from "../../Common/ColumnPicker";
 import { Space } from "../../Common/Space/Space";
-import "./OrderButton.scss";
+import "./OrderButton.prefix.css";
 
 const orderableFilter = (col) => col.orderable ?? col.original?.orderable;
 

@@ -6,7 +6,7 @@ import { cn } from "../../utils/bem";
 import { FF_DEV_4174, FF_LEAP_1173, FF_TASK_COUNT_FIX, isFF } from "../../utils/feature-flags";
 import { guidGenerator } from "../../utils/unique";
 import { isDefined } from "../../utils/utilities";
-import "./CurrentTask.scss";
+import "./CurrentTask.prefix.css";
 import { reaction } from "mobx";
 
 // Manager roles that can force-skip unskippable tasks (OW=Owner, AD=Admin, MA=Manager)

@@ -13,7 +13,7 @@ global.ResizeObserver = class ResizeObserver {
 Element.prototype.scrollIntoView = jest.fn();
 
 // Mock the styles
-jest.mock("./select.module.scss", () => ({
+jest.mock("./select.module.css", () => ({
   selectTrigger: "selectTrigger",
   isInline: "isInline",
   isOpen: "isOpen",

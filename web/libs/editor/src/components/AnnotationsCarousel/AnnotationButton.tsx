@@ -37,7 +37,7 @@ import { isFF } from "../../utils/feature-flags";
 import { confirm } from "../../common/Modal/Modal";
 import { type ContextMenuAction, ContextMenu, type MenuActionOnClick } from "../ContextMenu";
 import { useResolveUser, isUserComplete } from "@humansignal/core/hooks/useResolveUser";
-import "./AnnotationButton.scss";
+import "./AnnotationButton.prefix.css";
 
 // Constants for name truncation
 const NAME_TRUNCATE_START = 8;

@@ -6,7 +6,7 @@ import { cn } from "../../../utils/bem";
 import { Button, Tooltip } from "@humansignal/ui";
 import { Dropdown } from "@humansignal/ui";
 import Input from "../Input/Input";
-import "./Tabs.scss";
+import "./Tabs.prefix.css";
 import { TabsMenu } from "./TabsMenu";
 
 const TabsContext = createContext();

@@ -3,7 +3,7 @@ import type { MouseEventHandler } from "react";
 import { IconCommentLinkTo, IconSend } from "@humansignal/icons";
 import { Tooltip } from "@humansignal/ui";
 import { cn } from "../../../utils/bem";
-import "./CommentFormButtons.scss";
+import "./CommentFormButtons.prefix.css";
 
 export const CommentFormButtons = ({
   region,

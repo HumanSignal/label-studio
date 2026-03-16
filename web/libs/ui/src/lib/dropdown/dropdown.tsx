@@ -18,7 +18,7 @@ import { aroundTransition } from "@humansignal/core/lib/utils/transition";
 import { DropdownContext } from "./dropdown-context";
 import { DropdownTrigger } from "./dropdown-trigger";
 
-import "./dropdown.scss";
+import "./dropdown.prefix.css";
 
 let zIndexCounter = 0;
 

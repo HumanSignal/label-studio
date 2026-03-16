@@ -66,7 +66,7 @@ module.exports = {
     "^konva": "konva/konva",
     "^keymaster": "identity-obj-proxy",
     "^react-konva-utils": "identity-obj-proxy",
-    "\\.(s[ac]ss|css|svg|png|jpe?g)$": "identity-obj-proxy",
+    "\\.(css|svg|png|jpe?g)$": "identity-obj-proxy",
     "^@adobe/css-tools$": "<rootDir>/../../__mocks__/@adobe/css-tools.js",
     "^@humansignal/ui": "<rootDir>/../ui/src/index.ts",
     ...pathsToModuleNameMapper(tsconfig.compilerOptions.paths, {

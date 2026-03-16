@@ -13,45 +13,71 @@ const config: StorybookConfig = {
 
     for (const rule of rules) {
       if (!rule || typeof rule === "string") continue;
+      if (!(rule as any).oneOf || !rule.test?.toString().includes("css")) continue;
 
-      const testString = rule.test?.toString() ?? "";
-      const isCss = testString.includes("\\.css");
-      const isScss = testString.includes("scss") || testString.includes("sass");
+      const ruleAny = rule as any;
 
-      if (isCss) {
-        rule.exclude = /tailwind\.css/;
+      for (const oneOfRule of ruleAny.oneOf) {
+        if (!oneOfRule.use || !Array.isArray(oneOfRule.use)) continue;
+
+        oneOfRule.use = oneOfRule.use.filter(
+          (use: any) => !(use.loader && /sass-loader|stylus-loader|less-loader/.test(use.loader)),
+        );
+
+        const innerTest = oneOfRule.test?.toString() ?? "";
+        const cssLoader = oneOfRule.use.find((use: any) => use.loader?.includes("/css-loader/"));
+
+        if (innerTest.includes("module") && cssLoader?.options) {
+          cssLoader.options.modules = {
+            mode: "local",
+            auto: true,
+            namedExport: false,
+            localIdentName: "[local]--[hash:base64:5]",
+          };
+        }
       }
 
-      // Apply BEM class prefixing to non-module SCSS files
-      if (isScss && rule.oneOf) {
-        const scssRules = rule.oneOf.filter((r: any) => {
-          if (!r.use) return false;
-          const testString = r.test?.toString() ?? "";
-          // Skip CSS modules and node_modules
-          if (testString.match(/module/) || r.exclude?.toString().includes("node_modules")) return false;
-          // Target rules with css-loader
-          return (
-            testString.match(/scss|sass/) &&
-            Array.isArray(r.use) &&
-            r.use.some((u: any) => u.loader && u.loader.includes("css-loader"))
-          );
-        });
+      const insertions: number[] = [];
+      ruleAny.oneOf.forEach((oneOfRule: any, idx: number) => {
+        if (!oneOfRule.test || !oneOfRule.use) return;
+        const t = oneOfRule.test.toString();
+        if (/^\/\\\.css\$\/$/.test(t) && oneOfRule.use.some((u: any) => u.loader?.includes("/css-loader/"))) {
+          insertions.push(idx);
+        }
+      });
 
-        scssRules.forEach((r: any) => {
-          const cssLoader = r.use.find((use: any) => use.loader && use.loader.includes("css-loader"));
-
-          if (cssLoader && cssLoader.options) {
-            cssLoader.options.modules = {
-              localIdentName: `${css_prefix}[local]`,
-              getLocalIdent(ctx: any, _ident: any, className: string) {
-                // Skip prefixing for Storybook preview styles (targets Storybook DOM classes)
-                if (ctx.resourcePath?.includes("preview.scss")) return className;
-                if (className.includes("ant")) return className;
+      for (let i = insertions.length - 1; i >= 0; i--) {
+        const idx = insertions[i];
+        const template = ruleAny.oneOf[idx];
+        const prefixUse = template.use.map((u: any) => {
+          if (typeof u === "string") return u;
+          if (u.loader?.includes("/css-loader/")) {
+            return {
+              ...u,
+              options: {
+                ...(u.options ?? {}),
+                modules: {
+                  localIdentName: `${css_prefix}[local]`,
+                  getLocalIdent(ctx: any, _ident: any, className: string) {
+                    if (ctx.resourcePath?.includes("preview.prefix.css")) return className;
+                    if (className.includes("ant")) return className;
+                  },
+                },
               },
             };
           }
+          return u;
+        });
+
+        ruleAny.oneOf.splice(idx, 0, {
+          test: /\.prefix\.css$/,
+          include: template.include,
+          exclude: /node_modules/,
+          use: prefixUse,
         });
       }
+
+      ruleAny.exclude = /tailwind\.css/;
     }
 
     return {

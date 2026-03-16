@@ -435,6 +435,30 @@ describe("Grid", () => {
     expect(screen.getByTestId("annotation-panel")).toBeInTheDocument();
   });
 
+  it("VirtualizedAnnotationPanel shows Annotation when stub but already hydrated (e.g. empty result)", () => {
+    const stubAnnotation = {
+      id: "s1",
+      pk: 1,
+      type: "annotation",
+      userGenerate: false,
+      versions: { result: [] },
+      regions: [],
+    };
+    const hydratedIdsRef = { current: new Set(["s1"]) };
+    render(
+      <VirtualizedAnnotationPanel
+        annotation={stubAnnotation}
+        root={{}}
+        style={{}}
+        onSelect={jest.fn()}
+        isHydrating={false}
+        hydratedIdsRef={hydratedIdsRef}
+      />,
+    );
+    expect(screen.queryByText("Waiting to load...")).not.toBeInTheDocument();
+    expect(screen.getByTestId("annotation-panel")).toBeInTheDocument();
+  });
+
   it("VirtualizedGrid mount skips annotations that already have data (hasDataInMST)", () => {
     mockGetCachedAnnotation.mockClear();
     mockGetCachedAnnotation.mockReturnValue(undefined);

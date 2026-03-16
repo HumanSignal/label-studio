@@ -25,7 +25,7 @@ import { NodeIcon } from "../../Node/Node";
 import { LockButton } from "../Components/LockButton";
 import { RegionContextMenu } from "../Components/RegionContextMenu";
 import { RegionControlButton } from "../Components/RegionControlButton";
-import "./TreeView.scss";
+import "./TreeView.prefix.css";
 import type { EventDataNode, Key } from "rc-tree/es/interface";
 import ResizeObserver from "../../../utils/resize-observer";
 import { RegionLabel } from "./RegionLabel";

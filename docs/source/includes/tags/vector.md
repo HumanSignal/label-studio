@@ -14,7 +14,6 @@
 | [smartOnly] | <code>boolean</code> |  | Only show smart tool for interactive pre-annotations |
 | [snap] | <code>pixel</code> \| <code>none</code> | <code>none</code> | Snap vector to image pixels |
 | [closable] | <code>boolean</code> | <code>false</code> | Allow closed shapes |
-| [curves] | <code>boolean</code> | <code>false</code> | Allow Bezier curves |
 | [skeleton] | <code>boolean</code> | <code>false</code> | Enables skeleton mode to allow branch paths |
 | [minPoints] | <code>number</code> \| <code>none</code> | <code>none</code> | Minimum allowed number of points |
 | [maxPoints] | <code>number</code> \| <code>none</code> | <code>none</code> | Maximum allowed number of points |

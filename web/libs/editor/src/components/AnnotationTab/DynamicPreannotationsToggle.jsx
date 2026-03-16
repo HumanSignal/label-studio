@@ -4,7 +4,7 @@ import { Space } from "../../common/Space/Space";
 import { Toggle } from "@humansignal/ui";
 import ToolsManager from "../../tools/Manager";
 import { cn } from "../../utils/bem";
-import "./DynamicPreannotationsToggle.scss";
+import "./DynamicPreannotationsToggle.prefix.css";
 
 export const DynamicPreannotationsToggle = inject("store")(
   observer(({ store }) => {

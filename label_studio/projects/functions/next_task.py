@@ -28,6 +28,16 @@ should_attempt_ground_truth_first = (
 )
 
 
+# GT evaluation window: LSE-only feature, LSO default always returns False
+def _lso_is_user_in_gt_evaluation_window(user: User, project: Project) -> bool:
+    return False
+
+
+is_user_in_gt_evaluation_window = (
+    load_func(settings.IS_USER_IN_GT_EVALUATION_WINDOW) or _lso_is_user_in_gt_evaluation_window
+)
+
+
 def get_next_task_logging_level(user: User) -> int:
     level = logging.DEBUG
     if flag_set('fflag_fix_back_dev_4185_next_task_additional_logging_long', user=user):
@@ -157,39 +167,6 @@ def _try_uncertainty_sampling(
     return next_task
 
 
-def _should_include_gt_tasks(user: User, project: Project) -> bool:
-    """
-    Check if GT tasks should be included in the task pool for this user.
-
-    Returns True if user hasn't reached their GT limit (onboarding + continuous tasks).
-    """
-    if not project.annotator_evaluation_enabled:
-        return False
-
-    lse_project = getattr(project, 'lse_project', None)
-    if not lse_project:
-        return False
-
-    onboarding_tasks = getattr(lse_project, 'annotator_evaluation_onboarding_tasks', 0)
-    continuous_tasks = getattr(lse_project, 'annotator_evaluation_continuous_tasks', 0)
-    total_gt_limit = onboarding_tasks + continuous_tasks
-
-    if total_gt_limit == 0:
-        return False
-
-    # Count GT tasks user has completed
-    gt_task_ids = Task.objects.filter(project=project, annotations__ground_truth=True).values_list('pk', flat=True)
-
-    user_gt_completed = (
-        Annotation.objects.filter(project=project, completed_by=user, was_cancelled=False, task_id__in=gt_task_ids)
-        .values('task_id')
-        .distinct()
-        .count()
-    )
-
-    return user_gt_completed < total_gt_limit
-
-
 def _annotate_has_ground_truths(tasks: QuerySet[Task]) -> QuerySet[Task]:
     ground_truth = Annotation.objects.filter(task=OuterRef('pk'), ground_truth=True)
     return tasks.annotate(has_ground_truths=Exists(ground_truth))
@@ -213,7 +190,7 @@ def get_not_solved_tasks_qs(
         not_solved_tasks = not_solved_tasks.exclude(pk__in=user_postponed_tasks)
 
     prioritized_on_agreement = False
-    include_gt = _should_include_gt_tasks(user, project)
+    include_gt = is_user_in_gt_evaluation_window(user, project)
 
     # if annotator is assigned for tasks, they must solve it regardless of is_labeled=True
     if not assigned_flag:

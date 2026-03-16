@@ -1,7 +1,7 @@
 import color from "chroma-js";
 import { cn } from "../../../utils/bem";
 import { colors } from "../../../utils/colors";
-import "./Tag.scss";
+import "./Tag.prefix.css";
 
 const prepareColor = (colorString) => {
   const baseColor = color(colorString);

@@ -24,7 +24,7 @@ import {
   UnskipButton,
 } from "./buttons";
 
-import "./Controls.scss";
+import "./Controls.prefix.css";
 
 // these buttons can be reused inside custom buttons or can be replaces with custom buttons
 type SupportedInternalButtons = "accept" | "reject";

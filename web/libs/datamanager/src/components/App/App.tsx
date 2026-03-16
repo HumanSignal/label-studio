@@ -6,7 +6,7 @@ import { cn } from "../../utils/bem";
 import { Spinner } from "../Common/Spinner";
 import { DataManager } from "../DataManager/DataManager";
 import { Labeling } from "../Label/Label";
-import "./App.scss";
+import "./App.prefix.css";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { queryClient } from "@humansignal/core/lib/utils/query-client";
 import { AuthProvider } from "@humansignal/core/providers/AuthProvider";

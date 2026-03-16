@@ -16,9 +16,3 @@ repos:
         language: system
         pass_filenames: false
         files: ^web/.*
-      - id: stylelint
-        name: stylelint
-        entry: bash -c 'cd web && npx stylelint **/*.scss --fix'
-        language: node
-        types: [ scss ]
-        files: ^.*\.scss$

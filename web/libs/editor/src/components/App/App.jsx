@@ -51,7 +51,7 @@ import { ViewAll } from "./ViewAll";
 /**
  * Styles
  */
-import "./App.scss";
+import "./App.prefix.css";
 
 /**
  * Check if annotation has any tag that should be rendered in sidebar

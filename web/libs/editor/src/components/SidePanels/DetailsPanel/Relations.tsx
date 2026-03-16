@@ -13,7 +13,7 @@ import { type FC, useCallback, useMemo, useState } from "react";
 import { cn } from "../../../utils/bem";
 import { wrapArray } from "../../../utils/utilities";
 import { RegionItem } from "./RegionItem";
-import "./Relations.scss";
+import "./Relations.prefix.css";
 
 const RealtionsComponent: FC<any> = ({ relationStore }) => {
   const relations = relationStore.orderedRelations;

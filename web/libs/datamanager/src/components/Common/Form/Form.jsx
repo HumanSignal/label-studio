@@ -6,7 +6,7 @@ import { Button } from "@humansignal/ui";
 import { Oneof } from "../Oneof/Oneof";
 import { Space } from "../Space/Space";
 import { Counter, Input, Select, Toggle } from "./Elements";
-import "./Form.scss";
+import "./Form.prefix.css";
 import {
   FormContext,
   FormResponseContext,

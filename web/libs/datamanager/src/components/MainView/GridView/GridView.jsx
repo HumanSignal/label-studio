@@ -11,7 +11,7 @@ import * as DataGroups from "../../DataGroups";
 import { FF_LOPS_E_3, isFF } from "../../../utils/feature-flags";
 import { SkeletonLoader } from "../../Common/SkeletonLoader";
 import { GridViewContext, GridViewProvider } from "./GridPreview";
-import "./GridView.scss";
+import "./GridView.prefix.css";
 import { groupBy } from "../../../utils/utils";
 import { IMAGE_SIZE_COEFFICIENT } from "../../DataGroups/ImageDataGroup";
 

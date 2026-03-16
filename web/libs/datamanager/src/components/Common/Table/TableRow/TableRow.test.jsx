@@ -59,7 +59,7 @@ jest.mock("../../../../utils/bem", () => ({
 }));
 
 // Mock styles
-jest.mock("./TableRow.scss", () => ({}));
+jest.mock("./TableRow.prefix.css", () => ({}));
 
 describe("TableRow", () => {
   const mockData = {

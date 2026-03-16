@@ -7,7 +7,7 @@ import { LabelingSettings } from "./LabelingSettings";
 import { MachineLearningSettings } from "./MachineLearningSettings/MachineLearningSettings";
 import { PredictionsSettings } from "./PredictionsSettings/PredictionsSettings";
 import { StorageSettings } from "./StorageSettings/StorageSettings";
-import "./settings.scss";
+import "./settings.prefix.css";
 
 export const MenuLayout = ({ children, ...routeProps }) => {
   return (

@@ -7,7 +7,7 @@ import {
 } from "../../shad/components/ui/popover";
 import { twMerge } from "tailwind-merge";
 import clsx from "clsx";
-import styles from "./popover.module.scss";
+import styles from "./popover.module.css";
 
 export interface PopoverProps extends React.ComponentProps<typeof ShadPopover> {
   trigger?: React.ReactNode;

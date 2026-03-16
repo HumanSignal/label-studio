@@ -743,8 +743,8 @@ class Project(ProjectMixin, FsmHistoryStateModel):
             )
             parsed_config = parse_config(config_string)
             tag_types = [tag_info['type'] for _, tag_info in parsed_config.items()]
-            # DEV-1990 Workaround for Video labels as there are no labels in VideoRectangle tag
-            if 'VideoRectangle' in tag_types:
+            # DEV-1990 Workaround for Video labels as there are no labels in VideoRectangle/VideoVectorLabels tag
+            if 'VideoRectangle' in tag_types or 'VideoVectorLabels' in tag_types:
                 for key in labels_from_config:
                     labels_from_config_by_tag |= set(labels_from_config[key])
             if 'Taxonomy' in tag_types:
@@ -1508,7 +1508,7 @@ class ProjectSummary(models.Model):
     def _get_labels(self, result):
         result_type = result.get('type')
         # DEV-1990 Workaround for Video labels as there are no labels in VideoRectangle tag
-        if result_type in ['videorectangle']:
+        if result_type in ['videorectangle', 'videovector']:
             result_type = 'labels'
         result_value = result['value'].get(result_type)
         if not result_value or not isinstance(result_value, list) or result_type == 'text':

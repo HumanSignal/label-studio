@@ -1,6 +1,6 @@
 import { cn } from "../../utils/bem";
 import { Menu } from "../Menu/Menu";
-import "./SidebarMenu.scss";
+import "./SidebarMenu.prefix.css";
 
 export const SidebarMenu = ({ children, menu, path, menuItems }) => {
   const rootClass = cn("sidebar-menu");

@@ -6,7 +6,7 @@ import "@cypress/code-coverage/support";
 // Output spec steps
 require("cypress-terminal-report/src/installLogsCollector")({
   filterLog: ([type, message]: [string, string]) => {
-    // Suppress noisy webpack-dev-server / Sass deprecation warnings
+    // Suppress noisy webpack-dev-server warnings
     if (type === "cons:warn" && typeof message === "string" && message.includes("[webpack-dev-server]")) {
       return false;
     }

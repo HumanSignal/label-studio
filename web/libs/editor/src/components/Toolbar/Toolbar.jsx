@@ -7,9 +7,9 @@ import { isDefined } from "../../utils/utilities";
 import { Tool } from "./Tool";
 import { ToolbarProvider } from "./ToolbarContext";
 
-import "./FlyoutMenu.scss";
-import "./Tool.scss";
-import "./Toolbar.scss";
+import "./FlyoutMenu.prefix.css";
+import "./Tool.prefix.css";
+import "./Toolbar.prefix.css";
 
 export const Toolbar = inject("store")(
   observer(({ store, tools, expanded }) => {

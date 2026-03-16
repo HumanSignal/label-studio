@@ -1,5 +1,5 @@
 import "@humansignal/ui/tailwind.css";
-import "./preview.scss";
+import "./preview.prefix.css";
 import "../addons/theme-toggle/preview";
 import type { Preview } from "@storybook/react";
 

@@ -9,7 +9,7 @@ import {
   UndoOutlined,
 } from "@ant-design/icons";
 
-import styles from "./Panel.module.scss";
+import styles from "./Panel.module.css";
 import Hint from "../Hint/Hint";
 
 /**

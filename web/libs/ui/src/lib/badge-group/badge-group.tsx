@@ -1,7 +1,7 @@
 import { forwardRef, useRef, useEffect, useState } from "react";
 import { Badge, type BadgeProps } from "../badge/badge";
 import { useBadgeOverflow } from "./useBadgeOverflow";
-import styles from "./badge-group.module.scss";
+import styles from "./badge-group.module.css";
 import clsx from "clsx";
 
 export interface BadgeGroupItem {

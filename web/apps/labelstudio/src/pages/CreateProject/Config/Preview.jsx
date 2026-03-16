@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Spinner } from "../../../components";
 import { cn } from "../../../utils/bem";
-import "./Config.scss";
+import "./Config.prefix.css";
 import { EMPTY_CONFIG } from "./Template";
 import { API_CONFIG } from "../../../config/ApiConfig";
 import { useAPI } from "../../../providers/ApiProvider";

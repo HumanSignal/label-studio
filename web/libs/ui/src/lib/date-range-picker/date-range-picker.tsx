@@ -26,7 +26,7 @@ import { Space } from "../space/space";
 import { Sidebar } from "./sidebar";
 import { DateTimeInput } from "./date-time-input";
 import { Typography } from "../typography/typography";
-import styles from "./date-range-picker.module.scss";
+import styles from "./date-range-picker.module.css";
 
 const today = new Date();
 const month = today.getMonth();

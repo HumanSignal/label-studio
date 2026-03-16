@@ -2,7 +2,7 @@ import React from "react";
 import { Spinner } from "../../../components";
 import { useAPI } from "../../../providers/ApiProvider";
 import { cn } from "../../../utils/bem";
-import "./Config.scss";
+import "./Config.prefix.css";
 import { IconInfo } from "@humansignal/icons";
 import { Button, EnterpriseBadge } from "@humansignal/ui";
 

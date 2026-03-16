@@ -2,7 +2,7 @@ import { createElement } from "react";
 import { IconInfoOutline } from "@humansignal/icons";
 import { Tooltip } from "@humansignal/ui";
 import { cn } from "../../../../utils/bem";
-import "./Label.scss";
+import "./Label.prefix.css";
 import { clsx } from "clsx";
 /** @deprecated - needs to be replaced with @humansignal/ui Label - visualizes differently currently */
 const Label = ({

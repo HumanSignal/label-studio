@@ -7,7 +7,7 @@ import { AutoAcceptToggle } from "../AnnotationTab/AutoAcceptToggle";
 import { DynamicPreannotationsToggle } from "../AnnotationTab/DynamicPreannotationsToggle";
 import { GroundTruth } from "../CurrentEntity/GroundTruth";
 import { EditingHistory } from "./HistoryActions";
-import "./Actions.scss";
+import "./Actions.prefix.css";
 
 export const Actions = ({ store }) => {
   const annotationStore = store.annotationStore;

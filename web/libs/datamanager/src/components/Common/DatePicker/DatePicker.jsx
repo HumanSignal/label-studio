@@ -6,8 +6,8 @@ import { cn } from "../../../utils/bem";
 import { isDefined } from "../../../utils/utils";
 import { Dropdown } from "@humansignal/ui";
 import Input from "../Input/Input";
-import "./DatePicker.global.scss";
-import "./DatePicker.scss";
+import "./DatePicker.global.prefix.css";
+import "./DatePicker.prefix.css";
 
 export const DatePicker = ({
   size,

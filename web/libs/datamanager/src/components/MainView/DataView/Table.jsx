@@ -1,17 +1,18 @@
-import { IconQuestionOutline } from "@humansignal/icons";
-import { Tooltip, Badge, EnterpriseBadge } from "@humansignal/ui";
+import { IconQuestionOutline, IconSettings } from "@humansignal/icons";
+import { Tooltip, Badge } from "@humansignal/ui";
 import { inject } from "mobx-react";
 import { getRoot } from "mobx-state-tree";
 import { useCallback, useMemo } from "react";
 import { useShortcut } from "../../../sdk/hotkeys";
 import { cn } from "../../../utils/bem";
 import { FF_DEV_2536, isFF } from "../../../utils/feature-flags";
+import { isActive, FF_UTC_428_CONSENSUS_CONTROL_TAG_AGREEMENT } from "@humansignal/core/lib/utils/feature-flags";
 import * as CellViews from "../../CellViews";
 import { Icon } from "../../Common/Icon/Icon";
 import { Spinner } from "../../Common/Spinner";
 import { Table } from "../../Common/Table/Table";
 import { GridView } from "../GridView/GridView";
-import "./Table.scss";
+import "./Table.prefix.css";
 import { Button } from "@humansignal/ui";
 import { useEffect, useState } from "react";
 import { EmptyState } from "./empty-state";
@@ -145,8 +146,16 @@ export const DataView = injector(
         typeof original?.alias === "string" &&
         (original.alias === "agreement" || original.alias.startsWith("dimension_agreement_"));
 
-      // Agreement columns get an IconSettings button via Agreement.HeaderCell — skip the help icon
-      if (help && decoration?.help !== false && !isAgreementColumn) {
+      // A column is a clickable button when: agreement with flag ON, or agreement_selected (always a button)
+      const isInteractiveAgreementColumn =
+        (isAgreementColumn && isActive(FF_UTC_428_CONSENSUS_CONTROL_TAG_AGREEMENT)) ||
+        (typeof original?.alias === "string" && original.alias === "agreement_selected");
+
+      if (isInteractiveAgreementColumn) {
+        children.push(<IconSettings width={16} height={16} className="ml-auto" />);
+      }
+
+      if (help && decoration?.help !== false && !isInteractiveAgreementColumn) {
         children.push(
           <Tooltip key="help-tooltip" title={help}>
             <Icon icon={IconQuestionOutline} style={{ opacity: 0.5 }} />

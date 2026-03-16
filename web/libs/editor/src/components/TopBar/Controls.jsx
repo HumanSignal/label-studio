@@ -8,7 +8,7 @@ import { Button, Tooltip } from "@humansignal/ui";
 import { cn } from "../../utils/bem";
 import { isDefined } from "../../utils/utilities";
 
-import "./Controls.scss";
+import "./Controls.prefix.css";
 import { useCallback, useMemo, useState } from "react";
 
 const TOOLTIP_DELAY = 0.8;

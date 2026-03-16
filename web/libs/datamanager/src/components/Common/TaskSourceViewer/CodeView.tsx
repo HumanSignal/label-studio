@@ -3,7 +3,7 @@ import { FixedSizeList as List } from "react-window";
 import AutoSizer from "react-virtualized-auto-sizer";
 import { Button, Tooltip } from "@humansignal/ui";
 import { IconCopyOutline } from "@humansignal/icons";
-import styles from "./CodeView.module.scss";
+import styles from "./CodeView.module.css";
 
 interface CodeViewProps {
   /** JSON data to display */

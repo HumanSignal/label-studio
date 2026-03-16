@@ -7,7 +7,7 @@ import { clamp, fixMobxObserve, isDefined } from "../../utils/utilities";
 import { TimelineContextProvider } from "./Context";
 import { Controls } from "./Controls";
 import { Seeker } from "./Seeker";
-import "./Timeline.scss";
+import "./Timeline.prefix.css";
 import type { TimelineContextValue, TimelineControlsStepHandler, TimelineProps } from "./Types";
 import { default as Views } from "./Views";
 

@@ -7,7 +7,7 @@ import { cn } from "../../utils/bem";
 import { clamp, sortAnnotations } from "../../utils/utilities";
 import { isActive, FF_FIT_720_LAZY_LOAD_ANNOTATIONS } from "@humansignal/core/lib/utils/feature-flags";
 import { AnnotationButton } from "./AnnotationButton";
-import "./AnnotationsCarousel.scss";
+import "./AnnotationsCarousel.prefix.css";
 
 const ITEM_WIDTH = 200; // Approximate width of each annotation button (min-width: 186px + gap)
 const ITEM_GAP = 4; // Gap between items (--spacing-tighter)

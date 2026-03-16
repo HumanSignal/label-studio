@@ -19,7 +19,7 @@ import {
   type Selected,
   Side,
 } from "./date-utils";
-import styles from "./date-time-input.module.scss";
+import styles from "./date-time-input.module.css";
 import clsx from "clsx";
 
 type SimpleInputProps = {
