@@ -76,6 +76,8 @@ Categorical comparisons inherently produce binary scores (`0` or `1`). This mean
 
 - [**Pairwise Average**](#Pairwise): Average all the 0s and 1s across annotator pairs. 
 - [**Consensus**](#Consensus): Because the scores are already binary, no threshold conversion is needed. The consensus method naturally reflects majority agreement. 
+
+See [Categorical examples](#Categorical-examples) for an example of how agreement is calculated for categorical control tags.
     
 ### Non-categorical control tags
 
@@ -91,6 +93,8 @@ Because two annotators rarely draw identical regions, the system uses continuous
 
 - **IoU (Intersection over Union)** for bounding boxes and polygons. Returns a float between `0.0` (no overlap) and `1.0` (perfect overlap)
 - **Span Overlap** for text spans -- measures how much two highlighted text regions overlap
+
+See [Non-categorical examples](#Non-categorical-examples) for an example of how agreement is calculated for non-categorical control tags.
 
 
 ##### Summary of differences
@@ -199,6 +203,8 @@ Consensus may be more useful for teams more focused on data quality than annotat
 
 #### Categorical examples 
 
+[Categorical control tags](#Categorical-control-tags) are control tags that have a fixed set of choices. For example, a control tag that has the choices "Cat", "Dog", "Bird".
+
 <div class="code-tabs">
   <div data-name="Pairwise">
 
@@ -252,6 +258,8 @@ So 2 out of 3 annotators chose the most common answer (`2/3 = 66.67`).
 </div>
 
 #### Non-categorical examples
+
+[Non-categorical control tags](#Non-categorical-control-tags) are control tags have continuous values that are not as simple to quantify as "match" or "no match". For example, **RectangleLabels**, **PolygonLabels**, **Labels**, **TextArea**.
 
 
 <div class="code-tabs">
