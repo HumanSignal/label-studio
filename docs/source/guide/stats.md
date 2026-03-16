@@ -197,12 +197,12 @@ Consensus may be more useful for teams more focused on data quality than annotat
 
 ### Examples
 
-#### Categorical examples
-
-Say you have 3 annotators select between 3 different choices: "A", "B", "C". 
+#### Categorical examples 
 
 <div class="code-tabs">
   <div data-name="Pairwise">
+
+Say you have 3 annotators select between 3 different choices: "A", "B", "C".
 
 If all three annotators select a different choice, Pairwise is `0`:
 
@@ -223,13 +223,15 @@ If Annotator 2 were to change their choice to agree with Annotator 1, the agreem
 
 <div data-name="Consensus">
 
+Say you have 3 annotators select between 3 different choices: "A", "B", "C".
+
 If all three annotators select a different choice, Consensus is `33.33%`:
 
 * Annotator 1 chose "A"
 * Annotator 2 chose "B"
 * Annotator 3 chose "C"
 
-In Consensus, we are looking at the most common answer. In this case, `A`, `B`, and `C` were each chosen once. 
+In Consensus, we are looking at the most common answer. In this case, `A`, `B`, and `C` were each chosen once, and are therefore equally common. 
 
 So 1 out of 3 annotators chose the most common answer (`1/3 = 33.33`). 
 
@@ -255,7 +257,7 @@ So 2 out of 3 annotators chose the most common answer (`2/3 = 66.67`).
 <div class="code-tabs">
   <div data-name="Pairwise">
 
-Say you have 3 annotators each draw a bounding box around a cat in an image using **RectangleLabels**.
+Say you have 3 annotators drawing boxes using **RectangleLabels**. You are using the **Intersection over Union (IoU)** metric to calculate agreement. 
 
 If all three annotators draw their boxes in completely different areas of the image with no overlap, Pairwise is `0`:
 
@@ -265,49 +267,56 @@ If all three annotators draw their boxes in completely different areas of the im
 
 `(0 + 0 + 0) / 3 = 0`
 
-Now say Annotator 2 adjusts their box so it mostly overlaps with Annotator 1's box (IoU = `0.82`), but Annotator 3's box remains in a different area. The agreement becomes `27.33%`:
+Now the annotators adjust their boxes so that there is some overlap between them. In this case, the agreement is `72%`:
 
-* Annotator 1 is compared with Annotator 2 (strong overlap, IoU = `0.82`)
-* Annotator 1 is compared with Annotator 3 (no overlap, IoU = `0`)
-* Annotator 2 is compared with Annotator 3 (no overlap, IoU = `0`)
+- Annotators 1 vs Annotator 2 (IoU = `.74`)
+- Annotators 1 vs Annotator 3 (IoU = `.90`)
+- Annotators 2 vs Annotator 3 (IoU = `.52`)
 
-`(0.82 + 0 + 0) / 3 = 0.2733`
+`(.74 + .90 + .52) / 3 = 72%`
 
 </div>
 
 <div data-name="Consensus">
 
-Say you have 3 annotators each draw a bounding box around a cat in an image using **RectangleLabels**.
+Say you have 3 annotators drawing boxes using **RectangleLabels**. 
 
-Because consensus requires binary scores, you must first set an **IoU threshold**. Let's say you set it to `75%`: any pair with IoU >= 0.75 counts as a match (`1`), and anything below is not a match (`0`).
+However, Consensus requires binary (`0` or `1`) scores. So this time, you are using the **Intersection over Union (IoU) (Threshold)** metric to calculate agreement. 
 
-Take these raw IoU scores:
+This is the same as the **Intersection over Union** metric used in the Pairwise example, but with a threshold applied. A threshold is necessary to determine what is considered a match (`1`) and what is not a match (`0`). 
 
-* Annotator 1 vs Annotator 2: IoU = `0.82`
-* Annotator 1 vs Annotator 3: IoU = `0.65`
-* Annotator 2 vs Annotator 3: IoU = `0.58`
+Let's say you set the threshold to `65%`: any pair with IoU >= 0.75 counts as a match (`1`), and anything below is not a match (`0`).
 
-**Step 1 -- Binarize using the threshold (75%):**
+You have the following raw IoU scores:
 
-* Annotator 1 vs Annotator 2: `0.82` >= 0.75 → match = `1`
-* Annotator 1 vs Annotator 3: `0.65` < 0.75 → no match = `0`
-* Annotator 2 vs Annotator 3: `0.58` < 0.75 → no match = `0`
+- Annotators 1 vs Annotator 2 (IoU = `.74`)
+- Annotators 1 vs Annotator 3 (IoU = `.90`)
+- Annotators 2 vs Annotator 3 (IoU = `.52`)
 
-**Step 2 -- Calculate consensus:**
+**Step 1 – Binarize using the threshold (65%):**
 
-Annotators 1 and 2 agree with each other, but Annotator 3 doesn't agree with either. The consensus score reflects that 2 out of 3 annotators converge: **`66%`**.
+- Annotators 1 vs Annotator 2: `.74` >= `.65` → match = 1
+- Annotators 1 vs Annotator 3: `.90` >= `.65` → match = 1
+- Annotators 2 vs Annotator 3: `.52` <= `.65` → no match = 0
+
+**Step 2 – Calculate consensus:**
+
+You have two matches out of three pairs. So the consensus score is `66.67%` 
+
+(`2/3 = 66.67`).
+
 
 **How the threshold changes the result:**
 
 The threshold you choose directly affects the consensus score. Using the same raw IoU values:
 
-| Threshold | Pair 1-2 (`0.82`) | Pair 1-3 (`0.65`) | Pair 2-3 (`0.58`) | Consensus |
+| Threshold | Pair 1-2 (`.74`) | Pair 1-3 (`.90`) | Pair 2-3 (`.52`) | Consensus |
 |---|---|---|---|---|
 | **50%** | match | match | match | **100%** (all agree) |
-| **75%** | match | no match | no match | **66%** (2 of 3 agree) |
-| **90%** | no match | no match | no match | **0%** (none agree) |
+| **75%** | no match | match | no match | **33%** (1 of 3 agree) |
+| **95%** | no match | no match | no match | **0%** (none agree) |
 
-At a lenient 50% threshold, all three boxes overlap "enough" and consensus is perfect. At a strict 90% threshold, no pair is close enough and consensus drops to zero. 
+At a lenient 50% threshold, all three boxes overlap "enough" and consensus is perfect. At a strict 95% threshold, no pair is close enough and consensus drops to zero. 
 
 This is why choosing the right threshold is critical for non-categorical consensus -- it determines where you draw the line between "these annotations agree" and "these annotations disagree."
 
