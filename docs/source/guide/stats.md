@@ -147,6 +147,50 @@ This means Pairwise preserves the full granularity of non-categorical comparison
 
 <div style="text-align:center"><img alt="Diagram showing annotations are collected for each task, agreement scores are computed for each pair, the resulting scores are averaged for a task." src="/images/stats-no_grouping.png"/></div>
 
+### Consensus vs. Pairwise at a glance
+
+| | **Pairwise** | **Consensus** |
+|---|---|---|
+| **How it works** | Compares every unique pair of annotators, scores each pair, and averages all pair scores | Measures how much the full group converges toward a common answer using binary match/no match |
+| **Score type used** | Uses raw scores directly (binary for categorical, continuous for non-categorical) | Always requires binary scores (match or no match) |
+| **Threshold needed?** | No -- works with raw scores as-is | Only for non-categorical tags; categorical tags are already binary |
+| **Partial credit** | Yes -- a bounding box overlap of 0.6 contributes 0.6 to the average | No -- overlap is either above the threshold (match) or below it (no match) |
+| **Sensitivity to outliers** | High -- one disagreeing annotator creates multiple low-scoring pairs, pulling the average down | Low -- one disagreeing annotator is outvoted by the majority |
+| **3 annotators, 2 agree (categorical)** | 33% (only 1 of 3 pairs match) | 66% (majority agreement recognized) |
+| **3 annotators, all agree** | 100% | 100% |
+| **3 annotators, none agree** | 0% | 0% |
+| **Best suited for** | Projects with 2 annotators per task, or when you want granular continuous scores | Projects with 3+ annotators per task, or when majority agreement matters most |
+
+#### When to select Pairwise vs. Consensus
+
+In extremely simple terms, Pairwise is best if you're more focused on your annotators. Consensus is best if you're more focused on the final labeled data.
+
+##### Pairwise 
+
+**Pairwise** tells you how much annotators agree with each other overall. 
+
+* Best for when you care about assessing your annotators, want to understand inconsistencies/fragmentation in the annotation pool, and find ambiguity in your tasks and/or instructions.
+
+* Can be more sensitive to outliers which could be desired (a single disagreeing annotator can significantly lower the score)
+
+* Pairwise does not require you to define thresholds for non-categorical control tags (e.g. `RectangleLabels` and `TextArea`), and so might be simpler to set up in those cases.  
+
+Pairwise might be particularly useful for teams where annotators are direct reports or contractors and you are responsible for your annotator's performance. 
+
+##### Consensus
+
+**Consensus** tells you how strongly the task converged on one answer.
+
+* Better reflects majority agreement and is more intuitive for most users
+
+* More robust to outliers (a single disagreeing annotator has less impact)
+
+* The Consensus measurement is a good proxy for label stability and task convergence.
+
+* Requires thresholds for non-categorical control tags (e.g. bounding boxes and text spans). Thresholds are how you define what "close enough" means. 
+
+Consensus may be more useful for teams more focused on data quality than annotator performance. 
+
 ### Examples
 
 #### Categorical examples
@@ -254,35 +298,6 @@ At a lenient 50% threshold, all three boxes overlap "enough" and consensus is pe
   </div>
 </div>
 
-### When to select Pairwise vs. Consensus
-
-In extremely simple terms, Pairwise is best if you're more focused on your annotators. Consensus is best if you're more focused on the final labeled data.
-
-##### Pairwise 
-
-**Pairwise** tells you how much annotators agree with each other overall. 
-
-* Best for when you care about assessing your annotators, want to understand inconsistencies/fragmentation in the annotation pool, and find ambiguity in your tasks and/or instructions.
-
-* Can be more sensitive to outliers which could be desired (a single disagreeing annotator can significantly lower the score)
-
-* Pairwise does not require you to define thresholds for non-categorical control tags (e.g. `RectangleLabels` and `TextArea`), and so might be simpler to set up in those cases.  
-
-Pairwise might be particularly useful for teams where annotators are direct reports or contractors and you are responsible for your annotator's performance. 
-
-##### Consensus
-
-**Consensus** tells you how strongly the task converged on one answer.
-
-* Better reflects majority agreement and is more intuitive for most users
-
-* More robust to outliers (a single disagreeing annotator has less impact)
-
-* The Consensus measurement is a good proxy for label stability and task convergence.
-
-* Requires thresholds for non-categorical control tags (e.g. bounding boxes and text spans). Thresholds are how you define what "close enough" means. 
-
-Consensus may be more useful for teams more focused on data quality than annotator performance. 
 
 ## Other agreement settings
 
