@@ -81,7 +81,10 @@ export const VirtualizedAnnotationPanel = observer(
 
     return (
       <div style={{ ...style, paddingRight: PANEL_GAP }}>
-        <div id={`c-${annotation.id}`} style={{ position: "relative", height: "100%" }}>
+        <div
+          id={`c-${annotation.id}`}
+          className="flex h-full flex-col relative"
+        >
           <EntityTab
             entity={annotation}
             onClick={() => onSelect(annotation)}
@@ -91,21 +94,10 @@ export const VirtualizedAnnotationPanel = observer(
           />
           {!wasHydrated && (isStub || isHydrating) ? (
             <div
-              style={{
-                position: "absolute",
-                top: 44,
-                left: 0,
-                width: "100%",
-                height: "calc(100% - 44px)",
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                justifyContent: "center",
-                background: "var(--color-neutral-surface)",
-              }}
+              className="min-h-0 flex-1 flex flex-col items-center justify-center bg-[var(--color-neutral-surface)]"
             >
               <Spin size="large" />
-              <span style={{ marginTop: 12, color: "#999" }}>
+              <span className="mt-300 text-neutral-content-subtler">
                 {isHydrating ? "Loading annotation..." : "Waiting to load..."}
               </span>
             </div>
@@ -405,7 +397,7 @@ const VirtualizedGrid = observer(({ store, annotations, root }) => {
 
   return (
     <div className={styles.containerVirtualized}>
-      <div className={styles.grid} style={{ overflow: "hidden", height: "100%" }}>
+      <div className={`${styles.grid} overflow-hidden h-full`}>
         <AutoSizer>
           {({ width, height }) => {
             if (width !== containerWidth) {
