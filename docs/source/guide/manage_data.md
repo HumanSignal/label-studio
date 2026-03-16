@@ -29,7 +29,7 @@ For information on setting up a project, see [Create and configure projects](set
 
 </div>
 
-In Label Studio Community Edition, the data manager is the default view for your data. In Label Studio Enterprise, click **Data Manager** to open and view the data manager page. Every row in the data manager represents a labeling task in your dataset.
+Every row in the data manager represents a labeling task in your dataset.
 
 <div class="enterprise-only">
 
@@ -142,136 +142,52 @@ If you want to make changes to the labeling interface or perform a different typ
 
 <div class="enterprise-only">
 
-## Agreement and Agreement (Selected) columns
+## Agreement columns
 
-These two columns allow you to see agreement scores at a task level. 
+The agreement columns in the Data Manager reflect consensus between annotators for a task. For more information on agreement and how it is calculated, see [Task agreement](stats).
 
-### Agreement
+You will see the following agreement columns in the Data Manager: 
 
-The **Agreement** column displays the average agreement score between all annotators for a particular task. 
+* **Agreement** - The is the overall agreement for the task. 
 
-Each annotation pair's agreement score will be calculated as new annotations are submitted. For example, if there are three annotations for a task, there will be three unique annotation pairs, and the agreement column will show the average agreement score of those three pairs. 
+    This is calculated as the mean agreement score between all control tags for a particular task. See [Overall agreement](stats#Overall-agreement).
+* **[Control tag] agreement** - Each control tag has its own agreement score. 
 
-Here is an example with a simple label config. Let's assume we are using ["Exact matching choices" agreement calculation](stats#Exact-matching-choices-example)
-```xml
-<View>
-  <Image name="image_object" value="$image_url"/>
-  <Choices name="image_classes" toName="image_object">
-    <Choice value="Cat"/>
-    <Choice value="Dog"/>
-  </Choices>
-</View>
-```
-Annotation 1: `Cat`  
-Annotation 2: `Dog`  
-Annotation 3: `Cat`  
+    How control tag agreement is calculated depends on how your project is set up. See [Per-control-tag agreement](stats#Per-control-tag-agreement).
 
-The three unique pairs are
-1. Annotation 1 <> Annotation 2 - agreement score is `0`
-2. Annotation 1 <> Annotation 3 - agreement score is `1`
-3. Annotation 2 <> Annotation 3 - agreement score is `0`
+![Screenshot](/images/review/agreement-dm.png)
 
-The agreement column for this task would show the average of all annotation pair's agreement score:
-`33%`
+### Annotators and models
 
-### Agreement (Selected)
+Click any agreement column to select specific annotators and models that you want to use for agreement calculation.
 
-The **Agreement (Selected)** column builds on top of the agreement column, allowing you to get agreement scores between annotators, ground truth, and model versions. 
+![Screenshot](/images/review/agreement-dm-modal.png)
 
-The column header is a dropdown where you can make your selection of which pairs you want to include in the calculation.
+You can select a subset of annotators, models, or models and annotators to compare. 
 
-<img src="/images/project/agreement-selected.png" class="gif-border" style="max-width:679px">
+For example, if you have 10 annotators and you select 3, the overall agreement score and the control tag agreement scores will be recalculated to reflect only your selections. 
 
-Under **Choose What To Calculate** there are two options, which can be used for different use cases. 
+!!! note
+    You must select at least two items to compare. 
 
-#### Agreement Pairs
-
-This allows you to select specific annotators and/or models to compare.  
+    Your selections will apply to all agreement columns in the Data Manager. You cannot select different annotators and models for different agreement columns.
 
 
-You must select at least two items to compare. This can be used in a variety of ways. 
+### Ground truth match
 
-**Subset of annotators**
+If your project contains ground truth annotations, you can use this option to compare either a single annotator or a single model to ground truth annotations. 
 
-You can select a subset of annotators to compare. This is different and more precise than the **Agreement** column which automatically includes all annotators in the score.
+Label Studio will apply whatever agreement metrics and methodology you have configured for your project, but will limit the calculation to the selected annotator or model and the annotations marked as ground truth.  
 
-This will then average all annotator vs annotator scores for only the selected annotators.
+<img src="/images/review/agreement-dm-gt.png" class="gif-border" style="max-width:679px">
 
-<img src="/images/project/agreement-selected-annotators.png" class="gif-border" style="max-width:679px">
+### Agreement popover
 
-**Subset of models**
+Click any agreement column to see a popover that has information about the methodology used. 
 
-You can also select multiple models to see model consensus in your project. This will average all model vs model scores for the selected models.
+If you are using **Pairwise** methodology, you will see a breakdown of agreement scores for the selected annotators and models.
 
-<img src="/images/project/agreement-selected-models.png" class="gif-border" style="max-width:679px">
-
-**Subset of models and annotators**
-
-Other combinations are also possible such as selecting one annotator and multiple models, multiple annotators and multiple models, etc.
-
-* If multiple annotators are selected, all annotator vs annotator scores will be included in the average.
-* If multiple models are selected, all model vs model scores will be included in the average. 
-* If one or more annotators are selected along with one or more models, all annotator vs model scores will be included in the average. 
-
-#### Ground Truth Match
-
-If your project contains ground truth annotations, this allows you to compare either a single annotator or a single model to ground truth annotations. 
-
-<img src="/images/project/agreement-selected-gt.png" class="gif-border" style="max-width:679px">
+<img src="/images/review/agreement-dm-popover.png" class="gif-border" style="max-width:600px">
 
 
-#### Limitations
-
-We currently only support calculating the **Agreement (Selected)** columen for tasks with 20 or less annotations. If you have a task with more than this threshold, you will see an info icon with a tooltip.
-
-<img src="/images/project/agreement-selected-threshold.png" class="gif-border" style="max-width:679px">
-
-
-#### Example Score Calculations
-
-Example using the same simple label config as above: 
-
-```xml
-<View>
-  <Image name="image_object" value="$image_url"/>
-  <Choices name="image_classes" toName="image_object">
-    <Choice value="Cat"/>
-    <Choice value="Dog"/>
-  </Choices>
-</View>
-```
-
-Lets say for one task we have the following:
-1. Annotation 1 from annotator 1 - `Cat` (marked as ground truth)
-2. Annotation 2 from annotator 2 - `Dog`
-3. Prediction 1 from model version 1 - `Dog` 
-4. Prediction 2 from model version 2 - `Cat` 
-
-Here is how the score would be calculated for various selections in the dropdown
-
-#### `Agreement Pairs` with `All Annotators` selected
-This will match the behavior of the **Agreement** column - all annotation pair's scores will be averaged:
-
-1. Annotation 1 <> Annotation 2: Agreement score is `0`
-
-Score displayed in column for this task: `0%`
-
-#### `Agreement Pairs` with `All Annotators` and `All Model Versions` selected
-This will average all annotation pair's scores, as well as all annotation <> model version pair's scores
-1. Annotation 1 <> Annotation 2 - agreement score is `0`
-4. Annotation 1 <> Prediction 1 - agreement score is `0`
-5. Annotation 1 <> Prediction 2 - agreement score is `1`
-6. Annotation 2 <> Prediction 1 - agreement score is `1`
-7. Annotation 2 <> Prediction 2 - agreement score is `0`
-
-Score displayed in column for this task: `40%` 
-
-#### `Ground Truth Match` with `model version 2` selected
-This will compare all ground truth annotations with all predictions from `model version 2`.
-
-In this example, Annotation 1 is marked as ground truth and Prediction 2 is from `model version 2`:
-
-1. Annotation 1 <> Prediction 2 - agreement score is `1`
-
-Score displayed in column for this task: `100%` 
 </div>

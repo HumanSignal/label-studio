@@ -4,7 +4,7 @@ short: Built-in metrics
 tier: enterprise
 type: guide
 order: 0
-order_enterprise: 308
+order_enterprise: 309
 meta_title: Built-in agreement metrics in Label Studio Enterprise
 meta_description: Built-in agreement metrics in Label Studio Enterprise.
 section: "Review & Measure Quality"
@@ -14,9 +14,9 @@ parent_enterprise: "stats"
 
 The following metrics are available out-of-the-box in Label Studio Enterprise. You can use them as is, or you can create your own [custom metrics](custom_metric).
 
-## Categorical/discrete dimensions
+## Categorical/discrete control tags
 
-A categorical/discrete dimension is a dimension that has a fixed set of choices. For example, a dimension that has the choices "Cat", "Dog", "Bird".
+A categorical/discrete control tag is a control tag that has a fixed set of choices. For example, a control tag that has the choices "Cat", "Dog", "Bird".
 
 | Display Name | Default For | Methodologies |
 |-------------|-------------|---------------|
@@ -31,7 +31,7 @@ A categorical/discrete dimension is a dimension that has a fixed set of choices.
 
     **Taxonomy IOU (Threshold)** computes IoU over the subtree of selected taxonomy nodes.
 
-## Numeric dimensions
+## Numeric control tags
 
 
 | Display Name | Default For | Methodologies |
@@ -39,7 +39,7 @@ A categorical/discrete dimension is a dimension that has a fixed set of choices.
 | **Numeric Difference** | `Number`, `Rating` | Pairwise only |
 | **Numeric Difference (Threshold)** | — | Pairwise + Consensus |
 
-## Bounding box (rectangle) dimensions
+## Bounding box (rectangle) control tags
 
 
 | Display Name | Default For | Methodologies |
@@ -56,7 +56,7 @@ A categorical/discrete dimension is a dimension that has a fixed set of choices.
     **Bounding Box Text Similarity** combines bounding box overlap (IoU) with text similarity over transcribed text.
 
 
-## Polygon dimensions
+## Polygon control tags
 
 | Display Name | Default For | Methodologies |
 |-------------|-------------|---------------|
@@ -68,9 +68,9 @@ A categorical/discrete dimension is a dimension that has a fixed set of choices.
 | **Polygon Text Similarity (Threshold)** | — | Pairwise + Consensus |
 
 
-## Span/segment dimensions
+## Span/segment control tags
 
-A span/segment dimension is a dimension that has a variable set of choices.  These are typically used for labeling text spans, time series, or paragraphs.
+A span/segment control tag is a control tag that has a variable set of choices.  These are typically used for labeling text spans, time series, or paragraphs.
 
 | Display Name | Default For | Methodologies |
 |-------------|-------------|---------------|
@@ -83,9 +83,9 @@ A span/segment dimension is a dimension that has a variable set of choices.  The
 | **Timeline Event Matching** | — | Pairwise + Consensus |
 
 !!! note
-    `UNORDERED_NAIVE` compares `TimelineLabels` spans without regard to order.
+    **Timeline Event Matching** compares `TimelineLabels` spans without regard to order.
 
-## HTML spans (hypertext) dimensions
+## HTML spans (hypertext) control tags
 
 | Display Name | Default For | Methodologies |
 |-------------|-------------|---------------|
@@ -96,7 +96,7 @@ A span/segment dimension is a dimension that has a variable set of choices.  The
 | **HTML Span Text Similarity** | `TextArea` (per HyperTextLabels) | Pairwise only |
 | **HTML Span Text Similarity (Threshold)** | — | Pairwise + Consensus |
 
-## Text dimensions
+## Text control tags
 
 | Display Name | Default For | Methodologies |
 |-------------|-------------|---------------|
@@ -106,9 +106,9 @@ A span/segment dimension is a dimension that has a variable set of choices.  The
 
 !!! note
     **Text Similarity** uses surface-level string similarity (e.g. edit distance / n-gram).
-    **Semantic Similarity** uses embedding-based semantic similarity; applicable to any user-defined dimension.
+    **Semantic Similarity** uses embedding-based semantic similarity; applicable to any user-defined control tag.
 
-## Video/landmarks dimensions
+## Video/landmarks control tags
 
 | Display Name | Default For | Methodologies |
 |-------------|-------------|---------------|
@@ -118,11 +118,11 @@ A span/segment dimension is a dimension that has a variable set of choices.  The
 | **Keypoint Distance** | — | Pairwise + Consensus |
 
 !!! note
-    **Object Tracking** and **Keypoint Distance** have no predefined control tag associations and are intended for user-defined dimensions.
+    **Object Tracking** and **Keypoint Distance** have no predefined control tag associations and are intended for user-defined control tags.
 
 
 
-## Control tag default metric reference
+## Default metric reference
 
 | Control Tag | Category | Default Metric |
 |-------------|----------|----------------|

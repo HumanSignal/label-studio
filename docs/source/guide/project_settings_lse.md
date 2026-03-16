@@ -791,7 +791,7 @@ When multiple annotators are labeling a task, the task agreement reflects how mu
 
 For example, if 10 annotators review a task and only 2 select the same choice, then that task would have a low agreement score.  
 
-You can customize how task agreement is calculated and how it should affect the project workflow. For more information, see [Task agreement and how it is calculated](stats). 
+You can customize how task agreement is calculated and how it should affect the project workflow. For more information, see [Task agreement](stats). 
 
 <table>
 <thead>
@@ -803,20 +803,91 @@ You can customize how task agreement is calculated and how it should affect the 
 <tr>
 <td>
 
-**Agreement metric**
+**Methodology**
+
+<span class="badge"></span>
 </td>
 <td>
 
-Select the [metric](stats#Available-agreement-metrics) that should determine task agreement.
+Methodology to use for calculating task agreement. 
+
+* **Consensus**: Consensus measures *"What percentage of annotators chose the most common answer?"*
+* **Pairwise**: Pairwise measures *"What is the average agreement score across all pairs of annotators?"*
+
+For more information, see [Task agreement - methodology](stats#Methodology).
 
 </td>
 </tr>
 <tr>
 <td>
 
-**Assign additional annotator**
+**Built-in Metrics vs Custom**
+</td>
+<td>
+
+Select whether you want to use the built-in metrics or custom metrics for agreement.
+
+For more information, see [Built-in agreement metrics reference](agreement_metrics) and [Custom agreement metrics](custom_metric).
+
+</td>
+</tr>
+<tr>
+<td>
+
+**Overall Agreement**
+
+</td>
+<td>
+
+Configure how overall agreement is calculated by setting the weight for each control tag.
+
+For more information, see [Configure weight for the overall agreement](stats#Configure-weight-for-the-overall-agreement).
+
+
+</td>
+</tr>
+<tr>
+<td>
+
+**Agreement Columns**
 
 <span class="badge"></span>
+</td>
+<td>
+
+Configure how agreement is calculated for each control tag.
+
+For more information, see [Configure agreement for each control tag](stats#Configure-agreement-for-each-control-tag).
+
+</td>
+</tr>
+</table>
+
+</dd>
+
+<dt id="low-agreement">Low Agreement Resolution <span class="badge"></span></dt>
+
+<dd>
+
+!!! note
+    Low agreement resolution settings are only available when the project is configured to [automatically assign tasks](#distribute-tasks). If you are using Manual distribution, this section will not appear in your project settings.
+    
+    If you switch a project from Automatic to Manual distribution, low agreement resolution is automatically disabled.
+
+Resolve tasks with low agreement scores by automatically assigning additional annotators to the task. 
+
+<table>
+<thead>
+    <tr>
+      <th>Field</th>
+      <th>Description</th>
+    </tr>
+</thead>
+<tr>
+<td>
+
+**Assign additional annotator**
+
 </td>
 <td>
 Enable this option to automatically assign an additional annotator to any tasks that have a low agreement score. 
@@ -832,7 +903,6 @@ Note that to see this setting, the project must be set up with [automatic task a
 
 **Agreement threshold**
 
-<span class="badge"></span>
 </td>
 <td>
 
@@ -845,7 +915,6 @@ Enter the agreement score that a task must meet before it can be considered comp
 
 **Maximum additional annotators**
 
-<span class="badge"></span>
 </td>
 <td>
 
@@ -859,16 +928,6 @@ Annotators are assigned one at a time until the agreement threshold is achieved.
 
 !!! note
     When configuring **Maximum additional annotators**, be mindful of the number of annotators available in your project. If you have fewer annotators available than the sum of [**Annotations per task**](#overlap) + **Maximum additional annotators**, you might encounter a scenario in which a task with a low agreement score cannot be marked complete.
-
-</dd>
-
-<dt>Custom weights</dt>
-
-<dd>
-
-Set custom weights for tags and labels to change the agreement calculation. The options you are given are automatically generated from your labeling interface setup. 
-
-Weights set to zero are ignored from calculation.
 
 </dd>
 </dl>

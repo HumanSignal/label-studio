@@ -63,6 +63,9 @@ The Annotator Agreement Matrix helps you see how consistently different members 
 - **Hover over any cell** to view more information including the number of tasks where both members made an annotation. If a member made more than one annotation in a task, the additional annotation(s) are also considered. 
 - **Use the label dropdown** to filter and explore agreement when at least one annotation contains the specified label.
 
+!!! note
+    Agreement in the Members Dashboard reflects the [Pairwise agreement](stats#Pairwise) between annotators, regardless of what methodology you have selected for the project. 
+
 ## Agreement Distribution
 
 The Agreement Distribution visualizes how agreement scores vary across tasks in your project. The bar chart displays the number of tasks at each agreement score range.
