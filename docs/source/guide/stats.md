@@ -293,7 +293,7 @@ However, Consensus requires binary (`0` or `1`) scores. So this time, you are us
 
 This is the same as the **Intersection over Union** metric used in the Pairwise example, but with a threshold applied. A threshold is necessary to determine what is considered a match (`1`) and what is not a match (`0`). 
 
-Let's say you set the threshold to `65%`: any pair with IoU >= 0.75 counts as a match (`1`), and anything below is not a match (`0`).
+Let's say you set the threshold to `65%`: any pair with IoU >= 0.65 counts as a match (`1`), and anything below is not a match (`0`).
 
 You have the following raw IoU scores:
 
