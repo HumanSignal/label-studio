@@ -81,10 +81,7 @@ export const VirtualizedAnnotationPanel = observer(
 
     return (
       <div style={{ ...style, paddingRight: PANEL_GAP }}>
-        <div
-          id={`c-${annotation.id}`}
-          className="flex h-full flex-col relative"
-        >
+        <div id={`c-${annotation.id}`} className="flex h-full flex-col relative">
           <EntityTab
             entity={annotation}
             onClick={() => onSelect(annotation)}
@@ -93,9 +90,7 @@ export const VirtualizedAnnotationPanel = observer(
             style={{ height: 44 }}
           />
           {!wasHydrated && (isStub || isHydrating) ? (
-            <div
-              className="min-h-0 flex-1 flex flex-col items-center justify-center bg-[var(--color-neutral-surface)]"
-            >
+            <div className="min-h-0 flex-1 flex flex-col items-center justify-center bg-[var(--color-neutral-surface)]">
               <Spin size="large" />
               <span className="mt-300 text-neutral-content-subtler">
                 {isHydrating ? "Loading annotation..." : "Waiting to load..."}
