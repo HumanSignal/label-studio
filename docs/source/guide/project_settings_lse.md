@@ -783,7 +783,7 @@ For more information about pausing annotators, including how to manually pause s
 
 </dd>
 
-<dt id="task-agreement">Agreement</dt>
+<dt id="task-agreement">Agreement <span class="badge"></span></dt>
 
 <dd>
 
@@ -792,6 +792,9 @@ When multiple annotators are labeling a task, the task agreement reflects how mu
 For example, if 10 annotators review a task and only 2 select the same choice, then that task would have a low agreement score.  
 
 You can customize how task agreement is calculated and how it should affect the project workflow. For more information, see [Task agreement](stats). 
+
+!!! error Enterprise
+    Label Studio Starter Cloud only supports the **Pairwise** methodology. Each control tag uses the [default built-in metric](agreement_metrics#Default-metric-reference) for agreement calculation.
 
 <table>
 <thead>
@@ -805,7 +808,6 @@ You can customize how task agreement is calculated and how it should affect the 
 
 **Methodology**
 
-<span class="badge"></span>
 </td>
 <td>
 
@@ -822,6 +824,7 @@ For more information, see [Task agreement - methodology](stats#Methodology).
 <td>
 
 **Built-in Metrics vs Custom**
+
 </td>
 <td>
 
@@ -851,7 +854,6 @@ For more information, see [Configure weight for the overall agreement](stats#Con
 
 **Agreement Columns**
 
-<span class="badge"></span>
 </td>
 <td>
 
