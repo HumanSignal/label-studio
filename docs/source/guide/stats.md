@@ -23,9 +23,7 @@ You can view agreement in the following ways:
 - **Members Dashboard** - Displays an inter-annotator agreement matrix and agreement distribution. See [Members dashboard](dashboard_members). 
 
 !!! note
-    All agreement as displayed in the Members Dashboard is calculated using the **Pairwise** methodology.
-
-![Screenshot](/images/review/agreement-dm.png)
+    All agreement scores displayed in the Members Dashboard are calculated using the **Pairwise** methodology.
 
 ## Overall vs per-control-tag agreement
 
@@ -33,6 +31,8 @@ Agreement is calculated at two levels:
 
 * Per-control-tag agreement
 * Overall agreement
+
+![Screenshot](/images/review/agreement-annotated.png)
 
 
 ### Per-control-tag agreement
@@ -43,7 +43,7 @@ For example, if your labeling configuration involves annotating an image with `R
 
 Agreement is calculated for each control tag separately, and you can configure the metric used to calculate agreement for each control tag. See [Built-in agreement metrics reference](agreement_metrics).
 
-You can see an agreement score for each control tag separately. This lets you see which parts of the task have higher or lower agreement (e.g., good agreement on bounding boxes but low agreement on a choice field).
+In the Data Manager, you can see an agreement score for each control tag separately. This lets you see which parts of the task have higher or lower agreement (e.g., good agreement on bounding boxes but low agreement on a choice field).
 
 ### Overall agreement
 
@@ -68,18 +68,20 @@ Examples include:
 - **Choices** (e.g., "Small", "Medium", "Large")
 - **Rating** (e.g., 1-5 stars)
 
-Since categorical values are discrete, the typical metric is **Exact Match** -- the two values either match (score = 1.0) or they don't (score = 0.0). 
+Since categorical values are discrete, the typical metric is **Exact Match** -- the two values either match (score = `1.0`) or they don't (score = `0.0`). 
 
-However, tags such as **Rating** or **Number** can also use **Numeric Difference with Threshold**, where you define how much numeric deviation is tolerable (e.g., a threshold of 0 means only identical ratings count as a match).
+However, tags such as **Rating** or **Number** can also use **Numeric Difference with Threshold**, where you define how much numeric deviation is tolerable (e.g., a threshold of `0` means only identical ratings count as a match).
 
-Categorical comparisons inherently produce binary scores (0 or 1). This means they work seamlessly with both agreement methodologies:
+Categorical comparisons inherently produce binary scores (`0` or `1`). This means they work with both agreement methodologies:
 
 - [**Pairwise Average**](#Pairwise): Average all the 0s and 1s across annotator pairs. 
-- [**Consensus**](#Consensus): Because the scores are already binary, no threshold conversion is needed. The consensus method naturally reflects majority agreement -- the same Choices example yields 0.66 under consensus, correctly capturing that 2 of 3 annotators agreed. 
+- [**Consensus**](#Consensus): Because the scores are already binary, no threshold conversion is needed. The consensus method naturally reflects majority agreement. 
     
 ### Non-categorical control tags
 
-Non-categorical control tags produce spatial, geometric, or structural data -- annotators draw regions, highlight spans, or position elements. Examples include:
+Non-categorical control tags produce spatial, geometric, or structural data. Annotators draw regions, highlight spans, or position elements. 
+
+For example:
 
 - **RectangleLabels** (bounding boxes around objects)
 - **Labels** (text spans / NER annotations)
@@ -87,7 +89,7 @@ Non-categorical control tags produce spatial, geometric, or structural data -- a
 
 Because two annotators rarely draw identical regions, the system uses continuous similarity metrics that measure degree of overlap. For example:
 
-- **IoU (Intersection over Union)** for bounding boxes and polygons -- returns a float between 0.0 (no overlap) and 1.0 (perfect overlap)
+- **IoU (Intersection over Union)** for bounding boxes and polygons. Returns a float between `0.0` (no overlap) and `1.0` (perfect overlap)
 - **Span Overlap** for text spans -- measures how much two highlighted text regions overlap
 
 
@@ -97,7 +99,7 @@ Because two annotators rarely draw identical regions, the system uses continuous
 |---|---|---|
 | **Output type** | Discrete values (labels, ratings) | Spatial/structural data (boxes, spans) |
 | **Typical metrics** | Exact Match, Numeric Difference | IoU, Span Overlap |
-| **Score type** | Binary (0 or 1) | Continuous (0.0 to 1.0) |
+| **Score type** | Binary (`0` or `1`) | Continuous (`0.0` to `1.0`) |
 | **Pairwise** | Works directly; averages binary scores | Works directly; averages continuous scores |
 | **Consensus** | Works directly; no threshold needed | Requires a user-defined threshold to binarize scores first |
 
@@ -122,11 +124,13 @@ Agreement is computed across all annotators at once, measuring how much they con
 
 Consensus measures operates on binary scores -- each pair of annotators either matches (`1`) or does not match (`0`). 
 
-For categorical tags like **Choices** or **Rating**, this binary outcome happens naturally: two annotators either selected the same value or they didn't. 
+* For categorical tags like **Choices** or **Rating**, this binary outcome happens naturally: two annotators either selected the same value or they didn't. 
 
-For non-categorical tags like bounding boxes or text spans, the raw comparison produces a continuous score (e.g., IoU of 0.82), so a user-defined threshold is applied to convert it into a binary decision -- at or above the threshold counts as a match (`1`), below it does not (`0`). 
+* For non-categorical tags like bounding boxes or text spans, the raw comparison produces a continuous score (e.g., IoU of 0.82), so a user-defined threshold is applied to convert it into a binary decision -- at or above the threshold counts as a match (`1`), below it does not (`0`). 
 
-Once annotation has been reduced to a 1 or 0, consensus calculates how much the group converges overall, giving proportional credit for majority agreement. This is why, in a group of three annotators where two agree and one disagrees, consensus returns 66% rather than the 33% you'd get from pairwise average -- it recognizes that most of the group reached the same answer.
+Once annotations have been reduced to a `1` or `0`, consensus calculates how much the group converges overall, giving proportional credit for majority agreement. 
+
+This is why, in a group of three annotators where two agree and one disagrees, consensus returns `66%` rather than the `33%` you'd get from pairwise -- it recognizes that most of the group reached the same answer.
 
 ![Screenshot](/images/review/consensus-agreement.png)
 
@@ -219,26 +223,39 @@ If Annotator 2 were to change their choice to agree with Annotator 1, the agreem
 
 <div data-name="Consensus">
 
-If all three annotators select a different choice, Consensus is `33.33%`. 
+If all three annotators select a different choice, Consensus is `33.33%`:
 
-This is because the most common answer was given by 1 of the 3 annotators (`1/3 = 33.33`). 
+* Annotator 1 chose "A"
+* Annotator 2 chose "B"
+* Annotator 3 chose "C"
+
+In Consensus, we are looking at the most common answer. In this case, `A`, `B`, and `C` were each chosen once. 
+
+So 1 out of 3 annotators chose the most common answer (`1/3 = 33.33`). 
 
 * It does not matter what the value of their choice was, just that there are 3 choices and no overlapping choice between annotators. 
 * In this case, any one of the choices becomes the "most common answer" as they are all equally common (all were selected once). 
     
-If Annotator 2 were to change their choice to agree with Annotator 1, the agreement would increase to `66.67%`, because 2 out of the 3 annotators (`2/3 = 66.67`) chose the most common choice. 
+If Annotator 2 were to change their choice to agree with Annotator 1, the agreement would increase to `66.67%`:
+
+* Annotator 1 chose "A"
+* Annotator 2 chose "A"
+* Annotator 3 chose "C"
+
+In this case, `A` was chosen twice and `C` was chosen once. 
+
+So 2 out of 3 annotators chose the most common answer (`2/3 = 66.67`). 
 
 </div>
 </div>
 
 #### Non-categorical examples
 
-Say you have 3 annotators each draw a bounding box around a cat in an image using **RectangleLabels**
 
 <div class="code-tabs">
   <div data-name="Pairwise">
 
-The metric used in this example is **IoU (Intersection over Union)**.
+Say you have 3 annotators each draw a bounding box around a cat in an image using **RectangleLabels**.
 
 If all three annotators draw their boxes in completely different areas of the image with no overlap, Pairwise is `0`:
 
@@ -260,9 +277,11 @@ Now say Annotator 2 adjusts their box so it mostly overlaps with Annotator 1's b
 
 <div data-name="Consensus">
 
+Say you have 3 annotators each draw a bounding box around a cat in an image using **RectangleLabels**.
+
 Because consensus requires binary scores, you must first set an **IoU threshold**. Let's say you set it to `75%`: any pair with IoU >= 0.75 counts as a match (`1`), and anything below is not a match (`0`).
 
-Take the raw IoU scores from the pairwise example above:
+Take these raw IoU scores:
 
 * Annotator 1 vs Annotator 2: IoU = `0.82`
 * Annotator 1 vs Annotator 3: IoU = `0.65`
@@ -278,11 +297,6 @@ Take the raw IoU scores from the pairwise example above:
 
 Annotators 1 and 2 agree with each other, but Annotator 3 doesn't agree with either. The consensus score reflects that 2 out of 3 annotators converge: **`66%`**.
 
-Now compare this to the pairwise average of the same raw scores, which was `68.33%`. The two methods tell a different story:
-
-* **Pairwise average (`68.33%`)** says: "On average, annotators' boxes overlap a fair amount."
-* **Consensus (`66%`)** says: "Two annotators agree on box placement, but one does not."
-
 **How the threshold changes the result:**
 
 The threshold you choose directly affects the consensus score. Using the same raw IoU values:
@@ -293,7 +307,9 @@ The threshold you choose directly affects the consensus score. Using the same ra
 | **75%** | match | no match | no match | **66%** (2 of 3 agree) |
 | **90%** | no match | no match | no match | **0%** (none agree) |
 
-At a lenient 50% threshold, all three boxes overlap "enough" and consensus is perfect. At a strict 90% threshold, no pair is close enough and consensus drops to zero. This is why choosing the right threshold is critical for non-categorical consensus -- it determines where you draw the line between "these annotations agree" and "these annotations disagree."
+At a lenient 50% threshold, all three boxes overlap "enough" and consensus is perfect. At a strict 90% threshold, no pair is close enough and consensus drops to zero. 
+
+This is why choosing the right threshold is critical for non-categorical consensus -- it determines where you draw the line between "these annotations agree" and "these annotations disagree."
 
   </div>
 </div>
@@ -315,7 +331,9 @@ Under **Built-in Metrics vs Custom**, you can select whether you want to customi
 
 Overall agreement is the average of all control tag agreement scores. It is displayed in the main **Agreement** column in the Data Manager.
 
-Under **Overall Agreement**, you can customize how overall agreement is calculated by setting the **weight** of different control tags when calculating agreement. This ensures that a critical control tag has more bearing on the overall agreement score than a less important control tag.
+Under **Settings > Quality > Agreement > Overall Agreement**, you can customize how overall agreement is calculated by setting the **weight** of different control tags when calculating agreement. 
+
+This ensures that a critical control tag has more bearing on the overall agreement score than a less important control tag.
 
 <img src="/images/review/agreement-overall.png" class="gif-border" style="max-width:600px">
 
@@ -336,7 +354,7 @@ Then the overall agreement is calculated as:
 
 ### Configure agreement for each control tag
 
-Under **Agreement Columns**, you can customize how agreement is calculated for each control tag. 
+Under **Settings > Quality > Agreement > Agreement Columns**, you can customize how agreement is calculated for each control tag. 
 
 <img src="/images/review/agreement-column-settings.png" class="gif-border" style="max-width:600px">
 
@@ -346,6 +364,8 @@ For information on the different metrics available for each control tag, see the
 
 !!! info "Tip"
     For IoU-based control tags, you can set a threshold to determine what is considered a match. Click **Try it** to open a preview window to see how the threshold affects the agreement score. 
+
+    <img src="/images/review/agreement-iou.png" class="gif-border" style="max-width:600px">
 
 
 

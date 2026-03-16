@@ -16,7 +16,7 @@ The following metrics are available out-of-the-box in Label Studio Enterprise. Y
 
 ## Categorical/discrete control tags
 
-A categorical/discrete control tag is a control tag that has a fixed set of choices. For example, a control tag that has the choices "Cat", "Dog", "Bird".
+A [categorical](stats#Categorical-vs-non-categorical-control-tags)/discrete control tag is a control tag that has a fixed set of choices. For example, a control tag that has the choices "Cat", "Dog", "Bird".
 
 | Display Name | Default For | Methodologies |
 |-------------|-------------|---------------|
@@ -183,4 +183,4 @@ Used for spans (text, paragraphs, time series, HTML). Compares overlap of spans 
 For Number or Rating: compares the numeric values (e.g., difference, or whether the difference is within a threshold). The threshold variant is used for consensus.
 
 **Consensus and thresholds**  
-When using **Consensus** methodology with a continuous metric (e.g., IoU), you must pick the metric’s **threshold** variant and set the threshold (e.g., 0.75). Pairs with raw score ≥ threshold count as agreement (1), others as no agreement (0), so consensus can be computed.
+When using [**Consensus** methodology](stats#Consensus) with a continuous metric (e.g., IoU), you must pick the metric’s **threshold** variant and set the threshold (e.g., 0.75). Pairs with raw score ≥ threshold count as agreement (1), others as no agreement (0), so consensus can be computed.
