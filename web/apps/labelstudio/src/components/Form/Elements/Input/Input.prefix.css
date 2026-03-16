@@ -39,7 +39,6 @@
   &:not([disabled]):hover {
     border-color: var(--color-neutral-border-bold);
   }
-  
 
   &:not([disabled]):active {
     border-color: var(--color-neutral-border-bolder);

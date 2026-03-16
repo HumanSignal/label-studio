@@ -44,10 +44,10 @@
   --kale_0: var(--color-kale-000);
   --kale_300: var(--color-kale-300);
   --kale_400: var(--color-kale-400);
-  --red_1: #FFF1F0;
-  --red_3: #FFCCC7;
-  --red_7: #CF1322;
-  --red_10: #5C0011;
+  --red_1: #fff1f0;
+  --red_3: #ffccc7;
+  --red_7: #cf1322;
+  --red_10: #5c0011;
   --grape_0: var(--color-grape-000);
   --grape_100: var(--color-grape-100);
   --grape_500-raw: 86 111 207;
@@ -89,22 +89,51 @@
   --primary-bright-tertiary: var(--color-primary-surface-content-subtle);
   --primary-text-on-background-dark: var(--grape_800);
   --color-surface-on-base-subtle: var(--color-neutral-content-subtler);
-  --color-negative-bold: #CC5E46;
-  --color-negative-accent-light: #FFBAAA;
+  --color-negative-bold: #cc5e46;
+  --color-negative-accent-light: #ffbaaa;
   --accent_color: var(--grape_500);
   --colors-surface-border: var(--sand_300);
   --colors-surface-icon-on-base: var(--sand_700);
   --colors-surface-text: var(--sand_700);
-  --primary-button-waiting-animation-bg: repeating-linear-gradient(-63.43deg, rgba(var(--color-primary-surface-active-raw) / 50%) 1px, rgba(var(--color-primary-surface-raw) / 50%) 2px, rgba(var(--color-primary-surface-raw) / 50%) 6px, rgba(var(--color-primary-surface-active-raw) / 50%) 7px, rgba(var(--color-primary-surface-active-raw) / 50%) 12px);
-  --negative-button-waiting-animation-bg: repeating-linear-gradient(-63.43deg, rgba(var(--color-negative-surface-active-raw) / 50%) 1px, rgba(var(--color-negative-surface-raw) / 50%) 2px, rgba(var(--color-negative-surface-raw) / 50%) 6px, rgba(var(--color-negative-surface-active-raw) / 50%) 7px, rgba(var(--color-negative-surface-active-raw) / 50%) 12px);
-  --button-waiting-animation-bg: repeating-linear-gradient(-63.43deg, rgba(var(--color-neutral-surface-active-raw) / 50%) 1px, rgba(var(--color-neutral-surface-raw) / 50%) 2px, rgba(var(--color-neutral-surface-raw) / 50%) 6px, rgba(var(--color-neutral-surface-active-raw) / 50%) 7px, rgba(var(--color-neutral-surface-active-raw) / 50%) 12px);
+  --primary-button-waiting-animation-bg: repeating-linear-gradient(
+    -63.43deg,
+    rgba(var(--color-primary-surface-active-raw) / 50%) 1px,
+    rgba(var(--color-primary-surface-raw) / 50%) 2px,
+    rgba(var(--color-primary-surface-raw) / 50%) 6px,
+    rgba(var(--color-primary-surface-active-raw) / 50%) 7px,
+    rgba(var(--color-primary-surface-active-raw) / 50%) 12px
+  );
+  --negative-button-waiting-animation-bg: repeating-linear-gradient(
+    -63.43deg,
+    rgba(var(--color-negative-surface-active-raw) / 50%) 1px,
+    rgba(var(--color-negative-surface-raw) / 50%) 2px,
+    rgba(var(--color-negative-surface-raw) / 50%) 6px,
+    rgba(var(--color-negative-surface-active-raw) / 50%) 7px,
+    rgba(var(--color-negative-surface-active-raw) / 50%) 12px
+  );
+  --button-waiting-animation-bg: repeating-linear-gradient(
+    -63.43deg,
+    rgba(var(--color-neutral-surface-active-raw) / 50%) 1px,
+    rgba(var(--color-neutral-surface-raw) / 50%) 2px,
+    rgba(var(--color-neutral-surface-raw) / 50%) 6px,
+    rgba(var(--color-neutral-surface-active-raw) / 50%) 7px,
+    rgba(var(--color-neutral-surface-active-raw) / 50%) 12px
+  );
   --project-title-icon-primary-color: rgba(var(--black-raw), 0.35);
   --project-title-icon-alternate-color: rgba(var(--white-raw), 0.35);
   --shadow-intensity: 1;
-  --color-accent-gradient-subtle: rgba(var(--color-accent-canteloupe-base-raw) / 10%) 0%, rgba(var(--color-accent-persimmon-base-raw) / 10%) 50%, rgba(var(--color-accent-plum-base-raw) / 10%) 100%;
-  --color-accent-gradient-base: rgba(var(--color-accent-canteloupe-base-raw) / 90%) 0%, rgba(var(--color-accent-persimmon-base-raw) / 90%) 50%, rgba(var(--color-accent-plum-base-raw) / 90%) 100%;
-  --color-accent-gradient-bold: rgba(var(--color-accent-canteloupe-base-raw) / 100%) 0%, rgba(var(--color-accent-persimmon-base-raw) / 100%) 50%, rgba(var(--color-accent-plum-base-raw) / 100%) 100%;
-  --color-accent-gradient-dark: rgba(var(--color-accent-canteloupe-bold-raw) / 100%) 0%, rgba(var(--color-accent-persimmon-bold-raw) / 100%) 50%, rgba(var(--color-accent-plum-bold-raw) / 100%) 100%;
+  --color-accent-gradient-subtle:
+    rgba(var(--color-accent-canteloupe-base-raw) / 10%) 0%, rgba(var(--color-accent-persimmon-base-raw) / 10%) 50%,
+    rgba(var(--color-accent-plum-base-raw) / 10%) 100%;
+  --color-accent-gradient-base:
+    rgba(var(--color-accent-canteloupe-base-raw) / 90%) 0%, rgba(var(--color-accent-persimmon-base-raw) / 90%) 50%,
+    rgba(var(--color-accent-plum-base-raw) / 90%) 100%;
+  --color-accent-gradient-bold:
+    rgba(var(--color-accent-canteloupe-base-raw) / 100%) 0%, rgba(var(--color-accent-persimmon-base-raw) / 100%) 50%,
+    rgba(var(--color-accent-plum-base-raw) / 100%) 100%;
+  --color-accent-gradient-dark:
+    rgba(var(--color-accent-canteloupe-bold-raw) / 100%) 0%, rgba(var(--color-accent-persimmon-bold-raw) / 100%) 50%,
+    rgba(var(--color-accent-plum-bold-raw) / 100%) 100%;
 }
 
 [data-color-scheme="dark"] {

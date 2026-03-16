@@ -23,13 +23,13 @@
     font-weight: 500;
     line-height: 24px;
     letter-spacing: 0.15px;
-    color:  var(--color-neutral-content);
+    color: var(--color-neutral-content);
   }
 
   &__text {
     line-height: 20px;
     letter-spacing: 0.25px;
-    color:  var(--color-neutral-content-subtler);
+    color: var(--color-neutral-content-subtler);
   }
 
   &__link {
@@ -57,7 +57,6 @@
       & path.spike-stroke {
         color: red;
       }
-
     }
   }
 }

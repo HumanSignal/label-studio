@@ -11,7 +11,9 @@
   z-index: 100;
   background: var(--color-neutral-border);
   transform: translateX(-50%);
-  transition: width 0.15s ease, background-color 0.15s ease;
+  transition:
+    width 0.15s ease,
+    background-color 0.15s ease;
 
   &:hover {
     width: var(--handle-size-hover);

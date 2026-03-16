@@ -28,7 +28,7 @@
     height: var(--height);
     display: block;
 
-    &::-webkit-progress-inner-element{
+    &::-webkit-progress-inner-element {
       padding: 3px;
     }
 
@@ -42,7 +42,10 @@
     &[value]::-webkit-progress-value {
       background: royalblue;
       border-radius: 10px;
-      background-size: 35px 20px, 100% 100%, 100% 100%;
+      background-size:
+        35px 20px,
+        100% 100%,
+        100% 100%;
       transition: all 80ms ease;
       height: var(--height);
     }

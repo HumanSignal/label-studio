@@ -28,9 +28,8 @@
   width: 40rem;
   color: var(--color-neutral-content-subtle);
 
-
-  & +.settings-wrapper,
-  & +.form-wrapper {
+  & + .settings-wrapper,
+  & + .form-wrapper {
     margin-top: 1.5rem;
   }
 
@@ -46,7 +45,6 @@
     margin-bottom: 0;
     color: var(--color-neutral-content);
   }
-
 }
 
 .general-settings {

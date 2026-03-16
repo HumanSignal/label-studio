@@ -6,7 +6,7 @@
     border-radius: 5px;
     color: var(--color-negative-content);
 
-    &+& {
+    & + & {
       margin-top: 5px;
     }
   }

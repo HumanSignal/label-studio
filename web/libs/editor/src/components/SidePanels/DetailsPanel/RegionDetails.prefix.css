@@ -20,7 +20,7 @@
     align-items: flex-start;
     word-break: break-word;
 
-    &+span {
+    & + span {
       color: var(--color-neutral-content);
 
       &::before {

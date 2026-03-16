@@ -21,7 +21,7 @@
     height: 100%;
     will-change: margin-left;
     transition: background-color 400ms ease-out;
-    
+
     &_withSidebar {
       margin-left: var(--menu-sidebar-width);
     }

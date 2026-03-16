@@ -54,14 +54,17 @@
       }
     }
 
-    & input, textarea {
+    & input,
+    textarea {
       background-color: var(--color-neutral-background);
       padding: var(--spacing-tight) var(--spacing-widest) var(--spacing-tight) var(--spacing-base);
       font-size: var(--font-size-body-small);
       letter-spacing: var(--letter-spacing-wider);
       border: 1px solid var(--color-neutral-border-bold);
       line-height: var(--line-height-body-small);
-      transition: border-color 150ms ease-out, box-shadow 150ms ease-out;
+      transition:
+        border-color 150ms ease-out,
+        box-shadow 150ms ease-out;
 
       &:focus {
         border-color: var(--color-neutral-border-bolder);
@@ -80,7 +83,9 @@
     gap: var(--spacing-tight);
     pointer-events: none;
     opacity: 0;
-    transition: transform 150ms ease-out, opacity 150ms ease-out;
+    transition:
+      transform 150ms ease-out,
+      opacity 150ms ease-out;
 
     & button {
       pointer-events: auto;
@@ -100,8 +105,7 @@
   margin-bottom: 0;
 }
 
-
-:global(.ant-form-item .ant-form-item-control-input-content  .ant-form-item-control-input-content) {
+:global(.ant-form-item .ant-form-item-control-input-content .ant-form-item-control-input-content) {
   padding: var(--spacing-tight) 0;
 }
 

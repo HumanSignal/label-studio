@@ -59,7 +59,7 @@
     flex: 1;
     font-size: 12px;
 
-    &:not([type='checkbox'], [type='radio']) {
+    &:not([type="checkbox"], [type="radio"]) {
       flex: 1;
       outline: none;
       width: 100%;

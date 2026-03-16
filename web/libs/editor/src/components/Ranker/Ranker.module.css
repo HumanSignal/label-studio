@@ -71,7 +71,7 @@
   align-items: center;
 }
 
-.item.collapsed>*:not(.itemTitle) {
+.item.collapsed > *:not(.itemTitle) {
   display: none;
 }
 

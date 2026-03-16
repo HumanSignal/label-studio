@@ -1,5 +1,6 @@
 .toggle-items {
-  --button-checked-shadow: 0 1px 0 rgba(var(--color-neutral-shadow-raw) / 10%), 0 5px 10px rgba(var(--color-neutral-shadow-raw) / 10%);
+  --button-checked-shadow:
+    0 1px 0 rgba(var(--color-neutral-shadow-raw) / 10%), 0 5px 10px rgba(var(--color-neutral-shadow-raw) / 10%);
 
   display: flex;
   justify-content: stretch;

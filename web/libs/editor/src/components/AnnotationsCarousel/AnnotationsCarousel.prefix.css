@@ -8,7 +8,7 @@
   flex: 1;
 
   &::before {
-    content: '';
+    content: "";
     position: absolute;
     top: 0;
     left: 0;
@@ -17,7 +17,11 @@
     display: block;
     pointer-events: none;
     opacity: 0;
-    background: linear-gradient(to right, rgba(var(--color-neutral-shadow-raw) / 16%), rgba(var(--color-neutral-shadow-raw) / 0%));
+    background: linear-gradient(
+      to right,
+      rgba(var(--color-neutral-shadow-raw) / 16%),
+      rgba(var(--color-neutral-shadow-raw) / 0%)
+    );
     z-index: 1;
     transition: opacity 300ms ease-out;
   }

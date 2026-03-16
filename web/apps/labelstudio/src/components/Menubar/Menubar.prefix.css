@@ -42,28 +42,27 @@
   }
 
   &__hotkeys {
-      display: flex;
-      padding: 0 var(--spacing-base);
-      align-items: center;
+    display: flex;
+    padding: 0 var(--spacing-base);
+    align-items: center;
   }
 
   &__hotkeys-button {
-      & button {
-        & svg {
-          width: 20px;
-          height: 20px;
-          color: var(--color-neutral-content-subtler);
-        }
+    & button {
+      & svg {
+        width: 20px;
+        height: 20px;
+        color: var(--color-neutral-content-subtler);
+      }
 
-        &:hover {
-          & svg {
-            color: var(--color-neutral-icon);
-          }
+      &:hover {
+        & svg {
+          color: var(--color-neutral-icon);
         }
       }
+    }
   }
 
-  
   &__trigger {
     display: flex;
     padding: 0 20px;

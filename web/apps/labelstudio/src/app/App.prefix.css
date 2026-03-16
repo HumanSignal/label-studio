@@ -1,4 +1,4 @@
-@import '../themes/default/variables.prefix.css';
+@import "../themes/default/variables.prefix.css";
 
 body {
   --header-height: 48px;
@@ -54,7 +54,7 @@ body {
     display: flex;
     gap: 8px;
 
-    >* {
+    > * {
       line-height: 1em;
     }
   }
@@ -81,7 +81,7 @@ body {
     height: 24px;
     display: block;
     margin: 0 auto;
-    content: '';
+    content: "";
     border-radius: 100%;
     background-color: var(--background);
     color: var(--color-neutral-content);

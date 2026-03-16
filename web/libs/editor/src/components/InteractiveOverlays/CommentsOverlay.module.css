@@ -13,7 +13,7 @@
   .commentItem {
     transition: opacity 300ms;
     transform: translateY(-100%);
-    filter: drop-shadow(0 2px 8px #12110D52) drop-shadow(0 8px 16px #12110D1F);
+    filter: drop-shadow(0 2px 8px #12110d52) drop-shadow(0 8px 16px #12110d1f);
     pointer-events: all;
     cursor: pointer;
   }
@@ -51,5 +51,4 @@
       }
     }
   }
-
 }

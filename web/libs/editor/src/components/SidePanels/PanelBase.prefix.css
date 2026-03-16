@@ -102,7 +102,9 @@
     left: 0;
     position: absolute;
     border: 1px solid var(--color-neutral-border);
-    box-shadow: 0 6px 10px 4px rgb(38 38 38 / 15%), 0 2px 3px rgb(38 38 38 / 30%);
+    box-shadow:
+      0 6px 10px 4px rgb(38 38 38 / 15%),
+      0 2px 3px rgb(38 38 38 / 30%);
 
     & .panel_hidden:not(.panel_detached) {
       margin: 0;
@@ -336,7 +338,7 @@
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      content: '';
+      content: "";
       width: 6px;
       height: 6px;
       display: none;

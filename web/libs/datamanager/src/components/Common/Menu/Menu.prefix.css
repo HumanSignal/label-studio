@@ -22,7 +22,7 @@
     padding: 0 var(--spacing-tight);
   }
 
-  & li+li:not(.menu-dm__divider) {
+  & li + li:not(.menu-dm__divider) {
     margin-top: 0;
   }
 
@@ -38,7 +38,9 @@
     font-size: 14px;
     white-space: nowrap;
     user-select: none;
-    transition: background-color 150ms ease-out, color 150ms ease-out;
+    transition:
+      background-color 150ms ease-out,
+      color 150ms ease-out;
 
     &[disabled] {
       color: var(--color-neutral-content-subtlest);
@@ -116,7 +118,6 @@
     padding: 0 var(--spacing-tight);
   }
 
-
   &_size_compact {
     padding: var(--spacing-tightest);
     gap: var(--spacing-tightest);
@@ -142,7 +143,6 @@
       padding: 0 var(--spacing-tight);
     }
   }
-
 
   &_collapsed {
     padding: var(--spacing-tighter);

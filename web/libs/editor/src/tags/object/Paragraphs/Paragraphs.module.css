@@ -1,4 +1,3 @@
-
 .paragraphs {
   position: relative;
 }
@@ -17,7 +16,6 @@
     content: counter(phrase);
     margin-right: 4px;
   }
-
 }
 
 .phrase:focus {
@@ -180,7 +178,6 @@
   margin-left: 0;
 }
 
-
 /* .playNewUi { */
 /*   user-select: none; */
 /*   cursor: pointer; */
@@ -225,7 +222,9 @@
   transform: translateY(-50%); /* Perfect vertical centering */
   font-size: inherit;
 
-  &:hover, &:active, &:focus {
+  &:hover,
+  &:active,
+  &:focus {
     background: none;
   }
 
@@ -263,7 +262,7 @@
 }
 
 .newUI {
-  transition: all .1s ease-out;
+  transition: all 0.1s ease-out;
   border-radius: 4px;
   display: flex;
   flex-wrap: wrap;
@@ -294,18 +293,18 @@
   }
 
   .dialoguename {
-    transition: all .1s ease-out;
+    transition: all 0.1s ease-out;
     background: none;
     font-size: 16px;
     font-style: normal;
     font-weight: 600;
     line-height: 24px;
     letter-spacing: 0.15px;
-    padding: 0
+    padding: 0;
   }
 
   .dialoguetext {
-    transition: all .1s ease-out;
+    transition: all 0.1s ease-out;
     font-size: 14px;
     font-style: normal;
     font-weight: 400;

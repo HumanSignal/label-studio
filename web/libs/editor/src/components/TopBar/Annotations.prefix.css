@@ -13,7 +13,10 @@
     right: -1px;
     position: absolute;
     background-color: var(--color-neutral-background);
-    box-shadow: 0 0 1px rgb(0 0 0 / 10%), 0 2px 8px -2px rgb(0 0 0 / 10%), 0 0 0 1px rgb(0 0 0 / 10%) inset;
+    box-shadow:
+      0 0 1px rgb(0 0 0 / 10%),
+      0 2px 8px -2px rgb(0 0 0 / 10%),
+      0 0 0 1px rgb(0 0 0 / 10%) inset;
   }
 
   &__create {
@@ -121,7 +124,7 @@
     &::before {
       top: 50%;
       left: 50%;
-      content: '';
+      content: "";
       width: 10px;
       height: 10px;
       display: block;

@@ -55,7 +55,7 @@
   padding-left: var(--spacing-tightest);
 
   &_interactive {
-    user-select: none
+    user-select: none;
   }
 
   &__icon {

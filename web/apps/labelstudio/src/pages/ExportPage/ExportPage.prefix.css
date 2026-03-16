@@ -316,7 +316,6 @@
       background-color: var(--color-primary-emphasis-subtle);
     }
 
-
     &:not(&_active) {
       opacity: 0.3;
     }
@@ -327,7 +326,7 @@
       left: 10px;
       width: 18px;
       height: 18px;
-      content: '';
+      content: "";
       display: block;
       position: absolute;
       border-radius: 100%;

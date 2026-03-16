@@ -81,7 +81,6 @@
     background-color: var(--color-neutral-surface);
     color: var(--color-neutral-content);
 
-
     &:hover {
       border: 1px solid var(--color-neutral-border-bold);
       background-color: var(--color-neutral-surface-hover);

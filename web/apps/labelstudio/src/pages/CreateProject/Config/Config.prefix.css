@@ -10,19 +10,19 @@
   flex-direction: column;
 }
 
-.sidebar-menu__content>.wizard {
+.sidebar-menu__content > .wizard {
   height: calc(100% + 64px);
   margin: -32px;
 }
 
-.wizard>.configure {
+.wizard > .configure {
   flex: 1;
   min-height: 0;
   display: flex;
   align-items: stretch;
   position: relative;
 
-  >* {
+  > * {
     flex: 50%;
     min-width: 0;
   }
@@ -37,7 +37,7 @@
   overflow-y: scroll;
   background-color: var(--color-neutral-background);
 
-  &>div {
+  & > div {
     padding: var(--spacing-base) calc(24px - var(--scroll-width)) var(--spacing-base) 20px;
 
     &:first-child {
@@ -55,7 +55,7 @@
 }
 
 /* Apply max-height only in Create Project wizard context (not in Labeling Settings) */
-.create-project .wizard .configure__container>div {
+.create-project .wizard .configure__container > div {
   --create-project-header-height: 73px;
   --create-project-modal-padding: calc(var(--spacing-widest) * 2);
 
@@ -138,11 +138,13 @@
       gap: var(--spacing-wide);
 
       /* Better space utilization on larger screens */
-      @media (width >=1200px) { /* desktop */
+      @media (width >= 1200px) {
+        /* desktop */
         grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
       }
 
-      @media (width >=1600px) { /* wide desktop */
+      @media (width >= 1600px) {
+        /* wide desktop */
         grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
       }
     }
@@ -227,7 +229,7 @@
 }
 
 .wizard a.back::before {
-  content: '\2190';
+  content: "\2190";
   margin-right: 8px;
 }
 
@@ -268,7 +270,7 @@
   line-height: 1;
 }
 
-.configure__container>div>header {
+.configure__container > div > header {
   display: flex;
   justify-content: flex-end;
   align-items: center;
@@ -291,7 +293,7 @@
   }
 }
 
-.configure__container>div>header .toggle-items {
+.configure__container > div > header .toggle-items {
   margin-left: auto;
 }
 
@@ -309,7 +311,7 @@
 .wizard .configure__visual {
   padding: 0 var(--spacing-tighter);
 
-  >* {
+  > * {
     border-top: 1px solid var(--color-neutral-border);
     padding-top: 16px;
     margin-bottom: 16px;
@@ -322,7 +324,6 @@
     &:hover {
       text-decoration: underline;
       color: var(--color-primary-content-hover);
-
     }
   }
 
@@ -344,7 +345,7 @@
     color: var(--color-neutral-content);
   }
 
-  &>p {
+  & > p {
     line-height: 32px;
     display: flex;
     flex-wrap: wrap;
@@ -364,7 +365,7 @@
     }
   }
 
-  &>p.configure__object-error {
+  & > p.configure__object-error {
     line-height: 140%;
     color: var(--color-negative-content);
   }
@@ -500,7 +501,6 @@
       opacity: 0;
     }
 
-
     .configure__delete-label {
       min-width: 0;
       border: 0;
@@ -621,11 +621,10 @@
     }
   }
 
-  .editor>.common {
+  .editor > .common {
     flex: 1;
     max-width: 100%;
   }
-
 
   .main-view {
     &__annotation {
@@ -679,7 +678,7 @@
   min-height: 200px;
 }
 
-div[class^="App_menu"]>div {
+div[class^="App_menu"] > div {
   width: 100%;
 }
 

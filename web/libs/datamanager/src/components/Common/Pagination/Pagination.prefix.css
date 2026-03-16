@@ -42,15 +42,21 @@
     align-items: center;
     border-radius: var(--border-radius, 5px);
     background: var(--white);
-    box-shadow: inset 0 -1px 0 var(--black_10), inset 0 0 0 1px var(--black_15);
+    box-shadow:
+      inset 0 -1px 0 var(--black_10),
+      inset 0 0 0 1px var(--black_15);
 
     .pagination-dm_waiting & {
       pointer-events: none;
       animation: button-waiting 1s linear infinite;
-      background-image: repeating-linear-gradient(-63.43deg,
-          rgb(var(--white-raw) / 20%) 1px, #efefef 2px, #efefef 6px,
-          rgb(var(--white-raw) / 20%) 7px,
-          rgb(var(--white-raw) / 20%) 12px);
+      background-image: repeating-linear-gradient(
+        -63.43deg,
+        rgb(var(--white-raw) / 20%) 1px,
+        #efefef 2px,
+        #efefef 6px,
+        rgb(var(--white-raw) / 20%) 7px,
+        rgb(var(--white-raw) / 20%) 12px
+      );
     }
   }
 
@@ -93,7 +99,7 @@
 
       &::before,
       &::after {
-        content: '';
+        content: "";
         display: block;
         position: absolute;
         left: 50%;
@@ -154,10 +160,10 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    border: 1px solid #D9D9D9;
+    border: 1px solid #d9d9d9;
     border-top: none;
     border-bottom: none;
-    background: #FAFAFA;
+    background: #fafafa;
     margin: 1px 0;
 
     .pagination-dm_waiting & {

@@ -1,4 +1,4 @@
-@import '../../ui/src/styles.prefix.css';
+@import "../../ui/src/styles.prefix.css";
 
 body {
   height: 100vh;
@@ -24,7 +24,6 @@ body {
   color: var(--color-neutral-content) !important;
 }
 
-
 /* Within Doc Pages apply the theme colors only to the preview blocks */
 .sbdocs-preview {
   background-color: var(--color-neutral-background) !important;
@@ -34,7 +33,6 @@ body {
 
 /* Style Storybook docs UI elements for dark mode support */
 #storybook-docs {
-
   /* Args table (props documentation) */
   .docblock-argstable {
     color: var(--color-neutral-content) !important;
@@ -56,7 +54,6 @@ body {
 
     /* Property names and descriptions */
     & td {
-
       & span,
       & p,
       & div {
@@ -92,14 +89,14 @@ body {
   }
 
   /* Type signature chips (e.g., "(element: HTMLElement) => boolean") */
-  .docblock-argstable td div[class*="css-"]>span[class*="css-"] {
+  .docblock-argstable td div[class*="css-"] > span[class*="css-"] {
     background-color: var(--color-neutral-surface) !important;
     color: var(--color-neutral-content) !important;
     border: none !important;
   }
 
   /* Default value chips (e.g., "false", "true") */
-  .docblock-argstable td>span[class*="css-"] {
+  .docblock-argstable td > span[class*="css-"] {
     background-color: var(--color-neutral-surface) !important;
     color: var(--color-neutral-content) !important;
     border: none !important;
@@ -114,7 +111,6 @@ body {
     border-color: var(--color-neutral-border) !important;
   }
 
-
   /* Toggle switches (label with for starting with "control-") */
   .docblock-argstable label[for^="control-"] {
     background: var(--color-neutral-background) !important;
@@ -122,23 +118,22 @@ body {
   }
 
   .docblock-argstable input[role="switch"] {
-
     /* Toggle text labels (False/True) */
-    &~span[aria-hidden="true"] {
+    & ~ span[aria-hidden="true"] {
       color: var(--color-neutral-content) !important;
       background-color: var(--color-neutral-background) !important;
     }
 
     /* Checked state - use primary color */
     &:checked {
-      &~span:last-of-type {
+      & ~ span:last-of-type {
         background-color: var(--color-primary-background) !important;
         color: var(--color-primary-content) !important;
       }
     }
 
     &:not(:checked) {
-      &~span:first-of-type {
+      & ~ span:first-of-type {
         background-color: var(--color-primary-background) !important;
         color: var(--color-primary-content) !important;
       }

@@ -82,15 +82,13 @@
     margin: 0 4px;
   }
 
-
-
   .ant-select {
     margin: 4px 0;
   }
 
   .audio-slider {
     &__control {
-      padding: 4px 0 8px
+      padding: 4px 0 8px;
     }
 
     &__range {

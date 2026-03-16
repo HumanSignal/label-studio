@@ -7,7 +7,7 @@
   /* z-index doesn't work here, so we just reimplement shadow of aggregation row */
   /* in this exact cell as inset; also we had to expand and shift the shadow */
   /* to only drop from the top of the cell */
-  &+tr td:first-child {
+  & + tr td:first-child {
     box-shadow: 0 10px 8px -8px rgba(var(--color-neutral-shadow-raw) / 10%) inset;
   }
 }

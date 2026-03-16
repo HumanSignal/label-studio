@@ -5,7 +5,7 @@
   --json-viewer-collection-background: transparent;
   --json-viewer-input-background: var(--color-neutral-background);
   --json-viewer-button-hover-background: var(--color-primary-emphasis-subtle);
-  
+
   /* Color tokens for JSON values */
   --json-viewer-color-edit: var(--color-primary-content);
   --json-viewer-color-copy: var(--color-primary-content);
@@ -122,21 +122,25 @@
   line-height: var(--line-height-body-small);
   box-sizing: border-box;
   transition: box-shadow 180ms ease-out;
-  
+
   &:not(:disabled):hover {
     border-color: var(--color-neutral-border-bold);
   }
-  
+
   &:not(:disabled):active {
     border-color: var(--color-neutral-border-bolder);
   }
-  
+
   &:focus {
     outline: none;
-    box-shadow: 0 0 0 4px var(--color-primary-focus-outline), inset 0 -1px 0 rgb(0 0 0 / 10%), inset 0 0 0 1px rgb(0 0 0 / 15%), inset 0 0 0 1px var(--color-primary-surface-content-subtle);
+    box-shadow:
+      0 0 0 4px var(--color-primary-focus-outline),
+      inset 0 -1px 0 rgb(0 0 0 / 10%),
+      inset 0 0 0 1px rgb(0 0 0 / 15%),
+      inset 0 0 0 1px var(--color-primary-surface-content-subtle);
     border-color: var(--color-neutral-border-bold);
   }
-  
+
   &::placeholder {
     color: var(--color-neutral-content-subtler);
   }
@@ -182,21 +186,21 @@
       font-size: var(--font-size-smaller);
       line-height: 1.6;
     }
-    
+
     /* Override button styles */
     .jer-button {
       transition: background-color 150ms ease;
-      
+
       &:hover {
         background-color: var(--json-viewer-button-hover-background);
       }
-      
+
       &:focus {
         outline: 2px solid var(--color-primary-border);
         outline-offset: 2px;
       }
     }
-    
+
     /* Override input styles */
     .jer-input {
       background: var(--json-viewer-input-background);
@@ -205,18 +209,18 @@
       border-radius: var(--corner-radius-small);
       padding: var(--spacing-tight) var(--spacing-base);
       transition: border-color 150ms ease;
-      
+
       &:hover {
         border-color: var(--color-primary-border-subtle);
       }
-      
+
       &:focus {
         outline: none;
         border-color: var(--color-primary-border);
         box-shadow: 0 0 0 1px var(--color-primary-border);
       }
     }
-    
+
     /* Override collection/object/array backgrounds */
     .jer-collection {
       background-color: var(--json-viewer-collection-background);
@@ -226,7 +230,7 @@
     .jer-editor-container {
       background: transparent;
     }
-    
+
     /* Override key-value pair spacing */
     .jer-key-value-pair {
       padding: var(--spacing-tighter) 0;
@@ -291,7 +295,10 @@
       display: flex;
       transform: none;
       border-radius: var(--corner-radius-smaller);
-      transition: background-color 150ms ease-out, color 150ms ease-out, opacity 150ms ease-out;
+      transition:
+        background-color 150ms ease-out,
+        color 150ms ease-out,
+        opacity 150ms ease-out;
 
       &::after {
         display: none;

@@ -98,7 +98,7 @@
 
       &::before {
         position: absolute;
-        content: '';
+        content: "";
         width: 1px;
         height: 100%;
         background: var(--color-primary-content-subtle);
@@ -110,7 +110,7 @@
       }
 
       &::after {
-        content: '';
+        content: "";
         position: absolute;
         width: 7px;
         height: 7px;

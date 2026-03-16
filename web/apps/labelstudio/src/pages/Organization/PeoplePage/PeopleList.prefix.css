@@ -85,7 +85,7 @@
         top: 0;
         bottom: 0;
         left: 0;
-        content: '';
+        content: "";
         display: block;
         position: absolute;
       }
@@ -94,7 +94,9 @@
         z-index: 1;
         background-color: var(--color-neutral-surface);
         width: calc(100% + 22px);
-        box-shadow: inset 4px 0 0 var(--grape_500), 1px 0 0 1px var(--color-neutral-border) inset;
+        box-shadow:
+          inset 4px 0 0 var(--grape_500),
+          1px 0 0 1px var(--color-neutral-border) inset;
       }
 
       &::before {

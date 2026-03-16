@@ -82,13 +82,8 @@
 
     /* Automatic fallback positioning when overflowing */
     position-try-fallbacks:
-      --dropdown-bottom-right,
-      --dropdown-bottom-center,
-      --dropdown-top-left,
-      --dropdown-top-right,
-      --dropdown-top-center,
-      flip-block,
-      flip-inline;
+      --dropdown-bottom-right, --dropdown-bottom-center, --dropdown-top-left, --dropdown-top-right,
+      --dropdown-top-center, flip-block, flip-inline;
 
     /* Only show when anchor is visible */
     position-visibility: anchors-visible;

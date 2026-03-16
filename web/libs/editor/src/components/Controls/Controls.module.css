@@ -17,7 +17,8 @@
       margin-left: 0;
     }
 
-    @media (width <= 760px) { /* phone */
+    @media (width <= 760px) {
+      /* phone */
       margin-left: 0;
       margin-bottom: 5px;
     }
@@ -31,7 +32,8 @@
     margin-right: 0;
   }
 
-  @media (width <= 760px) { /* phone */
+  @media (width <= 760px) {
+    /* phone */
     justify-content: flex-start;
     align-items: flex-start;
     flex-flow: column;
@@ -48,7 +50,8 @@
   align-items: center;
   margin-top: 20px;
 
-  @media (width <= 760px) { /* phone */
+  @media (width <= 760px) {
+    /* phone */
     flex-flow: column;
     align-items: flex-start;
   }

@@ -24,7 +24,7 @@
     align-items: center;
     justify-content: space-between;
 
-    &+.inline-error {
+    & + .inline-error {
       margin-top: 32px;
     }
   }

@@ -14,7 +14,9 @@
   width: 100%;
   min-width: 0;
   background: var(--color-neutral-background);
-  transition: background 150ms ease-out, border-color 150ms ease-out;
+  transition:
+    background 150ms ease-out,
+    border-color 150ms ease-out;
 
   /* body/medium */
   font-size: var(--select-trigger-font-size);
@@ -72,7 +74,6 @@
   &:focus {
     outline: none;
     padding: var(--spacing-tight);
-
   }
 }
 
@@ -161,4 +162,3 @@
   pointer-events: none;
   user-select: none;
 }
-

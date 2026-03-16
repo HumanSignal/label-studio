@@ -91,7 +91,7 @@
 
   &.today {
     &::before {
-      content: '';
+      content: "";
       position: absolute;
       left: calc(50% - 2px);
       bottom: 0;
@@ -112,4 +112,3 @@
     }
   }
 }
-

@@ -120,7 +120,6 @@ body :global(.ant-radio:hover .ant-radio-inner) {
   background-color: var(--color-neutral-background);
 }
 
-
 body :global(.ant-radio .ant-radio-input:focus + .ant-radio-inner) {
   border-color: var(--color-primary-border);
   background-color: var(--color-neutral-background);

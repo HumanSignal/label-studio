@@ -27,7 +27,7 @@
 
   &::before {
     inset: -5px;
-    content: '';
+    content: "";
     display: block;
     position: absolute;
   }

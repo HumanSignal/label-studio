@@ -51,10 +51,17 @@
     overflow: hidden;
     cursor: pointer;
     position: relative;
-    box-shadow: -1px 0 0 var(--color-neutral-border) inset, 1px 0 0 var(--color-neutral-border) inset, 0 1px 0 var(--color-neutral-border-subtle) inset, 0 -1px 0 var(--color-neutral-border) inset;
+    box-shadow:
+      -1px 0 0 var(--color-neutral-border) inset,
+      1px 0 0 var(--color-neutral-border) inset,
+      0 1px 0 var(--color-neutral-border-subtle) inset,
+      0 -1px 0 var(--color-neutral-border) inset;
     border-top-left-radius: var(--corner-radius-small);
     border-top-right-radius: var(--corner-radius-small);
-    transition: background-color 150ms ease-out, opacity 150ms ease-out, border-color 150ms ease-out;
+    transition:
+      background-color 150ms ease-out,
+      opacity 150ms ease-out,
+      border-color 150ms ease-out;
     opacity: 0.7;
 
     & .tabs-dm__item-right {
@@ -73,7 +80,11 @@
     &:hover,
     &:focus-within {
       background-color: var(--color-primary-emphasis-subtle);
-      box-shadow: -1px 0 0 var(--color-primary-border-subtler) inset, 1px 0 0 var(--color-primary-border-subtler) inset, 0 1px 0 var(--color-primary-border-subtler) inset, 0 -1px 0 var(--color-neutral-border) inset;
+      box-shadow:
+        -1px 0 0 var(--color-primary-border-subtler) inset,
+        1px 0 0 var(--color-primary-border-subtler) inset,
+        0 1px 0 var(--color-primary-border-subtler) inset,
+        0 -1px 0 var(--color-neutral-border) inset;
       color: var(--color-neutral-content);
       opacity: 1;
 
@@ -100,13 +111,19 @@
       color: var(--color-neutral-content);
       cursor: default;
       background-color: var(--color-neutral-background);
-      box-shadow: -1px 0 0 var(--color-neutral-border) inset, 1px 0 0 var(--color-neutral-border) inset, 0 1px 0 var(--color-neutral-border) inset;
+      box-shadow:
+        -1px 0 0 var(--color-neutral-border) inset,
+        1px 0 0 var(--color-neutral-border) inset,
+        0 1px 0 var(--color-neutral-border) inset;
       opacity: 1;
       font-weight: var(--font-weight-medium);
 
       &:hover {
         background-color: var(--color-neutral-background);
-        box-shadow: -1px 0 0 var(--color-neutral-border) inset, 1px 0 0 var(--color-neutral-border) inset, 0 1px 0 var(--color-neutral-border) inset;
+        box-shadow:
+          -1px 0 0 var(--color-neutral-border) inset,
+          1px 0 0 var(--color-neutral-border) inset,
+          0 1px 0 var(--color-neutral-border) inset;
       }
     }
 
@@ -139,12 +156,14 @@
         width: calc(100% - 8px);
         display: block;
         border-color: var(--accent-base);
-        background-image: repeating-linear-gradient(-63.43deg, 
-          transparent 1px, 
-          var(--accent-base) 2px, 
-          var(--accent-base) 7px, 
-          var(--accent-subtle) 8px, 
-          var(--accent-subtle) 12px);
+        background-image: repeating-linear-gradient(
+          -63.43deg,
+          transparent 1px,
+          var(--accent-base) 2px,
+          var(--accent-base) 7px,
+          var(--accent-subtle) 8px,
+          var(--accent-subtle) 12px
+        );
         background-repeat: repeat-x;
         background-position: top;
         background-size: 100% 2px;
@@ -246,7 +265,9 @@
     width: 36px;
     max-width: 60%;
     opacity: 0;
-    transition: opacity 150ms ease-out, right 150ms ease-out;
+    transition:
+      opacity 150ms ease-out,
+      right 150ms ease-out;
   }
 
   &__item-right-button {
@@ -285,6 +306,6 @@
     left: 0;
     background: var(--color-neutral-background);
     border-top: 1px solid var(--color-neutral-border);
-    padding: .625rem 1rem;
+    padding: 0.625rem 1rem;
   }
 }

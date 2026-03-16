@@ -10,7 +10,9 @@
   border-radius: var(--radius);
   padding: var(--padding);
   background: linear-gradient(0deg, rgb(0 0 0 / 5%), rgb(0 0 0 / 5%)), var(--color-neutral-background);
-  box-shadow: inset 0 1px 0 rgb(0 0 0 / 5%), inset 0 0 0 1px rgb(0 0 0 / 5%);
+  box-shadow:
+    inset 0 1px 0 rgb(0 0 0 / 5%),
+    inset 0 0 0 1px rgb(0 0 0 / 5%);
 
   &__buttons {
     height: calc(var(--height) - calc(var(--padding) * 2));

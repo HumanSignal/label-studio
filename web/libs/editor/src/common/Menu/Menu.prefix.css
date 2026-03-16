@@ -16,7 +16,7 @@
     margin: 0.5rem;
   }
 
-  & li+li {
+  & li + li {
     margin-top: 0;
   }
 

@@ -79,8 +79,8 @@
     overflow-y: auto;
     padding: 0;
 
-    >.audio-config__slider-container,
-    >.audio-config__toggle {
+    > .audio-config__slider-container,
+    > .audio-config__toggle {
       padding: 8px 16px;
     }
   }
@@ -105,7 +105,6 @@
       background: var(--color-primary-emphasis-subtle);
     }
   }
-
 
   &__section-header {
     position: sticky;

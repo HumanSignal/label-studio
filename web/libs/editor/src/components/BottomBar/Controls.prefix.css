@@ -65,7 +65,6 @@
           color: var(--color-neutral-content-subtlest);
           cursor: not-allowed;
         }
-
       }
 
       &__has_icon {
@@ -154,11 +153,12 @@
   font-style: normal;
   font-weight: 400;
   line-height: 24px;
-  box-shadow: 0 1px 3px 1px rgb(38 38 38 / 15%), 0 1px 2px 0 rgb(38 38 38 / 30%);
-
+  box-shadow:
+    0 1px 3px 1px rgb(38 38 38 / 15%),
+    0 1px 2px 0 rgb(38 38 38 / 30%);
 
   &::before {
-    content: '';
+    content: "";
     z-index: -1;
     width: calc(100% - 16px);
     height: calc(100% - 16px);

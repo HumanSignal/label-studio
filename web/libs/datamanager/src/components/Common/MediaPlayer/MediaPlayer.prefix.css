@@ -7,7 +7,9 @@
   border-radius: 4px;
   align-items: center;
   background-color: var(--color-neutral-background);
-  box-shadow: 0 0 0 1px var(--color-neutral-border) inset, 0 2px 4px rgba(var(--color-neutral-shadow-raw) / 8%);
+  box-shadow:
+    0 0 0 1px var(--color-neutral-border) inset,
+    0 2px 4px rgba(var(--color-neutral-shadow-raw) / 8%);
 
   & video {
     width: 140px;

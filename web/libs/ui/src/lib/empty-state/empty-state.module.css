@@ -4,11 +4,11 @@
 }
 
 .icon {
-    @apply aspect-square p-tight;
+  @apply aspect-square p-tight;
 }
 
 .title {
-    @apply text-center;
+  @apply text-center;
 }
 
 /* Size Styles */
@@ -142,8 +142,18 @@
 /* Gradient Variant - AI theme with gradient and animation */
 .variant-gradient {
   .icon {
-    background: linear-gradient(109deg, var(--color-accent-canteloupe-base) 0%, var(--color-accent-persimmon-base) 51.56%, var(--color-accent-plum-base) 100%), var(--color-accent-grape-subtle);
-    box-shadow: 0 0 16px 0 rgb(255 166 99 / 50%), 0 0 48px 0 rgb(255 117 87 / 60%), 0 0 128px 0 rgb(227 123 211 / 50%);
+    background:
+      linear-gradient(
+        109deg,
+        var(--color-accent-canteloupe-base) 0%,
+        var(--color-accent-persimmon-base) 51.56%,
+        var(--color-accent-plum-base) 100%
+      ),
+      var(--color-accent-grape-subtle);
+    box-shadow:
+      0 0 16px 0 rgb(255 166 99 / 50%),
+      0 0 48px 0 rgb(255 117 87 / 60%),
+      0 0 128px 0 rgb(227 123 211 / 50%);
     animation: pulsate 4s infinite;
 
     @apply text-neutral-on-dark-content;

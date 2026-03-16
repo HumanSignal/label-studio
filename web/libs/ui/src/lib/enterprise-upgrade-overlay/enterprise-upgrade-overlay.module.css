@@ -12,10 +12,17 @@
 .container {
   /* Gradient border effect using padding + background + pseudo-element */
   padding: 2px;
-  background: linear-gradient(109.47deg, var(--color-accent-canteloupe-base) 0%, var(--color-accent-persimmon-base) 50%, var(--color-accent-plum-base) 100%);
+  background: linear-gradient(
+    109.47deg,
+    var(--color-accent-canteloupe-base) 0%,
+    var(--color-accent-persimmon-base) 50%,
+    var(--color-accent-plum-base) 100%
+  );
   border-radius: 12px;
   width: 780px;
-  box-shadow: 0 8px 24px rgb(var(--color-neutral-shadow-raw) / 24%),  0 4px 16px rgb(var(--color-neutral-shadow-raw) / 32%);
+  box-shadow:
+    0 8px 24px rgb(var(--color-neutral-shadow-raw) / 24%),
+    0 4px 16px rgb(var(--color-neutral-shadow-raw) / 32%);
   position: relative;
   transform: translateY(-3rem);
 
@@ -84,4 +91,3 @@
     white-space: nowrap;
   }
 }
-

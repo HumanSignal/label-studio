@@ -62,7 +62,9 @@
     background-color: var(--sand_400);
     border-radius: 100%;
     will-change: color, opacity;
-    transition: color 0.1s ease, opacity 0.1s ease;
+    transition:
+      color 0.1s ease,
+      opacity 0.1s ease;
     animation: pulse 1s linear infinite;
   }
 
@@ -168,6 +170,6 @@
 
   &__classifications {
     font-size: 13px;
-    letter-spacing: .8px;
+    letter-spacing: 0.8px;
   }
 }

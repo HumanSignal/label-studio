@@ -35,7 +35,7 @@
       color: var(--color-accent-plum-bold);
     }
 
-    & .annotation-button__userpic {      
+    & .annotation-button__userpic {
       .userpic-badge {
         width: 10px;
         height: 10px;
@@ -45,7 +45,7 @@
         justify-content: center;
         border-radius: 2px;
         box-shadow: 0 0 0 2px var(--color-neutral-background);
-        transform: translate(2px,2px);
+        transform: translate(2px, 2px);
       }
     }
   }
@@ -99,7 +99,7 @@
       opacity: 1;
       right: var(--spacing-tighter);
     }
-    
+
     & .annotation-button__picSection {
       opacity: 1;
     }
@@ -119,7 +119,8 @@
     border-color: transparent;
   }
 
-  &_draft, &_draftSaved {
+  &_draft,
+  &_draftSaved {
     --accent-base: var(--color-accent-grape-base);
     --accent-subtle: var(--color-accent-grape-subtle);
 
@@ -140,12 +141,14 @@
       width: 100%;
       display: block;
       border-color: var(--accent-base);
-      background-image: repeating-linear-gradient(-63.43deg, 
-      transparent 1px, 
-      var(--accent-base) 2px, 
-      var(--accent-base) 7px, 
-      var(--accent-subtle) 8px, 
-      var(--accent-subtle) 12px);
+      background-image: repeating-linear-gradient(
+        -63.43deg,
+        transparent 1px,
+        var(--accent-base) 2px,
+        var(--accent-base) 7px,
+        var(--accent-subtle) 8px,
+        var(--accent-subtle) 12px
+      );
       background-repeat: repeat-x;
       background-position: top;
       background-size: 100% 2px;
@@ -183,7 +186,9 @@
     transform: translate(0, 1px);
     margin-top: 1px;
     height: calc(100% - 2px);
-    box-shadow: inset 0 4px 2px 0 var(--color-neutral-background), 0 4px 2px 0 rgba(var(--color-neutral-shadow-raw) / 20%);
+    box-shadow:
+      inset 0 4px 2px 0 var(--color-neutral-background),
+      0 4px 2px 0 rgba(var(--color-neutral-shadow-raw) / 20%);
 
     & .annotation-button__picSection {
       opacity: 1;
@@ -236,8 +241,13 @@
     justify-content: center;
     border: 1px solid var(--trigger-border-color);
     background-color: var(--color-neutral-background);
-    transition: opacity 150ms ease-out, background-color 150ms ease-out, right 150ms ease-out;
-    box-shadow: 2px 0 6px rgb(var(--color-neutral-shadow-raw) / 8%), 1px 0 2px rgb(var(--color-neutral-shadow-raw) / 8%);
+    transition:
+      opacity 150ms ease-out,
+      background-color 150ms ease-out,
+      right 150ms ease-out;
+    box-shadow:
+      2px 0 6px rgb(var(--color-neutral-shadow-raw) / 8%),
+      1px 0 2px rgb(var(--color-neutral-shadow-raw) / 8%);
 
     & svg {
       width: 20px;
@@ -272,8 +282,6 @@
   }
 
   /* Badge styles - matching Annotators component (global styles) */
-
-
 
   &__tooltipContainer {
     position: fixed;

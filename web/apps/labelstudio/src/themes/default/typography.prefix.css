@@ -6,7 +6,6 @@
   font-display: swap;
 }
 
-
 @font-face {
   font-family: Figtree;
   src: url("/static/fonts/Figtree-SemiBold.ttf") format("truetype");
@@ -16,7 +15,7 @@
 }
 
 body {
-  --font-sans: 'Figtree', sans-serif !important;
+  --font-sans: "Figtree", sans-serif !important;
   --font-mono: monaco, monospace !important;
   --font-weight-400: 400;
   --font-weight-500: 500;

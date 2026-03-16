@@ -39,7 +39,12 @@
     padding: 2px 7px;
     text-align: center;
     background-color: var(--color-neutral-background);
-    background-image: repeating-linear-gradient(90deg, var(--color-primary-content) 0, var(--color-primary-content-subtle) 120px, var(--color-primary-content) 240px);
+    background-image: repeating-linear-gradient(
+      90deg,
+      var(--color-primary-content) 0,
+      var(--color-primary-content-subtle) 120px,
+      var(--color-primary-content) 240px
+    );
     animation: buffering 1.2s linear infinite;
   }
 }

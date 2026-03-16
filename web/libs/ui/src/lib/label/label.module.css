@@ -79,7 +79,6 @@
   &_placement_left:not(.label_withDescription) &__field {
     display: flex;
     align-items: center;
-
   }
 
   &_placement_right.label_withDescription &__field,

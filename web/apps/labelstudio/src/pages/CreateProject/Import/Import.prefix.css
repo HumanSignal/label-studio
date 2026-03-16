@@ -19,7 +19,7 @@
     line-height: 1em;
   }
 
-  &>header {
+  & > header {
     font-size: 14px;
     padding: 24px 32px;
     background: var(--color-neutral-background);
@@ -57,7 +57,7 @@
       border-radius: 0 var(--corner-radius-smaller) var(--corner-radius-smaller) 0;
     }
 
-    &+span {
+    & + span {
       color: var(--color-neutral-content-subtler);
     }
   }
@@ -68,8 +68,8 @@
   }
 
   /* Shared custom scrollbar styles */
-  &>main,
-  &__code-wrapper>div {
+  & > main,
+  &__code-wrapper > div {
     scrollbar-color: var(--color-neutral-border-bold) transparent;
     scrollbar-width: thin;
 
@@ -99,19 +99,23 @@
     }
   }
 
-  &>main {
+  & > main {
     flex: 1;
     overflow-y: auto;
-    background: linear-gradient(var(--color-neutral-background) 30%, rgb(255 255 255 / 0%)), linear-gradient(rgb(0 0 0 / 10%), var(--color-neutral-background) 100%);
+    background:
+      linear-gradient(var(--color-neutral-background) 30%, rgb(255 255 255 / 0%)),
+      linear-gradient(rgb(0 0 0 / 10%), var(--color-neutral-background) 100%);
     background-repeat: no-repeat;
     background-color: var(--color-neutral-background);
-    background-size: 100% 20px, 100% 5px;
+    background-size:
+      100% 20px,
+      100% 5px;
     background-attachment: local, scroll;
   }
 
   & table {
     table-layout: fixed;
-    
+
     & tr {
       border-bottom: 2px solid var(--color-neutral-background);
       background-color: transparent;
@@ -145,10 +149,14 @@
       background-position: 40px;
       background-size: 37px 100%;
       animation: status-uploading 1s linear infinite;
-      background-image: repeating-linear-gradient(-63.43deg,
-          rgb(255 255 255 / 20%) 1px, #efefef 2px, #efefef 6px,
-          rgb(255 255 255 / 20%) 7px,
-          rgb(255 255 255 / 20%) 12px);
+      background-image: repeating-linear-gradient(
+        -63.43deg,
+        rgb(255 255 255 / 20%) 1px,
+        #efefef 2px,
+        #efefef 6px,
+        rgb(255 255 255 / 20%) 7px,
+        rgb(255 255 255 / 20%) 12px
+      );
     }
   }
 
@@ -179,7 +187,7 @@
     padding: 0 var(--spacing-base) var(--spacing-base);
     height: calc(100% - var(--spacing-tight));
 
-    &>div {
+    & > div {
       height: 100%;
       overflow-y: auto;
       font-size: var(--font-size-14);
@@ -270,7 +278,9 @@
       border: 2px dashed var(--color-primary-border-subtle);
       background: var(--color-primary-emphasis);
       font-size: 32px;
-      box-shadow: inset 2px 2px 24px 0 rgba(var(--color-primary-shadow-raw) / 10%), inset 2px 2px 8px 0 rgba(var(--color-primary-shadow-raw) / 15%);
+      box-shadow:
+        inset 2px 2px 24px 0 rgba(var(--color-primary-shadow-raw) / 10%),
+        inset 2px 2px 8px 0 rgba(var(--color-primary-shadow-raw) / 15%);
     }
   }
 
@@ -296,7 +306,7 @@
     border-radius: var(--corner-radius-small);
     transition: all 150ms ease-out;
 
-    &>*:not(:first-child) {
+    & > *:not(:first-child) {
       margin-top: 32px;
     }
 
@@ -331,7 +341,6 @@
     &:hover {
       border-color: var(--color-primary-border);
     }
-
   }
 }
 
@@ -354,7 +363,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.5rem
+  gap: 0.5rem;
 }
 
 @keyframes reveal {
@@ -394,7 +403,7 @@
   0% {
     background-color: var(--color-positive-emphasis);
   }
-  
+
   20% {
     background-color: var(--color-positive-emphasis);
   }

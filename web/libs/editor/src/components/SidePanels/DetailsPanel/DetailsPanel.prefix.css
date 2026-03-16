@@ -79,7 +79,8 @@
   }
 }
 
-.history, .info {
+.history,
+.info {
   &__section-tab {
     padding: 4px;
   }

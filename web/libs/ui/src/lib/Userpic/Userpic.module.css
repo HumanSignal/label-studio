@@ -8,7 +8,7 @@
   border-radius: 50%;
   justify-content: center;
   background: var(--color-neutral-surface);
-  border: 1px solid rgba(var(--color-neutral-shadow-raw) / 10% );
+  border: 1px solid rgba(var(--color-neutral-shadow-raw) / 10%);
   box-shadow: none;
   transition: all 150ms ease-out;
   user-select: none;

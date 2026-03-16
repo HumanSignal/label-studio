@@ -91,7 +91,6 @@
     background: var(--button-color);
   }
 
-
   & input[type="range"]::-moz-range-thumb:hover {
     background: var(--button-color);
   }
@@ -113,7 +112,6 @@
     border: none;
     background: transparent;
   }
-
 
   & input[type="range"]::-ms-track {
     appearance: none;

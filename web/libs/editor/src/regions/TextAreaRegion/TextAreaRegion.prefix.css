@@ -5,7 +5,9 @@
   margin: 0 var(--spacing-tight) 0 0;
   padding: var(--spacing-tight) var(--spacing-base);
   white-space: pre-line;
-  box-shadow: 0 4px 12px 0 var(--black_4), 0 1px 2px 0 var(--black_10);
+  box-shadow:
+    0 4px 12px 0 var(--black_4),
+    0 1px 2px 0 var(--black_10);
   flex-grow: 1;
   color: var(--color-neutral-content);
 
@@ -71,4 +73,3 @@
   border-color: var(--color-neutral-border-bold);
   box-shadow: 0 0 0 4px var(--color-primary-focus-outline);
 }
-

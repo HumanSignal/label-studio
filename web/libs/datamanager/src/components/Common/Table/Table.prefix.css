@@ -59,7 +59,7 @@
     min-width: 100vw;
   }
 
-  &__virtual>div {
+  &__virtual > div {
     min-width: fit-content;
   }
 
@@ -69,9 +69,8 @@
     cursor: pointer;
     background-color: var(--color-neutral-background);
 
-
     &::after {
-      content: '';
+      content: "";
       position: absolute;
       right: 0;
       top: 0;
@@ -95,7 +94,7 @@
       position: relative;
 
       &::after {
-        content: '';
+        content: "";
         position: absolute;
         right: 0;
         top: 0;

@@ -1,7 +1,12 @@
 .badge {
   display: inline-block;
   border-radius: 4px;
-  background: linear-gradient(135deg, var(--color-accent-canteloupe-base) 0%, var(--color-accent-persimmon-base) 50%, var(--color-accent-plum-base) 100%);
+  background: linear-gradient(
+    135deg,
+    var(--color-accent-canteloupe-base) 0%,
+    var(--color-accent-persimmon-base) 50%,
+    var(--color-accent-plum-base) 100%
+  );
   vertical-align: middle;
   height: 20px;
 }
@@ -21,7 +26,12 @@
 
 .label {
   margin: 1px;
-  background: linear-gradient(135deg, var(--color-accent-canteloupe-subtlest) 0%, var(--color-accent-persimmon-subtlest) 50%, var(--color-accent-plum-subtlest) 100%);
+  background: linear-gradient(
+    135deg,
+    var(--color-accent-canteloupe-subtlest) 0%,
+    var(--color-accent-persimmon-subtlest) 50%,
+    var(--color-accent-plum-subtlest) 100%
+  );
   color: var(--color-accent-persimmon-base);
   border-radius: 3px;
   font-size: 11px;

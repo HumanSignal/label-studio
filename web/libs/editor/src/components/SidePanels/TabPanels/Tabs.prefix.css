@@ -63,7 +63,7 @@
     &_hoveringRight {
       &:hover {
         &::before {
-          content: '';
+          content: "";
           position: absolute;
           background: var(--grape_400);
           width: 4px;
@@ -105,7 +105,9 @@
       transform: translate(-1px, -1px);
       border-style: solid;
       background: var(--color-neutral-background);
-      box-shadow: 1px 4px 0 rgba(var(--color-neutral-shadow-raw) / 4%), -1px 4px 0 rgba(var(--color-neutral-shadow-raw) / 4%);
+      box-shadow:
+        1px 4px 0 rgba(var(--color-neutral-shadow-raw) / 4%),
+        -1px 4px 0 rgba(var(--color-neutral-shadow-raw) / 4%);
     }
 
     &:hover svg {
@@ -138,7 +140,7 @@
 
 .drag_over_tab_left {
   &::before {
-    content: '';
+    content: "";
     position: absolute;
     left: 0;
     background: var(--grape_400);
@@ -150,7 +152,7 @@
 
 .drag_over_tab_right {
   &::after {
-    content: '';
+    content: "";
     position: absolute;
     right: 0;
     background: var(--grape_400);
@@ -162,7 +164,7 @@
 
 .drag_over_empty_tab_space {
   &::before {
-    content: '';
+    content: "";
     transform: translate(-4px, 2px);
     position: absolute;
     background: var(--grape_400);

@@ -23,12 +23,14 @@
       width: var(--handle-size);
       height: 100%;
       background: var(--color-neutral-border);
-      content: '';
+      content: "";
       position: absolute;
       top: 0;
       left: 50%;
       transform: translateX(-50%);
-      transition: width 150ms ease-out, background-color 150ms ease-out;
+      transition:
+        width 150ms ease-out,
+        background-color 150ms ease-out;
     }
 
     &:hover::before,

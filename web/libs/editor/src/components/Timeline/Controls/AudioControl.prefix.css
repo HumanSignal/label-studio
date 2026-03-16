@@ -9,7 +9,7 @@
     background: var(--color-neutral-background);
     border-radius: 4px;
     padding: 22px 0 0;
-    box-shadow: 0 4px 10px 0 rgba(var(--color-neutral-shadow-raw) / calc( 30% * var(--shadow-intensity) ));
+    box-shadow: 0 4px 10px 0 rgba(var(--color-neutral-shadow-raw) / calc(30% * var(--shadow-intensity)));
     z-index: 10;
   }
 

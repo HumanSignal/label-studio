@@ -16,7 +16,9 @@
     transform: none;
     border-width: 0;
     color: var(--color-neutral-content);
-    box-shadow: 1px -1px 0 rgba(var(--color-neutral-shadow-raw) / 4%), -1px -1px 0 rgba(var(--color-neutral-shadow-raw) / 4%);
+    box-shadow:
+      1px -1px 0 rgba(var(--color-neutral-shadow-raw) / 4%),
+      -1px -1px 0 rgba(var(--color-neutral-shadow-raw) / 4%);
   }
 
   :global(.lsf-tabs__tabs-row) {

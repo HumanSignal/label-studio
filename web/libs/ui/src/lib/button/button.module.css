@@ -32,7 +32,7 @@
   }
 
   &:focus {
-    box-shadow:  var(--emboss-shadow),var(--focus-shadow);
+    box-shadow: var(--emboss-shadow), var(--focus-shadow);
   }
 
   &:disabled:not(.waiting),
@@ -168,20 +168,20 @@
 
     background-image: linear-gradient(
       90deg,
-      var(--color-accent-canteloupe-base, #FFA663) 0%,
-      var(--color-accent-persimmon-base, #FF7557) 50%,
-      var(--color-accent-plum-base, #E37BD3) 100%
+      var(--color-accent-canteloupe-base, #ffa663) 0%,
+      var(--color-accent-persimmon-base, #ff7557) 50%,
+      var(--color-accent-plum-base, #e37bd3) 100%
     );
   }
 
   &.waiting {
     background-image: linear-gradient(
       90deg,
-      var(--color-accent-canteloupe-base, #FFA663) 0%,
-      var(--color-accent-persimmon-base, #FF7557) 25%,
-      var(--color-accent-plum-base, #E37BD3) 50%,
-      var(--color-accent-persimmon-base, #FF7557) 75%,
-      var(--color-accent-canteloupe-base, #FFA663) 100%
+      var(--color-accent-canteloupe-base, #ffa663) 0%,
+      var(--color-accent-persimmon-base, #ff7557) 25%,
+      var(--color-accent-plum-base, #e37bd3) 50%,
+      var(--color-accent-persimmon-base, #ff7557) 75%,
+      var(--color-accent-canteloupe-base, #ffa663) 100%
     );
     background-size: 200% 100%;
     background-position: 0 0;
@@ -195,15 +195,14 @@
     background-image: linear-gradient(
       90deg,
       var(--color-accent-canteloupe-dark, #664228) 0%,
-      var(--color-accent-persimmon-dark, #803B2C) 50%,
-      var(--color-accent-plum-dark, #723E6A) 100%
+      var(--color-accent-persimmon-dark, #803b2c) 50%,
+      var(--color-accent-plum-dark, #723e6a) 100%
     );
   }
 
   &:disabled:not(.waiting) {
     background-image: none;
   }
-
 }
 
 .base.variant-gradient.look-outlined:not(:disabled) {
@@ -305,7 +304,7 @@
   }
 }
 
-  /* / VARIANT LOOK */
+/* / VARIANT LOOK */
 .look-outlined {
   &:not(:disabled),
   &.waiting {
@@ -348,7 +347,7 @@
       color: var(--text-outline);
     }
 
-    &:focus{
+    &:focus {
       border-color: var(--border-color-hover);
     }
   }
@@ -382,7 +381,6 @@
 .size-small {
   @apply p-tighter text-label-small h-800;
 
-
   & > span {
     @apply px-tighter gap-tighter;
   }
@@ -407,7 +405,7 @@
 /* / STATES */
 .waiting {
   --background-image: repeating-linear-gradient(
-      -63.43deg,
+    -63.43deg,
     transparent 1px,
     var(--wait-color) 2px,
     var(--wait-color) 7px,
@@ -422,9 +420,9 @@
   animation: button-waiting 1s linear infinite;
 
   &:disabled {
-  --background-color-hover: var(--background-color);
-  --background-color-active: var(--background-color);
-  --border-color-hover: var(--border-color);
+    --background-color-hover: var(--background-color);
+    --background-color-active: var(--background-color);
+    --border-color-hover: var(--border-color);
 
     cursor: wait;
   }
@@ -479,9 +477,9 @@
   &.button-group-collapsed {
     @apply gap-0;
 
-  & button:not(:first-child) {
-    border-left: none;
-  }
+    & button:not(:first-child) {
+      border-left: none;
+    }
 
     & button:first-child:not(:only-child) {
       border-top-right-radius: 0;

@@ -11,7 +11,9 @@
   border: 1px solid var(--color-neutral-border);
   border-radius: var(--corner-radius-smaller);
   cursor: text;
-  transition: border-color 150ms ease-out, box-shadow 150ms ease-out;
+  transition:
+    border-color 150ms ease-out,
+    box-shadow 150ms ease-out;
   overflow: hidden;
 
   &:hover:not(.triggerDisabled) {

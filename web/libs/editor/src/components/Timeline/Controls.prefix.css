@@ -62,9 +62,8 @@
     display: flex;
     max-width: 310px;
     justify-content: space-between;
-    gap: var(--spacing-tight)
+    gap: var(--spacing-tight);
   }
-
 
   &__group {
     gap: 4px;
@@ -109,7 +108,7 @@
         }
       }
 
-      &+& {
+      & + & {
         border-left: 1px solid var(--color-neutral-border);
       }
     }

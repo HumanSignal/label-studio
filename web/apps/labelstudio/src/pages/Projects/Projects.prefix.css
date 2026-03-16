@@ -42,13 +42,15 @@
     box-sizing: border-box;
   }
 
-  @media (width >= 1200px) { /* desktop */
+  @media (width >= 1200px) {
+    /* desktop */
     &__list {
       grid-template-columns: repeat(3, 1fr);
     }
   }
 
-  @media (width >= 1360px) { /* wide desktop */
+  @media (width >= 1360px) {
+    /* wide desktop */
     &__list {
       grid-template-columns: repeat(4, 1fr);
     }

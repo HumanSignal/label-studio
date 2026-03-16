@@ -34,7 +34,9 @@
     align-items: center;
     justify-content: center;
     transition: all 150ms ease;
-    box-shadow: 0 4px 8px rgba(var(--color-neutral-shadow-raw) / 16%), 0 1px 2px rgba(var(--color-neutral-shadow-raw) / 30%);
+    box-shadow:
+      0 4px 8px rgba(var(--color-neutral-shadow-raw) / 16%),
+      0 1px 2px rgba(var(--color-neutral-shadow-raw) / 30%);
 
     &_disabled {
       box-shadow: none;
@@ -47,9 +49,12 @@
     &:hover {
       background: var(--color-neutral-surface-hover);
       color: var(--color-primary-content);
-      box-shadow: 0 6px 12px 0 rgb(0 0 0 / 15%), 0 2px 4px 0 rgb(38 38 38 / 30%);
-      box-shadow: 0 6px 12px rgba(var(--color-neutral-shadow-raw) / 16%), 0 2px 4px rgba(var(--color-neutral-shadow-raw) / 30%);
-
+      box-shadow:
+        0 6px 12px 0 rgb(0 0 0 / 15%),
+        0 2px 4px 0 rgb(38 38 38 / 30%);
+      box-shadow:
+        0 6px 12px rgba(var(--color-neutral-shadow-raw) / 16%),
+        0 2px 4px rgba(var(--color-neutral-shadow-raw) / 30%);
     }
   }
 

@@ -155,12 +155,12 @@
   &[type="range"]:hover {
     accent-color: var(--color-primary-surface-hover);
   }
-  
+
   /* Removes default focus */
   &[type="range"]:focus {
     outline: none;
   }
-  
+
   /* slider thumb */
   &[type="range"]::-webkit-slider-thumb {
     appearance: none;
@@ -168,11 +168,11 @@
     transition: all 150ms ease-out;
     border-radius: 50%;
   }
-  
+
   &[type="range"]:hover::-webkit-slider-thumb {
     background-color: var(--color-primary-surface-hover);
   }
-  
+
   &[type="range"]:focus::-webkit-slider-thumb {
     background-color: var(--color-primary-surface-hover);
     outline: 4px solid var(--color-primary-focus-outline);

@@ -28,7 +28,10 @@
     align-items: center;
     justify-content: center;
     transition: all 80ms ease;
-    box-shadow: 0 1px 0 rgba(var(--color-neutral-shadow-raw) / 24%), 0 0 0 1px rgba(var(--color-neutral-shadow-raw) / 10%), 0 5px 10px rgba(var(--color-neutral-shadow-raw) / 10%);
+    box-shadow:
+      0 1px 0 rgba(var(--color-neutral-shadow-raw) / 24%),
+      0 0 0 1px rgba(var(--color-neutral-shadow-raw) / 10%),
+      0 5px 10px rgba(var(--color-neutral-shadow-raw) / 10%);
 
     &_disabled {
       box-shadow: none;
@@ -39,7 +42,10 @@
 
     &:active {
       background: var(--color-neutral-background);
-      box-shadow: 0 1px 0 rgba(var(--color-neutral-shadow-raw) / 24%), 0 0 0 1px rgba(var(--color-neutral-shadow-raw) / 10%), 0 5px 10px rgba(var(--color-neutral-shadow-raw) / 10%);
+      box-shadow:
+        0 1px 0 rgba(var(--color-neutral-shadow-raw) / 24%),
+        0 0 0 1px rgba(var(--color-neutral-shadow-raw) / 10%),
+        0 5px 10px rgba(var(--color-neutral-shadow-raw) / 10%);
     }
 
     &:active,

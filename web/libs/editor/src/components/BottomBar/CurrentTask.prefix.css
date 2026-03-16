@@ -32,7 +32,7 @@
     user-select: text;
 
     &::before {
-      content: '#';
+      content: "#";
     }
   }
 
@@ -68,7 +68,7 @@
     &::before {
       top: 50%;
       left: 50%;
-      content: '';
+      content: "";
       width: 10px;
       height: 10px;
       display: block;
@@ -111,4 +111,3 @@
     }
   }
 }
-

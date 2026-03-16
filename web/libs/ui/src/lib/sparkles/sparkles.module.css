@@ -1,5 +1,7 @@
 .sparkle {
-  animation: sparkles-come-in-out 2000ms forwards, sparkles-spin 2000ms ease-in-out;
+  animation:
+    sparkles-come-in-out 2000ms forwards,
+    sparkles-spin 2000ms ease-in-out;
   box-shadow: none;
 }
 
@@ -38,4 +40,4 @@
 .sparkles-area-overlay {
   /* Controls the color of the area overlay for showArea */
   color: var(--color-accent-primary-base);
-} 
+}

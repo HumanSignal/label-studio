@@ -73,18 +73,20 @@
     position: absolute;
 
     &::before {
-      content: '';
+      content: "";
       width: 16px;
       height: 16px;
       position: absolute;
       background: var(--color-primary-surface);
       border-radius: 100%;
-      box-shadow: 0 5px 10px var(--color-primary-surface-content-subtle), inset 0 -1px 0 rgb(0 0 0 / 10%);
+      box-shadow:
+        0 5px 10px var(--color-primary-surface-content-subtle),
+        inset 0 -1px 0 rgb(0 0 0 / 10%);
       transform: translate3d(-50%, -50%, 0);
     }
 
     &::after {
-      content: '';
+      content: "";
       width: 25px;
       height: 25px;
       position: absolute;

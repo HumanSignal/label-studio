@@ -75,7 +75,9 @@
   margin-bottom: var(--spacing-tight);
   color: var(--color-primary-content);
   font-weight: var(--font-weight-medium);
-  transition: background-color 150ms ease-out, border-color 150ms ease-out;
+  transition:
+    background-color 150ms ease-out,
+    border-color 150ms ease-out;
   border: 1px solid transparent;
   border-radius: var(--corner-radius-small);
 

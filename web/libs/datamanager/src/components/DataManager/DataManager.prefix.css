@@ -36,7 +36,7 @@
 }
 
 :global(.react-datepicker .react-datepicker__current-month) {
-  color: var(--color-neutral-content) ;
+  color: var(--color-neutral-content);
 }
 
 :global(.react-datepicker .react-datepicker__day-name) {
@@ -63,7 +63,6 @@
   color: var(--color-neutral-content);
 }
 
-
 :global(.react-datepicker .react-datepicker__day--today) {
   background-color: transparent;
   color: var(--color-neutral-content);
@@ -71,7 +70,7 @@
 }
 
 :global(.react-datepicker .react-datepicker__day--today::before) {
-  content:'';
+  content: "";
   display: block;
   width: 4px;
   height: 4px;
@@ -96,22 +95,41 @@
 }
 
 :global(.react-datepicker .react-datepicker__time-list-item) {
-  background-color: transparent ;
+  background-color: transparent;
   color: var(--color-neutral-content-subtler);
   transition: all 150ms ease-out;
 }
 
-:global(.react-datepicker .react-datepicker__time-container .react-datepicker__time .react-datepicker__time-box ul.react-datepicker__time-list) {
+:global(
+    .react-datepicker
+    .react-datepicker__time-container
+    .react-datepicker__time
+    .react-datepicker__time-box
+    ul.react-datepicker__time-list
+  ) {
   height: 235px;
 }
 
-:global(.react-datepicker .react-datepicker__time-container .react-datepicker__time .react-datepicker__time-box ul.react-datepicker__time-list li.react-datepicker__time-list-item:hover) {
+:global(
+    .react-datepicker
+    .react-datepicker__time-container
+    .react-datepicker__time
+    .react-datepicker__time-box
+    ul.react-datepicker__time-list
+    li.react-datepicker__time-list-item:hover
+  ) {
   background-color: var(--color-primary-emphasis-subtle);
   color: var(--color-neutral-content);
 }
 
-:global(.react-datepicker .react-datepicker__time-container .react-datepicker__time .react-datepicker__time-box ul.react-datepicker__time-list li.react-datepicker__time-list-item--selected) {
+:global(
+    .react-datepicker
+    .react-datepicker__time-container
+    .react-datepicker__time
+    .react-datepicker__time-box
+    ul.react-datepicker__time-list
+    li.react-datepicker__time-list-item--selected
+  ) {
   background-color: var(--color-primary-emphasis);
   color: var(--color-neutral-content);
 }
-

@@ -9,7 +9,7 @@
   background-color: var(--white);
   min-width: fit-content;
   font-size: 14px;
-  border-bottom: 1px solid #D8D5DD;
+  border-bottom: 1px solid #d8d5dd;
 
   &__extra {
     flex: 1;

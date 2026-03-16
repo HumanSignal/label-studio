@@ -30,7 +30,8 @@ body {
   }
 }
 
-@media (width <= 760px) { /* phone */
+@media (width <= 760px) {
+  /* phone */
   .editor {
     width: 300px;
     min-width: 300px;
@@ -105,7 +106,9 @@ body {
     font-weight: bold;
     font-size: 12px;
     text-transform: uppercase;
-    box-shadow: 0 0 0 1px rgb(0 0 0 / 10%), 0 1px 0 rgb(0 0 0 / 8%);
+    box-shadow:
+      0 0 0 1px rgb(0 0 0 / 10%),
+      0 1px 0 rgb(0 0 0 / 8%);
   }
 
   &__key + &__key {
@@ -132,7 +135,8 @@ body {
   background-color: var(--color-neutral-background);
   border-left: 1px solid var(--color-neutral-border);
 
-  @media (width <= 760px) { /* phone */
+  @media (width <= 760px) {
+    /* phone */
     margin-left: 0;
     margin-top: 20px;
   }
@@ -162,6 +166,6 @@ body {
   color: var(--color-neutral-content);
 }
 
-:global(.ant-result-success .ant-result-icon>.anticon) {
+:global(.ant-result-success .ant-result-icon > .anticon) {
   color: var(--color-positive-icon);
 }

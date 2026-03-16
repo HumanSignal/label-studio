@@ -22,7 +22,7 @@
     }
 
     &:active {
-      background: linear-gradient(0deg, var(--black_2), var(--black_2)), #FFF;
+      background: linear-gradient(0deg, var(--black_2), var(--black_2)), #fff;
       box-shadow: 0 0 5px 0 var(--black_20);
     }
   }
@@ -58,7 +58,7 @@
     min-width: 100vw;
   }
 
-  &__virtual>div {
+  &__virtual > div {
     min-width: fit-content;
   }
 

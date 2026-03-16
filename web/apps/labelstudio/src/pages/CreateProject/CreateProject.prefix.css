@@ -62,7 +62,8 @@
       align-items: center;
     }
 
-    & input, textarea {
+    & input,
+    textarea {
       background: var(--color-neutral-background);
       border: 1px solid var(--color-neutral-border);
       color: var(--color-neutral-content);
@@ -74,7 +75,8 @@
         border-color: var(--color-neutral-border-bold);
       }
 
-      &:focus, &:focus-visible {
+      &:focus,
+      &:focus-visible {
         border-color: var(--color-neutral-border-bolder);
         outline: none;
         box-shadow: 0 0 0 4px var(--color-primary-focus-outline);

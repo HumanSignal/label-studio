@@ -50,7 +50,7 @@
     margin: 0;
     padding: 0;
 
-    & li+li {
+    & li + li {
       margin-top: var(--toast-spacing);
     }
   }
@@ -190,9 +190,7 @@
     &__content {
       display: block;
     }
-
   }
-
 }
 
 .messageToast {

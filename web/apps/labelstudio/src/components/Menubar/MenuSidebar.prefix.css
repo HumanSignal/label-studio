@@ -24,7 +24,9 @@
   }
 
   &:not(.sidebar_floating) {
-    box-shadow: 0 1px 12px rgba(var(--color-neutral-shadow-raw) / 8%), 0 1px 4px 1px rgb(var(--color-neutral-shadow-raw) / 12%);
+    box-shadow:
+      0 1px 12px rgba(var(--color-neutral-shadow-raw) / 8%),
+      0 1px 4px 1px rgb(var(--color-neutral-shadow-raw) / 12%);
 
     .pin-menu {
       display: none;

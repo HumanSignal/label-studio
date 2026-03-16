@@ -76,7 +76,9 @@
     transform: translate(0, 1px);
     margin-top: 1px;
     height: calc(100% - 2px);
-    box-shadow: inset 0 4px 2px 0 var(--color-neutral-background), 0 4px 2px 0 rgba(var(--color-neutral-shadow-raw) / 20%);
+    box-shadow:
+      inset 0 4px 2px 0 var(--color-neutral-background),
+      0 4px 2px 0 rgba(var(--color-neutral-shadow-raw) / 20%);
 
     & .view-all-toggle__label {
       color: var(--color-neutral-content);
