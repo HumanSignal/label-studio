@@ -56,6 +56,32 @@ class TestControlTagWeightSerializer(TestCase):
         assert serializer.is_valid(), serializer.errors
         assert serializer.validated_data['labels'] == {}
 
+    def test_accepts_overall_with_three_decimal_places(self):
+        """Overall weight with exactly 3 decimal places is accepted."""
+        data = {'overall': 0.009, 'type': 'Choices', 'labels': {}}
+        serializer = ControlTagWeightSerializer(data=data)
+        assert serializer.is_valid(), serializer.errors
+
+    def test_rejects_overall_with_more_than_three_decimal_places(self):
+        """Overall weight with more than 3 decimal places is rejected."""
+        data = {'overall': 0.0009, 'type': 'Choices', 'labels': {}}
+        serializer = ControlTagWeightSerializer(data=data)
+        assert not serializer.is_valid()
+        assert 'overall' in serializer.errors
+
+    def test_accepts_label_with_three_decimal_places(self):
+        """Per-label weight with exactly 3 decimal places is accepted."""
+        data = {'overall': 1.0, 'type': 'Labels', 'labels': {'cat': 0.125}}
+        serializer = ControlTagWeightSerializer(data=data)
+        assert serializer.is_valid(), serializer.errors
+
+    def test_rejects_label_with_more_than_three_decimal_places(self):
+        """Per-label weight with more than 3 decimal places is rejected."""
+        data = {'overall': 1.0, 'type': 'Labels', 'labels': {'cat': 0.1234}}
+        serializer = ControlTagWeightSerializer(data=data)
+        assert not serializer.is_valid()
+        assert 'labels' in serializer.errors
+
 
 class TestProjectSerializer(TestCase):
     """Validates the cross-field validate_control_weights on ProjectSerializer."""

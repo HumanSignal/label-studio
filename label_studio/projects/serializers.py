@@ -1,5 +1,7 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license."""
 
+from decimal import Decimal
+
 import bleach
 from constants import SAFE_HTML_ATTRIBUTES, SAFE_HTML_TAGS
 from django.db.models import Q
@@ -47,6 +49,12 @@ class OpenApiObjectJSONField(serializers.JSONField):
     """
 
 
+def validate_weight_precision(value):
+    """Reject weight values with more than 3 decimal places."""
+    if Decimal(str(value)).as_tuple().exponent < -3:
+        raise serializers.ValidationError(f'Weight values support at most 3 decimal places, got {value}.')
+
+
 class ControlTagWeightSerializer(serializers.Serializer):
     """Weights configuration for a single control tag.
 
@@ -56,13 +64,14 @@ class ControlTagWeightSerializer(serializers.Serializer):
     overall = serializers.FloatField(
         min_value=0.0,
         max_value=1.0,
+        validators=[validate_weight_precision],
         help_text='Overall weight for this control tag (0.0 to 1.0). Zero excludes the tag from agreement.',
     )
     type = serializers.CharField(
         help_text='Control tag type from the labeling config (e.g. Choices, Labels, TextArea).',
     )
     labels = serializers.DictField(
-        child=serializers.FloatField(min_value=0.0, max_value=1.0),
+        child=serializers.FloatField(min_value=0.0, max_value=1.0, validators=[validate_weight_precision]),
         required=False,
         default=dict,
         help_text='Per-label weights (0.0 to 1.0). Zero excludes the label from agreement.',
