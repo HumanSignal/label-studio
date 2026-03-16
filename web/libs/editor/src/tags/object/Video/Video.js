@@ -125,7 +125,13 @@ const Model = types
     },
 
     get videoControl() {
-      return self.annotation.toNames.get(self.name)?.find((s) => s.type.includes("video"));
+      return self.annotation.toNames
+        .get(self.name)
+        ?.find((s) => s.type.includes("video") && !s.type.includes("videovector"));
+    },
+
+    get videoVectorControl() {
+      return self.annotation.toNames.get(self.name)?.find((s) => s.type.includes("videovector"));
     },
 
     states() {
@@ -420,6 +426,35 @@ const Model = types
 
         if (!ff.isActive(ff.FF_MULTIPLE_LABELS_REGIONS)) {
           // add labels
+          for (const tag of self.activeStates()) {
+            area.setValue(tag);
+          }
+        }
+        return area;
+      },
+
+      addVideoVectorRegion(data) {
+        const control = self.videoVectorControl;
+
+        if (!control) {
+          console.error("No video vector control is found");
+          return;
+        }
+
+        const sequence = [
+          {
+            frame: self.frame,
+            enabled: true,
+            ...data,
+          },
+        ];
+
+        const activeStates = self.activeStates();
+        const area = ff.isActive(ff.FF_MULTIPLE_LABELS_REGIONS)
+          ? self.annotation.createResult({ sequence }, {}, control, self, true, activeStates)
+          : self.annotation.createResult({ sequence }, {}, control, self, true);
+
+        if (!ff.isActive(ff.FF_MULTIPLE_LABELS_REGIONS)) {
           for (const tag of self.activeStates()) {
             area.setValue(tag);
           }

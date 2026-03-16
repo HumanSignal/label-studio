@@ -91,6 +91,7 @@ function createMockRegion(overrides: Record<string, unknown> = {}) {
     getOneColor: () => "#ff0000",
     style: {},
     isDrawing: false,
+    incomplete: false,
     type: "rectangleregion",
     isReadOnly: () => false,
     locked: false,
@@ -167,15 +168,15 @@ describe("RegionItem", () => {
     expect(screen.getByTestId("meta-edit-mode")).toHaveTextContent("false");
   });
 
-  it("shows drawing warning when region.isDrawing is true", () => {
-    const region = createMockRegion({ isDrawing: true, type: "rectangleregion" });
+  it("shows warning when region.incomplete is true", () => {
+    const region = createMockRegion({ incomplete: true, type: "rectangleregion" });
     render(<RegionItem region={region} />);
     expect(screen.getByTestId("icon-warning")).toBeInTheDocument();
     expect(screen.getByText(/Incomplete rectangle/)).toBeInTheDocument();
   });
 
-  it("shows generic warning when region.isDrawing is true and type is missing", () => {
-    const region = createMockRegion({ isDrawing: true, type: undefined });
+  it("shows generic warning when region.incomplete is true and type is missing", () => {
+    const region = createMockRegion({ incomplete: true, type: undefined });
     render(<RegionItem region={region} />);
     expect(screen.getByText(/Incomplete region/)).toBeInTheDocument();
   });
