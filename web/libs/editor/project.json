@@ -69,7 +69,7 @@
       "executor": "nx:run-commands",
       "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
       "options": {
-        "command": "npx vitest run --config vitest.config.ts",
+        "command": "vitest run --config vitest.config.ts",
         "cwd": "libs/editor",
         "env": {
           "NODE_PATH": "../../node_modules"
@@ -77,7 +77,7 @@
       },
       "configurations": {
         "ci": {
-          "command": "npx vitest run --config vitest.config.ts --coverage",
+          "command": "vitest run --config vitest.config.ts --coverage",
           "cwd": "libs/editor"
         }
       }
