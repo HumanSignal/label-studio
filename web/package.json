@@ -140,7 +140,6 @@
     "@nx/js": "21.4.0",
     "@nx/react": "21.4.0",
     "@nx/storybook": "21.4.0",
-    "@nx/vite": "21.4.0",
     "@nx/webpack": "21.4.0",
     "@nx/workspace": "21.4.0",
     "@pmmmwh/react-refresh-webpack-plugin": "^0.5.7",

@@ -66,15 +66,16 @@
       }
     },
     "unit": {
-      "executor": "@nx/vite:test",
+      "executor": "nx:run-commands",
       "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
       "options": {
-        "configFile": "libs/editor/vitest.config.ts",
-        "watch": false
+        "command": "vitest run --config vitest.config.ts",
+        "cwd": "libs/editor"
       },
       "configurations": {
         "ci": {
-          "reportsDirectory": "../../coverage/libs/editor"
+          "command": "vitest run --config vitest.config.ts --coverage",
+          "cwd": "libs/editor"
         }
       }
     },
