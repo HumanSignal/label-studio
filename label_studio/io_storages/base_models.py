@@ -373,6 +373,7 @@ class ImportStorage(Storage):
         return False
 
     def resolve_uri(self, uri, task=None):
+        # DEPRECATED: use resolve_uris instead.
         #  list of objects
         if isinstance(uri, list):
             resolved = []

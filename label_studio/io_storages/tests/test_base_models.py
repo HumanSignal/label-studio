@@ -113,3 +113,14 @@ class TestImportStorageResolveUris(TestCase):
         assert result is not None
         assert 's3://test-bucket' not in result
         assert 'http://localhost:8080' in result
+
+    @override_settings(HOSTNAME='http://localhost:8080')
+    @patch('io_storages.base_models.reverse', return_value='/api/storages/task/1/resolve/')
+    def test_embedded_uri_with_spaces_in_path(self, mock_reverse):
+        """A quoted URI embedded in HTML is resolved when its path contains literal spaces."""
+        html = '<img src="s3://test-bucket/images/some directory/sub folder/img.jpg" alt="test" />'
+        result = self.storage.resolve_uris(html, self.task)
+
+        assert result is not None
+        assert 's3://test-bucket/images/some directory/sub folder/img.jpg' not in result
+        assert 'http://localhost:8080' in result

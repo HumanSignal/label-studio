@@ -100,3 +100,9 @@ class TestGetAllUrisViaRegex(TestCase):
         uri = 's3://my-bucket/images/some directory/sub folder/image.jpg'
         result = get_all_uris_via_regex(uri, prefixes=['s3'])
         assert result == [(uri, 's3')]
+
+    def test_embedded_uri_with_spaces_in_path(self):
+        """A quoted URI embedded in HTML is extracted when its path contains literal spaces."""
+        html = '<img src="s3://my-bucket/images/some directory/sub folder/image.jpg" alt="test" />'
+        result = get_all_uris_via_regex(html, prefixes=['s3'])
+        assert result == [('s3://my-bucket/images/some directory/sub folder/image.jpg', 's3')]

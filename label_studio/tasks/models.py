@@ -441,6 +441,7 @@ class Task(TaskMixin, FsmHistoryStateModel):
             }
 
     def resolve_uri(self, task_data, project):
+        # DEPRECATED: use resolve_uris instead.
         from io_storages.functions import get_storage_by_url
 
         if project.task_data_login and project.task_data_password:
