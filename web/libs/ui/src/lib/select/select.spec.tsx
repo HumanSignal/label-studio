@@ -10,29 +10,31 @@ global.ResizeObserver = class ResizeObserver {
 };
 
 // Mock scrollIntoView
-Element.prototype.scrollIntoView = jest.fn();
+Element.prototype.scrollIntoView = vi.fn();
 
 // Mock the styles
-jest.mock("./select.module.css", () => ({
-  selectTrigger: "selectTrigger",
-  isInline: "isInline",
-  isOpen: "isOpen",
-  isDisabled: "isDisabled",
-  sizeSmall: "sizeSmall",
-  sizeMedium: "sizeMedium",
-  sizeLarge: "sizeLarge",
-  selectLoading: "selectLoading",
-  valueInput: "valueInput",
-  selectedItemsGroup: "selectedItemsGroup",
-  selectedItemsHeader: "selectedItemsHeader",
-  selectedItemsCaret: "selectedItemsCaret",
-  selectedItemsTitle: "selectedItemsTitle",
-  selectedItemsContent: "selectedItemsContent",
+vi.mock("./select.module.css", () => ({
+  default: {
+    selectTrigger: "selectTrigger",
+    isInline: "isInline",
+    isOpen: "isOpen",
+    isDisabled: "isDisabled",
+    sizeSmall: "sizeSmall",
+    sizeMedium: "sizeMedium",
+    sizeLarge: "sizeLarge",
+    selectLoading: "selectLoading",
+    valueInput: "valueInput",
+    selectedItemsGroup: "selectedItemsGroup",
+    selectedItemsHeader: "selectedItemsHeader",
+    selectedItemsCaret: "selectedItemsCaret",
+    selectedItemsTitle: "selectedItemsTitle",
+    selectedItemsContent: "selectedItemsContent",
+  },
 }));
 
 // Mock react-window and react-window-infinite-loader to capture props
-const mockVariableSizeList = jest.fn();
-jest.mock("react-window", () => ({
+const mockVariableSizeList = vi.fn();
+vi.mock("react-window", () => ({
   VariableSizeList: (props: any) => {
     mockVariableSizeList(props);
     // Render the items directly for testing
@@ -52,11 +54,11 @@ jest.mock("react-window", () => ({
   },
 }));
 
-jest.mock("react-window-infinite-loader", () => ({
+vi.mock("react-window-infinite-loader", () => ({
   __esModule: true,
   default: ({ children, ...props }: any) => {
     return children({
-      onItemsRendered: jest.fn(),
+      onItemsRendered: vi.fn(),
       ref: { current: null },
     });
   },
@@ -226,7 +228,7 @@ describe("Select Component", () => {
 
   describe("Infinite Loading Support", () => {
     it("supports loadMore callback for infinite scroll", async () => {
-      const loadMore = jest.fn();
+      const loadMore = vi.fn();
       const options = Array.from({ length: 10 }, (_, i) => `Option ${i + 1}`);
 
       render(
@@ -251,7 +253,7 @@ describe("Select Component", () => {
     });
 
     it("maintains correct height calculation with paginated flat options", async () => {
-      const loadMore = jest.fn();
+      const loadMore = vi.fn();
       // Simulate first page of 10 items loaded
       const options = Array.from({ length: 10 }, (_, i) => `User ${i + 1}`);
 
@@ -299,7 +301,7 @@ describe("Select Component", () => {
 
   describe("Selection Behavior", () => {
     it("selects an option when clicked", async () => {
-      const onChange = jest.fn();
+      const onChange = vi.fn();
 
       render(
         <Select options={["Apple", "Banana", "Cherry"] as any} placeholder="Select a fruit" onChange={onChange} />,
@@ -317,7 +319,7 @@ describe("Select Component", () => {
     });
 
     it("handles multiple selection", async () => {
-      const onChange = jest.fn();
+      const onChange = vi.fn();
 
       render(
         <Select
@@ -392,7 +394,7 @@ describe("Select Component", () => {
     });
 
     it("deselects item from selected group when clicking option", async () => {
-      const onChange = jest.fn();
+      const onChange = vi.fn();
       render(
         <Select
           options={["Apple", "Banana"] as any}
@@ -437,7 +439,7 @@ describe("Select Component", () => {
 
   describe("Search and callbacks", () => {
     it("calls onSearch when search input changes", async () => {
-      const onSearch = jest.fn();
+      const onSearch = vi.fn();
       render(
         <Select options={["Apple", "Banana"] as any} placeholder="Select" searchable={true} onSearch={onSearch} />,
       );
@@ -448,7 +450,7 @@ describe("Select Component", () => {
     });
 
     it("uses custom searchFilter when provided", async () => {
-      const searchFilter = jest.fn((option: any, q: string) => {
+      const searchFilter = vi.fn((option: any, q: string) => {
         const label = option?.label ?? option;
         return String(label).toLowerCase().startsWith(q.toLowerCase());
       });
@@ -469,8 +471,8 @@ describe("Select Component", () => {
 
   describe("Open/close callbacks", () => {
     it("calls onOpen when dropdown opens and onClose when option selected (single)", async () => {
-      const onOpen = jest.fn();
-      const onClose = jest.fn();
+      const onOpen = vi.fn();
+      const onClose = vi.fn();
       render(<Select options={["Apple", "Banana"] as any} placeholder="Select" onOpen={onOpen} onClose={onClose} />);
       fireEvent.click(screen.getByRole("button"));
       await waitFor(() => expect(onOpen).toHaveBeenCalled());
@@ -481,7 +483,7 @@ describe("Select Component", () => {
 
   describe("renderSelected and selectFirstIfEmpty", () => {
     it("uses renderSelected when provided", async () => {
-      const renderSelected = jest.fn((selected: any[], placeholder: string) =>
+      const renderSelected = vi.fn((selected: any[], placeholder: string) =>
         selected.length ? selected.map((s) => s?.label ?? s).join(", ") : placeholder,
       );
       render(<Select options={["Apple", "Banana"] as any} placeholder="Pick one" renderSelected={renderSelected} />);
@@ -493,7 +495,7 @@ describe("Select Component", () => {
     });
 
     it("selects first option when selectFirstIfEmpty and no value", () => {
-      const onChange = jest.fn();
+      const onChange = vi.fn();
       render(
         <Select
           options={[{ value: "a", label: "Option A" }] as any}
@@ -521,7 +523,7 @@ describe("Select Component", () => {
 
   describe("Option keyboard navigation", () => {
     it("selects option on Enter key", async () => {
-      const onChange = jest.fn();
+      const onChange = vi.fn();
       render(<Select options={["Apple", "Banana"] as any} placeholder="Select" onChange={onChange} />);
       fireEvent.click(screen.getByRole("button"));
       await waitFor(() => expect(screen.getByText("Apple")).toBeInTheDocument());
@@ -532,7 +534,7 @@ describe("Select Component", () => {
     });
 
     it("selects option on Space key", async () => {
-      const onChange = jest.fn();
+      const onChange = vi.fn();
       render(<Select options={["Banana"] as any} placeholder="Select" onChange={onChange} />);
       fireEvent.click(screen.getByRole("button"));
       await waitFor(() => expect(screen.getByText("Banana")).toBeInTheDocument());
@@ -545,7 +547,7 @@ describe("Select Component", () => {
 
   describe("Group option with multiple", () => {
     it("toggles all children when clicking group header in multiple mode", async () => {
-      const onChange = jest.fn();
+      const onChange = vi.fn();
       const options = [
         {
           label: "Fruits",
@@ -565,7 +567,7 @@ describe("Select Component", () => {
 
   describe("SelectedItemsGroup disabled and deselect all", () => {
     it("does not deselect when clicking option in selected group if disabled", () => {
-      const onChange = jest.fn();
+      const onChange = vi.fn();
       render(
         <Select
           options={["Apple", "Banana"] as any}
@@ -583,7 +585,7 @@ describe("Select Component", () => {
     });
 
     it("deselects all when clicking deselect all checkbox in selected group", async () => {
-      const onChange = jest.fn();
+      const onChange = vi.fn();
       render(
         <Select
           options={["Apple", "Banana", "Cherry"] as any}
@@ -606,7 +608,7 @@ describe("Select Component", () => {
     });
 
     it("collapses selected group when all items are deselected", async () => {
-      const onChange = jest.fn();
+      const onChange = vi.fn();
       render(
         <Select
           options={["Apple", "Banana"] as any}
@@ -657,7 +659,7 @@ describe("Select Component", () => {
 
   describe("defaultSearchValue and open/close", () => {
     it("restores defaultSearchValue when opening and resets when closing", async () => {
-      const onSearch = jest.fn();
+      const onSearch = vi.fn();
       render(
         <Select
           options={["Apple", "Banana"] as any}
@@ -722,7 +724,7 @@ describe("Select Component", () => {
 
   describe("selectedValueRenderer", () => {
     it("uses selectedValueRenderer for each selected option in display", async () => {
-      const selectedValueRenderer = jest.fn((option: any) => (
+      const selectedValueRenderer = vi.fn((option: any) => (
         <span data-testid="custom-label">{option?.label ?? option}</span>
       ));
       render(
@@ -777,7 +779,7 @@ describe("Select Component", () => {
 
   describe("searchFilter with empty query", () => {
     it("calls custom searchFilter even with empty query when searchFilter provided", async () => {
-      const searchFilter = jest.fn(() => true);
+      const searchFilter = vi.fn(() => true);
       render(
         <Select
           options={["Apple", "Banana"] as any}
@@ -793,7 +795,7 @@ describe("Select Component", () => {
 
   describe("onChange when disabled", () => {
     it("does not call onChange when selecting and component is disabled", async () => {
-      const onChange = jest.fn();
+      const onChange = vi.fn();
       render(<Select options={["Apple", "Banana"] as any} placeholder="Select" disabled={true} onChange={onChange} />);
       const trigger = screen.getByRole("button");
       expect(trigger).toBeDisabled();

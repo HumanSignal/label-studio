@@ -7,24 +7,24 @@ import type { DropdownRef } from "./dropdown";
 // Create a mock dropdown element factory
 const createMockDropdownElement = () => {
   const mockElement = {
-    contains: jest.fn(() => false),
-    addEventListener: jest.fn(),
-    removeEventListener: jest.fn(),
+    contains: vi.fn(() => false),
+    addEventListener: vi.fn(),
+    removeEventListener: vi.fn(),
   };
   return mockElement as any;
 };
 
 // Mock the dropdown component to avoid complex portal rendering in tests
-jest.mock("./dropdown", () => ({
+vi.mock("./dropdown", () => ({
   Dropdown: ({ children, ref }: any) => {
     // Simulate dropdown ref API
     if (ref) {
       const mockRef: any = {
         dropdown: createMockDropdownElement(),
         visible: false,
-        toggle: jest.fn(),
-        open: jest.fn(),
-        close: jest.fn(),
+        toggle: vi.fn(),
+        open: vi.fn(),
+        close: vi.fn(),
       };
       if (typeof ref === "function") {
         ref(mockRef);
@@ -38,7 +38,7 @@ jest.mock("./dropdown", () => ({
 
 describe("DropdownTrigger - Context Menu Mode", () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe("Basic Rendering", () => {
