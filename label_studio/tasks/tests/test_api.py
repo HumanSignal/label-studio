@@ -7,6 +7,7 @@ from projects.models import Project
 from projects.tests.factories import ProjectFactory
 from rest_framework.test import APITestCase
 from tasks.tests.factories import AnnotationFactory, PredictionFactory, TaskFactory
+from tests.utils import mock_feature_flag
 
 
 class TestTaskAPI(APITestCase):
@@ -144,6 +145,7 @@ class TestTaskAPIResolveUri(APITestCase):
         cls.project = ProjectFactory(organization=cls.organization)
         cls.user = cls.organization.created_by
 
+    @mock_feature_flag('fflag_fix_fit_1511_resolve_multiple_cloud_uris', False, parent_module='tasks.serializers')
     def test_get_task_resolve_uri_default_true(self):
         """Test that resolve_uri defaults to True when not specified.
 
@@ -158,7 +160,6 @@ class TestTaskAPIResolveUri(APITestCase):
         task = TaskFactory(project=self.project, data={'image': 's3://bucket/image.jpg'})
         self.client.force_authenticate(user=self.user)
 
-        # Patch resolve_uri to track if it's called
         with patch.object(task.__class__, 'resolve_uri', return_value={'image': '/resolved/url'}) as mock_resolve:
             response = self.client.get(f'/api/tasks/{task.id}/')
 
@@ -166,6 +167,7 @@ class TestTaskAPIResolveUri(APITestCase):
         # resolve_uri should be called by default
         mock_resolve.assert_called_once()
 
+    @mock_feature_flag('fflag_fix_fit_1511_resolve_multiple_cloud_uris', False, parent_module='tasks.serializers')
     def test_get_task_resolve_uri_explicit_true(self):
         """Test that resolve_uri=true explicitly enables URL resolution.
 
