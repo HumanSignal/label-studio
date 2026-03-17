@@ -98,6 +98,7 @@ function createAudioNode(storeRef = { task: { dataObj: { audio: "/test.mp3" } } 
 }
 
 beforeEach(() => {
+  vi.useFakeTimers();
   vi.clearAllMocks();
   mockToNames.set("audio", []);
   window.LS_SECURE_MODE = false;
@@ -105,6 +106,8 @@ beforeEach(() => {
 });
 
 afterEach(() => {
+  vi.clearAllTimers();
+  vi.useRealTimers();
   window.STORE_INIT_OK = undefined;
 });
 

@@ -80,8 +80,14 @@ function createEntity(overrides: Record<string, unknown> = {}) {
 
 describe("AnnotationButton", () => {
   beforeEach(() => {
+    vi.useFakeTimers();
     vi.clearAllMocks();
     (isAlive as any).mockReturnValue(true);
+  });
+
+  afterEach(() => {
+    vi.clearAllTimers();
+    vi.useRealTimers();
   });
 
   it("renders null when entity is not alive", () => {

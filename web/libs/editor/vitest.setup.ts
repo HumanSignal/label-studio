@@ -47,7 +47,7 @@ Object.defineProperty(window, "matchMedia", {
 const canvas2dMock = {
   fillRect: vi.fn(),
   clearRect: vi.fn(),
-  getImageData: vi.fn(() => ({ data: new Array(4) })),
+  getImageData: vi.fn((_x: number, _y: number, w = 1, h = 1) => ({ data: new Uint8ClampedArray(w * h * 4) })),
   putImageData: vi.fn(),
   createImageData: vi.fn(() => []),
   setTransform: vi.fn(),
@@ -70,18 +70,18 @@ const canvas2dMock = {
   clip: vi.fn(),
 };
 
-HTMLCanvasElement.prototype.getContext = vi.fn().mockImplementation((contextType: string) => {
+// Plain functions (not vi.fn()) so vi.restoreAllMocks() can't reset them.
+// This prevents async callbacks from crashing after a test restores mocks.
+HTMLCanvasElement.prototype.getContext = function (contextType: string) {
   if (contextType === "2d" || (contextType && String(contextType).toLowerCase() === "2d")) {
     return canvas2dMock;
   }
   return null;
-});
+} as any;
 
-if (typeof HTMLCanvasElement.prototype.toDataURL === "undefined") {
-  HTMLCanvasElement.prototype.toDataURL = function () {
-    return "data:image/png;base64,stub";
-  };
-}
+HTMLCanvasElement.prototype.toDataURL = function () {
+  return "data:image/png;base64,stub";
+};
 
 const mediaMock = {
   paused: true,

@@ -150,6 +150,15 @@ describe("mask2DataURL", () => {
 });
 
 describe("maskDataURL2Image", () => {
+  beforeEach(() => {
+    vi.useFakeTimers();
+  });
+
+  afterEach(() => {
+    vi.clearAllTimers();
+    vi.useRealTimers();
+  });
+
   test("resolves with image after processing mask data URL (mocked canvas/img)", async () => {
     const putImageData = vi.fn();
     const getImageData = vi.fn().mockReturnValue({
@@ -184,7 +193,9 @@ describe("maskDataURL2Image", () => {
       return origCreateElement(tag);
     });
 
-    const result = await Canvas.maskDataURL2Image("data:image/png;base64,stub", { color: "#00ff00" });
+    const resultPromise = Canvas.maskDataURL2Image("data:image/png;base64,stub", { color: "#00ff00" });
+    await vi.advanceTimersByTimeAsync(0);
+    const result = await resultPromise;
 
     expect(result).toBe(imgStub);
     expect(putImageData).toHaveBeenCalled();

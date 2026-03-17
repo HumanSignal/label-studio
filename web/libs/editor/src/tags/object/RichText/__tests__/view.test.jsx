@@ -146,12 +146,15 @@ function createMockItem(overrides = {}) {
 
 beforeEach(() => {
   mockDocRef = typeof document !== "undefined" ? document : null;
+  vi.useFakeTimers();
   vi.clearAllMocks();
   window.LS_SECURE_MODE = false;
   window.STORE_INIT_OK = true;
 });
 
 afterEach(() => {
+  vi.clearAllTimers();
+  vi.useRealTimers();
   window.STORE_INIT_OK = undefined;
 });
 
@@ -614,8 +617,14 @@ describe("RichText view", () => {
         type: "text",
         inline: true,
         activeStates: () => [{ selectedLabels: [{}], selectedValues: () => [] }],
-        annotation: { isReadOnly: () => false },
+        annotation: {
+          isReadOnly: () => false,
+          pauseAutosave: vi.fn(),
+          startAutosave: vi.fn(),
+          history: { freeze: vi.fn(), unfreeze: vi.fn(), setReplaceNextUndoState: vi.fn() },
+        },
         selectionenabled: true,
+        needsUpdate: vi.fn(),
         addRegion,
       });
       const store = { settings: {} };
@@ -630,11 +639,9 @@ describe("RichText view", () => {
       const content = container.querySelector("[class*='container']");
       content.dispatchEvent(new MouseEvent("mouseup", { bubbles: true, pageX: 10, pageY: 10 }));
       expect(addRegion).toHaveBeenCalledTimes(1);
-      vi.useFakeTimers();
       vi.advanceTimersByTime(500);
       content.dispatchEvent(new MouseEvent("mouseup", { bubbles: true, pageX: 10, pageY: 10 }));
       expect(addRegion).toHaveBeenCalledTimes(2);
-      vi.useRealTimers();
     });
 
     it("_onRegionClick returns early when _selectionMode is true (set by captureSelection beforeCleanup)", () => {
