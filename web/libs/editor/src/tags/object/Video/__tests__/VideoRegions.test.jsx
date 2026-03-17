@@ -3,6 +3,7 @@
  */
 import React from "react";
 import { render, screen, fireEvent, act } from "@testing-library/react";
+import { getParentOfType } from "mobx-state-tree";
 import { VideoRegions, MIN_SIZE } from "../VideoRegions";
 
 vi.mock("chroma-js", () => ({
