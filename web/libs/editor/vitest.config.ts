@@ -165,6 +165,9 @@ export default defineConfig({
     },
   ],
   test: {
+    onConsoleLog(log: string) {
+      if (log.startsWith("Warning:") || log.includes("inside a test was not wrapped in act")) return false;
+    },
     environment: "jsdom",
     globals: true,
     setupFiles: [path.join(root, "vitest.setup.ts")],
