@@ -488,6 +488,61 @@ class Task(TaskMixin, FsmHistoryStateModel):
                         task_data[field] = resolved_uri
             return task_data
 
+    def resolve_uris(self, task_data, project):
+        """Resolve all cloud storage URIs across all project storages.
+
+        Unlike resolve_uri which picks one storage per field and resolves
+        only the first URI, this iterates all storages per field and resolves
+        every URI each storage can handle.
+        """
+        if project.task_data_login and project.task_data_password:
+            protected_data = {}
+            for key, value in task_data.items():
+                if isinstance(value, str) and string_is_url(value):
+                    path = (
+                        reverse('projects-file-proxy', kwargs={'pk': project.pk})
+                        + '?url='
+                        + base64.urlsafe_b64encode(value.encode()).decode()
+                    )
+                    value = urljoin(settings.HOSTNAME, path)
+                protected_data[key] = value
+            return protected_data
+
+        storage_objects = project.get_all_import_storage_objects
+
+        for field in task_data:
+            prepared_filename = self.prepare_filename(task_data[field])
+            if settings.CLOUD_FILE_STORAGE_ENABLED and self.is_upload_file(prepared_filename):
+                file_upload = fast_first(FileUpload.objects.filter(project=project, file=prepared_filename))
+                if file_upload is not None:
+                    task_data[field] = file_upload.url
+                else:
+                    task_data[field] = task_data[field] + '?not_uploaded_project_file'
+                continue
+
+            for storage_object in storage_objects:
+                try:
+                    resolved = storage_object.resolve_uris(task_data[field], self)
+                except Exception as exc:
+                    logger.debug(exc, exc_info=True)
+                    resolved = None
+                if resolved:
+                    task_data[field] = resolved
+
+            fallback_storage = self.storage
+            if fallback_storage:
+                storage_ids = {s.id for s in storage_objects}
+                if fallback_storage.id not in storage_ids:
+                    try:
+                        resolved = fallback_storage.resolve_uris(task_data[field], self)
+                    except Exception as exc:
+                        logger.debug(exc, exc_info=True)
+                        resolved = None
+                    if resolved:
+                        task_data[field] = resolved
+
+        return task_data
+
     @property
     def storage(self):
         # maybe task has storage link

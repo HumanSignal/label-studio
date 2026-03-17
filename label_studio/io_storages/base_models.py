@@ -30,7 +30,7 @@ from django.shortcuts import reverse
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from fsm.functions import backfill_fsm_states_for_tasks
-from io_storages.utils import StorageObject, get_uri_via_regex, parse_bucket_uri
+from io_storages.utils import StorageObject, get_all_uris_via_regex, get_uri_via_regex, parse_bucket_uri
 from rest_framework.exceptions import ValidationError
 from rq.job import Job
 from tasks.models import Annotation, Task
@@ -410,6 +410,55 @@ class ImportStorage(Storage):
                 return uri.replace(extracted_uri, proxy_url)
             except Exception:
                 logger.info(f"Can't resolve URI={uri}", exc_info=True)
+
+    def resolve_uris(self, data, task):
+        """Resolve all cloud storage URIs in data, replacing each with a proxy URL.
+
+        Unlike resolve_uri which only handles the first URI in a string,
+        this finds and replaces every URI matching this storage's scheme.
+        Handles str, list, and dict data recursively.
+
+        Returns the resolved data, or None if nothing was resolved.
+        """
+        if not self.url_scheme:
+            return None
+
+        if isinstance(data, list):
+            resolved = [self.resolve_uris(item, task) or item for item in data]
+            return resolved
+
+        if isinstance(data, dict):
+            resolved = {key: self.resolve_uris(val, task) or val for key, val in data.items()}
+            return resolved
+
+        if not isinstance(data, str) or self.url_scheme not in data:
+            return None
+
+        try:
+            all_uris = get_all_uris_via_regex(data, prefixes=[self.url_scheme])
+            if not all_uris:
+                return None
+
+            if task is None:
+                logger.error(f'Task is required to resolve URIs in data={data}', exc_info=True)
+                raise ValueError(f'Task is required to resolve URIs in data={data}')
+
+            resolved = data
+            any_resolved = False
+            for extracted_uri, _ in all_uris:
+                if not self.can_resolve_url(extracted_uri):
+                    continue
+                proxy_url = urljoin(
+                    settings.HOSTNAME,
+                    reverse('storages:task-storage-data-resolve', kwargs={'task_id': task.id})
+                    + f'?fileuri={base64.urlsafe_b64encode(extracted_uri.encode()).decode()}',
+                )
+                resolved = resolved.replace(extracted_uri, proxy_url, 1)
+                any_resolved = True
+            return resolved if any_resolved else None
+        except Exception:
+            logger.info(f"Can't resolve URIs in data={data}", exc_info=True)
+            return None
 
     def _scan_and_create_links_v2(self):
         # Async job execution for batch of objects:

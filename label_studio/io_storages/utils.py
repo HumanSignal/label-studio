@@ -55,6 +55,34 @@ def get_uri_via_regex(data, prefixes=('s3', 'gs')) -> tuple[Union[str, None], Un
     return r_match.group('uri'), r_match.group('storage')
 
 
+def get_all_uris_via_regex(data: str, prefixes: list[str]) -> list[tuple[str, str]]:
+    """Return all (uri, storage_prefix) pairs found in data.
+
+    Unlike get_uri_via_regex which returns only the first match,
+    this uses re.finditer to find every URI matching the given prefixes.
+    """
+    prefixes = tuple(p for p in prefixes if p)
+    if not prefixes:
+        return []
+
+    data = str(data).strip()
+
+    # fast path: bare URI that IS the entire string value
+    for prefix in prefixes:
+        if data.startswith(prefix):
+            return [(data, prefix)]
+
+    if not any(prefix + ':' in data for prefix in prefixes):
+        return []
+
+    try:
+        uri_regex_prepared = uri_regex.format('|'.join(prefixes))
+        return [(m.group('uri'), m.group('storage')) for m in re.finditer(uri_regex_prepared, data)]
+    except Exception as exc:
+        logger.error(f"Can't parse task.data to match URIs. Reason: {exc}", exc_info=True)
+        return []
+
+
 def parse_bucket_uri(value: object, storage) -> Union[BucketURI, None]:
     if not value:
         return None
