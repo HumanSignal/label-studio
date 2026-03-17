@@ -4,6 +4,9 @@ import { defineConfig } from "vitest/config";
 import { transform as esbuildTransform } from "esbuild";
 import { baseAlias } from "../../vitest.base";
 
+// Tests expect the default "ls-" BEM prefix. Ensure no inherited env overrides it.
+delete process.env.CSS_PREFIX;
+
 const root = __dirname;
 const webRoot = path.join(root, "../..");
 const nodeModules = path.join(webRoot, "node_modules");
