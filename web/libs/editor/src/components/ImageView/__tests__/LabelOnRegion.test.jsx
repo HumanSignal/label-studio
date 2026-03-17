@@ -2,7 +2,6 @@
  * Unit tests for LabelOnRegion (components/ImageView/LabelOnRegion.jsx)
  */
 import React from "react";
-import { vi } from "vitest";
 import { render } from "@testing-library/react";
 import { getRoot } from "mobx-state-tree";
 import {
@@ -16,19 +15,17 @@ import {
   LabelOnOcrBox,
 } from "../LabelOnRegion";
 
-vi.mock("mobx-react", () => ({ observer: (Comp) => Comp }));
-
-vi.mock("react-konva", () => {
-  const mockReact = (typeof globalThis !== "undefined" && globalThis.React) || require("react");
+jest.mock("react-konva", () => {
+  const mockReact = require("react");
   const mockShape = () => ({ width: () => 60, height: () => 20 });
   const mockContext = {
-    beginPath: vi.fn(),
-    rect: vi.fn(),
-    moveTo: vi.fn(),
-    lineTo: vi.fn(),
-    arc: vi.fn(),
-    closePath: vi.fn(),
-    fillStrokeShape: vi.fn(),
+    beginPath: jest.fn(),
+    rect: jest.fn(),
+    moveTo: jest.fn(),
+    lineTo: jest.fn(),
+    arc: jest.fn(),
+    closePath: jest.fn(),
+    fillStrokeShape: jest.fn(),
   };
   return {
     Group: ({ children, ...p }) => mockReact.createElement("div", { "data-testid": "konva-group", ...p }, children),
@@ -47,14 +44,14 @@ vi.mock("react-konva", () => {
   };
 });
 
-vi.mock("mobx-state-tree", () => ({
-  ...vi.importActual("mobx-state-tree"),
-  getRoot: vi.fn(),
+jest.mock("mobx-state-tree", () => ({
+  ...jest.requireActual("mobx-state-tree"),
+  getRoot: jest.fn(),
 }));
 
 describe("LabelOnRegion", () => {
   beforeEach(() => {
-    vi.clearAllMocks();
+    jest.clearAllMocks();
     getRoot.mockReturnValue({ settings: { showLabels: true } });
   });
 

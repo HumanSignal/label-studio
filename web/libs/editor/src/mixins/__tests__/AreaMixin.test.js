@@ -4,10 +4,12 @@
  */
 import { destroy, getParent, isAlive, types } from "mobx-state-tree";
 import { guidGenerator } from "../../core/Helpers";
-import { withFeatureFlags } from "@humansignal/frontend-test/feature-flag-test-setup";
-import { FF_LSDV_4930, FF_TAXONOMY_LABELING } from "../../utils/feature-flags";
-import { defaultStyle } from "../../core/Constants";
-import { PER_REGION_MODES } from "../PerRegionModes.js";
+
+jest.mock("../../utils/feature-flags", () => ({
+  isFF: jest.fn(() => false),
+  FF_LSDV_4930: "ff_lsdv_4930",
+  FF_TAXONOMY_LABELING: "ff_taxonomy_labeling",
+}));
 
 jest.mock("../../regions/Result", () => require("./AreaMixinMockResult"));
 
@@ -74,8 +76,7 @@ const BaseWithVolatiles = types
     },
   }));
 
-// BaseWithVolatiles last so its results: types.array(MockResult) overrides AreaMixinBase's, accepting plain from_name/to_name snapshots
-const TestArea = types.compose(AreaMixinBase, ReadOnlyRegionMixin, BaseWithVolatiles);
+const TestArea = types.compose(BaseWithVolatiles, AreaMixinBase, ReadOnlyRegionMixin);
 
 const Root = types
   .model("AreaMixinTestRoot", {
@@ -274,17 +275,19 @@ describe("AreaMixin", () => {
     });
 
     it("returns tags with classification and isLabeling when FF_TAXONOMY_LABELING is on", () => {
-      withFeatureFlags({ [FF_TAXONOMY_LABELING]: true }, () => {
-        const { area, annotation } = createStore();
-        const taxonomyTag = { classification: true, isLabeling: true };
-        annotation.toNames.set("img1", [taxonomyTag]);
-        expect(area.labelingTags).toEqual([taxonomyTag]);
-      });
+      const isFF = require("../../utils/feature-flags").isFF;
+      isFF.mockImplementation((flag) => flag === "ff_taxonomy_labeling");
+      const { area, annotation } = createStore();
+      const taxonomyTag = { classification: true, isLabeling: true };
+      annotation.toNames.set("img1", [taxonomyTag]);
+      expect(area.labelingTags).toEqual([taxonomyTag]);
+      isFF.mockReturnValue(false);
     });
   });
 
   describe("perRegionDescControls", () => {
     it("filters perRegionTags by displaymode REGION_LIST", () => {
+      const { PER_REGION_MODES } = require("../PerRegion");
       const { root, area, annotation } = createStore();
       const listTag = { perregion: true, displaymode: PER_REGION_MODES.REGION_LIST };
       const tagTag = { perregion: true, displaymode: PER_REGION_MODES.TAG };
@@ -466,6 +469,7 @@ describe("AreaMixin", () => {
     });
 
     it("returns defaultStyle.fillcolor when no style", () => {
+      const { defaultStyle } = require("../../core/Constants");
       const { area } = createStore();
       const color = typeof area.getOneColor === "function" ? area.getOneColor() : area.getOneColor;
       expect(color).toBe(defaultStyle.fillcolor);
@@ -502,14 +506,15 @@ describe("AreaMixin", () => {
     });
 
     it("returns false when FF_LSDV_4930 on and hidden (without calling intersectsBbox)", () => {
-      withFeatureFlags({ [FF_LSDV_4930]: true }, () => {
-        const { area, object } = createStore();
-        object.selectionArea = { isActive: true, intersectsBbox: jest.fn(() => true) };
-        area.setHighlighted(false);
-        area.setHidden(true);
-        expect(area.isInSelectionArea).toBe(false);
-        expect(object.selectionArea.intersectsBbox).not.toHaveBeenCalled();
-      });
+      const isFF = require("../../utils/feature-flags").isFF;
+      isFF.mockImplementation((flag) => flag === "ff_lsdv_4930");
+      const { area, object } = createStore();
+      object.selectionArea = { isActive: true, intersectsBbox: jest.fn(() => true) };
+      area.setHighlighted(false);
+      area.setHidden(true);
+      expect(area.isInSelectionArea).toBe(false);
+      expect(object.selectionArea.intersectsBbox).not.toHaveBeenCalled();
+      isFF.mockReturnValue(false);
     });
   });
 

@@ -3,8 +3,12 @@ import userEvent from "@testing-library/user-event";
 import "@testing-library/jest-dom";
 import { TaskSourceViewer } from "./TaskSourceViewer";
 
-// Use real feature-flags; enable interactive viewer so renderToggle is called
-import { FF_INTERACTIVE_JSON_VIEWER } from "../../../utils/feature-flags";
+// Mock feature flags
+jest.mock("../../../utils/feature-flags", () => ({
+  FF_LOPS_E_3: "ff_lops_e_3",
+  FF_INTERACTIVE_JSON_VIEWER: "ff_interactive_json_viewer",
+  isFF: (flag: string) => flag === "ff_interactive_json_viewer",
+}));
 
 // Mock UI components
 jest.mock("@humansignal/ui", () => ({
@@ -84,10 +88,6 @@ describe("TaskSourceViewer Component", () => {
   beforeEach(() => {
     jest.clearAllMocks();
     localStorage.clear();
-    (window as any).APP_SETTINGS = {
-      ...(window as any).APP_SETTINGS,
-      feature_flags: { ...(window as any).APP_SETTINGS?.feature_flags, [FF_INTERACTIVE_JSON_VIEWER]: true },
-    };
   });
 
   describe("Initial Load", () => {
@@ -220,23 +220,27 @@ describe("TaskSourceViewer Component", () => {
 
     it("should update renderToggle when view changes via callback", async () => {
       const mockRenderToggle = jest.fn();
+      let capturedOnViewChange: ((view: string) => void) | null = null;
+
+      // Capture the onViewChange callback from the toggle
+      mockRenderToggle.mockImplementation((toggle: any) => {
+        if (toggle?.props?.onViewChange) {
+          capturedOnViewChange = toggle.props.onViewChange;
+        }
+      });
 
       render(<TaskSourceViewer {...defaultProps} renderToggle={mockRenderToggle} />);
 
       await waitFor(() => {
-        expect(mockRenderToggle).toHaveBeenCalled();
+        expect(capturedOnViewChange).toBeTruthy();
       });
 
-      const toggleArg = mockRenderToggle.mock.calls[0][0];
-      const capturedOnViewChange = toggleArg?.props?.onViewChange;
-      expect(capturedOnViewChange).toBeTruthy();
-
-      await act(async () => {
-        capturedOnViewChange!("interactive");
-      });
+      // Simulate view change via callback
+      capturedOnViewChange!("interactive");
 
       await waitFor(() => {
         expect(localStorage.getItem(`${GLOBAL_STORAGE_KEY}:view`)).toBe("interactive");
+        expect(screen.getByTestId("json-viewer")).toBeInTheDocument();
       });
     });
   });

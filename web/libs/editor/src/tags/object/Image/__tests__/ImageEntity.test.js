@@ -1,26 +1,22 @@
 /**
  * Unit tests for ImageEntity (tags/object/Image/ImageEntity.js)
  */
-import { vi } from "vitest";
 import { types } from "mobx-state-tree";
 import { ImageEntity } from "../ImageEntity";
 import { ImageEntityMixin } from "../ImageEntityMixin";
-
-const mockImageCache = vi.hoisted(() => ({
-  get: vi.fn(),
-  addRef: vi.fn(),
-  releaseRef: vi.fn(),
-  forceRemove: vi.fn(),
-  load: vi.fn(),
-  isLoading: vi.fn(),
-  getPendingLoad: vi.fn(),
-}));
-
-vi.mock("@humansignal/core", () => ({
-  imageCache: mockImageCache,
-}));
-
 import { imageCache } from "@humansignal/core";
+
+jest.mock("@humansignal/core", () => ({
+  imageCache: {
+    get: jest.fn(),
+    addRef: jest.fn(),
+    releaseRef: jest.fn(),
+    forceRemove: jest.fn(),
+    load: jest.fn(),
+    isLoading: jest.fn(),
+    getPendingLoad: jest.fn(),
+  },
+}));
 
 jest.mock("../../../../utils/feature-flags", () => ({
   FF_IMAGE_MEMORY_USAGE: "fflag_image_memory_usage",
@@ -75,7 +71,7 @@ function createEntityWithParent(imageCrossOrigin = "anonymous") {
 
 describe("ImageEntity", () => {
   beforeEach(() => {
-    vi.clearAllMocks();
+    jest.clearAllMocks();
   });
 
   describe("views", () => {

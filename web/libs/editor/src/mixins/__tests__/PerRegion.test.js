@@ -220,7 +220,7 @@ describe("PerRegion mixin", () => {
       const setValue = jest.fn();
       const area = { setValue };
       const m = TestModel.create({ perregion: true });
-      m.setAnnotation({ highlightedNode: area, results: [] });
+      m.setAnnotation({ highlightedNode: area });
       m.createPerRegionResult();
       expect(setValue).toHaveBeenCalledWith(m);
     });

@@ -2,17 +2,15 @@
  * Unit tests for SettingsStore (SettingsModel).
  * Parity: stores/SettingsStore.js target 48.92%.
  */
-import { vi } from "vitest";
 import SettingsModel from "../SettingsStore";
-import { Hotkey } from "../../core/Hotkey";
 
 describe("SettingsStore", () => {
   let localStorageMock;
 
   beforeEach(() => {
     localStorageMock = {
-      getItem: vi.fn().mockReturnValue(null),
-      setItem: vi.fn(),
+      getItem: jest.fn().mockReturnValue(null),
+      setItem: jest.fn(),
     };
     Object.defineProperty(global, "window", {
       value: { localStorage: localStorageMock },
@@ -21,7 +19,7 @@ describe("SettingsStore", () => {
   });
 
   afterEach(() => {
-    vi.restoreAllMocks();
+    jest.restoreAllMocks();
   });
 
   it("creates with default values when no localStorage", () => {
@@ -110,7 +108,8 @@ describe("SettingsStore", () => {
   });
 
   it("toggleHotkeys toggles enableHotkeys and calls Hotkey.setScope", () => {
-    const spy = vi.spyOn(Hotkey, "setScope").mockImplementation(() => {});
+    const { Hotkey } = require("../../core/Hotkey");
+    const spy = jest.spyOn(Hotkey, "setScope").mockImplementation(() => {});
     const store = SettingsModel.create({}, { settings: {} });
     store.toggleHotkeys();
     expect(store.enableHotkeys).toBe(false);

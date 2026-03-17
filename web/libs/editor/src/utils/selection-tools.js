@@ -1,4 +1,4 @@
-import { isDefined } from "./utilities.js";
+import { isDefined } from "./utilities";
 
 export const isTextNode = (node) => node && node.nodeType === Node.TEXT_NODE;
 

@@ -3,8 +3,15 @@
  */
 import { getParent, types } from "mobx-state-tree";
 import { guidGenerator } from "../../core/Helpers";
-import { FF_ZOOM_OPTIM } from "../../utils/feature-flags";
-import { setFeatureFlag, clearFeatureFlag } from "@humansignal/frontend-test/feature-flag-test-setup";
+
+jest.mock("../../utils/feature-flags", () => ({
+  isFF: jest.fn(() => false),
+  FF_ZOOM_OPTIM: "ff_zoom_optim",
+  FF_DEV_3391: "ff_3391",
+  FF_SIMPLE_INIT: "ff_simple_init",
+}));
+
+const featureFlags = require("../../utils/feature-flags");
 
 const mockAnnotation = () => ({
   regionStore: {
@@ -78,12 +85,6 @@ const Base = types
 const WithDeleteRegion = types.model({}).actions(() => ({
   deleteRegion() {},
 }));
-// Override Regions mixin's editable getter (which throws "Not implemented") for tests.
-const EditableOverride = types.model({}).views(() => ({
-  get editable() {
-    return true;
-  },
-}));
 // Override annotation to read from root._annotationForTest so tests pass regardless of
 // feature-flag or module-load order when run with the full editor suite.
 const AnnotationOverrideForTest = types.model({}).views((self) => ({
@@ -92,15 +93,7 @@ const AnnotationOverrideForTest = types.model({}).views((self) => ({
     return root?._annotationForTest ?? null;
   },
 }));
-// Override KonvaRegionMixin's bboxCoords (which returns null) so bboxCoordsCanvas and inViewPort work.
-const BboxCoordsOverride = types.model({}).views(() => ({
-  get bboxCoords() {
-    return { left: 0, top: 0, right: 10, bottom: 10 };
-  },
-}));
-const TestRegion = types.compose(Base, Regions, EditableOverride, WithDeleteRegion, KonvaRegionMixin, BboxCoordsOverride, AnnotationOverrideForTest);
-// Region without BboxCoordsOverride for the test that asserts bboxCoords returns null.
-const TestRegionWithoutBboxOverride = types.compose(Base, Regions, EditableOverride, WithDeleteRegion, KonvaRegionMixin, AnnotationOverrideForTest);
+const TestRegion = types.compose(Base, Regions, WithDeleteRegion, KonvaRegionMixin, AnnotationOverrideForTest);
 
 const _annotationRef = { current: null };
 
@@ -129,7 +122,6 @@ const RootModel = types
     getToolsManager: () => ({ findSelectedTool: () => null }),
     naturalWidth: 100,
     naturalHeight: 100,
-    findImageEntity: jest.fn(() => null),
   }))
   .actions((self) => ({
     setAnnotationStore(store) {
@@ -169,39 +161,7 @@ describe("KonvaRegion mixin", () => {
   describe("views", () => {
     it("bboxCoords returns null and warns when not overridden", () => {
       const warnSpy = jest.spyOn(console, "warn").mockImplementation(() => {});
-      const RootWithoutBbox = types
-        .model({ region: types.maybe(TestRegionWithoutBboxOverride) })
-        .views((self) => ({
-          get annotationStore() {
-            return self._annotationForTest != null ? { selected: self._annotationForTest, selectedHistory: null } : null;
-          },
-          get stageWidth() {
-            return self._stageWidth ?? 100;
-          },
-          get stageHeight() {
-            return self._stageHeight ?? 100;
-          },
-        }))
-        .volatile(() => ({
-          _annotationForTest: null,
-          _stageWidth: 100,
-          _stageHeight: 100,
-          internalToCanvasX: (x) => x,
-          internalToCanvasY: (y) => y,
-          stageRef: null,
-          getToolsManager: () => ({ findSelectedTool: () => null }),
-          naturalWidth: 100,
-          naturalHeight: 100,
-          findImageEntity: jest.fn(() => null),
-        }))
-        .actions((self) => ({
-          setAnnotationStore(store) {
-            self._annotationForTest = store?.selected ?? null;
-          },
-        }));
-      const root = RootWithoutBbox.create({ region: {} });
-      root.setAnnotationStore({ selected: mockAnnotation() });
-      const region = root.region;
+      const { region } = createStore();
       expect(region.bboxCoords).toBeNull();
       expect(warnSpy).toHaveBeenCalledWith("KonvaRegionMixin needs to implement bboxCoords getter in regions");
       warnSpy.mockRestore();
@@ -233,13 +193,13 @@ describe("KonvaRegion mixin", () => {
     });
 
     it("inViewPort returns true when FF_ZOOM_OPTIM is off", () => {
-      clearFeatureFlag(FF_ZOOM_OPTIM);
+      featureFlags.isFF.mockReturnValue(false);
       const { region } = createStore();
       expect(region.inViewPort).toBe(true);
     });
 
     it("inViewPort is false when FF_ZOOM_OPTIM is on and no object", () => {
-      setFeatureFlag(FF_ZOOM_OPTIM, true);
+      featureFlags.isFF.mockReturnValue(true);
       const RegionWithBbox = types.compose(TestRegion).views((_self) => ({
         get bboxCoords() {
           return { left: 0, top: 0, right: 10, bottom: 10 };
@@ -266,7 +226,7 @@ describe("KonvaRegion mixin", () => {
     });
 
     it("inViewPort is true when FF_ZOOM_OPTIM is on and bbox inside viewport", () => {
-      setFeatureFlag(FF_ZOOM_OPTIM, true);
+      featureFlags.isFF.mockReturnValue(true);
       const RegionWithBbox = types.compose(TestRegion).views((_self) => ({
         get bboxCoords() {
           return { left: 5, top: 5, right: 15, bottom: 15 };

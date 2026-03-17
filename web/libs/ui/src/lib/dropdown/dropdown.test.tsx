@@ -4,8 +4,26 @@ import { useRef, useEffect } from "react";
 import { Dropdown, type DropdownRef } from "./dropdown";
 import { DropdownContext, type DropdownContextValue } from "./dropdown-context";
 
-// Only mock CSS (no real behavior to test)
+// Mock the SCSS module
 jest.mock("./dropdown.prefix.css", () => ({}));
+
+// Mock the alignment utility
+jest.mock("@humansignal/core/lib/utils/dom", () => ({
+  alignElements: jest.fn(() => ({
+    left: 100,
+    top: 200,
+    maxHeight: 500,
+  })),
+}));
+
+// Mock the transition utility
+jest.mock("@humansignal/core/lib/utils/transition", () => ({
+  aroundTransition: jest.fn((_element, callbacks) => {
+    callbacks.beforeTransition?.();
+    callbacks.transition?.();
+    callbacks.afterTransition?.();
+  }),
+}));
 
 // Mock CSS.supports for anchor positioning tests
 const originalCSSSupports = CSS.supports;
@@ -51,8 +69,7 @@ describe("Dropdown - Cursor Position Support", () => {
       );
 
       const dropdown = screen.getByTestId("dropdown");
-      // jsdom may not compute inline styles; assert on style attribute
-      expect(dropdown.getAttribute("style")).toMatch(/background(-color)?:\s*red/);
+      expect(dropdown).toHaveStyle({ backgroundColor: "red" });
     });
   });
 
@@ -264,6 +281,8 @@ describe("Dropdown - Cursor Position Support", () => {
 
   describe("Alignment", () => {
     it("should use default alignment when not specified", async () => {
+      const { alignElements } = require("@humansignal/core/lib/utils/dom");
+
       const TestComponent = () => {
         const dropdownRef = useRef<DropdownRef>(null);
         const triggerRef = useRef<HTMLElement>(document.createElement("button"));
@@ -536,36 +555,51 @@ describe("Dropdown - Cursor Position Support", () => {
   });
 
   describe("Animation", () => {
-    it("opens and shows content when animated (default)", async () => {
+    it("should animate by default", () => {
+      const { aroundTransition } = require("@humansignal/core/lib/utils/transition");
+
       const TestComponent = () => {
         const dropdownRef = useRef<DropdownRef>(null);
+
         useEffect(() => {
           dropdownRef.current?.open();
         }, []);
+
         return (
-          <Dropdown ref={dropdownRef} dataTestId="dropdown">
+          <Dropdown ref={dropdownRef}>
             <div>Content</div>
           </Dropdown>
         );
       };
+
       render(<TestComponent />);
-      await waitFor(() => expect(screen.getByText("Content")).toBeInTheDocument(), { timeout: 100 });
+
+      // aroundTransition should be called for animation
+      expect(aroundTransition).toHaveBeenCalled();
     });
 
-    it("opens and shows content immediately when animated is false", async () => {
+    it("should skip animation when animated is false", () => {
+      const { aroundTransition } = require("@humansignal/core/lib/utils/transition");
+      aroundTransition.mockClear();
+
       const TestComponent = () => {
         const dropdownRef = useRef<DropdownRef>(null);
+
         useEffect(() => {
-          dropdownRef.current?.open(true);
+          dropdownRef.current?.open();
         }, []);
+
         return (
-          <Dropdown ref={dropdownRef} animated={false} dataTestId="dropdown">
+          <Dropdown ref={dropdownRef} animated={false}>
             <div>Content</div>
           </Dropdown>
         );
       };
+
       render(<TestComponent />);
-      await waitFor(() => expect(screen.getByText("Content")).toBeInTheDocument());
+
+      // aroundTransition should not be called when animation is disabled
+      expect(aroundTransition).not.toHaveBeenCalled();
     });
   });
 });

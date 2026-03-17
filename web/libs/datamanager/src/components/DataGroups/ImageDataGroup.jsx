@@ -4,15 +4,6 @@ import { cn } from "../../utils/bem";
 
 export const IMAGE_SIZE_COEFFICIENT = 8;
 
-const defaultRoot = { showPreviews: false, SDK: {} };
-function getRootSafe(node) {
-  try {
-    return getRoot(node);
-  } catch {
-    return defaultRoot;
-  }
-}
-
 export const ImageDataGroup = (column) => {
   const {
     value,
@@ -20,7 +11,7 @@ export const ImageDataGroup = (column) => {
     field: { alias },
     columnCount,
   } = column;
-  const root = getRootSafe(original);
+  const root = getRoot(original);
   const imageHeight = ImageDataGroup.height * Math.max(1, IMAGE_SIZE_COEFFICIENT - columnCount);
 
   return original.total_annotations === 0 || !root.showPreviews ? (
@@ -31,7 +22,7 @@ export const ImageDataGroup = (column) => {
     <AnnotationPreview
       task={original}
       annotation={original.annotations[0]}
-      config={root.SDK}
+      config={getRoot(original).SDK}
       name={alias}
       width="100%"
       size="large"

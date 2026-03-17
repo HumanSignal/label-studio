@@ -5,8 +5,12 @@
  * undo/redo/set/reset, and FF_DEV_1284 branch.
  */
 import { applySnapshot, types } from "mobx-state-tree";
-import { withFeatureFlags } from "@humansignal/frontend-test/feature-flag-test-setup";
-import { FF_DEV_1284 } from "../../utils/feature-flags";
+
+const mockIsFF = jest.fn(() => false);
+jest.mock("../../utils/feature-flags", () => ({
+  isFF: (...args) => mockIsFF(...args),
+  FF_DEV_1284: "fflag_fix_front_dev_1284_auto_detect_undo_281022_short",
+}));
 
 import TimeTraveller from "../TimeTraveller";
 
@@ -34,6 +38,7 @@ function addHistoryStates(tt, states) {
 
 describe("TimeTraveller", () => {
   beforeEach(() => {
+    mockIsFF.mockReturnValue(false);
     jest.useFakeTimers();
   });
 
@@ -331,14 +336,14 @@ describe("TimeTraveller", () => {
 
   describe("FF_DEV_1284", () => {
     it("set schedules setSkipNextUndoState(false) when flag is on", () => {
-      withFeatureFlags({ [FF_DEV_1284]: true }, () => {
-        const { root, store } = createRoot();
-        addHistoryStates(root.timeTraveller, [{ value: 1 }]);
-        root.timeTraveller.undo();
-        root.timeTraveller.set(1);
-        jest.runAllTimers();
-        expect(root.timeTraveller.skipNextUndoState).toBe(false);
-      });
+      mockIsFF.mockReturnValue(true);
+      const { root, store } = createRoot();
+      addHistoryStates(root.timeTraveller, [{ value: 1 }]);
+      root.timeTraveller.undo();
+      root.timeTraveller.set(1);
+      expect(mockIsFF).toHaveBeenCalledWith("fflag_fix_front_dev_1284_auto_detect_undo_281022_short");
+      jest.runAllTimers();
+      expect(root.timeTraveller.skipNextUndoState).toBe(false);
     });
   });
 });

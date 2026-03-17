@@ -1,8 +1,11 @@
 /* global describe, test, expect, jest, beforeEach */
 import { encode as rleEncode } from "@thi.ng/rle-pack";
 import Canvas from "../canvas";
-import { FF_LSDV_4583 } from "../feature-flags";
-import { withFeatureFlags } from "@humansignal/frontend-test/feature-flag-test-setup";
+
+jest.mock("../feature-flags", () => ({
+  FF_LSDV_4583: "fflag_feat_front_lsdv_4583_multi_image_segmentation_short",
+  isFF: jest.fn(() => false),
+}));
 
 const svgs = {
   simple: [
@@ -127,7 +130,6 @@ describe("mask2DataURL", () => {
       getContext: () => ({
         getImageData,
         putImageData,
-        drawImage: jest.fn(),
       }),
       toDataURL,
     };
@@ -208,7 +210,6 @@ describe("RLE2Region", () => {
         createImageData: () => imageData,
         putImageData,
         getImageData: () => imageData,
-        drawImage: jest.fn(),
       }),
       toDataURL,
     };
@@ -243,7 +244,6 @@ describe("RLE2Region", () => {
         createImageData: () => imageData,
         putImageData: jest.fn(),
         getImageData: () => imageData,
-        drawImage: jest.fn(),
       }),
       toDataURL: () => "data:image/png;base64,default",
     };
@@ -291,8 +291,14 @@ function createExportRLECanvas(nw, nh) {
 }
 
 describe("Region2RLE", () => {
+  beforeEach(() => {
+    const { isFF } = require("../feature-flags");
+    isFF.mockReturnValue(false);
+  });
+
   test("returns RLE when isFF(FF_LSDV_4583) is true (exportRLE path)", () => {
-    withFeatureFlags({ [FF_LSDV_4583]: true }, () => {
+    const { isFF } = require("../feature-flags");
+    isFF.mockImplementation((id) => id === "fflag_feat_front_lsdv_4583_multi_image_segmentation_short");
     const origCreateElement = document.createElement.bind(document);
     jest.spyOn(document, "createElement").mockImplementation((tag) => {
       if (tag === "canvas") return createExportRLECanvas(4, 4);
@@ -306,12 +312,12 @@ describe("Region2RLE", () => {
     const result = Canvas.Region2RLE(region);
     expect(result).toBeDefined();
     expect(Array.isArray(result) || typeof result === "string" || ArrayBuffer.isView(result)).toBe(true);
-    });
     jest.restoreAllMocks();
   });
 
   test("exportRLE path with existing region.rle applies decode and putImageData", () => {
-    withFeatureFlags({ [FF_LSDV_4583]: true }, () => {
+    const { isFF } = require("../feature-flags");
+    isFF.mockImplementation((id) => id === "fflag_feat_front_lsdv_4583_multi_image_segmentation_short");
     const nw = 4;
     const nh = 4;
     const raw = new Uint8Array(nw * nh * 4);
@@ -340,12 +346,12 @@ describe("Region2RLE", () => {
 
     expect(result).toBeDefined();
     expect(putImageData).toHaveBeenCalled();
-    });
     jest.restoreAllMocks();
   });
 
   test("exportRLE path with getMaskImage draws mask on canvas", () => {
-    withFeatureFlags({ [FF_LSDV_4583]: true }, () => {
+    const { isFF } = require("../feature-flags");
+    isFF.mockImplementation((id) => id === "fflag_feat_front_lsdv_4583_multi_image_segmentation_short");
     const origCreateElement = document.createElement.bind(document);
     jest.spyOn(document, "createElement").mockImplementation((tag) => {
       if (tag === "canvas") return createExportRLECanvas(4, 4);
@@ -362,12 +368,12 @@ describe("Region2RLE", () => {
     };
     const result = Canvas.Region2RLE(region);
     expect(result).toBeDefined();
-    });
     jest.restoreAllMocks();
   });
 
   test("exportRLE path with touches renders strokes and encodes", () => {
-    withFeatureFlags({ [FF_LSDV_4583]: true }, () => {
+    const { isFF } = require("../feature-flags");
+    isFF.mockImplementation((id) => id === "fflag_feat_front_lsdv_4583_multi_image_segmentation_short");
     const origCreateElement = document.createElement.bind(document);
     jest.spyOn(document, "createElement").mockImplementation((tag) => {
       if (tag === "canvas") return createExportRLECanvas(10, 10);
@@ -386,7 +392,6 @@ describe("Region2RLE", () => {
     };
     const result = Canvas.Region2RLE(region);
     expect(result).toBeDefined();
-    });
     jest.restoreAllMocks();
   });
 

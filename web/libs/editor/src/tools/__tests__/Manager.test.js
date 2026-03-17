@@ -5,35 +5,10 @@
  * addToolsFromControl, findSelectedTool, findDrawingTool, resetActiveDrawing, event,
  * reload, removeAllTools), and getters (preservedTool, root, obj, hasSelected).
  */
-import { FF_DEV_3391 } from "../../utils/feature-flags";
 
 const mockDestroy = jest.fn();
 jest.mock("mobx-state-tree", () => ({
   destroy: (...args) => mockDestroy(...args),
-  getRoot: () => null,
-  getParent: () => null,
-  getSnapshot: () => ({}),
-  types: {},
-  flow: () => () => {},
-  onSnapshot: () => () => {},
-  addMiddleware: () => () => {},
-  process: () => ({}),
-  unprotect: () => {},
-  protect: () => {},
-  isProtected: () => false,
-  applySnapshot: () => {},
-  getEnv: () => ({}),
-  clone: (n) => n,
-  getIdentifier: () => undefined,
-  getType: () => ({}),
-  tryReference: () => undefined,
-  isValidReference: () => false,
-  resolvePath: () => null,
-  resolveIdentifier: () => null,
-  recordActions: () => () => ({}),
-  recordPatches: () => () => ({}),
-  createActionTrackingMiddleware: () => () => ({}),
-  setLivelinessChecking: () => {},
 }));
 
 const mockGuid = jest.fn((n) => `guid-${n ?? 10}`);
@@ -44,6 +19,10 @@ jest.mock("../../utils/unique", () => ({
 const mockFfActive = jest.fn(() => false);
 jest.mock("@humansignal/core", () => ({
   ff: { isActive: (flag) => mockFfActive(flag) },
+}));
+
+jest.mock("../../utils/feature-flags", () => ({
+  FF_DEV_3391: "ff_3391",
 }));
 
 const storage = {};
@@ -66,15 +45,15 @@ Object.defineProperty(global, "window", {
 
 let ToolsManager;
 
-beforeEach(async () => {
+beforeEach(() => {
   jest.clearAllMocks();
   mockGuid.mockImplementation((n) => `guid-${n ?? 10}`);
   mockFfActive.mockReturnValue(false);
   localStorageMock.getItem.mockImplementation((key) => storage[key] ?? null);
   Object.keys(storage).forEach((k) => delete storage[k]);
-  jest.resetModules();
-  const mod = await import("../Manager");
-  ToolsManager = mod.default;
+  jest.isolateModules(() => {
+    ToolsManager = require("../Manager").default;
+  });
   // Default root so obj getter does not throw when tests trigger unselectAll/selectTool
   ToolsManager.setRoot({
     annotationStore: { names: new Map(), selected: null },
@@ -198,6 +177,7 @@ describe("ToolsManager", () => {
     });
 
     it("obj returns annotationStore.selected?.names.get(name) when FF_DEV_3391 is on", () => {
+      const { FF_DEV_3391 } = require("../../utils/feature-flags");
       const obj = {};
       const root = {
         annotationStore: {

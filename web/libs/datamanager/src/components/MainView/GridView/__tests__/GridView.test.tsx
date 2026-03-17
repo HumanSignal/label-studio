@@ -21,12 +21,89 @@ interface MockDataItem {
   getProperty: (path: string) => any;
 }
 
-// Render GridView in a sized container so real AutoSizer gets dimensions.
-const gridViewWrapper = (ui: React.ReactElement) => (
-  <div style={{ width: 1000, height: 800, position: "relative" }}>
-    <div style={{ position: "absolute", inset: 0 }}>{ui}</div>
-  </div>
-);
+// Mock MST getRoot
+jest.mock("mobx-state-tree", () => ({
+  ...jest.requireActual("mobx-state-tree"),
+  getRoot: jest.fn((node) => ({
+    dataStore: {
+      total: 100,
+      hasNextPage: true,
+      pageSize: 10,
+    },
+    taskStore: {
+      loadTask: jest.fn(),
+    },
+    SDK: {
+      invoke: jest.fn(),
+    },
+  })),
+}));
+
+// Mock the required dependencies
+jest.mock("react-virtualized-auto-sizer", () => ({
+  __esModule: true,
+  default: ({ children }: { children: (size: { width: number; height: number }) => React.ReactNode }) =>
+    children({ width: 1000, height: 800 }),
+}));
+
+jest.mock("react-window", () => {
+  const React = require("react");
+  return {
+    FixedSizeGrid: React.forwardRef(
+      (
+        {
+          children,
+          width,
+          height,
+          rowHeight,
+          columnWidth,
+          rowCount,
+          columnCount,
+          overscanRowCount,
+          onItemsRendered,
+          className,
+          style,
+          ...props
+        }: {
+          children: (props: { rowIndex: number; columnIndex: number; style: React.CSSProperties }) => React.ReactNode;
+          width?: number;
+          height?: number;
+          rowHeight?: number;
+          columnWidth?: number;
+          rowCount?: number;
+          columnCount?: number;
+          overscanRowCount?: number;
+          onItemsRendered?: () => void;
+          className?: string;
+          style?: React.CSSProperties;
+        },
+        ref: any,
+      ) => (
+        <div
+          ref={ref}
+          data-testid="fixed-size-grid"
+          className={className}
+          style={{ ...style, width, height }}
+          data-column-count={columnCount}
+          data-row-count={rowCount}
+          data-row-height={rowHeight}
+          data-column-width={columnWidth}
+        >
+          {children({ rowIndex: 0, columnIndex: 0, style: {} })}
+        </div>
+      ),
+    ),
+  };
+});
+
+jest.mock("react-window-infinite-loader", () => ({
+  __esModule: true,
+  default: ({
+    children,
+  }: {
+    children: (props: { onItemsRendered: () => void; ref: React.RefObject<unknown> }) => React.ReactNode;
+  }) => children({ onItemsRendered: jest.fn(), ref: jest.fn() }),
+}));
 
 // Mock data for testing
 const mockData: MockDataItem[] = [
@@ -118,9 +195,7 @@ describe("GridView", () => {
   describe("Main GridView Component", () => {
     it("renders grid view with correct number of columns", () => {
       renderWithBEM(
-        gridViewWrapper(
-          <GridView data={mockData} view={mockView} fields={mockFields} loadMore={() => {}} onChange={() => {}} />,
-        ),
+        <GridView data={mockData} view={mockView} fields={mockFields} loadMore={() => {}} onChange={() => {}} />,
       );
 
       const grid = screen.getByTestId("fixed-size-grid");
@@ -131,9 +206,7 @@ describe("GridView", () => {
       const loadMore = jest.fn();
 
       renderWithBEM(
-        gridViewWrapper(
-          <GridView data={mockData} view={mockView} fields={mockFields} loadMore={loadMore} onChange={() => {}} />,
-        ),
+        <GridView data={mockData} view={mockView} fields={mockFields} loadMore={loadMore} onChange={() => {}} />,
       );
 
       expect(screen.getByTestId("fixed-size-grid")).toBeInTheDocument();
@@ -143,9 +216,7 @@ describe("GridView", () => {
       const customView = { ...mockView, gridWidth: 3 };
 
       renderWithBEM(
-        gridViewWrapper(
-          <GridView data={mockData} view={customView} fields={mockFields} loadMore={() => {}} onChange={() => {}} />,
-        ),
+        <GridView data={mockData} view={customView} fields={mockFields} loadMore={() => {}} onChange={() => {}} />,
       );
 
       const grid = screen.getByTestId("fixed-size-grid");
@@ -319,15 +390,13 @@ describe("GridView", () => {
       };
 
       renderWithBEM(
-        gridViewWrapper(
-          <GridView
-            data={mockData}
-            view={{ ...mockView, selected }}
-            fields={mockFields}
-            loadMore={() => {}}
-            onChange={() => {}}
-          />,
-        ),
+        <GridView
+          data={mockData}
+          view={{ ...mockView, selected }}
+          fields={mockFields}
+          loadMore={() => {}}
+          onChange={() => {}}
+        />,
       );
 
       const checkboxes = screen.getAllByRole("checkbox");
@@ -335,8 +404,7 @@ describe("GridView", () => {
         fireEvent.click(checkbox);
       });
 
-      expect(selected.isSelected).toHaveBeenCalled();
-      expect(selected.isSelected.mock.calls.length).toBeGreaterThanOrEqual(mockData.length);
+      expect(selected.isSelected).toHaveBeenCalledTimes(mockData.length);
     });
   });
 
@@ -369,15 +437,13 @@ describe("GridView", () => {
 
       columnCounts.forEach((count) => {
         const { unmount } = renderWithBEM(
-          gridViewWrapper(
-            <GridView
-              data={mockData}
-              view={{ ...mockView, gridWidth: count }}
-              fields={mockFields}
-              loadMore={() => {}}
-              onChange={() => {}}
-            />,
-          ),
+          <GridView
+            data={mockData}
+            view={{ ...mockView, gridWidth: count }}
+            fields={mockFields}
+            loadMore={() => {}}
+            onChange={() => {}}
+          />,
         );
 
         const grid = screen.getByTestId("fixed-size-grid");

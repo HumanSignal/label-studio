@@ -1,5 +1,4 @@
-import React from "react";
-import type { ReactNode } from "react";
+import type React from "react";
 import { Modal } from "antd";
 import { sanitizeHtml } from "../../utils/html";
 
@@ -10,7 +9,7 @@ export const InstructionsModal = ({
   onCancel,
 }: {
   title: string;
-  children: ReactNode;
+  children: React.ReactNode;
   visible: boolean;
   onCancel: () => void;
 }) => {

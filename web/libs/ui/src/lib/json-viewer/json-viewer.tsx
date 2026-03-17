@@ -221,7 +221,7 @@ export const JsonViewer: FC<JsonViewerProps> = ({
   );
 
   return (
-    <div className={className} data-testid="json-viewer">
+    <div className={className}>
       <div className={styles.jsonViewer} style={{ minHeight }}>
         {(showSearch || (showFilters && allFilters.length > 0)) && (
           <div className={styles.controls}>
@@ -278,7 +278,7 @@ export const JsonViewer: FC<JsonViewerProps> = ({
                   )}
                 </div>
               )}
-              {toolbarExtra && <div data-testid="json-viewer-toolbar-extra">{toolbarExtra}</div>}
+              {toolbarExtra}
             </div>
           </div>
         )}

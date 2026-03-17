@@ -1,12 +1,11 @@
 /**
  * Unit tests for WebAudioDecoder (lib/AudioUltra/Media/WebAudioDecoder.ts)
  */
-import { vi } from "vitest";
 import { info } from "../../Common/Utils";
 import { WebAudioDecoder } from "../WebAudioDecoder";
 
-vi.mock("../../Common/Utils", () => ({
-  info: vi.fn(),
+jest.mock("../../Common/Utils", () => ({
+  info: jest.fn(),
 }));
 
 function createFakeAudioBuffer(
@@ -26,7 +25,7 @@ function createFakeAudioBuffer(
 }
 
 function createMockOfflineContext(decodeResolve?: (buffer: unknown) => void) {
-  const decodeAudioData = vi
+  const decodeAudioData = jest
     .fn()
     .mockImplementation((buf: ArrayBuffer, onSuccess?: (b: unknown) => void, onError?: (e: Error) => void) => {
       const buffer = createFakeAudioBuffer();
@@ -51,10 +50,10 @@ describe("WebAudioDecoder", () => {
   const originalWebkit = (global as any).webkitOfflineAudioContext;
 
   beforeEach(() => {
-    vi.clearAllMocks();
+    jest.clearAllMocks();
     (global as any).WebAudioOfflineAudioContext = undefined;
     mockContext = createMockOfflineContext();
-    (global as any).OfflineAudioContext = vi.fn().mockImplementation(() => mockContext.ctx);
+    (global as any).OfflineAudioContext = jest.fn().mockImplementation(() => mockContext.ctx);
     (global as any).webkitOfflineAudioContext = (global as any).OfflineAudioContext;
     decoder = new WebAudioDecoder(src);
   });

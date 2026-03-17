@@ -1,45 +1,36 @@
-import React from "react";
-import { vi } from "vitest";
 import { render, waitFor } from "@testing-library/react";
+import { PlaygroundApp } from "../PlaygroundApp";
+import { useAtom, useSetAtom } from "jotai";
 import { configAtom, errorAtom, loadingAtom } from "../../../atoms/configAtoms";
 
-// Load PlaygroundApp after mocks are set so jotai mock is applied (Vitest module resolution)
-let PlaygroundApp: React.ComponentType;
-async function getPlaygroundApp() {
-  if (!PlaygroundApp) {
-    const mod = await import("../PlaygroundApp");
-    PlaygroundApp = mod.PlaygroundApp;
-  }
-  return PlaygroundApp;
-}
-
-// Hoist jotai mocks so we can use mockImplementation in tests (Vitest needs same reference)
-const { mockUseAtom, mockUseSetAtom } = vi.hoisted(() => ({
-  mockUseAtom: vi.fn(),
-  mockUseSetAtom: vi.fn(),
+// Mock CodeEditor and allow it to be spied on
+jest.mock("../../EditorPanel", () => ({
+  EditorPanel: () => <div>EditorPanel</div>,
+}));
+jest.mock("../../PreviewPanel", () => ({
+  PreviewPanel: () => <div>PreviewPanel</div>,
+}));
+jest.mock("@humansignal/ui", () => ({
+  ...jest.requireActual("@humansignal/ui"),
+  ThemeToggle: () => <div>ThemeToggle</div>,
+  ToastProvider: ({ children }: { children: React.ReactNode }) => children,
+  useToast: () => ({
+    show: jest.fn(),
+  }),
 }));
 
-// Mock panels and TopBar so we don't need to resolve all UI/icons in test env (use global React for hoisted mocks)
-jest.mock("../../EditorPanel", () => {
-  const R = (globalThis as unknown as { React: typeof React }).React;
-  return { EditorPanel: () => R.createElement("div", null, "EditorPanel") };
-});
-jest.mock("../../PreviewPanel", () => {
-  const R = (globalThis as unknown as { React: typeof React }).React;
-  return { PreviewPanel: () => R.createElement("div", null, "PreviewPanel") };
-});
-// Toast subpath, UI icons, and ThemeToggle stubbed via vitest.config aliases.
-
-// react-codemirror2 stubbed via vitest.config alias.
-
-// Mock only useAtom/useSetAtom so tests can assert on setters; useAtomValue stays real (displayMode etc.)
-vi.mock("jotai", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("jotai")>();
-  return { ...actual, useAtom: mockUseAtom, useSetAtom: mockUseSetAtom };
+// Mock the atoms
+jest.mock("jotai", () => {
+  const originalModule = jest.requireActual("jotai");
+  return {
+    ...originalModule,
+    useAtom: jest.fn(),
+    useSetAtom: jest.fn(),
+  };
 });
 
 // Mock the fetch function
-global.fetch = vi.fn();
+global.fetch = jest.fn();
 
 function removeAllSpaceLikeCharacters(str: string): string {
   return str
@@ -48,37 +39,36 @@ function removeAllSpaceLikeCharacters(str: string): string {
 }
 
 describe("PlaygroundApp", () => {
-  const mockSetConfig = vi.fn();
-  const mockSetError = vi.fn();
-  const mockSetLoading = vi.fn();
-  const mockSetInterfaces = vi.fn();
+  const mockSetConfig = jest.fn();
+  const mockSetError = jest.fn();
+  const mockSetLoading = jest.fn();
+  const mockSetInterfaces = jest.fn();
 
-  beforeEach(async () => {
-    vi.clearAllMocks();
-    mockUseAtom.mockImplementation((atom: unknown) => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    (useAtom as jest.Mock).mockImplementation((atom) => {
       if (atom === configAtom) return ["", mockSetConfig];
       if (atom === errorAtom) return ["", mockSetError];
       if (atom === loadingAtom) return [false, mockSetLoading];
       return [null, mockSetInterfaces];
     });
-    mockUseSetAtom.mockImplementation((atom: unknown) => {
+    (useSetAtom as jest.Mock).mockImplementation((atom) => {
       if (atom === configAtom) return (c: string) => mockSetConfig(removeAllSpaceLikeCharacters(c));
       if (atom === errorAtom) return mockSetError;
       if (atom === loadingAtom) return mockSetLoading;
       return mockSetInterfaces;
     });
 
+    // Reset window.location to default
     Object.defineProperty(window, "location", {
       value: new URL("http://localhost"),
       writable: true,
       configurable: true,
     });
-
-    // Load app after mocks so PlaygroundApp gets mocked jotai
-    await getPlaygroundApp();
   });
 
   it("should handle config parameter in URL", async () => {
+    // Mock URL with config parameter
     const mockConfig = '<View><Text name="text" value="$text"/></View>';
     const encodedConfig = encodeURIComponent(mockConfig.replace(/\n/g, "<br>"));
     Object.defineProperty(window, "location", {

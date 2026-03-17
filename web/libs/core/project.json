@@ -6,16 +6,16 @@
   "tags": [],
   "targets": {
     "unit": {
-      "executor": "nx:run-commands",
+      "executor": "@nx/jest:jest",
       "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
       "options": {
-        "command": "vitest run --config vitest.config.ts",
-        "cwd": "libs/core"
+        "jestConfig": "libs/core/jest.config.ts",
+        "passWithNoTests": true
       },
       "configurations": {
         "ci": {
-          "command": "vitest run --config vitest.config.ts --coverage",
-          "cwd": "libs/core"
+          "ci": true,
+          "codeCoverage": true
         }
       }
     }

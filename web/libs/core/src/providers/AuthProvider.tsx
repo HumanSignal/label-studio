@@ -37,7 +37,7 @@ type AuthState = {
   permissions: AuthPermissions;
 };
 
-export const AuthContext = createContext<AuthState | null>(null);
+const AuthContext = createContext<AuthState | null>(null);
 
 const makePermissionChecker = (list?: (Ability | string)[]) => {
   const abilities = new Set<string>((list as string[]) ?? []);
@@ -107,24 +107,12 @@ export const AuthProvider = memo<{ children: React.ReactNode }>(({ children }) =
   return <AuthContext.Provider value={contextValue}>{children}</AuthContext.Provider>;
 });
 
-const defaultAuthState: AuthState = {
-  user: null,
-  isLoading: false,
-  refetch: () => {},
-  update: async () => undefined,
-  permissions: makePermissionChecker([]),
-};
-
 export const useAuth = () => {
-  const ctx = useContext(AuthContext);
-
-  if (ctx === null) {
-    return defaultAuthState;
-  }
+  const ctx = useContext(AuthContext)!;
 
   return {
     user: ctx.user,
-    isLoading: ctx.isLoading ?? false,
+    isLoading: ctx?.isLoading ?? false,
     refetch: ctx.refetch,
     update: ctx.update,
     permissions: ctx.permissions,

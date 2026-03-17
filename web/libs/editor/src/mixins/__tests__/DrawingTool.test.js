@@ -5,19 +5,16 @@
  * resetBeforeAnnotationSwitch, and TwoPointsDrawingTool / MultipleClicksDrawingTool / ThreePointsDrawingTool.
  */
 
-import { vi } from "vitest";
 import { getEnv, types } from "mobx-state-tree";
 import { DrawingTool, TwoPointsDrawingTool, MultipleClicksDrawingTool, ThreePointsDrawingTool } from "../DrawingTool";
 
-const { mockIsFF, mockFfIsActive } = vi.hoisted(() => ({
-  mockIsFF: vi.fn(() => false),
-  mockFfIsActive: vi.fn(() => false),
+jest.mock("../../utils/feature-flags", () => ({
+  isFF: jest.fn(() => false),
+  FF_DEV_3391: "ff_3391",
 }));
-vi.mock("../../utils/feature-flags", async (importOriginal) => {
-  const actual = await importOriginal();
-  return { ...actual, isFF: mockIsFF };
-});
-vi.mock("@humansignal/core", () => ({
+
+const mockFfIsActive = jest.fn(() => false);
+jest.mock("@humansignal/core", () => ({
   ff: {
     isActive: (flag) => mockFfIsActive(flag),
     FF_MULTIPLE_LABELS_REGIONS: "ff_multiple_labels",
@@ -26,18 +23,18 @@ vi.mock("@humansignal/core", () => ({
 
 function createMockAnnotation(overrides = {}) {
   return {
-    isReadOnly: vi.fn(() => false),
+    isReadOnly: jest.fn(() => false),
     editable: true,
     isDrawing: false,
-    setIsDrawing: vi.fn(),
-    createResult: vi.fn(() => mockCreatedResult),
-    history: { freeze: vi.fn(), unfreeze: vi.fn() },
-    unselectAll: vi.fn(),
+    setIsDrawing: jest.fn(),
+    createResult: jest.fn(() => mockCreatedResult),
+    history: { freeze: jest.fn(), unfreeze: jest.fn() },
+    unselectAll: jest.fn(),
     regionStore: {
       selection: {
-        _updateResultsFromRegions: vi.fn(),
-        drawingSelect: vi.fn(),
-        drawingUnselect: vi.fn(),
+        _updateResultsFromRegions: jest.fn(),
+        drawingSelect: jest.fn(),
+        drawingUnselect: jest.fn(),
       },
       hasSelection: false,
     },
@@ -49,7 +46,7 @@ function createMockControl(overrides = {}) {
   return {
     type: "rectlabels",
     isSelected: true,
-    getResultValue: vi.fn(() => ({})),
+    getResultValue: jest.fn(() => ({})),
     ...overrides,
   };
 }
@@ -59,13 +56,13 @@ function createMockObj(overrides = {}) {
     stageScale: 1,
     stageWidth: 800,
     stageHeight: 600,
-    checkLabels: vi.fn(() => true),
-    createDrawingRegion: vi.fn(() => mockDrawingRegion),
-    deleteDrawingRegion: vi.fn(),
-    activeStates: vi.fn(() => []),
+    checkLabels: jest.fn(() => true),
+    createDrawingRegion: jest.fn(() => mockDrawingRegion),
+    deleteDrawingRegion: jest.fn(),
+    activeStates: jest.fn(() => []),
     canvasSize: { width: 800, height: 600 },
-    canvasToInternalX: vi.fn((v) => v),
-    canvasToInternalY: vi.fn((v) => v),
+    canvasToInternalX: jest.fn((v) => v),
+    canvasToInternalY: jest.fn((v) => v),
     multiImage: false,
     currentImage: 0,
     ...overrides,
@@ -74,10 +71,10 @@ function createMockObj(overrides = {}) {
 
 function createMockManager(overrides = {}) {
   return {
-    findSelectedTool: vi.fn(function fn() {
+    findSelectedTool: jest.fn(function fn() {
       return this._currentTool ?? null;
     }),
-    selectTool: vi.fn(),
+    selectTool: jest.fn(),
     _currentTool: null,
     ...overrides,
   };
@@ -226,11 +223,12 @@ describe("DrawingTool mixin", () => {
     });
 
     it("isAllowedInteraction returns false when FF_DEV_3391 and !annotation.editable", () => {
-      mockIsFF.mockReturnValue(true);
+      const { isFF } = require("../../utils/feature-flags");
+      isFF.mockReturnValue(true);
       const { tool, annotation } = createStore();
       annotation.editable = false;
       expect(tool.isAllowedInteraction({ offsetX: 50, offsetY: 50 })).toBe(false);
-      mockIsFF.mockReturnValue(false);
+      isFF.mockReturnValue(false);
     });
 
     it("isIncorrectControl returns true when tagTypes.stateTypes matches control.type and control not selected", () => {

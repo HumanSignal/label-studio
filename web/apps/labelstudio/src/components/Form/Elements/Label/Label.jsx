@@ -1,4 +1,4 @@
-import React, { createElement } from "react";
+import { createElement } from "react";
 import { IconInfoOutline } from "@humansignal/icons";
 import { Tooltip } from "@humansignal/ui";
 import { cn } from "../../../../utils/bem";

@@ -5,22 +5,20 @@
  * and actions (setSelected, afterUpdateSelected, event, shouldSkipInteractions, disable, enable).
  */
 
-import { vi } from "vitest";
 import { getEnv, types } from "mobx-state-tree";
 import ToolMixinComposed from "../Tool";
 
-const { mockFfIsActive } = vi.hoisted(() => ({
-  mockFfIsActive: vi.fn(() => false),
-}));
-vi.mock("@humansignal/core", () => ({
+const mockFfIsActive = jest.fn(() => false);
+jest.mock("@humansignal/core", () => ({
   ff: {
     isActive: (flag) => mockFfIsActive(flag),
   },
 }));
-vi.mock("../../utils/feature-flags", async (importOriginal) => {
-  const actual = await importOriginal();
-  return { ...actual, isFF: vi.fn(() => false) };
-});
+
+jest.mock("../../utils/feature-flags", () => ({
+  FF_DEV_3391: "ff_3391",
+  isFF: jest.fn(() => false),
+}));
 
 // Stub that provides toolName and dynamic so ToolMixin views work
 const StubTool = types.model("StubTool", {}).views((self) => ({
@@ -43,18 +41,11 @@ const ObjModel = types.model("Obj", {
   regs: types.optional(types.array(types.frozen()), []),
 });
 
-const RootModel = types
-  .model("Root", {
-    settings: types.optional(SettingsModel, {}),
-    obj: types.optional(ObjModel, {}),
-    tool: types.optional(TestTool, {}),
-  })
-  .volatile(() => ({ annotationStore: undefined }))
-  .actions((self) => ({
-    setAnnotationStore(store) {
-      self.annotationStore = store;
-    },
-  }));
+const RootModel = types.model("Root", {
+  settings: types.optional(SettingsModel, {}),
+  obj: types.optional(ObjModel, {}),
+  tool: types.optional(TestTool, {}),
+});
 
 function createManager(overrides = {}) {
   return {
@@ -103,7 +94,7 @@ function createRoot(options = {}) {
 describe("Tool mixin", () => {
   beforeEach(() => {
     mockFfIsActive.mockReturnValue(false);
-    vi.clearAllMocks();
+    jest.clearAllMocks();
     if (typeof window !== "undefined" && window.localStorage) {
       window.localStorage.clear();
     }
@@ -339,9 +330,9 @@ describe("Tool mixin", () => {
         },
       );
       manager.root = root;
-      root.setAnnotationStore({
+      root.annotationStore = {
         selected: { names: selectedNames },
-      });
+      };
       expect(root.tool.obj).toBe(objFromSelected);
     });
 
@@ -360,9 +351,9 @@ describe("Tool mixin", () => {
         },
       );
       manager.root = root;
-      root.setAnnotationStore({
+      root.annotationStore = {
         selected: { names: selectedNames },
-      });
+      };
       expect(root.tool.control).toBe(controlFromSelected);
     });
   });

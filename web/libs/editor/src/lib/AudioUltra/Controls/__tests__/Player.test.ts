@@ -2,13 +2,12 @@
  * Unit tests for Player (lib/AudioUltra/Controls/Player.ts).
  * Player is abstract; we test it via Html5Player with mocks.
  */
-import { vi } from "vitest";
+import { ff } from "@humansignal/core";
 import { Html5Player } from "../Html5Player";
 
-const mockIsActive = vi.hoisted(() => vi.fn().mockReturnValue(false));
 jest.mock("@humansignal/core", () => ({
   ff: {
-    isActive: mockIsActive,
+    isActive: jest.fn().mockReturnValue(false),
     FF_SYNCED_BUFFERING: "FF_SYNCED_BUFFERING",
   },
 }));
@@ -611,7 +610,7 @@ describe("Player (via Html5Player)", () => {
 
   describe("Html5Player handleResetSource", () => {
     it("calls audio.el.load() and play() when ff is inactive and was playing", async () => {
-      mockIsActive.mockReturnValue(false);
+      (ff.isActive as jest.Mock).mockReturnValue(false);
       const wf = createMockWaveform() as any;
       const audio = createMockAudio() as any;
       audio.el.load = jest.fn();
@@ -624,9 +623,8 @@ describe("Player (via Html5Player)", () => {
       expect(player.playing).toBe(true);
     });
 
-    // TODO: In Vitest, ff mock may not be applied to Html5Player's import of @humansignal/core in time; skip until mock order is fixed
-    it.skip("does not call audio.el.load() when ff FF_SYNCED_BUFFERING is active", async () => {
-      mockIsActive.mockImplementation((flag: string) => flag === "FF_SYNCED_BUFFERING");
+    it("does not call audio.el.load() when ff FF_SYNCED_BUFFERING is active", async () => {
+      (ff.isActive as jest.Mock).mockImplementation((flag: string) => flag === "FF_SYNCED_BUFFERING");
       const wf = createMockWaveform() as any;
       const audio = createMockAudio() as any;
       audio.el.load = jest.fn();
@@ -636,11 +634,11 @@ describe("Player (via Html5Player)", () => {
       const resetSourceCb = audio.on.mock.calls.find((c: string[]) => c[0] === "resetSource")?.[1];
       await resetSourceCb?.();
       expect(audio.el.load).not.toHaveBeenCalled();
-      mockIsActive.mockReturnValue(false);
+      (ff.isActive as jest.Mock).mockReturnValue(false);
     });
 
     it("returns early when audio has no el", async () => {
-      mockIsActive.mockReturnValue(false);
+      (ff.isActive as jest.Mock).mockReturnValue(false);
       const wf = createMockWaveform() as any;
       const player = new Html5Player(wf);
       (player as any).audio = { el: null };

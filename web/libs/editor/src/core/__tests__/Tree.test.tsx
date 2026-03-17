@@ -199,12 +199,11 @@ describe("Tree", () => {
     });
   });
 
-  // TODO: extractNames/renderItem/renderChildren require View+RichText; RichText.prefix.css fails to resolve in Vitest (alias not applied in import-analysis). Re-enable when CSS stub is fixed.
   describe("extractNames", () => {
-    it.skip("returns names and toNames from root with name/toname", async () => {
-      const { default: Registry } = await import("../Registry");
-      await import("../../tags/visual/View");
-      await import("../../tags/object/RichText");
+    it("returns names and toNames from root with name/toname", () => {
+      const Registry = require("../Registry").default;
+      require("../../tags/visual/View");
+      require("../../tags/object/RichText");
       const config = Tree.treeToModel(`<View><Text name="mytext" value="$t" /></View>`, {
         task: { dataObj: { t: "hi" } },
       });
@@ -218,10 +217,10 @@ describe("Tree", () => {
   });
 
   describe("renderItem and renderChildren", () => {
-    it.skip("renderItem returns a React element for a registered View model", async () => {
-      const { default: Registry } = await import("../Registry");
-      await import("../../tags/visual/View");
-      await import("../../tags/object/RichText");
+    it("renderItem returns a React element for a registered View model", () => {
+      const Registry = require("../Registry").default;
+      require("../../tags/visual/View");
+      require("../../tags/object/RichText");
       const config = Tree.treeToModel(`<View><Text name="mytext" value="$t" /></View>`, {
         task: { dataObj: { t: "hi" } },
       });
@@ -232,10 +231,10 @@ describe("Tree", () => {
       expect(result?.type).toBeDefined();
     });
 
-    it.skip("renderChildren returns array of elements when item has children", async () => {
-      const { default: Registry } = await import("../Registry");
-      await import("../../tags/visual/View");
-      await import("../../tags/object/RichText");
+    it("renderChildren returns array of elements when item has children", () => {
+      const Registry = require("../Registry").default;
+      require("../../tags/visual/View");
+      require("../../tags/object/RichText");
       const config = Tree.treeToModel(`<View><Text name="a" value="$x" /><Text name="b" value="$y" /></View>`, {
         task: { dataObj: { x: "1", y: "2" } },
       });
@@ -247,10 +246,10 @@ describe("Tree", () => {
       expect(result!.length).toBeGreaterThan(0);
     });
 
-    it.skip("renderChildren returns null when item has no children", async () => {
-      const { default: Registry } = await import("../Registry");
-      await import("../../tags/visual/View");
-      await import("../../tags/object/RichText");
+    it("renderChildren returns null when item has no children", () => {
+      const Registry = require("../Registry").default;
+      require("../../tags/visual/View");
+      require("../../tags/object/RichText");
       const config = Tree.treeToModel(`<View><Text name="only" value="$x" /></View>`, {
         task: { dataObj: { x: "1" } },
       });

@@ -1,20 +1,5 @@
-import React from "react";
-import { vi } from "vitest";
 import { fireEvent, render, screen } from "@testing-library/react";
 import { InstructionsModal } from "../InstructionsModal";
-
-vi.mock("antd", () => ({
-  Modal: ({ children, open, onCancel, title, ...props }: any) =>
-    open
-      ? React.createElement(
-          "div",
-          { "data-testid": "instructions-modal", ...props },
-          title,
-          children,
-          React.createElement("button", { "aria-label": "Close", onClick: onCancel }, "Close"),
-        )
-      : null,
-}));
 
 describe("InstructionsModal Component", () => {
   it("should render the title and children", () => {
@@ -45,7 +30,7 @@ describe("InstructionsModal Component", () => {
   });
 
   it("should call onCancel when the modal is cancelled", () => {
-    const onCancel = vi.fn();
+    const onCancel = jest.fn();
     const { getByLabelText } = render(
       <InstructionsModal title="Test Title" visible={true} onCancel={onCancel}>
         <p>Test Children</p>

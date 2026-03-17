@@ -1,18 +1,3 @@
-import { vi } from "vitest";
-
-// Mock Konva so getBoundingBoxAfterChanges (which uses Konva.Transform) works in jsdom.
-vi.mock("konva", () => ({
-  default: {
-    Transform: class Transform {
-      translate() {}
-      rotate() {}
-      point(p) {
-        return { x: p.x, y: p.y };
-      }
-    },
-  },
-}));
-
 import {
   mapKonvaBrightness,
   reverseCoordinates,

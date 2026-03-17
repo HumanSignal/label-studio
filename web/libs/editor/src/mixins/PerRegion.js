@@ -1,5 +1,5 @@
 import { types } from "mobx-state-tree";
-import { PER_REGION_MODES } from "./PerRegionModes.js";
+import { PER_REGION_MODES } from "./PerRegionModes";
 
 /**
  * This mixing defines perRegion control tag's parameter and related basic functionality

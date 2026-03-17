@@ -388,7 +388,7 @@ export const AudioModel = types.compose(
           }
 
           updateTimeout = setTimeout(() => {
-            if (self._ws?.regions) self._ws.regions.redraw();
+            self._ws.regions.redraw();
           }, 33);
         },
 

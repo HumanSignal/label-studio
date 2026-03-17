@@ -7,23 +7,20 @@
  */
 import { types } from "mobx-state-tree";
 
-import { vi } from "vitest";
+const mockIsFF = jest.fn(() => false);
+jest.mock("../../utils/feature-flags", () => ({
+  isFF: (...args) => mockIsFF(...args),
+  FF_LSDV_4583: "ff_lsdv_4583",
+}));
 
-const mockIsFF = vi.fn(() => false);
-vi.mock("../../utils/feature-flags", async (importOriginal) => {
-  const actual = await importOriginal();
-  return { ...actual, isFF: (...args) => mockIsFF(...args) };
-});
-
-vi.mock("@humansignal/core", () => ({
+jest.mock("@humansignal/core", () => ({
   ff: {
     isActive: () => false,
   },
 }));
 
-vi.mock("../../core/Registry", async () => {
-  const mst = await import("mobx-state-tree");
-  const t = mst.types;
+jest.mock("../../core/Registry", () => {
+  const { types: t } = require("mobx-state-tree");
   const MinimalControl = t
     .model("MinimalControl", {
       id: t.identifier,
@@ -41,7 +38,7 @@ vi.mock("../../core/Registry", async () => {
       strokewidth: t.maybeNull(t.number),
       fillopacity: t.maybeNull(t.number),
       opacity: t.maybeNull(t.number),
-      emptyLabel: t.maybeNull(t.frozen()),
+      emptyLabel: t.optional(t.frozen(), () => null),
     })
     .views((self) => ({
       get findLabel() {
@@ -707,9 +704,8 @@ describe("Result", () => {
       expect(data.parentID).toBe("pid-123");
     });
 
-    it("includes item_index when isFF(FF_LSDV_4583) and area.item_index is set", async () => {
-      const { FF_LSDV_4583 } = await import("../../utils/feature-flags");
-      mockIsFF.mockImplementation((flag) => flag === FF_LSDV_4583);
+    it("includes item_index when isFF(FF_LSDV_4583) and area.item_index is set", () => {
+      mockIsFF.mockImplementation((flag) => flag === "ff_lsdv_4583");
       const root = createTree({}, {}, { item_index: 2 });
       const result = root.annotationStore.selected.areas[0].results[0];
       const data = result.serialize();

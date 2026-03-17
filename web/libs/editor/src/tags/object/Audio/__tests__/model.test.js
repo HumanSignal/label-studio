@@ -784,9 +784,9 @@ describe("Audio model", () => {
   });
 
   describe("addRegion with FF_MULTIPLE_LABELS_REGIONS", () => {
-    it("calls createResult with rest when FF_MULTIPLE_LABELS_REGIONS is on", async () => {
-      const core = await import("@humansignal/core");
-      core.ff.isActive.mockImplementation((flag) => flag === "FF_MULTIPLE_LABELS_REGIONS");
+    it("calls createResult with rest when FF_MULTIPLE_LABELS_REGIONS is on", () => {
+      const ff = require("@humansignal/core").ff;
+      ff.isActive.mockImplementation((flag) => flag === "FF_MULTIPLE_LABELS_REGIONS");
       const secondState = { ...mockLabelsState, selectedValues: () => ["L2"] };
       mockToNames.set("audio", [mockLabelsState, secondState]);
       const node = createAudioNode();
@@ -805,7 +805,7 @@ describe("Audio model", () => {
         expect.any(Array),
       );
       mockToNames.set("audio", []);
-      core.ff.isActive.mockReturnValue(false);
+      ff.isActive.mockReturnValue(false);
     });
   });
 

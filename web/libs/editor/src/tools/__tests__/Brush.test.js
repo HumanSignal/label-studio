@@ -17,6 +17,10 @@ jest.mock("../../utils/canvas", () => ({
   },
 }));
 
+jest.mock("../../utils/feature-flags", () => ({
+  isFF: jest.fn(() => false),
+}));
+
 const stageContent = {};
 jest.mock("../../utils/utilities", () => {
   const actual = jest.requireActual("../../utils/utilities");

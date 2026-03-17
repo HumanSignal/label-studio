@@ -30,9 +30,42 @@ jest.mock("./select.module.css", () => ({
   selectedItemsContent: "selectedItemsContent",
 }));
 
-// Use real react-window; tests assert on visible behavior (options in list) not implementation
+// Mock react-window and react-window-infinite-loader to capture props
+const mockVariableSizeList = jest.fn();
+jest.mock("react-window", () => ({
+  VariableSizeList: (props: any) => {
+    mockVariableSizeList(props);
+    // Render the items directly for testing
+    const items = [];
+    for (let i = 0; i < Math.min(props.itemCount, 5); i++) {
+      items.push(
+        <div key={i} data-testid={`virtual-item-${i}`}>
+          {props.children({ index: i, style: {} })}
+        </div>,
+      );
+    }
+    return (
+      <div data-testid="virtual-list" data-height={props.height}>
+        {items}
+      </div>
+    );
+  },
+}));
+
+jest.mock("react-window-infinite-loader", () => ({
+  __esModule: true,
+  default: ({ children, ...props }: any) => {
+    return children({
+      onItemsRendered: jest.fn(),
+      ref: { current: null },
+    });
+  },
+}));
 
 describe("Select Component", () => {
+  beforeEach(() => {
+    mockVariableSizeList.mockClear();
+  });
 
   describe("Basic Rendering", () => {
     it("renders with placeholder", () => {
@@ -73,6 +106,9 @@ describe("Select Component", () => {
   });
 
   describe("Virtual List Height Calculation", () => {
+    const ITEM_HEIGHT = 40;
+    const MAX_VISIBLE_ITEMS = 5;
+
     it("calculates correct height for flat options with virtual list", async () => {
       const flatOptions = ["Option 1", "Option 2", "Option 3"];
 
@@ -80,11 +116,14 @@ describe("Select Component", () => {
 
       fireEvent.click(screen.getByRole("button"));
 
-      await waitFor(() => {
-        expect(screen.getByText("Option 1")).toBeInTheDocument();
-        expect(screen.getByText("Option 2")).toBeInTheDocument();
-        expect(screen.getByText("Option 3")).toBeInTheDocument();
-      });
+      await waitFor(
+        () => {
+          const virtualList = screen.getByTestId("virtual-list");
+          expect(virtualList).toBeInTheDocument();
+          expect(virtualList).toHaveAttribute("data-height", String(3 * ITEM_HEIGHT));
+        },
+        { timeout: 3000 },
+      );
     });
 
     it("calculates correct height for many flat options (capped at max visible)", async () => {
@@ -95,11 +134,17 @@ describe("Select Component", () => {
       fireEvent.click(screen.getByRole("button"));
 
       await waitFor(() => {
-        expect(screen.getByText("Option 1")).toBeInTheDocument();
+        expect(mockVariableSizeList).toHaveBeenCalled();
       });
+
+      // With 20 options, height should be capped at 5 * 40 = 200
+      const lastCall = mockVariableSizeList.mock.calls[mockVariableSizeList.mock.calls.length - 1][0];
+      expect(lastCall.height).toBe(MAX_VISIBLE_ITEMS * ITEM_HEIGHT);
     });
 
     it("calculates correct height for grouped options using flatOptions count", async () => {
+      // This is the key test for the filter dropdown bug fix
+      // 2 groups with 3 children each = 6 total items
       const groupedOptions = [
         { label: "Tasks", children: ["Task 1", "Task 2", "Task 3"] },
         { label: "Annotations", children: ["Anno 1", "Anno 2", "Anno 3"] },
@@ -110,12 +155,18 @@ describe("Select Component", () => {
       fireEvent.click(screen.getByRole("button"));
 
       await waitFor(() => {
-        expect(screen.getByText("Task 1")).toBeInTheDocument();
-        expect(screen.getByText("Anno 1")).toBeInTheDocument();
+        expect(mockVariableSizeList).toHaveBeenCalled();
       });
+
+      // With 6 flattened items (3 + 3), height should be capped at 5 * 40 = 200
+      // NOT 2 * 40 = 80 (which would be wrong if using renderedOptions.length)
+      const lastCall = mockVariableSizeList.mock.calls[mockVariableSizeList.mock.calls.length - 1][0];
+      expect(lastCall.height).toBe(MAX_VISIBLE_ITEMS * ITEM_HEIGHT);
     });
 
     it("calculates correct height for single group with few children", async () => {
+      // This reproduces the exact bug from the screenshot
+      // 1 group with 2 children = 2 total items
       const groupedOptions = [{ label: "Tasks", children: ["Task 1", "Task 2"] }];
 
       render(<Select options={groupedOptions as any} isVirtualList={true} searchable={true} placeholder="Select" />);
@@ -123,9 +174,13 @@ describe("Select Component", () => {
       fireEvent.click(screen.getByRole("button"));
 
       await waitFor(() => {
-        expect(screen.getByText("Task 1")).toBeInTheDocument();
-        expect(screen.getByText("Task 2")).toBeInTheDocument();
+        expect(mockVariableSizeList).toHaveBeenCalled();
       });
+
+      // With 2 flattened items, height should be 2 * 40 = 80
+      // NOT 1 * 40 = 40 (which was the bug - only counting the group element)
+      const lastCall = mockVariableSizeList.mock.calls[mockVariableSizeList.mock.calls.length - 1][0];
+      expect(lastCall.height).toBe(2 * ITEM_HEIGHT);
     });
 
     it("calculates correct height when searching flat options", async () => {
@@ -135,12 +190,14 @@ describe("Select Component", () => {
 
       fireEvent.click(screen.getByRole("button"));
 
+      // Type in search to filter
       const searchInput = screen.getByTestId("select-search-field");
       fireEvent.change(searchInput, { target: { value: "Ap" } });
 
       await waitFor(() => {
-        expect(screen.getByText("Apple")).toBeInTheDocument();
-        expect(screen.getByText("Apricot")).toBeInTheDocument();
+        // Should filter to Apple and Apricot (2 items)
+        const lastCall = mockVariableSizeList.mock.calls[mockVariableSizeList.mock.calls.length - 1][0];
+        expect(lastCall.height).toBe(2 * ITEM_HEIGHT);
       });
     });
 
@@ -154,12 +211,15 @@ describe("Select Component", () => {
 
       fireEvent.click(screen.getByRole("button"));
 
+      // Type in search to filter - "Ap" should match Apple and Apricot only
       const searchInput = screen.getByTestId("select-search-field");
       fireEvent.change(searchInput, { target: { value: "Ap" } });
 
       await waitFor(() => {
-        expect(screen.getByText("Apple")).toBeInTheDocument();
-        expect(screen.getByText("Apricot")).toBeInTheDocument();
+        // When searching, options are flattened and filtered
+        // "Ap" matches: Apple, Apricot = 2 items
+        const lastCall = mockVariableSizeList.mock.calls[mockVariableSizeList.mock.calls.length - 1][0];
+        expect(lastCall.height).toBe(2 * ITEM_HEIGHT);
       });
     });
   });
@@ -183,12 +243,16 @@ describe("Select Component", () => {
       fireEvent.click(screen.getByRole("button"));
 
       await waitFor(() => {
-        expect(screen.getByText("Option 1")).toBeInTheDocument();
+        expect(screen.getByTestId("virtual-list")).toBeInTheDocument();
       });
+
+      // The InfiniteLoader should be set up for infinite scroll
+      expect(mockVariableSizeList).toHaveBeenCalled();
     });
 
     it("maintains correct height calculation with paginated flat options", async () => {
       const loadMore = jest.fn();
+      // Simulate first page of 10 items loaded
       const options = Array.from({ length: 10 }, (_, i) => `User ${i + 1}`);
 
       render(
@@ -197,7 +261,7 @@ describe("Select Component", () => {
           isVirtualList={true}
           searchable={true}
           loadMore={loadMore}
-          itemCount={100}
+          itemCount={100} // Total available
           placeholder="Select a user"
         />,
       );
@@ -205,8 +269,12 @@ describe("Select Component", () => {
       fireEvent.click(screen.getByRole("button"));
 
       await waitFor(() => {
-        expect(screen.getByText("User 1")).toBeInTheDocument();
+        expect(mockVariableSizeList).toHaveBeenCalled();
       });
+
+      // Height should be based on loaded items (10), capped at 5 visible
+      const lastCall = mockVariableSizeList.mock.calls[mockVariableSizeList.mock.calls.length - 1][0];
+      expect(lastCall.height).toBe(5 * 40); // 5 * ITEM_HEIGHT
     });
   });
 

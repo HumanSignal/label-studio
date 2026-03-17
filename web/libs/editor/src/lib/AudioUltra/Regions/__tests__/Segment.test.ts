@@ -2,7 +2,6 @@
  * Unit tests for Segment (lib/AudioUltra/Regions/Segment.ts)
  */
 import { Segment } from "../Segment";
-import { CursorSymbol } from "../../Cursor/Cursor";
 
 function createMockLayer() {
   return {
@@ -590,6 +589,7 @@ describe("Segment", () => {
 
   describe("switchCursor", () => {
     it("calls waveform.cursor.set with symbol", () => {
+      const { CursorSymbol } = require("../../Cursor/Cursor");
       const visualizer = createMockVisualizer();
       const waveform = createMockWaveform();
       const controller = createMockController();
@@ -599,6 +599,7 @@ describe("Segment", () => {
     });
 
     it("passes layerName when shouldGrabFocus true and symbol is not crosshair", () => {
+      const { CursorSymbol } = require("../../Cursor/Cursor");
       const visualizer = createMockVisualizer();
       const waveform = createMockWaveform();
       const controller = createMockController();
@@ -613,6 +614,7 @@ describe("Segment", () => {
     });
 
     it("passes empty string when symbol is crosshair (no cursor focus)", () => {
+      const { CursorSymbol } = require("../../Cursor/Cursor");
       const visualizer = createMockVisualizer();
       const waveform = createMockWaveform();
       const controller = createMockController();
@@ -829,6 +831,7 @@ describe("Segment", () => {
 
   describe("mouseOver (via event)", () => {
     it("does nothing when controller.layerGroup is not visible", () => {
+      const { CursorSymbol } = require("../../Cursor/Cursor");
       const visualizer = createMockVisualizer();
       const waveform = createMockWaveform();
       const controller = createMockController();
@@ -841,6 +844,7 @@ describe("Segment", () => {
     });
 
     it("sets colResize when over edge and updateable", () => {
+      const { CursorSymbol } = require("../../Cursor/Cursor");
       const container = document.createElement("div");
       const visualizer = createMockVisualizer({
         container,
@@ -857,6 +861,7 @@ describe("Segment", () => {
     });
 
     it("sets grab when not over edge", () => {
+      const { CursorSymbol } = require("../../Cursor/Cursor");
       const container = document.createElement("div");
       const visualizer = createMockVisualizer({ container, getScrollLeftPx: () => 0, zoomedWidth: 800 });
       const waveform = createMockWaveform({ duration: 10 });
@@ -869,6 +874,7 @@ describe("Segment", () => {
     });
 
     it("does nothing when isDragging", () => {
+      const { CursorSymbol } = require("../../Cursor/Cursor");
       const visualizer = createMockVisualizer();
       const waveform = createMockWaveform();
       const controller = createMockController();
@@ -950,6 +956,7 @@ describe("Segment", () => {
 
   describe("handleMouseUp and handleDrag", () => {
     it("calls handleUpdateEnd and switchCursor when isDragging on mouseup", () => {
+      const { CursorSymbol } = require("../../Cursor/Cursor");
       const visualizer = createMockVisualizer();
       const waveform = createMockWaveform();
       const controller = createMockController();
@@ -1039,6 +1046,7 @@ describe("Segment", () => {
     });
 
     it("handleDrag resize path (right edge) calls switchCursor colResize and updatePosition", () => {
+      const { CursorSymbol } = require("../../Cursor/Cursor");
       const container = document.createElement("div");
       const visualizer = createMockVisualizer({
         container,

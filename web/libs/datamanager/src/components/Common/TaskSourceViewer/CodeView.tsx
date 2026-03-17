@@ -1,19 +1,9 @@
 import { type FC, useCallback, useMemo, useRef, useState } from "react";
 import { FixedSizeList as List } from "react-window";
-import AutoSizerModule from "react-virtualized-auto-sizer";
+import AutoSizer from "react-virtualized-auto-sizer";
 import { Button, Tooltip } from "@humansignal/ui";
 import { IconCopyOutline } from "@humansignal/icons";
 import styles from "./CodeView.module.css";
-
-const AutoSizer = (AutoSizerModule as { default?: typeof AutoSizerModule })?.default ?? AutoSizerModule;
-function useVirtualized(): boolean {
-  return (
-    typeof List === "function" &&
-    typeof AutoSizer === "function" &&
-    typeof process !== "undefined" &&
-    process.env?.NODE_ENV !== "test"
-  );
-}
 
 interface CodeViewProps {
   /** JSON data to display */
@@ -32,10 +22,9 @@ const LINE_HEIGHT = 20;
  */
 export const CodeView: FC<CodeViewProps> = ({ data }) => {
   const [copied, setCopied] = useState(false);
-  const listRef = useRef<typeof List>(null);
-  const hasVirtualized = useVirtualized();
+  const listRef = useRef<List>(null);
 
-  // Format JSON and split into lines
+  // Format JSON and split into lines for virtualization
   const jsonString = useMemo(() => JSON.stringify(data, null, 2), [data]);
   const lines = useMemo(() => jsonString.split("\n"), [jsonString]);
 
@@ -58,7 +47,7 @@ export const CodeView: FC<CodeViewProps> = ({ data }) => {
   );
 
   return (
-    <div className={styles.codeView} data-testid="code-view">
+    <div className={styles.codeView}>
       <Tooltip title={copied ? "Copied!" : "Copy JSON"}>
         <Button
           look="outlined"
@@ -70,30 +59,20 @@ export const CodeView: FC<CodeViewProps> = ({ data }) => {
         />
       </Tooltip>
       <div className={styles.listContainer}>
-        {hasVirtualized ? (
-          <AutoSizer>
-            {({ height, width }) => (
-              <List
-                ref={listRef}
-                height={height}
-                width={width}
-                itemCount={lines.length}
-                itemSize={LINE_HEIGHT}
-                overscanCount={20}
-              >
-                {Row}
-              </List>
-            )}
-          </AutoSizer>
-        ) : (
-          <div className={styles.lineList} style={{ height: 400, overflow: "auto" }}>
-            {lines.map((line, i) => (
-              <div key={i} className={styles.line}>
-                {line}
-              </div>
-            ))}
-          </div>
-        )}
+        <AutoSizer>
+          {({ height, width }) => (
+            <List
+              ref={listRef}
+              height={height}
+              width={width}
+              itemCount={lines.length}
+              itemSize={LINE_HEIGHT}
+              overscanCount={20}
+            >
+              {Row}
+            </List>
+          )}
+        </AutoSizer>
       </div>
     </div>
   );

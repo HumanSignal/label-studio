@@ -13,30 +13,30 @@
       }
     },
     "test": {
-      "executor": "nx:run-commands",
+      "executor": "@nx/jest:jest",
       "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
       "options": {
-        "command": "vitest run --config vitest.config.ts",
-        "cwd": "libs/app-common"
+        "jestConfig": "libs/app-common/jest.config.ts",
+        "passWithNoTests": true
       },
       "configurations": {
         "ci": {
-          "command": "vitest run --config vitest.config.ts --coverage",
-          "cwd": "libs/app-common"
+          "ci": true,
+          "codeCoverage": true
         }
       }
     },
     "unit": {
-      "executor": "nx:run-commands",
+      "executor": "@nx/jest:jest",
       "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
       "options": {
-        "command": "vitest run --config vitest.config.ts",
-        "cwd": "libs/app-common"
+        "jestConfig": "libs/app-common/jest.config.ts",
+        "passWithNoTests": true
       },
       "configurations": {
         "ci": {
-          "command": "vitest run --config vitest.config.ts --coverage",
-          "cwd": "libs/app-common"
+          "ci": true,
+          "codeCoverage": true
         }
       }
     }

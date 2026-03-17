@@ -7,7 +7,15 @@ declare global {
   var __jsonEditorProps: any;
 }
 
-// json-edit-react is aliased to __mocks__/json-edit-react.tsx in vitest.config so we can assert on searchFilter
+jest.mock("json-edit-react", () => ({
+  JsonEditor: (props: any) => {
+    global.__jsonEditorProps = props;
+    return <div data-testid="json-editor" />;
+  },
+  defaultTheme: { styles: {} },
+  matchNode: jest.fn(() => false),
+}));
+
 jest.mock("@humansignal/icons", () => ({
   IconSearch: () => null,
   IconReset: () => null,
@@ -45,10 +53,12 @@ describe("JsonViewer filtered search", () => {
     fireEvent.click(screen.getByRole("button", { name: "All" }));
     fireEvent.change(screen.getByLabelText("Search JSON"), { target: { value: "id" } });
 
-    const searchFilter = global.__jsonEditorProps?.searchFilter;
-    expect(searchFilter).toBeDefined();
+    const { matchNode } = require("json-edit-react");
+    const searchFilter = global.__jsonEditorProps.searchFilter;
+
     expect(typeof searchFilter).toBe("function");
     expect(searchFilter({ key: "id", value: 123, path: ["id"] }, "id")).toBe(true);
+    expect(matchNode).toHaveBeenCalled();
   });
 
   it("keeps custom filter scope while matching keys in filtered nodes", () => {
@@ -72,8 +82,8 @@ describe("JsonViewer filtered search", () => {
     fireEvent.click(screen.getByRole("button", { name: "Data" }));
     fireEvent.change(screen.getByLabelText("Search JSON"), { target: { value: "id" } });
 
-    const searchFilter = global.__jsonEditorProps?.searchFilter;
-    expect(searchFilter).toBeDefined();
+    const searchFilter = global.__jsonEditorProps.searchFilter;
+
     expect(searchFilter({ key: "id", value: 123, path: ["annotations", 0, "id"] }, "id")).toBe(false);
     expect(searchFilter({ key: "id", value: 123, path: ["data", "id"] }, "id")).toBe(true);
   });

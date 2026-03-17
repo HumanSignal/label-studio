@@ -142,8 +142,7 @@ export const absoluteURL = (path = "") => {
   if (path.match(/^https?/) || path.match(/^\/\//)) {
     return path;
   }
-  const base = typeof APP_SETTINGS !== "undefined" && APP_SETTINGS?.hostname ? APP_SETTINGS.hostname.replace(/([/]+)$/, "") : "";
-  return base ? [base, path.replace(/^([/]+)/, "")].join("/") : path;
+  return [APP_SETTINGS.hostname.replace(/([/]+)$/, ""), path.replace(/^([/]+)/, "")].join("/");
 };
 
 export const isDefined = <T>(value?: T): value is NonNullable<T> => {

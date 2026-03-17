@@ -52,19 +52,15 @@ describe("DropdownTrigger - Context Menu Mode", () => {
       expect(screen.getByText("Trigger")).toBeInTheDocument();
     });
 
-    it("should render dropdown content when provided", async () => {
+    it("should render dropdown content when provided", () => {
       render(
-        <DropdownTrigger content={<div data-testid="dropdown-content">Menu Content</div>}>
+        <DropdownTrigger content={<div>Menu Content</div>}>
           <button type="button">Trigger</button>
         </DropdownTrigger>,
       );
 
-      // Open dropdown by clicking trigger so content is shown (real Dropdown only renders content when visible)
-      fireEvent.click(screen.getByText("Trigger"));
-      await waitFor(() => {
-        expect(screen.getByTestId("dropdown-content")).toBeInTheDocument();
-        expect(screen.getByText("Menu Content")).toBeInTheDocument();
-      });
+      expect(screen.getByTestId("dropdown-content")).toBeInTheDocument();
+      expect(screen.getByText("Menu Content")).toBeInTheDocument();
     });
   });
 

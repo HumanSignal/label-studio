@@ -303,12 +303,7 @@ export const GridView = observer(({ data, view, loadMore, fields, onChange, hidd
 
   return (
     <GridViewProvider data={data} view={view} fields={fieldsData}>
-      <div
-        className={cn("grid-view").mod({ columnCount }).toClassName()}
-        data-testid="fixed-size-grid"
-        data-column-count={columnCount}
-        style={{ height: "100%" }}
-      >
+      <div className={cn("grid-view").mod({ columnCount }).toClassName()}>
         <AutoSizer className={cn("grid-view").elem("resize").toClassName()}>
           {({ width, height }) => (
             <InfiniteLoader

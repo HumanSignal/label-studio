@@ -5,13 +5,12 @@ import {
   IconCheck,
   IconSearch,
   IconInbox,
-  IconExternal,
   IconCloudProviderS3,
   IconCloudProviderGCS,
   IconCloudProviderAzure,
   IconCloudProviderRedis,
 } from "@humansignal/icons";
-import { Button, Typography, Tooltip } from "@humansignal/ui";
+import { Button, IconExternal, Typography, Tooltip } from "@humansignal/ui";
 import { getDocsUrl } from "../../../../../../editor/src/utils/docs";
 import { ABILITY, useAuth } from "@humansignal/core/providers/AuthProvider";
 
@@ -220,7 +219,7 @@ export const EmptyState: FC<EmptyStateProps> = ({
   // If filters are applied, show the filter-specific empty state (regardless of user role)
   if (hasFilters) {
     return renderEmptyStateLayout({
-      icon: <IconSearch data-testid="icon-search" />,
+      icon: <IconSearch />,
       iconBackground: "bg-warning-background",
       iconColor: "text-warning-icon",
       title: "No tasks found",
@@ -240,7 +239,7 @@ export const EmptyState: FC<EmptyStateProps> = ({
     // Reviewer empty state
     if (userRole === "REVIEWER") {
       return renderEmptyStateLayout({
-        icon: <IconCheck data-testid="icon-check" />,
+        icon: <IconCheck />,
         title: "No tasks available for review or labeling",
         description: "Tasks imported to this project will appear here",
       });
@@ -253,7 +252,7 @@ export const EmptyState: FC<EmptyStateProps> = ({
 
       if (isAutoDistribution) {
         return renderEmptyStateLayout({
-          icon: <IconLsLabeling data-testid="icon-ls-labeling" />,
+          icon: <IconLsLabeling />,
           title: "Start labeling tasks",
           description: "Tasks you've labeled will appear here",
           actions: (
@@ -272,7 +271,7 @@ export const EmptyState: FC<EmptyStateProps> = ({
 
       if (isManualDistribution) {
         return renderEmptyStateLayout({
-          icon: <IconInbox data-testid="icon-inbox" />,
+          icon: <IconInbox />,
           title: "No tasks available",
           description: "Tasks assigned to you will appear here",
         });
@@ -280,7 +279,7 @@ export const EmptyState: FC<EmptyStateProps> = ({
 
       // Fallback for annotators with unknown distribution setting
       return renderEmptyStateLayout({
-        icon: <IconInbox width={40} height={40} data-testid="icon-inbox" />,
+        icon: <IconInbox width={40} height={40} />,
         title: "No tasks available",
         description: "Tasks will appear here when they become available",
       });
@@ -289,7 +288,7 @@ export const EmptyState: FC<EmptyStateProps> = ({
 
   // Default case: show import functionality (existing behavior for Owners/Admins/Managers)
   return renderEmptyStateLayout({
-    icon: <IconUpload data-testid="icon-upload" />,
+    icon: <IconUpload />,
     title: "Import data to get your project started",
     description: "Connect your cloud storage or upload files from your computer",
     testId: "empty-state-label",
