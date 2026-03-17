@@ -3,6 +3,10 @@ import { render, fireEvent } from "@testing-library/react";
 import { Provider } from "mobx-react";
 import { SkipButton } from "../buttons";
 
+vi.mock("../Controls", () => ({
+  INCOMPLETE_ACCEPT_TOOLTIP: "Complete all regions before accepting",
+}));
+
 vi.mock("@humansignal/ui", async () => {
   const { forwardRef } = await vi.importActual<typeof import("react")>("react");
   return {

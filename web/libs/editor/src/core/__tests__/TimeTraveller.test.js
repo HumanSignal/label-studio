@@ -5,15 +5,12 @@
  * undo/redo/set/reset, and FF_DEV_1284 branch.
  */
 import { applySnapshot, types } from "mobx-state-tree";
-
-const mockIsFF = vi.fn(() => false);
-vi.mock("../../utils/feature-flags", () => ({
-  isFF: mockIsFF,
-  FF_DEV_1284: "fflag_fix_front_dev_1284_auto_detect_undo_281022_short",
-  FF_SIMPLE_INIT: "fflag_fix_front_leap_443_select_annotation_once",
-}));
+import { mockFF } from "../../../__mocks__/global";
+import { FF_DEV_1284 } from "../../utils/feature-flags";
 
 import TimeTraveller from "../TimeTraveller";
+
+const ff = mockFF();
 
 const TargetStore = types.model("TargetStore", {
   value: types.optional(types.number, 0),
@@ -39,12 +36,13 @@ function addHistoryStates(tt, states) {
 
 describe("TimeTraveller", () => {
   beforeEach(() => {
-    mockIsFF.mockReturnValue(false);
+    ff.setup();
     vi.useFakeTimers();
   });
 
   afterEach(() => {
     vi.useRealTimers();
+    ff.reset();
   });
 
   describe("views", () => {
@@ -337,12 +335,11 @@ describe("TimeTraveller", () => {
 
   describe("FF_DEV_1284", () => {
     it("set schedules setSkipNextUndoState(false) when flag is on", () => {
-      mockIsFF.mockReturnValue(true);
+      ff.set({ [FF_DEV_1284]: true });
       const { root, store } = createRoot();
       addHistoryStates(root.timeTraveller, [{ value: 1 }]);
       root.timeTraveller.undo();
       root.timeTraveller.set(1);
-      expect(mockIsFF).toHaveBeenCalledWith("fflag_fix_front_dev_1284_auto_detect_undo_281022_short");
       vi.runAllTimers();
       expect(root.timeTraveller.skipNextUndoState).toBe(false);
     });

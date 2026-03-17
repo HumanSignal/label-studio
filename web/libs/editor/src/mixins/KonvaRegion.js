@@ -24,14 +24,16 @@ export const KonvaRegionMixin = types
       },
       get inViewPort() {
         if (!isFF(FF_ZOOM_OPTIM)) return true;
+        const vp = self.object?.viewPortBBoxCoords;
+
         return (
           !!self &&
           !!self.bboxCoordsCanvas &&
-          !!self.object &&
-          self.bboxCoordsCanvas.right >= self.object.viewPortBBoxCoords.left &&
-          self.bboxCoordsCanvas.bottom >= self.object.viewPortBBoxCoords.top &&
-          self.bboxCoordsCanvas.left <= self.object.viewPortBBoxCoords.right &&
-          self.bboxCoordsCanvas.top <= self.object.viewPortBBoxCoords.bottom
+          !!vp &&
+          self.bboxCoordsCanvas.right >= vp.left &&
+          self.bboxCoordsCanvas.bottom >= vp.top &&
+          self.bboxCoordsCanvas.left <= vp.right &&
+          self.bboxCoordsCanvas.top <= vp.bottom
         );
       },
       get control() {

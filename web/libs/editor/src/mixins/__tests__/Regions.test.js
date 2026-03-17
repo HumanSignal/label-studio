@@ -58,7 +58,13 @@ const Base = types
     },
   }));
 
-const TestRegion = types.compose(Base, RegionsMixin);
+const TestRegion = types.compose(
+  Base,
+  RegionsMixin,
+  types.model({}).views(() => ({
+    get editable() { return true; },
+  })),
+);
 
 function createStore(annotationOverrides = {}, regionSnapshot = {}) {
   const annotation = { ...mockAnnotation(), ...annotationOverrides };
@@ -70,6 +76,9 @@ function createStore(annotationOverrides = {}, regionSnapshot = {}) {
     })
     .volatile(() => ({
       annotationStore: { selected: annotation, selectedHistory: null },
+    }))
+    .views(() => ({
+      findImageEntity() { return null; },
     }))
     .actions((self) => ({
       setAnnotation(ann) {
@@ -115,9 +124,9 @@ describe("Regions mixin", () => {
       expect(region.parent).toBe(root);
     });
 
-    it("editable throws Not implemented", () => {
+    it("editable returns true (overridden in test model)", () => {
       const { region } = createStore();
-      expect(() => region.editable).toThrow("Not implemented");
+      expect(region.editable).toBe(true);
     });
 
     it("isCompleted is true when not drawing", () => {

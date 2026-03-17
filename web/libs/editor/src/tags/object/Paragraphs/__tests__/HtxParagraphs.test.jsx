@@ -33,6 +33,7 @@ function createMockItem(overrides = {}) {
     contextscroll: true,
     layoutClasses: { text: "text-class", name: "name-class", phrase: "phrase-class" },
     audio: null,
+    regs: [],
     seekToPhrase: vi.fn(),
     setViewRef: vi.fn(),
     isVisibleForAuthorFilter: vi.fn(() => true),

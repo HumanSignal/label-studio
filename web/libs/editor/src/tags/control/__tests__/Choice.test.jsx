@@ -10,7 +10,7 @@ import { ChoicesModel } from "../Choices";
 
 vi.mock("../../../core/Tree", async () => {
   const actual = (await vi.importActual("../../../core/Tree")).default;
-  return {
+  const mock = {
     ...actual,
     cssConverter: (style) => {
       if (!style) return null;
@@ -28,6 +28,10 @@ vi.mock("../../../core/Tree", async () => {
       return result;
     },
     renderChildren: () => null,
+  };
+  return {
+    ...mock,
+    default: mock,
   };
 });
 
@@ -454,7 +458,8 @@ describe("HtxChoice view", () => {
       </Provider>,
     );
     const itemDiv = container.querySelector('[class*="choice__item"]');
-    expect(itemDiv).toHaveStyle({ color: "red" });
+    expect(itemDiv).toBeTruthy();
+    expect(itemDiv.style.color).toBe("red");
   });
 
   it("renders html when item.html is set", () => {

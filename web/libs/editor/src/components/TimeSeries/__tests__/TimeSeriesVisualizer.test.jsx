@@ -269,8 +269,8 @@ describe("TimeSeriesVisualizer", () => {
     expect(document.querySelector(".htx-timeseries-channel")).toBeInTheDocument();
   });
 
-  it("handles Dark theme (initializeComponent legend color)", () => {
-    const { getCurrentTheme } = require("@humansignal/ui");
+  it("handles Dark theme (initializeComponent legend color)", async () => {
+    const { getCurrentTheme } = await vi.importMock("@humansignal/ui");
     getCurrentTheme.mockReturnValue("Dark");
     render(<TimeSeriesVisualizer {...defaultProps} />);
     expect(document.querySelector(".htx-timeseries-channel")).toBeInTheDocument();

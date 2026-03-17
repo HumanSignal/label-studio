@@ -35,9 +35,21 @@ const StubWithIcon = types.model("StubWithIcon").views(() => ({
   },
 }));
 
-const ComposedBase = types.compose("ComposedBase", ToolMixin, BaseTool, StubWithIcon);
+const SafeOverrides = types.model("SafeOverrides").views(() => ({
+  get getActiveShape() {
+    return null;
+  },
+  get annotation() {
+    return null;
+  },
+  get annotationStore() {
+    return null;
+  },
+}));
+
+const ComposedBase = types.compose("ComposedBase", ToolMixin, BaseTool, StubWithIcon, SafeOverrides);
 // No icon so shouldRenderView stays false when not separated/smartEnabled
-const ComposedBaseNoIcon = types.compose("ComposedBaseNoIcon", ToolMixin, BaseTool);
+const ComposedBaseNoIcon = types.compose("ComposedBaseNoIcon", ToolMixin, BaseTool, SafeOverrides);
 
 function createManager() {
   return { name: "test", selectTool: vi.fn(), addTool: vi.fn() };
@@ -248,7 +260,7 @@ describe("Base tool", () => {
         ComposedBase,
         { selected: false },
         {
-          control: createControl({ isSeparated: true }),
+          control: createControl({ isSeparated: true, regs: [] }),
         },
       );
       const viewEl = tool.viewClass();
@@ -265,7 +277,7 @@ describe("Base tool", () => {
         ComposedBase,
         { selected: true },
         {
-          control: createControl({ isSeparated: true }),
+          control: createControl({ isSeparated: true, regs: [] }),
         },
       );
       const viewEl = tool.viewClass();

@@ -1,3 +1,4 @@
+import { types } from "mobx-state-tree";
 import * as Polygon from "../Polygon";
 import { Hotkey as HotkeyImport } from "../../../core/Hotkey";
 
@@ -5,6 +6,10 @@ vi.mock("../../../utils/feature-flags", () => ({
   isFF: vi.fn(() => false),
   FF_DEV_3391: "fflag_fix_front_dev_3391_interactive_view_all",
   FF_SIMPLE_INIT: "fflag_fix_front_leap_443_select_annotation_once",
+}));
+
+vi.mock("../../../components/ImageView/Image", () => ({
+  SNAP_TO_PIXEL_MODE: { EDGE: "edge", CENTER: "center" },
 }));
 
 vi.mock("../../../core/Hotkey", () => {
@@ -25,12 +30,13 @@ vi.mock("../../../tools/Manager", () => ({
   },
 }));
 
+vi.mock("../../../tools", () => ({}));
+
 let PolygonModel;
 let Store;
 let HotkeyMock;
 
 beforeAll(() => {
-  const { types } = require("mobx-state-tree");
   PolygonModel = Polygon.PolygonModel;
   HotkeyMock = HotkeyImport;
 

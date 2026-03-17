@@ -9,6 +9,7 @@ if (typeof globalThis.structuredClone === "undefined") {
 vi.mock("keymaster", () => {
   const keymaster = () => {};
   keymaster.unbind = () => {};
+  keymaster.unbindAll = () => {};
   keymaster.setScope = () => {};
   return { __esModule: true, default: keymaster };
 });

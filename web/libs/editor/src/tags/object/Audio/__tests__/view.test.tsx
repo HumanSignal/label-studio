@@ -563,8 +563,8 @@ describe("Audio view", () => {
   });
 
   describe("dark theme", () => {
-    it("uses dark theme colors when getCurrentTheme returns Dark", () => {
-      const getCurrentTheme = require("@humansignal/ui").getCurrentTheme;
+    it("uses dark theme colors when getCurrentTheme returns Dark", async () => {
+      const { getCurrentTheme } = await vi.importMock<typeof import("@humansignal/ui")>("@humansignal/ui");
       (getCurrentTheme as vi.Mock).mockReturnValue("Dark");
       render(<Audio item={defaultItem as any} />);
       expect(screen.getByTestId("timeline-controls")).toBeInTheDocument();

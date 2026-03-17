@@ -1,6 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { defineProject } from "vitest/config";
+import { transform as esbuildTransform } from "esbuild";
 import { baseAlias } from "../../vitest.base";
 
 const root = __dirname;
@@ -17,8 +18,10 @@ const coreHelpersTs = path.join(editorSrc, "core/Helpers.ts");
 const coreRegistryJs = path.join(editorSrc, "core/Registry.js");
 const coreHelpersJs = path.join(editorSrc, "core/Helpers.js");
 const coreHotkeyTs = path.join(editorSrc, "core/Hotkey.ts");
+const coreHotkeyJs = path.join(editorSrc, "core/Hotkey.js");
 const coreCustomTypesTs = path.join(editorSrc, "core/CustomTypes.ts");
 const utilsUtilitiesTs = path.join(editorSrc, "utils/utilities.ts");
+const utilsUtilitiesJs = path.join(editorSrc, "utils/utilities.js");
 const antDesignIconsStub = path.resolve(root, "__mocks__", "ant-design-icons.js");
 const noOpModuleStub = path.resolve(root, "__mocks__", "no-op-module.js");
 
@@ -49,9 +52,9 @@ export default defineProject({
         const n = id.replace(/\\/g, "/");
         if (n.endsWith("/Registry") || n === "Registry" || n.endsWith("core/Registry")) return coreRegistryJs;
         if (n.endsWith("/Helpers") || n === "Helpers" || n.endsWith("core/Helpers")) return coreHelpersJs;
-        if (n.endsWith("/Hotkey") || n === "Hotkey" || n.endsWith("core/Hotkey")) return coreHotkeyTs;
+        if (n.endsWith("/Hotkey") || n === "Hotkey" || n.endsWith("core/Hotkey")) return coreHotkeyJs;
         if (n.endsWith("/CustomTypes") || n === "CustomTypes" || n.endsWith("core/CustomTypes")) return coreCustomTypesTs;
-        if (n.endsWith("/utilities") || (n === "utilities" && importer?.replace(/\\/g, "/").includes("utils"))) return utilsUtilitiesTs;
+        if (n.endsWith("/utilities") || (n === "utilities" && importer?.replace(/\\/g, "/").includes("utils"))) return utilsUtilitiesJs;
         let absPath: string | null = null;
         if (id.startsWith("/") || /^[A-Za-z]:/.test(id)) {
           absPath = path.normalize(id);
@@ -122,6 +125,18 @@ export default defineProject({
           return "import React from 'react'; export const ReactComponent = () => null; export default '';";
         }
         return null;
+      },
+    },
+    {
+      name: "editor-jsx-in-js",
+      enforce: "pre",
+      async transform(code: string, id: string) {
+        if (!id.endsWith(".js")) return null;
+        if (!id.includes(editorSrc) && !id.includes("/libs/editor/")) return null;
+        if (id.includes("node_modules")) return null;
+        if (!code.includes("<") || !/< *[A-Z]|<\/|< *[a-z]+[\s>]/.test(code)) return null;
+        const result = await esbuildTransform(code, { loader: "jsx", jsx: "automatic", sourcefile: id });
+        return { code: result.code, map: result.map || null };
       },
     },
     {
@@ -204,7 +219,7 @@ export default defineProject({
       { find: "../core/Registry", replacement: coreRegistryJs },
       { find: "../../core/Helpers", replacement: coreHelpersJs },
       { find: "../core/Helpers", replacement: coreHelpersJs },
-      { find: "./utilities", replacement: utilsUtilitiesTs },
+      { find: "./utilities", replacement: utilsUtilitiesJs },
     ],
   },
   server: {

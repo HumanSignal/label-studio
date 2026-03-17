@@ -2,16 +2,13 @@ import React from "react";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { Provider } from "mobx-react";
+import { mockFF } from "../../../../__mocks__/global";
 import Grid, { VirtualizedGrid, VirtualizedAnnotationPanel, Item } from "../Grid";
-import { FF_DEV_3391, FF_FIT_720_LAZY_LOAD_ANNOTATIONS } from "../../../utils/feature-flags";
+import { FF_DEV_3391 } from "../../../utils/feature-flags";
 
-const mockIsFF = vi.fn();
-vi.mock("../../../utils/feature-flags", () => ({
-  isFF: mockIsFF,
-  FF_DEV_3391: "fflag_dev_3391",
-  FF_FIT_720_LAZY_LOAD_ANNOTATIONS: "fflag_fit_720_lazy_load_annotations",
-  FF_SIMPLE_INIT: "fflag_fix_front_leap_443_select_annotation_once",
-}));
+const FF_FIT_720_LAZY_LOAD_ANNOTATIONS = "fflag_fix_all_fit_720_lazy_load_annotations";
+
+const ff = mockFF();
 
 vi.mock("../../AnnotationTabs/AnnotationTabs", () => ({
   EntityTab: ({ entity, onClick }) => (
@@ -101,15 +98,18 @@ function createAnnotation(overrides = {}) {
 
 describe("Grid", () => {
   beforeEach(() => {
-    mockIsFF.mockReset();
+    ff.setup();
     mockGetCachedAnnotation.mockReturnValue(undefined);
     if (typeof Element.prototype.scrollTo !== "function") {
       Element.prototype.scrollTo = vi.fn();
     }
   });
 
+  afterEach(() => {
+    ff.reset();
+  });
+
   it("renders classic Grid (GridClassComponent) when virtualization FF is off", () => {
-    mockIsFF.mockReturnValue(false);
     const annotations = [createAnnotation({ id: "a1" }), createAnnotation({ id: "a2" })];
     const store = createStore({ selected: { selected: annotations[0] } });
     const root = {};
@@ -126,7 +126,6 @@ describe("Grid", () => {
   });
 
   it("filters out hidden annotations", () => {
-    mockIsFF.mockReturnValue(false);
     const annotations = [createAnnotation({ id: "a1" }), createAnnotation({ id: "a2", hidden: true })];
     const store = createStore({ selected: { selected: annotations[0] } });
     const root = {};
@@ -141,7 +140,7 @@ describe("Grid", () => {
   });
 
   it("renders GridClassComponent with FF_DEV_3391 on (direct Annotation per panel)", () => {
-    mockIsFF.mockImplementation((flag) => flag === FF_DEV_3391);
+    ff.set({ [FF_DEV_3391]: true });
     const annotations = [createAnnotation({ id: "a1" }), createAnnotation({ id: "a2" })];
     const store = createStore({ selected: { selected: annotations[0] } });
     const root = {};
@@ -158,7 +157,6 @@ describe("Grid", () => {
   });
 
   it("calls selectAnnotation when clicking second panel entity tab", async () => {
-    mockIsFF.mockReturnValue(false);
     const annotations = [createAnnotation({ id: "a1" }), createAnnotation({ id: "a2" })];
     const store = createStore({ selected: { selected: annotations[0] } });
     const root = {};
@@ -175,7 +173,6 @@ describe("Grid", () => {
   });
 
   it("calls selectPrediction when clicking prediction entity tab", async () => {
-    mockIsFF.mockReturnValue(false);
     const annotations = [
       createAnnotation({ id: "a1", type: "annotation" }),
       createAnnotation({ id: "a2", type: "prediction" }),
@@ -195,7 +192,6 @@ describe("Grid", () => {
   });
 
   it("re-renders when selected annotation changes (shouldComponentUpdate)", () => {
-    mockIsFF.mockReturnValue(false);
     const annotations = [createAnnotation({ id: "a1" }), createAnnotation({ id: "a2" })];
     const store = createStore({ selected: { selected: annotations[0] } });
     const root = {};
@@ -217,7 +213,6 @@ describe("Grid", () => {
   });
 
   it("navigates with Move right then Move left buttons", async () => {
-    mockIsFF.mockReturnValue(false);
     const annotations = [
       createAnnotation({ id: "a1" }),
       createAnnotation({ id: "a2" }),
@@ -239,7 +234,6 @@ describe("Grid", () => {
   });
 
   it("GridClassComponent onFinish runs when Item finishes loading", async () => {
-    mockIsFF.mockReturnValue(false);
     const annotations = [createAnnotation({ id: "a1" }), createAnnotation({ id: "a2" })];
     const store = createStore({ selected: { selected: annotations[0] } });
     const root = {};
@@ -255,7 +249,7 @@ describe("Grid", () => {
   });
 
   it("renders VirtualizedGrid when FIT_720 on (including compare-all with few annotations)", () => {
-    mockIsFF.mockImplementation((flag) => flag === FF_DEV_3391 || flag === FF_FIT_720_LAZY_LOAD_ANNOTATIONS);
+    ff.set({ [FF_DEV_3391]: true, [FF_FIT_720_LAZY_LOAD_ANNOTATIONS]: true });
     const annotations = Array.from({ length: 5 }, (_, i) => createAnnotation({ id: `a${i}`, pk: i + 1 }));
     const store = createStore({ selected: { selected: annotations[0] } });
     const root = {};
@@ -270,7 +264,7 @@ describe("Grid", () => {
   });
 
   it("renders VirtualizedGrid when FIT_720 FF on and more than 10 annotations", () => {
-    mockIsFF.mockImplementation((flag) => flag === FF_DEV_3391 || flag === FF_FIT_720_LAZY_LOAD_ANNOTATIONS);
+    ff.set({ [FF_DEV_3391]: true, [FF_FIT_720_LAZY_LOAD_ANNOTATIONS]: true });
     const annotations = Array.from({ length: 11 }, (_, i) => createAnnotation({ id: `a${i}`, pk: i + 1 }));
     const store = createStore({ selected: { selected: annotations[0] } });
     const root = {};
@@ -286,7 +280,7 @@ describe("Grid", () => {
   });
 
   it("VirtualizedGrid direct render exercises hooks and callbacks", () => {
-    mockIsFF.mockReturnValue(true);
+    ff.set({ [FF_DEV_3391]: true, [FF_FIT_720_LAZY_LOAD_ANNOTATIONS]: true });
     const annotations = Array.from({ length: 12 }, (_, i) => createAnnotation({ id: `a${i}`, pk: i + 1 }));
     const store = createStore({ selected: { selected: annotations[0] } });
     const root = {};
@@ -303,7 +297,7 @@ describe("Grid", () => {
   });
 
   it("VirtualizedGrid scroll right and left buttons work", async () => {
-    mockIsFF.mockImplementation((flag) => flag === FF_DEV_3391 || flag === FF_FIT_720_LAZY_LOAD_ANNOTATIONS);
+    ff.set({ [FF_DEV_3391]: true, [FF_FIT_720_LAZY_LOAD_ANNOTATIONS]: true });
     const annotations = Array.from({ length: 11 }, (_, i) => createAnnotation({ id: `a${i}`, pk: i + 1 }));
     const store = createStore({ selected: { selected: annotations[0] } });
     const root = {};
@@ -439,7 +433,7 @@ describe("Grid", () => {
   it("VirtualizedGrid mount skips annotations that already have data (hasDataInMST)", () => {
     mockGetCachedAnnotation.mockClear();
     mockGetCachedAnnotation.mockReturnValue(undefined);
-    mockIsFF.mockReturnValue(true);
+    ff.set({ [FF_DEV_3391]: true, [FF_FIT_720_LAZY_LOAD_ANNOTATIONS]: true });
     const annWithData = {
       ...createAnnotation({ id: "a1", pk: 1 }),
       versions: { result: [{ id: "r1" }] },
@@ -464,7 +458,7 @@ describe("Grid", () => {
   it("VirtualizedGrid mount restores annotations from getCachedAnnotation cache", () => {
     const result = [{ id: "r1", from_name: "rating", to_name: "text", type: "rating", value: { rating: 1 } }];
     mockGetCachedAnnotation.mockImplementation((id) => (id === 1 ? { result } : undefined));
-    mockIsFF.mockReturnValue(true);
+    ff.set({ [FF_DEV_3391]: true, [FF_FIT_720_LAZY_LOAD_ANNOTATIONS]: true });
     const ann = {
       ...createAnnotation({ id: "a1", pk: 1 }),
       versions: {},
@@ -499,7 +493,7 @@ describe("Grid", () => {
     mockFetchAnnotationCached.mockResolvedValue({
       result: [{ id: "r1", from_name: "rating", to_name: "text", type: "rating", value: { rating: 1 } }],
     });
-    mockIsFF.mockImplementation((flag) => flag === FF_DEV_3391 || flag === FF_FIT_720_LAZY_LOAD_ANNOTATIONS);
+    ff.set({ [FF_DEV_3391]: true, [FF_FIT_720_LAZY_LOAD_ANNOTATIONS]: true });
     const stubAnnotation = (id, pk) => ({
       ...createAnnotation({ id, pk }),
       versions: { result: [] },
@@ -525,7 +519,7 @@ describe("Grid", () => {
 
   it("VirtualizedGrid hydrateAnnotation uses sdk.ensureAnnotationLoaded when available", async () => {
     const ensureAnnotationLoaded = vi.fn().mockResolvedValue(undefined);
-    mockIsFF.mockReturnValue(true);
+    ff.set({ [FF_DEV_3391]: true, [FF_FIT_720_LAZY_LOAD_ANNOTATIONS]: true });
     const store = createStore({
       selected: { selected: null },
       store: { SDK: { ensureAnnotationLoaded } },
@@ -546,7 +540,7 @@ describe("Grid", () => {
 
   it("VirtualizedGrid hydrateAnnotation uses taskStore.loadAnnotation when no ensureAnnotationLoaded", async () => {
     const loadAnnotation = vi.fn().mockResolvedValue({ result: [] });
-    mockIsFF.mockReturnValue(true);
+    ff.set({ [FF_DEV_3391]: true, [FF_FIT_720_LAZY_LOAD_ANNOTATIONS]: true });
     const store = createStore({
       selected: { selected: null },
       store: {
@@ -573,7 +567,7 @@ describe("Grid", () => {
   it("VirtualizedGrid hydrateAnnotation deserializes and updates annotation", async () => {
     const result = [{ id: "r1", type: "rating", value: { rating: 1 } }];
     mockFetchAnnotationCached.mockResolvedValue({ result });
-    mockIsFF.mockReturnValue(true);
+    ff.set({ [FF_DEV_3391]: true, [FF_FIT_720_LAZY_LOAD_ANNOTATIONS]: true });
     const ann = {
       ...createAnnotation({ id: "a1", pk: 1 }),
       versions: { result: [] },
@@ -607,7 +601,7 @@ describe("Grid", () => {
 
   it("VirtualizedGrid hydrateAnnotation marks hydrated when fetch returns no result", async () => {
     mockFetchAnnotationCached.mockResolvedValue({ result: undefined });
-    mockIsFF.mockReturnValue(true);
+    ff.set({ [FF_DEV_3391]: true, [FF_FIT_720_LAZY_LOAD_ANNOTATIONS]: true });
     const annotations = Array.from({ length: 11 }, (_, i) => createAnnotation({ id: `a${i}`, pk: i + 1 }));
     const store = createStore({ selected: { selected: annotations[0] } });
     const root = {};
@@ -626,7 +620,7 @@ describe("Grid", () => {
     const err = new Error("cancelled");
     err.name = "CancelledError";
     mockFetchAnnotationCached.mockRejectedValue(err);
-    mockIsFF.mockReturnValue(true);
+    ff.set({ [FF_DEV_3391]: true, [FF_FIT_720_LAZY_LOAD_ANNOTATIONS]: true });
     const annotations = Array.from({ length: 11 }, (_, i) => createAnnotation({ id: `a${i}`, pk: i + 1 }));
     const store = createStore({ selected: { selected: annotations[0] } });
     const root = {};
@@ -643,7 +637,7 @@ describe("Grid", () => {
 
   it("VirtualizedGrid hydrateAnnotation marks hydrated when fetch returns error", async () => {
     mockFetchAnnotationCached.mockResolvedValue({ error: "Not found", result: undefined });
-    mockIsFF.mockReturnValue(true);
+    ff.set({ [FF_DEV_3391]: true, [FF_FIT_720_LAZY_LOAD_ANNOTATIONS]: true });
     const annotations = Array.from({ length: 11 }, (_, i) => createAnnotation({ id: `a${i}`, pk: i + 1 }));
     const store = createStore({ selected: { selected: annotations[0] } });
     const root = {};
@@ -660,7 +654,7 @@ describe("Grid", () => {
 
   it("VirtualizedGrid onItemsRendered runs debounced hydration", () => {
     vi.useFakeTimers();
-    mockIsFF.mockImplementation((flag) => flag === FF_DEV_3391 || flag === FF_FIT_720_LAZY_LOAD_ANNOTATIONS);
+    ff.set({ [FF_DEV_3391]: true, [FF_FIT_720_LAZY_LOAD_ANNOTATIONS]: true });
     const stubAnnotation = (id, pk) => ({
       ...createAnnotation({ id, pk }),
       versions: { result: [] },
@@ -682,7 +676,7 @@ describe("Grid", () => {
   });
 
   it("VirtualizedGrid renders with stub annotations (no result)", () => {
-    mockIsFF.mockImplementation((flag) => flag === FF_DEV_3391 || flag === FF_FIT_720_LAZY_LOAD_ANNOTATIONS);
+    ff.set({ [FF_DEV_3391]: true, [FF_FIT_720_LAZY_LOAD_ANNOTATIONS]: true });
     const stubAnnotation = (id, pk) => ({
       ...createAnnotation({ id, pk }),
       versions: { result: [] },

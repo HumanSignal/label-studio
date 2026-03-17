@@ -35,9 +35,12 @@ vi.mock("../../tags/object/Image", () => {
       annotation: null,
       regs: [],
     }))
-    .views(() => ({
+    .views((self) => ({
       get stageRef() {
         return null;
+      },
+      findImageEntity() {
+        return self.currentImageEntity;
       },
     }))
     .actions((self) => ({
@@ -73,7 +76,7 @@ vi.mock("../../tags/object/Image", () => {
 const origGetContext = HTMLCanvasElement.prototype.getContext;
 HTMLCanvasElement.prototype.getContext = function (type, ...args) {
   const ctx = origGetContext.apply(this, [type, ...args]);
-  if (ctx && type === "2d" && !ctx.canvas) {
+  if (ctx && type === "2d") {
     ctx.canvas = this;
   }
   return ctx;
@@ -147,15 +150,34 @@ vi.mock("../AliveRegion", () => ({
   AliveRegion: (Comp) => Comp,
 }));
 
+const EditableBitmaskRegion = types.compose(
+  BitmaskRegionModel,
+  types.model({}).views(() => ({
+    get editable() { return true; },
+  })),
+);
+
 const TestRoot = types
   .model("TestRoot", {
     image: types.optional(ImageModel, { id: "img1" }),
-    region: types.optional(BitmaskRegionModel, {
+    region: types.optional(EditableBitmaskRegion, {
       id: "bm1",
       pid: "p1",
       object: "img1",
     }),
   })
+  .views(() => ({
+    get annotationStore() {
+      return {
+        selected: {
+          toNames: new Map(),
+          regionStore: { isSelected: () => false },
+          isReadOnly: () => false,
+        },
+        selectedHistory: null,
+      };
+    },
+  }))
   .actions((self) => ({
     createSerializedResult(region, value) {
       return {
@@ -308,10 +330,11 @@ describe("BitmaskRegion", () => {
     });
 
     it("redraw schedules restoreFromImageDataURL via requestIdleCallback when refs and imageDataURL set", () => {
+      vi.useFakeTimers();
       region.setImageDataURL("data:image/png;base64,abc");
       region.redraw();
       vi.runAllTimers();
-      // redraw calls requestIdleCallback (mocked as setTimeout); restoreFromImageDataURL is no-op for this URL
+      vi.useRealTimers();
       expect(region.imageDataURL).toBe("data:image/png;base64,abc");
     });
 

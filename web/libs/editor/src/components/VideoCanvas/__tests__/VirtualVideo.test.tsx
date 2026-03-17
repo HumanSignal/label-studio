@@ -1,9 +1,21 @@
 import React from "react";
 import { render } from "@testing-library/react";
-import fetchMock from "jest-fetch-mock";
 import * as VirtualVideo from "../VirtualVideo";
 
+function mockFetchResponse(contentType: string) {
+  (globalThis.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
+    headers: { get: (name: string) => (name === "content-type" ? contentType : null) },
+  });
+}
+
 describe("VirtualVideo", () => {
+  beforeEach(() => {
+    (globalThis.fetch as ReturnType<typeof vi.fn>).mockReset();
+    (globalThis.fetch as ReturnType<typeof vi.fn>).mockResolvedValue({
+      headers: { get: () => null },
+    });
+  });
+
   it("should call canPlayUrl and return false if no url specified", async () => {
     const canPlayType = vi.fn();
 
@@ -42,13 +54,7 @@ describe("VirtualVideo", () => {
   it("should call canPlayUrl and return true if valid url specified, even if content-type is binary/octet-stream", async () => {
     const canPlayType = vi.fn();
 
-    // return binary/octet-stream for all requests, mimicking the situation where
-    // the server doesn't set the content-type header and defaults to binary/octet-stream
-    fetchMock.mockResponseOnce("", {
-      headers: {
-        "content-type": "binary/octet-stream",
-      },
-    });
+    mockFetchResponse("binary/octet-stream");
 
     render(
       <VirtualVideo.VirtualVideo
@@ -65,13 +71,7 @@ describe("VirtualVideo", () => {
   it("should call canPlayUrl and return true if valid file is specified, and content-type is binary/octet-stream but no file extension", async () => {
     const canPlayType = vi.fn();
 
-    // return binary/octet-stream for all requests, mimicking the situation where
-    // the server doesn't set the content-type header and defaults to binary/octet-stream
-    fetchMock.mockResponseOnce("", {
-      headers: {
-        "content-type": "binary/octet-stream",
-      },
-    });
+    mockFetchResponse("binary/octet-stream");
 
     render(
       <VirtualVideo.VirtualVideo src="https://app.heartex.ai/static/samples/opossum_snow" canPlayType={canPlayType} />,
@@ -100,13 +100,7 @@ describe("VirtualVideo", () => {
   it("should call canPlayUrl and return false if invalid url specified, even if content-type is binary/octet-stream", async () => {
     const canPlayType = vi.fn();
 
-    // return binary/octet-stream for all requests, mimicking the situation where
-    // the server doesn't set the content-type header and defaults to binary/octet-stream
-    fetchMock.mockResponseOnce("", {
-      headers: {
-        "content-type": "binary/octet-stream",
-      },
-    });
+    mockFetchResponse("binary/octet-stream");
 
     render(
       <VirtualVideo.VirtualVideo

@@ -6,5 +6,13 @@ export function Hotkey() {
   return {
     addNamed: () => {},
     removeNamed: () => {},
+    unbindAll: () => {},
+    addKey: () => {},
+    removeKey: () => {},
   };
 }
+
+Hotkey.DEFAULT_SCOPE = "__main__";
+Hotkey.setScope = () => {};
+Hotkey.unbindAll = () => {};
+Hotkey.keymap = {};

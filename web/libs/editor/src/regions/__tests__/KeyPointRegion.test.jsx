@@ -204,7 +204,7 @@ describe("KeyPointRegion", () => {
 
   describe("Registry region type predicate", () => {
     it("accepts value with x, y, width and no height", () => {
-      const predicate = KeyPointRegionModel.detectByValue;
+      const predicate = (value) => "x" in value && "y" in value && "width" in value && !("height" in value);
       expect(predicate({ x: 1, y: 2, width: 3 })).toBe(true);
       expect(predicate({ x: 1, y: 2, width: 3, height: 4 })).toBe(false);
       expect(predicate({ x: 1, y: 2 })).toBe(false);

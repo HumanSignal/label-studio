@@ -7,14 +7,9 @@ if (typeof globalThis.structuredClone === "undefined") {
 }
 
 import { getRoot, types } from "mobx-state-tree";
+import { mockFF } from "../../../../../__mocks__/global";
 
-vi.mock("../../../../utils/feature-flags", () => ({
-  isFF: vi.fn(() => false),
-  FF_DEV_3377: "ff_dev_3377",
-  FF_ZOOM_OPTIM: "ff_zoom_optim",
-  FF_LSDV_4583: "ff_lsdv_4583",
-  FF_DEV_3391: "ff_dev_3391",
-}));
+const ff = mockFF();
 
 const mockManager = {
   addTool: vi.fn(),
@@ -59,7 +54,6 @@ vi.mock("@humansignal/core", () => ({
 
 import { ImageModel } from "../Image";
 import { SNAP_TO_PIXEL_MODE } from "../../../../components/ImageView/Image";
-import * as featureFlags from "../../../../utils/feature-flags";
 import { FF_ZOOM_OPTIM } from "../../../../utils/feature-flags";
 
 const defaultHistory = {
@@ -158,6 +152,7 @@ function createStoreWithStates(statesForImage = []) {
 
 describe("Image model", () => {
   beforeEach(() => {
+    ff.setup();
     mockManager.addTool.mockClear();
     mockManager.findSelectedTool.mockReturnValue({
       useTransformer: false,
@@ -169,6 +164,10 @@ describe("Image model", () => {
     mockManager.allTools.mockReturnValue([]);
     window.Htx = window.Htx || {};
     window.Htx.annotationStore = window.Htx.annotationStore || { names: new Map() };
+  });
+
+  afterEach(() => {
+    ff.reset();
   });
 
   describe("store and task", () => {
@@ -762,10 +761,7 @@ describe("Image model", () => {
 
   describe("alignmentOffset when FF_ZOOM_OPTIM", () => {
     beforeEach(() => {
-      featureFlags.isFF.mockImplementation((key) => key === FF_ZOOM_OPTIM);
-    });
-    afterEach(() => {
-      featureFlags.isFF.mockImplementation(() => false);
+      ff.set({ [FF_ZOOM_OPTIM]: true });
     });
 
     it("returns center offset for horizontalalignment center", () => {
@@ -1078,10 +1074,7 @@ describe("Image model", () => {
 
   describe("getSkipInteractions with FF_ZOOM_OPTIM", () => {
     beforeEach(() => {
-      featureFlags.isFF.mockImplementation((key) => key === FF_ZOOM_OPTIM);
-    });
-    afterEach(() => {
-      featureFlags.isFF.mockImplementation(() => false);
+      ff.set({ [FF_ZOOM_OPTIM]: true });
     });
 
     it("returns false when isLinkingMode is true", () => {

@@ -6,6 +6,25 @@ import { render, screen, fireEvent } from "@testing-library/react";
 import ImageView, { splitRegions } from "../ImageView";
 import { mockFF } from "../../../../__mocks__/global";
 import { FF_DEV_1442, FF_LSDV_4930 } from "../../../utils/feature-flags";
+import { isAlive, getRoot } from "mobx-state-tree";
+
+vi.mock("konva", () => {
+  const Transform = vi.fn().mockImplementation(function () {
+    this.rotate = vi.fn();
+    this.point = vi.fn((p) => ({ x: p.x, y: p.y }));
+    return this;
+  });
+  return {
+    default: {
+      Transform,
+      Transformer: class {},
+      Node: class {},
+      getAngle: (a) => a,
+      showWarnings: false,
+    },
+    Transform,
+  };
+});
 
 vi.mock("react-konva", () => {
   const React = require("react");
@@ -252,7 +271,6 @@ describe("ImageView", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     ff.setup();
-    const { isAlive } = require("mobx-state-tree");
     isAlive.mockImplementation((x) => !!x);
   });
 
@@ -261,7 +279,6 @@ describe("ImageView", () => {
   });
 
   it("returns null when item is not alive", () => {
-    const { isAlive } = require("mobx-state-tree");
     isAlive.mockReturnValue(false);
     const item = createItem();
     const store = createStore();
@@ -343,7 +360,6 @@ describe("ImageView", () => {
   });
 
   it("applies container maxWidth/maxHeight when getRoot settings fullscreen is false", () => {
-    const { getRoot } = require("mobx-state-tree");
     getRoot.mockReturnValue({ settings: { fullscreen: false } });
     const store = createStore();
     const item = createItem({ maxwidth: 600, maxheight: 400, width: 600, height: 400 });
@@ -1136,7 +1152,6 @@ describe("ImageView with feature flags", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     ff.setup();
-    const { isAlive } = require("mobx-state-tree");
     isAlive.mockImplementation((x) => !!x);
   });
 

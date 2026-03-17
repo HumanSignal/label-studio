@@ -33,6 +33,17 @@ vi.mock("../RegionWrapper", () => ({
   RegionWrapper: ({ children }) => require("react").createElement("div", { "data-testid": "region-wrapper" }, children),
 }));
 
+vi.mock("../AliveRegion", () => ({
+  AliveRegion: (Comp) => {
+    const React = require("react");
+    const { observer } = require("mobx-react");
+    const Observed = observer(Comp);
+    return observer(({ item, ...rest }) =>
+      React.createElement(Observed, { item, setShapeRef: () => {}, ...rest }),
+    );
+  },
+}));
+
 vi.mock("../../components/ImageView/LabelOnRegion", () => ({
   LabelOnRect: () => require("react").createElement("div", { "data-testid": "label-on-rect" }),
 }));
@@ -42,12 +53,14 @@ vi.mock("../../utils/image", () => ({
 }));
 
 vi.mock("konva", () => {
+  const Transform = vi.fn().mockImplementation(function () {
+    this.rotate = vi.fn();
+    this.point = vi.fn((p) => ({ x: p.x, y: p.y }));
+    return this;
+  });
   return {
-    Transform: vi.fn().mockImplementation(function () {
-      this.rotate = vi.fn();
-      this.point = vi.fn((p) => ({ x: p.x, y: p.y }));
-      return this;
-    }),
+    default: { Transform, Transformer: class {}, getAngle: (a) => a, showWarnings: false },
+    Transform,
   };
 });
 

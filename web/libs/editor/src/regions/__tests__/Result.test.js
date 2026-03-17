@@ -6,13 +6,10 @@
  * serialize, setHighlight, toggleHighlight, toggleHidden).
  */
 import { types } from "mobx-state-tree";
+import { mockFF } from "../../../__mocks__/global";
+import { FF_LSDV_4583 } from "../../utils/feature-flags";
 
-const mockIsFF = vi.fn(() => false);
-vi.mock("../../utils/feature-flags", () => ({
-  isFF: mockIsFF,
-  FF_LSDV_4583: "ff_lsdv_4583",
-  FF_SIMPLE_INIT: "fflag_fix_front_leap_443_select_annotation_once",
-}));
+const ff = mockFF();
 
 vi.mock("@humansignal/core", () => ({
   ff: {
@@ -160,6 +157,14 @@ function createTreeWithControl(controlSnapshot) {
 }
 
 describe("Result", () => {
+  beforeEach(() => {
+    ff.setup();
+  });
+
+  afterEach(() => {
+    ff.reset();
+  });
+
   describe("views", () => {
     it("store returns getRoot(self)", () => {
       const root = createTree();
@@ -706,12 +711,11 @@ describe("Result", () => {
     });
 
     it("includes item_index when isFF(FF_LSDV_4583) and area.item_index is set", () => {
-      mockIsFF.mockImplementation((flag) => flag === "ff_lsdv_4583");
+      ff.set({ [FF_LSDV_4583]: true });
       const root = createTree({}, {}, { item_index: 2 });
       const result = root.annotationStore.selected.areas[0].results[0];
       const data = result.serialize();
       expect(data.item_index).toBe(2);
-      mockIsFF.mockReturnValue(false);
     });
 
     it("initializes data.value when area.serialize returns object without value", () => {

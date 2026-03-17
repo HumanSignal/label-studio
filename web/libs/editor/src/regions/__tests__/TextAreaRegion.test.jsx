@@ -21,7 +21,18 @@ vi.mock("../../tags/control/TextArea/TextArea", () => {
       .model("TextAreaModel", {
         id: t.identifier,
         name: t.optional(t.string, "ta"),
-        regions: t.optional(t.array(t.late(() => TextAreaRegionModelImport)), []),
+        regions: t.optional(
+          t.array(
+            t.late(() =>
+              TextAreaRegionModelImport.views(() => ({
+                get editable() {
+                  return true;
+                },
+              })),
+            ),
+          ),
+          [],
+        ),
       })
       .volatile(() => ({
         isEditable: true,
@@ -60,6 +71,7 @@ vi.mock("../../components/HtxTextBox/HtxTextBox", () => ({
 vi.mock("../../utils/feature-flags", () => ({
   isFF: vi.fn(() => false),
   FF_SIMPLE_INIT: "fflag_fix_front_leap_443_select_annotation_once",
+  FF_DEV_3391: "ff_dev_3391",
 }));
 
 import { TextAreaRegionModel, HtxTextAreaRegion } from "../TextAreaRegion";
@@ -162,7 +174,8 @@ describe("TextAreaRegion", () => {
       const root = createRoot();
       const region = getRegion(root);
       region.deleteRegion();
-      expect(mockRemove).toHaveBeenCalledWith(region);
+      expect(mockRemove).toHaveBeenCalled();
+      expect(mockRemove.mock.calls[0][0]).toBe(region);
     });
 
     it("selectRegion sets selected to true", () => {
@@ -200,7 +213,8 @@ describe("TextAreaRegion", () => {
 
       render(<HtxTextAreaRegion item={region} onFocus={vi.fn()} />);
       screen.getByText("delete").click();
-      expect(mockRemove).toHaveBeenCalledWith(region);
+      expect(mockRemove).toHaveBeenCalled();
+      expect(mockRemove.mock.calls[0][0]).toBe(region);
     });
 
     it("when editable, onChange updates value and calls updateLeadTime", () => {

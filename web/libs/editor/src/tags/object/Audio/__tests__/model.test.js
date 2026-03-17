@@ -7,6 +7,7 @@ import Tree from "../../../../core/Tree";
 import Registry from "../../../../core/Registry";
 import "../../../visual/View";
 import { AudioModel } from "../model";
+import { ff as ffCore } from "@humansignal/core";
 
 Registry.addTag("audio", AudioModel, () => null);
 Registry.addObjectType(AudioModel);
@@ -71,10 +72,13 @@ vi.mock("mobx-state-tree", async () => {
   };
 });
 
-vi.mock("../../../../utils/feature-flags", () => ({
-  FF_LSDV_E_278: "FF_LSDV_E_278",
-  isFF: vi.fn(() => false),
-}));
+vi.mock("../../../../utils/feature-flags", async (importOriginal) => {
+  const actual = await importOriginal();
+  return {
+    ...actual,
+    isFF: vi.fn(() => false),
+  };
+});
 
 vi.mock("@humansignal/core", () => ({
   ff: {
@@ -785,7 +789,7 @@ describe("Audio model", () => {
 
   describe("addRegion with FF_MULTIPLE_LABELS_REGIONS", () => {
     it("calls createResult with rest when FF_MULTIPLE_LABELS_REGIONS is on", () => {
-      const ff = require("@humansignal/core").ff;
+      const ff = ffCore;
       ff.isActive.mockImplementation((flag) => flag === "FF_MULTIPLE_LABELS_REGIONS");
       const secondState = { ...mockLabelsState, selectedValues: () => ["L2"] };
       mockToNames.set("audio", [mockLabelsState, secondState]);

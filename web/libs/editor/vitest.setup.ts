@@ -4,7 +4,6 @@
 import React from "react";
 import * as matchers from "@testing-library/jest-dom/matchers";
 import { expect, vi } from "vitest";
-
 (globalThis as unknown as { jest: typeof vi }).jest = vi;
 expect.extend(matchers);
 
@@ -140,3 +139,53 @@ window.HTMLMediaElement.prototype.pause = function pauseMock(this: HTMLMediaElem
 window.HTMLMediaElement.prototype.canPlayType = function canPlayTypeMock(this: HTMLMediaElement, type: string) {
   return (window.HTMLMediaElement.prototype as unknown as { _mock: { _supportsTypes: string[] } })._mock._supportsTypes.includes(type) ? "maybe" : "";
 };
+
+// Global Konva mock — konva requires native `canvas` which isn't available in jsdom.
+// This provides stub classes so that `LSTransformer extends Konva.Transformer` etc. work.
+vi.mock("konva", () => {
+  const noop = () => {};
+  class KonvaNode {
+    on = noop; off = noop; destroy = noop;
+    getLayer() { return null; }
+    getStage() { return null; }
+    getParent() { return null; }
+    remove = noop;
+  }
+  class Transformer extends KonvaNode {
+    nodes() { return []; }
+    forceUpdate = noop;
+  }
+  class Transform {
+    m = [1, 0, 0, 1, 0, 0];
+    copy() { return new Transform(); }
+    point(p: any) { return p; }
+    translate() { return this; }
+    scale() { return this; }
+    rotate() { return this; }
+    invert() { return this; }
+    getMatrix() { return this.m; }
+    multiply() { return this; }
+  }
+  const konva = {
+    Transformer,
+    Transform,
+    Node: KonvaNode,
+    Group: class extends KonvaNode {},
+    Layer: class extends KonvaNode {},
+    Stage: class extends KonvaNode {},
+    Rect: class extends KonvaNode {},
+    Circle: class extends KonvaNode {},
+    Line: class extends KonvaNode {},
+    Image: class extends KonvaNode {},
+    Text: class extends KonvaNode {},
+    Shape: class extends KonvaNode {},
+    Arrow: class extends KonvaNode {},
+    Path: class extends KonvaNode {},
+    Label: class extends KonvaNode {},
+    Tag: class extends KonvaNode {},
+    Ring: class extends KonvaNode {},
+    getAngle: (a: number) => a,
+    showWarnings: false,
+  };
+  return { default: konva, ...konva };
+});

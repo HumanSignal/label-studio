@@ -14,7 +14,8 @@ export const mockFF = () => {
   };
 
   const setup = () => {
-    // Set up the window mock before running tests
+    // Reset feature flags to a fresh copy so mutations from ff.set() don't leak across tests
+    windowMock.APP_SETTINGS.feature_flags = { ...originalFF };
     global.window.APP_SETTINGS = windowMock.APP_SETTINGS;
   };
 

@@ -3,14 +3,10 @@
  */
 import { getParent, types } from "mobx-state-tree";
 import { guidGenerator } from "../../core/Helpers";
+import { mockFF } from "../../../__mocks__/global";
+import { FF_ZOOM_OPTIM } from "../../utils/feature-flags";
 
-const mockIsFF = vi.fn(() => false);
-vi.mock("../../utils/feature-flags", () => ({
-  isFF: mockIsFF,
-  FF_ZOOM_OPTIM: "ff_zoom_optim",
-  FF_DEV_3391: "ff_3391",
-  FF_SIMPLE_INIT: "fflag_fix_front_leap_443_select_annotation_once",
-}));
+const ff = mockFF();
 
 const mockAnnotation = () => ({
   regionStore: {
@@ -84,6 +80,11 @@ const Base = types
 const WithDeleteRegion = types.model({}).actions(() => ({
   deleteRegion() {},
 }));
+const WithEditable = types.model({}).views(() => ({
+  get editable() {
+    return true;
+  },
+}));
 // Override annotation to read from root._annotationForTest so tests pass regardless of
 // feature-flag or module-load order when run with the full editor suite.
 const AnnotationOverrideForTest = types.model({}).views((self) => ({
@@ -92,7 +93,19 @@ const AnnotationOverrideForTest = types.model({}).views((self) => ({
     return root?._annotationForTest ?? null;
   },
 }));
-const TestRegion = types.compose(Base, Regions, WithDeleteRegion, KonvaRegionMixin, AnnotationOverrideForTest);
+const SafeBboxCoordsCanvas = types.model({}).views((self) => ({
+  get bboxCoordsCanvas() {
+    const bbox = self.bboxCoords;
+    if (!bbox || !self.parent) return null;
+    return {
+      left: self.parent.internalToCanvasX(bbox.left),
+      top: self.parent.internalToCanvasY(bbox.top),
+      right: self.parent.internalToCanvasX(bbox.right),
+      bottom: self.parent.internalToCanvasY(bbox.bottom),
+    };
+  },
+}));
+const TestRegion = types.compose(Base, Regions, WithDeleteRegion, KonvaRegionMixin, WithEditable, SafeBboxCoordsCanvas, AnnotationOverrideForTest);
 
 const _annotationRef = { current: null };
 
@@ -109,6 +122,9 @@ const RootModel = types
     },
     get stageHeight() {
       return self._stageHeight ?? 100;
+    },
+    findImageEntity() {
+      return null;
     },
   }))
   .volatile(() => ({
@@ -154,7 +170,12 @@ function createStore(annotationOverrides = {}, regionSnapshot = {}, rootVolatile
 
 describe("KonvaRegion mixin", () => {
   beforeEach(() => {
+    ff.setup();
     window.STORE_INIT_OK = true;
+  });
+
+  afterEach(() => {
+    ff.reset();
   });
 
   describe("views", () => {
@@ -192,13 +213,12 @@ describe("KonvaRegion mixin", () => {
     });
 
     it("inViewPort returns true when FF_ZOOM_OPTIM is off", () => {
-      mockIsFF.mockReturnValue(false);
       const { region } = createStore();
       expect(region.inViewPort).toBe(true);
     });
 
     it("inViewPort is false when FF_ZOOM_OPTIM is on and no object", () => {
-      mockIsFF.mockReturnValue(true);
+      ff.set({ [FF_ZOOM_OPTIM]: true });
       const RegionWithBbox = types.compose(TestRegion).views((_self) => ({
         get bboxCoords() {
           return { left: 0, top: 0, right: 10, bottom: 10 };
@@ -225,7 +245,7 @@ describe("KonvaRegion mixin", () => {
     });
 
     it("inViewPort is true when FF_ZOOM_OPTIM is on and bbox inside viewport", () => {
-      mockIsFF.mockReturnValue(true);
+      ff.set({ [FF_ZOOM_OPTIM]: true });
       const RegionWithBbox = types.compose(TestRegion).views((_self) => ({
         get bboxCoords() {
           return { left: 5, top: 5, right: 15, bottom: 15 };

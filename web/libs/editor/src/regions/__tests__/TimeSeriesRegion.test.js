@@ -20,6 +20,11 @@ vi.mock("../../tags/object/TimeSeries", () => {
         id: t.identifier,
         timeformat: t.optional(t.string, ""),
       })
+      .views(() => ({
+        findImageEntity() {
+          return null;
+        },
+      }))
       .actions((self) => ({
         parseTime(val) {
           return typeof val === "string" ? Number(val) : val;
@@ -32,20 +37,40 @@ vi.mock("../../tags/object/TimeSeries", () => {
   };
 });
 
-import { TimeSeriesRegionModel } from "../TimeSeriesRegion";
+import { TimeSeriesRegionModel as _TimeSeriesRegionModel } from "../TimeSeriesRegion";
 import { TimeSeriesModel } from "../../tags/object/TimeSeries";
 
-const TestRoot = types.model("TestRoot", {
-  timeseries: types.optional(TimeSeriesModel, { id: "ts1", timeformat: "" }),
-  region: types.optional(TimeSeriesRegionModel, {
-    id: "r1",
-    pid: "p1",
-    object: "ts1",
-    start: 0,
-    end: 100,
-    results: [],
-  }),
-});
+const TimeSeriesRegionModel = types.compose(
+  _TimeSeriesRegionModel,
+  types.model({}).views(() => ({
+    get editable() {
+      return true;
+    },
+  })),
+);
+
+const TestRoot = types
+  .model("TestRoot", {
+    timeseries: types.optional(TimeSeriesModel, { id: "ts1", timeformat: "" }),
+    region: types.optional(TimeSeriesRegionModel, {
+      id: "r1",
+      pid: "p1",
+      object: "ts1",
+      start: 0,
+      end: 100,
+      results: [],
+    }),
+  })
+  .volatile(() => ({
+    annotationStore: {
+      selected: {
+        toNames: new Map(),
+        results: [],
+        regionStore: { isSelected: () => false },
+      },
+      selectedHistory: null,
+    },
+  }));
 
 describe("TimeSeriesRegion", () => {
   describe("TimeSeriesRegionModel", () => {

@@ -11,6 +11,11 @@ vi.mock("../../../tags/object/Audio/model", () => {
       .model("AudioModel", {
         id: types.identifier,
       })
+      .views(() => ({
+        findImageEntity() {
+          return null;
+        },
+      }))
       .volatile(() => ({
         _ws: { duration: 12.5 },
         _wfFrame: null,
@@ -19,14 +24,28 @@ vi.mock("../../../tags/object/Audio/model", () => {
 });
 
 import { AudioRegionModel } from "../AudioRegionModel";
-import { AudioRegionModel as ComposedAudioRegionModel } from "../../AudioRegion";
+import { AudioRegionModel as _ComposedAudioRegionModel } from "../../AudioRegion";
 import { AudioModel } from "../../../tags/object/Audio/model";
+
+const ComposedAudioRegionModel = types.compose(
+  _ComposedAudioRegionModel,
+  types.model({}).views(() => ({
+    get editable() {
+      return true;
+    },
+  })),
+);
 
 function createMockAnnotation(overrides = {}) {
   return {
     deleteRegion: vi.fn(),
     isLinkingMode: false,
     isReadOnly: () => false,
+    regionStore: {
+      isSelected: vi.fn(() => false),
+    },
+    toNames: new Map(),
+    results: [],
     ...overrides,
   };
 }

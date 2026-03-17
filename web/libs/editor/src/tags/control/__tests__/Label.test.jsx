@@ -49,6 +49,7 @@ vi.mock("mobx-state-tree", async () => {
 
 vi.mock("../../../utils/feature-flags", () => ({
   FF_DEV_3391: "FF_DEV_3391",
+  FF_SIMPLE_INIT: "fflag_fix_front_leap_443_select_annotation_once",
   isFF: vi.fn(() => false),
 }));
 
@@ -316,7 +317,8 @@ describe("Label model", () => {
     const labels = label.parent;
     vi.spyOn(labels, "unselectAll");
     label.toggleSelected();
-    expect(setValue).toHaveBeenCalledWith(labels);
+    expect(setValue).toHaveBeenCalled();
+    expect(setValue.mock.calls[0][0]).toBe(labels);
     expect(notifyDrawingFinished).toHaveBeenCalled();
     mockAnnotation.selectedRegions = [];
     mockAnnotation.selectedDrawingRegions = [];
@@ -342,7 +344,8 @@ describe("Label model", () => {
     const unselectAllSpy = vi.spyOn(labels, "unselectAll");
     label.toggleSelected();
     expect(unselectAllSpy).toHaveBeenCalled();
-    expect(setValue).toHaveBeenCalledWith(labels);
+    expect(setValue).toHaveBeenCalled();
+    expect(setValue.mock.calls[0][0]).toBe(labels);
     expect(notifyDrawingFinished).toHaveBeenCalled();
     expect(label.selected).toBe(true);
     unselectAllSpy.mockRestore();

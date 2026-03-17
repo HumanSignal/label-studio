@@ -9,9 +9,15 @@ import React from "react";
 import { render, screen } from "@testing-library/react";
 import { types } from "mobx-state-tree";
 import { Brush, BrushCursorMixin } from "../Brush";
-import { findClosestParent } from "../../utils/utilities";
 
-const mockCreateBrushSizeCircleCursor = vi.fn((val) => `url('cursor-${val}') auto`);
+const { mockCreateBrushSizeCircleCursor, stageContent, mockFindClosestParent } = vi.hoisted(() => {
+  const _stageContent = {};
+  return {
+    mockCreateBrushSizeCircleCursor: vi.fn((val) => `url('cursor-${val}') auto`),
+    stageContent: _stageContent,
+    mockFindClosestParent: vi.fn(() => _stageContent),
+  };
+});
 vi.mock("../../utils/canvas", () => ({
   __esModule: true,
   default: {
@@ -19,21 +25,24 @@ vi.mock("../../utils/canvas", () => ({
   },
 }));
 
-vi.mock("../../utils/feature-flags", () => ({
-  isFF: vi.fn(() => false),
-  FF_SIMPLE_INIT: "fflag_fix_front_leap_443_select_annotation_once",
+vi.mock("../../utils/utilities", () => ({
+  findClosestParent: mockFindClosestParent,
+  clamp: (v, min, max) => Math.max(min, Math.min(max, v)),
+  isDefined: (v) => v !== null && v !== undefined,
+  isValidNumber: (v) => typeof v === "number" && !Number.isNaN(v),
+  debounce: (fn) => fn,
+  throttle: (fn) => fn,
 }));
 
-const stageContent = {};
-vi.mock("../../utils/utilities", async () => {
-  const actual = await vi.importActual("../../utils/utilities");
-  return {
-    ...actual,
-    findClosestParent: vi.fn(() => stageContent),
-  };
-});
+import { mockFF } from "../../../__mocks__/global";
+import { findClosestParent } from "../../utils/utilities";
 
-const MockIcon = () => React.createElement("span", { "data-testid": "brush-icon" });
+const ff = mockFF();
+
+const { MockIcon } = vi.hoisted(() => {
+  const React = require("react");
+  return { MockIcon: () => React.createElement("span", { "data-testid": "brush-icon" }) };
+});
 vi.mock("../../components/Node/Node", () => ({
   NodeViews: {
     BrushRegionModel: {
@@ -103,6 +112,14 @@ function createMockAnnotation(overrides = {}) {
 }
 
 let mockNewArea;
+
+beforeEach(() => {
+  ff.setup();
+});
+
+afterEach(() => {
+  ff.reset();
+});
 
 describe("Brush tool", () => {
   let manager;

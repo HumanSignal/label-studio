@@ -2,6 +2,8 @@ import React from "react";
 import { render, screen, fireEvent } from "@testing-library/react";
 import { Provider } from "mobx-react";
 import { AnnotationButton } from "../AnnotationButton";
+import { isAlive } from "mobx-state-tree";
+import { confirm } from "../../../common/Modal/Modal";
 
 vi.mock("mobx-state-tree", () => ({
   isAlive: vi.fn(() => true),
@@ -79,13 +81,11 @@ function createEntity(overrides: Record<string, unknown> = {}) {
 describe("AnnotationButton", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    const { isAlive } = vi.requireMock("mobx-state-tree");
-    (isAlive as vi.Mock).mockReturnValue(true);
+    (isAlive as any).mockReturnValue(true);
   });
 
   it("renders null when entity is not alive", () => {
-    const { isAlive } = vi.requireMock("mobx-state-tree");
-    (isAlive as vi.Mock).mockReturnValue(false);
+    (isAlive as any).mockReturnValue(false);
 
     const entity = createEntity();
     const { container } = render(
@@ -427,7 +427,7 @@ describe("AnnotationButton", () => {
   });
 
   it("opens delete confirmation when Delete Annotation is clicked", () => {
-    const confirm = vi.requireMock("../../../common/Modal/Modal").confirm;
+    (confirm as any).mockClear();
     const entity = createEntity();
     const { container } = render(
       <Provider store={defaultStore}>

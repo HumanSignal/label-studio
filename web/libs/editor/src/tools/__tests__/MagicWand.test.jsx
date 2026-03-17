@@ -14,7 +14,7 @@ import { MagicWand } from "../MagicWand";
 
 vi.mock("chroma-js", () => {
   const hex = (c) => (c && typeof c === "string" ? c : "#000000");
-  return (c) => ({ hex: () => hex(c) });
+  return { default: (c) => ({ hex: () => hex(c) }) };
 });
 
 const mockDrawMask = vi.fn(() => ({ data: new Uint8Array(0) }));
@@ -41,6 +41,7 @@ vi.mock("../../core/Helpers", () => ({
 }));
 vi.mock("../../utils/feature-flags", () => ({
   isFF: vi.fn(() => false),
+  FF_DEV_3391: "fflag_fix_front_dev_3391_interactive_view_all",
   FF_SIMPLE_INIT: "fflag_fix_front_leap_443_select_annotation_once",
 }));
 
@@ -63,17 +64,21 @@ if (typeof HTMLImageElement !== "undefined" && !HTMLImageElement.prototype.decod
   HTMLImageElement.prototype.decode = () => Promise.resolve();
 }
 
-const MockIcon = () => React.createElement("span", { "data-testid": "magic-wand-icon" });
+const { MockIcon, MockTool } = vi.hoisted(() => {
+  const React = require("react");
+  return {
+    MockIcon: () => React.createElement("span", { "data-testid": "magic-wand-icon" }),
+    MockTool: ({ label, ariaLabel, onClick }) =>
+      React.createElement(
+        "button",
+        { type: "button", "data-testid": "magic-wand-tool", "aria-label": ariaLabel, onClick },
+        label,
+      ),
+  };
+});
 vi.mock("@humansignal/icons", () => ({
   IconMagicWandTool: MockIcon,
 }));
-
-const MockTool = ({ label, ariaLabel, onClick }) =>
-  React.createElement(
-    "button",
-    { type: "button", "data-testid": "magic-wand-tool", "aria-label": ariaLabel, onClick },
-    label,
-  );
 vi.mock("../../components/Toolbar/Tool", () => ({ Tool: MockTool }));
 
 function createMockManager() {

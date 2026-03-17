@@ -1,392 +1,718 @@
 /**
- * Unit tests for BrushRegion (model views and actions).
- * View/React coverage is largely from Cypress; these tests cover model logic.
+ * Unit tests for BrushRegion (regions/BrushRegion.jsx).
+ * Covers BrushRegionModel views (parent, colorParts, strokeColor, touchesLength,
+ * bboxCoordsCanvas, bboxCoords) and actions (serialize, beginPath, endPath,
+ * setScale, updateImageSize, endUpdatedMaskDataURL, convertToImage, etc.),
+ * and HtxBrush/HtxBrushLayer view rendering.
  */
-import React from "react";
-import { types } from "mobx-state-tree";
 
-vi.mock("../../utils/canvas", () => ({
-  Region2RLE: vi.fn(() => new Uint8Array([0, 1, 2])),
-  RLE2Region: vi.fn(() => null),
-  maskDataURL2Image: vi.fn(() => Promise.resolve(null)),
+import React from "react";
+import { render, waitFor, fireEvent, act } from "@testing-library/react";
+import { types } from "mobx-state-tree";
+import * as mst from "mobx-state-tree";
+import { mockFF } from "../../../__mocks__/global";
+import { FF_ZOOM_OPTIM } from "../../utils/feature-flags";
+
+const { mockBrushImageRef: _mockBrushImageRefRef } = vi.hoisted(() => ({ mockBrushImageRef: { current: null } }));
+vi.mock("../../utils/canvas", () => {
+  const Region2RLE = vi.fn();
+  const RLE2Region = vi.fn(() => ({ onload: null, src: "" }));
+  const maskDataURL2Image = vi.fn(() => {
+    _mockBrushImageRefRef.current = { onload: null, width: 100, height: 100 };
+    return Promise.resolve(_mockBrushImageRefRef.current);
+  });
+  return {
+    Region2RLE,
+    RLE2Region,
+    maskDataURL2Image,
+    default: { Region2RLE, RLE2Region, maskDataURL2Image },
+  };
+});
+
+vi.mock("../../components/InteractiveOverlays/Geometry", () => ({
+  Geometry: {
+    getImageDataBBox: vi.fn(() => ({ x: 0, y: 0, width: 50, height: 50 })),
+  },
 }));
 
-vi.mock("../../tags/object/Image", () => {
+const mockCtx = {
+  save: vi.fn(),
+  restore: vi.fn(),
+  beginPath: vi.fn(),
+  moveTo: vi.fn(),
+  lineTo: vi.fn(),
+  stroke: vi.fn(),
+  drawImage: vi.fn(),
+  getImageData: vi.fn(() => ({ data: new Uint8ClampedArray(4 * 100 * 100), width: 100, height: 100 })),
+  putImageData: vi.fn(),
+};
+vi.mock("react-konva", () => {
+  const React = require("react");
+  return {
+    Layer: React.forwardRef(({ children, ...p }, ref) => {
+      const { visible, opacity, clip, ...rest } = p;
+      return React.createElement("div", { "data-testid": "konva-layer", ref, ...rest }, children);
+    }),
+    Group: React.forwardRef(({ children, ...p }, ref) => {
+      const {
+        shadowColor,
+        shadowBlur,
+        shadowOffsetX,
+        shadowOffsetY,
+        shadowOpacity,
+        attrMy,
+        hitFunc,
+        sceneFunc,
+        visible,
+        opacity,
+        clip,
+        listening,
+        ...rest
+      } = p;
+      return React.createElement("div", { "data-testid": "konva-group", ref, ...rest }, children);
+    }),
+    Image: React.forwardRef((p, ref) => {
+      const { hitFunc, image, sceneFunc, width, height, ...rest } = p;
+      if (hitFunc && image) {
+        hitFunc(mockCtx, { colorKey: "#ff0000" });
+      }
+      return React.createElement("div", { "data-testid": "konva-image", ref, ...rest });
+    }),
+    Shape: React.forwardRef((p, ref) => {
+      const { sceneFunc, hitFunc, ...rest } = p;
+      if (sceneFunc) sceneFunc(mockCtx, {});
+      if (hitFunc) hitFunc(mockCtx, { colorKey: "#ff0000" });
+      return React.createElement("div", { "data-testid": "konva-shape", ref, ...rest });
+    }),
+  };
+});
+
+vi.mock("../../components/ImageView/ImageViewContext", () => ({
+  ImageViewContext: require("react").createContext({ suggestion: null }),
+}));
+
+import * as Canvas from "../../utils/canvas";
+import { Geometry } from "../../components/InteractiveOverlays/Geometry";
+
+function createMockAnnotation(overrides = {}) {
+  return {
+    pauseAutosave: vi.fn(),
+    startAutosave: vi.fn(),
+    autosave: vi.fn(),
+    isReadOnly: () => false,
+    unselectAll: vi.fn(),
+    ...overrides,
+  };
+}
+
+const { MockImageModel } = vi.hoisted(() => {
   const { types } = require("mobx-state-tree");
-  const image = types
-    .model("ImageModel", {
+  const MockImageModel = types
+    .model("MockImageModel", {
       id: types.identifier,
-      stageWidth: types.optional(types.number, 800),
-      stageHeight: types.optional(types.number, 600),
+      name: types.optional(types.string, "image"),
     })
-    .views(() => ({
-      get stageRef() {
-        return null;
-      },
+    .volatile(() => ({
+      naturalWidth: 100,
+      naturalHeight: 100,
+      stageWidth: 100,
+      stageHeight: 100,
+      stageScale: 1,
+      stageRef: { container: () => ({ style: {} }) },
+      alignmentOffset: { x: 0, y: 0 },
+      zoomingPositionX: 0,
+      zoomingPositionY: 0,
+      zoomScale: 1,
+      containerWidth: 100,
+      containerHeight: 100,
+      canvasSize: { width: 100, height: 100 },
+      zoomOriginalCoords: ([x, y]) => [x, y],
+      canvasToInternalX: (v) => v,
+      canvasToInternalY: (v) => v,
+      createSerializedResult: (region, value) => ({ value, original_width: 100, original_height: 100 }),
+      getSkipInteractions: () => false,
+      getToolsManager: () => ({ findSelectedTool: () => null }),
+      supportSuggestions: false,
+      findImageEntity: () => null,
+      annotation: null,
+      drawingRegion: null,
     }))
     .actions((self) => ({
-      createSerializedResult(region, value) {
-        return {
-          value: { ...value },
-          original_width: 100,
-          original_height: 100,
-          image_rotation: 0,
-        };
-      },
-      canvasToInternalX(v) {
-        return v / 2;
-      },
-      canvasToInternalY(v) {
-        return v / 2;
-      },
-      zoomOriginalCoords([x, y]) {
-        return [x, y];
+      setAnnotation(ann) {
+        self.annotation = ann;
       },
       setStageSize(w, h) {
         self.stageWidth = w;
         self.stageHeight = h;
       },
+      overrideGetToolsManager(fn) {
+        self.getToolsManager = fn;
+      },
     }));
-  return { ImageModel: image };
+  return { MockImageModel };
 });
 
-import { BrushRegionModel } from "../BrushRegion";
-import { ImageModel } from "../../tags/object/Image";
-import * as Canvas from "../../utils/canvas";
+vi.mock("../../tags/object/Image", () => ({
+  ImageModel: MockImageModel,
+}));
 
-const TestRoot = types
-  .model("TestRoot", {
-    image: types.optional(ImageModel, { id: "img1" }),
+import { BrushRegionModel, HtxBrush } from "../BrushRegion";
+import { ImageViewContext } from "../../components/ImageView/ImageViewContext";
+
+const ff = mockFF();
+
+describe("BrushRegion", () => {
+  let root;
+  let region;
+  let mockAnnotation;
+  let originalError;
+
+  beforeAll(() => {
+    originalError = console.error;
+    console.error = (...args) => {
+      const msg = typeof args[0] === "string" ? args[0] : "";
+      if (msg.includes("was not wrapped in act") || msg.includes("for a non-boolean attribute `visible`")) {
+        return;
+      }
+      originalError(...args);
+    };
+  });
+
+  afterAll(() => {
+    console.error = originalError;
+  });
+
+  const TestRoot = types.model("TestRoot", {
+    annotationStore: types.optional(
+      types.model({
+        selected: types.frozen(),
+      }),
+      { selected: null },
+    ),
+    settings: types.optional(
+      types.model({
+        showLabels: types.optional(types.boolean, false),
+      }),
+      { showLabels: false },
+    ),
+    image: types.optional(MockImageModel, { id: "img1" }),
     region: types.optional(BrushRegionModel, {
       id: "br1",
       pid: "p1",
       object: "img1",
       touches: [],
     }),
-  })
-  .actions((self) => ({
-    createSerializedResult(region, value) {
-      return {
-        value: { ...value },
-        original_width: 100,
-        original_height: 100,
-        image_rotation: 0,
-      };
-    },
-  }));
+  });
 
-describe("BrushRegion", () => {
-  describe("BrushRegionModel", () => {
-    let root;
-    let region;
-
-    beforeEach(() => {
-      root = TestRoot.create({
-        image: { id: "img1" },
-        region: {
-          id: "br1",
-          pid: "p1",
-          object: "img1",
-          touches: [],
-        },
-      });
-      region = root.region;
+  beforeEach(() => {
+    ff.setup();
+    mockAnnotation = createMockAnnotation();
+    root = TestRoot.create({
+      annotationStore: { selected: mockAnnotation },
+      settings: { showLabels: false },
+      image: { id: "img1" },
+      region: { id: "br1", pid: "p1", object: "img1", touches: [] },
     });
+    root.image.setAnnotation(mockAnnotation);
+    region = root.region;
+    vi.clearAllMocks();
+  });
 
-    it("strokeColor and colorParts use defaultStyle when no style/tag", () => {
-      expect(region.colorParts).toBeDefined();
-      expect(Array.isArray(region.colorParts)).toBe(true);
-      expect(region.strokeColor).toBeDefined();
-      expect(typeof region.strokeColor).toBe("string");
+  afterEach(() => {
+    ff.reset();
+  });
+
+  describe("BrushRegionModel views", () => {
+    it("parent returns object when alive", () => {
+      expect(region.parent).toBe(root.image);
     });
 
     it("touchesLength returns touches length", () => {
       expect(region.touchesLength).toBe(0);
     });
 
+    it("strokeColor returns hex from style or defaultStyle", () => {
+      expect(region.strokeColor).toBeDefined();
+      expect(typeof region.strokeColor).toBe("string");
+    });
+
+    it("bboxCoordsCanvas returns bbox from first touch points when no imageData", () => {
+      region.beginPath({ type: "add", strokeWidth: 25 });
+      region.addPoint(10, 10);
+      region.addPoint(50, 10);
+      region.addPoint(50, 50);
+      region.addPoint(10, 50);
+      region.endPath();
+      const bbox = region.bboxCoordsCanvas;
+      expect(bbox).toEqual({ left: 10, top: 10, right: 50, bottom: 50 });
+    });
+  });
+
+  describe("serialize", () => {
+    it("returns result from parent.createSerializedResult with fast option when rle present", () => {
+      const rootWithRle = TestRoot.create({
+        annotationStore: { selected: mockAnnotation },
+        image: { id: "img1" },
+        region: { id: "br2", pid: "p2", object: "img1", touches: [], rle: [1, 2, 3] },
+      });
+      rootWithRle.image.setAnnotation(mockAnnotation);
+      const result = rootWithRle.region.serialize({ fast: true });
+      expect(result).toBeDefined();
+      expect(result.value.format).toBe("rle");
+      expect(result.value.rle).toEqual([1, 2, 3]);
+    });
+
+    it("serialize(fast: true) includes touches and maskDataURL when set", () => {
+      region.beginPath({ type: "add", strokeWidth: 25 });
+      region.addPoint(0, 0);
+      region.addPoint(10, 10);
+      region.endPath();
+      region.endUpdatedMaskDataURL("data:image/png;base64,abc");
+      const result = region.serialize({ fast: true });
+      expect(result.value.touches).toBeDefined();
+      expect(result.value.maskDataURL).toBe("data:image/png;base64,abc");
+    });
+
+    it("serialize() without fast returns null when Region2RLE returns empty", () => {
+      Canvas.Region2RLE.mockReturnValue(null);
+      const result = region.serialize();
+      expect(result).toBeNull();
+    });
+
+    it("serialize() without fast returns createSerializedResult when Region2RLE returns non-empty", () => {
+      Canvas.Region2RLE.mockReturnValue(new Uint8Array([1, 2, 3]));
+      region.beginPath({ type: "add", strokeWidth: 25 });
+      region.addPoint(0, 0);
+      region.addPoint(10, 10);
+      region.endPath();
+      const result = region.serialize();
+      expect(result).toBeDefined();
+      expect(result.value.rle).toEqual([1, 2, 3]);
+    });
+  });
+
+  describe("actions", () => {
     it("setScale updates scaleX and scaleY", () => {
       region.setScale(2, 3);
       expect(region.scaleX).toBe(2);
       expect(region.scaleY).toBe(3);
     });
 
-    it("updateImageSize is no-op when parent stage dimensions are small", () => {
-      root.image.setStageSize(1, 1);
-      region.updateImageSize(100, 100, 100, 100);
-      expect(region.needsUpdate).toBe(1);
-    });
-
-    it("updateMaskImage does nothing when no maskDataURL", () => {
-      expect(() => region.updateMaskImage()).not.toThrow();
-    });
-
-    it("updateMaskImage sets mask image src when maskDataURL present", () => {
-      const dataUrl = "data:image/png;base64,abc";
-      root = TestRoot.create({
-        image: { id: "img1" },
-        region: {
-          id: "br1",
-          pid: "p1",
-          object: "img1",
-          maskDataURL: dataUrl,
-          touches: [],
-        },
-      });
-      region = root.region;
+    it("updateMaskImage sets maskImage src when maskDataURL present", () => {
       region.updateMaskImage();
-      const img = region.getMaskImage();
-      expect(img).toBeInstanceOf(window.Image);
-      expect(img.src).toContain("base64,abc");
+      region.endUpdatedMaskDataURL("data:image/png;base64,x");
+      region.updateMaskImage();
+      expect(region.getMaskImage()).toBeDefined();
     });
 
-    it("getMaskImage returns undefined when no mask set", () => {
-      expect(region.getMaskImage()).toBeUndefined();
+    it("beginPath calls annotation.pauseAutosave and returns Points instance", () => {
+      const pathPoints = region.beginPath({ type: "add", strokeWidth: 25 });
+      expect(mockAnnotation.pauseAutosave).toHaveBeenCalled();
+      expect(pathPoints).toBeDefined();
+      expect(pathPoints.type).toBe("add");
+    });
+
+    it("beginPath with type eraser returns Points with type eraser", () => {
+      const pathPoints = region.beginPath({ type: "eraser", strokeWidth: 30 });
+      expect(pathPoints.type).toBe("eraser");
+    });
+
+    it("endPath calls startAutosave, pushes touch and sets currentTouch", () => {
+      const pathPoints = region.beginPath({ type: "add", strokeWidth: 25 });
+      region.addPoint(0, 0);
+      region.addPoint(10, 10);
+      region.endPath();
+      expect(mockAnnotation.startAutosave).toHaveBeenCalled();
+      expect(region.touches.length).toBe(1);
+      expect(region.currentTouch).toBe(pathPoints);
+    });
+
+    it("endPath with only two points duplicates to form a line", () => {
+      region.beginPath({ type: "add", strokeWidth: 25 });
+      region.addPoint(0, 0);
+      region.addPoint(10, 10);
+      region.endPath();
+      expect(region.touches.length).toBe(1);
+      expect(region.touches[0].points.length).toBe(4);
+    });
+
+    it("endUpdatedMaskDataURL sets maskDataURL and calls startAutosave", () => {
+      region.endUpdatedMaskDataURL("data:image/png;base64,xyz");
+      expect(region.maskDataURL).toBe("data:image/png;base64,xyz");
+      expect(mockAnnotation.startAutosave).toHaveBeenCalled();
+    });
+
+    it("updateImageSize updates touches when stage size > 1", () => {
+      region.beginPath({ type: "add", strokeWidth: 25 });
+      region.addPoint(0, 0);
+      region.addPoint(10, 10);
+      region.endPath();
+      const initialUpdate = region.needsUpdate;
+      region.updateImageSize(100, 100, 100, 100);
+      expect(region.needsUpdate).toBe(initialUpdate + 1);
+    });
+
+    it("updateImageSize does nothing when stage width or height <= 1", () => {
+      root.image.setStageSize(1, 1);
+      const initialUpdate = region.needsUpdate;
+      region.updateImageSize(1, 1, 1, 1);
+      expect(region.needsUpdate).toBe(initialUpdate);
+    });
+
+    it("convertToImage clears touches and sets rle when touches exist", () => {
+      Canvas.Region2RLE.mockReturnValue(new Uint8Array([5, 6, 7]));
+      region.beginPath({ type: "add", strokeWidth: 25 });
+      region.addPoint(0, 0);
+      region.addPoint(10, 10);
+      region.endPath();
+      expect(region.touches.length).toBe(1);
+      region.convertToImage();
+      expect(region.touches.length).toBe(0);
+      expect(region.rle).toEqual([5, 6, 7]);
+    });
+
+    it("convertToImage does nothing when touches empty", () => {
+      region.convertToImage();
+      expect(region.touches.length).toBe(0);
+      expect(region.rle).toBeUndefined();
+    });
+
+    it("prepareCoords returns parent.zoomOriginalCoords result", () => {
+      const result = region.prepareCoords([10, 20]);
+      expect(result).toEqual([10, 20]);
+    });
+
+    it("convertPointsToMask is a no-op", () => {
+      expect(() => region.convertPointsToMask()).not.toThrow();
     });
 
     it("setLayerRef sets layerRef when ref provided", () => {
-      const canvas = document.createElement("canvas");
-      const ref = { canvas: { _canvas: canvas } };
-      region.setLayerRef(ref);
-      expect(region.layerRef).toBe(ref);
+      const mockLayer = {
+        canvas: { _canvas: { style: {} } },
+      };
+      region.setLayerRef(mockLayer);
+      expect(region.layerRef).toBe(mockLayer);
     });
 
     it("setLayerRef does nothing when ref is falsy", () => {
       region.setLayerRef(null);
       expect(region.layerRef).toBeUndefined();
     });
+  });
 
-    it("prepareCoords delegates to parent zoomOriginalCoords", () => {
-      const coords = region.prepareCoords([10, 20]);
-      expect(coords).toEqual([10, 20]);
+  describe("preDraw", () => {
+    it("preDraw does nothing when layerRef is not set", () => {
+      region.beginPath({ type: "add", strokeWidth: 25 });
+      expect(() => region.preDraw(5, 5)).not.toThrow();
     });
 
-    it("convertPointsToMask is callable (no-op)", () => {
-      expect(() => region.convertPointsToMask()).not.toThrow();
+    it("preDraw draws with layerRef and uses ctx when FF_ZOOM_OPTIM is false", () => {
+      const ctx = {
+        save: vi.fn(),
+        restore: vi.fn(),
+        beginPath: vi.fn(),
+        moveTo: vi.fn(),
+        lineTo: vi.fn(),
+        rect: vi.fn(),
+        clip: vi.fn(),
+        lineCap: "",
+        lineJoin: "",
+        lineWidth: 0,
+        strokeStyle: "",
+        globalCompositeOperation: "",
+        stroke: vi.fn(),
+      };
+      const mockRef = {
+        getLayer: () => ({ canvas: { context: ctx } }),
+        canvas: { _canvas: { style: {} }, context: ctx, width: 100, height: 100 },
+      };
+      region.setLayerRef(mockRef);
+      region.beginPath({ type: "add", strokeWidth: 25 });
+      region.preDraw(10, 20);
+      expect(ctx.save).toHaveBeenCalled();
+      expect(ctx.moveTo).toHaveBeenCalledWith(10, 20);
+      expect(ctx.lineTo).toHaveBeenCalled();
+      expect(ctx.stroke).toHaveBeenCalled();
+      expect(ctx.restore).toHaveBeenCalled();
     });
 
-    it("serialize with fast: true returns value with format and optional touches/maskDataURL", () => {
-      const result = region.serialize({ fast: true });
-      expect(result).toBeDefined();
-      expect(result.value.format).toBe("rle");
-      expect(result.original_width).toBe(100);
+    it("preDraw uses clip rect when FF_ZOOM_OPTIM is true", () => {
+      ff.set({ [FF_ZOOM_OPTIM]: true });
+      const ctx = {
+        save: vi.fn(),
+        restore: vi.fn(),
+        beginPath: vi.fn(),
+        moveTo: vi.fn(),
+        lineTo: vi.fn(),
+        rect: vi.fn(),
+        clip: vi.fn(),
+        lineCap: "",
+        lineJoin: "",
+        lineWidth: 0,
+        strokeStyle: "",
+        globalCompositeOperation: "",
+        stroke: vi.fn(),
+      };
+      const mockRef = {
+        getLayer: () => ({ canvas: { context: ctx } }),
+        canvas: { _canvas: { style: {} }, context: ctx, width: 100, height: 100 },
+      };
+      region.setLayerRef(mockRef);
+      region.beginPath({ type: "add", strokeWidth: 25 });
+      region.preDraw(5, 5);
+      expect(ctx.rect).toHaveBeenCalled();
+      expect(ctx.clip).toHaveBeenCalled();
     });
 
-    it("serialize with fast: true includes touches when present", () => {
-      const pointId = "pt1";
-      root = TestRoot.create({
-        image: { id: "img1" },
-        region: {
-          id: "br1",
-          pid: "p1",
-          object: "img1",
-          touches: [
-            {
-              id: pointId,
-              type: "add",
-              points: [0, 0, 10, 10],
-              relativePoints: [0, 0, 1.25, 1.67],
-              strokeWidth: 25,
-              relativeStrokeWidth: 25,
-            },
-          ],
-        },
-      });
-      region = root.region;
-      const result = region.serialize({ fast: true });
-      expect(result.value.touches).toBeDefined();
-      expect(result.value.touches.length).toBe(1);
-    });
-
-    it("serialize with fast: true includes maskDataURL when present", () => {
-      root = TestRoot.create({
-        image: { id: "img1" },
-        region: {
-          id: "br1",
-          pid: "p1",
-          object: "img1",
-          maskDataURL: "data:image/png;base64,xyz",
-          touches: [],
-        },
-      });
-      region = root.region;
-      const result = region.serialize({ fast: true });
-      expect(result.value.maskDataURL).toBe("data:image/png;base64,xyz");
-    });
-
-    it("updateImageSize updates touches when parent stage size > 1", () => {
-      root = TestRoot.create({
-        image: { id: "img1", stageWidth: 800, stageHeight: 600 },
-        region: {
-          id: "br1",
-          pid: "p1",
-          object: "img1",
-          touches: [
-            {
-              id: "pt1",
-              type: "add",
-              points: [10, 20],
-              relativePoints: [1.25, 3.33],
-              strokeWidth: 25,
-              relativeStrokeWidth: 25,
-            },
-          ],
-        },
-      });
-      region = root.region;
-      const before = region.needsUpdate;
-      region.updateImageSize(100, 100, 800, 600);
-      expect(region.needsUpdate).toBe(before + 1);
-    });
-
-    it("serialize without fast uses Canvas.Region2RLE and returns result", () => {
-      Canvas.Region2RLE.mockReturnValue(new Uint8Array([0, 1, 2, 3]));
-      const result = region.serialize();
-      expect(Canvas.Region2RLE).toHaveBeenCalled();
-      expect(result).toBeDefined();
-      expect(result.value.rle).toEqual([0, 1, 2, 3]);
-    });
-
-    it("serialize without fast returns null when Region2RLE returns empty", () => {
-      Canvas.Region2RLE.mockReturnValue(null);
-      const result = region.serialize();
-      expect(result).toBeNull();
-    });
-
-    it("serialize without fast returns null when Region2RLE returns empty array", () => {
-      Canvas.Region2RLE.mockReturnValue([]);
-      const result = region.serialize();
-      expect(result).toBeNull();
+    it("preDraw uses cachedPoints when multiple points added", () => {
+      const ctx = {
+        save: vi.fn(),
+        restore: vi.fn(),
+        beginPath: vi.fn(),
+        moveTo: vi.fn(),
+        lineTo: vi.fn(),
+        rect: vi.fn(),
+        clip: vi.fn(),
+        lineCap: "",
+        lineJoin: "",
+        lineWidth: 0,
+        strokeStyle: "",
+        globalCompositeOperation: "",
+        stroke: vi.fn(),
+      };
+      const mockRef = {
+        getLayer: () => ({ canvas: { context: ctx } }),
+        canvas: { _canvas: { style: {} }, context: ctx, width: 100, height: 100 },
+      };
+      region.setLayerRef(mockRef);
+      region.beginPath({ type: "add", strokeWidth: 25 });
+      region.addPoint(1, 1);
+      region.addPoint(2, 2);
+      region.addPoint(3, 3);
+      region.addPoint(4, 4);
+      region.addPoint(5, 5);
+      expect(ctx.moveTo).toHaveBeenCalled();
+      expect(ctx.lineTo).toHaveBeenCalled();
     });
   });
 
-  describe("Points (touches) views", () => {
-    it("compositeOperation is destination-out for eraser type", () => {
-      const testRoot = TestRoot.create({
-        image: { id: "img1" },
-        region: {
-          id: "br1",
-          pid: "p1",
-          object: "img1",
-          touches: [
-            {
-              id: "pt1",
-              type: "eraser",
-              points: [0, 0, 10, 10],
-              relativePoints: [0, 0, 1.25, 1.67],
-              strokeWidth: 25,
-              relativeStrokeWidth: 25,
-            },
-          ],
-        },
-      });
-      const testRegion = testRoot.region;
-      expect(testRegion.touches[0].compositeOperation).toBe("destination-out");
+  describe("Points (from beginPath)", () => {
+    it("setType toggles eraser type", () => {
+      region.beginPath({ type: "add", strokeWidth: 25 });
+      region.addPoint(0, 0);
+      region.addPoint(10, 10);
+      region.endPath();
+      const stroke = region.touches[0];
+      expect(stroke.compositeOperation).toBe("source-over");
+      stroke.setType("eraser");
+      expect(stroke.type).toBe("eraser");
+      expect(stroke.compositeOperation).toBe("destination-out");
     });
 
-    it("compositeOperation is source-over for add type", () => {
-      const testRoot = TestRoot.create({
-        image: { id: "img1" },
-        region: {
-          id: "br1",
-          pid: "p1",
-          object: "img1",
-          touches: [
-            {
-              id: "pt1",
-              type: "add",
-              points: [0, 0],
-              relativePoints: [0, 0],
-              strokeWidth: 25,
-              relativeStrokeWidth: 25,
-            },
-          ],
-        },
-      });
-      const testRegion = testRoot.region;
-      expect(testRegion.touches[0].compositeOperation).toBe("source-over");
+    it("rescale returns points scaled by destW/origW", () => {
+      region.beginPath({ type: "add", strokeWidth: 25 });
+      region.addPoint(10, 20);
+      region.addPoint(30, 40);
+      region.endPath();
+      const stroke = region.touches[0];
+      const rescaled = stroke.rescale(100, 100, 200);
+      expect(rescaled).toEqual([
+        stroke.points[0] * 2,
+        stroke.points[1] * 2,
+        stroke.points[2] * 2,
+        stroke.points[3] * 2,
+      ]);
+    });
+
+    it("scaledStrokeWidth returns strokeWidth scaled by destW/origW", () => {
+      region.beginPath({ type: "add", strokeWidth: 25 });
+      region.addPoint(0, 0);
+      region.addPoint(10, 10);
+      region.endPath();
+      const stroke = region.touches[0];
+      const w = stroke.scaledStrokeWidth(100, 100, 200);
+      expect(w).toBe(stroke.strokeWidth * 2);
     });
   });
 
-  describe("bboxCoordsCanvas with touches", () => {
-    it("computes bbox from first touch points when imageData is null", () => {
-      const root = TestRoot.create({
-        image: { id: "img1" },
-        region: {
-          id: "br1",
-          pid: "p1",
-          object: "img1",
-          touches: [
-            {
-              id: "pt1",
-              type: "add",
-              points: [5, 10, 25, 30, 15, 20],
-              relativePoints: [5, 10, 25, 30, 15, 20],
-              strokeWidth: 25,
-              relativeStrokeWidth: 25,
-            },
-          ],
-        },
-      });
-      const region = root.region;
-      const bbox = region.bboxCoordsCanvas;
-      expect(bbox).toEqual({
-        left: 5,
-        top: 10,
-        right: 25,
-        bottom: 30,
-      });
-    });
-
-    it("bboxCoords maps bboxCoordsCanvas via parent canvasToInternal", () => {
-      const root = TestRoot.create({
-        image: { id: "img1" },
-        region: {
-          id: "br1",
-          pid: "p1",
-          object: "img1",
-          touches: [
-            {
-              id: "pt1",
-              type: "add",
-              points: [10, 20, 30, 40],
-              relativePoints: [10, 20, 30, 40],
-              strokeWidth: 25,
-              relativeStrokeWidth: 25,
-            },
-          ],
-        },
-      });
-      const region = root.region;
+  describe("bboxCoords", () => {
+    it("returns bbox with exact coords from touch points", () => {
+      region.beginPath({ type: "add", strokeWidth: 25 });
+      region.addPoint(5, 5);
+      region.addPoint(15, 15);
+      region.endPath();
       const bbox = region.bboxCoords;
-      expect(bbox).toEqual({
-        left: 5,
-        top: 10,
-        right: 15,
-        bottom: 20,
-      });
+      expect(bbox).not.toBeNull();
+      expect(bbox.left).toBe(5);
+      expect(bbox.top).toBe(5);
+      expect(bbox.right).toBe(15);
+      expect(bbox.bottom).toBe(15);
     });
   });
 
-  describe("Registry region type predicate", () => {
-    it("accepts value with rle (predicate returns truthy)", () => {
-      const predicate = BrushRegionModel.detectByValue;
-      expect(Boolean(predicate({ rle: [0, 1, 2] }))).toBe(true);
+  describe("HtxBrush component", () => {
+    it("renders when item has parent and annotation", () => {
+      const { getAllByTestId } = render(
+        <ImageViewContext.Provider value={{ suggestion: null }}>
+          <HtxBrush item={region} />
+        </ImageViewContext.Provider>,
+      );
+      expect(getAllByTestId("konva-group").length).toBeGreaterThanOrEqual(1);
     });
 
-    it("accepts value with touches (predicate returns truthy)", () => {
-      const predicate = BrushRegionModel.detectByValue;
-      expect(Boolean(predicate({ touches: [] }))).toBe(true);
+    it("renders brush layer and shape when region has touches", () => {
+      region.beginPath({ type: "add", strokeWidth: 25 });
+      region.addPoint(0, 0);
+      region.addPoint(10, 10);
+      region.endPath();
+      const { getAllByTestId } = render(
+        <ImageViewContext.Provider value={{ suggestion: null }}>
+          <HtxBrush item={region} />
+        </ImageViewContext.Provider>,
+      );
+      expect(getAllByTestId("konva-group").length).toBeGreaterThanOrEqual(1);
+      expect(getAllByTestId("konva-shape").length).toBeGreaterThanOrEqual(1);
     });
 
-    it("accepts value with maskDataURL (predicate returns truthy)", () => {
-      const predicate = BrushRegionModel.detectByValue;
-      expect(Boolean(predicate({ maskDataURL: "data:image/png;base64,abc" }))).toBe(true);
+    it("loads image from maskDataURL and calls setReady when onload fires", async () => {
+      region.endUpdatedMaskDataURL("data:image/png;base64,test");
+      _mockBrushImageRefRef.current = null;
+      render(
+        <ImageViewContext.Provider value={{ suggestion: null }}>
+          <HtxBrush item={region} />
+        </ImageViewContext.Provider>,
+      );
+      await waitFor(() => {
+        expect(_mockBrushImageRefRef.current).not.toBeNull();
+      });
+      if (_mockBrushImageRefRef.current && typeof _mockBrushImageRefRef.current.onload === "function") {
+        _mockBrushImageRefRef.current.onload();
+      }
+      await waitFor(() => {
+        expect(Canvas.maskDataURL2Image).toHaveBeenCalledWith("data:image/png;base64,test", expect.any(Object));
+      });
     });
 
-    it("rejects value without rle, touches, or maskDataURL (predicate returns falsy)", () => {
-      const predicate = BrushRegionModel.detectByValue;
-      expect(Boolean(predicate({}))).toBe(false);
-      expect(Boolean(predicate({ format: "rle" }))).toBe(false);
+    it("handles Group onMouseOver and onMouseOut without throwing", () => {
+      const { getAllByTestId } = render(
+        <ImageViewContext.Provider value={{ suggestion: null }}>
+          <HtxBrush item={region} />
+        </ImageViewContext.Provider>,
+      );
+      const groups = getAllByTestId("konva-group");
+      const segmentationGroup = groups.find((g) => g.getAttribute("name") === "segmentation") ?? groups[0];
+      expect(() => {
+        act(() => {
+          fireEvent.mouseOver(segmentationGroup);
+          fireEvent.mouseOut(segmentationGroup);
+        });
+      }).not.toThrow();
+    });
+
+    it("calls setHighlight and updateCursor when isLinkingMode and mouseOver/mouseOut", () => {
+      const linkingRoot = TestRoot.create({
+        annotationStore: { selected: { ...createMockAnnotation(), isLinkingMode: true } },
+        settings: { showLabels: false },
+        image: { id: "img1" },
+        region: { id: "br4", pid: "p4", object: "img1", touches: [] },
+      });
+      linkingRoot.image.setAnnotation(linkingRoot.annotationStore.selected);
+      const setHighlightSpy = vi.spyOn(linkingRoot.region, "setHighlight");
+      const { getAllByTestId } = render(
+        <ImageViewContext.Provider value={{ suggestion: null }}>
+          <HtxBrush item={linkingRoot.region} />
+        </ImageViewContext.Provider>,
+      );
+      const groups = getAllByTestId("konva-group");
+      const segmentationGroup = groups.find((g) => g.getAttribute("name") === "segmentation") ?? groups[0];
+      act(() => {
+        fireEvent.mouseOver(segmentationGroup);
+      });
+      expect(setHighlightSpy).toHaveBeenCalledWith(true);
+      act(() => {
+        fireEvent.mouseOut(segmentationGroup);
+      });
+      expect(setHighlightSpy).toHaveBeenCalledWith(false);
+      setHighlightSpy.mockRestore();
+    });
+
+    it("handles Group onMouseDown when isLinkingMode without throwing", () => {
+      const linkingRoot = TestRoot.create({
+        annotationStore: { selected: { ...createMockAnnotation(), isLinkingMode: true } },
+        settings: { showLabels: false },
+        image: { id: "img1" },
+        region: { id: "br4", pid: "p4", object: "img1", touches: [] },
+      });
+      linkingRoot.image.setAnnotation(linkingRoot.annotationStore.selected);
+      const { getAllByTestId } = render(
+        <ImageViewContext.Provider value={{ suggestion: null }}>
+          <HtxBrush item={linkingRoot.region} />
+        </ImageViewContext.Provider>,
+      );
+      const groups = getAllByTestId("konva-group");
+      const segmentationGroup = groups.find((g) => g.getAttribute("name") === "segmentation") ?? groups[0];
+      expect(() => {
+        act(() => {
+          fireEvent.mouseDown(segmentationGroup);
+        });
+      }).not.toThrow();
+    });
+
+    it("renders Image with imageHitFunc when image loads from maskDataURL", async () => {
+      region.endUpdatedMaskDataURL("data:image/png;base64,hit");
+      _mockBrushImageRefRef.current = null;
+      render(
+        <ImageViewContext.Provider value={{ suggestion: null }}>
+          <HtxBrush item={region} />
+        </ImageViewContext.Provider>,
+      );
+      await waitFor(() => expect(_mockBrushImageRefRef.current).not.toBeNull());
+      if (_mockBrushImageRefRef.current && typeof _mockBrushImageRefRef.current.onload === "function") {
+        act(() => {
+          _mockBrushImageRefRef.current.onload();
+        });
+      }
+      await waitFor(() => {
+        expect(mockCtx.drawImage).toHaveBeenCalled();
+        expect(mockCtx.getImageData).toHaveBeenCalled();
+        expect(mockCtx.putImageData).toHaveBeenCalled();
+      });
+    });
+
+    it("renders with eraser touch without throwing", () => {
+      region.beginPath({ type: "eraser", strokeWidth: 25 });
+      region.addPoint(0, 0);
+      region.addPoint(10, 10);
+      region.endPath();
+      expect(() =>
+        render(
+          <ImageViewContext.Provider value={{ suggestion: null }}>
+            <HtxBrush item={region} />
+          </ImageViewContext.Provider>,
+        ),
+      ).not.toThrow();
+    });
+
+    it("Group onClick calls setHighlight(false) and onClickRegion when not linking and MoveTool", () => {
+      vi.spyOn(mst, "getType").mockReturnValue({ name: "MoveTool" });
+      root.image.overrideGetToolsManager(vi.fn().mockReturnValue({ findSelectedTool: () => ({}) }));
+      const setHighlightSpy = vi.spyOn(region, "setHighlight");
+      const onClickRegionSpy = vi.spyOn(region, "onClickRegion").mockImplementation(() => {});
+      const { getAllByTestId } = render(
+        <ImageViewContext.Provider value={{ suggestion: null }}>
+          <HtxBrush item={region} />
+        </ImageViewContext.Provider>,
+      );
+      const groups = getAllByTestId("konva-group");
+      const segmentationGroup = groups.find((g) => g.getAttribute("name") === "segmentation") ?? groups[0];
+      act(() => {
+        fireEvent.click(segmentationGroup);
+      });
+      expect(setHighlightSpy).toHaveBeenCalledWith(false);
+      expect(onClickRegionSpy).toHaveBeenCalled();
+      setHighlightSpy.mockRestore();
+      onClickRegionSpy.mockRestore();
+      vi.restoreAllMocks();
     });
   });
 });

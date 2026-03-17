@@ -53,9 +53,13 @@ vi.mock("../../../components/Taxonomy/Taxonomy", () => ({
 
 vi.mock("../../../core/Tree", async () => {
   const actual = (await vi.importActual("../../../core/Tree")).default;
-  return {
+  const mock = {
     ...actual,
     filterChildrenOfType: vi.fn((node, type) => (node?.tiedChildren ?? []) || []),
+  };
+  return {
+    ...mock,
+    default: mock,
   };
 });
 
@@ -476,9 +480,8 @@ describe("Taxonomy model", () => {
     });
     root.annotationStore.addErrors = mockAddErrors;
     const taxonomy = root.wrapper.view.children.find((c) => c.type === "taxonomy");
-    await taxonomy.updateValue(storeWithTask);
     global.fetch = vi.fn().mockResolvedValue({ ok: false, status: 500, statusText: "Server Error" });
-    await taxonomy.loadItems();
+    await taxonomy.updateValue(storeWithTask);
     expect(mockAddErrors).toHaveBeenCalled();
     if (global.fetch.mockRestore) global.fetch.mockRestore();
   });
