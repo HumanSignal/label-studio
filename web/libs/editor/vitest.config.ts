@@ -1,6 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
-import { defineProject } from "vitest/config";
+import { defineConfig } from "vitest/config";
 import { transform as esbuildTransform } from "esbuild";
 import { baseAlias } from "../../vitest.base";
 
@@ -25,7 +25,7 @@ const utilsUtilitiesJs = path.join(editorSrc, "utils/utilities.js");
 const antDesignIconsStub = path.resolve(root, "__mocks__", "ant-design-icons.js");
 const noOpModuleStub = path.resolve(root, "__mocks__", "no-op-module.js");
 
-export default defineProject({
+export default defineConfig({
   root,
   plugins: [
     {
