@@ -28,7 +28,6 @@ class UserProductTourSerializer(serializers.ModelSerializer):
         return {pathlib.Path(f).stem for f in PRODUCT_TOURS_CONFIGS_DIR.iterdir()}
 
     def validate_name(self, value):
-
         if value not in self.available_tours:
             raise serializers.ValidationError(
                 f'Product tour {value} not found. Available tours: {self.available_tours}'

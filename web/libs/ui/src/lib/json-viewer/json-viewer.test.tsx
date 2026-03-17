@@ -39,7 +39,7 @@ jest.mock("./reader-view-button", () => ({
   ReaderViewButton: () => null,
 }));
 
-jest.mock("./json-viewer.module.scss", () => ({}));
+jest.mock("./json-viewer.module.css", () => ({}));
 
 describe("JsonViewer filtered search", () => {
   beforeEach(() => {

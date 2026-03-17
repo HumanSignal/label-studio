@@ -1,0 +1,72 @@
+.filterLine {
+  position: relative;
+  width: 100%;
+
+  /* Apply the same grid layout as the parent filters container */
+  display: grid;
+  grid-template-columns: 80px minmax(120px, max-content) minmax(100px, max-content) 1fr 24px;
+  grid-gap: var(--spacing-tightest);
+  align-items: start;
+
+  &__remove {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: -4px;
+
+    .button-dm {
+      height: 24px;
+      width: 24px;
+      padding: 0;
+      flex: none;
+    }
+  }
+
+  &__column {
+    min-height: 24px;
+
+    &.conjunction {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+    }
+
+    &.operation {
+      display: flex;
+      align-items: center;
+    }
+
+    &.value {
+      display: flex;
+      align-items: center;
+    }
+
+    &.field {
+      display: flex;
+      align-items: center;
+    }
+  }
+
+  &__group {
+    flex: 0;
+    display: grid;
+    grid-template-columns: min-content 1fr;
+    grid-gap: 2px;
+    align-items: flex-start;
+  }
+
+  &__selector {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .selectTrigger {
+    padding: 0 4px;
+  }
+
+  .datepicker {
+    width: 100%;
+  }
+}

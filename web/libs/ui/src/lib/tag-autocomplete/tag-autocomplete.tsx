@@ -9,13 +9,12 @@ import React, {
 } from "react";
 import { Command, CommandEmpty, CommandGroup, CommandItem, CommandList } from "@humansignal/shad/components/ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "@humansignal/shad/components/ui/popover";
-import { Spinner } from "@humansignal/ui";
+import { Badge, Spinner, Typography } from "@humansignal/ui";
 import { IconPlus } from "@humansignal/icons";
 import { cnm } from "../../utils/utils";
-import { Tag } from "./tag";
 import { useTagAutocomplete } from "./use-tag-autocomplete";
 import type { TagAutocompleteProps, NormalizedTagOption } from "./types";
-import styles from "./tag-autocomplete.module.scss";
+import styles from "./tag-autocomplete.module.css";
 
 export const TagAutocomplete = forwardRef(
   <T = string>(props: TagAutocompleteProps<T>, ref: ForwardedRef<HTMLSelectElement>) => {
@@ -53,7 +52,9 @@ export const TagAutocomplete = forwardRef(
       setFocusedTagIndex,
       setHighlightedOptionIndex,
       handleKeyDown,
+      handlePaste,
       focusInput,
+      error,
     } = useTagAutocomplete({ ...props, createTagCallbackRef });
 
     // --- NEW: control cmdk selection so first item is always highlighted ---
@@ -154,7 +155,7 @@ export const TagAutocomplete = forwardRef(
         }
 
         return (
-          <Tag
+          <Badge
             key={String(option.value)}
             ref={(el) => {
               if (el) {
@@ -163,15 +164,24 @@ export const TagAutocomplete = forwardRef(
                 tagRefs.current.delete(index);
               }
             }}
-            label={option.label}
-            onRemove={handleRemove}
-            isFocused={focusedTagIndex === index}
-            disabled={disabled}
-            className={tagClassName}
+            maxWidth={150}
+            onClose={handleRemove}
             tabIndex={focusedTagIndex === index ? 0 : -1}
+            className={cnm(
+              "flex-shrink-0 group focus:ring-0 focus:ring-offset-0",
+              {
+                [styles.tagFocused]: focusedTagIndex === index,
+                "opacity-60 cursor-not-allowed": disabled,
+              },
+              tagClassName,
+            )}
             onKeyDown={handleKeyDown}
-            dataTestid={`tag-${option.value}`}
-          />
+            data-testid={`tag-${option.value}`}
+            data-tag="true"
+            aria-label={`${option.label}, press Delete or Backspace to remove`}
+          >
+            {option.label}
+          </Badge>
         );
       },
       [renderTag, removeTag, focusedTagIndex, disabled, tagClassName, handleKeyDown, tagRefs],
@@ -278,6 +288,7 @@ export const TagAutocomplete = forwardRef(
                   className={styles.input}
                   value={query}
                   onChange={handleInputChange}
+                  onPaste={handlePaste}
                   onFocus={() => {
                     setFocusedTagIndex(null);
                     // Don't automatically open dropdown on focus - wait for user to type
@@ -346,7 +357,9 @@ export const TagAutocomplete = forwardRef(
                       <div className="flex items-center gap-2 w-full px-4 py-1 hover:bg-primary-emphasis-subtle hover:cursor-pointer group-focus-within:bg-primary-emphasis-subtle group-aria-selected:bg-primary-emphasis-subtle rounded-4 duration-150 ease-out">
                         <IconPlus className={styles.createIcon} />
                         <span>
-                          Add "<strong>{query.trim()}</strong>" tag
+                          Add "
+                          <strong className="inline-block max-w-[200px] truncate align-bottom">{query.trim()}</strong>"
+                          tag
                         </span>
                       </div>
                     </CommandItem>
@@ -356,6 +369,12 @@ export const TagAutocomplete = forwardRef(
             </CommandList>
           </PopoverContent>
         </Popover>
+
+        {error && (
+          <Typography variant="body" size="small" className="text-negative-content mt-tight" role="alert">
+            {error}
+          </Typography>
+        )}
 
         {/* Hidden select for form integration */}
         <select

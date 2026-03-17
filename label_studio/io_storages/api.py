@@ -1,5 +1,5 @@
-"""This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
-"""
+"""This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license."""
+
 import inspect
 import logging
 import os
@@ -61,7 +61,6 @@ class ImportStorageDetailAPI(generics.RetrieveUpdateDestroyAPIView):
 
 
 class ExportStorageListAPI(generics.ListCreateAPIView):
-
     permission_required = ViewClassPermission(
         GET=all_permissions.storages_view,
         POST=all_permissions.storages_change,
@@ -115,7 +114,6 @@ class ExportStorageDetailAPI(generics.RetrieveUpdateDestroyAPIView):
 
 
 class ImportStorageSyncAPI(generics.GenericAPIView):
-
     permission_required = ViewClassPermission(
         POST=all_permissions.storages_sync,
     )
@@ -139,7 +137,6 @@ class ImportStorageSyncAPI(generics.GenericAPIView):
 
 
 class ExportStorageSyncAPI(generics.GenericAPIView):
-
     permission_required = ViewClassPermission(
         POST=all_permissions.storages_sync,
     )
@@ -163,7 +160,6 @@ class ExportStorageSyncAPI(generics.GenericAPIView):
 
 
 class StorageValidateAPI(generics.CreateAPIView):
-
     permission_required = all_permissions.storages_change
     parser_classes = (JSONParser, FormParser, MultiPartParser)
 
@@ -176,7 +172,6 @@ class StorageValidateAPI(generics.CreateAPIView):
 
 @extend_schema(exclude=True)
 class ImportStorageListFilesAPI(generics.CreateAPIView):
-
     permission_required = all_permissions.storages_change
     parser_classes = (JSONParser, FormParser, MultiPartParser)
     serializer_class = None  # Default serializer
@@ -218,7 +213,6 @@ class ImportStorageListFilesAPI(generics.CreateAPIView):
 
 @extend_schema(exclude=True)
 class StorageFormLayoutAPI(generics.RetrieveAPIView):
-
     permission_required = all_permissions.storages_change
     parser_classes = (JSONParser, FormParser, MultiPartParser)
     storage_type = None

@@ -41,9 +41,9 @@ Once completed, you can use the action icons to:
 ![Screenshot of support reports page](/images/admin/support-report-generate.png)
 
 !!! note
-    To download the ZIP file, you need to have at least one project with S3 or S3-compatible storage configured. This is because when generating a support report, Label Studio persists the report artifact using the configured storage backend before it becomes available for download.
+    To download the ZIP file, you need to have [persistent storage](persistent_storage) configured. This is because when generating a support report, Label Studio persists the report artifact using the configured storage backend before it becomes available for download.
     
-    If you do not have S3-compatible storage configured, or if the credentials are not valid, you will receive a `botocore.exceptions.ClientError` when you try to download the ZIP file. 
+    If you do not have persistent storage configured, or if the credentials are not valid, you will receive an error when you try to download the ZIP file. 
     
     
 

@@ -4,7 +4,7 @@ import { observer } from "mobx-react";
 
 import { Hotkey } from "../../core/Hotkey";
 
-import "./Settings.scss";
+import "./Settings.prefix.css";
 import { cn } from "../../utils/bem";
 import { triggerResizeEvent } from "../../utils/utilities";
 
@@ -69,8 +69,8 @@ const editorSettingsKeys = Object.keys(EditorSettings).filter((key) => {
   return flag ? ff.isActive(flag) : true;
 });
 
-const enableTooltipsIndex = editorSettingsKeys.findIndex((key) => key === "enableTooltips");
-const enableLabelTooltipsIndex = editorSettingsKeys.findIndex((key) => key === "enableLabelTooltips");
+const enableTooltipsIndex = editorSettingsKeys.indexOf("enableTooltips");
+const enableLabelTooltipsIndex = editorSettingsKeys.indexOf("enableLabelTooltips");
 
 // swap these in the array (new UI order)
 const tmp = editorSettingsKeys[enableTooltipsIndex];

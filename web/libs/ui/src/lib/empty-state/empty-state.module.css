@@ -1,0 +1,180 @@
+/* Empty State Base Styles */
+.base {
+  @apply w-full h-full flex flex-col items-center justify-center text-center;
+}
+
+.icon {
+  @apply aspect-square p-tight;
+}
+
+.title {
+  @apply text-center;
+}
+
+/* Size Styles */
+
+/* Large Size - Data Manager style */
+.size-large {
+  @apply gap-tight;
+
+  .icon {
+    @apply mb-tight;
+  }
+
+  .description {
+    @apply max-w-xl mb-tight;
+  }
+
+  .actions {
+    @apply mt-base;
+  }
+
+  .footer {
+    @apply mt-base;
+  }
+}
+
+/* Medium Size - Home page style */
+.size-medium {
+  @apply gap-tight;
+
+  .icon {
+    @apply mb-tight;
+  }
+
+  .description {
+    @apply max-w-lg;
+  }
+
+  .additional {
+    @apply mt-base mb-tight;
+  }
+
+  .actions {
+    @apply mt-base;
+  }
+
+  .footer {
+    @apply mt-wide;
+  }
+}
+
+/* Small Size - Sidepanel style */
+.size-small {
+  @apply gap-tighter;
+
+  .icon {
+    @apply mb-tighter;
+  }
+
+  .description {
+    @apply text-center w-full;
+  }
+
+  /* Text container wrapper for title and description */
+  .text-wrapper {
+    @apply flex flex-col items-center w-full gap-tightest;
+  }
+
+  .additional {
+    @apply mt-tight;
+  }
+
+  .actions {
+    @apply mt-base;
+  }
+
+  .footer {
+    @apply pt-tight mt-tight;
+  }
+}
+
+/* Actions Sizes - different max widths for different sizes */
+.actions-large {
+  @apply max-w-lg;
+}
+
+.actions-medium {
+  @apply max-w-md;
+}
+
+.actions-small {
+  @apply max-w-sm;
+}
+
+/* Color Variants */
+
+/* Primary Variant - Blue theme */
+.variant-primary {
+  .icon {
+    @apply bg-primary-emphasis text-primary-icon;
+  }
+}
+
+/* Neutral Variant - Gray theme */
+.variant-neutral {
+  .icon {
+    @apply bg-neutral-emphasis text-neutral-icon;
+  }
+}
+
+/* Negative Variant - Red theme */
+.variant-negative {
+  .icon {
+    @apply bg-negative-emphasis text-negative-icon;
+  }
+}
+
+/* Positive Variant - Green theme */
+.variant-positive {
+  .icon {
+    @apply bg-positive-emphasis text-positive-icon;
+  }
+}
+
+/* Warning Variant - Orange/Yellow theme */
+.variant-warning {
+  .icon {
+    @apply bg-warning-emphasis text-warning-icon;
+  }
+}
+
+/* Gradient Variant - AI theme with gradient and animation */
+.variant-gradient {
+  .icon {
+    background:
+      linear-gradient(
+        109deg,
+        var(--color-accent-canteloupe-base) 0%,
+        var(--color-accent-persimmon-base) 51.56%,
+        var(--color-accent-plum-base) 100%
+      ),
+      var(--color-accent-grape-subtle);
+    box-shadow:
+      0 0 16px 0 rgb(255 166 99 / 50%),
+      0 0 48px 0 rgb(255 117 87 / 60%),
+      0 0 128px 0 rgb(227 123 211 / 50%);
+    animation: pulsate 4s infinite;
+
+    @apply text-neutral-on-dark-content;
+  }
+}
+
+@keyframes pulsate {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+
+  50% {
+    transform: scale(1.05);
+    opacity: 0.9;
+  }
+
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* Element Styles - All styling is handled by variants and utility classes */

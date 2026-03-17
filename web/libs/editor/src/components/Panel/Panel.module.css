@@ -1,0 +1,46 @@
+@import "../../assets/styles/global.prefix.css";
+
+.container {
+  display: flex;
+  justify-content: space-between;
+
+  @media (width <= 760px) {
+    /* phone */
+    flex-direction: column;
+  }
+}
+
+.block {
+  &__controls {
+    @media (width <= 760px) {
+      /* phone */
+      width: 100%;
+    }
+  }
+
+  & > button {
+    margin: 0 5px;
+
+    &:first-child {
+      margin-left: 0;
+    }
+
+    &:last-child {
+      margin-right: 0;
+    }
+
+    @media (width <= 760px) {
+      /* phone */
+      margin: 0 2px;
+      margin-bottom: 10px;
+    }
+  }
+}
+
+.common {
+  margin-left: auto;
+}
+
+.hidden {
+  display: none;
+}

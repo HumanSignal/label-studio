@@ -8,7 +8,7 @@ import type { CNTagName } from "../../utils/bem";
 import { isArraysEqual } from "../../utils/utilities";
 import TreeStructure from "../TreeStructure/TreeStructure";
 
-import styles from "./Taxonomy.module.scss";
+import styles from "./Taxonomy.module.css";
 
 type TaxonomyPath = string[];
 type onAddLabelCallback = (path: string[]) => any;

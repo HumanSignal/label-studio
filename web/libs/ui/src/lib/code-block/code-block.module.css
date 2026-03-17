@@ -1,0 +1,3 @@
+.code-block-shadow {
+  box-shadow: inset 0 2px 8px rgba(var(--color-neutral-shadow-raw) / 12%);
+}

@@ -1,7 +1,7 @@
 import { type FC, type MouseEvent, useCallback, useMemo } from "react";
 import { cn } from "../../utils/bem";
 import { IconCross } from "@humansignal/icons";
-import "./HeidiTip.scss";
+import "./HeidiTip.prefix.css";
 import { Button } from "@humansignal/ui";
 import { HeidiSpeaking } from "../../assets/images";
 import type { HeidiTipProps, Tip } from "./types";

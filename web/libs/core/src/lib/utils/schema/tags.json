@@ -2705,13 +2705,6 @@
         "required": false,
         "default": false
       },
-      "curves": {
-        "name": "curves",
-        "description": "Allow Bezier curves",
-        "type": ["true", "false"],
-        "required": false,
-        "default": false
-      },
       "skeleton": {
         "name": "skeleton",
         "description": "Enables skeleton mode to allow branch paths",
@@ -2898,6 +2891,207 @@
         "description": "Name of the element to control (video)",
         "type": "string",
         "required": true
+      }
+    }
+  },
+  "VideoVector": {
+    "name": "VideoVector",
+    "description": "VideoVector tag brings vector annotation capabilities to videos.\nIt works in combination with the `<Video/>` and the `<Labels/>` tags.\nSupports closable paths and skeleton mode with\nkeyframe-based interpolation across video frames.\n\nUse with the following data types: video",
+    "attrs": {
+      "name": {
+        "name": "name",
+        "description": "Name of the element",
+        "type": "string",
+        "required": true
+      },
+      "toName": {
+        "name": "toName",
+        "description": "Name of the element to control (video)",
+        "type": "string",
+        "required": true
+      },
+      "opacity": {
+        "name": "opacity",
+        "description": "Opacity of vector",
+        "type": "number",
+        "required": false,
+        "default": 0.2
+      },
+      "fillColor": {
+        "name": "fillColor",
+        "description": "Vector fill color in hexadecimal or HTML color name",
+        "type": "string",
+        "required": false,
+        "default": "#f48a42"
+      },
+      "strokeColor": {
+        "name": "strokeColor",
+        "description": "Stroke color in hexadecimal",
+        "type": "string",
+        "required": false,
+        "default": "#f48a42"
+      },
+      "strokeWidth": {
+        "name": "strokeWidth",
+        "description": "Width of stroke",
+        "type": "number",
+        "required": false,
+        "default": 2
+      },
+      "pointSize": {
+        "name": "pointSize",
+        "description": "Size of vector handle points",
+        "type": ["small", "medium", "large"],
+        "required": false,
+        "default": "small"
+      },
+      "pointStyle": {
+        "name": "pointStyle",
+        "description": "Style of points",
+        "type": ["rectangle", "circle"],
+        "required": false,
+        "default": "circle"
+      },
+      "closable": {
+        "name": "closable",
+        "description": "Allow closed shapes",
+        "type": ["true", "false"],
+        "required": false,
+        "default": false
+      },
+      "skeleton": {
+        "name": "skeleton",
+        "description": "Enables skeleton mode to allow branch paths",
+        "type": ["true", "false"],
+        "required": false,
+        "default": false
+      },
+      "minPoints": {
+        "name": "minPoints",
+        "description": "Minimum allowed number of points",
+        "type": ["number", "none"],
+        "required": false,
+        "default": "none"
+      },
+      "maxPoints": {
+        "name": "maxPoints",
+        "description": "Maximum allowed number of points",
+        "type": ["number", "none"],
+        "required": false,
+        "default": "none"
+      },
+      "snap": {
+        "name": "snap",
+        "description": "Snap vector to image pixels",
+        "type": ["pixel", "none"],
+        "required": false,
+        "default": "none"
+      },
+      "pointSizeEnabled": {
+        "name": "pointSizeEnabled",
+        "description": "Size of a point in pixels when shape is selected",
+        "type": "number",
+        "required": false,
+        "default": 5
+      },
+      "pointSizeDisabled": {
+        "name": "pointSizeDisabled",
+        "description": "Size of a point in pixels when shape is not selected",
+        "type": "number",
+        "required": false,
+        "default": 3
+      }
+    }
+  },
+  "VideoVectorLabels": {
+    "name": "VideoVectorLabels",
+    "description": "The `VideoVectorLabels` tag creates labeled vectors on video frames.\nCombines VideoVector and Labels into one tag for convenient vector annotation.\n\nUse with the following data types: video.",
+    "attrs": {
+      "name": {
+        "name": "name",
+        "description": "Name of tag",
+        "type": "string",
+        "required": true
+      },
+      "toName": {
+        "name": "toName",
+        "description": "Name of video to label",
+        "type": "string",
+        "required": true
+      },
+      "choice": {
+        "name": "choice",
+        "description": "Configure whether you can select one or multiple labels",
+        "type": ["single", "multiple"],
+        "required": false,
+        "default": "single"
+      },
+      "maxUsages": {
+        "name": "maxUsages",
+        "description": "Maximum number of times a label can be used per task",
+        "type": "number",
+        "required": false
+      },
+      "showInline": {
+        "name": "showInline",
+        "description": "Show labels in the same visual line",
+        "type": ["true", "false"],
+        "required": false,
+        "default": true
+      },
+      "opacity": {
+        "name": "opacity",
+        "description": "Opacity of vector",
+        "type": "number",
+        "required": false,
+        "default": 0.2
+      },
+      "fillColor": {
+        "name": "fillColor",
+        "description": "Vector fill color in hexadecimal",
+        "type": "string",
+        "required": false
+      },
+      "strokeColor": {
+        "name": "strokeColor",
+        "description": "Stroke color in hexadecimal",
+        "type": "string",
+        "required": false
+      },
+      "strokeWidth": {
+        "name": "strokeWidth",
+        "description": "Width of stroke",
+        "type": "number",
+        "required": false,
+        "default": 1
+      },
+      "closable": {
+        "name": "closable",
+        "description": "Allow closed shapes",
+        "type": ["true", "false"],
+        "required": false,
+        "default": false
+      },
+      "skeleton": {
+        "name": "skeleton",
+        "description": "Enables skeleton mode",
+        "type": ["true", "false"],
+        "required": false,
+        "default": false
+      },
+      "minPoints": {
+        "name": "minPoints",
+        "description": "Minimum allowed number of points",
+        "type": ["number", "none"],
+        "required": false,
+        "default": "none"
+      },
+      "maxPoints": {
+        "name": "maxPoints",
+        "description": "Maximum allowed number of points",
+        "type": ["number", "none"],
+        "required": false,
+        "default": "none"
       }
     }
   },
@@ -3164,6 +3358,8 @@
       "Vector",
       "VectorLabels",
       "VideoRectangle",
+      "VideoVector",
+      "VideoVectorLabels",
       "Collapse",
       "Filter",
       "Header",

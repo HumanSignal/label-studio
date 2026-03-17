@@ -1,12 +1,18 @@
-import { LabelStudio, Sidebar, Textarea, ToolBar } from "@humansignal/frontend-test/helpers/LSF";
+import { LabelStudio, Modals, Sidebar, Textarea, ToolBar } from "@humansignal/frontend-test/helpers/LSF";
 import {
   simpleData,
   textareaConfigPerRegion,
   textareaConfigSimple,
   textareaConfigWithValue,
   textareaConfigWithValueAndRows,
+  textareaConfigWithRowsAndMaxSubmissions,
   textareaConfigWithMaxSubmissions,
   textareaConfigWithValueAndMaxSubmissions,
+  textareaConfigWithSkipDuplicates,
+  textareaPerRegionRegionListConfig,
+  textareaPerRegionRegionListData,
+  textareaPerRegionRegionListResult,
+  textareaSkipDuplicatesError,
   textareaResultsPerRegion,
 } from "../../data/control_tags/textarea";
 import { FF_LEAD_TIME } from "../../../../src/utils/feature-flags";
@@ -128,6 +134,18 @@ describe("Control Tags - TextArea - Pre-filled Value", () => {
 
     // The submitted text should appear as a region
     Textarea.hasValue("Pre-filled text");
+  });
+
+  it("should display deterministic character and submission counters for multi-row textarea", () => {
+    LabelStudio.params().config(textareaConfigWithRowsAndMaxSubmissions).data(simpleData).withResult([]).init();
+
+    Textarea.input.type("abc");
+    cy.get('[data-testid="textarea-character-count"]').should("contain.text", "3 characters");
+    cy.get('[data-testid="textarea-submission-count"]').should("contain.text", "0 / 2 submissions");
+
+    cy.get('[data-testid="textarea-add-button"]').click();
+    Textarea.hasValue("abc");
+    cy.get('[data-testid="textarea-submission-count"]').should("contain.text", "1 / 2 submission");
   });
 
   it("should allow adding new text after submitting pre-filled value", () => {
@@ -343,6 +361,169 @@ describe("Control Tags - TextArea - Auto-submit on Annotation Submit", () => {
       expect(result[0].value.text).to.deep.eq(["First existing text", "Second existing text"]);
       // Ensure pre-filled text was not added
       expect(result[0].value.text).to.not.include("Pre-filled text");
+    });
+  });
+});
+
+describe("Control Tags - TextArea - Duplicate prevention", () => {
+  it("should skip duplicate submissions when skipDuplicates is enabled", () => {
+    LabelStudio.params().config(textareaConfigWithSkipDuplicates).data(simpleData).withResult([]).init();
+
+    Textarea.type("Same text{enter}");
+    Textarea.type("Same text{enter}");
+    Textarea.input.click({ force: true }).type("Different text{enter}", { force: true });
+
+    LabelStudio.serialize().then((result) => {
+      expect(result).to.have.length(1);
+      expect(result[0].value.text).to.deep.equal(["Same text", "Different text"]);
+    });
+  });
+
+  it("supports deterministic edit/delete in per-region region-list mode", () => {
+    LabelStudio.params()
+      .config(textareaPerRegionRegionListConfig)
+      .data(textareaPerRegionRegionListData)
+      .withResult(textareaPerRegionRegionListResult)
+      .init();
+
+    Sidebar.findRegionByIndex(0).click();
+
+    cy.get('[data-testid="textarea-region-form"] [data-testid="textarea-region-input"]')
+      .click({ force: true })
+      .type('The "H1" Header{enter}', { force: true });
+    cy.get('[data-testid="textarea-region-form"] [data-testid="textarea-region-input"]')
+      .click({ force: true })
+      .type("Wrong text{enter}", { force: true });
+
+    cy.get('[data-testid="textarea-region-item"]').should("have.length", 2);
+    cy.get('[data-testid="textarea-region-item"]')
+      .eq(1)
+      .find('[data-testid="textarea-region-input"]')
+      .clear()
+      .type('The "H1" Header{enter}', { force: true });
+    Modals.hasWarning(textareaSkipDuplicatesError);
+    cy.contains(".ant-modal.ant-modal-confirm-warning button", "OK").click();
+
+    cy.get('[data-testid="textarea-region-item"]')
+      .eq(1)
+      .find('[data-testid="textarea-region-input"]')
+      .clear()
+      .type("Corrected text{enter}", { force: true });
+    Modals.hasNoWarnings();
+
+    LabelStudio.serialize().then((result) => {
+      const textareaResult = result.find((item) => item.type === "textarea" && item.from_name === "ocr");
+
+      expect(textareaResult).to.exist;
+      expect(textareaResult.value.text).to.deep.equal(['The "H1" Header', "Corrected text"]);
+    });
+  });
+
+  it("supports deterministic model shortcut insertion and focus return", () => {
+    LabelStudio.params().config(textareaConfigSimple).data(simpleData).withResult([]).init();
+
+    Textarea.input.click().type("Base");
+    cy.window().then((win) => {
+      const model = win.Htx.annotationStore.selected.names.get("desc");
+
+      model.onShortcut(" + Shortcut");
+      model.returnFocus();
+    });
+
+    Textarea.input.should("have.value", "Base + Shortcut");
+  });
+
+  it("handles shortcut fallback paths deterministically for single-line and multi-line textarea", () => {
+    LabelStudio.params().config(textareaConfigSimple).data(simpleData).withResult([]).init();
+
+    cy.window().then((win) => {
+      const model = win.Htx.annotationStore.selected.names.get("desc");
+
+      model.setLastFocusedElement(null);
+      model.onShortcut("Single");
+      model.onShortcut(" line");
+      model.returnFocus();
+    });
+
+    Textarea.input.should("have.value", "Single line");
+
+    LabelStudio.params().config(textareaConfigWithRowsAndMaxSubmissions).data(simpleData).withResult([]).init();
+
+    cy.window().then((win) => {
+      const model = win.Htx.annotationStore.selected.names.get("desc");
+
+      model.setLastFocusedElement(null);
+      model.onShortcut("Multi");
+      model.onShortcut(" line");
+    });
+
+    Textarea.input.should("have.value", "Multi line");
+  });
+
+  it("keeps shortcut and remove guards deterministic for unavailable elements and missing regions", () => {
+    LabelStudio.params().config(textareaConfigSimple).data(simpleData).withResult([]).init();
+
+    Textarea.input.type("Keep this text");
+    Textarea.input.should("have.value", "Keep this text");
+
+    cy.window().then((win) => {
+      const model = win.Htx.annotationStore.selected.names.get("desc");
+      const detached = document.createElement("textarea");
+
+      model.setLastFocusedElement(detached);
+      model.onShortcut(" ignored");
+      model.remove({ pid: "missing-region" });
+    });
+
+    Textarea.input.should("have.value", "Keep this text ignored");
+  });
+
+  it("covers deterministic duplicate guard in addTextToResult and remove success path", () => {
+    LabelStudio.params().config(textareaConfigWithSkipDuplicates).data(simpleData).withResult([]).init();
+
+    Textarea.type("Same text{enter}");
+    Textarea.hasValue("Same text");
+
+    cy.window().then((win) => {
+      const model = win.Htx.annotationStore.selected.names.get("desc");
+      const result = model.result;
+
+      expect(result.mainValue.toJSON()).to.deep.equal(["Same text"]);
+      model.addTextToResult("Same text", result);
+      expect(result.mainValue.toJSON()).to.deep.equal(["Same text"]);
+
+      const firstRegion = model.regions[0];
+      model.remove(firstRegion);
+    });
+
+    LabelStudio.serialize().then((result) => {
+      expect(result).to.have.length(0);
+    });
+  });
+
+  it("covers deterministic TextArea model serialization and sync utility actions", () => {
+    LabelStudio.params().config(textareaConfigSimple).data(simpleData).withResult([]).init();
+
+    Textarea.type("Alpha{enter}");
+    Textarea.hasValue("Alpha");
+
+    cy.window().then((win) => {
+      const model = win.Htx.annotationStore.selected.names.get("desc");
+      const serializable = model.getSerializableValue();
+
+      expect(serializable.text).to.deep.equal(["Alpha"]);
+
+      model.setValue("Beta");
+      model.beforeSend();
+      expect(model.result.mainValue.toJSON()).to.deep.equal(["Alpha", "Beta"]);
+
+      model.needsUpdate();
+      expect(model.regions).to.have.length(2);
+    });
+
+    LabelStudio.serialize().then((result) => {
+      expect(result).to.have.length(1);
+      expect(result[0].value.text).to.deep.equal(["Alpha", "Beta"]);
     });
   });
 });

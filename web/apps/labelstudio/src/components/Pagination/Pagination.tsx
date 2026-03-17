@@ -12,7 +12,7 @@ import { cn } from "../../utils/bem";
 import { clamp, isDefined } from "../../utils/helpers";
 import { useValueTracker } from "../Form/Utils";
 import { Select } from "@humansignal/ui";
-import "./Pagination.scss";
+import "./Pagination.prefix.css";
 import { useUpdateEffect } from "../../utils/hooks";
 
 interface PaginationProps {

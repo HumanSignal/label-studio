@@ -1,5 +1,5 @@
-"""This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
-"""
+"""This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license."""
+
 import getpass
 import io
 import json
@@ -163,7 +163,7 @@ def _create_user(input_args, config):
 
             Token.objects.filter(key=user.auth_token.key).update(key=token)
         elif token:
-            print(f'Token {token} is not applied to user {DEFAULT_USERNAME} ' f"because it's empty or len(token) < 5")
+            print(f"Token {token} is not applied to user {DEFAULT_USERNAME} because it's empty or len(token) < 5")
 
     except IntegrityError:
         print('User {} already exists'.format(username))
@@ -416,7 +416,7 @@ def main():
         key_file = input_args.key_file or config.get('key')
         if cert_file or key_file:
             logger.error(
-                "Label Studio doesn't support SSL web server with cert and key.\n" 'Use nginx or other servers for it.'
+                "Label Studio doesn't support SSL web server with cert and key.\nUse nginx or other servers for it."
             )
             return
 

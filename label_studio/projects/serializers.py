@@ -1,5 +1,7 @@
-"""This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
-"""
+"""This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license."""
+
+from decimal import Decimal
+
 import bleach
 from constants import SAFE_HTML_ATTRIBUTES, SAFE_HTML_TAGS
 from django.db.models import Q
@@ -47,6 +49,35 @@ class OpenApiObjectJSONField(serializers.JSONField):
     """
 
 
+def validate_weight_precision(value):
+    """Reject weight values with more than 3 decimal places."""
+    if Decimal(str(value)).as_tuple().exponent < -3:
+        raise serializers.ValidationError(f'Weight values support at most 3 decimal places, got {value}.')
+
+
+class ControlTagWeightSerializer(serializers.Serializer):
+    """Weights configuration for a single control tag.
+
+    Structure: {"overall": 0.5, "type": "Choices", "labels": {"cat": 1.0, "dog": 0.0}}
+    """
+
+    overall = serializers.FloatField(
+        min_value=0.0,
+        max_value=1.0,
+        validators=[validate_weight_precision],
+        help_text='Overall weight for this control tag (0.0 to 1.0). Zero excludes the tag from agreement.',
+    )
+    type = serializers.CharField(
+        help_text='Control tag type from the labeling config (e.g. Choices, Labels, TextArea).',
+    )
+    labels = serializers.DictField(
+        child=serializers.FloatField(min_value=0.0, max_value=1.0, validators=[validate_weight_precision]),
+        required=False,
+        default=dict,
+        help_text='Per-label weights (0.0 to 1.0). Zero excludes the label from agreement.',
+    )
+
+
 class CreatedByFromContext:
     requires_context = True
 
@@ -64,8 +95,7 @@ class ProjectSerializer(FlexFieldsModelSerializer):
     total_annotations_number = serializers.IntegerField(
         default=None,
         read_only=True,
-        help_text='Total annotations number in project including '
-        'skipped_annotations_number and ground_truth_number.',
+        help_text='Total annotations number in project including skipped_annotations_number and ground_truth_number.',
     )
     total_predictions_number = serializers.IntegerField(
         default=None,
@@ -94,8 +124,13 @@ class ProjectSerializer(FlexFieldsModelSerializer):
 
     created_by = UserSimpleSerializer(default=CreatedByFromContext(), help_text='Project owner')
 
-    control_weights = OpenApiObjectJSONField(
-        required=False, allow_null=True, help_text='Dict of weights for each control tag in metric calculation.'
+    control_weights = serializers.DictField(
+        child=ControlTagWeightSerializer(),
+        required=False,
+        allow_null=True,
+        help_text='Dict of weights for each control tag in metric calculation. '
+        'Keys are control tag names from the labeling config. '
+        'At least one tag must have a non-zero overall weight.',
     )
     parsed_label_config = OpenApiObjectJSONField(
         default=None, read_only=True, help_text='JSON-formatted labeling configuration'
@@ -213,6 +248,16 @@ class ProjectSerializer(FlexFieldsModelSerializer):
             except ValueError:
                 pass
         raise serializers.ValidationError('Color must be in "#RRGGBB" format')
+
+    def validate_control_weights(self, value):
+        if not value:
+            return value
+        overall_weights = [
+            tag_config.get('overall', 1.0) for tag_config in value.values() if isinstance(tag_config, dict)
+        ]
+        if overall_weights and all(w == 0 for w in overall_weights):
+            raise serializers.ValidationError('At least one tag must have a non-zero overall weight.')
+        return value
 
     class Meta:
         model = Project

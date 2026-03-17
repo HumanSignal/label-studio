@@ -1,6 +1,6 @@
 import clsx from "clsx";
 import type { HTMLAttributes, PropsWithChildren } from "react";
-import styles from "./card.module.scss";
+import styles from "./card.module.css";
 
 export function Card({ children, className, ...rest }: PropsWithChildren<HTMLAttributes<HTMLDivElement>>) {
   const finalClass = clsx(styles.card, className);

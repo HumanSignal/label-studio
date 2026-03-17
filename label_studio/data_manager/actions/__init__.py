@@ -1,5 +1,5 @@
-"""This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
-"""
+"""This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license."""
+
 """ Actions for tasks and annotations provided by data manager.
     All actions are stored in settings.DATA_MANAGER_ACTIONS dict.
     Data manager uses settings.DATA_MANAGER_ACTIONS to know the list of available actions,

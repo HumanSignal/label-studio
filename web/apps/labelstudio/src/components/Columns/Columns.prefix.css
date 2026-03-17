@@ -1,0 +1,17 @@
+.columns {
+  --column-default-width: calc(100% / var(--columns));
+  --column-size: var(--column-width, var(--column-default-width));
+
+  display: grid;
+  grid-template-columns: repeat(var(--columns), var(--column-size));
+  grid-column-gap: var(--column-gap, 10px);
+
+  &__title {
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    font-size: 1.125rem;
+    line-height: 22px;
+    padding: 0 1rem 0 0;
+    color: var(--color-neutral-content);
+  }
+}

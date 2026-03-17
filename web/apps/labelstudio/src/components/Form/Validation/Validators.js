@@ -1,5 +1,5 @@
 import { isDefined, isEmptyString } from "../../../utils/helpers";
-import "./Validation.scss";
+import "./Validation.prefix.css";
 
 export const required = (fieldName, value) => {
   if (!isDefined(value) || isEmptyString(value)) {

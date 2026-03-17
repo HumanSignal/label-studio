@@ -7,7 +7,7 @@ import { cn } from "../../../utils/bem";
 import { NodeIcon } from "../../Node/Node";
 import { RegionLabel } from "../../SidePanels/OutlinerPanel/RegionLabel";
 
-import "./LinkState.scss";
+import "./LinkState.prefix.css";
 
 type LinkStateProps = {
   linking: boolean;

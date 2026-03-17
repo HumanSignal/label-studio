@@ -1,0 +1,37 @@
+/**
+ * Keyboard key component styles
+ * Provides styled key elements for keyboard shortcuts display
+ */
+
+.individualKey {
+  display: inline-flex;
+  align-items: center;
+  padding: var(--spacing-tightest) var(--spacing-tighter);
+  background: var(--color-neutral-background);
+  border: 1px solid var(--color-neutral-border);
+  border-radius: var(--corner-radius-smaller);
+  font-weight: bold;
+  font-size: 12px;
+  min-width: 24px;
+  min-height: 24px;
+  justify-content: center;
+  text-transform: uppercase;
+  box-shadow:
+    inset 0 -2px 0 0 rgba(var(--color-neutral-shadow-raw) / 8%),
+    0 1px 4px rgba(var(--color-neutral-shadow-raw) / 6%);
+  transition: all 150ms ease-out;
+
+  &:hover {
+    transform: translateY(-2px);
+    border-color: var(--color-neutral-border-bold);
+    box-shadow:
+      inset 0 -2px 0 0 rgba(var(--color-neutral-shadow-raw) / 8%),
+      0 3px 6px rgba(var(--color-neutral-shadow-raw) / 6%);
+  }
+}
+
+.keyGroup {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-tighter); /* 0.25rem equivalent */
+}

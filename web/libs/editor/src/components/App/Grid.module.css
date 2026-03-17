@@ -1,0 +1,131 @@
+/* Grid (View All mode) */
+@import "../../assets/styles/global.prefix.css";
+
+.grid {
+  flex-grow: 1;
+  display: grid;
+  grid-auto-columns: calc(50% - 15px);
+
+  @media (width <= 1200px) {
+    /* compact desktop */
+    grid-auto-columns: 100%;
+  }
+
+  grid-auto-flow: column;
+  grid-column-gap: var(--grid-gap);
+  margin: 0 var(--spacing-wider);
+  padding: 0 var(--spacing-tight) var(--spacing-base) var(--spacing-tight);
+  overflow: auto;
+  position: relative;
+
+  &:has([data-virtualized="true"]) {
+    display: block;
+  }
+}
+
+.grid > div > h4 {
+  cursor: pointer;
+}
+
+.container,
+.containerVirtualized {
+  --grid-gap: 30px;
+}
+
+.container {
+  position: relative;
+  flex-grow: 1;
+  min-width: 0; /* famous flex hack to prevent block from growing enormously */
+  margin-top: var(--spacing-tight);
+
+  &::before,
+  &::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    height: 100%;
+    width: var(--spacing-tighter);
+    z-index: 1;
+    pointer-events: none;
+  }
+
+  &::before {
+    left: 30px;
+    background: linear-gradient(
+      to right,
+      rgba(var(--color-neutral-background-raw) / 100%),
+      rgba(var(--color-neutral-background-raw) / 0%)
+    );
+  }
+
+  &::after {
+    right: 30px;
+    background: linear-gradient(
+      to left,
+      rgba(var(--color-neutral-background-raw) / 100%),
+      rgba(var(--color-neutral-background-raw) / 0%)
+    );
+  }
+}
+
+.containerVirtualized {
+  position: relative;
+  flex-grow: 1;
+  min-width: 0;
+  height: calc(100vh - 200px); /* Account for header/tabs */
+  min-height: 400px;
+}
+
+.container > button,
+.containerVirtualized > button {
+  position: absolute;
+  top: 0;
+  width: var(--grid-gap);
+  height: 100%;
+  z-index: 10;
+
+  & span > span {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  & svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  &:hover {
+    background: var(--color-primary-emphasis-subtle);
+  }
+}
+
+.container > button.left,
+.containerVirtualized > button.left {
+  left: 0;
+}
+
+.container > button.right,
+.containerVirtualized > button.right {
+  right: 0;
+}
+
+.grid > div:global(.hover) {
+  background: var(--color-primary-emphasis-subtle);
+
+  & h4 {
+    color: var(--primary_link);
+  }
+}
+
+/* don't let the empty blocks to break the nice grid */
+.grid > div:empty {
+  display: none;
+}
+
+:global(.ant-btn.ant-btn-text.ant-btn-icon-only:hover) {
+  background-color: var(--color-primary-emphasis-subtle);
+}

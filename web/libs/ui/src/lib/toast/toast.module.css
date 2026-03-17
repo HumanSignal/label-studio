@@ -1,0 +1,209 @@
+@keyframes toast-enter-up {
+  from {
+    opacity: 0;
+    transform: translateY(100%);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes toast-leave-fade {
+  from {
+    opacity: 1;
+  }
+
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes toast-leave-down {
+  from {
+    opacity: 1;
+    transform: translateY(var(--radix-toast-swipe-end-y));
+  }
+
+  to {
+    opacity: 0;
+    transform: translateY(100%);
+  }
+}
+
+.toast-viewport {
+  --toast-spacing: var(--spacing-tight);
+
+  position: fixed;
+  display: flex;
+  justify-content: center;
+  left: 0;
+  right: 0;
+  width: 100%;
+  z-index: 9999;
+  bottom: 24px;
+  pointer-events: none;
+
+  & ol {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+
+    & li + li {
+      margin-top: var(--toast-spacing);
+    }
+  }
+
+  & ol:empty {
+    display: none;
+  }
+
+  & li {
+    @media (prefers-reduced-motion: no-preference) {
+      will-change: opacity, transform;
+
+      &[data-state="open"] {
+        animation: toast-enter-up 100ms ease-out forwards;
+      }
+
+      &[data-state="closed"] {
+        animation: toast-leave-fade 100ms ease-out forwards;
+      }
+
+      &[data-swipe="move"] {
+        transform: translateY(var(--radix-toast-swipe-move-y));
+      }
+
+      &[data-swipe="cancel"] {
+        transform: translateY(0);
+      }
+
+      &[data-swipe="end"] {
+        animation: toast-leave-down 100ms ease-out forwards;
+      }
+    }
+  }
+}
+
+.toast {
+  --text-color: var(--color-neutral-inverted-content);
+  --background-color: var(--color-neutral-inverted-surface);
+  --border-color: var(--color-surface-border);
+  --hover-color: var(--color-neutral-inverted-surface-hover);
+  --padding: var(--toast-spacing);
+
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  border-radius: 4px;
+  overflow: hidden;
+  color: var(--text-color);
+  border: 1px solid var(--border-color);
+  background-color: var(--background-color);
+  pointer-events: all;
+
+  & > div,
+  &__content {
+    font-size: 14px;
+    line-height: 24px;
+    flex: 1;
+  }
+
+  &__action,
+  &__content {
+    padding: var(--padding);
+    color: var(--text-color);
+  }
+
+  &__action {
+    flex: 0;
+    min-width: min-content;
+    font-weight: 500;
+    font-size: 16px;
+    line-height: 24px;
+    border: none;
+    border-radius: 0;
+    border-left: 1px solid var(--border-color);
+    white-space: nowrap;
+    background: none;
+    align-self: stretch;
+    display: flex;
+    align-items: center;
+
+    &:hover {
+      color: var(--color-negative-border);
+    }
+  }
+
+  &__close {
+    width: 24px;
+    min-width: 40px;
+    min-height: 40px;
+    height: 40px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    padding: 0;
+    border: none;
+    background: none;
+    cursor: pointer;
+    border-radius: 0;
+
+    &:hover {
+      background-color: var(--hover-color);
+    }
+  }
+
+  &_info {
+    /* Always maintain a dark background for info toasts */
+    --text-color: var(--color-sand-100);
+    --background-color: var(--color-sand-900);
+    --border-color: var(--color-sand-700);
+    --hover-color: var(--color-sand-800);
+  }
+
+  &_error {
+    --text-color: var(--color-negative-surface-content);
+    --background-color: var(--color-negative-surface);
+    --border-color: var(--color-negative-border);
+    --hover-color: var(--color-negative-surface-hover);
+  }
+
+  &_alertError {
+    --text-color: var(--color-neutral-content);
+    --background-color: var(--color-neutral-surface);
+    --border-color: var(--color-neutral-border);
+    --hover-color: var(--color-neutral-inverted-surface-hover);
+
+    border-bottom: 5px solid var(--color-negative-border);
+    border-radius: 4px;
+    text-align: center;
+
+    &__action {
+      display: flex;
+      align-items: center;
+      align-self: stretch;
+    }
+
+    &__content {
+      display: block;
+    }
+  }
+}
+
+.messageToast {
+  border-radius: 4px;
+
+  &_alertError {
+    position: fixed;
+    top: 60px;
+    left: calc(50vw - 250px);
+    width: calc(100vw - 60px);
+    max-width: 500px;
+    transform: translateY(-200%);
+    transition: transform 1s;
+    z-index: 100;
+  }
+}

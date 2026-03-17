@@ -23,7 +23,7 @@ import { FF_LSDV_4583, FF_TAXONOMY_LABELING, isFF } from "../../../utils/feature
 import ControlBase from "../Base";
 import ClassificationBase from "../ClassificationBase";
 
-import styles from "./Taxonomy.scss";
+import styles from "./Taxonomy.prefix.css";
 import messages from "../../../utils/messages";
 import { errorBuilder } from "../../../core/DataValidator/ConfigValidator";
 
@@ -642,4 +642,4 @@ const HtxTaxonomy = observer(({ item }) => {
 
 Registry.addTag("taxonomy", TaxonomyModel, HtxTaxonomy);
 
-export { HtxTaxonomy, TaxonomyModel, TagAttrs };
+export { HtxTaxonomy, TaxonomyModel, TagAttrs, traverse };

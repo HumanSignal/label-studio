@@ -1,5 +1,4 @@
-"""This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
-"""
+"""This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license."""
 
 import logging
 
@@ -70,7 +69,6 @@ def extract_labels(annotation, control_tag, label_interface_tags=None):
             # or taxonomy (list of string-lists)
             for key in region['value']:
                 if region['value'][key] and isinstance(region['value'][key], list):
-
                     if key == 'taxonomy':
                         showFullPath = 'true'
                         pathSeparator = '/'

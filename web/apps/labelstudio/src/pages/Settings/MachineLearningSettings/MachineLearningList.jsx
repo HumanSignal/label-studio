@@ -11,7 +11,7 @@ import { Tooltip } from "@humansignal/ui";
 import { ApiContext } from "../../../providers/ApiProvider";
 import { cn } from "../../../utils/bem";
 
-import "./MachineLearningList.scss";
+import "./MachineLearningList.prefix.css";
 
 export const MachineLearningList = ({ backends, fetchBackends, onEdit, onTestRequest, onStartTraining }) => {
   const api = useContext(ApiContext);

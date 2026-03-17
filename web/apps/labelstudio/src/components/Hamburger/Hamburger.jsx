@@ -1,5 +1,5 @@
 import { cn } from "../../utils/bem";
-import "./Hamburger.scss";
+import "./Hamburger.prefix.css";
 
 export const Hamburger = ({ opened, animated = true }) => {
   const root = cn("hamburger");

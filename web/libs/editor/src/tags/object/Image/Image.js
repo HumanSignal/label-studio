@@ -167,13 +167,15 @@ const Model = types
     mode: types.optional(types.enumeration(["drawing", "viewing", "brush", "eraser"]), "viewing"),
 
     regions: types.array(
-      types.union(
-        BrushRegionModel,
-        RectRegionModel,
-        EllipseRegionModel,
-        PolygonRegionModel,
-        VectorRegionModel,
-        KeyPointRegionModel,
+      types.late(() =>
+        types.union(
+          BrushRegionModel,
+          RectRegionModel,
+          EllipseRegionModel,
+          PolygonRegionModel,
+          VectorRegionModel,
+          KeyPointRegionModel,
+        ),
       ),
       [],
     ),

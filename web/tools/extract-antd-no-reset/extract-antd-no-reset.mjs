@@ -46,8 +46,6 @@ const header = `/*!
  * Modified version to exclude global resets
  *
  */
-/* stylelint-disable */
-
 /* This is a modified version of antd.css that excludes global reset styles */
 `;
 

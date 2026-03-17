@@ -1,6 +1,6 @@
 import { cn } from "../../utils/utils";
 import { forwardRef, type MouseEvent, type ButtonHTMLAttributes, type PropsWithChildren, type ReactNode } from "react";
-import styles from "./button.module.scss";
+import styles from "./button.module.css";
 import { setRef } from "@humansignal/core/lib/utils/unwrapRef";
 import { Tooltip } from "../Tooltip/Tooltip";
 

@@ -4,7 +4,7 @@ import { Message, type MessageProps } from "./message";
 import { IconUpload } from "@humansignal/icons";
 
 // Mock the styles since they're SCSS modules
-jest.mock("./message.module.scss", () => ({
+jest.mock("./message.module.css", () => ({
   base: "base",
   // Size classes
   "size-medium": "size-medium",

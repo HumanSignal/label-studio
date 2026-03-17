@@ -1,6 +1,6 @@
 ---
 description: Design system and UI consistency guidelines for Label Studio
-globs: **/*.tsx,**/*.jsx,**/*.scss,**/*.css
+globs: **/*.tsx,**/*.jsx,**/*.css
 alwaysApply: false
 ---
 
@@ -51,7 +51,7 @@ This rule provides guidance for creating user interfaces consistent with the Hum
 
 ## Design Tokens
 
-**Location**: `web/libs/ui/src/tokens/tokens.scss`
+**Location**: `web/libs/ui/src/tokens/tokens.prefix.css`
 
 **Always Use Semantic Tokens**:
 
@@ -143,9 +143,9 @@ import { cn } from '@humansignal/core';
 <div className="p-200 bg-grape-600 text-16">
 ```
 
-**SCSS Modules** (co-located `.module.scss`):
-```scss
-// Create component tokens → semantic tokens
+**CSS Modules** (co-located `.module.css`):
+```css
+/* Component tokens → semantic tokens */
 .component {
   --component-bg: var(--color-neutral-surface);
   --component-text: var(--color-neutral-content);
@@ -156,7 +156,7 @@ import { cn } from '@humansignal/core';
   padding: var(--component-spacing);
 }
 
-// Variant pattern
+/* Variant pattern */
 .variant-primary {
   --component-bg: var(--color-primary-surface);
   --component-text: var(--color-primary-surface-content);
@@ -187,7 +187,7 @@ See `react.mdc` for complete React patterns.
 ```
 button/
   button.tsx
-  button.module.scss
+  button.module.css
   button.stories.tsx
   button.test.tsx
   index.ts
@@ -196,7 +196,7 @@ button/
 **Pattern**:
 ```tsx
 import { forwardRef } from 'react';
-import styles from './button.module.scss';
+import styles from './button.module.css';
 import { cn } from '@humansignal/core';
 
 export interface ButtonProps {
@@ -315,7 +315,7 @@ export const Primary: Story = {
 
 **Files**:
 - Components: `web/libs/ui/src/lib/`
-- Tokens: `web/libs/ui/src/tokens/tokens.scss`
+- Tokens: `web/libs/ui/src/tokens/tokens.prefix.css`
 - Storybook: `yarn nx storybook storybook`
 
 **Related Rules**:

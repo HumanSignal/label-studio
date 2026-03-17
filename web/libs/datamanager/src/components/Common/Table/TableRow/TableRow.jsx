@@ -4,7 +4,7 @@ import { cn } from "../../../../utils/bem";
 import { FF_LOPS_E_3, isFF } from "../../../../utils/feature-flags";
 import { normalizeCellAlias } from "../../../CellViews";
 import { SkeletonLoader } from "../../SkeletonLoader";
-import "./TableRow.scss";
+import "./TableRow.prefix.css";
 import { TableContext, tableCN } from "../TableContext";
 import { getProperty, getStyle } from "../utils";
 

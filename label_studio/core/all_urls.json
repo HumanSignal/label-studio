@@ -42,12 +42,6 @@
         "decorators": ""
     },
     {
-        "url": "/static/fonts/roboto/roboto.css",
-        "module": "core.views.serve_file",
-        "name": "",
-        "decorators": ""
-    },
-    {
         "url": "/static/<path>",
         "module": "core.utils.static_serve.serve",
         "name": "",

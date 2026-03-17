@@ -6,6 +6,8 @@ export type SelectOptionData<T = any> = {
   hidden?: boolean;
   disabled?: boolean;
   children?: SelectOptionData<T>[];
+  /** Custom row height (px) for virtual-list mode; defaults to VARIABLE_LIST_ITEM_HEIGHT (40). */
+  height?: number;
 };
 
 export enum SelectSize {
@@ -26,22 +28,32 @@ export type OptionProps = {
   onSelect?: () => void;
   isIndeterminate?: boolean;
   className?: string;
+  /** When provided, renders custom content instead of default label (e.g. icon, Tag, badge) */
+  optionRenderer?: FC<{ option: any; index: number }>;
+  /** Full option object passed to optionRenderer */
+  option?: any;
+  /** Index passed to optionRenderer */
+  optionIndex?: number;
 };
 
 type ExtractStructOption<T> = T extends SelectOptionData ? T["value"] : never;
 type ExtractPrimitiveOption<T> = T extends string | number ? T : never;
-export type ExtractOption<T> = T extends SelectOption<any>
-  ? T extends SelectOptionData<any>
-    ? ExtractStructOption<T>
-    : ExtractPrimitiveOption<T>
-  : never;
+export type ExtractOption<T> =
+  T extends SelectOption<any>
+    ? T extends SelectOptionData<any>
+      ? ExtractStructOption<T>
+      : ExtractPrimitiveOption<T>
+    : never;
 
 export type ExtractValue<T, A extends SelectOption<T>[]> = A[number] extends { value: infer U } ? U : A[number];
 
 export type SelectProps<T, A extends SelectOption<T>[]> = {
   label?: string;
   description?: string;
-  options: A;
+  /** Options list. */
+  options?: A;
+  /** Field name to group options by. Options with `option[groupBy]` are grouped under that value as a header; null/undefined go in an ungrouped leading section. */
+  groupBy?: string;
   value?: ExtractOption<A[number]> | null;
   defaultValue?: ExtractOption<A[number]> | null;
   validate?: any;
@@ -82,13 +94,18 @@ export type SelectProps<T, A extends SelectOption<T>[]> = {
   selectFirstIfEmpty?: boolean;
   renderSelected?: (selectedOptions?: A[number][], placeholder?: string) => React.ReactNode | string;
   isVirtualList?: boolean;
+  /** Max visible items in the virtual list before scrolling (default: 5) */
+  virtualListMaxVisible?: number;
   loadMore?: () => void;
   pageSize?: number;
   page?: number;
   itemCount?: number;
   onClose?: () => void;
   onOpen?: () => void;
+  /** Controlled open state. When provided, the dropdown open/close state is driven externally. */
+  open?: boolean;
   alwaysShowSelectedGroup?: boolean;
+  onSelectAllClick?: () => void;
 } & SelectVirtualizedProps &
   Omit<React.SelectHTMLAttributes<HTMLSelectElement>, "value" | "placeholder">;
 

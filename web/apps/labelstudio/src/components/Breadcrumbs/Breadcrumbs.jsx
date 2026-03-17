@@ -6,7 +6,7 @@ import { cn } from "../../utils/bem";
 import { absoluteURL } from "../../utils/helpers";
 import { Dropdown } from "@humansignal/ui";
 import { Menu } from "../Menu/Menu";
-import "./Breadcrumbs.scss";
+import "./Breadcrumbs.prefix.css";
 
 export const Breadcrumbs = () => {
   const config = useConfig();

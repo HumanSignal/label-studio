@@ -262,7 +262,7 @@ class AnnotationStubSerializer(FlexFieldsModelSerializer):
         ]
 
 
-class TaskSimpleSerializer(ModelSerializer):
+class TaskSimpleSerializer(FlexFieldsModelSerializer):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['annotations'] = AnnotationSerializer(many=True, default=[], context=self.context, read_only=True)
@@ -326,7 +326,10 @@ class BaseTaskSerializer(FlexFieldsModelSerializer):
         if project:
             # resolve uri for storage (s3/gcs/etc)
             if self.context.get('resolve_uri', False):
-                instance.data = instance.resolve_uri(instance.data, project)
+                if flag_set('fflag_fix_fit_1511_resolve_multiple_cloud_uris', user='auto'):
+                    instance.data = instance.resolve_uris(instance.data, project)
+                else:
+                    instance.data = instance.resolve_uri(instance.data, project)
 
             # resolve $undefined$ key in task data
             data = instance.data

@@ -5,9 +5,9 @@ import { useSDK } from "../../../providers/SDKProvider";
 import { isDefined } from "../../../utils/utils";
 import { Icon } from "../Icon/Icon";
 import { modal } from "../Modal/Modal";
-import { IconBraces, IconChevronDown } from "@humansignal/icons";
+import { IconBraces } from "@humansignal/icons";
 import { AutoSizerTable, Button } from "@humansignal/ui";
-import "./Table.scss";
+import "./Table.prefix.css";
 import { TableCheckboxCell } from "./TableCheckbox";
 import { tableCN, TableContext } from "./TableContext";
 import { TableHead } from "./TableHead/TableHead";
@@ -18,7 +18,7 @@ import { cn } from "../../../utils/bem";
 import { FieldsButton } from "../FieldsButton";
 import { FF_LOPS_E_3, isFF } from "../../../utils/feature-flags";
 import { DensityToggle } from "../../DataManager/Toolbar/DensityToggle";
-import { TaskSourceViewer } from "../TaskSourceViewer";
+import { TaskSourceViewer, getTaskSourceViewerStorageKey } from "../TaskSourceViewer";
 
 const Decorator = (decoration) => {
   return {
@@ -62,7 +62,7 @@ export const Table = observer(
     const [colOrder, setColOrder] = useState(JSON.parse(localStorage.getItem(colOrderKey)) ?? {});
     const listRef = useRef();
     const Decoration = useMemo(() => Decorator(decoration), [decoration]);
-    const { api, type } = useSDK();
+    const { api, type, projectId } = useSDK();
     const toolbarHeight = 41;
     const isQuickView = view.root.isLabeling;
     const [toolbarVisible, setToolbarVisible] = useState(true);
@@ -194,7 +194,7 @@ export const Table = observer(
                     content={out}
                     onTaskLoad={onTaskLoad}
                     sdkType={type}
-                    storageKey="dm:tasksource"
+                    storageKey={getTaskSourceViewerStorageKey(projectId)}
                     renderToggle={(toggle) => {
                       // Update modal header with toggle
                       modalInstance?.update({ header: toggle });
@@ -285,11 +285,9 @@ export const Table = observer(
       return (
         <div className={cn("table-toolbar").mod({ visible: toolbarVisible }).toClassName()}>
           <FieldsButton
-            className={cn("table-toolbar").elem("customize-button").toClassName()}
-            wrapper={FieldsButton.Checkbox}
+            multiSelect={true}
             title={"Columns"}
             size="small"
-            trailingIcon={<Icon icon={IconChevronDown} />}
             tooltip={"Customize Columns"}
             data-testid="columns-picker-quickview"
           />
@@ -640,7 +638,7 @@ const innerElementType = forwardRef(({ children, ...rest }, ref) => {
 const ContextMenuPortal = memo(
   ({ contextMenu, view, onViewAnalytics, onViewReviewerAnalytics, onClose, RowContextMenuComponent }) => {
     const MenuComponent = RowContextMenuComponent || RowContextMenu;
-    const { api, type } = useSDK();
+    const { api, type, projectId } = useSDK();
 
     return (
       <MenuComponent
@@ -649,6 +647,7 @@ const ContextMenuPortal = memo(
         view={view}
         api={api}
         sdkType={type}
+        projectId={projectId}
         onViewAnalytics={onViewAnalytics}
         onViewReviewerAnalytics={onViewReviewerAnalytics}
         cursorPosition={{ x: contextMenu.x, y: contextMenu.y }}

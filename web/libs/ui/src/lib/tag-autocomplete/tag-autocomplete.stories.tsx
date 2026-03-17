@@ -1,9 +1,9 @@
-import { useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
+import { useState } from "react";
+import { Button } from "../button/button";
+import { Typography } from "../typography/typography";
 import { TagAutocomplete } from "./tag-autocomplete";
 import type { TagOption } from "./types";
-import { Typography } from "../typography/typography";
-import { Button } from "../button/button";
 
 const meta: Meta<typeof TagAutocomplete> = {
   component: TagAutocomplete,
@@ -26,13 +26,14 @@ const meta: Meta<typeof TagAutocomplete> = {
 A tag-like autocomplete component that allows users to select multiple tags from a predefined list.
 
 ## Features
-- **Typeahead search** - Filter options by typing (minimum 2 characters by default)
-- **Keyboard navigation** - Full keyboard support for selecting and removing tags
-- **Multiline tags** - Tags automatically wrap to multiple lines when needed
-- **Highlighted search** - Search text is highlighted in matching options
-- **Tag creation** - Allow users to create new tags on the fly (with allowCreate prop)
-- **Loading state** - Displays a spinner in the dropdown while fetching options
-- **Form integration** - Works with standard HTML forms via name prop
+- **Typeahead search**: Filter options by typing (minimum 2 characters by default)
+- **Keyboard navigation**: Full keyboard support for selecting and removing tags
+- **Multiline tags**: Tags automatically wrap to multiple lines when needed
+- **Highlighted search**: Search text is highlighted in matching options
+- **Tag creation**: Allow users to create new tags on the fly (with allowCreate prop)
+- **Paste support**: Paste comma-separated values to create multiple tags at once (only when \`allowCreate\` is enabled)
+- **Loading state**: Displays a spinner in the dropdown while fetching options
+- **Form integration**: Works with standard HTML forms via name prop
 
 ## Keyboard Shortcuts
 | Key | Action |
@@ -40,6 +41,7 @@ A tag-like autocomplete component that allows users to select multiple tags from
 | Arrow Left/Right | Navigate between tags |
 | Arrow Up/Down | Navigate dropdown options |
 | Enter / Comma | Select highlighted option or create new tag |
+| Paste (comma-separated) | Create multiple tags from clipboard (requires \`allowCreate\`) |
 | Backspace/Delete | Remove focused tag |
 | Escape | Close dropdown |
         `,
@@ -503,8 +505,14 @@ export const LongLabels: Story = {
   render: () => {
     const [value, setValue] = useState<string[]>(["long-1", "long-2"]);
     const longOptions = [
-      { value: "long-1", label: "This is a very long tag label that should be truncated" },
-      { value: "long-2", label: "Another extremely long label for demonstration" },
+      {
+        value: "long-1",
+        label: "This is a very long tag label that should be truncated",
+      },
+      {
+        value: "long-2",
+        label: "Another extremely long label for demonstration",
+      },
       { value: "long-3", label: "Short" },
       { value: "long-4", label: "Medium length label" },
     ];
@@ -595,6 +603,96 @@ export const CustomMinSearchLength: Story = {
         <Typography variant="body" size="small" className="mt-base text-neutral-content-subtle">
           <strong>Available:</strong> {sampleTags.map((tag) => tag.label).join(", ")}
         </Typography>
+      </div>
+    );
+  },
+};
+
+/**
+ * Paste With Creation (allowCreate=true)
+ *
+ * When allowCreate is enabled, pasting a comma-separated string creates each value
+ * as a new tag immediately — no existing options required.
+ *
+ * Try pasting: `React, Vue, Angular, Svelte`
+ */
+export const PasteWithCreation: Story = {
+  render: () => {
+    const [value, setValue] = useState<string[]>([]);
+    return (
+      <div className="w-full max-w-lg space-y-base">
+        <TagAutocomplete
+          options={[]}
+          value={value}
+          onChange={setValue as any}
+          allowCreate={true}
+          placeholder="Paste comma-separated values to create tags..."
+        />
+        <div className="p-base bg-neutral-surface rounded-md space-y-tight">
+          <Typography variant="body" size="small" className="font-medium">
+            Try it:
+          </Typography>
+          <Typography variant="body" size="small" className="text-neutral-content-subtle">
+            Copy and paste this into the field above:
+          </Typography>
+          <Typography variant="body" size="small" className="font-mono bg-neutral-surface-bold rounded px-tight py-1">
+            React, Vue, Angular, Svelte
+          </Typography>
+          <Typography variant="body" size="small" className="text-neutral-content-subtle mt-tight">
+            Each comma-separated value is created as a new tag instantly.
+          </Typography>
+        </div>
+        {value.length > 0 && (
+          <Typography variant="body" size="small" className="text-neutral-content-subtle">
+            <strong>Selected:</strong> {value.join(", ")}
+          </Typography>
+        )}
+      </div>
+    );
+  },
+};
+
+/**
+ * Paste Blocked (allowCreate=false)
+ *
+ * When allowCreate is disabled (e.g. the field searches a server-side list),
+ * pasting comma-separated values is not supported. A validation error is shown
+ * below the input prompting the user to search and select tags individually.
+ *
+ * Try pasting: `Frontend, Backend, DevOps`
+ */
+export const PasteBlocked: Story = {
+  render: () => {
+    const [value, setValue] = useState<string[]>([]);
+    return (
+      <div className="w-full max-w-lg space-y-base">
+        <TagAutocomplete
+          options={sampleTags}
+          value={value}
+          onChange={setValue as any}
+          allowCreate={false}
+          minSearchLength={0}
+          placeholder="Search and select tags..."
+        />
+        <div className="p-base bg-neutral-surface rounded-md space-y-tight">
+          <Typography variant="body" size="small" className="font-medium">
+            Try it:
+          </Typography>
+          <Typography variant="body" size="small" className="text-neutral-content-subtle">
+            Paste the following into the field above and a validation error will appear:
+          </Typography>
+          <Typography variant="body" size="small" className="font-mono bg-neutral-surface-bold rounded px-tight py-1">
+            Frontend, Backend, DevOps
+          </Typography>
+          <Typography variant="body" size="small" className="text-neutral-content-subtle mt-tight">
+            To add tags, type in the field and select from the dropdown.
+          </Typography>
+        </div>
+        {value.length > 0 && (
+          <Typography variant="body" size="small" className="text-neutral-content-subtle">
+            <strong>Selected:</strong> {value.join(", ")}
+          </Typography>
+        )}
       </div>
     );
   },

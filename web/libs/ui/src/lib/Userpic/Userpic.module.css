@@ -1,0 +1,84 @@
+.userpic {
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+  display: flex;
+  position: relative;
+  align-items: center;
+  border-radius: 50%;
+  justify-content: center;
+  background: var(--color-neutral-surface);
+  border: 1px solid rgba(var(--color-neutral-shadow-raw) / 10%);
+  box-shadow: none;
+  transition: all 150ms ease-out;
+  user-select: none;
+
+  .avatar {
+    opacity: 0;
+    width: 100%;
+    height: 100%;
+    font-size: 12px;
+    line-height: 22px;
+    object-fit: cover;
+    position: absolute;
+    border-radius: 100%;
+
+    /* Firefox displays weird empty box extending viewport's width (img shouldn't render ::before at all!) */
+    /* this is a hack to prevent it from rendering */
+    &::before {
+      content: none;
+      display: none;
+    }
+  }
+
+  .username {
+    font-size: 12px;
+    white-space: nowrap;
+    overflow: hidden;
+    line-height: 1;
+    font-weight: bold;
+    text-align: center;
+    opacity: 0.6;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    user-select: none;
+  }
+
+  .badge {
+    position: absolute;
+
+    &.topLeft {
+      top: 0;
+      left: 0;
+    }
+
+    &.topRight {
+      top: 0;
+      right: 0;
+    }
+
+    &.bottomLeft {
+      bottom: 0;
+      left: 0;
+    }
+
+    &.bottomRight {
+      bottom: 0;
+      right: 0;
+    }
+  }
+
+  &.faded {
+    background: var(--color-neutral-surface);
+    box-shadow: inset 0 0 0 1px var(--color-neutral-border-subtle);
+
+    .avatar {
+      opacity: 0.3;
+    }
+  }
+
+  &.faded .username {
+    opacity: 0.2;
+  }
+}

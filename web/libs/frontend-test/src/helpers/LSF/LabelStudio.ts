@@ -1,5 +1,6 @@
 import { fixLSParams } from "@humansignal/frontend-test/helpers/utils/fixLSParams";
 import { expect } from "chai";
+import { ImageView } from "./ImageView";
 
 type LSParams = Record<string, any>;
 
@@ -277,6 +278,15 @@ export const LabelStudio = {
         watchObjectsReady();
       });
     });
+  },
+
+  /**
+   * Wait for objects ready and then for the image view (image loaded and Konva canvas).
+   * Use in image-based specs to avoid repeating waitForObjectsReady + ImageView.waitForImage.
+   */
+  waitForImageReady() {
+    this.waitForObjectsReady();
+    ImageView.waitForImage();
   },
 
   /**

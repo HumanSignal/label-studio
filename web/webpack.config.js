@@ -9,10 +9,9 @@ require("dotenv").config({
   path: path.resolve(__dirname, "../.env"),
 });
 
-// Import webpack plugins from the same webpack version that @nx/webpack uses for compilation,
-// to avoid version mismatches between the root webpack and the NX-bundled webpack.
-const nxWebpack = require("@nx/webpack/node_modules/webpack");
-const { EnvironmentPlugin, DefinePlugin } = nxWebpack;
+// Use the project's webpack so resolution works (e.g. when @nx/webpack does not bundle webpack under node_modules).
+const webpack = require("webpack");
+const { EnvironmentPlugin, DefinePlugin } = webpack;
 const TerserPlugin = require("terser-webpack-plugin");
 const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
 
@@ -78,11 +77,11 @@ const optimizer = () => {
 module.exports = composePlugins(
   withNx({
     nx: {
-      svgr: true,
+      svgr: false,
     },
     skipTypeChecking: true,
   }),
-  withReact({ svgr: true }),
+  withReact({ svgr: false }),
   (config) => {
     // Remove the extension alias as this conflicts with the nx/webpack v21 changes
     delete config.resolve.extensionAlias;
@@ -148,92 +147,154 @@ module.exports = composePlugins(
     };
 
     config.module.rules.forEach((rule) => {
-      const testString = rule.test.toString();
-      const isScss = testString.includes("scss");
-      const isCssModule = testString.includes(".module");
+      if (!rule.oneOf || !rule.test?.toString().includes("css")) return;
 
-      if (isScss) {
-        rule.oneOf.forEach((loader) => {
-          if (loader.use) {
-            const cssLoader = loader.use.find((use) => use.loader && use.loader.includes("css-loader"));
+      rule.oneOf.forEach((oneOfRule) => {
+        if (!oneOfRule.use) return;
 
-            if (cssLoader && cssLoader.options) {
-              cssLoader.options.modules = {
-                mode: "local",
-                auto: true,
-                namedExport: false,
-                localIdentName: "[local]--[hash:base64:5]",
-              };
-            }
-          }
-        });
-      }
+        oneOfRule.use = oneOfRule.use.filter(
+          (use) => !(use.loader && /sass-loader|stylus-loader|less-loader/.test(use.loader)),
+        );
 
-      if (rule.test.toString().match(/scss|sass/) && !isCssModule) {
-        const r = rule.oneOf.filter((r) => {
-          // we don't need rules that don't have loaders
-          if (!r.use) return false;
+        const innerTest = oneOfRule.test?.toString() ?? "";
+        const cssLoader = oneOfRule.use.find((use) => use.loader?.includes("/css-loader/"));
 
-          const testString = r.test.toString();
+        if (innerTest.includes("module") && cssLoader?.options) {
+          cssLoader.options.modules = {
+            mode: "local",
+            auto: true,
+            namedExport: false,
+            localIdentName: "[local]--[hash:base64:5]",
+          };
+        }
+      });
 
-          // we also don't need css modules as these are used directly
-          // in the code and don't need prefixing
-          if (testString.match(/module|raw|antd/)) return false;
+      const insertions = [];
+      rule.oneOf.forEach((oneOfRule, idx) => {
+        if (!oneOfRule.test || !oneOfRule.use) return;
+        const t = oneOfRule.test.toString();
+        if (/^\/\\\.css\$\/$/.test(t) && oneOfRule.use.some((u) => u.loader?.includes("/css-loader/"))) {
+          insertions.push(idx);
+        }
+      });
 
-          // we only target pre-processors that has 'css-loader included'
-          return testString.match(/scss|sass/) && r.use.some((u) => u.loader && u.loader.includes("css-loader"));
-        });
-
-        r.forEach((_r) => {
-          const cssLoader = _r.use.find((use) => use.loader && use.loader.includes("css-loader"));
-
-          if (!cssLoader) return;
-
-          const isSASS = _r.use.some((use) => use.loader && use.loader.match(/sass|scss/));
-
-          if (isSASS) _r.exclude = /node_modules/;
-
-          if (cssLoader.options) {
-            cssLoader.options.modules = {
-              localIdentName: `${css_prefix}[local]`, // Customize this format
-              getLocalIdent(_ctx, _ident, className) {
-                if (className.includes("ant")) return className;
+      for (let i = insertions.length - 1; i >= 0; i--) {
+        const idx = insertions[i];
+        const template = rule.oneOf[idx];
+        const prefixUse = template.use.map((u) => {
+          if (typeof u === "string") return u;
+          if (u.loader?.includes("/css-loader/")) {
+            return {
+              ...u,
+              options: {
+                ...(u.options ?? {}),
+                modules: {
+                  localIdentName: `${css_prefix}[local]`,
+                  getLocalIdent(_ctx, _ident, className) {
+                    if (className.includes("ant")) return className;
+                  },
+                },
               },
             };
           }
+          return u;
+        });
+
+        rule.oneOf.splice(idx, 0, {
+          test: /\.prefix\.css$/,
+          include: template.include,
+          exclude: /node_modules/,
+          use: prefixUse,
         });
       }
 
-      if (testString.includes(".css")) {
-        rule.exclude = /tailwind\.css/;
+      rule.exclude = /tailwind\.css/;
+    });
+
+    // Force local @humansignal icon SVGs through svgr regardless of issuer.
+    const humansignalIconsSvgRule = {
+      test: /libs[\\/]ui[\\/]src[\\/]assets[\\/]icons[\\/].*\.svg(\?.*)?$/,
+      use: [
+        {
+          loader: "@svgr/webpack",
+          options: {
+            ref: true,
+            exportType: "named",
+            namedExport: "ReactComponent",
+            svgo: false,
+          },
+        },
+        path.resolve(__dirname, "tools/loaders/svg-source-loader.cjs"),
+      ],
+    };
+    config.module.rules.unshift(humansignalIconsSvgRule);
+
+    const svgRule = {
+      test: /\.svg(\?.*)?$/,
+      exclude: /node_modules/,
+      oneOf: [
+        {
+          issuer: /\.[jt]sx?$/,
+          use: [
+            {
+              loader: "@svgr/webpack",
+              options: {
+                ref: true,
+                exportType: "named",
+                namedExport: "ReactComponent",
+                svgo: false, // avoid parse errors with resolved svgo >=3.3.3
+              },
+            },
+            path.resolve(__dirname, "tools/loaders/svg-source-loader.cjs"),
+          ],
+        },
+        {
+          type: "asset/resource",
+        },
+      ],
+    };
+    config.module.rules.unshift(svgRule);
+
+    // Ensure no other webpack rules process .svg and override svgr output
+    const isOurSvgRule = (rule) => rule === svgRule || rule === humansignalIconsSvgRule;
+    const addSvgExclude = (rule) => {
+      if (!rule || isOurSvgRule(rule)) return;
+      const testString = rule.test?.toString?.() ?? "";
+      if (!testString.includes("svg")) return;
+      const svgExclude = /\.svg(\?.*)?$/;
+      if (!rule.exclude) {
+        rule.exclude = svgExclude;
+      } else if (Array.isArray(rule.exclude)) {
+        rule.exclude = [...rule.exclude, svgExclude];
+      } else {
+        rule.exclude = [rule.exclude, svgExclude];
+      }
+    };
+    config.module.rules.forEach((rule) => {
+      addSvgExclude(rule);
+      if (Array.isArray(rule.oneOf)) {
+        rule.oneOf.forEach(addSvgExclude);
       }
     });
 
     config.module.rules.push(
       {
-        test: /\.svg$/,
-        exclude: /node_modules/,
-        use: [
-          {
-            loader: "@svgr/webpack",
-            options: {
-              ref: true,
-            },
-          },
-          "url-loader",
-        ],
-      },
-      {
         test: /\.xml$/,
         exclude: /node_modules/,
-        loader: "url-loader",
+        type: "asset/resource",
       },
       {
         test: /\.wasm$/,
-        type: "javascript/auto",
-        loader: "file-loader",
-        options: {
-          name: "[name].[ext]",
+        type: "asset/resource",
+        generator: {
+          filename: "[name][ext]",
+        },
+      },
+      {
+        test: /\.(gif|png|jpe?g|webp)(\?.*)?$/,
+        type: "asset/resource",
+        generator: {
+          filename: "assets/[name]-[hash][ext]",
         },
       },
       // tailwindcss
@@ -261,12 +322,16 @@ module.exports = composePlugins(
     }
 
     config.resolve.alias = {
+      ...(config.resolve.alias ?? {}),
       // Common dependencies across at least two sub-packages
       react: path.resolve(__dirname, "node_modules/react"),
       "react-dom": path.resolve(__dirname, "node_modules/react-dom"),
       "react-joyride": path.resolve(__dirname, "node_modules/react-joyride"),
       "@humansignal/ui": path.resolve(__dirname, "libs/ui"),
       "@humansignal/core": path.resolve(__dirname, "libs/core"),
+      "@humansignal/icons$": path.resolve(__dirname, "libs/ui/src/assets/icons/index.ts"),
+      "@humansignal/shad": path.resolve(__dirname, "libs/ui/src/shad"),
+      "@humansignal/ui/lib": path.resolve(__dirname, "libs/ui/src/lib"),
     };
 
     return merge(config, {

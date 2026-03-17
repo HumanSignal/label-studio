@@ -7,6 +7,7 @@ Feature flag fixtures are defined in tasks/tests/conftest.py:
 - fflag_fix_all_fit_720_lazy_load_annotations_on: Enable the feature flag
 - fflag_fix_all_fit_720_lazy_load_annotations_off: Disable the feature flag
 """
+
 import pytest
 from organizations.tests.factories import OrganizationFactory
 from projects.tests.factories import ProjectFactory

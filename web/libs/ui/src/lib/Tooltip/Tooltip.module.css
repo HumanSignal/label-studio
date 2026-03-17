@@ -1,0 +1,144 @@
+.tooltip {
+  --transition-delay: 150ms;
+  --animation-duration: 100ms;
+  --animation-curve: cubic-bezier(0.21, 1.04, 0.68, 1);
+  --animation-start: -10px;
+  --pointer-size: 10px;
+  --offset-x: var(--spacing-base);
+
+  top: -1000px;
+  left: -1000px;
+  color: var(--color-neutral-inverted-content);
+  display: none;
+  z-index: 99999;
+  padding: 4px 10px;
+  font-size: 14px;
+  line-height: 24px;
+  position: absolute;
+  pointer-events: none;
+  background-color: var(--color-neutral-inverted-background);
+  border-radius: 3px;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  max-width: 250px;
+
+  &::before {
+    left: 50%;
+    bottom: 0;
+    content: "";
+    width: var(--pointer-size);
+    height: var(--pointer-size);
+    display: block;
+    position: absolute;
+    background-color: inherit;
+    transform: translate(-50%, 50%) rotate(45deg);
+  }
+
+  &.before-appear,
+  &.before-disappear {
+    transition:
+      opacity var(--animation-duration) var(--animation-curve) var(--transition-delay),
+      transform var(--animation-duration) var(--animation-curve) var(--transition-delay);
+  }
+
+  &.before-appear {
+    opacity: 0;
+    display: flex;
+    transform: translate3d(0, var(--animation-start), 0);
+  }
+
+  &.appear {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+
+  &.visible {
+    opacity: 1;
+    display: flex;
+  }
+
+  &.before-disappear {
+    opacity: 1;
+    display: flex;
+    transform: translate3d(0, 0, 0);
+  }
+
+  &.disappear {
+    opacity: 0;
+    transform: translate3d(0, var(--animation-start), 0);
+  }
+
+  &_align {
+    &_top-center {
+      --animation-start: -10px;
+
+      &::before {
+        bottom: 0;
+        transform: translate(-50%, 50%) rotate(45deg);
+      }
+    }
+
+    &_bottom-center {
+      --animation-start: 10px;
+
+      &::before {
+        top: 0;
+        transform: translate(-50%, -50%) rotate(45deg);
+      }
+    }
+
+    &_bottom-left {
+      margin-left: calc(-1 * (var(--offset-x) - var(--pointer-size) / 2));
+
+      --animation-start: 10px;
+
+      &::before {
+        top: 0;
+        left: 24px;
+        transform: translate(-50%, -50%) rotate(45deg);
+      }
+    }
+
+    &_top-left {
+      margin-left: calc(-1 * (var(--offset-x) - var(--pointer-size) / 2));
+
+      --animation-start: -10px;
+
+      &::before {
+        bottom: 0;
+        left: 24px;
+        transform: translate(-50%, 50%) rotate(45deg);
+      }
+    }
+
+    &_top-right {
+      margin-left: calc(var(--offset-x) - (var(--pointer-size) / 2));
+
+      --animation-start: -10px;
+
+      &::before {
+        left: initial;
+        bottom: 0;
+        right: 18px;
+        transform: translate(-50%, 50%) rotate(45deg);
+      }
+    }
+
+    &_bottom-right {
+      margin-left: calc(var(--offset-x) - (var(--pointer-size) / 2));
+
+      --animation-start: 10px;
+
+      &::before {
+        left: initial;
+        top: 0;
+        right: var(--offset-x);
+        transform: translate(-50%, -50%) rotate(45deg);
+      }
+    }
+  }
+}
+
+.wrapper {
+  display: contents;
+}

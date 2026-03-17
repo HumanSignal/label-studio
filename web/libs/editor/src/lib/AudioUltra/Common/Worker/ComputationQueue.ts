@@ -75,7 +75,6 @@ export class ComputationQueue<T = any> {
   private running = false;
   private runLoopTimeout: any = null;
   private options: ComputationQueueOptions<T>;
-  private version = 0;
   private nextBatchId = 0;
   // Track active batch counts by priority
   private activeBatchCounts: Record<TaskPriority, Set<string>> = {

@@ -12,8 +12,6 @@ _Important Note: These scripts must be executed within the web folder or its sub
   - Crucial for development, this script continuously builds Label Studio Frontend (LSF), allowing developers to observe their changes in real-time within the Label Studio environment.
 - **`yarn lsf:serve`: Run LSF standalone**
   - To run Label Studio Frontend in standalone mode. Visit http://localhost:3000 to use the application in standalone mode.
-- **`yarn lsf:e2e`: Execute end-to-end (e2e) tests on LSF**
-  - To run comprehensive e2e tests, ensuring the frontend works as expected from start to finish. The Label Studio environment must be running, typically at `http://localhost:8080`.
 - **`yarn lsf:integration`: Run integration tests**
   - To conduct integration tests using Cypress, verifying that different parts of LSF work together correctly. The LSF in standalone mode (`yarn lsf:serve`) must be running.
 - **`yarn lsf:integration:ui`: Run integration tests in UI mode**

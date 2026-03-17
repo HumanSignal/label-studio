@@ -3,7 +3,7 @@ import { IconOutlinerDrag, IconCollapseSmall, IconExpandSmall } from "@humansign
 import { useDrag } from "../../../hooks/useDrag";
 import { cn } from "../../../utils/bem";
 import { DEFAULT_PANEL_HEIGHT } from "../constants";
-import "./Tabs.scss";
+import "./Tabs.prefix.css";
 import { type BaseProps, Side, type TabProps } from "./types";
 import { determineDroppableArea, determineLeftOrRight } from "./utils";
 import { Button } from "../../../common/Button/Button";

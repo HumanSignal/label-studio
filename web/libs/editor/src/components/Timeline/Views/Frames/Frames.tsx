@@ -6,7 +6,7 @@ import { cn } from "../../../../utils/bem";
 import { isDefined } from "../../../../utils/utilities";
 import type { MSTTimelineRegion, TimelineRegion, TimelineViewProps } from "../../Types";
 import { Keypoints } from "./Keypoints";
-import "./Frames.scss";
+import "./Frames.prefix.css";
 
 /**
  * Effectively returns the frame on the given offset

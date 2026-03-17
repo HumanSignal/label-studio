@@ -1,5 +1,5 @@
 import { cn } from "@humansignal/shad/utils";
-import styles from "./space.module.scss";
+import styles from "./space.module.css";
 import type { CSSProperties, PropsWithChildren } from "react";
 
 export type SpaceProps = PropsWithChildren<{

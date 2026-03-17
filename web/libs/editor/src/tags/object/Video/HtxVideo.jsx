@@ -22,7 +22,7 @@ import { useToggle } from "../../../hooks/useToggle";
 import { cn } from "../../../utils/bem";
 import ResizeObserver from "../../../utils/resize-observer";
 import { clamp, isDefined } from "../../../utils/utilities";
-import "./Video.scss";
+import "./Video.prefix.css";
 import { VideoRegions } from "./VideoRegions";
 import { ff } from "@humansignal/core";
 
@@ -196,7 +196,7 @@ const HtxVideoView = ({ item, store }) => {
   );
 
   const supportsRegions = useMemo(() => {
-    return isDefined(item?.videoControl);
+    return isDefined(item?.videoControl) || isDefined(item?.videoVectorControl);
   }, [item]);
 
   const supportsTimelineRegions = useMemo(() => {

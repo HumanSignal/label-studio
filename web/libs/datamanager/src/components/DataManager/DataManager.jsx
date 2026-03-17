@@ -8,7 +8,7 @@ import { Spinner } from "../Common/Spinner";
 import { Tabs, TabsItem } from "../Common/Tabs/Tabs";
 import { FiltersSidebar } from "../Filters/FiltersSidebar/FilterSidebar";
 import { DataView } from "../MainView";
-import "./DataManager.scss";
+import "./DataManager.prefix.css";
 import { Toolbar } from "./Toolbar/Toolbar";
 
 const tabContentCN = cn("tabs-dm-content");

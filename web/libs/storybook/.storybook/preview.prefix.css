@@ -1,0 +1,172 @@
+@import "../../ui/src/styles.prefix.css";
+
+body {
+  height: 100vh;
+  color: var(--color-neutral-content) !important;
+  background-color: var(--color-neutral-background) !important;
+}
+
+#storybook-root,
+#storybook-docs,
+.sbdocs {
+  height: 100%;
+  color: var(--color-neutral-content) !important;
+  background-color: var(--color-neutral-background) !important;
+}
+
+/* Undo tailwind reset for the Docs pages */
+#storybook-docs .sbdocs-content h1:not(.sbdocs-preview *),
+#storybook-docs .sbdocs-content h2:not(.sbdocs-preview *),
+#storybook-docs .sbdocs-content h3:not(.sbdocs-preview *),
+#storybook-docs .sbdocs-content h4:not(.sbdocs-preview *),
+#storybook-docs .sbdocs-content h5:not(.sbdocs-preview *),
+#storybook-docs .sbdocs-content h6:not(.sbdocs-preview *) {
+  color: var(--color-neutral-content) !important;
+}
+
+/* Within Doc Pages apply the theme colors only to the preview blocks */
+.sbdocs-preview {
+  background-color: var(--color-neutral-background) !important;
+  color: var(--color-neutral-content) !important;
+  border: 1px solid var(--color-neutral-border) !important;
+}
+
+/* Style Storybook docs UI elements for dark mode support */
+#storybook-docs {
+  /* Args table (props documentation) */
+  .docblock-argstable {
+    color: var(--color-neutral-content) !important;
+
+    & thead,
+    & tbody,
+    & tr,
+    & th,
+    & td {
+      color: var(--color-neutral-content) !important;
+      background-color: var(--color-neutral-background) !important;
+      border-color: var(--color-neutral-border) !important;
+    }
+
+    /* Table header styling */
+    & th {
+      color: var(--color-neutral-content-subtle) !important;
+    }
+
+    /* Property names and descriptions */
+    & td {
+      & span,
+      & p,
+      & div {
+        color: var(--color-neutral-content) !important;
+      }
+    }
+  }
+
+  /* General content area (docs text only; exclude elements inside story preview blocks) */
+  .sbdocs-content {
+    color: var(--color-neutral-content) !important;
+
+    & p:not(.sbdocs-preview p),
+    & span:not(.sbdocs-preview span),
+    & div:not(.sbdocs-preview div),
+    & li:not(.sbdocs-preview li),
+    & code:not(.sbdocs-preview code) {
+      color: inherit !important;
+    }
+  }
+
+  /* Code blocks - ensure text is readable on dark backgrounds */
+  & code,
+  & pre {
+    background-color: var(--color-neutral-surface) !important;
+    color: var(--color-neutral-content) !important;
+  }
+
+  /* Inline code in args table (type annotations, default values) */
+  .docblock-argstable code,
+  .docblock-argstable span[class*="css-"] {
+    color: var(--color-neutral-content) !important;
+  }
+
+  /* Type signature chips (e.g., "(element: HTMLElement) => boolean") */
+  .docblock-argstable td div[class*="css-"] > span[class*="css-"] {
+    background-color: var(--color-neutral-surface) !important;
+    color: var(--color-neutral-content) !important;
+    border: none !important;
+  }
+
+  /* Default value chips (e.g., "false", "true") */
+  .docblock-argstable td > span[class*="css-"] {
+    background-color: var(--color-neutral-surface) !important;
+    color: var(--color-neutral-content) !important;
+    border: none !important;
+  }
+
+  /* Form controls in args table (selects, inputs, toggles) */
+  .docblock-argstable select,
+  .docblock-argstable textarea,
+  .docblock-argstable input:not([role="switch"]) {
+    background-color: var(--color-neutral-surface) !important;
+    color: var(--color-neutral-content) !important;
+    border-color: var(--color-neutral-border) !important;
+  }
+
+  /* Toggle switches (label with for starting with "control-") */
+  .docblock-argstable label[for^="control-"] {
+    background: var(--color-neutral-background) !important;
+    border: 1px solid var(--color-neutral-border) !important;
+  }
+
+  .docblock-argstable input[role="switch"] {
+    /* Toggle text labels (False/True) */
+    & ~ span[aria-hidden="true"] {
+      color: var(--color-neutral-content) !important;
+      background-color: var(--color-neutral-background) !important;
+    }
+
+    /* Checked state - use primary color */
+    &:checked {
+      & ~ span:last-of-type {
+        background-color: var(--color-primary-background) !important;
+        color: var(--color-primary-content) !important;
+      }
+    }
+
+    &:not(:checked) {
+      & ~ span:first-of-type {
+        background-color: var(--color-primary-background) !important;
+        color: var(--color-primary-content) !important;
+      }
+    }
+  }
+
+  /* Buttons (Set boolean, Set string, Set object, etc.) */
+  .docblock-argstable button {
+    background-color: var(--color-neutral-surface) !important;
+    color: var(--color-neutral-content) !important;
+    border-color: var(--color-neutral-border) !important;
+    box-shadow: var(--color-neutral-border) 0px 0px 0px 1px inset !important;
+  }
+
+  /* Show code / Hide code toggle buttons */
+  .docblock-code-toggle {
+    border-radius: 0 !important;
+    background-color: var(--color-neutral-surface) !important;
+    color: var(--color-neutral-content) !important;
+    border-color: var(--color-neutral-border) !important;
+  }
+
+  /* Preview toolbar (zoom controls, etc.) */
+  .sbdocs-preview .sb-bar {
+    background-color: var(--color-neutral-surface) !important;
+    border-color: var(--color-neutral-border) !important;
+
+    & button {
+      color: var(--color-neutral-content) !important;
+
+      & svg {
+        fill: currentColor !important;
+      }
+    }
+  }
+}

@@ -41,15 +41,15 @@
   "generators": {
     "@nx/react": {
       "application": {
-        "style": "scss",
+        "style": "css",
         "bundler": "webpack",
         "babel": true
       },
       "component": {
-        "style": "scss"
+        "style": "css"
       },
       "library": {
-        "style": "scss",
+        "style": "css",
         "unitTestRunner": "jest"
       }
     }

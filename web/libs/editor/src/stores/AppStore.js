@@ -25,8 +25,6 @@ import {
   FF_SIMPLE_INIT,
   isFF,
 } from "../utils/feature-flags";
-import { imageCache } from "@humansignal/core";
-import { isActive, FF_FIT_720_LAZY_LOAD_ANNOTATIONS } from "@humansignal/core/lib/utils/feature-flags";
 import { CommentStore } from "./Comment/CommentStore";
 import { CustomButton } from "./CustomButton";
 
@@ -370,6 +368,7 @@ export default types
           if (annotationStore.viewingAll) return;
           if (isUpdateDisabled) return;
           if (entity.isReadOnly()) return;
+          if (entity.hasIncompletePolygons) return;
 
           entity?.submissionInProgress();
 
@@ -814,11 +813,10 @@ export default types
         destroy(oldAnnotationStore);
       }
 
-      // forceClear() revokes all blob URLs regardless of reference count
-      // This is safe here because we're destroying the annotation store anyway
-      if (isActive(FF_FIT_720_LAZY_LOAD_ANNOTATIONS)) {
-        imageCache.forceClear();
-      }
+      // Do NOT forceClear the image cache on task switch. Destroyed ImageEntities
+      // already call releaseRef(), so old entries have refCount 0. Keeping them
+      // allows instant load when switching back to a previously viewed task.
+      // Cache evicts automatically when it exceeds maxSize (100).
 
       self.annotationStore = AnnotationStore.create({ annotations: [] });
       self.initialized = false;
@@ -963,6 +961,19 @@ export default types
       });
     }
 
+    /**
+     * Hydrate a stubbed history item with full result (FIT-720 lazy load).
+     * Called when the host fetches GET /api/annotation-history/<id>/ and passes the response.
+     */
+    function hydrateHistoryItem(historyId, fullItem) {
+      const as = self.annotationStore;
+      // historyId is the numeric API id (pk); store items have id=guid and pk=numeric from createItem
+      const item = as.history.find((h) => h.pk && Number(h.pk) === Number(historyId));
+      if (!item) return;
+      item.deserializeResults(fullItem?.result ?? [], { hidden: true });
+      as.selectHistory(item);
+    }
+
     const setAutoAnnotation = (value) => {
       self._autoAnnotation = value;
       localStorage.setItem("autoAnnotation", value);
@@ -1068,6 +1079,7 @@ export default types
       resetAnnotationStore,
       initializeStore,
       setHistory,
+      hydrateHistoryItem,
       attachHotkeys,
 
       skipTask,

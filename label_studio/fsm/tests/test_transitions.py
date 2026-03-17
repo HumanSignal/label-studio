@@ -713,7 +713,7 @@ class ValidationAndErrorHandlingTests(TestCase):
 
                 if errors:
                     raise TransitionValidationError(
-                        f"Validation failed: {'; '.join(errors)}",
+                        f'Validation failed: {"; ".join(errors)}',
                         {
                             'validation_errors': errors,
                             'amount': self.amount,

@@ -1,0 +1,409 @@
+.annotation-button {
+  display: flex;
+  padding: var(--spacing-tighter) var(--spacing-tight);
+  border-radius: var(--corner-radius-small) var(--corner-radius-small) 0 0;
+  border-width: 1px 1px 0;
+  border-style: solid;
+  background-color: var(--color-neutral-surface);
+  margin-top: var(--spacing-tightest);
+  align-items: flex-start;
+  gap: var(--spacing-base);
+  cursor: pointer;
+  height: calc(100% - 3px);
+  min-width: 186px;
+  border-color: var(--color-neutral-border);
+  transition: all 150ms ease-out;
+  position: relative;
+
+  &__user {
+    line-height: 16px;
+    height: 16px;
+  }
+
+  &__main {
+    flex: 1 0 auto;
+  }
+
+  &__mainSection {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-tight);
+    flex: 1 0 auto;
+
+    & .annotation-button__userpic_prediction {
+      background-color: var(--color-accent-plum-subtle);
+      color: var(--color-accent-plum-bold);
+    }
+
+    & .annotation-button__userpic {
+      .userpic-badge {
+        width: 10px;
+        height: 10px;
+        color: var(--color-neutral-background);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 2px;
+        box-shadow: 0 0 0 2px var(--color-neutral-background);
+        transform: translate(2px, 2px);
+      }
+    }
+  }
+
+  &__name {
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 16px;
+    letter-spacing: 0.4px;
+    text-align: left;
+    color: var(--color-neutral-content-subtle);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 150px;
+  }
+
+  &__entity-id {
+    font-size: 10px;
+    font-weight: 400;
+    line-height: 16px;
+    letter-spacing: 0.4px;
+    text-align: left;
+    color: var(--color-neutral-content-subtler);
+    margin-left: 8px;
+  }
+
+  &__info {
+    font-size: 10px;
+    font-weight: 400;
+    line-height: 16px;
+    letter-spacing: 0.4px;
+    text-align: left;
+    color: var(--color-neutral-content-subtler);
+  }
+
+  &:hover {
+    background-color: var(--color-primary-emphasis-subtle);
+    border-color: var(--color-primary-border-subtler);
+    border-bottom-color: transparent;
+
+    & .annotation-button__name {
+      color: var(--color-neutral-content);
+    }
+
+    & .annotation-button__created {
+      color: var(--color-neutral-content);
+    }
+
+    & .annotation-button__trigger {
+      opacity: 1;
+      right: var(--spacing-tighter);
+    }
+
+    & .annotation-button__picSection {
+      opacity: 1;
+    }
+  }
+
+  &::before {
+    content: "";
+    position: absolute;
+    top: -1px;
+    left: 0;
+    width: 100%;
+    height: 10px;
+    border-top-style: solid;
+    border-top-width: 2px;
+    border-top-left-radius: var(--corner-radius-small);
+    border-top-right-radius: var(--corner-radius-small);
+    border-color: transparent;
+  }
+
+  &_draft,
+  &_draftSaved {
+    --accent-base: var(--color-accent-grape-base);
+    --accent-subtle: var(--color-accent-grape-subtle);
+
+    &::before {
+      display: block;
+      border-color: var(--accent-base);
+
+      & .annotation-button__name {
+        font-style: italic;
+      }
+    }
+
+    &::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      display: block;
+      border-color: var(--accent-base);
+      background-image: repeating-linear-gradient(
+        -63.43deg,
+        transparent 1px,
+        var(--accent-base) 2px,
+        var(--accent-base) 7px,
+        var(--accent-subtle) 8px,
+        var(--accent-subtle) 12px
+      );
+      background-repeat: repeat-x;
+      background-position: top;
+      background-size: 100% 2px;
+      overflow: hidden;
+      border-top-left-radius: var(--corner-radius-small);
+      border-top-right-radius: var(--corner-radius-small);
+      height: 10px;
+      transform: translateY(-1px);
+    }
+  }
+
+  &_groundTruth {
+    --accent-base: var(--color-accent-canteloupe-base);
+    --accent-subtle: var(--color-accent-canteloupe-subtle);
+
+    &::before {
+      display: block;
+      border-color: var(--accent-base);
+    }
+  }
+
+  &_skipped {
+    --accent-base: var(--color-accent-persimmon-base);
+    --accent-subtle: var(--color-accent-persimmon-subtle);
+
+    &::before {
+      display: block;
+      border-color: var(--accent-base);
+    }
+  }
+
+  &_selected {
+    background-color: var(--color-neutral-background);
+    border-color: var(--color-neutral-border);
+    transform: translate(0, 1px);
+    margin-top: 1px;
+    height: calc(100% - 2px);
+    box-shadow:
+      inset 0 4px 2px 0 var(--color-neutral-background),
+      0 4px 2px 0 rgba(var(--color-neutral-shadow-raw) / 20%);
+
+    & .annotation-button__picSection {
+      opacity: 1;
+    }
+
+    &:hover {
+      cursor: default;
+      background-color: var(--color-neutral-background);
+      border-color: var(--color-neutral-border);
+    }
+
+    & .annotation-button__created {
+      color: var(--color-neutral-content);
+    }
+
+    & .annotation-button__name {
+      color: var(--color-neutral-content);
+    }
+  }
+
+  &__icons {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  &__icon {
+    display: flex;
+    border-radius: 4px;
+
+    &_groundTruth {
+      color: var(--canteloupe_400);
+    }
+  }
+
+  &__trigger {
+    --trigger-border-color: var(--color-neutral-border);
+
+    position: absolute;
+    top: var(--spacing-tighter);
+    right: var(--spacing-tightest);
+    transform: rotate(90deg);
+    border-radius: var(--corner-radius-smaller);
+    color: var(--color-neutral-content-subtler);
+    opacity: 0;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--trigger-border-color);
+    background-color: var(--color-neutral-background);
+    transition:
+      opacity 150ms ease-out,
+      background-color 150ms ease-out,
+      right 150ms ease-out;
+    box-shadow:
+      2px 0 6px rgb(var(--color-neutral-shadow-raw) / 8%),
+      1px 0 2px rgb(var(--color-neutral-shadow-raw) / 8%);
+
+    & svg {
+      width: 20px;
+      height: 20px;
+      transform-origin: center;
+      transform: rotate(90deg);
+    }
+
+    &:hover {
+      cursor: pointer;
+      color: var(--color-neutral-content);
+      background: var(--color-primary-emphasis);
+      border-color: var(--color-primary-border-subtler);
+
+      & svg {
+        color: var(--color-neutral-content);
+      }
+    }
+  }
+
+  &_triggerOpened {
+    & .annotation-button__trigger {
+      opacity: 1;
+      right: var(--spacing-tighter);
+    }
+  }
+
+  &__picSection {
+    position: relative;
+    opacity: 0.7;
+    transition: opacity 150ms ease-out;
+  }
+
+  /* Badge styles - matching Annotators component (global styles) */
+
+  &__tooltipContainer {
+    position: fixed;
+    background: var(--color-neutral-inverted-background);
+    border-radius: 4px;
+    color: var(--color-neutral-inverted-content);
+    padding: 8px 16px;
+    opacity: 0;
+    pointer-events: none;
+    max-width: 360px;
+    z-index: 9999;
+    transition: opacity 150ms ease-out;
+
+    &_open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    &::after {
+      content: "";
+      width: 0;
+      height: 0;
+      border-left: 5px solid transparent;
+      border-right: 5px solid transparent;
+      border-bottom: 5px solid var(--color-neutral-inverted-background);
+      position: absolute;
+      left: 0;
+      bottom: 99%;
+      translate: var(--tooltip-arrow-position, 2px);
+    }
+  }
+
+  &__tooltipBadges {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 8px;
+    flex-wrap: wrap;
+
+    /* Force light mode colors for better readability when tooltip has white background (dark theme) */
+    /* Override the CSS variables to always use light mode values */
+    --color-accent-grape-subtlest: var(--color-grape-100);
+    --color-accent-grape-subtle: var(--color-grape-200);
+    --color-accent-grape-bold: var(--color-grape-700);
+    --color-accent-kale-subtlest: var(--color-kale-100);
+    --color-accent-kale-subtle: var(--color-kale-200);
+    --color-accent-kale-bold: var(--color-kale-700);
+    --color-accent-canteloupe-subtlest: var(--color-canteloupe-100);
+    --color-accent-canteloupe-subtle: var(--color-canteloupe-200);
+    --color-accent-canteloupe-bold: var(--color-canteloupe-700);
+    --color-accent-persimmon-subtlest: var(--color-persimmon-100);
+    --color-accent-persimmon-subtle: var(--color-persimmon-200);
+    --color-accent-persimmon-bold: var(--color-persimmon-700);
+  }
+
+  &__tooltipContainerTitle {
+    font-weight: 500;
+    font-size: 16px;
+    line-height: 24px;
+    align-items: center;
+    max-width: 100%;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    margin-bottom: 8px;
+  }
+
+  &__tooltipContainerInfo {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  &__infoRow {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    font-weight: 400;
+    gap: 20px;
+
+    &:first-child {
+      margin-top: 0;
+    }
+  }
+
+  &__infoRowLabel {
+    font-size: var(--font-size-body-small);
+    white-space: nowrap;
+  }
+
+  &__infoRowValue {
+    font-size: var(--font-size-label-small);
+    white-space: nowrap;
+    font-weight: 500;
+  }
+
+  &__status {
+    position: absolute;
+    top: 15px;
+    left: calc(50% + 5px);
+    border-radius: 4px;
+    color: var(--color-neutral-background);
+    border: 2px solid var(--color-neutral-border);
+    display: flex;
+    width: 10px;
+    height: 10px;
+    box-sizing: content-box;
+    align-items: center;
+    justify-content: center;
+
+    &_approved {
+      background-color: var(--color-positive-content);
+    }
+
+    &_skipped {
+      background-color: var(--color-negative-content);
+    }
+
+    &_updated {
+      background-color: var(--color-primary-content);
+
+      & svg {
+        display: block;
+      }
+    }
+  }
+}

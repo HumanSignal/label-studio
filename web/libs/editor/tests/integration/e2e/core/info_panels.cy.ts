@@ -1,4 +1,4 @@
-import { Labels, LabelStudio } from "@humansignal/frontend-test/helpers/LSF";
+import { Hotkeys, Labels, LabelStudio, Sidebar } from "@humansignal/frontend-test/helpers/LSF";
 import { RichText } from "@humansignal/frontend-test/helpers/LSF/RichText";
 import { configSimple, dataSimple, resultSimple } from "../../data/core/info_panels";
 
@@ -71,5 +71,91 @@ describe("Label Studio UI info panels", () => {
 
     // And draft panel just appeared in a history
     cy.get("[class$=history-item_selected]").find("[data-reason='Draft']").should("be.visible");
+  });
+
+  describe("Region details panel", () => {
+    it("shows region details content when a region is selected", () => {
+      LabelStudio.init({
+        config: configSimple,
+        task: {
+          annotations: [{ id: 1, result: [resultSimple] }],
+          predictions: [],
+          id: 1,
+          data: dataSimple,
+        },
+      });
+
+      cy.get("#Regions-draggable").click();
+      cy.get(".lsf-outliner-item").first().click();
+      cy.get("[data-testid='detailed-region']").should("be.visible");
+      cy.get("[class$=control_type_score]").should("have.text", "0.89");
+    });
+
+    it("shows ResultItem content (rating, text) in region details", () => {
+      LabelStudio.init({
+        config: configSimple,
+        task: {
+          annotations: [{ id: 1, result: [resultSimple] }],
+          predictions: [],
+          id: 1,
+          data: dataSimple,
+        },
+      });
+
+      cy.get("#Regions-draggable").click();
+      cy.get(".lsf-outliner-item").first().click();
+      cy.get("[data-testid='detailed-region']").should("be.visible");
+      cy.get("[data-testid='detailed-region']").contains("Word1").should("be.visible");
+    });
+  });
+
+  describe("Text selection with word granularity", () => {
+    const configWordGranularity = `<View>
+  <Labels name="lbl" toName="text">
+    <Label value="Word1" />
+    <Label value="Word2" />
+  </Labels>
+  <Text name="text" value="$text" inline="true" granularity="word" />
+</View>`;
+
+    it("creates region when selecting text with word granularity", () => {
+      LabelStudio.init({
+        config: configWordGranularity,
+        task: {
+          annotations: [{ id: 1, result: [] }],
+          predictions: [],
+          id: 1,
+          data: { text: "Hello world test" },
+        },
+      });
+
+      Labels.select("Word1");
+      RichText.selectText("world");
+      RichText.hasRegionWithText("world");
+    });
+  });
+
+  describe("Delete region via hotkey", () => {
+    it("deletes selected region via Backspace when selected from outliner", () => {
+      LabelStudio.init({
+        config: configSimple,
+        task: {
+          annotations: [{ id: 1, result: [] }],
+          predictions: [],
+          id: 1,
+          data: dataSimple,
+        },
+      });
+
+      Labels.select("Word1");
+      RichText.selectText("text");
+      RichText.hasRegionWithText("text");
+      Sidebar.hasRegions(1);
+
+      cy.get("#Regions-draggable").click();
+      Sidebar.findRegionByIndex(0).click();
+      Hotkeys.deleteRegion();
+      Sidebar.hasNoRegions();
+    });
   });
 });

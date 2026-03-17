@@ -19,3 +19,4 @@ export { TimeSeries, useTimeSeries } from "./TimeSeries";
 export { Table, useTable } from "./Table";
 export { Ranker, useRanker } from "./Ranker";
 export { Collapse, useCollapse } from "./Collapse";
+export { Hotkeys } from "./Hotkeys";

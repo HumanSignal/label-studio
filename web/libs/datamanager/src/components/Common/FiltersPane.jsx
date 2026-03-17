@@ -2,9 +2,7 @@ import { inject, observer } from "mobx-react";
 import React, { useEffect, useRef } from "react";
 import { IconChevronDown } from "@humansignal/icons";
 import { Filters } from "../Filters/Filters";
-import { Badge } from "./Badge/Badge";
-import { Button } from "@humansignal/ui";
-import { Dropdown } from "@humansignal/ui";
+import { Badge, Button, Dropdown } from "@humansignal/ui";
 import { Icon } from "./Icon/Icon";
 
 const buttonInjector = inject(({ store }) => {
@@ -35,7 +33,7 @@ export const FiltersButton = buttonInjector(
         >
           Filters{" "}
           {hasFilters && (
-            <Badge size="small" style={{ marginLeft: 5 }}>
+            <Badge size="small" className="ml-tightest">
               {activeFiltersNumber}
             </Badge>
           )}

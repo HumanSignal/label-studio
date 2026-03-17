@@ -1,6 +1,9 @@
+import { useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import { Select } from "./select";
+import { Badge } from "../badge/badge";
 import { BadgeGroup } from "../badge-group";
+import { Button } from "../button/button";
 
 const thousandOptions = (() => {
   return Array.from({ length: 1000 }, (_, i) => `Option ${i}`);
@@ -220,8 +223,6 @@ export const MultipleWithBadges: Story = {
                     label: opt?.label ?? opt?.value ?? opt,
                   })) ?? []
                 }
-                variant="info"
-                shape="squared"
               />
             );
           }}
@@ -259,5 +260,137 @@ export const MultipleSelectWithVirtualListAndSearch: Story = {
     options: techOptions as any[],
     placeholder: "Select technologies...",
     label: "Multiple Select with Selected Items Group",
+  },
+};
+
+/**
+ * Flat options with groupBy: options include a field (e.g. `parent`) and `groupBy="parent"` renders
+ * subtle headers above each group. Options without the field go in an ungrouped leading section.
+ */
+export const WithGroupBy: Story = {
+  args: {
+    placeholder: "Select a column",
+    searchable: true,
+    searchPlaceholder: "Search columns",
+    groupBy: "group",
+    options: [
+      { key: "id", title: "ID", value: "id" },
+      { key: "inner_id", title: "Inner ID", value: "inner_id" },
+      { key: "task_state", title: "Task State", value: "task_state" },
+      { key: "agreement", title: "Agreement", value: "agreement", group: "Agreement" },
+      { key: "dim_1", title: "Dimension 1", value: "dim_1", group: "Agreement" },
+      { key: "annot_completed", title: "Annotation Completed At", value: "annot_completed", group: "Annotations" },
+      { key: "lead_time", title: "Lead Time", value: "lead_time", group: "Annotations" },
+      { key: "summary", title: "summary", value: "summary", group: "Data", readableType: "TextArea" },
+      { key: "rating", title: "rating", value: "rating", group: "Data", readableType: "Rating" },
+      { key: "heading", title: "heading", value: "heading", group: "Data", readableType: "str" },
+      { key: "author", title: "author", value: "author", group: "Data", readableType: "str" },
+    ] as any[],
+    label: "With groupBy (single-select)",
+  },
+};
+
+export const WithGroupByMultiple: Story = {
+  args: {
+    ...WithGroupBy.args,
+    multiple: true,
+    value: ["id", "task_state"],
+    label: "With groupBy (multi-select)",
+  },
+};
+
+/**
+ * groupBy with custom option content via optionRenderer (e.g. type badges).
+ */
+export const WithGroupByAndOptionRenderer: Story = {
+  args: {
+    placeholder: "Select a column",
+    searchable: true,
+    searchPlaceholder: "Search columns",
+    groupBy: "group",
+    options: [
+      { key: "summary", title: "summary", value: "summary", group: "Data", readableType: "TextArea" },
+      { key: "rating", title: "rating", value: "rating", group: "Data", readableType: "Rating" },
+      { key: "heading", title: "heading", value: "heading", group: "Data", readableType: "str" },
+      { key: "author", title: "author", value: "author", group: "Data", readableType: "str" },
+    ] as any[],
+    optionRenderer: ({ option }) => (
+      <span className="flex w-full items-center justify-between gap-2">
+        <span>{option?.title ?? option?.label ?? option?.value}</span>
+        {option?.readableType && (
+          <Badge variant="secondary" shape="squared" className="text-[10px]">
+            {option.readableType}
+          </Badge>
+        )}
+      </span>
+    ),
+    label: "With groupBy and optionRenderer (type badges)",
+  },
+};
+
+/**
+ * Demonstrates the controlled `open` prop with a footer Apply button.
+ *
+ * The dropdown stays open while the user makes selections. Clicking Apply
+ * commits the pending selection and closes the dropdown by setting
+ * `open={false}` via the controlled prop. Clicking outside or pressing
+ * Escape also closes via the `onClose` callback.
+ */
+export const ControlledOpenWithFooterApply: Story = {
+  render: () => {
+    const options = [
+      { value: "javascript", label: "JavaScript" },
+      { value: "typescript", label: "TypeScript" },
+      { value: "react", label: "React" },
+      { value: "vue", label: "Vue" },
+      { value: "angular", label: "Angular" },
+      { value: "node", label: "Node.js" },
+      { value: "python", label: "Python" },
+      { value: "django", label: "Django" },
+    ];
+
+    const [isOpen, setIsOpen] = useState(false);
+    const [pending, setPending] = useState<string[]>([]);
+    const [applied, setApplied] = useState<string[]>([]);
+
+    const handleApply = () => {
+      setApplied(pending);
+      setIsOpen(false);
+    };
+
+    const hasChanges = pending.length !== applied.length || pending.some((v) => !applied.includes(v));
+
+    return (
+      <div className="flex flex-col gap-4 w-[350px]">
+        <Select
+          multiple
+          searchable
+          open={isOpen}
+          value={isOpen ? pending : applied}
+          options={options as any[]}
+          placeholder="Select technologies..."
+          label="Controlled open + footer Apply"
+          onOpen={() => {
+            setPending(applied);
+            setIsOpen(true);
+          }}
+          onClose={() => setIsOpen(false)}
+          onChange={(vals: any) => setPending(Array.isArray(vals) ? vals.map((v: any) => v?.value ?? v) : [])}
+          footer={
+            <Button
+              variant="primary"
+              look="filled"
+              size="small"
+              className="w-full"
+              disabled={!hasChanges}
+              onClick={handleApply}
+            >
+              Apply
+            </Button>
+          }
+        />
+        <p className="text-sm text-neutral-content">Applied: {applied.length > 0 ? applied.join(", ") : "none"}</p>
+      </div>
+    );
   },
 };

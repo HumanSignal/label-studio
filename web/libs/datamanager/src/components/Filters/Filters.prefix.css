@@ -1,0 +1,114 @@
+.filters {
+  background-color: var(--color-neutral-background);
+  position: relative;
+
+  &:not(&_sidebar) {
+    padding-top: var(--spacing-tight);
+    min-width: 400px;
+    border-radius: var(--corner-radius-small);
+    box-shadow:
+      0 3px 6px -4px rgb(0 0 0 / 12%),
+      0 6px 16px 0 rgb(0 0 0 / 8%),
+      0 9px 28px 8px var(--black_5);
+  }
+
+  &_sidebar {
+    width: 100%;
+
+    .filterLine {
+      .datepicker__output_range {
+        display: flex;
+        width: 100%;
+
+        .input-dm {
+          min-width: 100px;
+        }
+      }
+    }
+  }
+
+  &__actions {
+    display: flex;
+    align-items: center;
+    margin-top: var(--spacing-base);
+    padding: 0 var(--spacing-tight) var(--spacing-tight);
+    justify-content: space-between;
+
+    .button-dm {
+      border: 1px solid var(--color-neutral-border);
+
+      &:hover {
+        border: 1px solid var(--color-neutral-border);
+      }
+    }
+  }
+
+  &__actions-right {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+  }
+
+  &__empty {
+    padding: 0 var(--spacing-tight);
+    font-size: 14px;
+    color: var(--color-neutral-content-subtler);
+  }
+
+  &__list {
+    padding: var(--spacing-tight) var(--spacing-tight) var(--spacing-tighter);
+
+    &_withFilters {
+      display: flex;
+      flex-flow: column nowrap;
+      gap: var(--spacing-tight);
+    }
+  }
+
+  &_sidebar &__list {
+    padding: var(--spacing-base) var(--spacing-tight) var(--spacing-tighter);
+
+    &_withFilters {
+      display: flex;
+      flex-flow: column nowrap;
+      gap: var(--spacing-tight);
+    }
+  }
+}
+
+.filter-data-tag {
+  margin: 1px;
+  font-size: 12px;
+  padding: 2px 4px;
+  display: inline-flex;
+  align-items: center;
+}
+
+/* Note: Dropdown padding is now controlled via triggerProps in FilterDropdown component */
+
+:global(.filter-dropdown-content) {
+  min-width: 270px !important;
+  width: max-content;
+  max-width: min(500px, 90vw);
+
+  /* Decorative items (headers) are disabled in cmdk. Override the default */
+  /* disabled styles so they look like clean section labels, not grayed-out options. */
+  [data-disabled] {
+    pointer-events: auto !important;
+    cursor: default !important;
+    opacity: 1;
+  }
+
+  /* Suppress the hover highlight on the inner div of disabled/decorative items. */
+  [data-disabled="true"] > div[data-disabled="true"] {
+    background: transparent !important;
+    cursor: default !important;
+  }
+
+  /* Section headers (Recent, All fields): reduce left padding so they sit further left */
+  /* than list items, making section boundaries easier to spot. */
+  [data-value="__recent_header__"] > div,
+  [data-value="__all_fields_header__"] > div {
+    padding-left: 8px !important;
+  }
+}

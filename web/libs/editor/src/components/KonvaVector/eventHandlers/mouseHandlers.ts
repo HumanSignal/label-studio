@@ -623,7 +623,9 @@ export function createMouseMoveHandler(props: EventHandlerProps, handledSelectio
 
     // Handle Bezier curve creation in drawing mode (click-drag without shift key) - only when path is not closed and transformer is not active
     // Skip if PointCreationManager is currently creating a point
+    // Skip if internal point addition is disabled (parent manages point creation)
     if (
+      !props.disableInternalPointAddition &&
       props.isDrawingMode &&
       !props.isPathClosed &&
       props.selectedPoints.size <= 1 &&

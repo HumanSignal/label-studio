@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect, type CSSProperties, useCallback } from "react";
 import { observer } from "mobx-react";
-import styles from "./GridPreview.module.scss";
+import styles from "./GridPreview.module.css";
 import { cn } from "@humansignal/ui";
 
 const MAX_ZOOM = 20;
@@ -218,6 +218,7 @@ const ImagePreview = observer(({ task, field }: ImagePreviewProps) => {
           ref={imageRef}
           src={src}
           alt="Task Preview"
+          loading="lazy"
           style={imageStyle}
           className={styles.image}
           onLoad={handleImageLoad}

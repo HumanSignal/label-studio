@@ -1,0 +1,86 @@
+.create-project {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+
+  .modal-ls__header {
+    border-bottom: 1px solid var(--color-neutral-border);
+
+    & h1 {
+      width: 224px;
+      margin-right: auto;
+      margin-bottom: 0;
+      margin-top: 0;
+      font-size: 24px;
+      color: var(--color-neutral-content);
+    }
+
+    & button {
+      line-height: 1em;
+      min-width: 100px;
+    }
+
+    .toggle-items {
+      width: 500px;
+      margin-right: auto;
+      box-sizing: border-box;
+    }
+
+    .space-ls_direction_horizontal {
+      min-width: 224px;
+    }
+  }
+
+  &__tab_disabled {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    &::before {
+      content: "";
+      display: block;
+      height: 8px;
+      width: 8px;
+      border-radius: 4px;
+      margin-right: 6px;
+      background: var(--color-negative-content);
+    }
+  }
+
+  & form.project-name {
+    width: 500px;
+    margin: 32px auto;
+
+    & > *:not(:first-child) {
+      margin-top: 32px;
+    }
+
+    & label {
+      display: inline-flex;
+      align-items: center;
+    }
+
+    & input,
+    textarea {
+      background: var(--color-neutral-background);
+      border: 1px solid var(--color-neutral-border);
+      color: var(--color-neutral-content);
+      border-radius: var(--corner-radius-smaller);
+      box-shadow: inset 0 1px 2px rgba(var(--color-neutral-shadow-raw) / 12%);
+      transition: all 150ms ease-out;
+
+      &:hover {
+        border-color: var(--color-neutral-border-bold);
+      }
+
+      &:focus,
+      &:focus-visible {
+        border-color: var(--color-neutral-border-bolder);
+        outline: none;
+        box-shadow: 0 0 0 4px var(--color-primary-focus-outline);
+      }
+    }
+  }
+}
