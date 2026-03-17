@@ -1,42 +1,20 @@
-/* vitest setup: globals and mocks for editor unit tests */
-import React from "react";
+/**
+ * Vitest setup: Jest API compat + same env as jest.setup.js (ResizeObserver, matchMedia, canvas, HTMLMediaElement, fetch).
+ */
 import * as matchers from "@testing-library/jest-dom/matchers";
 import { expect, vi } from "vitest";
 
-
-(globalThis as unknown as { React: typeof React }).React = React;
-
+(globalThis as unknown as { jest: typeof vi }).jest = vi;
 expect.extend(matchers);
 
-// Jest compat: existing tests use jest.fn(), jest.mock(), jest.spyOn(), jest.isolateModules()
-const jestCompat = {
-  ...vi,
-  isolateModules(fn: () => void): void {
-    fn();
-  },
-  resetModules(): void {
-    if (typeof (vi as { resetModules?: () => void }).resetModules === "function") {
-      (vi as { resetModules: () => void }).resetModules();
-    }
-  },
-};
-(globalThis as unknown as { jest: typeof jestCompat }).jest = jestCompat;
+vi.stubGlobal("fetch", vi.fn());
 
-// Reusable feature-flag test setup: ensures window.APP_SETTINGS.feature_flags exists so real utils/feature-flags works without mocks.
-import "@humansignal/frontend-test/feature-flag-test-setup";
-
-// Vitest fetch mock (replaces jest-fetch-mock)
-const mockFetch = vi.fn();
-vi.stubGlobal("fetch", mockFetch);
-
-// ResizeObserver is not in JSDOM; required by many layout components.
 globalThis.ResizeObserver = class ResizeObserver {
   observe() {}
   unobserve() {}
   disconnect() {}
 };
 
-// IntersectionObserver is not in JSDOM; required by visibility/lazy-load logic.
 globalThis.IntersectionObserver = class IntersectionObserver {
   constructor(callback: IntersectionObserverCallback) {
     (this as unknown as { _callback: IntersectionObserverCallback })._callback = callback;
@@ -46,7 +24,6 @@ globalThis.IntersectionObserver = class IntersectionObserver {
   disconnect() {}
 };
 
-// matchMedia is not in JSDOM; required by responsive hooks and Konva.
 Object.defineProperty(window, "matchMedia", {
   writable: true,
   value: vi.fn().mockImplementation((query: string) => ({
@@ -61,7 +38,6 @@ Object.defineProperty(window, "matchMedia", {
   })),
 });
 
-// Canvas 2D context is not fully implemented in JSDOM; required by Konva/canvas usage.
 HTMLCanvasElement.prototype.getContext = vi.fn().mockImplementation((contextType: string) => {
   if (contextType === "2d") {
     return {
@@ -93,20 +69,7 @@ HTMLCanvasElement.prototype.getContext = vi.fn().mockImplementation((contextType
   return null;
 });
 
-// JSDOM does not implement toDataURL; required by canvas utils and some regions/tools.
-if (typeof HTMLCanvasElement.prototype.toDataURL === "undefined") {
-  HTMLCanvasElement.prototype.toDataURL = function () {
-    return "data:image/png;base64,stub";
-  };
-}
-
-// getComputedStyle is required by some components (e.g. HtxParagraphs); JSDOM has it but ensure it returns a usable shape.
-if (typeof window.getComputedStyle === "undefined") {
-  window.getComputedStyle = () => ({ getPropertyValue: () => "" });
-}
-
-// Mock HTMLMediaElement data and methods not implemented by jsdom.
-(window.HTMLMediaElement.prototype as unknown as { _mock: Record<string, unknown> })._mock = {
+const mediaMock = {
   paused: true,
   duration: Number.NaN,
   _loaded: false,
@@ -116,20 +79,12 @@ if (typeof window.getComputedStyle === "undefined") {
     media.dispatchEvent(new Event("canplaythrough"));
   },
   _resetMock(media: HTMLMediaElement) {
-    (media as unknown as { _mock: Record<string, unknown> })._mock = {
-      ...(window.HTMLMediaElement.prototype as unknown as { _mock: Record<string, unknown> })._mock,
-    };
+    (media as unknown as { _mock: typeof mediaMock })._mock = { ...mediaMock };
   },
-  _supportsTypes: [
-    "video/mp4",
-    "video/webm",
-    "video/ogg",
-    "audio/mp3",
-    "audio/webm",
-    "audio/ogg",
-    "audio/wav",
-  ],
+  _supportsTypes: ["video/mp4", "video/webm", "video/ogg", "audio/mp3", "audio/webm", "audio/ogg", "audio/wav"],
 };
+
+(window.HTMLMediaElement.prototype as unknown as { _mock: typeof mediaMock })._mock = mediaMock;
 
 Object.defineProperty(window.HTMLMediaElement.prototype, "paused", {
   get(this: HTMLMediaElement) {
@@ -143,27 +98,22 @@ Object.defineProperty(window.HTMLMediaElement.prototype, "duration", {
     return (this as unknown as { _mock: { duration: number } })._mock.duration;
   },
   set(this: HTMLMediaElement, value: number) {
-    const proto = window.HTMLMediaElement.prototype as unknown as { _mock: { _resetMock: (m: HTMLMediaElement) => void; duration: number } };
-    proto._mock._resetMock(this);
+    (window.HTMLMediaElement.prototype as unknown as { _mock: { _resetMock: (m: HTMLMediaElement) => void } })._mock._resetMock(this);
     (this as unknown as { _mock: { duration: number } })._mock.duration = value;
   },
   configurable: true,
 });
 
 window.HTMLMediaElement.prototype.load = function loadMock(this: HTMLMediaElement) {
-  const mock = (this as unknown as { _mock: { _loaded: boolean; _load: (m: HTMLMediaElement) => void } })._mock;
-  if (!mock._loaded) {
-    mock._load(this);
-  }
+  const m = (this as unknown as { _mock: { _loaded: boolean; _load: (x: HTMLMediaElement) => void } })._mock;
+  if (!m._loaded) m._load(this);
   this.dispatchEvent(new Event("load"));
 };
 
 window.HTMLMediaElement.prototype.play = function playMock(this: HTMLMediaElement) {
-  const mock = (this as unknown as { _mock: { _loaded: boolean; _load: (m: HTMLMediaElement) => void; paused: boolean } })._mock;
-  if (!mock._loaded) {
-    mock._load(this);
-  }
-  mock.paused = false;
+  const m = (this as unknown as { _mock: { _loaded: boolean; _load: (x: HTMLMediaElement) => void; paused: boolean } })._mock;
+  if (!m._loaded) m._load(this);
+  m.paused = false;
   this.dispatchEvent(new Event("play"));
 };
 
@@ -173,6 +123,5 @@ window.HTMLMediaElement.prototype.pause = function pauseMock(this: HTMLMediaElem
 };
 
 window.HTMLMediaElement.prototype.canPlayType = function canPlayTypeMock(this: HTMLMediaElement, type: string) {
-  const supported = (window.HTMLMediaElement.prototype as unknown as { _mock: { _supportsTypes: string[] } })._mock._supportsTypes;
-  return supported.includes(type) ? "maybe" : "";
+  return (window.HTMLMediaElement.prototype as unknown as { _mock: { _supportsTypes: string[] } })._mock._supportsTypes.includes(type) ? "maybe" : "";
 };
