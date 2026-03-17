@@ -147,7 +147,7 @@ One way to do that is to use [ngrok](https://ngrok.io/), a reverse proxy that al
 
     ![Ngrok authentication](images/install/ngrok-dashboard.png)  
 
-4. Start `ngrok` and point it at Label Studio: 
+4. Start ngrok and point it at Label Studio: 
 
     ```bash
     ngrok http --host-header=rewrite 8080
@@ -161,7 +161,7 @@ One way to do that is to use [ngrok](https://ngrok.io/), a reverse proxy that al
 
    
 <div class="code-tabs">
-<div data-name="Local - Mac/Unix">
+<div data-name="Native - Mac/Unix">
 
 ```bash
 # Avoid CSRF errors 
@@ -172,7 +172,7 @@ LABEL_STUDIO_HOST=https://your-subdomain.ngrok-free.app label-studio start
 ```
 </div>
 
-<div data-name="Local - Windows">
+<div data-name="Native - Windows">
 
 ```bash
 # Avoid CSRF errors 
