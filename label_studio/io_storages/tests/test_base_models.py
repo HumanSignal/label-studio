@@ -102,3 +102,14 @@ class TestImportStorageResolveUris(TestCase):
         """
         result = self.storage.resolve_uris('s3://test-bucket/file.jpg', task=None)
         assert result is None
+
+    @override_settings(HOSTNAME='http://localhost:8080')
+    @patch('io_storages.base_models.reverse', return_value='/api/storages/task/1/resolve/')
+    def test_bare_uri_with_spaces_in_path(self, mock_reverse):
+        """A bare URI with literal spaces in the path is resolved to a proxy URL."""
+        uri = 's3://test-bucket/images/some directory/sub folder/img.jpg'
+        result = self.storage.resolve_uris(uri, self.task)
+
+        assert result is not None
+        assert 's3://test-bucket' not in result
+        assert 'http://localhost:8080' in result

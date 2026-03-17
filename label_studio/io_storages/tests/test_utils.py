@@ -94,3 +94,9 @@ class TestGetAllUrisViaRegex(TestCase):
         html = '<img src="s3://bucket/path/to/file%20name.jpg" alt="test" />'
         result = get_all_uris_via_regex(html, prefixes=['s3'])
         assert result == [('s3://bucket/path/to/file%20name.jpg', 's3')]
+
+    def test_bare_uri_with_spaces_in_path(self):
+        """A bare URI with literal spaces in the path is resolved via the fast-path startswith check."""
+        uri = 's3://my-bucket/images/some directory/sub folder/image.jpg'
+        result = get_all_uris_via_regex(uri, prefixes=['s3'])
+        assert result == [(uri, 's3')]
