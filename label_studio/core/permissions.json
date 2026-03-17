@@ -1,0 +1,93 @@
+{
+  "version": "1.0.0",
+  "roles": {
+    "Admin": {
+      "Users": {
+        "Invite users": true,
+        "Remove users": true,
+        "View user list": true,
+        "Edit own profile": true
+      },
+      "Projects": {
+        "Create project": true,
+        "Delete project": true,
+        "Edit project settings": true,
+        "View assigned projects": true
+      },
+      "Tasks": {
+        "Create task": true,
+        "Import tasks": true,
+        "Delete task": true,
+        "View assigned tasks": true,
+        "Annotate assigned tasks": true,
+        "View unassigned tasks": true
+      },
+      "Annotations": {
+        "Edit any annotation": true,
+        "Edit own annotation": true,
+        "Delete any annotation": true
+      },
+      "Labels/Taxonomy": {
+        "Create label": true,
+        "Edit label": true,
+        "Delete label": true,
+        "View labels": true
+      },
+      "Export": {
+        "Export dataset": true
+      },
+      "API Keys": {
+        "Generate any key": true,
+        "Revoke any key": true,
+        "Generate own key": true
+      },
+      "Audit Logs": {
+        "View audit logs": true
+      }
+    },
+    "Annotator": {
+      "Users": {
+        "Invite users": false,
+        "Remove users": false,
+        "View user list": false,
+        "Edit own profile": true
+      },
+      "Projects": {
+        "Create project": false,
+        "Delete project": false,
+        "Edit project settings": false,
+        "View assigned projects": true
+      },
+      "Tasks": {
+        "Create task": false,
+        "Import tasks": false,
+        "Delete task": false,
+        "View assigned tasks": true,
+        "Annotate assigned tasks": true,
+        "View unassigned tasks": false
+      },
+      "Annotations": {
+        "Edit any annotation": false,
+        "Edit own annotation": true,
+        "Delete any annotation": false
+      },
+      "Labels/Taxonomy": {
+        "Create label": false,
+        "Edit label": false,
+        "Delete label": false,
+        "View labels": true
+      },
+      "Export": {
+        "Export dataset": false
+      },
+      "API Keys": {
+        "Generate any key": false,
+        "Revoke any key": false,
+        "Generate own key": true
+      },
+      "Audit Logs": {
+        "View audit logs": false
+      }
+    }
+  }
+}
