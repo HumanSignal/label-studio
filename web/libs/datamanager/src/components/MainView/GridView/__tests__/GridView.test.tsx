@@ -22,32 +22,32 @@ interface MockDataItem {
 }
 
 // Mock MST getRoot
-jest.mock("mobx-state-tree", () => ({
-  ...jest.requireActual("mobx-state-tree"),
-  getRoot: jest.fn((node) => ({
+vi.mock("mobx-state-tree", async () => ({
+  ...(await vi.importActual("mobx-state-tree")),
+  getRoot: vi.fn((node) => ({
     dataStore: {
       total: 100,
       hasNextPage: true,
       pageSize: 10,
     },
     taskStore: {
-      loadTask: jest.fn(),
+      loadTask: vi.fn(),
     },
     SDK: {
-      invoke: jest.fn(),
+      invoke: vi.fn(),
     },
   })),
 }));
 
 // Mock the required dependencies
-jest.mock("react-virtualized-auto-sizer", () => ({
+vi.mock("react-virtualized-auto-sizer", () => ({
   __esModule: true,
   default: ({ children }: { children: (size: { width: number; height: number }) => React.ReactNode }) =>
     children({ width: 1000, height: 800 }),
 }));
 
-jest.mock("react-window", () => {
-  const React = require("react");
+vi.mock("react-window", async () => {
+  const React = await vi.importActual<typeof import("react")>("react");
   return {
     FixedSizeGrid: React.forwardRef(
       (
@@ -96,13 +96,13 @@ jest.mock("react-window", () => {
   };
 });
 
-jest.mock("react-window-infinite-loader", () => ({
+vi.mock("react-window-infinite-loader", () => ({
   __esModule: true,
   default: ({
     children,
   }: {
     children: (props: { onItemsRendered: () => void; ref: React.RefObject<unknown> }) => React.ReactNode;
-  }) => children({ onItemsRendered: jest.fn(), ref: jest.fn() }),
+  }) => children({ onItemsRendered: vi.fn(), ref: vi.fn() }),
 }));
 
 // Mock data for testing
@@ -171,7 +171,7 @@ const mockFields = [
 const mockView = {
   gridWidth: 2,
   selected: {
-    isSelected: jest.fn(),
+    isSelected: vi.fn(),
     list: [],
     all: false,
   },
@@ -189,7 +189,7 @@ const renderWithBEM = (ui: React.ReactElement) => {
 
 describe("GridView", () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe("Main GridView Component", () => {
@@ -203,7 +203,7 @@ describe("GridView", () => {
     });
 
     it("handles infinite loading correctly", () => {
-      const loadMore = jest.fn();
+      const loadMore = vi.fn();
 
       renderWithBEM(
         <GridView data={mockData} view={mockView} fields={mockFields} loadMore={loadMore} onChange={() => {}} />,
@@ -228,8 +228,8 @@ describe("GridView", () => {
     it("renders header with checkbox and ID", () => {
       const row = mockData[0];
       const selected = {
-        isSelected: jest.fn().mockReturnValue(false),
-        toggleSelected: jest.fn(),
+        isSelected: vi.fn().mockReturnValue(false),
+        toggleSelected: vi.fn(),
       };
 
       renderWithBEM(<GridHeader row={row} selected={selected} onSelect={selected.toggleSelected} />);
@@ -241,8 +241,8 @@ describe("GridView", () => {
     it("handles checkbox selection state", () => {
       const row = mockData[0];
       const selected = {
-        isSelected: jest.fn().mockReturnValue(true),
-        toggleSelected: jest.fn(),
+        isSelected: vi.fn().mockReturnValue(true),
+        toggleSelected: vi.fn(),
       };
 
       renderWithBEM(<GridHeader row={row} selected={selected} onSelect={selected.toggleSelected} />);
@@ -254,8 +254,8 @@ describe("GridView", () => {
     it("handles row selection through checkbox", () => {
       const row = mockData[0];
       const selected = {
-        isSelected: jest.fn().mockReturnValue(false),
-        toggleSelected: jest.fn(),
+        isSelected: vi.fn().mockReturnValue(false),
+        toggleSelected: vi.fn(),
       };
 
       renderWithBEM(<GridHeader row={row} selected={selected} onSelect={selected.toggleSelected} />);
@@ -269,7 +269,7 @@ describe("GridView", () => {
   describe("GridCell Component", () => {
     it("renders cell with header and body", () => {
       const row = mockData[0];
-      const selected = { isSelected: jest.fn().mockReturnValue(false) };
+      const selected = { isSelected: vi.fn().mockReturnValue(false) };
 
       renderWithBEM(
         <GridCell
@@ -287,7 +287,7 @@ describe("GridView", () => {
 
     it("handles selection state correctly", () => {
       const row = mockData[0];
-      const selected = { isSelected: jest.fn().mockReturnValue(true) };
+      const selected = { isSelected: vi.fn().mockReturnValue(true) };
 
       renderWithBEM(
         <GridCell
@@ -305,8 +305,8 @@ describe("GridView", () => {
 
     it("calls onChange when cell is clicked", () => {
       const row = mockData[0];
-      const onChange = jest.fn();
-      const selected = { isSelected: jest.fn().mockReturnValue(false) };
+      const onChange = vi.fn();
+      const selected = { isSelected: vi.fn().mockReturnValue(false) };
 
       renderWithBEM(
         <GridCell
@@ -372,8 +372,8 @@ describe("GridView", () => {
   describe("Grid Selection Interactions", () => {
     it("handles row selection through checkbox", () => {
       const row = mockData[0];
-      const selected = { isSelected: jest.fn().mockReturnValue(false) };
-      const onSelect = jest.fn();
+      const selected = { isSelected: vi.fn().mockReturnValue(false) };
+      const onSelect = vi.fn();
 
       renderWithBEM(<GridHeader row={row} selected={selected} onSelect={onSelect} />);
 
@@ -384,7 +384,7 @@ describe("GridView", () => {
 
     it("handles multiple row selection", () => {
       const selected = {
-        isSelected: jest.fn().mockReturnValue(false),
+        isSelected: vi.fn().mockReturnValue(false),
         list: [],
         all: false,
       };
@@ -411,7 +411,7 @@ describe("GridView", () => {
   describe("Grid Responsive Behavior", () => {
     it("adjusts cell height based on content type", () => {
       const row = mockData[0];
-      const selected = { isSelected: jest.fn().mockReturnValue(false) };
+      const selected = { isSelected: vi.fn().mockReturnValue(false) };
       const view = { ...mockView, gridFitImagesToWidth: false };
 
       renderWithBEM(

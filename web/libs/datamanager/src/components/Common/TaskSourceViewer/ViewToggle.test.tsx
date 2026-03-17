@@ -4,7 +4,7 @@ import "@testing-library/jest-dom";
 import { ViewToggle } from "./ViewToggle";
 
 // Mock the UI components
-jest.mock("@humansignal/ui", () => ({
+vi.mock("@humansignal/ui", () => ({
   Tabs: ({ children, value, onValueChange }: any) => (
     <div
       data-testid="tabs"
@@ -34,11 +34,11 @@ jest.mock("@humansignal/ui", () => ({
 describe("ViewToggle Component", () => {
   const defaultProps = {
     view: "code" as const,
-    onViewChange: jest.fn(),
+    onViewChange: vi.fn(),
   };
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe("View Mode Toggle", () => {
@@ -53,7 +53,7 @@ describe("ViewToggle Component", () => {
 
     it("should call onViewChange when switching view modes", async () => {
       const user = userEvent.setup();
-      const mockOnViewChange = jest.fn();
+      const mockOnViewChange = vi.fn();
 
       render(<ViewToggle {...defaultProps} onViewChange={mockOnViewChange} />);
 
@@ -70,7 +70,7 @@ describe("ViewToggle Component", () => {
 
     it("should switch from interactive to code view", async () => {
       const user = userEvent.setup();
-      const mockOnViewChange = jest.fn();
+      const mockOnViewChange = vi.fn();
 
       render(<ViewToggle view="interactive" onViewChange={mockOnViewChange} />);
 

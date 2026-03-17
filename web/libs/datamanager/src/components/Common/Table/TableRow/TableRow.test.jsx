@@ -2,21 +2,23 @@ import { render, screen, fireEvent } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import { TableRow } from "./TableRow";
 import { TableContext } from "../TableContext";
+import { getProperty } from "../utils";
+import { isFF } from "../../../../utils/feature-flags";
 
 // Mock SkeletonLoader
-jest.mock("../../SkeletonLoader", () => ({
+vi.mock("../../SkeletonLoader", () => ({
   SkeletonLoader: () => <div data-testid="skeleton-loader">Loading...</div>,
 }));
 
 // Mock feature flags
-jest.mock("../../../../utils/feature-flags", () => ({
+vi.mock("../../../../utils/feature-flags", () => ({
   FF_LOPS_E_3: "fflag_feat_all_lops_e_3_short",
-  isFF: jest.fn(() => false),
+  isFF: vi.fn(() => false),
 }));
 
 // Mock utils
-jest.mock("../utils", () => ({
-  getProperty: jest.fn((obj, path) => {
+vi.mock("../utils", () => ({
+  getProperty: vi.fn((obj, path) => {
     const keys = path.split(".");
     let result = obj;
     for (const key of keys) {
@@ -24,17 +26,17 @@ jest.mock("../utils", () => ({
     }
     return result;
   }),
-  getStyle: jest.fn(() => ({})),
+  getStyle: vi.fn(() => ({})),
 }));
 
 // Mock normalizeCellAlias
-jest.mock("../../../CellViews", () => ({
-  normalizeCellAlias: jest.fn((alias) => alias),
+vi.mock("../../../CellViews", () => ({
+  normalizeCellAlias: vi.fn((alias) => alias),
 }));
 
 // Mock BEM utility
-jest.mock("../../../../utils/bem", () => ({
-  cn: jest.fn((name) => {
+vi.mock("../../../../utils/bem", () => ({
+  cn: vi.fn((name) => {
     const createCN = (fullName, mods = {}) => {
       const modClasses = Object.entries(mods)
         .filter(([_, value]) => value)
@@ -59,7 +61,7 @@ jest.mock("../../../../utils/bem", () => ({
 }));
 
 // Mock styles
-jest.mock("./TableRow.prefix.css", () => ({}));
+vi.mock("./TableRow.prefix.css", () => ({}));
 
 describe("TableRow", () => {
   const mockData = {
@@ -91,13 +93,13 @@ describe("TableRow", () => {
     even: false,
     style: {},
     wrapperStyle: {},
-    onClick: jest.fn(),
+    onClick: vi.fn(),
     stopInteractions: false,
     decoration: null,
   };
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   const renderWithContext = (props = {}, contextOverrides = {}) => {
@@ -110,8 +112,7 @@ describe("TableRow", () => {
 
   describe("Basic Rendering", () => {
     it("should render row with correct structure", () => {
-      const { getProperty } = require("../utils");
-      getProperty.mockReturnValue("test-value");
+      vi.mocked(getProperty).mockReturnValue("test-value");
 
       renderWithContext();
 
@@ -123,8 +124,7 @@ describe("TableRow", () => {
     });
 
     it("should render cells for each column", () => {
-      const { getProperty } = require("../utils");
-      getProperty.mockReturnValue("test-value");
+      vi.mocked(getProperty).mockReturnValue("test-value");
 
       const { container } = renderWithContext();
 
@@ -168,7 +168,7 @@ describe("TableRow", () => {
 
   describe("Click Handling", () => {
     it("should call onClick when row is clicked", () => {
-      const mockOnClick = jest.fn();
+      const mockOnClick = vi.fn();
       renderWithContext({ onClick: mockOnClick });
 
       const rowWrapper = screen.getByTestId("table-row-wrapper");
@@ -178,7 +178,7 @@ describe("TableRow", () => {
     });
 
     it("should not call onClick when stopInteractions is true", () => {
-      const mockOnClick = jest.fn();
+      const mockOnClick = vi.fn();
       renderWithContext({ onClick: mockOnClick, stopInteractions: true });
 
       const rowWrapper = screen.getByTestId("table-row-wrapper");
@@ -191,7 +191,7 @@ describe("TableRow", () => {
 
   describe("Context Menu Integration", () => {
     it("should call onContextMenu when right-clicked", () => {
-      const mockOnContextMenu = jest.fn();
+      const mockOnContextMenu = vi.fn();
       renderWithContext({ onContextMenu: mockOnContextMenu });
 
       const rowWrapper = screen.getByTestId("table-row-wrapper");
@@ -213,7 +213,7 @@ describe("TableRow", () => {
     });
 
     it("should pass event and data to onContextMenu callback", () => {
-      const mockOnContextMenu = jest.fn();
+      const mockOnContextMenu = vi.fn();
       renderWithContext({ onContextMenu: mockOnContextMenu });
 
       const rowWrapper = screen.getByTestId("table-row-wrapper");
@@ -229,8 +229,7 @@ describe("TableRow", () => {
 
   describe("Cell Rendering", () => {
     it("should render cell values using getProperty", () => {
-      const { getProperty } = require("../utils");
-      getProperty.mockReturnValue("test-value");
+      vi.mocked(getProperty).mockReturnValue("test-value");
 
       renderWithContext();
 
@@ -258,8 +257,7 @@ describe("TableRow", () => {
     });
 
     it("should show skeleton loader when cell is loading", () => {
-      const { isFF } = require("../../../../utils/feature-flags");
-      isFF.mockReturnValue(true);
+      vi.mocked(isFF).mockReturnValue(true);
 
       const loadingData = { ...mockData, loading: "col1" };
       renderWithContext({ data: loadingData });
@@ -271,7 +269,7 @@ describe("TableRow", () => {
   describe("Decoration", () => {
     it("should apply decoration styles to cells", () => {
       const mockDecoration = {
-        get: jest.fn(() => ({ style: { color: "red" } })),
+        get: vi.fn(() => ({ style: { color: "red" } })),
       };
 
       renderWithContext({ decoration: mockDecoration });
@@ -286,7 +284,7 @@ describe("TableRow", () => {
       renderWithContext({ wrapperStyle });
 
       const rowWrapper = screen.getByTestId("table-row-wrapper");
-      expect(rowWrapper).toHaveStyle(wrapperStyle);
+      expect(rowWrapper.style.backgroundColor).toBe("blue");
     });
 
     it("should apply style to table row", () => {

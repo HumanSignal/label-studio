@@ -2,6 +2,9 @@ import path from "node:path";
 import { defineProject } from "vitest/config";
 import { baseAlias } from "../../vitest.base";
 
+// Tests expect the default "ls-" BEM prefix. Ensure no inherited env overrides it.
+delete process.env.CSS_PREFIX;
+
 const root = path.resolve(__dirname);
 const webRoot = path.resolve(root, "../..");
 const editorMocks = path.join(webRoot, "libs/editor/__mocks__");

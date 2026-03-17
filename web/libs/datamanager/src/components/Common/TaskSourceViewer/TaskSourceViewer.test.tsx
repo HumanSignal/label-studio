@@ -4,14 +4,14 @@ import "@testing-library/jest-dom";
 import { TaskSourceViewer } from "./TaskSourceViewer";
 
 // Mock feature flags
-jest.mock("../../../utils/feature-flags", () => ({
+vi.mock("../../../utils/feature-flags", () => ({
   FF_LOPS_E_3: "ff_lops_e_3",
   FF_INTERACTIVE_JSON_VIEWER: "ff_interactive_json_viewer",
   isFF: (flag: string) => flag === "ff_interactive_json_viewer",
 }));
 
 // Mock UI components
-jest.mock("@humansignal/ui", () => ({
+vi.mock("@humansignal/ui", () => ({
   JsonViewer: ({ data, toolbarExtra }: any) => (
     <div data-testid="json-viewer">
       {toolbarExtra && <div data-testid="json-viewer-toolbar-extra">{toolbarExtra}</div>}
@@ -53,17 +53,19 @@ jest.mock("@humansignal/ui", () => ({
 }));
 
 // Mock CodeView component
-jest.mock("./CodeView", () => ({
+vi.mock("./CodeView", () => ({
   CodeView: ({ data }: any) => <pre data-testid="code-view">{JSON.stringify(data, null, 2)}</pre>,
 }));
 
-// Mock styles
-jest.mock("./TaskSourceViewer.module.css", () => ({
-  taskSourceView: "taskSourceView",
-  viewToggleContainer: "viewToggleContainer",
-  viewContent: "viewContent",
-  loadingContainer: "loadingContainer",
-  resolveUriToggle: "resolveUriToggle",
+// Mock styles — Vite imports CSS modules as default export
+vi.mock("./TaskSourceViewer.module.css", () => ({
+  default: {
+    taskSourceView: "taskSourceView",
+    viewToggleContainer: "viewToggleContainer",
+    viewContent: "viewContent",
+    loadingContainer: "loadingContainer",
+    resolveUriToggle: "resolveUriToggle",
+  },
 }));
 
 describe("TaskSourceViewer Component", () => {
@@ -81,18 +83,18 @@ describe("TaskSourceViewer Component", () => {
 
   const defaultProps = {
     content: { id: 123, data: {} },
-    onTaskLoad: jest.fn().mockResolvedValue(mockTaskData),
+    onTaskLoad: vi.fn().mockResolvedValue(mockTaskData),
     storageKey: "test:tasksource",
   };
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     localStorage.clear();
   });
 
   describe("Initial Load", () => {
     it("should load task data on mount with default resolveUri=false", async () => {
-      const mockOnTaskLoad = jest.fn().mockResolvedValue(mockTaskData);
+      const mockOnTaskLoad = vi.fn().mockResolvedValue(mockTaskData);
 
       render(<TaskSourceViewer {...defaultProps} onTaskLoad={mockOnTaskLoad} />);
 
@@ -112,7 +114,7 @@ describe("TaskSourceViewer Component", () => {
 
     it("should respect stored resolveUrls preference from localStorage", async () => {
       localStorage.setItem("test:tasksource:resolveUrls", "true");
-      const mockOnTaskLoad = jest.fn().mockResolvedValue(mockTaskData);
+      const mockOnTaskLoad = vi.fn().mockResolvedValue(mockTaskData);
 
       render(<TaskSourceViewer {...defaultProps} onTaskLoad={mockOnTaskLoad} />);
 
@@ -149,7 +151,7 @@ describe("TaskSourceViewer Component", () => {
     it("should reload task data when resolve URIs toggle changes", async () => {
       localStorage.setItem(`${GLOBAL_STORAGE_KEY}:view`, "interactive");
       const user = userEvent.setup();
-      const mockOnTaskLoad = jest.fn().mockResolvedValue(mockTaskData);
+      const mockOnTaskLoad = vi.fn().mockResolvedValue(mockTaskData);
 
       render(<TaskSourceViewer {...defaultProps} onTaskLoad={mockOnTaskLoad} />);
 
@@ -205,7 +207,7 @@ describe("TaskSourceViewer Component", () => {
     });
 
     it("should call renderToggle with ViewToggle component", async () => {
-      const mockRenderToggle = jest.fn();
+      const mockRenderToggle = vi.fn();
 
       render(<TaskSourceViewer {...defaultProps} renderToggle={mockRenderToggle} />);
 
@@ -219,7 +221,7 @@ describe("TaskSourceViewer Component", () => {
     });
 
     it("should update renderToggle when view changes via callback", async () => {
-      const mockRenderToggle = jest.fn();
+      const mockRenderToggle = vi.fn();
       let capturedOnViewChange: ((view: string) => void) | null = null;
 
       // Capture the onViewChange callback from the toggle
@@ -247,7 +249,7 @@ describe("TaskSourceViewer Component", () => {
 
   describe("Data Explorer Mode", () => {
     it("should not include annotations/predictions for Data Explorer", async () => {
-      const mockOnTaskLoad = jest.fn().mockResolvedValue({
+      const mockOnTaskLoad = vi.fn().mockResolvedValue({
         ...mockTaskData,
         annotations: [{ id: 1 }],
         predictions: [{ id: 2 }],
@@ -267,7 +269,7 @@ describe("TaskSourceViewer Component", () => {
     it("should show skeleton while loading then update to code view", async () => {
       // Create a promise that doesn't resolve immediately
       let resolvePromise: (value: any) => void;
-      const mockOnTaskLoad = jest.fn().mockImplementation(
+      const mockOnTaskLoad = vi.fn().mockImplementation(
         () =>
           new Promise((resolve) => {
             resolvePromise = resolve;
