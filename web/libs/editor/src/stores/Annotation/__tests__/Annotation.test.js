@@ -6,7 +6,7 @@ if (typeof globalThis.structuredClone === "undefined") {
   globalThis.structuredClone = (obj) => JSON.parse(JSON.stringify(obj));
 }
 
-jest.mock("keymaster", () => {
+vi.mock("keymaster", () => {
   const keymaster = () => {};
   keymaster.unbind = () => {};
   keymaster.setScope = () => {};
@@ -23,8 +23,8 @@ const MINIMAL_CONFIG = `<View><Text name="t1" value="$text" /></View>`;
 
 const createTestEnv = () => ({
   events: {
-    hasEvent: jest.fn(() => false),
-    invoke: jest.fn(),
+    hasEvent: vi.fn(() => false),
+    invoke: vi.fn(),
   },
   messages: {},
   settings: {},
@@ -254,7 +254,7 @@ describe("Annotation model", () => {
 
     it("updatePersonalKey sets pk", () => {
       const { store, annotation } = createStoreWithAnnotation();
-      store.addAnnotationToTaskHistory = jest.fn();
+      store.addAnnotationToTaskHistory = vi.fn();
       annotation.updatePersonalKey("42");
       expect(annotation.pk).toBe("42");
       expect(store.addAnnotationToTaskHistory).toHaveBeenCalledWith("42");
@@ -292,7 +292,7 @@ describe("Annotation model", () => {
 
     it("dropDraft clears draft state when autosave exists", () => {
       const { annotation } = createStoreWithAnnotation();
-      annotation.autosave = { cancel: jest.fn() };
+      annotation.autosave = { cancel: vi.fn() };
       annotation.setDraftId(1);
       annotation.setDraftSelected(true);
       annotation.addVersions({ draft: [] });
@@ -304,15 +304,15 @@ describe("Annotation model", () => {
 
     it("reinitHistory calls history.reinit and setInitialValues for annotation type", () => {
       const { annotation } = createStoreWithAnnotation();
-      annotation.history.reinit = jest.fn();
+      annotation.history.reinit = vi.fn();
       annotation.reinitHistory(true);
       expect(annotation.history.reinit).toHaveBeenCalledWith(true);
     });
 
     it("deserializeAnnotation warns and delegates to deserializeResults", () => {
-      const consoleSpy = jest.spyOn(console, "warn").mockImplementation(() => {});
+      const consoleSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
       const { annotation } = createStoreWithAnnotation();
-      annotation.deserializeResults = jest.fn();
+      annotation.deserializeResults = vi.fn();
       annotation.deserializeAnnotation([]);
       expect(consoleSpy).toHaveBeenCalled();
       expect(annotation.deserializeResults).toHaveBeenCalledWith([]);

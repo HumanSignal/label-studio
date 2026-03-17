@@ -9,40 +9,37 @@
 import React from "react";
 import { render, waitFor, fireEvent, act } from "@testing-library/react";
 import { types } from "mobx-state-tree";
+import { mockFF } from "../../../__mocks__/global";
+import { FF_ZOOM_OPTIM } from "../../utils/feature-flags";
 
 let mockBrushImageRef = null;
-jest.mock("../../utils/canvas", () => ({
-  Region2RLE: jest.fn(),
-  RLE2Region: jest.fn(() => ({ onload: null, src: "" })),
-  maskDataURL2Image: jest.fn(() => {
+vi.mock("../../utils/canvas", () => ({
+  Region2RLE: vi.fn(),
+  RLE2Region: vi.fn(() => ({ onload: null, src: "" })),
+  maskDataURL2Image: vi.fn(() => {
     mockBrushImageRef = { onload: null, width: 100, height: 100 };
     return Promise.resolve(mockBrushImageRef);
   }),
 }));
 
-jest.mock("../../components/InteractiveOverlays/Geometry", () => ({
+vi.mock("../../components/InteractiveOverlays/Geometry", () => ({
   Geometry: {
-    getImageDataBBox: jest.fn(() => ({ x: 0, y: 0, width: 50, height: 50 })),
+    getImageDataBBox: vi.fn(() => ({ x: 0, y: 0, width: 50, height: 50 })),
   },
 }));
 
-jest.mock("../../utils/feature-flags", () => ({
-  isFF: jest.fn(() => false),
-  FF_ZOOM_OPTIM: "ff_zoom_optim",
-}));
-
 const mockCtx = {
-  save: jest.fn(),
-  restore: jest.fn(),
-  beginPath: jest.fn(),
-  moveTo: jest.fn(),
-  lineTo: jest.fn(),
-  stroke: jest.fn(),
-  drawImage: jest.fn(),
-  getImageData: jest.fn(() => ({ data: new Uint8ClampedArray(4 * 100 * 100), width: 100, height: 100 })),
-  putImageData: jest.fn(),
+  save: vi.fn(),
+  restore: vi.fn(),
+  beginPath: vi.fn(),
+  moveTo: vi.fn(),
+  lineTo: vi.fn(),
+  stroke: vi.fn(),
+  drawImage: vi.fn(),
+  getImageData: vi.fn(() => ({ data: new Uint8ClampedArray(4 * 100 * 100), width: 100, height: 100 })),
+  putImageData: vi.fn(),
 };
-jest.mock("react-konva", () => {
+vi.mock("react-konva", () => {
   const React = require("react");
   return {
     Layer: React.forwardRef(({ children, ...p }, ref) => {
@@ -83,7 +80,7 @@ jest.mock("react-konva", () => {
   };
 });
 
-jest.mock("../../components/ImageView/ImageViewContext", () => ({
+vi.mock("../../components/ImageView/ImageViewContext", () => ({
   ImageViewContext: require("react").createContext({ suggestion: null }),
 }));
 
@@ -92,11 +89,11 @@ const { Geometry } = require("../../components/InteractiveOverlays/Geometry");
 
 function createMockAnnotation(overrides = {}) {
   return {
-    pauseAutosave: jest.fn(),
-    startAutosave: jest.fn(),
-    autosave: jest.fn(),
+    pauseAutosave: vi.fn(),
+    startAutosave: vi.fn(),
+    autosave: vi.fn(),
     isReadOnly: () => false,
-    unselectAll: jest.fn(),
+    unselectAll: vi.fn(),
     ...overrides,
   };
 }
@@ -141,12 +138,14 @@ const MockImageModel = types
     },
   }));
 
-jest.mock("../../tags/object/Image", () => ({
+vi.mock("../../tags/object/Image", () => ({
   ImageModel: MockImageModel,
 }));
 
 const { BrushRegionModel, HtxBrush } = require("../BrushRegion");
 const { ImageViewContext } = require("../../components/ImageView/ImageViewContext");
+
+const ff = mockFF();
 
 describe("BrushRegion", () => {
   let root;
@@ -192,6 +191,7 @@ describe("BrushRegion", () => {
   });
 
   beforeEach(() => {
+    ff.setup();
     mockAnnotation = createMockAnnotation();
     root = TestRoot.create({
       annotationStore: { selected: mockAnnotation },
@@ -201,7 +201,11 @@ describe("BrushRegion", () => {
     });
     root.image.setAnnotation(mockAnnotation);
     region = root.region;
-    jest.clearAllMocks();
+    vi.clearAllMocks();
+  });
+
+  afterEach(() => {
+    ff.reset();
   });
 
   describe("BrushRegionModel views", () => {
@@ -389,22 +393,20 @@ describe("BrushRegion", () => {
     });
 
     it("preDraw draws with layerRef and uses ctx when FF_ZOOM_OPTIM is false", () => {
-      const featureFlags = require("../../utils/feature-flags");
-      featureFlags.isFF.mockReturnValue(false);
       const ctx = {
-        save: jest.fn(),
-        restore: jest.fn(),
-        beginPath: jest.fn(),
-        moveTo: jest.fn(),
-        lineTo: jest.fn(),
-        rect: jest.fn(),
-        clip: jest.fn(),
+        save: vi.fn(),
+        restore: vi.fn(),
+        beginPath: vi.fn(),
+        moveTo: vi.fn(),
+        lineTo: vi.fn(),
+        rect: vi.fn(),
+        clip: vi.fn(),
         lineCap: "",
         lineJoin: "",
         lineWidth: 0,
         strokeStyle: "",
         globalCompositeOperation: "",
-        stroke: jest.fn(),
+        stroke: vi.fn(),
       };
       const mockRef = {
         getLayer: () => ({ canvas: { context: ctx } }),
@@ -418,26 +420,24 @@ describe("BrushRegion", () => {
       expect(ctx.lineTo).toHaveBeenCalled();
       expect(ctx.stroke).toHaveBeenCalled();
       expect(ctx.restore).toHaveBeenCalled();
-      featureFlags.isFF.mockReturnValue(false);
     });
 
     it("preDraw uses clip rect when FF_ZOOM_OPTIM is true", () => {
-      const featureFlags = require("../../utils/feature-flags");
-      featureFlags.isFF.mockReturnValue(true);
+      ff.set({ [FF_ZOOM_OPTIM]: true });
       const ctx = {
-        save: jest.fn(),
-        restore: jest.fn(),
-        beginPath: jest.fn(),
-        moveTo: jest.fn(),
-        lineTo: jest.fn(),
-        rect: jest.fn(),
-        clip: jest.fn(),
+        save: vi.fn(),
+        restore: vi.fn(),
+        beginPath: vi.fn(),
+        moveTo: vi.fn(),
+        lineTo: vi.fn(),
+        rect: vi.fn(),
+        clip: vi.fn(),
         lineCap: "",
         lineJoin: "",
         lineWidth: 0,
         strokeStyle: "",
         globalCompositeOperation: "",
-        stroke: jest.fn(),
+        stroke: vi.fn(),
       };
       const mockRef = {
         getLayer: () => ({ canvas: { context: ctx } }),
@@ -448,26 +448,23 @@ describe("BrushRegion", () => {
       region.preDraw(5, 5);
       expect(ctx.rect).toHaveBeenCalled();
       expect(ctx.clip).toHaveBeenCalled();
-      featureFlags.isFF.mockReturnValue(false);
     });
 
     it("preDraw uses cachedPoints when multiple points added", () => {
-      const featureFlags = require("../../utils/feature-flags");
-      featureFlags.isFF.mockReturnValue(false);
       const ctx = {
-        save: jest.fn(),
-        restore: jest.fn(),
-        beginPath: jest.fn(),
-        moveTo: jest.fn(),
-        lineTo: jest.fn(),
-        rect: jest.fn(),
-        clip: jest.fn(),
+        save: vi.fn(),
+        restore: vi.fn(),
+        beginPath: vi.fn(),
+        moveTo: vi.fn(),
+        lineTo: vi.fn(),
+        rect: vi.fn(),
+        clip: vi.fn(),
         lineCap: "",
         lineJoin: "",
         lineWidth: 0,
         strokeStyle: "",
         globalCompositeOperation: "",
-        stroke: jest.fn(),
+        stroke: vi.fn(),
       };
       const mockRef = {
         getLayer: () => ({ canvas: { context: ctx } }),
@@ -482,7 +479,6 @@ describe("BrushRegion", () => {
       region.addPoint(5, 5);
       expect(ctx.moveTo).toHaveBeenCalled();
       expect(ctx.lineTo).toHaveBeenCalled();
-      featureFlags.isFF.mockReturnValue(false);
     });
   });
 
@@ -607,7 +603,7 @@ describe("BrushRegion", () => {
         region: { id: "br4", pid: "p4", object: "img1", touches: [] },
       });
       linkingRoot.image.setAnnotation(linkingRoot.annotationStore.selected);
-      const setHighlightSpy = jest.spyOn(linkingRoot.region, "setHighlight");
+      const setHighlightSpy = vi.spyOn(linkingRoot.region, "setHighlight");
       const { getAllByTestId } = render(
         <ImageViewContext.Provider value={{ suggestion: null }}>
           <HtxBrush item={linkingRoot.region} />
@@ -686,11 +682,11 @@ describe("BrushRegion", () => {
     it("Group onClick calls setHighlight(false) and onClickRegion when not linking and MoveTool", () => {
       const mst = require("mobx-state-tree");
       const origGetType = mst.getType;
-      mst.getType = jest.fn().mockReturnValue({ name: "MoveTool" });
-      const mockGetToolsManager = jest.fn().mockReturnValue({ findSelectedTool: () => ({}) });
-      jest.spyOn(root.image, "getToolsManager").mockImplementation(mockGetToolsManager);
-      const setHighlightSpy = jest.spyOn(region, "setHighlight");
-      const onClickRegionSpy = jest.spyOn(region, "onClickRegion").mockImplementation(() => {});
+      mst.getType = vi.fn().mockReturnValue({ name: "MoveTool" });
+      const mockGetToolsManager = vi.fn().mockReturnValue({ findSelectedTool: () => ({}) });
+      vi.spyOn(root.image, "getToolsManager").mockImplementation(mockGetToolsManager);
+      const setHighlightSpy = vi.spyOn(region, "setHighlight");
+      const onClickRegionSpy = vi.spyOn(region, "onClickRegion").mockImplementation(() => {});
       const { getAllByTestId } = render(
         <ImageViewContext.Provider value={{ suggestion: null }}>
           <HtxBrush item={region} />

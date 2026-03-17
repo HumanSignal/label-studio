@@ -1,22 +1,21 @@
 /**
  * Unit tests for HtxParagraphs view (tags/object/Paragraphs/HtxParagraphs.jsx)
  */
+import React from "react";
 import { FF_DEV_2669, FF_DEV_2918, FF_LSDV_E_278, FF_NER_SELECT_ALL } from "../../../../utils/feature-flags";
 import { HtxParagraphsView } from "../HtxParagraphs";
+import { mockFF } from "../../../../../__mocks__/global";
 
-jest.mock("../../../../utils/feature-flags", () => ({
-  ...jest.requireActual("../../../../utils/feature-flags"),
-  isFF: jest.fn(),
-}));
-
-function defaultIsFF(flag) {
-  return flag === FF_LSDV_E_278;
-}
+const ff = mockFF();
 
 beforeEach(() => {
-  jest.clearAllMocks();
-  const { isFF } = require("../../../../utils/feature-flags");
-  isFF.mockImplementation(defaultIsFF);
+  vi.clearAllMocks();
+  ff.setup();
+  ff.set({ [FF_LSDV_E_278]: true });
+});
+
+afterEach(() => {
+  ff.reset();
 });
 
 function createMockItem(overrides = {}) {
@@ -32,10 +31,10 @@ function createMockItem(overrides = {}) {
     contextscroll: true,
     layoutClasses: { text: "text-class", name: "name-class", phrase: "phrase-class" },
     audio: null,
-    seekToPhrase: jest.fn(),
-    setViewRef: jest.fn(),
-    isVisibleForAuthorFilter: jest.fn(() => true),
-    activeStates: jest.fn(() => []),
+    seekToPhrase: vi.fn(),
+    setViewRef: vi.fn(),
+    isVisibleForAuthorFilter: vi.fn(() => true),
+    activeStates: vi.fn(() => []),
     ...overrides,
   };
 }
@@ -134,8 +133,8 @@ describe("HtxParagraphsView", () => {
       const view = new HtxParagraphsView({ item });
       const el = document.createElement("div");
       view.myRef = { current: el };
-      const getPropertyValue = jest.fn(() => "16");
-      window.getComputedStyle = jest.fn(() => ({ getPropertyValue }));
+      const getPropertyValue = vi.fn(() => "16");
+      window.getComputedStyle = vi.fn(() => ({ getPropertyValue }));
       expect(view.getContainerPadding()).toBe(16);
     });
 
@@ -143,7 +142,7 @@ describe("HtxParagraphsView", () => {
       const item = createMockItem();
       const view = new HtxParagraphsView({ item });
       view.myRef = { current: document.createElement("div") };
-      window.getComputedStyle = jest.fn(() => ({ getPropertyValue: () => "" }));
+      window.getComputedStyle = vi.fn(() => ({ getPropertyValue: () => "" }));
       expect(view.getContainerPadding()).toBe(0);
     });
   });
@@ -153,7 +152,7 @@ describe("HtxParagraphsView", () => {
       const item = createMockItem();
       const view = new HtxParagraphsView({ item });
       const root = document.createElement("div");
-      root.querySelector = jest.fn(() => null);
+      root.querySelector = vi.fn(() => null);
       view.myRef = { current: root };
       expect(view.calculatePhraseScrollPosition(0)).toBe(0);
     });
@@ -163,10 +162,10 @@ describe("HtxParagraphsView", () => {
       const view = new HtxParagraphsView({ item });
       const phraseEl = document.createElement("div");
       const root = document.createElement("div");
-      root.querySelector = jest.fn(() => phraseEl);
-      root.getBoundingClientRect = jest.fn(() => ({ top: 100 }));
+      root.querySelector = vi.fn(() => phraseEl);
+      root.getBoundingClientRect = vi.fn(() => ({ top: 100 }));
       root.scrollTop = 50;
-      phraseEl.getBoundingClientRect = jest.fn(() => ({ top: 200 }));
+      phraseEl.getBoundingClientRect = vi.fn(() => ({ top: 200 }));
       view.myRef = { current: root };
       expect(view.calculatePhraseScrollPosition(0)).toBe(150);
     });
@@ -177,8 +176,8 @@ describe("HtxParagraphsView", () => {
       const item = createMockItem();
       const view = new HtxParagraphsView({ item });
       view.state = { inViewPort: false };
-      view.performProgrammaticScroll = jest.fn();
-      view.getContainerPadding = jest.fn(() => 0);
+      view.performProgrammaticScroll = vi.fn();
+      view.getContainerPadding = vi.fn(() => 0);
       view.handleNormalPhraseScroll();
       expect(view.performProgrammaticScroll).not.toHaveBeenCalled();
     });
@@ -187,8 +186,8 @@ describe("HtxParagraphsView", () => {
       const item = createMockItem({ playingId: 0 });
       const view = new HtxParagraphsView({ item });
       view.state = { inViewPort: true };
-      view.performProgrammaticScroll = jest.fn();
-      view.getContainerPadding = jest.fn(() => 10);
+      view.performProgrammaticScroll = vi.fn();
+      view.getContainerPadding = vi.fn(() => 10);
       view.handleNormalPhraseScroll();
       expect(view.performProgrammaticScroll).toHaveBeenCalledWith(10);
     });
@@ -197,9 +196,9 @@ describe("HtxParagraphsView", () => {
       const item = createMockItem({ playingId: 1 });
       const view = new HtxParagraphsView({ item });
       view.state = { inViewPort: true };
-      view.myRef = { current: { querySelector: jest.fn(() => ({})), getBoundingClientRect: () => ({}), scrollTop: 0 } };
-      view.performProgrammaticScroll = jest.fn();
-      view.calculatePhraseScrollPosition = jest.fn(() => 100);
+      view.myRef = { current: { querySelector: vi.fn(() => ({})), getBoundingClientRect: () => ({}), scrollTop: 0 } };
+      view.performProgrammaticScroll = vi.fn();
+      view.calculatePhraseScrollPosition = vi.fn(() => 100);
       view.handleNormalPhraseScroll();
       expect(view.performProgrammaticScroll).toHaveBeenCalledWith(100);
     });
@@ -290,7 +289,7 @@ describe("HtxParagraphsView", () => {
     it("updates state with given value", () => {
       const item = createMockItem();
       const view = new HtxParagraphsView({ item });
-      view.setState = jest.fn();
+      view.setState = vi.fn();
       view.setIsInViewPort(false);
       expect(view.setState).toHaveBeenCalledWith({ inViewPort: false });
     });
@@ -300,7 +299,7 @@ describe("HtxParagraphsView", () => {
     it("sets inViewPort to false when not programmatic scroll", () => {
       const item = createMockItem();
       const view = new HtxParagraphsView({ item });
-      view.setState = jest.fn();
+      view.setState = vi.fn();
       view.state = { inViewPort: true };
       view.isProgrammaticScroll = false;
       view.onScroll();
@@ -310,7 +309,7 @@ describe("HtxParagraphsView", () => {
     it("does not update state when isProgrammaticScroll is true", () => {
       const item = createMockItem();
       const view = new HtxParagraphsView({ item });
-      view.setState = jest.fn();
+      view.setState = vi.fn();
       view.state = { inViewPort: true };
       view.isProgrammaticScroll = true;
       view.onScroll();
@@ -322,21 +321,20 @@ describe("HtxParagraphsView", () => {
     it("calls scrollTo on myRef with max(0, top)", () => {
       const item = createMockItem();
       const view = new HtxParagraphsView({ item });
-      const scrollTo = jest.fn();
+      const scrollTo = vi.fn();
       view.myRef = { current: { scrollTo } };
-      jest.useFakeTimers();
+      vi.useFakeTimers();
       view.performProgrammaticScroll(100);
       expect(scrollTo).toHaveBeenCalledWith({ top: 100, behavior: "smooth" });
       view.performProgrammaticScroll(-10);
       expect(scrollTo).toHaveBeenLastCalledWith({ top: 0, behavior: "smooth" });
-      jest.useRealTimers();
+      vi.useRealTimers();
     });
   });
 
   describe("getRegionsForPhrase (FF_NER_SELECT_ALL)", () => {
     beforeEach(() => {
-      const { isFF } = require("../../../../utils/feature-flags");
-      isFF.mockImplementation((flag) => flag === FF_LSDV_E_278 || flag === FF_NER_SELECT_ALL);
+      ff.set({ [FF_NER_SELECT_ALL]: true });
     });
 
     it("returns [] when item has no annotation", () => {
@@ -367,12 +365,11 @@ describe("HtxParagraphsView", () => {
 
   describe("selectRegion (FF_NER_SELECT_ALL)", () => {
     beforeEach(() => {
-      const { isFF } = require("../../../../utils/feature-flags");
-      isFF.mockImplementation((flag) => flag === FF_LSDV_E_278 || flag === FF_NER_SELECT_ALL);
+      ff.set({ [FF_NER_SELECT_ALL]: true });
     });
 
     it("calls item.annotation.selectArea and returns true", () => {
-      const selectArea = jest.fn();
+      const selectArea = vi.fn();
       const item = createMockItem({ annotation: { selectArea } });
       const view = new HtxParagraphsView({ item });
       const region = {};
@@ -383,25 +380,24 @@ describe("HtxParagraphsView", () => {
 
   describe("hasSelectedLabels (FF_NER_SELECT_ALL)", () => {
     beforeEach(() => {
-      const { isFF } = require("../../../../utils/feature-flags");
-      isFF.mockImplementation((flag) => flag === FF_LSDV_E_278 || flag === FF_NER_SELECT_ALL);
+      ff.set({ [FF_NER_SELECT_ALL]: true });
     });
 
     it("returns false when activeStates returns empty", () => {
-      const item = createMockItem({ activeStates: jest.fn(() => []) });
+      const item = createMockItem({ activeStates: vi.fn(() => []) });
       const view = new HtxParagraphsView({ item });
       expect(view.hasSelectedLabels).toBe(false);
     });
 
     it("returns true when activeStates returns non-empty", () => {
-      const item = createMockItem({ activeStates: jest.fn(() => [{}]) });
+      const item = createMockItem({ activeStates: vi.fn(() => [{}]) });
       const view = new HtxParagraphsView({ item });
       expect(view.hasSelectedLabels).toBe(true);
     });
 
     it("returns false when activeStates throws", () => {
       const item = createMockItem({
-        activeStates: jest.fn(() => {
+        activeStates: vi.fn(() => {
           throw new Error("");
         }),
       });
@@ -412,41 +408,40 @@ describe("HtxParagraphsView", () => {
 
   describe("selectRegionsForPhrase (FF_NER_SELECT_ALL)", () => {
     beforeEach(() => {
-      const { isFF } = require("../../../../utils/feature-flags");
-      isFF.mockImplementation((flag) => flag === FF_LSDV_E_278 || flag === FF_NER_SELECT_ALL);
+      ff.set({ [FF_NER_SELECT_ALL]: true });
     });
 
     it("returns early when annotation has no results", () => {
       const item = createMockItem({ annotation: { results: null, regionStore: { regions: [] } } });
       const view = new HtxParagraphsView({ item });
-      view.getRegionsForPhrase = jest.fn();
-      view.selectRegion = jest.fn();
+      view.getRegionsForPhrase = vi.fn();
+      view.selectRegion = vi.fn();
       view.selectRegionsForPhrase(0);
       expect(view.getRegionsForPhrase).not.toHaveBeenCalled();
     });
 
     it("calls unselectAreas and selectRegion when phrase has regions", () => {
       const r1 = {};
-      const unselectAreas = jest.fn();
+      const unselectAreas = vi.fn();
       const item = createMockItem({
         annotation: { unselectAreas, results: [{}], regionStore: { regions: [r1] } },
       });
       const view = new HtxParagraphsView({ item });
-      view.getRegionsForPhrase = jest.fn(() => [r1]);
-      view.selectRegion = jest.fn();
+      view.getRegionsForPhrase = vi.fn(() => [r1]);
+      view.selectRegion = vi.fn();
       view.selectRegionsForPhrase(0);
       expect(unselectAreas).toHaveBeenCalled();
       expect(view.selectRegion).toHaveBeenCalledWith(r1);
     });
 
     it("does not call selectRegion when phrase has no regions", () => {
-      const unselectAreas = jest.fn();
+      const unselectAreas = vi.fn();
       const item = createMockItem({
         annotation: { unselectAreas, results: [{}], regionStore: { regions: [] } },
       });
       const view = new HtxParagraphsView({ item });
-      view.getRegionsForPhrase = jest.fn(() => []);
-      view.selectRegion = jest.fn();
+      view.getRegionsForPhrase = vi.fn(() => []);
+      view.selectRegion = vi.fn();
       view.selectRegionsForPhrase(0);
       expect(unselectAreas).toHaveBeenCalled();
       expect(view.selectRegion).not.toHaveBeenCalled();
@@ -455,20 +450,19 @@ describe("HtxParagraphsView", () => {
 
   describe("handleNextPhrase", () => {
     beforeEach(() => {
-      const { isFF } = require("../../../../utils/feature-flags");
-      isFF.mockImplementation((flag) => flag === FF_LSDV_E_278 || flag === FF_NER_SELECT_ALL);
+      ff.set({ [FF_NER_SELECT_ALL]: true });
     });
 
     it("calls item.goToNextPhrase and selectRegionsForPhrase", () => {
-      const goToNextPhrase = jest.fn();
+      const goToNextPhrase = vi.fn();
       const item = createMockItem({
         goToNextPhrase,
         playingId: 0,
         annotation: { regionStore: { regions: [] } },
       });
       const view = new HtxParagraphsView({ item });
-      view.selectRegion = jest.fn();
-      view.getRegionsForPhrase = jest.fn(() => []);
+      view.selectRegion = vi.fn();
+      view.getRegionsForPhrase = vi.fn(() => []);
       view.handleNextPhrase();
       expect(goToNextPhrase).toHaveBeenCalled();
     });
@@ -476,20 +470,19 @@ describe("HtxParagraphsView", () => {
 
   describe("handlePreviousPhrase", () => {
     beforeEach(() => {
-      const { isFF } = require("../../../../utils/feature-flags");
-      isFF.mockImplementation((flag) => flag === FF_LSDV_E_278 || flag === FF_NER_SELECT_ALL);
+      ff.set({ [FF_NER_SELECT_ALL]: true });
     });
 
     it("calls item.goToPreviousPhrase", () => {
-      const goToPreviousPhrase = jest.fn();
+      const goToPreviousPhrase = vi.fn();
       const item = createMockItem({
         goToPreviousPhrase,
         playingId: 1,
         annotation: { regionStore: { regions: [] } },
       });
       const view = new HtxParagraphsView({ item });
-      view.selectRegion = jest.fn();
-      view.getRegionsForPhrase = jest.fn(() => []);
+      view.selectRegion = vi.fn();
+      view.getRegionsForPhrase = vi.fn(() => []);
       view.handlePreviousPhrase();
       expect(goToPreviousPhrase).toHaveBeenCalled();
     });
@@ -497,12 +490,11 @@ describe("HtxParagraphsView", () => {
 
   describe("handleSelectAllAndAnnotate", () => {
     beforeEach(() => {
-      const { isFF } = require("../../../../utils/feature-flags");
-      isFF.mockImplementation((flag) => flag === FF_NER_SELECT_ALL);
+      ff.set({ [FF_LSDV_E_278]: false, [FF_NER_SELECT_ALL]: true });
     });
 
     it("calls item.selectAllAndAnnotateCurrentPhrase", () => {
-      const selectAllAndAnnotateCurrentPhrase = jest.fn();
+      const selectAllAndAnnotateCurrentPhrase = vi.fn();
       const item = createMockItem({ selectAllAndAnnotateCurrentPhrase });
       const view = new HtxParagraphsView({ item });
       view.handleSelectAllAndAnnotate();
@@ -512,24 +504,23 @@ describe("HtxParagraphsView", () => {
 
   describe("handleNextRegion (FF_NER_SELECT_ALL)", () => {
     beforeEach(() => {
-      const { isFF } = require("../../../../utils/feature-flags");
-      isFF.mockImplementation((flag) => flag === FF_LSDV_E_278 || flag === FF_NER_SELECT_ALL);
+      ff.set({ [FF_NER_SELECT_ALL]: true });
     });
 
     it("returns early when playingId < 0", () => {
-      const item = createMockItem({ playingId: -1, annotation: { selectedRegions: [], unselectAll: jest.fn() } });
+      const item = createMockItem({ playingId: -1, annotation: { selectedRegions: [], unselectAll: vi.fn() } });
       const view = new HtxParagraphsView({ item });
-      view.getRegionsForPhrase = jest.fn(() => []);
-      view.selectRegion = jest.fn();
+      view.getRegionsForPhrase = vi.fn(() => []);
+      view.selectRegion = vi.fn();
       view.handleNextRegion();
       expect(view.selectRegion).not.toHaveBeenCalled();
     });
 
     it("returns early when phraseRegions is empty", () => {
-      const item = createMockItem({ playingId: 0, annotation: { selectedRegions: [], unselectAll: jest.fn() } });
+      const item = createMockItem({ playingId: 0, annotation: { selectedRegions: [], unselectAll: vi.fn() } });
       const view = new HtxParagraphsView({ item });
-      view.getRegionsForPhrase = jest.fn(() => []);
-      view.selectRegion = jest.fn();
+      view.getRegionsForPhrase = vi.fn(() => []);
+      view.selectRegion = vi.fn();
       view.handleNextRegion();
       expect(view.selectRegion).not.toHaveBeenCalled();
     });
@@ -537,14 +528,14 @@ describe("HtxParagraphsView", () => {
     it("selects next region in phrase", () => {
       const r1 = {};
       const r2 = {};
-      const unselectAll = jest.fn();
+      const unselectAll = vi.fn();
       const item = createMockItem({
         playingId: 0,
         annotation: { selectedRegions: [r1], unselectAll },
       });
       const view = new HtxParagraphsView({ item });
-      view.getRegionsForPhrase = jest.fn(() => [r1, r2]);
-      view.selectRegion = jest.fn();
+      view.getRegionsForPhrase = vi.fn(() => [r1, r2]);
+      view.selectRegion = vi.fn();
       view.handleNextRegion();
       expect(unselectAll).toHaveBeenCalled();
       expect(view.selectRegion).toHaveBeenCalledWith(r2);
@@ -553,14 +544,14 @@ describe("HtxParagraphsView", () => {
     it("selects first region when no region is selected (currentIndex -1)", () => {
       const r1 = {};
       const r2 = {};
-      const unselectAll = jest.fn();
+      const unselectAll = vi.fn();
       const item = createMockItem({
         playingId: 0,
         annotation: { selectedRegions: [], unselectAll },
       });
       const view = new HtxParagraphsView({ item });
-      view.getRegionsForPhrase = jest.fn(() => [r1, r2]);
-      view.selectRegion = jest.fn();
+      view.getRegionsForPhrase = vi.fn(() => [r1, r2]);
+      view.selectRegion = vi.fn();
       view.handleNextRegion();
       expect(view.selectRegion).toHaveBeenCalledWith(r1);
     });
@@ -568,21 +559,20 @@ describe("HtxParagraphsView", () => {
 
   describe("handlePreviousRegion (FF_NER_SELECT_ALL)", () => {
     beforeEach(() => {
-      const { isFF } = require("../../../../utils/feature-flags");
-      isFF.mockImplementation((flag) => flag === FF_LSDV_E_278 || flag === FF_NER_SELECT_ALL);
+      ff.set({ [FF_NER_SELECT_ALL]: true });
     });
 
     it("selects previous region in phrase", () => {
       const r1 = {};
       const r2 = {};
-      const unselectAll = jest.fn();
+      const unselectAll = vi.fn();
       const item = createMockItem({
         playingId: 0,
         annotation: { selectedRegions: [r2], unselectAll },
       });
       const view = new HtxParagraphsView({ item });
-      view.getRegionsForPhrase = jest.fn(() => [r1, r2]);
-      view.selectRegion = jest.fn();
+      view.getRegionsForPhrase = vi.fn(() => [r1, r2]);
+      view.selectRegion = vi.fn();
       view.handlePreviousRegion();
       expect(unselectAll).toHaveBeenCalled();
       expect(view.selectRegion).toHaveBeenCalledWith(r1);
@@ -591,14 +581,14 @@ describe("HtxParagraphsView", () => {
     it("selects last region when no region is selected (currentIndex -1)", () => {
       const r1 = {};
       const r2 = {};
-      const unselectAll = jest.fn();
+      const unselectAll = vi.fn();
       const item = createMockItem({
         playingId: 0,
         annotation: { selectedRegions: [], unselectAll },
       });
       const view = new HtxParagraphsView({ item });
-      view.getRegionsForPhrase = jest.fn(() => [r1, r2]);
-      view.selectRegion = jest.fn();
+      view.getRegionsForPhrase = vi.fn(() => [r1, r2]);
+      view.selectRegion = vi.fn();
       view.handlePreviousRegion();
       expect(view.selectRegion).toHaveBeenCalledWith(r2);
     });
@@ -610,9 +600,9 @@ describe("HtxParagraphsView", () => {
       const view = new HtxParagraphsView({ item });
       view.myRef = { current: { offsetHeight: 100 } };
       view.activeRef = { current: { offsetTop: 0, offsetHeight: 300 } };
-      view.getContainerPadding = jest.fn(() => 0);
+      view.getContainerPadding = vi.fn(() => 0);
       view.state = { inViewPort: true, canScroll: true };
-      view.performProgrammaticScroll = jest.fn();
+      view.performProgrammaticScroll = vi.fn();
       view.scrollTimeout = [];
       view.handleTallPhraseScroll(300, 2);
       expect(view.scrollTimeout.length).toBeGreaterThan(0);
@@ -623,15 +613,15 @@ describe("HtxParagraphsView", () => {
       const view = new HtxParagraphsView({ item });
       view.myRef = { current: { offsetHeight: 100 } };
       view.activeRef = { current: { offsetTop: 0, offsetHeight: 300 } };
-      view.getContainerPadding = jest.fn(() => 0);
+      view.getContainerPadding = vi.fn(() => 0);
       view.state = { inViewPort: false, canScroll: true };
-      view.performProgrammaticScroll = jest.fn();
+      view.performProgrammaticScroll = vi.fn();
       view.scrollTimeout = [];
-      jest.useFakeTimers();
+      vi.useFakeTimers();
       view.handleTallPhraseScroll(300, 2);
-      jest.advanceTimersByTime(2000);
+      vi.advanceTimersByTime(2000);
       expect(view.performProgrammaticScroll).not.toHaveBeenCalled();
-      jest.useRealTimers();
+      vi.useRealTimers();
     });
 
     it("does not call performProgrammaticScroll when canScroll is false", () => {
@@ -639,15 +629,15 @@ describe("HtxParagraphsView", () => {
       const view = new HtxParagraphsView({ item });
       view.myRef = { current: { offsetHeight: 100 } };
       view.activeRef = { current: { offsetTop: 0, offsetHeight: 300 } };
-      view.getContainerPadding = jest.fn(() => 0);
+      view.getContainerPadding = vi.fn(() => 0);
       view.state = { inViewPort: true, canScroll: false };
-      view.performProgrammaticScroll = jest.fn();
+      view.performProgrammaticScroll = vi.fn();
       view.scrollTimeout = [];
-      jest.useFakeTimers();
+      vi.useFakeTimers();
       view.handleTallPhraseScroll(300, 2);
-      jest.advanceTimersByTime(2000);
+      vi.advanceTimersByTime(2000);
       expect(view.performProgrammaticScroll).not.toHaveBeenCalled();
-      jest.useRealTimers();
+      vi.useRealTimers();
     });
   });
 
@@ -657,7 +647,7 @@ describe("HtxParagraphsView", () => {
       const view = new HtxParagraphsView({ item });
       const span = document.createElement("span");
       span.className = "htx-highlight";
-      const region = { find: jest.fn(() => true) };
+      const region = { find: vi.fn(() => true) };
       item.regs = [region];
       expect(view._determineRegion(span)).toBe(region);
     });
@@ -670,8 +660,8 @@ describe("HtxParagraphsView", () => {
       const parent = document.createElement("div");
       parent.className = "htx-highlight";
       parent.appendChild(span);
-      parent.closest = jest.fn(() => span);
-      const region = { find: jest.fn(() => true) };
+      parent.closest = vi.fn(() => span);
+      const region = { find: vi.fn(() => true) };
       item.regs = [region];
       expect(view._determineRegion(parent)).toBe(region);
       expect(parent.closest).toHaveBeenCalledWith(".htx-highlight");
@@ -682,7 +672,7 @@ describe("HtxParagraphsView", () => {
       const view = new HtxParagraphsView({ item });
       const span = document.createElement("span");
       span.className = "htx-highlight";
-      item.regs = [{ find: jest.fn(() => false) }];
+      item.regs = [{ find: vi.fn(() => false) }];
       expect(view._determineRegion(span)).toBeUndefined();
     });
   });
@@ -696,7 +686,7 @@ describe("HtxParagraphsView", () => {
       const el2 = document.createElement("div");
       el2.className = "text-class";
       const collection = [el1, el2];
-      view.myRef = { current: { getElementsByClassName: jest.fn(() => collection) } };
+      view.myRef = { current: { getElementsByClassName: vi.fn(() => collection) } };
       expect(view.phraseElements).toEqual([el1, el2]);
       expect(view.myRef.current.getElementsByClassName).toHaveBeenCalledWith("text-class");
     });
@@ -707,9 +697,9 @@ describe("HtxParagraphsView", () => {
       const item = createMockItem({ _value: null });
       const view = new HtxParagraphsView({ item });
       view.myRef = { current: { getElementsByClassName: () => [] } };
-      const removeAllRanges = jest.fn();
-      const addRange = jest.fn();
-      window.getSelection = jest.fn(() => ({ removeAllRanges, addRange }));
+      const removeAllRanges = vi.fn();
+      const addRange = vi.fn();
+      window.getSelection = vi.fn(() => ({ removeAllRanges, addRange }));
       view.selectText(0);
       expect(addRange).not.toHaveBeenCalled();
     });
@@ -727,13 +717,13 @@ describe("HtxParagraphsView", () => {
       const view = new HtxParagraphsView({ item });
       const phraseEl = document.createElement("div");
       phraseEl.textContent = "Hello";
-      const getElementsByClassName = jest.fn(() => [phraseEl]);
+      const getElementsByClassName = vi.fn(() => [phraseEl]);
       view.myRef = { current: { getElementsByClassName } };
-      const removeAllRanges = jest.fn();
-      const addRange = jest.fn();
-      window.getSelection = jest.fn(() => ({ removeAllRanges, addRange }));
-      const mockRange = { selectNodeContents: jest.fn() };
-      const createRangeSpy = jest.spyOn(document, "createRange").mockReturnValue(mockRange);
+      const removeAllRanges = vi.fn();
+      const addRange = vi.fn();
+      window.getSelection = vi.fn(() => ({ removeAllRanges, addRange }));
+      const mockRange = { selectNodeContents: vi.fn() };
+      const createRangeSpy = vi.spyOn(document, "createRange").mockReturnValue(mockRange);
       view.selectText(0);
       expect(getElementsByClassName).toHaveBeenCalledWith("text-class");
       expect(mockRange.selectNodeContents).toHaveBeenCalledWith(phraseEl);
@@ -746,8 +736,8 @@ describe("HtxParagraphsView", () => {
       const item = createMockItem();
       const view = new HtxParagraphsView({ item });
       view.myRef = { current: { getElementsByClassName: () => [] } };
-      const addRange = jest.fn();
-      window.getSelection = jest.fn(() => ({ removeAllRanges: jest.fn(), addRange }));
+      const addRange = vi.fn();
+      window.getSelection = vi.fn(() => ({ removeAllRanges: vi.fn(), addRange }));
       view.selectText(0);
       expect(addRange).not.toHaveBeenCalled();
     });
@@ -755,9 +745,9 @@ describe("HtxParagraphsView", () => {
 
   describe("_selectRegions", () => {
     it("calls extendSelectionWith when additionalMode is true", () => {
-      const extendSelectionWith = jest.fn();
+      const extendSelectionWith = vi.fn();
       const item = createMockItem({
-        annotation: { extendSelectionWith, selectAreas: jest.fn() },
+        annotation: { extendSelectionWith, selectAreas: vi.fn() },
         regs: [],
       });
       const view = new HtxParagraphsView({ item });
@@ -766,20 +756,20 @@ describe("HtxParagraphsView", () => {
       const root = document.createElement("div");
       root.appendChild(span);
       view.myRef = { current: root };
-      const removeAllRanges = jest.fn();
-      window.getSelection = jest.fn(() => ({ removeAllRanges }));
-      jest.spyOn(require("../../../../utils/selection-tools"), "isSelectionContainsSpan").mockReturnValue(true);
+      const removeAllRanges = vi.fn();
+      window.getSelection = vi.fn(() => ({ removeAllRanges }));
+      vi.spyOn(require("../../../../utils/selection-tools"), "isSelectionContainsSpan").mockReturnValue(true);
       const region = {};
-      view._determineRegion = jest.fn(() => region);
+      view._determineRegion = vi.fn(() => region);
       view._selectRegions(true);
       expect(extendSelectionWith).toHaveBeenCalledWith([region]);
       expect(removeAllRanges).toHaveBeenCalled();
     });
 
     it("calls selectAreas when additionalMode is false", () => {
-      const selectAreas = jest.fn();
+      const selectAreas = vi.fn();
       const item = createMockItem({
-        annotation: { selectAreas, extendSelectionWith: jest.fn() },
+        annotation: { selectAreas, extendSelectionWith: vi.fn() },
         regs: [],
       });
       const view = new HtxParagraphsView({ item });
@@ -788,26 +778,26 @@ describe("HtxParagraphsView", () => {
       const root = document.createElement("div");
       root.appendChild(span);
       view.myRef = { current: root };
-      jest.spyOn(require("../../../../utils/selection-tools"), "isSelectionContainsSpan").mockReturnValue(true);
+      vi.spyOn(require("../../../../utils/selection-tools"), "isSelectionContainsSpan").mockReturnValue(true);
       const region = {};
-      view._determineRegion = jest.fn(() => region);
+      view._determineRegion = vi.fn(() => region);
       view._selectRegions(false);
       expect(selectAreas).toHaveBeenCalledWith([region]);
     });
 
     it("does not call selectAreas or removeAllRanges when no regions found", () => {
-      const selectAreas = jest.fn();
-      const removeAllRanges = jest.fn();
+      const selectAreas = vi.fn();
+      const removeAllRanges = vi.fn();
       const item = createMockItem({
-        annotation: { selectAreas, extendSelectionWith: jest.fn() },
+        annotation: { selectAreas, extendSelectionWith: vi.fn() },
         regs: [],
       });
       const view = new HtxParagraphsView({ item });
       const root = document.createElement("div");
       root.appendChild(document.createElement("div"));
       view.myRef = { current: root };
-      window.getSelection = jest.fn(() => ({ removeAllRanges }));
-      jest.spyOn(require("../../../../utils/selection-tools"), "isSelectionContainsSpan").mockReturnValue(false);
+      window.getSelection = vi.fn(() => ({ removeAllRanges }));
+      vi.spyOn(require("../../../../utils/selection-tools"), "isSelectionContainsSpan").mockReturnValue(false);
       view._selectRegions(false);
       expect(selectAreas).not.toHaveBeenCalled();
       expect(removeAllRanges).not.toHaveBeenCalled();
@@ -816,13 +806,11 @@ describe("HtxParagraphsView", () => {
 
   describe("isDuplicateRegion (FF_NER_SELECT_ALL)", () => {
     beforeEach(() => {
-      const { isFF } = require("../../../../utils/feature-flags");
-      isFF.mockImplementation((flag) => flag === FF_LSDV_E_278 || flag === FF_NER_SELECT_ALL);
+      ff.set({ [FF_NER_SELECT_ALL]: true });
     });
 
     it("returns false when FF_NER_SELECT_ALL is off", () => {
-      const { isFF } = require("../../../../utils/feature-flags");
-      isFF.mockImplementation(() => false);
+      ff.set({ [FF_LSDV_E_278]: false, [FF_NER_SELECT_ALL]: false });
       const item = createMockItem({ regs: [{ start: "0", end: "1", startOffset: 0, endOffset: 5 }] });
       const view = new HtxParagraphsView({ item });
       expect(view.isDuplicateRegion({ start: "0", end: "1", startOffset: 0, endOffset: 5 }, ["Label"], null)).toBe(
@@ -898,8 +886,8 @@ describe("HtxParagraphsView", () => {
   describe("createAnnotationFromRanges", () => {
     it("sets _currentSpan to null and skips duplicate check when selectedRanges is empty", () => {
       const item = createMockItem({
-        activeStates: jest.fn(() => [{}]),
-        addRegion: jest.fn(),
+        activeStates: vi.fn(() => [{}]),
+        addRegion: vi.fn(),
       });
       item._currentSpan = "something";
       const view = new HtxParagraphsView({ item });
@@ -908,11 +896,10 @@ describe("HtxParagraphsView", () => {
     });
 
     it("returns early when duplicate detected (FF_NER_SELECT_ALL)", () => {
-      const { isFF } = require("../../../../utils/feature-flags");
-      isFF.mockImplementation((flag) => flag === FF_NER_SELECT_ALL || flag === FF_LSDV_E_278);
-      const addRegion = jest.fn();
+      ff.set({ [FF_NER_SELECT_ALL]: true });
+      const addRegion = vi.fn();
       const item = createMockItem({
-        activeStates: jest.fn(() => [{ selectedValues: () => ["Label"] }]),
+        activeStates: vi.fn(() => [{ selectedValues: () => ["Label"] }]),
         addRegion,
         regs: [
           {
@@ -930,10 +917,10 @@ describe("HtxParagraphsView", () => {
     });
 
     it("calls console.warn when no label selected", () => {
-      const warn = jest.spyOn(console, "warn").mockImplementation(() => {});
+      const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
       const item = createMockItem({
-        activeStates: jest.fn(() => []),
-        addRegion: jest.fn(),
+        activeStates: vi.fn(() => []),
+        addRegion: vi.fn(),
       });
       const view = new HtxParagraphsView({ item });
       view.createAnnotationFromRanges([{ start: "0", end: "1", startOffset: 0, endOffset: 5 }]);
@@ -942,15 +929,13 @@ describe("HtxParagraphsView", () => {
     });
 
     it("calls item.addRegion when FF_DEV_2918 is off", () => {
-      const { isFF } = require("../../../../utils/feature-flags");
-      isFF.mockImplementation((flag) => flag === FF_LSDV_E_278);
       const createdRegion = {
-        createSpans: jest.fn(() => []),
-        addEventsToSpans: jest.fn(),
+        createSpans: vi.fn(() => []),
+        addEventsToSpans: vi.fn(),
       };
-      const addRegion = jest.fn(() => createdRegion);
+      const addRegion = vi.fn(() => createdRegion);
       const item = createMockItem({
-        activeStates: jest.fn(() => [{ selectedValues: () => [] }]),
+        activeStates: vi.fn(() => [{ selectedValues: () => [] }]),
         addRegion,
       });
       const view = new HtxParagraphsView({ item });
@@ -961,15 +946,14 @@ describe("HtxParagraphsView", () => {
     });
 
     it("calls item.addRegions when FF_DEV_2918 is on", () => {
-      const { isFF } = require("../../../../utils/feature-flags");
-      isFF.mockImplementation((flag) => flag === FF_DEV_2918 || flag === FF_LSDV_E_278);
+      ff.set({ [FF_DEV_2918]: true });
       const htxRange = {
-        createSpans: jest.fn(() => []),
-        addEventsToSpans: jest.fn(),
+        createSpans: vi.fn(() => []),
+        addEventsToSpans: vi.fn(),
       };
-      const addRegions = jest.fn(() => [htxRange]);
+      const addRegions = vi.fn(() => [htxRange]);
       const item = createMockItem({
-        activeStates: jest.fn(() => [{ selectedValues: () => [] }]),
+        activeStates: vi.fn(() => [{ selectedValues: () => [] }]),
         addRegions,
       });
       const view = new HtxParagraphsView({ item });
@@ -980,11 +964,10 @@ describe("HtxParagraphsView", () => {
     });
 
     it("does not iterate htxRanges when addRegions returns empty array", () => {
-      const { isFF } = require("../../../../utils/feature-flags");
-      isFF.mockImplementation((flag) => flag === FF_DEV_2918 || flag === FF_LSDV_E_278);
-      const addRegions = jest.fn(() => []);
+      ff.set({ [FF_DEV_2918]: true });
+      const addRegions = vi.fn(() => []);
       const item = createMockItem({
-        activeStates: jest.fn(() => [{ selectedValues: () => [] }]),
+        activeStates: vi.fn(() => [{ selectedValues: () => [] }]),
         addRegions,
       });
       const view = new HtxParagraphsView({ item });
@@ -993,13 +976,12 @@ describe("HtxParagraphsView", () => {
     });
 
     it("iterates all htxRanges when addRegions returns multiple", () => {
-      const { isFF } = require("../../../../utils/feature-flags");
-      isFF.mockImplementation((flag) => flag === FF_DEV_2918 || flag === FF_LSDV_E_278);
-      const htxRange1 = { createSpans: jest.fn(() => []), addEventsToSpans: jest.fn() };
-      const htxRange2 = { createSpans: jest.fn(() => []), addEventsToSpans: jest.fn() };
-      const addRegions = jest.fn(() => [htxRange1, htxRange2]);
+      ff.set({ [FF_DEV_2918]: true });
+      const htxRange1 = { createSpans: vi.fn(() => []), addEventsToSpans: vi.fn() };
+      const htxRange2 = { createSpans: vi.fn(() => []), addEventsToSpans: vi.fn() };
+      const addRegions = vi.fn(() => [htxRange1, htxRange2]);
       const item = createMockItem({
-        activeStates: jest.fn(() => [{ selectedValues: () => [] }]),
+        activeStates: vi.fn(() => [{ selectedValues: () => [] }]),
         addRegions,
       });
       const view = new HtxParagraphsView({ item });
@@ -1014,11 +996,9 @@ describe("HtxParagraphsView", () => {
     });
 
     it("does not call createSpans when addRegion returns null", () => {
-      const { isFF } = require("../../../../utils/feature-flags");
-      isFF.mockImplementation((flag) => flag === FF_LSDV_E_278);
-      const addRegion = jest.fn(() => null);
+      const addRegion = vi.fn(() => null);
       const item = createMockItem({
-        activeStates: jest.fn(() => [{ selectedValues: () => [] }]),
+        activeStates: vi.fn(() => [{ selectedValues: () => [] }]),
         addRegion,
       });
       const view = new HtxParagraphsView({ item });
@@ -1055,10 +1035,10 @@ describe("HtxParagraphsView", () => {
     it("delegates to captureDocumentSelection after setting selection", () => {
       const item = createMockItem();
       const view = new HtxParagraphsView({ item });
-      view.captureDocumentSelection = jest.fn(() => []);
+      view.captureDocumentSelection = vi.fn(() => []);
       const range = document.createRange();
-      const sel = { removeAllRanges: jest.fn(), addRange: jest.fn() };
-      window.getSelection = jest.fn(() => sel);
+      const sel = { removeAllRanges: vi.fn(), addRange: vi.fn() };
+      window.getSelection = vi.fn(() => sel);
       view.captureDocumentSelectionFromRange(range);
       expect(sel.removeAllRanges).toHaveBeenCalled();
       expect(sel.addRange).toHaveBeenCalledWith(range);
@@ -1073,10 +1053,10 @@ describe("HtxParagraphsView", () => {
       const nameEl = document.createElement("div");
       nameEl.className = "name-class";
       view.myRef = { current: { getElementsByClassName: (cls) => (cls === "name-class" ? [nameEl] : []) } };
-      const removeAllRanges = jest.fn();
-      const addRange = jest.fn();
+      const removeAllRanges = vi.fn();
+      const addRange = vi.fn();
       const getSelection = window.getSelection;
-      window.getSelection = jest.fn(() => ({
+      window.getSelection = vi.fn(() => ({
         isCollapsed: true,
         rangeCount: 0,
         removeAllRanges,
@@ -1104,10 +1084,10 @@ describe("HtxParagraphsView", () => {
       const range = document.createRange();
       range.setStart(textEl.firstChild, 0);
       range.setEnd(textEl.firstChild, 1);
-      const removeAllRanges = jest.fn();
-      const addRange = jest.fn();
+      const removeAllRanges = vi.fn();
+      const addRange = vi.fn();
       const getSelection = window.getSelection;
-      window.getSelection = jest.fn(() => ({
+      window.getSelection = vi.fn(() => ({
         isCollapsed: false,
         rangeCount: 1,
         getRangeAt: () => range,
@@ -1115,10 +1095,10 @@ describe("HtxParagraphsView", () => {
         addRange,
         toString: () => "x",
       }));
-      jest.spyOn(require("../../../../utils/html"), "splitBoundaries").mockImplementation(() => {
+      vi.spyOn(require("../../../../utils/html"), "splitBoundaries").mockImplementation(() => {
         throw new Error("splitBoundaries error");
       });
-      const errSpy = jest.spyOn(console, "error").mockImplementation(() => {});
+      const errSpy = vi.spyOn(console, "error").mockImplementation(() => {});
       const result = view.captureDocumentSelection();
       expect(result).toEqual([]);
       expect(nameEl.style.visibility).toBe("unset");
@@ -1143,10 +1123,10 @@ describe("HtxParagraphsView", () => {
       const range = document.createRange();
       range.setStart(textEl.firstChild, 0);
       range.setEnd(textEl.firstChild, 5);
-      const removeAllRanges = jest.fn();
-      const addRange = jest.fn();
+      const removeAllRanges = vi.fn();
+      const addRange = vi.fn();
       const getSelection = window.getSelection;
-      window.getSelection = jest.fn(() => ({
+      window.getSelection = vi.fn(() => ({
         isCollapsed: false,
         rangeCount: 1,
         getRangeAt: () => range,
@@ -1154,7 +1134,7 @@ describe("HtxParagraphsView", () => {
         addRange,
         toString: () => "hello",
       }));
-      jest.spyOn(require("../../../../utils/html"), "splitBoundaries").mockImplementation(() => {});
+      vi.spyOn(require("../../../../utils/html"), "splitBoundaries").mockImplementation(() => {});
       view.getOffsetInPhraseElement = jest
         .fn()
         .mockReturnValueOnce([0, textEl, 0, 0])
@@ -1184,10 +1164,10 @@ describe("HtxParagraphsView", () => {
       const range = document.createRange();
       range.setStart(textEl.firstChild, 0);
       range.setEnd(emptyEl, 0);
-      const removeAllRanges = jest.fn();
-      const addRange = jest.fn();
+      const removeAllRanges = vi.fn();
+      const addRange = vi.fn();
       const getSelection = window.getSelection;
-      window.getSelection = jest.fn(() => ({
+      window.getSelection = vi.fn(() => ({
         isCollapsed: false,
         rangeCount: 1,
         getRangeAt: () => range,
@@ -1195,8 +1175,8 @@ describe("HtxParagraphsView", () => {
         addRange,
         toString: () => "",
       }));
-      jest.spyOn(require("../../../../utils/html"), "splitBoundaries").mockImplementation(() => {});
-      view.getOffsetInPhraseElement = jest.fn().mockReturnValue([0, textEl, 0, 0]);
+      vi.spyOn(require("../../../../utils/html"), "splitBoundaries").mockImplementation(() => {});
+      view.getOffsetInPhraseElement = vi.fn().mockReturnValue([0, textEl, 0, 0]);
       const result = view.captureDocumentSelection();
       expect(result).toEqual([]);
       expect(nameEl.style.visibility).toBe("unset");
@@ -1208,7 +1188,7 @@ describe("HtxParagraphsView", () => {
     it("returns early when phraseIndex < 0 or >= phrases.length", () => {
       const item = createMockItem();
       const view = new HtxParagraphsView({ item });
-      view.createAnnotationFromRanges = jest.fn();
+      view.createAnnotationFromRanges = vi.fn();
       view.createAnnotationForPhrase(-1);
       view.createAnnotationForPhrase(10);
       expect(view.createAnnotationFromRanges).not.toHaveBeenCalled();
@@ -1218,7 +1198,7 @@ describe("HtxParagraphsView", () => {
       const item = createMockItem();
       const view = new HtxParagraphsView({ item });
       view.myRef = { current: null };
-      view.captureDocumentSelectionFromRange = jest.fn();
+      view.captureDocumentSelectionFromRange = vi.fn();
       view.createAnnotationForPhrase(0);
       expect(view.captureDocumentSelectionFromRange).not.toHaveBeenCalled();
     });
@@ -1227,7 +1207,7 @@ describe("HtxParagraphsView", () => {
       const item = createMockItem();
       const view = new HtxParagraphsView({ item });
       view.myRef = { current: { getElementsByClassName: () => [] } };
-      view.captureDocumentSelectionFromRange = jest.fn();
+      view.captureDocumentSelectionFromRange = vi.fn();
       view.createAnnotationForPhrase(0);
       expect(view.captureDocumentSelectionFromRange).not.toHaveBeenCalled();
     });
@@ -1238,10 +1218,10 @@ describe("HtxParagraphsView", () => {
       const phraseEl = document.createElement("div");
       phraseEl.textContent = "Hello";
       view.myRef = { current: { getElementsByClassName: () => [phraseEl] } };
-      view.captureDocumentSelectionFromRange = jest.fn(() => [
+      view.captureDocumentSelectionFromRange = vi.fn(() => [
         { start: "0", end: "0", startOffset: 0, endOffset: 5, text: "Hello" },
       ]);
-      view.createAnnotationFromRanges = jest.fn();
+      view.createAnnotationFromRanges = vi.fn();
       view.createAnnotationForPhrase(0);
       expect(view.captureDocumentSelectionFromRange).toHaveBeenCalled();
       expect(view.createAnnotationFromRanges).toHaveBeenCalledWith([
@@ -1255,7 +1235,7 @@ describe("HtxParagraphsView", () => {
       const phraseEl = document.createElement("div");
       phraseEl.appendChild(document.createElement("span"));
       view.myRef = { current: { getElementsByClassName: () => [phraseEl] } };
-      view.captureDocumentSelectionFromRange = jest.fn();
+      view.captureDocumentSelectionFromRange = vi.fn();
       view.createAnnotationForPhrase(0);
       expect(view.captureDocumentSelectionFromRange).not.toHaveBeenCalled();
     });
@@ -1263,9 +1243,8 @@ describe("HtxParagraphsView", () => {
 
   describe("selectRegion when FF off", () => {
     it("returns false when FF_NER_SELECT_ALL is off", () => {
-      const { isFF } = require("../../../../utils/feature-flags");
-      isFF.mockImplementation(() => false);
-      const item = createMockItem({ annotation: { selectArea: jest.fn() } });
+      ff.set({ [FF_LSDV_E_278]: false });
+      const item = createMockItem({ annotation: { selectArea: vi.fn() } });
       const view = new HtxParagraphsView({ item });
       expect(view.selectRegion({})).toBe(false);
     });
@@ -1273,8 +1252,7 @@ describe("HtxParagraphsView", () => {
 
   describe("getRegionsForPhrase when FF off", () => {
     it("returns [] when FF_NER_SELECT_ALL is off", () => {
-      const { isFF } = require("../../../../utils/feature-flags");
-      isFF.mockImplementation(() => false);
+      ff.set({ [FF_LSDV_E_278]: false });
       const item = createMockItem({ annotation: { regionStore: { regions: [{}] } } });
       const view = new HtxParagraphsView({ item });
       expect(view.getRegionsForPhrase(0)).toEqual([]);
@@ -1292,9 +1270,9 @@ describe("HtxParagraphsView", () => {
 
   describe("onMouseUp", () => {
     it("calls _selectRegions when ctrlKey or metaKey", () => {
-      const item = createMockItem({ activeStates: jest.fn(() => []) });
+      const item = createMockItem({ activeStates: vi.fn(() => []) });
       const view = new HtxParagraphsView({ item });
-      view._selectRegions = jest.fn();
+      view._selectRegions = vi.fn();
       view.onMouseUp({ ctrlKey: true, metaKey: false });
       expect(view._selectRegions).toHaveBeenCalledWith(true);
       view.onMouseUp({ ctrlKey: false, metaKey: true });
@@ -1302,48 +1280,47 @@ describe("HtxParagraphsView", () => {
     });
 
     it("calls _selectRegions when no states", () => {
-      const item = createMockItem({ activeStates: jest.fn(() => []) });
+      const item = createMockItem({ activeStates: vi.fn(() => []) });
       const view = new HtxParagraphsView({ item });
-      view._selectRegions = jest.fn();
+      view._selectRegions = vi.fn();
       view.onMouseUp({ ctrlKey: false, metaKey: false });
       expect(view._selectRegions).toHaveBeenCalledWith(false);
     });
 
     it("returns early when annotation is read-only", () => {
       const item = createMockItem({
-        activeStates: jest.fn(() => [{}]),
-        annotation: { isReadOnly: jest.fn(() => true) },
+        activeStates: vi.fn(() => [{}]),
+        annotation: { isReadOnly: vi.fn(() => true) },
       });
       const view = new HtxParagraphsView({ item });
-      view.captureDocumentSelection = jest.fn();
+      view.captureDocumentSelection = vi.fn();
       view.onMouseUp({ ctrlKey: false, metaKey: false });
       expect(view.captureDocumentSelection).not.toHaveBeenCalled();
     });
 
     it("returns early when captureDocumentSelection returns empty", () => {
       const item = createMockItem({
-        activeStates: jest.fn(() => [{}]),
-        annotation: { isReadOnly: jest.fn(() => false) },
+        activeStates: vi.fn(() => [{}]),
+        annotation: { isReadOnly: vi.fn(() => false) },
       });
       const view = new HtxParagraphsView({ item });
-      view.captureDocumentSelection = jest.fn(() => []);
+      view.captureDocumentSelection = vi.fn(() => []);
       view.onMouseUp({ ctrlKey: false, metaKey: false });
       expect(view.captureDocumentSelection).toHaveBeenCalled();
     });
 
     it("calls item.addRegions when FF_DEV_2918 and selection captured", () => {
-      const { isFF } = require("../../../../utils/feature-flags");
-      isFF.mockImplementation((flag) => flag === FF_DEV_2918 || flag === FF_LSDV_E_278);
+      ff.set({ [FF_DEV_2918]: true });
       const ranges = [{ start: "0", end: "0", startOffset: 0, endOffset: 5 }];
-      const htxRange = { createSpans: jest.fn(() => []), addEventsToSpans: jest.fn() };
-      const addRegions = jest.fn(() => [htxRange]);
+      const htxRange = { createSpans: vi.fn(() => []), addEventsToSpans: vi.fn() };
+      const addRegions = vi.fn(() => [htxRange]);
       const item = createMockItem({
-        activeStates: jest.fn(() => [{}]),
-        annotation: { isReadOnly: jest.fn(() => false) },
+        activeStates: vi.fn(() => [{}]),
+        annotation: { isReadOnly: vi.fn(() => false) },
         addRegions,
       });
       const view = new HtxParagraphsView({ item });
-      view.captureDocumentSelection = jest.fn(() => ranges);
+      view.captureDocumentSelection = vi.fn(() => ranges);
       view.onMouseUp({ ctrlKey: false, metaKey: false });
       expect(addRegions).toHaveBeenCalledWith(ranges);
       expect(htxRange.createSpans).toHaveBeenCalled();
@@ -1351,35 +1328,32 @@ describe("HtxParagraphsView", () => {
     });
 
     it("calls item.addRegion when FF_DEV_2918 off and selection captured", () => {
-      const { isFF } = require("../../../../utils/feature-flags");
-      isFF.mockImplementation((flag) => flag === FF_LSDV_E_278);
       const ranges = [{ start: "0", end: "0", startOffset: 0, endOffset: 5 }];
-      const createdRegion = { createSpans: jest.fn(() => []), addEventsToSpans: jest.fn() };
-      const addRegion = jest.fn(() => createdRegion);
+      const createdRegion = { createSpans: vi.fn(() => []), addEventsToSpans: vi.fn() };
+      const addRegion = vi.fn(() => createdRegion);
       const item = createMockItem({
-        activeStates: jest.fn(() => [{}]),
-        annotation: { isReadOnly: jest.fn(() => false) },
+        activeStates: vi.fn(() => [{}]),
+        annotation: { isReadOnly: vi.fn(() => false) },
         addRegion,
       });
       const view = new HtxParagraphsView({ item });
-      view.captureDocumentSelection = jest.fn(() => ranges);
+      view.captureDocumentSelection = vi.fn(() => ranges);
       view.onMouseUp({ ctrlKey: false, metaKey: false });
       expect(addRegion).toHaveBeenCalledWith(ranges[0]);
       expect(createdRegion.createSpans).toHaveBeenCalled();
     });
 
     it("handles addRegions returning empty array", () => {
-      const { isFF } = require("../../../../utils/feature-flags");
-      isFF.mockImplementation((flag) => flag === FF_DEV_2918 || flag === FF_LSDV_E_278);
+      ff.set({ [FF_DEV_2918]: true });
       const ranges = [{ start: "0", end: "0", startOffset: 0, endOffset: 5 }];
-      const addRegions = jest.fn(() => []);
+      const addRegions = vi.fn(() => []);
       const item = createMockItem({
-        activeStates: jest.fn(() => [{}]),
-        annotation: { isReadOnly: jest.fn(() => false) },
+        activeStates: vi.fn(() => [{}]),
+        annotation: { isReadOnly: vi.fn(() => false) },
         addRegions,
       });
       const view = new HtxParagraphsView({ item });
-      view.captureDocumentSelection = jest.fn(() => ranges);
+      view.captureDocumentSelection = vi.fn(() => ranges);
       view.onMouseUp({ ctrlKey: false, metaKey: false });
       expect(addRegions).toHaveBeenCalledWith(ranges);
     });
@@ -1397,8 +1371,7 @@ describe("HtxParagraphsView", () => {
 
   describe("render", () => {
     it("returns null when FF_DEV_2669 and !item._value", () => {
-      const { isFF } = require("../../../../utils/feature-flags");
-      isFF.mockImplementation((flag) => flag === FF_DEV_2669 || flag === FF_LSDV_E_278);
+      ff.set({ [FF_DEV_2669]: true });
       const item = createMockItem({ _value: null });
       const view = new HtxParagraphsView({ item });
       expect(view.render()).toBe(null);
@@ -1407,17 +1380,16 @@ describe("HtxParagraphsView", () => {
     it("calls _disposeTimeout when !playing and FF_LSDV_E_278", () => {
       const item = createMockItem({ playing: false });
       const view = new HtxParagraphsView({ item });
-      view._disposeTimeout = jest.fn();
+      view._disposeTimeout = vi.fn();
       view.render();
       expect(view._disposeTimeout).toHaveBeenCalled();
     });
 
     it("does not call _disposeTimeout when FF_LSDV_E_278 is off", () => {
-      const { isFF } = require("../../../../utils/feature-flags");
-      isFF.mockImplementation(() => false);
+      ff.set({ [FF_LSDV_E_278]: false });
       const item = createMockItem({ playing: false, _value: [{}] });
       const view = new HtxParagraphsView({ item });
-      view._disposeTimeout = jest.fn();
+      view._disposeTimeout = vi.fn();
       view.render();
       expect(view._disposeTimeout).not.toHaveBeenCalled();
     });
@@ -1471,8 +1443,8 @@ describe("HtxParagraphsView", () => {
       root.appendChild(badChild);
       const view = new HtxParagraphsView({ item });
       view.myRef = { current: root };
-      view.shouldScroll = jest.fn(() => false);
-      const logSpy = jest.spyOn(console, "log").mockImplementation(() => {});
+      view.shouldScroll = vi.fn(() => false);
+      const logSpy = vi.spyOn(console, "log").mockImplementation(() => {});
       view._handleUpdate();
       expect(logSpy).toHaveBeenCalled();
       logSpy.mockRestore();
@@ -1485,10 +1457,10 @@ describe("HtxParagraphsView", () => {
       });
       const anchor = document.createElement("a");
       anchor.href = "#";
-      const addEventListener = jest.fn();
+      const addEventListener = vi.fn();
       anchor.addEventListener = addEventListener;
       const root = document.createElement("div");
-      root.getElementsByTagName = jest.fn((tag) => (tag === "a" ? [anchor] : []));
+      root.getElementsByTagName = vi.fn((tag) => (tag === "a" ? [anchor] : []));
       const view = new HtxParagraphsView({ item });
       view.myRef = { current: root };
       view.state = { canScroll: false, inViewPort: true };
@@ -1510,11 +1482,11 @@ describe("HtxParagraphsView", () => {
       view.myRef = { current: root };
       view.lastPlayingId = -1;
       view.state = { canScroll: true, inViewPort: true };
-      view._disposeTimeout = jest.fn();
-      view.handleNormalPhraseScroll = jest.fn();
-      view.handleTallPhraseScroll = jest.fn();
+      view._disposeTimeout = vi.fn();
+      view.handleNormalPhraseScroll = vi.fn();
+      view.handleTallPhraseScroll = vi.fn();
       view.activeRef = { current: { offsetHeight: 50 } };
-      view.shouldScroll = jest.fn(() => true);
+      view.shouldScroll = vi.fn(() => true);
       view._handleUpdate();
       expect(view.handleNormalPhraseScroll).toHaveBeenCalled();
       expect(view.lastPlayingId).toBe(0);
@@ -1534,11 +1506,11 @@ describe("HtxParagraphsView", () => {
       view.myRef = { current: root };
       view.lastPlayingId = -1;
       view.state = { canScroll: true, inViewPort: true };
-      view._disposeTimeout = jest.fn();
-      view.handleNormalPhraseScroll = jest.fn();
-      view.handleTallPhraseScroll = jest.fn();
+      view._disposeTimeout = vi.fn();
+      view.handleNormalPhraseScroll = vi.fn();
+      view.handleTallPhraseScroll = vi.fn();
       view.activeRef = { current: { offsetHeight: 300, offsetTop: 0 } };
-      view.shouldScroll = jest.fn(() => true);
+      view.shouldScroll = vi.fn(() => true);
       view._handleUpdate();
       expect(view.handleTallPhraseScroll).toHaveBeenCalledWith(300, 1);
       expect(view.lastPlayingId).toBe(0);
@@ -1560,7 +1532,7 @@ describe("HtxParagraphsView", () => {
       });
       const annotationView = document.createElement("div");
       Object.defineProperty(annotationView, "offsetHeight", { value: 200, configurable: true });
-      document.querySelector = jest.fn((sel) => {
+      document.querySelector = vi.fn((sel) => {
         if (sel === view.mainContentSelector) return mainContentView;
         if (sel === view.mainViewAnnotationSelector) return annotationView;
         return null;
@@ -1570,7 +1542,7 @@ describe("HtxParagraphsView", () => {
         configurable: true,
       });
       window.getComputedStyle = () => ({ getPropertyValue: () => "0" });
-      const raf = jest.spyOn(window, "requestAnimationFrame").mockImplementation((cb) => {
+      const raf = vi.spyOn(window, "requestAnimationFrame").mockImplementation((cb) => {
         cb(0);
       });
       view._handleScrollContainerHeight();
@@ -1591,13 +1563,13 @@ describe("HtxParagraphsView", () => {
       });
       const annotationView = document.createElement("div");
       Object.defineProperty(annotationView, "offsetHeight", { value: 200, configurable: true });
-      document.querySelector = jest.fn((sel) => {
+      document.querySelector = vi.fn((sel) => {
         if (sel === view.mainContentSelector) return mainContentView;
         if (sel === view.mainViewAnnotationSelector) return annotationView;
         return null;
       });
       window.getComputedStyle = () => ({ getPropertyValue: () => "0" });
-      const raf = jest.spyOn(window, "requestAnimationFrame").mockImplementation((cb) => {
+      const raf = vi.spyOn(window, "requestAnimationFrame").mockImplementation((cb) => {
         cb(0);
       });
       expect(() => view._handleScrollContainerHeight()).not.toThrow();
@@ -1609,7 +1581,7 @@ describe("HtxParagraphsView", () => {
     it("calls _handleUpdate", () => {
       const item = createMockItem();
       const view = new HtxParagraphsView({ item });
-      view._handleUpdate = jest.fn();
+      view._handleUpdate = vi.fn();
       view.componentDidUpdate();
       expect(view._handleUpdate).toHaveBeenCalled();
     });
@@ -1617,32 +1589,31 @@ describe("HtxParagraphsView", () => {
 
   describe("componentDidMount", () => {
     beforeEach(() => {
-      const { isFF } = require("../../../../utils/feature-flags");
-      isFF.mockImplementation((flag) => flag === FF_LSDV_E_278 || flag === FF_NER_SELECT_ALL);
+      ff.set({ [FF_NER_SELECT_ALL]: true });
     });
 
     it("calls setViewRef when FF_NER_SELECT_ALL", () => {
-      const setViewRef = jest.fn();
+      const setViewRef = vi.fn();
       const item = createMockItem({ setViewRef });
       const view = new HtxParagraphsView({ item });
-      view._resizeObserver = { observe: jest.fn(), unobserve: jest.fn(), disconnect: jest.fn() };
-      view._handleUpdate = jest.fn();
+      view._resizeObserver = { observe: vi.fn(), unobserve: vi.fn(), disconnect: vi.fn() };
+      view._handleUpdate = vi.fn();
       view.componentDidMount();
       expect(setViewRef).toHaveBeenCalledWith(view);
     });
 
     it("calls seekToPhrase(0) when no audio and playingId -1", () => {
-      const seekToPhrase = jest.fn();
+      const seekToPhrase = vi.fn();
       const item = createMockItem({
         audio: null,
         playingId: -1,
-        setViewRef: jest.fn(),
+        setViewRef: vi.fn(),
         seekToPhrase,
       });
       const view = new HtxParagraphsView({ item });
-      view._resizeObserver = { observe: jest.fn(), unobserve: jest.fn(), disconnect: jest.fn() };
-      view._handleUpdate = jest.fn();
-      document.querySelector = jest.fn(() => document.createElement("div"));
+      view._resizeObserver = { observe: vi.fn(), unobserve: vi.fn(), disconnect: vi.fn() };
+      view._handleUpdate = vi.fn();
+      document.querySelector = vi.fn(() => document.createElement("div"));
       view.componentDidMount();
       expect(seekToPhrase).toHaveBeenCalledWith(0);
     });
@@ -1650,17 +1621,16 @@ describe("HtxParagraphsView", () => {
 
   describe("componentWillUnmount", () => {
     beforeEach(() => {
-      const { isFF } = require("../../../../utils/feature-flags");
-      isFF.mockImplementation((flag) => flag === FF_LSDV_E_278 || flag === FF_NER_SELECT_ALL);
+      ff.set({ [FF_NER_SELECT_ALL]: true });
     });
 
     it("calls setViewRef(null) and disconnects resize observer", () => {
-      const setViewRef = jest.fn();
+      const setViewRef = vi.fn();
       const item = createMockItem({ setViewRef });
       const view = new HtxParagraphsView({ item });
       const target = document.createElement("div");
-      view._resizeObserver = { observe: jest.fn(), unobserve: jest.fn(), disconnect: jest.fn() };
-      document.querySelector = jest.fn(() => target);
+      view._resizeObserver = { observe: vi.fn(), unobserve: vi.fn(), disconnect: vi.fn() };
+      document.querySelector = vi.fn(() => target);
       view.componentWillUnmount();
       expect(setViewRef).toHaveBeenCalledWith(null);
       expect(view._resizeObserver.unobserve).toHaveBeenCalledWith(target);
@@ -1668,11 +1638,11 @@ describe("HtxParagraphsView", () => {
     });
 
     it("disconnects without unobserve when mainContentSelector target is null", () => {
-      const setViewRef = jest.fn();
+      const setViewRef = vi.fn();
       const item = createMockItem({ setViewRef });
       const view = new HtxParagraphsView({ item });
-      view._resizeObserver = { observe: jest.fn(), unobserve: jest.fn(), disconnect: jest.fn() };
-      document.querySelector = jest.fn(() => null);
+      view._resizeObserver = { observe: vi.fn(), unobserve: vi.fn(), disconnect: vi.fn() };
+      document.querySelector = vi.fn(() => null);
       view.componentWillUnmount();
       expect(view._resizeObserver.unobserve).not.toHaveBeenCalled();
       expect(view._resizeObserver.disconnect).toHaveBeenCalled();
@@ -1681,8 +1651,7 @@ describe("HtxParagraphsView", () => {
 
   describe("getRegionsForPhrase edge cases", () => {
     beforeEach(() => {
-      const { isFF } = require("../../../../utils/feature-flags");
-      isFF.mockImplementation((flag) => flag === FF_LSDV_E_278 || flag === FF_NER_SELECT_ALL);
+      ff.set({ [FF_NER_SELECT_ALL]: true });
     });
 
     it("filters out regions with non-numeric start or end", () => {

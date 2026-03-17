@@ -6,7 +6,7 @@ if (typeof globalThis.structuredClone === "undefined") {
   globalThis.structuredClone = (obj) => JSON.parse(JSON.stringify(obj));
 }
 
-jest.mock("keymaster", () => {
+vi.mock("keymaster", () => {
   const keymaster = () => {};
   keymaster.unbind = () => {};
   keymaster.setScope = () => {};
@@ -25,8 +25,8 @@ const CONFIG_IMAGE_RECT_RELATIONS =
 
 const createTestEnv = () => ({
   events: {
-    hasEvent: jest.fn(() => false),
-    invoke: jest.fn(),
+    hasEvent: vi.fn(() => false),
+    invoke: vi.fn(),
   },
   messages: {},
   settings: {},
@@ -390,8 +390,8 @@ describe("Relation (model)", () => {
       const { relationStore, regions } = createStoreWithTwoRectRegionsAndRelations();
       const [r1, r2] = regions;
       const rl = relationStore.addRelation(r1, r2);
-      const spy1 = jest.spyOn(r1, "toggleHighlight");
-      const spy2 = jest.spyOn(r2, "toggleHighlight");
+      const spy1 = vi.spyOn(r1, "toggleHighlight");
+      const spy2 = vi.spyOn(r2, "toggleHighlight");
       rl.toggleHighlight();
       expect(spy1).toHaveBeenCalled();
       expect(spy2).toHaveBeenCalled();
@@ -403,7 +403,7 @@ describe("Relation (model)", () => {
       const { relationStore, regions } = createStoreWithTwoRectRegionsAndRelations();
       const [r1] = regions;
       const rl = relationStore.addRelation(r1, r1);
-      const spy1 = jest.spyOn(r1, "toggleHighlight");
+      const spy1 = vi.spyOn(r1, "toggleHighlight");
       rl.toggleHighlight();
       expect(spy1).toHaveBeenCalledTimes(1);
       spy1.mockRestore();

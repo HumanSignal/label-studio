@@ -1,3 +1,4 @@
+import React from "react";
 import { act, render, screen } from "@testing-library/react";
 import { TimeAgo } from "../TimeAgo";
 
@@ -5,12 +6,12 @@ describe("TimeAgo", () => {
   const fixedNow = new Date("2025-02-10T12:00:00.000Z").getTime();
 
   beforeEach(() => {
-    jest.useFakeTimers();
-    jest.setSystemTime(fixedNow);
+    vi.useFakeTimers();
+    vi.setSystemTime(fixedNow);
   });
 
   afterEach(() => {
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   it("renders relative time for a date in the past", () => {
@@ -58,13 +59,13 @@ describe("TimeAgo", () => {
     expect(screen.getByText("seconds ago")).toBeInTheDocument();
 
     act(() => {
-      jest.advanceTimersByTime(55 * 1000);
+      vi.advanceTimersByTime(55 * 1000);
     });
     expect(screen.getByText(/1 minute ago/)).toBeInTheDocument();
   });
 
   it("cleans up timeout on unmount", () => {
-    const clearTimeoutSpy = jest.spyOn(window, "clearTimeout");
+    const clearTimeoutSpy = vi.spyOn(window, "clearTimeout");
     const past = new Date(fixedNow - 1000);
     const { unmount } = render(<TimeAgo date={past} />);
     unmount();

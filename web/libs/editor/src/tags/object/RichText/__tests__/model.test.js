@@ -6,14 +6,14 @@ import Registry from "../../../../core/Registry";
 import "../../../visual/View";
 import "../index";
 
-const mockAddErrors = jest.fn();
+const mockAddErrors = vi.fn();
 const mockRegionStore = { regions: [] };
 const mockSelected = {
   toNames: new Map(),
   id: 1,
   isReadOnly: () => false,
   regionStore: mockRegionStore,
-  unselectAll: jest.fn(),
+  unselectAll: vi.fn(),
 };
 const mockRoot = {
   task: { dataObj: {} },
@@ -23,8 +23,8 @@ const mockRoot = {
   },
 };
 
-jest.mock("mobx-state-tree", () => {
-  const actual = jest.requireActual("mobx-state-tree");
+vi.mock("mobx-state-tree", async () => {
+  const actual = await vi.importActual("mobx-state-tree");
   return {
     ...actual,
     getRoot: (node) => {
@@ -37,19 +37,19 @@ jest.mock("mobx-state-tree", () => {
 });
 
 const mockDomManager = {
-  setStyles: jest.fn(),
-  removeStyles: jest.fn(),
-  destroy: jest.fn(),
-  globalOffsetsToRelativeOffsets: jest.fn(() => ({ start: "", startOffset: 0, end: "", endOffset: 0 })),
-  relativeOffsetsToGlobalOffsets: jest.fn(() => [0, 0]),
-  rangeToGlobalOffset: jest.fn(() => [0, 0]),
-  createSpans: jest.fn(() => []),
-  removeSpans: jest.fn(),
-  getText: jest.fn(() => ""),
+  setStyles: vi.fn(),
+  removeStyles: vi.fn(),
+  destroy: vi.fn(),
+  globalOffsetsToRelativeOffsets: vi.fn(() => ({ start: "", startOffset: 0, end: "", endOffset: 0 })),
+  relativeOffsetsToGlobalOffsets: vi.fn(() => [0, 0]),
+  rangeToGlobalOffset: vi.fn(() => [0, 0]),
+  createSpans: vi.fn(() => []),
+  removeSpans: vi.fn(),
+  getText: vi.fn(() => ""),
 };
-jest.mock("../domManager", () => ({ __esModule: true, default: jest.fn(() => mockDomManager) }));
-jest.mock("../../../../utils/selection-tools", () => ({
-  rangeToGlobalOffset: jest.fn(() => [0, 10]),
+vi.mock("../domManager", () => ({ __esModule: true, default: vi.fn(() => mockDomManager) }));
+vi.mock("../../../../utils/selection-tools", () => ({
+  rangeToGlobalOffset: vi.fn(() => [0, 10]),
 }));
 
 const MINIMAL_CONFIG = `<View><Text name="t1" value="$text" /></View>`;
@@ -62,7 +62,7 @@ function createTextNode(storeRef = { task: { dataObj: { text: "Hello" } } }) {
 }
 
 beforeEach(() => {
-  jest.clearAllMocks();
+  vi.clearAllMocks();
   window.LS_SECURE_MODE = false;
   window.STORE_INIT_OK = true;
 });
@@ -238,7 +238,7 @@ describe("RichText model", () => {
     });
 
     it("for valueType url with valid URL fetches and sets text", async () => {
-      global.fetch = jest.fn(() =>
+      global.fetch = vi.fn(() =>
         Promise.resolve({
           ok: true,
           text: () => Promise.resolve("Fetched content"),
@@ -255,7 +255,7 @@ describe("RichText model", () => {
     });
 
     it("for valueType url fetch error adds error and sets empty", async () => {
-      global.fetch = jest.fn(() =>
+      global.fetch = vi.fn(() =>
         Promise.resolve({
           ok: false,
           status: 404,
@@ -372,7 +372,7 @@ describe("RichText model", () => {
     it("calls setHighlight when region is provided and in regs", () => {
       const node = createTextNode();
       const region = {
-        setHighlight: jest.fn(),
+        setHighlight: vi.fn(),
         annotation: { isLinkingMode: true },
       };
       mockRegionStore.regions = [{ object: node, ...region }];
@@ -396,7 +396,7 @@ describe("RichText model", () => {
   describe("onDispose", () => {
     it("clears spans on each region in regs", () => {
       const node = createTextNode();
-      const clearSpans = jest.fn();
+      const clearSpans = vi.fn();
       mockRegionStore.regions = [{ object: node, clearSpans }];
       node.onDispose();
       expect(clearSpans).toHaveBeenCalled();
@@ -424,14 +424,14 @@ describe("RichText model", () => {
       mockSelected.toNames.set("t1", [control]);
       const mockArea = {
         _range: null,
-        updateGlobalOffsets: jest.fn(),
-        updateTextOffsets: jest.fn(),
-        updateXPathsFromGlobalOffsets: jest.fn(),
-        applyHighlight: jest.fn(),
-        notifyDrawingFinished: jest.fn(),
-        setValue: jest.fn(),
+        updateGlobalOffsets: vi.fn(),
+        updateTextOffsets: vi.fn(),
+        updateXPathsFromGlobalOffsets: vi.fn(),
+        applyHighlight: vi.fn(),
+        notifyDrawingFinished: vi.fn(),
+        setValue: vi.fn(),
       };
-      mockSelected.createResult = jest.fn(() => mockArea);
+      mockSelected.createResult = vi.fn(() => mockArea);
       const range = { _range: document.createRange(), isText: true };
       const result = node.addRegion(range, null);
       expect(mockSelected.createResult).toHaveBeenCalled();
@@ -456,8 +456,8 @@ describe("RichText model", () => {
         initRangeAndOffsets: () => {
           throw new Error("test error");
         },
-        applyHighlight: jest.fn(),
-        updateHighlightedText: jest.fn(),
+        applyHighlight: vi.fn(),
+        updateHighlightedText: vi.fn(),
         get identifier() {
           return "r1";
         },
@@ -466,7 +466,7 @@ describe("RichText model", () => {
         },
       };
       mockRegionStore.regions = [badRegion];
-      const consoleSpy = jest.spyOn(console, "error").mockImplementation(() => {});
+      const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
       node.needsUpdate();
       expect(consoleSpy).toHaveBeenCalled();
       expect(mockDomManager.setStyles).toHaveBeenCalled();

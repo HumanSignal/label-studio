@@ -1,32 +1,31 @@
 import React from "react";
 import { render, screen, act } from "@testing-library/react";
 import { VideoCanvas, clampZoom, type VideoRef } from "../VideoCanvas";
+import { FF_VIDEO_FRAME_SEEK_PRECISION } from "../../../utils/feature-flags";
+import { mockFF } from "../../../../__mocks__/global";
 
-jest.mock("../../../utils/feature-flags", () => ({
-  FF_VIDEO_FRAME_SEEK_PRECISION: "fflag_fix_front_optic_1608_improve_video_frame_seek_precision_short",
-  isFF: jest.fn(() => false),
-}));
+const ff = mockFF();
 
-jest.mock("@humansignal/core", () => ({
-  ...jest.requireActual("@humansignal/core"),
+vi.mock("@humansignal/core", async () => ({
+  ...(await vi.importActual("@humansignal/core")),
   ff: {
-    isActive: jest.fn(() => false),
+    isActive: vi.fn(() => false),
   },
 }));
 
-const mockUpdateBuffering = jest.fn();
-jest.mock("../../../hooks/useUpdateBuffering", () => ({
+const mockUpdateBuffering = vi.fn();
+vi.mock("../../../hooks/useUpdateBuffering", () => ({
   useUpdateBuffering: () => mockUpdateBuffering,
 }));
 
-const mockPrepareLoop = jest.fn();
-jest.mock("../hooks/useLoopRange", () => ({
+const mockPrepareLoop = vi.fn();
+vi.mock("../hooks/useLoopRange", () => ({
   useLoopRange: () => ({ prepareLoop: mockPrepareLoop }),
 }));
 
-const mockClearRect = jest.fn();
-const mockDrawImage = jest.fn();
-const mockGetContext = jest.fn(() => ({
+const mockClearRect = vi.fn();
+const mockDrawImage = vi.fn();
+const mockGetContext = vi.fn(() => ({
   clearRect: mockClearRect,
   drawImage: mockDrawImage,
   canvas: { width: 600, height: 600 },
@@ -35,7 +34,7 @@ const mockGetContext = jest.fn(() => ({
 let mockVideoEl: Partial<HTMLVideoElement> & { _handlers?: Record<string, (e?: any) => void> };
 let mockCanvasEl: HTMLCanvasElement | null = null;
 
-jest.mock("../VirtualCanvas", () => {
+vi.mock("../VirtualCanvas", () => {
   const React = require("react");
   return {
     VirtualCanvas: React.forwardRef((_props: unknown, ref: React.Ref<HTMLCanvasElement>) => {
@@ -52,7 +51,7 @@ jest.mock("../VirtualCanvas", () => {
   };
 });
 
-jest.mock("../VirtualVideo", () => {
+vi.mock("../VirtualVideo", () => {
   const React = require("react");
   return {
     VirtualVideo: React.forwardRef(
@@ -80,9 +79,9 @@ jest.mock("../VirtualVideo", () => {
       ) => {
         if (!mockVideoEl) {
           mockVideoEl = {
-            play: jest.fn(() => onPlay?.()),
-            pause: jest.fn(),
-            load: jest.fn(),
+            play: vi.fn(() => onPlay?.()),
+            pause: vi.fn(),
+            load: vi.fn(),
             currentTime: 0,
             duration: 10,
             volume: 1,
@@ -92,8 +91,8 @@ jest.mock("../VirtualVideo", () => {
             networkState: 2,
             NETWORK_IDLE: 2,
             paused: true,
-            requestVideoFrameCallback: jest.fn((cb: (t: number, d: { mediaTime: number }) => void) => 1),
-            cancelVideoFrameCallback: jest.fn(),
+            requestVideoFrameCallback: vi.fn((cb: (t: number, d: { mediaTime: number }) => void) => 1),
+            cancelVideoFrameCallback: vi.fn(),
           };
         }
         if (typeof ref === "function") {
@@ -122,28 +121,30 @@ const origCancelRAF = window.cancelAnimationFrame;
 const origResizeObserver = window.ResizeObserver;
 
 beforeAll(() => {
+  ff.setup();
   let rafId = 0;
   window.requestAnimationFrame = (cb: FrameRequestCallback) => {
     rafId += 1;
     setTimeout(() => cb(performance.now()), 0);
     return rafId;
   };
-  window.cancelAnimationFrame = jest.fn();
-  window.ResizeObserver = jest.fn().mockImplementation((cb) => ({
-    observe: jest.fn(),
-    disconnect: jest.fn(),
-    unobserve: jest.fn(),
+  window.cancelAnimationFrame = vi.fn();
+  window.ResizeObserver = vi.fn().mockImplementation((cb) => ({
+    observe: vi.fn(),
+    disconnect: vi.fn(),
+    unobserve: vi.fn(),
   }));
 });
 
 afterAll(() => {
+  ff.reset();
   window.requestAnimationFrame = origRAF;
   window.cancelAnimationFrame = origCancelRAF;
   window.ResizeObserver = origResizeObserver;
 });
 
 beforeEach(() => {
-  jest.clearAllMocks();
+  vi.clearAllMocks();
   mockCanvasEl = null;
   mockVideoEl = undefined as any;
 });
@@ -188,7 +189,7 @@ describe("VideoCanvas", () => {
   });
 
   it("calls onClick when view is clicked", () => {
-    const onClick = jest.fn();
+    const onClick = vi.fn();
     const { container } = render(<VideoCanvas src="/test.mp4" speed={1} onClick={onClick} />);
     const view = container.querySelector("[class*='view']");
     view?.dispatchEvent(new MouseEvent("click", { bubbles: true }));
@@ -293,7 +294,7 @@ describe("VideoCanvas", () => {
     });
     expect(mockPrepareLoop).toHaveBeenCalled();
     if (mockVideoEl?.play) {
-      expect((mockVideoEl.play as jest.Mock).mock.calls.length).toBeGreaterThanOrEqual(1);
+      expect((mockVideoEl.play as vi.Mock).mock.calls.length).toBeGreaterThanOrEqual(1);
     }
   });
 
@@ -405,7 +406,7 @@ describe("VideoCanvas", () => {
   });
 
   it("calls onPlay when play is triggered", async () => {
-    const onPlay = jest.fn();
+    const onPlay = vi.fn();
     const ref = { current: null as VideoRef | null };
     render(<VideoCanvas ref={ref} src="/test.mp4" speed={1} onPlay={onPlay} />);
     await act(async () => {
@@ -418,17 +419,17 @@ describe("VideoCanvas", () => {
   });
 
   it("calls onLoad when video is loaded (readyState 4)", async () => {
-    jest.useFakeTimers();
-    const onLoad = jest.fn();
+    vi.useFakeTimers();
+    const onLoad = vi.fn();
     const ref = { current: null as VideoRef | null };
     render(<VideoCanvas ref={ref} src="/test.mp4" speed={1} framerate={30} onLoad={onLoad} />);
 
     await act(async () => {
-      jest.advanceTimersByTime(250);
+      vi.advanceTimersByTime(250);
     });
 
     expect(onLoad).toHaveBeenCalled();
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   it("ref.goToFrame seeks to frame and updates currentTime", async () => {
@@ -457,9 +458,9 @@ describe("VideoCanvas", () => {
   });
 
   it("calls onEnded when video ends", async () => {
-    const onEnded = jest.fn();
-    const onSeeked = jest.fn();
-    const onPause = jest.fn();
+    const onEnded = vi.fn();
+    const onSeeked = vi.fn();
+    const onPause = vi.fn();
     render(<VideoCanvas src="/test.mp4" speed={1} onEnded={onEnded} onSeeked={onSeeked} onPause={onPause} />);
     await act(async () => {
       await new Promise((r) => setTimeout(r, 50));
@@ -474,7 +475,7 @@ describe("VideoCanvas", () => {
   });
 
   it("calls onError when video errors and never loaded", async () => {
-    const onError = jest.fn();
+    const onError = vi.fn();
     render(<VideoCanvas src="/test.mp4" speed={1} onError={onError} />);
     await act(async () => {
       await new Promise((r) => setTimeout(r, 50));
@@ -490,12 +491,12 @@ describe("VideoCanvas", () => {
   });
 
   it("calls onResize when ResizeObserver fires", async () => {
-    const onResize = jest.fn();
+    const onResize = vi.fn();
     let observerCallback: (() => void) | null = null;
     const origRO = window.ResizeObserver;
-    window.ResizeObserver = jest.fn().mockImplementation((cb: () => void) => {
+    window.ResizeObserver = vi.fn().mockImplementation((cb: () => void) => {
       observerCallback = cb;
-      return { observe: jest.fn(), disconnect: jest.fn(), unobserve: jest.fn() };
+      return { observe: vi.fn(), disconnect: vi.fn(), unobserve: vi.fn() };
     });
     render(<VideoCanvas src="/test.mp4" speed={1} onResize={onResize} />);
     await act(async () => {
@@ -520,13 +521,12 @@ describe("VideoCanvas", () => {
       await new Promise((r) => setTimeout(r, 0));
     });
     if (mockVideoEl?.play) {
-      expect((mockVideoEl.play as jest.Mock).mock.calls.length).toBeGreaterThanOrEqual(1);
+      expect((mockVideoEl.play as vi.Mock).mock.calls.length).toBeGreaterThanOrEqual(1);
     }
   });
 
   it("frameSteppedTime with FF_VIDEO_FRAME_SEEK_PRECISION uses rounded time", async () => {
-    const { isFF } = require("../../../utils/feature-flags");
-    (isFF as jest.Mock).mockReturnValue(true);
+    ff.set({ [FF_VIDEO_FRAME_SEEK_PRECISION]: true });
     const ref = { current: null as VideoRef | null };
     render(<VideoCanvas ref={ref} src="/test.mp4" speed={1} />);
     await act(async () => {
@@ -534,26 +534,25 @@ describe("VideoCanvas", () => {
     });
     const t = ref.current?.frameSteppedTime(0.1, true);
     expect(typeof t).toBe("number");
-    (isFF as jest.Mock).mockReturnValue(false);
+    ff.set({ [FF_VIDEO_FRAME_SEEK_PRECISION]: false });
   });
 
   it("allowPanOffscreen allows pan outside bounds", async () => {
     const ref = { current: null as VideoRef | null };
-    jest.useFakeTimers();
+    vi.useFakeTimers();
     render(<VideoCanvas ref={ref} src="/test.mp4" speed={1} allowPanOffscreen />);
     await act(async () => {
-      jest.advanceTimersByTime(250);
+      vi.advanceTimersByTime(250);
     });
     act(() => {
       ref.current?.setPan(100, 200);
     });
     expect(ref.current?.pan).toEqual({ x: 100, y: 200 });
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   it("ref.pause with FF_VIDEO_FRAME_SEEK_PRECISION clamps currentTime when duration not finite", async () => {
-    const { isFF } = require("../../../utils/feature-flags");
-    (isFF as jest.Mock).mockReturnValue(true);
+    ff.set({ [FF_VIDEO_FRAME_SEEK_PRECISION]: true });
     const ref = { current: null as VideoRef | null };
     render(<VideoCanvas ref={ref} src="/test.mp4" speed={1} />);
     await act(async () => {
@@ -565,14 +564,14 @@ describe("VideoCanvas", () => {
     act(() => {
       ref.current?.pause();
     });
-    (isFF as jest.Mock).mockReturnValue(false);
+    ff.set({ [FF_VIDEO_FRAME_SEEK_PRECISION]: false });
   });
 
   it("calls video.load when error after load (recovery path)", async () => {
-    jest.useFakeTimers();
+    vi.useFakeTimers();
     render(<VideoCanvas src="/test.mp4" speed={1} onLoad={() => {}} />);
     await act(async () => {
-      jest.advanceTimersByTime(250);
+      vi.advanceTimersByTime(250);
     });
     const triggerCanPlay = screen.getByTestId("trigger-canplay");
     await act(async () => {
@@ -586,8 +585,8 @@ describe("VideoCanvas", () => {
       triggerError.click();
     });
     if (mockVideoEl?.load) {
-      expect((mockVideoEl.load as jest.Mock).mock.calls.length).toBeGreaterThanOrEqual(1);
+      expect((mockVideoEl.load as vi.Mock).mock.calls.length).toBeGreaterThanOrEqual(1);
     }
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 });

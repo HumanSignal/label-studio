@@ -3,6 +3,7 @@
  * Covers cssConverter, cleanUpId, findParentOfType, filterChildrenOfType,
  * traverseTree (TRAVERSE_SKIP, TRAVERSE_STOP), treeToModel parse error.
  */
+import React from "react";
 import { types } from "mobx-state-tree";
 import Tree, { TRAVERSE_SKIP, TRAVERSE_STOP, findParentOfType } from "../Tree";
 
@@ -62,7 +63,7 @@ describe("Tree", () => {
     });
 
     it("catches getParentOfType errors and continues to next class", () => {
-      const consoleSpy = jest.spyOn(console, "error").mockImplementation();
+      const consoleSpy = vi.spyOn(console, "error").mockImplementation();
       const badObj = {} as any;
       const parent = findParentOfType(badObj, [NodeA, NodeB]);
       expect(parent).toBeNull();

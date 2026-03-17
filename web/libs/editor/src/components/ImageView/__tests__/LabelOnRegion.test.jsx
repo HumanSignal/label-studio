@@ -15,17 +15,17 @@ import {
   LabelOnOcrBox,
 } from "../LabelOnRegion";
 
-jest.mock("react-konva", () => {
+vi.mock("react-konva", () => {
   const mockReact = require("react");
   const mockShape = () => ({ width: () => 60, height: () => 20 });
   const mockContext = {
-    beginPath: jest.fn(),
-    rect: jest.fn(),
-    moveTo: jest.fn(),
-    lineTo: jest.fn(),
-    arc: jest.fn(),
-    closePath: jest.fn(),
-    fillStrokeShape: jest.fn(),
+    beginPath: vi.fn(),
+    rect: vi.fn(),
+    moveTo: vi.fn(),
+    lineTo: vi.fn(),
+    arc: vi.fn(),
+    closePath: vi.fn(),
+    fillStrokeShape: vi.fn(),
   };
   return {
     Group: ({ children, ...p }) => mockReact.createElement("div", { "data-testid": "konva-group", ...p }, children),
@@ -44,14 +44,14 @@ jest.mock("react-konva", () => {
   };
 });
 
-jest.mock("mobx-state-tree", () => ({
-  ...jest.requireActual("mobx-state-tree"),
-  getRoot: jest.fn(),
+vi.mock("mobx-state-tree", async () => ({
+  ...(await vi.importActual("mobx-state-tree")),
+  getRoot: vi.fn(),
 }));
 
 describe("LabelOnRegion", () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     getRoot.mockReturnValue({ settings: { showLabels: true } });
   });
 
@@ -89,7 +89,7 @@ describe("LabelOnRegion", () => {
     });
 
     it("calls onClickLabel when label is clicked", () => {
-      const onClickLabel = jest.fn();
+      const onClickLabel = vi.fn();
       const { getByTestId } = render(
         <LabelOnBbox x={0} y={0} text="L" showLabels={true} color="#fff" onClickLabel={onClickLabel} />,
       );

@@ -12,7 +12,7 @@ import { types } from "mobx-state-tree";
 import BaseTool, { MIN_SIZE, DEFAULT_DIMENSIONS } from "../Base";
 import ToolMixin from "../../mixins/Tool";
 
-jest.mock("../../components/Toolbar/Tool", () => {
+vi.mock("../../components/Toolbar/Tool", () => {
   const React = require("react");
   return {
     Tool: ({ ariaLabel, active, onClick }) =>
@@ -40,7 +40,7 @@ const ComposedBase = types.compose("ComposedBase", ToolMixin, BaseTool, StubWith
 const ComposedBaseNoIcon = types.compose("ComposedBaseNoIcon", ToolMixin, BaseTool);
 
 function createManager() {
-  return { name: "test", selectTool: jest.fn(), addTool: jest.fn() };
+  return { name: "test", selectTool: vi.fn(), addTool: vi.fn() };
 }
 
 function createControl(overrides = {}) {

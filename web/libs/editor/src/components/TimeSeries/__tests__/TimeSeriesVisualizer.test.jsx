@@ -6,15 +6,15 @@ import React from "react";
 import { render, act } from "@testing-library/react";
 import TimeSeriesVisualizer from "../TimeSeriesVisualizer";
 
-jest.mock("@humansignal/ui", () => ({
-  getCurrentTheme: jest.fn(() => "Light"),
+vi.mock("@humansignal/ui", () => ({
+  getCurrentTheme: vi.fn(() => "Light"),
 }));
 
-jest.mock("../../../tags/object/TimeSeries/helpers", () => {
-  const actual = jest.requireActual("../../../tags/object/TimeSeries/helpers");
+vi.mock("../../../tags/object/TimeSeries/helpers", async () => {
+  const actual = await vi.importActual("../../../tags/object/TimeSeries/helpers");
   return {
     ...actual,
-    getOptimalWidth: jest.fn(() => 1),
+    getOptimalWidth: vi.fn(() => 1),
   };
 });
 
@@ -201,7 +201,7 @@ describe("TimeSeriesVisualizer", () => {
   });
 
   it("unmounts and removes resize listener", () => {
-    const removeEventListenerSpy = jest.spyOn(window, "removeEventListener");
+    const removeEventListenerSpy = vi.spyOn(window, "removeEventListener");
     const { unmount } = render(<TimeSeriesVisualizer {...defaultProps} />);
     unmount();
     expect(removeEventListenerSpy).toHaveBeenCalledWith("resize", expect.any(Function));

@@ -5,12 +5,12 @@ import { Visualizer } from "../Visualizer";
 import type { Waveform } from "../../Waveform";
 import type { WaveformAudio } from "../../Media/WaveformAudio";
 
-jest.mock("@humansignal/ui", () => ({
-  getCurrentTheme: jest.fn(() => "Light"),
+vi.mock("@humansignal/ui", () => ({
+  getCurrentTheme: vi.fn(() => "Light"),
 }));
 
-jest.mock("../../../../utils/feature-flags", () => ({
-  isFF: jest.fn(() => false),
+vi.mock("../../../../utils/feature-flags", () => ({
+  isFF: vi.fn(() => false),
   FF_AUDIO_SPECTROGRAMS: "fflag_feat_optic_2123_audio_spectrograms",
 }));
 
@@ -64,10 +64,10 @@ function createMockWaveform(overrides: Partial<Record<string, unknown>> = {}): P
     loaded: true,
     playing: false,
     params: { decoderType: "webaudio" },
-    invoke: jest.fn(),
-    on: jest.fn(),
-    off: jest.fn(),
-    renderTimeline: jest.fn(),
+    invoke: vi.fn(),
+    on: vi.fn(),
+    off: vi.fn(),
+    renderTimeline: vi.fn(),
     ...overrides,
   };
 }
@@ -93,17 +93,17 @@ describe("Visualizer", () => {
       return rafCbs.length;
     };
     (window as any).requestAnimationFrame = raf;
-    jest.useFakeTimers();
+    vi.useFakeTimers();
     container = createContainer();
     mockWaveform = createMockWaveform();
     const mockCtx = mockCanvas2DContext();
-    jest.spyOn(HTMLCanvasElement.prototype, "getContext").mockReturnValue(mockCtx);
+    vi.spyOn(HTMLCanvasElement.prototype, "getContext").mockReturnValue(mockCtx);
   });
 
   afterEach(() => {
     if (container?.parentNode) container.parentNode.removeChild(container);
-    jest.restoreAllMocks();
-    jest.useRealTimers();
+    vi.restoreAllMocks();
+    vi.useRealTimers();
   });
 
   function createVisualizer(
@@ -174,12 +174,12 @@ describe("Visualizer", () => {
       vis.init(audio);
       expect(vis.getLayer("regions")).toBeDefined();
       flushRaf();
-      jest.advanceTimersByTime(20);
+      vi.advanceTimersByTime(20);
       vis.destroy();
     });
 
     it("warns when init is called twice", () => {
-      const warn = jest.spyOn(console, "warn").mockImplementation(() => {});
+      const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
       const vis = createVisualizer();
       const audio = createMockAudio();
       vis.setLoading(true);
@@ -213,7 +213,7 @@ describe("Visualizer", () => {
       const vis = createVisualizer();
       vis.setLoading(true);
       const loader = container.querySelector("loading-progress-bar") as any;
-      loader.update = jest.fn();
+      loader.update = vi.fn();
       vis.setLoadingProgress(50, 100);
       expect(loader.loaded).toBe(50);
       expect(loader.total).toBe(100);
@@ -227,7 +227,7 @@ describe("Visualizer", () => {
       vis.setLoading(true);
       const loader = container.querySelector("loading-progress-bar") as any;
       loader.loaded = 80;
-      loader.update = jest.fn();
+      loader.update = vi.fn();
       vis.setLoadingProgress(undefined, undefined, true);
       expect(loader.total).toBe(80);
       vis.setLoading(false);
@@ -240,7 +240,7 @@ describe("Visualizer", () => {
       const vis = createVisualizer();
       vis.setLoading(true);
       const loader = container.querySelector("loading-progress-bar") as any;
-      loader.update = jest.fn();
+      loader.update = vi.fn();
       vis.setDecodingProgress(1, 5);
       expect(loader.loaded).toBe(1);
       expect(loader.total).toBe(5);
@@ -254,7 +254,7 @@ describe("Visualizer", () => {
       const vis = createVisualizer();
       vis.setLoading(true);
       const loader = container.querySelector("loading-progress-bar") as any;
-      loader.update = jest.fn();
+      loader.update = vi.fn();
       vis.setError("Something failed");
       expect(loader.error).toBe("Something failed");
       expect(loader.update).toHaveBeenCalled();
@@ -378,7 +378,7 @@ describe("Visualizer", () => {
     it("calls playhead updatePositionFromTime", () => {
       const vis = createVisualizer();
       initVisualizer(vis);
-      const spy = jest.spyOn(vis.playhead, "updatePositionFromTime");
+      const spy = vi.spyOn(vis.playhead, "updatePositionFromTime");
       vis.updateCursorToTime(5);
       expect(spy).toHaveBeenCalledWith(5);
       vis.destroy();
@@ -533,7 +533,7 @@ describe("Visualizer", () => {
 
     it("useLayer invokes callback with layer and context", () => {
       const vis = createVisualizer();
-      const cb = jest.fn();
+      const cb = vi.fn();
       vis.useLayer("waveform", cb);
       expect(cb).toHaveBeenCalledWith(vis.getLayer("waveform"), expect.anything());
       vis.destroy();
@@ -557,7 +557,7 @@ describe("Visualizer", () => {
       mockWaveform.playing = true;
       const vis = createVisualizer({ autoCenter: true });
       initVisualizer(vis);
-      const spy = jest.spyOn(vis, "centerToCurrentTime");
+      const spy = vi.spyOn(vis, "centerToCurrentTime");
       vis.draw(false);
       flushRaf();
       expect(spy).toHaveBeenCalled();
@@ -569,7 +569,7 @@ describe("Visualizer", () => {
     it("playing event triggers handlePlaying and draw", () => {
       const vis = createVisualizer();
       initVisualizer(vis);
-      const playingHandler = (mockWaveform.on as jest.Mock).mock.calls.find((c: unknown[]) => c[0] === "playing")?.[1];
+      const playingHandler = (mockWaveform.on as vi.Mock).mock.calls.find((c: unknown[]) => c[0] === "playing")?.[1];
       expect(playingHandler).toBeDefined();
       playingHandler(5);
       flushRaf();
@@ -578,9 +578,9 @@ describe("Visualizer", () => {
 
     it("ResizeObserver callback runs handleResize", () => {
       let resizeCb: (entries: unknown[]) => void = () => {};
-      jest.spyOn(global, "ResizeObserver").mockImplementation((cb: (entries: unknown[]) => void) => {
+      vi.spyOn(global, "ResizeObserver").mockImplementation((cb: (entries: unknown[]) => void) => {
         resizeCb = cb;
-        return { observe: jest.fn(), unobserve: jest.fn(), disconnect: jest.fn() };
+        return { observe: vi.fn(), unobserve: vi.fn(), disconnect: vi.fn() };
       });
       const vis = createVisualizer();
       initVisualizer(vis);
@@ -594,7 +594,7 @@ describe("Visualizer", () => {
       initVisualizer(vis);
       const wrapper = (vis as any).wrapper;
       wrapper.dispatchEvent(new WheelEvent("wheel", { deltaY: -10, ctrlKey: true, bubbles: true }));
-      jest.advanceTimersByTime(20);
+      vi.advanceTimersByTime(20);
       flushRaf();
       vis.destroy();
     });
@@ -647,7 +647,7 @@ describe("Visualizer", () => {
   describe("syncCursor", () => {
     it("syncCursor updates cursor to current time", () => {
       const vis = createVisualizer();
-      const spy = jest.spyOn(vis, "updateCursorToTime");
+      const spy = vi.spyOn(vis, "updateCursorToTime");
       vis.syncCursor();
       expect(spy).toHaveBeenCalled();
       vis.destroy();

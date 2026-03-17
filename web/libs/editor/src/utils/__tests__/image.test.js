@@ -131,7 +131,7 @@ describe("getTransformedImageData", () => {
       width: 10,
       height: 10,
       getContext: () => ({
-        drawImage: jest.fn(),
+        drawImage: vi.fn(),
         getImageData: () => imageData,
       }),
     };
@@ -139,14 +139,14 @@ describe("getTransformedImageData", () => {
 
   beforeEach(() => {
     const createElement = document.createElement.bind(document);
-    jest.spyOn(document, "createElement").mockImplementation((tagName) => {
+    vi.spyOn(document, "createElement").mockImplementation((tagName) => {
       if (tagName === "canvas") return createMockCanvas();
       return createElement(tagName);
     });
   });
 
   afterEach(() => {
-    jest.restoreAllMocks();
+    vi.restoreAllMocks();
   });
 
   it("uses negativezoom branch for canvas size and viewport natural dimensions", () => {
@@ -169,13 +169,13 @@ describe("getTransformedImageData", () => {
 
   it("throws when getImageData fails (CORS)", () => {
     const createElement = document.createElement.bind(document);
-    jest.spyOn(document, "createElement").mockImplementation((tagName) => {
+    vi.spyOn(document, "createElement").mockImplementation((tagName) => {
       if (tagName === "canvas") {
         return {
           width: 10,
           height: 10,
           getContext: () => ({
-            drawImage: jest.fn(),
+            drawImage: vi.fn(),
             getImageData: () => {
               throw new Error("CORS");
             },
@@ -184,8 +184,8 @@ describe("getTransformedImageData", () => {
       }
       return createElement(tagName);
     });
-    const alertSpy = jest.spyOn(global, "alert").mockImplementation(() => {});
-    const consoleSpy = jest.spyOn(console, "error").mockImplementation(() => {});
+    const alertSpy = vi.spyOn(global, "alert").mockImplementation(() => {});
+    const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
 
     expect(() => getTransformedImageData({}, 10, 10, 10, 10, 10, 10, 1, 0, 0, false)).toThrow(
       "Please configure CORS cross-domain headers correctly",
@@ -193,7 +193,7 @@ describe("getTransformedImageData", () => {
 
     alertSpy.mockRestore();
     consoleSpy.mockRestore();
-    jest.restoreAllMocks();
+    vi.restoreAllMocks();
   });
 });
 

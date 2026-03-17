@@ -9,14 +9,14 @@ import Registry from "../../../../core/Registry";
 import "../../../visual/View";
 import "../index";
 
-const mockAddErrors = jest.fn();
+const mockAddErrors = vi.fn();
 const mockRegionStore = { regions: [] };
 const mockSelected = {
   toNames: new Map(),
   id: 1,
   isReadOnly: () => false,
   regionStore: mockRegionStore,
-  unselectAll: jest.fn(),
+  unselectAll: vi.fn(),
 };
 const mockRoot = {
   task: { dataObj: { text: "Hello" } },
@@ -26,8 +26,8 @@ const mockRoot = {
   },
 };
 
-jest.mock("mobx-state-tree", () => {
-  const actual = jest.requireActual("mobx-state-tree");
+vi.mock("mobx-state-tree", async () => {
+  const actual = await vi.importActual("mobx-state-tree");
   return {
     ...actual,
     getRoot: (node) => {
@@ -43,8 +43,8 @@ jest.mock("mobx-state-tree", () => {
   };
 });
 
-jest.mock("mobx", () => {
-  const actual = jest.requireActual("mobx");
+vi.mock("mobx", async () => {
+  const actual = await vi.importActual("mobx");
   return {
     ...actual,
     observe: (target, key, handler, fireImmediately) => {
@@ -57,23 +57,23 @@ jest.mock("mobx", () => {
 });
 
 const mockDomManager = {
-  setStyles: jest.fn(),
-  removeStyles: jest.fn(),
-  destroy: jest.fn(),
-  globalOffsetsToRelativeOffsets: jest.fn(() => ({ start: "", startOffset: 0, end: "", endOffset: 0 })),
-  relativeOffsetsToGlobalOffsets: jest.fn(() => [0, 0]),
-  rangeToGlobalOffset: jest.fn(() => [0, 0]),
-  createSpans: jest.fn(() => []),
-  removeSpans: jest.fn(),
-  getText: jest.fn(() => ""),
+  setStyles: vi.fn(),
+  removeStyles: vi.fn(),
+  destroy: vi.fn(),
+  globalOffsetsToRelativeOffsets: vi.fn(() => ({ start: "", startOffset: 0, end: "", endOffset: 0 })),
+  relativeOffsetsToGlobalOffsets: vi.fn(() => [0, 0]),
+  rangeToGlobalOffset: vi.fn(() => [0, 0]),
+  createSpans: vi.fn(() => []),
+  removeSpans: vi.fn(),
+  getText: vi.fn(() => ""),
 };
-jest.mock("../domManager", () => ({ __esModule: true, default: jest.fn(() => mockDomManager) }));
+vi.mock("../domManager", () => ({ __esModule: true, default: vi.fn(() => mockDomManager) }));
 
 let mockDocRef = null;
-jest.mock("../../../../utils", () => {
+vi.mock("../../../../utils", async () => {
   let actual;
   try {
-    actual = jest.requireActual("../../../../utils");
+    actual = await vi.importActual("../../../../utils");
   } catch {
     actual = { default: { Selection: {} } };
   }
@@ -106,7 +106,7 @@ jest.mock("../../../../utils", () => {
   };
 });
 
-jest.mock("xpath-range", () => ({
+vi.mock("xpath-range", () => ({
   fromRange: () => ({ _range: null, text: "", isText: true }),
 }));
 
@@ -133,12 +133,12 @@ function createMockItem(overrides = {}) {
     type: "text",
     inline: true,
     mountNodeRef: React.createRef(),
-    getRootNode: jest.fn(() => null),
-    setLoaded: jest.fn(),
-    setReady: jest.fn(),
-    onDispose: jest.fn(),
-    setStyles: jest.fn(),
-    setHighlight: jest.fn(),
+    getRootNode: vi.fn(() => null),
+    setLoaded: vi.fn(),
+    setReady: vi.fn(),
+    onDispose: vi.fn(),
+    setStyles: vi.fn(),
+    setHighlight: vi.fn(),
     regs: [],
     ...overrides,
   };
@@ -146,7 +146,7 @@ function createMockItem(overrides = {}) {
 
 beforeEach(() => {
   mockDocRef = typeof document !== "undefined" ? document : null;
-  jest.clearAllMocks();
+  vi.clearAllMocks();
   window.LS_SECURE_MODE = false;
   window.STORE_INIT_OK = true;
 });
@@ -259,7 +259,7 @@ describe("RichText view", () => {
 
   describe("_handleUpdate", () => {
     it("returns early when non-inline and root has no childNodes (iframe path)", () => {
-      const needsUpdate = jest.fn();
+      const needsUpdate = vi.fn();
       const emptyRoot = document.createElement("div");
       const mockItem = createMockItem({
         _value: "<p>Hi</p>",
@@ -289,15 +289,15 @@ describe("RichText view", () => {
         value: iframeDoc,
         configurable: true,
       });
-      jest.useFakeTimers();
+      vi.useFakeTimers();
       iframe.dispatchEvent(new Event("load"));
-      jest.runAllTimers();
-      jest.useRealTimers();
+      vi.runAllTimers();
+      vi.useRealTimers();
       expect(needsUpdate).not.toHaveBeenCalled();
     });
 
     it("calls needsUpdate when markObjectAsLoaded runs without annotation (else branch)", () => {
-      const needsUpdate = jest.fn();
+      const needsUpdate = vi.fn();
       const rootWithChild = document.createElement("div");
       rootWithChild.appendChild(document.createTextNode("x"));
       const mockItem = createMockItem({
@@ -339,15 +339,15 @@ describe("RichText view", () => {
         value: iframeDoc,
         configurable: true,
       });
-      jest.useFakeTimers();
+      vi.useFakeTimers();
       iframe.dispatchEvent(new Event("load"));
-      jest.runAllTimers();
-      jest.useRealTimers();
+      vi.runAllTimers();
+      vi.useRealTimers();
       expect(needsUpdate).toHaveBeenCalled();
     });
 
     it("onIFrameLoad sets iframe height when body.scrollHeight and dispatches keydown to _passHotkeys", () => {
-      const needsUpdate = jest.fn();
+      const needsUpdate = vi.fn();
       const rootWithChild = document.createElement("div");
       rootWithChild.appendChild(document.createTextNode("x"));
       const mockItem = createMockItem({
@@ -392,9 +392,9 @@ describe("RichText view", () => {
     });
 
     it("calls annotation history and needsUpdate when markObjectAsLoaded runs with annotation", () => {
-      const pauseAutosave = jest.fn();
-      const startAutosave = jest.fn();
-      const needsUpdate = jest.fn();
+      const pauseAutosave = vi.fn();
+      const startAutosave = vi.fn();
+      const needsUpdate = vi.fn();
       const rootDiv = document.createElement("div");
       rootDiv.appendChild(document.createTextNode("x"));
       const mockItem = createMockItem({
@@ -403,9 +403,9 @@ describe("RichText view", () => {
         getRootNode: () => rootDiv,
         annotation: {
           history: {
-            freeze: jest.fn(),
-            unfreeze: jest.fn(),
-            setReplaceNextUndoState: jest.fn(),
+            freeze: vi.fn(),
+            unfreeze: vi.fn(),
+            setReplaceNextUndoState: vi.fn(),
           },
           pauseAutosave,
           startAutosave,
@@ -415,14 +415,14 @@ describe("RichText view", () => {
       const store = { settings: {} };
       const TextView = Registry.getViewByTag("text");
 
-      jest.useFakeTimers();
+      vi.useFakeTimers();
       render(
         <Provider store={store}>
           <TextView item={mockItem} store={store} />
         </Provider>,
       );
-      jest.runAllTimers();
-      jest.useRealTimers();
+      vi.runAllTimers();
+      vi.useRealTimers();
 
       expect(needsUpdate).toHaveBeenCalled();
       expect(pauseAutosave).toHaveBeenCalled();
@@ -432,7 +432,7 @@ describe("RichText view", () => {
 
   describe("event handlers", () => {
     it("calls setHighlight on mouseover over container", () => {
-      const mockItem = createMockItem({ _value: "Hello", setHighlight: jest.fn() });
+      const mockItem = createMockItem({ _value: "Hello", setHighlight: vi.fn() });
       const store = { settings: {} };
       const TextView = Registry.getViewByTag("text");
 
@@ -468,13 +468,13 @@ describe("RichText view", () => {
       const link = container.querySelector("a[href]");
       expect(link).toBeInTheDocument();
       const ev = new MouseEvent("click", { bubbles: true });
-      ev.preventDefault = jest.fn();
+      ev.preventDefault = vi.fn();
       link.dispatchEvent(ev);
       expect(ev.preventDefault).toHaveBeenCalled();
     });
 
     it("calls addRegion when mouseup triggers captureSelection with valid range", () => {
-      const addRegion = jest.fn();
+      const addRegion = vi.fn();
       const mockItem = createMockItem({
         _value: "Select me",
         type: "text",
@@ -505,7 +505,7 @@ describe("RichText view", () => {
         type: "richtext",
         inline: true,
         activeStates: () => null,
-        annotation: { extendSelectionWith: jest.fn(), selectAreas: jest.fn() },
+        annotation: { extendSelectionWith: vi.fn(), selectAreas: vi.fn() },
         regs: [],
       });
       const store = { settings: {} };
@@ -525,7 +525,7 @@ describe("RichText view", () => {
     });
 
     it("calls region.onClickRegion when clicking a highlight span", () => {
-      const onClickRegion = jest.fn();
+      const onClickRegion = vi.fn();
       const mockRegion = { find: (el) => el?.classList?.contains?.("htx-highlight"), onClickRegion };
       const mockItem = createMockItem({
         _value: '<span class="htx-highlight">label</span>',
@@ -571,7 +571,7 @@ describe("RichText view", () => {
     });
 
     it("sets selection style and handles mousemove when mousedown on resize handle", () => {
-      const setStyles = jest.fn();
+      const setStyles = vi.fn();
       const mockRegion = {
         find: (el) => el?.classList?.contains?.("htx-highlight") && !el.classList?.contains?.("__resize_left"),
         getColors: () => ({ resizeBackground: "#eee", activeText: "#000" }),
@@ -608,7 +608,7 @@ describe("RichText view", () => {
     });
 
     it("clears doubleClickSelection when second mouseup is after timeout", () => {
-      const addRegion = jest.fn();
+      const addRegion = vi.fn();
       const mockItem = createMockItem({
         _value: "One two",
         type: "text",
@@ -630,15 +630,15 @@ describe("RichText view", () => {
       const content = container.querySelector("[class*='container']");
       content.dispatchEvent(new MouseEvent("mouseup", { bubbles: true, pageX: 10, pageY: 10 }));
       expect(addRegion).toHaveBeenCalledTimes(1);
-      jest.useFakeTimers();
-      jest.advanceTimersByTime(500);
+      vi.useFakeTimers();
+      vi.advanceTimersByTime(500);
       content.dispatchEvent(new MouseEvent("mouseup", { bubbles: true, pageX: 10, pageY: 10 }));
       expect(addRegion).toHaveBeenCalledTimes(2);
-      jest.useRealTimers();
+      vi.useRealTimers();
     });
 
     it("_onRegionClick returns early when _selectionMode is true (set by captureSelection beforeCleanup)", () => {
-      const onClickRegion = jest.fn();
+      const onClickRegion = vi.fn();
       const mockItem = createMockItem({
         _value: '<span class="htx-highlight">x</span>',
         type: "richtext",
@@ -646,7 +646,7 @@ describe("RichText view", () => {
         activeStates: () => [{ selectedLabels: [{}], selectedValues: () => [] }],
         annotation: { isReadOnly: () => false },
         selectionenabled: true,
-        addRegion: jest.fn(),
+        addRegion: vi.fn(),
         regs: [{ find: (el) => el?.classList?.contains?.("htx-highlight"), onClickRegion }],
       });
       const store = { settings: {} };

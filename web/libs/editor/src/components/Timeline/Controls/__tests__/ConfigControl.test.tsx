@@ -1,9 +1,14 @@
+import React from "react";
 import { fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { ConfigControl } from "../ConfigControl";
 import { TimelineContext } from "../../Context";
+import { FF_AUDIO_SPECTROGRAMS } from "../../../../utils/feature-flags";
+import { mockFF } from "../../../../../__mocks__/global";
 
-jest.mock("../../Controls", () => ({
+const ff = mockFF();
+
+vi.mock("../../Controls", () => ({
   ControlButton: ({
     children,
     onClick,
@@ -21,7 +26,7 @@ jest.mock("../../Controls", () => ({
   ),
 }));
 
-jest.mock("../Slider", () => ({
+vi.mock("../Slider", () => ({
   Slider: ({
     value,
     onChange,
@@ -49,11 +54,11 @@ jest.mock("../Slider", () => ({
   ),
 }));
 
-jest.mock("../SpectrogramControl", () => ({
+vi.mock("../SpectrogramControl", () => ({
   SpectrogramControl: () => <div data-testid="spectrogram-control">Spectrogram</div>,
 }));
 
-jest.mock("@humansignal/ui", () => ({
+vi.mock("@humansignal/ui", () => ({
   Toggle: ({
     checked,
     onChange,
@@ -70,21 +75,16 @@ jest.mock("@humansignal/ui", () => ({
   ),
 }));
 
-jest.mock("@humansignal/icons", () => ({
+vi.mock("@humansignal/icons", () => ({
   IconConfig: () => <span data-testid="icon-config">Config</span>,
-}));
-
-jest.mock("../../../../utils/feature-flags", () => ({
-  FF_AUDIO_SPECTROGRAMS: "fflag_audio_spectrograms",
-  isFF: jest.fn(() => false),
 }));
 
 const defaultProps = {
   configModal: false,
   speed: 1,
   amp: 10,
-  onSpeedChange: jest.fn(),
-  onAmpChange: jest.fn(),
+  onSpeedChange: vi.fn(),
+  onAmpChange: vi.fn(),
   waveform: {},
 };
 
@@ -92,7 +92,7 @@ function renderWithContext(
   props: Partial<typeof defaultProps> = {},
   contextValue: { settings?: Record<string, unknown>; changeSetting?: (key: string, value: unknown) => void } = {},
 ) {
-  const changeSetting = jest.fn();
+  const changeSetting = vi.fn();
   const value = {
     position: 0,
     length: 0,
@@ -117,9 +117,12 @@ function renderWithContext(
 
 describe("ConfigControl", () => {
   beforeEach(() => {
-    jest.clearAllMocks();
-    const { isFF } = require("../../../../utils/feature-flags");
-    (isFF as jest.Mock).mockReturnValue(false);
+    vi.clearAllMocks();
+    ff.setup();
+  });
+
+  afterEach(() => {
+    ff.reset();
   });
 
   it("renders config button with aria-label Audio settings", () => {
@@ -130,14 +133,14 @@ describe("ConfigControl", () => {
   });
 
   it("calls onSetModal when config button is clicked", async () => {
-    const onSetModal = jest.fn();
+    const onSetModal = vi.fn();
     renderWithContext({ onSetModal });
     await userEvent.click(screen.getByTestId("config-button"));
     expect(onSetModal).toHaveBeenCalledTimes(1);
   });
 
   it("stops propagation on wrapper div click", async () => {
-    const parentClick = jest.fn();
+    const parentClick = vi.fn();
     render(
       <div onClick={parentClick}>
         <TimelineContext.Provider
@@ -179,7 +182,7 @@ describe("ConfigControl", () => {
   });
 
   it("calls onSpeedChange when playback speed slider changes", () => {
-    const onSpeedChange = jest.fn();
+    const onSpeedChange = vi.fn();
     renderWithContext({ configModal: true, onSpeedChange });
     const input = screen.getByTestId("slider-input-playback-speed");
     fireEvent.change(input, { target: { value: "1.5" } });
@@ -187,7 +190,7 @@ describe("ConfigControl", () => {
   });
 
   it("calls onAmpChange when audio zoom slider changes", () => {
-    const onAmpChange = jest.fn();
+    const onAmpChange = vi.fn();
     renderWithContext({ configModal: true, onAmpChange });
     const input = screen.getByTestId("slider-input-audio-zoom-y-axis");
     fireEvent.change(input, { target: { value: "20" } });
@@ -195,7 +198,7 @@ describe("ConfigControl", () => {
   });
 
   it("does not call onSpeedChange when value is NaN", () => {
-    const onSpeedChange = jest.fn();
+    const onSpeedChange = vi.fn();
     renderWithContext({ configModal: true, onSpeedChange });
     const input = screen.getByTestId("slider-input-playback-speed");
     fireEvent.change(input, { target: { value: "not-a-number" } });
@@ -204,7 +207,7 @@ describe("ConfigControl", () => {
   });
 
   it("calls changeSetting when Loop Regions toggle is changed", async () => {
-    const changeSetting = jest.fn();
+    const changeSetting = vi.fn();
     renderWithContext({ configModal: true }, { settings: { loopRegion: false }, changeSetting });
     const toggle = screen.getByTestId("toggle-loop-regions").querySelector("input");
     expect(toggle).toBeInTheDocument();
@@ -213,7 +216,7 @@ describe("ConfigControl", () => {
   });
 
   it("calls changeSetting when Auto-play New Regions toggle is changed", async () => {
-    const changeSetting = jest.fn();
+    const changeSetting = vi.fn();
     renderWithContext({ configModal: true }, { settings: { autoPlayNewSegments: false }, changeSetting });
     const toggle = screen.getByTestId("toggle-auto-play-new-regions").querySelector("input");
     await userEvent.click(toggle!);
@@ -227,14 +230,14 @@ describe("ConfigControl", () => {
   });
 
   it("calls toggleVisibility when Hide timeline is clicked", async () => {
-    const toggleVisibility = jest.fn();
+    const toggleVisibility = vi.fn();
     renderWithContext({ configModal: true, toggleVisibility });
     await userEvent.click(screen.getByText("Hide timeline"));
     expect(toggleVisibility).toHaveBeenCalledWith("timeline", false);
   });
 
   it("calls toggleVisibility for waveform and regions when Hide audio wave is clicked", async () => {
-    const toggleVisibility = jest.fn();
+    const toggleVisibility = vi.fn();
     renderWithContext({ configModal: true, toggleVisibility });
     await userEvent.click(screen.getByText("Hide audio wave"));
     expect(toggleVisibility).toHaveBeenCalledWith("waveform", false);
@@ -253,7 +256,7 @@ describe("ConfigControl", () => {
   });
 
   it("stops propagation when modal content is clicked", async () => {
-    const parentClick = jest.fn();
+    const parentClick = vi.fn();
     render(
       <div onClick={parentClick}>
         <TimelineContext.Provider
@@ -278,8 +281,7 @@ describe("ConfigControl", () => {
   });
 
   it("shows spectrogram section and Show spectrogram when FF_AUDIO_SPECTROGRAMS is on", () => {
-    const { isFF } = require("../../../../utils/feature-flags");
-    (isFF as jest.Mock).mockReturnValue(true);
+    ff.set({ [FF_AUDIO_SPECTROGRAMS]: true });
     renderWithContext({ configModal: true });
     expect(screen.getByText("Spectrogram Settings")).toBeInTheDocument();
     expect(screen.getByTestId("spectrogram-control")).toBeInTheDocument();
@@ -287,9 +289,8 @@ describe("ConfigControl", () => {
   });
 
   it("calls toggleVisibility for spectrogram when Show spectrogram is clicked and FF on", async () => {
-    const { isFF } = require("../../../../utils/feature-flags");
-    (isFF as jest.Mock).mockReturnValue(true);
-    const toggleVisibility = jest.fn();
+    ff.set({ [FF_AUDIO_SPECTROGRAMS]: true });
+    const toggleVisibility = vi.fn();
     renderWithContext({ configModal: true, toggleVisibility });
     await userEvent.click(screen.getByText("Show spectrogram"));
     expect(toggleVisibility).toHaveBeenCalledWith("spectrogram", true);

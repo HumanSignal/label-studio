@@ -1,10 +1,11 @@
+import React from "react";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import * as featureFlags from "../../../../utils/feature-flags";
 import { OutlinerTree } from "../OutlinerTree";
 
-const mockObserve = jest.fn();
-const mockUnobserve = jest.fn();
-const mockDisconnect = jest.fn();
+const mockObserve = vi.fn();
+const mockUnobserve = vi.fn();
+const mockDisconnect = vi.fn();
 
 beforeAll(() => {
   (global as any).ResizeObserver = class ResizeObserver {
@@ -25,7 +26,7 @@ beforeEach(() => {
   mockDisconnect.mockClear();
 });
 
-jest.mock("../../../../utils/bem", () => ({
+vi.mock("../../../../utils/bem", () => ({
   cn: (block: string) => ({
     elem: (elem: string) => ({
       mod: (mods: Record<string, unknown>) => ({
@@ -40,19 +41,19 @@ jest.mock("../../../../utils/bem", () => ({
   }),
 }));
 
-jest.mock("../../../../utils/feature-flags", () => ({
-  isFF: jest.fn(() => false),
+vi.mock("../../../../utils/feature-flags", () => ({
+  isFF: vi.fn(() => false),
   FF_DEV_2755: "ff_dev_2755",
 }));
 
-jest.mock("../../../../core/Registry", () => ({
+vi.mock("../../../../core/Registry", () => ({
   __esModule: true,
   default: {
     getPerRegionView: () => null,
   },
 }));
 
-jest.mock("chroma-js", () => ({
+vi.mock("chroma-js", () => ({
   __esModule: true,
   default: (style: string) => {
     const c = style ?? "#666";
@@ -64,25 +65,25 @@ jest.mock("chroma-js", () => ({
   },
 }));
 
-jest.mock("../RegionLabel", () => ({
+vi.mock("../RegionLabel", () => ({
   RegionLabel: ({ item }: { item: { type?: string } }) => (
     <span data-testid="region-label">{item?.type ?? "No Label"}</span>
   ),
 }));
 
-jest.mock("../../../Node/Node", () => ({
+vi.mock("../../../Node/Node", () => ({
   NodeIcon: () => <span data-testid="node-icon" />,
 }));
 
-jest.mock("../../Components/LockButton", () => ({
+vi.mock("../../Components/LockButton", () => ({
   LockButton: () => <span data-testid="lock-button" />,
 }));
 
-jest.mock("../../Components/RegionContextMenu", () => ({
+vi.mock("../../Components/RegionContextMenu", () => ({
   RegionContextMenu: () => <span data-testid="region-context-menu" />,
 }));
 
-jest.mock("../../Components/RegionControlButton", () => ({
+vi.mock("../../Components/RegionControlButton", () => ({
   RegionControlButton: ({ children, ...props }: any) => (
     <button type="button" data-testid="region-control-button" {...props}>
       {children}
@@ -90,11 +91,11 @@ jest.mock("../../Components/RegionControlButton", () => ({
   ),
 }));
 
-jest.mock("@humansignal/ui", () => ({
+vi.mock("@humansignal/ui", () => ({
   Tooltip: ({ children }: any) => <span data-testid="tooltip">{children}</span>,
 }));
 
-jest.mock("@humansignal/icons", () => ({
+vi.mock("@humansignal/icons", () => ({
   IconArrow: () => <span data-testid="icon-arrow" />,
   IconChevronLeft: () => <span data-testid="icon-chevron-left" />,
   IconEyeClosed: () => <span data-testid="icon-eye-closed" />,
@@ -103,7 +104,7 @@ jest.mock("@humansignal/icons", () => ({
   IconWarning: () => <span data-testid="icon-warning" />,
 }));
 
-jest.mock("mobx-react", () => {
+vi.mock("mobx-react", () => {
   const React = require("react");
   const observer = (C: any) => C;
   const inject = () => (C: any) => (props: any) =>
@@ -112,7 +113,7 @@ jest.mock("mobx-react", () => {
 });
 
 const mockResizeCallback = { current: null as ((entries: Array<{ contentRect: { height: number } }>) => void) | null };
-jest.mock("../../../../utils/resize-observer", () => {
+vi.mock("../../../../utils/resize-observer", () => {
   return {
     __esModule: true,
     default: class ResizeObserver {
@@ -139,12 +140,12 @@ const defaultItem = {
   incomplete: false,
   annotation: null,
   selected: false,
-  setHighlight: jest.fn(),
+  setHighlight: vi.fn(),
   isReadOnly: () => false,
   hideable: true,
   highlighted: false,
-  toggleHidden: jest.fn(),
-  setLocked: jest.fn(),
+  toggleHidden: vi.fn(),
+  setLocked: vi.fn(),
   origin: undefined,
   score: undefined,
   text: undefined,
@@ -337,16 +338,16 @@ describe("OutlinerTree", () => {
   });
 
   it("onSelect selects region when node is clicked", async () => {
-    const selectArea = jest.fn();
-    const unselectAll = jest.fn();
+    const selectArea = vi.fn();
+    const unselectAll = vi.fn();
     const mockAnnotation = {
       selectArea,
       unselectAll,
-      toggleRegionSelection: jest.fn(),
+      toggleRegionSelection: vi.fn(),
       isLinkingMode: false,
-      addLinkedRegion: jest.fn(),
-      stopLinkingMode: jest.fn(),
-      regionStore: { unselectAll: jest.fn() },
+      addLinkedRegion: vi.fn(),
+      stopLinkingMode: vi.fn(),
+      regionStore: { unselectAll: vi.fn() },
     };
     const items = [
       {
@@ -368,11 +369,11 @@ describe("OutlinerTree", () => {
   });
 
   it("onSelect unselects when clicking selected node", async () => {
-    const unselectAll = jest.fn();
+    const unselectAll = vi.fn();
     const items = [
       {
         ...defaultItem,
-        annotation: { selectArea: jest.fn(), unselectAll, regionStore: {} },
+        annotation: { selectArea: vi.fn(), unselectAll, regionStore: {} },
         selected: true,
       },
     ];
@@ -387,7 +388,7 @@ describe("OutlinerTree", () => {
   });
 
   it("onSelect with ctrlKey toggles region selection", async () => {
-    const toggleRegionSelection = jest.fn();
+    const toggleRegionSelection = vi.fn();
     const items = [
       {
         ...defaultItem,
@@ -408,14 +409,14 @@ describe("OutlinerTree", () => {
   });
 
   it("onSelect calls onSelectInOutliner when region was not selected", async () => {
-    const onSelectInOutliner = jest.fn();
-    const selectArea = jest.fn();
+    const onSelectInOutliner = vi.fn();
+    const selectArea = vi.fn();
     const items = [
       {
         ...defaultItem,
         selected: false,
         onSelectInOutliner,
-        annotation: { selectArea, unselectAll: jest.fn(), regionStore: {} },
+        annotation: { selectArea, unselectAll: vi.fn(), regionStore: {} },
       },
     ];
     const regions = createMockRegions({}, items);
@@ -430,9 +431,9 @@ describe("OutlinerTree", () => {
   });
 
   it("onSelect in linking mode adds linked region and stops linking", async () => {
-    const addLinkedRegion = jest.fn();
-    const stopLinkingMode = jest.fn();
-    const unselectAll = jest.fn();
+    const addLinkedRegion = vi.fn();
+    const stopLinkingMode = vi.fn();
+    const unselectAll = vi.fn();
     const items = [
       {
         ...defaultItem,
@@ -458,7 +459,7 @@ describe("OutlinerTree", () => {
   });
 
   it("onMouseEnter and onMouseLeave call setHighlight", async () => {
-    const setHighlight = jest.fn();
+    const setHighlight = vi.fn();
     const items = [{ ...defaultItem, setHighlight }];
     const regions = createMockRegions({}, items);
     const { container } = render(<OutlinerTree regions={regions} footer={null} />);
@@ -474,8 +475,8 @@ describe("OutlinerTree", () => {
   });
 
   it("onMouseEnter on second node clears highlight on first", async () => {
-    const setHighlight1 = jest.fn();
-    const setHighlight2 = jest.fn();
+    const setHighlight1 = vi.fn();
+    const setHighlight2 = vi.fn();
     const items = [
       { ...defaultItem, id: "r1", setHighlight: setHighlight1 },
       { ...defaultItem, id: "r2", setHighlight: setHighlight2 },
@@ -514,7 +515,7 @@ describe("OutlinerTree", () => {
   });
 
   it("RegionItemDesc onClick selects area when not selected", async () => {
-    const selectArea = jest.fn();
+    const selectArea = vi.fn();
     const items = [
       {
         ...defaultItem,
@@ -534,16 +535,16 @@ describe("OutlinerTree", () => {
 
   describe("with FF_DEV_2755 (persist collapse)", () => {
     beforeEach(() => {
-      (featureFlags.isFF as jest.Mock).mockImplementation((flag: string) => flag === "ff_dev_2755");
+      (featureFlags.isFF as vi.Mock).mockImplementation((flag: string) => flag === "ff_dev_2755");
     });
     afterEach(() => {
-      (featureFlags.isFF as jest.Mock).mockReturnValue(false);
+      (featureFlags.isFF as vi.Mock).mockReturnValue(false);
     });
 
     it("uses expandedKeys and onExpand when group is label", async () => {
       const storageKey = "collapsed-label-pos";
-      const getItem = jest.spyOn(Storage.prototype, "getItem").mockReturnValue(null);
-      const setItem = jest.spyOn(Storage.prototype, "setItem");
+      const getItem = vi.spyOn(Storage.prototype, "getItem").mockReturnValue(null);
+      const setItem = vi.spyOn(Storage.prototype, "setItem");
 
       const parentItem = { ...defaultItem, id: "label-1", type: "label" };
       const childItem = { ...defaultItem, id: "r1", type: "rectangle" };

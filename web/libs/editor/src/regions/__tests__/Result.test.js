@@ -7,19 +7,20 @@
  */
 import { types } from "mobx-state-tree";
 
-const mockIsFF = jest.fn(() => false);
-jest.mock("../../utils/feature-flags", () => ({
-  isFF: (...args) => mockIsFF(...args),
+const mockIsFF = vi.fn(() => false);
+vi.mock("../../utils/feature-flags", () => ({
+  isFF: mockIsFF,
   FF_LSDV_4583: "ff_lsdv_4583",
+  FF_SIMPLE_INIT: "fflag_fix_front_leap_443_select_annotation_once",
 }));
 
-jest.mock("@humansignal/core", () => ({
+vi.mock("@humansignal/core", () => ({
   ff: {
     isActive: () => false,
   },
 }));
 
-jest.mock("../../core/Registry", () => {
+vi.mock("../../core/Registry", () => {
   const { types: t } = require("mobx-state-tree");
   const MinimalControl = t
     .model("MinimalControl", {

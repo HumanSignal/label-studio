@@ -1,6 +1,7 @@
 /**
  * Unit tests for Taxonomy tag (tags/control/Taxonomy/Taxonomy.jsx)
  */
+import React from "react";
 import { render, screen } from "@testing-library/react";
 import { Provider } from "mobx-react";
 import Tree from "../../../core/Tree";
@@ -10,10 +11,12 @@ import "../Choice";
 import "../Taxonomy/Taxonomy";
 import "../../object/RichText";
 import { HtxTaxonomy, TaxonomyModel, traverse } from "../Taxonomy/Taxonomy";
+import { mockFF } from "../../../../__mocks__/global";
+import { FF_TAXONOMY_LABELING } from "../../../utils/feature-flags";
 
-const mockUnlock = jest.fn();
-const mockAddErrors = jest.fn();
-const mockSetChildren = jest.fn();
+const mockUnlock = vi.fn();
+const mockAddErrors = vi.fn();
+const mockSetChildren = vi.fn();
 const mockAnnotation = {
   id: 1,
   results: [],
@@ -23,39 +26,33 @@ const mockAnnotation = {
 };
 const mockStore = {
   unlock: mockUnlock,
-  lock: jest.fn(),
+  lock: vi.fn(),
   setChildren: mockSetChildren,
   children: [],
   task: { dataObj: {} },
-  presignUrlForProject: jest.fn(() => Promise.resolve(null)),
+  presignUrlForProject: vi.fn(() => Promise.resolve(null)),
   userLabels: null,
 };
 mockAnnotation.store = mockStore;
 
-jest.mock("../../../utils/feature-flags", () => ({
-  FF_LSDV_4583: "FF_LSDV_4583",
-  FF_TAXONOMY_LABELING: "FF_TAXONOMY_LABELING",
-  isFF: jest.fn(() => false),
-}));
-
-jest.mock("../../../components/Infomodal/Infomodal", () => ({
+vi.mock("../../../components/Infomodal/Infomodal", () => ({
   __esModule: true,
-  default: { warning: jest.fn() },
+  default: { warning: vi.fn() },
 }));
 
-jest.mock("../../../components/NewTaxonomy/NewTaxonomy", () => ({
+vi.mock("../../../components/NewTaxonomy/NewTaxonomy", () => ({
   NewTaxonomy: () => <div data-testid="new-taxonomy">NewTaxonomy</div>,
 }));
 
-jest.mock("../../../components/Taxonomy/Taxonomy", () => ({
+vi.mock("../../../components/Taxonomy/Taxonomy", () => ({
   Taxonomy: () => <div data-testid="legacy-taxonomy">Legacy Taxonomy</div>,
 }));
 
-jest.mock("../../../core/Tree", () => {
-  const actual = jest.requireActual("../../../core/Tree").default;
+vi.mock("../../../core/Tree", async () => {
+  const actual = (await vi.importActual("../../../core/Tree")).default;
   return {
     ...actual,
-    filterChildrenOfType: jest.fn((node, type) => (node?.tiedChildren ?? []) || []),
+    filterChildrenOfType: vi.fn((node, type) => (node?.tiedChildren ?? []) || []),
   };
 });
 
@@ -149,8 +146,11 @@ function createTaxonomyNodeWithConfig(configXml, storeRef = { task: { dataObj: {
   return createTaxonomyNode(storeRef, null, {}, config);
 }
 
+const ff = mockFF();
+
 beforeEach(() => {
-  jest.clearAllMocks();
+  vi.clearAllMocks();
+  ff.setup();
   window.STORE_INIT_OK = true;
   const { destroy } = require("../../../mixins/SharedChoiceStore/mixin");
   destroy();
@@ -162,6 +162,7 @@ beforeEach(() => {
   });
 });
 afterEach(() => {
+  ff.reset();
   window.STORE_INIT_OK = undefined;
 });
 
@@ -238,7 +239,7 @@ describe("Taxonomy model", () => {
 
   it("holdsState and isSelected reflect selected length", () => {
     const taxonomy = createTaxonomyNode();
-    taxonomy.updateResult = jest.fn();
+    taxonomy.updateResult = vi.fn();
     expect(taxonomy.holdsState).toBe(false);
     expect(taxonomy.isSelected).toBe(false);
     expect(taxonomy.hasValue).toBe(false);
@@ -254,7 +255,7 @@ describe("Taxonomy model", () => {
 
   it("selectedItems maps selected paths to levels", () => {
     const taxonomy = createTaxonomyNode();
-    taxonomy.updateResult = jest.fn();
+    taxonomy.updateResult = vi.fn();
     taxonomy.onChange(null, [{ path: ["A"] }, { path: ["B"] }]);
     const selectedItems = taxonomy.selectedItems;
     expect(Array.isArray(selectedItems)).toBe(true);
@@ -263,7 +264,7 @@ describe("Taxonomy model", () => {
 
   it("selectedValues returns selected array", () => {
     const taxonomy = createTaxonomyNode();
-    taxonomy.updateResult = jest.fn();
+    taxonomy.updateResult = vi.fn();
     taxonomy.onChange(null, [{ path: ["A"] }]);
     expect(taxonomy.selectedValues()).toEqual([["A"]]);
   });
@@ -299,7 +300,7 @@ describe("Taxonomy model", () => {
 
   it("needsUpdate clears selected when no result", () => {
     const taxonomy = createTaxonomyNode();
-    taxonomy.updateResult = jest.fn();
+    taxonomy.updateResult = vi.fn();
     taxonomy.onChange(null, [{ path: ["A"] }]);
     mockAnnotation.results = [];
     taxonomy.needsUpdate();
@@ -307,21 +308,19 @@ describe("Taxonomy model", () => {
   });
 
   it("onChange does not clear when canRemoveItems is false and checked is empty", () => {
-    const { isFF } = require("../../../utils/feature-flags");
-    isFF.mockImplementation((ff) => ff === "FF_TAXONOMY_LABELING");
+    ff.set({ [FF_TAXONOMY_LABELING]: true });
     const storeRef = { task: { dataObj: { text: "Hi" } } };
     const config = Tree.treeToModel(
       `<View><Taxonomy name="tax" toName="t1" labeling="true"><Choice value="A" /></Taxonomy><Text name="t1" value="$text" /></View>`,
       storeRef,
     );
     const taxonomy = createTaxonomyNode(storeRef);
-    taxonomy.updateResult = jest.fn();
+    taxonomy.updateResult = vi.fn();
     taxonomy.onChange(null, [{ path: ["A"] }]);
     expect(taxonomy.selected).toEqual([["A"]]);
     Object.defineProperty(taxonomy, "canRemoveItems", { get: () => false, configurable: true });
     taxonomy.onChange(null, []);
     expect(taxonomy.selected).toEqual([["A"]]);
-    isFF.mockImplementation(() => false);
   });
 
   it("onChange updates selected and maxUsagesReached", () => {
@@ -333,7 +332,7 @@ describe("Taxonomy model", () => {
     const ViewModel = Registry.getModelByTag("view");
     const root = ViewModel.create(config);
     const taxonomy = root.children.find((c) => c.type === "taxonomy");
-    taxonomy.updateResult = jest.fn();
+    taxonomy.updateResult = vi.fn();
     taxonomy.onChange(null, [{ path: ["A"] }, { path: ["B"] }]);
     expect(taxonomy.selected).toEqual([["A"], ["B"]]);
     expect(taxonomy.maxUsagesReached).toBe(true);
@@ -341,8 +340,7 @@ describe("Taxonomy model", () => {
   });
 
   it("unselectAll clears selected when labeling ff on", () => {
-    const { isFF } = require("../../../utils/feature-flags");
-    isFF.mockImplementation((ff) => ff === "FF_TAXONOMY_LABELING");
+    ff.set({ [FF_TAXONOMY_LABELING]: true });
     const storeRef = { task: { dataObj: { text: "Hi" } } };
     const config = Tree.treeToModel(
       `<View><Taxonomy name="tax" toName="t1" labeling="true"><Choice value="A" /></Taxonomy><Text name="t1" value="$text" /></View>`,
@@ -351,15 +349,14 @@ describe("Taxonomy model", () => {
     const ViewModel = Registry.getModelByTag("view");
     const root = ViewModel.create(config);
     const taxonomy = root.children.find((c) => c.type === "taxonomy");
-    taxonomy.updateResult = jest.fn();
+    taxonomy.updateResult = vi.fn();
     taxonomy.onChange(null, [{ path: ["A"] }]);
     taxonomy.unselectAll();
     expect(taxonomy.selected).toEqual([]);
-    isFF.mockImplementation(() => false);
   });
 
   it("onAddLabel calls userLabels.addLabel when userLabels exists", () => {
-    const addLabel = jest.fn();
+    const addLabel = vi.fn();
     const storeWithLabels = { ...mockStore, userLabels: { addLabel } };
     const taxonomy = createTaxonomyNode(undefined, storeWithLabels);
     taxonomy.onAddLabel(["Custom"]);
@@ -367,7 +364,7 @@ describe("Taxonomy model", () => {
   });
 
   it("onDeleteLabel calls userLabels.deleteLabel when userLabels exists", () => {
-    const deleteLabel = jest.fn();
+    const deleteLabel = vi.fn();
     const storeWithLabels = { ...mockStore, userLabels: { deleteLabel } };
     const taxonomy = createTaxonomyNode(undefined, storeWithLabels);
     taxonomy.onDeleteLabel(["Custom"]);
@@ -390,7 +387,7 @@ describe("Taxonomy model", () => {
     const ViewModel = Registry.getModelByTag("view");
     const root = ViewModel.create(config);
     const taxonomy = root.children.find((c) => c.type === "taxonomy");
-    taxonomy.updateResult = jest.fn();
+    taxonomy.updateResult = vi.fn();
     taxonomy.onChange(null, [{ path: ["A"] }, { path: ["B"] }]);
     expect(taxonomy.validate()).toBe(false);
   });
@@ -404,7 +401,7 @@ describe("Taxonomy model", () => {
     const ViewModel = Registry.getModelByTag("view");
     const root = ViewModel.create(config);
     const taxonomy = root.children.find((c) => c.type === "taxonomy");
-    taxonomy.updateResult = jest.fn();
+    taxonomy.updateResult = vi.fn();
     taxonomy.onChange(null, [{ path: ["A"] }, { path: ["B"] }]);
     const Infomodal = require("../../../components/Infomodal/Infomodal").default;
     taxonomy.beforeSend();
@@ -413,7 +410,7 @@ describe("Taxonomy model", () => {
 
   it("afterClone copies selected from node", () => {
     const taxonomy = createTaxonomyNode();
-    taxonomy.updateResult = jest.fn();
+    taxonomy.updateResult = vi.fn();
     taxonomy.onChange(null, [{ path: ["A"] }]);
     const node = { selected: [["B"]] };
     taxonomy.afterClone(node);
@@ -421,7 +418,7 @@ describe("Taxonomy model", () => {
   });
 
   it("items merges userLabels when present", () => {
-    const addLabel = jest.fn();
+    const addLabel = vi.fn();
     const storeWithLabels = {
       ...mockStore,
       userLabels: {
@@ -482,7 +479,7 @@ describe("Taxonomy model", () => {
     root.annotationStore.addErrors = mockAddErrors;
     const taxonomy = root.wrapper.view.children.find((c) => c.type === "taxonomy");
     await taxonomy.updateValue(storeWithTask);
-    global.fetch = jest.fn().mockResolvedValue({ ok: false, status: 500, statusText: "Server Error" });
+    global.fetch = vi.fn().mockResolvedValue({ ok: false, status: 500, statusText: "Server Error" });
     await taxonomy.loadItems();
     expect(mockAddErrors).toHaveBeenCalled();
     if (global.fetch.mockRestore) global.fetch.mockRestore();
@@ -497,7 +494,7 @@ describe("Taxonomy model", () => {
     );
     const taxonomy = createTaxonomyNode({ task: { dataObj: { api: apiUrl } } }, storeWithTask, {}, config);
     const mockData = { items: [{ value: "X", alias: "x" }, { value: "Y" }] };
-    global.fetch = jest.fn(() =>
+    global.fetch = vi.fn(() =>
       Promise.resolve({
         ok: true,
         json: () => Promise.resolve(mockData),
@@ -520,7 +517,7 @@ describe("Taxonomy model", () => {
     );
     const taxonomy = createTaxonomyNode({ task: { dataObj: { api: apiUrl } } }, storeWithTask, {}, config);
     let capturedOptions = {};
-    global.fetch = jest.fn((url, options) => {
+    global.fetch = vi.fn((url, options) => {
       capturedOptions = options ?? {};
       return Promise.resolve({
         ok: true,
@@ -535,7 +532,7 @@ describe("Taxonomy model", () => {
 
   it("updateFromResult calls needsUpdate", () => {
     const taxonomy = createTaxonomyNode();
-    taxonomy.updateResult = jest.fn();
+    taxonomy.updateResult = vi.fn();
     taxonomy.onChange(null, [{ path: ["A"] }]);
     expect(taxonomy.selected).toEqual([["A"]]);
     taxonomy.updateFromResult();
@@ -565,7 +562,7 @@ describe("HtxTaxonomy view", () => {
 
   it("renders NewTaxonomy when not legacy and not loading", () => {
     const taxonomy = createTaxonomyNode();
-    jest.spyOn(taxonomy, "isReadOnly").mockReturnValue(false);
+    vi.spyOn(taxonomy, "isReadOnly").mockReturnValue(false);
     const store = { settings: {} };
     render(
       <Provider store={store}>
@@ -607,7 +604,7 @@ describe("HtxTaxonomy view", () => {
       wrapper: { view: config },
     });
     const taxonomy = root.wrapper.view.children.find((c) => c.type === "taxonomy");
-    jest.spyOn(taxonomy, "isReadOnly").mockReturnValue(false);
+    vi.spyOn(taxonomy, "isReadOnly").mockReturnValue(false);
     const store = { settings: {} };
     render(
       <Provider store={store}>
@@ -619,8 +616,8 @@ describe("HtxTaxonomy view", () => {
 
   it("hides when perRegionVisible is false", () => {
     const taxonomy = createTaxonomyNode();
-    jest.spyOn(taxonomy, "perRegionVisible").mockReturnValue(false);
-    jest.spyOn(taxonomy, "isReadOnly").mockReturnValue(false);
+    vi.spyOn(taxonomy, "perRegionVisible").mockReturnValue(false);
+    vi.spyOn(taxonomy, "isReadOnly").mockReturnValue(false);
     const store = { settings: {} };
     const { container } = render(
       <Provider store={store}>

@@ -4,8 +4,8 @@
  */
 import { types } from "mobx-state-tree";
 
-const mockRemoveSpans = jest.fn();
-jest.mock("../../utils", () => ({
+const mockRemoveSpans = vi.fn();
+vi.mock("../../utils", () => ({
   __esModule: true,
   default: {
     HTML: {
@@ -14,7 +14,7 @@ jest.mock("../../utils", () => ({
   },
 }));
 
-jest.mock("../../tags/object/Paragraphs", () => {
+vi.mock("../../tags/object/Paragraphs", () => {
   const { types: t } = require("mobx-state-tree");
   return {
     ParagraphsModel: t.model("ParagraphsModel", {

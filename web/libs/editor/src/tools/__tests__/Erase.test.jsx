@@ -1,14 +1,15 @@
 /**
  * Unit tests for Erase tool (tools/Erase.jsx)
  */
+import React from "react";
 import { Erase } from "../Erase";
 
 const stageContent = {};
 const mockBrush = {
   type: "brushregion",
-  addPoint: jest.fn(),
-  beginPath: jest.fn(),
-  endPath: jest.fn(),
+  addPoint: vi.fn(),
+  beginPath: vi.fn(),
+  endPath: vi.fn(),
 };
 
 function makeMockObj() {
@@ -22,14 +23,14 @@ function makeMockObj() {
   };
 }
 
-jest.mock("../../utils/utilities", () => ({
-  clamp: jest.fn((v, min, max) => Math.max(min, Math.min(max, v))),
-  findClosestParent: jest.fn(() => true),
+vi.mock("../../utils/utilities", () => ({
+  clamp: vi.fn((v, min, max) => Math.max(min, Math.min(max, v))),
+  findClosestParent: vi.fn(() => true),
 }));
 
 describe("Erase tool", () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     const { findClosestParent } = require("../../utils/utilities");
     findClosestParent.mockReturnValue(true);
   });
@@ -38,7 +39,7 @@ describe("Erase tool", () => {
     const obj = makeMockObj();
     const env = {
       object: obj,
-      manager: { selectTool: jest.fn() },
+      manager: { selectTool: vi.fn() },
       control: { annotation: { highlightedNode: mockBrush } },
     };
     return Erase.create(overrides, env);
@@ -105,7 +106,7 @@ describe("Erase tool", () => {
   it("afterUpdateSelected calls updateCursor", () => {
     const tool = createTool();
     if (typeof tool.updateCursor === "function") {
-      const spy = jest.spyOn(tool, "updateCursor");
+      const spy = vi.spyOn(tool, "updateCursor");
       tool.afterUpdateSelected();
       expect(spy).toHaveBeenCalled();
     } else {
@@ -215,7 +216,7 @@ describe("Erase tool", () => {
   it("mousedownEv when getSelectedShape is null does not start drawing", () => {
     const env = {
       object: makeMockObj(),
-      manager: { selectTool: jest.fn() },
+      manager: { selectTool: vi.fn() },
       control: { annotation: { highlightedNode: null } },
     };
     const tool = Erase.create({}, env);

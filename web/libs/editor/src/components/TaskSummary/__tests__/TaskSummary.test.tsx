@@ -1,3 +1,4 @@
+import React from "react";
 import type { ReactElement } from "react";
 import { render, screen } from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -179,15 +180,15 @@ describe("TaskSummary", () => {
       },
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       names: new Map(allNames as Array<[string, any]>),
-      selectAnnotation: jest.fn(),
-      selectPrediction: jest.fn(),
+      selectAnnotation: vi.fn(),
+      selectPrediction: vi.fn(),
     };
 
     return mockStore as unknown as MSTStore["annotationStore"];
   };
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     // Reset feature flags to default (FF off) for each test
     window.APP_SETTINGS.feature_flags = { [FF_FIT_720_LAZY_LOAD_ANNOTATIONS]: false };
   });

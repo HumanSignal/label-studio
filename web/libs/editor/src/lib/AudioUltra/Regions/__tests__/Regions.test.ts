@@ -7,17 +7,17 @@ import { Segment } from "../Segment";
 
 function createMockLayerGroup() {
   return {
-    clear: jest.fn(),
+    clear: vi.fn(),
     isVisible: true,
     fillStyle: "",
-    fillRect: jest.fn(),
+    fillRect: vi.fn(),
     context: {
-      measureText: jest.fn(() => ({ width: 0, fontBoundingBoxAscent: 10, fontBoundingBoxDescent: 2 })),
+      measureText: vi.fn(() => ({ width: 0, fontBoundingBoxAscent: 10, fontBoundingBoxDescent: 2 })),
       fillStyle: "",
-      fillRect: jest.fn(),
-      roundRect: jest.fn(),
+      fillRect: vi.fn(),
+      roundRect: vi.fn(),
       font: "",
-      fitText: jest.fn(),
+      fitText: vi.fn(),
     },
     canvas: null,
   };
@@ -26,7 +26,7 @@ function createMockLayerGroup() {
 function createMockLayer() {
   return {
     fillStyle: "",
-    fillRect: jest.fn(),
+    fillRect: vi.fn(),
     isVisible: true,
   };
 }
@@ -36,14 +36,14 @@ function createMockVisualizer(overrides = {}) {
   const layer = createMockLayer();
   const container = document.createElement("div");
   return {
-    getLayer: jest.fn((name: string) => (name === "regions" ? layerGroup : null)),
-    createLayer: jest.fn(() => layer),
+    getLayer: vi.fn((name: string) => (name === "regions" ? layerGroup : null)),
+    createLayer: vi.fn(() => layer),
     container,
-    on: jest.fn(),
-    off: jest.fn(),
-    draw: jest.fn(),
-    lockSeek: jest.fn(),
-    unlockSeek: jest.fn(),
+    on: vi.fn(),
+    off: vi.fn(),
+    draw: vi.fn(),
+    lockSeek: vi.fn(),
+    unlockSeek: vi.fn(),
     getScrollLeftPx: () => 0,
     getScrollLeft: () => 0,
     width: 800,
@@ -62,12 +62,12 @@ function createMockWaveform(overrides = {}) {
     currentTime: 2,
     duration: 10,
     params: { showLabels: false },
-    on: jest.fn(),
-    off: jest.fn(),
-    invoke: jest.fn(),
-    cursor: { set: jest.fn(), hasFocus: jest.fn(() => false), isFocused: jest.fn(() => false) },
+    on: vi.fn(),
+    off: vi.fn(),
+    invoke: vi.fn(),
+    cursor: { set: vi.fn(), hasFocus: vi.fn(() => false), isFocused: vi.fn(() => false) },
     settings: { autoPlayNewSegments: false },
-    player: { playing: false, pause: jest.fn(), seek: jest.fn(), play: jest.fn() },
+    player: { playing: false, pause: vi.fn(), seek: vi.fn(), play: vi.fn() },
     ...overrides,
   };
 }
@@ -161,7 +161,7 @@ describe("Regions", () => {
       const visualizer = createMockVisualizer();
       const waveform = createMockWaveform();
       const regions = new Regions({}, waveform as any, visualizer as any);
-      const drawSpy = visualizer.draw as jest.Mock;
+      const drawSpy = visualizer.draw as vi.Mock;
       drawSpy.mockClear();
       regions.addRegion({ start: 1, end: 2 }, false);
       expect(drawSpy).not.toHaveBeenCalled();
@@ -185,7 +185,7 @@ describe("Regions", () => {
       const waveform = createMockWaveform();
       const regions = new Regions({}, waveform as any, visualizer as any);
       const r = regions.addRegion({ id: "r1", start: 1, end: 2 }, false);
-      const destroySpy = jest.spyOn(r, "destroy");
+      const destroySpy = vi.spyOn(r, "destroy");
       regions.removeRegion("r1");
       expect(destroySpy).toHaveBeenCalledWith(false);
       expect(regions.list).toHaveLength(0);
@@ -208,7 +208,7 @@ describe("Regions", () => {
       const waveform = createMockWaveform();
       const regions = new Regions({}, waveform as any, visualizer as any);
       const r = regions.addRegion({ id: "r1", start: 1, end: 3 }, false);
-      const updateSpy = jest.spyOn(r, "update");
+      const updateSpy = vi.spyOn(r, "update");
       regions.updateRegion({ id: "r1", start: 1, end: 5 });
       expect(updateSpy).toHaveBeenCalledWith({ id: "r1", start: 1, end: 5 });
       expect(visualizer.draw).toHaveBeenCalledWith(true);
@@ -269,7 +269,7 @@ describe("Regions", () => {
       const seg1 = regions.addRegion({ id: "s1", start: 0, end: 1 }, false) as Segment;
       const seg2 = regions.addRegion({ id: "s2", start: 2, end: 3, external: true }, false) as Segment;
       regions.addRegion({ id: "r1", start: 1, end: 2, labels: ["X"] }, false);
-      const destroy1 = jest.spyOn(seg1, "destroy");
+      const destroy1 = vi.spyOn(seg1, "destroy");
       regions.clearSegments(false);
       expect(destroy1).toHaveBeenCalled();
       expect(regions.list).toHaveLength(2);
@@ -423,7 +423,7 @@ describe("Regions", () => {
       const waveform = createMockWaveform();
       const regions = new Regions({}, waveform as any, visualizer as any);
       const seg = regions.addRegion({ start: 1, end: 2 }, false) as Segment;
-      const invokeSpy = jest.spyOn(seg, "invoke");
+      const invokeSpy = vi.spyOn(seg, "invoke");
       const e = new MouseEvent("mouseenter");
       regions.hover(seg, e);
       expect(regions.isHovered(seg)).toBe(true);
@@ -470,7 +470,7 @@ describe("Regions", () => {
       const waveform = createMockWaveform();
       const regions = new Regions({}, waveform as any, visualizer as any);
       const r = regions.addRegion({ start: 1, end: 2 }, false);
-      const destroySpy = jest.spyOn(r, "destroy");
+      const destroySpy = vi.spyOn(r, "destroy");
       regions.destroy();
       expect(visualizer.off).toHaveBeenCalledWith("initialized", expect.any(Function));
       expect(visualizer.off).toHaveBeenCalledWith("draw", expect.any(Function));
@@ -495,7 +495,7 @@ describe("Regions", () => {
     it("handleDraw does nothing when waveform not loaded", () => {
       const visualizer = createMockVisualizer();
       const layerGroup = createMockLayerGroup();
-      (visualizer as any).getLayer = jest.fn(() => layerGroup);
+      (visualizer as any).getLayer = vi.fn(() => layerGroup);
       const waveform = createMockWaveform({ loaded: false });
       const regions = new Regions({}, waveform as any, visualizer as any);
       regions.addRegion({ start: 1, end: 2 }, false);
@@ -506,11 +506,11 @@ describe("Regions", () => {
     it("handleDraw calls renderAll when loaded", () => {
       const visualizer = createMockVisualizer();
       const layerGroup = createMockLayerGroup();
-      (visualizer as any).getLayer = jest.fn(() => layerGroup);
+      (visualizer as any).getLayer = vi.fn(() => layerGroup);
       const waveform = createMockWaveform({ loaded: true });
       const regions = new Regions({}, waveform as any, visualizer as any);
       const r = regions.addRegion({ start: 1, end: 2 }, false);
-      const renderSpy = jest.spyOn(r, "render");
+      const renderSpy = vi.spyOn(r, "render");
       (regions as any).handleDraw();
       expect(layerGroup.clear).toHaveBeenCalled();
       expect(renderSpy).toHaveBeenCalled();
@@ -531,7 +531,7 @@ describe("Regions", () => {
         waveform as any,
         visualizer as any,
       );
-      const handleInit = (visualizer.on as jest.Mock).mock.calls.find((c: unknown[]) => c[0] === "initialized")?.[1];
+      const handleInit = (visualizer.on as vi.Mock).mock.calls.find((c: unknown[]) => c[0] === "initialized")?.[1];
       expect(handleInit).toBeDefined();
       handleInit();
       expect(regions.list).toHaveLength(2);
@@ -544,7 +544,7 @@ describe("Regions", () => {
       const visualizer = createMockVisualizer();
       const waveform = createMockWaveform();
       const regions = new Regions({}, waveform as any, visualizer as any);
-      const handler = (waveform.on as jest.Mock).mock.calls.find((c: unknown[]) => c[0] === "regionUpdated")?.[1];
+      const handler = (waveform.on as vi.Mock).mock.calls.find((c: unknown[]) => c[0] === "regionUpdated")?.[1];
       expect(handler).toBeDefined();
       handler();
       expect(visualizer.draw).toHaveBeenCalledWith(true);
@@ -555,8 +555,8 @@ describe("Regions", () => {
       const waveform = createMockWaveform();
       const regions = new Regions({}, waveform as any, visualizer as any);
       const seg = regions.addRegion({ id: "s1", start: 1, end: 2 }, false) as Segment;
-      const removeSpy = jest.spyOn(regions, "removeRegion");
-      const handler = (waveform.on as jest.Mock).mock.calls.find((c: unknown[]) => c[0] === "regionRemoved")?.[1];
+      const removeSpy = vi.spyOn(regions, "removeRegion");
+      const handler = (waveform.on as vi.Mock).mock.calls.find((c: unknown[]) => c[0] === "regionRemoved")?.[1];
       expect(handler).toBeDefined();
       handler(seg);
       expect(removeSpy).toHaveBeenCalledWith("s1");

@@ -1,5 +1,19 @@
+import React from "react";
 import { fireEvent, render, screen } from "@testing-library/react";
 import { InstructionsModal } from "../InstructionsModal";
+
+vi.mock("antd", () => ({
+  Modal: ({ children, open, onCancel, footer }: any) =>
+    open ? (
+      <div data-testid="antd-modal">
+        {children}
+        {footer}
+        <button type="button" aria-label="Close" onClick={onCancel}>
+          Close
+        </button>
+      </div>
+    ) : null,
+}));
 
 describe("InstructionsModal Component", () => {
   it("should render the title and children", () => {
@@ -30,7 +44,7 @@ describe("InstructionsModal Component", () => {
   });
 
   it("should call onCancel when the modal is cancelled", () => {
-    const onCancel = jest.fn();
+    const onCancel = vi.fn();
     const { getByLabelText } = render(
       <InstructionsModal title="Test Title" visible={true} onCancel={onCancel}>
         <p>Test Children</p>

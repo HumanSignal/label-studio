@@ -10,8 +10,8 @@ const ff = mockFF();
 
 // Mock environment
 const mockEnv = {
-  events: { addNamed: jest.fn(), removeNamed: jest.fn() },
-  syncManager: { syncSend: jest.fn() },
+  events: { addNamed: vi.fn(), removeNamed: vi.fn() },
+  syncManager: { syncSend: vi.fn() },
   messages: {
     URL_TAGS_DOCS: "https://labelstud.io/tags",
     ERR_LOADING_S3: "S3 loading error",
@@ -31,7 +31,7 @@ const MockStore = types
       selected: {},
       root: {},
       names: [],
-      addErrors: jest.fn(),
+      addErrors: vi.fn(),
     },
   }));
 
@@ -383,16 +383,16 @@ describe("TimeSeries playback", () => {
 
   beforeAll(() => {
     // Ensure performance.now mock is in place
-    jest.spyOn(performance, "now").mockImplementation(() => 1000);
+    vi.spyOn(performance, "now").mockImplementation(() => 1000);
   });
 
   beforeEach(() => {
     // Reset all mocks
-    jest.clearAllMocks();
+    vi.clearAllMocks();
 
     // Set up other mocks
-    global.requestAnimationFrame = jest.fn().mockReturnValue(1); // Return a frame ID
-    global.cancelAnimationFrame = jest.fn();
+    global.requestAnimationFrame = vi.fn().mockReturnValue(1); // Return a frame ID
+    global.cancelAnimationFrame = vi.fn();
 
     // Set up test data with proper structure
     const times = [0, 20, 40, 60, 80, 100];
@@ -430,7 +430,7 @@ describe("TimeSeries playback", () => {
 
   afterAll(() => {
     // Restore all mocks
-    jest.restoreAllMocks();
+    vi.restoreAllMocks();
     performance.now = originalPerformanceNow;
   });
 
@@ -475,7 +475,7 @@ describe("TimeSeries playback", () => {
 
   it("should update view during playback loop", () => {
     // Set initial time to 0
-    jest.spyOn(performance, "now").mockImplementation(() => 0);
+    vi.spyOn(performance, "now").mockImplementation(() => 0);
 
     // Start playback at position 50
     const data = { time: 50, speed: 2 };
@@ -488,7 +488,7 @@ describe("TimeSeries playback", () => {
     expect(model.playbackSpeed).toBe(2);
 
     // Mock performance.now() to return a time 1 second later
-    jest.spyOn(performance, "now").mockImplementation(() => 1000);
+    vi.spyOn(performance, "now").mockImplementation(() => 1000);
 
     // Run playback loop
     model.playbackLoop();
@@ -1256,9 +1256,9 @@ describe("TimeSeries playbackLoop boundary and formatTime date", () => {
     model.updateCanvasWidth(1000);
     model.updateTR([0, 100]);
     model.registerSyncHandlers();
-    jest.spyOn(performance, "now").mockImplementation(() => 0);
+    vi.spyOn(performance, "now").mockImplementation(() => 0);
     model._handlePlay({ time: 95, speed: 100 });
-    jest.spyOn(performance, "now").mockImplementation(() => 10000);
+    vi.spyOn(performance, "now").mockImplementation(() => 10000);
     model.playbackLoop();
     expect(model.isPlaying).toBe(false);
     expect(model.cursorTime).toBe(100);
@@ -1490,9 +1490,9 @@ describe("TimeSeries _handlePause isDate and playbackLoop minKey", () => {
     model.updateCanvasWidth(1000);
     model.updateTR([0, 100]);
     model.registerSyncHandlers();
-    jest.spyOn(performance, "now").mockImplementation(() => 0);
+    vi.spyOn(performance, "now").mockImplementation(() => 0);
     model._handlePlay({ time: -10, speed: 1 });
-    jest.spyOn(performance, "now").mockImplementation(() => 5000);
+    vi.spyOn(performance, "now").mockImplementation(() => 5000);
     model.playbackLoop();
     expect(model.isPlaying).toBe(false);
     expect(model.cursorTime).toBe(0);
@@ -1886,7 +1886,7 @@ describe("TimeSeries isNotReady and _handlePlay cancelAnimationFrame", () => {
   });
 
   it("_handlePlay cancels previous animation frame when called again", () => {
-    const cancelSpy = jest.spyOn(global, "cancelAnimationFrame").mockImplementation(() => {});
+    const cancelSpy = vi.spyOn(global, "cancelAnimationFrame").mockImplementation(() => {});
     const model = TimeSeriesModel.create(
       {
         name: "timeseries",

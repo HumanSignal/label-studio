@@ -1,3 +1,4 @@
+import React from "react";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { Provider } from "mobx-react";
@@ -7,15 +8,15 @@ function createStore(overrides = {}) {
   const annotation = overrides.annotation ?? {
     hasSuggestionsSupport: true,
     suggestions: { size: 0 },
-    rejectAllSuggestions: jest.fn(),
-    acceptAllSuggestions: jest.fn(),
+    rejectAllSuggestions: vi.fn(),
+    acceptAllSuggestions: vi.fn(),
   };
   return {
     autoAnnotation: true,
     forceAutoAcceptSuggestions: false,
     awaitingSuggestions: false,
     autoAcceptSuggestions: false,
-    setAutoAcceptSuggestions: jest.fn(),
+    setAutoAcceptSuggestions: vi.fn(),
     annotationStore: { selected: annotation },
     ...overrides,
   };
@@ -35,7 +36,7 @@ describe("AutoAcceptToggle", () => {
 
   it("renders wrapper with Toggle when autoAnnotation true and no suggestions", async () => {
     const user = userEvent.setup();
-    const setAutoAcceptSuggestions = jest.fn();
+    const setAutoAcceptSuggestions = vi.fn();
     const store = createStore({
       setAutoAcceptSuggestions,
       annotation: {
@@ -55,8 +56,8 @@ describe("AutoAcceptToggle", () => {
   });
 
   it("renders accept/reject buttons when suggestions.size > 0", () => {
-    const rejectAllSuggestions = jest.fn();
-    const acceptAllSuggestions = jest.fn();
+    const rejectAllSuggestions = vi.fn();
+    const acceptAllSuggestions = vi.fn();
     const store = createStore({
       annotation: {
         hasSuggestionsSupport: true,

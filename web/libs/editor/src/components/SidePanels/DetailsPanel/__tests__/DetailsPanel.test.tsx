@@ -1,9 +1,10 @@
+import React from "react";
 import { render, screen } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import { Relations, Info } from "../DetailsPanel";
 
 // Mock the dependencies
-jest.mock("../../../../utils/bem", () => ({
+vi.mock("../../../../utils/bem", () => ({
   cn: (block: string) => ({
     elem: (elem: string) => ({
       toClassName: () => `dm-${block}__${elem}`,
@@ -24,20 +25,20 @@ jest.mock("../../../../utils/bem", () => ({
   }),
 }));
 
-jest.mock("../../../Comments/Comments", () => ({
+vi.mock("../../../Comments/Comments", () => ({
   Comments: (props: any) => <div data-testid="comments-component" {...props} />,
 }));
 
-jest.mock("../../../CurrentEntity/AnnotationHistory", () => ({
+vi.mock("../../../CurrentEntity/AnnotationHistory", () => ({
   AnnotationHistory: (props: any) => <div data-testid="annotation-history" {...props} />,
 }));
 
-jest.mock("../RegionDetails", () => ({
+vi.mock("../RegionDetails", () => ({
   RegionDetailsMain: (props: any) => <div data-testid="region-details-main" {...props} />,
   RegionDetailsMeta: (props: any) => <div data-testid="region-details-meta" {...props} />,
 }));
 
-jest.mock("../RegionItem", () => ({
+vi.mock("../RegionItem", () => ({
   RegionItem: ({ region, mainDetails, metaDetails }: any) => (
     <div data-testid="detailed-region">
       <div data-testid="region-id">{region.id}</div>
@@ -47,15 +48,15 @@ jest.mock("../RegionItem", () => ({
   ),
 }));
 
-jest.mock("../Relations", () => ({
+vi.mock("../Relations", () => ({
   Relations: (props: any) => <div data-testid="relations-component" {...props} />,
 }));
 
-jest.mock("../RelationsControls", () => ({
+vi.mock("../RelationsControls", () => ({
   RelationsControls: (props: any) => <div data-testid="relations-controls" {...props} />,
 }));
 
-jest.mock("../../Components/EmptyState", () => ({
+vi.mock("../../Components/EmptyState", () => ({
   EmptyState: ({ icon, header, description, learnMore }: any) => (
     <div data-testid="empty-state">
       <div data-testid="empty-state-icon">{icon}</div>
@@ -70,7 +71,7 @@ jest.mock("../../Components/EmptyState", () => ({
   ),
 }));
 
-jest.mock("@humansignal/icons", () => ({
+vi.mock("@humansignal/icons", () => ({
   IconCursor: ({ width, height }: { width: number; height: number }) => (
     <svg data-testid="icon-cursor" width={width} height={height} />
   ),
@@ -79,12 +80,12 @@ jest.mock("@humansignal/icons", () => ({
   ),
 }));
 
-jest.mock("../../../../utils/docs", () => ({
+vi.mock("../../../../utils/docs", () => ({
   getDocsUrl: (path: string) => `https://docs.example.com/${path}`,
 }));
 
 // Mock observer and inject
-jest.mock("mobx-react", () => ({
+vi.mock("mobx-react", () => ({
   observer: (component: any) => component,
   inject: (storeName: string) => (component: any) => component,
 }));

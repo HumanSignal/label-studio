@@ -2,15 +2,16 @@
  * Unit tests for BrushRegion (model views and actions).
  * View/React coverage is largely from Cypress; these tests cover model logic.
  */
+import React from "react";
 import { types } from "mobx-state-tree";
 
-jest.mock("../../utils/canvas", () => ({
-  Region2RLE: jest.fn(() => new Uint8Array([0, 1, 2])),
-  RLE2Region: jest.fn(() => null),
-  maskDataURL2Image: jest.fn(() => Promise.resolve(null)),
+vi.mock("../../utils/canvas", () => ({
+  Region2RLE: vi.fn(() => new Uint8Array([0, 1, 2])),
+  RLE2Region: vi.fn(() => null),
+  maskDataURL2Image: vi.fn(() => Promise.resolve(null)),
 }));
 
-jest.mock("../../tags/object/Image", () => {
+vi.mock("../../tags/object/Image", () => {
   const { types } = require("mobx-state-tree");
   const image = types
     .model("ImageModel", {

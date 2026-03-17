@@ -2,12 +2,13 @@
  * Unit tests for KeyPointRegion (model views and region type predicate).
  * View coverage is largely from Cypress; these tests cover model logic.
  */
+import React from "react";
 import { applySnapshot, getSnapshot, getRoot, types } from "mobx-state-tree";
 
 // Avoid pulling in full Image tag (circular deps / heavy union) in unit tests.
 // AreaMixin makes region.parent === region.object (the image), so image must provide createSerializedResult,
 // internalToCanvasX/Y and canvasToInternalX/Y for region canvas getters and setPosition.
-jest.mock("../../tags/object/Image", () => {
+vi.mock("../../tags/object/Image", () => {
   const { types } = require("mobx-state-tree");
   return {
     ImageModel: types.model("ImageModel", { id: types.identifier }).actions((self) => ({

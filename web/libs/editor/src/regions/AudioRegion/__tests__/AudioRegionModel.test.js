@@ -4,7 +4,7 @@
  */
 import { types } from "mobx-state-tree";
 
-jest.mock("../../../tags/object/Audio/model", () => {
+vi.mock("../../../tags/object/Audio/model", () => {
   const { types } = require("mobx-state-tree");
   return {
     AudioModel: types
@@ -24,7 +24,7 @@ import { AudioModel } from "../../../tags/object/Audio/model";
 
 function createMockAnnotation(overrides = {}) {
   return {
-    deleteRegion: jest.fn(),
+    deleteRegion: vi.fn(),
     isLinkingMode: false,
     isReadOnly: () => false,
     ...overrides,
@@ -115,7 +115,7 @@ describe("AudioRegionModel", () => {
 
       it("returns null when _ws_region.inViewport is false", () => {
         region.setWSRegion({
-          on: jest.fn(),
+          on: vi.fn(),
           inViewport: false,
           xStart: 10,
           xEnd: 50,
@@ -128,7 +128,7 @@ describe("AudioRegionModel", () => {
 
       it("returns clamped coords when _ws_region in viewport", () => {
         region.setWSRegion({
-          on: jest.fn(),
+          on: vi.fn(),
           inViewport: true,
           xStart: 10,
           xEnd: 90,
@@ -147,7 +147,7 @@ describe("AudioRegionModel", () => {
 
       it("clamps left/right to visualizer width", () => {
         region.setWSRegion({
-          on: jest.fn(),
+          on: vi.fn(),
           inViewport: true,
           xStart: -10,
           xEnd: 150,
@@ -193,8 +193,8 @@ describe("AudioRegionModel", () => {
       });
 
       it("calls _ws_region.updateColor when set", () => {
-        const updateColor = jest.fn();
-        region.setWSRegion({ on: jest.fn(), updateColor });
+        const updateColor = vi.fn();
+        region.setWSRegion({ on: vi.fn(), updateColor });
         region.updateColor(0.8);
         expect(updateColor).toHaveBeenCalledWith(expect.any(String));
       });
@@ -207,15 +207,15 @@ describe("AudioRegionModel", () => {
       });
 
       it("calls _ws_region.updatePosition with start and end", () => {
-        const updatePosition = jest.fn();
-        region.setWSRegion({ on: jest.fn(), updatePosition });
+        const updatePosition = vi.fn();
+        region.setWSRegion({ on: vi.fn(), updatePosition });
         region.updatePosition(2, 7);
         expect(updatePosition).toHaveBeenCalledWith(2, 7);
       });
 
       it("uses self.start/self.end when args omitted", () => {
-        const updatePosition = jest.fn();
-        region.setWSRegion({ on: jest.fn(), updatePosition });
+        const updatePosition = vi.fn();
+        region.setWSRegion({ on: vi.fn(), updatePosition });
         region.updatePosition();
         expect(updatePosition).toHaveBeenCalledWith(1.5, 5.2);
       });
@@ -227,11 +227,11 @@ describe("AudioRegionModel", () => {
       });
 
       it("calls handleSelected, bringToFront, scrollToRegion when _ws_region set", () => {
-        const handleSelected = jest.fn();
-        const bringToFront = jest.fn();
-        const scrollToRegion = jest.fn();
+        const handleSelected = vi.fn();
+        const bringToFront = vi.fn();
+        const scrollToRegion = vi.fn();
         region.setWSRegion({
-          on: jest.fn(),
+          on: vi.fn(),
           handleSelected,
           bringToFront,
           scrollToRegion,
@@ -256,8 +256,8 @@ describe("AudioRegionModel", () => {
       });
 
       it("calls _ws_region.handleSelected(false) when set", () => {
-        const handleSelected = jest.fn();
-        region.setWSRegion({ on: jest.fn(), handleSelected });
+        const handleSelected = vi.fn();
+        region.setWSRegion({ on: vi.fn(), handleSelected });
         region.afterUnselectRegion();
         expect(handleSelected).toHaveBeenCalledWith(false);
       });
@@ -272,8 +272,8 @@ describe("AudioRegionModel", () => {
       });
 
       it("calls _ws_region.handleHighlighted when set", () => {
-        const handleHighlighted = jest.fn();
-        region.setWSRegion({ on: jest.fn(), handleHighlighted });
+        const handleHighlighted = vi.fn();
+        region.setWSRegion({ on: vi.fn(), handleHighlighted });
         region.setHighlight(true);
         expect(handleHighlighted).toHaveBeenCalledWith(true);
       });
@@ -285,8 +285,8 @@ describe("AudioRegionModel", () => {
       });
 
       it("calls _ws_region.remove when set", () => {
-        const remove = jest.fn();
-        region.setWSRegion({ on: jest.fn(), remove });
+        const remove = vi.fn();
+        region.setWSRegion({ on: vi.fn(), remove });
         region.beforeDestroy();
         expect(remove).toHaveBeenCalled();
       });
@@ -294,8 +294,8 @@ describe("AudioRegionModel", () => {
 
     describe("setLocked", () => {
       it("updates locked and calls _ws_region.setLocked when set", () => {
-        const setLocked = jest.fn();
-        region.setWSRegion({ on: jest.fn(), setLocked });
+        const setLocked = vi.fn();
+        region.setWSRegion({ on: vi.fn(), setLocked });
         region.setLocked(true);
         expect(region.locked).toBe(true);
         expect(setLocked).toHaveBeenCalledWith(true);
@@ -309,9 +309,9 @@ describe("AudioRegionModel", () => {
 
       it("when annotation.isLinkingMode sets highlight and switchCursor", () => {
         root.setAnnotation(createMockAnnotation({ isLinkingMode: true }));
-        const switchCursor = jest.fn();
-        const handleHighlighted = jest.fn();
-        region.setWSRegion({ on: jest.fn(), switchCursor, handleHighlighted });
+        const switchCursor = vi.fn();
+        const handleHighlighted = vi.fn();
+        region.setWSRegion({ on: vi.fn(), switchCursor, handleHighlighted });
         region.onMouseOver();
         expect(region._highlighted).toBe(true);
         expect(switchCursor).toHaveBeenCalledWith("crosshair");
@@ -321,9 +321,9 @@ describe("AudioRegionModel", () => {
     describe("onMouseLeave", () => {
       it("when annotation.isLinkingMode clears highlight and switchCursor", () => {
         root.setAnnotation(createMockAnnotation({ isLinkingMode: true }));
-        const switchCursor = jest.fn();
-        const handleHighlighted = jest.fn();
-        region.setWSRegion({ on: jest.fn(), switchCursor, handleHighlighted });
+        const switchCursor = vi.fn();
+        const handleHighlighted = vi.fn();
+        region.setWSRegion({ on: vi.fn(), switchCursor, handleHighlighted });
         region.setHighlight(true);
         region.onMouseLeave();
         expect(region._highlighted).toBe(false);
@@ -333,9 +333,9 @@ describe("AudioRegionModel", () => {
 
     describe("onUpdateEnd", () => {
       it("updates start/end from _ws_region and calls notifyDrawingFinished", () => {
-        const notifyDrawingFinished = jest.fn();
+        const notifyDrawingFinished = vi.fn();
         region.notifyDrawingFinished = notifyDrawingFinished;
-        region.setWSRegion({ on: jest.fn(), start: 2, end: 6 });
+        region.setWSRegion({ on: vi.fn(), start: 2, end: 6 });
         region.onUpdateEnd();
         expect(region.start).toBe(2);
         expect(region.end).toBe(6);
@@ -353,14 +353,14 @@ describe("AudioRegionModel", () => {
       });
 
       it("accepts event and stops propagation", () => {
-        const e = { stopPropagation: jest.fn() };
+        const e = { stopPropagation: vi.fn() };
         region.toggleHidden(e);
         expect(e.stopPropagation).toHaveBeenCalled();
       });
 
       it("calls _ws_region.setVisibility when set", () => {
-        const setVisibility = jest.fn();
-        region.setWSRegion({ on: jest.fn(), setVisibility });
+        const setVisibility = vi.fn();
+        region.setWSRegion({ on: vi.fn(), setVisibility });
         region.toggleHidden();
         expect(region.hidden).toBe(true);
         expect(setVisibility).toHaveBeenCalledWith(false);
@@ -369,8 +369,8 @@ describe("AudioRegionModel", () => {
 
     describe("setProperty", () => {
       it("updates position when start or end changed", () => {
-        const updatePosition = jest.fn();
-        region.setWSRegion({ on: jest.fn(), updatePosition });
+        const updatePosition = vi.fn();
+        region.setWSRegion({ on: vi.fn(), updatePosition });
         region.setProperty("start", 2);
         expect(region.start).toBe(2);
         expect(updatePosition).toHaveBeenCalled();
@@ -381,7 +381,7 @@ describe("AudioRegionModel", () => {
 
     describe("setWSRegion", () => {
       it("sets _ws_region and attaches mouseOver/mouseLeave when wsRegion provided", () => {
-        const on = jest.fn();
+        const on = vi.fn();
         const wsRegion = { on };
         region.setWSRegion(wsRegion);
         expect(region._ws_region).toBe(wsRegion);
@@ -390,7 +390,7 @@ describe("AudioRegionModel", () => {
       });
 
       it("allows setting null", () => {
-        region.setWSRegion({ on: jest.fn() });
+        region.setWSRegion({ on: vi.fn() });
         region.setWSRegion(null);
         expect(region._ws_region).toBeNull();
       });

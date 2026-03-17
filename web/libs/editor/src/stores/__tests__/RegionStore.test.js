@@ -6,7 +6,7 @@ if (typeof globalThis.structuredClone === "undefined") {
   globalThis.structuredClone = (obj) => JSON.parse(JSON.stringify(obj));
 }
 
-jest.mock("keymaster", () => {
+vi.mock("keymaster", () => {
   const keymaster = () => {};
   keymaster.unbind = () => {};
   keymaster.setScope = () => {};
@@ -25,8 +25,8 @@ const CONFIG_IMAGE_RECT = '<View><Image name="img" value="$img" /><Rectangle nam
 
 const createTestEnv = () => ({
   events: {
-    hasEvent: jest.fn(() => false),
-    invoke: jest.fn(),
+    hasEvent: vi.fn(() => false),
+    invoke: vi.fn(),
   },
   messages: {},
   settings: {},
@@ -357,7 +357,7 @@ describe("RegionStore", () => {
 
     it("unselectAll delegates to annotation", () => {
       const { annotation } = createStoreWithAnnotation();
-      annotation.unselectAll = jest.fn();
+      annotation.unselectAll = vi.fn();
       annotation.regionStore.unselectAll();
       expect(annotation.unselectAll).toHaveBeenCalled();
     });
@@ -379,7 +379,7 @@ describe("RegionStore", () => {
 
     it("setFilteredRegions clears filter when length matches regions", () => {
       const { annotation } = createStoreWithAnnotation();
-      annotation.updateAppearenceFromState = jest.fn();
+      annotation.updateAppearenceFromState = vi.fn();
       annotation.regionStore.setFilteredRegions([]);
       expect(annotation.regionStore.filter).toBe(null);
       expect(annotation.updateAppearenceFromState).toHaveBeenCalled();
@@ -441,7 +441,7 @@ describe("RegionStore", () => {
 
     it("selectNext selects first region when none selected", () => {
       const { annotation } = createStoreWithOneRectRegion();
-      annotation.selectArea = jest.fn();
+      annotation.selectArea = vi.fn();
       annotation.regionStore.selectNext();
       expect(annotation.selectArea).toHaveBeenCalledWith(annotation.regionStore.regions[0]);
     });
@@ -491,7 +491,7 @@ describe("RegionStore", () => {
 
     it("setFilteredRegions with same length clears filter", () => {
       const { annotation } = createStoreWithOneRectRegion();
-      annotation.updateAppearenceFromState = jest.fn();
+      annotation.updateAppearenceFromState = vi.fn();
       const regions = annotation.regionStore.regions;
       annotation.regionStore.setFilteredRegions(regions);
       expect(annotation.regionStore.filter).toBe(null);

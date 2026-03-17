@@ -3,43 +3,43 @@
  */
 import { Waveform } from "../Waveform";
 
-const mockMediaLoad = jest.fn();
-const mockDestroy = jest.fn();
-const mockRender = jest.fn();
-const mockDraw = jest.fn();
-const mockSetLoading = jest.fn();
-const mockSetScrollLeft = jest.fn();
-const mockGetScrollLeft = jest.fn(() => 0);
-const mockGetScrollLeftPx = jest.fn(() => 0);
-const mockGetZoom = jest.fn(() => 1);
-const mockSetZoom = jest.fn();
-const mockOn = jest.fn();
-const mockShow = jest.fn();
-const mockHide = jest.fn();
-const mockSet = jest.fn();
-const mockAddRegions = jest.fn();
-const mockAddRegion = jest.fn();
-const mockUpdateRegion = jest.fn();
-const mockUpdateLabelVisibility = jest.fn();
-const mockRemoveRegion = jest.fn();
-const mockGetLayers = jest.fn(() => new Map());
-const mockGetLayer = jest.fn(() => null);
-const mockSeek = jest.fn();
-const mockSeekSilent = jest.fn();
-const mockPlay = jest.fn();
-const mockPause = jest.fn();
-const mockStop = jest.fn();
-const mockInit = jest.fn();
-const mockUpdateCursorToTime = jest.fn();
-const mockTransferImage = jest.fn();
-const mockSetLoadingProgress = jest.fn();
-const mockSetDecodingProgress = jest.fn();
-const mockSetError = jest.fn();
-const mockSetAmp = jest.fn();
-const mockUpdateSpectrogramConfig = jest.fn();
+const mockMediaLoad = vi.fn();
+const mockDestroy = vi.fn();
+const mockRender = vi.fn();
+const mockDraw = vi.fn();
+const mockSetLoading = vi.fn();
+const mockSetScrollLeft = vi.fn();
+const mockGetScrollLeft = vi.fn(() => 0);
+const mockGetScrollLeftPx = vi.fn(() => 0);
+const mockGetZoom = vi.fn(() => 1);
+const mockSetZoom = vi.fn();
+const mockOn = vi.fn();
+const mockShow = vi.fn();
+const mockHide = vi.fn();
+const mockSet = vi.fn();
+const mockAddRegions = vi.fn();
+const mockAddRegion = vi.fn();
+const mockUpdateRegion = vi.fn();
+const mockUpdateLabelVisibility = vi.fn();
+const mockRemoveRegion = vi.fn();
+const mockGetLayers = vi.fn(() => new Map());
+const mockGetLayer = vi.fn(() => null);
+const mockSeek = vi.fn();
+const mockSeekSilent = vi.fn();
+const mockPlay = vi.fn();
+const mockPause = vi.fn();
+const mockStop = vi.fn();
+const mockInit = vi.fn();
+const mockUpdateCursorToTime = vi.fn();
+const mockTransferImage = vi.fn();
+const mockSetLoadingProgress = vi.fn();
+const mockSetDecodingProgress = vi.fn();
+const mockSetError = vi.fn();
+const mockSetAmp = vi.fn();
+const mockUpdateSpectrogramConfig = vi.fn();
 
-jest.mock("../Media/MediaLoader", () => ({
-  MediaLoader: jest.fn().mockImplementation(() => ({
+vi.mock("../Media/MediaLoader", () => ({
+  MediaLoader: vi.fn().mockImplementation(() => ({
     load: mockMediaLoad,
     decoderPromise: undefined,
     duration: 10,
@@ -48,16 +48,16 @@ jest.mock("../Media/MediaLoader", () => ({
   })),
 }));
 
-jest.mock("../Tooltip/Tooltip", () => ({
-  Tooltip: jest.fn().mockImplementation(() => ({
+vi.mock("../Tooltip/Tooltip", () => ({
+  Tooltip: vi.fn().mockImplementation(() => ({
     show: mockShow,
     hide: mockHide,
     destroy: mockDestroy,
   })),
 }));
 
-jest.mock("../Visual/Visualizer", () => ({
-  Visualizer: jest.fn().mockImplementation(() => ({
+vi.mock("../Visual/Visualizer", () => ({
+  Visualizer: vi.fn().mockImplementation(() => ({
     setLoading: mockSetLoading,
     draw: mockDraw,
     render: mockRender,
@@ -73,7 +73,7 @@ jest.mock("../Visual/Visualizer", () => ({
     getLayer: mockGetLayer,
     on: mockOn,
     destroy: mockDestroy,
-    container: { contains: jest.fn(() => false) },
+    container: { contains: vi.fn(() => false) },
     setLoadingProgress: mockSetLoadingProgress,
     setDecodingProgress: mockSetDecodingProgress,
     setError: mockSetError,
@@ -81,31 +81,31 @@ jest.mock("../Visual/Visualizer", () => ({
     updateSpectrogramConfig: mockUpdateSpectrogramConfig,
     updateCursorToTime: mockUpdateCursorToTime,
     transferImage: mockTransferImage,
-    init: jest.fn(),
+    init: vi.fn(),
   })),
 }));
 
-jest.mock("../Cursor/Cursor", () => ({
-  Cursor: jest.fn().mockImplementation(() => ({
+vi.mock("../Cursor/Cursor", () => ({
+  Cursor: vi.fn().mockImplementation(() => ({
     on: mockOn,
     set: mockSet,
     show: mockShow,
     hide: mockHide,
     destroy: mockDestroy,
     inView: true,
-    hasFocus: jest.fn(() => false),
+    hasFocus: vi.fn(() => false),
   })),
 }));
 
-jest.mock("../Timeline/Timeline", () => ({
-  Timeline: jest.fn().mockImplementation(() => ({
+vi.mock("../Timeline/Timeline", () => ({
+  Timeline: vi.fn().mockImplementation(() => ({
     render: mockRender,
     destroy: mockDestroy,
   })),
 }));
 
-jest.mock("../Regions/Regions", () => ({
-  Regions: jest.fn().mockImplementation(() => ({
+vi.mock("../Regions/Regions", () => ({
+  Regions: vi.fn().mockImplementation(() => ({
     addRegions: mockAddRegions,
     addRegion: mockAddRegion,
     updateRegion: mockUpdateRegion,
@@ -115,8 +115,8 @@ jest.mock("../Regions/Regions", () => ({
   })),
 }));
 
-jest.mock("../Controls/Html5Player", () => ({
-  Html5Player: jest.fn().mockImplementation(() => ({
+vi.mock("../Controls/Html5Player", () => ({
+  Html5Player: vi.fn().mockImplementation(() => ({
     playing: false,
     buffering: false,
     volume: 1,
@@ -133,8 +133,8 @@ jest.mock("../Controls/Html5Player", () => ({
   })),
 }));
 
-jest.mock("../Controls/WebAudioPlayer", () => ({
-  WebAudioPlayer: jest.fn().mockImplementation(() => ({
+vi.mock("../Controls/WebAudioPlayer", () => ({
+  WebAudioPlayer: vi.fn().mockImplementation(() => ({
     playing: false,
     buffering: false,
     volume: 1,
@@ -156,7 +156,7 @@ describe("Waveform", () => {
   const baseParams = { src: "https://example.com/audio.mp3", container };
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     mockGetZoom.mockReturnValue(1);
     mockGetScrollLeft.mockReturnValue(0);
     mockGetScrollLeftPx.mockReturnValue(0);
@@ -223,7 +223,7 @@ describe("Waveform", () => {
     });
 
     it("warns when decoderType is none and splitChannels is set", async () => {
-      const warnSpy = jest.spyOn(console, "warn").mockImplementation();
+      const warnSpy = vi.spyOn(console, "warn").mockImplementation();
       mockMediaLoad.mockResolvedValue({ duration: 10 });
       const wf = new Waveform({
         ...baseParams,
@@ -239,7 +239,7 @@ describe("Waveform", () => {
     });
 
     it("warns when decoderType is none and playerType is webaudio", async () => {
-      const warnSpy = jest.spyOn(console, "warn").mockImplementation();
+      const warnSpy = vi.spyOn(console, "warn").mockImplementation();
       mockMediaLoad.mockResolvedValue({ duration: 10 });
       const wf = new Waveform({
         ...baseParams,
@@ -270,7 +270,7 @@ describe("Waveform", () => {
       const audio = { duration: 10 };
       mockMediaLoad.mockResolvedValue(audio);
       const wf = new Waveform(baseParams);
-      const loadSpy = jest.fn();
+      const loadSpy = vi.fn();
       wf.on("load", loadSpy);
       await wf.load();
       expect(mockInit).toHaveBeenCalledWith(audio);
@@ -334,7 +334,7 @@ describe("Waveform", () => {
       const wf = new Waveform(baseParams);
       mockGetZoom.mockReturnValue(2);
       (wf as any).media.duration = 10;
-      const scrollSpy = jest.fn();
+      const scrollSpy = vi.fn();
       wf.on("scroll", scrollSpy);
       wf.scrollToRegion(5);
       expect(mockSetScrollLeft).toHaveBeenCalled();
@@ -393,7 +393,7 @@ describe("Waveform", () => {
     it("setError invokes error and sets visualizer error", () => {
       const wf = new Waveform(baseParams);
       const err = new Error("custom");
-      const errorSpy = jest.fn();
+      const errorSpy = vi.fn();
       wf.on("error", errorSpy);
       wf.setError("msg", err);
       expect(errorSpy).toHaveBeenCalledWith(err);
@@ -547,7 +547,7 @@ describe("Waveform", () => {
     it("set updates visualizer scroll and invokes scroll", () => {
       const wf = new Waveform(baseParams);
       (wf as any).media.duration = 10;
-      const scrollSpy = jest.fn();
+      const scrollSpy = vi.fn();
       wf.on("scroll", scrollSpy);
       wf.scroll = 5000;
       expect(mockSetScrollLeft).toHaveBeenCalled();

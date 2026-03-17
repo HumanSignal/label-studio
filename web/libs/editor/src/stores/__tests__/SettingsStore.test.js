@@ -9,8 +9,8 @@ describe("SettingsStore", () => {
 
   beforeEach(() => {
     localStorageMock = {
-      getItem: jest.fn().mockReturnValue(null),
-      setItem: jest.fn(),
+      getItem: vi.fn().mockReturnValue(null),
+      setItem: vi.fn(),
     };
     Object.defineProperty(global, "window", {
       value: { localStorage: localStorageMock },
@@ -19,7 +19,7 @@ describe("SettingsStore", () => {
   });
 
   afterEach(() => {
-    jest.restoreAllMocks();
+    vi.restoreAllMocks();
   });
 
   it("creates with default values when no localStorage", () => {
@@ -109,7 +109,7 @@ describe("SettingsStore", () => {
 
   it("toggleHotkeys toggles enableHotkeys and calls Hotkey.setScope", () => {
     const { Hotkey } = require("../../core/Hotkey");
-    const spy = jest.spyOn(Hotkey, "setScope").mockImplementation(() => {});
+    const spy = vi.spyOn(Hotkey, "setScope").mockImplementation(() => {});
     const store = SettingsModel.create({}, { settings: {} });
     store.toggleHotkeys();
     expect(store.enableHotkeys).toBe(false);

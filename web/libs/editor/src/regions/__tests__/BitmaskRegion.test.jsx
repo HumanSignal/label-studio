@@ -4,20 +4,20 @@
  */
 import { destroy, types } from "mobx-state-tree";
 
-jest.mock("../BitmaskRegion/utils", () => ({
+vi.mock("../BitmaskRegion/utils", () => ({
   BitmaskDrawing: {
-    begin: jest.fn(({ x, y }) => ({ x, y })),
-    draw: jest.fn(({ x, y }) => ({ x, y })),
+    begin: vi.fn(({ x, y }) => ({ x, y })),
+    draw: vi.fn(({ x, y }) => ({ x, y })),
   },
-  getCanvasPixelBounds: jest.fn(() => ({ left: 0, top: 0, right: 10, bottom: 10 })),
-  isHoveringNonTransparentPixel: jest.fn(() => false),
+  getCanvasPixelBounds: vi.fn(() => ({ left: 0, top: 0, right: 10, bottom: 10 })),
+  isHoveringNonTransparentPixel: vi.fn(() => false),
 }));
 
-jest.mock("../BitmaskRegion/contour", () => ({
-  generateMultiShapeOutline: jest.fn(() => []),
+vi.mock("../BitmaskRegion/contour", () => ({
+  generateMultiShapeOutline: vi.fn(() => []),
 }));
 
-jest.mock("../../tags/object/Image", () => {
+vi.mock("../../tags/object/Image", () => {
   const { types } = require("mobx-state-tree");
   const image = types
     .model("ImageModel", {
@@ -120,13 +120,13 @@ import React from "react";
 import { BitmaskRegionModel, HtxBitmask } from "../BitmaskRegion";
 import { ImageModel } from "../../tags/object/Image";
 
-jest.mock("../RegionWrapper", () => {
+vi.mock("../RegionWrapper", () => {
   const React = require("react");
   return {
     RegionWrapper: ({ children }) => React.createElement("div", { "data-testid": "region-wrapper" }, children),
   };
 });
-jest.mock("react-konva", () => {
+vi.mock("react-konva", () => {
   const React = require("react");
   return {
     Group: ({ children, ...p }) => React.createElement("div", { "data-testid": "konva-group", ...p }, children),
@@ -135,13 +135,13 @@ jest.mock("react-konva", () => {
     Rect: (p) => React.createElement("div", { "data-testid": "konva-rect", ...p }),
   };
 });
-jest.mock("../../components/ImageView/LabelOnRegion", () => {
+vi.mock("../../components/ImageView/LabelOnRegion", () => {
   const React = require("react");
   return {
     LabelOnMask: () => React.createElement("div", { "data-testid": "label-on-mask" }),
   };
 });
-jest.mock("../AliveRegion", () => ({
+vi.mock("../AliveRegion", () => ({
   AliveRegion: (Comp) => Comp,
 }));
 
@@ -308,14 +308,14 @@ describe("BitmaskRegion", () => {
     it("redraw schedules restoreFromImageDataURL via requestIdleCallback when refs and imageDataURL set", () => {
       region.setImageDataURL("data:image/png;base64,abc");
       region.redraw();
-      jest.runAllTimers();
+      vi.runAllTimers();
       // redraw calls requestIdleCallback (mocked as setTimeout); restoreFromImageDataURL is no-op for this URL
       expect(region.imageDataURL).toBe("data:image/png;base64,abc");
     });
 
     it("restoreFromImageDataURL async path runs when imageDataURL set and Image.decode resolves", async () => {
-      const mockDecode = jest.fn().mockResolvedValue(undefined);
-      global.Image = jest.fn().mockImplementation(function () {
+      const mockDecode = vi.fn().mockResolvedValue(undefined);
+      global.Image = vi.fn().mockImplementation(function () {
         this.src = "";
         this.naturalWidth = 50;
         this.naturalHeight = 50;
@@ -354,7 +354,7 @@ describe("BitmaskRegion", () => {
     });
 
     it("setLayerRef sets layerRef from ref getParent when ref provided", () => {
-      const layer = { batchDraw: jest.fn() };
+      const layer = { batchDraw: vi.fn() };
       const ref = { getParent: () => layer };
       region.setLayerRef(ref);
       expect(region.layerRef).toBe(layer);
@@ -388,7 +388,7 @@ describe("BitmaskRegion", () => {
     });
 
     it("beginPath with brush type uses black and source-over", () => {
-      const annotation = { pauseAutosave: jest.fn() };
+      const annotation = { pauseAutosave: vi.fn() };
       root.image.setAnnotation(annotation);
       const Utils = require("../BitmaskRegion/utils");
       Utils.BitmaskDrawing.begin.mockClear();
@@ -403,7 +403,7 @@ describe("BitmaskRegion", () => {
     });
 
     it("beginPath with eraser type uses white and destination-out", () => {
-      const annotation = { pauseAutosave: jest.fn() };
+      const annotation = { pauseAutosave: vi.fn() };
       root.image.setAnnotation(annotation);
       const Utils = require("../BitmaskRegion/utils");
       Utils.BitmaskDrawing.begin.mockClear();
@@ -440,20 +440,20 @@ describe("BitmaskRegion", () => {
     });
 
     it("endPath finalizes region, updates URL, resumes autosave, notifies and autosaves", () => {
-      jest.useFakeTimers();
-      const autosave = jest.fn();
+      vi.useFakeTimers();
+      const autosave = vi.fn();
       const annotation = {
-        startAutosave: jest.fn(),
+        startAutosave: vi.fn(),
         autosave,
       };
       root.image.setAnnotation(annotation);
-      region.notifyDrawingFinished = jest.fn();
+      region.notifyDrawingFinished = vi.fn();
       region.endPath();
       expect(annotation.startAutosave).toHaveBeenCalled();
       expect(region.notifyDrawingFinished).toHaveBeenCalled();
-      jest.runAllTimers();
+      vi.runAllTimers();
       expect(autosave).toHaveBeenCalled();
-      jest.useRealTimers();
+      vi.useRealTimers();
     });
 
     it("updateImageSize finalizes and increments needsUpdate when stage size > 1", () => {

@@ -3,13 +3,13 @@
  * Mocks env and AppStore so we test configureStore logic only.
  */
 
-const mockGetData = jest.fn((task) => (task?.data ? { ...task, data: JSON.stringify(task.data) } : task));
-const mockGetState = jest.fn(() => ({}));
-const mockRootElement = jest.fn(() => ({}));
-const mockConfigureApplication = jest.fn(() => ({}));
-const mockGetExample = jest.fn();
+const mockGetData = vi.fn((task) => (task?.data ? { ...task, data: JSON.stringify(task.data) } : task));
+const mockGetState = vi.fn(() => ({}));
+const mockRootElement = vi.fn(() => ({}));
+const mockConfigureApplication = vi.fn(() => ({}));
+const mockGetExample = vi.fn();
 
-jest.mock("../env/production", () => ({
+vi.mock("../env/production", () => ({
   __esModule: true,
   default: {
     getData: mockGetData,
@@ -22,7 +22,7 @@ jest.mock("../env/production", () => ({
   },
 }));
 
-jest.mock("../env/development", () => ({
+vi.mock("../env/development", () => ({
   __esModule: true,
   default: {
     getData: mockGetData,
@@ -35,19 +35,19 @@ jest.mock("../env/development", () => ({
   },
 }));
 
-const mockInitializeStore = jest.fn();
-const mockCreate = jest.fn((params, opts) => ({
+const mockInitializeStore = vi.fn();
+const mockCreate = vi.fn((params, opts) => ({
   initializeStore: mockInitializeStore,
 }));
 
-jest.mock("../stores/AppStore", () => ({
+vi.mock("../stores/AppStore", () => ({
   __esModule: true,
   default: { create: (...args) => mockCreate(...args) },
 }));
 
 describe("configureStore", () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     window.LS_SECURE_MODE = undefined;
   });
 

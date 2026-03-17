@@ -1,6 +1,7 @@
 /**
  * Unit tests for Zoom tool (tools/Zoom.jsx)
  */
+import React from "react";
 import { Zoom } from "../Zoom";
 
 function makeMockObj() {
@@ -10,11 +11,11 @@ function makeMockObj() {
     zoomScale: 2,
     zoomingPositionX: 0,
     zoomingPositionY: 0,
-    setZoomPosition: jest.fn(),
-    handleZoom: jest.fn(),
-    sizeToFit: jest.fn(),
-    sizeToAuto: jest.fn(),
-    sizeToOriginal: jest.fn(),
+    setZoomPosition: vi.fn(),
+    handleZoom: vi.fn(),
+    sizeToFit: vi.fn(),
+    sizeToAuto: vi.fn(),
+    sizeToOriginal: vi.fn(),
     container,
   };
 }

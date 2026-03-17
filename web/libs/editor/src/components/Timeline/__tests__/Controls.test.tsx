@@ -1,9 +1,10 @@
+import React from "react";
 import { fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { Controls, ControlButton } from "../Controls";
 import { TimelineContext } from "../Context";
 
-jest.mock("../Controls/ConfigControl", () => ({
+vi.mock("../Controls/ConfigControl", () => ({
   ConfigControl: ({
     onSetModal,
     configModal,
@@ -17,7 +18,7 @@ jest.mock("../Controls/ConfigControl", () => ({
   ),
 }));
 
-jest.mock("../Controls/AudioControl", () => ({
+vi.mock("../Controls/AudioControl", () => ({
   AudioControl: ({
     onSetModal,
     audioModal,
@@ -31,7 +32,7 @@ jest.mock("../Controls/AudioControl", () => ({
   ),
 }));
 
-jest.mock("../../TimeDurationControl/TimeDurationControl", () => ({
+vi.mock("../../TimeDurationControl/TimeDurationControl", () => ({
   TimeDurationControl: ({
     onChangeStartTime,
     currentTime,
@@ -50,11 +51,11 @@ jest.mock("../../TimeDurationControl/TimeDurationControl", () => ({
   ),
 }));
 
-jest.mock("../../../common/Hotkey/WithHotkey", () => ({
+vi.mock("../../../common/Hotkey/WithHotkey", () => ({
   WithHotkey: ({ children }: { children: React.ReactNode; binging?: string; hotkeyScope?: string }) => <>{children}</>,
 }));
 
-jest.mock("../SideControls", () => ({
+vi.mock("../SideControls", () => ({
   FramesControl: ({ onPositionChange }: { onPositionChange?: (p: number) => void }) => (
     <button type="button" data-testid="frames-control" onClick={() => onPositionChange?.(5)}>
       Frames
@@ -83,13 +84,13 @@ const defaultProps = {
   collapsed: false,
   fullscreen: false,
   mediaType: "video" as const,
-  onRewind: jest.fn(),
-  onForward: jest.fn(),
-  onPositionChange: jest.fn(),
-  onToggleCollapsed: jest.fn(),
-  onStepBackward: jest.fn(),
-  onStepForward: jest.fn(),
-  onFullScreenToggle: jest.fn(),
+  onRewind: vi.fn(),
+  onForward: vi.fn(),
+  onPositionChange: vi.fn(),
+  onToggleCollapsed: vi.fn(),
+  onStepBackward: vi.fn(),
+  onStepForward: vi.fn(),
+  onFullScreenToggle: vi.fn(),
 };
 
 function renderControls(
@@ -106,7 +107,7 @@ function renderControls(
 
 describe("Controls", () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe("render", () => {
@@ -163,8 +164,8 @@ describe("Controls", () => {
 
   describe("playback", () => {
     it("calls onPause when play button clicked and playing is true", async () => {
-      const onPause = jest.fn();
-      const onPlay = jest.fn();
+      const onPause = vi.fn();
+      const onPlay = vi.fn();
       renderControls({ playing: true, onPause, onPlay });
       const playButton = screen.getByTestId("playback-button:pause");
       await userEvent.click(playButton);
@@ -173,8 +174,8 @@ describe("Controls", () => {
     });
 
     it("calls onPlay when play button clicked and playing is false", async () => {
-      const onPause = jest.fn();
-      const onPlay = jest.fn();
+      const onPause = vi.fn();
+      const onPlay = vi.fn();
       renderControls({ playing: false, onPause, onPlay });
       const playButton = screen.getByTestId("playback-button:play");
       await userEvent.click(playButton);
@@ -195,21 +196,21 @@ describe("Controls", () => {
     });
 
     it("calls onStepBackward when step backward clicked", async () => {
-      const onStepBackward = jest.fn();
+      const onStepBackward = vi.fn();
       renderControls({ position: 50, onStepBackward });
       await userEvent.click(screen.getByRole("button", { name: /step backward/i }));
       expect(onStepBackward).toHaveBeenCalled();
     });
 
     it("calls onStepForward when step forward clicked", async () => {
-      const onStepForward = jest.fn();
+      const onStepForward = vi.fn();
       renderControls({ position: 50, onStepForward });
       await userEvent.click(screen.getByRole("button", { name: /step forward/i }));
       expect(onStepForward).toHaveBeenCalled();
     });
 
     it("calls onPositionChange when TimeDurationControl changes (audio)", async () => {
-      const onPositionChange = jest.fn();
+      const onPositionChange = vi.fn();
       renderControls({ mediaType: "audio", onPositionChange });
       const input = screen.getByTestId("time-duration-input");
       fireEvent.change(input, { target: { value: "42" } });
@@ -257,7 +258,7 @@ describe("Controls", () => {
     });
 
     it("calls onRewind when skip to start clicked", async () => {
-      const onRewind = jest.fn();
+      const onRewind = vi.fn();
       renderControls({ position: 50, onRewind, disableFrames: false }, { settings: { stepSize: () => 5 } });
       fireEvent.keyDown(document, { key: "Shift" });
       await userEvent.click(screen.getByRole("button", { name: /skip to start/i }));
@@ -265,7 +266,7 @@ describe("Controls", () => {
     });
 
     it("calls onRewind with altHopSize when media rewind clicked", async () => {
-      const onRewind = jest.fn();
+      const onRewind = vi.fn();
       renderControls(
         { position: 50, onRewind, altHopSize: 10, disableFrames: false },
         { settings: { stepSize: () => 5 } },
@@ -276,7 +277,7 @@ describe("Controls", () => {
     });
 
     it("calls onForward with altHopSize when media fast forward clicked", async () => {
-      const onForward = jest.fn();
+      const onForward = vi.fn();
       renderControls(
         { position: 50, onForward, altHopSize: 10, disableFrames: false },
         { settings: { stepSize: () => 5 } },
@@ -287,7 +288,7 @@ describe("Controls", () => {
     });
 
     it("calls onForward when skip to end clicked", async () => {
-      const onForward = jest.fn();
+      const onForward = vi.fn();
       renderControls({ position: 50, onForward, disableFrames: false }, { settings: { stepSize: () => 5 } });
       fireEvent.keyDown(document, { key: "Shift" });
       await userEvent.click(screen.getByRole("button", { name: /skip to end/i }));
@@ -297,7 +298,7 @@ describe("Controls", () => {
 
   describe("collapse and fullscreen", () => {
     it("renders toggle timeline button when allowViewCollapse and not disableFrames", async () => {
-      const onToggleCollapsed = jest.fn();
+      const onToggleCollapsed = vi.fn();
       const { container } = renderControls({
         allowViewCollapse: true,
         disableFrames: false,
@@ -315,7 +316,7 @@ describe("Controls", () => {
     });
 
     it("calls onToggleCollapsed with false when currently collapsed", async () => {
-      const onToggleCollapsed = jest.fn();
+      const onToggleCollapsed = vi.fn();
       const { container } = renderControls({
         allowViewCollapse: true,
         disableFrames: false,
@@ -332,7 +333,7 @@ describe("Controls", () => {
     });
 
     it("renders fullscreen button when allowFullscreen", async () => {
-      const onFullScreenToggle = jest.fn();
+      const onFullScreenToggle = vi.fn();
       const { container } = renderControls({ allowFullscreen: true, onFullScreenToggle });
       const groups = container.querySelectorAll(".ls-timeline-controls__group");
       const groupWithOneButton = [...groups].find((g) => g.querySelectorAll("button").length === 1);
@@ -385,8 +386,8 @@ describe("Controls", () => {
 
   describe("step with stepSize (hop)", () => {
     it("calls onStepBackward with stepSize when hop backward clicked", async () => {
-      const onStepBackward = jest.fn();
-      const stepSize = jest.fn(() => 3);
+      const onStepBackward = vi.fn();
+      const stepSize = vi.fn(() => 3);
       renderControls({ position: 50, onStepBackward, disableFrames: false }, { settings: { stepSize } });
       const hopBack = screen.getByRole("button", { name: /hop backward/i });
       await userEvent.click(hopBack);
@@ -394,8 +395,8 @@ describe("Controls", () => {
     });
 
     it("calls onStepForward with stepSize when hop forward clicked", async () => {
-      const onStepForward = jest.fn();
-      const stepSize = jest.fn(() => 3);
+      const onStepForward = vi.fn();
+      const stepSize = vi.fn(() => 3);
       renderControls({ position: 50, onStepForward, disableFrames: false }, { settings: { stepSize } });
       const hopForward = screen.getByRole("button", { name: /hop forward/i });
       await userEvent.click(hopForward);
@@ -407,7 +408,7 @@ describe("Controls", () => {
 describe("ControlButton", () => {
   it("renders children and passes props to button", () => {
     render(
-      <ControlButton onClick={jest.fn()} aria-label="Test">
+      <ControlButton onClick={vi.fn()} aria-label="Test">
         Click me
       </ControlButton>,
     );

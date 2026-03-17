@@ -6,31 +6,31 @@ if (typeof globalThis.structuredClone === "undefined") {
   globalThis.structuredClone = (obj) => JSON.parse(JSON.stringify(obj));
 }
 
-jest.mock("keymaster", () => {
+vi.mock("keymaster", () => {
   const keymaster = () => {};
   keymaster.unbind = () => {};
   keymaster.setScope = () => {};
   return { __esModule: true, default: keymaster };
 });
 
-jest.mock("../../../tools/Manager", () => ({
+vi.mock("../../../tools/Manager", () => ({
   __esModule: true,
   default: {
-    setRoot: jest.fn(),
-    removeAllTools: jest.fn(),
-    allInstances: jest.fn(() => []),
-    resetActiveDrawings: jest.fn(),
+    setRoot: vi.fn(),
+    removeAllTools: vi.fn(),
+    allInstances: vi.fn(() => []),
+    resetActiveDrawings: vi.fn(),
   },
 }));
 
-const mockInvoke = jest.fn();
-const mockInvokeFirst = jest.fn();
-const mockHasEvent = jest.fn(() => false);
-jest.mock("../../../components/Infomodal/Infomodal", () => ({
+const mockInvoke = vi.fn();
+const mockInvokeFirst = vi.fn();
+const mockHasEvent = vi.fn(() => false);
+vi.mock("../../../components/Infomodal/Infomodal", () => ({
   __esModule: true,
   default: {
-    warning: jest.fn(),
-    error: jest.fn(),
+    warning: vi.fn(),
+    error: vi.fn(),
   },
 }));
 
@@ -72,7 +72,7 @@ function createStore(snapshot = {}, envOverrides) {
 
 describe("Annotation store (store.js)", () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     mockHasEvent.mockReturnValue(false);
     localStorage.setItem("annotation-store-viewing-all", "false");
   });
@@ -242,7 +242,7 @@ describe("Annotation store (store.js)", () => {
       const store = createStore();
       store.initializeStore({});
       const ann = store.annotationStore.addAnnotation({ result: [], pk: "42" });
-      store.addAnnotationToTaskHistory = jest.fn();
+      store.addAnnotationToTaskHistory = vi.fn();
       store.annotationStore.selectAnnotation(ann.id);
       expect(store.addAnnotationToTaskHistory).toHaveBeenCalledWith("42");
     });

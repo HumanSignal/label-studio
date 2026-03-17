@@ -5,14 +5,15 @@ import { Provider } from "mobx-react";
 import Grid, { VirtualizedGrid, VirtualizedAnnotationPanel, Item } from "../Grid";
 import { FF_DEV_3391, FF_FIT_720_LAZY_LOAD_ANNOTATIONS } from "../../../utils/feature-flags";
 
-const mockIsFF = jest.fn();
-jest.mock("../../../utils/feature-flags", () => ({
-  isFF: (...args) => mockIsFF(...args),
+const mockIsFF = vi.fn();
+vi.mock("../../../utils/feature-flags", () => ({
+  isFF: mockIsFF,
   FF_DEV_3391: "fflag_dev_3391",
   FF_FIT_720_LAZY_LOAD_ANNOTATIONS: "fflag_fit_720_lazy_load_annotations",
+  FF_SIMPLE_INIT: "fflag_fix_front_leap_443_select_annotation_once",
 }));
 
-jest.mock("../../AnnotationTabs/AnnotationTabs", () => ({
+vi.mock("../../AnnotationTabs/AnnotationTabs", () => ({
   EntityTab: ({ entity, onClick }) => (
     <div
       data-testid="entity-tab"
@@ -27,28 +28,28 @@ jest.mock("../../AnnotationTabs/AnnotationTabs", () => ({
   ),
 }));
 
-jest.mock("../Annotation", () => ({
+vi.mock("../Annotation", () => ({
   Annotation: () => <div data-testid="annotation-panel">Annotation</div>,
 }));
 
-const mockFetchAnnotationCached = jest.fn();
-const mockGetCachedAnnotation = jest.fn();
-jest.mock("../../../hooks/useAnnotationQuery", () => ({
+const mockFetchAnnotationCached = vi.fn();
+const mockGetCachedAnnotation = vi.fn();
+vi.mock("../../../hooks/useAnnotationQuery", () => ({
   useAnnotationFetcher: () => ({
     fetchAnnotationCached: mockFetchAnnotationCached,
     getCachedAnnotation: mockGetCachedAnnotation,
   }),
 }));
 
-jest.mock("react-virtualized-auto-sizer", () => ({
+vi.mock("react-virtualized-auto-sizer", () => ({
   __esModule: true,
   default: ({ children }) => children({ width: 800, height: 400 }),
 }));
 
-jest.mock("react-window", () => {
+vi.mock("react-window", () => {
   const R = require("react");
   const { useEffect } = R;
-  const listRefObj = { scrollTo: jest.fn() };
+  const listRefObj = { scrollTo: vi.fn() };
   return {
     FixedSizeList: R.forwardRef(({ children, itemCount, itemData, onItemsRendered, onScroll }, ref) => {
       useEffect(() => {
@@ -78,10 +79,10 @@ jest.mock("react-window", () => {
 function createStore(overrides = {}) {
   return {
     selected: { selected: null },
-    selectAnnotation: jest.fn(),
-    selectPrediction: jest.fn(),
-    _selectItem: jest.fn(),
-    _unselectAll: jest.fn(),
+    selectAnnotation: vi.fn(),
+    selectPrediction: vi.fn(),
+    _selectItem: vi.fn(),
+    _unselectAll: vi.fn(),
     store: {},
     ...overrides,
   };
@@ -103,7 +104,7 @@ describe("Grid", () => {
     mockIsFF.mockReset();
     mockGetCachedAnnotation.mockReturnValue(undefined);
     if (typeof Element.prototype.scrollTo !== "function") {
-      Element.prototype.scrollTo = jest.fn();
+      Element.prototype.scrollTo = vi.fn();
     }
   });
 
@@ -319,7 +320,7 @@ describe("Grid", () => {
   });
 
   it("Item renders and componentDidMount runs for image objects", async () => {
-    const onFinish = jest.fn();
+    const onFinish = vi.fn();
     const annotation = {
       id: "a1",
       pk: 1,
@@ -336,7 +337,7 @@ describe("Grid", () => {
   });
 
   it("Item componentDidMount runs for non-image object with isReady true", async () => {
-    const onFinish = jest.fn();
+    const onFinish = vi.fn();
     const annotation = {
       id: "a1",
       pk: 1,
@@ -365,7 +366,7 @@ describe("Grid", () => {
         annotation={stubAnnotation}
         root={{}}
         style={{}}
-        onSelect={jest.fn()}
+        onSelect={vi.fn()}
         isHydrating={false}
       />,
     );
@@ -386,7 +387,7 @@ describe("Grid", () => {
         annotation={stubAnnotation}
         root={{}}
         style={{}}
-        onSelect={jest.fn()}
+        onSelect={vi.fn()}
         isHydrating={false}
       />,
     );
@@ -407,7 +408,7 @@ describe("Grid", () => {
         annotation={stubAnnotation}
         root={{}}
         style={{}}
-        onSelect={jest.fn()}
+        onSelect={vi.fn()}
         isHydrating={true}
       />,
     );
@@ -428,7 +429,7 @@ describe("Grid", () => {
         annotation={annotationWithData}
         root={{}}
         style={{}}
-        onSelect={jest.fn()}
+        onSelect={vi.fn()}
         isHydrating={false}
       />,
     );
@@ -469,12 +470,12 @@ describe("Grid", () => {
       versions: {},
       regions: [],
       history: {
-        freeze: jest.fn(),
-        safeUnfreeze: jest.fn(),
-        reinitHistory: jest.fn(),
+        freeze: vi.fn(),
+        safeUnfreeze: vi.fn(),
+        reinitHistory: vi.fn(),
       },
-      deserializeResults: jest.fn(),
-      updateObjects: jest.fn(),
+      deserializeResults: vi.fn(),
+      updateObjects: vi.fn(),
     };
     const annotations = [
       ann,
@@ -503,10 +504,10 @@ describe("Grid", () => {
       ...createAnnotation({ id, pk }),
       versions: { result: [] },
       regions: [],
-      history: { freeze: jest.fn(), safeUnfreeze: jest.fn() },
-      deserializeResults: jest.fn(),
-      updateObjects: jest.fn(),
-      reinitHistory: jest.fn(),
+      history: { freeze: vi.fn(), safeUnfreeze: vi.fn() },
+      deserializeResults: vi.fn(),
+      updateObjects: vi.fn(),
+      reinitHistory: vi.fn(),
     });
     const annotations = Array.from({ length: 11 }, (_, i) => stubAnnotation(`a${i}`, i + 1));
     const store = createStore({ selected: { selected: annotations[0] } });
@@ -523,7 +524,7 @@ describe("Grid", () => {
   });
 
   it("VirtualizedGrid hydrateAnnotation uses sdk.ensureAnnotationLoaded when available", async () => {
-    const ensureAnnotationLoaded = jest.fn().mockResolvedValue(undefined);
+    const ensureAnnotationLoaded = vi.fn().mockResolvedValue(undefined);
     mockIsFF.mockReturnValue(true);
     const store = createStore({
       selected: { selected: null },
@@ -544,7 +545,7 @@ describe("Grid", () => {
   });
 
   it("VirtualizedGrid hydrateAnnotation uses taskStore.loadAnnotation when no ensureAnnotationLoaded", async () => {
-    const loadAnnotation = jest.fn().mockResolvedValue({ result: [] });
+    const loadAnnotation = vi.fn().mockResolvedValue({ result: [] });
     mockIsFF.mockReturnValue(true);
     const store = createStore({
       selected: { selected: null },
@@ -578,12 +579,12 @@ describe("Grid", () => {
       versions: { result: [] },
       regions: [],
       history: {
-        freeze: jest.fn(),
-        safeUnfreeze: jest.fn(),
-        reinitHistory: jest.fn(),
+        freeze: vi.fn(),
+        safeUnfreeze: vi.fn(),
+        reinitHistory: vi.fn(),
       },
-      deserializeResults: jest.fn(),
-      updateObjects: jest.fn(),
+      deserializeResults: vi.fn(),
+      updateObjects: vi.fn(),
     };
     const annotations = [
       ann,
@@ -658,7 +659,7 @@ describe("Grid", () => {
   });
 
   it("VirtualizedGrid onItemsRendered runs debounced hydration", () => {
-    jest.useFakeTimers();
+    vi.useFakeTimers();
     mockIsFF.mockImplementation((flag) => flag === FF_DEV_3391 || flag === FF_FIT_720_LAZY_LOAD_ANNOTATIONS);
     const stubAnnotation = (id, pk) => ({
       ...createAnnotation({ id, pk }),
@@ -675,9 +676,9 @@ describe("Grid", () => {
       </Provider>,
     );
 
-    jest.advanceTimersByTime(200);
+    vi.advanceTimersByTime(200);
     expect(screen.getByLabelText("Move right")).toBeInTheDocument();
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   it("VirtualizedGrid renders with stub annotations (no result)", () => {

@@ -2,10 +2,11 @@
  * Unit tests for PolygonPoint (model views and actions).
  * Covers point model and view behavior used by PolygonRegion.
  */
+import React from "react";
 import { render } from "@testing-library/react";
 import { getParent, hasParent, types } from "mobx-state-tree";
 
-jest.mock("../../tags/object/Image", () => {
+vi.mock("../../tags/object/Image", () => {
   const { types } = require("mobx-state-tree");
   return {
     ImageModel: types
@@ -41,7 +42,7 @@ import { PolygonPointView } from "../PolygonPoint";
 import { PolygonRegionModel } from "../PolygonRegion";
 import { ImageModel } from "../../tags/object/Image";
 
-jest.mock("../../hooks/useRegionColor", () => ({
+vi.mock("../../hooks/useRegionColor", () => ({
   useRegionStyles: () => ({ strokeColor: "#000" }),
 }));
 
@@ -65,7 +66,7 @@ const TestPolygonRegionModel = types.compose(
 
 const mockAnnotation = {
   isReadOnly: () => false,
-  history: { freeze: jest.fn(), unfreeze: jest.fn() },
+  history: { freeze: vi.fn(), unfreeze: vi.fn() },
 };
 
 const WrapperModel = types
@@ -296,13 +297,13 @@ describe("PolygonPoint", () => {
       const ev = {
         cancelBubble: false,
         target: {
-          setX: jest.fn(),
-          setY: jest.fn(),
+          setX: vi.fn(),
+          setY: vi.fn(),
           x: () => 0,
           y: () => 0,
           width: () => 0,
           height: () => 0,
-          scale: jest.fn(),
+          scale: vi.fn(),
         },
       };
       point.handleMouseOverStartPoint(ev);
@@ -314,7 +315,7 @@ describe("PolygonPoint", () => {
       region.setMouseOverStartPoint(true);
       expect(region.mouseOverStartPoint).toBe(true);
       const ev = {
-        target: { setX: jest.fn(), setY: jest.fn(), x: () => 0, y: () => 0, scale: jest.fn() },
+        target: { setX: vi.fn(), setY: vi.fn(), x: () => 0, y: () => 0, scale: vi.fn() },
       };
       point.handleMouseOutStartPoint(ev);
       expect(region.mouseOverStartPoint).toBe(false);

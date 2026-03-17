@@ -1,11 +1,18 @@
 /**
  * Vitest setup: Jest API compat + same env as jest.setup.js (ResizeObserver, matchMedia, canvas, HTMLMediaElement, fetch).
  */
+import React from "react";
 import * as matchers from "@testing-library/jest-dom/matchers";
 import { expect, vi } from "vitest";
 
 (globalThis as unknown as { jest: typeof vi }).jest = vi;
 expect.extend(matchers);
+
+// So components and deps that expect global React (e.g. classic JSX) work in tests
+vi.stubGlobal("React", React);
+if (typeof window !== "undefined") {
+  (window as unknown as { React: typeof React }).React = React;
+}
 
 vi.stubGlobal("fetch", vi.fn());
 
@@ -38,36 +45,44 @@ Object.defineProperty(window, "matchMedia", {
   })),
 });
 
+const canvas2dMock = {
+  fillRect: vi.fn(),
+  clearRect: vi.fn(),
+  getImageData: vi.fn(() => ({ data: new Array(4) })),
+  putImageData: vi.fn(),
+  createImageData: vi.fn(() => []),
+  setTransform: vi.fn(),
+  drawImage: vi.fn(),
+  save: vi.fn(),
+  restore: vi.fn(),
+  beginPath: vi.fn(),
+  moveTo: vi.fn(),
+  lineTo: vi.fn(),
+  closePath: vi.fn(),
+  stroke: vi.fn(),
+  translate: vi.fn(),
+  scale: vi.fn(),
+  rotate: vi.fn(),
+  arc: vi.fn(),
+  fill: vi.fn(),
+  measureText: vi.fn(() => ({ width: 0 })),
+  transform: vi.fn(),
+  rect: vi.fn(),
+  clip: vi.fn(),
+};
+
 HTMLCanvasElement.prototype.getContext = vi.fn().mockImplementation((contextType: string) => {
-  if (contextType === "2d") {
-    return {
-      fillRect: vi.fn(),
-      clearRect: vi.fn(),
-      getImageData: vi.fn(() => ({ data: new Array(4) })),
-      putImageData: vi.fn(),
-      createImageData: vi.fn(() => []),
-      setTransform: vi.fn(),
-      drawImage: vi.fn(),
-      save: vi.fn(),
-      restore: vi.fn(),
-      beginPath: vi.fn(),
-      moveTo: vi.fn(),
-      lineTo: vi.fn(),
-      closePath: vi.fn(),
-      stroke: vi.fn(),
-      translate: vi.fn(),
-      scale: vi.fn(),
-      rotate: vi.fn(),
-      arc: vi.fn(),
-      fill: vi.fn(),
-      measureText: vi.fn(() => ({ width: 0 })),
-      transform: vi.fn(),
-      rect: vi.fn(),
-      clip: vi.fn(),
-    };
+  if (contextType === "2d" || (contextType && String(contextType).toLowerCase() === "2d")) {
+    return canvas2dMock;
   }
   return null;
 });
+
+if (typeof HTMLCanvasElement.prototype.toDataURL === "undefined") {
+  HTMLCanvasElement.prototype.toDataURL = function () {
+    return "data:image/png;base64,stub";
+  };
+}
 
 const mediaMock = {
   paused: true,

@@ -5,7 +5,7 @@ import { types } from "mobx-state-tree";
 import ObjectTag from "../Base";
 import InfoModal from "../../../components/Infomodal/Infomodal";
 
-const mockUnselectAll = jest.fn();
+const mockUnselectAll = vi.fn();
 const mockRegionStore = { regions: [] };
 const mockAnnotation = {
   regionStore: mockRegionStore,
@@ -16,14 +16,15 @@ const mockAnnotationStore = {
   selectedHistory: mockAnnotation,
 };
 
-jest.mock("../../../utils/feature-flags", () => ({
+vi.mock("../../../utils/feature-flags", () => ({
   FF_DEV_3391: "FF_DEV_3391",
-  isFF: jest.fn(() => false),
+  FF_SIMPLE_INIT: "fflag_fix_front_leap_443_select_annotation_once",
+  isFF: vi.fn(() => false),
 }));
 
-jest.mock("../../../components/Infomodal/Infomodal", () => ({
+vi.mock("../../../components/Infomodal/Infomodal", () => ({
   __esModule: true,
-  default: { warning: jest.fn() },
+  default: { warning: vi.fn() },
 }));
 
 // Extended model so we have .regions and .states()/.activeStates() (required by findRegion and getAvailableStates)
@@ -63,7 +64,7 @@ function createNode(snapshot = {}) {
 }
 
 beforeEach(() => {
-  jest.clearAllMocks();
+  vi.clearAllMocks();
   mockRegionStore.regions = [];
 });
 
@@ -158,7 +159,7 @@ describe("Object Base (tags/object/Base.js)", () => {
         .compose(ObjectTag, types.model({ regions: types.optional(types.array(types.frozen()), []) }))
         .views((self) => ({
           states() {
-            return [{ value: "A", selected: false, setSelected: jest.fn(), checkMaxUsages: undefined }];
+            return [{ value: "A", selected: false, setSelected: vi.fn(), checkMaxUsages: undefined }];
           },
           activeStates() {
             return active;
@@ -176,7 +177,7 @@ describe("Object Base (tags/object/Base.js)", () => {
     });
 
     it("shows InfoModal.warning and unselects when maxUsages exceeded", () => {
-      const setSelected = jest.fn();
+      const setSelected = vi.fn();
       const exceededItem = { value: "L1", maxUsages: 1, selected: true, setSelected };
       const ExceededState = types
         .compose(ObjectTag, types.model({ regions: types.optional(types.array(types.frozen()), []) }))

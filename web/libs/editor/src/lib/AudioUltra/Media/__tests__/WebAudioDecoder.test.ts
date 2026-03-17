@@ -4,8 +4,8 @@
 import { info } from "../../Common/Utils";
 import { WebAudioDecoder } from "../WebAudioDecoder";
 
-jest.mock("../../Common/Utils", () => ({
-  info: jest.fn(),
+vi.mock("../../Common/Utils", () => ({
+  info: vi.fn(),
 }));
 
 function createFakeAudioBuffer(
@@ -50,10 +50,10 @@ describe("WebAudioDecoder", () => {
   const originalWebkit = (global as any).webkitOfflineAudioContext;
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     (global as any).WebAudioOfflineAudioContext = undefined;
     mockContext = createMockOfflineContext();
-    (global as any).OfflineAudioContext = jest.fn().mockImplementation(() => mockContext.ctx);
+    (global as any).OfflineAudioContext = vi.fn().mockImplementation(() => mockContext.ctx);
     (global as any).webkitOfflineAudioContext = (global as any).OfflineAudioContext;
     decoder = new WebAudioDecoder(src);
   });

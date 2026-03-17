@@ -8,8 +8,8 @@ if (typeof globalThis.structuredClone === "undefined") {
 
 import { getRoot, types } from "mobx-state-tree";
 
-jest.mock("../../../../utils/feature-flags", () => ({
-  isFF: jest.fn(() => false),
+vi.mock("../../../../utils/feature-flags", () => ({
+  isFF: vi.fn(() => false),
   FF_DEV_3377: "ff_dev_3377",
   FF_ZOOM_OPTIM: "ff_zoom_optim",
   FF_LSDV_4583: "ff_lsdv_4583",
@@ -17,24 +17,24 @@ jest.mock("../../../../utils/feature-flags", () => ({
 }));
 
 const mockManager = {
-  addTool: jest.fn(),
-  findSelectedTool: jest.fn(() => ({
+  addTool: vi.fn(),
+  findSelectedTool: vi.fn(() => ({
     useTransformer: false,
     canInteractWithRegions: true,
     toolName: "MoveTool",
-    updateCursor: jest.fn(),
+    updateCursor: vi.fn(),
     shouldSkipInteractions: undefined,
   })),
-  allTools: jest.fn(() => []),
-  event: jest.fn(),
+  allTools: vi.fn(() => []),
+  event: vi.fn(),
 };
 
-jest.mock("../../../../tools/Manager", () => ({
+vi.mock("../../../../tools/Manager", () => ({
   __esModule: true,
-  default: { getInstance: jest.fn(() => mockManager) },
+  default: { getInstance: vi.fn(() => mockManager) },
 }));
 
-jest.mock("../../../../tools", () => ({
+vi.mock("../../../../tools", () => ({
   Selection: { create: () => ({}) },
   Zoom: { create: () => ({}) },
   Brightness: { create: () => ({}) },
@@ -42,18 +42,18 @@ jest.mock("../../../../tools", () => ({
   Rotate: { create: () => ({}) },
 }));
 
-jest.mock("@humansignal/core", () => ({
+vi.mock("@humansignal/core", () => ({
   ff: { isActive: () => false },
   imageCache: {
-    get: jest.fn(() => null),
-    set: jest.fn(),
-    has: jest.fn(() => false),
-    isLoading: jest.fn(() => false),
-    getPendingLoad: jest.fn(() => null),
-    load: jest.fn(() => Promise.resolve({ blobUrl: "blob:mock" })),
-    releaseRef: jest.fn(),
-    forceRemove: jest.fn(),
-    addRef: jest.fn(),
+    get: vi.fn(() => null),
+    set: vi.fn(),
+    has: vi.fn(() => false),
+    isLoading: vi.fn(() => false),
+    getPendingLoad: vi.fn(() => null),
+    load: vi.fn(() => Promise.resolve({ blobUrl: "blob:mock" })),
+    releaseRef: vi.fn(),
+    forceRemove: vi.fn(),
+    addRef: vi.fn(),
   },
 }));
 
@@ -83,9 +83,9 @@ const MockAnnotation = types
     image: ImageModel,
   })
   .actions((self) => ({
-    addRegion: jest.fn(),
-    reinitHistory: jest.fn(),
-    unselectAll: jest.fn(),
+    addRegion: vi.fn(),
+    reinitHistory: vi.fn(),
+    unselectAll: vi.fn(),
   }));
 
 const Root = types
@@ -163,7 +163,7 @@ describe("Image model", () => {
       useTransformer: false,
       canInteractWithRegions: true,
       toolName: "MoveTool",
-      updateCursor: jest.fn(),
+      updateCursor: vi.fn(),
       shouldSkipInteractions: undefined,
     });
     mockManager.allTools.mockReturnValue([]);
@@ -366,7 +366,7 @@ describe("Image model", () => {
     it("setCurrentImage no-ops when index unchanged", () => {
       const store = createStore();
       const image = store.annotation.image;
-      const spy = jest.spyOn(image, "preloadImages");
+      const spy = vi.spyOn(image, "preloadImages");
       image.setCurrentImage(0);
       expect(spy).not.toHaveBeenCalled();
       spy.mockRestore();
@@ -861,7 +861,7 @@ describe("Image model", () => {
         useTransformer: true,
         canInteractWithRegions: true,
         toolName: "MoveTool",
-        updateCursor: jest.fn(),
+        updateCursor: vi.fn(),
       });
       const store = createStore();
       expect(store.annotation.image.useTransformer).toBe(true);
@@ -874,7 +874,7 @@ describe("Image model", () => {
         toolName: "ZoomPanTool",
         useTransformer: false,
         canInteractWithRegions: true,
-        updateCursor: jest.fn(),
+        updateCursor: vi.fn(),
       });
       const store = createStore();
       expect(store.annotation.image.getSkipInteractions()).toBe(true);
@@ -1091,7 +1091,7 @@ describe("Image model", () => {
       mockManager.findSelectedTool.mockReturnValue({
         toolName: "MoveTool",
         canInteractWithRegions: false,
-        updateCursor: jest.fn(),
+        updateCursor: vi.fn(),
       });
       expect(image.getSkipInteractions()).toBe(false);
     });
@@ -1103,7 +1103,7 @@ describe("Image model", () => {
       mockManager.findSelectedTool.mockReturnValue({
         toolName: "MoveTool",
         canInteractWithRegions: false,
-        updateCursor: jest.fn(),
+        updateCursor: vi.fn(),
       });
       expect(image.getSkipInteractions()).toBe(true);
     });
@@ -1143,8 +1143,8 @@ describe("Image model", () => {
       mockManager.findSelectedTool.mockReturnValue({
         toolName: "MoveTool",
         canInteractWithRegions: true,
-        shouldSkipInteractions: jest.fn(() => true),
-        updateCursor: jest.fn(),
+        shouldSkipInteractions: vi.fn(() => true),
+        updateCursor: vi.fn(),
       });
       image.updateSkipInteractions({ evt: {} });
       expect(image.getSkipInteractions()).toBe(true);
@@ -1305,14 +1305,14 @@ describe("Image model", () => {
     it("returns false when activeStates has items and getAvailableStates is empty", () => {
       const store = createStoreWithStates([{ type: "rectanglelabels", isSelected: true }]);
       const image = store.annotation.image;
-      jest.spyOn(image, "getAvailableStates").mockReturnValue([]);
+      vi.spyOn(image, "getAvailableStates").mockReturnValue([]);
       expect(image.checkLabels()).toBe(false);
     });
 
     it("returns true when getAvailableStates has items", () => {
       const store = createStoreWithStates([{ type: "rectanglelabels", isSelected: true }]);
       const image = store.annotation.image;
-      jest.spyOn(image, "getAvailableStates").mockReturnValue([{ type: "rectanglelabels" }]);
+      vi.spyOn(image, "getAvailableStates").mockReturnValue([{ type: "rectanglelabels" }]);
       expect(image.checkLabels()).toBe(true);
     });
   });
@@ -1338,7 +1338,7 @@ describe("Image model", () => {
     it("calls setCurrentImage when region has item_index and multiImage is true", () => {
       const store = createStore();
       const image = store.annotation.image;
-      const setCurrentImageSpy = jest.spyOn(image, "setCurrentImage");
+      const setCurrentImageSpy = vi.spyOn(image, "setCurrentImage");
       image.afterRegionSelected({ item_index: 2 });
       // Without multiImage, setCurrentImage is not called for item_index
       expect(setCurrentImageSpy).not.toHaveBeenCalledWith(2);

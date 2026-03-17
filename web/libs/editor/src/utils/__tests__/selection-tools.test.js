@@ -429,7 +429,7 @@ describe("selection-tools", () => {
     });
 
     it("catches when boundarySelection throws (e.g. unsupported browser)", () => {
-      const consoleSpy = jest.spyOn(console, "warn").mockImplementation(() => {});
+      const consoleSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
       const doc = document.implementation.createHTMLDocument("");
       const text = doc.createTextNode("word");
       const range = doc.createRange();
@@ -513,7 +513,7 @@ describe("selection-tools", () => {
       const sel = window.getSelection();
       sel.removeAllRanges();
       sel.addRange(range);
-      const callback = jest.fn();
+      const callback = vi.fn();
       captureSelection(callback, { granularity: "symbol", window });
       expect(callback).toHaveBeenCalledTimes(1);
       expect(callback.mock.calls[0][0]).toMatchObject({ selectionText: "hello" });
@@ -533,7 +533,7 @@ describe("selection-tools", () => {
       const sel = window.getSelection();
       sel.removeAllRanges();
       sel.addRange(range);
-      const callback = jest.fn();
+      const callback = vi.fn();
       captureSelection(callback, { window });
       expect(callback).not.toHaveBeenCalled();
       sel.removeAllRanges();
@@ -551,8 +551,8 @@ describe("selection-tools", () => {
       const sel = window.getSelection();
       sel.removeAllRanges();
       sel.addRange(range);
-      const callback = jest.fn();
-      const beforeCleanup = jest.fn();
+      const callback = vi.fn();
+      const beforeCleanup = vi.fn();
       captureSelection(callback, { granularity: "symbol", window, beforeCleanup });
       expect(callback).toHaveBeenCalledTimes(1);
       expect(beforeCleanup).toHaveBeenCalledTimes(1);
@@ -568,7 +568,7 @@ describe("selection-tools", () => {
       doc.body.appendChild(root);
       const sel = createMockSelection(doc, text, 0, 5);
       const win = { getSelection: () => sel };
-      const callback = jest.fn();
+      const callback = vi.fn();
       captureSelection(callback, { granularity: "word", window: win });
       expect(callback).toHaveBeenCalledTimes(1);
       expect(callback.mock.calls[0][0].selectionText).toBeDefined();

@@ -1,10 +1,11 @@
 /**
  * Unit tests for Audio tag view (tags/object/Audio/view.tsx)
  */
+import React from "react";
 import { render, screen, fireEvent } from "@testing-library/react";
 import { Audio } from "../view";
 
-jest.mock("../../../../components/Timeline/Controls", () => {
+vi.mock("../../../../components/Timeline/Controls", () => {
   const MockControls = (props: any) => (
     <div data-testid="timeline-controls">
       <button type="button" aria-label="Step backward" onClick={props.onStepBackward}>
@@ -42,51 +43,51 @@ jest.mock("../../../../components/Timeline/Controls", () => {
   return { Controls: MockControls };
 });
 
-jest.mock("../../../../core/Hotkey", () => ({
-  Hotkey: jest.fn(() => ({
-    addNamed: jest.fn(),
-    unbindAll: jest.fn(),
+vi.mock("../../../../core/Hotkey", () => ({
+  Hotkey: vi.fn(() => ({
+    addNamed: vi.fn(),
+    unbindAll: vi.fn(),
   })),
 }));
 
-jest.mock("@humansignal/ui", () => ({
-  getCurrentTheme: jest.fn(() => "Light"),
+vi.mock("@humansignal/ui", () => ({
+  getCurrentTheme: vi.fn(() => "Light"),
 }));
 
-jest.mock("../../../../utils/feature-flags", () => ({
+vi.mock("../../../../utils/feature-flags", () => ({
   FF_AUDIO_SPECTROGRAMS: "FF_AUDIO_SPECTROGRAMS",
-  isFF: jest.fn(() => true),
+  isFF: vi.fn(() => true),
 }));
 
-jest.mock("../../../../lib/AudioUltra/hooks/useSpectrogramControls", () => ({
-  useSpectrogramControls: jest.fn(),
+vi.mock("../../../../lib/AudioUltra/hooks/useSpectrogramControls", () => ({
+  useSpectrogramControls: vi.fn(),
 }));
 
-jest.mock("@humansignal/core", () => ({
+vi.mock("@humansignal/core", () => ({
   ff: {
-    isActive: jest.fn(() => true),
+    isActive: vi.fn(() => true),
   },
 }));
 
-const mockSetVisibility = jest.fn();
-const mockGetLayer = jest.fn(() => ({ setVisibility: mockSetVisibility }));
-const mockLoad = jest.fn();
-const mockOn = jest.fn();
-const mockSeekBackward = jest.fn();
-const mockSeekForward = jest.fn();
-const mockSeek = jest.fn();
-const mockSyncCursor = jest.fn();
-const mockClearSegments = jest.fn();
-const mockRegionDrawableTarget = jest.fn();
-const mockSetDrawingColor = jest.fn();
-const mockSetLabels = jest.fn();
-const mockResetDrawableTarget = jest.fn();
-const mockResetDrawingColor = jest.fn();
-const mockResetLabels = jest.fn();
-const mockFindRegion = jest.fn(() => null);
-const mockHandleSelected = jest.fn();
+const mockSetVisibility = vi.fn();
+const mockGetLayer = vi.fn(() => ({ setVisibility: mockSetVisibility }));
+const mockLoad = vi.fn();
+const mockOn = vi.fn();
+const mockSeekBackward = vi.fn();
+const mockSeekForward = vi.fn();
+const mockSeek = vi.fn();
+const mockSyncCursor = vi.fn();
+const mockClearSegments = vi.fn();
+const mockRegionDrawableTarget = vi.fn();
+const mockSetDrawingColor = vi.fn();
+const mockSetLabels = vi.fn();
+const mockResetDrawableTarget = vi.fn();
+const mockResetDrawingColor = vi.fn();
+const mockResetLabels = vi.fn();
+const mockFindRegion = vi.fn(() => null);
+const mockHandleSelected = vi.fn();
 
-jest.mock("../../../../lib/AudioUltra/react", () => {
+vi.mock("../../../../lib/AudioUltra/react", () => {
   const React = require("react");
   return {
     useWaveform: (ref: any, options: any) => {
@@ -125,11 +126,11 @@ jest.mock("../../../../lib/AudioUltra/react", () => {
         duration: 10,
         amp: 1,
         layerVisibility: new Map(),
-        setPlaying: jest.fn(),
-        setVolume: jest.fn(),
-        setRate: jest.fn(),
-        setZoom: jest.fn(),
-        setAmp: jest.fn(),
+        setPlaying: vi.fn(),
+        setVolume: vi.fn(),
+        setRate: vi.fn(),
+        setZoom: vi.fn(),
+        setAmp: vi.fn(),
       };
     },
   };
@@ -162,43 +163,43 @@ const defaultItem = {
   muted: "false",
   isBuffering: false,
   wasPlayingBeforeBuffering: false,
-  handleBuffering: jest.fn(),
-  onLoad: jest.fn(),
+  handleBuffering: vi.fn(),
+  onLoad: vi.fn(),
   spectrogram: true,
-  onPlaying: jest.fn(),
-  onSeek: jest.fn(),
-  onRateChange: jest.fn(),
-  onError: jest.fn(),
-  setWFFrame: jest.fn(),
+  onPlaying: vi.fn(),
+  onSeek: vi.fn(),
+  onRateChange: vi.fn(),
+  onError: vi.fn(),
+  setWFFrame: vi.fn(),
   readonly: false,
-  getRegionColor: jest.fn(() => null),
+  getRegionColor: vi.fn(() => null),
   activeState: undefined,
   regs: [],
-  addRegion: jest.fn(),
-  updateRegion: jest.fn(),
+  addRegion: vi.fn(),
+  updateRegion: vi.fn(),
   annotationStore: {
     store: { settings: { showLabels: true } },
   },
   annotation: {
-    regionStore: { unselectAll: jest.fn(), toggleSelection: jest.fn() },
+    regionStore: { unselectAll: vi.fn(), toggleSelection: vi.fn() },
     isLinkingMode: false,
-    addLinkedRegion: jest.fn(),
-    stopLinkingMode: jest.fn(),
+    addLinkedRegion: vi.fn(),
+    stopLinkingMode: vi.fn(),
   },
   errors: undefined,
-  triggerSyncPlay: jest.fn(),
-  triggerSyncPause: jest.fn(),
+  triggerSyncPlay: vi.fn(),
+  triggerSyncPause: vi.fn(),
 };
 
 function getLastHotkeyInstance() {
   const { Hotkey } = require("../../../../core/Hotkey");
-  const results = (Hotkey as jest.Mock).mock?.results ?? [];
+  const results = (Hotkey as vi.Mock).mock?.results ?? [];
   return results[results.length - 1]?.value;
 }
 
 describe("Audio view", () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     mockFindRegion.mockReturnValue(null);
   });
 
@@ -333,7 +334,7 @@ describe("Audio view", () => {
     it("beforeRegionsDraw with regionColor and regionLabels calls setDrawingColor and setLabels", () => {
       const item = {
         ...defaultItem,
-        getRegionColor: jest.fn(() => "#ff0000"),
+        getRegionColor: vi.fn(() => "#ff0000"),
         activeState: { selectedValues: () => ["Label1"] },
       } as any;
       const regions = {
@@ -355,7 +356,7 @@ describe("Audio view", () => {
 
   describe("region callbacks", () => {
     it("regionCreated calls item.addRegion", () => {
-      const addRegion = jest.fn();
+      const addRegion = vi.fn();
       const item = { ...defaultItem, addRegion } as any;
       render(<Audio item={item} />);
       const createCb = mockOn.mock.calls.find((c: any[]) => c[0] === "regionCreated")?.[1];
@@ -365,7 +366,7 @@ describe("Audio view", () => {
     });
 
     it("regionUpdatedEnd calls item.updateRegion", () => {
-      const updateRegion = jest.fn();
+      const updateRegion = vi.fn();
       const item = { ...defaultItem, updateRegion } as any;
       render(<Audio item={item} />);
       const updateCb = mockOn.mock.calls.find((c: any[]) => c[0] === "regionUpdatedEnd")?.[1];
@@ -379,7 +380,7 @@ describe("Audio view", () => {
     it("region:delete callback calls clearSegments(false)", () => {
       render(<Audio item={defaultItem as any} />);
       const hotkey = getLastHotkeyInstance();
-      const deleteCb = (hotkey?.addNamed as jest.Mock)?.mock?.calls?.find((c: any[]) => c[0] === "region:delete")?.[1];
+      const deleteCb = (hotkey?.addNamed as vi.Mock)?.mock?.calls?.find((c: any[]) => c[0] === "region:delete")?.[1];
       expect(deleteCb).toBeDefined();
       deleteCb?.();
       expect(mockClearSegments).toHaveBeenCalledWith(false);
@@ -388,7 +389,7 @@ describe("Audio view", () => {
     it("region:delete-all callback calls clearSegments()", () => {
       render(<Audio item={defaultItem as any} />);
       const hotkey = getLastHotkeyInstance();
-      const deleteAllCb = (hotkey?.addNamed as jest.Mock)?.mock?.calls?.find(
+      const deleteAllCb = (hotkey?.addNamed as vi.Mock)?.mock?.calls?.find(
         (c: any[]) => c[0] === "region:delete-all",
       )?.[1];
       expect(deleteAllCb).toBeDefined();
@@ -408,7 +409,7 @@ describe("Audio view", () => {
 
   describe("selectRegion callback", () => {
     it("calls unselectAll when not growSelection", () => {
-      const unselectAll = jest.fn();
+      const unselectAll = vi.fn();
       const item = {
         ...defaultItem,
         annotation: { ...defaultItem.annotation, regionStore: { ...defaultItem.annotation.regionStore, unselectAll } },
@@ -422,11 +423,11 @@ describe("Audio view", () => {
     });
 
     it("calls toggleSelection when itemRegion is found", () => {
-      const toggleSelection = jest.fn();
+      const toggleSelection = vi.fn();
       const itemRegion = { id: "r1" };
       const item = {
         ...defaultItem,
-        annotation: { ...defaultItem.annotation, regionStore: { unselectAll: jest.fn(), toggleSelection } },
+        annotation: { ...defaultItem.annotation, regionStore: { unselectAll: vi.fn(), toggleSelection } },
         regs: [itemRegion],
         _ws: { ...defaultItem._ws, regions: { ...defaultItem._ws.regions, regions: [], findRegion: mockFindRegion } },
       } as any;
@@ -458,8 +459,8 @@ describe("Audio view", () => {
     });
 
     it("when isLinkingMode and itemRegion, calls addLinkedRegion and stopLinkingMode", () => {
-      const addLinkedRegion = jest.fn();
-      const stopLinkingMode = jest.fn();
+      const addLinkedRegion = vi.fn();
+      const stopLinkingMode = vi.fn();
       const itemRegion = { id: "r1" };
       const item = {
         ...defaultItem,
@@ -468,14 +469,14 @@ describe("Audio view", () => {
           isLinkingMode: true,
           addLinkedRegion,
           stopLinkingMode,
-          regionStore: { unselectAll: jest.fn(), toggleSelection: jest.fn() },
+          regionStore: { unselectAll: vi.fn(), toggleSelection: vi.fn() },
         },
         regs: [itemRegion],
         _ws: { ...defaultItem._ws, regions: { ...defaultItem._ws.regions, regions: [], findRegion: mockFindRegion } },
       } as any;
       render(<Audio item={item} />);
       const selectCb = mockOn.mock.calls.find((c: any[]) => c[0] === "regionSelected")?.[1];
-      const region = { id: "r1", selected: true, handleSelected: jest.fn() };
+      const region = { id: "r1", selected: true, handleSelected: vi.fn() };
       selectCb?.(region, { metaKey: false, ctrlKey: false } as MouseEvent);
       expect(addLinkedRegion).toHaveBeenCalledWith(itemRegion);
       expect(stopLinkingMode).toHaveBeenCalled();
@@ -483,7 +484,7 @@ describe("Audio view", () => {
     });
 
     it("does not call unselectAll when growSelection (metaKey) is true", () => {
-      const unselectAll = jest.fn();
+      const unselectAll = vi.fn();
       const item = {
         ...defaultItem,
         annotation: { ...defaultItem.annotation, regionStore: { ...defaultItem.annotation.regionStore, unselectAll } },
@@ -497,7 +498,7 @@ describe("Audio view", () => {
     });
 
     it("deselects other segments when not growSelection", () => {
-      const otherHandleSelected = jest.fn();
+      const otherHandleSelected = vi.fn();
       const regions = [
         { id: "r1", handleSelected: mockHandleSelected },
         { id: "r2", handleSelected: otherHandleSelected },
@@ -538,14 +539,14 @@ describe("Audio view", () => {
 
   describe("synced buffering play/pause", () => {
     it("when isBuffering, onPlay calls triggerSyncPlay", () => {
-      const triggerSyncPlay = jest.fn();
+      const triggerSyncPlay = vi.fn();
       const item = { ...defaultItem, isBuffering: true, triggerSyncPlay } as any;
       render(<Audio item={item} />);
       fireEvent.click(screen.getByText("Play"));
       expect(triggerSyncPlay).toHaveBeenCalledWith(true);
     });
     it("when isBuffering, onPause calls triggerSyncPause", () => {
-      const triggerSyncPause = jest.fn();
+      const triggerSyncPause = vi.fn();
       const item = { ...defaultItem, isBuffering: true, triggerSyncPause } as any;
       render(<Audio item={item} />);
       fireEvent.click(screen.getByText("Pause"));
@@ -564,10 +565,10 @@ describe("Audio view", () => {
   describe("dark theme", () => {
     it("uses dark theme colors when getCurrentTheme returns Dark", () => {
       const getCurrentTheme = require("@humansignal/ui").getCurrentTheme;
-      (getCurrentTheme as jest.Mock).mockReturnValue("Dark");
+      (getCurrentTheme as vi.Mock).mockReturnValue("Dark");
       render(<Audio item={defaultItem as any} />);
       expect(screen.getByTestId("timeline-controls")).toBeInTheDocument();
-      (getCurrentTheme as jest.Mock).mockReturnValue("Light");
+      (getCurrentTheme as vi.Mock).mockReturnValue("Light");
     });
   });
 });

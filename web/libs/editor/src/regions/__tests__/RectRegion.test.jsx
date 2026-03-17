@@ -3,9 +3,11 @@
  * View coverage is largely from Cypress; these tests cover model logic.
  */
 import { getRoot, types } from "mobx-state-tree";
+import { mockFF } from "../../../__mocks__/global";
+import { FF_ZOOM_OPTIM } from "../../utils/feature-flags";
 
 const rectPropsRef = { current: null };
-jest.mock("react-konva", () => {
+vi.mock("react-konva", () => {
   const React = require("react");
   return {
     Rect: (props) => {
@@ -15,46 +17,41 @@ jest.mock("react-konva", () => {
   };
 });
 
-jest.mock("../../utils/feature-flags", () => ({
-  isFF: jest.fn(() => false),
-  FF_ZOOM_OPTIM: "ff_zoom_optim",
-}));
-
-jest.mock("../../hooks/useRegionColor", () => ({
-  useRegionStyles: jest.fn(() => ({
+vi.mock("../../hooks/useRegionColor", () => ({
+  useRegionStyles: vi.fn(() => ({
     fillColor: "#ff8800",
     strokeColor: "#000",
     strokeWidth: 1,
   })),
 }));
 
-jest.mock("../../components/ImageView/ImageViewContext", () => ({
+vi.mock("../../components/ImageView/ImageViewContext", () => ({
   ImageViewContext: require("react").createContext({ suggestion: null }),
 }));
 
-jest.mock("../RegionWrapper", () => ({
+vi.mock("../RegionWrapper", () => ({
   RegionWrapper: ({ children }) => require("react").createElement("div", { "data-testid": "region-wrapper" }, children),
 }));
 
-jest.mock("../../components/ImageView/LabelOnRegion", () => ({
+vi.mock("../../components/ImageView/LabelOnRegion", () => ({
   LabelOnRect: () => require("react").createElement("div", { "data-testid": "label-on-rect" }),
 }));
 
-jest.mock("../../utils/image", () => ({
-  createDragBoundFunc: jest.fn(() => () => ({ x: 0, y: 0 })),
+vi.mock("../../utils/image", () => ({
+  createDragBoundFunc: vi.fn(() => () => ({ x: 0, y: 0 })),
 }));
 
-jest.mock("konva", () => {
+vi.mock("konva", () => {
   return {
-    Transform: jest.fn().mockImplementation(function () {
-      this.rotate = jest.fn();
-      this.point = jest.fn((p) => ({ x: p.x, y: p.y }));
+    Transform: vi.fn().mockImplementation(function () {
+      this.rotate = vi.fn();
+      this.point = vi.fn((p) => ({ x: p.x, y: p.y }));
       return this;
     }),
   };
 });
 
-jest.mock("../../tags/object/Image", () => {
+vi.mock("../../tags/object/Image", () => {
   const { types } = require("mobx-state-tree");
   return {
     ImageModel: types
@@ -192,12 +189,15 @@ const RootWithControl = types
     },
   }));
 
+const ff = mockFF();
+
 describe("RectRegion", () => {
   let root;
   let region;
 
   beforeEach(() => {
     rectPropsRef.current = null;
+    ff.setup();
     root = TestRoot.create({
       image: { id: "img1" },
       region: {
@@ -213,6 +213,10 @@ describe("RectRegion", () => {
       },
     });
     region = root.region;
+  });
+
+  afterEach(() => {
+    ff.reset();
   });
 
   describe("RectRegionModel", () => {
@@ -350,7 +354,7 @@ describe("RectRegion", () => {
     });
 
     it("setPosition with control.snap pixel uses getSnappedPoint and setPositionInternal", () => {
-      const getSnappedPoint = jest.fn((p) => ({ x: Math.round(p.x), y: Math.round(p.y) }));
+      const getSnappedPoint = vi.fn((p) => ({ x: Math.round(p.x), y: Math.round(p.y) }));
       const rootWithControl = RootWithControl.create({
         image: { id: "img1" },
         region: {
@@ -452,7 +456,7 @@ describe("RectRegion", () => {
     });
 
     it("setPosition with snap pixel clamps width and height to min pixel size", () => {
-      const getSnappedPoint = jest.fn((p) => {
+      const getSnappedPoint = vi.fn((p) => {
         if (p.x === 10 && p.y === 20) return { x: 10, y: 20 };
         return { x: 10, y: 20 };
       });
@@ -498,7 +502,7 @@ describe("RectRegion", () => {
     it("renders Rect and RegionWrapper when item has parent and inViewPort", () => {
       root.setAnnotation({
         regionStore: { isSelected: () => false },
-        history: { freeze: jest.fn(), unfreeze: jest.fn() },
+        history: { freeze: vi.fn(), unfreeze: vi.fn() },
         isReadOnly: () => false,
         isDrawing: false,
       });
@@ -514,7 +518,7 @@ describe("RectRegion", () => {
     it("renders with suggestion (dash and listening branches)", () => {
       root.setAnnotation({
         regionStore: { isSelected: () => false },
-        history: { freeze: jest.fn(), unfreeze: jest.fn() },
+        history: { freeze: vi.fn(), unfreeze: vi.fn() },
         isReadOnly: () => false,
         isDrawing: false,
       });
@@ -527,11 +531,10 @@ describe("RectRegion", () => {
     });
 
     it("returns null when inViewPort is false (FF_ZOOM_OPTIM on, object has no viewPortBBoxCoords)", () => {
-      const { isFF } = require("../../utils/feature-flags");
-      isFF.mockReturnValue(true);
+      ff.set({ [FF_ZOOM_OPTIM]: true });
       root.setAnnotation({
         regionStore: { isSelected: () => false },
-        history: { freeze: jest.fn(), unfreeze: jest.fn() },
+        history: { freeze: vi.fn(), unfreeze: vi.fn() },
         isReadOnly: () => false,
         isDrawing: false,
       });
@@ -541,15 +544,14 @@ describe("RectRegion", () => {
         </ImageViewContext.Provider>,
       );
       expect(container.firstChild).toBeNull();
-      isFF.mockReturnValue(false);
     });
 
     it("onTransformEnd updates region and calls notifyDrawingFinished", () => {
-      const notifyDrawingFinished = jest.fn();
+      const notifyDrawingFinished = vi.fn();
       region.notifyDrawingFinished = notifyDrawingFinished;
       root.setAnnotation({
         regionStore: { isSelected: () => false },
-        history: { freeze: jest.fn(), unfreeze: jest.fn() },
+        history: { freeze: vi.fn(), unfreeze: vi.fn() },
         isReadOnly: () => false,
         isDrawing: false,
       });
@@ -566,8 +568,8 @@ describe("RectRegion", () => {
           if (k === "rotation") return 0;
           return 10;
         },
-        setAttr: jest.fn(),
-        position: jest.fn(),
+        setAttr: vi.fn(),
+        position: vi.fn(),
       };
       props.onTransformEnd({ target: mockTarget });
       expect(region.x).toBe(10);
@@ -580,7 +582,7 @@ describe("RectRegion", () => {
     it("onTransform resets skew on target", () => {
       root.setAnnotation({
         regionStore: { isSelected: () => false },
-        history: { freeze: jest.fn(), unfreeze: jest.fn() },
+        history: { freeze: vi.fn(), unfreeze: vi.fn() },
         isReadOnly: () => false,
         isDrawing: false,
       });
@@ -590,15 +592,15 @@ describe("RectRegion", () => {
         </ImageViewContext.Provider>,
       );
       const props = rectPropsRef.current;
-      const mockTarget = { setAttr: jest.fn() };
+      const mockTarget = { setAttr: vi.fn() };
       props.onTransform({ target: mockTarget });
       expect(mockTarget.setAttr).toHaveBeenCalledWith("skewX", 0);
       expect(mockTarget.setAttr).toHaveBeenCalledWith("skewY", 0);
     });
 
     it("onDragStart freezes history and onDragEnd unfreezes and updates region", () => {
-      const freeze = jest.fn();
-      const unfreeze = jest.fn();
+      const freeze = vi.fn();
+      const unfreeze = vi.fn();
       root.setAnnotation({
         regionStore: { isSelected: () => false },
         history: { freeze, unfreeze },
@@ -611,10 +613,10 @@ describe("RectRegion", () => {
         </ImageViewContext.Provider>,
       );
       const props = rectPropsRef.current;
-      props.onDragStart({ currentTarget: { stopDrag: jest.fn() }, evt: {} });
+      props.onDragStart({ currentTarget: { stopDrag: vi.fn() }, evt: {} });
       expect(freeze).toHaveBeenCalledWith(region.id);
-      const mockTarget = { getAttr: (k) => (k === "scaleX" || k === "scaleY" ? 1 : 15), position: jest.fn() };
-      region.notifyDrawingFinished = jest.fn();
+      const mockTarget = { getAttr: (k) => (k === "scaleX" || k === "scaleY" ? 1 : 15), position: vi.fn() };
+      region.notifyDrawingFinished = vi.fn();
       props.onDragEnd({ target: mockTarget });
       expect(region.x).toBe(15);
       expect(region.y).toBe(15);
@@ -625,10 +627,10 @@ describe("RectRegion", () => {
     });
 
     it("onTransformEnd with isFlipped sets rotation on target", () => {
-      region.notifyDrawingFinished = jest.fn();
+      region.notifyDrawingFinished = vi.fn();
       root.setAnnotation({
         regionStore: { isSelected: () => false },
-        history: { freeze: jest.fn(), unfreeze: jest.fn() },
+        history: { freeze: vi.fn(), unfreeze: vi.fn() },
         isReadOnly: () => false,
         isDrawing: false,
       });
@@ -638,11 +640,11 @@ describe("RectRegion", () => {
         </ImageViewContext.Provider>,
       );
       const props = rectPropsRef.current;
-      const setAttr = jest.fn();
+      const setAttr = vi.fn();
       const mockTarget = {
         getAttr: (k) => (k === "scaleY" ? -1 : k === "rotation" ? 0 : 5),
         setAttr,
-        position: jest.fn(),
+        position: vi.fn(),
       };
       props.onTransformEnd({ target: mockTarget });
       expect(setAttr).toHaveBeenCalledWith("rotation", region.rotation);

@@ -1,9 +1,10 @@
+import React from "react";
 import { render, fireEvent } from "@testing-library/react";
 import { Provider } from "mobx-react";
 import { Controls } from "../Controls";
 
-jest.mock("@humansignal/ui", () => {
-  const { forwardRef } = jest.requireActual("react");
+vi.mock("@humansignal/ui", async () => {
+  const { forwardRef } = await vi.importActual<typeof import("react")>("react");
   return {
     Button: forwardRef(({ children, disabled, ...props }: any, ref: any) => {
       return (
@@ -24,13 +25,13 @@ jest.mock("@humansignal/ui", () => {
 
 const createMockStore = (overrides: any = {}) => ({
   task: { id: 1, allow_skip: true, ...overrides.task },
-  skipTask: jest.fn(),
+  skipTask: vi.fn(),
   isSubmitting: false,
   settings: {
     enableTooltips: true,
     ...overrides.settings,
   },
-  hasInterface: jest.fn((name: string) => overrides.interfaces?.includes(name) ?? false),
+  hasInterface: vi.fn((name: string) => overrides.interfaces?.includes(name) ?? false),
   annotationStore: {
     selectedHistory: undefined,
     selected: {
@@ -41,14 +42,14 @@ const createMockStore = (overrides: any = {}) => ({
     ...overrides.annotationStore,
   },
   commentStore: {
-    commentFormSubmit: jest.fn(),
+    commentFormSubmit: vi.fn(),
     addedCommentThisSession: false,
     currentComment: {},
     inputRef: { current: null },
-    setTooltipMessage: jest.fn(),
+    setTooltipMessage: vi.fn(),
     ...overrides.commentStore,
   },
-  rejectAnnotation: jest.fn(),
+  rejectAnnotation: vi.fn(),
   ...overrides,
 });
 
@@ -66,7 +67,7 @@ const setupAppSettings = (options: { role?: string; enterprise?: boolean } = {})
 
 describe("TopBar Controls", () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     // Reset APP_SETTINGS before each test
     (window as any).APP_SETTINGS = undefined;
   });

@@ -1,13 +1,13 @@
-import type React from "react";
+import React from "react";
 import { fireEvent, render, screen } from "@testing-library/react";
 import TreeStructure, { type RowItem } from "./TreeStructure";
 
-const mockResetAfterIndex = jest.fn();
+const mockResetAfterIndex = vi.fn();
 const mockOffsetHeight = 200;
 const mockOffsetWidth = 150;
 const mockClientWidth = 150;
 
-jest.mock("react-window", () => {
+vi.mock("react-window", () => {
   const R = require("react");
   return {
     VariableSizeList: R.forwardRef(

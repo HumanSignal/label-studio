@@ -1,14 +1,15 @@
 /**
  * Unit tests for Choice tag (tags/control/Choice.jsx)
  */
+import React from "react";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { Provider } from "mobx-react";
 import { ChoiceModel, HtxChoice } from "../Choice";
 import { ChoicesModel } from "../Choices";
 
-jest.mock("../../../core/Tree", () => {
-  const actual = jest.requireActual("../../../core/Tree").default;
+vi.mock("../../../core/Tree", async () => {
+  const actual = (await vi.importActual("../../../core/Tree")).default;
   return {
     ...actual,
     cssConverter: (style) => {
@@ -320,7 +321,7 @@ describe("HtxChoice view", () => {
       parent: { layout: "vertical" },
       nestedResults: false,
       children: [],
-      toggleSelected: jest.fn(),
+      toggleSelected: vi.fn(),
       annotation: null,
       ...overrides,
     };
@@ -342,7 +343,7 @@ describe("HtxChoice view", () => {
 
   it("calls toggleSelected when checkbox is clicked", async () => {
     const user = userEvent.setup();
-    const toggleSelected = jest.fn();
+    const toggleSelected = vi.fn();
     const item = createMockItem({ _value: "Click me", toggleSelected });
     const store = createMockStore();
     render(
@@ -391,7 +392,7 @@ describe("HtxChoice view", () => {
 
   it("does not call toggleSelected when readonly and clicked", async () => {
     const user = userEvent.setup();
-    const toggleSelected = jest.fn();
+    const toggleSelected = vi.fn();
     const item = createMockItem({ _value: "R", isReadOnly: () => true, toggleSelected });
     const store = createMockStore();
     render(

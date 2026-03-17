@@ -1,23 +1,23 @@
-jest.mock("../../../utils/feature-flags", () => ({
-  isFF: () => false,
+vi.mock("../../../utils/feature-flags", () => ({
+  isFF: vi.fn(() => false),
   FF_DEV_3391: "fflag_fix_front_dev_3391_interactive_view_all",
   FF_SIMPLE_INIT: "fflag_fix_front_leap_443_select_annotation_once",
 }));
 
-jest.mock("../../../core/Hotkey", () => {
-  const addNamed = jest.fn();
-  const removeNamed = jest.fn();
+vi.mock("../../../core/Hotkey", () => {
+  const addNamed = vi.fn();
+  const removeNamed = vi.fn();
   const instance = { addNamed, removeNamed };
   const Hotkey = () => instance;
   Hotkey._testInstance = instance;
   return { Hotkey };
 });
 
-jest.mock("../../../tools/Manager", () => ({
+vi.mock("../../../tools/Manager", () => ({
   __esModule: true,
   default: {
     getInstance: () => ({
-      addToolsFromControl: jest.fn(),
+      addToolsFromControl: vi.fn(),
     }),
   },
 }));
@@ -27,7 +27,7 @@ let Store;
 let HotkeyMock;
 
 beforeAll(() => {
-  jest.resetModules();
+  vi.resetModules();
   const { types } = require("mobx-state-tree");
   const Polygon = require("../Polygon");
   PolygonModel = Polygon.PolygonModel;
@@ -45,8 +45,8 @@ beforeAll(() => {
     .volatile(() => ({
       selected: true,
       isDrawing: true,
-      undo: jest.fn(),
-      redo: jest.fn(),
+      undo: vi.fn(),
+      redo: vi.fn(),
     }));
 
   Store = types.model("Store", {

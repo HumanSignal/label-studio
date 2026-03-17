@@ -11,39 +11,40 @@ import React from "react";
 import { render, screen } from "@testing-library/react";
 import { types } from "mobx-state-tree";
 
-jest.mock("chroma-js", () => {
+vi.mock("chroma-js", () => {
   const hex = (c) => (c && typeof c === "string" ? c : "#000000");
   return (c) => ({ hex: () => hex(c) });
 });
 
-const mockDrawMask = jest.fn(() => ({ data: new Uint8Array(0) }));
-const mockGetTransformedImageData = jest.fn(() => [null, { width: 100, height: 100 }]);
-const mockGetActualZoomingPosition = jest.fn(() => [0, 0]);
-const mockMask2DataURL = jest.fn(() => "data:image/png;base64,mock");
-const mockGuidGenerator = jest.fn(() => "test-guid");
+const mockDrawMask = vi.fn(() => ({ data: new Uint8Array(0) }));
+const mockGetTransformedImageData = vi.fn(() => [null, { width: 100, height: 100 }]);
+const mockGetActualZoomingPosition = vi.fn(() => [0, 0]);
+const mockMask2DataURL = vi.fn(() => "data:image/png;base64,mock");
+const mockGuidGenerator = vi.fn(() => "test-guid");
 
-jest.mock("../../utils/image", () => ({
+vi.mock("../../utils/image", () => ({
   getTransformedImageData: (...args) => mockGetTransformedImageData(...args),
   getActualZoomingPosition: (...args) => mockGetActualZoomingPosition(...args),
 }));
-jest.mock("../../utils/magic-wand", () => ({
+vi.mock("../../utils/magic-wand", () => ({
   drawMask: (...args) => mockDrawMask(...args),
 }));
-jest.mock("../../utils/canvas", () => ({
+vi.mock("../../utils/canvas", () => ({
   __esModule: true,
   default: {
     mask2DataURL: (...args) => mockMask2DataURL(...args),
   },
 }));
-jest.mock("../../core/Helpers", () => ({
+vi.mock("../../core/Helpers", () => ({
   guidGenerator: (...args) => mockGuidGenerator(...args),
 }));
-jest.mock("../../utils/feature-flags", () => ({
-  isFF: jest.fn(() => false),
+vi.mock("../../utils/feature-flags", () => ({
+  isFF: vi.fn(() => false),
+  FF_SIMPLE_INIT: "fflag_fix_front_leap_443_select_annotation_once",
 }));
 
-jest.mock("mobx-state-tree", () => {
-  const actual = jest.requireActual("mobx-state-tree");
+vi.mock("mobx-state-tree", async () => {
+  const actual = await vi.importActual("mobx-state-tree");
   const origGetRoot = actual.getRoot;
   return {
     ...actual,
@@ -62,7 +63,7 @@ if (typeof HTMLImageElement !== "undefined" && !HTMLImageElement.prototype.decod
 }
 
 const MockIcon = () => React.createElement("span", { "data-testid": "magic-wand-icon" });
-jest.mock("@humansignal/icons", () => ({
+vi.mock("@humansignal/icons", () => ({
   IconMagicWandTool: MockIcon,
 }));
 
@@ -72,14 +73,14 @@ const MockTool = ({ label, ariaLabel, onClick }) =>
     { type: "button", "data-testid": "magic-wand-tool", "aria-label": ariaLabel, onClick },
     label,
   );
-jest.mock("../../components/Toolbar/Tool", () => ({ Tool: MockTool }));
+vi.mock("../../components/Toolbar/Tool", () => ({ Tool: MockTool }));
 
 const { MagicWand } = require("../MagicWand");
 
 function createMockManager() {
   return {
     name: "image",
-    selectTool: jest.fn(),
+    selectTool: vi.fn(),
     root: null,
   };
 }
@@ -121,12 +122,12 @@ function createMockImageObj(overrides = {}) {
     annotation: null,
     states: () => [],
     activeStates: () => [],
-    deleteDrawingRegion: jest.fn(),
-    createDrawingRegion: jest.fn((opts, resultValue, control, isDynamic) => ({
+    deleteDrawingRegion: vi.fn(),
+    createDrawingRegion: vi.fn((opts, resultValue, control, isDynamic) => ({
       id: "drawing-region-id",
-      setDrawing: jest.fn(),
+      setDrawing: vi.fn(),
       results: [{ value: { toJSON: () => ({}) } }],
-      notifyDrawingFinished: jest.fn(),
+      notifyDrawingFinished: vi.fn(),
     })),
     ...overrides,
   };
@@ -135,14 +136,14 @@ function createMockImageObj(overrides = {}) {
 function createMockAnnotation(overrides = {}) {
   const mockNewRegion = {
     id: "new-region-id",
-    notifyDrawingFinished: jest.fn(),
+    notifyDrawingFinished: vi.fn(),
   };
   return {
-    createResult: jest.fn(() => mockNewRegion),
-    history: { freeze: jest.fn(), unfreeze: jest.fn(), onUpdate: jest.fn(() => () => {}) },
+    createResult: vi.fn(() => mockNewRegion),
+    history: { freeze: vi.fn(), unfreeze: vi.fn(), onUpdate: vi.fn(() => () => {}) },
     isReadOnly: () => false,
-    setIsDrawing: jest.fn(),
-    selectArea: jest.fn(),
+    setIsDrawing: vi.fn(),
+    selectArea: vi.fn(),
     highlightedNode: null,
     ...overrides,
   };
@@ -155,7 +156,7 @@ describe("MagicWand tool", () => {
   let annotation;
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     mockGetTransformedImageData.mockReturnValue([null, { width: 100, height: 100 }]);
     mockDrawMask.mockReturnValue({ data: new Uint8Array(0) });
     mockGetActualZoomingPosition.mockReturnValue([0, 0]);
@@ -168,8 +169,8 @@ describe("MagicWand tool", () => {
     annotation = createMockAnnotation();
     control.annotation = annotation;
     obj.annotation = {
-      selectArea: jest.fn(),
-      setIsDrawing: jest.fn(),
+      selectArea: vi.fn(),
+      setIsDrawing: vi.fn(),
     };
     control.__mockRoot = { annotationStore: { selected: annotation }, settings: {} };
     obj.__mockRoot = { annotationStore: { selected: annotation }, settings: {} };
@@ -304,7 +305,7 @@ describe("MagicWand tool", () => {
   describe("initCache", () => {
     it("creates new cachedNaturalCanvas when existingRegion is null (via mousedownEv)", () => {
       const tool = createMagicWand();
-      tool.getEventCoords = jest.fn(() => [5, 5, 5, 5]);
+      tool.getEventCoords = vi.fn(() => [5, 5, 5, 5]);
       const ev = { offsetX: 5, offsetY: 5, screenX: 5, screenY: 5 };
       tool.mousedownEv(ev);
       expect(tool.isFirstWand).toBe(true);
@@ -317,7 +318,7 @@ describe("MagicWand tool", () => {
   describe("invalidateCache", () => {
     it("resets cachedNaturalCanvas and isFirstWand", () => {
       const tool = createMagicWand();
-      tool.getEventCoords = jest.fn(() => [5, 5, 5, 5]);
+      tool.getEventCoords = vi.fn(() => [5, 5, 5, 5]);
       tool.mousedownEv({ offsetX: 5, offsetY: 5, screenX: 5, screenY: 5 });
       const prevCanvas = tool.cachedNaturalCanvas;
       tool.invalidateCache();
@@ -331,12 +332,12 @@ describe("MagicWand tool", () => {
 
   describe("keydownEv", () => {
     it("on Escape sets mode to viewing and removes listener", () => {
-      const removeSpy = jest.spyOn(window, "removeEventListener");
+      const removeSpy = vi.spyOn(window, "removeEventListener");
       const tool = createMagicWand();
-      tool.getEventCoords = jest.fn(() => [5, 5, 5, 5]);
+      tool.getEventCoords = vi.fn(() => [5, 5, 5, 5]);
       tool.mousedownEv({ offsetX: 5, offsetY: 5, screenX: 5, screenY: 5 });
       expect(tool.mode).toBe("drawing");
-      const ev = { key: "Escape", preventDefault: jest.fn(), stopPropagation: jest.fn() };
+      const ev = { key: "Escape", preventDefault: vi.fn(), stopPropagation: vi.fn() };
       tool.keydownEv(ev);
       expect(tool.mode).toBe("viewing");
       expect(removeSpy).toHaveBeenCalledWith("keydown", expect.any(Function), true);
@@ -346,7 +347,7 @@ describe("MagicWand tool", () => {
 
     it("ignores non-Escape key", () => {
       const tool = createMagicWand();
-      tool.getEventCoords = jest.fn(() => [5, 5, 5, 5]);
+      tool.getEventCoords = vi.fn(() => [5, 5, 5, 5]);
       tool.mousedownEv({ offsetX: 5, offsetY: 5, screenX: 5, screenY: 5 });
       tool.keydownEv({ key: "Enter" });
       expect(tool.mode).toBe("drawing");
@@ -356,17 +357,17 @@ describe("MagicWand tool", () => {
   describe("mousemoveEv", () => {
     it("does nothing when mode is not drawing", () => {
       const tool = createMagicWand();
-      tool.threshold = jest.fn();
+      tool.threshold = vi.fn();
       tool.mousemoveEv({ offsetX: 5, offsetY: 5, screenX: 10, screenY: 10 });
       expect(tool.threshold).not.toHaveBeenCalled();
     });
 
     it("calls threshold when mode is drawing", () => {
       const tool = createMagicWand();
-      tool.getEventCoords = jest.fn(() => [5, 5, 5, 5]);
+      tool.getEventCoords = vi.fn(() => [5, 5, 5, 5]);
       tool.mousedownEv({ offsetX: 5, offsetY: 5, screenX: 5, screenY: 5 });
-      tool.getEventCoords = jest.fn(() => [5, 5, 10, 10]);
-      tool.threshold = jest.fn();
+      tool.getEventCoords = vi.fn(() => [5, 5, 10, 10]);
+      tool.threshold = vi.fn();
       tool.mousemoveEv({ offsetX: 5, offsetY: 5, screenX: 10, screenY: 10 });
       expect(tool.threshold).toHaveBeenCalledWith(10, 10, tool.fillcolor, tool.opacity);
     });
@@ -375,7 +376,7 @@ describe("MagicWand tool", () => {
   describe("threshold", () => {
     it("does nothing when new position equals anchor", () => {
       const tool = createMagicWand();
-      tool.getEventCoords = jest.fn(() => [5, 5, 5, 5]);
+      tool.getEventCoords = vi.fn(() => [5, 5, 5, 5]);
       tool.mousedownEv({ offsetX: 5, offsetY: 5, screenX: 5, screenY: 5 });
       mockDrawMask.mockClear();
       tool.threshold(5, 5);
@@ -384,7 +385,7 @@ describe("MagicWand tool", () => {
 
     it("updates threshold and calls drawMask when position differs", () => {
       const tool = createMagicWand();
-      tool.getEventCoords = jest.fn(() => [5, 5, 5, 5]);
+      tool.getEventCoords = vi.fn(() => [5, 5, 5, 5]);
       tool.mousedownEv({ offsetX: 5, offsetY: 5, screenX: 0, screenY: 0 });
       mockDrawMask.mockClear();
       tool.threshold(100, 0);
@@ -394,7 +395,7 @@ describe("MagicWand tool", () => {
 
     it("clamps threshold to 1 and 255", () => {
       const tool = createMagicWand();
-      tool.getEventCoords = jest.fn(() => [5, 5, 5, 5]);
+      tool.getEventCoords = vi.fn(() => [5, 5, 5, 5]);
       tool.mousedownEv({ offsetX: 5, offsetY: 5, screenX: 0, screenY: 0 });
       tool.threshold(-1000, -1000);
       expect(tool.currentThreshold).toBeGreaterThanOrEqual(1);
@@ -406,7 +407,7 @@ describe("MagicWand tool", () => {
   describe("initCurrentRegion", () => {
     it("creates new drawing region when isFirstWand (via mousedownEv)", () => {
       const tool = createMagicWand();
-      tool.getEventCoords = jest.fn(() => [5, 5, 5, 5]);
+      tool.getEventCoords = vi.fn(() => [5, 5, 5, 5]);
       tool.mousedownEv({ offsetX: 5, offsetY: 5, screenX: 5, screenY: 5 });
       expect(obj.createDrawingRegion).toHaveBeenCalled();
       expect(tool.currentRegion).toBeDefined();
@@ -417,7 +418,7 @@ describe("MagicWand tool", () => {
   describe("copyTransformedMaskToNaturalSize", () => {
     it("runs without throwing and returns cachedNaturalCanvas.toDataURL()", () => {
       const tool = createMagicWand();
-      tool.getEventCoords = jest.fn(() => [5, 5, 5, 5]);
+      tool.getEventCoords = vi.fn(() => [5, 5, 5, 5]);
       tool.mousedownEv({ offsetX: 5, offsetY: 5, screenX: 5, screenY: 5 });
       const blitImg = document.createElement("img");
       blitImg.src = "data:image/png;base64,mock";
@@ -429,11 +430,11 @@ describe("MagicWand tool", () => {
   describe("finalMaskToRegion and commitDrawingRegion (via mouseupEv flow)", () => {
     it("full mousedown then mouseup commits region and selects it", async () => {
       const tool = createMagicWand();
-      tool.getEventCoords = jest.fn(() => [5, 5, 5, 5]);
+      tool.getEventCoords = vi.fn(() => [5, 5, 5, 5]);
       const ev = { offsetX: 5, offsetY: 5, screenX: 5, screenY: 5 };
       tool.mousedownEv(ev);
       expect(tool.mode).toBe("drawing");
-      const removeSpy = jest.spyOn(window, "removeEventListener");
+      const removeSpy = vi.spyOn(window, "removeEventListener");
       const promise = tool.mouseupEv();
       expect(removeSpy).toHaveBeenCalledWith("keydown", expect.any(Function), true);
       expect(tool.mode).toBe("viewing");
@@ -449,7 +450,7 @@ describe("MagicWand tool", () => {
 
   describe("mousedownEv", () => {
     it("sets mode to viewing and alerts when image has rotation", () => {
-      const alertSpy = jest.spyOn(window, "alert").mockImplementation(() => {});
+      const alertSpy = vi.spyOn(window, "alert").mockImplementation(() => {});
       obj.rotation = 90;
       const tool = createMagicWand();
       const ev = {
@@ -465,7 +466,7 @@ describe("MagicWand tool", () => {
     });
 
     it("sets mode to viewing and alerts when crosshair is on", () => {
-      const alertSpy = jest.spyOn(window, "alert").mockImplementation(() => {});
+      const alertSpy = vi.spyOn(window, "alert").mockImplementation(() => {});
       obj.crosshair = true;
       const tool = createMagicWand();
       const ev = { offsetX: 10, offsetY: 10, screenX: 10, screenY: 10 };
@@ -475,12 +476,12 @@ describe("MagicWand tool", () => {
     });
 
     it("starts drawing and calls initCanvas when no rotation and no crosshair", () => {
-      const addSpy = jest.spyOn(window, "addEventListener");
+      const addSpy = vi.spyOn(window, "addEventListener");
       const tool = createMagicWand();
-      tool.initCache = jest.fn();
-      tool.initCanvas = jest.fn();
-      tool.initCurrentRegion = jest.fn();
-      tool.getEventCoords = jest.fn(() => [5, 5, 5, 5]);
+      tool.initCache = vi.fn();
+      tool.initCanvas = vi.fn();
+      tool.initCurrentRegion = vi.fn();
+      tool.getEventCoords = vi.fn(() => [5, 5, 5, 5]);
       const ev = { offsetX: 5, offsetY: 5, screenX: 5, screenY: 5 };
       tool.mousedownEv(ev);
       expect(annotation.history.freeze).toHaveBeenCalled();
@@ -497,7 +498,7 @@ describe("MagicWand tool", () => {
   describe("mouseupEv", () => {
     it("does nothing when mode is viewing", async () => {
       const tool = createMagicWand();
-      tool.setupFinalMask = jest.fn();
+      tool.setupFinalMask = vi.fn();
       await tool.mouseupEv();
       expect(tool.setupFinalMask).not.toHaveBeenCalled();
     });

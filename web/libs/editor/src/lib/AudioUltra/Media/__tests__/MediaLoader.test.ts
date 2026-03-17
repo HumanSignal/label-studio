@@ -1,25 +1,25 @@
 /**
  * Unit tests for MediaLoader (lib/AudioUltra/Media/MediaLoader.ts)
  */
-jest.mock("../WaveformAudio", () => ({
-  WaveformAudio: jest.fn().mockImplementation(() => ({
-    sourceDecoded: jest.fn().mockResolvedValue(false),
-    initDecoder: jest.fn().mockResolvedValue(undefined),
-    decodeAudioData: jest.fn().mockResolvedValue(undefined),
+vi.mock("../WaveformAudio", () => ({
+  WaveformAudio: vi.fn().mockImplementation(() => ({
+    sourceDecoded: vi.fn().mockResolvedValue(false),
+    initDecoder: vi.fn().mockResolvedValue(undefined),
+    decodeAudioData: vi.fn().mockResolvedValue(undefined),
     duration: 0,
     sampleRate: 0,
-    setDurationWithoutDecoding: jest.fn(),
-    destroy: jest.fn(),
-    on: jest.fn(),
+    setDurationWithoutDecoding: vi.fn(),
+    destroy: vi.fn(),
+    on: vi.fn(),
   })),
 }));
 
 import { MediaLoader } from "../MediaLoader";
 
-const mockInvoke = jest.fn();
-const mockSetError = jest.fn();
-const mockSetLoadingProgress = jest.fn();
-const mockSetDecodingProgress = jest.fn();
+const mockInvoke = vi.fn();
+const mockSetError = vi.fn();
+const mockSetLoadingProgress = vi.fn();
+const mockSetDecodingProgress = vi.fn();
 
 function createMockWaveform(params: { decoderType?: string; playerType?: string; splitChannels?: boolean } = {}) {
   return {
@@ -37,27 +37,27 @@ function createMockWaveform(params: { decoderType?: string; playerType?: string;
 
 describe("MediaLoader", () => {
   let mockAudio: {
-    sourceDecoded: jest.Mock;
-    initDecoder: jest.Mock;
-    decodeAudioData: jest.Mock;
+    sourceDecoded: vi.Mock;
+    initDecoder: vi.Mock;
+    decodeAudioData: vi.Mock;
     duration: number;
     sampleRate: number;
-    setDurationWithoutDecoding: jest.Mock;
-    destroy: jest.Mock;
-    on: jest.Mock;
+    setDurationWithoutDecoding: vi.Mock;
+    destroy: vi.Mock;
+    on: vi.Mock;
   };
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     mockAudio = {
-      sourceDecoded: jest.fn().mockResolvedValue(false),
-      initDecoder: jest.fn().mockResolvedValue(undefined),
-      decodeAudioData: jest.fn().mockResolvedValue(undefined),
+      sourceDecoded: vi.fn().mockResolvedValue(false),
+      initDecoder: vi.fn().mockResolvedValue(undefined),
+      decodeAudioData: vi.fn().mockResolvedValue(undefined),
       duration: 10.5,
       sampleRate: 44100,
-      setDurationWithoutDecoding: jest.fn(),
-      destroy: jest.fn(),
-      on: jest.fn(),
+      setDurationWithoutDecoding: vi.fn(),
+      destroy: vi.fn(),
+      on: vi.fn(),
     };
   });
 
@@ -99,12 +99,12 @@ describe("MediaLoader", () => {
 
   describe("reset", () => {
     it("resets state and calls cancel", () => {
-      const cancel = jest.fn();
+      const cancel = vi.fn();
       const wf = createMockWaveform();
       const loader = new MediaLoader(wf as any, { src: "https://example.com/a.mp3" });
       (loader as any).cancel = cancel;
       (loader as any).loaded = true;
-      (loader as any).decoderResolve = jest.fn();
+      (loader as any).decoderResolve = vi.fn();
       (loader as any).decoderPromise = Promise.resolve();
       loader.reset();
       expect(cancel).toHaveBeenCalled();
@@ -157,7 +157,7 @@ describe("MediaLoader", () => {
     it("throws when createAnalyzer fails to allocate audio (decoder path)", async () => {
       const wf = createMockWaveform({ decoderType: "webaudio" });
       const loader = new MediaLoader(wf as any, { src: "https://example.com/a.mp3" });
-      const createSpy = jest.spyOn(MediaLoader.prototype as any, "createAnalyzer").mockReturnValue(undefined);
+      const createSpy = vi.spyOn(MediaLoader.prototype as any, "createAnalyzer").mockReturnValue(undefined);
       await expect(loader.load({})).rejects.toThrow("MediaLoader: Failed to allocate audio decoder");
       createSpy.mockRestore();
     });
@@ -166,7 +166,7 @@ describe("MediaLoader", () => {
       mockAudio.sourceDecoded.mockResolvedValue(true);
       const wf = createMockWaveform();
       const loader = new MediaLoader(wf as any, { src: "https://example.com/a.mp3" });
-      const createSpy = jest.spyOn(MediaLoader.prototype as any, "createAnalyzer").mockImplementation(function (
+      const createSpy = vi.spyOn(MediaLoader.prototype as any, "createAnalyzer").mockImplementation(function (
         this: any,
       ) {
         this.audio = mockAudio;
@@ -197,7 +197,7 @@ describe("MediaLoader with WaveformAudio", () => {
   const originalXHR = global.XMLHttpRequest;
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   afterEach(() => {
@@ -207,9 +207,9 @@ describe("MediaLoader with WaveformAudio", () => {
   it("load() full path: performRequest, initDecoder, decodeAudioData", async () => {
     const wf = createMockWaveform({ decoderType: "webaudio", splitChannels: false });
     const loader = new MediaLoader(wf as any, { src: "https://example.com/audio.mp3" });
-    global.XMLHttpRequest = jest.fn().mockImplementation(function (this: any) {
-      this.open = jest.fn();
-      this.send = jest.fn().mockImplementation(() => {
+    global.XMLHttpRequest = vi.fn().mockImplementation(function (this: any) {
+      this.open = vi.fn();
+      this.send = vi.fn().mockImplementation(() => {
         setTimeout(() => {
           if (this.onprogress) {
             this.onprogress({ lengthComputable: true, loaded: 100, total: 200 });
@@ -231,15 +231,15 @@ describe("MediaLoader with WaveformAudio", () => {
     }) as any;
 
     const audioInstance = {
-      sourceDecoded: jest.fn().mockResolvedValue(false),
-      initDecoder: jest.fn().mockResolvedValue(undefined),
-      decodeAudioData: jest.fn().mockResolvedValue(undefined),
+      sourceDecoded: vi.fn().mockResolvedValue(false),
+      initDecoder: vi.fn().mockResolvedValue(undefined),
+      decodeAudioData: vi.fn().mockResolvedValue(undefined),
       duration: 10.5,
       sampleRate: 44100,
-      destroy: jest.fn(),
-      on: jest.fn(),
+      destroy: vi.fn(),
+      on: vi.fn(),
     };
-    const createAnalyzerSpy = jest.spyOn(MediaLoader.prototype as any, "createAnalyzer").mockImplementation(function (
+    const createAnalyzerSpy = vi.spyOn(MediaLoader.prototype as any, "createAnalyzer").mockImplementation(function (
       this: any,
     ) {
       this.audio = audioInstance;
@@ -260,21 +260,21 @@ describe("MediaLoader with WaveformAudio", () => {
     const wf = createMockWaveform();
     const loader = new MediaLoader(wf as any, { src: "https://example.com/audio.mp3" });
     const audioInstance = {
-      sourceDecoded: jest.fn().mockResolvedValue(false),
-      initDecoder: jest.fn().mockResolvedValue(undefined),
-      decodeAudioData: jest.fn().mockResolvedValue(undefined),
+      sourceDecoded: vi.fn().mockResolvedValue(false),
+      initDecoder: vi.fn().mockResolvedValue(undefined),
+      decodeAudioData: vi.fn().mockResolvedValue(undefined),
       duration: 10.5,
-      destroy: jest.fn(),
-      on: jest.fn(),
+      destroy: vi.fn(),
+      on: vi.fn(),
     };
-    jest.spyOn(MediaLoader.prototype as any, "createAnalyzer").mockImplementation(function (this: any) {
+    vi.spyOn(MediaLoader.prototype as any, "createAnalyzer").mockImplementation(function (this: any) {
       this.audio = audioInstance;
       return audioInstance;
     });
 
-    global.XMLHttpRequest = jest.fn().mockImplementation(function (this: any) {
-      this.open = jest.fn();
-      this.send = jest.fn().mockImplementation(() => {
+    global.XMLHttpRequest = vi.fn().mockImplementation(function (this: any) {
+      this.open = vi.fn();
+      this.send = vi.fn().mockImplementation(() => {
         setTimeout(() => {
           if (this.onprogress) this.onprogress({ lengthComputable: false, loaded: 50, total: 0 });
           if (this.onload) {
@@ -299,20 +299,20 @@ describe("MediaLoader with WaveformAudio", () => {
     const wf = createMockWaveform();
     const loader = new MediaLoader(wf as any, { src: "https://example.com/audio.mp3" });
     const audioInstance = {
-      sourceDecoded: jest.fn().mockResolvedValue(false),
-      initDecoder: jest.fn(),
-      decodeAudioData: jest.fn(),
-      destroy: jest.fn(),
-      on: jest.fn(),
+      sourceDecoded: vi.fn().mockResolvedValue(false),
+      initDecoder: vi.fn(),
+      decodeAudioData: vi.fn(),
+      destroy: vi.fn(),
+      on: vi.fn(),
     };
-    jest.spyOn(MediaLoader.prototype as any, "createAnalyzer").mockImplementation(function (this: any) {
+    vi.spyOn(MediaLoader.prototype as any, "createAnalyzer").mockImplementation(function (this: any) {
       this.audio = audioInstance;
       return audioInstance;
     });
 
-    global.XMLHttpRequest = jest.fn().mockImplementation(function (this: any) {
-      this.open = jest.fn();
-      this.send = jest.fn().mockImplementation(() => {
+    global.XMLHttpRequest = vi.fn().mockImplementation(function (this: any) {
+      this.open = vi.fn();
+      this.send = vi.fn().mockImplementation(() => {
         setTimeout(() => {
           if (this.onerror) this.onerror(new Event("error"));
         }, 0);
@@ -324,7 +324,7 @@ describe("MediaLoader with WaveformAudio", () => {
       return this;
     }) as any;
 
-    const errSpy = jest.spyOn(console, "error").mockImplementation(() => {});
+    const errSpy = vi.spyOn(console, "error").mockImplementation(() => {});
     const result = await loader.load({});
     expect(result).toBeNull();
     expect(wf.setError).toHaveBeenCalledWith("HTTP error status: 0", expect.any(Error));
@@ -335,20 +335,20 @@ describe("MediaLoader with WaveformAudio", () => {
     const wf = createMockWaveform();
     const loader = new MediaLoader(wf as any, { src: "https://example.com/audio.mp3" });
     const audioInstance = {
-      sourceDecoded: jest.fn().mockResolvedValue(false),
-      initDecoder: jest.fn(),
-      decodeAudioData: jest.fn(),
-      destroy: jest.fn(),
-      on: jest.fn(),
+      sourceDecoded: vi.fn().mockResolvedValue(false),
+      initDecoder: vi.fn(),
+      decodeAudioData: vi.fn(),
+      destroy: vi.fn(),
+      on: vi.fn(),
     };
-    jest.spyOn(MediaLoader.prototype as any, "createAnalyzer").mockImplementation(function (this: any) {
+    vi.spyOn(MediaLoader.prototype as any, "createAnalyzer").mockImplementation(function (this: any) {
       this.audio = audioInstance;
       return audioInstance;
     });
 
-    global.XMLHttpRequest = jest.fn().mockImplementation(function (this: any) {
-      this.open = jest.fn();
-      this.send = jest.fn().mockImplementation(() => {
+    global.XMLHttpRequest = vi.fn().mockImplementation(function (this: any) {
+      this.open = vi.fn();
+      this.send = vi.fn().mockImplementation(() => {
         setTimeout(() => {
           this.readyState = 4;
           this.status = 404;
@@ -364,7 +364,7 @@ describe("MediaLoader with WaveformAudio", () => {
       return this;
     }) as any;
 
-    const errSpy = jest.spyOn(console, "error").mockImplementation(() => {});
+    const errSpy = vi.spyOn(console, "error").mockImplementation(() => {});
     const result = await loader.load({});
     expect(result).toBeNull();
     expect(wf.setError).toHaveBeenCalledWith("HTTP error status: 404", expect.any(Error));
@@ -375,20 +375,20 @@ describe("MediaLoader with WaveformAudio", () => {
     const wf = createMockWaveform();
     const loader = new MediaLoader(wf as any, { src: "https://example.com/audio.mp3" });
     const audioInstance = {
-      sourceDecoded: jest.fn().mockResolvedValue(false),
-      initDecoder: jest.fn().mockRejectedValue(new Error("decode failed")),
-      decodeAudioData: jest.fn(),
-      destroy: jest.fn(),
-      on: jest.fn(),
+      sourceDecoded: vi.fn().mockResolvedValue(false),
+      initDecoder: vi.fn().mockRejectedValue(new Error("decode failed")),
+      decodeAudioData: vi.fn(),
+      destroy: vi.fn(),
+      on: vi.fn(),
     };
-    jest.spyOn(MediaLoader.prototype as any, "createAnalyzer").mockImplementation(function (this: any) {
+    vi.spyOn(MediaLoader.prototype as any, "createAnalyzer").mockImplementation(function (this: any) {
       this.audio = audioInstance;
       return audioInstance;
     });
 
-    global.XMLHttpRequest = jest.fn().mockImplementation(function (this: any) {
-      this.open = jest.fn();
-      this.send = jest.fn().mockImplementation(() => {
+    global.XMLHttpRequest = vi.fn().mockImplementation(function (this: any) {
+      this.open = vi.fn();
+      this.send = vi.fn().mockImplementation(() => {
         setTimeout(() => {
           if (this.onload) {
             this.response = new ArrayBuffer(4);
@@ -402,11 +402,11 @@ describe("MediaLoader with WaveformAudio", () => {
       return this;
     }) as any;
 
-    const errSpy = jest.spyOn(console, "error").mockImplementation(() => {});
+    const errSpy = vi.spyOn(console, "error").mockImplementation(() => {});
     const result = await loader.load({});
     expect(result).toBeNull();
     expect(wf.setError).toHaveBeenCalled();
-    expect((wf.setError as jest.Mock).mock.calls[0][0]).toContain("An error occurred while decoding the audio file");
+    expect((wf.setError as vi.Mock).mock.calls[0][0]).toContain("An error occurred while decoding the audio file");
     errSpy.mockRestore();
   });
 
@@ -414,23 +414,23 @@ describe("MediaLoader with WaveformAudio", () => {
     const wf = createMockWaveform();
     const loader = new MediaLoader(wf as any, { src: "https://example.com/audio.mp3" });
     const audioInstance = {
-      sourceDecoded: jest.fn().mockResolvedValue(false),
-      initDecoder: jest.fn().mockResolvedValue(undefined),
-      decodeAudioData: jest.fn().mockResolvedValue(undefined),
-      destroy: jest.fn(),
-      on: jest.fn(),
+      sourceDecoded: vi.fn().mockResolvedValue(false),
+      initDecoder: vi.fn().mockResolvedValue(undefined),
+      decodeAudioData: vi.fn().mockResolvedValue(undefined),
+      destroy: vi.fn(),
+      on: vi.fn(),
     };
-    jest.spyOn(MediaLoader.prototype as any, "createAnalyzer").mockImplementation(function (this: any) {
+    vi.spyOn(MediaLoader.prototype as any, "createAnalyzer").mockImplementation(function (this: any) {
       this.audio = audioInstance;
       return audioInstance;
     });
 
     let openedUrl: string | null = null;
-    global.XMLHttpRequest = jest.fn().mockImplementation(function (this: any) {
-      this.open = jest.fn().mockImplementation((_method: string, url: string) => {
+    global.XMLHttpRequest = vi.fn().mockImplementation(function (this: any) {
+      this.open = vi.fn().mockImplementation((_method: string, url: string) => {
         openedUrl = url;
       });
-      this.send = jest.fn().mockImplementation(() => {
+      this.send = vi.fn().mockImplementation(() => {
         setTimeout(() => {
           if (this.onload) {
             this.response = new ArrayBuffer(4);
@@ -452,25 +452,25 @@ describe("MediaLoader with WaveformAudio", () => {
     const wf = createMockWaveform();
     const loader = new MediaLoader(wf as any, { src: "https://example.com/audio.mp3" });
     const audioInstance = {
-      sourceDecoded: jest.fn().mockResolvedValue(false),
-      initDecoder: jest.fn().mockResolvedValue(undefined),
-      decodeAudioData: jest.fn().mockResolvedValue(undefined),
-      destroy: jest.fn(),
-      on: jest.fn(),
+      sourceDecoded: vi.fn().mockResolvedValue(false),
+      initDecoder: vi.fn().mockResolvedValue(undefined),
+      decodeAudioData: vi.fn().mockResolvedValue(undefined),
+      destroy: vi.fn(),
+      on: vi.fn(),
     };
-    jest.spyOn(MediaLoader.prototype as any, "createAnalyzer").mockImplementation(function (this: any) {
+    vi.spyOn(MediaLoader.prototype as any, "createAnalyzer").mockImplementation(function (this: any) {
       this.audio = audioInstance;
       return audioInstance;
     });
 
     let abortCalled = false;
-    global.XMLHttpRequest = jest.fn().mockImplementation(function (this: any) {
-      this.open = jest.fn();
-      this.send = jest.fn().mockImplementation(() => {
+    global.XMLHttpRequest = vi.fn().mockImplementation(function (this: any) {
+      this.open = vi.fn();
+      this.send = vi.fn().mockImplementation(() => {
         (loader as any).cancel();
         expect(abortCalled).toBe(true);
       });
-      this.abort = jest.fn().mockImplementation(() => {
+      this.abort = vi.fn().mockImplementation(() => {
         abortCalled = true;
         if (this.onerror) this.onerror(new Event("error"));
       });
@@ -495,24 +495,24 @@ describe("MediaLoader loadWithoutDecoding (decoder none)", () => {
   });
 
   it("loads with decoder none and warns when playerType is not html5", async () => {
-    const warnSpy = jest.spyOn(console, "warn").mockImplementation(() => {});
+    const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
     const wf = createMockWaveform({ decoderType: "none", playerType: "webaudio" });
     const loader = new MediaLoader(wf as any, { src: "https://example.com/audio.mp3" });
 
     const mockAudioInstance = {
-      setDurationWithoutDecoding: jest.fn(),
+      setDurationWithoutDecoding: vi.fn(),
       get duration() {
         return 12;
       },
-      destroy: jest.fn(),
-      on: jest.fn(),
+      destroy: vi.fn(),
+      on: vi.fn(),
     };
-    jest.spyOn(MediaLoader.prototype as any, "createAnalyzer").mockImplementation(function (this: any) {
+    vi.spyOn(MediaLoader.prototype as any, "createAnalyzer").mockImplementation(function (this: any) {
       this.audio = mockAudioInstance;
       return mockAudioInstance;
     });
 
-    global.Audio = jest.fn().mockImplementation(function (this: any) {
+    global.Audio = vi.fn().mockImplementation(function (this: any) {
       this.preload = "";
       this.src = "";
       this.duration = 12;
@@ -534,11 +534,11 @@ describe("MediaLoader loadWithoutDecoding (decoder none)", () => {
   });
 
   it("loadWithoutDecoding catch: setError on load error", async () => {
-    const errSpy = jest.spyOn(console, "error").mockImplementation(() => {});
+    const errSpy = vi.spyOn(console, "error").mockImplementation(() => {});
     const wf = createMockWaveform({ decoderType: "none", playerType: "html5" });
     const loader = new MediaLoader(wf as any, { src: "https://example.com/audio.mp3" });
 
-    global.Audio = jest.fn().mockImplementation(function (this: any) {
+    global.Audio = vi.fn().mockImplementation(function (this: any) {
       this.preload = "";
       this.src = "";
       this.addEventListener = (ev: string, fn: (e?: Event) => void) => {
@@ -550,7 +550,7 @@ describe("MediaLoader loadWithoutDecoding (decoder none)", () => {
     const result = await loader.load({});
     expect(result).toBeNull();
     expect(wf.setError).toHaveBeenCalled();
-    const setErrorCalls = (wf.setError as jest.Mock).mock.calls;
+    const setErrorCalls = (wf.setError as vi.Mock).mock.calls;
     expect(setErrorCalls.some((c) => String(c[0]).includes("An error occurred while loading the audio file"))).toBe(
       true,
     );
@@ -563,14 +563,14 @@ describe("MediaLoader createAnalyzer and decodingProgress", () => {
     const wf = createMockWaveform();
     const loader = new MediaLoader(wf as any, { src: "https://example.com/audio.mp3" });
     const audioInstance = {
-      sourceDecoded: jest.fn().mockResolvedValue(true),
+      sourceDecoded: vi.fn().mockResolvedValue(true),
       duration: 5,
-      initDecoder: jest.fn(),
-      decodeAudioData: jest.fn(),
-      destroy: jest.fn(),
-      on: jest.fn(),
+      initDecoder: vi.fn(),
+      decodeAudioData: vi.fn(),
+      destroy: vi.fn(),
+      on: vi.fn(),
     };
-    const createSpy = jest.spyOn(MediaLoader.prototype as any, "createAnalyzer").mockImplementation(function (
+    const createSpy = vi.spyOn(MediaLoader.prototype as any, "createAnalyzer").mockImplementation(function (
       this: any,
     ) {
       this.audio = audioInstance;

@@ -5,14 +5,14 @@
  */
 import { types } from "mobx-state-tree";
 
-jest.mock("../../core/Hotkey", () => ({
+vi.mock("../../core/Hotkey", () => ({
   Hotkey: () => ({
-    addNamed: jest.fn(),
-    removeNamed: jest.fn(),
+    addNamed: vi.fn(),
+    removeNamed: vi.fn(),
   }),
 }));
 
-jest.mock("../../tags/object/TimeSeries", () => {
+vi.mock("../../tags/object/TimeSeries", () => {
   const { types: t } = require("mobx-state-tree");
   return {
     TimeSeriesModel: t
@@ -26,8 +26,8 @@ jest.mock("../../tags/object/TimeSeries", () => {
         },
       }))
       .volatile(() => ({
-        scrollToRegion: jest.fn(),
-        updateView: jest.fn(),
+        scrollToRegion: vi.fn(),
+        updateView: vi.fn(),
       })),
   };
 });
@@ -126,7 +126,7 @@ describe("TimeSeriesRegion", () => {
         timeseries: { id: "ts1" },
         region: { id: "r1", pid: "p1", object: "ts1", start: 0, end: 100, results: [] },
       });
-      const spy = jest.spyOn(root.region, "notifyDrawingFinished");
+      const spy = vi.spyOn(root.region, "notifyDrawingFinished");
       root.region.updateRegion(20, 80);
       expect(root.region.start).toBe(20);
       expect(root.region.end).toBe(80);

@@ -2,6 +2,7 @@
  * Unit tests for EllipseRegion (model views, actions, and region type).
  * View coverage is largely from Cypress; these tests cover model logic.
  */
+import React from "react";
 import { types } from "mobx-state-tree";
 
 // Math.unit is used in coordsInside (degrees to radians); not in standard JS.
@@ -15,7 +16,7 @@ afterAll(() => {
   delete Math.unit;
 });
 
-jest.mock("../../tags/object/Image", () => {
+vi.mock("../../tags/object/Image", () => {
   const { types } = require("mobx-state-tree");
   return {
     ImageModel: types

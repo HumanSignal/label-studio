@@ -11,7 +11,7 @@ import { AudioModel } from "../model";
 Registry.addTag("audio", AudioModel, () => null);
 Registry.addObjectType(AudioModel);
 
-const mockAddErrors = jest.fn();
+const mockAddErrors = vi.fn();
 const mockRegionStore = { regions: [] };
 const mockToNames = new Map();
 const mockAnnotation = {
@@ -19,10 +19,10 @@ const mockAnnotation = {
   id: 1,
   isReadOnly: () => false,
   regionStore: mockRegionStore,
-  unselectAll: jest.fn(),
+  unselectAll: vi.fn(),
   areas: new Map(),
-  createResult: jest.fn(() => ({ setWSRegion: jest.fn(), updateColor: jest.fn() })),
-  selectArea: jest.fn(),
+  createResult: vi.fn(() => ({ setWSRegion: vi.fn(), updateColor: vi.fn() })),
+  selectArea: vi.fn(),
 };
 const mockRoot = {
   task: { dataObj: {} },
@@ -31,8 +31,8 @@ const mockRoot = {
     selected: mockAnnotation,
   },
   messages: {
-    ERR_LOADING_HTTP: jest.fn(({ attr, url, error }) => `HTTP: ${attr} ${url} ${error}`),
-    ERR_LOADING_AUDIO: jest.fn(({ attr, url, error }) => `Audio: ${attr} ${url} ${error}`),
+    ERR_LOADING_HTTP: vi.fn(({ attr, url, error }) => `HTTP: ${attr} ${url} ${error}`),
+    ERR_LOADING_AUDIO: vi.fn(({ attr, url, error }) => `Audio: ${attr} ${url} ${error}`),
   },
 };
 
@@ -43,8 +43,8 @@ const mockLabelsState = {
   valueType: "labels",
 };
 
-jest.mock("mobx-state-tree", () => {
-  const actual = jest.requireActual("mobx-state-tree");
+vi.mock("mobx-state-tree", async () => {
+  const actual = await vi.importActual("mobx-state-tree");
   return {
     ...actual,
     getRoot: (node) => {
@@ -71,14 +71,14 @@ jest.mock("mobx-state-tree", () => {
   };
 });
 
-jest.mock("../../../../utils/feature-flags", () => ({
+vi.mock("../../../../utils/feature-flags", () => ({
   FF_LSDV_E_278: "FF_LSDV_E_278",
-  isFF: jest.fn(() => false),
+  isFF: vi.fn(() => false),
 }));
 
-jest.mock("@humansignal/core", () => ({
+vi.mock("@humansignal/core", () => ({
   ff: {
-    isActive: jest.fn(() => false),
+    isActive: vi.fn(() => false),
     FF_SYNCED_BUFFERING: "FF_SYNCED_BUFFERING",
     FF_MULTIPLE_LABELS_REGIONS: "FF_MULTIPLE_LABELS_REGIONS",
   },
@@ -94,7 +94,7 @@ function createAudioNode(storeRef = { task: { dataObj: { audio: "/test.mp3" } } 
 }
 
 beforeEach(() => {
-  jest.clearAllMocks();
+  vi.clearAllMocks();
   mockToNames.set("audio", []);
   window.LS_SECURE_MODE = false;
   window.STORE_INIT_OK = true;
@@ -219,7 +219,7 @@ describe("Audio model", () => {
     it("triggerSync sends data when _ws exists", () => {
       const node = createAudioNode();
       node.onLoad({ playing: false, currentTime: 0, rate: 1 });
-      node.syncSend = jest.fn();
+      node.syncSend = vi.fn();
       node.triggerSync("play", { playing: true });
       expect(node.syncSend).toHaveBeenCalledWith(expect.objectContaining({ playing: true, time: 0, speed: 1 }), "play");
     });
@@ -228,7 +228,7 @@ describe("Audio model", () => {
   describe("sync actions (with _ws mock)", () => {
     it("handleSyncPlay sets isPlaying and calls _ws.play when _ws exists", () => {
       const node = createAudioNode();
-      const play = jest.fn();
+      const play = vi.fn();
       node.onLoad({ playing: false, play });
       node.handleSyncPlay();
       expect(node.isPlaying).toBe(true);
@@ -237,7 +237,7 @@ describe("Audio model", () => {
 
     it("handleSyncPlay is no-op when _ws already playing", () => {
       const node = createAudioNode();
-      const play = jest.fn();
+      const play = vi.fn();
       node.onLoad({ playing: true, play });
       node.handleSyncPlay();
       expect(play).not.toHaveBeenCalled();
@@ -245,7 +245,7 @@ describe("Audio model", () => {
 
     it("handleSyncPause returns early when isPlaying is true (does not call pause)", () => {
       const node = createAudioNode();
-      const pause = jest.fn();
+      const pause = vi.fn();
       node.onLoad({ pause });
       runInAction(() => {
         node.isPlaying = true;
@@ -256,7 +256,7 @@ describe("Audio model", () => {
 
     it("handleSyncPause calls _ws.pause when isPlaying is false", () => {
       const node = createAudioNode();
-      const pause = jest.fn();
+      const pause = vi.fn();
       node.onLoad({ pause });
       runInAction(() => {
         node.isPlaying = false;
@@ -267,7 +267,7 @@ describe("Audio model", () => {
 
     it("handleSyncSeek is no-op when time not defined", () => {
       const node = createAudioNode();
-      node.onLoad({ loaded: true, setCurrentTime: jest.fn(), syncCursor: jest.fn() });
+      node.onLoad({ loaded: true, setCurrentTime: vi.fn(), syncCursor: vi.fn() });
       node.handleSyncSeek({});
       expect(node._ws.setCurrentTime).not.toHaveBeenCalled();
     });
@@ -312,8 +312,8 @@ describe("Audio model", () => {
 
     it("addRegion returns existing area when annotation.areas has matching id", () => {
       const node = createAudioNode();
-      const setWSRegion = jest.fn();
-      const updateColor = jest.fn();
+      const setWSRegion = vi.fn();
+      const updateColor = vi.fn();
       const existingArea = { setWSRegion, updateColor };
       mockAnnotation.areas.set("region-1", existingArea);
       const wsRegion = { id: "region-1" };
@@ -326,7 +326,7 @@ describe("Audio model", () => {
 
     it("addRegion calls convertToSegment when getAvailableStates is empty and wsRegion.isRegion", () => {
       const node = createAudioNode();
-      const handleSelected = jest.fn();
+      const handleSelected = vi.fn();
       const wsRegion = {
         id: "seg-1",
         isRegion: true,
@@ -340,10 +340,10 @@ describe("Audio model", () => {
     it("addRegion creates result and sets WS region when activeStates exist", () => {
       mockToNames.set("audio", [mockLabelsState]);
       const node = createAudioNode();
-      const setWSRegion = jest.fn();
-      const updateColor = jest.fn();
+      const setWSRegion = vi.fn();
+      const updateColor = vi.fn();
       mockAnnotation.createResult.mockReturnValue({ setWSRegion, updateColor });
-      const convertToRegion = jest.fn((labels) => ({ id: "r1", labels }));
+      const convertToRegion = vi.fn((labels) => ({ id: "r1", labels }));
       const wsRegion = { id: "seg-1", isRegion: false, convertToRegion };
       const result = node.addRegion(wsRegion);
       expect(mockAnnotation.createResult).toHaveBeenCalled();
@@ -361,7 +361,7 @@ describe("Audio model", () => {
 
     it("clearRegionMappings calls setWSRegion(null) on each reg", () => {
       const node = createAudioNode();
-      const setWSRegion = jest.fn();
+      const setWSRegion = vi.fn();
       const reg = { _ws_region: {}, setWSRegion };
       reg.object = node;
       mockRegionStore.regions = [reg];
@@ -378,7 +378,7 @@ describe("Audio model", () => {
 
     it("onRateChange calls triggerSyncSpeed", () => {
       const node = createAudioNode();
-      node.triggerSyncSpeed = jest.fn();
+      node.triggerSyncSpeed = vi.fn();
       node.onRateChange(1.5);
       expect(node.triggerSyncSpeed).toHaveBeenCalledWith(1.5);
     });
@@ -390,8 +390,8 @@ describe("Audio model", () => {
 
     it("needsUpdate calls handleNewRegions and requestWSUpdate", () => {
       const node = createAudioNode();
-      node.handleNewRegions = jest.fn();
-      node.requestWSUpdate = jest.fn();
+      node.handleNewRegions = vi.fn();
+      node.requestWSUpdate = vi.fn();
       node.needsUpdate();
       expect(node.handleNewRegions).toHaveBeenCalled();
       expect(node.requestWSUpdate).toHaveBeenCalled();
@@ -399,22 +399,22 @@ describe("Audio model", () => {
 
     it("requestWSUpdate is no-op when _ws is null", () => {
       const node = createAudioNode();
-      jest.useFakeTimers();
+      vi.useFakeTimers();
       node.requestWSUpdate();
-      jest.advanceTimersByTime(50);
-      jest.useRealTimers();
+      vi.advanceTimersByTime(50);
+      vi.useRealTimers();
       expect(node._ws).toBeNull();
     });
 
     it("requestWSUpdate schedules _ws.regions.redraw when _ws exists", () => {
       const node = createAudioNode();
-      const redraw = jest.fn();
+      const redraw = vi.fn();
       node.onLoad({ regions: { redraw } });
-      jest.useFakeTimers();
+      vi.useFakeTimers();
       node.requestWSUpdate();
-      jest.advanceTimersByTime(50);
+      vi.advanceTimersByTime(50);
       expect(redraw).toHaveBeenCalled();
-      jest.useRealTimers();
+      vi.useRealTimers();
     });
 
     it("syncMuted sets _ws.muted when _ws exists", () => {
@@ -463,7 +463,7 @@ describe("Audio model", () => {
   describe("beforeDestroy", () => {
     it("cleans up _ws and dispose without throwing", () => {
       const node = createAudioNode();
-      const destroy = jest.fn();
+      const destroy = vi.fn();
       node.onLoad({ destroy });
       expect(() => node.beforeDestroy()).not.toThrow();
       expect(destroy).toHaveBeenCalled();
@@ -473,11 +473,11 @@ describe("Audio model", () => {
     it("handles already destroyed _ws", () => {
       const node = createAudioNode();
       node.onLoad({
-        destroy: jest.fn(() => {
+        destroy: vi.fn(() => {
           throw new Error("Already destroyed");
         }),
       });
-      const consoleSpy = jest.spyOn(console, "warn").mockImplementation(() => {});
+      const consoleSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
       expect(() => node.beforeDestroy()).not.toThrow();
       expect(node._ws).toBeNull();
       consoleSpy.mockRestore();
@@ -487,9 +487,9 @@ describe("Audio model", () => {
   describe("onLoad", () => {
     it("sets _ws and calls clearRegionMappings, checkReady, needsUpdate", () => {
       const node = createAudioNode();
-      node.clearRegionMappings = jest.fn();
-      node.checkReady = jest.fn();
-      node.needsUpdate = jest.fn();
+      node.clearRegionMappings = vi.fn();
+      node.checkReady = vi.fn();
+      node.needsUpdate = vi.fn();
       const ws = {};
       node.onLoad(ws);
       expect(node._ws).toBe(ws);
@@ -502,7 +502,7 @@ describe("Audio model", () => {
   describe("handleSyncBuffering", () => {
     it("does not throw when called with buffering data", () => {
       const node = createAudioNode();
-      node.onLoad({ pause: jest.fn(), play: jest.fn() });
+      node.onLoad({ pause: vi.fn(), play: vi.fn() });
       expect(() => node.handleSyncBuffering({ playing: true, buffering: true })).not.toThrow();
     });
   });
@@ -510,7 +510,7 @@ describe("Audio model", () => {
   describe("handleSync with _ws loaded", () => {
     it("calls _ws.play when data.playing is true and _ws not playing", () => {
       const node = createAudioNode();
-      const play = jest.fn();
+      const play = vi.fn();
       node.onLoad({ loaded: true, playing: false, play });
       node.handleSync({ playing: true }, "play");
       expect(node.isPlaying).toBe(true);
@@ -519,7 +519,7 @@ describe("Audio model", () => {
 
     it("calls _ws.pause when data.playing is false and _ws playing", () => {
       const node = createAudioNode();
-      const pause = jest.fn();
+      const pause = vi.fn();
       node.onLoad({ loaded: true, playing: true, pause });
       node.handleSync({ playing: false }, "pause");
       expect(node.isPlaying).toBe(false);
@@ -530,8 +530,8 @@ describe("Audio model", () => {
   describe("onHotKey", () => {
     it("calls preventDefault and _ws.togglePlay and returns false", () => {
       const node = createAudioNode();
-      const e = { preventDefault: jest.fn() };
-      const togglePlay = jest.fn();
+      const e = { preventDefault: vi.fn() };
+      const togglePlay = vi.fn();
       node.onLoad({ togglePlay });
       const result = node.onHotKey(e);
       expect(e.preventDefault).toHaveBeenCalled();
@@ -543,8 +543,8 @@ describe("Audio model", () => {
   describe("handleSyncSeek with time", () => {
     it("calls _ws.setCurrentTime when time is defined", () => {
       const node = createAudioNode();
-      const setCurrentTime = jest.fn();
-      const syncCursor = jest.fn();
+      const setCurrentTime = vi.fn();
+      const syncCursor = vi.fn();
       node.onLoad({ loaded: true, setCurrentTime, syncCursor });
       node.handleSyncSeek({ time: 5 });
       expect(setCurrentTime).toHaveBeenCalledWith(5, true);
@@ -554,15 +554,15 @@ describe("Audio model", () => {
   describe("onSeek and onPlaying", () => {
     it("onSeek calls triggerSyncSeek", () => {
       const node = createAudioNode();
-      node.triggerSyncSeek = jest.fn();
+      node.triggerSyncSeek = vi.fn();
       node.onSeek(10);
       expect(node.triggerSyncSeek).toHaveBeenCalledWith(10);
     });
 
     it("onPlaying updates isPlaying and triggers sync", () => {
       const node = createAudioNode();
-      node.triggerSyncPlay = jest.fn();
-      node.triggerSyncPause = jest.fn();
+      node.triggerSyncPlay = vi.fn();
+      node.triggerSyncPause = vi.fn();
       node.onPlaying(true);
       expect(node.triggerSyncPlay).toHaveBeenCalled();
       expect(node.isPlaying).toBe(true);
@@ -576,7 +576,7 @@ describe("Audio model", () => {
     it("calls onReady when _ws exists and not isDrawing", () => {
       const node = createAudioNode();
       node.onLoad({ destroyed: false, isDrawing: false });
-      node.onReady = jest.fn();
+      node.onReady = vi.fn();
       node.checkReady();
       expect(node.onReady).toHaveBeenCalled();
     });
@@ -589,8 +589,8 @@ describe("Audio model", () => {
     it("schedules requestAnimationFrame when _ws.isDrawing", () => {
       const node = createAudioNode();
       node.onLoad({ destroyed: false, isDrawing: true });
-      node.onReady = jest.fn();
-      const raf = jest.spyOn(window, "requestAnimationFrame").mockImplementation((cb) => {
+      node.onReady = vi.fn();
+      const raf = vi.spyOn(window, "requestAnimationFrame").mockImplementation((cb) => {
         setTimeout(cb, 0);
         return 1;
       });
@@ -603,15 +603,15 @@ describe("Audio model", () => {
   describe("handleSyncSeek error path", () => {
     it("catches when setCurrentTime throws", () => {
       const node = createAudioNode();
-      const syncCursor = jest.fn();
+      const syncCursor = vi.fn();
       node.onLoad({
         loaded: true,
-        setCurrentTime: jest.fn(() => {
+        setCurrentTime: vi.fn(() => {
           throw new Error("seek failed");
         }),
         syncCursor,
       });
-      const logSpy = jest.spyOn(console, "log").mockImplementation(() => {});
+      const logSpy = vi.spyOn(console, "log").mockImplementation(() => {});
       expect(() => node.handleSyncSeek({ time: 5 })).not.toThrow();
       expect(logSpy).toHaveBeenCalled();
       logSpy.mockRestore();
@@ -621,9 +621,9 @@ describe("Audio model", () => {
   describe("createWsRegion and updateWsRegion", () => {
     it("createWsRegion adds region via _ws and sets WS region on region", () => {
       const node = createAudioNode();
-      const addRegion = jest.fn(() => ({ id: "ws-1" }));
+      const addRegion = vi.fn(() => ({ id: "ws-1" }));
       node.onLoad({ addRegion });
-      const setWSRegion = jest.fn();
+      const setWSRegion = vi.fn();
       const mockReg = {
         _ws_region: null,
         labels: ["L1"],
@@ -637,12 +637,12 @@ describe("Audio model", () => {
 
     it("createWsRegion omits labels when region.labels is empty", () => {
       const node = createAudioNode();
-      const addRegion = jest.fn(() => ({}));
+      const addRegion = vi.fn(() => ({}));
       node.onLoad({ addRegion });
       const mockReg = {
         labels: [],
         wsRegionOptions: () => ({ start: 0, end: 1 }),
-        setWSRegion: jest.fn(),
+        setWSRegion: vi.fn(),
       };
       node.createWsRegion(mockReg);
       expect(addRegion).toHaveBeenCalledWith(expect.objectContaining({ start: 0, end: 1 }), false);
@@ -651,7 +651,7 @@ describe("Audio model", () => {
 
     it("updateWsRegion updates region via _ws", () => {
       const node = createAudioNode();
-      const updateRegion = jest.fn();
+      const updateRegion = vi.fn();
       node.onLoad({ updateRegion });
       const mockReg = {
         _ws_region: { id: "ws-1" },
@@ -666,17 +666,17 @@ describe("Audio model", () => {
   describe("handleNewRegions", () => {
     it("calls updateWsRegion for regs with _ws_region and createWsRegion for others", () => {
       const node = createAudioNode();
-      node.onLoad({ addRegion: jest.fn(() => ({})), updateRegion: jest.fn() });
+      node.onLoad({ addRegion: vi.fn(() => ({})), updateRegion: vi.fn() });
       const regWithWs = {
         _ws_region: { id: "w1" },
         wsRegionOptions: () => ({}),
-        setWSRegion: jest.fn(),
+        setWSRegion: vi.fn(),
       };
       const regWithoutWs = {
         _ws_region: null,
         labels: [],
         wsRegionOptions: () => ({ start: 0, end: 1 }),
-        setWSRegion: jest.fn(),
+        setWSRegion: vi.fn(),
       };
       regWithWs.object = node;
       regWithoutWs.object = node;
@@ -691,7 +691,7 @@ describe("Audio model", () => {
   describe("updateRegion", () => {
     it("calls onUpdateEnd on found region", () => {
       const node = createAudioNode();
-      const onUpdateEnd = jest.fn();
+      const onUpdateEnd = vi.fn();
       const reg = { _ws_region: { id: "wr1" }, onUpdateEnd };
       reg.object = node;
       mockRegionStore.regions = [reg];
@@ -716,13 +716,13 @@ describe("Audio model", () => {
   describe("handleSync with _ws loaded", () => {
     it("calls handleSyncSeek with time when data has time", () => {
       const node = createAudioNode();
-      const setCurrentTime = jest.fn();
+      const setCurrentTime = vi.fn();
       node.onLoad({
         loaded: true,
         playing: false,
-        play: jest.fn(),
+        play: vi.fn(),
         setCurrentTime,
-        syncCursor: jest.fn(),
+        syncCursor: vi.fn(),
       });
       node.handleSync({ time: 3, playing: true }, "seek");
       expect(setCurrentTime).toHaveBeenCalledWith(3, true);
@@ -730,7 +730,7 @@ describe("Audio model", () => {
 
     it("sets wasPlayingBeforeBuffering for play/pause events", () => {
       const node = createAudioNode();
-      node.onLoad({ loaded: true, playing: false, play: jest.fn() });
+      node.onLoad({ loaded: true, playing: false, play: vi.fn() });
       node.handleSync({ playing: true }, "play");
       expect(node.wasPlayingBeforeBuffering).toBe(true);
       node.handleSync({ playing: false }, "pause");
@@ -741,9 +741,9 @@ describe("Audio model", () => {
   describe("triggerSyncPlay and triggerSyncPause", () => {
     it("triggerSyncPlay sets wasPlayingBeforeBuffering and calls handleSyncPlay and triggerSync", () => {
       const node = createAudioNode();
-      const play = jest.fn();
+      const play = vi.fn();
       node.onLoad({ play });
-      node.syncSend = jest.fn();
+      node.syncSend = vi.fn();
       node.triggerSyncPlay();
       expect(node.wasPlayingBeforeBuffering).toBe(true);
       expect(play).toHaveBeenCalled();
@@ -752,9 +752,9 @@ describe("Audio model", () => {
 
     it("triggerSyncPause sets wasPlayingBeforeBuffering false and calls handleSyncPause and triggerSync", () => {
       const node = createAudioNode();
-      const pause = jest.fn();
+      const pause = vi.fn();
       node.onLoad({ pause });
-      node.syncSend = jest.fn();
+      node.syncSend = vi.fn();
       node.triggerSyncPause();
       expect(node.wasPlayingBeforeBuffering).toBe(false);
       expect(pause).toHaveBeenCalled();
@@ -776,8 +776,8 @@ describe("Audio model", () => {
   describe("handleBuffering", () => {
     it("is no-op when isSyncedBuffering is false (module constant)", () => {
       const node = createAudioNode();
-      node.onLoad({ pause: jest.fn() });
-      node.triggerSyncBuffering = jest.fn();
+      node.onLoad({ pause: vi.fn() });
+      node.triggerSyncBuffering = vi.fn();
       node.handleBuffering(true);
       expect(node.triggerSyncBuffering).not.toHaveBeenCalled();
     });
@@ -791,10 +791,10 @@ describe("Audio model", () => {
       mockToNames.set("audio", [mockLabelsState, secondState]);
       const node = createAudioNode();
       mockAnnotation.createResult.mockReturnValue({
-        setWSRegion: jest.fn(),
-        updateColor: jest.fn(),
+        setWSRegion: vi.fn(),
+        updateColor: vi.fn(),
       });
-      const wsRegion = { id: "seg-1", isRegion: false, convertToRegion: jest.fn((labels) => ({ id: "r1", labels })) };
+      const wsRegion = { id: "seg-1", isRegion: false, convertToRegion: vi.fn((labels) => ({ id: "r1", labels })) };
       node.addRegion(wsRegion);
       expect(mockAnnotation.createResult).toHaveBeenCalledWith(
         wsRegion,
@@ -822,7 +822,7 @@ describe("Audio model", () => {
   describe("handleSyncBuffering", () => {
     it("handleSyncBuffering pauses and sets wasPlaying when data.buffering is true", () => {
       const node = createAudioNode();
-      const pause = jest.fn();
+      const pause = vi.fn();
       node.onLoad({ pause });
       node.handleSyncBuffering({ playing: true, buffering: true });
       expect(node.wasPlayingBeforeBuffering).toBe(true);
@@ -831,7 +831,7 @@ describe("Audio model", () => {
 
     it("handleSyncBuffering calls play when !isBuffering && !data.buffering && playing", () => {
       const node = createAudioNode();
-      const play = jest.fn();
+      const play = vi.fn();
       node.onLoad({ play });
       node.handleSyncBuffering({ playing: true, buffering: false });
       expect(play).toHaveBeenCalled();
@@ -841,12 +841,12 @@ describe("Audio model", () => {
   describe("handleSync with time", () => {
     it("calls handleSyncSeek with time when _ws is loaded", () => {
       const node = createAudioNode();
-      const setCurrentTime = jest.fn();
-      const syncCursor = jest.fn();
+      const setCurrentTime = vi.fn();
+      const syncCursor = vi.fn();
       node.onLoad({
         loaded: true,
         playing: false,
-        play: jest.fn(),
+        play: vi.fn(),
         setCurrentTime,
         syncCursor,
       });

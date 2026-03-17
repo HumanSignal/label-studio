@@ -1,9 +1,10 @@
+import React from "react";
 import { render, fireEvent } from "@testing-library/react";
 import { Provider } from "mobx-react";
 import { Controls } from "../Controls";
 
-jest.mock("@humansignal/ui", () => {
-  const { forwardRef } = jest.requireActual("react");
+vi.mock("@humansignal/ui", async () => {
+  const { forwardRef } = await vi.importActual<typeof import("react")>("react");
   return {
     Button: forwardRef(({ children, ...props }: { children: React.ReactNode }) => {
       return (
@@ -29,24 +30,24 @@ jest.mock("@humansignal/ui", () => {
   };
 });
 const mockStore = {
-  hasInterface: jest.fn(),
+  hasInterface: vi.fn(),
   isSubmitting: false,
   settings: {
     enableTooltips: true,
   },
   task: { id: 1, allow_skip: true },
-  skipTask: jest.fn(),
+  skipTask: vi.fn(),
   commentStore: {
     currentComment: {
       a3r0fa: "It's working",
       a0lsuf: "It's working fine",
     },
-    commentFormSubmit: jest.fn(),
-    setTooltipMessage: jest.fn(),
+    commentFormSubmit: vi.fn(),
+    setTooltipMessage: vi.fn(),
   },
   annotationStore: {
     selected: {
-      submissionInProgress: jest.fn(),
+      submissionInProgress: vi.fn(),
       history: {
         canUndo: false,
       },
@@ -83,7 +84,7 @@ const setupAppSettings = (options: { role?: string; enterprise?: boolean } = {})
 
 describe("Controls", () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     // Reset APP_SETTINGS before each test
     (window as any).APP_SETTINGS = undefined;
     // Reset mockStore task to default

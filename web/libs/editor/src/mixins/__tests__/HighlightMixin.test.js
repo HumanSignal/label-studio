@@ -7,28 +7,28 @@ const mockSpan = (overrides = {}) => {
   const span = {
     isConnected: true,
     className: "",
-    setAttribute: jest.fn(),
-    classList: { add: jest.fn(), remove: jest.fn() },
-    prepend: jest.fn(),
-    append: jest.fn(),
-    getAttribute: jest.fn((name) => (name === "data-start" ? "0" : "10")),
-    querySelectorAll: jest.fn(() => []),
-    scrollIntoView: jest.fn(),
-    scrollIntoViewIfNeeded: jest.fn(),
+    setAttribute: vi.fn(),
+    classList: { add: vi.fn(), remove: vi.fn() },
+    prepend: vi.fn(),
+    append: vi.fn(),
+    getAttribute: vi.fn((name) => (name === "data-start" ? "0" : "10")),
+    querySelectorAll: vi.fn(() => []),
+    scrollIntoView: vi.fn(),
+    scrollIntoViewIfNeeded: vi.fn(),
     ...overrides,
   };
   return span;
 };
 
-jest.mock("../../utils", () => ({
+vi.mock("../../utils", () => ({
   __esModule: true,
   default: {
     Colors: {
-      convertToRGBA: jest.fn((color, alpha) => (color ? `rgba(0,0,0,${alpha})` : "rgba(210,147,93,0.3)")),
-      contrastColor: jest.fn(() => "#fff"),
+      convertToRGBA: vi.fn((color, alpha) => (color ? `rgba(0,0,0,${alpha})` : "rgba(210,147,93,0.3)")),
+      contrastColor: vi.fn(() => "#fff"),
     },
     Selection: {
-      applySpanStyles: jest.fn(),
+      applySpanStyles: vi.fn(),
     },
   },
 }));
@@ -44,11 +44,11 @@ const Base = types
     parent: {
       showlabels: undefined,
       highlightcolor: null,
-      createSpansByGlobalOffsets: jest.fn(() => [mockSpan(), mockSpan()]),
-      setStyles: jest.fn(),
-      removeStyles: jest.fn(),
-      removeSpansInGlobalOffsets: jest.fn(),
-      getTextFromGlobalOffsets: jest.fn(() => "sample text"),
+      createSpansByGlobalOffsets: vi.fn(() => [mockSpan(), mockSpan()]),
+      setStyles: vi.fn(),
+      removeStyles: vi.fn(),
+      removeSpansInGlobalOffsets: vi.fn(),
+      getTextFromGlobalOffsets: vi.fn(() => "sample text"),
       canResizeSpans: false,
     },
     store: { settings: { showLabels: true } },
@@ -59,7 +59,7 @@ const Base = types
     labeling: { selectedLabels: [{ value: "A" }] },
     style: null,
     tag: null,
-    annotation: { setHighlightedNode: jest.fn() },
+    annotation: { setHighlightedNode: vi.fn() },
     hidden: false,
     highlighted: false,
     _highlighted: false,
@@ -125,7 +125,7 @@ function getTestTree(snap = {}) {
 
 describe("HighlightMixin", () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe("STATE_CLASS_MODS", () => {
@@ -373,9 +373,9 @@ describe("HighlightMixin", () => {
       model.setSpans(spans);
       model.setParent({
         canResizeSpans: true,
-        setStyles: jest.fn(),
-        removeStyles: jest.fn(),
-        createSpansByGlobalOffsets: jest.fn(() => [mockSpan(), mockSpan()]),
+        setStyles: vi.fn(),
+        removeStyles: vi.fn(),
+        createSpansByGlobalOffsets: vi.fn(() => [mockSpan(), mockSpan()]),
       });
       model.setGlobalOffsets({ start: 0, end: 10 });
       model.updateAppearenceFromState();
@@ -391,9 +391,9 @@ describe("HighlightMixin", () => {
       model.setSpans(spans);
       model.setParent({
         canResizeSpans: true,
-        setStyles: jest.fn(),
-        removeStyles: jest.fn(),
-        createSpansByGlobalOffsets: jest.fn(),
+        setStyles: vi.fn(),
+        removeStyles: vi.fn(),
+        createSpansByGlobalOffsets: vi.fn(),
       });
       model.setGlobalOffsets({ start: 0, end: 10 });
       model.updateAppearenceFromState();
@@ -403,7 +403,7 @@ describe("HighlightMixin", () => {
     it("calls setStyles when canResizeSpans is false", () => {
       const { model } = getTestTree();
       model.setSpans([mockSpan(), mockSpan()]);
-      model.setParent({ canResizeSpans: false, setStyles: jest.fn() });
+      model.setParent({ canResizeSpans: false, setStyles: vi.fn() });
       model.updateAppearenceFromState();
       expect(model.parent.setStyles).toHaveBeenCalled();
     });
@@ -425,7 +425,7 @@ describe("HighlightMixin", () => {
     it("removes area elements from spans", () => {
       const { model } = getTestTree();
       const span = mockSpan();
-      const areas = [{ remove: jest.fn() }];
+      const areas = [{ remove: vi.fn() }];
       span.querySelectorAll = () => areas;
       model.setSpans([span]);
       model.detachHandles();
@@ -455,7 +455,7 @@ describe("HighlightMixin", () => {
     it("calls scrollIntoViewIfNeeded when available", () => {
       const { model } = getTestTree();
       const first = mockSpan();
-      first.scrollIntoViewIfNeeded = jest.fn();
+      first.scrollIntoViewIfNeeded = vi.fn();
       model.setSpans([first, mockSpan()]);
       model.selectRegion();
       expect(first.scrollIntoViewIfNeeded).toHaveBeenCalled();
@@ -650,7 +650,7 @@ describe("HighlightMixin", () => {
 
     it("stops propagation when event passed", () => {
       const { model } = getTestTree();
-      const e = { stopPropagation: jest.fn() };
+      const e = { stopPropagation: vi.fn() };
       model.setSpans([mockSpan()]);
       model.toggleHidden(e);
       expect(e.stopPropagation).toHaveBeenCalled();

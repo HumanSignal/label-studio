@@ -6,10 +6,11 @@
  */
 import { applySnapshot, types } from "mobx-state-tree";
 
-const mockIsFF = jest.fn(() => false);
-jest.mock("../../utils/feature-flags", () => ({
-  isFF: (...args) => mockIsFF(...args),
+const mockIsFF = vi.fn(() => false);
+vi.mock("../../utils/feature-flags", () => ({
+  isFF: mockIsFF,
   FF_DEV_1284: "fflag_fix_front_dev_1284_auto_detect_undo_281022_short",
+  FF_SIMPLE_INIT: "fflag_fix_front_leap_443_select_annotation_once",
 }));
 
 import TimeTraveller from "../TimeTraveller";
@@ -39,11 +40,11 @@ function addHistoryStates(tt, states) {
 describe("TimeTraveller", () => {
   beforeEach(() => {
     mockIsFF.mockReturnValue(false);
-    jest.useFakeTimers();
+    vi.useFakeTimers();
   });
 
   afterEach(() => {
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   describe("views", () => {
@@ -187,7 +188,7 @@ describe("TimeTraveller", () => {
   describe("onUpdate", () => {
     it("calls handler on set/undo/redo and returns unsubscribe", () => {
       const { root, store } = createRoot();
-      const handler = jest.fn();
+      const handler = vi.fn();
       const unsub = root.timeTraveller.onUpdate(handler);
       applySnapshot(store, { value: 1 });
       root.timeTraveller.undo(); // triggers triggerHandlers
@@ -223,7 +224,7 @@ describe("TimeTraveller", () => {
     it("resets history to single state and triggers handlers", () => {
       const { root } = createRoot();
       addHistoryStates(root.timeTraveller, [{ value: 1 }, { value: 2 }]);
-      const handler = jest.fn();
+      const handler = vi.fn();
       root.timeTraveller.onUpdate(handler);
       root.timeTraveller.reinit();
       expect(root.timeTraveller.history.length).toBe(1);
@@ -235,7 +236,7 @@ describe("TimeTraveller", () => {
     it("reinit(false) calls handlers with force false", () => {
       const { root } = createRoot();
       addHistoryStates(root.timeTraveller, [{ value: 1 }]);
-      const handler = jest.fn();
+      const handler = vi.fn();
       root.timeTraveller.onUpdate(handler);
       root.timeTraveller.reinit(false);
       expect(handler).toHaveBeenCalledWith(false);
@@ -280,7 +281,7 @@ describe("TimeTraveller", () => {
     it("disposes snapshot listener and clears state", () => {
       const store = TargetStore.create({ value: 0 });
       const tt = TimeTraveller.create({}, { targetStore: store });
-      const handler = jest.fn();
+      const handler = vi.fn();
       tt.onUpdate(handler);
       addHistoryStates(tt, [{ value: 1 }]);
       tt.undo();
@@ -317,7 +318,7 @@ describe("TimeTraveller", () => {
     it("set applies history at index and triggers handlers", () => {
       const { root, store } = createRoot();
       addHistoryStates(root.timeTraveller, [{ value: 1 }, { value: 2 }]);
-      const handler = jest.fn();
+      const handler = vi.fn();
       root.timeTraveller.onUpdate(handler);
       root.timeTraveller.set(0);
       expect(store.value).toBe(0);
@@ -342,7 +343,7 @@ describe("TimeTraveller", () => {
       root.timeTraveller.undo();
       root.timeTraveller.set(1);
       expect(mockIsFF).toHaveBeenCalledWith("fflag_fix_front_dev_1284_auto_detect_undo_281022_short");
-      jest.runAllTimers();
+      vi.runAllTimers();
       expect(root.timeTraveller.skipNextUndoState).toBe(false);
     });
   });

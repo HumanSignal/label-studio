@@ -26,15 +26,15 @@ async function triggerVideoLoad() {
   });
 }
 
-jest.mock("@humansignal/core", () => ({
+vi.mock("@humansignal/core", () => ({
   ff: { isActive: () => false },
 }));
 
-jest.mock("@humansignal/icons", () => ({
+vi.mock("@humansignal/icons", () => ({
   IconZoomIn: () => <span data-testid="icon-zoom-in" />,
 }));
 
-jest.mock("@humansignal/ui", () => ({
+vi.mock("@humansignal/ui", () => ({
   Button: ({ children, ...props }) => (
     <button type="button" data-testid="ui-button" {...props}>
       {children}
@@ -50,7 +50,7 @@ jest.mock("@humansignal/ui", () => ({
   },
 }));
 
-jest.mock("../../../../common/Menu/Menu", () => ({
+vi.mock("../../../../common/Menu/Menu", () => ({
   Menu: ({ children }) => <div data-testid="menu">{children}</div>,
   Item: ({ children, onClick }) => (
     <button type="button" data-testid="menu-item" onClick={onClick}>
@@ -59,21 +59,21 @@ jest.mock("../../../../common/Menu/Menu", () => ({
   ),
 }));
 
-jest.mock("../../../../components/ErrorMessage/ErrorMessage", () => ({
+vi.mock("../../../../components/ErrorMessage/ErrorMessage", () => ({
   ErrorMessage: ({ error }) => <div data-testid="error-message">{String(error)}</div>,
 }));
 
-jest.mock("../../../../components/Tags/Object", () => ({
+vi.mock("../../../../components/Tags/Object", () => ({
   __esModule: true,
   default: ({ item, children }) => <div data-testid="object-tag">{children}</div>,
 }));
 
-jest.mock("../../../../components/Timeline/Controls/VideoConfigControl", () => ({
+vi.mock("../../../../components/Timeline/Controls/VideoConfigControl", () => ({
   VideoConfigControl: () => <div data-testid="video-config-control" />,
 }));
 
 const mockTimelineProps = {};
-jest.mock("../../../../components/Timeline/Timeline", () => ({
+vi.mock("../../../../components/Timeline/Timeline", () => ({
   Timeline: (props) => {
     Object.assign(mockTimelineProps, props);
     return <div data-testid="timeline">Timeline</div>;
@@ -81,7 +81,7 @@ jest.mock("../../../../components/Timeline/Timeline", () => ({
 }));
 
 const mockVideoCanvasProps = {};
-jest.mock("../../../../components/VideoCanvas/VideoCanvas", () => ({
+vi.mock("../../../../components/VideoCanvas/VideoCanvas", () => ({
   clampZoom: (z) => Math.max(0.1, Math.min(10, z)),
   VideoCanvas: (props) => {
     Object.assign(mockVideoCanvasProps, props);
@@ -89,19 +89,19 @@ jest.mock("../../../../components/VideoCanvas/VideoCanvas", () => ({
   },
 }));
 
-jest.mock("../VideoRegions", () => ({
+vi.mock("../VideoRegions", () => ({
   VideoRegions: () => <div data-testid="video-regions">VideoRegions</div>,
 }));
 
-jest.mock("../../../../hooks/useFullscreen", () => ({
+vi.mock("../../../../hooks/useFullscreen", () => ({
   useFullscreen: () => ({
-    enter: jest.fn(),
-    exit: jest.fn(),
+    enter: vi.fn(),
+    exit: vi.fn(),
     getElement: () => null,
   }),
 }));
 
-jest.mock("../../../../hooks/useToggle", () => {
+vi.mock("../../../../hooks/useToggle", () => {
   const { useState } = require("react");
   return {
     useToggle: (initial) => {
@@ -111,11 +111,11 @@ jest.mock("../../../../hooks/useToggle", () => {
   };
 });
 
-jest.mock("../../../../utils/resize-observer", () => ({
+vi.mock("../../../../utils/resize-observer", () => ({
   __esModule: true,
-  default: jest.fn().mockImplementation(function (callback) {
+  default: vi.fn().mockImplementation(function (callback) {
     this._callback = callback;
-    this.observe = jest.fn((el) => {
+    this.observe = vi.fn((el) => {
       if (this._callback && el) {
         try {
           Object.defineProperty(el, "clientWidth", { value: 800, configurable: true });
@@ -124,8 +124,8 @@ jest.mock("../../../../utils/resize-observer", () => ({
         this._callback();
       }
     });
-    this.unobserve = jest.fn();
-    this.disconnect = jest.fn();
+    this.unobserve = vi.fn();
+    this.disconnect = vi.fn();
     return this;
   }),
 }));
@@ -138,9 +138,9 @@ function createMockItem(overrides = {}) {
       position: 1,
       playing: false,
       videoDimensions: { width: 800, height: 600, ratio: 1 },
-      adjustPan: jest.fn((x, y) => ({ x, y })),
-      play: jest.fn(),
-      pause: jest.fn(),
+      adjustPan: vi.fn((x, y) => ({ x, y })),
+      play: vi.fn(),
+      pause: vi.fn(),
       videoRef: { current: null },
     },
   };
@@ -151,21 +151,21 @@ function createMockItem(overrides = {}) {
     errors: [],
     regs: [],
     videoControl: true,
-    findRegion: jest.fn(() => null),
-    setOnlyFrame: jest.fn(),
-    setLength: jest.fn(),
-    setReady: jest.fn(),
-    setFrame: jest.fn(),
-    triggerSyncPlay: jest.fn(),
-    triggerSyncPause: jest.fn(),
-    handleSpeed: jest.fn(),
-    setLoopTimelineRegion: jest.fn(),
-    handleSeek: jest.fn(),
-    handleBuffering: jest.fn(),
-    startDrawing: jest.fn(),
-    finishDrawing: jest.fn(),
-    handleSyncPlay: jest.fn(),
-    handleSyncPause: jest.fn(),
+    findRegion: vi.fn(() => null),
+    setOnlyFrame: vi.fn(),
+    setLength: vi.fn(),
+    setReady: vi.fn(),
+    setFrame: vi.fn(),
+    triggerSyncPlay: vi.fn(),
+    triggerSyncPause: vi.fn(),
+    handleSpeed: vi.fn(),
+    setLoopTimelineRegion: vi.fn(),
+    handleSeek: vi.fn(),
+    handleBuffering: vi.fn(),
+    startDrawing: vi.fn(),
+    finishDrawing: vi.fn(),
+    handleSyncPlay: vi.fn(),
+    handleSyncPause: vi.fn(),
     speed: 1,
     framerate: 24,
     muted: false,
@@ -193,7 +193,7 @@ function createMockStore() {
 
 describe("HtxVideoView", () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     mockTimelineProps.current = {};
     mockVideoCanvasProps.current = {};
   });
@@ -321,7 +321,7 @@ describe("HtxVideoView", () => {
   });
 
   it("Timeline onSelectRegion calls item.findRegion and region.onClickRegion when region exists", async () => {
-    const onClickRegion = jest.fn();
+    const onClickRegion = vi.fn();
     const item = createMockItem({
       findRegion: (id) => (id === "r1" ? { selected: false, inSelection: false, onClickRegion } : null),
     });
@@ -335,7 +335,7 @@ describe("HtxVideoView", () => {
   });
 
   it("Timeline onSelectRegion does nothing when region not found", async () => {
-    const item = createMockItem({ findRegion: jest.fn(() => null) });
+    const item = createMockItem({ findRegion: vi.fn(() => null) });
     const store = createMockStore();
     render(<HtxVideoView item={item} store={store} />);
     await flushRaf();
@@ -346,7 +346,7 @@ describe("HtxVideoView", () => {
   });
 
   it("Timeline onAction calls toggleLifespan for lifespan_add", async () => {
-    const toggleLifespan = jest.fn();
+    const toggleLifespan = vi.fn();
     const item = createMockItem({
       regs: [
         {
@@ -375,7 +375,7 @@ describe("HtxVideoView", () => {
   });
 
   it("Timeline onAction calls addKeypoint for keypoint_add", async () => {
-    const addKeypoint = jest.fn();
+    const addKeypoint = vi.fn();
     const item = createMockItem({
       regs: [
         {
@@ -404,7 +404,7 @@ describe("HtxVideoView", () => {
   });
 
   it("Timeline onAction calls removeKeypoint for keypoint_remove", async () => {
-    const removeKeypoint = jest.fn();
+    const removeKeypoint = vi.fn();
     const item = createMockItem({
       regs: [
         {

@@ -1,3 +1,4 @@
+import React from "react";
 import { render } from "@testing-library/react";
 import { CurrentTask } from "../CurrentTask";
 import { FF_LEAP_1173 } from "../../../utils/feature-flags";
@@ -35,7 +36,7 @@ describe("CurrentTask", () => {
       annotationStore: { selected: { pk: null } },
       canGoNextTask: false,
       canGoPrevTask: false,
-      hasInterface: jest.fn(),
+      hasInterface: vi.fn(),
       taskHistory: [
         {
           taskId: 6627,
@@ -50,12 +51,12 @@ describe("CurrentTask", () => {
       commentStore: {
         loading: "list",
         comments: [],
-        setAddedCommentThisSession: jest.fn(),
+        setAddedCommentThisSession: vi.fn(),
       },
       queuePosition: 1,
-      prevTask: jest.fn(),
-      nextTask: jest.fn(),
-      postponeTask: jest.fn(),
+      prevTask: vi.fn(),
+      nextTask: vi.fn(),
+      postponeTask: vi.fn(),
       queueTotal: 22,
     };
   });

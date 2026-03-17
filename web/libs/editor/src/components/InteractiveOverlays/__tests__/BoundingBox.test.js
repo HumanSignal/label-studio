@@ -4,17 +4,17 @@
 import { BoundingBox } from "../BoundingBox";
 import { Geometry } from "../Geometry";
 
-jest.mock("../Geometry", () => ({
+vi.mock("../Geometry", () => ({
   Geometry: {
-    getDOMBBox: jest.fn(),
-    clampBBox: jest.fn((bbox) => ({ ...bbox })),
-    modifyBBoxCoords: jest.fn((bbox) => ({ ...bbox })),
+    getDOMBBox: vi.fn(),
+    clampBBox: vi.fn((bbox) => ({ ...bbox })),
+    modifyBBoxCoords: vi.fn((bbox) => ({ ...bbox })),
   },
 }));
 
 describe("BoundingBox", () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe("class", () => {
@@ -52,7 +52,7 @@ describe("BoundingBox", () => {
   describe("bbox (static)", () => {
     it("returns array of default bbox for unknown region type", () => {
       const region = { type: "unknown" };
-      const warnSpy = jest.spyOn(console, "warn").mockImplementation(() => {});
+      const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
       const result = BoundingBox.bbox(region);
       expect(result).toEqual([{ x: 0, y: 0, width: 0, height: 0 }]);
       expect(warnSpy).toHaveBeenCalledWith("Unknown region type: unknown");

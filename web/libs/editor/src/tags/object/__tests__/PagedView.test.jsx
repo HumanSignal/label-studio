@@ -1,3 +1,4 @@
+import React from "react";
 import { getStoredPageSize, setStoredPageSize, getQueryPage, updateQueryPage } from "../PagedView";
 
 const PAGE_PARAM = "view_page";
@@ -10,7 +11,7 @@ describe("PagedView helpers", () => {
   beforeEach(() => {
     locationSearch = "";
     locationPathname = "/app";
-    replaceStateSpy = jest.fn();
+    replaceStateSpy = vi.fn();
     Object.defineProperty(window, "location", {
       get() {
         return { search: locationSearch, pathname: locationPathname };

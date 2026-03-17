@@ -1,6 +1,7 @@
 /**
  * Unit tests for Playhead (lib/AudioUltra/Visual/PlayHead.ts)
  */
+import { CursorSymbol } from "../../Cursor/Cursor";
 import { Playhead } from "../PlayHead";
 import { rgba } from "../../Common/Color";
 
@@ -18,8 +19,8 @@ function createMockVisualizer(overrides = {}) {
       getBoundingClientRect: () => ({ left: 0, top: 0, width: 800, height: 100 }),
     },
     getScrollLeft: () => 0,
-    transferImage: jest.fn(),
-    draw: jest.fn(),
+    transferImage: vi.fn(),
+    draw: vi.fn(),
     ...overrides,
   };
 }
@@ -30,12 +31,12 @@ function createMockWaveform(overrides = {}) {
     currentTime: 0,
     zoom: 1,
     cursor: {
-      set: jest.fn(),
-      hasFocus: jest.fn(() => false),
-      isFocused: jest.fn(() => false),
+      set: vi.fn(),
+      hasFocus: vi.fn(() => false),
+      isFocused: vi.fn(() => false),
     },
-    on: jest.fn(),
-    off: jest.fn(),
+    on: vi.fn(),
+    off: vi.fn(),
     ...overrides,
   };
 }
@@ -82,7 +83,7 @@ describe("Playhead", () => {
       const visualizer = createMockVisualizer();
       const wf = createMockWaveform();
       const playhead = new Playhead({ x: 0 }, visualizer as any, wf as any);
-      const drawSpy = jest.spyOn(playhead, "drawPlayheadSlice");
+      const drawSpy = vi.spyOn(playhead, "drawPlayheadSlice");
       playhead.onInit();
       expect(drawSpy).toHaveBeenCalled();
       expect(wf.on).toHaveBeenCalledWith("playing", expect.any(Function));
@@ -128,9 +129,9 @@ describe("Playhead", () => {
       playhead.onInit();
       const ctx = {
         canvas: { width: 0, height: 0 },
-        save: jest.fn(),
-        restore: jest.fn(),
-        drawImage: jest.fn(),
+        save: vi.fn(),
+        restore: vi.fn(),
+        drawImage: vi.fn(),
         globalAlpha: 1,
       } as unknown as CanvasRenderingContext2D;
       playhead.renderTo(ctx, 10);
@@ -142,11 +143,11 @@ describe("Playhead", () => {
       const wf = createMockWaveform();
       const playhead = new Playhead({ x: 0 }, visualizer as any, wf as any);
       playhead.onInit();
-      const drawImageSpy = jest.fn();
+      const drawImageSpy = vi.fn();
       const ctx = {
         canvas: { width: 800, height: 100 },
-        save: jest.fn(),
-        restore: jest.fn(),
+        save: vi.fn(),
+        restore: vi.fn(),
         drawImage: drawImageSpy,
         globalAlpha: 1,
       } as unknown as CanvasRenderingContext2D;
@@ -246,7 +247,7 @@ describe("Playhead", () => {
     it("mouseEnter does not set cursor when cursor has focus", () => {
       const visualizer = createMockVisualizer();
       const wf = createMockWaveform();
-      (wf.cursor as any).hasFocus = jest.fn(() => true);
+      (wf.cursor as any).hasFocus = vi.fn(() => true);
       const playhead = new Playhead({ x: 0 }, visualizer as any, wf as any);
       playhead.onInit();
       wf.cursor.set.mockClear();
@@ -258,8 +259,7 @@ describe("Playhead", () => {
     it("mouseLeave clears isHovered and resets cursor when focused on playhead", () => {
       const visualizer = createMockVisualizer();
       const wf = createMockWaveform();
-      (wf.cursor as any).isFocused = jest.fn((id: string) => id === "playhead");
-      const CursorSymbol = require("../../Cursor/Cursor").CursorSymbol;
+      (wf.cursor as any).isFocused = vi.fn((id: string) => id === "playhead");
       const playhead = new Playhead({ x: 0 }, visualizer as any, wf as any);
       playhead.onInit();
       (playhead as any).invoke("mouseEnter");
@@ -273,7 +273,7 @@ describe("Playhead", () => {
       const wf = createMockWaveform();
       const playhead = new Playhead({ x: 0 }, visualizer as any, wf as any);
       playhead.onInit();
-      const playingCb = (wf.on as jest.Mock).mock.calls.find((c: any[]) => c[0] === "playing")?.[1];
+      const playingCb = (wf.on as vi.Mock).mock.calls.find((c: any[]) => c[0] === "playing")?.[1];
       expect(playingCb).toBeDefined();
       playingCb(5, true, true);
       expect(playhead.x).toBe(400);
@@ -285,7 +285,7 @@ describe("Playhead", () => {
       (wf as any).currentTime = 2;
       const playhead = new Playhead({ x: 0 }, visualizer as any, wf as any);
       playhead.onInit();
-      const onZoomCb = (wf.on as jest.Mock).mock.calls.find((c: any[]) => c[0] === "zoom")?.[1];
+      const onZoomCb = (wf.on as vi.Mock).mock.calls.find((c: any[]) => c[0] === "zoom")?.[1];
       expect(onZoomCb).toBeDefined();
       onZoomCb();
       expect(playhead.x).toBeGreaterThanOrEqual(0);
@@ -297,7 +297,7 @@ describe("Playhead", () => {
       (wf as any).currentTime = 1;
       const playhead = new Playhead({ x: 0 }, visualizer as any, wf as any);
       playhead.onInit();
-      const onScrollCb = (wf.on as jest.Mock).mock.calls.find((c: any[]) => c[0] === "scroll")?.[1];
+      const onScrollCb = (wf.on as vi.Mock).mock.calls.find((c: any[]) => c[0] === "scroll")?.[1];
       expect(onScrollCb).toBeDefined();
       onScrollCb();
       expect(playhead.x).toBeGreaterThanOrEqual(0);
@@ -309,8 +309,8 @@ describe("Playhead", () => {
       const playhead = new Playhead({ x: 0 }, visualizer as any, wf as any);
       playhead.onInit();
       playhead.isHovered = true;
-      const addSpy = jest.spyOn(document, "addEventListener");
-      const removeSpy = jest.spyOn(document, "removeEventListener");
+      const addSpy = vi.spyOn(document, "addEventListener");
+      const removeSpy = vi.spyOn(document, "removeEventListener");
       const e = new MouseEvent("mousedown", { clientX: 100 });
       (playhead as any).invoke("mouseDown", [e]);
       expect(playhead.isDragging).toBe(true);
@@ -332,7 +332,7 @@ describe("Playhead", () => {
       const playhead = new Playhead({ x: 0 }, visualizer as any, wf as any);
       playhead.onInit();
       playhead.isHovered = true;
-      const addSpy = jest.spyOn(document, "addEventListener");
+      const addSpy = vi.spyOn(document, "addEventListener");
       const e = new MouseEvent("mousedown", { clientX: 100 });
       (playhead as any).invoke("mouseDown", [e]);
       const mouseMoveHandler = addSpy.mock.calls.find((c) => c[0] === "mousemove")?.[1] as (ev: MouseEvent) => void;

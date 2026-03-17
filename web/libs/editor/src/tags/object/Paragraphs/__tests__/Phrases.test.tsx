@@ -1,3 +1,4 @@
+import React from "react";
 import { render, screen, fireEvent } from "@testing-library/react";
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
@@ -13,22 +14,22 @@ const intersectionObserverMock = () => ({
   disconnect: () => null,
 });
 
-window.IntersectionObserver = jest.fn().mockImplementation(intersectionObserverMock);
+window.IntersectionObserver = vi.fn().mockImplementation(intersectionObserverMock);
 
 // Mock scrollIntoView and focus methods
 Object.defineProperty(HTMLElement.prototype, "scrollIntoView", {
-  value: jest.fn(),
+  value: vi.fn(),
   writable: true,
 });
 
 Object.defineProperty(HTMLElement.prototype, "focus", {
-  value: jest.fn(),
+  value: vi.fn(),
   writable: true,
 });
 
-jest.mock("mobx-state-tree", () => ({
-  ...jest.requireActual("mobx-state-tree"),
-  getRoot: jest.fn(),
+vi.mock("mobx-state-tree", async () => ({
+  ...(await vi.importActual("mobx-state-tree")),
+  getRoot: vi.fn(),
 }));
 
 describe("Phrases Component", () => {
@@ -46,15 +47,15 @@ describe("Phrases Component", () => {
       { start: 0, end: 1, name: "Speaker A", text: "This is phrase 1" },
       { start: 1, end: 2, name: "Speaker B", text: "This is phrase 2" },
     ],
-    isVisibleForAuthorFilter: jest.fn(() => true),
+    isVisibleForAuthorFilter: vi.fn(() => true),
     layoutStyles: () => ({ phrase: { color: "red" } }),
-    seekToPhrase: jest.fn(),
-    selectAndAnnotatePhrase: jest.fn(),
+    seekToPhrase: vi.fn(),
+    selectAndAnnotatePhrase: vi.fn(),
     ...overrides,
   });
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     getRoot.mockReturnValue({ settings: { showLineNumbers: false } });
@@ -84,7 +85,7 @@ describe("Phrases Component", () => {
           item={item}
           playingId={0}
           activeRef={{ current: null }}
-          setIsInViewport={jest.fn()}
+          setIsInViewport={vi.fn()}
           hasSelectedLabels={false}
         />,
       );
@@ -116,7 +117,7 @@ describe("Phrases Component", () => {
             item={item}
             playingId={0}
             activeRef={{ current: null }}
-            setIsInViewport={jest.fn()}
+            setIsInViewport={vi.fn()}
             hasSelectedLabels={true}
           />,
         );
@@ -137,7 +138,7 @@ describe("Phrases Component", () => {
             item={item}
             playingId={0}
             activeRef={{ current: null }}
-            setIsInViewport={jest.fn()}
+            setIsInViewport={vi.fn()}
             hasSelectedLabels={true}
           />,
         );
@@ -156,7 +157,7 @@ describe("Phrases Component", () => {
             item={item}
             playingId={0}
             activeRef={{ current: null }}
-            setIsInViewport={jest.fn()}
+            setIsInViewport={vi.fn()}
             hasSelectedLabels={true}
           />,
         );
@@ -181,7 +182,7 @@ describe("Phrases Component", () => {
             item={item}
             playingId={0}
             activeRef={{ current: null }}
-            setIsInViewport={jest.fn()}
+            setIsInViewport={vi.fn()}
             hasSelectedLabels={false}
           />,
         );
@@ -202,7 +203,7 @@ describe("Phrases Component", () => {
             item={item}
             playingId={0}
             activeRef={{ current: null }}
-            setIsInViewport={jest.fn()}
+            setIsInViewport={vi.fn()}
             hasSelectedLabels={false}
           />,
         );
@@ -221,7 +222,7 @@ describe("Phrases Component", () => {
             item={item}
             playingId={0}
             activeRef={{ current: null }}
-            setIsInViewport={jest.fn()}
+            setIsInViewport={vi.fn()}
             hasSelectedLabels={false}
           />,
         );
@@ -242,7 +243,7 @@ describe("Phrases Component", () => {
             item={item}
             playingId={0}
             activeRef={{ current: null }}
-            setIsInViewport={jest.fn()}
+            setIsInViewport={vi.fn()}
             hasSelectedLabels={true}
           />,
         );
@@ -266,7 +267,7 @@ describe("Phrases Component", () => {
             item={item}
             playingId={0}
             activeRef={{ current: null }}
-            setIsInViewport={jest.fn()}
+            setIsInViewport={vi.fn()}
             hasSelectedLabels={false}
           />,
         );
@@ -287,7 +288,7 @@ describe("Phrases Component", () => {
             item={item}
             playingId={0}
             activeRef={{ current: null }}
-            setIsInViewport={jest.fn()}
+            setIsInViewport={vi.fn()}
             hasSelectedLabels={false}
           />,
         );
@@ -301,7 +302,7 @@ describe("Phrases Component", () => {
             item={item}
             playingId={0}
             activeRef={{ current: null }}
-            setIsInViewport={jest.fn()}
+            setIsInViewport={vi.fn()}
             hasSelectedLabels={true}
           />,
         );
@@ -320,7 +321,7 @@ describe("Phrases Component", () => {
             item={item}
             playingId={0}
             activeRef={{ current: null }}
-            setIsInViewport={jest.fn()}
+            setIsInViewport={vi.fn()}
             hasSelectedLabels={true}
           />,
         );
@@ -340,7 +341,7 @@ describe("Phrases Component", () => {
               item={item}
               playingId={0}
               activeRef={{ current: null }}
-              setIsInViewport={jest.fn()}
+              setIsInViewport={vi.fn()}
               hasSelectedLabels={true}
             />,
           ),
@@ -355,7 +356,7 @@ describe("Phrases Component", () => {
             item={item}
             playingId={0}
             activeRef={{ current: null }}
-            setIsInViewport={jest.fn()}
+            setIsInViewport={vi.fn()}
             hasSelectedLabels={true}
           />,
         );

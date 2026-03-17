@@ -1,3 +1,4 @@
+import React from "react";
 import { DEFAULT_PANEL_HEIGHT, DEFAULT_PANEL_WIDTH } from "../../constants";
 import { JoinOrder, type PanelBBox, Side } from "../types";
 import {

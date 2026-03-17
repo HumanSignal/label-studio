@@ -1,9 +1,10 @@
+import React from "react";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import "@testing-library/jest-dom";
 import { RegionItem } from "../RegionItem";
 
-jest.mock("../../../../utils/bem", () => ({
+vi.mock("../../../../utils/bem", () => ({
   cn: (block: string) => ({
     elem: (elem: string) => ({
       toClassName: () => `dm-${block}__${elem}`,
@@ -24,15 +25,15 @@ jest.mock("../../../../utils/bem", () => ({
   }),
 }));
 
-jest.mock("../../../Node/Node", () => ({
+vi.mock("../../../Node/Node", () => ({
   NodeIcon: ({ node }: { node: any }) => <span data-testid="node-icon">{node?.id ?? "no-node"}</span>,
 }));
 
-jest.mock("../RegionLabels", () => ({
+vi.mock("../RegionLabels", () => ({
   RegionLabels: ({ region }: { region: any }) => <div data-testid="region-labels">{region?.cleanId ?? "labels"}</div>,
 }));
 
-jest.mock("../../Components/LockButton", () => ({
+vi.mock("../../Components/LockButton", () => ({
   LockButton: ({ onClick, "aria-label": ariaLabel }: any) => (
     <button type="button" onClick={onClick} aria-label={ariaLabel} data-testid="lock-button">
       Lock
@@ -40,11 +41,11 @@ jest.mock("../../Components/LockButton", () => ({
   ),
 }));
 
-jest.mock("../../../../common/Hotkey/WithHotkey", () => ({
+vi.mock("../../../../common/Hotkey/WithHotkey", () => ({
   WithHotkey: ({ children }: { children: React.ReactNode }) => <div data-testid="with-hotkey">{children}</div>,
 }));
 
-jest.mock("chroma-js", () => ({
+vi.mock("chroma-js", () => ({
   __esModule: true,
   default: (color: string) => ({
     alpha: () => ({
@@ -53,7 +54,7 @@ jest.mock("chroma-js", () => ({
   }),
 }));
 
-jest.mock("@humansignal/icons", () => ({
+vi.mock("@humansignal/icons", () => ({
   IconEyeClosed: () => <span data-testid="icon-eye-closed" />,
   IconEyeOpened: () => <span data-testid="icon-eye-opened" />,
   IconPlus: () => <span data-testid="icon-plus" />,
@@ -62,7 +63,7 @@ jest.mock("@humansignal/icons", () => ({
   IconWarning: () => <span data-testid="icon-warning" />,
 }));
 
-jest.mock("@humansignal/ui", () => ({
+vi.mock("@humansignal/ui", () => ({
   Button: ({ children, onClick, "aria-label": ariaLabel, disabled, ...rest }: any) => (
     <button type="button" onClick={onClick} aria-label={ariaLabel} disabled={disabled} {...rest}>
       {children}
@@ -70,7 +71,7 @@ jest.mock("@humansignal/ui", () => ({
   ),
 }));
 
-jest.mock("mobx-react", () => ({
+vi.mock("mobx-react", () => ({
   observer: (component: any) => component,
 }));
 
@@ -78,9 +79,9 @@ function createMockRegion(overrides: Record<string, unknown> = {}) {
   const annotation = {
     selectedRegions: [{ isReadOnly: () => false, classification: false }],
     isLinkingMode: false,
-    startLinkingMode: jest.fn(),
-    stopLinkingMode: jest.fn(),
-    deleteRegion: jest.fn(),
+    startLinkingMode: vi.fn(),
+    stopLinkingMode: vi.fn(),
+    deleteRegion: vi.fn(),
   };
   return {
     id: "region-1",
@@ -95,10 +96,10 @@ function createMockRegion(overrides: Record<string, unknown> = {}) {
     type: "rectangleregion",
     isReadOnly: () => false,
     locked: false,
-    setLocked: jest.fn(),
+    setLocked: vi.fn(),
     hideable: false,
     hidden: false,
-    toggleHidden: jest.fn(),
+    toggleHidden: vi.fn(),
     ...overrides,
   };
 }
@@ -282,9 +283,9 @@ describe("RegionItem", () => {
       annotation: {
         selectedRegions: [{ isReadOnly: () => false, classification: false }],
         isLinkingMode: false,
-        startLinkingMode: jest.fn(),
-        stopLinkingMode: jest.fn(),
-        deleteRegion: jest.fn(),
+        startLinkingMode: vi.fn(),
+        stopLinkingMode: vi.fn(),
+        deleteRegion: vi.fn(),
       },
     });
     render(<RegionItem region={region} />);
@@ -296,9 +297,9 @@ describe("RegionItem", () => {
       annotation: {
         selectedRegions: [{ isReadOnly: () => true, classification: false }],
         isLinkingMode: false,
-        startLinkingMode: jest.fn(),
-        stopLinkingMode: jest.fn(),
-        deleteRegion: jest.fn(),
+        startLinkingMode: vi.fn(),
+        stopLinkingMode: vi.fn(),
+        deleteRegion: vi.fn(),
       },
     });
     render(<RegionItem region={region} />);

@@ -2,28 +2,25 @@
  * Unit tests for Regions mixin (mixins/Regions.js)
  */
 import { getEnv, getRoot, getParent, types } from "mobx-state-tree";
+import { mockFF } from "../../../__mocks__/global";
 
-jest.mock("../../utils/feature-flags", () => ({
-  isFF: () => false,
-  FF_DEV_3391: "ff_3391",
-  FF_SIMPLE_INIT: "ff_simple_init",
-}));
+const ff = mockFF();
 
 const mockAnnotation = () => ({
   regionStore: {
-    isSelected: jest.fn(() => false),
-    unselectAll: jest.fn(),
-    toggleRegionSelection: jest.fn(),
+    isSelected: vi.fn(() => false),
+    unselectAll: vi.fn(),
+    toggleRegionSelection: vi.fn(),
   },
-  selectArea: jest.fn(),
-  unselectAll: jest.fn(),
-  toggleRegionSelection: jest.fn(),
+  selectArea: vi.fn(),
+  unselectAll: vi.fn(),
+  toggleRegionSelection: vi.fn(),
   isDrawing: false,
   isLinkingMode: false,
-  addLinkedRegion: jest.fn(),
-  stopLinkingMode: jest.fn(),
+  addLinkedRegion: vi.fn(),
+  stopLinkingMode: vi.fn(),
   isSuggestionsAccepting: false,
-  isReadOnly: jest.fn(() => false),
+  isReadOnly: vi.fn(() => false),
   areas: new Map(),
 });
 
@@ -87,6 +84,9 @@ function createStore(annotationOverrides = {}, regionSnapshot = {}) {
 }
 
 describe("Regions mixin", () => {
+  beforeEach(() => { ff.setup(); });
+  afterEach(() => { ff.reset(); });
+
   describe("views", () => {
     it("perRegionStates returns states filtered by perregion", () => {
       const { region } = createStore();
@@ -150,7 +150,7 @@ describe("Regions mixin", () => {
     it("currentImageEntity uses parent.findImageEntity", () => {
       const { root, region } = createStore();
       const entity = {};
-      root.findImageEntity = jest.fn(() => entity);
+      root.findImageEntity = vi.fn(() => entity);
       region.setItemIndex(0);
       expect(region.currentImageEntity).toBe(entity);
       expect(root.findImageEntity).toHaveBeenCalledWith(0);
@@ -229,7 +229,7 @@ describe("Regions mixin", () => {
 
     it("beforeDestroy calls beforeDestroyArea when isRealRegion", () => {
       const { region, annotation } = createStore();
-      const spy = jest.spyOn(region, "beforeDestroyArea");
+      const spy = vi.spyOn(region, "beforeDestroyArea");
       region.beforeDestroy();
       expect(spy).toHaveBeenCalled();
     });
@@ -237,7 +237,7 @@ describe("Regions mixin", () => {
     it("beforeDestroy does not call beforeDestroyArea when not real region", () => {
       const { region, annotation } = createStore();
       annotation.areas.clear();
-      const spy = jest.spyOn(region, "beforeDestroyArea");
+      const spy = vi.spyOn(region, "beforeDestroyArea");
       region.beforeDestroy();
       expect(spy).not.toHaveBeenCalled();
     });
@@ -277,7 +277,7 @@ describe("Regions mixin", () => {
 
     it("toggleFiltered toggles filtered and calls toggleHidden", () => {
       const { region } = createStore();
-      const e = { stopPropagation: jest.fn() };
+      const e = { stopPropagation: vi.fn() };
       region.toggleFiltered(e);
       expect(region.filtered).toBe(true);
       expect(region.hidden).toBe(true);
@@ -286,7 +286,7 @@ describe("Regions mixin", () => {
 
     it("toggleHidden toggles hidden and stops propagation", () => {
       const { region } = createStore();
-      const e = { stopPropagation: jest.fn() };
+      const e = { stopPropagation: vi.fn() };
       region.toggleHidden(e);
       expect(region.hidden).toBe(true);
       expect(e.stopPropagation).toHaveBeenCalled();

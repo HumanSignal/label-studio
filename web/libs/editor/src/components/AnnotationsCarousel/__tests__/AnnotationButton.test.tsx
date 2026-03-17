@@ -1,36 +1,38 @@
+import React from "react";
 import { render, screen, fireEvent } from "@testing-library/react";
 import { Provider } from "mobx-react";
 import { AnnotationButton } from "../AnnotationButton";
 
-jest.mock("mobx-state-tree", () => ({
-  isAlive: jest.fn(() => true),
+vi.mock("mobx-state-tree", () => ({
+  isAlive: vi.fn(() => true),
 }));
 
-jest.mock("@humansignal/core/hooks/useResolveUser", () => ({
-  useResolveUser: jest.fn(),
+vi.mock("@humansignal/core/hooks/useResolveUser", () => ({
+  useResolveUser: vi.fn(),
   isUserComplete: (u: any) => !!(u && (u.email || (u.firstName && u.lastName))),
 }));
 
-jest.mock("@humansignal/core", () => ({
-  useCopyText: () => [jest.fn()],
+vi.mock("@humansignal/core", () => ({
+  useCopyText: () => [vi.fn()],
 }));
 
-const mockToastShow = jest.fn();
-jest.mock("@humansignal/ui", () => {
-  const actual = jest.requireActual("@humansignal/ui");
+const mockToastShow = vi.fn();
+vi.mock("@humansignal/ui", async () => {
+  const actual = await vi.importActual("@humansignal/ui");
   return {
     ...actual,
     useToast: () => ({ show: mockToastShow }),
-    useDropdown: () => ({ close: jest.fn() }),
+    useDropdown: () => ({ close: vi.fn() }),
   };
 });
 
-jest.mock("../../../common/Modal/Modal", () => ({
-  confirm: jest.fn(),
+vi.mock("../../../common/Modal/Modal", () => ({
+  confirm: vi.fn(),
 }));
 
-jest.mock("../../../utils/feature-flags", () => ({
-  isFF: () => false,
+vi.mock("../../../utils/feature-flags", () => ({
+  isFF: vi.fn(() => false),
+  FF_SIMPLE_INIT: "fflag_fix_front_leap_443_select_annotation_once",
 }));
 
 const defaultCapabilities = {
@@ -40,18 +42,18 @@ const defaultCapabilities = {
 };
 
 const defaultStore = {
-  hasInterface: jest.fn(() => false),
+  hasInterface: vi.fn(() => false),
   user: { id: 1, email: "current@test.com" },
-  enrichUsers: jest.fn(),
+  enrichUsers: vi.fn(),
   task: null,
 };
 
 const defaultAnnotationStore = {
   store: defaultStore,
-  selectAnnotation: jest.fn(),
-  selectPrediction: jest.fn(),
-  addAnnotationFromPrediction: jest.fn(),
-  toggleViewingAllAnnotations: jest.fn(),
+  selectAnnotation: vi.fn(),
+  selectPrediction: vi.fn(),
+  addAnnotationFromPrediction: vi.fn(),
+  toggleViewingAllAnnotations: vi.fn(),
 };
 
 function createEntity(overrides: Record<string, unknown> = {}) {
@@ -66,8 +68,8 @@ function createEntity(overrides: Record<string, unknown> = {}) {
     skipped: false,
     createdDate: new Date().toISOString(),
     user: null,
-    list: { deleteAnnotation: jest.fn() },
-    setGroundTruth: jest.fn(),
+    list: { deleteAnnotation: vi.fn() },
+    setGroundTruth: vi.fn(),
     comment_count: 0,
     unresolved_comment_count: 0,
     ...overrides,
@@ -76,14 +78,14 @@ function createEntity(overrides: Record<string, unknown> = {}) {
 
 describe("AnnotationButton", () => {
   beforeEach(() => {
-    jest.clearAllMocks();
-    const { isAlive } = jest.requireMock("mobx-state-tree");
-    (isAlive as jest.Mock).mockReturnValue(true);
+    vi.clearAllMocks();
+    const { isAlive } = vi.requireMock("mobx-state-tree");
+    (isAlive as vi.Mock).mockReturnValue(true);
   });
 
   it("renders null when entity is not alive", () => {
-    const { isAlive } = jest.requireMock("mobx-state-tree");
-    (isAlive as jest.Mock).mockReturnValue(false);
+    const { isAlive } = vi.requireMock("mobx-state-tree");
+    (isAlive as vi.Mock).mockReturnValue(false);
 
     const entity = createEntity();
     const { container } = render(
@@ -145,7 +147,7 @@ describe("AnnotationButton", () => {
 
   it("calls selectAnnotation when clicking unselected annotation", () => {
     const entity = createEntity({ selected: false });
-    const selectAnnotation = jest.fn();
+    const selectAnnotation = vi.fn();
     const annotationStore = {
       ...defaultAnnotationStore,
       selectAnnotation,
@@ -157,7 +159,7 @@ describe("AnnotationButton", () => {
 
   it("does not call selectAnnotation when clicking already selected annotation", () => {
     const entity = createEntity({ selected: true });
-    const selectAnnotation = jest.fn();
+    const selectAnnotation = vi.fn();
     const annotationStore = {
       ...defaultAnnotationStore,
       selectAnnotation,
@@ -173,7 +175,7 @@ describe("AnnotationButton", () => {
       id: 42,
       pk: undefined,
     });
-    const selectPrediction = jest.fn();
+    const selectPrediction = vi.fn();
     const annotationStore = {
       ...defaultAnnotationStore,
       selectPrediction,
@@ -196,7 +198,7 @@ describe("AnnotationButton", () => {
   it("hides user info when store has annotations:hide-info and shows Me/User", () => {
     const store = {
       ...defaultStore,
-      hasInterface: jest.fn((key: string) => key === "annotations:hide-info"),
+      hasInterface: vi.fn((key: string) => key === "annotations:hide-info"),
     };
     const entity = createEntity({
       createdBy: "current@test.com",
@@ -269,7 +271,7 @@ describe("AnnotationButton", () => {
 
   it("calls onAnnotationChange when provided", () => {
     const entity = createEntity();
-    const onAnnotationChange = jest.fn();
+    const onAnnotationChange = vi.fn();
     render(
       <AnnotationButton
         entity={entity}
@@ -362,7 +364,7 @@ describe("AnnotationButton", () => {
   it("shows Copy Annotation Link when store has annotations:copy-link", () => {
     const storeWithCopyLink = {
       ...defaultStore,
-      hasInterface: jest.fn((key: string) => key === "annotations:copy-link"),
+      hasInterface: vi.fn((key: string) => key === "annotations:copy-link"),
     };
     const entity = createEntity();
     const { container } = render(
@@ -385,7 +387,7 @@ describe("AnnotationButton", () => {
 
   it("calls setGroundTruth when Set as Ground Truth is clicked", () => {
     const entity = createEntity({ ground_truth: false });
-    const setGroundTruth = jest.fn();
+    const setGroundTruth = vi.fn();
     entity.setGroundTruth = setGroundTruth;
     const { container } = render(
       <Provider store={defaultStore}>
@@ -403,7 +405,7 @@ describe("AnnotationButton", () => {
 
   it("calls toggleViewingAllAnnotations when Show Other Annotations is clicked", () => {
     const entity = createEntity();
-    const toggleViewingAllAnnotations = jest.fn();
+    const toggleViewingAllAnnotations = vi.fn();
     const { container } = render(
       <Provider store={defaultStore}>
         <AnnotationButton
@@ -425,7 +427,7 @@ describe("AnnotationButton", () => {
   });
 
   it("opens delete confirmation when Delete Annotation is clicked", () => {
-    const confirm = jest.requireMock("../../../common/Modal/Modal").confirm;
+    const confirm = vi.requireMock("../../../common/Modal/Modal").confirm;
     const entity = createEntity();
     const { container } = render(
       <Provider store={defaultStore}>
@@ -469,7 +471,7 @@ describe("AnnotationButton", () => {
     mockToastShow.mockClear();
     const storeWithCopyLink = {
       ...defaultStore,
-      hasInterface: jest.fn((key: string) => key === "annotations:copy-link"),
+      hasInterface: vi.fn((key: string) => key === "annotations:copy-link"),
     };
     const entity = createEntity();
     const { container } = render(
@@ -489,10 +491,10 @@ describe("AnnotationButton", () => {
   });
 
   it("calls addAnnotationFromPrediction and selectAnnotation when Duplicate Annotation is clicked", () => {
-    jest.useFakeTimers();
+    vi.useFakeTimers();
     const newAnnotation = { id: 99 };
-    const addAnnotationFromPrediction = jest.fn().mockReturnValue(newAnnotation);
-    const selectAnnotation = jest.fn();
+    const addAnnotationFromPrediction = vi.fn().mockReturnValue(newAnnotation);
+    const selectAnnotation = vi.fn();
     const entity = createEntity();
     const { container } = render(
       <Provider store={defaultStore}>
@@ -513,14 +515,14 @@ describe("AnnotationButton", () => {
     fireEvent.click(container.querySelector(".ls-annotation-button__trigger")!);
     fireEvent.click(screen.getByText("Duplicate Annotation"));
     expect(addAnnotationFromPrediction).toHaveBeenCalledWith(entity);
-    jest.runAllTimers();
+    vi.runAllTimers();
     expect(selectAnnotation).toHaveBeenCalledWith(99, { exitViewAll: true });
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   it("calls setGroundTruth(false) when Unset as Ground Truth is clicked", () => {
     const entity = createEntity({ ground_truth: true });
-    const setGroundTruth = jest.fn();
+    const setGroundTruth = vi.fn();
     entity.setGroundTruth = setGroundTruth;
     const { container } = render(
       <Provider store={defaultStore}>

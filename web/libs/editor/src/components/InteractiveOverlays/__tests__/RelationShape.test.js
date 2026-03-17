@@ -4,9 +4,9 @@
 import { BoundingBox } from "../BoundingBox";
 import { RelationShape } from "../RelationShape";
 
-jest.mock("../BoundingBox", () => ({
+vi.mock("../BoundingBox", () => ({
   BoundingBox: {
-    bbox: jest.fn(() => [{ x: 0, y: 0, width: 10, height: 10 }]),
+    bbox: vi.fn(() => [{ x: 0, y: 0, width: 10, height: 10 }]),
   },
 }));
 
@@ -14,7 +14,7 @@ describe("RelationShape", () => {
   const mockElement = { getBoundingClientRect: () => ({}) };
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe("constructor", () => {
@@ -27,7 +27,7 @@ describe("RelationShape", () => {
     });
 
     it("creates watcher when watcher constructor is provided", () => {
-      const WatcherClass = jest.fn();
+      const WatcherClass = vi.fn();
       const root = document.body;
       const shape = new RelationShape({
         root,
@@ -55,7 +55,7 @@ describe("RelationShape", () => {
   describe("onUpdate", () => {
     it("sets the callback so onChanged invokes it", () => {
       const shape = new RelationShape({ element: mockElement });
-      const callback = jest.fn();
+      const callback = vi.fn();
 
       shape.onUpdate(callback);
       shape.onChanged();
@@ -67,7 +67,7 @@ describe("RelationShape", () => {
   describe("onChanged", () => {
     it("calls onUpdated when set", () => {
       const shape = new RelationShape({ element: mockElement });
-      const callback = jest.fn();
+      const callback = vi.fn();
       shape.onUpdate(callback);
 
       shape.onChanged();
@@ -85,7 +85,7 @@ describe("RelationShape", () => {
   describe("destroy", () => {
     it("clears onUpdated", () => {
       const shape = new RelationShape({ element: mockElement });
-      const callback = jest.fn();
+      const callback = vi.fn();
       shape.onUpdate(callback);
 
       shape.destroy();

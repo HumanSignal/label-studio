@@ -3,7 +3,7 @@
  */
 import { types } from "mobx-state-tree";
 
-jest.mock("../../tags/object/Video", () => {
+vi.mock("../../tags/object/Video", () => {
   const { types } = require("mobx-state-tree");
   return {
     VideoModel: types

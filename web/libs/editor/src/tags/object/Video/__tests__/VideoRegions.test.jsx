@@ -5,7 +5,7 @@ import React from "react";
 import { render, screen, fireEvent, act } from "@testing-library/react";
 import { VideoRegions, MIN_SIZE } from "../VideoRegions";
 
-jest.mock("chroma-js", () => ({
+vi.mock("chroma-js", () => ({
   __esModule: true,
   default: () => ({
     alpha: () => ({
@@ -14,24 +14,24 @@ jest.mock("chroma-js", () => ({
   }),
 }));
 
-jest.mock("mobx-state-tree", () => ({
-  ...jest.requireActual("mobx-state-tree"),
-  getParentOfType: jest.fn(() => null),
+vi.mock("mobx-state-tree", async () => ({
+  ...(await vi.importActual("mobx-state-tree")),
+  getParentOfType: vi.fn(() => null),
 }));
 
-jest.mock("../../../../utils/utilities", () => ({
-  fixMobxObserve: jest.fn(),
+vi.mock("../../../../utils/utilities", () => ({
+  fixMobxObserve: vi.fn(),
 }));
 
-const mockCreateBoundingBoxGetter = jest.fn(() => () => (oldBox, newBox) => newBox);
-const mockCreateOnDragMoveHandler = jest.fn(() => () => {});
+const mockCreateBoundingBoxGetter = vi.fn(() => () => (oldBox, newBox) => newBox);
+const mockCreateOnDragMoveHandler = vi.fn(() => () => {});
 
-jest.mock("../TransformTools", () => ({
+vi.mock("../TransformTools", () => ({
   createBoundingBoxGetter: (...args) => mockCreateBoundingBoxGetter(...args),
   createOnDragMoveHandler: (...args) => mockCreateOnDragMoveHandler(...args),
 }));
 
-jest.mock("../Rectangle", () => {
+vi.mock("../Rectangle", () => {
   const React = require("react");
   return {
     Rectangle: ({ id, reg, onClick, ...rest }) => (
@@ -40,7 +40,7 @@ jest.mock("../Rectangle", () => {
   };
 });
 
-jest.mock("react-konva", () => {
+vi.mock("react-konva", () => {
   const React = require("react");
   function withKonvaEvt(handler) {
     if (!handler) return undefined;
@@ -66,7 +66,7 @@ jest.mock("react-konva", () => {
         ref.current = {
           getStage: () => ({ findOne: () => null }),
           nodes: () => [],
-          getLayer: () => ({ batchDraw: jest.fn() }),
+          getLayer: () => ({ batchDraw: vi.fn() }),
         };
         if (typeof initRef === "function") initRef(ref.current);
         else if (initRef) initRef.current = ref.current;
@@ -104,8 +104,8 @@ function createMockRegion(overrides = {}) {
     isReadOnly: () => false,
     isInLifespan: () => true,
     getShape: () => ({ x: 10, y: 10, width: 50, height: 50, rotation: 0 }),
-    setHighlight: jest.fn(),
-    onClickRegion: jest.fn(),
+    setHighlight: vi.fn(),
+    onClickRegion: vi.fn(),
     ...overrides,
   };
 }
@@ -113,13 +113,13 @@ function createMockRegion(overrides = {}) {
 function createMockItem(overrides = {}) {
   const annotation = {
     isReadOnly: () => false,
-    unselectAreas: jest.fn(),
+    unselectAreas: vi.fn(),
     ...overrides.annotation,
   };
   return {
     frame: 1,
     annotation,
-    addVideoRegion: jest.fn(),
+    addVideoRegion: vi.fn(),
     ...overrides,
   };
 }
@@ -208,7 +208,7 @@ describe("VideoRegions", () => {
     });
 
     it("on stage mouseDown when annotation is readOnly does nothing", () => {
-      const item = createMockItem({ annotation: { isReadOnly: () => true, unselectAreas: jest.fn() } });
+      const item = createMockItem({ annotation: { isReadOnly: () => true, unselectAreas: vi.fn() } });
       const stageRef = React.createRef();
       render(<VideoRegions {...defaultProps} item={item} stageRef={stageRef} />);
       const stage = screen.getByTestId("stage");
@@ -273,7 +273,7 @@ describe("VideoRegions", () => {
     });
 
     it("does not render Transformer when annotation is readOnly", () => {
-      const item = createMockItem({ annotation: { isReadOnly: () => true, unselectAreas: jest.fn() } });
+      const item = createMockItem({ annotation: { isReadOnly: () => true, unselectAreas: vi.fn() } });
       const reg = createMockRegion({ id: "sel-2", selected: true });
       render(<VideoRegions {...defaultProps} item={item} regions={[reg]} />);
       expect(screen.queryByTestId("mock-transformer")).not.toBeInTheDocument();

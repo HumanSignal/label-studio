@@ -1,11 +1,12 @@
+import React from "react";
 import { act, render, screen } from "@testing-library/react";
 import { Frames } from "./Frames";
 
-jest.mock("@humansignal/core/hooks/useResizeObserver", () => ({
+vi.mock("@humansignal/core/hooks/useResizeObserver", () => ({
   useResizeObserver: () => ({ width: 400 }),
 }));
 
-jest.mock("./Keypoints", () => ({
+vi.mock("./Keypoints", () => ({
   Keypoints: () => <div data-testid="keypoints-mock" />,
 }));
 
@@ -27,14 +28,14 @@ const defaultProps = {
       timeline: true,
     },
   ] as any,
-  onScroll: jest.fn(),
-  onPositionChange: jest.fn(),
-  onResize: jest.fn(),
+  onScroll: vi.fn(),
+  onPositionChange: vi.fn(),
+  onResize: vi.fn(),
 };
 
 describe("Frames", () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it("renders timeline frames structure", () => {
@@ -88,7 +89,7 @@ describe("Frames", () => {
   });
 
   it("handles indicator mouse down for position change", async () => {
-    const onPositionChange = jest.fn();
+    const onPositionChange = vi.fn();
     render(<Frames {...defaultProps} onPositionChange={onPositionChange} />);
     const indicator = document.querySelector(".ls-timeline-frames__indicator");
     const scrollArea = document.querySelector(".ls-timeline-frames__scroll");
@@ -128,8 +129,8 @@ describe("Frames", () => {
   });
 
   it("calls onStartDrawing when clicking on keyframes area with no region", async () => {
-    const onStartDrawing = jest.fn(
-      () => ({ id: "new", ranges: [{ start: 1, end: 1 }], object: { length: 100 }, setRange: jest.fn() }) as any,
+    const onStartDrawing = vi.fn(
+      () => ({ id: "new", ranges: [{ start: 1, end: 1 }], object: { length: 100 }, setRange: vi.fn() }) as any,
     );
     render(<Frames {...defaultProps} onStartDrawing={onStartDrawing} />);
     const scrollArea = document.querySelector(".ls-timeline-frames__scroll") as HTMLElement;
@@ -159,7 +160,7 @@ describe("Frames", () => {
   });
 
   it("scrolls position when position prop changes outside visible range", () => {
-    const onScroll = jest.fn();
+    const onScroll = vi.fn();
     const { rerender } = render(<Frames {...defaultProps} position={1} offset={0} onScroll={onScroll} />);
     const scrollArea = document.querySelector(".ls-timeline-frames__scroll") as HTMLDivElement;
     if (scrollArea) {

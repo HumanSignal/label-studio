@@ -1,12 +1,13 @@
 /**
  * Unit tests for Segment (lib/AudioUltra/Regions/Segment.ts)
  */
+import { CursorSymbol } from "../../Cursor/Cursor";
 import { Segment } from "../Segment";
 
 function createMockLayer() {
   return {
     fillStyle: "",
-    fillRect: jest.fn(),
+    fillRect: vi.fn(),
     isVisible: true,
   };
 }
@@ -22,8 +23,8 @@ function createMockVisualizer(overrides = {}) {
     timelinePlacement: "top" as const,
     getScrollLeft: () => 0,
     getScrollLeftPx: () => 0,
-    getLayer: jest.fn((name: string) => (name === "timeline" ? timelineLayer : null)),
-    createLayer: jest.fn(() => layer),
+    getLayer: vi.fn((name: string) => (name === "timeline" ? timelineLayer : null)),
+    createLayer: vi.fn(() => layer),
     container: document.createElement("div"),
     ...overrides,
   };
@@ -33,10 +34,10 @@ function createMockWaveform(overrides = {}) {
   return {
     duration: 10,
     zoom: 1,
-    cursor: { set: jest.fn() },
-    player: { pause: jest.fn() },
-    invoke: jest.fn(),
-    scrollToRegion: jest.fn(),
+    cursor: { set: vi.fn() },
+    player: { pause: vi.fn() },
+    invoke: vi.fn(),
+    scrollToRegion: vi.fn(),
     playing: false,
     ...overrides,
   };
@@ -45,15 +46,15 @@ function createMockWaveform(overrides = {}) {
 function createMockController(overrides = {}) {
   const layerGroup = { isVisible: true };
   return {
-    bringRegionToFront: jest.fn(),
-    isHovered: jest.fn(() => false),
+    bringRegionToFront: vi.fn(),
+    isHovered: vi.fn(() => false),
     layerGroup,
-    isOverrideKeyPressed: jest.fn(() => false),
+    isOverrideKeyPressed: vi.fn(() => false),
     get isLocked() {
       return false;
     },
-    convertToRegion: jest.fn(),
-    convertToSegment: jest.fn(),
+    convertToRegion: vi.fn(),
+    convertToSegment: vi.fn(),
     ...overrides,
   };
 }
@@ -200,7 +201,7 @@ describe("Segment", () => {
       const waveform = createMockWaveform();
       const controller = createMockController();
       const segment = new Segment({ start: 1, end: 5 }, waveform as any, visualizer as any, controller as any);
-      const invokeSpy = waveform.invoke as jest.Mock;
+      const invokeSpy = waveform.invoke as vi.Mock;
       invokeSpy.mockClear();
       segment.setVisibility(true);
       expect(invokeSpy).not.toHaveBeenCalled();
@@ -386,7 +387,7 @@ describe("Segment", () => {
         visualizer as any,
         controller as any,
       );
-      const invokeSpy = waveform.invoke as jest.Mock;
+      const invokeSpy = waveform.invoke as vi.Mock;
       invokeSpy.mockClear();
       segment.updateColor("#00ff00");
       expect(invokeSpy).not.toHaveBeenCalled();
@@ -438,7 +439,7 @@ describe("Segment", () => {
         visualizer as any,
         controller as any,
       );
-      const invokeSpy = waveform.invoke as jest.Mock;
+      const invokeSpy = waveform.invoke as vi.Mock;
       invokeSpy.mockClear();
       segment.updatePosition(2, 7);
       expect(segment.start).toBe(1);
@@ -536,7 +537,7 @@ describe("Segment", () => {
       const controller = createMockController();
       const segment = new Segment({ start: 1, end: 5 }, waveform as any, visualizer as any, controller as any);
       segment.update({ deleteable: false });
-      const invokeSpy = waveform.invoke as jest.Mock;
+      const invokeSpy = waveform.invoke as vi.Mock;
       invokeSpy.mockClear();
       segment.remove();
       expect(invokeSpy).not.toHaveBeenCalledWith("regionRemoved", expect.anything());
@@ -558,7 +559,7 @@ describe("Segment", () => {
       const waveform = createMockWaveform();
       const controller = createMockController();
       const segment = new Segment({ start: 1, end: 5 }, waveform as any, visualizer as any, controller as any);
-      const invokeSpy = waveform.invoke as jest.Mock;
+      const invokeSpy = waveform.invoke as vi.Mock;
       invokeSpy.mockClear();
       segment.destroy(false);
       expect(invokeSpy).not.toHaveBeenCalledWith("regionRemoved", expect.anything());
@@ -570,7 +571,7 @@ describe("Segment", () => {
       const controller = createMockController();
       const segment = new Segment({ start: 1, end: 5 }, waveform as any, visualizer as any, controller as any);
       segment.update({ deleteable: false });
-      const invokeSpy = waveform.invoke as jest.Mock;
+      const invokeSpy = waveform.invoke as vi.Mock;
       invokeSpy.mockClear();
       segment.destroy(true);
       expect(invokeSpy).not.toHaveBeenCalled();
@@ -589,7 +590,6 @@ describe("Segment", () => {
 
   describe("switchCursor", () => {
     it("calls waveform.cursor.set with symbol", () => {
-      const { CursorSymbol } = require("../../Cursor/Cursor");
       const visualizer = createMockVisualizer();
       const waveform = createMockWaveform();
       const controller = createMockController();
@@ -599,7 +599,6 @@ describe("Segment", () => {
     });
 
     it("passes layerName when shouldGrabFocus true and symbol is not crosshair", () => {
-      const { CursorSymbol } = require("../../Cursor/Cursor");
       const visualizer = createMockVisualizer();
       const waveform = createMockWaveform();
       const controller = createMockController();
@@ -614,7 +613,6 @@ describe("Segment", () => {
     });
 
     it("passes empty string when symbol is crosshair (no cursor focus)", () => {
-      const { CursorSymbol } = require("../../Cursor/Cursor");
       const visualizer = createMockVisualizer();
       const waveform = createMockWaveform();
       const controller = createMockController();
@@ -636,7 +634,7 @@ describe("Segment", () => {
         controller as any,
       );
       (segment as any).isDragging = true;
-      const invokeSpy = waveform.invoke as jest.Mock;
+      const invokeSpy = waveform.invoke as vi.Mock;
       invokeSpy.mockClear();
       segment.handleSelected();
       expect(segment.selected).toBe(true);
@@ -655,7 +653,7 @@ describe("Segment", () => {
         visualizer as any,
         controller as any,
       );
-      const invokeSpy = waveform.invoke as jest.Mock;
+      const invokeSpy = waveform.invoke as vi.Mock;
       invokeSpy.mockClear();
       segment.handleHighlighted(true);
       expect(segment.highlighted).toBe(false);
@@ -673,7 +671,7 @@ describe("Segment", () => {
         controller as any,
       );
       (segment as any).isDragging = true;
-      const invokeSpy = waveform.invoke as jest.Mock;
+      const invokeSpy = waveform.invoke as vi.Mock;
       invokeSpy.mockClear();
       segment.handleHighlighted(true);
       expect(invokeSpy).not.toHaveBeenCalled();
@@ -696,7 +694,7 @@ describe("Segment", () => {
       const visualizer = createMockVisualizer();
       const waveform = createMockWaveform();
       const controller = createMockController();
-      (controller.isHovered as jest.Mock).mockReturnValue(true);
+      (controller.isHovered as vi.Mock).mockReturnValue(true);
       const segment = new Segment({ start: 1, end: 5 }, waveform as any, visualizer as any, controller as any);
       expect(segment.hovered).toBe(true);
       expect(controller.isHovered).toHaveBeenCalledWith(segment);
@@ -806,7 +804,7 @@ describe("Segment", () => {
       const controller = createMockController();
       const segment = new Segment({ start: 1, end: 5 }, waveform as any, visualizer as any, controller as any);
       segment.destroy(true);
-      const invokeSpy = waveform.invoke as jest.Mock;
+      const invokeSpy = waveform.invoke as vi.Mock;
       invokeSpy.mockClear();
       segment.destroy(true);
       expect(invokeSpy).not.toHaveBeenCalled();
@@ -831,20 +829,18 @@ describe("Segment", () => {
 
   describe("mouseOver (via event)", () => {
     it("does nothing when controller.layerGroup is not visible", () => {
-      const { CursorSymbol } = require("../../Cursor/Cursor");
       const visualizer = createMockVisualizer();
       const waveform = createMockWaveform();
       const controller = createMockController();
       (controller as any).layerGroup = { isVisible: false };
       const segment = new Segment({ start: 1, end: 5 }, waveform as any, visualizer as any, controller as any);
-      const cursorSetSpy = waveform.cursor.set as jest.Mock;
+      const cursorSetSpy = waveform.cursor.set as vi.Mock;
       cursorSetSpy.mockClear();
       (segment as any).invoke("mouseOver", [segment, { clientX: 100 } as MouseEvent]);
       expect(cursorSetSpy).not.toHaveBeenCalled();
     });
 
     it("sets colResize when over edge and updateable", () => {
-      const { CursorSymbol } = require("../../Cursor/Cursor");
       const container = document.createElement("div");
       const visualizer = createMockVisualizer({
         container,
@@ -861,7 +857,6 @@ describe("Segment", () => {
     });
 
     it("sets grab when not over edge", () => {
-      const { CursorSymbol } = require("../../Cursor/Cursor");
       const container = document.createElement("div");
       const visualizer = createMockVisualizer({ container, getScrollLeftPx: () => 0, zoomedWidth: 800 });
       const waveform = createMockWaveform({ duration: 10 });
@@ -874,13 +869,12 @@ describe("Segment", () => {
     });
 
     it("does nothing when isDragging", () => {
-      const { CursorSymbol } = require("../../Cursor/Cursor");
       const visualizer = createMockVisualizer();
       const waveform = createMockWaveform();
       const controller = createMockController();
       const segment = new Segment({ start: 1, end: 5 }, waveform as any, visualizer as any, controller as any);
       (segment as any).isDragging = true;
-      const cursorSetSpy = waveform.cursor.set as jest.Mock;
+      const cursorSetSpy = waveform.cursor.set as vi.Mock;
       cursorSetSpy.mockClear();
       (segment as any).invoke("mouseOver", [segment, { clientX: 200 } as MouseEvent]);
       expect(cursorSetSpy).not.toHaveBeenCalled();
@@ -894,7 +888,7 @@ describe("Segment", () => {
       const controller = createMockController();
       (controller as any).layerGroup = { isVisible: false };
       const segment = new Segment({ start: 1, end: 5 }, waveform as any, visualizer as any, controller as any);
-      const addSpy = jest.spyOn(document, "addEventListener");
+      const addSpy = vi.spyOn(document, "addEventListener");
       (segment as any).invoke("mouseDown", [segment, { clientX: 100 } as MouseEvent]);
       expect(controller.bringRegionToFront).not.toHaveBeenCalled();
       addSpy.mockRestore();
@@ -904,7 +898,7 @@ describe("Segment", () => {
       const visualizer = createMockVisualizer();
       const waveform = createMockWaveform();
       const controller = createMockController();
-      (controller.isOverrideKeyPressed as jest.Mock).mockReturnValue(true);
+      (controller.isOverrideKeyPressed as vi.Mock).mockReturnValue(true);
       const segment = new Segment({ start: 1, end: 5 }, waveform as any, visualizer as any, controller as any);
       (segment as any).invoke("mouseDown", [segment, { clientX: 100 } as MouseEvent]);
       expect(controller.bringRegionToFront).not.toHaveBeenCalled();
@@ -930,7 +924,7 @@ describe("Segment", () => {
         visualizer as any,
         controller as any,
       );
-      const addSpy = jest.spyOn(document, "addEventListener");
+      const addSpy = vi.spyOn(document, "addEventListener");
       (segment as any).invoke("mouseDown", [segment, { clientX: 100 } as MouseEvent]);
       expect(controller.bringRegionToFront).toHaveBeenCalled();
       const mousemoveCalls = addSpy.mock.calls.filter((c) => c[0] === "mousemove");
@@ -944,7 +938,7 @@ describe("Segment", () => {
       const waveform = createMockWaveform();
       const controller = createMockController();
       const segment = new Segment({ start: 1, end: 5 }, waveform as any, visualizer as any, controller as any);
-      const addSpy = jest.spyOn(document, "addEventListener");
+      const addSpy = vi.spyOn(document, "addEventListener");
       (segment as any).invoke("mouseDown", [segment, { clientX: 100 } as MouseEvent]);
       const mousemoveCalls = addSpy.mock.calls.filter((c) => c[0] === "mousemove");
       expect(mousemoveCalls.length).toBe(1);
@@ -956,15 +950,14 @@ describe("Segment", () => {
 
   describe("handleMouseUp and handleDrag", () => {
     it("calls handleUpdateEnd and switchCursor when isDragging on mouseup", () => {
-      const { CursorSymbol } = require("../../Cursor/Cursor");
       const visualizer = createMockVisualizer();
       const waveform = createMockWaveform();
       const controller = createMockController();
       const segment = new Segment({ start: 1, end: 5 }, waveform as any, visualizer as any, controller as any);
       (segment as any).draggingStartPosition = { grabPosition: 0, start: 1, end: 5 };
       (segment as any).isDragging = true;
-      const invokeSpy = waveform.invoke as jest.Mock;
-      const cursorSetSpy = waveform.cursor.set as jest.Mock;
+      const invokeSpy = waveform.invoke as vi.Mock;
+      const cursorSetSpy = waveform.cursor.set as vi.Mock;
       cursorSetSpy.mockClear();
       invokeSpy.mockClear();
       (segment as any).handleMouseUp({} as MouseEvent);
@@ -1003,9 +996,9 @@ describe("Segment", () => {
         controller as any,
       );
       (segment as any).draggingStartPosition = { grabPosition: 0, start: 1, end: 5 };
-      const invokeSpy = waveform.invoke as jest.Mock;
+      const invokeSpy = waveform.invoke as vi.Mock;
       invokeSpy.mockClear();
-      (segment as any).handleDrag({ preventDefault: jest.fn(), stopPropagation: jest.fn(), clientX: 100 } as any);
+      (segment as any).handleDrag({ preventDefault: vi.fn(), stopPropagation: vi.fn(), clientX: 100 } as any);
       expect(invokeSpy).not.toHaveBeenCalled();
     });
 
@@ -1020,9 +1013,9 @@ describe("Segment", () => {
         controller as any,
       );
       (segment as any).draggingStartPosition = { grabPosition: 0, start: 1, end: 5 };
-      const invokeSpy = waveform.invoke as jest.Mock;
+      const invokeSpy = waveform.invoke as vi.Mock;
       invokeSpy.mockClear();
-      (segment as any).handleDrag({ preventDefault: jest.fn(), stopPropagation: jest.fn(), clientX: 100 } as any);
+      (segment as any).handleDrag({ preventDefault: vi.fn(), stopPropagation: vi.fn(), clientX: 100 } as any);
       expect(invokeSpy).not.toHaveBeenCalled();
     });
 
@@ -1046,7 +1039,6 @@ describe("Segment", () => {
     });
 
     it("handleDrag resize path (right edge) calls switchCursor colResize and updatePosition", () => {
-      const { CursorSymbol } = require("../../Cursor/Cursor");
       const container = document.createElement("div");
       const visualizer = createMockVisualizer({
         container,
@@ -1059,9 +1051,9 @@ describe("Segment", () => {
       const segment = new Segment({ start: 2, end: 6 }, waveform as any, visualizer as any, controller as any);
       (segment as any).draggingStartPosition = { grabPosition: 600, start: 2, end: 6 };
       (segment as any).isGrabbingEdge = { isRightEdge: true, isLeftEdge: false };
-      const cursorSetSpy = waveform.cursor.set as jest.Mock;
+      const cursorSetSpy = waveform.cursor.set as vi.Mock;
       cursorSetSpy.mockClear();
-      const invokeSpy = waveform.invoke as jest.Mock;
+      const invokeSpy = waveform.invoke as vi.Mock;
       invokeSpy.mockClear();
       const moveEvent = new MouseEvent("mousemove", { clientX: 700 });
       (segment as any).handleDrag(moveEvent);

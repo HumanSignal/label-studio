@@ -5,14 +5,14 @@ import { Loader } from "../Loader";
 
 describe("Loader", () => {
   beforeEach(() => {
-    jest.spyOn(window, "requestAnimationFrame").mockImplementation((cb: FrameRequestCallback) => {
+    vi.spyOn(window, "requestAnimationFrame").mockImplementation((cb: FrameRequestCallback) => {
       (cb as (time: number) => void)(0);
       return 0;
     });
   });
 
   afterEach(() => {
-    jest.restoreAllMocks();
+    vi.restoreAllMocks();
   });
 
   function flushRaf() {

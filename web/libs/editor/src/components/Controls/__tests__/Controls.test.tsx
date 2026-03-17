@@ -1,9 +1,10 @@
+import React from "react";
 import { render, fireEvent } from "@testing-library/react";
 import { Provider } from "mobx-react";
 import Controls from "../Controls";
 
-jest.mock("@humansignal/ui", () => {
-  const { forwardRef } = jest.requireActual("react");
+vi.mock("@humansignal/ui", async () => {
+  const { forwardRef } = await vi.importActual<typeof import("react")>("react");
   return {
     Button: forwardRef(({ children, disabled, tooltip, onClick, ...props }: any, ref: any) => {
       return (
@@ -22,7 +23,7 @@ jest.mock("@humansignal/ui", () => {
   };
 });
 
-jest.mock("@humansignal/icons", () => ({
+vi.mock("@humansignal/icons", () => ({
   IconInfoOutline: ({ width, height, className }: any) => (
     <svg data-testid="info-icon" width={width} height={height} className={className} />
   ),
@@ -30,9 +31,9 @@ jest.mock("@humansignal/icons", () => ({
 
 const createMockStore = (overrides: any = {}) => ({
   task: { id: 1, allow_skip: true, ...overrides.task },
-  skipTask: jest.fn(),
+  skipTask: vi.fn(),
   isSubmitting: false,
-  hasInterface: jest.fn((name: string) => overrides.interfaces?.includes(name) ?? false),
+  hasInterface: vi.fn((name: string) => overrides.interfaces?.includes(name) ?? false),
   settings: {
     enableHotkeys: true,
     enableTooltips: true,
@@ -58,7 +59,7 @@ const setupAppSettings = (options: { role?: string; enterprise?: boolean } = {})
 
 describe("Controls", () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     // Reset APP_SETTINGS before each test
     (window as any).APP_SETTINGS = undefined;
   });

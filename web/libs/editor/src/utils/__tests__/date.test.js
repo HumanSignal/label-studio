@@ -12,12 +12,12 @@ describe("Helper function prettyDate", () => {
     const fixedNow = new Date("2025-02-10T12:00:00.000Z");
 
     beforeEach(() => {
-      jest.useFakeTimers();
-      jest.setSystemTime(fixedNow);
+      vi.useFakeTimers();
+      vi.setSystemTime(fixedNow);
     });
 
     afterEach(() => {
-      jest.useRealTimers();
+      vi.useRealTimers();
     });
 
     test("Yesterday", () => {

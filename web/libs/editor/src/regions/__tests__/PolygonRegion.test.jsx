@@ -2,9 +2,10 @@
  * Unit tests for PolygonRegion (model views, actions, and region type predicate).
  * View coverage is largely from Cypress; these tests cover model logic.
  */
+import React from "react";
 import { types } from "mobx-state-tree";
 
-jest.mock("../../tags/object/Image", () => {
+vi.mock("../../tags/object/Image", () => {
   const { types } = require("mobx-state-tree");
   return {
     ImageModel: types
@@ -375,7 +376,7 @@ describe("PolygonRegion", () => {
 
   describe("moveHoverAnchor", () => {
     it("moves existing hover anchor to point when layer has one", () => {
-      const to = jest.fn();
+      const to = vi.fn();
       const layer = { findOne: () => ({ to }), draw: () => {} };
       moveHoverAnchor({ point: [10, 20], group: {}, layer, zoom: 1 });
       expect(to).toHaveBeenCalledWith({ x: 10, y: 20, duration: 0 });
@@ -389,8 +390,8 @@ describe("PolygonRegion", () => {
     });
 
     it("destroys hover anchor and redraws layer when anchor exists", () => {
-      const destroy = jest.fn();
-      const draw = jest.fn();
+      const destroy = vi.fn();
+      const draw = vi.fn();
       const layer = { findOne: () => ({ destroy }), draw };
       removeHoverAnchor({ layer });
       expect(destroy).toHaveBeenCalled();

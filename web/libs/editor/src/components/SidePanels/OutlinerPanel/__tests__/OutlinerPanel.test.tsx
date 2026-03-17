@@ -1,8 +1,9 @@
+import React from "react";
 import { render, screen } from "@testing-library/react";
 import { OutlinerPanel } from "../OutlinerPanel";
 
 // Mock the dependencies
-jest.mock("../../../../utils/bem", () => ({
+vi.mock("../../../../utils/bem", () => ({
   cn: (block: string) => ({
     elem: (elem: string) => ({
       toClassName: () => `dm-${block}__${elem}`,
@@ -23,7 +24,7 @@ jest.mock("../../../../utils/bem", () => ({
   }),
 }));
 
-jest.mock("../../PanelBase", () => ({
+vi.mock("../../PanelBase", () => ({
   PanelBase: ({ children, ...props }: any) => (
     <div data-testid="panel-base" {...props}>
       {children}
@@ -31,29 +32,29 @@ jest.mock("../../PanelBase", () => ({
   ),
 }));
 
-jest.mock("../OutlinerTree", () => ({
+vi.mock("../OutlinerTree", () => ({
   OutlinerTree: ({ regions, footer }: any) => (
     <div data-testid="outliner-tree">{footer && <div data-testid="outliner-tree-footer">{footer}</div>}</div>
   ),
 }));
 
-jest.mock("../ViewControls", () => ({
+vi.mock("../ViewControls", () => ({
   ViewControls: (props: any) => <div data-testid="view-controls" {...props} />,
 }));
 
-jest.mock("@humansignal/icons", () => ({
+vi.mock("@humansignal/icons", () => ({
   IconInfo: ({ width, height }: { width: number; height: number }) => (
     <svg data-testid="icon-info" width={width} height={height} />
   ),
 }));
 
-jest.mock("@humansignal/ui", () => ({
+vi.mock("@humansignal/ui", () => ({
   IconLsLabeling: ({ width, height }: { width: number; height: number }) => (
     <svg data-testid="icon-ls-labeling" width={width} height={height} />
   ),
 }));
 
-jest.mock("../../Components/EmptyState", () => ({
+vi.mock("../../Components/EmptyState", () => ({
   EmptyState: ({ icon, header, description, learnMore }: any) => (
     <div data-testid="empty-state">
       <div data-testid="empty-state-icon">{icon}</div>
@@ -68,12 +69,12 @@ jest.mock("../../Components/EmptyState", () => ({
   ),
 }));
 
-jest.mock("../../../../utils/docs", () => ({
+vi.mock("../../../../utils/docs", () => ({
   getDocsUrl: (path: string) => `https://docs.example.com/${path}`,
 }));
 
 // Mock observer
-jest.mock("mobx-react", () => ({
+vi.mock("mobx-react", () => ({
   observer: (component: any) => component,
 }));
 
@@ -84,9 +85,9 @@ describe("OutlinerPanel", () => {
     group: "manual",
     regions: [],
     filter: [],
-    setSort: jest.fn(),
-    setGrouping: jest.fn(),
-    setFilteredRegions: jest.fn(),
+    setSort: vi.fn(),
+    setGrouping: vi.fn(),
+    setFilteredRegions: vi.fn(),
   };
 
   const defaultProps = {
@@ -97,7 +98,7 @@ describe("OutlinerPanel", () => {
   };
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe("OutlinerEmptyState", () => {

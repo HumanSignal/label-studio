@@ -1,7 +1,8 @@
+import React from "react";
 import { render, fireEvent } from "@testing-library/react";
 import { ResultItem, RegionDetailsMain, RegionDetailsMeta } from "../RegionDetails";
 
-jest.mock("../RegionEditor", () => ({
+vi.mock("../RegionEditor", () => ({
   RegionEditor: () => null,
 }));
 
@@ -83,7 +84,7 @@ describe("RegionDetails", () => {
     it("renders textarea when in edit mode", () => {
       const region = { meta: { text: "Edit me" } };
       const { container } = render(
-        <RegionDetailsMeta region={region} editMode={true} cancelEditMode={jest.fn()} enterEditMode={jest.fn()} />,
+        <RegionDetailsMeta region={region} editMode={true} cancelEditMode={vi.fn()} enterEditMode={vi.fn()} />,
       );
       const textarea = container.querySelector("textarea");
       expect(textarea).toBeInTheDocument();
@@ -91,11 +92,11 @@ describe("RegionDetails", () => {
     });
 
     it("calls saveMeta and cancelEditMode on blur", () => {
-      const setMetaText = jest.fn();
-      const cancelEditMode = jest.fn();
+      const setMetaText = vi.fn();
+      const cancelEditMode = vi.fn();
       const region = { meta: { text: "Meta" }, setMetaText };
       const { container } = render(
-        <RegionDetailsMeta region={region} editMode={true} cancelEditMode={cancelEditMode} enterEditMode={jest.fn()} />,
+        <RegionDetailsMeta region={region} editMode={true} cancelEditMode={cancelEditMode} enterEditMode={vi.fn()} />,
       );
       const textarea = container.querySelector("textarea");
       fireEvent.blur(textarea as HTMLTextAreaElement);
@@ -104,11 +105,11 @@ describe("RegionDetails", () => {
     });
 
     it("calls saveMeta and cancelEditMode on Enter key", () => {
-      const setMetaText = jest.fn();
-      const cancelEditMode = jest.fn();
+      const setMetaText = vi.fn();
+      const cancelEditMode = vi.fn();
       const region = { meta: { text: "Meta" }, setMetaText };
       const { container } = render(
-        <RegionDetailsMeta region={region} editMode={true} cancelEditMode={cancelEditMode} enterEditMode={jest.fn()} />,
+        <RegionDetailsMeta region={region} editMode={true} cancelEditMode={cancelEditMode} enterEditMode={vi.fn()} />,
       );
       const textarea = container.querySelector("textarea");
       fireEvent.keyDown(textarea as HTMLTextAreaElement, { key: "Enter", shiftKey: false });

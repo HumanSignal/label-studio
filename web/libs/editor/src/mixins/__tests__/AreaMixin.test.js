@@ -4,14 +4,16 @@
  */
 import { destroy, getParent, isAlive, types } from "mobx-state-tree";
 import { guidGenerator } from "../../core/Helpers";
+import { isFF } from "../../utils/feature-flags";
 
-jest.mock("../../utils/feature-flags", () => ({
-  isFF: jest.fn(() => false),
+vi.mock("../../utils/feature-flags", () => ({
+  isFF: vi.fn(() => false),
+  FF_SIMPLE_INIT: "fflag_fix_front_leap_443_select_annotation_once",
   FF_LSDV_4930: "ff_lsdv_4930",
   FF_TAXONOMY_LABELING: "ff_taxonomy_labeling",
 }));
 
-jest.mock("../../regions/Result", () => require("./AreaMixinMockResult"));
+vi.mock("../../regions/Result", () => require("./AreaMixinMockResult"));
 
 import { AreaMixin, AreaMixinBase } from "../AreaMixin";
 import { ReadOnlyRegionMixin } from "../ReadOnlyMixin";
@@ -19,13 +21,13 @@ import MockResult from "./AreaMixinMockResult";
 
 const mockAnnotation = () => ({
   toNames: new Map(),
-  deleteRegion: jest.fn(),
-  deleteArea: jest.fn(),
-  isReadOnly: jest.fn(() => false),
+  deleteRegion: vi.fn(),
+  deleteArea: vi.fn(),
+  isReadOnly: vi.fn(() => false),
   highlightedNode: null,
   regionStore: { regionIndexMap: {} },
-  updateAppearenceFromState: jest.fn(),
-  unselectAll: jest.fn(),
+  updateAppearenceFromState: vi.fn(),
+  unselectAll: vi.fn(),
 });
 
 const mockObject = (name = "img1") => ({
@@ -275,7 +277,6 @@ describe("AreaMixin", () => {
     });
 
     it("returns tags with classification and isLabeling when FF_TAXONOMY_LABELING is on", () => {
-      const isFF = require("../../utils/feature-flags").isFF;
       isFF.mockImplementation((flag) => flag === "ff_taxonomy_labeling");
       const { area, annotation } = createStore();
       const taxonomyTag = { classification: true, isLabeling: true };
@@ -485,7 +486,7 @@ describe("AreaMixin", () => {
 
     it("returns isInSelectionArea when parent.selectionArea.isActive", () => {
       const { area, object } = createStore();
-      object.selectionArea = { isActive: true, intersectsBbox: jest.fn(() => true) };
+      object.selectionArea = { isActive: true, intersectsBbox: vi.fn(() => true) };
       expect(area.highlighted).toBe(true);
     });
   });
@@ -493,7 +494,7 @@ describe("AreaMixin", () => {
   describe("isInSelectionArea", () => {
     it("returns parent.selectionArea.intersectsBbox(bboxCoords) when active", () => {
       const { area, object } = createStore();
-      const intersectsBbox = jest.fn(() => true);
+      const intersectsBbox = vi.fn(() => true);
       object.selectionArea = { isActive: true, intersectsBbox };
       expect(area.isInSelectionArea).toBe(true);
       expect(intersectsBbox).toHaveBeenCalledWith(area.bboxCoords);
@@ -506,10 +507,9 @@ describe("AreaMixin", () => {
     });
 
     it("returns false when FF_LSDV_4930 on and hidden (without calling intersectsBbox)", () => {
-      const isFF = require("../../utils/feature-flags").isFF;
       isFF.mockImplementation((flag) => flag === "ff_lsdv_4930");
       const { area, object } = createStore();
-      object.selectionArea = { isActive: true, intersectsBbox: jest.fn(() => true) };
+      object.selectionArea = { isActive: true, intersectsBbox: vi.fn(() => true) };
       area.setHighlighted(false);
       area.setHidden(true);
       expect(area.isInSelectionArea).toBe(false);
@@ -567,14 +567,14 @@ describe("AreaMixin", () => {
   describe("deleteRegion", () => {
     it("does nothing when annotation is read-only", () => {
       const { area, annotation } = createStore();
-      annotation.isReadOnly = jest.fn(() => true);
+      annotation.isReadOnly = vi.fn(() => true);
       area.deleteRegion();
       expect(annotation.deleteRegion).not.toHaveBeenCalled();
     });
 
     it("does nothing when area is read-only", () => {
       const { area, annotation } = createStore({ readonly: true });
-      annotation.isReadOnly = jest.fn(() => false);
+      annotation.isReadOnly = vi.fn(() => false);
       area.deleteRegion();
       expect(annotation.deleteRegion).not.toHaveBeenCalled();
     });
@@ -589,7 +589,7 @@ describe("AreaMixin", () => {
 
     it("calls destroyRegion when present then deleteRegion", () => {
       const { area, annotation } = createStore();
-      const destroyRegion = jest.fn();
+      const destroyRegion = vi.fn();
       area.setDestroyRegion(destroyRegion);
       area.deleteRegion();
       expect(destroyRegion).toHaveBeenCalled();
@@ -671,7 +671,7 @@ describe("AreaMixin", () => {
         value: { labels: [] },
       });
       const r = area.results[0];
-      r.setValue = jest.fn();
+      r.setValue = vi.fn();
       area.setValue(tag);
       expect(r.setValue).toHaveBeenCalledWith(["L1"]);
     });
@@ -712,7 +712,7 @@ describe("AreaMixin", () => {
 
     it("calls updateAppearenceFromState after setValue when set", () => {
       const { area } = createStore();
-      const updateAppearenceFromState = jest.fn();
+      const updateAppearenceFromState = vi.fn();
       area.setUpdateAppearenceFromState(updateAppearenceFromState);
       const tag = {
         holdsState: true,

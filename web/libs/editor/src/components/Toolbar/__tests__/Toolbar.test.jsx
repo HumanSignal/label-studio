@@ -1,13 +1,14 @@
+import React from "react";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { Provider } from "mobx-react";
 import { Toolbar } from "../Toolbar";
 
-jest.mock("../../../common/Utils/useWindowSize", () => ({
+vi.mock("../../../common/Utils/useWindowSize", () => ({
   useWindowSize: () => ({ width: 1024, height: 768 }),
 }));
 
-jest.mock("../Tool", () => ({
+vi.mock("../Tool", () => ({
   Tool: ({ label, onClick, extra }) => (
     <div data-testid="mock-tool" data-label={label} onClick={onClick}>
       {label}
@@ -63,7 +64,7 @@ describe("Toolbar", () => {
   it("uses alignment right when toolbar is near left edge of window", () => {
     const ToolView = () => <span>T</span>;
     const tools = [{ dynamic: false, group: "draw", viewClass: ToolView, index: 0, toolName: "rect" }];
-    const spied = jest.spyOn(Element.prototype, "getBoundingClientRect").mockReturnValue({
+    const spied = vi.spyOn(Element.prototype, "getBoundingClientRect").mockReturnValue({
       left: 50,
       right: 400,
       top: 0,
@@ -110,7 +111,7 @@ describe("Toolbar", () => {
 
   it("renders SmartTools when store.autoAnnotation is true and tools are dynamic", () => {
     const ToolView = () => <span data-testid="smart-tool">Smart</span>;
-    const selectTool = jest.fn();
+    const selectTool = vi.fn();
     const tools = [
       {
         dynamic: true,
@@ -137,7 +138,7 @@ describe("Toolbar", () => {
     const user = userEvent.setup();
     const ToolView1 = () => <span data-testid="smart-1">S1</span>;
     const ToolView2 = () => <span data-testid="smart-2">S2</span>;
-    const selectTool = jest.fn();
+    const selectTool = vi.fn();
     const tools = [
       {
         dynamic: true,
