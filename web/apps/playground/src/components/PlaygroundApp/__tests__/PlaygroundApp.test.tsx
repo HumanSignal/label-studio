@@ -4,33 +4,33 @@ import { useAtom, useSetAtom } from "jotai";
 import { configAtom, errorAtom, loadingAtom } from "../../../atoms/configAtoms";
 
 // Mock CodeEditor and allow it to be spied on
-jest.mock("../../EditorPanel", () => ({
+vi.mock("../../EditorPanel", () => ({
   EditorPanel: () => <div>EditorPanel</div>,
 }));
-jest.mock("../../PreviewPanel", () => ({
+vi.mock("../../PreviewPanel", () => ({
   PreviewPanel: () => <div>PreviewPanel</div>,
 }));
-jest.mock("@humansignal/ui", () => ({
-  ...jest.requireActual("@humansignal/ui"),
+vi.mock("@humansignal/ui", async () => ({
+  ...(await vi.importActual("@humansignal/ui")),
   ThemeToggle: () => <div>ThemeToggle</div>,
   ToastProvider: ({ children }: { children: React.ReactNode }) => children,
   useToast: () => ({
-    show: jest.fn(),
+    show: vi.fn(),
   }),
 }));
 
 // Mock the atoms
-jest.mock("jotai", () => {
-  const originalModule = jest.requireActual("jotai");
+vi.mock("jotai", async () => {
+  const originalModule = await vi.importActual("jotai");
   return {
     ...originalModule,
-    useAtom: jest.fn(),
-    useSetAtom: jest.fn(),
+    useAtom: vi.fn(),
+    useSetAtom: vi.fn(),
   };
 });
 
 // Mock the fetch function
-global.fetch = jest.fn();
+global.fetch = vi.fn();
 
 function removeAllSpaceLikeCharacters(str: string): string {
   return str
@@ -39,20 +39,20 @@ function removeAllSpaceLikeCharacters(str: string): string {
 }
 
 describe("PlaygroundApp", () => {
-  const mockSetConfig = jest.fn();
-  const mockSetError = jest.fn();
-  const mockSetLoading = jest.fn();
-  const mockSetInterfaces = jest.fn();
+  const mockSetConfig = vi.fn();
+  const mockSetError = vi.fn();
+  const mockSetLoading = vi.fn();
+  const mockSetInterfaces = vi.fn();
 
   beforeEach(() => {
-    jest.clearAllMocks();
-    (useAtom as jest.Mock).mockImplementation((atom) => {
+    vi.clearAllMocks();
+    vi.mocked(useAtom).mockImplementation((atom) => {
       if (atom === configAtom) return ["", mockSetConfig];
       if (atom === errorAtom) return ["", mockSetError];
       if (atom === loadingAtom) return [false, mockSetLoading];
       return [null, mockSetInterfaces];
     });
-    (useSetAtom as jest.Mock).mockImplementation((atom) => {
+    vi.mocked(useSetAtom).mockImplementation((atom) => {
       if (atom === configAtom) return (c: string) => mockSetConfig(removeAllSpaceLikeCharacters(c));
       if (atom === errorAtom) return mockSetError;
       if (atom === loadingAtom) return mockSetLoading;
@@ -112,7 +112,7 @@ describe("PlaygroundApp", () => {
     });
 
     // Mock successful fetch response
-    (global.fetch as jest.Mock).mockResolvedValueOnce({
+    (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
       ok: true,
       text: () => Promise.resolve(mockConfig),
     });
@@ -138,7 +138,7 @@ describe("PlaygroundApp", () => {
     });
 
     // Mock failed fetch response
-    (global.fetch as jest.Mock).mockRejectedValueOnce(new Error("Failed to fetch"));
+    (global.fetch as ReturnType<typeof vi.fn>).mockRejectedValueOnce(new Error("Failed to fetch"));
 
     render(<PlaygroundApp />);
 
@@ -161,7 +161,7 @@ describe("PlaygroundApp", () => {
     });
 
     // Mock non-200 fetch response
-    (global.fetch as jest.Mock).mockResolvedValueOnce({
+    (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
       ok: false,
     });
 

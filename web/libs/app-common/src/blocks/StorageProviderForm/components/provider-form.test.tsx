@@ -75,7 +75,7 @@ describe("ProviderForm visibleWhen", () => {
   const defaultProps = {
     provider: createTestProvider(),
     errors: {},
-    onChange: jest.fn(),
+    onChange: vi.fn(),
   };
 
   it("renders fields without visibleWhen condition", () => {
@@ -173,7 +173,7 @@ describe("ProviderForm visibleWhen with function values", () => {
         provider={createProviderWithFunctionCondition()}
         formData={{ enable_advanced: true }}
         errors={{}}
-        onChange={jest.fn()}
+        onChange={vi.fn()}
       />,
     );
 
@@ -186,7 +186,7 @@ describe("ProviderForm visibleWhen with function values", () => {
         provider={createProviderWithFunctionCondition()}
         formData={{ enable_advanced: false }}
         errors={{}}
-        onChange={jest.fn()}
+        onChange={vi.fn()}
       />,
     );
 
