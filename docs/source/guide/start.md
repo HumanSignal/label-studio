@@ -1,7 +1,7 @@
 ---
 title: Start Label Studio
 type: guide
-tier: all
+tier: opensource
 order: 93
 order_enterprise: 0
 meta_title: Start commands for Label Studio
