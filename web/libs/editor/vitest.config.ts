@@ -20,6 +20,7 @@ const coreHotkeyTs = path.join(editorSrc, "core/Hotkey.ts");
 const coreCustomTypesTs = path.join(editorSrc, "core/CustomTypes.ts");
 const utilsUtilitiesTs = path.join(editorSrc, "utils/utilities.ts");
 const antDesignIconsStub = path.resolve(root, "__mocks__", "ant-design-icons.js");
+const noOpModuleStub = path.resolve(root, "__mocks__", "no-op-module.js");
 
 export default defineProject({
   root,
@@ -46,13 +47,11 @@ export default defineProject({
       enforce: "pre",
       resolveId(id: string, importer?: string) {
         const n = id.replace(/\\/g, "/");
-        // Prefer .js re-exports so loaders that don't add extension still resolve
         if (n.endsWith("/Registry") || n === "Registry" || n.endsWith("core/Registry")) return coreRegistryJs;
         if (n.endsWith("/Helpers") || n === "Helpers" || n.endsWith("core/Helpers")) return coreHelpersJs;
         if (n.endsWith("/Hotkey") || n === "Hotkey" || n.endsWith("core/Hotkey")) return coreHotkeyTs;
         if (n.endsWith("/CustomTypes") || n === "CustomTypes" || n.endsWith("core/CustomTypes")) return coreCustomTypesTs;
         if (n.endsWith("/utilities") || (n === "utilities" && importer?.replace(/\\/g, "/").includes("utils"))) return utilsUtilitiesTs;
-        // Absolute path under editor src without extension → try .js then .ts
         let absPath: string | null = null;
         if (id.startsWith("/") || /^[A-Za-z]:/.test(id)) {
           absPath = path.normalize(id);
@@ -60,14 +59,32 @@ export default defineProject({
           absPath = path.normalize(path.join(path.dirname(importer), id));
         }
         if (absPath && absPath.startsWith(editorSrc) && !path.extname(absPath)) {
-          const withJs = absPath + ".js";
-          const withTs = absPath + ".ts";
-          const withTsx = absPath + ".tsx";
-          if (fs.existsSync(withJs)) return withJs;
-          if (fs.existsSync(withTs)) return withTs;
-          if (fs.existsSync(withTsx)) return withTsx;
+          for (const ext of [".js", ".ts", ".tsx", ".jsx"]) {
+            if (fs.existsSync(absPath + ext)) return absPath + ext;
+          }
         }
         return null;
+      },
+      transform(code: string, id: string) {
+        // Rewrite extensionless relative imports in .js files so they resolve
+        // even when loaded outside Vite (e.g. via require() in tests)
+        if (!id.endsWith(".js") || !id.replace(/\\/g, "/").includes(editorSrc.replace(/\\/g, "/"))) return null;
+        const dir = path.dirname(id);
+        const importRe = /((?:from|import)\s*['"])(\.\.?\/[^'"]+)(['"])/g;
+        let result = code;
+        let changed = false;
+        result = code.replace(importRe, (full, prefix, specifier, quote) => {
+          if (path.extname(specifier)) return full;
+          const abs = path.resolve(dir, specifier);
+          for (const ext of [".js", ".ts", ".tsx", ".jsx"]) {
+            if (fs.existsSync(abs + ext)) {
+              changed = true;
+              return prefix + specifier + ext + quote;
+            }
+          }
+          return full;
+        });
+        return changed ? { code: result, map: null } : null;
       },
     },
     {
@@ -77,10 +94,10 @@ export default defineProject({
         if (id === VIRTUAL_CSS_ID || id === VIRTUAL_SVG_ID) {
           return id;
         }
-        if (id.endsWith(".prefix.css") || id.endsWith(".css")) {
+        if (id.endsWith(".css")) {
           return styleMockJs;
         }
-        if (id.endsWith(".svg")) {
+        if (id.endsWith(".svg") || id.endsWith(".png") || id.endsWith(".jpg") || id.endsWith(".jpeg")) {
           return VIRTUAL_SVG_ID;
         }
         return null;
@@ -172,31 +189,22 @@ export default defineProject({
       // Stub icons so no second React from @ant-design/icons (physical file, no Proxy)
       { find: "@ant-design/icons", replacement: antDesignIconsStub },
       ...Object.entries(baseAlias).map(([find, replacement]) => ({ find, replacement })),
-      // Same as jest.config.js moduleNameMapper
       { find: "konva", replacement: path.join(nodeModules, "konva/konva") },
-      { find: "keymaster", replacement: path.join(nodeModules, "identity-obj-proxy") },
-      { find: "react-konva-utils", replacement: path.join(nodeModules, "identity-obj-proxy") },
-      { find: /\.(css|svg|png|jpe?g)(\?.*)?$/, replacement: path.join(nodeModules, "identity-obj-proxy") },
-      // Stub .prefix.css (relative imports) to a real file so Vite resolves it
-      { find: /\.prefix\.css$/, replacement: styleMockJs },
+      { find: "keymaster", replacement: noOpModuleStub },
+      { find: "react-konva-utils", replacement: noOpModuleStub },
+      { find: "jest-fetch-mock", replacement: noOpModuleStub },
+      // CSS/SVG/images are handled by the editor-stub-css plugin's resolveId — no regex alias needed
       { find: "@adobe/css-tools", replacement: path.join(webRoot, "__mocks__/@adobe/css-tools.js") },
       { find: "@humansignal/ui", replacement: path.join(root, "../ui/src/index.ts") },
-      // PerRegionModes: force .js (alias matches resolved path; plugin handles relative id)
-      { find: /[\/\\]mixins[\/\\]PerRegionModes$/, replacement: path.join(editorSrc, "mixins/PerRegionModes.js") },
+      // PerRegionModes: force .js
       { find: path.join(editorSrc, "mixins/PerRegionModes"), replacement: path.join(editorSrc, "mixins/PerRegionModes.js") },
-      // Core/utils resolution: use .js re-exports so path-without-extension resolves
+      // Core/utils: exact-match string aliases for common relative depths
+      // (the resolveId plugin handles all other depths as fallback)
       { find: "../../core/Registry", replacement: coreRegistryJs },
       { find: "../core/Registry", replacement: coreRegistryJs },
       { find: "../../core/Helpers", replacement: coreHelpersJs },
       { find: "../core/Helpers", replacement: coreHelpersJs },
       { find: "./utilities", replacement: utilsUtilitiesTs },
-      { find: /(^|\/)core\/Registry$/, replacement: coreRegistryJs },
-      { find: /(^|\/)core\/Helpers$/, replacement: coreHelpersJs },
-      { find: path.join(editorSrc, "core/Registry"), replacement: coreRegistryJs },
-      { find: path.join(editorSrc, "core/Helpers"), replacement: coreHelpersJs },
-      { find: path.join(editorSrc, "core/Hotkey"), replacement: coreHotkeyTs },
-      { find: path.join(editorSrc, "core/CustomTypes"), replacement: coreCustomTypesTs },
-      { find: path.join(editorSrc, "utils/utilities"), replacement: utilsUtilitiesTs },
     ],
   },
   server: {

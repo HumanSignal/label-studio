@@ -57,6 +57,7 @@ vi.mock("../../tags/object/Image", () => {
 
 import { EllipseRegionModel } from "../EllipseRegion";
 import { ImageModel } from "../../tags/object/Image";
+import Registry from "../../core/Registry";
 
 const TestRoot = types
   .model("TestRoot", {
@@ -214,7 +215,6 @@ describe("EllipseRegion", () => {
 
   describe("Registry region type", () => {
     it("is registered as ellipseregion", () => {
-      const Registry = require("../../core/Registry").default;
       const Model = Registry.getModelByTag("ellipseregion");
       expect(Model).toBeDefined();
       expect(Model).toBe(EllipseRegionModel);

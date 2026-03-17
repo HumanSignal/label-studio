@@ -100,6 +100,7 @@ import { render } from "@testing-library/react";
 import { RectRegionModel, HtxRectangle } from "../RectRegion";
 import { ImageModel } from "../../tags/object/Image";
 import { ImageViewContext } from "../../components/ImageView/ImageViewContext";
+import Registry from "../../core/Registry";
 
 // Composed model that reads control from root._testControl for setPosition(snap) tests.
 const TestRectRegionWithControl = types.compose(
@@ -491,7 +492,6 @@ describe("RectRegion", () => {
 
   describe("Registry region type", () => {
     it("is registered as rectangleregion", () => {
-      const Registry = require("../../core/Registry").default;
       const Model = Registry.getModelByTag("rectangleregion");
       expect(Model).toBeDefined();
       expect(Model).toBe(RectRegionModel);

@@ -1,3 +1,6 @@
+import * as Polygon from "../Polygon";
+import { Hotkey as HotkeyImport } from "../../../core/Hotkey";
+
 vi.mock("../../../utils/feature-flags", () => ({
   isFF: vi.fn(() => false),
   FF_DEV_3391: "fflag_fix_front_dev_3391_interactive_view_all",
@@ -27,11 +30,9 @@ let Store;
 let HotkeyMock;
 
 beforeAll(() => {
-  vi.resetModules();
   const { types } = require("mobx-state-tree");
-  const Polygon = require("../Polygon");
   PolygonModel = Polygon.PolygonModel;
-  HotkeyMock = require("../../../core/Hotkey").Hotkey;
+  HotkeyMock = HotkeyImport;
 
   const MockImage = types.model("MockImage", {
     name: types.string,

@@ -12,6 +12,7 @@ import "../Label";
 import "../../object/RichText";
 import "../Labels/Labels";
 import { HtxLabelView, LabelModel } from "../Label";
+import InfoModal from "../../../components/Infomodal/Infomodal";
 
 const mockAddErrors = vi.fn();
 const mockRegions = [{ hasLabel: (v) => v === "A" }, { hasLabel: (v) => v === "B" }];
@@ -270,7 +271,6 @@ describe("Label model", () => {
   });
 
   it("toggleSelected shows warning when maxUsages would be exceeded", () => {
-    const InfoModal = require("../../../components/Infomodal/Infomodal").default;
     const storeRef = { task: { dataObj: { text: "Hi" } } };
     const config = Tree.treeToModel(
       `<View><Labels name="l" toName="t" maxUsages="1"><Label value="A" /></Labels><Text name="t" value="$text" /></View>`,

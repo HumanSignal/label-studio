@@ -6,6 +6,7 @@
 import React from "react";
 import { types } from "mobx-state-tree";
 import { render, screen } from "@testing-library/react";
+import { TextAreaRegionModel as TextAreaRegionModelImport } from "../TextAreaRegion";
 
 const mockOnChange = vi.fn();
 const mockRemove = vi.fn();
@@ -20,7 +21,7 @@ vi.mock("../../tags/control/TextArea/TextArea", () => {
       .model("TextAreaModel", {
         id: t.identifier,
         name: t.optional(t.string, "ta"),
-        regions: t.optional(t.array(t.late(() => require("../TextAreaRegion").TextAreaRegionModel)), []),
+        regions: t.optional(t.array(t.late(() => TextAreaRegionModelImport)), []),
       })
       .volatile(() => ({
         isEditable: true,

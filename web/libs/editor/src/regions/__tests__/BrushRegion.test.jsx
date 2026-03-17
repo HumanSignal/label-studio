@@ -52,6 +52,7 @@ vi.mock("../../tags/object/Image", () => {
 
 import { BrushRegionModel } from "../BrushRegion";
 import { ImageModel } from "../../tags/object/Image";
+import * as Canvas from "../../utils/canvas";
 
 const TestRoot = types
   .model("TestRoot", {
@@ -238,7 +239,6 @@ describe("BrushRegion", () => {
     });
 
     it("serialize without fast uses Canvas.Region2RLE and returns result", () => {
-      const Canvas = require("../../utils/canvas");
       Canvas.Region2RLE.mockReturnValue(new Uint8Array([0, 1, 2, 3]));
       const result = region.serialize();
       expect(Canvas.Region2RLE).toHaveBeenCalled();
@@ -247,14 +247,12 @@ describe("BrushRegion", () => {
     });
 
     it("serialize without fast returns null when Region2RLE returns empty", () => {
-      const Canvas = require("../../utils/canvas");
       Canvas.Region2RLE.mockReturnValue(null);
       const result = region.serialize();
       expect(result).toBeNull();
     });
 
     it("serialize without fast returns null when Region2RLE returns empty array", () => {
-      const Canvas = require("../../utils/canvas");
       Canvas.Region2RLE.mockReturnValue([]);
       const result = region.serialize();
       expect(result).toBeNull();

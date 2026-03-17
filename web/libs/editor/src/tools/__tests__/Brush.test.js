@@ -8,6 +8,8 @@
 import React from "react";
 import { render, screen } from "@testing-library/react";
 import { types } from "mobx-state-tree";
+import { Brush, BrushCursorMixin } from "../Brush";
+import { findClosestParent } from "../../utils/utilities";
 
 const mockCreateBrushSizeCircleCursor = vi.fn((val) => `url('cursor-${val}') auto`);
 vi.mock("../../utils/canvas", () => ({
@@ -54,8 +56,6 @@ vi.mock("mobx-state-tree", async () => {
     },
   };
 });
-
-const { Brush, BrushCursorMixin } = require("../Brush");
 
 function createMockManager() {
   return {
@@ -112,7 +112,6 @@ describe("Brush tool", () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    const { findClosestParent } = require("../../utils/utilities");
     findClosestParent.mockReturnValue(stageContent);
     manager = createMockManager();
     control = createMockControl();
@@ -321,7 +320,6 @@ describe("Brush tool", () => {
     });
 
     it("returns early when findClosestParent does not find stage content", () => {
-      const { findClosestParent } = require("../../utils/utilities");
       findClosestParent.mockReturnValueOnce(null);
       const tool = createBrush();
       const ev = {
@@ -482,7 +480,6 @@ describe("Brush tool", () => {
     });
 
     it("mousemoveEv in drawing mode does not addPoint when findClosestParent returns null", () => {
-      const { findClosestParent } = require("../../utils/utilities");
       const mockBrush = {
         type: "brushregion",
         addPoint: vi.fn(),

@@ -3,6 +3,7 @@
  */
 import Tree from "../../../../core/Tree";
 import Registry from "../../../../core/Registry";
+import DomManager from "../domManager";
 import "../../../visual/View";
 import "../index";
 
@@ -157,7 +158,6 @@ describe("RichText model", () => {
       const node = createTextNode();
       node.mountNodeRef.current = document.createElement("div");
       node.onLoaded();
-      const DomManager = require("../domManager").default;
       expect(DomManager).toHaveBeenCalledWith(node.mountNodeRef.current);
     });
   });

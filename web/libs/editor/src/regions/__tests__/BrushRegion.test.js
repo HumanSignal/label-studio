@@ -84,8 +84,8 @@ vi.mock("../../components/ImageView/ImageViewContext", () => ({
   ImageViewContext: require("react").createContext({ suggestion: null }),
 }));
 
-const Canvas = require("../../utils/canvas");
-const { Geometry } = require("../../components/InteractiveOverlays/Geometry");
+import * as Canvas from "../../utils/canvas";
+import { Geometry } from "../../components/InteractiveOverlays/Geometry";
 
 function createMockAnnotation(overrides = {}) {
   return {
@@ -142,8 +142,8 @@ vi.mock("../../tags/object/Image", () => ({
   ImageModel: MockImageModel,
 }));
 
-const { BrushRegionModel, HtxBrush } = require("../BrushRegion");
-const { ImageViewContext } = require("../../components/ImageView/ImageViewContext");
+import { BrushRegionModel, HtxBrush } from "../BrushRegion";
+import { ImageViewContext } from "../../components/ImageView/ImageViewContext";
 
 const ff = mockFF();
 

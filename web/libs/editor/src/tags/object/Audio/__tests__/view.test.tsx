@@ -4,6 +4,7 @@
 import React from "react";
 import { render, screen, fireEvent } from "@testing-library/react";
 import { Audio } from "../view";
+import { Hotkey } from "../../../../core/Hotkey";
 
 vi.mock("../../../../components/Timeline/Controls", () => {
   const MockControls = (props: any) => (
@@ -192,7 +193,6 @@ const defaultItem = {
 };
 
 function getLastHotkeyInstance() {
-  const { Hotkey } = require("../../../../core/Hotkey");
   const results = (Hotkey as vi.Mock).mock?.results ?? [];
   return results[results.length - 1]?.value;
 }

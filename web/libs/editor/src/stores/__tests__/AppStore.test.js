@@ -55,6 +55,8 @@ import "../../tags/object/RichText";
 import Tree from "../../core/Tree";
 import Registry from "../../core/Registry";
 import AppStore from "../AppStore";
+import InfoModal from "../../components/Infomodal/Infomodal";
+import ToolsManager from "../../tools/Manager";
 
 const MINIMAL_CONFIG = `<View><Text name="t1" value="$text" /></View>`;
 
@@ -459,7 +461,6 @@ describe("AppStore", () => {
 
   describe("showModal", () => {
     it("calls InfoModal with message and type", async () => {
-      const InfoModal = require("../../components/Infomodal/Infomodal").default;
       const store = createStore();
       store.showModal("Test message", "warning");
       expect(InfoModal.warning).toHaveBeenCalledWith("Test message");
@@ -623,7 +624,6 @@ describe("AppStore", () => {
 
   describe("beforeDestroy", () => {
     it("removes tools and clears appControls", () => {
-      const ToolsManager = require("../../tools/Manager").default;
       const store = createStore();
       store.setAppControls({ clear: vi.fn(), render: vi.fn() });
       store.beforeDestroy();

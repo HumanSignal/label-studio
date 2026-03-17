@@ -34,6 +34,7 @@ vi.mock("../../utils", () => ({
   },
 }));
 
+import { highlightRange } from "../../utils/html";
 import SpanTextMixin from "../SpanText";
 
 const Base = types
@@ -163,7 +164,6 @@ describe("SpanTextMixin", () => {
       const { model } = getTestTree();
       model.setParent({ highlightcolor: null });
       model.setStyle({ fillcolor: "#ccc" });
-      const { highlightRange } = require("../../utils/html");
       const result = model.createSpans();
       expect(highlightRange).toHaveBeenCalled();
       expect(model._spans).toBeDefined();
@@ -172,7 +172,6 @@ describe("SpanTextMixin", () => {
     });
 
     it("returns early when highlightRange returns empty array", () => {
-      const { highlightRange } = require("../../utils/html");
       highlightRange.mockReturnValueOnce([]);
       const { model } = getTestTree();
       model.setParent({ highlightcolor: null });

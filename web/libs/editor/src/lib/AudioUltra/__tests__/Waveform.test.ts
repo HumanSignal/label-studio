@@ -2,6 +2,8 @@
  * Unit tests for Waveform (lib/AudioUltra/Waveform.ts)
  */
 import { Waveform } from "../Waveform";
+import { Html5Player } from "../Controls/Html5Player";
+import { WebAudioPlayer } from "../Controls/WebAudioPlayer";
 
 const mockMediaLoad = vi.fn();
 const mockDestroy = vi.fn();
@@ -176,21 +178,17 @@ describe("Waveform", () => {
     });
 
     it("uses html5 player when decoderType is webaudio and playerType not set", () => {
-      const { Html5Player } = require("../Controls/Html5Player");
       new Waveform(baseParams);
       expect(Html5Player).toHaveBeenCalled();
     });
 
     it("forces html5 player when decoderType is ffmpeg", () => {
-      const { Html5Player } = require("../Controls/Html5Player");
-      const { WebAudioPlayer } = require("../Controls/WebAudioPlayer");
       new Waveform({ ...baseParams, decoderType: "ffmpeg" });
       expect(Html5Player).toHaveBeenCalled();
       expect(WebAudioPlayer).not.toHaveBeenCalled();
     });
 
     it("uses webaudio player when playerType is webaudio", () => {
-      const { WebAudioPlayer } = require("../Controls/WebAudioPlayer");
       new Waveform({ ...baseParams, playerType: "webaudio" });
       expect(WebAudioPlayer).toHaveBeenCalled();
     });

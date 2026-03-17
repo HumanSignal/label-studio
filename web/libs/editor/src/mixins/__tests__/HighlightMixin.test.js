@@ -33,6 +33,7 @@ vi.mock("../../utils", () => ({
   },
 }));
 
+import Utils from "../../utils";
 import { HighlightMixin, STATE_CLASS_MODS } from "../HighlightMixin";
 
 const Base = types
@@ -293,7 +294,6 @@ describe("HighlightMixin", () => {
 
   describe("updateSpans", () => {
     it("calls applySpanStyles and setAttribute when _spans present", () => {
-      const Utils = require("../../utils").default;
       const { model } = getTestTree();
       const spans = [mockSpan(), mockSpan()];
       model.setSpans(spans);
@@ -536,7 +536,6 @@ describe("HighlightMixin", () => {
 
   describe("getColors", () => {
     it("uses parent.highlightcolor when set", () => {
-      const Utils = require("../../utils").default;
       const { model } = getTestTree();
       model.setParent({ highlightcolor: "#abc" });
       model.getColors();

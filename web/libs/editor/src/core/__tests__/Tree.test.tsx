@@ -6,6 +6,9 @@
 import React from "react";
 import { types } from "mobx-state-tree";
 import Tree, { TRAVERSE_SKIP, TRAVERSE_STOP, findParentOfType } from "../Tree";
+import Registry from "../Registry";
+import "../../tags/visual/View";
+import "../../tags/object/RichText";
 
 describe("Tree", () => {
   describe("cssConverter", () => {
@@ -202,9 +205,6 @@ describe("Tree", () => {
 
   describe("extractNames", () => {
     it("returns names and toNames from root with name/toname", () => {
-      const Registry = require("../Registry").default;
-      require("../../tags/visual/View");
-      require("../../tags/object/RichText");
       const config = Tree.treeToModel(`<View><Text name="mytext" value="$t" /></View>`, {
         task: { dataObj: { t: "hi" } },
       });
@@ -219,9 +219,6 @@ describe("Tree", () => {
 
   describe("renderItem and renderChildren", () => {
     it("renderItem returns a React element for a registered View model", () => {
-      const Registry = require("../Registry").default;
-      require("../../tags/visual/View");
-      require("../../tags/object/RichText");
       const config = Tree.treeToModel(`<View><Text name="mytext" value="$t" /></View>`, {
         task: { dataObj: { t: "hi" } },
       });
@@ -233,9 +230,6 @@ describe("Tree", () => {
     });
 
     it("renderChildren returns array of elements when item has children", () => {
-      const Registry = require("../Registry").default;
-      require("../../tags/visual/View");
-      require("../../tags/object/RichText");
       const config = Tree.treeToModel(`<View><Text name="a" value="$x" /><Text name="b" value="$y" /></View>`, {
         task: { dataObj: { x: "1", y: "2" } },
       });
@@ -248,9 +242,6 @@ describe("Tree", () => {
     });
 
     it("renderChildren returns null when item has no children", () => {
-      const Registry = require("../Registry").default;
-      require("../../tags/visual/View");
-      require("../../tags/object/RichText");
       const config = Tree.treeToModel(`<View><Text name="only" value="$x" /></View>`, {
         task: { dataObj: { x: "1" } },
       });

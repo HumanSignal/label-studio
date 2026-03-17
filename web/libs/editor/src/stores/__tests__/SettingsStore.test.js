@@ -3,6 +3,7 @@
  * Parity: stores/SettingsStore.js target 48.92%.
  */
 import SettingsModel from "../SettingsStore";
+import { Hotkey } from "../../core/Hotkey";
 
 describe("SettingsStore", () => {
   let localStorageMock;
@@ -108,7 +109,6 @@ describe("SettingsStore", () => {
   });
 
   it("toggleHotkeys toggles enableHotkeys and calls Hotkey.setScope", () => {
-    const { Hotkey } = require("../../core/Hotkey");
     const spy = vi.spyOn(Hotkey, "setScope").mockImplementation(() => {});
     const store = SettingsModel.create({}, { settings: {} });
     store.toggleHotkeys();

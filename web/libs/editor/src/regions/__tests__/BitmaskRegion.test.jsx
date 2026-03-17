@@ -3,6 +3,8 @@
  * View/React coverage is largely from Cypress; these tests cover model logic.
  */
 import { destroy, types } from "mobx-state-tree";
+import * as BitmaskUtils from "../BitmaskRegion/utils";
+import * as BitmaskContour from "../BitmaskRegion/contour";
 
 vi.mock("../BitmaskRegion/utils", () => ({
   BitmaskDrawing: {
@@ -241,8 +243,8 @@ describe("BitmaskRegion", () => {
     });
 
     it("finalizeRegion composes mask, generates outline, updates bbox", () => {
-      const Utils = require("../BitmaskRegion/utils");
-      const Contour = require("../BitmaskRegion/contour");
+      const Utils = BitmaskUtils;
+      const Contour = BitmaskContour;
       Utils.getCanvasPixelBounds.mockClear();
       Contour.generateMultiShapeOutline.mockClear();
       region.finalizeRegion();
@@ -267,7 +269,7 @@ describe("BitmaskRegion", () => {
     });
 
     it("generateOutline calls generateMultiShapeOutline and setOutline", () => {
-      const Contour = require("../BitmaskRegion/contour");
+      const Contour = BitmaskContour;
       Contour.generateMultiShapeOutline.mockReturnValue([[0, 0, 10, 10]]);
       region.generateOutline();
       expect(Contour.generateMultiShapeOutline).toHaveBeenCalledWith(region);
@@ -346,7 +348,7 @@ describe("BitmaskRegion", () => {
     });
 
     it("updateBBox calls getCanvasPixelBounds and setBBox", () => {
-      const Utils = require("../BitmaskRegion/utils");
+      const Utils = BitmaskUtils;
       Utils.getCanvasPixelBounds.mockReturnValue({ left: 1, top: 2, right: 11, bottom: 12 });
       region.updateBBox();
       expect(Utils.getCanvasPixelBounds).toHaveBeenCalledWith(region.offscreenCanvasRef, 1);
@@ -390,7 +392,7 @@ describe("BitmaskRegion", () => {
     it("beginPath with brush type uses black and source-over", () => {
       const annotation = { pauseAutosave: vi.fn() };
       root.image.setAnnotation(annotation);
-      const Utils = require("../BitmaskRegion/utils");
+      const Utils = BitmaskUtils;
       Utils.BitmaskDrawing.begin.mockClear();
       region.beginPath({ type: "brush", strokeWidth: 5, x: 10, y: 20 });
       expect(annotation.pauseAutosave).toHaveBeenCalled();
@@ -405,7 +407,7 @@ describe("BitmaskRegion", () => {
     it("beginPath with eraser type uses white and destination-out", () => {
       const annotation = { pauseAutosave: vi.fn() };
       root.image.setAnnotation(annotation);
-      const Utils = require("../BitmaskRegion/utils");
+      const Utils = BitmaskUtils;
       Utils.BitmaskDrawing.begin.mockClear();
       region.beginPath({ type: "eraser", strokeWidth: 8, x: 0, y: 0 });
       expect(Utils.BitmaskDrawing.begin).toHaveBeenCalledWith(
@@ -417,7 +419,7 @@ describe("BitmaskRegion", () => {
     });
 
     it("addPoint calls BitmaskDrawing.draw and composeMask", () => {
-      const Utils = require("../BitmaskRegion/utils");
+      const Utils = BitmaskUtils;
       Utils.BitmaskDrawing.draw.mockClear();
       region.addPoint(5, 10, 4);
       expect(Utils.BitmaskDrawing.draw).toHaveBeenCalledWith(
@@ -429,7 +431,7 @@ describe("BitmaskRegion", () => {
     });
 
     it("addPoint with erase option passes eraserMode", () => {
-      const Utils = require("../BitmaskRegion/utils");
+      const Utils = BitmaskUtils;
       Utils.BitmaskDrawing.draw.mockClear();
       region.addPoint(1, 2, 3, { erase: true });
       expect(Utils.BitmaskDrawing.draw).toHaveBeenCalledWith(
@@ -478,7 +480,7 @@ describe("BitmaskRegion", () => {
     });
 
     it("isHovered delegates to isHoveringNonTransparentPixel", () => {
-      const Utils = require("../BitmaskRegion/utils");
+      const Utils = BitmaskUtils;
       Utils.isHoveringNonTransparentPixel.mockReturnValue(true);
       expect(region.isHovered()).toBe(true);
       Utils.isHoveringNonTransparentPixel.mockReturnValue(false);

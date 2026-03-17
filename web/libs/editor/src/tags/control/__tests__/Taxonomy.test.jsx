@@ -11,6 +11,9 @@ import "../Choice";
 import "../Taxonomy/Taxonomy";
 import "../../object/RichText";
 import { HtxTaxonomy, TaxonomyModel, traverse } from "../Taxonomy/Taxonomy";
+import { StoreExtender } from "../../../mixins/SharedChoiceStore/extender";
+import { destroy as destroyMixin } from "../../../mixins/SharedChoiceStore/mixin";
+import Infomodal from "../../../components/Infomodal/Infomodal";
 import { mockFF } from "../../../../__mocks__/global";
 import { FF_TAXONOMY_LABELING } from "../../../utils/feature-flags";
 
@@ -81,7 +84,6 @@ function createTaxonomyNode(
   configOverride = null,
 ) {
   const { types } = require("mobx-state-tree");
-  const { StoreExtender } = require("../../../mixins/SharedChoiceStore/extender");
   const ViewModel = Registry.getModelByTag("view");
   const WrapperModel = types.model("Wrapper", { view: ViewModel });
   const TaxonomyModelRef = types.safeReference(Registry.getModelByTag("taxonomy"));
@@ -152,8 +154,7 @@ beforeEach(() => {
   vi.clearAllMocks();
   ff.setup();
   window.STORE_INIT_OK = true;
-  const { destroy } = require("../../../mixins/SharedChoiceStore/mixin");
-  destroy();
+  destroyMixin();
   Tree.filterChildrenOfType.mockImplementation((node, type) => {
     if (type === "ChoiceModel" && node?.children) {
       return node.children.filter((c) => c.type === "choice");
@@ -373,7 +374,6 @@ describe("Taxonomy model", () => {
 
   it("requiredModal calls Infomodal.warning", () => {
     const taxonomy = createTaxonomyNode();
-    const Infomodal = require("../../../components/Infomodal/Infomodal").default;
     taxonomy.requiredModal();
     expect(Infomodal.warning).toHaveBeenCalled();
   });
@@ -403,7 +403,6 @@ describe("Taxonomy model", () => {
     const taxonomy = root.children.find((c) => c.type === "taxonomy");
     taxonomy.updateResult = vi.fn();
     taxonomy.onChange(null, [{ path: ["A"] }, { path: ["B"] }]);
-    const Infomodal = require("../../../components/Infomodal/Infomodal").default;
     taxonomy.beforeSend();
     expect(Infomodal.warning).toHaveBeenCalled();
   });
@@ -442,7 +441,6 @@ describe("Taxonomy model", () => {
       storeRef,
     );
     const { types } = require("mobx-state-tree");
-    const { StoreExtender } = require("../../../mixins/SharedChoiceStore/extender");
     const ViewModel = Registry.getModelByTag("view");
     const WrapperModel = types.model("Wrapper", { view: ViewModel });
     const RootModel = types.compose(
@@ -579,7 +577,6 @@ describe("HtxTaxonomy view", () => {
       storeRef,
     );
     const { types } = require("mobx-state-tree");
-    const { StoreExtender } = require("../../../mixins/SharedChoiceStore/extender");
     const ViewModel = Registry.getModelByTag("view");
     const WrapperModel = types.model("Wrapper", { view: ViewModel });
     const RootModel = types.compose(

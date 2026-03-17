@@ -2,6 +2,8 @@
  * Unit tests for NodesConnector (components/InteractiveOverlays/NodesConnector.js)
  */
 import NodesConnector from "../NodesConnector";
+import { Geometry } from "../Geometry";
+import { RelationShape } from "../RelationShape";
 
 const mockRelationShapeInstance = {
   boundingBox: vi.fn(),
@@ -29,9 +31,6 @@ vi.mock("../Geometry", () => ({
     ]),
   },
 }));
-
-const { Geometry } = require("../Geometry");
-const { RelationShape } = require("../RelationShape");
 
 describe("NodesConnector", () => {
   beforeEach(() => {

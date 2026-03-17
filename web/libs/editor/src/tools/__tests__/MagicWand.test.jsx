@@ -10,6 +10,7 @@
 import React from "react";
 import { render, screen } from "@testing-library/react";
 import { types } from "mobx-state-tree";
+import { MagicWand } from "../MagicWand";
 
 vi.mock("chroma-js", () => {
   const hex = (c) => (c && typeof c === "string" ? c : "#000000");
@@ -74,8 +75,6 @@ const MockTool = ({ label, ariaLabel, onClick }) =>
     label,
   );
 vi.mock("../../components/Toolbar/Tool", () => ({ Tool: MockTool }));
-
-const { MagicWand } = require("../MagicWand");
 
 function createMockManager() {
   return {

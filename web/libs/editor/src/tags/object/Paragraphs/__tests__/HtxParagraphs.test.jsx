@@ -5,6 +5,8 @@ import React from "react";
 import { FF_DEV_2669, FF_DEV_2918, FF_LSDV_E_278, FF_NER_SELECT_ALL } from "../../../../utils/feature-flags";
 import { HtxParagraphsView } from "../HtxParagraphs";
 import { mockFF } from "../../../../../__mocks__/global";
+import * as SelectionTools from "../../../../utils/selection-tools";
+import * as HtmlUtils from "../../../../utils/html";
 
 const ff = mockFF();
 
@@ -758,7 +760,7 @@ describe("HtxParagraphsView", () => {
       view.myRef = { current: root };
       const removeAllRanges = vi.fn();
       window.getSelection = vi.fn(() => ({ removeAllRanges }));
-      vi.spyOn(require("../../../../utils/selection-tools"), "isSelectionContainsSpan").mockReturnValue(true);
+      vi.spyOn(SelectionTools, "isSelectionContainsSpan").mockReturnValue(true);
       const region = {};
       view._determineRegion = vi.fn(() => region);
       view._selectRegions(true);
@@ -778,7 +780,7 @@ describe("HtxParagraphsView", () => {
       const root = document.createElement("div");
       root.appendChild(span);
       view.myRef = { current: root };
-      vi.spyOn(require("../../../../utils/selection-tools"), "isSelectionContainsSpan").mockReturnValue(true);
+      vi.spyOn(SelectionTools, "isSelectionContainsSpan").mockReturnValue(true);
       const region = {};
       view._determineRegion = vi.fn(() => region);
       view._selectRegions(false);
@@ -797,7 +799,7 @@ describe("HtxParagraphsView", () => {
       root.appendChild(document.createElement("div"));
       view.myRef = { current: root };
       window.getSelection = vi.fn(() => ({ removeAllRanges }));
-      vi.spyOn(require("../../../../utils/selection-tools"), "isSelectionContainsSpan").mockReturnValue(false);
+      vi.spyOn(SelectionTools, "isSelectionContainsSpan").mockReturnValue(false);
       view._selectRegions(false);
       expect(selectAreas).not.toHaveBeenCalled();
       expect(removeAllRanges).not.toHaveBeenCalled();
@@ -1095,7 +1097,7 @@ describe("HtxParagraphsView", () => {
         addRange,
         toString: () => "x",
       }));
-      vi.spyOn(require("../../../../utils/html"), "splitBoundaries").mockImplementation(() => {
+      vi.spyOn(HtmlUtils, "splitBoundaries").mockImplementation(() => {
         throw new Error("splitBoundaries error");
       });
       const errSpy = vi.spyOn(console, "error").mockImplementation(() => {});
@@ -1134,7 +1136,7 @@ describe("HtxParagraphsView", () => {
         addRange,
         toString: () => "hello",
       }));
-      vi.spyOn(require("../../../../utils/html"), "splitBoundaries").mockImplementation(() => {});
+      vi.spyOn(HtmlUtils, "splitBoundaries").mockImplementation(() => {});
       view.getOffsetInPhraseElement = jest
         .fn()
         .mockReturnValueOnce([0, textEl, 0, 0])
@@ -1175,7 +1177,7 @@ describe("HtxParagraphsView", () => {
         addRange,
         toString: () => "",
       }));
-      vi.spyOn(require("../../../../utils/html"), "splitBoundaries").mockImplementation(() => {});
+      vi.spyOn(HtmlUtils, "splitBoundaries").mockImplementation(() => {});
       view.getOffsetInPhraseElement = vi.fn().mockReturnValue([0, textEl, 0, 0]);
       const result = view.captureDocumentSelection();
       expect(result).toEqual([]);

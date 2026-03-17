@@ -3,6 +3,7 @@
  */
 import React from "react";
 import { Erase } from "../Erase";
+import { findClosestParent } from "../../utils/utilities";
 
 const stageContent = {};
 const mockBrush = {
@@ -31,7 +32,6 @@ vi.mock("../../utils/utilities", () => ({
 describe("Erase tool", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    const { findClosestParent } = require("../../utils/utilities");
     findClosestParent.mockReturnValue(true);
   });
 
@@ -182,7 +182,6 @@ describe("Erase tool", () => {
   });
 
   it("mousemoveEv when findClosestParent returns false does not call addPoint", () => {
-    const { findClosestParent } = require("../../utils/utilities");
     findClosestParent.mockReturnValue(false);
     const tool = createTool();
     const ev = { target: stageContent, offsetX: 10, offsetY: 10 };
@@ -204,7 +203,6 @@ describe("Erase tool", () => {
   });
 
   it("mousedownEv when findClosestParent returns false does not start drawing", () => {
-    const { findClosestParent } = require("../../utils/utilities");
     findClosestParent.mockReturnValue(false);
     const tool = createTool();
     const ev = { target: stageContent, offsetX: 10, offsetY: 10 };

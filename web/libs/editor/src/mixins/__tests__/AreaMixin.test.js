@@ -18,6 +18,8 @@ vi.mock("../../regions/Result", () => require("./AreaMixinMockResult"));
 import { AreaMixin, AreaMixinBase } from "../AreaMixin";
 import { ReadOnlyRegionMixin } from "../ReadOnlyMixin";
 import MockResult from "./AreaMixinMockResult";
+import { PER_REGION_MODES } from "../PerRegion";
+import { defaultStyle } from "../../core/Constants";
 
 const mockAnnotation = () => ({
   toNames: new Map(),
@@ -288,7 +290,6 @@ describe("AreaMixin", () => {
 
   describe("perRegionDescControls", () => {
     it("filters perRegionTags by displaymode REGION_LIST", () => {
-      const { PER_REGION_MODES } = require("../PerRegion");
       const { root, area, annotation } = createStore();
       const listTag = { perregion: true, displaymode: PER_REGION_MODES.REGION_LIST };
       const tagTag = { perregion: true, displaymode: PER_REGION_MODES.TAG };
@@ -470,7 +471,6 @@ describe("AreaMixin", () => {
     });
 
     it("returns defaultStyle.fillcolor when no style", () => {
-      const { defaultStyle } = require("../../core/Constants");
       const { area } = createStore();
       const color = typeof area.getOneColor === "function" ? area.getOneColor() : area.getOneColor;
       expect(color).toBe(defaultStyle.fillcolor);

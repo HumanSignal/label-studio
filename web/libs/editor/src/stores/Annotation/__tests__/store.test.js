@@ -39,6 +39,7 @@ import "../../../tags/object/RichText";
 import Tree from "../../../core/Tree";
 import Registry from "../../../core/Registry";
 import AppStore from "../../AppStore";
+import { errorBuilder } from "../../../core/DataValidator/ConfigValidator";
 
 const MINIMAL_CONFIG = `<View><Text name="t1" value="$text" /></View>`;
 
@@ -390,7 +391,6 @@ describe("Annotation store (store.js)", () => {
     it("addErrors appends to validation and deduplicates by identifier", () => {
       const store = createStore();
       store.initializeStore({});
-      const { errorBuilder } = require("../../../core/DataValidator/ConfigValidator");
       const err1 = errorBuilder.generalError("Err1");
       const err2 = errorBuilder.generalError("Err2");
       store.annotationStore.addErrors([err1]);
