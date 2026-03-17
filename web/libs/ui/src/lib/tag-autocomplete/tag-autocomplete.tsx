@@ -9,7 +9,7 @@ import React, {
 } from "react";
 import { Command, CommandEmpty, CommandGroup, CommandItem, CommandList } from "@humansignal/shad/components/ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "@humansignal/shad/components/ui/popover";
-import { Badge, Spinner } from "@humansignal/ui";
+import { Badge, Spinner, Typography } from "@humansignal/ui";
 import { IconPlus } from "@humansignal/icons";
 import { cnm } from "../../utils/utils";
 import { useTagAutocomplete } from "./use-tag-autocomplete";
@@ -52,7 +52,9 @@ export const TagAutocomplete = forwardRef(
       setFocusedTagIndex,
       setHighlightedOptionIndex,
       handleKeyDown,
+      handlePaste,
       focusInput,
+      error,
     } = useTagAutocomplete({ ...props, createTagCallbackRef });
 
     // --- NEW: control cmdk selection so first item is always highlighted ---
@@ -286,6 +288,7 @@ export const TagAutocomplete = forwardRef(
                   className={styles.input}
                   value={query}
                   onChange={handleInputChange}
+                  onPaste={handlePaste}
                   onFocus={() => {
                     setFocusedTagIndex(null);
                     // Don't automatically open dropdown on focus - wait for user to type
@@ -366,6 +369,12 @@ export const TagAutocomplete = forwardRef(
             </CommandList>
           </PopoverContent>
         </Popover>
+
+        {error && (
+          <Typography variant="body" size="small" className="text-negative-content mt-tight" role="alert">
+            {error}
+          </Typography>
+        )}
 
         {/* Hidden select for form integration */}
         <select
