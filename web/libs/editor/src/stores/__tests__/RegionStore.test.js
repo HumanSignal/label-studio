@@ -441,10 +441,10 @@ describe("RegionStore", () => {
     });
 
     it("selectNext selects first region when none selected", () => {
-      const { annotation } = createStoreWithOneRectRegion();
-      annotation.selectArea = vi.fn();
+      const { annotation } = createStoreWithOneRectRegionViaInit();
       annotation.regionStore.selectNext();
-      expect(annotation.selectArea).toHaveBeenCalledWith(annotation.regionStore.regions[0]);
+      const region = annotation.regionStore.regions[0];
+      expect(annotation.regionStore.selection.highlighted).toBe(region);
     });
 
     it("asTree returns one node with enrich", () => {

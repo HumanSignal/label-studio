@@ -289,8 +289,7 @@ describe("VideoRegions", () => {
 
   describe("Shape onClick", () => {
     it("calls setHighlight and onClickRegion when rectangle is clicked", () => {
-      const getParentOfType = require("mobx-state-tree").getParentOfType;
-      getParentOfType.mockReturnValue(null);
+      vi.mocked(getParentOfType).mockReturnValue(null);
       const reg = createMockRegion({ id: "click-1" });
       render(<VideoRegions {...defaultProps} regions={[reg]} />);
       const rect = screen.getByTestId("rectangle-click-1");

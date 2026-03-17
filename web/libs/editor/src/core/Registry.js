@@ -16,6 +16,7 @@ class RegistryStub {
   objects = [];
   tools = {};
   perRegionViews = {};
+  areas = new Map();
 
   addTag = (tag, model, view) => {
     this.tags.push(tag);
@@ -26,14 +27,26 @@ class RegistryStub {
   addRegionType = (type, object, detector) => {
     this.regions.push(type);
     if (detector) type.detectByValue = detector;
+    const existing = this.areas.get(object);
+    if (existing) existing.push(type);
+    else this.areas.set(object, [type]);
   };
-  regionTypes = () => [];
+  regionTypes = () => this.regions;
   addObjectType = (m) => { this.objects.push(m); };
   objectTypes = () => this.objects;
   modelsArr = () => Object.values(this.models);
   getViewByModel = (name) => this.views_models[name] || null;
   getViewByTag = (tag) => this.views[tag] || null;
-  getAvailableAreas = () => [];
+  getAvailableAreas = (object, value) => {
+    const available = this.areas.get(object);
+    if (!available) return [];
+    if (value) {
+      for (const model of available) {
+        if (model.detectByValue && model.detectByValue(value)) return [model];
+      }
+    }
+    return available.filter((a) => !a.detectByValue);
+  };
   getTool = (name) => this.tools[name] || null;
   getModelByTag = (tag) => this.models[tag] || null;
   addPerRegionView = (tag, model) => { this.perRegionViews[tag] = model; };
