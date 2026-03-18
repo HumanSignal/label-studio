@@ -40,6 +40,15 @@ Note that annotation and acceptance metrics are calculated on when they are **co
 
 For example, say you select a date range of 2 days: Monday and Tuesday. If an annotator opens an annotation on Tuesday, begins working on it, and then submits it on Wednesday, then that annotation and the time they spent on it will **not** be included in the metrics.   
 
+### Save views
+
+You can save your date range and project filters as custom views. Saved views makes it easier for you to group dates and projects you want to readily access. 
+
+Note the following:
+
+* You can save, update, and delete views. 
+* Views are only visible to you (meaning they are not shared with other users within your organization).
+
 
 ## Tasks and project states
 

@@ -59,7 +59,15 @@ You can use the **Export** drop-down to export the following:
 
 * **Comments Added** - Download a CSV file with all of the comments that the user has left. 
 
-## Filter by date range
+## Filters
+
+### Filter by project and workspace
+
+Select one or more workspaces or individual projects. To see all projects, select **All Workspaces** at the top of the workspace filter. 
+
+This does not include Personal Sandbox projects. 
+
+### Filter by date range
 
 You can select a date range to apply to the performance metrics. If you want to be precise, you can also include time. 
 
@@ -68,6 +76,15 @@ Note that annotation and review metrics are calculated on when they are **comple
 For example, say you select a date range of 2 days: Monday and Tuesday. If an annotator opens an annotation on Tuesday, begins working on it, and then submits it on Wednesday, then that annotation and the time they spent on it will **not** be included in your performance report.  
 
 Similarly, if a reviewer opens an annotation on Tuesday but then doesn't accept it until Wednesday, that annotation is not counted in their total reviews or accepted annotation metrics. 
+
+### Save views
+
+You can save your member, date range, and project filters as custom views. Saved views makes it easier for you to group member and project combos you want to readily access. 
+
+Note the following:
+
+* You can save, update, and delete views. 
+* Views are only visible to you (meaning they are not shared with other users within your organization).
 
 
 ## Annotations
