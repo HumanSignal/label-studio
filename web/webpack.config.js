@@ -6,7 +6,7 @@ const { merge } = require("webpack-merge");
 
 require("dotenv").config({
   // resolve the .env file in the root of the project ../
-  path: path.resolve(__dirname, "../.env"),
+  path: path.resolve(__dirname, "../../../.env"),
 });
 
 // Use the project's webpack so resolution works (e.g. when @nx/webpack does not bundle webpack under node_modules).
