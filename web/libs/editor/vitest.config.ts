@@ -43,6 +43,16 @@ export default defineConfig({
           }
         }
 
+        // Force konva to resolve to its browser entry even under Node's native CJS resolver.
+        // konva ships main:"./cmj/index-node.js" which does require("canvas") — a native
+        // addon we don't install. Rewriting main to the browser field avoids this entirely.
+        const konvaPkgPath = path.join(nodeModules, "konva/package.json");
+        const konvaPkg = JSON.parse(fs.readFileSync(konvaPkgPath, "utf8"));
+        if (konvaPkg.main !== konvaPkg.browser) {
+          konvaPkg.main = konvaPkg.browser;
+          fs.writeFileSync(konvaPkgPath, JSON.stringify(konvaPkg, null, 2));
+        }
+
       },
     },
     {
