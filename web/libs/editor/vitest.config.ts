@@ -1,7 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
 import { defineConfig } from "vitest/config";
-import { transform as esbuildTransform } from "esbuild";
 import { baseAlias } from "../../vitest.base";
 
 // Tests expect the default "ls-" BEM prefix. Ensure no inherited env overrides it.
@@ -12,7 +11,6 @@ const webRoot = path.join(root, "../..");
 const nodeModules = path.join(webRoot, "node_modules");
 const editorSrc = path.join(root, "src");
 
-const perRegionModesJs = path.join(editorSrc, "mixins/PerRegionModes.js");
 const styleMockJs = path.resolve(root, "__mocks__", "styleMock.js");
 const VIRTUAL_CSS_ID = "\0editor-style-mock";
 const VIRTUAL_SVG_ID = "\0editor-svg-mock";
@@ -47,7 +45,6 @@ export default defineConfig({
           konvaPkg.main = konvaPkg.browser;
           fs.writeFileSync(konvaPkgPath, JSON.stringify(konvaPkg, null, 2));
         }
-
       },
     },
     {
@@ -84,42 +81,6 @@ export default defineConfig({
         }
         if (id === VIRTUAL_SVG_ID) {
           return "import React from 'react'; export const ReactComponent = () => null; export default '';";
-        }
-        return null;
-      },
-    },
-    {
-      name: "editor-jsx-in-js",
-      enforce: "pre",
-      async transform(code: string, id: string) {
-        if (!id.endsWith(".js")) return null;
-        if (!id.includes(editorSrc) && !id.includes("/libs/editor/")) return null;
-        if (id.includes("node_modules")) return null;
-        if (!code.includes("<") || !/< *[A-Z]|<\/|< *[a-z]+[\s>]/.test(code)) return null;
-        const result = await esbuildTransform(code, { loader: "jsx", jsx: "automatic", sourcefile: id });
-        return { code: result.code, map: result.map || null };
-      },
-    },
-    {
-      name: "editor-resolve-perregionmodes",
-      enforce: "pre",
-      resolveId(id: string, importer?: string) {
-        const norm = (p: string) => p.replace(/\\/g, "/");
-        const normId = norm(id);
-        // Absolute path without extension (e.g. from Node/worker)
-        if (
-          normId === norm(path.join(editorSrc, "mixins/PerRegionModes")) ||
-          normId.endsWith("mixins/PerRegionModes")
-        ) {
-          return perRegionModesJs;
-        }
-        if (importer && (id === "./PerRegionModes" || id === "PerRegionModes" || id.endsWith("/PerRegionModes"))) {
-          if (norm(importer).includes("mixins") || norm(importer).includes("OutlinerPanel")) {
-            return perRegionModesJs;
-          }
-        }
-        if (id === "../../../mixins/PerRegionModes" || id.endsWith("mixins/PerRegionModes")) {
-          return perRegionModesJs;
         }
         return null;
       },
@@ -186,15 +147,8 @@ export default defineConfig({
       { find: /^konva$/, replacement: path.join(nodeModules, "konva/lib/index.js") },
       { find: "keymaster", replacement: noOpModuleStub },
       { find: "react-konva-utils", replacement: noOpModuleStub },
-      { find: "jest-fetch-mock", replacement: noOpModuleStub },
-      // CSS/SVG/images are handled by the editor-stub-css plugin's resolveId — no regex alias needed
       { find: "@adobe/css-tools", replacement: path.join(webRoot, "__mocks__/@adobe/css-tools.js") },
       { find: "@humansignal/ui", replacement: path.join(root, "../ui/src/index.ts") },
-      // PerRegionModes: force .js
-      {
-        find: path.join(editorSrc, "mixins/PerRegionModes"),
-        replacement: path.join(editorSrc, "mixins/PerRegionModes.js"),
-      },
     ],
   },
   server: {
