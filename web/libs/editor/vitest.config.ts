@@ -201,7 +201,7 @@ export default defineConfig({
     coverage: {
       provider: "v8",
       reportsDirectory: path.join(webRoot, "coverage"),
-      reporter: ["json", "lcov", "text"],
+      reporter: ["json", "lcov"],
       include: ["src/**/*.{ts,tsx,js,jsx}"],
       exclude: ["**/__mocks__/**", "**/*.d.ts", "**/node_modules/**", "**/examples/**", "**/SplitChannel.ts"],
       thresholds: {

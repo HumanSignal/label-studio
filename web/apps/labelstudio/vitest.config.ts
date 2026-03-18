@@ -16,7 +16,7 @@ export default defineConfig({
     coverage: {
       provider: "v8",
       reportsDirectory: path.join(root, "../../coverage/apps/labelstudio"),
-      reporter: ["json", "lcov", "text"],
+      reporter: ["json", "lcov"],
     },
   },
   resolve: {

@@ -25,7 +25,7 @@ export default defineConfig({
     coverage: {
       provider: "v8",
       reportsDirectory: path.join(root, "../../coverage/libs/datamanager"),
-      reporter: ["json", "lcov", "text"],
+      reporter: ["json", "lcov"],
     },
   },
   resolve: {

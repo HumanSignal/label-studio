@@ -19,7 +19,7 @@ export default defineConfig({
     coverage: {
       provider: "v8",
       reportsDirectory: path.join(__dirname, "../../coverage/libs/core"),
-      reporter: ["json", "lcov", "text"],
+      reporter: ["json", "lcov"],
     },
   },
   resolve: {
