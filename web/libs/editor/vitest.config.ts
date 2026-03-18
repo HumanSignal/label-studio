@@ -24,7 +24,6 @@ const coreHotkeyTs = path.join(editorSrc, "core/Hotkey.ts");
 const coreHotkeyJs = path.join(editorSrc, "core/Hotkey.js");
 const coreCustomTypesTs = path.join(editorSrc, "core/CustomTypes.ts");
 const utilsUtilitiesTs = path.join(editorSrc, "utils/utilities.ts");
-const utilsUtilitiesJs = path.join(editorSrc, "utils/utilities.js");
 const antDesignIconsStub = path.resolve(root, "__mocks__", "ant-design-icons.js");
 const noOpModuleStub = path.resolve(root, "__mocks__", "no-op-module.js");
 
@@ -62,7 +61,7 @@ export default defineConfig({
         if (n.endsWith("/Helpers") || n === "Helpers" || n.endsWith("core/Helpers")) return coreHelpersJs;
         if (n.endsWith("/Hotkey") || n === "Hotkey" || n.endsWith("core/Hotkey")) return coreHotkeyJs;
         if (n.endsWith("/CustomTypes") || n === "CustomTypes" || n.endsWith("core/CustomTypes")) return coreCustomTypesTs;
-        if (n.endsWith("/utilities") || (n === "utilities" && importer?.replace(/\\/g, "/").includes("utils"))) return utilsUtilitiesJs;
+        if (n.endsWith("/utilities") || (n === "utilities" && importer?.replace(/\\/g, "/").includes("utils"))) return utilsUtilitiesTs;
         let absPath: string | null = null;
         if (id.startsWith("/") || /^[A-Za-z]:/.test(id)) {
           absPath = path.normalize(id);
@@ -252,7 +251,7 @@ export default defineConfig({
       { find: "../core/Registry", replacement: coreRegistryJs },
       { find: "../../core/Helpers", replacement: coreHelpersJs },
       { find: "../core/Helpers", replacement: coreHelpersJs },
-      { find: "./utilities", replacement: utilsUtilitiesJs },
+      { find: "./utilities", replacement: utilsUtilitiesTs },
     ],
   },
   server: {
