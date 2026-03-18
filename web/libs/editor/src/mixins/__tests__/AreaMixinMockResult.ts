@@ -3,7 +3,7 @@
  * without requiring full Registry and control/object tags.
  */
 import { types } from "mobx-state-tree";
-import { guidGenerator } from "../../utils/unique.js";
+import { guidGenerator } from "../../utils/unique";
 
 const MockResult = types
   .model("MockResult", {

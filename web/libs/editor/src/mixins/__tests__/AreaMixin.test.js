@@ -13,7 +13,7 @@ vi.mock("../../utils/feature-flags", () => ({
   FF_TAXONOMY_LABELING: "ff_taxonomy_labeling",
 }));
 
-vi.mock("../../regions/Result", () => require("./AreaMixinMockResult"));
+vi.mock("../../regions/Result", async () => await vi.importActual("./AreaMixinMockResult"));
 
 import { AreaMixin, AreaMixinBase } from "../AreaMixin";
 import { ReadOnlyRegionMixin } from "../ReadOnlyMixin";
