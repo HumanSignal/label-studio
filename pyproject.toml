@@ -101,7 +101,7 @@ test = [
     "psutil==7.0.0",
     "freezegun~=1.5.1",
     "pre-commit==3.3.3",
-    "s3transfer==0.13.0",
+    "s3transfer>=0.16.0",
     "mock>=5.1.0",
     "moto>=4.2.6",
     "requests-mock==1.12.1",
