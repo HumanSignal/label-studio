@@ -19,9 +19,6 @@
       "path": "./tsconfig.lib.json"
     },
     {
-      "path": "./tsconfig.spec.json"
-    },
-    {
       "path": "./cypress/tsconfig.json"
     },
     {
