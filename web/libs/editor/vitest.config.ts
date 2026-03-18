@@ -52,6 +52,11 @@ export default defineConfig({
       name: "editor-resolve-modules",
       enforce: "pre",
       resolveId(id: string, importer?: string) {
+        // Redirect konva to browser bundle so CJS require("konva") from react-konva
+        // never hits konva/cmj/index-node.js (which requires the missing `canvas` npm package).
+        if (id === "konva") return path.join(nodeModules, "konva/lib/index.js");
+        if (id === "canvas" && importer?.includes("konva")) return noOpModuleStub;
+
         const n = id.replace(/\\/g, "/");
         if (n.endsWith("/Registry") || n === "Registry" || n.endsWith("core/Registry")) return coreRegistryJs;
         if (n.endsWith("/Helpers") || n === "Helpers" || n.endsWith("core/Helpers")) return coreHelpersJs;

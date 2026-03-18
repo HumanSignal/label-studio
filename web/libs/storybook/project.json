@@ -28,7 +28,7 @@
       },
       "configurations": {
         "ci": {
-          "command": "vitest run --config vitest.config.ts --passWithNoTests --coverage",
+          "command": "vitest run --config vitest.config.ts --passWithNoTests",
           "cwd": "libs/storybook"
         }
       }
