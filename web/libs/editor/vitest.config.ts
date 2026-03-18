@@ -42,17 +42,13 @@ export default defineConfig({
             fs.renameSync(local, backup);
           }
         }
+
       },
     },
     {
       name: "editor-resolve-modules",
       enforce: "pre",
       resolveId(id: string, importer?: string) {
-        // Redirect konva to browser bundle so CJS require("konva") from react-konva
-        // never hits konva/cmj/index-node.js (which requires the missing `canvas` npm package).
-        if (id === "konva") return path.join(nodeModules, "konva/lib/index.js");
-        if (id === "canvas" && importer?.includes("konva")) return noOpModuleStub;
-
         const n = id.replace(/\\/g, "/");
         if (n.endsWith("/Registry") || n === "Registry" || n.endsWith("core/Registry")) return coreRegistryTs;
         if (n.endsWith("/Helpers") || n === "Helpers" || n.endsWith("core/Helpers")) return coreHelpersTs;
@@ -229,7 +225,7 @@ export default defineConfig({
       // Stub icons so no second React from @ant-design/icons (physical file, no Proxy)
       { find: "@ant-design/icons", replacement: antDesignIconsStub },
       ...Object.entries(baseAlias).map(([find, replacement]) => ({ find, replacement })),
-      { find: "konva", replacement: path.join(nodeModules, "konva/konva") },
+      { find: /^konva$/, replacement: path.join(nodeModules, "konva/lib/index.js") },
       { find: "keymaster", replacement: noOpModuleStub },
       { find: "react-konva-utils", replacement: noOpModuleStub },
       { find: "jest-fetch-mock", replacement: noOpModuleStub },
