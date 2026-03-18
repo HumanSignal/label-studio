@@ -4,9 +4,10 @@ import type { Plugin } from "vite";
 const root = path.resolve(__dirname);
 
 /**
- * Vitest 2.1.9 bug: BaseCoverageProvider.cleanAfterRun() calls fs.rm()
- * without { force: true }, causing ENOENT when .tmp doesn't exist.
- * This plugin monkey-patches the method at config resolution time.
+ * Vitest 2.1.9 bug: onAfterSuiteRun() writes coverage JSON to .tmp/ without
+ * ensuring the directory exists. clean() creates it at startup, but in CI the
+ * directory can vanish (NX output cleanup, parallel tasks, etc.) before the
+ * write happens. This patches both the write path and the cleanup path.
  * Remove once vitest ships the fix upstream.
  */
 export function patchCoverageCleanup(): Plugin {
@@ -16,6 +17,12 @@ export function patchCoverageCleanup(): Plugin {
       try {
         const { BaseCoverageProvider } = await import("vitest/coverage");
         const fs = await import("node:fs");
+
+        const origOnAfterSuiteRun = BaseCoverageProvider.prototype.onAfterSuiteRun;
+        BaseCoverageProvider.prototype.onAfterSuiteRun = function (...args: unknown[]) {
+          fs.mkdirSync(this.coverageFilesDirectory, { recursive: true });
+          return origOnAfterSuiteRun.apply(this, args);
+        };
 
         BaseCoverageProvider.prototype.cleanAfterRun = async function () {
           this.coverageFiles = new Map();
