@@ -1,11 +1,8 @@
-import fs from "node:fs";
 import path from "node:path";
 import { defineConfig } from "vitest/config";
 import { baseAlias } from "../../vitest.base";
 
 const workspaceRoot = path.resolve(__dirname, "../..");
-const coverageDir = path.join(__dirname, "../../coverage/libs/ui");
-fs.mkdirSync(path.join(coverageDir, ".tmp"), { recursive: true });
 
 export default defineConfig({
   root: __dirname,
@@ -23,7 +20,10 @@ export default defineConfig({
     },
     coverage: {
       provider: "v8",
-      reportsDirectory: coverageDir,
+      // Same as storybook: with very few tests, .tmp/ may not get created by workers,
+      // causing ENOENT when the coverage provider tries to merge. Skip the clean step.
+      clean: false,
+      reportsDirectory: path.join(__dirname, "../../coverage/libs/ui"),
       reporter: ["json", "lcov"],
     },
   },
