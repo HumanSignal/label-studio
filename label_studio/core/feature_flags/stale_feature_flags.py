@@ -74,7 +74,6 @@ STALE_FEATURE_FLAGS = {
     'fflag_fix_front_dev_3793_relative_coords_short': True,  # Removed from code
     'fflag_feat_front_lsdv_4583_6_images_preloading_short': True,  # Removed from code
     'fflag_feat_all_leap_1821_annotation_limit_short': True,
-    'fflag_all_feat_dia_1777_ls_homepage_short': True,
     'fflag_feat_all_leap_1181_bulk_annotation_short': True,
     'fflag_feat_front_lsdv_4583_multi_image_segmentation_short': True,
     'fflag_fix_back_plt_914_projects_list_cache_sdk_09102025_short': True,

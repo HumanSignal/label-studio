@@ -40,11 +40,6 @@ export const FF_AUTH_TOKENS = "fflag__feature_develop__prompts__dia_1829_jwt_tok
 export const FF_IMPROVE_GLOBAL_ERROR_MESSAGES = "fflag_feat_front_optic_1746_improve_global_error_messages_short";
 
 /**
- * Enable new home page for LSO and LSE
- */
-export const FF_HOMEPAGE = "fflag_all_feat_dia_1777_ls_homepage_short";
-
-/**
  * Sample datasets UI for the import flow
  */
 export const FF_SAMPLE_DATASETS = "fflag_feat_dia_1920_project_creation_sample_data_short";
