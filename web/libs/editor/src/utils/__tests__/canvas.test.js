@@ -343,7 +343,7 @@ describe("Region2RLE", () => {
     });
     const origCreateElement = document.createElement.bind(document);
     vi.spyOn(document, "createElement").mockImplementation((tag) =>
-      tag === "canvas" ? realCanvas : origCreateElement(tag)
+      tag === "canvas" ? realCanvas : origCreateElement(tag),
     );
 
     const region = {
