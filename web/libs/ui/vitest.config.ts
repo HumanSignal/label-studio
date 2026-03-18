@@ -20,9 +20,6 @@ export default defineConfig({
     },
     coverage: {
       provider: "v8",
-      // Same as storybook: with very few tests, .tmp/ may not get created by workers,
-      // causing ENOENT when the coverage provider tries to merge. Skip the clean step.
-      clean: false,
       reportsDirectory: path.join(__dirname, "../../coverage/libs/ui"),
       reporter: ["json", "lcov"],
     },
