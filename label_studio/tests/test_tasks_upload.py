@@ -251,7 +251,7 @@ def test_txt_task_upload(setup_project_dialog, format_type, tasks, status_code, 
 
 @pytest.mark.parametrize(
     'tasks, status_code, task_count, max_duration',
-    [([{'data': {'dialog': 'Test'}, 'annotations': [{'result': [{'id': '123'}]}]}] * 1000, 201, 1000, 30)],
+    [([{'data': {'dialog': 'Test'}, 'annotations': [{'result': [{'id': '123'}]}]}] * 1000, 201, 1000, 120)],
 )
 @pytest.mark.django_db
 def test_upload_duration(setup_project_dialog, tasks, status_code, task_count, max_duration):

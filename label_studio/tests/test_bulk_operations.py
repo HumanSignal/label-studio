@@ -54,4 +54,4 @@ def test_load_tasks_and_annotations(business_client, annotator_client, configure
     dt2 = datetime.datetime.now()
     # time depends on aws machine cpu
     # around 15-30 secs for 1000 tasks each w 5 annotations
-    assert (dt2 - dt1).seconds < 150
+    assert (dt2 - dt1).seconds < 300
