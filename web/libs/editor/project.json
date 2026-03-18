@@ -74,7 +74,7 @@
       },
       "configurations": {
         "ci": {
-          "command": "vitest run --config vitest.config.ts --coverage",
+          "command": "vitest run --config vitest.config.ts --coverage --pool=forks",
           "cwd": "libs/editor"
         }
       }
