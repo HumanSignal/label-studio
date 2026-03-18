@@ -8,6 +8,9 @@ export default defineProject({
   root: __dirname,
   server: { fs: { allow: [workspaceRoot] } },
   test: {
+    onConsoleLog(log: string) {
+      if (log.startsWith("Warning:") || log.includes("inside a test was not wrapped in act")) return false;
+    },
     environment: "jsdom",
     globals: true,
     setupFiles: [path.join(__dirname, "../../vitest.jest-compat.ts")],

@@ -15,6 +15,9 @@ export default defineProject({
   root,
   server: { fs: { allow: [webRoot] } },
   test: {
+    onConsoleLog(log: string) {
+      if (log.startsWith("Warning:") || log.includes("inside a test was not wrapped in act")) return false;
+    },
     environment: "jsdom",
     globals: true,
     setupFiles: [
