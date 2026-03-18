@@ -1,11 +1,12 @@
 import path from "node:path";
 import { defineConfig } from "vitest/config";
-import { baseAlias } from "../../vitest.base";
+import { baseAlias, patchCoverageCleanup } from "../../vitest.base";
 
 const workspaceRoot = path.resolve(__dirname, "../..");
 
 export default defineConfig({
   root: __dirname,
+  plugins: [patchCoverageCleanup()],
   server: { fs: { allow: [workspaceRoot] } },
   test: {
     onConsoleLog(log: string) {
