@@ -3,7 +3,6 @@
   "version": "0.0.0",
   "license": "MIT",
   "scripts": {
-    "postinstall": "node scripts/patch-vitest-coverage.js",
     "ui:serve": "nx storybook storybook",
     "ui:test:component": "nx test-component ui",
     "biome": "biome",
