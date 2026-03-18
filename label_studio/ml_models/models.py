@@ -2,7 +2,6 @@
 
 import logging
 
-from core.utils.common import load_func
 from django.conf import settings
 from django.db import models
 from django.db.models import Q
@@ -95,6 +94,11 @@ class ThirdPartyModelVersion(ModelVersion):
         help_text='The model provider to use e.g. OpenAI',
     )
 
+    max_few_shot_examples = models.PositiveIntegerField(
+        default=0,
+        help_text='Max number of few-shot examples to include in prompts. 0 = disabled.',
+    )
+
     provider_model_id = models.CharField(
         max_length=255,
         blank=False,
@@ -133,6 +137,7 @@ class ModelRun(models.Model):
         ALL = 'All', _('All')
         HASGT = 'HasGT', _('HasGT')
         SAMPLE = 'Sample', _('Sample')
+        CUSTOM = 'Custom', _('Custom')
 
     class FileType(models.TextChoices):
         INPUT = 'Input', _('Input')
@@ -186,6 +191,33 @@ class ModelRun(models.Model):
 
     completed_at = models.DateTimeField(_('completed at'), null=True, default=None)
 
+    task_ids = models.JSONField(
+        default=None,
+        null=True,
+        blank=True,
+        help_text='List of task IDs for Custom subset re-evaluation.',
+    )
+
+    sample_subset_size = models.PositiveIntegerField(
+        null=True,
+        blank=True,
+        help_text='Custom sample size for Sample subset. Uses PROMPTER_SAMPLE_SUBSET_SIZE if not set.',
+    )
+
+    filters_json = models.JSONField(
+        null=True,
+        blank=True,
+        help_text='DM filter group for Filtered subset. Stored for display/re-run purposes.',
+    )
+
+    source_model_run = models.ForeignKey(
+        'self',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='re_evaluations',
+    )
+
     def has_permission(self, user):
         return user.active_organization == self.organization
 
@@ -200,7 +232,6 @@ class ModelRun(models.Model):
         """
         predictions = Prediction.objects.filter(model_run=self.id)
         prediction_ids = [p.id for p in predictions]
-        task_ids = list({p.task_id for p in predictions})
         # to delete all dependencies where predictions are foreign keys.
         Annotation.objects.filter(parent_prediction__in=prediction_ids).update(parent_prediction=None)
         try:
@@ -227,14 +258,44 @@ class ModelRun(models.Model):
         predictions._raw_delete(predictions.db)
         failed_predictions._raw_delete(failed_predictions.db)
 
-        # Trigger postprocessing when predictions are deleted
-        postprocess = load_func(settings.DELETE_PREDICTIONS_POSTPROCESS)
-        if postprocess is not None:
-            postprocess(self.project, task_ids)
-
     def delete(self, *args, **kwargs):
         """
         Deletes Predictions associated with ModelRun
         """
         self.delete_predictions()
         super().delete(*args, **kwargs)
+
+
+class FewShotExample(models.Model):
+    """Links a ThirdPartyModelVersion to a specific task + annotation pair for use as a few-shot example in prompts."""
+
+    model_version = models.ForeignKey(
+        ThirdPartyModelVersion,
+        on_delete=models.CASCADE,
+        related_name='few_shot_examples',
+    )
+    task = models.ForeignKey(
+        'tasks.Task',
+        on_delete=models.CASCADE,
+        related_name='few_shot_usages',
+    )
+    annotation = models.ForeignKey(
+        'tasks.Annotation',
+        on_delete=models.CASCADE,
+        related_name='few_shot_usages',
+    )
+    order = models.PositiveIntegerField(default=0)
+    created_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        app_label = 'ml_models'
+        ordering = ['order']
+        unique_together = [('model_version', 'task', 'annotation')]
+
+    def has_permission(self, user):
+        return self.model_version.parent_model.has_permission(user)
