@@ -1,8 +1,11 @@
+import fs from "node:fs";
 import path from "node:path";
 import { defineConfig } from "vitest/config";
 import { baseAlias } from "../../vitest.base";
 
 const workspaceRoot = path.resolve(__dirname, "../..");
+const coverageDir = path.join(__dirname, "../../coverage/libs/storybook");
+fs.mkdirSync(path.join(coverageDir, ".tmp"), { recursive: true });
 
 export default defineConfig({
   root: __dirname,
@@ -14,7 +17,7 @@ export default defineConfig({
     include: ["**/*.test.{ts,tsx,js,jsx}"],
     coverage: {
       provider: "v8",
-      reportsDirectory: path.join(__dirname, "../../coverage/libs/storybook"),
+      reportsDirectory: coverageDir,
       reporter: ["json", "lcov"],
     },
   },
