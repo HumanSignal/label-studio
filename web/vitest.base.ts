@@ -27,7 +27,10 @@ export function patchCoverageCleanup(): Plugin {
         BaseCoverageProvider.prototype.cleanAfterRun = async function () {
           this.coverageFiles = new Map();
           await fs.promises.rm(this.coverageFilesDirectory, { recursive: true, force: true });
-          if (fs.existsSync(this.options.reportsDirectory) && fs.readdirSync(this.options.reportsDirectory).length === 0) {
+          if (
+            fs.existsSync(this.options.reportsDirectory) &&
+            fs.readdirSync(this.options.reportsDirectory).length === 0
+          ) {
             await fs.promises.rm(this.options.reportsDirectory, { recursive: true, force: true });
           }
         };
