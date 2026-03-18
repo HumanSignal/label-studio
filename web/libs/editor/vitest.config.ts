@@ -16,11 +16,6 @@ const perRegionModesJs = path.join(editorSrc, "mixins/PerRegionModes.js");
 const styleMockJs = path.resolve(root, "__mocks__", "styleMock.js");
 const VIRTUAL_CSS_ID = "\0editor-style-mock";
 const VIRTUAL_SVG_ID = "\0editor-svg-mock";
-const coreRegistryTs = path.join(editorSrc, "core/Registry.ts");
-const coreHelpersTs = path.join(editorSrc, "core/Helpers.ts");
-const coreHotkeyTs = path.join(editorSrc, "core/Hotkey.ts");
-const coreCustomTypesTs = path.join(editorSrc, "core/CustomTypes.ts");
-const utilsUtilitiesTs = path.join(editorSrc, "utils/utilities.ts");
 const antDesignIconsStub = path.resolve(root, "__mocks__", "ant-design-icons.js");
 const noOpModuleStub = path.resolve(root, "__mocks__", "no-op-module.js");
 
@@ -53,53 +48,6 @@ export default defineConfig({
           fs.writeFileSync(konvaPkgPath, JSON.stringify(konvaPkg, null, 2));
         }
 
-      },
-    },
-    {
-      name: "editor-resolve-modules",
-      enforce: "pre",
-      resolveId(id: string, importer?: string) {
-        const n = id.replace(/\\/g, "/");
-        if (n.endsWith("/Registry") || n === "Registry" || n.endsWith("core/Registry")) return coreRegistryTs;
-        if (n.endsWith("/Helpers") || n === "Helpers" || n.endsWith("core/Helpers")) return coreHelpersTs;
-        if (n.endsWith("/Hotkey") || n === "Hotkey" || n.endsWith("core/Hotkey")) return coreHotkeyTs;
-        if (n.endsWith("/CustomTypes") || n === "CustomTypes" || n.endsWith("core/CustomTypes"))
-          return coreCustomTypesTs;
-        if (n.endsWith("/utilities") || (n === "utilities" && importer?.replace(/\\/g, "/").includes("utils")))
-          return utilsUtilitiesTs;
-        let absPath: string | null = null;
-        if (id.startsWith("/") || /^[A-Za-z]:/.test(id)) {
-          absPath = path.normalize(id);
-        } else if (importer) {
-          absPath = path.normalize(path.join(path.dirname(importer), id));
-        }
-        if (absPath && absPath.startsWith(editorSrc) && !path.extname(absPath)) {
-          for (const ext of [".js", ".ts", ".tsx", ".jsx"]) {
-            if (fs.existsSync(absPath + ext)) return absPath + ext;
-          }
-        }
-        return null;
-      },
-      transform(code: string, id: string) {
-        // Rewrite extensionless relative imports in .js files so they resolve
-        // even when loaded outside Vite (e.g. via require() in tests)
-        if (!id.endsWith(".js") || !id.replace(/\\/g, "/").includes(editorSrc.replace(/\\/g, "/"))) return null;
-        const dir = path.dirname(id);
-        const importRe = /((?:from|import)\s*['"])(\.\.?\/[^'"]+)(['"])/g;
-        let result = code;
-        let changed = false;
-        result = code.replace(importRe, (full, prefix, specifier, quote) => {
-          if (path.extname(specifier)) return full;
-          const abs = path.resolve(dir, specifier);
-          for (const ext of [".js", ".ts", ".tsx", ".jsx"]) {
-            if (fs.existsSync(abs + ext)) {
-              changed = true;
-              return prefix + specifier + ext + quote;
-            }
-          }
-          return full;
-        });
-        return changed ? { code: result, map: null } : null;
       },
     },
     {
@@ -247,13 +195,6 @@ export default defineConfig({
         find: path.join(editorSrc, "mixins/PerRegionModes"),
         replacement: path.join(editorSrc, "mixins/PerRegionModes.js"),
       },
-      // Core/utils: exact-match string aliases for common relative depths
-      // (the resolveId plugin handles all other depths as fallback)
-      { find: "../../core/Registry", replacement: coreRegistryTs },
-      { find: "../core/Registry", replacement: coreRegistryTs },
-      { find: "../../core/Helpers", replacement: coreHelpersTs },
-      { find: "../core/Helpers", replacement: coreHelpersTs },
-      { find: "./utilities", replacement: utilsUtilitiesTs },
     ],
   },
   server: {
