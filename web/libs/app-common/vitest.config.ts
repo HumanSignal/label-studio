@@ -1,5 +1,5 @@
 import path from "node:path";
-import { defineProject } from "vitest/config";
+import { defineConfig } from "vitest/config";
 import { baseAlias } from "../../vitest.base";
 
 const root = path.resolve(__dirname);
@@ -7,7 +7,7 @@ const webRoot = path.resolve(root, "../..");
 const uiMocks = path.join(webRoot, "libs/ui/__mocks__");
 const labelstudioSrc = path.join(webRoot, "apps/labelstudio/src");
 
-export default defineProject({
+export default defineConfig({
   root,
   esbuild: { jsx: "automatic" },
   server: { fs: { allow: [webRoot] } },

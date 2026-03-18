@@ -255,6 +255,7 @@ export default defineConfig({
       inline: [
         "nanoid",
         "konva",
+        "react-konva",
         "@adobe/css-tools",
         "@humansignal/core",
         "react",

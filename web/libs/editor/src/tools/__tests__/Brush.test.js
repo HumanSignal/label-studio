@@ -427,7 +427,8 @@ describe("Brush tool", () => {
   });
 
   describe("mouseupEv and mousemoveEv drawing paths", () => {
-    it("mouseupEv in drawing mode commits and unfreezes when isFirstBrushStroke", (done) => {
+    it("mouseupEv in drawing mode commits and unfreezes when isFirstBrushStroke", async () => {
+      vi.useFakeTimers();
       const mockBrush = {
         beginPath: vi.fn(),
         setDrawing: vi.fn(),
@@ -452,12 +453,12 @@ describe("Brush tool", () => {
       expect(mockBrush.setDrawing).toHaveBeenCalledWith(false);
       expect(mockBrush.endPath).toHaveBeenCalled();
 
-      setTimeout(() => {
-        expect(annotation.createResult).toHaveBeenCalled();
-        expect(annotation.history.unfreeze).toHaveBeenCalled();
-        expect(obj.annotation.selectArea).toHaveBeenCalledWith(mockNewArea);
-        done();
-      }, 50);
+      await vi.advanceTimersByTimeAsync(50);
+
+      expect(annotation.createResult).toHaveBeenCalled();
+      expect(annotation.history.unfreeze).toHaveBeenCalled();
+      expect(obj.annotation.selectArea).toHaveBeenCalledWith(mockNewArea);
+      vi.useRealTimers();
     });
 
     it("mouseupEv in drawing mode unfreezes without commit when not isFirstBrushStroke", () => {

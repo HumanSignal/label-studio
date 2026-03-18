@@ -1,10 +1,10 @@
 import path from "node:path";
-import { defineProject } from "vitest/config";
+import { defineConfig } from "vitest/config";
 import { baseAlias } from "../../vitest.base";
 
 const workspaceRoot = path.resolve(__dirname, "../..");
 
-export default defineProject({
+export default defineConfig({
   root: __dirname,
   server: { fs: { allow: [workspaceRoot] } },
   test: {

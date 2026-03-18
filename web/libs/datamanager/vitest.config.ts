@@ -1,5 +1,5 @@
 import path from "node:path";
-import { defineProject } from "vitest/config";
+import { defineConfig } from "vitest/config";
 import { baseAlias } from "../../vitest.base";
 
 // Tests expect the default "ls-" BEM prefix. Ensure no inherited env overrides it.
@@ -11,7 +11,7 @@ const editorMocks = path.join(webRoot, "libs/editor/__mocks__");
 const uiMocks = path.join(webRoot, "libs/ui/__mocks__");
 const labelstudioSrc = path.join(webRoot, "apps/labelstudio/src");
 
-export default defineProject({
+export default defineConfig({
   root,
   server: { fs: { allow: [webRoot] } },
   test: {
