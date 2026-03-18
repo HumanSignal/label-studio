@@ -166,7 +166,29 @@ export default defineConfig({
   ],
   test: {
     onConsoleLog(log: string) {
-      if (log.startsWith("Warning:") || log.includes("inside a test was not wrapped in act")) return false;
+      const suppressPatterns = [
+        "Warning:",
+        "inside a test was not wrapped in act",
+        "whole package of antd",
+        "reactive render of an observer class component",
+        "needs to implement",
+        "Error checking selected labels",
+        "TimeSeries: timeFormat contains",
+        "ColorMapper: Cached colormap",
+        "An audio loading error occurred",
+        "Task cannot be skipped",
+        "Cannot read properties of undefined",
+        "[mobx-state-tree]",
+        "[mobx.array]",
+        "is deprecated",
+        "image.decode is not a function",
+        "500 Server Error",
+        "getaddrinfo ENOTFOUND",
+        "not available when decoder",
+        "splitChannels is not available",
+        "dispatchError",
+      ];
+      if (suppressPatterns.some((p) => log.includes(p))) return false;
     },
     environment: "jsdom",
     globals: true,
