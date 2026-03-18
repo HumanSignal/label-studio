@@ -153,19 +153,7 @@ export default defineConfig({
   },
   server: {
     deps: {
-      inline: [
-        "nanoid",
-        "konva",
-        "react-konva",
-        "@adobe/css-tools",
-        "@humansignal/core",
-        "react",
-        "react-dom",
-        "react/jsx-runtime",
-        "antd",
-        "mobx-react",
-        "mobx-react-lite",
-      ],
+      inline: [],
     },
   },
 });
