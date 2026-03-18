@@ -570,9 +570,7 @@ describe("MediaLoader createAnalyzer and decodingProgress", () => {
       destroy: vi.fn(),
       on: vi.fn(),
     };
-    const createSpy = vi.spyOn(MediaLoader.prototype as any, "createAnalyzer").mockImplementation(function (
-      this: any,
-    ) {
+    const createSpy = vi.spyOn(MediaLoader.prototype as any, "createAnalyzer").mockImplementation(function (this: any) {
       this.audio = audioInstance;
       (this.audio as any).on("decodingProgress", (chunk: number, total: number) => {
         this.wf.setDecodingProgress(chunk, total);

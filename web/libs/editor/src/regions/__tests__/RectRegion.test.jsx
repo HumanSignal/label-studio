@@ -38,9 +38,7 @@ vi.mock("../AliveRegion", () => ({
     const React = require("react");
     const { observer } = require("mobx-react");
     const Observed = observer(Comp);
-    return observer(({ item, ...rest }) =>
-      React.createElement(Observed, { item, setShapeRef: () => {}, ...rest }),
-    );
+    return observer(({ item, ...rest }) => React.createElement(Observed, { item, setShapeRef: () => {}, ...rest }));
   },
 }));
 

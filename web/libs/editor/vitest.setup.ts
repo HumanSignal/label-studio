@@ -112,7 +112,9 @@ Object.defineProperty(window.HTMLMediaElement.prototype, "duration", {
     return (this as unknown as { _mock: { duration: number } })._mock.duration;
   },
   set(this: HTMLMediaElement, value: number) {
-    (window.HTMLMediaElement.prototype as unknown as { _mock: { _resetMock: (m: HTMLMediaElement) => void } })._mock._resetMock(this);
+    (
+      window.HTMLMediaElement.prototype as unknown as { _mock: { _resetMock: (m: HTMLMediaElement) => void } }
+    )._mock._resetMock(this);
     (this as unknown as { _mock: { duration: number } })._mock.duration = value;
   },
   configurable: true,
@@ -125,7 +127,8 @@ window.HTMLMediaElement.prototype.load = function loadMock(this: HTMLMediaElemen
 };
 
 window.HTMLMediaElement.prototype.play = function playMock(this: HTMLMediaElement) {
-  const m = (this as unknown as { _mock: { _loaded: boolean; _load: (x: HTMLMediaElement) => void; paused: boolean } })._mock;
+  const m = (this as unknown as { _mock: { _loaded: boolean; _load: (x: HTMLMediaElement) => void; paused: boolean } })
+    ._mock;
   if (!m._loaded) m._load(this);
   m.paused = false;
   this.dispatchEvent(new Event("play"));
@@ -137,7 +140,11 @@ window.HTMLMediaElement.prototype.pause = function pauseMock(this: HTMLMediaElem
 };
 
 window.HTMLMediaElement.prototype.canPlayType = function canPlayTypeMock(this: HTMLMediaElement, type: string) {
-  return (window.HTMLMediaElement.prototype as unknown as { _mock: { _supportsTypes: string[] } })._mock._supportsTypes.includes(type) ? "maybe" : "";
+  return (
+    window.HTMLMediaElement.prototype as unknown as { _mock: { _supportsTypes: string[] } }
+  )._mock._supportsTypes.includes(type)
+    ? "maybe"
+    : "";
 };
 
 // Global Konva mock — konva requires native `canvas` which isn't available in jsdom.
@@ -145,26 +152,52 @@ window.HTMLMediaElement.prototype.canPlayType = function canPlayTypeMock(this: H
 vi.mock("konva", () => {
   const noop = () => {};
   class KonvaNode {
-    on = noop; off = noop; destroy = noop;
-    getLayer() { return null; }
-    getStage() { return null; }
-    getParent() { return null; }
+    on = noop;
+    off = noop;
+    destroy = noop;
+    getLayer() {
+      return null;
+    }
+    getStage() {
+      return null;
+    }
+    getParent() {
+      return null;
+    }
     remove = noop;
   }
   class Transformer extends KonvaNode {
-    nodes() { return []; }
+    nodes() {
+      return [];
+    }
     forceUpdate = noop;
   }
   class Transform {
     m = [1, 0, 0, 1, 0, 0];
-    copy() { return new Transform(); }
-    point(p: any) { return p; }
-    translate() { return this; }
-    scale() { return this; }
-    rotate() { return this; }
-    invert() { return this; }
-    getMatrix() { return this.m; }
-    multiply() { return this; }
+    copy() {
+      return new Transform();
+    }
+    point(p: any) {
+      return p;
+    }
+    translate() {
+      return this;
+    }
+    scale() {
+      return this;
+    }
+    rotate() {
+      return this;
+    }
+    invert() {
+      return this;
+    }
+    getMatrix() {
+      return this.m;
+    }
+    multiply() {
+      return this;
+    }
   }
   const konva = {
     Transformer,

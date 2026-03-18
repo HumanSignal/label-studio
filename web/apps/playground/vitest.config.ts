@@ -13,10 +13,7 @@ export default defineConfig({
   test: {
     environment: "jsdom",
     globals: true,
-    setupFiles: [
-      path.join(root, "../../vitest.jest-compat.ts"),
-      path.join(root, "vitest.setup.ts"),
-    ],
+    setupFiles: [path.join(root, "../../vitest.jest-compat.ts"), path.join(root, "vitest.setup.ts")],
     include: ["src/**/*.test.{ts,tsx}"],
     coverage: {
       provider: "v8",

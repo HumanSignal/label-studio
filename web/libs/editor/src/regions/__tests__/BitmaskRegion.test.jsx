@@ -153,7 +153,9 @@ vi.mock("../AliveRegion", () => ({
 const EditableBitmaskRegion = types.compose(
   BitmaskRegionModel,
   types.model({}).views(() => ({
-    get editable() { return true; },
+    get editable() {
+      return true;
+    },
   })),
 );
 

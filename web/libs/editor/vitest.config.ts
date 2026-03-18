@@ -18,10 +18,7 @@ const VIRTUAL_CSS_ID = "\0editor-style-mock";
 const VIRTUAL_SVG_ID = "\0editor-svg-mock";
 const coreRegistryTs = path.join(editorSrc, "core/Registry.ts");
 const coreHelpersTs = path.join(editorSrc, "core/Helpers.ts");
-const coreRegistryJs = path.join(editorSrc, "core/Registry.js");
-const coreHelpersJs = path.join(editorSrc, "core/Helpers.js");
 const coreHotkeyTs = path.join(editorSrc, "core/Hotkey.ts");
-const coreHotkeyJs = path.join(editorSrc, "core/Hotkey.js");
 const coreCustomTypesTs = path.join(editorSrc, "core/CustomTypes.ts");
 const utilsUtilitiesTs = path.join(editorSrc, "utils/utilities.ts");
 const antDesignIconsStub = path.resolve(root, "__mocks__", "ant-design-icons.js");
@@ -57,11 +54,13 @@ export default defineConfig({
         if (id === "canvas" && importer?.includes("konva")) return noOpModuleStub;
 
         const n = id.replace(/\\/g, "/");
-        if (n.endsWith("/Registry") || n === "Registry" || n.endsWith("core/Registry")) return coreRegistryJs;
-        if (n.endsWith("/Helpers") || n === "Helpers" || n.endsWith("core/Helpers")) return coreHelpersJs;
-        if (n.endsWith("/Hotkey") || n === "Hotkey" || n.endsWith("core/Hotkey")) return coreHotkeyJs;
-        if (n.endsWith("/CustomTypes") || n === "CustomTypes" || n.endsWith("core/CustomTypes")) return coreCustomTypesTs;
-        if (n.endsWith("/utilities") || (n === "utilities" && importer?.replace(/\\/g, "/").includes("utils"))) return utilsUtilitiesTs;
+        if (n.endsWith("/Registry") || n === "Registry" || n.endsWith("core/Registry")) return coreRegistryTs;
+        if (n.endsWith("/Helpers") || n === "Helpers" || n.endsWith("core/Helpers")) return coreHelpersTs;
+        if (n.endsWith("/Hotkey") || n === "Hotkey" || n.endsWith("core/Hotkey")) return coreHotkeyTs;
+        if (n.endsWith("/CustomTypes") || n === "CustomTypes" || n.endsWith("core/CustomTypes"))
+          return coreCustomTypesTs;
+        if (n.endsWith("/utilities") || (n === "utilities" && importer?.replace(/\\/g, "/").includes("utils")))
+          return utilsUtilitiesTs;
         let absPath: string | null = null;
         if (id.startsWith("/") || /^[A-Za-z]:/.test(id)) {
           absPath = path.normalize(id);
@@ -120,7 +119,8 @@ export default defineConfig({
         let newCode = code
           .replace(/import\s+['"][^'"]*\.prefix\.css['"]\s*;?/g, `import "${VIRTUAL_CSS_ID}";`)
           .replace(/import\s+(\w+\s+from\s+)?['"][^'"]*\.module\.css['"]\s*;?/g, (_m, defaultImport) =>
-            defaultImport ? `import ${defaultImport.trim()} "${VIRTUAL_CSS_ID}";` : `import "${VIRTUAL_CSS_ID}";`)
+            defaultImport ? `import ${defaultImport.trim()} "${VIRTUAL_CSS_ID}";` : `import "${VIRTUAL_CSS_ID}";`,
+          )
           .replace(/from\s+['"][^'"]*\.svg['"]/g, `from "${VIRTUAL_SVG_ID}"`);
         return newCode !== code ? { code: newCode, map: null } : null;
       },
@@ -153,7 +153,10 @@ export default defineConfig({
         const norm = (p: string) => p.replace(/\\/g, "/");
         const normId = norm(id);
         // Absolute path without extension (e.g. from Node/worker)
-        if (normId === norm(path.join(editorSrc, "mixins/PerRegionModes")) || normId.endsWith("mixins/PerRegionModes")) {
+        if (
+          normId === norm(path.join(editorSrc, "mixins/PerRegionModes")) ||
+          normId.endsWith("mixins/PerRegionModes")
+        ) {
           return perRegionModesJs;
         }
         if (importer && (id === "./PerRegionModes" || id === "PerRegionModes" || id.endsWith("/PerRegionModes"))) {
@@ -198,23 +201,13 @@ export default defineConfig({
     globals: true,
     setupFiles: [path.join(root, "vitest.setup.ts")],
     include: ["src/**/*.test.{ts,tsx,js,jsx}"],
-    exclude: [
-      "**/node_modules/**",
-      "**/e2e/**",
-      "**/renderEditor.test.{ts,tsx,js,jsx}",
-    ],
+    exclude: ["**/node_modules/**", "**/e2e/**", "**/renderEditor.test.{ts,tsx,js,jsx}"],
     coverage: {
       provider: "v8",
       reportsDirectory: path.join(webRoot, "coverage"),
       reporter: ["json", "lcov", "text"],
       include: ["src/**/*.{ts,tsx,js,jsx}"],
-      exclude: [
-        "**/__mocks__/**",
-        "**/*.d.ts",
-        "**/node_modules/**",
-        "**/examples/**",
-        "**/SplitChannel.ts",
-      ],
+      exclude: ["**/__mocks__/**", "**/*.d.ts", "**/node_modules/**", "**/examples/**", "**/SplitChannel.ts"],
       thresholds: {
         branches: 1,
         functions: 1,
@@ -244,13 +237,16 @@ export default defineConfig({
       { find: "@adobe/css-tools", replacement: path.join(webRoot, "__mocks__/@adobe/css-tools.js") },
       { find: "@humansignal/ui", replacement: path.join(root, "../ui/src/index.ts") },
       // PerRegionModes: force .js
-      { find: path.join(editorSrc, "mixins/PerRegionModes"), replacement: path.join(editorSrc, "mixins/PerRegionModes.js") },
+      {
+        find: path.join(editorSrc, "mixins/PerRegionModes"),
+        replacement: path.join(editorSrc, "mixins/PerRegionModes.js"),
+      },
       // Core/utils: exact-match string aliases for common relative depths
       // (the resolveId plugin handles all other depths as fallback)
-      { find: "../../core/Registry", replacement: coreRegistryJs },
-      { find: "../core/Registry", replacement: coreRegistryJs },
-      { find: "../../core/Helpers", replacement: coreHelpersJs },
-      { find: "../core/Helpers", replacement: coreHelpersJs },
+      { find: "../../core/Registry", replacement: coreRegistryTs },
+      { find: "../core/Registry", replacement: coreRegistryTs },
+      { find: "../../core/Helpers", replacement: coreHelpersTs },
+      { find: "../core/Helpers", replacement: coreHelpersTs },
       { find: "./utilities", replacement: utilsUtilitiesTs },
     ],
   },

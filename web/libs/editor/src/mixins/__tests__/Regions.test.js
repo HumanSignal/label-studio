@@ -62,7 +62,9 @@ const TestRegion = types.compose(
   Base,
   RegionsMixin,
   types.model({}).views(() => ({
-    get editable() { return true; },
+    get editable() {
+      return true;
+    },
   })),
 );
 
@@ -78,7 +80,9 @@ function createStore(annotationOverrides = {}, regionSnapshot = {}) {
       annotationStore: { selected: annotation, selectedHistory: null },
     }))
     .views(() => ({
-      findImageEntity() { return null; },
+      findImageEntity() {
+        return null;
+      },
     }))
     .actions((self) => ({
       setAnnotation(ann) {
@@ -93,8 +97,12 @@ function createStore(annotationOverrides = {}, regionSnapshot = {}) {
 }
 
 describe("Regions mixin", () => {
-  beforeEach(() => { ff.setup(); });
-  afterEach(() => { ff.reset(); });
+  beforeEach(() => {
+    ff.setup();
+  });
+  afterEach(() => {
+    ff.reset();
+  });
 
   describe("views", () => {
     it("perRegionStates returns states filtered by perregion", () => {

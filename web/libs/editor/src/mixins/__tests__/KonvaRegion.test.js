@@ -105,7 +105,15 @@ const SafeBboxCoordsCanvas = types.model({}).views((self) => ({
     };
   },
 }));
-const TestRegion = types.compose(Base, Regions, WithDeleteRegion, KonvaRegionMixin, WithEditable, SafeBboxCoordsCanvas, AnnotationOverrideForTest);
+const TestRegion = types.compose(
+  Base,
+  Regions,
+  WithDeleteRegion,
+  KonvaRegionMixin,
+  WithEditable,
+  SafeBboxCoordsCanvas,
+  AnnotationOverrideForTest,
+);
 
 const _annotationRef = { current: null };
 

@@ -1,14 +1,30 @@
 vi.mock("konva", () => {
   class Transform {
     m = [1, 0, 0, 1, 0, 0];
-    copy() { return new Transform(); }
-    point(p) { return p; }
-    translate() { return this; }
-    scale() { return this; }
-    rotate() { return this; }
-    invert() { return this; }
-    getMatrix() { return this.m; }
-    multiply() { return this; }
+    copy() {
+      return new Transform();
+    }
+    point(p) {
+      return p;
+    }
+    translate() {
+      return this;
+    }
+    scale() {
+      return this;
+    }
+    rotate() {
+      return this;
+    }
+    invert() {
+      return this;
+    }
+    getMatrix() {
+      return this.m;
+    }
+    multiply() {
+      return this;
+    }
   }
   return { default: { Transform } };
 });
