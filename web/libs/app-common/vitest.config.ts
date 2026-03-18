@@ -12,7 +12,6 @@ export default defineConfig({
   esbuild: { jsx: "automatic" },
   server: { fs: { allow: [webRoot] } },
   test: {
-    pool: "forks",
     environment: "jsdom",
     globals: true,
     setupFiles: [path.join(__dirname, "../../vitest.jest-compat.ts")],

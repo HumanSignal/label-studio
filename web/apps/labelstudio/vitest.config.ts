@@ -9,7 +9,6 @@ export default defineConfig({
   root,
   server: { fs: { allow: [workspaceRoot] } },
   test: {
-    pool: "forks",
     environment: "jsdom",
     globals: true,
     setupFiles: [path.join(root, "../../vitest.jest-compat.ts")],

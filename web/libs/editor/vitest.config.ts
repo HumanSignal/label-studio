@@ -112,7 +112,6 @@ export default defineConfig({
       ];
       if (suppressPatterns.some((p) => log.includes(p))) return false;
     },
-    pool: "forks",
     environment: "jsdom",
     globals: true,
     setupFiles: [path.join(root, "vitest.setup.ts")],
