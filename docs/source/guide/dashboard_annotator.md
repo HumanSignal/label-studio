@@ -87,7 +87,7 @@ Note the following:
 * Views are only visible to you (meaning they are not shared with other users within your organization).
 
 !!! note
-    If you click **Apply** after saving your data and project/workspace filters, your selections will propogate to other Analytics pages. You can reapply your view or incorporate those filters into a new or updated view. 
+    If you click **Apply** after saving your date and project/workspace filters, your selections will propogate to other Analytics pages. You can reapply your view or incorporate those filters into a new or updated view. 
 
 ## Annotations
 
