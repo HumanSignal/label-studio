@@ -84,5 +84,5 @@ module.exports = {
   transformIgnorePatterns: ["node_modules/?!(nanoid|konva|@adobe)"],
   // In CI, fewer workers reduces peak memory while coverage is collected and merged (parent process
   // still holds the combined result). Locally we keep Jest's default for speed.
-  ...(isCi ? { maxWorkers: 2, workerIdleMemoryLimit: "512MB" } : {}),
+  ...(isCi ? { maxWorkers: 4, workerIdleMemoryLimit: "1024MB" } : {}),
 };
