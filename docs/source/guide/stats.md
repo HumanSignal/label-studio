@@ -485,6 +485,8 @@ In this particular example:
   </div>
 </div>
 
+You can find additional examples in the [built-in metrics reference](agreement_metrics#Examples).
+
 
 ## Other agreement settings
 
