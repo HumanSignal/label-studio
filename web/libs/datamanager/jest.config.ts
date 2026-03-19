@@ -1,4 +1,6 @@
 /* eslint-disable */
+const isCi = Boolean(process.env.CI);
+
 export default {
   displayName: "datamanager",
   preset: "../../jest.preset.js",
@@ -14,4 +16,7 @@ export default {
     "\\.(css)$": "identity-obj-proxy",
     "\\.(gif|ttf|eot|svg|png)$": "<rootDir>/__mocks__/fileMock.js",
   },
+  // In CI, fewer workers reduces peak memory while coverage is collected and merged (parent process
+  // still holds the combined result). Locally we keep Jest's default for speed.
+  ...(isCi ? { maxWorkers: 2, workerIdleMemoryLimit: "512MB" } : {}),
 };

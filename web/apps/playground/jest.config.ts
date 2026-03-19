@@ -1,4 +1,6 @@
 /* eslint-disable */
+const isCi = Boolean(process.env.CI);
+
 export default {
   displayName: "playground",
   preset: "../../jest.preset.js",
@@ -13,4 +15,7 @@ export default {
     "^apps/playground/(.*)$": "<rootDir>/$1",
   },
   coverageDirectory: "../../coverage/apps/playground",
+  // In CI, fewer workers reduces peak memory while coverage is collected and merged (parent process
+  // still holds the combined result). Locally we keep Jest's default for speed.
+  ...(isCi ? { maxWorkers: 2, workerIdleMemoryLimit: "512MB" } : {}),
 };

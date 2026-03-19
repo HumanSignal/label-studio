@@ -1,6 +1,8 @@
 import { getJestProjectsAsync } from "@nx/jest";
 import { pathsToModuleNameMapper } from "ts-jest";
 
+const isCi = Boolean(process.env.CI);
+
 export default async () => ({
   projects: await getJestProjectsAsync(),
   moduleNameMapper: pathsToModuleNameMapper(
@@ -15,4 +17,7 @@ export default async () => ({
     },
     { prefix: "<rootDir>/../../" },
   ),
+  // In CI, fewer workers reduces peak memory while coverage is collected and merged (parent process
+  // still holds the combined result). Locally we keep Jest's default for speed.
+  ...(isCi ? { maxWorkers: 2, workerIdleMemoryLimit: "512MB" } : {}),
 });

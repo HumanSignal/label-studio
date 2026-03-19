@@ -1,5 +1,7 @@
 const { pathsToModuleNameMapper } = require("ts-jest");
 const tsconfig = require("../../tsconfig.base.json");
+const isCi = Boolean(process.env.CI);
+
 /** @type {import('ts-jest/dist/types').InitialOptionsTsJest} */
 module.exports = {
   roots: ["<rootDir>/src"],
@@ -80,4 +82,7 @@ module.exports = {
     "renderEditor\\.test\\.",
   ],
   transformIgnorePatterns: ["node_modules/?!(nanoid|konva|@adobe)"],
+  // In CI, fewer workers reduces peak memory while coverage is collected and merged (parent process
+  // still holds the combined result). Locally we keep Jest's default for speed.
+  ...(isCi ? { maxWorkers: 2, workerIdleMemoryLimit: "512MB" } : {}),
 };
