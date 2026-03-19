@@ -272,6 +272,85 @@ describe("RichText model", () => {
       expect(textNode._value).toBe("");
       global.fetch = undefined;
     });
+
+    it("resolves storage URIs in fetched HTML when resolveUrls is true (default)", async () => {
+      const html = '<div><img src="s3://bucket/img.png" /></div>';
+      global.fetch = jest.fn(() =>
+        Promise.resolve({
+          ok: true,
+          text: () => Promise.resolve(html),
+        }),
+      );
+      const storeRef = { task: { id: 42, dataObj: { url: "https://example.com/page.html" } } };
+      const config = Tree.treeToModel('<View><HyperText name="t1" value="$url" valueType="url" /></View>', storeRef);
+      const ViewModel = Registry.getModelByTag("view");
+      const root = ViewModel.create(config);
+      const node = root.children.find((c) => c.type === "hypertext");
+      await node.updateValue(storeRef);
+      expect(node._value).not.toContain("s3://bucket/img.png");
+      expect(node._value).toContain("/tasks/42/resolve/?fileuri=");
+      global.fetch = undefined;
+    });
+
+    it("does not resolve storage URIs when resolveUrls is false", async () => {
+      const html = '<div><img src="s3://bucket/img.png" /></div>';
+      global.fetch = jest.fn(() =>
+        Promise.resolve({
+          ok: true,
+          text: () => Promise.resolve(html),
+        }),
+      );
+      const storeRef = { task: { id: 42, dataObj: { url: "https://example.com/page.html" } } };
+      const config = Tree.treeToModel(
+        '<View><HyperText name="t1" value="$url" valueType="url" resolveUrls="false" /></View>',
+        storeRef,
+      );
+      const ViewModel = Registry.getModelByTag("view");
+      const root = ViewModel.create(config);
+      const node = root.children.find((c) => c.type === "hypertext");
+      await node.updateValue(storeRef);
+      expect(node._value).not.toContain("/tasks/42/resolve/");
+      global.fetch = undefined;
+    });
+
+    it("resolves multiple storage schemes in fetched HTML", async () => {
+      const html = '<div><img src="s3://b/a.png" /><img src="gs://b/b.png" /></div>';
+      global.fetch = jest.fn(() =>
+        Promise.resolve({
+          ok: true,
+          text: () => Promise.resolve(html),
+        }),
+      );
+      const storeRef = { task: { id: 7, dataObj: { url: "https://example.com/page.html" } } };
+      const config = Tree.treeToModel('<View><HyperText name="t1" value="$url" valueType="url" /></View>', storeRef);
+      const ViewModel = Registry.getModelByTag("view");
+      const root = ViewModel.create(config);
+      const node = root.children.find((c) => c.type === "hypertext");
+      await node.updateValue(storeRef);
+      expect(node._value).not.toContain("s3://b/a.png");
+      expect(node._value).not.toContain("gs://b/b.png");
+      expect(node._value).toContain("/tasks/7/resolve/");
+      global.fetch = undefined;
+    });
+
+    it("passes through HTML without storage URIs unchanged", async () => {
+      const html = '<div><img src="https://example.com/img.png" /></div>';
+      global.fetch = jest.fn(() =>
+        Promise.resolve({
+          ok: true,
+          text: () => Promise.resolve(html),
+        }),
+      );
+      const storeRef = { task: { id: 1, dataObj: { url: "https://example.com/page.html" } } };
+      const config = Tree.treeToModel('<View><HyperText name="t1" value="$url" valueType="url" /></View>', storeRef);
+      const ViewModel = Registry.getModelByTag("view");
+      const root = ViewModel.create(config);
+      const node = root.children.find((c) => c.type === "hypertext");
+      await node.updateValue(storeRef);
+      expect(node._value).toContain("https://example.com/img.png");
+      expect(node._value).not.toContain("/tasks/1/resolve/");
+      global.fetch = undefined;
+    });
   });
 
   describe("needsUpdate", () => {

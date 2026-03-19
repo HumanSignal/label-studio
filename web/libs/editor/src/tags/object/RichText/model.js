@@ -16,6 +16,7 @@ import { FF_SAFE_TEXT, isFF } from "../../../utils/feature-flags";
 import { sanitizeHtml } from "../../../utils/html";
 import messages from "../../../utils/messages";
 import { rangeToGlobalOffset } from "../../../utils/selection-tools";
+import { presignUrls } from "../../../utils/storage";
 import { escapeHtml, isValidObjectURL } from "../../../utils/utilities";
 import ObjectBase from "../Base";
 import DomManager from "./domManager";
@@ -74,6 +75,8 @@ const TagAttrs = types.model("RichTextModel", {
   encoding: types.optional(types.enumeration(["none", "base64", "base64unicode"]), "none"),
 
   granularity: types.optional(types.enumeration(["symbol", "word", "sentence", "paragraph"]), "symbol"),
+
+  resolveurls: types.optional(types.boolean, true),
 });
 
 const Model = types
@@ -213,7 +216,17 @@ const Model = types
 
             if (!ok) throw new Error(`${status} ${statusText}`);
 
-            self.setRemoteValue(yield response.text());
+            let content = yield response.text();
+
+            // When HTML is loaded via valueType="url" (e.g. from S3), it may contain
+            // embedded storage URIs in resource attributes (src, href) that the browser
+            // can't resolve directly. Replace them with /tasks/{id}/resolve/ proxy URLs
+            // so images and other assets load through LS auth and presigning.
+            if (self.resolveurls && self.type !== "text") {
+              content = presignUrls(content, store.task?.id);
+            }
+
+            self.setRemoteValue(content);
           } catch (error) {
             const message = messages.ERR_LOADING_HTTP({ attr: self.value, error: String(error), url });
 
