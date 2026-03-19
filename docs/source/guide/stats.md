@@ -117,35 +117,83 @@ You can configure the methodology to use for each project under **Settings > Qua
 You have the following methodologies to choose from:
 
 * **Consensus**: Consensus measures *"What percentage of annotators chose the most common answer?"*
+
+  ![Consensus example](/images/review/consensus-categorical.png)
+
 * **Pairwise**: Pairwise measures *"What is the average agreement score across all pairs of annotators?"*
+
+  ![Pairwise example](/images/review/pairwise-categorical.png)
 
 !!! info Tip
     You can switch between methodologies at any time.
 
 ### Consensus
 
-Agreement is computed across all annotators at once, measuring how much they converge to a common answer. The result aligns with “How many annotators agree?”
+Agreement is calculated across all annotators at once, measuring how much they converge to a common answer. 
 
-Consensus measures operates on binary scores -- each pair of annotators either matches (`1`) or does not match (`0`). 
+<img src="/images/review/consensus-1.png" alt="Screenshot" style="display: block; margin: 0 auto; max-width: 300px" />
+
+There are two equally valid ways to look at consensus:
+
+* *How many annotators agree?*
+
+and
+
+* *How many annotators chose the most common answer?*
+
+The easiest way to illustrate this is an example where each annotator selects a different choice:
+
+* Annotator 1 chooses A
+* Annotator 2 chooses B
+* Annotator 3 chooses C
+
+Even though none of the annotators agreed with each other, agreement is still `1/3 = 33.33%`. 
+
+* *How many annotators agree?* 
+
+  Given three annotators, 1/3 selected each choice.  
+
+* *How many annotators chose the most common answer?*
+
+  In this case, A, B, and C were each chosen once, and are therefore equally common.
+
+  So 1 out of 3 annotators chose the most common answer (`1/3 = 33.33`).
+
+If you were to switch to Pairwise methodology, the same task would have an agreement score of `0%`, as Pairwise is more focused on how much agreement there is between pairs of annotators.  
+
+#### Binary scoring
+
+Consensus measures agreement with binary scores -- each pair of annotators either matches (`1`) or does not match (`0`). 
 
 * For categorical tags like **Choices** or **Rating**, this binary outcome happens naturally: two annotators either selected the same value or they didn't. 
 
-* For non-categorical tags like bounding boxes or text spans, the raw comparison produces a continuous score (e.g., IoU of 0.82), so a user-defined threshold is applied to convert it into a binary decision -- at or above the threshold counts as a match (`1`), below it does not (`0`). 
+* For non-categorical tags like bounding boxes or text spans, the raw comparison produces a continuous score (e.g., IoU of 0.82). Therefore for non-categorical tags, you must define a threshold to determine whether the continuous score is high enough to be considered a match, allowing Label Studio to convert it into a binary decision. 
 
-Once annotations have been reduced to a `1` or `0`, consensus calculates how much the group converges overall, giving proportional credit for majority agreement. 
+  At or above the threshold counts as a match (`1`), below it does not (`0`). 
 
-This is why, in a group of three annotators where two agree and one disagrees, consensus returns `66%` rather than the `33%` you'd get from pairwise -- it recognizes that most of the group reached the same answer.
-
-![Screenshot](/images/review/consensus-agreement.png)
-
-!!! note 
-    **Consensus and continuous/non-categorical metrics**: Consensus uses binary match/no-match. For continuous metrics (e.g., IoU), you must set a threshold in the control tag’s metric parameters; scores above the threshold count as a match, below as no match. 
+Once annotations have been reduced to a `1` or `0`, consensus calculates how much the group converges overall. 
 
 ### Pairwise
 
 As the name "Pairwise" indicates, Pairwise looks at agreement between every unique *pair* of annotators, and then averages that agreement. 
 
+<img src="/images/review/pairwise-1.png" alt="Screenshot" style="display: block; margin: 0 auto; max-width: 300px" />
+
 Pairwise measures agreement by comparing every unique pair of annotators independently, calculating a score for each pair, and then averaging all those scores together. 
+
+Given the same example earlier: 
+
+* Annotator 1 chooses A
+* Annotator 2 chooses B
+* Annotator 3 chooses C
+
+While the Consensus agreement score was `33.33%`, the Pairwise agreement score is `0%`. 
+
+* Annotator 1 is compared with Annotator 2 (no match = `0`)
+* Annotator 1 is compared with Annotator 3 (no match = `0`)
+* Annotator 2 is compared with Annotator 3 (no match = `0`)
+
+`(0 + 0 + 0)/3 = 0`
 
 For categorical tags, each pair produces a binary result: a match scores `1` and a mismatch scores `0`. The average of these binary values becomes the overall agreement. 
 
@@ -153,7 +201,8 @@ For non-categorical tags like bounding boxes, each pair produces a continuous sc
 
 This means Pairwise preserves the full granularity of non-categorical comparisons, rewarding partial overlap rather than reducing it to all-or-nothing. 
 
-<div style="text-align:center"><img alt="Diagram showing annotations are collected for each task, agreement scores are computed for each pair, the resulting scores are averaged for a task." src="/images/stats-no_grouping.png"/></div>
+!!! info Tip
+    For non-categorical tags using Consensus methodology, you must use either exact match or a continuous metric that has a threshold. For Pairwise, you can use exact match, a continuous metric without a threshold, or a continuous metric with a threshold. 
 
 ### Consensus vs. Pairwise at a glance
 
@@ -199,16 +248,19 @@ In extremely simple terms:
 * Requires thresholds for non-categorical control tags (e.g. bounding boxes and text spans). Thresholds are how you define what "close enough" means. See [Non-categorical examples](#Non-categorical-examples) for an of consensus calculation with a threshold.
 
 
-### Examples
+### Examples 
 
 #### Categorical examples 
 
-[Categorical control tags](#Categorical-control-tags) are control tags that have a fixed set of choices. For example, a control tag that has the choices "Cat", "Dog", "Bird".
+[Categorical control tags](#Categorical-control-tags) are control tags that have a fixed set of choices. For example, a control tag that has the choices "Opossum", "Cat", "Hamster".
+
 
 <div class="code-tabs">
   <div data-name="Pairwise">
 
 Say you have 3 annotators select between 3 different choices: "A", "B", "C".
+
+![Pairwise example](/images/review/pairwise-categorical-0.png)
 
 If all three annotators select a different choice, Pairwise is `0`:
 
@@ -218,18 +270,35 @@ If all three annotators select a different choice, Pairwise is `0`:
 
 `(0 + 0 + 0)/3 = 0`
 
+![Pairwise example](/images/review/pairwise-categorical-1.png)
+
 If Annotator 2 were to change their choice to agree with Annotator 1, the agreement would change to `33.33%`:
 
-* Annotator 1 is compared with Annotator 2 (match = `100`)
+* Annotator 1 is compared with Annotator 2 (match = `1`)
 * Annotator 1 is compared with Annotator 3 (no match = `0`)
 * Annotator 2 is compared with Annotator 3 (no match = `0`) 
 
-`(100 + 0 + 0)/3 = 33.33 `
+`(1 + 0 + 0)/3 = .33 `
+
+![Pairwise example](/images/review/pairwise-categorical-2.png)
+
+If Annotator 3 were to change their choice to agree with Annotator 1 and Annotator 2, the agreement would change to `100%`:
+
+* Annotator 1 is compared with Annotator 2 (match = `1`)
+* Annotator 1 is compared with Annotator 3 (match = `1`)
+* Annotator 2 is compared with Annotator 3 (match = `1`)
+
+`(1 + 1 + 1)/3 = 1 `
+
+As you can see, Pairwise might not be as intuitive as Consensus (e.g. going from 33.33% to 100% when Annotator 3 changes their choice), but it is more sensitive to outliers.
+
 </div>
 
 <div data-name="Consensus">
 
 Say you have 3 annotators select between 3 different choices: "A", "B", "C".
+
+![Consensus example](/images/review/consensus-categorical-0.png)
 
 If all three annotators select a different choice, Consensus is `33.33%`:
 
@@ -239,10 +308,12 @@ If all three annotators select a different choice, Consensus is `33.33%`:
 
 In Consensus, we are looking at the most common answer. In this case, `A`, `B`, and `C` were each chosen once, and are therefore equally common. 
 
-So 1 out of 3 annotators chose the most common answer (`1/3 = 33.33`). 
+So 1 out of 3 annotators chose the most common answer (`1/3 = .33`). 
 
 * It does not matter what the value of their choice was, just that there are 3 choices and no overlapping choice between annotators. 
 * In this case, any one of the choices becomes the "most common answer" as they are all equally common (all were selected once). 
+
+![Consensus example](/images/review/consensus-categorical-1.png)
     
 If Annotator 2 were to change their choice to agree with Annotator 1, the agreement would increase to `66.67%`:
 
@@ -252,22 +323,95 @@ If Annotator 2 were to change their choice to agree with Annotator 1, the agreem
 
 In this case, `A` was chosen twice and `C` was chosen once. 
 
-So 2 out of 3 annotators chose the most common answer (`2/3 = 66.67`). 
+So 2 out of 3 annotators chose the most common answer (`2/3 = .66`). 
+
+![Consensus example](/images/review/consensus-categorical-2.png)
+
+If Annotator 3 were to change their choice to agree with Annotator 1 and Annotator 2, the agreement would increase to `100%`.
+
+All 3 annotators chose the most common answer (`3/3 = 1.0`). 
 
 </div>
 </div>
 
 #### Non-categorical examples
 
-[Non-categorical control tags](#Non-categorical-control-tags) are control tags have continuous values that are not as simple to quantify as "match" or "no match". For example, **RectangleLabels**, **PolygonLabels**, **Labels**, **TextArea**.
+[Non-categorical control tags](#Non-categorical-control-tags) are control tags have continuous values that are not as simple to quantify as "match" or "no match". For example, **RectangleLabels**, **PolygonLabels**, **Labels**, **Labels**.
 
+##### Text spans
+
+When you're labeling text spans, you can use the **Exact Match**, **Span Overlap** or **Span Overlap (Threshold)** metrics. 
+
+In this example, we'll look at **Span Overlap** and **Span Overlap (Threshold)**. 
+
+Span Overlap measures how much annotators' highlighted regions coincide. For more information on how it's calculated, see [Span Overlap](agreement_metrics#Span-overlap). 
+
+
+<div class="code-tabs">
+  <div data-name="Pairwise">
+
+You have three annotators who are highlighting text spans to label as "Positive" or "Negative."
+
+![Pairwise example](/images/review/pairwise-non-categorical-text.png)
+
+* Annotator 1 selects "Positive" and highlights the span `Excellent tool` = characters 0-14
+* Annotator 2 selects "Positive" and highlights the span `tool` = characters 10-14
+* Annotator 3 selects "Negative" and highlights the span `tool` = characters 10-14
+
+Annotator 3's overlap is negated because she chose a different label for her text span. 
+
+* Annotator 1 is compared with Annotator 2: overlap is `4/14 = .29`
+* Annotator 1 is compared with Annotator 3: overlap is `0` because they chose different labels
+* Annotator 2 is compared with Annotator 3: overlap is `0` because they chose different labels
+
+`(.29 + 0 + 0) / 3 = 0.0966`
+
+</div>
+
+<div data-name="Consensus">
+
+You have three annotators who are highlighting text spans to label as "Positive" or "Negative."
+
+![Consensus example](/images/review/consensus-non-categorical-text.png)
+
+* Annotator 1 selects "Positive" and highlights the span `Excellent tool` = characters 0-14
+* Annotator 2 selects "Positive" and highlights the span `tool` = characters 10-14
+* Annotator 3 selects "Negative" and highlights the span `tool` = characters 10-14
+
+Annotator 3's overlap is negated because she chose a different label for her text span. 
+
+Annotator 1 and 2 have 29% overlap (`4/14 = .29`). 
+
+However, Consensus requires binary (`0` or `1`) scores to determine match, which is why you have to select a threshold for non-categorical tags. 
+
+In this case, the threshold is set quite low to `25%`, meaning the annotations submitted by Annotator 1 and Annotator 2 are considered a match. 
+
+Therefore, 2 out of 3 annotators agree, which gives us an agreement score of (`2/3 = .66`).
+
+  </div>
+</div>
+
+##### Bounding boxes
+
+When you're annotating an image with bounding boxes, you can use the **Exact Match**, **Intersection over Union (IoU)** or **Intersection over Union (IoU) (Threshold)** metrics. 
+
+In this example, we'll look at **Intersection over Union (IoU)** and **Intersection over Union (IoU) (Threshold)**. 
+
+Intersection over Union, or IoU, is a way to say how similar two bounding boxes are.
+
+The idea is:
+
+- **Intersection**: The area shared by both boxes
+- **Union**: The total area covered by both boxes together
 
 <div class="code-tabs">
   <div data-name="Pairwise">
 
 Say you have 3 annotators drawing boxes using **RectangleLabels**. You are using the **Intersection over Union (IoU)** metric to calculate agreement. 
 
-If all three annotators draw their boxes in completely different areas of the image with no overlap, Pairwise is `0`:
+![Pairwise example](/images/review/pairwise-non-categorical-bbox.png)
+
+If all three annotators draw their boxes in completely different areas of the image with no overlap, Pairwise is `0%`:
 
 * Annotator 1 is compared with Annotator 2 (no overlap, IoU = `0`)
 * Annotator 1 is compared with Annotator 3 (no overlap, IoU = `0`)
@@ -277,11 +421,11 @@ If all three annotators draw their boxes in completely different areas of the im
 
 Now the annotators adjust their boxes so that there is some overlap between them. In this case, the agreement is `72%`:
 
-- Annotators 1 vs Annotator 2 (IoU = `.74`)
-- Annotators 1 vs Annotator 3 (IoU = `.90`)
-- Annotators 2 vs Annotator 3 (IoU = `.52`)
+- Annotators 1 vs Annotator 2 (IoU = `.53`)
+- Annotators 1 vs Annotator 3 (IoU = `.24`)
+- Annotators 2 vs Annotator 3 (IoU = `.45`)
 
-`(.74 + .90 + .52) / 3 = 72%`
+`(.53 + .24 + .45) / 3 = 40.67%`
 
 </div>
 
@@ -293,40 +437,48 @@ However, Consensus requires binary (`0` or `1`) scores. So this time, you are us
 
 This is the same as the **Intersection over Union** metric used in the Pairwise example, but with a threshold applied. A threshold is necessary to determine what is considered a match (`1`) and what is not a match (`0`). 
 
-Let's say you set the threshold to `65%`: any pair with IoU >= 0.65 counts as a match (`1`), and anything below is not a match (`0`).
+Let's say you set the threshold to `50%`: any pair with IoU >= 0.50 counts as a match (`1`), and anything below is not a match (`0`).
+
+![Consensus example](/images/review/consensus-non-categorical-bbox.png)
 
 You have the following raw IoU scores:
 
-- Annotators 1 vs Annotator 2 (IoU = `.74`)
-- Annotators 1 vs Annotator 3 (IoU = `.90`)
-- Annotators 2 vs Annotator 3 (IoU = `.52`)
+- Annotators 1 vs Annotator 2 (IoU = `.53`)
+- Annotators 1 vs Annotator 3 (IoU = `.24`)
+- Annotators 2 vs Annotator 3 (IoU = `.45`)
 
-**Step 1 – Binarize using the threshold (65%):**
+**Binarize using the threshold (50%):**
 
-- Annotators 1 vs Annotator 2: `.74` >= `.65` → match = 1
-- Annotators 1 vs Annotator 3: `.90` >= `.65` → match = 1
-- Annotators 2 vs Annotator 3: `.52` <= `.65` → no match = 0
+- Annotators 1 vs Annotator 2: `.53` >= `.50` → match = 1
+- Annotators 1 vs Annotator 3: `.24` <= `.50` → no match = 0
+- Annotators 2 vs Annotator 3: `.45` <= `.50` → no match = 0
 
-**Step 2 – Calculate consensus:**
-
-You have two matches out of three pairs. So the consensus score is `66.67%` 
-
-(`2/3 = 66.67`).
-
+Annotator 1 and Annotator 2 agree, giving us a consensus score of `2/3 = .66`.
 
 **How the threshold changes the result:**
 
-The threshold you choose directly affects the consensus score. Using the same raw IoU values:
+To give a more complex example, say you lowered the threshold to `25%`. This means that any pair with IoU >= 0.25 counts as a match (`1`), and anything below is not a match (`0`).
 
-| Threshold | Pair 1-2 (`.74`) | Pair 1-3 (`.90`) | Pair 2-3 (`.52`) | Consensus |
-|---|---|---|---|---|
-| **50%** | match | match | match | **100%** (all agree) |
-| **75%** | no match | match | no match | **33%** (1 of 3 agree) |
-| **95%** | no match | no match | no match | **0%** (none agree) |
+- Annotators 1 vs Annotator 2: `.53` >= `.25` → match = 1
+- Annotators 1 vs Annotator 3: `.24` <= `.25` → no match = 0
+- Annotators 2 vs Annotator 3: `.45` >= `.25` → match = 1
 
-At a lenient 50% threshold, all three boxes overlap "enough" and consensus is perfect. At a strict 95% threshold, no pair is close enough and consensus drops to zero. 
+This raises the agreement score to `80.47%`
 
-This is why choosing the right threshold is critical for non-categorical consensus -- it determines where you draw the line between "these annotations agree" and "these annotations disagree."
+When we have situations like this that do not reflect a simple consensus, Label Studio uses eigenvalues to calculate the consensus score. 
+
+Consensus = `λ_max / n`
+
+Where:
+
+`λ_max` = Largest eigenvalue of the binarized scores matrix
+
+`n` = Number of annotators
+
+In this particular example: 
+
+`Consensus = λ_max / n = (1 + √2) / 3 ≈ 2.4142 / 3 ≈ 0.8047`
+
 
   </div>
 </div>
@@ -379,10 +531,6 @@ Your options depend on the agreement methodology you have selected and what type
 
 For information on the different metrics available for each control tag, see the [built-in metrics reference](agreement_metrics).
 
-!!! info "Tip"
-    For IoU-based control tags, you can set a threshold to determine what is considered a match. Click **Try it** to open a preview window to see how the threshold affects the agreement score. 
-
-    <img src="/images/review/agreement-iou.png" class="gif-border" style="max-width:600px">
 
 
 
