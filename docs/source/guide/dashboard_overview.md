@@ -49,6 +49,8 @@ Note the following:
 * You can save, update, and delete views. 
 * Views are only visible to you (meaning they are not shared with other users within your organization).
 
+!!! note
+    If you click **Apply** after saving your date and project/workspace filters, your selections will propogate to other Analytics pages. You can reapply your view or incorporate those filters into a new or updated view. 
 
 ## Tasks and project states
 
