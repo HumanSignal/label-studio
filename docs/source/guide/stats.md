@@ -404,6 +404,8 @@ The idea is:
 - **Intersection**: The area shared by both boxes
 - **Union**: The total area covered by both boxes together
 
+For more information on how IoU is calculated, see [Intersection over Union (IoU)](agreement_metrics#Intersection-over-Union-for-bounding-boxes).
+
 <div class="code-tabs">
   <div data-name="Pairwise">
 
