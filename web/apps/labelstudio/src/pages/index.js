@@ -4,10 +4,4 @@ import { OrganizationPage } from "./Organization";
 import { ModelsPage } from "./Organization/Models/ModelsPage";
 import { pages } from "@humansignal/app-common";
 
-export const Pages = [
-  HomePage,
-  ProjectsPage,
-  OrganizationPage,
-  ModelsPage,
-  pages.AccountSettingsPage,
-].filter(Boolean);
+export const Pages = [HomePage, ProjectsPage, OrganizationPage, ModelsPage, pages.AccountSettingsPage].filter(Boolean);
