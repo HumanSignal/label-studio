@@ -1,7 +1,8 @@
 import { useSDK } from "../../../providers/SDKProvider";
 import { isDefined } from "../../../utils/utils";
 import { useState } from "react";
-import { Button, Popover } from "@humansignal/ui";
+import { Button, Popover, Tooltip } from "@humansignal/ui";
+import { IconInfoOutline } from "@humansignal/icons";
 
 const LOW_AGREEMENT_SCORE = 33;
 const MEDIUM_AGREEMENT_SCORE = 66;
@@ -44,6 +45,16 @@ export const Agreement = (cell) => {
   const dimensionId = isDimensionAgreementColumn ? Number(colPath.replace("dimension_agreement_", "")) : undefined;
   const isAgreementPopoverEnabled = !!basePopoverEnabled;
 
+  const consensusCap = Number(window.APP_SETTINGS?.consensus_agreement_participant_threshold ?? 20);
+  let methodology = "";
+  try {
+    methodology = String(getRoot(task).project?.agreement_methodology ?? "").toLowerCase();
+  } catch {
+    methodology = String(sdk?.project?.agreement_methodology ?? "").toLowerCase();
+  }
+  const participantTotal = Number(task?.total_annotations ?? 0) + Number(task?.total_predictions ?? 0);
+  const consensusSkipped = methodology === "consensus" && participantTotal > consensusCap;
+
   const handleClick = isAgreementPopoverEnabled
     ? (e) => {
         e.preventDefault();
@@ -52,13 +63,21 @@ export const Agreement = (cell) => {
       }
     : undefined;
 
-  const score = (
+  const score = consensusSkipped ? (
+    <Tooltip
+      title={`Consensus is not computed for tasks with more than ${consensusCap} annotations and predictions combined`}
+    >
+      <span className="inline-flex items-center text-neutral-content-subtler">
+        <IconInfoOutline />
+      </span>
+    </Tooltip>
+  ) : (
     <span className={agreementScoreTextColor(value)}>{isDefined(value) ? `${formatNumber(value)}%` : ""}</span>
   );
 
   return (
-    <div className="flex items-center" onClick={handleClick}>
-      {isAgreementPopoverEnabled ? <Popover trigger={score}>{content}</Popover> : score}
+    <div className="flex items-center" onClick={consensusSkipped ? undefined : handleClick}>
+      {consensusSkipped ? score : isAgreementPopoverEnabled ? <Popover trigger={score}>{content}</Popover> : score}
     </div>
   );
 };
