@@ -9870,9 +9870,9 @@ flat@^5.0.2:
   integrity sha512-b6suED+5/3rTpUBdG1gupIl8MPFCAMA0QXwmljLhvCUKcUvdE4gWky9zpuGCcXHOsz4J9wPGNWq6OKpmIzz3hQ==
 
 flatted@^3.2.7, flatted@^3.2.9:
-  version "3.3.3"
-  resolved "https://registry.yarnpkg.com/flatted/-/flatted-3.3.3.tgz#67c8fad95454a7c7abebf74bb78ee74a44023358"
-  integrity sha512-GX+ysw4PBCz0PzosHDepZGANEuFCMLrnRTiEy9McGjmkCQYwRq4A/X786G/fjM/+OjsWSU1ZrY5qyARZmO/uwg==
+  version "3.4.2"
+  resolved "https://registry.yarnpkg.com/flatted/-/flatted-3.4.2.tgz#f5c23c107f0f37de8dbdf24f13722b3b98d52726"
+  integrity sha512-PjDse7RzhcPkIJwy5t7KPWQSZ9cAbzQXcafsetQoD7sOJRQlGikNbx7yZp2OotDnJyrDcbyRq3Ttb18iYOqkxA==
 
 follow-redirects@^1.0.0, follow-redirects@^1.15.11:
   version "1.15.11"
@@ -12701,7 +12701,12 @@ lerp@^1.0.3:
   resolved "https://registry.yarnpkg.com/lerp/-/lerp-1.0.3.tgz#a18c8968f917896de15ccfcc28d55a6b731e776e"
   integrity sha512-70Rh4rCkJDvwWiTsyZ1HmJGvnyfFah4m6iTux29XmasRiZPDBpT9Cfa4ai73+uLZxnlKruUS62jj2lb11wURiA==
 
-less-loader@^11.1.0, "less-loader@npm:empty-npm-package@1.0.0", less@^4.1.3, less@^4.2.0, "less@npm:empty-npm-package@1.0.0", sass-embedded@^1.83.4, "sass-embedded@npm:empty-npm-package@1.0.0", sass-loader@^16.0.4, "sass-loader@npm:empty-npm-package@1.0.0", sass@^1.70.0, sass@^1.85.0, "sass@npm:empty-npm-package@1.0.0", "stylelint-config-standard@npm:empty-npm-package@1.0.0", "stylelint-config-tailwindcss@npm:empty-npm-package@1.0.0", "stylelint@npm:empty-npm-package@1.0.0", stylus@^0.62.0, "stylus@npm:empty-npm-package@1.0.0":
+less-loader@^11.1.0, "less-loader@npm:empty-npm-package@1.0.0":
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/empty-npm-package/-/empty-npm-package-1.0.0.tgz#fda29eb6de5efa391f73d578697853af55f6793a"
+  integrity sha512-q4Mq/+XO7UNDdMiPpR/LIBIW1Zl4V0Z6UT9aKGqIAnBCtCb3lvZJM1KbDbdzdC8fKflwflModfjR29Nt0EpcwA==
+
+less@^4.1.3, less@^4.2.0, "less@npm:empty-npm-package@1.0.0":
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/empty-npm-package/-/empty-npm-package-1.0.0.tgz#fda29eb6de5efa391f73d578697853af55f6793a"
   integrity sha512-q4Mq/+XO7UNDdMiPpR/LIBIW1Zl4V0Z6UT9aKGqIAnBCtCb3lvZJM1KbDbdzdC8fKflwflModfjR29Nt0EpcwA==
@@ -16653,6 +16658,21 @@ sanitize-html@^2.14.0:
     parse-srcset "^1.0.2"
     postcss "^8.3.11"
 
+sass-embedded@^1.83.4, "sass-embedded@npm:empty-npm-package@1.0.0":
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/empty-npm-package/-/empty-npm-package-1.0.0.tgz#fda29eb6de5efa391f73d578697853af55f6793a"
+  integrity sha512-q4Mq/+XO7UNDdMiPpR/LIBIW1Zl4V0Z6UT9aKGqIAnBCtCb3lvZJM1KbDbdzdC8fKflwflModfjR29Nt0EpcwA==
+
+sass-loader@^16.0.4, "sass-loader@npm:empty-npm-package@1.0.0":
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/empty-npm-package/-/empty-npm-package-1.0.0.tgz#fda29eb6de5efa391f73d578697853af55f6793a"
+  integrity sha512-q4Mq/+XO7UNDdMiPpR/LIBIW1Zl4V0Z6UT9aKGqIAnBCtCb3lvZJM1KbDbdzdC8fKflwflModfjR29Nt0EpcwA==
+
+sass@^1.70.0, sass@^1.85.0, "sass@npm:empty-npm-package@1.0.0":
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/empty-npm-package/-/empty-npm-package-1.0.0.tgz#fda29eb6de5efa391f73d578697853af55f6793a"
+  integrity sha512-q4Mq/+XO7UNDdMiPpR/LIBIW1Zl4V0Z6UT9aKGqIAnBCtCb3lvZJM1KbDbdzdC8fKflwflModfjR29Nt0EpcwA==
+
 sax@^1.5.0:
   version "1.5.0"
   resolved "https://registry.yarnpkg.com/sax/-/sax-1.5.0.tgz#b5549b671069b7aa392df55ec7574cf411179eb8"
@@ -17318,7 +17338,16 @@ string-length@^4.0.2:
     char-regex "^1.0.2"
     strip-ansi "^6.0.0"
 
-"string-width-cjs@npm:string-width@^4.2.0", string-width@^4.1.0, string-width@^4.2.0, string-width@^4.2.3:
+"string-width-cjs@npm:string-width@^4.2.0":
+  version "4.2.3"
+  resolved "https://registry.yarnpkg.com/string-width/-/string-width-4.2.3.tgz#269c7117d27b05ad2e536830a8ec895ef9c6d010"
+  integrity sha512-wKyQRQpjJ0sIp62ErSZdGsjMJWsap5oRNihHhu6G7JVO/9jIB6UyevL+tXuOqrng8j/cxKTWyWUwvSTriiZz/g==
+  dependencies:
+    emoji-regex "^8.0.0"
+    is-fullwidth-code-point "^3.0.0"
+    strip-ansi "^6.0.1"
+
+string-width@^4.1.0, string-width@^4.2.0, string-width@^4.2.3:
   version "4.2.3"
   resolved "https://registry.yarnpkg.com/string-width/-/string-width-4.2.3.tgz#269c7117d27b05ad2e536830a8ec895ef9c6d010"
   integrity sha512-wKyQRQpjJ0sIp62ErSZdGsjMJWsap5oRNihHhu6G7JVO/9jIB6UyevL+tXuOqrng8j/cxKTWyWUwvSTriiZz/g==
@@ -17367,7 +17396,7 @@ stringify-object@^5.0.0:
     is-obj "^3.0.0"
     is-regexp "^3.1.0"
 
-"strip-ansi-cjs@npm:strip-ansi@^6.0.1", strip-ansi@^6.0.0, strip-ansi@^6.0.1:
+"strip-ansi-cjs@npm:strip-ansi@^6.0.1":
   version "6.0.1"
   resolved "https://registry.yarnpkg.com/strip-ansi/-/strip-ansi-6.0.1.tgz#9e26c63d30f53443e9489495b2105d37b67a85d9"
   integrity sha512-Y38VPSHcqkFrCpFnQ9vuSXmquuv5oXOKpGeT6aGrr3o3Gc9AlVa6JBfUSOCnbxGGZF+/0ooI7KrPuUSztUdU5A==
@@ -17380,6 +17409,13 @@ strip-ansi@^3.0.0:
   integrity sha512-VhumSSbBqDTP8p2ZLKj40UjBCV4+v8bUSEpUb4KjRgWk9pbqGF4REFj6KEagidb2f/M6AzC0EmFyDNGaw9OCzg==
   dependencies:
     ansi-regex "^2.0.0"
+
+strip-ansi@^6.0.0, strip-ansi@^6.0.1:
+  version "6.0.1"
+  resolved "https://registry.yarnpkg.com/strip-ansi/-/strip-ansi-6.0.1.tgz#9e26c63d30f53443e9489495b2105d37b67a85d9"
+  integrity sha512-Y38VPSHcqkFrCpFnQ9vuSXmquuv5oXOKpGeT6aGrr3o3Gc9AlVa6JBfUSOCnbxGGZF+/0ooI7KrPuUSztUdU5A==
+  dependencies:
+    ansi-regex "^5.0.1"
 
 strip-ansi@^7.0.1:
   version "7.1.2"
@@ -17498,6 +17534,26 @@ stylehacks@^6.1.1:
   dependencies:
     browserslist "^4.23.0"
     postcss-selector-parser "^6.0.16"
+
+"stylelint-config-standard@npm:empty-npm-package@1.0.0":
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/empty-npm-package/-/empty-npm-package-1.0.0.tgz#fda29eb6de5efa391f73d578697853af55f6793a"
+  integrity sha512-q4Mq/+XO7UNDdMiPpR/LIBIW1Zl4V0Z6UT9aKGqIAnBCtCb3lvZJM1KbDbdzdC8fKflwflModfjR29Nt0EpcwA==
+
+"stylelint-config-tailwindcss@npm:empty-npm-package@1.0.0":
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/empty-npm-package/-/empty-npm-package-1.0.0.tgz#fda29eb6de5efa391f73d578697853af55f6793a"
+  integrity sha512-q4Mq/+XO7UNDdMiPpR/LIBIW1Zl4V0Z6UT9aKGqIAnBCtCb3lvZJM1KbDbdzdC8fKflwflModfjR29Nt0EpcwA==
+
+"stylelint@npm:empty-npm-package@1.0.0":
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/empty-npm-package/-/empty-npm-package-1.0.0.tgz#fda29eb6de5efa391f73d578697853af55f6793a"
+  integrity sha512-q4Mq/+XO7UNDdMiPpR/LIBIW1Zl4V0Z6UT9aKGqIAnBCtCb3lvZJM1KbDbdzdC8fKflwflModfjR29Nt0EpcwA==
+
+stylus@^0.62.0, "stylus@npm:empty-npm-package@1.0.0":
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/empty-npm-package/-/empty-npm-package-1.0.0.tgz#fda29eb6de5efa391f73d578697853af55f6793a"
+  integrity sha512-q4Mq/+XO7UNDdMiPpR/LIBIW1Zl4V0Z6UT9aKGqIAnBCtCb3lvZJM1KbDbdzdC8fKflwflModfjR29Nt0EpcwA==
 
 sucrase@^3.32.0, sucrase@^3.35.0:
   version "3.35.1"
@@ -18851,7 +18907,7 @@ workerpool@^9.2.0:
   resolved "https://registry.yarnpkg.com/workerpool/-/workerpool-9.3.4.tgz#f6c92395b2141afd78e2a889e80cb338fe9fca41"
   integrity sha512-TmPRQYYSAnnDiEB0P/Ytip7bFGvqnSU6I2BcuSw7Hx+JSg/DsUi5ebYfc8GYaSdpuvOcEs6dXxPurOYpe9QFwg==
 
-"wrap-ansi-cjs@npm:wrap-ansi@^7.0.0", wrap-ansi@^7.0.0:
+"wrap-ansi-cjs@npm:wrap-ansi@^7.0.0":
   version "7.0.0"
   resolved "https://registry.yarnpkg.com/wrap-ansi/-/wrap-ansi-7.0.0.tgz#67e145cff510a6a6984bdf1152911d69d2eb9e43"
   integrity sha512-YVGIj2kamLSTxw6NsZjoBxfSwsn0ycdesmc4p+Q21c5zPuZ1pl+NfxVdxPtdHvmNVOQ6XSYG4AUtyt/Fi7D16Q==
@@ -18864,6 +18920,15 @@ wrap-ansi@^6.2.0:
   version "6.2.0"
   resolved "https://registry.yarnpkg.com/wrap-ansi/-/wrap-ansi-6.2.0.tgz#e9393ba07102e6c91a3b221478f0257cd2856e53"
   integrity sha512-r6lPcBGxZXlIcymEu7InxDMhdW0KDxpLgoFLcguasxCaJ/SOIZwINatK9KY/tf+ZrlywOKU0UDj3ATXUBfxJXA==
+  dependencies:
+    ansi-styles "^4.0.0"
+    string-width "^4.1.0"
+    strip-ansi "^6.0.0"
+
+wrap-ansi@^7.0.0:
+  version "7.0.0"
+  resolved "https://registry.yarnpkg.com/wrap-ansi/-/wrap-ansi-7.0.0.tgz#67e145cff510a6a6984bdf1152911d69d2eb9e43"
+  integrity sha512-YVGIj2kamLSTxw6NsZjoBxfSwsn0ycdesmc4p+Q21c5zPuZ1pl+NfxVdxPtdHvmNVOQ6XSYG4AUtyt/Fi7D16Q==
   dependencies:
     ansi-styles "^4.0.0"
     string-width "^4.1.0"
