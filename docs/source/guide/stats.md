@@ -465,22 +465,7 @@ To give a more complex example, say you lowered the threshold to `25%`. This mea
 - Annotators 1 vs Annotator 3: `.24` <= `.25` → no match = 0
 - Annotators 2 vs Annotator 3: `.45` >= `.25` → match = 1
 
-This raises the agreement score to `80.47%`
-
-When we have situations like this that do not reflect a simple consensus, Label Studio uses eigenvalues to calculate the consensus score. 
-
-Consensus = `λ_max / n`
-
-Where:
-
-`λ_max` = Largest eigenvalue of the binarized scores matrix
-
-`n` = Number of annotators
-
-In this particular example: 
-
-`Consensus = λ_max / n = (1 + √2) / 3 ≈ 2.4142 / 3 ≈ 0.8047`
-
+This raises the agreement score to `80.47%` to reflect the higher agreement between Annotator 1 and Annotator 2.
 
   </div>
 </div>
