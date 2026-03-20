@@ -163,7 +163,9 @@ Click any agreement column to select specific annotators and models that you wan
 
 ![Screenshot](/images/review/agreement-dm-modal.png)
 
-You can select a subset of annotators, models, or models and annotators to compare. 
+By default, all annotators (and not models) are selected for agreement calculation.
+
+However, you can customize this to select a subset of annotators, models, or models and annotators to compare. 
 
 For example, if you have 10 annotators and you select 3, the overall agreement score and the control tag agreement scores will be recalculated to reflect only your selections. 
 
@@ -183,7 +185,7 @@ Label Studio will apply whatever agreement metrics and methodology you have conf
 
 ### Agreement popover
 
-Click any agreement column to see a popover that has information about the methodology used. 
+Click any agreement column to see a popover that has information about the metric and methodology used. 
 
 If you are using **Pairwise** methodology, you will see a breakdown of agreement scores for the selected annotators and models.
 

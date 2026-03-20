@@ -51,7 +51,7 @@ Label Studio aggregates per-control-tag scores into a single task-level score.
 
 By default, this is calculated as the mean of all control-tag scores. This is what appears in the main **Agreement** column when you do not filter by control tag.
 
-You can customize how overall agreement is calculated by setting the **weight** of different control tags when calculating agreement. This ensures that a critical control tag is has more bearing on the overall agreement score than a less important control tag.
+You can customize how overall agreement is calculated by setting the **weight** of different control tags when calculating agreement. This ensures that a critical control tag is has more bearing on the overall agreement score than a less important control tag. See [Configure weight for the overall agreement](#Configure-weight-for-the-overall-agreement).
 
 ## Categorical vs. non-categorical control tags
 
@@ -457,15 +457,19 @@ You have the following raw IoU scores:
 
 Annotator 1 and Annotator 2 agree, giving us a consensus score of `2/3 = .66`.
 
-**How the threshold changes the result:**
+**Stronger IoU agreements**
 
-To give a more complex example, say you lowered the threshold to `25%`. This means that any pair with IoU >= 0.25 counts as a match (`1`), and anything below is not a match (`0`).
+There will be situations where there is more agreement than simply 2 annotators agreeing, but less than all three agreeing. 
 
-- Annotators 1 vs Annotator 2: `.53` >= `.25` → match = 1
-- Annotators 1 vs Annotator 3: `.24` <= `.25` → no match = 0
-- Annotators 2 vs Annotator 3: `.45` >= `.25` → match = 1
+For example, in the following image: 
 
-This raises the agreement score to `80.47%` to reflect the higher agreement between Annotator 1 and Annotator 2.
+![Screenshot of opossum bboxes](/images/review/agreement-bbox-opossum.png)
+
+* Annotator 1 and Annotator 2 have strong overlap
+* Annotator 2 and Annotator 3 have strong overlap
+* Annotator 1 and 3 have weak overlap
+
+In these cases, the agreement will be higher to reflect that there is stronger agreement than a simple 2/3 consensus. (In the example above, the agreement score is `80.47%`.)
 
   </div>
 </div>

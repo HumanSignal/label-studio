@@ -12,13 +12,21 @@ parent: "stats"
 parent_enterprise: "stats"
 ---
 
-The following metrics are available out-of-the-box in Label Studio Enterprise. You can use them as is, or you can create your own [custom metrics](custom_metric).
+The following metrics are available for control tags out-of-the-box in Label Studio Enterprise. You can use them as is, or you can create your own [custom metrics](custom_metric).
 
-## Categorical
+## All control tags
 
 | Metric | Description | Tags | Methodology |
 |--------|-------------|------|-------------|
-| **Exact Match** | Evaluates whether annotation results exactly match, with optional label weights | Choices<br/><br/>Taxonomy<br/><br/>Pairwise<br/><br/>DateTime<br/><br/>And most other tag types | Pairwise, Consensus |
+| **Exact Match** | Evaluates whether annotation results exactly match, with optional label weights | All tags | Pairwise, Consensus |
+
+
+## Choices and taxonomy
+
+Categorical metrics are used for categorical control tags, such as `Choices` and `Taxonomy`.
+
+| Metric | Description | Tags | Methodology |
+|--------|-------------|------|-------------|
 | **Common Labels Matches** | Evaluates common label matches for a taxonomy of labels assigned to regions. Computes partial credit along taxonomy paths. | Taxonomy | Pairwise |
 | **Common Labels Matches (Threshold)** | Evaluates common label matches for a taxonomy of labels, returns binarized match based on threshold | Taxonomy | Pairwise, Consensus |
 | **Common Subtree Matches** | Evaluates common subtree matches for a taxonomy of choices. Computes IoU over the subtree of selected taxonomy nodes. | Taxonomy | Pairwise |
@@ -33,7 +41,7 @@ The following metrics are available out-of-the-box in Label Studio Enterprise. Y
 | **Numeric Difference** | Evaluates how similar two numeric values are based on their absolute difference | Number<br/><br/>Rating | Pairwise |
 | **Numeric Difference (Threshold)** | Evaluates whether two numeric values match within a specified tolerance | Number<br/><br/>Rating | Pairwise, Consensus |
 
-## Bounding Box (Rectangles)
+## Rectangles
 
 | Metric | Description | Tags | Methodology |
 |--------|-------------|------|-------------|
@@ -46,7 +54,7 @@ The following metrics are available out-of-the-box in Label Studio Enterprise. Y
 
 \* Nested Choices or TextArea tags inside RectangleLabels/Rectangle tags
 
-## Polygon
+## Polygons
 
 | Metric | Description | Tags | Methodology |
 |--------|-------------|------|-------------|
@@ -59,14 +67,14 @@ The following metrics are available out-of-the-box in Label Studio Enterprise. Y
 
 \* Nested Choices or TextArea tags inside PolygonLabels/Polygon tags
 
-## Brush and Bitmap
+## Brush
 
 | Metric | Description | Tags | Methodology |
 |--------|-------------|------|-------------|
 | **Brush Intersection over Union** | Evaluates pixel overlap between brush mask regions, returns raw IoU score | BrushLabels<br/><br/>Brush | Pairwise |
 | **Brush Intersection over Union (Threshold)** | Evaluates pixel overlap between brush mask regions, returns binarized match based on threshold | BrushLabels<br/><br/>Brush | Pairwise, Consensus |
 
-## Span and segment (Labels, Time Series, Paragraph)
+## Span and segment
 
 | Metric | Description | Tags | Methodology |
 |--------|-------------|------|-------------|
@@ -80,7 +88,7 @@ The following metrics are available out-of-the-box in Label Studio Enterprise. Y
 
 \* Nested Choices or TextArea tags inside Labels tags
 
-## HTML spans (HyperText)
+## HTML spans
 
 | Metric | Description | Tags | Methodology |
 |--------|-------------|------|-------------|
@@ -101,64 +109,19 @@ The following metrics are available out-of-the-box in Label Studio Enterprise. Y
 | **Text Similarity (Threshold)** | Uses the edit distance algorithm to determine if two text annotations match based on a similarity threshold | TextArea | Pairwise, Consensus |
 | **Semantic Similarity** | Evaluates text similarity by comparing semantic meaning using embeddings | User-defined | Pairwise, Consensus |
 
-## Video and keypoints
+## Video 
 
 | Metric | Description | Tags | Methodology |
 |--------|-------------|------|-------------|
 | **Exact Frames Matching for Video** | Evaluates video annotations by comparing exact frame matches | VideoRectangle | Pairwise |
 | **Exact Frames Matching for Video (Threshold)** | Evaluates video annotations by comparing exact frame matches, returns binarized match based on threshold | VideoRectangle | Pairwise, Consensus |
 | **Video Tracking** | Evaluates video tracking by comparing bounding boxes using IoU score across frames | User-defined | Pairwise, Consensus |
+
+## Keypoints
+
+| Metric | Description | Tags | Methodology |
+|--------|-------------|------|-------------|
 | **Keypoint Distance** | Evaluates keypoint annotations by checking if corresponding labeled keypoints are within a coordinate distance threshold | KeypointLabels<br/><br/>Keypoint | Pairwise |
-
-
-## Default metrics by tag
-
-The following table shows which metric is automatically selected when a dimension is created for each tag type.
-
-| Tag | Default Metric |
-|-----|----------------|
-| Choices | Exact Match |
-| Choices (multi-select enabled) | Jaccard Similarity |
-| Taxonomy | Exact Match |
-| Pairwise | Exact Match |
-| DateTime | Exact Match |
-| Number | Numeric Difference |
-| Rating | Numeric Difference |
-| RectangleLabels | Intersection over Union |
-| Rectangle | Intersection over Union |
-| PolygonLabels | Intersection over Union for Polygons |
-| Polygon | Intersection over Union for Polygons |
-| EllipseLabels | Exact Match |
-| BrushLabels | Brush Intersection over Union |
-| Brush | Brush Intersection over Union |
-| BitmaskLabels | Exact Match |
-| Labels | Span Overlap |
-| ParagraphLabels | Span Overlap |
-| TimeSeriesLabels | Span Overlap |
-| TimelineLabels | Span Overlap |
-| HyperTextLabels | Overlap over HTML Spans |
-| TextArea | Text Similarity |
-| VideoRectangle | Exact Frames Matching for Video |
-| KeypointLabels | Exact Match |
-| VectorLabels | Exact Match |
-
-### Nested tag defaults
-
-When a Choices or TextArea tag is nested inside a region tag, a separate default metric is applied:
-
-| Nested Tag Configuration | Default Metric |
-|--------------------------|----------------|
-| Choices inside RectangleLabels / Rectangle | Bounding Box Labels Similarity |
-| Choices inside PolygonLabels / Polygon | Polygon Labels Similarity |
-| Choices inside Labels | Span Labels Similarity |
-| Choices inside HyperTextLabels | HTML Span Labels Similarity |
-| Choices inside EllipseLabels / BitmaskLabels / BrushLabels | Exact Match |
-| TextArea inside RectangleLabels / Rectangle | Bounding Box Text Similarity |
-| TextArea inside PolygonLabels / Polygon | Polygon Text Similarity |
-| TextArea inside Labels | Span Text Similarity |
-| TextArea inside HyperTextLabels | HTML Span Text Similarity |
-| TextArea inside EllipseLabels / BitmaskLabels / BrushLabels | Exact Match |
-
 
 ## Examples
 
