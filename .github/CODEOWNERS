@@ -6,15 +6,15 @@ docs/.npmignore                             @hlomzik @nick-skriabin
 docs/package.json                           @hlomzik @nick-skriabin
 docs/yarn.lock                              @hlomzik @nick-skriabin
 web/libs/editor                             @hlomzik @nick-skriabin
-web/tools                                   @HumanSignal/fine-tuners
-web/libs/datamanager                        @HumanSignal/fine-tuners
-web/design-tokens.json                      @HumanSignal/fine-tuners
-web/libs/ui/**/tokens*                      @HumanSignal/fine-tuners
-web/**/tailwind*                            @HumanSignal/fine-tuners
-web/libs/editor/**/Audio*                   @HumanSignal/fine-tuners
-web/libs/editor/**/Video*                   @HumanSignal/fine-tuners
-web/libs/editor/**/TimeSeries*              @HumanSignal/fine-tuners
-web/apps/labelstudio/src/pages/DataManager  @HumanSignal/fine-tuners
-label_studio/data_manager                   @HumanSignal/fine-tuners
-web/apps/playground                         @HumanSignal/fine-tuners
-label_studio/**/migrations/*.py             @HumanSignal/team-root
+web/tools                                   @HumanSignal/team-fit
+web/libs/datamanager                        @HumanSignal/team-fit
+web/design-tokens.json                      @HumanSignal/team-fit
+web/libs/ui/**/tokens*                      @HumanSignal/team-fit
+web/**/tailwind*                            @HumanSignal/team-fit
+web/libs/editor/**/Audio*                   @HumanSignal/team-fit
+web/libs/editor/**/Video*                   @HumanSignal/team-fit
+web/libs/editor/**/TimeSeries*              @HumanSignal/team-fit
+web/apps/labelstudio/src/pages/DataManager  @HumanSignal/team-fit
+label_studio/data_manager                   @HumanSignal/team-fit
+web/apps/playground                         @HumanSignal/team-fit
+label_studio/**/migrations/*.py             @HumanSignal/migrations
