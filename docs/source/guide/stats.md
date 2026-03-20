@@ -29,7 +29,7 @@ You can view agreement in the following ways:
 
 Agreement is calculated at two levels: 
 
-* Per-control-tag agreement
+* Per-control-tag agreement (also referred to as "question-level agreement")
 * Overall agreement
 
 ![Screenshot](/images/review/agreement-annotated.png)
