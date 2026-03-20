@@ -10,7 +10,10 @@ import {
 } from "@humansignal/shad/components/ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "@humansignal/shad/components/ui/popover";
 import type { SelectOption, OptionProps, SelectProps } from "./types.ts";
-import { Button, Checkbox, Label, Typography } from "@humansignal/ui";
+import { Button } from "../button/button";
+import { Checkbox } from "../checkbox/checkbox";
+import { Label } from "../label/label";
+import { Typography } from "../typography/typography";
 import { Badge } from "../badge/badge";
 import { isDefined } from "@humansignal/core/lib/utils/helpers";
 import { IconChevron, IconChevronDown } from "@humansignal/icons";
