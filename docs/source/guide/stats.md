@@ -338,59 +338,6 @@ All 3 annotators chose the most common answer (`3/3 = 1.0`).
 
 [Non-categorical control tags](#Non-categorical-control-tags) are control tags have continuous values that are not as simple to quantify as "match" or "no match". For example, **RectangleLabels**, **PolygonLabels**, **Labels**, **Labels**.
 
-##### Text spans
-
-When you're labeling text spans, you can use the **Exact Match**, **Span Overlap** or **Span Overlap (Threshold)** metrics. 
-
-In this example, we'll look at **Span Overlap** and **Span Overlap (Threshold)**. 
-
-Span Overlap measures how much annotators' highlighted regions coincide. For more information on how it's calculated, see [Span Overlap](agreement_metrics#Span-overlap). 
-
-
-<div class="code-tabs">
-  <div data-name="Pairwise">
-
-You have three annotators who are highlighting text spans to label as "Positive" or "Negative."
-
-![Pairwise example](/images/review/pairwise-non-categorical-text.png)
-
-* Annotator 1 selects "Positive" and highlights the span `Excellent tool` = characters 0-14
-* Annotator 2 selects "Positive" and highlights the span `tool` = characters 10-14
-* Annotator 3 selects "Negative" and highlights the span `tool` = characters 10-14
-
-Annotator 3's overlap is negated because she chose a different label for her text span. 
-
-* Annotator 1 is compared with Annotator 2: overlap is `4/14 = .29`
-* Annotator 1 is compared with Annotator 3: overlap is `0` because they chose different labels
-* Annotator 2 is compared with Annotator 3: overlap is `0` because they chose different labels
-
-`(.29 + 0 + 0) / 3 = 0.0966`
-
-</div>
-
-<div data-name="Consensus">
-
-You have three annotators who are highlighting text spans to label as "Positive" or "Negative."
-
-![Consensus example](/images/review/consensus-non-categorical-text.png)
-
-* Annotator 1 selects "Positive" and highlights the span `Excellent tool` = characters 0-14
-* Annotator 2 selects "Positive" and highlights the span `tool` = characters 10-14
-* Annotator 3 selects "Negative" and highlights the span `tool` = characters 10-14
-
-Annotator 3's overlap is negated because she chose a different label for her text span. 
-
-Annotator 1 and 2 have 29% overlap (`4/14 = .29`). 
-
-However, Consensus requires binary (`0` or `1`) scores to determine match, which is why you have to select a threshold for non-categorical tags. 
-
-In this case, the threshold is set quite low to `25%`, meaning the annotations submitted by Annotator 1 and Annotator 2 are considered a match. 
-
-Therefore, 2 out of 3 annotators agree, which gives us an agreement score of (`2/3 = .66`).
-
-  </div>
-</div>
-
 ##### Bounding boxes
 
 When you're annotating an image with bounding boxes, you can use the **Exact Match**, **Intersection over Union (IoU)** or **Intersection over Union (IoU) (Threshold)** metrics. 
@@ -470,6 +417,59 @@ For example, in the following image:
 * Annotator 1 and 3 have weak overlap
 
 In these cases, the agreement will be higher to reflect that there is stronger agreement than a simple 2/3 consensus. (In the example above, the agreement score is `80.47%`.)
+
+  </div>
+</div>
+
+##### Text spans
+
+When you're labeling text spans, you can use the **Exact Match**, **Span Overlap** or **Span Overlap (Threshold)** metrics. 
+
+In this example, we'll look at **Span Overlap** and **Span Overlap (Threshold)**. 
+
+Span Overlap measures how much annotators' highlighted regions coincide. For more information on how it's calculated, see [Span Overlap](agreement_metrics#Span-Overlap). 
+
+
+<div class="code-tabs">
+  <div data-name="Pairwise">
+
+You have three annotators who are highlighting text spans to label as "Positive" or "Negative."
+
+![Pairwise example](/images/review/pairwise-non-categorical-text.png)
+
+* Annotator 1 selects "Positive" and highlights the span `Excellent tool` = characters 0-14
+* Annotator 2 selects "Positive" and highlights the span `tool` = characters 10-14
+* Annotator 3 selects "Negative" and highlights the span `tool` = characters 10-14
+
+Annotator 3's overlap is negated because she chose a different label for her text span. 
+
+* Annotator 1 is compared with Annotator 2: overlap is `4/14 = .29`
+* Annotator 1 is compared with Annotator 3: overlap is `0` because they chose different labels
+* Annotator 2 is compared with Annotator 3: overlap is `0` because they chose different labels
+
+`(.29 + 0 + 0) / 3 = 0.0966`
+
+</div>
+
+<div data-name="Consensus">
+
+You have three annotators who are highlighting text spans to label as "Positive" or "Negative."
+
+![Consensus example](/images/review/consensus-non-categorical-text.png)
+
+* Annotator 1 selects "Positive" and highlights the span `Excellent tool` = characters 0-14
+* Annotator 2 selects "Positive" and highlights the span `tool` = characters 10-14
+* Annotator 3 selects "Negative" and highlights the span `tool` = characters 10-14
+
+Annotator 3's overlap is negated because she chose a different label for her text span. 
+
+Annotator 1 and 2 have 29% overlap (`4/14 = .29`). 
+
+However, Consensus requires binary (`0` or `1`) scores to determine match, which is why you have to select a threshold for non-categorical tags. 
+
+In this case, the threshold is set quite low to `25%`, meaning the annotations submitted by Annotator 1 and Annotator 2 are considered a match. 
+
+Therefore, 2 out of 3 annotators agree, which gives us an agreement score of (`2/3 = .66`).
 
   </div>
 </div>
