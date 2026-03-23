@@ -18,6 +18,10 @@ import { when, runInAction } from "mobx";
 import { isAlive } from "mobx-state-tree";
 import { imageCache } from "@humansignal/core";
 import { invalidateAnnotationCache, invalidateDistributionCache } from "@humansignal/core/lib/utils/annotation-cache";
+import {
+  annotationNeedsHydration,
+  applyAnnotationHydrationFromApi,
+} from "../../../editor/src/utils/annotationLazyHydration";
 
 const waitForPaint = () =>
   new Promise((resolve) => {
@@ -1230,18 +1234,7 @@ export class LSFWrapper {
 
   // FIT-720: Hydrate a stub annotation by fetching full data from API
   _hydrateStubAnnotation = async (annotation) => {
-    // Check if annotation is a stub (no regions/results)
-    // Stubs have empty results - check via the areas map which holds deserialized regions
-    const hasRegions = annotation.areas?.size > 0;
-    const isUserGenerated = annotation.userGenerate && !annotation.sentUserGenerate;
-
-    // Also check versions.result to see if the annotation was loaded with actual results
-    const versionsResult = annotation.versions?.result;
-    const hasVersionsResult = Array.isArray(versionsResult) && versionsResult.length > 0;
-
-    // Skip if already hydrated or is a new user-generated annotation
-    // Use versionsResult as the source of truth - if it has data, the annotation is already hydrated
-    if (hasVersionsResult || isUserGenerated) {
+    if (!annotationNeedsHydration(annotation)) {
       return;
     }
 
@@ -1252,47 +1245,7 @@ export class LSFWrapper {
         annotationID: annotationPk,
       });
 
-      if (fullAnnotation?.result && !fullAnnotation.error) {
-        // IMPORTANT: Re-fetch the annotation from the store after async operation
-        // The original reference might be stale (user navigated, scrolled, etc.)
-        // which causes MST "object is protected" errors
-        const freshAnnotation = this.annotations.find((a) => String(a.pk) === String(annotationPk));
-        if (!freshAnnotation) {
-          // Annotation no longer exists in the store
-          return;
-        }
-        if (!isAlive(freshAnnotation) || !isAlive(freshAnnotation.trackedState)) {
-          // Annotation node was detached while hydration request was in-flight
-          return;
-        }
-
-        // Check if annotation was already hydrated while we were fetching
-        const freshVersionsResult = freshAnnotation.versions?.result;
-        const freshHasVersionsResult = Array.isArray(freshVersionsResult) && freshVersionsResult.length > 0;
-        const freshHasRegions = freshAnnotation.areas?.size > 0;
-
-        if (freshHasVersionsResult || freshHasRegions) {
-          // Already hydrated (possibly by another code path)
-          return;
-        }
-
-        // Freeze history to prevent undo/redo issues during hydration
-        freshAnnotation.history?.freeze?.();
-
-        // Deserialize the results into the annotation
-        if (!isAlive(freshAnnotation) || !isAlive(freshAnnotation.trackedState)) return;
-        freshAnnotation.deserializeResults(fullAnnotation.result);
-
-        // Critical: updateObjects() MUST be called to render visual regions after deserializing
-        freshAnnotation.updateObjects?.();
-
-        // Unfreeze history
-        freshAnnotation.history?.safeUnfreeze?.();
-
-        // reinitHistory cancels autosave and sets initial values so LSF knows this is the base state
-        // This prevents the hydration from being treated as a user modification
-        freshAnnotation.reinitHistory?.();
-      }
+      applyAnnotationHydrationFromApi(this.annotations, annotationPk, fullAnnotation);
     } catch {
       // Failed to hydrate annotation - will show stub state
     }

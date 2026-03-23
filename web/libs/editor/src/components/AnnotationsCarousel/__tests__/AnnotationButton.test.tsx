@@ -1,9 +1,19 @@
-import { render, screen, fireEvent } from "@testing-library/react";
+import type { ReactElement } from "react";
+import { render as rtlRender, screen, fireEvent, waitFor } from "@testing-library/react";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Provider } from "mobx-react";
+import { FF_FIT_720_LAZY_LOAD_ANNOTATIONS } from "@humansignal/core/lib/utils/feature-flags";
 import { AnnotationButton } from "../AnnotationButton";
 
 jest.mock("mobx-state-tree", () => ({
   isAlive: jest.fn(() => true),
+}));
+
+const mockFetchAnnotationCached = jest.fn();
+jest.mock("../../../hooks/useAnnotationQuery", () => ({
+  useAnnotationFetcher: () => ({
+    fetchAnnotationCached: mockFetchAnnotationCached,
+  }),
 }));
 
 jest.mock("@humansignal/core/hooks/useResolveUser", () => ({
@@ -29,8 +39,9 @@ jest.mock("../../../common/Modal/Modal", () => ({
   confirm: jest.fn(),
 }));
 
+const mockIsFF = jest.fn(() => false);
 jest.mock("../../../utils/feature-flags", () => ({
-  isFF: () => false,
+  isFF: (flag: string) => mockIsFF(flag),
 }));
 
 const defaultCapabilities = {
@@ -53,6 +64,11 @@ const defaultAnnotationStore = {
   addAnnotationFromPrediction: jest.fn(),
   toggleViewingAllAnnotations: jest.fn(),
 };
+
+function render(ui: ReactElement) {
+  const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+  return rtlRender(<QueryClientProvider client={client}>{ui}</QueryClientProvider>);
+}
 
 function createEntity(overrides: Record<string, unknown> = {}) {
   return {
@@ -77,6 +93,8 @@ function createEntity(overrides: Record<string, unknown> = {}) {
 describe("AnnotationButton", () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    mockIsFF.mockReturnValue(false);
+    mockFetchAnnotationCached.mockReset();
     const { isAlive } = jest.requireMock("mobx-state-tree");
     (isAlive as jest.Mock).mockReturnValue(true);
   });
@@ -512,10 +530,52 @@ describe("AnnotationButton", () => {
     );
     fireEvent.click(container.querySelector(".ls-annotation-button__trigger")!);
     fireEvent.click(screen.getByText("Duplicate Annotation"));
+    expect(mockFetchAnnotationCached).not.toHaveBeenCalled();
     expect(addAnnotationFromPrediction).toHaveBeenCalledWith(entity);
     jest.runAllTimers();
     expect(selectAnnotation).toHaveBeenCalledWith(99, { exitViewAll: true });
     jest.useRealTimers();
+  });
+
+  it("fetches annotation before duplicate when lazy-load FF is on and annotation is a stub", async () => {
+    mockIsFF.mockImplementation((f) => f === FF_FIT_720_LAZY_LOAD_ANNOTATIONS);
+    mockFetchAnnotationCached.mockResolvedValue({ result: [{ id: "region-1" }] });
+    const newAnnotation = { id: 99 };
+    const addAnnotationFromPrediction = jest.fn().mockReturnValue(newAnnotation);
+    const selectAnnotation = jest.fn();
+    const entity = createEntity({
+      userGenerate: false,
+      versions: { result: [] },
+      areas: { size: 0 },
+      deserializeResults: jest.fn(),
+      updateObjects: jest.fn(),
+      reinitHistory: jest.fn(),
+      history: { freeze: jest.fn(), safeUnfreeze: jest.fn() },
+      trackedState: {},
+    });
+    const { container } = render(
+      <Provider store={defaultStore}>
+        <AnnotationButton
+          entity={entity}
+          capabilities={defaultCapabilities}
+          annotationStore={
+            {
+              ...defaultAnnotationStore,
+              store: defaultStore,
+              annotations: [entity],
+              addAnnotationFromPrediction,
+              selectAnnotation,
+            } as any
+          }
+        />
+      </Provider>,
+    );
+    fireEvent.click(container.querySelector(".ls-annotation-button__trigger")!);
+    fireEvent.click(screen.getByText("Duplicate Annotation"));
+    await waitFor(() => expect(mockFetchAnnotationCached).toHaveBeenCalledWith(1));
+    await waitFor(() => expect(entity.deserializeResults).toHaveBeenCalled());
+    await waitFor(() => expect(addAnnotationFromPrediction).toHaveBeenCalledWith(entity));
+    await waitFor(() => expect(selectAnnotation).toHaveBeenCalledWith(99, { exitViewAll: true }));
   });
 
   it("calls setGroundTruth(false) when Unset as Ground Truth is clicked", () => {

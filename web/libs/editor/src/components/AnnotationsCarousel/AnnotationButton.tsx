@@ -27,10 +27,13 @@ import {
   IconCrossAlt,
   IconEllipsisVertical,
 } from "@humansignal/icons";
+import { FF_FIT_720_LAZY_LOAD_ANNOTATIONS } from "@humansignal/core/lib/utils/feature-flags";
 import { Tooltip, Userpic, ToastType, useToast, Badge, DropdownTrigger } from "@humansignal/ui";
 import { TimeAgo } from "../../common/TimeAgo/TimeAgo";
 import { useDropdown } from "@humansignal/ui";
+import { useAnnotationFetcher } from "../../hooks/useAnnotationQuery";
 import { isFF } from "../../utils/feature-flags";
+import { annotationNeedsHydration, applyAnnotationHydrationFromApi } from "../../utils/annotationLazyHydration";
 
 // eslint-disable-next-line
 // @ts-ignore
@@ -360,6 +363,7 @@ const AnnotationButtonContextMenu = injector(
       const [copyLink] = useCopyText({ defaultText: annotationLink });
       const toast = useToast();
       const dropdown = useDropdown();
+      const { fetchAnnotationCached } = useAnnotationFetcher();
       const clickHandler = () => {
         onAnnotationChange?.();
         dropdown?.close();
@@ -368,14 +372,40 @@ const AnnotationButtonContextMenu = injector(
         entity.setGroundTruth(!isGroundTruth);
         clickHandler();
       }, [entity, isGroundTruth]);
-      const duplicateAnnotation = useCallback<MenuActionOnClick>(() => {
-        const c = annotationStore.addAnnotationFromPrediction(entity);
+      const duplicateAnnotation = useCallback<MenuActionOnClick>(async () => {
+        try {
+          if (
+            isFF(FF_FIT_720_LAZY_LOAD_ANNOTATIONS) &&
+            entity.type === "annotation" &&
+            entity.pk &&
+            annotationNeedsHydration(entity)
+          ) {
+            const data = await fetchAnnotationCached(entity.pk);
+            if (!data || (data as { error?: unknown }).error) {
+              toast?.show({
+                message: "Could not load annotation to duplicate. Try selecting it first.",
+                type: ToastType.error,
+              });
+              return;
+            }
+            applyAnnotationHydrationFromApi(annotationStore.annotations, entity.pk, data);
+          }
 
-        window.setTimeout(() => {
-          annotationStore.selectAnnotation(c.id, { exitViewAll: true });
-          clickHandler();
-        });
-      }, [entity, annotationStore]);
+          if (!isAlive(entity)) return;
+
+          const c = annotationStore.addAnnotationFromPrediction(entity);
+
+          window.setTimeout(() => {
+            annotationStore.selectAnnotation(c.id, { exitViewAll: true });
+            clickHandler();
+          });
+        } catch {
+          toast?.show({
+            message: "Could not duplicate annotation.",
+            type: ToastType.error,
+          });
+        }
+      }, [entity, annotationStore, fetchAnnotationCached, toast, clickHandler]);
       const linkAnnotation = useCallback<MenuActionOnClick>(() => {
         copyLink();
         dropdown?.close();
