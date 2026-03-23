@@ -1,4 +1,5 @@
 import json
+from pathlib import Path
 from unittest import TestCase
 
 import pytest
@@ -195,7 +196,7 @@ def test_webhooks_for_tasks_import(configured_project, business_client, organiza
 
     webhook = organization_webhook
 
-    IMPORT_CSV = 'tests/test_suites/samples/test_5.csv'
+    IMPORT_CSV = Path(__file__).parent.parent / 'test_suites' / 'samples' / 'test_5.csv'
 
     with open(IMPORT_CSV, 'rb') as file_:
         data = SimpleUploadedFile('test_5.csv', file_.read(), content_type='multipart/form-data')

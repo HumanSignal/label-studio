@@ -190,3 +190,17 @@ dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
 
 [tool.ruff.format]
 quote-style = "single"
+
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "core.settings.label_studio"
+python_files = ["tests.py", "test_*.py", "*_tests.py"]
+addopts = "-p no:warnings"
+tavern-global-cfg = ["label_studio/tests/shared_stages.yml"]
+env = [
+    "D:SENTRY_RATE=0",
+    "D:SENTRY_DSN=",
+    "D:USE_ENFORCE_CSRF_CHECKS=0",
+    "D:TEST_ENVIRONMENT=1",
+    "COLLECT_ANALYTICS=0",
+    "fflag_feat_fit_568_finite_state_management=1",
+]

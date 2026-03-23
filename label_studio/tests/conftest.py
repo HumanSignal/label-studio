@@ -752,7 +752,7 @@ def local_files_storage(settings):
     tempdir = Path(tempfile.gettempdir()) / Path('files')
     subdir = tempdir / Path('subdir')
     os.makedirs(str(subdir), exist_ok=True)
-    test_image = Path(*'tests/test_suites/samples/test_image.png'.split('/'))
+    test_image = Path(__file__).parent / 'test_suites' / 'samples' / 'test_image.png'
     shutil.copyfile(str(test_image), str(tempdir / Path('test_image1.png')))
     shutil.copyfile(str(test_image), str(subdir / Path('test_image2.png')))
 

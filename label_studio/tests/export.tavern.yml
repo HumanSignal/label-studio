@@ -24,7 +24,7 @@ stages:
 - name: stage
   request:
     files:
-      file: tests/test_suites/samples/lines.txt
+      file: label_studio/tests/test_suites/samples/lines.txt
     headers:
       content-type: multipart/form-data
     method: POST

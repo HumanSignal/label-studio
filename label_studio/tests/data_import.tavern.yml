@@ -22,8 +22,8 @@ stages:
 - name: stage
   request:
     files:
-      image_0: tests/test_suites/samples/test_image.jpg
-      image_1: tests/test_suites/samples/test_image.png
+      image_0: label_studio/tests/test_suites/samples/test_image.jpg
+      image_1: label_studio/tests/test_suites/samples/test_image.png
     headers:
       content-type: multipart/form-data
     method: POST
@@ -65,7 +65,7 @@ stages:
 - name: stage
   request:
     files:
-      csv_0: tests/test_suites/samples/test_1.csv
+      csv_0: label_studio/tests/test_suites/samples/test_1.csv
     headers:
       content-type: multipart/form-data
     method: POST
@@ -79,7 +79,7 @@ stages:
 - name: stage
   request:
     files:
-      csv_0: tests/test_suites/samples/test_2.csv
+      csv_0: label_studio/tests/test_suites/samples/test_2.csv
     headers:
       content-type: multipart/form-data
     method: POST
@@ -132,7 +132,7 @@ stages:
 - name: stage
   request:
     files:
-      csv_0: tests/test_suites/samples/random-with-predictions.json
+      csv_0: label_studio/tests/test_suites/samples/random-with-predictions.json
     headers:
       content-type: multipart/form-data
     method: POST
@@ -212,8 +212,8 @@ stages:
 - name: stage
   request:
     files:
-      image_0: tests/test_suites/samples/first.jpg
-      image_1: tests/test_suites/samples/second.jpg
+      image_0: label_studio/tests/test_suites/samples/first.jpg
+      image_1: label_studio/tests/test_suites/samples/second.jpg
     headers:
       content-type: multipart/form-data
     method: POST
@@ -317,8 +317,8 @@ stages:
 - name: stage
   request:
     files:
-      csv_1: tests/test_suites/samples/test_3.csv
-      csv_2: tests/test_suites/samples/test_4.csv
+      csv_1: label_studio/tests/test_suites/samples/test_3.csv
+      csv_2: label_studio/tests/test_suites/samples/test_4.csv
     headers:
       content-type: multipart/form-data
     method: POST
@@ -390,7 +390,7 @@ stages:
 - name: stage
   request:
     files:
-      json: tests/test_suites/samples/previous_export.json
+      json: label_studio/tests/test_suites/samples/previous_export.json
     headers:
       content-type: multipart/form-data
     method: POST
@@ -419,7 +419,7 @@ stages:
 - name: stage
   request:
     files:
-      json: tests/test_suites/samples/previous_export.json
+      json: label_studio/tests/test_suites/samples/previous_export.json
     headers:
       content-type: multipart/form-data
     method: POST
@@ -437,7 +437,7 @@ stages:
 - name: stage
   request:
     files:
-      json: tests/test_suites/samples/previous_export_unknown_completed_by.json
+      json: label_studio/tests/test_suites/samples/previous_export_unknown_completed_by.json
     headers:
       content-type: multipart/form-data
     method: POST
@@ -475,7 +475,7 @@ stages:
 - name: Import images with preannotations
   request:
     files:
-      csv: tests/test_suites/samples/image_urls_with_classes.csv
+      csv: label_studio/tests/test_suites/samples/image_urls_with_classes.csv
     headers:
       content-type: multipart/form-data
     method: POST
@@ -548,7 +548,7 @@ stages:
 - name: Import images with preannotations
   request:
     files:
-      csv: tests/test_suites/samples/image_urls_with_bboxes.json
+      csv: label_studio/tests/test_suites/samples/image_urls_with_bboxes.json
     headers:
       content-type: multipart/form-data
     method: POST
@@ -609,7 +609,7 @@ stages:
 - name: Import images
   request:
     files:
-      csv: tests/test_suites/samples/image_urls.csv
+      csv: label_studio/tests/test_suites/samples/image_urls.csv
     headers:
       content-type: multipart/form-data
     method: POST
@@ -725,7 +725,7 @@ stages:
 - name: Import images with preannotations
   request:
     files:
-      csv: tests/test_suites/samples/image_urls_with_bboxes_gt.json
+      csv: label_studio/tests/test_suites/samples/image_urls_with_bboxes_gt.json
     headers:
       content-type: multipart/form-data
     method: POST
@@ -769,7 +769,7 @@ stages:
 - name: stage
   request:
     files:
-      file: tests/test_suites/samples/test.wrong_ext
+      file: label_studio/tests/test_suites/samples/test.wrong_ext
     headers:
       content-type: multipart/form-data
     method: POST
@@ -805,7 +805,7 @@ stages:
 - name: stage
   request:
     files:
-      file: tests/test_suites/samples/test_file_without_extension
+      file: label_studio/tests/test_suites/samples/test_file_without_extension
     headers:
       content-type: multipart/form-data
     method: POST
