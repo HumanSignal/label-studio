@@ -64,12 +64,6 @@ export const FF_NER_SELECT_ALL = "fflag_feat_front_bros_199_enable_select_all_in
 export const FF_LSDV_4583 = "fflag_feat_front_lsdv_4583_multi_image_segmentation_short";
 
 /**
- * Allows to count time spend on textarea results and store it to lead_time meta field
- * @link https://app.launchdarkly.com/default/production/features/fflag_fix_front_lsdv_4600_lead_time_27072023_short
- */
-export const FF_LEAD_TIME = "fflag_fix_front_lsdv_4600_lead_time_27072023_short";
-
-/**
  * Fixes memory leaks in label studio frontend relative to mobx-state-tree and react usage
  *
  * @link https://app.launchdarkly.com/default/production/features/fflag_fix_front_lsdv_4620_memory_leaks_100723_short
