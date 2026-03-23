@@ -33,7 +33,10 @@ import { TimeAgo } from "../../common/TimeAgo/TimeAgo";
 import { useDropdown } from "@humansignal/ui";
 import { useAnnotationFetcher } from "../../hooks/useAnnotationQuery";
 import { isFF } from "../../utils/feature-flags";
-import { annotationNeedsHydration, applyAnnotationHydrationFromApi } from "../../utils/annotationLazyHydration";
+import {
+  annotationNeedsHydration,
+  applyAnnotationHydrationFromApi,
+} from "@humansignal/core/lib/utils/annotationLazyHydration";
 
 // eslint-disable-next-line
 // @ts-ignore

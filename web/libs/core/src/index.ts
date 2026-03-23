@@ -48,3 +48,6 @@ export {
   invalidateAnnotationCache,
   invalidateDistributionCache,
 } from "./lib/utils/annotation-cache";
+
+// FIT-720: Lazy annotation stub hydration (editor + datamanager)
+export { annotationNeedsHydration, applyAnnotationHydrationFromApi } from "./lib/utils/annotationLazyHydration";

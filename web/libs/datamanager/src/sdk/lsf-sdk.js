@@ -21,7 +21,7 @@ import { invalidateAnnotationCache, invalidateDistributionCache } from "@humansi
 import {
   annotationNeedsHydration,
   applyAnnotationHydrationFromApi,
-} from "../../../editor/src/utils/annotationLazyHydration";
+} from "@humansignal/core/lib/utils/annotationLazyHydration";
 
 const waitForPaint = () =>
   new Promise((resolve) => {

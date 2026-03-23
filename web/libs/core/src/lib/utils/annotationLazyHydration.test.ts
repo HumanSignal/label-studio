@@ -1,4 +1,4 @@
-import { annotationNeedsHydration, applyAnnotationHydrationFromApi } from "../annotationLazyHydration";
+import { annotationNeedsHydration, applyAnnotationHydrationFromApi } from "./annotationLazyHydration";
 
 jest.mock("mobx-state-tree", () => ({
   isAlive: jest.fn(() => true),
