@@ -16,6 +16,8 @@ Task agreement, also known as "labeling consensus" or "annotation consensus," sh
 
 Agreement helps you determine the quality of your dataset, its readiness to be used to train models, and assess the performance of your annotators and reviewers.
 
+<iframe class="video-border" style="width: 560px; display: block; margin-left: auto; margin-right: auto;" src="https://www.youtube.com/embed/ivT4UN5LzFw?si=UK88TAuE_iNOEkhj" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
 ## View agreement
 
 You can view agreement in the following ways:
@@ -352,6 +354,10 @@ The idea is:
 - **Union**: The total area covered by both boxes together
 
 For more information on how IoU is calculated, see [Intersection over Union (IoU)](agreement_metrics#Intersection-over-Union-for-bounding-boxes).
+
+For more information on thresholds, see the following video:
+
+<iframe class="video-border" style="width: 560px; display: block; margin-left: auto; margin-right: auto;" src="https://www.youtube.com/embed/j5xsZQHQ_s0?si=k0QqWNpKBdJD_FW2" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 
 <div class="code-tabs">
   <div data-name="Pairwise">

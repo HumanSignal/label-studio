@@ -303,7 +303,7 @@ Label Studio is available to everyone as open source software (Label Studio Comm
   <tr>
     <td><b>Agreement metrics</b><br/><a href="https://docs.humansignal.com/guide/stats.html">Define how annotator consensus is calculated using pre-defined agreement metrics.</a></td>
     <td style="text-align:center">❌</td>
-    <td style="text-align:center">✅</td>
+    <td style="text-align:center">Limited</td>
     <td style="text-align:center">✅</td>
   </tr>
   <tr>
