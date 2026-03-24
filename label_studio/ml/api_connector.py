@@ -201,6 +201,7 @@ class MLApi(BaseHTTPAPI):
                 'annotations': tasks_ser,
                 'project': self._create_project_uid(project),
                 'label_config': project.label_config,
+                'hostname': settings.HOSTNAME if settings.HOSTNAME else ('http://localhost:' + settings.INTERNAL_PORT),
                 'params': {'login': project.task_data_login, 'password': project.task_data_password},
             }
             return self._request('train', request, verbose=False, timeout=TIMEOUT_PREDICT)
@@ -213,6 +214,7 @@ class MLApi(BaseHTTPAPI):
             'params': {
                 'login': project.task_data_login,
                 'password': project.task_data_password,
+                'hostname': settings.HOSTNAME if settings.HOSTNAME else ('http://localhost:' + settings.INTERNAL_PORT),
                 'context': context,
             },
         }
