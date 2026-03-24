@@ -1008,6 +1008,18 @@
         "decorators": ""
     },
     {
+        "url": "/api/react-code/token/",
+        "module": "io_storages.react_code_proxy.ReactCodeTokenView",
+        "name": "storages:react-code-token",
+        "decorators": ""
+    },
+    {
+        "url": "/api/react-code/resolve/<str:token>/",
+        "module": "io_storages.react_code_proxy.ReactCodeResolveView",
+        "name": "storages:react-code-resolve",
+        "decorators": ""
+    },
+    {
         "url": "/api/ml/",
         "module": "ml.api.MLBackendListAPI",
         "name": "ml:api:ml-list",
