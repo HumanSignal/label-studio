@@ -5,8 +5,6 @@ import Utils from "../../utils";
 import { snakeizeKeys } from "../../utils/utilities";
 import { parseCommentClassificationConfig } from "../../utils/commentClassification";
 import { Comment } from "./Comment";
-import { FF_DEV_3034, isFF } from "../../utils/feature-flags";
-
 export const CommentStore = types
   .model("CommentStore", {
     loading: types.optional(types.maybeNull(types.string), "list"),
@@ -68,10 +66,7 @@ export const CommentStore = types
       return self.task?.id;
     },
     get canPersist() {
-      if (isFF(FF_DEV_3034)) {
-        return self.taskId !== null && self.taskId !== undefined;
-      }
-      return self.annotationId !== null && self.annotationId !== undefined;
+      return self.taskId !== null && self.taskId !== undefined;
     },
     get isCommentable() {
       return !self.annotation || ["annotation"].includes(self.annotation.type);
@@ -220,7 +215,7 @@ export const CommentStore = types
 
       if (!self.canPersist || !toPersist.length) return;
 
-      if (isFF(FF_DEV_3034) && !self.annotationId && !self.draftId) {
+      if (!self.annotationId && !self.draftId) {
         await self.store.submitDraft(self.annotation);
       }
 
@@ -268,7 +263,7 @@ export const CommentStore = types
       let refetchList = false;
       const { annotation } = self;
 
-      if (isFF(FF_DEV_3034) && !self.annotationId && !self.draftId) {
+      if (!self.annotationId && !self.draftId) {
         // rare case: draft is already saving, commit the outstanding draft before adding a comment
         if (annotation.history.hasChanges && !annotation.draftSaved) {
           // commit the pending draft

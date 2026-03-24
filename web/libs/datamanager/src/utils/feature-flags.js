@@ -12,8 +12,6 @@ export const FF_DEV_2536 = "fflag_feat_front_dev-2536_comment_notifications_shor
 // Comments for annotation editor
 export const FF_DEV_2887 = "fflag-feat-dev-2887-comments-ui-editor-short";
 
-export const FF_DEV_3034 = "fflag-feat-dev-3034-comments-with-drafts-short";
-
 /**
  * Support for Datasets functionality.
  */

@@ -9,7 +9,7 @@ import Types from "../../core/Types";
 import { StoreExtender } from "../../mixins/SharedChoiceStore/extender";
 import { ViewModel } from "../../tags/visual";
 import Utils from "../../utils";
-import { FF_DEV_3034, FF_DEV_3391, FF_SIMPLE_INIT, isFF } from "../../utils/feature-flags";
+import { FF_DEV_3391, FF_SIMPLE_INIT, isFF } from "../../utils/feature-flags";
 import { emailFromCreatedBy } from "../../utils/utilities";
 import ToolsManager from "../../tools/Manager";
 import { Annotation } from "./Annotation";
@@ -423,14 +423,12 @@ const AnnotationStoreModel = types
       if (item.userGenerate) {
         let actual_user;
 
-        if (isFF(FF_DEV_3034)) {
-          // drafts can be created by other user, but we don't have much info
-          // so parse "id", get email and find user by it
-          const email = emailFromCreatedBy(item.createdBy);
-          const user = email && self.store.users.find((user) => user.email === email);
+        // drafts can be created by other user, but we don't have much info
+        // so parse "id", get email and find user by it
+        const email = emailFromCreatedBy(item.createdBy);
+        const user = email && self.store.users.find((user) => user.email === email);
 
-          if (user) actual_user = user.id;
-        }
+        if (user) actual_user = user.id;
         item.completed_by = actual_user ?? getRoot(self).user?.id ?? undefined;
       }
 

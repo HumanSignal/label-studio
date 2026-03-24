@@ -3,7 +3,6 @@ import {
   FF_DEV_1752,
   FF_DEV_2186,
   FF_DEV_2887,
-  FF_DEV_3034,
   FF_LSDV_4620_3_ML,
   FF_FIT_1304_STRICT_OVERLAP,
   isFF,
@@ -1094,43 +1093,9 @@ export class LSFWrapper {
     await this.withinLoadingState(async () => {
       currentAnnotation.pauseAutosave();
 
-      if (isFF(FF_DEV_3034)) {
-        await this.datamanager.apiCall("convertToDraft", {
-          annotationID: currentAnnotation.pk,
-        });
-      } else {
-        if (currentAnnotation.draftId > 0) {
-          await this.datamanager.apiCall(
-            "updateDraft",
-            {
-              draftID: currentAnnotation.draftId,
-            },
-            {
-              body: { annotation: null },
-            },
-          );
-        } else {
-          const annotationData = { body: this.prepareData(currentAnnotation) };
-
-          await this.datamanager.apiCall(
-            "createDraftForTask",
-            {
-              taskID: this.task.id,
-            },
-            annotationData,
-          );
-        }
-
-        // Carry over any comments to when the annotation draft is eventually submitted
-        if (isFF(FF_DEV_2887) && this.lsf?.commentStore?.toCache) {
-          this.lsf.commentStore.toCache(`task.${task.id}`);
-        }
-
-        await this.datamanager.apiCall("deleteAnnotation", {
-          taskID: task.id,
-          annotationID: currentAnnotation.pk,
-        });
-      }
+      await this.datamanager.apiCall("convertToDraft", {
+        annotationID: currentAnnotation.pk,
+      });
     });
     await this.loadTask(task.id);
     this.datamanager.invoke("unskipTask");

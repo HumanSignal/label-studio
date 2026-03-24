@@ -6,8 +6,7 @@ import { cn } from "../../utils/bem";
 import { CommentForm } from "./Comment/CommentForm";
 import { CommentsList } from "./Comment/CommentsList";
 import { useMounted } from "../../common/Utils/useMounted";
-import { FF_DEV_3034, isFF } from "../../utils/feature-flags";
-import { FF_FIT_720_LAZY_LOAD_ANNOTATIONS } from "@humansignal/core/lib/utils/feature-flags";
+import { FF_FIT_720_LAZY_LOAD_ANNOTATIONS, isFF } from "@humansignal/core/lib/utils/feature-flags";
 
 import "./Comments.prefix.css";
 
@@ -24,9 +23,8 @@ const CommentsLoadingSkeleton: FC = () => (
 export const Comments: FC<{
   annotationStore: any;
   commentStore: any;
-  cacheKey?: string;
   isActive?: boolean; // FIT-720: Only fetch comments when tab is active (when FF enabled)
-}> = observer(({ annotationStore, commentStore, cacheKey, isActive = true }) => {
+}> = observer(({ annotationStore, commentStore, isActive = true }) => {
   const mounted = useMounted();
   // Track the annotation ID we last loaded comments for (FIT-720)
   const lastLoadedAnnotationId = useRef<string | null>(null);
@@ -46,9 +44,6 @@ export const Comments: FC<{
 
     if (!mounted.current) return;
 
-    if (!isFF(FF_DEV_3034)) {
-      commentStore.restoreCommentsFromCache(cacheKey);
-    }
     // Track that we loaded comments for this annotation (FIT-720)
     lastLoadedAnnotationId.current = annotationId ?? null;
   };
