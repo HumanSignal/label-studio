@@ -43,6 +43,10 @@ The charts show distribution of labels from annotations and from predictions.
 
 ![Screenshot of Label distribution dashboard](/images/analytics/label-dist-charts.png)
 
+You can click the overflow menu next to each chart to view it as a pie chart or to export the data as a CSV file.
+
+![Screenshot of Label distribution dashboard](/images/analytics/label-dist-menu.png)
+
 ## Label distribution tables
 
 The label distribution table shows a detailed distribution of labels from annotations and from predictions, shown as total count and as a percentage relative to the total number of annotations/predictions. 
