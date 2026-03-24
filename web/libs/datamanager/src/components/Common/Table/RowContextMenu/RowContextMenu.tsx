@@ -91,7 +91,7 @@ export const RowContextMenu: FC<RowContextMenuProps> = ({
 
   // 2. Copy cell content
   const handleCopyCellContent = useCallback(async () => {
-    if (!cellValue) {
+    if (cellValue == null || (typeof cellValue === "string" && cellValue.trim() === "")) {
       showToast("No content to copy", "error");
       onClose();
       return;
