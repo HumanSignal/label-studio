@@ -364,7 +364,6 @@ marks:
   - skipif: '"Windows" in platform.system()'
   - usefixtures:
       - django_live_url
-      - ff_back_dev_4664_remove_storage_file_on_export_delete_29032023_short_on
 stages:
   - id: signup
     type: ref
@@ -424,5 +423,5 @@ stages:
       verify_response_with:
         function: label_studio.tests.utils:file_exists_in_storage
         extra_kwargs:
-          exists: false
+          exists: true
           file_path: "{convert_file_path}"

@@ -9,7 +9,6 @@ from datetime import datetime
 
 import ujson as json
 from core import version
-from core.feature_flags import flag_set
 from core.utils.common import load_func
 from core.utils.io import get_all_files_from_dir, get_temp_dir, path_to_open_binary_file
 from django.conf import settings
@@ -247,7 +246,4 @@ class ConvertedFormat(models.Model):
     )
 
     def delete(self, *args, **kwargs):
-        if flag_set('ff_back_dev_4664_remove_storage_file_on_export_delete_29032023_short'):
-            if self.file:
-                self.file.delete()
         super().delete(*args, **kwargs)

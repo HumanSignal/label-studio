@@ -10,7 +10,6 @@ from core.feature_flags import flag_set
 from core.permissions import all_permissions
 from core.redis import start_job_async_or_sync
 from core.utils.common import batch
-from core.utils.exceptions import extract_message
 from django.conf import settings
 from django.core.files import File
 from django.core.files.storage import FileSystemStorage
@@ -463,23 +462,6 @@ class ExportDetailAPI(generics.RetrieveDestroyAPIView):
     permission_required = all_permissions.projects_change
 
     def delete(self, *args, **kwargs):
-        if flag_set('ff_back_dev_4664_remove_storage_file_on_export_delete_29032023_short'):
-            try:
-                export = self.get_object()
-                export.file.delete()
-
-                for converted_format in export.converted_formats.all():
-                    if converted_format.file:
-                        converted_format.file.delete()
-            except Exception as e:
-                return Response(
-                    status=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                    data={
-                        'detail': 'Could not delete file from storage. Check that your user has permissions to delete files: %s'
-                        % extract_message(e)
-                    },
-                )
-
         return super().delete(*args, **kwargs)
 
     def _get_project(self):
