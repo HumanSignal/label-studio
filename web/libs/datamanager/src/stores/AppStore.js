@@ -1,7 +1,7 @@
 import { destroy, flow, types } from "mobx-state-tree";
 import { runInAction } from "mobx";
 import { Modal } from "../components/Common/Modal/Modal";
-import { FF_DEV_2887, FF_DISABLE_GLOBAL_USER_FETCHING, FF_LOPS_E_3, isFF } from "../utils/feature-flags";
+import { FF_DISABLE_GLOBAL_USER_FETCHING, FF_LOPS_E_3, isFF } from "../utils/feature-flags";
 import { History } from "../utils/history";
 import { isDefined } from "../utils/utils";
 import { Action } from "./Action";
@@ -331,7 +331,7 @@ export const AppStore = types
         }
       };
 
-      if (isFF(FF_DEV_2887) && self.LSF?.lsf?.annotationStore?.selected?.commentStore?.hasUnsaved) {
+      if (self.LSF?.lsf?.annotationStore?.selected?.commentStore?.hasUnsaved) {
         Modal.confirm({
           title: "You have unsaved changes",
           body: "There are comments which are not persisted. Please submit the annotation. Continuing will discard these comments.",
@@ -377,7 +377,7 @@ export const AppStore = types
         }
       };
 
-      if (isFF(FF_DEV_2887) && self.LSF?.lsf?.annotationStore?.selected?.commentStore?.hasUnsaved) {
+      if (self.LSF?.lsf?.annotationStore?.selected?.commentStore?.hasUnsaved) {
         Modal.confirm({
           title: "You have unsaved changes",
           body: "There are comments which are not persisted. Please submit the annotation. Continuing will discard these comments.",

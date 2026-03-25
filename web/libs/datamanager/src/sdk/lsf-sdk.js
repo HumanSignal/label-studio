@@ -1,12 +1,5 @@
 import { Button } from "@humansignal/ui";
-import {
-  FF_DEV_1752,
-  FF_DEV_2186,
-  FF_DEV_2887,
-  FF_LSDV_4620_3_ML,
-  FF_FIT_1304_STRICT_OVERLAP,
-  isFF,
-} from "../utils/feature-flags";
+import { FF_DEV_1752, FF_DEV_2186, FF_LSDV_4620_3_ML, FF_FIT_1304_STRICT_OVERLAP, isFF } from "../utils/feature-flags";
 import { isActive, FF_FIT_720_LAZY_LOAD_ANNOTATIONS } from "@humansignal/core/lib/utils/feature-flags";
 import { isDefined } from "../utils/utils";
 import { Modal } from "../components/Common/Modal/Modal";
@@ -195,10 +188,8 @@ export class LSFWrapper {
       interfaces.push("auto-annotation");
     }
 
-    if (isFF(FF_DEV_2887)) {
-      interfaces.push("annotations:comments");
-      interfaces.push("comments:resolve-any");
-    }
+    interfaces.push("annotations:comments");
+    interfaces.push("comments:resolve-any");
 
     if (this.project.review_settings?.require_comment_on_reject) {
       interfaces.push("comments:reject");
@@ -276,9 +267,7 @@ export class LSFWrapper {
         });
       });
 
-      if (isFF(FF_DEV_2887)) {
-        new CommentsSdk(this.lsfInstance, this.datamanager);
-      }
+      new CommentsSdk(this.lsfInstance, this.datamanager);
 
       this.datamanager.invoke("lsfInit", this, this.lsfInstance);
     } catch (err) {
@@ -352,7 +341,7 @@ export class LSFWrapper {
       if (newTask) await this.selectTask(newTask, annotationID, fromHistory);
     };
 
-    if (isFF(FF_DEV_2887) && this.lsf?.commentStore?.hasUnsaved) {
+    if (this.lsf?.commentStore?.hasUnsaved) {
       Modal.confirm({
         title: "You have unsaved changes",
         body: "There are comments which are not persisted. Please submit the annotation. Continuing will discard these comments.",
@@ -1253,11 +1242,7 @@ export class LSFWrapper {
       this.datamanager.invoke(eventName, this.lsf, eventData, result);
 
       // Persist any queued comments which are not currently attached to an annotation
-      if (
-        isFF(FF_DEV_2887) &&
-        ["submitAnnotation", "skipTask"].includes(eventName) &&
-        this.lsf?.commentStore?.persistQueuedComments
-      ) {
+      if (["submitAnnotation", "skipTask"].includes(eventName) && this.lsf?.commentStore?.persistQueuedComments) {
         await this.lsf.commentStore.persistQueuedComments();
       }
     }
