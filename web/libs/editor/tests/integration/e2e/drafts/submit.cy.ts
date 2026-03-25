@@ -1,5 +1,5 @@
 import { Choices, LabelStudio, ToolBar } from "@humansignal/frontend-test/helpers/LSF";
-import { FF_CUSTOM_SCRIPT, FF_DEV_3873, FF_REVIEWER_FLOW } from "../../../../src/utils/feature-flags";
+import { FF_CUSTOM_SCRIPT, FF_REVIEWER_FLOW } from "../../../../src/utils/feature-flags";
 
 enum RESPONSE_TYPE {
   DRAFT = "draft",
@@ -11,7 +11,6 @@ const WAITING_FOR_EVENTS_DELAY = 200;
 describe("Annotation submitting process", () => {
   it("should not create a duplicate annotation if the annotation and draft are saved concurrently", () => {
     LabelStudio.addFeatureFlagsOnPageLoad({
-      [FF_DEV_3873]: true,
       [FF_REVIEWER_FLOW]: true,
       [FF_CUSTOM_SCRIPT]: true,
     });
