@@ -244,7 +244,7 @@ function AnnotationButtonTooltip({
 
     // Add Annotation ID first if available
     if (annotationId) {
-      rows.push({ label: "Annotation ID", value: String(annotationId) });
+      rows.push({ label: isPrediction ? "Prediction ID" : "Annotation ID", value: String(annotationId) });
     }
 
     // Add Type for all annotations/predictions
@@ -349,6 +349,7 @@ const AnnotationButtonContextMenu = injector(
     }) => {
       // Check if entity is alive - must be done before any hooks
       const entityIsAlive = isAlive(entity);
+      const isPrediction = entity.type === "prediction";
 
       const annotationLink = useMemo(() => {
         if (!entityIsAlive || !entity.pk) {
@@ -413,19 +414,19 @@ const AnnotationButtonContextMenu = injector(
         copyLink();
         dropdown?.close();
         toast?.show({
-          message: "Annotation link copied to clipboard",
+          message: isPrediction ? "Prediction link copied to clipboard" : "Annotation link copied to clipboard",
           type: ToastType.info,
         });
-      }, [copyLink, toast, dropdown]);
+      }, [copyLink, toast, dropdown, isPrediction]);
       const [copyAnnotationId] = useCopyText({ defaultText: entity.pk?.toString() ?? entity.id?.toString() ?? "" });
       const copyAnnotationIdHandler = useCallback<MenuActionOnClick>(() => {
         copyAnnotationId();
         dropdown?.close();
         toast?.show({
-          message: "Annotation ID copied to clipboard",
+          message: isPrediction ? "Prediction ID copied to clipboard" : "Annotation ID copied to clipboard",
           type: ToastType.info,
         });
-      }, [copyAnnotationId, toast, dropdown]);
+      }, [copyAnnotationId, toast, dropdown, isPrediction]);
       const openPerformanceDashboard = useCallback<MenuActionOnClick>(() => {
         // Only available in LSE
         const isLSE = (window as any).APP_SETTINGS?.version?.edition === "Enterprise";
@@ -461,7 +462,7 @@ const AnnotationButtonContextMenu = injector(
       const deleteAnnotation = useCallback(() => {
         clickHandler();
         confirm({
-          title: "Delete annotation?",
+          title: isPrediction ? "Delete prediction?" : "Delete annotation?",
           body: (
             <>
               This will <strong>delete all existing regions</strong>. Are you sure you want to delete them?
@@ -475,8 +476,7 @@ const AnnotationButtonContextMenu = injector(
             entity.list.deleteAnnotation(entity);
           },
         });
-      }, [entity, onAnnotationChange]);
-      const isPrediction = entity.type === "prediction";
+      }, [entity, onAnnotationChange, isPrediction]);
       const isDraft = !isDefined(entity.pk);
       const showGroundTruth = capabilities.groundTruthEnabled && !isPrediction && !isDraft;
       const showDuplicateAnnotation = capabilities.enableCreateAnnotation && !isDraft;
@@ -488,10 +488,11 @@ const AnnotationButtonContextMenu = injector(
       const actions = useMemo<ContextMenuAction[]>(
         () => [
           {
-            label: "Copy Annotation ID",
+            label: isPrediction ? "Copy Prediction ID" : "Copy Annotation ID",
             onClick: copyAnnotationIdHandler,
             icon: <IconClipboardCheck width={20} height={20} />,
             enabled: !isDraft,
+            dataTestId: "annotation-button-menu-copy-id",
           },
           {
             label: `${isGroundTruth ? "Unset " : "Set "} as Ground Truth`,
@@ -502,38 +503,46 @@ const AnnotationButtonContextMenu = injector(
               <IconStarOutline width={iconSize} height={iconSize} />
             ),
             enabled: showGroundTruth,
+            dataTestId: "annotation-button-menu-set-ground-truth",
           },
           {
-            label: "Duplicate Annotation",
+            label: isPrediction ? "Duplicate as Annotation" : "Duplicate Annotation",
             onClick: duplicateAnnotation,
             icon: <IconDuplicate width={20} height={20} />,
             enabled: showDuplicateAnnotation,
+            dataTestId: "annotation-button-menu-duplicate",
           },
           {
-            label: "Copy Annotation Link",
+            label: isPrediction ? "Copy Prediction Link" : "Copy Annotation Link",
             onClick: linkAnnotation,
             icon: <IconLink />,
             enabled: !isDraft && store.hasInterface("annotations:copy-link"),
+            dataTestId: "annotation-button-menu-copy-link",
           },
           {
             label: "Open Performance Dashboard",
             onClick: openPerformanceDashboard,
             icon: <IconAnalytics width={20} height={20} />,
             enabled: isLSE && hasProjectId && !isDraft && !isPrediction,
+            dataTestId: "annotation-button-menu-performance-dashboard",
           },
           {
-            label: "Show Other Annotations",
+            label: "Compare All Annotations",
             onClick: showOtherAnnotations,
             icon: <IconViewAll width={20} height={20} />,
             enabled: true,
+            dataTestId: "annotation-button-menu-compare-all",
           },
           {
-            label: "Delete Annotation",
+            label: isPrediction ? "Delete Prediction" : "Delete Annotation",
             onClick: deleteAnnotation,
             icon: <IconTrashRect />,
             separator: true,
             danger: true,
-            enabled: capabilities.enableAnnotationDelete && !isPrediction,
+            enabled: isPrediction
+              ? Boolean((capabilities as { enablePredictionDelete?: boolean }).enablePredictionDelete)
+              : capabilities.enableAnnotationDelete,
+            dataTestId: "annotation-button-menu-delete",
           },
         ],
         [
@@ -1083,6 +1092,7 @@ export const AnnotationButton = observer(
           >
             <div
               className={cn("annotation-button").elem("trigger").toClassName()}
+              data-testid="annotation-button-menu-trigger"
               onMouseEnter={handleTriggerEnter}
               onClick={(e) => e.stopPropagation()}
             >
