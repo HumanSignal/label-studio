@@ -53,7 +53,9 @@ Label Studio aggregates per-control-tag scores into a single task-level score.
 
 By default, this is calculated as the mean of all control-tag scores. This is what appears in the main **Agreement** column when you do not filter by control tag.
 
-You can customize how overall agreement is calculated by setting the **weight** of different control tags when calculating agreement. This ensures that a critical control tag is has more bearing on the overall agreement score than a less important control tag. See [Configure weight for the overall agreement](#Configure-weight-for-the-overall-agreement).
+You can customize how overall agreement is calculated by setting the **weight** of different control tags when calculating agreement. 
+
+This ensures that a critical control tag is has more bearing on the overall agreement score than a less important control tag. See [Configure weight for the overall agreement](#Configure-weight-for-the-overall-agreement).
 
 ## Categorical vs. non-categorical control tags
 
@@ -72,7 +74,7 @@ Examples include:
 
 Since categorical values are discrete, the typical metric is **Exact Match** -- the two values either match (score = `1.0`) or they don't (score = `0.0`). 
 
-However, tags such as **Rating** or **Number** can also use **Numeric Difference with Threshold**, where you define how much numeric deviation is tolerable (e.g., a threshold of `0` means only identical ratings count as a match).
+However, tags such as **Rating** or **Number** can also use [**Numeric Difference with Threshold**](agreement_metrics#Numeric-Difference), where you define how much numeric deviation is tolerable (e.g., a threshold of `0` means only identical ratings count as a match).
 
 Categorical comparisons inherently produce binary scores (`0` or `1`). This means they work with both agreement methodologies:
 
@@ -93,8 +95,8 @@ For example:
 
 Because two annotators rarely draw identical regions, the system uses continuous similarity metrics that measure degree of overlap. For example:
 
-- **IoU (Intersection over Union)** for bounding boxes and polygons. Returns a float between `0.0` (no overlap) and `1.0` (perfect overlap)
-- **Span Overlap** for text spans -- measures how much two highlighted text regions overlap
+- [**IoU (Intersection over Union)**](agreement_metrics#Intersection-over-Union-for-bounding-boxes) for bounding boxes and polygons. Returns a float between `0.0` (no overlap) and `1.0` (perfect overlap)
+- [**Span Overlap**](agreement_metrics#Span-Overlap) for text spans. Measures how much two highlighted text regions overlap
 
 See [Non-categorical examples](#Non-categorical-examples) for an example of how agreement is calculated for non-categorical control tags.
 
@@ -153,23 +155,23 @@ Even though none of the annotators agreed with each other, agreement is still `1
 
 * *How many annotators agree?* 
 
-  Given three annotators, 1/3 selected each choice.  
+  Given three annotators, 1/3 selected each choice: `1/3 = 33.33%`  
 
 * *How many annotators chose the most common answer?*
 
   In this case, A, B, and C were each chosen once, and are therefore equally common.
 
-  So 1 out of 3 annotators chose the most common answer (`1/3 = 33.33`).
+  So 1 out of 3 annotators chose the most common answer: `1/3 = 33.33%`
 
 If you were to switch to Pairwise methodology, the same task would have an agreement score of `0%`, as Pairwise is more focused on how much agreement there is between pairs of annotators.  
 
-#### Binary scoring
+#### Binary scoring in Consensus
 
 Consensus measures agreement with binary scores -- each pair of annotators either matches (`1`) or does not match (`0`). 
 
 * For categorical tags like **Choices** or **Rating**, this binary outcome happens naturally: two annotators either selected the same value or they didn't. 
 
-* For non-categorical tags like bounding boxes or text spans, the raw comparison produces a continuous score (e.g., IoU of 0.82). Therefore for non-categorical tags, you must define a threshold to determine whether the continuous score is high enough to be considered a match, allowing Label Studio to convert it into a binary decision. 
+* For non-categorical tags like bounding boxes or text spans, the raw comparison produces a continuous score (e.g., IoU of `0.82`). Therefore for non-categorical tags, you must define a threshold to determine whether the continuous score is high enough to be considered a match, allowing Label Studio to convert it into a binary decision. 
 
   At or above the threshold counts as a match (`1`), below it does not (`0`). 
 
@@ -217,7 +219,7 @@ This means Pairwise preserves the full granularity of non-categorical comparison
 | **Sensitivity to outliers** | High -- one disagreeing annotator creates multiple low-scoring pairs, pulling the average down | Low -- one disagreeing annotator is outvoted by the majority |
 | **3 annotators, 2 agree (categorical)** | 33% (only 1 of 3 pairs match) | 66% (majority agreement recognized) |
 | **3 annotators, all agree** | 100% | 100% |
-| **3 annotators, none agree** | 0% | 0% |
+| **3 annotators, none agree** | 0% | 33% (1 out of 3 annotators chose the most common answer) |
 | **Best suited for** | Projects with 2 annotators per task, or when you want granular continuous scores | Projects with 3+ annotators per task, or when majority agreement matters most |
 
 #### When to select Pairwise vs. Consensus
@@ -247,7 +249,7 @@ In extremely simple terms:
 
 * The Consensus measurement is a good proxy for label stability and task convergence.
 
-* Requires thresholds for non-categorical control tags (e.g. bounding boxes and text spans). Thresholds are how you define what "close enough" means. See [Non-categorical examples](#Non-categorical-examples) for an of consensus calculation with a threshold.
+* Requires thresholds for non-categorical control tags. Thresholds are how you define what "close enough" means. See [Non-categorical examples](#Non-categorical-examples) for an of consensus calculation with a threshold.
 
 
 ### Examples 
@@ -338,7 +340,7 @@ All 3 annotators chose the most common answer (`3/3 = 1.0`).
 
 #### Non-categorical examples
 
-[Non-categorical control tags](#Non-categorical-control-tags) are control tags have continuous values that are not as simple to quantify as "match" or "no match". For example, **RectangleLabels**, **PolygonLabels**, **Labels**, **Labels**.
+[Non-categorical control tags](#Non-categorical-control-tags) are control tags have continuous values that are not as simple to quantify as "match" or "no match". For example, **RectangleLabels**, **PolygonLabels**, and **Labels**.
 
 ##### Bounding boxes
 
@@ -374,7 +376,7 @@ If all three annotators draw their boxes in completely different areas of the im
 
 `(0 + 0 + 0) / 3 = 0`
 
-Now the annotators adjust their boxes so that there is some overlap between them. In this case, the agreement is `72%`:
+Now the annotators adjust their boxes so that there is some overlap between them. In this case, the agreement is `40.67%`:
 
 - Annotators 1 vs Annotator 2 (IoU = `.53`)
 - Annotators 1 vs Annotator 3 (IoU = `.24`)
