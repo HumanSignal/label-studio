@@ -139,6 +139,29 @@ class TestAnnotationsStubQueryParameter(APITestCase):
         assert annotation_data.get('is_stub') is True
 
     @pytest.mark.usefixtures('fflag_fix_all_fit_720_lazy_load_annotations_on')
+    def test_task_api_stub_annotations_respect_annotations_ordering_desc(self):
+        """annotations_ordering=-id must return highest id first (not prefetch cache order)."""
+        AnnotationFactory(
+            task=self.task,
+            completed_by=self.user,
+            result=[
+                {
+                    'from_name': 'label',
+                    'to_name': 'text',
+                    'type': 'labels',
+                    'value': {'labels': ['class_B'], 'start': 0, 'end': 5},
+                }
+            ],
+        )
+        self.client.force_authenticate(user=self.user)
+        url = f'/api/tasks/{self.task.id}/?annotations_stub=true&annotations_ordering=-id&project={self.project.id}'
+        response = self.client.get(url)
+        assert response.status_code == 200
+        ids = [row['id'] for row in response.json()['annotations']]
+        assert len(ids) == 2
+        assert ids == sorted(ids, reverse=True), ids
+
+    @pytest.mark.usefixtures('fflag_fix_all_fit_720_lazy_load_annotations_on')
     def test_task_api_without_annotations_stub(self):
         """Test that TaskAPI returns full annotations when annotations_stub is not set."""
         self.client.force_authenticate(user=self.user)
@@ -241,6 +264,7 @@ class TestTaskAgreementAPI(APITestCase):
 
         assert data['total_annotations'] == 0
         assert data['distributions'] == {}
+        assert 'agreement' in data
 
     @pytest.mark.usefixtures('fflag_fix_all_fit_720_lazy_load_annotations_on')
     def test_agreement_endpoint_with_labels(self):

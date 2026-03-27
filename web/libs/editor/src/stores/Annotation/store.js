@@ -107,7 +107,12 @@ const AnnotationStoreModel = types
           a.editable = false;
         });
       } else {
-        selectAnnotation(self.annotations.at(isFF(FF_SIMPLE_INIT) ? -1 : 0).id, { fromViewAll: true });
+        // API order is newest-first; re-select the newest item when leaving View All.
+        if (self.annotations.length) {
+          selectAnnotation(self.annotations[0].id, { fromViewAll: true });
+        } else if (self.predictions.length) {
+          selectPrediction(self.predictions[0].id, { fromViewAll: true });
+        }
       }
     }
 
@@ -402,17 +407,9 @@ const AnnotationStoreModel = types
 
       const item = createItem(options);
 
-      if (isFF(FF_SIMPLE_INIT)) {
-        self.predictions.push(item);
+      self.predictions.push(item);
 
-        return self.predictions.at(-1);
-      }
-
-      self.predictions.unshift(item);
-
-      const record = self.predictions[0];
-
-      return record;
+      return self.predictions.at(-1);
     }
 
     function addAnnotation(options = {}) {
@@ -432,13 +429,15 @@ const AnnotationStoreModel = types
         item.completed_by = actual_user ?? getRoot(self).user?.id ?? undefined;
       }
 
-      if (isFF(FF_SIMPLE_INIT)) {
-        self.annotations.push(item);
-      } else {
+      // Server payloads (initializeStore) are appended in API order (newest first with -id ordering).
+      // Locally created annotations (userGenerate) must be prepended so they stay at index 0 like the API.
+      if (item.userGenerate) {
         self.annotations.unshift(item);
+      } else {
+        self.annotations.push(item);
       }
 
-      const record = self.annotations.at(isFF(FF_SIMPLE_INIT) ? -1 : 0);
+      const record = item.userGenerate ? self.annotations[0] : self.annotations.at(-1);
 
       record.addVersions({
         result: options.result,

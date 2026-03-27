@@ -1,5 +1,5 @@
 import type { ReactElement } from "react";
-import { render, screen } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import type { MSTAnnotation, MSTStore } from "../../../stores/types";
 import { FF_FIT_720_LAZY_LOAD_ANNOTATIONS } from "@humansignal/core/lib/utils/feature-flags";
@@ -248,6 +248,15 @@ describe("TaskSummary", () => {
     expect(screen.getByText("85.5%")).toBeInTheDocument();
   });
 
+  it("does not show agreement mismatch hint when the agreement endpoint is not queried", () => {
+    const annotations = [createMockAnnotation()];
+    const store = createMockStore();
+
+    renderWithQueryClient(<TaskSummary annotations={annotations} store={store} />);
+
+    expect(screen.queryByTestId("agreement-value-mismatch")).not.toBeInTheDocument();
+  });
+
   it("counts submitted annotations correctly (excludes drafts)", () => {
     const annotations = [
       createMockAnnotation({ pk: "1", type: "annotation" }),
@@ -407,8 +416,54 @@ describe("TaskSummary", () => {
   });
 
   describe("with FF_FIT_720_LAZY_LOAD_ANNOTATIONS enabled", () => {
+    const originalIntersectionObserver = globalThis.IntersectionObserver;
+    const originalFetch = globalThis.fetch;
+
     beforeEach(() => {
       window.APP_SETTINGS.feature_flags[FF_FIT_720_LAZY_LOAD_ANNOTATIONS] = true;
+
+      globalThis.fetch = jest.fn().mockResolvedValue({
+        ok: true,
+        json: async () => ({
+          total_annotations: 0,
+          distributions: {},
+          agreement: null,
+        }),
+      }) as unknown as typeof fetch;
+
+      globalThis.IntersectionObserver = class MockIntersectionObserver {
+        callback: IntersectionObserverCallback;
+
+        constructor(callback: IntersectionObserverCallback) {
+          this.callback = callback;
+        }
+
+        observe(element: Element) {
+          this.callback(
+            [
+              {
+                isIntersecting: true,
+                target: element,
+              } as IntersectionObserverEntry,
+            ],
+            this as unknown as IntersectionObserver,
+          );
+        }
+
+        unobserve() {}
+        disconnect() {}
+        takeRecords() {
+          return [];
+        }
+        root = null;
+        rootMargin = "0px";
+        thresholds = [0];
+      } as unknown as typeof IntersectionObserver;
+    });
+
+    afterEach(() => {
+      globalThis.IntersectionObserver = originalIntersectionObserver;
+      globalThis.fetch = originalFetch;
     });
 
     it("renders main headings when FF is on", () => {
@@ -448,7 +503,7 @@ describe("TaskSummary", () => {
       expect(screen.getByText("Annotations")).toBeInTheDocument();
     });
 
-    it("counts annotations correctly with mixed stub and full annotations", () => {
+    it("counts annotations correctly with mixed stub and full annotations", async () => {
       const annotations = [
         createMockAnnotation({ pk: "1", type: "annotation" }), // full annotation
         createMockAnnotation({ pk: "2", type: "annotation", versions: { result: [] } }), // stub annotation
@@ -459,7 +514,7 @@ describe("TaskSummary", () => {
       renderWithProviders(<TaskSummary annotations={annotations} store={store} />);
 
       expect(screen.getByText("Annotations")).toBeInTheDocument();
-      expect(screen.getByText("3")).toBeInTheDocument(); // All annotations counted
+      expect(await screen.findByText("3")).toBeInTheDocument(); // All annotations counted (after agreement query finishes)
     });
 
     it("renders labeling summary table with annotations when FF is on", () => {
@@ -476,6 +531,163 @@ describe("TaskSummary", () => {
 
       expect(screen.getByText("Annotator")).toBeInTheDocument();
       expect(screen.getByText("label")).toBeInTheDocument();
+    });
+
+    it("shows agreement mismatch hint when task and agreement endpoint disagree", async () => {
+      const annotations = [createMockAnnotation()];
+      const store = createMockStore();
+
+      (globalThis.fetch as jest.Mock).mockImplementation((input: RequestInfo | URL) => {
+        const url =
+          typeof input === "string"
+            ? input
+            : typeof input === "object" && input !== null && "url" in input
+              ? String((input as { url: string }).url)
+              : String(input);
+        if (url.includes("/agreement/")) {
+          return Promise.resolve({
+            ok: true,
+            json: async () => ({
+              total_annotations: 0,
+              distributions: {},
+              agreement: 90,
+            }),
+          } as Response);
+        }
+        return Promise.resolve({
+          ok: true,
+          json: async () => ({}),
+        } as Response);
+      });
+
+      renderWithProviders(<TaskSummary annotations={annotations} store={store} />);
+
+      await screen.findByText("90%");
+      expect(screen.getByTestId("agreement-value-mismatch")).toBeInTheDocument();
+    });
+
+    it("does not show agreement mismatch hint when task and endpoint values match", async () => {
+      const annotations = [createMockAnnotation()];
+      const store = createMockStore();
+
+      (globalThis.fetch as jest.Mock).mockImplementation((input: RequestInfo | URL) => {
+        const url =
+          typeof input === "string"
+            ? input
+            : typeof input === "object" && input !== null && "url" in input
+              ? String((input as { url: string }).url)
+              : String(input);
+        if (url.includes("/agreement/")) {
+          return Promise.resolve({
+            ok: true,
+            json: async () => ({
+              total_annotations: 0,
+              distributions: {},
+              agreement: 85.5,
+            }),
+          } as Response);
+        }
+        return Promise.resolve({
+          ok: true,
+          json: async () => ({}),
+        } as Response);
+      });
+
+      renderWithProviders(<TaskSummary annotations={annotations} store={store} />);
+
+      await screen.findByText("85.5%");
+
+      expect(screen.queryByTestId("agreement-value-mismatch")).not.toBeInTheDocument();
+    });
+
+    it("hydrates stub annotation only once when it has no regions yet", async () => {
+      const annotation = createMockAnnotation({
+        id: "101",
+        pk: "101",
+        type: "annotation",
+        userGenerate: false,
+        is_stub: true,
+        versions: { result: [] },
+        areas: new Map(),
+        history: {
+          freeze: jest.fn(),
+          safeUnfreeze: jest.fn(),
+        },
+        deserializeResults: jest.fn(),
+        deleteAllRegions: jest.fn(),
+        updateObjects: jest.fn(),
+        reinitHistory: jest.fn(),
+      });
+
+      const fetchSpy = jest.spyOn(globalThis, "fetch" as any).mockResolvedValue({
+        ok: true,
+        json: async () => ({
+          id: 101,
+          result: [{ from_name: "label", to_name: "text", type: "choices", value: { choices: ["positive"] } }],
+        }),
+      } as Response);
+
+      const store = createMockStore();
+
+      renderWithProviders(<TaskSummary annotations={[annotation]} store={store} />);
+
+      await waitFor(() => {
+        expect((annotation as any).deserializeResults).toHaveBeenCalledTimes(1);
+      });
+
+      expect((annotation as any).deleteAllRegions).toHaveBeenCalledTimes(1);
+      expect((annotation as any).updateObjects).toHaveBeenCalledTimes(1);
+      expect((annotation as any).reinitHistory).toHaveBeenCalledTimes(1);
+      expect(fetchSpy).toHaveBeenCalledWith("/api/annotations/101/");
+
+      fetchSpy.mockRestore();
+    });
+
+    it("clears existing areas and deserializes from server even when MST already had regions", async () => {
+      const annotation = createMockAnnotation({
+        id: "202",
+        pk: "202",
+        type: "annotation",
+        userGenerate: false,
+        is_stub: true,
+        versions: { result: [] },
+        // Stale local regions must not block applying an empty or updated server payload.
+        areas: new Map([["r1", { id: "r1" }]]),
+        history: {
+          freeze: jest.fn(),
+          safeUnfreeze: jest.fn(),
+        },
+        deserializeResults: jest.fn(),
+        deleteAllRegions: jest.fn(),
+        updateObjects: jest.fn(),
+        reinitHistory: jest.fn(),
+      });
+
+      const fetchSpy = jest.spyOn(globalThis, "fetch" as any).mockResolvedValue({
+        ok: true,
+        json: async () => ({
+          id: 202,
+          result: [],
+        }),
+      } as Response);
+
+      const store = createMockStore();
+
+      renderWithProviders(<TaskSummary annotations={[annotation]} store={store} />);
+
+      await waitFor(() => {
+        expect(fetchSpy).toHaveBeenCalledWith("/api/annotations/202/");
+      });
+
+      await waitFor(() => {
+        expect((annotation as any).deserializeResults).toHaveBeenCalledWith([]);
+      });
+
+      expect((annotation as any).deleteAllRegions).toHaveBeenCalledWith({ deleteReadOnly: true });
+      expect((annotation as any).updateObjects).toHaveBeenCalledTimes(1);
+      expect((annotation as any).reinitHistory).toHaveBeenCalledTimes(1);
+
+      fetchSpy.mockRestore();
     });
   });
 });

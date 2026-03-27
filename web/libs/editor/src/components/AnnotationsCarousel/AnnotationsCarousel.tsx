@@ -1,10 +1,11 @@
 import { Button, IconChevronLeft, IconChevronRight } from "@humansignal/ui";
+import { usePersistentState } from "@humansignal/core/lib/hooks/usePersistentState";
 import { observer } from "mobx-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { FixedSizeList as List, type ListChildComponentProps } from "react-window";
 import AutoSizer from "react-virtualized-auto-sizer";
 import { cn } from "../../utils/bem";
-import { clamp, sortAnnotations } from "../../utils/utilities";
+import { clamp } from "../../utils/utilities";
 import { isActive, FF_FIT_720_LAZY_LOAD_ANNOTATIONS } from "@humansignal/core/lib/utils/feature-flags";
 import { AnnotationButton } from "./AnnotationButton";
 import "./AnnotationsCarousel.prefix.css";
@@ -51,6 +52,8 @@ export const AnnotationsCarousel = observer(({ store, annotationStore }: Annotat
   const listRef = useRef<List>(null);
   const carouselRef = useRef<HTMLElement>();
   const containerRef = useRef<HTMLElement>();
+  /** Tracks strip length so we can snap to the start when an item is removed (e.g. delete annotation). */
+  const prevEntityCountRef = useRef<number | null>(null);
 
   const [scrollOffset, setScrollOffset] = useState(0);
   const [containerWidth, setContainerWidth] = useState(0);
@@ -71,11 +74,13 @@ export const AnnotationsCarousel = observer(({ store, annotationStore }: Annotat
     [enablePredictions, enableCreateAnnotation, groundTruthEnabled, enableAnnotations, enableAnnotationDelete],
   );
 
-  const sortedEntities = useMemo(() => sortAnnotations(entities), [entities]);
+  /** Same key as `ViewAll.tsx` — keep carousel at scroll 0 on Task Summary; side-by-side centers the selected tab. */
+  const hasSummaryTab = store.hasInterface("annotations:summary");
+  const [viewAllTab] = usePersistentState<"summary" | "compare">("view-all-tab", "summary");
+  const suppressScrollToSelected = annotationStore.viewingAll && hasSummaryTab && viewAllTab === "summary";
 
-  const totalWidth = sortedEntities.length * (ITEM_WIDTH + ITEM_GAP);
-  const shouldVirtualize =
-    isActive(FF_FIT_720_LAZY_LOAD_ANNOTATIONS) && sortedEntities.length > VIRTUALIZATION_THRESHOLD;
+  const totalWidth = entities.length * (ITEM_WIDTH + ITEM_GAP);
+  const shouldVirtualize = isActive(FF_FIT_720_LAZY_LOAD_ANNOTATIONS) && entities.length > VIRTUALIZATION_THRESHOLD;
 
   const isLeftDisabled = scrollOffset <= 0;
   const isRightDisabled = scrollOffset >= totalWidth - containerWidth;
@@ -122,20 +127,34 @@ export const AnnotationsCarousel = observer(({ store, annotationStore }: Annotat
         currentPosition >= (carouselRef.current?.clientWidth ?? 0) - (containerRef.current?.clientWidth ?? 0),
       );
     }
-  }, [sortedEntities.length, containerRef.current, carouselRef.current, currentPosition, shouldVirtualize]);
+  }, [entities.length, containerRef.current, carouselRef.current, currentPosition, shouldVirtualize]);
 
+  // Keep the tab strip aligned with the selected annotation; after a deletion, snap to the start
+  // instead of re-centering (centering with API ordering used to leave the viewport at the far right).
   useEffect(() => {
+    const prev = prevEntityCountRef.current;
+    const countDecreased = prev !== null && entities.length < prev;
+    prevEntityCountRef.current = entities.length;
+
+    if (suppressScrollToSelected) return;
+
+    if (countDecreased) {
+      setCurrentPosition(0);
+      setScrollOffset(0);
+      if (shouldVirtualize && listRef.current) {
+        listRef.current.scrollTo(0);
+      }
+      return;
+    }
+
     if (shouldVirtualize && listRef.current && annotationStore.selected) {
-      const selectedIndex = sortedEntities.findIndex((e: any) => e?.id === annotationStore.selected?.id);
+      const selectedIndex = entities.findIndex((e: any) => e?.id === annotationStore.selected?.id);
       if (selectedIndex >= 0) {
         listRef.current.scrollToItem(selectedIndex, "center");
       }
+      return;
     }
-  }, [annotationStore.selected?.id, sortedEntities, shouldVirtualize]);
 
-  // Non-virtualized: scroll carousel to bring selected annotation tab into view
-  useEffect(() => {
-    if (shouldVirtualize) return;
     if (!carouselRef.current || !containerRef.current || !annotationStore.selected) return;
 
     const selectedId = annotationStore.selected.pk ?? annotationStore.selected.id;
@@ -152,7 +171,17 @@ export const AnnotationsCarousel = observer(({ store, annotationStore }: Annotat
     const maxPosition = Math.max(0, carouselWidth - containerWidth);
     const newPosition = clamp(targetPosition, 0, maxPosition);
     setCurrentPosition(newPosition);
-  }, [annotationStore.selected?.id, shouldVirtualize]);
+  }, [annotationStore.selected?.id, entities, shouldVirtualize, suppressScrollToSelected]);
+
+  // View All → Task Summary: keep the strip at the left; scroll-to-selected is disabled above.
+  useEffect(() => {
+    if (!suppressScrollToSelected) return;
+    setCurrentPosition(0);
+    setScrollOffset(0);
+    if (shouldVirtualize && listRef.current) {
+      listRef.current.scrollTo(0);
+    }
+  }, [suppressScrollToSelected, shouldVirtualize]);
 
   useEffect(() => {
     const newEntities = [];
@@ -165,12 +194,12 @@ export const AnnotationsCarousel = observer(({ store, annotationStore }: Annotat
 
   const itemData = useMemo(
     () => ({
-      entities: sortedEntities,
+      entities,
       capabilities,
       annotationStore,
       store,
     }),
-    [sortedEntities, capabilities, annotationStore, store],
+    [entities, capabilities, annotationStore, store],
   );
 
   if (!(enableAnnotations || enablePredictions || enableCreateAnnotation)) {
@@ -198,7 +227,7 @@ export const AnnotationsCarousel = observer(({ store, annotationStore }: Annotat
                   layout="horizontal"
                   height={height}
                   width={width - 77} // Account for controls
-                  itemCount={sortedEntities.length}
+                  itemCount={entities.length}
                   itemSize={ITEM_WIDTH + ITEM_GAP}
                   itemData={itemData}
                   onScroll={handleScroll}
@@ -247,7 +276,7 @@ export const AnnotationsCarousel = observer(({ store, annotationStore }: Annotat
     >
       <div ref={containerRef as any} className={cn("annotations-carousel").elem("container").toClassName()}>
         <div ref={carouselRef as any} className={cn("annotations-carousel").elem("carosel").toClassName()}>
-          {sortedEntities.map((entity) => (
+          {entities.map((entity) => (
             <AnnotationButton
               key={entity?.id}
               entity={entity}

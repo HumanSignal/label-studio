@@ -2,7 +2,7 @@
  * FIT-720: Shared annotation fetching hook using TanStack Query
  *
  * Provides caching, deduplication, and invalidation for annotation fetches.
- * Cache invalidation utilities (invalidateAnnotationCache, invalidateDistributionCache)
+ * Cache invalidation utilities (invalidateAnnotationCache, invalidateTaskAgreementCache)
  * live in @humansignal/core/lib/utils/annotation-cache and are re-exported from this module.
  */
 import { useQueryClient, useQuery } from "@tanstack/react-query";
@@ -12,7 +12,7 @@ import { annotationKeys } from "@humansignal/core/lib/utils/annotation-cache";
 // Re-export annotationKeys so existing consumers don't break
 export { annotationKeys };
 // Re-export cache invalidation functions from core
-export { invalidateAnnotationCache, invalidateDistributionCache } from "@humansignal/core/lib/utils/annotation-cache";
+export { invalidateAnnotationCache, invalidateTaskAgreementCache } from "@humansignal/core/lib/utils/annotation-cache";
 
 // Type for annotation API response
 export type AnnotationData = {
@@ -161,6 +161,22 @@ export const useAnnotationFetcher = () => {
     [queryClient],
   );
 
+  /**
+   * Cached annotation snapshot safe to merge into MST (e.g. on Summary mount).
+   * Omits stale entries so we do not re-apply pre-invalidation data after save/refetch.
+   */
+  const getFreshCachedAnnotation = useCallback(
+    (id: number | string): AnnotationData | undefined => {
+      const key = annotationKeys.detail(id);
+      const state = queryClient.getQueryState(key);
+      const data = queryClient.getQueryData(key) as AnnotationData | undefined;
+      if (data?.result === undefined) return undefined;
+      if (!state || state.isStale) return undefined;
+      return data;
+    },
+    [queryClient],
+  );
+
   return {
     fetchAnnotationCached,
     prefetchAnnotation,
@@ -170,6 +186,7 @@ export const useAnnotationFetcher = () => {
     isAnnotationCached,
     isAnnotationFetching,
     getCachedAnnotation,
+    getFreshCachedAnnotation,
   };
 };
 

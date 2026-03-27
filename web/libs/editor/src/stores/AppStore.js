@@ -893,12 +893,10 @@ export default types
         // simple logging to detect if simple init is used on users' machines
         console.log("LSF: deserialization is finished");
 
-        // next line might be unclear after removing FF_SIMPLE_INIT
-        // reversing the list caused problems before when task is reloaded and list is reversed again.
-        // AnnotationsCarousel has its own ordering anyway, so we just keep technical order
-        // as simple as possible.
-        const current = as.annotations.at(-1);
-        const currentPrediction = !current && as.predictions.at(-1);
+        // Server payloads are appended in API order (newest first — see AnnotationStore.addAnnotation).
+        // Select the newest annotation (index 0), not the oldest (last index).
+        const current = as.annotations[0];
+        const currentPrediction = !current && as.predictions[0];
 
         if (current) {
           as.selectAnnotation(current.id);
@@ -932,7 +930,14 @@ export default types
           obj.reinitHistory();
         });
 
-        const current = as.annotations.at(-1);
+        // Last iteration left the oldest annotation selected; select the newest (API order: index 0).
+        if (as.annotations.length) {
+          as.selectAnnotation(as.annotations[0].id);
+        } else if (as.predictions.length) {
+          as.selectPrediction(as.predictions[0].id);
+        }
+
+        const current = as.annotations[0];
 
         if (current) current.setInitialValues();
 

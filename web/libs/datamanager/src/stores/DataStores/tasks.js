@@ -167,6 +167,8 @@ export const create = (columns) => {
         if (isActive(FF_FIT_720_LAZY_LOAD_ANNOTATIONS)) {
           taskParams.annotations_stub = true;
         }
+        // Django-style: GET /api/tasks/:id/?annotations_ordering=-id
+        taskParams.annotations_ordering = "-id";
 
         const taskData = yield self.root.apiCall("task", taskParams);
 

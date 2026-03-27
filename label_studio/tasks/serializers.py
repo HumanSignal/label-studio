@@ -26,6 +26,7 @@ from rest_framework.serializers import ModelSerializer
 from rest_framework.settings import api_settings
 from tasks.exceptions import AnnotationDuplicateError
 from tasks.models import Annotation, AnnotationDraft, Prediction, PredictionMeta, Task
+from tasks.ordering import apply_annotation_ordering, apply_prediction_ordering
 from tasks.validation import TaskValidator
 from users.models import User
 from users.serializers import UserSerializer
@@ -906,6 +907,7 @@ class TaskWithAnnotationsAndPredictionsAndDraftsSerializer(TaskSerializer):
             predictions = predictions.filter(model_version__in=model_versions)
         elif task.project.model_version:
             predictions = predictions.filter(model_version=task.project.model_version)
+        predictions = apply_prediction_ordering(predictions, self.context.get('annotations_ordering'))
         return PredictionSerializer(predictions, many=True, read_only=True, default=[], context=self.context).data
 
     def get_annotations(self, task):
@@ -916,6 +918,7 @@ class TaskWithAnnotationsAndPredictionsAndDraftsSerializer(TaskSerializer):
         if user and user.is_annotator:
             annotations = annotations.filter(completed_by=user)
 
+        annotations = apply_annotation_ordering(annotations, self.context.get('annotations_ordering'))
         return AnnotationSerializer(annotations, many=True, read_only=True, default=[], context=self.context).data
 
     def get_drafts(self, task):
@@ -943,6 +946,7 @@ class NextTaskSerializer(TaskWithAnnotationsAndPredictionsAndDraftsSerializer):
 
     def get_predictions(self, task):
         predictions = task.get_predictions_for_prelabeling()
+        predictions = apply_prediction_ordering(predictions, self.context.get('annotations_ordering'))
         return PredictionSerializer(predictions, many=True, read_only=True, default=[], context=self.context).data
 
     def get_annotations(self, task):
@@ -960,6 +964,7 @@ class NextTaskSerializer(TaskWithAnnotationsAndPredictionsAndDraftsSerializer):
                     annotations = annotations.filter(completed_by=user)
                 else:
                     annotations = annotations.filter(completed_by=user)
+                annotations = apply_annotation_ordering(annotations, self.context.get('annotations_ordering'))
                 return AnnotationStubSerializer(annotations, many=True, read_only=True, context=self.context).data
             else:
                 annotations = super().get_annotations(task)

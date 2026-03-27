@@ -46,7 +46,7 @@ export { imageCache } from "./lib/utils/ImageCache";
 export {
   annotationKeys,
   invalidateAnnotationCache,
-  invalidateDistributionCache,
+  invalidateTaskAgreementCache,
 } from "./lib/utils/annotation-cache";
 
 // FIT-720: Lazy annotation stub hydration (editor + datamanager)

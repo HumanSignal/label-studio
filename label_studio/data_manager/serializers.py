@@ -13,6 +13,10 @@ from fsm.serializer_fields import FSMStateField
 from projects.models import Project
 from rest_framework import serializers
 from tasks.models import Task
+from tasks.ordering import (
+    get_task_annotations_queryset,
+    get_task_predictions_queryset,
+)
 from tasks.serializers import (
     AnnotationDraftSerializer,
     AnnotationSerializer,
@@ -514,7 +518,9 @@ class DataManagerTaskSerializer(TaskSerializer):
         return self._pretty_results(task, 'predictions_results')
 
     def get_predictions(self, task):
-        return PredictionSerializer(task.predictions, many=True, default=[], read_only=True).data
+        ordering = self.context.get('annotations_ordering')
+        predictions = get_task_predictions_queryset(task, ordering)
+        return PredictionSerializer(predictions, many=True, default=[], read_only=True).data
 
     def get_annotations(self, task):
         """Return annotations for the task.
@@ -526,7 +532,8 @@ class DataManagerTaskSerializer(TaskSerializer):
         if not self.context.get('annotations'):
             return []
 
-        annotations = task.annotations.all()
+        ordering = self.context.get('annotations_ordering')
+        annotations = get_task_annotations_queryset(task, ordering, include_completed_by=True)
 
         # Use stub serializer if requested (feature flag checked at API level)
         if self.context.get('annotations_stub'):

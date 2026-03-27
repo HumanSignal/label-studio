@@ -7,6 +7,6 @@ export {
   annotationKeys,
   fetchAnnotation,
   invalidateAnnotationCache,
-  invalidateDistributionCache,
+  invalidateTaskAgreementCache,
   type AnnotationData,
 } from "./useAnnotationQuery";

@@ -34,6 +34,10 @@ from tasks.openapi_schema import (
     task_request_schema,
     task_response_example,
 )
+from tasks.ordering import (
+    get_task_children_prefetch,
+    parse_annotations_ordering_request,
+)
 from tasks.serializers import (
     AnnotationDraftSerializer,
     AnnotationSerializer,
@@ -214,6 +218,16 @@ class TaskListAPI(DMTaskListAPI):
         """,
         parameters=[
             OpenApiParameter(name='id', type=OpenApiTypes.STR, location='path', description='Task ID'),
+            OpenApiParameter(
+                name='annotations_ordering',
+                type=OpenApiTypes.STR,
+                location='query',
+                required=False,
+                description=(
+                    'Django-style ordering for nested annotations and predictions: `-id` or `-pk` for descending '
+                    'primary key (labeling UI), `id` or `pk` for ascending. Omit for default database ordering.'
+                ),
+            ),
         ],
         request=None,
         responses={
@@ -288,10 +302,12 @@ class TaskAPI(generics.RetrieveUpdateDestroyAPIView):
         super().initial(request, *args, **kwargs)
         self.task = self.get_object()
 
-    def prefetch(self, queryset):
+    def prefetch(self, queryset, request=None):
+        ordering = parse_annotations_ordering_request(request)
+        annotation_children, prediction_children = get_task_children_prefetch(ordering)
         return queryset.prefetch_related(
-            'annotations',
-            'predictions',
+            annotation_children,
+            prediction_children,
             'annotations__completed_by',
             'project',
             'io_storages_azureblobimportstoragelink',
@@ -325,6 +341,7 @@ class TaskAPI(generics.RetrieveUpdateDestroyAPIView):
             'annotations': 'annotations' in fields,
             'drafts': 'drafts' in fields,
             'annotations_stub': annotations_stub,
+            'annotations_ordering': parse_annotations_ordering_request(request),
             'request': request,
         }
 
@@ -369,7 +386,8 @@ class TaskAPI(generics.RetrieveUpdateDestroyAPIView):
         return self.prefetch(
             Task.prepared.get_queryset(
                 prepare_params=PrepareParams(project=project, selectedItems=selected, request=self.request), **kwargs
-            )
+            ),
+            self.request,
         )
 
     def get_object(self):
@@ -430,6 +448,7 @@ class TaskAPI(generics.RetrieveUpdateDestroyAPIView):
                         name='response',
                         value={
                             'total_annotations': 100,
+                            'agreement': 85.5,
                             'distributions': {
                                 'label': {
                                     'type': 'rectanglelabels',
@@ -562,10 +581,18 @@ class TaskAgreementAPI(generics.RetrieveAPIView):
             # Remove raw values from response to keep it lightweight
             del dist['values']
 
+        agreement_score = None
+        raw_agreement = getattr(task, 'precomputed_agreement', None)
+        if raw_agreement is not None:
+            val = float(raw_agreement)
+            # DM / LSE task payloads expose agreement as 0–100; DB may store 0–1 or percent
+            agreement_score = val * 100.0 if val <= 1.0 else val
+
         return Response(
             {
                 'total_annotations': total_annotations,
                 'distributions': distributions,
+                'agreement': agreement_score,
             }
         )
 

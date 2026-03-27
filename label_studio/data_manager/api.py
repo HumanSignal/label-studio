@@ -33,6 +33,10 @@ from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from tasks.models import Annotation, Prediction, Task
+from tasks.ordering import (
+    get_task_children_prefetch,
+    parse_annotations_ordering_request,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -337,16 +341,15 @@ class TaskListAPI(generics.ListCreateAPIView):
             'drafts': all_fields,
             'predictions': all_fields,
             'annotations': all_fields,
+            'annotations_ordering': parse_annotations_ordering_request(request),
         }
 
     def get_task_queryset(self, request, prepare_params):
         return Task.prepared.only_filtered(prepare_params=prepare_params)
 
     @staticmethod
-    def prefetch(queryset):
-        return queryset.prefetch_related(
-            'annotations',
-            'predictions',
+    def prefetch(queryset, request=None):
+        common = (
             'annotations__completed_by',
             'project',
             'io_storages_azureblobimportstoragelink',
@@ -355,6 +358,15 @@ class TaskListAPI(generics.ListCreateAPIView):
             'io_storages_redisimportstoragelink',
             'io_storages_s3importstoragelink',
             'file_upload',
+        )
+        if request:
+            ordering = parse_annotations_ordering_request(request)
+            annotation_children, prediction_children = get_task_children_prefetch(ordering)
+            return queryset.prefetch_related(annotation_children, prediction_children, *common)
+        return queryset.prefetch_related(
+            'annotations',
+            'predictions',
+            *common,
         )
 
     def get(self, request):
@@ -393,7 +405,8 @@ class TaskListAPI(generics.ListCreateAPIView):
                     fields_for_evaluation=fields_for_evaluation,
                     all_fields=all_fields,
                     request=request,
-                )
+                ),
+                request,
             )
 
             tasks_by_ids = {task.id: task for task in tasks}

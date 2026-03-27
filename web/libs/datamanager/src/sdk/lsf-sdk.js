@@ -9,7 +9,7 @@ import { annotationToServer, taskToLSFormat } from "./lsf-utils";
 import { when, runInAction } from "mobx";
 import { isAlive } from "mobx-state-tree";
 import { imageCache } from "@humansignal/core";
-import { invalidateAnnotationCache, invalidateDistributionCache } from "@humansignal/core/lib/utils/annotation-cache";
+import { invalidateAnnotationCache, invalidateTaskAgreementCache } from "@humansignal/core/lib/utils/annotation-cache";
 import {
   annotationNeedsHydration,
   applyAnnotationHydrationFromApi,
@@ -857,7 +857,7 @@ export class LSFWrapper {
         invalidateAnnotationCache(result.id);
       }
       // Invalidate distribution for the task
-      invalidateDistributionCache(this.task?.id);
+      invalidateTaskAgreementCache(this.task?.id);
     }
 
     if (exitStream) return this.exitStream();
@@ -896,7 +896,7 @@ export class LSFWrapper {
     // FIT-720: Invalidate annotation cache after successful update
     if (status < 400 && annotation.pk) {
       invalidateAnnotationCache(annotation.pk);
-      invalidateDistributionCache(task.id);
+      invalidateTaskAgreementCache(task.id);
     }
 
     if (exitStream) return this.exitStream();
@@ -927,6 +927,8 @@ export class LSFWrapper {
   /**@private */
   onDeleteAnnotation = async (ls, annotation) => {
     const { task } = this;
+    const deletedAnnotationPk = annotation.pk;
+    const taskId = task.id;
     let response;
 
     task.deleteAnnotation(annotation);
@@ -940,8 +942,8 @@ export class LSFWrapper {
     } else {
       response = await this.withinLoadingState(async () => {
         return this.datamanager.apiCall("deleteAnnotation", {
-          taskID: task.id,
-          annotationID: annotation.pk,
+          taskID: taskId,
+          annotationID: deletedAnnotationPk,
         });
       });
 
@@ -949,11 +951,24 @@ export class LSFWrapper {
       this.datamanager.invoke("deleteAnnotation", ls, annotation);
     }
 
-    if (response.ok) {
-      const lastAnnotation = this.annotations[this.annotations.length - 1] ?? {};
-      const annotationID = lastAnnotation.pk ?? undefined;
+    const status = response?.$meta?.status ?? response?.status;
+    const deleteSucceeded = !response?.error && (status === undefined ? response?.ok !== false : status < 400);
 
-      await this.setAnnotation(annotationID);
+    if (deleteSucceeded) {
+      invalidateTaskAgreementCache(taskId);
+      if (deletedAnnotationPk) {
+        invalidateAnnotationCache(deletedAnnotationPk);
+      }
+
+      const isRejectedQueue = isDefined(task.default_selected_annotation);
+      const next = this.currentAnnotation;
+      const nextAnnotationId = next?.pk ?? next?.id;
+
+      if (isRejectedQueue) {
+        await this.loadTask();
+      } else {
+        await this.loadTask(taskId, nextAnnotationId, true);
+      }
     }
   };
 
