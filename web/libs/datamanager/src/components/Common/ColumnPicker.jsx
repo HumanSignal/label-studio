@@ -375,6 +375,7 @@ export function ColumnPicker({
       disabled={disabled}
       dataTestid={dataTestid}
       triggerClassName={triggerClassName}
+      showGroupActions={multiple}
       triggerProps={{
         ...triggerProps,
         style: {

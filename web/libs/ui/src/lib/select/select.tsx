@@ -275,6 +275,7 @@ export const Select = forwardRef(
       alwaysShowSelectedGroup = false,
       optionRenderer,
       onSelectAllClick,
+      showGroupActions = false,
       open: controlledOpen,
       ...props
     }: SelectProps<T, A>,
@@ -478,17 +479,8 @@ export const Select = forwardRef(
     const renderedOptions = useMemo(() => {
       if (groupedOptions) {
         let globalIndex = 0;
-        return groupedOptions.flatMap((group, groupIdx) => {
-          const elements: React.ReactNode[] = [];
-          if (group.groupKey !== null) {
-            elements.push(
-              <div key={`group-header-${group.groupKey}-${groupIdx}`} className={styles.groupHeader}>
-                <Typography variant="label" size="smaller">
-                  {group.groupKey}
-                </Typography>
-              </div>,
-            );
-          }
+        return groupedOptions.map((group, groupIdx) => {
+          const itemElements: React.ReactNode[] = [];
           group.items.forEach((item) => {
             const val = typeof item === "object" && item != null ? (item.value ?? item.key ?? item) : item;
             const lab =
@@ -498,7 +490,7 @@ export const Select = forwardRef(
             const isOptionSelected = isSelected(val);
             const idx = globalIndex;
             globalIndex += 1;
-            elements.push(
+            itemElements.push(
               <Option
                 key={`${val}_${idx}`}
                 value={val}
@@ -514,7 +506,33 @@ export const Select = forwardRef(
               />,
             );
           });
-          return elements;
+
+          const hasHeader = group.groupKey !== null;
+          const hasActions = hasHeader && showGroupActions && multiple;
+
+          return (
+            <div
+              key={`group-container-${group.groupKey ?? "__ungrouped__"}-${groupIdx}`}
+              className={hasActions ? styles.groupContainer : undefined}
+            >
+              {hasHeader && (
+                <div className={styles.groupHeader}>
+                  <Typography variant="label" size="smaller">
+                    {group.groupKey}
+                  </Typography>
+                  {hasActions && (
+                    <GroupActions
+                      groupItems={group.items}
+                      valueRef={valueRef}
+                      setValue={setValue}
+                      onChange={props?.onChange}
+                    />
+                  )}
+                </div>
+              )}
+              {itemElements}
+            </div>
+          );
         });
       }
       return _options.map((option, index) => {
@@ -585,7 +603,7 @@ export const Select = forwardRef(
           />
         );
       });
-    }, [_options, groupedOptions, multiple, isSelected, _onChange, optionRenderer]);
+    }, [_options, groupedOptions, multiple, isSelected, _onChange, optionRenderer, showGroupActions, props?.onChange]);
 
     const combobox = (
       <Popover
@@ -755,6 +773,56 @@ export const Select = forwardRef(
     return combobox;
   },
 );
+
+type GroupActionsProps = {
+  groupItems: any[];
+  valueRef: React.MutableRefObject<any>;
+  setValue: (value: any) => void;
+  onChange?: (value: any) => void;
+};
+
+const GroupActions = ({ groupItems, valueRef, setValue, onChange }: GroupActionsProps) => {
+  const handleSelectAll = useCallback(
+    (e: React.MouseEvent) => {
+      e.stopPropagation();
+      const keys = groupItems
+        .filter((item) => !(typeof item === "object" && item?.disabled))
+        .map((item) => (typeof item === "object" && item != null ? (item.value ?? item.key ?? item) : item));
+      const currentSet = new Set(Array.isArray(valueRef.current) ? valueRef.current : []);
+      for (const k of keys) currentSet.add(k);
+      valueRef.current = [...currentSet];
+      setValue(valueRef.current);
+      onChange?.(valueRef.current);
+    },
+    [groupItems, valueRef, setValue, onChange],
+  );
+
+  const handleSelectNone = useCallback(
+    (e: React.MouseEvent) => {
+      e.stopPropagation();
+      const removeSet = new Set(
+        groupItems
+          .filter((item) => !(typeof item === "object" && item?.disabled))
+          .map((item) => (typeof item === "object" && item != null ? (item.value ?? item.key ?? item) : item)),
+      );
+      valueRef.current = (Array.isArray(valueRef.current) ? valueRef.current : []).filter((v) => !removeSet.has(v));
+      setValue(valueRef.current);
+      onChange?.(valueRef.current);
+    },
+    [groupItems, valueRef, setValue, onChange],
+  );
+
+  return (
+    <div className={styles.groupActions}>
+      <Button type="button" look="string" size="smaller" onClick={handleSelectAll}>
+        All
+      </Button>
+      <Button type="button" look="string" size="smaller" onClick={handleSelectNone}>
+        None
+      </Button>
+    </div>
+  );
+};
 
 const Option = ({
   value,

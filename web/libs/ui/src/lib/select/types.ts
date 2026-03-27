@@ -106,6 +106,8 @@ export type SelectProps<T, A extends SelectOption<T>[]> = {
   open?: boolean;
   alwaysShowSelectedGroup?: boolean;
   onSelectAllClick?: () => void;
+  /** When true (requires `multiple` + `groupBy`), shows "All" / "None" bulk-toggle buttons on group header hover. Fires a single `onChange` with the full updated array. */
+  showGroupActions?: boolean;
 } & SelectVirtualizedProps &
   Omit<React.SelectHTMLAttributes<HTMLSelectElement>, "value" | "placeholder">;
 

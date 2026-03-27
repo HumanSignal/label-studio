@@ -152,13 +152,30 @@
   border-top: 1px solid var(--color-neutral-border-subtler);
 }
 
-/* Flat group header: subtle, non-interactive label above items */
+/* Flat group header: subtle label above items */
 .groupHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   padding: var(--spacing-tight);
   padding-bottom: 0;
   color: var(--color-neutral-content-subtler);
   text-transform: capitalize;
   letter-spacing: normal;
-  pointer-events: none;
   user-select: none;
+}
+
+/* Bulk-action buttons (All / None) in group headers; revealed on group hover. */
+.groupActions {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-tighter);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s ease-out;
+}
+
+.groupContainer:hover .groupActions {
+  opacity: 1;
+  pointer-events: auto;
 }

@@ -300,6 +300,42 @@ export const WithGroupByMultiple: Story = {
 };
 
 /**
+ * Multi-select with groupBy and showGroupActions enabled.
+ * Hovering a group header or any of its items reveals "All" / "None" buttons
+ * that bulk-select or deselect the entire group in a single onChange call.
+ * Disabled items are skipped by the bulk actions.
+ */
+export const WithGroupByMultipleAndGroupActions: Story = {
+  args: {
+    ...WithGroupBy.args,
+    multiple: true,
+    value: ["id", "task_state"],
+    showGroupActions: true,
+    label: "With groupBy + group actions (All / None)",
+    options: [
+      { key: "id", title: "ID", value: "id" },
+      { key: "inner_id", title: "Inner ID", value: "inner_id" },
+      { key: "task_state", title: "Task State", value: "task_state" },
+      { key: "agreement", title: "Agreement", value: "agreement", group: "Agreement" },
+      { key: "dim_1", title: "Dimension 1", value: "dim_1", group: "Agreement" },
+      {
+        key: "dim_2",
+        title: "Dimension 2 (disabled)",
+        value: "dim_2",
+        group: "Agreement",
+        disabled: true,
+      },
+      { key: "annot_completed", title: "Annotation Completed At", value: "annot_completed", group: "Annotations" },
+      { key: "lead_time", title: "Lead Time", value: "lead_time", group: "Annotations" },
+      { key: "summary", title: "summary", value: "summary", group: "Data", readableType: "TextArea" },
+      { key: "rating", title: "rating", value: "rating", group: "Data", readableType: "Rating" },
+      { key: "heading", title: "heading", value: "heading", group: "Data", readableType: "str" },
+      { key: "author", title: "author", value: "author", group: "Data", readableType: "str" },
+    ] as any[],
+  },
+};
+
+/**
  * groupBy with custom option content via optionRenderer (e.g. type badges).
  */
 export const WithGroupByAndOptionRenderer: Story = {
