@@ -47,11 +47,15 @@ export function applyAnnotationHydrationFromApi(
   const freshHasRegions = freshAnnotation.areas?.size > 0;
 
   if (freshHasVersionsResult || freshHasRegions) {
+    if (!freshHasVersionsResult && fullAnnotation.result) {
+      freshAnnotation.addVersions?.({ result: fullAnnotation.result });
+    }
     return false;
   }
 
   freshAnnotation.history?.freeze?.();
   if (!isAlive(freshAnnotation) || !isAlive(freshAnnotation.trackedState)) return false;
+  freshAnnotation.addVersions?.({ result: fullAnnotation.result });
   freshAnnotation.deserializeResults(fullAnnotation.result);
   freshAnnotation.updateObjects?.();
   freshAnnotation.history?.safeUnfreeze?.();

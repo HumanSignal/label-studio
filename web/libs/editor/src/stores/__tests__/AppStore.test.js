@@ -694,7 +694,7 @@ describe("AppStore", () => {
       expect(Number(first.pk)).toBe(historyRowId);
     });
 
-    it("hydrateHistoryItem finds item by pk (not MST id) and hydrates then selects", () => {
+    it("hydrateHistoryItem finds item by MST guid and hydrates then selects", () => {
       const store = createStore();
       store.initializeStore({
         annotations: [{ id: "a1", pk: 100, result: [] }],
@@ -710,6 +710,7 @@ describe("AppStore", () => {
         },
       ]);
       expect(store.annotationStore.history.length).toBe(1);
+      const mstGuid = store.annotationStore.history[0].id;
       const fullItem = {
         id: historyRowId,
         annotation_id: 100,
@@ -723,10 +724,11 @@ describe("AppStore", () => {
           },
         ],
       };
-      store.hydrateHistoryItem(historyRowId, fullItem);
+      store.hydrateHistoryItem(mstGuid, fullItem);
       expect(store.annotationStore.selectedHistory).toBe(store.annotationStore.history[0]);
       expect(store.annotationStore.selectedHistory.pk).toBeDefined();
       expect(Number(store.annotationStore.selectedHistory.pk)).toBe(historyRowId);
+      expect(store.annotationStore.selectedHistory.is_stub).toBe(false);
     });
   });
 

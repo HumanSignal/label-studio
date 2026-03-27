@@ -540,12 +540,15 @@ export class LSFWrapper {
         const hasRegions = lsfAnnotation.areas?.size > 0;
 
         if (hasVersionsResult || hasRegions) {
-          // Already hydrated
+          if (!hasVersionsResult && fullAnnotation.result) {
+            lsfAnnotation.addVersions?.({ result: fullAnnotation.result });
+          }
           return fullAnnotation;
         }
 
         if (fullAnnotation.result) {
           if (!isAlive(lsfAnnotation) || !isAlive(lsfAnnotation.trackedState)) return fullAnnotation;
+          lsfAnnotation.addVersions?.({ result: fullAnnotation.result });
           lsfAnnotation.history.freeze();
           lsfAnnotation.deserializeResults(fullAnnotation.result);
           // Critical: updateObjects() is required to render visual regions after deserializing
@@ -1188,7 +1191,14 @@ export class LSFWrapper {
 
   // FIT-720: Hydrate a stub annotation by fetching full data from API
   _hydrateStubAnnotation = async (annotation) => {
-    if (!annotationNeedsHydration(annotation)) {
+    const needsFullHydration = annotationNeedsHydration(annotation);
+    const versionsResult = annotation?.versions?.result;
+    const needsVersionsPopulated =
+      !needsFullHydration &&
+      annotation?.type === "annotation" &&
+      (!Array.isArray(versionsResult) || versionsResult.length === 0);
+
+    if (!needsFullHydration && !needsVersionsPopulated) {
       return;
     }
 

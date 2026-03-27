@@ -965,12 +965,19 @@ export default types
      * Hydrate a stubbed history item with full result (FIT-720 lazy load).
      * Called when the host fetches GET /api/annotation-history/<id>/ and passes the response.
      */
-    function hydrateHistoryItem(historyId, fullItem) {
+    function hydrateHistoryItem(historyItemId, fullItem) {
       const as = self.annotationStore;
-      // historyId is the numeric API id (pk); store items have id=guid and pk=numeric from createItem
-      const item = as.history.find((h) => h.pk && Number(h.pk) === Number(historyId));
+      // historyItemId is the MST guid (item.id from AnnotationHistory.tsx), which is unique per
+      // history entry. We cannot match by pk because the API can return multiple history records
+      // with the same pk (e.g. "accepted" and "updated" both share pk=248 for the same review).
+      const item = as.history.find((h) => h.id === historyItemId);
       if (!item) return;
       item.deserializeResults(fullItem?.result ?? [], { hidden: true });
+      // Mark as no longer a stub so subsequent clicks use selectHistory() directly
+      // instead of re-invoking the async hydration callback. Without this, clicking
+      // A → B → A again re-hydrates A and area.addResult() accumulates duplicate
+      // label results per region ("Car" → "Car, Car").
+      item.is_stub = false;
       as.selectHistory(item);
     }
 
