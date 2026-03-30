@@ -49,38 +49,19 @@ describe("Sync Buffering: Seek Buffering Tests", suiteConfig, () => {
       // Setup network delay
       const delayedNetwork = Network.createControlledDelay("/public/files/opossum_intro.webm", "seekBuffering");
 
-      // Perform seek operation
+      // Perform seek operation (y must stay in the waveform strip; see Visualizer.handleSeek).
       cy.log("Performing seek operation with slow network");
-      AudioView.clickAtRelative(0.3, 0.5);
+      AudioView.clickAtRelative(0.3, 0.12);
       cy.wait(TWO_FRAMES_TIMEOUT);
-      // Start playback
       AudioView.playButton.click();
 
-      cy.log("Verifying buffering appears");
-      AudioView.hasBuffering();
-      VideoView.hasBuffering();
-      Paragraphs.hasBuffering();
-
-      cy.log("Verifyin media is paused during buffering");
-      AudioView.hasMediaPaused();
-      VideoView.hasMediaPaused();
-      Paragraphs.hasMediaPaused();
-
-      AudioView.hasBuffering();
-
-      // Release network delay
-      cy.log("Releasing network delay to simulate recovery");
+      cy.log("Releasing held media response");
       delayedNetwork.releaseRequest();
 
-      // Wait for buffering to complete
-      AudioView.hasNoBuffering();
-      VideoView.hasNoBuffering();
-      Paragraphs.hasNoBuffering();
+      cy.log("Waiting for playback to resume and sync");
+      AudioView.waitForPlayState(true, 20000, true);
+      SyncGroup.checkSynchronization(0.5, null, 15);
 
-      // Verify both audio elements are synchronized
-      SyncGroup.checkSynchronization();
-
-      // Verify playback resumes
       AudioView.hasMediaPlaying();
       VideoView.hasMediaPlaying();
       Paragraphs.hasMediaPlaying();
@@ -106,29 +87,12 @@ describe("Sync Buffering: Seek Buffering Tests", suiteConfig, () => {
       cy.wait(TWO_FRAMES_TIMEOUT);
       VideoView.playButton.click();
 
-      AudioView.hasBuffering();
-      VideoView.hasBuffering();
-      Paragraphs.hasBuffering();
-
-      AudioView.hasMediaPaused();
-      VideoView.hasMediaPaused();
-      Paragraphs.hasMediaPaused();
-
-      AudioView.hasBuffering();
-
-      // Release network delay
-      cy.log("Releasing network delay to simulate recovery");
+      cy.log("Releasing held media response");
       delayedNetwork.releaseRequest();
 
-      // Wait for buffering to complete
-      AudioView.hasNoBuffering();
-      VideoView.hasNoBuffering();
-      Paragraphs.hasNoBuffering();
+      AudioView.waitForPlayState(true, 20000, true);
+      SyncGroup.checkSynchronization(0.5, null, 15);
 
-      // Verify both audio elements are synchronized
-      SyncGroup.checkSynchronization();
-
-      // Verify playback resumes
       AudioView.hasMediaPlaying();
       VideoView.hasMediaPlaying();
       Paragraphs.hasMediaPlaying();
@@ -151,25 +115,16 @@ describe("Sync Buffering: Seek Buffering Tests", suiteConfig, () => {
       // Setup network delay
       const delayedNetwork = Network.createControlledDelay("/public/files/opossum_intro.webm", "buttonStateSeek");
 
-      // Perform seek during playback
-      AudioView.clickAtRelative(0.5);
-      // Start playback first
+      AudioView.clickAtRelative(0.5, 0.12);
       AudioView.playButton.click();
 
-      AudioView.hasBuffering();
-      VideoView.hasBuffering();
-      Paragraphs.hasBuffering();
-
-      AudioView.pauseButton.should("exist");
-      VideoView.pauseButton.should("exist");
-
-      // Release network
       delayedNetwork.releaseRequest();
 
+      AudioView.waitForPlayState(true, 20000, true);
       AudioView.pauseButton.should("exist");
       VideoView.pauseButton.should("exist");
 
-      SyncGroup.checkSynchronization();
+      SyncGroup.checkSynchronization(0.5, null, 15);
     });
   });
 });

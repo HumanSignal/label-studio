@@ -20,13 +20,11 @@ ARG UV_VERSION=0.10.2
 FROM ghcr.io/astral-sh/uv:${UV_VERSION} AS uv
 
 ################################ Stage: frontend-builder (build frontend assets)
-FROM --platform=${BUILDPLATFORM} node:${NODE_VERSION}-alpine AS frontend-builder
+FROM --platform=${BUILDPLATFORM} oven/bun:1.3-alpine AS frontend-builder
 ENV BUILD_NO_SERVER=true \
     BUILD_NO_HASH=true \
     BUILD_NO_CHUNKS=true \
     BUILD_MODULE=true \
-    YARN_CACHE_FOLDER=/root/web/.yarn \
-    NX_CACHE_DIRECTORY=/root/web/.nx \
     NODE_ENV=production \
     NODE_OPTIONS="--max-old-space-size=4096"
 
@@ -44,17 +42,17 @@ RUN apk add --no-cache \
     python3
 
 COPY services/lso/web/package.json \
-     services/lso/web/yarn.lock \
+     services/lso/web/bun.lock \
      ./
-RUN --mount=type=cache,target=/root/web/.yarn,id=yarn-cache,sharing=locked \
-    --mount=type=cache,target=/root/web/.nx,id=nx-cache,sharing=locked \
-    yarn install --prefer-offline --no-progress --pure-lockfile --frozen-lockfile --ignore-engines --non-interactive --production=false
+RUN --mount=type=cache,target=/root/.bun/install/cache,id=bun-install-cache,sharing=locked \
+    bun install --frozen-lockfile --prefer-offline
 
 COPY services/lso/web ./
+# Target path for django-manifest-plugin → label_studio/core/static/js/manifest.json (collectstatic input).
+RUN mkdir -p /label-studio/label_studio/core/static/js
 COPY services/lso/pyproject.toml ../pyproject.toml
-RUN --mount=type=cache,target=/root/web/.yarn,id=yarn-cache,sharing=locked \
-    --mount=type=cache,target=/root/web/.nx,id=nx-cache,sharing=locked \
-    yarn run build
+RUN --mount=type=cache,target=/root/.bun/install/cache,id=bun-install-cache,sharing=locked \
+    bun run build
 
 ################################ Stage: venv-builder (prepare the virtualenv)
 FROM python:${PYTHON_VERSION}-alpine AS venv-builder
@@ -106,6 +104,11 @@ RUN --mount=type=cache,target=/.uv-cache,id=uv-cache-alpine,sharing=locked \
 # --- Phase 2: Install project + SDK (only reruns on source changes) ---
 COPY libs/lso-client-generator/fern/.preview/fern-python-sdk/src ./label-studio-sdk/src
 COPY services/lso/label_studio ./label_studio
+
+# Vite emits this path in frontend-builder; collectstatic must see it before STATIC_ROOT is populated.
+COPY --from=frontend-builder /label-studio/label_studio/core/static/js/manifest.json ./label_studio/core/static/js/manifest.json
+COPY --from=frontend-builder /label-studio/label_studio/core/static/js/sw.js ./label_studio/core/static/js/sw.js
+COPY --from=frontend-builder /label-studio/label_studio/core/static/js/sw.js.map ./label_studio/core/static/js/sw.js.map
 
 RUN --mount=type=cache,target=/.uv-cache,id=uv-cache-alpine,sharing=locked \
     if [ "$INCLUDE_DEV" = "true" ]; then \

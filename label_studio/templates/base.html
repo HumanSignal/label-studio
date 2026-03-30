@@ -16,16 +16,11 @@
   <meta name="msapplication-navbutton-color" content="#272727">  <!-- Windows Phone -->
   <meta name="apple-mobile-web-app-status-bar-style" content="#272727">  <!-- iOS Safari -->
 
-  <!-- Preload fonts -->
-  <link rel="preload" href="{{ settings.HOSTNAME }}/static/fonts/Figtree-Regular.ttf" as="font" type="font/ttf"
-    crossorigin="anonymous">
-  <link rel="preload" href="{{ settings.HOSTNAME }}/static/fonts/Figtree-SemiBold.ttf" as="font" type="font/ttf"
-    crossorigin="anonymous">
-
-
   <!-- CSS -->
   {% block app-css %}
-    <link href="{{settings.FRONTEND_HOSTNAME}}/react-app/main.css?v={{ versions.backend.commit }}" rel="stylesheet">
+    {% if not settings.FRONTEND_HMR %}
+      <link href="{% manifest_asset 'main.css' %}" rel="stylesheet">
+    {% endif %}
   {% endblock %}
 
   {% block theme_colors %}
@@ -206,13 +201,17 @@
 </script>
 
 {% block app-js %}
-<script src="{{settings.FRONTEND_HOSTNAME}}/react-app/runtime.js?v={{ versions.backend.commit }}"></script>
-{% comment %}
-  NOTE: purposely setting this to not cache using backend commit as we do not intend this to change frequently.
-  If for any reason we need to invalidate the cache, we can do so by changing the version number.
-{% endcomment %}
-<script src="{{settings.FRONTEND_HOSTNAME}}/react-app/vendor.js?v=1"></script>
-<script src="{{settings.FRONTEND_HOSTNAME}}/react-app/main.js?v={{ versions.backend.commit }}"></script>
+  {% if settings.FRONTEND_HMR %}
+  <script type="module" nonce="{{ request.csp_nonce }}">
+    import RefreshRuntime from '{{ settings.FRONTEND_HOSTNAME }}/react-app/@react-refresh'
+    RefreshRuntime.injectIntoGlobalHook(window)
+    window.$RefreshReg$ = () => {}
+    window.$RefreshSig$ = () => (type) => type
+    window.__vite_plugin_react_preamble_installed__ = true
+  </script>
+  <script type="module" src="{{ settings.FRONTEND_HOSTNAME }}/react-app/@vite/client"></script>
+  {% endif %}
+  <script type="module" src="{% manifest_asset 'main.js' %}"></script>
 {% endblock %}
 
 {% block bottomjs %}

@@ -1,11 +1,9 @@
-const { pathsToModuleNameMapper } = require("ts-jest");
-const tsconfig = require("../../tsconfig.base.json");
+const jestPathAliases = require("../../jest.pathMapper.cjs");
 const isCi = Boolean(process.env.CI);
 
 /** @type {import('ts-jest/dist/types').InitialOptionsTsJest} */
 module.exports = {
   roots: ["<rootDir>/src"],
-  preset: "../../jest.preset.js",
   setupFilesAfterEnv: ["./jest.setup.js"],
   testEnvironment: "jsdom",
   collectCoverageFrom: [
@@ -65,21 +63,20 @@ module.exports = {
   moduleFileExtensions: ["js", "ts", "jsx", "tsx"],
   moduleDirectories: ["node_modules"],
   moduleNameMapper: {
+    ...jestPathAliases,
     "^konva": "konva/konva",
     "^keymaster": "identity-obj-proxy",
     "^react-konva-utils": "identity-obj-proxy",
     "\\.(css|svg|png|jpe?g)$": "identity-obj-proxy",
     "^@adobe/css-tools$": "<rootDir>/../../__mocks__/@adobe/css-tools.js",
-    "^@humansignal/ui": "<rootDir>/../ui/src/index.ts",
-    ...pathsToModuleNameMapper(tsconfig.compilerOptions.paths, {
-      prefix: "<rootDir>/../../",
-    }),
+    "^@humansignal/ui$": "<rootDir>/../ui/src/index.ts",
   },
   testPathIgnorePatterns: [
     "/node_modules/",
     "/e2e/",
     // Full-app renderEditor tests require MST/load order not available in this env; skip until integration setup is ready.
     "renderEditor\\.test\\.",
+    "AreaMixinMockResult\\.js",
   ],
   transformIgnorePatterns: ["node_modules/?!(nanoid|konva|@adobe)"],
   // In CI, fewer workers reduces peak memory while coverage is collected and merged (parent process

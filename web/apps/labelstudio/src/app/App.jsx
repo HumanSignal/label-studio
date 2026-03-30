@@ -89,7 +89,3 @@ const root = document.querySelector(".app-wrapper");
 const content = document.querySelector("#main-content");
 
 render(<App content={content.innerHTML} />, root);
-
-if (module?.hot) {
-  module.hot.accept(); // Enable HMR for React components
-}

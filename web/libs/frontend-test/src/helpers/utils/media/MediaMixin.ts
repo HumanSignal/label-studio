@@ -4,21 +4,28 @@ export function withMedia<T extends new (...args: any[]) => ViewWithMedia>(
   Base: T,
 ): T & (new (...args: any[]) => MediaView) {
   return class extends Base implements MediaView {
-    _bufferingIndicatorSelector = ".lsf-timeline-controls__buffering";
+    /** Shared by timeline controls, Paragraphs, and VideoCanvas buffering overlays */
+    _bufferingIndicatorSelector = '[aria-label="Buffering Media Source"]';
+    /**
+     * Buffering overlays are not scoped under the audio or video tag roots (see Timeline Controls,
+     * ParagraphAudio, VideoCanvas). Query globally so AudioView / VideoView / Paragraphs helpers
+     * observe the same sync buffering UI.
+     */
     get bufferingIndicator() {
-      return this.root.get(this._bufferingIndicatorSelector);
+      return cy.get(this._bufferingIndicatorSelector);
     }
     /**
      * Check if Tag is in buffering state
      */
     hasBuffering() {
-      this.bufferingIndicator.should("be.visible");
+      // Multiple overlays can exist; at least one must be visible (others may be in hidden layout).
+      cy.get(this._bufferingIndicatorSelector).filter(":visible").should("have.length.at.least", 1);
     }
     /**
      * Check if Tag is not in buffering state
      */
     hasNoBuffering() {
-      this.bufferingIndicator.should("not.exist");
+      cy.get("body").find(this._bufferingIndicatorSelector).filter(":visible").should("have.length", 0);
     }
 
     /**

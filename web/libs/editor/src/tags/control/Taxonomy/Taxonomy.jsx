@@ -23,7 +23,8 @@ import { FF_LSDV_4583, FF_TAXONOMY_LABELING, isFF } from "../../../utils/feature
 import ControlBase from "../Base";
 import ClassificationBase from "../ClassificationBase";
 
-import styles from "./Taxonomy.prefix.css";
+import { cn } from "../../../utils/bem";
+import "./Taxonomy.prefix.css";
 import messages from "../../../utils/messages";
 import { errorBuilder } from "../../../core/DataValidator/ConfigValidator";
 
@@ -582,8 +583,8 @@ const TaxonomyModel = types.compose(
 );
 
 const HtxTaxonomy = observer(({ item }) => {
-  // literal "taxonomy" class name is for external styling
-  const className = [styles.taxonomy, "taxonomy", styles.taxonomy__new].filter(Boolean).join(" ");
+  // literal "taxonomy" class name is for external styling (unprefixed hook)
+  const className = [cn("taxonomy").mix("taxonomy__new").toClassName(), "taxonomy"].filter(Boolean).join(" ");
   const visibleStyle = item.perRegionVisible() && item.isVisible ? {} : { display: "none" };
   const options = {
     showFullPath: item.showfullpath,
@@ -605,7 +606,7 @@ const HtxTaxonomy = observer(({ item }) => {
   if (item.loading && firstLoad) {
     return (
       <div className={className} style={visibleStyle}>
-        <div className={styles.taxonomy__loading}>
+        <div className={cn("taxonomy").elem("loading").toClassName()}>
           <Spin size="small" />
         </div>
       </div>

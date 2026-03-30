@@ -1,7 +1,5 @@
 import { type AudioDecoderWorker, getAudioDecoderWorker } from "@humansignal/audio-file-decoder";
-// eslint-disable-next-line
-// @ts-ignore
-import DecodeAudioWasm from "@humansignal/audio-file-decoder/decode-audio.wasm";
+import decodeAudioWasmUrl from "@humansignal/audio-file-decoder/decode-audio.wasm?url";
 import { BaseAudioDecoder } from "./BaseAudioDecoder";
 import { clamp, info } from "../Common/Utils";
 import { SplitChannel } from "./SplitChannel";
@@ -41,7 +39,7 @@ export class AudioDecoder extends BaseAudioDecoder {
    */
   async init(arraybuffer: ArrayBuffer) {
     if (this.worker) return;
-    this.worker = await getAudioDecoderWorker(DecodeAudioWasm, arraybuffer);
+    this.worker = await getAudioDecoderWorker(decodeAudioWasmUrl, arraybuffer);
 
     info("decode:worker:ready", this.src);
   }

@@ -943,7 +943,7 @@ function addToJsTokens(obj, path, cssVarName) {
  * @returns {String} - The CSS content
  */
 function generateCssContent(result) {
-  let content = "// Generated from design-tokens.json - DO NOT EDIT DIRECTLY\n\n";
+  let content = "/* Generated from design-tokens.json - DO NOT EDIT DIRECTLY */\n\n";
 
   // Light mode variables (default)
   content += ":root {\n";
@@ -1078,7 +1078,7 @@ function generateJsContent(jsTokens) {
 
 const designTokens = ${literalStr};
 
-module.exports = designTokens;
+export default designTokens;
 `;
 
   return content;

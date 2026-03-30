@@ -1,16 +1,29 @@
 /* eslint-disable */
+const jestPathAliases = require("../../jest.pathMapper.cjs");
 const isCi = Boolean(process.env.CI);
 
 export default {
   displayName: "core",
-  preset: "../../jest.preset.js",
+  roots: ["<rootDir>/src"],
+  testEnvironment: "jsdom",
   transform: {
-    "^(?!.*\\.(js|jsx|ts|tsx|css|json)$)": "@nx/react/plugins/jest",
-    "^.+\\.[tj]sx?$": ["babel-jest", { presets: ["@nx/react/babel"] }],
+    "^.+\\.[tj]sx?$": [
+      "babel-jest",
+      {
+        presets: [
+          ["@babel/preset-env", { targets: { node: "current" } }],
+          ["@babel/preset-react", { runtime: "automatic" }],
+          "@babel/preset-typescript",
+        ],
+      },
+    ],
   },
   moduleFileExtensions: ["ts", "tsx", "js", "jsx"],
+  moduleNameMapper: {
+    ...jestPathAliases,
+    "\\.(css|less|scss|sass|gif|png|jpe?g|svg)$": "identity-obj-proxy",
+  },
+  moduleDirectories: ["node_modules", "<rootDir>/../../node_modules"],
   coverageDirectory: "../../coverage/libs/core",
-  // In CI, fewer workers reduces peak memory while coverage is collected and merged (parent process
-  // still holds the combined result). Locally we keep Jest's default for speed.
   ...(isCi ? { maxWorkers: 2, workerIdleMemoryLimit: "512MB" } : {}),
 };

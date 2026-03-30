@@ -5,10 +5,13 @@ import * as tasks from "./tasks";
 import { disableChromeGPU } from "./plugins/disable_gpu";
 import { coverageParallel } from "./plugins/coverage_parallel.js";
 import { addMatchImageSnapshotPlugin } from "cypress-image-snapshot/plugin";
-import { nxE2EPreset } from "@nx/cypress/plugins/cypress-preset";
 
 const COLLECT_COVERAGE = process.env.COLLECT_COVERAGE === "true" || process.env.COLLECT_COVERAGE === "1";
-const localPath = (p: string) => path.resolve(process.cwd(), p);
+
+export type ConfigureOptions = {
+  /** Directory of the Cypress project (e.g. `libs/editor`). Defaults to `process.cwd()`. */
+  rootDir?: string;
+};
 
 /**
  * Override Cypress settings
@@ -16,16 +19,18 @@ const localPath = (p: string) => path.resolve(process.cwd(), p);
 export default function (
   configModifier?: (config: Cypress.ConfigOptions) => Cypress.ConfigOptions,
   setupNodeEvents?: Cypress.EndToEndConfigOptions["setupNodeEvents"],
+  options?: ConfigureOptions,
 ) {
+  const root = options?.rootDir ?? process.cwd();
+  const localPath = (p: string) => path.resolve(root, p);
+
   /** @type {Cypress.ConfigOptions<any>} */
   const defaultConfig: Cypress.ConfigOptions = {
-    // Assets configuration
-    supportFolder: localPath("./cypress/support/"),
-    videosFolder: localPath("./output/video"),
-    screenshotsFolder: localPath("./output/screenshots"),
-    downloadsFolder: localPath("./output/downloads"),
-    fixturesFolder: localPath("./fixtures"),
-    trashAssetsBeforeRuns: false, // Kills ability to run in parallel, must be off
+    supportFolder: localPath("tests/integration/support"),
+    videosFolder: localPath("output/video"),
+    screenshotsFolder: localPath("output/screenshots"),
+    downloadsFolder: localPath("output/downloads"),
+    trashAssetsBeforeRuns: false,
     numTestsKeptInMemory: 1,
     env: {
       coverage: COLLECT_COVERAGE,
@@ -33,16 +38,15 @@ export default function (
       DEFAULT_NETWORK_THROTTLING: process.env.DEFAULT_NETWORK_THROTTLING || null,
     },
     e2e: {
-      ...nxE2EPreset(__filename, { cypressDir: "tests/integration" }),
+      specPattern: localPath("tests/integration/**/*.cy.{js,jsx,ts,tsx}"),
+      supportFile: localPath("tests/integration/support/e2e.ts"),
       baseUrl: "http://localhost:3000",
       injectDocumentDomain: true,
       viewportWidth: 1600,
       viewportHeight: 900,
-      // output config
       setupNodeEvents(on, config) {
         on("before:browser:launch", (browser = null, launchOptions) => {
           if (browser.name === "chrome") {
-            // Force sRGB color profile to prevent color mismatch in CI vs local runs
             launchOptions.args.push("--force-color-profile=srgb");
             return launchOptions;
           }
@@ -50,16 +54,12 @@ export default function (
 
         addMatchImageSnapshotPlugin(on, config);
 
-        // Allows collecting coverage
         coverageParallel(on, config);
         on("task", { ...tasks });
-        // Gives a step-by-step output for failed tests in headless mode
         installLogsPrinter(on, {
           outputVerbose: false,
         });
-        // Allows compiling TS files from node_modules (this package)
         setupNodeEvents?.(on, config);
-        // When running in headless on the CI, there's no GPU acceleration available
         disableChromeGPU(on);
         return config;
       },

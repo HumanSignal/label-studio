@@ -19,8 +19,10 @@ MODE=standalone yarn nx run editor:build:production
 In the same or another terminal, from `web/`:
 
 ```bash
-npx serve dist/libs/editor -l 3000
+bun libs/editor/server.mjs
 ```
+
+(Uses the Bun static server in `libs/editor/server.mjs`; same as CI. Port `3000` by default, override with `PORT`.)
 
 Leave this running. Confirm in the browser: [http://localhost:3000](http://localhost:3000) should load the LSF app (and CSS).
 

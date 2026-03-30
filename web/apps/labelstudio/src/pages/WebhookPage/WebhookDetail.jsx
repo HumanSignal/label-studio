@@ -80,7 +80,7 @@ const WebhookForm = ({
                 variant="primary"
                 look="string"
                 onClick={onAddHeaderClick}
-                className="!p-0 [&_span]:!text-[var(--grape_500)]"
+                className="!p-0 [&_span]:!text-[var(--grape\_500)]"
                 leading={<IconPlus />}
                 tooltip="Add Header"
               />

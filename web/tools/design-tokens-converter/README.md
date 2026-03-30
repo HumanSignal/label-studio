@@ -42,10 +42,10 @@ Import the CSS file in your main stylesheet:
 Update your Tailwind configuration to import the design tokens:
 
 ```js
-// tailwind.config.js
-const designTokens = require('./libs/ui/src/tokens/tokens.js');
+// tailwind.config.js (ESM)
+import designTokens from "./libs/ui/src/tokens/tokens.js";
 
-module.exports = {
+export default {
   // ...
   theme: {
     extend: {
@@ -64,6 +64,8 @@ module.exports = {
   },
 };
 ```
+
+From CommonJS, use `require("./libs/ui/src/tokens/tokens.js").default`.
 
 ## Usage Examples
 
