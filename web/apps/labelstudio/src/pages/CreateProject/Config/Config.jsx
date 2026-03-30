@@ -443,7 +443,7 @@ const Configurator = ({
   // Once enabled, stays enabled until user clicks "Update Preview"
   const [manualUpdateMode, setManualUpdateMode] = React.useState(false);
   // Track if config has changed since last preview update
-  const [hasPendingChanges, setHasPendingChanges] = React.useState(false);
+  const [_hasPendingChanges, setHasPendingChanges] = React.useState(false);
   // Track the last config that was successfully validated and displayed
   const lastValidatedConfig = React.useRef(null);
   // Increment when configToDisplay changes so Preview remounts and LSF initializes with new config (avoids stale/empty main area)

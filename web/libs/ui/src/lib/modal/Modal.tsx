@@ -63,14 +63,14 @@ const standaloneModal = <T,>({ simple = true, ...props }: ModalProps<T> & ExtraP
   }
   const modalRef = createRef<Modal>();
   const rootDiv = document.createElement("div");
-  let renderCount = 0;
+  let _renderCount = 0;
 
   rootDiv.className = cn("modal-holder").toClassName();
 
   document.body.appendChild(rootDiv);
 
   const renderModal = (props: ModalProps<T> & ExtraProps, animate?: boolean) => {
-    renderCount++;
+    _renderCount++;
 
     // Get providers from props or use empty array for simple modals
     const providers = simple ? [] : (props.providers ?? []);

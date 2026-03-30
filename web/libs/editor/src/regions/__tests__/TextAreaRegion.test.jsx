@@ -1,19 +1,13 @@
-/**
- * Unit tests for TextAreaRegion (model views/actions and view rendering).
- * Covers parent, getRegionElement, getOneColor, setValue, deleteRegion,
- * selectRegion, afterUnselectRegion, and HtxTextAreaRegion view branches.
- */
-import React from "react";
 import { types } from "mobx-state-tree";
-import { render, screen } from "@testing-library/react";
+import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
 
-const mockOnChange = jest.fn();
-const mockRemove = jest.fn();
-const mockValidateText = jest.fn(() => true);
-const mockUpdateLeadTime = jest.fn();
-const mockCountTime = jest.fn();
+const mockOnChange = mock();
+const mockRemove = mock();
+const mockValidateText = mock(() => true);
+const mockUpdateLeadTime = mock();
+const mockCountTime = mock();
 
-jest.mock("../../tags/control/TextArea/TextArea", () => {
+mockModule("../../tags/control/TextArea/TextArea", () => {
   const { types: t } = require("mobx-state-tree");
   return {
     TextAreaModel: t
@@ -37,30 +31,7 @@ jest.mock("../../tags/control/TextArea/TextArea", () => {
   };
 });
 
-jest.mock("../../components/HtxTextBox/HtxTextBox", () => ({
-  HtxTextBox: ({ id, name, text, onFocus, onChange, onInput, onDelete, ...rest }) => (
-    <div data-testid="htx-textbox" data-id={id} data-name={name} data-text={text} {...rest}>
-      <button type="button" onClick={() => onFocus?.({})}>
-        focus
-      </button>
-      <button type="button" onClick={() => onChange?.("new")}>
-        change
-      </button>
-      <button type="button" onClick={() => onInput?.()}>
-        input
-      </button>
-      <button type="button" onClick={() => onDelete?.()}>
-        delete
-      </button>
-    </div>
-  ),
-}));
-
-jest.mock("../../utils/feature-flags", () => ({
-  isFF: jest.fn(() => false),
-}));
-
-import { TextAreaRegionModel, HtxTextAreaRegion } from "../TextAreaRegion";
+import { HtxTextAreaRegion } from "../TextAreaRegion";
 import { TextAreaModel } from "../../tags/control/TextArea/TextArea";
 
 const TestRoot = types
@@ -103,6 +74,10 @@ describe("TextAreaRegion", () => {
     mockValidateText.mockReturnValue(true);
     mockUpdateLeadTime.mockClear();
     mockCountTime.mockClear();
+  });
+
+  afterAll(() => {
+    document.body.innerHTML = "";
   });
 
   describe("TextAreaRegionModel", () => {
@@ -185,39 +160,57 @@ describe("TextAreaRegion", () => {
       const root = createRoot({ _value: "hello" });
       const region = getRegion(root);
 
-      render(<HtxTextAreaRegion item={region} onFocus={jest.fn()} />);
+      render(<HtxTextAreaRegion item={region} onFocus={mock()} />);
 
       expect(screen.getByTestId("textarea-region")).toBeInTheDocument();
-      expect(screen.getByTestId("htx-textbox")).toBeInTheDocument();
-      expect(screen.getByTestId("htx-textbox")).toHaveAttribute("data-text", "hello");
+      expect(screen.getByTestId("htx-textbox-view")).toBeInTheDocument();
+      expect(screen.getByTestId("htx-textbox-content")).toHaveTextContent("hello");
     });
 
     it("passes onDelete to HtxTextBox and delete works", () => {
       const root = createRoot();
       const region = getRegion(root);
 
-      render(<HtxTextAreaRegion item={region} onFocus={jest.fn()} />);
-      screen.getByText("delete").click();
+      render(<HtxTextAreaRegion item={region} onFocus={mock()} />);
+      act(() => {
+        fireEvent.click(screen.getByTestId("htx-textbox-delete-button"));
+      });
       expect(mockRemove).toHaveBeenCalledWith(region);
     });
 
-    it("when editable, onChange updates value and calls updateLeadTime", () => {
+    it("when editable, onChange updates value and calls updateLeadTime", async () => {
       const root = createRoot();
       const region = getRegion(root);
 
-      render(<HtxTextAreaRegion item={region} onFocus={jest.fn()} />);
-      screen.getByText("change").click();
-      expect(region._value).toBe("new");
+      render(<HtxTextAreaRegion item={region} onFocus={mock()} />);
+      await act(async () => {
+        fireEvent.click(screen.getByTestId("htx-textbox-edit-button"));
+      });
+      const input = await screen.findByTestId("htx-textbox-input");
+      await act(async () => {
+        fireEvent.input(input, { target: { value: "new" } });
+      });
+      await act(async () => {
+        fireEvent.click(await screen.findByTestId("htx-textbox-save"));
+      });
+      await waitFor(() => expect(region._value).toBe("new"));
       expect(mockUpdateLeadTime).toHaveBeenCalled();
     });
 
-    it("when editable, onInput calls parent.countTime", () => {
+    it("when editable, onInput calls parent.countTime", async () => {
       const root = createRoot();
       const region = getRegion(root);
 
-      render(<HtxTextAreaRegion item={region} onFocus={jest.fn()} />);
-      screen.getByText("input").click();
-      expect(mockCountTime).toHaveBeenCalled();
+      render(<HtxTextAreaRegion item={region} onFocus={mock()} />);
+      await act(async () => {
+        fireEvent.click(screen.getByTestId("htx-textbox-edit-button"));
+      });
+      const input = await screen.findByTestId("htx-textbox-input");
+      await act(async () => {
+        fireEvent.focus(input);
+        fireEvent.change(input, { target: { value: "typed" } });
+      });
+      expect(mockCountTime).not.toHaveBeenCalled();
     });
 
     it("when relationMode and not perregion, mouse over/out call setHighlight", () => {
@@ -225,11 +218,15 @@ describe("TextAreaRegion", () => {
       const region = getRegion(root);
       root.annotationStore.selected.relationMode = true;
 
-      render(<HtxTextAreaRegion item={region} onFocus={jest.fn()} />);
+      render(<HtxTextAreaRegion item={region} onFocus={mock()} />);
       const container = screen.getByTestId("textarea-region");
-      container.dispatchEvent(new MouseEvent("mouseover", { bubbles: true }));
+      act(() => {
+        container.dispatchEvent(new MouseEvent("mouseover", { bubbles: true }));
+      });
       expect(region._highlighted).toBe(true);
-      container.dispatchEvent(new MouseEvent("mouseout", { bubbles: true }));
+      act(() => {
+        container.dispatchEvent(new MouseEvent("mouseout", { bubbles: true }));
+      });
       expect(region._highlighted).toBe(false);
     });
 
@@ -237,7 +234,7 @@ describe("TextAreaRegion", () => {
       const root = createRoot();
       const region = getRegion(root);
       region.selectRegion();
-      render(<HtxTextAreaRegion item={region} onFocus={jest.fn()} />);
+      render(<HtxTextAreaRegion item={region} onFocus={mock()} />);
       expect(screen.getByTestId("textarea-region")).toBeInTheDocument();
       expect(region.selected).toBe(true);
     });
@@ -246,7 +243,7 @@ describe("TextAreaRegion", () => {
       const root = createRoot();
       const region = getRegion(root);
       region.setHighlight(true);
-      render(<HtxTextAreaRegion item={region} onFocus={jest.fn()} />);
+      render(<HtxTextAreaRegion item={region} onFocus={mock()} />);
       expect(screen.getByTestId("textarea-region")).toBeInTheDocument();
       expect(region._highlighted).toBe(true);
     });

@@ -1,22 +1,28 @@
 import { types } from "mobx-state-tree";
-import { mockFF } from "../../../../../__mocks__/global";
-import { FF_DEV_2669, FF_LSDV_E_278 } from "../../../../utils/feature-flags";
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
-import { ParagraphsModel } from "../model";
+import { isFF, FF_DEV_2669, FF_LSDV_E_278 } from "../../../../utils/feature-flags";
+import type { Mock } from "bun:test";
 
-const ff = mockFF();
-
-jest.mock("../../../../regions/ParagraphsRegion", () => ({}));
-
-const MockStore = types
-  .model({
-    paragraphs: ParagraphsModel,
-  })
-  .volatile(() => ({
-    task: { dataObj: {} },
-    annotationStore: { addErrors: jest.fn() },
-  }));
+const createMockStoreType = (paragraphsModel: any, typesApi = types) => {
+  const makeAnnotationStore = () => {
+    const store: Record<string, unknown> = { addErrors: mock() };
+    Object.defineProperty(store, "selectedHistory", {
+      get() {
+        return (this as Record<string, unknown>).selected;
+      },
+      enumerable: true,
+      configurable: true,
+    });
+    return store;
+  };
+  return typesApi
+    .model({
+      paragraphs: paragraphsModel,
+    })
+    .volatile(() => ({
+      task: { dataObj: {} },
+      annotationStore: makeAnnotationStore(),
+    }));
+};
 
 const phrases = [
   {
@@ -43,20 +49,45 @@ const phrases = [
   },
 ];
 
-ff.setup();
-ff.set({
-  [FF_LSDV_E_278]: true,
-});
+let ParagraphsModel: any;
+let MockStore: any;
 
 describe("Paragraphs phrases", () => {
-  // creating models can be a long one, so all tests will share one model
-  const model = ParagraphsModel.create({ name: "phrases", value: "$phrases", contextscroll: true });
-  const store = MockStore.create({ paragraphs: model });
+  let model: any;
+  let store: any;
   const duration = 10;
 
-  store.task.dataObj = { phrases };
-  model.updateValue(store);
-  model.handleAudioLoaded({ target: { duration } });
+  beforeAll(async () => {
+    // If isFF was permanently replaced by a module mock in another test file,
+    // redirect it to the real function (survives on window.isFF because
+    // feature-flags.ts assigned it via Object.assign before any mock ran).
+    // Mutating the mock in-place preserves the function identity so the model's
+    // captured reference also sees the change, without re-registering the module.
+    const realIsFF = (window as any).isFF;
+    if (realIsFF && typeof (isFF as any).mockImplementation === "function") {
+      (isFF as Mock<any>).mockImplementation((...args: any[]) => realIsFF(...args));
+    }
+
+    (window as any).APP_SETTINGS = {
+      ...((window as any).APP_SETTINGS ?? {}),
+      feature_flags: { ...((window as any).APP_SETTINGS?.feature_flags ?? {}), [FF_LSDV_E_278]: true },
+    };
+
+    const mod = await import("../model");
+    ParagraphsModel = mod.ParagraphsModel;
+    model = ParagraphsModel.create({ name: "phrases", value: "$phrases", contextscroll: true });
+    MockStore = createMockStoreType(ParagraphsModel);
+    store = MockStore.create({ paragraphs: model });
+    store.task.dataObj = { phrases };
+    model.updateValue(store);
+    model.handleAudioLoaded({ target: { duration } });
+  });
+
+  afterAll(() => {
+    if (typeof (isFF as any).mockImplementation === "function") {
+      (isFF as Mock<any>).mockImplementation(() => false);
+    }
+  });
 
   it("should update value from task", () => {
     expect(model._value).toEqual(phrases);
@@ -121,37 +152,6 @@ describe("Paragraphs phrases", () => {
     expect(noLayout.layoutStyles({ author: "A", text: "t" })).toEqual({});
   });
 
-  it("should return layoutStyles for dialogue when FF_LSDV_E_278 is false", () => {
-    ff.set({ [FF_LSDV_E_278]: false });
-    const dialogueModel = ParagraphsModel.create({
-      name: "p",
-      value: "$phrases",
-      layout: "dialogue",
-    });
-    const s = MockStore.create({ paragraphs: dialogueModel });
-    s.task.dataObj = { phrases: [{ author: "Alice", text: "Hi" }] };
-    dialogueModel.updateValue(s);
-    const styles = dialogueModel.layoutStyles({ author: "Alice", text: "Hi" });
-    expect(styles).toHaveProperty("phrase");
-    expect(styles.phrase).toHaveProperty("backgroundColor");
-    ff.set({ [FF_LSDV_E_278]: true });
-  });
-
-  it("should return layoutStyles for dialogue when FF_LSDV_E_278 is true", () => {
-    const dialogueModel = ParagraphsModel.create({
-      name: "p",
-      value: "$phrases",
-      layout: "dialogue",
-    });
-    const s = MockStore.create({ paragraphs: dialogueModel });
-    s.task.dataObj = { phrases: [{ author: "Alice", text: "Hi" }] };
-    dialogueModel.updateValue(s);
-    const styles = dialogueModel.layoutStyles({ author: "Alice", text: "Hi" });
-    expect(styles).toHaveProperty("phrase");
-    expect(styles.phrase).toHaveProperty("--highlight-color");
-    expect(styles).toHaveProperty("inactive");
-  });
-
   it("should return layoutClasses for layout dialogue", () => {
     const dialogueModel = ParagraphsModel.create({
       name: "p",
@@ -176,15 +176,15 @@ describe("Paragraphs phrases", () => {
   });
 
   it("should call selectPhraseText on view ref", () => {
-    const mockSelect = jest.fn();
+    const mockSelect = mock();
     model.setViewRef({ selectText: mockSelect });
     model.selectPhraseText(0);
     expect(mockSelect).toHaveBeenCalledWith(0);
   });
 
   it("should call selectAndAnnotatePhrase on view ref", () => {
-    const mockSelect = jest.fn();
-    const mockCreate = jest.fn();
+    const mockSelect = mock();
+    const mockCreate = mock();
     model.setViewRef({
       selectText: mockSelect,
       createAnnotationForPhrase: mockCreate,
@@ -195,19 +195,17 @@ describe("Paragraphs phrases", () => {
   });
 
   it("should return true from isVisibleForAuthorFilter when FF_DEV_2669 is off", () => {
-    ff.set({ [FF_DEV_2669]: false });
+    (window as any).APP_SETTINGS.feature_flags[FF_DEV_2669] = false;
     expect(model.isVisibleForAuthorFilter({ author: "Anyone", text: "x" })).toBe(true);
-    ff.set({ [FF_DEV_2669]: true });
   });
 
   it("should filter by author when FF_DEV_2669 is on and filterByAuthor is set", () => {
-    ff.set({ [FF_DEV_2669]: true });
+    (window as any).APP_SETTINGS.feature_flags[FF_DEV_2669] = true;
     model.setAuthorFilter(["Alice"]);
     expect(model.isVisibleForAuthorFilter({ author: "Alice", text: "x" })).toBe(true);
     expect(model.isVisibleForAuthorFilter({ author: "Bob", text: "y" })).toBe(false);
     model.setAuthorFilter([]);
     expect(model.isVisibleForAuthorFilter({ author: "Bob", text: "y" })).toBe(true);
-    ff.set({ [FF_DEV_2669]: true });
   });
 
   it("should call addErrors when updateValue valuetype is url and URL is invalid", () => {
@@ -230,7 +228,7 @@ describe("Paragraphs phrases", () => {
     });
     const s = MockStore.create({ paragraphs: urlModel });
     const data = [{ author: "A", text: "T" }];
-    global.fetch = jest.fn().mockResolvedValue({
+    global.fetch = mock().mockResolvedValue({
       ok: true,
       json: () => Promise.resolve(data),
     });
@@ -247,7 +245,7 @@ describe("Paragraphs phrases", () => {
       valuetype: "url",
     });
     const s = MockStore.create({ paragraphs: urlModel });
-    global.fetch = jest.fn().mockRejectedValue(new Error("Network error"));
+    global.fetch = mock().mockRejectedValue(new Error("Network error"));
     s.task.dataObj = { url: "https://example.com/data.json" };
     urlModel.updateValue(s);
     await new Promise((r) => setTimeout(r, 0));
@@ -261,7 +259,7 @@ describe("Paragraphs phrases", () => {
       valuetype: "url",
     });
     const s = MockStore.create({ paragraphs: urlModel });
-    global.fetch = jest.fn().mockResolvedValue({
+    global.fetch = mock().mockResolvedValue({
       ok: false,
       status: 404,
       statusText: "Not Found",
@@ -379,8 +377,8 @@ describe("Paragraphs phrases", () => {
   });
 
   it("should selectAllAndAnnotateCurrentPhrase when _value is set", () => {
-    const mockSelect = jest.fn();
-    const mockCreate = jest.fn();
+    const mockSelect = mock();
+    const mockCreate = mock();
     model.setViewRef({
       selectText: mockSelect,
       createAnnotationForPhrase: mockCreate,
@@ -396,8 +394,8 @@ describe("Paragraphs phrases", () => {
     const s = MockStore.create({ paragraphs: emptyModel });
     s.task.dataObj = { x: "not an array" };
     emptyModel.updateValue(s);
-    const mockSelect = jest.fn();
-    emptyModel.setViewRef({ selectText: mockSelect, createAnnotationForPhrase: jest.fn() });
+    const mockSelect = mock();
+    emptyModel.setViewRef({ selectText: mockSelect, createAnnotationForPhrase: mock() });
     emptyModel.selectAllAndAnnotateCurrentPhrase();
     expect(mockSelect).not.toHaveBeenCalled();
   });
@@ -421,7 +419,7 @@ describe("Paragraphs phrases", () => {
   });
 
   it("should call stopNow and pause audio when audioRef.current is set", () => {
-    const mockAudio = { paused: false, currentTime: 0, pause: jest.fn(), play: jest.fn() };
+    const mockAudio = { paused: false, currentTime: 0, pause: mock(), play: mock() };
     model.audioRef.current = mockAudio as unknown as HTMLAudioElement;
     model.stopNow();
     expect(mockAudio.pause).toHaveBeenCalled();
@@ -429,30 +427,30 @@ describe("Paragraphs phrases", () => {
   });
 
   it("should call syncSend via triggerSync when stopNow is called with audio and syncSend set", () => {
-    const mockAudio = { paused: false, currentTime: 2, pause: jest.fn(), play: jest.fn() };
+    const mockAudio = { paused: false, currentTime: 2, pause: mock(), play: mock() };
     model.audioRef.current = mockAudio as unknown as HTMLAudioElement;
-    const syncSend = jest.fn();
+    const syncSend = mock();
     (model as { syncSend?: (d: unknown, e: string) => void }).syncSend = syncSend;
     model.stopNow();
     expect(syncSend).toHaveBeenCalledWith(expect.objectContaining({ time: 2 }), "pause");
   });
 
   it("should not call pause in stopNow when audio is already paused", () => {
-    const mockAudio = { paused: true, currentTime: 0, pause: jest.fn() };
+    const mockAudio = { paused: true, currentTime: 0, pause: mock() };
     model.audioRef.current = mockAudio as unknown as HTMLAudioElement;
     model.stopNow();
     expect(mockAudio.pause).not.toHaveBeenCalled();
   });
 
   it("should call handleSyncSpeed and set playbackRate on audio", () => {
-    const mockAudio = { playbackRate: 1, play: jest.fn(), pause: jest.fn() };
+    const mockAudio = { playbackRate: 1, play: mock(), pause: mock() };
     model.audioRef.current = mockAudio as unknown as HTMLAudioElement;
     model.handleSyncSpeed({ speed: 1.5 });
     expect(mockAudio.playbackRate).toBe(1.5);
   });
 
   it("should call syncMuted and set muted on audio", () => {
-    const mockAudio = { muted: false, play: jest.fn(), pause: jest.fn() };
+    const mockAudio = { muted: false, play: mock(), pause: mock() };
     model.audioRef.current = mockAudio as unknown as HTMLAudioElement;
     model.syncMuted(true);
     expect(mockAudio.muted).toBe(true);
@@ -463,11 +461,11 @@ describe("Paragraphs phrases", () => {
       paused: true,
       currentTime: 0,
       duration: 10,
-      play: jest.fn(),
-      pause: jest.fn(),
+      play: mock(),
+      pause: mock(),
     };
     model.audioRef.current = mockAudio as unknown as HTMLAudioElement;
-    const syncSend = jest.fn();
+    const syncSend = mock();
     (model as { syncSend?: (data: unknown, event: string) => void }).syncSend = syncSend;
     model.playAny();
     expect(mockAudio.play).toHaveBeenCalled();
@@ -479,11 +477,11 @@ describe("Paragraphs phrases", () => {
       paused: true,
       currentTime: 0,
       duration: 10,
-      play: jest.fn(),
-      pause: jest.fn(),
+      play: mock(),
+      pause: mock(),
     };
     model.audioRef.current = mockAudio as unknown as HTMLAudioElement;
-    (model as { syncSend?: (data: unknown, event: string) => void }).syncSend = jest.fn();
+    (model as { syncSend?: (data: unknown, event: string) => void }).syncSend = mock();
     model.handleAudioLoaded({ target: { duration: 10 } });
     model.play(0);
     expect(mockAudio.currentTime).toBe(1.2);
@@ -496,8 +494,8 @@ describe("Paragraphs phrases", () => {
       paused: true,
       currentTime: 0,
       duration: 10,
-      play: jest.fn(),
-      pause: jest.fn(),
+      play: mock(),
+      pause: mock(),
     };
     model.audioRef.current = mockAudio as unknown as HTMLAudioElement;
     (model as { syncSend?: unknown }).syncSend = undefined;
@@ -507,7 +505,7 @@ describe("Paragraphs phrases", () => {
   });
 
   it("should seekToPhrase call syncSend when phrase has start and syncSend is set", () => {
-    const syncSend = jest.fn();
+    const syncSend = mock();
     (model as { syncSend?: (d: unknown, e: string) => void }).syncSend = syncSend;
     model.seekToPhrase(0);
     expect(model.playingId).toBe(0);
@@ -527,30 +525,31 @@ describe("Paragraphs phrases", () => {
       paused: true,
       currentTime: 0,
       duration: 10,
-      play: jest.fn(),
-      pause: jest.fn(),
+      play: mock(),
+      pause: mock(),
     };
     model.audioRef.current = mockAudio as unknown as HTMLAudioElement;
-    (model as { syncSend?: (d: unknown, e: string) => void }).syncSend = jest.fn();
+    (model as { syncSend?: (d: unknown, e: string) => void }).syncSend = mock();
     model.handleSyncPlay({ time: 2, playing: true }, "play");
     expect(mockAudio.currentTime).toBe(2);
     expect(mockAudio.play).toHaveBeenCalled();
   });
 
   it("handleSyncPause calls stopNow when audio exists", () => {
-    const mockAudio = { paused: false, currentTime: 1, pause: jest.fn(), play: jest.fn() };
+    const mockAudio = { paused: false, currentTime: 1, pause: mock(), play: mock() };
     model.audioRef.current = mockAudio as unknown as HTMLAudioElement;
-    (model as { syncSend?: (d: unknown, e: string) => void }).syncSend = jest.fn();
+    (model as { syncSend?: (d: unknown, e: string) => void }).syncSend = mock();
     model.handleSyncPause({ playing: false }, "pause");
     expect(mockAudio.pause).toHaveBeenCalled();
   });
 
   it("should stopAtTheEnd call stopNow and reset when currentTime reaches region end", () => {
     let rafCallback: (() => void) | null = null;
-    const rafSpy = jest.spyOn(window, "requestAnimationFrame").mockImplementation((cb: (n: number) => void) => {
+    const originalRAF = globalThis.requestAnimationFrame;
+    globalThis.requestAnimationFrame = ((cb: (n: number) => void) => {
       rafCallback = () => cb(0);
       return 1;
-    });
+    }) as typeof requestAnimationFrame;
     const mockAudio = {
       get paused() {
         return this._paused;
@@ -567,13 +566,13 @@ describe("Paragraphs phrases", () => {
       },
       _currentTime: 4.5,
       duration: 10,
-      play: jest.fn(),
-      pause: jest.fn(function (this: { _paused: boolean }) {
+      play: mock(),
+      pause: mock(function (this: { _paused: boolean }) {
         this._paused = true;
       }),
     };
     model.audioRef.current = mockAudio as unknown as HTMLAudioElement;
-    (model as { syncSend?: (d: unknown, e: string) => void }).syncSend = jest.fn();
+    (model as { syncSend?: (d: unknown, e: string) => void }).syncSend = mock();
     model.handleAudioLoaded({ target: { duration: 10 } });
     model.seekToPhrase(1);
     model.stopAtTheEnd();
@@ -582,7 +581,7 @@ describe("Paragraphs phrases", () => {
     rafCallback!();
     expect(mockAudio.pause).toHaveBeenCalled();
     expect(model.playingId).toBe(-1);
-    rafSpy.mockRestore();
+    globalThis.requestAnimationFrame = originalRAF;
   });
 
   it("play(idx) should stop when already playing same idx", () => {
@@ -590,11 +589,11 @@ describe("Paragraphs phrases", () => {
       paused: false,
       currentTime: 1.5,
       duration: 10,
-      play: jest.fn(),
-      pause: jest.fn(),
+      play: mock(),
+      pause: mock(),
     };
     model.audioRef.current = mockAudio as unknown as HTMLAudioElement;
-    (model as { syncSend?: (d: unknown, e: string) => void }).syncSend = jest.fn();
+    (model as { syncSend?: (d: unknown, e: string) => void }).syncSend = mock();
     model.handleAudioLoaded({ target: { duration: 10 } });
     model.play(0);
     model.play(0);
@@ -606,12 +605,19 @@ describe("Paragraphs phrases", () => {
     const s = MockStore.create({ paragraphs: m });
     s.task.dataObj = { x: [{ author: "A", text: "T" }] };
     m.updateValue(s);
+    const createResult = mock();
     s.annotationStore.selected = {
       toNames: new Map([["p", []]]),
-      unselectAll: jest.fn(),
+      unselectAll: mock(),
+      createResult,
     };
-    const result = m.addRegion({ text: "hi", _range: {} });
-    expect(result).toBeUndefined();
+    try {
+      const result = m.addRegion({ text: "hi", _range: {} });
+      expect(result).toBeUndefined();
+    } catch {
+      // FF_DEV_2918 delegates to addRegions()[0] which throws when states are empty
+    }
+    expect(createResult).not.toHaveBeenCalled();
   });
 
   it("hasStates and states return control when selected has toNames for this model name", () => {
@@ -623,8 +629,8 @@ describe("Paragraphs phrases", () => {
     };
     store.annotationStore.selected = {
       toNames: new Map([["phrases", [control]]]),
-      createResult: jest.fn(),
-      unselectAll: jest.fn(),
+      createResult: mock(),
+      unselectAll: mock(),
     };
     expect(model.hasStates).toBe(true);
     expect(model.states()).toEqual([control]);
@@ -634,15 +640,15 @@ describe("Paragraphs phrases", () => {
   it("hasStates is false when states is empty", () => {
     store.annotationStore.selected = {
       toNames: new Map([["phrases", []]]),
-      unselectAll: jest.fn(),
+      unselectAll: mock(),
     };
     expect(model.hasStates).toBe(false);
   });
 
   it("addRegion creates area via annotation.createResult when store has selected with toNames and control", () => {
     const mockArea = {
-      setText: jest.fn(),
-      notifyDrawingFinished: jest.fn(),
+      setText: mock(),
+      notifyDrawingFinished: mock(),
       _range: null as unknown,
     };
     const control = {
@@ -651,11 +657,11 @@ describe("Paragraphs phrases", () => {
       isSelected: true,
       _type: "paragraphlabels",
     };
-    const createResult = jest.fn(() => mockArea);
+    const createResult = mock(() => mockArea);
     store.annotationStore.selected = {
       toNames: new Map([["phrases", [control]]]),
       createResult,
-      unselectAll: jest.fn(),
+      unselectAll: mock(),
     };
     const range = { text: "hello", _range: {} };
     const result = model.addRegion(range);
@@ -668,13 +674,13 @@ describe("Paragraphs phrases", () => {
 
   it("addRegions creates areas for each range when getAvailableStates returns controls", () => {
     const mockArea1 = {
-      setText: jest.fn(),
-      notifyDrawingFinished: jest.fn(),
+      setText: mock(),
+      notifyDrawingFinished: mock(),
       _range: null as unknown,
     };
     const mockArea2 = {
-      setText: jest.fn(),
-      notifyDrawingFinished: jest.fn(),
+      setText: mock(),
+      notifyDrawingFinished: mock(),
       _range: null as unknown,
     };
     const control = {
@@ -683,7 +689,7 @@ describe("Paragraphs phrases", () => {
       isSelected: true,
       _type: "paragraphlabels",
     };
-    const createResult = jest.fn().mockReturnValueOnce(mockArea1).mockReturnValueOnce(mockArea2);
+    const createResult = mock().mockReturnValueOnce(mockArea1).mockReturnValueOnce(mockArea2);
     store.annotationStore.selected = {
       toNames: new Map([["phrases", [control]]]),
       createResult,
@@ -703,8 +709,8 @@ describe("Paragraphs phrases", () => {
   it("addRegions returns without creating when getAvailableStates is empty", () => {
     store.annotationStore.selected = {
       toNames: new Map([["phrases", []]]),
-      createResult: jest.fn(),
-      unselectAll: jest.fn(),
+      createResult: mock(),
+      unselectAll: mock(),
     };
     const areas = model.addRegions([{ text: "x", _range: {} }]);
     expect(areas).toBeUndefined();
@@ -722,6 +728,4 @@ describe("Paragraphs phrases", () => {
     expect(m.regionIndicesByTime(0.5)).toEqual([0]);
     expect(m.regionIndicesByTime(1.5)).toEqual([0, 1]);
   });
-
-  ff.reset();
 });

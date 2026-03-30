@@ -159,7 +159,7 @@ export function extractDefaultValues(fields: (FieldDefinition | MessageDefinitio
             break;
         }
       }
-    } catch (error) {
+    } catch (_error) {
       // If we can't extract the default, use type-based defaults
       switch (field.type) {
         case "text":

@@ -1,38 +1,32 @@
 import { render, screen, waitFor } from "@testing-library/react";
-import "@testing-library/jest-dom";
 import { useRef, useEffect } from "react";
 import { Dropdown, type DropdownRef } from "./dropdown";
 import { DropdownContext, type DropdownContextValue } from "./dropdown-context";
-
-// Mock the SCSS module
-jest.mock("./dropdown.prefix.css", () => ({}));
-
-// Mock the alignment utility
-jest.mock("@humansignal/core/lib/utils/dom", () => ({
-  alignElements: jest.fn(() => ({
-    left: 100,
-    top: 200,
-    maxHeight: 500,
-  })),
-}));
-
-// Mock the transition utility
-jest.mock("@humansignal/core/lib/utils/transition", () => ({
-  aroundTransition: jest.fn((_element, callbacks) => {
-    callbacks.beforeTransition?.();
-    callbacks.transition?.();
-    callbacks.afterTransition?.();
-  }),
-}));
+import * as domUtils from "@humansignal/core/lib/utils/dom";
+import * as transitionUtils from "@humansignal/core/lib/utils/transition";
 
 // Mock CSS.supports for anchor positioning tests
 const originalCSSSupports = CSS.supports;
 
 describe("Dropdown - Cursor Position Support", () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    mock.clearAllMocks();
     // Reset CSS.supports to default (no anchor positioning support)
-    CSS.supports = jest.fn(() => false);
+    CSS.supports = mock(() => false);
+    spyOn(domUtils, "alignElements").mockImplementation(
+      mock(() => ({
+        left: 100,
+        top: 200,
+        maxHeight: 500,
+      })),
+    );
+    spyOn(transitionUtils, "aroundTransition").mockImplementation(
+      mock((_element: any, callbacks: any) => {
+        callbacks.beforeTransition?.();
+        callbacks.transition?.();
+        callbacks.afterTransition?.();
+      }),
+    );
   });
 
   afterEach(() => {
@@ -69,7 +63,7 @@ describe("Dropdown - Cursor Position Support", () => {
       );
 
       const dropdown = screen.getByTestId("dropdown");
-      expect(dropdown).toHaveStyle({ backgroundColor: "red" });
+      expect((dropdown as HTMLElement).style.backgroundColor).toBe("red");
     });
   });
 
@@ -108,7 +102,8 @@ describe("Dropdown - Cursor Position Support", () => {
 
       await waitFor(() => {
         const dropdown = screen.getByTestId("dropdown");
-        expect(dropdown).toHaveStyle({ left: "150px", top: "250px" });
+        expect((dropdown as HTMLElement).style.left).toBe("150px");
+        expect((dropdown as HTMLElement).style.top).toBe("250px");
       });
     });
 
@@ -184,7 +179,8 @@ describe("Dropdown - Cursor Position Support", () => {
 
       await waitFor(() => {
         const dropdown = screen.getByTestId("dropdown");
-        expect(dropdown).toHaveStyle({ left: "300px", top: "400px" });
+        expect((dropdown as HTMLElement).style.left).toBe("300px");
+        expect((dropdown as HTMLElement).style.top).toBe("400px");
       });
     });
 
@@ -222,7 +218,8 @@ describe("Dropdown - Cursor Position Support", () => {
 
       await waitFor(() => {
         const dropdown = screen.getByTestId("dropdown");
-        expect(dropdown).toHaveStyle({ left: "500px", top: "600px" });
+        expect((dropdown as HTMLElement).style.left).toBe("500px");
+        expect((dropdown as HTMLElement).style.top).toBe("600px");
       });
     });
   });
@@ -249,7 +246,7 @@ describe("Dropdown - Cursor Position Support", () => {
     });
 
     it("should call onToggle callback when visibility changes", async () => {
-      const onToggle = jest.fn();
+      const onToggle = mock();
       const TestComponent = () => {
         const dropdownRef = useRef<DropdownRef>(null);
 
@@ -267,7 +264,7 @@ describe("Dropdown - Cursor Position Support", () => {
     });
 
     it("should call onVisibilityChanged callback when visibility changes", () => {
-      const onVisibilityChanged = jest.fn();
+      const onVisibilityChanged = mock();
 
       render(
         <Dropdown onVisibilityChanged={onVisibilityChanged} dataTestId="dropdown">
@@ -281,8 +278,6 @@ describe("Dropdown - Cursor Position Support", () => {
 
   describe("Alignment", () => {
     it("should use default alignment when not specified", async () => {
-      const { alignElements } = require("@humansignal/core/lib/utils/dom");
-
       const TestComponent = () => {
         const dropdownRef = useRef<DropdownRef>(null);
         const triggerRef = useRef<HTMLElement>(document.createElement("button"));
@@ -556,8 +551,6 @@ describe("Dropdown - Cursor Position Support", () => {
 
   describe("Animation", () => {
     it("should animate by default", () => {
-      const { aroundTransition } = require("@humansignal/core/lib/utils/transition");
-
       const TestComponent = () => {
         const dropdownRef = useRef<DropdownRef>(null);
 
@@ -575,12 +568,11 @@ describe("Dropdown - Cursor Position Support", () => {
       render(<TestComponent />);
 
       // aroundTransition should be called for animation
-      expect(aroundTransition).toHaveBeenCalled();
+      expect(transitionUtils.aroundTransition).toHaveBeenCalled();
     });
 
     it("should skip animation when animated is false", () => {
-      const { aroundTransition } = require("@humansignal/core/lib/utils/transition");
-      aroundTransition.mockClear();
+      (transitionUtils.aroundTransition as any).mockClear();
 
       const TestComponent = () => {
         const dropdownRef = useRef<DropdownRef>(null);
@@ -599,7 +591,7 @@ describe("Dropdown - Cursor Position Support", () => {
       render(<TestComponent />);
 
       // aroundTransition should not be called when animation is disabled
-      expect(aroundTransition).not.toHaveBeenCalled();
+      expect(transitionUtils.aroundTransition).not.toHaveBeenCalled();
     });
   });
 });

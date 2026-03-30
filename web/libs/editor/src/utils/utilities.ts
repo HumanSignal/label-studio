@@ -33,7 +33,7 @@ export const isStringJSON = (value: string) => {
   if (isString(value)) {
     try {
       JSON.parse(value);
-    } catch (e) {
+    } catch (_e) {
       return false;
     }
 

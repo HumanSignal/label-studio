@@ -142,8 +142,8 @@ export const isPointInPolygon = (point: Point, polygon: BezierPoint[]): boolean 
   if (polygon.length < 3) return false;
 
   let inside = false;
-  const x = point.x;
-  const y = point.y;
+  const _x = point.x;
+  const _y = point.y;
 
   // Create a map for quick point lookup
   const pointMap = new Map<string, BezierPoint>();
@@ -173,8 +173,8 @@ export const isPointInPolygon = (point: Point, polygon: BezierPoint[]): boolean 
  * Handles both straight lines and Bezier curves
  */
 const checkRayIntersectionWithEdge = (testPoint: Point, startPoint: BezierPoint, endPoint: BezierPoint): boolean => {
-  const x = testPoint.x;
-  const y = testPoint.y;
+  const _x = testPoint.x;
+  const _y = testPoint.y;
 
   // For straight line edges
   if (!startPoint.isBezier && !endPoint.isBezier) {

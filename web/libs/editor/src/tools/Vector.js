@@ -134,7 +134,7 @@ const _Tool = types
     // Store the MultipleClicksDrawingTool's canStartDrawing before we override it
     const MultipleClicksCanStartDrawing = self.canStartDrawing;
 
-    const Super = {
+    const _Super = {
       startDrawing: self.startDrawing,
       _finishDrawing: self._finishDrawing,
       deleteRegion: self.deleteRegion,
@@ -309,7 +309,7 @@ const _Tool = types
         }
       },
 
-      mousedownEv(e, [x, y]) {
+      mousedownEv(_e, [x, y]) {
         if (self.mode === "drawing") {
           return;
         }

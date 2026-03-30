@@ -61,7 +61,7 @@ type CMHintOptions = {
  * @param self list of all hints
  * @param data current hint
  */
-function richHint(el: Element, self: any, data: CMHintResult) {
+function richHint(el: Element, _self: any, data: CMHintResult) {
   const name = document.createElement("b");
 
   name.appendChild(document.createTextNode(data.name ?? data.text));

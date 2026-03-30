@@ -6,9 +6,9 @@ import { Erase } from "../Erase";
 const stageContent = {};
 const mockBrush = {
   type: "brushregion",
-  addPoint: jest.fn(),
-  beginPath: jest.fn(),
-  endPath: jest.fn(),
+  addPoint: mock(),
+  beginPath: mock(),
+  endPath: mock(),
 };
 
 function makeMockObj() {
@@ -22,23 +22,27 @@ function makeMockObj() {
   };
 }
 
-jest.mock("../../utils/utilities", () => ({
-  clamp: jest.fn((v, min, max) => Math.max(min, Math.min(max, v))),
-  findClosestParent: jest.fn(() => true),
-}));
+let findClosestParentSpy;
+let clampSpy;
 
 describe("Erase tool", () => {
   beforeEach(() => {
-    jest.clearAllMocks();
-    const { findClosestParent } = require("../../utils/utilities");
-    findClosestParent.mockReturnValue(true);
+    clearAllMocks();
+    const utilitiesModule = require("../../utils/utilities");
+    findClosestParentSpy = spyOn(utilitiesModule, "findClosestParent").mockReturnValue(true);
+    clampSpy = spyOn(utilitiesModule, "clamp").mockImplementation((v, min, max) => Math.max(min, Math.min(max, v)));
+  });
+
+  afterEach(() => {
+    findClosestParentSpy?.mockRestore?.();
+    clampSpy?.mockRestore?.();
   });
 
   function createTool(overrides = {}) {
     const obj = makeMockObj();
     const env = {
       object: obj,
-      manager: { selectTool: jest.fn() },
+      manager: { selectTool: mock() },
       control: { annotation: { highlightedNode: mockBrush } },
     };
     return Erase.create(overrides, env);
@@ -105,7 +109,7 @@ describe("Erase tool", () => {
   it("afterUpdateSelected calls updateCursor", () => {
     const tool = createTool();
     if (typeof tool.updateCursor === "function") {
-      const spy = jest.spyOn(tool, "updateCursor");
+      const spy = spyOn(tool, "updateCursor");
       tool.afterUpdateSelected();
       expect(spy).toHaveBeenCalled();
     } else {
@@ -215,7 +219,7 @@ describe("Erase tool", () => {
   it("mousedownEv when getSelectedShape is null does not start drawing", () => {
     const env = {
       object: makeMockObj(),
-      manager: { selectTool: jest.fn() },
+      manager: { selectTool: mock() },
       control: { annotation: { highlightedNode: null } },
     };
     const tool = Erase.create({}, env);

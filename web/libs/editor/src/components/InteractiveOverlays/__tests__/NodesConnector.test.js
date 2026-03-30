@@ -4,26 +4,26 @@
 import NodesConnector from "../NodesConnector";
 
 const mockRelationShapeInstance = {
-  boundingBox: jest.fn(),
-  onUpdate: jest.fn(),
-  destroy: jest.fn(),
+  boundingBox: mock(),
+  onUpdate: mock(),
+  destroy: mock(),
 };
 
-jest.mock("../RelationShape", () => ({
-  RelationShape: jest.fn(() => mockRelationShapeInstance),
+mockModule("../RelationShape", () => ({
+  RelationShape: mock(() => mockRelationShapeInstance),
 }));
 
-jest.mock("../Geometry", () => ({
+mockModule("../Geometry", () => ({
   Geometry: {
-    getDOMBBox: jest.fn(),
-    padding: jest.fn((bbox, pad = 0) => ({
+    getDOMBBox: mock(),
+    padding: mock((bbox, pad = 0) => ({
       ...bbox,
       x: bbox.x - pad,
       y: bbox.y - pad,
       width: bbox.width + pad * 2,
       height: bbox.height + pad * 2,
     })),
-    closestRects: jest.fn((list1, list2) => [
+    closestRects: mock((list1, list2) => [
       list1[0] ?? { x: 0, y: 0, width: 0, height: 0 },
       list2[0] ?? { x: 0, y: 0, width: 0, height: 0 },
     ]),
@@ -35,7 +35,7 @@ const { RelationShape } = require("../RelationShape");
 
 describe("NodesConnector", () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    clearAllMocks();
     mockRelationShapeInstance.boundingBox.mockReturnValue([{ x: 0, y: 0, width: 10, height: 10 }]);
     Geometry.getDOMBBox.mockReturnValue({ x: 0, y: 0 });
   });
@@ -165,7 +165,7 @@ describe("NodesConnector", () => {
         endNode: { type: "rectangleregion" },
       };
       const conn = NodesConnector.connect(relation, {});
-      const cb = jest.fn();
+      const cb = mock();
       conn.onChange(cb);
       expect(mockRelationShapeInstance.onUpdate).toHaveBeenCalledTimes(2);
     });

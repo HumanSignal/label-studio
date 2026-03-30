@@ -1,10 +1,35 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
-import * as featureFlags from "../../../../utils/feature-flags";
+import { Provider } from "mobx-react";
+import { FF_DEV_2755 } from "../../../../utils/feature-flags";
 import { OutlinerTree } from "../OutlinerTree";
+import * as bemModule from "../../../../utils/bem";
+import * as registryModule from "../../../../core/Registry";
+import * as chromaModule from "chroma-js";
+import * as regionLabelModule from "../RegionLabel";
+import * as nodeModule from "../../../Node/Node";
+import * as lockButtonModule from "../../Components/LockButton";
+import * as regionContextMenuModule from "../../Components/RegionContextMenu";
+import * as regionControlButtonModule from "../../Components/RegionControlButton";
+import * as uiModule from "@humansignal/ui";
+import * as iconsModule from "@humansignal/icons";
+import * as mobxReactModule from "mobx-react";
+import * as resizeObserverModule from "../../../../utils/resize-observer";
 
-const mockObserve = jest.fn();
-const mockUnobserve = jest.fn();
-const mockDisconnect = jest.fn();
+const ff = mockFF();
+
+(OutlinerTree as any).defaultProps = {
+  ...((OutlinerTree as any).defaultProps ?? {}),
+  store: { hasInterface: () => false },
+};
+
+function renderWithStore(ui: any) {
+  return render(<Provider store={{ hasInterface: () => false }}>{ui}</Provider>);
+}
+
+const mockObserve = mock();
+const mockUnobserve = mock();
+const mockDisconnect = mock();
+const mockResizeCallback = { current: null as ((entries: Array<{ contentRect: { height: number } }>) => void) | null };
 
 beforeAll(() => {
   (global as any).ResizeObserver = class ResizeObserver {
@@ -23,12 +48,10 @@ beforeEach(() => {
   mockObserve.mockClear();
   mockUnobserve.mockClear();
   mockDisconnect.mockClear();
-});
 
-jest.mock("../../../../utils/bem", () => ({
-  cn: (block: string) => ({
+  spyOn(bemModule, "cn").mockImplementation((block: string) => ({
     elem: (elem: string) => ({
-      mod: (mods: Record<string, unknown>) => ({
+      mod: (_mods: Record<string, unknown>) => ({
         toClassName: () => `dm-${block}__${elem}`,
       }),
       toClassName: () => `dm-${block}__${elem}`,
@@ -37,96 +60,62 @@ jest.mock("../../../../utils/bem", () => ({
       toClassName: () => `dm-${block}`,
     }),
     toClassName: () => `dm-${block}`,
-  }),
-}));
+  }));
 
-jest.mock("../../../../utils/feature-flags", () => ({
-  isFF: jest.fn(() => false),
-  FF_DEV_2755: "ff_dev_2755",
-}));
+  spyOn(registryModule.default, "getPerRegionView").mockReturnValue(null);
 
-jest.mock("../../../../core/Registry", () => ({
-  __esModule: true,
-  default: {
-    getPerRegionView: () => null,
-  },
-}));
-
-jest.mock("chroma-js", () => ({
-  __esModule: true,
-  default: (style: string) => {
+  spyOn(chromaModule, "default").mockImplementation((style: string) => {
     const c = style ?? "#666";
-    const chain = {
+    const chain: any = {
       css: () => c,
       alpha: () => chain,
     };
     return chain;
-  },
-}));
+  });
 
-jest.mock("../RegionLabel", () => ({
-  RegionLabel: ({ item }: { item: { type?: string } }) => (
+  spyOn(regionLabelModule, "RegionLabel").mockImplementation(({ item }: { item: { type?: string } }) => (
     <span data-testid="region-label">{item?.type ?? "No Label"}</span>
-  ),
-}));
+  ));
 
-jest.mock("../../../Node/Node", () => ({
-  NodeIcon: () => <span data-testid="node-icon" />,
-}));
+  spyOn(nodeModule, "NodeIcon").mockImplementation(() => <span data-testid="node-icon" />);
 
-jest.mock("../../Components/LockButton", () => ({
-  LockButton: () => <span data-testid="lock-button" />,
-}));
+  spyOn(lockButtonModule, "LockButton").mockImplementation(() => <span data-testid="lock-button" />);
 
-jest.mock("../../Components/RegionContextMenu", () => ({
-  RegionContextMenu: () => <span data-testid="region-context-menu" />,
-}));
+  spyOn(regionContextMenuModule, "RegionContextMenu").mockImplementation(() => (
+    <span data-testid="region-context-menu" />
+  ));
 
-jest.mock("../../Components/RegionControlButton", () => ({
-  RegionControlButton: ({ children, ...props }: any) => (
+  spyOn(regionControlButtonModule, "RegionControlButton").mockImplementation(({ children, ...props }: any) => (
     <button type="button" data-testid="region-control-button" {...props}>
       {children}
     </button>
-  ),
-}));
+  ));
 
-jest.mock("@humansignal/ui", () => ({
-  Tooltip: ({ children }: any) => <span data-testid="tooltip">{children}</span>,
-}));
+  spyOn(uiModule, "Tooltip").mockImplementation(({ children }: any) => <span data-testid="tooltip">{children}</span>);
 
-jest.mock("@humansignal/icons", () => ({
-  IconArrow: () => <span data-testid="icon-arrow" />,
-  IconChevronLeft: () => <span data-testid="icon-chevron-left" />,
-  IconEyeClosed: () => <span data-testid="icon-eye-closed" />,
-  IconEyeOpened: () => <span data-testid="icon-eye-opened" />,
-  IconSparks: () => <span data-testid="icon-sparks" />,
-  IconWarning: () => <span data-testid="icon-warning" />,
-}));
+  spyOn(iconsModule, "IconArrow").mockImplementation(() => <span data-testid="icon-arrow" />);
+  spyOn(iconsModule, "IconChevronLeft").mockImplementation(() => <span data-testid="icon-chevron-left" />);
+  spyOn(iconsModule, "IconEyeClosed").mockImplementation(() => <span data-testid="icon-eye-closed" />);
+  spyOn(iconsModule, "IconEyeOpened").mockImplementation(() => <span data-testid="icon-eye-opened" />);
+  spyOn(iconsModule, "IconSparks").mockImplementation(() => <span data-testid="icon-sparks" />);
+  spyOn(iconsModule, "IconWarning").mockImplementation(() => <span data-testid="icon-warning" />);
 
-jest.mock("mobx-react", () => {
-  const React = require("react");
-  const observer = (C: any) => C;
-  const inject = () => (C: any) => (props: any) =>
-    React.createElement(C, { ...props, store: { hasInterface: () => false } });
-  return { observer, inject };
-});
+  spyOn(mobxReactModule, "observer").mockImplementation((C: any) => C);
+  spyOn(mobxReactModule, "inject").mockImplementation(() => (C: any) => (props: any) => (
+    <C {...props} store={{ hasInterface: () => false }} />
+  ));
 
-const mockResizeCallback = { current: null as ((entries: Array<{ contentRect: { height: number } }>) => void) | null };
-jest.mock("../../../../utils/resize-observer", () => {
-  return {
-    __esModule: true,
-    default: class ResizeObserver {
-      observe = mockObserve;
-      unobserve = mockUnobserve;
-      disconnect = mockDisconnect;
-      constructor(callback: (entries: Array<{ contentRect: { height: number } }>) => void) {
-        mockResizeCallback.current = callback;
-        queueMicrotask(() => {
-          callback([{ contentRect: { height: 400 } }]);
-        });
-      }
-    },
-  };
+  spyOn(resizeObserverModule, "default").mockImplementation(function MockResizeObserver(callback: any) {
+    mockResizeCallback.current = callback;
+    queueMicrotask(() => {
+      callback([{ contentRect: { height: 400 } }]);
+    });
+    return {
+      observe: mockObserve,
+      unobserve: mockUnobserve,
+      disconnect: mockDisconnect,
+    };
+  } as any);
 });
 
 const defaultItem = {
@@ -139,12 +128,12 @@ const defaultItem = {
   incomplete: false,
   annotation: null,
   selected: false,
-  setHighlight: jest.fn(),
+  setHighlight: mock(),
   isReadOnly: () => false,
   hideable: true,
   highlighted: false,
-  toggleHidden: jest.fn(),
-  setLocked: jest.fn(),
+  toggleHidden: mock(),
+  setLocked: mock(),
   origin: undefined,
   score: undefined,
   text: undefined,
@@ -177,7 +166,9 @@ function createMockRegions(overrides: Record<string, unknown> = {}, itemsOverrid
 describe("OutlinerTree", () => {
   it("renders tree container and tree when regions provide getRegionsTree", async () => {
     const regions = createMockRegions();
-    const { container } = render(<OutlinerTree regions={regions} footer={null} />);
+    const { container } = renderWithStore(
+      <OutlinerTree regions={regions} footer={null} store={{ hasInterface: () => false }} />,
+    );
 
     await waitFor(() => {
       expect(container.querySelector(".dm-outliner-tree")).toBeInTheDocument();
@@ -187,7 +178,7 @@ describe("OutlinerTree", () => {
   it("renders footer when footer prop is provided", async () => {
     const regions = createMockRegions();
     const footer = <div data-testid="outliner-footer">Footer content</div>;
-    render(<OutlinerTree regions={regions} footer={footer} />);
+    renderWithStore(<OutlinerTree regions={regions} footer={footer} store={{ hasInterface: () => false }} />);
 
     await waitFor(() => {
       expect(screen.getByTestId("outliner-footer")).toHaveTextContent("Footer content");
@@ -196,7 +187,7 @@ describe("OutlinerTree", () => {
 
   it("uses ResizeObserver and sets height so Tree is rendered", async () => {
     const regions = createMockRegions();
-    render(<OutlinerTree regions={regions} footer={null} />);
+    renderWithStore(<OutlinerTree regions={regions} footer={null} store={{ hasInterface: () => false }} />);
 
     await waitFor(() => {
       expect(mockObserve).toHaveBeenCalled();
@@ -205,7 +196,7 @@ describe("OutlinerTree", () => {
 
   it("ResizeObserver early return when height unchanged", async () => {
     const regions = createMockRegions();
-    render(<OutlinerTree regions={regions} footer={null} />);
+    renderWithStore(<OutlinerTree regions={regions} footer={null} store={{ hasInterface: () => false }} />);
 
     await waitFor(() => {
       expect(mockResizeCallback.current).toBeTruthy();
@@ -217,7 +208,9 @@ describe("OutlinerTree", () => {
 
   it("renders tree with manual group (draggable)", async () => {
     const regions = createMockRegions({ group: "manual" });
-    const { container } = render(<OutlinerTree regions={regions} footer={null} />);
+    const { container } = renderWithStore(
+      <OutlinerTree regions={regions} footer={null} store={{ hasInterface: () => false }} />,
+    );
 
     await waitFor(() => {
       expect(container.querySelector(".dm-tree")).toBeInTheDocument();
@@ -226,7 +219,9 @@ describe("OutlinerTree", () => {
 
   it("renders tree with label group", async () => {
     const regions = createMockRegions({ group: "label" });
-    const { container } = render(<OutlinerTree regions={regions} footer={null} />);
+    const { container } = renderWithStore(
+      <OutlinerTree regions={regions} footer={null} store={{ hasInterface: () => false }} />,
+    );
 
     await waitFor(() => {
       expect(container.querySelector(".dm-tree")).toBeInTheDocument();
@@ -244,7 +239,9 @@ describe("OutlinerTree", () => {
       },
     ];
     const regions = createMockRegions({}, items);
-    const { container } = render(<OutlinerTree regions={regions} footer={null} />);
+    const { container } = renderWithStore(
+      <OutlinerTree regions={regions} footer={null} store={{ hasInterface: () => false }} />,
+    );
 
     await waitFor(() => {
       expect(container.querySelector(".dm-outliner-tree")).toBeInTheDocument();
@@ -255,7 +252,9 @@ describe("OutlinerTree", () => {
 
   it("renders with selected keys", async () => {
     const regions = createMockRegions({ selection: { keys: ["r1"] } });
-    const { container } = render(<OutlinerTree regions={regions} footer={null} />);
+    const { container } = renderWithStore(
+      <OutlinerTree regions={regions} footer={null} store={{ hasInterface: () => false }} />,
+    );
 
     await waitFor(() => {
       expect(container.querySelector(".dm-tree")).toBeInTheDocument();
@@ -271,7 +270,9 @@ describe("OutlinerTree", () => {
       },
     ];
     const regions = createMockRegions({}, items);
-    const { container } = render(<OutlinerTree regions={regions} footer={null} />);
+    const { container } = renderWithStore(
+      <OutlinerTree regions={regions} footer={null} store={{ hasInterface: () => false }} />,
+    );
 
     await waitFor(() => {
       expect(container.querySelector(".dm-tree")).toBeInTheDocument();
@@ -289,7 +290,9 @@ describe("OutlinerTree", () => {
       },
     ];
     const regions = createMockRegions({}, items);
-    const { container } = render(<OutlinerTree regions={regions} footer={null} />);
+    const { container } = renderWithStore(
+      <OutlinerTree regions={regions} footer={null} store={{ hasInterface: () => false }} />,
+    );
 
     await waitFor(() => {
       expect(container.querySelector(".dm-tree")).toBeInTheDocument();
@@ -300,7 +303,9 @@ describe("OutlinerTree", () => {
 
   it("calls setRef with null on unmount", async () => {
     const regions = createMockRegions();
-    const { unmount } = render(<OutlinerTree regions={regions} footer={null} />);
+    const { unmount } = renderWithStore(
+      <OutlinerTree regions={regions} footer={null} store={{ hasInterface: () => false }} />,
+    );
 
     await waitFor(() => {
       expect(mockObserve).toHaveBeenCalled();
@@ -329,7 +334,9 @@ describe("OutlinerTree", () => {
         });
       },
     };
-    const { container } = render(<OutlinerTree regions={regions} footer={null} />);
+    const { container } = renderWithStore(
+      <OutlinerTree regions={regions} footer={null} store={{ hasInterface: () => false }} />,
+    );
 
     await waitFor(() => {
       expect(container.querySelector(".dm-tree")).toBeInTheDocument();
@@ -337,16 +344,16 @@ describe("OutlinerTree", () => {
   });
 
   it("onSelect selects region when node is clicked", async () => {
-    const selectArea = jest.fn();
-    const unselectAll = jest.fn();
+    const selectArea = mock();
+    const unselectAll = mock();
     const mockAnnotation = {
       selectArea,
       unselectAll,
-      toggleRegionSelection: jest.fn(),
+      toggleRegionSelection: mock(),
       isLinkingMode: false,
-      addLinkedRegion: jest.fn(),
-      stopLinkingMode: jest.fn(),
-      regionStore: { unselectAll: jest.fn() },
+      addLinkedRegion: mock(),
+      stopLinkingMode: mock(),
+      regionStore: { unselectAll: mock() },
     };
     const items = [
       {
@@ -356,7 +363,9 @@ describe("OutlinerTree", () => {
       },
     ];
     const regions = createMockRegions({}, items);
-    const { container } = render(<OutlinerTree regions={regions} footer={null} />);
+    const { container } = renderWithStore(
+      <OutlinerTree regions={regions} footer={null} store={{ hasInterface: () => false }} />,
+    );
 
     await waitFor(() => {
       expect(container.querySelector(".dm-tree")).toBeInTheDocument();
@@ -368,16 +377,18 @@ describe("OutlinerTree", () => {
   });
 
   it("onSelect unselects when clicking selected node", async () => {
-    const unselectAll = jest.fn();
+    const unselectAll = mock();
     const items = [
       {
         ...defaultItem,
-        annotation: { selectArea: jest.fn(), unselectAll, regionStore: {} },
+        annotation: { selectArea: mock(), unselectAll, regionStore: {} },
         selected: true,
       },
     ];
     const regions = createMockRegions({}, items);
-    const { container } = render(<OutlinerTree regions={regions} footer={null} />);
+    const { container } = renderWithStore(
+      <OutlinerTree regions={regions} footer={null} store={{ hasInterface: () => false }} />,
+    );
 
     await waitFor(() => {
       expect(container.querySelector(".dm-tree-node-content-wrapper")).toBeInTheDocument();
@@ -387,7 +398,7 @@ describe("OutlinerTree", () => {
   });
 
   it("onSelect with ctrlKey toggles region selection", async () => {
-    const toggleRegionSelection = jest.fn();
+    const toggleRegionSelection = mock();
     const items = [
       {
         ...defaultItem,
@@ -395,7 +406,9 @@ describe("OutlinerTree", () => {
       },
     ];
     const regions = createMockRegions({}, items);
-    const { container } = render(<OutlinerTree regions={regions} footer={null} />);
+    const { container } = renderWithStore(
+      <OutlinerTree regions={regions} footer={null} store={{ hasInterface: () => false }} />,
+    );
 
     await waitFor(() => {
       expect(container.querySelector(".dm-tree-node-content-wrapper")).toBeInTheDocument();
@@ -408,18 +421,20 @@ describe("OutlinerTree", () => {
   });
 
   it("onSelect calls onSelectInOutliner when region was not selected", async () => {
-    const onSelectInOutliner = jest.fn();
-    const selectArea = jest.fn();
+    const onSelectInOutliner = mock();
+    const selectArea = mock();
     const items = [
       {
         ...defaultItem,
         selected: false,
         onSelectInOutliner,
-        annotation: { selectArea, unselectAll: jest.fn(), regionStore: {} },
+        annotation: { selectArea, unselectAll: mock(), regionStore: {} },
       },
     ];
     const regions = createMockRegions({}, items);
-    const { container } = render(<OutlinerTree regions={regions} footer={null} />);
+    const { container } = renderWithStore(
+      <OutlinerTree regions={regions} footer={null} store={{ hasInterface: () => false }} />,
+    );
 
     await waitFor(() => {
       expect(container.querySelector(".dm-tree-node-content-wrapper")).toBeInTheDocument();
@@ -430,9 +445,9 @@ describe("OutlinerTree", () => {
   });
 
   it("onSelect in linking mode adds linked region and stops linking", async () => {
-    const addLinkedRegion = jest.fn();
-    const stopLinkingMode = jest.fn();
-    const unselectAll = jest.fn();
+    const addLinkedRegion = mock();
+    const stopLinkingMode = mock();
+    const unselectAll = mock();
     const items = [
       {
         ...defaultItem,
@@ -446,7 +461,9 @@ describe("OutlinerTree", () => {
       },
     ];
     const regions = createMockRegions({}, items);
-    const { container } = render(<OutlinerTree regions={regions} footer={null} />);
+    const { container } = renderWithStore(
+      <OutlinerTree regions={regions} footer={null} store={{ hasInterface: () => false }} />,
+    );
 
     await waitFor(() => {
       expect(container.querySelector(".dm-tree-node-content-wrapper")).toBeInTheDocument();
@@ -458,10 +475,12 @@ describe("OutlinerTree", () => {
   });
 
   it("onMouseEnter and onMouseLeave call setHighlight", async () => {
-    const setHighlight = jest.fn();
+    const setHighlight = mock();
     const items = [{ ...defaultItem, setHighlight }];
     const regions = createMockRegions({}, items);
-    const { container } = render(<OutlinerTree regions={regions} footer={null} />);
+    const { container } = renderWithStore(
+      <OutlinerTree regions={regions} footer={null} store={{ hasInterface: () => false }} />,
+    );
 
     await waitFor(() => {
       expect(container.querySelector(".dm-tree-node-content-wrapper")).toBeInTheDocument();
@@ -474,14 +493,16 @@ describe("OutlinerTree", () => {
   });
 
   it("onMouseEnter on second node clears highlight on first", async () => {
-    const setHighlight1 = jest.fn();
-    const setHighlight2 = jest.fn();
+    const setHighlight1 = mock();
+    const setHighlight2 = mock();
     const items = [
       { ...defaultItem, id: "r1", setHighlight: setHighlight1 },
       { ...defaultItem, id: "r2", setHighlight: setHighlight2 },
     ];
     const regions = createMockRegions({}, items);
-    const { container } = render(<OutlinerTree regions={regions} footer={null} />);
+    const { container } = renderWithStore(
+      <OutlinerTree regions={regions} footer={null} store={{ hasInterface: () => false }} />,
+    );
 
     await waitFor(() => {
       const wrappers = container.querySelectorAll(".dm-tree-node-content-wrapper");
@@ -505,7 +526,9 @@ describe("OutlinerTree", () => {
       },
     ];
     const regions = createMockRegions({}, items);
-    const { container } = render(<OutlinerTree regions={regions} footer={null} />);
+    const { container } = renderWithStore(
+      <OutlinerTree regions={regions} footer={null} store={{ hasInterface: () => false }} />,
+    );
 
     await waitFor(() => {
       expect(container.querySelector(".dm-tree")).toBeInTheDocument();
@@ -514,7 +537,7 @@ describe("OutlinerTree", () => {
   });
 
   it("RegionItemDesc onClick selects area when not selected", async () => {
-    const selectArea = jest.fn();
+    const selectArea = mock();
     const items = [
       {
         ...defaultItem,
@@ -523,7 +546,9 @@ describe("OutlinerTree", () => {
       },
     ];
     const regions = createMockRegions({}, items);
-    const { container } = render(<OutlinerTree regions={regions} footer={null} />);
+    const { container } = renderWithStore(
+      <OutlinerTree regions={regions} footer={null} store={{ hasInterface: () => false }} />,
+    );
 
     await waitFor(() => {
       expect(container.querySelector(".dm-ocr")).toBeInTheDocument();
@@ -534,16 +559,16 @@ describe("OutlinerTree", () => {
 
   describe("with FF_DEV_2755 (persist collapse)", () => {
     beforeEach(() => {
-      (featureFlags.isFF as jest.Mock).mockImplementation((flag: string) => flag === "ff_dev_2755");
+      ff.set({ [FF_DEV_2755]: true });
     });
     afterEach(() => {
-      (featureFlags.isFF as jest.Mock).mockReturnValue(false);
+      ff.reset();
     });
 
     it("uses expandedKeys and onExpand when group is label", async () => {
       const storageKey = "collapsed-label-pos";
-      const getItem = jest.spyOn(Storage.prototype, "getItem").mockReturnValue(null);
-      const setItem = jest.spyOn(Storage.prototype, "setItem");
+      const getItem = spyOn(Storage.prototype, "getItem").mockReturnValue(null);
+      const setItem = spyOn(Storage.prototype, "setItem");
 
       const parentItem = { ...defaultItem, id: "label-1", type: "label" };
       const childItem = { ...defaultItem, id: "r1", type: "rectangle" };
@@ -570,7 +595,9 @@ describe("OutlinerTree", () => {
           return [parentNode];
         },
       };
-      const { container } = render(<OutlinerTree regions={regions} footer={null} />);
+      const { container } = renderWithStore(
+        <OutlinerTree regions={regions} footer={null} store={{ hasInterface: () => false }} />,
+      );
 
       await waitFor(() => {
         expect(container.querySelector(".dm-tree")).toBeInTheDocument();
@@ -590,7 +617,9 @@ describe("OutlinerTree", () => {
   it("renders item text with escaped newlines", async () => {
     const items = [{ ...defaultItem, text: "line1\\nline2" }];
     const regions = createMockRegions({}, items);
-    const { container } = render(<OutlinerTree regions={regions} footer={null} />);
+    const { container } = renderWithStore(
+      <OutlinerTree regions={regions} footer={null} store={{ hasInterface: () => false }} />,
+    );
 
     await waitFor(() => {
       expect(container.querySelector(".dm-tree")).toBeInTheDocument();
@@ -602,7 +631,9 @@ describe("OutlinerTree", () => {
   it("renders node with type range for RegionControls branch", async () => {
     const items = [{ ...defaultItem, type: "range", hidden: false }];
     const regions = createMockRegions({}, items);
-    const { container } = render(<OutlinerTree regions={regions} footer={null} />);
+    const { container } = renderWithStore(
+      <OutlinerTree regions={regions} footer={null} store={{ hasInterface: () => false }} />,
+    );
 
     await waitFor(() => {
       expect(container.querySelector(".dm-tree")).toBeInTheDocument();

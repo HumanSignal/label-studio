@@ -58,7 +58,7 @@ export const Menubar = ({ enabled, defaultOpened, defaultPinned, children, onSid
   const { user, isLoading } = useAuth();
   const location = useFixedLocation();
 
-  const config = useConfig();
+  const _config = useConfig();
   const [sidebarOpened, setSidebarOpened] = useState(defaultOpened ?? false);
   const [sidebarPinned, setSidebarPinned] = useState(defaultPinned ?? false);
   const [PageContext, setPageContext] = useState({

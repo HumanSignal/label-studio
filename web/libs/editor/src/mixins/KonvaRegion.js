@@ -49,7 +49,7 @@ export const KonvaRegionMixin = types
     };
   })
   .actions((self) => {
-    let deferredSelectId = null;
+    let _deferredSelectId = null;
     const Super = {
       deleteRegion: self.deleteRegion,
     };
@@ -149,9 +149,9 @@ export const KonvaRegionMixin = types
           return;
         }
 
-        const selectAction = () => {
+        const _selectAction = () => {
           self._selectArea(additiveMode);
-          deferredSelectId = null;
+          _deferredSelectId = null;
         };
 
         if (!annotation.isReadOnly() && annotation.isLinkingMode) {

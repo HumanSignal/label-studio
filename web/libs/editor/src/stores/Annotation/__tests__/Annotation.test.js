@@ -6,25 +6,30 @@ if (typeof globalThis.structuredClone === "undefined") {
   globalThis.structuredClone = (obj) => JSON.parse(JSON.stringify(obj));
 }
 
-jest.mock("keymaster", () => {
+mockModule("keymaster", () => {
+  let scope = "all";
   const keymaster = () => {};
   keymaster.unbind = () => {};
-  keymaster.setScope = () => {};
+  keymaster.setScope = (nextScope) => {
+    scope = nextScope ?? scope;
+  };
+  keymaster.getScope = () => scope;
   return { __esModule: true, default: keymaster };
 });
 
 import "../../../tags/visual/View";
 import "../../../tags/object/RichText";
-import Tree from "../../../core/Tree";
-import Registry from "../../../core/Registry";
+import "../../../tags/object/Image/Image.js";
+import "../../../tags/control/Labels/Labels.jsx";
 import AppStore from "../../AppStore";
 
-const MINIMAL_CONFIG = `<View><Text name="t1" value="$text" /></View>`;
+const MINIMAL_CONFIG =
+  '<View><Image name="img" value="$img" /><Labels name="l" toName="img"><Label value="A" /></Labels></View>';
 
 const createTestEnv = () => ({
   events: {
-    hasEvent: jest.fn(() => false),
-    invoke: jest.fn(),
+    hasEvent: mock(() => false),
+    invoke: mock(),
   },
   messages: {},
   settings: {},
@@ -34,7 +39,7 @@ function createStoreWithAnnotation(annotationSnapshot = {}) {
   const env = createTestEnv();
   const task = {
     id: 1,
-    data: JSON.stringify({ text: "Hello" }),
+    data: JSON.stringify({ img: "https://example.com/test.jpg" }),
   };
   const store = AppStore.create(
     {
@@ -66,7 +71,7 @@ describe("Annotation model", () => {
       const store = AppStore.create(
         {
           config: MINIMAL_CONFIG,
-          task: { id: 1, data: JSON.stringify({ text: "Hi" }) },
+          task: { id: 1, data: JSON.stringify({ img: "https://example.com/test.jpg" }) },
           interfaces: ["basic"],
         },
         env,
@@ -205,7 +210,7 @@ describe("Annotation model", () => {
     it("prepareAnnotation parses JSON string", () => {
       const { annotation } = createStoreWithAnnotation();
       const result = annotation.prepareAnnotation(
-        '[{"type":"labels","from_name":"l","to_name":"t1","value":{"labels":["A"]}}]',
+        '[{"type":"labels","from_name":"l","to_name":"img","value":{"labels":["A"]}}]',
       );
       expect(Array.isArray(result)).toBe(true);
     });
@@ -254,7 +259,7 @@ describe("Annotation model", () => {
 
     it("updatePersonalKey sets pk", () => {
       const { store, annotation } = createStoreWithAnnotation();
-      store.addAnnotationToTaskHistory = jest.fn();
+      store.addAnnotationToTaskHistory = mock();
       annotation.updatePersonalKey("42");
       expect(annotation.pk).toBe("42");
       expect(store.addAnnotationToTaskHistory).toHaveBeenCalledWith("42");
@@ -292,7 +297,7 @@ describe("Annotation model", () => {
 
     it("dropDraft clears draft state when autosave exists", () => {
       const { annotation } = createStoreWithAnnotation();
-      annotation.autosave = { cancel: jest.fn() };
+      annotation.autosave = { cancel: mock() };
       annotation.setDraftId(1);
       annotation.setDraftSelected(true);
       annotation.addVersions({ draft: [] });
@@ -304,15 +309,15 @@ describe("Annotation model", () => {
 
     it("reinitHistory calls history.reinit and setInitialValues for annotation type", () => {
       const { annotation } = createStoreWithAnnotation();
-      annotation.history.reinit = jest.fn();
+      annotation.history.reinit = mock();
       annotation.reinitHistory(true);
       expect(annotation.history.reinit).toHaveBeenCalledWith(true);
     });
 
     it("deserializeAnnotation warns and delegates to deserializeResults", () => {
-      const consoleSpy = jest.spyOn(console, "warn").mockImplementation(() => {});
+      const consoleSpy = spyOn(console, "warn").mockImplementation(() => {});
       const { annotation } = createStoreWithAnnotation();
-      annotation.deserializeResults = jest.fn();
+      annotation.deserializeResults = mock();
       annotation.deserializeAnnotation([]);
       expect(consoleSpy).toHaveBeenCalled();
       expect(annotation.deserializeResults).toHaveBeenCalledWith([]);

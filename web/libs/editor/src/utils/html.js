@@ -544,7 +544,7 @@ function sanitizeHtml(html = []) {
       // Check if hostname matches any allowed domain
       const isAllowed = ALLOWED_IFRAME_DOMAINS.includes(url.hostname);
       return isAllowed;
-    } catch (e) {
+    } catch (_e) {
       // Invalid URL format
       return false;
     }

@@ -40,7 +40,7 @@ describe("useRecentFilters", () => {
 
     const values = (result.current.fields as Array<{ value?: string; title?: string }>).map((f) => f.value ?? f.title);
     expect(values[0]).toBe("__recent_header__");
-    expect(values[1]).toBe(RECENT_VALUE_PREFIX + "filter:tasks:image");
+    expect(values[1]).toBe(`${RECENT_VALUE_PREFIX}filter:tasks:image`);
     expect(values[2]).toBe("__all_fields_header__");
   });
 
@@ -66,7 +66,7 @@ describe("useRecentFilters", () => {
 
     const recentItems = (result.current.fields as Array<Record<string, unknown>>).filter((f) => f._isRecent);
     expect(recentItems).toHaveLength(1);
-    expect(recentItems[0].value).toBe(RECENT_VALUE_PREFIX + "filter:tasks:created_at");
+    expect(recentItems[0].value).toBe(`${RECENT_VALUE_PREFIX}filter:tasks:created_at`);
     expect(recentItems[0]._recentOperator).toBe("greater");
     expect(recentItems[0]._recentValue).toBe("2025-01-01");
   });
@@ -87,8 +87,8 @@ describe("useRecentFilters", () => {
     });
 
     const recentItems = (result.current.fields as Array<Record<string, unknown>>).filter((f) => f._isRecent);
-    expect(recentItems[0].value).toBe(RECENT_VALUE_PREFIX + "filter:tasks:image");
-    expect(recentItems[1].value).toBe(RECENT_VALUE_PREFIX + "filter:tasks:text");
+    expect(recentItems[0].value).toBe(`${RECENT_VALUE_PREFIX}filter:tasks:image`);
+    expect(recentItems[1].value).toBe(`${RECENT_VALUE_PREFIX}filter:tasks:text`);
     expect(recentItems[1]._recentOperator).toBe("regex");
     expect(recentItems[1]._recentValue).toBe("new.*");
   });
@@ -104,8 +104,8 @@ describe("useRecentFilters", () => {
     });
 
     const recentItems = (result.current.fields as Array<Record<string, unknown>>).filter((f) => f._isRecent);
-    expect(recentItems[0].value).toBe(RECENT_VALUE_PREFIX + "filter:tasks:text");
-    expect(recentItems[1].value).toBe(RECENT_VALUE_PREFIX + "filter:tasks:image");
+    expect(recentItems[0].value).toBe(`${RECENT_VALUE_PREFIX}filter:tasks:text`);
+    expect(recentItems[1].value).toBe(`${RECENT_VALUE_PREFIX}filter:tasks:image`);
   });
 
   it("filters out recents that no longer exist in availableFilters", () => {

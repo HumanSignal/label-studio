@@ -225,7 +225,7 @@ export const HotkeysManager = () => {
   };
 
   // Enhanced import handler that manages dirty state
-  const handleImportHotkeys = async (importedData: ImportData | Hotkey[]) => {
+  const _handleImportHotkeys = async (importedData: ImportData | Hotkey[]) => {
     try {
       setIsLoading(true);
 

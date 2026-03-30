@@ -4,12 +4,14 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { Provider } from "mobx-react";
-import { ChoiceModel, HtxChoice } from "../Choice";
+import { types } from "mobx-state-tree";
+import { HtxChoice } from "../Choice";
 import { ChoicesModel } from "../Choices";
 
-jest.mock("../../../core/Tree", () => {
-  const actual = jest.requireActual("../../../core/Tree").default;
-  return {
+mockModule("../../../core/Tree", () => {
+  const actualModule = requireActual("../../../core/Tree");
+  const actual = actualModule.default ?? actualModule;
+  const treeMock = {
     ...actual,
     cssConverter: (style) => {
       if (!style) return null;
@@ -27,6 +29,12 @@ jest.mock("../../../core/Tree", () => {
       return result;
     },
     renderChildren: () => null,
+  };
+  return {
+    __esModule: true,
+    __skipMerge: true,
+    ...treeMock,
+    default: treeMock,
   };
 });
 
@@ -161,14 +169,23 @@ describe("Choice model", () => {
   });
 
   it("toggleSelected flips _sel when parent updateResult is no-op", () => {
-    const choices = ChoicesModel.create({
-      name: "ch",
-      toname: "t",
-      choice: "single",
-      children: [{ type: "choice", value: "T", _value: "T" }],
+    const Root = types
+      .model({
+        choices: ChoicesModel,
+      })
+      .volatile(() => ({
+        annotationStore: { selected: { isReadOnly: () => false } },
+      }));
+    const root = Root.create({
+      choices: {
+        name: "ch",
+        toname: "t",
+        choice: "single",
+        children: [{ type: "choice", value: "T", _value: "T" }],
+      },
     });
-    choices.updateResult = () => {};
-    const choice = choices.children[0];
+    root.choices.updateResult = () => {};
+    const choice = root.choices.children[0];
     expect(choice.sel).toBe(false);
     choice.toggleSelected();
     expect(choice.sel).toBe(true);
@@ -320,7 +337,7 @@ describe("HtxChoice view", () => {
       parent: { layout: "vertical" },
       nestedResults: false,
       children: [],
-      toggleSelected: jest.fn(),
+      toggleSelected: mock(),
       annotation: null,
       ...overrides,
     };
@@ -342,7 +359,7 @@ describe("HtxChoice view", () => {
 
   it("calls toggleSelected when checkbox is clicked", async () => {
     const user = userEvent.setup();
-    const toggleSelected = jest.fn();
+    const toggleSelected = mock();
     const item = createMockItem({ _value: "Click me", toggleSelected });
     const store = createMockStore();
     render(
@@ -391,7 +408,7 @@ describe("HtxChoice view", () => {
 
   it("does not call toggleSelected when readonly and clicked", async () => {
     const user = userEvent.setup();
-    const toggleSelected = jest.fn();
+    const toggleSelected = mock();
     const item = createMockItem({ _value: "R", isReadOnly: () => true, toggleSelected });
     const store = createMockStore();
     render(
@@ -453,7 +470,7 @@ describe("HtxChoice view", () => {
       </Provider>,
     );
     const itemDiv = container.querySelector('[class*="choice__item"]');
-    expect(itemDiv).toHaveStyle({ color: "red" });
+    expect(itemDiv?.style.color).toBe("red");
   });
 
   it("renders html when item.html is set", () => {

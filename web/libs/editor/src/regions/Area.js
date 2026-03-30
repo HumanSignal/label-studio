@@ -31,7 +31,7 @@ const ClassificationArea = types.compose(
       // true only for global classifications
       classification: true,
     })
-    .views((self) => ({
+    .views((_self) => ({
       get supportSuggestions() {
         return false;
       },

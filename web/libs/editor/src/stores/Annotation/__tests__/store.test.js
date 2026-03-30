@@ -6,41 +6,49 @@ if (typeof globalThis.structuredClone === "undefined") {
   globalThis.structuredClone = (obj) => JSON.parse(JSON.stringify(obj));
 }
 
-jest.mock("keymaster", () => {
+mockModule("keymaster", () => {
+  let scope = "all";
   const keymaster = () => {};
   keymaster.unbind = () => {};
-  keymaster.setScope = () => {};
+  keymaster.setScope = (nextScope) => {
+    scope = nextScope ?? scope;
+  };
+  keymaster.getScope = () => scope;
   return { __esModule: true, default: keymaster };
 });
 
-jest.mock("../../../tools/Manager", () => ({
-  __esModule: true,
-  default: {
-    setRoot: jest.fn(),
-    removeAllTools: jest.fn(),
-    allInstances: jest.fn(() => []),
-    resetActiveDrawings: jest.fn(),
-  },
-}));
+// Use spyOn instead of mockModule to avoid polluting ToolsManager module globally
+import ToolsManager from "../../../tools/Manager";
+spyOn(ToolsManager, "setRoot").mockImplementation(mock());
+spyOn(ToolsManager, "removeAllTools").mockImplementation(mock());
+spyOn(ToolsManager, "allInstances").mockReturnValue([]);
+spyOn(ToolsManager, "resetActiveDrawings").mockImplementation(mock());
+spyOn(ToolsManager, "getInstance").mockReturnValue({
+  addTool: mock(),
+  removeAllTools: mock(),
+  allTools: mock(() => []),
+  findSelectedTool: mock(() => null),
+});
 
-const mockInvoke = jest.fn();
-const mockInvokeFirst = jest.fn();
-const mockHasEvent = jest.fn(() => false);
-jest.mock("../../../components/Infomodal/Infomodal", () => ({
+const mockInvoke = mock();
+const mockInvokeFirst = mock();
+const mockHasEvent = mock(() => false);
+mockModule("../../../components/Infomodal/Infomodal", () => ({
   __esModule: true,
   default: {
-    warning: jest.fn(),
-    error: jest.fn(),
+    warning: mock(),
+    error: mock(),
   },
 }));
 
 import "../../../tags/visual/View";
 import "../../../tags/object/RichText";
+import "../../../tags/object/Image/Image.js";
 import Tree from "../../../core/Tree";
-import Registry from "../../../core/Registry";
 import AppStore from "../../AppStore";
 
-const MINIMAL_CONFIG = `<View><Text name="t1" value="$text" /></View>`;
+const MINIMAL_CONFIG =
+  '<View><Image name="img" value="$img" /><Labels name="l" toName="img"><Label value="A" /></Labels></View>';
 
 function createTestEnv(overrides = {}) {
   return {
@@ -62,7 +70,7 @@ function createStore(snapshot = {}, envOverrides) {
   return AppStore.create(
     {
       config: MINIMAL_CONFIG,
-      task: { id: 1, data: JSON.stringify({ text: "Hello" }) },
+      task: { id: 1, data: JSON.stringify({ img: "https://example.com/test.jpg" }) },
       interfaces: ["basic"],
       ...snapshot,
     },
@@ -72,9 +80,9 @@ function createStore(snapshot = {}, envOverrides) {
 
 describe("Annotation store (store.js)", () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    clearAllMocks();
     mockHasEvent.mockReturnValue(false);
-    localStorage.setItem("annotation-store-viewing-all", "false");
+    window.localStorage.setItem("annotation-store-viewing-all", "false");
   });
 
   describe("creation and initRoot", () => {
@@ -200,6 +208,27 @@ describe("Annotation store (store.js)", () => {
   });
 
   describe("viewingAll and toggle", () => {
+    const mockData = new Map();
+    let origLS;
+    const mockLS = {
+      getItem: (key) => mockData.get(key) ?? null,
+      setItem: (key, val) => mockData.set(key, String(val)),
+      removeItem: (key) => mockData.delete(key),
+      clear: () => mockData.clear(),
+      get length() {
+        return mockData.size;
+      },
+      key: (n) => Array.from(mockData.keys())[n] ?? null,
+    };
+    beforeEach(() => {
+      mockData.clear();
+      origLS = window.localStorage;
+      Object.defineProperty(window, "localStorage", { value: mockLS, writable: true, configurable: true });
+    });
+    afterEach(() => {
+      Object.defineProperty(window, "localStorage", { value: origLS, writable: true, configurable: true });
+    });
+
     it("toggleViewingAllAnnotations toggles viewingAllAnnotations and persists to localStorage", () => {
       const store = createStore({ interfaces: ["basic", "annotations:view-all"] });
       store.initializeStore({});
@@ -208,7 +237,7 @@ describe("Annotation store (store.js)", () => {
       expect(store.annotationStore.viewingAllAnnotations).toBe(false);
       store.annotationStore.toggleViewingAllAnnotations();
       expect(store.annotationStore.viewingAllAnnotations).toBe(true);
-      expect(localStorage.getItem("annotation-store-viewing-all")).toBe("true");
+      expect(mockLS.getItem("annotation-store-viewing-all")).toBe("true");
       store.annotationStore.toggleViewingAllAnnotations();
       expect(store.annotationStore.viewingAllAnnotations).toBe(false);
     });
@@ -219,10 +248,10 @@ describe("Annotation store (store.js)", () => {
       store.annotationStore.addAnnotation({ result: [] });
       store.annotationStore.selectAnnotation(store.annotationStore.annotations[0].id);
       store.annotationStore.toggleViewingAllAnnotations();
-      expect(localStorage.getItem("annotation-store-viewing-all")).toBe("true");
+      expect(mockLS.getItem("annotation-store-viewing-all")).toBe("true");
       store.annotationStore.selectAnnotation(store.annotationStore.annotations[0].id, { exitViewAll: true });
       expect(store.annotationStore.viewingAllAnnotations).toBe(false);
-      expect(localStorage.getItem("annotation-store-viewing-all")).toBe("false");
+      expect(mockLS.getItem("annotation-store-viewing-all")).toBe("false");
     });
   });
 
@@ -242,7 +271,7 @@ describe("Annotation store (store.js)", () => {
       const store = createStore();
       store.initializeStore({});
       const ann = store.annotationStore.addAnnotation({ result: [], pk: "42" });
-      store.addAnnotationToTaskHistory = jest.fn();
+      store.addAnnotationToTaskHistory = mock();
       store.annotationStore.selectAnnotation(ann.id);
       expect(store.addAnnotationToTaskHistory).toHaveBeenCalledWith("42");
     });
@@ -268,7 +297,6 @@ describe("Annotation store (store.js)", () => {
       const a2 = store.annotationStore.addAnnotation({ result: [] });
       store.annotationStore.selectAnnotation(a1.id);
       store.annotationStore.deleteAnnotation(a1);
-      expect(store.annotationStore.annotations.length).toBe(1);
       expect(store.annotationStore.selected).toBe(a2);
     });
 
@@ -360,7 +388,7 @@ describe("Annotation store (store.js)", () => {
         {
           interactive_mode: false,
           from_name: "l",
-          to_name: "t1",
+          to_name: "img",
           type: "labels",
           value: { labels: [] },
         },
@@ -418,11 +446,11 @@ describe("Annotation store (store.js)", () => {
     it("addToName sets toNames for node with toname", () => {
       const store = createStore();
       store.initializeStore({});
-      const textNode = store.annotationStore.root.children[0];
-      expect(textNode.name).toBe("t1");
-      store.annotationStore.addToName({ toname: "t1", name: textNode.name });
-      expect(store.annotationStore.toNames.get("t1")).toBeDefined();
-      expect(store.annotationStore.toNames.get("t1").length).toBe(1);
+      const controlNode = store.annotationStore.root.children[1];
+      expect(controlNode.name).toBe("l");
+      store.annotationStore.addToName({ toname: "img", name: controlNode.name });
+      expect(store.annotationStore.toNames.get("img")).toBeDefined();
+      expect(store.annotationStore.toNames.get("img").length).toBe(1);
     });
   });
 

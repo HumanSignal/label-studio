@@ -95,7 +95,7 @@ const SettingsModel = types
         const { localStorage } = window;
 
         if (!localStorage) return;
-      } catch (e) {
+      } catch (_e) {
         return;
       }
 

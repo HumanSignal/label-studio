@@ -3,52 +3,58 @@
  * Mocks env and AppStore so we test configureStore logic only.
  */
 
-const mockGetData = jest.fn((task) => (task?.data ? { ...task, data: JSON.stringify(task.data) } : task));
-const mockGetState = jest.fn(() => ({}));
-const mockRootElement = jest.fn(() => ({}));
-const mockConfigureApplication = jest.fn(() => ({}));
-const mockGetExample = jest.fn();
+const mockGetData = mock((task) => (task?.data ? { ...task, data: JSON.stringify(task.data) } : task));
+const mockRootElement = mock(() => ({}));
+const mockConfigureApplication = mock(() => ({}));
+const mockGetExample = mock();
 
-jest.mock("../env/production", () => ({
-  __esModule: true,
-  default: {
-    getData: mockGetData,
-    getState: mockGetState,
-    rootElement: mockRootElement,
-    configureApplication: mockConfigureApplication,
-    get getExample() {
-      return mockGetExample();
-    },
-  },
-}));
-
-jest.mock("../env/development", () => ({
-  __esModule: true,
-  default: {
-    getData: mockGetData,
-    getState: mockGetState,
-    rootElement: mockRootElement,
-    configureApplication: mockConfigureApplication,
-    get getExample() {
-      return mockGetExample();
-    },
-  },
-}));
-
-const mockInitializeStore = jest.fn();
-const mockCreate = jest.fn((params, opts) => ({
+const mockInitializeStore = mock();
+const mockCreate = mock((_params, _opts) => ({
   initializeStore: mockInitializeStore,
 }));
 
-jest.mock("../stores/AppStore", () => ({
-  __esModule: true,
-  default: { create: (...args) => mockCreate(...args) },
-}));
+import AppStore from "../stores/AppStore";
+import productionEnv from "../env/production";
+import developmentEnv from "../env/development";
+
+let appStoreCreateSpy;
+let productionGetDataSpy;
+let productionRootElementSpy;
+let productionConfigureApplicationSpy;
+let developmentGetDataSpy;
+let developmentRootElementSpy;
+let developmentConfigureApplicationSpy;
 
 describe("configureStore", () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    clearAllMocks();
+    appStoreCreateSpy = spyOn(AppStore, "create").mockImplementation((...args) => mockCreate(...args));
+    productionGetDataSpy = spyOn(productionEnv, "getData").mockImplementation((...args) => mockGetData(...args));
+    productionRootElementSpy = spyOn(productionEnv, "rootElement").mockImplementation((...args) =>
+      mockRootElement(...args),
+    );
+    productionConfigureApplicationSpy = spyOn(productionEnv, "configureApplication").mockImplementation((...args) =>
+      mockConfigureApplication(...args),
+    );
+    developmentGetDataSpy = spyOn(developmentEnv, "getData").mockImplementation((...args) => mockGetData(...args));
+    developmentRootElementSpy = spyOn(developmentEnv, "rootElement").mockImplementation((...args) =>
+      mockRootElement(...args),
+    );
+    developmentConfigureApplicationSpy = spyOn(developmentEnv, "configureApplication").mockImplementation((...args) =>
+      mockConfigureApplication(...args),
+    );
     window.LS_SECURE_MODE = undefined;
+    window.__LSF_INTEGRATION_TEST__ = undefined;
+  });
+
+  afterEach(() => {
+    appStoreCreateSpy?.mockRestore?.();
+    productionGetDataSpy?.mockRestore?.();
+    productionRootElementSpy?.mockRestore?.();
+    productionConfigureApplicationSpy?.mockRestore?.();
+    developmentGetDataSpy?.mockRestore?.();
+    developmentRootElementSpy?.mockRestore?.();
+    developmentConfigureApplicationSpy?.mockRestore?.();
   });
 
   it("sets LS_SECURE_MODE when options.secureMode is true", async () => {
@@ -100,7 +106,8 @@ describe("configureStore", () => {
     expect(result).toHaveProperty("store");
     expect(result).toHaveProperty("getRoot");
     expect(typeof result.getRoot).toBe("function");
-    expect(result.getRoot).toBe(mockRootElement);
+    result.getRoot("root");
+    expect(mockRootElement).toHaveBeenCalledWith("root");
   });
 
   it("calls store.initializeStore with task and hydrated", async () => {
@@ -119,9 +126,11 @@ describe("configureStore", () => {
   });
 
   it("calls env.getExample when config is missing and getExample is defined", async () => {
+    window.__LSF_INTEGRATION_TEST__ = true;
     const exampleTask = { id: 99, data: { x: 1 } };
     const exampleConfig = '<View><Text name="t"/></View>';
-    mockGetExample.mockReturnValue(() => Promise.resolve({ task: exampleTask, config: exampleConfig }));
+    mockGetExample.mockReturnValue(Promise.resolve({ task: exampleTask, config: exampleConfig }));
+    spyOn(developmentEnv, "getExample").mockImplementation(() => mockGetExample());
     const { configureStore } = await import("../configureStore");
     await configureStore({});
     expect(mockGetExample).toHaveBeenCalled();
@@ -129,7 +138,7 @@ describe("configureStore", () => {
     const [params] = mockCreate.mock.calls[0];
     expect(params.config).toBe(exampleConfig);
     expect(params.task).toEqual(exampleTask);
-    mockGetExample.mockReturnValue(undefined);
+    window.__LSF_INTEGRATION_TEST__ = undefined;
   });
 
   it("passes hydrated, users, and annotationHistory to initializeStore", async () => {

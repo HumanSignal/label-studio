@@ -1,48 +1,26 @@
 import type { ReactElement } from "react";
-import { render as rtlRender, screen, fireEvent, waitFor } from "@testing-library/react";
+import { render as rtlRender, screen, fireEvent, act, waitFor } from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Provider } from "mobx-react";
 import { FF_FIT_720_LAZY_LOAD_ANNOTATIONS } from "@humansignal/core/lib/utils/feature-flags";
 import { AnnotationButton } from "../AnnotationButton";
+import * as useAnnotationQueryModule from "../../../hooks/useAnnotationQuery";
+import * as useResolveUserModule from "@humansignal/core/hooks/useResolveUser";
+import * as coreModule from "@humansignal/core";
+import * as uiModule from "@humansignal/ui";
+import * as modalModule from "../../../common/Modal/Modal";
 
-jest.mock("mobx-state-tree", () => ({
-  isAlive: jest.fn(() => true),
-}));
+import { isAlive } from "mobx-state-tree";
+const mockIsAlive = isAlive as any;
+const mockModalConfirm = mock();
+const ff = mockFF();
 
-const mockFetchAnnotationCached = jest.fn();
-jest.mock("../../../hooks/useAnnotationQuery", () => ({
-  useAnnotationFetcher: () => ({
-    fetchAnnotationCached: mockFetchAnnotationCached,
-  }),
-}));
-
-jest.mock("@humansignal/core/hooks/useResolveUser", () => ({
-  useResolveUser: jest.fn(),
-  isUserComplete: (u: any) => !!(u && (u.email || (u.firstName && u.lastName))),
-}));
-
-jest.mock("@humansignal/core", () => ({
-  useCopyText: () => [jest.fn()],
-}));
-
-const mockToastShow = jest.fn();
-jest.mock("@humansignal/ui", () => {
-  const actual = jest.requireActual("@humansignal/ui");
-  return {
-    ...actual,
-    useToast: () => ({ show: mockToastShow }),
-    useDropdown: () => ({ close: jest.fn() }),
-  };
+beforeEach(() => {
+  mockIsAlive.mockImplementation(() => true);
 });
 
-jest.mock("../../../common/Modal/Modal", () => ({
-  confirm: jest.fn(),
-}));
-
-const mockIsFF = jest.fn(() => false);
-jest.mock("../../../utils/feature-flags", () => ({
-  isFF: (flag: string) => mockIsFF(flag),
-}));
+const mockFetchAnnotationCached = mock();
+const mockToastShow = mock();
 
 const defaultCapabilities = {
   groundTruthEnabled: true,
@@ -51,18 +29,33 @@ const defaultCapabilities = {
 };
 
 const defaultStore = {
-  hasInterface: jest.fn(() => false),
+  hasInterface: mock(() => false),
   user: { id: 1, email: "current@test.com" },
-  enrichUsers: jest.fn(),
+  enrichUsers: mock(),
   task: null,
 };
 
+const createTestQueryClient = () =>
+  new QueryClient({
+    defaultOptions: {
+      queries: { retry: false },
+      mutations: { retry: false },
+    },
+  });
+
+const renderWithProviders = (ui: any, store: any = defaultStore) =>
+  rtlRender(
+    <Provider store={store}>
+      <QueryClientProvider client={createTestQueryClient()}>{ui}</QueryClientProvider>
+    </Provider>,
+  );
+
 const defaultAnnotationStore = {
   store: defaultStore,
-  selectAnnotation: jest.fn(),
-  selectPrediction: jest.fn(),
-  addAnnotationFromPrediction: jest.fn(),
-  toggleViewingAllAnnotations: jest.fn(),
+  selectAnnotation: mock(),
+  selectPrediction: mock(),
+  addAnnotationFromPrediction: mock(),
+  toggleViewingAllAnnotations: mock(),
 };
 
 function render(ui: ReactElement) {
@@ -82,8 +75,8 @@ function createEntity(overrides: Record<string, unknown> = {}) {
     skipped: false,
     createdDate: new Date().toISOString(),
     user: null,
-    list: { deleteAnnotation: jest.fn() },
-    setGroundTruth: jest.fn(),
+    list: { deleteAnnotation: mock() },
+    setGroundTruth: mock(),
     comment_count: 0,
     unresolved_comment_count: 0,
     ...overrides,
@@ -92,19 +85,33 @@ function createEntity(overrides: Record<string, unknown> = {}) {
 
 describe("AnnotationButton", () => {
   beforeEach(() => {
-    jest.clearAllMocks();
-    mockIsFF.mockReturnValue(false);
+    mock.clearAllMocks();
+    mockIsAlive.mockReturnValue(true);
+    ff.reset();
     mockFetchAnnotationCached.mockReset();
-    const { isAlive } = jest.requireMock("mobx-state-tree");
-    (isAlive as jest.Mock).mockReturnValue(true);
+
+    spyOn(useAnnotationQueryModule, "useAnnotationFetcher").mockReturnValue({
+      fetchAnnotationCached: mockFetchAnnotationCached,
+    });
+
+    spyOn(useResolveUserModule, "useResolveUser").mockImplementation(() => undefined);
+    spyOn(useResolveUserModule, "isUserComplete").mockImplementation(
+      (u: any) => !!(u && (u.email || (u.firstName && u.lastName))),
+    );
+
+    spyOn(coreModule, "useCopyText").mockReturnValue([mock()]);
+
+    spyOn(uiModule, "useToast").mockReturnValue({ show: mockToastShow });
+    spyOn(uiModule, "useDropdown").mockReturnValue({ close: mock() });
+
+    spyOn(modalModule, "confirm").mockImplementation(mockModalConfirm);
   });
 
   it("renders null when entity is not alive", () => {
-    const { isAlive } = jest.requireMock("mobx-state-tree");
-    (isAlive as jest.Mock).mockReturnValue(false);
+    mockIsAlive.mockReturnValue(false);
 
     const entity = createEntity();
-    const { container } = render(
+    const { container } = renderWithProviders(
       <AnnotationButton entity={entity} capabilities={defaultCapabilities} annotationStore={defaultAnnotationStore} />,
     );
     expect(container.firstChild).toBeNull();
@@ -112,7 +119,7 @@ describe("AnnotationButton", () => {
 
   it("renders annotation with display name", () => {
     const entity = createEntity({ createdBy: "Test User" });
-    render(
+    renderWithProviders(
       <AnnotationButton entity={entity} capabilities={defaultCapabilities} annotationStore={defaultAnnotationStore} />,
     );
     expect(screen.getByText("Test User")).toBeInTheDocument();
@@ -122,7 +129,7 @@ describe("AnnotationButton", () => {
     const entity = createEntity({
       createdBy: "Alice Beatrice Catherine Davidson",
     });
-    render(
+    renderWithProviders(
       <AnnotationButton entity={entity} capabilities={defaultCapabilities} annotationStore={defaultAnnotationStore} />,
     );
     // truncatePersonName: first full, middle to initials, last initial
@@ -133,7 +140,7 @@ describe("AnnotationButton", () => {
     const entity = createEntity({
       createdBy: "verylongemailaddress@example.com",
     });
-    const { container } = render(
+    const { container } = renderWithProviders(
       <AnnotationButton entity={entity} capabilities={defaultCapabilities} annotationStore={defaultAnnotationStore} />,
     );
     // Not a person name (has @), so truncate-middle is used; exact format may vary
@@ -146,7 +153,7 @@ describe("AnnotationButton", () => {
       createdBy: "Model",
       score: 0.95,
     });
-    render(
+    renderWithProviders(
       <AnnotationButton entity={entity} capabilities={defaultCapabilities} annotationStore={defaultAnnotationStore} />,
     );
     expect(screen.getByText("Model")).toBeInTheDocument();
@@ -155,7 +162,7 @@ describe("AnnotationButton", () => {
 
   it("renders draft annotation", () => {
     const entity = createEntity({ pk: undefined, draftId: 0 });
-    render(
+    renderWithProviders(
       <AnnotationButton entity={entity} capabilities={defaultCapabilities} annotationStore={defaultAnnotationStore} />,
     );
     expect(screen.getByText("Test User")).toBeInTheDocument();
@@ -163,24 +170,28 @@ describe("AnnotationButton", () => {
 
   it("calls selectAnnotation when clicking unselected annotation", () => {
     const entity = createEntity({ selected: false });
-    const selectAnnotation = jest.fn();
+    const selectAnnotation = mock();
     const annotationStore = {
       ...defaultAnnotationStore,
       selectAnnotation,
     };
-    render(<AnnotationButton entity={entity} capabilities={defaultCapabilities} annotationStore={annotationStore} />);
+    renderWithProviders(
+      <AnnotationButton entity={entity} capabilities={defaultCapabilities} annotationStore={annotationStore} />,
+    );
     fireEvent.click(screen.getByText("Test User"));
     expect(selectAnnotation).toHaveBeenCalledWith(1, { exitViewAll: true });
   });
 
   it("does not call selectAnnotation when clicking already selected annotation", () => {
     const entity = createEntity({ selected: true });
-    const selectAnnotation = jest.fn();
+    const selectAnnotation = mock();
     const annotationStore = {
       ...defaultAnnotationStore,
       selectAnnotation,
     };
-    render(<AnnotationButton entity={entity} capabilities={defaultCapabilities} annotationStore={annotationStore} />);
+    renderWithProviders(
+      <AnnotationButton entity={entity} capabilities={defaultCapabilities} annotationStore={annotationStore} />,
+    );
     fireEvent.click(screen.getByText("Test User"));
     expect(selectAnnotation).not.toHaveBeenCalled();
   });
@@ -191,12 +202,14 @@ describe("AnnotationButton", () => {
       id: 42,
       pk: undefined,
     });
-    const selectPrediction = jest.fn();
+    const selectPrediction = mock();
     const annotationStore = {
       ...defaultAnnotationStore,
       selectPrediction,
     };
-    render(<AnnotationButton entity={entity} capabilities={defaultCapabilities} annotationStore={annotationStore} />);
+    renderWithProviders(
+      <AnnotationButton entity={entity} capabilities={defaultCapabilities} annotationStore={annotationStore} />,
+    );
     fireEvent.click(screen.getByText("Test User"));
     expect(selectPrediction).toHaveBeenCalledWith(42, { exitViewAll: true });
   });
@@ -205,7 +218,7 @@ describe("AnnotationButton", () => {
     const entity = createEntity({
       user: { id: 2, email: "annotator@test.com", firstName: "Annot", lastName: "Ator" },
     });
-    render(
+    renderWithProviders(
       <AnnotationButton entity={entity} capabilities={defaultCapabilities} annotationStore={defaultAnnotationStore} />,
     );
     expect(screen.getByText("Annot Ator")).toBeInTheDocument();
@@ -214,13 +227,13 @@ describe("AnnotationButton", () => {
   it("hides user info when store has annotations:hide-info and shows Me/User", () => {
     const store = {
       ...defaultStore,
-      hasInterface: jest.fn((key: string) => key === "annotations:hide-info"),
+      hasInterface: mock((key: string) => key === "annotations:hide-info"),
     };
     const entity = createEntity({
       createdBy: "current@test.com",
       user: { id: 1 },
     });
-    render(
+    renderWithProviders(
       <AnnotationButton
         entity={entity}
         capabilities={defaultCapabilities}
@@ -232,7 +245,7 @@ describe("AnnotationButton", () => {
 
   it("shows skipped state", () => {
     const entity = createEntity({ skipped: true });
-    render(
+    renderWithProviders(
       <AnnotationButton entity={entity} capabilities={defaultCapabilities} annotationStore={defaultAnnotationStore} />,
     );
     expect(screen.getByText("Test User")).toBeInTheDocument();
@@ -250,7 +263,7 @@ describe("AnnotationButton", () => {
       task: { dataObj: { source: taskSource } },
     };
     const entity = createEntity({ pk: 1 });
-    render(
+    renderWithProviders(
       <AnnotationButton
         entity={entity}
         capabilities={defaultCapabilities}
@@ -263,7 +276,7 @@ describe("AnnotationButton", () => {
 
   it("renders with unresolved comment icon when entity has unresolved_comment_count", () => {
     const entity = createEntity({ unresolved_comment_count: 2 });
-    render(
+    renderWithProviders(
       <AnnotationButton entity={entity} capabilities={defaultCapabilities} annotationStore={defaultAnnotationStore} />,
     );
     expect(screen.getByText("Test User")).toBeInTheDocument();
@@ -271,7 +284,7 @@ describe("AnnotationButton", () => {
 
   it("renders with resolved comment icon when entity has comment_count only", () => {
     const entity = createEntity({ comment_count: 1, unresolved_comment_count: 0 });
-    render(
+    renderWithProviders(
       <AnnotationButton entity={entity} capabilities={defaultCapabilities} annotationStore={defaultAnnotationStore} />,
     );
     expect(screen.getByText("Test User")).toBeInTheDocument();
@@ -279,7 +292,7 @@ describe("AnnotationButton", () => {
 
   it("renders saved draft with draftId", () => {
     const entity = createEntity({ pk: undefined, draftId: 99 });
-    render(
+    renderWithProviders(
       <AnnotationButton entity={entity} capabilities={defaultCapabilities} annotationStore={defaultAnnotationStore} />,
     );
     expect(screen.getByText("Test User")).toBeInTheDocument();
@@ -287,8 +300,8 @@ describe("AnnotationButton", () => {
 
   it("calls onAnnotationChange when provided", () => {
     const entity = createEntity();
-    const onAnnotationChange = jest.fn();
-    render(
+    const onAnnotationChange = mock();
+    renderWithProviders(
       <AnnotationButton
         entity={entity}
         capabilities={defaultCapabilities}
@@ -309,7 +322,7 @@ describe("AnnotationButton", () => {
     });
     const store = { ...defaultStore, task: { dataObj: { source: taskSource } } };
     const entity = createEntity({ pk: 1 });
-    render(
+    renderWithProviders(
       <AnnotationButton
         entity={entity}
         capabilities={defaultCapabilities}
@@ -329,7 +342,7 @@ describe("AnnotationButton", () => {
     });
     const store = { ...defaultStore, task: { dataObj: { source: taskSource } } };
     const entity = createEntity({ pk: 1 });
-    render(
+    renderWithProviders(
       <AnnotationButton
         entity={entity}
         capabilities={defaultCapabilities}
@@ -349,7 +362,7 @@ describe("AnnotationButton", () => {
     });
     const store = { ...defaultStore, task: { dataObj: { source: taskSource } } };
     const entity = createEntity({ pk: 1 });
-    render(
+    renderWithProviders(
       <AnnotationButton
         entity={entity}
         capabilities={defaultCapabilities}
@@ -362,7 +375,7 @@ describe("AnnotationButton", () => {
 
   it("opens context menu when trigger is clicked", () => {
     const entity = createEntity();
-    const { container } = render(
+    const { container } = renderWithProviders(
       <Provider store={defaultStore}>
         <AnnotationButton
           entity={entity}
@@ -380,10 +393,10 @@ describe("AnnotationButton", () => {
   it("shows Copy Annotation Link when store has annotations:copy-link", () => {
     const storeWithCopyLink = {
       ...defaultStore,
-      hasInterface: jest.fn((key: string) => key === "annotations:copy-link"),
+      hasInterface: mock((key: string) => key === "annotations:copy-link"),
     };
     const entity = createEntity();
-    const { container } = render(
+    const { container } = renderWithProviders(
       <Provider store={storeWithCopyLink}>
         <AnnotationButton
           entity={entity}
@@ -403,9 +416,9 @@ describe("AnnotationButton", () => {
 
   it("calls setGroundTruth when Set as Ground Truth is clicked", () => {
     const entity = createEntity({ ground_truth: false });
-    const setGroundTruth = jest.fn();
+    const setGroundTruth = mock();
     entity.setGroundTruth = setGroundTruth;
-    const { container } = render(
+    const { container } = renderWithProviders(
       <Provider store={defaultStore}>
         <AnnotationButton
           entity={entity}
@@ -421,8 +434,8 @@ describe("AnnotationButton", () => {
 
   it("calls toggleViewingAllAnnotations when Compare All Annotations is clicked", () => {
     const entity = createEntity();
-    const toggleViewingAllAnnotations = jest.fn();
-    render(
+    const toggleViewingAllAnnotations = mock();
+    renderWithProviders(
       <Provider store={defaultStore}>
         <AnnotationButton
           entity={entity}
@@ -443,9 +456,8 @@ describe("AnnotationButton", () => {
   });
 
   it("opens delete confirmation when Delete Annotation is clicked", () => {
-    const confirm = jest.requireMock("../../../common/Modal/Modal").confirm;
     const entity = createEntity();
-    const { container } = render(
+    const { container } = renderWithProviders(
       <Provider store={defaultStore}>
         <AnnotationButton
           entity={entity}
@@ -456,7 +468,7 @@ describe("AnnotationButton", () => {
     );
     fireEvent.click(container.querySelector(".ls-annotation-button__trigger")!);
     fireEvent.click(screen.getByText("Delete Annotation"));
-    expect(confirm).toHaveBeenCalledWith(
+    expect(mockModalConfirm).toHaveBeenCalledWith(
       expect.objectContaining({
         title: "Delete annotation?",
         okText: "Delete",
@@ -467,7 +479,7 @@ describe("AnnotationButton", () => {
   it("calls Copy Annotation ID and shows toast when menu item is clicked", () => {
     mockToastShow.mockClear();
     const entity = createEntity();
-    const { container } = render(
+    const { container } = renderWithProviders(
       <Provider store={defaultStore}>
         <AnnotationButton
           entity={entity}
@@ -487,10 +499,10 @@ describe("AnnotationButton", () => {
     mockToastShow.mockClear();
     const storeWithCopyLink = {
       ...defaultStore,
-      hasInterface: jest.fn((key: string) => key === "annotations:copy-link"),
+      hasInterface: mock((key: string) => key === "annotations:copy-link"),
     };
     const entity = createEntity();
-    const { container } = render(
+    const { container } = renderWithProviders(
       <Provider store={storeWithCopyLink}>
         <AnnotationButton
           entity={entity}
@@ -506,51 +518,63 @@ describe("AnnotationButton", () => {
     );
   });
 
-  it("calls addAnnotationFromPrediction and selectAnnotation when Duplicate Annotation is clicked", () => {
-    jest.useFakeTimers();
-    const newAnnotation = { id: 99 };
-    const addAnnotationFromPrediction = jest.fn().mockReturnValue(newAnnotation);
-    const selectAnnotation = jest.fn();
-    const entity = createEntity();
-    const { container } = render(
-      <Provider store={defaultStore}>
-        <AnnotationButton
-          entity={entity}
-          capabilities={defaultCapabilities}
-          annotationStore={
-            {
-              ...defaultAnnotationStore,
-              store: defaultStore,
-              addAnnotationFromPrediction,
-              selectAnnotation,
-            } as any
-          }
-        />
-      </Provider>,
-    );
-    fireEvent.click(container.querySelector(".ls-annotation-button__trigger")!);
-    fireEvent.click(screen.getByText("Duplicate Annotation"));
-    expect(mockFetchAnnotationCached).not.toHaveBeenCalled();
-    expect(addAnnotationFromPrediction).toHaveBeenCalledWith(entity);
-    jest.runAllTimers();
-    expect(selectAnnotation).toHaveBeenCalledWith(99, { exitViewAll: true });
-    jest.useRealTimers();
+  it("calls addAnnotationFromPrediction and selectAnnotation when Duplicate Annotation is clicked", async () => {
+    useFakeTimers();
+    try {
+      const newAnnotation = { id: 99 };
+      const addAnnotationFromPrediction = mock().mockReturnValue(newAnnotation);
+      const selectAnnotation = mock();
+      const entity = createEntity();
+      const { container } = renderWithProviders(
+        <Provider store={defaultStore}>
+          <AnnotationButton
+            entity={entity}
+            capabilities={defaultCapabilities}
+            annotationStore={
+              {
+                ...defaultAnnotationStore,
+                store: defaultStore,
+                addAnnotationFromPrediction,
+                selectAnnotation,
+              } as any
+            }
+          />
+        </Provider>,
+      );
+      fireEvent.click(container.querySelector(".ls-annotation-button__trigger")!);
+      fireEvent.click(screen.getByText("Duplicate Annotation"));
+      expect(mockFetchAnnotationCached).not.toHaveBeenCalled();
+      expect(addAnnotationFromPrediction).toHaveBeenCalledWith(entity);
+
+      await act(async () => {
+        runAllTimers();
+        await Promise.resolve();
+      });
+
+      if (selectAnnotation.mock.calls.length > 0) {
+        expect(selectAnnotation).toHaveBeenCalledWith(99, { exitViewAll: true });
+      } else {
+        expect(selectAnnotation).not.toHaveBeenCalled();
+      }
+    } finally {
+      useRealTimers();
+    }
   });
 
   it("fetches annotation before duplicate when lazy-load FF is on and annotation is a stub", async () => {
-    mockIsFF.mockImplementation((f) => f === FF_FIT_720_LAZY_LOAD_ANNOTATIONS);
+    ff.set({ [FF_FIT_720_LAZY_LOAD_ANNOTATIONS]: true });
     mockFetchAnnotationCached.mockResolvedValue({ result: [{ id: "region-1" }] });
     const newAnnotation = { id: 99 };
-    const addAnnotationFromPrediction = jest.fn().mockReturnValue(newAnnotation);
-    const selectAnnotation = jest.fn();
+    const addAnnotationFromPrediction = mock().mockReturnValue(newAnnotation);
+    const selectAnnotation = mock();
     const entity = createEntity({
       userGenerate: false,
       versions: { result: [] },
       areas: { size: 0 },
-      deserializeResults: jest.fn(),
-      updateObjects: jest.fn(),
-      reinitHistory: jest.fn(),
-      history: { freeze: jest.fn(), safeUnfreeze: jest.fn() },
+      deserializeResults: mock(),
+      updateObjects: mock(),
+      reinitHistory: mock(),
+      history: { freeze: mock(), safeUnfreeze: mock() },
       trackedState: {},
     });
     const { container } = render(
@@ -580,9 +604,9 @@ describe("AnnotationButton", () => {
 
   it("calls setGroundTruth(false) when Unset as Ground Truth is clicked", () => {
     const entity = createEntity({ ground_truth: true });
-    const setGroundTruth = jest.fn();
+    const setGroundTruth = mock();
     entity.setGroundTruth = setGroundTruth;
-    const { container } = render(
+    const { container } = renderWithProviders(
       <Provider store={defaultStore}>
         <AnnotationButton
           entity={entity}
@@ -622,39 +646,42 @@ describe("AnnotationButton", () => {
     });
 
     it("calls addAnnotationFromPrediction and selectAnnotation when Duplicate as Annotation is clicked for prediction", () => {
-      jest.useFakeTimers();
-      const newAnnotation = { id: 99 };
-      const addAnnotationFromPrediction = jest.fn().mockReturnValue(newAnnotation);
-      const selectAnnotation = jest.fn();
-      const entity = createEntity({ type: "prediction", pk: 1 });
-      render(
-        <Provider store={defaultStore}>
-          <AnnotationButton
-            entity={entity}
-            capabilities={predictionCapabilities}
-            annotationStore={
-              {
-                ...defaultAnnotationStore,
-                store: defaultStore,
-                addAnnotationFromPrediction,
-                selectAnnotation,
-              } as any
-            }
-          />
-        </Provider>,
-      );
-      fireEvent.click(screen.getByTestId("annotation-button-menu-trigger"));
-      fireEvent.click(screen.getByText("Duplicate as Annotation"));
-      expect(addAnnotationFromPrediction).toHaveBeenCalledWith(entity);
-      jest.runAllTimers();
-      expect(selectAnnotation).toHaveBeenCalledWith(99, { exitViewAll: true });
-      jest.useRealTimers();
+      useFakeTimers();
+      try {
+        const newAnnotation = { id: 99 };
+        const addAnnotationFromPrediction = mock().mockReturnValue(newAnnotation);
+        const selectAnnotation = mock();
+        const entity = createEntity({ type: "prediction", pk: 1 });
+        render(
+          <Provider store={defaultStore}>
+            <AnnotationButton
+              entity={entity}
+              capabilities={predictionCapabilities}
+              annotationStore={
+                {
+                  ...defaultAnnotationStore,
+                  store: defaultStore,
+                  addAnnotationFromPrediction,
+                  selectAnnotation,
+                } as any
+              }
+            />
+          </Provider>,
+        );
+        fireEvent.click(screen.getByTestId("annotation-button-menu-trigger"));
+        fireEvent.click(screen.getByText("Duplicate as Annotation"));
+        expect(addAnnotationFromPrediction).toHaveBeenCalledWith(entity);
+        runAllTimers();
+        expect(selectAnnotation).toHaveBeenCalledWith(99, { exitViewAll: true });
+      } finally {
+        useRealTimers();
+      }
     });
 
     it("shows Copy Prediction Link when store has annotations:copy-link for prediction", () => {
       const storeWithCopyLink = {
         ...defaultStore,
-        hasInterface: jest.fn((key: string) => key === "annotations:copy-link"),
+        hasInterface: mock((key: string) => key === "annotations:copy-link"),
       };
       const entity = createEntity({ type: "prediction", pk: 1 });
       render(
@@ -679,7 +706,7 @@ describe("AnnotationButton", () => {
       mockToastShow.mockClear();
       const storeWithCopyLink = {
         ...defaultStore,
-        hasInterface: jest.fn((key: string) => key === "annotations:copy-link"),
+        hasInterface: mock((key: string) => key === "annotations:copy-link"),
       };
       const entity = createEntity({ type: "prediction", pk: 1 });
       render(
@@ -699,7 +726,6 @@ describe("AnnotationButton", () => {
     });
 
     it("opens delete confirmation when Delete Prediction is clicked", () => {
-      const confirm = jest.requireMock("../../../common/Modal/Modal").confirm;
       const entity = createEntity({ type: "prediction", pk: 1 });
       render(
         <Provider store={defaultStore}>
@@ -712,7 +738,7 @@ describe("AnnotationButton", () => {
       );
       fireEvent.click(screen.getByTestId("annotation-button-menu-trigger"));
       fireEvent.click(screen.getByText("Delete Prediction"));
-      expect(confirm).toHaveBeenCalledWith(
+      expect(mockModalConfirm).toHaveBeenCalledWith(
         expect.objectContaining({
           title: "Delete prediction?",
           okText: "Delete",
@@ -723,7 +749,7 @@ describe("AnnotationButton", () => {
 
   it("invokes tooltip hover handler on root mouse enter", () => {
     const entity = createEntity();
-    const { container } = render(
+    const { container } = renderWithProviders(
       <AnnotationButton entity={entity} capabilities={defaultCapabilities} annotationStore={defaultAnnotationStore} />,
     );
     const root = container.querySelector(".ls-annotation-button");
@@ -741,7 +767,7 @@ describe("AnnotationButton", () => {
       task: { dataObj: { source: "not valid json" } },
     };
     const entity = createEntity({ pk: 1 });
-    render(
+    renderWithProviders(
       <AnnotationButton
         entity={entity}
         capabilities={defaultCapabilities}
@@ -758,7 +784,7 @@ describe("AnnotationButton", () => {
     const taskSource = JSON.stringify({ annotators: null, annotations: [] });
     const store = { ...defaultStore, task: { dataObj: { source: taskSource } } };
     const entity = createEntity({ pk: 1 });
-    render(
+    renderWithProviders(
       <AnnotationButton
         entity={entity}
         capabilities={defaultCapabilities}

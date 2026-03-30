@@ -81,10 +81,10 @@ const revokeTokenAtom = atomWithMutation((get) => {
       // We need to keep everything but one token that we just deleted
       const filtered = previousTokens.filter((t) => t.token !== token);
       // We now optimistically override data inside the query
-      queryClient.setQueryData(ACCESS_TOKENS_QUERY_KEY, (old: Token[]) => filtered as Token[]);
+      queryClient.setQueryData(ACCESS_TOKENS_QUERY_KEY, (_old: Token[]) => filtered as Token[]);
       return { previousTokens };
     },
-    onError: (err, newTodo, context) => {
+    onError: (_err, _newTodo, context) => {
       // If error, reset query to its previous state (without changes from `onMutate`)
       queryClient.setQueryData(ACCESS_TOKENS_QUERY_KEY, context?.previousTokens);
     },

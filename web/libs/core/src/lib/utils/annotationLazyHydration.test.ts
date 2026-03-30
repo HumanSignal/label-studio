@@ -1,8 +1,5 @@
 import { annotationNeedsHydration, applyAnnotationHydrationFromApi } from "./annotationLazyHydration";
-
-jest.mock("mobx-state-tree", () => ({
-  isAlive: jest.fn(() => true),
-}));
+import type { Mock } from "bun:test";
 
 describe("annotationNeedsHydration", () => {
   it("returns false for non-annotation", () => {
@@ -56,8 +53,8 @@ describe("annotationNeedsHydration", () => {
 
 describe("applyAnnotationHydrationFromApi", () => {
   beforeEach(() => {
-    const { isAlive } = jest.requireMock("mobx-state-tree");
-    (isAlive as jest.Mock).mockReturnValue(true);
+    const mst = require("mobx-state-tree");
+    (mst.isAlive as Mock<any>).mockReturnValue(true);
   });
 
   it("returns false when payload missing result", () => {
@@ -75,10 +72,10 @@ describe("applyAnnotationHydrationFromApi", () => {
       versions: { result: [] },
       areas: { size: 0 },
       trackedState: {},
-      deserializeResults: jest.fn(),
-      updateObjects: jest.fn(),
-      reinitHistory: jest.fn(),
-      history: { freeze: jest.fn(), safeUnfreeze: jest.fn() },
+      deserializeResults: mock(),
+      updateObjects: mock(),
+      reinitHistory: mock(),
+      history: { freeze: mock(), safeUnfreeze: mock() },
     };
     const result = [{ id: "region-1" }];
     expect(applyAnnotationHydrationFromApi([ann], 5, { result })).toBe(true);
@@ -95,7 +92,7 @@ describe("applyAnnotationHydrationFromApi", () => {
       versions: { result: [] },
       areas: { size: 1 },
       trackedState: {},
-      deserializeResults: jest.fn(),
+      deserializeResults: mock(),
     };
     expect(applyAnnotationHydrationFromApi([ann], 1, { result: [{ id: "x" }] })).toBe(false);
     expect(ann.deserializeResults).not.toHaveBeenCalled();

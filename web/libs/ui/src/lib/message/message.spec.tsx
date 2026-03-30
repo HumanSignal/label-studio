@@ -1,10 +1,9 @@
 import { render, screen, fireEvent } from "@testing-library/react";
-import "@testing-library/jest-dom";
 import { Message, type MessageProps } from "./message";
 import { IconUpload } from "@humansignal/icons";
 
 // Mock the styles since they're SCSS modules
-jest.mock("./message.module.css", () => ({
+mockModule("./message.module.css", () => ({
   base: "base",
   // Size classes
   "size-medium": "size-medium",
@@ -149,7 +148,7 @@ describe("Message Component", () => {
     expect(boldElement.tagName).toBe("STRONG");
 
     // Verify the full title text is present
-    const titleElement = screen.getByText((content, element) => {
+    const titleElement = screen.getByText((_content, element) => {
       return element?.textContent === "This is a bold title";
     });
     expect(titleElement).toBeInTheDocument();
@@ -181,7 +180,7 @@ describe("Message Component", () => {
   });
 
   it("calls onClose when close button is clicked", () => {
-    const onClose = jest.fn();
+    const onClose = mock();
     render(<Message {...defaultProps} closable onClose={onClose} />);
 
     const closeButton = screen.getByTestId("message-dismiss-button");
@@ -261,7 +260,7 @@ describe("Message Component", () => {
   });
 
   it("renders with all features combined", () => {
-    const onClose = jest.fn();
+    const onClose = mock();
     render(
       <Message
         variant="warning"

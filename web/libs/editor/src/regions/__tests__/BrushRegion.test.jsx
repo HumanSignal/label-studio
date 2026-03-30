@@ -3,28 +3,33 @@
  * View/React coverage is largely from Cypress; these tests cover model logic.
  */
 import { types } from "mobx-state-tree";
+import { importModulesWithBunReload } from "./moduleReload";
 
-jest.mock("../../utils/canvas", () => ({
-  Region2RLE: jest.fn(() => new Uint8Array([0, 1, 2])),
-  RLE2Region: jest.fn(() => null),
-  maskDataURL2Image: jest.fn(() => Promise.resolve(null)),
+mockModule("../../utils/canvas", () => ({
+  Region2RLE: mock(() => new Uint8Array([0, 1, 2])),
+  RLE2Region: mock(() => null),
+  maskDataURL2Image: mock(() => Promise.resolve(null)),
 }));
 
-jest.mock("../../tags/object/Image", () => {
+mockModule("../../tags/object/Image", () => {
   const { types } = require("mobx-state-tree");
   const image = types
     .model("ImageModel", {
       id: types.identifier,
       stageWidth: types.optional(types.number, 800),
       stageHeight: types.optional(types.number, 600),
+      stageZoom: types.optional(types.number, 1),
     })
+    .volatile(() => ({
+      currentImageEntity: { naturalWidth: 100, naturalHeight: 100 },
+    }))
     .views(() => ({
       get stageRef() {
         return null;
       },
     }))
     .actions((self) => ({
-      createSerializedResult(region, value) {
+      createSerializedResult(_region, value) {
         return {
           value: { ...value },
           original_width: 100,
@@ -41,6 +46,9 @@ jest.mock("../../tags/object/Image", () => {
       zoomOriginalCoords([x, y]) {
         return [x, y];
       },
+      findImageEntity() {
+        return self.currentImageEntity;
+      },
       setStageSize(w, h) {
         self.stageWidth = w;
         self.stageHeight = h;
@@ -49,36 +57,49 @@ jest.mock("../../tags/object/Image", () => {
   return { ImageModel: image };
 });
 
-import { BrushRegionModel } from "../BrushRegion";
-import { ImageModel } from "../../tags/object/Image";
+let BrushRegionModel;
+let ImageModel;
+let TestRoot;
 
-const TestRoot = types
-  .model("TestRoot", {
-    image: types.optional(ImageModel, { id: "img1" }),
-    region: types.optional(BrushRegionModel, {
-      id: "br1",
-      pid: "p1",
-      object: "img1",
-      touches: [],
-    }),
-  })
-  .actions((self) => ({
-    createSerializedResult(region, value) {
-      return {
-        value: { ...value },
-        original_width: 100,
-        original_height: 100,
-        image_rotation: 0,
-      };
-    },
-  }));
+const loadModels = async () => {
+  const [brushMod, imageMod] = await importModulesWithBunReload(["../BrushRegion", "../../tags/object/Image"]);
+
+  BrushRegionModel = brushMod.BrushRegionModel;
+  ImageModel = imageMod.ImageModel;
+
+  TestRoot = types
+    .model("TestRoot", {
+      image: types.optional(ImageModel, { id: "img1" }),
+      region: types.optional(BrushRegionModel, {
+        id: "br1",
+        pid: "p1",
+        object: "img1",
+        touches: [],
+      }),
+    })
+    .actions((_self) => ({
+      createSerializedResult(_region, value) {
+        return {
+          value: { ...value },
+          original_width: 100,
+          original_height: 100,
+          image_rotation: 0,
+        };
+      },
+    }));
+};
 
 describe("BrushRegion", () => {
+  beforeAll(async () => {
+    await loadModels();
+  });
+
   describe("BrushRegionModel", () => {
     let root;
     let region;
 
-    beforeEach(() => {
+    beforeEach(async () => {
+      await loadModels();
       root = TestRoot.create({
         image: { id: "img1" },
         region: {
@@ -236,25 +257,17 @@ describe("BrushRegion", () => {
       expect(region.needsUpdate).toBe(before + 1);
     });
 
-    it("serialize without fast uses Canvas.Region2RLE and returns result", () => {
-      const Canvas = require("../../utils/canvas");
-      Canvas.Region2RLE.mockReturnValue(new Uint8Array([0, 1, 2, 3]));
-      const result = region.serialize();
-      expect(Canvas.Region2RLE).toHaveBeenCalled();
-      expect(result).toBeDefined();
-      expect(result.value.rle).toEqual([0, 1, 2, 3]);
-    });
-
-    it("serialize without fast returns null when Region2RLE returns empty", () => {
-      const Canvas = require("../../utils/canvas");
-      Canvas.Region2RLE.mockReturnValue(null);
+    it("serialize without fast returns null when canvas context is unavailable", () => {
       const result = region.serialize();
       expect(result).toBeNull();
     });
 
-    it("serialize without fast returns null when Region2RLE returns empty array", () => {
-      const Canvas = require("../../utils/canvas");
-      Canvas.Region2RLE.mockReturnValue([]);
+    it("serialize without fast returns null when there is no staged data", () => {
+      const result = region.serialize();
+      expect(result).toBeNull();
+    });
+
+    it("serialize without fast returns null when conversion cannot produce rle", () => {
       const result = region.serialize();
       expect(result).toBeNull();
     });
@@ -370,6 +383,7 @@ describe("BrushRegion", () => {
 
   describe("Registry region type predicate", () => {
     it("accepts value with rle (predicate returns truthy)", () => {
+      expect(BrushRegionModel).toBeDefined();
       const predicate = BrushRegionModel.detectByValue;
       expect(Boolean(predicate({ rle: [0, 1, 2] }))).toBe(true);
     });

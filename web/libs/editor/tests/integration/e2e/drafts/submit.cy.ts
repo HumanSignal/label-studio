@@ -59,7 +59,7 @@ describe("Annotation submitting process", () => {
     cy.wait(WAITING_FOR_EVENTS_DELAY);
 
     // Check order
-    cy.window().then((win) => {
+    cy.window().then((_win) => {
       expect(callApi).to.be.calledTwice;
       expect(callApi.firstCall).to.be.calledWith(RESPONSE_TYPE.DRAFT);
       expect(callApi.secondCall).to.be.calledWith(RESPONSE_TYPE.SUBMIT);

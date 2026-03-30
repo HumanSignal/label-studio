@@ -174,20 +174,20 @@ describe("TaskSummary", () => {
           },
           ...overrides.project,
         },
-        hasInterface: (interfaceName: string) => false,
+        hasInterface: (_interfaceName: string) => false,
         ...overrides.store,
       },
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       names: new Map(allNames as Array<[string, any]>),
-      selectAnnotation: jest.fn(),
-      selectPrediction: jest.fn(),
+      selectAnnotation: mock(),
+      selectPrediction: mock(),
     };
 
     return mockStore as unknown as MSTStore["annotationStore"];
   };
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    mock.clearAllMocks();
     // Reset feature flags to default (FF off) for each test
     window.APP_SETTINGS.feature_flags = { [FF_FIT_720_LAZY_LOAD_ANNOTATIONS]: false };
   });

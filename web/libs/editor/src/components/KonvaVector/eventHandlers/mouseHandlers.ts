@@ -34,7 +34,7 @@ export function createMouseDownHandler(props: EventHandlerProps, handledSelectio
     // This ensures clean state for each interaction
     handledSelectionInMouseDown.current = false;
 
-    let shiftClickHandled = false;
+    let _shiftClickHandled = false;
 
     // Set up ghost point drag info when Shift is held (for UI feedback)
     // This works even when internal point addition is disabled
@@ -99,7 +99,7 @@ export function createMouseDownHandler(props: EventHandlerProps, handledSelectio
           // Only mark as handled if internal point addition is enabled
           // This prevents other handlers from interfering when we want to add points
           if (!props.disableInternalPointAddition) {
-            shiftClickHandled = true; // Mark that Shift+click was handled
+            _shiftClickHandled = true; // Mark that Shift+click was handled
           }
         }
       }
@@ -303,7 +303,7 @@ export function createMouseMoveHandler(props: EventHandlerProps, handledSelectio
 
     // Update cursor position
     // Note: cursor position is now handled by stage-level events when disableInternalPointAddition is true
-    const imagePos = stageToImageCoordinates(pos, props.transform, props.fitScale, props.x, props.y);
+    const _imagePos = stageToImageCoordinates(pos, props.transform, props.fitScale, props.x, props.y);
     // props.setCursorPosition(imagePos); // Removed - handled elsewhere
 
     // Set ghost point when Shift is held - snap to path (but not when dragging or creating bezier points)
@@ -729,7 +729,7 @@ export function createMouseMoveHandler(props: EventHandlerProps, handledSelectio
       // Continue shift-click-drag bezier point creation - update control points to follow cursor
       // Only update actual control points if internal point addition is enabled
       if (!props.disableInternalPointAddition) {
-        const imagePos = stageToImageCoordinates(pos, props.transform, props.fitScale, props.x, props.y);
+        const _imagePos = stageToImageCoordinates(pos, props.transform, props.fitScale, props.x, props.y);
         // Use the shared utility for continuing bezier drag
         continueBezierDrag(props);
       }

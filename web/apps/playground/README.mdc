@@ -228,7 +228,6 @@ web/apps/playground/
 │   ├── index.html      # Entry HTML file
 │   └── main.tsx        # Entry point
 ├── .babelrc           # Babel configuration
-├── jest.config.ts     # Jest configuration
 ├── project.json       # Nx project configuration
 ├── tsconfig.json      # TypeScript configuration
 ├── tsconfig.app.json  # App-specific TypeScript configuration

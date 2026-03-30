@@ -46,7 +46,7 @@ const loadAsyncPage = async (url) => {
 
     pageCache.set(url, html);
     return html;
-  } catch (err) {
+  } catch (_err) {
     modal({
       body: () => (
         <ErrorWrapper

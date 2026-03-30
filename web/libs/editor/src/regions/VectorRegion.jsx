@@ -355,7 +355,7 @@ const Model = types
           const selection = self.vectorRef.getSelectedPointIds();
           const result = selection.length > 1;
           return result;
-        } catch (error) {
+        } catch (_error) {
           return false;
         }
       },
@@ -405,7 +405,7 @@ const Model = types
         return self.parent.createSerializedResult(self, value);
       },
 
-      updateImageSize(wp, hp, sw, sh) {
+      updateImageSize(_wp, _hp, sw, sh) {
         if (self.coordstype === "px") {
           self.vertices.forEach((p) => {
             const x = (sw * (p.relativeX || 0)) / RELATIVE_STAGE_WIDTH;
@@ -543,7 +543,7 @@ const Model = types
        * @param {Object} transform - Transform object with dx, dy, scaleX, scaleY, rotation
        * @param {Object} transformerCenter - Center point used by the ImageTransformer for scaling/rotation
        */
-      applyTransform(transform, transformerCenter) {
+      applyTransform(_transform, _transformerCenter) {
         if (!self.vectorRef) {
           return;
         }
@@ -654,7 +654,7 @@ const HtxVectorView = observer(({ item, suggestion }) => {
           onTransformStart={() => {
             item.parent.annotation.history.freeze();
           }}
-          onTransformEnd={(e) => {
+          onTransformEnd={(_e) => {
             item.parent.annotation.history.unfreeze();
           }}
           onPointsChange={(points) => {

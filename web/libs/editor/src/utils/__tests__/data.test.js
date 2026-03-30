@@ -2,7 +2,7 @@
 import { timeFormat } from "d3";
 import { parseCSV, parseValue, tryToParseJSON, parseTypeAndOption } from "../data";
 
-const now = +new Date();
+const now = Date.now();
 const dateISO = timeFormat("%Y-%m-%d %H:%M:%S");
 const minute = 60 * 1000;
 const data = {

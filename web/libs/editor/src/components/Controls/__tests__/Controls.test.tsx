@@ -1,38 +1,14 @@
 import { render, fireEvent } from "@testing-library/react";
 import { Provider } from "mobx-react";
 import Controls from "../Controls";
-
-jest.mock("@humansignal/ui", () => {
-  const { forwardRef } = jest.requireActual("react");
-  return {
-    Button: forwardRef(({ children, disabled, tooltip, onClick, ...props }: any, ref: any) => {
-      return (
-        <button {...props} ref={ref} data-testid="button" disabled={disabled} title={tooltip} onClick={onClick}>
-          {children}
-        </button>
-      );
-    }),
-    Tooltip: ({ children, title }: any) => {
-      return (
-        <div data-testid="tooltip" title={title}>
-          {children}
-        </div>
-      );
-    },
-  };
-});
-
-jest.mock("@humansignal/icons", () => ({
-  IconInfoOutline: ({ width, height, className }: any) => (
-    <svg data-testid="info-icon" width={width} height={height} className={className} />
-  ),
-}));
+import * as uiModule from "@humansignal/ui";
+import * as iconsModule from "@humansignal/icons";
 
 const createMockStore = (overrides: any = {}) => ({
   task: { id: 1, allow_skip: true, ...overrides.task },
-  skipTask: jest.fn(),
+  skipTask: mock(),
   isSubmitting: false,
-  hasInterface: jest.fn((name: string) => overrides.interfaces?.includes(name) ?? false),
+  hasInterface: mock((name: string) => overrides.interfaces?.includes(name) ?? false),
   settings: {
     enableHotkeys: true,
     enableTooltips: true,
@@ -48,6 +24,7 @@ const createMockStore = (overrides: any = {}) => ({
 const setupAppSettings = (options: { role?: string; enterprise?: boolean } = {}) => {
   (window as any).APP_SETTINGS = {
     user: {
+      id: 999,
       role: options.role,
     },
     billing: {
@@ -58,8 +35,20 @@ const setupAppSettings = (options: { role?: string; enterprise?: boolean } = {})
 
 describe("Controls", () => {
   beforeEach(() => {
-    jest.clearAllMocks();
-    // Reset APP_SETTINGS before each test
+    mock.clearAllMocks();
+    spyOn(uiModule, "Button").mockImplementation(({ children, disabled, tooltip, onClick, ...props }: any) => (
+      <button {...props} data-testid="button" disabled={disabled} title={tooltip} onClick={onClick}>
+        {children}
+      </button>
+    ));
+    spyOn(uiModule, "Tooltip").mockImplementation(({ children, title }: any) => (
+      <div data-testid="tooltip" title={title}>
+        {children}
+      </div>
+    ));
+    spyOn(iconsModule, "IconInfoOutline").mockImplementation(({ width, height, className }: any) => (
+      <svg data-testid="info-icon" width={width} height={height} className={className} />
+    ));
     (window as any).APP_SETTINGS = undefined;
   });
 

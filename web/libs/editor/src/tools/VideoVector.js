@@ -223,7 +223,7 @@ const _Tool = types
         }
       },
 
-      mousedownEv(ev, [x, y]) {
+      mousedownEv(_ev, [x, y]) {
         if (self.mode === "drawing") {
           self.annotation?.history?.freeze();
           down = true;

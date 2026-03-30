@@ -134,7 +134,7 @@ export async function generateSampleTaskFromConfig(config: string): Promise<{
   let xml: Document;
   try {
     xml = parser.parseFromString(`<View>${config}</View>`, "text/xml");
-  } catch (e) {
+  } catch (_e) {
     return { id: 1, data: {}, annotations: [{ id: 1, result: [] }], predictions: [] };
   }
 
@@ -162,7 +162,7 @@ export async function generateSampleTaskFromConfig(config: string): Promise<{
               break;
             }
           }
-        } catch (e) {
+        } catch (_e) {
           // Ignore invalid JSON in comments
         }
       }

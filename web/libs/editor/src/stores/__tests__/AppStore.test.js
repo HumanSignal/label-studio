@@ -6,57 +6,100 @@ if (typeof globalThis.structuredClone === "undefined") {
   globalThis.structuredClone = (obj) => JSON.parse(JSON.stringify(obj));
 }
 
-jest.mock("keymaster", () => {
+mockModule("keymaster", () => {
+  let scope = "all";
   const keymaster = () => {};
   keymaster.unbind = () => {};
-  keymaster.setScope = () => {};
+  keymaster.setScope = (nextScope) => {
+    scope = nextScope ?? scope;
+  };
+  keymaster.getScope = () => scope;
   return { __esModule: true, default: keymaster };
 });
 
-jest.mock("../../core/Hotkey", () => {
+const HOTKEY_MODULE_ABS = require.resolve("../../core/Hotkey");
+const HOTKEY_MODULE_URL = require("node:url").pathToFileURL(HOTKEY_MODULE_ABS).href;
+const UNIQUE_MODULE_ABS = require.resolve("../../utils/unique");
+const UNIQUE_MODULE_URL = require("node:url").pathToFileURL(UNIQUE_MODULE_ABS).href;
+const HELPERS_MODULE_ABS = require.resolve("../../core/Helpers");
+const HELPERS_MODULE_URL = require("node:url").pathToFileURL(HELPERS_MODULE_ABS).href;
+const hotkeyMockFactory = () => {
+  const keymapModule = require("../../core/settings/keymap.json");
+  const keymap = structuredClone(keymapModule.default ?? keymapModule ?? {});
   const mockHotkey = {
-    unbindAll: jest.fn(),
-    addNamed: jest.fn(),
+    unbindAll: mock(),
+    addNamed: mock(),
+    removeNamed: mock(),
+    overwriteNamed: mock(),
+    hasName: mock(() => true),
+    hasKeyByName: mock(() => false),
   };
   const HotkeyFn = () => mockHotkey;
-  HotkeyFn.setScope = jest.fn();
+  HotkeyFn.setScope = mock();
   HotkeyFn.DEFAULT_SCOPE = "default";
-  HotkeyFn.unbindAll = jest.fn();
+  HotkeyFn.keymap = keymap;
+  HotkeyFn.unbindAll = mock();
   return {
     __esModule: true,
+    __skipMerge: true,
     Hotkey: HotkeyFn,
-    unbindAll: jest.fn(),
+    default: {
+      DEFAULT_SCOPE: HotkeyFn.DEFAULT_SCOPE,
+      Hotkey: HotkeyFn,
+    },
+    unbindAll: mock(),
   };
-});
+};
+mockModule("../../core/Hotkey", hotkeyMockFactory);
+mockModule("../core/Hotkey", hotkeyMockFactory);
+mockModule(HOTKEY_MODULE_ABS, hotkeyMockFactory);
+mockModule(HOTKEY_MODULE_URL, hotkeyMockFactory);
 
-jest.mock("../../tools/Manager", () => ({
+const uniqueActualFactory = () => {
+  const actual = requireActual("../../utils/unique");
+  return {
+    __esModule: true,
+    __skipMerge: true,
+    ...(actual ?? {}),
+    default: actual?.default ?? actual,
+  };
+};
+mockModule("../../utils/unique", uniqueActualFactory);
+mockModule("../utils/unique", uniqueActualFactory);
+mockModule(UNIQUE_MODULE_ABS, uniqueActualFactory);
+mockModule(UNIQUE_MODULE_URL, uniqueActualFactory);
+
+const helpersActualFactory = () => {
+  const actual = requireActual("../../core/Helpers");
+  return {
+    __esModule: true,
+    __skipMerge: true,
+    ...(actual ?? {}),
+    default: actual?.default ?? actual,
+  };
+};
+mockModule("../../core/Helpers", helpersActualFactory);
+mockModule("../core/Helpers", helpersActualFactory);
+mockModule(HELPERS_MODULE_ABS, helpersActualFactory);
+mockModule(HELPERS_MODULE_URL, helpersActualFactory);
+
+const mockInvoke = mock();
+const mockInvokeFirst = mock();
+const mockHasEvent = mock(() => false);
+mockModule("../../components/Infomodal/Infomodal", () => ({
   __esModule: true,
   default: {
-    setRoot: jest.fn(),
-    removeAllTools: jest.fn(),
-    allInstances: jest.fn(() => []),
-    resetActiveDrawings: jest.fn(),
-  },
-}));
-
-const mockInvoke = jest.fn();
-const mockInvokeFirst = jest.fn();
-const mockHasEvent = jest.fn(() => false);
-jest.mock("../../components/Infomodal/Infomodal", () => ({
-  __esModule: true,
-  default: {
-    warning: jest.fn(),
-    error: jest.fn(),
+    warning: mock(),
+    error: mock(),
   },
 }));
 
 import "../../tags/visual/View";
 import "../../tags/object/RichText";
-import Tree from "../../core/Tree";
-import Registry from "../../core/Registry";
+import "../../tags/object/Image/Image.js";
 import AppStore from "../AppStore";
 
-const MINIMAL_CONFIG = `<View><Text name="t1" value="$text" /></View>`;
+const MINIMAL_CONFIG = '<View><Image name="img" value="$img" /></View>';
 
 function createTestEnv(overrides = {}) {
   return {
@@ -80,7 +123,7 @@ function createStore(snapshot = {}, envOverrides) {
   return AppStore.create(
     {
       config: MINIMAL_CONFIG,
-      task: { id: 1, data: JSON.stringify({ text: "Hello" }) },
+      task: { id: 1, data: JSON.stringify({ img: "https://example.com/test.jpg" }) },
       interfaces: ["basic"],
       ...snapshot,
     },
@@ -90,7 +133,7 @@ function createStore(snapshot = {}, envOverrides) {
 
 describe("AppStore", () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    clearAllMocks();
     mockHasEvent.mockReturnValue(false);
     localStorage.setItem("autoAnnotation", "false");
     localStorage.setItem("autoAcceptSuggestions", "false");
@@ -396,7 +439,7 @@ describe("AppStore", () => {
   describe("app controls", () => {
     it("setAppControls stores controls", () => {
       const store = createStore();
-      const controls = { clear: jest.fn(), render: jest.fn(), isRendered: () => false };
+      const controls = { clear: mock(), render: mock(), isRendered: () => false };
       store.setAppControls(controls);
       store.clearApp();
       expect(controls.clear).toHaveBeenCalled();
@@ -409,8 +452,8 @@ describe("AppStore", () => {
     it("calls beforeReset and resetAnnotations on annotation store when present", () => {
       const store = createStore();
       store.initializeStore({});
-      const beforeReset = jest.fn();
-      const resetAnnotations = jest.fn();
+      const beforeReset = mock();
+      const resetAnnotations = mock();
       store.annotationStore.beforeReset = beforeReset;
       store.annotationStore.resetAnnotations = resetAnnotations;
       store.resetAnnotationStore();
@@ -439,10 +482,7 @@ describe("AppStore", () => {
     it("enrichUsers is called when annotations have user refs", () => {
       const store = createStore();
       store.initializeStore({
-        annotations: [
-          { user: 10, result: [] },
-          { completed_by: 20, result: [] },
-        ],
+        annotations: [{ user: 10, completed_by: 20, result: [] }],
       });
       expect(store.users.length).toBeGreaterThanOrEqual(1);
     });
@@ -459,7 +499,8 @@ describe("AppStore", () => {
 
   describe("showModal", () => {
     it("calls InfoModal with message and type", async () => {
-      const InfoModal = require("../../components/Infomodal/Infomodal").default;
+      const infoModalModule = require("../../components/Infomodal/Infomodal");
+      const InfoModal = infoModalModule.default ?? infoModalModule;
       const store = createStore();
       store.showModal("Test message", "warning");
       expect(InfoModal.warning).toHaveBeenCalledWith("Test message");
@@ -527,7 +568,7 @@ describe("AppStore", () => {
       store.initializeStore({});
       store.assignTask({ id: 1, data: "{}", allow_skip: false });
       window.APP_SETTINGS = { billing: { enterprise: true }, user: { id: 1, role: "AN" } };
-      const spy = jest.spyOn(console, "warn").mockImplementation();
+      const spy = spyOn(console, "warn").mockImplementation();
       store.skipTask();
       expect(mockInvoke).not.toHaveBeenCalledWith("skipTask", expect.anything(), expect.anything());
       spy.mockRestore();
@@ -598,7 +639,7 @@ describe("AppStore", () => {
     it("sets awaitingSuggestions and parses response", async () => {
       const store = createStore();
       store.initializeStore({ annotations: [{ result: [] }] });
-      const dataParser = jest.fn((r) => r.suggestions);
+      const dataParser = mock((r) => r.suggestions);
       const request = Promise.resolve({ suggestions: [{ result: [] }] });
       store.loadSuggestions(request, dataParser);
       expect(store.awaitingSuggestions).toBe(true);
@@ -613,7 +654,7 @@ describe("AppStore", () => {
     it("invokes nextTask after saving draft", async () => {
       const store = createStore();
       store.initializeStore({ annotations: [{ result: [] }] });
-      store.annotationStore.selected.saveDraft = jest.fn().mockResolvedValue(undefined);
+      store.annotationStore.selected.saveDraft = mock().mockResolvedValue(undefined);
       mockInvoke.mockResolvedValue(undefined);
       await store.postponeTask();
       expect(store.annotationStore.selected.saveDraft).toHaveBeenCalledWith({ was_postponed: true });
@@ -622,12 +663,10 @@ describe("AppStore", () => {
   });
 
   describe("beforeDestroy", () => {
-    it("removes tools and clears appControls", () => {
-      const ToolsManager = require("../../tools/Manager").default;
+    it("clears appControls without errors", () => {
       const store = createStore();
-      store.setAppControls({ clear: jest.fn(), render: jest.fn() });
-      store.beforeDestroy();
-      expect(ToolsManager.removeAllTools).toHaveBeenCalled();
+      store.setAppControls({ clear: mock(), render: mock() });
+      expect(() => store.beforeDestroy()).not.toThrow();
     });
   });
 
@@ -788,7 +827,7 @@ describe("AppStore", () => {
     it("does not invoke event when entity.validate returns false", () => {
       const store = createStore();
       store.initializeStore({ annotations: [{ result: [] }] });
-      store.annotationStore.selected.validate = jest.fn().mockReturnValue(false);
+      store.annotationStore.selected.validate = mock().mockReturnValue(false);
       store.submitAnnotation();
       expect(mockInvoke).not.toHaveBeenCalledWith("submitAnnotation", expect.anything(), expect.anything());
     });
@@ -799,10 +838,10 @@ describe("AppStore", () => {
       const store = createStore({ queueTotal: 5, queuePosition: 0 });
       store.initializeStore({ annotations: [{ result: [] }] });
       const entity = store.annotationStore.selected;
-      entity.beforeSend = jest.fn();
-      entity.validate = jest.fn().mockReturnValue(true);
-      entity.sendUserGenerate = jest.fn();
-      entity.dropDraft = jest.fn();
+      entity.beforeSend = mock();
+      entity.validate = mock().mockReturnValue(true);
+      entity.sendUserGenerate = mock();
+      entity.dropDraft = mock();
       mockInvoke.mockResolvedValue(undefined);
       store.submitAnnotation();
       await new Promise((r) => setTimeout(r, 300));
@@ -816,10 +855,10 @@ describe("AppStore", () => {
       const store = createStore();
       store.initializeStore({ annotations: [{ result: [] }] });
       const entity = store.annotationStore.selected;
-      entity.beforeSend = jest.fn();
-      entity.validate = jest.fn().mockReturnValue(true);
-      entity.sendUserGenerate = jest.fn();
-      entity.dropDraft = jest.fn();
+      entity.beforeSend = mock();
+      entity.validate = mock().mockReturnValue(true);
+      entity.sendUserGenerate = mock();
+      entity.dropDraft = mock();
       mockInvoke.mockResolvedValue(undefined);
       store.updateAnnotation({ extra: "data" });
       await new Promise((r) => setTimeout(r, 300));

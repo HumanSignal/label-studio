@@ -53,7 +53,7 @@ export const LabelingSettings = () => {
     [project, config],
   );
 
-  const projectAlreadySetUp = useMemo(() => {
+  const _projectAlreadySetUp = useMemo(() => {
     if (project.label_config) {
       const hasConfig = !isEmptyString(project.label_config);
       const configIsEmpty = project.label_config.replace(/\s/g, "") === "<View></View>";

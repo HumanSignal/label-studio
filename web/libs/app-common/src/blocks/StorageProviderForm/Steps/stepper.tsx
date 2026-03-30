@@ -69,7 +69,7 @@ export const Stepper = ({ steps, currentStep, onStepClick, isEditMode = false }:
 
           {/* Step circles positioned along the progress bar */}
           <div className="w-full grid grid-cols-4 absolute justify-center">
-            {steps.map((step, index) => (
+            {steps.map((_step, index) => (
               <div key={index}>
                 <div
                   className={cn(

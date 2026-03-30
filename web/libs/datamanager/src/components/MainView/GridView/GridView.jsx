@@ -194,7 +194,7 @@ export const GridView = observer(({ data, view, loadMore, fields, onChange, hidd
         const visibleItemStopIndex = getCellIndex(visibleRowStopIndex, columnCount - 1);
 
         // Calculate how many items are visible in the current view
-        const visibleItemsCount = (visibleRowStopIndex - visibleRowStartIndex + 1) * columnCount;
+        const _visibleItemsCount = (visibleRowStopIndex - visibleRowStartIndex + 1) * columnCount;
 
         // If we're showing items near the end of our loaded data, trigger loading
         // Use a threshold of 2 rows worth of items to trigger loading

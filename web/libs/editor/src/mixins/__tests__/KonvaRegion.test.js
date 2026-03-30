@@ -3,31 +3,25 @@
  */
 import { getParent, types } from "mobx-state-tree";
 import { guidGenerator } from "../../core/Helpers";
+import { FF_ZOOM_OPTIM } from "../../utils/feature-flags";
 
-jest.mock("../../utils/feature-flags", () => ({
-  isFF: jest.fn(() => false),
-  FF_ZOOM_OPTIM: "ff_zoom_optim",
-  FF_DEV_3391: "ff_3391",
-  FF_SIMPLE_INIT: "ff_simple_init",
-}));
-
-const featureFlags = require("../../utils/feature-flags");
+const ff = mockFF();
 
 const mockAnnotation = () => ({
   regionStore: {
-    isSelected: jest.fn(() => false),
-    unselectAll: jest.fn(),
-    toggleRegionSelection: jest.fn(),
+    isSelected: mock(() => false),
+    unselectAll: mock(),
+    toggleRegionSelection: mock(),
   },
-  selectArea: jest.fn(),
-  selectAreas: jest.fn(),
-  unselectAll: jest.fn(),
-  toggleRegionSelection: jest.fn(),
+  selectArea: mock(),
+  selectAreas: mock(),
+  unselectAll: mock(),
+  toggleRegionSelection: mock(),
   isDrawing: false,
   isLinkingMode: false,
-  isReadOnly: jest.fn(() => false),
-  addLinkedRegion: jest.fn(),
-  stopLinkingMode: jest.fn(),
+  isReadOnly: mock(() => false),
+  addLinkedRegion: mock(),
+  stopLinkingMode: mock(),
   isSuggestionsAccepting: false,
   areas: new Map(),
 });
@@ -160,7 +154,7 @@ describe("KonvaRegion mixin", () => {
 
   describe("views", () => {
     it("bboxCoords returns null and warns when not overridden", () => {
-      const warnSpy = jest.spyOn(console, "warn").mockImplementation(() => {});
+      const warnSpy = spyOn(console, "warn").mockImplementation(() => {});
       const { region } = createStore();
       expect(region.bboxCoords).toBeNull();
       expect(warnSpy).toHaveBeenCalledWith("KonvaRegionMixin needs to implement bboxCoords getter in regions");
@@ -193,13 +187,13 @@ describe("KonvaRegion mixin", () => {
     });
 
     it("inViewPort returns true when FF_ZOOM_OPTIM is off", () => {
-      featureFlags.isFF.mockReturnValue(false);
+      ff.reset();
       const { region } = createStore();
       expect(region.inViewPort).toBe(true);
     });
 
     it("inViewPort is false when FF_ZOOM_OPTIM is on and no object", () => {
-      featureFlags.isFF.mockReturnValue(true);
+      ff.set({ [FF_ZOOM_OPTIM]: true });
       const RegionWithBbox = types.compose(TestRegion).views((_self) => ({
         get bboxCoords() {
           return { left: 0, top: 0, right: 10, bottom: 10 };
@@ -226,7 +220,7 @@ describe("KonvaRegion mixin", () => {
     });
 
     it("inViewPort is true when FF_ZOOM_OPTIM is on and bbox inside viewport", () => {
-      featureFlags.isFF.mockReturnValue(true);
+      ff.set({ [FF_ZOOM_OPTIM]: true });
       const RegionWithBbox = types.compose(TestRegion).views((_self) => ({
         get bboxCoords() {
           return { left: 5, top: 5, right: 15, bottom: 15 };
@@ -324,7 +318,7 @@ describe("KonvaRegion mixin", () => {
 
     it("updateCursor calls selectedTool.updateCursor when not hovered and tool has it", () => {
       const style = {};
-      const updateCursor = jest.fn();
+      const updateCursor = mock();
       const { region } = createStore(
         {},
         {},
@@ -339,7 +333,7 @@ describe("KonvaRegion mixin", () => {
 
     it("checkSizes calls updateImageSize when dimensions > 1", () => {
       const { region } = createStore();
-      const updateImageSize = jest.fn();
+      const updateImageSize = mock();
       region.setUpdateImageSize(updateImageSize);
       region.checkSizes();
       expect(updateImageSize).toHaveBeenCalledWith(1, 1, 100, 100);
@@ -348,7 +342,7 @@ describe("KonvaRegion mixin", () => {
     it("checkSizes does not call updateImageSize when stage width or height <= 1", () => {
       const { root, region } = createStore();
       root.setStageSize(1, 1);
-      const updateImageSize = jest.fn();
+      const updateImageSize = mock();
       region.setUpdateImageSize(updateImageSize);
       region.checkSizes();
       expect(updateImageSize).not.toHaveBeenCalled();
@@ -357,7 +351,7 @@ describe("KonvaRegion mixin", () => {
     it("selectRegion calls scrollToRegion", () => {
       const { region } = createStore();
       region.setObject({ zoomScale: 1 });
-      const spy = jest.spyOn(region, "scrollToRegion");
+      const spy = spyOn(region, "scrollToRegion");
       region.selectRegion();
       expect(spy).toHaveBeenCalled();
     });
@@ -431,7 +425,7 @@ describe("KonvaRegion mixin", () => {
       const region = root.region;
       region.setObject({ zoomScale: 1 });
       region.setShapeRef({ parent: { canvas: { _canvas: canvas } } });
-      viewport.scrollBy = jest.fn();
+      viewport.scrollBy = mock();
       region.scrollToRegion();
       expect(viewport.scrollBy).not.toHaveBeenCalled();
     });
@@ -489,7 +483,7 @@ describe("KonvaRegion mixin", () => {
       const region = root.region;
       region.setObject({ zoomScale: 1 });
       region.setShapeRef({ parent: { canvas: { _canvas: canvas } } });
-      viewport.scrollBy = jest.fn();
+      viewport.scrollBy = mock();
       region.scrollToRegion();
       expect(viewport.scrollBy).toHaveBeenCalledWith({ top: -50, left: 0, behavior: "smooth" });
     });
@@ -547,13 +541,13 @@ describe("KonvaRegion mixin", () => {
       const region = root.region;
       region.setObject({ zoomScale: 1 });
       region.setShapeRef({ parent: { canvas: { _canvas: canvas } } });
-      viewport.scrollBy = jest.fn();
+      viewport.scrollBy = mock();
       region.scrollToRegion();
       expect(viewport.scrollBy).toHaveBeenCalledWith({ top: 186, left: 0, behavior: "smooth" });
     });
 
     it("deleteRegion enables selected tool and calls super deleteRegion", () => {
-      const enable = jest.fn();
+      const enable = mock();
       const { region } = createStore({}, {}, { getToolsManager: () => ({ findSelectedTool: () => ({ enable }) }) });
       region.deleteRegion();
       expect(enable).toHaveBeenCalled();
@@ -571,9 +565,9 @@ describe("KonvaRegion mixin", () => {
     });
 
     it("onClickRegion when isLinkingMode calls addLinkedRegion, stopLinkingMode, unselectAll", () => {
-      const addLinkedRegion = jest.fn();
-      const stopLinkingMode = jest.fn();
-      const unselectAll = jest.fn();
+      const addLinkedRegion = mock();
+      const stopLinkingMode = mock();
+      const unselectAll = mock();
       const { region } = createStore({
         isLinkingMode: true,
         isReadOnly: () => false,

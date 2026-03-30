@@ -3,8 +3,9 @@
  * View coverage is largely from Cypress; these tests cover model logic.
  */
 import { types } from "mobx-state-tree";
+import { importModulesWithBunReload } from "./moduleReload";
 
-jest.mock("../../tags/object/Image", () => {
+mockModule("../../tags/object/Image", () => {
   const { types } = require("mobx-state-tree");
   return {
     ImageModel: types
@@ -36,60 +37,74 @@ jest.mock("../../tags/object/Image", () => {
   };
 });
 
-import {
-  PolygonRegionModel,
-  getAnchorPoint,
-  getFlattenedPoints,
-  moveHoverAnchor,
-  removeHoverAnchor,
-} from "../PolygonRegion";
-import { ImageModel } from "../../tags/object/Image";
+let PolygonRegionModel;
+let getAnchorPoint;
+let getFlattenedPoints;
+let moveHoverAnchor;
+let removeHoverAnchor;
+let TestRoot;
 
-const TestRoot = types
-  .model("TestRoot", {
-    image: types.optional(ImageModel, { id: "img1" }),
-    region: types.optional(PolygonRegionModel, {
-      id: "poly1",
-      pid: "p1",
-      object: "img1",
-      points: [
-        [10, 10],
-        [50, 10],
-        [50, 50],
-        [10, 50],
-      ],
-      closed: true,
-      results: [],
-    }),
-  })
-  .views(() => ({
-    get canvasToInternalX() {
-      return (x) => x;
-    },
-    get canvasToInternalY() {
-      return (y) => y;
-    },
-    get isSamePixel() {
-      return () => false;
-    },
-  }))
-  .actions(() => ({
-    createSerializedResult(_region, value) {
-      return {
-        value: { ...value },
-        original_width: 100,
-        original_height: 100,
-        image_rotation: 0,
-      };
-    },
-  }));
+const loadModels = async () => {
+  const [polygonMod, imageMod] = await importModulesWithBunReload(["../PolygonRegion", "../../tags/object/Image"]);
+  const ImageModel = imageMod.ImageModel;
+
+  PolygonRegionModel = polygonMod.PolygonRegionModel;
+  getAnchorPoint = polygonMod.getAnchorPoint;
+  getFlattenedPoints = polygonMod.getFlattenedPoints;
+  moveHoverAnchor = polygonMod.moveHoverAnchor;
+  removeHoverAnchor = polygonMod.removeHoverAnchor;
+
+  TestRoot = types
+    .model("TestRoot", {
+      image: types.optional(ImageModel, { id: "img1" }),
+      region: types.optional(PolygonRegionModel, {
+        id: "poly1",
+        pid: "p1",
+        object: "img1",
+        points: [
+          [10, 10],
+          [50, 10],
+          [50, 50],
+          [10, 50],
+        ],
+        closed: true,
+        results: [],
+      }),
+    })
+    .views(() => ({
+      get canvasToInternalX() {
+        return (x) => x;
+      },
+      get canvasToInternalY() {
+        return (y) => y;
+      },
+      get isSamePixel() {
+        return () => false;
+      },
+    }))
+    .actions(() => ({
+      createSerializedResult(_region, value) {
+        return {
+          value: { ...value },
+          original_width: 100,
+          original_height: 100,
+          image_rotation: 0,
+        };
+      },
+    }));
+};
 
 describe("PolygonRegion", () => {
+  beforeAll(async () => {
+    await loadModels();
+  });
+
   describe("PolygonRegionModel", () => {
     let root;
     let region;
 
-    beforeEach(() => {
+    beforeEach(async () => {
+      await loadModels();
       root = TestRoot.create({
         image: { id: "img1" },
         region: {
@@ -266,10 +281,27 @@ describe("PolygonRegion", () => {
     });
 
     it("deletePoint removes point when more than 3 points and closed", () => {
-      expect(region.points.length).toBe(4);
-      const pointToRemove = region.points[1];
-      region.deletePoint(pointToRemove);
-      expect(region.points.length).toBe(3);
+      const rootWithObjectPoints = TestRoot.create({
+        image: { id: "img1" },
+        region: {
+          id: "poly-delete",
+          pid: "p-delete",
+          object: "img1",
+          points: [
+            { id: "p1", x: 10, y: 10, index: 0 },
+            { id: "p2", x: 50, y: 10, index: 1 },
+            { id: "p3", x: 50, y: 50, index: 2 },
+            { id: "p4", x: 10, y: 50, index: 3 },
+          ],
+          closed: true,
+          results: [],
+        },
+      });
+      const deleteRegion = rootWithObjectPoints.region;
+      expect(deleteRegion.points.length).toBe(4);
+      const pointToRemove = deleteRegion.points[1];
+      deleteRegion.deletePoint(pointToRemove);
+      expect(deleteRegion.points.length).toBe(3);
     });
 
     it("deletePoint does nothing when would eliminate closed shape (3 points)", () => {
@@ -375,7 +407,7 @@ describe("PolygonRegion", () => {
 
   describe("moveHoverAnchor", () => {
     it("moves existing hover anchor to point when layer has one", () => {
-      const to = jest.fn();
+      const to = mock();
       const layer = { findOne: () => ({ to }), draw: () => {} };
       moveHoverAnchor({ point: [10, 20], group: {}, layer, zoom: 1 });
       expect(to).toHaveBeenCalledWith({ x: 10, y: 20, duration: 0 });
@@ -389,8 +421,8 @@ describe("PolygonRegion", () => {
     });
 
     it("destroys hover anchor and redraws layer when anchor exists", () => {
-      const destroy = jest.fn();
-      const draw = jest.fn();
+      const destroy = mock();
+      const draw = mock();
       const layer = { findOne: () => ({ destroy }), draw };
       removeHoverAnchor({ layer });
       expect(destroy).toHaveBeenCalled();

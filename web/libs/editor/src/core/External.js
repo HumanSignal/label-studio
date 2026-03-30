@@ -53,28 +53,28 @@ function onGroundTruth() {}
 /**
  * Callback when a new annotation gets selected
  */
-function onSelectAnnotation(annotation, previousAnnotation) {}
+function onSelectAnnotation(_annotation, _previousAnnotation) {}
 
 /**
  * Called when "Accept" or "Fix + Accept" is pressed
  */
-function onAcceptAnnotation(store, entity) {}
+function onAcceptAnnotation(_store, _entity) {}
 
 /**
  * Called when "Reject" is pressed
  */
-function onRejectAnnotation(store, entity) {}
+function onRejectAnnotation(_store, _entity) {}
 
 /**
  * Called when storage gets initialized for the first time
  */
-function onStorageInitialized(ls) {}
+function onStorageInitialized(_ls) {}
 
-function onSubmitDraft(entity) {}
+function onSubmitDraft(_entity) {}
 
-function onNextTask(nextTaskId) {}
+function onNextTask(_nextTaskId) {}
 
-function onPrevTask(prevTaskId) {}
+function onPrevTask(_prevTaskId) {}
 
 export default {
   onDeleteAnnotation,

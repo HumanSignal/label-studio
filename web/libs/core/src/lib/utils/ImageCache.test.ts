@@ -12,8 +12,8 @@ import { imageCache } from "./ImageCache";
 // Use a counter so each blob URL is unique; otherwise forceClear() revokes the same URL
 // and later tests see it in revokedUrls and get() returns undefined.
 let blobUrlCounter = 0;
-global.URL.createObjectURL = jest.fn(() => `blob:http://localhost/mock-${++blobUrlCounter}`);
-global.URL.revokeObjectURL = jest.fn();
+global.URL.createObjectURL = mock(() => `blob:http://localhost/mock-${++blobUrlCounter}`);
+global.URL.revokeObjectURL = mock();
 
 // Minimal valid image data (> 100 bytes to pass minBlobSize check)
 const FAKE_IMAGE_DATA = new Uint8Array(200).fill(0xff);
@@ -26,18 +26,18 @@ function mockXHRWithContentType(contentType: string) {
   const blob = new Blob([FAKE_IMAGE_DATA], { type: contentType });
 
   const originalXHR = global.XMLHttpRequest;
-  const mockXHRClass = jest.fn().mockImplementation(() => {
+  const mockXHRClass = mock().mockImplementation(() => {
     const listeners: Record<string, Function> = {};
     return {
       responseType: "",
       readyState: 4,
       status: 200,
       response: blob,
-      open: jest.fn(),
-      send: jest.fn(() => {
+      open: mock(),
+      send: mock(() => {
         setTimeout(() => listeners.load?.(new Event("load")), 0);
       }),
-      addEventListener: jest.fn((event: string, handler: Function) => {
+      addEventListener: mock((event: string, handler: Function) => {
         listeners[event] = handler;
       }),
     };
@@ -78,7 +78,7 @@ beforeAll(() => {
 describe("ImageCache content type validation", () => {
   beforeEach(() => {
     imageCache.forceClear();
-    jest.clearAllMocks();
+    mock.clearAllMocks();
   });
 
   /**
@@ -186,19 +186,19 @@ describe("ImageCache content type validation", () => {
     const smallBlob = new Blob([new Uint8Array(50)], { type: "image/png" });
     const originalXHR = global.XMLHttpRequest;
     let loadHandler: (() => void) | null = null;
-    (global as any).XMLHttpRequest = jest.fn().mockImplementation(function (this: any) {
+    (global as any).XMLHttpRequest = mock().mockImplementation(function (this: any) {
       const xhr = {
         responseType: "",
         readyState: 4,
         status: 200,
         response: smallBlob,
-        open: jest.fn(),
-        send: jest.fn(() => {
+        open: mock(),
+        send: mock(() => {
           setTimeout(() => {
             if (loadHandler) loadHandler();
           }, 0);
         }),
-        addEventListener: jest.fn((event: string, handler: Function) => {
+        addEventListener: mock((event: string, handler: Function) => {
           if (event === "load") loadHandler = handler as () => void;
         }),
       };
@@ -215,7 +215,7 @@ describe("ImageCache content type validation", () => {
 describe("ImageCache get, refs, and cache lifecycle", () => {
   beforeEach(() => {
     imageCache.forceClear();
-    jest.clearAllMocks();
+    mock.clearAllMocks();
   });
 
   it("get returns undefined when url not in cache", () => {
@@ -274,7 +274,7 @@ describe("ImageCache get, refs, and cache lifecycle", () => {
 
   it("load returns cached result and calls onProgress(1)", async () => {
     const restore = mockXHRWithContentType("image/png");
-    const onProgress = jest.fn();
+    const onProgress = mock();
     try {
       await imageCache.load("https://example.com/cached.png", undefined, onProgress);
       onProgress.mockClear();

@@ -403,12 +403,12 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
   }, [transformMode, initialPoints.length, selectedPoints]);
   const [lastAddedPointId, setLastAddedPointId] = useState<string | null>(null);
 
-  const transformerRef = useRef<Konva.Transformer>(null);
+  const _transformerRef = useRef<Konva.Transformer>(null);
   const stageRef = useRef<Konva.Layer>(null);
   const pointRefs = useRef<{ [key: number]: Konva.Circle | null }>({});
-  const proxyRefs = useRef<{ [key: number]: Konva.Circle | null }>({});
+  const _proxyRefs = useRef<{ [key: number]: Konva.Circle | null }>({});
   // Store transformer state to preserve rotation, scale, and center when updating selection
-  const transformerStateRef = useRef<{
+  const _transformerStateRef = useRef<{
     rotation: number;
     scaleX: number;
     scaleY: number;
@@ -495,7 +495,7 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
   const lastCallbackTime = useRef<number>(DEFAULT_CALLBACK_TIME);
   const [visibleControlPoints, setVisibleControlPoints] = useState<Set<number>>(new Set());
   const [activePointId, setActivePointId] = useState<string | null>(null);
-  const [isTransforming, setIsTransforming] = useState(false);
+  const [isTransforming, _setIsTransforming] = useState(false);
 
   // Flag to track if point selection was handled in VectorPoints onClick
   const pointSelectionHandled = useRef(false);
@@ -753,8 +753,8 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
   // Debug logging for path closure state
   useEffect(() => {
     if (allowClose && initialPoints.length >= 2) {
-      const firstPoint = initialPoints[0];
-      const lastPoint = initialPoints[initialPoints.length - 1];
+      const _firstPoint = initialPoints[0];
+      const _lastPoint = initialPoints[initialPoints.length - 1];
     }
   }, [allowClose, initialPoints, isPathClosed, finalIsPathClosed]);
 
@@ -1092,12 +1092,12 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
   }, [updatePoints]);
 
   // Function to update current points ref - used by VectorTransformer during transformation
-  const updateCurrentPointsRef = useCallback((points: BezierPoint[]) => {
+  const _updateCurrentPointsRef = useCallback((points: BezierPoint[]) => {
     currentPointsRef.current = points;
   }, []);
 
   // Function to get current points ref - used by VectorTransformer during transformation
-  const getCurrentPointsRef = useCallback(() => {
+  const _getCurrentPointsRef = useCallback(() => {
     return currentPointsRef.current;
   }, []);
   const setSelectedPointsStable = useCallback((selectedPoints: Set<number>) => {
@@ -3057,7 +3057,7 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
               let snappedPos = snapToPixel({ x: point.x, y: point.y }, pixelSnapping);
 
               // Check if this snapped position would collide with any previously snapped point
-              let wouldCollapse = false;
+              let _wouldCollapse = false;
               for (let j = 0; j < i; j++) {
                 const prevSnapped = snappedPositions.get(j);
                 if (prevSnapped) {
@@ -3071,7 +3071,7 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
                   // If snapped positions would be the same but original positions were different,
                   // preserve relative offset to prevent collapse
                   if (snappedDistance < 0.1 && originalDistance > 0.1) {
-                    wouldCollapse = true;
+                    _wouldCollapse = true;
                     // Preserve relative offset from first point
                     const relativeX = point.x - firstPoint.x;
                     const relativeY = point.y - firstPoint.y;

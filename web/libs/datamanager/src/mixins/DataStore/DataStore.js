@@ -301,7 +301,7 @@ export const DataStore = (modelName, { listItemType, apiMethod, properties, asso
         const params = { id, query, pageNumber, reload, interaction, pageSize };
         const root = getRoot(self);
         // Only use debouncing for virtual tabs that use queries (like search/filter tabs)
-        const currentView = root.viewsStore.selected;
+        const _currentView = root.viewsStore.selected;
         // const isVirtualTab = currentView?.virtual && currentView?.query;
 
         // Initialize debounced function if not already done

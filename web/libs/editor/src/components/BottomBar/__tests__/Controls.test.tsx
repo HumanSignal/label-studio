@@ -1,52 +1,26 @@
 import { render, fireEvent } from "@testing-library/react";
 import { Provider } from "mobx-react";
+import * as uiModule from "@humansignal/ui";
 import { Controls } from "../Controls";
-
-jest.mock("@humansignal/ui", () => {
-  const { forwardRef } = jest.requireActual("react");
-  return {
-    Button: forwardRef(({ children, ...props }: { children: React.ReactNode }) => {
-      return (
-        <button {...props} data-testid="button">
-          {children}
-        </button>
-      );
-    }),
-    Tooltip: ({ children }: { children: React.ReactNode }) => {
-      return <div data-testid="tooltip">{children}</div>;
-    },
-    Userpic: ({ children }: { children: React.ReactNode }) => {
-      return (
-        <div
-          data-testid="userpic"
-          className="userpic--tBKCQ"
-          style={{ background: "rgb(155, 166, 211)", color: "rgb(0, 0, 0)" }}
-        >
-          {children}
-        </div>
-      );
-    },
-  };
-});
 const mockStore = {
-  hasInterface: jest.fn(),
+  hasInterface: mock(),
   isSubmitting: false,
   settings: {
     enableTooltips: true,
   },
   task: { id: 1, allow_skip: true },
-  skipTask: jest.fn(),
+  skipTask: mock(),
   commentStore: {
     currentComment: {
       a3r0fa: "It's working",
       a0lsuf: "It's working fine",
     },
-    commentFormSubmit: jest.fn(),
-    setTooltipMessage: jest.fn(),
+    commentFormSubmit: mock(),
+    setTooltipMessage: mock(),
   },
   annotationStore: {
     selected: {
-      submissionInProgress: jest.fn(),
+      submissionInProgress: mock(),
       history: {
         canUndo: false,
       },
@@ -73,6 +47,7 @@ const mockAnnotation = {
 const setupAppSettings = (options: { role?: string; enterprise?: boolean } = {}) => {
   (window as any).APP_SETTINGS = {
     user: {
+      id: 999,
       role: options.role,
     },
     billing: {
@@ -83,10 +58,23 @@ const setupAppSettings = (options: { role?: string; enterprise?: boolean } = {})
 
 describe("Controls", () => {
   beforeEach(() => {
-    jest.clearAllMocks();
-    // Reset APP_SETTINGS before each test
+    mock.clearAllMocks();
+    spyOn(uiModule, "Button").mockImplementation(({ children, ...props }: any) => (
+      <button {...props} data-testid="button">
+        {children}
+      </button>
+    ));
+    spyOn(uiModule, "Tooltip").mockImplementation(({ children }: any) => <div data-testid="tooltip">{children}</div>);
+    spyOn(uiModule, "Userpic").mockImplementation(({ children }: any) => (
+      <div
+        data-testid="userpic"
+        className="userpic--tBKCQ"
+        style={{ background: "rgb(155, 166, 211)", color: "rgb(0, 0, 0)" }}
+      >
+        {children}
+      </div>
+    ));
     (window as any).APP_SETTINGS = undefined;
-    // Reset mockStore task to default
     mockStore.task = { id: 1, allow_skip: true };
   });
 

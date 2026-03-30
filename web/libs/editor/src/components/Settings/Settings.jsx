@@ -114,7 +114,7 @@ const GeneralSettings = observer(({ store }) => {
   );
 });
 
-const LayoutSettings = observer(({ store }) => {
+const _LayoutSettings = observer(({ store }) => {
   return (
     <div className={cn("settings").mod(newUI).toClassName()}>
       <div className={cn("settings").elem("field").toClassName()}>

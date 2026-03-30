@@ -1,0 +1,5 @@
+[test]
+preload = ["./test/bun/preload.ts"]
+coverage = true
+coverageReporter = ["lcov"]
+coverageDir = "./coverage"

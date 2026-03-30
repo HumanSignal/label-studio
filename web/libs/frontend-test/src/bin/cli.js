@@ -50,7 +50,7 @@ yargs(hideBin(process.argv))
     "init",
     "Initialize framework",
     () => {},
-    async (args) => {
+    async (_args) => {
       console.log("Preparing environment");
 
       await Promise.all(CREATE_DIRS.map((dir) => runCommand("mkdir", ["-p", dir], `Creating ${dir}`)));

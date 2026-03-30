@@ -1,5 +1,5 @@
 import { IconChevronDown, IconChevronRight, IconTrash } from "@humansignal/icons";
-import { Button, Spinner, Badge, EnterpriseBadge } from "@humansignal/ui";
+import { Button, Spinner, EnterpriseBadge } from "@humansignal/ui";
 import { inject, observer } from "mobx-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useActions } from "../../../hooks/useActions";

@@ -13,7 +13,7 @@ import "./TopBar.prefix.css";
 export const TopBar = observer(({ store }) => {
   const annotationStore = store.annotationStore;
   const entity = annotationStore?.selected;
-  const isPrediction = entity?.type === "prediction";
+  const _isPrediction = entity?.type === "prediction";
 
   const isViewAll = annotationStore?.viewingAll === true;
   const isBulkMode = isFF(FF_BULK_ANNOTATION) && !isStarterCloudPlan() && store.hasInterface("annotation:bulk");

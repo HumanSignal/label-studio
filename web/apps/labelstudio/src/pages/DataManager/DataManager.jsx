@@ -66,7 +66,7 @@ export const DataManagerPage = ({ ...props }) => {
   const api = useAPI();
   const { project } = useProject();
   const setContextProps = useContextProps();
-  const [crashed, setCrashed] = useState(false);
+  const [crashed, _setCrashed] = useState(false);
   const [loading, setLoading] = useState(!window.DataManager || !window.LabelStudio);
   const dataManagerRef = useRef();
   const projectId = project?.id;
@@ -155,7 +155,7 @@ export const DataManagerPage = ({ ...props }) => {
     });
 
     if (interactiveBacked) {
-      dataManager.on("lsf:regionFinishedDrawing", (reg, group) => {
+      dataManager.on("lsf:regionFinishedDrawing", (_reg, group) => {
         const { lsf, task, currentAnnotation: annotation } = dataManager.lsf;
         const ids = group.map((r) => r.cleanId);
         const result = annotation.serializeAnnotation().filter((res) => ids.includes(res.id));

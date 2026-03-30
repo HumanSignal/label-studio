@@ -1,67 +1,71 @@
-import type React from "react";
+import React from "react";
 import { fireEvent, render, screen } from "@testing-library/react";
-import TreeStructure, { type RowItem } from "./TreeStructure";
+import type { RowItem } from "./TreeStructure";
+import * as reactWindowModule from "react-window";
 
-const mockResetAfterIndex = jest.fn();
+const mockResetAfterIndex = mock();
+const mockScrollToItem = mock();
 const mockOffsetHeight = 200;
 const mockOffsetWidth = 150;
 const mockClientWidth = 150;
 
-jest.mock("react-window", () => {
-  const R = require("react");
-  return {
-    VariableSizeList: R.forwardRef(
-      (
-        {
-          children,
-          itemCount,
-          itemData,
-          itemSize,
-          height,
-          width,
-        }: {
-          children: (props: { data: (i: number) => unknown; index: number; style: object }) => React.ReactNode;
-          itemCount: number;
-          itemData: (index: number) => unknown;
-          itemSize: number | ((index: number) => number);
-          height: number;
-          width: number;
-        },
-        ref: React.Ref<unknown>,
-      ) => {
-        R.useEffect(() => {
-          if (ref && typeof ref === "object" && "current" in ref) {
-            (ref as React.MutableRefObject<unknown>).current = {
-              resetAfterIndex: mockResetAfterIndex,
-              _outerRef: {
-                firstChild: {
-                  offsetHeight: mockOffsetHeight,
-                  offsetWidth: mockOffsetWidth,
-                  clientWidth: mockClientWidth,
-                },
-              },
-            };
-          }
-        }, [ref]);
-        const rows = [];
-        for (let i = 0; i < itemCount; i++) {
-          const rowHeight = typeof itemSize === "function" ? itemSize(i) : itemSize;
-          rows.push(
-            R.createElement(
-              R.Fragment,
-              { key: i },
-              children({
-                data: itemData,
-                index: i,
-                style: { height: rowHeight },
-              }),
-            ),
-          );
-        }
-        return <div data-testid="variable-size-list">{rows}</div>;
-      },
-    ),
-  };
+const listHandle = {
+  resetAfterIndex: (...args: unknown[]) => mockResetAfterIndex(...args),
+  scrollToItem: (...args: unknown[]) => mockScrollToItem(...args),
+  _outerRef: {
+    firstChild: {
+      offsetHeight: mockOffsetHeight,
+      offsetWidth: mockOffsetWidth,
+      clientWidth: mockClientWidth,
+    },
+  },
+};
+
+const MockVariableSizeList = React.forwardRef(function MockVariableSizeList(
+  {
+    children,
+    itemCount,
+    itemData,
+    itemSize,
+  }: {
+    children: (props: { data: (i: number) => unknown; index: number; style: object }) => React.ReactNode;
+    itemCount: number;
+    itemData: (index: number) => unknown;
+    itemSize: number | ((index: number) => number);
+    height?: number;
+    width?: number;
+  },
+  ref: React.Ref<unknown>,
+) {
+  // Before row ref/dimensionCallback runs, TreeStructure may call listRef.current.resetAfterIndex during render.
+  // useImperativeHandle is too late; assign synchronously for this test double.
+  if (ref != null && typeof ref === "object" && "current" in ref) {
+    (ref as React.MutableRefObject<typeof listHandle>).current = listHandle;
+  }
+  const rows = [];
+  for (let i = 0; i < itemCount; i++) {
+    const rowHeight = typeof itemSize === "function" ? itemSize(i) : itemSize;
+    rows.push(
+      React.createElement(
+        React.Fragment,
+        { key: i },
+        children({ data: itemData, index: i, style: { height: rowHeight } }),
+      ),
+    );
+  }
+  return <div data-testid="variable-size-list">{rows}</div>;
+});
+
+let TreeStructure: typeof import("./TreeStructure")["default"];
+
+beforeAll(async () => {
+  // `spyOn(...).mockImplementation(forwardRef)` is not callable in Bun; ESM namespace is not assignable.
+  mock.module("react-window", () => ({
+    ...reactWindowModule,
+    VariableSizeList: MockVariableSizeList,
+  }));
+  const treeMod = await import("./TreeStructure");
+  TreeStructure = treeMod.default;
 });
 
 const defaultTransformationCallback = ({
@@ -133,6 +137,7 @@ const makeItems = (overrides?: Partial<RowItem>[]): RowItem[] => [
 describe("TreeStructure", () => {
   beforeEach(() => {
     mockResetAfterIndex.mockClear();
+    mockScrollToItem.mockClear();
     Object.defineProperty(document.body, "clientHeight", { value: 800, configurable: true });
   });
 

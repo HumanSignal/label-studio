@@ -1,5 +1,5 @@
-import { useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
-import { Group, Image, Layer, Shape } from "react-konva";
+import { useCallback, useContext, useEffect, useRef, useState } from "react";
+import { Group, Image, Shape } from "react-konva";
 import { observer } from "mobx-react";
 import { getParent, getRoot, getType, hasParent, isAlive, types } from "mobx-state-tree";
 
@@ -10,7 +10,6 @@ import Canvas from "../utils/canvas";
 
 import { ImageViewContext } from "../components/ImageView/ImageViewContext";
 import { LabelOnMask } from "../components/ImageView/LabelOnRegion";
-import { Geometry } from "../components/InteractiveOverlays/Geometry";
 import { defaultStyle } from "../core/Constants";
 import { guidGenerator } from "../core/Helpers";
 import { AreaMixin } from "../mixins/AreaMixin";
@@ -22,7 +21,7 @@ import { FF_ZOOM_OPTIM, isFF } from "../utils/feature-flags";
 import { AliveRegion } from "./AliveRegion";
 import { RegionWrapper } from "./RegionWrapper";
 
-const highlightOptions = {
+const _highlightOptions = {
   opacity: 1,
 };
 
@@ -60,7 +59,7 @@ const Points = types
   }))
   .actions((self) => {
     return {
-      updateImageSize(wp, hp, sw, sh) {
+      updateImageSize(_wp, _hp, sw, sh) {
         self.points = self.relativePoints.map((v, idx) => {
           const isX = !(idx % 2);
           const stageSize = isX ? sw : sh;
@@ -91,13 +90,13 @@ const Points = types
       },
 
       // rescale points to the new width and height from the original
-      rescale(origW, origH, destW) {
+      rescale(origW, _origH, destW) {
         const s = destW / origW;
 
         return self.points.map((p) => p * s);
       },
 
-      scaledStrokeWidth(origW, origH, destW) {
+      scaledStrokeWidth(origW, _origH, destW) {
         const s = destW / origW;
 
         return s * self.strokeWidth;

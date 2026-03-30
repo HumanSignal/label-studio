@@ -11,7 +11,7 @@ import { isDefined } from "../../utils/utilities";
 import "./Controls.prefix.css";
 import { useCallback, useMemo, useState } from "react";
 
-const TOOLTIP_DELAY = 0.8;
+const _TOOLTIP_DELAY = 0.8;
 
 const ButtonTooltip = inject("store")(
   observer(({ store, title, children }) => {

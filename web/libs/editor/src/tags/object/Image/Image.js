@@ -577,7 +577,7 @@ const Model = types
       };
     },
   }))
-  .volatile((self) => ({
+  .volatile((_self) => ({
     manager: null,
   }))
   // actions for the tools

@@ -15,7 +15,6 @@ import { LoadingOutlined } from "@ant-design/icons";
 import { Toolbar } from "../Toolbar/Toolbar";
 import { ImageViewProvider } from "./ImageViewContext";
 import { Hotkey } from "../../core/Hotkey";
-import { useObserver } from "mobx-react";
 import ResizeObserver from "../../utils/resize-observer";
 import { debounce } from "@humansignal/core/lib/utils/debounce";
 import Constants from "../../core/Constants";
@@ -271,7 +270,7 @@ const TransformerBack = observer(({ item }) => {
   );
 });
 
-const SelectedRegions = observer(({ item, selectedRegions }) => {
+const _SelectedRegions = observer(({ item, selectedRegions }) => {
   if (!selectedRegions) return null;
   const { brushRegions = [], shapeRegions = [] } = splitRegions(selectedRegions);
 
@@ -444,7 +443,7 @@ const PixelGridLayer = observer(({ item }) => {
   const visible = item.zoomScale > ZOOM_THRESHOLD;
   const { naturalWidth, naturalHeight } = item.currentImageEntity ?? {};
   const { stageWidth, stageHeight } = item;
-  const imageSmallerThanStage = naturalWidth < stageWidth || naturalHeight < stageHeight;
+  const _imageSmallerThanStage = naturalWidth < stageWidth || naturalHeight < stageHeight;
 
   const step = item.stageZoom; // image pixel
 
@@ -568,9 +567,9 @@ export default observer(
       // shape we can click on. Here we're relying on cursor position and non-transparent pixels
       // of the mask to detect cursor-region collision.
       const allowedHoverTypes = /bitmask|vector/i;
-      const hasSelected = item.selectedRegions.some((r) => r.type.match(allowedHoverTypes) !== null);
+      const _hasSelected = item.selectedRegions.some((r) => r.type.match(allowedHoverTypes) !== null);
       const tool = item.getToolsManager().findSelectedTool();
-      const isAllowedTool = tool?.toolName?.match?.(allowedHoverTypes) !== null ?? false;
+      const _isAllowedTool = tool?.toolName?.match?.(allowedHoverTypes) !== null ?? false;
 
       const hoveredRegion = item.regs.find((reg) => {
         if (reg.selected || tool?.mode === "drawing") return false;
@@ -1326,7 +1325,7 @@ const CursorLayer = observer(({ item, tool }) => {
   useEffect(() => {
     if (!item.stageRef) return;
     const stage = item.stageRef;
-    const onMouseMove = (e) => {
+    const onMouseMove = (_e) => {
       const { x, y } = stage.getPointerPosition();
       const { x: deltaX, y: deltaY } = stage.position();
       const { x: scaleX, y: scaleY } = stage.scale();

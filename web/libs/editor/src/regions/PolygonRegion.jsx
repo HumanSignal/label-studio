@@ -473,7 +473,7 @@ const Edges = memo(
     }
     return (
       <Group key={name} name={name}>
-        {points.map((p, idx) => {
+        {points.map((_p, idx) => {
           const idx1 = idx;
           const idx2 = idx === points.length - 1 ? 0 : idx + 1;
 
@@ -524,7 +524,7 @@ const HtxPolygonView = ({ item, setShapeRef }) => {
     }
     return (
       <Group key={name} name={name}>
-        {points.map((p, idx) => renderCircle({ points, idx }))}
+        {points.map((_p, idx) => renderCircle({ points, idx }))}
       </Group>
     );
   }

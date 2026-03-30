@@ -136,7 +136,7 @@ export const tryToParseJSON = (value) => {
   if (isString(value) && value[0] === "{") {
     try {
       return JSON.parse(value);
-    } catch (e) {
+    } catch (_e) {
       // somthing went wrong
     }
   }

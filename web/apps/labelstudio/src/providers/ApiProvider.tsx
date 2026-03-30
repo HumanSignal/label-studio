@@ -115,7 +115,7 @@ export const ApiProvider = forwardRef<ApiContextType, PropsWithChildren<Record<s
   /**
    * Handles fatal errors like 401 and 404.
    */
-  const handleFatalError = useCallback((errorDetails: FormattedError, result: ApiResponse) => {
+  const handleFatalError = useCallback((_errorDetails: FormattedError, result: ApiResponse) => {
     if (apiLocked) return;
 
     const status = result.$meta?.status;

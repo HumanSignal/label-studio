@@ -1,36 +1,39 @@
 import { render, waitFor } from "@testing-library/react";
 import { PlaygroundApp } from "../PlaygroundApp";
-import { useAtom, useSetAtom } from "jotai";
+import * as jotaiModule from "jotai";
 import { configAtom, errorAtom, loadingAtom } from "../../../atoms/configAtoms";
-
-// Mock CodeEditor and allow it to be spied on
-jest.mock("../../EditorPanel", () => ({
-  EditorPanel: () => <div>EditorPanel</div>,
-}));
-jest.mock("../../PreviewPanel", () => ({
-  PreviewPanel: () => <div>PreviewPanel</div>,
-}));
-jest.mock("@humansignal/ui", () => ({
-  ...jest.requireActual("@humansignal/ui"),
-  ThemeToggle: () => <div>ThemeToggle</div>,
-  ToastProvider: ({ children }: { children: React.ReactNode }) => children,
-  useToast: () => ({
-    show: jest.fn(),
-  }),
-}));
-
-// Mock the atoms
-jest.mock("jotai", () => {
-  const originalModule = jest.requireActual("jotai");
-  return {
-    ...originalModule,
-    useAtom: jest.fn(),
-    useSetAtom: jest.fn(),
-  };
-});
+import type { Mock } from "bun:test";
+import * as editorPanelModule from "../../EditorPanel";
+import * as previewPanelModule from "../../PreviewPanel";
+import * as toastModule from "@humansignal/ui/lib/toast/toast";
+import * as uiModule from "@humansignal/ui";
 
 // Mock the fetch function
-global.fetch = jest.fn();
+global.fetch = mock();
+const originalDefineProperty = Object.defineProperty;
+
+beforeAll(() => {
+  Object.defineProperty = ((target: object, property: PropertyKey, descriptor: PropertyDescriptor) => {
+    if (target === window && property === "location" && descriptor && "value" in descriptor) {
+      const nextValue = (descriptor as any).value;
+      const href = typeof nextValue === "string" ? nextValue : nextValue?.toString?.();
+      if (href) {
+        try {
+          window.history.replaceState({}, "", href);
+        } catch {
+          const parsed = new URL(href, window.location.origin);
+          window.history.replaceState({}, "", `${parsed.pathname}${parsed.search}${parsed.hash}`);
+        }
+        return target;
+      }
+    }
+    return originalDefineProperty(target, property, descriptor);
+  }) as typeof Object.defineProperty;
+});
+
+afterAll(() => {
+  Object.defineProperty = originalDefineProperty;
+});
 
 function removeAllSpaceLikeCharacters(str: string): string {
   return str
@@ -38,21 +41,42 @@ function removeAllSpaceLikeCharacters(str: string): string {
     .replace(/·/g, ""); // Remove the special middle dot character
 }
 
+function setWindowLocation(url: string) {
+  try {
+    window.history.replaceState({}, "", url);
+  } catch {
+    const parsed = new URL(url, window.location.origin);
+    window.history.replaceState({}, "", `${parsed.pathname}${parsed.search}${parsed.hash}`);
+  }
+}
+
 describe("PlaygroundApp", () => {
-  const mockSetConfig = jest.fn();
-  const mockSetError = jest.fn();
-  const mockSetLoading = jest.fn();
-  const mockSetInterfaces = jest.fn();
+  const mockSetConfig = mock();
+  const mockSetError = mock();
+  const mockSetLoading = mock();
+  const mockSetInterfaces = mock();
 
   beforeEach(() => {
-    jest.clearAllMocks();
-    (useAtom as jest.Mock).mockImplementation((atom) => {
+    mock.clearAllMocks();
+
+    spyOn(editorPanelModule, "EditorPanel").mockImplementation(() => <div>EditorPanel</div>);
+    spyOn(previewPanelModule, "PreviewPanel").mockImplementation(() => <div>PreviewPanel</div>);
+    spyOn(uiModule, "ThemeToggle").mockImplementation(() => <div>ThemeToggle</div>);
+    // PlaygroundApp imports toast from the subpath; mock must target that module. A pass-through
+    // ToastProvider omits Radix ToastPrimitive.Provider, so ToastViewport must be stubbed too.
+    spyOn(toastModule, "ToastProvider").mockImplementation(({ children }: any) => (
+      <div data-testid="toast-provider">{children}</div>
+    ));
+    spyOn(toastModule, "ToastViewport").mockImplementation(() => <div data-testid="toast-viewport" />);
+    spyOn(uiModule, "useToast").mockReturnValue({ show: mock() });
+
+    spyOn(jotaiModule, "useAtom").mockImplementation((atom: any) => {
       if (atom === configAtom) return ["", mockSetConfig];
       if (atom === errorAtom) return ["", mockSetError];
       if (atom === loadingAtom) return [false, mockSetLoading];
       return [null, mockSetInterfaces];
     });
-    (useSetAtom as jest.Mock).mockImplementation((atom) => {
+    spyOn(jotaiModule, "useSetAtom").mockImplementation((atom: any) => {
       if (atom === configAtom) return (c: string) => mockSetConfig(removeAllSpaceLikeCharacters(c));
       if (atom === errorAtom) return mockSetError;
       if (atom === loadingAtom) return mockSetLoading;
@@ -112,7 +136,7 @@ describe("PlaygroundApp", () => {
     });
 
     // Mock successful fetch response
-    (global.fetch as jest.Mock).mockResolvedValueOnce({
+    (global.fetch as Mock<any>).mockResolvedValueOnce({
       ok: true,
       text: () => Promise.resolve(mockConfig),
     });
@@ -138,7 +162,7 @@ describe("PlaygroundApp", () => {
     });
 
     // Mock failed fetch response
-    (global.fetch as jest.Mock).mockRejectedValueOnce(new Error("Failed to fetch"));
+    (global.fetch as Mock<any>).mockRejectedValueOnce(new Error("Failed to fetch"));
 
     render(<PlaygroundApp />);
 
@@ -161,7 +185,7 @@ describe("PlaygroundApp", () => {
     });
 
     // Mock non-200 fetch response
-    (global.fetch as jest.Mock).mockResolvedValueOnce({
+    (global.fetch as Mock<any>).mockResolvedValueOnce({
       ok: false,
     });
 
@@ -1254,11 +1278,7 @@ describe("PlaygroundApp", () => {
     </View>`,
       },
     ])("$name", async ({ url, expectedConfig }) => {
-      Object.defineProperty(window, "location", {
-        value: new URL(url),
-        writable: true,
-        configurable: true,
-      });
+      setWindowLocation(url);
 
       render(<PlaygroundApp />);
 

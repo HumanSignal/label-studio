@@ -7,7 +7,7 @@ Based on Tailwind and Shadcn. Still WIP with the Design System, so refer to offi
 
 ## Running unit tests
 
-Run `yarn nx test ui` to execute the unit tests via [Jest](https://jestjs.io).
+Run `yarn test:unit:ui` to execute the unit tests via [Bun](https://bun.sh/docs/test/writing).
 
 ## Running Storybook
 

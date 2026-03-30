@@ -30,7 +30,7 @@ describe("InstructionsModal Component", () => {
   });
 
   it("should call onCancel when the modal is cancelled", () => {
-    const onCancel = jest.fn();
+    const onCancel = mock();
     const { getByLabelText } = render(
       <InstructionsModal title="Test Title" visible={true} onCancel={onCancel}>
         <p>Test Children</p>

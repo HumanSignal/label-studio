@@ -1298,7 +1298,7 @@ export class Visualizer extends Events<VisualizerEvents> {
 
     const timelineLayer = this.getLayer("timeline");
     const waveformLayer = this.getLayer("waveform");
-    const spectrogramLayer = this.getLayer("spectrogram");
+    const _spectrogramLayer = this.getLayer("spectrogram");
 
     // Calculate Y offset based on composition structure
     let offsetY = 0;

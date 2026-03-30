@@ -1,7 +1,6 @@
 import { LabelStudio, Modals, Sidebar, Textarea, ToolBar } from "@humansignal/frontend-test/helpers/LSF";
 import {
   simpleData,
-  textareaConfigPerRegion,
   textareaConfigSimple,
   textareaConfigWithValue,
   textareaConfigWithValueAndRows,
@@ -13,7 +12,6 @@ import {
   textareaPerRegionRegionListData,
   textareaPerRegionRegionListResult,
   textareaSkipDuplicatesError,
-  textareaResultsPerRegion,
 } from "../../data/control_tags/textarea";
 
 describe("Control Tags - TextArea - Pre-filled Value", () => {

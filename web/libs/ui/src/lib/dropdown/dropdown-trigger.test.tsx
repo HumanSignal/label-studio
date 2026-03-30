@@ -1,44 +1,39 @@
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
-import "@testing-library/jest-dom";
 import { useRef } from "react";
 import { DropdownTrigger } from "./dropdown-trigger";
 import type { DropdownRef } from "./dropdown";
+import * as dropdownModule from "./dropdown";
 
 // Create a mock dropdown element factory
 const createMockDropdownElement = () => {
   const mockElement = {
-    contains: jest.fn(() => false),
-    addEventListener: jest.fn(),
-    removeEventListener: jest.fn(),
+    contains: mock(() => false),
+    addEventListener: mock(),
+    removeEventListener: mock(),
   };
   return mockElement as any;
 };
 
-// Mock the dropdown component to avoid complex portal rendering in tests
-jest.mock("./dropdown", () => ({
-  Dropdown: ({ children, ref }: any) => {
-    // Simulate dropdown ref API
-    if (ref) {
-      const mockRef: any = {
-        dropdown: createMockDropdownElement(),
-        visible: false,
-        toggle: jest.fn(),
-        open: jest.fn(),
-        close: jest.fn(),
-      };
-      if (typeof ref === "function") {
-        ref(mockRef);
-      } else {
-        ref.current = mockRef;
-      }
-    }
-    return <div data-testid="dropdown-content">{children}</div>;
-  },
-}));
-
 describe("DropdownTrigger - Context Menu Mode", () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    mock.clearAllMocks();
+    spyOn(dropdownModule, "Dropdown").mockImplementation(({ children, ref }: any) => {
+      if (ref) {
+        const mockRef: any = {
+          dropdown: createMockDropdownElement(),
+          visible: false,
+          toggle: mock(),
+          open: mock(),
+          close: mock(),
+        };
+        if (typeof ref === "function") {
+          ref(mockRef);
+        } else {
+          ref.current = mockRef;
+        }
+      }
+      return <div data-testid="dropdown-content">{children}</div>;
+    });
   });
 
   describe("Basic Rendering", () => {
@@ -109,7 +104,7 @@ describe("DropdownTrigger - Context Menu Mode", () => {
       });
 
       // Should not prevent default in click mode
-      const preventDefaultSpy = jest.spyOn(contextMenuEvent, "preventDefault");
+      const preventDefaultSpy = spyOn(contextMenuEvent, "preventDefault");
       fireEvent(trigger, contextMenuEvent);
 
       expect(preventDefaultSpy).not.toHaveBeenCalled();
@@ -167,8 +162,8 @@ describe("DropdownTrigger - Context Menu Mode", () => {
         clientY: 200,
       });
 
-      const preventDefaultSpy = jest.spyOn(contextMenuEvent, "preventDefault");
-      const stopPropagationSpy = jest.spyOn(contextMenuEvent, "stopPropagation");
+      const preventDefaultSpy = spyOn(contextMenuEvent, "preventDefault");
+      const stopPropagationSpy = spyOn(contextMenuEvent, "stopPropagation");
 
       fireEvent(trigger, contextMenuEvent);
 

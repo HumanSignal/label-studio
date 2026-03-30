@@ -3,7 +3,7 @@
  */
 import { types } from "mobx-state-tree";
 
-jest.mock("../../tags/object/Video", () => {
+mockModule("../../tags/object/Video", () => {
   const { types } = require("mobx-state-tree");
   return {
     VideoModel: types
@@ -36,8 +36,8 @@ const TestRoot = types
       sequence: [],
     }),
   })
-  .actions((self) => ({
-    createSerializedResult(region, value) {
+  .actions((_self) => ({
+    createSerializedResult(_region, value) {
       return { value: { ...value }, original_width: 100, original_height: 100, image_rotation: 0 };
     },
   }));

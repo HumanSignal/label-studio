@@ -141,7 +141,7 @@ export const StorageProviderForm = forwardRef<unknown, StorageProviderFormProps>
     // Handle modal hide (including Escape key)
     useEffect(() => {
       if (onHide) {
-        const handleModalHide = () => {
+        const _handleModalHide = () => {
           resetForm();
           setFilesPreview(null);
           setConnectionChecked(false);

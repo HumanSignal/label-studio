@@ -1,36 +1,17 @@
 import { render, fireEvent } from "@testing-library/react";
 import { Provider } from "mobx-react";
 import { Controls } from "../Controls";
-
-jest.mock("@humansignal/ui", () => {
-  const { forwardRef } = jest.requireActual("react");
-  return {
-    Button: forwardRef(({ children, disabled, ...props }: any, ref: any) => {
-      return (
-        <button {...props} ref={ref} data-testid="button" disabled={disabled}>
-          {children}
-        </button>
-      );
-    }),
-    Tooltip: ({ children, title }: any) => {
-      return (
-        <div data-testid="tooltip" title={title}>
-          {children}
-        </div>
-      );
-    },
-  };
-});
+import * as uiModule from "@humansignal/ui";
 
 const createMockStore = (overrides: any = {}) => ({
   task: { id: 1, allow_skip: true, ...overrides.task },
-  skipTask: jest.fn(),
+  skipTask: mock(),
   isSubmitting: false,
   settings: {
     enableTooltips: true,
     ...overrides.settings,
   },
-  hasInterface: jest.fn((name: string) => overrides.interfaces?.includes(name) ?? false),
+  hasInterface: mock((name: string) => overrides.interfaces?.includes(name) ?? false),
   annotationStore: {
     selectedHistory: undefined,
     selected: {
@@ -41,14 +22,14 @@ const createMockStore = (overrides: any = {}) => ({
     ...overrides.annotationStore,
   },
   commentStore: {
-    commentFormSubmit: jest.fn(),
+    commentFormSubmit: mock(),
     addedCommentThisSession: false,
     currentComment: {},
     inputRef: { current: null },
-    setTooltipMessage: jest.fn(),
+    setTooltipMessage: mock(),
     ...overrides.commentStore,
   },
-  rejectAnnotation: jest.fn(),
+  rejectAnnotation: mock(),
   ...overrides,
 });
 
@@ -56,6 +37,7 @@ const createMockStore = (overrides: any = {}) => ({
 const setupAppSettings = (options: { role?: string; enterprise?: boolean } = {}) => {
   (window as any).APP_SETTINGS = {
     user: {
+      id: 999,
       role: options.role,
     },
     billing: {
@@ -66,8 +48,17 @@ const setupAppSettings = (options: { role?: string; enterprise?: boolean } = {})
 
 describe("TopBar Controls", () => {
   beforeEach(() => {
-    jest.clearAllMocks();
-    // Reset APP_SETTINGS before each test
+    mock.clearAllMocks();
+    spyOn(uiModule, "Button").mockImplementation(({ children, disabled, ...props }: any) => (
+      <button {...props} data-testid="button" disabled={disabled}>
+        {children}
+      </button>
+    ));
+    spyOn(uiModule, "Tooltip").mockImplementation(({ children, title }: any) => (
+      <div data-testid="tooltip" title={title}>
+        {children}
+      </div>
+    ));
     (window as any).APP_SETTINGS = undefined;
   });
 

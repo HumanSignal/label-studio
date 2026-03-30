@@ -631,7 +631,7 @@ export const Tab = types
         const filterType = self.availableFilters.find((ft) => ft.field.id === firstChildColumn.id);
 
         if (filterType) {
-          const childFilter = self.createChildFilterForType(filterType, rootFilter);
+          const _childFilter = self.createChildFilterForType(filterType, rootFilter);
         }
       }
     },
