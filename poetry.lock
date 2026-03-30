@@ -3507,18 +3507,18 @@ typing-extensions = ">=4.6.0,<4.7.0 || >4.7.0"
 
 [[package]]
 name = "pygments"
-version = "2.16.1"
+version = "2.20.0"
 description = "Pygments is a syntax highlighting package written in Python."
 optional = false
-python-versions = ">=3.7"
+python-versions = ">=3.9"
 groups = ["main", "build"]
 files = [
-    {file = "Pygments-2.16.1-py3-none-any.whl", hash = "sha256:13fc09fa63bc8d8671a6d247e1eb303c4b343eaee81d861f3404db2935653692"},
-    {file = "Pygments-2.16.1.tar.gz", hash = "sha256:1daff0494820c69bc8941e407aa20f577374ee88364ee10a98fdbe0aece96e29"},
+    {file = "pygments-2.20.0-py3-none-any.whl", hash = "sha256:81a9e26dd42fd28a23a2d169d86d7ac03b46e2f8b59ed4698fb4785f946d0176"},
+    {file = "pygments-2.20.0.tar.gz", hash = "sha256:6757cd03768053ff99f3039c1a36d6c0aa0b263438fcab17520b30a303a82b5f"},
 ]
 
 [package.extras]
-plugins = ["importlib-metadata ; python_version < \"3.8\""]
+windows-terminal = ["colorama (>=0.4.6)"]
 
 [[package]]
 name = "pyjwt"
