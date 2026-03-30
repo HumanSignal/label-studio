@@ -31,6 +31,7 @@ export const ViewColumnType = types.enumeration([
   "Unknown",
   "AgreementSelected",
   "TaskState",
+  "PaymentStatus",
 ]);
 
 const typeShortMap = {
@@ -111,6 +112,7 @@ export const TabColumn = types
         if (!self.parent) {
           const value = data[self.alias];
 
+          if (self.type === "PaymentStatus") return value ?? null;
           return typeof value === "object" ? null : value;
         }
 
