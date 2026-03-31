@@ -4,6 +4,7 @@ import installLogsPrinter from "cypress-terminal-report/src/installLogsPrinter";
 import * as tasks from "./tasks";
 import { disableChromeGPU } from "./plugins/disable_gpu";
 import { addMatchImageSnapshotPlugin } from "./cypress-image-snapshot/plugin";
+import { coverageParallel } from "./plugins/coverage_parallel.js";
 
 const COLLECT_COVERAGE = process.env.COLLECT_COVERAGE === "true" || process.env.COLLECT_COVERAGE === "1";
 
@@ -51,6 +52,7 @@ export default function (
         });
 
         addMatchImageSnapshotPlugin(on, config);
+        coverageParallel(on, config);
         on("task", { ...tasks });
         installLogsPrinter(on, {
           outputVerbose: false,
