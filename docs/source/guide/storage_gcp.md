@@ -780,8 +780,9 @@ Before you begin:
 
 You will be working in two Google Cloud projects:
 
-* Your target Google Cloud project. This is where your GCS buckets are located. 
-* Your GKE project. This is where you have deployed Label Studio using GKE.
+* [Your base GKE project.](#Configure-the-GKE-project-platform-administrator) This is where you have deployed Label Studio using GKE.
+* [Your target Google Cloud project.](#Configure-the-target-Google-Cloud-project) This is where your GCS buckets are located. 
+
 
 ### Configure the GKE project (platform administrator)
 
