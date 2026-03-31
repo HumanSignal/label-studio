@@ -24,6 +24,7 @@ export * from "./lib/select/select";
 export * from "./lib/tag-autocomplete";
 export * from "./lib/skeleton/skeleton";
 export * from "./lib/state-chip/state-chip";
+export * from "./lib/stepper";
 export * from "./lib/tabs";
 export * from "./lib/toast/toast";
 export * from "./lib/toggle/toggle";
