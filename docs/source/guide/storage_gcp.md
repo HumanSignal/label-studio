@@ -751,9 +751,7 @@ After adding the storage, click **Sync**.
 
 In Label Studio Enterprise, if you are deploying Label Studio in GKE, you can set up service account impersonation.
 
-Google Cloud Storage service account impersonation allows a Google Cloud service account to temporarily assume the permissions of another service account without requiring access to its keys. 
-
-Unlike with application credentials, WIF allows you to use temporary credentials. Each time you make a request to GCS, Label Studio connects to your identity pool to request temporary credentials.
+Google Cloud Storage service account impersonation allows a Google Cloud service account to temporarily assume the permissions of another service account without requiring access to its keys.
 
 For more information, see [Google Cloud Storage with service account impersonation for GKE](https://docs.humansignal.com/guide/storage_gcp.html#Google-Cloud-Storage-with-service-account-impersonation-for-GKE) in our Enterprise documentation.
 
