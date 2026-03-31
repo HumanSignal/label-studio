@@ -487,33 +487,6 @@
       "version": 6,
       "deleted": false
     },
-    "ff_front_dev_1682_model_version_dropdown_070622_short": {
-      "key": "ff_front_dev_1682_model_version_dropdown_070622_short",
-      "on": false,
-      "prerequisites": [],
-      "targets": [],
-      "contextTargets": [],
-      "rules": [],
-      "fallthrough": {
-        "variation": 0
-      },
-      "offVariation": 1,
-      "variations": [
-        true,
-        false
-      ],
-      "clientSideAvailability": {
-        "usingMobileKey": false,
-        "usingEnvironmentId": false
-      },
-      "clientSide": false,
-      "salt": "58f4f819d52b461b9e833cdb896311d6",
-      "trackEvents": false,
-      "trackEventsFallthrough": false,
-      "debugEventsUntilDate": null,
-      "version": 9,
-      "deleted": false
-    },
     "ff_front_dev_2186_comments_for_update": {
       "key": "ff_front_dev_2186_comments_for_update",
       "on": false,
