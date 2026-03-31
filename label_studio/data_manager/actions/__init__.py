@@ -28,7 +28,7 @@ class DataManagerAction(TypedDict):
     order: int
     experimental: Optional[bool]
     dialog: dict
-    hidden: Optional[bool]
+    hidden: Optional[Union[bool, Callable]]
     disabled: Optional[Callable]
     disabled_reason: Optional[str]
     enterprise_badge: Optional[bool]
@@ -61,10 +61,15 @@ def get_all_actions(user, project):
     actions: list[DataManagerAction] = sorted(actions, key=lambda x: x['order'])
 
     check_permission = load_func(settings.DATA_MANAGER_CHECK_ACTION_PERMISSION)
+
+    def _is_hidden(action):
+        hidden = action.get('hidden', False)
+        return hidden(user, project) if callable(hidden) else hidden
+
     actions = [
         {key: action[key] for key in action if key != 'entry_point'}
         for action in actions
-        if not action.get('hidden', False) and check_permission(user, action, project)
+        if not _is_hidden(action) and check_permission(user, action, project)
     ]
     # remove experimental features if they are disabled
     if not (
@@ -79,6 +84,10 @@ def get_all_actions(user, project):
         form_generator = action.get('dialog', {}).get('form')
         if callable(form_generator):
             action['dialog']['form'] = None
+
+        hidden_value = action.get('hidden')
+        if callable(hidden_value):
+            action['hidden'] = False
 
         disabled_generator = action.get('disabled')
         if callable(disabled_generator):
