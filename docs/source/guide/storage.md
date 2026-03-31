@@ -19,6 +19,7 @@ Integrate popular cloud and external storage systems with Label Studio to collec
 | [Amazon S3 with IAM role](storage_s3#Amazon-S3-with-IAM-role) | ❌ | ✅ |
 | [Google Cloud Storage](storage_gcp) | ✅ | ✅ |
 | [Google Cloud Storage WIF Auth](storage_gcp#Google-Cloud-Storage-with-Workload-Identity-Federation-WIF) | ❌ | ✅ |
+| [Google Cloud Storage with service account impersonation for GKE](storage_gcp#Google-Cloud-Storage-with-service-account-impersonation-for-GKE) | ❌ | ✅ |
 | [Microsoft Azure Blob Storage](storage_azure) | ✅ | ✅ |
 | [Microsoft Azure Blob Storage with Service Principal](storage_azure#Azure-blob-storage-with-Service-Principal) | ❌ | ✅ |
 | [Databricks Files (UC Volumes)](storage_databricks) | ❌ | ✅ |

@@ -663,8 +663,6 @@ If everything looks correct, click **Save & Sync** to sync immediately, or click
 !!! info Tip
     You can also use the API to [sync import storage](https://api.labelstud.io/api-reference/api-reference/import-storage/gcswif/sync).
 
-
-
 ### Create a target storage connection
 
 From Label Studio, open your project and select **Settings > Cloud Storage > Add Target Storage**.
@@ -747,10 +745,370 @@ After adding the storage, click **Sync**.
 </div>
 
 
+## Google Cloud Storage with service account impersonation for GKE
+
+<div class="opensource-only">
+
+In Label Studio Enterprise, if you are deploying Label Studio in GKE, you can set up service account impersonation.
+
+Google Cloud Storage service account impersonation allows a Google Cloud service account to temporarily assume the permissions of another service account without requiring access to its keys. 
+
+Unlike with application credentials, WIF allows you to use temporary credentials. Each time you make a request to GCS, Label Studio connects to your identity pool to request temporary credentials.
+
+For more information, see [Google Cloud Storage with service account impersonation for GKE](https://docs.humansignal.com/guide/storage_gcp.html#Google-Cloud-Storage-with-service-account-impersonation-for-GKE) in our Enterprise documentation.
+
+</div>
+
+<div class="enterprise-only">
+
+Google Cloud Storage service account impersonation allows a Google Cloud service account to temporarily assume the permissions of another service account without requiring access to its keys. 
+
+When deploying Label Studio on Google Kubernetes Engine (GKE), workloads typically authenticate using a Kubernetes service account mapped to a Google Cloud service account through Workload Identity. However, this directly linked GCP service account might not have broad access to your GCS buckets. 
+
+With service account impersonation, the workload's GCP service account can instead impersonate a separate, more privileged service account that has the necessary storage permissions. This approach eliminates the need to create, distribute, and rotate long-lived service account keys, reducing the risk of credential leakage. 
+
+For more information, see:
+
+* [Service account impersonation](https://cloud.google.com/iam/docs/service-account-impersonation)
+* [Use service account impersonation](https://cloud.google.com/docs/authentication/use-service-account-impersonation) 
+
+Before you begin:
+
+* Review the information in [Cloud storage for projects](storage) and [Secure access to cloud storage](security.html#Secure-access-to-cloud-storage).
+* [Configure access to your bucket](#Configure-access-to-your-GCS-bucket).
+* You will need the **base service account email** from your Label Studio platform administrator. This is the GCP service account that is bound to the Kubernetes service account running Label Studio via GKE Workload Identity. If this has not been set up yet, see [Configure the GKE project (platform administrator)](#Configure-the-GKE-project-platform-administrator) below.
+
+You will be working in two Google Cloud projects:
+
+* Your target Google Cloud project. This is where your GCS buckets are located. 
+* Your GKE project. This is where you have deployed Label Studio using GKE.
+
+### Configure the GKE project (platform administrator)
+
+This is a one-time setup performed by the platform administrator who manages the Label Studio deployment in GKE. If this has already been completed, you can skip to [Configure the target Google Cloud project](#Configure-the-target-Google-Cloud-project) and request the base service account email from your administrator.
+
+
+#### Enable the feature flag
+
+You must enable the `fflag_feat_bros_763_gcs_sa_impersonation` feature flag in your Label Studio deployment in order to use service account impersonation. You can add this under [extraEnvironmentVars](helm_values#The-global-extraEnvironmentVars-usage) in your helm chart:
+
+```yaml
+global:
+  extraEnvironmentVars:
+      FFLAG_FEAT_BROS_763_GCS_SA_IMPERSONATION: "true"
+```
+
+#### Create a base service account
+
+Create a GCP service account in the GKE project that will serve as the identity for your Label Studio pods. This is the "base" service account that will later be granted permission to impersonate target service accounts in other projects.
+
+1. From the Google Cloud Console, ensure you are in the **GKE project** (the project where Label Studio is deployed).
+2. Go to [**IAM & Admin > Service Accounts**](https://console.cloud.google.com/iam-admin/serviceAccounts).
+3. Click **Create Service Account**.
+4. Enter a name and description (for example, `lse-base`).
+5. Click **Done**. No additional roles need to be granted at this stage.
+6. Note the service account email (for example, `lse-base@your-gke-project.iam.gserviceaccount.com`). This is the **base service account email** that you will share with data teams who need to configure bucket access.
+
+#### Bind the base service account to the Kubernetes service account
+
+Use [GKE Workload Identity](https://cloud.google.com/kubernetes-engine/docs/how-to/workload-identity) to link the GCP base service account to the Kubernetes service account used by your Label Studio pods. This allows the pods to automatically authenticate as the base service account without managing keys.
+
+1. Add the Workload Identity annotation to the Kubernetes service account used by Label Studio:
+
+    ```shell
+    kubectl annotate serviceaccount label-studio-sa \
+      --namespace=label-studio \
+      iam.gke.io/gcp-service-account=BASE_SA_EMAIL
+    ```
+
+    Replace `label-studio-sa` and `label-studio` with your actual Kubernetes service account name and namespace, and `BASE_SA_EMAIL` with the email from the previous step.
+
+2. Grant the Workload Identity User role so the Kubernetes service account can act as the GCP service account:
+
+    ```shell
+    gcloud iam service-accounts add-iam-policy-binding BASE_SA_EMAIL \
+      --role="roles/iam.workloadIdentityUser" \
+      --member="serviceAccount:GKE_PROJECT_ID.svc.id.goog[NAMESPACE/KSA_NAME]"
+    ```
+
+    Where:
+
+    * `BASE_SA_EMAIL` is the base service account email (for example, `lse-base@your-gke-project.iam.gserviceaccount.com`).
+    * `GKE_PROJECT_ID` is the ID of your GKE project.
+    * `NAMESPACE` is the Kubernetes namespace where Label Studio is deployed (for example, `label-studio`).
+    * `KSA_NAME` is the name of the Kubernetes service account used by Label Studio (for example, `label-studio-sa`).
+
+3. Verify the binding is working by running a test pod:
+
+    ```shell
+    kubectl run workload-identity-test \
+      --image=google/cloud-sdk:slim \
+      --serviceaccount=label-studio-sa \
+      --namespace=label-studio \
+      -it --rm -- gcloud auth list
+    ```
+
+    The output should show the base service account email as the active account.
+
+For more information, see [Use Workload Identity](https://cloud.google.com/kubernetes-engine/docs/how-to/workload-identity) in the Google Cloud documentation.
+
+<details>
+<summary>Using Terraform</summary>
+<br>
+
+```hcl
+resource "google_service_account" "lse_base" {
+  project      = "your-gke-project"
+  account_id   = "lse-base"
+  display_name = "Label Studio Base SA"
+}
+
+resource "google_service_account_iam_member" "workload_identity_binding" {
+  service_account_id = google_service_account.lse_base.name
+  role               = "roles/iam.workloadIdentityUser"
+  member             = "serviceAccount:your-gke-project.svc.id.goog[label-studio/label-studio-sa]"
+}
+```
+
+Replace `your-gke-project`, `label-studio`, and `label-studio-sa` with your actual project ID, namespace, and Kubernetes service account name.
+
+</details>
+
+### Configure the target Google Cloud project
+
+#### Step 1: Create a service account in your target Google Cloud project
+
+In your Google Cloud project where your bucket is located, create a service account that Label Studio will impersonate to access your data.
+
+1. From the Google Cloud Console, go to [**IAM & Admin > Service Accounts**](https://console.cloud.google.com/iam-admin/serviceAccounts).
+2. Click **Create Service Account**.
+3. Enter a name and description (for example, `sa-label-studio-data`).
+4. Click **Create and Continue**.
+5. Note the service account email (for example, `sa-label-studio-data@your-data-project.iam.gserviceaccount.com`). You will need this later.
+
+See [Create service accounts](https://cloud.google.com/iam/docs/service-accounts-create) in the Google Cloud documentation.
+
+#### Step 2: Grant the target service account access to your bucket
+
+Grant the target service account the appropriate roles on the Google Cloud Storage bucket that you want to connect to Label Studio. The roles you need depend on how you plan to use the storage:
+
+* For **source storage** (importing data): `roles/storage.objectViewer`
+* For **target storage** (exporting annotations): `roles/storage.objectCreator`
+* For both import and export: Grant both roles.
+
+1. Go to [**Cloud Storage > Buckets**](https://console.cloud.google.com/storage/browser) and select your bucket.
+2. Click **Permissions** and then click **Grant Access**.
+3. In the **New principals** field, enter the target service account email you received [in step 1](#Step-1-Create-a-service-account-in-your-target-Google-Cloud-project).
+4. In the **Role** dropdown, select **Storage Object Viewer** (`roles/storage.objectViewer`) for source storage or **Storage Object Creator** (`roles/storage.objectCreator`) for target storage. Use **Add another role** to add both if needed.
+5. Click **Save**.
+
+<details>
+<summary>Using gcloud</summary>
+<br>
+
+For source storage (read access):
+
+```shell
+gcloud storage buckets add-iam-policy-binding gs://YOUR_BUCKET_NAME \
+  --member="serviceAccount:TARGET_SA_EMAIL" \
+  --role="roles/storage.objectViewer"
+```
+
+For target storage (write access):
+
+```shell
+gcloud storage buckets add-iam-policy-binding gs://YOUR_BUCKET_NAME \
+  --member="serviceAccount:TARGET_SA_EMAIL" \
+  --role="roles/storage.objectCreator"
+```
+
+Replace `YOUR_BUCKET_NAME` and `TARGET_SA_EMAIL` with your values.
+
+</details>
+
+#### Step 3: Allow impersonation from the Label Studio base service account
+
+This step authorizes the Label Studio base service account (running in GKE) to impersonate your target service account.
+
+Grant `roles/iam.serviceAccountTokenCreator` to the base service account on the target service account:
+
+1. Go to [**IAM & Admin > Service Accounts**](https://console.cloud.google.com/iam-admin/serviceAccounts) and select the target service account you [created in step 1](#Step-1-Create-a-service-account-in-your-target-Google-Cloud-project).
+2. Click the **Permissions** tab and then click **Grant Access**.
+3. In the **New principals** field, enter the **base service account email** provided by [your Label Studio platform administrator in the base account](Create-a-base-service-account).
+4. In the **Role** dropdown, select **Service Account Token Creator** (`roles/iam.serviceAccountTokenCreator`).
+5. Click **Save**.
+
+<details>
+<summary>Using gcloud</summary>
+<br>
+
+```shell
+gcloud iam service-accounts add-iam-policy-binding TARGET_SA_EMAIL \
+  --member="serviceAccount:BASE_SA_EMAIL" \
+  --role="roles/iam.serviceAccountTokenCreator"
+```
+
+Where:
+
+* `TARGET_SA_EMAIL` is the email of the target service account you received [in step 1](#Step-1-Create-a-service-account-in-your-target-Google-Cloud-project).
+* `BASE_SA_EMAIL` is the base service account email provided by [your Label Studio platform administrator in the base account](Create-a-base-service-account).
+
+</details>
+
+### Create a source storage connection
+
+From Label Studio, open your project and select **Settings > Cloud Storage > Add Source Storage**.
+
+Select **Google Cloud Storage (SA Impersonation)** and click **Next**.
+
+#### Configure Connection
+
+Complete the following fields and then click **Test connection**:
+
+<div class="noheader rowheader">
+
+<table style="width: 100%; border-collapse: collapse;">
+  <tr>
+    <th style="width: 25%;">Field</th>
+    <th>Description</th>
+  </tr>
+
+  <tr>
+    <td>Storage Title</td>
+    <td>Enter a name to identify the storage connection.</td>
+  </tr>
+
+  <tr>
+    <td>Bucket Name</td>
+    <td>
+      Enter the name of your Google Cloud Storage bucket.
+    </td>
+  </tr>
+
+  <tr>
+    <td>Target Service Account Email</td>
+    <td>
+      Enter the email of the target service account you created [in step 1](#Step-1-Create-a-service-account-in-your-target-Google-Cloud-project) (for example, <code>sa-label-studio-data@your-data-project.iam.gserviceaccount.com</code>).
+    </td>
+  </tr>
+
+  <tr>
+    <td>Google Project ID</td>
+    <td>
+      Enter the ID of the Google project in which the bucket is located (for example, <code>your-data-project</code>). You can find this in Google Cloud Console under <strong>IAM & Admin > Settings</strong>.
+    </td>
+  </tr>
+
+  <tr>
+    <td>Use pre-signed URLs (On) /<br/> Proxy through the platform (Off)</td>
+    <td>
+      This determines how data from your bucket is loaded:
+      <ul>
+        <li><strong>Use pre-signed URLs</strong>: Label Studio generates time-limited HTTPS links directly to your GCS objects and redirects the browser there (HTTP 303), so annotators' browsers download media straight from cloud storage. This is usually faster and scales better, but requires correct CORS and presign permissions on the bucket. It also means traffic flows from browser to storage, not through Label Studio.</li>
+        <li><strong>Proxy through the platform</strong> – The backend downloads the file from cloud storage and streams it to the browser, so all media traffic passes through the Label Studio server. This keeps data fully inside the Label Studio/network boundary, enforces task-level access checks on every request, and avoids CORS/presign setup, but uses more Label Studio worker resources and can be slightly slower.</li>
+      </ul>
+      <br/>
+      For more information, see
+      <a href="storage#Pre-signed-URLs-vs-Storage-proxies">Pre-signed URLs vs Storage proxies</a>.
+    </td>
+  </tr>
+
+  <tr>
+    <td>Expire pre-signed URLs (minutes)</td>
+    <td>Control how long pre-signed URLs remain valid.</td>
+  </tr>
+
+</table>
+</div>
+
+#### Import Settings & Preview
+
+Complete the following fields and then click **Load preview** to ensure you are syncing the correct data:
+
+<div class="noheader rowheader">
+
+| | |
+| --- | --- |
+| Bucket Prefix | Optionally, enter the directory name within your bucket that you would like to use.  For example, `data-set-1` or `data-set-1/subfolder-2`.  | 
+| Import Method | Select whether you want create a task for each file in your bucket or whether you would like to use a JSON/JSONL/Parquet file to define the data for each task. |
+| File Name Filter | Specify a regular expression to filter bucket objects. Use `.*` to collect all objects. |
+| Scan all sub-folders | Enable this option to perform a recursive scan across subfolders within your container. |
+
+</div>
+
+#### Review & Confirm
+
+If everything looks correct, click **Save & Sync** to sync immediately, or click **Save** to save your settings and sync later.
+
+### Create a target storage connection
+
+From Label Studio, open your project and select **Settings > Cloud Storage > Add Target Storage**.
+
+Select **Google Cloud Storage (SA Impersonation)** and click **Next**.
+
+Complete the following fields:
+
+<div class="noheader rowheader">
+
+<table style="width: 100%; border-collapse: collapse;">
+
+  <tr>
+    <td style="width: 25%;">Storage Title</td>
+    <td>Enter a name to identify the storage connection.</td>
+  </tr>
+
+  <tr>
+    <td>Bucket Name</td>
+    <td>
+      Enter the name of your GCS bucket.
+    </td>
+  </tr>
+
+  <tr>
+    <td>Bucket Prefix</td>
+    <td>
+      Optionally, enter the directory name within your bucket that you would like to use.  For example, <code>data-set-1</code> or <code>data-set-1/subfolder-2</code>.
+    </td>
+  </tr>
+
+  <tr>
+    <td>Target Service Account Email</td>
+    <td>
+      Enter the email of the target service account you created in Step 1 (for example, <code>sa-label-studio-data@your-data-project.iam.gserviceaccount.com</code>).
+    </td>
+  </tr>
+
+  <tr>
+    <td>Google Project ID</td>
+    <td>
+      Enter the ID of the Google project in which the bucket is located (for example, <code>your-data-project</code>). You can find this in Google Cloud Console under <strong>IAM & Admin > Settings</strong>.
+    </td>
+  </tr>
+
+  <tr>
+    <td>Can delete objects from storage</td>
+    <td>Enable this option if you want to delete annotations stored in the bucket when they are deleted in Label Studio. Your credentials must include the ability to delete bucket objects.</td>
+  </tr>
+
+</table>
+</div>
+
+After adding the storage, click **Sync**.
+
+### Troubleshooting
+
+| Error | Cause | Solution |
+|-------|-------|----------|
+| No **Google Cloud Storage (SA Impersonation)** option in Label Studio | You have not enabled the required feature flag. | Set the feature flag in your Label Studio GKE deployment (see [Enable the feature flag](#Enable-the-feature-flag)). |
+| `403 Permission denied on generateAccessToken` | The base service account does not have permission to impersonate the target service account. | Verify that the base service account has `roles/iam.serviceAccountTokenCreator` on the target service account (see [Step 3](#Step-3-Allow-impersonation-from-the-Label-Studio-base-service-account)). |
+| `404 Service account not found` | The target service account email is incorrect or the account does not exist. | Verify the email ends with `.iam.gserviceaccount.com` and that the account exists in your GCP project. |
+| `403 Access denied to bucket` | The target service account does not have the necessary permissions on the bucket. | Grant `roles/storage.objectViewer` (for source storage) or `roles/storage.objectCreator` (for target storage) to the target service account on the bucket (see [Step 2](#Step-2-Grant-the-target-service-account-access-to-your-bucket)). |
+
+</div>
+
 ## Add storage with the Label Studio API
 
 You can also use the API to programmatically create connections. [See our API documentation.](https://api.labelstud.io/api-reference/introduction/getting-started)
-
 
 ## IP filtering for enhanced security for GCS
 
