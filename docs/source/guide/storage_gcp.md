@@ -797,7 +797,8 @@ global:
       fflag_feat_bros_763_gcs_sa_impersonation: "true"
 ```
 
-> **Note:** The environment variable name must be **lowercase**. The Label Studio feature flag parser matches the `fflag_` prefix in a case-sensitive manner.
+!!! note 
+    The environment variable name must be **lowercase**. The Label Studio feature flag parser matches the `fflag_` prefix in a case-sensitive manner.
 
 #### Create a base service account
 
