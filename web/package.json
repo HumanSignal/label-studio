@@ -161,7 +161,6 @@
     "autoprefixer": "^10.4.20",
     "chai": "^4.3.7",
     "cypress": "^15.13.0",
-    "cypress-image-snapshot": "^4.0.1",
     "cypress-multi-reporters": "^2.0.5",
     "cypress-parallel": "^0.15.0",
     "cypress-terminal-report": "^5.1.1",

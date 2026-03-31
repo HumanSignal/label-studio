@@ -19,8 +19,6 @@ declare namespace Cypress {
       assert: "shouldChange" | "shouldNotChange" | "diff",
       screenshotCompareOptions?: Partial<Loggable & Timeoutable & CompareScreenshotOptions & Thresholdable>,
     ): Chainable<JQuery<Element>>;
-    matchImageSnapshot(options?: { name?: string; threshold?: number }): Chainable<JQuery<Element>>;
-
     /**
      * Waits for a specified number of frames before continuing execution.
      * Uses `requestAnimationFrame` to ensure synchronization with the browser's refresh rate,
