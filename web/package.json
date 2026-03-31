@@ -162,7 +162,6 @@
     "chai": "^4.3.7",
     "cypress": "^15.13.0",
     "cypress-multi-reporters": "^2.0.5",
-    "cypress-parallel": "^0.15.0",
     "cypress-terminal-report": "^5.1.1",
     "esbuild": "^0.25.5",
     "identity-obj-proxy": "^3.0.0",
