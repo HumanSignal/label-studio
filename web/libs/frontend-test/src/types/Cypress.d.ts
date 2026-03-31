@@ -2,6 +2,18 @@ declare namespace Cypress {
   interface Thresholdable {
     threshold?: number;
   }
+  interface MatchImageSnapshotOptions {
+    customDiffConfig?: any;
+    customDiffDir?: string;
+    customSnapshotsDir?: string;
+    customSnapshotIdentifier?: string | ((parameters: any) => string);
+    failureThreshold?: number;
+    failureThresholdType?: "pixel" | "percent";
+    e2eSpecDir?: string;
+    updateSnapshots?: boolean;
+    blur?: number;
+    allowSizeMismatch?: boolean;
+  }
   interface CompareScreenshotOptions extends ScreenshotOptions {
     withHidden: string[];
   }
@@ -18,6 +30,10 @@ declare namespace Cypress {
       name: string,
       assert: "shouldChange" | "shouldNotChange" | "diff",
       screenshotCompareOptions?: Partial<Loggable & Timeoutable & CompareScreenshotOptions & Thresholdable>,
+    ): Chainable<JQuery<Element>>;
+    matchImageSnapshot(
+      nameOrOptions?: string | MatchImageSnapshotOptions,
+      options?: MatchImageSnapshotOptions,
     ): Chainable<JQuery<Element>>;
     /**
      * Waits for a specified number of frames before continuing execution.

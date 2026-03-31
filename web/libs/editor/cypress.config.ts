@@ -1,7 +1,3 @@
-import path from "node:path";
-import { fileURLToPath } from "node:url";
-import configure from "@humansignal/frontend-test/configure";
-
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
+import configure from "../frontend-test/src/configure";
 
 export default configure(undefined, undefined, { rootDir: __dirname });
