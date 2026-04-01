@@ -3,6 +3,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Group } from "react-konva";
 import { useRegionStyles } from "../../../hooks/useRegionColor";
 import { KonvaVector } from "../../../components/KonvaVector/KonvaVector";
+import { generatePointId } from "../../../components/KonvaVector/utils";
 import { LabelOnVideoBbox } from "../../../components/ImageView/LabelOnRegion";
 import ToolsManager from "../../../tools/Manager";
 
@@ -10,58 +11,22 @@ import ToolsManager from "../../../tools/Manager";
  * Convert vertices from percent (0-100) to pixel coords using working area dimensions.
  */
 const percentToPixelVertices = (vertices, waWidth, waHeight) => {
-  return vertices.map((v) => {
-    const result = {
-      ...v,
-      x: (v.x * waWidth) / 100,
-      y: (v.y * waHeight) / 100,
-    };
-
-    if (v.controlPoint1) {
-      result.controlPoint1 = {
-        x: (v.controlPoint1.x * waWidth) / 100,
-        y: (v.controlPoint1.y * waHeight) / 100,
-      };
-    }
-
-    if (v.controlPoint2) {
-      result.controlPoint2 = {
-        x: (v.controlPoint2.x * waWidth) / 100,
-        y: (v.controlPoint2.y * waHeight) / 100,
-      };
-    }
-
-    return result;
-  });
+  return vertices.map((v) => ({
+    ...v,
+    x: (v.x * waWidth) / 100,
+    y: (v.y * waHeight) / 100,
+  }));
 };
 
 /**
  * Convert vertices from pixel coords to percent (0-100) using working area dimensions.
  */
 const pixelToPercentVertices = (vertices, waWidth, waHeight) => {
-  return vertices.map((v) => {
-    const result = {
-      ...v,
-      x: (v.x / waWidth) * 100,
-      y: (v.y / waHeight) * 100,
-    };
-
-    if (v.controlPoint1) {
-      result.controlPoint1 = {
-        x: (v.controlPoint1.x / waWidth) * 100,
-        y: (v.controlPoint1.y / waHeight) * 100,
-      };
-    }
-
-    if (v.controlPoint2) {
-      result.controlPoint2 = {
-        x: (v.controlPoint2.x / waWidth) * 100,
-        y: (v.controlPoint2.y / waHeight) * 100,
-      };
-    }
-
-    return result;
-  });
+  return vertices.map((v) => ({
+    ...v,
+    x: (v.x / waWidth) * 100,
+    y: (v.y / waHeight) * 100,
+  }));
 };
 
 const EPSILON = 1e-6;
@@ -75,24 +40,6 @@ const verticesMatch = (a, b) => {
 
   for (let i = 0; i < a.length; i++) {
     if (Math.abs(a[i].x - b[i].x) > EPSILON || Math.abs(a[i].y - b[i].y) > EPSILON) return false;
-
-    const acp1 = a[i].controlPoint1;
-    const bcp1 = b[i].controlPoint1;
-
-    if (acp1 && bcp1) {
-      if (Math.abs(acp1.x - bcp1.x) > EPSILON || Math.abs(acp1.y - bcp1.y) > EPSILON) return false;
-    } else if (acp1 !== bcp1 && (acp1 || bcp1)) {
-      return false;
-    }
-
-    const acp2 = a[i].controlPoint2;
-    const bcp2 = b[i].controlPoint2;
-
-    if (acp2 && bcp2) {
-      if (Math.abs(acp2.x - bcp2.x) > EPSILON || Math.abs(acp2.y - bcp2.y) > EPSILON) return false;
-    } else if (acp2 !== bcp2 && (acp2 || bcp2)) {
-      return false;
-    }
   }
 
   return true;
@@ -134,14 +81,16 @@ const getPointRadiusFromSize = (control) => {
 
 const getMinPoints = (control) => {
   const val = control?.minpoints;
+  const parsed = Number.parseInt(val);
 
-  return val ? Number.parseInt(val) : undefined;
+  return Number.isFinite(parsed) ? parsed : undefined;
 };
 
 const getMaxPoints = (control) => {
   const val = control?.maxpoints;
+  const parsed = Number.parseInt(val);
 
-  return val ? Number.parseInt(val) : undefined;
+  return Number.isFinite(parsed) ? parsed : undefined;
 };
 
 /**
@@ -167,6 +116,7 @@ const VideoVectorPure = ({
   listening,
   onClick: onClickProp,
   onDragMove,
+  allowOutsideBounds = false,
   ...rest
 }) => {
   const vectorRef = useRef(null);
@@ -220,20 +170,17 @@ const VideoVectorPure = ({
   const pointRadius = useMemo(() => getPointRadiusFromSize(control), [control?.pointsize]);
   const isReadOnly = reg.isReadOnly();
 
-  // Match image VectorRegion's disabled/selected detection pattern exactly:
-  //   model:  disabled = (tool?.disabled) || isReadOnly || (!selected && !isDrawing)
-  //   view:   kvSelected = !disabled,  kvDisabled = isReadOnly
   const objectTag = reg.object;
   const manager = objectTag ? ToolsManager.getInstance({ name: objectTag.name }) : null;
   const selectedTool = manager?.findSelectedTool?.();
   const toolDisabled = selectedTool?.disabled ?? false;
-  const kvDisabled = toolDisabled || isReadOnly || !listening || (!selected && !reg.isDrawing);
-  const kvSelected = !kvDisabled;
+  const disabled = toolDisabled || !listening || (!selected && !reg.isDrawing);
+  const kvSelected = !disabled;
 
   const handleRef = useCallback(
     (kv) => {
       vectorRef.current = kv;
-      reg.setVectorRef(kv);
+      reg.setKonvaVectorRef(kv);
     },
     [reg],
   );
@@ -354,11 +301,20 @@ const VideoVectorPure = ({
   );
 
   return (
-    <Group listening={listening} opacity={reg.hidden ? 0 : 1}>
+    <Group
+      listening={listening}
+      opacity={reg.hidden ? 0 : 1}
+      onClick={(e) => {
+        if (!selected && !e.evt.defaultPrevented) {
+          handleRegionClick(e);
+        }
+      }}
+    >
       <KonvaVector
         key={reg.id}
         ref={handleRef}
         initialPoints={Array.from(pixelVertices)}
+        isMultiRegionSelected={reg.object?.selectedRegions?.length > 1}
         closed={box.closed}
         width={waWidth}
         height={waHeight}
@@ -366,6 +322,7 @@ const VideoVectorPure = ({
         scaleY={1}
         x={0}
         y={0}
+        transformMode={selected && reg.transformMode && !isReadOnly}
         transform={stageTransform}
         fitScale={waScale}
         allowClose={control?.closable ?? false}
@@ -388,17 +345,44 @@ const VideoVectorPure = ({
         pointStyle={control?.pointstyle ?? "circle"}
         disableInternalPointAddition={true}
         disableGhostLine={isDraggingRef.current}
+        allowOutsideBounds={allowOutsideBounds}
         onFinish={handleFinish}
         onPointsChange={handlePointsChange}
         onTransformStart={handleTransformStart}
         onTransformEnd={handleTransformEnd}
         onPathClosedChange={handlePathClosedChange}
-        onClick={handleRegionClick}
-        onMouseEnter={() => {
-          reg.setHighlight(true);
+        onGhostPointClick={(ghostPoint) => {
+          if (reg.isReadOnly()) return;
+
+          const max = getMaxPoints(control);
+          if (max && pixelVertices.length >= max) return;
+
+          const currentPoints = [...pixelVertices];
+          const nextIdx = currentPoints.findIndex((p) => p.id === ghostPoint.nextPointId);
+          if (nextIdx === -1) return;
+
+          const newPoint = {
+            id: generatePointId(),
+            x: ghostPoint.x,
+            y: ghostPoint.y,
+            prevPointId: ghostPoint.prevPointId,
+          };
+
+          currentPoints[nextIdx] = { ...currentPoints[nextIdx], prevPointId: newPoint.id };
+          currentPoints.splice(nextIdx, 0, newPoint);
+
+          commitPoints(currentPoints);
         }}
-        onMouseLeave={() => {
+        onClick={handleRegionClick}
+        onMouseEnter={(e) => {
+          reg.setHighlight(true);
+          const stage = e?.target?.getStage?.();
+          if (stage) stage.container().style.cursor = "pointer";
+        }}
+        onMouseLeave={(e) => {
           reg.setHighlight(false);
+          const stage = e?.target?.getStage?.();
+          if (stage) stage.container().style.cursor = "default";
         }}
       />
 

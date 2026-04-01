@@ -44,15 +44,6 @@ const TestRoot = types
 
 const mkVertices = (pts) => pts.map(([x, y], i) => ({ id: `v${i}`, x, y }));
 
-const mkBezierVertices = (pts) =>
-  pts.map(([x, y, cp1x, cp1y, cp2x, cp2y], i) => ({
-    id: `v${i}`,
-    x,
-    y,
-    controlPoint1: { x: cp1x, y: cp1y },
-    controlPoint2: { x: cp2x, y: cp2y },
-  }));
-
 describe("VideoVectorRegion", () => {
   describe("getShape — exact keyframe retrieval", () => {
     it("returns exact keyframe data when frame matches", () => {
@@ -182,7 +173,7 @@ describe("VideoVectorRegion", () => {
       expect(shape.vertices[0].y).toBeCloseTo(25);
     });
 
-    it("interpolates bezier control points", () => {
+    it("interpolates at quarter ratio", () => {
       const root = TestRoot.create({
         video: { id: "vid1" },
         region: {
@@ -190,18 +181,14 @@ describe("VideoVectorRegion", () => {
           pid: "p1",
           object: "vid1",
           sequence: [
-            { frame: 0, enabled: true, vertices: mkBezierVertices([[0, 0, 10, 10, 20, 20]]), closed: false },
-            { frame: 10, enabled: true, vertices: mkBezierVertices([[100, 100, 50, 50, 80, 80]]), closed: false },
+            { frame: 0, enabled: true, vertices: mkVertices([[0, 0]]), closed: false },
+            { frame: 20, enabled: true, vertices: mkVertices([[100, 100]]), closed: false },
           ],
         },
       });
-      const shape = root.region.getShape(5);
-      expect(shape.vertices[0].x).toBeCloseTo(50);
-      expect(shape.vertices[0].y).toBeCloseTo(50);
-      expect(shape.vertices[0].controlPoint1.x).toBeCloseTo(30);
-      expect(shape.vertices[0].controlPoint1.y).toBeCloseTo(30);
-      expect(shape.vertices[0].controlPoint2.x).toBeCloseTo(50);
-      expect(shape.vertices[0].controlPoint2.y).toBeCloseTo(50);
+      const shape = root.region.getShape(15);
+      expect(shape.vertices[0].x).toBeCloseTo(75);
+      expect(shape.vertices[0].y).toBeCloseTo(75);
     });
   });
 

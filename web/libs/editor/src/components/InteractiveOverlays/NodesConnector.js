@@ -46,6 +46,10 @@ const obtainWatcher = (node) => {
       return createPropertyWatcher(["needsUpdate", "hidden", "touchesLength", parentImagePropsWatch]);
     case "timeseriesregion":
       return createPropertyWatcher(["start", "end", { parent: ["zoomedRange"] }]);
+    case "videovectorregion":
+      return createPropertyWatcher(["sequence", "hidden", { parent: ["frame", "workingArea"] }]);
+    case "videoregion":
+      return createPropertyWatcher(["sequence", "hidden", { parent: ["frame", "workingArea"] }]);
     default:
       return null;
   }

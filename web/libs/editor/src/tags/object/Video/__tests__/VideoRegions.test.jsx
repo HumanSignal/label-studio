@@ -112,6 +112,8 @@ function createMockItem(overrides = {}) {
     frame: 1,
     annotation,
     addVideoRegion: mock(),
+    setStageRef: mock(),
+    setWorkingArea: mock(),
     ...overrides,
   };
 }

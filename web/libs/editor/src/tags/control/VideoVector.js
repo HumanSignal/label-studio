@@ -2,7 +2,6 @@ import { observer } from "mobx-react";
 import { types } from "mobx-state-tree";
 
 import Registry from "../../core/Registry";
-import { guidGenerator } from "../../core/Helpers";
 import ControlBase from "./Base";
 import { AnnotationMixin } from "../../mixins/AnnotationMixin";
 import SeparatedControlMixin from "../../mixins/SeparatedControlMixin";
@@ -62,8 +61,8 @@ const TagAttrs = types.model({
   pointstyle: types.optional(types.string, "circle"),
 
   closable: types.optional(types.maybeNull(types.boolean), false),
-  minpoints: types.optional(types.maybeNull(types.string), null),
-  maxpoints: types.optional(types.maybeNull(types.string), null),
+  minpoints: types.optional(customTypes.positiveInteger, null),
+  maxpoints: types.optional(customTypes.positiveInteger, null),
   skeleton: types.optional(types.maybeNull(types.boolean), false),
   pointsizeenabled: types.optional(types.maybeNull(types.string), "5"),
   pointsizedisabled: types.optional(types.maybeNull(types.string), "3"),
@@ -71,7 +70,6 @@ const TagAttrs = types.model({
 
 const ModelAttrs = types
   .model("VideoVectorModel", {
-    pid: types.optional(types.string, guidGenerator),
     type: "videovector",
     _value: types.optional(types.string, ""),
   })

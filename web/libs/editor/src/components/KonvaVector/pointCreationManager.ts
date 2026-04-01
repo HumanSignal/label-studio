@@ -37,6 +37,7 @@ export interface PointCreationManagerProps {
   isShiftKeyHeld?: boolean;
   setGhostPoint?: (point: GhostPoint | null) => void;
   selectedPoints?: Set<number>;
+  allowOutsideBounds?: boolean;
 }
 
 export class PointCreationManager {
@@ -75,8 +76,7 @@ export class PointCreationManager {
     // Snap to pixel grid if enabled
     const snappedCoords = snapToPixel({ x, y }, this.props.pixelSnapping);
 
-    // Check if we're within canvas bounds (only if bounds checking is enabled)
-    if (this.props.width && this.props.height) {
+    if (!this.props.allowOutsideBounds && this.props.width && this.props.height) {
       if (
         snappedCoords.x < 0 ||
         snappedCoords.x > this.props.width ||
@@ -127,8 +127,7 @@ export class PointCreationManager {
     // Snap to pixel grid if enabled
     const snappedCoords = snapToPixel({ x, y }, this.props.pixelSnapping);
 
-    // Check if we're within canvas bounds (only if bounds checking is enabled)
-    if (this.props.width && this.props.height) {
+    if (!this.props.allowOutsideBounds && this.props.width && this.props.height) {
       if (
         snappedCoords.x < 0 ||
         snappedCoords.x > this.props.width ||
@@ -199,8 +198,7 @@ export class PointCreationManager {
     // Snap to pixel grid if enabled
     const snappedCoords = snapToPixel({ x: finalX, y: finalY }, this.props.pixelSnapping);
 
-    // Check if we're within canvas bounds (only if bounds checking is enabled)
-    if (this.props.width && this.props.height) {
+    if (!this.props.allowOutsideBounds && this.props.width && this.props.height) {
       if (
         snappedCoords.x < 0 ||
         snappedCoords.x > this.props.width ||
@@ -299,8 +297,7 @@ export class PointCreationManager {
     // Snap to pixel grid if enabled
     const snappedCoords = snapToPixel({ x, y }, this.props.pixelSnapping);
 
-    // Check if we're within canvas bounds (only if bounds checking is enabled)
-    if (this.props.width && this.props.height) {
+    if (!this.props.allowOutsideBounds && this.props.width && this.props.height) {
       if (
         snappedCoords.x < 0 ||
         snappedCoords.x > this.props.width ||
@@ -336,8 +333,7 @@ export class PointCreationManager {
     // Snap to pixel grid if enabled
     const snappedCoords = snapToPixel({ x, y }, this.props.pixelSnapping);
 
-    // Check if we're within canvas bounds (only if bounds checking is enabled)
-    if (this.props.width && this.props.height) {
+    if (!this.props.allowOutsideBounds && this.props.width && this.props.height) {
       if (
         snappedCoords.x < 0 ||
         snappedCoords.x > this.props.width ||
@@ -381,8 +377,7 @@ export class PointCreationManager {
     // Snap to pixel grid if enabled
     const snappedCoords = snapToPixel({ x, y }, this.props.pixelSnapping);
 
-    // Check if we're within canvas bounds (only if bounds checking is enabled)
-    if (this.props.width && this.props.height) {
+    if (!this.props.allowOutsideBounds && this.props.width && this.props.height) {
       if (
         snappedCoords.x < 0 ||
         snappedCoords.x > this.props.width ||

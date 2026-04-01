@@ -110,6 +110,8 @@ const Model = types
     length: 1,
     drawingRegion: null,
     loopTimelineRegion: false,
+    stageRef: null,
+    workingArea: null,
   }))
   .views((self) => ({
     get store() {
@@ -117,7 +119,7 @@ const Model = types
     },
 
     get currentFrame() {
-      return self.ref.current?.position ?? 1;
+      return self.ref.current?.currentFrame ?? self.frame;
     },
 
     get timelineControl() {
@@ -217,6 +219,14 @@ const Model = types
 
       // set initial speed to defaultPlaybackSpeed
       self.speed = self.defaultplaybackspeed;
+    },
+  }))
+  .actions((self) => ({
+    setStageRef(ref) {
+      self.stageRef = ref;
+    },
+    setWorkingArea(wa) {
+      self.workingArea = wa;
     },
   }))
   ////// Sync actions

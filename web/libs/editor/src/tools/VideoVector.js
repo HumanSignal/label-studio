@@ -1,102 +1,149 @@
 import { isAlive, types } from "mobx-state-tree";
 
 import BaseTool, { DEFAULT_DIMENSIONS } from "./Base";
-
-/** Max time (ms) between two clicks to treat as double-click */
-const DOUBLE_CLICK_MAX_MS = 300;
-/** Max pixel distance between two clicks to treat as same position (double-click) */
-const DOUBLE_CLICK_MAX_PIXEL_DIST = 5;
 import ToolMixin from "../mixins/Tool";
 import { MultipleClicksDrawingTool } from "../mixins/DrawingTool";
 import { NodeViews } from "../components/Node/Node";
 import { observe } from "mobx";
 import { ff } from "@humansignal/core";
 
+/** Max time (ms) between two clicks to treat as double-click */
+const DOUBLE_CLICK_MAX_MS = 300;
+/** Max pixel distance between two clicks to treat as same position */
+const DOUBLE_CLICK_MAX_PIXEL_DIST = 5;
+
 const _Tool = types
   .model("VideoVectorTool", {
     group: "segmentation",
     shortcut: "tool:videovector",
   })
-  .views((self) => ({
-    get tagTypes() {
-      return {
-        stateTypes: "videovectorlabels",
-        controlTagTypes: ["videovectorlabels", "videovector"],
-      };
-    },
+  .views((self) => {
+    const Super = {
+      isIncorrectControl: self.isIncorrectControl,
+    };
 
-    get viewTooltip() {
-      return "Video vector region";
-    },
+    return {
+      get getActiveVector() {
+        const area = self.currentArea;
 
-    get iconComponent() {
-      return NodeViews.VideoVectorRegionModel?.icon ?? NodeViews.VectorRegionModel?.icon;
-    },
+        if (area && !isAlive(area)) return null;
+        if (area && area.closed) return null;
+        if (area === undefined) return null;
+        if (area && area.type !== "videovectorregion") return null;
 
-    get defaultDimensions() {
-      return DEFAULT_DIMENSIONS.vector;
-    },
+        return area;
+      },
 
-    // Video object doesn't have checkLabels(); use activeStates instead
-    isIncorrectLabel() {
-      const states = self.obj?.activeStates?.();
-      return states && states.length === 0 && self.obj.hasStates;
-    },
+      get tagTypes() {
+        return {
+          stateTypes: "videovectorlabels",
+          controlTagTypes: ["videovectorlabels", "videovector"],
+        };
+      },
 
-    canStart() {
-      return !self.isDrawing && !self.annotation?.isReadOnly();
-    },
+      get viewTooltip() {
+        return "Video vector region";
+      },
 
-    get canResumeDrawing() {
-      if (self.isDrawing) return false;
-      const obj = self.obj;
-      const frame = obj?.currentFrame ?? obj?.frame;
+      get iconComponent() {
+        return NodeViews.VideoVectorRegionModel?.icon ?? NodeViews.VectorRegionModel?.icon;
+      },
 
-      return !!obj?.regs?.find((reg) => {
-        if (reg.type !== "videovectorregion" || !reg.selected || !isAlive(reg)) return false;
-        const shape = reg.getShape?.(frame);
-        return shape && !shape.closed && shape.vertices?.length > 0;
-      });
-    },
+      get defaultDimensions() {
+        return DEFAULT_DIMENSIONS.vector;
+      },
 
-    getActiveVector() {
-      const area = self.currentArea;
+      isIncorrectControl() {
+        return Super.isIncorrectControl() && self.current() === null;
+      },
 
-      if (area && !isAlive(area)) return null;
-      if (area === undefined) return null;
-      if (area && area.type !== "videovectorregion") return null;
+      isIncorrectLabel() {
+        if (self.current()) return false;
+        const obj = self.obj;
+        if (!obj) return false;
 
-      return area;
-    },
+        const labelStates = obj.activeStates?.() || [];
+        if (labelStates.length === 0) return !!obj.hasStates;
 
-    getCurrentArea() {
-      return self.currentArea;
-    },
+        const availableStates = obj.getAvailableStates?.() ?? [];
+        return availableStates.length === 0;
+      },
 
-    current() {
-      if (self.currentArea) {
-        return self.getActiveVector();
-      }
+      canStart() {
+        const currentRegion = self.current();
+        return currentRegion === null || (currentRegion && currentRegion.closed);
+      },
 
-      const obj = self.obj;
+      get canResumeDrawing() {
+        if (self.isDrawing) return false;
+        const obj = self.obj;
+        const frame = obj?.currentFrame ?? obj?.frame;
 
-      if (obj?.regs) {
-        const activeDrawing = obj.regs.find((reg) => reg.type === "videovectorregion" && reg.isDrawing && isAlive(reg));
+        return !!obj?.regs?.find((reg) => {
+          if (reg.type !== "videovectorregion" || !reg.selected || !isAlive(reg)) return false;
+          const shape = reg.getShape?.(frame);
+          return shape && !shape.closed && shape.vertices?.length > 0;
+        });
+      },
 
-        if (activeDrawing) return activeDrawing;
-      }
+      current() {
+        if (self.currentArea) {
+          return self.getActiveVector;
+        }
 
-      return self.getActiveVector();
-    },
-  }))
+        const obj = self.obj;
+
+        let regionsToSearch = [];
+        if (obj?.regs && obj.regs.length > 0) {
+          regionsToSearch = Array.from(obj.regs);
+        } else if (self.annotation?.regions && self.annotation.regions.length > 0) {
+          regionsToSearch = Array.from(self.annotation.regions);
+        }
+
+        if (regionsToSearch.length > 0) {
+          const highlighted = self.annotation?.regionStore?.selection?.highlighted;
+          if (highlighted && highlighted.type === "videovectorregion" && !highlighted.closed && isAlive(highlighted)) {
+            return highlighted;
+          }
+
+          const selectedRegions = self.annotation?.selectedRegions || [];
+          const selectedVectorRegions = selectedRegions.filter(
+            (reg) => reg.type === "videovectorregion" && !reg.closed && isAlive(reg),
+          );
+          if (selectedVectorRegions.length === 1) {
+            return selectedVectorRegions[0];
+          }
+
+          const activeDrawingVector = regionsToSearch.find(
+            (reg) => reg.type === "videovectorregion" && reg.isDrawing && !reg.closed && isAlive(reg),
+          );
+
+          if (activeDrawingVector) {
+            return activeDrawingVector;
+          }
+        }
+
+        return self.getActiveVector;
+      },
+
+      getCurrentArea() {
+        const currentRegion = self.current();
+        if (currentRegion) {
+          return currentRegion;
+        }
+        return self.currentArea;
+      },
+    };
+  })
   .actions((self) => {
+    const disposers = [];
     let down = false;
     let initialCursorPosition = null;
-    const disposers = [];
     let lastClick = { ts: 0, x: 0, y: 0 };
 
     return {
-      // Video passes [x,y] (not [x,y,canvasX,canvasY]) and should not filter shift
+      // Video passes [x, y] pixel coords (not [x, y, canvasX, canvasY])
+      // and should not filter shift for ghost point insertion
       event(name, ev, args) {
         if (ev.button > 0) return;
         let fn = `${name}Ev`;
@@ -130,8 +177,8 @@ const _Tool = types
 
       handleToolSwitch() {
         self.stopListening();
-        if (self.currentArea?.isDrawing) {
-          if (self.currentArea?.incomplete) self.deleteRegion();
+        if (self.getCurrentArea()?.isDrawing) {
+          if (self.getCurrentArea()?.incomplete) self.deleteRegion();
           else self._finishDrawing();
         }
       },
@@ -141,12 +188,15 @@ const _Tool = types
 
         if (!currentArea) return;
 
+        // Video stores closed state in keyframes within `sequence`
         disposers.push(
           observe(
             currentArea,
             "sequence",
             () => {
-              const shape = self.currentArea?.getShape(self.obj.frame);
+              const obj = self.obj;
+              const frame = obj?.currentFrame ?? obj?.frame;
+              const shape = self.currentArea?.getShape(frame);
 
               if (shape?.closed) self._finishDrawing();
             },
@@ -166,10 +216,6 @@ const _Tool = types
         );
       },
 
-      closeCurrent() {
-        // Video vector closing is handled by listenForClose observers
-      },
-
       stopListening() {
         for (const disposer of disposers) {
           disposer();
@@ -184,46 +230,58 @@ const _Tool = types
 
         initialCursorPosition = { x, y };
 
-        let area = self.current();
+        let area = self.getCurrentArea();
 
+        // If no currentArea but there's an active drawing region, use it
         if (!area) {
-          area = videoObj.addVideoVectorRegion({
+          if (videoObj?.regs) {
+            const activeDrawingVector = videoObj.regs.find(
+              (reg) => reg.type === "videovectorregion" && reg.isDrawing && !reg.closed && isAlive(reg),
+            );
+            if (activeDrawingVector) {
+              area = activeDrawingVector;
+              self.currentArea = area;
+            }
+          }
+        }
+
+        const currentArea = area && isAlive(area) ? area : null;
+
+        // Only create new region if we don't have an existing one
+        if (!currentArea) {
+          const newArea = videoObj.addVideoVectorRegion({
             vertices: [],
             closed: false,
           });
 
-          if (!area) return;
+          if (!newArea) return;
 
-          self.currentArea = area;
-
-          const activeStates = videoObj.activeStates();
-
-          if (ff.isActive(ff.FF_MULTIPLE_LABELS_REGIONS)) {
-            // labels are already applied in addVideoVectorRegion
-          } else {
-            for (const tag of activeStates) {
-              area.setValue(tag);
-            }
-          }
+          self.currentArea = newArea;
         } else {
-          self.currentArea = area;
+          self.currentArea = currentArea;
+          if (!currentArea.isDrawing) {
+            currentArea.setDrawing(true);
+          }
         }
 
         self.mode = "drawing";
-        area.setDrawing(true);
-        self.annotation?.setIsDrawing(true);
+        self.setDrawing(true);
         self.annotation?.history?.freeze();
 
         self.listenForClose();
 
-        if (!area || (area.sequence?.[0]?.vertices?.length ?? 0) === 0) {
+        if (!currentArea || (currentArea.sequence?.[0]?.vertices?.length ?? 0) === 0) {
           setTimeout(() => {
             self.currentArea?.startPoint(x, y);
           });
         }
       },
 
-      mousedownEv(_ev, [x, y]) {
+      mousedownEv(ev, [x, y]) {
+        // Shift+click is handled by KonvaVector for ghost point insertion
+        // Alt+click is handled by KonvaVector for point deletion
+        if (ev?.shiftKey || ev?.altKey) return;
+
         if (self.mode === "drawing") {
           self.annotation?.history?.freeze();
           down = true;
@@ -231,11 +289,12 @@ const _Tool = types
           return;
         }
 
+        // Check for selected unclosed region to resume drawing
         const obj = self.obj;
-        const frame = obj?.currentFrame;
+        const frame = obj?.currentFrame ?? obj?.frame;
         const selectedUnclosed = obj?.regs?.find((reg) => {
           if (reg.type !== "videovectorregion" || !reg.selected || !isAlive(reg)) return false;
-          const shape = reg.getShape(frame);
+          const shape = reg.getShape?.(frame);
           return shape && !shape.closed && shape.vertices?.length > 0;
         });
 
@@ -256,6 +315,7 @@ const _Tool = types
         self.startDrawing(x, y);
       },
 
+      // No bezier: mousemove is a no-op
       mousemoveEv() {},
 
       mouseupEv(_, [x, y]) {
@@ -278,7 +338,7 @@ const _Tool = types
         }
       },
 
-      // Video uses mousedown/mouseup exclusively; disable MultipleClicksDrawingTool's click handler
+      // Video uses mousedown/mouseup exclusively
       clickEv() {},
 
       dblclickEv() {
@@ -295,21 +355,25 @@ const _Tool = types
 
       _finishDrawing({ skipAfterCreate = false } = {}) {
         if (!self.currentArea) return;
-        self.currentArea.setDrawing(false);
-        self.currentArea.notifyDrawingFinished?.();
-        self.annotation?.setIsDrawing(false);
-        self.annotation?.history?.unfreeze();
 
         const { currentArea, control } = self;
 
-        self.currentArea = null;
-        self.mode = "viewing";
         down = false;
+        self.currentArea?.notifyDrawingFinished?.();
+        self.setDrawing(false);
+        self.mode = "viewing";
+        self.currentArea = null;
         self.stopListening();
+        self.annotation?.history?.unfreeze();
 
         if (!skipAfterCreate && currentArea && !currentArea.incomplete) {
           self.annotation?.afterCreateResult?.(currentArea, control);
         }
+      },
+
+      setDrawing(drawing) {
+        self.currentArea?.setDrawing(drawing);
+        self.annotation?.setIsDrawing(drawing);
       },
 
       complete() {

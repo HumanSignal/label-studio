@@ -9,6 +9,7 @@ import { useRegionStyles } from "../hooks/useRegionColor";
 import { KonvaRegionMixin } from "../mixins/KonvaRegion";
 import { RELATIVE_STAGE_HEIGHT, RELATIVE_STAGE_WIDTH } from "../components/ImageView/Image";
 import { KonvaVector } from "../components/KonvaVector/KonvaVector";
+import { generatePointId } from "../components/KonvaVector/utils";
 import { observer } from "mobx-react";
 import Constants from "../core/Constants";
 import { RegionWrapper } from "./RegionWrapper";
@@ -664,18 +665,34 @@ const HtxVectorView = observer(({ item, suggestion }) => {
             item.onPathClosedChange(isClosed);
           }}
           onGhostPointClick={(ghostPoint) => {
-            // Only handle if we're drawing
-            if (!item.isDrawing) {
+            if (item.isReadOnly()) return;
+
+            if (item.isDrawing) {
+              if (item.vectorRef) {
+                const startResult = item.vectorRef.startPoint(ghostPoint.x, ghostPoint.y);
+                if (startResult) {
+                  item.vectorRef.commitPoint(ghostPoint.x, ghostPoint.y);
+                }
+              }
               return;
             }
 
-            if (item.vectorRef) {
-              // Start and immediately commit to insert the point at ghost location
-              const startResult = item.vectorRef.startPoint(ghostPoint.x, ghostPoint.y);
-              if (startResult) {
-                item.vectorRef.commitPoint(ghostPoint.x, ghostPoint.y);
-              }
-            }
+            // On a finished region, insert between the two segment points
+            const currentPoints = [...item.vertices];
+            const nextIdx = currentPoints.findIndex((p) => p.id === ghostPoint.nextPointId);
+            if (nextIdx === -1) return;
+
+            const newPoint = {
+              id: generatePointId(),
+              x: ghostPoint.x,
+              y: ghostPoint.y,
+              prevPointId: ghostPoint.prevPointId,
+            };
+
+            currentPoints[nextIdx] = { ...currentPoints[nextIdx], prevPointId: newPoint.id };
+            currentPoints.splice(nextIdx, 0, newPoint);
+
+            item.updatePointsFromKonvaVector(currentPoints);
           }}
           onClick={(e) => {
             if (e.evt.defaultPrevented) {

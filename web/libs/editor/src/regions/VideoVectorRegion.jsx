@@ -5,35 +5,17 @@ import RegionsMixin from "../mixins/Regions";
 import Registry from "../core/Registry";
 import { AreaMixin } from "../mixins/AreaMixin";
 import { VideoRegion } from "./VideoRegion";
+import ToolsManager from "../tools/Manager";
 
 /**
  * Interpolate a single vertex between two keyframes.
- * Linear interpolation: prev + (next - prev) * r (i.e. prev.x + (next.x - prev.x) * r).
- * Also interpolates controlPoint1/controlPoint2 when both keyframes have them (bezier).
+ * Linear interpolation: prev + (next - prev) * r.
  */
-const interpolateVertex = (prev, next, r) => {
-  const result = {
-    ...prev,
-    x: prev.x + (next.x - prev.x) * r,
-    y: prev.y + (next.y - prev.y) * r,
-  };
-
-  if (prev.controlPoint1 && next.controlPoint1) {
-    result.controlPoint1 = {
-      x: prev.controlPoint1.x + (next.controlPoint1.x - prev.controlPoint1.x) * r,
-      y: prev.controlPoint1.y + (next.controlPoint1.y - prev.controlPoint1.y) * r,
-    };
-  }
-
-  if (prev.controlPoint2 && next.controlPoint2) {
-    result.controlPoint2 = {
-      x: prev.controlPoint2.x + (next.controlPoint2.x - prev.controlPoint2.x) * r,
-      y: prev.controlPoint2.y + (next.controlPoint2.y - prev.controlPoint2.y) * r,
-    };
-  }
-
-  return result;
-};
+const interpolateVertex = (prev, next, r) => ({
+  ...prev,
+  x: prev.x + (next.x - prev.x) * r,
+  y: prev.y + (next.y - prev.y) * r,
+});
 
 /**
  * Interpolate all vertices between two keyframes.
@@ -55,14 +37,39 @@ const interpolateVertices = (prevKeyframe, nextKeyframe, frame) => {
   });
 };
 
+/**
+ * VideoVectorRegion — Vector graphics region for video annotation.
+ *
+ * Follows the same structure as the image VectorRegion, but stores coordinates
+ * as percentages (0-100) in a keyframe `sequence` (via the VideoRegion mixin).
+ * The view component (VideoVectorShape) handles percent-to-pixel conversion.
+ *
+ * Coordinate flow:
+ *   MobX store (% in sequence) <-> VideoVectorShape (px for KonvaVector)
+ */
 const Model = types
   .model("VideoVectorRegionModel", {
     type: "videovectorregion",
+
+    readonly: types.optional(types.boolean, false),
+
+    transformMode: false,
   })
   .volatile(() => ({
+    mouseOverStartPoint: false,
+    selectedPoint: null,
+    hideable: true,
+    _supportsTransform: true,
+    useTransformer: false,
+    preferTransformer: false,
+    supportsRotate: true,
+    supportsScale: true,
     vectorRef: null,
+    groupRef: null,
   }))
   .views((self) => ({
+    // --- Video-specific views ---
+
     getShape(frame) {
       let prev;
       let next;
@@ -95,6 +102,19 @@ const Model = types
     get control() {
       return self.results.find((result) => result.from_name.tools)?.from_name;
     },
+
+    get vertices() {
+      const kf = self.sequence[0];
+      return kf?.vertices ?? [];
+    },
+
+    get closed() {
+      const kf = self.sequence[0];
+      return kf?.closed ?? false;
+    },
+
+    // --- Ported from image VectorRegion ---
+
     get closable() {
       return self.control?.closable ?? false;
     },
@@ -105,17 +125,6 @@ const Model = types
     get maxPoints() {
       const max = self.control?.maxpoints;
       return max ? Number.parseInt(max) : undefined;
-    },
-    get vertices() {
-      const kf = self.sequence[0];
-      return kf?.vertices ?? [];
-    },
-    get closed() {
-      const kf = self.sequence[0];
-      return kf?.closed ?? false;
-    },
-    get atMaxLength() {
-      return self.maxPoints && self.vertices.length === self.maxPoints;
     },
     get incomplete() {
       if (self.atMaxLength) return false;
@@ -128,11 +137,43 @@ const Model = types
       if (self.atMaxLength) return true;
       return false;
     },
+    get atMaxLength() {
+      return self.maxPoints && self.vertices.length === self.maxPoints;
+    },
+
+    get pointEnabledSize() {
+      const customEnabledSize = self.control?.pointsizeenabled;
+      return customEnabledSize ? Number.parseInt(customEnabledSize) : 5;
+    },
+    get pointDisabledSize() {
+      const customDisabledSize = self.control?.pointsizedisabled;
+      return customDisabledSize ? Number.parseInt(customDisabledSize) : 3;
+    },
+    get pointRadiusFromSize() {
+      const size = self.control?.pointsize ?? "small";
+      switch (size) {
+        case "small":
+          return { enabled: 4, disabled: 3 };
+        case "medium":
+          return { enabled: 6, disabled: 4 };
+        case "large":
+          return { enabled: 8, disabled: 6 };
+        default:
+          return { enabled: 6, disabled: 4 };
+      }
+    },
+    get pointStyle() {
+      return self.control?.pointstyle ?? "circle";
+    },
+    get disabled() {
+      const objectTag = self.object;
+      const manager = objectTag ? ToolsManager.getInstance({ name: objectTag.name }) : null;
+      const tool = manager?.findSelectedTool?.();
+      return (tool?.disabled ?? false) || self.isReadOnly() || (!self.selected && !self.isDrawing);
+    },
   }))
   .actions((self) => ({
-    setVectorRef(ref) {
-      self.vectorRef = ref;
-    },
+    // --- Video-specific actions ---
 
     updateShape(data, frame) {
       const newItem = {
@@ -162,16 +203,138 @@ const Model = types
       }
     },
 
+    // --- Ported from image VectorRegion ---
+
+    setMouseOverStartPoint(value) {
+      self.mouseOverStartPoint = value;
+    },
+
+    closePoly() {
+      if (!self.closable) return;
+      self.vectorRef?.close();
+    },
+
+    _selectArea(additiveMode = false, preserveTransformMode = false) {
+      const annotation = self.annotation;
+      if (!preserveTransformMode) {
+        self.setTransformMode(false);
+      }
+      if (!annotation) return;
+
+      if (additiveMode) {
+        annotation.toggleRegionSelection(self);
+      } else {
+        const wasNotSelected = !self.selected;
+
+        if (wasNotSelected) {
+          annotation.selectArea(self);
+        } else {
+          annotation.unselectAll();
+        }
+      }
+    },
+
+    setHighlight(val) {
+      self._highlighted = val;
+    },
+
+    isTransforming() {
+      if (!self.vectorRef || !self.selected) {
+        return false;
+      }
+      try {
+        const selection = self.vectorRef.getSelectedPointIds();
+        return selection.length > 1;
+      } catch {
+        return false;
+      }
+    },
+
+    segGroupRef(ref) {
+      self.groupRef = ref;
+    },
+
+    setKonvaVectorRef(ref) {
+      self.vectorRef = ref;
+    },
+
+    selectRegion(preserveTransformMode = false) {
+      if (!preserveTransformMode) {
+        self.setTransformMode(false);
+      }
+    },
+
     startPoint(x, y) {
+      if (self.isReadOnly()) return;
       self.vectorRef?.startPoint(x, y);
     },
 
     updatePoint(x, y) {
+      if (self.isReadOnly()) return;
       self.vectorRef?.updatePoint(x, y);
     },
 
     commitPoint(x, y) {
+      if (self.isReadOnly()) return;
       self.vectorRef?.commitPoint(x, y);
+    },
+
+    handleFinish() {
+      const objectTag = self.object;
+      const manager = objectTag ? ToolsManager.getInstance({ name: objectTag.name }) : null;
+      const tool = manager?.findSelectedTool?.();
+
+      if (tool?.currentArea) {
+        tool.commitDrawingRegion?.();
+      } else {
+        self.annotation?.toggleRegionSelection(self);
+      }
+      tool?.complete?.();
+    },
+
+    toggleTransformMode() {
+      self.setTransformMode(!self.transformMode);
+    },
+
+    setTransformMode(transformMode) {
+      self.transformMode = transformMode;
+    },
+
+    applyTransform() {
+      if (!self.vectorRef) return;
+
+      if (typeof self.vectorRef.commitMultiRegionTransform === "function") {
+        self.vectorRef.commitMultiRegionTransform();
+      }
+    },
+
+    deleteRegion() {
+      const isMultiRegionSelected = self.object?.selectedRegions?.length > 1;
+
+      if (!isMultiRegionSelected) {
+        if (self.vectorRef && typeof self.vectorRef.getSelectedPointIds === "function") {
+          const selectedPointIds = self.vectorRef.getSelectedPointIds();
+          const totalPoints = self.vertices.length;
+
+          if (selectedPointIds.length > 0 && selectedPointIds.length < totalPoints) {
+            if (typeof self.vectorRef.deletePointsByIds === "function") {
+              self.vectorRef.deletePointsByIds(selectedPointIds);
+              return;
+            }
+          }
+        }
+      }
+
+      const objectTag = self.object;
+      const manager = objectTag ? ToolsManager.getInstance({ name: objectTag.name }) : null;
+      const selectedTool = manager?.findSelectedTool?.();
+      selectedTool?.enable?.();
+
+      if (self.annotation?.isReadOnly()) return;
+      if (self.isReadOnly()) return;
+      if (self.selected) self.annotation.unselectAll(true);
+      if (self.destroyRegion) self.destroyRegion();
+      self.annotation.deleteRegion(self);
     },
   }));
 

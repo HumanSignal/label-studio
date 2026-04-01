@@ -230,6 +230,8 @@ export interface KonvaVectorProps {
   isMultiRegionSelected?: boolean;
   /** Disable internal point addition - when true, prevents KonvaVector from adding points internally and disables the invisible shape */
   disableInternalPointAddition?: boolean;
+  /** Allow points to be placed and dragged outside the canvas boundaries (0..width, 0..height) */
+  allowOutsideBounds?: boolean;
   /** Name attribute for the component */
   name?: string;
   /** Ref to access component methods */
