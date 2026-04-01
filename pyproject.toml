@@ -73,7 +73,7 @@ dependencies = [
 ]
 
 [tool.uv.sources]
-label-studio-sdk = { git = "https://github.com/HumanSignal/label-studio-sdk.git", rev = "5fa063c851de4414ecb4090d60149cac4f7e8830" }
+label-studio-sdk = { git = "https://github.com/HumanSignal/label-studio-sdk.git", rev = "824b33bf7f836ccf0e045684ef32f5fa8fa842d5" }
 
 [project.optional-dependencies]
 uwsgi = [
