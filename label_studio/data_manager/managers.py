@@ -12,6 +12,7 @@ from core.utils.db import fast_first
 from data_manager.prepare_params import ConjunctionEnum
 from django.conf import settings
 from django.contrib.postgres.aggregates import ArrayAgg
+from django.core.exceptions import FieldError
 from django.db import models
 from django.db.models import (
     Aggregate,
@@ -125,15 +126,39 @@ def _set_prefilter_task_ids_for_agreement(request, queryset, prepare_params, pro
     non_agreement_filters = [
         _filter
         for _filter in filters.items
-        if not is_agreement_related_field(_filter.filter.replace('filter:tasks:', ''))
+        if _filter.filter.startswith('filter:tasks:')
+        and not is_agreement_related_field(_filter.filter.removeprefix('filter:tasks:'))
     ]
     if not non_agreement_filters:
         return
 
+    preprocess_field_name = load_func(settings.PREPROCESS_FIELD_NAME)
+    annotation_fields = set(get_annotations_map().keys())
+    prefilter_annotation_fields = []
+    for _filter in non_agreement_filters:
+        filter_field_name = _filter.filter.removeprefix('filter:tasks:')
+        if filter_field_name in annotation_fields and filter_field_name not in prefilter_annotation_fields:
+            prefilter_annotation_fields.append(filter_field_name)
+        processed_field_name, _ = preprocess_field_name(_filter.filter, project=project)
+        if processed_field_name in annotation_fields and processed_field_name not in prefilter_annotation_fields:
+            prefilter_annotation_fields.append(processed_field_name)
+
     from data_manager.prepare_params import Filters
 
+    if prefilter_annotation_fields:
+        queryset = PreparedTaskManager.annotate_queryset(
+            queryset,
+            fields_for_evaluation=prefilter_annotation_fields,
+            request=request,
+        )
+
     narrowed_filters = Filters(conjunction=filters.conjunction, items=non_agreement_filters)
-    narrowed_queryset = apply_filters(queryset, narrowed_filters, project, request)
+    try:
+        narrowed_queryset = apply_filters(queryset, narrowed_filters, project, request)
+    except FieldError:
+        # Fail open: prefilter is an optimization only, the main filtered query still runs later.
+        logger.warning('DM agreement prefilter skipped due to unresolved filter field', exc_info=True)
+        return
     request._dm_prefilter_task_ids = tuple(narrowed_queryset.values_list('id', flat=True))
 
 
