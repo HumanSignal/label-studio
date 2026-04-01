@@ -281,9 +281,7 @@ class TaskPagination(PageNumberPagination):
         return super().paginate_queryset(id_only_queryset, request, view)
 
     def paginate_queryset(self, queryset, request, view=None):
-        if flag_set('fflag_fix_back_optic_1407_optimize_tasks_api_pagination_counts'):
-            return self.paginate_totals_queryset(queryset, request, view)
-        return self.sync_paginate_queryset(queryset, request, view)
+        return self.paginate_totals_queryset(queryset, request, view)
 
     def get_paginated_response_schema(self, schema):
         return {

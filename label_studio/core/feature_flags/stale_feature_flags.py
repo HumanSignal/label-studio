@@ -8,7 +8,6 @@ STALE_FEATURE_FLAGS = {
     'fflag_feat_front_lsdv_5452_taxonomy_labeling_110823_short': True,
     # Feb 5
     'fflag_feature_all_optic_1421_cold_start_v2': False,
-    'fflag_fix_back_optic_1407_optimize_tasks_api_pagination_counts': True,
     'fflag_fix_optic_1259_lse_projects_read_apis_use_replica_short': True,
     'fflag_feat_optic_1025_zendesk_widget_integration': False,
     'fflag_feat_optic_378_limit_projects_per_page_to_ten_short': True,

@@ -62,8 +62,7 @@ class TestTaskPaginationMemoryOptimization(TestCase):
         """Test paginate_totals_queryset applies .only('id') optimization.
 
         This test validates:
-        - The optimized path (with fflag_fix_back_optic_1407_optimize_tasks_api_pagination_counts)
-          also uses .only('id')
+        - Pagination totals use .only('id') for the page slice
         - Aggregate queries work correctly
         """
         mock_queryset = MagicMock()
