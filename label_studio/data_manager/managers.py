@@ -98,6 +98,45 @@ def get_fields_for_filter_ordering(prepare_params):
     return result
 
 
+def is_agreement_related_field(field_name):
+    return field_name in {'agreement', 'agreement_selected'} or field_name.startswith('dimension_agreement_')
+
+
+def _set_prefilter_task_ids_for_agreement(request, queryset, prepare_params, project):
+    """Pre-narrow agreement candidate tasks using ANDed non-agreement filters.
+
+    Safe optimization: for conjunction=AND, applying only non-agreement filters yields
+    a superset of rows that could match the final query after agreement filters/order.
+    """
+    if request is None:
+        return
+
+    if hasattr(request, '_dm_prefilter_task_ids'):
+        delattr(request, '_dm_prefilter_task_ids')
+
+    filters = getattr(prepare_params, 'filters', None)
+    if not filters or filters.conjunction != ConjunctionEnum.AND:
+        return
+
+    fields_for_filter_ordering = get_fields_for_filter_ordering(prepare_params)
+    if not any(is_agreement_related_field(field) for field in fields_for_filter_ordering):
+        return
+
+    non_agreement_filters = [
+        _filter
+        for _filter in filters.items
+        if not is_agreement_related_field(_filter.filter.replace('filter:tasks:', ''))
+    ]
+    if not non_agreement_filters:
+        return
+
+    from data_manager.prepare_params import Filters
+
+    narrowed_filters = Filters(conjunction=filters.conjunction, items=non_agreement_filters)
+    narrowed_queryset = apply_filters(queryset, narrowed_filters, project, request)
+    request._dm_prefilter_task_ids = tuple(narrowed_queryset.values_list('id', flat=True))
+
+
 def get_fields_for_evaluation(prepare_params, user, skip_regular=True):
     """Collecting field names to annotate them
 
@@ -816,6 +855,11 @@ class PreparedTaskManager(models.Manager):
         if excluded_fields_for_evaluation is None:
             excluded_fields_for_evaluation = []
 
+        if request is not None:
+            # Expose the exact annotation fields requested in this pass so downstream
+            # annotators can choose cheaper implementations when safe.
+            request._dm_annotation_fields = tuple(fields_for_evaluation)
+
         first_task = queryset.first()
         project = None if first_task is None else first_task.project
 
@@ -863,14 +907,24 @@ class PreparedTaskManager(models.Manager):
         )
 
     def only_filtered(self, prepare_params=None):
+        from projects.models import Project
+
         request = prepare_params.request
+        if request is not None and hasattr(request, '_dm_prefilter_task_ids'):
+            delattr(request, '_dm_prefilter_task_ids')
         # Support both single and multiple projects
         if prepare_params.is_multi_project:
             queryset = TaskQuerySet(self.model).filter(project__in=prepare_params.projects)
         else:
             queryset = TaskQuerySet(self.model).filter(project=prepare_params.project)
+            project = Project.objects.get(pk=prepare_params.project)
+            _set_prefilter_task_ids_for_agreement(request, queryset, prepare_params, project)
         fields_for_filter_ordering = get_fields_for_filter_ordering(prepare_params)
         queryset = self.annotate_queryset(queryset, fields_for_evaluation=fields_for_filter_ordering, request=request)
+        # TaskListAPI runs a second annotate_queryset on the same request for the paginated id__in slice.
+        # Drop the prefilter so agreement does not reuse this large ID list for that pass (must use page tasks only).
+        if request is not None and hasattr(request, '_dm_prefilter_task_ids'):
+            delattr(request, '_dm_prefilter_task_ids')
         return queryset.prepared(prepare_params=prepare_params)
 
 
