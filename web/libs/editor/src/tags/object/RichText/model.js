@@ -12,7 +12,6 @@ import ProcessAttrsMixin from "../../../mixins/ProcessAttrs";
 import RegionsMixin from "../../../mixins/Regions";
 import Utils from "../../../utils";
 import { parseValue } from "../../../utils/data";
-import { FF_SAFE_TEXT, isFF } from "../../../utils/feature-flags";
 import { sanitizeHtml } from "../../../utils/html";
 import messages from "../../../utils/messages";
 import { rangeToGlobalOffset } from "../../../utils/selection-tools";
@@ -247,7 +246,7 @@ const Model = types
         // clean up the html — remove scripts and iframes
         // nodes count better be the same, so replace them with stubs
         // we should not sanitize text tasks because we already have htmlEscape in view.js
-        if (isFF(FF_SAFE_TEXT) && self.type === "text") {
+        if (self.type === "text") {
           self._value = String(val);
         } else {
           self._value = sanitizeHtml(String(val));

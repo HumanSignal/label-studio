@@ -205,10 +205,13 @@ describe("RichText model", () => {
   });
 
   describe("setRemoteValue", () => {
-    it("sets _value from plain text", () => {
+    it("assigns text-type values without sanitizeHtml (plain and HTML-like)", () => {
       const node = createTextNode();
       node.setRemoteValue("plain text");
       expect(node._value).toBe("plain text");
+      const raw = "<script>alert(1)</script>ok";
+      node.setRemoteValue(raw);
+      expect(node._value).toBe(raw);
     });
 
     it("decodes base64 when encoding is base64", () => {
@@ -220,16 +223,6 @@ describe("RichText model", () => {
       const encoded = Buffer.from("hello", "utf-8").toString("base64");
       textNode.setRemoteValue(encoded);
       expect(textNode._value).toBe("hello");
-    });
-
-    it("applies sanitizeHtml for non-FF_SAFE_TEXT text type", () => {
-      const node = createTextNode();
-      node.setRemoteValue("<script>alert(1)</script>ok");
-      if (typeof node._value === "string") {
-        expect(node._value.includes("ok") || !node._value.includes("script")).toBe(true);
-      } else {
-        expect(node._value).toBeDefined();
-      }
     });
 
     it("decodes base64unicode when encoding is base64unicode", () => {
