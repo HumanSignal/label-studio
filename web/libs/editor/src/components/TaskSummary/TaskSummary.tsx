@@ -82,7 +82,7 @@ const TaskSummary = observer(({ annotations: all, store: annotationStore }: Task
   const controls = Object.entries(grouped).flatMap(([_, controls]) => sortControls(controls ?? []));
 
   const objectTags: ObjectTagEntry[] = allTags.filter(
-    ([_, tag]) => tag.isObjectTag && (tag.value.includes("$") || tag.loadedData),
+    ([_, tag]) => tag.isObjectTag && (tag.value?.includes("$") || tag.valueList?.includes("$") || tag.loadedData),
   ) as ObjectTagEntry[];
   const dataTypes: ObjectTypes = Object.fromEntries(
     objectTags.map(([name, object]) => [

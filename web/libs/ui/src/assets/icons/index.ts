@@ -53,6 +53,7 @@ export { ReactComponent as IconChat } from "./chat.svg";
 export { ReactComponent as IconCheck } from "./check.svg";
 export { ReactComponent as IconCheck2 } from "./check2.svg";
 export { ReactComponent as IconCheck3 } from "./check3.svg";
+export { ReactComponent as IconChecklist } from "./checklist.svg";
 export { ReactComponent as IconCheckAlt } from "./check-alt.svg";
 export { ReactComponent as IconCheckBold } from "./check-bold.svg";
 export { ReactComponent as IconCheckCircle } from "./check-circle.svg";

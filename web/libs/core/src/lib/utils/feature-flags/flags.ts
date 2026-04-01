@@ -125,3 +125,8 @@ export const FF_FIT_720_LAZY_LOAD_ANNOTATIONS = "fflag_fix_all_fit_720_lazy_load
  */
 export const FF_FIT_1443_ANALYTICS_LABEL_DISTRIBUTION_PAGE =
   "fflag_feat_all_fit_1443_analytics_label_distribution_page";
+
+/**
+ * Show per-item classifications (like Choices or Taxonomy) alongside regions in the Outliner panel
+ */
+export const FF_CLASSIFICATIONS_IN_OUTLINER = "fflag_feat_front_bros_766_per_item_in_outliner";

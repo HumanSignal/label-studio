@@ -170,7 +170,7 @@ const OutlinerInnerTreeComponent: FC<OutlinerInnerTreeProps> = observer(({ regio
       {!!height && (
         <Tree
           key={regions.group}
-          draggable={regions.group === "manual"}
+          draggable={regions.group === "manual" ? (node: any) => !node?.data?.isClassification : false}
           multiple
           defaultExpandAll
           defaultExpandParent={!isPersistCollapseEnabled}
@@ -206,19 +206,21 @@ const titleRenderer = (nodeData: any) => {
 const useDataTree = ({ regions, rootClass, footer }: any) => {
   const processor = useCallback((item: any, idx, _false, _null, _onClick) => {
     const { id, type, hidden, locked } = item ?? {};
+    const isClassification = item?.classification === true;
     const style = item?.background ?? item?.getOneColor?.();
     const color = chroma(style ?? "#666").alpha(1);
-    const mods: Record<string, any> = { hidden, type };
+    const mods: Record<string, any> = { hidden, type: type || (isClassification ? "classification" : undefined) };
 
     const label = <RegionLabel item={item} />;
 
     return {
       idx,
       key: id,
-      type,
+      type: type || (isClassification ? "classification" : undefined),
       label,
       hidden,
       entity: item,
+      isClassification,
       color: color.css(),
       style: {
         "--icon-color": color.css(),
@@ -274,6 +276,10 @@ const useEventHandlers = () => {
       annotation.selectArea(self);
       // post-select hook
       self.onSelectInOutliner?.(wasNotSelected);
+      // navigate to connected page for per-item classifications
+      if (self.classification && self.item_index != null) {
+        self.object?.setCurrentItem?.(self.item_index);
+      }
     } else {
       annotation.unselectAll();
     }
@@ -329,7 +335,8 @@ const useEventHandlers = () => {
   }, []);
 
   const onDrop = useCallback(({ node, dragNode, dropPosition, dropToGap }) => {
-    if (node.classification) return false;
+    if (node.classification || node.isClassification) return false;
+    if (dragNode.isClassification) return false;
     const dropKey = node.props.eventKey;
     const dragKey = dragNode.props.eventKey;
     const dropPos = node.props.pos.split("-");
@@ -402,14 +409,15 @@ const RootTitle: FC<any> = observer(
     item, // can be undefined for group titles in Labels or Tools mode
     label,
     isArea,
+    isClassification,
     ...props
   }) => {
     const [collapsed, setCollapsed] = useState(false);
 
     const controls = useMemo(() => {
-      if (!isArea) return [];
+      if (!isArea || isClassification) return [];
       return item.perRegionDescControls ?? [];
-    }, [item?.perRegionDescControls, isArea]);
+    }, [item?.perRegionDescControls, isArea, isClassification]);
 
     const hasControls = useMemo(() => {
       return controls.length > 0;
@@ -425,9 +433,10 @@ const RootTitle: FC<any> = observer(
     );
 
     const incomplete = item?.incomplete;
+    const showControls = !isClassification && item?.hideable !== false;
 
     return (
-      <div className={cn("outliner-item").mod({ incomplete }).toClassName()}>
+      <div className={cn("outliner-item").mod({ incomplete, classification: isClassification }).toClassName()}>
         <div className={cn("outliner-item").elem("content").toClassName()}>
           {!props.isGroup && <div className={cn("outliner-item").elem("index").toClassName()}>{props.idx + 1}</div>}
           <div className={cn("outliner-item").elem("title").toClassName()}>
@@ -443,7 +452,7 @@ const RootTitle: FC<any> = observer(
               </span>
             )}
           </div>
-          {item?.hideable !== false && (
+          {showControls && (
             <RegionControls
               item={item}
               entity={props.entity}
@@ -480,6 +489,7 @@ const MemoizedRootTitle = memo(RootTitle, (prevProps, nextProps) => {
   if (prevProps.idx !== nextProps.idx) return false;
   if (prevProps.isArea !== nextProps.isArea) return false;
   if (prevProps.isGroup !== nextProps.isGroup) return false;
+  if (prevProps.isClassification !== nextProps.isClassification) return false;
   // Re-render group when any child's hidden state changes so hide/show icon stays in sync
   if (nextProps.isGroup && nextProps.children && prevProps.children) {
     if (prevProps.children.length !== nextProps.children.length) return false;

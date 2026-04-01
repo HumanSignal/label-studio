@@ -112,4 +112,5 @@ const Area = types.union(
   ...Registry.customTags.map((t) => t.region).filter(Boolean),
 );
 
+export { ClassificationArea };
 export default Area;
