@@ -339,6 +339,7 @@ module.exports = composePlugins(
       mode,
       plugins,
       optimization: optimizer(),
+      ignoreWarnings: [/Failed to parse source map/],
       devServer: process.env.MODE?.startsWith("standalone")
         ? {}
         : {
