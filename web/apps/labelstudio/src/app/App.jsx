@@ -14,7 +14,6 @@ import { RoutesProvider } from "../providers/RoutesProvider";
 import { DRAFT_GUARD_KEY, DraftGuard, draftGuardCallback } from "../components/DraftGuard/DraftGuard";
 import { AsyncPage } from "./AsyncPage/AsyncPage";
 import ErrorBoundary from "./ErrorBoundary";
-import { FF_UNSAVED_CHANGES, isFF } from "../utils/feature-flags";
 import { TourProvider } from "@humansignal/core";
 import { ToastProvider, ToastViewport } from "@humansignal/ui";
 import { JotaiProvider, JotaiStore } from "../utils/jotai-store";
@@ -40,11 +39,11 @@ const browserHistory = createBrowserHistory({
     const callbackWrapper = (result) => {
       browserHistory.isBlocking = false;
       callback(result);
-      isFF(FF_UNSAVED_CHANGES) && window.postMessage({ source: "label-studio", payload: UNBLOCK_HISTORY_MESSAGE });
+      window.postMessage({ source: "label-studio", payload: UNBLOCK_HISTORY_MESSAGE });
     };
     if (message === DRAFT_GUARD_KEY) {
       draftGuardCallback.current = callbackWrapper;
-    } else if (isFF(FF_UNSAVED_CHANGES) && message === LEAVE_BLOCKER_KEY) {
+    } else if (message === LEAVE_BLOCKER_KEY) {
       leaveBlockerCallback.current = callbackWrapper;
     } else {
       callbackWrapper(window.confirm(message));
