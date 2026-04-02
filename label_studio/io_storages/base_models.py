@@ -227,12 +227,19 @@ class StorageInfo(models.Model):
         # iterate over all storages
         storages = storages.only('id', 'last_sync_job', 'status', 'meta')
         for storage in storages:
-            storage.health_check()
+            try:
+                storage.health_check()
+            except Exception:
+                logger.warning(f'Health check failed for storage {storage.id}', exc_info=True)
 
     def health_check(self):
         # get duration between last ping time and now
         now = timezone.now()
-        last_ping = datetime.fromisoformat(self.meta.get('time_last_ping', str(now)))
+        meta = self.meta if self.meta is not None else {}
+        try:
+            last_ping = datetime.fromisoformat(meta.get('time_last_ping', str(now)))
+        except (ValueError, TypeError):
+            last_ping = now
         delta = (now - last_ping).total_seconds()
 
         # check redis connection
@@ -258,12 +265,15 @@ class StorageInfo(models.Model):
         if self.status not in [Status.IN_PROGRESS, Status.QUEUED]:
             return
 
-        queue = django_rq.get_queue('low')
-        try:
-            sync_job = Job.fetch(self.last_sync_job, connection=queue.connection)
-            job_status = sync_job.get_status()
-        except rq.exceptions.NoSuchJobError:
+        if not self.last_sync_job:
             job_status = 'not found'
+        else:
+            queue = django_rq.get_queue('low')
+            try:
+                sync_job = Job.fetch(self.last_sync_job, connection=queue.connection)
+                job_status = sync_job.get_status()
+            except (rq.exceptions.NoSuchJobError, TypeError):
+                job_status = 'not found'
 
         # broken synchronization between storage and job
         # this might happen when job was stopped because of OOM and on_failure wasn't called
