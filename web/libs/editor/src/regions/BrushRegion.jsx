@@ -21,10 +21,6 @@ import { FF_ZOOM_OPTIM, isFF } from "../utils/feature-flags";
 import { AliveRegion } from "./AliveRegion";
 import { RegionWrapper } from "./RegionWrapper";
 
-const _highlightOptions = {
-  opacity: 1,
-};
-
 const Points = types
   .model("Points", {
     id: types.optional(types.identifier, guidGenerator),
@@ -440,6 +436,12 @@ const HtxBrushLayer = observer(({ item, setShapeRef, pointsList }) => {
     ctx.lineWidth = strokeWidth;
     ctx.strokeStyle = strokeColor;
     ctx.globalCompositeOperation = compositeOperation;
+    // Eraser must draw at full alpha to completely remove pixels.
+    // Konva applies the parent Group's opacity (globalAlpha) before calling
+    // sceneFunc, which causes destination-out to only partially erase.
+    if (compositeOperation === "destination-out") {
+      ctx.globalAlpha = 1;
+    }
     ctx.stroke();
     ctx.restore();
   });
@@ -522,23 +524,23 @@ const HtxBrushView = ({ item, setShapeRef }) => {
 
   const imageDataRef = useRef(null);
 
-  // Drawing hit area by shape color to detect interactions inside the Konva
+  // Drawing hit area by shape color to detect interactions inside the Konva.
+  // Uses an offscreen canvas with drawImage (respects transforms) instead of
+  // putImageData (ignores transforms and always writes at canvas origin).
   const imageHitFunc = useCallback(
     (context, shape) => {
       if (image) {
         if (!imageDataRef.current) {
-          context.drawImage(image, 0, 0, item.parent.stageWidth, item.parent.stageHeight);
-          let imageData;
-          if (isFF(FF_ZOOM_OPTIM)) {
-            imageData = context.getImageData(
-              item.parent.alignmentOffset.x,
-              item.parent.alignmentOffset.y,
-              item.parent.stageWidth,
-              item.parent.stageHeight,
-            );
-          } else {
-            imageData = context.getImageData(0, 0, item.parent.stageWidth, item.parent.stageHeight);
-          }
+          const w = item.parent.stageWidth;
+          const h = item.parent.stageHeight;
+          const offscreen = document.createElement("canvas");
+
+          offscreen.width = w;
+          offscreen.height = h;
+          const offCtx = offscreen.getContext("2d");
+
+          offCtx.drawImage(image, 0, 0, w, h);
+          const imageData = offCtx.getImageData(0, 0, w, h);
           const colorParts = colorToRGBAArray(shape.colorKey);
 
           for (let i = imageData.data.length / 4 - 1; i >= 0; i--) {
@@ -548,9 +550,10 @@ const HtxBrushView = ({ item, setShapeRef }) => {
               }
             }
           }
-          imageDataRef.current = imageData;
+          offCtx.putImageData(imageData, 0, 0);
+          imageDataRef.current = offscreen;
         }
-        context.putImageData(imageDataRef.current, 0, 0);
+        context.drawImage(imageDataRef.current, 0, 0, item.parent.stageWidth, item.parent.stageHeight);
       }
     },
     [image, item.parent?.stageWidth, item.parent?.stageHeight],
@@ -580,14 +583,12 @@ const HtxBrushView = ({ item, setShapeRef }) => {
   if (!item.parent) return null;
 
   const stage = item.parent?.stageRef;
-  const clip = isFF(FF_ZOOM_OPTIM)
-    ? {
-        x: 0,
-        y: 0,
-        width: item.parent.stageWidth,
-        height: item.parent.stageHeight,
-      }
-    : null;
+  const clip = {
+    x: 0,
+    y: 0,
+    width: item.parent.stageWidth,
+    height: item.parent.stageHeight,
+  };
 
   return (
     <RegionWrapper item={item}>
