@@ -534,7 +534,7 @@ const AnnotationStoreModel = types
       // Area id is <uniq-id>#<annotation-id> to be uniq across all tree
       s.forEach((r) => {
         if ("id" in r) {
-          const id = r.id.replace(/#.*$/, `#${c.id}`);
+          const id = String(r.id).replace(/#.*$/, `#${c.id}`);
 
           ids[r.id] = id;
           r.id = id;

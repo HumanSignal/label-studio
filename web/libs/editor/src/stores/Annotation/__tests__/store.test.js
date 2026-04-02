@@ -352,6 +352,19 @@ describe("Annotation store (store.js)", () => {
       expect(childAnn.parent_annotation).toBe(100);
     });
 
+    it("addAnnotationFromPrediction handles numeric result ids without throwing (e.id.replace bug)", () => {
+      const store = createStore();
+      store.initializeStore({});
+      const pred = store.annotationStore.addPrediction({ result: [], pk: "51" });
+      // Simulate a result where id is a number (not a string), which previously caused
+      // "e.id.replace is not a function" when .replace() was called directly on a number.
+      pred._initialAnnotationObj = [{ id: 12345, from_name: "t1", to_name: "t1", type: "labels", value: {} }];
+      expect(() => {
+        const ann = store.annotationStore.addAnnotationFromPrediction(pred);
+        expect(ann).toBeDefined();
+      }).not.toThrow();
+    });
+
     it("createAnnotation with non-interactive prediction result deserializes and selects", () => {
       const store = createStore();
       store.initializeStore({});
