@@ -20,6 +20,18 @@ const waitForPaint = () =>
     requestAnimationFrame(() => requestAnimationFrame(resolve));
   });
 
+/** Upper bound for lazy stub GET /api/annotations/:id/ so loading state cannot hang forever (FIT-1570). */
+const STUB_ANNOTATION_FETCH_TIMEOUT_MS = 120_000;
+
+function promiseWithTimeout(promise, ms, label = "Operation") {
+  return Promise.race([
+    promise,
+    new Promise((_, reject) => {
+      setTimeout(() => reject(new Error(`${label} timed out after ${ms}ms`)), ms);
+    }),
+  ]);
+}
+
 const DEFAULT_INTERFACES = [
   "basic",
   "controls",
@@ -103,6 +115,12 @@ export class LSFWrapper {
 
   /** @type {function} */
   interfacesModifier = (interfaces) => interfaces;
+
+  /**
+   * FIT-1570: Incremented for each stub hydration that shows the app loader (annotation tab switches).
+   * Used so an older in-flight fetch does not clear loading after a newer selection.
+   */
+  _hydrateStubAnnotationSeq = 0;
 
   /**
    *
@@ -386,75 +404,90 @@ export class LSFWrapper {
 
     this.setLoading(true, hasChangedTasks);
 
-    // Let the browser paint the loading indicator before heavy store operations
-    await waitForPaint();
-
-    if (!this.lsf) return;
-
-    // Pure data preparation (no MobX mutations)
-    const lsfTask = taskToLSFormat(task);
-    const isRejectedQueue = isDefined(task.default_selected_annotation);
-    const taskList = this.datamanager.store.taskStore.list;
-    const taskHistory = taskList
-      .map((task) => this.taskHistory.find((item) => item.taskId === task.id))
-      .filter(Boolean);
-
-    const extracted = taskHistory.find((item) => item.taskId === task.id);
-
-    if (!fromHistory && extracted) {
-      taskHistory.splice(taskHistory.indexOf(extracted), 1);
-      taskHistory.push(extracted);
+    if (isActive(FF_FIT_720_LAZY_LOAD_ANNOTATIONS)) {
+      // Invalidate in-flight stub hydrations from annotation tab switches so their finally
+      // does not call setLoading(false) while this task load is in progress (FIT-1570).
+      this._hydrateStubAnnotationSeq++;
     }
 
-    if (!extracted) {
-      taskHistory.push({ taskId: task.id, annotationId: null });
-    }
+    try {
+      // Let the browser paint the loading indicator before heavy store operations
+      await waitForPaint();
 
-    if (isRejectedQueue && !annotationID) {
-      annotationID = task.default_selected_annotation;
-    }
-
-    // Batch store reset and interface mutations in a single MobX transaction
-    // so reactions fire only once instead of cascading after each action.
-    // initializeStore must run OUTSIDE this batch because it calls afterReset()
-    // which re-attaches shared stores (e.g. Taxonomy). If detach() and re-attach
-    // happen in the same transaction, MST throws "already part of state tree".
-    runInAction(() => {
-      if (hasChangedTasks) {
-        this.lsf.resetState();
-      } else {
-        this.lsf.resetAnnotationStore();
+      if (!this.lsf) {
+        return;
       }
 
-      this.lsf.toggleInterface("postpone", this.task.allow_postpone !== false);
-      this.lsf.toggleInterface("topbar:task-counter", true);
+      // Pure data preparation (no MobX mutations)
+      const lsfTask = taskToLSFormat(task);
+      const isRejectedQueue = isDefined(task.default_selected_annotation);
+      const taskList = this.datamanager.store.taskStore.list;
+      const taskHistory = taskList
+        .map((task) => this.taskHistory.find((item) => item.taskId === task.id))
+        .filter(Boolean);
 
-      if (isFF(FF_FIT_1304_STRICT_OVERLAP)) {
-        const overlapReached = this.task.overlap_reached === true;
-        this.overlapReached = overlapReached;
-        this.overlapReachedMessage =
-          this.task.overlap_reached_message ||
-          "Annotation overlap has been reached for this task. Your draft is preserved but cannot be submitted.";
+      const extracted = taskHistory.find((item) => item.taskId === task.id);
 
-        this.lsf.setFlags({
-          overlapReached,
-          overlapReachedMessage: this.overlapReachedMessage,
-        });
-      } else {
-        this.overlapReached = false;
-        this.overlapReachedMessage = "";
+      if (!fromHistory && extracted) {
+        taskHistory.splice(taskHistory.indexOf(extracted), 1);
+        taskHistory.push(extracted);
       }
 
-      this.lsf.assignTask(task);
-    });
+      if (!extracted) {
+        taskHistory.push({ taskId: task.id, annotationId: null });
+      }
 
-    this.lsf.initializeStore(lsfTask);
+      if (isRejectedQueue && !annotationID) {
+        annotationID = task.default_selected_annotation;
+      }
 
-    await this.setAnnotation(annotationID, fromHistory || isRejectedQueue, selectPrediction);
-    this.setLoading(false);
+      // Batch store reset and interface mutations in a single MobX transaction
+      // so reactions fire only once instead of cascading after each action.
+      // initializeStore must run OUTSIDE this batch because it calls afterReset()
+      // which re-attaches shared stores (e.g. Taxonomy). If detach() and re-attach
+      // happen in the same transaction, MST throws "already part of state tree".
+      runInAction(() => {
+        if (hasChangedTasks) {
+          this.lsf.resetState();
+        } else {
+          this.lsf.resetAnnotationStore();
+        }
 
-    if (isFF(FF_FIT_1304_STRICT_OVERLAP) && this.overlapReached) {
-      this.showOverlapReachedMessage();
+        this.lsf.toggleInterface("postpone", this.task.allow_postpone !== false);
+        this.lsf.toggleInterface("topbar:task-counter", true);
+
+        if (isFF(FF_FIT_1304_STRICT_OVERLAP)) {
+          const overlapReached = this.task.overlap_reached === true;
+          this.overlapReached = overlapReached;
+          this.overlapReachedMessage =
+            this.task.overlap_reached_message ||
+            "Annotation overlap has been reached for this task. Your draft is preserved but cannot be submitted.";
+
+          this.lsf.setFlags({
+            overlapReached,
+            overlapReachedMessage: this.overlapReachedMessage,
+          });
+        } else {
+          this.overlapReached = false;
+          this.overlapReachedMessage = "";
+        }
+
+        this.lsf.assignTask(task);
+      });
+
+      this.lsf.initializeStore(lsfTask);
+
+      await this.setAnnotation(annotationID, fromHistory || isRejectedQueue, selectPrediction);
+
+      if (isFF(FF_FIT_1304_STRICT_OVERLAP) && this.overlapReached) {
+        this.showOverlapReachedMessage();
+      }
+    } catch (error) {
+      console.error("[LSFWrapper] setLSFTask failed", error);
+      throw error;
+    } finally {
+      // Always clear loading: early return after waitForPaint, thrown errors, or success (FIT-1570 hardening).
+      this.setLoading(false);
     }
   }
 
@@ -505,7 +538,8 @@ export class LSFWrapper {
    * @private
    */
   async ensureAnnotationLoaded(annotationPk) {
-    if (!isFF(FF_FIT_720_LAZY_LOAD_ANNOTATIONS) || !this.labelStream) {
+    // Not label-stream-only: Grid / other callers may hydrate stubs outside label stream (FIT-1570).
+    if (!isActive(FF_FIT_720_LAZY_LOAD_ANNOTATIONS)) {
       return null;
     }
 
@@ -624,8 +658,6 @@ export class LSFWrapper {
         // not submitted draft, most likely from previous labeling session
         annotation = first;
       } else if (isDefined(annotationID) && selectAnnotation) {
-        // Lazy load annotation if it's a stub (FIT-720)
-        await this.ensureAnnotationLoaded(annotationID);
         annotation = this.annotations.find(({ pk }) => pk === annotationID);
       } else if (showPredictions && this.predictions.length > 0 && !this.isInteractivePreannotations) {
         annotation = cs.addAnnotationFromPrediction(this.predictions[0]);
@@ -658,6 +690,17 @@ export class LSFWrapper {
         cs.selectAnnotation(annotation.id);
       }
       this.datamanager.invoke("annotationSet", annotation);
+
+      // FIT-1570: Stub hydration is debounced in onSelectAnnotation (setTimeout(0)), so it used to run
+      // after setLoading(false). Await hydration here so the editor stays blocked until results exist,
+      // avoiding drafts that overwrite the payload still in flight.
+      if (isActive(FF_FIT_720_LAZY_LOAD_ANNOTATIONS)) {
+        const selected = this.lsf.annotationStore.selected;
+        if (selected?.type === "annotation" && selected?.pk) {
+          // setLSFTask already set isLoading; do not toggle again inside hydration (FIT-1570)
+          await this._hydrateStubAnnotation(selected, { showLoadingWhileFetching: false });
+        }
+      }
     }
   }
 
@@ -1146,7 +1189,7 @@ export class LSFWrapper {
     // FIT-720: Debounce selectAnnotation callbacks during batch selection (init)
     // During init, selectAnnotation fires for ALL annotations in rapid succession.
     // This debounce ensures only the final selection triggers the callback.
-    if (isFF(FF_FIT_720_LAZY_LOAD_ANNOTATIONS)) {
+    if (isActive(FF_FIT_720_LAZY_LOAD_ANNOTATIONS)) {
       if (this._selectAnnotationTimeout) {
         clearTimeout(this._selectAnnotationTimeout);
         // Keep nextAnnotation (the "old" selection) from the FIRST call in the batch.
@@ -1190,7 +1233,7 @@ export class LSFWrapper {
     // FIT-720: Hydrate stub annotations when selected
     // IMPORTANT: Use the CURRENTLY SELECTED annotation, not the one from the callback
     // The debounce may have caused the callback annotation to be stale
-    if (isFF(FF_FIT_720_LAZY_LOAD_ANNOTATIONS)) {
+    if (isActive(FF_FIT_720_LAZY_LOAD_ANNOTATIONS)) {
       const currentSelected = this.lsf?.annotationStore?.selected;
       if (currentSelected?.pk) {
         // Prefetch comments on annotation selection so region comment indicators
@@ -1199,13 +1242,19 @@ export class LSFWrapper {
         // if the Comments tab is already open and triggers its own fetch.
         this.lsf?.commentStore?.listComments({ suppressClearComments: false });
 
-        await this._hydrateStubAnnotation(currentSelected);
+        // FIT-1570: This path runs from setTimeout(0) (debounced) and is not awaited by the editor.
+        // Show the app loader until the stub fetch completes so users cannot edit or create drafts first.
+        await this._hydrateStubAnnotation(currentSelected, { showLoadingWhileFetching: true });
       }
     }
   };
 
-  // FIT-720: Hydrate a stub annotation by fetching full data from API
-  _hydrateStubAnnotation = async (annotation) => {
+  /**
+   * FIT-720: Hydrate a stub annotation by fetching full data from API.
+   * @param {{ showLoadingWhileFetching?: boolean }} [options] - When true, toggles LSF isLoading during fetch (annotation switch path only; initial task load already has loading).
+   */
+  _hydrateStubAnnotation = async (annotation, options = {}) => {
+    const { showLoadingWhileFetching = false } = options;
     const needsFullHydration = annotationNeedsHydration(annotation);
     const versionsResult = annotation?.versions?.result;
     const needsVersionsPopulated =
@@ -1218,15 +1267,31 @@ export class LSFWrapper {
     }
 
     const annotationPk = annotation.pk;
+    let seq = 0;
+    if (showLoadingWhileFetching && isActive(FF_FIT_720_LAZY_LOAD_ANNOTATIONS)) {
+      seq = ++this._hydrateStubAnnotationSeq;
+      this.setLoading(true);
+    }
 
     try {
-      const fullAnnotation = await this.datamanager.apiCall("fetchAnnotation", {
-        annotationID: annotationPk,
-      });
+      const fullAnnotation = await promiseWithTimeout(
+        this.datamanager.apiCall("fetchAnnotation", {
+          annotationID: annotationPk,
+        }),
+        STUB_ANNOTATION_FETCH_TIMEOUT_MS,
+        "fetchAnnotation",
+      );
 
       applyAnnotationHydrationFromApi(this.annotations, annotationPk, fullAnnotation);
-    } catch {
+    } catch (error) {
       // Failed to hydrate annotation - will show stub state
+      if (String(error?.message ?? "").includes("timed out")) {
+        console.warn("[LSFWrapper] Annotation hydration timed out", { annotationPk });
+      }
+    } finally {
+      if (showLoadingWhileFetching && seq > 0 && seq === this._hydrateStubAnnotationSeq) {
+        this.setLoading(false);
+      }
     }
   };
 
@@ -1362,15 +1427,14 @@ export class LSFWrapper {
   }
 
   async withinLoadingState(callback) {
-    let result;
-
     this.setLoading(true);
-    if (callback) {
-      result = await callback.call(this);
+    try {
+      if (callback) {
+        return await callback.call(this);
+      }
+    } finally {
+      this.setLoading(false);
     }
-    this.setLoading(false);
-
-    return result;
   }
 
   destroy() {
