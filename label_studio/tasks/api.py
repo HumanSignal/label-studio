@@ -724,7 +724,7 @@ class AnnotationAPI(generics.RetrieveUpdateDestroyAPIView):
                 description='Annotation',
                 response=AnnotationSerializer(many=True),
                 examples=[
-                    OpenApiExample(name='response', value=[annotation_response_example], media_type='application/json')
+                    OpenApiExample(name='response', value=annotation_response_example, media_type='application/json')
                 ],
             )
         },
@@ -943,7 +943,7 @@ class AnnotationDraftAPI(generics.RetrieveUpdateDestroyAPIView):
                 description='Predictions list',
                 response=PredictionSerializer(many=True),
                 examples=[
-                    OpenApiExample(name='response', value=[prediction_response_example], media_type='application/json')
+                    OpenApiExample(name='response', value=prediction_response_example, media_type='application/json')
                 ],
             )
         },

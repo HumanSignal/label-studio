@@ -73,17 +73,32 @@ dm_task_response_example = {
 
 annotation_response_example = {
     'id': 1,
+    'state': 'CREATED',
     'result': result_example,
+    'created_username': '',
+    'created_ago': '',
     'task': 1,
     'project': 1,
     'completed_by': 1,
     'updated_by': 1,
     'was_cancelled': False,
     'ground_truth': False,
+    'created_at': '2024-06-18T23:45:46.048490Z',
+    'updated_at': '2024-06-18T23:45:46.048538Z',
     'lead_time': 10,
 }
 
-prediction_response_example = {'id': 1, 'task': 1, 'result': result_example, 'score': 0.95, 'model_version': 'yolo-v8'}
+prediction_response_example = {
+    'id': 1,
+    'task': 1,
+    'project': 1,
+    'result': result_example,
+    'score': 0.95,
+    'model_version': 'yolo-v8',
+    'created_ago': '',
+    'created_at': '2024-06-18T23:45:46.048490Z',
+    'updated_at': '2024-06-18T23:45:46.048538Z',
+}
 
 # Task request schema following OpenAPI 3.0 specification
 task_request_schema = {
