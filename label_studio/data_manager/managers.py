@@ -145,6 +145,17 @@ def _set_prefilter_task_ids_for_agreement(request, queryset, prepare_params, pro
 
     from data_manager.prepare_params import Filters
 
+    # Run prefilter with deep-copied filter models to avoid mutating the original request filters.
+    # apply_filters() casts values in-place (e.g. Datetime strings -> datetime), and reusing those
+    # mutated objects in the main filtering pass can trigger type errors.
+    #
+    # Child filters are dropped for prefiltering.
+    narrowed_items = []
+    for _filter in non_agreement_filters:
+        copied_filter = _filter.copy(deep=True)
+        copied_filter.child_filter = None
+        narrowed_items.append(copied_filter)
+
     if prefilter_annotation_fields:
         queryset = PreparedTaskManager.annotate_queryset(
             queryset,
@@ -152,7 +163,7 @@ def _set_prefilter_task_ids_for_agreement(request, queryset, prepare_params, pro
             request=request,
         )
 
-    narrowed_filters = Filters(conjunction=filters.conjunction, items=non_agreement_filters)
+    narrowed_filters = Filters(conjunction=filters.conjunction, items=narrowed_items)
     try:
         narrowed_queryset = apply_filters(queryset, narrowed_filters, project, request)
     except FieldError:
