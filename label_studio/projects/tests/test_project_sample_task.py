@@ -121,6 +121,39 @@ class TestProjectSampleTask(TestCase):
             assert 'sample_task' in response_data
             assert response_data['sample_task'] == fallback_data
 
+    def test_sample_task_returns_400_when_both_enhanced_and_fallback_fail(self):
+        """Test that endpoint returns 400 instead of 500 when both generation paths fail."""
+        client = APIClient()
+        client.force_authenticate(user=self.project.created_by)
+        label_config = """
+        <View>
+          <Text name='text' value='$text'/>
+          <Choices name='sentiment' toName='text'>
+            <Choice value='Positive'/>
+            <Choice value='Negative'/>
+            <Choice value='Neutral'/>
+          </Choices>
+        </View>
+        """
+
+        with (
+            patch.object(
+                projects.api.LabelInterface,
+                'generate_complete_sample_task',
+                side_effect=ValueError('Enhanced generation failed'),
+            ),
+            patch('projects.api.Project.get_sample_task', side_effect=ValueError('Fallback generation failed')),
+        ):
+            response = client.post(
+                self.url,
+                data=json.dumps({'label_config': label_config, 'include_annotation_and_prediction': True}),
+                content_type='application/json',
+            )
+
+            assert response.status_code == 400
+            response_data = response.json()
+            assert 'Unable to generate sample task from the provided label config.' in json.dumps(response_data)
+
     def test_sample_task_fallback_when_prediction_generation_fails(self):
         """Test fallback to project.get_sample_task when LabelInterface.generate_sample_prediction raises an exception"""
         client = APIClient()
