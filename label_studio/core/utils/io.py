@@ -20,7 +20,7 @@ from django.core.files.temp import NamedTemporaryFile
 from urllib3.util import parse_url
 
 # full path import results in unit test failures
-from .exceptions import InvalidUploadUrlError
+from .exceptions import SsrfBlockedUrlError
 
 _DIR_APP_NAME = 'label-studio'
 
@@ -175,9 +175,9 @@ class SerializableGenerator(list):
         return itertools.chain(self._head, *self[:1])
 
 
-def validate_upload_url(url, block_local_urls=True):
+def validate_url_for_ssrf(url, block_local_urls=True):
     """Utility function for defending against SSRF attacks. Raises
-        - InvalidUploadUrlError if the url is not HTTP[S], or if block_local_urls is enabled
+        - SsrfBlockedUrlError if the url is not HTTP[S], or if block_local_urls is enabled
           and the URL resolves to a local address.
         - LabelStudioApiException if the hostname cannot be resolved
 
@@ -188,7 +188,7 @@ def validate_upload_url(url, block_local_urls=True):
     parsed_url = parse_url(url)
 
     if parsed_url.scheme not in ('http', 'https'):
-        raise InvalidUploadUrlError
+        raise SsrfBlockedUrlError
 
     domain = parsed_url.host
     try:
@@ -200,6 +200,11 @@ def validate_upload_url(url, block_local_urls=True):
 
     if block_local_urls:
         validate_ip(ip)
+
+
+def validate_upload_url(url, block_local_urls=True):
+    """Backward-compatible wrapper around validate_url_for_ssrf."""
+    return validate_url_for_ssrf(url, block_local_urls=block_local_urls)
 
 
 def validate_ip(ip: str) -> None:
@@ -257,17 +262,30 @@ def validate_ip(ip: str) -> None:
 
     for subnet in banned_subnets:
         if ipaddress.ip_address(ip) in ipaddress.ip_network(subnet):
-            raise InvalidUploadUrlError(f'URL resolves to a reserved network address (block: {subnet})')
+            raise SsrfBlockedUrlError(f'URL resolves to a reserved network address (block: {subnet})')
+
+
+def ssrf_safe_request(method, url, *args, **kwargs):
+    block_local_urls = kwargs.pop('block_local_urls', settings.SSRF_PROTECTION_ENABLED)
+    validate_url_for_ssrf(url, block_local_urls=block_local_urls)
+    # Reason for #nosec: url has been validated as SSRF safe by the
+    # validation check above.
+    response = requests.request(method, url, *args, **kwargs)  # nosec
+
+    # second check for SSRF for prevent redirect and dns rebinding attacks
+    if block_local_urls:
+        try:
+            response_ip = response.raw._connection.sock.getpeername()[0]
+            validate_ip(response_ip)
+        except (AttributeError, TypeError, ValueError):
+            # Some adapters/mocks don't expose socket details.
+            pass
+    return response
 
 
 def ssrf_safe_get(url, *args, **kwargs):
-    validate_upload_url(url, block_local_urls=settings.SSRF_PROTECTION_ENABLED)
-    # Reason for #nosec: url has been validated as SSRF safe by the
-    # validation check above.
-    response = requests.get(url, *args, **kwargs)  # nosec
+    return ssrf_safe_request('GET', url, *args, **kwargs)
 
-    # second check for SSRF for prevent redirect and dns rebinding attacks
-    if settings.SSRF_PROTECTION_ENABLED:
-        response_ip = response.raw._connection.sock.getpeername()[0]
-        validate_ip(response_ip)
-    return response
+
+def ssrf_safe_post(url, *args, **kwargs):
+    return ssrf_safe_request('POST', url, *args, **kwargs)
