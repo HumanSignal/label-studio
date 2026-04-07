@@ -5,23 +5,10 @@ import { createElement, Fragment } from "react";
 import { Tooltip } from "@humansignal/ui";
 import Hint from "../components/Hint/Hint";
 import { cn } from "../utils/bem";
-import { FF_MULTI_OBJECT_HOTKEYS, isFF } from "../utils/feature-flags";
 import { isDefined, isMacOS } from "../utils/utilities";
 import defaultKeymap from "./settings/keymap.json";
 
 type Keymap = typeof defaultKeymap;
-
-if (!isFF(FF_MULTI_OBJECT_HOTKEYS)) {
-  const prev = (defaultKeymap as Keymap)["image:prev"];
-  const next = (defaultKeymap as Keymap)["image:next"];
-
-  if (prev) {
-    prev.key = prev.mac = "ctrl+a";
-  }
-  if (next) {
-    next.key = next.mac = "ctrl+d";
-  }
-}
 
 // Validate keymap integrity
 const allowedKeymapKeys = ["key", "mac", "description", "modifier", "modifierDescription", "active"];

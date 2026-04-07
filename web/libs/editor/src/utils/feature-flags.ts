@@ -104,8 +104,6 @@ export const FF_SIMPLE_INIT = "fflag_fix_front_leap_443_select_annotation_once";
  */
 export const FF_ZOOM_OPTIM = "fflag_fix_front_leap_32_zoom_perf_190923_short";
 
-export const FF_MULTI_OBJECT_HOTKEYS = "fflag_fix_leap_246_multi_object_hotkeys_160124_short";
-
 /**
  * It changes the reviewer flow to be more user-friendly and intuitive.
  */

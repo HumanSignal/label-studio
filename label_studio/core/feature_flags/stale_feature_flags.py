@@ -11,7 +11,6 @@ STALE_FEATURE_FLAGS = {
     # Feb 6
     'fflag_feat_all_dia_1576_prompts_easy_breezy_onboarding_short_async_presets_ks': False,
     'fflag_front_dia_1150_ddisco_sneak_preview': False,
-    'fflag_fix_leap_246_multi_object_hotkeys_160124_short': True,
     # Dec 29
     'fflag_feat_all_optic_1811_automax_project_setup_streaming': True,
     # Dec 31
