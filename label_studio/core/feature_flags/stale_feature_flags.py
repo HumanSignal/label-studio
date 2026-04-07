@@ -14,7 +14,6 @@ STALE_FEATURE_FLAGS = {
     # Dec 29
     'fflag_feat_all_optic_1811_automax_project_setup_streaming': True,
     # Dec 31
-    'fflag_root_43_prediction_results_filter': True,
     'fflag_root_45_better_user_filter': True,
     'fflag_root_13_annotation_results_filtering': True,
     'fflag_feat_root_16_support_parquet_cloud_storage': True,
