@@ -13,7 +13,7 @@ from core.redis import start_job_async_or_sync
 from core.utils.params import get_env
 from django.conf import settings
 from django.db import models, transaction
-from django.db.models.signals import post_save
+from django.db.models.signals import post_save, pre_delete
 from django.dispatch import receiver
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
@@ -277,7 +277,19 @@ class AzureBlobExportStorage(AzureBlobStorageMixin, ExportStorage):  # note: ord
         blob.upload_blob(json.dumps(ser_annotation), overwrite=True)
 
         # create link if everything ok
-        AzureBlobExportStorageLink.create(annotation, self)
+        AzureBlobExportStorageLink.create_or_skip_missing_annotation(annotation, self)
+
+    def delete_annotation(self, annotation):
+        container = self.get_container()
+        logger.debug(f'Deleting object on {self.__class__.__name__} Storage {self} for annotation {annotation}')
+
+        key = AzureBlobExportStorageLink.get_key(annotation)
+        key = str(self.prefix) + '/' + key if self.prefix else key
+
+        blob = container.get_blob_client(key)
+        blob.delete_blob()
+
+        AzureBlobExportStorageLink.objects.filter(storage=self, annotation=annotation).delete()
 
 
 def async_export_annotation_to_azure_storages(annotation: 'Annotation | int'):
@@ -300,6 +312,16 @@ def export_annotation_to_azure_storages(sender, instance, **kwargs):
     storages = getattr(instance.project, 'io_storages_azureblobexportstorages', None)
     if storages and storages.exists():  # avoid excess jobs in rq
         transaction.on_commit(lambda: start_job_async_or_sync(async_export_annotation_to_azure_storages, instance.pk))
+
+
+@receiver(pre_delete, sender=Annotation)
+def delete_annotation_from_azure_storages(sender, instance, **kwargs):
+    links = AzureBlobExportStorageLink.objects.filter(annotation=instance)
+    for link in links:
+        storage = link.storage
+        if storage.can_delete_objects:
+            logger.debug(f'Delete {instance} from Azure Blob storage {storage}')
+            storage.delete_annotation(instance)
 
 
 class AzureBlobImportStorageLink(ImportStorageLink):

@@ -24,7 +24,7 @@ from core.utils.iterators import iterate_queryset
 from data_export.serializers import ExportDataSerializer
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
-from django.db import models, transaction
+from django.db import IntegrityError, models, transaction
 from django.db.models import JSONField
 from django.shortcuts import reverse
 from django.utils import timezone
@@ -988,6 +988,25 @@ class ExportStorageLink(models.Model):
             # update updated_at field
             link.save()
         return link
+
+    @classmethod
+    def create_or_skip_missing_annotation(cls, annotation, storage):
+        """Create export link unless annotation disappeared during async export."""
+        try:
+            return cls.create(annotation, storage)
+        except Exception as exc:
+            if not isinstance(exc, IntegrityError):
+                raise
+            annotation_id = getattr(annotation, 'pk', annotation)
+            if annotation_id and not Annotation.objects.filter(pk=annotation_id).exists():
+                logger.info(
+                    'Skipping export link creation because annotation %s was deleted during export for %s storage %s',
+                    annotation_id,
+                    cls.__name__,
+                    getattr(storage, 'pk', None),
+                )
+                return None
+            raise
 
     def has_permission(self, user):
         user.project = self.annotation.project  # link for activity log

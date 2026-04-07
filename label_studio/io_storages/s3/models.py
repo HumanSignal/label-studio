@@ -297,7 +297,7 @@ class S3ExportStorage(S3StorageMixin, ExportStorage):
         s3.Object(self.bucket, key).put(Body=json.dumps(ser_annotation), **additional_params)
 
         # create link if everything ok
-        S3ExportStorageLink.create(annotation, self)
+        S3ExportStorageLink.create_or_skip_missing_annotation(annotation, self)
 
     @catch_and_reraise_from_none
     def delete_annotation(self, annotation):
