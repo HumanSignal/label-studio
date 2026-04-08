@@ -1,6 +1,6 @@
 import { type ChangeEvent, type FC, useEffect, useMemo, useState, useCallback } from "react";
 import { JsonViewer, type FilterConfig, Toggle } from "@humansignal/ui";
-import { FF_LOPS_E_3, FF_INTERACTIVE_JSON_VIEWER, isFF } from "../../../utils/feature-flags";
+import { FF_LOPS_E_3, isFF } from "../../../utils/feature-flags";
 import { CodeView } from "./CodeView";
 import styles from "./TaskSourceViewer.module.css";
 import { ViewToggle, type ViewMode } from "./ViewToggle";
@@ -76,14 +76,12 @@ export const TaskSourceViewer: FC<TaskSourceViewerProps> = ({
   storageKey,
   renderToggle,
 }) => {
-  const isInteractiveViewerEnabled = isFF(FF_INTERACTIVE_JSON_VIEWER);
-
   const [taskData, setTaskData] = useState(content);
   const [loading, setLoading] = useState(true);
 
   // View mode (Code/Interactive) — global key so preference is shared across projects
   const [view, setView] = useState<ViewMode>(
-    () => (localStorage.getItem(`${TASK_SOURCE_VIEWER_GLOBAL_KEY}:view`) as ViewMode) || "code",
+    () => (localStorage.getItem(`${TASK_SOURCE_VIEWER_GLOBAL_KEY}:view`) as ViewMode) || "interactive",
   );
 
   // Resolve URIs — per project when storageKey is set (same key as JSON viewer search/filters)
@@ -134,10 +132,10 @@ export const TaskSourceViewer: FC<TaskSourceViewerProps> = ({
 
   // Provide toggle to external render location (e.g., modal header)
   useEffect(() => {
-    if (renderToggle && isInteractiveViewerEnabled) {
+    if (renderToggle) {
       renderToggle(<ViewToggle view={view} onViewChange={handleViewChange} />);
     }
-  }, [renderToggle, view, handleViewChange, isInteractiveViewerEnabled]);
+  }, [renderToggle, view, handleViewChange]);
 
   // Collapse the tree when there are many annotations/predictions to avoid freezing
   const collapseDepth = useMemo(() => {
