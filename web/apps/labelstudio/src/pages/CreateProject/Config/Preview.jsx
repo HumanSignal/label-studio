@@ -147,10 +147,10 @@ export const Preview = ({ config, data, error, loading, project }) => {
 
   return (
     <div className={configClass.elem("preview").toClassName()}>
-      <h3>Preview</h3>
+      <h3 className={configClass.elem("preview-header").toClassName()}>Preview</h3>
       {error && (
         <div className={configClass.elem("preview-error").toClassName()}>
-          <h2>
+          <h2 className={configClass.elem("preview-error-header").toClassName()}>
             {error.detail} {error.id}
           </h2>
           {error.validation_errors?.non_field_errors?.map?.((err) => (
