@@ -84,7 +84,9 @@ export const Preview = ({ config, data, error, loading, project }) => {
         interfaces: ["side-column"],
         // with SharedStore we should use more late event
         onStorageInitialized(LS) {
-          LS.settings.bottomSidePanel = true;
+          if (!LS.settings.bottomSidePanel) {
+            LS.settings.toggleBottomSP();
+          }
 
           const initAnnotation = () => {
             const as = LS.annotationStore;
