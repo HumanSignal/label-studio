@@ -16,8 +16,9 @@ import { jsxJsPlugin } from "./vite-lib-jsx-plugins";
 const require = createRequire(import.meta.url);
 loadEnv("", path.resolve(__dirname, "../../../"), "");
 
-const { postcssPrefixLsfClasses } = require("./postcss-prefix-lsf.cjs") as {
+const { postcssPrefixLsfClasses, postcssPreProcessGlobalBlocks } = require("./postcss-prefix-lsf.cjs") as {
   postcssPrefixLsfClasses: () => AcceptedPlugin;
+  postcssPreProcessGlobalBlocks: () => AcceptedPlugin;
 };
 
 /**
@@ -95,6 +96,7 @@ export default defineConfig(async ({ mode }): Promise<UserConfig> => {
       postcss: {
         plugins: [
           postcssImport(),
+          postcssPreProcessGlobalBlocks(),
           postcssNested(),
           postcssPrefixLsfClasses(),
           tailwindcss({ config: tailwindConfig }),

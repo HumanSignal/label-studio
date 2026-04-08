@@ -206,7 +206,7 @@ flowchart TD
 
 ```mermaid
 flowchart TD
-  A1[Developer runs yarn playground build] --> B1[Nx playground build production target]
+  A1[Developer runs bun run playground:build] --> B1[Nx playground build production target]
   B1 --> C1[Webpack bundles app<br/>outputPath dist apps playground playground assets]
   C1 --> D1[Move built index html<br/>to dist apps playground index html]
   D1 --> E1[Static hosting platform<br/>serves dist apps playground]

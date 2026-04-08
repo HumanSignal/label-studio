@@ -569,7 +569,7 @@ export default observer(
       const allowedHoverTypes = /bitmask|vector/i;
       const _hasSelected = item.selectedRegions.some((r) => r.type.match(allowedHoverTypes) !== null);
       const tool = item.getToolsManager().findSelectedTool();
-      const _isAllowedTool = tool?.toolName?.match?.(allowedHoverTypes) !== null ?? false;
+      const _isAllowedTool = Boolean(tool?.toolName?.match?.(allowedHoverTypes));
 
       const hoveredRegion = item.regs.find((reg) => {
         if (reg.selected || tool?.mode === "drawing") return false;

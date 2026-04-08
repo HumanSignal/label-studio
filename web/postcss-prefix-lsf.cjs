@@ -97,4 +97,31 @@ function postcssPrefixLsfClasses() {
 
 postcssPrefixLsfClasses.postcss = true;
 
-module.exports = { postcssPrefixLsfClasses };
+function postcssPreProcessGlobalBlocks() {
+  return {
+    postcssPlugin: "postcss-preprocess-global-blocks",
+    Once(root) {
+      const from = root.source?.input?.from;
+      if (!isPrefixCssFile(from)) return;
+
+      // Find rules that are exactly `:global` block wrappers
+      root.walkRules((rule) => {
+        if (rule.selector === ":global") {
+          // Wrap all child rules in :global(...) pseudo class
+          rule.walkRules((child) => {
+            // Split the child selector by comma in case it's a list like `.a, .b`
+            child.selector = child.selector
+              .split(",")
+              .map((s) => `:global(${s.trim()})`)
+              .join(", ");
+          });
+          // Replace the `:global` wrapper block with its children
+          rule.replaceWith(rule.nodes);
+        }
+      });
+    },
+  };
+}
+postcssPreProcessGlobalBlocks.postcss = true;
+
+module.exports = { postcssPrefixLsfClasses, postcssPreProcessGlobalBlocks };

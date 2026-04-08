@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { IconWarning, ToastType, useToast } from "@humansignal/ui";
+import { cnm, IconWarning, ToastType, useToast } from "@humansignal/ui";
 
 // Shadcn UI components
 import { Button } from "@humansignal/ui";
@@ -32,7 +32,7 @@ export const HotkeysHeaderButtons = () => {
 
   return (
     <>
-      <div className={`${styles.flexRow} justify-end gap-tight`}>
+      <div className={cnm(styles.flexRow, "justify-end !gap-tight")}>
         <Button variant="neutral" look="outlined" onClick={() => setImportDialogOpen(true)}>
           Import
         </Button>

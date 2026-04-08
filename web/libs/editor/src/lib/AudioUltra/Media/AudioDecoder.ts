@@ -1,4 +1,5 @@
 import { type AudioDecoderWorker, getAudioDecoderWorker } from "@humansignal/audio-file-decoder";
+/** URL to decode-audio.wasm so the package can fetch and instantiate it with its own Emscripten env. */
 import decodeAudioWasmUrl from "@humansignal/audio-file-decoder/decode-audio.wasm?url";
 import { BaseAudioDecoder } from "./BaseAudioDecoder";
 import { clamp, info } from "../Common/Utils";

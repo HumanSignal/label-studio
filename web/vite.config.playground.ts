@@ -16,8 +16,9 @@ import { jsxJsPlugin, optimizeDepsAutomaticJsxPlugin } from "./vite-lib-jsx-plug
 const require = createRequire(import.meta.url);
 loadEnv("", path.resolve(__dirname, "../../../"), "");
 
-const { postcssPrefixLsfClasses } = require("./postcss-prefix-lsf.cjs") as {
+const { postcssPrefixLsfClasses, postcssPreProcessGlobalBlocks } = require("./postcss-prefix-lsf.cjs") as {
   postcssPrefixLsfClasses: () => AcceptedPlugin;
+  postcssPreProcessGlobalBlocks: () => AcceptedPlugin;
 };
 const isPlaygroundProd = process.env.MODE === "standalone-playground";
 
@@ -63,6 +64,7 @@ export default defineConfig(({ mode }) => {
       postcss: {
         plugins: [
           postcssImport(),
+          postcssPreProcessGlobalBlocks(),
           postcssNested(),
           postcssPrefixLsfClasses(),
           tailwindcss({ config: tailwindConfig }),

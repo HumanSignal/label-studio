@@ -26,4 +26,12 @@ def get_manifest_asset(path: str) -> str:
     """
     if path in _MANIFEST:
         return f'{settings.FRONTEND_HOSTNAME}{_MANIFEST[path]}'
+    # In HMR/dev mode use same-origin paths so the browser requests Django, which proxies to Vite.
+    # Cross-origin requests to Vite (e.g. FRONTEND_HOSTNAME) get blocked by ORB (Opaque Response Blocking).
+    if settings.FRONTEND_HMR:
+        if path == 'main.js':
+            return f'{settings.FRONTEND_HOSTNAME}/react-app/src/main.tsx'
+        if path == 'embed.js':
+            return f'{settings.FRONTEND_HOSTNAME}/react-app/src/embed.tsx'
+        return f'{settings.FRONTEND_HOSTNAME}/react-app/{path}'
     return f'{settings.FRONTEND_HOSTNAME}/react-app/{path}'

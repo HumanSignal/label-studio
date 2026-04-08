@@ -11,7 +11,7 @@ To reproduce CI locally and debug in Cypress UI:
 From the `web/` directory:
 
 ```bash
-MODE=standalone yarn nx run editor:build:production
+MODE=standalone bunx nx run editor:build:production
 ```
 
 **2. Serve the build on port 3000**
@@ -31,7 +31,7 @@ Leave this running. Confirm in the browser: [http://localhost:3000](http://local
 In a second terminal, from `web/`:
 
 ```bash
-yarn lsf:integration:watch
+bun run lsf:integration:watch
 ```
 
 This opens the Cypress UI. Choose a spec and run it; tests will hit `http://localhost:3000` (baseUrl in config). You can step through, inspect the app, and see exactly what Cypress sees.
@@ -39,5 +39,5 @@ This opens the Cypress UI. Choose a spec and run it; tests will hit `http://loca
 To run headless (like CI) instead:
 
 ```bash
-yarn lsf:integration
+bun run lsf:integration
 ```

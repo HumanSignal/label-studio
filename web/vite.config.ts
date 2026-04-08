@@ -13,12 +13,36 @@ import { CSS_PREFIX, cssModulesGenerateScopedName } from "./vite-prefix-css-modu
 import postcssImport from "postcss-import";
 import { jsxJsPlugin, optimizeDepsAutomaticJsxPlugin } from "./vite-lib-jsx-plugins";
 
+/**
+ * Enforces the loading order of global stylesheets (Tailwind reset/utilities and core variables).
+ * By explicitly injecting these at the very top of the entrypoint modules within the build system,
+ * we eliminate fragility and "hidden" implicit import order requirements inside React components.
+ */
+function enforceGlobalCssOrderPlugin(): import("vite").Plugin {
+  return {
+    name: "enforce-global-css-order",
+    enforce: "pre",
+    transform(code, id) {
+      const posixId = id.replace(/\\/g, "/");
+
+      if (posixId.endsWith("apps/labelstudio/src/main.tsx")) {
+        const cleanCode = code
+          .replace(/import ['"]@humansignal\/ui\/src\/tailwind\.css['"];?\n?/g, "")
+          .replace(/import ['"]\.\/app\/App\.prefix\.css['"];?\n?/g, "");
+        return `import "@humansignal/ui/src/tailwind.css";\nimport "./app/App.prefix.css";\n` + cleanCode;
+      }
+      return null;
+    },
+  };
+}
+
 const require = createRequire(import.meta.url);
 loadEnv("", path.resolve(__dirname, "../../../"), "");
 
 const release = require("./release");
-const { postcssPrefixLsfClasses } = require("./postcss-prefix-lsf.cjs") as {
+const { postcssPrefixLsfClasses, postcssPreProcessGlobalBlocks } = require("./postcss-prefix-lsf.cjs") as {
   postcssPrefixLsfClasses: () => AcceptedPlugin;
+  postcssPreProcessGlobalBlocks: () => AcceptedPlugin;
 };
 
 export default defineConfig(({ mode }) => {
@@ -128,6 +152,7 @@ export default defineConfig(({ mode }) => {
       postcss: {
         plugins: [
           postcssImport(),
+          postcssPreProcessGlobalBlocks(),
           postcssNested(),
           postcssPrefixLsfClasses(),
           tailwindcss({ config: tailwindConfig }),
@@ -163,6 +188,7 @@ export default defineConfig(({ mode }) => {
       chunkSizeWarningLimit: 2000,
     },
     plugins: [
+      enforceGlobalCssOrderPlugin(),
       jsxJsPlugin(),
       react(),
       svgr({
@@ -177,6 +203,9 @@ export default defineConfig(({ mode }) => {
       strictPort: true,
       cors: true,
       origin: FRONTEND_HOSTNAME,
+      headers: {
+        "Cross-Origin-Resource-Policy": "cross-origin",
+      },
       proxy: {
         "/api": { target: DJANGO_HOSTNAME, changeOrigin: true },
         "/static": { target: DJANGO_HOSTNAME, changeOrigin: true },

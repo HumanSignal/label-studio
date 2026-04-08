@@ -34,7 +34,7 @@
     "lsf:unit": "bun test --dom libs/editor/src",
     "dm:unit": "bun test --dom libs/datamanager/src",
     "test:unit": "bun test --dom",
-    "test:unit:coverage": "yarn run test:unit --coverage",
+    "test:unit:coverage": "bun run test:unit --coverage",
     "test:unit:editor": "bun test --dom libs/editor/src",
     "test:unit:core": "bun test --dom libs/core/src",
     "test:unit:datamanager": "bun test --dom libs/datamanager/src",
