@@ -2,11 +2,6 @@
 // Consider all pre-XFN flags legacy. Should be revised and removed.
 
 /**
- * Fix displaying of created_at in the review mode
- */
-export const FF_DEV_1480 = "ff_front_dev_1480_created_on_in_review_180122_short";
-
-/**
  * Model version selector per model backend
  */
 export const FF_DEV_1682 = "ff_front_dev_1682_model_version_dropdown_070622_short";
