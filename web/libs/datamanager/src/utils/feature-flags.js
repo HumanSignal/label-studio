@@ -22,12 +22,6 @@ export const FF_LOPS_E_3 = "fflag_feat_all_lops_e_3_datasets_short";
 export const FF_LSDV_4620_3_ML = "fflag_fix_front_lsdv_4620_memory_leaks_100723_short";
 
 /**
- * Allow to filter tasks in Data Manager by control tag labels used in annotation results
- * @link https://app.launchdarkly.com/projects/default/flags/fflag_root_13_annotation_results_filtering
- */
-export const FF_ANNOTATION_RESULTS_FILTERING = "fflag_root_13_annotation_results_filtering";
-
-/**
  * Allow to filter tasks in Data Manager by annotation results and user annotated on the same annotation
  * @link https://app.launchdarkly.com/projects/default/flags/fflag_root_45_better_user_filter
  */
