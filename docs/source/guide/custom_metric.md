@@ -117,7 +117,7 @@ Custom agreement metrics are added at the project level under **Settings > Quali
 
 ### On-prem deployment using Google Cloud Functions
 
-Unlike with AWS Lambda, you cannot set a prefix or tags for the Google Cloud Functions function. See LINK below. 
+Unlike with AWS Lambda, you cannot set a prefix or tags for the Google Cloud Functions function. See [Adding functions to projects in Label Studio](#Adding-functions-to-projects-in-Label-Studio) below. 
 
 
 ## On-prem deployments
