@@ -856,9 +856,17 @@ class Annotation(AnnotationMixin, FsmHistoryStateModel):
         return result
 
     def delete(self, *args, **kwargs):
-        # Store task and project references before deletion
-
-        result = super().delete(*args, **kwargs)
+        # Guard against FK violations from FSM signal handlers during CASCADE.
+        # When Django's collector deletes child AnnotationReviews before this
+        # annotation, the review post_delete handler (handle_review_deletion)
+        # would otherwise try to INSERT new AnnotationState rows referencing
+        # this soon-to-be-deleted annotation, causing an IntegrityError.
+        previous = CurrentContext.get('bulk_annotation_delete_in_progress')
+        CurrentContext.set('bulk_annotation_delete_in_progress', True)
+        try:
+            result = super().delete(*args, **kwargs)
+        finally:
+            CurrentContext.set('bulk_annotation_delete_in_progress', previous)
         self.update_task()
         self.on_delete_update_counters()
 
