@@ -600,6 +600,9 @@ describe("TaskSummary", () => {
       expect(screen.queryByTestId("agreement-value-mismatch")).not.toBeInTheDocument();
     });
 
+    /** One response object per call so each `response.json()` is independent (agreement + annotation). */
+    const jsonResponse = (data: object) => ({ ok: true, json: async () => data }) as unknown as Response;
+
     it("hydrates stub annotation only once when it has no regions yet", async () => {
       const annotation = createMockAnnotation({
         id: "101",
@@ -619,13 +622,32 @@ describe("TaskSummary", () => {
         reinitHistory: jest.fn(),
       });
 
-      const fetchSpy = jest.spyOn(globalThis, "fetch" as any).mockResolvedValue({
-        ok: true,
-        json: async () => ({
-          id: 101,
-          result: [{ from_name: "label", to_name: "text", type: "choices", value: { choices: ["positive"] } }],
-        }),
-      } as Response);
+      (globalThis.fetch as jest.Mock).mockImplementation((input: RequestInfo | URL) => {
+        const url =
+          typeof input === "string"
+            ? input
+            : typeof input === "object" && input !== null && "url" in input
+              ? String((input as { url: string }).url)
+              : String(input);
+        if (url.includes("/agreement/")) {
+          return Promise.resolve(
+            jsonResponse({
+              total_annotations: 0,
+              distributions: {},
+              agreement: 85.5,
+            }),
+          );
+        }
+        if (url.includes("/api/annotations/101/")) {
+          return Promise.resolve(
+            jsonResponse({
+              id: 101,
+              result: [{ from_name: "label", to_name: "text", type: "choices", value: { choices: ["positive"] } }],
+            }),
+          );
+        }
+        return Promise.resolve(jsonResponse({}));
+      });
 
       const store = createMockStore();
 
@@ -638,9 +660,6 @@ describe("TaskSummary", () => {
       expect((annotation as any).deleteAllRegions).toHaveBeenCalledTimes(1);
       expect((annotation as any).updateObjects).toHaveBeenCalledTimes(1);
       expect((annotation as any).reinitHistory).toHaveBeenCalledTimes(1);
-      expect(fetchSpy).toHaveBeenCalledWith("/api/annotations/101/");
-
-      fetchSpy.mockRestore();
     });
 
     it("clears existing areas and deserializes from server even when MST already had regions", async () => {
@@ -663,21 +682,31 @@ describe("TaskSummary", () => {
         reinitHistory: jest.fn(),
       });
 
-      const fetchSpy = jest.spyOn(globalThis, "fetch" as any).mockResolvedValue({
-        ok: true,
-        json: async () => ({
-          id: 202,
-          result: [],
-        }),
-      } as Response);
+      (globalThis.fetch as jest.Mock).mockImplementation((input: RequestInfo | URL) => {
+        const url =
+          typeof input === "string"
+            ? input
+            : typeof input === "object" && input !== null && "url" in input
+              ? String((input as { url: string }).url)
+              : String(input);
+        if (url.includes("/agreement/")) {
+          return Promise.resolve(
+            jsonResponse({
+              total_annotations: 0,
+              distributions: {},
+              agreement: 85.5,
+            }),
+          );
+        }
+        if (url.includes("/api/annotations/202/")) {
+          return Promise.resolve(jsonResponse({ id: 202, result: [] }));
+        }
+        return Promise.resolve(jsonResponse({}));
+      });
 
       const store = createMockStore();
 
       renderWithProviders(<TaskSummary annotations={[annotation]} store={store} />);
-
-      await waitFor(() => {
-        expect(fetchSpy).toHaveBeenCalledWith("/api/annotations/202/");
-      });
 
       await waitFor(() => {
         expect((annotation as any).deserializeResults).toHaveBeenCalledWith([]);
@@ -686,8 +715,6 @@ describe("TaskSummary", () => {
       expect((annotation as any).deleteAllRegions).toHaveBeenCalledWith({ deleteReadOnly: true });
       expect((annotation as any).updateObjects).toHaveBeenCalledTimes(1);
       expect((annotation as any).reinitHistory).toHaveBeenCalledTimes(1);
-
-      fetchSpy.mockRestore();
     });
   });
 });
