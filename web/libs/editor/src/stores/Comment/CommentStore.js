@@ -378,7 +378,9 @@ export const CommentStore = types
     const listComments = flow(function* ({ mounted = { current: true }, suppressClearComments } = {}) {
       if (!self.draftId && !self.annotationId) {
         if (!suppressClearComments) self.setComments([]);
-        if (mounted.current) self.setLoading(null);
+        // Always clear list loading: the store outlives the React tree (e.g. DM refresh /
+        // unmount mid-fetch). Gating on mounted strands loading === "list".
+        self.setLoading(null);
         return;
       }
 
@@ -405,7 +407,9 @@ export const CommentStore = types
           draft: self.draftId,
         });
 
-        if (mounted.current && annotation === self.annotationId) {
+        // Apply by annotation id only — do not gate on React mounted. If we skip setComments
+        // but Comments.tsx still advances lastLoadedAnnotationId, comments never load.
+        if (annotation === self.annotationId) {
           self.setComments(comments, commentsKey);
         }
       } catch (err) {
@@ -414,9 +418,9 @@ export const CommentStore = types
         if (fetchKey === self._fetchingCommentsForAnnotation) {
           self._fetchingCommentsForAnnotation = null;
         }
-        if (mounted.current) {
-          self.setLoading(null);
-        }
+        // Always clear list loading when the flow ends. Skipping this when the Comments
+        // component unmounted mid-request leaves isListLoading true forever.
+        self.setLoading(null);
       }
     });
 
