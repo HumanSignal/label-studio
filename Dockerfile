@@ -30,28 +30,19 @@ ENV BUILD_NO_SERVER=true \
 
 WORKDIR /label-studio/web
 
-RUN apk add --no-cache \
-    build-base \
-    pkgconfig \
-    cairo-dev \
-    giflib-dev \
-    libjpeg-turbo-dev \
-    libpng-dev \
-    pango-dev \
-    git \
-    python3
+RUN apk add --no-cache git
 
 COPY services/lso/web/package.json \
      services/lso/web/bun.lock \
      ./
-RUN --mount=type=cache,target=/root/.bun/install/cache,id=bun-install-cache,sharing=locked \
+RUN --mount=type=cache,target=/root/.bun/install/cache,id=bun-install-cache-lso,sharing=locked \
     bun install --frozen-lockfile --prefer-offline
 
 COPY services/lso/web ./
 # Target path for django-manifest-plugin → label_studio/core/static/js/manifest.json (collectstatic input).
 RUN mkdir -p /label-studio/label_studio/core/static/js
 COPY services/lso/pyproject.toml ../pyproject.toml
-RUN --mount=type=cache,target=/root/.bun/install/cache,id=bun-install-cache,sharing=locked \
+RUN --mount=type=cache,target=/root/.bun/install/cache,id=bun-install-cache-lso,sharing=locked \
     bun run build
 
 ################################ Stage: venv-builder (prepare the virtualenv)
