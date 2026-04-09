@@ -1,4 +1,4 @@
-import { flow, getRoot, types } from "mobx-state-tree";
+import { flow, getRoot, types, isAlive } from "mobx-state-tree";
 import { guidGenerator } from "../../utils/random";
 import { isDefined } from "../../utils/utils";
 import { DEFAULT_PAGE_SIZE, getStoredPageSize } from "../../components/Common/Pagination/Pagination";
@@ -259,6 +259,8 @@ export const DataStore = (modelName, { listItemType, apiMethod, properties, asso
         if (interaction) Object.assign(params, { interaction });
 
         const data = yield root.apiCall(apiMethod, params, {}, { allowToCancel: root.SDK.type === "DE" });
+
+        if (!isAlive(self)) return;
 
         // We cancel current request processing if request id
         // changed during the request. It indicates that something

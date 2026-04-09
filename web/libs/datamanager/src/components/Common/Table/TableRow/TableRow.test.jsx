@@ -9,6 +9,12 @@ mockModule("../../SkeletonLoader", () => ({
 }));
 
 // Mock feature flags
+let mockFlags = {};
+mockModule("../../../../utils/feature-flags", () => ({
+  FF_LOPS_E_3: "fflag_feat_all_lops_e_3_datasets_short",
+  isFF: mock((id) => mockFlags[id] === true),
+}));
+
 // Mock utils
 mockModule("../utils", () => ({
   getProperty: mock((obj, path) => {
@@ -68,8 +74,18 @@ describe("TableRow", () => {
   };
 
   const mockColumns = [
-    { id: "col1", Header: "Column 1", alias: "col1", original: { currentType: "String" } },
-    { id: "col2", Header: "Column 2", alias: "col2", original: { currentType: "String" } },
+    {
+      id: "col1",
+      Header: "Column 1",
+      alias: "col1",
+      original: { currentType: "String" },
+    },
+    {
+      id: "col2",
+      Header: "Column 2",
+      alias: "col2",
+      original: { currentType: "String" },
+    },
   ];
 
   const mockCellViews = {
@@ -253,15 +269,16 @@ describe("TableRow", () => {
     });
 
     it("should show skeleton loader when cell is loading", () => {
-      window.APP_SETTINGS = {
-        ...window.APP_SETTINGS,
-        feature_flags: { ...window.APP_SETTINGS?.feature_flags, [FF_LOPS_E_3]: true },
-      };
+      mockFlags[FF_LOPS_E_3] = true;
 
-      const loadingData = { ...mockData, loading: "col1" };
-      renderWithContext({ data: loadingData });
+      try {
+        const loadingData = { ...mockData, loading: "col1" };
+        renderWithContext({ data: loadingData });
 
-      expect(screen.getByTestId("skeleton-loader")).toBeInTheDocument();
+        expect(screen.getByTestId("skeleton-loader")).toBeInTheDocument();
+      } finally {
+        mockFlags[FF_LOPS_E_3] = false;
+      }
     });
   });
 

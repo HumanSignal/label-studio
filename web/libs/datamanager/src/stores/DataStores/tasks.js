@@ -1,4 +1,4 @@
-import { flow, getRoot, getSnapshot, types } from "mobx-state-tree";
+import { flow, getRoot, getSnapshot, types, isAlive } from "mobx-state-tree";
 import { DataStore, DataStoreItem } from "../../mixins/DataStore";
 import { getAnnotationSnapshot } from "../../sdk/lsf-utils";
 import { isDefined } from "../../utils/utils";
@@ -113,6 +113,8 @@ export const create = (columns) => {
       loadAnnotations: flow(function* () {
         const annotations = yield Promise.all([getRoot(self).apiCall("annotations", { taskID: self.id })]);
 
+        if (!isAlive(self)) return;
+
         self.annotations = annotations[0];
       }),
     }));
@@ -138,6 +140,8 @@ export const create = (columns) => {
     .actions((self) => ({
       loadTaskHistory: flow(function* (props) {
         const taskHistory = yield self.root.apiCall("taskHistory", props);
+
+        if (!isAlive(self)) return [];
 
         if (!Array.isArray(taskHistory)) {
           return [];
@@ -172,6 +176,8 @@ export const create = (columns) => {
 
         const taskData = yield self.root.apiCall("task", taskParams);
 
+        if (!isAlive(self)) return null;
+
         const taskStatusCode =
           taskData?.status ??
           taskData?.$meta?.status ??
@@ -205,6 +211,8 @@ export const create = (columns) => {
         const taskData = yield self.root.invokeAction("next_task", {
           reload: false,
         });
+
+        if (!isAlive(self)) return null;
 
         if (taskData?.$meta?.status === 404) {
           getRoot(self).SDK.invoke("labelStreamFinished");
@@ -248,6 +256,9 @@ export const create = (columns) => {
        */
       loadAnnotation: flow(function* (annotationID) {
         const annotationData = yield self.root.apiCall("fetchAnnotation", { annotationID });
+
+        if (!isAlive(self)) return null;
+
         return annotationData;
       }),
 
