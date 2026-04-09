@@ -6,7 +6,6 @@ STALE_FEATURE_FLAGS = {
     'fflag_feat_front_lsdv_5452_taxonomy_labeling_110823_short': True,
     # Feb 5
     'fflag_feature_all_optic_1421_cold_start_v2': False,
-    'fflag_feat_optic_1025_zendesk_widget_integration': False,
     # Feb 6
     'fflag_feat_all_dia_1576_prompts_easy_breezy_onboarding_short_async_presets_ks': False,
     'fflag_front_dia_1150_ddisco_sneak_preview': False,
