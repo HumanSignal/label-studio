@@ -8,8 +8,6 @@
 
 import { render, fireEvent, act } from "@testing-library/react";
 import { types } from "mobx-state-tree";
-import { FF_ZOOM_OPTIM } from "../../utils/feature-flags";
-
 const ff = mockFF();
 
 let mockBrushImageRef = null;
@@ -503,40 +501,8 @@ describe("BrushRegion", () => {
       expect(() => region.preDraw(5, 5)).not.toThrow();
     });
 
-    it("preDraw draws with layerRef and uses ctx when FF_ZOOM_OPTIM is false", () => {
+    it("preDraw uses clip rect from alignment and stage scale", () => {
       ff.reset();
-      const ctx = {
-        save: mock(),
-        restore: mock(),
-        beginPath: mock(),
-        moveTo: mock(),
-        lineTo: mock(),
-        rect: mock(),
-        clip: mock(),
-        lineCap: "",
-        lineJoin: "",
-        lineWidth: 0,
-        strokeStyle: "",
-        globalCompositeOperation: "",
-        stroke: mock(),
-      };
-      const mockRef = {
-        getLayer: () => ({ canvas: { context: ctx } }),
-        canvas: { _canvas: { style: {} }, context: ctx, width: 100, height: 100 },
-      };
-      region.setLayerRef(mockRef);
-      region.beginPath({ type: "add", strokeWidth: 25 });
-      region.preDraw(10, 20);
-      expect(ctx.save).toHaveBeenCalled();
-      expect(ctx.moveTo).toHaveBeenCalledWith(10, 20);
-      expect(ctx.lineTo).toHaveBeenCalled();
-      expect(ctx.stroke).toHaveBeenCalled();
-      expect(ctx.restore).toHaveBeenCalled();
-      ff.reset();
-    });
-
-    it("preDraw uses clip rect when FF_ZOOM_OPTIM is true", () => {
-      ff.set({ [FF_ZOOM_OPTIM]: true });
       const ctx = {
         save: mock(),
         restore: mock(),
@@ -561,7 +527,6 @@ describe("BrushRegion", () => {
       region.preDraw(5, 5);
       expect(ctx.rect).toHaveBeenCalled();
       expect(ctx.clip).toHaveBeenCalled();
-      ff.reset();
     });
 
     it("preDraw uses cachedPoints when multiple points added", () => {

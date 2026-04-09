@@ -98,8 +98,6 @@ mockModule("../../tags/object/Image", () => {
 });
 import { act, render } from "@testing-library/react";
 import { importModulesWithBunReload } from "./moduleReload";
-import { FF_ZOOM_OPTIM } from "../../utils/feature-flags";
-
 const ff = mockFF();
 let RectRegionModel;
 let HtxRectangle;
@@ -549,8 +547,8 @@ describe("RectRegion", () => {
       expect(getByTestId("konva-rect")).toBeInTheDocument();
     });
 
-    it("returns null when inViewPort is false (FF_ZOOM_OPTIM on)", () => {
-      ff.set({ [FF_ZOOM_OPTIM]: true });
+    it("returns null when inViewPort is false", () => {
+      ff.reset();
       root.image.setViewPortBBoxCoords({ left: 200, top: 200, right: 300, bottom: 300 });
       root.setAnnotation({
         regionStore: { isSelected: () => false },

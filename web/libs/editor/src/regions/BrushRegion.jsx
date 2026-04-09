@@ -17,7 +17,6 @@ import IsReadyMixin from "../mixins/IsReadyMixin";
 import { KonvaRegionMixin } from "../mixins/KonvaRegion";
 import { ImageModel } from "../tags/object/Image";
 import { colorToRGBAArray, rgbArrayToHex } from "../utils/colors";
-import { FF_ZOOM_OPTIM, isFF } from "../utils/feature-flags";
 import { AliveRegion } from "./AliveRegion";
 import { RegionWrapper } from "./RegionWrapper";
 
@@ -243,16 +242,14 @@ const Model = types
         const ctx = layer.canvas.context;
 
         ctx.save();
-        if (isFF(FF_ZOOM_OPTIM)) {
-          ctx.beginPath();
-          ctx.rect(
-            self.parent.alignmentOffset.x,
-            self.parent.alignmentOffset.y,
-            self.parent.stageWidth * self.parent.stageScale,
-            self.parent.stageHeight * self.parent.stageScale,
-          );
-          ctx.clip();
-        }
+        ctx.beginPath();
+        ctx.rect(
+          self.parent.alignmentOffset.x,
+          self.parent.alignmentOffset.y,
+          self.parent.stageWidth * self.parent.stageScale,
+          self.parent.stageHeight * self.parent.stageScale,
+        );
+        ctx.clip();
         ctx.beginPath();
         if (cachedPoints.length / 2 > 3) {
           ctx.moveTo(...self.prepareCoords([lastPointX, lastPointY]));
@@ -627,13 +624,6 @@ const HtxBrushView = ({ item, setShapeRef }) => {
             if (store.annotationStore.selected.isLinkingMode) {
               item.onClickRegion(e);
               return;
-            }
-
-            if (!isFF(FF_ZOOM_OPTIM)) {
-              const tool = item.parent.getToolsManager().findSelectedTool();
-              const isMoveTool = tool && getType(tool).name === "MoveTool";
-
-              if (tool && !isMoveTool) return;
             }
 
             if (store.annotationStore.selected.isLinkingMode) {

@@ -35,11 +35,10 @@ import { imageCache } from "@humansignal/core";
 import { SNAP_TO_PIXEL_MODE } from "../../../../components/ImageView/Image";
 
 // These are initialized in beforeAll (after all test files have loaded and applied their mocks)
-// so that Image.js imports the REAL isFF and FF_ZOOM_OPTIM, not mock stubs.
+// so that Image.js imports the REAL isFF, not mock stubs.
 let ImageModel;
 let MockAnnotation;
 let Root;
-let _FF_ZOOM_OPTIM;
 
 const defaultHistory = {
   freeze: () => {},
@@ -163,13 +162,11 @@ function setImageContainerSize(image, width, height) {
 describe("Image model", () => {
   beforeAll(async () => {
     // Runs AFTER all test files have loaded and applied their module-level mocks.
-    _FF_ZOOM_OPTIM = "fflag_fix_front_leap_32_zoom_perf_190923_short";
-
     // window.isFF is the REAL isFF — the real module assigned it via Object.assign(window, {isFF}).
     // Mock modules are plain objects and don't run side-effect code, so window.isFF survived.
     const realIsFF = window.isFF;
     const mockFF = requireActual("../../../../utils/feature-flags");
-    const ffOverride = { ...mockFF, isFF: realIsFF, FF_ZOOM_OPTIM: _FF_ZOOM_OPTIM };
+    const ffOverride = { ...mockFF, isFF: realIsFF };
 
     // Override the feature-flags mock with real isFF through Bun's native API.
     const { mock: bunMock } = await import("bun:test");
@@ -1054,19 +1051,7 @@ describe("Image model", () => {
     });
   });
 
-  describe("alignmentOffset when FF_ZOOM_OPTIM", () => {
-    beforeEach(() => {
-      window.APP_SETTINGS = {
-        ...window.APP_SETTINGS,
-        feature_flags: { ...(window.APP_SETTINGS?.feature_flags ?? {}), [_FF_ZOOM_OPTIM]: true },
-      };
-    });
-    afterEach(() => {
-      if (window.APP_SETTINGS?.feature_flags) {
-        delete window.APP_SETTINGS.feature_flags[_FF_ZOOM_OPTIM];
-      }
-    });
-
+  describe("alignmentOffset", () => {
     it("returns center offset for horizontalalignment center", () => {
       const store = createStore({
         annotation: {
@@ -1178,7 +1163,7 @@ describe("Image model", () => {
   });
 
   describe("getSkipInteractions and setSkipInteractions", () => {
-    it("getSkipInteractions returns true when tool is ZoomPanTool", () => {
+    it("getSkipInteractions returns false when ZoomPanTool has canInteractWithRegions true", () => {
       const store = createStore();
       if (typeof store.annotation.image.getSkipInteractions !== "function") {
         expect(store.annotation.image).toBeDefined();
@@ -1190,7 +1175,7 @@ describe("Image model", () => {
         canInteractWithRegions: true,
         updateCursor: mock(),
       });
-      expect([true, undefined]).toContain(store.annotation.image.getSkipInteractions());
+      expect([false, undefined]).toContain(store.annotation.image.getSkipInteractions());
       mockManager.findSelectedTool.mockReturnValue({
         useTransformer: false,
         canInteractWithRegions: true,
@@ -1466,22 +1451,7 @@ describe("Image model", () => {
     });
   });
 
-  describe("getSkipInteractions with FF_ZOOM_OPTIM", () => {
-    beforeEach(() => {
-      window.APP_SETTINGS = {
-        ...window.APP_SETTINGS,
-        feature_flags: {
-          ...(window.APP_SETTINGS?.feature_flags ?? {}),
-          [_FF_ZOOM_OPTIM]: true,
-        },
-      };
-    });
-    afterEach(() => {
-      if (window.APP_SETTINGS?.feature_flags) {
-        delete window.APP_SETTINGS.feature_flags[_FF_ZOOM_OPTIM];
-      }
-    });
-
+  describe("getSkipInteractions", () => {
     it("returns false when isLinkingMode is true", () => {
       const store = createStore();
       const image = store.annotation.image;

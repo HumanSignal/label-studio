@@ -19,7 +19,7 @@ import ResizeObserver from "../../utils/resize-observer";
 import { debounce } from "@humansignal/core/lib/utils/debounce";
 import Constants from "../../core/Constants";
 import { fixRectToFit, mapKonvaBrightness } from "../../utils/image";
-import { FF_DEV_1442, FF_LSDV_4930, FF_ZOOM_OPTIM, isFF } from "../../utils/feature-flags";
+import { FF_DEV_1442, FF_LSDV_4930, isFF } from "../../utils/feature-flags";
 import { Pagination } from "../../common/Pagination/Pagination";
 import { Image } from "./Image";
 
@@ -1194,25 +1194,14 @@ const EntireStage = observer(
     crosshairRef,
   }) => {
     const { store } = item;
-    let size;
-    let position;
-
-    if (isFF(FF_ZOOM_OPTIM)) {
-      size = {
-        width: item.containerWidth,
-        height: item.containerHeight,
-      };
-      position = {
-        x: item.zoomingPositionX + item.alignmentOffset.x,
-        y: item.zoomingPositionY + item.alignmentOffset.y,
-      };
-    } else {
-      size = { ...item.canvasSize };
-      position = {
-        x: item.zoomingPositionX,
-        y: item.zoomingPositionY,
-      };
-    }
+    const size = {
+      width: item.containerWidth,
+      height: item.containerHeight,
+    };
+    const position = {
+      x: item.zoomingPositionX + item.alignmentOffset.x,
+      y: item.zoomingPositionY + item.alignmentOffset.y,
+    };
 
     return (
       <Stage
@@ -1443,13 +1432,7 @@ const StageContent = observer(({ item, store, state, crosshairRef }) => {
       <DrawingRegion item={item} />
       {item.smoothingEnabled === false && <PixelGridLayer item={item} />}
 
-      {item.crosshair && (
-        <Crosshair
-          ref={crosshairRef}
-          width={isFF(FF_ZOOM_OPTIM) ? item.containerWidth : item.stageWidth}
-          height={isFF(FF_ZOOM_OPTIM) ? item.containerHeight : item.stageHeight}
-        />
-      )}
+      {item.crosshair && <Crosshair ref={crosshairRef} width={item.containerWidth} height={item.containerHeight} />}
 
       {tool && tool.toolName?.match(/bitmask/i) && <CursorLayer item={item} tool={tool} />}
     </>

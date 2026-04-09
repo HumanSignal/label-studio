@@ -99,12 +99,6 @@ export const FF_TASK_COUNT_FIX = "fflag_fix_all_optic_79_task_count_is_wrong_sho
 export const FF_SIMPLE_INIT = "fflag_fix_front_leap_443_select_annotation_once";
 
 /**
- * Optimize stage rendering for large number of regions and zoom interactions
- * @link https://app.launchdarkly.com/default/production/features/fflag_fix_front_leap_32_zoom_perf_190923_short/targeting
- */
-export const FF_ZOOM_OPTIM = "fflag_fix_front_leap_32_zoom_perf_190923_short";
-
-/**
  * It changes the reviewer flow to be more user-friendly and intuitive.
  */
 export const FF_REVIEWER_FLOW = "fflag_feat_all_leap_1081_reviewer_flow_updates";

@@ -16,7 +16,7 @@ import { RectRegionModel } from "../../../regions/RectRegion";
 import * as Tools from "../../../tools";
 import ToolsManager from "../../../tools/Manager";
 import { parseValue } from "../../../utils/data";
-import { FF_DEV_3377, FF_DEV_3391, FF_LSDV_4583, FF_ZOOM_OPTIM, isFF } from "../../../utils/feature-flags";
+import { FF_DEV_3377, FF_DEV_3391, FF_LSDV_4583, isFF } from "../../../utils/feature-flags";
 import { guidGenerator } from "../../../utils/unique";
 import { clamp, isDefined } from "../../../utils/utilities";
 import ObjectBase from "../Base";
@@ -465,26 +465,24 @@ const Model = types
     get alignmentOffset() {
       const offset = { x: 0, y: 0 };
 
-      if (isFF(FF_ZOOM_OPTIM)) {
-        switch (self.horizontalalignment) {
-          case "center": {
-            offset.x = (self.containerWidth - self.canvasSize.width) / 2;
-            break;
-          }
-          case "right": {
-            offset.x = self.containerWidth - self.canvasSize.width;
-            break;
-          }
+      switch (self.horizontalalignment) {
+        case "center": {
+          offset.x = (self.containerWidth - self.canvasSize.width) / 2;
+          break;
         }
-        switch (self.verticalalignment) {
-          case "center": {
-            offset.y = (self.containerHeight - self.canvasSize.height) / 2;
-            break;
-          }
-          case "bottom": {
-            offset.y = self.containerHeight - self.canvasSize.height;
-            break;
-          }
+        case "right": {
+          offset.x = self.containerWidth - self.canvasSize.width;
+          break;
+        }
+      }
+      switch (self.verticalalignment) {
+        case "center": {
+          offset.y = (self.containerHeight - self.canvasSize.height) / 2;
+          break;
+        }
+        case "bottom": {
+          offset.y = self.containerHeight - self.canvasSize.height;
+          break;
         }
       }
       return offset;
@@ -654,24 +652,17 @@ const Model = types
     return {
       views: {
         getSkipInteractions() {
-          if (isFF(FF_ZOOM_OPTIM)) {
-            if (skipInteractions) return true;
+          if (skipInteractions) return true;
 
-            const isLinkingMode = self.annotation.isLinkingMode;
+          const isLinkingMode = self.annotation.isLinkingMode;
 
-            if (isLinkingMode) return false;
+          if (isLinkingMode) return false;
 
-            const manager = self.getToolsManager();
-            const tool = manager.findSelectedTool();
-            const canInteractWithRegions = tool?.canInteractWithRegions;
-
-            return !canInteractWithRegions;
-          }
           const manager = self.getToolsManager();
+          const tool = manager.findSelectedTool();
+          const canInteractWithRegions = tool?.canInteractWithRegions;
 
-          const isPanning = manager.findSelectedTool()?.toolName === "ZoomPanTool";
-
-          return skipInteractions || isPanning;
+          return !canInteractWithRegions;
         },
         get smoothingEnabled() {
           const names = self.annotation?.names;

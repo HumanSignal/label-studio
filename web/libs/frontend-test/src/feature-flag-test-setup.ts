@@ -9,8 +9,8 @@
  *   import { withFeatureFlags, setFeatureFlag, clearFeatureFlag } from "@humansignal/frontend-test/feature-flag-test-setup";
  *   withFeatureFlags({ [FF_LSDV_4583]: true }, () => { ... });
  *   // or
- *   beforeEach(() => setFeatureFlag(FF_ZOOM_OPTIM, true));
- *   afterEach(() => clearFeatureFlag(FF_ZOOM_OPTIM));
+ *   beforeEach(() => setFeatureFlag(FF_LSDV_4583, true));
+ *   afterEach(() => clearFeatureFlag(FF_LSDV_4583));
  */
 
 declare global {

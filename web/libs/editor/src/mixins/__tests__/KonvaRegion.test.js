@@ -3,8 +3,6 @@
  */
 import { getParent, types } from "mobx-state-tree";
 import { guidGenerator } from "../../core/Helpers";
-import { FF_ZOOM_OPTIM } from "../../utils/feature-flags";
-
 const ff = mockFF();
 
 const mockAnnotation = () => ({
@@ -186,14 +184,8 @@ describe("KonvaRegion mixin", () => {
       expect(r.bboxCoordsCanvas).toEqual({ left: 1, top: 2, right: 11, bottom: 12 });
     });
 
-    it("inViewPort returns true when FF_ZOOM_OPTIM is off", () => {
+    it("inViewPort is false when there is no object", () => {
       ff.reset();
-      const { region } = createStore();
-      expect(region.inViewPort).toBe(true);
-    });
-
-    it("inViewPort is false when FF_ZOOM_OPTIM is on and no object", () => {
-      ff.set({ [FF_ZOOM_OPTIM]: true });
       const RegionWithBbox = types.compose(TestRegion).views((_self) => ({
         get bboxCoords() {
           return { left: 0, top: 0, right: 10, bottom: 10 };
@@ -219,8 +211,8 @@ describe("KonvaRegion mixin", () => {
       expect(r.inViewPort).toBe(false);
     });
 
-    it("inViewPort is true when FF_ZOOM_OPTIM is on and bbox inside viewport", () => {
-      ff.set({ [FF_ZOOM_OPTIM]: true });
+    it("inViewPort is true when bbox is inside viewport", () => {
+      ff.reset();
       const RegionWithBbox = types.compose(TestRegion).views((_self) => ({
         get bboxCoords() {
           return { left: 5, top: 5, right: 15, bottom: 15 };
