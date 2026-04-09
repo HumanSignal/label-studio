@@ -2,47 +2,28 @@
  * Unit tests for VideoRegion (model views, actions, onlyProps util).
  * VideoRegion is base for VideoRectangleRegion; these tests cover shared logic.
  */
-import { types } from "mobx-state-tree";
-
-mockModule("../../tags/object/Video", () => {
-  const { types } = require("mobx-state-tree");
-  return {
-    VideoModel: types
-      .model("VideoModel", {
-        id: types.identifier,
-        framerate: types.optional(types.string, "24"),
-        length: types.optional(types.number, 100),
-      })
-      .volatile(() => ({
-        ref: { current: { duration: 10.5 } },
-      }))
-      .actions((self) => ({
-        setFrame(frame) {
-          self._lastSetFrame = frame;
-        },
-      })),
-  };
-});
+import { types, destroy, unprotect } from "mobx-state-tree";
 
 describe("VideoRegion", () => {
   let onlyProps;
-  let VideoRegion;
+  let VideoRegionModel;
   let VideoRectangleRegionModel;
   let TestRoot;
 
   beforeAll(() => {
+    require("../../tags/object/Video");
+    require("../../stores/RegionStore");
     const mod1 = require("../VideoRegion");
     const mod2 = require("../VideoRectangleRegion");
     onlyProps = mod1.onlyProps;
-    VideoRegion = mod1.VideoRegion;
+    VideoRegionModel = mod1.VideoRegion;
     VideoRectangleRegionModel = mod2.VideoRectangleRegionModel;
 
     TestRoot = types
       .model("TestRoot", {
         video: types.optional(require("../../tags/object/Video").VideoModel, {
           id: "vid1",
-          framerate: "24",
-          length: 100,
+          name: "vid1",
         }),
         region: types.optional(VideoRectangleRegionModel, {
           id: "vr1",
@@ -78,7 +59,7 @@ describe("VideoRegion", () => {
 
     beforeEach(() => {
       root = TestRoot.create({
-        video: { id: "vid1", framerate: "24", length: 100 },
+        video: { id: "vid1", name: "vid1", framerate: "24" },
         region: {
           id: "vr1",
           pid: "p1",
@@ -90,6 +71,15 @@ describe("VideoRegion", () => {
         },
       });
       region = root.region;
+      unprotect(root);
+      root.video.length = 100;
+      jest.spyOn(root.video, "setFrame").mockImplementation(() => {});
+      // @ts-ignore - patching volatile for testing
+      root.video.ref = { current: { duration: 10.5 } };
+    });
+
+    afterEach(() => {
+      if (root) destroy(root);
     });
 
     it("serialize returns value with framesCount, duration, sequence with time from frame/framerate", () => {
@@ -110,7 +100,7 @@ describe("VideoRegion", () => {
       expect(region.closestKeypoint(12, true).frame).toBe(0);
       // No keypoint with frame <= targetFrame when target is before first keypoint
       const afterFirst = TestRoot.create({
-        video: { id: "vid2", framerate: "24", length: 100 },
+        video: { id: "vid2", name: "vid2", framerate: "24" },
         region: {
           id: "vr2",
           pid: "p2",
@@ -119,6 +109,7 @@ describe("VideoRegion", () => {
         },
       });
       expect(afterFirst.region.closestKeypoint(10, true)).toBeUndefined();
+      destroy(afterFirst);
     });
 
     it("closestKeypoint returns next keypoint when targetFrame before first", () => {
@@ -131,10 +122,11 @@ describe("VideoRegion", () => {
 
     it("isInLifespan returns false when no keypoint", () => {
       const emptyRoot = TestRoot.create({
-        video: { id: "vid2", framerate: "24", length: 100 },
+        video: { id: "vid2", name: "vid2", framerate: "24" },
         region: { id: "vr2", pid: "p2", object: "vid2", sequence: [] },
       });
       expect(emptyRoot.region.isInLifespan(0)).toBe(false);
+      destroy(emptyRoot);
     });
 
     it("isInLifespan returns true for exact frame when keypoint disabled", () => {
@@ -159,7 +151,7 @@ describe("VideoRegion", () => {
 
     it("onSelectInOutliner calls object.setFrame with first frame", () => {
       region.onSelectInOutliner();
-      expect(root.video._lastSetFrame).toBe(0);
+      expect(root.video.setFrame).toHaveBeenCalledWith(0);
     });
 
     it("getVisibility returns true", () => {
@@ -174,10 +166,10 @@ describe("VideoRegion", () => {
       BaseVideoRoot = types.model("BaseVideoRoot", {
         video: types.optional(require("../../tags/object/Video").VideoModel, {
           id: "vid1",
+          name: "vid1",
           framerate: "24",
-          length: 100,
         }),
-        region: types.optional(VideoRegion, {
+        region: types.optional(VideoRegionModel, {
           id: "vr1",
           pid: "p1",
           object: "vid1",
@@ -188,25 +180,27 @@ describe("VideoRegion", () => {
 
     it("getShape throws (must be implemented on shape level)", () => {
       const root = BaseVideoRoot.create({
-        video: { id: "vid1" },
+        video: { id: "vid1", name: "vid1" },
         region: { id: "vr1", pid: "p1", object: "vid1", sequence: [{ frame: 0, enabled: true }] },
       });
       expect(() => root.region.getShape()).toThrow("Method getShape be implemented on a shape level");
+      destroy(root);
     });
 
     it("updateShape throws (must be implemented on shape level)", () => {
       const root = BaseVideoRoot.create({
-        video: { id: "vid1" },
+        video: { id: "vid1", name: "vid1" },
         region: { id: "vr1", pid: "p1", object: "vid1", sequence: [{ frame: 0, enabled: true }] },
       });
       expect(() => root.region.updateShape()).toThrow("Method updateShape must be implemented on a shape level");
+      destroy(root);
     });
   });
 
   describe("preProcessSnapshot", () => {
     it("uses value.sequence when sequence missing in snapshot", () => {
       const root = TestRoot.create({
-        video: { id: "vid1" },
+        video: { id: "vid1", name: "vid1" },
         region: {
           id: "vr1",
           pid: "p1",
@@ -216,6 +210,7 @@ describe("VideoRegion", () => {
       });
       expect(root.region.sequence).toHaveLength(1);
       expect(root.region.sequence[0].frame).toBe(5);
+      destroy(root);
     });
   });
 });
