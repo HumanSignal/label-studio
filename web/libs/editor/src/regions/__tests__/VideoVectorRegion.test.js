@@ -23,28 +23,34 @@ mockModule("../../tags/object/Video", () => {
   };
 });
 
-import { VideoVectorRegionModel } from "../VideoVectorRegion";
-import { VideoModel } from "../../tags/object/Video";
-
-const TestRoot = types
-  .model("TestRoot", {
-    video: types.optional(VideoModel, { id: "vid1", framerate: "24", length: 100 }),
-    region: types.optional(VideoVectorRegionModel, {
-      id: "vvr1",
-      pid: "p1",
-      object: "vid1",
-      sequence: [],
-    }),
-  })
-  .actions((_self) => ({
-    createSerializedResult(_region, value) {
-      return { value: { ...value }, original_width: 100, original_height: 100, image_rotation: 0 };
-    },
-  }));
-
 const mkVertices = (pts) => pts.map(([x, y], i) => ({ id: `v${i}`, x, y }));
 
 describe("VideoVectorRegion", () => {
+  let VideoVectorRegionModel;
+  let VideoModel;
+  let TestRoot;
+
+  beforeAll(() => {
+    VideoVectorRegionModel = require("../VideoVectorRegion").VideoVectorRegionModel;
+    VideoModel = require("../../tags/object/Video").VideoModel;
+
+    TestRoot = types
+      .model("TestRoot", {
+        video: types.optional(VideoModel, { id: "vid1", framerate: "24", length: 100 }),
+        region: types.optional(VideoVectorRegionModel, {
+          id: "vvr1",
+          pid: "p1",
+          object: "vid1",
+          sequence: [],
+        }),
+      })
+      .actions((_self) => ({
+        createSerializedResult(_region, value) {
+          return { value: { ...value }, original_width: 100, original_height: 100, image_rotation: 0 };
+        },
+      }));
+  });
+
   describe("getShape — exact keyframe retrieval", () => {
     it("returns exact keyframe data when frame matches", () => {
       const vertices = mkVertices([

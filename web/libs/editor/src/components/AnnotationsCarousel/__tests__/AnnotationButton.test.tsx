@@ -794,4 +794,20 @@ describe("AnnotationButton", () => {
     expect(screen.getByText("Test User")).toBeInTheDocument();
     (window as any).APP_SETTINGS = origAppSettings;
   });
+
+  it("handles mouse leave with window as relatedTarget without throwing error", () => {
+    const entity = createEntity();
+    const { container } = renderWithProviders(
+      <AnnotationButton entity={entity} capabilities={defaultCapabilities} annotationStore={defaultAnnotationStore} />,
+    );
+    const root = container.querySelector(".ls-annotation-button");
+    expect(root).toBeInTheDocument();
+
+    // The component needs to have the tooltip open for the interaction to be fully tested,
+    // but the error happens specifically when relatedTarget has no nodeType.
+    // Triggering it directly through fireEvent
+    expect(() => {
+      fireEvent.mouseLeave(root!, { relatedTarget: window });
+    }).not.toThrow();
+  });
 });

@@ -9,10 +9,6 @@ const mockRelationShapeInstance = {
   destroy: mock(),
 };
 
-mockModule("../RelationShape", () => ({
-  RelationShape: mock(() => mockRelationShapeInstance),
-}));
-
 mockModule("../Geometry", () => ({
   Geometry: {
     getDOMBBox: mock(),
@@ -31,11 +27,13 @@ mockModule("../Geometry", () => ({
 }));
 
 const { Geometry } = require("../Geometry");
-const { RelationShape } = require("../RelationShape");
+import * as RelationShapeModule from "../RelationShape";
+const RelationShape = mock(() => mockRelationShapeInstance);
 
 describe("NodesConnector", () => {
   beforeEach(() => {
     clearAllMocks();
+    spyOn(RelationShapeModule, "RelationShape").mockImplementation(RelationShape);
     mockRelationShapeInstance.boundingBox.mockReturnValue([{ x: 0, y: 0, width: 10, height: 10 }]);
     Geometry.getDOMBBox.mockReturnValue({ x: 0, y: 0 });
   });

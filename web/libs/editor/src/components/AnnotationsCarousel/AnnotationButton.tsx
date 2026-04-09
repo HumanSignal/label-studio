@@ -654,7 +654,8 @@ export const AnnotationButton = observer(
     useEffect(() => {
       function handleClickOutside(e: MouseEvent) {
         const target = e.target as HTMLElement;
-        if (!buttonRef.current?.contains(target) && !tooltipContainerRef.current?.contains(target)) {
+        const isValidNode = target && "nodeType" in target;
+        if (!isValidNode || (!buttonRef.current?.contains(target) && !tooltipContainerRef.current?.contains(target))) {
           setTooltipOpen(false);
         }
       }
@@ -674,8 +675,12 @@ export const AnnotationButton = observer(
         if (isTooltipOpen) {
           const elementAtPoint = document.elementFromPoint(e.clientX, e.clientY);
           // Only call contains() if elementAtPoint is actually a Node
-          const isOverTooltip = elementAtPoint && tooltipContainerRef.current?.contains(elementAtPoint as Node);
-          const isOverButton = elementAtPoint && buttonRef.current?.contains(elementAtPoint as Node);
+          const isOverTooltip =
+            elementAtPoint &&
+            "nodeType" in elementAtPoint &&
+            tooltipContainerRef.current?.contains(elementAtPoint as Node);
+          const isOverButton =
+            elementAtPoint && "nodeType" in elementAtPoint && buttonRef.current?.contains(elementAtPoint as Node);
           const isOverTrigger = (elementAtPoint as HTMLElement)?.closest?.(".annotation-button__trigger");
 
           // Close tooltip if mouse is not over button or tooltip (or is over trigger)
@@ -801,11 +806,13 @@ export const AnnotationButton = observer(
 
       // Check if we're moving to the tooltip container
       // Only call contains() if relatedTarget is actually a Node
-      const isMovingToTooltip = relatedTarget && tooltipContainerRef.current?.contains(relatedTarget as Node);
+      const isMovingToTooltip =
+        relatedTarget && "nodeType" in relatedTarget && tooltipContainerRef.current?.contains(relatedTarget as Node);
 
       // If not moving to tooltip, check if moving back to button (but not trigger)
       // Only call contains() if relatedTarget is actually a Node
-      const isMovingToButton = relatedTarget && buttonRef.current?.contains(relatedTarget as Node);
+      const isMovingToButton =
+        relatedTarget && "nodeType" in relatedTarget && buttonRef.current?.contains(relatedTarget as Node);
       const isMovingToTrigger = relatedTarget?.closest?.(".annotation-button__trigger");
 
       // If moving to tooltip or button (but not trigger), keep tooltip open
@@ -822,8 +829,12 @@ export const AnnotationButton = observer(
         if (currentMouseX !== undefined && currentMouseY !== undefined) {
           const elementAtPoint = document.elementFromPoint(currentMouseX, currentMouseY);
           // Only call contains() if elementAtPoint is actually a Node
-          const isOverTooltip = elementAtPoint && tooltipContainerRef.current?.contains(elementAtPoint as Node);
-          const isOverButton = elementAtPoint && buttonRef.current?.contains(elementAtPoint as Node);
+          const isOverTooltip =
+            elementAtPoint &&
+            "nodeType" in elementAtPoint &&
+            tooltipContainerRef.current?.contains(elementAtPoint as Node);
+          const isOverButton =
+            elementAtPoint && "nodeType" in elementAtPoint && buttonRef.current?.contains(elementAtPoint as Node);
           const isOverTrigger = (elementAtPoint as HTMLElement)?.closest?.(".annotation-button__trigger");
 
           // Close tooltip unless mouse is over tooltip or button (but not trigger)

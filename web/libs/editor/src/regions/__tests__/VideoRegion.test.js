@@ -24,30 +24,43 @@ mockModule("../../tags/object/Video", () => {
   };
 });
 
-import { onlyProps, VideoRegion } from "../VideoRegion";
-import { VideoRectangleRegionModel } from "../VideoRectangleRegion";
-import { VideoModel } from "../../tags/object/Video";
-
-const TestRoot = types
-  .model("TestRoot", {
-    video: types.optional(VideoModel, { id: "vid1", framerate: "24", length: 100 }),
-    region: types.optional(VideoRectangleRegionModel, {
-      id: "vr1",
-      pid: "p1",
-      object: "vid1",
-      sequence: [
-        { x: 10, y: 10, width: 50, height: 30, frame: 0, enabled: true },
-        { x: 20, y: 20, width: 60, height: 40, frame: 24, enabled: true },
-      ],
-    }),
-  })
-  .actions((_self) => ({
-    createSerializedResult(_region, value) {
-      return { value: { ...value }, original_width: 100, original_height: 100, image_rotation: 0 };
-    },
-  }));
-
 describe("VideoRegion", () => {
+  let onlyProps;
+  let VideoRegion;
+  let VideoRectangleRegionModel;
+  let TestRoot;
+
+  beforeAll(() => {
+    const mod1 = require("../VideoRegion");
+    const mod2 = require("../VideoRectangleRegion");
+    onlyProps = mod1.onlyProps;
+    VideoRegion = mod1.VideoRegion;
+    VideoRectangleRegionModel = mod2.VideoRectangleRegionModel;
+
+    TestRoot = types
+      .model("TestRoot", {
+        video: types.optional(require("../../tags/object/Video").VideoModel, {
+          id: "vid1",
+          framerate: "24",
+          length: 100,
+        }),
+        region: types.optional(VideoRectangleRegionModel, {
+          id: "vr1",
+          pid: "p1",
+          object: "vid1",
+          sequence: [
+            { x: 10, y: 10, width: 50, height: 30, frame: 0, enabled: true },
+            { x: 20, y: 20, width: 60, height: 40, frame: 24, enabled: true },
+          ],
+        }),
+      })
+      .actions((_self) => ({
+        createSerializedResult(_region, value) {
+          return { value: { ...value }, original_width: 100, original_height: 100, image_rotation: 0 };
+        },
+      }));
+  });
+
   describe("onlyProps", () => {
     it("returns object with only requested props", () => {
       const obj = { a: 1, b: 2, c: 3 };
@@ -155,14 +168,22 @@ describe("VideoRegion", () => {
   });
 
   describe("base VideoRegion getShape/updateShape", () => {
-    const BaseVideoRoot = types.model("BaseVideoRoot", {
-      video: types.optional(VideoModel, { id: "vid1", framerate: "24", length: 100 }),
-      region: types.optional(VideoRegion, {
-        id: "vr1",
-        pid: "p1",
-        object: "vid1",
-        sequence: [{ frame: 0, enabled: true }],
-      }),
+    let BaseVideoRoot;
+
+    beforeAll(() => {
+      BaseVideoRoot = types.model("BaseVideoRoot", {
+        video: types.optional(require("../../tags/object/Video").VideoModel, {
+          id: "vid1",
+          framerate: "24",
+          length: 100,
+        }),
+        region: types.optional(VideoRegion, {
+          id: "vr1",
+          pid: "p1",
+          object: "vid1",
+          sequence: [{ frame: 0, enabled: true }],
+        }),
+      });
     });
 
     it("getShape throws (must be implemented on shape level)", () => {
