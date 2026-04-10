@@ -14,6 +14,9 @@ mockModule("./message.module.css", () => ({
   "variant-negative": "variant-negative",
   "variant-positive": "variant-positive",
   "variant-warning": "variant-warning",
+  // Look classes
+  "look-card": "look-card",
+  "look-ghost": "look-ghost",
   // Element classes
   icon: "icon",
   content: "content",
@@ -54,6 +57,20 @@ describe("Message Component", () => {
   it("defaults to primary variant", () => {
     render(<Message {...defaultProps} data-testid="message" />);
     expect(screen.getByTestId("message")).toHaveClass("variant-primary");
+  });
+
+  it("applies correct look classes", () => {
+    const { rerender } = render(<Message {...defaultProps} look="card" data-testid="message" />);
+
+    expect(screen.getByTestId("message")).toHaveClass("look-card");
+
+    rerender(<Message {...defaultProps} look="ghost" data-testid="message" />);
+    expect(screen.getByTestId("message")).toHaveClass("look-ghost");
+  });
+
+  it("defaults to card look", () => {
+    render(<Message {...defaultProps} data-testid="message" />);
+    expect(screen.getByTestId("message")).toHaveClass("look-card");
   });
 
   it("applies correct size classes", () => {

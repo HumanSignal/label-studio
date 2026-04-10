@@ -110,3 +110,15 @@
     @apply text-warning-icon;
   }
 }
+
+/* Look Styles */
+
+/* Card Look - Default: background, border, border-radius and padding applied via base and size classes */
+.look-card {
+  /* inherits all base, size, and variant styling — no overrides needed */
+}
+
+/* Ghost Look - No card wrapper: transparent background, no border, no padding */
+.look-ghost {
+  @apply bg-transparent border-transparent rounded-none p-0;
+}

@@ -12,7 +12,7 @@ const meta: Meta<typeof Message> = {
     docs: {
       description: {
         component:
-          "A reusable message component for displaying inline messages, notifications, and alerts with support for different variants and customizable content.",
+          "A reusable message component for displaying inline messages, notifications, and alerts with support for different variants, looks, and customizable content.",
       },
     },
   },
@@ -22,6 +22,12 @@ const meta: Meta<typeof Message> = {
       options: ["primary", "neutral", "negative", "positive", "warning", "info", "success", "error"],
       description:
         "Visual variant of the message. Primary variants: primary, neutral, negative, positive, warning. Aliases: info (→primary), success (→positive), error (→negative)",
+    },
+    look: {
+      control: "select",
+      options: ["card", "ghost"],
+      description:
+        "Visual look of the message. card: default with background and border. ghost: minimal without card wrapper.",
     },
     size: {
       control: "select",
@@ -104,6 +110,24 @@ export const Warning: Story = {
     variant: "warning",
     title: "Warning",
     children: "Your session will expire in 5 minutes. Please save your work.",
+  },
+};
+
+// Look Stories
+export const Ghost: Story = {
+  args: {
+    variant: "primary",
+    look: "ghost",
+    title: "Ghost look",
+    children: "This message has no card background or border — just the icon and content inline.",
+  },
+};
+
+export const GhostWarning: Story = {
+  args: {
+    variant: "warning",
+    look: "ghost",
+    children: "A ghost warning message without a card wrapper.",
   },
 };
 
@@ -252,6 +276,30 @@ export const AllVariants: Story = {
       <Message variant="warning" title="Warning">
         This is a warning message.
       </Message>
+    </div>
+  ),
+};
+
+export const AllLooks: Story = {
+  render: () => (
+    <div className="space-y-base">
+      <div>
+        <Typography variant="label" size="medium" className="mb-tight">
+          Card Look (Default)
+        </Typography>
+        <Message variant="primary" look="card" title="Card">
+          This message has a background, border and padding.
+        </Message>
+      </div>
+
+      <div>
+        <Typography variant="label" size="medium" className="mb-tight">
+          Ghost Look
+        </Typography>
+        <Message variant="primary" look="ghost" title="Ghost">
+          This message has no card wrapper — just the icon and content.
+        </Message>
+      </div>
     </div>
   ),
 };

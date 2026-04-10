@@ -20,6 +20,12 @@ const variants = {
   warning: styles["variant-warning"],
 } as const;
 
+// Look configuration
+const looks = {
+  card: styles["look-card"],
+  ghost: styles["look-ghost"],
+} as const;
+
 // Size configuration
 const sizes = {
   medium: styles["size-medium"],
@@ -27,6 +33,7 @@ const sizes = {
 } as const;
 
 export type MessageVariant = keyof typeof variants | "info" | "success" | "error";
+export type MessageLook = keyof typeof looks;
 export type MessageSize = keyof typeof sizes;
 
 export interface MessageProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -44,6 +51,13 @@ export interface MessageProps extends React.HTMLAttributes<HTMLDivElement> {
    * - success → positive
    */
   variant?: MessageVariant;
+
+  /**
+   * Visual look of the message
+   * - card: Default look with background, border and padding (default)
+   * - ghost: Minimal look without background, border or padding — just the icon and content
+   */
+  look?: MessageLook;
 
   /**
    * Size of the message
@@ -106,11 +120,12 @@ export interface MessageProps extends React.HTMLAttributes<HTMLDivElement> {
  * Message Component
  *
  * A reusable component for displaying inline messages, notifications, and alerts throughout the application.
- * Supports different variants and customizable content including icons, text, actions, and extra content.
+ * Supports different variants, looks, and customizable content including icons, text, actions, and extra content.
  *
  * Features:
  * - Five primary variants: primary, neutral, negative, positive, warning
  * - Backward compatibility aliases: info, success, error
+ * - Two looks: card (default with background/border) and ghost (minimal, no card wrapper)
  * - Optional closable functionality
  * - Flexible content areas for actions and extra elements
  * - Full accessibility support with ARIA attributes
@@ -124,14 +139,10 @@ export interface MessageProps extends React.HTMLAttributes<HTMLDivElement> {
  * ```
  *
  * @example
- * With title and actions:
+ * Ghost look (no card wrapper):
  * ```tsx
- * <Message
- *   variant="positive"
- *   title="Success"
- *   actions={<Button onClick={onContinue}>Continue</Button>}
- * >
- *   Your changes have been saved successfully.
+ * <Message variant="primary" look="ghost">
+ *   Inline informational text without a card background.
  * </Message>
  * ```
  *
@@ -153,6 +164,7 @@ export const Message = forwardRef<HTMLDivElement, MessageProps>(
   (
     {
       variant = "primary",
+      look = "card",
       size = "medium",
       icon,
       iconSize,
@@ -215,7 +227,7 @@ export const Message = forwardRef<HTMLDivElement, MessageProps>(
     return (
       <div
         ref={ref}
-        className={cn("message", styles.base, sizes[size], variants[normalizedVariant], className)}
+        className={cn("message", styles.base, sizes[size], variants[normalizedVariant], looks[look], className)}
         data-testid={testId}
         role="alert"
         aria-live="polite"
