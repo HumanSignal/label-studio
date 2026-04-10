@@ -768,16 +768,16 @@ wheels = [
 
 [[package]]
 name = "django-migration-linter"
-version = "5.2.0"
+version = "6.0.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "appdirs" },
     { name = "django" },
     { name = "toml" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/3a/2b/721ca8f373edb4a666ec175c6a1761f64cfdde1e3599373a47348aded1a9/django_migration_linter-5.2.0.tar.gz", hash = "sha256:ba8b4d5aeacce9a2441c4d863321867eaeb498a873ac6657f91350f5b3119bc7", size = 35398, upload-time = "2025-03-30T17:44:03.793Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/5c/0c/fed1d01477ecb8547750df6b4922129cbf4bab26433df77c81fa77da06df/django_migration_linter-6.0.0.tar.gz", hash = "sha256:b7fdd4fe55862795378d99b4d8d80d454408c22647909d0fa533b63f9545c63e", size = 35917, upload-time = "2026-01-04T13:08:26.454Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/00/5f/cda51e4c1a59a2bafc62f7b880ec18e9df3a034654e5056e9a0ffa1ccb68/django_migration_linter-5.2.0-py3-none-any.whl", hash = "sha256:db9ef2d7ba37179882a6f4849fd6277cd6d18613d66c34a4046db26a1f40601d", size = 27174, upload-time = "2025-03-30T17:43:10.975Z" },
+    { url = "https://files.pythonhosted.org/packages/65/22/1f99542f53f0f55ad766ed2fe4c788f1a6120dbdbb2d05446c5127dfb84e/django_migration_linter-6.0.0-py3-none-any.whl", hash = "sha256:8fbac51a77fbe86d814e2b996b80aa831d21499982085cda1cacc84b7b4971a5", size = 27660, upload-time = "2026-01-04T13:08:23.819Z" },
 ]
 
 [[package]]
@@ -1865,7 +1865,7 @@ requires-dist = [
     { name = "django-environ", specifier = "==0.10.0" },
     { name = "django-extensions", specifier = "==3.2.3" },
     { name = "django-filter", specifier = "==24.3" },
-    { name = "django-migration-linter", specifier = ">=5.1.0,<6.0.0" },
+    { name = "django-migration-linter", specifier = ">=6.0.0,<7.0.0" },
     { name = "django-ranged-fileresponse", specifier = ">=0.1.2" },
     { name = "django-rq", specifier = ">=3.1,<3.2" },
     { name = "django-storages", specifier = "==1.12.3" },
