@@ -1,10 +1,11 @@
-import { render, fireEvent } from "@testing-library/react";
+import { render, fireEvent, waitFor } from "@testing-library/react";
 import { Provider } from "mobx-react";
 import * as uiModule from "@humansignal/ui";
 import { Controls } from "../Controls";
 const mockStore = {
   hasInterface: mock(),
   isSubmitting: false,
+  overlapReached: false,
   settings: {
     enableTooltips: true,
   },
@@ -192,5 +193,67 @@ describe("Controls", () => {
     fireEvent.click(skipTask);
 
     expect(mockStore.skipTask).not.toHaveBeenCalled();
+  });
+
+  test("Skip button enabled when allow_skip=false but user is Owner (OW) in LSE", () => {
+    setupAppSettings({ role: "OW", enterprise: true });
+    mockStore.hasInterface = (a: string) => a === "skip";
+    mockStore.task = { id: 1, allow_skip: false };
+
+    const { getByLabelText } = render(
+      <Provider store={mockStore}>
+        <Controls history={mockHistory} annotation={mockAnnotation} />
+      </Provider>,
+    );
+
+    expect(getByLabelText("skip-task")).not.toBeDisabled();
+  });
+
+  test("Skip button enabled when allow_skip=false but user is Manager (MA) in LSE", () => {
+    setupAppSettings({ role: "MA", enterprise: true });
+    mockStore.hasInterface = (a: string) => a === "skip";
+    mockStore.task = { id: 1, allow_skip: false };
+
+    const { getByLabelText } = render(
+      <Provider store={mockStore}>
+        <Controls history={mockHistory} annotation={mockAnnotation} />
+      </Provider>,
+    );
+
+    expect(getByLabelText("skip-task")).not.toBeDisabled();
+  });
+
+  test("Skip button disabled when allow_skip=false and user is Annotator (AN) in LSE", () => {
+    setupAppSettings({ role: "AN", enterprise: true });
+    mockStore.hasInterface = (a: string) => a === "skip";
+    mockStore.task = { id: 1, allow_skip: false };
+
+    const { getByLabelText } = render(
+      <Provider store={mockStore}>
+        <Controls history={mockHistory} annotation={mockAnnotation} />
+      </Provider>,
+    );
+
+    expect(getByLabelText("skip-task")).toBeDisabled();
+  });
+
+  test("Skip triggers skipTask when allow_skip=false but user is Manager (MA) in LSE", async () => {
+    setupAppSettings({ role: "MA", enterprise: true });
+    mockStore.hasInterface = (a: string) => a === "skip";
+    mockStore.task = { id: 1, allow_skip: false };
+    mockStore.skipTask.mockClear();
+    mockStore.commentStore.commentFormSubmit = mock(() => Promise.resolve());
+
+    const { getByLabelText } = render(
+      <Provider store={mockStore}>
+        <Controls history={mockHistory} annotation={mockAnnotation} />
+      </Provider>,
+    );
+
+    fireEvent.click(getByLabelText("skip-task"));
+
+    await waitFor(() => {
+      expect(mockStore.skipTask).toHaveBeenCalled();
+    });
   });
 });
