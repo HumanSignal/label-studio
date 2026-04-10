@@ -118,7 +118,7 @@ function filterFieldOptionRender({ item }) {
       style={{ display: "flex", alignItems: "center", gap: "6px" }}
     >
       <span>{filter?.field?.title}</span>
-      {showEnterpriseBadge && <EnterpriseBadge style="ghost" />}
+      {showEnterpriseBadge && <EnterpriseBadge look="ghost" />}
       {filter?.field?.parent && (
         <Badge size="small" className="ml-tightest">
           {filter.field.parent.title}

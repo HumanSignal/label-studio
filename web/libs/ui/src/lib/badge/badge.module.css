@@ -115,8 +115,8 @@
   color: var(--color-accent-sand-bold);
 }
 
-/* Outline style */
-.style-outline {
+/* Outline look */
+.look-outline {
   &.variant-grape {
     background: transparent;
     border-color: var(--color-accent-grape-subtle);
@@ -178,8 +178,8 @@
   }
 }
 
-/* Ghost style */
-.style-ghost {
+/* Ghost look */
+.look-ghost {
   background: none !important;
   border: none !important;
 
@@ -224,8 +224,8 @@
   }
 }
 
-/* Solid style */
-.style-solid {
+/* Solid look */
+.look-solid {
   border: none !important;
 
   &.variant-grape {
@@ -337,7 +337,7 @@
     -webkit-text-fill-color: transparent;
   }
 
-  &.style-filled {
+  &.look-filled {
     .badge-content {
       background: linear-gradient(
         135deg,
@@ -348,7 +348,7 @@
       height: calc(100% - 2px);
     }
 
-    /* Shape variants for filled style */
+    /* Shape variants for filled look */
     &.shape-rounded {
       .badge-content {
         border-radius: calc(var(--corner-radius-large) - 1px);
@@ -362,13 +362,13 @@
     }
   }
 
-  &.style-outline {
+  &.look-outline {
     .badge-content {
       background: var(--color-neutral-background);
       height: calc(100% - 2px);
     }
 
-    /* Shape variants for outline style */
+    /* Shape variants for outline look */
     &.shape-rounded {
       .badge-content {
         border-radius: calc(var(--corner-radius-large) - 1px);
@@ -382,7 +382,7 @@
     }
   }
 
-  &.style-solid {
+  &.look-solid {
     .badge-content {
       border: none;
       background: none;
@@ -402,7 +402,7 @@
       }
     }
 
-    /* Shape variants for solid style */
+    /* Shape variants for solid look */
     &.shape-rounded {
       .badge-content {
         border-radius: calc(var(--corner-radius-large) - 1px);
@@ -416,7 +416,7 @@
     }
   }
 
-  &.style-ghost {
+  &.look-ghost {
     background: none;
     border-radius: 0;
 

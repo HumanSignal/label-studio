@@ -33,7 +33,7 @@ const meta: Meta<typeof Badge> = {
       // Note: Other variants (default, secondary, destructive, error, info, success, caution, beta, enterprise)
       // are still supported as hidden fallbacks for backwards compatibility
     },
-    style: {
+    look: {
       control: "select",
       options: ["filled", "outline", "ghost", "solid"],
     },
@@ -168,16 +168,16 @@ export const StyleVariants: Story = {
         <div>
           <p className="text-sm text-neutral-content-subtle mb-2">Filled (default):</p>
           <div className="flex flex-wrap gap-3">
-            <Badge variant="grape" style="filled">
+            <Badge variant="grape" look="filled">
               Grape
             </Badge>
-            <Badge variant="kale" style="filled">
+            <Badge variant="kale" look="filled">
               Kale
             </Badge>
-            <Badge variant="persimmon" style="filled">
+            <Badge variant="persimmon" look="filled">
               Persimmon
             </Badge>
-            <Badge variant="canteloupe" style="filled">
+            <Badge variant="canteloupe" look="filled">
               Canteloupe
             </Badge>
           </div>
@@ -185,16 +185,16 @@ export const StyleVariants: Story = {
         <div>
           <p className="text-sm text-neutral-content-subtle mb-2">Outline:</p>
           <div className="flex flex-wrap gap-3">
-            <Badge variant="grape" style="outline">
+            <Badge variant="grape" look="outline">
               Grape
             </Badge>
-            <Badge variant="kale" style="outline">
+            <Badge variant="kale" look="outline">
               Kale
             </Badge>
-            <Badge variant="persimmon" style="outline">
+            <Badge variant="persimmon" look="outline">
               Persimmon
             </Badge>
-            <Badge variant="canteloupe" style="outline">
+            <Badge variant="canteloupe" look="outline">
               Canteloupe
             </Badge>
           </div>
@@ -202,16 +202,16 @@ export const StyleVariants: Story = {
         <div>
           <p className="text-sm text-neutral-content-subtle mb-2">Ghost:</p>
           <div className="flex flex-wrap gap-3">
-            <Badge variant="grape" style="ghost">
+            <Badge variant="grape" look="ghost">
               Grape
             </Badge>
-            <Badge variant="kale" style="ghost">
+            <Badge variant="kale" look="ghost">
               Kale
             </Badge>
-            <Badge variant="persimmon" style="ghost">
+            <Badge variant="persimmon" look="ghost">
               Persimmon
             </Badge>
-            <Badge variant="canteloupe" style="ghost">
+            <Badge variant="canteloupe" look="ghost">
               Canteloupe
             </Badge>
           </div>
@@ -219,16 +219,16 @@ export const StyleVariants: Story = {
         <div>
           <p className="text-sm text-neutral-content-subtle mb-2">Solid:</p>
           <div className="flex flex-wrap gap-3">
-            <Badge variant="grape" style="solid">
+            <Badge variant="grape" look="solid">
               Grape
             </Badge>
-            <Badge variant="kale" style="solid">
+            <Badge variant="kale" look="solid">
               Kale
             </Badge>
-            <Badge variant="persimmon" style="solid">
+            <Badge variant="persimmon" look="solid">
               Persimmon
             </Badge>
-            <Badge variant="canteloupe" style="solid">
+            <Badge variant="canteloupe" look="solid">
               Canteloupe
             </Badge>
           </div>
@@ -339,25 +339,25 @@ export const GradientVariant: Story = {
         <p className="text-sm text-neutral-content-subtle mb-2">With icon and label (default):</p>
         <div className="flex flex-wrap gap-3">
           <EnterpriseBadge />
-          <EnterpriseBadge style="filled" />
-          <EnterpriseBadge style="ghost" />
-          <EnterpriseBadge style="solid" />
+          <EnterpriseBadge look="filled" />
+          <EnterpriseBadge look="ghost" />
+          <EnterpriseBadge look="solid" />
         </div>
       </div>
       <div>
         <p className="text-sm text-neutral-content-subtle mb-2">Text only (no icon):</p>
         <div className="flex flex-wrap gap-3">
           <EnterpriseBadge icon={null} />
-          <EnterpriseBadge icon={null} style="filled" />
+          <EnterpriseBadge icon={null} look="filled" />
         </div>
       </div>
       <div>
         <p className="text-sm text-neutral-content-subtle mb-2">Icon-only:</p>
         <div className="flex flex-wrap gap-3">
           <EnterpriseBadge children="" />
-          <EnterpriseBadge style="filled" children="" />
-          <EnterpriseBadge style="ghost" children="" />
-          <EnterpriseBadge style="solid" children="" />
+          <EnterpriseBadge look="filled" children="" />
+          <EnterpriseBadge look="ghost" children="" />
+          <EnterpriseBadge look="solid" children="" />
         </div>
       </div>
       <div>

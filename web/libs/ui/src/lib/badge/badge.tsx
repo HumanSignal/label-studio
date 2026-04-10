@@ -55,13 +55,13 @@ export type BadgeVariant =
   | "gradient"
   | (typeof ACCENT_COLORS)[number];
 
-export type BadgeStyle = "filled" | "outline" | "ghost" | "solid";
+export type BadgeLook = "filled" | "outline" | "ghost" | "solid";
 export type BadgeShape = "rounded" | "square" | "squared";
 export type BadgeSize = "medium" | "small" | "compact" | "default"; // "default" is deprecated, use "medium"; "compact" is deprecated, use "small"
 
 export interface BadgeProps extends Omit<React.HTMLAttributes<HTMLDivElement>, "style"> {
   variant?: BadgeVariant;
-  style?: BadgeStyle;
+  look?: BadgeLook;
   shape?: BadgeShape;
   size?: BadgeSize;
   children?: React.ReactNode;
@@ -83,7 +83,7 @@ export const Badge = forwardRef<HTMLDivElement, BadgeProps>(
   (
     {
       variant = "grape",
-      style = "filled",
+      look = "filled",
       shape = "square",
       size = "medium",
       children,
@@ -136,7 +136,7 @@ export const Badge = forwardRef<HTMLDivElement, BadgeProps>(
         className={cn(
           styles.badge,
           styles[`variant-${normalizedVariant}`],
-          styles[`style-${style}`],
+          styles[`look-${look}`],
           styles[`shape-${shape === "square" ? "squared" : shape}`],
           normalizedSize !== "medium" && styles[`size-${normalizedSize}`],
           isIconOnly && styles["icon-only"],

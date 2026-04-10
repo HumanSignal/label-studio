@@ -97,7 +97,7 @@ const ActionButton = ({ action, parentRef, store, formRef }) => {
       >
         <div className={cn("actionButton").elem("title").toClassName()}>
           {action.title}
-          {action.enterprise_badge && <EnterpriseBadge className="ml-tightest" style="ghost" />}
+          {action.enterprise_badge && <EnterpriseBadge className="ml-tightest" look="ghost" />}
         </div>
         {hasChildren ? <IconChevronRight className={cn("actionButton").elem("icon").toClassName()} /> : null}
       </div>
@@ -148,7 +148,7 @@ const ActionButton = ({ action, parentRef, store, formRef }) => {
     >
       <span className="flex items-center justify-between gap-base w-full">
         {action.title}
-        {action.enterprise_badge && <EnterpriseBadge style="ghost" children="" />}
+        {action.enterprise_badge && <EnterpriseBadge look="ghost" children="" />}
       </span>
     </Menu.Item>
   );

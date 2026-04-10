@@ -89,7 +89,7 @@ FieldsButton.Checkbox = observer(({ column, children, disabled, enterpriseBadge 
       </div>
       {enterpriseBadge && (
         <div style={{ flexShrink: 0 }}>
-          <EnterpriseBadge style="ghost" />
+          <EnterpriseBadge look="ghost" />
         </div>
       )}
     </div>
