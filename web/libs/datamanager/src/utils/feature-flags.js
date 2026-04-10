@@ -15,13 +15,6 @@ export const FF_DEV_2536 = "fflag_feat_front_dev-2536_comment_notifications_shor
 export const FF_LOPS_E_3 = "fflag_feat_all_lops_e_3_datasets_short";
 
 /**
- * Fixes memory leaks in label studio frontend relative to mobx-state-tree and react usage
- *
- * @link https://app.launchdarkly.com/default/production/features/fflag_fix_front_lsdv_4620_memory_leaks_100723_short
- */
-export const FF_LSDV_4620_3_ML = "fflag_fix_front_lsdv_4620_memory_leaks_100723_short";
-
-/**
  * Allow to filter tasks in Data Manager by annotation results and user annotated on the same annotation
  * @link https://app.launchdarkly.com/projects/default/flags/fflag_root_45_better_user_filter
  */
@@ -49,14 +42,6 @@ function getFeatureFlags() {
 
 export function isFF(id) {
   const featureFlags = getFeatureFlags();
-  // TODO: remove the override + if statement once LSE and LSO start building react the same way and fflag_fix_front_lsdv_4620_memory_leaks_100723_short is removed
-  const override = {
-    fflag_fix_front_lsdv_4620_memory_leaks_100723_short: false,
-  };
-  if (window?.APP_SETTINGS?.sentry_environment === "opensource" && id in override) {
-    return override[id];
-  }
-
   if (id in featureFlags) {
     return featureFlags[id] === true;
   }

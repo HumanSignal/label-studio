@@ -1,4 +1,3 @@
-import "./core/feature-flags";
 import "./assets/styles/global.prefix.css";
 import { LabelStudio } from "./LabelStudio";
 

@@ -17,14 +17,7 @@ import Settings from "./SettingsStore";
 import Task from "./TaskStore";
 import { UserExtended } from "./UserStore";
 import { UserLabels } from "./UserLabels";
-import {
-  FF_CUSTOM_SCRIPT,
-  FF_LSDV_4620_3_ML,
-  FF_LSDV_4998,
-  FF_REVIEWER_FLOW,
-  FF_SIMPLE_INIT,
-  isFF,
-} from "../utils/feature-flags";
+import { FF_CUSTOM_SCRIPT, FF_LSDV_4998, FF_REVIEWER_FLOW, FF_SIMPLE_INIT, isFF } from "../utils/feature-flags";
 import { CommentStore } from "./Comment/CommentStore";
 import { CustomButton } from "./CustomButton";
 
@@ -258,19 +251,6 @@ export default types
     },
   }))
   .actions((self) => {
-    let appControls;
-
-    function setAppControls(controls) {
-      appControls = controls;
-    }
-
-    function clearApp() {
-      appControls?.clear();
-    }
-
-    function renderApp() {
-      appControls?.render();
-    }
     /**
      * Update settings display state
      */
@@ -844,9 +824,6 @@ export default types
 
       if (!as.initialized) {
         as.initRoot(self.config);
-        if (isFF(FF_LSDV_4620_3_ML) && !appControls?.isRendered()) {
-          appControls?.render();
-        }
       }
 
       // Ensure users referenced by annotations exist in the users store
@@ -1125,12 +1102,8 @@ export default types
       incrementQueuePosition,
       beforeDestroy() {
         ToolsManager.removeAllTools();
-        appControls = null;
       },
 
-      setAppControls,
-      clearApp,
-      renderApp,
       selfDestroy() {
         const children = [];
 

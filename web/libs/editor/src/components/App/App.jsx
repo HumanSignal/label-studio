@@ -28,8 +28,7 @@ import { Space } from "../../common/Space/Space";
 import { Button, EmptyState, IconCheck } from "@humansignal/ui";
 import { isStarterCloudPlan } from "@humansignal/core";
 import { cn } from "../../utils/bem";
-import { FF_BULK_ANNOTATION, FF_LSDV_4620_3_ML, isFF } from "../../utils/feature-flags";
-import { reactCleaner } from "../../utils/reactCleaner";
+import { FF_BULK_ANNOTATION, isFF } from "../../utils/feature-flags";
 import { guidGenerator } from "../../utils/unique";
 import { isDefined } from "../../utils/utilities";
 import { queryClient } from "@humansignal/core/lib/utils/query-client";
@@ -262,10 +261,7 @@ class App extends Component {
 
     const isBulkMode = isFF(FF_BULK_ANNOTATION) && !isStarterCloudPlan() && store.hasInterface("annotation:bulk");
     return (
-      <div
-        className={cn("editor").mod({ fullscreen: settings.fullscreen }).toClassName()}
-        ref={isFF(FF_LSDV_4620_3_ML) ? reactCleaner(this) : null}
-      >
+      <div className={cn("editor").mod({ fullscreen: settings.fullscreen }).toClassName()} ref={null}>
         <QueryClientProvider client={queryClient}>
           <Settings store={store} />
           <Provider store={store}>

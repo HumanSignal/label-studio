@@ -436,18 +436,6 @@ describe("AppStore", () => {
     });
   });
 
-  describe("app controls", () => {
-    it("setAppControls stores controls", () => {
-      const store = createStore();
-      const controls = { clear: mock(), render: mock(), isRendered: () => false };
-      store.setAppControls(controls);
-      store.clearApp();
-      expect(controls.clear).toHaveBeenCalled();
-      store.renderApp();
-      expect(controls.render).toHaveBeenCalled();
-    });
-  });
-
   describe("resetAnnotationStore", () => {
     it("calls beforeReset and resetAnnotations on annotation store when present", () => {
       const store = createStore();
@@ -663,9 +651,8 @@ describe("AppStore", () => {
   });
 
   describe("beforeDestroy", () => {
-    it("clears appControls without errors", () => {
+    it("runs teardown without errors", () => {
       const store = createStore();
-      store.setAppControls({ clear: mock(), render: mock() });
       expect(() => store.beforeDestroy()).not.toThrow();
     });
   });

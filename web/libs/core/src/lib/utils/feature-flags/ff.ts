@@ -2,8 +2,6 @@ import { FF_NEW_STORAGES, FF_THEME_TOGGLE } from "./flags";
 
 const FEATURE_FLAGS = window.APP_SETTINGS?.feature_flags || {};
 
-// TODO: remove the override + if statement once LSE and LSO start building
-// react the same way and `fflag_fix_front_lsdv_4620_memory_leaks_100723_short` is removed
 const FLAGS_OVERRIDE: Record<string, boolean> = {
   // While it's safe to have overrides living here forever,
   // they could disrupt others' work if left. Keep it clean
@@ -45,7 +43,6 @@ export const isFlagEnabled = (id: string, flagList: Record<string, boolean>, def
  * @deprecated Use `isActive` instead
  */
 export function isFF(id: string) {
-  // TODO: remove the override + if statement once LSE and LSO start building react the same way and fflag_fix_front_lsdv_4620_memory_leaks_100723_short is removed
   const override: Record<string, boolean> = FLAGS_OVERRIDE;
   if (window?.APP_SETTINGS?.sentry_environment === "opensource" && id in override) {
     return override[id];

@@ -1,5 +1,4 @@
 STALE_FEATURE_FLAGS = {
-    'fflag_fix_front_lsdv_4620_memory_leaks_100723_short': False,
     # Jan 16
     'ff_back_2884_comments_notifications_02092022_short': True,
     'fflag_feat_front_lsdv_5452_taxonomy_labeling_110823_short': True,

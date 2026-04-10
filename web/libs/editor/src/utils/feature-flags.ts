@@ -62,13 +62,6 @@ export const FF_NER_SELECT_ALL = "fflag_feat_front_bros_199_enable_select_all_in
 export const FF_LSDV_4583 = "fflag_feat_front_lsdv_4583_multi_image_segmentation_short";
 
 /**
- * Fixes memory leaks in label studio frontend relative to mobx-state-tree and react usage
- *
- * @link https://app.launchdarkly.com/default/production/features/fflag_fix_front_lsdv_4620_memory_leaks_100723_short
- */
-export const FF_LSDV_4620_3_ML = "fflag_fix_front_lsdv_4620_memory_leaks_100723_short";
-
-/**
  * Fixing issues related to selection tool functional (selecting hidden regions, onClick in Konva, interaction with regions inside selection area)
  *
  * @link https://app.launchdarkly.com/default/production/features/fflag_fix_front_lsdv_4930_selection_tool_fixes_240423_short
@@ -145,14 +138,6 @@ function getFeatureFlags() {
 
 export function isFF(id: string) {
   const featureFlags = getFeatureFlags();
-  // TODO: remove the override + if statement once LSE and LSO start building react the same way and fflag_fix_front_lsdv_4620_memory_leaks_100723_short is removed
-  const override: Record<string, boolean> = {
-    fflag_fix_front_lsdv_4620_memory_leaks_100723_short: false,
-  };
-
-  if (id in override) {
-    return override[id];
-  }
   if (id in featureFlags) {
     return featureFlags[id] === true;
   }

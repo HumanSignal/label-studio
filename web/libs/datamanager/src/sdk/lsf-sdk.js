@@ -1,5 +1,5 @@
 import { Button } from "@humansignal/ui";
-import { FF_DEV_1752, FF_DEV_2186, FF_LSDV_4620_3_ML, FF_FIT_1304_STRICT_OVERLAP, isFF } from "../utils/feature-flags";
+import { FF_DEV_1752, FF_DEV_2186, FF_FIT_1304_STRICT_OVERLAP, isFF } from "../utils/feature-flags";
 import { isActive, FF_FIT_720_LAZY_LOAD_ANNOTATIONS } from "@humansignal/core/lib/utils/feature-flags";
 import { isDefined } from "../utils/utils";
 import { Modal } from "../components/Common/Modal/Modal";
@@ -402,7 +402,7 @@ export class LSFWrapper {
 
     const hasChangedTasks = this.lsf?.task?.id !== task?.id && task?.id;
 
-    this.setLoading(true, hasChangedTasks);
+    this.setLoading(true);
 
     if (isActive(FF_FIT_720_LAZY_LOAD_ANNOTATIONS)) {
       // Invalidate in-flight stub hydrations from annotation tab switches so their finally
@@ -1424,10 +1424,8 @@ export class LSFWrapper {
   }
 
   /** @private */
-  setLoading(isLoading, shouldReset = false) {
-    if (isFF(FF_LSDV_4620_3_ML) && shouldReset) this.lsf.clearApp();
+  setLoading(isLoading) {
     this.lsf.setFlags({ isLoading });
-    if (isFF(FF_LSDV_4620_3_ML) && shouldReset) this.lsf.renderApp();
   }
 
   async withinLoadingState(callback) {
