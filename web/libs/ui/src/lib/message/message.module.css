@@ -52,7 +52,7 @@
 
 /* Body */
 .body {
-  @apply text-neutral-content flex flex-col gap-tight;
+  @apply text-neutral-content gap-tight;
 }
 
 /* Close Button */

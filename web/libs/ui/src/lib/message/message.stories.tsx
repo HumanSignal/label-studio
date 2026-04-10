@@ -157,7 +157,7 @@ export const WithActions: Story = {
     variant: "warning",
     title: "Unsaved Changes",
     children: (
-      <>
+      <div className="flex flex-col gap-base">
         <Typography>You have unsaved changes. Do you want to save them before leaving?</Typography>
         <div className="flex gap-tight">
           <Button variant="primary" look="filled" size="small">
@@ -167,7 +167,7 @@ export const WithActions: Story = {
             Discard
           </Button>
         </div>
-      </>
+      </div>
     ),
   },
 };
