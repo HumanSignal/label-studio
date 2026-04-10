@@ -588,7 +588,9 @@ export class LSFWrapper {
           // Critical: updateObjects() is required to render visual regions after deserializing
           lsfAnnotation.updateObjects();
           lsfAnnotation.history.safeUnfreeze();
-          lsfAnnotation.history.reinit();
+          // reinitHistory cancels autosave and sets initial values so the hydration
+          // isn't treated as a user modification (prevents unwanted draft creation)
+          lsfAnnotation.reinitHistory?.();
         }
 
         return fullAnnotation;
@@ -643,7 +645,9 @@ export class LSFWrapper {
         c.setDraftId(draft.id);
         c.setDraftSaved(draft.created_at);
         c.history.safeUnfreeze();
-        c.history.reinit();
+        // reinitHistory cancels autosave and sets initial values so the hydration
+        // isn't treated as a user modification (prevents unwanted draft creation)
+        c.reinitHistory?.();
       }
     }
     const first = this.annotations?.length ? this.annotations[0] : null;
