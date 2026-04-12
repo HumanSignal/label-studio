@@ -812,6 +812,8 @@ const _Annotation = types
 
       const result = self.serializeAnnotation({ fast: true });
 
+      await getEnv(self).events.invoke("beforeSaveDraft", self.store, self, result);
+
       self.setDraftSelected();
       self.versions.draft = result;
       self.setDraftSaving(true);
