@@ -1,6 +1,5 @@
 STALE_FEATURE_FLAGS = {
     # Jan 16
-    'ff_back_2884_comments_notifications_02092022_short': True,
     'fflag_feat_front_lsdv_5452_taxonomy_labeling_110823_short': True,
     # Feb 5
     'fflag_feature_all_optic_1421_cold_start_v2': False,
