@@ -1,3 +1,7 @@
+[[edge_functions]]
+path = "/*"
+function = "content-negotiation"
+
 [[redirects]]
 from = "/redirect/guide/*"
 to = "/guide/:splat"
