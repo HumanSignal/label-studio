@@ -111,6 +111,21 @@
   }
 }
 
+/* Enterprise Variant — exclusively for gated/enterprise-only feature callouts */
+.variant-enterprise {
+  background-image: linear-gradient(
+    to bottom right,
+    var(--color-accent-canteloupe-subtlest),
+    var(--color-accent-persimmon-subtlest),
+    var(--color-accent-plum-subtlest)
+  );
+  border-color: var(--color-accent-persimmon-subtle);
+
+  .title {
+    color: var(--color-accent-persimmon-base);
+  }
+}
+
 /* Look Styles */
 
 /* Card Look - Default: background, border, border-radius and padding applied via base and size classes */

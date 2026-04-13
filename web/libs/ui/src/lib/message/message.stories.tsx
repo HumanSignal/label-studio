@@ -19,9 +19,9 @@ const meta: Meta<typeof Message> = {
   argTypes: {
     variant: {
       control: "select",
-      options: ["primary", "neutral", "negative", "positive", "warning", "info", "success", "error"],
+      options: ["primary", "neutral", "negative", "positive", "warning", "enterprise", "info", "success", "error"],
       description:
-        "Visual variant of the message. Primary variants: primary, neutral, negative, positive, warning. Aliases: info (→primary), success (→positive), error (→negative)",
+        "Visual variant of the message. Primary variants: primary, neutral, negative, positive, warning, enterprise. Aliases: info (→primary), success (→positive), error (→negative). Use enterprise exclusively for gated/enterprise-only feature callouts.",
     },
     look: {
       control: "select",
@@ -110,6 +110,36 @@ export const Warning: Story = {
     variant: "warning",
     title: "Warning",
     children: "Your session will expire in 5 minutes. Please save your work.",
+  },
+};
+
+/**
+ * Use this variant **exclusively** to call out features that are gated behind Label Studio Enterprise.
+ * It uses the enterprise gradient palette (canteloupe → persimmon → plum) and defaults to IconSpark.
+ * Do not use it for general informational or warning messages.
+ */
+export const EnterpriseFeature: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Use `variant="enterprise"` exclusively to call out gated/enterprise-only features. ' +
+          "It uses the enterprise gradient palette (canteloupe → persimmon → plum) and defaults to IconSpark. " +
+          "Do not use it for general informational or warning messages.",
+      },
+    },
+  },
+  args: {
+    variant: "enterprise",
+    title: "Enterprise Feature",
+    children: (
+      <>
+        This feature is available in Label Studio Enterprise.{" "}
+        <a href="https://humansignal.com/enterprise" target="_blank" rel="noopener noreferrer">
+          Learn more
+        </a>
+      </>
+    ),
   },
 };
 
@@ -275,6 +305,13 @@ export const AllVariants: Story = {
 
       <Message variant="warning" title="Warning">
         This is a warning message.
+      </Message>
+
+      <Message variant="enterprise" title="Enterprise Feature">
+        This feature is available in Label Studio Enterprise.{" "}
+        <a href="https://humansignal.com/enterprise" target="_blank" rel="noopener noreferrer">
+          Learn more
+        </a>
       </Message>
     </div>
   ),

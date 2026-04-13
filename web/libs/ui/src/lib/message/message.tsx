@@ -8,6 +8,7 @@ import {
   IconCheckCircleOutline,
   IconCloseCircleOutline,
   IconClose,
+  IconSpark,
 } from "@humansignal/icons";
 import styles from "./message.module.css";
 
@@ -18,6 +19,7 @@ const variants = {
   negative: styles["variant-negative"],
   positive: styles["variant-positive"],
   warning: styles["variant-warning"],
+  enterprise: styles["variant-enterprise"],
 } as const;
 
 // Look configuration
@@ -44,6 +46,9 @@ export interface MessageProps extends React.HTMLAttributes<HTMLDivElement> {
    * - negative: Error/danger variant (red)
    * - positive: Success variant (green)
    * - warning: Warning/caution variant (orange/yellow)
+   * - enterprise: Exclusively for gated/enterprise-only feature callouts.
+   *               Uses the enterprise gradient palette (canteloupe → persimmon → plum)
+   *               and defaults to IconSpark. Do not use for general informational messages.
    *
    * Aliases for backward compatibility:
    * - info → primary
@@ -123,7 +128,7 @@ export interface MessageProps extends React.HTMLAttributes<HTMLDivElement> {
  * Supports different variants, looks, and customizable content including icons, text, actions, and extra content.
  *
  * Features:
- * - Five primary variants: primary, neutral, negative, positive, warning
+ * - Six primary variants: primary, neutral, negative, positive, warning, enterprise
  * - Backward compatibility aliases: info, success, error
  * - Two looks: card (default with background/border) and ghost (minimal, no card wrapper)
  * - Optional closable functionality
@@ -202,6 +207,8 @@ export const Message = forwardRef<HTMLDivElement, MessageProps>(
           return <IconCloseCircleOutline />;
         case "neutral":
           return <IconInfoOutline />;
+        case "enterprise":
+          return <IconSpark />;
         default:
           return <IconInfoOutline />;
       }

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Button } from "@humansignal/ui";
+import { Button, Message } from "@humansignal/ui";
 import {
   Dialog,
   DialogContent,
@@ -8,7 +8,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@humansignal/shad/components/ui/dialog";
-import { Alert, AlertDescription, AlertTitle } from "@humansignal/shad/components/ui/alert";
 
 // Type definitions
 interface Hotkey {
@@ -187,10 +186,9 @@ export const ImportDialog = ({ open, onOpenChange, onImport }: ImportDialogProps
           />
 
           {error && (
-            <Alert variant="destructive" id="import-error">
-              <AlertTitle>Import Error</AlertTitle>
-              <AlertDescription>{error}</AlertDescription>
-            </Alert>
+            <Message variant="negative" title="Import Error" id="import-error">
+              {error}
+            </Message>
           )}
         </div>
 
