@@ -312,7 +312,7 @@ Your app runs inside an iframe. Label Studio communicates with it via `postMessa
 
 ### Minimal `src` app template
 
-```html
+```xml
 <!DOCTYPE html>
 <html lang="en">
 <head>
