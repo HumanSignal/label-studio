@@ -23,15 +23,14 @@
 }
 
 .cardDescription {
-  padding-top: var(--spacing-tight);
   color: var(--color-neutral-content-subtler);
 
   /* title/medium */
-  font-family: var(--font-family-headings, Figtree);
-  font-size: var(--font-size-title-medium, 16px);
+  font-family: var(--font-family-body);
+  font-size: var(--font-size-body-medium);
   font-style: normal;
-  line-height: var(--line-height-title-medium, 24px); /* 150% */
-  letter-spacing: var(--letter-spacing-base, 0);
+  line-height: var(--line-height-body-medium); /* 150% */
+  letter-spacing: var(--letter-spacing-base);
 }
 
 .cardContent {
