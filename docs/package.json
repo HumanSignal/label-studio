@@ -51,7 +51,7 @@
     "server:enterprise": "hexo clean && touch db.json && hexo serve --config enterprise.yml,_config.yml",
     "publish": "hexo clean && touch db.json && hexo generate --config opensource.yml,_config.yml && hexo deploy --config opensource.yml,_config.yml",
     "publish:enterprise": "hexo clean && touch db.json && hexo generate --config enterprise.yml,_config.yml && hexo deploy --config enterprise.yml,_config.yml",
-    "build": "hexo clean && touch db.json && hexo generate --config opensource.yml,_config.yml && ls -ll && cd source && find . -name '*.md' -exec cp --parents {} ../public/ \\;",
+    "build": "hexo clean && touch db.json && hexo generate --config opensource.yml,_config.yml",
     "build:enterprise": "hexo clean && touch db.json && hexo generate --config enterprise.yml,_config.yml",
     "new": "hexo new"
   },
