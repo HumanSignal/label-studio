@@ -291,9 +291,14 @@ class TestTaskAgreementAPI(APITestCase):
         other_project = ProjectFactory(organization=other_org)
         task = TaskFactory(project=other_project)
 
-        # In OSS Project.has_permission is a stub that always returns True; patch so other_project denies access
-        def has_perm(project, user):
-            return project.id != other_project.id
+        # In OSS Project.has_permission is a stub that always returns True; patch so other_project denies access.
+        # Class-level patch: the mock is invoked with (user) only, not (self, user).
+        def has_perm(*args):
+            if len(args) == 2:
+                project, _ = args
+                return project.id != other_project.id
+            # Class-level method patch: mock is called as (user,) only.
+            return False
 
         mock_has_permission.side_effect = has_perm
         self.client.force_authenticate(user=self.user)
