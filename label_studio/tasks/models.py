@@ -607,8 +607,18 @@ class Task(TaskMixin, FsmHistoryStateModel):
             (post_delete, update_all_task_states_after_deleting_task, Task),
             (pre_delete, remove_data_columns, Task),
         ]
-        with temporary_disconnect_list_signal(signals):
-            return batch_delete(queryset, batch_size=500)
+        # Suppress LSE FSM review/annotation state writes during CASCADE deletes.
+        # Without this flag, `handle_review_deletion` tries to persist an
+        # AnnotationState row whose project_id is read from task.project_id —
+        # which is NULL when delete_tasks has just unlinked the task from the
+        # project, causing a NOT NULL violation and leaving orphaned tasks.
+        previous = CurrentContext.get('bulk_annotation_delete_in_progress')
+        CurrentContext.set('bulk_annotation_delete_in_progress', True)
+        try:
+            with temporary_disconnect_list_signal(signals):
+                return batch_delete(queryset, batch_size=500)
+        finally:
+            CurrentContext.set('bulk_annotation_delete_in_progress', previous)
 
     @staticmethod
     def delete_tasks_without_signals_from_task_ids(task_ids):
