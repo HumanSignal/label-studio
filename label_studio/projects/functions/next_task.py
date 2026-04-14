@@ -254,7 +254,7 @@ def get_not_solved_tasks_qs(
 
             # Exclude tasks where distinct annotator count >= effective overlap
             # Ground truth annotations don't count toward overlap
-            tasks_at_overlap = (
+            overlap_tasks_qs = (
                 Task.objects.filter(project=project)
                 .annotate(
                     distinct_annotators=Count(
@@ -264,10 +264,19 @@ def get_not_solved_tasks_qs(
                     )
                 )
                 .filter(distinct_annotators__gte=F('overlap') + max_additional)
-                .values_list('pk', flat=True)
             )
 
-            not_solved_tasks = not_solved_tasks.exclude(pk__in=tasks_at_overlap)
+            # Align bulk exclusion with Task.is_overlap_reached_for_user (LSE): while the user is
+            # still in their GT evaluation window, tasks that have a ground truth annotation must
+            # remain in the pool for onboarding / continuous GT — strict overlap must not empty the
+            # label stream for those tasks.
+            if include_gt:
+                overlap_tasks_qs = overlap_tasks_qs.exclude(annotations__ground_truth=True)
+
+            overlap_task_ids = list(overlap_tasks_qs.values_list('pk', flat=True))
+
+            if overlap_task_ids:
+                not_solved_tasks = not_solved_tasks.exclude(pk__in=overlap_task_ids)
 
     return not_solved_tasks, user_solved_tasks_array, queue_info, prioritized_on_agreement
 
