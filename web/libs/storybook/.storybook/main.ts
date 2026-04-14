@@ -7,16 +7,36 @@ import postcssNested from "postcss-nested";
 import autoprefixer from "autoprefixer";
 import tailwindcss from "tailwindcss";
 import svgr from "vite-plugin-svgr";
-import tailwindConfig from "../../../tailwind.config.js";
 import postcssImport from "postcss-import";
-import { cssModulesGenerateScopedName } from "../../../vite-prefix-css-module";
-import { jsxJsPlugin, optimizeDepsAutomaticJsxPlugin } from "../../../vite-lib-jsx-plugins";
-import postcssPrefixLsfModule from "../../../postcss-prefix-lsf.cjs";
 
-const { postcssPrefixLsfClasses } = postcssPrefixLsfModule as {
-  postcssPrefixLsfClasses: () => AcceptedPlugin;
-};
 const dirname = path.dirname(fileURLToPath(import.meta.url));
+
+/** Storybook evaluates this file with a virtual `/` root, so filesystem-relative imports must use `import.meta.url` (see Makefile: `bun run storybook:serve`). */
+async function loadWebTooling() {
+  const base = new URL("../../../", import.meta.url).href;
+  const [
+    { default: tailwindConfig },
+    { cssModulesGenerateScopedName, CSS_PREFIX },
+    { jsxJsPlugin, optimizeDepsAutomaticJsxPlugin },
+    postcssPrefixLsfModule,
+  ] = await Promise.all([
+    import(new URL("tailwind.config.js", base).href),
+    import(new URL("vite-prefix-css-module.ts", base).href),
+    import(new URL("vite-lib-jsx-plugins.ts", base).href),
+    import(new URL("postcss-prefix-lsf.cjs", base).href),
+  ]);
+  const { postcssPrefixLsfClasses } = postcssPrefixLsfModule.default as {
+    postcssPrefixLsfClasses: () => AcceptedPlugin;
+  };
+  return {
+    tailwindConfig,
+    cssModulesGenerateScopedName,
+    CSS_PREFIX,
+    jsxJsPlugin,
+    optimizeDepsAutomaticJsxPlugin,
+    postcssPrefixLsfClasses,
+  };
+}
 
 const config: StorybookConfig = {
   stories: ["../../../libs/**/*.@(mdx|stories.@(js|jsx|ts|tsx))", "../../../apps/**/*.@(mdx|stories.@(js|jsx|ts|tsx))"],
@@ -31,7 +51,24 @@ const config: StorybookConfig = {
   },
 
   viteFinal: async (viteConfig) => {
+    const {
+      tailwindConfig,
+      cssModulesGenerateScopedName,
+      CSS_PREFIX,
+      jsxJsPlugin,
+      optimizeDepsAutomaticJsxPlugin,
+      postcssPrefixLsfClasses,
+    } = await loadWebTooling();
     const root = path.resolve(dirname, "../../..");
+    const mode = viteConfig.mode ?? "development";
+    viteConfig.define = {
+      ...(viteConfig.define ?? {}),
+      global: "globalThis",
+      "process.env.CSS_PREFIX": JSON.stringify(CSS_PREFIX),
+      "process.env.BUILD_NO_SERVER": JSON.stringify(""),
+      "process.env.NODE_ENV": JSON.stringify(mode),
+      "process.env.RELEASE_NAME": JSON.stringify("storybook"),
+    };
     viteConfig.esbuild = {
       ...(viteConfig.esbuild ?? {}),
       jsx: "automatic",

@@ -35,10 +35,11 @@ mockModule("../../../utils/feature-flags", () => ({
   isFF: () => false,
 }));
 
-mockModule("@humansignal/core/lib/utils/feature-flags", () => ({
-  isActive: () => false,
-  FF_FIT_720_LAZY_LOAD_ANNOTATIONS: "ff_fit_720",
-}));
+import * as coreFf from "@humansignal/core/lib/utils/feature-flags";
+
+beforeAll(() => {
+  spyOn(coreFf, "isActive").mockReturnValue(false);
+});
 
 mockModule("../../mixins/DataStore", () => {
   const { types } = require("mobx-state-tree");

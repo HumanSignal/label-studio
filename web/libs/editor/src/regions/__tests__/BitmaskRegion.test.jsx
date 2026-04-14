@@ -165,6 +165,14 @@ const TestRoot = types
     },
   }));
 
+const ImgConstructor =
+  typeof window !== "undefined" ? window.Image : typeof global !== "undefined" ? global.Image : null;
+if (ImgConstructor && !ImgConstructor.prototype.decode) {
+  ImgConstructor.prototype.decode = function () {
+    return Promise.resolve();
+  };
+}
+
 describe("BitmaskRegion", () => {
   describe("BitmaskRegionModel", () => {
     let root;

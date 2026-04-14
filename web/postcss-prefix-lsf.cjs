@@ -16,6 +16,13 @@ function isPrefixCssFile(from) {
   return /\.prefix\.css$/i.test(normalized);
 }
 
+/** Storybook preview overlay targets third-party class names (.sbdocs, .docblock-argstable, …); prefixing breaks them. */
+function isStorybookPreviewOverlay(from) {
+  if (!from) return false;
+  const normalized = from.split("\\").join("/");
+  return normalized.includes(".storybook/preview.prefix.css");
+}
+
 function isInsideGlobalPseudo(node) {
   let n = node.parent;
   while (n) {
@@ -82,6 +89,7 @@ function postcssPrefixLsfClasses() {
     OnceExit(root) {
       const from = root.source?.input?.from;
       if (!isPrefixCssFile(from)) return;
+      if (isStorybookPreviewOverlay(from)) return;
 
       root.walkRules((rule) => {
         if (isInsideKeyframes(rule)) return;

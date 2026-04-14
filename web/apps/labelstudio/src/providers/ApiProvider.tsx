@@ -14,7 +14,6 @@ import { FF_IMPROVE_GLOBAL_ERROR_MESSAGES, isFF } from "../utils/feature-flags";
 import { ToastType, useToast } from "@humansignal/ui";
 import { captureException } from "../config/Sentry";
 
-export const IMPROVE_GLOBAL_ERROR_MESSAGES = isFF(FF_IMPROVE_GLOBAL_ERROR_MESSAGES);
 // Duration for toast errors
 export const API_ERROR_TOAST_DURATION = 10000;
 
@@ -58,7 +57,7 @@ const displayErrorModal = (errorDetails: FormattedError) => {
         {...formattedError}
         title={title}
         message={message}
-        stacktrace={IMPROVE_GLOBAL_ERROR_MESSAGES ? undefined : stacktrace}
+        stacktrace={isFF(FF_IMPROVE_GLOBAL_ERROR_MESSAGES) ? undefined : stacktrace}
       />
     ),
     simple: true,
@@ -98,7 +97,7 @@ export const ApiProvider = forwardRef<ApiContextType, PropsWithChildren<Record<s
       }
 
       // Show toast for 4xx without validation errors
-      if (IMPROVE_GLOBAL_ERROR_MESSAGES && is4xx && !containsValidationErrors) {
+      if (isFF(FF_IMPROVE_GLOBAL_ERROR_MESSAGES) && is4xx && !containsValidationErrors) {
         toast?.show({
           message: `${errorDetails.title}: ${errorDetails.message}`,
           type: ToastType.error,
@@ -128,7 +127,7 @@ export const ApiProvider = forwardRef<ApiContextType, PropsWithChildren<Record<s
     }
 
     // Handle 404 redirects with improved error messages
-    if (IMPROVE_GLOBAL_ERROR_MESSAGES && status === 404) {
+    if (isFF(FF_IMPROVE_GLOBAL_ERROR_MESSAGES) && status === 404) {
       apiLocked = true;
       let redirectUrl = absoluteURL("/");
 

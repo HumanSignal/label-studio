@@ -35,6 +35,7 @@ const mockInvokeFirst = mock();
 const mockHasEvent = mock(() => false);
 mockModule("../../../components/Infomodal/Infomodal", () => ({
   __esModule: true,
+  __skipMerge: true,
   default: {
     warning: mock(),
     error: mock(),

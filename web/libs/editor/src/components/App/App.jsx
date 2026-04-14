@@ -26,7 +26,7 @@ import "../../tags/Custom";
  */
 import { Space } from "../../common/Space/Space";
 import { Button, EmptyState, IconCheck } from "@humansignal/ui";
-import { isStarterCloudPlan } from "@humansignal/core";
+import { isStarterCloudPlan, ff } from "@humansignal/core";
 import { cn } from "../../utils/bem";
 import { FF_BULK_ANNOTATION, isFF } from "../../utils/feature-flags";
 import { guidGenerator } from "../../utils/unique";
@@ -40,6 +40,7 @@ import { ToastProvider, ToastViewport } from "@humansignal/ui/lib/toast/toast";
 import { Annotation } from "./Annotation";
 import { BottomBar } from "../BottomBar/BottomBar";
 import Debug from "../Debug";
+import { InfoModalRoot } from "../Infomodal/InfoModalRoot";
 import { InstructionsModal } from "../InstructionsModal/InstructionsModal";
 import { RelationsOverlay } from "../InteractiveOverlays/RelationsOverlay";
 import Settings from "../Settings/Settings";
@@ -266,6 +267,7 @@ class App extends Component {
           <Settings store={store} />
           <Provider store={store}>
             <ToastProvider>
+              {ff.isActive(ff.FF_MODAL_WINDOW_APP_CHROME) ? <InfoModalRoot /> : null}
               <InstructionsModal
                 visible={store.showingDescription}
                 onCancel={() => store.toggleDescription()}

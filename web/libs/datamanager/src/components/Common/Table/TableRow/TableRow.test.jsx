@@ -28,11 +28,6 @@ mockModule("../utils", () => ({
   getStyle: mock(() => ({})),
 }));
 
-// Mock normalizeCellAlias
-mockModule("../../../CellViews", () => ({
-  normalizeCellAlias: mock((alias) => alias),
-}));
-
 // Mock BEM utility
 mockModule("../../../../utils/bem", () => ({
   cn: mock((name) => {

@@ -11,7 +11,7 @@ import { triggerResizeEvent } from "../../utils/utilities";
 import EditorSettings from "../../core/settings/editorsettings";
 import * as TagSettings from "./TagSettings";
 import { IconClose } from "@humansignal/icons";
-import { Checkbox, Toggle } from "@humansignal/ui";
+import { Checkbox, ModalWindow, Toggle } from "@humansignal/ui";
 import { ff } from "@humansignal/core";
 
 const HotkeysDescription = () => {
@@ -203,6 +203,40 @@ export default observer(({ store }) => {
     }, []);
   }, []);
 
+  const settingsTabs = (
+    <Tabs defaultActiveKey={DEFAULT_ACTIVE}>
+      {Object.entries(Settings).map(([key, { name, component }]) => (
+        <Tabs.TabPane tab={name} key={key}>
+          {React.createElement(component, { store })}
+        </Tabs.TabPane>
+      ))}
+      {availableSettings.map((Page) => (
+        <Tabs.TabPane tab={Page.title} key={Page.tagName}>
+          <Page store={store} />
+        </Tabs.TabPane>
+      ))}
+    </Tabs>
+  );
+
+  if (ff.isActive(ff.FF_MODAL_WINDOW_APP_CHROME)) {
+    return (
+      <ModalWindow
+        className={cn(DEFAULT_MODAL_SETTINGS.name).toClassName()}
+        open={store.showingSettings}
+        onOpenChange={(open) => {
+          if (!open && store.showingSettings) store.toggleSettings();
+        }}
+        title={DEFAULT_MODAL_SETTINGS.title}
+        size="large"
+        contentClassName="max-w-[568px]"
+        bodyClassName="min-h-0 p-0"
+        dataTestId="editor-settings-modal"
+      >
+        {settingsTabs}
+      </ModalWindow>
+    );
+  }
+
   return (
     <Modal
       className={cn(DEFAULT_MODAL_SETTINGS.name).toClassName()}
@@ -211,20 +245,8 @@ export default observer(({ store }) => {
       footer=""
       title={DEFAULT_MODAL_SETTINGS.title}
       closeIcon={DEFAULT_MODAL_SETTINGS.closeIcon}
-      bodyStyle={DEFAULT_MODAL_SETTINGS.bodyStyle}
     >
-      <Tabs defaultActiveKey={DEFAULT_ACTIVE}>
-        {Object.entries(Settings).map(([key, { name, component }]) => (
-          <Tabs.TabPane tab={name} key={key}>
-            {React.createElement(component, { store })}
-          </Tabs.TabPane>
-        ))}
-        {availableSettings.map((Page) => (
-          <Tabs.TabPane tab={Page.title} key={Page.tagName}>
-            <Page store={store} />
-          </Tabs.TabPane>
-        ))}
-      </Tabs>
+      {settingsTabs}
     </Modal>
   );
 });

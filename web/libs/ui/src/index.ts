@@ -41,6 +41,7 @@ export * from "./lib/auto-sizer-table/auto-sizer-table";
 export * from "./lib/data-table";
 export * from "./lib/pagination";
 export * from "./lib/drawer";
+export * from "./lib/modal-window";
 
 export * from "./utils/utils";
 export * from "./utils/getTokenColor";

@@ -2,8 +2,7 @@ import React, { Component } from "react";
 import { ErrorWrapper } from "../components/Error/Error";
 import { Modal } from "../components/Modal/ModalPopup";
 import { captureException } from "../config/Sentry";
-import { isFF } from "../utils/feature-flags";
-import { IMPROVE_GLOBAL_ERROR_MESSAGES } from "../providers/ApiProvider";
+import { FF_IMPROVE_GLOBAL_ERROR_MESSAGES, isFF } from "../utils/feature-flags";
 
 export const ErrorContext = React.createContext();
 
@@ -50,7 +49,7 @@ export default class ErrorBoundary extends Component {
 
       // We will capture the stacktrace in Sentry, so we don't need to show it in the modal
       // It is not actionable to the user, let's not show it
-      const stacktrace = isFF(IMPROVE_GLOBAL_ERROR_MESSAGES)
+      const stacktrace = isFF(FF_IMPROVE_GLOBAL_ERROR_MESSAGES)
         ? undefined
         : `${errorInfo ? `Component Stack: ${errorInfo}` : ""}\n\n${this.state.error?.stack ?? ""}`;
 

@@ -84,9 +84,10 @@ const generateTimeseriesData = (
 // Override fetch for CSV and other static files that would produce a CORS error potentially
 const originalFetch = global.fetch;
 // @ts-ignore
-global.fetch = async (url: string) => {
-  if (url.startsWith(SAMPLE_CSV)) {
-    const params = new URLSearchParams(url.split("?")[1]);
+global.fetch = async (url: any, ...args: any[]) => {
+  const urlString = url instanceof URL ? url.toString() : String(url);
+  if (urlString.startsWith(SAMPLE_CSV)) {
+    const params = new URLSearchParams(urlString.split("?")[1]);
     const timeColumn = params.get("time") || "None";
     const values = params.get("values");
     const separator = params.get("sep") || ",";
@@ -101,7 +102,7 @@ global.fetch = async (url: string) => {
     });
     return new Response(data as string);
   }
-  return originalFetch(url);
+  return originalFetch(url, ...args);
 };
 
 // Format based on timeFormat

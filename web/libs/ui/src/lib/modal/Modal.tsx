@@ -200,5 +200,8 @@ export const info = <T,>({ okText, onOkPress, ...props }: InfoProps<T>) => {
   return modal;
 };
 
+/**
+ * @deprecated Prefer `ModalWindow` from `@humansignal/ui` for app chrome; use `ff.isActive` at the call site.
+ */
 export { standaloneModal as modal };
 export { Modal };

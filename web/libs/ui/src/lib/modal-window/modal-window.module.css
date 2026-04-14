@@ -1,0 +1,127 @@
+/* Modal window motion: soft zoom-in (scale down from ~1.03 to 1) + fade; exit shrinks + fades.
+   Transforms include horizontal centering for non-fullscreen (matches left-1/2 / translate). */
+
+.withAnimation,
+.withAnimationDialog,
+.withAnimationFullscreen {
+  --modal-window-duration-enter: 300ms;
+  --modal-window-duration-exit: 100ms;
+  --modal-window-scale-out: 0.95;
+  --modal-window-scale-in: 1;
+  --scrim-blur: 2px;
+}
+
+.withAnimation[data-state="open"] {
+  animation: modalWindowEnter var(--modal-window-duration-enter) cubic-bezier(0.33, 1, 0.68, 1) forwards;
+}
+
+.withAnimation[data-state="closed"] {
+  animation: modalWindowExit var(--modal-window-duration-exit) ease-in forwards;
+}
+
+.withAnimationFullscreen[data-state="open"] {
+  animation: modalWindowEnterFs var(--modal-window-duration-enter) cubic-bezier(0.33, 1, 0.68, 1) forwards;
+}
+
+.withAnimationFullscreen[data-state="closed"] {
+  animation: modalWindowExitFs var(--modal-window-duration-exit) ease-in forwards;
+}
+
+.withAnimationDialog[data-state="open"] {
+  animation: modalWindowDialogEnter var(--modal-window-duration-enter) cubic-bezier(0.33, 1, 0.68, 1) forwards;
+}
+
+.withAnimationDialog[data-state="closed"] {
+  animation: modalWindowDialogExit var(--modal-window-duration-exit) ease-in forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .withAnimation[data-state="open"],
+  .withAnimation[data-state="closed"],
+  .withAnimationDialog[data-state="open"],
+  .withAnimationDialog[data-state="closed"],
+  .withAnimationFullscreen[data-state="open"],
+  .withAnimationFullscreen[data-state="closed"] {
+    animation: none !important;
+  }
+}
+
+@keyframes modalWindowEnter {
+  from {
+    opacity: 0;
+    transform: translate(-50%, var(--spacing-widest)) scale(var(--modal-window-scale-out));
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0) scale(var(--modal-window-scale-in));
+  }
+}
+
+@keyframes modalWindowExit {
+  from {
+    opacity: 1;
+    transform: translate(-50%, 0) scale(var(--modal-window-scale-in));
+  }
+  to {
+    opacity: 0;
+    transform: translate(-50%, var(--spacing-widest)) scale(var(--modal-window-scale-out));
+  }
+}
+
+@keyframes modalWindowDialogEnter {
+  from {
+    opacity: 0;
+    transform: translate(-50%, calc(-50% + var(--spacing-wide))) scale(var(--modal-window-scale-out));
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(var(--modal-window-scale-in));
+  }
+}
+
+@keyframes modalWindowDialogExit {
+  from {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(var(--modal-window-scale-in));
+  }
+  to {
+    opacity: 0;
+    transform: translate(-50%, calc(-50% + var(--spacing-wide))) scale(var(--modal-window-scale-out));
+  }
+}
+
+@keyframes modalWindowEnterFs {
+  from {
+    opacity: 0;
+    transform: scale(var(--modal-window-scale-out));
+  }
+  to {
+    opacity: 1;
+    transform: scale(var(--modal-window-scale-in));
+  }
+}
+
+@keyframes modalWindowExitFs {
+  from {
+    opacity: 1;
+    transform: scale(var(--modal-window-scale-in));
+  }
+  to {
+    opacity: 0;
+    transform: scale(var(--modal-window-scale-out));
+  }
+}
+
+.panel {
+  box-shadow:
+    0 16px 36px rgba(var(--color-neutral-shadow-raw) / calc(40% * var(--shadow-intensity))),
+    inset 0 1px 1px var(--color-neutral-border),
+    inset 0 -1px rgba(var(--color-neutral-shadow-raw) / 30%);
+}
+
+/* Match legacy .modal-ls stacking (z-index: 2000) so ModalWindow sits above app chrome. */
+.scrim {
+  z-index: 2000;
+  background-color: rgba(var(--color-neutral-shadow-raw) / 70%);
+  backdrop-filter: blur(var(--scrim-blur));
+}

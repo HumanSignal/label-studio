@@ -91,28 +91,34 @@ function registerMock(specifier: string, factory?: ModuleFactory) {
     if (actual && typeof actual === "object") {
       const actualObj = actual as Record<string, unknown>;
       const producedObj = produced as Record<string, unknown>;
-      const merged: Record<string, unknown> = { ...actualObj, ...producedObj };
-      if (producedObj.default && typeof producedObj.default === "object") {
-        const actualDefaultCandidate =
-          actualObj.default && typeof actualObj.default === "object" ? actualObj.default : actualObj;
-        const actualDefault = actualDefaultCandidate as object;
-        const producedDefault = producedObj.default as object;
-        const mergedDefault = Object.assign(
-          Object.create(Object.getPrototypeOf(actualDefault)),
-          actualDefault as Record<string, unknown>,
-        );
-        for (const [key, descriptor] of Object.entries(Object.getOwnPropertyDescriptors(producedDefault))) {
-          try {
-            Object.defineProperty(mergedDefault, key, descriptor);
-          } catch {
-            if ("value" in descriptor) {
-              (mergedDefault as Record<string, unknown>)[key] = descriptor.value;
+      try {
+        // Spreading `actual` can throw ReferenceError (e.g. `default` in TDZ) during circular imports.
+        const merged: Record<string, unknown> = { ...actualObj, ...producedObj };
+        if (producedObj.default && typeof producedObj.default === "object") {
+          const actualDefaultCandidate =
+            actualObj.default && typeof actualObj.default === "object" ? actualObj.default : actualObj;
+          const actualDefault = actualDefaultCandidate as object;
+          const producedDefault = producedObj.default as object;
+          const mergedDefault = Object.assign(
+            Object.create(Object.getPrototypeOf(actualDefault)),
+            actualDefault as Record<string, unknown>,
+          );
+          for (const [key, descriptor] of Object.entries(Object.getOwnPropertyDescriptors(producedDefault))) {
+            try {
+              Object.defineProperty(mergedDefault, key, descriptor);
+            } catch {
+              if ("value" in descriptor) {
+                (mergedDefault as Record<string, unknown>)[key] = descriptor.value;
+              }
             }
           }
+          merged.default = mergedDefault;
         }
-        merged.default = mergedDefault;
+        value = merged;
+      } catch {
+        // Spread/merge can throw (e.g. TDZ on `default` during circular ESM load); use mock only.
+        value = produced;
       }
-      value = merged;
     }
   }
 
@@ -162,15 +168,9 @@ if (bunJest) {
 (globalThis as any).restoreAllMocks = () => bunJest.restoreAllMocks();
 (globalThis as any).resetModules = () => {};
 
-try {
-  const realVirtualVideo = await import("../../libs/editor/src/components/VideoCanvas/VirtualVideo");
-  (globalThis as any).__realVirtualVideo = {
-    VirtualVideo: realVirtualVideo?.VirtualVideo,
-    canPlayUrl: realVirtualVideo?.canPlayUrl,
-  };
-} catch {
-  // optional cache of real module to bypass cross-file mocks in tests
-}
+// Do not eagerly import VirtualVideo here: it pulls Infomodal (and antd/ff graph) during preload and
+// can hit TDZ / ordering issues with Bun's test runner. VirtualVideo.test.tsx loads the module via
+// dynamic import when needed.
 
 const reactNoisePatterns = [
   /^You are using a whole package of antd/,
@@ -225,6 +225,10 @@ if (typeof window === "undefined") {
   (globalThis as any).HTMLDivElement = dom.window.HTMLDivElement;
   (globalThis as any).HTMLCanvasElement = dom.window.HTMLCanvasElement;
   (globalThis as any).HTMLMediaElement = dom.window.HTMLMediaElement;
+  (globalThis as any).HTMLInputElement = dom.window.HTMLInputElement;
+  (globalThis as any).HTMLTextAreaElement = dom.window.HTMLTextAreaElement;
+  (globalThis as any).HTMLSelectElement = dom.window.HTMLSelectElement;
+  (globalThis as any).HTMLButtonElement = dom.window.HTMLButtonElement;
   (globalThis as any).Event = dom.window.Event;
   (globalThis as any).Node = dom.window.Node;
 }
@@ -237,6 +241,10 @@ if (typeof window === "undefined") {
 (globalThis as any).WheelEvent = (window as any).WheelEvent;
 (globalThis as any).SVGElement = (window as any).SVGElement;
 (globalThis as any).HTMLIFrameElement = (window as any).HTMLIFrameElement;
+(globalThis as any).HTMLInputElement = (window as any).HTMLInputElement;
+(globalThis as any).HTMLTextAreaElement = (window as any).HTMLTextAreaElement;
+(globalThis as any).HTMLSelectElement = (window as any).HTMLSelectElement;
+(globalThis as any).HTMLButtonElement = (window as any).HTMLButtonElement;
 (globalThis as any).Option = (window as any).Option;
 (globalThis as any).CustomEvent = (window as any).CustomEvent;
 (globalThis as any).DOMParser = (window as any).DOMParser;

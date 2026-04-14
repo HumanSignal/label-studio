@@ -121,3 +121,9 @@ export const FF_FIT_1443_ANALYTICS_LABEL_DISTRIBUTION_PAGE =
  * Show per-item classifications (like Choices or Taxonomy) alongside regions in the Outliner panel
  */
 export const FF_CLASSIFICATIONS_IN_OUTLINER = "fflag_feat_front_bros_766_per_item_in_outliner";
+
+/**
+ * Single feature flag for migrating app-chrome dialogs from legacy `modal()` / `Modal` to `ModalWindow`.
+ * Use `ff.isActive(FF_MODAL_WINDOW_APP_CHROME)` next to each migrated modal (not a global switch in app Modal.tsx).
+ */
+export const FF_MODAL_WINDOW_APP_CHROME = "fflag_feat_front_fit_1559_modal_window_short";

@@ -18,7 +18,8 @@ const mockAnnotationStore = {
 
 mockModule("../../../components/Infomodal/Infomodal", () => ({
   __esModule: true,
-  default: { warning: mock() },
+  __skipMerge: true,
+  default: { error: mock(), warning: mock(), success: mock(), info: mock() },
 }));
 
 // Extended model so we have .regions and .states()/.activeStates() (required by findRegion and getAvailableStates)

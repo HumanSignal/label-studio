@@ -13,7 +13,8 @@ import { HtxDateTime } from "../DateTime";
 
 mockModule("../../../components/Infomodal/Infomodal", () => ({
   __esModule: true,
-  default: { warning: mock() },
+  __skipMerge: true,
+  default: { error: mock(), warning: mock(), success: mock(), info: mock() },
 }));
 
 import { getRoot } from "mobx-state-tree";
