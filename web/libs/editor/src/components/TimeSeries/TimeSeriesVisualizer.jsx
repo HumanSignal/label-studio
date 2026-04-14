@@ -692,24 +692,21 @@ class TimeSeriesVisualizerD3 extends React.Component {
   initializeChannel(item) {
     const markerId = `marker_${item.id}`;
     const column = item.columnName;
-    const { time, range } = this.props;
+    const { time } = this.props;
     const { margin } = item;
     const height = this.height;
 
     const channel = (this.channels[column] = { id: item.id, units: item.units });
+    const timeBisector = d3.bisector((d) => d[time]).left;
 
-    let { series } = this.props;
+    const fullSeries = this.props.series.filter((x) => x[column] !== null);
+    channel.fullSeries = fullSeries;
+
+    let series = fullSeries;
 
     if (this.optimizedSeries) {
       channel.useOptimizedData = this.useOptimizedData;
-      series = this.optimizedSeries;
-    }
-
-    series = series.filter((x) => {
-      return x[column] !== null;
-    });
-
-    if (this.optimizedSeries) {
+      series = this.optimizedSeries.filter((x) => x[column] !== null);
       channel.optimizedSeries = series;
     }
 
@@ -717,8 +714,8 @@ class TimeSeriesVisualizerD3 extends React.Component {
       return x[column];
     });
 
-    if (!values) {
-      const names = Object.keys(data).filter((name) => name !== time);
+    if (!values || values.length === 0) {
+      const names = Object.keys(this.props.data ?? {}).filter((name) => name !== time);
       const message = `\`${column}\` not found in data. Available columns: ${names.join(
         ", ",
       )}. For headless csv you can use column index`;
@@ -749,9 +746,31 @@ class TimeSeriesVisualizerD3 extends React.Component {
     // line that has representation only on the current range
     channel.lineSlice = d3
       .line()
-      .defined((d) => d[time] >= range[0] && d[time] <= range[1])
+      .defined(
+        (d) =>
+          d &&
+          d[column] !== null &&
+          Number.isFinite(channel.y(d[column])) &&
+          Number.isFinite(channel.x(d[time])),
+      )
       .y((d) => channel.y(d[column]))
       .x((d) => channel.x(d[time]));
+
+    channel.getVisibleSegment = (src, visibleRange) => {
+      if (!src || src.length === 0) return [];
+
+      const start = Math.max(0, timeBisector(src, visibleRange[0]) - 1);
+      const end = Math.min(src.length, timeBisector(src, visibleRange[1]) + 1);
+
+      let segment = src.slice(start, Math.max(start + 2, end));
+
+      if (segment.length < 2) {
+        const pivot = Math.min(src.length - 1, start);
+        segment = src.slice(Math.max(0, pivot - 1), Math.min(src.length, pivot + 2));
+      }
+
+      return segment;
+    };
 
     const marker = this.defs
       .append("marker")
@@ -826,39 +845,55 @@ class TimeSeriesVisualizerD3 extends React.Component {
       channel.x.domain(timerange);
     }
 
-    if (!fixedscale) {
-      // array slice may slow it down, so just find a min-max by ourselves
-      const { data, time } = this.props;
-      const values = data[column];
-      // indices of the first and last displayed values
-      let i = d3.bisectRight(data[time], range[0]);
-      const j = d3.bisectRight(data[time], range[1]);
-      // find min-max
-      let min = values[i];
-      let max = values[i];
+   if (!fixedscale) {
+  const { data, time } = this.props;
+  const values = data[column];
 
-      for (; i < j; i++) {
-        if (min > values[i]) min = values[i];
-        if (max < values[i]) max = values[i];
-      }
+  if (Array.isArray(values) && values.length > 0) {
+    const numericValues = values.filter((v) => v != null && Number.isFinite(v));
+    if (!numericValues.length) return;
 
-      if (channelItem.datarange) {
-        const datarange = channelItem.datarange.split(",");
+    let i = d3.bisectRight(data[time], range[0]);
+    const j = d3.bisectRight(data[time], range[1]);
+    const safeIndex = Math.min(i, values.length - 1);
 
-        if (datarange[0] !== "") min = new Number(datarange[0]);
-        if (datarange[1] !== "") max = new Number(datarange[1]);
-      }
+    let min = values[safeIndex];
+    let max = values[safeIndex];
 
-      // calc scale and shift
-      const [globalMin, globalMax] = d3.extent(values);
-      const diffY = globalMax - globalMin;
-
-      scaleY = diffY / (max - min);
-
-      channel.y.domain([min, max]);
-      // `translateY` relies on the current `y`'s domain so it should be calculated after it
-      translateY = channel.y(globalMin) - channel.y(min);
+    for (; i < j && i < values.length; i++) {
+      const v = values[i];
+      if (v == null || !Number.isFinite(v)) continue;
+      if (!Number.isFinite(min) || min > v) min = v;
+      if (!Number.isFinite(max) || max < v) max = v;
     }
+
+    if (!Number.isFinite(min) || !Number.isFinite(max)) {
+      const [fallbackMin, fallbackMax] = d3.extent(numericValues);
+      min = fallbackMin;
+      max = fallbackMax;
+    }
+
+    if (channelItem.datarange) {
+      const datarange = channelItem.datarange.split(",");
+      if (datarange[0] !== "") min = Number(datarange[0]);
+      if (datarange[1] !== "") max = Number(datarange[1]);
+    }
+
+    if (max === min) {
+      min -= 1;
+      max += 1;
+    }
+
+    const [globalMin, globalMax] = d3.extent(numericValues);
+    const globalSpan = globalMax - globalMin;
+    const domainSpan = max - min;
+
+    scaleY = globalSpan !== 0 && domainSpan !== 0 ? globalSpan / domainSpan : 1;
+
+    channel.y.domain([min, max]);
+    translateY = channel.y(globalMin) - channel.y(min);
+  }
+}
 
     // zoomStep - zoom level when we need to switch between optimized and original data
     const strongZoom = scale > this.zoomStep;
@@ -875,24 +910,19 @@ class TimeSeriesVisualizerD3 extends React.Component {
     }
 
     if (channel.useOptimizedData) {
-      channel.path.attr("transform", `translate(${translate} ${translateY}) scale(${scale} ${scaleY})`);
-      channel.path.attr("transform-origin", `left ${originY}`);
-      channel.path2.attr("d", "");
-    } else {
-      if (channel.optimizedSeries) {
-        channel.path.datum(this.slices[left]);
-        channel.path.attr("d", channel.lineSlice);
-        if (left !== right && this.slices[right]) {
-          channel.path2.datum(this.slices[right]);
-          channel.path2.attr("d", channel.lineSlice);
-        } else {
-          channel.path2.attr("d", "");
-        }
-      } else {
-        channel.path.attr("d", channel.lineSlice);
-        channel.path2.attr("d", "");
-      }
-    }
+  channel.path.attr("transform", `translate(${translate} ${translateY}) scale(${scale} ${scaleY})`);
+  channel.path.attr("transform-origin", `left ${originY}`);
+  channel.path2.attr("d", "");
+} else {
+  channel.path.attr("transform", "");
+
+  const visibleSeries = channel.getVisibleSegment(channel.fullSeries, range);
+
+  channel.path.datum(visibleSeries);
+  channel.path.attr("d", visibleSeries.length >= 2 ? channel.lineSlice : null);
+
+  channel.path2.attr("d", "");
+}
 
     this.renderXAxis();
     this.renderYAxis();
