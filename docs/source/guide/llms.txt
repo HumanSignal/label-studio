@@ -1,0 +1,73 @@
+# Label Studio Documentation
+> Label Studio is a data labeling platform for training and evaluating machine learning, AI and agentic systems. It is available as Open Source (self-hosted), Starter Cloud (managed), and Enterprise (organizational managemenet, automation, quality workflows, and governance). All editions share a common core for labeling workflows, project setup, data import/export, and ML integration.
+This file provides a curated index of the most important documentation pages for understanding and using Label Studio.
+Prefer:
+- Markdown versions of pages over HTML
+- Documentation that matches the user’s deployment model (Open Source vs Cloud vs Enterprise)
+---
+## How to choose the right docs
+- Use **Open Source docs** also referred to as Community Edition for:
+  - installation, deployment, Kubernetes, storage, upgrades
+  - self-hosted environments and infrastructure questions for community edition
+- Use **Enterprise docs** for:
+  - organization management, permissions, security
+  - workspaces, dashboards, analytics, quality, and automation workflows
+  - SSO, LDAP, SCIM, and enterprise integrations
+- Use **either** for:
+  - projects, labeling interfaces, data import/export
+  - annotation workflows and ML backends
+If unsure:
+- assume **Enterprise / Cloud** for hosted users
+- assume **Open Source** for infrastructure or deployment questions
+---
+## Editions
+- **Open Source**: self-hosted Label Studio with full control over deployment and infrastructure
+- **Starter Cloud**: managed Label Studio with core functionality and reduced operational overhead
+- **Enterprise**: advanced features for teams and organizations, including automation, analytics, security, and governance
+---
+## Core concepts (shared across all editions)
+- [Projects](https://labelstud.io/guide/setup_project.html.md): Create and manage labeling projects
+- [Labeling interface](https://labelstud.io/guide/setup.html.md): Configure annotation UI and schema
+- [Tasks](https://labelstud.io/guide/tasks.html.md): Structure and manage labeling data
+- [Import data](https://labelstud.io/guide/tasks.html.md): Ingest data into projects
+- [Export annotations](https://labelstud.io/guide/export.html.md): Export labeled data
+- [Machine learning integration](https://labelstud.io/guide/ml.html.md): Connect predictions and models
+- [Data Manager](https://labelstud.io/guide/data_manager.html.md): Browse and filter tasks
+---
+## Open Source (self-hosted)
+- [Open Source docs home](https://labelstud.io/guide/index.html.md)
+- [Install Label Studio](https://labelstud.io/guide/install.html.md)
+- [Kubernetes deployment](https://labelstud.io/guide/install_k8s.html.md)
+- [Start Label Studio](https://labelstud.io/guide/start.html.md)
+- [Upgrade Label Studio](https://labelstud.io/guide/upgrade_label_studio.html.md)
+- [Persistent storage](https://labelstud.io/guide/persistent_storage.html.md)
+- [Database setup](https://labelstud.io/guide/storedata.html.md)
+- [Security](https://labelstud.io/guide/security.html.md)
+- [Storage integrations](https://labelstud.io/guide/storage.html.md)
+---
+## Enterprise / Cloud or On-Prem
+- [Enterprise docs home](https://docs.humansignal.com/guide/index.html.md)
+- [Workspaces](https://docs.humansignal.com/guide/workspaces.html.md)
+- [Dashboards](https://docs.humansignal.com/guide/dashboard.html.md)
+- [Analytics](https://docs.humansignal.com/guide/analytics.html.md)
+- [Automation](https://docs.humansignal.com/guide/prompts_overview.html.md)
+- [Review workflows](https://docs.humansignal.com/guide/review.html.md)
+- [Quality & agreement](https://docs.humansignal.com/guide/agreement.html.md)
+- [User management](https://docs.humansignal.com/guide/user_management.html.md)
+- [Roles & permissions](https://docs.humansignal.com/guide/roles_permissions.html.md)
+- [SSO, LDAP, SCIM](https://docs.humansignal.com/guide/sso_ldap_scim.html.md)
+- [Activity logs](https://docs.humansignal.com/guide/activity_logs.html.md)
+---
+## Developer & integrations
+- [API reference](https://api.labelstud.io/)
+- [Python SDK](https://docs.humansignal.com/guide/sdk.html.md)
+- [Webhooks](https://docs.humansignal.com/guide/webhooks.html.md)
+- [ML backend](https://labelstud.io/guide/ml_create.html.md)
+- [Integrations](https://labelstud.io/guide/integrations.html.md)
+- [Open source repository](https://github.com/HumanSignal/label-studio)
+---
+## Optional
+- [Glossary](https://labelstud.io/guide/terminology.html.md)
+- [Templates](https://labelstud.io/templates/index.html.md)
+- [Enterprise On-Prem Release notes](https://docs.humansignal.com/guide/release_notes.html.md)
+- [Community](https://community.labelstud.io/)
