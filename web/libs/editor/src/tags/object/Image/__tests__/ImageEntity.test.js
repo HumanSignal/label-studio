@@ -238,6 +238,37 @@ describe("ImageEntity", () => {
     });
   });
 
+  describe("dead node safety (Sentry: async after destroy)", () => {
+    it("does not throw when imageCache.load resolves after entity is destroyed", async () => {
+      imageCache.get.mockReturnValue(null);
+      imageCache.isLoading.mockReturnValue(false);
+      let resolveLoad;
+      const loadPromise = new Promise((resolve) => {
+        resolveLoad = resolve;
+      });
+      imageCache.load.mockReturnValue(loadPromise);
+
+      const RootWithChild = types.model({ child: types.maybe(ModelWithMixin) }).actions((self) => ({
+        clearChild() {
+          self.child = undefined;
+        },
+      }));
+
+      const root = RootWithChild.create({
+        child: {
+          imageEntities: [{ id: "img-1", src: "https://example.com/1.jpg", index: 0 }],
+          currentImageEntity: null,
+        },
+      });
+      const entity = root.child.imageEntities[0];
+      entity.preload();
+      root.clearChild();
+      resolveLoad({ blobUrl: "blob:late" });
+      await loadPromise;
+      await Promise.resolve();
+    });
+  });
+
   describe("afterCreate disposer", () => {
     it("calls releaseImage when node is destroyed", () => {
       const RootWithChild = types.model({ child: types.maybe(ModelWithMixin) }).actions((self) => ({
