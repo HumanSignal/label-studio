@@ -162,6 +162,9 @@ const Model = types
       get touchesLength() {
         return self.touches.length;
       },
+      get hasEraserTouches() {
+        return self.touches.some((t) => t.type === "eraser");
+      },
       get bboxCoordsCanvas() {
         const points = { x: [], y: [] };
 
@@ -653,7 +656,14 @@ const HtxBrushView = ({ item, setShapeRef }) => {
 
 const HtxBrush = AliveRegion(HtxBrushView, {
   renderHidden: true,
-  shouldNotUsePortal: true,
+  getPortalSelector: (item) => {
+    // Brush regions with eraser touches get their own layer when selected
+    // to prevent destination-out bleeding into other selected regions
+    if (item.inSelection && item.hasEraserTouches) {
+      return `.selected-eraser-${item.id}`;
+    }
+    return ".selection-regions-layer";
+  },
 });
 
 Registry.addTag("brushregion", BrushRegionModel, HtxBrush);

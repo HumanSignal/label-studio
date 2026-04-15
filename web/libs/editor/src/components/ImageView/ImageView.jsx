@@ -60,17 +60,46 @@ const Region = observer(({ region, showSelected = false }) => {
   return Tree.renderItem(region, region.annotation, true);
 });
 
-const RegionsLayer = memo(({ regions, name, useLayers, showSelected = false, smoothing = true }) => {
-  const content = regions.map((el) => {
-    return <Region key={`region-${el.id}`} region={el} showSelected={showSelected} />;
-  });
+const RegionsLayer = observer(({ regions, name, useLayers, showSelected = false, smoothing = true }) => {
+  if (useLayers === false) {
+    return regions.map((el) => <Region key={`region-${el.id}`} region={el} showSelected={showSelected} />);
+  }
 
-  return useLayers === false ? (
-    content
-  ) : (
-    <Layer name={name} imageSmoothingEnabled={smoothing}>
-      {content}
-    </Layer>
+  // Brush regions with eraser touches need their own Layer so that
+  // destination-out compositing doesn't bleed into other regions.
+  // All other regions share a Layer (cheaper — see FIT-1482).
+  //
+  // To prevent blinking when adding the first eraser stroke: if a region is
+  // currently being drawn (isDrawing), we keep it in the shared layer even if
+  // it has eraser touches. It will move to an isolated layer on the next render
+  // after drawing completes. This avoids the unmount/remount mid-drawing.
+  const shared = [];
+  const isolated = [];
+
+  for (const el of regions) {
+    const needsIsolation = el.type === "brushregion" && el.hasEraserTouches && !el.isDrawing;
+    if (needsIsolation) {
+      isolated.push(el);
+    } else {
+      shared.push(el);
+    }
+  }
+
+  return (
+    <>
+      {shared.length > 0 && (
+        <Layer name={name} imageSmoothingEnabled={smoothing}>
+          {shared.map((el) => (
+            <Region key={`region-${el.id}`} region={el} showSelected={showSelected} />
+          ))}
+        </Layer>
+      )}
+      {isolated.map((el) => (
+        <Layer key={`layer-${el.id}`} name={`eraser-${el.id}`} imageSmoothingEnabled={smoothing}>
+          <Region key={`region-${el.id}`} region={el} showSelected={showSelected} />
+        </Layer>
+      ))}
+    </>
   );
 });
 
@@ -270,24 +299,6 @@ const TransformerBack = observer(({ item }) => {
   );
 });
 
-const _SelectedRegions = observer(({ item, selectedRegions }) => {
-  if (!selectedRegions) return null;
-  const { brushRegions = [], shapeRegions = [] } = splitRegions(selectedRegions);
-
-  return (
-    <>
-      {isFF(FF_LSDV_4930) ? null : <TransformerBack item={item} />}
-      {brushRegions.length > 0 && (
-        <Regions key="brushes" name="brushes" regions={brushRegions} useLayers={true} showSelected chankSize={0} />
-      )}
-
-      {shapeRegions.length > 0 && (
-        <Regions key="shapes" name="shapes" regions={shapeRegions} showSelected chankSize={0} />
-      )}
-    </>
-  );
-});
-
 const SelectionLayer = observer(({ item, selectionArea }) => {
   const scale = 1;
   const [isMouseWheelClick, setIsMouseWheelClick] = useState(false);
@@ -357,9 +368,28 @@ const SelectionLayer = observer(({ item, selectionArea }) => {
 const Selection = observer(({ item, ...triggeredOnResize }) => {
   const { selectionArea } = item;
 
+  // Separate selected brush regions with erasers into their own layers
+  // to prevent destination-out bleeding when multiple regions are selected
+  const selectedBrushesWithErasers = item.selectedRegions.filter((r) => r.type === "brushregion" && r.hasEraserTouches);
+  const currentEraserIds = selectedBrushesWithErasers.map((r) => r.cleanId);
+
+  // Eraser layers must outlive the Portal that moves region nodes into them.
+  // When a region is deselected, the Portal needs one render cycle to move
+  // the Konva nodes back; if the layer is unmounted in the same commit,
+  // its children (the portaled nodes) are destroyed and the region disappears.
+  // Merging previous IDs keeps the layer alive for that extra cycle.
+  const prevEraserIdsRef = useRef([]);
+  const eraserLayerIds = [...new Set([...prevEraserIdsRef.current, ...currentEraserIds])];
+  prevEraserIdsRef.current = currentEraserIds;
+
   return (
     <>
+      {/* Shared layer for selected regions without erasers */}
       <Layer name="selection-regions-layer" />
+      {/* Separate layers for each selected brush region with eraser */}
+      {eraserLayerIds.map((cleanId) => (
+        <Layer key={`layer-${cleanId}`} name={`selected-eraser-${cleanId}`} />
+      ))}
       <SelectionLayer item={item} selectionArea={selectionArea} />
     </>
   );

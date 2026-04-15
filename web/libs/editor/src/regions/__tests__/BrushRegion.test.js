@@ -92,6 +92,7 @@ function createMockAnnotation(overrides = {}) {
     autosave: mock(),
     isReadOnly: () => false,
     unselectAll: mock(),
+    regionStore: { isSelected: () => false },
     ...overrides,
   };
 }
