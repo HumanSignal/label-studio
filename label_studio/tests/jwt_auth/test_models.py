@@ -8,8 +8,8 @@ from ..utils import mock_feature_flag
 from .utils import create_user_with_token_settings
 
 
-@mock_feature_flag(flag_name='fflag__feature_develop__prompts__dia_1829_jwt_token_auth', value=True)
 @pytest.fixture
+@mock_feature_flag(flag_name='fflag__feature_develop__prompts__dia_1829_jwt_token_auth', value=True)
 def token_backend():
     return LSTokenBackend(
         algorithm=simple_jwt_settings.ALGORITHM,
