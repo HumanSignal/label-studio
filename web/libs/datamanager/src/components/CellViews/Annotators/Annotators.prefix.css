@@ -1,7 +1,10 @@
 .annotators {
   display: grid;
   grid-auto-flow: column;
-  grid-column-gap: 4px;
+  grid-column-gap: var(--spacing-tighter);
+  overflow: hidden;
+  width: 100%;
+  justify-content: flex-start;
 
   &__item {
     z-index: 1;
@@ -9,6 +12,7 @@
     height: 28px;
     border-radius: 100%;
     position: relative;
+    flex-shrink: 0;
 
     &:hover {
       z-index: 10;

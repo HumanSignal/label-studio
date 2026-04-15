@@ -1,6 +1,6 @@
 import { inject } from "mobx-react";
 import clsx from "clsx";
-import { useMemo } from "react";
+import { useMemo, useRef } from "react";
 import { useSDK } from "../../../providers/SDKProvider";
 import { cn } from "../../../utils/bem";
 import { isDefined } from "../../../utils/utils";
@@ -8,6 +8,7 @@ import { Space } from "../../Common/Space/Space";
 import { IconCheckAlt, IconCrossAlt } from "@humansignal/icons";
 import { Tooltip, Userpic } from "@humansignal/ui";
 import { Common } from "../../Filters/types";
+import { useAvatarOverflow } from "../../../hooks/useAvatarOverflow";
 import "./Annotators.prefix.css";
 import { isActive, FF_DM_FILTER_MEMBERS } from "@humansignal/core/lib/utils/feature-flags";
 import { VariantSelect } from "../../Filters/types/List";
@@ -16,8 +17,20 @@ import { UserSelect } from "../../Common/UserSelect";
 export const Annotators = (cell) => {
   const { value, column, original: task } = cell;
   const sdk = useSDK();
+  const containerRef = useRef(null);
+
+  // Use dynamic avatar overflow calculation based on container width
+  const visibleAvatarCount = useAvatarOverflow({
+    enabled: true,
+    containerRef,
+    itemCount: value.length,
+  });
+
+  // Fall back to max_users_to_display for backward compatibility if needed
   const maxUsersToDisplay = window.APP_SETTINGS.data_manager?.max_users_to_display ?? 0;
-  const userList = maxUsersToDisplay > 0 ? Array.from(value).slice(0, maxUsersToDisplay) : value;
+  const effectiveVisibleCount = visibleAvatarCount ?? (maxUsersToDisplay > 0 ? maxUsersToDisplay : value.length);
+  const userList = Array.from(value).slice(0, effectiveVisibleCount);
+
   const userPickBadge = cn("userpic-badge");
   const annotatorsCN = cn("annotators");
   const isEnterprise = window.APP_SETTINGS.billing?.enterprise;
@@ -37,11 +50,11 @@ export const Annotators = (cell) => {
       }
     };
 
-    return getCountField() - maxUsersToDisplay;
-  }, [column.alias, task?.annotators_count, task?.reviewers_count, task?.comment_authors_count]);
+    return getCountField() - effectiveVisibleCount;
+  }, [column.alias, task?.annotators_count, task?.reviewers_count, task?.comment_authors_count, effectiveVisibleCount]);
 
   return (
-    <div className={annotatorsCN.toClassName()}>
+    <div ref={containerRef} className={annotatorsCN.toClassName()}>
       {userList.map((item, index) => {
         const user = item.user ?? item;
         const { annotated, reviewed, review } = item;
