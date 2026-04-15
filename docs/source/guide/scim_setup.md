@@ -31,7 +31,7 @@ For more information on SCIM workflows, see [How SCIM works with Label Studio En
 !!! note
     Okta or similar SSO providers have SCIM integration based on SSO.
 
-* You will need to provide a [Legacy token](access_tokens#Legacy-tokens), and it must be associated with the Owner role of your organization.  
+* You will need a Label Studio API token from the organization owner. Both [Legacy tokens](access_tokens#Legacy-tokens) and JWT-based Personal Access Tokens (PATs) are supported.
 
 ## Set up SCIM integration with Okta
 
@@ -151,45 +151,246 @@ To unassign a group from the application, follow the steps for [Unassigning the 
 
 ## Set up SCIM with Microsoft Entra ID (Azure AD)
 
-Label Studio Enterprise supports SCIM provisioning with Microsoft Entra ID (formerly Azure AD). The setup is similar to Okta, but requires specific attribute mapping configuration.
+Label Studio Enterprise supports SCIM provisioning with Microsoft Entra ID (formerly Azure AD). You can use the same Enterprise Application created for SAML SSO, or create a separate one for SCIM provisioning. Using the same application is simpler when you want both SSO and provisioning.
 
-### Supported user attributes
+### Step 1: Create or reuse the Enterprise Application
 
-Label Studio Enterprise supports a limited set of SCIM user attributes for provisioning. When configuring attribute mappings in Microsoft Entra ID, only include the attributes listed below.
+If creating a new application specifically for SCIM:
 
-| SCIM Attribute | Description | Required |
-|---|---|---|
-| `emails[type eq "work"].value` | User's email address (primary identifier) | Yes |
-| `userName` | Username (mapped to email in Label Studio) | Yes |
-| `active` | Whether the user is active | Yes |
-| `name.givenName` | User's first name | No |
-| `name.familyName` | User's last name | No |
+1. In the Azure Portal, go to **Entra ID → Enterprise Applications → New Application**.
+2. Select **Create your own application** → **Integrate any other application not found in the gallery**.
+3. Name it (e.g. `Label Studio SCIM`) and create it.
+
+### Step 2: Enable provisioning
+
+1. Open your Enterprise Application → **Provisioning** → **Get started**.
+2. Set **Provisioning Mode** to **Automatic**.
+3. Under **Admin Credentials**:
+    - **Tenant URL**: `https://<your-label-studio-host>/scim/v2` (both `/scim/v2` and `/scim/` are accepted)
+    - **Secret Token**: A Label Studio API token from the organization owner (legacy token or PAT)
+4. Click **Test Connection** to verify connectivity.
+5. Click **Save**.
+
+### Step 3: Configure user attribute mappings
+
+Go to **Provisioning → Mappings → Provision Microsoft Entra ID Users**.
+
+#### Required mappings
+
+| Entra ID Attribute | SCIM Target Attribute | Required | Notes |
+| --- | --- | --- | --- |
+| `userPrincipalName` | `userName` | **Yes** | Must be a valid email address. Label Studio uses this as the user's email and login identifier. If your UPNs are not email addresses, map `mail` instead. |
+| `Switch([IsSoftDeleted], , "False", "True", "True", "False")` | `active` | **Yes** | Controls user activation/deactivation. When set to `false`, the user's org role becomes **Deactivated**. |
+
+#### Recommended mappings
+
+| Entra ID Attribute | SCIM Target Attribute | Required | Notes |
+| --- | --- | --- | --- |
+| `givenName` | `name.givenName` | No | First name, displayed in the Label Studio UI. |
+| `surname` | `name.familyName` | No | Last name, displayed in the Label Studio UI. |
+
+#### Optional mappings (no effect)
+
+These attributes are accepted by the SCIM endpoint but have no functional impact in Label Studio:
+
+| Entra ID Attribute | SCIM Target Attribute | Notes |
+| --- | --- | --- |
+| `objectId` | `externalId` | Ignored on write---Label Studio always returns the user's email as `externalId` regardless of the inbound value. |
+| `displayName` | `displayName` | Read-only in Label Studio; always derived from `first_name + last_name`. |
+| `preferredLanguage` | `locale` | Ignored; always returns `en-US`. |
+
+#### Mappings to remove
 
 !!! warning "Unsupported attributes cause provisioning errors"
-    Mapping attributes that Label Studio does not support will result in **HTTP 501 (Not Implemented)** errors during SCIM provisioning. You must remove all excess Microsoft Entra ID attribute mappings like these:
+    Remove any default Entra ID mappings that target attributes not supported by Label Studio's SCIM endpoint. Leaving unsupported mappings in place will result in **HTTP 501 (Not Implemented)** errors during provisioning. Common mappings to remove:
     
-    * `displayName`
-    * `preferredLanguage`
+    * `mailNickname`
+    * `facsimileTelephoneNumber`
+    * `mobile`
+    * `physicalDeliveryOfficeName`
+    * `streetAddress`, `state`, `postalCode`, `country`
     * `name.formatted`
-    * `externalId`
+    * Any `urn:ietf:params:scim:schemas:extension:enterprise:2.0:User:*` attributes
 
-### Configure Microsoft Entra ID provisioning
+!!! note
+    Entra ID typically does **not** send the `emails` array in its SCIM payloads. Label Studio derives the email from `userName` when `emails` is absent, as long as `userName` is a valid email address. If your tenant's UPNs are not email addresses (e.g. `jsmith@contoso.local`), map `mail` to `userName` instead.
 
-1. In the [Microsoft Entra admin center](https://entra.microsoft.com), select **Enterprise apps** in the left menu.
-2. Select your enterprise application.
-3. Select **Provisioning** in the left menu.
-4. Set the **Tenant URL** to `https://<LABEL_STUDIO_BASE_URL>/scim/v2/`.
-5. Set the **Secret Token** to the [Legacy token](access_tokens#Legacy-tokens) associated with the Owner account in Label Studio. 
+### Step 4: Configure group provisioning
 
-    This must be the Legacy token, not the Personal Access Token. It must also be associated with the user in the Owner role. 
-6. Under **Mappings**, open **Provision Microsoft Entra ID Users**.
-7. Remove all attribute mappings except the supported ones listed above. 
+Go to **Provisioning → Mappings → Provision Microsoft Entra ID Groups**.
 
-    Keep:
-    * `emails[type eq "work"].value` → `userPrincipalName`
-    * `userName` → `userPrincipalName`
-    * `active` → `Switch([IsSoftDeleted], , "False", "True", "True", "False")`
-    * `name.givenName` → `givenName`
-    * `name.familyName` → `surname`
-8. Under **Mappings**, open **Provision Microsoft Entra ID Groups** and ensure it is enabled if you want to use group-based role assignment.
-9. For group provisioning, configure SCIM group settings in Label Studio (see [Set up group mapping](#set-up-group-mapping) above).
+#### Required group mappings
+
+| Entra ID Attribute | SCIM Target Attribute | Required | Notes |
+| --- | --- | --- | --- |
+| `displayName` | `displayName` | **Yes** | The group name. This value must **exactly match** (case-sensitive) the group names configured in Label Studio's SCIM settings. |
+| `members` | `members` | **Yes** | The list of group members. Entra ID sends member additions/removals as PATCH operations. |
+
+#### Assigning groups to the application
+
+Only groups that are **assigned to the Enterprise Application** in Entra ID will be provisioned:
+
+1. Go to **Enterprise Application → Users and groups → Add user/group**.
+2. Select the security groups you want to provision.
+3. Click **Assign**.
+
+The `displayName` of each assigned group is what Label Studio uses to match against its mapping rules.
+
+### Step 5: Configure SCIM group mappings in Label Studio
+
+This is where you tell Label Studio what each Entra ID group **means**---which role, workspace, or project access it grants.
+
+Configure mappings via the API:
+
+```bash
+curl -X POST "https://<your-label-studio-host>/api/scim/settings" \
+  -H "Authorization: Token <owner-api-token>" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "roles_groups": [
+      ["Administrator", "LS-Admins"],
+      ["Manager", "LS-Managers"],
+      ["Reviewer", "LS-Reviewers"],
+      ["Annotator", "LS-Annotators"]
+    ],
+    "workspaces_groups": [
+      ["Engineering", "LS-Engineering-Team"],
+      ["QA", "LS-QA-Team"]
+    ],
+    "projects_groups": [
+      {"project_id": 42, "group": "LS-Project42-Annotators", "role": "Annotator"},
+      {"project_id": 42, "group": "LS-Project42-Reviewers", "role": "Reviewer"},
+      {"project_id": 99, "group": "LS-AllProjects", "role": "Inherit"}
+    ]
+  }'
+```
+
+Or configure them in the Label Studio UI under **Organization → SCIM Settings**.
+
+For detailed information on the mapping format and behavior, see [Group mapping reference](#group-mapping-reference) below.
+
+### Step 6: Start provisioning
+
+1. Go to **Provisioning → Overview**.
+2. Click **Start provisioning**.
+3. Entra ID will perform an initial sync cycle (can take 20--40 minutes for the first cycle).
+4. Subsequent incremental syncs run approximately every 40 minutes.
+
+You can trigger an on-demand sync from the **Provision on demand** option for individual users.
+
+
+## Group mapping reference
+
+Both SAML and SCIM use the same group mapping format and the same underlying mapping logic. The mapping types are configured independently for each protocol (SAML settings and SCIM settings are separate), but the behavior is identical.
+
+### Organization role mapping (`roles_groups`)
+
+Maps a group from your IdP to an organization-level role.
+
+**Format:** `["<RoleName>", "<GroupName>"]`
+
+**Available roles:**
+
+| Role Name | Description |
+| --- | --- |
+| `Administrator` | Full organization admin access |
+| `Manager` | Can manage projects and members |
+| `Reviewer` | Can review annotations |
+| `Annotator` | Can annotate tasks |
+
+!!! note
+    `Owner` cannot be assigned via SAML or SCIM---it is explicitly excluded from group mappings. `Not Activated` and `Deactivated` are internal system states managed automatically and should not be used in `roles_groups` mappings.
+
+**Behavior when a user is in multiple role groups:** The most elevated role wins. For example, if a user is in both an Annotator group and a Manager group, they get the Manager role.
+
+**Behavior when a user is removed from all role groups:** Their role is set to Deactivated (subject to the `manual_role_management` flag).
+
+### Workspace mapping (`workspaces_groups`)
+
+Maps a group from your IdP to a Label Studio workspace.
+
+**Format:** `["<WorkspaceTitle>", "<GroupName>"]`
+
+- Workspaces are **automatically created** when a SCIM group push or SAML login triggers the mapping. However, the `/api/scim/settings` endpoint validates that referenced workspaces already exist---create them first, or use the UI to save settings.
+- A user can be mapped to multiple workspaces through multiple group memberships.
+- **SCIM:** removal respects the `manual_workspace_management` billing flag---if enabled, users are not automatically removed from workspaces when they leave a group.
+- **SAML:** workspace sync behavior is controlled by the `MANUAL_WORKSPACE_MANAGEMENT` environment variable (default: `True`). When `False`, all SAML-mapped workspaces are reset and re-applied on each login.
+
+### Project role mapping (`projects_groups`)
+
+Maps a group from your IdP to membership in a specific project, with a project-level role.
+
+**Format:** `{"project_id": <id>, "group": "<GroupName>", "role": "<Role>"}`
+
+**Available project roles:**
+
+| Role | Description |
+| --- | --- |
+| `Inherit` | User gets project access but inherits their organization role (no explicit project role assigned) |
+| `Annotator` | Explicit annotator role on the project |
+| `Reviewer` | Explicit reviewer role on the project |
+
+- `project_id` must be an existing project in your organization.
+- The most elevated role wins when a user is in multiple groups mapped to the same project.
+- Removal respects the `manual_project_member_management` billing flag.
+- **When SCIM project group assignments exist for a user, SAML project sync is skipped** for that user to avoid conflicts.
+
+
+## SCIM user lifecycle
+
+| Event | What happens in Label Studio |
+| --- | --- |
+| **User provisioned** | Account created with the organization's default role (configured in Organization settings). Role is then updated when group sync runs. |
+| **User already exists in another org** | User is added to this organization with the default role. Profile fields (name, etc.) are **not** overwritten---only the org membership is created. |
+| **User added to a role group** | Role upgraded to the mapped role (or highest if in multiple groups). |
+| **User removed from a role group** | Role falls back to the next-highest mapped role, or Deactivated if no role groups remain (subject to `manual_role_management`). |
+| **User deactivated in Entra ID / Okta** | `active` set to `false` → role becomes Deactivated. |
+| **User reactivated in Entra ID / Okta** | `active` set to `true` → role restored from SCIM group mappings, or the organization's default role if no mappings exist. |
+| **User deleted in Entra ID / Okta** | Soft-deleted in Label Studio (deactivated, not removed). |
+
+
+## SAML and SCIM interaction
+
+If your organization uses both SAML SSO and SCIM provisioning, be aware of the following interactions:
+
+- **Group mappings are configured separately.** SAML settings (`/api/saml/settings`) and SCIM settings (`/api/scim/settings`) each have their own `roles_groups`, `workspaces_groups`, and `projects_groups`. You can configure identical mappings in both, or use different mappings for each protocol.
+- **SCIM project mappings take precedence over SAML.** When SCIM-driven project group assignments exist for a user, SAML skips its project role sync for that user entirely, to avoid conflicts.
+- **Deleting SAML settings clears SCIM group assignments.** Using `DELETE /api/saml/settings` wipes all group assignment records and resets SCIM group settings for the organization. If you need to reconfigure SAML, re-save your SCIM settings afterward and wait for the next group sync to rebuild assignments.
+- **`manual_role_management` is shared.** The per-org override in SAML settings takes precedence over the billing/environment default for both SAML and SCIM role removal behavior.
+- **SSO login can still change roles even with SCIM.** If a user authenticates via SAML and SAML role mappings are configured, the role may be re-evaluated on login based on SAML group attributes---potentially overriding a role set by SCIM. To avoid this, either use the same mappings in both, or configure role mappings in only one of the two.
+
+For more information on SAML SSO setup, see [Set up SSO authentication for Label Studio](auth_setup.html).
+
+
+## Troubleshooting
+
+### Provisioning test connection fails
+
+- Verify the SCIM endpoint URL ends with `/scim/v2` (or `/scim/`).
+- Verify the bearer token belongs to the **organization owner** (SCIM API requires owner-level authentication). Both legacy API tokens and PATs are accepted.
+- Check that the Label Studio instance is reachable from the internet (or via your network configuration).
+
+### User created but has wrong role
+
+1. Verify the user is assigned to the correct group in your IdP.
+2. Verify the group is assigned to the Enterprise Application (in Entra ID) or pushed to the application (in Okta).
+3. Verify the group `displayName` in your IdP exactly matches (case-sensitive) the name in Label Studio SCIM settings.
+4. Ensure a provisioning cycle has completed after the group assignment (or trigger on-demand provisioning).
+
+### Users not appearing in workspaces or projects
+
+- Group provisioning must be enabled in the attribute mappings.
+- The group must be **assigned** to the Enterprise Application (just existing in Entra ID is not enough).
+- SCIM group settings in Label Studio must be configured **before** or **at the same time as** the groups are pushed. If settings are configured after groups were already synced, save the SCIM settings again to trigger re-evaluation.
+
+### Unsupported attribute errors in provisioning logs
+
+Remove any default IdP attribute mappings that target attributes not in the Label Studio SCIM schema. See the [Mappings to remove](#mappings-to-remove) section above for common attributes to remove.
+
+### Email case mismatches
+
+Label Studio normalizes all emails to lowercase for both SAML and SCIM operations. `Alice@Contoso.com` and `alice@contoso.com` are treated as the same user. No special configuration is needed.
+
+### Group name mismatches
+
+Group name matching in SCIM settings is **case-sensitive**. `LS-Admins` and `ls-admins` are treated as different groups. Ensure exact casing matches between your IdP group names and Label Studio mapping configurations.
