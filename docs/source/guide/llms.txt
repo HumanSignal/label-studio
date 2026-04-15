@@ -26,48 +26,48 @@ If unsure:
 - **Enterprise**: advanced features for teams and organizations, including automation, analytics, security, and governance
 ---
 ## Core concepts (shared across all editions)
-- [Projects](https://labelstud.io/guide/setup_project.html.md): Create and manage labeling projects
-- [Labeling interface](https://labelstud.io/guide/setup.html.md): Configure annotation UI and schema
-- [Tasks](https://labelstud.io/guide/tasks.html.md): Structure and manage labeling data
-- [Import data](https://labelstud.io/guide/tasks.html.md): Ingest data into projects
-- [Export annotations](https://labelstud.io/guide/export.html.md): Export labeled data
-- [Machine learning integration](https://labelstud.io/guide/ml.html.md): Connect predictions and models
-- [Data Manager](https://labelstud.io/guide/data_manager.html.md): Browse and filter tasks
+- [Projects](https://labelstud.io/guide/setup_project.md): Create and manage labeling projects
+- [Labeling interface](https://labelstud.io/guide/setup.md): Configure annotation UI and schema
+- [Tasks](https://labelstud.io/guide/tasks.md): Structure and manage labeling data
+- [Import data](https://labelstud.io/guide/tasks.md): Ingest data into projects
+- [Export annotations](https://labelstud.io/guide/export.md): Export labeled data
+- [Machine learning integration](https://labelstud.io/guide/ml.md): Connect predictions and models
+- [Data Manager](https://labelstud.io/guide/data_manager.md): Browse and filter tasks
 ---
 ## Open Source (self-hosted)
-- [Open Source docs home](https://labelstud.io/guide/index.html.md)
-- [Install Label Studio](https://labelstud.io/guide/install.html.md)
-- [Kubernetes deployment](https://labelstud.io/guide/install_k8s.html.md)
-- [Start Label Studio](https://labelstud.io/guide/start.html.md)
-- [Upgrade Label Studio](https://labelstud.io/guide/upgrade_label_studio.html.md)
-- [Persistent storage](https://labelstud.io/guide/persistent_storage.html.md)
-- [Database setup](https://labelstud.io/guide/storedata.html.md)
-- [Security](https://labelstud.io/guide/security.html.md)
-- [Storage integrations](https://labelstud.io/guide/storage.html.md)
+- [Open Source docs home](https://labelstud.io/guide/index.md)
+- [Install Label Studio](https://labelstud.io/guide/install.md)
+- [Kubernetes deployment](https://labelstud.io/guide/install_k8s.md)
+- [Start Label Studio](https://labelstud.io/guide/start.md)
+- [Upgrade Label Studio](https://labelstud.io/guide/upgrade_label_studio.md)
+- [Persistent storage](https://labelstud.io/guide/persistent_storage.md)
+- [Database setup](https://labelstud.io/guide/storedata.md)
+- [Security](https://labelstud.io/guide/security.md)
+- [Storage integrations](https://labelstud.io/guide/storage.md)
 ---
 ## Enterprise / Cloud or On-Prem
-- [Enterprise docs home](https://docs.humansignal.com/guide/index.html.md)
-- [Workspaces](https://docs.humansignal.com/guide/workspaces.html.md)
-- [Dashboards](https://docs.humansignal.com/guide/dashboard.html.md)
-- [Analytics](https://docs.humansignal.com/guide/analytics.html.md)
-- [Automation](https://docs.humansignal.com/guide/prompts_overview.html.md)
-- [Review workflows](https://docs.humansignal.com/guide/review.html.md)
-- [Quality & agreement](https://docs.humansignal.com/guide/agreement.html.md)
-- [User management](https://docs.humansignal.com/guide/user_management.html.md)
-- [Roles & permissions](https://docs.humansignal.com/guide/roles_permissions.html.md)
-- [SSO, LDAP, SCIM](https://docs.humansignal.com/guide/sso_ldap_scim.html.md)
-- [Activity logs](https://docs.humansignal.com/guide/activity_logs.html.md)
+- [Enterprise docs home](https://docs.humansignal.com/guide/index.md)
+- [Workspaces](https://docs.humansignal.com/guide/workspaces.md)
+- [Dashboards](https://docs.humansignal.com/guide/dashboard.md)
+- [Analytics](https://docs.humansignal.com/guide/analytics.md)
+- [Automation](https://docs.humansignal.com/guide/prompts_overview.md)
+- [Review workflows](https://docs.humansignal.com/guide/review.md)
+- [Quality & agreement](https://docs.humansignal.com/guide/agreement.md)
+- [User management](https://docs.humansignal.com/guide/user_management.md)
+- [Roles & permissions](https://docs.humansignal.com/guide/roles_permissions.md)
+- [SSO, LDAP, SCIM](https://docs.humansignal.com/guide/sso_ldap_scim.md)
+- [Activity logs](https://docs.humansignal.com/guide/activity_logs.md)
 ---
 ## Developer & integrations
 - [API reference](https://api.labelstud.io/)
-- [Python SDK](https://docs.humansignal.com/guide/sdk.html.md)
-- [Webhooks](https://docs.humansignal.com/guide/webhooks.html.md)
-- [ML backend](https://labelstud.io/guide/ml_create.html.md)
-- [Integrations](https://labelstud.io/guide/integrations.html.md)
+- [Python SDK](https://docs.humansignal.com/guide/sdk.md)
+- [Webhooks](https://docs.humansignal.com/guide/webhooks.md)
+- [ML backend](https://labelstud.io/guide/ml_create.md)
+- [Integrations](https://labelstud.io/guide/integrations.md)
 - [Open source repository](https://github.com/HumanSignal/label-studio)
 ---
 ## Optional
-- [Glossary](https://labelstud.io/guide/terminology.html.md)
-- [Templates](https://labelstud.io/templates/index.html.md)
-- [Enterprise On-Prem Release notes](https://docs.humansignal.com/guide/release_notes.html.md)
+- [Glossary](https://labelstud.io/guide/terminology.md)
+- [Templates](https://labelstud.io/templates/index.md)
+- [Enterprise On-Prem Release notes](https://docs.humansignal.com/guide/release_notes.md)
 - [Community](https://community.labelstud.io/)
