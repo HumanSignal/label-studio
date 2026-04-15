@@ -6,6 +6,7 @@ from core.feature_flags import flag_set
 from core.mixins import GetParentObjectMixin
 from core.permissions import ViewClassPermission, all_permissions
 from core.utils.common import is_community
+from core.utils.db import delete_annotation_with_retry
 from core.utils.params import bool_from_request
 from data_manager.api import TaskListAPI as DMTaskListAPI
 from data_manager.functions import evaluate_predictions
@@ -672,7 +673,7 @@ class AnnotationAPI(generics.RetrieveUpdateDestroyAPIView):
     queryset = Annotation.objects.all()
 
     def perform_destroy(self, annotation):
-        annotation.delete()
+        delete_annotation_with_retry(annotation)
 
     def update(self, request, *args, **kwargs):
         # save user history with annotator_id, time & annotation result
@@ -1123,7 +1124,7 @@ class AnnotationConvertAPI(generics.RetrieveAPIView):
 
             self.process_intermediate_state(annotation, draft)
 
-            annotation.delete()
+            delete_annotation_with_retry(annotation)
 
         emit_webhooks_for_instance(organization, project, WebhookAction.ANNOTATIONS_DELETED, [pk])
         data = AnnotationDraftSerializer(instance=draft).data

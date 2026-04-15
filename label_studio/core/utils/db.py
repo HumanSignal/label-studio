@@ -3,7 +3,7 @@ import logging
 import time
 from typing import Dict, Optional, TypeVar
 
-from django.db import OperationalError, connection, models, transaction
+from django.db import IntegrityError, OperationalError, connection, models, transaction
 from django.db.models import Model, QuerySet, Subquery
 from django.db.models.signals import post_migrate
 from django.db.utils import DatabaseError, ProgrammingError
@@ -62,7 +62,7 @@ def batch_update_with_retry(queryset, batch_size=500, max_retries=3, **update_fi
                 break
             except OperationalError as e:
                 last_error = e
-                if 'deadlock detected' in str(e):
+                if 'deadlock detected' in str(e).lower():
                     retry_count += 1
                     wait_time = 0.1 * (2**retry_count)  # Exponential backoff
                     logger.warning(
@@ -75,6 +75,73 @@ def batch_update_with_retry(queryset, batch_size=500, max_retries=3, **update_fi
         else:
             logger.error(f'Failed to update batch after {max_retries} retries. Batch: {i}-{i + len(batch_ids)}')
             raise last_error
+
+
+_ANNOTATION_DELETE_MAX_RETRIES = 3
+
+
+def delete_annotation_with_retry(annotation, max_retries=_ANNOTATION_DELETE_MAX_RETRIES):
+    """Delete a single ``Annotation`` with retry on deadlock or FK violation.
+
+    Calls ``annotation.delete()`` (not ``QuerySet.delete``) so
+    ``Annotation.delete`` hooks run: task updates, project summary counters,
+    and FSM bulk-delete context.
+    """
+    for attempt in range(max_retries):
+        try:
+            with transaction.atomic():
+                annotation.delete()
+            return
+        except (IntegrityError, OperationalError) as exc:
+            is_deadlock = isinstance(exc, OperationalError) and 'deadlock detected' in str(exc).lower()
+            is_fk = isinstance(exc, IntegrityError)
+            if not (is_deadlock or is_fk):
+                raise
+            if attempt < max_retries - 1:
+                logger.warning(
+                    'Annotation.delete attempt %d/%d failed (%s), retrying…',
+                    attempt + 1,
+                    max_retries,
+                    exc,
+                )
+                time.sleep(0.2 * (attempt + 1))
+            else:
+                raise
+
+
+def delete_annotations_queryset_with_retry(annotations_qs, max_retries=_ANNOTATION_DELETE_MAX_RETRIES):
+    """Delete annotations with retry on deadlock or FK constraint violation.
+
+    Background workers (e.g. Enterprise dimension score flush) may concurrently
+    insert rows referencing the same annotations, causing deadlocks or FK
+    violations when Django's delete collector removes parent rows. Retrying
+    after a short back-off lets the concurrent transaction finish so the next
+    attempt succeeds cleanly.
+
+    Args:
+        annotations_qs: QuerySet of ``tasks.Annotation`` rows to delete.
+        max_retries: Maximum attempts including the first try.
+    """
+    for attempt in range(max_retries):
+        try:
+            with transaction.atomic():
+                annotations_qs.delete()
+            return
+        except (IntegrityError, OperationalError) as exc:
+            is_deadlock = isinstance(exc, OperationalError) and 'deadlock detected' in str(exc).lower()
+            is_fk = isinstance(exc, IntegrityError)
+            if not (is_deadlock or is_fk):
+                raise
+            if attempt < max_retries - 1:
+                logger.warning(
+                    'Annotation deletion attempt %d/%d failed (%s), retrying…',
+                    attempt + 1,
+                    max_retries,
+                    exc,
+                )
+                time.sleep(0.2 * (attempt + 1))
+            else:
+                raise
 
 
 def batch_delete(queryset, batch_size=500):

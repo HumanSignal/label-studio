@@ -7,6 +7,7 @@ from core.feature_flags import flag_set
 from core.permissions import AllPermissions
 from core.redis import start_job_async_or_sync
 from core.utils.common import load_func
+from core.utils.db import delete_annotations_queryset_with_retry
 from data_manager.actions import DataManagerAction
 from data_manager.functions import evaluate_predictions
 from django.conf import settings
@@ -101,7 +102,11 @@ def delete_tasks_annotations(project, queryset, **kwargs):
 
     # count before delete to return the number of deleted items, not including cascade deletions
     count = annotations.count()
-    annotations.delete()
+
+    # Retry on deadlock / FK violation from concurrent background workers (e.g.
+    # dimension score recomputation) that may INSERT rows referencing annotations
+    # being deleted, causing either a deadlock or a dangling FK constraint error.
+    delete_annotations_queryset_with_retry(annotations)
     drafts.delete()  # since task-level annotation drafts will not have been deleted by CASCADE
     emit_webhooks_for_instance(project.organization, project, WebhookAction.ANNOTATIONS_DELETED, annotations_ids)
     request = kwargs['request']
