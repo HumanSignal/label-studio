@@ -1,24 +1,23 @@
+import { getCurrentTheme, getTokenColor } from "@humansignal/ui";
 import Konva from "konva";
+import { observer } from "mobx-react";
+import { destroy, detach, getRoot, isAlive, types } from "mobx-state-tree";
 import { memo, useContext, useEffect, useMemo } from "react";
 import { Group, Line } from "react-konva";
-import { destroy, detach, getRoot, isAlive, types } from "mobx-state-tree";
-
+import { ImageViewContext } from "../components/ImageView/ImageViewContext";
+import { LabelOnPolygon } from "../components/ImageView/LabelOnRegion";
 import Constants from "../core/Constants";
+import { guidGenerator } from "../core/Helpers";
+import Registry from "../core/Registry";
+import { useRegionStyles } from "../hooks/useRegionColor";
+import { AreaMixin } from "../mixins/AreaMixin";
+import { KonvaRegionMixin } from "../mixins/KonvaRegion";
 import NormalizationMixin from "../mixins/Normalization";
 import RegionsMixin from "../mixins/Regions";
-import Registry from "../core/Registry";
 import { ImageModel } from "../tags/object/Image";
-import { LabelOnPolygon } from "../components/ImageView/LabelOnRegion";
-import { PolygonPoint, PolygonPointView } from "./PolygonPoint";
-import { green } from "@ant-design/colors";
-import { guidGenerator } from "../core/Helpers";
-import { AreaMixin } from "../mixins/AreaMixin";
-import { useRegionStyles } from "../hooks/useRegionColor";
-import { AliveRegion } from "./AliveRegion";
-import { KonvaRegionMixin } from "../mixins/KonvaRegion";
-import { observer } from "mobx-react";
 import { createDragBoundFunc } from "../utils/image";
-import { ImageViewContext } from "../components/ImageView/ImageViewContext";
+import { AliveRegion } from "./AliveRegion";
+import { PolygonPoint, PolygonPointView } from "./PolygonPoint";
 
 const Model = types
   .model({
@@ -329,12 +328,16 @@ function getHoverAnchor({ layer }) {
  * Create new anchor for current polygon
  */
 function createHoverAnchor({ point, group, layer, zoom }) {
+  const theme = getCurrentTheme() === "Dark" ? "dark" : "light";
+  const stroke = getTokenColor("accent-kale-base", { theme });
+  const fill = "white";
+
   const hoverAnchor = new Konva.Circle({
     name: "hoverAnchor",
     x: point[0],
     y: point[1],
-    stroke: green.primary,
-    fill: green[0],
+    stroke,
+    fill,
     scaleX: 1 / (zoom || 1),
     scaleY: 1 / (zoom || 1),
 
@@ -544,7 +547,10 @@ const HtxPolygonView = ({ item, setShapeRef }) => {
 
         item.annotation.history.freeze(item.id);
       },
-      dragBoundFunc: createDragBoundFunc(item, { x: -item.bboxCoords.left, y: -item.bboxCoords.top }),
+      dragBoundFunc: createDragBoundFunc(item, {
+        x: -item.bboxCoords.left,
+        y: -item.bboxCoords.top,
+      }),
       onDragEnd: (e) => {
         if (!isDragging) return;
         const t = e.target;
