@@ -155,10 +155,10 @@ const ConfigureControl = ({ control, template }) => {
         </Button>
       </form>
       <div className={configClass.elem("current-labels").toClassName()}>
-        <h3>
+        <h3 className={configClass.elem("current-labels-header").toClassName()}>
           {tagname === "Choices" ? "Choices" : "Labels"} ({control.children.length})
         </h3>
-        <ul>
+        <ul className={configClass.elem("labels-list").toClassName()}>
           {Array.from(control.children).map((label) => (
             <Label
               label={label}
