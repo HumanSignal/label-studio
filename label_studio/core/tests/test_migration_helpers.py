@@ -200,7 +200,7 @@ class TestMakeSqlMigration(TestCase):
         assert kwargs['sql'] == self.sql_forwards
         assert kwargs['reverse'] is False
 
-    @override_settings(ALLOW_SCHEDULED_MIGRATIONS=True)
+    @override_settings(ALLOW_SCHEDULED_MIGRATIONS=True, CI=False)
     def test_creates_scheduled_status_when_enabled(self):
         """Test that SCHEDULED status is created when ALLOW_SCHEDULED_MIGRATIONS=True."""
         forwards, backwards = make_sql_migration(

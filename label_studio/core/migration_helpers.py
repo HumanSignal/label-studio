@@ -77,8 +77,10 @@ def make_sql_migration(
         if schema_editor.connection.vendor == 'sqlite' and not apply_on_sqlite:
             logger.info('Skipping migration for SQLite (apply_on_sqlite=False)')
             return
-        should_execute = execute_immediately or not settings.ALLOW_SCHEDULED_MIGRATIONS
+        should_execute = execute_immediately or not settings.ALLOW_SCHEDULED_MIGRATIONS or settings.CI
         if should_execute:
+            # In CI, force synchronous execution so columns exist before tests run
+            force_sync = settings.CI
             start_job_async_or_sync(
                 execute_sql_job,
                 migration_name=mig_key,
@@ -86,6 +88,7 @@ def make_sql_migration(
                 apply_on_sqlite=apply_on_sqlite,
                 reverse=False,
                 retry=Retry(max=3, interval=[60, 300, 1800]),
+                redis=not force_sync,
             )
         else:
             AsyncMigrationStatus = apps.get_model('core', 'AsyncMigrationStatus')

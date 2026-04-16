@@ -44,6 +44,7 @@ export * from "./lib/drawer";
 export * from "./lib/modal-window";
 
 export * from "./utils/utils";
+export * from "./lib/resize-handle/resize-handle";
 export * from "./utils/getTokenColor";
 export * from "./hooks/useTokenColor";
 
