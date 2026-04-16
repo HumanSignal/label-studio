@@ -23,6 +23,10 @@ export function annotationNeedsHydration(annotation: any): boolean {
 
 type FullAnnotationPayload = { result?: unknown; error?: unknown } | null | undefined;
 
+function annotationResultsEqual(a: unknown, b: unknown): boolean {
+  return JSON.stringify(a ?? []) === JSON.stringify(b ?? []);
+}
+
 /**
  * Apply GET /api/annotations/:id/ payload to the matching store annotation (by pk).
  * Mirrors LSFWrapper._hydrateStubAnnotation in datamanager lsf-sdk.js.
@@ -45,8 +49,28 @@ export function applyAnnotationHydrationFromApi(
   const freshVersionsResult = freshAnnotation.versions?.result;
   const freshHasVersionsResult = Array.isArray(freshVersionsResult) && freshVersionsResult.length > 0;
   const freshHasRegions = freshAnnotation.areas?.size > 0;
+  const serverResult = fullAnnotation.result;
 
   if (freshHasVersionsResult || freshHasRegions) {
+    const localSerialized =
+      typeof freshAnnotation.serializeAnnotation === "function" ? freshAnnotation.serializeAnnotation() : undefined;
+    // MST can already have regions (e.g. after task reload + merge) while the
+    // server payload is newer — re-apply so Compare All / side-by-side never shows stale labels.
+    const needsReapplyFromServer =
+      serverResult !== undefined &&
+      (localSerialized === undefined || !annotationResultsEqual(localSerialized, serverResult));
+
+    if (needsReapplyFromServer) {
+      freshAnnotation.history?.freeze?.();
+      if (!isAlive(freshAnnotation) || !isAlive(freshAnnotation.trackedState)) return false;
+      freshAnnotation.addVersions?.({ result: serverResult });
+      freshAnnotation.deserializeResults(serverResult);
+      freshAnnotation.updateObjects?.();
+      freshAnnotation.history?.safeUnfreeze?.();
+      freshAnnotation.reinitHistory?.();
+      return true;
+    }
+
     if (!freshHasVersionsResult && fullAnnotation.result) {
       freshAnnotation.addVersions?.({ result: fullAnnotation.result });
     }

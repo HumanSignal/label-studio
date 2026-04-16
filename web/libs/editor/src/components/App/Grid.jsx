@@ -20,6 +20,7 @@ import { FF_DEV_3391, isFF } from "../../utils/feature-flags";
 import { FF_FIT_720_LAZY_LOAD_ANNOTATIONS } from "@humansignal/core/lib/utils/feature-flags";
 import { moveStylesBetweenHeadTags } from "../../utils/html";
 import { useAnnotationFetcher } from "../../hooks/useAnnotationQuery";
+import { applyAnnotationHydrationFromApi } from "@humansignal/core/lib/utils/annotationLazyHydration";
 
 // FIT-720: Virtualization constants for Compare view
 const PANEL_WIDTH = 500; // Width of each annotation panel (approximately 50% of typical viewport)
@@ -116,8 +117,21 @@ const VirtualizedGrid = observer(({ store, annotations, root }) => {
   // Debounce timer for scroll-based hydration
   const scrollHydrationTimer = useRef(null);
 
-  // FIT-720: Use TanStack Query for annotation fetching
-  const { fetchAnnotationCached, getCachedAnnotation } = useAnnotationFetcher();
+  const taskId = store?.store?.task?.id ?? store?.task?.id;
+  const viewingAll = Boolean(store?.viewingAll);
+  // FIT-720: TanStack Query for annotation fetches (task-scoped keys for prefix invalidation)
+  const { fetchAnnotationCached, getCachedAnnotation } = useAnnotationFetcher(taskId);
+
+  const annotationPkSignature = useMemo(
+    () => annotations.map((a) => (a.pk != null ? String(a.pk) : "")).join(","),
+    [annotations],
+  );
+
+  // After task reload / annotation list changes, allow Compare All panels to re-fetch (FIT-1660).
+  useEffect(() => {
+    hydratedIds.current.clear();
+    initialHydrationDone.current = false;
+  }, [taskId, annotationPkSignature]);
 
   // FIT-720: On mount, initialize hydratedIds with annotations that already have data
   // This handles the case where user navigated away and came back
@@ -136,8 +150,11 @@ const VirtualizedGrid = observer(({ store, annotations, root }) => {
       const hasRegions = regions && regions.length > 0;
 
       if (hasDataInMST || hasRegions) {
-        // This annotation was previously hydrated or has data
-        hydratedIds.current.add(annotation.id);
+        // FIT-1660: Do not mark hydrated from MST regions alone — Compare All can show stale regions
+        // after a sibling save + task reload; onItemsRendered / viewingAll hydration must re-sync from API.
+        if (!viewingAll) {
+          hydratedIds.current.add(annotation.id);
+        }
         return;
       }
 
@@ -155,7 +172,7 @@ const VirtualizedGrid = observer(({ store, annotations, root }) => {
         hydratedIds.current.add(annotation.id);
       }
     });
-  }, []); // Only run once on mount
+  }, [taskId, viewingAll, annotations, getCachedAnnotation]); // Re-run when task / compare mode changes
 
   // Filter visible annotations
   const visibleAnnotations = useMemo(() => annotations.filter((c) => !c.hidden), [annotations]);
@@ -214,74 +231,36 @@ const VirtualizedGrid = observer(({ store, annotations, root }) => {
       setHydratingIds((prev) => new Set([...prev, annotationId]));
 
       try {
-        // Access the root store to get the SDK
         const rootStore = store.store;
         const sdk = rootStore?.SDK;
 
         let fullAnnotation = null;
 
         if (sdk?.ensureAnnotationLoaded) {
-          // Try the SDK method (works for labelStream)
-          await sdk.ensureAnnotationLoaded(annotationPk);
-          return; // SDK method handles everything
+          fullAnnotation = await sdk.ensureAnnotationLoaded(annotationPk);
         }
 
-        if (sdk?.datamanager?.store?.taskStore?.loadAnnotation) {
-          // Fallback: directly load annotation via taskStore
-          fullAnnotation = await sdk.datamanager.store.taskStore.loadAnnotation(annotationPk);
-        } else {
-          // Use TanStack Query for caching and deduplication
+        const loadViaDm = sdk?.datamanager?.store?.taskStore?.loadAnnotation;
+        if ((!fullAnnotation || fullAnnotation.error || fullAnnotation.result === undefined) && loadViaDm) {
+          const fromDm = await loadViaDm(annotationPk);
+          if (fromDm && !fromDm.error) {
+            fullAnnotation = fromDm;
+          }
+        }
+
+        if (!fullAnnotation || fullAnnotation.error || fullAnnotation.result === undefined) {
           fullAnnotation = await fetchAnnotationCached(annotationPk);
         }
 
-        if (fullAnnotation && !fullAnnotation.error && fullAnnotation.result) {
-          // IMPORTANT: Re-fetch the annotation from the store after async operation
-          // The original reference might be stale (user navigated, scrolled, etc.)
-          // which causes MST "object is protected" errors
+        if (fullAnnotation && !fullAnnotation.error) {
           const freshAnnotation = annotations.find((a) => a.id === annotationId);
-          if (!freshAnnotation) {
-            // Annotation no longer exists in the store
-            return;
+          if (freshAnnotation) {
+            applyAnnotationHydrationFromApi(annotations, annotationPk, fullAnnotation);
+            freshAnnotation.setEditable?.(false);
           }
-
-          // Check if annotation is still valid and not already hydrated
-          const versionsResult = freshAnnotation.versions?.result;
-          const hasVersionsResult = Array.isArray(versionsResult) && versionsResult.length > 0;
-          const regions = freshAnnotation.regions;
-          const hasRegions = regions && regions.length > 0;
-
-          if (hasVersionsResult || hasRegions) {
-            // Already hydrated (possibly by another code path)
-            hydratedIds.current.add(annotationId);
-            return;
-          }
-
-          // Hydrate the annotation with the loaded result
-          freshAnnotation.history?.freeze?.();
-          freshAnnotation.deserializeResults?.(fullAnnotation.result);
-
-          // Ensure dynamically hydrated annotation is strictly read-only when viewing all (Compare All)
-          freshAnnotation.setEditable?.(false);
-
-          // Critical: updateObjects() is required to render visual regions after deserializing
-          freshAnnotation.updateObjects?.();
-
-          // Unfreeze history
-          freshAnnotation.history?.safeUnfreeze?.();
-
-          // reinitHistory cancels autosave and sets initial values so the hydration
-          // isn't treated as a user modification (prevents unwanted draft creation)
-          freshAnnotation.reinitHistory?.();
-
-          // Mark as successfully hydrated to avoid re-hydrating
-          // Note: Don't directly modify MST model (is_stub) - it causes protection errors
-          hydratedIds.current.add(annotationId);
-        } else {
-          // Even if no results, mark as hydrated to avoid repeated attempts
-          hydratedIds.current.add(annotationId);
         }
+        hydratedIds.current.add(annotationId);
       } catch (error) {
-        // Silently ignore cancellation errors - they're expected when scrolling
         /* istanbul ignore next: non-cancel path is hard to trigger in tests */
         if (error?.name === "CancelledError" || error?.revert === true) {
           return;
@@ -322,14 +301,16 @@ const VirtualizedGrid = observer(({ store, annotations, root }) => {
           const regions = annotation.regions;
           const hasRegions = regions && regions.length > 0;
           const isStub = !hasVersionsResult && !hasRegions && annotation.pk && !annotation.userGenerate;
+          const needsCompareResync =
+            viewingAll && annotation.pk && !annotation.userGenerate && annotation.type !== "prediction";
 
-          if (isStub) {
+          if (isStub || needsCompareResync) {
             hydrateAnnotation(annotation);
           }
         }
       }, 150); // Debounce for 150ms to avoid rapid-fire hydration
     },
-    [visibleAnnotations, hydratingIds, hydrateAnnotation],
+    [visibleAnnotations, hydratingIds, hydrateAnnotation, viewingAll],
   );
 
   // FIT-720: Initial hydration on mount - hydrate first visible annotations
@@ -355,12 +336,14 @@ const VirtualizedGrid = observer(({ store, annotations, root }) => {
       const regions = annotation.regions;
       const hasRegions = regions && regions.length > 0;
       const isStub = !hasVersionsResult && !hasRegions && annotation.pk && !annotation.userGenerate;
+      const needsCompareResync =
+        viewingAll && annotation.pk && !annotation.userGenerate && annotation.type !== "prediction";
 
-      if (isStub) {
+      if (isStub || needsCompareResync) {
         hydrateAnnotation(annotation);
       }
     }
-  }, [containerWidth, visibleAnnotations, panelWidth, hydrateAnnotation]);
+  }, [containerWidth, visibleAnnotations, panelWidth, hydrateAnnotation, viewingAll]);
 
   // Item data for virtualized list
   const itemData = useMemo(

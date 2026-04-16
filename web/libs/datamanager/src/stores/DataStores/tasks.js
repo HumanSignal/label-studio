@@ -69,6 +69,28 @@ export const create = (columns) => {
             const existingAnnotation = self.annotations.find((ec) => ec.id === Number(c.pk));
 
             if (existingAnnotation) {
+              // FIT-1660: Task reload can replace merged rows with API stubs while LSF still holds
+              // fully hydrated in-memory annotations — prefer live serialized results over stale stubs.
+              if (existingAnnotation.is_stub === true && typeof c.serializeAnnotation === "function") {
+                try {
+                  const live = c.serializeAnnotation();
+                  if (Array.isArray(live) && live.length > 0) {
+                    return {
+                      ...existingAnnotation,
+                      id: existingAnnotation.id,
+                      pk: c.pk,
+                      draftId: c.draftId,
+                      result: live,
+                      leadTime: c.leadTime,
+                      userGenerate: !!c.userGenerate,
+                      sentUserGenerate: !!c.sentUserGenerate,
+                      is_stub: false,
+                    };
+                  }
+                } catch {
+                  // ignore serialization errors from detached nodes
+                }
+              }
               return existingAnnotation;
             }
             return {

@@ -44,8 +44,10 @@ export { imageCache } from "./lib/utils/ImageCache";
 
 // Annotation cache invalidation for shared use across editor and datamanager
 export {
+  ANNOTATION_DETAIL_TASK_SCOPE,
   annotationKeys,
   invalidateAnnotationCache,
+  invalidateAnnotationCachesForTask,
   invalidateTaskAgreementCache,
 } from "./lib/utils/annotation-cache";
 

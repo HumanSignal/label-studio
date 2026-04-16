@@ -9,7 +9,10 @@ import { annotationToServer, taskToLSFormat } from "./lsf-utils";
 import { when, runInAction } from "mobx";
 import { isAlive } from "mobx-state-tree";
 import { imageCache } from "@humansignal/core";
-import { invalidateAnnotationCache, invalidateTaskAgreementCache } from "@humansignal/core/lib/utils/annotation-cache";
+import {
+  invalidateAnnotationCachesForTask,
+  invalidateTaskAgreementCache,
+} from "@humansignal/core/lib/utils/annotation-cache";
 import {
   annotationNeedsHydration,
   applyAnnotationHydrationFromApi,
@@ -555,44 +558,7 @@ export class LSFWrapper {
       const fullAnnotation = await taskStore.loadAnnotation(annotationPk);
 
       if (fullAnnotation && !fullAnnotation.error) {
-        // IMPORTANT: Re-fetch the annotation from the store after async operation
-        // The original reference might be stale (user navigated, scrolled, etc.)
-        // which causes MST "object is protected" errors
-        const lsfAnnotation = this.annotations.find((a) => String(a.pk) === String(annotationPk));
-        if (!lsfAnnotation) {
-          // Annotation no longer exists in the store
-          return fullAnnotation;
-        }
-        if (!isAlive(lsfAnnotation) || !isAlive(lsfAnnotation.trackedState)) {
-          // Annotation node was detached while hydration request was in-flight
-          return fullAnnotation;
-        }
-
-        // Check if already hydrated while we were fetching
-        const versionsResult = lsfAnnotation.versions?.result;
-        const hasVersionsResult = Array.isArray(versionsResult) && versionsResult.length > 0;
-        const hasRegions = lsfAnnotation.areas?.size > 0;
-
-        if (hasVersionsResult || hasRegions) {
-          if (!hasVersionsResult && fullAnnotation.result) {
-            lsfAnnotation.addVersions?.({ result: fullAnnotation.result });
-          }
-          return fullAnnotation;
-        }
-
-        if (fullAnnotation.result) {
-          if (!isAlive(lsfAnnotation) || !isAlive(lsfAnnotation.trackedState)) return fullAnnotation;
-          lsfAnnotation.addVersions?.({ result: fullAnnotation.result });
-          lsfAnnotation.history.freeze();
-          lsfAnnotation.deserializeResults(fullAnnotation.result);
-          // Critical: updateObjects() is required to render visual regions after deserializing
-          lsfAnnotation.updateObjects();
-          lsfAnnotation.history.safeUnfreeze();
-          // reinitHistory cancels autosave and sets initial values so the hydration
-          // isn't treated as a user modification (prevents unwanted draft creation)
-          lsfAnnotation.reinitHistory?.();
-        }
-
+        applyAnnotationHydrationFromApi(this.annotations, annotationPk, fullAnnotation);
         return fullAnnotation;
       }
     } catch {
@@ -899,11 +865,8 @@ export class LSFWrapper {
 
     // FIT-720: Invalidate caches after successful submit
     if (status < 400) {
-      // Invalidate specific annotation if ID is in result
-      if (result?.id) {
-        invalidateAnnotationCache(result.id);
-      }
-      // Invalidate distribution for the task
+      // Single prefix invalidation for all GET /api/annotations/:id/ entries on this task (task-scoped query keys).
+      invalidateAnnotationCachesForTask(this.task?.id);
       invalidateTaskAgreementCache(this.task?.id);
     }
 
@@ -942,7 +905,7 @@ export class LSFWrapper {
 
     // FIT-720: Invalidate annotation cache after successful update
     if (status < 400 && annotation.pk) {
-      invalidateAnnotationCache(annotation.pk);
+      invalidateAnnotationCachesForTask(task.id);
       invalidateTaskAgreementCache(task.id);
     }
 
@@ -1003,9 +966,7 @@ export class LSFWrapper {
 
     if (deleteSucceeded) {
       invalidateTaskAgreementCache(taskId);
-      if (deletedAnnotationPk) {
-        invalidateAnnotationCache(deletedAnnotationPk);
-      }
+      invalidateAnnotationCachesForTask(taskId);
 
       const isRejectedQueue = isDefined(task.default_selected_annotation);
       const next = this.currentAnnotation;

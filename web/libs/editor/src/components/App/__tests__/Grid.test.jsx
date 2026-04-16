@@ -551,6 +551,49 @@ describe("Grid", () => {
     expect(screen.getByLabelText("Move right")).toBeInTheDocument();
   });
 
+  it("FIT-1660: Compare all re-fetches when ensureAnnotationLoaded returns null but MST has stale regions", async () => {
+    const ensureAnnotationLoaded = mock().mockResolvedValue(null);
+    mockFetchAnnotationCached.mockResolvedValue({
+      result: [{ id: "taxonomy-new", from_name: "taxonomy", type: "taxonomy", value: { choices: ["Dog"] } }],
+    });
+    ff.set({ [FF_DEV_3391]: true, [FF_FIT_720_LAZY_LOAD_ANNOTATIONS]: true });
+
+    const ann = {
+      ...createAnnotation({ id: "a0", pk: 42 }),
+      versions: { result: [] },
+      regions: [{ id: "region-stale" }],
+      userGenerate: false,
+      serializeAnnotation: mock(() => [
+        { id: "taxonomy-old", from_name: "taxonomy", type: "taxonomy", value: { choices: [] } },
+      ]),
+      history: { freeze: mock(), safeUnfreeze: mock(), reinitHistory: mock() },
+      deserializeResults: mock(),
+      updateObjects: mock(),
+      setEditable: mock(),
+    };
+    const annotations = [
+      ann,
+      ...Array.from({ length: 10 }, (_, i) => createAnnotation({ id: `a${i + 1}`, pk: i + 2 })),
+    ];
+    const store = createStore({
+      viewingAll: true,
+      selected: { selected: annotations[0] },
+      store: { task: { id: 100 }, SDK: { ensureAnnotationLoaded } },
+    });
+    const root = {};
+
+    render(
+      <Provider store={store}>
+        <VirtualizedGrid store={store} annotations={annotations} root={root} />
+      </Provider>,
+    );
+
+    await waitForUpdates(400);
+    expect(ensureAnnotationLoaded).toHaveBeenCalledWith(42);
+    expect(mockFetchAnnotationCached).toHaveBeenCalledWith(42);
+    expect(ann.deserializeResults).toHaveBeenCalled();
+  });
+
   it("VirtualizedGrid hydrateAnnotation uses sdk.ensureAnnotationLoaded when available", async () => {
     const ensureAnnotationLoaded = mock().mockResolvedValue(undefined);
     ff.set({ [FF_DEV_3391]: true, [FF_FIT_720_LAZY_LOAD_ANNOTATIONS]: true });

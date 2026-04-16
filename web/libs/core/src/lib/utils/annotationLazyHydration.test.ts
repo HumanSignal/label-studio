@@ -86,15 +86,37 @@ describe("applyAnnotationHydrationFromApi", () => {
     expect(ann.reinitHistory).toHaveBeenCalled();
   });
 
-  it("returns false when already hydrated (has regions)", () => {
+  it("returns false when already hydrated and server result matches local", () => {
+    const serverResult = [{ id: "x" }];
     const ann = {
       pk: "1",
       versions: { result: [] },
       areas: { size: 1 },
       trackedState: {},
       deserializeResults: mock(),
+      serializeAnnotation: () => serverResult,
     };
-    expect(applyAnnotationHydrationFromApi([ann], 1, { result: [{ id: "x" }] })).toBe(false);
+    expect(applyAnnotationHydrationFromApi([ann], 1, { result: serverResult })).toBe(false);
     expect(ann.deserializeResults).not.toHaveBeenCalled();
+  });
+
+  it("re-applies server result when regions exist but payload differs (FIT-1660)", () => {
+    const ann = {
+      pk: "1",
+      versions: { result: [] },
+      areas: { size: 1 },
+      trackedState: {},
+      serializeAnnotation: () => [{ stale: true }],
+      addVersions: mock(),
+      deserializeResults: mock(),
+      updateObjects: mock(),
+      reinitHistory: mock(),
+      history: { freeze: mock(), safeUnfreeze: mock() },
+    };
+    const serverResult = [{ fresh: true }];
+    expect(applyAnnotationHydrationFromApi([ann], 1, { result: serverResult })).toBe(true);
+    expect(ann.deserializeResults).toHaveBeenCalledWith(serverResult);
+    expect(ann.updateObjects).toHaveBeenCalled();
+    expect(ann.reinitHistory).toHaveBeenCalled();
   });
 });

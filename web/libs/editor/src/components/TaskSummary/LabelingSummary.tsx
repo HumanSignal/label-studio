@@ -13,7 +13,7 @@ import { ResizeHandler } from "./ResizeHandler";
 import type { AnnotationSummary, ControlTag, RendererType } from "./types";
 import { FF_FIT_720_LAZY_LOAD_ANNOTATIONS } from "@humansignal/core/lib/utils/feature-flags";
 import { isFF } from "../../utils/feature-flags";
-import { useAnnotationFetcher, annotationKeys } from "../../hooks/useAnnotationQuery";
+import { useAnnotationFetcher, annotationKeys, ANNOTATION_DETAIL_TASK_SCOPE } from "../../hooks/useAnnotationQuery";
 import { useQueryClient } from "@tanstack/react-query";
 
 /**
@@ -179,7 +179,7 @@ export const LabelingSummary = observer(({ hideInfo, annotations: all, controls,
 
   // FIT-720: Single source of truth for GET /api/annotations/:id/ — TanStack Query only (no parallel ref “hydrated” cache).
   const queryClient = useQueryClient();
-  const { fetchAnnotationCached } = useAnnotationFetcher();
+  const { fetchAnnotationCached } = useAnnotationFetcher(taskId);
   const containerRef = useRef<HTMLDivElement>(null);
   /** Scrollport for the summary table (virtual window + vertical scroll). */
   const scrollAreaRef = useRef<HTMLDivElement>(null);
@@ -217,7 +217,7 @@ export const LabelingSummary = observer(({ hideInfo, annotations: all, controls,
 
       try {
         const fullAnnotation = await fetchAnnotationCached(id);
-        const state = queryClient.getQueryState(annotationKeys.detail(id));
+        const state = queryClient.getQueryState(annotationKeys.detail(taskId, id));
         const updatedAt = state?.dataUpdatedAt ?? 0;
         if (lastAppliedQueryDataUpdatedAt.current.get(idKey) === updatedAt) {
           if (!summaryHydratedPksRef.current.has(idKey)) {
@@ -257,7 +257,7 @@ export const LabelingSummary = observer(({ hideInfo, annotations: all, controls,
         hydrationInFlight.current.delete(id);
       }
     },
-    [fetchAnnotationCached, queryClient, scheduleTableRefresh],
+    [fetchAnnotationCached, queryClient, scheduleTableRefresh, taskId],
   );
 
   // Only react when new data lands in the TanStack cache (`success`). Other `updated` actions (`fetch`, `invalidate`, …)
@@ -270,12 +270,18 @@ export const LabelingSummary = observer(({ hideInfo, annotations: all, controls,
       const q = event.query;
       const k = q?.queryKey;
       if (!Array.isArray(k) || k[0] !== "annotations" || k.length < 2) return;
-      const pk = String(k[1]);
+      let pk;
+      if (k[1] === ANNOTATION_DETAIL_TASK_SCOPE && k.length >= 4) {
+        if (taskId != null && String(k[2]) !== String(taskId)) return;
+        pk = String(k[3]);
+      } else {
+        pk = String(k[1]);
+      }
       const ann = allAnnotationsRef.current.find((a) => a.pk != null && String(a.pk) === pk);
       if (!ann || ann.type === "prediction" || ann.userGenerate) return;
       void hydrateAnnotation(ann);
     });
-  }, [queryClient, hydrateAnnotation]);
+  }, [queryClient, hydrateAnnotation, taskId]);
 
   /**
    * Whether this annotation should be fetched for the current virtual window.
@@ -285,12 +291,12 @@ export const LabelingSummary = observer(({ hideInfo, annotations: all, controls,
     (annotation: MSTAnnotation | undefined): boolean => {
       if (!annotation?.pk || annotation.type === "prediction" || annotation.userGenerate) return false;
       if (needsSummaryHydration(annotation, summaryHydratedPksRef.current)) return true;
-      const state = queryClient.getQueryState(annotationKeys.detail(annotation.pk)) as
+      const state = queryClient.getQueryState(annotationKeys.detail(taskId, annotation.pk)) as
         | { isStale?: boolean }
         | undefined;
       return Boolean(state?.isStale);
     },
-    [queryClient],
+    [queryClient, taskId],
   );
 
   useEffect(() => {

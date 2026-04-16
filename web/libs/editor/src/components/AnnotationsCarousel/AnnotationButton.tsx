@@ -367,7 +367,7 @@ const AnnotationButtonContextMenu = injector(
       const [copyLink] = useCopyText({ defaultText: annotationLink });
       const toast = useToast();
       const dropdown = useDropdown();
-      const { fetchAnnotationCached } = useAnnotationFetcher();
+      const { fetchAnnotationCached } = useAnnotationFetcher(store?.task?.id);
       const clickHandler = () => {
         onAnnotationChange?.();
         dropdown?.close();
