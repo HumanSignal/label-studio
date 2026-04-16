@@ -21,7 +21,7 @@ class UserAdminShort(UserAdmin):
             'email',
             'username',
             'active_organization',
-            'organization',
+            'created_organization',
             'is_staff',
             'is_superuser',
         )
@@ -51,6 +51,13 @@ class UserAdminShort(UserAdmin):
             ),
             ('Important dates', {'fields': ('last_login', 'date_joined')}),
         )
+
+    @admin.display(description='Organization')
+    def created_organization(self, obj):
+        try:
+            return obj.organization
+        except Organization.DoesNotExist:
+            return None
 
 
 class AsyncMigrationStatusAdmin(admin.ModelAdmin):
