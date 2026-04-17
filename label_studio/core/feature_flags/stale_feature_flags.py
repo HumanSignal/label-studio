@@ -4,7 +4,6 @@ STALE_FEATURE_FLAGS = {
     # Feb 5
     'fflag_feature_all_optic_1421_cold_start_v2': False,
     # Feb 6
-    'fflag_feat_all_dia_1576_prompts_easy_breezy_onboarding_short_async_presets_ks': False,
     'fflag_front_dia_1150_ddisco_sneak_preview': False,
     # Dec 31
     'fflag_root_45_better_user_filter': True,
