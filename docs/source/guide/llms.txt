@@ -48,15 +48,15 @@ If unsure:
 ## Enterprise / Cloud or On-Prem
 - [Enterprise docs home](https://docs.humansignal.com/guide/index.md)
 - [Workspaces](https://docs.humansignal.com/guide/workspaces.md)
-- [Dashboards](https://docs.humansignal.com/guide/dashboard.md)
-- [Analytics](https://docs.humansignal.com/guide/analytics.md)
+- [Dashboards](https://docs.humansignal.com/guide/dashboards.md)
+- [Analytics](https://docs.humansignal.com/guide/dashboard_overview.md)
 - [Automation](https://docs.humansignal.com/guide/prompts_overview.md)
-- [Review workflows](https://docs.humansignal.com/guide/review.md)
-- [Quality & agreement](https://docs.humansignal.com/guide/agreement.md)
-- [User management](https://docs.humansignal.com/guide/user_management.md)
-- [Roles & permissions](https://docs.humansignal.com/guide/roles_permissions.md)
-- [SSO, LDAP, SCIM](https://docs.humansignal.com/guide/sso_ldap_scim.md)
-- [Activity logs](https://docs.humansignal.com/guide/activity_logs.md)
+- [Review workflows](https://docs.humansignal.com/guide/quality.md)
+- [Quality & agreement](https://docs.humansignal.com/guide/agreement_metrics.md)
+- [User management](https://docs.humansignal.com/guide/manage_users.md)
+- [Roles & permissions](https://docs.humansignal.com/guide/admin_roles.md)
+- [SSO, LDAP, SCIM](https://docs.humansignal.com/guide/admin_auth.md)
+- [Activity logs](https://docs.humansignal.com/guide/admin_logs.md)
 ---
 ## Developer & integrations
 - [API reference](https://api.labelstud.io/)
