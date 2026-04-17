@@ -32,14 +32,14 @@ If unsure:
 - [Import data](https://labelstud.io/guide/tasks.md): Ingest data into projects
 - [Export annotations](https://labelstud.io/guide/export.md): Export labeled data
 - [Machine learning integration](https://labelstud.io/guide/ml.md): Connect predictions and models
-- [Data Manager](https://labelstud.io/guide/data_manager.md): Browse and filter tasks
+- [Data Manager](https://labelstud.io/guide/manage_data.md): Browse and filter tasks
 ---
 ## Open Source (self-hosted)
 - [Open Source docs home](https://labelstud.io/guide/index.md)
 - [Install Label Studio](https://labelstud.io/guide/install.md)
 - [Kubernetes deployment](https://labelstud.io/guide/install_k8s.md)
 - [Start Label Studio](https://labelstud.io/guide/start.md)
-- [Upgrade Label Studio](https://labelstud.io/guide/upgrade_label_studio.md)
+- [Upgrade Label Studio](https://labelstud.io/guide/upgrade_community.md)
 - [Persistent storage](https://labelstud.io/guide/persistent_storage.md)
 - [Database setup](https://labelstud.io/guide/storedata.md)
 - [Security](https://labelstud.io/guide/security.md)
@@ -63,11 +63,10 @@ If unsure:
 - [Python SDK](https://docs.humansignal.com/guide/sdk.md)
 - [Webhooks](https://docs.humansignal.com/guide/webhooks.md)
 - [ML backend](https://labelstud.io/guide/ml_create.md)
-- [Integrations](https://labelstud.io/guide/integrations.md)
 - [Open source repository](https://github.com/HumanSignal/label-studio)
 ---
 ## Optional
-- [Glossary](https://labelstud.io/guide/terminology.md)
+- [Glossary](https://labelstud.io/guide/glossary.md)
 - [Templates](https://labelstud.io/templates/index.md)
 - [Enterprise On-Prem Release notes](https://docs.humansignal.com/guide/release_notes.md)
 - [Community](https://community.labelstud.io/)
