@@ -123,6 +123,11 @@ export const FF_FIT_1443_ANALYTICS_LABEL_DISTRIBUTION_PAGE =
 export const FF_CLASSIFICATIONS_IN_OUTLINER = "fflag_feat_front_bros_766_per_item_in_outliner";
 
 /**
+ * Non-antd Taxonomy control (design-system tree + search) for the Taxonomy tag and comment classifications.
+ */
+export const FF_ECHO_466_TAXONOMY_ANTD_REMOVAL = "fflag_feat_all_echo_466_taxonomy_antd_removal_short";
+
+/**
  * Single feature flag for migrating app-chrome dialogs from legacy `modal()` / `Modal` to `ModalWindow`.
  * Use `ff.isActive(FF_MODAL_WINDOW_APP_CHROME)` next to each migrated modal (not a global switch in app Modal.tsx).
  */

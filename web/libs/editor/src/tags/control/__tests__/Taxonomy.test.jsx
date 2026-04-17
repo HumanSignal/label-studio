@@ -4,6 +4,7 @@
 import { render, screen } from "@testing-library/react";
 import { Provider } from "mobx-react";
 import Tree from "../../../core/Tree";
+import { FF_ECHO_466_TAXONOMY_ANTD_REMOVAL } from "@humansignal/core/lib/utils/feature-flags";
 import { FF_TAXONOMY_LABELING } from "../../../utils/feature-flags";
 
 const ff = mockFF();
@@ -43,6 +44,10 @@ mockModule("../../../components/Infomodal/Infomodal", () => ({
 
 mockModule("../../../components/NewTaxonomy/NewTaxonomy", () => ({
   NewTaxonomy: () => <div data-testid="new-taxonomy">NewTaxonomy</div>,
+}));
+
+mockModule("../../../components/TaxonomyEcho466/TaxonomyEcho466", () => ({
+  TaxonomyEcho466: () => <div data-testid="taxonomy-echo466">TaxonomyEcho466</div>,
 }));
 
 mockModule("../../../components/Taxonomy/Taxonomy", () => ({
@@ -136,7 +141,7 @@ function createTaxonomyNode(
   return taxonomy ?? null;
 }
 
-function _createTaxonomyNodeWithConfig(configXml, storeRef = { task: { dataObj: { text: "Hello" } } }) {
+function createTaxonomyNodeWithConfig(configXml, storeRef = { task: { dataObj: { text: "Hello" } } }) {
   const config = Tree.treeToModel(configXml, storeRef);
   return createTaxonomyNode(storeRef, null, {}, config);
 }
@@ -216,6 +221,61 @@ describe("Taxonomy model", () => {
     expect(taxonomy.type).toBe("taxonomy");
     expect(taxonomy.name).toBe("tax");
     expect(taxonomy.toname).toBe("t1");
+  });
+
+  it("defaults allowAddLabels to false", () => {
+    const taxonomy = createTaxonomyNode();
+    expect(taxonomy.allowAddLabels).toBe(false);
+  });
+
+  it("parses allowAddLabels true from XML", () => {
+    const taxonomy = createTaxonomyNodeWithConfig(
+      `<View>
+        <Taxonomy name="tax" toName="t1" allowAddLabels="true">
+          <Choice value="A" />
+        </Taxonomy>
+        <Text name="t1" value="$text" />
+      </View>`,
+    );
+    expect(taxonomy.allowAddLabels).toBe(true);
+  });
+
+  it("defaults allowAddLabels to legacy when legacy is set and allowAddLabels is omitted", () => {
+    const taxonomy = createTaxonomyNodeWithConfig(
+      `<View>
+        <Taxonomy name="tax" toName="t1" legacy="true">
+          <Choice value="A" />
+        </Taxonomy>
+        <Text name="t1" value="$text" />
+      </View>`,
+    );
+    expect(taxonomy.legacy).toBe(true);
+    expect(taxonomy.allowAddLabels).toBe(true);
+  });
+
+  it("defaults allowAddLabels to false when legacy is explicitly false and allowAddLabels is omitted", () => {
+    const taxonomy = createTaxonomyNodeWithConfig(
+      `<View>
+        <Taxonomy name="tax" toName="t1" legacy="false">
+          <Choice value="A" />
+        </Taxonomy>
+        <Text name="t1" value="$text" />
+      </View>`,
+    );
+    expect(taxonomy.legacy).toBe(false);
+    expect(taxonomy.allowAddLabels).toBe(false);
+  });
+
+  it("does not override allowAddLabels when both legacy and allowAddLabels are set", () => {
+    const taxonomy = createTaxonomyNodeWithConfig(
+      `<View>
+        <Taxonomy name="tax" toName="t1" legacy="true" allowAddLabels="false">
+          <Choice value="A" />
+        </Taxonomy>
+        <Text name="t1" value="$text" />
+      </View>`,
+    );
+    expect(taxonomy.allowAddLabels).toBe(false);
   });
 
   it("items returns traversed tree from children", () => {
@@ -537,6 +597,11 @@ describe("Taxonomy model", () => {
 });
 
 describe("HtxTaxonomy view", () => {
+  beforeEach(() => {
+    ff.reset();
+    ff.set({ [FF_ECHO_466_TAXONOMY_ANTD_REMOVAL]: false });
+  });
+
   it("renders loading spinner when loading and firstLoad", () => {
     const mockItem = {
       loading: true,
@@ -553,10 +618,10 @@ describe("HtxTaxonomy view", () => {
         <HtxTaxonomy item={mockItem} />
       </Provider>,
     );
-    expect(document.querySelector(".ant-spin")).toBeInTheDocument();
+    expect(screen.getByTestId("taxonomy-loading")).toBeInTheDocument();
   });
 
-  it("renders NewTaxonomy when not legacy and not loading", () => {
+  it("renders NewTaxonomy when not legacy, not loading, and ECHO-466 flag is off", () => {
     const taxonomy = createTaxonomyNode();
     spyOn(taxonomy, "isReadOnly").mockReturnValue(false);
     const store = { settings: {} };
@@ -566,6 +631,57 @@ describe("HtxTaxonomy view", () => {
       </Provider>,
     );
     expect(screen.getByTestId("new-taxonomy")).toBeInTheDocument();
+  });
+
+  it("renders TaxonomyEcho466 when not legacy, not loading, and ECHO-466 flag is on", () => {
+    ff.reset();
+    ff.set({ [FF_ECHO_466_TAXONOMY_ANTD_REMOVAL]: true });
+    const taxonomy = createTaxonomyNode();
+    spyOn(taxonomy, "isReadOnly").mockReturnValue(false);
+    const store = { settings: {} };
+    render(
+      <Provider store={store}>
+        <HtxTaxonomy item={taxonomy} />
+      </Provider>,
+    );
+    expect(screen.getByTestId("taxonomy-echo466")).toBeInTheDocument();
+  });
+
+  it("shows warning when apiUrl and allowAddLabels are both enabled", () => {
+    const taxonomy = {
+      loading: false,
+      items: [{ label: "A", path: ["A"], depth: 0 }],
+      isLoadedByApi: true,
+      allowAddLabels: true,
+      legacy: false,
+      userLabels: null,
+      selectedItems: [],
+      selected: [],
+      showfullpath: false,
+      leafsonly: false,
+      pathseparator: " / ",
+      maxusages: null,
+      maxwidth: null,
+      minwidth: null,
+      dropdownwidth: null,
+      placeholder: "",
+      canRemoveItems: true,
+      onChange: jest.fn(),
+      loadItems: jest.fn(),
+      onAddLabel: jest.fn(),
+      onDeleteLabel: jest.fn(),
+      perRegionVisible: () => true,
+      isVisible: true,
+      elementRef: { current: null },
+      isReadOnly: () => false,
+    };
+    const store = { settings: {} };
+    render(
+      <Provider store={store}>
+        <HtxTaxonomy item={taxonomy} />
+      </Provider>,
+    );
+    expect(screen.getByTestId("taxonomy-api-allowAddLabels-warning")).toBeInTheDocument();
   });
 
   it("renders legacy Taxonomy when legacy is true", () => {

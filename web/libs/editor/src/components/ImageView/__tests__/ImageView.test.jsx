@@ -7,7 +7,36 @@ const ff = mockFF();
 mockModule("react-konva", () => {
   const React = require("react");
   const { forwardRef, useImperativeHandle } = React;
-  const _wrap = (name) => (props) => React.createElement("div", { "data-testid": `konva-${name}`, ...props });
+
+  /** Konva-only handlers (not valid on DOM elements) — forwarding them triggers React console.error in CI. */
+  const KONVA_ONLY_EVENT_HANDLERS = new Set(["onDragMove", "onTransform", "onTransformEnd", "onTransformStart"]);
+
+  /** Konva props must not hit real DOM nodes — React 18+ logs console.error and CI can fail. */
+  const pickDomProps = (props) => {
+    if (!props || typeof props !== "object") return {};
+    return Object.fromEntries(
+      Object.entries(props).filter(([k, v]) => {
+        if (k === "children") return false;
+        if (k === "key") return true;
+        if (
+          k === "className" ||
+          k === "style" ||
+          k === "id" ||
+          k === "title" ||
+          k === "role" ||
+          k === "tabIndex" ||
+          k === "name"
+        )
+          return true;
+        if (k.startsWith("data-") || k.startsWith("aria-")) return true;
+        if (k.startsWith("on") && typeof v === "function") {
+          return !KONVA_ONLY_EVENT_HANDLERS.has(k);
+        }
+        return false;
+      }),
+    );
+  };
+
   const wrapEvt = (handler) => {
     if (!handler) return undefined;
     return (e) => {
@@ -29,16 +58,28 @@ mockModule("react-konva", () => {
     if (props.onMouseDown) wrappedProps.onMouseDown = wrapEvt(props.onMouseDown);
     if (props.onMouseMove) wrappedProps.onMouseMove = wrapEvt(props.onMouseMove);
     if (props.onMouseLeave) wrappedProps.onMouseLeave = wrapEvt(props.onMouseLeave);
-    return React.createElement("div", { "data-testid": "konva-stage", ...wrappedProps });
+    return React.createElement(
+      "div",
+      {
+        "data-testid": "konva-stage",
+        ref,
+        ...pickDomProps(wrappedProps),
+      },
+      wrappedProps.children,
+    );
   });
   return {
     Stage: StageWithRef,
-    Layer: ({ children, ...p }) => React.createElement("div", { "data-testid": "konva-layer", ...p }, children),
-    Group: ({ children, ...p }) => React.createElement("div", { "data-testid": "konva-group", ...p }, children),
-    Line: (p) => React.createElement("div", { "data-testid": "konva-line", ...p }),
-    Rect: (p) => React.createElement("div", { "data-testid": "konva-rect", ...p }),
-    Circle: (p) => React.createElement("div", { "data-testid": "konva-circle", ...p }),
-    Image: (p) => React.createElement("div", { "data-testid": "konva-image", ...p }),
+    Layer: ({ children, ...p }) =>
+      React.createElement("div", { "data-testid": "konva-layer", ...pickDomProps(p) }, children),
+    Group: ({ children, ...p }) =>
+      React.createElement("div", { "data-testid": "konva-group", ...pickDomProps(p) }, children),
+    Line: (p) => React.createElement("div", { "data-testid": "konva-line", ...pickDomProps(p) }),
+    Rect: (p) => React.createElement("div", { "data-testid": "konva-rect", ...pickDomProps(p) }),
+    Circle: (p) => React.createElement("div", { "data-testid": "konva-circle", ...pickDomProps(p) }),
+    Image: forwardRef((p, ref) =>
+      React.createElement("div", { "data-testid": "konva-image", ref, ...pickDomProps(p) }),
+    ),
   };
 });
 

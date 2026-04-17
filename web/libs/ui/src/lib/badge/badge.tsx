@@ -106,18 +106,20 @@ export const Badge = forwardRef<HTMLDivElement, BadgeProps>(
 
     const textRef = useRef<HTMLSpanElement>(null);
     const [isTruncated, setIsTruncated] = useState(false);
+    const [truncationTooltipTitle, setTruncationTooltipTitle] = useState("");
 
     useEffect(() => {
       if (!maxWidth) return;
       const el = textRef.current;
       if (el) {
         setIsTruncated(el.scrollWidth > el.offsetWidth);
+        setTruncationTooltipTitle((el.textContent ?? "").trim());
       }
     }, [maxWidth, children]);
 
     const textContent =
       maxWidth != null ? (
-        <Tooltip title={String(children ?? "")} disabled={!isTruncated}>
+        <Tooltip title={truncationTooltipTitle} disabled={!isTruncated}>
           {/* Tooltip clones this div and may override its ref — that's fine, we don't need it */}
           <div className="min-w-0">
             {/* Our measurement ref lives here, safely outside Tooltip's cloneElement reach */}
