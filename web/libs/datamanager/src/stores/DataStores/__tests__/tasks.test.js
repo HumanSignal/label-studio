@@ -30,7 +30,6 @@ mockModule("../types", () => {
 // Avoid importing LSF utils/feature flags directly to prevent heavy dependencies
 mockModule("../../../utils/feature-flags", () => ({
   FF_DEV_2536: "ff_dev_2536",
-  FF_DISABLE_GLOBAL_USER_FETCHING: "ff_disable_global_user_fetching",
   FF_LOPS_E_3: "ff_lops_e_3",
   isFF: () => false,
 }));

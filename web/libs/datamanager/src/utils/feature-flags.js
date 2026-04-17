@@ -21,13 +21,6 @@ export const FF_LOPS_E_3 = "fflag_feat_all_lops_e_3_datasets_short";
 export const FF_BETTER_USER_FILTER = "fflag_root_45_better_user_filter";
 
 /**
- * Disable global user fetching for large-scale deployments
- * @link https://app.launchdarkly.com/projects/default/flags/fflag_all_feat_utc_204_users_performance_improvements_in_dm_for_large_orgs
- */
-export const FF_DISABLE_GLOBAL_USER_FETCHING =
-  "fflag_all_feat_utc_204_users_performance_improvements_in_dm_for_large_orgs";
-
-/**
  * Strict task overlap enforcement - prevents annotators from submitting
  * annotations when task overlap limit has been reached
  */

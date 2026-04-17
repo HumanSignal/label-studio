@@ -129,9 +129,11 @@ class ListAnnotationSerializer(serializers.ListSerializer):
 
 
 class CompletedByDMSerializer(UserSerializer):
+    """DM column user snippet: fields must satisfy Data Manager MST `User` after camelCase."""
+
     class Meta:
         model = User
-        fields = ['id', 'first_name', 'last_name', 'avatar', 'email', 'initials']
+        fields = ['id', 'first_name', 'last_name', 'username', 'last_activity', 'avatar', 'email', 'initials']
 
 
 class AnnotationSerializer(FlexFieldsModelSerializer):

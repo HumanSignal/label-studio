@@ -204,7 +204,10 @@ stages:
           ],
           "drafts": [],
           "annotators": [
-            !int "{created_by}"
+            {
+              "user_id": !int "{created_by}",
+              "annotated": true
+            }
           ],
           "avg_lead_time": 3.0
         },
@@ -286,7 +289,10 @@ stages:
           ],
           "drafts": [],
           "annotators": [
-            !int "{created_by}"
+            {
+              "user_id": !int "{created_by}",
+              "annotated": true
+            }
           ],
           "avg_lead_time": 4.0
         },
@@ -331,7 +337,10 @@ stages:
           "drafts": [],
 
           "annotators": [
-            !int "{created_by}"
+            {
+              "user_id": !int "{created_by}",
+              "annotated": true
+            }
           ]
 
         }
@@ -507,7 +516,10 @@ stages:
             ],
             "drafts": [],
             "annotators": [
-              !int "{created_by}"
+              {
+                "user_id": !int "{created_by}",
+                "annotated": true
+              }
             ],
             "project": !int "{project_pk}"
           },
@@ -642,7 +654,10 @@ stages:
             ],
             "drafts": [],
             "annotators": [
-              !int "{created_by}"
+              {
+                "user_id": !int "{created_by}",
+                "annotated": true
+              }
             ],
             "project": !int "{project_pk}"
           },
@@ -687,7 +702,10 @@ stages:
             "predictions": [],
             "drafts": [],
             "annotators": [
-              !int "{created_by}"
+              {
+                "user_id": !int "{created_by}",
+                "annotated": true
+              }
             ],
             "project": !int "{project_pk}"
           }
@@ -978,7 +996,10 @@ stages:
           "drafts": [],
 
           "annotators": [
-            !int "{created_by}"
+            {
+              "user_id": !int "{created_by}",
+              "annotated": true
+            }
           ],
           "project": !int "{project_pk}"
         },
@@ -1070,7 +1091,10 @@ stages:
           ],
           "drafts": [],
           "annotators": [
-            !int "{created_by}"
+            {
+              "user_id": !int "{created_by}",
+              "annotated": true
+            }
           ],
           "project": !int "{project_pk}"
         },
@@ -1117,7 +1141,10 @@ stages:
           "drafts": [],
 
           "annotators": [
-            !int "{created_by}"
+            {
+              "user_id": !int "{created_by}",
+              "annotated": true
+            }
           ],
           "project": !int "{project_pk}"
         }
@@ -1222,7 +1249,10 @@ stages:
           "drafts": [],
           "file_upload": null,
           "annotators": [
-            !int "{created_by}"
+            {
+              "user_id": !int "{created_by}",
+              "annotated": true
+            }
           ],
           "project": !int "{project_pk}"
         },
@@ -1240,7 +1270,10 @@ stages:
           "drafts": [],
           "file_upload": null,
           "annotators": [
-            !int "{created_by}"
+            {
+              "user_id": !int "{created_by}",
+              "annotated": true
+            }
           ],
           "project": !int "{project_pk}"
         },
@@ -1258,7 +1291,10 @@ stages:
           "drafts": [],
           "file_upload": null,
           "annotators": [
-            !int "{created_by}"
+            {
+              "user_id": !int "{created_by}",
+              "annotated": true
+            }
           ],
           "project": !int "{project_pk}"
         }
@@ -1698,7 +1734,7 @@ stages:
         "total": 1,
         "tasks": [
         {
-          "storage_filename": "/tmp/files/subdir/test_image2.png",
+          "storage_filename": !re_match ".+files/subdir/test_image2\\.png$",
           "project": !int "{project_pk}"
         }
         ]

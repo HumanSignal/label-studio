@@ -21,6 +21,7 @@ from tasks.serializers import (
     AnnotationDraftSerializer,
     AnnotationSerializer,
     AnnotationStubSerializer,
+    CompletedByDMSerializer,
     PredictionSerializer,
     TaskSerializer,
 )
@@ -320,9 +321,12 @@ class UpdatedByDMFieldSerializer(serializers.SerializerMethodField):
 @extend_schema_field(
     {
         'type': 'array',
-        'title': 'Annotators IDs',
-        'description': 'Annotators IDs who annotated this task',
-        'items': {'type': 'integer', 'title': 'User IDs'},
+        'title': 'Annotators',
+        'description': 'Who annotated this task; each item includes user_id plus minimal profile fields for Data Manager display.',
+        'items': {
+            'type': 'object',
+            'title': 'Annotator',
+        },
     }
 )
 class AnnotatorsDMFieldSerializer(serializers.SerializerMethodField):
@@ -567,8 +571,7 @@ class DataManagerTaskSerializer(TaskSerializer):
     def get_updated_by(obj):
         return [{'user_id': obj.updated_by_id}] if obj.updated_by_id else []
 
-    @staticmethod
-    def get_annotators(obj):
+    def get_annotators(self, obj):
         if not hasattr(obj, 'annotators'):
             return []
 
@@ -580,7 +583,28 @@ class DataManagerTaskSerializer(TaskSerializer):
 
         annotators = list(set(annotators))
         annotators = [a for a in annotators if a is not None]
-        return annotators if hasattr(obj, 'annotators') and annotators else []
+        if not annotators:
+            return []
+
+        ordered_ids = sorted(annotators)
+
+        users_by_id = User.objects.in_bulk(ordered_ids, field_name='id')
+        out = []
+        for pk in ordered_ids:
+            user_obj = users_by_id.get(pk)
+            if not user_obj:
+                continue
+            user_data = CompletedByDMSerializer(user_obj).data
+            out.append(
+                {
+                    'user_id': pk,
+                    'annotated': True,
+                    'review': None,
+                    'reviewed': False,
+                    **user_data,
+                }
+            )
+        return out
 
     def get_annotations_ids(self, task):
         return self._pretty_results(task, 'annotations_ids', unique=True)

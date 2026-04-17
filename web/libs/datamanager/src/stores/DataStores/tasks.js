@@ -5,7 +5,7 @@ import { isDefined } from "../../utils/utils";
 import { Assignee } from "../Assignee";
 import { DynamicModel, registerModel } from "../DynamicModel";
 import { CustomJSON } from "../types";
-import { FF_DEV_2536, FF_DISABLE_GLOBAL_USER_FETCHING, FF_LOPS_E_3, isFF } from "../../utils/feature-flags";
+import { FF_DEV_2536, FF_LOPS_E_3, isFF } from "../../utils/feature-flags";
 import { isActive, FF_FIT_720_LAZY_LOAD_ANNOTATIONS } from "@humansignal/core/lib/utils/feature-flags";
 
 const SIMILARITY_UPPER_LIMIT_PRECISION = 1000;
@@ -40,13 +40,9 @@ export const create = (columns) => {
     allow_skip: types.optional(types.maybeNull(types.boolean), true),
     unique_lock_id: types.maybeNull(types.string),
     updated_by: types.optional(types.array(Assignee), []),
-    ...(isFF(FF_DISABLE_GLOBAL_USER_FETCHING)
-      ? {
-          annotators_count: types.optional(types.maybeNull(types.number), 0),
-          reviewers_count: types.optional(types.maybeNull(types.number), 0),
-          comment_authors_count: types.optional(types.maybeNull(types.number), 0),
-        }
-      : {}),
+    annotators_count: types.optional(types.maybeNull(types.number), 0),
+    reviewers_count: types.optional(types.maybeNull(types.number), 0),
+    comment_authors_count: types.optional(types.maybeNull(types.number), 0),
     ...(isFF(FF_LOPS_E_3)
       ? {
           _additional: types.optional(fileAttributes, {}),
