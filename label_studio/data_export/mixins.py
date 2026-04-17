@@ -184,6 +184,10 @@ class ExportMixin:
 
         return qs
 
+    def prepare_export_tasks(self, tasks, task_filter_options=None):
+        """Hook for subclasses to enrich task instances before serialization (e.g. agreement)."""
+        return tasks
+
     def get_export_data(self, task_filter_options=None, annotation_filter_options=None, serialization_options=None):
         """
         serialization_options: None or Dict({
@@ -237,6 +241,8 @@ class ExportMixin:
                 logger.debug(f'Batch: {i * BATCH_SIZE}')
                 if isinstance(task_filter_options, dict) and task_filter_options.get('only_with_annotations'):
                     tasks = [task for task in tasks if task.annotations.exists()]
+
+                tasks = self.prepare_export_tasks(tasks, task_filter_options=task_filter_options)
 
                 if serialization_options and serialization_options.get('include_annotation_history') is True:
                     task_ids = [task.id for task in tasks]
