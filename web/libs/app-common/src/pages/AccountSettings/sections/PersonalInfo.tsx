@@ -1,5 +1,6 @@
 import { type FormEventHandler, useCallback, useEffect, useRef, useState } from "react";
 import clsx from "clsx";
+import { format } from "date-fns";
 import { Button, InputFile, ToastType, useToast, Userpic } from "@humansignal/ui";
 import { getApiInstance } from "@humansignal/core";
 import styles from "../AccountSettings.module.css";
@@ -12,6 +13,15 @@ import { useAtomValue } from "jotai";
  * each one of these eventually has to be migrated to core or ui
  */
 import { Input } from "apps/labelstudio/src/components/Form/Elements";
+
+const PROVIDER_DISPLAY_NAMES: Record<string, string> = {
+  google: "Google",
+  github: "GitHub",
+};
+
+function formatProvider(provider: string): string {
+  return PROVIDER_DISPLAY_NAMES[provider] ?? provider.charAt(0).toUpperCase() + provider.slice(1);
+}
 
 const updateUserAvatarAtom = atomWithMutation(() => ({
   mutationKey: ["update-user"],
@@ -154,6 +164,20 @@ export const PersonalInfo = () => {
               />
             </div>
           </div>
+          {user?.social_accounts?.map((account) => (
+            <div className={styles.flexRow} key={account.provider}>
+              <div className={styles.flex1}>
+                <Input label="Connected Account" readOnly={true} value={formatProvider(account.provider)} />
+              </div>
+              <div className={styles.flex1}>
+                <Input
+                  label="Connected Since"
+                  readOnly={true}
+                  value={format(new Date(account.date_joined), "dd MMM yyyy")}
+                />
+              </div>
+            </div>
+          ))}
           <div className={clsx(styles.flexRow, styles.flexEnd)}>
             <Button style={{ width: 125 }} waiting={isInProgress}>
               Save
