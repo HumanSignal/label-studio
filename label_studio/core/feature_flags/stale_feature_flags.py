@@ -70,4 +70,6 @@ STALE_FEATURE_FLAGS = {
     'fflag_fix_front_lsdv_4930_selection_tool_fixes_240423_short': False,
     'fflag_fix_back_dev_4174_overlap_issue_experiments_10012023_short': False,
     'fflag_feat_dev_2755_regions_list_grouped_by_labels_with_ordered_collapse_short': False,
+    # Apr 14
+    'ff_front_dev_1682_model_version_dropdown_070622_short': False,
 }

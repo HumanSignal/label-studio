@@ -754,7 +754,25 @@ def annotate_predictions_score(queryset):
                 predictions_score=Avg('predictions__score', filter=Q(predictions__model_version__in=model_versions))
             )
     else:
-        model_version = first_task.project.model_version
+        project = first_task.project
+        model_version = project.model_version
+        if model_version is not None:
+            backend_exists_for_model_version = project.ml_backends.filter(model_version=model_version).exists()
+            predictions_exists_for_model_version = False
+            if not backend_exists_for_model_version:
+                predictions_exists_for_model_version = project.predictions.filter(model_version=model_version).exists()
+            if not backend_exists_for_model_version and not predictions_exists_for_model_version:
+                # project.model_version can secretly store a title instead of a model_version
+                backup_model_version = (
+                    project.ml_backends.filter(title=model_version)
+                    .order_by('-updated_at')
+                    .values_list('model_version', flat=True)
+                    .first()
+                )
+                if backup_model_version is not None:
+                    # '' is used for 'no selected model version', don't overwrite it
+                    model_version = backup_model_version
+
         if model_version is None:
             return queryset.annotate(predictions_score=Avg('predictions__score'))
         else:
