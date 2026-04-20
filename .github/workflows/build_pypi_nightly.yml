@@ -139,7 +139,7 @@ jobs:
       steps:
         - name: Send Notification to Slack
           id: slack_notify_ops_release
-          uses: slackapi/slack-github-action@v1.27
+          uses: slackapi/slack-github-action@v3.0
           with:
             channel-id: 'C01RJV08UJK'
             slack-message: |
