@@ -134,6 +134,16 @@ describe("Timeline", () => {
     }
   });
 
+  it("steps forward by one frame when alt hop size is configured", async () => {
+    const onPositionChange = mock();
+    render(<Timeline {...defaultProps} position={5} onPositionChange={onPositionChange} altHopSize={10} />);
+
+    const stepForwardBtn = screen.getByRole("button", { name: /step forward/i });
+    await userEvent.click(stepForwardBtn);
+
+    expect(onPositionChange).toHaveBeenCalledWith(6);
+  });
+
   it("steps backward decrease position", async () => {
     const onPositionChange = mock();
     render(<Timeline {...defaultProps} position={5} onPositionChange={onPositionChange} hopSize={1} />);
