@@ -118,6 +118,11 @@ export const FF_FIT_1443_ANALYTICS_LABEL_DISTRIBUTION_PAGE =
   "fflag_feat_all_fit_1443_analytics_label_distribution_page";
 
 /**
+ * LSE project hub: Dashboard + Members under a shared layout (throughput + members tabs)
+ */
+export const FF_LSE_PROJECT_DASHBOARDS_V3 = "fflag_feat_front_lse_project_dashboards_v3_short";
+
+/**
  * Show per-item classifications (like Choices or Taxonomy) alongside regions in the Outliner panel
  */
 export const FF_CLASSIFICATIONS_IN_OUTLINER = "fflag_feat_front_bros_766_per_item_in_outliner";

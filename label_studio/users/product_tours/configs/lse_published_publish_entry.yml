@@ -1,0 +1,13 @@
+steps:
+  - target: '[data-testid="project-publish-status-trigger"]'
+    placement: bottom
+    offset: 8
+    floaterProps:
+      disableFlip: true
+    title: "Publish and unpublish from here"
+    content: >
+      Use the control next to the project name to open the publishing checklist, publish when you are ready, or unpublish later.
+    disableBeacon: true
+    locale:
+      last: "Got it"
+      skip: "Don't show this again"

@@ -66,7 +66,8 @@ const MixinBase = types
         self.selected = selected;
         self.highlighted = selected;
 
-        getRoot(self).SDK.invoke("taskSelected");
+        const root = getRoot(self);
+        root.SDK?.invoke?.("taskSelected");
       }
     },
 

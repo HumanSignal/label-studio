@@ -97,9 +97,11 @@ const updateProductTourState = async (
 interface TourContextType {
   registerTour: (name: string, dispatch: React.Dispatch<TourAction>) => void;
   unregisterTour: (name: string) => void;
-  startTour: (name: string) => void;
-  setTourViewed: (name: string, isSkipped: boolean, interactionData: Record<string, any>) => void;
+  startTour: (name: string) => Promise<void>;
+  setTourViewed: (name: string, isSkipped: boolean, interactionData: Record<string, any>) => Promise<void>;
   restartTour: (name: string) => void;
+  /** Re-fetch tours that were blocked by `awaiting` (dependencies) after another tour completes. */
+  retryAwaitingTours: () => Promise<void>;
 }
 
 export const TourContext = createContext<TourContextType | null>(null);
@@ -111,6 +113,8 @@ export const TourProvider: React.FC<{
 }> = ({ children, useAPI }) => {
   const api = useAPI();
   const toursRef = useRef<Record<string, React.Dispatch<TourAction>>>({});
+  /** Tours whose last getProductTour returned `awaiting: true` (dependency not finished yet). */
+  const awaitingToursRef = useRef<Set<string>>(new Set());
 
   const registerTour = (name: string, dispatch: React.Dispatch<TourAction>) => {
     toursRef.current[name] = dispatch;
@@ -132,9 +136,12 @@ export const TourProvider: React.FC<{
       }
 
       if (response.awaiting) {
+        awaitingToursRef.current.add(name);
         console.info(`Tour "${name}" is awaiting other tours`);
         return;
       }
+
+      awaitingToursRef.current.delete(name);
 
       if (!response.steps?.length) {
         console.info(`No steps found for tour "${name}"`);
@@ -152,10 +159,25 @@ export const TourProvider: React.FC<{
     [api],
   );
 
+  const retryAwaitingTours = useCallback(async () => {
+    const pending = [...awaitingToursRef.current];
+    for (const n of pending) {
+      await startTour(n);
+    }
+    // PATCH for the completed tour may lag behind getProductTour; one short follow-up avoids stuck second tour.
+    if (awaitingToursRef.current.size > 0) {
+      await new Promise((r) => setTimeout(r, 450));
+      const still = [...awaitingToursRef.current];
+      for (const n of still) {
+        await startTour(n);
+      }
+    }
+  }, [startTour]);
+
   const setTourViewed = useCallback(
-    (name: string, isSkipped: boolean, interactionData: Record<string, any> = {}) => {
+    async (name: string, isSkipped: boolean, interactionData: Record<string, any> = {}) => {
       // TODO: currently we don't have per-tour complete state, so we just update the global state
-      updateProductTourState(api, name, isSkipped ? "skipped" : "completed", interactionData);
+      await updateProductTourState(api, name, isSkipped ? "skipped" : "completed", interactionData);
     },
     [api],
   );
@@ -180,7 +202,9 @@ export const TourProvider: React.FC<{
   };
 
   return (
-    <TourContext.Provider value={{ registerTour, unregisterTour, startTour, setTourViewed, restartTour }}>
+    <TourContext.Provider
+      value={{ registerTour, unregisterTour, startTour, setTourViewed, restartTour, retryAwaitingTours }}
+    >
       {children}
     </TourContext.Provider>
   );
