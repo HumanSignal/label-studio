@@ -1,5 +1,23 @@
-import { Component, createRef, forwardRef, Fragment, memo, useEffect, useMemo, useRef, useState } from "react";
-import { Group, Layer, Line, Rect, Stage, Image as KonvaImage, Circle } from "react-konva";
+import {
+  Component,
+  createRef,
+  forwardRef,
+  Fragment,
+  memo,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
+import {
+  Group,
+  Layer,
+  Line,
+  Rect,
+  Stage,
+  Image as KonvaImage,
+  Circle,
+} from "react-konva";
 import { observer } from "mobx-react";
 import { getEnv, getRoot, isAlive } from "mobx-state-tree";
 
@@ -20,7 +38,12 @@ import ResizeObserver from "../../utils/resize-observer";
 import { debounce } from "@humansignal/core/lib/utils/debounce";
 import Constants from "../../core/Constants";
 import { fixRectToFit, mapKonvaBrightness } from "../../utils/image";
-import { FF_DEV_1442, FF_LSDV_4930, FF_ZOOM_OPTIM, isFF } from "../../utils/feature-flags";
+import {
+  FF_DEV_1442,
+  FF_LSDV_4930,
+  FF_ZOOM_OPTIM,
+  isFF,
+} from "../../utils/feature-flags";
 import { Pagination } from "../../common/Pagination/Pagination";
 import { Image } from "./Image";
 
@@ -61,22 +84,37 @@ const Region = observer(({ region, showSelected = false }) => {
   return Tree.renderItem(region, region.annotation, true);
 });
 
-const RegionsLayer = memo(({ regions, name, useLayers, showSelected = false, smoothing = true }) => {
-  const content = regions.map((el) => {
-    return <Region key={`region-${el.id}`} region={el} showSelected={showSelected} />;
-  });
+const RegionsLayer = memo(
+  ({ regions, name, useLayers, showSelected = false, smoothing = true }) => {
+    const content = regions.map((el) => {
+      return (
+        <Region
+          key={`region-${el.id}`}
+          region={el}
+          showSelected={showSelected}
+        />
+      );
+    });
 
-  return useLayers === false ? (
-    content
-  ) : (
-    <Layer name={name} imageSmoothingEnabled={smoothing}>
-      {content}
-    </Layer>
-  );
-});
+    return useLayers === false ? (
+      content
+    ) : (
+      <Layer name={name} imageSmoothingEnabled={smoothing}>
+        {content}
+      </Layer>
+    );
+  },
+);
 
 const Regions = memo(
-  ({ regions, useLayers = true, chunkSize = 15, suggestion = false, showSelected = false, smoothing = true }) => {
+  ({
+    regions,
+    useLayers = true,
+    chunkSize = 15,
+    suggestion = false,
+    showSelected = false,
+    smoothing = true,
+  }) => {
     return (
       <ImageViewProvider value={{ suggestion }}>
         {(chunkSize ? chunks(regions, chunkSize) : regions).map((chunk, i) => (
@@ -98,13 +136,18 @@ const DrawingRegion = observer(({ item }) => {
   const { drawingRegion } = item;
 
   if (!drawingRegion) return null;
-  if (item.multiImage && item.currentImage !== drawingRegion.item_index) return null;
+  if (item.multiImage && item.currentImage !== drawingRegion.item_index)
+    return null;
 
   const Wrapper = Layer;
 
   return (
     <Wrapper imageSmoothingEnabled={item.smoothingEnabled}>
-      {drawingRegion ? <Region key={"drawing"} region={drawingRegion} /> : drawingRegion}
+      {drawingRegion ? (
+        <Region key={"drawing"} region={drawingRegion} />
+      ) : (
+        drawingRegion
+      )}
     </Wrapper>
   );
 });
@@ -139,7 +182,7 @@ const SelectionBorders = observer(({ item, selectionArea }) => {
         },
       ]
     : [];
-  const ANCHOR_SIZE = 6 / item.stageScale;
+  const ANCHOR_SIZE = Math.max(8, 6) / item.stageScale;
 
   return (
     <>
@@ -193,7 +236,12 @@ const SelectionRect = observer(({ item }) => {
 
   return (
     <>
-      <Rect {...positionProps} stroke={SELECTION_COLOR} dash={SELECTION_DASH} strokeScaleEnabled={false} />
+      <Rect
+        {...positionProps}
+        stroke={SELECTION_COLOR}
+        dash={SELECTION_DASH}
+        strokeScaleEnabled={false}
+      />
       <Rect
         {...positionProps}
         stroke={SELECTION_SECOND_COLOR}
@@ -224,11 +272,13 @@ const TransformerBack = observer(({ item }) => {
           }}
           onMouseOver={(ev) => {
             if (!item.annotation.isLinkingMode) {
-              ev.target.getStage().container().style.cursor = Constants.POINTER_CURSOR;
+              ev.target.getStage().container().style.cursor =
+                Constants.POINTER_CURSOR;
             }
           }}
           onMouseOut={(ev) => {
-            ev.target.getStage().container().style.cursor = Constants.DEFAULT_CURSOR;
+            ev.target.getStage().container().style.cursor =
+              Constants.DEFAULT_CURSOR;
           }}
           onDragStart={(e) => {
             dragStartPointRef.current = {
@@ -273,17 +323,31 @@ const TransformerBack = observer(({ item }) => {
 
 const SelectedRegions = observer(({ item, selectedRegions }) => {
   if (!selectedRegions) return null;
-  const { brushRegions = [], shapeRegions = [] } = splitRegions(selectedRegions);
+  const { brushRegions = [], shapeRegions = [] } =
+    splitRegions(selectedRegions);
 
   return (
     <>
       {isFF(FF_LSDV_4930) ? null : <TransformerBack item={item} />}
       {brushRegions.length > 0 && (
-        <Regions key="brushes" name="brushes" regions={brushRegions} useLayers={true} showSelected chankSize={0} />
+        <Regions
+          key="brushes"
+          name="brushes"
+          regions={brushRegions}
+          useLayers={true}
+          showSelected
+          chankSize={0}
+        />
       )}
 
       {shapeRegions.length > 0 && (
-        <Regions key="shapes" name="shapes" regions={shapeRegions} showSelected chankSize={0} />
+        <Regions
+          key="shapes"
+          name="shapes"
+          regions={shapeRegions}
+          showSelected
+          chankSize={0}
+        />
       )}
     </>
   );
@@ -293,7 +357,8 @@ const SelectionLayer = observer(({ item, selectionArea }) => {
   const scale = 1;
   const [isMouseWheelClick, setIsMouseWheelClick] = useState(false);
   const [shift, setShift] = useState(false);
-  const isPanTool = item.getToolsManager().findSelectedTool()?.fullName === "ZoomPanTool";
+  const isPanTool =
+    item.getToolsManager().findSelectedTool()?.fullName === "ZoomPanTool";
 
   const dragHandler = (e) => setIsMouseWheelClick(e.buttons === 4);
 
@@ -312,7 +377,8 @@ const SelectionLayer = observer(({ item, selectionArea }) => {
     };
   }, []);
 
-  const disableTransform = item.zoomScale > 1 && (shift || isPanTool || isMouseWheelClick);
+  const disableTransform =
+    item.zoomScale > 1 && (shift || isPanTool || isMouseWheelClick);
 
   let supportsTransform = true;
   let supportsRotate = true;
@@ -327,7 +393,8 @@ const SelectionLayer = observer(({ item, selectionArea }) => {
   supportsTransform =
     supportsTransform &&
     (item.selectedRegions.length > 1 ||
-      ((item.useTransformer || item.selectedShape?.preferTransformer) && item.selectedShape?.useTransformer));
+      ((item.useTransformer || item.selectedShape?.preferTransformer) &&
+        item.selectedShape?.useTransformer));
 
   return (
     <Layer scaleX={scale} scaleY={scale}>
@@ -343,7 +410,9 @@ const SelectionLayer = observer(({ item, selectionArea }) => {
         supportsScale={supportsScale}
         selectedShapes={item.selectedRegions}
         singleNodeMode={item.selectedRegions.length === 1}
-        useSingleNodeRotation={item.selectedRegions.length === 1 && supportsRotate}
+        useSingleNodeRotation={
+          item.selectedRegions.length === 1 && supportsRotate
+        }
         draggableBackgroundSelector={`#${TRANSFORMER_BACK_ID}`}
       />
     </Layer>
@@ -444,7 +513,8 @@ const PixelGridLayer = observer(({ item }) => {
   const visible = item.zoomScale > ZOOM_THRESHOLD;
   const { naturalWidth, naturalHeight } = item.currentImageEntity ?? {};
   const { stageWidth, stageHeight } = item;
-  const imageSmallerThanStage = naturalWidth < stageWidth || naturalHeight < stageHeight;
+  const imageSmallerThanStage =
+    naturalWidth < stageWidth || naturalHeight < stageHeight;
 
   const step = item.stageZoom; // image pixel
 
@@ -568,9 +638,12 @@ export default observer(
       // shape we can click on. Here we're relying on cursor position and non-transparent pixels
       // of the mask to detect cursor-region collision.
       const allowedHoverTypes = /bitmask|vector/i;
-      const hasSelected = item.selectedRegions.some((r) => r.type.match(allowedHoverTypes) !== null);
+      const hasSelected = item.selectedRegions.some(
+        (r) => r.type.match(allowedHoverTypes) !== null,
+      );
       const tool = item.getToolsManager().findSelectedTool();
-      const isAllowedTool = tool?.toolName?.match?.(allowedHoverTypes) !== null ?? false;
+      const isAllowedTool =
+        tool?.toolName?.match?.(allowedHoverTypes) !== null ?? false;
 
       const hoveredRegion = item.regs.find((reg) => {
         if (reg.selected || tool?.mode === "drawing") return false;
@@ -589,14 +662,20 @@ export default observer(
 
     resetDeferredClickTimeout = () => {
       if (this.deferredClickTimeout.length > 0) {
-        this.deferredClickTimeout = this.deferredClickTimeout.filter((timeout) => {
-          clearTimeout(timeout);
-          return false;
-        });
+        this.deferredClickTimeout = this.deferredClickTimeout.filter(
+          (timeout) => {
+            clearTimeout(timeout);
+            return false;
+          },
+        );
       }
     };
 
-    handleDeferredClick = (handleDeferredMouseDownCallback, handleDeselection, eligibleToDeselect = false) => {
+    handleDeferredClick = (
+      handleDeferredMouseDownCallback,
+      handleDeselection,
+      eligibleToDeselect = false,
+    ) => {
       this.handleDeferredMouseDown = (wasClicked) => {
         if (wasClicked && eligibleToDeselect) {
           handleDeselection();
@@ -619,10 +698,15 @@ export default observer(
     handleMouseDown = (e) => {
       this.mouseDown = true;
       const { item } = this.props;
-      const isPanTool = item.getToolsManager().findSelectedTool()?.fullName === "ZoomPanTool";
-      const isMoveTool = item.getToolsManager().findSelectedTool()?.fullName === "MoveTool";
+      const isPanTool =
+        item.getToolsManager().findSelectedTool()?.fullName === "ZoomPanTool";
+      const isMoveTool =
+        item.getToolsManager().findSelectedTool()?.fullName === "MoveTool";
 
-      this.skipNextMouseDown = this.skipNextMouseUp = this.skipNextClick = false;
+      this.skipNextMouseDown =
+        this.skipNextMouseUp =
+        this.skipNextClick =
+          false;
       if (isFF(FF_LSDV_4930)) {
         this.mouseDownPoint = { x: e.evt.offsetX, y: e.evt.offsetY };
       }
@@ -643,7 +727,11 @@ export default observer(
         const isRightElementToCatchToolInteractions = (el) => {
           // Bitmask is like Brush, so treat it the same
           // The only difference is that Bitmask doesn't have a group inside
-          if (el.nodeType === "Layer" && !isMoveTool && el.attrs?.name === "bitmask") {
+          if (
+            el.nodeType === "Layer" &&
+            !isMoveTool &&
+            el.attrs?.name === "bitmask"
+          ) {
             return true;
           }
 
@@ -701,8 +789,10 @@ export default observer(
 
       if (isFF(FF_DEV_1442) && eligibleToolForDeselect) {
         const targetIsCanvas = e.target === item.stageRef;
-        const annotationHasSelectedRegions = item.annotation.selectedRegions.length > 0;
-        const eligibleToDeselect = targetIsCanvas && annotationHasSelectedRegions;
+        const annotationHasSelectedRegions =
+          item.annotation.selectedRegions.length > 0;
+        const eligibleToDeselect =
+          targetIsCanvas && annotationHasSelectedRegions;
 
         const handleDeselection = () => {
           item.annotation.unselectAll();
@@ -711,7 +801,11 @@ export default observer(
           this.skipNextClick = true;
         };
 
-        this.handleDeferredClick(handleMouseDown, handleDeselection, eligibleToDeselect);
+        this.handleDeferredClick(
+          handleMouseDown,
+          handleDeselection,
+          eligibleToDeselect,
+        );
         return;
       }
 
@@ -840,7 +934,9 @@ export default observer(
     updateCrosshair = (e) => {
       if (this.crosshairRef.current) {
         const { x, y } = e.currentTarget.getPointerPosition();
-        this.crosshairRef.current.updatePointer(...this.props.item.fixZoomedCoords([x, y]));
+        this.crosshairRef.current.updatePointer(
+          ...this.props.item.fixZoomedCoords([x, y]),
+        );
       }
     };
 
@@ -879,13 +975,19 @@ export default observer(
         const stage = item.stageRef;
 
         // Unified smooth zoom behavior for both trackpad and mouse wheel
-        item.handleZoom(e.evt.deltaY, stage.getPointerPosition(), e.evt.ctrlKey);
+        item.handleZoom(
+          e.evt.deltaY,
+          stage.getPointerPosition(),
+          e.evt.ctrlKey,
+        );
       } else if (e.evt) {
         // Two fingers scroll (panning) - only when zoomed in
         const { item } = this.props;
 
-        const maxScrollX = Math.round(item.stageWidth * item.zoomScale) - item.stageWidth;
-        const maxScrollY = Math.round(item.stageHeight * item.zoomScale) - item.stageHeight;
+        const maxScrollX =
+          Math.round(item.stageWidth * item.zoomScale) - item.stageWidth;
+        const maxScrollY =
+          Math.round(item.stageHeight * item.zoomScale) - item.stageHeight;
 
         const newPos = {
           x: Math.min(0, Math.ceil(item.zoomingPositionX - e.evt.deltaX)),
@@ -893,8 +995,10 @@ export default observer(
         };
 
         // Calculate scroll boundaries to allow scrolling the page when reaching stage edges
-        const withinX = newPos.x !== 0 && newPos.x > -maxScrollX && item.zoomScale !== 1;
-        const withinY = newPos.y !== 0 && newPos.y > -maxScrollY && item.zoomScale !== 1;
+        const withinX =
+          newPos.x !== 0 && newPos.x > -maxScrollX && item.zoomScale !== 1;
+        const withinY =
+          newPos.y !== 0 && newPos.y > -maxScrollY && item.zoomScale !== 1;
 
         // Detect scroll direction
         const scrollingX = Math.abs(e.evt.deltaX) > Math.abs(e.evt.deltaY);
@@ -949,7 +1053,11 @@ export default observer(
         const { offsetWidth, offsetHeight } = this.props.item.containerRef;
 
         if (this.props.item.naturalWidth <= 1) return;
-        if (this.lastOffsetWidth === offsetWidth && this.lastOffsetHeight === offsetHeight) return;
+        if (
+          this.lastOffsetWidth === offsetWidth &&
+          this.lastOffsetHeight === offsetHeight
+        )
+          return;
 
         this.props.item.onResize(offsetWidth, offsetHeight, true);
         this.lastOffsetWidth = offsetWidth;
@@ -1002,7 +1110,8 @@ export default observer(
       const { imageRef } = this;
 
       if (!item || !isAlive(item) || !imageRef.current) return;
-      if (item.isReady !== imageRef.current.complete) item.setReady(imageRef.current.complete);
+      if (item.isReady !== imageRef.current.complete)
+        item.setReady(imageRef.current.complete);
     }
 
     renderTools() {
@@ -1044,11 +1153,16 @@ export default observer(
 
       const imagePositionClassnames = [
         styles.image_position,
-        styles[`image_position__${item.verticalalignment === "center" ? "middle" : item.verticalalignment}`],
+        styles[
+          `image_position__${item.verticalalignment === "center" ? "middle" : item.verticalalignment}`
+        ],
         styles[`image_position__${item.horizontalalignment}`],
       ];
 
-      const wrapperClasses = [styles.wrapperComponent, item.images.length > 1 ? styles.withGallery : styles.wrapper];
+      const wrapperClasses = [
+        styles.wrapperComponent,
+        item.images.length > 1 ? styles.withGallery : styles.wrapper,
+      ];
 
       if (paginationEnabled) wrapperClasses.push(styles.withPagination);
 
@@ -1062,7 +1176,11 @@ export default observer(
           {paginationEnabled ? (
             <div
               className={styles.pagination}
-              title={isViewingAll ? "Pagination is not supported in View All Annotations" : undefined}
+              title={
+                isViewingAll
+                  ? "Pagination is not supported in View All Annotations"
+                  : undefined
+              }
             >
               <Pagination
                 size="small"
@@ -1131,7 +1249,8 @@ export default observer(
                   if (this.crosshairRef.current) {
                     this.crosshairRef.current.updateVisibility(false);
                   }
-                  const { width: stageWidth, height: stageHeight } = item.canvasSize;
+                  const { width: stageWidth, height: stageHeight } =
+                    item.canvasSize;
                   const { offsetX: mouseposX, offsetY: mouseposY } = e.evt;
                   const newEvent = { ...e };
 
@@ -1220,7 +1339,9 @@ const EntireStage = observer(
         ref={(ref) => {
           item.setStageRef(ref);
         }}
-        className={[styles["image-element"], ...imagePositionClassnames].join(" ")}
+        className={[styles["image-element"], ...imagePositionClassnames].join(
+          " ",
+        )}
         width={size.width}
         height={size.height}
         scaleX={item.zoomScale}
@@ -1239,7 +1360,12 @@ const EntireStage = observer(
         onMouseUp={onMouseUp}
         onWheel={onWheel}
       >
-        <StageContent item={item} store={store} state={state} crosshairRef={crosshairRef} />
+        <StageContent
+          item={item}
+          store={store}
+          state={state}
+          crosshairRef={crosshairRef}
+        />
       </Stage>
     );
   },
@@ -1281,7 +1407,12 @@ const ImageLayer = observer(({ item }) => {
       width: imageEntity.naturalWidth,
       height: imageEntity.naturalHeight,
     };
-  }, [imageEntity.naturalWidth, imageEntity.naturalHeight, item.stageWidth, item.stageHeight]);
+  }, [
+    imageEntity.naturalWidth,
+    imageEntity.naturalHeight,
+    item.stageWidth,
+    item.stageHeight,
+  ]);
 
   const brightness = mapKonvaBrightness(imageEntity.brightnessGrade);
   const contrast = imageEntity.contrastGrade - 100;
@@ -1306,7 +1437,10 @@ const ImageLayer = observer(({ item }) => {
   }, [loadedImage, brightness, contrast, currentSrc]);
 
   return loadedImage ? (
-    <Layer imageSmoothingEnabled={item.smoothingEnabled} scale={{ x: item.stageZoom, y: item.stageZoom }}>
+    <Layer
+      imageSmoothingEnabled={item.smoothingEnabled}
+      scale={{ x: item.stageZoom, y: item.stageZoom }}
+    >
       <KonvaImage
         key={currentSrc ?? "image-source"}
         ref={konvaImageRef}
@@ -1379,8 +1513,22 @@ const CursorLayer = observer(({ item, tool }) => {
         </>
       ) : (
         <>
-          <Circle x={x} y={y} radius={size} stroke="black" strokeWidth={3} strokeScaleEnabled={false} />
-          <Circle x={x} y={y} radius={size} stroke="white" strokeWidth={1} strokeScaleEnabled={false} />
+          <Circle
+            x={x}
+            y={y}
+            radius={size}
+            stroke="black"
+            strokeWidth={3}
+            strokeScaleEnabled={false}
+          />
+          <Circle
+            x={x}
+            y={y}
+            radius={size}
+            stroke="white"
+            strokeWidth={1}
+            strokeScaleEnabled={false}
+          />
         </>
       )}
     </Layer>
@@ -1392,9 +1540,14 @@ const StageContent = observer(({ item, store, state, crosshairRef }) => {
   if (!store.task || !item.currentSrc) return null;
 
   // Keep selected or highlighted region on top
-  const regions = [...item.regs].sort((r) => (r.highlighted || r.selected ? 1 : -1));
+  const regions = [...item.regs].sort((r) =>
+    r.highlighted || r.selected ? 1 : -1,
+  );
   const paginationEnabled = !!item.isMultiItem;
-  const wrapperClasses = [styles.wrapperComponent, item.images.length > 1 ? styles.withGallery : styles.wrapper];
+  const wrapperClasses = [
+    styles.wrapperComponent,
+    item.images.length > 1 ? styles.withGallery : styles.wrapper,
+  ];
   const tool = item.getToolsManager().findSelectedTool();
 
   if (paginationEnabled) wrapperClasses.push(styles.withPagination);
@@ -1452,7 +1605,9 @@ const StageContent = observer(({ item, store, state, crosshairRef }) => {
         />
       )}
 
-      {tool && tool.toolName?.match(/bitmask/i) && <CursorLayer item={item} tool={tool} />}
+      {tool && tool.toolName?.match(/bitmask/i) && (
+        <CursorLayer item={item} tool={tool} />
+      )}
     </>
   );
 });

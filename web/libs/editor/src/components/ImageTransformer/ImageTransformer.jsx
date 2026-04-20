@@ -4,6 +4,7 @@ import { getBoundingBoxAfterChanges } from "../../utils/image";
 import LSTransformer from "./LSTransformer";
 import LSTransformerOld from "./LSTransformerOld";
 import { FF_DEV_2671, FF_ZOOM_OPTIM, isFF } from "../../utils/feature-flags";
+import { computeAnchorSize, computeAnchorHitSize } from "./anchorSizing";
 
 const EPSILON = 0.001;
 
@@ -61,7 +62,8 @@ export default class TransformerComponent extends Component {
       });
 
       if (!shapeContainer) return;
-      if (shapeContainer.hasName("_transformable")) selectedNodes.push(shapeContainer);
+      if (shapeContainer.hasName("_transformable"))
+        selectedNodes.push(shapeContainer);
       if (!shapeContainer.find) return;
 
       const transformableElements = shapeContainer.find((node) => {
@@ -73,7 +75,8 @@ export default class TransformerComponent extends Component {
     const prevNodes = this.transformer.nodes();
     // do nothing if selected node is already attached
     const nodesWereNotChanged =
-      selectedNodes?.length === prevNodes?.length && !selectedNodes.find((node, idx) => node !== prevNodes[idx]);
+      selectedNodes?.length === prevNodes?.length &&
+      !selectedNodes.find((node, idx) => node !== prevNodes[idx]);
 
     if (nodesWereNotChanged) {
       return;
@@ -114,10 +117,16 @@ export default class TransformerComponent extends Component {
     const stage = this.transformer.getStage();
     const { stageWidth, stageHeight } = this.props.item;
 
-    let [scaledStageWidth, scaledStageHeight] = [stageWidth * stage.scaleX(), stageHeight * stage.scaleY()];
+    let [scaledStageWidth, scaledStageHeight] = [
+      stageWidth * stage.scaleX(),
+      stageHeight * stage.scaleY(),
+    ];
 
     if (isFF(FF_ZOOM_OPTIM) && this.props.item.isSideways) {
-      [scaledStageWidth, scaledStageHeight] = [scaledStageHeight, scaledStageWidth];
+      [scaledStageWidth, scaledStageHeight] = [
+        scaledStageHeight,
+        scaledStageWidth,
+      ];
     }
     const [stageX, stageY] = [stage.x(), stage.y()];
 
@@ -131,7 +140,8 @@ export default class TransformerComponent extends Component {
 
   constrainSizes = (oldBox, newBox) => {
     // it's important to compare against `undefined` because it can be missed (not rotated box?)
-    const rotation = newBox.rotation !== undefined ? newBox.rotation : oldBox.rotation;
+    const rotation =
+      newBox.rotation !== undefined ? newBox.rotation : oldBox.rotation;
     const isRotated = rotation !== oldBox.rotation;
     const stageDimensions = this.getStageAbsoluteDimensions();
 
@@ -144,11 +154,20 @@ export default class TransformerComponent extends Component {
       const selfRect = { x: 0, y: 0, width, height };
 
       // bounding box, got by applying current shift and rotation to normalized box
-      const clientRect = getBoundingBoxAfterChanges(selfRect, { x, y }, rotation);
+      const clientRect = getBoundingBoxAfterChanges(
+        selfRect,
+        { x, y },
+        rotation,
+      );
       const fixed = this.fitBBoxToScaledStage(clientRect, stageDimensions);
 
       // if bounding box is out of stage — do nothing
-      if (["x", "y", "width", "height"].some((key) => Math.abs(fixed[key] - clientRect[key]) > EPSILON)) return oldBox;
+      if (
+        ["x", "y", "width", "height"].some(
+          (key) => Math.abs(fixed[key] - clientRect[key]) > EPSILON,
+        )
+      )
+        return oldBox;
       return newBox;
     }
     return this.fitBBoxToScaledStage(newBox, stageDimensions);
@@ -186,6 +205,10 @@ export default class TransformerComponent extends Component {
   };
 
   renderLSTransformer() {
+    const zoomScale = this.props.item.zoomScale || 1;
+    const anchorSize = computeAnchorSize(zoomScale);
+    const hitSize = computeAnchorHitSize(anchorSize, zoomScale);
+
     return (
       <>
         <LSTransformer
@@ -204,9 +227,24 @@ export default class TransformerComponent extends Component {
           borderDash={[3, 1]}
           // borderStroke={"red"}
           boundBoxFunc={this.constrainSizes}
-          anchorSize={8}
+          anchorSize={anchorSize}
+          anchorCornerRadius={anchorSize / 2}
+          anchorStyleFunc={(anchor) => {
+            // Expand the invisible hit region around each resize handle
+            // so small bounding boxes are easier to grab and resize
+            anchor.hitFunc(function (context) {
+              const halfHit = hitSize / 2;
+              const halfAnchor = anchorSize / 2;
+              const offset = halfHit - halfAnchor;
+
+              context.beginPath();
+              context.rect(-offset, -offset, hitSize, hitSize);
+              context.closePath();
+              context.fillStrokeShape(anchor);
+            });
+          }}
           flipEnabled={true}
-          zoomedIn={this.props.item.zoomScale > 1}
+          zoomedIn={zoomScale > 1}
           onDragStart={(e) => {
             const {
               item: { selectedRegionsBBox },
@@ -214,7 +252,12 @@ export default class TransformerComponent extends Component {
 
             this.freeze();
 
-            if (!this.transformer || e.target !== e.currentTarget || !selectedRegionsBBox) return;
+            if (
+              !this.transformer ||
+              e.target !== e.currentTarget ||
+              !selectedRegionsBBox
+            )
+              return;
 
             this.draggingAreaBBox = {
               x: selectedRegionsBBox.left,
@@ -242,6 +285,10 @@ export default class TransformerComponent extends Component {
   }
 
   renderOldLSTransformer() {
+    const zoomScale = this.props.item.zoomScale || 1;
+    const anchorSize = computeAnchorSize(zoomScale);
+    const hitSize = computeAnchorHitSize(anchorSize, zoomScale);
+
     return (
       <>
         <LSTransformerOld
@@ -256,9 +303,22 @@ export default class TransformerComponent extends Component {
           borderDash={[3, 1]}
           // borderStroke={"red"}
           boundBoxFunc={this.constrainSizes}
-          anchorSize={8}
+          anchorSize={anchorSize}
+          anchorCornerRadius={anchorSize / 2}
+          anchorStyleFunc={(anchor) => {
+            anchor.hitFunc(function (context) {
+              const halfHit = hitSize / 2;
+              const halfAnchor = anchorSize / 2;
+              const offset = halfHit - halfAnchor;
+
+              context.beginPath();
+              context.rect(-offset, -offset, hitSize, hitSize);
+              context.closePath();
+              context.fillStrokeShape(anchor);
+            });
+          }}
           flipEnabled={true}
-          zoomedIn={this.props.item.zoomScale > 1}
+          zoomedIn={zoomScale > 1}
           onDragStart={(e) => {
             const {
               item: { selectedRegionsBBox },
@@ -266,7 +326,12 @@ export default class TransformerComponent extends Component {
 
             this.freeze();
 
-            if (!this.transformer || e.target !== e.currentTarget || !selectedRegionsBBox) return;
+            if (
+              !this.transformer ||
+              e.target !== e.currentTarget ||
+              !selectedRegionsBBox
+            )
+              return;
 
             this.draggingAreaBBox = {
               x: selectedRegionsBBox.left,
