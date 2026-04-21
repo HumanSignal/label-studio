@@ -15,12 +15,6 @@ export const FF_DEV_2536 = "fflag_feat_front_dev-2536_comment_notifications_shor
 export const FF_LOPS_E_3 = "fflag_feat_all_lops_e_3_datasets_short";
 
 /**
- * Allow to filter tasks in Data Manager by annotation results and user annotated on the same annotation
- * @link https://app.launchdarkly.com/projects/default/flags/fflag_root_45_better_user_filter
- */
-export const FF_BETTER_USER_FILTER = "fflag_root_45_better_user_filter";
-
-/**
  * Strict task overlap enforcement - prevents annotators from submitting
  * annotations when task overlap limit has been reached
  */

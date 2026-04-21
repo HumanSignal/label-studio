@@ -6,7 +6,6 @@ STALE_FEATURE_FLAGS = {
     # Feb 6
     'fflag_front_dia_1150_ddisco_sneak_preview': False,
     # Dec 31
-    'fflag_root_45_better_user_filter': True,
     'fflag_feat_root_16_support_parquet_cloud_storage': True,
     'fflag_feat_root_47_plugins_without_eval': False,
     'fflag_feat_front_bros_327_multiple_labels_regions_short': True,
