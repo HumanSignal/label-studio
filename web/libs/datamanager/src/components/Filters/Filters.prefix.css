@@ -5,7 +5,10 @@
   &:not(&_sidebar) {
     padding-top: var(--spacing-tight);
     min-width: 400px;
+    max-height: 70vh;
     border-radius: var(--corner-radius-small);
+    display: flex;
+    flex-direction: column;
     box-shadow:
       0 3px 6px -4px rgb(0 0 0 / 12%),
       0 6px 16px 0 rgb(0 0 0 / 8%),
@@ -63,6 +66,15 @@
       flex-flow: column nowrap;
       gap: var(--spacing-tight);
     }
+  }
+
+  &:not(&_sidebar) &__list {
+    flex: 1;
+    min-height: 0;
+  }
+
+  &:not(&_sidebar) &__list_withFilters {
+    overflow-y: auto;
   }
 
   &_sidebar &__list {
