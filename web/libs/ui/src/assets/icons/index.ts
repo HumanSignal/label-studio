@@ -102,6 +102,7 @@ export { ReactComponent as IconDatasets } from "./datasets.svg";
 export { ReactComponent as IconDelete } from "./delete.svg";
 export { ReactComponent as IconDetails } from "./details.svg";
 export { ReactComponent as IconDocument } from "./document.svg";
+export { ReactComponent as IconDollarCircle } from "./dollar-circle.svg";
 export { ReactComponent as IconDoor } from "./door.svg";
 export { ReactComponent as IconDown } from "./down.svg";
 export { ReactComponent as IconDraftCreated } from "./draft-created.svg";
