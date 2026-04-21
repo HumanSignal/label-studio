@@ -124,6 +124,128 @@ describe("tasks DataStore", () => {
     expect(result).toBeNull();
   });
 
+  describe("mergeAnnotations", () => {
+    const createRootWithTask = (annotations) => {
+      const RootModel = types
+        .model("Root", {
+          taskStore: types.optional(TasksStoreMock, {}),
+          annotationStore: types.optional(types.model({ selected: types.frozen() }), {}),
+          SDK: types.frozen({ mode: "explorer", invoke: jest.fn() }),
+        })
+        .actions(() => ({
+          apiCall: jest.fn(),
+          invokeAction: jest.fn(),
+        }));
+
+      const root = RootModel.create({ taskStore: { list: [] } });
+      const task = root.taskStore.applyTaskSnapshot({
+        id: 100,
+        annotations,
+      });
+      return { root, task };
+    };
+
+    it("preserves server userGenerate/sentUserGenerate when replacing a stub (FIT-1680)", () => {
+      // Server response for a saved annotation: userGenerate/sentUserGenerate are falsy.
+      const { task } = createRootWithTask([
+        {
+          id: 42,
+          pk: 42,
+          result: [],
+          is_stub: true,
+          userGenerate: false,
+          sentUserGenerate: false,
+        },
+      ]);
+
+      // In-memory LSF annotation immediately after a Submit from Quick View:
+      // sendUserGenerate() flipped sentUserGenerate to true and userGenerate stayed true
+      // because LSF never resets that local creation-lifecycle flag.
+      const lsfAnnotation = {
+        id: 42,
+        pk: "42",
+        draftId: null,
+        leadTime: 5,
+        serializeAnnotation: () => [{ id: "region-1", type: "labels", value: {} }],
+        userGenerate: true,
+        sentUserGenerate: true,
+      };
+
+      task.mergeAnnotations([lsfAnnotation]);
+
+      expect(task.annotations).toHaveLength(1);
+      const merged = task.annotations[0];
+      expect(merged.userGenerate).toBe(false);
+      expect(merged.sentUserGenerate).toBe(false);
+      expect(merged.is_stub).toBe(false);
+      expect(merged.result).toEqual([{ id: "region-1", type: "labels", value: {} }]);
+    });
+
+    it("replaces stub result with live serialized regions (FIT-1660 guard)", () => {
+      const { task } = createRootWithTask([
+        {
+          id: 43,
+          pk: 43,
+          result: [],
+          is_stub: true,
+          userGenerate: false,
+          sentUserGenerate: false,
+        },
+      ]);
+
+      const lsfAnnotation = {
+        id: 43,
+        pk: "43",
+        draftId: null,
+        leadTime: 12,
+        serializeAnnotation: () => [{ id: "live-region", type: "labels", value: {} }],
+        userGenerate: false,
+        sentUserGenerate: false,
+      };
+
+      task.mergeAnnotations([lsfAnnotation]);
+
+      const merged = task.annotations[0];
+      expect(merged.is_stub).toBe(false);
+      expect(merged.result).toEqual([{ id: "live-region", type: "labels", value: {} }]);
+      expect(merged.leadTime).toBe(12);
+      expect(merged.pk).toBe("43");
+    });
+
+    it("returns existing entry unchanged when it is not a stub", () => {
+      const { task } = createRootWithTask([
+        {
+          id: 44,
+          pk: 44,
+          result: [{ id: "saved-region", type: "labels", value: {} }],
+          is_stub: false,
+          userGenerate: false,
+          sentUserGenerate: false,
+          leadTime: 99,
+        },
+      ]);
+
+      const lsfAnnotation = {
+        id: 44,
+        pk: "44",
+        draftId: null,
+        leadTime: 5,
+        serializeAnnotation: () => [{ id: "lsf-region", type: "labels", value: {} }],
+        userGenerate: true,
+        sentUserGenerate: true,
+      };
+
+      task.mergeAnnotations([lsfAnnotation]);
+
+      const merged = task.annotations[0];
+      expect(merged.result).toEqual([{ id: "saved-region", type: "labels", value: {} }]);
+      expect(merged.userGenerate).toBe(false);
+      expect(merged.sentUserGenerate).toBe(false);
+      expect(merged.leadTime).toBe(99);
+      expect(merged.is_stub).toBe(false);
+    });
+  });
+
   it("loadNextTask gracefully exits and doesn't crash when node is destroyed", async () => {
     // A mock root API that we can control resolution
     let resolveInvokeAction;

@@ -71,6 +71,11 @@ export const create = (columns) => {
                 try {
                   const live = c.serializeAnnotation();
                   if (Array.isArray(live) && live.length > 0) {
+                    // FIT-1680: Keep userGenerate/sentUserGenerate from the freshly-fetched server
+                    // snapshot. The in-memory LSF annotation still carries userGenerate=true and
+                    // sentUserGenerate=true right after a Quick View submit (LSF never resets the
+                    // local creation flag), and copying those here pins Controls.tsx into the
+                    // "Submit" branch instead of the disabled "Update" button.
                     return {
                       ...existingAnnotation,
                       id: existingAnnotation.id,
@@ -78,8 +83,6 @@ export const create = (columns) => {
                       draftId: c.draftId,
                       result: live,
                       leadTime: c.leadTime,
-                      userGenerate: !!c.userGenerate,
-                      sentUserGenerate: !!c.sentUserGenerate,
                       is_stub: false,
                     };
                   }
