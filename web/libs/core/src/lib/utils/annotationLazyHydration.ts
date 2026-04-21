@@ -28,6 +28,22 @@ function annotationResultsEqual(a: unknown, b: unknown): boolean {
 }
 
 /**
+ * FIT-1681: an annotation has an in-flight draft when LSF has applied `versions.draft`
+ * on top of the persisted result (either explicitly via `draftSelected`, or by the
+ * presence of a non-empty `versions.draft` payload). In that case the local MST regions
+ * intentionally diverge from the server's `result` and must not be overwritten by the
+ * Compare-All re-sync path from FIT-1660.
+ */
+function annotationHasLocalDraft(annotation: any): boolean {
+  if (!annotation) return false;
+  if (annotation.draftSelected === true) return true;
+  const draft = annotation.versions?.draft;
+  if (draft == null) return false;
+  if (Array.isArray(draft)) return draft.length > 0;
+  return true;
+}
+
+/**
  * Apply GET /api/annotations/:id/ payload to the matching store annotation (by pk).
  * Mirrors LSFWrapper._hydrateStubAnnotation in datamanager lsf-sdk.js.
  *
@@ -52,6 +68,20 @@ export function applyAnnotationHydrationFromApi(
   const serverResult = fullAnnotation.result;
 
   if (freshHasVersionsResult || freshHasRegions) {
+    // FIT-1681: a local draft is the user's uncommitted work (e.g. reorderings or edits
+    // persisted to the draft endpoint after a prior Submit). Its regions intentionally
+    // diverge from the server `result`; re-applying the server payload here would wipe
+    // the draft from the LSF view and the next autosave would then persist the wiped
+    // state as the new draft — classic data loss. Keep local, but still populate
+    // `versions.result` so the annotation is logically hydrated (prevents repeated
+    // _hydrateStubAnnotation attempts and keeps the Submit/Update button state correct).
+    if (annotationHasLocalDraft(freshAnnotation)) {
+      if (!freshHasVersionsResult && serverResult !== undefined) {
+        freshAnnotation.addVersions?.({ result: serverResult });
+      }
+      return false;
+    }
+
     const localSerialized =
       typeof freshAnnotation.serializeAnnotation === "function" ? freshAnnotation.serializeAnnotation() : undefined;
     // MST can already have regions (e.g. after task reload + merge) while the
