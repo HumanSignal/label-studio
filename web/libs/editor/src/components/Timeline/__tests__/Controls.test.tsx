@@ -317,6 +317,19 @@ describe("Controls", () => {
       await userEvent.click(screen.getByRole("button", { name: /skip to end/i }));
       expect(onForward).toHaveBeenCalled();
     });
+
+    it("keeps hop controls available when frames view is disabled", async () => {
+      const onForward = mock();
+      renderControls(
+        { position: 50, onForward, altHopSize: 10, disableFrames: true },
+        { settings: { stepSize: () => 5 } },
+      );
+
+      fireEvent.keyDown(document, { key: "Shift" });
+      await userEvent.click(screen.getByRole("button", { name: /media fast forward/i }));
+
+      expect(onForward).toHaveBeenCalledWith(10);
+    });
   });
 
   describe("collapse and fullscreen", () => {

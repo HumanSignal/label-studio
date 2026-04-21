@@ -216,7 +216,7 @@ export const Controls: FC<TimelineControlsProps> = memo(
           <Space size="small">
             {customControls?.leftCenter}
             <AltControls
-              showAlterantive={altControlsMode && !disableFrames}
+              showAlterantive={altControlsMode}
               main={
                 <>
                   {settings?.stepSize && !disableFrames && (
@@ -270,7 +270,7 @@ export const Controls: FC<TimelineControlsProps> = memo(
               {playing ? <IconTimelinePause /> : <IconTimelinePlay />}
             </ControlButton>
             <AltControls
-              showAlterantive={altControlsMode && !disableFrames}
+              showAlterantive={altControlsMode}
               main={
                 <>
                   <ControlButton
