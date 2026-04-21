@@ -23,11 +23,8 @@ export const Tour: React.FC<TourProps> = ({ name, autoStart = false, delay = 0, 
   }
   const [state, dispatch] = userTourStateReducer();
 
-  // Skip tours in automated browsers: Cypress (in-app E2E) and WebDriver (e.g. Selenium), which set
-  // navigator.webdriver. Avoids overlays blocking clicks and matches external automation expectations.
-  const isAutomationE2E =
-    typeof window !== "undefined" &&
-    (!!(window as any).Cypress || (typeof navigator !== "undefined" && navigator.webdriver === true));
+  // Skip tours only in Cypress in-app E2E runs. Selenium/WebDriver should keep normal tour behavior.
+  const isAutomationE2E = typeof window !== "undefined" && "Cypress" in window;
 
   useEffect(() => {
     // E2E: skip registration and product-tour fetch. Joyride still mounts a subtree when steps exist
