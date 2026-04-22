@@ -25,7 +25,7 @@
 .cardDescription {
   color: var(--color-neutral-content-subtler);
 
-  /* title/medium */
+  /* body/medium */
   font-family: var(--font-family-body);
   font-size: var(--font-size-body-medium);
   font-style: normal;

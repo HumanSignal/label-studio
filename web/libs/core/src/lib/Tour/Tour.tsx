@@ -150,7 +150,7 @@ export const Tour: React.FC<TourProps> = ({ name, autoStart = false, delay = 0, 
           backgroundColor: "var(--color-neutral-background)",
           primaryColor: "var(--color-primary-surface)",
           textColor: "var(--color-neutral-content)",
-          overlayColor: "rgba(var(--color-neutral-shadow-raw) / calc( 50% * var(--shadow-intensity)))",
+          overlayColor: "rgba(var(--color-neutral-shadow-raw) / 50%)",
           // Match tooltip card so the floater arrow is not a contrasting primary wedge
           arrowColor: "var(--color-neutral-background)",
         },
