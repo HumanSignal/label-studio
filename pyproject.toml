@@ -38,7 +38,7 @@ dependencies = [
     "drf-flex-fields (==0.9.5)",
     "drf-spectacular (==0.28.0)",
     "drf-generators (==0.3.0)",
-    "lxml[html-clean] (>=4.9.4)",
+    "lxml[html-clean] (>=6.1.0)",
     "defusedxml (>=0.7.1)",
     "numpy (>=2.2.6,<3.0.0)",
     "ordered-set (==4.0.2)",
@@ -73,7 +73,7 @@ dependencies = [
 ]
 
 [tool.uv.sources]
-label-studio-sdk = { git = "https://github.com/HumanSignal/label-studio-sdk.git", rev = "98675b8a5979f58a10df0a7286d536e97e4a7976" }
+label-studio-sdk = { git = "https://github.com/HumanSignal/label-studio-sdk.git", rev = "b8e4ec1907eaa4deaa7e9e93b9d8c097274e47d7" }
 
 [project.optional-dependencies]
 uwsgi = [
