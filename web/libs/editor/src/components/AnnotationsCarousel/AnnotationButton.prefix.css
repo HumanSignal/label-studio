@@ -183,21 +183,28 @@
   &_selected {
     background-color: var(--color-neutral-background);
     border-color: var(--color-neutral-border);
-    transform: translate(0, 1px);
-    margin-top: 1px;
+    border-top-color: var(--color-neutral-border-bold);
+    border-bottom-color: var(--color-neutral-background);
     height: calc(100% - 2px);
     box-shadow:
       inset 0 4px 2px 0 var(--color-neutral-background),
-      0 4px 2px 0 rgba(var(--color-neutral-shadow-raw) / 20%);
+      0 4px 2px 0 rgba(var(--color-neutral-shadow-raw) / 26%);
 
     & .annotation-button__picSection {
       opacity: 1;
+    }
+
+    & .annotation-button__main {
+      .annotation-button__name {
+        font-weight: 600;
+      }
     }
 
     &:hover {
       cursor: default;
       background-color: var(--color-neutral-background);
       border-color: var(--color-neutral-border);
+      border-top-color: var(--color-neutral-border-bold);
     }
 
     & .annotation-button__created {

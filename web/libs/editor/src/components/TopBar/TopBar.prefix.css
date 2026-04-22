@@ -53,4 +53,17 @@
       }
     }
   }
+
+  &::after {
+    content: "";
+    display: block;
+    height: 24px;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: -1;
+    pointer-events: none;
+    background: linear-gradient(to top, rgba(var(--color-neutral-shadow-raw) / 8%), transparent);
+  }
 }
