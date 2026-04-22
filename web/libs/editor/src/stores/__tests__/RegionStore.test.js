@@ -21,6 +21,7 @@ import "../../tags/visual/View";
 import "../../tags/object/RichText";
 import "../../tags/object/Image/Image.js";
 import "../../tags/control/Rectangle.js";
+import { dedupeAnnotationWireResults } from "../../utils/dedupeAnnotationWireResults";
 import AppStore from "../AppStore";
 
 const MINIMAL_CONFIG = '<View><Image name="img" value="$img" /></View>';
@@ -638,6 +639,39 @@ describe("RegionStore", () => {
       annotation.regionStore.clearSelection();
       expect(annotation.regionStore.selection.size).toBe(0);
       expect(annotation.regionStore.hasSelection).toBe(false);
+    });
+  });
+
+  describe("FIT-1669: wire-result dedupe helper", () => {
+    it("dedupeAnnotationWireResults collapses (id, from_name, type) collisions", () => {
+      // Pure helper test: `fixBrokenAnnotation` applies this after its reducer
+      // so duplicate-id hydrations never reach `deserializeSingleResult`.
+      const serialized = dedupeAnnotationWireResults([
+        {
+          id: "region-A",
+          from_name: "lbl",
+          to_name: "img",
+          type: "labels",
+          value: { labels: ["A"] },
+        },
+        {
+          id: "region-A",
+          from_name: "lbl",
+          to_name: "img",
+          type: "labels",
+          value: { labels: ["A"] },
+        },
+        {
+          id: "region-B",
+          from_name: "lbl",
+          to_name: "img",
+          type: "labels",
+          value: { labels: ["B"] },
+        },
+      ]);
+      expect(serialized.filter((r) => r && r.id === "region-A")).toHaveLength(1);
+      expect(serialized.filter((r) => r && r.id === "region-B")).toHaveLength(1);
+      expect(serialized).toHaveLength(2);
     });
   });
 });

@@ -238,6 +238,34 @@ describe("Annotation model", () => {
       expect(fixed.some((r) => r.type === "relation")).toBe(true);
     });
 
+    it("fixBrokenAnnotation collapses duplicate (id, from_name, type) rows (FIT-1669)", () => {
+      // Ensures the deserialize entry point (used by live annotations,
+      // history items, and predictions) never forwards stacked duplicates
+      // to `deserializeSingleResult` / `area.addResult`. `l`/`img` match
+      // the `MINIMAL_CONFIG` tag names so rows survive the `tagNames`
+      // filter and exercise the dedupe branch.
+      const { annotation } = createStoreWithAnnotation();
+      const json = [
+        { id: "r1", type: "labels", from_name: "l", to_name: "img", value: { labels: ["A"] } },
+        { id: "r1", type: "labels", from_name: "l", to_name: "img", value: { labels: ["A"] } },
+        { id: "r2", type: "labels", from_name: "l", to_name: "img", value: { labels: ["A"] } },
+      ];
+      const fixed = annotation.fixBrokenAnnotation(json);
+      const ids = fixed.filter((r) => r.type === "labels").map((r) => r.id);
+      expect(ids).toEqual(["r1", "r2"]);
+    });
+
+    it("fixBrokenAnnotation preserves distinct from_name on shared id (FIT-1669)", () => {
+      const { annotation } = createStoreWithAnnotation();
+      const json = [
+        { id: "shared", type: "labels", from_name: "l", to_name: "img", value: { labels: ["A"] } },
+        { id: "shared", type: "relation", from_id: "a", to_id: "b", direction: "right", labels: [] },
+      ];
+      const fixed = annotation.fixBrokenAnnotation(json);
+      expect(fixed.some((r) => r.type === "labels" && r.id === "shared")).toBe(true);
+      expect(fixed.some((r) => r.type === "relation")).toBe(true);
+    });
+
     it("serializeAnnotation returns array and resets cursor", () => {
       const { annotation } = createStoreWithAnnotation();
       const result = annotation.serializeAnnotation();

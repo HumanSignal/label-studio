@@ -27,6 +27,7 @@ from rest_framework.settings import api_settings
 from tasks.exceptions import AnnotationDuplicateError
 from tasks.models import Annotation, AnnotationDraft, Prediction, PredictionMeta, Task
 from tasks.ordering import apply_annotation_ordering, apply_prediction_ordering
+from tasks.result_utils import dedupe_annotation_result_list
 from tasks.validation import TaskValidator
 from users.models import User
 from users.serializers import UserSerializer
@@ -178,7 +179,9 @@ class AnnotationSerializer(FlexFieldsModelSerializer):
         if not isinstance(data, list):
             raise ValidationError('annotation "result" field in annotation must be list')
 
-        return data
+        # FIT-1669: collapse `(id, from_name, type)` collisions at the write boundary
+        # so the annotation record never persists duplicate-id rows.
+        return dedupe_annotation_result_list(data)
 
     def get_created_username(self, annotation) -> str:
         user = annotation.completed_by

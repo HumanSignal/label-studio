@@ -1,5 +1,6 @@
+import { mock, describe, it, expect, beforeEach, afterEach, spyOn } from "bun:test";
+import * as mst from "mobx-state-tree";
 import { annotationNeedsHydration, applyAnnotationHydrationFromApi } from "./annotationLazyHydration";
-import type { Mock } from "bun:test";
 
 describe("annotationNeedsHydration", () => {
   it("returns false for non-annotation", () => {
@@ -52,9 +53,14 @@ describe("annotationNeedsHydration", () => {
 });
 
 describe("applyAnnotationHydrationFromApi", () => {
+  let isAliveSpy: ReturnType<typeof spyOn>;
+
   beforeEach(() => {
-    const mst = require("mobx-state-tree");
-    (mst.isAlive as Mock<any>).mockReturnValue(true);
+    isAliveSpy = spyOn(mst, "isAlive").mockReturnValue(true);
+  });
+
+  afterEach(() => {
+    isAliveSpy?.mockRestore();
   });
 
   it("returns false when payload missing result", () => {
@@ -154,6 +160,67 @@ describe("applyAnnotationHydrationFromApi", () => {
     // But versions.result should be populated so the annotation is logically hydrated
     // (prevents repeated re-hydration attempts and keeps Submit/Update button state correct).
     expect(addVersions).toHaveBeenCalledWith({ result: serverResult });
+  });
+
+  it("re-apply path clears existing regions before deserializing server result (FIT-1669)", () => {
+    // Repro: when regions are re-hydrated on scroll in Compare All, `deserializeResults`
+    // on a live annotation with existing areas stacks new results on top of them. The
+    // hydration helper must `deleteAllRegions({ deleteReadOnly: true })` first so the
+    // rebuild starts from a clean slate and the Outliner never renders ghost regions.
+    const deleteAllRegions = mock();
+    const deserializeResults = mock();
+    const ann = {
+      pk: "9",
+      versions: { result: [] },
+      areas: { size: 1 },
+      trackedState: {},
+      serializeAnnotation: () => [{ stale: true }],
+      addVersions: mock(),
+      deleteAllRegions,
+      deserializeResults,
+      updateObjects: mock(),
+      reinitHistory: mock(),
+      history: { freeze: mock(), safeUnfreeze: mock() },
+    };
+    const serverResult = [{ fresh: true }];
+
+    expect(applyAnnotationHydrationFromApi([ann], 9, { result: serverResult })).toBe(true);
+    expect(deleteAllRegions).toHaveBeenCalledWith({ deleteReadOnly: true });
+
+    // Ordering matters: the region wipe must precede the deserialize call.
+    const wipeOrder = deleteAllRegions.mock.invocationCallOrder?.[0];
+    const deserializeOrder = deserializeResults.mock.invocationCallOrder?.[0];
+    expect(wipeOrder).toBeLessThan(deserializeOrder);
+  });
+
+  it("safeUnfreeze does not run if isAlive flips to false after freeze (FIT-1669)", () => {
+    // If `isAlive` flips off between `freeze` and `deserializeResults` (e.g. the
+    // annotation is torn down by a concurrent selection change), safeUnfreeze MUST
+    // NOT be called or MST will throw an assertion error on the dead object.
+    let calls = 0;
+    isAliveSpy.mockImplementation(() => {
+      calls += 1;
+      // Alive on initial guard and after-freeze check, then dead for all subsequent calls.
+      return calls <= 2;
+    });
+
+    const safeUnfreeze = mock();
+    const ann = {
+      pk: "11",
+      versions: { result: [] },
+      areas: { size: 0 },
+      trackedState: {},
+      addVersions: mock(),
+      deserializeResults: mock(),
+      updateObjects: mock(),
+      reinitHistory: mock(),
+      history: { freeze: mock(), safeUnfreeze },
+    };
+
+    applyAnnotationHydrationFromApi([ann], 11, { result: [{ id: "r" }] });
+
+    expect(ann.history.freeze).toHaveBeenCalled();
+    expect(safeUnfreeze).not.toHaveBeenCalled();
   });
 
   it("preserves local work when versions.draft is present even without draftSelected flag (FIT-1681)", () => {

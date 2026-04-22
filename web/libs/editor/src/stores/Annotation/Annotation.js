@@ -10,6 +10,7 @@ import Types from "../../core/Types";
 import Area from "../../regions/Area";
 import Result from "../../regions/Result";
 import Utils from "../../utils";
+import { dedupeAnnotationWireResults } from "../../utils/dedupeAnnotationWireResults";
 import { FF_DEV_1284, FF_DEV_3391, FF_LSDV_4583, FF_REVIEWER_FLOW, isFF } from "../../utils/feature-flags";
 import { delay, isDefined } from "../../utils/utilities";
 import { CommentStore } from "../Comment/CommentStore";
@@ -1086,7 +1087,16 @@ const _Annotation = types
     // Some annotations may be created with wrong assumptions
     // And this problems are fixable, so better to fix them on start
     fixBrokenAnnotation(json) {
-      return (json ?? []).reduce((res, objRaw) => {
+      // FIT-1669: collapse `(id, from_name, type)` collisions at the
+      // deserialize entry point so the rest of the pipeline
+      // (deserializeSingleResult -> area.addResult -> Outliner) never sees
+      // stacked duplicates. This is the canonical path for every
+      // hydration — live annotation, history items, and predictions — so
+      // it also protects the AnnotationHistory panel from rendering ghost
+      // rows when a tainted `result` payload lands on the client.
+      // Applied after the reducer so label-redirect rewrites on
+      // `obj.from_name` / `obj.type` are reflected in the dedupe key.
+      const normalized = (json ?? []).reduce((res, objRaw) => {
         if (!objRaw) return res;
 
         const obj = structuredClone(objRaw) ?? {};
@@ -1161,6 +1171,8 @@ const _Annotation = types
 
         return res;
       }, []);
+
+      return dedupeAnnotationWireResults(normalized);
     },
 
     setSuggestions(rawSuggestions) {

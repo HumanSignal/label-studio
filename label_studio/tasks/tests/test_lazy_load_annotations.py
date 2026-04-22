@@ -15,6 +15,40 @@ from rest_framework.test import APITestCase
 from tasks.serializers import AnnotationSerializer, AnnotationStubSerializer
 from tasks.tests.factories import AnnotationFactory, TaskFactory
 
+# FIT-1669: payload mirrors the bug reported in the ticket — two result rows share
+# the same (id, from_name, type) with different taxonomy values. The write path
+# must collapse them before persistence so the editor can't hydrate ghost regions.
+FIT_1669_DUPLICATE_RESULT = [
+    {
+        'id': 'region-A',
+        'from_name': 'tax',
+        'to_name': 'txt',
+        'type': 'taxonomy',
+        'value': {'taxonomy': [['A1_term_inexact', 'B2_diff_trads_var']]},
+    },
+    {
+        'id': 'region-A',
+        'from_name': 'tax',
+        'to_name': 'txt',
+        'type': 'taxonomy',
+        'value': {'taxonomy': [['E1_explicitation', 'F3_err_collocation']]},
+    },
+    {
+        'id': 'region-B',
+        'from_name': 'tax',
+        'to_name': 'txt',
+        'type': 'taxonomy',
+        'value': {'taxonomy': [['A1_term_inexact', 'B2_diff_trads_var']]},
+    },
+    {
+        'id': 'region-C',
+        'from_name': 'tax',
+        'to_name': 'txt',
+        'type': 'taxonomy',
+        'value': {'taxonomy': [['Magnetisme']]},
+    },
+]
+
 
 class TestAnnotationStubSerializer(APITestCase):
     """Test the AnnotationStubSerializer excludes result field and includes is_stub flag."""
@@ -557,3 +591,46 @@ class TestTaskAgreementAPI(APITestCase):
 
         # Taxonomy aggregates leaf nodes
         assert data['distributions']['taxonomy']['labels'] == {'Dog': 2, 'Cat': 1}
+
+
+class TestAnnotationResultDedupe(APITestCase):
+    """FIT-1669 RED: write-path dedupe for AnnotationSerializer.
+
+    Duplicate-id result entries (same (id, from_name, type)) must be collapsed before
+    persistence. We exercise the serializer validator directly — cheaper than a full
+    API round trip and keeps the failure mode localized to the write boundary we are
+    fixing.
+    """
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.organization = OrganizationFactory(created_by_active_organization=True)
+        cls.project = ProjectFactory(organization=cls.organization)
+        cls.user = cls.organization.created_by
+        cls.task = TaskFactory(project=cls.project, data={'text': 'test'})
+
+    def test_annotation_validate_result_collapses_duplicate_region_ids(self):
+        serializer = AnnotationSerializer(
+            data={
+                'task': self.task.id,
+                'completed_by': self.user.id,
+                'result': FIT_1669_DUPLICATE_RESULT,
+            }
+        )
+        assert serializer.is_valid(), serializer.errors
+
+        cleaned = serializer.validated_data['result']
+        assert len(cleaned) == 3, cleaned
+        assert [row['id'] for row in cleaned] == ['region-A', 'region-B', 'region-C']
+        # First occurrence wins — later duplicates are dropped.
+        assert cleaned[0]['value']['taxonomy'] == [['A1_term_inexact', 'B2_diff_trads_var']]
+
+    def test_annotation_validate_result_preserves_distinct_from_name(self):
+        """Two rows sharing `id` but with different `from_name` must both survive."""
+        payload = [
+            {'id': 'shared', 'from_name': 'tax', 'to_name': 'txt', 'type': 'taxonomy', 'value': {'taxonomy': [['A']]}},
+            {'id': 'shared', 'from_name': 'rating', 'to_name': 'txt', 'type': 'rating', 'value': {'rating': 4}},
+        ]
+        serializer = AnnotationSerializer(data={'task': self.task.id, 'completed_by': self.user.id, 'result': payload})
+        assert serializer.is_valid(), serializer.errors
+        assert serializer.validated_data['result'] == payload

@@ -92,13 +92,28 @@ export function applyAnnotationHydrationFromApi(
 
     if (needsReapplyFromServer) {
       freshAnnotation.history?.freeze?.();
-      if (!isAlive(freshAnnotation) || !isAlive(freshAnnotation.trackedState)) return false;
-      freshAnnotation.addVersions?.({ result: serverResult });
-      freshAnnotation.deserializeResults(serverResult);
-      freshAnnotation.updateObjects?.();
-      freshAnnotation.history?.safeUnfreeze?.();
-      freshAnnotation.reinitHistory?.();
-      return true;
+      try {
+        if (!isAlive(freshAnnotation) || !isAlive(freshAnnotation.trackedState)) return false;
+        // FIT-1669: MST `deserializeResults` is additive — it pushes new areas/results
+        // alongside existing ones instead of replacing them. When Compare-All re-hydrates
+        // on scroll, this stacks duplicate-id rows onto the same Outliner area and the
+        // "By Label" view renders ghost rows. Wipe the regions first so the rebuild is
+        // deterministic. `deleteReadOnly: true` matches the prior server-authoritative
+        // re-sync contract.
+        freshAnnotation.deleteAllRegions?.({ deleteReadOnly: true });
+        freshAnnotation.addVersions?.({ result: serverResult });
+        freshAnnotation.deserializeResults(serverResult);
+        freshAnnotation.updateObjects?.();
+        freshAnnotation.reinitHistory?.();
+        return true;
+      } finally {
+        // Always release the freeze — even if isAlive flipped off mid-hydration or a
+        // downstream action threw (provided the node wasn't destroyed) — otherwise
+        // the undo stack stays frozen for the remainder of the session.
+        if (isAlive(freshAnnotation)) {
+          freshAnnotation.history?.safeUnfreeze?.();
+        }
+      }
     }
 
     if (!freshHasVersionsResult && fullAnnotation.result) {
@@ -108,11 +123,16 @@ export function applyAnnotationHydrationFromApi(
   }
 
   freshAnnotation.history?.freeze?.();
-  if (!isAlive(freshAnnotation) || !isAlive(freshAnnotation.trackedState)) return false;
-  freshAnnotation.addVersions?.({ result: fullAnnotation.result });
-  freshAnnotation.deserializeResults(fullAnnotation.result);
-  freshAnnotation.updateObjects?.();
-  freshAnnotation.history?.safeUnfreeze?.();
-  freshAnnotation.reinitHistory?.();
-  return true;
+  try {
+    if (!isAlive(freshAnnotation) || !isAlive(freshAnnotation.trackedState)) return false;
+    freshAnnotation.addVersions?.({ result: fullAnnotation.result });
+    freshAnnotation.deserializeResults(fullAnnotation.result);
+    freshAnnotation.updateObjects?.();
+    freshAnnotation.reinitHistory?.();
+    return true;
+  } finally {
+    if (isAlive(freshAnnotation)) {
+      freshAnnotation.history?.safeUnfreeze?.();
+    }
+  }
 }

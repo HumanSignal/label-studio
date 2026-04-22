@@ -1,4 +1,4 @@
-import { render, screen, waitFor, fireEvent } from "@testing-library/react";
+import { render, screen, waitFor, fireEvent, act } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import { useState } from "react";
 import type { ComponentProps } from "react";
@@ -42,10 +42,15 @@ describe("ModalWindow", () => {
       </ControlledModal>,
     );
 
-    fireEvent.click(screen.getByTestId("open-btn"));
+    await act(async () => {
+      fireEvent.click(screen.getByTestId("open-btn"));
+    });
+
     expect(await screen.findByRole("dialog")).toBeInTheDocument();
 
-    fireEvent.keyDown(document, { key: "Escape", code: "Escape", bubbles: true });
+    await act(async () => {
+      fireEvent.keyDown(document, { key: "Escape", code: "Escape", bubbles: true });
+    });
 
     await waitFor(() => {
       expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
@@ -59,8 +64,13 @@ describe("ModalWindow", () => {
       </ControlledModal>,
     );
 
-    fireEvent.click(screen.getByTestId("open-btn"));
-    fireEvent.click(screen.getByTestId("modal-window-close-button"));
+    await act(async () => {
+      fireEvent.click(screen.getByTestId("open-btn"));
+    });
+
+    await act(async () => {
+      fireEvent.click(screen.getByTestId("modal-window-close-button"));
+    });
 
     await waitFor(() => {
       expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
@@ -74,7 +84,10 @@ describe("ModalWindow", () => {
       </ControlledModal>,
     );
 
-    fireEvent.click(screen.getByTestId("open-btn"));
+    await act(async () => {
+      fireEvent.click(screen.getByTestId("open-btn"));
+    });
+
     expect(await screen.findByRole("dialog", { name: "Modal window" })).toBeInTheDocument();
   });
 
@@ -85,7 +98,10 @@ describe("ModalWindow", () => {
       </ControlledModal>,
     );
 
-    fireEvent.click(screen.getByTestId("open-btn"));
+    await act(async () => {
+      fireEvent.click(screen.getByTestId("open-btn"));
+    });
+
     expect(await screen.findByRole("dialog")).toBeInTheDocument();
     expect(screen.queryByTestId("modal-window-scrim")).not.toBeInTheDocument();
   });
@@ -97,7 +113,10 @@ describe("ModalWindow", () => {
       </ControlledModal>,
     );
 
-    fireEvent.click(screen.getByTestId("open-btn"));
+    await act(async () => {
+      fireEvent.click(screen.getByTestId("open-btn"));
+    });
+
     expect(await screen.findByRole("dialog")).toBeInTheDocument();
     expect(screen.getByTestId("modal-window-scrim")).toBeInTheDocument();
   });
@@ -109,7 +128,10 @@ describe("ModalWindow", () => {
       </ControlledModal>,
     );
 
-    fireEvent.click(screen.getByTestId("open-btn"));
+    await act(async () => {
+      fireEvent.click(screen.getByTestId("open-btn"));
+    });
+
     expect(await screen.findByRole("dialog", { name: "Static" })).toBeInTheDocument();
   });
 
