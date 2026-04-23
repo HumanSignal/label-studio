@@ -22,20 +22,25 @@ To more easily [manage access to Label Studio Enterprise](manage_users.html), yo
 
 ## Set up SAML SSO
 
-The organization Owner or Administrator for Label Studio Enterprise can set up SSO & SAML for the instance. Label Studio Enterprise supports the following IdPs:
+The organization Owner or Administrator for Label Studio Enterprise can set up SSO & SAML. 
+
+Label Studio Enterprise supports the following IdPs:
 - [Okta](https://www.youtube.com/watch?v=Dr-_hyWIw4M)
 - [Google SAML](google_saml.html)
 - [Ping Federate and Ping Identity SAML SSO Setup Example](pingone.html)
-- OneLogin
 - Microsoft Entra ID (formerly Azure Active Directory, Azure AD)
 - Auth0
 - Others that use SAML assertions
 
-After setting up the SSO, you can use native authentication to access the Label Studio UI, however it's not a recommended option especially for the user with the Owner role.
+After setting up the SSO, you can use native authentication to access the Label Studio UI. 
 
-- You can use SSO along with normal login. This is not a recommended option.
+- You can use SSO along with a normal login. This is not a recommended option, especially for the user in the Owner role. 
 
-- You can prevent a user from creating his own organization by using [DISABLE_SIGNUP_WITHOUT_LINK](admin_user#Require-invites-for-new-users) option.
+- You can prevent users from registering a new account through the `/user/signup` page by setting the following environment variable:
+
+```bash
+LABEL_STUDIO_DISABLE_SIGNUP_WITHOUT_LINK=true
+```
 
 ### Connect your Identity Provider to Label Studio Enterprise
 
@@ -45,14 +50,13 @@ The details will vary depending on your IdP, but in general you will complete th
 
 #### From Label Studio:
 
-1. Go to the **Organization** page. 
+1. Go to **Organization > Security > SSO & SCIM**. 
     
     If you do not see the option to select **Organization**, you are not logged in with the appropriate role. 
-2. Select **SSO & SAML** in the upper right. 
-3. In the **Organization** field, ensure the domain matches the domain used for your organization in your IdP.
-4. Copy the following URLs:
-    
-    * **Assertion Consumer Service (ACS) URL with Audience (EntityID), and Recipient (Reply) details**---The IdP uses this URL to redirect users to after a successful authentication. Format: `https://<your-host>/saml/<token>/acs`
+2. Under **Domain**, ensure the domain matches the domain used for your organization in your IdP. Click **Next**. 
+3. Select your IdP and copy the service provider details:
+    * **ACS URL**---The IdP uses this URL to redirect users to after a successful authentication. Format: `https://<your-host>/saml/<token>/acs`
+    * **Entity ID**---The IdP uses this URL to identify the service provider. Format: `https://<your-host>/saml/<token>/acs`
     * **Login URL**---This is the URL that users will use to log in to Label Studio. Format: `https://<your-host>/saml/<token>/login`
     * **Logout URL**---This is the URL used to redirect users after successfully logging out of Label Studio. Format: `https://<your-host>/saml/<token>/logout`
 
@@ -74,8 +78,10 @@ The details will vary depending on your IdP, but in general you will complete th
 | Last or family name | LastName |
 | Group name | Groups | 
 
-!!! note Note
-    Different Identity Providers use different attribute names. Label Studio provides **presets** in the SSO & SAML settings page to quickly configure the correct attribute mappings for popular IdPs. You can also manually configure custom attribute names if your IdP uses different values.
+!!! info Tip
+    Different Identity Providers use different attribute names. 
+    
+    Label Studio provides presets in the SSO & SAML settings page to quickly configure the correct attribute mappings for popular IdPs. You can also manually configure custom attribute names if your IdP uses different values.
 
 **Attribute presets by IdP:**
 
@@ -100,7 +106,11 @@ If your Entra ID is configured with default claim URIs, use:
 | Groups | `http://schemas.microsoft.com/ws/2008/06/identity/claims/groups` |
 
 !!! warning "Important: Group names vs. Object IDs in Entra ID"
-    If you use group-based mappings (roles, workspaces, projects), you must configure Entra ID to send **group names** (not Object IDs) in the groups claim. In **User Attributes & Claims → Groups returned in claim**, select **Groups assigned to the application** and set **Source attribute** to `sAMAccountName` or another human-readable group property. Sending Object IDs instead of names will prevent group mappings from working correctly.
+    If you use group-based mappings (roles, workspaces, projects), you must configure Entra ID to send **group names** (not Object IDs) in the groups claim. 
+    
+    In **User Attributes & Claims > Groups returned in claim**, select **Groups assigned to the application** and set **Source attribute** to `sAMAccountName` or another human-readable group property. 
+    
+    Sending Object IDs instead of names will prevent group mappings from working correctly.
 
 #### From Label Studio:
 
