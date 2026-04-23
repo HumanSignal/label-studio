@@ -627,7 +627,16 @@ class Task(TaskMixin, FsmHistoryStateModel):
 
     def delete(self, *args, **kwargs):
         self.before_delete_actions()
-        result = super().delete(*args, **kwargs)
+        # Task deletion cascades to annotations and reviews. During that cascade,
+        # review post_delete signals may fire before parent annotations are gone.
+        # Guard FSM handlers so they don't create transient AnnotationState rows
+        # that reference annotations being deleted in the same transaction.
+        previous = CurrentContext.get('bulk_annotation_delete_in_progress')
+        CurrentContext.set('bulk_annotation_delete_in_progress', True)
+        try:
+            result = super().delete(*args, **kwargs)
+        finally:
+            CurrentContext.set('bulk_annotation_delete_in_progress', previous)
         # set updated_at field of task to now()
         return result
 
