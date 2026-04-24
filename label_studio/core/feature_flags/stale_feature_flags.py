@@ -10,7 +10,6 @@ STALE_FEATURE_FLAGS = {
     'fflag_fix_leap_2052_detect_empty_filters_at_next_task_endpoint_short': True,
     'fflag_feat_dia_1925_view_sample_raw_json_short': False,
     'fflag__feature_develop__prompts__dia_1868_azure_ai_foundry': True,
-    'fflag_fix_back_leap_1818_set_convert_background_failure_logging_02062025_short': True,
     'fflag_feat_all_leap_1429_flexible_reject_mode_250924_short': True,
     'fflag_fix_front_lsdv_4998_missed_dynamic_children_030523_short': True,
     'fflag_fix_back_lsdv_4929_limit_exports_10042023_short': True,
