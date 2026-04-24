@@ -120,6 +120,7 @@ requires = ["uv_build>=0.11.2,<0.12.0"]
 build-backend = "uv_build"
 
 [tool.uv]
+exclude-newer = "4 days"
 
 
 [tool.uv.build-backend]
