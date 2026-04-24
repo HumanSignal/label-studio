@@ -128,6 +128,11 @@ export const FF_LSE_PROJECT_DASHBOARDS_V3 = "fflag_feat_front_lse_project_dashbo
 export const FF_LSE_PROJECT_DASHBOARDS_V3_THROUGHPUT = "fflag_feat_lse_project_dashboards_v3_throughput_short";
 
 /**
+ * LSE project throughput: Velocity / Diagnostics tabbed UI and Diagnostics tab (FIT-1678).
+ */
+export const FF_LSE_PROJECT_DASHBOARDS_V3_DIAGNOSTICS = "fflag_feat_lse_project_dashboards_v3_diagnostics_short";
+
+/**
  * Show per-item classifications (like Choices or Taxonomy) alongside regions in the Outliner panel
  */
 export const FF_CLASSIFICATIONS_IN_OUTLINER = "fflag_feat_front_bros_766_per_item_in_outliner";
