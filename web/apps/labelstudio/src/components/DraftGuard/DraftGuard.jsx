@@ -8,6 +8,41 @@ export const draftGuardCallback = {
   current: null,
 };
 
+const DRAFT_STATUS = {
+  SUCCESS: "success",
+  FAILURE: "failure",
+  NO_CHANGES: "no_changes",
+};
+
+export const toastDraftStatus = (status, toast) => {
+  switch (status) {
+    case DRAFT_STATUS.SUCCESS:
+      toast.show({ message: "Draft saved successfully", type: "info" });
+      break;
+    case DRAFT_STATUS.FAILURE:
+      toast.show({ message: "There was an error saving your draft", type: "error" });
+      break;
+  }
+};
+
+/** Uses `Annotation.needsDraftSave()` so draft / preview rules live in one place (FIT-1685). */
+
+export const draftSave = async () => {
+  const selected = window.Htx?.annotationStore?.selected;
+  const submissionInProgress = !!selected?.submissionStarted;
+  const hasChanges = selected?.needsDraftSave?.() && !submissionInProgress;
+
+  if (hasChanges) {
+    const res = await selected.saveDraftImmediatelyWithResults();
+    const status = res?.$meta?.status;
+
+    if (status === 200 || status === 201) return DRAFT_STATUS.SUCCESS;
+    if (status !== undefined) return DRAFT_STATUS.FAILURE;
+  }
+
+  return DRAFT_STATUS.NO_CHANGES;
+};
+
 export const DraftGuard = () => {
   const toast = useContext(ToastContext);
   const history = useHistory();
@@ -27,27 +62,12 @@ export const DraftGuard = () => {
      * to signify that we aren't looking for user confirmation but to utilize this to enable navigation blocking based on
      * unsuccessful draft saves.
      */
-    const unsubscribe = history.block(() => {
-      const selected = window.Htx?.annotationStore?.selected;
-      const submissionInProgress = !!selected?.submissionStarted;
-      const hasChanges = !!selected?.history.undoIdx && !submissionInProgress;
+    const unsubscribe = history.block(async () => {
+      const draftStatus = await draftSave();
 
-      if (hasChanges) {
-        selected.saveDraftImmediatelyWithResults()?.then((res) => {
-          const status = res?.$meta?.status;
-
-          if (status === 200 || status === 201) {
-            toast.show({ message: "Draft saved successfully", type: "info" });
-            unblock();
-          } else if (status !== undefined) {
-            toast.show({ message: "There was an error saving your draft", type: "error" });
-          } else {
-            unblock();
-          }
-        });
-
-        return DRAFT_GUARD_KEY;
-      }
+      toastDraftStatus(draftStatus, toast);
+      if (draftStatus !== DRAFT_STATUS.FAILURE) unblock();
+      return DRAFT_GUARD_KEY;
     });
 
     return () => {

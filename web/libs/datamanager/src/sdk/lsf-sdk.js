@@ -984,15 +984,7 @@ export class LSFWrapper {
     this.showOperationToast(status, "Draft saved successfully", "Draft is not saved", result);
   };
 
-  needsDraftSave = (annotation) => {
-    if (annotation.history?.hasChanges && !annotation.draftSaved) return true;
-    if (
-      annotation.history?.hasChanges &&
-      new Date(annotation.history.lastAdditionTime) > new Date(annotation.draftSaved)
-    )
-      return true;
-    return false;
-  };
+  needsDraftSave = (annotation) => annotation?.needsDraftSave?.() ?? false;
 
   saveDraft = async (target = null) => {
     const selected = target || this.lsf?.annotationStore?.selected;

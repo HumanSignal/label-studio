@@ -369,6 +369,23 @@ const _Annotation = types
     isReadOnly() {
       return self.isNonEditableDraft || self.readonly || !self.editable;
     },
+
+    /**
+     * Whether callers (DataManager, route DraftGuard) should persist draft before leaving.
+     * Centralizes the same preconditions as the `saveDraft` action (submission, editable,
+     * FIT-1685 preview) plus change tracking: `history.hasChanges` alone is not enough once
+     * a draft was saved — we compare `lastAdditionTime` to `draftSaved`.
+     */
+    needsDraftSave() {
+      if (self.submissionStarted) return false;
+      if (!self.editable) return false;
+      if (self.versions?.draft && !self.draftSelected) return false;
+
+      const history = self.history;
+      if (!history?.hasChanges) return false;
+      if (!self.draftSaved) return true;
+      return new Date(history.lastAdditionTime) > new Date(self.draftSaved);
+    },
   }))
   .volatile(() => ({
     hidden: false,
@@ -810,6 +827,18 @@ const _Annotation = types
       if (self.submissionStarted) return;
       // if this is now a history item or prediction don't save it
       if (!self.editable) return;
+      // FIT-1685: When a draft exists but the user is currently previewing a
+      // non-draft version (e.g. they clicked a submitted history item so
+      // `toggleDraft(false)` repopulated `self.areas` from `versions.result`),
+      // serializing `self.areas` right now would capture the preview, not the
+      // draft. Persisting that would overwrite the real server-side draft
+      // with the submitted snapshot. `draftSelected === true` is the
+      // authoritative signal that the current areas represent the draft.
+      if (self.versions.draft && !self.draftSelected) {
+        // Keep the saving flag in sync for callers that optimistically set it.
+        if (self.isDraftSaving) self.setDraftSaving(false);
+        return;
+      }
 
       const result = self.serializeAnnotation({ fast: true });
 
@@ -836,6 +865,10 @@ const _Annotation = types
     async saveDraftImmediatelyWithResults(params) {
       // There is no draft to save as it was already saved as an annotation
       if (self.submissionStarted || self.isDraftSaving) return {};
+      // FIT-1685: Mirror the guard in `saveDraft` so the draft-saving flag is
+      // never set for a preview-only save. If we set it here and `saveDraft`
+      // short-circuits, callers observing `isDraftSaving` would hang.
+      if (self.versions.draft && !self.draftSelected) return {};
       self.setDraftSaving(true);
       const res = await self.saveDraft(params);
 

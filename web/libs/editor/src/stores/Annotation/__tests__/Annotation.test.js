@@ -21,6 +21,7 @@ import "../../../tags/visual/View";
 import "../../../tags/object/RichText";
 import "../../../tags/object/Image/Image.js";
 import "../../../tags/control/Labels/Labels.jsx";
+import { getSnapshot, unprotect, protect } from "mobx-state-tree";
 import AppStore from "../../AppStore";
 
 const MINIMAL_CONFIG =
@@ -340,6 +341,128 @@ describe("Annotation model", () => {
       annotation.history.reinit = mock();
       annotation.reinitHistory(true);
       expect(annotation.history.reinit).toHaveBeenCalledWith(true);
+    });
+
+    describe("needsDraftSave view (FIT-1685)", () => {
+      /** Simulate a second undo state (requires unprotecting the store root in MST 3). */
+      function pushDuplicateHistoryState(store, annotation) {
+        unprotect(store);
+        try {
+          const tt = annotation.history;
+          const snap = getSnapshot(annotation.trackedState);
+          tt.history.push(snap);
+          tt.undoIdx = tt.history.length - 1;
+        } finally {
+          protect(store);
+        }
+      }
+
+      it("is false when there is no undo history beyond the initial state", () => {
+        const { annotation } = createStoreWithAnnotation();
+        expect(annotation.needsDraftSave()).toBe(false);
+      });
+
+      it("is false when previewing a submitted snapshot while a server draft exists, even if history looks dirty", () => {
+        const { annotation, store } = createStoreWithAnnotation();
+        pushDuplicateHistoryState(store, annotation);
+        annotation.addVersions({ draft: [{ id: "d1", type: "labels" }] });
+        annotation.setDraftSelected(false);
+        expect(annotation.history.hasChanges).toBe(true);
+        expect(annotation.needsDraftSave()).toBe(false);
+      });
+
+      it("is true when there are tracked changes and no draftSaved yet", () => {
+        const { annotation, store } = createStoreWithAnnotation();
+        pushDuplicateHistoryState(store, annotation);
+        annotation.setDraftSaved(undefined);
+        expect(annotation.needsDraftSave()).toBe(true);
+      });
+
+      it("is true when lastAdditionTime is after draftSaved", () => {
+        const { annotation, store } = createStoreWithAnnotation();
+        pushDuplicateHistoryState(store, annotation);
+        unprotect(store);
+        try {
+          annotation.history.lastAdditionTime = new Date("2099-06-01T00:00:00.000Z");
+        } finally {
+          protect(store);
+        }
+        annotation.setDraftSaved("2020-01-01T00:00:00.000Z");
+        expect(annotation.needsDraftSave()).toBe(true);
+      });
+
+      it("is false when draftSaved is newer than lastAdditionTime", () => {
+        const { annotation, store } = createStoreWithAnnotation();
+        pushDuplicateHistoryState(store, annotation);
+        unprotect(store);
+        try {
+          annotation.history.lastAdditionTime = new Date("2020-01-01T00:00:00.000Z");
+        } finally {
+          protect(store);
+        }
+        annotation.setDraftSaved("2099-01-01T00:00:00.000Z");
+        expect(annotation.needsDraftSave()).toBe(false);
+      });
+
+      it("is false while submission is in progress", () => {
+        const { annotation, store } = createStoreWithAnnotation();
+        pushDuplicateHistoryState(store, annotation);
+        annotation.submissionInProgress();
+        annotation.setDraftSaved(undefined);
+        expect(annotation.needsDraftSave()).toBe(false);
+      });
+
+      it("is false when the annotation is not editable", () => {
+        const { annotation, store } = createStoreWithAnnotation();
+        annotation.setEditable(false);
+        pushDuplicateHistoryState(store, annotation);
+        expect(annotation.needsDraftSave()).toBe(false);
+      });
+    });
+
+    describe("saveDraft preview guard (FIT-1685)", () => {
+      it("saveDraft does not call submitDraft when a server draft exists but draft is not selected", async () => {
+        const { annotation, store } = createStoreWithAnnotation();
+        const submitDraft = mock().mockResolvedValue({});
+        store.submitDraft = submitDraft;
+        annotation.addVersions({
+          draft: [{ id: "d1", type: "labels", from_name: "l", to_name: "img", value: { labels: ["A"] } }],
+        });
+        annotation.setDraftSelected(false);
+
+        await annotation.saveDraft();
+
+        expect(submitDraft).not.toHaveBeenCalled();
+      });
+
+      it("saveDraft clears isDraftSaving when skipping preview-only persist", async () => {
+        const { annotation, store } = createStoreWithAnnotation();
+        store.submitDraft = mock().mockResolvedValue({});
+        annotation.addVersions({
+          draft: [{ id: "d1", type: "labels", from_name: "l", to_name: "img", value: { labels: ["A"] } }],
+        });
+        annotation.setDraftSelected(false);
+        annotation.setDraftSaving(true);
+
+        await annotation.saveDraft();
+
+        expect(annotation.isDraftSaving).toBe(false);
+      });
+
+      it("saveDraftImmediatelyWithResults returns empty object without setting saving when previewing", async () => {
+        const { annotation, store } = createStoreWithAnnotation();
+        store.submitDraft = mock().mockResolvedValue({});
+        annotation.addVersions({
+          draft: [{ id: "d1", type: "labels", from_name: "l", to_name: "img", value: { labels: ["A"] } }],
+        });
+        annotation.setDraftSelected(false);
+
+        const res = await annotation.saveDraftImmediatelyWithResults();
+
+        expect(res).toEqual({});
+        expect(store.submitDraft).not.toHaveBeenCalled();
+        expect(annotation.isDraftSaving).toBe(false);
+      });
     });
 
     it("deserializeAnnotation warns and delegates to deserializeResults", () => {
