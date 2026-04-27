@@ -138,6 +138,12 @@ export const FF_LSE_PROJECT_DASHBOARDS_V3_DIAGNOSTICS = "fflag_feat_lse_project_
 export const FF_CLASSIFICATIONS_IN_OUTLINER = "fflag_feat_front_bros_766_per_item_in_outliner";
 
 /**
+ * Segment Anything via ML backend — server-side SAM2 flow. Controls the
+ * editor-side interactive UI (point / box prompts, Accept, Track).
+ */
+export const FF_SEGMENT_ANYTHING_ML_BACKEND = "fflag_feat_bros_951_ml_backend_short";
+
+/**
  * Non-antd Taxonomy control (design-system tree + search) for the Taxonomy tag and comment classifications.
  */
 export const FF_ECHO_466_TAXONOMY_ANTD_REMOVAL = "fflag_feat_all_echo_466_taxonomy_antd_removal_short";

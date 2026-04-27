@@ -1,19 +1,43 @@
 .multiStateToggle {
   display: inline-flex;
-  align-items: center;
+  align-items: stretch;
   justify-content: center;
-  transition: outline 0.1s ease;
+  padding: var(--spacing-tightest);
+  border-radius: var(--corner-radius-small);
+  background: var(--color-neutral-surface-inset);
+  gap: var(--spacing-tightest);
 
   &__option {
+    display: inline-flex;
     align-items: center;
     justify-content: center;
-    padding: 0 8px;
+    padding: var(--spacing-tighter) var(--spacing-tight);
+    border: none;
+    border-radius: var(--corner-radius-smaller);
+    background: transparent;
+    color: var(--color-neutral-content-subtler);
+    font-family: inherit;
+    font-size: var(--font-size-body-small);
+    line-height: 1.2;
     cursor: pointer;
-    transition: background-color 0.1s ease;
-    display: none;
+    transition:
+      background-color 0.1s ease,
+      color 0.1s ease;
+
+    &:hover:not(&_selected) {
+      color: var(--color-neutral-content);
+      background: var(--color-neutral-surface-hover);
+    }
+
+    &:focus-visible {
+      outline: 2px solid var(--color-primary-focus-outline);
+      outline-offset: 1px;
+    }
 
     &_selected {
-      display: inline-flex;
+      background: var(--color-neutral-background);
+      color: var(--color-neutral-content);
+      box-shadow: 0 1px 2px rgb(var(--color-neutral-shadow-raw) / 8%);
     }
   }
 }

@@ -65,6 +65,26 @@ const Model = types
       return { value };
     },
 
+    /**
+     * Insert or replace the keypoint at `frame` with the given `enabled`
+     * state. Needed because `updateShape` force-sets `enabled: true`, which
+     * makes it impossible to terminate a tracked region's lifespan from
+     * outside this model.
+     */
+    setLifespanAt(frame, enabled) {
+      const existingIndex = self.sequence.findIndex((k) => k.frame === frame);
+      const keypoint = { frame, enabled };
+      if (existingIndex >= 0) {
+        self.sequence = [
+          ...self.sequence.slice(0, existingIndex),
+          { ...self.sequence[existingIndex], ...keypoint },
+          ...self.sequence.slice(existingIndex + 1),
+        ];
+      } else {
+        self.sequence = [...self.sequence, keypoint].sort((a, b) => a.frame - b.frame);
+      }
+    },
+
     toggleLifespan(frame) {
       const keypoint = self.closestKeypoint(frame, true);
 

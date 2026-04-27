@@ -14,12 +14,15 @@ import Konva from "konva";
 import { LoadingOutlined } from "@ant-design/icons";
 import { Toolbar } from "../Toolbar/Toolbar";
 import { ImageViewProvider } from "./ImageViewContext";
+import { InteractiveOverlayHost } from "../../ml-interactive/InteractiveOverlayHost";
 import { Hotkey } from "../../core/Hotkey";
 import ResizeObserver from "../../utils/resize-observer";
+import { ff } from "@humansignal/core";
 import { debounce } from "@humansignal/core/lib/utils/debounce";
 import Constants from "../../core/Constants";
 import { fixRectToFit, mapKonvaBrightness } from "../../utils/image";
 import { FF_DEV_1442, FF_LSDV_4930, isFF } from "../../utils/feature-flags";
+import { InteractiveActionsBar } from "../../ml-interactive/InteractiveActionsBar";
 import { Pagination } from "../../common/Pagination/Pagination";
 import { Image } from "./Image";
 
@@ -1184,7 +1187,10 @@ export default observer(
                 onWheel={item.zoom ? this.handleZoom : () => {}}
               />
             ) : null}
+            {imageIsLoaded && ff.isSegmentAnythingEditorEnabled() && <InteractiveOverlayHost objectTag={item} />}
           </div>
+
+          {imageIsLoaded && ff.isSegmentAnythingEditorEnabled() && <InteractiveActionsBar objectTag={item} />}
 
           {toolsReady && imageIsLoaded && this.renderTools()}
           {item.images.length > 1 && (

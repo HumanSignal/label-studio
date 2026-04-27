@@ -25,6 +25,8 @@ import { clamp, isDefined } from "../../../utils/utilities";
 import "./Video.prefix.css";
 import { VideoRegions } from "./VideoRegions";
 import { ff } from "@humansignal/core";
+import { InteractiveOverlayHost } from "../../../ml-interactive/InteractiveOverlayHost";
+import { InteractiveActionsBar } from "../../../ml-interactive/InteractiveActionsBar";
 
 const isSyncedBuffering = ff.isActive(ff.FF_SYNCED_BUFFERING);
 
@@ -591,6 +593,7 @@ const HtxVideoView = ({ item, store }) => {
                     currentFrame={position}
                   />
                 )}
+                {loaded && ff.isSegmentAnythingEditorEnabled() && <InteractiveOverlayHost objectTag={item} />}
                 <VideoCanvas
                   ref={item.ref}
                   src={item._value}
@@ -620,6 +623,8 @@ const HtxVideoView = ({ item, store }) => {
             )}
           </div>
         </div>
+
+        {loaded && ff.isSegmentAnythingEditorEnabled() && <InteractiveActionsBar objectTag={item} />}
 
         {loaded && (
           <Timeline

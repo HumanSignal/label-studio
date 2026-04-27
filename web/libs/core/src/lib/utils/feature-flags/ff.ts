@@ -1,4 +1,4 @@
-import { FF_NEW_STORAGES, FF_THEME_TOGGLE } from "./flags";
+import { FF_NEW_STORAGES, FF_SEGMENT_ANYTHING_ML_BACKEND, FF_THEME_TOGGLE } from "./flags";
 
 const FLAGS_OVERRIDE: Record<string, boolean> = {
   // While it's safe to have overrides living here forever,
@@ -52,5 +52,8 @@ export function isFF(id: string) {
     window.APP_SETTINGS?.feature_flags_default_value === true,
   );
 }
+
+/** True when the editor should render the SAM interactive UI. */
+export const isSegmentAnythingEditorEnabled = () => isActive(FF_SEGMENT_ANYTHING_ML_BACKEND);
 
 export * from "./flags";

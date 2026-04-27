@@ -460,6 +460,19 @@ export default types
         annotation.undo();
       });
 
+      // Quick toggle for Auto-Annotation so the user can temporarily drop
+      // out of SAM capture to select / edit an existing region and flip
+      // back without reaching for the bottombar switch. Mirrors the
+      // DynamicPreannotationsToggle click handler.
+      hotkeys.addNamed("annotation:toggle-auto-annotation", () => {
+        if (!self.hasInterface("auto-annotation") || self.forceAutoAnnotation) return;
+        const next = !self.autoAnnotation;
+        self.setAutoAnnotation(next);
+        if (!next) {
+          ToolsManager.allInstances().forEach((inst) => inst.selectDefault());
+        }
+      });
+
       hotkeys.addNamed("annotation:redo", () => {
         const annotation = self.annotationStore.selected;
 
