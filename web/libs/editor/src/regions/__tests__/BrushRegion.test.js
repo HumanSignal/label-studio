@@ -335,7 +335,7 @@ describe("BrushRegion", () => {
       expect(typeof region.strokeColor).toBe("string");
     });
 
-    it("bboxCoordsCanvas returns bbox from first touch points when no imageData", () => {
+    it("bboxCoordsCanvas returns bbox from touch points", () => {
       region.beginPath({ type: "add", strokeWidth: 25 });
       region.addPoint(10, 10);
       region.addPoint(50, 10);

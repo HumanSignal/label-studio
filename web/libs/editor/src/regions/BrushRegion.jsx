@@ -2,6 +2,7 @@ import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import { Group, Image, Shape } from "react-konva";
 import { observer } from "mobx-react";
 import { getParent, getRoot, getType, hasParent, isAlive, types } from "mobx-state-tree";
+import { decode as rleDecode } from "@thi.ng/rle-pack";
 
 import Registry from "../core/Registry";
 import NormalizationMixin from "../mixins/Normalization";
@@ -145,6 +146,7 @@ const Model = types
     needsUpdate: 1,
     hideable: true,
     layerRef: undefined,
+    rleBbox: null,
   }))
   .views((self) => {
     return {
@@ -166,25 +168,51 @@ const Model = types
         return self.touches.some((t) => t.type === "eraser");
       },
       get bboxCoordsCanvas() {
-        const points = { x: [], y: [] };
+        let touchBbox = null;
+        let scaledRleBbox = null;
 
         if (self.touches && self.touches.length > 0) {
+          const points = { x: [], y: [] };
+
           self.touches.forEach((touch) => {
             for (let i = 0; i < touch.points.length; i += 2) {
               points.x.push(touch.points[i]);
               points.y.push(touch.points[i + 1]);
             }
           });
+
+          if (points.x.length > 0) {
+            touchBbox = {
+              left: Math.min(...points.x),
+              top: Math.min(...points.y),
+              right: Math.max(...points.x),
+              bottom: Math.max(...points.y),
+            };
+          }
         }
 
-        if (points.x.length === 0) return null;
+        if (self.rleBbox && self.parent) {
+          const scaleX = self.parent.stageWidth / (self.currentImageEntity?.naturalWidth || 1);
+          const scaleY = self.parent.stageHeight / (self.currentImageEntity?.naturalHeight || 1);
 
-        return {
-          left: Math.min(...points.x),
-          top: Math.min(...points.y),
-          right: Math.max(...points.x),
-          bottom: Math.max(...points.y),
-        };
+          scaledRleBbox = {
+            left: self.rleBbox.left * scaleX,
+            top: self.rleBbox.top * scaleY,
+            right: self.rleBbox.right * scaleX,
+            bottom: self.rleBbox.bottom * scaleY,
+          };
+        }
+
+        if (touchBbox && scaledRleBbox) {
+          return {
+            left: Math.min(touchBbox.left, scaledRleBbox.left),
+            top: Math.min(touchBbox.top, scaledRleBbox.top),
+            right: Math.max(touchBbox.right, scaledRleBbox.right),
+            bottom: Math.max(touchBbox.bottom, scaledRleBbox.bottom),
+          };
+        }
+
+        return touchBbox || scaledRleBbox || null;
       },
       /**
        * Brushes are processed in pixels, so percentages are derived values for them,
@@ -214,6 +242,55 @@ const Model = types
     return {
       afterCreate() {
         self.updateMaskImage();
+        if (self.rle) {
+          self.updateRLEBBox();
+        }
+      },
+
+      updateRLEBBox() {
+        if (!self.rle) {
+          self.rleBbox = null;
+          return;
+        }
+        try {
+          const nw = self.currentImageEntity?.naturalWidth;
+          const nh = self.currentImageEntity?.naturalHeight;
+
+          if (!nw || !nh) return;
+
+          const decoded = rleDecode(self.rle);
+
+          let minX = nw;
+          let minY = nh;
+          let maxX = -1;
+          let maxY = -1;
+
+          for (let i = decoded.length / 4 - 1; i >= 0; i--) {
+            if (decoded[i * 4 + 3] > 0) {
+              const x = i % nw;
+              const y = Math.floor(i / nw);
+
+              if (x < minX) minX = x;
+              if (x > maxX) maxX = x;
+              if (y < minY) minY = y;
+              if (y > maxY) maxY = y;
+            }
+          }
+
+          if (maxX < minX || maxY < minY) {
+            self.rleBbox = null;
+            return;
+          }
+
+          self.rleBbox = {
+            left: minX,
+            top: minY,
+            right: maxX + 1,
+            bottom: maxY + 1,
+          };
+        } catch {
+          self.rleBbox = null;
+        }
       },
 
       updateMaskImage() {
@@ -357,6 +434,7 @@ const Model = types
 
           self.touches = [];
           self.rle = Array.from(rle);
+          self.updateRLEBBox();
         }
       },
 
