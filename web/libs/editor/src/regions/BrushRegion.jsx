@@ -424,6 +424,8 @@ const BrushRegionModel = types.compose(
 );
 
 const HtxBrushLayer = observer(({ item, setShapeRef, pointsList }) => {
+  const offscreenRef = useRef(null);
+
   const drawLine = useCallback((ctx, { points, strokeWidth, strokeColor, compositeOperation }) => {
     ctx.save();
     ctx.beginPath();
@@ -436,28 +438,50 @@ const HtxBrushLayer = observer(({ item, setShapeRef, pointsList }) => {
     ctx.lineWidth = strokeWidth;
     ctx.strokeStyle = strokeColor;
     ctx.globalCompositeOperation = compositeOperation;
-    // Eraser must draw at full alpha to completely remove pixels.
-    // Konva applies the parent Group's opacity (globalAlpha) before calling
-    // sceneFunc, which causes destination-out to only partially erase.
-    if (compositeOperation === "destination-out") {
-      ctx.globalAlpha = 1;
-    }
+    ctx.globalAlpha = 1;
     ctx.stroke();
     ctx.restore();
-  });
+  }, []);
 
   const sceneFunc = useCallback(
     (context) => {
+      if (pointsList.length === 0) return;
+
+      const nativeCtx = context._context || context;
+      const canvas = nativeCtx.canvas;
+      const w = canvas.width;
+      const h = canvas.height;
+
+      if (!w || !h) return;
+
+      if (!offscreenRef.current || offscreenRef.current.width !== w || offscreenRef.current.height !== h) {
+        offscreenRef.current = document.createElement("canvas");
+        offscreenRef.current.width = w;
+        offscreenRef.current.height = h;
+      }
+      const offCtx = offscreenRef.current.getContext("2d");
+
+      offCtx.clearRect(0, 0, w, h);
+
+      const currentTransform = nativeCtx.getTransform();
+
+      offCtx.setTransform(currentTransform);
+
       pointsList.forEach((points) => {
-        drawLine(context, {
+        drawLine(offCtx, {
           points: points.points,
           strokeWidth: points.strokeWidth,
           strokeColor: item.strokeColor,
           compositeOperation: points.compositeOperation,
         });
       });
+
+      nativeCtx.save();
+      nativeCtx.setTransform(1, 0, 0, 1, 0, 0);
+      nativeCtx.drawImage(offscreenRef.current, 0, 0);
+      nativeCtx.restore();
     },
-    [pointsList, pointsList.length, item.strokeColor],
+    [pointsList, pointsList.length, item.strokeColor, drawLine],
   );
 
   const hitFunc = useCallback(
@@ -471,7 +495,7 @@ const HtxBrushLayer = observer(({ item, setShapeRef, pointsList }) => {
         });
       });
     },
-    [pointsList, pointsList.length],
+    [pointsList, pointsList.length, drawLine],
   );
 
   return <Shape ref={(node) => setShapeRef(node)} sceneFunc={sceneFunc} hitFunc={hitFunc} />;

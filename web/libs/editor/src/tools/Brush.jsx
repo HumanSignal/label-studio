@@ -193,6 +193,7 @@ const _Tool = types
 
         // Reset the timer if a user started drawing again
         if (brush && brush.type === "brushregion") {
+          if (brush.isReadOnly() || brush.hidden) return;
           self.annotation.history.freeze();
           self.mode = "drawing";
           brush.setDrawing(true);

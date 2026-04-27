@@ -36,6 +36,10 @@ const mockCtx = {
   drawImage: mock(),
   getImageData: mock(() => ({ data: new Uint8ClampedArray(4 * 100 * 100), width: 100, height: 100 })),
   putImageData: mock(),
+  getTransform: mock(() => ({ a: 1, b: 0, c: 0, d: 1, e: 0, f: 0 })),
+  setTransform: mock(),
+  clearRect: mock(),
+  canvas: { width: 100, height: 100 },
 };
 mockModule("react-konva", () => {
   const React = require("react");

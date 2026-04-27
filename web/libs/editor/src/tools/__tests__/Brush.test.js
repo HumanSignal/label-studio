@@ -330,6 +330,7 @@ describe("Brush tool", () => {
         beginPath: mock(),
         setDrawing: mock(),
         endPath: mock(),
+        isReadOnly: () => false,
       };
       annotation.highlightedNode = mockBrush;
       const tool = createBrush();
@@ -344,6 +345,55 @@ describe("Brush tool", () => {
       expect(annotation.history.freeze).toHaveBeenCalled();
       expect(mockBrush.beginPath).toHaveBeenCalledWith({ type: "add", strokeWidth: 15 });
       expect(mockBrush.addPoint).toHaveBeenCalledWith(10, 10);
+    });
+
+    it("returns early when existing brush region is read-only (locked)", () => {
+      const mockBrush = {
+        type: "brushregion",
+        addPoint: mock(),
+        beginPath: mock(),
+        setDrawing: mock(),
+        endPath: mock(),
+        isReadOnly: () => true,
+      };
+      annotation.highlightedNode = mockBrush;
+      const tool = createBrush();
+      const ev = {
+        target: stageContent,
+        button: 0,
+        shiftKey: false,
+        offsetX: 10,
+        offsetY: 10,
+      };
+      tool.mousedownEv(ev, null, [10, 10]);
+      expect(annotation.history.freeze).not.toHaveBeenCalled();
+      expect(mockBrush.beginPath).not.toHaveBeenCalled();
+      expect(mockBrush.addPoint).not.toHaveBeenCalled();
+    });
+
+    it("returns early when existing brush region is hidden", () => {
+      const mockBrush = {
+        type: "brushregion",
+        addPoint: mock(),
+        beginPath: mock(),
+        setDrawing: mock(),
+        endPath: mock(),
+        isReadOnly: () => false,
+        hidden: true,
+      };
+      annotation.highlightedNode = mockBrush;
+      const tool = createBrush();
+      const ev = {
+        target: stageContent,
+        button: 0,
+        shiftKey: false,
+        offsetX: 10,
+        offsetY: 10,
+      };
+      tool.mousedownEv(ev, null, [10, 10]);
+      expect(annotation.history.freeze).not.toHaveBeenCalled();
+      expect(mockBrush.beginPath).not.toHaveBeenCalled();
+      expect(mockBrush.addPoint).not.toHaveBeenCalled();
     });
 
     it("starts new drawing when no selected shape and canStartDrawing", () => {
@@ -440,6 +490,7 @@ describe("Brush tool", () => {
         beginPath: mock(),
         setDrawing: mock(),
         endPath: mock(),
+        isReadOnly: () => false,
       };
       annotation.highlightedNode = mockBrush;
       const tool = createBrush();
@@ -459,6 +510,7 @@ describe("Brush tool", () => {
         beginPath: mock(),
         setDrawing: mock(),
         endPath: mock(),
+        isReadOnly: () => false,
       };
       annotation.highlightedNode = mockBrush;
       const tool = createBrush();
@@ -477,6 +529,7 @@ describe("Brush tool", () => {
         beginPath: mock(),
         setDrawing: mock(),
         endPath: mock(),
+        isReadOnly: () => false,
       };
       annotation.highlightedNode = mockBrush;
       const tool = createBrush();
@@ -494,6 +547,7 @@ describe("Brush tool", () => {
         addPoint: mock(),
         beginPath: mock(),
         setDrawing: mock(),
+        isReadOnly: () => false,
       };
       annotation.highlightedNode = mockBrush;
       const tool = createBrush();
