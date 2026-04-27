@@ -777,8 +777,7 @@ export class LSFWrapper {
     this.datamanager.invoke("onStorageInitialized", ls);
 
     if (this.task && this.labelStream === false) {
-      const annotationID =
-        this.initialAnnotation?.pk ?? this.task.lastAnnotation?.pk ?? this.task.lastAnnotation?.id ?? "auto";
+      const annotationID = this.initialAnnotation?.pk ?? this.initialAnnotation?.id ?? "auto";
 
       await this.setAnnotation(annotationID);
     }

@@ -443,7 +443,9 @@ export class DataManager {
     }
 
     if (!isLabelStream && (!taskSelected || isDefined(annotation))) {
-      const annotationID = annotation?.id ?? task.lastAnnotation?.id;
+      // When opening a task from Data Manager rows (without explicit annotation),
+      // let LSF pick the default annotation from the loaded task payload.
+      const annotationID = annotation?.id;
 
       // this.lsf.loadTask(task.id, annotationID);
       this.lsf.selectTask(task, annotationID);
