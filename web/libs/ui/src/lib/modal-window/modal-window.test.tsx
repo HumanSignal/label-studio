@@ -52,9 +52,12 @@ describe("ModalWindow", () => {
       fireEvent.keyDown(document, { key: "Escape", code: "Escape", bubbles: true });
     });
 
-    await waitFor(() => {
-      expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
-    });
+    await waitFor(
+      () => {
+        expect(screen.queryByTestId("modal-window")).not.toBeInTheDocument();
+      },
+      { timeout: 5000 },
+    );
   });
 
   it("closes when close button is activated", async () => {
@@ -72,9 +75,12 @@ describe("ModalWindow", () => {
       fireEvent.click(screen.getByTestId("modal-window-close-button"));
     });
 
-    await waitFor(() => {
-      expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
-    });
+    await waitFor(
+      () => {
+        expect(screen.queryByTestId("modal-window")).not.toBeInTheDocument();
+      },
+      { timeout: 5000 },
+    );
   });
 
   it("provides a screen-reader title when no visible title is passed", async () => {

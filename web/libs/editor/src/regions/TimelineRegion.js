@@ -94,12 +94,9 @@ const Model = types
      * @return {TimelineRegionResult}
      */
     serialize() {
-      // Return plain JS ranges so the serialized payload is structured-cloneable.
-      // `self.ranges` is a MobX/MST observable array, which cannot be passed through
-      // `structuredClone()` (see Annotation.fixBrokenAnnotation) — FIT-1686.
       return {
         value: {
-          ranges: self.ranges.map(({ start, end }) => ({ start, end })),
+          ranges: self.ranges,
         },
       };
     },

@@ -17,6 +17,7 @@ mockModule("keymaster", () => {
   return { __esModule: true, default: keymaster };
 });
 
+import { observable } from "mobx";
 import "../../../tags/visual/View";
 import "../../../tags/object/RichText";
 import "../../../tags/object/Image/Image.js";
@@ -237,6 +238,28 @@ describe("Annotation model", () => {
       const json = [{ type: "relation", from_id: "a", to_id: "b", direction: "right", labels: [] }];
       const fixed = annotation.fixBrokenAnnotation(json);
       expect(fixed.some((r) => r.type === "relation")).toBe(true);
+    });
+
+    it("fixBrokenAnnotation strips MobX observables before structuredClone (FIT-1686, FIT-1692)", () => {
+      const { annotation } = createStoreWithAnnotation();
+      const ranges = observable([observable({ start: 3, end: 5 }), observable({ start: 10, end: 20 })]);
+      const json = [
+        {
+          id: "r1",
+          type: "labels",
+          from_name: "l",
+          to_name: "img",
+          value: { labels: ["A"], ranges },
+        },
+      ];
+      expect(() => annotation.fixBrokenAnnotation(json)).not.toThrow();
+      const fixed = annotation.fixBrokenAnnotation(json);
+      expect(fixed).toHaveLength(1);
+      expect(() => structuredClone(fixed[0])).not.toThrow();
+      expect(fixed[0].value.ranges).toEqual([
+        { start: 3, end: 5 },
+        { start: 10, end: 20 },
+      ]);
     });
 
     it("fixBrokenAnnotation collapses duplicate (id, from_name, type) rows (FIT-1669)", () => {

@@ -1,5 +1,18 @@
 import { throttle } from "@humansignal/core/lib/utils/lodash-replacements";
-import { destroy, detach, flow, getEnv, getParent, getRoot, isAlive, onSnapshot, types } from "mobx-state-tree";
+import { toJS } from "mobx";
+import {
+  destroy,
+  detach,
+  flow,
+  getEnv,
+  getParent,
+  getRoot,
+  getSnapshot,
+  isAlive,
+  isStateTreeNode,
+  onSnapshot,
+  types,
+} from "mobx-state-tree";
 import { ff } from "@humansignal/core";
 import { errorBuilder } from "../../core/DataValidator/ConfigValidator";
 import { guidGenerator } from "../../core/Helpers";
@@ -1132,10 +1145,27 @@ const _Annotation = types
       const normalized = (json ?? []).reduce((res, objRaw) => {
         if (!objRaw) return res;
 
-        const obj = structuredClone(objRaw) ?? {};
+        // Draft payloads must not retain live MST references (e.g. brush `touches` from
+        // serialize fast). Break tree nodes to snapshots first; then deep plain JS for
+        // nested MobX observables before structuredClone (FIT-1686, FIT-1692).
+        let source = objRaw;
+        if (isStateTreeNode(objRaw)) {
+          try {
+            source = getSnapshot(objRaw);
+          } catch {
+            return res;
+          }
+        }
+
+        let obj;
+        try {
+          obj = structuredClone(toJS(source, { recurseEverything: true })) ?? {};
+        } catch {
+          obj = toJS(source, { recurseEverything: true }) ?? {};
+        }
 
         if (obj.type === "relation") {
-          res.push(objRaw);
+          res.push(obj);
           return res;
         }
 

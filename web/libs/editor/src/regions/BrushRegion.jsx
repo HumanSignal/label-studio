@@ -1,7 +1,7 @@
 import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import { Group, Image, Shape } from "react-konva";
 import { observer } from "mobx-react";
-import { getParent, getRoot, getType, hasParent, isAlive, types } from "mobx-state-tree";
+import { getParent, getRoot, getSnapshot, getType, hasParent, isAlive, types } from "mobx-state-tree";
 import { decode as rleDecode } from "@thi.ng/rle-pack";
 
 import Registry from "../core/Registry";
@@ -56,6 +56,24 @@ const Points = types
   .actions((self) => {
     return {
       updateImageSize(_wp, _hp, sw, sh) {
+        // Wire snapshots (draft / history) often include `points` but omit `relativePoints`.
+        // Without % coords, the map below would wipe `points` to [] — invisible strokes after rehydrate.
+        if (self.relativePoints.length === 0 && self.points.length > 0 && self.parent) {
+          const sx = self.parent.scaleX;
+          const sy = self.parent.scaleY;
+          const rel = [];
+
+          for (let i = 0; i < self.points.length; i++) {
+            const p = self.points[i];
+            const raw = p * (i % 2 === 0 ? sx : sy);
+            const stageDim = i % 2 === 0 ? sw : sh;
+
+            rel.push((raw / stageDim) * 100);
+          }
+          self.relativePoints.replace(rel);
+          self.relativeStrokeWidth = (self.strokeWidth / sw) * 100;
+        }
+
         self.points = self.relativePoints.map((v, idx) => {
           const isX = !(idx % 2);
           const stageSize = isX ? sw : sh;
@@ -471,7 +489,10 @@ const Model = types
         if (options?.fast) {
           value.rle = self.rle;
 
-          if (self.touches.length) value.touches = self.touches;
+          // Plain snapshots only — assigning `self.touches` kept live MST nodes in
+          // `versions.draft`; after deleteAllRegions / draft toggle, fixBrokenAnnotation's
+          // deep toJS traversed dead Points nodes and threw MST "initializing phase" errors.
+          if (self.touches.length) value.touches = getSnapshot(self.touches);
           if (self.maskDataURL) value.maskDataURL = self.maskDataURL;
         } else {
           if (self.touches.length === 0 && self.rle && self.rle.length > 0) {
@@ -591,7 +612,8 @@ const HtxBrushView = ({ item, setShapeRef }) => {
     //  an image without having to go through an RLE encode/decode loop to save performance for tools
     //  that dynamically produce image masks.
     const prepareImage = async () => {
-      if (!item.rle && !item.maskDataURL) return;
+      const hasRle = item.rle && (!Array.isArray(item.rle) || item.rle.length > 0);
+      if (!hasRle && !item.maskDataURL) return;
       if (!item.parent || item.parent.naturalWidth <= 1 || item.parent.naturalHeight <= 1) return;
 
       let img;
@@ -626,39 +648,50 @@ const HtxBrushView = ({ item, setShapeRef }) => {
 
   const imageDataRef = useRef(null);
 
+  // Drop cached hit mask when the image tag detaches (draft ↔ history tree swap);
+  // otherwise Konva can still call hitFunc with a stale closure while `item.parent` is null.
+  useEffect(() => {
+    if (!item.parent) {
+      imageDataRef.current = null;
+    }
+  }, [item.parent]);
+
   // Drawing hit area by shape color to detect interactions inside the Konva.
   // Uses an offscreen canvas with drawImage (respects transforms) instead of
   // putImageData (ignores transforms and always writes at canvas origin).
   const imageHitFunc = useCallback(
     (context, shape) => {
-      if (image) {
-        if (!imageDataRef.current) {
-          const w = item.parent.stageWidth;
-          const h = item.parent.stageHeight;
-          const offscreen = document.createElement("canvas");
+      const parent = item.parent;
+      if (!image || !parent) return;
 
-          offscreen.width = w;
-          offscreen.height = h;
-          const offCtx = offscreen.getContext("2d");
+      const w = parent.stageWidth;
+      const h = parent.stageHeight;
+      if (!w || !h || w <= 1 || h <= 1) return;
 
-          offCtx.drawImage(image, 0, 0, w, h);
-          const imageData = offCtx.getImageData(0, 0, w, h);
-          const colorParts = colorToRGBAArray(shape.colorKey);
+      if (!imageDataRef.current) {
+        const offscreen = document.createElement("canvas");
 
-          for (let i = imageData.data.length / 4 - 1; i >= 0; i--) {
-            if (imageData.data[i * 4 + 3] > 0) {
-              for (let k = 0; k < 3; k++) {
-                imageData.data[i * 4 + k] = colorParts[k];
-              }
+        offscreen.width = w;
+        offscreen.height = h;
+        const offCtx = offscreen.getContext("2d");
+
+        offCtx.drawImage(image, 0, 0, w, h);
+        const imageData = offCtx.getImageData(0, 0, w, h);
+        const colorParts = colorToRGBAArray(shape.colorKey);
+
+        for (let i = imageData.data.length / 4 - 1; i >= 0; i--) {
+          if (imageData.data[i * 4 + 3] > 0) {
+            for (let k = 0; k < 3; k++) {
+              imageData.data[i * 4 + k] = colorParts[k];
             }
           }
-          offCtx.putImageData(imageData, 0, 0);
-          imageDataRef.current = offscreen;
         }
-        context.drawImage(imageDataRef.current, 0, 0, item.parent.stageWidth, item.parent.stageHeight);
+        offCtx.putImageData(imageData, 0, 0);
+        imageDataRef.current = offscreen;
       }
+      context.drawImage(imageDataRef.current, 0, 0, w, h);
     },
-    [image, item.parent?.stageWidth, item.parent?.stageHeight],
+    [image, item, item.parent?.stageWidth, item.parent?.stageHeight],
   );
 
   useEffect(() => {
@@ -682,14 +715,14 @@ const HtxBrushView = ({ item, setShapeRef }) => {
     [item],
   );
 
-  if (!item.parent) return null;
+  const parent = item.parent;
+  if (!parent) return null;
 
-  const stage = item.parent?.stageRef;
   const clip = {
     x: 0,
     y: 0,
-    width: item.parent.stageWidth,
-    height: item.parent.stageHeight,
+    width: parent.stageWidth,
+    height: parent.stageHeight,
   };
 
   return (
@@ -708,31 +741,27 @@ const HtxBrushView = ({ item, setShapeRef }) => {
           attrMy={item.needsUpdate}
           name="segmentation"
           onMouseDown={(e) => {
-            if (store.annotationStore.selected.isLinkingMode) {
+            if (store.annotationStore.selected?.isLinkingMode) {
               e.cancelBubble = true;
             }
           }}
           onMouseOver={() => {
-            if (store.annotationStore.selected.isLinkingMode) {
+            if (store.annotationStore.selected?.isLinkingMode) {
               item.setHighlight(true);
             }
             item.updateCursor(true);
           }}
           onMouseOut={() => {
-            if (store.annotationStore.selected.isLinkingMode) {
+            if (store.annotationStore.selected?.isLinkingMode) {
               item.setHighlight(false);
             }
             item.updateCursor();
           }}
           onClick={(e) => {
-            if (item.parent.getSkipInteractions()) return;
-            if (store.annotationStore.selected.isLinkingMode) {
+            if (item.parent?.getSkipInteractions?.()) return;
+            if (store.annotationStore.selected?.isLinkingMode) {
               item.onClickRegion(e);
               return;
-            }
-
-            if (store.annotationStore.selected.isLinkingMode) {
-              stage.container().style.cursor = "default";
             }
 
             item.setHighlight(false);
@@ -741,7 +770,7 @@ const HtxBrushView = ({ item, setShapeRef }) => {
           listening={!suggestion}
         >
           {/* RLE */}
-          <Image image={image} hitFunc={imageHitFunc} width={item.parent.stageWidth} height={item.parent.stageHeight} />
+          <Image image={image} hitFunc={imageHitFunc} width={parent.stageWidth} height={parent.stageHeight} />
 
           {/* Touches */}
           <Group>

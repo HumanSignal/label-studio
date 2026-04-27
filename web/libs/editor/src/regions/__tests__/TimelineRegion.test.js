@@ -1,14 +1,11 @@
 /**
  * Unit tests for TimelineRegion (model serialization).
  *
- * Regression: FIT-1686 — submitting a TimelineLabels annotation produced
- *   "DataCloneError: Failed to execute 'structuredClone' on 'Window':
- *    [object Array] could not be cloned."
- * because `serialize()` returned the MST observable `ranges` array directly.
- * `Annotation.fixBrokenAnnotation` later calls `structuredClone(objRaw)` on the
- * serialized draft; MobX/MST observable arrays are not structured-cloneable.
+ * Draft/history uses `Annotation.fixBrokenAnnotation`, which runs `toJS` before
+ * `structuredClone` so MST/MobX observables from `serialize()` are safe (FIT-1686).
  */
-import { destroy, isStateTreeNode, types } from "mobx-state-tree";
+import { destroy, types } from "mobx-state-tree";
+import { toJS } from "mobx";
 
 describe("TimelineRegion", () => {
   let TimelineRegionModel;
@@ -64,28 +61,10 @@ describe("TimelineRegion", () => {
       if (root) destroy(root);
     });
 
-    it("returns value.ranges as a plain array (not an MST observable)", () => {
+    it("returns value.ranges with expected frame spans (MobX toJS for comparison)", () => {
       const { value } = region.serialize();
       expect(Array.isArray(value.ranges)).toBe(true);
-      // MST observable arrays are also `isStateTreeNode` — a plain array is not.
-      expect(isStateTreeNode(value.ranges)).toBe(false);
-    });
-
-    it("returns value.ranges entries as plain objects (not MST nodes)", () => {
-      const { value } = region.serialize();
-      expect(value.ranges).toHaveLength(2);
-      expect(value.ranges[0]).toEqual({ start: 3, end: 5 });
-      expect(value.ranges[1]).toEqual({ start: 10, end: 20 });
-      for (const range of value.ranges) {
-        expect(isStateTreeNode(range)).toBe(false);
-      }
-    });
-
-    it("produces a payload that is structuredClone-able (root cause of FIT-1686)", () => {
-      const serialized = region.serialize();
-      expect(() => structuredClone(serialized)).not.toThrow();
-      const cloned = structuredClone(serialized);
-      expect(cloned.value.ranges).toEqual([
+      expect(toJS(value.ranges)).toEqual([
         { start: 3, end: 5 },
         { start: 10, end: 20 },
       ]);

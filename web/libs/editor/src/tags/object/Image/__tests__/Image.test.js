@@ -6,7 +6,7 @@ if (typeof globalThis.structuredClone === "undefined") {
   globalThis.structuredClone = (obj) => JSON.parse(JSON.stringify(obj));
 }
 
-import { getRoot, types } from "mobx-state-tree";
+import { addMiddleware, getRoot, types } from "mobx-state-tree";
 
 const mockManager = {
   addTool: mock(),
@@ -185,6 +185,7 @@ describe("Image model", () => {
     // Build model types using the correctly-loaded ImageModel
     MockAnnotation = types
       .model("MockAnnotation", {
+        pk: types.optional(types.maybeNull(types.string), null),
         toNames: types.optional(types.frozen(), new Map()),
         regionStore: types.optional(
           types.model({
@@ -361,6 +362,122 @@ describe("Image model", () => {
       const out = image.snapPointToPixel({ x: 1.2, y: 2.8 }, SNAP_TO_PIXEL_MODE.CENTER);
       expect(out.x).toBe(1.5);
       expect(out.y).toBe(2.5);
+    });
+  });
+
+  describe("_updateRegionsSizes and reinitHistory", () => {
+    function countReinitHistoryCalls(store) {
+      let count = 0;
+      const stop = addMiddleware(store.annotation, (call, next) => {
+        if (call.type === "action" && call.name === "reinitHistory") {
+          count += 1;
+        }
+        return next(call);
+      });
+      return { getCount: () => count, stop };
+    }
+
+    it("does not schedule reinitHistory when annotation has a server pk", async () => {
+      const store = createStore({
+        annotation: {
+          pk: "42",
+          toNames: new Map(),
+          regionStore: { regions: [], suggestions: [] },
+          history: { freeze: mock(), unfreeze: mock(), history: { length: 1 } },
+          names: new Map(),
+          image: {
+            name: "img",
+            value: "$url",
+            type: "image",
+            defaultzoom: "fit",
+          },
+        },
+      });
+      const { getCount, stop } = countReinitHistoryCalls(store);
+      const image = store.annotation.image;
+      if (!setImageNaturalSize(image, 800, 600) || !setImageStageSize(image, 400, 300)) {
+        stop();
+        expect(image).toBeDefined();
+        return;
+      }
+      image._updateRegionsSizes({
+        width: 400,
+        height: 300,
+        naturalWidth: 800,
+        naturalHeight: 600,
+      });
+      await new Promise((r) => setTimeout(r, 20));
+      stop();
+      expect(getCount()).toBe(0);
+    });
+
+    it("schedules reinitHistory when pk is null and history length is at most 1", async () => {
+      const store = createStore({
+        annotation: {
+          pk: null,
+          toNames: new Map(),
+          regionStore: { regions: [], suggestions: [] },
+          history: { freeze: mock(), unfreeze: mock(), history: { length: 1 } },
+          names: new Map(),
+          image: {
+            name: "img",
+            value: "$url",
+            type: "image",
+            defaultzoom: "fit",
+          },
+        },
+      });
+      const { getCount, stop } = countReinitHistoryCalls(store);
+      const image = store.annotation.image;
+      if (!setImageNaturalSize(image, 800, 600) || !setImageStageSize(image, 400, 300)) {
+        stop();
+        expect(image).toBeDefined();
+        return;
+      }
+      image._updateRegionsSizes({
+        width: 400,
+        height: 300,
+        naturalWidth: 800,
+        naturalHeight: 600,
+      });
+      await new Promise((r) => setTimeout(r, 20));
+      stop();
+      expect(getCount()).toBe(1);
+    });
+
+    it("does not schedule reinitHistory when skipHistoryReinit is true", async () => {
+      const store = createStore({
+        annotation: {
+          pk: null,
+          toNames: new Map(),
+          regionStore: { regions: [], suggestions: [] },
+          history: { freeze: mock(), unfreeze: mock(), history: { length: 1 } },
+          names: new Map(),
+          image: {
+            name: "img",
+            value: "$url",
+            type: "image",
+            defaultzoom: "fit",
+          },
+        },
+      });
+      const { getCount, stop } = countReinitHistoryCalls(store);
+      const image = store.annotation.image;
+      if (!setImageNaturalSize(image, 800, 600) || !setImageStageSize(image, 400, 300)) {
+        stop();
+        expect(image).toBeDefined();
+        return;
+      }
+      image._updateRegionsSizes({
+        width: 400,
+        height: 300,
+        naturalWidth: 800,
+        naturalHeight: 600,
+        skipHistoryReinit: true,
+      });
+      await new Promise((r) => setTimeout(r, 20));
+      stop();
+      expect(getCount()).toBe(0);
     });
   });
 

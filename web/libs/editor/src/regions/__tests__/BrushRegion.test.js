@@ -7,7 +7,7 @@
  */
 
 import { render, fireEvent, act } from "@testing-library/react";
-import { types } from "mobx-state-tree";
+import { isStateTreeNode, types } from "mobx-state-tree";
 const ff = mockFF();
 
 let mockBrushImageRef = null;
@@ -85,9 +85,6 @@ mockModule("react-konva", () => {
 mockModule("../../components/ImageView/ImageViewContext", () => ({
   ImageViewContext: require("react").createContext({ suggestion: null }),
 }));
-
-const _Canvas = require("../../utils/canvas");
-const { Geometry } = require("../../components/InteractiveOverlays/Geometry");
 
 function createMockAnnotation(overrides = {}) {
   return {
@@ -373,6 +370,17 @@ describe("BrushRegion", () => {
       expect(result.value.maskDataURL).toBe("data:image/png;base64,abc");
     });
 
+    it("serialize(fast: true) emits plain touch snapshots, not live MST nodes", () => {
+      region.beginPath({ type: "add", strokeWidth: 25 });
+      region.addPoint(0, 0);
+      region.addPoint(10, 10);
+      region.endPath();
+      const result = region.serialize({ fast: true });
+      expect(result.value.touches.length).toBeGreaterThan(0);
+      expect(isStateTreeNode(result.value.touches)).toBe(false);
+      expect(isStateTreeNode(result.value.touches[0])).toBe(false);
+    });
+
     it("serialize() without fast returns null when stage is unavailable", () => {
       root.image.setStageRef(null);
       const result = region.serialize();
@@ -450,6 +458,38 @@ describe("BrushRegion", () => {
       const initialUpdate = region.needsUpdate;
       region.updateImageSize(100, 100, 100, 100);
       expect(region.needsUpdate).toBe(initialUpdate + 1);
+    });
+
+    it("updateImageSize keeps stroke geometry when relativePoints were omitted (draft / history rehydrate)", () => {
+      const rootWire = TestRoot.create({
+        annotationStore: { selected: mockAnnotation },
+        settings: { showLabels: false },
+        image: { id: "img1", name: "image" },
+        region: {
+          id: "br_wire",
+          pid: "p1",
+          object: "img1",
+          touches: [
+            {
+              id: "touch_wire",
+              type: "add",
+              strokeWidth: 25,
+              points: [20, 20, 80, 80],
+              relativePoints: [],
+            },
+          ],
+        },
+      });
+      rootWire.image.setAnnotation(mockAnnotation);
+      stubRegionObjectRefs(rootWire);
+      const reg = rootWire.region;
+      const stroke = reg.touches[0];
+
+      expect(stroke.points.length).toBe(4);
+      reg.updateImageSize(1, 1, 100, 100);
+      expect(stroke.points.length).toBe(4);
+      expect(stroke.points.every((n) => Number.isFinite(n))).toBe(true);
+      expect(stroke.relativePoints.length).toBe(4);
     });
 
     it("updateImageSize does nothing when stage width or height <= 1", () => {
