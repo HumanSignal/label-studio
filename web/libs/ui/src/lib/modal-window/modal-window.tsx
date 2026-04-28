@@ -151,7 +151,7 @@ export function ModalWindow({
   const isDialogVariant = !isFullscreen && variant === "dialog";
 
   const panelClassName = cnm(
-    "flex min-h-0 flex-col bg-neutral-background overflow-hidden outline-none",
+    "flex min-h-0 flex-col bg-neutral-background outline-none",
     isDialogVariant ? "origin-center" : "origin-top",
     styles.panel,
     isFullscreen
