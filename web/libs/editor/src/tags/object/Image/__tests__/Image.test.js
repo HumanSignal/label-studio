@@ -444,41 +444,6 @@ describe("Image model", () => {
       stop();
       expect(getCount()).toBe(1);
     });
-
-    it("does not schedule reinitHistory when skipHistoryReinit is true", async () => {
-      const store = createStore({
-        annotation: {
-          pk: null,
-          toNames: new Map(),
-          regionStore: { regions: [], suggestions: [] },
-          history: { freeze: mock(), unfreeze: mock(), history: { length: 1 } },
-          names: new Map(),
-          image: {
-            name: "img",
-            value: "$url",
-            type: "image",
-            defaultzoom: "fit",
-          },
-        },
-      });
-      const { getCount, stop } = countReinitHistoryCalls(store);
-      const image = store.annotation.image;
-      if (!setImageNaturalSize(image, 800, 600) || !setImageStageSize(image, 400, 300)) {
-        stop();
-        expect(image).toBeDefined();
-        return;
-      }
-      image._updateRegionsSizes({
-        width: 400,
-        height: 300,
-        naturalWidth: 800,
-        naturalHeight: 600,
-        skipHistoryReinit: true,
-      });
-      await new Promise((r) => setTimeout(r, 20));
-      stop();
-      expect(getCount()).toBe(0);
-    });
   });
 
   describe("stageTranslate", () => {

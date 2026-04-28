@@ -23,6 +23,13 @@ const waitForPaint = () =>
     requestAnimationFrame(() => requestAnimationFrame(resolve));
   });
 
+export const shouldSaveDraftOnSelectionChange = (annotation) => {
+  if (typeof annotation?.needsDraftSave === "function") {
+    return annotation.needsDraftSave();
+  }
+  return Boolean(annotation?.history?.undoIdx);
+};
+
 /** Upper bound for lazy stub GET /api/annotations/:id/ so loading state cannot hang forever (FIT-1570). */
 const STUB_ANNOTATION_FETCH_TIMEOUT_MS = 120_000;
 
@@ -1178,7 +1185,7 @@ export class LSFWrapper {
     // Invoke the DataManager callback first so that history fetch can start immediately.
     // The history endpoint only needs the annotation pk (available on stubs).
     // Hydration (which fetches full annotation data) runs in parallel afterwards.
-    if (nextAnnotation?.history?.undoIdx) {
+    if (shouldSaveDraftOnSelectionChange(nextAnnotation)) {
       this.saveDraft(nextAnnotation).then(() => {
         this.datamanager.invoke("onSelectAnnotation", prevAnnotation, nextAnnotation, options, this);
       });

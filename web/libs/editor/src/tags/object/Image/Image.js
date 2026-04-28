@@ -1083,7 +1083,7 @@ const Model = types
         : Math.round(self.naturalHeight * self.stageZoom);
     },
 
-    _updateImageSize({ width, height, userResize, skipHistoryReinit }) {
+    _updateImageSize({ width, height, userResize }) {
       if (self.naturalWidth === undefined) {
         return;
       }
@@ -1118,11 +1118,10 @@ const Model = types
         naturalWidth: self.naturalWidth,
         naturalHeight: self.naturalHeight,
         userResize,
-        skipHistoryReinit: Boolean(skipHistoryReinit),
       });
     },
 
-    _updateRegionsSizes({ width, height, naturalWidth, naturalHeight, userResize, skipHistoryReinit }) {
+    _updateRegionsSizes({ width, height, naturalWidth, naturalHeight, userResize }) {
       const _historyLength = self.annotation?.history?.history?.length;
 
       self.annotation.history.freeze();
@@ -1140,7 +1139,7 @@ const Model = types
       // Sometimes when user zoomed in, annotation was creating a new history. Reinit collapses that
       // only for unsaved annotations (no server pk). After submit, history legitimately has one baseline
       // entry — reinit would cancel autosave / drafts and wipe undo needed for Update.
-      const shouldReinitHistoryAfterSizing = _historyLength <= 1 && !skipHistoryReinit && self.annotation?.pk == null;
+      const shouldReinitHistoryAfterSizing = _historyLength <= 1 && self.annotation?.pk == null;
       if (shouldReinitHistoryAfterSizing) {
         // Don't force unselection of regions during the updateObjects callback from history reinit
         setTimeout(() => self.annotation?.reinitHistory(false), 0);
@@ -1191,22 +1190,6 @@ const Model = types
      */
     onResize(width, height, userResize) {
       self._updateImageSize({ width, height, userResize });
-    },
-
-    /**
-     * Invoked from Annotation.updateObjects() after bulk region changes (draft ↔ submitted,
-     * history hydration). Re-runs stage sizing so brush strokes recompute canvas points.
-     */
-    needsUpdate(_opts) {
-      if (self.naturalWidth === undefined) return;
-      const container = self.containerRef;
-      if (!container?.offsetWidth || !container?.offsetHeight) return;
-      if (container.offsetWidth <= 1 || container.offsetHeight <= 1) return;
-      self._updateImageSize({
-        width: container.offsetWidth,
-        height: container.offsetHeight,
-        skipHistoryReinit: true,
-      });
     },
 
     event(name, ev, screenX, screenY) {
