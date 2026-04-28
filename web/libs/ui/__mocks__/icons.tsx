@@ -1,5 +1,18 @@
 import type React from "react";
 const IconStub = (props: React.SVGProps<SVGSVGElement>) => <svg {...(props as any)} />;
+
+export const Icon = new Proxy({} as Record<string, typeof IconStub>, {
+  get(target, prop: string) {
+    if (!target[prop]) {
+      target[prop] = IconStub;
+    }
+    return target[prop];
+  },
+});
+
+export const IconContext = {
+  Provider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+};
 export const IconAIAssistant = IconStub;
 export const IconAllProjects = IconStub;
 export const IconAnalytics = IconStub;

@@ -224,6 +224,7 @@ export default defineConfig(({ mode }) => {
         "mobx",
         "mobx-react",
         "mobx-state-tree",
+        "@phosphor-icons/react",
       ],
       rolldownOptions: {
         plugins: [optimizeDepsAutomaticJsxPlugin() as any],

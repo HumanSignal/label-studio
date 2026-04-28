@@ -1,3 +1,5 @@
+export * from "./icons";
+
 export { ReactComponent as IconAIAssistant } from "./ai-assistant.svg";
 export { ReactComponent as IconAllProjects } from "./all-projects.svg";
 export { ReactComponent as IconAnalytics } from "./analytics.svg";
