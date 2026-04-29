@@ -133,6 +133,11 @@ export const FF_LSE_PROJECT_DASHBOARDS_V3_THROUGHPUT = "fflag_feat_lse_project_d
 export const FF_LSE_PROJECT_DASHBOARDS_V3_DIAGNOSTICS = "fflag_feat_lse_project_dashboards_v3_diagnostics_short";
 
 /**
+ * LSE project hub: redesigned Members dashboard (performance + inter-rater reliability) under Dashboard V3.
+ */
+export const FF_LSE_PROJECT_DASHBOARDS_V3_MEMBERS = "fflag_feat_lse_project_dashboards_v3_members_short";
+
+/**
  * Show per-item classifications (like Choices or Taxonomy) alongside regions in the Outliner panel
  */
 export const FF_CLASSIFICATIONS_IN_OUTLINER = "fflag_feat_front_bros_766_per_item_in_outliner";
