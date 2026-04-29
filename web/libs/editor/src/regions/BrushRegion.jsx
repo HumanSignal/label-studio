@@ -1,5 +1,5 @@
 import { useCallback, useContext, useEffect, useRef, useState } from "react";
-import { Group, Image, Shape } from "react-konva";
+import { Group, Shape } from "react-konva";
 import { observer } from "mobx-react";
 import { getParent, getRoot, getSnapshot, getType, hasParent, isAlive, types } from "mobx-state-tree";
 import { decode as rleDecode } from "@thi.ng/rle-pack";
@@ -522,8 +522,23 @@ const BrushRegionModel = types.compose(
   Model,
 );
 
-const HtxBrushLayer = observer(({ item, setShapeRef, pointsList }) => {
+const HtxBrushLayer = observer(({ item, image, setShapeRef, pointsList }) => {
   const offscreenRef = useRef(null);
+  const imageHitDataRef = useRef(null);
+
+  // Drop the cached hit canvas whenever the bitmap reference changes (RLE
+  // update, recolor, history detach). Otherwise hit-testing would keep
+  // matching against a stale image after re-render.
+  useEffect(() => {
+    imageHitDataRef.current = null;
+  }, [image]);
+
+  useEffect(() => {
+    return () => {
+      offscreenRef.current = null;
+      imageHitDataRef.current = null;
+    };
+  }, []);
 
   const drawLine = useCallback((ctx, { points, strokeWidth, strokeColor, compositeOperation }) => {
     ctx.save();
@@ -544,8 +559,29 @@ const HtxBrushLayer = observer(({ item, setShapeRef, pointsList }) => {
 
   const sceneFunc = useCallback(
     (context) => {
-      if (pointsList.length === 0) return;
+      const hasTouches = pointsList.length > 0;
+      const hasImage = !!image;
+      if (!hasImage && !hasTouches) return;
 
+      const parent = item.parent;
+      if (!parent) return;
+
+      // Fast path — saved region with no in-progress strokes. A single
+      // drawImage on the layer canvas inherits the parent group's opacity
+      // cleanly, no offscreen needed. This is the steady state for most
+      // visible regions, so we keep it cheap.
+      if (!hasTouches) {
+        context.drawImage(image, 0, 0, parent.stageWidth, parent.stageHeight);
+        return;
+      }
+
+      // Slow path — touches are present (Draft mode, or Edit mode with new
+      // strokes on top of submitted RLE). RLE bitmap and touches are composed
+      // into one offscreen at full alpha so the parent opacity applies once to
+      // the combined result. Otherwise overlapping draws multiply alpha:
+      // stroke-vs-stroke (BROS-964) and stroke-vs-RLE (BROS-1082). Drawing the
+      // image first also lets eraser touches carve RLE pixels, not just
+      // sibling strokes.
       const nativeCtx = context._context || context;
       const canvas = nativeCtx.canvas;
       const w = canvas.width;
@@ -566,6 +602,10 @@ const HtxBrushLayer = observer(({ item, setShapeRef, pointsList }) => {
 
       offCtx.setTransform(currentTransform);
 
+      if (hasImage) {
+        offCtx.drawImage(image, 0, 0, parent.stageWidth, parent.stageHeight);
+      }
+
       pointsList.forEach((points) => {
         drawLine(offCtx, {
           points: points.points,
@@ -580,11 +620,48 @@ const HtxBrushLayer = observer(({ item, setShapeRef, pointsList }) => {
       nativeCtx.drawImage(offscreenRef.current, 0, 0);
       nativeCtx.restore();
     },
-    [pointsList, pointsList.length, item.strokeColor, drawLine],
+    [pointsList, pointsList.length, item, item.strokeColor, image, drawLine],
   );
 
   const hitFunc = useCallback(
     (context, shape) => {
+      const parent = item.parent;
+      if (!parent) return;
+      const w = parent.stageWidth;
+      const h = parent.stageHeight;
+
+      // Image-derived hit area: recolor non-transparent pixels to shape.colorKey
+      // so Konva's hit canvas matches this shape on click. Cached per image
+      // reference because getImageData/putImageData is expensive.
+      if (image && w > 1 && h > 1) {
+        if (!imageHitDataRef.current) {
+          const offscreen = document.createElement("canvas");
+
+          offscreen.width = w;
+          offscreen.height = h;
+          const offCtx = offscreen.getContext("2d");
+
+          offCtx.drawImage(image, 0, 0, w, h);
+          const imageData = offCtx.getImageData(0, 0, w, h);
+          const colorParts = colorToRGBAArray(shape.colorKey);
+
+          for (let i = imageData.data.length / 4 - 1; i >= 0; i--) {
+            if (imageData.data[i * 4 + 3] > 0) {
+              for (let k = 0; k < 3; k++) {
+                imageData.data[i * 4 + k] = colorParts[k];
+              }
+            }
+          }
+          offCtx.putImageData(imageData, 0, 0);
+          imageHitDataRef.current = offscreen;
+        }
+        context.drawImage(imageHitDataRef.current, 0, 0, w, h);
+      }
+
+      // Stroke-derived hit area. Eraser strokes paint white in source-over
+      // (not destination-out) so they don't contribute matchable hits but
+      // also don't carve the existing image hit area — preserving the
+      // pre-unification eraser-hit semantics.
       pointsList.forEach((points) => {
         drawLine(context, {
           points: points.points,
@@ -594,7 +671,7 @@ const HtxBrushLayer = observer(({ item, setShapeRef, pointsList }) => {
         });
       });
     },
-    [pointsList, pointsList.length, drawLine],
+    [pointsList, pointsList.length, image, item, drawLine],
   );
 
   return <Shape ref={(node) => setShapeRef(node)} sceneFunc={sceneFunc} hitFunc={hitFunc} />;
@@ -645,61 +722,6 @@ const HtxBrushView = ({ item, setShapeRef }) => {
     item.strokeColor,
     item.opacity,
   ]);
-
-  const imageDataRef = useRef(null);
-
-  // Drop cached hit mask when the image tag detaches (draft ↔ history tree swap);
-  // otherwise Konva can still call hitFunc with a stale closure while `item.parent` is null.
-  useEffect(() => {
-    if (!item.parent) {
-      imageDataRef.current = null;
-    }
-  }, [item.parent]);
-
-  // Drawing hit area by shape color to detect interactions inside the Konva.
-  // Uses an offscreen canvas with drawImage (respects transforms) instead of
-  // putImageData (ignores transforms and always writes at canvas origin).
-  const imageHitFunc = useCallback(
-    (context, shape) => {
-      const parent = item.parent;
-      if (!image || !parent) return;
-
-      const w = parent.stageWidth;
-      const h = parent.stageHeight;
-      if (!w || !h || w <= 1 || h <= 1) return;
-
-      if (!imageDataRef.current) {
-        const offscreen = document.createElement("canvas");
-
-        offscreen.width = w;
-        offscreen.height = h;
-        const offCtx = offscreen.getContext("2d");
-
-        offCtx.drawImage(image, 0, 0, w, h);
-        const imageData = offCtx.getImageData(0, 0, w, h);
-        const colorParts = colorToRGBAArray(shape.colorKey);
-
-        for (let i = imageData.data.length / 4 - 1; i >= 0; i--) {
-          if (imageData.data[i * 4 + 3] > 0) {
-            for (let k = 0; k < 3; k++) {
-              imageData.data[i * 4 + k] = colorParts[k];
-            }
-          }
-        }
-        offCtx.putImageData(imageData, 0, 0);
-        imageDataRef.current = offscreen;
-      }
-      context.drawImage(imageDataRef.current, 0, 0, w, h);
-    },
-    [image, item, item.parent?.stageWidth, item.parent?.stageHeight],
-  );
-
-  useEffect(() => {
-    // Cleanup the massive 8MB ImageData array when navigating away or unmounting
-    return () => {
-      imageDataRef.current = null;
-    };
-  }, []);
 
   const { store } = item;
 
@@ -769,13 +791,10 @@ const HtxBrushView = ({ item, setShapeRef }) => {
           }}
           listening={!suggestion}
         >
-          {/* RLE */}
-          <Image image={image} hitFunc={imageHitFunc} width={parent.stageWidth} height={parent.stageHeight} />
-
-          {/* Touches */}
-          <Group>
-            <HtxBrushLayer store={store} item={item} pointsList={item.touches} setShapeRef={setShapeRef} />
-          </Group>
+          {/* RLE/maskDataURL bitmap and brush touches are rendered together
+              inside HtxBrushLayer's offscreen canvas, so the parent group's
+              opacity is applied once to the combined result (BROS-1082). */}
+          <HtxBrushLayer store={store} item={item} pointsList={item.touches} image={image} setShapeRef={setShapeRef} />
         </Group>
       </Group>
       <Group id={`${item.cleanId}_labels`} opacity={item.opacity}>
