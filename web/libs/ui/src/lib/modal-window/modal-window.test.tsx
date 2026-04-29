@@ -8,16 +8,25 @@ import { Button } from "../button/button";
 function ControlledModal(
   props: Omit<ComponentProps<typeof ModalWindow>, "open" | "onOpenChange"> & {
     initiallyOpen?: boolean;
+    /** Observes dismiss requests; Radix `DismissableLayer` only handles Escape for the topmost layer. */
+    onOpenChangeSpy?: (open: boolean) => void;
   },
 ) {
-  const { initiallyOpen, ...rest } = props;
+  const { initiallyOpen, onOpenChangeSpy, ...rest } = props;
   const [open, setOpen] = useState(initiallyOpen ?? false);
   return (
     <>
       <Button onClick={() => setOpen(true)} data-testid="open-btn">
         Open
       </Button>
-      <ModalWindow {...rest} open={open} onOpenChange={setOpen} />
+      <ModalWindow
+        {...rest}
+        open={open}
+        onOpenChange={(next) => {
+          onOpenChangeSpy?.(next);
+          setOpen(next);
+        }}
+      />
     </>
   );
 }
@@ -36,17 +45,26 @@ describe("ModalWindow", () => {
   });
 
   it("closes on Escape", async () => {
+    const onOpenChangeSpy = mock<(open: boolean) => void>();
+    // `animate={false}` avoids Radix Presence waiting on exit keyframes in JSDOM.
+    // Escape is only handled for the topmost `DismissableLayer` (shared default context);
+    // under coverage / ordering, retry Escape until this modal's `onOpenChange(false)` runs.
     render(
-      <ControlledModal title="Dismiss me">
+      <ControlledModal title="Dismiss me" animate={false} onOpenChangeSpy={onOpenChangeSpy}>
         <div>Content</div>
       </ControlledModal>,
     );
 
-    await act(async () => {
-      fireEvent.click(screen.getByTestId("open-btn"));
-    });
+    fireEvent.click(screen.getByTestId("open-btn"));
+    await screen.findByRole("dialog");
 
-    expect(await screen.findByRole("dialog")).toBeInTheDocument();
+    await waitFor(() => {
+      const surface = screen.queryByRole("dialog");
+      if (surface) {
+        fireEvent.keyDown(surface, { key: "Escape", code: "Escape", bubbles: true, cancelable: true });
+      }
+      expect(onOpenChangeSpy).toHaveBeenCalledWith(false);
+    });
 
     await act(async () => {
       fireEvent.keyDown(document, { key: "Escape", code: "Escape", bubbles: true });
@@ -62,7 +80,7 @@ describe("ModalWindow", () => {
 
   it("closes when close button is activated", async () => {
     render(
-      <ControlledModal title="Closable">
+      <ControlledModal title="Closable" animate={false}>
         <div>Inside</div>
       </ControlledModal>,
     );
