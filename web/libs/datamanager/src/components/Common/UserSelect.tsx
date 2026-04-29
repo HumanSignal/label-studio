@@ -31,17 +31,18 @@ export const UserSelect = observer(({ filter, onChange, multiple, value, placeho
     selectedValue,
   );
   const options = useMemo(() => {
-    return users.map((user) => {
+    return users.filter(Boolean).map((user) => {
       const displayName = userDisplayName(user);
-      user.displayName = displayName;
+      const displayUser = { ...user, displayName };
+
       return {
         value: user.id,
         raw: { id: user.id, email: user.email, displayName, username: user.username },
         label: (
-          <Tooltip title={user.displayName} alignment="top-left">
+          <Tooltip title={displayName} alignment="top-left">
             <div className="flex gap-2 w-full items-center">
-              <Userpic user={user} size={16} key={`user-${user.id}`} showName={true} />
-              <span className="text-ellipsis text-nowrap overflow-hidden w-full">{user.displayName}</span>
+              <Userpic user={displayUser} size={16} key={`user-${user.id}`} showName={true} />
+              <span className="text-ellipsis text-nowrap overflow-hidden w-full">{displayName}</span>
             </div>
           </Tooltip>
         ),
