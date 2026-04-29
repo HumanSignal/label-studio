@@ -58,6 +58,8 @@ To create a project template:
 3. Add a title and description for the project.
 4. Click **Save**.
 
+These templates then appear under **Label Studio Enterprise Templates** section in the Template Gallery in the project creation flow.
+
 ## Duplicate projects
 
 When you duplicate a project, you can copy the following:
@@ -92,6 +94,15 @@ You may need to refresh the page before you can see the new project.
 2. Under the **General** tab, use the **Workspace** drop-down menu to select a new workspace.
 3. Click **Save**.
 
+## Publish a project 
+
+You can hide projects from annotators so that you can fully configure the project before anyone can start labeling. When you're ready for annotators to start labeling, publish the project.
+
+To publish a project, click the pause icon in the breadcrumb at the top of the page:
+
+![Screenshot of publish project](/images/project/publish.png)
+
+You can later unpublish the project by clicking the play icon in the breadcrumb.
 
 ## Pin projects
 
