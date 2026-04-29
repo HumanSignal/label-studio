@@ -36,6 +36,7 @@
  * spinner?: import("react").ReactNode
  * apiTransform?: Record<string, Record<string, Function>
  * tabControls?: { add?: boolean, delete?: boolean, edit?: boolean, duplicate?: boolean },
+ * AgreementSettingsSummary?: import("react").ComponentType<{ filters: unknown }>,
  * }} DMConfig
  */
 
@@ -191,10 +192,12 @@ export class DataManager {
 
     Object.assign(this.tabControls, config.tabControls ?? {});
 
-    // Store LSE-specific callbacks and components
+    // Store enterprise-host callbacks and components (LSE); OSS Data Manager does not set these.
     this.onViewAnalytics = config.onViewAnalytics;
     this.onViewReviewerAnalytics = config.onViewReviewerAnalytics;
     this.RowContextMenuComponent = config.RowContextMenuComponent;
+    /** LSE only: rich agreement header tooltip (`filters` prop). OSS uses built-in plain summary. */
+    this.AgreementSettingsSummary = config.AgreementSettingsSummary ?? null;
 
     this.updateActions(config.actions);
 

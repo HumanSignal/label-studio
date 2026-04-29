@@ -3,6 +3,16 @@ import { isDefined } from "../../../utils/utils";
 import { useState } from "react";
 import { Button, Popover, Tooltip } from "@humansignal/ui";
 import { IconInfoOutline } from "@humansignal/icons";
+import {
+  isActive,
+  FF_AGREEMENT_FILTERED,
+  FF_UTC_428_CONSENSUS_CONTROL_TAG_AGREEMENT,
+} from "@humansignal/core/lib/utils/feature-flags";
+import {
+  buildAgreementCalculationPlainSummary,
+  normalizeAgreementSelected,
+  shouldShowAgreementCalculationIndicator,
+} from "../../../utils/agreementSelected";
 
 const LOW_AGREEMENT_SCORE = 33;
 const MEDIUM_AGREEMENT_SCORE = 66;
@@ -84,18 +94,46 @@ export const Agreement = (cell) => {
 
 Agreement.userSelectable = false;
 
+const AGREEMENT_HEADER_DEFAULT_TOOLTIP = "Adjust calculation and display of all agreement columns";
+
 Agreement.HeaderCell = ({ agreementFilters, onSave, children }) => {
   const sdk = useSDK();
+  const AgreementSettingsSummary = sdk?.AgreementSettingsSummary ?? null;
+
+  const agreementFeatureFlagsActive =
+    isActive(FF_AGREEMENT_FILTERED) && isActive(FF_UTC_428_CONSENSUS_CONTROL_TAG_AGREEMENT);
+  const normalized = normalizeAgreementSelected(agreementFilters);
+  const showCustomSummary = shouldShowAgreementCalculationIndicator(agreementFeatureFlagsActive, agreementFilters);
+
+  const customTooltipTitle = showCustomSummary ? (
+    AgreementSettingsSummary ? (
+      <AgreementSettingsSummary filters={normalized} />
+    ) : (
+      <div className="max-w-sm whitespace-pre-line p-tight text-body-small text-neutral-content">
+        {buildAgreementCalculationPlainSummary(normalized, {})}
+      </div>
+    )
+  ) : null;
+
+  const tooltipTitle = showCustomSummary && customTooltipTitle ? customTooltipTitle : AGREEMENT_HEADER_DEFAULT_TOOLTIP;
+
   return (
-    <Button
-      look="outlined"
-      variant="neutral"
-      size="small"
-      tooltip="Adjust calculation and display of all agreement columns"
-      onClick={() => sdk.invoke("AgreementHeaderClick", { agreementFilters, onSave })}
-      className="flex items-center justify-between gap-tight w-full cursor-pointer overflow-hidden"
+    <Tooltip
+      interactive={showCustomSummary}
+      theme={showCustomSummary ? "light" : "dark"}
+      alignment="bottom-center"
+      className={showCustomSummary ? "!max-w-[min(320px,calc(100vw-2rem))]" : undefined}
+      title={tooltipTitle}
     >
-      {children}
-    </Button>
+      <Button
+        look="outlined"
+        variant="neutral"
+        size="small"
+        onClick={() => sdk.invoke("AgreementHeaderClick", { agreementFilters, onSave })}
+        className="flex w-full cursor-pointer items-center justify-between gap-tight overflow-hidden"
+      >
+        {children}
+      </Button>
+    </Tooltip>
   );
 };
