@@ -175,6 +175,7 @@ export const IconInfoConfig = IconStub;
 export const IconInfoFilled = IconStub;
 export const IconInfoOutline = IconStub;
 export const IconInputField = IconStub;
+export const IconInterfaces = IconStub;
 export const IconInterpolationAdd = IconStub;
 export const IconInterpolationDisabled = IconStub;
 export const IconInterpolationRemove = IconStub;

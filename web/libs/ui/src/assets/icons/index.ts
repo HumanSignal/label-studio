@@ -158,6 +158,7 @@ export { ReactComponent as IconInputField } from "./input-field.svg";
 export { ReactComponent as IconInfoConfig } from "./info-config.svg";
 export { ReactComponent as IconInfoFilled } from "./info-filled.svg";
 export { ReactComponent as IconInfoOutline } from "./info-outline.svg";
+export { ReactComponent as IconInterfaces } from "./interfaces.svg";
 export { ReactComponent as IconInterpolationAdd } from "./interpolation-add.svg";
 export { ReactComponent as IconInterpolationDisabled } from "./interpolation-disabled.svg";
 export { ReactComponent as IconInterpolationRemove } from "./interpolation-remove.svg";
