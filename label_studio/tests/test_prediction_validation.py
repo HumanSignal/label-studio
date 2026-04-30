@@ -23,7 +23,7 @@ from organizations.tests.factories import OrganizationFactory
 from projects.tests.factories import ProjectFactory
 from rest_framework.exceptions import ValidationError
 from rest_framework.test import APIRequestFactory, force_authenticate
-from tasks.models import Annotation, Prediction, Task
+from tasks.models import Annotation, AnnotationDraft, Prediction, Task
 from tasks.tests.factories import TaskFactory
 from users.tests.factories import UserFactory
 
@@ -135,6 +135,40 @@ class TestPredictionValidation:
         assert serializer.is_valid(), serializer.errors
         created_tasks = serializer.save(project_id=self.project.id)
         assert len(created_tasks) == 1
+
+    @patch('tasks.serializers.flag_set', return_value=True)
+    def test_import_tasks_sanitizes_draft_state_from_snapshot(self, _mock_flag_set):
+        """ImportApiSerializer must ignore export-only draft state fields from JSON snapshots."""
+        tasks = [
+            {
+                'data': {'text': 'Draft state should be ignored'},
+                'drafts': [
+                    {
+                        'id': 222,
+                        'state': 'CREATED',
+                        'result': [
+                            {
+                                'from_name': 'sentiment',
+                                'to_name': 'text',
+                                'type': 'choices',
+                                'value': {'choices': ['positive']},
+                            }
+                        ],
+                        'lead_time': 1.25,
+                        'was_postponed': False,
+                        'user': self.user.email,
+                    }
+                ],
+            }
+        ]
+
+        serializer = ImportApiSerializer(data=tasks, many=True, context={'project': self.project, 'user': self.user})
+        assert serializer.is_valid(), serializer.errors
+        created_tasks = serializer.save(project_id=self.project.id)
+
+        draft = AnnotationDraft.objects.get(task=created_tasks[0])
+        assert draft.import_id == 222
+        assert draft.result[0]['value'] == {'choices': ['positive']}
 
     @patch(
         'data_import.api.flag_set',

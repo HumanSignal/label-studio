@@ -679,10 +679,10 @@ class BaseTaskSerializerBulk(serializers.ListSerializer):
                         'import_id': draft.get('id'),
                     }
                 )
-                # remove redundant fields
+                # remove redundant/export-only fields
                 [
                     draft.pop(field, None)
-                    for field in ['id', 'task', 'annotation', 'project', 'created_username', 'created_ago']
+                    for field in ['id', 'task', 'annotation', 'project', 'created_username', 'created_ago', 'state']
                 ]
                 db_drafts.append(AnnotationDraft(**draft))
 
