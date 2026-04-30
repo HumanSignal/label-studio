@@ -532,6 +532,34 @@ After you set up these permissions in your environment, you're ready to write yo
 | `GCP_REGION_CUSTOM_METRICS` | The GCP region for Cloud Functions (e.g. `us-central1`, `europe-west1`). | `us-central1` |
 | `GCP_SERVICE_ACCOUNT_CUSTOM_METRICS` | The email of the runtime service account that deployed Cloud Functions execute as. | (none, optional) |
 
+#### Cloud Function runtime configuration
+
+Label Studio Enterprise deploys each custom metric Cloud Function with a fixed runtime configuration. These values are not user-configurable from the UI or environment variables and apply to every deployed function:
+
+| Setting | Value |
+| --- | --- |
+| **Runtime** | Python 3.13 (`python313`) |
+| **Entry point** | `agreement_handler` |
+| **Memory** | 256 MB |
+| **Request timeout** | 60 seconds |
+| **Max instance count** | 1 |
+| **Ingress** | Internal only (`ALLOW_INTERNAL_ONLY`) |
+
+Notes on these defaults:
+
+- **Python 3.13** is the only runtime version. Make sure your custom agreement metric code (and any imports you rely on) is compatible with Python 3.13.
+- **Memory and timeout** are fixed at 256 MB and 60 seconds. Metric implementations that load large models or perform expensive computation may exceed these limits and fail to score. Keep your `agreement` function lightweight and stateless.
+- **Max instance count of 1** means concurrent agreement scoring requests are queued at the function level. This is intentional, since custom metric scoring is invoked from background workers and not from interactive paths.
+
+##### Internal ingress and network connectivity
+
+Cloud Functions deployed by Label Studio Enterprise are configured with `ALLOW_INTERNAL_ONLY` ingress. This has two practical implications:
+
+1. **Label Studio Enterprise must be able to reach Cloud Functions over Google's internal network.** When LSE is running on Compute Engine or GKE in the same GCP project, this works out of the box — internal traffic from Google Cloud services to Cloud Functions is permitted by default.
+2. **You cannot invoke the deployed function directly from outside Google's network** (for example, from a developer laptop using `curl` or the Cloud Console "Test" button) — those requests will be rejected with a `403 Forbidden`. To verify a deployed function works, trigger scoring from inside Label Studio Enterprise (for example, by recalculating agreement on a project that uses the metric).
+
+If your LSE deployment lives in a separate VPC or project from the Cloud Functions, you must establish internal connectivity (Shared VPC, VPC peering, or a Serverless VPC Access connector configured for the Cloud Function) before scoring will succeed.
+
 #### Adding functions to projects in Label Studio
 
 When using Google Cloud Functions, Label Studio stores and reuses the function identity per project, then resolves the function URL automatically during scoring. 
