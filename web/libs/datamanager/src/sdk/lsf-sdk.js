@@ -5,7 +5,7 @@ import { isDefined } from "../utils/utils";
 import { Modal } from "../components/Common/Modal/Modal";
 import { CommentsSdk } from "./comments-sdk";
 // import { LSFHistory } from "./lsf-history";
-import { annotationToServer, taskToLSFormat } from "./lsf-utils";
+import { annotationToServer, formatDraftCreatedUsernameFromUser, taskToLSFormat } from "./lsf-utils";
 import { when, runInAction } from "mobx";
 import { isAlive } from "mobx-state-tree";
 import { imageCache } from "@humansignal/core";
@@ -603,12 +603,16 @@ export class LSFWrapper {
           }
         } else {
           // Annotation not found - restore annotation from draft
+          const cb = draft?.created_by;
+          const ownerUser = cb && typeof cb.id === "number" ? cb : undefined;
+          const createdBy = draft.created_username || (ownerUser ? formatDraftCreatedUsernameFromUser(ownerUser) : "");
           c = cs.addAnnotation({
             draft: draft.result,
             userGenerate: true,
+            user: ownerUser,
             comment_count: draft.comment_count,
             unresolved_comment_count: draft.unresolved_comment_count,
-            createdBy: draft.created_username,
+            createdBy,
             createdAgo: draft.created_ago,
             createdDate: draft.created_at,
           });

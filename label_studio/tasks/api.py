@@ -13,7 +13,7 @@ from data_manager.functions import evaluate_predictions
 from data_manager.models import PrepareParams
 from data_manager.serializers import DataManagerTaskSerializer
 from django.db import transaction
-from django.db.models import Q
+from django.db.models import Prefetch, Q
 from django.utils import timezone
 from django.utils.decorators import method_decorator
 from django_filters.rest_framework import DjangoFilterBackend
@@ -310,6 +310,7 @@ class TaskAPI(generics.RetrieveUpdateDestroyAPIView):
             annotation_children,
             prediction_children,
             'annotations__completed_by',
+            Prefetch('drafts', queryset=AnnotationDraft.objects.select_related('user')),
             'project',
             'io_storages_azureblobimportstoragelink',
             'io_storages_gcsimportstoragelink',

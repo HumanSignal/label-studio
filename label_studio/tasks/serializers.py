@@ -682,7 +682,16 @@ class BaseTaskSerializerBulk(serializers.ListSerializer):
                 # remove redundant/export-only fields
                 [
                     draft.pop(field, None)
-                    for field in ['id', 'task', 'annotation', 'project', 'created_username', 'created_ago', 'state']
+                    for field in [
+                        'id',
+                        'task',
+                        'annotation',
+                        'project',
+                        'created_username',
+                        'created_ago',
+                        'state',
+                        'created_by',
+                    ]
                 ]
                 db_drafts.append(AnnotationDraft(**draft))
 
@@ -858,6 +867,7 @@ class AnnotationDraftSerializer(ModelSerializer):
 
     state = FSMStateField(read_only=True)  # FSM state - automatically uses annotation if present
     user = serializers.CharField(default=serializers.CurrentUserDefault())
+    created_by = CompletedByDMSerializer(source='user', read_only=True, allow_null=True)
     created_username = serializers.SerializerMethodField(default='', read_only=True, help_text='User name string')
     created_ago = serializers.CharField(default='', read_only=True, help_text='Delta time from creation time')
 
