@@ -1,6 +1,5 @@
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import type { AcceptedPlugin } from "postcss";
 import type { StorybookConfig } from "@storybook/react-vite";
 import type { ESBuildOptions, Plugin } from "vite";
 import postcssNested from "postcss-nested";
@@ -9,34 +8,15 @@ import tailwindcss from "tailwindcss";
 import svgr from "vite-plugin-svgr";
 import postcssImport from "postcss-import";
 
+import tailwindConfigModule from "../../../tailwind.config.js";
+import { CSS_PREFIX, cssModulesGenerateScopedName } from "../../../vite-prefix-css-module";
+import { jsxJsPlugin, optimizeDepsAutomaticJsxPlugin } from "../../../vite-lib-jsx-plugins";
+import { postcssPrefixLsfClasses } from "../../../postcss-prefix-lsf.cjs";
+
 const dirname = path.dirname(fileURLToPath(import.meta.url));
 
-/** Storybook evaluates this file with a virtual `/` root, so filesystem-relative imports must use `import.meta.url` (see Makefile: `bun run storybook:serve`). */
-async function loadWebTooling() {
-  const base = new URL("../../../", import.meta.url).href;
-  const [
-    { default: tailwindConfig },
-    { cssModulesGenerateScopedName, CSS_PREFIX },
-    { jsxJsPlugin, optimizeDepsAutomaticJsxPlugin },
-    postcssPrefixLsfModule,
-  ] = await Promise.all([
-    import(new URL("tailwind.config.js", base).href),
-    import(new URL("vite-prefix-css-module.ts", base).href),
-    import(new URL("vite-lib-jsx-plugins.ts", base).href),
-    import(new URL("postcss-prefix-lsf.cjs", base).href),
-  ]);
-  const { postcssPrefixLsfClasses } = postcssPrefixLsfModule.default as {
-    postcssPrefixLsfClasses: () => AcceptedPlugin;
-  };
-  return {
-    tailwindConfig,
-    cssModulesGenerateScopedName,
-    CSS_PREFIX,
-    jsxJsPlugin,
-    optimizeDepsAutomaticJsxPlugin,
-    postcssPrefixLsfClasses,
-  };
-}
+const tailwindConfig =
+  (tailwindConfigModule as { default?: typeof tailwindConfigModule }).default ?? tailwindConfigModule;
 
 const config: StorybookConfig = {
   stories: ["../../../libs/**/*.@(mdx|stories.@(js|jsx|ts|tsx))", "../../../apps/**/*.@(mdx|stories.@(js|jsx|ts|tsx))"],
@@ -51,14 +31,6 @@ const config: StorybookConfig = {
   },
 
   viteFinal: async (viteConfig) => {
-    const {
-      tailwindConfig,
-      cssModulesGenerateScopedName,
-      CSS_PREFIX,
-      jsxJsPlugin,
-      optimizeDepsAutomaticJsxPlugin,
-      postcssPrefixLsfClasses,
-    } = await loadWebTooling();
     const root = path.resolve(dirname, "../../..");
     const mode = viteConfig.mode ?? "development";
     viteConfig.define = {
