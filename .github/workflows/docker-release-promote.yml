@@ -180,12 +180,12 @@ jobs:
 
       - name: Extract Docker metadata
         id: meta
-        uses: docker/metadata-action@v5
+        uses: docker/metadata-action@v6
         with:
           images: ${{ env.IMAGE_NAME }}
 
       - name: Build and Push Release Ubuntu Docker image (${{ matrix.platform }})
-        uses: docker/build-push-action@v6.19.2
+        uses: docker/build-push-action@v7.0.0
         id: docker_build
         with:
           context: ${{ steps.release_dockerfile.outputs.release_dir }}
@@ -236,7 +236,7 @@ jobs:
 
       - name: Extract Docker metadata
         id: meta
-        uses: docker/metadata-action@v5
+        uses: docker/metadata-action@v6
         with:
           images: ${{ env.IMAGE_NAME }}
           labels: |

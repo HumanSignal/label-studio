@@ -90,12 +90,12 @@ jobs:
 
       - name: Docker meta
         id: meta
-        uses: docker/metadata-action@v5
+        uses: docker/metadata-action@v6
         with:
           images: ${{ env.IMAGE_NAME }}
 
       - name: Push Docker image (${{ matrix.platform }})
-        uses: docker/build-push-action@v6.19.2
+        uses: docker/build-push-action@v7.0.0
         id: docker_build_and_push
         with:
           context: .
@@ -153,7 +153,7 @@ jobs:
 
       - name: Extract Docker metadata
         id: meta
-        uses: docker/metadata-action@v5
+        uses: docker/metadata-action@v6
         with:
           images: ${{ env.IMAGE_NAME }}
           tags: |

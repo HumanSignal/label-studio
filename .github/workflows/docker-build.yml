@@ -139,12 +139,12 @@ jobs:
 
       - name: Docker meta
         id: meta
-        uses: docker/metadata-action@v5
+        uses: docker/metadata-action@v6
         with:
           images: ${{ env.IMAGE_NAME }}
 
       - name: Push Docker image (${{ matrix.platform }})
-        uses: docker/build-push-action@v6.19.2
+        uses: docker/build-push-action@v7.0.0
         id: docker_build_and_push
         with:
           context: .
@@ -200,7 +200,7 @@ jobs:
 
       - name: Docker meta
         id: meta
-        uses: docker/metadata-action@v5
+        uses: docker/metadata-action@v6
         with:
           images: ${{ env.IMAGE_NAME }}
           tags: |
@@ -265,7 +265,7 @@ jobs:
           GITHUB_RUN_ID: "${{ github.run_id }}"
           GITHUB_SHA: "${{ github.sha }}"
           SLACK_BOT_TOKEN: ${{ secrets.SLACK_LSE_BOT_TOKEN }}
-        uses: slackapi/slack-github-action@v1.27
+        uses: slackapi/slack-github-action@v3.0
         with:
           channel-id: 'C01RJV08UJK'
           slack-message: |

@@ -42,7 +42,7 @@ jobs:
         with:
           ref: ${{ github.ref }}
 
-      - uses: dorny/paths-filter@v3
+      - uses: dorny/paths-filter@v4
         id: changes
         with:
           filters: |

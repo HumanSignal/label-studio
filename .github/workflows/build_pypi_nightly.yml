@@ -103,7 +103,7 @@ jobs:
 
       - name: Create Nightly Release
         id: create_release
-        uses: softprops/action-gh-release@v2.5.0
+        uses: softprops/action-gh-release@v2.6.1
         with:
           token: ${{ secrets.GIT_PAT }}
           body_path: ${{ github.workspace }}-CHANGELOG.txt
@@ -139,7 +139,7 @@ jobs:
       steps:
         - name: Send Notification to Slack
           id: slack_notify_ops_release
-          uses: slackapi/slack-github-action@v1.27
+          uses: slackapi/slack-github-action@v3.0
           with:
             channel-id: 'C01RJV08UJK'
             slack-message: |
