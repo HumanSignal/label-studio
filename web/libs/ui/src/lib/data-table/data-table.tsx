@@ -10,6 +10,7 @@ import {
   type VisibilityState,
   type HeaderContext,
   type SortingState,
+  type Column,
 } from "@tanstack/react-table";
 
 // Extend ColumnMeta to include noDivider
@@ -18,7 +19,7 @@ declare module "@tanstack/react-table" {
     noDivider?: boolean;
   }
 }
-import { memo, useState, useMemo, useCallback } from "react";
+import { memo, useState, useMemo, useCallback, useLayoutEffect, type CSSProperties, type UIEventHandler } from "react";
 import { cn } from "../../utils/utils";
 import { useColumnSizing, useDataColumns } from "../../hooks/data-table";
 import { Checkbox } from "../checkbox/checkbox";
@@ -46,10 +47,14 @@ export type DataTableProps<T extends DataShape> = {
   includeColumns?: (keyof T[number])[];
   excludeColumns?: (keyof T[number])[];
   pinColumns?: (keyof T[number])[];
+  /** Column ids pinned to the left (e.g. first user column) for horizontal scroll context */
+  pinLeftColumns?: string[];
   columnOrder?: (keyof T[number])[];
   columnVisibility?: VisibilityState;
   onColumnVisibilityChange?: (updater: VisibilityState | ((state: VisibilityState) => VisibilityState)) => void;
   cellSizesStorageKey?: string;
+  /** Fires after layout with pixel widths from TanStack (resize, visibility, pin). Use to align external footer rows. */
+  onLeafColumnSizesChange?: (sizesByColumnId: Record<string, number>) => void;
   onRowClick?: (row?: Row<T[number]>) => void;
   rowClassName?: (row: Row<T[number]>) => string | undefined;
   selectable?: boolean;
@@ -86,6 +91,12 @@ export type DataTableProps<T extends DataShape> = {
   className?: string;
   /** Test ID for the table container */
   dataTestId?: string;
+  /**
+   * Scroll events from the table body element.
+   * When column pinning is off, this is the vertical scroll container. When pinning is on,
+   * the body does not scroll (parent should scroll); use a wrapper `onScroll` for infinite lists.
+   */
+  onBodyScroll?: UIEventHandler<HTMLDivElement>;
   /** Controlled active row ID - when provided, controls which row is active */
   activeRowId?: string;
   /** Custom function to extract row ID from row data - useful when row.id is not the primary identifier */
@@ -101,6 +112,17 @@ const getColumnStyle = (size: number, minSize: number, maxSize: number | undefin
   maxWidth: maxSize ? `${maxSize}px` : undefined,
   flex: `0 0 ${size}px`,
 });
+
+const getPinnedOffsetStyle = <T,>(column: Column<T, unknown>): CSSProperties => {
+  const pin = column.getIsPinned();
+  if (pin === "left") {
+    return { left: `${column.getStart("left")}px` };
+  }
+  if (pin === "right") {
+    return { right: `${column.getAfter("right")}px` };
+  }
+  return {};
+};
 
 export const DataTable = <T extends DataShape>(props: DataTableProps<T>) => {
   const {
@@ -308,6 +330,12 @@ export const DataTable = <T extends DataShape>(props: DataTableProps<T>) => {
     return [selectionColumn, ...columnsWithHeaders];
   }, [columnsWithHeaders, selectable]);
 
+  // Only enable TanStack column pinning when used — avoids pinning feature overhead and
+  // keeps behavior aligned with pre-pinning tables (all current @humansignal/ui consumers
+  // except callers that pass pinLeftColumns / pinColumns).
+  const columnPinningEnabled =
+    (props.pinLeftColumns?.length ?? 0) > 0 || (Array.isArray(props.pinColumns) && props.pinColumns.length > 0);
+
   const table = useReactTable({
     data: props.data,
     meta: props.meta ?? {},
@@ -319,7 +347,8 @@ export const DataTable = <T extends DataShape>(props: DataTableProps<T>) => {
     },
     state: {
       columnPinning: {
-        right: props.pinColumns as string[],
+        left: props.pinLeftColumns ?? [],
+        right: (props.pinColumns ?? []) as string[],
       },
       columnVisibility: props.columnVisibility,
       rowSelection,
@@ -369,6 +398,7 @@ export const DataTable = <T extends DataShape>(props: DataTableProps<T>) => {
         return rowId !== undefined ? String(rowId) : String(index);
       }),
     columnResizeMode: "onChange",
+    enableColumnPinning: columnPinningEnabled,
     enableSorting: enableSorting,
     manualSorting,
     getCoreRowModel: getCoreRowModel(),
@@ -379,6 +409,11 @@ export const DataTable = <T extends DataShape>(props: DataTableProps<T>) => {
   useColumnSizing(table, props.cellSizesStorageKey);
 
   const { columnSizing } = table.getState();
+
+  useLayoutEffect(() => {
+    if (!props.onLeafColumnSizesChange) return;
+    props.onLeafColumnSizesChange(Object.fromEntries(table.getVisibleLeafColumns().map((c) => [c.id, c.getSize()])));
+  }, [props.onLeafColumnSizesChange, table, columnSizing, props.columnVisibility]);
   const rows = table.getRowModel().rows;
 
   const handleRowClick = useCallback(
@@ -396,8 +431,13 @@ export const DataTable = <T extends DataShape>(props: DataTableProps<T>) => {
   // Check if we should show empty state
   const showEmptyState = rows.length === 0 && !props.isLoading && props.emptyState;
 
+  const bodyShellClassName = cn(styles.body, columnPinningEnabled && styles.bodyWithColumnPins);
+
   return (
-    <div className={cn(styles.container, className)} data-testid={dataTestId}>
+    <div
+      className={cn(styles.container, columnPinningEnabled && styles.containerWithColumnPins, className)}
+      data-testid={dataTestId}
+    >
       <DataTableHead table={table} />
       {props.isLoading ? (
         <DataTableSkeletonBody
@@ -405,9 +445,11 @@ export const DataTable = <T extends DataShape>(props: DataTableProps<T>) => {
           loadingRows={loadingRows}
           columnSizing={columnSizing}
           selectable={selectable}
+          bodyClassName={bodyShellClassName}
+          onBodyScroll={props.onBodyScroll}
         />
       ) : showEmptyState ? (
-        <div className={styles.body}>
+        <div className={bodyShellClassName} onScroll={props.onBodyScroll}>
           <EmptyState
             className="px-wide py-widest"
             size="small"
@@ -429,6 +471,8 @@ export const DataTable = <T extends DataShape>(props: DataTableProps<T>) => {
           columnSizing={columnSizing}
           rowSelection={rowSelection}
           activeRowId={activeRowId}
+          bodyClassName={bodyShellClassName}
+          onBodyScroll={props.onBodyScroll}
         />
       )}
     </div>
@@ -446,7 +490,7 @@ const DataTableHead = <T extends Record<string, unknown>>({ table }: DataTableHe
         <div className={styles.headRow} key={group.id}>
           {group.headers.map((header, index) => {
             const { column } = header;
-            const isPinned = column.getIsPinned();
+            const pinSide = column.getIsPinned();
             const columnDef = column.columnDef;
             const minSize = columnDef.minSize ?? 50;
             const maxSize = columnDef.maxSize ?? 1200;
@@ -456,7 +500,7 @@ const DataTableHead = <T extends Record<string, unknown>>({ table }: DataTableHe
             const isSortable = column.getCanSort();
 
             // Calculate column style
-            const style = getColumnStyle(size, minSize, maxSize);
+            const style = { ...getColumnStyle(size, minSize, maxSize), ...getPinnedOffsetStyle(column) };
 
             const noDivider = column.columnDef.meta?.noDivider;
             // Also check if previous column has noDivider to prevent divider between them
@@ -481,13 +525,15 @@ const DataTableHead = <T extends Record<string, unknown>>({ table }: DataTableHe
               <div
                 className={cn(
                   styles.headCell,
-                  isPinned && styles.headCellPinned,
+                  pinSide === "right" && styles.headCellPinnedRight,
+                  pinSide === "left" && styles.headCellPinnedLeft,
                   hideDivider && styles.headCellNoDivider,
                   isSortable && styles.headCellSortable,
                 )}
                 key={header.id}
                 style={style}
                 data-testid={`data-table-header-${header.id}`}
+                data-pinned={typeof pinSide === "string" ? pinSide : undefined}
               >
                 <div className={styles.headCellContent} onClick={handleHeaderClick}>
                   {header.isPlaceholder ? null : flexRender(column.columnDef.header, header.getContext())}
@@ -544,17 +590,26 @@ const DataTableRow = <T,>({ row, className, onRowClick, isSelected, isActive }: 
       data-testid={`data-table-row-${row.id}`}
     >
       {row.getVisibleCells().map((cell) => {
-        const isPinned = cell.column.getIsPinned();
+        const pinSide = cell.column.getIsPinned();
         const columnDef = cell.column.columnDef;
         const minSize = columnDef.minSize ?? 50;
         const maxSize = columnDef.maxSize ?? 1200;
         const size = cell.column.getSize();
 
         // Calculate column style
-        const style = getColumnStyle(size, minSize, maxSize);
+        const style = { ...getColumnStyle(size, minSize, maxSize), ...getPinnedOffsetStyle(cell.column) };
 
         return (
-          <div className={cn(styles.bodyCell, isPinned && styles.bodyCellPinned)} key={cell.id} style={style}>
+          <div
+            className={cn(
+              styles.bodyCell,
+              pinSide === "right" && styles.bodyCellPinnedRight,
+              pinSide === "left" && styles.bodyCellPinnedLeft,
+            )}
+            key={cell.id}
+            style={style}
+            data-pinned={typeof pinSide === "string" ? pinSide : undefined}
+          >
             {flexRender(cell.column.columnDef.cell, cell.getContext())}
           </div>
         );
@@ -571,6 +626,9 @@ interface DataTableBodyProps<T> {
   columnSizing?: Record<string, number>;
   rowSelection?: Record<string, boolean>;
   activeRowId?: string;
+  /** Merged `styles.body` (+ pinned scroll shell when column pinning is on) */
+  bodyClassName: string;
+  onBodyScroll?: UIEventHandler<HTMLDivElement>;
 }
 
 const DataTableBody = <T,>({
@@ -581,9 +639,11 @@ const DataTableBody = <T,>({
   columnSizing: _columnSizing,
   rowSelection, // used to retrigger memo when selection changes
   activeRowId,
+  bodyClassName,
+  onBodyScroll,
 }: DataTableBodyProps<T>) => {
   return (
-    <div className={styles.body}>
+    <div className={bodyClassName} onScroll={onBodyScroll}>
       {rows.map((row) => (
         <DataTableRow
           key={row.id}
@@ -604,7 +664,9 @@ const MemoizedDataTableBody = memo(DataTableBody, (prev, next) => {
     JSON.stringify(prev.columnVisibility) === JSON.stringify(next.columnVisibility) &&
     JSON.stringify(prev.columnSizing) === JSON.stringify(next.columnSizing) &&
     JSON.stringify(prev.rowSelection) === JSON.stringify(next.rowSelection) &&
-    prev.activeRowId === next.activeRowId
+    prev.activeRowId === next.activeRowId &&
+    prev.bodyClassName === next.bodyClassName &&
+    prev.onBodyScroll === next.onBodyScroll
   );
 }) as typeof DataTableBody;
 
@@ -617,6 +679,8 @@ interface DataTableSkeletonBodyProps<T> {
   loadingRows: number;
   columnSizing: Record<string, number>;
   selectable: boolean;
+  bodyClassName: string;
+  onBodyScroll?: UIEventHandler<HTMLDivElement>;
 }
 
 const DataTableSkeletonBody = <T,>({
@@ -624,6 +688,8 @@ const DataTableSkeletonBody = <T,>({
   loadingRows,
   columnSizing: _columnSizing,
   selectable: _selectable,
+  bodyClassName,
+  onBodyScroll,
 }: DataTableSkeletonBodyProps<T>) => {
   const headerGroups = table.getHeaderGroups();
   const headers = headerGroups[0]?.headers || [];
@@ -662,24 +728,33 @@ const DataTableSkeletonBody = <T,>({
   };
 
   return (
-    <div className={styles.body}>
+    <div className={bodyClassName} onScroll={onBodyScroll}>
       {Array.from({ length: loadingRows }).map((_, rowIndex) => (
         <div className={styles.bodyRow} key={rowIndex}>
           {headers.map((header, columnIndex) => {
             const { column } = header;
-            const isPinned = column.getIsPinned();
+            const pinSide = column.getIsPinned();
             const columnDef = column.columnDef;
             const minSize = columnDef.minSize ?? 50;
             const maxSize = columnDef.maxSize ?? 1200;
             const size = header.getSize();
 
             // Calculate column style
-            const style = getColumnStyle(size, minSize, maxSize);
+            const style = { ...getColumnStyle(size, minSize, maxSize), ...getPinnedOffsetStyle(column) };
 
             // For selection column, show empty cell
             if (column.id === "select") {
               return (
-                <div className={cn(styles.bodyCell, isPinned && styles.bodyCellPinned)} key={header.id} style={style}>
+                <div
+                  className={cn(
+                    styles.bodyCell,
+                    pinSide === "right" && styles.bodyCellPinnedRight,
+                    pinSide === "left" && styles.bodyCellPinnedLeft,
+                  )}
+                  key={header.id}
+                  style={style}
+                  data-pinned={typeof pinSide === "string" ? pinSide : undefined}
+                >
                   <div className="w-4 h-4" />
                 </div>
               );
@@ -689,7 +764,16 @@ const DataTableSkeletonBody = <T,>({
             const patternColumnIndex = headers[0]?.column.id === "select" ? columnIndex - 1 : columnIndex;
 
             return (
-              <div className={cn(styles.bodyCell, isPinned && styles.bodyCellPinned)} key={header.id} style={style}>
+              <div
+                className={cn(
+                  styles.bodyCell,
+                  pinSide === "right" && styles.bodyCellPinnedRight,
+                  pinSide === "left" && styles.bodyCellPinnedLeft,
+                )}
+                key={header.id}
+                style={style}
+                data-pinned={typeof pinSide === "string" ? pinSide : undefined}
+              >
                 {renderSkeletonPattern(patternColumnIndex)}
               </div>
             );
