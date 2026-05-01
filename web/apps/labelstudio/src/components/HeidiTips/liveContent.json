@@ -1,15 +1,15 @@
 {
   "projectCreation": [
     {
-      "title": "New Storage Connector",
-      "content": "You can connect Label Studio Enterprise to Databricks Unity Catalog (UC) Volumes to import files as tasks and export annotations.",
+      "title": "Advanced PDF and Document AI Interface",
+      "content": "Designed for large, complex PDF documents and image OCR",
       "closable": true,
       "link": {
         "label": "Learn more",
-        "url": "https://docs.humansignal.com/guide/storage.html#Databricks-Files-UC-Volumes",
+        "url": "https://humansignal.com/blog/new-pdf-ocr-document-ai-labeling-interface/",
         "params": {
           "experiment": "project_creation_tip",
-          "treatment": "databricks_uc_live"
+          "treatment": "lse_pdf_react_live"
         }
       }
     },
@@ -26,15 +26,15 @@
       }
     },
     {
-      "title": "Did you know?",
-      "content": "You can control access to specific projects and workspaces for internal team members and external annotators using Label Studio Enterprise.",
+      "title": "Synchronize audio and transcript editing",
+      "content": "A New Audio Transcription UI for Speed and Quality at Scale",
       "closable": true,
       "link": {
         "label": "Learn more",
-        "url": "https://docs.humansignal.com/guide/manage_users#Roles-in-Label-Studio-Enterprise",
+        "url": "https://humansignal.com/blog/building-a-better-ui-for-audio-transcription-at-scale/",
         "params": {
           "experiment": "project_creation_tip",
-          "treatment": "access_to_projects_live"
+          "treatment": "lse_audio_transcription_live"
         }
       }
     },
@@ -138,10 +138,10 @@
       "closable": true,
       "link": {
         "label": "Learn more",
-        "url": "https://aws.amazon.com/marketplace/pp/prodview-wjac3msf77tny",
+        "url": "https://aws.amazon.com/marketplace/pp/prodview-yanyf6wguitb2",
         "params": {
           "experiment": "project_settings_tip",
-          "treatment": "aws_marketplace"
+          "treatment": "aws_marketplace_live"
         }
       }
     },
@@ -172,15 +172,15 @@
       }
     },
     {
-      "title": "Evaluate GenAI models",
-      "content": "Combine automation plus human supervision to evaluate and ensure LLM quality in the Enterprise platform.",
+      "title": "Synchronize audio and transcript editing",
+      "content": "A New Audio Transcription UI for Speed and Quality at Scale",
       "closable": true,
       "link": {
         "label": "Learn more",
-        "url": "https://humansignal.com/evals/",
+        "url": "https://humansignal.com/blog/building-a-better-ui-for-audio-transcription-at-scale/",
         "params": {
           "experiment": "project_settings_tip",
-          "treatment": "evals_live"
+          "treatment": "lse_audio_transcription_live"
         }
       }
     },
@@ -198,29 +198,29 @@
       }
     },
     {
-      "title": "Native PDF support is coming!",
-      "content": "Label Studio Enterprise provides native PDF support.",
+      "title": "Advanced PDF and Document AI Interface",
+      "content": "Designed for large, complex PDF documents and image OCR",
       "closable": true,
       "link": {
-        "label": "Request early access",
-        "url": "https://humansignal.com/pdf-interest-signup",
+        "label": "Learn more",
+        "url": "https://humansignal.com/blog/new-pdf-ocr-document-ai-labeling-interface/",
         "params": {
           "experiment": "project_settings_tip",
-          "treatment": "lse_pdf_live"
+          "treatment": "lse_pdf_react_live"
         }
       }
     }
   ],
   "authPage": [
     {
-      "title": "Live Event Dec 10th",
-      "description": "Join the Label Studio product team for a fast-paced tour of this year's biggest releases",
+      "title": "Are you building agents?",
+      "description": "Introducing Human-in-the-Loop Evaluation for Agentic AI Observability",
       "link": {
-        "label": "December 10, 2025 9am PST",
-        "url": "https://humansignal.com/webinars/label-studio-wrapped-2025/",
+        "label": "Learn more",
+        "url": "https://humansignal.com/blog/introducing-human-in-the-loop-evaluation-for-agentic-ai-observability/",
         "params": {
           "experiment": "login_revamp",
-          "treatment": "wrapped_webinar_2025_live"
+          "treatment": "agentic_traces_live"
         }
       }
     },
@@ -245,18 +245,6 @@
         "params": {
           "experiment": "login_revamp",
           "treatment": "legalbench_live"
-        }
-      }
-    },
-    {
-      "title": "New Enterprise Feature!",
-      "description": "Chat conversations are now a native data type for creating and evaluating chat-based AI experiences in Label Studio.",
-      "link": {
-        "label": "Learn more",
-        "url": "https://humansignal.com/blog/introducing-chat-4-use-cases-to-ship-a-high-quality-chatbot/",
-        "params": {
-          "experiment": "login_revamp",
-          "treatment": "chat_live"
         }
       }
     },
