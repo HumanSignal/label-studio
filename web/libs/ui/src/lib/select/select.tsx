@@ -628,6 +628,7 @@ export const Select = forwardRef(
             type="button"
             data-testid={
               props?.dataTestid ??
+              props?.testId ??
               `select-trigger${props?.name ? `-${props?.name?.replace?.(/\s/g, "-")}` : ""}${value ? `-${value}` : ""}`
             }
             ref={triggerRef}

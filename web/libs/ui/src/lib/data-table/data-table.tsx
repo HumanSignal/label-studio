@@ -97,6 +97,12 @@ export type DataTableProps<T extends DataShape> = {
    * the body does not scroll (parent should scroll); use a wrapper `onScroll` for infinite lists.
    */
   onBodyScroll?: UIEventHandler<HTMLDivElement>;
+  /**
+   * `default` — table body scrolls inside the component (nested scroll).
+   * `page` — no inner vertical scroll; use a fixed-height ancestor with `overflow-auto` for a single scrollport
+   * (pairs with sticky header / left-pinned columns).
+   */
+  layoutScroll?: "default" | "page";
   /** Controlled active row ID - when provided, controls which row is active */
   activeRowId?: string;
   /** Custom function to extract row ID from row data - useful when row.id is not the primary identifier */
@@ -137,6 +143,7 @@ export const DataTable = <T extends DataShape>(props: DataTableProps<T>) => {
     onSelectAllChange,
     invertedSelectionEnabled,
     loadingRows = 5,
+    layoutScroll = "default",
     className,
     dataTestId,
     activeRowId: controlledActiveRowId,
@@ -431,11 +438,20 @@ export const DataTable = <T extends DataShape>(props: DataTableProps<T>) => {
   // Check if we should show empty state
   const showEmptyState = rows.length === 0 && !props.isLoading && props.emptyState;
 
-  const bodyShellClassName = cn(styles.body, columnPinningEnabled && styles.bodyWithColumnPins);
+  const bodyShellClassName = cn(
+    styles.body,
+    layoutScroll === "page" && styles.bodyInPageScroll,
+    columnPinningEnabled && styles.bodyWithColumnPins,
+  );
 
   return (
     <div
-      className={cn(styles.container, columnPinningEnabled && styles.containerWithColumnPins, className)}
+      className={cn(
+        styles.container,
+        columnPinningEnabled && styles.containerWithColumnPins,
+        layoutScroll === "page" && styles.containerInPageScroll,
+        className,
+      )}
       data-testid={dataTestId}
     >
       <DataTableHead table={table} />
@@ -534,6 +550,7 @@ const DataTableHead = <T extends Record<string, unknown>>({ table }: DataTableHe
                 style={style}
                 data-testid={`data-table-header-${header.id}`}
                 data-pinned={typeof pinSide === "string" ? pinSide : undefined}
+                {...(pinSide === "left" ? { "data-pinned-left": "" } : {})}
               >
                 <div className={styles.headCellContent} onClick={handleHeaderClick}>
                   {header.isPlaceholder ? null : flexRender(column.columnDef.header, header.getContext())}
@@ -609,6 +626,7 @@ const DataTableRow = <T,>({ row, className, onRowClick, isSelected, isActive }: 
             key={cell.id}
             style={style}
             data-pinned={typeof pinSide === "string" ? pinSide : undefined}
+            {...(pinSide === "left" ? { "data-pinned-left": "" } : {})}
           >
             {flexRender(cell.column.columnDef.cell, cell.getContext())}
           </div>
@@ -754,6 +772,7 @@ const DataTableSkeletonBody = <T,>({
                   key={header.id}
                   style={style}
                   data-pinned={typeof pinSide === "string" ? pinSide : undefined}
+                  {...(pinSide === "left" ? { "data-pinned-left": "" } : {})}
                 >
                   <div className="w-4 h-4" />
                 </div>
@@ -773,6 +792,7 @@ const DataTableSkeletonBody = <T,>({
                 key={header.id}
                 style={style}
                 data-pinned={typeof pinSide === "string" ? pinSide : undefined}
+                {...(pinSide === "left" ? { "data-pinned-left": "" } : {})}
               >
                 {renderSkeletonPattern(patternColumnIndex)}
               </div>

@@ -7,6 +7,14 @@
   max-height: 100%;
 }
 
+/**
+ * Table participates in an ancestor scrollport (no nested vertical scroll on `.body`).
+ * Use with `pinLeftColumns` / sticky header so one outer container owns overflow.
+ */
+.containerInPageScroll {
+  @apply overflow-visible max-h-none;
+}
+
 /*
  * When columns are pinned, sticky left/right must use the same scrollport as siblings
  * (e.g. a Total row) outside this table. overflow-y:auto on .body forces overflow-x to
@@ -117,6 +125,10 @@
   min-width: 100%;
   border-bottom-left-radius: inherit;
   border-bottom-right-radius: inherit;
+}
+
+.bodyInPageScroll {
+  @apply overflow-y-visible flex-none min-h-0;
 }
 
 /*
