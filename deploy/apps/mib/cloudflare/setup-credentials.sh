@@ -1,5 +1,5 @@
-#!/bin/bash
-# Script to generate credentials.json from token
+#!/usr/bin/env bash
+# Generate credentials.json from a Cloudflare tunnel token.
 # Usage: ./setup-credentials.sh <token>
 
 set -e
@@ -27,6 +27,7 @@ TUNNEL_ID=$(echo "$DECODED" | python3 -c "import sys, json; print(json.load(sys.
 TUNNEL_SECRET=$(echo "$DECODED" | python3 -c "import sys, json; print(json.load(sys.stdin)['s'])")
 
 # Create credentials.json
+umask 077
 cat > "$CREDENTIALS_FILE" <<EOF
 {
   "AccountTag": "$ACCOUNT_TAG",
@@ -38,4 +39,3 @@ EOF
 echo "Credentials file created at: $CREDENTIALS_FILE"
 echo "Account Tag: $ACCOUNT_TAG"
 echo "Tunnel ID: $TUNNEL_ID"
-

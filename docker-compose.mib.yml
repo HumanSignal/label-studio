@@ -1,118 +1,104 @@
-volumes:
-  label-studio-data:
-    driver: local
+x-label-studio-image: &label-studio-image gavinlouuu/label-studio-custom:${IMAGE_TAG:-latest}
+x-label-studio-build: &label-studio-build
+  context: .
+  dockerfile: Dockerfile
+x-mib-env-file: &mib-env-file
+  - ${MIB_ENV_FILE:-deploy/apps/mib/.env}
+x-service-defaults: &service-defaults
+  restart: unless-stopped
+  networks:
+    - label-studio-network
+x-label-studio-defaults: &label-studio-defaults
+  <<: *service-defaults
+  image: *label-studio-image
+  env_file: *mib-env-file
+x-database-client-env: &database-client-env
+  DJANGO_DB: default
+  POSTGRE_NAME: ${POSTGRE_NAME:-postgres}
+  POSTGRE_USER: ${POSTGRE_USER:-postgres}
+  POSTGRE_PASSWORD: ${POSTGRE_PASSWORD:-postgres}
+  POSTGRE_PORT: "5432"
+  POSTGRE_HOST: db
+x-redis-client-env: &redis-client-env
+  REDIS_HOST: redis
+  REDIS_PORT: "6379"
+x-label-studio-runtime-env: &label-studio-runtime-env
+  <<:
+    - *database-client-env
+    - *redis-client-env
+  BASE_DATA_DIR: /label-studio/data
 
 services:
   nginx:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    image: gavinlouuu/label-studio-custom:${IMAGE_TAG:-latest}
+    <<: *label-studio-defaults
+    build: *label-studio-build
     container_name: label-studio-nginx
-    restart: unless-stopped
     ports:
-      - "8080:8085"
-      - "8081:8086"
+      - "${MIB_HTTP_BIND:-127.0.0.1}:${MIB_HTTP_PORT:-8080}:8085"
+      - "${MIB_HTTPS_BIND:-127.0.0.1}:${MIB_HTTPS_PORT:-8081}:8086"
     depends_on:
       - app
-    env_file:
-      - .mib.env
     environment:
-      - APP_HOST=app
+      APP_HOST: app
     volumes:
       - label-studio-data:/label-studio/data:rw
       - ./deploy/nginx/certs:/certs:ro
     command: nginx
-    networks:
-      - label-studio-network
 
   app:
+    <<: *label-studio-defaults
+    build: *label-studio-build
     stdin_open: true
     tty: true
-    build:
-      context: .
-      dockerfile: Dockerfile
-    image: gavinlouuu/label-studio-custom:${IMAGE_TAG:-latest}
     container_name: label-studio-app
-    restart: unless-stopped
     expose:
       - "8000"
     depends_on:
       - db
       - redis
-    env_file:
-      - .mib.env
     environment:
-      - DJANGO_DB=default
-      - POSTGRE_NAME=postgres
-      - POSTGRE_USER=postgres
-      - POSTGRE_PASSWORD=postgres
-      - POSTGRE_PORT=5432
-      - POSTGRE_HOST=db
-      - REDIS_HOST=redis
-      - REDIS_PORT=6379
-      - SESSION_COOKIE_SECURE=${SESSION_COOKIE_SECURE:-1}
-      - CSRF_COOKIE_SECURE=${CSRF_COOKIE_SECURE:-1}
-      - JSON_LOG=1
-      - LOG_LEVEL=ERROR
-      # Cloudflare Turnstile
-      - TURNSTILE_ENABLED=${TURNSTILE_ENABLED:-true}
-      # Base Data Directory (inside container)
-      - BASE_DATA_DIR=/label-studio/data
+      <<: *label-studio-runtime-env
+      SESSION_COOKIE_SECURE: ${SESSION_COOKIE_SECURE:-1}
+      CSRF_COOKIE_SECURE: ${CSRF_COOKIE_SECURE:-1}
+      JSON_LOG: "1"
+      LOG_LEVEL: ${LOG_LEVEL:-ERROR}
+      TURNSTILE_ENABLED: ${TURNSTILE_ENABLED:-true}
     volumes:
       - label-studio-data:/label-studio/data:rw
     command: label-studio-uwsgi
-    networks:
-      - label-studio-network
 
   rqworker:
-    image: gavinlouuu/label-studio-custom:${IMAGE_TAG:-latest}
+    <<: *label-studio-defaults
     container_name: label-studio-rqworker
-    restart: unless-stopped
     depends_on:
       - db
       - redis
-    env_file:
-      - .mib.env
     environment:
-      - DJANGO_DB=default
-      - POSTGRE_NAME=postgres
-      - POSTGRE_USER=postgres
-      - POSTGRE_PASSWORD=postgres
-      - POSTGRE_PORT=5432
-      - POSTGRE_HOST=db
-      - REDIS_HOST=redis
-      - REDIS_PORT=6379
-      - BASE_DATA_DIR=/label-studio/data
+      <<: *label-studio-runtime-env
     volumes:
       - label-studio-data:/label-studio/data:rw
     command: python3 /label-studio/label_studio/manage.py rqworker default
-    networks:
-      - label-studio-network
 
   redis:
+    <<: *service-defaults
     image: redis:7-alpine
     container_name: label-studio-redis
-    restart: unless-stopped
     command: ["redis-server", "--save", "", "--appendonly", "no"]
-    networks:
-      - label-studio-network
 
   db:
+    <<: *service-defaults
     image: pgautoupgrade/pgautoupgrade:13-alpine
     container_name: label-studio-db
     hostname: db
-    restart: unless-stopped
+    env_file: *mib-env-file
     environment:
-      - POSTGRES_DB=postgres
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
-      - POSTGRES_HOST_AUTH_METHOD=md5
+      POSTGRES_DB: ${POSTGRES_DB:-postgres}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_HOST_AUTH_METHOD: md5
     volumes:
-      - ${POSTGRES_DATA_DIR:-./postgres-data}:/var/lib/postgresql/data
+      - ${MIB_POSTGRES_DATA_DIR:-./postgres-data}:/var/lib/postgresql/data
       - ./deploy/pgsql/certs:/var/lib/postgresql/certs:ro
-    networks:
-      - label-studio-network
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 10s
@@ -120,19 +106,21 @@ services:
       retries: 5
 
   cloudflared:
+    <<: *service-defaults
     image: cloudflare/cloudflared:latest
     container_name: cloudflared
-    restart: unless-stopped
     depends_on:
       - nginx
     command: tunnel --no-autoupdate --config /etc/cloudflared/config.yml run
     volumes:
-      - ./deploy/cloudflare/config.yml:/etc/cloudflared/config.yml:ro
-      - ./deploy/cloudflare/credentials.json:/etc/cloudflared/credentials.json:ro
+      - ./deploy/apps/mib/cloudflare/config.yml:/etc/cloudflared/config.yml:ro
+      - ./deploy/apps/mib/cloudflare/credentials.json:/etc/cloudflared/credentials.json:ro
     environment:
-      - TUNNEL_TRANSPORT_PROTOCOL=quic
-    networks:
-      - label-studio-network
+      TUNNEL_TRANSPORT_PROTOCOL: quic
+
+volumes:
+  label-studio-data:
+    driver: local
 
 networks:
   label-studio-network:

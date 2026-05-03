@@ -1,15 +1,17 @@
-# Cloudflare Tunnel Configuration
+# MIB Cloudflare Tunnel
 
-This directory contains the Cloudflare tunnel configuration files.
+This directory contains the Cloudflare Tunnel files for `mib.biowork.app`.
 
 ## Files
 
 - `config.yml` - Main tunnel configuration file
-- `credentials.json` - Tunnel authentication credentials
+- `credentials.json` - Tunnel authentication credentials; ignored by git
+- `credentials.json.template` - Expected credentials file shape
+- `setup-credentials.sh` - Helper to generate `credentials.json` from a tunnel token
 
 ## Setup Instructions
 
-To convert from token-based authentication to config file:
+To convert from token-based authentication to a config file:
 
 1. Extract your tunnel ID from the Cloudflare dashboard or using the token:
    ```bash
@@ -27,8 +29,7 @@ To convert from token-based authentication to config file:
    # cloudflared tunnel create <tunnel-name>
    ```
 
-4. Update `config.yml`:
-   - Replace `TUNNEL_ID_PLACEHOLDER` with your actual tunnel ID
+4. Confirm `config.yml` uses the same tunnel ID.
 
 5. Update `credentials.json`:
    - Replace `ACCOUNT_TAG_PLACEHOLDER` with your Cloudflare Account ID
@@ -48,4 +49,3 @@ The token contains:
 - `s` - Tunnel Secret
 
 Use these values to populate the config files.
-

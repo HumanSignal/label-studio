@@ -1,4 +1,5 @@
 .mib.env
+deploy/apps/*/.env
 backups/
 
 data/
@@ -67,6 +68,7 @@ deploy/pgsql/certs/*
 
 # Cloudflare tunnel credentials
 deploy/cloudflare/credentials.json
+deploy/apps/*/cloudflare/credentials.json
 
 *.swp
 *.swo
