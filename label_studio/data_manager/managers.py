@@ -80,6 +80,10 @@ operators = {
     Operator.REGEX: '__regex',
 }
 
+KNOWN_FILTER_VALUE_TYPES = {
+    'reviewed': 'bool',
+}
+
 
 def get_fields_for_filter_ordering(prepare_params):
     result = []
@@ -460,8 +464,8 @@ def apply_filters(queryset, filters, project, request):
                 _filter.value = 0
 
             # get type of annotated field
-            value_type = 'str'
-            if queryset.exists():
+            value_type = KNOWN_FILTER_VALUE_TYPES.get(field_name, 'str')
+            if field_name not in KNOWN_FILTER_VALUE_TYPES and queryset.exists():
                 value_type = type(queryset.values_list(field_name, flat=True)[0]).__name__
 
             if (value_type == 'list' or value_type == 'tuple') and 'equal' in _filter.operator:
@@ -599,22 +603,23 @@ class TaskQuerySet(FSMStateQuerySetMixin, models.QuerySet):
         else:
             # Backwards compatible: prepare_params.project is an int
             project = Project.objects.get(pk=prepare_params.project)
+            queryset.project = project
 
         request = prepare_params.request
         queryset = apply_filters(queryset, prepare_params.filters, project, request)
         queryset = apply_ordering(queryset, prepare_params.ordering, project, request, view_data=prepare_params.data)
 
-        if not prepare_params.selectedItems:
-            return queryset
+        if prepare_params.selectedItems:
+            # included selected items
+            if prepare_params.selectedItems.all is False and prepare_params.selectedItems.included:
+                queryset = queryset.filter(id__in=prepare_params.selectedItems.included)
 
-        # included selected items
-        if prepare_params.selectedItems.all is False and prepare_params.selectedItems.included:
-            queryset = queryset.filter(id__in=prepare_params.selectedItems.included)
+            # excluded selected items
+            elif prepare_params.selectedItems.all is True and prepare_params.selectedItems.excluded:
+                queryset = queryset.exclude(id__in=prepare_params.selectedItems.excluded)
 
-        # excluded selected items
-        elif prepare_params.selectedItems.all is True and prepare_params.selectedItems.excluded:
-            queryset = queryset.exclude(id__in=prepare_params.selectedItems.excluded)
-
+        if not prepare_params.is_multi_project:
+            queryset.project = project
         return queryset
 
 
@@ -881,6 +886,7 @@ class PreparedTaskManager(models.Manager):
         queryset, fields_for_evaluation=None, all_fields=False, excluded_fields_for_evaluation=None, request=None
     ):
         annotations_map = get_annotations_map()
+        project = getattr(queryset, 'project', None)
         # If we have dynamic control-tag level agreement columns, inject into annotation map
         # without mutating the global map
         if flag_set('fflag_utc_428_consensus_control_tag_agreement', user='auto'):
@@ -888,7 +894,10 @@ class PreparedTaskManager(models.Manager):
             if inject_path:
                 overlay_func = load_func(inject_path)
                 # Expect a dict of {field_name: function that annotates the queryset}
-                overlay_map = overlay_func(request=request, project=getattr(queryset.first(), 'project', None)) or {}
+                if project is None:
+                    first_task = queryset.first()
+                    project = None if first_task is None else first_task.project
+                overlay_map = overlay_func(request=request, project=project) or {}
                 if isinstance(overlay_map, dict) and overlay_map:
                     # Only add overlay_map keys if they're explicitly requested in fields_for_evaluation
                     # or if all_fields=True. Don't automatically add all overlay_map keys to avoid
@@ -914,8 +923,9 @@ class PreparedTaskManager(models.Manager):
             # annotators can choose cheaper implementations when safe.
             request._dm_annotation_fields = tuple(fields_for_evaluation)
 
-        first_task = queryset.first()
-        project = None if first_task is None else first_task.project
+        if project is None:
+            first_task = queryset.first()
+            project = None if first_task is None else first_task.project
 
         # db annotations applied only if we need them in ordering or filters
         for field in annotations_map.keys():
