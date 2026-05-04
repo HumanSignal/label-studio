@@ -5,7 +5,7 @@ import { objectClean } from "../../../utils/helpers";
 import { Button } from "@humansignal/ui";
 import { Oneof } from "../Oneof/Oneof";
 import { Space } from "../Space/Space";
-import { Counter, Input, Select, Toggle } from "./Elements";
+import { Counter, Input, MultiSelect, Select, Toggle } from "./Elements";
 import "./Form.prefix.css";
 import {
   FormContext,
@@ -190,6 +190,11 @@ export default class Form extends Component {
           }
           if (["number", "range"].includes(fieldType)) {
             return Number(field.value);
+          }
+          // Native <select multiple> only exposes the first selected option via
+          // ``value``; pull the full list from ``selectedOptions`` instead.
+          if (fieldType === "select-multiple" && field.selectedOptions) {
+            return Array.from(field.selectedOptions).map((o) => o.value);
           }
 
           return inputValue;
@@ -416,10 +421,36 @@ Form.Builder = forwardRef(
     const [fields, setFields] = useState(defaultFields ?? []);
     const [formData, setFormData] = useState(defaultFormData ?? {});
 
+    // Mirror of currently-changed-by-user values so ``visible_when`` can react
+    // immediately to user input (e.g. ``selection_mode`` switching from ``all``
+    // to ``include``) without waiting for a server round-trip.
+    const [liveValues, setLiveValues] = useState({});
+
+    const trackLiveValue = (fieldName, raw) => {
+      // onChange is called with a synthetic event for native inputs and with a
+      // bare value for our custom Select (Radix-based). Normalize to a string.
+      const val =
+        raw !== null && typeof raw === "object" && "target" in raw
+          ? String(raw?.target?.value ?? "")
+          : String(raw ?? "");
+      setLiveValues((prev) => (prev[fieldName] === val ? prev : { ...prev, [fieldName]: val }));
+    };
+
     const renderFields = (fields) => {
       return fields.map((field, index) => {
         if (!field) return <div key={`spacer-${index}`} />;
-        const { trigger_form_update, ...restProps } = field;
+        const { trigger_form_update, visible_when, ...restProps } = field;
+
+        // Conditional visibility — applied before any other processing so we
+        // never register a hidden field with the parent Form (avoids stale
+        // fields contributing values to ``assembleFormData``).
+        if (visible_when) {
+          const current = String(liveValues[visible_when.field] ?? formData?.[visible_when.field] ?? "");
+          const allowed = [].concat(visible_when.values);
+          if (!allowed.includes(current)) {
+            return <div key={`hidden-${field.name ?? index}`} />;
+          }
+        }
 
         const currentValue = formData?.[field.name] ?? undefined;
         const triggerUpdate = props.autosubmit !== true && trigger_form_update === true;
@@ -439,21 +470,25 @@ Form.Builder = forwardRef(
 
         const commonProps = {};
 
-        if (triggerUpdate) {
-          commonProps.onChange = async () => {
-            if (triggerAction instanceof Function) {
-              triggerAction(field);
+        // Always wire onChange so ``visible_when`` reacts to user changes;
+        // chain to existing trigger_form_update behaviour when present.
+        commonProps.onChange = triggerUpdate
+          ? async (eventOrValue) => {
+              trackLiveValue(field.name, eventOrValue);
+              if (triggerAction instanceof Function) {
+                triggerAction(field);
+              }
+              await updateFields();
+              await updateFormData();
             }
-
-            await updateFields();
-            await updateFormData();
-          };
-        }
+          : (eventOrValue) => trackLiveValue(field.name, eventOrValue);
 
         const InputComponent = (() => {
           switch (field.type) {
             case "select":
               return Select;
+            case "multiselect":
+              return MultiSelect;
             case "counter":
               return Counter;
             case "toggle":
@@ -525,6 +560,8 @@ Form.Builder = forwardRef(
 
     useEffect(() => {
       setFormData(defaultFormData);
+      // Drop any stale live overrides so the freshly supplied formData wins.
+      setLiveValues({});
     }, [defaultFormData]);
 
     return (
