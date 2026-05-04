@@ -25,7 +25,7 @@ from colorama import Fore
 from core.utils.params import get_env
 from django.conf import settings
 from django.contrib.postgres.operations import BtreeGinExtension, TrigramExtension
-from django.core.exceptions import ValidationError
+from django.core.exceptions import TooManyFilesSent, ValidationError
 from django.core.paginator import EmptyPage, Paginator
 from django.core.validators import URLValidator
 from django.db import models, transaction
@@ -90,7 +90,7 @@ def custom_exception_handler(exc, context):
     exception_id = uuid.uuid4()
 
     sentry_skip = False
-    if isinstance(exc, APIException) and exc.status_code < 500:
+    if (isinstance(exc, APIException) and exc.status_code < 500) or isinstance(exc, TooManyFilesSent):
         # Skipping Sentry for non-500 unhandled exceptions
         sentry_skip = True
 
@@ -145,6 +145,9 @@ def custom_exception_handler(exc, context):
         response_data['exc_info'] = exc_tb
         # Thrown by sdk when label config is invalid
         if isinstance(exc, LabelStudioXMLSyntaxErrorSentryIgnored):
+            response_data['status_code'] = status.HTTP_400_BAD_REQUEST
+            response = Response(status=status.HTTP_400_BAD_REQUEST, data=response_data)
+        elif isinstance(exc, TooManyFilesSent):
             response_data['status_code'] = status.HTTP_400_BAD_REQUEST
             response = Response(status=status.HTTP_400_BAD_REQUEST, data=response_data)
         else:
