@@ -269,7 +269,7 @@ export class MediaLoader extends Destructable {
       ];
 
       // If the url is signed, we need to preserve the query params otherwise the signature will be invalid
-      if (!signedUrlParams.some((p) => newUrl.searchParams.has(p))) {
+      if (!newUrl.protocol.startsWith("data") && !signedUrlParams.some((p) => newUrl.searchParams.has(p))) {
         // Arbitrary setting of query param to stop caching from reusing any media requests which may have less headers
         // cached than this request. This is to prevent a CORS error when the headers are different between partial
         // content and full content requests.
