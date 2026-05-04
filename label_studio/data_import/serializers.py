@@ -25,3 +25,11 @@ class FileUploadSerializer(serializers.ModelSerializer):
     class Meta:
         model = FileUpload
         fields = ['id', 'file']
+
+
+class HuggingFaceImportSerializer(serializers.Serializer):
+    dataset = serializers.CharField(max_length=255)
+    config = serializers.CharField(max_length=255, required=False, allow_blank=True, default='default')
+    split = serializers.CharField(max_length=255, required=False, allow_blank=True, default='train')
+    offset = serializers.IntegerField(required=False, min_value=0, default=0)
+    limit = serializers.IntegerField(required=False, min_value=1, max_value=1000, default=100)

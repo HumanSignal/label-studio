@@ -219,11 +219,20 @@ export const ImportPage = ({
   addColumns,
   openLabelingConfig,
   setReimportExtras,
+  huggingFaceImport,
+  onHuggingFaceImportPrepared,
+  onHuggingFaceImportCleared,
   tasksToImport = 0,
   usageLimits = null,
   isTaskLimitExceeded = false,
 }) => {
   const [error, setError] = useState();
+  const [hfDataset, setHfDataset] = useState("");
+  const [hfConfig, setHfConfig] = useState("default");
+  const [hfSplit, setHfSplit] = useState("train");
+  const [hfOffset, setHfOffset] = useState("0");
+  const [hfLimit, setHfLimit] = useState("100");
+  const [hfLoading, setHfLoading] = useState(false);
   const [fileTags, setFileTags] = useState({}); // Map of file_upload_id -> [tags]
   const [selectedFiles, setSelectedFiles] = useState(new Set()); // Set of selected file IDs
   const [isDragging, setIsDragging] = useState(false);
@@ -262,7 +271,8 @@ export const ImportPage = ({
   };
 
   const [files, dispatch] = useReducer(processFiles, { uploaded: [], uploading: [], ids: [] });
-  const showList = Boolean(files.uploaded?.length || files.uploading?.length || sample);
+  const hasFileSources = Boolean(files.uploaded?.length || files.uploading?.length || sample);
+  const showList = Boolean(hasFileSources || huggingFaceImport);
 
   const loadFilesList = useCallback(
     async (file_upload_ids) => {
@@ -577,6 +587,66 @@ export const ImportPage = ({
     [importFilesImmediately],
   );
 
+  const onLoadHuggingFace = useCallback(
+    async (e) => {
+      e.preventDefault();
+      setError(null);
+
+      const dataset = hfDataset.trim();
+      if (!dataset) return;
+
+      const request = {
+        dataset,
+        config: hfConfig.trim() || "default",
+        split: hfSplit.trim() || "train",
+        offset: Number.parseInt(hfOffset || "0", 10),
+        limit: Number.parseInt(hfLimit || "100", 10),
+      };
+
+      setHfLoading(true);
+      onWaiting?.(true);
+      let res;
+      try {
+        res = await api.callApi("importHuggingFace", {
+          params: {
+            pk: project.id,
+            commit_to_project: "false",
+          },
+          body: request,
+          suppressError: true,
+        });
+      } catch (err) {
+        setError(err?.response ?? err ?? { detail: "Unable to load Hugging Face dataset" });
+        return;
+      } finally {
+        setHfLoading(false);
+        onWaiting?.(false);
+      }
+
+      if (!res || res.error) {
+        if (res?.response?.code === "huggingface_token_not_configured") {
+          window.location.assign(res.response.settings_url || "/user/account#huggingface-token");
+          return;
+        }
+        setError(res?.response ?? res ?? { detail: "Unable to load Hugging Face dataset" });
+        return;
+      }
+
+      onHuggingFaceImportPrepared?.(request, res);
+    },
+    [
+      api,
+      hfConfig,
+      hfDataset,
+      hfLimit,
+      hfOffset,
+      hfSplit,
+      onHuggingFaceImportPrepared,
+      onWaiting,
+      project?.id,
+    ],
+  );
+
   const openConfig = useCallback(
     (e) => {
       e.preventDefault();
@@ -682,6 +752,39 @@ export const ImportPage = ({
         </div>
       </header>
 
+      <section className="mt-4 mb-4 rounded border border-neutral-border bg-neutral-background p-4">
+        <form className="flex flex-wrap items-end gap-3" method="POST" onSubmit={onLoadHuggingFace}>
+          <div className="flex flex-col gap-1 min-w-[220px]">
+            <label className="text-xs font-medium text-neutral-content">Hugging Face dataset</label>
+            <Input
+              placeholder="namespace/repo"
+              value={hfDataset}
+              onChange={(e) => setHfDataset(e.target.value)}
+              style={{ height: 36 }}
+            />
+          </div>
+          <div className="flex flex-col gap-1 w-[140px]">
+            <label className="text-xs font-medium text-neutral-content">Subset</label>
+            <Input value={hfConfig} onChange={(e) => setHfConfig(e.target.value)} style={{ height: 36 }} />
+          </div>
+          <div className="flex flex-col gap-1 w-[120px]">
+            <label className="text-xs font-medium text-neutral-content">Split</label>
+            <Input value={hfSplit} onChange={(e) => setHfSplit(e.target.value)} style={{ height: 36 }} />
+          </div>
+          <div className="flex flex-col gap-1 w-[120px]">
+            <label className="text-xs font-medium text-neutral-content">Offset</label>
+            <Input value={hfOffset} onChange={(e) => setHfOffset(e.target.value)} style={{ height: 36 }} />
+          </div>
+          <div className="flex flex-col gap-1 w-[120px]">
+            <label className="text-xs font-medium text-neutral-content">Rows</label>
+            <Input value={hfLimit} onChange={(e) => setHfLimit(e.target.value)} style={{ height: 36 }} />
+          </div>
+          <Button type="submit" look="primary" waiting={hfLoading} disabled={hfLoading || !hfDataset.trim()}>
+            Add HF Dataset
+          </Button>
+        </form>
+      </section>
+
       <ErrorMessage error={limitError || error} />
 
       <main>
@@ -766,148 +869,164 @@ export const ImportPage = ({
 
             {showList && (
               <div className="w-full">
-                <SimpleCard title="Files" className="w-full h-full">
-                  <div className="flex flex-col gap-4 mb-4">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-4">
-                        <div className="flex items-center gap-2">
-                          <input
-                            type="checkbox"
-                            checked={files.uploaded.length > 0 && selectedFiles.size === files.uploaded.length}
-                            onChange={handleSelectAll}
-                            className="cursor-pointer"
+                <SimpleCard title={huggingFaceImport ? "Sources" : "Files"} className="w-full h-full">
+                  {hasFileSources && (
+                    <div className="flex flex-col gap-4 mb-4">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-4">
+                          <div className="flex items-center gap-2">
+                            <input
+                              type="checkbox"
+                              checked={files.uploaded.length > 0 && selectedFiles.size === files.uploaded.length}
+                              onChange={handleSelectAll}
+                              className="cursor-pointer"
+                            />
+                            <span className="text-sm">
+                              {selectedFiles.size > 0
+                                ? `${selectedFiles.size} of ${files.uploaded.length} selected`
+                                : `Select files (${files.uploaded.length} total)`}
+                            </span>
+                          </div>
+                          {selectedFiles.size > 0 && (
+                            <>
+                              <Button size="small" look="secondary" onClick={() => setSelectedFiles(new Set())}>
+                                Clear Selection
+                              </Button>
+                              <Button size="small" look="destructive" onClick={handleDeleteSelected}>
+                                <IconTrash className="w-4 h-4 mr-1" />
+                                Delete Selected ({selectedFiles.size})
+                              </Button>
+                            </>
+                          )}
+                        </div>
+                      </div>
+                      <div className="flex flex-col gap-2 p-3 bg-neutral-background rounded border">
+                        <div className="text-sm font-medium">
+                          {selectedFiles.size > 0
+                            ? `Apply tags to ${selectedFiles.size} selected file(s)`
+                            : "Apply tags to all files"}
+                        </div>
+                        <div className="flex flex-col gap-2">
+                          <Input
+                            placeholder="Add import tag (e.g., ds_a) - applies to selected/all files"
+                            value={bulkTagInput}
+                            onChange={handleBulkTagChange}
+                            onBlur={handleBulkTagBlur}
+                            onKeyDown={handleBulkTagKeyDown}
+                            className="h-8 text-xs"
                           />
-                          <span className="text-sm">
-                            {selectedFiles.size > 0
-                              ? `${selectedFiles.size} of ${files.uploaded.length} selected`
-                              : `Select files (${files.uploaded.length} total)`}
-                          </span>
+                          <div className="flex flex-wrap gap-1">
+                            {(() => {
+                              // Get common tags from selected files, or all files if none selected
+                              const targetFiles =
+                                selectedFiles.size > 0 ? Array.from(selectedFiles) : files.uploaded.map((f) => f.id);
+                              const allTags = new Set();
+                              targetFiles.forEach((fileId) => {
+                                (fileTags[fileId] || []).forEach((tag) => allTags.add(tag));
+                              });
+                              return Array.from(allTags).map((t) => (
+                                <Badge
+                                  key={t}
+                                  variant="secondary"
+                                  className="h-5 text-xs cursor-pointer"
+                                  onClick={() => handleRemoveBulkTag(t)}
+                                >
+                                  {t} ×
+                                </Badge>
+                              ));
+                            })()}
+                          </div>
                         </div>
-                        {selectedFiles.size > 0 && (
-                          <>
-                            <Button
-                              size="small"
-                              look="secondary"
-                              onClick={() => setSelectedFiles(new Set())}
-                            >
-                              Clear Selection
-                            </Button>
-                            <Button
-                              size="small"
-                              look="destructive"
-                              onClick={handleDeleteSelected}
-                            >
-                              <IconTrash className="w-4 h-4 mr-1" />
-                              Delete Selected ({selectedFiles.size})
-                            </Button>
-                          </>
-                        )}
                       </div>
                     </div>
-                    <div className="flex flex-col gap-2 p-3 bg-neutral-background rounded border">
-                      <div className="text-sm font-medium">
-                        {selectedFiles.size > 0
-                          ? `Apply tags to ${selectedFiles.size} selected file(s)`
-                          : "Apply tags to all files"}
+                  )}
+                  {huggingFaceImport && (
+                    <div className="mb-4 flex items-center justify-between rounded border border-neutral-border bg-neutral-background p-3">
+                      <div className="flex flex-col gap-1">
+                        <div className="text-sm font-medium">
+                          {huggingFaceImport.request.dataset}
+                          <Badge variant="info" className="ml-2 h-5 text-xs rounded-sm">
+                            Hugging Face
+                          </Badge>
+                        </div>
+                        <div className="text-xs text-neutral-content-subtler">
+                          {huggingFaceImport.request.config}/{huggingFaceImport.request.split} ·{" "}
+                          {huggingFaceImport.response?.task_count ?? 0} rows queued
+                        </div>
                       </div>
-                      <div className="flex flex-col gap-2">
-                        <Input
-                          placeholder="Add import tag (e.g., ds_a) - applies to selected/all files"
-                          value={bulkTagInput}
-                          onChange={handleBulkTagChange}
-                          onBlur={handleBulkTagBlur}
-                          onKeyDown={handleBulkTagKeyDown}
-                          className="h-8 text-xs"
-                        />
-                        <div className="flex flex-wrap gap-1">
-                          {(() => {
-                            // Get common tags from selected files, or all files if none selected
-                            const targetFiles =
-                              selectedFiles.size > 0 ? Array.from(selectedFiles) : files.uploaded.map((f) => f.id);
-                            const allTags = new Set();
-                            targetFiles.forEach((fileId) => {
-                              (fileTags[fileId] || []).forEach((tag) => allTags.add(tag));
-                            });
-                            return Array.from(allTags).map((t) => (
-                              <Badge
-                                key={t}
-                                variant="secondary"
-                                className="h-5 text-xs cursor-pointer"
-                                onClick={() => handleRemoveBulkTag(t)}
+                      <Button size="small" look="destructive" onClick={onHuggingFaceImportCleared}>
+                        <IconTrash className="w-4 h-4 mr-1" />
+                        Remove
+                      </Button>
+                    </div>
+                  )}
+                  {hasFileSources && (
+                    <table>
+                      <thead>
+                        <tr>
+                          <th>File</th>
+                          <th>Status</th>
+                          <th>Import Tags</th>
+                        </tr>
+                      </thead>
+                      <tbody
+                        ref={tableBodyRef}
+                        style={{ userSelect: "none" }}
+                        onMouseLeave={() => {
+                          if (isDragging) {
+                            setIsDragging(false);
+                            setDragStart(null);
+                            setDragStartSelected(false);
+                          }
+                        }}
+                      >
+                        {sample && (
+                          <tr key={sample.url}>
+                            <td>
+                              <div className="flex items-center gap-2">
+                                {sample.title}
+                                <Badge variant="info" className="h-5 text-xs rounded-sm">
+                                  Sample
+                                </Badge>
+                              </div>
+                            </td>
+                            <td>{sample.description}</td>
+                            <td colSpan={2}></td>
+                            <td>
+                              <Button
+                                size="icon"
+                                look="destructive"
+                                rawClassName="h-6 w-6 p-0"
+                                onClick={() => onSampleDatasetSelect(undefined)}
                               >
-                                {t} ×
-                              </Badge>
-                            ));
-                          })()}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <table>
-                    <thead>
-                      <tr>
-                        <th>File</th>
-                        <th>Status</th>
-                        <th>Import Tags</th>
-                      </tr>
-                    </thead>
-                    <tbody
-                      ref={tableBodyRef}
-                      style={{ userSelect: "none" }}
-                      onMouseLeave={() => {
-                        if (isDragging) {
-                          setIsDragging(false);
-                          setDragStart(null);
-                          setDragStartSelected(false);
-                        }
-                      }}
-                    >
-                      {sample && (
-                        <tr key={sample.url}>
-                          <td>
-                            <div className="flex items-center gap-2">
-                              {sample.title}
-                              <Badge variant="info" className="h-5 text-xs rounded-sm">
-                                Sample
-                              </Badge>
-                            </div>
-                          </td>
-                          <td>{sample.description}</td>
-                          <td colSpan={2}></td>
-                          <td>
-                            <Button
-                              size="icon"
-                              look="destructive"
-                              rawClassName="h-6 w-6 p-0"
-                              onClick={() => onSampleDatasetSelect(undefined)}
-                            >
-                              <IconTrash className="w-3 h-3" />
-                            </Button>
-                          </td>
-                        </tr>
-                      )}
-                      {files.uploading.map((file, idx) => (
-                        <tr key={`${idx}-${file.name}`}>
-                          <td>{file.name}</td>
-                          <td colSpan={2}>
-                            <span className={importClass.elem("file-status").mod({ uploading: true })} />
-                          </td>
-                        </tr>
-                      ))}
-                      {files.uploaded.map((file) => (
-                        <FileRow
-                          key={file.file}
-                          file={file}
-                          fileTags={fileTags}
-                          setFileTags={setFileTags}
-                          isSelected={selectedFiles.has(file.id)}
-                          onSelect={handleSelectFile}
-                          onMouseDown={(e) => handleMouseDown(e, file.id)}
-                          onMouseEnter={() => handleMouseEnter(file.id)}
-                        />
-                      ))}
-                    </tbody>
-                  </table>
+                                <IconTrash className="w-3 h-3" />
+                              </Button>
+                            </td>
+                          </tr>
+                        )}
+                        {files.uploading.map((file, idx) => (
+                          <tr key={`${idx}-${file.name}`}>
+                            <td>{file.name}</td>
+                            <td colSpan={2}>
+                              <span className={importClass.elem("file-status").mod({ uploading: true })} />
+                            </td>
+                          </tr>
+                        ))}
+                        {files.uploaded.map((file) => (
+                          <FileRow
+                            key={file.file}
+                            file={file}
+                            fileTags={fileTags}
+                            setFileTags={setFileTags}
+                            isSelected={selectedFiles.has(file.id)}
+                            onSelect={handleSelectFile}
+                            onMouseDown={(e) => handleMouseDown(e, file.id)}
+                            onMouseEnter={() => handleMouseEnter(file.id)}
+                          />
+                        ))}
+                      </tbody>
+                    </table>
+                  )}
                 </SimpleCard>
               </div>
             )}

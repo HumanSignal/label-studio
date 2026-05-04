@@ -14,10 +14,13 @@ export const useImportPage = (project, sample) => {
   // choose - csv added, block modal until user chooses a way to hangle csv
   // tasks | ts — choice made, all good, this cannot be undone
   const [csvHandling, setCsvHandling] = React.useState(); // undefined | choose | tasks | ts
-  const [tasksToImport, setTasksToImport] = React.useState(0);
+  const [fileTasksToImport, setFileTasksToImport] = React.useState(0);
+  const [huggingFaceImport, setHuggingFaceImport] = React.useState(null);
+  const [huggingFaceTasksToImport, setHuggingFaceTasksToImport] = React.useState(0);
   const [usageLimits, setUsageLimits] = React.useState(null);
   const api = useAPI();
   const [reimportExtras, setReimportExtras] = React.useState({});
+  const tasksToImport = fileTasksToImport + huggingFaceTasksToImport;
 
   // don't use columns from csv if we'll not use it as csv
   const columns = ["choose", "ts"].includes(csvHandling) ? [DEFAULT_COLUMN] : _columns;
@@ -54,14 +57,14 @@ export const useImportPage = (project, sample) => {
           },
         })
         .then((response) => {
-          setTasksToImport(response.task_count || 0);
+          setFileTasksToImport(response.task_count || 0);
         })
         .catch((error) => {
           console.error("Failed to count tasks:", error);
-          setTasksToImport(0);
+          setFileTasksToImport(0);
         });
     } else {
-      setTasksToImport(0);
+      setFileTasksToImport(0);
     }
   }, [fileIds, project?.id, csvHandling, api]);
 
@@ -85,21 +88,35 @@ export const useImportPage = (project, sample) => {
 
   const finishUpload = async () => {
     setUploadingStatus(true);
-    const imported = await api.callApi("reimportFiles", {
-      params: {
-        pk: project.id,
-      },
-      body: {
-        file_upload_ids: fileIds,
-        files_as_tasks_list: csvHandling === "tasks",
-        ...reimportExtras,
-        // propagate optional import metadata captured in Import.jsx via setReimportExtras
-        // Expected keys: file_upload_tags (object mapping file_upload_id -> [tags]), import_source (string)
-      },
-    });
+    try {
+      let imported = null;
+      if (fileIds.length > 0 || !huggingFaceImport) {
+        imported = await api.callApi("reimportFiles", {
+          params: {
+            pk: project.id,
+          },
+          body: {
+            file_upload_ids: fileIds,
+            files_as_tasks_list: csvHandling === "tasks",
+            ...reimportExtras,
+            // propagate optional import metadata captured in Import.jsx via setReimportExtras
+            // Expected keys: file_upload_tags (object mapping file_upload_id -> [tags]), import_source (string)
+          },
+        });
+      }
 
-    setUploadingStatus(false);
-    return imported;
+      if (huggingFaceImport) {
+        imported = await api.callApi("importHuggingFace", {
+          params: {
+            pk: project.id,
+          },
+          body: huggingFaceImport.request,
+        });
+      }
+      return imported;
+    } finally {
+      setUploadingStatus(false);
+    }
   };
 
   const uploadSample = useCallback(
@@ -133,6 +150,16 @@ export const useImportPage = (project, sample) => {
     onFileListUpdate: setFileIds,
     dontCommitToProject: true,
     setReimportExtras,
+    huggingFaceImport,
+    onHuggingFaceImportPrepared: (request, response) => {
+      setHuggingFaceImport({ request, response });
+      setHuggingFaceTasksToImport(response?.task_count || 0);
+      addColumns(response?.data_columns || []);
+    },
+    onHuggingFaceImportCleared: () => {
+      setHuggingFaceImport(null);
+      setHuggingFaceTasksToImport(0);
+    },
     tasksToImport,
     usageLimits,
     isTaskLimitExceeded,

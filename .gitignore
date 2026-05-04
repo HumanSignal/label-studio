@@ -1,5 +1,7 @@
 .mib.env
 deploy/apps/*/.env
+deploy/apps/*/.env.dev
+deploy/apps/*/.env.prod
 backups/
 
 data/

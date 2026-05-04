@@ -117,3 +117,7 @@ class UserSimpleSerializer(BaseUserSerializer):
 
 UserSerializer = load_func(settings.USER_SERIALIZER)
 UserSerializerUpdate = load_func(settings.USER_SERIALIZER_UPDATE)
+
+
+class UserHuggingFaceTokenSerializer(serializers.Serializer):
+    token = serializers.CharField(trim_whitespace=True)

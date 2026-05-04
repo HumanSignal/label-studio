@@ -5,21 +5,31 @@ This directory owns the production-style configuration for the MIB app at
 
 ## Files
 
-- `.env` - local runtime secrets and deployment values; ignored by git
-- `.env.example` - committed template for `.env`
+- `.env` - production runtime secrets and deployment values; ignored by git
+- `.env.dev` - local development runtime values; ignored by git
+- `.env.example` - generic template (backward-compatible)
+- `.env.prod.example` - production template
+- `.env.dev.example` - local development template
 - `cloudflare/config.yml` - committed Cloudflare Tunnel ingress config
 - `cloudflare/credentials.json` - local tunnel credentials; ignored by git
 
 ## Setup
 
-Create the local env file:
+Create separate env files once:
 
 ```bash
-cp deploy/apps/mib/.env.example deploy/apps/mib/.env
+cp deploy/apps/mib/.env.prod.example deploy/apps/mib/.env
+cp deploy/apps/mib/.env.dev.example deploy/apps/mib/.env.dev
 ```
 
-Fill in the secret values in `deploy/apps/mib/.env`, especially database,
-Turnstile, and Stripe values.
+Fill secrets in both files as needed.
+
+- `deploy/apps/mib/.env` is for production-like runs (`mib.biowork.app`)
+- `deploy/apps/mib/.env.dev` is for local development (`localhost`) and has:
+  - `TURNSTILE_ENABLED=false`
+  - `SESSION_COOKIE_SECURE=0`
+  - `CSRF_COOKIE_SECURE=0`
+  - local host URLs to avoid redirects to production
 
 Create tunnel credentials from a Cloudflare tunnel token:
 
@@ -27,22 +37,29 @@ Create tunnel credentials from a Cloudflare tunnel token:
 deploy/apps/mib/cloudflare/setup-credentials.sh <cloudflare-tunnel-token>
 ```
 
-Start or update the stack:
+## Workflow
+
+Use native Docker Compose with a dev-default base file and a prod override file.
+
+### Local dev (no Turnstile, localhost host/cookies)
 
 ```bash
-docker compose --env-file deploy/apps/mib/.env -f docker-compose.mib.yml up -d
+docker compose -f docker-compose.mib.yml build
+docker compose -f docker-compose.mib.yml up -d --force-recreate
+docker compose -f docker-compose.mib.yml exec -T app python label_studio/manage.py migrate
+docker compose -f docker-compose.mib.yml ps
 ```
 
-Check it:
+### Production-like (prod env + tunnel profile)
 
 ```bash
-docker compose -f docker-compose.mib.yml ps
-curl -I http://localhost:8080/nginx_health
-curl -I https://mib.biowork.app
+docker compose -f docker-compose.mib.yml -f docker-compose.mib.prod.yml --profile prod build
+docker compose -f docker-compose.mib.yml -f docker-compose.mib.prod.yml --profile prod up -d --force-recreate
+docker compose -f docker-compose.mib.yml -f docker-compose.mib.prod.yml --profile prod exec -T app python label_studio/manage.py migrate
+docker compose -f docker-compose.mib.yml -f docker-compose.mib.prod.yml --profile prod ps
 ```
 
 ## Notes
 
-The compose file binds nginx to `127.0.0.1` by default so the public path is
-Cloudflare Tunnel, not direct origin access. Override `MIB_HTTP_BIND` only when
-direct host access is intentional.
+The base dev file binds nginx to `127.0.0.1:8080/8081`. Public exposure should
+go through the `cloudflared` service in the prod-profile workflow.

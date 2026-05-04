@@ -44,8 +44,9 @@ from .functions import (
     set_import_background_failure,
     set_reimport_background_failure,
 )
+from .huggingface import build_huggingface_import_response, fetch_huggingface_rows
 from .models import FileUpload
-from .serializers import FileUploadSerializer, ImportApiSerializer, PredictionSerializer
+from .serializers import FileUploadSerializer, HuggingFaceImportSerializer, ImportApiSerializer, PredictionSerializer
 from .uploader import create_file_uploads, load_tasks
 
 logger = logging.getLogger(__name__)
@@ -505,6 +506,80 @@ class ImportPredictionsAPI(generics.CreateAPIView):
 class TasksBulkCreateAPI(ImportAPI):
     # just for compatibility - can be safely removed
     swagger_schema = None
+
+
+class HuggingFaceImportAPI(ImportAPI):
+    permission_required = all_permissions.projects_change
+    parser_classes = (JSONParser,)
+    serializer_class = ImportApiSerializer
+    queryset = Task.objects.all()
+    swagger_schema = None
+
+    def create(self, request, *args, **kwargs):
+        start = time.time()
+        commit_to_project = bool_from_request(request.query_params, 'commit_to_project', True)
+        return_task_ids = bool_from_request(request.query_params, 'return_task_ids', False)
+        preannotated_from_fields = list_of_strings_from_request(request.query_params, 'preannotated_from_fields', None)
+
+        project = generics.get_object_or_404(Project.objects.for_user(self.request.user), pk=self.kwargs['pk'])
+        input_serializer = HuggingFaceImportSerializer(data=request.data)
+        input_serializer.is_valid(raise_exception=True)
+        payload = input_serializer.validated_data
+        token = (request.user.huggingface_token or '').strip()
+        if not token:
+            return Response(
+                {
+                    'detail': 'Hugging Face token is not configured. Please add it in My Account settings.',
+                    'code': 'huggingface_token_not_configured',
+                    'settings_url': '/user/account#huggingface-token',
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        tasks, total_rows, partial = fetch_huggingface_rows(
+            dataset=payload['dataset'],
+            config=payload.get('config') or 'default',
+            split=payload.get('split') or 'train',
+            token=token,
+            offset=payload.get('offset', 0),
+            limit=payload.get('limit', 100),
+        )
+
+        if preannotated_from_fields:
+            tasks = reformat_predictions(tasks, preannotated_from_fields)
+
+        created_tasks = None
+        serializer = None
+        if commit_to_project:
+            validate_task_import(project.organization, len(tasks))
+            created_tasks, serializer = self._save(tasks)
+
+            recalculate_stats_counts = {
+                'task_count': len(created_tasks),
+                'annotation_count': len(serializer.db_annotations),
+                'prediction_count': len(serializer.db_predictions),
+            }
+            project.update_tasks_counters_and_task_states(
+                tasks_queryset=created_tasks,
+                maximum_annotations_changed=False,
+                overlap_cohort_percentage_changed=False,
+                tasks_number_changed=True,
+                recalculate_stats_counts=recalculate_stats_counts,
+            )
+            project.summary.update_data_columns(tasks)
+
+        duration = time.time() - start
+        response = build_huggingface_import_response(
+            tasks,
+            duration,
+            total_rows=total_rows,
+            partial=partial,
+            created_tasks=created_tasks if return_task_ids else None,
+            serializer=serializer,
+        )
+        if commit_to_project and not return_task_ids:
+            response['task_count'] = len(created_tasks)
+        return Response(response, status=status.HTTP_201_CREATED)
 
 
 class ReImportAPI(ImportAPI):

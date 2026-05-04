@@ -17,7 +17,7 @@ from rest_framework.views import APIView
 from turnstile.decorators import require_turnstile
 from users.functions import check_avatar
 from users.models import User
-from users.serializers import UserSerializer, UserSerializerUpdate
+from users.serializers import UserHuggingFaceTokenSerializer, UserSerializer, UserSerializerUpdate
 
 logger = logging.getLogger(__name__)
 
@@ -296,3 +296,57 @@ class UserWhoAmIAPI(generics.RetrieveAPIView):
 
     def get(self, request, *args, **kwargs):
         return super(UserWhoAmIAPI, self).get(request, *args, **kwargs)
+
+
+@method_decorator(
+    name='get',
+    decorator=swagger_auto_schema(
+        tags=['Users'],
+        x_fern_audiences=['internal'],
+        operation_summary='Get Hugging Face token settings',
+        operation_description='Returns whether the current user has a Hugging Face token configured.',
+        request_body=no_body,
+    ),
+)
+@method_decorator(
+    name='post',
+    decorator=swagger_auto_schema(
+        tags=['Users'],
+        x_fern_audiences=['internal'],
+        operation_summary='Set Hugging Face token settings',
+        operation_description='Stores Hugging Face token for the current user.',
+        request_body=UserHuggingFaceTokenSerializer,
+    ),
+)
+@method_decorator(
+    name='delete',
+    decorator=swagger_auto_schema(
+        tags=['Users'],
+        x_fern_audiences=['internal'],
+        operation_summary='Clear Hugging Face token settings',
+        operation_description='Removes Hugging Face token for the current user.',
+        request_body=no_body,
+    ),
+)
+class UserHuggingFaceTokenAPI(APIView):
+    parser_classes = (JSONParser,)
+    permission_classes = (IsAuthenticated,)
+
+    def get(self, request, *args, **kwargs):
+        configured = bool((request.user.huggingface_token or '').strip())
+        return Response({'configured': configured}, status=200)
+
+    def post(self, request, *args, **kwargs):
+        serializer = UserHuggingFaceTokenSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        token = serializer.validated_data['token'].strip()
+        if not token:
+            return Response({'detail': 'Token cannot be empty.'}, status=400)
+        request.user.huggingface_token = token
+        request.user.save(update_fields=['huggingface_token'])
+        return Response({'configured': True}, status=200)
+
+    def delete(self, request, *args, **kwargs):
+        request.user.huggingface_token = None
+        request.user.save(update_fields=['huggingface_token'])
+        return Response({'configured': False}, status=200)

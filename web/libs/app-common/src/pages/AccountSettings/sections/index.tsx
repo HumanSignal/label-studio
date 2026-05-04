@@ -2,6 +2,7 @@ import { PersonalInfo } from "./PersonalInfo";
 import { EmailPreferences } from "./EmailPreferences";
 import { PersonalAccessToken, PersonalAccessTokenDescription } from "./PersonalAccessToken";
 import { MembershipInfo } from "./MembershipInfo";
+import { HuggingFaceTokenSettings } from "./HuggingFaceTokenSettings";
 import type React from "react";
 import { PersonalJWTToken } from "./PersonalJWTToken";
 import type { AuthTokenSettings } from "../types";
@@ -30,6 +31,11 @@ export const accountSettingsSections = (settings: AuthTokenSettings): SectionTyp
       title: "Membership Info",
       id: "membership-info",
       component: MembershipInfo,
+    },
+    {
+      title: "Hugging Face",
+      id: "huggingface-token",
+      component: HuggingFaceTokenSettings,
     },
     settings.api_tokens_enabled &&
       ff.isActive(ff.FF_AUTH_TOKENS) && {

@@ -1,0 +1,19 @@
+services:
+  nginx:
+    env_file: !override
+      - deploy/apps/mib/.env
+
+  app:
+    env_file: !override
+      - deploy/apps/mib/.env
+
+  rqworker:
+    env_file: !override
+      - deploy/apps/mib/.env
+
+  db:
+    env_file: !override
+      - deploy/apps/mib/.env
+    volumes:
+      - ./postgres-data:/var/lib/postgresql/data
+      - ./deploy/pgsql/certs:/var/lib/postgresql/certs:ro

@@ -1,9 +1,9 @@
-x-label-studio-image: &label-studio-image gavinlouuu/label-studio-custom:${IMAGE_TAG:-latest}
+x-label-studio-image: &label-studio-image gavinlouuu/label-studio-custom:latest
 x-label-studio-build: &label-studio-build
   context: .
   dockerfile: Dockerfile
 x-mib-env-file: &mib-env-file
-  - ${MIB_ENV_FILE:-deploy/apps/mib/.env}
+  - deploy/apps/mib/.env.dev
 x-service-defaults: &service-defaults
   restart: unless-stopped
   networks:
@@ -14,11 +14,11 @@ x-label-studio-defaults: &label-studio-defaults
   env_file: *mib-env-file
 x-database-client-env: &database-client-env
   DJANGO_DB: default
-  POSTGRE_NAME: ${POSTGRE_NAME:-postgres}
-  POSTGRE_USER: ${POSTGRE_USER:-postgres}
-  POSTGRE_PASSWORD: ${POSTGRE_PASSWORD:-postgres}
-  POSTGRE_PORT: "5432"
+  POSTGRE_NAME: postgres
+  POSTGRE_USER: postgres
+  POSTGRE_PASSWORD: postgres
   POSTGRE_HOST: db
+  POSTGRE_PORT: "5432"
 x-redis-client-env: &redis-client-env
   REDIS_HOST: redis
   REDIS_PORT: "6379"
@@ -34,8 +34,8 @@ services:
     build: *label-studio-build
     container_name: label-studio-nginx
     ports:
-      - "${MIB_HTTP_BIND:-127.0.0.1}:${MIB_HTTP_PORT:-8080}:8085"
-      - "${MIB_HTTPS_BIND:-127.0.0.1}:${MIB_HTTPS_PORT:-8081}:8086"
+      - "127.0.0.1:8080:8085"
+      - "127.0.0.1:8081:8086"
     depends_on:
       - app
     environment:
@@ -58,11 +58,7 @@ services:
       - redis
     environment:
       <<: *label-studio-runtime-env
-      SESSION_COOKIE_SECURE: ${SESSION_COOKIE_SECURE:-1}
-      CSRF_COOKIE_SECURE: ${CSRF_COOKIE_SECURE:-1}
       JSON_LOG: "1"
-      LOG_LEVEL: ${LOG_LEVEL:-ERROR}
-      TURNSTILE_ENABLED: ${TURNSTILE_ENABLED:-true}
     volumes:
       - label-studio-data:/label-studio/data:rw
     command: label-studio-uwsgi
@@ -92,12 +88,12 @@ services:
     hostname: db
     env_file: *mib-env-file
     environment:
-      POSTGRES_DB: ${POSTGRES_DB:-postgres}
-      POSTGRES_USER: ${POSTGRES_USER:-postgres}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_DB: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
       POSTGRES_HOST_AUTH_METHOD: md5
     volumes:
-      - ${MIB_POSTGRES_DATA_DIR:-./postgres-data}:/var/lib/postgresql/data
+      - ./postgres-data-dev:/var/lib/postgresql/data
       - ./deploy/pgsql/certs:/var/lib/postgresql/certs:ro
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
@@ -109,6 +105,8 @@ services:
     <<: *service-defaults
     image: cloudflare/cloudflared:latest
     container_name: cloudflared
+    profiles:
+      - prod
     depends_on:
       - nginx
     command: tunnel --no-autoupdate --config /etc/cloudflared/config.yml run

@@ -34,6 +34,7 @@ export const API_CONFIG = {
     deleteFileUploads: "DELETE:/projects/:pk/file-uploads",
     fileUploadTaskCount: "POST:/projects/:pk/file-uploads/count-tasks",
     importFiles: "POST:/projects/:pk/import",
+    importHuggingFace: "POST:/projects/:pk/import/huggingface",
     reimportFiles: "POST:/projects/:pk/reimport",
     dataSummary: "/projects/:pk/summary",
 
@@ -87,6 +88,9 @@ export const API_CONFIG = {
     accessTokenList: "GET:/token",
     accessTokenGetRefreshToken: "POST:/token",
     accessTokenRevoke: "POST:/token/blacklist",
+    huggingFaceTokenSettings: "GET:/current-user/huggingface-token",
+    huggingFaceTokenSettingsUpdate: "POST:/current-user/huggingface-token",
+    huggingFaceTokenSettingsDelete: "DELETE:/current-user/huggingface-token",
 
     accessTokenSettings: "GET:/jwt/settings",
     accessTokenUpdateSettings: "POST:/jwt/settings",

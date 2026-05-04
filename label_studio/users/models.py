@@ -112,6 +112,12 @@ class User(UserMixin, AbstractBaseUser, PermissionsMixin, UserLastActivityMixin)
     allow_newsletters = models.BooleanField(
         _('allow newsletters'), null=True, default=None, help_text=_('Allow sending newsletters to user')
     )
+    huggingface_token = models.TextField(
+        _('huggingface token'),
+        blank=True,
+        null=True,
+        help_text=_('Personal Hugging Face access token for dataset imports'),
+    )
 
     objects = UserManager()
 
