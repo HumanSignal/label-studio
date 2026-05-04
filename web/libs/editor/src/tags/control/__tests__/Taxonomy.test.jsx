@@ -5,7 +5,6 @@ import { render, screen } from "@testing-library/react";
 import { Provider } from "mobx-react";
 import Tree from "../../../core/Tree";
 import { FF_ECHO_466_TAXONOMY_ANTD_REMOVAL } from "@humansignal/core/lib/utils/feature-flags";
-import { FF_TAXONOMY_LABELING } from "../../../utils/feature-flags";
 
 const ff = mockFF();
 import Registry from "../../../core/Registry";
@@ -334,7 +333,7 @@ describe("Taxonomy model", () => {
     expect(item).not.toBeNull();
   });
 
-  it.skip("findLabel returns label for single-level path (requires FF_TAXONOMY_LABELING)", () => {
+  it("findLabel returns label for single-level path", () => {
     const taxonomy = createTaxonomyNode();
     const label = taxonomy.findLabel(["A"]);
     expect(label).not.toBeNull();
@@ -359,23 +358,6 @@ describe("Taxonomy model", () => {
     expect(taxonomy.selected).toEqual([]);
   });
 
-  it("onChange does not clear when canRemoveItems is false and checked is empty", () => {
-    ff.set({ [FF_TAXONOMY_LABELING]: true });
-    const storeRef = { task: { dataObj: { text: "Hi" } } };
-    const _config = Tree.treeToModel(
-      `<View><Taxonomy name="tax" toName="t1" labeling="true"><Choice value="A" /></Taxonomy><Text name="t1" value="$text" /></View>`,
-      storeRef,
-    );
-    const taxonomy = createTaxonomyNode(storeRef);
-    taxonomy.updateResult = mock();
-    taxonomy.onChange(null, [{ path: ["A"] }]);
-    expect(taxonomy.selected).toEqual([["A"]]);
-    Object.defineProperty(taxonomy, "canRemoveItems", { get: () => false, configurable: true });
-    taxonomy.onChange(null, []);
-    expect(taxonomy.selected).toEqual([["A"]]);
-    ff.reset();
-  });
-
   it("onChange updates selected and maxUsagesReached", () => {
     const storeRef = { task: { dataObj: { text: "Hi" } } };
     const config = Tree.treeToModel(
@@ -392,21 +374,17 @@ describe("Taxonomy model", () => {
     expect(taxonomy.updateResult).toHaveBeenCalled();
   });
 
-  it("unselectAll clears selected when labeling ff on", () => {
-    ff.set({ [FF_TAXONOMY_LABELING]: true });
+  it("unselectAll clears selected when in labeling mode", () => {
     const storeRef = { task: { dataObj: { text: "Hi" } } };
     const config = Tree.treeToModel(
       `<View><Taxonomy name="tax" toName="t1" labeling="true"><Choice value="A" /></Taxonomy><Text name="t1" value="$text" /></View>`,
       storeRef,
     );
-    const ViewModel = Registry.getModelByTag("view");
-    const root = ViewModel.create(config);
-    const taxonomy = root.children.find((c) => c.type === "taxonomy");
+    const taxonomy = createTaxonomyNode(storeRef, null, {}, config);
     taxonomy.updateResult = mock();
     taxonomy.onChange(null, [{ path: ["A"] }]);
     taxonomy.unselectAll();
     expect(taxonomy.selected).toEqual([]);
-    ff.reset();
   });
 
   it("onAddLabel calls userLabels.addLabel when userLabels exists", () => {

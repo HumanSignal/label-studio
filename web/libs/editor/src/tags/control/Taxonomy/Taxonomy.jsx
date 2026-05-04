@@ -21,7 +21,7 @@ import SelectedChoiceMixin from "../../../mixins/SelectedChoiceMixin";
 import { SharedStoreMixin } from "../../../mixins/SharedChoiceStore/mixin";
 import VisibilityMixin from "../../../mixins/Visibility";
 import { parseValue } from "../../../utils/data";
-import { FF_LSDV_4583, FF_TAXONOMY_LABELING, isFF } from "../../../utils/feature-flags";
+import { FF_LSDV_4583, isFF } from "../../../utils/feature-flags";
 import { FF_ECHO_466_TAXONOMY_ANTD_REMOVAL } from "@humansignal/core/lib/utils/feature-flags";
 import ControlBase from "../Base";
 import ClassificationBase from "../ClassificationBase";
@@ -148,6 +148,7 @@ const TaxonomyLabelingResult = types
   .model({})
   .views((self) => ({
     get result() {
+      if (!self.annotation) return null;
       // @todo make it without duplication of ClassificationBase code
       if (!self.isLabeling && !self.perregion) {
         if (self.peritem) {
@@ -235,7 +236,7 @@ const Model = types
       self._children = val;
     },
     get isLabeling() {
-      return isFF(FF_TAXONOMY_LABELING) && self.labeling;
+      return self.labeling;
     },
 
     get userLabels() {
@@ -506,7 +507,7 @@ const Model = types
     },
 
     unselectAll() {
-      if (isFF(FF_TAXONOMY_LABELING) && self.isLabeling) self.selected = [];
+      if (self.isLabeling) self.selected = [];
     },
 
     onAddLabel(path) {
@@ -591,7 +592,7 @@ const TaxonomyModel = types.compose(
   SharedStoreMixin,
   PerRegionMixin,
   ...(isFF(FF_LSDV_4583) ? [PerItemMixin] : []),
-  ...(isFF(FF_TAXONOMY_LABELING) ? [TaxonomyLabelingResult] : []),
+  TaxonomyLabelingResult,
   ReadOnlyControlMixin,
   SelectedChoiceMixin,
   VisibilityMixin,

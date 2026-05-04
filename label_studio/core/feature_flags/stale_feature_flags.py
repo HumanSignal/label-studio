@@ -1,6 +1,4 @@
 STALE_FEATURE_FLAGS = {
-    # Jan 16
-    'fflag_feat_front_lsdv_5452_taxonomy_labeling_110823_short': True,
     # Feb 6
     'fflag_front_dia_1150_ddisco_sneak_preview': False,
     # Dec 31

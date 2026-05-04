@@ -1,14 +1,9 @@
 import { LabelStudio, Sidebar, useTaxonomy } from "@humansignal/frontend-test/helpers/LSF";
 import { RichText } from "@humansignal/frontend-test/helpers/LSF/RichText";
-import { FF_TAXONOMY_LABELING } from "../../../../src/utils/feature-flags";
 import { textWithDualTaxonomyConfig, simpleTextData } from "../../data/control_tags/text-with-dual-taxonomy";
 
 describe("Control Tags - Text with Dual Taxonomy", () => {
   it("should select options from two taxonomies and create text region", () => {
-    LabelStudio.addFeatureFlagsOnPageLoad({
-      [FF_TAXONOMY_LABELING]: true,
-    });
-
     cy.log("Initialize LabelStudio with text and dual taxonomy configuration");
     LabelStudio.params().config(textWithDualTaxonomyConfig).data(simpleTextData).withResult([]).init();
 

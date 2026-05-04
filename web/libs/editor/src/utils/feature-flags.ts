@@ -76,12 +76,6 @@ export const FF_LSDV_4930 = "fflag_fix_front_lsdv_4930_selection_tool_fixes_2404
 export const FF_LSDV_4998 = "fflag_fix_front_lsdv_4998_missed_dynamic_children_030523_short";
 
 /**
- * Allow to label NER directly with Taxonomy instead of Labels
- * @link https://app.launchdarkly.com/default/production/features/fflag_feat_front_lsdv_5452_taxonomy_labeling_110823_short
- */
-export const FF_TAXONOMY_LABELING = "fflag_feat_front_lsdv_5452_taxonomy_labeling_110823_short";
-
-/**
  * Fix task count on projects with over 100 tasks (switch from task history to queue count)
  * @link https://app.launchdarkly.com/default/production/features/fflag_fix_all_optic_79_task_count_is_wrong_short/targeting
  */

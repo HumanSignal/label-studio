@@ -4,7 +4,7 @@
  */
 import { getParent, isAlive, types } from "mobx-state-tree";
 import { guidGenerator } from "../../core/Helpers";
-import { FF_TAXONOMY_LABELING, FF_LSDV_4930 } from "../../utils/feature-flags";
+import { FF_LSDV_4930 } from "../../utils/feature-flags";
 
 const ff = mockFF();
 
@@ -269,18 +269,16 @@ describe("AreaMixin", () => {
   });
 
   describe("labelingTags", () => {
-    it("returns empty array when FF_TAXONOMY_LABELING is off (mocked)", () => {
+    it("returns empty array when no taxonomy labeling tags for object", () => {
       const { area } = createStore();
       expect(area.labelingTags).toEqual([]);
     });
 
-    it("returns tags with classification and isLabeling when FF_TAXONOMY_LABELING is on", () => {
-      ff.set({ [FF_TAXONOMY_LABELING]: true });
+    it("returns tags with classification and isLabeling", () => {
       const { area, annotation } = createStore();
       const taxonomyTag = { classification: true, isLabeling: true };
       annotation.toNames.set("img1", [taxonomyTag]);
       expect(area.labelingTags).toEqual([taxonomyTag]);
-      ff.reset();
     });
   });
 
