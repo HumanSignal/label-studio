@@ -243,7 +243,7 @@ jobs:
 
       - name: Upload coverage to Codecov
         if: github.event.pull_request.head.repo.fork == false && github.event.pull_request.user.login != 'dependabot[bot]'
-        uses: codecov/codecov-action@v5
+        uses: codecov/codecov-action@v6
         with:
           name: lsf-integration
           flags: lsf-integration
