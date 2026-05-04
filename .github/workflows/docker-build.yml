@@ -109,7 +109,7 @@ jobs:
           fetch-depth: 2147483647
 
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3.11.1
+        uses: docker/setup-buildx-action@v4
 
       - name: Login to DockerHub
         uses: docker/login-action@v4
@@ -196,7 +196,7 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+        uses: docker/setup-buildx-action@v4
 
       - name: Docker meta
         id: meta
