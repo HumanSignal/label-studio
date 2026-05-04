@@ -28,7 +28,7 @@ jobs:
     steps:
       - uses: hmarr/debug-action@v3.0.0
 
-      - uses: actions/github-script@v8
+      - uses: actions/github-script@v9
         env:
           WORKFLOW_RUN_LINK: "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
         with:

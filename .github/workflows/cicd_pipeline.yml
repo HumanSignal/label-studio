@@ -71,7 +71,7 @@ jobs:
             migrations:
               - 'label_studio/*/migrations/**'
 
-      - uses: actions/github-script@v8
+      - uses: actions/github-script@v9
         id: commit-details
         with:
           script: |
@@ -85,7 +85,7 @@ jobs:
             core.setOutput("commit-message", commit.commit.message);
 
       - name: Check user's membership
-        uses: actions/github-script@v8
+        uses: actions/github-script@v9
         id: check-membership
         env:
           ACTOR: ${{ github.actor }}
@@ -244,7 +244,7 @@ jobs:
           path: ./.github/actions-hub
 
       - name: Create release draft
-        uses: actions/github-script@v8
+        uses: actions/github-script@v9
         id: create-draft-release
         env:
           TARGET_COMMITISH: "${{ github.ref_name }}"
@@ -403,7 +403,7 @@ jobs:
           helm_chart_path: "heartex/label-studio/Chart.yaml"
 
       - name: Update Draft Release
-        uses: actions/github-script@v8
+        uses: actions/github-script@v9
         id: update-draft-release
         env:
           CHANGELOG: "${{ steps.changelog.outputs.changelog }}"

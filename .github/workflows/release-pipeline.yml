@@ -91,7 +91,7 @@ jobs:
       - uses: hmarr/debug-action@v3.0.0
 
       - name: Delete Release Candidate Assets
-        uses: actions/github-script@v8
+        uses: actions/github-script@v9
         env:
           RELEASE_ID: "${{ inputs.release_id || github.event.release.id }}"
         with:
@@ -126,7 +126,7 @@ jobs:
       - uses: hmarr/debug-action@v3.0.0
 
       - name: DispatchEvent
-        uses: actions/github-script@v8
+        uses: actions/github-script@v9
         with:
           github-token: ${{ secrets.GIT_PAT }}
           script: |

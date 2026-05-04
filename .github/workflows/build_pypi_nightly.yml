@@ -31,7 +31,7 @@ jobs:
     steps:
       - name: Get previous nightly release
         id: previous-nightly
-        uses: actions/github-script@v8
+        uses: actions/github-script@v9
         with:
           github-token: ${{ secrets.GIT_PAT }}
           script: |
@@ -61,7 +61,7 @@ jobs:
             }
 
       - name: Generate Changelog
-        uses: actions/github-script@v8
+        uses: actions/github-script@v9
         with:
           github-token: ${{ secrets.GIT_PAT }}
           script: |

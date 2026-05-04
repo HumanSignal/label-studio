@@ -35,7 +35,7 @@ jobs:
 
       - name: "Validate command"
         id: determine_command
-        uses: actions/github-script@v8
+        uses: actions/github-script@v9
         env:
           COMMANDS_LIST: ${{ github.event.issue.pull_request && env.pull_request_commands_list || env.issue_commands_list }}
         with:

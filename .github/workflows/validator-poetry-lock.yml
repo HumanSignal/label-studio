@@ -24,7 +24,7 @@ jobs:
       - uses: hmarr/debug-action@v3.0.0
 
       - name: Validate
-        uses: actions/github-script@v8
+        uses: actions/github-script@v9
         env:
           BASE_REF: "${{ github.event.merge_group.base_sha || github.event.pull_request.base.sha || github.event.before }}"
           HEAD_REF: "${{ github.event.merge_group.head_sha || github.event.pull_request.head.sha || github.event.after }}"

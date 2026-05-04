@@ -14,7 +14,7 @@ jobs:
     steps:
       - uses: hmarr/debug-action@v3.0.0
 
-      - uses: actions/github-script@v8
+      - uses: actions/github-script@v9
         with:
           github-token: ${{ secrets.GIT_PAT_HEIDI }}
           script: |

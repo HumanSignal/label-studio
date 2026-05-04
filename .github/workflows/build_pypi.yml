@@ -135,7 +135,7 @@ jobs:
 
       - name: Attach artifacts to release
         if: inputs.release-id
-        uses: actions/github-script@v8
+        uses: actions/github-script@v9
         with:
           github-token: ${{ secrets.GIT_PAT }}
           script: |
@@ -171,7 +171,7 @@ jobs:
       - name: Get PyPI package details
         id: pypi-package-details
         if: inputs.upload_to_pypi && inputs.release_type == 'release'
-        uses: actions/github-script@v8
+        uses: actions/github-script@v9
         env:
           VERSION: ${{ inputs.version }}
         with:

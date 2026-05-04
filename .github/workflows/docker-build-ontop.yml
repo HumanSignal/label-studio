@@ -146,7 +146,7 @@ jobs:
 
       - name: Calculate Docker tags
         id: calculate-docker-tags
-        uses: actions/github-script@v8
+        uses: actions/github-script@v9
         with:
           script: |
             core.setOutput('docker-tags', `${{ inputs.tags }}`.split(",").join("\n"))

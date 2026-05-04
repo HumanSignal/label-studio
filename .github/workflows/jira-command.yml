@@ -25,7 +25,7 @@ jobs:
             > [Workflow run](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
 
       - name: Check user's membership
-        uses: actions/github-script@v8
+        uses: actions/github-script@v9
         id: check-membership
         env:
           ACTOR: ${{ github.actor }}

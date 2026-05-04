@@ -40,7 +40,7 @@ jobs:
       - uses: hmarr/debug-action@v3.0.0
 
       - name: Get an artifact from check suite
-        uses: actions/github-script@v8
+        uses: actions/github-script@v9
         id: get_info
         with:
           github-token: ${{ secrets.GIT_PAT }}
@@ -71,7 +71,7 @@ jobs:
           ref: ${{ inputs.release_tag }}
 
       - name: Check if the latest tag needs to be updated
-        uses: actions/github-script@v8
+        uses: actions/github-script@v9
         id: generate-tags
         with:
           github-token: ${{ secrets.GIT_PAT }}
