@@ -12,6 +12,9 @@ upstream Label Studio.
   app (development, Docker, production examples).
 
 ### `features/` — deeper dives
+- `biowork_template_entrypoint.md` — how Biowork templates act as
+  project bootstrap orchestration (default behavior, ML auto-connect,
+  and setup args flow).
 - `billing_djstripe.md` — Stripe billing API surface, webhook flow, tier
   detail, dj-stripe gotchas.
 - `billing_prevent_duplicate_pro_checkout.md` — UI + API guard against
