@@ -125,7 +125,8 @@ function DataViewInner({
   );
 
   const agreementFeatureFlagsActive =
-    isActive(FF_AGREEMENT_FILTERED) && isActive(FF_UTC_428_CONSENSUS_CONTROL_TAG_AGREEMENT);
+    isActive(FF_AGREEMENT_FILTERED) &&
+    (project?.is_dimensions_enabled ?? isActive(FF_UTC_428_CONSENSUS_CONTROL_TAG_AGREEMENT));
   const agreementSelectedKey = JSON.stringify(view?.agreement_selected ?? {});
 
   const columnHeaderExtra = useCallback(

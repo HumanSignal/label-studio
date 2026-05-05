@@ -164,17 +164,17 @@ const ColumnRenderer = observer(
     const extra = !isDE && columnHeaderExtra ? columnHeaderExtra(column, Decoration) : null;
     const content = Decoration?.content ? Decoration.content(column) : column.title;
     const style = getStyle(cellViews, column, Decoration);
+    const isAgreementV2Enabled =
+      root.project?.is_dimensions_enabled ?? isActive(FF_UTC_428_CONSENSUS_CONTROL_TAG_AGREEMENT);
 
     const isAgreementColumn =
       isActive(FF_AGREEMENT_FILTERED) &&
-      isActive(FF_UTC_428_CONSENSUS_CONTROL_TAG_AGREEMENT) &&
+      isAgreementV2Enabled &&
       (column.original?.alias === "agreement" ||
         (typeof column.original?.alias === "string" && column.original.alias.startsWith("dimension_agreement_")));
 
     const isAgreementSelected =
-      isActive(FF_AGREEMENT_FILTERED) &&
-      !isActive(FF_UTC_428_CONSENSUS_CONTROL_TAG_AGREEMENT) &&
-      column.type === "AgreementSelected";
+      isActive(FF_AGREEMENT_FILTERED) && !isAgreementV2Enabled && column.type === "AgreementSelected";
 
     const headContent = (
       <>
