@@ -54,6 +54,8 @@ this app.
 
 ## 1. Annotation templates & default labeling interface
 
+Deep dive: `knowledge_map/features/biowork_template_entrypoint.md`
+
 **Biowork adds two project templates in a "Biowork" group:**
 
 | File | Title | Order | ML backend (template-attached) |
