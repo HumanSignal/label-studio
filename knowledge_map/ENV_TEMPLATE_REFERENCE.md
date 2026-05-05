@@ -1,13 +1,15 @@
-# Label Studio .env Template Reference
+# Biowork `.env` Template Reference
 
-This document provides a complete reference template for the `.env` file used by Label Studio.
+Reference template for the `.env` consumed by Django settings. Pair with
+`BIOWORK_FORK_OVERVIEW.md` for which features each variable feeds.
 
 ## Location
 
-The `.env` file should be located at:
-```
-/path/to/label-studio-custom/data/.env
-```
+- **Local dev (non-Docker):** `<repo>/data/.env` (auto-loaded by
+  `label_studio/core/settings/base.py:25`).
+- **Docker:** values are defined inline in `docker-compose*.yml` or in a
+  root-level `.env` referenced via `${VAR}` from compose. Don't rely on
+  `data/.env` inside the container — it's not picked up early enough.
 
 ## Complete Template
 
@@ -258,11 +260,11 @@ For local development:
 ```env
 # Development Configuration
 SECRET_KEY=dev-secret-key-not-for-production
-BASE_DATA_DIR=/Users/yourname/Developer/label-studio-custom/data
+BASE_DATA_DIR=./data
 
 # Local SQLite
 DJANGO_DB=sqlite
-DATABASE_NAME=/Users/yourname/Developer/label-studio-custom/data/label_studio.sqlite3
+DATABASE_NAME=./data/label_studio.sqlite3
 
 # Local ML Backend
 ADD_DEFAULT_ML_BACKENDS=true
