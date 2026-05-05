@@ -6,7 +6,7 @@ feature that optimizes task API performance by excluding expensive fields.
 
 from unittest.mock import Mock, patch
 
-from django.test import TestCase
+from django.test import TestCase, override_settings
 
 
 class TestExcludedFieldsLogic(TestCase):
@@ -304,6 +304,35 @@ class TestPreparedTaskManagerBehavior(TestCase):
                 called_functions,
                 "Field 'predictions_results' should not be processed (not in fields_for_evaluation)",
             )
+
+    @override_settings(GET_DYNAMIC_DM_ANNOTATIONS='lse_data_manager.hooks.get_dynamic_annotations')
+    def test_dynamic_agreement_annotations_are_not_gated_by_raw_feature_flag(self):
+        """Dynamic Agreement V2 annotations are delegated to the configured hook for project-level gating."""
+        from data_manager.managers import PreparedTaskManager
+
+        mock_queryset = Mock()
+        mock_queryset.project = Mock(id=123)
+        called_functions = []
+
+        def dimension_agreement_annotator(queryset):
+            called_functions.append('dimension_agreement_1')
+            return queryset
+
+        def overlay_func(request=None, project=None):
+            return {'dimension_agreement_1': dimension_agreement_annotator}
+
+        with (
+            patch('data_manager.managers.get_annotations_map', return_value={}),
+            patch('data_manager.managers.load_func', return_value=overlay_func),
+            patch('data_manager.managers.flag_set', return_value=False),
+        ):
+            manager = PreparedTaskManager()
+            manager.annotate_queryset(
+                queryset=mock_queryset,
+                fields_for_evaluation=['dimension_agreement_1'],
+            )
+
+        self.assertEqual(called_functions, ['dimension_agreement_1'])
 
 
 class TestGetQuerysetParameterPassing(TestCase):

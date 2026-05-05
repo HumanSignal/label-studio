@@ -887,30 +887,31 @@ class PreparedTaskManager(models.Manager):
     ):
         annotations_map = get_annotations_map()
         project = getattr(queryset, 'project', None)
-        # If we have dynamic control-tag level agreement columns, inject into annotation map
-        # without mutating the global map
-        if flag_set('fflag_utc_428_consensus_control_tag_agreement', user='auto'):
-            inject_path = getattr(settings, 'GET_DYNAMIC_DM_ANNOTATIONS', None)
-            if inject_path:
-                overlay_func = load_func(inject_path)
-                # Expect a dict of {field_name: function that annotates the queryset}
-                if project is None:
-                    first_task = queryset.first()
-                    project = None if first_task is None else first_task.project
-                overlay_map = overlay_func(request=request, project=project) or {}
-                if isinstance(overlay_map, dict) and overlay_map:
-                    # Only add overlay_map keys if they're explicitly requested in fields_for_evaluation
-                    # or if all_fields=True. Don't automatically add all overlay_map keys to avoid
-                    # processing all tasks when only a page is needed (e.g., in only_filtered).
-                    # Merge overlay with base map for this call only (all keys available, but only used if requested)
-                    annotations_map = {**annotations_map, **overlay_map}
-                    # Only add overlay_map keys to fields_for_evaluation if they're explicitly requested
-                    if fields_for_evaluation is not None:
-                        # Only include overlay_map keys that are already in fields_for_evaluation
-                        overlay_keys_in_request = [k for k in overlay_map.keys() if k in fields_for_evaluation]
-                        if overlay_keys_in_request:
-                            # Ensure they're in the list (they already are, but this makes it explicit)
-                            fields_for_evaluation = list(set(fields_for_evaluation) | set(overlay_keys_in_request))
+        # If configured, inject dynamic annotation fields without mutating the global map.
+        # Do not pre-gate this with the Agreement V2 feature flag here: LSE uses this hook
+        # for project-level Agreement V2 targeting, so the hook itself must decide whether
+        # to return dynamic agreement fields for the current project.
+        inject_path = getattr(settings, 'GET_DYNAMIC_DM_ANNOTATIONS', None)
+        if inject_path:
+            overlay_func = load_func(inject_path)
+            # Expect a dict of {field_name: function that annotates the queryset}
+            if project is None:
+                first_task = queryset.first()
+                project = None if first_task is None else first_task.project
+            overlay_map = overlay_func(request=request, project=project) or {}
+            if isinstance(overlay_map, dict) and overlay_map:
+                # Only add overlay_map keys if they're explicitly requested in fields_for_evaluation
+                # or if all_fields=True. Don't automatically add all overlay_map keys to avoid
+                # processing all tasks when only a page is needed (e.g., in only_filtered).
+                # Merge overlay with base map for this call only (all keys available, but only used if requested)
+                annotations_map = {**annotations_map, **overlay_map}
+                # Only add overlay_map keys to fields_for_evaluation if they're explicitly requested
+                if fields_for_evaluation is not None:
+                    # Only include overlay_map keys that are already in fields_for_evaluation
+                    overlay_keys_in_request = [k for k in overlay_map.keys() if k in fields_for_evaluation]
+                    if overlay_keys_in_request:
+                        # Ensure they're in the list (they already are, but this makes it explicit)
+                        fields_for_evaluation = list(set(fields_for_evaluation) | set(overlay_keys_in_request))
 
         if fields_for_evaluation is None:
             fields_for_evaluation = []
