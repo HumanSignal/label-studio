@@ -361,7 +361,7 @@ export class APIProxy<T extends {}> {
         throw new Error(`Can't find key \`${key}\` in data [${path}]`);
       }
 
-      return result;
+      return encodeURIComponent(String(result));
     });
 
     url.pathname += processedPath.replace(/\/+/g, "/").replace(/\/+$/g, "");
