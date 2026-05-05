@@ -1,10 +1,9 @@
 "use client";
 
-import * as React from "react";
-import * as DialogPrimitive from "@radix-ui/react-dialog";
-import { IconClose } from "@humansignal/icons";
-
+import { Icon } from "@humansignal/icons";
 import { cn } from "@humansignal/shad/utils";
+import * as DialogPrimitive from "@radix-ui/react-dialog";
+import * as React from "react";
 import { Button } from "../../../lib/button/button";
 
 const Sheet = DialogPrimitive.Root;
@@ -67,7 +66,7 @@ const SheetContent = React.forwardRef<React.ElementRef<typeof DialogPrimitive.Co
                 size="small"
                 className="absolute right-3 !p-0"
                 style={{ top: "12px" }}
-                leading={<IconClose />}
+                leading={<Icon.X />}
                 aria-label="Close"
                 data-testid="drawer-close-button"
               />

@@ -142,7 +142,9 @@
 }
 
 .selectedItemsCaret {
-  transition: opacity 150ms ease-out;
+  transition:
+    opacity 150ms ease-out,
+    transform 150ms ease-out;
   flex-shrink: 0;
 }
 

@@ -1,4 +1,5 @@
 import path from "node:path";
+import { createRequire } from "node:module";
 import { fileURLToPath } from "node:url";
 import type { StorybookConfig } from "@storybook/react-vite";
 import type { ESBuildOptions, Plugin } from "vite";
@@ -8,12 +9,20 @@ import tailwindcss from "tailwindcss";
 import svgr from "vite-plugin-svgr";
 import postcssImport from "postcss-import";
 
-import tailwindConfigModule from "../../../tailwind.config.js";
-import { CSS_PREFIX, cssModulesGenerateScopedName } from "../../../vite-prefix-css-module";
-import { jsxJsPlugin, optimizeDepsAutomaticJsxPlugin } from "../../../vite-lib-jsx-plugins";
-import { postcssPrefixLsfClasses } from "../../../postcss-prefix-lsf.cjs";
-
 const dirname = path.dirname(fileURLToPath(import.meta.url));
+const webRoot = path.resolve(dirname, "../../..");
+const requireFromStorybook = createRequire(import.meta.url);
+
+// Storybook evaluates this file under a virtual path like `/libs/storybook/.storybook/main.ts`,
+// so static `../../../…` imports resolve to `/…` on disk. Load web-root modules by absolute path.
+const tailwindConfigModule = requireFromStorybook(path.join(webRoot, "tailwind.config.js"));
+const { CSS_PREFIX, cssModulesGenerateScopedName } = requireFromStorybook(
+  path.join(webRoot, "vite-prefix-css-module.ts"),
+) as { CSS_PREFIX: string; cssModulesGenerateScopedName: (name: string, filename: string) => string };
+const { jsxJsPlugin, optimizeDepsAutomaticJsxPlugin } = requireFromStorybook(
+  path.join(webRoot, "vite-lib-jsx-plugins.ts"),
+) as { jsxJsPlugin: () => Plugin; optimizeDepsAutomaticJsxPlugin: () => Plugin };
+const { postcssPrefixLsfClasses } = requireFromStorybook(path.join(webRoot, "postcss-prefix-lsf.cjs"));
 
 const tailwindConfig =
   (tailwindConfigModule as { default?: typeof tailwindConfigModule }).default ?? tailwindConfigModule;
@@ -31,7 +40,12 @@ const config: StorybookConfig = {
   },
 
   viteFinal: async (viteConfig) => {
-    const root = path.resolve(dirname, "../../..");
+    const root = webRoot;
+    // Storybook's Vite builder defaults projectRoot to `libs/storybook`, so source under
+    // `libs/ui`, `libs/editor`, etc. falls outside `root` and is served via `/@fs/...`.
+    // That breaks dynamic `import()` for stories with rolldown-vite. Use the web package
+    // root so all story sources resolve as normal module URLs under `/libs/...`.
+    viteConfig.root = root;
     const mode = viteConfig.mode ?? "development";
     viteConfig.define = {
       ...(viteConfig.define ?? {}),

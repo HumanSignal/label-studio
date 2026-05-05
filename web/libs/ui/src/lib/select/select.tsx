@@ -1,5 +1,5 @@
-import React, { type ForwardedRef, forwardRef, useCallback, useEffect, useMemo, useRef, useState } from "react";
-
+import { isDefined } from "@humansignal/core/lib/utils/helpers";
+import { Icon } from "@humansignal/icons";
 import {
   Command,
   CommandEmpty,
@@ -9,19 +9,18 @@ import {
   CommandList,
 } from "@humansignal/shad/components/ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "@humansignal/shad/components/ui/popover";
-import type { SelectOption, OptionProps, SelectProps } from "./types.ts";
+import clsx from "clsx";
+import React, { type ForwardedRef, forwardRef, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { VariableSizeList } from "react-window";
+import InfiniteLoader from "react-window-infinite-loader";
+import { cn, cnm } from "../../utils/utils";
+import { Badge } from "../badge/badge";
 import { Button } from "../button/button";
 import { Checkbox } from "../checkbox/checkbox";
 import { Label } from "../label/label";
 import { Typography } from "../typography/typography";
-import { Badge } from "../badge/badge";
-import { isDefined } from "@humansignal/core/lib/utils/helpers";
-import { IconChevron, IconChevronDown } from "@humansignal/icons";
-import clsx from "clsx";
 import styles from "./select.module.css";
-import { cn, cnm } from "../../utils/utils";
-import { VariableSizeList } from "react-window";
-import InfiniteLoader from "react-window-infinite-loader";
+import type { OptionProps, SelectOption, SelectProps } from "./types.ts";
 
 const VARIABLE_LIST_ITEM_HEIGHT = 40;
 const VARIABLE_LIST_COUNT_RENDERED = 5;
@@ -48,7 +47,10 @@ function groupOptionsByField(options: any[], groupBy: string): { groupKey: strin
   const rest = order.filter((k) => k !== null);
   const orderedKeys = [...nullFirst, ...rest];
 
-  return orderedKeys.map((groupKey) => ({ groupKey, items: byKey.get(groupKey) ?? [] }));
+  return orderedKeys.map((groupKey) => ({
+    groupKey,
+    items: byKey.get(groupKey) ?? [],
+  }));
 }
 
 /**
@@ -127,12 +129,10 @@ const SelectedItemsGroup = ({
           style={{ cursor: hasNoItems ? "default" : "pointer" }}
         >
           {/* Caret icon */}
-          <IconChevronDown
-            className={cn(
-              styles.selectedItemsCaret,
-              "transition-transform ease-out duration-200",
-              !expanded && "-rotate-90",
-            )}
+          <Icon.CaretDown
+            className={cn(styles.selectedItemsCaret, !expanded && "-rotate-90")}
+            size={16}
+            weight="bold"
             aria-hidden="true"
             style={{ opacity: hasNoItems ? 0.3 : 1 }}
           />
@@ -495,7 +495,11 @@ export const Select = forwardRef(
                 key={`${val}_${idx}`}
                 value={val}
                 label={lab}
-                {...(optionRenderer && { optionRenderer, option: item, optionIndex: idx })}
+                {...(optionRenderer && {
+                  optionRenderer,
+                  option: item,
+                  optionIndex: idx,
+                })}
                 isOptionSelected={isOptionSelected}
                 disabled={typeof item === "object" && item?.disabled}
                 style={typeof item === "object" ? item?.style : undefined}
@@ -572,7 +576,11 @@ export const Select = forwardRef(
                       key={`${val}_${i}`}
                       value={val}
                       label={lab}
-                      {...(optionRenderer && { optionRenderer, option: item, optionIndex: i })}
+                      {...(optionRenderer && {
+                        optionRenderer,
+                        option: item,
+                        optionIndex: i,
+                      })}
                       isOptionSelected={isChildOptionSelected}
                       disabled={item?.disabled}
                       style={item?.style}
@@ -592,7 +600,11 @@ export const Select = forwardRef(
             key={`${optionValue}_${index}`}
             value={optionValue}
             label={label}
-            {...(optionRenderer && { optionRenderer, option, optionIndex: index })}
+            {...(optionRenderer && {
+              optionRenderer,
+              option,
+              optionIndex: index,
+            })}
             isOptionSelected={isOptionSelected}
             disabled={option?.disabled}
             style={option?.style}
@@ -639,11 +651,13 @@ export const Select = forwardRef(
             <span className="flex flex-1 text-left gap-2 max-w-full overflow-hidden" data-testid="select-display-value">
               {renderSelected ? renderSelected?.(selectedOptions, props?.placeholder) : displayValue}
             </span>
-            {isOpen ? (
-              <IconChevron className="h-4 w-4 shrink-0 opacity-50 pointer-events-none" />
-            ) : (
-              <IconChevronDown className="h-4 w-4 shrink-0 opacity-50 pointer-events-none" />
-            )}
+            <Icon.CaretDown
+              weight="bold"
+              className={cnm(
+                "h-4 w-4 shrink-0 text-neutral-content-subtler pointer-events-none transition-transform ease-out duration-150",
+                isOpen && "rotate-180",
+              )}
+            />
           </button>
         </PopoverTrigger>
         <PopoverContent align="start" data-testid="select-popup" className={cnm("min-w-full", contentClassName)}>

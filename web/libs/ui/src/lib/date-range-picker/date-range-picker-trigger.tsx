@@ -1,10 +1,10 @@
-import type { ReactNode, ComponentPropsWithoutRef } from "react";
+import { Icon } from "@humansignal/icons";
+import type { ComponentPropsWithoutRef, ReactNode } from "react";
+import { cnm } from "../../utils/utils";
 import { DropdownTrigger } from "../dropdown/dropdown-trigger";
 import { Typography } from "../typography/typography";
-import { IconCalendar } from "@humansignal/icons";
 import type { DateOrDateTimeRange } from "./date-utils";
 import { formatDateString } from "./date-utils";
-import { cnm } from "../../utils/utils";
 
 type DateRangePickerTriggerProps = {
   /**
@@ -102,7 +102,7 @@ export const DateRangePickerTrigger = ({
         data-testid={dataTestId}
       >
         {label}
-        <IconCalendar height={18} width={18} className="text-neutral-content-subtlest shrink-0" />
+        <Icon.CalendarBlank size={24} className="text-neutral-content-subtlest shrink-0" />
       </div>
     </DropdownTrigger>
   );

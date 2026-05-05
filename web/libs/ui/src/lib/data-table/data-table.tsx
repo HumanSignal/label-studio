@@ -1,16 +1,16 @@
 import {
-  type Table,
+  type Column,
+  type ColumnDef,
   flexRender,
   getCoreRowModel,
   getSortedRowModel,
-  useReactTable,
-  type Row,
-  type ColumnDef,
-  type TableMeta,
-  type VisibilityState,
   type HeaderContext,
+  type Row,
   type SortingState,
-  type Column,
+  type Table,
+  type TableMeta,
+  useReactTable,
+  type VisibilityState,
 } from "@tanstack/react-table";
 
 // Extend ColumnMeta to include noDivider
@@ -19,15 +19,16 @@ declare module "@tanstack/react-table" {
     noDivider?: boolean;
   }
 }
-import { memo, useState, useMemo, useCallback, useLayoutEffect, type CSSProperties, type UIEventHandler } from "react";
-import { cn } from "../../utils/utils";
+
+import { Icon } from "@humansignal/icons";
+import { type CSSProperties, memo, type UIEventHandler, useCallback, useLayoutEffect, useMemo, useState } from "react";
 import { useColumnSizing, useDataColumns } from "../../hooks/data-table";
+import { cn } from "../../utils/utils";
 import { Checkbox } from "../checkbox/checkbox";
-import { Typography } from "../typography/typography";
-import { Tooltip } from "../Tooltip/Tooltip";
-import { IconSortUp, IconSortDown, IconSearch, IconInfoOutline } from "@humansignal/icons";
 import { EmptyState } from "../empty-state/empty-state";
 import { Skeleton } from "../skeleton/skeleton";
+import { Tooltip } from "../Tooltip/Tooltip";
+import { Typography } from "../typography/typography";
 import styles from "./data-table.module.css";
 
 export type DataShape = Record<string, any>[];
@@ -74,7 +75,7 @@ export type DataTableProps<T extends DataShape> = {
   // Empty state props
   /** Empty state configuration when no data is available */
   emptyState?: {
-    /** Icon to display (defaults to IconSearch) */
+    /** Icon to display (defaults to Icon.MagnifyingGlass) */
     icon?: React.ReactNode;
     /** Title text (defaults to "No items found") */
     title?: string;
@@ -470,7 +471,7 @@ export const DataTable = <T extends DataShape>(props: DataTableProps<T>) => {
             className="px-wide py-widest"
             size="small"
             variant="warning"
-            icon={props.emptyState?.icon ?? <IconSearch />}
+            icon={props.emptyState?.icon ?? <Icon.MagnifyingGlass />}
             title={props.emptyState?.title ?? "No items found"}
             description={
               props.emptyState?.description ?? "Try adjusting your search or clearing the filters to see more results."
@@ -516,7 +517,10 @@ const DataTableHead = <T extends Record<string, unknown>>({ table }: DataTableHe
             const isSortable = column.getCanSort();
 
             // Calculate column style
-            const style = { ...getColumnStyle(size, minSize, maxSize), ...getPinnedOffsetStyle(column) };
+            const style = {
+              ...getColumnStyle(size, minSize, maxSize),
+              ...getPinnedOffsetStyle(column),
+            };
 
             const noDivider = column.columnDef.meta?.noDivider;
             // Also check if previous column has noDivider to prevent divider between them
@@ -614,7 +618,10 @@ const DataTableRow = <T,>({ row, className, onRowClick, isSelected, isActive }: 
         const size = cell.column.getSize();
 
         // Calculate column style
-        const style = { ...getColumnStyle(size, minSize, maxSize), ...getPinnedOffsetStyle(cell.column) };
+        const style = {
+          ...getColumnStyle(size, minSize, maxSize),
+          ...getPinnedOffsetStyle(cell.column),
+        };
 
         return (
           <div
@@ -758,7 +765,10 @@ const DataTableSkeletonBody = <T,>({
             const size = header.getSize();
 
             // Calculate column style
-            const style = { ...getColumnStyle(size, minSize, maxSize), ...getPinnedOffsetStyle(column) };
+            const style = {
+              ...getColumnStyle(size, minSize, maxSize),
+              ...getPinnedOffsetStyle(column),
+            };
 
             // For selection column, show empty cell
             if (column.id === "select") {
@@ -857,13 +867,21 @@ export const Header = <T,>({
         )}
         {help && (
           <Tooltip title={help} alignment="top-center">
-            <IconInfoOutline width={18} height={18} className="text-neutral-content-subtler cursor-help shrink-0" />
+            <Icon.Info width={18} height={18} className="text-neutral-content-subtler cursor-help shrink-0" />
           </Tooltip>
         )}
       </div>
       {enableSorting && (
         <div className={cn(styles.headerIcon, isSorted === true && styles.headerIconVisible)}>
-          {isSorted ? isDesc ? <IconSortUp /> : <IconSortDown /> : <IconSortDown />}
+          {isSorted ? (
+            isDesc ? (
+              <Icon.ArrowUp size={18} className="text-neutral-content-subtler" />
+            ) : (
+              <Icon.ArrowDown size={18} className="text-neutral-content-subtler" />
+            )
+          ) : (
+            <Icon.ArrowDown size={18} className="text-neutral-content-subtler" />
+          )}
         </div>
       )}
     </div>

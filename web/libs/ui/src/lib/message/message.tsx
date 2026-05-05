@@ -1,15 +1,8 @@
-import React, { type ReactNode, forwardRef, useMemo } from "react";
+import { Icon, IconClose, IconSpark } from "@humansignal/icons";
+import React, { forwardRef, type ReactNode, useMemo } from "react";
 import { cn } from "../../utils/utils";
-import { Typography } from "../typography/typography";
 import { Button } from "../button/button";
-import {
-  IconInfoOutline,
-  IconWarning,
-  IconCheckCircleOutline,
-  IconCloseCircleOutline,
-  IconClose,
-  IconSpark,
-} from "@humansignal/icons";
+import { Typography } from "../typography/typography";
 import styles from "./message.module.css";
 
 // Variant configuration
@@ -198,19 +191,19 @@ export const Message = forwardRef<HTMLDivElement, MessageProps>(
     const defaultIcon = useMemo(() => {
       switch (normalizedVariant) {
         case "primary":
-          return <IconInfoOutline />;
+          return <Icon.Info />;
         case "warning":
-          return <IconWarning />;
+          return <Icon.Warning />;
         case "positive":
-          return <IconCheckCircleOutline />;
+          return <Icon.CheckCircle />;
         case "negative":
-          return <IconCloseCircleOutline />;
+          return <Icon.XCircle />;
         case "neutral":
-          return <IconInfoOutline />;
+          return <Icon.Info />;
         case "enterprise":
           return <IconSpark />;
         default:
-          return <IconInfoOutline />;
+          return <Icon.Info />;
       }
     }, [normalizedVariant]);
 
@@ -277,7 +270,7 @@ export const Message = forwardRef<HTMLDivElement, MessageProps>(
             tooltip="Dismiss"
             aria-label="Dismiss message"
             data-testid="message-dismiss-button"
-            leading={<IconClose />}
+            leading={<Icon.X />}
           />
         )}
       </div>
