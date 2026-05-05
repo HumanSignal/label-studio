@@ -8,7 +8,10 @@ import {
   FF_FIT_1304_STRICT_OVERLAP,
   isFF,
 } from "../utils/feature-flags";
-import { isActive, FF_FIT_720_LAZY_LOAD_ANNOTATIONS } from "@humansignal/core/lib/utils/feature-flags";
+import {
+  isActive,
+  FF_FIT_720_LAZY_LOAD_ANNOTATIONS,
+} from "@humansignal/core/lib/utils/feature-flags";
 import { isDefined } from "../utils/utils";
 import { Modal } from "../components/Common/Modal/Modal";
 import { CommentsSdk } from "./comments-sdk";
@@ -17,7 +20,10 @@ import { annotationToServer, taskToLSFormat } from "./lsf-utils";
 import { when, runInAction } from "mobx";
 import { isAlive } from "mobx-state-tree";
 import { imageCache } from "@humansignal/core";
-import { invalidateAnnotationCache, invalidateDistributionCache } from "@humansignal/core/lib/utils/annotation-cache";
+import {
+  invalidateAnnotationCache,
+  invalidateDistributionCache,
+} from "@humansignal/core/lib/utils/annotation-cache";
 
 const waitForPaint = () =>
   new Promise((resolve) => {
@@ -73,7 +79,8 @@ const errorHandlerAllowSpecialErrors = (result) => {
 // Support portal URL constants used to construct error reporting links
 // These are used in showOperationToast() to create support links with request IDs
 // for better error tracking and customer support
-export const SUPPORT_URL = "https://support.humansignal.com/hc/en-us/requests/new";
+export const SUPPORT_URL =
+  "https://support.humansignal.com/hc/en-us/requests/new";
 export const SUPPORT_URL_REQUEST_ID_PARAM = "tf_37934448633869"; // request_id field ID in ZD
 
 // Toast ID for overlap reached message - used to dismiss this specific toast
@@ -144,9 +151,18 @@ export class LSFWrapper {
       this.handleOverlapNextTask = () => this.loadTask();
       this.handleOverlapCloseTask = () => this.closeTask();
       this.handleOverlapExitStream = () => this.exitStream();
-      window.addEventListener("overlap-error-next-task", this.handleOverlapNextTask);
-      window.addEventListener("overlap-error-close-task", this.handleOverlapCloseTask);
-      window.addEventListener("overlap-error-exit-stream", this.handleOverlapExitStream);
+      window.addEventListener(
+        "overlap-error-next-task",
+        this.handleOverlapNextTask,
+      );
+      window.addEventListener(
+        "overlap-error-close-task",
+        this.handleOverlapCloseTask,
+      );
+      window.addEventListener(
+        "overlap-error-exit-stream",
+        this.handleOverlapExitStream,
+      );
     }
 
     let interfaces = [...DEFAULT_INTERFACES];
@@ -155,14 +171,21 @@ export class LSFWrapper {
       interfaces.push("annotations:deny-empty");
     }
 
-    if (window.APP_SETTINGS.annotator_reviewer_firewall_enabled && this.labelStream) {
+    if (
+      window.APP_SETTINGS.annotator_reviewer_firewall_enabled &&
+      this.labelStream
+    ) {
       interfaces.push("annotations:hide-info");
     }
 
     if (this.labelStream) {
-      interfaces.push("infobar");
-      if (!window.APP_SETTINGS.label_stream_navigation_disabled) interfaces.push("topbar:prevnext");
-      if (FF_DEV_2186 && this.project.review_settings?.require_comment_on_reject) {
+      interfaces.push("infobar", "predictions:tabs");
+      if (!window.APP_SETTINGS.label_stream_navigation_disabled)
+        interfaces.push("topbar:prevnext");
+      if (
+        FF_DEV_2186 &&
+        this.project.review_settings?.require_comment_on_reject
+      ) {
         interfaces.push("comments:update");
       }
       if (this.project.show_skip_button) {
@@ -174,11 +197,10 @@ export class LSFWrapper {
         "annotations:add-new",
         "annotations:view-all",
         "annotations:delete",
-        "annotations:tabs",
-        "predictions:tabs",
         "annotations:copy-link",
       );
     }
+    interfaces.push("annotations:tabs", "predictions:tabs");
 
     if (this.datamanager.hasInterface("instruction")) {
       interfaces.push("instruction");
@@ -211,11 +233,17 @@ export class LSFWrapper {
       });
     }
 
-    const queueTotal = dm.store.project.reviewer_queue_total || dm.store.project.queue_total;
+    const queueTotal =
+      dm.store.project.reviewer_queue_total || dm.store.project.queue_total;
     const queueDone = dm.store.project.queue_done;
     const queueLeft = dm.store.project.queue_left;
-    const queuePosition = queueDone ? queueDone + 1 : queueLeft ? queueTotal - queueLeft + 1 : 1;
-    const commentClassificationConfig = dm.store.project.comment_classification_config;
+    const queuePosition = queueDone
+      ? queueDone + 1
+      : queueLeft
+        ? queueTotal - queueLeft + 1
+        : 1;
+    const commentClassificationConfig =
+      dm.store.project.comment_classification_config;
 
     const lsfProperties = {
       user: options.user,
@@ -265,7 +293,9 @@ export class LSFWrapper {
 
       this.lsfInstance.on("presignUrlForProject", this.onPresignUrlForProject);
 
-      const names = Array.from(this.datamanager.callbacks.keys()).filter((k) => k.startsWith("lsf:"));
+      const names = Array.from(this.datamanager.callbacks.keys()).filter((k) =>
+        k.startsWith("lsf:"),
+      );
 
       names.forEach((name) => {
         this.datamanager.getEventCallbacks(name).forEach((clb) => {
@@ -296,7 +326,8 @@ export class LSFWrapper {
 
     if (params) {
       const task = await api.call("task", { params });
-      const noData = !task || (!task.annotations?.length && !task.drafts?.length);
+      const noData =
+        !task || (!task.annotations?.length && !task.drafts?.length);
       const body = `Task #${taskID}${commentId ? ` with comment #${commentId}` : ""} was not found!`;
 
       if (noData) {
@@ -458,7 +489,11 @@ export class LSFWrapper {
 
     this.lsf.initializeStore(lsfTask);
 
-    await this.setAnnotation(annotationID, fromHistory || isRejectedQueue, selectPrediction);
+    await this.setAnnotation(
+      annotationID,
+      fromHistory || isRejectedQueue,
+      selectPrediction,
+    );
     this.setLoading(false);
 
     if (isFF(FF_FIT_1304_STRICT_OVERLAP) && this.overlapReached) {
@@ -481,7 +516,9 @@ export class LSFWrapper {
           <span>{this.overlapReachedMessage}</span>
           <Button
             onClick={() => {
-              this.datamanager.invoke("toast:dismiss", { id: OVERLAP_TOAST_ID });
+              this.datamanager.invoke("toast:dismiss", {
+                id: OVERLAP_TOAST_ID,
+              });
               this.handleOverlapNextTask();
             }}
             className="ml-4"
@@ -518,7 +555,9 @@ export class LSFWrapper {
     }
 
     // Check if this annotation is a stub in the original task data
-    const taskAnnotation = this.task?.annotations?.find((a) => String(a.id) === String(annotationPk));
+    const taskAnnotation = this.task?.annotations?.find(
+      (a) => String(a.id) === String(annotationPk),
+    );
     if (!taskAnnotation?.is_stub) {
       return null;
     }
@@ -532,7 +571,9 @@ export class LSFWrapper {
         // IMPORTANT: Re-fetch the annotation from the store after async operation
         // The original reference might be stale (user navigated, scrolled, etc.)
         // which causes MST "object is protected" errors
-        const lsfAnnotation = this.annotations.find((a) => String(a.pk) === String(annotationPk));
+        const lsfAnnotation = this.annotations.find(
+          (a) => String(a.pk) === String(annotationPk),
+        );
         if (!lsfAnnotation) {
           // Annotation no longer exists in the store
           return fullAnnotation;
@@ -544,7 +585,8 @@ export class LSFWrapper {
 
         // Check if already hydrated while we were fetching
         const versionsResult = lsfAnnotation.versions?.result;
-        const hasVersionsResult = Array.isArray(versionsResult) && versionsResult.length > 0;
+        const hasVersionsResult =
+          Array.isArray(versionsResult) && versionsResult.length > 0;
         const hasRegions = lsfAnnotation.areas?.size > 0;
 
         if (hasVersionsResult || hasRegions) {
@@ -553,7 +595,8 @@ export class LSFWrapper {
         }
 
         if (fullAnnotation.result) {
-          if (!isAlive(lsfAnnotation) || !isAlive(lsfAnnotation.trackedState)) return fullAnnotation;
+          if (!isAlive(lsfAnnotation) || !isAlive(lsfAnnotation.trackedState))
+            return fullAnnotation;
           lsfAnnotation.history.freeze();
           lsfAnnotation.deserializeResults(fullAnnotation.result);
           // Critical: updateObjects() is required to render visual regions after deserializing
@@ -572,7 +615,11 @@ export class LSFWrapper {
   }
 
   /** @private */
-  async setAnnotation(annotationID, selectAnnotation = false, selectPrediction = false) {
+  async setAnnotation(
+    annotationID,
+    selectAnnotation = false,
+    selectPrediction = false,
+  ) {
     const id = annotationID ? annotationID.toString() : null;
     const { annotationStore: cs } = this.lsf;
     let annotation;
@@ -621,8 +668,10 @@ export class LSFWrapper {
     // if we have annotations created automatically, we don't need to create another one
     // automatically === created here and haven't saved yet, so they don't have pk
     // @todo because of some weird reason pk may be string uid, so check flags then
-    const hasAutoAnnotations = !!first && (!first.pk || (first.userGenerate && first.sentUserGenerate === false));
-    const showPredictions = this.project.show_collab_predictions === true;
+    const hasAutoAnnotations =
+      !!first &&
+      (!first.pk || (first.userGenerate && first.sentUserGenerate === false));
+    const showPredictions = Boolean(this.project.show_collab_predictions);
 
     if (this.labelStream) {
       if (first?.draftId) {
@@ -632,7 +681,11 @@ export class LSFWrapper {
         // Lazy load annotation if it's a stub (FIT-720)
         await this.ensureAnnotationLoaded(annotationID);
         annotation = this.annotations.find(({ pk }) => pk === annotationID);
-      } else if (showPredictions && this.predictions.length > 0 && !this.isInteractivePreannotations) {
+      } else if (
+        showPredictions &&
+        this.predictions.length > 0 &&
+        !this.isInteractivePreannotations
+      ) {
         annotation = cs.addAnnotationFromPrediction(this.predictions[0]);
       } else {
         annotation = cs.createAnnotation();
@@ -641,12 +694,23 @@ export class LSFWrapper {
       if (selectPrediction) {
         annotation = this.predictions.find((p) => p.pk === id);
         annotation ??= first; // if prediction not found, select first annotation and resume existing behaviour
-      } else if (this.annotations.length === 0 && this.predictions.length > 0 && !this.isInteractivePreannotations) {
-        const predictionByModelVersion = this.predictions.find((p) => p.createdBy === this.project.model_version);
-        annotation = cs.addAnnotationFromPrediction(predictionByModelVersion ?? this.predictions[0]);
+      } else if (
+        this.annotations.length === 0 &&
+        this.predictions.length > 0 &&
+        !this.isInteractivePreannotations
+      ) {
+        const predictionByModelVersion = this.predictions.find(
+          (p) => p.createdBy === this.project.model_version,
+        );
+        annotation = cs.addAnnotationFromPrediction(
+          predictionByModelVersion ?? this.predictions[0],
+        );
       } else if (this.annotations.length > 0 && id && id !== "auto") {
         annotation = this.annotations.find((c) => c.pk === id || c.id === id);
-      } else if (this.annotations.length > 0 && (id === "auto" || hasAutoAnnotations)) {
+      } else if (
+        this.annotations.length > 0 &&
+        (id === "auto" || hasAutoAnnotations)
+      ) {
         annotation = first;
       } else {
         annotation = cs.createAnnotation();
@@ -719,9 +783,11 @@ export class LSFWrapper {
 
     if (!this.lsf.task) this.setLoading(true);
 
-    const _taskHistory = await this.datamanager.store.taskStore.loadTaskHistory({
-      projectId: this.datamanager.store.project.id,
-    });
+    const _taskHistory = await this.datamanager.store.taskStore.loadTaskHistory(
+      {
+        projectId: this.datamanager.store.project.id,
+      },
+    );
 
     this.lsf.setTaskHistory(_taskHistory);
 
@@ -762,7 +828,10 @@ export class LSFWrapper {
     const projectId = this.project.id;
     const fileuri = btoa(url);
 
-    return api.createUrl(api.endpoints.presignUrlForProject, { projectId, fileuri }).url;
+    return api.createUrl(api.endpoints.presignUrlForProject, {
+      projectId,
+      fileuri,
+    }).url;
   };
 
   onStorageInitialized = async (ls) => {
@@ -770,7 +839,10 @@ export class LSFWrapper {
 
     if (this.task && this.labelStream === false) {
       const annotationID =
-        this.initialAnnotation?.pk ?? this.task.lastAnnotation?.pk ?? this.task.lastAnnotation?.id ?? "auto";
+        this.initialAnnotation?.pk ??
+        this.task.lastAnnotation?.pk ??
+        this.task.lastAnnotation?.id ??
+        "auto";
 
       await this.setAnnotation(annotationID);
     }
@@ -779,14 +851,18 @@ export class LSFWrapper {
   /** @private */
   showOperationToast(status, successMessage, errorAction, result) {
     if (status === 200 || status === 201) {
-      this.datamanager.invoke("toast", { message: successMessage, type: "info" });
+      this.datamanager.invoke("toast", {
+        message: successMessage,
+        type: "info",
+      });
     } else if (status !== undefined) {
       // Skip toast for errors that are handled by global modal handlers via display_context
       // These errors bubble up to ApiProvider which shows appropriate modals
       // Note: display_context is in result.response for API error responses
       const displayReason = result?.response?.display_context?.reason;
       const isPausedError = displayReason === "PAUSED";
-      const isOverlapError = isFF(FF_FIT_1304_STRICT_OVERLAP) && displayReason === "OVERLAP_REACHED";
+      const isOverlapError =
+        isFF(FF_FIT_1304_STRICT_OVERLAP) && displayReason === "OVERLAP_REACHED";
       if (isPausedError || isOverlapError) {
         // Also update local state for overlap reached (only when feature flag is enabled)
         if (isOverlapError) {
@@ -804,7 +880,9 @@ export class LSFWrapper {
       }
 
       const requestId = result?.$meta?.headers?.get("x-ls-request-id");
-      const supportUrl = requestId ? `${SUPPORT_URL}?${SUPPORT_URL_REQUEST_ID_PARAM}=${requestId}` : SUPPORT_URL;
+      const supportUrl = requestId
+        ? `${SUPPORT_URL}?${SUPPORT_URL_REQUEST_ID_PARAM}=${requestId}`
+        : SUPPORT_URL;
 
       this.datamanager.invoke("toast", {
         message: (
@@ -853,7 +931,12 @@ export class LSFWrapper {
     );
     const status = result?.$meta?.status;
 
-    this.showOperationToast(status, "Annotation saved successfully", "Annotation is not saved", result);
+    this.showOperationToast(
+      status,
+      "Annotation saved successfully",
+      "Annotation is not saved",
+      result,
+    );
 
     // FIT-720: Invalidate caches after successful submit
     if (status < 400) {
@@ -894,7 +977,12 @@ export class LSFWrapper {
     });
     const status = result?.$meta?.status;
 
-    this.showOperationToast(status, "Annotation updated successfully", "Annotation is not updated", result);
+    this.showOperationToast(
+      status,
+      "Annotation updated successfully",
+      "Annotation is not updated",
+      result,
+    );
 
     this.datamanager.invoke("updateAnnotation", ls, annotation, result);
 
@@ -955,7 +1043,8 @@ export class LSFWrapper {
     }
 
     if (response.ok) {
-      const lastAnnotation = this.annotations[this.annotations.length - 1] ?? {};
+      const lastAnnotation =
+        this.annotations[this.annotations.length - 1] ?? {};
       const annotationID = lastAnnotation.pk ?? undefined;
 
       await this.setAnnotation(annotationID);
@@ -963,14 +1052,20 @@ export class LSFWrapper {
   };
 
   draftToast = (status, result = null) => {
-    this.showOperationToast(status, "Draft saved successfully", "Draft is not saved", result);
+    this.showOperationToast(
+      status,
+      "Draft saved successfully",
+      "Draft is not saved",
+      result,
+    );
   };
 
   needsDraftSave = (annotation) => {
     if (annotation.history?.hasChanges && !annotation.draftSaved) return true;
     if (
       annotation.history?.hasChanges &&
-      new Date(annotation.history.lastAdditionTime) > new Date(annotation.draftSaved)
+      new Date(annotation.history.lastAdditionTime) >
+        new Date(annotation.draftSaved)
     )
       return true;
     return false;
@@ -1007,7 +1102,11 @@ export class LSFWrapper {
 
     if (annotation.draftId > 0) {
       // draft has been already created
-      const res = await this.datamanager.apiCall("updateDraft", { draftID: annotation.draftId }, data);
+      const res = await this.datamanager.apiCall(
+        "updateDraft",
+        { draftID: annotation.draftId },
+        data,
+      );
 
       showToast && this.draftToast(res.$meta?.status, res);
       this.datamanager.invoke("submitDraft", this, annotation, res);
@@ -1016,7 +1115,11 @@ export class LSFWrapper {
     let response;
 
     if (annotationDoesntExist) {
-      response = await this.datamanager.apiCall("createDraftForTask", { taskID: taskId }, data);
+      response = await this.datamanager.apiCall(
+        "createDraftForTask",
+        { taskID: taskId },
+        data,
+      );
     } else {
       response = await this.datamanager.apiCall(
         "createDraftForAnnotation",
@@ -1047,7 +1150,9 @@ export class LSFWrapper {
     const hasForceSkipPermission = MANAGER_ROLES.includes(userRole);
     const canSkip = !skipDisabled || hasForceSkipPermission;
     if (!canSkip) {
-      console.warn("Task cannot be skipped: allow_skip is false and user lacks manager role");
+      console.warn(
+        "Task cannot be skipped: allow_skip is false and user lacks manager role",
+      );
       this.showOperationToast(400, null, "This task cannot be skipped", {
         error: "Task cannot be skipped",
       });
@@ -1076,7 +1181,12 @@ export class LSFWrapper {
     );
     const status = result?.$meta?.status;
 
-    this.showOperationToast(status, "Task skipped successfully", "Task is not skipped", result);
+    this.showOperationToast(
+      status,
+      "Task skipped successfully",
+      "Task is not skipped",
+      result,
+    );
   };
 
   onUnskipTask = async () => {
@@ -1149,14 +1259,17 @@ export class LSFWrapper {
     searchParams.delete(paramName);
     let newRelativePathQuery = window.location.pathname;
 
-    if (searchParams.toString()) newRelativePathQuery += `?${searchParams.toString()}`;
+    if (searchParams.toString())
+      newRelativePathQuery += `?${searchParams.toString()}`;
     window.history.pushState(null, "", newRelativePathQuery);
     return !!urlParam;
   };
 
   // Proxy events that are unused by DM integration
-  onEntityCreate = (...args) => this.datamanager.invoke("onEntityCreate", ...args);
-  onEntityDelete = (...args) => this.datamanager.invoke("onEntityDelete", ...args);
+  onEntityCreate = (...args) =>
+    this.datamanager.invoke("onEntityCreate", ...args);
+  onEntityDelete = (...args) =>
+    this.datamanager.invoke("onEntityDelete", ...args);
   _selectAnnotationTimeout = null;
   _debouncedFirstOldSelection = undefined;
   onSelectAnnotation = (prevAnnotation, nextAnnotation, options) => {
@@ -1205,10 +1318,22 @@ export class LSFWrapper {
     // Hydration (which fetches full annotation data) runs in parallel afterwards.
     if (nextAnnotation?.history?.undoIdx) {
       this.saveDraft(nextAnnotation).then(() => {
-        this.datamanager.invoke("onSelectAnnotation", prevAnnotation, nextAnnotation, options, this);
+        this.datamanager.invoke(
+          "onSelectAnnotation",
+          prevAnnotation,
+          nextAnnotation,
+          options,
+          this,
+        );
       });
     } else {
-      this.datamanager.invoke("onSelectAnnotation", prevAnnotation, nextAnnotation, options, this);
+      this.datamanager.invoke(
+        "onSelectAnnotation",
+        prevAnnotation,
+        nextAnnotation,
+        options,
+        this,
+      );
     }
 
     // FIT-720: Hydrate stub annotations when selected
@@ -1233,11 +1358,13 @@ export class LSFWrapper {
     // Check if annotation is a stub (no regions/results)
     // Stubs have empty results - check via the areas map which holds deserialized regions
     const hasRegions = annotation.areas?.size > 0;
-    const isUserGenerated = annotation.userGenerate && !annotation.sentUserGenerate;
+    const isUserGenerated =
+      annotation.userGenerate && !annotation.sentUserGenerate;
 
     // Also check versions.result to see if the annotation was loaded with actual results
     const versionsResult = annotation.versions?.result;
-    const hasVersionsResult = Array.isArray(versionsResult) && versionsResult.length > 0;
+    const hasVersionsResult =
+      Array.isArray(versionsResult) && versionsResult.length > 0;
 
     // Skip if already hydrated or is a new user-generated annotation
     // Use versionsResult as the source of truth - if it has data, the annotation is already hydrated
@@ -1256,19 +1383,25 @@ export class LSFWrapper {
         // IMPORTANT: Re-fetch the annotation from the store after async operation
         // The original reference might be stale (user navigated, scrolled, etc.)
         // which causes MST "object is protected" errors
-        const freshAnnotation = this.annotations.find((a) => String(a.pk) === String(annotationPk));
+        const freshAnnotation = this.annotations.find(
+          (a) => String(a.pk) === String(annotationPk),
+        );
         if (!freshAnnotation) {
           // Annotation no longer exists in the store
           return;
         }
-        if (!isAlive(freshAnnotation) || !isAlive(freshAnnotation.trackedState)) {
+        if (
+          !isAlive(freshAnnotation) ||
+          !isAlive(freshAnnotation.trackedState)
+        ) {
           // Annotation node was detached while hydration request was in-flight
           return;
         }
 
         // Check if annotation was already hydrated while we were fetching
         const freshVersionsResult = freshAnnotation.versions?.result;
-        const freshHasVersionsResult = Array.isArray(freshVersionsResult) && freshVersionsResult.length > 0;
+        const freshHasVersionsResult =
+          Array.isArray(freshVersionsResult) && freshVersionsResult.length > 0;
         const freshHasRegions = freshAnnotation.areas?.size > 0;
 
         if (freshHasVersionsResult || freshHasRegions) {
@@ -1280,7 +1413,8 @@ export class LSFWrapper {
         freshAnnotation.history?.freeze?.();
 
         // Deserialize the results into the annotation
-        if (!isAlive(freshAnnotation) || !isAlive(freshAnnotation.trackedState)) return;
+        if (!isAlive(freshAnnotation) || !isAlive(freshAnnotation.trackedState))
+          return;
         freshAnnotation.deserializeResults(fullAnnotation.result);
 
         // Critical: updateObjects() MUST be called to render visual regions after deserializing
@@ -1306,10 +1440,17 @@ export class LSFWrapper {
     await this.saveDraft();
     await this.loadTask(prevTaskId, prevAnnotationId, true);
   };
-  async submitCurrentAnnotation(eventName, submit, includeId = false, loadNext = true) {
+  async submitCurrentAnnotation(
+    eventName,
+    submit,
+    includeId = false,
+    loadNext = true,
+  ) {
     const { taskID, currentAnnotation } = this;
     const unique_id = this.task.unique_lock_id;
-    const serializedAnnotation = this.prepareData(currentAnnotation, { includeId });
+    const serializedAnnotation = this.prepareData(currentAnnotation, {
+      includeId,
+    });
 
     if (unique_id) {
       serializedAnnotation.unique_id = unique_id;
@@ -1367,7 +1508,9 @@ export class LSFWrapper {
    */
   findActiveDraft(annotation) {
     if (isDefined(annotation.draftId)) {
-      return this.task.drafts.find((possibleDraft) => possibleDraft.id === annotation.draftId);
+      return this.task.drafts.find(
+        (possibleDraft) => possibleDraft.id === annotation.draftId,
+      );
     }
     return undefined;
   }
@@ -1402,17 +1545,24 @@ export class LSFWrapper {
    * @private
    */
   prepareData(annotation, { includeId, isNewDraft } = {}) {
-    const userGenerate = !annotation.userGenerate || annotation.sentUserGenerate;
+    const userGenerate =
+      !annotation.userGenerate || annotation.sentUserGenerate;
     const currentDraft = this.findActiveDraft(annotation);
     const sessionTime = (Date.now() - annotation.loadedDate.getTime()) / 1000;
     const submittedTime = isNewDraft ? 0 : Number(annotation.leadTime ?? 0);
     const draftTime = Number(currentDraft?.lead_time ?? 0);
     const leadTime = submittedTime + draftTime + sessionTime;
-    const startedAt = this.calculateStartedAt(currentDraft, annotation.loadedDate);
+    const startedAt = this.calculateStartedAt(
+      currentDraft,
+      annotation.loadedDate,
+    );
 
     const result = {
       lead_time: leadTime,
-      result: (isNewDraft ? annotation.versions.draft : annotation.serializeAnnotation()) ?? [],
+      result:
+        (isNewDraft
+          ? annotation.versions.draft
+          : annotation.serializeAnnotation()) ?? [],
       draft_id: annotation.draftId,
       parent_prediction: annotation.parent_prediction,
       parent_annotation: annotation.parent_annotation,
@@ -1448,9 +1598,18 @@ export class LSFWrapper {
   destroy() {
     // Clean up overlap error event listeners and dismiss toast (only when feature flag is enabled)
     if (isFF(FF_FIT_1304_STRICT_OVERLAP)) {
-      window.removeEventListener("overlap-error-next-task", this.handleOverlapNextTask);
-      window.removeEventListener("overlap-error-close-task", this.handleOverlapCloseTask);
-      window.removeEventListener("overlap-error-exit-stream", this.handleOverlapExitStream);
+      window.removeEventListener(
+        "overlap-error-next-task",
+        this.handleOverlapNextTask,
+      );
+      window.removeEventListener(
+        "overlap-error-close-task",
+        this.handleOverlapCloseTask,
+      );
+      window.removeEventListener(
+        "overlap-error-exit-stream",
+        this.handleOverlapExitStream,
+      );
       // Dismiss the overlap toast if it's showing - this ensures the toast doesn't
       // persist after leaving the labeling interface
       this.dismissOverlapToast();
@@ -1508,7 +1667,13 @@ export class LSFWrapper {
 
   /** @returns {string|null} */
   get instruction() {
-    return (this.project.instruction ?? this.project.expert_instruction ?? "").trim() || null;
+    return (
+      (
+        this.project.instruction ??
+        this.project.expert_instruction ??
+        ""
+      ).trim() || null
+    );
   }
 
   get canPreloadTask() {
