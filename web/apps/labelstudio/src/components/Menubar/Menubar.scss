@@ -20,6 +20,11 @@
     width: var(--spacing-tight);
   }
 
+  &__plan-badge {
+    align-self: center;
+    margin-right: 20px; // match spacing between theme toggle and user menu (user wrapper has margin: 0 20px)
+  }
+
   &__context {
     flex: 1;
     display: flex;

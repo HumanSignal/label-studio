@@ -186,6 +186,11 @@ EXPERIMENTAL_FEATURES=false
 # FRONTEND_SENTRY_DSN=https://your-frontend-sentry-dsn@sentry.io/project-id
 # FRONTEND_SENTRY_ENVIRONMENT=production
 
+# Stripe Billing Configuration (dj-stripe)
+# DJSTRIPE_WEBHOOK_SECRET=whsec_your_webhook_signing_secret
+# STRIPE_PRO_PRICE_ID=price_your_pro_plan_price_id
+# STRIPE_PORTAL_CONFIGURATION_ID=bpc_your_portal_config_id
+
 # ============================================================================
 # ADVANCED CONFIGURATION
 # ============================================================================

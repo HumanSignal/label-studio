@@ -123,6 +123,13 @@
     server_id: {{ request.server_id|json_dumps_ensure_ascii|safe }},
     collect_analytics: {{ settings.COLLECT_ANALYTICS|yesno:"true,false" }},
 
+    billing: {
+      pricing_table_id: {% if settings.STRIPE_PRICING_TABLE_ID %}"{{ settings.STRIPE_PRICING_TABLE_ID }}"{% else %}null{% endif %},
+      stripe_publishable_key: {% if settings.STRIPE_PUBLISHABLE_KEY %}"{{ settings.STRIPE_PUBLISHABLE_KEY }}"{% else %}null{% endif %},
+      client_reference_id: {% if user.is_authenticated and user.active_organization_id %}"{{ user.active_organization_id }}"{% else %}null{% endif %},
+      customer_email: {% if user.is_authenticated and user.email %}"{{ user.email }}"{% else %}null{% endif %},
+    },
+
     {% block app_more_settings %}
       flags: {
         allow_organization_webhooks: {{settings.ALLOW_ORGANIZATION_WEBHOOKS|yesno:"true,false"}},

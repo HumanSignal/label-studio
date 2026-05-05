@@ -27,6 +27,9 @@ from drf_yasg import openapi
 from drf_yasg.views import get_schema_view
 from rest_framework.permissions import AllowAny, IsAuthenticated
 
+from billing import views as billing_views
+from billing.stripe_webhook import stripe_webhook
+
 versions = collect_versions()
 open_api_info = openapi.Info(
     title='Label Studio API',
@@ -77,6 +80,7 @@ urlpatterns = [
         views.static_file_with_host_resolver('static/fonts/roboto/roboto.css', content_type='text/css'),
     ),
     re_path(r'^static/(?P<path>.*)$', serve, kwargs={'document_root': settings.STATIC_ROOT, 'show_indexes': True}),
+    path('billing/', billing_views.billing_page, name='billing-page'),
     re_path(r'^', include('organizations.urls')),
     re_path(r'^', include('projects.urls')),
     re_path(r'^', include('data_import.urls')),
@@ -112,6 +116,10 @@ urlpatterns = [
     path('feature-flags/', views.feature_flags, name='feature_flags'),
     path('heidi-tips/', views.heidi_tips, name='heidi_tips'),
     path('__lsa/', views.collect_metrics, name='collect_metrics'),
+    path('api/billing/', include('billing.urls')),
+    # Explicit webhook route to ensure Stripe deliveries succeed even if dj-stripe URLconf changes.
+    path('stripe/webhook/', stripe_webhook, name='stripe-webhook'),
+    path('stripe/', include('djstripe.urls', namespace='djstripe')),
     re_path(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     re_path(r'^', include('jwt_auth.urls')),
     re_path(r'^', include('session_policy.urls')),

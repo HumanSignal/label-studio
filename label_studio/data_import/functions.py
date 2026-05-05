@@ -64,6 +64,9 @@ def async_import_background(
             raise
 
     if project_import.commit_to_project:
+        # Check task limits before creating tasks
+        project.organization.check_max_tasks(len(tasks))
+
         with transaction.atomic():
             # Lock summary for update to avoid race conditions
             summary = ProjectSummary.objects.select_for_update().get(project=project)
