@@ -1,14 +1,20 @@
-# Toolbar Auto-Annotation Toggle Implementation
+# Toolbar Auto-Annotation Toggle (deep dive)
+
+Companion to `BIOWORK_FORK_OVERVIEW.md` §8 — kept for the deeper
+description of how the regular/smart swap works.
 
 ## Overview
-Modified the toolbar behavior so that control tools are always visible, while segmentation tools swap between regular and smart variants based on the auto-annotation toggle. The Move (selection) tool is now the default selected tool for image-based tasks.
-
-## Implementation Date
-October 5, 2025
+The toolbar shows control tools always; segmentation tools swap between
+regular and smart variants based on `store.autoAnnotation`. The Move
+(selection) tool is the default selection for image-based tasks.
 
 ## Modified Files
-- `/Users/reading/Developer/label-studio-custom/web/libs/editor/src/components/Toolbar/Toolbar.jsx`
-- `/Users/reading/Developer/label-studio-custom/web/libs/editor/src/tools/Base.jsx`
+- `web/libs/editor/src/components/Toolbar/Toolbar.jsx`
+- `web/libs/editor/src/tools/Base.jsx`
+- `web/libs/editor/src/tools/Selection.js`
+- `web/libs/editor/src/tools/Manager.js`
+- `web/libs/editor/src/components/AnnotationTab/DynamicPreannotationsToggle.jsx`
+- `web/libs/editor/src/tags/control/Label.jsx`
 
 ## Changes Made
 

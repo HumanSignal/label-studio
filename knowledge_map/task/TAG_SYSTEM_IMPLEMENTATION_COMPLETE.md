@@ -1,11 +1,26 @@
-# Tag System Implementation - Complete
+# Tag System Implementation
 
 ## Summary
 
-Successfully implemented a comprehensive tag system for Label Studio to track import groups and batch metadata during data import and labeling review.
+Per-task tag system: tasks can be imported with `import_tags`,
+`import_batch_id`, and `import_source` fields stored on the task model and
+filterable in the Data Manager.
 
 ## Implementation Date
 October 16, 2025
+
+## Current state (2026-05)
+
+- Backend: all three fields (`import_tags`, `import_batch_id`,
+  `import_source`) are stored on `Task` and exposed/filterable.
+- Frontend: the **per-file tag chip UI** in the Import modal sends
+  `file_upload_tags` (a map keyed by file_upload id). `import_source` is
+  hardcoded to `"ui"` in the UI.
+- **`import_batch_id` is no longer surfaced as a separate text input** in
+  the Import UI; the column still exists in the DB and accepts values via
+  direct API calls. If you need the batch UI back, re-add a text input
+  next to the per-file tag chips in
+  `web/apps/labelstudio/src/pages/CreateProject/Import/Import.jsx`.
 
 ## Features Implemented
 
@@ -60,13 +75,16 @@ Successfully imported task with tags via direct API call:
 }
 ```
 
-### UI Testing
-- Import modal displays Batch ID and Tags input fields correctly
-- Tags can be added by typing and pressing Enter
-- Tag chips display with delete functionality
-- Batch ID is captured and sent to backend
+### UI Testing (historical — initial implementation)
+- Import modal displayed Batch ID and Tags input fields
+- Tags could be added by typing and pressing Enter
+- Tag chips displayed with delete functionality
+- Batch ID was captured and sent to backend
 - Data Manager displays both fields in table columns
 - Filtering panel includes "Import Tags" filter option with operators
+
+> **Update:** the current Import UI shows per-file tag chips only — there
+> is no separate Batch ID input. See "Current state" at the top.
 
 ## Known Issues & Notes
 
