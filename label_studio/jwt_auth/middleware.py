@@ -27,6 +27,9 @@ class JWTAuthenticationMiddleware:
         from rest_framework_simplejwt.authentication import JWTAuthentication
         from rest_framework_simplejwt.exceptions import AuthenticationFailed, InvalidToken, TokenError
 
+        # Default: no embed project scope
+        request.embed_project_id = None
+
         if not self._has_bearer_jwt_token(request):
             return self.get_response(request)
 
@@ -40,6 +43,11 @@ class JWTAuthenticationMiddleware:
                 if JWT_ACCESS_TOKEN_ENABLED and user.active_organization.jwt.api_tokens_enabled:
                     request.user = user
                     request.is_jwt = True
+                    # Extract embed project scope from token claims
+                    validated_token = user_and_token[1]
+                    embed_project_id = validated_token.get('embed_project_id')
+                    if embed_project_id is not None:
+                        request.embed_project_id = int(embed_project_id)
         except User.DoesNotExist:
             logger.info('JWT authentication failed: User no longer exists')
             return JsonResponse({'detail': 'User not found'}, status=status.HTTP_401_UNAUTHORIZED)

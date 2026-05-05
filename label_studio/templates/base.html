@@ -154,7 +154,7 @@
   window.APP_SETTINGS = Object.assign({
 
     user: {
-      id: {{ user.pk }},
+      id: {{ user.pk|json_dumps_ensure_ascii|safe }},
       username: "{{user.username}}",
       firstName: "{{user.first_name}}",
       lastName: "{{user.last_name}}",

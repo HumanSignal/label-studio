@@ -37,5 +37,7 @@ def get_manifest_asset(path: str) -> str:
             return f'{settings.FRONTEND_HOSTNAME}/react-app/main.tsx'
         if path == 'embed.js':
             return f'{settings.FRONTEND_HOSTNAME}/react-app/src/embed.tsx'
+        if path == 'embed-v2.js':
+            return f'{settings.FRONTEND_HOSTNAME}/react-app/src/embed-v2.tsx'
         return f'{settings.FRONTEND_HOSTNAME}/react-app/{path}'
     return f'{settings.FRONTEND_HOSTNAME}/react-app/{path}'
