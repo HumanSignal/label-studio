@@ -3,7 +3,6 @@ STALE_FEATURE_FLAGS = {
     'fflag_front_dia_1150_ddisco_sneak_preview': False,
     # Dec 31
     'fflag_feat_root_47_plugins_without_eval': False,
-    'fflag_feat_front_bros_327_multiple_labels_regions_short': True,
     'fflag_feat_front_bros_199_enable_select_all_in_ner_phrase_short': True,
     'fflag_fix_leap_2052_detect_empty_filters_at_next_task_endpoint_short': True,
     'fflag_feat_dia_1925_view_sample_raw_json_short': False,

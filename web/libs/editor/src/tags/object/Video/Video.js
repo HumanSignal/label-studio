@@ -430,16 +430,7 @@ const Model = types
         ];
 
         const activeStates = self.activeStates();
-        const area = ff.isActive(ff.FF_MULTIPLE_LABELS_REGIONS)
-          ? self.annotation.createResult({ sequence }, {}, control, self, false, activeStates)
-          : self.annotation.createResult({ sequence }, {}, control, self, false);
-
-        if (!ff.isActive(ff.FF_MULTIPLE_LABELS_REGIONS)) {
-          // add labels
-          for (const tag of self.activeStates()) {
-            area.setValue(tag);
-          }
-        }
+        const area = self.annotation.createResult({ sequence }, {}, control, self, false, activeStates);
         return area;
       },
 
@@ -460,15 +451,7 @@ const Model = types
         ];
 
         const activeStates = self.activeStates();
-        const area = ff.isActive(ff.FF_MULTIPLE_LABELS_REGIONS)
-          ? self.annotation.createResult({ sequence }, {}, control, self, true, activeStates)
-          : self.annotation.createResult({ sequence }, {}, control, self, true);
-
-        if (!ff.isActive(ff.FF_MULTIPLE_LABELS_REGIONS)) {
-          for (const tag of self.activeStates()) {
-            area.setValue(tag);
-          }
-        }
+        const area = self.annotation.createResult({ sequence }, {}, control, self, true, activeStates);
         return area;
       },
 
@@ -484,24 +467,13 @@ const Model = types
         const value = {
           ranges: [{ start: frame, end: frame }],
         };
-        let labeling;
-        let additionalStates;
-        if (ff.isActive(ff.FF_MULTIPLE_LABELS_REGIONS)) {
-          const activeStates = self.activeStates();
-          additionalStates = activeStates.filter((state) => state !== control);
-          labeling = {
-            [control.valueType]: control.selectedValues(),
-          };
-        } else {
-          const labels = self.activeStates()?.[0];
-          labeling = {
-            [labels.valueType]: labels.selectedValues(),
-          };
-        }
+        const activeStates = self.activeStates();
+        const additionalStates = activeStates.filter((state) => state !== control);
+        const labeling = {
+          [control.valueType]: control.selectedValues(),
+        };
 
-        return ff.isActive(ff.FF_MULTIPLE_LABELS_REGIONS)
-          ? self.annotation.createResult(value, labeling, control, self, false, additionalStates)
-          : self.annotation.createResult(value, labeling, control, self, false);
+        return self.annotation.createResult(value, labeling, control, self, false, additionalStates);
       },
 
       deleteRegion(id) {

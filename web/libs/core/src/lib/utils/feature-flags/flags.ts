@@ -72,11 +72,6 @@ export const FF_DM_FILTER_MEMBERS = "fflag_feat_fit_449_datamanager_filter_membe
 export const FF_CUSTOM_TAGS = "fflag_feat_front_bros_194_custom_tags_short";
 
 /**
- * Multiple labels support for region creation - improved label blocks handling
- */
-export const FF_MULTIPLE_LABELS_REGIONS = "fflag_feat_front_bros_327_multiple_labels_regions_short";
-
-/**
  * Agreement Filtered
  */
 export const FF_AGREEMENT_FILTERED = "fflag_feat_utc_239_filterable_agreement_column_short";

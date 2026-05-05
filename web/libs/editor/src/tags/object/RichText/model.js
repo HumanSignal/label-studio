@@ -1,10 +1,8 @@
-import * as ff from "@humansignal/core/lib/utils/feature-flags/ff";
-import { destroy as destroyNode, flow, types } from "mobx-state-tree";
+import { flow, types } from "mobx-state-tree";
 import { createRef } from "react";
 import Constants from "../../../core/Constants";
 import { customTypes } from "../../../core/CustomTypes";
 import { errorBuilder } from "../../../core/DataValidator/ConfigValidator";
-import { cloneNode } from "../../../core/Helpers";
 import { AnnotationMixin } from "../../../mixins/AnnotationMixin";
 import { STATE_CLASS_MODS } from "../../../mixins/HighlightMixin";
 import IsReadyMixin from "../../../mixins/IsReadyMixin";
@@ -402,24 +400,9 @@ const Model = types
         const [control, ...rest] = states;
         const values = doubleClickLabel?.value ?? control.selectedValues();
         const labels = { [control.valueType]: values };
-        let restSelectedStates;
-        if (!ff.isActive(ff.FF_MULTIPLE_LABELS_REGIONS)) {
-          // Clone labels nodes to avoid unselecting them on creating result
-          restSelectedStates = rest.map((state) => cloneNode(state));
-        }
 
-        const area = ff.isActive(ff.FF_MULTIPLE_LABELS_REGIONS)
-          ? self.annotation.createResult(range, labels, control, self, false, rest)
-          : self.annotation.createResult(range, labels, control, self, false);
+        const area = self.annotation.createResult(range, labels, control, self, false, rest);
         const root = self.getRootNode();
-
-        if (!ff.isActive(ff.FF_MULTIPLE_LABELS_REGIONS)) {
-          //when user is using two different labels tag to draw a region, the other labels will be added to the region
-          restSelectedStates.forEach((state) => {
-            area.setValue(state);
-            destroyNode(state);
-          });
-        }
 
         area._range = range._range;
 

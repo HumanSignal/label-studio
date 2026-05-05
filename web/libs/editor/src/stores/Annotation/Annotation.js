@@ -1063,12 +1063,10 @@ const _Annotation = types
 
       if (!area) return;
 
-      if (ff.isActive(ff.FF_MULTIPLE_LABELS_REGIONS)) {
-        // Add additional states before any deselection happens
-        additionalStates.forEach((state) => {
-          area.setValue(state);
-        });
-      }
+      // Add additional states before any deselection happens
+      additionalStates.forEach((state) => {
+        area.setValue(state);
+      });
 
       // This is added mostly for the reason of updating indexes in labels
       // for the elements (like highlights in text) that won't be dynamically changed

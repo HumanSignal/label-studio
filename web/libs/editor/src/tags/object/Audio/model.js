@@ -490,9 +490,7 @@ export const AudioModel = types.compose(
           const activeStates = self.activeStates();
           const [control, ...rest] = activeStates;
           const labels = { [control.valueType]: control.selectedValues() };
-          const r = ff.isActive(ff.FF_MULTIPLE_LABELS_REGIONS)
-            ? self.annotation.createResult(wsRegion, labels, control, self, false, rest)
-            : self.annotation.createResult(wsRegion, labels, control, self, false);
+          const r = self.annotation.createResult(wsRegion, labels, control, self, false, rest);
           const updatedRegion = wsRegion.convertToRegion(labels.labels);
 
           r.setWSRegion(updatedRegion);

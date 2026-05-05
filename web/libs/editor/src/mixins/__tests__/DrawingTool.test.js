@@ -16,7 +16,7 @@ mockModule("@humansignal/core", () => {
   const actual = requireActual("@humansignal/core");
   return {
     ...actual,
-    ff: { ...actual.ff, isActive: (flag) => mockFfIsActive(flag), FF_MULTIPLE_LABELS_REGIONS: "ff_multiple_labels" },
+    ff: { ...actual.ff, isActive: (flag) => mockFfIsActive(flag) },
   };
 });
 
@@ -389,18 +389,17 @@ describe("DrawingTool mixin", () => {
   });
 
   describe("createRegion", () => {
-    it("createRegion sets currentArea and applies active states when ff multiple labels is off", () => {
+    it("createRegion passes empty additionalStates when only the control is active", () => {
       const { tool, annotation, obj } = createStore();
       const area = { setValue: mock() };
       annotation.createResult.mockReturnValue(area);
       obj.activeStates.mockReturnValue([]);
-      const _result = tool.createRegion({ x: 10, y: 10 });
-      expect(annotation.createResult).toHaveBeenCalledWith({ x: 10, y: 10 }, {}, expect.anything(), obj, false);
+      tool.createRegion({ x: 10, y: 10 });
+      expect(annotation.createResult).toHaveBeenCalledWith({ x: 10, y: 10 }, {}, expect.anything(), obj, false, []);
       expect(tool.currentArea).toBe(area);
     });
 
-    it("createRegion with FF_MULTIPLE_LABELS_REGIONS passes additionalStates", () => {
-      mockFfIsActive.mockReturnValue(true);
+    it("createRegion passes additionalStates excluding the main control", () => {
       const { tool, annotation, obj } = createStore();
       const area = { setValue: mock() };
       annotation.createResult.mockReturnValue(area);
@@ -412,7 +411,6 @@ describe("DrawingTool mixin", () => {
         state1,
         state2,
       ]);
-      mockFfIsActive.mockReturnValue(false);
     });
   });
 
