@@ -72,17 +72,39 @@ const collectFiles = (entryPath, out) => {
 const files = [];
 for (const root of roots) collectFiles(root, files);
 
+/** Fixed "en-US" + numeric sort — host-default localeCompare() differs across macOS vs Linux. */
+const pathOrder = new Intl.Collator("en-US", { numeric: true, sensitivity: "variant" });
 const uniqueSortedFiles = [...new Set(files)]
   .map((absPath) => path.relative(process.cwd(), absPath))
-  .sort((a, b) => a.localeCompare(b));
+  .sort((a, b) => pathOrder.compare(a, b));
 
 if (!uniqueSortedFiles.length) {
   console.error("No test files found for provided paths.");
   process.exit(1);
 }
 
-const bunBin = path.resolve("node_modules/.bin/bun");
-const args = ["test", "--dom", ...bunArgs, ...uniqueSortedFiles];
-const result = spawnSync(bunBin, args, { stdio: "inherit" });
+function resolveBunExecutable() {
+  const candidates = [
+    path.resolve("node_modules/.bin/bun"),
+    path.resolve("node_modules/.bin/bun.exe"),
+    path.resolve("node_modules/.bin/bun.cmd"),
+  ];
+  for (const p of candidates) {
+    if (fs.existsSync(p)) return p;
+  }
+  return "bun";
+}
 
-process.exit(result.status ?? 1);
+const bunBin = resolveBunExecutable();
+const args = ["test", "--dom", ...bunArgs, ...uniqueSortedFiles];
+const result = spawnSync(bunBin, args, { stdio: "inherit", env: process.env });
+
+if (result.error) {
+  console.error(
+    `bun-test-ordered: failed to run "${bunBin}" (${result.error.code ?? result.error.message}).`,
+    "Install Bun or run from the web package root after bun install so node_modules/.bin/bun exists.",
+  );
+  process.exit(1);
+}
+
+process.exit(result.status === null ? 1 : result.status);

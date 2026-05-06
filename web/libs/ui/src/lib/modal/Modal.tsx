@@ -104,7 +104,7 @@ const standaloneModal = <T,>({ simple = true, ...props }: ModalProps<T> & ExtraP
             rootDiv.remove();
             if (props.unique) UNIQUE_MODALS.delete(props.unique);
           }}
-          animateAppearance={animate}
+          animateAppearance={props.animateAppearance ?? animate}
         />
         {hasToastProvider && <ToastViewport />}
       </>,
