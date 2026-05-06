@@ -23,6 +23,8 @@ upstream Label Studio.
 - `regions_filter_and_group.md` — Outliner filter/group/sort additions.
 - `rgb_mean_intensity.md` — `meta.mean_r/g/b` schema + sort behavior.
 - `toolbar_auto_annotation_toggle.md` — toolbar swap mechanics.
+- `ml_backend_topology.md` — dev/prod Docker topology for SAM2,
+  FastSAM, and YOLO backend servers.
 
 ### `task/` — implementation notes / task records
 - `TAG_SYSTEM_IMPLEMENTATION_COMPLETE.md` — `import_tags`/`import_batch_id`/
