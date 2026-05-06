@@ -119,10 +119,11 @@ If your overlap is greater than `1`, the task will sit in the **Annotating** sta
 
 ##### Needs Review state
 
-There are two settings that can cause tasks (and by extension, the project) to skip the **Needs Review** state:
+There are several settings that can cause tasks (and by extension, the project) to skip the **Needs Review** state:
 
 * If you have [**Review > Reviewing Options > Review only manually assigned tasks**](project_settings_lse#reviewing-options) enabled, but have not assigned any reviewers. 
-* If you have [**Review > Task Ordering > Random**](project_settings_lse#task-ordering) selected and the **Task limit (%)** set to `0`. 
+* If you have your [**Review Sampling**](project_settings_lse#review-sampling) settings configured in a way that allows some or all tasks to bypass the **Needs Review** state. 
+
 
 
 ##### In Review state
@@ -159,8 +160,6 @@ For example, if you have 10 tasks:
 * 5 tasks are in the **In Review** state
 
 Your project will be in the **Annotating** state, even though you do not have any tasks in the **Annotating** state.
-
-
 
 ### API values
 
