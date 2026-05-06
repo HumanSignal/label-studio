@@ -81,6 +81,7 @@ function configureApplication(params) {
     // other settings aka flags
     forceAutoAnnotation: params.forceAutoAnnotation ?? false,
     forceAutoAcceptSuggestions: params.forceAutoAcceptSuggestions ?? false,
+    forceAiReviewFastMode: params.forceAiReviewFastMode ?? false,
   };
 
   return options;

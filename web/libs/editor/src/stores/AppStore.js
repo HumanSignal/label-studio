@@ -246,6 +246,9 @@ export default types
     get autoAcceptSuggestions() {
       return self.forceAutoAcceptSuggestions || self._autoAcceptSuggestions;
     },
+    get aiReviewFastMode() {
+      return getEnv(self).forceAiReviewFastMode || self.interfaces.includes("annotations:ai-review-fast");
+    },
   }))
   .actions((self) => {
     let appControls;
