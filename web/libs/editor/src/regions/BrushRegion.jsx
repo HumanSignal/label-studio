@@ -30,6 +30,33 @@ const highlightOptions = {
   shadowOpacity: 1,
 };
 
+export function getBrushBBoxFromMeta(metaBBox, parent) {
+  if (!metaBBox || !Number.isFinite(metaBBox.x) || !Number.isFinite(metaBBox.y)) return null;
+
+  const width = Number.isFinite(metaBBox.width) ? metaBBox.width : 0;
+  const height = Number.isFinite(metaBBox.height) ? metaBBox.height : 0;
+  const scaleX = parent?.naturalWidth ? parent.stageWidth / parent.naturalWidth : 1;
+  const scaleY = parent?.naturalHeight ? parent.stageHeight / parent.naturalHeight : 1;
+
+  return {
+    left: metaBBox.x * scaleX,
+    top: metaBBox.y * scaleY,
+    right: (metaBBox.x + width) * scaleX,
+    bottom: (metaBBox.y + height) * scaleY,
+  };
+}
+
+export function shouldUseFastStaticBrushReview({ store, suggestion, item }) {
+  return (
+    store.aiReviewFastMode &&
+    !suggestion &&
+    !item.selected &&
+    !item.highlighted &&
+    !item.isDrawing &&
+    !store.annotationStore.selected?.isLinkingMode
+  );
+}
+
 const Points = types
   .model("Points", {
     id: types.optional(types.identifier, guidGenerator),
@@ -174,21 +201,9 @@ const Model = types
         return self.touches.length;
       },
       get bboxCoordsCanvas() {
-        const metaBBox = self.meta?.bbox;
+        const metaBBox = getBrushBBoxFromMeta(self.meta?.bbox, self.parent);
 
-        if (metaBBox && Number.isFinite(metaBBox.x) && Number.isFinite(metaBBox.y)) {
-          const width = Number.isFinite(metaBBox.width) ? metaBBox.width : 0;
-          const height = Number.isFinite(metaBBox.height) ? metaBBox.height : 0;
-          const scaleX = self.parent?.naturalWidth ? self.parent.stageWidth / self.parent.naturalWidth : 1;
-          const scaleY = self.parent?.naturalHeight ? self.parent.stageHeight / self.parent.naturalHeight : 1;
-
-          return {
-            left: metaBBox.x * scaleX,
-            top: metaBBox.y * scaleY,
-            right: (metaBBox.x + width) * scaleX,
-            bottom: (metaBBox.y + height) * scaleY,
-          };
-        }
+        if (metaBBox) return metaBBox;
 
         if (!self.imageData) {
           const points = { x: [], y: [] };
@@ -665,13 +680,7 @@ const HtxBrushView = ({ item, setShapeRef }) => {
   if (!item.parent) return null;
 
   const stage = item.parent?.stageRef;
-  const fastStaticReview =
-    store.aiReviewFastMode &&
-    !suggestion &&
-    !item.selected &&
-    !item.highlighted &&
-    !item.isDrawing &&
-    !store.annotationStore.selected?.isLinkingMode;
+  const fastStaticReview = shouldUseFastStaticBrushReview({ store, suggestion, item });
   const highlightProps = isFF(FF_ZOOM_OPTIM)
     ? {
         scaleX: 1 / item.parent.zoomScale,
