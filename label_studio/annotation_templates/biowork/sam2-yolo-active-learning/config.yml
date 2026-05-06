@@ -49,5 +49,6 @@ project_defaults:
   reveal_preannotations_interactively: true
   sampling: Uncertainty sampling
   start_training_on_annotation_update: true
+  training_backend: YOLO
 
 active_learning_backend_title: YOLO

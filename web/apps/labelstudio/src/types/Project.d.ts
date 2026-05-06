@@ -37,6 +37,9 @@ declare type APIProject = {
   /** Machine learning model version */
   model_version?: string | null;
 
+  /** Title of the ML backend that should receive training requests */
+  training_backend?: string | null;
+
   /** Whether or not the project is in the middle of being created */
   is_draft?: boolean;
   created_by?: APIUserSimple;

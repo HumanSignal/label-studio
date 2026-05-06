@@ -258,6 +258,7 @@ export const CreateProject = ({ onClose }) => {
           );
           if (activeLearningBackend) {
             projectDefaults.model_version = activeLearningBackend.title;
+            projectDefaults.training_backend = activeLearningBackend.title;
           }
         }
 
