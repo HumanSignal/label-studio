@@ -88,11 +88,12 @@ export const RoutesProvider = ({ children }) => {
           const params = matchPath(location.pathname, { path: route.path });
           const path = generatePath(route.path, params.params);
           const title = route.title instanceof Function ? route.title() : route.title;
+          const extra = route.extra instanceof Function ? route.extra(params?.params ?? {}) : route.extra;
           const key = route.component?.displayName ?? route.key ?? path;
 
-          return { path, title, key };
+          return { path, title, key, extra };
         })
-        .filter((c) => !!c.title);
+        .filter((c) => !!c.title || !!c.extra);
 
       setBreadcrumbs(crumbs);
     } catch (err) {

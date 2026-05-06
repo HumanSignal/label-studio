@@ -26,6 +26,10 @@
   color: var(--color-neutral-content);
 }
 
+.has-trailing-icon {
+  padding-right: var(--spacing-tighter);
+}
+
 /* Shape variants */
 .shape-rounded {
   border-radius: var(--corner-radius-large);
@@ -50,6 +54,19 @@
       width: 12px;
       height: 12px;
     }
+  }
+
+  .iconTrailing {
+    margin-left: var(--spacing-tightest);
+
+    & svg {
+      width: 12px;
+      height: 12px;
+    }
+  }
+
+  &.has-trailing-icon {
+    padding-right: var(--spacing-tightest);
   }
 }
 
@@ -181,7 +198,7 @@
 /* Ghost look */
 .look-ghost {
   background: none !important;
-  border: none !important;
+  border: 1px solid transparent !important;
 
   &.variant-grape {
     color: var(--color-accent-grape-bold);
@@ -226,7 +243,7 @@
 
 /* Solid look */
 .look-solid {
-  border: none !important;
+  border: 1px solid transparent !important;
 
   &.variant-grape {
     background: var(--color-accent-grape-subtle);
@@ -396,7 +413,8 @@
       color: var(--color-neutral-on-dark-content);
     }
 
-    .icon {
+    .icon,
+    .iconTrailing {
       & path {
         fill: var(--color-neutral-on-dark-content);
       }
@@ -465,6 +483,18 @@
   display: inline-flex;
   align-items: center;
   flex-shrink: 0;
+
+  & svg {
+    width: 14px;
+    height: 14px;
+  }
+}
+
+.iconTrailing {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+  margin-left: var(--spacing-tightest);
 
   & svg {
     width: 14px;

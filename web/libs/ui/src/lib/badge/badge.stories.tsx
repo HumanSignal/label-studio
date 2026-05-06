@@ -1,6 +1,7 @@
 import { useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import type { ColumnDef } from "@tanstack/react-table";
+import { IconChevronRight } from "@humansignal/icons";
 import { Badge } from "./badge";
 import { EnterpriseBadge } from "../enterprise-badge/enterprise-badge";
 import { DataTable } from "../data-table";
@@ -288,6 +289,26 @@ export const ShapeVariants: Story = {
  *
  * Badges support two sizes: medium (default) and small. Small should be used sparingly, only when real estate is minimal—e.g. inside input fields, dropdowns, or beside field labels.
  */
+/**
+ *
+ * When `trailingIcon` is set, an icon renders after the label (e.g. chevron for interactive chips).
+ */
+export const WithTrailingIcon: Story = {
+  render: () => (
+    <div className="flex flex-wrap items-center gap-3">
+      <Badge variant="grape" shape="rounded" look="filled" trailingIcon={<IconChevronRight aria-hidden />}>
+        Annotation in progress
+      </Badge>
+      <Badge variant="grape" shape="rounded" look="solid" trailingIcon={<IconChevronRight aria-hidden />}>
+        Solid look
+      </Badge>
+      <Badge variant="kale" shape="rounded" size="small" trailingIcon={<IconChevronRight aria-hidden />}>
+        Small
+      </Badge>
+    </div>
+  ),
+};
+
 export const SizeVariants: Story = {
   render: () => {
     return (
