@@ -1,6 +1,16 @@
 import { get } from "@humansignal/core/lib/utils/lodash-replacements";
 import { escapeHtml, isString } from "./utilities";
 
+const DATA_REF_REGEX = /\$[\w[\].{}]+/i;
+
+/**
+ * Whether `value` references task data via at least one `$field` token.
+ * Mirrors the pattern resolved by `parseValue`.
+ * @param {unknown} value
+ * @returns {boolean}
+ */
+export const isDataBound = (value) => typeof value === "string" && DATA_REF_REGEX.test(value);
+
 /**
  * Simple way to retrieve linked data in `value` param from task
  * Works only for prefixed values ($image); non-prefixed values left as is
@@ -10,9 +20,9 @@ import { escapeHtml, isString } from "./utilities";
  * @param {object} task
  */
 export const parseValue = (value, task) => {
-  const reVar = /\$[\w[\].{}]+/gi;
-
   if (!value) return "";
+
+  const reVar = new RegExp(DATA_REF_REGEX.source, `${DATA_REF_REGEX.flags}g`);
 
   // value can refer to structures, not only texts, so just replace wouldn't be enough
   if (value.match(reVar)?.[0] === value) {

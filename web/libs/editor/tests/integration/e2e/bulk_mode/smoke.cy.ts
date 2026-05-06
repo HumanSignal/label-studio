@@ -120,6 +120,35 @@ describe("Bulk mode", () => {
     cy.get(".lsf-main-view__annotation div:eq(0)").should("be.empty");
   });
 
+  it("should show static Header and Markdown content but not data-bound ones", () => {
+    const config = `
+      <View>
+        <Header value="Static section title"/>
+        <Header value="$dynamicTitle"/>
+        <Markdown value="**Static instructions**"/>
+        <Markdown value="$dynamicMarkdown"/>
+        <Choices name="q" toName="t" choice="single">
+          <Choice value="Yes"/>
+          <Choice value="No"/>
+        </Choices>
+        <Text name="t" value="$text"/>
+      </View>
+    `;
+
+    LabelStudio.params()
+      .config(config)
+      .withInterface("annotation:bulk")
+      .data({ text: "anything", dynamicTitle: "should not appear", dynamicMarkdown: "should not appear" })
+      .withResult([])
+      .init();
+
+    cy.contains("Static section title").should("be.visible");
+    cy.contains("Static instructions").should("be.visible");
+    cy.contains("should not appear").should("not.exist");
+    Choices.findChoice("Yes").should("be.visible");
+    Choices.findChoice("No").should("be.visible");
+  });
+
   it("should hide panels and buttons not related to the bulk mode", () => {
     LabelStudio.params().config("<View></View>").withInterface("annotation:bulk").data({}).withResult([]).init();
 
