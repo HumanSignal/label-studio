@@ -128,9 +128,7 @@ WORKDIR $LS_DIR
 # install prerequisites for app
 RUN apk add --no-cache \
     expat \
-    mesa-gl \
     glib \
-    curl \
     nginx \
     bash \
     procps
