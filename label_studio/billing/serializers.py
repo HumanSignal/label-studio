@@ -79,4 +79,4 @@ class UsageLimitsSerializer(serializers.Serializer):
     project_task_count = serializers.IntegerField(required=False, allow_null=True, help_text='Current number of tasks in the specified project (if project_id provided)')
     can_create_project = serializers.BooleanField(help_text='Whether a new project can be created')
     can_import_tasks = serializers.BooleanField(help_text='Whether tasks can be imported')
-
+    billing_enforcement_enabled = serializers.BooleanField(required=False, help_text='Whether billing quota enforcement is enabled')

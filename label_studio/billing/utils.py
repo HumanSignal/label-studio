@@ -2,6 +2,7 @@
 import logging
 
 import djstripe
+from django.conf import settings
 from rest_framework.exceptions import ValidationError
 
 from billing.models import OrganizationCustomer
@@ -30,6 +31,11 @@ USAGE_LIMITS = {
         'max_tasks': None,  # Unlimited
     },
 }
+
+
+def should_enforce_usage_limits():
+    """Return whether project/import quota validators should block writes."""
+    return getattr(settings, 'BILLING_ENFORCE_USAGE_LIMITS', True)
 
 
 def _get_product_from_organization(organization):
@@ -256,6 +262,10 @@ def validate_project_creation(organization):
     Raises:
         ValidationError: If project limit would be exceeded
     """
+    if not should_enforce_usage_limits():
+        logger.debug('Billing project creation limit enforcement is disabled.')
+        return
+
     current_count, max_count, can_create = check_project_limit(organization)
     
     if not can_create:
@@ -289,6 +299,10 @@ def validate_task_import(organization, additional_tasks):
     Raises:
         ValidationError: If task limit would be exceeded
     """
+    if not should_enforce_usage_limits():
+        logger.debug('Billing task import limit enforcement is disabled.')
+        return
+
     current_count, max_count, can_import = check_task_limit(organization, additional_tasks)
     
     if not can_import:
@@ -311,4 +325,3 @@ def validate_task_import(organization, additional_tasks):
             error_msg += 'Please contact support.'
         
         raise ValidationError(error_msg)
-

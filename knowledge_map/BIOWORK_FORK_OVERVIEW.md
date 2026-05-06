@@ -184,6 +184,15 @@ called from:
   `HuggingFaceImportAPI` paths
 - `data_import/uploader.py:43,298,392` — `bulk_create_tasks`
 - `data_import/functions.py:15,56,68` — async import background
+- `organizations/models.py` — `check_max_projects` / `check_max_tasks`
+  model guards used by project/import paths
+
+Dev-only bypass: `BILLING_ENFORCE_USAGE_LIMITS=false` skips only these write
+validators/guards. It does not alter Stripe/dj-stripe subscription status,
+checkout, portal, pricing, or webhooks. The usage-limit API still returns
+tier/usage counts, but reports effective dev permissions (`max_*: null`,
+`can_*: true`) so the frontend does not block local testing. Production should
+leave this setting unset or `true`.
 
 ### dj-stripe model gotchas
 - Use `.id` (not `.stripe_id`) to get Stripe object IDs on dj-stripe models

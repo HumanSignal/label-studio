@@ -26,7 +26,7 @@ from billing.serializers import (
     SubscriptionStatusSerializer,
     UsageLimitsSerializer,
 )
-from billing.utils import check_project_limit, check_task_limit, get_membership_tier, get_usage_limits
+from billing.utils import check_project_limit, check_task_limit, get_membership_tier, get_usage_limits, should_enforce_usage_limits
 from core.permissions import all_permissions
 from projects.models import Project
 from tasks.models import Task
@@ -612,6 +612,13 @@ class UsageLimitsAPI(APIView):
             limits = get_usage_limits(organization)
             current_projects, max_projects, can_create_project = check_project_limit(organization)
             current_tasks, max_tasks, can_import_tasks = check_task_limit(organization)
+            enforce_usage_limits = should_enforce_usage_limits()
+
+            if not enforce_usage_limits:
+                max_projects = None
+                max_tasks = None
+                can_create_project = True
+                can_import_tasks = True
 
             # Get project task count if project_id is provided
             project_task_count = None
@@ -632,6 +639,7 @@ class UsageLimitsAPI(APIView):
                 'project_task_count': project_task_count,
                 'can_create_project': can_create_project,
                 'can_import_tasks': can_import_tasks,
+                'billing_enforcement_enabled': enforce_usage_limits,
             }
 
             serializer = UsageLimitsSerializer(data)
@@ -639,4 +647,3 @@ class UsageLimitsAPI(APIView):
         except Exception as e:
             logger.exception('Error fetching usage limits: %s', e)
             return Response({'error': 'Failed to fetch usage limits'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-

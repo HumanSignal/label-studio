@@ -65,6 +65,7 @@ services:
       - CSRF_COOKIE_SECURE=${CSRF_COOKIE_SECURE:-1}
       - JSON_LOG=1
       - LOG_LEVEL=DEBUG
+      - BILLING_ENFORCE_USAGE_LIMITS=${BILLING_ENFORCE_USAGE_LIMITS:-false}
       - BASE_DATA_DIR=/label-studio/data
     volumes:
       - label-studio-data-dev:/label-studio/data:rw
@@ -91,6 +92,7 @@ services:
       - REDIS_HOST=redis-dev
       - REDIS_PORT=6379
       - LOG_LEVEL=DEBUG
+      - BILLING_ENFORCE_USAGE_LIMITS=${BILLING_ENFORCE_USAGE_LIMITS:-false}
       - BASE_DATA_DIR=/label-studio/data
     volumes:
       - label-studio-data-dev:/label-studio/data:rw
