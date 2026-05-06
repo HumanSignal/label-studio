@@ -10,7 +10,7 @@
     "biome": "biome",
     "lint": "bun --bun run biome check --write .",
     "lint-css": "bun --bun run biome check --write '**/*.css'",
-    "dev": "NODE_ENV=development BUILD_NO_SERVER=true bun --bun run vite",
+    "dev": "NODE_ENV=development BUILD_NO_SERVER=true bun run vite",
     "build:dev": "BUILD_NO_SERVER=true bun --bun run vite build --mode development",
     "build:app": "bun --bun run vite build && bun ./tools/build-service-worker.mjs",
     "build": "bun run build:app",
@@ -18,8 +18,8 @@
     "ls:e2e": "bun --bun run cypress run --project apps/labelstudio-e2e",
     "lsf:build": "NODE_ENV=production MODE=standalone bun --bun run vite build --config vite.config.editor.ts",
     "lsf:build:coverage": "NODE_ENV=production BABEL_ENV=test MODE=standalone bun --bun run vite build --config vite.config.editor.ts",
-    "lsf:watch": "NODE_ENV=development MODE=standalone bun --bun run vite build --config vite.config.editor.ts --mode development --watch",
-    "lsf:serve": "NODE_ENV=development MODE=standalone bun --bun run vite preview --config vite.config.editor.ts --port 3000 --host",
+    "lsf:watch": "NODE_ENV=development MODE=standalone bun run vite build --config vite.config.editor.ts --mode development --watch",
+    "lsf:serve": "NODE_ENV=development MODE=standalone bun run vite preview --config vite.config.editor.ts --port 3000 --host",
     "lsf:serve-build": "bun libs/editor/server.mjs",
     "lsf:integration": "NODE_ENV=production MODE=standalone bun --bun run cypress run --config-file libs/editor/cypress.config.ts",
     "lsf:integration:slow": "DEFAULT_CPU_THROTTLING=4 DEFAULT_NETWORK_THROTTLING=4g bun --bun run cypress run --config-file libs/editor/cypress.config.ts",
@@ -47,7 +47,7 @@
     "extract-antd-no-reset": "cd libs/editor && bun ../../tools/extract-antd-no-reset/extract-antd-no-reset.mjs",
     "storybook:serve": "bun run storybook dev -c libs/storybook/.storybook --port 4400",
     "storybook:build": "bun run storybook build -c libs/storybook/.storybook -o dist/libs/storybook/storybook",
-    "playground:serve": "FRONTEND_HOSTNAME=http://localhost:4200 bun --bun run vite --config vite.config.playground.ts",
+    "playground:serve": "FRONTEND_HOSTNAME=http://localhost:4200 bun run vite --config vite.config.playground.ts",
     "playground:build": "NODE_ENV=production MODE=standalone-playground bun --bun run vite build --config vite.config.playground.ts && mv dist/apps/playground/playground-assets/index.html dist/apps/playground/index.html"
   },
   "dependencies": {
