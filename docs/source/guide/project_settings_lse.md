@@ -348,8 +348,6 @@ For more information about states, see [Project states](project_states).
     * **Export**: Which tasks are included when you want to only include reviewed tasks in your export snapshot.
     * **Dashboards**: Various  counts and metric related to reviews. 
 
-The **Review Sampling** section allows you to custo
-
 <table>
 <thead>
     <tr>
@@ -388,6 +386,8 @@ For eligible tasks (tasks that enter the **Needs Review** state) in which multip
 
 If enabled, a reviewer can only see tasks to which they've been assigned.
 
+This also means that a task can progress from the **Annotating** state directly to the **Done** state if this is enabled and no reviewers are assigned. 
+
 </td>
 </tr>
 <tr>
@@ -411,7 +411,7 @@ Note that in most cases, skipped tasks do not contribute towards meeting the min
 
 </dd>
 
-<dt id="review-sampling">Review Sampling</dt>
+<dt id="review-sampling">Review Sampling <span class="badge"></span></dt>
 
 <dd>
 
@@ -425,6 +425,11 @@ Determine how many eligible tasks need to be reviewed.
 Eligible tasks enter the **Needs Review** state, which means they are included in the review stream.  
 
 You can use the review sampling settings to configure whether tasks can skip the **Needs Review** state and go straight to **Done**. 
+
+!!! note
+    The percentages set under **Review Sampling** are applied as probabilistic sampling rates, not exact quotas. 
+    
+    For example, setting **Basic Sampling** to 50% does not guarantee that exactly half of eligible tasks will be reviewed — the actual share will vary around 50%, with less variance the more tasks your project has.
 
 <table>
 <thead>
@@ -447,8 +452,7 @@ Configure the percentage of eligible tasks that enter the **Needs Review** state
 <tr>
 <td>
 
-**Agreement-based Sampling** <br/>
-<span class="badge"></span>
+**Agreement-based Sampling** 
 </td>
 <td>
 
