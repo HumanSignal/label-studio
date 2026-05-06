@@ -5,7 +5,7 @@ import os
 import pathlib
 
 from core.feature_flags import flag_set
-from core.filters import ListFilter
+from core.filters import NumberInFilter
 from core.label_config import config_essential_data_has_changed
 from core.mixins import GetParentObjectMixin
 from core.permissions import ViewClassPermission, all_permissions
@@ -105,7 +105,7 @@ class ProjectListPagination(PageNumberPagination):
 
 
 class ProjectFilterSet(FilterSet):
-    ids = ListFilter(field_name='id', lookup_expr='in')
+    ids = NumberInFilter(field_name='id', lookup_expr='in')
     title = CharFilter(field_name='title', lookup_expr='icontains')
 
 
