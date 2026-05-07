@@ -192,6 +192,8 @@ EXPERIMENTAL_FEATURES=false
 # DJSTRIPE_WEBHOOK_SECRET=whsec_your_webhook_signing_secret
 # STRIPE_PRO_PRICE_ID=price_your_pro_plan_price_id
 # STRIPE_PORTAL_CONFIGURATION_ID=bpc_your_portal_config_id
+# Enforce project/import quota validators. Set false only in local/dev stacks.
+BILLING_ENFORCE_USAGE_LIMITS=true
 
 # ============================================================================
 # ADVANCED CONFIGURATION
@@ -341,4 +343,3 @@ To verify your configuration is loaded correctly:
 - Main settings: `label_studio/core/settings/base.py`
 - Label Studio settings: `label_studio/core/settings/label_studio.py`
 - Environment utils: `label_studio/core/utils/params.py`
-

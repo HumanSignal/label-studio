@@ -339,6 +339,42 @@ def get_org_subscription_status(organization) -> dict:
                 'current_period_end': None,
             },
         }
+    except ValueError as e:
+        # Some deployments (notably dev setups) don't use a dj-stripe subscriber
+        # relation compatible with Organization. Treat this as "no subscription"
+        # instead of failing request paths such as task import.
+        logger.warning(
+            "Billing subscriber lookup is incompatible for org %s: %s. Falling back to free tier.",
+            getattr(organization, "id", None),
+            e,
+        )
+        return {
+            'plan': 'free',
+            'subscription': {
+                'plan': 'free',
+                'interval': None,
+                'subscription_id': None,
+                'status': None,
+                'current_period_end': None,
+            },
+        }
+    except Exception as e:
+        logger.error(
+            "Failed to resolve subscription status for org %s: %s. Falling back to free tier.",
+            getattr(organization, "id", None),
+            e,
+            exc_info=True,
+        )
+        return {
+            'plan': 'free',
+            'subscription': {
+                'plan': 'free',
+                'interval': None,
+                'subscription_id': None,
+                'status': None,
+                'current_period_end': None,
+            },
+        }
 
 
 def _price_map() -> dict:

@@ -9,6 +9,9 @@ The companion repo for the ML side is **biowork-ml-backend**, which forks
 predictors that emit the per-region `meta` (area / bbox / RGB) consumed by
 this app.
 
+For Docker networking, dev and prod/MIB ML backends are intentionally
+separate. See `knowledge_map/features/ml_backend_topology.md`.
+
 ---
 
 ## Topology
@@ -56,10 +59,11 @@ this app.
 
 Deep dive: `knowledge_map/features/biowork_template_entrypoint.md`
 
-**Biowork adds two project templates in a "Biowork" group:**
+**Biowork adds project templates in a "Biowork" group:**
 
 | File | Title | Order | ML backend (template-attached) |
 |------|-------|-------|------------|
+| `label_studio/annotation_templates/biowork/sam2-yolo-active-learning/config.yml` | "SAM2 + YOLO Active Learning" | 1 | `http://sam2-backend:9090`, `http://yolo-backend:9090` |
 | `label_studio/annotation_templates/biowork/fastsam-interactive-segmentation/config.yml` | "Full Auto Detection" | 2 | `http://fastsam-backend:9090` |
 | `label_studio/annotation_templates/biowork/sam2-interactive-segmentation/config.yml` | "Semi Auto Detection" | 3 | `http://sam2-backend:9090` |
 
@@ -180,6 +184,15 @@ called from:
   `HuggingFaceImportAPI` paths
 - `data_import/uploader.py:43,298,392` — `bulk_create_tasks`
 - `data_import/functions.py:15,56,68` — async import background
+- `organizations/models.py` — `check_max_projects` / `check_max_tasks`
+  model guards used by project/import paths
+
+Dev-only bypass: `BILLING_ENFORCE_USAGE_LIMITS=false` skips only these write
+validators/guards. It does not alter Stripe/dj-stripe subscription status,
+checkout, portal, pricing, or webhooks. The usage-limit API still returns
+tier/usage counts, but reports effective dev permissions (`max_*: null`,
+`can_*: true`) so the frontend does not block local testing. Production should
+leave this setting unset or `true`.
 
 ### dj-stripe model gotchas
 - Use `.id` (not `.stripe_id`) to get Stripe object IDs on dj-stripe models
@@ -686,6 +699,8 @@ Files: `model.py` (with `_compute_mask_geometry`, RGB intensity helpers,
 - Image: `gavinlouuu/sam2-backend:v0`.
 - `SAM2_CHOICE` env (default `large`).
 - Used by the SAM2 ("Semi Auto Detection") template.
+- Dev compose joins only `label-studio-dev-network` as `sam2-backend`;
+  prod compose joins only `label-studio-network` as `sam2-backend`.
 
 ### `FastSAM/` (biowork-modified)
 Files: `model.py` (full-auto everything-mode + interactive prompts +
@@ -699,6 +714,17 @@ Files: `model.py` (full-auto everything-mode + interactive prompts +
 - Env knobs: `RESPONSE_TYPE` (brush/polygon/both),
   `POLYGON_DETAIL_LEVEL`, `MAX_RESULTS`, `USE_ORG_MIDDLEWARE`.
 - Used by the FastSAM ("Full Auto Detection") template.
+- Dev compose joins only `label-studio-dev-network` as `fastsam-backend`;
+  prod compose joins only `label-studio-network` as `fastsam-backend`.
+
+### `yolo/` (biowork-modified)
+Files: `model.py` (YOLO detector with lowercase `model_version` used by
+Label Studio model setup), `docker-compose.yml`, `docker-compose.prod.yml`,
+`start.sh`.
+- Image: `humansignal/yolo:v0`.
+- Used by the SAM2 + YOLO Active Learning template.
+- Dev compose joins only `label-studio-dev-network` as `yolo-backend`;
+  prod compose joins only `label-studio-network` as `yolo-backend`.
 
 ### `segment_anything_model/` (NOT biowork-modified — upstream)
 Static-token SAM (1.0). Useful as a reference but doesn't emit `meta` and
@@ -711,10 +737,14 @@ features; use `segment_anything_2_image/` or `FastSAM/`.
 - No tests exist for the middleware, multi-org token resolution, RGB
   intensity computation, or `meta` schema. Rely on the runtime
   `MIDDLEWARE_DEBUG_SUMMARY.md` runbook + manual checks.
-- Both biowork backends mount Label Studio data read-only at
+- The Biowork backends mount Label Studio data read-only at
   `LABEL_STUDIO_DB_PATH` for dynamic credentials and expose port 9090 on
   their docker network so the app reaches them via service names
-  (`sam2-backend`, `fastsam-backend`).
+  (`sam2-backend`, `fastsam-backend`, `yolo-backend`).
+- Keep dev and prod/MIB backend containers separate. Do not attach one
+  backend container to both `label-studio-dev-network` and
+  `label-studio-network`; Docker aliases are scoped per network, so each
+  environment can use the same service alias with different containers.
 
 ---
 

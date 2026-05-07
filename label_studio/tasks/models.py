@@ -1379,7 +1379,10 @@ def update_ml_backend(sender, instance, **kwargs):
 
         # start training every N annotation
         if annotation_count % project.min_annotations_to_start_training == 0:
-            for ml_backend in project.ml_backends.all():
+            training_backends = project.ml_backends.all()
+            if project.training_backend:
+                training_backends = training_backends.filter(title=project.training_backend)
+            for ml_backend in training_backends:
                 ml_backend.train()
 
 

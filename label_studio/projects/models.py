@@ -246,6 +246,13 @@ class Project(ProjectMixin, models.Model):
         default=0,
         help_text='Minimum number of completed tasks after which model training is started',
     )
+    training_backend = models.TextField(
+        _('training backend'),
+        blank=True,
+        null=True,
+        default='',
+        help_text='ML backend title that should receive training requests from annotation updates',
+    )
 
     control_weights = JSONField(
         _('control weights'),

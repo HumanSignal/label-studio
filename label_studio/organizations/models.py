@@ -197,7 +197,12 @@ class Organization(OrganizationMixin, models.Model):
 
     def check_max_projects(self):
         """This check raise an exception if the projects limit is hit"""
+        from django.conf import settings
         from billing.services.plans import check_org_limits
+
+        if not getattr(settings, 'BILLING_ENFORCE_USAGE_LIMITS', True):
+            logger.debug('Billing project limit enforcement is disabled.')
+            return
 
         limits_check = check_org_limits(self, additional_projects=1)
         if not limits_check['projects_ok']:
@@ -206,7 +211,12 @@ class Organization(OrganizationMixin, models.Model):
 
     def check_max_tasks(self, additional_tasks: int):
         """This check raises an exception if the tasks limit would be hit"""
+        from django.conf import settings
         from billing.services.plans import check_org_limits
+
+        if not getattr(settings, 'BILLING_ENFORCE_USAGE_LIMITS', True):
+            logger.debug('Billing task limit enforcement is disabled.')
+            return
 
         limits_check = check_org_limits(self, additional_tasks=additional_tasks)
         if not limits_check['tasks_ok']:
