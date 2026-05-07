@@ -177,6 +177,24 @@ export const DataManagerPage = ({ ...props }) => {
     });
 
     if (interactiveBacked) {
+      const hasInteractiveResults = (response) => {
+        const result = response?.data?.result;
+
+        return Array.isArray(result) ? result.length > 0 : Boolean(result);
+      };
+
+      const clearPromptRegions = (annotation, promptRegionIds = []) => {
+        if (!annotation?.regions?.length || !promptRegionIds.length) return;
+
+        annotation.regions
+          .filter((region) => promptRegionIds.includes(region.cleanId))
+          .forEach((region) => {
+            // Prevent region deletion from retriggering interactive requests.
+            region.setDrawing?.(true);
+            region.deleteRegion?.();
+          });
+      };
+
       dataManager.on("lsf:regionFinishedDrawing", (reg, group) => {
         const { lsf, task, currentAnnotation: annotation } = dataManager.lsf;
         const ids = group.map((r) => r.cleanId);
@@ -204,6 +222,10 @@ export const DataManagerPage = ({ ...props }) => {
         });
 
         lsf.loadSuggestions(wrappedRequest, (response) => {
+          if (hasInteractiveResults(response)) {
+            clearPromptRegions(annotation, ids);
+          }
+
           if (response.data) {
             return response.data.result;
           }
