@@ -1,6 +1,7 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license."""
 
 import logging
+import re
 import time
 from datetime import timedelta
 from uuid import uuid4
@@ -111,6 +112,59 @@ class SetSessionUIDMiddleware(CommonMiddleware):
     def process_request(self, request):
         if 'uid' not in request.session:
             request.session['uid'] = str(uuid4())
+
+
+class NoindexUrlMiddleware:
+    """Add crawler directives to configured URLs that should not be indexed."""
+
+    ROBOTS_DIRECTIVES = ('noindex', 'nofollow')
+    ROBOTS_HEADER = ', '.join(ROBOTS_DIRECTIVES)
+    NOINDEX_URL_PATTERNS = [
+        r'^/api/invite/?$',
+        r'^/api/invite/reset-token/?$',
+        r'^/user/email-verification/?$',
+        r'^/user/login/?$',
+        r'^/user/signup/?$',
+        r'^/password-reset/?$',
+        r'^/password-reset/done/?$',
+        r'^/password-reset/[^/]+/[^/]+/?$',
+        r'^/password-set/[^/]+/[^/]+/?$',
+        r'^/password-reset/complete/?$',
+        r'^/saml/[^/]+/acs/?$',
+        r'^/saml/[^/]+/welcome/?$',
+        r'^/saml/[^/]+/denied/?$',
+        r'^/saml/[^/]+/login/?$',
+        r'^/saml/[^/]+/logout/?$',
+        r'^/saml/[^/]+/xml/?$',
+    ]
+    NOINDEX_URL_COMPILED_PATTERNS = tuple(re.compile(pattern) for pattern in NOINDEX_URL_PATTERNS)
+
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+        response = self.get_response(request)
+        if self._should_noindex(request):
+            self._append_robots_directives(response)
+        return response
+
+    def _should_noindex(self, request):
+        return any(pattern.match(request.path_info) for pattern in self.NOINDEX_URL_COMPILED_PATTERNS)
+
+    def _append_robots_directives(self, response):
+        existing_header = response.get('X-Robots-Tag', '')
+        if not existing_header:
+            response['X-Robots-Tag'] = self.ROBOTS_HEADER
+            return
+
+        existing_directives = [directive.strip() for directive in existing_header.split(',') if directive.strip()]
+        existing_directives_lower = {directive.lower() for directive in existing_directives}
+
+        for directive in self.ROBOTS_DIRECTIVES:
+            if directive not in existing_directives_lower:
+                existing_directives.append(directive)
+
+        response['X-Robots-Tag'] = ', '.join(existing_directives)
 
 
 class ContextLogMiddleware(CommonMiddleware):
