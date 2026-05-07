@@ -146,14 +146,12 @@ export const CreateProject = ({ onClose }) => {
   React.useEffect(() => {
     const loadTemplates = async () => {
       const res = await api.callApi("configTemplates");
-      const wantedTitles = ["Full Auto Detection", "Semi Auto Detection"];
-      const wanted = new Set(wantedTitles);
-      const items = (res?.templates ?? []).filter((t) => wanted.has(t.title));
+      const items = (res?.templates ?? []).filter((t) => t.group === "Biowork");
 
       setTemplateOptions(items);
 
       if (!selectedRecipe) {
-        const defaultTemplate = items.find((t) => t.title === "Full Auto Detection");
+        const defaultTemplate = items.find((t) => t.default) ?? items[0];
 
         if (defaultTemplate) {
           setSelectedRecipe(defaultTemplate);
@@ -249,12 +247,38 @@ export const CreateProject = ({ onClose }) => {
       }
     }
 
+    // Apply template-driven project behavior after ML backends are attached
+    if (response && (selectedRecipe?.project_defaults || selectedRecipe?.active_learning_backend_title)) {
+      try {
+        const projectDefaults = { ...(selectedRecipe.project_defaults ?? {}) };
+        if (selectedRecipe.active_learning_backend_title) {
+          const connectedBackends = await api.callApi("mlBackends", { params: { project: response.id } });
+          const activeLearningBackend = (connectedBackends ?? []).find(
+            (mb) => mb.title === selectedRecipe.active_learning_backend_title,
+          );
+          if (activeLearningBackend) {
+            projectDefaults.model_version = activeLearningBackend.title;
+            projectDefaults.training_backend = activeLearningBackend.title;
+          }
+        }
+
+        if (Object.keys(projectDefaults).length > 0) {
+          await api.callApi("updateProject", {
+            params: { pk: response.id },
+            body: projectDefaults,
+          });
+        }
+      } catch (e) {
+        // non-blocking: continue navigation even if defaults update fails
+      }
+    }
+
     setWaitingStatus(false);
 
     if (response !== null) {
       history.push(`/projects/${response.id}/data`);
     }
-  }, [project, projectBody, finishUpload]);
+  }, [api, finishUpload, history, project, projectBody, sample, selectedRecipe, uploadSample]);
 
   const onSaveName = async () => {
     if (error) return;

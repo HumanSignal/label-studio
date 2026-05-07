@@ -219,6 +219,7 @@ class ProjectSerializer(FlexFieldsModelSerializer):
             'maximum_annotations',
             'is_published',
             'model_version',
+            'training_backend',
             'is_draft',
             'created_by',
             'created_at',

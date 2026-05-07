@@ -75,6 +75,16 @@ called from:
 - `data_import/api.py:326,556,600,631` (sync_import, sync_reimport, HF)
 - `data_import/uploader.py:43,298,392`
 - `data_import/functions.py:15,56,68` (async path)
+- `organizations/models.py` also has `check_max_projects` and
+  `check_max_tasks` guards used by project/import paths.
+
+Set `BILLING_ENFORCE_USAGE_LIMITS=false` only for local/dev stacks that need
+unlimited project creation/import while testing. This bypasses these write
+guards, but it does not change Stripe checkout, portal,
+subscription status, pricing, or webhook handling. The usage-limit API still
+returns tier/usage counts, but reports effective dev permissions
+(`max_*: null`, `can_*: true`) so the frontend does not block local testing.
+Production should leave the setting unset or `true`.
 
 ## Webhook flow
 

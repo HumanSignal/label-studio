@@ -1,0 +1,54 @@
+title: Semi Auto + YOLO Active Learning
+type: community
+group: Biowork
+image: /static/templates/semantic-segmentation-with-masks.png
+order: 1
+default: true
+config: |
+  <View style="display: flex;">
+  <!-- Left side: Image -->
+  <View style="flex: 80%; margin-right: 1em">
+    <Image name="image" value="$image" zoom="true"/>
+  </View>
+
+  <!-- Right side: All labeling tools -->
+  <View style="flex: 20%;">
+    <!-- Smart Keypoint Labels (tag3) -->
+    <Header value="Keypoint Labels"/>
+    <KeyPointLabels name="tag3" toName="image" smart="true">
+      <Label value="Object" background="#0000FF" showInline="true" />
+    </KeyPointLabels>
+
+    <!-- Smart Rectangle Labels (tag4) -->
+    <Header value="Rectangle Labels"/>
+    <RectangleLabels name="tag4" toName="image" smart="true">
+      <Label value="Object" smart="true" background="#0000FF"/>
+    </RectangleLabels>
+
+    <!-- Brush Labels (tag1) -->
+    <Header value="Result: Brush Labels"/>
+    <BrushLabels name="tag1" toName="image">
+      <Label value="Object" background="#FF0000"/>
+    </BrushLabels>
+
+  </View>
+  </View>
+
+ml_backends:
+  - url: http://sam2-backend:9090
+    title: SAM2
+    is_interactive: true
+    extra_params:
+      SAM_PREANNOTATE: 0
+  - url: http://yolo-backend:9090
+    title: YOLO
+    is_interactive: false
+
+project_defaults:
+  show_collab_predictions: true
+  reveal_preannotations_interactively: true
+  sampling: Uncertainty sampling
+  start_training_on_annotation_update: true
+  training_backend: YOLO
+
+active_learning_backend_title: YOLO

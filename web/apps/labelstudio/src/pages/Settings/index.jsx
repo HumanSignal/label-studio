@@ -7,6 +7,8 @@ import { LabelingSettings } from "./LabelingSettings";
 import { MachineLearningSettings } from "./MachineLearningSettings/MachineLearningSettings";
 import { PredictionsSettings } from "./PredictionsSettings/PredictionsSettings";
 import { StorageSettings } from "./StorageSettings/StorageSettings";
+import { YoloInferenceSettings } from "./YoloInferenceSettings";
+import { YoloTrainingSettings } from "./YoloTrainingSettings";
 import { isInLicense, LF_CLOUD_STORAGE_FOR_MANAGERS } from "../../utils/license-flags";
 
 const isAllowCloudStorage = !isInLicense(LF_CLOUD_STORAGE_FOR_MANAGERS);
@@ -19,6 +21,8 @@ export const MenuLayout = ({ children, ...routeProps }) => {
         LabelingSettings,
         AnnotationSettings,
         MachineLearningSettings,
+        YoloTrainingSettings,
+        YoloInferenceSettings,
         PredictionsSettings,
         isAllowCloudStorage && StorageSettings,
         WebhookPage,
@@ -34,6 +38,8 @@ const pages = {
   AnnotationSettings,
   LabelingSettings,
   MachineLearningSettings,
+  YoloTrainingSettings,
+  YoloInferenceSettings,
   PredictionsSettings,
   WebhookPage,
   DangerZone,
