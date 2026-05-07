@@ -1882,4 +1882,102 @@ describe("Image model", () => {
       setCurrentImageSpy.mockRestore();
     });
   });
+
+  describe("createImageEntities re-preload + setCurrentImage isAlive guard (TRIAG-2331)", () => {
+    /**
+     * Regression coverage for TRIAG-2331.
+     *
+     * Background:
+     *   `currentImageEntity` is `types.maybeNull(types.reference(ImageEntity))`.
+     *   When `createImageEntities()` runs a second time (React StrictMode
+     *   double-mount or any flow that re-runs afterAttach), it calls
+     *   `imageEntities.clear()` and pushes brand-new ImageEntity instances
+     *   that share the same identifier (`name#index@annotationId`). MST then
+     *   transparently re-resolves the reference, BUT the new instance has
+     *   never been preload()'d.
+     *
+     *   The original `setCurrentImage(0)` short-circuited on
+     *   `index === self.currentImage`, so `preloadImages()` was never called
+     *   on the freshly-created entity — leaving its currentSrc undefined and
+     *   the user staring at a never-loading image.
+     *
+     * Fix: createImageEntities() now resets currentImage/currentImageEntity
+     * BEFORE clearing imageEntities, so the next setCurrentImage(0) cannot
+     * short-circuit (`0 === undefined` is false) and preloadImages() runs.
+     * setCurrentImage also gained a defense-in-depth isAlive() check.
+     */
+
+    it("createImageEntities resets currentImage so the post-clear entity gets preloaded", () => {
+      const { isAlive } = require("mobx-state-tree");
+      const store = createStore();
+      const image = store.annotation.image;
+
+      if (
+        !image.imageEntities ||
+        typeof image.findImageEntity !== "function" ||
+        typeof image.setCurrentImage !== "function" ||
+        typeof image.afterAttach !== "function" ||
+        typeof image.preloadImages !== "function"
+      ) {
+        expect(image).toBeDefined();
+        return;
+      }
+
+      // After initial afterAttach: currentImage=0, currentImageEntity is alive.
+      expect(image.currentImage).toBe(0);
+      const initialEntity = image.currentImageEntity;
+      expect(initialEntity).not.toBeNull();
+      expect(isAlive(initialEntity)).toBe(true);
+
+      // Spy on preloadImages BEFORE the second afterAttach so we capture the
+      // call (or its absence) made by createImageEntities → setCurrentImage.
+      const spy = spyOn(image, "preloadImages");
+
+      // Trigger the StrictMode-style double-mount through the production code
+      // path: afterAttach() → createImageEntities() → reset currentImage +
+      // imageEntities.clear() + push new entities + setCurrentImage(0).
+      //
+      // Without the fix, the inner setCurrentImage(0) short-circuited because
+      // currentImage was already 0, so preloadImages was NOT called and the
+      // new entity stayed un-downloaded.
+      image.afterAttach();
+
+      // With the fix: setCurrentImage(0) DID call preloadImages on the new
+      // (freshly-pushed, never-preloaded) entity.
+      expect(spy).toHaveBeenCalled();
+
+      // And currentImageEntity now points at a live entity from the new
+      // batch (MST auto-resolves the reference to the new instance).
+      const resolvedEntity = image.currentImageEntity;
+      expect(resolvedEntity).not.toBeNull();
+      expect(isAlive(resolvedEntity)).toBe(true);
+      expect(image.imageEntities.includes(resolvedEntity)).toBe(true);
+      // The previous entity instance was destroyed by the clear().
+      expect(isAlive(initialEntity)).toBe(false);
+
+      spy.mockRestore();
+    });
+
+    it("setCurrentImage still no-ops when index unchanged AND currentImageEntity is alive", () => {
+      const { isAlive } = require("mobx-state-tree");
+      const store = createStore();
+      const image = store.annotation.image;
+
+      if (typeof image.preloadImages !== "function" || typeof image.setCurrentImage !== "function") {
+        expect(image).toBeDefined();
+        return;
+      }
+
+      // Confirm the guard's preconditions before asserting the no-op behavior,
+      // otherwise this test could silently pass for the wrong reason.
+      expect(image.currentImage).toBe(0);
+      expect(isAlive(image.currentImageEntity)).toBe(true);
+
+      const spy = spyOn(image, "preloadImages");
+      image.setCurrentImage(0);
+      // All three guard conditions true → preloadImages NOT called.
+      expect(spy).not.toHaveBeenCalled();
+      spy.mockRestore();
+    });
+  });
 });

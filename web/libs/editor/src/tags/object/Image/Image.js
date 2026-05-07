@@ -1,6 +1,6 @@
 import { ff } from "@humansignal/core";
 import { inject } from "mobx-react";
-import { destroy, getRoot, getType, types } from "mobx-state-tree";
+import { destroy, getRoot, getType, isAlive, types } from "mobx-state-tree";
 
 import ImageView from "../../../components/ImageView/ImageView";
 import { customTypes } from "../../../core/CustomTypes";
@@ -586,7 +586,13 @@ const Model = types
     function createImageEntities() {
       if (!self.store.task) return;
 
-      // Clear existing entities to prevent duplicates from React StrictMode double mounting
+      // Reset before clearing so the setCurrentImage(0) below cannot
+      // short-circuit on `index === self.currentImage` and skip preloading
+      // the freshly-recreated entities (TRIAG-2331). Also avoids briefly
+      // holding a reference to a node that's about to be destroyed.
+      self.currentImageEntity = null;
+      self.currentImage = undefined;
+
       self.imageEntities.clear();
 
       const parsedValue = self.multiImage ? self.parsedValueList : self.parsedValue;
@@ -775,7 +781,12 @@ const Model = types
 
     setCurrentImage(index = 0) {
       index = index ?? 0;
-      if (index === self.currentImage) return;
+      // Only short-circuit when the cached entity is still alive; otherwise
+      // a destroyed-then-recreated entity (e.g. multi-image re-init) would
+      // skip preloading (TRIAG-2331).
+      if (index === self.currentImage && self.currentImageEntity && isAlive(self.currentImageEntity)) {
+        return;
+      }
 
       self.currentImage = index;
       self.currentImageEntity = self.findImageEntity(index);
