@@ -30,6 +30,33 @@ const highlightOptions = {
   shadowOpacity: 1,
 };
 
+export function getBrushBBoxFromMeta(metaBBox, parent) {
+  if (!metaBBox || !Number.isFinite(metaBBox.x) || !Number.isFinite(metaBBox.y)) return null;
+
+  const width = Number.isFinite(metaBBox.width) ? metaBBox.width : 0;
+  const height = Number.isFinite(metaBBox.height) ? metaBBox.height : 0;
+  const scaleX = parent?.naturalWidth ? parent.stageWidth / parent.naturalWidth : 1;
+  const scaleY = parent?.naturalHeight ? parent.stageHeight / parent.naturalHeight : 1;
+
+  return {
+    left: metaBBox.x * scaleX,
+    top: metaBBox.y * scaleY,
+    right: (metaBBox.x + width) * scaleX,
+    bottom: (metaBBox.y + height) * scaleY,
+  };
+}
+
+export function shouldUseFastStaticBrushReview({ store, suggestion, item }) {
+  return (
+    store.aiReviewFastMode &&
+    !suggestion &&
+    !item.selected &&
+    !item.highlighted &&
+    !item.isDrawing &&
+    !store.annotationStore.selected?.isLinkingMode
+  );
+}
+
 const Points = types
   .model("Points", {
     id: types.optional(types.identifier, guidGenerator),
@@ -174,6 +201,10 @@ const Model = types
         return self.touches.length;
       },
       get bboxCoordsCanvas() {
+        const metaBBox = getBrushBBoxFromMeta(self.meta?.bbox, self.parent);
+
+        if (metaBBox) return metaBBox;
+
         if (!self.imageData) {
           const points = { x: [], y: [] };
 
@@ -184,6 +215,7 @@ const Model = types
             points.x.push(curX);
             points.y.push(curY);
           }
+          if (!points.x.length || !points.y.length) return null;
           return {
             left: Math.min(...points.x),
             top: Math.min(...points.y),
@@ -509,6 +541,7 @@ const HtxBrushLayer = observer(({ item, setShapeRef, pointsList }) => {
 const HtxBrushView = ({ item, setShapeRef }) => {
   const [image, setImage] = useState();
   const { suggestion } = useContext(ImageViewContext) ?? {};
+  const { store } = item;
 
   // Prepare brush stroke from RLE with current stroke color
   useEffect(() => {
@@ -584,8 +617,6 @@ const HtxBrushView = ({ item, setShapeRef }) => {
     };
   }, [image, item.parent?.stageWidth, item.parent?.stageHeight]);
 
-  const { store } = item;
-
   const highlightedImageRef = useRef(new window.Image());
   const layerRef = useRef();
   const highlightedRef = useRef({});
@@ -649,6 +680,7 @@ const HtxBrushView = ({ item, setShapeRef }) => {
   if (!item.parent) return null;
 
   const stage = item.parent?.stageRef;
+  const fastStaticReview = shouldUseFastStaticBrushReview({ store, suggestion, item });
   const highlightProps = isFF(FF_ZOOM_OPTIM)
     ? {
         scaleX: 1 / item.parent.zoomScale,
@@ -674,6 +706,37 @@ const HtxBrushView = ({ item, setShapeRef }) => {
         height: item.parent.stageHeight,
       }
     : null;
+
+  if (fastStaticReview) {
+    return (
+      <RegionWrapper item={item}>
+        <Layer id={item.cleanId} clearBeforeDraw={!item.isDrawing} visible={!item.hidden} clip={clip} listening={false}>
+          <Group attrMy={item.needsUpdate} name="segmentation" listening={false}>
+            <Image image={image} width={item.parent.stageWidth} height={item.parent.stageHeight} listening={false} />
+
+            {item.touches.length ? (
+              <Group listening={false}>
+                <HtxBrushLayer store={store} item={item} pointsList={item.touches} setShapeRef={setShapeRef} />
+              </Group>
+            ) : null}
+          </Group>
+        </Layer>
+        <Layer
+          id={`${item.cleanId}_labels`}
+          listening={false}
+          ref={(ref) => {
+            if (ref) {
+              ref.canvas._canvas.style.opacity = item.opacity;
+            }
+          }}
+        >
+          <Group listening={false}>
+            <LabelOnMask item={item} color={item.strokeColor} />
+          </Group>
+        </Layer>
+      </RegionWrapper>
+    );
+  }
 
   return (
     <RegionWrapper item={item}>

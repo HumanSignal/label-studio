@@ -1,0 +1,270 @@
+openapi: 3.1.0
+info:
+  title: Loading Mode Local Browser Agent Gateway
+  version: 0.1.0
+  description: |
+    Action API for a local Docker-hosted Chromium browser agent. The agent can
+    open the app, inspect screenshots, click/type/scroll through the UI, and
+    return a recorded WebM video after the session is closed.
+servers:
+  - url: https://your-agent-gateway.example.com
+security:
+  - bearerAuth: []
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+  schemas:
+    CreateSessionRequest:
+      type: object
+      properties:
+        app_url:
+          type: string
+          format: uri
+          description: URL for the Label Studio app or route to inspect.
+        width:
+          type: integer
+          default: 1280
+          minimum: 640
+          maximum: 1920
+        height:
+          type: integer
+          default: 720
+          minimum: 480
+          maximum: 1200
+        timeout_ms:
+          type: integer
+          default: 30000
+          minimum: 5000
+          maximum: 120000
+    ClickRequest:
+      type: object
+      required: [x, y]
+      properties:
+        x:
+          type: integer
+          minimum: 0
+        y:
+          type: integer
+          minimum: 0
+        button:
+          type: string
+          enum: [left, right, middle, double]
+          default: left
+    TypeRequest:
+      type: object
+      required: [text]
+      properties:
+        text:
+          type: string
+          minLength: 1
+          maxLength: 4000
+    KeypressRequest:
+      type: object
+      required: [keys]
+      properties:
+        keys:
+          type: array
+          minItems: 1
+          maxItems: 4
+          items:
+            type: string
+          description: One key or a modifier combo, for example ["ctrl", "l"].
+    ScrollRequest:
+      type: object
+      properties:
+        direction:
+          type: string
+          enum: [up, down]
+          default: down
+        amount:
+          type: integer
+          default: 600
+          minimum: 1
+          maximum: 5000
+    NavigateRequest:
+      type: object
+      required: [url]
+      properties:
+        url:
+          type: string
+          format: uri
+        timeout_ms:
+          type: integer
+          default: 30000
+          minimum: 5000
+          maximum: 120000
+    StopRequest:
+      type: object
+      properties:
+        close_browser:
+          type: boolean
+          default: true
+paths:
+  /health:
+    get:
+      operationId: health
+      summary: Check gateway health.
+      responses:
+        "200":
+          description: Gateway is running.
+  /sessions:
+    get:
+      operationId: listSessions
+      summary: List active browser sessions.
+      responses:
+        "200":
+          description: Active sessions.
+    post:
+      operationId: createSession
+      summary: Create a browser session and start video recording.
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateSessionRequest"
+      responses:
+        "200":
+          description: Session created.
+  /sessions/{session_id}/screenshot:
+    get:
+      operationId: getScreenshot
+      summary: Return the current viewport screenshot as base64 PNG.
+      parameters:
+        - name: session_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Screenshot captured.
+  /sessions/{session_id}/click:
+    post:
+      operationId: click
+      summary: Click at viewport coordinates.
+      parameters:
+        - name: session_id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ClickRequest"
+      responses:
+        "200":
+          description: Click sent.
+  /sessions/{session_id}/type:
+    post:
+      operationId: typeText
+      summary: Type text into the active element.
+      parameters:
+        - name: session_id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TypeRequest"
+      responses:
+        "200":
+          description: Text typed.
+  /sessions/{session_id}/keypress:
+    post:
+      operationId: keypress
+      summary: Press one key or a key combination.
+      parameters:
+        - name: session_id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/KeypressRequest"
+      responses:
+        "200":
+          description: Keypress sent.
+  /sessions/{session_id}/scroll:
+    post:
+      operationId: scroll
+      summary: Scroll the active page.
+      parameters:
+        - name: session_id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ScrollRequest"
+      responses:
+        "200":
+          description: Scroll sent.
+  /sessions/{session_id}/navigate:
+    post:
+      operationId: navigate
+      summary: Navigate the active page to another allowed URL.
+      parameters:
+        - name: session_id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/NavigateRequest"
+      responses:
+        "200":
+          description: Navigation completed.
+  /sessions/{session_id}/stop:
+    post:
+      operationId: stopSession
+      summary: Stop the session and return the recorded video URL.
+      parameters:
+        - name: session_id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/StopRequest"
+      responses:
+        "200":
+          description: Recording stopped.
+  /sessions/{session_id}:
+    delete:
+      operationId: deleteSession
+      summary: Close the browser session.
+      parameters:
+        - name: session_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Session closed.

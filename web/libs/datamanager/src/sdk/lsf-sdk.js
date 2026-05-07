@@ -192,6 +192,7 @@ export class LSFWrapper {
       keymap: options.keymap,
       forceAutoAnnotation: this.isInteractivePreannotations,
       forceAutoAcceptSuggestions: this.isInteractivePreannotations,
+      forceAiReviewFastMode: this.isInteractivePreannotations,
       messages: options.messages,
       queueTotal,
       queuePosition,
