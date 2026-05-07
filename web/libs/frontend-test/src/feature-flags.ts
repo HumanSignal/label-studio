@@ -20,8 +20,6 @@ export const FF_DEV_2755 = "fflag_feat_dev_2755_regions_list_grouped_by_labels_w
  */
 export const FF_DEV_2918 = "fflag_fix_front_dev_2918_labeling_filtered_paragraphs_250822_short";
 
-export const FF_DEV_3077 = "fflag_feat_front_dev_3077_repeater_tag_loading_performance_short";
-
 /**
  * Correction of image and stage size. It also affects the zoom position restrictions.
  * @link https://app.launchdarkly.com/default/production/features/fflag_fix_front_dev_3377_image_regions_shift_on_resize_280922_short

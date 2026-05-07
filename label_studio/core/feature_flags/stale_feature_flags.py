@@ -9,7 +9,6 @@ STALE_FEATURE_FLAGS = {
     'fflag__feature_develop__prompts__dia_1868_azure_ai_foundry': True,
     'fflag_feat_all_leap_1429_flexible_reject_mode_250924_short': True,
     'fflag_fix_front_lsdv_4998_missed_dynamic_children_030523_short': True,
-    'fflag_fix_back_lsdv_4929_limit_exports_10042023_short': True,
     'fflag_fix_front_dev_3377_image_regions_shift_on_resize_280922_short': True,
     # Jan 5
     'fflag_feat_all_fit_524_review_time_chart': True,
