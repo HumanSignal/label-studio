@@ -15,5 +15,5 @@ services:
     env_file: !override
       - deploy/apps/mib/.env
     volumes:
-      - ./postgres-data:/var/lib/postgresql/data
+      - ${MIB_POSTGRES_DATA_DIR:-./postgres-data}:/var/lib/postgresql/data
       - ./deploy/pgsql/certs:/var/lib/postgresql/certs:ro

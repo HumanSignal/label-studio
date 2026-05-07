@@ -30,6 +30,12 @@ Fill secrets in both files as needed.
   - `SESSION_COOKIE_SECURE=0`
   - `CSRF_COOKIE_SECURE=0`
   - local host URLs to avoid redirects to production
+  - `MIB_POSTGRES_DATA_DIR=./postgres-data-mib-dev`
+
+Keep MIB local data (`postgres-data-mib-dev`), main Biowork dev data
+(`postgres-data-dev`), and production data (`postgres-data`) separate. Sharing a
+Postgres data directory between compose stacks can corrupt WAL state and make
+data appear to disappear after container recreation.
 
 Create tunnel credentials from a Cloudflare tunnel token:
 

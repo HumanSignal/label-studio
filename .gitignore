@@ -37,6 +37,8 @@ deploy/redis-data/
 deploy/dockerfiles/postgres-data
 deploy/dockerfiles/mysql-data
 postgres-data
+postgres-data-dev
+postgres-data-mib-dev
 mysql-data
 
 label_studio/core/media

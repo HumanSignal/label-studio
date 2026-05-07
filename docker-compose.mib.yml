@@ -3,7 +3,7 @@ x-label-studio-build: &label-studio-build
   context: .
   dockerfile: Dockerfile
 x-mib-env-file: &mib-env-file
-  - deploy/apps/mib/.env.dev
+  - ${MIB_ENV_FILE:-deploy/apps/mib/.env.dev}
 x-service-defaults: &service-defaults
   restart: unless-stopped
   networks:
@@ -93,7 +93,7 @@ services:
       POSTGRES_PASSWORD: postgres
       POSTGRES_HOST_AUTH_METHOD: md5
     volumes:
-      - ./postgres-data-dev:/var/lib/postgresql/data
+      - ${MIB_POSTGRES_DATA_DIR:-./postgres-data-mib-dev}:/var/lib/postgresql/data
       - ./deploy/pgsql/certs:/var/lib/postgresql/certs:ro
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
