@@ -4,7 +4,6 @@ import { IconPlus } from "@humansignal/icons";
 import { Button } from "@humansignal/ui";
 import { isStarterCloudPlan } from "@humansignal/core";
 import { cn } from "../../utils/bem";
-import { FF_BULK_ANNOTATION, isFF } from "../../utils/feature-flags";
 import { AnnotationsCarousel } from "../AnnotationsCarousel/AnnotationsCarousel";
 import { ViewAllToggle } from "../AnnotationsCarousel/ViewAllToggle";
 
@@ -16,7 +15,7 @@ export const TopBar = observer(({ store }) => {
   const _isPrediction = entity?.type === "prediction";
 
   const isViewAll = annotationStore?.viewingAll === true;
-  const isBulkMode = isFF(FF_BULK_ANNOTATION) && !isStarterCloudPlan() && store.hasInterface("annotation:bulk");
+  const isBulkMode = !isStarterCloudPlan() && store.hasInterface("annotation:bulk");
 
   if (isBulkMode) return null;
 

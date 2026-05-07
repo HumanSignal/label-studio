@@ -28,7 +28,6 @@ import { Space } from "../../common/Space/Space";
 import { Button, EmptyState, IconCheck } from "@humansignal/ui";
 import { isStarterCloudPlan, ff } from "@humansignal/core";
 import { cn } from "../../utils/bem";
-import { FF_BULK_ANNOTATION, isFF } from "../../utils/feature-flags";
 import { guidGenerator } from "../../utils/unique";
 import { isDefined } from "../../utils/utilities";
 import { queryClient } from "@humansignal/core/lib/utils/query-client";
@@ -260,7 +259,7 @@ class App extends Component {
       </div>
     );
 
-    const isBulkMode = isFF(FF_BULK_ANNOTATION) && !isStarterCloudPlan() && store.hasInterface("annotation:bulk");
+    const isBulkMode = !isStarterCloudPlan() && store.hasInterface("annotation:bulk");
     return (
       <div className={cn("editor").mod({ fullscreen: settings.fullscreen }).toClassName()} ref={null}>
         <QueryClientProvider client={queryClient}>

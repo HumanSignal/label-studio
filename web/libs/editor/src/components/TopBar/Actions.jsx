@@ -3,7 +3,6 @@ import { IconCopy, IconInfo, IconViewAll, IconTrash, IconSettings } from "@human
 import { Tooltip } from "@humansignal/ui";
 import { isStarterCloudPlan } from "@humansignal/core";
 import { cn } from "../../utils/bem";
-import { FF_BULK_ANNOTATION, isFF } from "../../utils/feature-flags";
 import { GroundTruth } from "../CurrentEntity/GroundTruth";
 import { EditingHistory } from "./HistoryActions";
 import { confirm } from "../../common/Modal/Modal";
@@ -15,7 +14,7 @@ export const Actions = ({ store }) => {
   const saved = !entity.userGenerate || entity.sentUserGenerate;
   const isPrediction = entity?.type === "prediction";
   const isViewAll = annotationStore.viewingAll;
-  const isBulkMode = isFF(FF_BULK_ANNOTATION) && !isStarterCloudPlan() && store.hasInterface("annotation:bulk");
+  const isBulkMode = !isStarterCloudPlan() && store.hasInterface("annotation:bulk");
 
   const onToggleVisibility = useCallback(() => {
     annotationStore.toggleViewingAllAnnotations();

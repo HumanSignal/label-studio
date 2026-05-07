@@ -16,7 +16,7 @@ import {
   Collapse,
 } from "@humansignal/frontend-test/helpers/LSF";
 import { RichText } from "@humansignal/frontend-test/helpers/LSF/RichText";
-import { FF_BULK_ANNOTATION, FF_LSDV_4583 } from "../../../../src/utils/feature-flags";
+import { FF_LSDV_4583 } from "../../../../src/utils/feature-flags";
 import {
   allTagsConfig,
   allTagsSampleData,
@@ -26,12 +26,6 @@ import {
   perRegionConfig,
   simpleMIGData,
 } from "../../data/bulk_mode/smoke";
-
-beforeEach(() => {
-  LabelStudio.addFeatureFlagsOnPageLoad({
-    [FF_BULK_ANNOTATION]: true,
-  });
-});
 
 describe("Bulk mode", () => {
   it("should show per object classifications", () => {
