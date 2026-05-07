@@ -6,6 +6,9 @@ feature that optimizes task API performance by excluding expensive fields.
 
 from unittest.mock import Mock, patch
 
+from data_manager.prepare_params import ConjunctionEnum, Filter, Filters
+from django.conf import settings
+from django.core.exceptions import FieldDoesNotExist, FieldError
 from django.test import TestCase, override_settings
 
 
@@ -427,3 +430,68 @@ class TestGetQuerysetParameterPassing(TestCase):
                 call_kwargs.get('excluded_fields_for_evaluation'),
                 'excluded_fields_for_evaluation should default to None',
             )
+
+
+class TestApplyOrderingStaleAgreementFields(TestCase):
+    """Regression tests for stale agreement fields in saved Data Manager views."""
+
+    def test_stale_dimension_agreement_ordering_falls_back_to_id(self):
+        """Ordering by a stale dimension_agreement_* key should fail open and use default ordering."""
+        from data_manager.managers import apply_ordering
+
+        queryset = Mock()
+        queryset.order_by.side_effect = [FieldError('Cannot resolve keyword'), queryset]
+
+        with patch(
+            'data_manager.managers.load_func', return_value=lambda raw, project=None: ('dimension_agreement_1', True)
+        ):
+            result = apply_ordering(
+                queryset=queryset,
+                ordering=['tasks:dimension_agreement_1'],
+                project=Mock(),
+                request=Mock(),
+            )
+
+        self.assertIs(result, queryset)
+        self.assertEqual(queryset.order_by.call_count, 2)
+        self.assertEqual(queryset.order_by.call_args_list[-1].args, ('id',))
+
+
+class TestApplyFiltersStaleAgreementFields(TestCase):
+    """Regression tests for stale agreement filters in saved Data Manager views."""
+
+    def test_stale_dimension_agreement_filter_is_skipped(self):
+        """Stale dimension_agreement_* filters should be ignored instead of raising FieldError."""
+        from data_manager.managers import apply_filters
+
+        queryset = Mock()
+        queryset.query.annotations = {}
+        queryset.model._meta.get_field.side_effect = FieldDoesNotExist('missing')
+        queryset.filter.return_value = queryset
+
+        filters = Filters(
+            conjunction=ConjunctionEnum.AND,
+            items=[
+                Filter(
+                    filter='filter:tasks:dimension_agreement_1',
+                    operator='equal',
+                    type='Number',
+                    value='0.6',
+                )
+            ],
+        )
+
+        def _load_func(path):
+            if path == settings.DATA_MANAGER_CUSTOM_FILTER_EXPRESSIONS:
+                return lambda *_args, **_kwargs: None
+            if path == settings.PREPROCESS_FIELD_NAME:
+                return lambda _field, _project: ('dimension_agreement_1', True)
+            if path == settings.DATA_MANAGER_PREPROCESS_FILTER:
+                return lambda _filter, _field_name: _filter
+            raise AssertionError(f'unexpected load_func path: {path}')
+
+        with patch('data_manager.managers.load_func', side_effect=_load_func):
+            result = apply_filters(queryset=queryset, filters=filters, project=Mock(), request=Mock())
+
+        self.assertIs(result, queryset)
+        queryset.filter.assert_not_called()

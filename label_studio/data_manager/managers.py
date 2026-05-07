@@ -12,7 +12,7 @@ from core.utils.db import fast_first
 from data_manager.prepare_params import ConjunctionEnum
 from django.conf import settings
 from django.contrib.postgres.aggregates import ArrayAgg
-from django.core.exceptions import FieldError
+from django.core.exceptions import FieldDoesNotExist, FieldError
 from django.db import models
 from django.db.models import (
     Aggregate,
@@ -104,7 +104,27 @@ def get_fields_for_filter_ordering(prepare_params):
 
 
 def is_agreement_related_field(field_name):
-    return field_name in {'agreement', 'agreement_selected'} or field_name.startswith('dimension_agreement_')
+    return field_name in {
+        'agreement',
+        'agreement_selected',
+        '_agreement',
+        '_agreement_selected',
+    } or field_name.startswith('dimension_agreement_')
+
+
+def _is_stale_agreement_field(queryset, field_name):
+    """Return true when an agreement field is no longer available for this queryset."""
+    if not is_agreement_related_field(field_name):
+        return False
+
+    if field_name in getattr(queryset.query, 'annotations', {}):
+        return False
+
+    try:
+        queryset.model._meta.get_field(field_name)
+        return False
+    except (AttributeError, FieldDoesNotExist):
+        return True
 
 
 def _set_prefilter_task_ids_for_agreement(request, queryset, prepare_params, project):
@@ -261,7 +281,13 @@ def apply_ordering(queryset, ordering, project, request, view_data=None):
         else:
             f = F(field_name).asc(nulls_last=True) if ascending else F(field_name).desc(nulls_last=True)
 
-        queryset = queryset.order_by(f)
+        try:
+            queryset = queryset.order_by(f)
+        except FieldError:
+            if is_agreement_related_field(field_name):
+                logger.warning('Skipping stale agreement ordering field: %s', field_name, exc_info=True)
+                return queryset.order_by('id')
+            raise
     else:
         queryset = queryset.order_by('id')
 
@@ -369,6 +395,9 @@ def apply_filters(queryset, filters, project, request):
             # django orm loop expression attached to column name
             preprocess_field_name = load_func(settings.PREPROCESS_FIELD_NAME)
             field_name, _ = preprocess_field_name(_filter.filter, project)
+            if _is_stale_agreement_field(queryset, field_name):
+                logger.warning('Skipping stale agreement filter field: %s', field_name)
+                continue
 
             # filter pre-processing, value type conversion, etc..
             preprocess_filter = load_func(settings.DATA_MANAGER_PREPROCESS_FILTER)
@@ -555,7 +584,8 @@ def apply_filters(queryset, filters, project, request):
                 cast_value(_filter)
                 filter_expressions.append(Q(**{field_name: _filter.value}))
 
-        filter_line_expressions.append(filter_expressions)
+        if filter_expressions:
+            filter_line_expressions.append(filter_expressions)
 
     resolved_filter_lines = [reduce(lambda x, y: x & y, fle) for fle in filter_line_expressions]
 
