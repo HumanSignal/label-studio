@@ -133,6 +133,12 @@ export const FF_LSE_PROJECT_DASHBOARDS_V3_DIAGNOSTICS = "fflag_feat_lse_project_
 export const FF_LSE_PROJECT_DASHBOARDS_V3_MEMBERS = "fflag_feat_lse_project_dashboards_v3_members_short";
 
 /**
+ * LSE project hub: Data Quality tab (FIT-1634) — Agreement analysis sub-tab consumes
+ * the FIT-1633 endpoints; Label distribution sub-tab is a placeholder owned by FIT-1536.
+ */
+export const FF_LSE_PROJECT_DASHBOARDS_V3_DATA_QUALITY = "fflag_feat_lse_project_dashboards_v3_data_quality_short";
+
+/**
  * Show per-item classifications (like Choices or Taxonomy) alongside regions in the Outliner panel
  */
 export const FF_CLASSIFICATIONS_IN_OUTLINER = "fflag_feat_front_bros_766_per_item_in_outliner";
