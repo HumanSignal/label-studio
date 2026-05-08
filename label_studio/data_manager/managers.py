@@ -194,6 +194,11 @@ def _set_prefilter_task_ids_for_agreement(request, queryset, prepare_params, pro
         # Fail open: prefilter is an optimization only, the main filtered query still runs later.
         logger.warning('DM agreement prefilter skipped due to unresolved filter field', exc_info=True)
         return
+    except (TypeError, ValueError):
+        # Fail open: filter value cannot be cast (e.g. bool passed for a Datetime filter).
+        # The main filtered query will surface the error from its own apply_filters pass.
+        logger.warning('DM agreement prefilter skipped due to filter value cast error', exc_info=True)
+        return
     request._dm_prefilter_task_ids = tuple(narrowed_queryset.values_list('id', flat=True))
 
 
