@@ -98,13 +98,13 @@ export const Tour: React.FC<TourProps> = ({ name, autoStart = false, delay = 0, 
         (status === STATUS.SKIPPED && state.run) || action === ACTIONS.CLOSE || status === STATUS.FINISHED;
 
       if (shouldEndTour) {
-        // mark tour as viewed and update onboarding state if it's the final step or the tour was skipped
-        if (status === STATUS.SKIPPED || status === STATUS.FINISHED) {
-          void (async () => {
+        void (async () => {
+          // mark tour as viewed and update onboarding state if it's the final step or the tour was skipped
+          if (status === STATUS.SKIPPED || status === STATUS.FINISHED) {
             await tourContext?.setTourViewed(name, status === STATUS.SKIPPED, { index, action, type, status });
-            await tourContext?.retryAwaitingTours();
-          })();
-        }
+          }
+          await tourContext?.onTourClosed(name);
+        })();
         dispatch({ type: "STOP" });
         return;
       }
@@ -118,7 +118,7 @@ export const Tour: React.FC<TourProps> = ({ name, autoStart = false, delay = 0, 
         });
       }
     },
-    [name, state.run],
+    [name, state.run, tourContext],
   );
 
   const { key, ...joyrideState } = state;

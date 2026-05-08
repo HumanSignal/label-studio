@@ -100,6 +100,8 @@ interface TourContextType {
   startTour: (name: string) => Promise<void>;
   setTourViewed: (name: string, isSkipped: boolean, interactionData: Record<string, any>) => Promise<void>;
   restartTour: (name: string) => void;
+  /** Marks current tour as closed and triggers next queued tour (if any). */
+  onTourClosed: (name: string) => Promise<void>;
   /** Re-fetch tours that were blocked by `awaiting` (dependencies) after another tour completes. */
   retryAwaitingTours: () => Promise<void>;
 }
@@ -115,6 +117,8 @@ export const TourProvider: React.FC<{
   const toursRef = useRef<Record<string, React.Dispatch<TourAction>>>({});
   /** Tours whose last getProductTour returned `awaiting: true` (dependency not finished yet). */
   const awaitingToursRef = useRef<Set<string>>(new Set());
+  /** Global lock: only one tour can fetch/start/run at a time. */
+  const activeTourRef = useRef<string | null>(null);
 
   const registerTour = (name: string, dispatch: React.Dispatch<TourAction>) => {
     toursRef.current[name] = dispatch;
@@ -122,22 +126,44 @@ export const TourProvider: React.FC<{
 
   const startTour = useCallback(
     async (name: string) => {
+      const activeTour = activeTourRef.current;
+
+      // Keep a strict global queue to avoid overlapping joyride tooltips.
+      if (activeTour && activeTour !== name) {
+        awaitingToursRef.current.add(name);
+        return;
+      }
+
+      if (activeTour === name) {
+        return;
+      }
+
       const dispatch = toursRef.current[name];
       if (!dispatch) {
         console.error("Dispatch for tour", name, "not found");
         return;
       }
 
+      activeTourRef.current = name;
+
+      const releaseLock = () => {
+        if (activeTourRef.current === name) {
+          activeTourRef.current = null;
+        }
+      };
+
       const response = await api.callApi("getProductTour", { params: { name } });
 
       if (response?.$meta?.status !== 200) {
         console.error("Error fetching tour data", response);
+        releaseLock();
         return;
       }
 
       if (response.awaiting) {
         awaitingToursRef.current.add(name);
         console.info(`Tour "${name}" is awaiting other tours`);
+        releaseLock();
         return;
       }
 
@@ -145,11 +171,13 @@ export const TourProvider: React.FC<{
 
       if (!response.steps?.length) {
         console.info(`No steps found for tour "${name}"`);
+        releaseLock();
         return;
       }
 
       if (response.state === "completed" || response.state === "skipped") {
         console.debug(`Tour "${name}" is already completed`);
+        releaseLock();
         return;
       }
 
@@ -178,8 +206,21 @@ export const TourProvider: React.FC<{
     async (name: string, isSkipped: boolean, interactionData: Record<string, any> = {}) => {
       // TODO: currently we don't have per-tour complete state, so we just update the global state
       await updateProductTourState(api, name, isSkipped ? "skipped" : "completed", interactionData);
+      if (activeTourRef.current === name) {
+        activeTourRef.current = null;
+      }
     },
     [api],
+  );
+
+  const onTourClosed = useCallback(
+    async (name: string) => {
+      if (activeTourRef.current === name) {
+        activeTourRef.current = null;
+      }
+      await retryAwaitingTours();
+    },
+    [retryAwaitingTours],
   );
 
   const restartTour = useCallback(
@@ -203,7 +244,7 @@ export const TourProvider: React.FC<{
 
   return (
     <TourContext.Provider
-      value={{ registerTour, unregisterTour, startTour, setTourViewed, restartTour, retryAwaitingTours }}
+      value={{ registerTour, unregisterTour, startTour, setTourViewed, restartTour, onTourClosed, retryAwaitingTours }}
     >
       {children}
     </TourContext.Provider>
