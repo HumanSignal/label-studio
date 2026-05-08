@@ -149,6 +149,10 @@ def custom_exception_handler(exc, context):
             response = Response(status=status.HTTP_400_BAD_REQUEST, data=response_data)
         elif isinstance(exc, TooManyFilesSent):
             response_data['status_code'] = status.HTTP_400_BAD_REQUEST
+            response_data['detail'] = (
+                f'The number of files exceeded the limit of {settings.DATA_UPLOAD_MAX_NUMBER_FILES}. '
+                'Please reduce the number of files or increase DATA_UPLOAD_MAX_NUMBER_FILES.'
+            )
             response = Response(status=status.HTTP_400_BAD_REQUEST, data=response_data)
         else:
             response = Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR, data=response_data)

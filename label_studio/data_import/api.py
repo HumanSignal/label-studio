@@ -378,7 +378,7 @@ class ImportAPI(generics.CreateAPIView):
             return_task_ids=return_task_ids,
         )
 
-        if len(request.FILES):
+        if len(request.FILES) > 0:
             logger.debug(f'Import from files: {request.FILES}')
             file_upload_ids, could_be_tasks_list = create_file_uploads(request.user, project, request.FILES)
             project_import.file_upload_ids = file_upload_ids

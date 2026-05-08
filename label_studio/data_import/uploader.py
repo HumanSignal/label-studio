@@ -345,7 +345,7 @@ def load_tasks(request, project):
     could_be_tasks_list = False
 
     # take tasks from request FILES
-    if len(request.FILES):
+    if len(request.FILES) > 0:
         check_request_files_size(request.FILES)
         check_extensions(request.FILES)
         for filename, file in request.FILES.items():
