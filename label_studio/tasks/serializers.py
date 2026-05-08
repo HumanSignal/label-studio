@@ -548,6 +548,11 @@ class BaseTaskSerializerBulk(serializers.ListSerializer):
             if prediction_errors and raise_prediction_errors:
                 raise ValidationError({'predictions': prediction_errors})
 
+            if db_annotations:
+                # Keep ProjectSummary counters in sync for imported annotations so
+                # label-distribution statistics don't require a manual summary reset.
+                self.project.summary.update_created_annotations_and_labels(db_annotations)
+
         self.post_process_annotations(user, db_annotations, 'imported')
         self.post_process_tasks(self.project.id, [t.id for t in self.db_tasks])
         self.post_process_custom_callback(self.project.id, user)
@@ -559,7 +564,9 @@ class BaseTaskSerializerBulk(serializers.ListSerializer):
                 annotation_mapping = {v.import_id: v.id for v in db_annotations}
                 annotation_mapping[None] = None
                 # the sequence of add_ functions is very important because of references to ids
-                self.add_drafts(task_drafts, db_tasks, annotation_mapping, self.project)
+                db_drafts = self.add_drafts(task_drafts, db_tasks, annotation_mapping, self.project)
+                if db_drafts:
+                    self.project.summary.update_created_labels_drafts(db_drafts)
                 self.add_reviews(task_reviews, annotation_mapping, self.project)
 
         # Backfill FSM states for bulk-created tasks

@@ -95,6 +95,39 @@ def test_reset_summary_project_has_annotations(business_client):
     assert s.created_labels == {'some': {'Opossum': 1}}
 
 
+def test_imported_annotations_update_project_summary_without_reset(business_client):
+    project = make_project(project_choices(), business_client.user, use_ml_backend=False)
+
+    response = business_client.post(
+        f'/api/projects/{project.id}/import',
+        data=json.dumps(
+            [
+                {
+                    'data': {'image': 'kittens.jpg'},
+                    'annotations': [
+                        {
+                            'result': [
+                                {
+                                    'from_name': 'animals',
+                                    'to_name': 'xxx',
+                                    'type': 'choices',
+                                    'value': {'choices': ['Cat']},
+                                }
+                            ]
+                        }
+                    ],
+                }
+            ]
+        ),
+        content_type='application/json',
+    )
+    assert response.status_code == 201
+
+    project.summary.refresh_from_db()
+    assert project.summary.created_annotations == {'animals|xxx|choices': 1}
+    assert project.summary.created_labels == {'animals': {'Cat': 1}}
+
+
 def test_delete_tasks_and_annotations_clears_created_drafts_annotations_and_labels(business_client):
     project = make_project(project_choices(), business_client.user, use_ml_backend=False)
 
