@@ -3,7 +3,7 @@ import { IconOutlinerDrag, IconCollapseSmall, IconExpandSmall } from "@humansign
 import { useDrag } from "../../../hooks/useDrag";
 import { cn } from "../../../utils/bem";
 import { DEFAULT_PANEL_HEIGHT } from "../constants";
-import "./Tabs.scss";
+import "./Tabs.prefix.css";
 import { type BaseProps, Side, type TabProps } from "./types";
 import { determineDroppableArea, determineLeftOrRight } from "./utils";
 import { Button } from "../../../common/Button/Button";
@@ -240,7 +240,8 @@ export const Tabs = (
                   setBreakPointActiveTab={props.setBreakPointActiveTab}
                 >
                   <div className={cn("tabs").elem("content").toClassName()}>
-                    <Component key={`${view.title}-${index}-ghost`} {...props} name={"outliner"} />
+                    {/* FIT-720: Pass isActive={false} for ghost/preview components to prevent eager loading */}
+                    <Component key={`${view.title}-${index}-ghost`} {...props} name={"outliner"} isActive={false} />
                   </div>
                 </Tab>
               </div>
@@ -276,7 +277,8 @@ export const Tabs = (
         </div>
         {!props.bottomCollapsed && (
           <div className={cn("tabs").elem("contents").toClassName()} style={{ overflow: "auto" }}>
-            {ActiveComponent && <ActiveComponent {...props} />}
+            {/* FIT-720: Pass isActive={true} for the active component to enable data fetching */}
+            {ActiveComponent && <ActiveComponent {...props} isActive={true} />}
           </div>
         )}
       </div>

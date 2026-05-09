@@ -225,9 +225,12 @@ For more information, see [Project settings - Members](project_settings_lse#Memb
 
 ## Publish a project 
 
-In Label Studio Enterprise, you can hide projects from annotators so that you can fully configure the project before anyone can start labeling. When you're ready for annotators to start labeling, publish the project.
+You can hide projects from annotators so that you can fully configure the project before anyone can start labeling. When you're ready for annotators to start labeling, publish the project.
 
-1. Open a project and select **Dashboard** in the upper right.
-2. Click **Publish**. 
+To publish a project, click the pause icon in the breadcrumb at the top of the page:
+
+![Screenshot of publish project](/images/project/publish.png)
+
+You can later unpublish the project by clicking the play icon in the breadcrumb.
 
 </div>

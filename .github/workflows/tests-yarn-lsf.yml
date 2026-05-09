@@ -1,0 +1,254 @@
+# Single workflow: build the editor once (production standalone), then run Cypress integration tests.
+name: "yarn integration (LSF)"
+
+on:
+  workflow_call:
+    inputs:
+      head_sha:
+        required: true
+        type: string
+
+env:
+  NODE: "22"
+  FRONTEND_MONOREPO_DIR: "web"
+
+jobs:
+  build-editor:
+    name: "Build editor"
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: hmarr/debug-action@v3.0.0
+
+      - name: Configure git
+        shell: bash
+        run: |
+          set -xeuo pipefail
+          git config --global user.name 'robot-ci-heartex'
+          git config --global user.email 'robot-ci-heartex@users.noreply.github.com'
+
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ inputs.head_sha }}
+
+      - name: Setup frontend environment
+        uses: ./.github/actions/setup-frontend-environment
+        with:
+          node-version: "${{ env.NODE }}"
+          directory: "${{ env.FRONTEND_MONOREPO_DIR }}"
+
+      # Nx cache is restored/saved here. With Nx's db cache, artifacts from other runners are not used
+      # (machine ID mismatch). For shared CI cache, use Nx Cloud (Nx Replay) instead.
+      - name: Cache Nx
+        uses: actions/cache@v5
+        with:
+          path: ${{ env.FRONTEND_MONOREPO_DIR }}/.nx/cache
+          key: nx-v2-lsf-${{ runner.os }}-${{ env.NODE }}-${{ hashFiles('web/package.json', 'web/yarn.lock') }}
+          restore-keys: |
+            nx-v2-lsf-${{ runner.os }}-${{ env.NODE }}-
+
+      - name: Build editor (production)
+        working-directory: ${{ env.FRONTEND_MONOREPO_DIR }}
+        run: BABEL_ENV=test MODE=standalone yarn nx run editor:build:production
+
+      - name: Upload editor build
+        uses: actions/upload-artifact@v7
+        with:
+          name: editor-build
+          path: ${{ env.FRONTEND_MONOREPO_DIR }}/dist/libs/editor
+
+  prepare-chunks:
+    name: "Prepare Cypress chunks"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ inputs.head_sha }}
+
+      - name: Setup frontend environment
+        uses: ./.github/actions/setup-frontend-environment
+        with:
+          node-version: "${{ env.NODE }}"
+          directory: "${{ env.FRONTEND_MONOREPO_DIR }}"
+
+      - name: Discover specs and build chunk matrix
+        id: chunks
+        working-directory: ${{ env.FRONTEND_MONOREPO_DIR }}
+        run: |
+          json=$(node scripts/cypress-spec-chunks.js --chunks 4)
+          echo "matrix<<MATRIX_EOF" >> $GITHUB_OUTPUT
+          echo "$json" >> $GITHUB_OUTPUT
+          echo "MATRIX_EOF" >> $GITHUB_OUTPUT
+    outputs:
+      matrix: ${{ steps.chunks.outputs.matrix }}
+
+  cypress:
+    name: "Cypress (${{ matrix.chunk }})"
+    needs: [build-editor, prepare-chunks]
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJson(needs.prepare-chunks.outputs.matrix) }}
+    steps:
+      - uses: hmarr/debug-action@v3.0.0
+
+      - name: Configure git
+        shell: bash
+        run: |
+          set -xeuo pipefail
+          git config --global user.name 'robot-ci-heartex'
+          git config --global user.email 'robot-ci-heartex@users.noreply.github.com'
+
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ inputs.head_sha }}
+
+      - name: Setup frontend environment
+        uses: ./.github/actions/setup-frontend-environment
+        with:
+          node-version: "${{ env.NODE }}"
+          directory: "${{ env.FRONTEND_MONOREPO_DIR }}"
+
+      - name: Cache Cypress binary
+        uses: actions/cache@v5
+        id: cypress-binary
+        with:
+          path: ~/.cache/Cypress
+          key: cypress-${{ runner.os }}-${{ hashFiles('web/yarn.lock') }}
+
+      - name: Install Cypress binary
+        if: steps.cypress-binary.outputs.cache-hit != 'true'
+        working-directory: ${{ env.FRONTEND_MONOREPO_DIR }}
+        run: npx cypress install
+
+      - name: Download editor build
+        uses: actions/download-artifact@v8
+        with:
+          name: editor-build
+          path: ${{ env.FRONTEND_MONOREPO_DIR }}/dist/libs/editor
+
+      - name: Verify build contains assets and CSS
+        working-directory: ${{ env.FRONTEND_MONOREPO_DIR }}
+        run: |
+          set -e
+          echo "Build output:"
+          ls -la dist/libs/editor/
+          test -f dist/libs/editor/index.html || (echo "Missing index.html" && exit 1)
+          # Ensure CSS is present (webpack emits main.css or similar)
+          if ! find dist/libs/editor -maxdepth 1 -name "*.css" -print -quit | grep -q .; then
+            echo "No CSS file in build - styles may not load. Contents:"
+            ls dist/libs/editor/
+            exit 1
+          fi
+          echo "Build contains index.html and CSS assets."
+
+      - name: Run server
+        id: run-server
+        timeout-minutes: 1
+        working-directory: ${{ env.FRONTEND_MONOREPO_DIR }}
+        run: |
+          set -xeuo pipefail
+          npx serve dist/libs/editor -l 3000 &
+          pid=$!
+          echo "pid=${pid}" >> $GITHUB_OUTPUT
+          while ! curl -s -o /dev/null -L "http://localhost:3000"; do
+            echo "=> Waiting for service to become available"
+            sleep 2s
+          done
+          # Verify root and that CSS is served (same origin as page)
+          code=$(curl -s -o /dev/null -w "%{http_code}" -L "http://localhost:3000/")
+          test "$code" = "200" || (echo "Root URL returned $code" && exit 1)
+          css_ref=$(curl -s -L "http://localhost:3000/" | grep -oE 'href="[^"]+\.css[^"]*"' | head -1 | cut -d'"' -f2)
+          if [ -n "$css_ref" ]; then
+            css_url="http://localhost:3000/${css_ref#/}"
+            css_code=$(curl -s -o /dev/null -w "%{http_code}" -L "$css_url")
+            test "$css_code" = "200" || (echo "CSS URL $css_url returned $css_code" && exit 1)
+            echo "Root and CSS are served correctly."
+          fi
+
+      - name: Run Cypress (chunk ${{ matrix.chunk }})
+        working-directory: ${{ env.FRONTEND_MONOREPO_DIR }}
+        run: COLLECT_COVERAGE=1 npx nx run editor:integration -- --spec "${{ matrix.specs }}"
+
+      - name: Upload coverage chunk
+        if: always()
+        working-directory: ${{ env.FRONTEND_MONOREPO_DIR }}
+        run: |
+          mkdir -p coverage-chunks
+          cp libs/editor/.nyc_output/out.json coverage-chunks/${{ matrix.chunk }}.json 2>/dev/null || touch coverage-chunks/${{ matrix.chunk }}.json
+      - name: Upload coverage artifact
+        uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: cypress-coverage-${{ matrix.chunk }}
+          path: ${{ env.FRONTEND_MONOREPO_DIR }}/coverage-chunks/${{ matrix.chunk }}.json
+
+      - name: Upload test results and screenshots
+        uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: cypress-output-${{ matrix.chunk }}
+          path: |
+            ${{ env.FRONTEND_MONOREPO_DIR }}/dist/cypress/libs/frontend-test/src/screenshots
+            ${{ env.FRONTEND_MONOREPO_DIR }}/dist/cypress/libs/frontend-test/src/videos
+
+      - name: Kill server
+        if: always()
+        continue-on-error: true
+        run: kill -9 "${{ steps.run-server.outputs.pid }}" 2>/dev/null || true
+
+  merge-coverage:
+    name: "Merge coverage and upload to Codecov"
+    needs: cypress
+    runs-on: ubuntu-latest
+    if: always() && needs.cypress.result != 'failure'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ inputs.head_sha }}
+
+      - name: Setup frontend environment
+        uses: ./.github/actions/setup-frontend-environment
+        with:
+          node-version: "${{ env.NODE }}"
+          directory: "${{ env.FRONTEND_MONOREPO_DIR }}"
+
+      # Download to workspace root so artifact paths like web/coverage-chunks/core.json
+      # extract to web/coverage-chunks/ (merge step runs with working-directory: web).
+      - name: Download all coverage chunks
+        uses: actions/download-artifact@v8
+        with:
+          pattern: cypress-coverage-*
+          path: .
+          merge-multiple: true
+
+      # If artifacts flattened to workspace root (chunk_*.json), place them in web/coverage-chunks
+      - name: Ensure coverage chunks in expected dir
+        run: |
+          mkdir -p ${{ env.FRONTEND_MONOREPO_DIR }}/coverage-chunks
+          for f in chunk_*.json; do
+            [ -f "$f" ] && mv "$f" ${{ env.FRONTEND_MONOREPO_DIR }}/coverage-chunks/
+          done
+
+      - name: Merge coverage
+        working-directory: ${{ env.FRONTEND_MONOREPO_DIR }}
+        run: |
+          mkdir -p libs/editor/.nyc_output
+          node scripts/merge-cypress-coverage.js --chunks-dir coverage-chunks --out libs/editor/.nyc_output/out.json
+
+      - name: Upload coverage to Codecov
+        if: github.event.pull_request.head.repo.fork == false && github.event.pull_request.user.login != 'dependabot[bot]'
+        uses: codecov/codecov-action@v5
+        with:
+          name: lsf-integration
+          flags: lsf-integration
+          files: ${{ env.FRONTEND_MONOREPO_DIR }}/libs/editor/.nyc_output/out.json
+          token: ${{ secrets.CODECOV_TOKEN }}
+          verbose: true
+          fail_ci_if_error: false
+

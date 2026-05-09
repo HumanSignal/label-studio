@@ -7,7 +7,7 @@ import { clamp, fixMobxObserve, isDefined } from "../../utils/utilities";
 import { TimelineContextProvider } from "./Context";
 import { Controls } from "./Controls";
 import { Seeker } from "./Seeker";
-import "./Timeline.scss";
+import "./Timeline.prefix.css";
 import type { TimelineContextValue, TimelineControlsStepHandler, TimelineProps } from "./Types";
 import { default as Views } from "./Views";
 
@@ -18,8 +18,8 @@ const TimelineComponent: FC<TimelineProps> = ({
   length = 1024,
   position = 1,
   framerate = 24,
-  altHopSize = 1,
-  hopSize = altHopSize,
+  hopSize = 1,
+  altHopSize = hopSize,
   playing = false,
   buffering = false,
   fullscreen = false,

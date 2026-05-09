@@ -40,7 +40,7 @@ def test_cache_labels_job(source, control_tag, with_counters, expected_cache_col
                 'from_name': 'label',  # Control tag used in the result
                 'to_name': 'text',
                 'type': 'labels',
-                'value': {'labels': [f'Label_{i%2+1}']},
+                'value': {'labels': [f'Label_{i % 2 + 1}']},
             }
         ]
         if use_predictions:

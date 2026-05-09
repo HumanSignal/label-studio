@@ -1,5 +1,4 @@
-"""This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
-"""
+"""This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license."""
 
 import logging
 from collections import defaultdict
@@ -32,6 +31,7 @@ def remove_duplicates(project, queryset, **kwargs):
         project,
         queryset,
         organization_id=project.organization_id,
+        queue_name='high',
     )
     return {'response_code': 200}
 
@@ -124,7 +124,7 @@ def move_annotations(duplicates):
                 Task.objects.get(id=task['id']).annotations.update(task_id=first['id'])
                 total_moved_annotations += task['total_annotations'] + task['cancelled_annotations']
                 logger.info(
-                    f"Moved {task['total_annotations']} annotations from task {task['id']} to task {first['id']}"
+                    f'Moved {task["total_annotations"]} annotations from task {task["id"]} to task {first["id"]}'
                 )
                 task['total_annotations'] = 0
                 task['cancelled_annotations'] = 0
@@ -181,7 +181,7 @@ def restore_storage_links_for_duplicated_tasks(duplicates) -> None:
                 link.save()
                 total_restored_links += 1
                 logger.info(
-                    f"Restored storage link for task {task['id']} from source task {tasks_with_storagelinks[0]['id']}"
+                    f'Restored storage link for task {task["id"]} from source task {tasks_with_storagelinks[0]["id"]}'
                 )
 
     logger.info(f'Restored {total_restored_links} storage links for duplicated tasks')

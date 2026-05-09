@@ -4,7 +4,7 @@ import { IconBan, IconSparks, IconStar } from "@humansignal/icons";
 import { Userpic } from "@humansignal/ui";
 import { Space } from "../../common/Space/Space";
 import { cn } from "../../utils/bem";
-import "./AnnotationTabs.scss";
+import "./AnnotationTabs.prefix.css";
 
 export const EntityTab = observer(
   forwardRef(
@@ -21,7 +21,7 @@ export const EntityTab = observer(
           onClick={(e) => {
             e.preventDefault();
             e.stopPropagation();
-            onClick?.(entity, prediction);
+            if (onClick) onClick(entity, prediction);
           }}
         >
           <Space size="small">

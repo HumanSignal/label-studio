@@ -1,6 +1,6 @@
 import React from "react";
-import { cn } from "../../../utils/bem";
-import "./Resizer.scss";
+import { cnm } from "@humansignal/ui";
+import styles from "./Resizer.module.css";
 
 const calculateWidth = (width, minWidth, maxWidth, initialX, currentX) => {
   const offset = currentX - initialX;
@@ -16,6 +16,7 @@ export const Resizer = ({
   initialWidth,
   className,
   type,
+  variant: variantProp,
   minWidth,
   maxWidth,
   showResizerLine,
@@ -23,6 +24,7 @@ export const Resizer = ({
   onResizeFinished,
   onReset,
 }) => {
+  const variant = variantProp ?? (type === "quickview" ? "quickview" : "column");
   const [width, setWidth] = React.useState(initialWidth ?? 150);
   const [isResizing, setIsResizing] = React.useState(false);
   const resizeHandler = React.useRef();
@@ -34,28 +36,30 @@ export const Resizer = ({
     onResizeCallback?.(newWidth);
   }, []);
 
-  /** @param {MouseEvent} evt */
+  /** @param {React.PointerEvent} evt */
   const handleResize = React.useCallback(
     (evt) => {
       evt.stopPropagation();
+      evt.preventDefault();
+      const handleEl = evt.currentTarget;
+      handleEl.setPointerCapture(evt.pointerId);
+
       const initialX = evt.pageX;
-      let newWidth = width;
 
-      /** @param {MouseEvent} evt */
-      const onResize = (evt) => {
-        newWidth = calculateWidth(width, minWidth, maxWidth, initialX, evt.pageX);
-
+      /** @param {PointerEvent} e */
+      const onResize = (e) => {
+        const newWidth = calculateWidth(width, minWidth, maxWidth, initialX, e.pageX);
         setWidth(newWidth);
         onResizeCallback?.(newWidth);
       };
 
-      const stopResize = (evt) => {
-        document.removeEventListener("mousemove", onResize);
-        document.removeEventListener("mouseup", stopResize);
+      /** @param {PointerEvent} e */
+      const stopResize = (e) => {
+        handleEl.removeEventListener("pointermove", onResize);
+        handleEl.removeEventListener("pointerup", stopResize);
         document.body.style.removeProperty("user-select");
 
-        newWidth = calculateWidth(width, minWidth, maxWidth, initialX, evt.pageX);
-
+        const newWidth = calculateWidth(width, minWidth, maxWidth, initialX, e.pageX);
         setIsResizing(false);
 
         if (newWidth !== width) {
@@ -64,8 +68,8 @@ export const Resizer = ({
         }
       };
 
-      document.addEventListener("mousemove", onResize);
-      document.addEventListener("mouseup", stopResize);
+      handleEl.addEventListener("pointermove", onResize);
+      handleEl.addEventListener("pointerup", stopResize);
       document.body.style.userSelect = "none";
       setIsResizing(true);
     },
@@ -73,19 +77,14 @@ export const Resizer = ({
   );
 
   return (
-    <div className={cn("resizer").mix(className).toClassName()} style={{ width }}>
-      <div className={cn("resizer").elem("content").toClassName()} style={style ?? {}}>
-        {children}
-      </div>
+    <div className={cnm(styles.root, variant === "quickview" && styles.quickview, className)} style={{ width }}>
+      <div style={style ?? {}}>{children}</div>
 
       <div
-        className={cn("resizer")
-          .elem("handle")
-          .mod({ resizing: showResizerLine !== false && isResizing, quickview: type === "quickview" })
-          .toClassName()}
+        className={cnm(styles.handle, showResizerLine !== false && isResizing && styles.handleResizing)}
         ref={resizeHandler}
         style={handleStyle}
-        onMouseDown={handleResize}
+        onPointerDown={handleResize}
         onDoubleClick={() => onReset?.()}
       />
     </div>

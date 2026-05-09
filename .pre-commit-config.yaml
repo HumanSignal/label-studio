@@ -1,27 +1,19 @@
 default_stages: [ pre-push ]
 repos:
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.14.9
+    rev: v0.15.1
     hooks:
+      # Run the linter.
       - id: ruff-check
-        args: [ --fix ]
-  - repo: https://github.com/grantjenks/blue
-    rev: v0.9.1
-    hooks:
-      - id: blue
-        args: [ --check, --diff, --color ]
-  - repo: https://github.com/biomejs/pre-commit
-    rev: "v0.1.0"
-    hooks:
-      - id: biome-check
-        args: [ --config-path, ./web ]
-        additional_dependencies: [ "@biomejs/biome@1.9.4" ]
-        files: ^web/.*
+        args: [ --no-fix, --show-fixes ]
+      # Run the formatter.
+      - id: ruff-format
+        args: [ --check, --diff ]
   - repo: local
     hooks:
-      - id: stylelint
-        name: stylelint
-        entry: bash -c 'cd web && npx stylelint **/*.scss --fix'
-        language: node
-        types: [ scss ]
-        files: ^.*\.scss$
+      - id: biome-check
+        name: biome-check
+        entry: bash -c 'cd web && yarn biome check . --diagnostic-level=error'
+        language: system
+        pass_filenames: false
+        files: ^web/.*

@@ -1,5 +1,5 @@
 ---
-title: Red-Teaming in Chat
+title: Red-Teaming in Chat 🔒
 type: templates
 category: Chat
 cat: Chat

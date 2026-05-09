@@ -1,0 +1,71 @@
+.badge {
+  display: inline-block;
+  border-radius: 4px;
+  background: linear-gradient(
+    135deg,
+    var(--color-accent-canteloupe-base) 0%,
+    var(--color-accent-persimmon-base) 50%,
+    var(--color-accent-plum-base) 100%
+  );
+  vertical-align: middle;
+  height: 20px;
+}
+
+.filled {
+  .label {
+    background: none;
+    color: var(--color-neutral-on-dark-content);
+  }
+
+  .icon {
+    & path {
+      fill: var(--color-neutral-on-dark-content);
+    }
+  }
+}
+
+.label {
+  margin: 1px;
+  background: linear-gradient(
+    135deg,
+    var(--color-accent-canteloupe-subtlest) 0%,
+    var(--color-accent-persimmon-subtlest) 50%,
+    var(--color-accent-plum-subtlest) 100%
+  );
+  color: var(--color-accent-persimmon-base);
+  border-radius: 3px;
+  font-size: 11px;
+  padding: 2px 5px 2px 3px;
+  display: flex;
+  gap: 4px;
+  align-items: center;
+  line-height: 100%;
+  font-weight: 500;
+  cursor: default;
+}
+
+.compact {
+  .label {
+    padding: 2px 3px;
+  }
+}
+
+.ghost {
+  background: none;
+  height: auto;
+  border-radius: 0;
+
+  .label {
+    margin: 0;
+    background: none;
+    border-radius: 0;
+    padding: 0;
+    color: var(--color-accent-persimmon-base);
+  }
+
+  .icon {
+    & path {
+      fill: var(--color-accent-persimmon-base);
+    }
+  }
+}

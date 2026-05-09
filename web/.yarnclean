@@ -1,0 +1,16 @@
+# Minimal .yarnclean for CI: reduce node_modules size without breaking resolution or build.
+# Only patterns that cannot affect module resolution, Jest, or docs generation are included.
+#
+# DO NOT add: types.js, dist, doc, docs, history, HISTORY, test, tests, __tests__,
+# or any package config (tsconfig, babelrc, webpack.config, etc.) — they break
+# react-dnd, react-router/history, jsdoc-to-markdown partials, and Jest.
+
+# Source maps only (~60MB+ savings; not required for resolution)
+*.js.map
+*.mjs.map
+*.ts.map
+*.css.map
+*.d.ts.map
+
+# CI metadata inside packages (safe to remove)
+.github

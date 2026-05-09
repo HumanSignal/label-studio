@@ -1,6 +1,6 @@
 import { forwardRef, createElement } from "react";
 import { cn } from "../../../../../utils/bem";
-import "./Label.scss";
+import "./Label.prefix.css";
 /** @deprecated - needs to be replaced with @humansignal/ui Label - visualizes differently currently */
 const Label = forwardRef(
   ({ text, children, required, placement, description, size, large, style, simple, flat }, ref) => {

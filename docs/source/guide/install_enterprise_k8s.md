@@ -43,8 +43,8 @@ If you want to install Label Studio Enterprise on Kubernetes and you have unrest
 2. [Prepare the Kubernetes cluster](#Prepare-the-Kubernetes-cluster).
 3. [Add the Helm chart repository](#Add-the-Helm-chart-repository).
 4. [Configure Kubernetes secrets](#Configure-Kubernetes-secrets)
-5. (Optional) Set up [persistent storage](persistent_storage.html). 
-6. (Optional) Configure [ingress](ingress_config.html).
+5. [Configure persistent storage](persistent_storage.html). 
+6. [Configure ingress](ingress_config.html).
 7. [Configure a values.yaml file](#Configure-values-yaml).
 8. (Optional) [Set up TLS for PostgreSQL](#Optional-set-up-TLS-for-PostgreSQL)
 9. (Optional) [Set up TLS for Redis](#Optional-set-up-TLS-for-Redis)
@@ -54,10 +54,15 @@ If you use a proxy to access the internet from your Kubernetes cluster, or it is
 
 ### Required software prerequisites
 
-- Kubernetes and kubectl version 1.17 or higher
-- Helm version 3.6.3 or higher
-- Redis version 6.0.5 or higher
-- PostgreSQL version 13.0 or higher
+- **Kubernetes** — version 1.17 or higher
+- **Helm** — version 3.6.3 or higher
+- **Redis** — version 6.0.5 or higher
+- **PostgreSQL** — version 13.0 or higher
+- **Persistent storage** — PVC with ReadWriteMany access mode or S3-compatible object storage
+
+Redis and PostgreSQL are mandatory components of Label Studio Enterprise and are required for it to be fully functional. This chart does not include or install Redis or PostgreSQL; you must have them preconfigured (for example, according to your company’s standards) and provide connection details in your Helm values.
+
+**Persistent storage** must use one of the following: a Persistent Volume Claim (PVC) with **ReadWriteMany** access mode, or S3-compatible object storage. See [Set up persistent storage](persistent_storage.html) for configuration details.
 
 This chart has been tested and confirmed to work with the [NGINX Ingress Controller](https://kubernetes.github.io/ingress-nginx/) and [cert-manager](https://cert-manager.io/docs/). See [Set up an ingress controller for Label Studio Kubernetes deployments](ingress_config.html) for more on ingress settings with Label Studio. 
 

@@ -22,16 +22,16 @@ app.humansignal.eu sends emails from the `humansignal.eu` domain by using [SendG
 
 - `159.183.231.189`
 
-## IP Ranges
+## IP ranges
 
 ### app.humansignal.com (app.heartex.com)
 
-#### Inbound Traffic IP Addresses
+#### Inbound traffic IP addresses
 - `34.199.69.93`
 - `52.22.82.31`
 - `3.233.209.176`
 
-#### Outbound Connections IP Addresses
+#### Outbound connections IP addresses
 *Used for Import/Export, ML backends, and Prompts*
 
 - `3.219.3.197`
@@ -40,12 +40,12 @@ app.humansignal.eu sends emails from the `humansignal.eu` domain by using [SendG
 
 ### app.humansignal.eu
 
-#### Inbound Traffic IP Addresses
+#### Inbound traffic IP addresses
 - `3.79.91.185`
 - `63.176.196.34`
 - `18.153.87.16`
 
-#### Outbound Connections IP Addresses
+#### Outbound connections IP addresses
 *Used for Import/Export, ML backends, and Prompts*
 
 - `52.59.18.15`
@@ -61,7 +61,7 @@ For setting up allow-lists in local HTTP(S) proxies, or other web-blocking softw
 
 Please note that our documentation and company pages, served via https://app.humansignal.com/docs/api and https://humansignal.com/ respectively, load certain page content directly from commonly used public CDN hostnames.
 
-## Usage Limits
+## Usage limits
 
 Label Studio imposes rate limits on a per-Access Token basis. If a request exceeds the rate limit, a response with a 429 status code is returned. Clients are advised to pause and retry after a short delay in such instances.
 
@@ -73,10 +73,13 @@ Label Studio imposes rate limits on a per-Access Token basis. If a request excee
 
 
 
-## Other Operational Limits
+## Other operational limits
 
 | Setting                  | Default Limit |
 |--------------------------|---------------|
 | Maximum import file size | 200 MB        |
 | Timeout for page load    | 90 seconds    |
 
+## Activity log retention
+
+Activity logs are retained for 180 days. 

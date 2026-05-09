@@ -8,9 +8,10 @@ import { Space } from "../../common/Space/Space";
 import { IconPlusCircle, IconComment, IconCommentRed, IconSparks } from "@humansignal/icons";
 import { Userpic } from "@humansignal/ui";
 import { cn } from "../../utils/bem";
-import { isDefined, userDisplayName } from "../../utils/utilities";
+import { userDisplayName } from "@humansignal/core";
+import { isDefined } from "../../utils/utilities";
 import { GroundTruth } from "../CurrentEntity/GroundTruth";
-import "./Annotations.scss";
+import "./Annotations.prefix.css";
 import { TimeAgo } from "../../common/TimeAgo/TimeAgo";
 import { reaction } from "mobx";
 

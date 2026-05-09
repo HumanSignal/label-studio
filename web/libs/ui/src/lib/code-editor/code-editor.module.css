@@ -1,0 +1,161 @@
+.codeEditor {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+
+  & textarea,
+  :global(.react-codemirror2) {
+    height: 100%;
+    width: 100%;
+    flex: 1;
+    font-family: var(--font-mono);
+    caret-color: var(--color-neutral-content);
+
+    :global(.CodeMirror) {
+      height: 100%;
+      width: 100%;
+      border: 1px solid var(--color-neutral-border);
+      background: var(--color-neutral-background);
+      color: var(--color-neutral-content-subtle);
+      border-radius: var(--corner-radius-small);
+    }
+
+    :global(.CodeMirror.dialog-opened) {
+      padding-top: 38px;
+    }
+
+    :global(.CodeMirror-lines) {
+      padding: var(--spacing-tight) 0;
+    }
+
+    :global(.CodeMirror-line) {
+      padding: 0 var(--spacing-tight);
+    }
+
+    /**
+     * @todo .CodeMirror-hints and all descendants are outside of editor in a modal,
+     * so we need to move them to the top level of this file
+     */
+    :global(.CodeMirror-hint-tag) {
+      white-space: normal;
+      line-height: 1.4em;
+      max-height: 3em;
+      max-width: 400px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    :global(.CodeMirror-hint-name) {
+      font-weight: 500;
+      color: darkgoldenrod;
+      font-family: var(--font-mono);
+    }
+
+    :global(.CodeMirror-hint-active) :global(.CodeMirror-hint-name) {
+      color: blanchedalmond;
+    }
+
+    :global(.CodeMirror-hint-type) {
+      font-style: italic;
+      color: #aaa;
+    }
+
+    :global(.CodeMirror-hint-active) :global(.CodeMirror-hint-type) {
+      color: #ddd;
+    }
+
+    :global(.CodeMirror-cursor) {
+      border-color: var(--color-neutral-content);
+    }
+
+    :global(.cm-attribute),
+    :global(.cm-keyword) {
+      color: var(--color-accent-blueberry-bold);
+    }
+
+    :global(.cm-def) {
+      color: var(--color-accent-grape-bold);
+    }
+
+    :global(.cm-builtin) {
+      color: var(--color-accent-canteloupe-bold);
+    }
+
+    :global(.cm-number) {
+      color: var(--color-accent-kiwi-bold);
+    }
+
+    :global(.cm-tag),
+    :global(.cm-bracket) {
+      color: var(--color-accent-kale-bold);
+    }
+
+    :global(.cm-string) {
+      color: var(--color-accent-persimmon-bold);
+    }
+
+    :global(.cm-comment) {
+      color: var(--color-accent-sand-bold);
+    }
+
+    :global(.cm-atom),
+    :global(.cm-meta) {
+      color: var(--color-accent-blueberry-bolder);
+    }
+
+    :global(.cm-variable),
+    :global(.cm-variable-2) {
+      color: var(--color-neutral-content);
+    }
+
+    :global(.cm-variable-3),
+    :global(.cm-type) {
+      color: var(--color-accent-kale-bolder);
+    }
+
+    :global(.CodeMirror-gutters) {
+      background-color: var(--color-neutral-surface-inset);
+      color: var(--color-neutral-content-subtlest);
+      border-right: 1px solid var(--color-neutral-border);
+    }
+  }
+}
+
+.border :global(.CodeMirror) {
+  border: 1px solid var(--color-neutral-border);
+}
+
+:global(.CodeMirror-hints) {
+  background-color: var(--color-neutral-background);
+  border: 1px solid var(--color-neutral-border);
+  box-shadow:
+    0 2px 4px rgba(var(--color-neutral-shadow-raw) / calc(30% * var(--shadow-intensity))),
+    0 4px 16px rgba(var(--color-neutral-shadow-raw) / calc(15% * var(--shadow-intensity)));
+
+  /* Create Project modal has z-index: 10000, so we have to overrule it */
+  z-index: 11000;
+  max-width: 600px;
+}
+
+:global(.CodeMirror-hints .CodeMirror-hint) {
+  color: var(--color-neutral-content);
+}
+
+:global(.CodeMirror-hints .CodeMirror-hint-active) {
+  color: var(--color-neutral-content);
+  background: var(--color-primary-emphasis-subtle);
+}
+
+:global(.CodeMirror-hints .CodeMirror-hint:hover) {
+  color: var(--color-neutral-content);
+  background: var(--color-primary-emphasis-subtle);
+}
+
+:global(.CodeMirror-hints .CodeMirror-hint-type) {
+  color: var(--color-neutral-content-subtle);
+}
+
+:global(.CodeMirror-hints .CodeMirror-hint-description) {
+  color: var(--color-neutral-content-subtler);
+}

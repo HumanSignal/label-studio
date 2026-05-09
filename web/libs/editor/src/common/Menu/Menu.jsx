@@ -1,7 +1,7 @@
 import { forwardRef, useCallback, useMemo } from "react";
 import { cn } from "../../utils/bem";
 import { useDropdown } from "@humansignal/ui";
-import "./Menu.scss";
+import "./Menu.prefix.css";
 import { MenuContext } from "./MenuContext";
 import { MenuItem } from "./MenuItem";
 
@@ -70,9 +70,9 @@ Menu.Group = ({ children, title, className, style }) => {
   const rootClass = cn("menu-group");
 
   return (
-    <li className={rootClass.mix(className)} style={style}>
-      <div className={rootClass.elem("title")}>{title}</div>
-      <ul className={rootClass.elem("list")}>{children}</ul>
+    <li className={rootClass.mix(className).toClassName()} style={style}>
+      <div className={rootClass.elem("title").toClassName()}>{title}</div>
+      <ul className={rootClass.elem("list").toClassName()}>{children}</ul>
     </li>
   );
 };

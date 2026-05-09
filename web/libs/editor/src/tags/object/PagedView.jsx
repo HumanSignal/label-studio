@@ -210,4 +210,4 @@ const HtxPagedView = observer(({ item }) => {
 
 Registry.addTag("pagedview", PagedViewModel, HtxPagedView);
 
-export { HtxPagedView, PagedViewModel };
+export { HtxPagedView, PagedViewModel, getStoredPageSize, setStoredPageSize, getQueryPage, updateQueryPage };

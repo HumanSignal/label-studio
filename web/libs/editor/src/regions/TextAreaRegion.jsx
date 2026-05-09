@@ -7,7 +7,7 @@ import Registry from "../core/Registry";
 import { TextAreaModel } from "../tags/control/TextArea/TextArea";
 import { guidGenerator } from "../core/Helpers";
 
-import styles from "./TextAreaRegion/TextAreaRegion.scss";
+import styles from "./TextAreaRegion/TextAreaRegion.prefix.css";
 import { HtxTextBox } from "../components/HtxTextBox/HtxTextBox";
 import { cn } from "../utils/bem";
 
@@ -111,7 +111,7 @@ const HtxTextAreaRegionView = ({ item, onFocus }) => {
   const name = `${parent?.name ?? ""}:${item.id}`;
 
   return (
-    <div {...divAttrs} className={cn("row").toString()} data-testid="textarea-region">
+    <div {...divAttrs} className={cn("row").toClassName()} data-testid="textarea-region">
       <HtxTextBox
         isEditable={editable}
         isDeleteable={deleteable}

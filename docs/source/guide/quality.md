@@ -183,11 +183,6 @@ Review a table to see the following for each annotator:
 - The agreement of their annotations with the ground truth annotations, if there are any.
 - The agreement of their annotations with predicted annotations, if there are any.
 
-See the following video for an overview of annotator agreement metrics: 
-
-<iframe class="video-border" width="560" height="315" src="https://www.youtube.com/embed/Lo_PVE9Pyw4?si=z1vtyI_xIo8aR8fY" width="100%" height="400vh" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-
-
 ### Review annotator agreement matrix
 
 You can also review the overall annotator agreement on a more individual basis with the annotator agreement matrix.

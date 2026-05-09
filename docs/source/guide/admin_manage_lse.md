@@ -6,7 +6,7 @@ type: guide
 order: 0
 order_enterprise: 372
 meta_title: Manage user accounts
-meta_description: How to assign users to roles, delete users, deactivate users
+meta_description: How to assign users to roles, delete users, tag users, and deactivate users
 section: "Manage Your Organization"
 parent: "manage_users"
 parent_enterprise: "manage_users"
@@ -46,8 +46,6 @@ To programmatically activate and assign roles to users, you can use the API:
 https://api.labelstud.io/api-reference/api-reference/organizations/members/update
 
 
-#### Determine the organization ID or user ID
-
 You can find user ID and organization ID from the **Organization** page:
 
 ![Screenshot of the role drop-down menu](/images/admin/user-ids.png)
@@ -57,6 +55,41 @@ You can also use the API:
 * [List organizations](https://api.labelstud.io/api-reference/api-reference/organizations/list)
 * [List members](https://api.labelstud.io/api-reference/api-reference/organizations/members/list)
 
+## Tag members
+
+You can tag organization members with metadata. 
+
+### Apply member tags via CSV
+
+To bulk apply member tags, go to the Organization page and click **Tag Members**. 
+
+From here you can upload a CSV with the following format:
+
+```csv
+email,tags
+heidi@humansignal.com,"Data Science, Seattle"
+sally@humansignal.com,"Finance, New York City"
+```
+
+* Ensure you include `email,tags` as the header. 
+* Tags must be encapsulated in quotation marks. 
+* If you have multiple tags, separate them with a comma. 
+
+
+
+!!! info Tip
+    If you are exporting the CSV from a spreadsheet editor, make sure you check the format in a text editor before uploading. Spreadsheet editors can add unnecessary formatting. 
+
+
+### Add and delete tags
+
+To delete or manually add new tags, go to **Organization > Settings > Member Tags**. 
+
+### Manually assign tags
+
+If you want to manually assign tags to individual users, you can use the **Tags** column in the org members table. 
+
+![screenshot](/images/admin/tags-apply.png)
 
 ## Deactivate users
 

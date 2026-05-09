@@ -42,7 +42,7 @@ jobs:
         with:
           ref: ${{ github.ref }}
 
-      - uses: dorny/paths-filter@v3
+      - uses: dorny/paths-filter@v4
         id: changes
         with:
           filters: |
@@ -58,8 +58,7 @@ jobs:
             frontend:
               - 'web/**'
               - '.github/workflows/tests-yarn-unit.yml'
-              - '.github/workflows/tests-yarn-integration.yml'
-              - '.github/workflows/tests-yarn-e2e.yml'
+              - '.github/workflows/tests-yarn-lsf.yml'
             docker:
               - 'label_studio/**'
               - 'web/**'
@@ -95,6 +94,11 @@ jobs:
           script: |
             const { repo, owner } = context.repo;
             const actor = process.env.ACTOR;
+            if (actor === 'cursor[bot]' || actor === 'claude[bot]') {
+              console.log(`Bypassing membership check for ${actor} GitHub App`);
+              core.setOutput("membership", "active");
+              return;
+            }
             const { data: membership } = await github.rest.orgs.getMembershipForUser({
               org: owner,
               username: actor,
@@ -127,30 +131,12 @@ jobs:
     with:
       head_sha: ${{ github.event.pull_request.head.sha || github.event.after }}
 
-  blue:
-    name: "Linter"
-    needs:
-      - changed_files
-    if: needs.changed_files.outputs.src == 'true'
-    uses: ./.github/workflows/blue.yml
-    with:
-      head_sha: ${{ github.event.pull_request.head.sha || github.event.after }}
-
   biome:
     name: "Linter"
     needs:
       - changed_files
     if: needs.changed_files.outputs.frontend == 'true'
     uses: ./.github/workflows/biome.yml
-    with:
-      head_sha: ${{ github.event.pull_request.head.sha || github.event.after }}
-
-  stylelint:
-    name: "Linter"
-    needs:
-      - changed_files
-    if: needs.changed_files.outputs.frontend == 'true'
-    uses: ./.github/workflows/stylelint.yml
     with:
       head_sha: ${{ github.event.pull_request.head.sha || github.event.after }}
 
@@ -183,34 +169,6 @@ jobs:
       sha: ${{ github.event.pull_request.head.sha || github.event.after }}
       branch_name: ${{ github.event.pull_request.head.ref || github.ref_name }}
     secrets: inherit
-
-  deploy:
-    name: "Deploy"
-    if: startsWith(github.ref_name, 'ls-release/')
-    runs-on: ubuntu-latest
-    needs:
-      - build-docker
-    steps:
-      - uses: actions/github-script@v8
-        env:
-          DOCKER_IMAGE_VERSION: ${{ needs.build-docker.outputs.build_version }}
-          RELEASE_NAME: 'ls-release'
-        with:
-          github-token: ${{ secrets.GIT_PAT }}
-          script: |
-            const docker_image_version = process.env.DOCKER_IMAGE_VERSION;
-            const release_name = process.env.RELEASE_NAME;
-            github.rest.actions.createWorkflowDispatch({
-              owner: "HumanSignal",
-              repo: "label-studio-enterprise",
-              workflow_id: "argocd-deploy.yml",
-              ref: "develop",
-              inputs: {
-                docker_image_version: docker_image_version,
-                release_name: release_name,
-                template_name: "lso",
-              }
-            });
 
   pytest:
     name: "Tests"
@@ -496,22 +454,12 @@ jobs:
       head_sha: ${{ github.event.pull_request.head.sha || github.event.after }}
     secrets: inherit
 
-  tests-yarn-integration:
+  tests-yarn-lsf:
     name: "Tests"
     needs:
       - changed_files
     if: needs.changed_files.outputs.frontend == 'true'
-    uses: ./.github/workflows/tests-yarn-integration.yml
-    with:
-      head_sha: ${{ github.event.pull_request.head.sha || github.event.after }}
-    secrets: inherit
-
-  tests-yarn-e2e:
-    name: "Tests"
-    needs:
-      - changed_files
-    if: needs.changed_files.outputs.frontend == 'true'
-    uses: ./.github/workflows/tests-yarn-e2e.yml
+    uses: ./.github/workflows/tests-yarn-lsf.yml
     with:
       head_sha: ${{ github.event.pull_request.head.sha || github.event.after }}
     secrets: inherit
@@ -523,22 +471,19 @@ jobs:
       - gitleaks
       - bandit
       - ruff
-      - blue
       - biome
-      - stylelint
       - pytest
       - migrations
       - build-docker
       - tests-yarn-unit
-      - tests-yarn-integration
-      - tests-yarn-e2e
+      - tests-yarn-lsf
       - cursor-review
     runs-on: ubuntu-latest
     steps:
       - name: Decide whether the needed jobs succeeded or failed
         uses: re-actors/alls-green@release/v1
         with:
-          allowed-skips: gitleaks, bandit, ruff, blue, biome, stylelint, pytest, migrations, conda-test, build-docker, tests-yarn-unit, tests-yarn-integration, tests-yarn-e2e, cursor-review
+          allowed-skips: gitleaks, bandit, ruff, biome, pytest, migrations, conda-test, build-docker, tests-yarn-unit, tests-yarn-lsf, cursor-review
           allowed-failures: |
             [
               "gitleaks",

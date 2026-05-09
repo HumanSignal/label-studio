@@ -40,6 +40,52 @@ The labeling interface is the central configuration point for projects. This det
 
 For information on setting up the labeling interface, see [Labeling configuration](setup). 
 
+## Members
+
+Use this section to add and remove project members. You can only configure project members for public projects (meaning the project is not in your Personal Sandbox workspace). 
+
+##### Add members
+
+Click **Add Members** to open a window where you can search for and add members to the project. Depending on your organization's permission settings, you may also be able to invite new users to an organization and automatically add them to the project. 
+
+!!! info Tip
+    If you are in the Admin or Owner role, you can bulk assign users to workspaces and projects from the **Organization > Members** page. 
+
+##### User roles and membership
+
+| Role | Membership |
+| ------------- | ------------ |
+| **Admins and Owners** | Cannot be added or removed from a public project. These users have access to all projects, regardless of state, unless the project is in a Personal Sandbox workspace. |
+| **Managers** | Must be added to a project or parent workspace to have access, but once added will have access to the project regardless of state. |
+| **Annotators and Reviewers** | Must be added to a project or parent workspace to have access, but cannot access projects until they are published. |
+
+##### Inherited members
+
+Managers, Reviewers, and Annotators who are added as members at the [workspace level](workspaces#Add-or-remove-workspace-members) are automatically granted membership to any projects within the workspace. 
+
+Admins and Owners have inherited membership because they have access to all public projects within an organizations. 
+
+##### Annotator roles 
+
+The annotator role is the most constrained role in Label Studio, and by default annotators can only access the labeling stream where they see tasks that are ready for labeling. 
+
+* If you have [Automatic distribution](#distribute-tasks) enabled, users with the Annotator role are automatically assigned tasks when they are added as members. Similarly, by default, project members with the Reviewer role are able to begin reviewing annotations once the tasks are labeled. 
+* If you have [Manual distribution](#distribute-tasks) enabled, you need to add users with the Annotator role as project members before you can assign them to tasks. And if you have [**Review only manually assigned tasks**](#reviewing-options) enabled, the users with the Reviewer role must also be project members before they can be assigned to tasks. 
+
+##### Project-level roles
+
+For users in the Annotator or Reviewer role (set at the organization level), you can change their role from project to project as needed. 
+
+For example, if Heidi Opossum is granted the Annotator role at the organization level, but you would like her to work as a Reviewer in "Project 1", you can set her project-level role to Reviewer.    
+
+To assign a project-level role, first add the person to your project. Once added, you can use the drop-down menu to change their role:
+
+![Screenshot](/images/project/member_roles.png)
+
+
+!!! note
+    This is only available for users who have the Annotator or Reviewer role applied at the organization level. Users with Manager, Administrator, and Owner role cannot have their permissions downgraded to Annotator or Reviewer on a per-project basis. 
+
 ## Annotation
 
 Use these settings to configure what options annotators will see and how their labeling tasks are assigned. 
@@ -136,6 +182,8 @@ When setting a reservation time, you should aim to allow a little above the max 
     For example, say you have multiple annotators working on a project. Your minimum annotation overlap is set to `2`. 
     
     Two annotators begin working on a task and it takes them both 15 minutes to complete, but your reservation time is 10 minutes. This means that after 10 minutes, another annotator can also begin working on that task - resulting in 3 annotations on the task rather than 2 (your minimum annotator overlap).
+
+    You can help avoid this by selecting **Enforce strict overlap** under [**Quality > Overlap of Annotations**](#overlap).
 
 </dd>
 
@@ -282,15 +330,23 @@ Enable **Show before reviewing** to display a pop-up message to reviewers when t
 
 <dd>
 
-Configure what is required for a task to be considered "reviewed."
+Use this section to configure:
+
+* How many annotations need to be accepted/rejected for the task to be considered reviewed (move from the **Needs Review** state to the **Done** state).
+
+* How many annotations need to be submitted for a task to enter the **Needs Review** state.
+
+* Whether a reviewer can only see tasks to which they've been assigned.
+
+For more information about states, see [Project states](project_states).
 
 !!! note
-    This metric determines:
+    Moving from **Needs Review** to **Done** influences the following:
 
-    * **Review stream**: When a task is removed from the review queue.
+    * **Review stream**: Tasks that are **Done** are not shown in the review stream (what reviewers see when they click **Review All Tasks**).
     * **Data Manager**: The value shown in the **Reviewed** column. 
     * **Export**: Which tasks are included when you want to only include reviewed tasks in your export snapshot.
-    * **Dashboards**: Reviewed counts and related metrics. 
+    * **Dashboards**: Various  counts and metric related to reviews. 
 
 <table>
 <thead>
@@ -306,7 +362,7 @@ Configure what is required for a task to be considered "reviewed."
 </td>
 <td>
 
-In a task where multiple annotators submitted labels, the reviewer only needs to accept one to consider the task reviewed. 
+For eligible tasks (tasks that enter the **Needs Review** state) in which multiple annotators submitted annotations, the reviewer only needs to accept one annotation to consider the task done. 
 
 </td>
 </tr>
@@ -317,7 +373,7 @@ In a task where multiple annotators submitted labels, the reviewer only needs to
 </td>
 <td>
 
-In a task where multiple annotators submitted labels, the reviewer needs to accept or reject annotations submitted by all annotators. 
+For eligible tasks (tasks that enter the **Needs Review** state) in which multiple annotators submitted annotations, the reviewer needs to either accept or reject **all** annotations to consider the task done.
 
 </td>
 </tr>
@@ -328,7 +384,9 @@ In a task where multiple annotators submitted labels, the reviewer needs to acce
 </td>
 <td>
 
-If enabled, a reviewer can only see tasks to which they've been assigned. Otherwise, they can view all tasks that are ready for review.
+If enabled, a reviewer can only see tasks to which they've been assigned.
+
+This also means that a task can progress from the **Annotating** state directly to the **Done** state if this is enabled and no reviewers are assigned. 
 
 </td>
 </tr>
@@ -339,13 +397,70 @@ If enabled, a reviewer can only see tasks to which they've been assigned. Otherw
 </td>
 <td>
 
-When enabled, a reviewer only sees tasks that have been completed by all required annotators. 
+When enabled, a task is considered ready for review only when it has achieved its annotation requirement.   
 
-If your project is using auto distribution, then this means a reviewer only sees tasks that have met the **Annotations per task** threshold. 
+If your project is using [auto distribution](#distribute-tasks), then this means the task has met the [**Annotations per task** threshold](#overlap). 
 
-If your project is using manual distribution, then this means a reviewer only sees tasks in which all assigned annotators have submitted an annotation. 
+If your project is using [manual distribution](#distribute-tasks), then this means all assigned annotators have submitted an annotation. 
 
 Note that in most cases, skipped tasks do not contribute towards meeting the minimum.  
+
+</td>
+</tr>
+</table>
+
+</dd>
+
+<dt id="review-sampling">Review Sampling <span class="badge"></span></dt>
+
+<dd>
+
+Determine how many eligible tasks need to be reviewed. 
+
+"Eligible" tasks are first defined by whether you have enabled **Show only finished tasks in the review stream**:
+
+* If enabled, then eligible tasks only include those tasks that have been completed by all required annotators. 
+* If not enabled, as soon as a task has at least one submitted annotation, it is eligible for review. 
+
+Eligible tasks enter the **Needs Review** state, which means they are included in the review stream.  
+
+You can use the review sampling settings to configure whether tasks can skip the **Needs Review** state and go straight to **Done**. 
+
+!!! note
+    The percentages set under **Review Sampling** are applied as probabilistic sampling rates, not exact quotas. 
+    
+    For example, setting **Basic Sampling** to 50% does not guarantee that exactly half of eligible tasks will be reviewed — the actual share will vary around 50%, with less variance the more tasks your project has.
+
+<table>
+<thead>
+    <tr>
+      <th style="width: 20%;">Field</th>
+      <th>Description</th>
+    </tr>
+</thead>
+<tr>
+<td>
+
+**Basic Sampling**
+</td>
+<td>
+
+Configure the percentage of eligible tasks that enter the **Needs Review** state.<br/><br/>For example, if you set this to 80%, then reviewers will see 80% of eligible tasks in the review stream. The remaining 20% of tasks will go straight to the **Done** state and skip the review stream. 
+
+</td>
+</tr>
+<tr>
+<td>
+
+**Agreement-based Sampling** 
+</td>
+<td>
+
+Use [agreement scores](stats) to determine which and how many tasks enter the **Needs Review** state vs. moving straight to the **Done** state.  
+<ul><li><b>Agreement threshold</b>: The agreement score threshold you will use to partition the the <b>High agreement</b>/<b>Low agreement</b> sampling rates.</li>
+<li><b>Agreement source</b>: The source of the agreement score used for the agreement threshold. You can select the overall task agreement or the control tag-level agreement score. For more information, see <a href="stats#Overall-vs-per-control-tag-agreement">Overall vs. per-control-tag agreement</a>.</li>
+<li><b>Low agreement</b>: The percentage of tasks with agreement scores that fall below the <b>Agreement threshold</b> that you want to enter the <b>Needs Review</b> state.</li>
+<li><b>High agreement</b>: The percentage of tasks with agreement scores that fall above the <b>Agreement threshold</b> that you want to enter the <b>Needs Review</b> state.</li></ul>
 
 </td>
 </tr>
@@ -357,7 +472,7 @@ Note that in most cases, skipped tasks do not contribute towards meeting the min
 
 <dd>
 
-Choose the order in which reviewers see tasks in the review stream.
+Select the order in which reviewers see tasks in the review stream.
 
 <table>
 <thead>
@@ -380,39 +495,16 @@ Tasks are ordered by their numeric ID (ascending). Annotation order within a tas
 <tr>
 <td>
 
-**Random**
+**Random** <br/>
 <span class="badge"></span>
 </td>
 <td>
 
-Tasks are shown in randomized task order while preserving the stable order of annotations within each task. This mode enables **Task limit (%)** (see below). 
-
-!!! note
-    If any tasks are selected in the Data Manager or reviewers use Quickview, this limit will not be applied. You can disable the Data Manager for reviewers in the project settings to avoid these situations.
+Tasks are shown in randomized task order while preserving the stable order of annotations within each task. 
 
 </td>
 </tr>
 </table>
-
-</dd>
-
-<dt id="task-limit">Task Limit (%) <span class="badge"></span></dt>
-
-<dd>
-
-Limit the portion of project tasks that are available to reviewers when **Task Ordering** is set to **Random**.
-
-Set this to a percentage from `0` to `100`. 
-
-!!! note
-    Note the following:
-
-    * This only applies only when sampling is **Random**. 
-    * If you enter a percentage of `≤0` or `≥100`, you will effectively disable limiting. 
-    * This limit is applied over the eligible task set after filters (for example, **Show only finished tasks**) are applied.
-    * If reviewers open the review stream by selecting tasks and then clicking **Label *n* Tasks** from the Data Manager, they will bypass the limit. 
-
-    For example, if a project has 1,000 tasks and the limit is set to 60%, at most ~600 tasks will be served for review under Random sampling. When the limit is reached, the API returns “no more annotations to review,” and the UI displays **Review finished**.
 
 </dd>
 
@@ -563,6 +655,9 @@ Note that in certain situations, this may be exceeded. For example, if there are
 
 Also note that only annotations created by distinct users count towards the overlap. For example, if the overlap is `2` and a user creates and submits two annotations on a single task (which can be done in Quick View), the overlap threshold will not be reached until another user submits an annotation. 
 
+!!! note
+    Setting annotations per task above 20 may impact loading performance in the Data Manager.
+
 </td>
 </tr>
 <tr>
@@ -597,7 +692,23 @@ If you want half of the tasks to be annotated by at least 3 people:
 
 If your overlap enforcement is less than 100% (meaning that only some tasks require multiple annotators), then the tasks that *do* require multiple annotations are shown first. <br /><br />If your overlap is 100%, then this setting has no effect.
 
-Note that if enabled, this setting supersedes what you specified under [**Annotations > Task Ordering Method**](#task-ordering)
+Note that if enabled, this setting supersedes what you specified under [**Annotations > Task Ordering Method**](#task-ordering).
+
+</td>
+</tr>
+<tr>
+<td>
+
+**Enforce strict overlap limit** 
+</td>
+<td>
+
+This setting strictly enforces your **Annotations per task** limit.<br /><br />If you do not enable this setting, you may see tasks where the number of annotations exceed your **Annotations per task** limit. This typically happens when you set a low [task reservation time](#lock-tasks), meaning that task locks expire before annotators submit their tasks. This allows other annotators to access and then submit the task, potentially resulting in an excess of annotations.<br /><br />
+
+When enabled, if an annotator tries to submit a task after the limit has been reached, they will receive an error message stating **Annotation Overlap Reached**. Their draft will be saved but they will be unable to submit. <br /><br />
+
+Note that enforcement only applies when the user submitting the annotation is in the Annotator role. All other roles are exempt. 
+
 
 </td>
 </tr>
@@ -696,9 +807,11 @@ Set this counter to zero if you want to skip onboarding and only use continuous 
 </td>
 <td>
 
-Annotators are presented with tasks in the order that is configured under [**Task Ordering Method**](#task-ordering). 
+Annotators are presented with ground truth tasks in the order that is configured under [**Task Ordering Method**](#task-ordering). 
 
-To have all ground truths presented as part of continuous evaluation, set the **Onboarding evaluation** counter to zero. You can also use a combination of both, so that annotators see a subset of ground truths immediately, and then are presented the remaining ground truths periodically as they progress through the project (depending on your task ordering method). 
+To have all ground truths presented as part of continuous evaluation, set the **Onboarding evaluation** counter to zero and set this number equal to the number of ground truth tasks in your project. 
+
+You can also use a combination of both, so that annotators see a subset of ground truths immediately, and then are presented the remaining ground truths periodically as they progress through the project (depending on your task ordering method). 
 
 </td>
 </tr>
@@ -760,7 +873,7 @@ For more information about pausing annotators, including how to manually pause s
 
 </dd>
 
-<dt id="task-agreement">Agreement</dt>
+<dt id="task-agreement">Agreement <span class="badge"></span></dt>
 
 <dd>
 
@@ -768,7 +881,10 @@ When multiple annotators are labeling a task, the task agreement reflects how mu
 
 For example, if 10 annotators review a task and only 2 select the same choice, then that task would have a low agreement score.  
 
-You can customize how task agreement is calculated and how it should affect the project workflow. For more information, see [Task agreement and how it is calculated](stats). 
+You can customize how task agreement is calculated and how it should affect the project workflow. For more information, see [Task agreement](stats). 
+
+!!! error Enterprise
+    Label Studio Starter Cloud only supports the **Pairwise** methodology. Each control tag uses the [default built-in metric](agreement_metrics#Default-metric-reference) for agreement calculation.
 
 <table>
 <thead>
@@ -780,20 +896,90 @@ You can customize how task agreement is calculated and how it should affect the 
 <tr>
 <td>
 
-**Agreement metric**
+**Methodology**
+
 </td>
 <td>
 
-Select the [metric](stats#Available-agreement-metrics) that should determine task agreement.
+Methodology to use for calculating task agreement. 
+
+* **Consensus**: Consensus measures *"What percentage of annotators chose the most common answer?"*
+* **Pairwise**: Pairwise measures *"What is the average agreement score across all pairs of annotators?"*
+
+For more information, see [Task agreement - methodology](stats#Methodology).
 
 </td>
 </tr>
 <tr>
 <td>
 
+**Built-in Metrics vs Custom**
+
+</td>
+<td>
+
+Select whether you want to use the built-in metrics or custom metrics for agreement.
+
+For more information, see [Built-in agreement metrics reference](agreement_metrics) and [Custom agreement metrics](custom_metric).
+
+</td>
+</tr>
+<tr>
+<td>
+
+**Overall Agreement**
+
+</td>
+<td>
+
+Configure how overall agreement is calculated by setting the weight for each control tag.
+
+For more information, see [Configure weight for the overall agreement](stats#Configure-weight-for-the-overall-agreement).
+
+
+</td>
+</tr>
+<tr>
+<td>
+
+**Agreement Columns**
+
+</td>
+<td>
+
+Configure how agreement is calculated for each control tag.
+
+For more information, see [Configure agreement for each control tag](stats#Configure-agreement-for-each-control-tag).
+
+</td>
+</tr>
+</table>
+
+</dd>
+
+<dt id="low-agreement">Low Agreement Resolution <span class="badge"></span></dt>
+
+<dd>
+
+!!! note
+    Low agreement resolution settings are only available when the project is configured to [automatically assign tasks](#distribute-tasks). If you are using Manual distribution, this section will not appear in your project settings.
+    
+    If you switch a project from Automatic to Manual distribution, low agreement resolution is automatically disabled.
+
+Resolve tasks with low agreement scores by automatically assigning additional annotators to the task. 
+
+<table>
+<thead>
+    <tr>
+      <th>Field</th>
+      <th>Description</th>
+    </tr>
+</thead>
+<tr>
+<td>
+
 **Assign additional annotator**
 
-<span class="badge"></span>
 </td>
 <td>
 Enable this option to automatically assign an additional annotator to any tasks that have a low agreement score. 
@@ -809,7 +995,6 @@ Note that to see this setting, the project must be set up with [automatic task a
 
 **Agreement threshold**
 
-<span class="badge"></span>
 </td>
 <td>
 
@@ -822,7 +1007,6 @@ Enter the agreement score that a task must meet before it can be considered comp
 
 **Maximum additional annotators**
 
-<span class="badge"></span>
 </td>
 <td>
 
@@ -838,44 +1022,7 @@ Annotators are assigned one at a time until the agreement threshold is achieved.
     When configuring **Maximum additional annotators**, be mindful of the number of annotators available in your project. If you have fewer annotators available than the sum of [**Annotations per task**](#overlap) + **Maximum additional annotators**, you might encounter a scenario in which a task with a low agreement score cannot be marked complete.
 
 </dd>
-
-<dt>Custom weights</dt>
-
-<dd>
-
-Set custom weights for tags and labels to change the agreement calculation. The options you are given are automatically generated from your labeling interface setup. 
-
-Weights set to zero are ignored from calculation.
-
-</dd>
 </dl>
-
-## Members
-
-Use this page to control which users are project members. 
-
-Project members have access to published projects, depending on the permissions associated with their role. For more information, see [User roles and permissions](admin_roles). 
-
-Some users cannot be added or removed from the Members page at the project level. These users include administrators, who already have access to every project (outside of the Sandbox). This also includes users who have been added as members to the Workspace. Workspace membership is inherited by the projects within the workspace.   
-
-* If you have [Automatic distribution](#distribute-tasks) enabled, users with the Annotator role are automatically assigned tasks when they are added as members. Similarly, by default, project members with the Reviewer role are able to begin reviewing annotations once the tasks are labeled. 
-
-* If you have [Manual distribution](#distribute-tasks) enabled, you need to add users with the Annotator role as project members before you can assign them to tasks. And if you have [**Review only manually assigned tasks**](#reviewing-options) enabled, the users with the Reviewer role must also be project members before they can be assigned to tasks. 
-
-#### Project-level roles
-
-Project-level roles are Annotator and Reviewer. 
-
-Users with these roles have their access constrained to the project level (meaning they cannot view organization-wide information and can only view project data when added to a project and assigned tasks). For more information, see [User roles and permissions](admin_roles).
-
-For Annotators and Reviewers, you can change their default role on a per-project basis to suit your needs. For example, a user can be assigned as an Annotator to "Project 1" and as a Reviewer to "Project 2." 
-
-To assign a project-level role, first add the person to your project. Once added, you can use the drop-down menu to change their role:
-
-![Screenshot of project-level role action](/images/project/member_roles.png)
-
-!!! note
-    This is only available for users who have the Annotator or Reviewer role applied at the organization level. Users with Manager, Administrator, and Owner role cannot have their permissions downgraded to Annotator or Reviewer on a per-project basis. 
 
 ## Model
 

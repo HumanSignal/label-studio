@@ -3,7 +3,7 @@ import React from "react";
 import { taskToLSFormat } from "../../../sdk/lsf-utils";
 import { cn } from "../../../utils/bem";
 import { Spinner } from "../Spinner";
-import "./AnnotationPreview.scss";
+import "./AnnotationPreview.prefix.css";
 
 const imgDefaultProps = { crossOrigin: "anonymous" };
 
@@ -127,12 +127,13 @@ export const AnnotationPreview = injector(
         {...imgDefaultProps}
         src={preview[`$${name}`][variant]}
         alt=""
+        loading="lazy"
         style={style}
         width={props.width}
         height={props.height}
       />
     ) : (
-      <div className={cn("annotation-preview").toString()} width={props.width} height={props.height}>
+      <div className={cn("annotation-preview").toClassName()} width={props.width} height={props.height}>
         <Spinner
           size={props.size ?? "default"}
           style={{
@@ -147,6 +148,7 @@ export const AnnotationPreview = injector(
           src={props.fallbackImage}
           style={{ ...(style ?? {}), opacity: 0.5 }}
           alt=""
+          loading="lazy"
           width={props.width}
           height={props.height}
         />

@@ -16,6 +16,9 @@ Installing Prompts in an on-prem environment requires installing Adala, our data
 
 You only need to complete these steps if you want to use Prompts. For more information, see our [Prompts overview](prompts_overview).
 
+!!! note
+    Prompts are only supported for Kubernetes deployments. If you are using Docker, you will need to migrate to a Kubernetes deployment to use Prompts. See [Deploy Label Studio Enterprise on Kubernetes](install_enterprise_k8s.html) for more information.
+
 
 ## Prerequisites
 
@@ -77,13 +80,13 @@ Create a file named `custom.values.yaml` with the following contents:
 adala-app:
   deployment:
     image:
-      tag: 20250428.151611-master-592e818
+      tag: 20260409.063233-main-6b619568
       pullSecrets:
         - heartex-pull-key
 adala-worker:
   deployment:
     image:
-      tag: 20250428.151611-master-592e818
+      tag: 20260409.063233-main-6b619568
       pullSecrets:
         - heartex-pull-key
 ```
@@ -165,3 +168,63 @@ Note the following for `PROMPTER_ADALA_URL`:
 - Port `8000` is the default port where Adala listens.
 
 After updating the values file, redeploy Label Studio to apply the changes.
+
+## 8. Optional: Add a custom CA bundle
+
+If your environment requires a custom CA bundle (for example, when communicating with an LLM provider behind a corporate proxy with a self-signed certificate), you must make the CA certificate available to the Adala pods.
+
+Because Label Studio Enterprise and Adala (Prompts) are deployed in separate namespaces, Kubernetes secrets cannot be shared between them. Even if you already have a CA bundle secret in the Label Studio namespace, you must create a new secret in the `prompt` namespace:
+
+```bash
+kubectl create secret generic custom-ca-bundle \
+  --from-file=ca.crt=my.cert \
+  -n prompt
+```
+
+Replace `my.cert` with the path to your CA certificate file. The key name (`ca.crt`) must match the `key` referenced in the values file below.
+
+Then add the following to your `custom.values.yaml` and re-run the `helm install`/`helm upgrade` command from step 5:
+
+```yaml
+adala-app:
+  deployment:
+    extraEnvVars:
+      REQUESTS_CA_BUNDLE: /etc/ssl/custom/ca.crt
+      SSL_CERT_FILE: /etc/ssl/custom/ca.crt
+    extraVolumeMounts:
+      - mountPath: /.cache
+        name: cache-dir
+      - mountPath: /etc/ssl/custom
+        name: custom-ca
+        readOnly: true
+    extraVolumes:
+      - name: cache-dir
+        emptyDir: {}
+      - name: custom-ca
+        secret:
+          secretName: custom-ca-bundle
+          items:
+            - key: ca.crt
+              path: ca.crt
+
+adala-worker:
+  deployment:
+    extraEnvVars:
+      REQUESTS_CA_BUNDLE: /etc/ssl/custom/ca.crt
+      SSL_CERT_FILE: /etc/ssl/custom/ca.crt
+    extraVolumeMounts:
+      - mountPath: /.cache
+        name: cache-dir
+      - mountPath: /etc/ssl/custom
+        name: custom-ca
+        readOnly: true
+    extraVolumes:
+      - name: cache-dir
+        emptyDir: {}
+      - name: custom-ca
+        secret:
+          secretName: custom-ca-bundle
+          items:
+            - key: ca.crt
+              path: ca.crt
+```

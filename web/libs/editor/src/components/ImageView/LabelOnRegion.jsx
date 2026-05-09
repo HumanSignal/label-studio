@@ -303,8 +303,11 @@ const LabelOnKP = observer(({ item, color }) => {
 });
 
 const LabelOnVideoBbox = observer(({ reg, box, color, scale, strokeWidth, adjacent = false }) => {
+  if (!reg?.store) return null;
+
   const isTexting = !!reg.texting;
   const labelText = reg.getLabelText(",");
+  const showLabels = reg.store.settings?.showLabels;
 
   return (
     <LabelOnBbox
@@ -314,7 +317,7 @@ const LabelOnVideoBbox = observer(({ reg, box, color, scale, strokeWidth, adjace
       isTexting={isTexting}
       text={labelText}
       score={reg.score}
-      showLabels={reg.store.settings.showLabels}
+      showLabels={showLabels}
       zoomScale={scale}
       color={color}
       maxWidth={box.width + strokeWidth}

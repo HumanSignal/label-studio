@@ -1,18 +1,18 @@
-import { IconQuestionOutline } from "@humansignal/icons";
-import { Tooltip, EnterpriseBadge } from "@humansignal/ui";
+import { IconQuestionOutline, IconSettings } from "@humansignal/icons";
+import { Tooltip, Badge } from "@humansignal/ui";
 import { inject } from "mobx-react";
 import { getRoot } from "mobx-state-tree";
 import { useCallback, useMemo } from "react";
 import { useShortcut } from "../../../sdk/hotkeys";
 import { cn } from "../../../utils/bem";
 import { FF_DEV_2536, isFF } from "../../../utils/feature-flags";
+import { isActive, FF_UTC_428_CONSENSUS_CONTROL_TAG_AGREEMENT } from "@humansignal/core/lib/utils/feature-flags";
 import * as CellViews from "../../CellViews";
 import { Icon } from "../../Common/Icon/Icon";
 import { Spinner } from "../../Common/Spinner";
 import { Table } from "../../Common/Table/Table";
-import { Tag } from "../../Common/Tag/Tag";
 import { GridView } from "../GridView/GridView";
-import "./Table.scss";
+import "./Table.prefix.css";
 import { Button } from "@humansignal/ui";
 import { useEffect, useState } from "react";
 import { EmptyState } from "./empty-state";
@@ -51,6 +51,10 @@ const injector = inject(({ store }) => {
     project: store.project ?? {},
     hasFilters: (currentView?.filtersApplied ?? 0) > 0,
     canLabel: totalTasks > 0 && foundTasks > 0,
+    // LSE-specific callbacks and components
+    onViewAnalytics: store.SDK?.onViewAnalytics,
+    onViewReviewerAnalytics: store.SDK?.onViewReviewerAnalytics,
+    RowContextMenuComponent: store.SDK?.RowContextMenuComponent,
   };
 
   return props;
@@ -75,6 +79,9 @@ export const DataView = injector(
     project,
     hasFilters,
     canLabel,
+    onViewAnalytics,
+    onViewReviewerAnalytics,
+    RowContextMenuComponent,
     ...props
   }) => {
     const [datasetStatusID, setDatasetStatusID] = useState(store.SDK.dataset?.status?.id);
@@ -115,46 +122,40 @@ export const DataView = injector(
     const columnHeaderExtra = useCallback(({ parent, original, help }, decoration) => {
       const children = [];
 
-      if (parent) {
+      if (parent && original?.alias !== "agreement") {
         children.push(
-          <Tag
-            key="column-type"
-            color="blue"
-            style={{
-              fontWeight: "500",
-              fontSize: 14,
-              cursor: "pointer",
-              width: 45,
-              padding: 0,
-            }}
-          >
+          <Badge key="column-type" size="small">
             {original?.readableType ?? parent.title}
-          </Tag>,
+          </Badge>,
         );
-      } else if (typeof original?.alias === "string" && original.alias.startsWith("dimension_agreement__")) {
+      } else if (typeof original?.alias === "string" && original.alias.startsWith("dimension_agreement_")) {
         // Show a short tag for per-dimension agreement columns (root columns, no parent)
         children.push(
-          <Tag
-            key="column-type"
-            color="blue"
-            style={{
-              fontWeight: "500",
-              fontSize: 14,
-              cursor: "pointer",
-              padding: "0 6px",
-            }}
-          >
+          <Badge key="column-type" size="small">
             {original.readableType}
-          </Tag>,
+          </Badge>,
         );
       }
 
-      // Add EnterpriseBadge when enterprise badge is set
+      // Add Badge when enterprise badge is set
       if (original.enterprise_badge) {
-        children.push(<EnterpriseBadge key="enterprise-badge" className="ml-2" compact />);
+        children.push(<EnterpriseBadge key="enterprise-badge" size="small" className="ml-tightest" children="" />);
       }
 
-      if (help && decoration?.help !== false) {
+      const isAgreementColumn =
+        typeof original?.alias === "string" &&
+        (original.alias === "agreement" || original.alias.startsWith("dimension_agreement_"));
+
+      // A column is a clickable button when: agreement with flag ON, or agreement_selected (always a button)
+      const isInteractiveAgreementColumn =
+        (isAgreementColumn && isActive(FF_UTC_428_CONSENSUS_CONTROL_TAG_AGREEMENT)) ||
+        (typeof original?.alias === "string" && original.alias === "agreement_selected");
+
+      if (isInteractiveAgreementColumn) {
+        children.push(<IconSettings width={16} height={16} className="ml-auto" />);
+      }
+
+      if (help && decoration?.help !== false && !isInteractiveAgreementColumn) {
         children.push(
           <Tooltip key="help-tooltip" title={help}>
             <Icon icon={IconQuestionOutline} style={{ opacity: 0.5 }} />
@@ -324,6 +325,14 @@ export const DataView = injector(
         isFF(FF_DEV_2536) && commonDecoration("comment_count", 60, "center"),
         isFF(FF_DEV_2536) && commonDecoration("unresolved_comment_count", 60, "center"),
         {
+          resolver: (col) => col.alias === "agreement",
+          style: { width: 130 },
+        },
+        {
+          resolver: (col) => typeof col.alias === "string" && col.alias.startsWith("dimension_agreement_"),
+          style: { width: 180 },
+        },
+        {
           resolver: (col) => col.type === "Number",
           style(col) {
             return /id/.test(col.id) ? { width: 50 } : { width: 110 };
@@ -383,6 +392,9 @@ export const DataView = injector(
             col.original.resetWidth();
           }}
           onDensityChange={setDensity}
+          onViewAnalytics={onViewAnalytics}
+          onViewReviewerAnalytics={onViewReviewerAnalytics}
+          RowContextMenuComponent={RowContextMenuComponent}
         />
       ) : (
         <GridView

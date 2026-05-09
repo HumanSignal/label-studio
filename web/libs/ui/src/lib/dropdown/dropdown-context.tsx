@@ -5,6 +5,7 @@ export interface DropdownContextValue {
   triggerRef: MutableRefObject<HTMLElement | undefined>;
   dropdown: RefObject<DropdownRef>;
   minIndex: number;
+  cursorPosition?: { x: number; y: number } | null;
   hasTarget(target: HTMLElement): boolean;
   addChild(child: DropdownContextValue): void;
   removeChild(child: DropdownContextValue): void;

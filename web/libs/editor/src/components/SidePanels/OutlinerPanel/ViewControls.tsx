@@ -20,9 +20,8 @@ import { Menu } from "../../../common/Menu/Menu";
 import MergeIcon from "./MergeIcon";
 import { cn } from "../../../utils/bem";
 import { SidePanelsContext } from "../SidePanelsContext";
-import "./ViewControls.scss";
+import "./ViewControls.prefix.css";
 import { observer } from "mobx-react";
-import { FF_DEV_3873, isFF } from "../../../utils/feature-flags";
 
 export type GroupingOptions = "manual" | "label" | "type";
 
@@ -78,7 +77,7 @@ export const ViewControls: FC<ViewControlsProps> = observer(
                 <IconList /> Group Manually
               </>
             ),
-            selectedLabel: isFF(FF_DEV_3873) ? "Manual" : "Manual Grouping",
+            selectedLabel: "Manual",
             icon: <IconList width={16} height={16} />,
             tooltip: "Manually Grouped",
           };
@@ -89,7 +88,7 @@ export const ViewControls: FC<ViewControlsProps> = observer(
                 <IconBoundingBox /> Group by Label
               </>
             ),
-            selectedLabel: isFF(FF_DEV_3873) ? "By Label" : "Grouped by Label",
+            selectedLabel: "By Label",
             icon: <IconBoundingBox width={16} height={16} />,
             tooltip: "Grouped by Label",
           };
@@ -100,7 +99,7 @@ export const ViewControls: FC<ViewControlsProps> = observer(
                 <IconCursor /> Group by Tool
               </>
             ),
-            selectedLabel: isFF(FF_DEV_3873) ? "By Tool" : "Grouped by Tool",
+            selectedLabel: "By Tool",
             icon: <IconCursor width={16} height={16} />,
             tooltip: "Grouped by Tool",
           };
@@ -216,7 +215,7 @@ const Grouping = <T extends string>({
         style={{
           width,
           minWidth: width,
-          borderRadius: isFF(FF_DEV_3873) && 4,
+          borderRadius: 4,
         }}
         selectedKeys={[value]}
         allowClickSelected={allowClickSelected}
@@ -243,13 +242,7 @@ const Grouping = <T extends string>({
         data-testid={`grouping-${value}`}
         look="string"
         leading={readableValue.icon}
-        trailing={
-          isFF(FF_DEV_3873) ? (
-            extraIcon
-          ) : (
-            <DirectionIndicator direction={direction} name={value} value={value} wrap={false} />
-          )
-        }
+        trailing={extraIcon}
       >
         {readableValue.selectedLabel}
       </Button>
@@ -286,7 +279,7 @@ interface DirectionIndicator {
 const DirectionIndicator: FC<DirectionIndicator> = ({ direction, value, name, wrap = true }) => {
   const content = direction === "asc" ? <IconSortUp /> : <IconSortDown />;
 
-  if (!direction || value !== name || isFF(FF_DEV_3873)) return null;
+  if (!direction || value !== name) return null;
   if (!wrap) return content;
 
   return <span>{content}</span>;

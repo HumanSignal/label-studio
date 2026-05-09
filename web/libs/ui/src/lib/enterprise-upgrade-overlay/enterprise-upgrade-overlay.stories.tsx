@@ -16,6 +16,7 @@ const meta: Meta<typeof EnterpriseUpgradeOverlay> = {
     "data-testid": { control: "text" },
     onContactSales: { action: "contact sales clicked" },
     onLearnMore: { action: "learn more clicked" },
+    onClose: { action: "close clicked" },
   },
   decorators: [
     (Story) => (
@@ -97,6 +98,21 @@ export const CustomButtonLabels: Story = {
     primaryButtonLabel: "Talk to Sales",
     secondaryButtonLabel: "View Pricing",
     learnMoreUrl: "https://humansignal.com/pricing",
+  },
+};
+
+/**
+ * Overlay with a close button — pass `onClose` to render the X in the top-right corner of the card.
+ * Useful when the overlay is triggered on demand (e.g. clicking a locked feature) rather than
+ * being a permanent gate, so users can dismiss it and return to the page.
+ */
+export const Closable: Story = {
+  args: {
+    title: "Agreement configuration is available in Label Studio Enterprise",
+    description: "Configure agreement metrics and calculation methods on the Enterprise plan.",
+    learnMoreUrl: "https://docs.humansignal.com/guide/stats",
+    secondaryButtonLabel: "Learn more",
+    onClose: () => {},
   },
 };
 

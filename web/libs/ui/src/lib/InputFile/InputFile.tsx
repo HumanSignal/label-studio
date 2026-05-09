@@ -9,7 +9,7 @@ type InputFileProps = HTMLAttributes<HTMLInputElement> & {
   props?: Record<string, any>;
 };
 
-import styles from "./InputFile.module.scss";
+import styles from "./InputFile.module.css";
 import type React from "react";
 import { forwardRef, type HTMLAttributes, useCallback, useRef } from "react";
 export const InputFile = forwardRef(({ name, className, text, onChange, ...props }: InputFileProps, ref: any) => {

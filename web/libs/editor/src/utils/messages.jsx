@@ -6,7 +6,7 @@ const URL_TAGS_DOCS = "https://labelstud.io/tags";
 export default {
   DONE: "Done!",
   NO_COMP_LEFT: "No more annotations",
-  NO_NEXT_TASK: "No More Tasks Left in Queue",
+  NO_NEXT_TASK: "You're all caught up!",
   NO_ACCESS: "You don't have access to this task",
 
   CONFIRM_TO_DELETE_ALL_REGIONS: "Please confirm you want to delete all labeled regions",

@@ -5,7 +5,7 @@ import { cn } from "../../utils/bem";
 import { FF_VIDEO_FRAME_SEEK_PRECISION, isFF } from "../../utils/feature-flags";
 import { clamp, isDefined } from "../../utils/utilities";
 import { useUpdateBuffering } from "../../hooks/useUpdateBuffering";
-import "./VideoCanvas.scss";
+import "./VideoCanvas.prefix.css";
 import { useLoopRange } from "./hooks/useLoopRange";
 import { MAX_ZOOM, MIN_ZOOM } from "./VideoConstants";
 import { VirtualCanvas } from "./VirtualCanvas";
@@ -554,8 +554,8 @@ export const VideoCanvas = memo(
 
     useEffect(() => {
       let isLoaded = false;
-      let loadTimeout: ReturnType<typeof setTimeout> | undefined = undefined;
-      let timeout: ReturnType<typeof setTimeout> | undefined = undefined;
+      let loadTimeout: ReturnType<typeof setTimeout> | undefined;
+      let timeout: ReturnType<typeof setTimeout> | undefined;
 
       const checkVideoLoaded = () => {
         if (isLoaded) return;

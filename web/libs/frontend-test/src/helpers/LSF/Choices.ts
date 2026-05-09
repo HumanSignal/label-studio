@@ -12,7 +12,7 @@ class ChoicesHelper {
 
   private _rootSelector: string;
   constructor(rootSelector) {
-    this._rootSelector = rootSelector.replace(/^\&/, this._baseRootSelector);
+    this._rootSelector = rootSelector.replace(/^&/, this._baseRootSelector);
   }
 
   get root() {

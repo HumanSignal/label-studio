@@ -137,36 +137,83 @@ LABEL_STUDIO_HOST=http://localhost:8080/foo docker-compose up -d
 
 ## Expose a local Label Studio instance outside using ngrok
 
-Sometimes it's useful to have the LabelStudio instance you're running on your local machine to be reachable over the internet.
+Sometimes it's useful to have the LabelStudio instance you're running on your local machine to be reachable over the internet. For example, if you want to share your Label Studio instance with a team member or a client.
 
 One way to do that is to use [ngrok](https://ngrok.io/), a reverse proxy that allows you to expose your instance to the Internet.
 
-1. Install `ngrok`: [Follow the official ngrok guidelines](https://ngrok.com/download)
-2. Authenticate the `ngrok` if this is your first time running it (the token can be obtained from [Ngrok dashboard](https://dashboard.ngrok.com/get-started/setup)): `ngrok config add-authtoken <Your token>`
-3. Start `ngrok` and point it at Label Studio: `ngrok http --host-header=rewrite 8080`
-4. Copy the `Forwarding` URL `ngrok` displays. e.g.: `https://xx-xx-xx-xx.eu.ngrok.io`
-5. Pass this url to Label Studio upon startup: 
+1. If you have Label Studio running, stop it (`Ctrl+C`).
+2. Sign up for a free ngrok account at [ngrok.com](https://dashboard.ngrok.com/signup).
+3. When you log in to your ngrok account, you will open [a dashboard with instructions](https://dashboard.ngrok.com/get-started/setup) to install ngrok and authenticate it. Complete both these steps:
+
+    ![Ngrok authentication](images/install/ngrok-dashboard.png)  
+
+4. Start ngrok and point it at Label Studio: 
+
+    ```bash
+    ngrok http --host-header=rewrite 8080
+    ```
+5. This will output a randomly generated URL. Copy this URL:
+
+    ![Ngrok URL](images/install/ngrok-url.png)
+
+5. Run the following commands (replace `your-subdomain.ngrok-free.app` with your actual ngrok URL as copied in step 5):
+
+
+   
+<div class="code-tabs">
+<div data-name="Native - Mac/Unix">
 
 ```bash
-# python instance
-LABEL_STUDIO_HOST=https://xx-xx-xx-xx.eu.ngrok.io label-studio start
+# Avoid CSRF errors 
+# Must exactly match the ngrok HTTPS URL, with no trailing slash
+export CSRF_TRUSTED_ORIGINS=https://your-subdomain.ngrok-free.app
+# Start Label Studio
+LABEL_STUDIO_HOST=https://your-subdomain.ngrok-free.app label-studio start
 ```
+</div>
+
+<div data-name="Native - Windows">
 
 ```bash
-# docker container
-docker run -it -e LABEL_STUDIO_HOST=https://xx-xx-xx-xx.eu.ngrok.io -p 8080:8080 -v <yourvolume>:/label-studio/data heartexlabs/label-studio:latest
+# Avoid CSRF errors 
+# Must exactly match the ngrok HTTPS URL, with no trailing slash
+set CSRF_TRUSTED_ORIGINS=https://your-subdomain.ngrok-free.app
+# Start Label Studio
+LABEL_STUDIO_HOST=https://your-subdomain.ngrok-free.app label-studio start
 ```
+</div>
 
-!!! attention "important"
-    As this is a non-root container, the mounted files and directories must have the proper permissions for the `UID 1001`.
+<div data-name="Docker Container">
 
 ```bash
-# docker-compose
-LABEL_STUDIO_HOST=https://xx-xx-xx-xx.eu.ngrok.io docker-compose up -d
+# Avoid CSRF errors 
+# Must exactly match the ngrok HTTPS URL, with no trailing slash
+docker run -it -p 8080:8080 \
+-e CSRF_TRUSTED_ORIGINS=https://your-subdomain.ngrok-free.app \ 
+-e LABEL_STUDIO_HOST=https://your-subdomain.ngrok-free.app \
+-v <yourvolume>:/label-studio/data \
+heartexlabs/label-studio:latest
 ```
+<div class="admonition attention"><p class="admonition-title">important</p>
+<p>As this is a non-root container, the mounted files and directories must have the proper permissions for the <code>UID 1001</code>.</p>
+</div>
 
-6. Open the ngrok URL in browser to make sure you see your instance
-7. Done
+</div>
+
+<div data-name="Docker Compose">
+
+```bash
+# Avoid CSRF errors 
+# Must exactly match the ngrok HTTPS URL, with no trailing slash
+CSRF_TRUSTED_ORIGINS=https://your-subdomain.ngrok-free.app \
+LABEL_STUDIO_HOST=https://your-subdomain.ngrok-free.app docker compose up -d
+```
+</div>
+</div>
+
+
+
+Now you can open the ngrok URL in browser to make sure you see your Label Studio instance. 
 
 
 ## Run Label Studio on Docker and use Local Storage

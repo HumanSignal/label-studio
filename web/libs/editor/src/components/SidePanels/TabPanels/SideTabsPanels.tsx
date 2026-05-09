@@ -11,7 +11,7 @@ import {
   DEFAULT_PANEL_WIDTH,
   PANEL_HEADER_HEIGHT,
 } from "../constants";
-import "../SidePanels.scss";
+import "../SidePanels.prefix.css";
 import { SidePanelsContext } from "../SidePanelsContext";
 import { useRegionsCopyPaste } from "../../../hooks/useRegionsCopyPaste";
 import { PanelTabsBase } from "./PanelTabsBase";
@@ -56,6 +56,7 @@ const SideTabsPanelsComponent: FC<SidePanelsProps> = ({
   panelsHidden,
   children,
   showComments,
+  showCustomTab,
   focusTab,
 }) => {
   const snapThreshold = 5;
@@ -69,7 +70,7 @@ const SideTabsPanelsComponent: FC<SidePanelsProps> = ({
   const [initialized, setInitialized] = useState(false);
   const rootRef = useRef<HTMLDivElement>();
   const [snap, setSnap] = useState<DropSide | Side | undefined>();
-  const initialState = useMemo(() => restorePanel(showComments), [showComments]);
+  const initialState = useMemo(() => restorePanel(showComments, showCustomTab), [showComments, showCustomTab]);
   const [panelData, setPanelData] = useState<Record<string, PanelBBox>>(initialState.panelData);
   const [collapsedSide, setCollapsedSide] = useState(initialState.collapsedSide);
   const [breakPointActiveTab, setBreakPointActiveTab] = useState(0);
@@ -197,7 +198,7 @@ const SideTabsPanelsComponent: FC<SidePanelsProps> = ({
       const panelLeftHit = left <= targetLeftWidth;
       const topHit = top <= snapThreshold;
       const bottomHit = bottom >= parentHeight - snapThreshold;
-      let snap: DropSide | undefined = undefined;
+      let snap: DropSide | undefined;
 
       if (!collapsedSideRef.current?.[Side.left] && panelLeftHit) {
         if (left <= snapThreshold) snap = DropSide.left;

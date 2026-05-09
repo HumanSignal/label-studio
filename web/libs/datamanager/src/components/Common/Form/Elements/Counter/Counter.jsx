@@ -6,7 +6,7 @@ import { Oneof } from "../../../Oneof/Oneof";
 import { FormField } from "../../FormField";
 import { useValueTracker } from "../../Utils";
 import { default as Label } from "../Label/Label";
-import "./Counter.scss";
+import "./Counter.prefix.css";
 
 const allowedKeys = ["ArrowUp", "ArrowDown", "Backspace", "Delete", /[0-9]/];
 

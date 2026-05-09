@@ -1,0 +1,17 @@
+.badge {
+  --badge-size: 20px;
+
+  height: var(--badge-size);
+  min-width: var(--badge-size);
+  border-radius: calc(var(--badge-size) / 2);
+  line-height: var(--badge-size);
+  padding: 0 6px;
+  flex-shrink: 0;
+  font-size: 12px;
+  font-weight: normal;
+  text-align: center;
+  white-space: nowrap;
+  background: var(--color-neutral-content-subtler);
+  color: var(--color-neutral-background);
+  box-shadow: 0 0 0 1px var(--color-neutral-background);
+}

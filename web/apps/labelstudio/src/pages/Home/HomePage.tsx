@@ -242,11 +242,7 @@ HomePage.title = "Home";
 HomePage.path = "/";
 HomePage.exact = true;
 
-function ProjectSimpleCard({
-  project,
-}: {
-  project: APIProject;
-}) {
+function ProjectSimpleCard({ project }: { project: APIProject }) {
   const finished = project.finished_task_number ?? 0;
   const total = project.task_number ?? 0;
   const progress = (total > 0 ? finished / total : 0) * 100;

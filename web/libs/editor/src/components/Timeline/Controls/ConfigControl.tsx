@@ -9,7 +9,7 @@ import { TimelineContext } from "../Context";
 import { ControlButton } from "../Controls";
 import { Slider } from "./Slider";
 import { SpectrogramControl } from "./SpectrogramControl";
-import "./ConfigControl.scss";
+import "./ConfigControl.prefix.css";
 import { FF_AUDIO_SPECTROGRAMS, isFF } from "../../../utils/feature-flags";
 
 // Define Scale Options Type

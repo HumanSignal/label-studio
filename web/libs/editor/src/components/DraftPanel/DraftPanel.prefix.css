@@ -1,0 +1,17 @@
+.draft-panel {
+  margin: 8px 0;
+
+  &__toggle {
+    border: 0;
+    vertical-align: -0.5px;
+    height: auto;
+    color: var(--grape_500);
+    background: none;
+    padding: 0;
+    cursor: pointer;
+
+    &:hover {
+      opacity: 0.8;
+    }
+  }
+}

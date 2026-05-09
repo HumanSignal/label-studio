@@ -1,0 +1,138 @@
+.menu-wrapper {
+  max-width: 100%;
+  min-height: 100vh;
+  min-width: 100vw;
+  font-size: 16px;
+}
+
+.menu-header {
+  top: 0;
+  height: var(--header-height);
+  z-index: 1000;
+  position: sticky;
+  display: flex;
+  box-sizing: border-box;
+  background-color: var(--color-neutral-background);
+  border-bottom: 1px solid var(--color-neutral-border);
+  transition: background-color 400ms ease-out;
+
+  &__spacer {
+    width: var(--spacing-tight);
+  }
+
+  &__context {
+    flex: 1;
+    display: flex;
+    padding: 0 0 0 1.125rem;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  &__context-item {
+    &_left,
+    &_right {
+      height: 100%;
+      display: flex;
+      align-items: center;
+    }
+
+    .button-ls {
+      height: 32px;
+    }
+  }
+
+  &__hotkeys {
+    display: flex;
+    padding: 0 var(--spacing-base);
+    align-items: center;
+  }
+
+  &__hotkeys-button {
+    & button {
+      & svg {
+        width: 20px;
+        height: 20px;
+        color: var(--color-neutral-content-subtler);
+      }
+
+      &:hover {
+        & svg {
+          color: var(--color-neutral-icon);
+        }
+      }
+    }
+  }
+
+  &__trigger {
+    display: flex;
+    padding: 0 20px;
+    cursor: pointer;
+    align-items: center;
+    justify-content: space-between;
+    min-width: 240px;
+    max-width: 240px;
+    box-sizing: border-box;
+    border-right: 1px solid var(--color-neutral-border);
+    transition: all 150ms ease-out;
+
+    &:hover {
+      background-color: var(--color-neutral-emphasis-subtle);
+    }
+  }
+
+  &__logo {
+    color: var(--color-neutral-content);
+    height: 22px;
+    width: 142px;
+  }
+
+  &__user {
+    display: flex;
+    margin: 0 var(--spacing-base);
+    align-self: center;
+    cursor: pointer;
+    position: relative;
+    align-items: center;
+    justify-content: center;
+  }
+
+  &__userpic-badge {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--primary_link);
+  }
+}
+
+.newsletter-menu-item {
+  width: 200px;
+  white-space: normal;
+  height: auto;
+  padding-bottom: 8px;
+  padding-top: 8px;
+  margin-top: -8px;
+  font-size: 14px;
+  position: relative;
+  background: var(--color-primary-background);
+  color: var(--color-neutral-content);
+  line-height: 1.4em;
+  transition: 0.2s all;
+
+  .main-menu &:hover {
+    background: var(--color-primary-emphasis-subtle);
+  }
+}
+
+.newsletter-menu-badge {
+  position: absolute;
+  display: block;
+  width: 8px;
+  height: 8px;
+  right: 8px;
+  top: 8px;
+  border-radius: 50%;
+  background: var(--primary_link);
+}

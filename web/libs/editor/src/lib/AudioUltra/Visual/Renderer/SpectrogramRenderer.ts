@@ -1,3 +1,4 @@
+// biome-ignore-all lint/correctness/noUnusedPrivateClassMembers: AudioUltra; skip unsafe removal
 import type { Layer } from "../Layer";
 import { clamp } from "../../Common/Utils";
 import { ComputationQueue, type DetailedComputationProgress, TaskPriority } from "../../Common/Worker/ComputationQueue";
@@ -73,7 +74,6 @@ export class SpectrogramRenderer implements Renderer<SpectrogramRendererConfig> 
   private isDestroyed = false;
   private lastRenderContext?: RenderContext;
   private readonly spectrogram: Layer;
-  private readonly gridLayer: Layer;
   private readonly progressContainer: HTMLElement;
   private rateLimitedRenderer: RateLimitedRenderer;
 

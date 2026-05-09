@@ -6,7 +6,7 @@ import Registry from "../../core/Registry";
 import Tree from "../../core/Tree";
 import { guidGenerator } from "../../utils/unique";
 import { clamp } from "../../utils/utilities";
-import "./Header.scss";
+import "./Header.prefix.css";
 import { Typography } from "@humansignal/ui";
 
 /**

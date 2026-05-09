@@ -1,6 +1,6 @@
 /* global describe, test, expect */
 import { timeFormat } from "d3";
-import { parseCSV, parseValue } from "../data";
+import { parseCSV, parseValue, tryToParseJSON, parseTypeAndOption } from "../data";
 
 const now = +new Date();
 const dateISO = timeFormat("%Y-%m-%d %H:%M:%S");
@@ -147,5 +147,47 @@ describe("parseValue", () => {
 
   test("Nested values", () => {
     expect(parseValue("$messages.greeting $messages.error [error]", data)).toEqual("Hey! It's broken. [error]");
+  });
+
+  test("returns empty string when value is falsy", () => {
+    expect(parseValue("", data)).toBe("");
+    expect(parseValue(null, data)).toBe("");
+    expect(parseValue(undefined, data)).toBe("");
+  });
+});
+
+describe("tryToParseJSON", () => {
+  test("returns parsed object when value is JSON object string", () => {
+    expect(tryToParseJSON('{"a":1}')).toEqual({ a: 1 });
+  });
+  test("returns false when value does not start with {", () => {
+    expect(tryToParseJSON("[1,2]")).toBe(false);
+    expect(tryToParseJSON("text")).toBe(false);
+  });
+  test("returns false when value is not a string", () => {
+    expect(tryToParseJSON(123)).toBe(false);
+  });
+  test("returns false when JSON parse throws", () => {
+    expect(tryToParseJSON("{ invalid }")).toBe(false);
+  });
+});
+
+describe("parseTypeAndOption", () => {
+  test("returns type and options from valueType string", () => {
+    expect(parseTypeAndOption("timeseries")).toEqual({ type: "timeseries", sep: undefined, options: {} });
+  });
+  test("parses separator and key=value options", () => {
+    expect(parseTypeAndOption("timeseries|foo=bar|baz=1")).toEqual({
+      type: "timeseries",
+      sep: "|",
+      options: { foo: "bar", baz: "1" },
+    });
+  });
+  test("options without value are true", () => {
+    expect(parseTypeAndOption("type|flag")).toEqual({
+      type: "type",
+      sep: "|",
+      options: { flag: true },
+    });
   });
 });

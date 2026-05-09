@@ -30,6 +30,10 @@ export interface FieldDefinition {
     field: string; // Name of the field this depends on
     value: any | ((dependencyValue: any, formData: Record<string, any>) => boolean); // The value or function to check if field should be enabled
   };
+  visibleWhen?: {
+    field: string; // Name of the field that depends on for visibility
+    value: string | string[] | ((dependencyValue: any, formData: Record<string, any>) => boolean); // Value(s) or function to check if field should be visible
+  };
 }
 
 export interface MessageDefinition {

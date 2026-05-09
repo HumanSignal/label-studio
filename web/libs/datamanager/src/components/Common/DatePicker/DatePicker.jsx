@@ -6,8 +6,8 @@ import { cn } from "../../../utils/bem";
 import { isDefined } from "../../../utils/utils";
 import { Dropdown } from "@humansignal/ui";
 import Input from "../Input/Input";
-import "./DatePicker.global.scss";
-import "./DatePicker.scss";
+import "./DatePicker.global.prefix.css";
+import "./DatePicker.prefix.css";
 
 export const DatePicker = ({
   size,
@@ -99,12 +99,12 @@ export const DatePicker = ({
   });
 
   return (
-    <div className={cn("datepicker")}>
+    <div className={cn("datepicker").toClassName()}>
       <Dropdown.Trigger
         ref={dropdownRef}
         toggle={false}
         content={
-          <div className={cn("datepicker").elem("wrapper")}>
+          <div className={cn("datepicker").elem("wrapper").toClassName()}>
             <DP
               {...dateRange}
               ref={datepickerRef}
@@ -120,7 +120,7 @@ export const DatePicker = ({
         }
         style={{ backgroundColor: "transparent", borderRadius: "1em" }}
       >
-        <div className={cn("datepicker").elem("output").mod({ range: selectRange })}>
+        <div className={cn("datepicker").elem("output").mod({ range: selectRange }).toClassName()}>
           <Input
             size={size}
             value={startDate || ""}
@@ -128,7 +128,7 @@ export const DatePicker = ({
           />
           {selectRange && (
             <>
-              <div className={cn("datepicker").elem("separator")}>and</div>
+              <div className={cn("datepicker").elem("separator").toClassName()}>and</div>
               <Input
                 size={size}
                 value={endDate || ""}

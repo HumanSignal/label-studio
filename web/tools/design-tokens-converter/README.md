@@ -24,17 +24,17 @@ nx design-tokens ui
 ```
 
 3. This will generate:
-   - `libs/ui/src/tokens/tokens.scss` - Contains CSS variables for light and dark themes
+   - `libs/ui/src/tokens/tokens.prefix.css` - Contains CSS variables for light and dark themes
    - `libs/ui/src/tokens/tokens.js` - Contains JavaScript object for Tailwind integration
 
 ## Importing the Generated Files
 
 ### CSS Variables
 
-Import the SCSS file in your main stylesheet:
+Import the CSS file in your main stylesheet:
 
-```scss
-@import 'libs/ui/src/tokens/tokens.scss';
+```css
+@import 'libs/ui/src/tokens/tokens.prefix.css';
 ```
 
 ### Tailwind Integration

@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import styles from "./Key.module.scss";
+import styles from "./Key.module.css";
 
 // Type definitions
 interface KeyboardKeyProps {
@@ -24,7 +24,7 @@ export const KeyboardKey = ({ children }: KeyboardKeyProps) => {
 
   // Split the key combination by common separators
   const keys = keyString
-    .split(/[\+\s]+/) // Split by + or spaces
+    .split(/[+\s]+/) // Split by + or spaces
     .filter((key) => key.trim().length > 0) // Remove empty strings
     .map((key) => key.trim()); // Trim whitespace
 

@@ -8,7 +8,7 @@ import { Spinner } from "../Common/Spinner";
 import { Tabs, TabsItem } from "../Common/Tabs/Tabs";
 import { FiltersSidebar } from "../Filters/FiltersSidebar/FilterSidebar";
 import { DataView } from "../MainView";
-import "./DataManager.scss";
+import "./DataManager.prefix.css";
 import { Toolbar } from "./Toolbar/Toolbar";
 
 const tabContentCN = cn("tabs-dm-content");
@@ -37,7 +37,7 @@ const switchInjector = inject(({ store }) => {
   return {
     sdk: store.SDK,
     views: store.viewsStore,
-    tabs: Array.from(store.viewsStore?.all ?? []),
+    tabs: store.viewsStore?.all ?? [],
     selectedKey: store.viewsStore?.selected?.key,
   };
 });
@@ -90,10 +90,11 @@ const TabsSwitch = switchInjector(
           <Draggable key={tab.key} draggableId={tab.key} index={index}>
             {(provided, snapshot) => (
               <div
-                className={tabContentCN.elem("draggable").toString()}
+                className={tabContentCN.elem("draggable").toClassName()}
                 ref={provided.innerRef}
                 {...provided.draggableProps}
                 {...provided.dragHandleProps}
+                tabIndex={-1}
                 style={{
                   background: snapshot.isDragging,
                   ...provided.draggableProps.style,
@@ -126,8 +127,8 @@ const TabsSwitch = switchInjector(
 
 export const DataManager = injector(({ shrinkWidth }) => {
   return (
-    <div className={tabContentCN.toString()}>
-      <div className={tabContentCN.elem("tab").mod({ shrink: shrinkWidth }).toString()}>
+    <div className={tabContentCN.toClassName()}>
+      <div className={tabContentCN.elem("tab").mod({ shrink: shrinkWidth }).toClassName()}>
         <Interface name="tabs">
           <TabsSwitch />
         </Interface>

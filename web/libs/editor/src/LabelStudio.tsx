@@ -2,7 +2,7 @@ import { configure } from "mobx";
 import { destroy } from "mobx-state-tree";
 import { render, unmountComponentAtNode } from "react-dom";
 import { createRoot } from "react-dom/client";
-import camelCase from "lodash/camelCase";
+import { camelCase } from "@humansignal/core/lib/utils/string";
 import { LabelStudio as LabelStudioReact } from "./Component";
 import App from "./components/App/App";
 import { configureStore } from "./configureStore";
@@ -177,17 +177,13 @@ export class LabelStudio {
          */
         this.store.selfDestroy();
       }
+
+      window.Htx = null;
       destroy(this.store);
       Hotkey.unbindAll();
-      if (isFF(FF_LSDV_4620_3_ML)) {
-        /*
-            ...
-            as well as nulling all these this.store
-         */
-        this.store = null;
-        this.destroy = null;
-        LabelStudio.instances.delete(this);
-      }
+      this.store = null;
+      this.destroy = null;
+      LabelStudio.instances.delete(this);
     };
   }
 

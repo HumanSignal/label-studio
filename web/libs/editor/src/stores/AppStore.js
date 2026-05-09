@@ -2,7 +2,7 @@
 
 import { destroy, detach, flow, getEnv, getParent, getSnapshot, isRoot, types, walk } from "mobx-state-tree";
 
-import uniqBy from "lodash/uniqBy";
+import { uniqBy } from "@humansignal/core/lib/utils/lodash-replacements";
 import InfoModal from "../components/Infomodal/Infomodal";
 import { Hotkey } from "../core/Hotkey";
 import { destroy as destroySharedStore } from "../mixins/SharedChoiceStore/mixin";
@@ -19,7 +19,6 @@ import { UserExtended } from "./UserStore";
 import { UserLabels } from "./UserLabels";
 import {
   FF_CUSTOM_SCRIPT,
-  FF_DEV_1536,
   FF_LSDV_4620_3_ML,
   FF_LSDV_4998,
   FF_REVIEWER_FLOW,
@@ -129,6 +128,17 @@ export default types
      */
     noAccess: types.optional(types.boolean, false),
     /**
+     * Flag for overlap reached - prevents annotation submission
+     */
+    overlapReached: types.optional(types.boolean, false),
+    /**
+     * Message to show when overlap is reached
+     */
+    overlapReachedMessage: types.optional(
+      types.string,
+      "Annotation overlap has been reached for this task. Your draft is preserved but cannot be submitted.",
+    ),
+    /**
      * Finish of labeling
      */
     labeledSuccess: types.optional(types.boolean, false),
@@ -155,7 +165,7 @@ export default types
 
     users: types.optional(types.array(UserExtended), []),
 
-    userLabels: isFF(FF_DEV_1536) ? types.optional(UserLabels, { controls: {} }) : types.undefined,
+    userLabels: types.optional(UserLabels, { controls: {} }),
 
     queueTotal: types.optional(types.number, 0),
 
@@ -283,6 +293,8 @@ export default types
         "isSubmitting",
         "noTask",
         "noAccess",
+        "overlapReached",
+        "overlapReachedMessage",
         "labeledSuccess",
         "awaitingSuggestions",
       ];
@@ -356,6 +368,7 @@ export default types
           if (annotationStore.viewingAll) return;
           if (isUpdateDisabled) return;
           if (entity.isReadOnly()) return;
+          if (entity.hasIncompletePolygons) return;
 
           entity?.submissionInProgress();
 
@@ -800,6 +813,11 @@ export default types
         destroy(oldAnnotationStore);
       }
 
+      // Do NOT forceClear the image cache on task switch. Destroyed ImageEntities
+      // already call releaseRef(), so old entries have refCount 0. Keeping them
+      // allows instant load when switching back to a previously viewed task.
+      // Cache evicts automatically when it exceeds maxSize (100).
+
       self.annotationStore = AnnotationStore.create({ annotations: [] });
       self.initialized = false;
     }
@@ -829,6 +847,25 @@ export default types
         if (isFF(FF_LSDV_4620_3_ML) && !appControls?.isRendered()) {
           appControls?.render();
         }
+      }
+
+      // Ensure users referenced by annotations exist in the users store
+      // before annotations are created. This prevents MST reference resolution errors
+      // when annotation.user references a user ID not yet present in the store
+      // (e.g. in review stream where annotators' user data isn't pre-loaded).
+      const allItems = [...(completions ?? []), ...(annotations ?? [])];
+      const userStubs = allItems
+        .map((item) => {
+          const userRef = item.user ?? item.completed_by;
+
+          if (typeof userRef === "number") return { id: userRef };
+          if (userRef && typeof userRef === "object" && userRef.id) return userRef;
+          return null;
+        })
+        .filter(Boolean);
+
+      if (userStubs.length) {
+        self.enrichUsers(userStubs);
       }
 
       // goal here is to deserialize everything fast and select only first annotation
@@ -922,6 +959,19 @@ export default types
 
         obj.deserializeResults(item.result ?? [], { hidden: true });
       });
+    }
+
+    /**
+     * Hydrate a stubbed history item with full result (FIT-720 lazy load).
+     * Called when the host fetches GET /api/annotation-history/<id>/ and passes the response.
+     */
+    function hydrateHistoryItem(historyId, fullItem) {
+      const as = self.annotationStore;
+      // historyId is the numeric API id (pk); store items have id=guid and pk=numeric from createItem
+      const item = as.history.find((h) => h.pk && Number(h.pk) === Number(historyId));
+      if (!item) return;
+      item.deserializeResults(fullItem?.result ?? [], { hidden: true });
+      as.selectHistory(item);
     }
 
     const setAutoAnnotation = (value) => {
@@ -1029,6 +1079,7 @@ export default types
       resetAnnotationStore,
       initializeStore,
       setHistory,
+      hydrateHistoryItem,
       attachHotkeys,
 
       skipTask,

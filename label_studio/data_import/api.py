@@ -1,5 +1,5 @@
-"""This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
-"""
+"""This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license."""
+
 import json
 import logging
 import mimetypes
@@ -33,6 +33,7 @@ from rest_framework.settings import api_settings
 from rest_framework.views import APIView
 from tasks.functions import update_tasks_counters
 from tasks.models import Prediction, Task
+from tasks.serializers import sanitize_prediction_import_payload
 from users.models import User
 from webhooks.models import WebhookAction
 from webhooks.utils import emit_webhooks_for_instance
@@ -239,9 +240,7 @@ task_create_response_scheme = {
             ```
 
             <br>
-        """.format(
-            host=(settings.HOSTNAME or 'https://localhost:8080')
-        ),
+        """.format(host=(settings.HOSTNAME or 'https://localhost:8080')),
         request=ImportApiSerializer(many=True),
         extensions={
             'x-fern-sdk-group-name': 'projects',
@@ -372,7 +371,6 @@ class ImportAPI(generics.CreateAPIView):
 
     @timeit
     def async_import(self, request, project, preannotated_from_fields, commit_to_project, return_task_ids):
-
         project_import = ProjectImport.objects.create(
             project=project,
             preannotated_from_fields=preannotated_from_fields,
@@ -537,11 +535,12 @@ class ImportPredictionsAPI(generics.CreateAPIView):
             # Build predictions for this batch
             batch_predictions = []
             for item in batch_items:
+                item = sanitize_prediction_import_payload(item)
                 task_id = item.get('task')
 
                 if task_id not in existing_task_ids:
                     raise ValidationError(
-                        f'{item} contains invalid "task" field: task ID {task_id} ' f'not found in project {project}'
+                        f'{item} contains invalid "task" field: task ID {task_id} not found in project {project}'
                     )
 
                 batch_predictions.append(
@@ -560,7 +559,7 @@ class ImportPredictionsAPI(generics.CreateAPIView):
             total_created += len(batch_created)
 
             logger.debug(
-                f'Processed batch {batch_start}-{batch_end-1}: created {len(batch_created)} predictions '
+                f'Processed batch {batch_start}-{batch_end - 1}: created {len(batch_created)} predictions '
                 f'(total so far: {total_created})'
             )
 
@@ -586,6 +585,7 @@ class ImportPredictionsAPI(generics.CreateAPIView):
         predictions = []
 
         for i, item in enumerate(self.request.data):
+            item = sanitize_prediction_import_payload(item)
             # Validate task ID
             if item.get('task') not in tasks_ids:
                 if flag_set('fflag_feat_utc_210_prediction_validation_15082025', user='auto'):
@@ -698,7 +698,6 @@ class ReImportAPI(ImportAPI):
         )
 
     def async_reimport(self, project, file_upload_ids, files_as_tasks_list, organization_id):
-
         project_reimport = ProjectReimport.objects.create(
             project=project, file_upload_ids=file_upload_ids, files_as_tasks_list=files_as_tasks_list
         )

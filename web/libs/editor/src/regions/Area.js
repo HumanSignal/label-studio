@@ -16,6 +16,7 @@ import { TimelineRegionModel } from "./TimelineRegion";
 import { TimeSeriesRegionModel } from "./TimeSeriesRegion";
 import { ParagraphsRegionModel } from "./ParagraphsRegion";
 import { VideoRectangleRegionModel } from "./VideoRectangleRegion";
+import { VideoVectorRegionModel } from "./VideoVectorRegion";
 import { BitmaskRegionModel } from "./BitmaskRegion";
 
 // general Area type for classification Results which doesn't belong to any real Area
@@ -75,9 +76,17 @@ const Area = types.union(
       const available = Registry.getAvailableAreas(tag.type, sn);
       // union of all available Areas for this Object type
 
-      // @todo dirty hack to distinguish two video types
       if (tag.type === "video") {
-        if (sn.sequence || sn.value?.sequence) return VideoRectangleRegionModel;
+        const seq = sn.sequence || sn.value?.sequence;
+
+        if (seq) {
+          const firstItem = Array.isArray(seq) ? seq[0] : null;
+
+          if (firstItem?.vertices !== undefined || sn.value?.vertices !== undefined) {
+            return VideoVectorRegionModel;
+          }
+          return VideoRectangleRegionModel;
+        }
         return TimelineRegionModel;
       }
 
@@ -98,6 +107,7 @@ const Area = types.union(
   BrushRegionModel,
   BitmaskRegionModel,
   VideoRectangleRegionModel,
+  VideoVectorRegionModel,
   ClassificationArea,
   ...Registry.customTags.map((t) => t.region).filter(Boolean),
 );

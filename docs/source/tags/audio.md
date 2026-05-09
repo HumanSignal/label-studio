@@ -8,6 +8,11 @@ meta_description: Customize Label Studio with the Audio tag for advanced audio a
 
 The Audio tag plays audio and shows its waveform. Use for audio annotation tasks where you want to label regions of audio, see the waveform, and manipulate audio during annotation.
 
+!!! error Enterprise
+    If you're managing more complex or high-volume audio labeling projects, Label Studio Enterprise includes an advanced audio transcription interface built to support faster, more precise annotation at scale.
+
+    See our new [Multi-Channel Audio Transcription](/templates/react_audio) template and learn more in [Blog - A New Audio Transcription UI for Speed and Quality at Scale](https://humansignal.com/blog/building-a-better-ui-for-audio-transcription-at-scale/).
+
 Use with the following data types: audio
 
 {% insertmd includes/tags/audio.md %}

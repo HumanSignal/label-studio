@@ -1,5 +1,5 @@
-"""This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
-"""
+"""This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license."""
+
 from django.urls import include, path
 from rest_framework import routers
 
@@ -21,6 +21,8 @@ _api_urlpatterns = [
         api.AnnotationDraftListAPI.as_view(),
         name='task-annotations-drafts',
     ),
+    # Agreement endpoint for Summary view
+    path('<int:pk>/agreement/', api.TaskAgreementAPI.as_view(), name='task-agreement'),
 ]
 
 _api_annotations_urlpatterns = [

@@ -1,0 +1,56 @@
+.topbar {
+  height: var(--topbar-height);
+  width: 100%;
+  z-index: 101;
+  flex: none;
+  display: flex;
+  align-items: stretch;
+  justify-content: space-between;
+  background-color: var(--color-neutral-surface);
+  border-bottom: 1px solid var(--color-neutral-border);
+  user-select: none;
+  position: sticky;
+  top: 0;
+
+  &__button {
+    transform: translateX(var(--spacing-tighter));
+  }
+
+  &__group {
+    display: flex;
+    align-items: stretch;
+    gap: var(--spacing-tight);
+    padding-left: var(--spacing-tight);
+    overflow: hidden;
+  }
+
+  &__section {
+    display: flex;
+    padding: 0 8px;
+    align-items: center;
+    box-sizing: border-box;
+
+    &_flat {
+      padding: 0;
+    }
+
+    & + & {
+      border-left: 1px solid var(--color-neutral-border);
+    }
+  }
+
+  &_newLabelingUI {
+    display: block;
+    background-color: var(--color-neutral-surface);
+    height: 42px;
+    border-bottom: 1px solid var(--color-neutral-border);
+
+    & .topbar {
+      &__group {
+        height: 42px;
+        flex: 1;
+        align-items: center;
+      }
+    }
+  }
+}

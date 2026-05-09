@@ -1,0 +1,25 @@
+.card {
+  border-radius: 5px;
+  background-color: var(--color-neutral-background);
+  border: 1px solid var(--color-neutral-border);
+
+  &__header {
+    display: flex;
+    height: 48px;
+    padding: 0 15px;
+    align-items: center;
+    font-weight: 500;
+    font-size: 16px;
+    line-height: 18px;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--color-neutral-border);
+  }
+
+  &__content {
+    padding: 15px;
+  }
+
+  &:not(:first-child) {
+    margin-top: 24px;
+  }
+}

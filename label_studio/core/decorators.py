@@ -4,7 +4,6 @@ from functools import wraps
 def permission_required(*permissions, fn=None):
     def decorator(view):
         def wrapped_view(self, request, *args, **kwargs):
-
             if callable(fn):
                 obj = fn(request, *args, **kwargs)
             else:

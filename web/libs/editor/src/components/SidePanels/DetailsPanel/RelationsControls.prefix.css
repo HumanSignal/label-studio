@@ -1,0 +1,33 @@
+.relation-controls {
+  display: flex;
+  align-items: center;
+
+  .button {
+    height: 24px;
+    font-size: 14px;
+    font-weight: 400;
+    padding: 0 2px !important;
+    justify-content: flex-start;
+
+    &__icon {
+      width: 24px;
+      height: 24px;
+      flex: none;
+      margin: 0;
+    }
+
+    &:focus {
+      box-shadow: none;
+    }
+
+    &:hover {
+      background: var(--color-neutral-surface-hover);
+      border-radius: 4px;
+    }
+
+    &[disabled] {
+      background-color: var(--color-neutral-background);
+      color: var(--color-neutral-content-subtlest);
+    }
+  }
+}

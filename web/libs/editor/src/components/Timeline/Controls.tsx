@@ -21,7 +21,7 @@ import { Hotkey, type HotkeyList } from "../../core/Hotkey";
 import { cn } from "../../utils/bem";
 import { isDefined } from "../../utils/utilities";
 import { TimelineContext } from "./Context";
-import "./Controls.scss";
+import "./Controls.prefix.css";
 import * as SideControls from "./SideControls";
 import type {
   TimelineControlsFormatterOptions,

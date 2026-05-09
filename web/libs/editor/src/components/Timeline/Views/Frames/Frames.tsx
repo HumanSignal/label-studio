@@ -1,12 +1,12 @@
 import { useResizeObserver } from "@humansignal/core/hooks/useResizeObserver";
-import clamp from "lodash/clamp";
+import { clamp } from "@humansignal/core/lib/utils/lodash-replacements";
 import { type FC, type MouseEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useMemoizedHandlers } from "../../../../hooks/useMemoizedHandlers";
 import { cn } from "../../../../utils/bem";
 import { isDefined } from "../../../../utils/utilities";
 import type { MSTTimelineRegion, TimelineRegion, TimelineViewProps } from "../../Types";
 import { Keypoints } from "./Keypoints";
-import "./Frames.scss";
+import "./Frames.prefix.css";
 
 /**
  * Effectively returns the frame on the given offset

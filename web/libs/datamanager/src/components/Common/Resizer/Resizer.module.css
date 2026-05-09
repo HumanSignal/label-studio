@@ -1,0 +1,50 @@
+.root {
+  --handle-size: 2px;
+  --handle-size-hover: 4px;
+  --handle-interactive-size: 8px;
+
+  & button {
+    &:focus {
+      outline: none;
+      box-shadow: none;
+    }
+  }
+
+  .handle {
+    top: var(--spacing-tight);
+    bottom: var(--spacing-tight);
+    position: absolute;
+    right: 0;
+    cursor: ew-resize;
+    z-index: 100;
+    width: var(--handle-interactive-size);
+
+    &::before {
+      width: var(--handle-size);
+      height: 100%;
+      background: var(--color-neutral-border);
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      transition:
+        width 150ms ease-out,
+        background-color 150ms ease-out;
+    }
+
+    &:hover::before,
+    &.handleResizing::before {
+      width: var(--handle-size-hover);
+      background-color: var(--color-primary-border-subtle);
+    }
+  }
+}
+
+.quickview {
+  & > .handle {
+    top: 0;
+    bottom: 0;
+    right: -4px;
+  }
+}

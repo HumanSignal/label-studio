@@ -5,15 +5,14 @@ import { useAtomValue } from "jotai";
 import clsx from "clsx";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { format } from "date-fns";
-import { useCopyText } from "@humansignal/core";
-import styles from "./PersonalJWTToken.module.scss";
+import { getApiInstance, useCopyText } from "@humansignal/core";
+import styles from "./PersonalJWTToken.module.css";
 import { Button } from "@humansignal/ui";
 
 /**
  * FIXME: This is legacy imports. We're not supposed to use such statements
  * each one of these eventually has to be migrated to core/ui
  */
-import { getApiInstance } from "@humansignal/core";
 import { modal, confirm } from "@humansignal/ui/lib/modal";
 import { Input, Label } from "apps/labelstudio/src/components/Form/Elements";
 import { Tooltip } from "@humansignal/ui";

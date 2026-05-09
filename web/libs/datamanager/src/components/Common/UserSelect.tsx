@@ -1,6 +1,6 @@
 import { observer } from "mobx-react";
 import { useState, useCallback, useMemo } from "react";
-import { debounce } from "../../utils/debounce";
+import { debounce } from "@humansignal/core/lib/utils/debounce";
 import { useDataManagerUsers } from "../../hooks/useUsers";
 import { Select, Tooltip, Userpic } from "@humansignal/ui";
 import { cn } from "../../utils/bem";

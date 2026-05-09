@@ -1,0 +1,113 @@
+.current-task {
+  padding: 0 var(--spacing-tight);
+  display: flex;
+  align-items: center;
+  position: relative;
+  width: auto;
+  height: 100%;
+
+  &::after {
+    content: "";
+    display: block;
+    width: 1px;
+    height: calc(100% - var(--spacing-tight) * 2);
+    background-color: var(--color-neutral-border);
+    position: absolute;
+    right: 0;
+    top: var(--spacing-tight);
+    bottom: var(--spacing-tight);
+  }
+
+  &_with-history {
+    height: 100%;
+    display: grid;
+    grid-template: "id buttons" 1fr "id buttons" 1fr / 1fr min-content;
+  }
+
+  &__task-id {
+    @apply text-body-smaller;
+
+    grid-area: id;
+    color: var(--color-neutral-content);
+    user-select: text;
+
+    &::before {
+      content: "#";
+    }
+  }
+
+  &__task-count {
+    @apply text-body-smaller;
+
+    grid-area: counter;
+    color: var(--color-neutral-content);
+    user-select: none;
+  }
+
+  &__history-controls {
+    display: flex;
+    grid-area: buttons;
+
+    &_newui {
+      gap: var(--spacing-tight);
+      margin-left: var(--spacing-tight);
+    }
+  }
+
+  &__prevnext {
+    width: 36px;
+    height: 36px;
+    place-self: center center;
+
+    &_newui {
+      &:hover {
+        background: var(--color-primary-emphasis-subtle);
+      }
+    }
+
+    &::before {
+      top: 50%;
+      left: 50%;
+      content: "";
+      width: 10px;
+      height: 10px;
+      display: block;
+      position: absolute;
+      border: 2px solid var(--color-neutral-icon);
+      border-bottom: none;
+      border-right: none;
+      margin-top: -3px;
+      transform: translate3d(-50%, -50%, 0) rotate(225deg);
+    }
+
+    &_next {
+      grid-area: n;
+      transform: rotate(-90deg);
+    }
+
+    &_next.current-task__prevnext_postpone::before {
+      border-color: var(--color-primary-border);
+    }
+
+    &_prev {
+      grid-area: p;
+      transform: rotate(90deg);
+    }
+
+    &_hidden {
+      display: none;
+    }
+
+    &_disabled {
+      &:hover {
+        background: inherit;
+      }
+
+      &::before {
+        border: 2px solid var(--color-neutral-content-subtlest);
+        border-bottom: none;
+        border-right: none;
+      }
+    }
+  }
+}

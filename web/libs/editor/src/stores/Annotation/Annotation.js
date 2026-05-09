@@ -1,4 +1,4 @@
-import throttle from "lodash/throttle";
+import { throttle } from "@humansignal/core/lib/utils/lodash-replacements";
 import { destroy, detach, flow, getEnv, getParent, getRoot, isAlive, onSnapshot, types } from "mobx-state-tree";
 import Canvas from "../../utils/canvas";
 import { decode, encode } from "@thi.ng/rle-pack";
@@ -12,15 +12,7 @@ import Types from "../../core/Types";
 import Area from "../../regions/Area";
 import Result from "../../regions/Result";
 import Utils from "../../utils";
-import {
-  FF_DEV_1284,
-  FF_DEV_3391,
-  FF_LLM_EPIC,
-  FF_LSDV_3009,
-  FF_LSDV_4583,
-  FF_REVIEWER_FLOW,
-  isFF,
-} from "../../utils/feature-flags";
+import { FF_DEV_1284, FF_DEV_3391, FF_LSDV_3009, FF_LSDV_4583, FF_REVIEWER_FLOW, isFF } from "../../utils/feature-flags";
 import { delay, isDefined } from "../../utils/utilities";
 import { CommentStore } from "../Comment/CommentStore";
 import RegionStore from "../RegionStore";
@@ -294,6 +286,14 @@ const _Annotation = types
       return results;
     },
 
+    get hasIncompletePolygons() {
+      if (!isAlive(self)) return false;
+      for (const area of self.areas.values()) {
+        if (area.type === "polygonregion" && area.incomplete) return true;
+      }
+      return false;
+    },
+
     get serialized() {
       // Dirty hack to force MST track changes
       self.areas.toJSON();
@@ -520,12 +520,14 @@ const _Annotation = types
 
     lockSelectedRegions() {
       for (const region of self.selectedRegions) {
+        if (region.incomplete === true) continue;
         region.setLocked(!region.locked);
       }
     },
 
     hideSelectedRegions() {
       for (const region of self.selectedRegions) {
+        if (region.incomplete === true) continue;
         region.toggleHidden();
       }
     },
@@ -1570,34 +1572,32 @@ const _Annotation = types
       const isGlobalClassification = item.classification;
 
       // this piece of code prevents from creating duplicated global classifications
-      if (isFF(FF_LLM_EPIC)) {
-        if (isGlobalClassification) {
-          const itemResult = item.results[0];
-          const areasIterator = self.areas.values();
+      if (isGlobalClassification) {
+        const itemResult = item.results[0];
+        const areasIterator = self.areas.values();
 
-          for (const area of areasIterator) {
-            const areaResult = area.results[0];
-            const isFound =
-              areaResult.from_name === itemResult.from_name &&
-              areaResult.to_name === itemResult.to_name &&
-              areaResult.item_index === itemResult.item_index;
+        for (const area of areasIterator) {
+          const areaResult = area.results[0];
+          const isFound =
+            areaResult.from_name === itemResult.from_name &&
+            areaResult.to_name === itemResult.to_name &&
+            areaResult.item_index === itemResult.item_index;
 
-            if (isFound) {
-              itemId = area.id;
-              break;
-            }
-          }
-        } else {
-          // @todo: there is a strange behaviour that should be documented somewhere
-          // On serialization we use area id as result id to save it somewhere
-          // and on deserialization we use result id as area id
-          // but when we use suggestions we should keep in mind that we need to do it manually or use serialized data instead
-          // or we can get weird regions duplication in some cases
-          const area = self.areas.get(item.cleanId);
-
-          if (area) {
+          if (isFound) {
             itemId = area.id;
+            break;
           }
+        }
+      } else {
+        // @todo: there is a strange behaviour that should be documented somewhere
+        // On serialization we use area id as result id to save it somewhere
+        // and on deserialization we use result id as area id
+        // but when we use suggestions we should keep in mind that we need to do it manually or use serialized data instead
+        // or we can get weird regions duplication in some cases
+        const area = self.areas.get(item.cleanId);
+
+        if (area) {
+          itemId = area.id;
         }
       }
 

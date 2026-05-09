@@ -13,10 +13,22 @@ class JWTAuthenticationMiddleware:
     def __init__(self, get_response):
         self.get_response = get_response
 
+    @staticmethod
+    def _has_bearer_jwt_token(request):
+        """Check if the Authorization header carries a Bearer token with JWT structure (xxx.xxx.xxx)."""
+        header = request.META.get('HTTP_AUTHORIZATION', '')
+        parts = header.split()
+        if len(parts) != 2 or parts[0].lower() != 'bearer':
+            return False
+        return parts[1].count('.') == 2
+
     def __call__(self, request):
         from core.feature_flags import flag_set
         from rest_framework_simplejwt.authentication import JWTAuthentication
         from rest_framework_simplejwt.exceptions import AuthenticationFailed, InvalidToken, TokenError
+
+        if not self._has_bearer_jwt_token(request):
+            return self.get_response(request)
 
         try:
             user_and_token = JWTAuthentication().authenticate(request)
@@ -33,6 +45,4 @@ class JWTAuthenticationMiddleware:
             return JsonResponse({'detail': 'User not found'}, status=status.HTTP_401_UNAUTHORIZED)
         except (AuthenticationFailed, InvalidToken, TokenError) as e:
             logger.info('JWT authentication failed: %s', e)
-            # don't raise 401 here, fallback to other auth methods (in case token is valid for them)
-            # (have unit tests verifying that this still results in a 401 if other auth mechanisms fail)
         return self.get_response(request)

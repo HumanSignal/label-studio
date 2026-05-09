@@ -21,9 +21,10 @@ export interface StateChipProps {
   description?: string;
 
   /**
-   * Tailwind CSS classes for styling the chip
+   * Badge variant for styling (e.g. "sand", "grape", "canteloupe", "kale", "plum").
+   * Use getStateVariant(state) from @humansignal/app-common to map state to variant.
    */
-  className: string;
+  variant: string;
 
   /**
    * Whether the chip should be interactive (clickable with popover)
@@ -49,7 +50,7 @@ export interface StateChipProps {
 export function StateChip({
   label,
   description,
-  className,
+  variant,
   interactive = false,
   popoverContent,
   open: controlledOpen,
@@ -66,7 +67,9 @@ export function StateChip({
     return (
       <Tooltip title={description || label}>
         <span>
-          <Badge className={className}>{label}</Badge>
+          <Badge variant={variant} shape="rounded">
+            {label}
+          </Badge>
         </span>
       </Tooltip>
     );
@@ -83,7 +86,9 @@ export function StateChip({
       type="button"
       title="Click to view history"
     >
-      <Badge className={className}>{label}</Badge>
+      <Badge variant={variant} shape="rounded">
+        {label}
+      </Badge>
     </button>
   );
 

@@ -1,5 +1,5 @@
-"""This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
-"""
+"""This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license."""
+
 import base64
 import datetime
 import logging
@@ -13,7 +13,7 @@ from urllib.parse import urljoin
 
 import ujson as json
 from core.bulk_update_utils import bulk_update
-from core.current_request import get_current_request
+from core.current_request import CurrentContext, get_current_request
 from core.feature_flags import flag_set
 from core.label_config import SINGLE_VALUED_TAGS
 from core.redis import start_job_async_or_sync
@@ -441,6 +441,7 @@ class Task(TaskMixin, FsmHistoryStateModel):
             }
 
     def resolve_uri(self, task_data, project):
+        # DEPRECATED: use resolve_uris instead.
         from io_storages.functions import get_storage_by_url
 
         if project.task_data_login and project.task_data_password:
@@ -487,6 +488,61 @@ class Task(TaskMixin, FsmHistoryStateModel):
                     if resolved_uri:
                         task_data[field] = resolved_uri
             return task_data
+
+    def resolve_uris(self, task_data, project):
+        """Resolve all cloud storage URIs across all project storages.
+
+        Unlike resolve_uri which picks one storage per field and resolves
+        only the first URI, this iterates all storages per field and resolves
+        every URI each storage can handle.
+        """
+        if project.task_data_login and project.task_data_password:
+            protected_data = {}
+            for key, value in task_data.items():
+                if isinstance(value, str) and string_is_url(value):
+                    path = (
+                        reverse('projects-file-proxy', kwargs={'pk': project.pk})
+                        + '?url='
+                        + base64.urlsafe_b64encode(value.encode()).decode()
+                    )
+                    value = urljoin(settings.HOSTNAME, path)
+                protected_data[key] = value
+            return protected_data
+
+        storage_objects = project.get_all_import_storage_objects
+
+        for field in task_data:
+            prepared_filename = self.prepare_filename(task_data[field])
+            if settings.CLOUD_FILE_STORAGE_ENABLED and self.is_upload_file(prepared_filename):
+                file_upload = fast_first(FileUpload.objects.filter(project=project, file=prepared_filename))
+                if file_upload is not None:
+                    task_data[field] = file_upload.url
+                else:
+                    task_data[field] = task_data[field] + '?not_uploaded_project_file'
+                continue
+
+            for storage_object in storage_objects:
+                try:
+                    resolved = storage_object.resolve_uris(task_data[field], self)
+                except Exception as exc:
+                    logger.debug(exc, exc_info=True)
+                    resolved = None
+                if resolved:
+                    task_data[field] = resolved
+
+            fallback_storage = self.storage
+            if fallback_storage:
+                storage_ids = {s.id for s in storage_objects}
+                if fallback_storage.id not in storage_ids:
+                    try:
+                        resolved = fallback_storage.resolve_uris(task_data[field], self)
+                    except Exception as exc:
+                        logger.debug(exc, exc_info=True)
+                        resolved = None
+                    if resolved:
+                        task_data[field] = resolved
+
+        return task_data
 
     @property
     def storage(self):
@@ -566,8 +622,8 @@ class Task(TaskMixin, FsmHistoryStateModel):
         return result
 
 
-pre_bulk_create = Signal()   # providing args 'objs' and 'batch_size'
-post_bulk_create = Signal()   # providing args 'objs' and 'batch_size'
+pre_bulk_create = Signal()  # providing args 'objs' and 'batch_size'
+post_bulk_create = Signal()  # providing args 'objs' and 'batch_size'
 
 
 class AnnotationQuerySet(models.QuerySet):
@@ -620,7 +676,7 @@ class Annotation(AnnotationMixin, FsmHistoryStateModel):
         'result',
         null=True,
         default=None,
-        help_text='The main value of annotator work - ' 'labeling result in JSON format',
+        help_text='The main value of annotator work - labeling result in JSON format',
     )
 
     task = models.ForeignKey(
@@ -1151,7 +1207,6 @@ class Prediction(models.Model):
             model_run: The model run that created the prediction.
         """
         try:
-
             # given the data receive, create annotation regions in LS format
             # e.g. {"sentiment": "positive"} -> {"value": {"choices": ["positive"]}, "from_name": "", "to_name": "", ..}
             pred = PredictionValue(result=label_interface.create_regions(data)).model_dump()
@@ -1168,8 +1223,7 @@ class Prediction(models.Model):
         except Exception as exc:
             # TODO: handle exceptions better
             logger.error(
-                f'Error creating prediction for task {task_id} with {data}: {exc}. '
-                f'Traceback: {traceback.format_exc()}'
+                f'Error creating prediction for task {task_id} with {data}: {exc}. Traceback: {traceback.format_exc()}'
             )
 
     class Meta:
@@ -1550,6 +1604,9 @@ def bulk_update_stats_project_tasks(tasks, project=None):
             first_task = Task.objects.get(id=task_ids[0])
             project = first_task.project
 
+        # Set user context so FSM checks work when this runs in an async worker
+        if project.created_by_id:
+            CurrentContext.set_user(project.created_by)
         bulk_update_is_labeled(task_ids, project)
     else:
         return deprecated_bulk_update_stats_project_tasks(tasks, project)

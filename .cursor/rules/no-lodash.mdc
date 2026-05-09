@@ -1,0 +1,33 @@
+---
+description: Prevent lodash usage - use es-toolkit via @humansignal/core wrappers
+globs: **/*.js,**/*.jsx,**/*.ts,**/*.tsx
+---
+
+# No Lodash — Use es-toolkit
+
+Do NOT import or use lodash in this codebase. Utilities are provided by **es-toolkit** and re-exported through **@humansignal/core** wrapper modules.
+
+## When you encounter or are about to write a lodash import
+
+1. STOP — do not add any `import ... from "lodash/..."` or `require("lodash...")`
+2. Do NOT import directly from `es-toolkit` or `es-toolkit/compat` in application code — always import through the **@humansignal/core** wrapper modules listed below. This keeps the dependency centralized and swappable.
+3. For `cloneDeep` use native `structuredClone(obj)`.
+
+## Import paths (subpath imports)
+
+- **debounce:** `import { debounce } from "@humansignal/core/lib/utils/debounce"`
+- **String utils** (camelCase, snakeCase, kebabCase, capitalize, startCase, pascalCase): `import { camelCase, snakeCase, kebabCase, capitalize, startCase, pascalCase } from "@humansignal/core/lib/utils/string"`
+- **Other utilities** (throttle, clamp, get, isMatch, uniqBy): `import { throttle, clamp, get, isMatch, uniqBy } from "@humansignal/core/lib/utils/lodash-replacements"`
+
+## Quick reference
+
+| Need | Import from |
+|------|-------------|
+| debounce | `@humansignal/core/lib/utils/debounce` |
+| throttle, clamp, get, isMatch, uniqBy | `@humansignal/core/lib/utils/lodash-replacements` |
+| camelCase, snakeCase, kebabCase, capitalize, startCase, pascalCase | `@humansignal/core/lib/utils/string` |
+| cloneDeep(obj) | `structuredClone(obj)` (native) |
+
+## Adding new utilities
+
+If you need a lodash function not listed above, check [es-toolkit](https://es-toolkit.dev/) first. Add it to the appropriate wrapper module in `@humansignal/core/lib/utils/` and re-export it — do not import es-toolkit directly in app code.

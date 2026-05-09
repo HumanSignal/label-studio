@@ -3,7 +3,7 @@
  * Shared between StateHistoryPopover and StateHistoryPopoverContent
  *
  * Uses CSS variable references for dark mode support.
- * Colors are defined in tokens.scss and automatically adapt to color scheme.
+ * Colors are defined in tokens.prefix.css and automatically adapt to color scheme.
  */
 
 import type React from "react";

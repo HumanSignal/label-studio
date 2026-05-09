@@ -8,13 +8,14 @@ import { Dropdown } from "@humansignal/ui";
 import { Menu } from "../../../common/Menu/Menu";
 import { Space } from "../../../common/Space/Space";
 import { cn } from "../../../utils/bem";
-import { humanDateDiff, userDisplayName } from "../../../utils/utilities";
+import { userDisplayName } from "@humansignal/core";
+import { humanDateDiff } from "../../../utils/utilities";
 import { CommentFormBase } from "../CommentFormBase";
 import { CommentsContext } from "./CommentsList";
 import { NewTaxonomy as Taxonomy, type TaxonomyPath } from "../../../components/NewTaxonomy/NewTaxonomy";
 import { taxonomyPathsToSelectedItems, COMMENT_TAXONOMY_OPTIONS } from "../../../utils/commentClassification";
 
-import "./CommentItem.scss";
+import "./CommentItem.prefix.css";
 import { LinkState } from "./LinkState";
 
 interface CommentItemProps {
@@ -42,11 +43,7 @@ interface CommentItemProps {
     setHighlighted: (value: boolean) => {};
     _commentRef: React.Ref<HTMLElement>;
   };
-  listComments: ({
-    suppressClearComments,
-  }: {
-    suppressClearComments: boolean;
-  }) => void;
+  listComments: ({ suppressClearComments }: { suppressClearComments: boolean }) => void;
   classificationsItems: any;
 }
 

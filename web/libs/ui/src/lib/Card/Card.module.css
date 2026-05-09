@@ -1,0 +1,35 @@
+.card {
+  border-radius: 5px;
+  background-color: var(--color-neutral-background);
+  border: 1px solid var(--color-neutral-border);
+
+  &:not(:first-child) {
+    margin-top: 24px;
+  }
+}
+
+.card.cardNoMargin {
+  &:not(:first-child) {
+    margin-top: 0;
+  }
+}
+
+.header {
+  display: flex;
+  height: 48px;
+  padding: 24px 24px 0;
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 18px;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--color-neutral-border);
+}
+
+.header.headerNoUnderline {
+  box-shadow: none;
+}
+
+.content {
+  padding: 24px;
+}

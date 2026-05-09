@@ -307,7 +307,7 @@ class TestSDKPredictionValidation:
                 {
                     'from_name': 'sentiment',
                     'to_name': 'text',
-                    'type': 'choices'
+                    'type': 'choices',
                     # Missing 'value' field
                 }
             ],
@@ -460,7 +460,7 @@ class TestSDKPredictionValidation:
                     'value': {
                         'labels': [['person']],
                         'start': 0,
-                        'end': 10
+                        'end': 10,
                         # Missing 'text' field
                     },
                 }

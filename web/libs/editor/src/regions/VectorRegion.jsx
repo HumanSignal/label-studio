@@ -71,7 +71,6 @@ const Model = types
     isDrawing: false,
     vectorRef: null,
     groupRef: null,
-    _justSelected: false,
   }))
   .views((self) => ({
     get store() {
@@ -165,6 +164,10 @@ const Model = types
           return { enabled: 6, disabled: 4 };
       }
     },
+    // Point style: "circle" or "rectangle"
+    get pointStyle() {
+      return self.control?.pointstyle ?? "circle";
+    },
     get disabled() {
       const tool = self.parent?.getToolsManager().findSelectedTool();
       return (tool?.disabled ?? false) || self.isReadOnly() || (!self.selected && !self.isDrawing);
@@ -246,16 +249,9 @@ const Model = types
           const wasNotSelected = !self.selected;
 
           if (wasNotSelected) {
-            // Set the flag before selecting to prevent double-click issues
-            // This will be cleared by selectRegion() when called from RegionStore
-            self._justSelected = true;
             annotation.selectArea(self);
           } else {
-            // If _justSelected is true, it means this click is part of a double-click
-            // Don't unselect - let the double-click handler manage selection
-            if (!self._justSelected) {
-              annotation.unselectAll();
-            }
+            annotation.unselectAll();
           }
         }
       },
@@ -264,30 +260,34 @@ const Model = types
         self._highlighted = val;
       },
 
-      updateCursor(isHovered = false) {
-        const stage = self.parent?.stageRef;
-        if (!stage) return;
-        const style = stage.container().style;
-
-        if (isHovered) {
-          if (self.annotation.isLinkingMode) {
-            style.cursor = "crosshair";
-          } else {
-            style.cursor = "pointer";
-          }
-          return;
+      /**
+       * Check if mouse pointer is currently over the vector shape
+       * Used by ImageView to determine cursor state
+       * For closed shapes, this checks both the path and the filled area inside
+       */
+      isHovered() {
+        if (!self.vectorRef || !self.parent?.stageRef) {
+          return false;
         }
 
-        const selectedTool = self.parent?.getToolsManager().findSelectedTool();
-        if (!selectedTool || !selectedTool.updateCursor) {
-          style.cursor = "default";
-        } else {
-          selectedTool.updateCursor();
-        }
-      },
+        const stage = self.parent.stageRef;
+        const pointerPos = stage.getPointerPosition();
 
-      isReadOnly() {
-        return self.readonly || self.annotation?.isReadOnly();
+        if (!pointerPos) {
+          return false;
+        }
+
+        // Use KonvaVector's hit testing method
+        // This method already checks:
+        // 1. If hovering over vertices
+        // 2. If hovering near path segments (within hitRadius)
+        // 3. If hovering inside closed polygons (for filled areas)
+        if (typeof self.vectorRef.isPointOverShape === "function") {
+          const isHovered = self.vectorRef.isPointOverShape(pointerPos.x, pointerPos.y);
+          return isHovered;
+        }
+
+        return false;
       },
 
       /**
@@ -441,17 +441,6 @@ const Model = types
       },
 
       /**
-       * Clear the just-selected flag (action for use in setTimeout)
-       */
-      clearJustSelectedFlag() {
-        self._justSelected = false;
-      },
-
-      setJustSelectedFlag(value) {
-        self._justSelected = value;
-      },
-
-      /**
        * Override selectRegion to reset transform mode when selecting from sidebar
        * This ensures transform mode is reset whether selecting by clicking on the shape
        * or selecting from the sidebar/outliner
@@ -462,16 +451,16 @@ const Model = types
         if (!preserveTransformMode) {
           self.setTransformMode(false);
         }
-        // Mark that we just selected this region (to prevent double-click from enabling transform mode)
-        self._justSelected = true;
-        setTimeout(() => {
-          self.clearJustSelectedFlag();
-        }, 300); // Clear after double-click detection window
         // Call parent selectRegion to handle scrolling
         self.scrollToRegion();
       },
 
       addPoint(x, y) {
+        // Don't allow adding points when region is readonly (includes locked)
+        if (self.isReadOnly()) {
+          return null;
+        }
+
         const image = self.parent.currentImageEntity;
         const width = image.naturalWidth;
         const height = image.naturalHeight;
@@ -499,6 +488,10 @@ const Model = types
       // Uses KonvaVector startPoint to start drawing
       // This will only initiate point drawing, but won't create actual point
       startPoint(x, y) {
+        // Don't allow adding points when region is readonly (includes locked)
+        if (self.isReadOnly()) {
+          return;
+        }
         self.vectorRef.startPoint(x, y);
       },
 
@@ -508,6 +501,10 @@ const Model = types
       //
       // This method is designed to create Bezier curve
       updatePoint(x, y) {
+        // Don't allow modifying points when region is readonly (includes locked)
+        if (self.isReadOnly()) {
+          return;
+        }
         self.vectorRef.updatePoint(x, y);
       },
 
@@ -515,6 +512,10 @@ const Model = types
       //
       // Will create a new point if it was started but never updated (regular click)
       commitPoint(x, y) {
+        // Don't allow adding points when region is readonly (includes locked)
+        if (self.isReadOnly()) {
+          return;
+        }
         self.vectorRef?.commitPoint(x, y);
       },
 
@@ -624,7 +625,8 @@ const HtxVectorView = observer(({ item, suggestion }) => {
   const { x: offsetX, y: offsetY } = item.parent?.layerZoomScalePosition ?? { x: 0, y: 0 };
   const disabled = item.disabled || suggestion || store.annotationStore.selected.isLinkingMode;
   const selected = !disabled; // Invert disabled to selected for KonvaVector
-  const isDisabled = item.locked; // Completely disable all interactions when locked
+  // Completely disable all interactions when readonly (includes locked, e.g., in View All mode), or Pan tool is active
+  const isDisabled = item.isReadOnly() || item.parent?.getSkipInteractions();
 
   // Wait for stage to be properly initialized
   if (!item.parent?.stageWidth || !item.parent?.stageHeight) {
@@ -644,7 +646,6 @@ const HtxVectorView = observer(({ item, suggestion }) => {
           isMultiRegionSelected={item.object?.selectedRegions?.length > 1}
           disableGhostLine={disableGhostLine}
           onFinish={(e) => {
-            console.log("on finish");
             if (disabled) return;
             e.evt.stopPropagation();
             e.evt.preventDefault();
@@ -687,26 +688,13 @@ const HtxVectorView = observer(({ item, suggestion }) => {
             if (item.isDrawing) return;
             if (e.evt.altKey || e.evt.ctrlKey || e.evt.shiftKey || e.evt.metaKey) return;
 
-            // If region was just selected (part of a double-click on unselected region),
-            // ignore this click to prevent it from unselecting
-            if (item._justSelected) {
-              e.cancelBubble = true;
-              return;
-            }
-
             e.cancelBubble = true;
 
-            // When clicking a selected region, set _justSelected flag temporarily
-            // to prevent unselection if this is part of a double-click
-            // The flag will be cleared by the double-click handler or after timeout
-            if (item.selected) {
-              item.setJustSelectedFlag(true);
-              setTimeout(() => {
-                // Only clear if still set (double-click handler might have cleared it)
-                if (item._justSelected) {
-                  item.clearJustSelectedFlag();
-                }
-              }, 200); // Slightly longer than debounce timeout to ensure double-click is detected
+            // If another region is being drawn, complete the drawing first
+            const tm = item.parent.getToolsManager();
+            const tool = tm.findSelectedTool();
+            if (tool?.currentArea && tool.currentArea !== item && tool.complete) {
+              tool.complete();
             }
 
             // Allow selection regardless of whether the path is closed
@@ -729,38 +717,6 @@ const HtxVectorView = observer(({ item, suggestion }) => {
               item.setHighlight(false);
             }
             item.updateCursor();
-          }}
-          onDblClick={(e) => {
-            e.evt.stopImmediatePropagation();
-            e.evt.stopPropagation();
-            e.evt.preventDefault();
-            e.cancelBubble = true;
-
-            // Clear the _justSelected flag if it was set (from first click of double-click)
-            // This prevents unselection logic from running
-            if (item._justSelected) {
-              item.clearJustSelectedFlag();
-            }
-
-            // Always ensure the region is selected first
-            // This handles the case where double-click starts from unselected state
-            const annotation = item.annotation;
-            if (!item.selected && annotation) {
-              // Select the region directly without going through _selectArea
-              // to avoid any potential unselection logic
-              annotation.selectArea(item);
-            }
-
-            // Always toggle transform mode for double-click (regardless of initial state)
-            // This ensures double-click always enters transform mode, whether starting from
-            // selected or unselected state
-            item.toggleTransformMode();
-
-            // Ensure the region stays selected after entering transform mode
-            // Transform mode requires the region to be selected (see line 868: transformMode={item.selected && ...})
-            if (!item.selected && annotation) {
-              annotation.selectArea(item);
-            }
           }}
           closed={item.closed}
           width={stageWidth}
@@ -790,6 +746,7 @@ const HtxVectorView = observer(({ item, suggestion }) => {
           pointStroke={item.selected ? "#ff0000" : regionStyles.strokeColor}
           pointStrokeSelected="#ff6b35"
           pointStrokeWidth={item.selected ? 2 : 1}
+          pointStyle={item.pointStyle}
           disableInternalPointAddition={true}
         />
 
