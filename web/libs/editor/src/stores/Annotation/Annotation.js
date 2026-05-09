@@ -12,7 +12,7 @@ import Types from "../../core/Types";
 import Area from "../../regions/Area";
 import Result from "../../regions/Result";
 import Utils from "../../utils";
-import { FF_DEV_1284, FF_DEV_3391, FF_LSDV_3009, FF_LSDV_4583, FF_REVIEWER_FLOW, isFF } from "../../utils/feature-flags";
+import { FF_DEV_1284, FF_DEV_3391, FF_LSDV_4583, FF_REVIEWER_FLOW, isFF } from "../../utils/feature-flags";
 import { delay, isDefined } from "../../utils/utilities";
 import { CommentStore } from "../Comment/CommentStore";
 import RegionStore from "../RegionStore";
@@ -966,7 +966,7 @@ const _Annotation = types
       const result = self.serializeAnnotation({ fast: true });
       // if this is new annotation and no regions added yet
 
-      if (!isFF(FF_LSDV_3009) && !self.pk && !result.length) return;
+      if (!self.pk && !result.length) return;
 
       self.setDraftSelected();
       self.versions.draft = result;
