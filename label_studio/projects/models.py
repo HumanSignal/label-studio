@@ -807,7 +807,9 @@ class Project(ProjectMixin, FsmHistoryStateModel):
         """
         params = {'project': self}
 
-        if model_version:
+        if model_version is None or model_version == 'undefined':
+            params.update({'model_version__isnull': True})
+        else:
             params.update({'model_version': model_version})
 
         predictions = Prediction.objects.filter(**params)
