@@ -1,4 +1,5 @@
-import React, { useContext, useEffect } from "react";
+import type React from "react";
+import { useContext, useEffect } from "react";
 import { render, waitFor } from "@testing-library/react";
 import { TourContext, TourProvider, type TourAction } from "./TourProvider";
 
