@@ -62,11 +62,6 @@ export const FF_ENTERPRISE_EMAIL_NOTIFICATIONS = "fflag_feat_front_fit_183_email
 export const FF_NEW_STORAGES = "fflag_feat_bros_193_new_cloud_storage_providers_short";
 
 /**
- * Datamanager filter members
- */
-export const FF_DM_FILTER_MEMBERS = "fflag_feat_fit_449_datamanager_filter_members_short";
-
-/**
  * Modify MST models to allow custom tags
  */
 export const FF_CUSTOM_TAGS = "fflag_feat_front_bros_194_custom_tags_short";

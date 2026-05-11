@@ -10,8 +10,6 @@ import { Tooltip, Userpic } from "@humansignal/ui";
 import { Common } from "../../Filters/types";
 import { useAvatarOverflow } from "../../../hooks/useAvatarOverflow";
 import "./Annotators.prefix.css";
-import { isActive, FF_DM_FILTER_MEMBERS } from "@humansignal/core/lib/utils/feature-flags";
-import { VariantSelect } from "../../Filters/types/List";
 import { UserSelect } from "../../Common/UserSelect";
 
 export const Annotators = (cell) => {
@@ -151,13 +149,13 @@ Annotators.customOperators = [
     key: "contains",
     label: "contains",
     valueType: "list",
-    input: (props) => (isActive(FF_DM_FILTER_MEMBERS) ? <UserSelect {...props} /> : <VariantSelect {...props} />),
+    input: (props) => <UserSelect {...props} />,
   },
   {
     key: "not_contains",
     label: "not contains",
     valueType: "list",
-    input: (props) => (isActive(FF_DM_FILTER_MEMBERS) ? <UserSelect {...props} /> : <VariantSelect {...props} />),
+    input: (props) => <UserSelect {...props} />,
   },
   ...Common,
 ];

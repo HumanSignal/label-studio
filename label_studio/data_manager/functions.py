@@ -6,7 +6,6 @@ from typing import Any, Iterable, Tuple
 from urllib.parse import unquote
 
 import ujson as json
-from core.feature_flags import flag_set
 from core.utils.common import int_from_request
 from data_manager.models import View
 from data_manager.prepare_params import PrepareParams
@@ -70,8 +69,6 @@ def get_all_columns(project, *_):
         task_data_children.append(column['id'])
         i += 1
 
-    remove_members_schema = flag_set('fflag_feat_fit_449_datamanager_filter_members_short', user='auto')
-
     # --- Data root ---
     data_root = {
         'id': 'data',
@@ -106,11 +103,6 @@ def get_all_columns(project, *_):
             'project_defined': False,
         }
     ]
-
-    if remove_members_schema:
-        project_members = []
-    else:
-        project_members = project.all_members.values_list('id', flat=True)
 
     result['columns'] += [
         {
@@ -155,7 +147,6 @@ def get_all_columns(project, *_):
             'type': 'List',
             'target': 'tasks',
             'help': 'All users who completed the task',
-            **({'schema': {'items': project_members}} if not remove_members_schema else {}),
             'visibility_defaults': {'explore': True, 'labeling': False},
             'project_defined': False,
         },
@@ -247,7 +238,6 @@ def get_all_columns(project, *_):
             'type': 'List',
             'target': 'tasks',
             'help': 'User who did the last task update',
-            **({'schema': {'items': project_members}} if not remove_members_schema else {}),
             'visibility_defaults': {'explore': False, 'labeling': False},
             'project_defined': False,
         },
