@@ -1,6 +1,6 @@
 ---
-title: Use the Agent to create an Interface
-short: Create with Agent
+title: Use the Label Studio agent to create an Interface
+short: Create with agent
 tier: enterprise
 type: guide
 order: 0
