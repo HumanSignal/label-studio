@@ -59,4 +59,6 @@ STALE_FEATURE_FLAGS = {
     'fflag_feat_dev_2755_regions_list_grouped_by_labels_with_ordered_collapse_short': False,
     # Apr 14
     'ff_front_dev_1682_model_version_dropdown_070622_short': False,
+    # May 7
+    'fflag_fix_front_fit_31_synced_media_buffering': False,
 }
