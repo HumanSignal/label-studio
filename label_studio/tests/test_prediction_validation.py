@@ -1068,3 +1068,57 @@ class TestPredictionValidation:
         assert serializer.is_valid()
         # Should not raise due to taxonomy flattening in value label validation
         serializer.save(project_id=project.id)
+
+
+@pytest.mark.django_db
+class TestImportPredictionsModelVersionDefault:
+    """Predictions imported without a model_version should land as NULL.
+
+    Regression coverage for the pairing fix that also updates the DELETE
+    endpoint: keeping these two halves in sync prevents the legacy
+    'undefined' placeholder from re-entering the database.
+    """
+
+    @pytest.fixture(autouse=True)
+    def setup(self, django_db_setup, django_db_blocker):
+        with django_db_blocker.unblock():
+            self.user = UserFactory()
+            self.organization = OrganizationFactory(created_by=self.user)
+            self.user.active_organization = self.organization
+            self.user.save()
+            self.project = ProjectFactory(
+                title='Import default test',
+                organization=self.organization,
+                created_by=self.user,
+            )
+            self.task = TaskFactory(project=self.project, data={'text': 'x'})
+
+    def _post(self, payload):
+        request = APIRequestFactory().post(
+            f'/api/projects/{self.project.id}/import/predictions',
+            data=payload,
+            format='json',
+        )
+        force_authenticate(request, user=self.user)
+        return ImportPredictionsAPI.as_view()(request, pk=self.project.id)
+
+    def test_missing_model_version_becomes_null(self):
+        response = self._post([{'result': [], 'task': self.task.id}])
+
+        assert response.status_code == 201
+        prediction = Prediction.objects.get(task=self.task)
+        assert prediction.model_version is None
+
+    def test_empty_model_version_becomes_null(self):
+        response = self._post([{'result': [], 'task': self.task.id, 'model_version': ''}])
+
+        assert response.status_code == 201
+        prediction = Prediction.objects.get(task=self.task)
+        assert prediction.model_version is None
+
+    def test_explicit_model_version_preserved(self):
+        response = self._post([{'result': [], 'task': self.task.id, 'model_version': 'v1'}])
+
+        assert response.status_code == 201
+        prediction = Prediction.objects.get(task=self.task)
+        assert prediction.model_version == 'v1'
