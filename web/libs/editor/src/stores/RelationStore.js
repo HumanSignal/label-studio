@@ -23,6 +23,9 @@ const Relation = types
 
     // labels
     labels: types.maybeNull(types.array(types.string)),
+
+    // free-text note stored with this relation
+    notes: types.optional(types.string, ""),
   })
   .volatile(() => ({
     showMeta: false,
@@ -100,6 +103,10 @@ const Relation = types
 
     setRelations(values) {
       self.labels = values;
+    },
+
+    setNotes(value) {
+      self.notes = value;
     },
   }));
 
@@ -212,18 +219,20 @@ const RelationStore = types
         };
 
         if (r.selectedValues) s.labels = r.selectedValues;
+        if (r.notes) s.notes = r.notes;
 
         return s;
       });
     },
 
-    deserializeRelation(node1, node2, direction, labels) {
+    deserializeRelation(node1, node2, direction, labels, notes) {
       const rl = self.addRelation(node1, node2);
 
       if (!rl) return; // duplicated relation
 
       rl.direction = direction;
       rl.labels = labels;
+      rl.notes = notes ?? "";
     },
 
     toggleConnections() {

@@ -9,7 +9,7 @@ import {
 } from "@humansignal/icons";
 import { Button, Select } from "@humansignal/ui";
 import { observer } from "mobx-react";
-import { type FC, useCallback, useMemo, useState } from "react";
+import { type ChangeEvent, type FC, useCallback, useMemo, useState } from "react";
 import { cn } from "../../../utils/bem";
 import { wrapArray } from "../../../utils/utilities";
 import { RegionItem } from "./RegionItem";
@@ -91,10 +91,10 @@ const RelationItem: FC<{ relation: any }> = observer(({ relation }) => {
         </div>
         <div className={cn("relations").elem("actions").toClassName()}>
           <div className={cn("relations").elem("action").toClassName()}>
-            {(hovered || relation.showMeta) && relation.hasRelations && (
+            {(hovered || relation.showMeta) && (
               <Button
                 primary={relation.showMeta}
-                aria-label={`${relation.showMeta ? "Hide" : "Show"} Relation Labels`}
+                aria-label={`${relation.showMeta ? "Hide" : "Show"} Relation Details`}
                 type={relation.showMeta ? undefined : "text"}
                 onClick={relation.toggleMeta}
                 style={{ padding: 0 }}
@@ -148,7 +148,8 @@ const RelationItem: FC<{ relation: any }> = observer(({ relation }) => {
 
 const RelationMeta: FC<any> = observer(({ relation }) => {
   const { selectedValues, control } = relation;
-  const { children, choice } = control;
+  const children = control?.children ?? [];
+  const choice = control?.choice;
 
   const selectionMode = useMemo(() => {
     return choice === "multiple";
@@ -159,6 +160,12 @@ const RelationMeta: FC<any> = observer(({ relation }) => {
       const values: any[] = wrapArray(val);
 
       relation.setRelations(values);
+    },
+    [relation],
+  );
+  const onNotesChange = useCallback(
+    (event: ChangeEvent<HTMLTextAreaElement>) => {
+      relation.setNotes(event.target.value);
     },
     [relation],
   );
@@ -173,13 +180,23 @@ const RelationMeta: FC<any> = observer(({ relation }) => {
 
   return (
     <div className={cn("relation-meta").toClassName()}>
-      <Select
-        multiple={selectionMode}
-        style={{ width: "100%" }}
-        placeholder="Select labels"
-        value={selectedValues}
-        onChange={onChange}
-        options={options}
+      {relation.hasRelations && (
+        <Select
+          multiple={selectionMode}
+          style={{ width: "100%" }}
+          placeholder="Select labels"
+          value={selectedValues}
+          onChange={onChange}
+          options={options}
+        />
+      )}
+      <textarea
+        aria-label="Relation note"
+        className={cn("relation-meta").elem("notes").toClassName()}
+        onChange={onNotesChange}
+        placeholder="Add note"
+        rows={2}
+        value={relation.notes}
       />
     </div>
   );
