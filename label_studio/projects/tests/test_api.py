@@ -90,3 +90,91 @@ class TestProjectModelVersionsAPI(APITestCase):
         assert response.json()['static'][1]['count'] == 1
         assert response.json()['static'][2]['model_version'] == 'model_1'
         assert response.json()['static'][2]['count'] == 2
+
+
+class TestDeletePredictionsAPI(APITestCase):
+    """Covers the DELETE /api/projects/<pk>/model-versions endpoint.
+
+    Regression coverage for issue #9717: predictions imported without a
+    model_version (stored as NULL, empty string, or the legacy 'undefined'
+    placeholder) must be deletable.
+    """
+
+    def setUp(self):
+        self.project = ProjectFactory()
+        self.user = self.project.created_by
+        self.task = TaskFactory(project=self.project)
+        self.client.force_authenticate(user=self.user)
+        self.url = f'/api/projects/{self.project.id}/model-versions'
+
+    def _prediction_count(self, **filters):
+        return self.task.predictions.filter(**filters).count()
+
+    def test_delete_by_specific_version(self):
+        PredictionFactory(task=self.task, model_version='v1')
+        PredictionFactory(task=self.task, model_version='v1')
+        PredictionFactory(task=self.task, model_version='v2')
+
+        response = self.client.delete(self.url, data={'model_version': 'v1'}, format='json')
+
+        assert response.status_code == 200
+        assert self._prediction_count(model_version='v1') == 0
+        assert self._prediction_count(model_version='v2') == 1
+
+    def test_delete_null_version_via_json_null(self):
+        PredictionFactory(task=self.task, model_version=None)
+        PredictionFactory(task=self.task, model_version='v1')
+
+        response = self.client.delete(self.url, data={'model_version': None}, format='json')
+
+        assert response.status_code == 200
+        assert self._prediction_count(model_version__isnull=True) == 0
+        assert self._prediction_count(model_version='v1') == 1
+
+    def test_delete_null_version_via_empty_string(self):
+        PredictionFactory(task=self.task, model_version='')
+        PredictionFactory(task=self.task, model_version='v1')
+
+        response = self.client.delete(self.url, data={'model_version': ''}, format='json')
+
+        assert response.status_code == 200
+        assert self._prediction_count(model_version='') == 0
+        assert self._prediction_count(model_version='v1') == 1
+
+    def test_delete_legacy_undefined_string(self):
+        """Pre-migration rows have model_version='undefined'. Migration 0062
+        backfills these to NULL, but the API still accepts the legacy string
+        so it works during a rolling deployment.
+        """
+        PredictionFactory(task=self.task, model_version='undefined')
+        PredictionFactory(task=self.task, model_version='v1')
+
+        response = self.client.delete(self.url, data={'model_version': 'undefined'}, format='json')
+
+        assert response.status_code == 200
+        assert self._prediction_count(model_version='undefined') == 0
+        assert self._prediction_count(model_version='v1') == 1
+
+    def test_delete_null_version_groups_legacy_representations(self):
+        """A single null-version delete request should sweep NULL, empty, and
+        the legacy 'undefined' placeholder together so callers don't need to
+        know about the pre-migration data layout.
+        """
+        PredictionFactory(task=self.task, model_version=None)
+        PredictionFactory(task=self.task, model_version='')
+        PredictionFactory(task=self.task, model_version='undefined')
+        PredictionFactory(task=self.task, model_version='v1')
+
+        response = self.client.delete(self.url, data={'model_version': None}, format='json')
+
+        assert response.status_code == 200
+        assert self.task.predictions.exclude(model_version='v1').count() == 0
+        assert self._prediction_count(model_version='v1') == 1
+
+    def test_delete_requires_model_version_key(self):
+        PredictionFactory(task=self.task, model_version='v1')
+
+        response = self.client.delete(self.url, data={}, format='json')
+
+        assert response.status_code == 400
+        assert self._prediction_count(model_version='v1') == 1

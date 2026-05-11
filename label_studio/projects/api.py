@@ -881,13 +881,19 @@ class ProjectModelVersions(generics.RetrieveAPIView):
 
     def delete(self, request, *args, **kwargs):
         project = self.get_object()
-        model_version = request.data.get('model_version', None)
 
-        if not model_version:
+        if 'model_version' not in request.data:
             raise RestValidationError('model_version param is required')
+        model_version = request.data.get('model_version')
+
+        # Normalize representations of "no model version" to None. JSON null
+        # already arrives as None; the empty string is the model field default,
+        # and the literal string 'undefined' is legacy data from older imports
+        # (see migration that backfills it to NULL).
+        if model_version in (None, '', 'undefined'):
+            model_version = None
 
         count = project.delete_predictions(model_version=model_version)
-
         return Response(data=count)
 
 

@@ -549,7 +549,7 @@ class ImportPredictionsAPI(generics.CreateAPIView):
                         project_id=project.id,
                         result=Prediction.prepare_prediction_result(item.get('result'), project),
                         score=item.get('score'),
-                        model_version=item.get('model_version', 'undefined'),
+                        model_version=item.get('model_version') or None,
                     )
                 )
                 all_task_ids.add(task_id)
@@ -623,7 +623,7 @@ class ImportPredictionsAPI(generics.CreateAPIView):
                         project_id=project.id,
                         result=Prediction.prepare_prediction_result(item.get('result'), project),
                         score=item.get('score'),
-                        model_version=item.get('model_version', 'undefined'),
+                        model_version=item.get('model_version') or None,
                     )
                 )
             except Exception as e:
