@@ -58,3 +58,5 @@ Use the drop-down to switch between versions.
 ### Interface configuration
 
 From here you can configure labeling elements such as label names, colors, and display text.
+
+![Screenshot](/images/interfaces/project-settings.png)

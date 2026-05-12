@@ -21,8 +21,6 @@ Developing locally is useful when you want to:
 - Bring an existing React mockup into Label Studio.
 - Run automated validation and Playwright scenarios against your Interface before publishing.
 
-SCREENSHOT
-
 ## Prerequisites
 
 Before you start, make sure you have:

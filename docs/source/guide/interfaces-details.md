@@ -14,7 +14,7 @@ The Interface details page is the home base for a saved Interface. Use it to ins
 
 To open it, select **Interfaces** in the main menu and then select the Interface you want to view.
 
-SCREENSHOT
+![Screenshot](/images/interfaces/details.png)
 
 ## Actions
 
@@ -57,6 +57,8 @@ You can also manage versions from the overflow menu next to that version:
 | --- | --- |
 | **Add Description** | Add a description to the version. |
 | **Unpublish** | When you create projects from an Interface, project managers can switch between interface versions from the context of the project. <br /><br />Unpublishing a version will hide it from the version list under **Project > Settings > Labeling Interface.**   |
+
+<img src="/images/interfaces/version-overflow.png" style="max-width: 500px" alt="Screenshot of Version overflow menu">
 
 
 ## Data I/O

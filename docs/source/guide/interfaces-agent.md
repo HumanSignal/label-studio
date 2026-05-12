@@ -14,15 +14,16 @@ You can create Interfaces in two ways:
 
 * **Within Label Studio** - Use Label Studio's out-of-the-box Interface builder to prompt our agent to build and refine your Interface. 
 
-    Select **Interfaces** in the main menu and then select **Create Interface** in the upper right. 
 * **Developed locally** - Install the `create-interface-skill` and use an agent of your choice to vibe code an Interface that you can then import into Label Studio. For more information, see [Develop an Interface locally](interfaces-local).
 
 To begin, select **Interfaces** in the main menu and then select **Create Interface > Create with Agent**. 
 
-SCREENSHOT
-
 !!! info Tip
     If you want to start from an existing labeling UI rather than a blank slate, select the overflow menu next to any Interface and select **Duplicate**. From here you can edit the copy. 
+
+
+![Screenshot](/images/interfaces/create-interface.png)
+
 
 
 The Interface builder is comprised of the following tabs:
@@ -57,7 +58,8 @@ In Plan mode, the agent will surface:
 
 Once the plan is approved, the agent switches to code generation.
 
-SCREENSHOT
+<img src="/images/interfaces/plan-mode.png" style="max-width: 500px" alt="Screenshot of Plan mode">
+
 
 ### Settings
 
@@ -73,7 +75,7 @@ The **Code** tab is where you can view and manually update the React component c
 
 As you update the Interface, the preview will update to reflect the changes. You can move between versions of the Interface using the controls above the chat panel:
 
-SCREENSHOT
+<img src="/images/interfaces/versions.png" style="max-width: 500px" alt="Screenshot of Versions">
 
 Use this to:
 
