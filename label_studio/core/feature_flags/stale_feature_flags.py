@@ -60,4 +60,9 @@ STALE_FEATURE_FLAGS = {
     'ff_front_dev_1682_model_version_dropdown_070622_short': False,
     # May 7
     'fflag_fix_front_fit_31_synced_media_buffering': False,
+    # May 11
+    'ff_front_dev_2669_paragraph_author_filter_210622_short': True,
+    'fflag_feat_front_lsdv_5038_enhanced_review_contextual_scrolling_short': True,
+    'fflag_fix_all_optic_18_dashboard_label_distribution_chart_async_22082023_short': False,
+    'fflag_fix_all_optic_79_task_count_is_wrong_short': True,
 }
