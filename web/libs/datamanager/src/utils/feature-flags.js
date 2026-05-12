@@ -66,6 +66,8 @@ export const FF_AVERAGE_AGREEMENT_SCORE_POPOVER = "fflag_feat_all_leap_2042_aver
  */
 export const FF_ANNOTATION_RESULTS_FILTERING = "fflag_root_13_annotation_results_filtering";
 
+export const FF_AI_REVIEW_FAST_MODE = "fflag_feat_front_biowork_001_ai_review_fast_mode_long";
+
 // Customize flags
 const flags = {};
 

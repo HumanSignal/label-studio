@@ -10,6 +10,7 @@ from django.conf import settings
 from django.contrib import auth
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
+from django.db import IntegrityError
 from django.shortcuts import redirect, render, reverse
 from django.utils.http import url_has_allowed_host_and_scheme
 from organizations.forms import OrganizationSignupForm
@@ -76,9 +77,12 @@ def user_signup(request):
         organization_form = OrganizationSignupForm(request.POST)
 
         if user_form.is_valid():
-            redirect_response = proceed_registration(request, user_form, organization_form, next_page)
-            if redirect_response:
-                return redirect_response
+            try:
+                redirect_response = proceed_registration(request, user_form, organization_form, next_page)
+                if redirect_response:
+                    return redirect_response
+            except IntegrityError:
+                user_form.add_error('email', 'User with this email already exists')
 
     if flag_set('fflag_feat_front_lsdv_e_297_increase_oss_to_enterprise_adoption_short'):
         return render(

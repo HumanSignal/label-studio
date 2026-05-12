@@ -10,7 +10,9 @@ every mask geometry.
 
 ## Activation
 
-Fast mode is enabled when either of these is true:
+Fast mode is gated by the `fflag_feat_front_biowork_001_ai_review_fast_mode_long`
+feature flag. When that flag is enabled, fast mode activates when either of
+these is true:
 
 - The Label Studio frontend is configured with `forceAiReviewFastMode: true`.
 - The editor interfaces array contains `annotations:ai-review-fast`.

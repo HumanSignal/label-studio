@@ -102,3 +102,8 @@ export const FF_ENTERPRISE_EMAIL_NOTIFICATIONS = "fflag_feat_front_fit_183_email
  * Hide Heidi mascot tips across UI
  */
 export const FF_HIDE_HEIDI_TIPS = "fflag_feat_front_hide_heidi_tips_short";
+
+/**
+ * Enables static brush rendering for dense AI review workflows.
+ */
+export const FF_AI_REVIEW_FAST_MODE = "fflag_feat_front_biowork_001_ai_review_fast_mode_long";

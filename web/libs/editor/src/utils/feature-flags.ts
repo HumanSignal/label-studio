@@ -192,6 +192,8 @@ export const FF_IMAGE_MEMORY_USAGE = "fflag_feat_front_optic_1479_improve_image_
 
 export const FF_VIDEO_FRAME_SEEK_PRECISION = "fflag_fix_front_optic_1608_improve_video_frame_seek_precision_short";
 
+export const FF_AI_REVIEW_FAST_MODE = "fflag_feat_front_biowork_001_ai_review_fast_mode_long";
+
 /**
  * Allows the time series component to participate in synchronized playback with other media components (like audio and video)
  * when the feature flag is enabled, while maintaining independent operation when the flag is disabled.
