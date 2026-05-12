@@ -306,14 +306,28 @@ def cast_value(_filter):
             _filter.value.min = float(_filter.value.min)
             _filter.value.max = float(_filter.value.max)
         elif _filter.type == 'Datetime':
-            _filter.value.min = datetime.strptime(_filter.value.min, DATETIME_FORMAT)
-            _filter.value.max = datetime.strptime(_filter.value.max, DATETIME_FORMAT)
+            try:
+                _filter.value.min = datetime.strptime(_filter.value.min, DATETIME_FORMAT)
+                _filter.value.max = datetime.strptime(_filter.value.max, DATETIME_FORMAT)
+            except (TypeError, ValueError):
+                logger.warning(
+                    'Skipping Datetime range cast for filter %s: invalid value %r',
+                    _filter.filter,
+                    _filter.value,
+                )
     # one value
     else:
         if _filter.type == 'Number':
             _filter.value = float(_filter.value)
         elif _filter.type == 'Datetime':
-            _filter.value = datetime.strptime(_filter.value, DATETIME_FORMAT)
+            try:
+                _filter.value = datetime.strptime(_filter.value, DATETIME_FORMAT)
+            except (TypeError, ValueError):
+                logger.warning(
+                    'Skipping Datetime cast for filter %s: invalid value %r',
+                    _filter.filter,
+                    _filter.value,
+                )
         elif _filter.type == 'Boolean':
             _filter.value = cast_bool_from_str(_filter.value)
 

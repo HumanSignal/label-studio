@@ -457,6 +457,29 @@ class TestApplyOrderingStaleAgreementFields(TestCase):
         self.assertEqual(queryset.order_by.call_args_list[-1].args, ('id',))
 
 
+class TestCastValueDatetimeBooleanValue(TestCase):
+    """Regression test for crashes when a saved view stores a non-string value for a Datetime filter."""
+
+    def test_cast_value_datetime_filter_with_boolean_value_does_not_raise(self):
+        # Reproduces: ENTERPRISE-V2-BACKEND-5NR
+        # TypeError: strptime() argument 1 must be str, not bool
+        # A saved Data Manager view persisted a Datetime filter whose value is a boolean
+        # (e.g. {filter: 'filter:tasks:completed_at', type: 'Datetime', value: true}).
+        # GET /api/tasks/ funnels that through cast_value, which calls
+        # datetime.strptime(_filter.value, ...) and crashes the request.
+        from data_manager.managers import cast_value
+
+        _filter = Filter(
+            filter='filter:tasks:completed_at',
+            operator='less',
+            type='Datetime',
+            value=True,
+        )
+
+        # Should handle the bad value gracefully rather than raising TypeError.
+        cast_value(_filter)
+
+
 class TestApplyFiltersStaleAgreementFields(TestCase):
     """Regression tests for stale agreement filters in saved Data Manager views."""
 
