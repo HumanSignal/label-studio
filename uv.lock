@@ -10,7 +10,7 @@ resolution-markers = [
 ]
 
 [options]
-exclude-newer = "2026-07-24T23:35:09.565549Z"
+exclude-newer = "2026-07-24T23:35:54.302144Z"
 exclude-newer-span = "P4D"
 
 [[package]]
@@ -1884,7 +1884,7 @@ requires-dist = [
     { name = "google-cloud-logging", specifier = ">=3.10.0,<4.0.0" },
     { name = "google-cloud-storage", specifier = ">=3.8.0,<4.0.0" },
     { name = "ijson", specifier = ">=3.4.0,<4.0.0" },
-    { name = "label-studio-sdk", git = "https://github.com/HumanSignal/label-studio-sdk.git?rev=d577767defd969bde9f53df859fe0a05afea15a9" },
+    { name = "label-studio-sdk", git = "https://github.com/HumanSignal/label-studio-sdk.git?rev=04237ebb7c17a659bb1cfe79797d95a0eb27329c" },
     { name = "launchdarkly-server-sdk", specifier = "==8.2.1" },
     { name = "lxml", extras = ["html-clean"], specifier = ">=6.1.0" },
     { name = "numpy", specifier = ">=2.2.6,<3.0.0" },
@@ -1945,8 +1945,8 @@ test = [
 
 [[package]]
 name = "label-studio-sdk"
-version = "2.0.22"
-source = { git = "https://github.com/HumanSignal/label-studio-sdk.git?rev=d577767defd969bde9f53df859fe0a05afea15a9#d577767defd969bde9f53df859fe0a05afea15a9" }
+version = "2.0.23"
+source = { git = "https://github.com/HumanSignal/label-studio-sdk.git?rev=04237ebb7c17a659bb1cfe79797d95a0eb27329c#04237ebb7c17a659bb1cfe79797d95a0eb27329c" }
 dependencies = [
     { name = "appdirs" },
     { name = "datamodel-code-generator" },
