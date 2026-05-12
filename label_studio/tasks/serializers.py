@@ -99,17 +99,23 @@ class PredictionSerializer(ModelSerializer):
             project = data['project']
         ff_user = project.organization.created_by if project else 'auto'
 
-        if not flag_set('fflag_feat_utc_210_prediction_validation_15082025', user=ff_user):
-            # Skip validation if feature flag is not set
-            logger.info(f'Skipping prediction validation in PredictionSerializer for user {ff_user}')
-            return super().validate(data)
-
         # Only validate if we're updating the result field
         if 'result' not in data:
             return data
 
         if not project:
             raise ValidationError('Project is required for prediction validation')
+
+        custom_interface_validator = load_func(getattr(settings, 'CUSTOM_INTERFACE_PREDICTION_VALIDATOR', None))
+        if custom_interface_validator:
+            validation_errors = custom_interface_validator(project, data.get('result', []))
+            if validation_errors:
+                raise ValidationError(f'Error validating prediction: {validation_errors}')
+
+        if not flag_set('fflag_feat_utc_210_prediction_validation_15082025', user=ff_user):
+            # Skip validation if feature flag is not set
+            logger.info(f'Skipping prediction validation in PredictionSerializer for user {ff_user}')
+            return super().validate(data)
 
         # Validate prediction using LabelInterface
         li = LabelInterface(project.label_config)

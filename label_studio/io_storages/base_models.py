@@ -508,6 +508,10 @@ class ImportStorage(Storage):
                 )
             cancelled_annotations = len([a for a in annotations if a.get('was_cancelled', False)])
 
+        storage_task_data_validator = load_func(getattr(settings, 'STORAGE_TASK_DATA_VALIDATOR', None))
+        if storage_task_data_validator:
+            storage_task_data_validator(project, data)
+
         if 'data' in data and isinstance(data['data'], dict):
             if data['data'] is not None:
                 data = data['data']

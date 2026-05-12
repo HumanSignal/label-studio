@@ -502,6 +502,15 @@ class ImportPredictionsAPI(generics.CreateAPIView):
         else:
             return self._create_legacy(project)
 
+    @staticmethod
+    def _validate_custom_interface_prediction(project, item, index):
+        custom_interface_validator = load_func(getattr(settings, 'CUSTOM_INTERFACE_PREDICTION_VALIDATOR', None))
+        if not custom_interface_validator:
+            return []
+
+        errors = custom_interface_validator(project, item.get('result', []))
+        return [f'Prediction {index}: {error}' for error in errors]
+
     def _create_memory_efficient(self, project):
         """Memory-efficient batch processing implementation"""
         # Configure batch processing settings
@@ -534,14 +543,21 @@ class ImportPredictionsAPI(generics.CreateAPIView):
 
             # Build predictions for this batch
             batch_predictions = []
-            for item in batch_items:
+            batch_validation_errors = []
+            for batch_offset, item in enumerate(batch_items):
                 item = sanitize_prediction_import_payload(item)
                 task_id = item.get('task')
+                prediction_index = batch_start + batch_offset
 
                 if task_id not in existing_task_ids:
                     raise ValidationError(
                         f'{item} contains invalid "task" field: task ID {task_id} not found in project {project}'
                     )
+
+                custom_interface_errors = self._validate_custom_interface_prediction(project, item, prediction_index)
+                if custom_interface_errors:
+                    batch_validation_errors.extend(custom_interface_errors)
+                    continue
 
                 batch_predictions.append(
                     Prediction(
@@ -553,6 +569,9 @@ class ImportPredictionsAPI(generics.CreateAPIView):
                     )
                 )
                 all_task_ids.add(task_id)
+
+            if batch_validation_errors:
+                raise ValidationError(batch_validation_errors)
 
             # Bulk create this batch with the configured batch size
             batch_created = Prediction.objects.bulk_create(batch_predictions, batch_size=settings.BATCH_SIZE)
@@ -613,6 +632,11 @@ class ImportPredictionsAPI(generics.CreateAPIView):
 
             except Exception as e:
                 validation_errors.append(f'Prediction {i}: Error validating prediction - {extract_message(e)}')
+                continue
+
+            custom_interface_errors = self._validate_custom_interface_prediction(project, item, i)
+            if custom_interface_errors:
+                validation_errors.extend(custom_interface_errors)
                 continue
 
             # If prediction is valid, add it to predictions list to be created
