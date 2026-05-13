@@ -1,5 +1,3 @@
-version: "3.9"
-
 name: biowork-dev
 
 # DEVELOPMENT ENVIRONMENT
@@ -9,6 +7,8 @@ name: biowork-dev
 
 volumes:
   label-studio-data-dev:
+    driver: local
+  label-studio-tailscale-proxy-dev:
     driver: local
 
 services:
@@ -67,11 +67,43 @@ services:
       - LOG_LEVEL=DEBUG
       - BILLING_ENFORCE_USAGE_LIMITS=${BILLING_ENFORCE_USAGE_LIMITS:-false}
       - BASE_DATA_DIR=/label-studio/data
+      - HTTP_PROXY=http://tailscale-proxy:1055
+      - HTTPS_PROXY=http://tailscale-proxy:1055
+      - ALL_PROXY=socks5://tailscale-proxy:1055
+      - NO_PROXY=localhost,127.0.0.1,db-dev,redis-dev,label-studio-nginx-dev,app-dev,sam2-backend,fastsam-backend,yolo-backend,tailscale-proxy
+      - AWS_SHARED_CREDENTIALS_FILE=/run/secrets/aws_credentials
+      - AWS_CONFIG_FILE=/run/secrets/aws_config
+      - AWS_PROFILE=default
+      - HDF5_IMPORT_DERIVED_PREFIX=${HDF5_IMPORT_DERIVED_PREFIX:-derived/h5-preview}
+      - HDF5_IMPORT_MAX_FRAMES_PER_DATASET=${HDF5_IMPORT_MAX_FRAMES_PER_DATASET:-100}
+      - HDF5_IMPORT_MAX_TASKS_PER_FILE=${HDF5_IMPORT_MAX_TASKS_PER_FILE:-100}
     volumes:
       - label-studio-data-dev:/label-studio/data:rw
+    secrets:
+      - aws_credentials
+      - aws_config
     command: label-studio-uwsgi
     networks:
       - label-studio-dev-network
+
+  tailscale-proxy-dev:
+    image: tailscale/tailscale:latest
+    container_name: label-studio-tailscale-proxy-dev
+    hostname: biowork-dev-proxy
+    restart: unless-stopped
+    environment:
+      - TS_AUTHKEY=${TS_AUTHKEY:-}
+      - TS_AUTH_ONCE=true
+      - TS_STATE_DIR=/var/lib/tailscale
+      - TS_USERSPACE=true
+      - TS_SOCKS5_SERVER=:1055
+      - TS_OUTBOUND_HTTP_PROXY_LISTEN=:1055
+    volumes:
+      - label-studio-tailscale-proxy-dev:/var/lib/tailscale
+    networks:
+      label-studio-dev-network:
+        aliases:
+          - tailscale-proxy
 
   rqworker-dev:
     image: gavinlouuu/label-studio-custom:dev
@@ -94,9 +126,22 @@ services:
       - LOG_LEVEL=DEBUG
       - BILLING_ENFORCE_USAGE_LIMITS=${BILLING_ENFORCE_USAGE_LIMITS:-false}
       - BASE_DATA_DIR=/label-studio/data
+      - HTTP_PROXY=http://tailscale-proxy:1055
+      - HTTPS_PROXY=http://tailscale-proxy:1055
+      - ALL_PROXY=socks5://tailscale-proxy:1055
+      - NO_PROXY=localhost,127.0.0.1,db-dev,redis-dev,label-studio-nginx-dev,app-dev,sam2-backend,fastsam-backend,yolo-backend,tailscale-proxy
+      - AWS_SHARED_CREDENTIALS_FILE=/run/secrets/aws_credentials
+      - AWS_CONFIG_FILE=/run/secrets/aws_config
+      - AWS_PROFILE=default
+      - HDF5_IMPORT_DERIVED_PREFIX=${HDF5_IMPORT_DERIVED_PREFIX:-derived/h5-preview}
+      - HDF5_IMPORT_MAX_FRAMES_PER_DATASET=${HDF5_IMPORT_MAX_FRAMES_PER_DATASET:-100}
+      - HDF5_IMPORT_MAX_TASKS_PER_FILE=${HDF5_IMPORT_MAX_TASKS_PER_FILE:-100}
     volumes:
       - label-studio-data-dev:/label-studio/data:rw
-    command: python3 /label-studio/label_studio/manage.py rqworker default
+    secrets:
+      - aws_credentials
+      - aws_config
+    command: python3 /label-studio/label_studio/manage.py rqworker default low
     networks:
       - label-studio-dev-network
 
@@ -133,3 +178,9 @@ networks:
   label-studio-dev-network:
     name: label-studio-dev-network
     driver: bridge
+
+secrets:
+  aws_credentials:
+    file: ./.secrets/aws_credentials
+  aws_config:
+    file: ./.secrets/aws_config

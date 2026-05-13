@@ -30,6 +30,7 @@ from io_storages.s3.utils import (
 from io_storages.utils import StorageObject, load_tasks_json, storage_can_resolve_bucket_url
 from tasks.models import Annotation
 
+from label_studio.io_storages.s3.hdf5 import extract_hdf5_images_from_s3, is_hdf5_key
 from label_studio.io_storages.s3.utils import AWS
 
 logger = logging.getLogger(__name__)
@@ -220,6 +221,9 @@ class S3ImportStorageBase(S3StorageMixin, ImportStorage):
     def get_data(self, key) -> list[StorageObject]:
         uri = f'{self.url_scheme}://{self.bucket}/{key}'
         if self.use_blob_urls:
+            if is_hdf5_key(key):
+                return extract_hdf5_images_from_s3(self, key)
+
             data_key = settings.DATA_UNDEFINED_NAME
             task = {data_key: uri}
             return [StorageObject(key=key, task_data=task)]

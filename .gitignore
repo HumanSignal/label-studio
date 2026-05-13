@@ -72,6 +72,9 @@ deploy/pgsql/certs/*
 deploy/cloudflare/credentials.json
 deploy/apps/*/cloudflare/credentials.json
 
+# Local runtime secrets (never commit)
+.secrets/
+
 *.swp
 *.swo
 *.swn

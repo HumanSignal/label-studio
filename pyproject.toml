@@ -69,6 +69,7 @@ dependencies = [
     "python-json-logger (==2.0.4)",
     "google-cloud-storage (>=2.13.0,<3.0.0)",
     "google-cloud-logging (>=3.10.0,<4.0.0)",
+    "h5py (>=3.13.0,<4.0.0)",
     "django-csp (==3.7)",
     "openai (>=1.10.0,<2.0.0)",
     "django-migration-linter (>=5.1.0,<6.0.0)",
