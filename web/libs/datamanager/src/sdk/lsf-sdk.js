@@ -13,6 +13,7 @@
  * }} LSFOptions */
 
 import {
+  FF_AI_REVIEW_FAST_MODE,
   FF_DEV_1752,
   FF_DEV_2186,
   FF_DEV_2887,
@@ -181,6 +182,7 @@ export class LSFWrapper {
     const queueLeft = dm.store.project.queue_left;
     const queuePosition = queueDone ? queueDone + 1 : queueLeft ? queueTotal - queueLeft + 1 : 1;
     const commentClassificationConfig = dm.store.project.comment_classification_config;
+    const useAiReviewFastMode = isFF(FF_AI_REVIEW_FAST_MODE) && this.isInteractivePreannotations;
 
     const lsfProperties = {
       user: options.user,
@@ -192,7 +194,7 @@ export class LSFWrapper {
       keymap: options.keymap,
       forceAutoAnnotation: this.isInteractivePreannotations,
       forceAutoAcceptSuggestions: this.isInteractivePreannotations,
-      forceAiReviewFastMode: this.isInteractivePreannotations,
+      forceAiReviewFastMode: useAiReviewFastMode,
       messages: options.messages,
       queueTotal,
       queuePosition,

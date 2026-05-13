@@ -18,6 +18,7 @@ import Task from "./TaskStore";
 import { UserExtended } from "./UserStore";
 import { UserLabels } from "./UserLabels";
 import {
+  FF_AI_REVIEW_FAST_MODE,
   FF_CUSTOM_SCRIPT,
   FF_DEV_1536,
   FF_LSDV_4620_3_ML,
@@ -247,7 +248,10 @@ export default types
       return self.forceAutoAcceptSuggestions || self._autoAcceptSuggestions;
     },
     get aiReviewFastMode() {
-      return getEnv(self).forceAiReviewFastMode || self.interfaces.includes("annotations:ai-review-fast");
+      return (
+        isFF(FF_AI_REVIEW_FAST_MODE) &&
+        (getEnv(self).forceAiReviewFastMode || self.interfaces.includes("annotations:ai-review-fast"))
+      );
     },
   }))
   .actions((self) => {

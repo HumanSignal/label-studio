@@ -1,6 +1,33 @@
 {
   "segments": {},
   "flags": {
+    "fflag_feat_front_biowork_001_ai_review_fast_mode_long": {
+      "key": "fflag_feat_front_biowork_001_ai_review_fast_mode_long",
+      "on": true,
+      "prerequisites": [],
+      "targets": [],
+      "contextTargets": [],
+      "rules": [],
+      "fallthrough": {
+        "variation": 0
+      },
+      "offVariation": 1,
+      "variations": [
+        true,
+        false
+      ],
+      "clientSideAvailability": {
+        "usingMobileKey": false,
+        "usingEnvironmentId": false
+      },
+      "clientSide": false,
+      "salt": "7d95f4bc9ba64af9a60bb6c1a7b12ef8",
+      "trackEvents": false,
+      "trackEventsFallthrough": false,
+      "debugEventsUntilDate": null,
+      "version": 1,
+      "deleted": false
+    },
     "feat_all_optic_71_dashboard_multiple_labeling_group_support_v1_01092023_short": {
       "key": "feat_all_optic_71_dashboard_multiple_labeling_group_support_v1_01092023_short",
       "on": false,

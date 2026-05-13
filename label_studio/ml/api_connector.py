@@ -210,6 +210,8 @@ class MLApi(BaseHTTPAPI):
             'tasks': tasks,
             'project': self._create_project_uid(project),
             'label_config': project.label_config,
+            'hostname': settings.HOSTNAME if settings.HOSTNAME else ('http://localhost:' + settings.INTERNAL_PORT),
+            'access_token': project.created_by.auth_token.key,
             'params': {
                 'login': project.task_data_login,
                 'password': project.task_data_password,
