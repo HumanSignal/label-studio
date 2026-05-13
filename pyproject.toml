@@ -51,7 +51,7 @@ dependencies = [
     "requests>=2.33.1,<2.34.0",
     "rq (>=2.6,<2.7)",
     "rules (==3.4)",
-    "ujson (>=3.0.0)",
+    "ujson (>=5.12.1)",
     "ijson (>=3.4.0,<4.0.0)",
     "xmljson (==0.2.1)",
     "colorama (>=0.4.4)",
@@ -73,7 +73,7 @@ dependencies = [
 ]
 
 [tool.uv.sources]
-label-studio-sdk = { git = "https://github.com/HumanSignal/label-studio-sdk.git", rev = "04237ebb7c17a659bb1cfe79797d95a0eb27329c" }
+label-studio-sdk = { git = "https://github.com/HumanSignal/label-studio-sdk.git", rev = "7a924d807b39c5360c71209c87fec3ecf54eeb45" }
 
 [project.optional-dependencies]
 uwsgi = [
