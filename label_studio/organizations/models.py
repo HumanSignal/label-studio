@@ -65,12 +65,14 @@ class OrganizationMember(OrganizationMemberMixin, models.Model):
             self.user.active_organization = self.user.organizations.filter(
                 organizationmember__deleted_at__isnull=True
             ).first()
-            if self.user.avatar:
+            update_fields = ['active_organization']
+            if self.user.active_organization is None and self.user.avatar:
                 self.user.avatar.delete(save=False)
                 self.user.avatar = None
-            self.user.save(update_fields=['active_organization', 'avatar'])
+                update_fields.append('avatar')
+            self.user.save(update_fields=update_fields)
 
-        self.user.task_locks.all().delete()
+        self.user.task_locks.filter(task__project__organization=self.organization).delete()
 
 
 OrganizationMixin = load_func(settings.ORGANIZATION_MIXIN)
