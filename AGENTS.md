@@ -1,5 +1,26 @@
 # AGENTS.md
 
+## Biowork product workflow
+
+This repo is one part of the Biowork product system:
+
+- `biowork`: product app, user workflows, annotation UI, projects, data import/export, ML backend connections.
+- `biowork-ml-backend`: SAM2/FastSAM/YOLO services, active training, MLflow logging, model APIs.
+- `rustfs_yolo_sam2_inference`: Kedro batch inference over Biowork datasets with a user-selected MLflow model.
+
+Keep the repos separate and coordinate with explicit contracts, linked PRs/issues, and the GitHub Project `Biowork Product Integration`.
+
+Default habit:
+
+- Check branch and dirty worktree before editing.
+- Create a purpose-named development branch from `origin/main` for new work.
+- Do not mix unrelated issue work into an existing feature branch.
+- Link paired backend/inference PRs when frontend changes depend on them.
+- Update the related GitHub issue/project with investigation notes, commit hashes, run IDs, and remaining risks.
+- Treat backend API/data/model behavior as a contract; document parameter, endpoint, and schema assumptions.
+
+See `knowledge_map/features/biowork_product_workflow.md` for the cross-repo workflow notes.
+
 ## Cursor Cloud specific instructions
 
 ### Product overview

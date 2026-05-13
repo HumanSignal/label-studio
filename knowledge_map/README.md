@@ -12,6 +12,9 @@ upstream Label Studio.
   app (development, Docker, production examples).
 
 ### `features/` — deeper dives
+- `biowork_product_workflow.md` — cross-repo workflow for `biowork`,
+  `biowork-ml-backend`, `rustfs_yolo_sam2_inference`, GitHub Project,
+  RustFS, MLflow, and verification habits.
 - `biowork_template_entrypoint.md` — how Biowork templates act as
   project bootstrap orchestration (default behavior, ML auto-connect,
   and setup args flow).
@@ -33,7 +36,9 @@ upstream Label Studio.
 - `DISABLE_HEIDI_TIPS_FLAG.md` — feature flag to silence Heidi tips.
 - `docker-build-node18.md` — Node 18 dependency pinning fix.
 
-## Companion repository
+## Companion repositories
 
-The ML side lives in `biowork-ml-backend` (sibling clone). See
-§9 and §13 of `BIOWORK_FORK_OVERVIEW.md` for the structure.
+The ML side lives in `biowork-ml-backend` and batch inference lives in
+`rustfs_yolo_sam2_inference` as sibling clones. See
+`features/biowork_product_workflow.md`, plus §9 and §13 of
+`BIOWORK_FORK_OVERVIEW.md`, for the structure.
