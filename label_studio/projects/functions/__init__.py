@@ -1,8 +1,6 @@
 from core.feature_flags import flag_set
 from core.utils.db import SQCount
-from django.db.models import Count, OuterRef, Q, Subquery
-from django.db.models.functions import Coalesce
-from fsm.state_choices import TaskStateChoices
+from django.db.models import Count, OuterRef, Q
 from tasks.models import Annotation, Prediction, Task
 
 
@@ -12,19 +10,6 @@ def annotate_task_number(queryset):
 
 
 def annotate_finished_task_number(queryset):
-    if flag_set('fflag_feat_fit_568_finite_state_management', user='auto') and flag_set(
-        'fflag_feat_utc_836_fsm_finished_task_number_short', user='auto'
-    ):
-        finished_subquery = (
-            Task.objects.filter(project_id=OuterRef('pk'))
-            .with_state()
-            # This state matches the legacy finished_task_number implementation: is_labeled=True.
-            .filter(current_state__in=[TaskStateChoices.COMPLETED])
-            .values('project_id')
-            .annotate(count=Count('id'))
-            .values('count')
-        )
-        return queryset.annotate(finished_task_number=Coalesce(Subquery(finished_subquery), 0))
     if flag_set('fflag_fix_back_plt_811_finished_task_number_01072025_short', user='auto'):
         return queryset.annotate(finished_task_number=Count('tasks', filter=Q(tasks__is_labeled=True)))
     else:
