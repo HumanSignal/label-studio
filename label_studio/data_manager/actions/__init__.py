@@ -14,9 +14,8 @@ from typing import Callable, Optional, TypedDict, Union
 
 from core.feature_flags import flag_set
 from core.utils.common import load_func
-from data_manager.functions import DataManagerException
 from django.conf import settings
-from rest_framework.exceptions import PermissionDenied
+from rest_framework.exceptions import PermissionDenied, ValidationError
 
 logger = logging.getLogger(__name__)
 
@@ -142,7 +141,7 @@ def register_actions_from_dir(base_module, action_dir):
 def perform_action(action_id, project, queryset, user, **kwargs):
     """Perform action using entry point from actions"""
     if action_id not in settings.DATA_MANAGER_ACTIONS:
-        raise DataManagerException("Can't find '" + action_id + "' in registered actions")
+        raise ValidationError("Can't find '" + action_id + "' in registered actions")
 
     action = settings.DATA_MANAGER_ACTIONS[action_id]
     check_permission = load_func(settings.DATA_MANAGER_CHECK_ACTION_PERMISSION)
@@ -163,7 +162,7 @@ def perform_action(action_id, project, queryset, user, **kwargs):
 
 def get_action_form(action_id, project, user):
     if action_id not in settings.DATA_MANAGER_ACTIONS:
-        raise DataManagerException("Can't find '" + action_id + "' in registered actions")
+        raise ValidationError("Can't find '" + action_id + "' in registered actions")
 
     action = settings.DATA_MANAGER_ACTIONS[action_id]
     check_permission = load_func(settings.DATA_MANAGER_CHECK_ACTION_PERMISSION)
