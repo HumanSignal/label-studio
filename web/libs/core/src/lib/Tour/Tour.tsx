@@ -23,8 +23,20 @@ export const Tour: React.FC<TourProps> = ({ name, autoStart = false, delay = 0, 
   }
   const [state, dispatch] = userTourStateReducer();
 
-  // Skip tours only in Cypress in-app E2E runs. Selenium/WebDriver should keep normal tour behavior.
-  const isAutomationE2E = typeof window !== "undefined" && "Cypress" in window;
+  // Skip product tours during E2E automation runs:
+  //  - Cypress sets `window.Cypress`.
+  //  - Selenium / WebDriver-controlled browsers (ChromeDriver, GeckoDriver, SafariDriver,
+  //    MSEdgeDriver, Selenium grid, etc.) set `navigator.webdriver === true` per the W3C
+  //    WebDriver spec.
+  // FIT-1758: before this gate covered WebDriver, selenium TC1700 was racing the joyride
+  // overlay on Project Settings → Members. Once the publish-state tour started firing
+  // reliably (FIT-1758 target-wait fix), the joyride backdrop began blocking the "Add
+  // Members" click 100% of the time on the PR branch deploy. Suppressing the tour in
+  // any WebDriver-controlled browser keeps the joyride overlay out of every automation
+  // run without changing behavior for real users.
+  const isAutomationE2E =
+    typeof window !== "undefined" &&
+    ("Cypress" in window || (typeof navigator !== "undefined" && navigator.webdriver === true));
 
   useEffect(() => {
     // E2E: skip registration and product-tour fetch. Joyride still mounts a subtree when steps exist

@@ -231,6 +231,7 @@ if (typeof window === "undefined") {
   (globalThis as any).HTMLButtonElement = dom.window.HTMLButtonElement;
   (globalThis as any).Event = dom.window.Event;
   (globalThis as any).Node = dom.window.Node;
+  (globalThis as any).MutationObserver = dom.window.MutationObserver;
 }
 // Ensure localStorage/sessionStorage always match window's, even if window was already defined
 (globalThis as any).localStorage = (window as any).localStorage;
@@ -253,6 +254,7 @@ if (typeof window === "undefined") {
 (globalThis as any).XPathResult = (window as any).XPathResult;
 (globalThis as any).Image = (window as any).Image;
 (globalThis as any).XMLHttpRequest = (window as any).XMLHttpRequest;
+(globalThis as any).MutationObserver = (window as any).MutationObserver;
 (globalThis as any).alert = (window as any).alert = mock();
 (globalThis as any).confirm = (window as any).confirm = mock(() => true);
 (globalThis as any).prompt = (window as any).prompt = mock(() => "");
