@@ -112,6 +112,7 @@ class ReactCodeResolveView(ResolveStorageUriAPIMixin, APIView):
     http_method_names = ['get', 'options']
     permission_classes = ()
     authentication_classes = ()
+    throttle_classes = ()
 
     def options(self, request, *args, **kwargs):
         response = HttpResponse(status=200)
