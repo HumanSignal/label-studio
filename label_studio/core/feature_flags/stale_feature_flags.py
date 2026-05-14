@@ -31,7 +31,6 @@ STALE_FEATURE_FLAGS = {
     'fflag_feat_front_lsdv_4583_multi_image_segmentation_short': True,
     'fflag_fix_back_plt_914_projects_list_cache_sdk_09102025_short': True,
     'fflag_fix_back_plt_913_cache_annotator_queue_total_07102025_short': True,
-    'fflag_fix_back_plt_913_cache_finished_task_number_06102025_short': True,
     'fflag_fix_back_plt_893_project_list_oom_fix_02102025_short': True,
     'fflag_fix_back_plt_902_async_import_background_oom_fix_22092025_short': True,
     'fflag_fix_back_plt_863_remove_iterator_27082025_short': True,
