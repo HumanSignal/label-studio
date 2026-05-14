@@ -7,7 +7,6 @@ from projects.models import Project
 from projects.tests.factories import ProjectFactory
 from rest_framework.test import APITestCase
 from tasks.tests.factories import AnnotationFactory, PredictionFactory, TaskFactory
-from tests.utils import mock_feature_flag
 
 
 class TestTaskAPI(APITestCase):
@@ -145,14 +144,13 @@ class TestTaskAPIResolveUri(APITestCase):
         cls.project = ProjectFactory(organization=cls.organization)
         cls.user = cls.organization.created_by
 
-    @mock_feature_flag('fflag_fix_fit_1511_resolve_multiple_cloud_uris', False, parent_module='tasks.serializers')
     def test_get_task_resolve_uri_default_true(self):
         """Test that resolve_uri defaults to True when not specified.
 
         This test validates:
         - Creating a task with a storage-like URL in data
         - Fetching the task without resolve_uri parameter
-        - Verifying that Task.resolve_uri method is called (default behavior)
+        - Verifying that Task.resolve_uris method is called (default behavior)
 
         Critical validation: By default, URLs should be resolved for security,
         preventing direct exposure of storage credentials.
@@ -160,28 +158,27 @@ class TestTaskAPIResolveUri(APITestCase):
         task = TaskFactory(project=self.project, data={'image': 's3://bucket/image.jpg'})
         self.client.force_authenticate(user=self.user)
 
-        with patch.object(task.__class__, 'resolve_uri', return_value={'image': '/resolved/url'}) as mock_resolve:
+        with patch.object(task.__class__, 'resolve_uris', return_value={'image': '/resolved/url'}) as mock_resolve:
             response = self.client.get(f'/api/tasks/{task.id}/')
 
         assert response.status_code == 200
-        # resolve_uri should be called by default
+        # resolve_uris should be called by default
         mock_resolve.assert_called_once()
 
-    @mock_feature_flag('fflag_fix_fit_1511_resolve_multiple_cloud_uris', False, parent_module='tasks.serializers')
     def test_get_task_resolve_uri_explicit_true(self):
         """Test that resolve_uri=true explicitly enables URL resolution.
 
         This test validates:
         - Creating a task with a storage-like URL in data
         - Fetching the task with resolve_uri=true
-        - Verifying that Task.resolve_uri method is called
+        - Verifying that Task.resolve_uris method is called
 
         Critical validation: Explicit resolve_uri=true should resolve URLs.
         """
         task = TaskFactory(project=self.project, data={'image': 's3://bucket/image.jpg'})
         self.client.force_authenticate(user=self.user)
 
-        with patch.object(task.__class__, 'resolve_uri', return_value={'image': '/resolved/url'}) as mock_resolve:
+        with patch.object(task.__class__, 'resolve_uris', return_value={'image': '/resolved/url'}) as mock_resolve:
             response = self.client.get(f'/api/tasks/{task.id}/?resolve_uri=true')
 
         assert response.status_code == 200
@@ -193,7 +190,7 @@ class TestTaskAPIResolveUri(APITestCase):
         This test validates:
         - Creating a task with a storage-like URL in data
         - Fetching the task with resolve_uri=false
-        - Verifying that Task.resolve_uri method is NOT called
+        - Verifying that Task.resolve_uris method is NOT called
         - Original URL is preserved in the response
 
         Critical validation: When resolve_uri=false, users should see original
@@ -203,11 +200,11 @@ class TestTaskAPIResolveUri(APITestCase):
         task = TaskFactory(project=self.project, data={'image': original_url, 'text': 'test'})
         self.client.force_authenticate(user=self.user)
 
-        with patch.object(task.__class__, 'resolve_uri') as mock_resolve:
+        with patch.object(task.__class__, 'resolve_uris') as mock_resolve:
             response = self.client.get(f'/api/tasks/{task.id}/?resolve_uri=false')
 
         assert response.status_code == 200
-        # resolve_uri should NOT be called when resolve_uri=false
+        # resolve_uris should NOT be called when resolve_uri=false
         mock_resolve.assert_not_called()
         # Original URL should be preserved
         assert response.json()['data']['image'] == original_url

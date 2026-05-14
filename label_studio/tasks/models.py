@@ -440,61 +440,11 @@ class Task(TaskMixin, FsmHistoryStateModel):
                 'presign_ttl': storage.presign_ttl,
             }
 
-    def resolve_uri(self, task_data, project):
-        # DEPRECATED: use resolve_uris instead.
-        from io_storages.functions import get_storage_by_url
-
-        if project.task_data_login and project.task_data_password:
-            protected_data = {}
-            for key, value in task_data.items():
-                if isinstance(value, str) and string_is_url(value):
-                    path = (
-                        reverse('projects-file-proxy', kwargs={'pk': project.pk})
-                        + '?url='
-                        + base64.urlsafe_b64encode(value.encode()).decode()
-                    )
-                    value = urljoin(settings.HOSTNAME, path)
-                protected_data[key] = value
-            return protected_data
-        else:
-            storage_objects = project.get_all_import_storage_objects
-
-            # try resolve URLs via storage associated with that task
-            for field in task_data:
-                # file saved in django file storage
-                prepared_filename = self.prepare_filename(task_data[field])
-                if settings.CLOUD_FILE_STORAGE_ENABLED and self.is_upload_file(prepared_filename):
-                    # permission check: resolve uploaded files to the project only
-                    file_upload = fast_first(FileUpload.objects.filter(project=project, file=prepared_filename))
-                    if file_upload is not None:
-                        task_data[field] = file_upload.url
-                    # it's very rare case, e.g. user tried to reimport exported file from another project
-                    # or user wrote his django storage path manually
-                    else:
-                        task_data[field] = task_data[field] + '?not_uploaded_project_file'
-                    continue
-
-                # project storage
-                # TODO: to resolve nested lists and dicts we should improve get_storage_by_url(),
-                # Now always using get_storage_by_url to ensure the storage with the correct bucket is used
-                # As a last fallback we can use self.storage which is the storage the Task was imported from
-                storage = get_storage_by_url(task_data[field], storage_objects) or self.storage
-                if storage:
-                    try:
-                        resolved_uri = storage.resolve_uri(task_data[field], self)
-                    except Exception as exc:
-                        logger.debug(exc, exc_info=True)
-                        resolved_uri = None
-                    if resolved_uri:
-                        task_data[field] = resolved_uri
-            return task_data
-
     def resolve_uris(self, task_data, project):
         """Resolve all cloud storage URIs across all project storages.
 
-        Unlike resolve_uri which picks one storage per field and resolves
-        only the first URI, this iterates all storages per field and resolves
-        every URI each storage can handle.
+        Iterates all storages per field and resolves every URI each storage
+        can handle (vs. picking a single storage per field).
         """
         if project.task_data_login and project.task_data_password:
             protected_data = {}
