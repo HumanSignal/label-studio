@@ -1,4 +1,4 @@
-import { Icon } from "@humansignal/icons";
+import { CheckIcon } from "@humansignal/icons";
 import type { ComponentPropsWithoutRef, ReactNode } from "react";
 import { useLayoutEffect, useRef, useState } from "react";
 import { cnm } from "../../utils/utils";
@@ -97,7 +97,7 @@ function StepBadge({ index, badgeTone, showCheck }: { index: number; badgeTone: 
         {showCheck ? (
           <>
             <span className={cnm(styles.badgeStamp, playCompleteEntry && styles.badgeStampEnter)} aria-hidden />
-            <Icon.Check className={cnm(styles.badgeIcon, playCompleteEntry && styles.badgeIconEnter)} aria-hidden />
+            <CheckIcon className={cnm(styles.badgeIcon, playCompleteEntry && styles.badgeIconEnter)} aria-hidden />
           </>
         ) : (
           n

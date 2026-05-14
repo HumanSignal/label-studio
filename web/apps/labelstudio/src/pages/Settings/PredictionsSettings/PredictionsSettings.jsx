@@ -1,7 +1,8 @@
 import { useCallback, useContext, useEffect, useState } from "react";
 import { Divider } from "../../../components/Divider/Divider";
 import { EmptyState, SimpleCard } from "@humansignal/ui";
-import { IconPredictions, Typography, IconExternal } from "@humansignal/ui";
+import { Typography } from "@humansignal/ui";
+import { IconExternal, IconPredictions } from "@humansignal/icons";
 import { useUpdatePageTitle, createTitleFromSegments } from "@humansignal/core";
 import { useAPI } from "../../../providers/ApiProvider";
 import { ProjectContext } from "../../../providers/ProjectProvider";

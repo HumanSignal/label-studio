@@ -1,5 +1,5 @@
 import { isDefined } from "@humansignal/core/lib/utils/helpers";
-import { Icon } from "@humansignal/icons";
+import { CaretDownIcon } from "@humansignal/icons";
 import {
   Command,
   CommandEmpty,
@@ -129,7 +129,7 @@ const SelectedItemsGroup = ({
           style={{ cursor: hasNoItems ? "default" : "pointer" }}
         >
           {/* Caret icon */}
-          <Icon.CaretDown
+          <CaretDownIcon
             className={cn(styles.selectedItemsCaret, !expanded && "-rotate-90")}
             size={16}
             weight="bold"
@@ -651,7 +651,7 @@ export const Select = forwardRef(
             <span className="flex flex-1 text-left gap-2 max-w-full overflow-hidden" data-testid="select-display-value">
               {renderSelected ? renderSelected?.(selectedOptions, props?.placeholder) : displayValue}
             </span>
-            <Icon.CaretDown
+            <CaretDownIcon
               weight="bold"
               className={cnm(
                 "h-4 w-4 shrink-0 text-neutral-content-subtler pointer-events-none transition-transform ease-out duration-150",

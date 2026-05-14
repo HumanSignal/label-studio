@@ -1,7 +1,8 @@
 import { useMemo } from "react";
 import { observer } from "mobx-react";
 import { useEffect, useState } from "react";
-import { Button, IconChevronLeft, IconChevronRight, Tooltip } from "@humansignal/ui";
+import { Button, Tooltip } from "@humansignal/ui";
+import { IconChevronLeft, IconChevronRight } from "@humansignal/icons";
 import { cn } from "../../utils/bem";
 import { FF_DEV_4174, FF_LEAP_1173, FF_TASK_COUNT_FIX, isFF } from "../../utils/feature-flags";
 import { guidGenerator } from "../../utils/unique";

@@ -1,6 +1,7 @@
 import { type FC, useCallback, useMemo, useRef } from "react";
 import { getRoot } from "mobx-state-tree";
-import { Dropdown, DropdownContext, IconViewAll, IconCopyOutline, IconBraces, IconUserStats } from "@humansignal/ui";
+import { Dropdown, DropdownContext } from "@humansignal/ui";
+import { IconBraces, IconCopyOutline, IconUserStats, IconViewAll } from "@humansignal/icons";
 // @ts-expect-error - Menu is from JS module
 import { Menu } from "../../Menu/Menu";
 import { modal } from "../../Modal/Modal";

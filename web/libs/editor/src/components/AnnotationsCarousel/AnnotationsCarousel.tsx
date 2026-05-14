@@ -1,4 +1,5 @@
-import { Button, IconChevronLeft, IconChevronRight } from "@humansignal/ui";
+import { Button } from "@humansignal/ui";
+import { IconChevronLeft, IconChevronRight } from "@humansignal/icons";
 import { usePersistentState } from "@humansignal/core/lib/hooks/usePersistentState";
 import { observer } from "mobx-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";

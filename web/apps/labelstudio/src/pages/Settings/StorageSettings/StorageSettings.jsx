@@ -1,17 +1,12 @@
+import { Button, EmptyState, SimpleCard, Spinner, Tooltip, Typography } from "@humansignal/ui";
 import {
-  Button,
-  EmptyState,
   IconCloudCustom,
   IconCloudProviderAzure,
   IconCloudProviderGCS,
   IconCloudProviderRedis,
   IconCloudProviderS3,
   IconExternal,
-  SimpleCard,
-  Spinner,
-  Tooltip,
-  Typography,
-} from "@humansignal/ui";
+} from "@humansignal/icons";
 import { useEffect, useRef } from "react";
 import { useHistory, useLocation } from "react-router-dom";
 import { useUpdatePageTitle, createTitleFromSegments } from "@humansignal/core";

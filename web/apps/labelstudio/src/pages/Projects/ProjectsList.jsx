@@ -2,7 +2,7 @@ import chr from "chroma-js";
 import { format } from "date-fns";
 import { useMemo } from "react";
 import { NavLink } from "react-router-dom";
-import { Icon, IconSparks } from "@humansignal/icons";
+import { CheckIcon, DotsThreeIcon, IconSparks, MinusIcon } from "@humansignal/icons";
 import { Userpic, Button, Dropdown, Tooltip } from "@humansignal/ui";
 import { Menu, Pagination } from "../../components";
 import { cn } from "../../utils/bem";
@@ -105,7 +105,7 @@ const ProjectCard = ({ project }) => {
                 }
               >
                 <Button size="smaller" look="string" aria-label="Project options">
-                  <Icon.DotsThree />
+                  <DotsThreeIcon />
                 </Button>
               </Dropdown.Trigger>
             </div>
@@ -123,11 +123,11 @@ const ProjectCard = ({ project }) => {
               </div>
               <div className={cn("project-card").elem("detail").toClassName()}>
                 <div className={cn("project-card").elem("detail-item").mod({ type: "completed" }).toClassName()}>
-                  <Icon.Check className={cn("project-card").elem("icon").toClassName()} />
+                  <CheckIcon className={cn("project-card").elem("icon").toClassName()} />
                   {project.total_annotations_number}
                 </div>
                 <div className={cn("project-card").elem("detail-item").mod({ type: "rejected" }).toClassName()}>
-                  <Icon.Minus className={cn("project-card").elem("icon").toClassName()} />
+                  <MinusIcon className={cn("project-card").elem("icon").toClassName()} />
                   {project.skipped_annotations_number}
                 </div>
                 <div className={cn("project-card").elem("detail-item").mod({ type: "predictions" }).toClassName()}>

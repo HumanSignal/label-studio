@@ -5,8 +5,7 @@ import { PanelBase, type PanelProps } from "../PanelBase";
 import { OutlinerTree } from "./OutlinerTree";
 import { ViewControls } from "./ViewControls";
 import "./OutlinerPanel.prefix.css";
-import { IconInfo } from "@humansignal/icons";
-import { IconLsLabeling } from "@humansignal/ui";
+import { IconInfo, IconLsLabeling } from "@humansignal/icons";
 import { EmptyState } from "../Components/EmptyState";
 import { getDocsUrl } from "../../../utils/docs";
 

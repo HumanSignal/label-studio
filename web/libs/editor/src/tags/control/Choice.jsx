@@ -13,7 +13,7 @@ import { TagParentMixin } from "../../mixins/TagParentMixin";
 import { FF_DEV_3391, isFF } from "../../utils/feature-flags";
 import { cn } from "../../utils/bem";
 import "./Choice/Choice.prefix.css";
-import { IconChevron } from "@humansignal/ui";
+import { IconChevron } from "@humansignal/icons";
 import { HintTooltip } from "../../components/Taxonomy/Taxonomy";
 import { sanitizeHtml } from "../../utils/html";
 

@@ -1,4 +1,4 @@
-import { Icon } from "@humansignal/icons";
+import { MagnifyingGlassIcon } from "@humansignal/icons";
 import { cn } from "@humansignal/shad/utils";
 import { Command as CommandPrimitive } from "cmdk";
 import React from "react";
@@ -24,7 +24,7 @@ function CommandInput({ className, ...props }: React.ComponentProps<typeof Comma
       className="flex items-center gap-2 h-8 px-2 m-1 focus-within:border-neutral-border-bold border outline-none border-neutral-border rounded-smaller hover:border-neutral-border-bold shadow-inner box-border"
       ref={ref}
     >
-      <Icon.MagnifyingGlass className="text-neutral-content-subtlest w-6 h-6 flex-none" />
+      <MagnifyingGlassIcon className="text-neutral-content-subtlest w-6 h-6 flex-none" />
       <CommandPrimitive.Input
         data-slot="command-input"
         className={cn(

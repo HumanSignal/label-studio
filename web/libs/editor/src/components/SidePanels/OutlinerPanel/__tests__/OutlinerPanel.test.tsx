@@ -4,7 +4,6 @@ import * as panelBaseModule from "../../PanelBase";
 import * as outlinerTreeModule from "../OutlinerTree";
 import * as viewControlsModule from "../ViewControls";
 import * as iconsModule from "@humansignal/icons";
-import * as uiModule from "@humansignal/ui";
 import * as emptyStateModule from "../../Components/EmptyState";
 import * as docsModule from "../../../../utils/docs";
 import { OutlinerPanel } from "../OutlinerPanel";
@@ -68,7 +67,7 @@ describe("OutlinerPanel", () => {
       <svg data-testid="icon-info" width={width} height={height} />
     ));
 
-    spyOn(uiModule, "IconLsLabeling").mockImplementation(({ width, height }: { width: number; height: number }) => (
+    spyOn(iconsModule, "IconLsLabeling").mockImplementation(({ width, height }: { width: number; height: number }) => (
       <svg data-testid="icon-ls-labeling" width={width} height={height} />
     ));
 

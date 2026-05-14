@@ -1,4 +1,5 @@
-import { Button, cnm, IconCheck, IconCopy } from "@humansignal/ui";
+import { Button, cnm } from "@humansignal/ui";
+import { IconCheck, IconCopy } from "@humansignal/icons";
 import styles from "./code-block.module.css";
 import { useCopyText } from "@humansignal/core/lib/hooks/useCopyText";
 

@@ -1,5 +1,5 @@
 import { useRef, useState } from "react";
-import { IconOutlinerDrag, IconCollapseSmall, IconExpandSmall } from "@humansignal/ui";
+import { IconCollapseSmall, IconExpandSmall, IconOutlinerDrag } from "@humansignal/icons";
 import { useDrag } from "../../../hooks/useDrag";
 import { cn } from "../../../utils/bem";
 import { DEFAULT_PANEL_HEIGHT } from "../constants";

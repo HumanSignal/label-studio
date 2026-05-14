@@ -31,7 +31,6 @@ export * from "./lib/toggle/toggle";
 export * from "./lib/typography/typography";
 export * from "./lib/accordion/accordion";
 
-export * from "./assets/icons";
 export * from "./lib/simple-card";
 export * from "./lib/space/space";
 export * from "./lib/spinner/spinner";

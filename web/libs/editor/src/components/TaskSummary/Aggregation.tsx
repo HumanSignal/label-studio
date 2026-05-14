@@ -1,5 +1,6 @@
 import { useLayoutEffect, useRef, useState } from "react";
-import { cnm, IconChevronDown, Skeleton } from "@humansignal/ui";
+import { cnm, Skeleton } from "@humansignal/ui";
+import { IconChevronDown } from "@humansignal/icons";
 import type { Header } from "@tanstack/react-table";
 import { useQuery } from "@tanstack/react-query";
 import type { RawResult } from "../../stores/types";

@@ -4,7 +4,8 @@ import type { ColumnDef, Row } from "@tanstack/react-table";
 import { observer } from "mobx-react";
 
 import { userDisplayName } from "@humansignal/core";
-import { cnm, IconSparks, Skeleton, Userpic } from "@humansignal/ui";
+import { cnm, Skeleton, Userpic } from "@humansignal/ui";
+import { IconSparks } from "@humansignal/icons";
 import type { MSTAnnotation, MSTResult, RawResult } from "../../stores/types";
 import { AggregationTableRow } from "./Aggregation";
 import { Chip } from "./Chip";

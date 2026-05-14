@@ -1,4 +1,4 @@
-import { Icon } from "@humansignal/icons";
+import { CalendarBlankIcon } from "@humansignal/icons";
 import type { ComponentPropsWithoutRef, ReactNode } from "react";
 import { cnm } from "../../utils/utils";
 import { DropdownTrigger } from "../dropdown/dropdown-trigger";
@@ -102,7 +102,7 @@ export const DateRangePickerTrigger = ({
         data-testid={dataTestId}
       >
         {label}
-        <Icon.CalendarBlank size={24} className="text-neutral-content-subtlest shrink-0" />
+        <CalendarBlankIcon size={24} className="text-neutral-content-subtlest shrink-0" />
       </div>
     </DropdownTrigger>
   );

@@ -265,7 +265,7 @@ const PhosphorIconItem = ({
   name: string;
   IconComponent: React.ComponentType<{ size?: number }>;
 }) => {
-  const copyLabel = `Icon.${name}`;
+  const copyLabel = name;
 
   return (
     <button
@@ -294,10 +294,9 @@ const PhosphorIconItem = ({
 const PhosphorIconCatalog = () => {
   const [searchTerm, setSearchTerm] = useState("");
 
-  const phosphorEntries = Object.entries(Icons.Icon ?? {}).filter(([name, comp]) => {
-    // Only render actual React components (not Icon suffix variants which are type exports)
-    // Phosphor exports each icon twice: FolderOpen and FolderOpenIcon — skip the *Icon suffix duplicates
-    if (name.endsWith("Icon") && name !== "Icon") return false;
+  const phosphorEntries = Object.entries(Icons).filter(([name, comp]) => {
+    // Only show canonical XxxIcon names; skip deprecated unsuffixed duplicates (e.g. ArrowRight)
+    if (!name.endsWith("Icon")) return false;
     if (PHOSPHOR_STORYBOOK_EXCLUSIONS.has(name)) return false;
     if (!isRenderableIcon(comp)) return false;
     return name.toLowerCase().includes(searchTerm.toLowerCase());
@@ -310,7 +309,8 @@ const PhosphorIconCatalog = () => {
         Cards are interactive: hover shows a copy hint and emphasis; click to copy the export name.
       </p>
       <p className="mb-4 text-sm text-neutral-content-subtle">
-        Usage: <code>{"import { Icon } from '@humansignal/icons'; <Icon.FolderSimplePlus size={24} />"}</code>
+        Usage:{" "}
+        <code>{'import { FolderSimplePlusIcon } from "@humansignal/icons"; <FolderSimplePlusIcon size={24} />'}</code>
       </p>
       <div className="search-container">
         <input
@@ -337,9 +337,13 @@ const PhosphorIconCatalog = () => {
 const IconCatalog = () => {
   const [searchTerm, setSearchTerm] = useState("");
 
-  // Only custom SVG icons (not Icon namespace or IconContext)
+  // Only custom SVG icons: start with "Icon" prefix, never end with "Icon" suffix (Phosphor convention)
   const iconEntries = Object.entries(Icons).filter(
-    ([name, comp]) => name.startsWith("Icon") && name !== "Icon" && name !== "IconContext" && isRenderableIcon(comp),
+    ([name, comp]) =>
+      name.startsWith("Icon") &&
+      !name.endsWith("Icon") &&
+      !PHOSPHOR_STORYBOOK_EXCLUSIONS.has(name) &&
+      isRenderableIcon(comp),
   );
 
   // Filter icons based on search term (component name or file name)
@@ -381,9 +385,13 @@ const IconCatalog = () => {
 const IconCatalogByCategory = () => {
   const [searchTerm, setSearchTerm] = useState("");
 
-  // Only custom SVG icons (not Icon namespace or IconContext)
+  // Only custom SVG icons: start with "Icon" prefix, never end with "Icon" suffix (Phosphor convention)
   const iconEntries = Object.entries(Icons).filter(
-    ([name, comp]) => name.startsWith("Icon") && name !== "Icon" && name !== "IconContext" && isRenderableIcon(comp),
+    ([name, comp]) =>
+      name.startsWith("Icon") &&
+      !name.endsWith("Icon") &&
+      !PHOSPHOR_STORYBOOK_EXCLUSIONS.has(name) &&
+      isRenderableIcon(comp),
   );
 
   // Group icons by category

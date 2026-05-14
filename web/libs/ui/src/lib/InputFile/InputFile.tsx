@@ -1,4 +1,4 @@
-import { Icon } from "@humansignal/icons";
+import { UploadSimpleIcon } from "@humansignal/icons";
 import clsx from "clsx";
 
 type InputFileProps = HTMLAttributes<HTMLInputElement> & {
@@ -30,7 +30,7 @@ export const InputFile = forwardRef(({ name, className, text, onChange, ...props
   return (
     <label className={clsx(styles.inputWrapper, className)} onKeyDown={wrapperKeyDownHandler}>
       <span className={styles.labelContent}>
-        <Icon.UploadSimple className="mr-tight" /> {text ?? <>Upload Image</>}
+        <UploadSimpleIcon className="mr-tight" /> {text ?? <>Upload Image</>}
       </span>
       <input
         ref={ref}

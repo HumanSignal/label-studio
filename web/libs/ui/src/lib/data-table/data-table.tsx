@@ -20,7 +20,7 @@ declare module "@tanstack/react-table" {
   }
 }
 
-import { Icon } from "@humansignal/icons";
+import { ArrowDownIcon, ArrowUpIcon, InfoIcon, MagnifyingGlassIcon } from "@humansignal/icons";
 import { type CSSProperties, memo, type UIEventHandler, useCallback, useLayoutEffect, useMemo, useState } from "react";
 import { useColumnSizing, useDataColumns } from "../../hooks/data-table";
 import { cn } from "../../utils/utils";
@@ -75,7 +75,7 @@ export type DataTableProps<T extends DataShape> = {
   // Empty state props
   /** Empty state configuration when no data is available */
   emptyState?: {
-    /** Icon to display (defaults to Icon.MagnifyingGlass) */
+    /** Icon to display (defaults to MagnifyingGlassIcon) */
     icon?: React.ReactNode;
     /** Title text (defaults to "No items found") */
     title?: string;
@@ -471,7 +471,7 @@ export const DataTable = <T extends DataShape>(props: DataTableProps<T>) => {
             className="px-wide py-widest"
             size="small"
             variant="warning"
-            icon={props.emptyState?.icon ?? <Icon.MagnifyingGlass />}
+            icon={props.emptyState?.icon ?? <MagnifyingGlassIcon />}
             title={props.emptyState?.title ?? "No items found"}
             description={
               props.emptyState?.description ?? "Try adjusting your search or clearing the filters to see more results."
@@ -867,7 +867,7 @@ export const Header = <T,>({
         )}
         {help && (
           <Tooltip title={help} alignment="top-center">
-            <Icon.Info width={18} height={18} className="text-neutral-content-subtler cursor-help shrink-0" />
+            <InfoIcon width={18} height={18} className="text-neutral-content-subtler cursor-help shrink-0" />
           </Tooltip>
         )}
       </div>
@@ -875,12 +875,12 @@ export const Header = <T,>({
         <div className={cn(styles.headerIcon, isSorted === true && styles.headerIconVisible)}>
           {isSorted ? (
             isDesc ? (
-              <Icon.ArrowUp size={18} className="text-neutral-content-subtler" />
+              <ArrowUpIcon size={18} className="text-neutral-content-subtler" />
             ) : (
-              <Icon.ArrowDown size={18} className="text-neutral-content-subtler" />
+              <ArrowDownIcon size={18} className="text-neutral-content-subtler" />
             )
           ) : (
-            <Icon.ArrowDown size={18} className="text-neutral-content-subtler" />
+            <ArrowDownIcon size={18} className="text-neutral-content-subtler" />
           )}
         </div>
       )}

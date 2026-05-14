@@ -25,7 +25,8 @@ import "../../tags/Custom";
  * Utils and common components
  */
 import { Space } from "../../common/Space/Space";
-import { Button, EmptyState, IconCheck } from "@humansignal/ui";
+import { Button, EmptyState } from "@humansignal/ui";
+import { IconCheck } from "@humansignal/icons";
 import { isStarterCloudPlan, ff } from "@humansignal/core";
 import { cn } from "../../utils/bem";
 import { guidGenerator } from "../../utils/unique";

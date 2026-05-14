@@ -1,5 +1,6 @@
 import { format } from "date-fns/esm";
-import { Button, CodeBlock, IconFileCopy, Space, Tooltip } from "@humansignal/ui";
+import { Button, CodeBlock, Space, Tooltip } from "@humansignal/ui";
+import { IconFileCopy } from "@humansignal/icons";
 import { DescriptionList } from "../../../components/DescriptionList/DescriptionList";
 import { modal } from "../../../components/Modal/Modal";
 import { Oneof } from "../../../components/Oneof/Oneof";

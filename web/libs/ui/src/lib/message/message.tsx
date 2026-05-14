@@ -1,4 +1,4 @@
-import { Icon, IconClose, IconSpark } from "@humansignal/icons";
+import { CheckCircleIcon, IconClose, IconSpark, InfoIcon, WarningIcon, XCircleIcon, XIcon } from "@humansignal/icons";
 import React, { forwardRef, type ReactNode, useMemo } from "react";
 import { cn } from "../../utils/utils";
 import { Button } from "../button/button";
@@ -191,19 +191,19 @@ export const Message = forwardRef<HTMLDivElement, MessageProps>(
     const defaultIcon = useMemo(() => {
       switch (normalizedVariant) {
         case "primary":
-          return <Icon.Info />;
+          return <InfoIcon />;
         case "warning":
-          return <Icon.Warning />;
+          return <WarningIcon />;
         case "positive":
-          return <Icon.CheckCircle />;
+          return <CheckCircleIcon />;
         case "negative":
-          return <Icon.XCircle />;
+          return <XCircleIcon />;
         case "neutral":
-          return <Icon.Info />;
+          return <InfoIcon />;
         case "enterprise":
           return <IconSpark />;
         default:
-          return <Icon.Info />;
+          return <InfoIcon />;
       }
     }, [normalizedVariant]);
 
@@ -270,7 +270,7 @@ export const Message = forwardRef<HTMLDivElement, MessageProps>(
             tooltip="Dismiss"
             aria-label="Dismiss message"
             data-testid="message-dismiss-button"
-            leading={<Icon.X />}
+            leading={<XIcon />}
           />
         )}
       </div>

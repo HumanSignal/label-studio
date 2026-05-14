@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { cnm, IconWarning, ToastType, useToast } from "@humansignal/ui";
+import { cnm, ToastType, useToast } from "@humansignal/ui";
+import { IconWarning } from "@humansignal/icons";
 
 // Shadcn UI components
 import { Button } from "@humansignal/ui";

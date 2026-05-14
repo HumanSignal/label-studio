@@ -1,6 +1,7 @@
 import { useContext, useEffect, useMemo, useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@humansignal/ui/lib/card-new/card";
-import { Button, IconCheck, IconCopy } from "@humansignal/ui";
+import { Button } from "@humansignal/ui";
+import { IconCheck, IconCopy } from "@humansignal/icons";
 import { useCopyText } from "@humansignal/core/lib/hooks/useCopyText";
 import { ProjectContext } from "../../../providers/ProjectProvider";
 

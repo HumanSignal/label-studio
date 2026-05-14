@@ -1,5 +1,5 @@
 import { useCopyText } from "@humansignal/core";
-import { Icon } from "@humansignal/icons";
+import { ArrowSquareOutIcon, CopyIcon } from "@humansignal/icons";
 import { Button, Label, Typography } from "@humansignal/ui";
 /**
  * FIXME: This is legacy imports. We're not supposed to use such statements
@@ -56,7 +56,7 @@ export const PersonalAccessToken = () => {
           <div className="flex gap-2 w-full justify-between">
             <Input name="token" className={styles.input} readOnly value={token ?? ""} />
             <Button
-              leading={<Icon.Copy />}
+              leading={<CopyIcon />}
               onClick={() => copyToken()}
               disabled={tokenCopied}
               variant="primary"
@@ -81,7 +81,7 @@ export const PersonalAccessToken = () => {
               value={curl ?? ""}
             />
             <Button
-              leading={<Icon.Copy />}
+              leading={<CopyIcon />}
               onClick={() => copyCurl()}
               disabled={curlCopied}
               variant="primary"
@@ -108,7 +108,7 @@ export function PersonalAccessTokenDescription() {
           <a href="https://labelstud.io/guide/api.html" target="_blank" rel="noreferrer" className="inline-flex gap-1">
             Docs{" "}
             <span>
-              <Icon.ArrowSquareOut size={20} />
+              <ArrowSquareOutIcon size={20} />
             </span>
           </a>
         </>
