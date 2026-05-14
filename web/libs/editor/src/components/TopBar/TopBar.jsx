@@ -1,55 +1,50 @@
+/**
+ * Classic editor (MST) TopBar wrapper.
+ *
+ * The shell + add-button + view-all visuals live in
+ * `@humansignal/core/lib/topbar/TopBar`. This wrapper:
+ *   1. Reads MST state via `observer()` so MobX tracks reactive properties.
+ *   2. Computes the classic visibility gates (`isBulkMode`, `isStarterCloudPlan`,
+ *      `hasInterface("annotations:view-all")`) and passes the result as
+ *      `visible` to the shared layer.
+ *   3. Renders the AnnotationsCarousel wrapper inside the children slot.
+ */
 import { observer } from "mobx-react";
-
-import { IconPlus } from "@humansignal/icons";
-import { Button } from "@humansignal/ui";
-import { isStarterCloudPlan } from "@humansignal/core";
-import { cn } from "../../utils/bem";
+import { TopBar as SharedTopBar, isStarterCloudPlan } from "@humansignal/core";
 import { AnnotationsCarousel } from "../AnnotationsCarousel/AnnotationsCarousel";
-import { ViewAllToggle } from "../AnnotationsCarousel/ViewAllToggle";
-
-import "./TopBar.prefix.css";
 
 export const TopBar = observer(({ store }) => {
-  const annotationStore = store.annotationStore;
-  const entity = annotationStore?.selected;
-  const _isPrediction = entity?.type === "prediction";
+  if (!store) return null;
 
+  const annotationStore = store.annotationStore;
   const isViewAll = annotationStore?.viewingAll === true;
   const isBulkMode = !isStarterCloudPlan() && store.hasInterface("annotation:bulk");
 
+  // Hide TopBar in bulk mode (preserves classic behavior).
   if (isBulkMode) return null;
 
-  // Hide TopBar for Labeling Stream (when annotations:view-all interface is not present)
-  // Keep TopBar visible for Review Stream and Quick View
-  if (!store.hasInterface("annotations:view-all")) return null;
+  // Hide TopBar for Labeling Stream when annotations:view-all is absent
+  // (Review Stream and Quick View keep it visible).
+  const visible = store.hasInterface("annotations:view-all");
 
-  return store ? (
-    <div className={cn("topbar").mod({ newLabelingUI: true }).toClassName()}>
-      <div className={cn("topbar").elem("group").toClassName()}>
-        {store.hasInterface("annotations:view-all") && (
-          <ViewAllToggle isActive={isViewAll} onClick={annotationStore.toggleViewingAllAnnotations} />
-        )}
-        {store.hasInterface("annotations:add-new") && (
-          <Button
-            className={cn("topbar").elem("button").toClassName()}
-            type={isViewAll ? undefined : "text"}
-            aria-label="Create an annotation"
-            variant="neutral"
-            size="small"
-            look="outlined"
-            tooltip="Create a new annotation"
-            onClick={(event) => {
-              event.preventDefault();
-              const created = store.annotationStore.createAnnotation();
+  const showViewAll = store.hasInterface("annotations:view-all");
+  const showAddNew = store.hasInterface("annotations:add-new");
 
-              store.annotationStore.selectAnnotation(created.id, { exitViewAll: true });
-            }}
-          >
-            <IconPlus />
-          </Button>
-        )}
-        <AnnotationsCarousel store={store} annotationStore={store.annotationStore} commentStore={store.commentStore} />
-      </div>
-    </div>
-  ) : null;
+  const onAddNew = () => {
+    const created = annotationStore.createAnnotation();
+    annotationStore.selectAnnotation(created.id, { exitViewAll: true });
+  };
+
+  return (
+    <SharedTopBar
+      visible={visible}
+      showViewAll={showViewAll}
+      isViewAll={isViewAll}
+      onToggleViewAll={annotationStore.toggleViewingAllAnnotations}
+      showAddNew={showAddNew}
+      onAddNew={onAddNew}
+    >
+      <AnnotationsCarousel store={store} annotationStore={annotationStore} commentStore={store.commentStore} />
+    </SharedTopBar>
+  );
 });

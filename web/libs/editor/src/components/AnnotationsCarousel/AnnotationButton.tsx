@@ -1,1117 +1,282 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { createPortal } from "react-dom";
+/**
+ * Classic editor (MST) AnnotationButton wrapper.
+ *
+ * Mounts the shared `AnnotationButton` from `@humansignal/core/lib/topbar` and is the
+ * ONLY place MobX/MST runs for the tab UI. Responsibilities that stay here:
+ *   - Lazy stub hydration via `useAnnotationFetcher` + `applyAnnotationHydrationFromApi`
+ *     when FF_FIT_720_LAZY_LOAD_ANNOTATIONS is on (B10).
+ *   - User resolution via `useResolveUser` + `enrichUsers` for stub annotations.
+ *   - Live MST → SharedAnnotation mapping (snake_case → camelCase, isAlive guard).
+ *   - Delete confirmation via `editor/common/Modal/Modal#confirm` (B9).
+ *   - Performance Dashboard URL construction (LSE-only, capability-gated, B6/B13).
+ *   - LSE review-status read from `task.dataObj.source` (preserves existing tooltip
+ *     accepted/rejected/fixed badges).
+ *
+ * The exported component name and props (`entity, capabilities, annotationStore,
+ * store, onAnnotationChange`) match the legacy API so the existing 774-line
+ * `__tests__/AnnotationButton.test.tsx` continues to compile.
+ */
+import { useCallback, useMemo, useRef } from "react";
 import { inject, observer } from "mobx-react";
 import { isAlive } from "mobx-state-tree";
-import truncate from "truncate-middle";
-import clsx from "clsx";
-import { format, isValid } from "date-fns";
-import { useCopyText } from "@humansignal/core";
-import { isDefined, userDisplayName } from "@humansignal/core/lib/utils/helpers";
-import { cn } from "../../utils/bem";
+import { ToastType, useToast } from "@humansignal/ui";
 import {
-  IconAnnotationGroundTruth,
-  IconAnnotationSkipped2,
-  IconDraftCreated2,
-  IconDuplicate,
-  IconLink,
-  IconTrashRect,
-  IconCommentResolved,
-  IconCommentUnresolved,
-  IconSparks,
-  IconStar,
-  IconStarOutline,
-  IconAnalytics,
-  IconViewAll,
-  IconClipboardCheck,
-  IconCheckAlt,
-  IconCrossAlt,
-  IconEllipsisVertical,
-} from "@humansignal/icons";
+  AnnotationButton as SharedAnnotationButton,
+  type AnnotationActionHandlers,
+  type AnnotationCapabilities,
+  type SharedAnnotation,
+} from "@humansignal/core";
+import { isDefined } from "@humansignal/core/lib/utils/helpers";
 import { FF_FIT_720_LAZY_LOAD_ANNOTATIONS } from "@humansignal/core/lib/utils/feature-flags";
-import { Tooltip, Userpic, ToastType, useToast, Badge, DropdownTrigger } from "@humansignal/ui";
-import { TimeAgo } from "../../common/TimeAgo/TimeAgo";
-import { useDropdown } from "@humansignal/ui";
-import { useAnnotationFetcher } from "../../hooks/useAnnotationQuery";
-import { isFF } from "../../utils/feature-flags";
 import {
   annotationNeedsHydration,
   applyAnnotationHydrationFromApi,
 } from "@humansignal/core/lib/utils/annotationLazyHydration";
-
+import { isUserComplete, useResolveUser } from "@humansignal/core/hooks/useResolveUser";
+import { isFF } from "../../utils/feature-flags";
+import { useAnnotationFetcher } from "../../hooks/useAnnotationQuery";
 // eslint-disable-next-line
 // @ts-ignore
 import { confirm } from "../../common/Modal/Modal";
-import { type ContextMenuAction, ContextMenu, type MenuActionOnClick } from "../ContextMenu";
-import { useResolveUser, isUserComplete } from "@humansignal/core/hooks/useResolveUser";
-import "./AnnotationButton.prefix.css";
-
-// Constants for name truncation
-const NAME_TRUNCATE_START = 8;
-const NAME_TRUNCATE_END = 6;
-const NAME_TRUNCATE_THRESHOLD = 15;
-
-// Utility function to detect if text is a person's name
-const isPersonName = (text: string): boolean => {
-  if (!text || text.includes("@")) return false; // Exclude emails
-  const parts = text.trim().split(/\s+/);
-  if (parts.length < 2) return false; // Need at least first + last name
-  // Check if all parts are valid name parts (letters, hyphens, no numbers)
-  return parts.every((part) => /^[a-zA-Z-]+$/.test(part) && part.length >= 2);
-};
-
-// Utility function to truncate person names
-const truncatePersonName = (name: string): string => {
-  // Only truncate if length exceeds threshold
-  if (name.length <= NAME_TRUNCATE_THRESHOLD) return name;
-
-  const parts = name.trim().split(/\s+/);
-  if (parts.length === 0) return name;
-  if (parts.length === 1) return name; // Single word, don't truncate
-
-  const firstName = parts[0]; // Keep full
-  const middleParts = parts.slice(1, -1).map((p) => `${p[0]}.`); // Middle names to initials
-  const lastName = parts[parts.length - 1];
-  const lastNameInitial = `${lastName[0]}.`;
-
-  return [firstName, ...middleParts, lastNameInitial].join(" ");
-};
 
 interface AnnotationButtonInterface {
   entity?: any;
   capabilities?: any;
   annotationStore?: any;
-  store: any;
+  store?: any;
   onAnnotationChange?: () => void;
 }
 
-const renderCommentIcon = (ent: any) => {
-  if (ent.unresolved_comment_count > 0) {
-    return IconCommentUnresolved;
-  }
-  if (ent.comment_count > 0) {
-    return IconCommentResolved;
-  }
+const injector = inject(({ store }) => ({ store }));
 
-  return null;
-};
+/**
+ * Pull the LSE review status from the encoded task source (preserves the existing
+ * accepted/rejected/fixed badge in the tooltip).
+ */
+function readReviewStatus(entity: any, annotationStore: any): SharedAnnotation["acceptedState"] {
+  const isLSE = (window as any).APP_SETTINGS?.version?.edition === "Enterprise";
+  if (!isLSE || !entity || entity.type === "prediction") return null;
 
-const renderCommentTooltip = (ent: any) => {
-  if (ent.unresolved_comment_count > 0) {
-    return "Unresolved Comments";
-  }
-  if (ent.comment_count > 0) {
-    return "All Comments Resolved";
-  }
-
-  return "";
-};
-
-// Utility function to get review badge based on acceptedState
-// Supports the same review statuses as the Annotators component: "accepted", "rejected", "fixed"
-// Also supports "fixed_and_accepted" for backward compatibility (maps to "fixed")
-const getReviewBadge = (acceptedState: string | null | undefined) => {
-  if (!acceptedState) {
+  const sourceStr = annotationStore?.store?.task?.dataObj?.source;
+  if (!sourceStr) return null;
+  try {
+    const parsed = typeof sourceStr === "string" ? JSON.parse(sourceStr) : sourceStr;
+    const annotators = parsed?.annotators;
+    const backendAnnotations = parsed?.annotations;
+    if (!Array.isArray(annotators) || !Array.isArray(backendAnnotations)) return null;
+    const idx = backendAnnotations.findIndex((a: any) => entity.pk && a.id && String(a.id) === String(entity.pk));
+    if (idx < 0 || idx >= annotators.length) return null;
+    return (annotators[idx]?.review ?? null) as SharedAnnotation["acceptedState"];
+  } catch {
     return null;
   }
-
-  let Icon = null;
-  let badgeMod = "";
-
-  switch (acceptedState) {
-    case "accepted":
-      Icon = IconCheckAlt;
-      badgeMod = "accepted";
-      break;
-    case "rejected":
-      Icon = IconCrossAlt;
-      badgeMod = "rejected";
-      break;
-    case "fixed":
-    case "fixed_and_accepted": // Backward compatibility
-      Icon = IconCheckAlt;
-      badgeMod = "fixed";
-      break;
-    default:
-      return null;
-  }
-
-  // Use the same class structure as Annotators component
-  const userPickBadge = cn("userpic-badge");
-  const className = clsx(userPickBadge.toString(), userPickBadge.mod({ [badgeMod]: true }).toString());
-
-  return (
-    <div className={className}>
-      <Icon />
-    </div>
-  );
-};
-
-const injector = inject(({ store }) => {
-  return {
-    store,
-  };
-});
-
-const hoverIntentDelay = 300;
-
-function AnnotationButtonTooltip({
-  displayUsername,
-  isDraft,
-  isDraftSaved,
-  isPrediction,
-  isSkipped,
-  isSubmitted,
-  isGroundTruth,
-  acceptedState,
-  predictionScore,
-  lastUpdated,
-  annotationId,
-  containerRef,
-  isTooltipOpen,
-  onMouseEnter,
-  onMouseLeave,
-  position,
-}: {
-  displayUsername: string;
-  isDraft: boolean;
-  isDraftSaved: boolean;
-  isPrediction: boolean;
-  isSkipped: boolean;
-  isSubmitted: boolean;
-  isGroundTruth?: boolean;
-  acceptedState: string | null | undefined;
-  predictionScore?: number | null;
-  lastUpdated?: string | null;
-  annotationId?: string | number | null;
-  containerRef?: React.MutableRefObject<HTMLElement | undefined>;
-  isTooltipOpen?: boolean;
-  onMouseEnter?: (e: React.MouseEvent) => void;
-  onMouseLeave?: (e: React.MouseEvent) => void;
-  position?: { top: number; left: number };
-}) {
-  // Determine status badge (only for annotations, not predictions)
-  // Draft/Submitted are separate from Skipped/Ground Truth
-  const statusBadge = useMemo(() => {
-    if (isPrediction) {
-      return null; // Status doesn't apply to predictions
-    }
-
-    // Priority order: Draft > Accepted/Rejected/Fixed > Submitted
-    // Skipped and Ground Truth are handled separately
-    // Check for both ephemeral drafts (isDraft) and saved drafts (isDraftSaved)
-    // Exception: If Draft AND Skipped, show both Draft and Skipped
-    if (isDraft || isDraftSaved) {
-      return { label: "Draft", variant: "primary" as const };
-    }
-    if (acceptedState) {
-      switch (acceptedState) {
-        case "accepted":
-          return { label: "Accepted", variant: "positive" as const };
-        case "rejected":
-          return { label: "Rejected", variant: "negative" as const };
-        case "fixed":
-        case "fixed_and_accepted":
-          return { label: "Fixed", variant: "warning" as const };
-        default:
-          break;
-      }
-    }
-    // Exception: If Submitted AND Skipped, only show Skipped (don't show Submitted)
-    if (isSubmitted && !isSkipped) {
-      return { label: "Submitted", variant: "positive" as const };
-    }
-
-    return null;
-  }, [isPrediction, isDraft, isDraftSaved, acceptedState, isSubmitted, isSkipped]);
-
-  // Format date using date-fns, matching Data Manager format: "MMM dd yyyy, HH:mm:ss" (e.g., "Jan 15 2024, 14:30:45")
-  const formatDate = useCallback((dateString: string | null | undefined): string | null => {
-    if (!dateString) return null;
-
-    try {
-      const date = new Date(dateString);
-      if (!isValid(date)) return null;
-
-      // Use the same format as Data Manager's DateTimeCell
-      return format(date, "MMM dd yyyy, HH:mm:ss");
-    } catch {
-      return null;
-    }
-  }, []);
-
-  const tooltipData = useMemo(() => {
-    const rows: Array<{ label: string; value: string }> = [];
-
-    // Add Annotation ID first if available
-    if (annotationId) {
-      rows.push({ label: isPrediction ? "Prediction ID" : "Annotation ID", value: String(annotationId) });
-    }
-
-    // Add Type for all annotations/predictions
-    if (isPrediction) {
-      rows.push({ label: "Type", value: "Prediction" });
-      if (isDefined(predictionScore)) {
-        rows.push({ label: "Prediction Score", value: `${(predictionScore * 100).toFixed(2)}%` });
-      }
-    } else {
-      rows.push({ label: "Type", value: "Annotation" });
-    }
-
-    // Add Last Updated after Type
-    if (lastUpdated) {
-      const formattedDate = formatDate(lastUpdated);
-      if (formattedDate) {
-        rows.push({ label: "Last Updated", value: formattedDate });
-      }
-    }
-
-    return rows;
-  }, [annotationId, isPrediction, predictionScore, lastUpdated, formatDate]);
-
-  const tooltipBadges = useMemo(() => {
-    const badges: Array<{ label: string; variant: "primary" | "positive" | "negative" | "warning" }> = [];
-    if (statusBadge) badges.push(statusBadge);
-    if (isSkipped) badges.push({ label: "Skipped", variant: "negative" });
-    if (isGroundTruth) badges.push({ label: "Ground Truth", variant: "warning" });
-    return badges;
-  }, [statusBadge, isSkipped, isGroundTruth]);
-
-  const isRenderable = tooltipData.length > 0 || !!displayUsername || tooltipBadges.length > 0 || !!annotationId;
-
-  if (!isRenderable) {
-    return null;
-  }
-
-  if (!isTooltipOpen || !position) {
-    return null;
-  }
-
-  const tooltipContent = (
-    <div
-      className={cn("annotation-button").elem("tooltipContainer").mod({ open: isTooltipOpen }).toClassName()}
-      ref={containerRef as any}
-      onMouseEnter={onMouseEnter}
-      onMouseLeave={onMouseLeave}
-      style={{
-        position: "fixed",
-        top: `${position.top}px`,
-        left: `${position.left}px`,
-      }}
-    >
-      {tooltipBadges.length > 0 && (
-        <div className={cn("annotation-button").elem("tooltipBadges").toClassName()}>
-          {tooltipBadges.map(({ label, variant }) => (
-            <Badge key={label} variant={variant} shape="rounded">
-              {label}
-            </Badge>
-          ))}
-        </div>
-      )}
-      {displayUsername && (
-        <div className={cn("annotation-button").elem("tooltipContainerTitle").toClassName()}>{displayUsername}</div>
-      )}
-      {tooltipData.length > 0 && (
-        <div className={cn("annotation-button").elem("tooltipContainerInfo").toClassName()}>
-          {tooltipData.map((row, index) => (
-            <div
-              key={`${row.label}-${row.value}-${index}`}
-              className={cn("annotation-button").elem("infoRow").toClassName()}
-            >
-              <div className={cn("annotation-button").elem("infoRowLabel").toClassName()}>{row.label}</div>
-              <div className={cn("annotation-button").elem("infoRowValue").toClassName()}>{row.value}</div>
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-
-  return typeof document !== "undefined" ? createPortal(tooltipContent, document.body) : null;
 }
 
-// AnnotationButtonContextMenu component - must be defined outside AnnotationButton
-// to maintain stable component reference and prevent hooks order issues
-const AnnotationButtonContextMenu = injector(
-  observer(
-    ({
-      entity,
-      capabilities,
-      store,
-      isGroundTruth,
-      iconSize,
-      onAnnotationChange,
-      annotationStore,
-    }: AnnotationButtonInterface & {
-      isGroundTruth?: boolean;
-      iconSize: number;
-      onAnnotationChange?: () => void;
-      annotationStore: any;
-    }) => {
-      // Check if entity is alive - must be done before any hooks
-      const entityIsAlive = isAlive(entity);
-      const isPrediction = entity.type === "prediction";
+/**
+ * Map a live MST `entity` node to the plain `SharedAnnotation` shape consumed by the
+ * shared TopBar layer. Reads must happen inside the observer body so MobX tracks
+ * dependencies correctly; that's why this is a function called every render rather
+ * than a memoized helper.
+ */
+function mapEntityToShared(entity: any, annotationStore: any, infoIsHidden: boolean): SharedAnnotation {
+  const isPrediction = entity.type === "prediction";
+  const acceptedState = readReviewStatus(entity, annotationStore);
 
-      const annotationLink = useMemo(() => {
-        if (!entityIsAlive || !entity.pk) {
-          return "";
-        }
-        const url = new URL(window.location.href);
-        if (entity.pk) {
-          url.searchParams.set("annotation", entity.pk);
-        }
-        // In case of targeting directly an annotation, we don't want to show the region in the URL
-        // otherwise it will be shown as a region link
-        url.searchParams.delete("region");
-        return url.toString();
-      }, [entityIsAlive, entity.pk]);
-      const [copyLink] = useCopyText({ defaultText: annotationLink });
-      const toast = useToast();
-      const dropdown = useDropdown();
-      const { fetchAnnotationCached } = useAnnotationFetcher(store?.task?.id);
-      const clickHandler = () => {
-        onAnnotationChange?.();
-        dropdown?.close();
-      };
-      const setGroundTruth = useCallback<MenuActionOnClick>(() => {
-        entity.setGroundTruth(!isGroundTruth);
-        clickHandler();
-      }, [entity, isGroundTruth]);
-      const duplicateAnnotation = useCallback<MenuActionOnClick>(async () => {
-        try {
-          if (
-            isFF(FF_FIT_720_LAZY_LOAD_ANNOTATIONS) &&
-            entity.type === "annotation" &&
-            entity.pk &&
-            annotationNeedsHydration(entity)
-          ) {
-            const data = await fetchAnnotationCached(entity.pk);
-            if (!data || (data as { error?: unknown }).error) {
-              toast?.show({
-                message: "Could not load annotation to duplicate. Try selecting it first.",
-                type: ToastType.error,
-              });
-              return;
-            }
-            applyAnnotationHydrationFromApi(annotationStore.annotations, entity.pk, data);
-          }
+  // Resolve a clean SharedUser shape; respect `infoIsHidden` (annotations:hide-info).
+  let user: SharedAnnotation["user"] = null;
+  if (infoIsHidden) {
+    const currentUser = annotationStore?.store?.user;
+    const isCurrentUser = entity.user?.id === currentUser?.id || entity.createdBy === currentUser?.email;
+    user = { email: isCurrentUser ? "Me" : "User" };
+  } else if (entity.user && isUserComplete(entity.user)) {
+    const u = entity.user;
+    user = {
+      id: u.id ?? null,
+      firstName: u.firstName ?? u.first_name ?? null,
+      lastName: u.lastName ?? u.last_name ?? null,
+      first_name: u.first_name ?? null,
+      last_name: u.last_name ?? null,
+      username: u.username ?? null,
+      email: u.email ?? null,
+      avatar: u.avatar ?? null,
+      initials: u.initials ?? null,
+    };
+  }
 
-          if (!isAlive(entity)) return;
+  return {
+    id: String(entity.id),
+    pk: entity.pk != null ? String(entity.pk) : null,
+    type: isPrediction ? "prediction" : "annotation",
+    selected: Boolean(entity.selected),
+    createdBy: entity.createdBy ?? "",
+    createdDate: entity.createdDate ?? "",
+    user,
+    groundTruth: Boolean(entity.ground_truth),
+    skipped: Boolean(entity.skipped),
+    editable: entity.editable,
+    draftId: entity.draftId ?? 0,
+    score: typeof entity.score === "number" ? entity.score : null,
+    commentCount: entity.comment_count ?? 0,
+    unresolvedCommentCount: entity.unresolved_comment_count ?? 0,
+    userGenerate: entity.userGenerate,
+    sentUserGenerate: entity.sentUserGenerate,
+    acceptedState,
+    versions: entity.versions,
+  };
+}
 
-          const c = annotationStore.addAnnotationFromPrediction(entity);
+const AnnotationButtonInner = injector(
+  observer(({ entity, capabilities = {}, annotationStore, store, onAnnotationChange }: AnnotationButtonInterface) => {
+    const buttonContainerRef = useRef<HTMLDivElement | null>(null);
+    const toast = useToast();
+    const { fetchAnnotationCached } = useAnnotationFetcher(store?.task?.id);
 
-          window.setTimeout(() => {
-            annotationStore.selectAnnotation(c.id, { exitViewAll: true });
-            clickHandler();
-          });
-        } catch {
-          toast?.show({
-            message: "Could not duplicate annotation.",
-            type: ToastType.error,
-          });
-        }
-      }, [entity, annotationStore, fetchAnnotationCached, toast, clickHandler]);
-      const linkAnnotation = useCallback<MenuActionOnClick>(() => {
-        copyLink();
-        dropdown?.close();
-        toast?.show({
-          message: isPrediction ? "Prediction link copied to clipboard" : "Annotation link copied to clipboard",
-          type: ToastType.info,
-        });
-      }, [copyLink, toast, dropdown, isPrediction]);
-      const [copyAnnotationId] = useCopyText({ defaultText: entity.pk?.toString() ?? entity.id?.toString() ?? "" });
-      const copyAnnotationIdHandler = useCallback<MenuActionOnClick>(() => {
-        copyAnnotationId();
-        dropdown?.close();
-        toast?.show({
-          message: isPrediction ? "Prediction ID copied to clipboard" : "Annotation ID copied to clipboard",
-          type: ToastType.info,
-        });
-      }, [copyAnnotationId, toast, dropdown, isPrediction]);
-      const openPerformanceDashboard = useCallback<MenuActionOnClick>(() => {
-        // Only available in LSE
-        const isLSE = (window as any).APP_SETTINGS?.version?.edition === "Enterprise";
-        if (!isLSE) return;
-
-        const url = new URL(window.location.origin);
-        const useNewAnalytics = isFF("fflag_feat_all_fit_778_analytics_short");
-
-        // Route to different dashboards based on feature flag
-        if (useNewAnalytics) {
-          url.pathname = "/analytics/member-performance";
-        } else {
-          url.pathname = "/performance";
-        }
-
-        // Add user, project, and annotation context
-        if (entity.user?.id) {
-          url.searchParams.set("user", entity.user.id);
-        }
-
-        const projectMatch = window.location.pathname.match(/\/projects\/(\d+)/);
-        if (projectMatch) {
-          url.searchParams.set("project", projectMatch[1]);
-        }
-
-        window.open(url.toString(), "_blank");
-        dropdown?.close();
-      }, [entity, dropdown]);
-      const showOtherAnnotations = useCallback<MenuActionOnClick>(() => {
-        annotationStore.toggleViewingAllAnnotations();
-        clickHandler();
-      }, [annotationStore, onAnnotationChange]);
-      const deleteAnnotation = useCallback(() => {
-        clickHandler();
-        confirm({
-          title: isPrediction ? "Delete prediction?" : "Delete annotation?",
-          body: (
-            <>
-              This will <strong>delete all existing regions</strong>. Are you sure you want to delete them?
-              <br />
-              This action cannot be undone.
-            </>
-          ),
-          buttonLook: "negative",
-          okText: "Delete",
-          onOk: () => {
-            entity.list.deleteAnnotation(entity);
-          },
-        });
-      }, [entity, onAnnotationChange, isPrediction]);
-      const isDraft = !isDefined(entity.pk);
-      const showGroundTruth = capabilities.groundTruthEnabled && !isPrediction && !isDraft;
-      const showDuplicateAnnotation = capabilities.enableCreateAnnotation && !isDraft;
-      const isLSE = (window as any).APP_SETTINGS?.version?.edition === "Enterprise";
-
-      // Check if project ID is available (from store or URL)
-      const hasProjectId = !!window.location.pathname.match(/\/projects\/(\d+)/);
-
-      const actions = useMemo<ContextMenuAction[]>(
-        () => [
-          {
-            label: isPrediction ? "Copy Prediction ID" : "Copy Annotation ID",
-            onClick: copyAnnotationIdHandler,
-            icon: <IconClipboardCheck width={20} height={20} />,
-            enabled: !isDraft,
-            dataTestId: "annotation-button-menu-copy-id",
-          },
-          {
-            label: `${isGroundTruth ? "Unset " : "Set "} as Ground Truth`,
-            onClick: setGroundTruth,
-            icon: isGroundTruth ? (
-              <IconStar color="#FFC53D" width={iconSize} height={iconSize} />
-            ) : (
-              <IconStarOutline width={iconSize} height={iconSize} />
-            ),
-            enabled: showGroundTruth,
-            dataTestId: "annotation-button-menu-set-ground-truth",
-          },
-          {
-            label: isPrediction ? "Duplicate as Annotation" : "Duplicate Annotation",
-            onClick: duplicateAnnotation,
-            icon: <IconDuplicate width={20} height={20} />,
-            enabled: showDuplicateAnnotation,
-            dataTestId: "annotation-button-menu-duplicate",
-          },
-          {
-            label: isPrediction ? "Copy Prediction Link" : "Copy Annotation Link",
-            onClick: linkAnnotation,
-            icon: <IconLink />,
-            enabled: !isDraft && store.hasInterface("annotations:copy-link"),
-            dataTestId: "annotation-button-menu-copy-link",
-          },
-          {
-            label: "Open Performance Dashboard",
-            onClick: openPerformanceDashboard,
-            icon: <IconAnalytics width={20} height={20} />,
-            enabled: isLSE && hasProjectId && !isDraft && !isPrediction,
-            dataTestId: "annotation-button-menu-performance-dashboard",
-          },
-          {
-            label: "Compare All Annotations",
-            onClick: showOtherAnnotations,
-            icon: <IconViewAll width={20} height={20} />,
-            enabled: true,
-            dataTestId: "annotation-button-menu-compare-all",
-          },
-          {
-            label: isPrediction ? "Delete Prediction" : "Delete Annotation",
-            onClick: deleteAnnotation,
-            icon: <IconTrashRect />,
-            separator: true,
-            danger: true,
-            enabled: isPrediction
-              ? Boolean((capabilities as { enablePredictionDelete?: boolean }).enablePredictionDelete)
-              : capabilities.enableAnnotationDelete,
-            dataTestId: "annotation-button-menu-delete",
-          },
-        ],
-        [
-          entity,
-          isGroundTruth,
-          isPrediction,
-          isDraft,
-          isLSE,
-          hasProjectId,
-          capabilities.enableAnnotationDelete,
-          capabilities.enableCreateAnnotation,
-          capabilities.groundTruthEnabled,
-          copyAnnotationIdHandler,
-          openPerformanceDashboard,
-          showOtherAnnotations,
-          deleteAnnotation,
-          setGroundTruth,
-          duplicateAnnotation,
-          linkAnnotation,
-          iconSize,
-          store,
-        ],
-      );
-
-      // Return null if entity is not alive, but only after all hooks have been called
-      if (!entityIsAlive) {
-        return null;
-      }
-
-      return <ContextMenu actions={actions} />;
-    },
-  ),
-);
-
-export const AnnotationButton = observer(
-  ({ entity, capabilities, annotationStore, onAnnotationChange }: AnnotationButtonInterface) => {
-    // Check if entity is alive - must be done before any hooks to avoid accessing dead entity
-    // But we'll return null AFTER all hooks are called to maintain hook order
-    const entityIsAlive = isAlive(entity);
-
-    const iconSize = 32;
-    // Guard entity property access - use safe defaults if entity is not alive
-    const isPrediction = entityIsAlive ? entity.type === "prediction" : false;
-    // Use entity.user if it has meaningful display data (name/email); otherwise
-    // fall back to createdBy (which comes from created_username in stub annotations).
-    const resolvedUser =
-      entityIsAlive && entity.user && isUserComplete(entity.user)
-        ? entity.user
-        : { firstName: entityIsAlive ? entity.createdBy || "Admin" : "Unknown" };
-    const username = entityIsAlive ? userDisplayName(resolvedUser) : "Unknown";
-    const [isGroundTruth, setIsGroundTruth] = useState<boolean>();
-    const isDraft = entityIsAlive && !isPrediction && !isDefined(entity.pk);
-    const isDraftSaved = entityIsAlive && !isPrediction && entity.draftId > 0;
-    const isSkipped = entityIsAlive && !isPrediction && entity.skipped === true;
-    // isSubmitted should be independent of skipped/ground truth status
-    const isSubmitted = entityIsAlive && !isPrediction && !isDraft && !isDraftSaved;
-    const infoIsHidden = annotationStore.store?.hasInterface("annotations:hide-info");
-    let hiddenUser = null;
-
-    // Tooltip state and refs
-    const buttonRef = useRef<HTMLElement>();
-    const mainSectionRef = useRef<HTMLElement>();
-    const tooltipContainerRef = useRef<HTMLElement>();
-    const timeoutRef = useRef<number>();
-    const leaveTimeoutRef = useRef<number>();
-    const [isTooltipOpen, setTooltipOpen] = useState(false);
-    const [tooltipPosition, setTooltipPosition] = useState<{ top: number; left: number } | undefined>(undefined);
-    const [isContextMenuOpen, setContextMenuOpen] = useState(false);
-
-    // Lazily resolve incomplete user data when the button comes into view.
-    // When annotations are loaded as stubs, entity.user may only have an ID
-    // (no name/email), so this fetches the full user and updates the MST store.
     const enrichUser = useCallback(
       (userData: any) => annotationStore?.store?.enrichUsers?.([userData]),
       [annotationStore],
     );
-    useResolveUser({ user: entity?.user, onUserResolved: enrichUser, elementRef: buttonRef });
+    useResolveUser({
+      user: entity?.user,
+      onUserResolved: enrichUser,
+      elementRef: buttonContainerRef as unknown as React.RefObject<HTMLElement | undefined>,
+    });
 
-    if (infoIsHidden && entityIsAlive) {
-      // this data can be missing in tests, but we don't have `infoIsHidden` there, so hiding logic like this
-      const currentUser = annotationStore.store.user;
-      const isCurrentUser = entity.user?.id === currentUser.id || entity.createdBy === currentUser.email;
-      hiddenUser = { email: isCurrentUser ? "Me" : "User" };
-    }
+    const entityIsAlive = entity ? isAlive(entity) : false;
+    const isPrediction = entityIsAlive ? entity.type === "prediction" : false;
+    const infoIsHidden = annotationStore?.store?.hasInterface?.("annotations:hide-info");
 
-    const displayUsername = hiddenUser ? hiddenUser.email : username;
+    // Building the shared shape every render keeps MobX subscriptions on the entity's
+    // live properties — memoizing on the entity reference would make the strip stop
+    // updating when MST mutates fields in place.
+    const sharedAnnotation: SharedAnnotation | null = entityIsAlive
+      ? mapEntityToShared(entity, annotationStore, Boolean(infoIsHidden))
+      : null;
 
-    // Apply smart truncation based on content type
-    const isName = isPersonName(displayUsername);
-    const displayNameTruncated = isName
-      ? displayUsername.length > NAME_TRUNCATE_THRESHOLD
-        ? truncatePersonName(displayUsername)
-        : displayUsername
-      : displayUsername.length > NAME_TRUNCATE_THRESHOLD
-        ? truncate(displayUsername, NAME_TRUNCATE_START, NAME_TRUNCATE_END, "...")
-        : displayUsername;
+    const isLSE = (window as any).APP_SETTINGS?.version?.edition === "Enterprise";
+    const hasProjectId = !!window.location.pathname.match(/\/projects\/(\d+)/);
 
-    const CommentIcon = renderCommentIcon(entity);
-    // need to find a more reliable way to grab this value
-    // const historyActionType = annotationStore.history.toJSON()?.[0]?.actionType;
-
-    useEffect(() => {
-      if (entityIsAlive) {
-        setIsGroundTruth(entity.ground_truth);
-      }
-    }, [entityIsAlive, entity, entity.ground_truth]);
-
-    // Click outside handler for tooltip
-    useEffect(() => {
-      function handleClickOutside(e: MouseEvent) {
-        const target = e.target as HTMLElement;
-        const isValidNode = target && "nodeType" in target;
-        if (!isValidNode || (!buttonRef.current?.contains(target) && !tooltipContainerRef.current?.contains(target))) {
-          setTooltipOpen(false);
-        }
-      }
-      document.addEventListener("mousedown", handleClickOutside);
-      return () => {
-        document.removeEventListener("mousedown", handleClickOutside);
-      };
-    }, []);
-
-    // Track mouse position and check if tooltip should remain open
-    useEffect(() => {
-      const handleMouseMove = (e: MouseEvent) => {
-        (window as any).lastMouseX = e.clientX;
-        (window as any).lastMouseY = e.clientY;
-
-        // If tooltip is open, check if mouse is still over button or tooltip
-        if (isTooltipOpen) {
-          const elementAtPoint = document.elementFromPoint(e.clientX, e.clientY);
-          // Only call contains() if elementAtPoint is actually a Node
-          const isOverTooltip =
-            elementAtPoint &&
-            "nodeType" in elementAtPoint &&
-            tooltipContainerRef.current?.contains(elementAtPoint as Node);
-          const isOverButton =
-            elementAtPoint && "nodeType" in elementAtPoint && buttonRef.current?.contains(elementAtPoint as Node);
-          const isOverTrigger = (elementAtPoint as HTMLElement)?.closest?.(".annotation-button__trigger");
-
-          // Close tooltip if mouse is not over button or tooltip (or is over trigger)
-          if (!isOverTooltip && (!isOverButton || isOverTrigger)) {
-            setTooltipOpen(false);
-          }
-        }
-      };
-      document.addEventListener("mousemove", handleMouseMove);
-      return () => {
-        document.removeEventListener("mousemove", handleMouseMove);
-      };
-    }, [isTooltipOpen]);
-
-    // Cleanup timeouts on unmount
-    useEffect(() => {
-      return () => {
-        if (timeoutRef.current) {
-          clearTimeout(timeoutRef.current);
-        }
-        if (leaveTimeoutRef.current) {
-          clearTimeout(leaveTimeoutRef.current);
-        }
-      };
-    }, []);
-
-    const recalculateTooltipPosition = useCallback(() => {
-      if (buttonRef.current) {
-        const anchorPosition = buttonRef.current.getBoundingClientRect();
-
-        // Estimate tooltip dimensions (we'll update after render)
-        const estimatedTooltipWidth = 250;
-        const estimatedTooltipHeight = 100;
-
-        // Check if tooltip would go off the bottom of the screen
-        const spaceBelow = window.innerHeight - anchorPosition.bottom;
-        const spaceAbove = anchorPosition.top;
-
-        let top: number;
-        let left: number;
-
-        // Position below by default, above if not enough space
-        if (spaceBelow < estimatedTooltipHeight + 20 && spaceAbove > spaceBelow) {
-          // Position above
-          top = anchorPosition.top - estimatedTooltipHeight - 12;
-        } else {
-          // Position below
-          top = anchorPosition.bottom + 12;
-        }
-
-        // Center horizontally, but adjust if too close to edges
-        left = anchorPosition.left + anchorPosition.width / 2 - estimatedTooltipWidth / 2;
-
-        // Adjust if too close to right edge
-        if (left + estimatedTooltipWidth > window.innerWidth - 20) {
-          left = window.innerWidth - estimatedTooltipWidth - 20;
-        }
-
-        // Adjust if too close to left edge
-        if (left < 20) {
-          left = 20;
-        }
-
-        setTooltipPosition({ top, left });
-
-        // Update arrow position after tooltip renders
-        requestAnimationFrame(() => {
-          if (tooltipContainerRef.current) {
-            const containerPosition = tooltipContainerRef.current.getBoundingClientRect();
-            const arrowOffset = anchorPosition.left + anchorPosition.width / 2 - containerPosition.left;
-            tooltipContainerRef.current.style.setProperty("--tooltip-arrow-position", `${arrowOffset}px`);
-          }
-        });
-      }
-    }, []);
-
-    const handleTooltipEnter = useCallback(
-      (e: React.MouseEvent) => {
-        // Don't show tooltip if context menu is open
-        if (isContextMenuOpen) {
-          return;
-        }
-
-        // Clear any pending leave timeout
-        if (leaveTimeoutRef.current) {
-          clearTimeout(leaveTimeoutRef.current);
-          leaveTimeoutRef.current = undefined;
-        }
-
-        const isTrigger = (e.target as HTMLElement)?.closest?.(".annotation-button__trigger");
-
-        // Don't show tooltip if hovering over trigger
-        if (isTrigger) {
-          return;
-        }
-
-        if (timeoutRef.current) {
-          clearTimeout(timeoutRef.current);
-        }
-
-        timeoutRef.current = window.setTimeout(() => {
-          recalculateTooltipPosition();
-          setTooltipOpen(true);
-        }, hoverIntentDelay);
-      },
-      [recalculateTooltipPosition, isContextMenuOpen],
+    const sharedCapabilities: AnnotationCapabilities = useMemo(
+      () => ({
+        groundTruthEnabled: Boolean(capabilities.groundTruthEnabled),
+        enableCreateAnnotation: Boolean(capabilities.enableCreateAnnotation),
+        enableAnnotationDelete: Boolean(capabilities.enableAnnotationDelete),
+        enablePredictionDelete: Boolean(capabilities.enablePredictionDelete),
+        enableAnnotations: capabilities.enableAnnotations !== false,
+        enablePredictions: capabilities.enablePredictions !== false,
+        enableCopyLink: Boolean(store?.hasInterface?.("annotations:copy-link")),
+        // Mirror the gate used by the left-side ViewAllToggle in
+        // `editor/src/components/TopBar/TopBar.jsx` so the menu item is
+        // hidden when the project's interfaces don't include
+        // `annotations:view-all` (otherwise the action would silently
+        // toggle a state with no UI to leave it).
+        enableCompareAllAnnotations: Boolean(store?.hasInterface?.("annotations:view-all")),
+        enablePerformanceDashboard: isLSE && hasProjectId,
+        showUserInfo: !infoIsHidden,
+      }),
+      [capabilities, store, isLSE, hasProjectId, infoIsHidden],
     );
 
-    const handleTooltipLeave = useCallback((e: React.MouseEvent | React.FocusEvent) => {
-      // Clear any pending enter timeout
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
-        timeoutRef.current = undefined;
-      }
-
-      // Clear any existing leave timeout
-      if (leaveTimeoutRef.current) {
-        clearTimeout(leaveTimeoutRef.current);
-      }
-
-      const relatedTarget = ((e as React.MouseEvent).relatedTarget ||
-        (e as React.FocusEvent).relatedTarget) as HTMLElement | null;
-
-      // Check if we're moving to the tooltip container
-      // Only call contains() if relatedTarget is actually a Node
-      const isMovingToTooltip =
-        relatedTarget && "nodeType" in relatedTarget && tooltipContainerRef.current?.contains(relatedTarget as Node);
-
-      // If not moving to tooltip, check if moving back to button (but not trigger)
-      // Only call contains() if relatedTarget is actually a Node
-      const isMovingToButton =
-        relatedTarget && "nodeType" in relatedTarget && buttonRef.current?.contains(relatedTarget as Node);
-      const isMovingToTrigger = relatedTarget?.closest?.(".annotation-button__trigger");
-
-      // If moving to tooltip or button (but not trigger), keep tooltip open
-      if (isMovingToTooltip || (isMovingToButton && !isMovingToTrigger)) {
-        return;
-      }
-
-      // Use a small delay to allow mouse to move to tooltip, but close if mouse is truly gone
-      leaveTimeoutRef.current = window.setTimeout(() => {
-        // Check current mouse position
-        const currentMouseX = (window as any).lastMouseX;
-        const currentMouseY = (window as any).lastMouseY;
-
-        if (currentMouseX !== undefined && currentMouseY !== undefined) {
-          const elementAtPoint = document.elementFromPoint(currentMouseX, currentMouseY);
-          // Only call contains() if elementAtPoint is actually a Node
-          const isOverTooltip =
-            elementAtPoint &&
-            "nodeType" in elementAtPoint &&
-            tooltipContainerRef.current?.contains(elementAtPoint as Node);
-          const isOverButton =
-            elementAtPoint && "nodeType" in elementAtPoint && buttonRef.current?.contains(elementAtPoint as Node);
-          const isOverTrigger = (elementAtPoint as HTMLElement)?.closest?.(".annotation-button__trigger");
-
-          // Close tooltip unless mouse is over tooltip or button (but not trigger)
-          if (!isOverTooltip && (!isOverButton || isOverTrigger)) {
-            setTooltipOpen(false);
+    const handlers: AnnotationActionHandlers = useMemo(
+      () => ({
+        onSelect: () => {
+          if (!entityIsAlive) return;
+          const { selected, id, type } = entity;
+          if (selected) return;
+          if (type === "prediction") {
+            annotationStore.selectPrediction(id, { exitViewAll: true });
+          } else {
+            annotationStore.selectAnnotation(id, { exitViewAll: true });
           }
-        } else {
-          // No mouse position available, close tooltip
-          setTooltipOpen(false);
-        }
-
-        leaveTimeoutRef.current = undefined;
-      }, 100); // Small delay to allow mouse movement to tooltip
-    }, []);
-
-    const handleTooltipContainerLeave = useCallback(() => {
-      // When mouse leaves tooltip container, close immediately
-      if (leaveTimeoutRef.current) {
-        clearTimeout(leaveTimeoutRef.current);
-        leaveTimeoutRef.current = undefined;
-      }
-      setTooltipOpen(false);
-    }, []);
-
-    const handleTooltipFocus = useCallback(() => {
-      if (isContextMenuOpen) {
-        return;
-      }
-
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
-      }
-
-      timeoutRef.current = window.setTimeout(() => {
-        recalculateTooltipPosition();
-        setTooltipOpen(true);
-      }, hoverIntentDelay);
-    }, [recalculateTooltipPosition, isContextMenuOpen]);
-
-    const handleTriggerEnter = useCallback(() => {
-      // Close tooltip immediately when hovering over trigger
-      setTooltipOpen(false);
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
-        timeoutRef.current = undefined;
-      }
-      if (leaveTimeoutRef.current) {
-        clearTimeout(leaveTimeoutRef.current);
-        leaveTimeoutRef.current = undefined;
-      }
-    }, []);
-
-    const clickHandler = useCallback(() => {
-      if (!entityIsAlive) return;
-      const { selected, id, type } = entity;
-
-      if (!selected) {
-        if (type === "prediction") {
-          annotationStore.selectPrediction(id, { exitViewAll: true });
-        } else {
-          annotationStore.selectAnnotation(id, { exitViewAll: true });
-        }
-      }
-    }, [entityIsAlive, entity, annotationStore]);
-
-    // Get review status from task source (LSE-only feature)
-    // The backend builds the annotators array by iterating through annotations in order,
-    // so we match by finding the annotation's position in the backend's annotation list
-    const getReviewStatus = useCallback(() => {
-      // Only available in LSE for non-predictions
-      const isLSE = (window as any).APP_SETTINGS?.version?.edition === "Enterprise";
-      if (!isLSE || !entityIsAlive || isPrediction) {
-        return null;
-      }
-
-      // Parse task source to get annotators array and backend annotations list
-      const task = annotationStore?.store?.task;
-      const sourceStr = task?.dataObj?.source;
-      if (!sourceStr) return null;
-
-      try {
-        const taskSource = typeof sourceStr === "string" ? JSON.parse(sourceStr) : sourceStr;
-        const annotators = taskSource?.annotators;
-        const backendAnnotations = taskSource?.annotations;
-
-        if (!Array.isArray(annotators) || !Array.isArray(backendAnnotations)) {
-          return null;
-        }
-
-        // Find the current annotation's index in the backend's annotations array
-        // The backend builds annotators array by iterating through this same list
-        const annotationIndex = backendAnnotations.findIndex((ann: any) => {
-          if (entity.pk && ann.id) {
-            return String(ann.id) === String(entity.pk);
-          }
-          return false;
-        });
-
-        if (annotationIndex === -1 || annotationIndex >= annotators.length) {
-          return null;
-        }
-
-        // Use the same index to get the corresponding annotator's review status
-        return annotators[annotationIndex]?.review ?? null;
-      } catch {
-        return null;
-      }
-    }, [entityIsAlive, isPrediction, annotationStore, entity.pk]);
-
-    // Return null if entity is not alive, but only after all hooks have been called
-    if (!entityIsAlive) {
-      return null;
-    }
-
-    // After this point, entityIsAlive is guaranteed to be true, so we can safely access entity properties
-    const acceptedState = getReviewStatus();
-    const reviewBadge = getReviewBadge(acceptedState);
-
-    return (
-      <div
-        className={cn("annotation-button")
-          .mod({
-            selected: entity.selected,
-            groundTruth: isGroundTruth,
-            draft: isDraft && !isDraftSaved, // Ephemeral draft only
-            draftSaved: isDraftSaved, // Saved draft
-            submitted: isSubmitted,
-            skipped: isSkipped,
-            triggerOpened: isContextMenuOpen,
-          })
-          .toClassName()}
-        data-annotation-id={entity.pk ?? entity.id}
-        ref={buttonRef as any}
-        onMouseEnter={handleTooltipEnter}
-        onMouseLeave={handleTooltipLeave}
-        onFocus={handleTooltipFocus}
-        onBlur={handleTooltipLeave}
-      >
-        <div
-          className={cn("annotation-button").elem("mainSection").toClassName()}
-          onClick={clickHandler}
-          ref={mainSectionRef as any}
-        >
-          <div className={cn("annotation-button").elem("picSection").toClassName()}>
-            <Userpic
-              className={cn("annotation-button").elem("userpic").mod({ prediction: isPrediction }).toClassName()}
-              // @ts-expect-error - block attribute for Selenium test compatibility
-              block="lsf-annotation-button"
-              username={isPrediction ? entity.createdBy : null}
-              user={hiddenUser ?? (isUserComplete(entity.user) ? entity.user : { email: entity.createdBy })}
-              size={24}
-              badge={
-                reviewBadge
-                  ? {
-                      bottomRight: reviewBadge,
-                    }
-                  : undefined
+        },
+        onSetGroundTruth: (_a, value) => {
+          if (!entityIsAlive) return;
+          entity.setGroundTruth(value);
+        },
+        onDuplicate: async () => {
+          if (!entityIsAlive) return;
+          try {
+            // FF_FIT_720_LAZY_LOAD_ANNOTATIONS: hydrate stub annotations before duplicating
+            // so the resulting copy has region results, not an empty shell.
+            if (
+              isFF(FF_FIT_720_LAZY_LOAD_ANNOTATIONS) &&
+              entity.type === "annotation" &&
+              entity.pk &&
+              annotationNeedsHydration(entity)
+            ) {
+              const data = await fetchAnnotationCached(entity.pk);
+              if (!data || (data as { error?: unknown }).error) {
+                toast?.show({
+                  message: "Could not load annotation to duplicate. Try selecting it first.",
+                  type: ToastType.error,
+                });
+                return;
               }
-            >
-              {isPrediction && <IconSparks style={{ width: 18, height: 18 }} />}
-            </Userpic>
-            {/* TODO: Remove block. Selenium is using this anchor that was mistakenly propagated into this element. */}
-            {/* to do: return these icons when we have a better way to grab the history action type */}
-            {/* {historyActionType === 'accepted' && <Elem name='status' mod={{ approved: true }}><IconCheckBold /></Elem>}
-          {historyActionType && (
-            <Elem name='status' mod={{ skipped: true }}>
-              <IconCrossBold />
-            </Elem>
-          )}
-          {entity.history.canUndo && (
-            <Elem name='status' mod={{ updated: true }}>
-              <IconCheckBold />
-            </Elem>
-          )} */}
-          </div>
-          <div className={cn("annotation-button").elem("main").toClassName()}>
-            <div className={cn("annotation-button").elem("user").toClassName()}>
-              <span className={cn("annotation-button").elem("name").toClassName()}>{displayNameTruncated}</span>
-            </div>
-            {!infoIsHidden && (
-              <div className={cn("annotation-button").elem("info").toClassName()}>
-                <TimeAgo className={cn("annotation-button").elem("date").toClassName()} date={entity.createdDate} />
-                {isPrediction && isDefined(entity.score) && (
-                  <span title={`Prediction score = ${entity.score}`}>
-                    {" · "} {(entity.score * 100).toFixed(2)}%
-                  </span>
-                )}
-              </div>
-            )}
-          </div>
-          {!isPrediction && (
-            <div className={cn("annotation-button").elem("icons").toClassName()}>
-              {(entity.draftId > 0 || isDraft) && (
-                <Tooltip title="Draft">
-                  <div className={cn("annotation-button").elem("icon").mod({ draft: true }).toClassName()}>
-                    <IconDraftCreated2 color="#617ADA" />
-                  </div>
-                </Tooltip>
-              )}
-              {entity.skipped && (
-                <Tooltip title="Skipped">
-                  <div className={cn("annotation-button").elem("icon").mod({ skipped: true }).toClassName()}>
-                    <IconAnnotationSkipped2 color="#DD0000" />
-                  </div>
-                </Tooltip>
-              )}
-              {isGroundTruth && (
-                <Tooltip title="Ground-truth">
-                  <div className={cn("annotation-button").elem("icon").mod({ groundTruth: true }).toClassName()}>
-                    <IconAnnotationGroundTruth />
-                  </div>
-                </Tooltip>
-              )}
-              {CommentIcon && (
-                <Tooltip title={renderCommentTooltip(entity)}>
-                  <div className={cn("annotation-button").elem("icon").mod({ comments: true }).toClassName()}>
-                    <CommentIcon />
-                  </div>
-                </Tooltip>
-              )}
-            </div>
-          )}
-          <AnnotationButtonTooltip
-            displayUsername={displayUsername}
-            isDraft={isDraft}
-            isDraftSaved={isDraftSaved}
-            isPrediction={isPrediction}
-            isSkipped={isSkipped}
-            isSubmitted={isSubmitted}
-            isGroundTruth={isGroundTruth}
-            acceptedState={acceptedState}
-            predictionScore={isPrediction ? entity.score : null}
-            lastUpdated={entity.createdDate}
-            annotationId={entity.pk ?? entity.id}
-            containerRef={tooltipContainerRef}
-            isTooltipOpen={isTooltipOpen}
-            onMouseEnter={handleTooltipEnter}
-            onMouseLeave={handleTooltipContainerLeave}
-            position={tooltipPosition}
-          />
-        </div>
-        {entityIsAlive && (
-          <DropdownTrigger
-            content={
-              <AnnotationButtonContextMenu
-                entity={entity}
-                capabilities={capabilities}
-                annotationStore={annotationStore}
-                store={annotationStore.store}
-                isGroundTruth={isGroundTruth}
-                iconSize={iconSize}
-                onAnnotationChange={onAnnotationChange}
-              />
+              applyAnnotationHydrationFromApi(annotationStore.annotations, entity.pk, data);
             }
-            onToggle={(isOpen) => {
-              setContextMenuOpen(isOpen);
-              // Close tooltip when context menu opens
-              if (isOpen) {
-                setTooltipOpen(false);
-                if (timeoutRef.current) {
-                  clearTimeout(timeoutRef.current);
-                  timeoutRef.current = undefined;
-                }
-              }
-            }}
-          >
-            <div
-              className={cn("annotation-button").elem("trigger").toClassName()}
-              data-testid="annotation-button-menu-trigger"
-              onMouseEnter={handleTriggerEnter}
-              onClick={(e) => e.stopPropagation()}
-            >
-              <IconEllipsisVertical width={20} height={20} />
-            </div>
-          </DropdownTrigger>
-        )}
-      </div>
+            if (!isAlive(entity)) return;
+            const c = annotationStore.addAnnotationFromPrediction(entity);
+            window.setTimeout(() => {
+              annotationStore.selectAnnotation(c.id, { exitViewAll: true });
+            });
+          } catch {
+            toast?.show({ message: "Could not duplicate annotation.", type: ToastType.error });
+          }
+        },
+        onDelete: () => {
+          if (!entityIsAlive) return;
+          const isPredictionLocal = entity.type === "prediction";
+          confirm({
+            title: isPredictionLocal ? "Delete prediction?" : "Delete annotation?",
+            body: (
+              <>
+                This will <strong>delete all existing regions</strong>. Are you sure you want to delete them?
+                <br />
+                This action cannot be undone.
+              </>
+            ),
+            buttonLook: "negative",
+            okText: "Delete",
+            onOk: () => {
+              entity.list.deleteAnnotation(entity);
+            },
+          });
+        },
+        onShowOtherAnnotations: () => {
+          annotationStore.toggleViewingAllAnnotations();
+        },
+        onOpenPerformanceDashboard: () => {
+          if (!isLSE) return;
+          const url = new URL(window.location.origin);
+          const useNewAnalytics = isFF("fflag_feat_all_fit_778_analytics_short");
+          url.pathname = useNewAnalytics ? "/analytics/member-performance" : "/performance";
+          if (entity?.user?.id) url.searchParams.set("user", String(entity.user.id));
+          const projectMatch = window.location.pathname.match(/\/projects\/(\d+)/);
+          if (projectMatch) url.searchParams.set("project", projectMatch[1]);
+          window.open(url.toString(), "_blank");
+        },
+        onAnnotationChange,
+      }),
+      [entityIsAlive, entity, annotationStore, fetchAnnotationCached, toast, isLSE, onAnnotationChange],
     );
-  },
+
+    if (!entityIsAlive || !sharedAnnotation) return null;
+
+    // IMPORTANT: do NOT introduce any wrapper element here. Selenium page objects
+    // (`label-studio-test-automation/.../QuickViewTabManagement.java`) rely on the
+    // direct-child relationship `lsf-annotations-carousel__carosel > .lsf-annotation-button`,
+    // and break (silently returning empty annotation IDs from the active tab) when
+    // any DOM element sits between the carousel container and the button. The
+    // shared `SharedAnnotationButton` accepts a `ref` to its outer container so
+    // `useResolveUser`'s IntersectionObserver still has the correct target.
+    return (
+      <SharedAnnotationButton
+        ref={buttonContainerRef as React.MutableRefObject<HTMLDivElement | null>}
+        annotation={sharedAnnotation}
+        capabilities={sharedCapabilities}
+        handlers={handlers}
+      />
+    );
+  }),
 );
+
+export const AnnotationButton = AnnotationButtonInner;

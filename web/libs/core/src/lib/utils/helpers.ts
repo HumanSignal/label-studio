@@ -36,8 +36,29 @@ export const userDisplayName = (user: Record<string, string> = {}) => {
     : username || email || "";
 };
 
-export const copyText = async (text: string) => {
-  await navigator.clipboard.writeText(text);
+/**
+ * Copy a string to the clipboard. Resolves to `true` on success and `false` if
+ * the clipboard write was rejected (no permission, opaque-origin sandboxed
+ * iframe without the `copyToClipboard` RPC capability, etc.).
+ *
+ * The promise is always resolved — never rejected — so callers that fire and
+ * forget (e.g. `useCopyText`) cannot leak an "Unhandled (in promise) Error:
+ * Clipboard write is not allowed in this embed" into the host page console.
+ * The rejection reason is still logged via `console.warn` so it remains
+ * debuggable.
+ */
+export const copyText = async (text: string): Promise<boolean> => {
+  try {
+    if (!navigator?.clipboard?.writeText) {
+      console.warn("[copyText] navigator.clipboard.writeText is not available");
+      return false;
+    }
+    await navigator.clipboard.writeText(text);
+    return true;
+  } catch (err) {
+    console.warn("[copyText] Clipboard write rejected:", err);
+    return false;
+  }
 };
 
 export const formatFileSize = (bytes: number): string => {

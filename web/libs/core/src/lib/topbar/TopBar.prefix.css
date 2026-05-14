@@ -7,7 +7,7 @@
   align-items: stretch;
   justify-content: space-between;
   background-color: var(--color-neutral-surface);
-  border-bottom: 1px solid var(--color-neutral-border);
+  border-bottom: 1px solid var(--shell-border-color, var(--color-neutral-border));
   user-select: none;
   position: sticky;
   top: 0;
@@ -43,7 +43,7 @@
     display: block;
     background-color: var(--color-neutral-surface);
     height: 42px;
-    border-bottom: 1px solid var(--color-neutral-border);
+    border-bottom: 1px solid var(--shell-border-color, var(--color-neutral-border));
 
     & .topbar {
       &__group {

@@ -1,3 +1,18 @@
+/**
+ * Integration tests for the classic-editor (MST) `AnnotationButton` wrapper.
+ *
+ * After FIT-1774 the visual + interaction surface lives in the shared
+ * `@humansignal/core/lib/topbar/AnnotationButton` (covered by Bun tests under
+ * `libs/core/src/lib/topbar/__tests__/`). The tests in this file remain as the
+ * source of truth for the MST → props/handler mapping done by the wrapper —
+ * lazy stub hydration, `useResolveUser`/`enrichUsers` plumbing, the
+ * `Modal#confirm` delete dialog, LSE-specific review-status parsing from
+ * `task.source`, and the wiring of MST actions onto SharedAnnotation handlers.
+ *
+ * If you need to add coverage for purely presentational behavior, prefer the
+ * shared Bun suite. Add tests here only when the assertion depends on MST state
+ * or wrapper-only side effects.
+ */
 import type { ReactElement } from "react";
 import { render as rtlRender, screen, fireEvent, act, waitFor } from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -8,6 +23,7 @@ import * as useAnnotationQueryModule from "../../../hooks/useAnnotationQuery";
 import * as useResolveUserModule from "@humansignal/core/hooks/useResolveUser";
 import * as coreModule from "@humansignal/core";
 import * as uiModule from "@humansignal/ui";
+import { ToastContext } from "@humansignal/ui";
 import * as modalModule from "../../../common/Modal/Modal";
 
 import { isAlive } from "mobx-state-tree";
@@ -46,7 +62,9 @@ const createTestQueryClient = () =>
 const renderWithProviders = (ui: any, store: any = defaultStore) =>
   rtlRender(
     <Provider store={store}>
-      <QueryClientProvider client={createTestQueryClient()}>{ui}</QueryClientProvider>
+      <QueryClientProvider client={createTestQueryClient()}>
+        <ToastContext.Provider value={{ show: mockToastShow, dismiss: mock() }}>{ui}</ToastContext.Provider>
+      </QueryClientProvider>
     </Provider>,
   );
 
@@ -60,7 +78,11 @@ const defaultAnnotationStore = {
 
 function render(ui: ReactElement) {
   const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
-  return rtlRender(<QueryClientProvider client={client}>{ui}</QueryClientProvider>);
+  return rtlRender(
+    <QueryClientProvider client={client}>
+      <ToastContext.Provider value={{ show: mockToastShow, dismiss: mock() }}>{ui}</ToastContext.Provider>
+    </QueryClientProvider>,
+  );
 }
 
 function createEntity(overrides: Record<string, unknown> = {}) {
@@ -433,17 +455,23 @@ describe("AnnotationButton", () => {
   });
 
   it("calls toggleViewingAllAnnotations when Compare All Annotations is clicked", () => {
+    // The wrapper now gates this row on `annotations:view-all` (mirrors the
+    // left-side ViewAllToggle in `editor/src/components/TopBar/TopBar.jsx`).
+    const storeWithViewAll = {
+      ...defaultStore,
+      hasInterface: mock((key: string) => key === "annotations:view-all"),
+    };
     const entity = createEntity();
     const toggleViewingAllAnnotations = mock();
     renderWithProviders(
-      <Provider store={defaultStore}>
+      <Provider store={storeWithViewAll}>
         <AnnotationButton
           entity={entity}
           capabilities={defaultCapabilities}
           annotationStore={
             {
               ...defaultAnnotationStore,
-              store: defaultStore,
+              store: storeWithViewAll,
               toggleViewingAllAnnotations,
             } as any
           }
@@ -453,6 +481,27 @@ describe("AnnotationButton", () => {
     fireEvent.click(screen.getByTestId("annotation-button-menu-trigger"));
     fireEvent.click(screen.getByTestId("annotation-button-menu-compare-all"));
     expect(toggleViewingAllAnnotations).toHaveBeenCalled();
+  });
+
+  it("hides Compare All Annotations when the store does not have annotations:view-all", () => {
+    // FIT-1774: the left-side ViewAllToggle is gated on
+    // `store.hasInterface('annotations:view-all')`. Before this change the
+    // context-menu row was always shown — a project that disabled the
+    // toggle could still trigger view-all from the menu and end up in a
+    // state with no UI to leave. Now the row is hidden.
+    const entity = createEntity();
+    renderWithProviders(
+      <Provider store={defaultStore}>
+        <AnnotationButton
+          entity={entity}
+          capabilities={defaultCapabilities}
+          annotationStore={{ ...defaultAnnotationStore, store: defaultStore } as any}
+        />
+      </Provider>,
+    );
+    fireEvent.click(screen.getByTestId("annotation-button-menu-trigger"));
+    expect(screen.queryByTestId("annotation-button-menu-compare-all")).toBeNull();
+    expect(screen.queryByText("Compare All Annotations")).toBeNull();
   });
 
   it("opens delete confirmation when Delete Annotation is clicked", () => {
