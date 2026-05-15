@@ -36,9 +36,9 @@ To add standard user accounts, you can do one of the following:
 Service accounts only have API access to Label Studio. They cannot log in and navigate the Label Studio UI.
 
 !!! note
-    Each organization is allowed 1 service account by default. This initial service account does not count against your seat count.
+    Each organization is allowed 1 service account by default. This initial service account is not counted against your license seat count.
 
-    If you need to add more service accounts, you can request additional seats from your HumanSignal account representative.
+    If you need to add more, you can request additional service accounts from your HumanSignal account representative.
 
 To add a service account, go to the **Organization > Members** page and click the drop-down option next to **Invite Members**. Select **Create Service Account**.
 
@@ -50,4 +50,4 @@ Complete the following fields:
 |---|---|
 | **Name** | The name of the service account. |
 | **Organization role** | The role determines the level of access the service account has within the organization. For more information, see [User roles and permissions](admin_roles). |
-| **Workspaces and projects** | For a service account with a role of Annotator, Reviewer, or Manager, assign the service account to one or more workspaces and projects. |
+| **Workspaces and projects** | For a service account with a role of Annotator, Reviewer, or Manager, assign the service account to one or more workspaces and/or projects. |
