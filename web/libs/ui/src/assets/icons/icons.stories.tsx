@@ -280,7 +280,7 @@ const PhosphorIconItem = ({
       <div className="icon-preview mb-2 flex h-10 w-10 items-center justify-center text-neutral-content transition-transform duration-200 group-hover:scale-150">
         {React.createElement(IconComponent, { size: 24 })}
       </div>
-      <div className="icon-name mb-1 break-words text-center text-xs font-bold text-neutral-content-subtle">
+      <div className="icon-name mb-1 w-full break-words text-center text-xs font-bold text-neutral-content-subtle">
         {copyLabel}
       </div>
       <span className="mt-2 text-center text-10 font-medium text-primary-content-subtle opacity-0 transition-opacity duration-200 group-hover:opacity-100">

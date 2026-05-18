@@ -837,4 +837,13 @@ afterEach(() => {
   if (settings?.user && typeof settings.user === "object" && typeof settings.user.id !== "number") {
     delete settings.user;
   }
+
+  // Guard against tests that set window.APP_SETTINGS = undefined; ApiConfig.js reads
+  // window.APP_SETTINGS.hostname at module-evaluation time, so a missing hostname
+  // causes an unhandled error when the next test file is loaded in the same worker.
+  if (!(window as any).APP_SETTINGS) {
+    (window as any).APP_SETTINGS = { hostname: "http://localhost" };
+  } else if (!(window as any).APP_SETTINGS.hostname) {
+    (window as any).APP_SETTINGS = { ...(window as any).APP_SETTINGS, hostname: "http://localhost" };
+  }
 });
