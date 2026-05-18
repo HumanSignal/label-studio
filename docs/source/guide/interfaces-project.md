@@ -23,7 +23,7 @@ Once you have created an Interface, you can create a project from it.
 
 | Field | Description |
 | --- | --- |
-| **Workspace** | The workspace where the project will be created. You can only select workspaces for [shared Interfaces](interfaces-overview#Interface-scope). |
+| **Workspace** | The workspace where the project will be created. You can only select workspaces for [shared Interfaces](interfaces#Interface-scope). |
 | **Project Title** | The name of the project. |
 | **Description** | A description of the project. |
 

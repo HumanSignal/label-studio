@@ -21,11 +21,11 @@ Developing locally is useful when you want to:
 - Bring an existing React mockup into Label Studio.
 - Run automated validation and Playwright scenarios against your Interface before publishing.
 
-## Prerequisites
+## 1. Install the label-studio-sdk package and check your setup
 
-Before you start, make sure you have:
+Before you begin, make sure you have:
 
-- The [`label-studio-sdk` Python package](https://github.com/HumanSignal/label-studio-sdk) installed
+- **The [`label-studio-sdk` Python package](https://github.com/HumanSignal/label-studio-sdk).** If you already have it installed, ensure you version 2.0.22 or later. 
    ```bash
    pip install --upgrade label-studio-sdk
    # or
@@ -35,15 +35,12 @@ Before you start, make sure you have:
 - Your Label Studio Enterprise URL and an [API token](access_tokens).
 - A coding agent installed (Claude, Codex, or Cursor) if you want agent assistance.
 
-!!! info Tip
-    You can also pass `--lse-url` and `--token` to individual commands instead of exporting them. This is useful if you work against more than one Label Studio instance.
-
 To begin, select **Interfaces** in the main menu and then select **Create Interface > Develop Locally**. 
 
 !!! info Tip
     To iterate on an Interface that already exists in Label Studio, open the Interface details page and click **Develop Locally** in the top bar. The dialog respects the version currently selected in the [version navigator](interface-details#Versions).
 
-## 1. Install the create-interface skill
+## 2. Install the create-interface skill
 
 Install the `create-interface-skill` for your local coding agent. The skill includes the commands and conventions for working with Interfaces locally so your agent can author a valid Interface module.
 
@@ -60,7 +57,7 @@ Run the command in your terminal, then restart your agent so that it picks up th
 !!! info Tip
     You can skip this step if you'd rather write the Interface by hand. The skill is optional — it just gives your agent context.
 
-## 2. Initialize the Interface
+## 3. Initialize the Interface
 
 Use the SDK-provided command to initialize the Interface in a local directory:
 
@@ -68,20 +65,29 @@ Use the SDK-provided command to initialize the Interface in a local directory:
 export LABEL_STUDIO_URL="https://your-instance.humansignal.com"
 export LABEL_STUDIO_API_KEY="<your token>"
 label-studio-sdk interface init ./my-interface
+cd ./my-interface
+label-studio-sdk interface preview .
 ```
 
 `interface init` scaffolds a starter `Screen.jsx`, `task.json`, and `scenarios.js` so you have a working baseline to build from.
 
 !!! info Tip
-    To start from an existing Interface instead of a fresh scaffold, use:
-    
-    ```
-    label-studio-sdk interface pull --id <interface-id> --version <version-id> ./my-interface
-    ```
-    
-    The dialog pre-fills the `--id` and `--version` for you. Without `--version`, `pull` grabs the latest version of the Interface, including any unpublished local drafts.
+    You can also pass `--lse-url` and `--token` to individual commands instead of exporting them. This is useful if you work against more than one Label Studio instance.
 
-## 3. Check local setup
+
+#### Start from an existing Interface
+
+To iterate on an Interface that already exists in Label Studio, open the Interface details page and click **Develop Locally** in the top bar. The dialog respects the version currently selected in the [version navigator](interface-details#Versions).
+
+Alternatively, you can use:
+    
+```bash
+label-studio-sdk interface pull --id <interface-id> --version <version-id> ./my-interface
+```
+    
+The dialog pre-fills the `--id` and `--version` for you. Without `--version`, `pull` grabs the latest version of the Interface, including any unpublished local drafts.
+
+## 4. Check local setup
 
 Run the following command to check your local setup:
 
@@ -91,7 +97,7 @@ label-studio-sdk interface doctor
 
 The first validation or doctor run installs the Node validator dependencies into a user cache directory.
 
-## 4. Start the live preview
+## 5. Start the live preview
 
 Change into your Interface directory and run the preview command:
 
@@ -102,11 +108,11 @@ label-studio-sdk interface preview .
 
 This opens a **playground** in Label Studio (at the `interfaces/playground` URL) that is live-connected to your local environment. The playground watches your source files — every save reflects your latest changes in the preview in real time.
 
-## 5. Develop in your local environment
+## 6. Develop in your local environment
 
 With the playground running, you can work in your familiar local tools — your IDE, terminal, or a coding agent on your machine — rather than editing in-product. Save your changes as you would for any other project, and the playground re-renders against the current sample task data.
 
-## 6. Validate the Interface
+## 7. Validate the Interface
 
 Before syncing your changes, validate the Interface to catch any issues:
 
@@ -122,7 +128,7 @@ label-studio-sdk interface validate . --scenario scenarios.js
 
 Validation also runs as part of `sync`, so you can skip this step if you'd rather catch issues at sync time. Use `--no-validate` on `sync` to bypass the check entirely.
 
-## 7. Sync your changes back to Label Studio
+## 8. Sync your changes back to Label Studio
 
 Once your local code is ready, run the sync command to synchronize your local directory with the Label Studio instance:
 
@@ -131,7 +137,13 @@ Once your local code is ready, run the sync command to synchronize your local di
 | **New Interface** | `label-studio-sdk interface sync . --title "My Interface" --workspace <id> --publish` |
 | **Existing Interface** | `label-studio-sdk interface sync . --message "Describe the change"` |
 
-By default, `sync` creates an **unpublished local draft** so you can review the version in Label Studio before publishing. Add `--publish` to publish the version immediately and make it available to new projects. The Develop Locally dialog includes `--publish` automatically when starting a new Interface from scratch and omits it when iterating on an existing one.
+Note the following:
+
+* By default, `sync` creates an **unpublished local draft** so you can review the version in Label Studio before publishing. 
+
+* Add `--publish` to publish the version immediately and make it available to new projects. The Develop Locally dialog includes `--publish` automatically when starting a new Interface from scratch and omits it when iterating on an existing one.
+
+* For new Interfaces, the `--workspace` flag is optional. If you don't specify a workspace, the Interface will be created [in the **Shared** scope](interfaces#Interface-scope) (it can be used by projects in any workspace).
 
 Useful flags for `sync`:
 
@@ -144,14 +156,16 @@ Useful flags for `sync`:
 | `--force` | Upload even when the local source hash hasn't changed. |
 | `--no-validate` | Skip the validation gate (compilation is still required). |
 
-After a successful sync, the CLI writes a sidecar file (`Screen.jsx.ls-interface.json`) next to your source. The sidecar is keyed by Label Studio base URL and remembers the Interface ID, workspace, source version, and last pushed source hash, so future `sync`, `start`, and `open` commands don't need `--id`.
+After a successful sync, the CLI writes a sidecar file (`Screen.jsx.ls-interface.json`) next to your source. 
+
+The sidecar is keyed by Label Studio base URL and remembers the Interface ID, workspace, source version, and last pushed source hash, so future `sync`, `start`, and `open` commands don't need `--id`.
 
 !!! info Tip
     Click **Refresh Versions** in the **Develop Locally** modal after a sync to see your new draft or published version appear on the Interface details page.
 
 ## Useful CLI commands
 
-The full command reference is in the [Interface CLI Guide](https://github.com/HumanSignal/label-studio-sdk/blob/master/interface-cli.md). The most useful commands while developing locally are:
+The full command reference is in the [**Interface CLI Guide**](https://github.com/HumanSignal/label-studio-sdk/blob/master/interface-cli.md). The most useful commands while developing locally are:
 
 | Command | Description |
 | --- | --- |
