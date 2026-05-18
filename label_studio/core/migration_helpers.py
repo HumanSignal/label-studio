@@ -60,6 +60,7 @@ def make_sql_migration(
     apply_on_sqlite: bool = False,
     execute_immediately: bool = False,
     migration_name: str | None = None,
+    queue_name: str | None = None,
 ) -> Tuple[Callable, Callable]:
     """Return (forwards, backwards) for migrations.RunPython.
 
@@ -81,6 +82,9 @@ def make_sql_migration(
         if should_execute:
             # In CI, force synchronous execution so columns exist before tests run
             force_sync = settings.CI
+            job_kwargs = {}
+            if queue_name is not None:
+                job_kwargs['queue_name'] = queue_name
             start_job_async_or_sync(
                 execute_sql_job,
                 migration_name=mig_key,
@@ -89,6 +93,7 @@ def make_sql_migration(
                 reverse=False,
                 retry=Retry(max=3, interval=[60, 300, 1800]),
                 redis=not force_sync,
+                **job_kwargs,
             )
         else:
             AsyncMigrationStatus = apps.get_model('core', 'AsyncMigrationStatus')
@@ -101,6 +106,9 @@ def make_sql_migration(
         # Early return for linter to not actually run code
         if getattr(schema_editor, 'collect_sql', False) is True:
             return
+        job_kwargs = {}
+        if queue_name is not None:
+            job_kwargs['queue_name'] = queue_name
         start_job_async_or_sync(
             execute_sql_job,
             migration_name=mig_key,
@@ -108,6 +116,7 @@ def make_sql_migration(
             apply_on_sqlite=apply_on_sqlite,
             reverse=True,
             retry=Retry(max=3, interval=[60, 300, 1800]),
+            **job_kwargs,
         )
 
     return forwards, backwards

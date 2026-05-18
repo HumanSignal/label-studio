@@ -182,7 +182,7 @@ class TestMakeSqlMigration(TestCase):
     @patch('core.migration_helpers.start_job_async_or_sync')
     def test_executes_immediately_when_scheduled_disabled(self, mock_start):
         """Test that migration executes immediately when ALLOW_SCHEDULED_MIGRATIONS=False."""
-        forwards, backwards = make_sql_migration(
+        forwards, _ = make_sql_migration(
             self.sql_forwards,
             self.sql_backwards,
             migration_name=self.migration_name,
@@ -203,7 +203,7 @@ class TestMakeSqlMigration(TestCase):
     @override_settings(ALLOW_SCHEDULED_MIGRATIONS=True, CI=False)
     def test_creates_scheduled_status_when_enabled(self):
         """Test that SCHEDULED status is created when ALLOW_SCHEDULED_MIGRATIONS=True."""
-        forwards, backwards = make_sql_migration(
+        forwards, _ = make_sql_migration(
             self.sql_forwards,
             self.sql_backwards,
             migration_name=self.migration_name,
@@ -300,3 +300,61 @@ class TestMakeSqlMigration(TestCase):
 
         args, kwargs = mock_start.call_args
         assert kwargs['apply_on_sqlite'] is True
+
+    @override_settings(ALLOW_SCHEDULED_MIGRATIONS=False)
+    @patch('core.migration_helpers.start_job_async_or_sync')
+    def test_omits_queue_name_when_not_provided(self, mock_start):
+        """Test that existing callers keep start_job_async_or_sync default queue behavior."""
+        forwards, _ = make_sql_migration(
+            self.sql_forwards,
+            self.sql_backwards,
+            migration_name=self.migration_name,
+        )
+
+        apps = MagicMock()
+        schema_editor = MagicMock()
+        schema_editor.connection.vendor = 'postgresql'
+
+        forwards(apps, schema_editor)
+
+        _, kwargs = mock_start.call_args
+        assert 'queue_name' not in kwargs
+
+    @override_settings(ALLOW_SCHEDULED_MIGRATIONS=False)
+    @patch('core.migration_helpers.start_job_async_or_sync')
+    def test_passes_queue_name_parameter_forwards(self, mock_start):
+        """Test that queue_name is passed to forward SQL jobs."""
+        forwards, _ = make_sql_migration(
+            self.sql_forwards,
+            self.sql_backwards,
+            migration_name=self.migration_name,
+            queue_name='service',
+        )
+
+        apps = MagicMock()
+        schema_editor = MagicMock()
+        schema_editor.connection.vendor = 'postgresql'
+
+        forwards(apps, schema_editor)
+
+        _, kwargs = mock_start.call_args
+        assert kwargs['queue_name'] == 'service'
+
+    @patch('core.migration_helpers.start_job_async_or_sync')
+    def test_passes_queue_name_parameter_backwards(self, mock_start):
+        """Test that queue_name is passed to reverse SQL jobs."""
+        _, backwards = make_sql_migration(
+            self.sql_forwards,
+            self.sql_backwards,
+            migration_name=self.migration_name,
+            queue_name='service',
+        )
+
+        apps = MagicMock()
+        schema_editor = MagicMock()
+        schema_editor.connection.vendor = 'postgresql'
+
+        backwards(apps, schema_editor)
+
+        _, kwargs = mock_start.call_args
+        assert kwargs['queue_name'] == 'service'
