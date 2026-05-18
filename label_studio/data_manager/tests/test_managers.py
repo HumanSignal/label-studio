@@ -518,3 +518,297 @@ class TestApplyFiltersStaleAgreementFields(TestCase):
 
         self.assertIs(result, queryset)
         queryset.filter.assert_not_called()
+
+
+class TestNormalizeInListValue(TestCase):
+    """Unit tests for `_normalize_in_list_value` (BROS-1203)."""
+
+    def _filter(self, value, type_='String'):
+        return Filter(filter='filter:tasks:id', operator='in_list', type=type_, value=value)
+
+    def test_strips_whitespace_and_surrounding_quotes(self):
+        from data_manager.managers import _normalize_in_list_value
+
+        f = self._filter(['  abc  ', '"def"', "'ghi'"])
+        _normalize_in_list_value(f)
+        self.assertEqual(f.value, ['abc', 'def', 'ghi'])
+
+    def test_dedupes_preserving_order(self):
+        from data_manager.managers import _normalize_in_list_value
+
+        f = self._filter(['a', 'b', 'a', 'c', 'b'])
+        _normalize_in_list_value(f)
+        self.assertEqual(f.value, ['a', 'b', 'c'])
+
+    def test_drops_empty_strings(self):
+        from data_manager.managers import _normalize_in_list_value
+
+        f = self._filter(['', ' ', 'x', '""'])
+        _normalize_in_list_value(f)
+        self.assertEqual(f.value, ['x'])
+
+    def test_number_type_drops_non_numeric_tokens(self):
+        from data_manager.managers import _normalize_in_list_value
+
+        f = self._filter([1, '2', 'foo', '3.5', 'bar', None], type_='Number')
+        _normalize_in_list_value(f)
+        self.assertEqual(f.value, [1.0, 2.0, 3.5])
+
+    def test_handles_non_list_value(self):
+        from data_manager.managers import _normalize_in_list_value
+
+        f = self._filter('not a list')
+        _normalize_in_list_value(f)
+        self.assertEqual(f.value, [])
+
+
+class TestValidateInListFilter(TestCase):
+    """Unit tests for `validate_in_list_filter` (BROS-1203)."""
+
+    def test_passthrough_for_non_list_operators(self):
+        from data_manager.managers import validate_in_list_filter
+
+        f = Filter(filter='filter:tasks:id', operator='equal', type='Number', value=1)
+        self.assertEqual(validate_in_list_filter(f, 'id'), 'ok')
+
+    def test_allowlisted_id_returns_ok(self):
+        from data_manager.managers import validate_in_list_filter
+
+        f = Filter(filter='filter:tasks:id', operator='in_list', type='Number', value=[1, 2, 3])
+        self.assertEqual(validate_in_list_filter(f, 'id'), 'ok')
+        self.assertEqual(f.value, [1.0, 2.0, 3.0])
+
+    def test_allowlisted_inner_id_returns_ok(self):
+        from data_manager.managers import validate_in_list_filter
+
+        f = Filter(filter='filter:tasks:inner_id', operator='in_list', type='Number', value=[5])
+        self.assertEqual(validate_in_list_filter(f, 'inner_id'), 'ok')
+
+    def test_allowlisted_data_field_returns_ok(self):
+        from data_manager.managers import validate_in_list_filter
+
+        f = Filter(filter='filter:tasks:data.object_id', operator='in_list', type='String', value=['a'])
+        self.assertEqual(validate_in_list_filter(f, 'data__object_id'), 'ok')
+
+    def test_rejects_unsupported_annotations_ids(self):
+        from data_manager.managers import validate_in_list_filter
+        from rest_framework.exceptions import ValidationError
+
+        f = Filter(filter='filter:tasks:annotations_ids', operator='in_list', type='Number', value=[1])
+        with self.assertRaises(ValidationError):
+            validate_in_list_filter(f, 'annotations_ids')
+
+    def test_rejects_unsupported_annotators(self):
+        from data_manager.managers import validate_in_list_filter
+        from rest_framework.exceptions import ValidationError
+
+        f = Filter(filter='filter:tasks:annotators', operator='in_list', type='Number', value=[1])
+        with self.assertRaises(ValidationError):
+            validate_in_list_filter(f, 'annotators')
+
+    def test_rejects_unsupported_total_annotations(self):
+        from data_manager.managers import validate_in_list_filter
+        from rest_framework.exceptions import ValidationError
+
+        f = Filter(filter='filter:tasks:total_annotations', operator='in_list', type='Number', value=[1])
+        with self.assertRaises(ValidationError):
+            validate_in_list_filter(f, 'total_annotations')
+
+    def test_rejects_unsupported_created_at(self):
+        from data_manager.managers import validate_in_list_filter
+        from rest_framework.exceptions import ValidationError
+
+        f = Filter(filter='filter:tasks:created_at', operator='in_list', type='Datetime', value=['2024'])
+        with self.assertRaises(ValidationError):
+            validate_in_list_filter(f, 'created_at')
+
+    def test_rejects_non_list_value(self):
+        from data_manager.managers import validate_in_list_filter
+        from rest_framework.exceptions import ValidationError
+
+        f = Filter(filter='filter:tasks:id', operator='in_list', type='Number', value='not a list')
+        with self.assertRaises(ValidationError):
+            validate_in_list_filter(f, 'id')
+
+    def test_empty_in_list_returns_none(self):
+        from data_manager.managers import validate_in_list_filter
+
+        f = Filter(filter='filter:tasks:id', operator='in_list', type='Number', value=[])
+        self.assertEqual(validate_in_list_filter(f, 'id'), 'none')
+
+    def test_empty_not_in_list_returns_skip(self):
+        from data_manager.managers import validate_in_list_filter
+
+        f = Filter(filter='filter:tasks:id', operator='not_in_list', type='Number', value=[])
+        self.assertEqual(validate_in_list_filter(f, 'id'), 'skip')
+
+    def test_normalization_to_empty_for_number_returns_none(self):
+        """All-garbage Number list normalizes to empty → behave like empty list."""
+        from data_manager.managers import validate_in_list_filter
+
+        f = Filter(filter='filter:tasks:id', operator='in_list', type='Number', value=['foo', 'bar'])
+        self.assertEqual(validate_in_list_filter(f, 'id'), 'none')
+
+
+class TestApplyFiltersInList(TestCase):
+    """Integration of in_list / not_in_list with the apply_filters() pipeline (BROS-1203)."""
+
+    def _run(self, _filter, conjunction=ConjunctionEnum.AND):
+        from data_manager.managers import apply_filters
+
+        queryset = Mock()
+        queryset.query.annotations = {}
+        queryset.model._meta.get_field.return_value = Mock()
+        queryset.filter.return_value = queryset
+        queryset.exists.return_value = False
+
+        filters = Filters(conjunction=conjunction, items=[_filter])
+
+        def _load_func(path):
+            if path == settings.DATA_MANAGER_CUSTOM_FILTER_EXPRESSIONS:
+                return lambda *_args, **_kwargs: None
+            if path == settings.PREPROCESS_FIELD_NAME:
+                field = _filter.filter.removeprefix('filter:tasks:').replace('.', '__')
+                return lambda _field, _project: (field, True)
+            if path == settings.DATA_MANAGER_PREPROCESS_FILTER:
+                return lambda f, _field_name: f
+            raise AssertionError(f'unexpected load_func path: {path}')
+
+        with patch('data_manager.managers.load_func', side_effect=_load_func):
+            return apply_filters(queryset=queryset, filters=filters, project=Mock(), request=Mock()), queryset
+
+    def test_id_in_list_builds_q_filter(self):
+        _filter = Filter(filter='filter:tasks:id', operator='in_list', type='Number', value=[1, 2, 3])
+        result, queryset = self._run(_filter)
+        self.assertIs(result, queryset)
+        queryset.filter.assert_called_once()
+
+    def test_id_not_in_list_builds_q_filter(self):
+        _filter = Filter(filter='filter:tasks:id', operator='not_in_list', type='Number', value=[1, 2])
+        result, queryset = self._run(_filter)
+        self.assertIs(result, queryset)
+        queryset.filter.assert_called_once()
+
+    def test_empty_in_list_appends_contradiction(self):
+        """Empty in_list results in `Q(pk__in=[])` so the filter line matches no rows.
+
+        This works for both AND and OR conjunctions (always-false predicate).
+        """
+        _filter = Filter(filter='filter:tasks:id', operator='in_list', type='Number', value=[])
+        result, queryset = self._run(_filter)
+        self.assertIs(result, queryset)
+        queryset.filter.assert_called_once()
+
+    def test_empty_not_in_list_drops_filter(self):
+        _filter = Filter(filter='filter:tasks:id', operator='not_in_list', type='Number', value=[])
+        result, queryset = self._run(_filter)
+        self.assertIs(result, queryset)
+        queryset.filter.assert_not_called()
+
+    def test_unsupported_field_raises_400(self):
+        from rest_framework.exceptions import ValidationError
+
+        _filter = Filter(filter='filter:tasks:annotations_ids', operator='in_list', type='Number', value=[1, 2])
+        with self.assertRaises(ValidationError):
+            self._run(_filter)
+
+    def test_annotations_ids_legacy_contains_smart_rewrite_still_works(self):
+        """Legacy `annotations_ids` smart-contains hack must remain intact.
+
+        The validator only fires when the *original* operator is in_list / not_in_list, so
+        `{annotations_ids, contains, "1 2,3"}` still hits the existing rewrite path at
+        `data_manager.managers.apply_filters` line ~458.
+        """
+        # `contains` (not in_list) — validator returns 'ok', rewrite proceeds.
+        _filter = Filter(
+            filter='filter:tasks:annotations_ids',
+            operator='contains',
+            type='String',
+            value='1 2,3',
+        )
+        result, queryset = self._run(_filter)
+        self.assertIs(result, queryset)
+        # The rewrite turns `contains` into `in_list` and emits a Q expression.
+        queryset.filter.assert_called_once()
+
+
+class TestApplyFiltersInListDB(TestCase):
+    """DB-backed integration tests for in_list against real columns (BROS-1203).
+
+    These verify the SQL path end-to-end: Number-type values are coerced to floats
+    by `_normalize_in_list_value`, then passed to `Q(field__in=...)`. Critical for
+    `Task.id` and `Task.inner_id` (IntegerField PKs) where float→int comparison must
+    work in Postgres.
+    """
+
+    @classmethod
+    def setUpTestData(cls):
+        from projects.tests.factories import ProjectFactory
+        from tasks.tests.factories import TaskFactory
+
+        cls.project = ProjectFactory()
+        cls.tasks = [
+            TaskFactory(project=cls.project, data={'text': 'a', 'object_id': '1'}),
+            TaskFactory(project=cls.project, data={'text': 'b', 'object_id': '2'}),
+            TaskFactory(project=cls.project, data={'text': 'c', 'object_id': '3'}),
+        ]
+
+    def _apply(self, _filter):
+        from data_manager.managers import apply_filters
+        from tasks.models import Task
+
+        queryset = Task.objects.filter(project=self.project)
+        filters = Filters(conjunction=ConjunctionEnum.AND, items=[_filter])
+        return apply_filters(queryset=queryset, filters=filters, project=self.project, request=None)
+
+    def test_task_id_in_list_returns_listed_tasks(self):
+        """Integer PK + float values from normalize — verifies Postgres coercion."""
+        target_ids = [self.tasks[0].id, self.tasks[2].id]
+        _filter = Filter(filter='filter:tasks:id', operator='in_list', type='Number', value=target_ids)
+
+        result = self._apply(_filter)
+
+        assert set(result.values_list('id', flat=True)) == set(target_ids)
+
+    def test_task_id_not_in_list_returns_complement(self):
+        excluded_ids = [self.tasks[0].id]
+        _filter = Filter(filter='filter:tasks:id', operator='not_in_list', type='Number', value=excluded_ids)
+
+        result = self._apply(_filter)
+
+        assert set(result.values_list('id', flat=True)) == {self.tasks[1].id, self.tasks[2].id}
+
+    def test_task_id_in_list_accepts_string_values(self):
+        """Users may paste IDs as strings; normalize coerces them to numbers."""
+        target_ids = [str(self.tasks[0].id), str(self.tasks[1].id)]
+        _filter = Filter(filter='filter:tasks:id', operator='in_list', type='Number', value=target_ids)
+
+        result = self._apply(_filter)
+
+        assert set(result.values_list('id', flat=True)) == {self.tasks[0].id, self.tasks[1].id}
+
+    def test_data_field_string_in_list_works(self):
+        _filter = Filter(
+            filter='filter:tasks:data.object_id',
+            operator='in_list',
+            type='String',
+            value=['1', '3'],
+        )
+
+        result = self._apply(_filter)
+
+        assert set(result.values_list('id', flat=True)) == {self.tasks[0].id, self.tasks[2].id}
+
+    def test_empty_in_list_returns_no_tasks(self):
+        _filter = Filter(filter='filter:tasks:id', operator='in_list', type='Number', value=[])
+
+        result = self._apply(_filter)
+
+        assert result.count() == 0
+
+    def test_empty_not_in_list_returns_all_tasks(self):
+        _filter = Filter(filter='filter:tasks:id', operator='not_in_list', type='Number', value=[])
+
+        result = self._apply(_filter)
+
+        assert result.count() == 3

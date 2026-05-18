@@ -84,6 +84,10 @@ KNOWN_FILTER_VALUE_TYPES = {
     'reviewed': 'bool',
 }
 
+# Fields supported by the public `in_list` / `not_in_list` operators (BROS-1203).
+# `data__*` keys are accepted via _is_supported_in_list_field.
+SUPPORTED_IN_LIST_FIELDS = {'id', 'inner_id'}
+
 
 def get_fields_for_filter_ordering(prepare_params):
     result = []
@@ -332,6 +336,69 @@ def cast_value(_filter):
             _filter.value = cast_bool_from_str(_filter.value)
 
 
+def _is_supported_in_list_field(field_name: str) -> bool:
+    """Return True if `field_name` (post-preprocess) is in the MVP allowlist for in_list / not_in_list."""
+    return field_name in SUPPORTED_IN_LIST_FIELDS or field_name.startswith('data__')
+
+
+def _normalize_in_list_value(_filter) -> None:
+    """Trim, dedupe, and coerce list values for in_list / not_in_list filters.
+
+    Mutates `_filter.value` in place. Lenient policy for Number type: non-numeric
+    tokens are dropped silently (the FE surfaces the invalid count to the user).
+    """
+    raw = _filter.value if isinstance(_filter.value, list) else []
+    cleaned = []
+    seen = set()
+    for el in raw:
+        if isinstance(el, str):
+            stripped = el.strip()
+            if len(stripped) >= 2 and (
+                (stripped[0] == '"' and stripped[-1] == '"') or (stripped[0] == "'" and stripped[-1] == "'")
+            ):
+                stripped = stripped[1:-1].strip()
+            if not stripped:
+                continue
+            el = stripped
+        if _filter.type == 'Number':
+            try:
+                el = float(el)
+            except (TypeError, ValueError):
+                continue
+        if el in seen:
+            continue
+        seen.add(el)
+        cleaned.append(el)
+    _filter.value = cleaned
+
+
+def validate_in_list_filter(_filter, field_name: str) -> str:
+    """Semantic validation for `in_list` / `not_in_list` operators (BROS-1203).
+
+    Returns one of:
+      - 'ok'   — proceed with the existing Q(__in=value) branch.
+      - 'none' — empty `in_list` after normalization: append a contradiction so the
+                 row contributes no matches (works correctly for both AND and OR).
+      - 'skip' — empty `not_in_list` after normalization: drop the filter entirely.
+
+    Raises ValidationError for unsupported fields. Only triggers when the *original*
+    operator is in_list / not_in_list, so the legacy `annotations_ids contains→in_list`
+    rewrite (below) remains unaffected.
+    """
+    if _filter.operator not in (Operator.IN_LIST, Operator.NOT_IN_LIST):
+        return 'ok'
+    if not _is_supported_in_list_field(field_name):
+        raise ValidationError(
+            '`is any of` / `is none of` support only Task ID, Inner ID, and task.data.* fields in this release.'
+        )
+    if not isinstance(_filter.value, list):
+        raise ValidationError('Filter value must be a list for `is any of` / `is none of`.')
+    _normalize_in_list_value(_filter)
+    if not _filter.value:
+        return 'none' if _filter.operator == Operator.IN_LIST else 'skip'
+    return 'ok'
+
+
 def add_result_filter(field_name, _filter, filter_expressions, project):
     from django.db.models.expressions import RawSQL
     from tasks.models import Annotation, Prediction
@@ -421,6 +488,19 @@ def apply_filters(queryset, filters, project, request):
             # filter pre-processing, value type conversion, etc..
             preprocess_filter = load_func(settings.DATA_MANAGER_PREPROCESS_FILTER)
             _filter = preprocess_filter(_filter, field_name)
+
+            # Semantic validation for in_list / not_in_list (BROS-1203). Runs *before*
+            # the LSE custom hook and *before* the legacy `annotations_ids contains→in_list`
+            # rewrite so the rewrite path remains untouched.
+            in_list_status = validate_in_list_filter(_filter, field_name)
+            if in_list_status == 'none':
+                # Empty `in_list`: this filter line matches no rows. Append a contradiction
+                # so AND/OR conjunction semantics stay correct (Q(pk__in=[]) is always false).
+                filter_expressions.append(Q(pk__in=[]))
+                continue
+            if in_list_status == 'skip':
+                # Empty `not_in_list`: no constraint.
+                continue
 
             # custom expressions for enterprise
             filter_expression = custom_filter_expressions(

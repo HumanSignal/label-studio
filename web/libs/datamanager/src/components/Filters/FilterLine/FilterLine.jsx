@@ -304,7 +304,7 @@ export const FilterLine = observer(
 
     // Main layout uses parent grid structure — render children as direct grid items
     return (
-      <div className={cn("filterLine").mod({ hasChild: !!childFilter }).toClassName()}>
+      <div className={cn("filterLine").mod({ hasChild: !!childFilter }).toClassName()} data-testid="filter-line">
         <div className={cn("filterLine").elem("column").mix("conjunction").toClassName()}>
           {index === 0 ? (
             <span style={{ fontSize: 12, paddingRight: 5 }}>Where</span>
@@ -313,7 +313,7 @@ export const FilterLine = observer(
           )}
         </div>
 
-        <div className={cn("filterLine").elem("column").mix("field").toClassName()}>
+        <div className={cn("filterLine").elem("column").mix("field").toClassName()} data-testid="filter-line-column">
           <FilterColumnPicker
             filter={filter}
             pickerFilters={pickerFilters ?? availableFilters}

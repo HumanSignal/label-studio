@@ -160,6 +160,17 @@ class Operator(CustomEnum):
         'not_in',
         'Is not between min and max values, so the filter `value` should be e.g. `{"min": 1, "max": 7}`',
     )
+    IS_ANY_OF = (
+        'in_list',
+        'Field value is one of the items in the supplied list. Value must be a JSON array of strings or '
+        'numbers, e.g. `[1, 2, 3]` or `["a", "b"]`. Supported only for Task ID, Inner ID, and `task.data.*` '
+        'fields.',
+    )
+    IS_NONE_OF = (
+        'not_in_list',
+        'Field value is NOT in the supplied list. Value must be a JSON array of strings or numbers. '
+        'Supported only for Task ID, Inner ID, and `task.data.*` fields.',
+    )
 
 
 class Type(CustomEnum):
@@ -264,7 +275,10 @@ filters_schema = {
                             {
                                 'type': 'object',
                                 'title': 'List',
-                                'description': 'List of strings or integers',
+                                'description': (
+                                    'List of strings or integers. Used by the `in_list` and `not_in_list` '
+                                    'operators, e.g. `[1, 2, 3]` or `["a", "b"]`.'
+                                ),
                             },
                         ],
                         'description': 'Value to filter by',

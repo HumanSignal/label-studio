@@ -8,6 +8,26 @@ import { isBlank, isDefined } from "../../utils/utils";
 import { FilterValueRange, FilterValueType, TabFilterType } from "./tab_filter_type";
 import { resolveFilterTransition } from "./filter_snapshot_utils";
 
+/**
+ * BROS-1203 — defensive snapshot recovery on TabFilter rehydration.
+ *
+ * Views persisted before the FilterSerializer rejected non-list values for the
+ * `in_list` / `not_in_list` operators can carry scalar values. Loading such a
+ * view as-is would then 400 every subsequent view-save (PATCH body includes the
+ * full filter group, BE re-validates all items), trapping the user in an
+ * unrecoverable loop. Coerce on load so the view can recover.
+ *
+ * Exported for unit testing — the live MST `preProcessSnapshot` hook delegates here.
+ */
+export function recoverFilterSnapshot(sn) {
+  if (!sn) return sn;
+  let value = sn.value ?? null;
+  if ((sn.operator === "in_list" || sn.operator === "not_in_list") && value !== null && !Array.isArray(value)) {
+    value = [value];
+  }
+  return { ...sn, value };
+}
+
 const operatorNames = Array.from(new Set([].concat(...Object.values(Filters).map((f) => f.map((op) => op.key)))));
 
 const Operators = types.enumeration(operatorNames);
@@ -84,6 +104,12 @@ export const TabFilter = types
       }
       if (FilterValueRange.is(value)) {
         return isDefined(value.min) && isDefined(value.max);
+      }
+      // BROS-1203: an empty list is "syntactically valid" (the BE accepts []) but
+      // doesn't represent a useful filter — treat it as not-yet-valid so we don't
+      // PATCH the view on every keystroke while the user is still composing.
+      if (Array.isArray(value) && value.length === 0) {
+        return false;
       }
 
       return true;
@@ -208,20 +234,49 @@ export const TabFilter = types
 
     setOperator(operator) {
       const previousValueType = self.componentValueType;
+      const previousValue = self.value;
 
       if (self.operator !== operator) {
         self.markUnsaved();
         self.operator = operator;
       }
 
-      if (previousValueType !== self.componentValueType) {
-        self.setDefaultValue();
+      const nextValueType = self.componentValueType;
+      if (previousValueType !== nextValueType) {
+        // BROS-1203: when crossing single ↔ list boundary, seed the new shape from the
+        // previous value instead of nuking it. Skip non-meaningful single values
+        // (null / empty string / NaN) so we don't seed ["" ] into the list.
+        const isMeaningfulSingle =
+          previousValue != null &&
+          typeof previousValue !== "object" &&
+          !(typeof previousValue === "string" && previousValue.trim() === "");
+        if (nextValueType === "list" && previousValueType === "single" && isMeaningfulSingle) {
+          self.setValue([previousValue]);
+        } else if (
+          nextValueType === "single" &&
+          previousValueType === "list" &&
+          Array.isArray(previousValue) &&
+          previousValue.length > 0
+        ) {
+          self.setValue(previousValue[0]);
+        } else {
+          self.setDefaultValue();
+        }
       }
 
       self.save();
     },
 
     setValue(newValue) {
+      // BROS-1203: list-type operators (e.g. `in_list`) require a JSON array on the
+      // wire. Coerce defensively so that a debounced forced save from FilterOperation
+      // (`save(true)` bypasses isValidFilter) can never PATCH a non-list value and
+      // trip the FilterSerializer 400 — which the FE error renderer can't display
+      // when nested under `filter_group.filters[i].value`.
+      if (self.componentValueType === "list" && newValue != null && !Array.isArray(newValue)) {
+        self.value = [newValue];
+        return;
+      }
       self.value = newValue;
     },
 
@@ -270,7 +325,4 @@ export const TabFilter = types
       self.save();
     }, 300),
   }))
-  .preProcessSnapshot((sn) => {
-    if (!sn) return sn;
-    return { ...sn, value: sn.value ?? null };
-  });
+  .preProcessSnapshot(recoverFilterSnapshot);

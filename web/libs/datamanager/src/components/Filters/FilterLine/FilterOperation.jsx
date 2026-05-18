@@ -7,6 +7,8 @@ import { FilterDropdown } from "../FilterDropdown";
 import * as FilterInputs from "../types";
 import { allowedFilterOperations } from "../types/Utility";
 import { Common } from "../types/Common";
+import { FF_BROS_1203, isFF } from "../../../utils/feature-flags";
+import { LIST_MEMBERSHIP_OPS, supportsListMembership } from "./list-membership";
 
 /** @typedef {{
  * type: keyof typeof FilterInputs,
@@ -57,6 +59,10 @@ export const FilterOperation = observer(({ filter, field, operator, value, disab
   const availableOperators = filter.cellView?.filterOperators;
   const Input = selected?.input;
   let operatorList = allowedFilterOperations(types, getRoot(filter)?.SDK?.type);
+  // BROS-1203 — hide list-membership operators unless FF is on AND the column is allowlisted.
+  if (!isFF(FF_BROS_1203) || !supportsListMembership(filter)) {
+    operatorList = operatorList.filter((op) => !LIST_MEMBERSHIP_OPS.has(op.key));
+  }
   if (filter.filter.field.isAnnotationResultsFilterColumn) {
     // We want at most one of "equal" or "contains" per filter type
     // They resolve to the same backend query in this custom case
@@ -80,7 +86,7 @@ export const FilterOperation = observer(({ filter, field, operator, value, disab
 
   return Input ? (
     <>
-      <div className={columnClass.mix("operation").toClassName()}>
+      <div className={columnClass.mix("operation").toClassName()} data-testid="filter-line-operator">
         <FilterDropdown
           placeholder="Condition"
           value={filter.operator}
@@ -89,7 +95,7 @@ export const FilterOperation = observer(({ filter, field, operator, value, disab
           onChange={onOperatorSelected}
         />
       </div>
-      <div className={columnClass.mix("value").toClassName()}>
+      <div className={columnClass.mix("value").toClassName()} data-testid="filter-line-value">
         <Input
           {...field}
           key={`${filter.filter.id}-${filter.filter.currentType}`}

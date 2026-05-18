@@ -56,12 +56,64 @@ class ChildFilterSerializer(serializers.ModelSerializer):
         return serializer.validated_data
 
 
+LIST_MEMBERSHIP_OPERATORS = {'in_list', 'not_in_list'}
+PRIMITIVE_LIST_ELEMENT_TYPES = (str, int, float, bool)
+
+
+def _column_supports_list_membership(column: str) -> bool:
+    """Return True if `column` is in the MVP allowlist for `in_list` / `not_in_list`.
+
+    Mirrors `data_manager.managers._is_supported_in_list_field` but operates on the
+    raw `filter:tasks:*` column string so the serializer can reject bad views before
+    persistence. The runtime check in `apply_filters` remains as a defensive safety
+    net for ad-hoc query payloads that bypass this serializer.
+    """
+    if not column.startswith('filter:tasks:'):
+        return False
+    field = column[len('filter:tasks:') :]
+    if field.startswith('-'):
+        field = field[1:]
+    return field in ('id', 'inner_id') or field.startswith('data.')
+
+
 class FilterSerializer(serializers.ModelSerializer):
     child_filter = ChildFilterSerializer(required=False)
 
     class Meta:
         model = Filter
         fields = '__all__'
+
+    def validate(self, attrs):
+        """Object-level validation for `in_list` / `not_in_list` filters (BROS-1203).
+
+        Performs both syntax (value shape, size, element types) and the MVP field
+        allowlist check, so saving a view with an unsupported field is rejected
+        early. The same semantic check is duplicated in
+        `data_manager/managers.py::validate_in_list_filter` as a safety net for
+        callers that build queries without going through this serializer.
+        """
+        operator = attrs.get('operator')
+        if operator in LIST_MEMBERSHIP_OPERATORS:
+            value = attrs.get('value')
+            if not isinstance(value, list):
+                raise serializers.ValidationError({'value': '`in_list` / `not_in_list` require a JSON array.'})
+            max_len = settings.DATA_MANAGER_LIST_FILTER_MAX_VALUES
+            if len(value) > max_len:
+                raise serializers.ValidationError({'value': f'List exceeds maximum size of {max_len}.'})
+            for el in value:
+                if not isinstance(el, PRIMITIVE_LIST_ELEMENT_TYPES):
+                    raise serializers.ValidationError({'value': 'List elements must be strings or numbers.'})
+            column = attrs.get('column', '')
+            if not _column_supports_list_membership(column):
+                raise serializers.ValidationError(
+                    {
+                        'column': (
+                            '`is any of` / `is none of` support only Task ID, Inner ID, '
+                            'and task.data.* fields in this release.'
+                        )
+                    }
+                )
+        return attrs
 
     def validate_column(self, column: str) -> str:
         """
