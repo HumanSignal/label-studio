@@ -1,6 +1,9 @@
 import logging
+import mimetypes
+import posixpath
 import uuid
 from datetime import timedelta
+from urllib.parse import unquote
 
 import jwt
 from django.conf import settings
@@ -60,6 +63,16 @@ def decode_react_code_token(token: str) -> dict:
         algorithms=['HS256'],
         audience=REACT_CODE_TOKEN_AUDIENCE,
     )
+
+
+def _decode_fileuri(raw: str) -> str:
+    """Decode a base64url or percent-encoded fileuri, returning the original string."""
+    import base64
+
+    try:
+        return base64.urlsafe_b64decode(raw.encode()).decode()
+    except Exception:
+        return unquote(raw)
 
 
 def _add_cors_headers(response: HttpResponse) -> HttpResponse:
@@ -153,5 +166,45 @@ class ReactCodeResolveView(ResolveStorageUriAPIMixin, APIView):
             return _add_cors_headers(Response(status=status.HTTP_404_NOT_FOUND))
 
         request.user = user
+
+        decoded_fileuri = _decode_fileuri(fileuri)
+        if decoded_fileuri.startswith('/data/upload/'):
+            return self._serve_local_upload(decoded_fileuri, project)
+
         response = self.resolve(request, fileuri, project)
         return _add_cors_headers(response)
+
+    def _serve_local_upload(self, url_path: str, project) -> HttpResponse:
+        """Proxy a locally-uploaded file so sandboxed iframes can load it without session cookies."""
+        # url_path: /data/upload/{project_id}/{filename}  →  storage path: upload/{project_id}/{filename}
+        parts = url_path.lstrip('/').split('/')
+        if len(parts) < 4 or parts[0] != 'data' or parts[1] != 'upload':
+            return _add_cors_headers(HttpResponse(status=400))
+
+        storage_path = posixpath.join(*parts[1:])  # upload/{project_id}/{filename}
+        normalized = posixpath.normpath(storage_path)
+        if normalized.startswith('..') or normalized.startswith('/'):
+            return _add_cors_headers(HttpResponse(status=400))
+
+        try:
+            from data_import.models import FileUpload
+
+            upload = FileUpload.objects.select_related('project').get(
+                file=normalized,
+                project__organization=project.organization,
+            )
+        except FileUpload.DoesNotExist:
+            return _add_cors_headers(HttpResponse(status=404))
+        except Exception as exc:
+            logger.error(f'Error looking up FileUpload for {url_path}: {exc}')
+            return _add_cors_headers(HttpResponse(status=500))
+
+        try:
+            content_type, _ = mimetypes.guess_type(upload.file.name)
+            with upload.file.open('rb') as f:
+                content = f.read()
+            response = HttpResponse(content, content_type=content_type or 'application/octet-stream')
+            return _add_cors_headers(response)
+        except Exception as exc:
+            logger.error(f'Error serving local upload {url_path}: {exc}')
+            return _add_cors_headers(HttpResponse(status=500))
