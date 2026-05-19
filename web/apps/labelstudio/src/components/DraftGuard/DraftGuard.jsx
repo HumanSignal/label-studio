@@ -27,10 +27,23 @@ export const toastDraftStatus = (status, toast) => {
 
 /** Uses `Annotation.needsDraftSave()` so draft / preview rules live in one place (FIT-1685). */
 
+function usesCustomInterfaceProject() {
+  return Boolean(window.Htx?.project?.use_custom_interface);
+}
+
 export const draftSave = async () => {
+  if (usesCustomInterfaceProject()) {
+    return DRAFT_STATUS.NO_CHANGES;
+  }
+
   const selected = window.Htx?.annotationStore?.selected;
   const submissionInProgress = !!selected?.submissionStarted;
-  const hasChanges = selected?.needsDraftSave?.() && !submissionInProgress;
+  let hasChanges = false;
+  try {
+    hasChanges = Boolean(selected?.needsDraftSave?.()) && !submissionInProgress;
+  } catch (error) {
+    console.warn("[DraftGuard] needsDraftSave failed:", error);
+  }
 
   if (hasChanges) {
     const res = await selected.saveDraftImmediatelyWithResults();

@@ -994,9 +994,24 @@ export class LSFWrapper {
     this.showOperationToast(status, "Draft saved successfully", "Draft is not saved", result);
   };
 
-  needsDraftSave = (annotation) => annotation?.needsDraftSave?.() ?? false;
+  usesCustomInterface() {
+    return Boolean(this.datamanager?.store?.project?.use_custom_interface);
+  }
+
+  needsDraftSave = (annotation) => {
+    if (this.usesCustomInterface()) return false;
+    try {
+      return annotation?.needsDraftSave?.() ?? false;
+    } catch (error) {
+      console.warn("[LSFWrapper] needsDraftSave failed:", error);
+      return false;
+    }
+  };
 
   saveDraft = async (target = null) => {
+    // Custom interface persists drafts via editor-shell; hidden LSF must not overwrite them.
+    if (this.usesCustomInterface()) return;
+
     const selected = target || this.lsf?.annotationStore?.selected;
     const hasChanges = selected ? this.needsDraftSave(selected) : false;
 

@@ -37,6 +37,7 @@
     "test:unit:coverage": "bun run test:unit --coverage",
     "test:unit:editor": "bun test --dom libs/editor/src",
     "test:unit:core": "bun test --dom libs/core/src",
+    "test:unit:editor-draft": "bun test --timeout 30000 libs/editor-draft/src",
     "test:unit:datamanager": "bun test --dom libs/datamanager/src",
     "test:unit:ui": "bun test --dom libs/ui/src",
     "test:unit:app-common": "bun test --dom libs/app-common/src",

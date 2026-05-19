@@ -14,6 +14,7 @@ import {
   types,
 } from "mobx-state-tree";
 import { ff } from "@humansignal/core";
+import { canWriteDraftSnapshot, draftViewModeFromClassic, shouldPersistBeforeLeave } from "@humansignal/editor-draft";
 import { errorBuilder } from "../../core/DataValidator/ConfigValidator";
 import { guidGenerator } from "../../core/Helpers";
 import { Hotkey } from "../../core/Hotkey";
@@ -390,14 +391,17 @@ const _Annotation = types
      * a draft was saved — we compare `lastAdditionTime` to `draftSaved`.
      */
     needsDraftSave() {
-      if (self.submissionStarted) return false;
-      if (!self.editable) return false;
-      if (self.versions?.draft && !self.draftSelected) return false;
-
       const history = self.history;
-      if (!history?.hasChanges) return false;
-      if (!self.draftSaved) return true;
-      return new Date(history.lastAdditionTime) > new Date(self.draftSaved);
+
+      return shouldPersistBeforeLeave({
+        submissionStarted: Boolean(self.submissionStarted),
+        editable: self.editable,
+        hasPersistedDraftVersion: Boolean(self.versions?.draft),
+        viewMode: draftViewModeFromClassic(Boolean(self.versions?.draft), self.draftSelected),
+        hasUnsavedEdits: Boolean(history?.hasChanges),
+        draftSavedAt: self.draftSaved,
+        lastEditAt: history?.lastAdditionTime,
+      });
     },
   }))
   .volatile(() => ({
@@ -840,15 +844,15 @@ const _Annotation = types
       if (self.submissionStarted) return;
       // if this is now a history item or prediction don't save it
       if (!self.editable) return;
-      // FIT-1685: When a draft exists but the user is currently previewing a
-      // non-draft version (e.g. they clicked a submitted history item so
-      // `toggleDraft(false)` repopulated `self.areas` from `versions.result`),
-      // serializing `self.areas` right now would capture the preview, not the
-      // draft. Persisting that would overwrite the real server-side draft
-      // with the submitted snapshot. `draftSelected === true` is the
-      // authoritative signal that the current areas represent the draft.
-      if (self.versions.draft && !self.draftSelected) {
-        // Keep the saving flag in sync for callers that optimistically set it.
+      const viewMode = draftViewModeFromClassic(Boolean(self.versions?.draft), self.draftSelected);
+      if (
+        !canWriteDraftSnapshot({
+          submissionStarted: Boolean(self.submissionStarted),
+          editable: self.editable,
+          readOnly: false,
+          viewMode,
+        })
+      ) {
         if (self.isDraftSaving) self.setDraftSaving(false);
         return;
       }
@@ -881,7 +885,16 @@ const _Annotation = types
       // FIT-1685: Mirror the guard in `saveDraft` so the draft-saving flag is
       // never set for a preview-only save. If we set it here and `saveDraft`
       // short-circuits, callers observing `isDraftSaving` would hang.
-      if (self.versions.draft && !self.draftSelected) return {};
+      if (
+        !canWriteDraftSnapshot({
+          submissionStarted: Boolean(self.submissionStarted),
+          editable: self.editable,
+          readOnly: false,
+          viewMode: draftViewModeFromClassic(Boolean(self.versions?.draft), self.draftSelected),
+        })
+      ) {
+        return {};
+      }
       self.setDraftSaving(true);
       const res = await self.saveDraft(params);
 

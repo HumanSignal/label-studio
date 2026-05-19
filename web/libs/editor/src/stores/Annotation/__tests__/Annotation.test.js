@@ -522,4 +522,37 @@ describe("Annotation model", () => {
       expect(() => annotation.resetReady()).not.toThrow();
     });
   });
+
+  describe("@humansignal/editor-draft parity", () => {
+    const { shouldPersistBeforeLeave, draftViewModeFromClassic } = require("@humansignal/editor-draft");
+
+    function mapNeedsDraftSaveInput(annotation) {
+      const history = annotation.history;
+      return {
+        submissionStarted: Boolean(annotation.submissionStarted),
+        editable: annotation.editable,
+        hasPersistedDraftVersion: Boolean(annotation.versions?.draft),
+        viewMode: draftViewModeFromClassic(Boolean(annotation.versions?.draft), annotation.draftSelected),
+        hasUnsavedEdits: Boolean(history?.hasChanges),
+        draftSavedAt: annotation.draftSaved,
+        lastEditAt: history?.lastAdditionTime,
+      };
+    }
+
+    it("needsDraftSave matches shouldPersistBeforeLeave for FIT-1685 preview", () => {
+      const { annotation, store } = createStoreWithAnnotation();
+      unprotect(store);
+      try {
+        const tt = annotation.history;
+        const snap = getSnapshot(annotation.trackedState);
+        tt.history.push(snap);
+        tt.undoIdx = tt.history.length - 1;
+      } finally {
+        protect(store);
+      }
+      annotation.addVersions({ draft: [{ id: "d1", type: "labels" }] });
+      annotation.setDraftSelected(false);
+      expect(annotation.needsDraftSave()).toBe(shouldPersistBeforeLeave(mapNeedsDraftSaveInput(annotation)));
+    });
+  });
 });

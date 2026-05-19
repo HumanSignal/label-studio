@@ -134,6 +134,10 @@ export default defineConfig(({ mode }) => {
           replacement: path.resolve(__dirname, "libs/editor/src/index.js"),
         },
         {
+          find: "@humansignal/editor-draft",
+          replacement: path.resolve(__dirname, "libs/editor-draft/src"),
+        },
+        {
           find: "@humansignal/frontend-test",
           replacement: path.resolve(__dirname, "libs/frontend-test/src"),
         },
