@@ -105,95 +105,11 @@ Trigger an initial sync from your IdP. Depending on the provider, the first sync
 After provisioning completes, verify in Label Studio that users appear with the expected roles and group memberships.
 
 
-
-
-
-
-## Group mapping reference
-
-Both SAML and SCIM use the same group mapping format and the same underlying mapping logic. The mapping types are configured independently for each protocol (SAML settings and SCIM settings are separate), but the behavior is identical.
-
-### Organization role mapping (`roles_groups`)
-
-Maps a group from your IdP to an organization-level role.
-
-**Format:** `["<RoleName>", "<GroupName>"]`
-
-**Available roles:**
-
-| Role Name | Description |
-| --- | --- |
-| `Administrator` | Full organization admin access |
-| `Manager` | Can manage projects and members |
-| `Reviewer` | Can review annotations |
-| `Annotator` | Can annotate tasks |
-
-!!! note
-    `Owner` cannot be assigned via SAML or SCIM---it is explicitly excluded from group mappings. `Not Activated` and `Deactivated` are internal system states managed automatically and should not be used in `roles_groups` mappings.
-
-**Behavior when a user is in multiple role groups:** The most elevated role wins. For example, if a user is in both an Annotator group and a Manager group, they get the Manager role.
-
-**Behavior when a user is removed from all role groups:** Their role is set to Deactivated (subject to the `manual_role_management` flag).
-
-### Workspace mapping (`workspaces_groups`)
-
-Maps a group from your IdP to a Label Studio workspace.
-
-**Format:** `["<WorkspaceTitle>", "<GroupName>"]`
-
-- Workspaces are **automatically created** when a SCIM group push or SAML login triggers the mapping. However, the `/api/scim/settings` endpoint validates that referenced workspaces already exist---create them first, or use the UI to save settings.
-- A user can be mapped to multiple workspaces through multiple group memberships.
-- **SCIM:** removal respects the `manual_workspace_management` billing flag---if enabled, users are not automatically removed from workspaces when they leave a group.
-- **SAML:** workspace sync behavior is controlled by the `MANUAL_WORKSPACE_MANAGEMENT` environment variable (default: `True`). When `False`, all SAML-mapped workspaces are reset and re-applied on each login.
-
-### Project role mapping (`projects_groups`)
-
-Maps a group from your IdP to membership in a specific project, with a project-level role.
-
-**Format:** `{"project_id": <id>, "group": "<GroupName>", "role": "<Role>"}`
-
-**Available project roles:**
-
-| Role | Description |
-| --- | --- |
-| `Inherit` | User gets project access but inherits their organization role (no explicit project role assigned) |
-| `Annotator` | Explicit annotator role on the project |
-| `Reviewer` | Explicit reviewer role on the project |
-
-- `project_id` must be an existing project in your organization.
-- The most elevated role wins when a user is in multiple groups mapped to the same project.
-- Removal respects the `manual_project_member_management` billing flag.
-- **When SCIM project group assignments exist for a user, SAML project sync is skipped** for that user to avoid conflicts.
-
-
-## SCIM user lifecycle
-
-| Event | What happens in Label Studio |
-| --- | --- |
-| **User provisioned** | Account created with the organization's default role (configured in Organization settings). Role is then updated when group sync runs. |
-| **User already exists in another org** | User is added to this organization with the default role. Profile fields (name, etc.) are **not** overwritten---only the org membership is created. |
-| **User added to a role group** | Role upgraded to the mapped role (or highest if in multiple groups). |
-| **User removed from a role group** | Role falls back to the next-highest mapped role, or Deactivated if no role groups remain (subject to `manual_role_management`). |
-| **User deactivated in Entra ID / Okta** | `active` set to `false` → role becomes Deactivated. |
-| **User reactivated in Entra ID / Okta** | `active` set to `true` → role restored from SCIM group mappings, or the organization's default role if no mappings exist. |
-| **User deleted in Entra ID / Okta** | Soft-deleted in Label Studio (deactivated, not removed). |
-
-
-## SAML and SCIM interaction
-
-If your organization uses both SAML SSO and SCIM provisioning, be aware of the following interactions:
-
-- **Group mappings are configured separately.** SAML settings (`/api/saml/settings`) and SCIM settings (`/api/scim/settings`) each have their own `roles_groups`, `workspaces_groups`, and `projects_groups`. You can configure identical mappings in both, or use different mappings for each protocol.
-- **SCIM project mappings take precedence over SAML.** When SCIM-driven project group assignments exist for a user, SAML skips its project role sync for that user entirely, to avoid conflicts.
-- **Deleting SAML settings clears SCIM group assignments.** Using `DELETE /api/saml/settings` wipes all group assignment records and resets SCIM group settings for the organization. If you need to reconfigure SAML, re-save your SCIM settings afterward and wait for the next group sync to rebuild assignments.
-- **`manual_role_management` is shared.** The per-org override in SAML settings takes precedence over the billing/environment default for both SAML and SCIM role removal behavior.
-- **SSO login can still change roles even with SCIM.** If a user authenticates via SAML and SAML role mappings are configured, the role may be re-evaluated on login based on SAML group attributes---potentially overriding a role set by SCIM. To avoid this, either use the same mappings in both, or configure role mappings in only one of the two.
-
-For more information on SAML SSO setup, see [Set up SSO authentication for Label Studio](auth_setup.html).
-
 ## IdP-specific setup guides
 
-This section contains IdP-specific setup guides for SCIM.
+### Okta
+
+To set up SCIM provisioning specifically with Okta:
 
 {% details <b>Okta</b> %}
 
@@ -312,7 +228,11 @@ To unassign a group from the application:
 
 {% enddetails %}
 
-{% details <b>Microsoft Entra ID (formerly Azure AD)</b> %}
+### Entra ID
+
+To set up SCIM provisioning specifically with Microsoft Entra ID (formerly Azure AD):
+
+{% details <b>Microsoft Entra ID</b> %}
 
 Label Studio Enterprise supports SCIM provisioning with Microsoft Entra ID (formerly Azure AD). You can use the same Enterprise Application created for SAML SSO, or create a separate one for SCIM provisioning. Using the same application is simpler when you want both SSO and provisioning.
 
@@ -442,6 +362,89 @@ For detailed information on the mapping format and behavior, see [Group mapping 
 You can trigger an on-demand sync from the **Provision on demand** option for individual users.
 
 {% enddetails %}
+
+## Group mapping reference
+
+Both SAML and SCIM use the same group mapping format and the same underlying mapping logic. The mapping types are configured independently for each protocol (SAML settings and SCIM settings are separate), but the behavior is identical.
+
+### Organization role mapping (`roles_groups`)
+
+Maps a group from your IdP to an organization-level role.
+
+**Format:** `["<RoleName>", "<GroupName>"]`
+
+**Available roles:**
+
+| Role Name | Description |
+| --- | --- |
+| `Administrator` | Full organization admin access |
+| `Manager` | Can manage projects and members |
+| `Reviewer` | Can review annotations |
+| `Annotator` | Can annotate tasks |
+
+!!! note
+    `Owner` cannot be assigned via SAML or SCIM---it is explicitly excluded from group mappings. `Not Activated` and `Deactivated` are internal system states managed automatically and should not be used in `roles_groups` mappings.
+
+**Behavior when a user is in multiple role groups:** The most elevated role wins. For example, if a user is in both an Annotator group and a Manager group, they get the Manager role.
+
+**Behavior when a user is removed from all role groups:** Their role is set to Deactivated (subject to the `manual_role_management` flag).
+
+### Workspace mapping (`workspaces_groups`)
+
+Maps a group from your IdP to a Label Studio workspace.
+
+**Format:** `["<WorkspaceTitle>", "<GroupName>"]`
+
+- Workspaces are **automatically created** when a SCIM group push or SAML login triggers the mapping. However, the `/api/scim/settings` endpoint validates that referenced workspaces already exist---create them first, or use the UI to save settings.
+- A user can be mapped to multiple workspaces through multiple group memberships.
+- **SCIM:** removal respects the `manual_workspace_management` billing flag---if enabled, users are not automatically removed from workspaces when they leave a group.
+- **SAML:** workspace sync behavior is controlled by the `MANUAL_WORKSPACE_MANAGEMENT` environment variable (default: `True`). When `False`, all SAML-mapped workspaces are reset and re-applied on each login.
+
+### Project role mapping (`projects_groups`)
+
+Maps a group from your IdP to membership in a specific project, with a project-level role.
+
+**Format:** `{"project_id": <id>, "group": "<GroupName>", "role": "<Role>"}`
+
+**Available project roles:**
+
+| Role | Description |
+| --- | --- |
+| `Inherit` | User gets project access but inherits their organization role (no explicit project role assigned) |
+| `Annotator` | Explicit annotator role on the project |
+| `Reviewer` | Explicit reviewer role on the project |
+
+- `project_id` must be an existing project in your organization.
+- The most elevated role wins when a user is in multiple groups mapped to the same project.
+- Removal respects the `manual_project_member_management` billing flag.
+- **When SCIM project group assignments exist for a user, SAML project sync is skipped** for that user to avoid conflicts.
+
+
+## SCIM user lifecycle
+
+| Event | What happens in Label Studio |
+| --- | --- |
+| **User provisioned** | Account created with the organization's default role (configured in Organization settings). Role is then updated when group sync runs. |
+| **User already exists in another org** | User is added to this organization with the default role. Profile fields (name, etc.) are **not** overwritten---only the org membership is created. |
+| **User added to a role group** | Role upgraded to the mapped role (or highest if in multiple groups). |
+| **User removed from a role group** | Role falls back to the next-highest mapped role, or Deactivated if no role groups remain (subject to `manual_role_management`). |
+| **User deactivated in Entra ID / Okta** | `active` set to `false` → role becomes Deactivated. |
+| **User reactivated in Entra ID / Okta** | `active` set to `true` → role restored from SCIM group mappings, or the organization's default role if no mappings exist. |
+| **User deleted in Entra ID / Okta** | Soft-deleted in Label Studio (deactivated, not removed). |
+
+
+## SAML and SCIM interaction
+
+If your organization uses both SAML SSO and SCIM provisioning, be aware of the following interactions:
+
+- **Group mappings are configured separately.** SAML settings (`/api/saml/settings`) and SCIM settings (`/api/scim/settings`) each have their own `roles_groups`, `workspaces_groups`, and `projects_groups`. You can configure identical mappings in both, or use different mappings for each protocol.
+- **SCIM project mappings take precedence over SAML.** When SCIM-driven project group assignments exist for a user, SAML skips its project role sync for that user entirely, to avoid conflicts.
+- **Deleting SAML settings clears SCIM group assignments.** Using `DELETE /api/saml/settings` wipes all group assignment records and resets SCIM group settings for the organization. If you need to reconfigure SAML, re-save your SCIM settings afterward and wait for the next group sync to rebuild assignments.
+- **`manual_role_management` is shared.** The per-org override in SAML settings takes precedence over the billing/environment default for both SAML and SCIM role removal behavior.
+- **SSO login can still change roles even with SCIM.** If a user authenticates via SAML and SAML role mappings are configured, the role may be re-evaluated on login based on SAML group attributes---potentially overriding a role set by SCIM. To avoid this, either use the same mappings in both, or configure role mappings in only one of the two.
+
+For more information on SAML SSO setup, see [Set up SSO authentication for Label Studio](auth_setup.html).
+
 
 ## Troubleshooting SCIM
 

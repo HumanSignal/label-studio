@@ -155,7 +155,59 @@ Click **Save**. Test the configuration by logging in to Label Studio Enterprise 
     
     `LS-Admins` and `ls-admins` are treated as different groups. Ensure exact casing matches between your IdP group names and Label Studio mapping configurations.
 
-## SAML SSO Settings API
+## IdP-specific setup guides
+
+This section contains IdP-specific setup guides for SAML SSO.
+
+### Okta
+
+To set up SAML SSO specifically with Okta:
+
+{% details <b>Okta video tutorial</b> %}
+<iframe class="video-border" width="560" height="315" src="https://www.youtube.com/embed/Dr-_hyWIw4M" width="100%" height="400vh" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+{% enddetails %}
+
+### Entra ID
+
+To set up SAML SSO specifically with Microsoft Entra ID (formerly Azure AD):
+
+{% details <b>Microsoft Entra ID</b> %}
+
+#### Step 1: Create the Enterprise Application in Entra ID
+
+1. In the Microsoft Entra admin center, go to **Enterprise Apps > New Application**.
+2. Select **Create your own application > Integrate any other application not found in the gallery**.
+3. Name it (e.g. `Label Studio SSO`) and create it.
+
+#### Step 2: Configure SAML in Entra ID
+
+1. Go to **Single sign-on > SAML**.
+2. Under **Basic SAML Configuration**:
+    - **Identifier (Entity ID)**: Paste the ACS URL from Label Studio.
+    - **Reply URL (ACS URL)**: Paste the same ACS URL.
+    - **Sign on URL**: Paste the Login URL from Label Studio.
+3. Under **User Attributes & Claims**, configure the attribute mappings using the Entra ID presets [shown above](#from-your-idp).
+4. Under **SAML Signing Certificate**, download the **Federation Metadata XML** file (or copy the **App Federation Metadata URL**).
+
+#### Step 3: Configure SAML in Label Studio
+
+1. Go to **Organization > SSO & SAML**.
+2. In the **Domain** field, enter the email domain(s) for your organization (comma-separated, e.g. `contoso.com`). This is used for domain-based SSO routing when users enter their email on the login page.
+3. Upload the **Federation Metadata XML** file downloaded from Entra ID, or paste the **App Federation Metadata URL** in the metadata URL field.
+4. Select `azure` as the IdP provider preset to auto-fill attribute mapping names, or configure them manually.
+5. Configure group mappings as needed.
+6. Click **Save**.
+
+#### Step 4: Assign users and test
+
+1. In Entra ID, go to **Enterprise Application > Users and groups > Add user/group**.
+2. Assign users or groups to the application.
+3. Test by navigating to the Label Studio Login URL, or by going to `https://<your-host>/saml/sso-domain` and entering your email---Label Studio will look up the SAML config by domain and redirect to Entra ID.
+4. After authenticating with Entra ID, you should be redirected back to Label Studio and logged in.
+
+{% enddetails %}
+
+## SAML SSO settings API
 
 You can also configure SAML settings programmatically using the API:
 
@@ -285,52 +337,6 @@ For advanced SAML configuration, the following environment variables control pys
 | `SAML_WANT_RESPONSE_SIGNED` | (pysaml2 default) | Require signed responses |
 | `SAML_WANT_ASSERTIONS_OR_RESPONSE_SIGNED` | (pysaml2 default) | Require at least one signed |
 | `DISABLE_SAML_SSL_VALIDATION` | (not set) | Disable SSL cert validation for metadata fetch |
-
-## IdP-specific setup guides
-
-This section contains IdP-specific setup guides for SAML SSO.
-
-{% details <b>Okta video tutorial</b> %}
-<iframe class="video-border" width="560" height="315" src="https://www.youtube.com/embed/Dr-_hyWIw4M" width="100%" height="400vh" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-{% enddetails %}
-
-{% details <b>Microsoft Entra ID</b> %}
-
-To set up SAML SSO specifically with Microsoft Entra ID (formerly Azure AD):
-
-#### Step 1: Create the Enterprise Application in Entra ID
-
-1. In the Azure Portal, go to **Entra ID → Enterprise Applications → New Application**.
-2. Select **Create your own application** → **Integrate any other application not found in the gallery**.
-3. Name it (e.g. `Label Studio SSO`) and create it.
-
-#### Step 2: Configure SAML in Entra ID
-
-1. Go to **Single sign-on → SAML**.
-2. Under **Basic SAML Configuration**:
-    - **Identifier (Entity ID)**: Paste the ACS URL from Label Studio.
-    - **Reply URL (ACS URL)**: Paste the same ACS URL.
-    - **Sign on URL**: Paste the Login URL from Label Studio.
-3. Under **User Attributes & Claims**, configure the attribute mappings using the Entra ID presets [shown above](#from-your-idp).
-4. Under **SAML Signing Certificate**, download the **Federation Metadata XML** file (or copy the **App Federation Metadata URL**).
-
-#### Step 3: Configure SAML in Label Studio
-
-1. Go to **Organization → SSO & SAML**.
-2. In the **Domain** field, enter the email domain(s) for your organization (comma-separated, e.g. `contoso.com`). This is used for domain-based SSO routing when users enter their email on the login page.
-3. Upload the **Federation Metadata XML** file downloaded from Entra ID, or paste the **App Federation Metadata URL** in the metadata URL field.
-4. Select `azure` as the IdP provider preset to auto-fill attribute mapping names, or configure them manually.
-5. Configure group mappings as needed.
-6. Click **Save**.
-
-#### Step 4: Assign users and test
-
-1. In Entra ID, go to **Enterprise Application → Users and groups → Add user/group**.
-2. Assign users or groups to the application.
-3. Test by navigating to the Label Studio Login URL, or by going to `https://<your-host>/saml/sso-domain` and entering your email---Label Studio will look up the SAML config by domain and redirect to Entra ID.
-4. After authenticating with Entra ID, you should be redirected back to Label Studio and logged in.
-
-{% enddetails %}
 
 ## Troubleshooting SAML SSO
 
