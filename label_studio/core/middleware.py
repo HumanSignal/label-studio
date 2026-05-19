@@ -222,6 +222,19 @@ class DatabaseIsLockedRetryMiddleware(CommonMiddleware):
         return response
 
 
+def authorization_header_from_x_api_key(api_key: str) -> str:
+    """Map X-API-Key to an Authorization header value.
+
+    JWT-formatted keys use Bearer (see jwt_auth.middleware.JWTAuthenticationMiddleware);
+    legacy API keys use Token.
+    """
+    from jwt_auth.token_format import is_jwt_formatted
+
+    if is_jwt_formatted(api_key):
+        return f'Bearer {api_key}'
+    return f'Token {api_key}'
+
+
 class XApiKeySupportMiddleware:
     """Middleware that adds support for the X-Api-Key header, by having its value supersede
     anything that's set in the Authorization header."""
@@ -231,7 +244,7 @@ class XApiKeySupportMiddleware:
 
     def __call__(self, request):
         if 'HTTP_X_API_KEY' in request.META:
-            request.META['HTTP_AUTHORIZATION'] = f'Token {request.META["HTTP_X_API_KEY"]}'
+            request.META['HTTP_AUTHORIZATION'] = authorization_header_from_x_api_key(request.META['HTTP_X_API_KEY'])
             del request.META['HTTP_X_API_KEY']
 
         return self.get_response(request)

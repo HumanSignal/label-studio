@@ -43,6 +43,20 @@ def test_request_with_valid_token_returns_authenticated_user():
 
 @mock_feature_flag(flag_name='fflag__feature_develop__prompts__dia_1829_jwt_token_auth', value=True)
 @pytest.mark.django_db
+def test_x_api_key_with_jwt_access_token_returns_authenticated_user():
+    user = create_user_with_token_settings(api_tokens_enabled=True, legacy_api_tokens_enabled=False)
+    refresh = LSAPIToken.for_user(user)
+    client = APIClient()
+    client.credentials(HTTP_X_API_KEY=str(refresh.access_token))
+
+    response = client.get('/api/projects/')
+
+    assert response.status_code == status.HTTP_200_OK
+    assert response.wsgi_request.user == user
+
+
+@mock_feature_flag(flag_name='fflag__feature_develop__prompts__dia_1829_jwt_token_auth', value=True)
+@pytest.mark.django_db
 def test_jwt_token_auth_disabled_user_cannot_use_jwt_token():
     user = create_user_with_token_settings(api_tokens_enabled=False, legacy_api_tokens_enabled=True)
     refresh = LSAPIToken.for_user(user)

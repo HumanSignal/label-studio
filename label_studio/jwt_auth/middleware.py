@@ -15,12 +15,14 @@ class JWTAuthenticationMiddleware:
 
     @staticmethod
     def _has_bearer_jwt_token(request):
-        """Check if the Authorization header carries a Bearer token with JWT structure (xxx.xxx.xxx)."""
+        """Check if the Authorization header carries a Bearer token with JWT structure."""
+        from jwt_auth.token_format import is_jwt_formatted
+
         header = request.META.get('HTTP_AUTHORIZATION', '')
         parts = header.split()
         if len(parts) != 2 or parts[0].lower() != 'bearer':
             return False
-        return parts[1].count('.') == 2
+        return is_jwt_formatted(parts[1])
 
     def __call__(self, request):
         from core.feature_flags import flag_set

@@ -1,7 +1,10 @@
+import jwt
 import pytest
-from core.middleware import NoindexUrlMiddleware
+from core.middleware import NoindexUrlMiddleware, XApiKeySupportMiddleware, authorization_header_from_x_api_key
 from django.http import HttpResponse
 from django.test import RequestFactory
+
+_VALID_JWT = jwt.encode({'token_type': 'access'}, 'secret', algorithm='HS256')
 
 
 class TestNoindexUrlMiddleware:
@@ -79,3 +82,35 @@ class TestNoindexUrlMiddleware:
         response = middleware(request)
 
         assert response['X-Robots-Tag'] == 'nosnippet, noindex, nofollow'
+
+
+@pytest.mark.parametrize(
+    'api_key, expected',
+    [
+        ('legacy-api-key', 'Token legacy-api-key'),
+        (_VALID_JWT, f'Bearer {_VALID_JWT}'),
+        ('aaa.bbb.ccc', 'Token aaa.bbb.ccc'),
+    ],
+)
+def test_authorization_header_from_x_api_key(api_key, expected):
+    assert authorization_header_from_x_api_key(api_key) == expected
+
+
+def test_x_api_key_middleware_maps_jwt_to_bearer_authorization():
+    request = RequestFactory().get('/api/projects/')
+    request.META['HTTP_X_API_KEY'] = _VALID_JWT
+
+    XApiKeySupportMiddleware(lambda request: HttpResponse())(request)
+
+    assert request.META['HTTP_AUTHORIZATION'] == f'Bearer {_VALID_JWT}'
+    assert 'HTTP_X_API_KEY' not in request.META
+
+
+def test_x_api_key_middleware_maps_legacy_key_to_token_authorization():
+    request = RequestFactory().get('/api/projects/')
+    request.META['HTTP_X_API_KEY'] = 'legacy-api-key'
+
+    XApiKeySupportMiddleware(lambda request: HttpResponse())(request)
+
+    assert request.META['HTTP_AUTHORIZATION'] == 'Token legacy-api-key'
+    assert 'HTTP_X_API_KEY' not in request.META
