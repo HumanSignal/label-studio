@@ -7,6 +7,7 @@ import { DynamicModel, registerModel } from "../DynamicModel";
 import { CustomJSON } from "../types";
 import { FF_DEV_2536, FF_LOPS_E_3, isFF } from "../../utils/feature-flags";
 import { isActive, FF_FIT_720_LAZY_LOAD_ANNOTATIONS } from "@humansignal/core/lib/utils/feature-flags";
+import { logLabelStreamDebug } from "@humansignal/core/lib/utils/streamDebugLog";
 
 const SIMILARITY_UPPER_LIMIT_PRECISION = 1000;
 const fileAttributes = types.model({
@@ -252,13 +253,14 @@ export const create = (columns) => {
         }
 
         const isLabelStream = getRoot(self).SDK?.mode === "labelstream";
-        if (isLabelStream) {
-          const selectedAnnotationID = getRoot(self).annotationStore.selected?.id;
-          if (task && selectedAnnotationID) {
-            console.log(
-              `[LABEL STREAM] ${task.queue}, task ${task.id}, project ${getRoot(self)?.SDK?.project?.id}, user ${getRoot(self).LSF.lsf.user.id}${selectedAnnotationID ? `, annotation ${selectedAnnotationID}` : ""}`,
-            );
-          }
+        if (isLabelStream && task) {
+          logLabelStreamDebug({
+            queue: task.queue,
+            taskId: task.id,
+            projectId: getRoot(self)?.SDK?.project?.id,
+            userId: getRoot(self).LSF?.lsf?.user?.id,
+            annotationId: getRoot(self).annotationStore.selected?.id,
+          });
         }
 
         return task;

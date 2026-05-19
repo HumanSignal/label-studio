@@ -9,6 +9,7 @@ export * from "./lib/utils/helpers";
 export * from "./lib/utils/validation-errors";
 export * from "./lib/utils/string";
 export * from "./lib/utils/debounce";
+export * from "./lib/utils/streamDebugLog";
 export * from "./lib/utils/lodash-replacements";
 export * from "./lib/utils/bem";
 export * from "./lib/utils/visitedProjects";

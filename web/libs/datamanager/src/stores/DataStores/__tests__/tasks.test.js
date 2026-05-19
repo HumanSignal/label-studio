@@ -291,4 +291,41 @@ describe("tasks DataStore", () => {
     // If it didn't crash because of our isAlive(self) checks it will just return null/undefined
     expect(result).toBeNull();
   });
+
+  it("loadNextTask logs label stream queue metadata without a selected annotation", async () => {
+    const logSpy = jest.spyOn(console, "log").mockImplementation(() => {});
+
+    const RootModel = types
+      .model("Root", {
+        taskStore: types.optional(TasksStoreMock, {}),
+        annotationStore: types.optional(types.model({ selected: types.frozen() }), {}),
+        SDK: types.frozen({
+          mode: "labelstream",
+          project: { id: 34 },
+          invoke: jest.fn(),
+        }),
+        LSF: types.frozen({
+          lsf: { user: { id: 7 } },
+        }),
+      })
+      .actions(() => ({
+        invokeAction: jest.fn(() =>
+          Promise.resolve({
+            id: 271,
+            queue: "Sequence queue",
+            annotations: [],
+          }),
+        ),
+      }));
+
+    const root = RootModel.create({
+      taskStore: { list: [] },
+      annotationStore: { selected: null },
+    });
+
+    await root.taskStore.loadNextTask();
+
+    expect(logSpy).toHaveBeenCalledWith("[LABEL STREAM] Sequence queue, task 271, project 34, user 7");
+    logSpy.mockRestore();
+  });
 });
