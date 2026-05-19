@@ -9,6 +9,24 @@ import { FilterValueRange, FilterValueType, TabFilterType } from "./tab_filter_t
 import { resolveFilterTransition } from "./filter_snapshot_utils";
 
 /**
+ * BROS-1203 — operators that strictly require a JSON array on the wire.
+ *
+ * Note: this is intentionally NOT every `valueType: "list"` operator. TaskState's
+ * `contains` / `not_contains` also declare `valueType: "list"`, but their value is
+ * a single state string applied via `state__icontains=<value>` on the BE — coercing
+ * to `[value]` would send an array where the BE expects a scalar, returning zero
+ * rows for the canonical TC1792 scenario.
+ *
+ * Exported so callers (setValue coercion, isValidFilter empty-array guard, and the
+ * recoverFilterSnapshot legacy-view healer) share the same scoping rule.
+ */
+export const LIST_MEMBERSHIP_OPERATORS = new Set(["in_list", "not_in_list"]);
+
+export function isListMembershipOperator(operator) {
+  return LIST_MEMBERSHIP_OPERATORS.has(operator);
+}
+
+/**
  * BROS-1203 — defensive snapshot recovery on TabFilter rehydration.
  *
  * Views persisted before the FilterSerializer rejected non-list values for the
@@ -22,7 +40,7 @@ import { resolveFilterTransition } from "./filter_snapshot_utils";
 export function recoverFilterSnapshot(sn) {
   if (!sn) return sn;
   let value = sn.value ?? null;
-  if ((sn.operator === "in_list" || sn.operator === "not_in_list") && value !== null && !Array.isArray(value)) {
+  if (isListMembershipOperator(sn.operator) && value !== null && !Array.isArray(value)) {
     value = [value];
   }
   return { ...sn, value };
@@ -105,10 +123,13 @@ export const TabFilter = types
       if (FilterValueRange.is(value)) {
         return isDefined(value.min) && isDefined(value.max);
       }
-      // BROS-1203: an empty list is "syntactically valid" (the BE accepts []) but
-      // doesn't represent a useful filter — treat it as not-yet-valid so we don't
-      // PATCH the view on every keystroke while the user is still composing.
-      if (Array.isArray(value) && value.length === 0) {
+      // BROS-1203: for `in_list`/`not_in_list` specifically, an empty list is
+      // "syntactically valid" (the BE accepts []) but doesn't represent a useful
+      // filter — treat it as not-yet-valid so we don't PATCH the view on every
+      // keystroke while the user is still composing. Scoped via the shared
+      // `isListMembershipOperator` so other `valueType: "list"` filters (e.g.
+      // TaskState `contains`) aren't wrongly invalidated.
+      if (isListMembershipOperator(self.operator) && Array.isArray(value) && value.length === 0) {
         return false;
       }
 
@@ -268,12 +289,18 @@ export const TabFilter = types
     },
 
     setValue(newValue) {
-      // BROS-1203: list-type operators (e.g. `in_list`) require a JSON array on the
-      // wire. Coerce defensively so that a debounced forced save from FilterOperation
-      // (`save(true)` bypasses isValidFilter) can never PATCH a non-list value and
-      // trip the FilterSerializer 400 — which the FE error renderer can't display
-      // when nested under `filter_group.filters[i].value`.
-      if (self.componentValueType === "list" && newValue != null && !Array.isArray(newValue)) {
+      // BROS-1203: `in_list` / `not_in_list` require a JSON array on the wire.
+      // Coerce defensively so that a debounced forced save from FilterOperation
+      // (`save(true)` bypasses isValidFilter) can never PATCH a non-list value
+      // and trip the FilterSerializer 400 — which the FE error renderer can't
+      // display when nested under `filter_group.filters[i].value`.
+      //
+      // Scoped via the shared `isListMembershipOperator` helper: other
+      // `valueType: "list"` filters (e.g. TaskState `contains`) carry a single
+      // state string and the BE applies it via `state__icontains=<value>` —
+      // coercing to `[value]` was sending an array where the BE expects a scalar,
+      // returning zero rows (TC1792 regression).
+      if (isListMembershipOperator(self.operator) && newValue != null && !Array.isArray(newValue)) {
         self.value = [newValue];
         return;
       }
