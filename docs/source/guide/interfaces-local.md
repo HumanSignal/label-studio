@@ -108,6 +108,8 @@ label-studio-sdk interface preview .
 
 This opens a **playground** in Label Studio (at the `interfaces/playground` URL) that is live-connected to your local environment. The playground watches your source files — every save reflects your latest changes in the preview in real time.
 
+For example, if your Label Studio instance is at `https://your-instance.humansignal.com`, the playground will be at `https://your-instance.humansignal.com/interfaces/playground`.
+
 ## 6. Develop in your local environment
 
 With the playground running, you can work in your familiar local tools — your IDE, terminal, or a coding agent on your machine — rather than editing in-product. Save your changes as you would for any other project, and the playground re-renders against the current sample task data.
