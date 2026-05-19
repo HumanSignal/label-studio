@@ -240,8 +240,8 @@ Label Studio Enterprise supports SCIM provisioning with Microsoft Entra ID (form
 
 If creating a new application specifically for SCIM:
 
-1. In the Azure Portal, go to **Entra ID > Enterprise Applications > New Application**.
-2. Select **Create your own application** > **Integrate any other application not found in the gallery**.
+1. In the Microsoft Entra admin center, go to **Enterprise Apps > New Application**.
+2. Select **Create your own application > Integrate any other application not found in the gallery**.
 3. Name it (e.g. `Label Studio SCIM`) and create it.
 
 #### Step 2: Enable provisioning

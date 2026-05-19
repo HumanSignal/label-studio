@@ -186,7 +186,7 @@ To set up SAML SSO specifically with Microsoft Entra ID (formerly Azure AD):
     - **Identifier (Entity ID)**: Paste the ACS URL from Label Studio.
     - **Reply URL (ACS URL)**: Paste the same ACS URL.
     - **Sign on URL**: Paste the Login URL from Label Studio.
-3. Under **User Attributes & Claims**, configure the attribute mappings using the Entra ID presets [shown above](#from-your-idp).
+3. Under **User Attributes & Claims**, configure the attribute mappings using the Entra ID presets [shown above](#Step-2-Get-metadata-from-your-IdP).
 4. Under **SAML Signing Certificate**, download the **Federation Metadata XML** file (or copy the **App Federation Metadata URL**).
 
 #### Step 3: Configure SAML in Label Studio
