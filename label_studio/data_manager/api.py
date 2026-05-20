@@ -513,7 +513,7 @@ class ProjectStateAPI(APIView):
         pk = int_from_request(request.GET, 'project', 1)  # replace 1 to None, it's for debug only
         project = generics.get_object_or_404(Project, pk=pk)
         self.check_object_permissions(request, project)
-        data = ProjectSerializer(project).data
+        data = ProjectSerializer(project, context={'request': request}).data
 
         data.update(
             {
