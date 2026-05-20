@@ -3,6 +3,7 @@
 import logging
 
 from asgiref.sync import async_to_sync, sync_to_async
+from core.current_request import CurrentContext
 from core.feature_flags import flag_set
 from core.permissions import ViewClassPermission, all_permissions
 from core.utils.common import int_from_request, load_func
@@ -329,6 +330,17 @@ class TaskListAPI(generics.ListCreateAPIView):
     )
     pagination_class = TaskPagination
 
+    def _ensure_state_field_for_evaluation(self, fields_for_evaluation, request):
+        if not (
+            CurrentContext.is_fsm_enabled() and flag_set('fflag_feat_fit_710_fsm_state_fields', user=request.user)
+        ):
+            return fields_for_evaluation
+
+        fields_for_evaluation = list(fields_for_evaluation)
+        if 'state' not in fields_for_evaluation:
+            fields_for_evaluation.append('state')
+        return fields_for_evaluation
+
     def get_task_serializer_context(self, request, project, queryset):
         all_fields = request.GET.get('fields', None) == 'all'  # false by default
 
@@ -395,6 +407,9 @@ class TaskListAPI(generics.ListCreateAPIView):
         if review:
             fields_for_evaluation = ['annotators', 'reviewed']
             all_fields = None
+        # If the response will expose task state, annotate it in bulk so FSMStateField does not
+        # fall back to one current-state lookup per task during serialization.
+        fields_for_evaluation = self._ensure_state_field_for_evaluation(fields_for_evaluation, request)
         if page is not None:
             ids = [task.id for task in page]  # page is a list already
             tasks = self.prefetch(

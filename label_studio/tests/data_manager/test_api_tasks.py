@@ -1,11 +1,24 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license."""
 
 import json
+from unittest.mock import patch
 
 import pytest
+from django.db import connection
+from django.test.utils import CaptureQueriesContext
+from fsm.state_choices import TaskStateChoices
+from fsm.tests.factories import TaskStateFactory
 from projects.models import Project
 
 from ..utils import make_annotation, make_prediction, make_task, project_id  # noqa
+
+
+def _task_state_point_lookup_queries(captured_queries):
+    return [
+        query['sql']
+        for query in captured_queries
+        if 'FROM "fsm_taskstate"' in query['sql'] and 'WHERE "fsm_taskstate"."task_id" = ' in query['sql']
+    ]
 
 
 @pytest.mark.django_db
@@ -87,6 +100,30 @@ def test_views_tasks_api(business_client, project_id):
     assert response_data['tasks'][0]['cancelled_annotations'] == 0
     assert response_data['tasks'][0]['total_annotations'] == 0
     assert response_data['tasks'][0]['total_predictions'] == 0
+
+
+@pytest.mark.django_db
+def test_tasks_api_annotates_state_when_state_field_flags_enabled(business_client, project_id):
+    project = Project.objects.get(pk=project_id)
+    task_1 = make_task({'data': {'text': 'one'}}, project)
+    task_2 = make_task({'data': {'text': 'two'}}, project)
+    TaskStateFactory(task=task_1, state=TaskStateChoices.IN_PROGRESS)
+    TaskStateFactory(task=task_2, state=TaskStateChoices.COMPLETED)
+
+    with (
+        patch('data_manager.api.flag_set', return_value=True),
+        patch('data_manager.serializers.flag_set', return_value=True),
+        patch('fsm.queryset_mixins.flag_set', return_value=True),
+        patch('fsm.serializer_fields.flag_set', return_value=True),
+        CaptureQueriesContext(connection) as queries,
+    ):
+        response = business_client.get(f'/api/tasks?fields=all&project={project_id}')
+
+    assert response.status_code == 200, response.content
+    rows_by_id = {row['id']: row for row in response.json()['tasks']}
+    assert rows_by_id[task_1.id]['state'] == TaskStateChoices.IN_PROGRESS
+    assert rows_by_id[task_2.id]['state'] == TaskStateChoices.COMPLETED
+    assert _task_state_point_lookup_queries(queries) == []
 
 
 @pytest.mark.parametrize(
