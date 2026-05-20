@@ -1,4 +1,10 @@
-import type { DraftViewMode, ReviewHasChangesInput, ShouldAutosaveInput, ShouldPersistBeforeLeaveInput } from "./types";
+import type {
+  DraftViewMode,
+  ReviewHasChangesInput,
+  ShouldAutosaveInput,
+  ShouldFlushDraftBeforeHistorySwitchInput,
+  ShouldPersistBeforeLeaveInput,
+} from "./types";
 
 /**
  * Whether debounced autosave should run (parity with Annotation.saveDraft guards).
@@ -41,6 +47,17 @@ export function shouldFlushDraftOnAnnotationSwitch(
   if (!input.hasUnsavedEdits) return false;
   if (input.viewMode !== "draft") return false;
   return true;
+}
+
+/**
+ * Whether to persist draft before switching history rows (classic saveDraftImmediately on history click).
+ * When leaving live canvas (draft or submitted-with-edits) for a history preview — not history-to-history hops.
+ */
+export function shouldFlushDraftBeforeHistorySwitch(input: ShouldFlushDraftBeforeHistorySwitchInput): boolean {
+  if (!input.hasUnsavedEdits) return false;
+  if (input.selectedHistoryId !== null) return false;
+  if (input.viewMode === "history") return false;
+  return input.viewMode === "draft" || input.viewMode === "submitted";
 }
 
 export function isViewingDraft(viewMode: DraftViewMode): boolean {

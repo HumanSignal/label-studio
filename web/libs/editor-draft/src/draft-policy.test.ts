@@ -4,8 +4,10 @@ import {
   draftViewModeFromClassic,
   reviewHasChanges,
   shouldAutosave,
+  shouldFlushDraftBeforeHistorySwitch,
   shouldPersistBeforeLeave,
 } from "./draft-policy";
+import { annotationHasEditableChanges, draftDiffersFromSubmitted } from "./draft-result-compare";
 import type { DraftViewMode } from "./types";
 
 describe("shouldAutosave", () => {
@@ -107,6 +109,53 @@ describe("reviewHasChanges", () => {
   });
 });
 
+describe("draftDiffersFromSubmitted", () => {
+  it("false when draft is empty or matches submitted", () => {
+    const submitted = [{ id: "a", type: "choices", value: { choices: ["Cat"] } }];
+    expect(draftDiffersFromSubmitted(submitted, [])).toBe(false);
+    expect(draftDiffersFromSubmitted(submitted, submitted)).toBe(false);
+  });
+
+  it("true when draft value differs", () => {
+    const submitted = [{ id: "a", type: "choices", value: { choices: ["Dog"] } }];
+    const draft = [{ id: "a", type: "choices", value: { choices: ["Bird"] } }];
+    expect(draftDiffersFromSubmitted(submitted, draft)).toBe(true);
+  });
+});
+
+describe("annotationHasEditableChanges", () => {
+  it("true when persisted draft over submitted without session undo", () => {
+    expect(
+      annotationHasEditableChanges({
+        canUndo: false,
+        hasUnsavedEdits: false,
+        draftOverSubmitted: true,
+      }),
+    ).toBe(true);
+  });
+
+  it("false on submitted live when only undo stack has depth (post-update hydrate)", () => {
+    expect(
+      annotationHasEditableChanges({
+        canUndo: true,
+        hasUnsavedEdits: false,
+        draftOverSubmitted: false,
+        isSubmittedLive: true,
+      }),
+    ).toBe(false);
+  });
+
+  it("true on submitted live when user has unsaved edits", () => {
+    expect(
+      annotationHasEditableChanges({
+        canUndo: false,
+        hasUnsavedEdits: true,
+        isSubmittedLive: true,
+      }),
+    ).toBe(true);
+  });
+});
+
 describe("draftViewModeFromClassic", () => {
   it("returns submitted when a draft exists but is not selected (FIT-1685)", () => {
     expect(draftViewModeFromClassic(true, false)).toBe("submitted");
@@ -115,6 +164,55 @@ describe("draftViewModeFromClassic", () => {
   it("returns draft when draft is selected or no persisted draft", () => {
     expect(draftViewModeFromClassic(true, true)).toBe("draft");
     expect(draftViewModeFromClassic(false, false)).toBe("draft");
+  });
+});
+
+describe("shouldFlushDraftBeforeHistorySwitch", () => {
+  it("returns false when already previewing history", () => {
+    expect(
+      shouldFlushDraftBeforeHistorySwitch({
+        hasUnsavedEdits: true,
+        viewMode: "history",
+        selectedHistoryId: "hist-1",
+      }),
+    ).toBe(false);
+  });
+
+  it("returns true when leaving live draft with unsaved edits", () => {
+    expect(
+      shouldFlushDraftBeforeHistorySwitch({
+        hasUnsavedEdits: true,
+        viewMode: "draft",
+        selectedHistoryId: null,
+      }),
+    ).toBe(true);
+    expect(
+      shouldFlushDraftBeforeHistorySwitch({
+        hasUnsavedEdits: false,
+        viewMode: "draft",
+        selectedHistoryId: null,
+      }),
+    ).toBe(false);
+  });
+
+  it("returns true when leaving submitted live with unsaved edits (new draft over submitted)", () => {
+    expect(
+      shouldFlushDraftBeforeHistorySwitch({
+        hasUnsavedEdits: true,
+        viewMode: "submitted",
+        selectedHistoryId: null,
+      }),
+    ).toBe(true);
+  });
+
+  it("returns false when hopping between history previews", () => {
+    expect(
+      shouldFlushDraftBeforeHistorySwitch({
+        hasUnsavedEdits: true,
+        viewMode: "history",
+        selectedHistoryId: "hist-1",
+      }),
+    ).toBe(false);
   });
 });
 

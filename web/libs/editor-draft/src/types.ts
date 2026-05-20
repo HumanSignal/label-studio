@@ -28,3 +28,10 @@ export interface ReviewHasChangesInput {
   canUndo: boolean;
   hasUnsavedEdits: boolean;
 }
+
+/** Flush live draft before leaving editable canvas for a history preview (not history-to-history hops). */
+export interface ShouldFlushDraftBeforeHistorySwitchInput {
+  hasUnsavedEdits: boolean;
+  viewMode: DraftViewMode;
+  selectedHistoryId: string | null;
+}
