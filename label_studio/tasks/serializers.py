@@ -189,6 +189,30 @@ class AnnotationSerializer(FlexFieldsModelSerializer):
         # so the annotation record never persists duplicate-id rows.
         return dedupe_annotation_result_list(data)
 
+    def _resolve_project_for_validation(self, data):
+        if 'task' in data:
+            return data['task'].project
+        if self.instance is not None:
+            return self.instance.project
+        task = self.context.get('task')
+        if task is not None:
+            return task.project
+        return None
+
+    def validate(self, data):
+        """Validate annotation result against project config and custom interface output_schema."""
+        if 'result' not in data or data.get('was_cancelled') is True:
+            return super().validate(data)
+
+        project = self._resolve_project_for_validation(data)
+        custom_interface_validator = load_func(getattr(settings, 'CUSTOM_INTERFACE_ANNOTATION_VALIDATOR', None))
+        if custom_interface_validator and project:
+            validation_errors = custom_interface_validator(project, data.get('result', []))
+            if validation_errors:
+                raise ValidationError(f'Error validating annotation: {validation_errors}')
+
+        return super().validate(data)
+
     def get_created_username(self, annotation) -> str:
         user = annotation.completed_by
         if not user:
