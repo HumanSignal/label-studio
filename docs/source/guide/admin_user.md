@@ -52,12 +52,6 @@ LABEL_STUDIO_DISABLE_SIGNUP_WITHOUT_LINK=true
 
 Users will only be able to sign up through an invitation link or email. 
 
-## Create service accounts
-
-A service account is a special user type. Service accounts are granted a role, but cannot access the Label Studio UI. They are used solely for programmatic access to the API.
-
-For more information, see [User types](user-types).
-
 ## Activate new users
 
 Users who sign up through the link will not be able to access Label Studio until they are assigned a user role. 
