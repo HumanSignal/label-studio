@@ -548,9 +548,13 @@ class ProjectLabelConfigValidateAPI(generics.RetrieveAPIView):
         if not label_config:
             raise RestValidationError('Label config is not set or is empty')
 
-        # check new config includes meaningful changes
-        has_changed = config_essential_data_has_changed(label_config, project.label_config)
-        project.validate_config(label_config, strict=True)
+        try:
+            # check new config includes meaningful changes
+            has_changed = config_essential_data_has_changed(label_config, project.label_config)
+            project.validate_config(label_config, strict=True)
+        except ValueError as exc:
+            # lxml raises ValueError on a str carrying an XML encoding declaration; surface as 400.
+            raise RestValidationError(str(exc))
         return Response({'config_essential_data_has_changed': has_changed}, status=status.HTTP_200_OK)
 
     @extend_schema(exclude=True)

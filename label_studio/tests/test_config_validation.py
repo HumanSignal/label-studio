@@ -210,6 +210,29 @@ def test_parse_wrong_xml(business_client, project_id):
 
 
 @pytest.mark.django_db
+def test_validate_label_config_with_xml_encoding_declaration_returns_400(business_client, project_id):
+    """lxml raises ValueError on a str carrying an XML encoding declaration; the validate
+    endpoint must surface that as 400 instead of leaking a 500."""
+    payload = {
+        'label_config': (
+            '<?xml version="1.0" encoding="UTF-8"?>'
+            '<View>'
+            '<Text name="text" value="$text"/>'
+            '<Choices name="sentiment" toName="text">'
+            '<Choice value="Positive"/><Choice value="Negative"/>'
+            '</Choices>'
+            '</View>'
+        )
+    }
+    response = business_client.post(
+        f'/api/projects/{project_id}/validate',
+        data=json.dumps(payload),
+        content_type='application/json',
+    )
+    assert response.status_code == 400
+
+
+@pytest.mark.django_db
 def test_label_config_versions(business_client, project_id):
     with io.open(os.path.join(os.path.dirname(__file__), 'test_data/data_for_test_label_config_matrix.yml')) as f:
         test_suites = yaml.safe_load(f)
