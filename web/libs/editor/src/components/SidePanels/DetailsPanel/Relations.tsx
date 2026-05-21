@@ -10,6 +10,7 @@ import {
 import { Button, Select } from "@humansignal/ui";
 import { observer } from "mobx-react";
 import { type FC, useCallback, useMemo, useState } from "react";
+import { TextArea } from "../../../common/TextArea/TextArea";
 import { cn } from "../../../utils/bem";
 import { wrapArray } from "../../../utils/utilities";
 import { RegionItem } from "./RegionItem";
@@ -91,10 +92,10 @@ const RelationItem: FC<{ relation: any }> = observer(({ relation }) => {
         </div>
         <div className={cn("relations").elem("actions").toClassName()}>
           <div className={cn("relations").elem("action").toClassName()}>
-            {(hovered || relation.showMeta) && relation.hasRelations && (
+            {(hovered || relation.showMeta) && (
               <Button
                 primary={relation.showMeta}
-                aria-label={`${relation.showMeta ? "Hide" : "Show"} Relation Labels`}
+                aria-label={`${relation.showMeta ? "Hide" : "Show"} Relation Details`}
                 type={relation.showMeta ? undefined : "text"}
                 onClick={relation.toggleMeta}
                 style={{ padding: 0 }}
@@ -148,7 +149,7 @@ const RelationItem: FC<{ relation: any }> = observer(({ relation }) => {
 
 const RelationMeta: FC<any> = observer(({ relation }) => {
   const { selectedValues, control } = relation;
-  const { children, choice } = control;
+  const { children = [], choice } = control ?? {};
 
   const selectionMode = useMemo(() => {
     return choice === "multiple";
@@ -171,16 +172,43 @@ const RelationMeta: FC<any> = observer(({ relation }) => {
     [children],
   );
 
+  const onNoteInput = useCallback(
+    (value: string) => {
+      relation.setNote(value);
+    },
+    [relation],
+  );
+
   return (
     <div className={cn("relation-meta").toClassName()}>
-      <Select
-        multiple={selectionMode}
-        style={{ width: "100%" }}
-        placeholder="Select labels"
-        value={selectedValues}
-        onChange={onChange}
-        options={options}
-      />
+      {relation.hasRelations && (
+        <div className={cn("relation-meta").elem("field").toClassName()}>
+          <Select
+            multiple={selectionMode}
+            style={{ width: "100%" }}
+            placeholder="Select labels"
+            value={selectedValues}
+            onChange={onChange}
+            options={options}
+          />
+        </div>
+      )}
+      <div className={cn("relation-meta").elem("field").toClassName()}>
+        <label className={cn("relation-meta").elem("label").toClassName()} htmlFor={`relation-note-${relation.id}`}>
+          Note
+        </label>
+        <TextArea
+          id={`relation-note-${relation.id}`}
+          className={cn("relation-meta").elem("note").toClassName()}
+          placeholder="Add a note"
+          value={relation.note}
+          rows={2}
+          maxRows={6}
+          aria-label="Relation note"
+          data-testid="relation-note"
+          onInput={onNoteInput}
+        />
+      </div>
     </div>
   );
 });

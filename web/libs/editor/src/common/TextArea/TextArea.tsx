@@ -24,6 +24,8 @@ export type TextAreaProps = {
   placeholder?: string;
   name?: string;
   id?: string;
+  "aria-label"?: string;
+  "data-testid"?: string;
 };
 
 export const TextArea: FC<TextAreaProps> = ({
