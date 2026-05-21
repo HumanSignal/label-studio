@@ -271,6 +271,19 @@ def test_url_upload(mocker, setup_project_dialog, tasks, status_code, task_count
             assert task.is_labeled, 'Task should be labeled since annotation is ground_truth'
 
 
+@pytest.mark.django_db
+def test_url_upload_too_long_returns_400(setup_project_dialog):
+    """URL longer than the 2048-char ProjectImport.url column must return 400, not 500."""
+    url = 'http://localhost:8111/test.json?' + ('x' * 2048)
+    r = setup_project_dialog.post(
+        setup_project_dialog.urls.task_bulk,
+        data='url=' + url,
+        content_type='application/x-www-form-urlencoded',
+    )
+    assert r.status_code == 400, r.content
+    assert b'2048 characters or fewer' in r.content
+
+
 @pytest.mark.parametrize(
     'tasks, status_code, task_count, bad_token',
     [([{'dialog': 'Test'}] * 1, 201, 1, False), ([{'dialog': 'Test'}] * 1, 401, 0, True)],

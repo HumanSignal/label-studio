@@ -390,6 +390,8 @@ class ImportAPI(generics.CreateAPIView):
             url = request.data.get('url')
             if not url:
                 raise ValidationError('"url" is not found in request data')
+            if len(url) > 2048:
+                raise ValidationError('"url" must be 2048 characters or fewer')
             project_import.url = url
             project_import.save(update_fields=['url'])
         # take one task from request DATA

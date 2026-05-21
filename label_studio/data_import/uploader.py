@@ -361,6 +361,8 @@ def load_tasks(request, project):
         url = request.data.get('url')
         if not url:
             raise ValidationError('"url" is not found in request data')
+        if len(url) > 2048:
+            raise ValidationError('"url" must be 2048 characters or fewer')
 
         # try to load json with task or tasks from url as string
         json_data = str_to_json(url)
