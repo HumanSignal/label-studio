@@ -825,6 +825,22 @@ S3_TRUSTED_STORAGE_DOMAINS = get_env_list(
     ],
 )
 
+# Hostnames whose iframes are allowed to survive the editor's HTML sanitizer
+# (see services/lso/web/libs/editor/src/utils/html.js: sanitizeHtml).
+# Override with the LABEL_STUDIO_ALLOWED_IFRAME_DOMAINS env var (comma-separated).
+ALLOWED_IFRAME_DOMAINS = get_env_list(
+    'ALLOWED_IFRAME_DOMAINS',
+    default=[
+        'www.youtube.com',
+        'youtube.com',
+        'www.youtube-nocookie.com',
+        'youtube-nocookie.com',
+        'youtu.be',
+        'www.canva.com',
+        'canva.com',
+    ],
+)
+
 REAL_HOSTNAME = os.getenv('HOSTNAME')  # we have to use getenv, because we don't use LABEL_STUDIO_ prefix
 GCS_CLOUD_STORAGE_FORCE_DEFAULT_CREDENTIALS = get_bool_env('GCS_CLOUD_STORAGE_FORCE_DEFAULT_CREDENTIALS', False)
 PUBLIC_API_DOCS = get_bool_env('PUBLIC_API_DOCS', False)

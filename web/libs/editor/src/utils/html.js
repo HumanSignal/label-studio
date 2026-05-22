@@ -513,6 +513,36 @@ function findNodeAt(context, at) {
 }
 
 /**
+ * Default allowlist of iframe domains permitted by the HTML sanitizer.
+ *
+ * Used as a fallback when `window.APP_SETTINGS.allowed_iframe_domains` is not
+ * provided (e.g. standalone editor, unit tests, SSR). In production the value
+ * is rendered into the page by Django via `settings.ALLOWED_IFRAME_DOMAINS`,
+ * configurable through the `LABEL_STUDIO_ALLOWED_IFRAME_DOMAINS` env var.
+ *
+ * Keep this list in sync with `ALLOWED_IFRAME_DOMAINS` in
+ * `services/lso/label_studio/core/settings/base.py`.
+ *
+ * @type {string[]}
+ */
+const DEFAULT_ALLOWED_IFRAME_DOMAINS = [
+  "www.youtube.com",
+  "youtube.com",
+  "www.youtube-nocookie.com",
+  "youtube-nocookie.com",
+  "youtu.be",
+  "www.canva.com",
+  "canva.com",
+];
+
+function getAllowedIframeDomains() {
+  const fromSettings =
+    (typeof window !== "undefined" && window.APP_SETTINGS && window.APP_SETTINGS.allowed_iframe_domains) || null;
+  if (Array.isArray(fromSettings) && fromSettings.length > 0) return fromSettings;
+  return DEFAULT_ALLOWED_IFRAME_DOMAINS;
+}
+
+/**
  * Sanitize html from scripts and iframes
  * @param {string} html
  * @returns {string}
@@ -520,14 +550,7 @@ function findNodeAt(context, at) {
 function sanitizeHtml(html = []) {
   if (!html) return "";
 
-  // Whitelist of allowed iframe domains - easily extensible for future additions
-  const ALLOWED_IFRAME_DOMAINS = [
-    "www.youtube.com",
-    "youtube.com",
-    "www.youtube-nocookie.com",
-    "youtube-nocookie.com",
-    "youtu.be", // YouTube's shortened URL format
-  ];
+  const ALLOWED_IFRAME_DOMAINS = getAllowedIframeDomains();
 
   // Helper function to validate if iframe src is from an allowed domain
   const isAllowedIframeSrc = (src) => {
@@ -699,4 +722,5 @@ export {
   createClass,
   moveStylesBetweenHeadTags,
   applyHighlightStylesToDoc,
+  DEFAULT_ALLOWED_IFRAME_DOMAINS,
 };
