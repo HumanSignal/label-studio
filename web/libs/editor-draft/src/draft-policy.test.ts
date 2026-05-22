@@ -6,6 +6,7 @@ import {
   shouldAutosave,
   shouldFlushDraftBeforeHistorySwitch,
   shouldPersistBeforeLeave,
+  shouldPromoteSubmittedToDraftSession,
 } from "./draft-policy";
 import { annotationHasEditableChanges, draftDiffersFromSubmitted } from "./draft-result-compare";
 import type { DraftViewMode } from "./types";
@@ -119,6 +120,12 @@ describe("draftDiffersFromSubmitted", () => {
   it("true when draft value differs", () => {
     const submitted = [{ id: "a", type: "choices", value: { choices: ["Dog"] } }];
     const draft = [{ id: "a", type: "choices", value: { choices: ["Bird"] } }];
+    expect(draftDiffersFromSubmitted(submitted, draft)).toBe(true);
+  });
+
+  it("true when only region meta differs", () => {
+    const submitted = [{ id: "a", type: "choices", value: { choices: ["Dog"] } }];
+    const draft = [{ id: "a", type: "choices", value: { choices: ["Dog"] }, meta: { text: ["note"] } }];
     expect(draftDiffersFromSubmitted(submitted, draft)).toBe(true);
   });
 });
@@ -237,5 +244,34 @@ describe("canWriteDraftSnapshot", () => {
         viewMode: "draft",
       }),
     ).toBe(true);
+  });
+});
+
+describe("shouldPromoteSubmittedToDraftSession", () => {
+  it("true for live submitted persisted annotation edits", () => {
+    expect(
+      shouldPromoteSubmittedToDraftSession({
+        viewMode: "submitted",
+        selectedHistoryId: null,
+        sentUserGenerate: true,
+      }),
+    ).toBe(true);
+  });
+
+  it("false when already in draft view or previewing history", () => {
+    expect(
+      shouldPromoteSubmittedToDraftSession({
+        viewMode: "draft",
+        selectedHistoryId: null,
+        sentUserGenerate: true,
+      }),
+    ).toBe(false);
+    expect(
+      shouldPromoteSubmittedToDraftSession({
+        viewMode: "submitted",
+        selectedHistoryId: "history-1",
+        sentUserGenerate: true,
+      }),
+    ).toBe(false);
   });
 });

@@ -4,6 +4,7 @@ import type {
   ShouldAutosaveInput,
   ShouldFlushDraftBeforeHistorySwitchInput,
   ShouldPersistBeforeLeaveInput,
+  ShouldPromoteSubmittedToDraftSessionInput,
 } from "./types";
 
 /**
@@ -62,6 +63,16 @@ export function shouldFlushDraftBeforeHistorySwitch(input: ShouldFlushDraftBefor
 
 export function isViewingDraft(viewMode: DraftViewMode): boolean {
   return viewMode === "draft";
+}
+
+/**
+ * After submit, the first live edit should enter draft view so `shouldAutosave` can run
+ * (classic: draftSelected / versions.draft session on a persisted annotation).
+ */
+export function shouldPromoteSubmittedToDraftSession(input: ShouldPromoteSubmittedToDraftSessionInput): boolean {
+  if (input.selectedHistoryId !== null) return false;
+  if (input.viewMode !== "submitted") return false;
+  return input.sentUserGenerate;
 }
 
 /** Map classic Annotation draftSelected / versions.draft to shell viewMode. */

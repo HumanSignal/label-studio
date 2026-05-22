@@ -35,3 +35,9 @@ export interface ShouldFlushDraftBeforeHistorySwitchInput {
   viewMode: DraftViewMode;
   selectedHistoryId: string | null;
 }
+
+export interface ShouldPromoteSubmittedToDraftSessionInput {
+  viewMode: DraftViewMode;
+  selectedHistoryId: string | null;
+  sentUserGenerate: boolean;
+}

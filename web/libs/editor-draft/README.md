@@ -12,6 +12,10 @@ Framework-agnostic draft autosave policy shared by **editor-shell**, **custom-in
 | `draftViewModeFromClassic` | Map `versions.draft` + `draftSelected` → `DraftViewMode` |
 | `reviewHasChanges` | Review Fix+Accept vs Accept |
 | `DebouncedSaveScheduler` | Generation-bump cancels in-flight debounced saves |
+| `shouldPromoteSubmittedToDraftSession` | First edit after submit → draft view (shell + `shouldAutosave`) |
+| `resolveDraftCreateUrl` / `resolveDraftUpdateUrl` | REST paths (LSF `createDraftForTask` / `createDraftForAnnotation`) |
+| `mergeDraftIntoTaskSnapshot` | Sync `task.drafts` + `annotations[].draft_id` after host autosave |
+| `parseShellAnnotationPk` | Numeric shell tab id → annotation pk for draft URLs |
 
 ## TDD examples
 
@@ -36,9 +40,14 @@ cd services/lso/web && bun test --timeout 30000 libs/editor-draft/src
 | false | false | false |
 | false | true | true |
 
+## Custom-interface hosts
+
+After `onSaveDraft` returns, call `mergeDraftIntoTaskSnapshot(task, savedDraft)` and pass the merged task back into `SandboxedShell` so `draftId` / `versions.draft` hydrate correctly. Use `resolveDraftCreateUrl(taskId, shellAnnotationId)` for POST — do not set `annotation` in the JSON body (the backend binds from the URL, same as LSF SDK).
+
 ## Related tickets
 
 - BROS-1117 — Quick View selection / phantom draft POST
+- BROS-1266 — Region metadata + annotation-linked draft autosave
 - BROS-1172 — Review stream phantom draft UI
 - BROS-1196 — Flush draft on annotation switch
 - BROS-1235 — History panel draft indicator layout

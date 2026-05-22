@@ -10,6 +10,7 @@ function normalizeResultsForCompare(results: unknown[] | undefined | null): stri
         from_name: row.from_name,
         to_name: row.to_name,
         value: row.value,
+        meta: row.meta,
       };
     })
     .sort((a, b) => String(a.id ?? "").localeCompare(String(b.id ?? "")));

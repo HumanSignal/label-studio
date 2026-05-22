@@ -4,6 +4,7 @@ export type {
   ShouldAutosaveInput,
   ShouldFlushDraftBeforeHistorySwitchInput,
   ShouldPersistBeforeLeaveInput,
+  ShouldPromoteSubmittedToDraftSessionInput,
 } from "./types";
 export {
   shouldAutosave,
@@ -14,7 +15,18 @@ export {
   canWriteDraftSnapshot,
   shouldFlushDraftOnAnnotationSwitch,
   shouldFlushDraftBeforeHistorySwitch,
+  shouldPromoteSubmittedToDraftSession,
 } from "./draft-policy";
+export {
+  parseShellAnnotationPk,
+  resolveDraftCreateUrl,
+  resolveDraftUpdateUrl,
+} from "./draft-api";
+export {
+  mergeDraftIntoTaskSnapshot,
+  type MergeDraftIntoTaskOptions,
+  type TaskDraftRecord,
+} from "./draft-task-merge";
 export {
   draftDiffersFromSubmitted,
   annotationHasEditableChanges,
