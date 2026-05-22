@@ -1218,11 +1218,15 @@ export class LSFWrapper {
     if (isActive(FF_FIT_720_LAZY_LOAD_ANNOTATIONS)) {
       const currentSelected = this.lsf?.annotationStore?.selected;
       if (currentSelected?.pk) {
-        // Prefetch comments on annotation selection so region comment indicators
-        // are visible immediately, without waiting for the Comments tab to be opened.
-        // Deduplication in CommentStore.listComments prevents redundant API calls
-        // if the Comments tab is already open and triggers its own fetch.
-        this.lsf?.commentStore?.listComments({ suppressClearComments: false });
+        // Custom interface quick view / shell owns comments via editor-comments + TanStack Query.
+        // Hidden LSF must not prefetch /api/comments in parallel (duplicate + stale tab state).
+        if (!this.usesCustomInterface()) {
+          // Prefetch comments on annotation selection so region comment indicators
+          // are visible immediately, without waiting for the Comments tab to be opened.
+          // Deduplication in CommentStore.listComments prevents redundant API calls
+          // if the Comments tab is already open and triggers its own fetch.
+          this.lsf?.commentStore?.listComments({ suppressClearComments: false });
+        }
 
         // FIT-1570: This path runs from setTimeout(0) (debounced) and is not awaited by the editor.
         // Show the app loader until the stub fetch completes so users cannot edit or create drafts first.

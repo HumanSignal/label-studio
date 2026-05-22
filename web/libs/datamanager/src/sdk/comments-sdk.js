@@ -43,6 +43,11 @@ export class CommentsSdk {
   };
 
   listComments = async (params) => {
+    // Custom interface hosts (quick view / shell) own comment fetching via editor-comments.
+    if (this.dm?.store?.project?.use_custom_interface) {
+      return [];
+    }
+
     const listParams = {
       ordering: params.ordering || "-id",
       expand_created_by: true,
