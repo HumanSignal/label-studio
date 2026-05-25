@@ -667,9 +667,9 @@ class DataManagerTaskSerializer(TaskSerializer):
     def get_drafts_serializer(self):
         return AnnotationDraftSerializer
 
-    def get_drafts_queryset(self, user, drafts):
+    def get_drafts_queryset(self, user, task):
         """Get all user's draft"""
-        return drafts.filter(user=user)
+        return task.drafts.filter(user=user)
 
     def get_drafts(self, task):
         """Return drafts only for the current user"""
@@ -677,10 +677,11 @@ class DataManagerTaskSerializer(TaskSerializer):
         if not isinstance(task, Task) or not self.context.get('drafts'):
             return []
 
-        drafts = task.drafts
         if 'request' in self.context and hasattr(self.context['request'], 'user'):
             user = self.context['request'].user
-            drafts = self.get_drafts_queryset(user, drafts)
+            drafts = self.get_drafts_queryset(user, task)
+        else:
+            drafts = task.drafts
 
         serializer_class = self.get_drafts_serializer()
         return serializer_class(drafts, many=True, read_only=True, default=True, context=self.context).data
