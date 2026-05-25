@@ -460,6 +460,7 @@ class Task(TaskMixin, FsmHistoryStateModel):
             return protected_data
 
         storage_objects = project.get_all_import_storage_objects
+        project_storage_keys = {(storage.__class__, storage.id) for storage in storage_objects}
 
         for field in task_data:
             prepared_filename = self.prepare_filename(task_data[field])
@@ -480,17 +481,27 @@ class Task(TaskMixin, FsmHistoryStateModel):
                 if resolved:
                     task_data[field] = resolved
 
-            fallback_storage = self.storage
+            storage_link = self.get_storage_link()
+            if storage_link:
+                storage_model = storage_link._meta.get_field('storage').remote_field.model
+                fallback_storage = (
+                    storage_link.storage
+                    if (storage_model, storage_link.storage_id) not in project_storage_keys
+                    else None
+                )
+            else:
+                fallback_storage = self.storage
+                if fallback_storage and (fallback_storage.__class__, fallback_storage.id) in project_storage_keys:
+                    fallback_storage = None
+
             if fallback_storage:
-                storage_ids = {s.id for s in storage_objects}
-                if fallback_storage.id not in storage_ids:
-                    try:
-                        resolved = fallback_storage.resolve_uris(task_data[field], self)
-                    except Exception as exc:
-                        logger.debug(exc, exc_info=True)
-                        resolved = None
-                    if resolved:
-                        task_data[field] = resolved
+                try:
+                    resolved = fallback_storage.resolve_uris(task_data[field], self)
+                except Exception as exc:
+                    logger.debug(exc, exc_info=True)
+                    resolved = None
+                if resolved:
+                    task_data[field] = resolved
 
         return task_data
 

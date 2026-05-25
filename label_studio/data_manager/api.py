@@ -26,6 +26,7 @@ from django.utils.decorators import method_decorator
 from django_filters.rest_framework import DjangoFilterBackend
 from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import OpenApiExample, OpenApiParameter, OpenApiResponse, extend_schema
+from io_storages.functions import get_import_storage_link_prefetches
 from projects.models import Project
 from projects.serializers import ProjectSerializer
 from rest_framework import generics, viewsets
@@ -362,11 +363,7 @@ class TaskListAPI(generics.ListCreateAPIView):
         common = (
             'annotations__completed_by',
             'project',
-            'io_storages_azureblobimportstoragelink',
-            'io_storages_gcsimportstoragelink',
-            'io_storages_localfilesimportstoragelink',
-            'io_storages_redisimportstoragelink',
-            'io_storages_s3importstoragelink',
+            *get_import_storage_link_prefetches(),
             'file_upload',
         )
         if request:

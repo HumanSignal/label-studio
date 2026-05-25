@@ -1,6 +1,8 @@
 import logging
 from typing import Dict, Iterable, List, Union
 
+from django.conf import settings
+from django.db.models import Prefetch
 from django.shortcuts import get_object_or_404
 from io_storages.base_models import ImportStorage
 from rest_framework.exceptions import PermissionDenied, ValidationError
@@ -109,3 +111,13 @@ def get_storage_by_url(url: Union[str, List, Dict], storage_objects: Iterable[Im
                 # note: only first found storage_object will be used for link resolving
                 # can_resolve_url now checks both the scheme and the bucket to ensure the correct storage is used
                 return storage_object
+
+
+def get_import_storage_link_prefetches() -> list[Prefetch]:
+    from tasks.models import Task
+
+    prefetches = []
+    for link_name in settings.IO_STORAGES_IMPORT_LINK_NAMES:
+        relation = Task._meta.get_field(link_name)
+        prefetches.append(Prefetch(link_name, queryset=relation.related_model.objects.select_related('storage')))
+    return prefetches
