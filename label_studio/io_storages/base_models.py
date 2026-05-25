@@ -34,7 +34,12 @@ from io_storages.utils import StorageObject, get_all_uris_via_regex, get_uri_via
 from rest_framework.exceptions import ValidationError
 from rq.job import Job
 from tasks.models import Annotation, Task
-from tasks.serializers import AnnotationSerializer, PredictionSerializer
+from tasks.serializers import (
+    FF_BROS_1092_IMPORT_UNKNOWN_COMPLETED_BY,
+    AnnotationSerializer,
+    PredictionSerializer,
+    resolve_completed_by_id,
+)
 from webhooks.models import WebhookAction
 from webhooks.utils import emit_webhooks_for_instance
 
@@ -558,6 +563,38 @@ class ImportStorage(Storage):
 
             # add annotations
             logger.debug(f'Create {len(annotations)} annotations for task={task}')
+
+            # BROS-1092: storage syncs cannot identify the user who triggered the sync,
+            # so re-attribute unknown/cross-org completed_by to project.created_by
+            # (or the organization's owner if the project has no creator). Without this
+            # the AnnotationSerializer below either silently keeps a foreign-org user id
+            # (because it validates against User.objects.all(), not org membership) or
+            # raises on unknown ids/email-shaped values that Export API legitimately emits.
+            if annotations and flag_set(
+                FF_BROS_1092_IMPORT_UNKNOWN_COMPLETED_BY, user=project.organization.created_by
+            ):
+                members_email_to_id = dict(project.organization.members.values_list('user__email', 'user__id'))
+                members_ids = set(members_email_to_id.values())
+                default_user_id = project.created_by_id or project.organization.created_by_id
+                if default_user_id is None:
+                    logger.warning(
+                        f'Cannot resolve default user for project {project.id} during storage sync; '
+                        f'annotations with unknown completed_by will be created without an annotator'
+                    )
+                for annotation in annotations:
+                    if 'completed_by' not in annotation:
+                        continue
+                    resolved = resolve_completed_by_id(
+                        annotation['completed_by'],
+                        members_email_to_id,
+                        members_ids,
+                        default_user_id,
+                    )
+                    if resolved is not None:
+                        annotation['completed_by'] = resolved
+                    else:
+                        annotation.pop('completed_by', None)
+
             for annotation in annotations:
                 annotation['task'] = task.id
                 annotation['project'] = project.id

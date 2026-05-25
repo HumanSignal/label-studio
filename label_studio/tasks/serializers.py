@@ -375,6 +375,76 @@ class BaseTaskSerializer(FlexFieldsModelSerializer):
         exclude = ('precomputed_agreement', 'allow_skip')
 
 
+FF_BROS_1092_IMPORT_UNKNOWN_COMPLETED_BY = 'fflag_fix_back_bros_1092_import_unknown_completed_by_short'
+
+
+def resolve_completed_by_id(
+    completed_by_value,
+    members_email_to_id: dict,
+    members_ids: set,
+    default_user_id: int | None,
+) -> int | None:
+    """Resolve imported annotation's ``completed_by`` to a valid org-member user id.
+
+    Used by both file imports (``BaseTaskSerializerBulk``) and storage syncs
+    (``ImportStorage.add_task``) when
+    ``fflag_fix_back_bros_1092_import_unknown_completed_by_short`` is enabled.
+    Goal: never reject an import just because the original annotator is not a member
+    of the receiving organization. Re-attribute to a sane fallback (importer for file
+    imports, ``project.created_by`` for storage sync) so re-imports of cross-org
+    snapshots work without manual cleanup.
+
+    Supported input shapes (mirror what Export API can produce):
+      - ``None``    -> ``default_user_id`` (annotation had no annotator).
+      - ``int``     -> that id if it belongs to the org, otherwise ``default_user_id``.
+      - ``dict``    -> try ``email`` first, then ``id``, otherwise ``default_user_id``.
+      - any other shape -> ``default_user_id`` with a warning (we never raise here;
+        the FF-off path retains strict legacy validation in
+        ``_insert_valid_completed_by``).
+
+    Args:
+        completed_by_value: raw value from the imported annotation payload.
+        members_email_to_id: mapping ``email -> user.id`` for the project organization.
+        members_ids: set of ``user.id`` for the project organization.
+        default_user_id: fallback id used when the value cannot be resolved.
+
+    Returns:
+        Resolved user id, or ``None`` when ``default_user_id`` is also ``None`` —
+        caller is expected to drop the ``completed_by`` field so the underlying
+        serializer treats it as missing.
+    """
+    # bool is a subclass of int in Python; reject up-front so True/False don't
+    # accidentally match user id 1 / 0 via membership checks below.
+    if isinstance(completed_by_value, bool):
+        logger.warning('Unknown completed_by shape: %r, falling back to %s', completed_by_value, default_user_id)
+        return default_user_id
+
+    if completed_by_value is None:
+        return default_user_id
+
+    if isinstance(completed_by_value, int):
+        if completed_by_value in members_ids:
+            return completed_by_value
+        return default_user_id
+
+    if isinstance(completed_by_value, dict):
+        email = completed_by_value.get('email')
+        if isinstance(email, str) and email in members_email_to_id:
+            return members_email_to_id[email]
+
+        candidate_id = completed_by_value.get('id')
+        # Same bool guard as above for the nested id field.
+        if isinstance(candidate_id, bool):
+            candidate_id = None
+        if isinstance(candidate_id, int) and candidate_id in members_ids:
+            return candidate_id
+
+        return default_user_id
+
+    logger.warning('Unknown completed_by shape: %r, falling back to %s', completed_by_value, default_user_id)
+    return default_user_id
+
+
 class BaseTaskSerializerBulk(serializers.ListSerializer):
     """Serialize task with annotation from source json data"""
 
@@ -436,10 +506,34 @@ class BaseTaskSerializerBulk(serializers.ListSerializer):
         return ret
 
     @staticmethod
-    def _insert_valid_completed_by(annotations, members_email_to_id, members_ids, default_user):
-        """Insert the correct id for completed_by by email in annotations"""
+    def _insert_valid_completed_by(annotations, members_email_to_id, members_ids, default_user, ff_user=None):
+        """Insert the correct id for completed_by by email/id in annotations.
+
+        Two modes of operation, gated on
+        ``fflag_fix_back_bros_1092_import_unknown_completed_by_short``:
+
+        - FF on (BROS-1092 default): unknown annotators are silently re-attributed
+          to ``default_user`` via :func:`resolve_completed_by_id` so cross-org
+          re-imports do not 400. ``default_user`` here is the importer (when
+          available in serializer context) or ``project.created_by`` as set by
+          :meth:`BaseTaskSerializerBulk.create`.
+        - FF off: keeps the historical strict validation that raises
+          ``ValidationError`` for any value that doesn't resolve to an org member,
+          preserving the legacy behavior for rollback.
+        """
+        use_fallback = flag_set(FF_BROS_1092_IMPORT_UNKNOWN_COMPLETED_BY, user=ff_user)
+
         for annotation in annotations:
             completed_by = annotation.get('completed_by')
+
+            if use_fallback:
+                resolved_id = resolve_completed_by_id(completed_by, members_email_to_id, members_ids, default_user.id)
+                if resolved_id is not None:
+                    annotation['completed_by_id'] = resolved_id
+                annotation.pop('completed_by', None)
+                continue
+
+            # --- legacy FF-off branches -------------------------------------------------
             # no completed_by info found - just skip it, will be assigned to the user who imports
             if completed_by is None:
                 annotation['completed_by_id'] = default_user.id
@@ -461,8 +555,6 @@ class BaseTaskSerializerBulk(serializers.ListSerializer):
 
             # old style annotators specification - try to find them by ID
             elif isinstance(completed_by, int) and completed_by in members_ids:
-                if completed_by not in members_ids:
-                    raise ValidationError(f"Unknown annotator's ID {completed_by}")
                 annotation['completed_by_id'] = completed_by
 
             # in any other cases - import validation error
@@ -544,7 +636,9 @@ class BaseTaskSerializerBulk(serializers.ListSerializer):
             for task in validated_tasks:
                 # extract annotations from snapshot
                 annotations = task.pop('annotations', [])
-                self._insert_valid_completed_by(annotations, members_email_to_id, members_ids, default_user)
+                self._insert_valid_completed_by(
+                    annotations, members_email_to_id, members_ids, default_user, ff_user=ff_user
+                )
                 task_annotations.append(annotations)
 
                 # extract predictions from snapshot
