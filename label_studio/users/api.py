@@ -179,7 +179,11 @@ class UserAPI(viewsets.ModelViewSet):
     http_method_names = ['get', 'post', 'head', 'patch', 'delete']
 
     def get_queryset(self):
-        return User.objects.filter(organizations=self.request.user.active_organization)
+        return (
+            User.objects.filter(organizations=self.request.user.active_organization)
+            .select_related('active_organization', 'active_organization__created_by')
+            .prefetch_related('om_through')
+        )
 
     @extend_schema(exclude=True)
     @action(detail=True, methods=['delete', 'post'], permission_required=all_permissions.avatar_any)
