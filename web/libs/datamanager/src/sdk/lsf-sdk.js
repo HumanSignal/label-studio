@@ -1392,7 +1392,12 @@ export class LSFWrapper {
     const result = {
       lead_time: leadTime,
       result: (isNewDraft ? annotation.versions.draft : annotation.serializeAnnotation()) ?? [],
-      draft_id: annotation.draftId,
+      // The Annotation MST model uses `draftId: 0` as a "no draft" sentinel.
+      // Sending 0 over the wire poisons backend bulk-update filters (BROS-1185
+      // AnnotationHistory cross-contamination, BROS-1298 lse_tasks_taskevent FK
+      // violation). Normalize at the payload boundary so the wire always
+      // carries either a real positive draft id or null.
+      draft_id: annotation.draftId || null,
       parent_prediction: annotation.parent_prediction,
       parent_annotation: annotation.parent_annotation,
       started_at: startedAt.toISOString(),
