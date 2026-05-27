@@ -41,6 +41,30 @@ class ExportMixin:
     def get_default_title(self):
         return f'{self.project.title.replace(" ", "-")}-at-{dateformat.format(timezone.now(), "Y-m-d-H-i")}'
 
+    def get_download_filename(self, file_name: str) -> str:
+        """Build a user-facing download filename from ``Export.title``.
+
+        Uses the slugified title combined with the 8-char md5 suffix already
+        present in the stored basename for uniqueness/cache-busting. Falls
+        back to the storage basename when the title is empty or slugifies
+        away (e.g. all special characters), preserving the legacy
+        ``project-{id}-at-{timestamp}-{md5}.{ext}`` pattern.
+        """
+        from django.utils.text import slugify
+
+        stored_basename = pathlib.PurePosixPath(file_name).name
+        stem, dot, ext = stored_basename.rpartition('.')
+        if not dot:
+            stem, ext = stored_basename, ''
+
+        slug = slugify(self.title or '')[:120].strip('-')
+        if not slug:
+            return stored_basename
+
+        md5_suffix = stem.rsplit('-', 1)[-1] if '-' in stem else ''
+        base = f'{slug}-{md5_suffix}' if md5_suffix else slug
+        return f'{base}.{ext}' if ext else base
+
     def _get_filtered_tasks(self, tasks, task_filter_options=None):
         """
         task_filter_options: None or Dict({

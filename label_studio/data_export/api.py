@@ -565,6 +565,7 @@ class ExportDownloadAPI(generics.RetrieveAPIView):
             else:
                 url = file.storage.url(file.name, storage_url=True)
             protocol = urlparse(url).scheme
+            download_name = snapshot.get_download_filename(file.name)
 
             # NGINX downloads are a solid way to make uwsgi workers free
             if settings.USE_NGINX_FOR_EXPORT_DOWNLOADS:
@@ -573,16 +574,16 @@ class ExportDownloadAPI(generics.RetrieveAPIView):
                 # below header tells NGINX to catch it and serve, see docker-config/nginx-app.conf
                 redirect = '/file_download/' + protocol + '/' + url.replace(protocol + '://', '')
                 response['X-Accel-Redirect'] = redirect
-                response['Content-Disposition'] = 'attachment; filename="{}"'.format(file.name)
-                response['filename'] = os.path.basename(file.name)
+                response['Content-Disposition'] = f'attachment; filename="{download_name}"'
+                response['filename'] = download_name
                 return response
 
             # No NGINX: standard way for export downloads in the community edition
             else:
                 ext = file.name.split('.')[-1]
                 response = RangedFileResponse(request, file, content_type=f'application/{ext}')
-                response['Content-Disposition'] = f'attachment; filename="{file.name}"'
-                response['filename'] = os.path.basename(file.name)
+                response['Content-Disposition'] = f'attachment; filename="{download_name}"'
+                response['filename'] = download_name
                 return response
         else:
             if export_type is None:
@@ -594,10 +595,11 @@ class ExportDownloadAPI(generics.RetrieveAPIView):
                 return HttpResponse("Can't get file", status=404)
 
             ext = file_.name.split('.')[-1]
+            download_name = snapshot.get_download_filename(file_.name)
 
             response = RangedFileResponse(request, file_, content_type=f'application/{ext}')
-            response['Content-Disposition'] = f'attachment; filename="{file_.name}"'
-            response['filename'] = file_.name
+            response['Content-Disposition'] = f'attachment; filename="{download_name}"'
+            response['filename'] = download_name
             return response
 
 
