@@ -822,7 +822,8 @@ export class LSFWrapper {
       }
 
       const requestId = result?.$meta?.headers?.get("x-ls-request-id");
-      const supportUrl = requestId ? `${SUPPORT_URL}?${SUPPORT_URL_REQUEST_ID_PARAM}=${requestId}` : SUPPORT_URL;
+      const baseSupportUrl = window?.APP_SETTINGS?.flags?.support_link || SUPPORT_URL;
+      const supportUrl = requestId ? `${baseSupportUrl}?${SUPPORT_URL_REQUEST_ID_PARAM}=${requestId}` : baseSupportUrl;
 
       this.datamanager.invoke("toast", {
         message: (
