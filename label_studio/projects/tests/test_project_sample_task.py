@@ -1,4 +1,5 @@
 import json
+import logging
 from unittest.mock import patch
 
 import projects.api
@@ -248,3 +249,82 @@ class TestProjectSampleTask(TestCase):
 
             mock_get_sample_task.assert_called_once()
             mock_generate_complete.assert_not_called()
+
+
+@pytest.mark.django_db
+def test_sample_task_ignores_malformed_embedded_task_json_without_error_log(caplog):
+    """Malformed sample-task JSON comments should fall back without creating Sentry error logs."""
+    project = ProjectFactory()
+    client = APIClient()
+    client.force_authenticate(user=project.created_by)
+    url = reverse('projects:api:project-sample-task', kwargs={'pk': project.id})
+    label_config = """
+    <View>
+      <Text name="text" value="$text"/>
+      <Choices name="sentiment" toName="text">
+        <Choice value="Positive"/>
+        <Choice value="Negative"/>
+      </Choices>
+    </View>
+    <!-- {
+      "data": {"text": "broken"
+    } -->
+    """
+
+    with caplog.at_level(logging.ERROR):
+        response = client.post(
+            url,
+            data=json.dumps({'label_config': label_config}),
+            content_type='application/json',
+        )
+
+    assert response.status_code == 200
+    assert response.json()['sample_task']['text']
+    assert not [record for record in caplog.records if record.levelno >= logging.ERROR]
+
+
+@pytest.mark.django_db
+def test_sample_task_returns_400_for_invalid_xml_without_error_log(caplog):
+    """Invalid user-authored XML should be a validation response, not a Sentry error log."""
+    project = ProjectFactory()
+    client = APIClient()
+    client.force_authenticate(user=project.created_by)
+    url = reverse('projects:api:project-sample-task', kwargs={'pk': project.id})
+
+    with caplog.at_level(logging.ERROR):
+        response = client.post(
+            url,
+            data=json.dumps({'label_config': '<View><Text name="text" value="$text"/></View><View/>'}),
+            content_type='application/json',
+        )
+
+    assert response.status_code == 400
+    assert not [record for record in caplog.records if record.levelno >= logging.ERROR]
+
+
+@pytest.mark.django_db
+def test_sample_task_enhanced_generation_fallback_does_not_log_error(caplog):
+    """Enhanced generation failures should use the simple fallback without creating Sentry error logs."""
+    project = ProjectFactory()
+    client = APIClient()
+    client.force_authenticate(user=project.created_by)
+    url = reverse('projects:api:project-sample-task', kwargs={'pk': project.id})
+    label_config = """
+    <View>
+      <Text name="text" value="$text"/>
+    </View>
+    """
+
+    with (
+        caplog.at_level(logging.ERROR),
+        patch.object(projects.api.LabelInterface, 'generate_complete_sample_task', side_effect=ValueError('boom')),
+    ):
+        response = client.post(
+            url,
+            data=json.dumps({'label_config': label_config, 'include_annotation_and_prediction': True}),
+            content_type='application/json',
+        )
+
+    assert response.status_code == 200
+    assert response.json()['sample_task']['text']
+    assert not [record for record in caplog.records if record.levelno >= logging.ERROR]

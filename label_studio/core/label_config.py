@@ -230,8 +230,8 @@ def get_task_from_labeling_config(config):
         try:
             logger.debug('Parse ' + config[start : start + end])
             body = json.loads(config[start : start + end])
-        except Exception:
-            logger.error("Can't parse task from labeling config", exc_info=True)
+        except Exception as exc:
+            logger.warning("Can't parse task from labeling config: %s", exc)
             pass
         else:
             logger.debug(json.dumps(body, indent=2))

@@ -844,7 +844,7 @@ class ProjectSampleTask(generics.RetrieveAPIView):
                     annotation['completed_by'] = user_id
                 return Response({'sample_task': complete_task}, status=200)
             except Exception as e:
-                logger.error(
+                logger.warning(
                     f'Error generating enhanced sample task, falling back to original method: {str(e)}. Label config: {label_config}',
                     exc_info=True,
                 )
@@ -852,8 +852,8 @@ class ProjectSampleTask(generics.RetrieveAPIView):
             # Fallback to project.get_sample_task if enhanced generation failed, or the simple path otherwise.
             return Response({'sample_task': project.get_sample_task(label_config)}, status=200)
         except Exception as e:
-            logger.error(f'Failed to generate sample task for project={project.id}: {e}', exc_info=True)
-            raise RestValidationError('Unable to generate sample task from the provided label config.')
+            logger.warning(f'Failed to generate sample task for project={project.id}: {e}', exc_info=True)
+            return Response({'detail': 'Unable to generate sample task from the provided label config.'}, status=400)
 
 
 @extend_schema(exclude=True)
