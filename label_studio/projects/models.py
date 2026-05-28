@@ -1564,11 +1564,22 @@ class ProjectSummary(models.Model):
         return key
 
     def _get_labels(self, result):
+        if not isinstance(result, dict):
+            return []
         result_type = result.get('type')
         # DEV-1990 Workaround for Video labels as there are no labels in VideoRectangle tag
         if result_type in ['videorectangle', 'videovector']:
             result_type = 'labels'
-        result_value = result['value'].get(result_type)
+        value = result.get('value')
+        if isinstance(value, list):
+            # Custom interface array-of-string pass-through (type labels, bare array on value).
+            if result_type != 'labels':
+                return []
+            result_value = value
+        elif isinstance(value, dict):
+            result_value = value.get(result_type)
+        else:
+            return []
         if not result_value or not isinstance(result_value, list) or result_type == 'text':
             # Non-list values are not labels. TextArea list values (texts) are not labels too.
             return []
