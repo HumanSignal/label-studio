@@ -455,14 +455,26 @@ export class DataManager {
     }
   }
 
-  destroyLSF() {
-    this.invoke("beforeLsfDestroy", this, this.lsf?.lsfInstance);
-    this.lsf?.destroy();
-    this.lsf = undefined;
+  async destroyLSF() {
+    if (this._destroyLSFInFlight) return this._destroyLSFInFlight;
+
+    this._destroyLSFInFlight = this._destroyLSFImpl();
+    return this._destroyLSFInFlight;
   }
 
-  destroy(detachCallbacks = true) {
-    this.destroyLSF();
+  async _destroyLSFImpl() {
+    try {
+      await this.lsf?.saveDraft?.();
+      await this.invoke("beforeLsfDestroy", this, this.lsf?.lsfInstance);
+      this.lsf?.destroy();
+      this.lsf = undefined;
+    } finally {
+      this._destroyLSFInFlight = null;
+    }
+  }
+
+  async destroy(detachCallbacks = true) {
+    await this.destroyLSF();
     unmountComponentAtNode(this.root);
 
     if (this.store) {
@@ -475,9 +487,9 @@ export class DataManager {
     }
   }
 
-  reload() {
-    this.destroy(false);
-    this.initApp();
+  async reload() {
+    await this.destroy(false);
+    await this.initApp();
     this.installActions();
   }
 

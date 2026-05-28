@@ -864,11 +864,37 @@ const _Annotation = types
       self.setDraftSelected();
       self.versions.draft = result;
       self.setDraftSaving(true);
-      return self.store.submitDraft(self, params).then((res) => {
+
+      try {
+        if (!isAlive(self)) {
+          self.setDraftSaving(false);
+          return;
+        }
+
+        const root = self.store;
+        const events = getEnv(self).events;
+
+        if (!events?.hasEvent?.("submitDraft")) {
+          self.setDraftSaving(false);
+          return;
+        }
+
+        let res;
+
+        if (root && typeof root.submitDraft === "function") {
+          res = await root.submitDraft(self, params);
+        } else {
+          // AppStore may be mid-teardown during route change; handlers stay on LSF events.
+          res = await Promise.resolve(events.invokeFirst("submitDraft", root, self, params));
+        }
+
         self.onDraftSaved(res);
 
         return res;
-      });
+      } catch (err) {
+        self.setDraftSaving(false);
+        throw err;
+      }
     },
 
     submissionInProgress() {
@@ -896,9 +922,12 @@ const _Annotation = types
         return {};
       }
       self.setDraftSaving(true);
-      const res = await self.saveDraft(params);
-
-      return res;
+      try {
+        return await self.saveDraft(params);
+      } catch (err) {
+        self.setDraftSaving(false);
+        throw err;
+      }
     },
 
     pauseAutosave() {

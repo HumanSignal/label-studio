@@ -407,8 +407,11 @@ export const AppStore = types
       return true;
     },
 
-    closeLabeling(options) {
+    closeLabeling: flow(function* closeLabeling(options) {
       const { SDK } = self;
+
+      // Flush draft and tear down LSF before unsetTask/setMode unmount <Labeling />.
+      yield SDK.destroyLSF();
 
       self.unsetTask(options);
 
@@ -428,8 +431,7 @@ export const AppStore = types
       }
 
       SDK.setMode("explorer");
-      SDK.destroyLSF();
-    },
+    }),
 
     handlePopState: (({ state }) => {
       const { tab, task, annotation, labeling, region } = state ?? {};
@@ -774,7 +776,7 @@ export const AppStore = types
       }
 
       if (result.reload) {
-        self.SDK.reload();
+        yield self.SDK.reload();
         self.SDK.invoke("actionDialogOkComplete", actionId, {
           result,
           view: viewReloaded,

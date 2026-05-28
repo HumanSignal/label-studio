@@ -28,14 +28,25 @@ export const toastDraftStatus = (status, toast) => {
 /** Uses `Annotation.needsDraftSave()` so draft / preview rules live in one place (FIT-1685). */
 
 function usesCustomInterfaceProject() {
-  return Boolean(window.Htx?.project?.use_custom_interface);
+  const dmProject = window.DM?._sdk?.store?.project ?? window.DM?.SDK?.store?.project;
+  return Boolean(window.Htx?.project?.use_custom_interface ?? dmProject?.use_custom_interface);
 }
 
-export const draftSave = async () => {
-  if (usesCustomInterfaceProject()) {
-    return DRAFT_STATUS.NO_CHANGES;
-  }
+function getDataManagerLsfWrapper() {
+  const sdk = window.DM?._sdk ?? window.DM?.SDK;
+  return sdk?.lsf;
+}
 
+async function draftSaveViaDataManager(wrapper) {
+  const selected = wrapper.lsf?.annotationStore?.selected;
+  if (!selected || selected.submissionStarted) return DRAFT_STATUS.NO_CHANGES;
+  if (!wrapper.needsDraftSave(selected)) return DRAFT_STATUS.NO_CHANGES;
+
+  await wrapper.saveDraft();
+  return DRAFT_STATUS.SUCCESS;
+}
+
+async function draftSaveViaHtx() {
   const selected = window.Htx?.annotationStore?.selected;
   const submissionInProgress = !!selected?.submissionStarted;
   let hasChanges = false;
@@ -45,15 +56,41 @@ export const draftSave = async () => {
     console.warn("[DraftGuard] needsDraftSave failed:", error);
   }
 
-  if (hasChanges) {
-    const res = await selected.saveDraftImmediatelyWithResults();
-    const status = res?.$meta?.status;
+  if (!hasChanges) return DRAFT_STATUS.NO_CHANGES;
 
-    if (status === 200 || status === 201) return DRAFT_STATUS.SUCCESS;
-    if (status !== undefined) return DRAFT_STATUS.FAILURE;
+  const res = await selected.saveDraftImmediatelyWithResults();
+  const status = res?.$meta?.status;
+
+  if (status === 200 || status === 201) return DRAFT_STATUS.SUCCESS;
+  if (status !== undefined) return DRAFT_STATUS.FAILURE;
+  return DRAFT_STATUS.NO_CHANGES;
+}
+
+export const draftSave = async () => {
+  if (usesCustomInterfaceProject()) {
+    return DRAFT_STATUS.NO_CHANGES;
   }
 
-  return DRAFT_STATUS.NO_CHANGES;
+  const lsfWrapper = getDataManagerLsfWrapper();
+  if (lsfWrapper?.lsf) {
+    try {
+      return await draftSaveViaDataManager(lsfWrapper);
+    } catch (error) {
+      console.warn("[DraftGuard] DataManager saveDraft failed:", error);
+      return DRAFT_STATUS.FAILURE;
+    }
+  }
+
+  if (!window.Htx?.annotationStore?.selected) {
+    return DRAFT_STATUS.NO_CHANGES;
+  }
+
+  try {
+    return await draftSaveViaHtx();
+  } catch (error) {
+    console.warn("[DraftGuard] saveDraft failed:", error);
+    return DRAFT_STATUS.FAILURE;
+  }
 };
 
 export const DraftGuard = () => {
@@ -76,9 +113,13 @@ export const DraftGuard = () => {
      * unsuccessful draft saves.
      */
     const unsubscribe = history.block(async () => {
+      const dmLsfActive = Boolean(getDataManagerLsfWrapper()?.lsf);
       const draftStatus = await draftSave();
 
-      toastDraftStatus(draftStatus, toast);
+      // LSFWrapper.saveDraft already shows success/error toasts in Data Manager labeling.
+      if (!(dmLsfActive && draftStatus === DRAFT_STATUS.SUCCESS)) {
+        toastDraftStatus(draftStatus, toast);
+      }
       if (draftStatus !== DRAFT_STATUS.FAILURE) unblock();
       return DRAFT_GUARD_KEY;
     });

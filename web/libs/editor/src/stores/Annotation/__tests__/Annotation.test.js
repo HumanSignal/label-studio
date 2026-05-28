@@ -22,7 +22,7 @@ import "../../../tags/visual/View";
 import "../../../tags/object/RichText";
 import "../../../tags/object/Image/Image.js";
 import "../../../tags/control/Labels/Labels.jsx";
-import { getSnapshot, unprotect, protect } from "mobx-state-tree";
+import { getEnv, getSnapshot, unprotect, protect } from "mobx-state-tree";
 import AppStore from "../../AppStore";
 
 const MINIMAL_CONFIG =
@@ -484,6 +484,31 @@ describe("Annotation model", () => {
 
         expect(res).toEqual({});
         expect(store.submitDraft).not.toHaveBeenCalled();
+        expect(annotation.isDraftSaving).toBe(false);
+      });
+
+      it("saveDraft invokes submitDraft via LSF events when AppStore.submitDraft is unavailable", async () => {
+        const { annotation, store } = createStoreWithAnnotation();
+        const submitHandler = mock().mockResolvedValue({ id: 99 });
+        const env = getEnv(annotation);
+
+        env.events.hasEvent = mock((name) => name === "submitDraft");
+        env.events.invokeFirst = mock(() => submitHandler());
+        delete store.submitDraft;
+
+        unprotect(store);
+        try {
+          const tt = annotation.history;
+          const snap = getSnapshot(annotation.trackedState);
+          tt.history.push(snap);
+          tt.undoIdx = tt.history.length - 1;
+        } finally {
+          protect(store);
+        }
+
+        await annotation.saveDraft();
+
+        expect(env.events.invokeFirst).toHaveBeenCalled();
         expect(annotation.isDraftSaving).toBe(false);
       });
     });
