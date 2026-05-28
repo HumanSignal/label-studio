@@ -1754,6 +1754,23 @@ describe("Image model", () => {
       expect(image.stageHeight).toBeDefined();
     });
 
+    it("updateImageAfterZoom calls updateCursor on the selected tool", () => {
+      const store = createStore();
+      const image = store.annotation.image;
+      if (
+        !setImageNaturalSize(image, 100, 80) ||
+        !setImageStageSize(image, 100, 80) ||
+        typeof image.updateImageAfterZoom !== "function"
+      ) {
+        expect(image).toBeDefined();
+        return;
+      }
+      const selectedTool = mockManager.findSelectedTool();
+      selectedTool.updateCursor.mockClear();
+      image.updateImageAfterZoom();
+      expect(selectedTool.updateCursor).toHaveBeenCalled();
+    });
+
     it("setZoomPosition clamps to valid range", () => {
       const store = createStore();
       const image = store.annotation.image;

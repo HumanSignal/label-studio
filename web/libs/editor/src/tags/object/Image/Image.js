@@ -886,6 +886,10 @@ const Model = types
           naturalHeight: self.naturalHeight,
         });
       }
+
+      const currentTool = self.getToolsManager().findSelectedTool();
+
+      currentTool?.updateCursor?.();
     },
 
     setZoomPosition(x, y) {

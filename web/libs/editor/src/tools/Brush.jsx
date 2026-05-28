@@ -232,7 +232,9 @@ const BrushCursorMixin = types
   .model("BrushCursorMixin")
   .views((self) => ({
     get cursorStyleRule() {
-      const val = self.strokeWidth;
+      const scaleX = self.obj?.scaleX || 1;
+      const stageScale = self.obj?.stageScale || 1;
+      const val = self.strokeWidth * scaleX * stageScale;
       return Canvas.createBrushSizeCircleCursor(val);
     },
   }))

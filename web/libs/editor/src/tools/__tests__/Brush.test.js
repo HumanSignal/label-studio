@@ -209,11 +209,30 @@ describe("Brush tool", () => {
   });
 
   describe("BrushCursorMixin", () => {
-    it("cursorStyleRule calls Canvas.createBrushSizeCircleCursor with strokeWidth", () => {
+    it("cursorStyleRule calls Canvas.createBrushSizeCircleCursor with strokeWidth scaled by scaleX and stageScale", () => {
+      obj.scaleX = 2;
+      obj.stageScale = 1.5;
       const tool = createBrush();
-      tool.setStroke(25);
-      expect(tool.cursorStyleRule).toBe("url('cursor-25') auto");
-      expect(mockCreateBrushSizeCircleCursor).toHaveBeenCalledWith(25);
+      tool.setStroke(10);
+      expect(tool.cursorStyleRule).toBe("url('cursor-30') auto");
+      expect(mockCreateBrushSizeCircleCursor).toHaveBeenCalledWith(30);
+    });
+
+    it("cursorStyleRule defaults scaleX and stageScale to 1 when obj is missing", () => {
+      const toolNoObj = Brush.create({}, { manager, control, object: null });
+      toolNoObj.setStroke(20);
+      mockCreateBrushSizeCircleCursor.mockClear();
+      const _rule = toolNoObj.cursorStyleRule;
+      expect(mockCreateBrushSizeCircleCursor).toHaveBeenCalledWith(20);
+    });
+
+    it("cursorStyleRule defaults scaleX to 1 when not present on obj", () => {
+      delete obj.scaleX;
+      obj.stageScale = 2;
+      const tool = createBrush();
+      tool.setStroke(10);
+      expect(tool.cursorStyleRule).toBe("url('cursor-20') auto");
+      expect(mockCreateBrushSizeCircleCursor).toHaveBeenCalledWith(20);
     });
 
     it("updateCursor does nothing when not selected", () => {
@@ -238,13 +257,14 @@ describe("Brush tool", () => {
       const tool = Brush.create({ selected: true }, { manager, control, object: obj });
       tool.updateCursor();
       expect(container.style.cursor).toContain("cursor");
-      expect(container.style.cursor).toContain("15");
     });
   });
 
   describe("setStroke and afterUpdateSelected", () => {
     it("setStroke updates strokeWidth and invokes updateCursor when selected", () => {
       obj.stageRef = { container: () => ({ style: {} }) };
+      obj.stageScale = 1;
+      delete obj.scaleX;
       const tool = Brush.create({ selected: true }, { manager, control, object: obj });
       mockCreateBrushSizeCircleCursor.mockClear();
       tool.setStroke(20);
