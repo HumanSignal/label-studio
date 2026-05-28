@@ -229,6 +229,11 @@ export const Tab = types
           title: self.title,
           filters: self.filterSnapshot,
           ordering: self.ordering.toJSON(),
+          hiddenColumns: self.hiddenColumnsSnapshot,
+          columnsWidth: self.columnsWidth.toPOJO(),
+          columnsDisplayType: self.columnsDisplayType.toPOJO(),
+          gridWidth: self.gridWidth,
+          gridFitImagesToWidth: self.gridFitImagesToWidth,
           agreement_selected: self.agreement_selected,
         };
       }

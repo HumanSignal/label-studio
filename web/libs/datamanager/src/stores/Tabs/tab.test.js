@@ -1,3 +1,5 @@
+import { destroy } from "mobx-state-tree";
+import { Tab } from "./tab";
 import { validateFilterSnapshot } from "./filter_snapshot_utils";
 
 const availableFilters = [{ id: "filter:tasks:image" }, { id: "filter:tasks:text" }, { id: "filter:tasks:created_at" }];
@@ -89,5 +91,34 @@ describe("validateFilterSnapshot", () => {
       items: [{ filter: "filter:tasks:image", operator: "equal", value: "x" }],
     };
     expect(validateFilterSnapshot(snapshot, [])).toBeNull();
+  });
+});
+
+// Unique counter to avoid MST identifier collisions across test runs in Bun's shared process
+let _tabIdCounter = 1000;
+
+describe("Tab virtual serialize (FIT-1835)", () => {
+  let tab;
+
+  afterEach(() => {
+    if (tab) {
+      destroy(tab);
+      tab = null;
+    }
+  });
+
+  it("includes hiddenColumns in virtual tab serialization so annotator column config persists", () => {
+    tab = Tab.create({ id: _tabIdCounter++, virtual: true });
+    const result = tab.serialize();
+    expect(result.hiddenColumns).toBeDefined();
+    expect(result.hiddenColumns).toEqual({ explore: [], labeling: [] });
+  });
+
+  it("includes hiddenColumns with explore and labeling lists in virtual tab serialization", () => {
+    tab = Tab.create({ id: _tabIdCounter++, virtual: true });
+    const result = tab.serialize();
+    expect(result).toHaveProperty("hiddenColumns");
+    expect(result).toHaveProperty("hiddenColumns.explore");
+    expect(result).toHaveProperty("hiddenColumns.labeling");
   });
 });
