@@ -83,7 +83,6 @@ export default defineConfig(async ({ mode }): Promise<UserConfig> => {
         "@humansignal/core/lib": path.resolve(__dirname, "libs/core/src/lib"),
         "@humansignal/core/hooks": path.resolve(__dirname, "libs/core/src/hooks"),
         "@humansignal/core": path.resolve(__dirname, "libs/core"),
-        "@humansignal/editor-draft": path.resolve(__dirname, "libs/editor-draft/src"),
         "@humansignal/app-common": path.resolve(__dirname, "libs/app-common/src"),
         "../../../../design-tokens.json": path.resolve(__dirname, "design-tokens.json"),
       },

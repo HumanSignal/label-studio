@@ -14,7 +14,7 @@ import {
   types,
 } from "mobx-state-tree";
 import { ff } from "@humansignal/core";
-import { canWriteDraftSnapshot, draftViewModeFromClassic, shouldPersistBeforeLeave } from "@humansignal/editor-draft";
+import { canWriteDraftSnapshot, draftViewModeFromClassic, shouldPersistBeforeLeave } from "./draft-policy";
 import { errorBuilder } from "../../core/DataValidator/ConfigValidator";
 import { guidGenerator } from "../../core/Helpers";
 import { Hotkey } from "../../core/Hotkey";

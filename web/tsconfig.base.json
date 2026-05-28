@@ -41,12 +41,6 @@
       "@humansignal/editor": [
         "libs/editor/src/index.js"
       ],
-      "@humansignal/editor-draft": [
-        "libs/editor-draft/src/index.ts"
-      ],
-      "@humansignal/editor-draft/*": [
-        "libs/editor-draft/src/*"
-      ],
       "@humansignal/frontend-test/*": [
         "libs/frontend-test/src/*"
       ],

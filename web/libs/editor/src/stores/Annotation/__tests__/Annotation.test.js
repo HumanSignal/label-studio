@@ -523,8 +523,8 @@ describe("Annotation model", () => {
     });
   });
 
-  describe("@humansignal/editor-draft parity", () => {
-    const { shouldPersistBeforeLeave, draftViewModeFromClassic } = require("@humansignal/editor-draft");
+  describe("draft-policy parity", () => {
+    const { shouldPersistBeforeLeave, draftViewModeFromClassic } = require("../draft-policy");
 
     function mapNeedsDraftSaveInput(annotation) {
       const history = annotation.history;
