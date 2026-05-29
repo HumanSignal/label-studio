@@ -2,7 +2,7 @@ import jwt
 import pytest
 from core.middleware import NoindexUrlMiddleware, XApiKeySupportMiddleware, authorization_header_from_x_api_key
 from django.http import HttpResponse
-from django.test import RequestFactory
+from django.test import RequestFactory, override_settings
 
 _VALID_JWT = jwt.encode({'token_type': 'access'}, 'secret', algorithm='HS256')
 
@@ -82,6 +82,19 @@ class TestNoindexUrlMiddleware:
         response = middleware(request)
 
         assert response['X-Robots-Tag'] == 'nosnippet, noindex, nofollow'
+
+    def test_additional_patterns_from_settings_are_honored(self):
+        """Downstream apps contribute extra noindex routes via ADDITIONAL_NOINDEX_URL_PATTERNS."""
+        with override_settings(ADDITIONAL_NOINDEX_URL_PATTERNS=(r'^/user/workforce-signup/?$',)):
+            middleware = NoindexUrlMiddleware(lambda request: HttpResponse())
+            response = middleware(RequestFactory().get('/user/workforce-signup'))
+            assert response['X-Robots-Tag'] == 'noindex, nofollow'
+
+    def test_additional_patterns_default_empty_does_not_noindex(self):
+        """Without the extension setting, a downstream route is not noindexed by OSS."""
+        middleware = NoindexUrlMiddleware(lambda request: HttpResponse())
+        response = middleware(RequestFactory().get('/user/workforce-signup'))
+        assert 'X-Robots-Tag' not in response
 
 
 @pytest.mark.parametrize(

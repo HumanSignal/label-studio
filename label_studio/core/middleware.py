@@ -137,10 +137,16 @@ class NoindexUrlMiddleware:
         r'^/saml/[^/]+/logout/?$',
         r'^/saml/[^/]+/xml/?$',
     ]
-    NOINDEX_URL_COMPILED_PATTERNS = tuple(re.compile(pattern) for pattern in NOINDEX_URL_PATTERNS)
 
     def __init__(self, get_response):
         self.get_response = get_response
+        # Downstream apps (e.g. enterprise features) contribute extra noindex patterns via settings,
+        # so this OSS middleware carries no feature-specific routes. Compiled per-instance so the
+        # patterns reflect the settings active at startup.
+        extra_patterns = getattr(settings, 'ADDITIONAL_NOINDEX_URL_PATTERNS', ())
+        self.noindex_compiled_patterns = tuple(
+            re.compile(pattern) for pattern in (*self.NOINDEX_URL_PATTERNS, *extra_patterns)
+        )
 
     def __call__(self, request):
         response = self.get_response(request)
@@ -149,7 +155,7 @@ class NoindexUrlMiddleware:
         return response
 
     def _should_noindex(self, request):
-        return any(pattern.match(request.path_info) for pattern in self.NOINDEX_URL_COMPILED_PATTERNS)
+        return any(pattern.match(request.path_info) for pattern in self.noindex_compiled_patterns)
 
     def _append_robots_directives(self, response):
         existing_header = response.get('X-Robots-Tag', '')

@@ -266,6 +266,12 @@ MIDDLEWARE = [
     'jwt_auth.middleware.JWTAuthenticationMiddleware',
 ]
 
+# Extension points for downstream apps (e.g. enterprise features) to contribute extra noindex URL
+# patterns (NoindexUrlMiddleware) and secured contextlog view names without adding feature-specific
+# routes to OSS. Each is a tuple appended to the OSS defaults.
+ADDITIONAL_NOINDEX_URL_PATTERNS = ()
+ADDITIONAL_CONTEXTLOG_SECURED_VIEWS = ()
+
 REST_FRAMEWORK = {
     'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend'],
     'DEFAULT_AUTHENTICATION_CLASSES': (

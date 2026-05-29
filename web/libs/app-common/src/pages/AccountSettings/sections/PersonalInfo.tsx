@@ -1,8 +1,8 @@
 import { type FormEventHandler, useCallback, useEffect, useRef, useState } from "react";
-import clsx from "clsx";
 import { format } from "date-fns";
-import { Button, InputFile, ToastType, useToast, Userpic } from "@humansignal/ui";
+import { Button, InputFile, ToastType, Typography, useToast, Userpic } from "@humansignal/ui";
 import { getApiInstance } from "@humansignal/core";
+import { useAccountSettingsExtension } from "../extensions";
 import styles from "../AccountSettings.module.css";
 import { useAuth } from "@humansignal/core/providers/AuthProvider";
 import { atomWithMutation } from "jotai-tanstack-query";
@@ -18,6 +18,26 @@ const PROVIDER_DISPLAY_NAMES: Record<string, string> = {
   google: "Google",
   github: "GitHub",
 };
+
+const PROFILE_FIELD_LABELS: Record<string, string> = {
+  first_name: "First Name",
+  last_name: "Last Name",
+  phone: "Phone",
+};
+
+const isRequiredProfileValueMissing = (isRequired: boolean, value: string) => isRequired && value.trim().length === 0;
+
+const RequiredFieldLabel = ({ label, isMissing }: { label: string; isMissing: boolean }) => (
+  <>
+    {label}
+    <span
+      className={`${styles.requiredText} ${isMissing ? styles.requiredTextMissing : ""}`}
+      data-required-missing={isMissing || undefined}
+    >
+      Required
+    </span>
+  </>
+);
 
 function formatProvider(provider: string): string {
   return PROVIDER_DISPLAY_NAMES[provider] ?? provider.charAt(0).toUpperCase() + provider.slice(1);
@@ -57,6 +77,12 @@ export const PersonalInfo = () => {
   const [fname, setFname] = useState(user?.first_name ?? "");
   const [lname, setLname] = useState(user?.last_name ?? "");
   const [phone, setPhone] = useState(user?.phone ?? "");
+  const { requiredProfileFields = [] } = useAccountSettingsExtension();
+  const isFieldRequired = (key: string) => requiredProfileFields.includes(key);
+  const isFirstNameMissing = isRequiredProfileValueMissing(isFieldRequired("first_name"), fname);
+  const isLastNameMissing = isRequiredProfileValueMissing(isFieldRequired("last_name"), lname);
+  const isPhoneMissing = isRequiredProfileValueMissing(isFieldRequired("phone"), phone);
+  const canDeleteAvatar = Boolean(user?.avatar);
   const avatarRef = useRef<HTMLInputElement>();
   const fileChangeHandler: FormEventHandler<HTMLInputElement> = useCallback(
     async (e) => {
@@ -90,8 +116,26 @@ export const PersonalInfo = () => {
     async (e) => {
       e.preventDefault();
       if (!user) return;
-      const body = new FormData(e.currentTarget as HTMLFormElement);
-      const json = Object.fromEntries(body.entries());
+      const json = {
+        first_name: fname,
+        last_name: lname,
+        phone,
+      };
+
+      const missingFields = requiredProfileFields.filter((key) => {
+        const value = (json as Record<string, unknown>)[key];
+        return typeof value !== "string" || value.trim().length === 0;
+      });
+
+      if (missingFields.length > 0) {
+        const missingFieldLabels = missingFields.map((key) => PROFILE_FIELD_LABELS[key] ?? key);
+        toast?.show({
+          message: `${missingFieldLabels.join(", ")} ${missingFieldLabels.length === 1 ? "is" : "are"} required.`,
+          type: ToastType.error,
+        });
+        return;
+      }
+
       const response = await updateUser(json);
 
       refetchUser();
@@ -99,7 +143,7 @@ export const PersonalInfo = () => {
         toast?.show({ message: response?.response?.detail ?? "Error updating user", type: ToastType.error });
       }
     },
-    [user?.id],
+    [fname, lname, phone, user?.id, requiredProfileFields, updateUser, refetchUser, toast],
   );
 
   useEffect(() => {
@@ -115,71 +159,80 @@ export const PersonalInfo = () => {
   return (
     <div className={styles.section} id="personal-info">
       <div className={styles.sectionContent}>
-        <div className={styles.flexRow}>
-          <Userpic user={user} isInProgress={userInProgress} size={92} style={{ flex: "none" }} />
-          <form className={styles.flex1}>
+        <div className={styles.profilePhotoRow}>
+          <Userpic user={user} isInProgress={userInProgress} size={88} style={{ flex: "none" }} />
+          <div className={styles.sectionContent}>
+            <Typography variant="label" size="medium">
+              Profile Photo
+            </Typography>
             <InputFile
               name="avatar"
               onChange={fileChangeHandler}
               accept="image/png, image/jpeg, image/jpg"
               ref={avatarRef}
             />
-          </form>
-          {user?.avatar && (
+          </div>
+          {canDeleteAvatar && (
             <Button type="submit" variant="negative" look="outlined" size="medium" onClick={deleteUserAvatar}>
-              Delete
+              Delete Photo
             </Button>
           )}
         </div>
         <form onSubmit={userFormSubmitHandler} className={styles.sectionContent}>
-          <div className={styles.flexRow}>
-            <div className={styles.flex1}>
-              <Input
-                label="First Name"
-                value={fname}
-                onChange={(e: React.KeyboardEvent<HTMLInputElement>) => setFname(e.currentTarget.value)}
-                name="first_name"
-              />
-            </div>
-            <div className={styles.flex1}>
-              <Input
-                label="Last Name"
-                value={lname}
-                onChange={(e: React.KeyboardEvent<HTMLInputElement>) => setLname(e.currentTarget.value)}
-                name="last_name"
-              />
-            </div>
-          </div>
-          <div className={styles.flexRow}>
-            <div className={styles.flex1}>
-              <Input label="E-mail" type="email" readOnly={true} value={user?.email ?? ""} />
-            </div>
-            <div className={styles.flex1}>
-              <Input
-                label="Phone"
-                type="phone"
-                onChange={(e: React.KeyboardEvent<HTMLInputElement>) => setPhone(e.currentTarget.value)}
-                value={phone}
-                name="phone"
-              />
-            </div>
-          </div>
-          {user?.social_accounts?.map((account) => (
-            <div className={styles.flexRow} key={account.provider}>
-              <div className={styles.flex1}>
+          <div className={styles.formGrid}>
+            <Input
+              label={
+                isFieldRequired("first_name") ? (
+                  <RequiredFieldLabel label="First Name" isMissing={isFirstNameMissing} />
+                ) : (
+                  "First Name"
+                )
+              }
+              value={fname}
+              onChange={(e: React.KeyboardEvent<HTMLInputElement>) => setFname(e.currentTarget.value)}
+              name="first_name"
+              aria-required={isFieldRequired("first_name")}
+              aria-invalid={isFirstNameMissing || undefined}
+            />
+            <Input
+              label={
+                isFieldRequired("last_name") ? (
+                  <RequiredFieldLabel label="Last Name" isMissing={isLastNameMissing} />
+                ) : (
+                  "Last Name"
+                )
+              }
+              value={lname}
+              onChange={(e: React.KeyboardEvent<HTMLInputElement>) => setLname(e.currentTarget.value)}
+              name="last_name"
+              aria-required={isFieldRequired("last_name")}
+              aria-invalid={isLastNameMissing || undefined}
+            />
+            <Input label="E-mail" type="email" readOnly={true} value={user?.email ?? ""} />
+            <Input
+              label={
+                isFieldRequired("phone") ? <RequiredFieldLabel label="Phone" isMissing={isPhoneMissing} /> : "Phone"
+              }
+              type="phone"
+              onChange={(e: React.KeyboardEvent<HTMLInputElement>) => setPhone(e.currentTarget.value)}
+              value={phone}
+              name="phone"
+              aria-required={isFieldRequired("phone")}
+              aria-invalid={isPhoneMissing || undefined}
+            />
+            {user?.social_accounts?.map((account) => (
+              <div className={`${styles.formGrid} ${styles.fullWidth}`} key={account.provider}>
                 <Input label="Connected Account" readOnly={true} value={formatProvider(account.provider)} />
-              </div>
-              <div className={styles.flex1}>
                 <Input
                   label="Connected Since"
                   readOnly={true}
                   value={format(new Date(account.date_joined), "dd MMM yyyy")}
                 />
               </div>
-            </div>
-          ))}
-          <div className={clsx(styles.flexRow, styles.flexEnd)}>
-            <Button style={{ width: 125 }} waiting={isInProgress}>
+            ))}
+          </div>
+          <div className={styles.formActions}>
+            <Button className="w-[120px]" waiting={isInProgress}>
               Save
             </Button>
           </div>

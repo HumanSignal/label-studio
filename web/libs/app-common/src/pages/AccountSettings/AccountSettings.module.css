@@ -3,11 +3,31 @@
   display: flex;
   flex-direction: column;
 
+  & :global(.label-ls[data-required] .label-ls__text span::after) {
+    display: inline-flex;
+    align-items: center;
+    min-height: 18px;
+    margin-left: var(--spacing-tightest);
+    padding: 1px 6px;
+    border: 1px solid var(--account-settings-required-label-border, var(--color-neutral-border));
+    border-radius: var(--corner-radius-smallest);
+    background: var(--account-settings-required-label-background, var(--color-neutral-background));
+    box-shadow: var(--account-settings-required-label-shadow, none);
+    color: var(--account-settings-required-label-color, var(--color-neutral-content-subtle));
+    font-size: var(--font-size-label-smallest);
+    font-weight: var(--font-weight-medium);
+    line-height: var(--line-height-label-smallest);
+    letter-spacing: var(--letter-spacing-base);
+    vertical-align: text-bottom;
+  }
+
   &__content {
     display: flex;
     flex-direction: column;
     gap: var(--spacing-wide);
-    max-width: 660px;
+    width: min(56rem, 100%);
+    margin-inline: auto;
+    padding-block: var(--spacing-wide);
 
     & h1 {
       font-size: var(--font-size-header, 28px);
@@ -17,7 +37,49 @@
 }
 
 .accountSettingsPadding {
-  padding: var(--spacing-wide);
+  padding-left: 0;
+  padding-right: 0;
+}
+
+.section {
+  width: 100%;
+}
+
+.requiredMissing {
+  --account-settings-required-label-background: var(--color-negative-background);
+  --account-settings-required-label-border: var(--color-negative-border-bold);
+  --account-settings-required-label-color: var(--color-negative-content);
+  --account-settings-required-label-shadow: inset 0 0 0 1px var(--color-negative-border-bold);
+}
+
+.requiredText {
+  display: inline-flex;
+  align-items: center;
+  min-height: 18px;
+  margin-left: var(--spacing-tightest);
+  padding: 1px 6px;
+  border: 1px solid var(--account-settings-required-label-border, var(--color-neutral-border));
+  border-radius: var(--corner-radius-smallest);
+  background: var(--account-settings-required-label-background, var(--color-neutral-background));
+  box-shadow: var(--account-settings-required-label-shadow, none);
+  color: var(--account-settings-required-label-color, var(--color-neutral-content-subtle));
+  font-size: var(--font-size-label-smallest);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--line-height-label-smallest);
+  letter-spacing: var(--letter-spacing-base);
+  vertical-align: text-bottom;
+}
+
+.requiredTextMissing {
+  --account-settings-required-label-background: var(--color-negative-background);
+  --account-settings-required-label-border: var(--color-negative-border-bold);
+  --account-settings-required-label-color: var(--color-negative-content);
+  --account-settings-required-label-shadow: inset 0 0 0 1px var(--color-negative-border-bold);
+}
+
+.section :global(.input-ls[aria-invalid="true"]) {
+  border-color: var(--color-negative-border-bold);
+  box-shadow: 0 0 0 1px var(--color-negative-border-bold);
 }
 
 .sectionContent {
@@ -39,12 +101,63 @@
 
 .flex1 {
   flex: 1;
+  min-width: 0;
 }
 
 .userPic {
   flex: none;
 }
 
-.saveButton {
-  width: 125px;
+.profilePhotoRow {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--spacing-wide);
+}
+
+.formGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--spacing-wide);
+}
+
+.fullWidth {
+  grid-column: 1 / -1;
+}
+
+.formActions {
+  display: flex;
+  justify-content: flex-end;
+  padding-top: var(--spacing-tight);
+}
+
+@media (max-width: 720px) {
+  .accountSettings {
+    &__content {
+      width: 100%;
+    }
+  }
+
+  .accountSettingsPadding {
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  .flexRow,
+  .profilePhotoRow {
+    align-items: stretch;
+    grid-template-columns: 1fr;
+  }
+
+  .flexRow {
+    flex-direction: column;
+  }
+
+  .formGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .formActions {
+    justify-content: stretch;
+  }
 }

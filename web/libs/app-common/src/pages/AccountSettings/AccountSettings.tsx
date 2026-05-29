@@ -2,6 +2,7 @@ import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@huma
 import { useMemo, isValidElement } from "react";
 import { Redirect, Route, Switch, useParams, useRouteMatch } from "react-router-dom";
 import { useUpdatePageTitle, createTitleFromSegments } from "@humansignal/core";
+import { useAccountSettingsExtension } from "./extensions";
 import styles from "./AccountSettings.module.css";
 import { accountSettingsSections } from "./sections";
 import { HotkeysHeaderButtons } from "./sections/Hotkeys";
@@ -17,7 +18,8 @@ import { useAuth } from "@humansignal/core/providers/AuthProvider";
 import { SidebarMenu } from "apps/labelstudio/src/components/SidebarMenu/SidebarMenu";
 
 const AccountSettingsSection = () => {
-  const { user, permissions } = useAuth();
+  const { permissions } = useAuth();
+  const { extraSections = [] } = useAccountSettingsExtension();
   const { sectionId } = useParams<{ sectionId: string }>();
   const settings = useAtomValue(settingsAtom);
   const contentClassName = clsx(styles.accountSettings__content, {
@@ -25,8 +27,10 @@ const AccountSettingsSection = () => {
   });
 
   const resolvedSections = useMemo(() => {
-    return settings.data && !("error" in settings.data) ? accountSettingsSections(settings.data, permissions) : [];
-  }, [settings.data, user]);
+    return settings.data && !("error" in settings.data)
+      ? accountSettingsSections(settings.data, permissions, extraSections)
+      : [];
+  }, [settings.data, permissions, extraSections]);
 
   const currentSection = useMemo(
     () => resolvedSections.find((section) => section.id === sectionId),
@@ -57,9 +61,17 @@ const AccountSettingsSection = () => {
     return <Redirect to={`${AccountSettingsPage.path}/${resolvedSections[0].id}`} />;
   }
 
+  if (currentSection?.rendersOwnCards) {
+    return (
+      <div className={contentClassName}>
+        <currentSection.component />
+      </div>
+    );
+  }
+
   return currentSection ? (
     <div className={contentClassName}>
-      <Card key={currentSection.id}>
+      <Card key={currentSection.id} className="!w-full">
         <CardHeader>
           <div className="flex flex-col gap-tight">
             <div className="flex justify-between items-center">
@@ -93,10 +105,13 @@ const AccountSettingsPage = () => {
   const settings = useAtomValue(settingsAtom);
   const match = useRouteMatch();
   const { sectionId } = useParams<{ sectionId: string }>();
-  const { user, permissions } = useAuth();
+  const { permissions } = useAuth();
+  const { extraSections = [] } = useAccountSettingsExtension();
   const resolvedSections = useMemo(() => {
-    return settings.data && !("error" in settings.data) ? accountSettingsSections(settings.data, permissions) : [];
-  }, [settings.data, user]);
+    return settings.data && !("error" in settings.data)
+      ? accountSettingsSections(settings.data, permissions, extraSections)
+      : [];
+  }, [settings.data, permissions, extraSections]);
 
   const menuItems = useMemo(
     () =>
