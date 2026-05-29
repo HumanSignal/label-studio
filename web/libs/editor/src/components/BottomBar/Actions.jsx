@@ -1,4 +1,4 @@
-import { IconInfoOutline, IconSettings } from "@humansignal/icons";
+import { InfoIcon, SlidersHorizontalIcon } from "@humansignal/icons";
 import { Button } from "@humansignal/ui";
 import { isStarterCloudPlan } from "@humansignal/core";
 import { cn } from "../../utils/bem";
@@ -30,7 +30,7 @@ export const Actions = ({ store }) => {
             tooltip="Show instructions"
             onClick={() => store.toggleDescription()}
             className="aspect-square"
-            leading={<IconInfoOutline />}
+            leading={<InfoIcon size={24} />}
             data-testid="bottombar-instructions-button"
           />
         )}
@@ -43,7 +43,7 @@ export const Actions = ({ store }) => {
           onClick={() => store.toggleSettings()}
           tooltip="Settings"
           className="aspect-square"
-          leading={<IconSettings />}
+          leading={<SlidersHorizontalIcon size={24} />}
           data-testid="bottombar-settings-button"
         />
       </div>

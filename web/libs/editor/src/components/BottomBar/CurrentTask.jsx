@@ -2,7 +2,7 @@ import { useMemo } from "react";
 import { observer } from "mobx-react";
 import { useEffect, useState } from "react";
 import { Button, Tooltip } from "@humansignal/ui";
-import { IconChevronLeft, IconChevronRight } from "@humansignal/icons";
+import { CaretLeftIcon, CaretRightIcon } from "@humansignal/icons";
 import { cn } from "../../utils/bem";
 import { FF_DEV_4174, FF_LEAP_1173, FF_TASK_COUNT_FIX, isFF } from "../../utils/feature-flags";
 import { guidGenerator } from "../../utils/unique";
@@ -124,7 +124,7 @@ export const CurrentTask = observer(({ store }) => {
                 disabled={!historyEnabled || !store.canGoPrevTask}
                 onClick={store.prevTask}
                 variant="neutral"
-                leading={<IconChevronLeft />}
+                leading={<CaretLeftIcon size={24} />}
                 size="small"
               />
             </Tooltip>
@@ -136,7 +136,7 @@ export const CurrentTask = observer(({ store }) => {
                 disabled={!canNavigateNext && !canPostponeTask}
                 onClick={canNavigateNext ? store.nextTask : store.postponeTask}
                 variant={!canNavigateNext && canPostponeTask ? "primary" : "neutral"}
-                leading={<IconChevronRight />}
+                leading={<CaretRightIcon size={24} />}
                 size="small"
               />
             </Tooltip>

@@ -9,7 +9,7 @@ import type React from "react";
 import { useCallback, useState } from "react";
 
 import { Button, ButtonGroup, type ButtonProps } from "@humansignal/ui";
-import { IconBan, IconChevronDown } from "@humansignal/icons";
+import { CaretDownIcon, IconBan, IconChevronDown } from "@humansignal/icons";
 import { Dropdown } from "@humansignal/ui";
 import type { CustomButtonType } from "../../stores/CustomButton";
 import { cn } from "../../utils/bem";
@@ -283,9 +283,8 @@ export const Controls = controlsInjector<{ annotation: MSTAnnotation }>(
                       disabled={isDisabled}
                       aria-label="Submit annotation"
                       data-testid="bottombar-submit-dropdown"
-                    >
-                      <IconChevronDown />
-                    </Button>
+                      leading={<CaretDownIcon size={24} />}
+                    />
                   </Dropdown.Trigger>
                 ) : null}
               </ButtonGroup>
