@@ -242,8 +242,7 @@ Select how you want to handle skipped tasks. To disallow skipping tasks, you can
 If an annotator skips a task, the task is moved to the bottom of their queue. They see the task again as they reach the end of their queue. 
 
 If the annotator exits the label stream without labeling the skipped task, and then later re-enters the label stream, whether they see the task again depends on how task assignments are set up. 
-
-* Automatic task assignment: Whether they see the task again depends on if other annotators have since completed the task. If the task is still incomplete when the annotator re-enters the labeling stream, they can update label and re-submit the task. 
+* Automatic task assignment: Whether they see the task again depends on whether other annotators have since completed the task or not. If the task is still incomplete when the annotator re-enters the labeling stream, they can update the labels and re-submit the task. 
 * Manual task assignment: The annotator will continue to see the skipped task until it is completed.  
 
 Skipped tasks are not marked as completed, and affect the Overall Project Progress calculation visible from the project Dashboard. (Meaning that the progress for a project that has skipped tasks will be less than 100%.)  
