@@ -171,7 +171,14 @@ class ReactCodeResolveView(ResolveStorageUriAPIMixin, APIView):
         if decoded_fileuri.startswith('/data/upload/'):
             return self._serve_local_upload(decoded_fileuri, project)
 
-        response = self.resolve(request, fileuri, project)
+        if not project.has_permission(user):
+            return _add_cors_headers(Response(status=status.HTTP_403_FORBIDDEN))
+
+        # Delegate to the standard resolve path (presigned redirect or proxy depending on
+        # storage.presign). The sandbox iframe fetches this endpoint via a parent-window
+        # bridge (fetch-bridge postMessage) that can follow the presigned redirect freely,
+        # so cloud-storage content never passes through the LS server.
+        response = self.resolve(request, decoded_fileuri, project)
         return _add_cors_headers(response)
 
     def _serve_local_upload(self, url_path: str, project) -> HttpResponse:

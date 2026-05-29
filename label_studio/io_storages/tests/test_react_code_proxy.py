@@ -375,12 +375,19 @@ class TestReactCodeResolveView:
     @patch('io_storages.react_code_proxy.Project.objects.get')
     @patch('io_storages.react_code_proxy.get_user_model')
     def test_get_success_delegates_to_resolve(self, mock_get_user_model, mock_project_get, mock_resolve, setup):
+        """Cloud-storage URIs are delegated to self.resolve() (presigned redirect or proxy).
+
+        The sandbox fetches this endpoint via the parent-window fetch-bridge, which can
+        follow presigned redirects freely — cloud-storage content never passes through
+        the LS server.
+        """
         UserModel = MagicMock()
         mock_user = MagicMock()
         UserModel.objects.get.return_value = mock_user
         mock_get_user_model.return_value = UserModel
 
         mock_project = MagicMock()
+        mock_project.has_permission.return_value = True
         mock_project_get.return_value = mock_project
 
         mock_resolve.return_value = Response(status=status.HTTP_200_OK)
@@ -398,7 +405,7 @@ class TestReactCodeResolveView:
         assert response['Access-Control-Allow-Origin'] == '*'
         mock_resolve.assert_called_once()
         call_args = mock_resolve.call_args[0]
-        assert call_args[1] == fileuri
+        assert call_args[1] == 's3://bucket/file.xml'
         assert call_args[2] == mock_project
 
     @override_settings(SECRET_KEY=TEST_SECRET_KEY)
@@ -406,7 +413,7 @@ class TestReactCodeResolveView:
     @patch('io_storages.react_code_proxy.Project.objects.get')
     @patch('io_storages.react_code_proxy.get_user_model')
     def test_get_sets_user_on_request(self, mock_get_user_model, mock_project_get, mock_resolve, setup):
-        """Verify the resolved user is set on request so ResolveStorageUriAPIMixin can check permissions."""
+        """Verify the resolved user is set on request before resolve() is called."""
         UserModel = MagicMock()
         mock_user = MagicMock()
         mock_user.pk = 42
@@ -414,7 +421,9 @@ class TestReactCodeResolveView:
         mock_get_user_model.return_value = UserModel
 
         mock_project = MagicMock()
+        mock_project.has_permission.return_value = True
         mock_project_get.return_value = mock_project
+
         mock_resolve.return_value = Response(status=status.HTTP_200_OK)
 
         user = MagicMock()
