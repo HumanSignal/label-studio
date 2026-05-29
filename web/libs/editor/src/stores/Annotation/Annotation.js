@@ -1037,9 +1037,28 @@ const _Annotation = types
       });
 
       self.traverseTree((node) => {
-        /**
-         * Hotkey for controls
-         */
+        // For tags composing `RandomizableMixin`, assign auto-hotkeys to the
+        // direct shuffled `displayChildren` first so `[N]` hints stay aligned
+        // with the rendered top-level rows. The shuffle is owned by the host's
+        // lifecycle, not by this pass, so repeated `setupHotKeys` calls on the
+        // same MST root are idempotent. Traversal then continues into the
+        // subtree: top-level children already have `hotkey` set so the generic
+        // branch skips them, and any nested choices (`allowNested`) still get
+        // auto-hotkeys assigned in their natural MST order.
+        if (node && node.randomize === true && typeof node.reshuffle === "function") {
+          for (const child of node.displayChildren ?? []) {
+            if (child?.onHotKey && !child.hotkey) {
+              const comb = hotkeys.makeComb();
+
+              if (!comb) break;
+
+              child.hotkey = comb;
+              hotkeys.addKey(child.hotkey, child.onHotKey);
+            }
+          }
+          return;
+        }
+
         if (node && node.onHotKey && !node.hotkey) {
           const comb = hotkeys.makeComb();
 

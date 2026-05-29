@@ -4,7 +4,7 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { Provider } from "mobx-react";
-import { types } from "mobx-state-tree";
+import { types, unprotect } from "mobx-state-tree";
 import { HtxChoice } from "../Choice";
 import { ChoicesModel } from "../Choices";
 
@@ -304,6 +304,161 @@ describe("Choice model", () => {
     expect(choice.sel).toBe(false);
     choice.onHotKey();
     expect(choice.sel).toBe(true);
+  });
+});
+
+describe("Choices randomize (RandomizableMixin)", () => {
+  function makeChoices({ randomize = false } = {}) {
+    return ChoicesModel.create({
+      name: "ch",
+      toname: "t",
+      choice: "single",
+      randomize,
+      children: [
+        { type: "choice", value: "A", _value: "A" },
+        { type: "choice", value: "B", _value: "B" },
+        { type: "choice", value: "C", _value: "C" },
+      ],
+    });
+  }
+
+  it("randomize defaults to false and displayChildren matches tiedChildren order", () => {
+    const choices = makeChoices();
+    expect(choices.randomize).toBe(false);
+    expect(choices.displayChildren.map((c) => c._value)).toEqual(choices.tiedChildren.map((c) => c._value));
+  });
+
+  it("reshuffle is a no-op when randomize is false", () => {
+    const choices = makeChoices();
+    choices.reshuffle();
+    expect(choices._shuffledChildren).toBeNull();
+    expect(choices.displayChildren.map((c) => c._value)).toEqual(choices.tiedChildren.map((c) => c._value));
+  });
+
+  it("afterCreate establishes a stable shuffled snapshot when randomize=true", () => {
+    // Math.random=0 collapses Fisher-Yates over [A,B,C] to [B,C,A].
+    const spy = spyOn(Math, "random").mockReturnValue(0);
+    try {
+      const choices = makeChoices({ randomize: true });
+      expect(choices._shuffledChildren).not.toBeNull();
+      expect(choices.displayChildren.map((c) => c._value)).toEqual(["B", "C", "A"]);
+    } finally {
+      spy.mockRestore();
+    }
+  });
+
+  it("displayChildren falls back to tiedChildren when the shuffled snapshot is cleared", () => {
+    const choices = makeChoices({ randomize: true });
+    unprotect(choices);
+    choices._shuffledChildren = null;
+    expect(choices.displayChildren.map((c) => c._value)).toEqual(choices.tiedChildren.map((c) => c._value));
+  });
+
+  it("reshuffle produces a deterministic permutation with a stubbed Math.random", () => {
+    const spy = spyOn(Math, "random").mockReturnValue(0);
+    try {
+      const choices = makeChoices({ randomize: true });
+      choices.reshuffle();
+      const values = choices.displayChildren.map((c) => c._value);
+      expect(values).toEqual(["B", "C", "A"]);
+    } finally {
+      spy.mockRestore();
+    }
+  });
+
+  it("reshuffle returns a different order on a different stubbed sequence", () => {
+    const spy = spyOn(Math, "random").mockReturnValue(0.99);
+    try {
+      const choices = makeChoices({ randomize: true });
+      choices.reshuffle();
+      const values = choices.displayChildren.map((c) => c._value);
+      expect(values).toEqual(["A", "B", "C"]);
+    } finally {
+      spy.mockRestore();
+    }
+  });
+
+  it("displayChildren is a permutation of tiedChildren (same set, same length)", () => {
+    const choices = makeChoices({ randomize: true });
+    choices.reshuffle();
+    const display = choices.displayChildren;
+    const tied = choices.tiedChildren;
+    expect(display).not.toBe(tied);
+    expect(display.length).toBe(tied.length);
+    expect(new Set(display)).toEqual(new Set(tied));
+  });
+
+  it("serialization is unaffected by display order (resultValue matches config value/alias)", () => {
+    const choices = ChoicesModel.create({
+      name: "ch",
+      toname: "t",
+      choice: "single",
+      randomize: true,
+      children: [
+        { type: "choice", value: "Positive", alias: "pos", _value: "Positive" },
+        { type: "choice", value: "Neutral", _value: "Neutral" },
+        { type: "choice", value: "Negative", _value: "Negative" },
+      ],
+    });
+    const spy = spyOn(Math, "random").mockReturnValue(0);
+    try {
+      choices.reshuffle();
+      const first = choices.displayChildren[0];
+      expect(first._resultValue).toBe(first.alias ?? first._value);
+      expect(["pos", "Neutral", "Negative"]).toContain(first._resultValue);
+    } finally {
+      spy.mockRestore();
+    }
+  });
+
+  it("displayChildren falls back to tiedChildren when shuffled snapshot is stale (length mismatch)", () => {
+    const choices = makeChoices({ randomize: true });
+    choices.reshuffle();
+    expect(choices._shuffledChildren.length).toBe(3);
+
+    // Simulate dynamic-children load adding a new entry between reshuffles.
+    unprotect(choices);
+    choices.children.push({ type: "choice", value: "D", _value: "D" });
+    expect(choices.tiedChildren.length).toBe(4);
+    expect(choices._shuffledChildren.length).toBe(3);
+    expect(choices.displayChildren.length).toBe(4);
+    expect(choices.displayChildren.map((c) => c._value)).toEqual(["A", "B", "C", "D"]);
+
+    choices.reshuffle();
+    expect(choices._shuffledChildren.length).toBe(4);
+    expect(new Set(choices.displayChildren.map((c) => c._value))).toEqual(new Set(["A", "B", "C", "D"]));
+  });
+
+  it("displayChildren contains only TOP-LEVEL choices (nested choices stay nested under their parent)", () => {
+    // With `allowNested`, `tiedChildren` is recursive and would include grand-
+    // children, which previously caused nested choices to be flattened (and
+    // duplicated) into the shuffle pool. `displayChildren` must stay direct.
+    const choices = ChoicesModel.create({
+      name: "ch",
+      toname: "t",
+      choice: "multiple",
+      allownested: true,
+      randomize: true,
+      children: [
+        {
+          type: "choice",
+          value: "P1",
+          _value: "P1",
+          children: [{ type: "choice", value: "C1", _value: "C1" }],
+        },
+        {
+          type: "choice",
+          value: "P2",
+          _value: "P2",
+          children: [{ type: "choice", value: "C2", _value: "C2" }],
+        },
+      ],
+    });
+
+    expect(choices.tiedChildren.map((c) => c._value).sort()).toEqual(["C1", "C2", "P1", "P2"]);
+    expect(choices.displayChildren.length).toBe(2);
+    expect(choices.displayChildren.map((c) => c._value).sort()).toEqual(["P1", "P2"]);
+    expect(choices.displayChildren.every((c) => c._value === "P1" || c._value === "P2")).toBe(true);
   });
 });
 
