@@ -331,6 +331,13 @@ class ViewSerializer(serializers.ModelSerializer):
             if filter_group_data:
                 filters_data = filter_group_data.pop('filters', [])
 
+                # BROS-1324: serialize concurrent view-saves. The Data Manager fires a
+                # burst of un-cancelled save requests during tab load/edit; without a
+                # row lock the filter replacement below (delete + recreate) interleaves
+                # across requests and leaves duplicate root filters in the group's M2M,
+                # which the user sees as filters multiplying on every reload.
+                instance = self.Meta.model.objects.select_for_update().get(pk=instance.pk)
+
                 filter_group = instance.filter_group
                 if filter_group is None:
                     filter_group = FilterGroup.objects.create(**filter_group_data)
@@ -342,7 +349,10 @@ class ViewSerializer(serializers.ModelSerializer):
                     filter_group.conjunction = conjunction
                     filter_group.save()
 
-                filter_group.filters.clear()
+                # BROS-1324: delete the old filters outright (cascades to child filters
+                # via the parent FK) instead of only clearing the M2M associations,
+                # which left orphaned Filter rows accumulating in the DB on every save.
+                Filter.objects.filter(filter_groups=filter_group).delete()
                 self._create_filters(filter_group=filter_group, filters_data=filters_data)
 
             ordering = validated_data.pop('ordering', None)
