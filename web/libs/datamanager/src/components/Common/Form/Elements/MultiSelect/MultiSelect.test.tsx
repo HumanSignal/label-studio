@@ -1,7 +1,7 @@
 /**
  * Tests for the DM Form.Builder ``multiselect`` field type and ``visible_when``
  * conditional visibility used by the Data Manager action dialogs (e.g. the
- * payments "Approve for Payment" dialog).
+ * payments "Mark Ready for Payment" dialog).
  *
  * These exercise the LSO datamanager Form.Builder (``Form.jsx``), which is
  * the form library that actually renders DM action dialogs — separate from

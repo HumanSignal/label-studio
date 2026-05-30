@@ -7,8 +7,11 @@ import "./PaymentStatus.prefix.css";
 const STATUS_PRIORITY = ["approved", "in_payout", "paid", "excluded"];
 
 // Maps API status strings to CSS modifiers and short labels on the avatar badge.
+// UI naming: the API status key stays "approved", but the user-facing label is "Ready for
+// payment" — the payments "approve" wording was renamed in the UI only, to disambiguate it from
+// review-approve and batch-approve. Keep the "approved" key (it's the value the API sends).
 const STATUS_CONFIG = {
-  approved: { mod: "approved", label: "Approved" },
+  approved: { mod: "approved", label: "Ready for payment" },
   in_payout: { mod: "in-payout", label: "In batch" },
   paid: { mod: "paid", label: "Paid" },
   excluded: { mod: "excluded", label: "Excluded" },
