@@ -288,13 +288,10 @@ class TestTaskAgreementAPI(APITestCase):
         other_project = ProjectFactory(organization=other_org)
         task = TaskFactory(project=other_project)
 
-        # In OSS Project.has_permission is a stub that always returns True; patch so other_project denies access.
-        # Class-level patch: the mock is invoked with (user) only, not (self, user).
         def has_perm(*args):
             if len(args) == 2:
                 project, _ = args
                 return project.id != other_project.id
-            # Class-level method patch: mock is called as (user,) only.
             return False
 
         mock_has_permission.side_effect = has_perm
@@ -312,6 +309,119 @@ class TestTaskAgreementAPI(APITestCase):
         data = response.json()
         assert data['total_annotations'] == 0
         assert data['distributions'] == {}
+
+    @patch('tasks.api.flag_set')
+    def test_distribution_includes_predictions_in_label_counts(self, mock_flag_set):
+        """Predictions are merged into distributions so aggregate matches client-side (develop / FF off)."""
+        mock_flag_set.return_value = True
+        task = TaskFactory(project=self.project)
+        AnnotationFactory(
+            task=task,
+            project=self.project,
+            result=[
+                {
+                    'from_name': 'label',
+                    'to_name': 'image',
+                    'type': 'rectanglelabels',
+                    'value': {'rectanglelabels': ['Car', 'Car']},
+                }
+            ],
+        )
+        PredictionFactory(
+            task=task,
+            project=self.project,
+            result=[
+                {
+                    'from_name': 'label',
+                    'to_name': 'image',
+                    'type': 'rectanglelabels',
+                    'value': {'rectanglelabels': ['Car']},
+                }
+            ],
+        )
+        self.client.force_authenticate(user=self.user)
+        response = self.client.get(f'/api/tasks/{task.id}/agreement/')
+        assert response.status_code == 200
+        data = response.json()
+        assert data['total_annotations'] == 1
+        assert data['distributions']['label']['labels'] == {'Car': 3}
+
+
+class TestTaskSummaryAPIFeatureOff(APITestCase):
+    """When feature flag is off, summary endpoint returns 403. Always run this test."""
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.organization = OrganizationFactory()
+        cls.project = ProjectFactory(organization=cls.organization)
+        cls.user = cls.organization.created_by
+
+    @patch('tasks.api.flag_set')
+    def test_distribution_returns_403_when_feature_flag_disabled(self, mock_flag_set):
+        mock_flag_set.return_value = False
+        task = TaskFactory(project=self.project)
+        self.client.force_authenticate(user=self.user)
+        response = self.client.get(f'/api/tasks/{task.id}/summary/')
+        assert response.status_code == 403
+        assert 'detail' in response.json() or 'error' in response.json()
+
+
+@unittest.skipUnless(
+    flag_set('fflag_fix_all_fit_720_lazy_load_annotations', user=None),
+    'Summary API tests require fflag_fix_all_fit_720_lazy_load_annotations to be on',
+)
+class TestTaskSummaryAPI(APITestCase):
+    """Tests for TaskSummaryAPI (GET /api/tasks/<id>/summary/). Run only when feature flag is on."""
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.organization = OrganizationFactory()
+        cls.project = ProjectFactory(organization=cls.organization)
+        cls.user = cls.organization.created_by
+
+    @patch('tasks.api.flag_set')
+    def test_distribution_returns_404_for_nonexistent_task(self, mock_flag_set):
+        mock_flag_set.return_value = True
+        self.client.force_authenticate(user=self.user)
+        response = self.client.get('/api/tasks/99999/summary/')
+        assert response.status_code == 404
+        assert response.json() == {'error': 'Task not found'}
+
+    @patch('tasks.api.flag_set')
+    @patch.object(Project, 'has_permission')
+    def test_distribution_permission_denied_for_other_project(self, mock_has_permission, mock_flag_set):
+        mock_flag_set.return_value = True
+        other_org = OrganizationFactory()
+        other_project = ProjectFactory(organization=other_org)
+        task = TaskFactory(project=other_project)
+
+        # In OSS Project.has_permission is a stub that always returns True; patch so other_project denies access.
+        # Class-level patch: the mock is invoked with (user) only, not (self, user).
+        def has_perm(*args):
+            if len(args) == 2:
+                project, _ = args
+                return project.id != other_project.id
+            # Class-level method patch: mock is called as (user,) only.
+            return False
+
+        mock_has_permission.side_effect = has_perm
+        self.client.force_authenticate(user=self.user)
+        response = self.client.get(f'/api/tasks/{task.id}/summary/')
+        assert response.status_code == 403
+
+    @patch('tasks.api.flag_set')
+    def test_distribution_empty_task_returns_zero_annotations(self, mock_flag_set):
+        mock_flag_set.return_value = True
+        task = TaskFactory(project=self.project)
+        self.client.force_authenticate(user=self.user)
+        response = self.client.get(f'/api/tasks/{task.id}/summary/')
+        assert response.status_code == 200
+        data = response.json()
+        assert data['total_annotations'] == 0
+        assert data['total_predictions'] == 0
+        assert data['distributions'] == {}
+        assert data['annotations'] == []
+        assert data['task']['id'] == task.id
 
     @patch('tasks.api.flag_set')
     def test_distribution_with_rectanglelabels(self, mock_flag_set):
@@ -342,7 +452,7 @@ class TestTaskAgreementAPI(APITestCase):
             ],
         )
         self.client.force_authenticate(user=self.user)
-        response = self.client.get(f'/api/tasks/{task.id}/agreement/')
+        response = self.client.get(f'/api/tasks/{task.id}/summary/')
         assert response.status_code == 200
         data = response.json()
         assert data['total_annotations'] == 2
@@ -392,7 +502,7 @@ class TestTaskAgreementAPI(APITestCase):
             ],
         )
         self.client.force_authenticate(user=self.user)
-        response = self.client.get(f'/api/tasks/{task.id}/agreement/')
+        response = self.client.get(f'/api/tasks/{task.id}/summary/')
         assert response.status_code == 200
         data = response.json()
         assert data['total_annotations'] == 3
@@ -430,7 +540,7 @@ class TestTaskAgreementAPI(APITestCase):
             ],
         )
         self.client.force_authenticate(user=self.user)
-        response = self.client.get(f'/api/tasks/{task.id}/agreement/')
+        response = self.client.get(f'/api/tasks/{task.id}/summary/')
         assert response.status_code == 200
         data = response.json()
         assert data['total_annotations'] == 2
@@ -468,7 +578,7 @@ class TestTaskAgreementAPI(APITestCase):
             ],
         )
         self.client.force_authenticate(user=self.user)
-        response = self.client.get(f'/api/tasks/{task.id}/agreement/')
+        response = self.client.get(f'/api/tasks/{task.id}/summary/')
         assert response.status_code == 200
         data = response.json()
         assert data['total_annotations'] == 2
@@ -505,7 +615,7 @@ class TestTaskAgreementAPI(APITestCase):
             ],
         )
         self.client.force_authenticate(user=self.user)
-        response = self.client.get(f'/api/tasks/{task.id}/agreement/')
+        response = self.client.get(f'/api/tasks/{task.id}/summary/')
         assert response.status_code == 200
         data = response.json()
         assert data['total_annotations'] == 2
@@ -543,7 +653,7 @@ class TestTaskAgreementAPI(APITestCase):
             ],
         )
         self.client.force_authenticate(user=self.user)
-        response = self.client.get(f'/api/tasks/{task.id}/agreement/')
+        response = self.client.get(f'/api/tasks/{task.id}/summary/')
         assert response.status_code == 200
         data = response.json()
         assert data['total_annotations'] == 2
@@ -582,15 +692,15 @@ class TestTaskAgreementAPI(APITestCase):
             ],
         )
         self.client.force_authenticate(user=self.user)
-        response = self.client.get(f'/api/tasks/{task.id}/agreement/')
+        response = self.client.get(f'/api/tasks/{task.id}/summary/')
         assert response.status_code == 200
         data = response.json()
         assert data['total_annotations'] == 1
         assert data['distributions']['label']['labels'] == {'Car': 1}
 
     @patch('tasks.api.flag_set')
-    def test_distribution_includes_predictions_in_label_counts(self, mock_flag_set):
-        """Predictions are merged into distributions so aggregate matches client-side (develop / FF off)."""
+    def test_distribution_excludes_predictions_from_label_counts(self, mock_flag_set):
+        """Predictions are not merged into distributions; only annotations are counted."""
         mock_flag_set.return_value = True
         task = TaskFactory(project=self.project)
         AnnotationFactory(
@@ -618,8 +728,76 @@ class TestTaskAgreementAPI(APITestCase):
             ],
         )
         self.client.force_authenticate(user=self.user)
-        response = self.client.get(f'/api/tasks/{task.id}/agreement/')
+        response = self.client.get(f'/api/tasks/{task.id}/summary/')
         assert response.status_code == 200
         data = response.json()
         assert data['total_annotations'] == 1
-        assert data['distributions']['label']['labels'] == {'Car': 3}
+        assert data['total_predictions'] == 1
+        assert data['distributions']['label']['labels'] == {'Car': 2}
+
+    @patch('tasks.api.flag_set')
+    def test_distribution_excludes_ground_truth_annotations(self, mock_flag_set):
+        """Ground truth annotations are excluded from distributions to match agreement filter."""
+        mock_flag_set.return_value = True
+        task = TaskFactory(project=self.project)
+        AnnotationFactory(
+            task=task,
+            project=self.project,
+            result=[
+                {
+                    'from_name': 'label',
+                    'to_name': 'image',
+                    'type': 'rectanglelabels',
+                    'value': {'rectanglelabels': ['Car']},
+                }
+            ],
+        )
+        AnnotationFactory(
+            task=task,
+            project=self.project,
+            ground_truth=True,
+            result=[
+                {
+                    'from_name': 'label',
+                    'to_name': 'image',
+                    'type': 'rectanglelabels',
+                    'value': {'rectanglelabels': ['Person']},
+                }
+            ],
+        )
+        self.client.force_authenticate(user=self.user)
+        response = self.client.get(f'/api/tasks/{task.id}/summary/')
+        assert response.status_code == 200
+        data = response.json()
+        assert data['total_annotations'] == 2
+        assert data['distributions']['label']['labels'] == {'Car': 1}
+        assert 'Person' not in data['distributions']['label']['labels']
+
+    @patch('tasks.api.flag_set')
+    def test_distribution_excludes_null_result_annotations(self, mock_flag_set):
+        """Annotations with null results are excluded from distributions to match agreement filter."""
+        mock_flag_set.return_value = True
+        task = TaskFactory(project=self.project)
+        AnnotationFactory(
+            task=task,
+            project=self.project,
+            result=[
+                {
+                    'from_name': 'label',
+                    'to_name': 'image',
+                    'type': 'rectanglelabels',
+                    'value': {'rectanglelabels': ['Car']},
+                }
+            ],
+        )
+        AnnotationFactory(
+            task=task,
+            project=self.project,
+            result=None,
+        )
+        self.client.force_authenticate(user=self.user)
+        response = self.client.get(f'/api/tasks/{task.id}/summary/')
+        assert response.status_code == 200
+        data = response.json()
+        assert data['total_annotations'] == 2
+        assert data['distributions']['label']['labels'] == {'Car': 1}

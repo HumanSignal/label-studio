@@ -102,6 +102,10 @@ export const FF_PREVIEW_PERFORMANCE = "fflag_fix_all_fit_287_preview_performance
 export const FF_FIT_720_LAZY_LOAD_ANNOTATIONS = "fflag_fix_all_fit_720_lazy_load_annotations";
 
 /**
+ * Use agreement dashboard v2 in Task Summary ViewAll summary tab
+ */
+export const FF_UTC_554_AGREEMENT_V2_IN_TASK_SUMMARY_VIEW = "feat_utc_554_agreement_v2_in_task_summary_view";
+/**
  * Analytics Label Distribution page
  */
 export const FF_FIT_1443_ANALYTICS_LABEL_DISTRIBUTION_PAGE =

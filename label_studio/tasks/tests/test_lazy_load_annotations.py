@@ -280,7 +280,7 @@ class TestTaskAgreementAPI(APITestCase):
 
     @pytest.mark.usefixtures('fflag_fix_all_fit_720_lazy_load_annotations_off')
     def test_agreement_endpoint_requires_feature_flag(self):
-        """Test that agreement endpoint returns 403 when feature flag is disabled."""
+        """Test that summary endpoint returns 403 when feature flag is disabled."""
         self.client.force_authenticate(user=self.user)
         response = self.client.get(f'/api/tasks/{self.task.id}/agreement/')
 
@@ -289,7 +289,7 @@ class TestTaskAgreementAPI(APITestCase):
 
     @pytest.mark.usefixtures('fflag_fix_all_fit_720_lazy_load_annotations_on')
     def test_agreement_endpoint_empty_task(self):
-        """Test agreement endpoint returns empty distributions for task with no annotations."""
+        """Test summary endpoint returns empty distributions for task with no annotations."""
         self.client.force_authenticate(user=self.user)
         response = self.client.get(f'/api/tasks/{self.task.id}/agreement/')
 
@@ -302,7 +302,7 @@ class TestTaskAgreementAPI(APITestCase):
 
     @pytest.mark.usefixtures('fflag_fix_all_fit_720_lazy_load_annotations_on')
     def test_agreement_endpoint_with_labels(self):
-        """Test agreement endpoint correctly aggregates label annotations."""
+        """Test summary endpoint correctly aggregates label annotations."""
         # Create multiple annotations with different labels
         AnnotationFactory(
             task=self.task,
@@ -361,7 +361,7 @@ class TestTaskAgreementAPI(APITestCase):
 
     @pytest.mark.usefixtures('fflag_fix_all_fit_720_lazy_load_annotations_on')
     def test_agreement_endpoint_with_choices(self):
-        """Test agreement endpoint correctly aggregates choices."""
+        """Test summary endpoint correctly aggregates choices."""
         AnnotationFactory(
             task=self.task,
             completed_by=self.user,
@@ -411,7 +411,7 @@ class TestTaskAgreementAPI(APITestCase):
 
     @pytest.mark.usefixtures('fflag_fix_all_fit_720_lazy_load_annotations_on')
     def test_agreement_endpoint_with_ratings(self):
-        """Test agreement endpoint correctly calculates rating average."""
+        """Test summary endpoint correctly calculates rating average."""
         AnnotationFactory(
             task=self.task,
             completed_by=self.user,
@@ -462,7 +462,7 @@ class TestTaskAgreementAPI(APITestCase):
 
     @pytest.mark.usefixtures('fflag_fix_all_fit_720_lazy_load_annotations_on')
     def test_agreement_endpoint_excludes_cancelled_annotations(self):
-        """Test that cancelled annotations are not included in agreement distributions."""
+        """Test that cancelled annotations are not included in summary distributions."""
         # Create a normal annotation
         AnnotationFactory(
             task=self.task,
@@ -505,7 +505,7 @@ class TestTaskAgreementAPI(APITestCase):
 
     @pytest.mark.usefixtures('fflag_fix_all_fit_720_lazy_load_annotations_on')
     def test_agreement_endpoint_with_multiple_controls(self):
-        """Test agreement endpoint handles multiple control types in one annotation."""
+        """Test summary endpoint handles multiple control types in one annotation."""
         AnnotationFactory(
             task=self.task,
             completed_by=self.user,
@@ -548,7 +548,7 @@ class TestTaskAgreementAPI(APITestCase):
 
     @pytest.mark.usefixtures('fflag_fix_all_fit_720_lazy_load_annotations_on')
     def test_agreement_endpoint_task_not_found(self):
-        """Test that agreement endpoint returns 404 for non-existent task."""
+        """Test that summary endpoint returns 404 for non-existent task."""
         self.client.force_authenticate(user=self.user)
         response = self.client.get('/api/tasks/99999999/agreement/')
 
@@ -557,7 +557,7 @@ class TestTaskAgreementAPI(APITestCase):
 
     @pytest.mark.usefixtures('fflag_fix_all_fit_720_lazy_load_annotations_on')
     def test_agreement_endpoint_with_taxonomy(self):
-        """Test agreement endpoint correctly handles taxonomy labels."""
+        """Test summary endpoint correctly handles taxonomy labels."""
         AnnotationFactory(
             task=self.task,
             completed_by=self.user,
@@ -591,6 +591,34 @@ class TestTaskAgreementAPI(APITestCase):
 
         # Taxonomy aggregates leaf nodes
         assert data['distributions']['taxonomy']['labels'] == {'Dog': 2, 'Cat': 1}
+
+
+class TestTaskSummaryAPI(APITestCase):
+    """Test the v2 task summary endpoint response shape (FIT-720)."""
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.organization = OrganizationFactory(created_by_active_organization=True)
+        cls.project = ProjectFactory(organization=cls.organization)
+        cls.user = cls.organization.created_by
+        cls.task = TaskFactory(project=cls.project, data={'text': 'test'})
+
+    @pytest.mark.usefixtures('fflag_fix_all_fit_720_lazy_load_annotations_off')
+    def test_summary_endpoint_requires_feature_flag(self):
+        self.client.force_authenticate(user=self.user)
+        response = self.client.get(f'/api/tasks/{self.task.id}/summary/')
+        assert response.status_code == 403
+        assert response.json()['detail'] == 'Feature not enabled'
+
+    @pytest.mark.usefixtures('fflag_fix_all_fit_720_lazy_load_annotations_on')
+    def test_summary_endpoint_includes_annotations_and_task(self):
+        self.client.force_authenticate(user=self.user)
+        response = self.client.get(f'/api/tasks/{self.task.id}/summary/')
+        assert response.status_code == 200
+        data = response.json()
+        assert data['total_predictions'] == 0
+        assert data['annotations'] == []
+        assert data['task']['id'] == self.task.id
 
 
 class TestAnnotationResultDedupe(APITestCase):

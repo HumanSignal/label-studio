@@ -602,6 +602,221 @@ class TaskAgreementAPI(generics.RetrieveAPIView):
 @method_decorator(
     name='get',
     decorator=extend_schema(
+        tags=['Tasks'],
+        summary='Get task summary',
+        description='Get the task summary payload including aggregated label distribution '
+        'across all annotations and (in LSE) per-dimension agreement scores. '
+        'Returns counts of each label value grouped by control tag. '
+        'This is an efficient endpoint that avoids N+1 queries.',
+        responses={
+            '200': OpenApiResponse(
+                description='Task summary payload',
+                examples=[
+                    OpenApiExample(
+                        name='response',
+                        value={
+                            'task': {'id': 42, 'agreement': 85.5},
+                            'total_annotations': 2,
+                            'total_predictions': 1,
+                            'annotations': [
+                                {
+                                    'id': 123,
+                                    'type': 'annotation',
+                                    'user': {
+                                        'id': 10,
+                                        'email': 'user@example.com',
+                                        'first_name': 'Alice',
+                                        'last_name': 'Smith',
+                                    },
+                                    'result': [],
+                                },
+                            ],
+                            'agreement': 85.5,
+                            'distributions': {
+                                'label': {
+                                    'type': 'rectanglelabels',
+                                    'labels': {'Car': 45, 'Person': 30, 'Dog': 25},
+                                },
+                            },
+                        },
+                        media_type='application/json',
+                    )
+                ],
+            )
+        },
+        extensions={
+            'x-fern-audiences': ['internal'],
+        },
+    ),
+)
+class TaskSummaryAPI(generics.RetrieveAPIView):
+    """
+    Efficient endpoint that produces the full payload for the task summary panel.
+
+    Aggregates annotation results at the database level to avoid N+1 queries.
+    Returns pre-computed label counts for the Distribution row and (in LSE)
+    per-dimension agreement scores.
+    """
+
+    permission_required = ViewClassPermission(GET=all_permissions.tasks_view)
+    queryset = Task.objects.all()
+
+    def get(self, request, pk):
+        # This endpoint is gated by feature flag
+        if not flag_set('fflag_fix_all_fit_720_lazy_load_annotations', user=request.user):
+            raise PermissionDenied('Feature not enabled')
+
+        try:
+            task = Task.objects.get(pk=pk)
+        except Task.DoesNotExist:
+            return Response({'error': 'Task not found'}, status=404)
+
+        # Check project access using LSO's native permission check
+        if not task.project.has_permission(request.user):
+            raise PermissionDenied('You do not have permission to view this task')
+
+        # Fetch annotations with user info for the summary panel
+        annotation_objs = list(
+            Annotation.objects.filter(task=task, was_cancelled=False)
+            .select_related('completed_by')
+            .only(
+                'id',
+                'result',
+                'ground_truth',
+                'lead_time',
+                'completed_by__id',
+                'completed_by__email',
+                'completed_by__first_name',
+                'completed_by__last_name',
+            )
+        )
+
+        total_annotations = len(annotation_objs)
+        total_predictions = Prediction.objects.filter(task=task).count()
+        distributions = {}
+
+        def merge_result_into_distributions(result):
+            """Merge a single result (list of labeling items) into distributions in place."""
+            if not result or not isinstance(result, list):
+                return
+            for item in result:
+                if not isinstance(item, dict):
+                    continue
+                from_name = item.get('from_name', '')
+                result_type = item.get('type', '')
+                value = item.get('value', {})
+
+                if from_name not in distributions:
+                    distributions[from_name] = {
+                        'type': result_type,
+                        'labels': {},
+                        'values': [],
+                    }
+
+                if result_type.endswith('labels'):
+                    labels = value.get(result_type, [])
+                    if isinstance(labels, list):
+                        for label in labels:
+                            if label not in distributions[from_name]['labels']:
+                                distributions[from_name]['labels'][label] = 0
+                            distributions[from_name]['labels'][label] += 1
+
+                elif result_type == 'choices':
+                    choices = value.get('choices', [])
+                    if isinstance(choices, list):
+                        for choice in choices:
+                            if choice not in distributions[from_name]['labels']:
+                                distributions[from_name]['labels'][choice] = 0
+                            distributions[from_name]['labels'][choice] += 1
+
+                elif result_type == 'rating':
+                    rating = value.get('rating')
+                    if rating is not None:
+                        distributions[from_name]['values'].append(rating)
+
+                elif result_type == 'number':
+                    number = value.get('number')
+                    if number is not None:
+                        distributions[from_name]['values'].append(number)
+
+                elif result_type == 'taxonomy':
+                    taxonomy = value.get('taxonomy', [])
+                    if isinstance(taxonomy, list):
+                        for path in taxonomy:
+                            if isinstance(path, list) and path:
+                                leaf = path[-1]
+                                if leaf not in distributions[from_name]['labels']:
+                                    distributions[from_name]['labels'][leaf] = 0
+                                distributions[from_name]['labels'][leaf] += 1
+
+                elif result_type == 'pairwise':
+                    selected = value.get('selected')
+                    if selected:
+                        if selected not in distributions[from_name]['labels']:
+                            distributions[from_name]['labels'][selected] = 0
+                        distributions[from_name]['labels'][selected] += 1
+
+        for ann in annotation_objs:
+            if ann.ground_truth or not ann.result:
+                continue
+            merge_result_into_distributions(ann.result)
+
+        # Post-process: calculate averages for numeric types
+        for from_name, dist in distributions.items():
+            if dist['values']:
+                dist['average'] = sum(dist['values']) / len(dist['values'])
+                dist['count'] = len(dist['values'])
+            del dist['values']
+
+        def _serialize_user(user):
+            if user is None:
+                return None
+            return {
+                'id': user.id,
+                'email': user.email,
+                'first_name': user.first_name,
+                'last_name': user.last_name,
+            }
+
+        annotations_list = [
+            {
+                'id': ann.id,
+                'type': 'annotation',
+                'user': _serialize_user(ann.completed_by),
+                'result': ann.result or [],
+                'ground_truth': ann.ground_truth,
+                'lead_time': ann.lead_time,
+                'reviews': [],
+                'comments': [],
+            }
+            for ann in annotation_objs
+        ]
+
+        agreement_score = None
+        raw_agreement = getattr(task, 'precomputed_agreement', None)
+        if raw_agreement is not None:
+            val = float(raw_agreement)
+            # DM / LSE task payloads expose agreement as 0–100; DB may store 0–1 or percent
+            agreement_score = val * 100.0 if val <= 1.0 else val
+
+        return Response(
+            {
+                'task': {
+                    'id': task.id,
+                    'agreement': getattr(task, 'agreement', None),
+                },
+                'total_annotations': total_annotations,
+                'total_predictions': total_predictions,
+                'annotations': annotations_list,
+                'distributions': distributions,
+                'agreement': agreement_score,
+            }
+        )
+
+
+@method_decorator(
+    name='get',
+    decorator=extend_schema(
         tags=['Annotations'],
         summary='Get annotation by its ID',
         description='Retrieve a specific annotation for a task using the annotation result ID.',

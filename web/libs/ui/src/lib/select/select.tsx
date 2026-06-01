@@ -298,7 +298,12 @@ export const Select = forwardRef(
 
     valueRef.current = value;
     useEffect(() => {
-      if (!isDefined(externalValue)) return;
+      if (!isDefined(externalValue)) {
+        const emptyVal = multiple ? [] : undefined;
+        valueRef.current = emptyVal;
+        setValue(emptyVal);
+        return;
+      }
       let val = externalValue?.value ?? externalValue;
       if (multiple && !Array.isArray(val)) {
         val = [val];

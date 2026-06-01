@@ -2,7 +2,9 @@ import { usePersistentState } from "@humansignal/core/lib/hooks/usePersistentSta
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@humansignal/ui/lib/tabs";
 import type { MSTAnnotation, MSTStore } from "../../stores/types";
 import TaskSummary from "../TaskSummary/TaskSummary";
+import TaskSummaryV2 from "../TaskSummary/TaskSummaryV2";
 import Grid from "./Grid";
+import { ff } from "@humansignal/core";
 
 type Props = {
   store: MSTStore["annotationStore"];
@@ -12,6 +14,7 @@ type Props = {
 
 export const ViewAll = ({ store: annotationStore, annotations, root }: Props) => {
   const [tab, setTab] = usePersistentState<"summary" | "compare">("view-all-tab", "summary");
+  const SummaryComponent = ff.isActive(ff.FF_UTC_554_AGREEMENT_V2_IN_TASK_SUMMARY_VIEW) ? TaskSummaryV2 : TaskSummary;
 
   if (annotationStore.store.hasInterface("annotations:summary")) {
     return (
@@ -27,7 +30,7 @@ export const ViewAll = ({ store: annotationStore, annotations, root }: Props) =>
           </TabsList>
 
           <TabsContent value="summary">
-            <TaskSummary store={annotationStore} annotations={annotations} />
+            <SummaryComponent store={annotationStore} annotations={annotations} />
           </TabsContent>
 
           <TabsContent value="compare">

@@ -576,6 +576,12 @@
         "decorators": ""
     },
     {
+        "url": "/api/tasks/<int:pk>/summary/",
+        "module": "tasks.api.TaskSummaryAPI",
+        "name": "tasks:api:task-summary",
+        "decorators": ""
+    },
+    {
         "url": "/api/annotations/<int:pk>/",
         "module": "tasks.api.AnnotationAPI",
         "name": "tasks:api-annotations:annotation-detail",
