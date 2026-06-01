@@ -1,7 +1,7 @@
 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-<rect x="3" y="3" width="4" height="4" rx="1" stroke="currentColor" stroke-width="2"/>
-<rect x="3" y="17" width="4" height="4" rx="1" stroke="currentColor" stroke-width="2"/>
-<rect x="17" y="3" width="4" height="4" rx="1" stroke="currentColor" stroke-width="2"/>
+<rect x="3" y="3" width="4" height="4" rx="1" stroke="currentColor" stroke-width="1.5"/>
+<rect x="3" y="17" width="4" height="4" rx="1" stroke="currentColor" stroke-width="1.5"/>
+<rect x="17" y="3" width="4" height="4" rx="1" stroke="currentColor" stroke-width="1.5"/>
 <rect x="4" y="8" width="2" height="8" fill="currentColor"/>
 <rect x="8" y="6" width="2" height="8" transform="rotate(-90 8 6)" fill="currentColor"/>
 <path fill-rule="evenodd" clip-rule="evenodd" d="M16.5 11C19 11 21 13 21 15.5C21 16.38 20.75 17.21 20.31 17.9L23.39 21L22 22.39L18.88 19.32C18.19 19.75 17.37 20 16.5 20C14 20 12 18 12 15.5C12 13 14 11 16.5 11ZM14 15.5C14 14.12 15.12 13 16.5 13C17.88 13 19 14.12 19 15.5C19 16.88 17.88 18 16.5 18C15.12 18 14 16.88 14 15.5Z" fill="currentColor"/>

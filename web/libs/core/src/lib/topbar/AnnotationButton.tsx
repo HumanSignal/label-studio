@@ -18,23 +18,21 @@ import { forwardRef, useCallback, useContext, useEffect, useMemo, useRef, useSta
 import { createPortal } from "react-dom";
 import { format, isValid } from "date-fns";
 import {
-  IconAnalytics,
+  ChartBarIcon,
   IconAnnotationGroundTruth,
   IconAnnotationSkipped2,
   IconCheckAlt,
-  IconClipboardCheck,
+  CopyIcon,
   IconCommentResolved,
   IconCommentUnresolved,
   IconCrossAlt,
   IconDraftCreated2,
-  IconDuplicate,
   IconEllipsisVertical,
-  IconLink,
+  LinkSimpleHorizontalIcon,
   IconSparks,
-  IconStar,
-  IconStarOutline,
-  IconTrashRect,
-  IconViewAll,
+  StarIcon,
+  TrashIcon,
+  IntersectSquareIcon,
 } from "@humansignal/icons";
 import { Badge, DropdownTrigger, Tooltip, ToastContext, ToastType, Userpic, useDropdown } from "@humansignal/ui";
 import { cnb as cn } from "../utils/bem";
@@ -335,7 +333,7 @@ function AnnotationContextMenu({ annotation, capabilities, handlers }: Annotatio
     () => [
       {
         label: isPrediction ? "Copy Prediction ID" : "Copy Annotation ID",
-        icon: <IconClipboardCheck width={20} height={20} />,
+        icon: <CopyIcon size={20} />,
         onClick: () => {
           copyAnnotationId();
           dropdown?.close();
@@ -349,11 +347,7 @@ function AnnotationContextMenu({ annotation, capabilities, handlers }: Annotatio
       },
       {
         label: `${annotation.groundTruth ? "Unset" : "Set"} as Ground Truth`,
-        icon: annotation.groundTruth ? (
-          <IconStar color="#FFC53D" width={32} height={32} />
-        ) : (
-          <IconStarOutline width={32} height={32} />
-        ),
+        icon: annotation.groundTruth ? <StarIcon weight="fill" color="#FFC53D" size={20} /> : <StarIcon size="20" />,
         onClick: () => {
           handlers.onSetGroundTruth(annotation, !annotation.groundTruth);
           close();
@@ -363,7 +357,7 @@ function AnnotationContextMenu({ annotation, capabilities, handlers }: Annotatio
       },
       {
         label: isPrediction ? "Duplicate as Annotation" : "Duplicate Annotation",
-        icon: <IconDuplicate width={20} height={20} />,
+        icon: <CopyIcon size="20" />,
         onClick: () => {
           handlers.onDuplicate(annotation);
           close();
@@ -373,7 +367,7 @@ function AnnotationContextMenu({ annotation, capabilities, handlers }: Annotatio
       },
       {
         label: isPrediction ? "Copy Prediction Link" : "Copy Annotation Link",
-        icon: <IconLink />,
+        icon: <LinkSimpleHorizontalIcon size="20" />,
         onClick: () => {
           copyLink();
           dropdown?.close();
@@ -387,7 +381,7 @@ function AnnotationContextMenu({ annotation, capabilities, handlers }: Annotatio
       },
       {
         label: "Open Performance Dashboard",
-        icon: <IconAnalytics width={20} height={20} />,
+        icon: <ChartBarIcon size={20} />,
         onClick: () => {
           handlers.onOpenPerformanceDashboard?.(annotation);
           dropdown?.close();
@@ -397,7 +391,7 @@ function AnnotationContextMenu({ annotation, capabilities, handlers }: Annotatio
       },
       {
         label: "Compare All Annotations",
-        icon: <IconViewAll width={20} height={20} />,
+        icon: <IntersectSquareIcon size="20" />,
         onClick: () => {
           handlers.onShowOtherAnnotations();
           close();
@@ -407,7 +401,7 @@ function AnnotationContextMenu({ annotation, capabilities, handlers }: Annotatio
       },
       {
         label: isPrediction ? "Delete Prediction" : "Delete Annotation",
-        icon: <IconTrashRect />,
+        icon: <TrashIcon size="20" />,
         onClick: () => {
           handlers.onDelete(annotation);
           close();

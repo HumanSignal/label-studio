@@ -1,4 +1,4 @@
-import { IconQuestionOutline, IconSettings } from "@humansignal/icons";
+import { QuestionIcon, SlidersHorizontalIcon } from "@humansignal/icons";
 import { Tooltip, Badge, EnterpriseBadge } from "@humansignal/ui";
 import { inject, observer } from "mobx-react";
 import { getRoot } from "mobx-state-tree";
@@ -175,13 +175,17 @@ function DataViewInner({
         (typeof original?.alias === "string" && original.alias === "agreement_selected");
 
       if (isInteractiveAgreementColumn) {
-        children.push(<IconSettings width={16} height={16} className="ml-auto" />);
+        children.push(<SlidersHorizontalIcon size={18} className="ml-auto" />);
       }
 
       if (help && decoration?.help !== false && !isInteractiveAgreementColumn) {
         children.push(
           <Tooltip key="help-tooltip" title={help}>
-            <Icon icon={IconQuestionOutline} style={{ opacity: 0.5 }} />
+            <QuestionIcon
+              size={16}
+              className="text-neutral-content-subtlest cursor-help"
+              data-testid="dm-column-header-help-tooltip"
+            />
           </Tooltip>,
         );
       }

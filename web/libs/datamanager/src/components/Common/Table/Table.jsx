@@ -3,9 +3,8 @@ import { createContext, forwardRef, memo, useCallback, useEffect, useMemo, useRe
 import { createPortal } from "react-dom";
 import { useSDK } from "../../../providers/SDKProvider";
 import { isDefined } from "../../../utils/utils";
-import { Icon } from "../Icon/Icon";
 import { modal } from "../Modal/Modal";
-import { IconBraces } from "@humansignal/icons";
+import { BracketsCurlyIcon } from "@humansignal/icons";
 import { AutoSizerTable, Button } from "@humansignal/ui";
 import "./Table.prefix.css";
 import { TableCheckboxCell } from "./TableCheckbox";
@@ -183,7 +182,7 @@ export const Table = observer(
         return (
           <Button
             look="string"
-            className="w-6 h-6 p-0 text-primary-content hover:text-primary-content-hover"
+            className="w-6 p-0 text-primary-content hover:text-primary-content-hover"
             onClick={() => {
               const modalInstance = modal({
                 title: `Source for task ${out?.id}`,
@@ -203,8 +202,9 @@ export const Table = observer(
                 ),
               });
             }}
-            leading={<Icon icon={IconBraces} />}
+            leading={<BracketsCurlyIcon size={20} className="w-5 h-5 shrink-0" />}
             tooltip="View Task Source"
+            data-testid="view-task-source"
           />
         );
       },

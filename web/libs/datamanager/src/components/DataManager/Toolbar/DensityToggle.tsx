@@ -63,14 +63,14 @@ export const DensityToggle = densityInjector(
               aria-label="Comfortable density"
               data-testid="density-comfortable"
             >
-              <IconRows3 />
+              <IconRows3 width={20} height={20} />
             </RadioGroup.Button>
           </div>
         </Tooltip>
         <Tooltip title="Compact density">
           <div>
             <RadioGroup.Button value={DENSITY_COMPACT} aria-label="Compact density" data-testid="density-compact">
-              <IconRows4 />
+              <IconRows4 width={20} height={20} />
             </RadioGroup.Button>
           </div>
         </Tooltip>

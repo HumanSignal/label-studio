@@ -1,7 +1,7 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { observer } from "mobx-react";
 import { DragDropContext, Droppable } from "react-beautiful-dnd";
-import { IconDragIndicator, IconEllipsisVertical, IconPlus } from "@humansignal/icons";
+import { DotsThreeVerticalIcon, DotsSixVerticalIcon, PlusIcon } from "@humansignal/icons";
 import { cn } from "../../../utils/bem";
 import { Button, Tooltip } from "@humansignal/ui";
 import { Dropdown } from "@humansignal/ui";
@@ -61,7 +61,7 @@ export const Tabs = ({
             </Droppable>
           </DragDropContext>
           {allowedActions.add !== false && (
-            <Tooltip title="Open New Tab">
+            <Tooltip title="Open New Tab" alignment="bottom-center">
               <Button
                 className={tabsCN.elem("add").toClassName()}
                 size="smaller"
@@ -70,8 +70,9 @@ export const Tabs = ({
                 onClick={onAdd}
                 aria-label="Open New Tab"
                 data-leave
+                data-testid="dm-add-tab"
               >
-                <IconPlus width={12} height={12} aria-hidden="true" />
+                <PlusIcon size={16} weight="bold" aria-hidden="true" />
               </Button>
             </Tooltip>
           )}
@@ -175,7 +176,7 @@ export const TabsItem = observer(
       >
         {!renameMode && (
           <div className={tabsCN.elem("item-drag").toClassName()} aria-hidden="true">
-            <IconDragIndicator className="w-4 h-4" />
+            <DotsSixVerticalIcon className="w-4 h-4" />
           </div>
         )}
         <div
@@ -198,6 +199,7 @@ export const TabsItem = observer(
             <Input
               size="small"
               autoFocus={true}
+              data-testid="dm-tab-name-input"
               value={currentTitle}
               aria-label="Tab name"
               onKeyDown={saveTabTitle}
@@ -247,8 +249,14 @@ export const TabsItem = observer(
               }
             >
               <div className={tabsCN.elem("item-right-button").toClassName()}>
-                <Button look="outline" size="smaller" variant="neutral" aria-label="Tab options">
-                  <IconEllipsisVertical className="w-4 h-4" aria-hidden="true" />
+                <Button
+                  look="outline"
+                  size="smaller"
+                  variant="neutral"
+                  aria-label="Tab options"
+                  data-testid="dm-tab-options"
+                >
+                  <DotsThreeVerticalIcon size={16} weight="bold" aria-hidden="true" />
                 </Button>
               </div>
             </Dropdown.Trigger>

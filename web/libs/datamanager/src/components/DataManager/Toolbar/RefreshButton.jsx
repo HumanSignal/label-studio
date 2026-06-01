@@ -1,5 +1,5 @@
 import { inject } from "mobx-react";
-import { IconRefresh } from "@humansignal/icons";
+import { ArrowsClockwiseIcon } from "@humansignal/icons";
 import { Button } from "@humansignal/ui";
 
 const injector = inject(({ store }) => {
@@ -22,8 +22,7 @@ export const RefreshButton = injector(({ store, needsDataFetch, projectFetch, si
         await store.fetchProject({ force: true, interaction: "refresh" });
         await store.currentView?.reload();
       }}
-    >
-      <IconRefresh />
-    </Button>
+      leading={<ArrowsClockwiseIcon size={20} />}
+    />
   );
 });

@@ -1,4 +1,4 @@
-import { IconChevronDown, IconChevronRight, IconTrash } from "@humansignal/icons";
+import { CaretDownIcon, IconChevronRight, IconTrash } from "@humansignal/icons";
 import { Button, Spinner, EnterpriseBadge } from "@humansignal/ui";
 import { inject, observer } from "mobx-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -257,8 +257,9 @@ export const ActionsButton = injector(
           variant="neutral"
           look="outlined"
           disabled={!hasSelected}
-          trailing={<IconChevronDown />}
+          trailing={<CaretDownIcon />}
           aria-label="Tasks Actions"
+          data-testid="dm-actions-button"
           {...rest}
         >
           {selectedCount > 0 ? `${selectedCount} ${recordTypeLabel}${selectedCount > 1 ? "s" : ""}` : "Actions"}

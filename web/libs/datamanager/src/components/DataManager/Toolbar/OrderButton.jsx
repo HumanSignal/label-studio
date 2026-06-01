@@ -1,5 +1,5 @@
-import { IconSortDown, IconSortUp } from "@humansignal/icons";
-import { Button, ButtonGroup } from "@humansignal/ui";
+import { ArrowDownIcon, ArrowUpIcon, CaretDownIcon } from "@humansignal/icons";
+import { Button, ButtonGroup, Tooltip } from "@humansignal/ui";
 import { inject, observer } from "mobx-react";
 import { ColumnPicker } from "../../Common/ColumnPicker";
 import { Space } from "../../Common/Space/Space";
@@ -35,16 +35,19 @@ export const OrderButton = injector(
             }}
           />
 
-          <Button
-            size={size}
-            look="outlined"
-            variant="neutral"
-            disabled={!ordering}
-            onClick={() => view.setOrdering(ordering?.field)}
-            aria-label={ordering?.desc ? "Sort ascending" : "Sort descending"}
-          >
-            {ordering?.desc ? <IconSortUp /> : <IconSortDown />}
-          </Button>
+          <Tooltip title={ordering?.desc ? "Sort ascending" : "Sort descending"}>
+            <Button
+              size={size}
+              look="outlined"
+              variant="neutral"
+              disabled={!ordering}
+              onClick={() => view.setOrdering(ordering?.field)}
+              aria-label={ordering?.desc ? "Sort ascending" : "Sort descending"}
+              data-testid="dm-order-button"
+            >
+              {ordering?.desc ? <ArrowUpIcon size={14} weight="bold" /> : <ArrowDownIcon size={14} weight="bold" />}
+            </Button>
+          </Tooltip>
         </ButtonGroup>
       </Space>
     );

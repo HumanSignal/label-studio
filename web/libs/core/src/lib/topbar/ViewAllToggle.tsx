@@ -6,7 +6,7 @@
  * preserving customer whitelabel CSS and Cypress selectors.
  */
 
-import { IconViewAll } from "@humansignal/icons";
+import { IntersectSquareIcon } from "@humansignal/icons";
 import { Typography } from "@humansignal/ui";
 import { cnb as cn } from "../utils/bem";
 import "./ViewAllToggle.prefix.css";
@@ -28,7 +28,7 @@ export function ViewAllToggle({ isActive, onClick }: ViewAllToggleProps) {
     >
       <div className={cn("view-all-toggle").elem("mainSection").toClassName()}>
         <div className={cn("view-all-toggle").elem("iconContainer").toClassName()}>
-          <IconViewAll />
+          <IntersectSquareIcon size="20" />
         </div>
         <div className={cn("view-all-toggle").elem("content").toClassName()}>
           <Typography variant="label" size="small" className={cn("view-all-toggle").elem("label").toClassName()}>

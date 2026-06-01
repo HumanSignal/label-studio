@@ -1,7 +1,7 @@
 import { type FC, useCallback, useMemo, useRef } from "react";
 import { getRoot } from "mobx-state-tree";
 import { Dropdown, DropdownContext } from "@humansignal/ui";
-import { IconBraces, IconCopyOutline, IconUserStats, IconViewAll } from "@humansignal/icons";
+import { IconBraces, IconCopyOutline, IconUserStats, IconViewAll, IntersectSquareIcon } from "@humansignal/icons";
 // @ts-expect-error - Menu is from JS module
 import { Menu } from "../../Menu/Menu";
 import { modal } from "../../Modal/Modal";
@@ -246,7 +246,7 @@ export const RowContextMenu: FC<RowContextMenuProps> = ({
           <Menu.Item
             onClick={handleCompareAnnotations}
             data-testid="menu-item-compare-annotations"
-            icon={<IconViewAll />}
+            icon={<IntersectSquareIcon size="20" />}
           >
             Compare All Annotations
           </Menu.Item>
