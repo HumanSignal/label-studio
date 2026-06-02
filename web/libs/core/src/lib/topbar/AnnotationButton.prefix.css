@@ -366,6 +366,7 @@
     justify-content: space-between;
     font-weight: 400;
     gap: 20px;
+    min-width: 0;
 
     &:first-child {
       margin-top: 0;
@@ -375,12 +376,18 @@
   &__infoRowLabel {
     font-size: var(--font-size-body-small);
     white-space: nowrap;
+    flex-shrink: 0;
   }
 
   &__infoRowValue {
     font-size: var(--font-size-label-small);
     white-space: nowrap;
     font-weight: 500;
+    min-width: 0;
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-align: right;
   }
 
   &__status {

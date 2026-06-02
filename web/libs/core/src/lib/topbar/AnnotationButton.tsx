@@ -69,6 +69,36 @@ function truncateMiddle(text: string, start: number, end: number, ellipsis: stri
   return text.slice(0, start) + ellipsis + text.slice(text.length - end);
 }
 
+const TOOLTIP_ID_TRUNCATE_START = 8;
+const TOOLTIP_ID_TRUNCATE_END = 6;
+const TOOLTIP_ID_TRUNCATE_THRESHOLD = 18;
+
+/**
+ * Compact tooltip label for shell tab ids (ULID/UUID) while keeping copy/link on the full value.
+ * Prefer persisted pk, then server draft pk, then middle-truncated client ids.
+ */
+export function formatTooltipAnnotationId(
+  shellOrPk: string | number | null | undefined,
+  options?: { draftId?: number | null; pk?: string | number | null },
+): string | null {
+  const pk = options?.pk;
+  if (pk != null && String(pk) !== "") return String(pk);
+
+  const draftId = options?.draftId;
+  if (draftId != null && Number(draftId) > 0) return String(draftId);
+
+  if (shellOrPk == null || shellOrPk === "") return null;
+  const raw = String(shellOrPk);
+  const draftShell = /^draft-(\d+)$/.exec(raw);
+  if (draftShell) return draftShell[1];
+
+  if (/^\d+$/.test(raw)) return raw;
+  if (raw.length > TOOLTIP_ID_TRUNCATE_THRESHOLD) {
+    return truncateMiddle(raw, TOOLTIP_ID_TRUNCATE_START, TOOLTIP_ID_TRUNCATE_END, "…");
+  }
+  return raw;
+}
+
 /**
  * Compact relative-date helper carried over from the new editor — keeps the shared
  * tooltip independent of the editor-only `TimeAgo` component.
@@ -147,6 +177,8 @@ interface TooltipProps {
   predictionScore: number | null;
   lastUpdated: string | null;
   annotationId: string | null;
+  /** Full shell id / pk for copy and tooltip `title`; display may be shortened. */
+  annotationIdFull?: string | null;
   containerRef: React.MutableRefObject<HTMLElement | undefined>;
   isOpen: boolean;
   onMouseEnter: (e: React.MouseEvent) => void;
@@ -166,6 +198,7 @@ function AnnotationButtonTooltip({
   predictionScore,
   lastUpdated,
   annotationId,
+  annotationIdFull,
   containerRef,
   isOpen,
   onMouseEnter,
@@ -204,9 +237,14 @@ function AnnotationButtonTooltip({
   }, []);
 
   const tooltipData = useMemo(() => {
-    const rows: { label: string; value: string }[] = [];
+    const rows: { label: string; value: string; title?: string }[] = [];
     if (annotationId) {
-      rows.push({ label: isPrediction ? "Prediction ID" : "Annotation ID", value: String(annotationId) });
+      const fullId = annotationIdFull ?? annotationId;
+      rows.push({
+        label: isPrediction ? "Prediction ID" : "Annotation ID",
+        value: String(annotationId),
+        title: fullId !== annotationId ? String(fullId) : undefined,
+      });
     }
     if (isPrediction) {
       rows.push({ label: "Type", value: "Prediction" });
@@ -221,7 +259,7 @@ function AnnotationButtonTooltip({
       if (formattedDate) rows.push({ label: "Last Updated", value: formattedDate });
     }
     return rows;
-  }, [annotationId, isPrediction, predictionScore, lastUpdated, formatDate]);
+  }, [annotationId, annotationIdFull, isPrediction, predictionScore, lastUpdated, formatDate]);
 
   const tooltipBadges = useMemo(() => {
     const badges: Array<{ label: string; variant: "primary" | "positive" | "negative" | "warning" }> = [];
@@ -262,7 +300,9 @@ function AnnotationButtonTooltip({
               className={cn("annotation-button").elem("infoRow").toClassName()}
             >
               <div className={cn("annotation-button").elem("infoRowLabel").toClassName()}>{row.label}</div>
-              <div className={cn("annotation-button").elem("infoRowValue").toClassName()}>{row.value}</div>
+              <div className={cn("annotation-button").elem("infoRowValue").toClassName()} title={row.title}>
+                {row.value}
+              </div>
             </div>
           ))}
         </div>
@@ -689,7 +729,11 @@ function AnnotationButtonImpl(
           acceptedState={annotation.acceptedState}
           predictionScore={isPrediction ? annotation.score : null}
           lastUpdated={annotation.createdDate}
-          annotationId={annotation.pk ?? annotation.id}
+          annotationId={formatTooltipAnnotationId(annotation.pk ?? annotation.id, {
+            draftId: annotation.draftId,
+            pk: annotation.pk,
+          })}
+          annotationIdFull={annotation.pk ?? annotation.id}
           containerRef={tooltipRef}
           isOpen={isTooltipOpen}
           onMouseEnter={handleTooltipEnter}

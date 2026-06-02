@@ -1,6 +1,6 @@
 import { createRef } from "react";
 import { fireEvent, render, screen } from "@testing-library/react";
-import { AnnotationButton } from "../AnnotationButton";
+import { AnnotationButton, formatTooltipAnnotationId } from "../AnnotationButton";
 import type { AnnotationActionHandlers, AnnotationCapabilities, SharedAnnotation } from "../types";
 
 const fullCapabilities: AnnotationCapabilities = {
@@ -340,5 +340,23 @@ describe("shared AnnotationButton", () => {
       expect(screen.queryByTestId("annotation-button-menu-copy-id")).toBeNull();
       expect(screen.queryByTestId("annotation-button-menu-copy-link")).toBeNull();
     });
+  });
+});
+
+describe("formatTooltipAnnotationId", () => {
+  it("prefers persisted pk over long shell ids", () => {
+    expect(formatTooltipAnnotationId("06D8B1FFC1YCJA6XPS44VTXFH4", { pk: "22164" })).toBe("22164");
+  });
+
+  it("shows server draft pk when draftId is set", () => {
+    expect(formatTooltipAnnotationId("06D8B1FFC1YCJA6XPS44VTXFH4", { draftId: 401 })).toBe("401");
+  });
+
+  it("parses draft-<pk> shell tabs", () => {
+    expect(formatTooltipAnnotationId("draft-88")).toBe("88");
+  });
+
+  it("middle-truncates long client ids without draft metadata", () => {
+    expect(formatTooltipAnnotationId("7A78BB9B1B89G2A2H6E7A1DA7A8")).toBe("7A78BB9B…1DA7A8");
   });
 });
