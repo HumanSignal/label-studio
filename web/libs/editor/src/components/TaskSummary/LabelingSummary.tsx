@@ -1,3 +1,5 @@
+/* @todo rewrite styles from inline to tailwind classes */
+
 import { useMemo, useState, useEffect, useLayoutEffect, useRef, useCallback } from "react";
 import { flexRender, getCoreRowModel, useReactTable, createColumnHelper } from "@tanstack/react-table";
 import type { ColumnDef, Row } from "@tanstack/react-table";
@@ -545,24 +547,25 @@ export const LabelingSummary = observer(({ hideInfo, annotations: all, controls,
     <div className="mb-base min-w-0" ref={containerRef}>
       <div
         ref={scrollAreaRef}
-        className="w-full min-w-0 max-w-full border border-neutral-border rounded-small"
+        className="w-full border border-neutral-border rounded-small"
         onScroll={(e) => {
           setScrollTop(e.currentTarget.scrollTop);
         }}
         style={{
           maxHeight: containerHeight,
           overflowY: "auto",
-          overflowX: "hidden",
+          overflowX: "auto",
           position: "relative",
         }}
       >
         <table
           ref={tableRef}
-          className="w-full min-w-0 max-w-full"
           style={{
+            minWidth: "100%",
             tableLayout: Object.keys(columnWidths).length > 0 ? "fixed" : "auto",
             borderCollapse: "separate",
             borderSpacing: 0,
+            ...(Object.keys(columnWidths).length > 0 ? { width: table.getTotalSize() } : { width: "100%" }),
           }}
         >
           {/* Sticky Header - z-20 to be above all row content */}
