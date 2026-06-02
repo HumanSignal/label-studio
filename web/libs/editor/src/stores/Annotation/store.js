@@ -260,6 +260,25 @@ const AnnotationStoreModel = types
       }
     }
 
+    function deletePrediction(prediction) {
+      getEnv(self).events.invoke("deletePrediction", self.store, prediction);
+
+      /**
+       * MST destroy prediction
+       */
+      destroy(prediction);
+
+      self.selected = null;
+      /**
+       * Select another tab — prefer a remaining prediction, then fall back to an annotation.
+       */
+      if (self.predictions.length > 0) {
+        self.selectPrediction(self.predictions[0].id);
+      } else if (self.annotations.length > 0) {
+        self.selectAnnotation(self.annotations[0].id);
+      }
+    }
+
     function showError(err) {
       if (err) self.addErrors([errorBuilder.generalError(err)]);
       // we have to return at least empty View to display interface
@@ -635,6 +654,7 @@ const AnnotationStoreModel = types
       _unselectAll,
 
       deleteAnnotation,
+      deletePrediction,
       clearDeletedParents,
       resetAnnotations,
     };

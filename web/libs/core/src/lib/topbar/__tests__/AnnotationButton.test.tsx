@@ -149,6 +149,35 @@ describe("shared AnnotationButton", () => {
     expect(screen.getByText("Delete Annotation")).toBeInTheDocument();
   });
 
+  it("invokes handlers.onDelete with the prediction when Delete Prediction is selected", () => {
+    const handlers = makeHandlers();
+    const annotation = makeAnnotation({ type: "prediction", pk: "9" });
+    render(
+      <AnnotationButton
+        annotation={annotation}
+        capabilities={{ ...fullCapabilities, enablePredictionDelete: true }}
+        handlers={handlers}
+      />,
+    );
+    fireEvent.click(screen.getByTestId("annotation-button-menu-trigger"));
+    fireEvent.click(screen.getByTestId("annotation-button-menu-delete"));
+    expect(handlers.onDelete).toHaveBeenCalledWith(annotation);
+  });
+
+  it("hides Delete Prediction when capabilities.enablePredictionDelete is false", () => {
+    const handlers = makeHandlers();
+    const annotation = makeAnnotation({ type: "prediction", pk: "9" });
+    render(
+      <AnnotationButton
+        annotation={annotation}
+        capabilities={{ ...fullCapabilities, enablePredictionDelete: false }}
+        handlers={handlers}
+      />,
+    );
+    fireEvent.click(screen.getByTestId("annotation-button-menu-trigger"));
+    expect(screen.queryByText("Delete Prediction")).not.toBeInTheDocument();
+  });
+
   it("invokes handlers.onShowOtherAnnotations when Compare All Annotations is selected", () => {
     const handlers = makeHandlers();
     const annotation = makeAnnotation({ pk: "7" });

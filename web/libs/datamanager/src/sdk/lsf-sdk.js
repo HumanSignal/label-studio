@@ -200,6 +200,7 @@ export class LSFWrapper {
         "annotations:delete",
         "annotations:tabs",
         "predictions:tabs",
+        "predictions:delete",
         "annotations:copy-link",
       );
     }
@@ -263,6 +264,7 @@ export class LSFWrapper {
       onSubmitAnnotation: this.onSubmitAnnotation,
       onUpdateAnnotation: this.onUpdateAnnotation,
       onDeleteAnnotation: this.onDeleteAnnotation,
+      onDeletePrediction: this.onDeletePrediction,
       onSkipTask: this.onSkipTask,
       onUnskipTask: this.onUnskipTask,
       onGroundTruth: this.onGroundTruth,
@@ -988,6 +990,36 @@ export class LSFWrapper {
       } else {
         await this.loadTask(taskId, nextAnnotationId, true);
       }
+    }
+  };
+
+  /**@private */
+  onDeletePrediction = async (ls, prediction) => {
+    const { task } = this;
+    const deletedPredictionPk = prediction.pk;
+    const taskId = task.id;
+
+    task.deletePrediction(prediction);
+
+    const response = await this.withinLoadingState(async () => {
+      return this.datamanager.apiCall("deletePrediction", {
+        predictionID: deletedPredictionPk,
+      });
+    });
+
+    this.datamanager.invoke("deletePrediction", ls, prediction);
+
+    const status = response?.$meta?.status ?? response?.status;
+    const deleteSucceeded = !response?.error && (status === undefined ? response?.ok !== false : status < 400);
+
+    if (deleteSucceeded) {
+      invalidateTaskAgreementCache(taskId);
+      invalidateAnnotationCachesForTask(taskId);
+
+      const next = this.currentAnnotation;
+      const nextAnnotationId = next?.pk ?? next?.id;
+
+      await this.loadTask(taskId, nextAnnotationId, true);
     }
   };
 

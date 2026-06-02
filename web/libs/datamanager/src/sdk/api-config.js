@@ -94,6 +94,12 @@ export const APIConfig = {
       method: "delete",
     },
 
+    /** Delete prediction */
+    deletePrediction: {
+      path: "/../predictions/:predictionID",
+      method: "delete",
+    },
+
     /** Task drafts */
     taskDrafts: "/../tasks/:taskID/drafts",
 

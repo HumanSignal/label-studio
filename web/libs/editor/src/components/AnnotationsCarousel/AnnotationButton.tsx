@@ -237,7 +237,11 @@ const AnnotationButtonInner = injector(
             buttonLook: "negative",
             okText: "Delete",
             onOk: () => {
-              entity.list.deleteAnnotation(entity);
+              if (isPredictionLocal) {
+                entity.list.deletePrediction(entity);
+              } else {
+                entity.list.deleteAnnotation(entity);
+              }
             },
           });
         },

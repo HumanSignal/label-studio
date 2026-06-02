@@ -16,6 +16,11 @@ function onUpdateAnnotation() {}
 function onDeleteAnnotation() {}
 
 /**
+ * Callback on delete prediction
+ */
+function onDeletePrediction() {}
+
+/**
  * Callback on skip task
  */
 function onSkipTask() {}
@@ -78,6 +83,7 @@ function onPrevTask(_prevTaskId) {}
 
 export default {
   onDeleteAnnotation,
+  onDeletePrediction,
   onEntityCreate,
   onEntityDelete,
   onGroundTruth,

@@ -301,6 +301,37 @@ describe("Annotation store (store.js)", () => {
       expect(store.annotationStore.selected).toBe(a2);
     });
 
+    it("deletePrediction destroys prediction and selects remaining prediction", () => {
+      const store = createStore();
+      store.initializeStore({});
+      const p1 = store.annotationStore.addPrediction({ result: [] });
+      const p2 = store.annotationStore.addPrediction({ result: [] });
+      store.annotationStore.selectPrediction(p1.id);
+      store.annotationStore.deletePrediction(p1);
+      expect(store.annotationStore.predictions.length).toBe(1);
+      expect(store.annotationStore.selected).toBe(p2);
+    });
+
+    it("deletePrediction falls back to an annotation when no predictions remain", () => {
+      const store = createStore();
+      store.initializeStore({});
+      const ann = store.annotationStore.addAnnotation({ result: [] });
+      const pred = store.annotationStore.addPrediction({ result: [] });
+      store.annotationStore.selectPrediction(pred.id);
+      store.annotationStore.deletePrediction(pred);
+      expect(store.annotationStore.predictions.length).toBe(0);
+      expect(store.annotationStore.selected).toBe(ann);
+    });
+
+    it("deletePrediction invokes the deletePrediction event", () => {
+      const store = createStore();
+      store.initializeStore({});
+      const pred = store.annotationStore.addPrediction({ result: [] });
+      mockInvoke.mockClear();
+      store.annotationStore.deletePrediction(pred);
+      expect(mockInvoke).toHaveBeenCalledWith("deletePrediction", store, pred);
+    });
+
     it("clearDeletedParents returns early when annotation has no pk", () => {
       const store = createStore();
       store.initializeStore({});

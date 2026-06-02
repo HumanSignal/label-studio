@@ -61,6 +61,7 @@ export const AnnotationsCarousel = observer(({ store, annotationStore }: Annotat
   const enableCreateAnnotation = store.hasInterface("annotations:add-new");
   const groundTruthEnabled = store.hasInterface("ground-truth");
   const enableAnnotationDelete = store.hasInterface("annotations:delete");
+  const enablePredictionDelete = store.hasInterface("predictions:delete");
 
   // Build live entity list inside the observer body so MobX subscribes to changes on
   // both arrays + the predictions/annotations themselves.
@@ -134,7 +135,7 @@ export const AnnotationsCarousel = observer(({ store, annotationStore }: Annotat
             groundTruthEnabled,
             enableCreateAnnotation,
             enableAnnotationDelete,
-            enablePredictionDelete: false,
+            enablePredictionDelete,
             enableAnnotations,
             enablePredictions,
           }}
@@ -148,6 +149,7 @@ export const AnnotationsCarousel = observer(({ store, annotationStore }: Annotat
       groundTruthEnabled,
       enableCreateAnnotation,
       enableAnnotationDelete,
+      enablePredictionDelete,
       enableAnnotations,
       enablePredictions,
       annotationStore,

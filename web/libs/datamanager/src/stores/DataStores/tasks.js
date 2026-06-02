@@ -119,6 +119,14 @@ export const create = (columns) => {
       if (index >= 0) self.annotations.splice(index, 1);
     },
 
+    deletePrediction(prediction) {
+      const index = self.predictions.findIndex((p) => {
+        return p.id === Number(prediction.pk) || p.id === prediction.id || p.pk === prediction.pk;
+      });
+
+      if (index >= 0) self.predictions.splice(index, 1);
+    },
+
     deleteDraft(id) {
       if (!self.drafts) return;
       const index = self.drafts.findIndex((d) => d.id === id);
