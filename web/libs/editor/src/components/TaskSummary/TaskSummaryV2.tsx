@@ -99,6 +99,7 @@ const TaskSummary = ({ annotations: allAnnotations, store: annotationStore }: Ta
   // ---------------------------------------------------------------------------
 
   const taskId = storeTask?.id;
+  const projectId = annotationStore.store?.project?.id ?? window.DM?.project?.id;
 
   const [taskDataExpanded, setTaskDataExpanded] = useLocalStorage<boolean>(
     "annotation_dashboard_task_data_expanded",
@@ -106,7 +107,7 @@ const TaskSummary = ({ annotations: allAnnotations, store: annotationStore }: Ta
   );
 
   const [visibleColumnIds, setVisibleColumnIds] = useLocalStorage<number[] | null>(
-    `annotation_dashboard_columns_${taskId}`,
+    `annotation_dashboard_columns_${projectId}`,
     null,
   );
 
