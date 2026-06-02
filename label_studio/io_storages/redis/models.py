@@ -85,7 +85,7 @@ class RedisImportStorageBase(ImportStorage, RedisStorageMixin):
 
     def iter_objects(self):
         client = self.get_client()
-        path = str(self.path)
+        path = str(self.path or "")
         for key in client.keys(path + '*'):
             yield key
 
@@ -136,7 +136,7 @@ class RedisExportStorage(RedisStorageMixin, ExportStorage):
         ser_annotation = self._get_serialized_data(annotation)
 
         # get key that identifies this object in storage
-        key = RedisExportStorageLink.get_key(annotation)
+        key = str(self.path or "") + RedisExportStorageLink.get_key(annotation)
 
         # put object into storage
         client.set(key, json.dumps(ser_annotation))
