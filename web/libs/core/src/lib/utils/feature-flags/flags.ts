@@ -104,7 +104,7 @@ export const FF_FIT_720_LAZY_LOAD_ANNOTATIONS = "fflag_fix_all_fit_720_lazy_load
 /**
  * Use agreement dashboard v2 in Task Summary ViewAll summary tab
  */
-export const FF_UTC_554_AGREEMENT_V2_IN_TASK_SUMMARY_VIEW = "feat_utc_554_agreement_v2_in_task_summary_view";
+export const FF_UTC_554_AGREEMENT_V2_IN_TASK_SUMMARY_VIEW = "fflag_feat_utc_554_agreement_v2_in_task_summary_view";
 /**
  * Analytics Label Distribution page
  */
