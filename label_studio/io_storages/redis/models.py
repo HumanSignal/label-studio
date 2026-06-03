@@ -85,7 +85,7 @@ class RedisImportStorageBase(ImportStorage, RedisStorageMixin):
 
     def iter_objects(self):
         client = self.get_client()
-        path = str(self.path)
+        path = str(self.path or "")
         for key in client.keys(path + '*'):
             yield key
 

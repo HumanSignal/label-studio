@@ -576,12 +576,12 @@ export const AppStore = types
 
       self.viewsStore.fetchColumns();
 
-      const requests = [self.fetchProject()];
-
-      // Only fetch all users if not disabled globally
+      // Fetch users before tabs so annotator/reviewer references in task data can be resolved.
       if (!isFF(FF_DISABLE_GLOBAL_USER_FETCHING)) {
-        requests.push(self.fetchUsers());
+        yield self.fetchUsers();
       }
+
+      const requests = [self.fetchProject()];
 
       if (!isLabelStream || (self.project?.show_annotation_history && task)) {
         if (self.SDK.settings?.onlyVirtualTabs && self.project?.show_annotation_history && !task) {
