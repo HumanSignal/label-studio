@@ -135,8 +135,10 @@ class RedisExportStorage(RedisStorageMixin, ExportStorage):
         logger.debug(f'Creating new object on {self.__class__.__name__} Storage {self} for annotation {annotation}')
         ser_annotation = self._get_serialized_data(annotation)
 
-        # get key that identifies this object in storage
+        # get key that identifies this object in storage, prepend path prefix if set
         key = RedisExportStorageLink.get_key(annotation)
+        if self.path:
+            key = str(self.path).rstrip('/') + '/' + key
 
         # put object into storage
         client.set(key, json.dumps(ser_annotation))

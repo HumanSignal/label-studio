@@ -58,5 +58,7 @@ ImportStorage:
             label: "Tasks - Treat each JSON or JSONL file as a task definition (one or more tasks per file)"
 
 ExportStorage:
+  - columnCount: 1
+    fields: *redis_title
   - columnCount: 2
     fields: *redis_params
