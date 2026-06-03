@@ -3,10 +3,12 @@ import logging
 import os
 import shutil
 import sys
+from importlib import import_module
+from typing import Optional
 
 from core.models import AsyncMigrationStatus
 from core.redis import start_job_async_or_sync
-from core.utils.common import batch, batched_iterator
+from core.utils.common import batch, batched_iterator, load_func
 from core.utils.iterators import iterate_queryset
 from data_export.mixins import ExportMixin
 from data_export.models import DataExport
@@ -14,11 +16,84 @@ from data_export.serializers import ExportDataSerializer
 from data_manager.managers import TaskQuerySet
 from django.conf import settings
 from django.db.models import Count, F, Q
+from django.utils.timezone import now
 from organizations.models import Organization
 from projects.models import Project
 from tasks.models import Annotation, Prediction, Task
 
 logger = logging.getLogger(__name__)
+
+
+def bulk_create_annotations_with_side_effects(
+    annotations: list[Annotation],
+    *,
+    project: Project,
+    user=None,
+    action: Optional[str] = None,
+    tasks_queryset=None,
+    update_project_summary: bool = True,
+    post_process_annotations: bool = True,
+    initialize_fsm_states: bool = True,
+    emit_created_webhook: bool = False,
+    update_task_timestamps: bool = True,
+    update_task_counters: bool = True,
+    recalculate_stats: bool = True,
+    batch_size: Optional[int] = None,
+) -> list[Annotation]:
+    """
+    Bulk-create annotations and run the side effects normally skipped by ``bulk_create``.
+
+    Django does not call ``Annotation.save()`` or model signals for bulk inserts.  Keep
+    this helper as the single place where bulk annotation flows opt into the
+    equivalent project-summary, history, FSM, webhook, task-counter, and stats work.
+    """
+    if not annotations:
+        return []
+
+    db_annotations = Annotation.objects.bulk_create(annotations, batch_size=batch_size or settings.BATCH_SIZE)
+    if not db_annotations:
+        return db_annotations
+
+    if update_project_summary and hasattr(project, 'summary'):
+        project.summary.update_created_annotations_and_labels(db_annotations)
+
+    if post_process_annotations and user is not None and action is not None:
+        from tasks.serializers import TaskSerializerBulk
+
+        TaskSerializerBulk.post_process_annotations(user, db_annotations, action)
+
+    if initialize_fsm_states and user is not None:
+        initializer = load_func(settings.BULK_CREATE_ANNOTATIONS_FSM_INITIALIZER)
+        if initializer is not None:
+            initializer(db_annotations, user, project)
+
+    if emit_created_webhook and user is not None:
+        from webhooks.models import WebhookAction
+        from webhooks.utils import emit_webhooks_for_instance
+
+        emit_webhooks_for_instance(
+            user.active_organization, project, WebhookAction.ANNOTATIONS_CREATED, db_annotations
+        )
+
+    if update_task_timestamps:
+        task_ids = {annotation.task_id for annotation in db_annotations if annotation.task_id}
+        if task_ids:
+            update_fields = {'updated_at': now()}
+            if user is not None:
+                update_fields['updated_by'] = user
+            Task.objects.filter(id__in=task_ids).update(**update_fields)
+
+    if update_task_counters and tasks_queryset is not None:
+        project.update_tasks_counters_and_is_labeled(tasks_queryset=tasks_queryset)
+
+    if recalculate_stats:
+        try:
+            recalculate_stats_async_or_sync = import_module('stats.functions.stats').recalculate_stats_async_or_sync
+            recalculate_stats_async_or_sync(project, all=False)
+        except (ModuleNotFoundError, ImportError):
+            logger.info('Bulk annotations created in LSO, stats recomputation skipped')
+
+    return db_annotations
 
 
 def calculate_stats_all_orgs(from_scratch, redis, migration_name='0018_manual_migrate_counters'):

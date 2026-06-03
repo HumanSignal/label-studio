@@ -4,11 +4,9 @@ import logging
 
 from core.permissions import AllPermissions
 from data_manager.actions import DataManagerAction
-from django.utils.timezone import now
+from tasks.functions import bulk_create_annotations_with_side_effects
 from tasks.models import Annotation, Prediction, Task
 from tasks.serializers import TaskSerializerBulk
-from webhooks.models import WebhookAction
-from webhooks.utils import emit_webhooks_for_instance
 
 all_permissions = AllPermissions()
 logger = logging.getLogger(__name__)
@@ -48,24 +46,14 @@ def predictions_to_annotations(project, queryset, **kwargs):
     count = len(annotations)
     logger.debug(f'{count} predictions will be converter to annotations')
     db_annotations = [Annotation(**annotation) for annotation in annotations]
-    db_annotations = Annotation.objects.bulk_create(db_annotations)
-    Task.objects.filter(id__in=tasks_ids).update(updated_at=now(), updated_by=request.user)
-
-    if db_annotations:
-        TaskSerializerBulk.post_process_annotations(user, db_annotations, 'prediction')
-        # Execute webhook for created annotations
-        emit_webhooks_for_instance(
-            user.active_organization, project, WebhookAction.ANNOTATIONS_CREATED, db_annotations
-        )
-        # Update counters for tasks and is_labeled. It should be a single operation as counters affect bulk is_labeled update
-        project.update_tasks_counters_and_is_labeled(Task.objects.filter(id__in=tasks_ids))
-
-        try:
-            from stats.functions.stats import recalculate_stats_async_or_sync
-
-            recalculate_stats_async_or_sync(project, all=False)
-        except (ModuleNotFoundError, ImportError):
-            logger.info('Predictions converted to annotations in LSO, stats recomputation skipped')
+    db_annotations = bulk_create_annotations_with_side_effects(
+        db_annotations,
+        project=project,
+        user=user,
+        action='prediction',
+        tasks_queryset=Task.objects.filter(id__in=tasks_ids),
+        emit_created_webhook=True,
+    )
 
     return {'response_code': 200, 'detail': f'Created {count} annotations'}
 

@@ -652,6 +652,7 @@ DATA_MANAGER_PREPROCESS_FILTER = 'data_manager.functions.preprocess_filter'
 DATA_MANAGER_CHECK_ACTION_PERMISSION = 'data_manager.actions.check_action_permission'
 DATA_MANAGER_LIST_FILTER_MAX_VALUES = int(get_env('DATA_MANAGER_LIST_FILTER_MAX_VALUES', 5000))
 BULK_UPDATE_IS_LABELED = 'tasks.functions.bulk_update_is_labeled_by_overlap'
+BULK_CREATE_ANNOTATIONS_FSM_INITIALIZER = None
 USER_LOGIN_FORM = 'users.forms.LoginForm'
 PROJECT_MIXIN = 'projects.mixins.ProjectMixin'
 TASK_MIXIN = 'tasks.mixins.TaskMixin'

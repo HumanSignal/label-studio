@@ -10,6 +10,7 @@ from data_manager.actions import DataManagerAction
 from data_manager.functions import DataManagerException
 from django.conf import settings
 from rest_framework.exceptions import ValidationError
+from tasks.functions import bulk_create_annotations_with_side_effects
 from tasks.models import Annotation, Task
 from tasks.serializers import TaskSerializerBulk
 
@@ -46,10 +47,15 @@ def propagate_annotations(project, queryset, **kwargs):
         body = TaskSerializerBulk.add_annotation_fields(body, user, 'propagated_annotation')
         db_annotations.append(Annotation(**body))
 
-    db_annotations = Annotation.objects.bulk_create(db_annotations, batch_size=settings.BATCH_SIZE)
-    TaskSerializerBulk.post_process_annotations(user, db_annotations, 'propagated_annotation')
-    # Update counters for tasks and is_labeled. It should be a single operation as counters affect bulk is_labeled update
-    project.update_tasks_counters_and_is_labeled(tasks_queryset=Task.objects.filter(id__in=tasks))
+    db_annotations = bulk_create_annotations_with_side_effects(
+        db_annotations,
+        project=project,
+        user=user,
+        action='propagated_annotation',
+        tasks_queryset=Task.objects.filter(id__in=tasks),
+        emit_created_webhook=True,
+        batch_size=settings.BATCH_SIZE,
+    )
     return {
         'response_code': 200,
         'detail': f'Created {len(db_annotations)} annotations',
