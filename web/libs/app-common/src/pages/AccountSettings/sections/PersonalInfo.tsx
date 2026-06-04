@@ -3,6 +3,7 @@ import { format } from "date-fns";
 import { Button, InputFile, ToastType, Typography, useToast, Userpic } from "@humansignal/ui";
 import { getApiInstance } from "@humansignal/core";
 import { useAccountSettingsExtension } from "../extensions";
+import { useReportProfileDirty } from "../ProfileDirtyContext";
 import styles from "../AccountSettings.module.css";
 import { useAuth } from "@humansignal/core/providers/AuthProvider";
 import { atomWithMutation } from "jotai-tanstack-query";
@@ -77,6 +78,10 @@ export const PersonalInfo = () => {
   const [fname, setFname] = useState(user?.first_name ?? "");
   const [lname, setLname] = useState(user?.last_name ?? "");
   const [phone, setPhone] = useState(user?.phone ?? "");
+  // Report unsaved changes to the page-level guard (avatar saves immediately, so it's excluded).
+  const isDirty =
+    fname !== (user?.first_name ?? "") || lname !== (user?.last_name ?? "") || phone !== (user?.phone ?? "");
+  useReportProfileDirty(isDirty);
   const { requiredProfileFields = [] } = useAccountSettingsExtension();
   const isFieldRequired = (key: string) => requiredProfileFields.includes(key);
   const isFirstNameMissing = isRequiredProfileValueMissing(isFieldRequired("first_name"), fname);

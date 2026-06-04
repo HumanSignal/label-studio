@@ -36,6 +36,12 @@ mockModule("@humansignal/ui", () => ({
 }));
 
 import { PersonalInfo } from "./PersonalInfo";
+import { ProfileDirtyProvider, useProfileFormsDirty } from "../ProfileDirtyContext";
+
+const DirtyReadout = () => {
+  const anyDirty = useProfileFormsDirty();
+  return <div data-testid="readout">{anyDirty ? "dirty" : "clean"}</div>;
+};
 
 const makeUser = (overrides = {}) => ({
   id: 1,
@@ -141,5 +147,48 @@ describe("PersonalInfo", () => {
     for (const badge of screen.getAllByText("Required")) {
       expect(badge).not.toHaveAttribute("data-required-missing");
     }
+  });
+
+  describe("unsaved changes", () => {
+    const renderWithReadout = () =>
+      render(
+        <ProfileDirtyProvider>
+          <PersonalInfo />
+          <DirtyReadout />
+        </ProfileDirtyProvider>,
+      );
+
+    it("reports no unsaved changes when fields match the saved user", () => {
+      setupUser(makeUser({ first_name: "Mika", last_name: "Kim", phone: "+1 555 0100" }));
+
+      renderWithReadout();
+
+      expect(screen.getByTestId("readout")).toHaveTextContent("clean");
+    });
+
+    it("reports unsaved changes after editing a field", () => {
+      setupUser(makeUser({ first_name: "Mika" }));
+
+      renderWithReadout();
+
+      expect(screen.getByTestId("readout")).toHaveTextContent("clean");
+
+      fireEvent.change(screen.getByLabelText(/First Name/), { target: { value: "Mika Updated" } });
+
+      expect(screen.getByTestId("readout")).toHaveTextContent("dirty");
+    });
+
+    it("is clean again when an edited field is reverted to the saved value", () => {
+      setupUser(makeUser({ first_name: "Mika" }));
+
+      renderWithReadout();
+
+      const firstName = screen.getByLabelText(/First Name/);
+      fireEvent.change(firstName, { target: { value: "Mika Updated" } });
+      expect(screen.getByTestId("readout")).toHaveTextContent("dirty");
+
+      fireEvent.change(firstName, { target: { value: "Mika" } });
+      expect(screen.getByTestId("readout")).toHaveTextContent("clean");
+    });
   });
 });
