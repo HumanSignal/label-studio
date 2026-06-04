@@ -29,15 +29,12 @@ const PROFILE_FIELD_LABELS: Record<string, string> = {
 const isRequiredProfileValueMissing = (isRequired: boolean, value: string) => isRequired && value.trim().length === 0;
 
 const RequiredFieldLabel = ({ label, isMissing }: { label: string; isMissing: boolean }) => (
-  <>
-    {label}
-    <span
-      className={`${styles.requiredText} ${isMissing ? styles.requiredTextMissing : ""}`}
-      data-required-missing={isMissing || undefined}
-    >
+  <span className={styles.requiredLabel}>
+    <span>{label}</span>
+    <span className={styles.requiredBadge} data-required-missing={isMissing || undefined}>
       Required
     </span>
-  </>
+  </span>
 );
 
 function formatProvider(provider: string): string {

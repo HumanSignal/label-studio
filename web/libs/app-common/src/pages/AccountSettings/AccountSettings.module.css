@@ -52,29 +52,32 @@
   --account-settings-required-label-shadow: inset 0 0 0 1px var(--color-negative-border-bold);
 }
 
-.requiredText {
+.requiredLabel {
   display: inline-flex;
   align-items: center;
-  min-height: 18px;
-  margin-left: var(--spacing-tightest);
-  padding: 1px 6px;
-  border: 1px solid var(--account-settings-required-label-border, var(--color-neutral-border));
-  border-radius: var(--corner-radius-smallest);
-  background: var(--account-settings-required-label-background, var(--color-neutral-background));
-  box-shadow: var(--account-settings-required-label-shadow, none);
-  color: var(--account-settings-required-label-color, var(--color-neutral-content-subtle));
-  font-size: var(--font-size-label-smallest);
-  font-weight: var(--font-weight-medium);
-  line-height: var(--line-height-label-smallest);
-  letter-spacing: var(--letter-spacing-base);
-  vertical-align: text-bottom;
+  gap: var(--spacing-tightest);
 }
 
-.requiredTextMissing {
-  --account-settings-required-label-background: var(--color-negative-background);
-  --account-settings-required-label-border: var(--color-negative-border-bold);
-  --account-settings-required-label-color: var(--color-negative-content);
-  --account-settings-required-label-shadow: inset 0 0 0 1px var(--color-negative-border-bold);
+.requiredBadge {
+  display: inline-flex;
+  align-items: center;
+  height: 18px;
+  padding: 0 var(--spacing-tighter);
+  border: 1px solid var(--color-accent-blueberry-subtle);
+  border-radius: var(--corner-radius-large);
+  background: var(--color-accent-blueberry-subtlest);
+  color: var(--color-accent-blueberry-bold);
+  font-size: var(--font-size-label-smaller);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--line-height-label-smaller);
+  letter-spacing: var(--letter-spacing-wider);
+  white-space: nowrap;
+}
+
+.requiredBadge[data-required-missing="true"] {
+  border-color: var(--color-accent-persimmon-subtle);
+  background: var(--color-accent-persimmon-subtlest);
+  color: var(--color-accent-persimmon-bold);
 }
 
 .section :global(.input-ls[aria-invalid="true"]) {
