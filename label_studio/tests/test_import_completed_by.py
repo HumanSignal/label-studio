@@ -235,6 +235,25 @@ class TestImportCompletedByFFOn:
         annotation = task.annotations.get()
         assert annotation.completed_by_id == self.member.id
 
+    def test_full_user_object_resolves_member_not_importer(self):
+        """Export-shaped ``completed_by`` for another org member is not rewritten to the importing user."""
+        assert self.member.id != self.importer.id
+
+        task = _import_one(
+            self.project,
+            self.importer,
+            completed_by={
+                'id': self.member.id,
+                'email': self.member.email,
+                'first_name': self.member.first_name,
+                'last_name': self.member.last_name,
+            },
+        )
+
+        annotation = task.annotations.get()
+        assert annotation.completed_by_id == self.member.id
+        assert annotation.completed_by_id != self.importer.id
+
     def test_garbage_string_falls_back_to_importer(self):
         """Garbage string value does not 400 — it re-attributes to the importer."""
         task = _import_one(self.project, self.importer, completed_by='garbage')

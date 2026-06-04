@@ -126,17 +126,16 @@ class TestStorageSyncFFOn:
 
 
 class TestStorageSyncFFOff:
-    """FF off: storage sync keeps the legacy AnnotationSerializer behavior.
+    """FF off: storage sync still accepts export-shaped completed_by objects.
 
     Legacy semantics:
       - unknown id -> ValidationError (suppressed under
         ``ff_fix_back_dev_3342_storage_scan_with_invalid_annotations``,
         annotation just skipped);
       - foreign-org id -> silently kept (validates against ``User.objects.all()``);
-      - dict -> ValidationError because PK field cannot parse a dict.
 
-    We only assert the foreign-org silent-attribution and that a known member is
-    preserved — these are the two stable legacy behaviors.
+    Export-shaped dicts are now normalized even with BROS-1092 disabled because
+    storage sync must accept JSON exported by Label Studio.
     """
 
     @staticmethod
@@ -158,6 +157,30 @@ class TestStorageSyncFFOff:
             task = _add_task_with_completed_by(project, storage, completed_by=member.id)
             annotation = task.annotations.get()
             assert annotation.completed_by_id == member.id
+
+    def test_full_user_object_preserved_when_flag_off(self, project, storage, member):
+        """Export API completed_by user objects are accepted even when BROS-1092 is off."""
+        completed_by = {
+            'id': member.id,
+            'email': member.email,
+            'first_name': member.first_name,
+            'last_name': member.last_name,
+        }
+
+        with patch('io_storages.base_models.flag_set', side_effect=self._flag_set_off):
+            task = _add_task_with_completed_by(project, storage, completed_by=completed_by)
+            annotation = task.annotations.get()
+            assert annotation.completed_by_id == member.id
+
+    def test_unknown_dict_still_skipped_when_flag_off(self, project, storage):
+        """FF-off keeps legacy handling for dicts that cannot resolve to an org member."""
+        with patch('io_storages.base_models.flag_set', side_effect=self._flag_set_off):
+            task = _add_task_with_completed_by(
+                project,
+                storage,
+                completed_by={'id': 99999, 'email': 'ghost@example.com'},
+            )
+            assert task.annotations.count() == 0
 
 
 class TestStorageSyncMissingCreator:

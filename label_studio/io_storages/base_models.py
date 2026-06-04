@@ -564,15 +564,18 @@ class ImportStorage(Storage):
             # add annotations
             logger.debug(f'Create {len(annotations)} annotations for task={task}')
 
-            # BROS-1092: storage syncs cannot identify the user who triggered the sync,
-            # so re-attribute unknown/cross-org completed_by to project.created_by
-            # (or the organization's owner if the project has no creator). Without this
-            # the AnnotationSerializer below either silently keeps a foreign-org user id
-            # (because it validates against User.objects.all(), not org membership) or
-            # raises on unknown ids/email-shaped values that Export API legitimately emits.
-            if annotations and flag_set(
+            # Storage sync must accept JSON exported by Label Studio. Exports can
+            # include ``completed_by`` as a full user object, while
+            # AnnotationSerializer expects a primary key. Keep BROS-1092's broader
+            # unknown/cross-org fallback behind its flag, but always normalize
+            # dict-shaped export values that resolve to an organization member.
+            normalize_completed_by = any(
+                isinstance(annotation.get('completed_by'), dict) for annotation in annotations
+            )
+            fallback_unknown_completed_by = flag_set(
                 FF_BROS_1092_IMPORT_UNKNOWN_COMPLETED_BY, user=project.organization.created_by
-            ):
+            )
+            if annotations and (normalize_completed_by or fallback_unknown_completed_by):
                 members_email_to_id = dict(project.organization.members.values_list('user__email', 'user__id'))
                 members_ids = set(members_email_to_id.values())
                 default_user_id = project.created_by_id or project.organization.created_by_id
@@ -584,15 +587,19 @@ class ImportStorage(Storage):
                 for annotation in annotations:
                     if 'completed_by' not in annotation:
                         continue
+                    completed_by = annotation['completed_by']
+                    if not fallback_unknown_completed_by and not isinstance(completed_by, dict):
+                        continue
+                    default_completed_by_id = default_user_id if fallback_unknown_completed_by else None
                     resolved = resolve_completed_by_id(
-                        annotation['completed_by'],
+                        completed_by,
                         members_email_to_id,
                         members_ids,
-                        default_user_id,
+                        default_completed_by_id,
                     )
                     if resolved is not None:
                         annotation['completed_by'] = resolved
-                    else:
+                    elif fallback_unknown_completed_by:
                         annotation.pop('completed_by', None)
 
             for annotation in annotations:
