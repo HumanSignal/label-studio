@@ -46,7 +46,7 @@ dependencies = [
     "ordered-set (==4.0.2)",
     "pandas (>=2.2.3)",
     "psycopg[binary] (>=3.2.0,<4.0.0)",
-    "pyarrow (>=22.0.0,<23.0.0)",
+    "pyarrow (>=23.0.1,<24.0.0)",
     "pydantic (>=2.9.2)",
     "python-dateutil (>=2.8.1)",
     "pytz (>=2022.1,<2023.0)",
