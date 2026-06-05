@@ -171,11 +171,11 @@ const Model = types
           const context = self.offscreenCanvasRef.getContext("2d");
           const bitmask = self.bitmaskCanvasRef;
           const image = new window.Image();
+          let hasRendered = false;
 
-          image.src = self.imageDataURL;
-
-          try {
-            await image.decode();
+          const renderImage = () => {
+            if (hasRendered || !isAlive(self) || !self.parent) return;
+            hasRendered = true;
             context.canvas.width = image.naturalWidth;
             context.canvas.height = image.naturalHeight;
             bitmask.width = image.naturalWidth;
@@ -184,8 +184,16 @@ const Model = types
             context.drawImage(image, 0, 0);
 
             self.finalizeRegion();
-          } catch (err) {
-            console.log(err);
+          };
+
+          image.onload = renderImage;
+          image.src = self.imageDataURL;
+
+          try {
+            await image.decode();
+            renderImage();
+          } catch {
+            // Chrome can reject decode() for large/concurrent mask loads even when onload still succeeds.
           }
         }
         renderDataURL();

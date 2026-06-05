@@ -363,6 +363,108 @@ describe("BitmaskRegion", () => {
       }
     });
 
+    it("restoreFromImageDataURL skips finalizeRegion when parent is detached before onload", async () => {
+      const mockDecode = mock().mockRejectedValue(
+        new DOMException("The source image cannot be decoded.", "EncodingError"),
+      );
+      const originalWindowImage = typeof window !== "undefined" ? window.Image : undefined;
+      const originalGlobalImage = global.Image;
+      const mockImageCtor = mock().mockImplementation(function () {
+        this.onload = null;
+        Object.defineProperty(this, "src", {
+          configurable: true,
+          set(_value) {
+            setTimeout(() => this.onload?.(), 0);
+          },
+        });
+        this.naturalWidth = 50;
+        this.naturalHeight = 50;
+        this.decode = mockDecode;
+        return this;
+      });
+
+      global.Image = mockImageCtor;
+      if (typeof window !== "undefined") {
+        Object.defineProperty(window, "Image", {
+          configurable: true,
+          writable: true,
+          value: mockImageCtor,
+        });
+      }
+
+      try {
+        region.setImageDataURL("data:image/png;base64,xyz");
+        region.restoreFromImageDataURL();
+        destroy(root);
+        await Promise.resolve();
+        await new Promise((r) => setTimeout(r, 0));
+        expect(mockDecode).toHaveBeenCalled();
+        expect(region.offscreenCanvasRef.width).toBe(100);
+        expect(region.offscreenCanvasRef.height).toBe(100);
+      } finally {
+        global.Image = originalGlobalImage;
+        if (typeof window !== "undefined") {
+          Object.defineProperty(window, "Image", {
+            configurable: true,
+            writable: true,
+            value: originalWindowImage,
+          });
+        }
+      }
+    });
+
+    it("restoreFromImageDataURL restores the bitmask when Image.decode rejects but onload fires", async () => {
+      const mockDecode = mock().mockRejectedValue(
+        new DOMException("The source image cannot be decoded.", "EncodingError"),
+      );
+      const originalWindowImage = typeof window !== "undefined" ? window.Image : undefined;
+      const originalGlobalImage = global.Image;
+      const mockImageCtor = mock().mockImplementation(function () {
+        this.onload = null;
+        Object.defineProperty(this, "src", {
+          configurable: true,
+          set(_value) {
+            setTimeout(() => this.onload?.(), 0);
+          },
+        });
+        this.naturalWidth = 50;
+        this.naturalHeight = 50;
+        this.decode = mockDecode;
+        return this;
+      });
+
+      global.Image = mockImageCtor;
+      if (typeof window !== "undefined") {
+        Object.defineProperty(window, "Image", {
+          configurable: true,
+          writable: true,
+          value: mockImageCtor,
+        });
+      }
+
+      try {
+        region.setImageDataURL("data:image/png;base64,xyz");
+        region.restoreFromImageDataURL();
+        await Promise.resolve();
+        await new Promise((r) => setTimeout(r, 0));
+        expect(mockDecode).toHaveBeenCalled();
+        expect(region.offscreenCanvasRef.width).toBe(50);
+        expect(region.offscreenCanvasRef.height).toBe(50);
+        expect(region.bitmaskCanvasRef.width).toBe(50);
+        expect(region.bitmaskCanvasRef.height).toBe(50);
+        expect(region.bbox).toEqual({ left: 0, top: 0, right: 10, bottom: 10 });
+      } finally {
+        global.Image = originalGlobalImage;
+        if (typeof window !== "undefined") {
+          Object.defineProperty(window, "Image", {
+            configurable: true,
+            writable: true,
+            value: originalWindowImage,
+          });
+        }
+      }
+    });
+
     it("composeMask clears and draws when not drawing", () => {
       expect(() => region.composeMask()).not.toThrow();
     });
