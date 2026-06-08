@@ -31,5 +31,9 @@ export function normalizeCellAlias(alias) {
     return "Agreement";
   }
 
+  if (safeAlias === "skipped_by_annotator") {
+    return "Annotators";
+  }
+
   return pascalCase(safeAlias);
 }
