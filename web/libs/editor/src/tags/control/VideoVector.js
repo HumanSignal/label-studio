@@ -6,6 +6,7 @@ import ControlBase from "./Base";
 import { AnnotationMixin } from "../../mixins/AnnotationMixin";
 import SeparatedControlMixin from "../../mixins/SeparatedControlMixin";
 import { ToolManagerMixin } from "../../mixins/ToolManagerMixin";
+import { InteractivePromptMixin } from "../../mixins/InteractivePromptMixin";
 import { customTypes } from "../../core/CustomTypes";
 
 /**
@@ -87,10 +88,18 @@ const VideoVectorModel = types.compose(
   ModelAttrs,
 );
 
+// Standalone `<VideoVector>` is a separated drawing control used with a
+// sibling `<Labels>`. It needs interactive-ML prompt state so SAM2 can drive
+// it, the same way `<VideoRectangle>` does. `VideoVectorLabels` composes its
+// own `InteractivePromptMixin`, so the shared base `VideoVectorModel` stays
+// without it — this wrapper adds the mixin only to the standalone tag and
+// avoids composing the mixin twice into the combined tag.
+const VideoVectorControlModel = types.compose("VideoVectorControlModel", VideoVectorModel, InteractivePromptMixin);
+
 const HtxVideoVector = observer(() => {
   return null;
 });
 
-Registry.addTag("videovector", VideoVectorModel, HtxVideoVector);
+Registry.addTag("videovector", VideoVectorControlModel, HtxVideoVector);
 
 export { HtxVideoVector, VideoVectorModel };

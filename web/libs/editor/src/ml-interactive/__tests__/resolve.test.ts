@@ -42,6 +42,7 @@ type MockControl = {
   toname?: string;
   selectedLabels?: Array<{ value: string }>;
   tools?: Record<string, { selected: boolean }>;
+  isSeparated?: boolean;
 };
 
 /** Build an annotation stub whose `names` map exposes .values() like MST does. */
@@ -206,6 +207,48 @@ describe("resolveActiveBinding — Pattern 2 (sibling <Labels>)", () => {
       toname: "videoB",
     };
     const resolved = resolveActiveBinding(makeAnnotation([labels, videoRectB]), 1);
+    expect(resolved).toBeNull();
+  });
+
+  it("pairs an external <Labels> with a separated <VideoVector> control", () => {
+    // BROS-1232: `<VideoVector>` (separated, no labels of its own) + sibling
+    // `<Labels>` must resolve to the same vector capability the backend
+    // advertises as "VideoVectorLabels". The control is label-less
+    // (`isSeparated`), so it belongs to Pattern 2 even though its mapped
+    // capability tag ends in "Labels".
+    getBindingsSpy.mockReturnValue([VIDEOVECTOR_BINDING]);
+    const labels: MockControl = {
+      type: "labels",
+      toname: "video",
+      selectedLabels: [{ value: "Human" }],
+    };
+    const videoVector: MockControl = {
+      type: "videovector",
+      toname: "video",
+      isSeparated: true,
+      // no selectedLabels of its own — labels come from the sibling
+    };
+    const resolved = resolveActiveBinding(makeAnnotation([labels, videoVector]), 1);
+    expect(resolved?.control).toBe(videoVector);
+    expect(resolved?.binding).toBe(VIDEOVECTOR_BINDING);
+    expect(resolved?.labelSource).toBe(labels);
+  });
+
+  it("still excludes a self-labeled <VideoVectorLabels> (no isSeparated) from Pattern 2", () => {
+    // The combined tag owns its labels — an external <Labels> must not drive
+    // it. Without a selected label of its own, it resolves to nothing.
+    getBindingsSpy.mockReturnValue([VIDEOVECTOR_BINDING]);
+    const labels: MockControl = {
+      type: "labels",
+      toname: "video",
+      selectedLabels: [{ value: "Human" }],
+    };
+    const videoVectorLabels: MockControl = {
+      type: "videovectorlabels",
+      toname: "video",
+      selectedLabels: [],
+    };
+    const resolved = resolveActiveBinding(makeAnnotation([labels, videoVectorLabels]), 1);
     expect(resolved).toBeNull();
   });
 });

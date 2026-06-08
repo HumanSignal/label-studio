@@ -18,6 +18,11 @@ const CONTROL_TAG_MAP: Record<string, string> = {
   vectorlabels: "VectorLabels",
   videorectangle: "VideoRectangle",
   videovectorlabels: "VideoVectorLabels",
+  // `<VideoVector>` (separated, paired with a sibling `<Labels>`) drives the
+  // same vector capability the backend advertises as "VideoVectorLabels".
+  // It carries no labels of its own (`SeparatedControlMixin.isSeparated`), so
+  // it resolves via Pattern 2 below rather than Pattern 1.
+  videovector: "VideoVectorLabels",
 };
 
 export function controlTagTypeFor(control: any): string | null {
@@ -125,10 +130,13 @@ export function resolveActiveBinding(
       // Skip self-labeled controls (VideoVectorLabels, BitmaskLabels, ...):
       // they have their own labels and should be driven by Pattern 1,
       // not by an external <Labels> tag. Their mapped capability name
-      // ends with "Labels" by convention.
+      // ends with "Labels" by convention. Separated drawing controls
+      // (`isSeparated`, e.g. `<VideoVector>`) are exempt — they keep no
+      // labels of their own even when their capability tag ends in "Labels",
+      // so they remain valid Pattern-2 candidates.
       const tagType = controlTagTypeFor(drawCtl);
       if (!tagType) continue;
-      if (tagType.endsWith("Labels")) continue;
+      if (tagType.endsWith("Labels") && !drawCtl.isSeparated) continue;
       const binding = bindings.find((b) => b.controlTag === tagType);
       if (binding) candidates.push({ control: drawCtl, binding, labelSource: labelsCtl });
     }
