@@ -4,6 +4,7 @@ import { isActive, FF_FIT_720_LAZY_LOAD_ANNOTATIONS } from "@humansignal/core/li
 import { isDefined } from "../utils/utils";
 import { Modal } from "../components/Common/Modal/Modal";
 import { CommentsSdk } from "./comments-sdk";
+import { errorHandlerAllowSpecialErrors } from "./special-errors";
 // import { LSFHistory } from "./lsf-history";
 import { annotationToServer, formatDraftCreatedUsernameFromUser, taskToLSFormat } from "./lsf-utils";
 import { when, runInAction } from "mobx";
@@ -67,26 +68,8 @@ const resolveLabelStudio = () => {
   }
 };
 
-// Returns true to suppress (swallow) the error, false to bubble to global handler.
-// We allow certain errors to bubble so the app-level ApiProvider can show modals:
-// - 403 PAUSED: User is paused in the project
-// - 400 OVERLAP_REACHED: Annotation overlap limit has been reached (only when feature flag is enabled)
-const errorHandlerAllowSpecialErrors = (result) => {
-  const isPaused =
-    result?.status === 403 &&
-    typeof result?.response === "object" &&
-    result?.response?.display_context?.reason === "PAUSED";
-
-  // Only handle OVERLAP_REACHED when feature flag is enabled
-  const isOverlapReached =
-    isFF(FF_FIT_1304_STRICT_OVERLAP) &&
-    result?.status === 400 &&
-    typeof result?.response === "object" &&
-    result?.response?.display_context?.reason === "OVERLAP_REACHED";
-
-  // Return false to allow these errors to bubble up to the global handler
-  return !(isPaused || isOverlapReached);
-};
+// errorHandlerAllowSpecialErrors lives in ./special-errors so comments-sdk can reuse it without an
+// import cycle (lsf-sdk imports comments-sdk).
 
 // Support portal URL constants used to construct error reporting links
 // These are used in showOperationToast() to create support links with request IDs

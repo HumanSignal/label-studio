@@ -666,7 +666,7 @@ export const AppStore = types
       // we will just allow it to try again later
       const resultStatusCode =
         result?.status ?? result?.$meta?.status ?? result?.response?.status ?? result?.response?.status_code;
-      if (result.error && resultStatusCode !== 404 && !signal.aborted && params.interaction !== "timer") {
+      if (result.error && resultStatusCode !== 404 && !signal.aborted && params?.interaction !== "timer") {
         if (options?.errorHandler?.(result)) {
           return result;
         }
