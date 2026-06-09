@@ -1,5 +1,3 @@
-import { isPausedResult } from "./special-errors";
-
 export class CommentsSdk {
   constructor(lsf, dm) {
     this.lsf = lsf;
@@ -29,17 +27,8 @@ export class CommentsSdk {
     } else if (comment.draft) {
       body.draft = comment.draft;
     }
-    // Granular pause: the classic DM uses its own /api/dm gateway, which does not flow
-    // through the app's ApiProvider pause handler. On a 403 PAUSED, suppress the DM's generic error
-    // UI (errorHandler returns true) and surface the shared pause modal via a window event — the same
-    // DM↔app bridge the overlap-error modal uses. Do not return a bogus comment to the editor.
-    const result = await this.dm.apiCall("createComment", {}, { body }, { errorHandler: (r) => isPausedResult(r) });
-    if (isPausedResult(result)) {
-      window.dispatchEvent(new CustomEvent("lsf:user-paused", { detail: result.response }));
-      return undefined;
-    }
+    const { $meta: _, ...newComment } = await this.dm.apiCall("createComment", undefined, { body });
 
-    const { $meta: _, ...newComment } = result;
     return newComment;
   };
 

@@ -6,12 +6,6 @@ import { FF_FIT_1304_STRICT_OVERLAP, isFF } from "../utils/feature-flags";
 // - 400 OVERLAP_REACHED: annotation overlap limit reached (only when the feature flag is enabled)
 // Shared by lsf-sdk (annotation submit/skip) and comments-sdk (comment create/update) so a paused
 // user gets the same pause modal regardless of which write they attempt.
-// True when an apiCall result is a 403 PAUSED response (user is paused in the project).
-export const isPausedResult = (result) =>
-  result?.status === 403 &&
-  typeof result?.response === "object" &&
-  result?.response?.display_context?.reason === "PAUSED";
-
 export const errorHandlerAllowSpecialErrors = (result) => {
   const isPaused =
     result?.status === 403 &&
