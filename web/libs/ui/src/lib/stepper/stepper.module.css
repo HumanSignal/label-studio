@@ -22,11 +22,21 @@
  *   - badges + label → neutral surface / subtlest text
  */
 
+/* Shared tokens for badge rail, grid columns, and stacked connectors (connector is outside `.step`). */
+.stepperRoot {
+  --stepper-badge-size: 24px;
+  --stepper-stacked-list-gap: var(--spacing-tighter);
+  --stepper-stacked-connector-inset: var(--spacing-tighter);
+}
+
+.stepperListStacked {
+  gap: var(--stepper-stacked-list-gap);
+}
+
 /* --- Step button --- */
 .step {
   /* Stamp + check entry duration; ripple delay matches (see `.badgeEntryRipple`). */
 
-  --stepper-badge-size: 24px;
   --stepper-badge-stamp-duration: 400ms;
   --stepper-badge-stamp-easing: cubic-bezier(0.68, 0.48, 0.24, 1);
   --stepper-badge-stamp-enter-opacity: 0.5;
@@ -65,7 +75,7 @@
   cursor: default;
 }
 
-.stepLayoutVertical {
+.stepLayoutDefault {
   flex-direction: column;
   align-items: center;
   gap: var(--spacing-tighter);
@@ -73,11 +83,81 @@
   text-align: center;
 }
 
-.stepLayoutHorizontal {
+.stepLayoutCompact {
   flex-direction: row;
-  align-items: center;
+  align-items: flex-start;
   gap: var(--spacing-tight);
-  padding-block: var(--spacing-tight);
+  padding: var(--spacing-tight);
+  text-align: left;
+}
+
+/* Vertical variant: grid places badge + connector in column 1, text in column 2. */
+.stepItemStacked {
+  display: grid;
+  grid-template-columns: var(--stepper-badge-size) minmax(0, 1fr);
+  column-gap: var(--spacing-tight);
+  padding: var(--spacing-tight);
+}
+
+.stepStackedButton {
+  grid-column: 1 / -1;
+  grid-row: 1;
+  display: grid;
+  grid-template-columns: var(--stepper-badge-size) minmax(0, 1fr);
+  column-gap: var(--spacing-tight);
+  align-items: stretch;
+  width: 100%;
+  text-align: left;
+}
+
+.stackedBadgeCell {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  align-self: stretch;
+}
+
+.stackedTextCell {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+}
+
+/* Rail between badges with inset; spans step padding, list gap, and next step padding-top. */
+.stackedConnectorCell {
+  position: absolute;
+  top: calc(var(--stepper-badge-size) + var(--stepper-stacked-connector-inset));
+  left: 50%;
+  width: 2px;
+  height: calc(
+    100% -
+    var(--stepper-badge-size) +
+    var(--stepper-stacked-list-gap) +
+    2 *
+    var(--spacing-tight) -
+    2 *
+    var(--stepper-stacked-connector-inset)
+  );
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+/* Beat `.connector.connectorVertical { height: var(--spacing-base) }` — fill the rail. */
+.stackedConnectorCell .connector.connectorVertical {
+  width: 2px;
+  min-width: 2px;
+  max-width: 2px;
+  height: 100%;
+  min-height: 0;
+}
+
+.stepTextBlock {
+  display: flex;
+  min-width: 0;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--spacing-tightest);
 }
 
 .badgeWrap {
@@ -275,8 +355,26 @@
   transition: color 150ms ease-out;
 }
 
+.stepLayoutCompact .label,
+.stepHasDescription .label {
+  white-space: normal;
+}
+
+.stepLayoutCompact .label,
+.stepHasDescription .label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 .step .labelActive {
   color: var(--color-neutral-content);
+}
+
+.step .description {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--color-neutral-content-subtle);
 }
 
 .stepNavigable:hover .label {
@@ -284,6 +382,10 @@
 }
 
 .step:disabled .label {
+  color: var(--color-neutral-content-subtlest);
+}
+
+.step:disabled .description {
   color: var(--color-neutral-content-subtlest);
 }
 
@@ -295,6 +397,14 @@
   min-width: var(--spacing-tight);
   overflow: hidden;
   border-radius: 9999px;
+}
+
+.connector.connectorVertical {
+  width: 2px;
+  min-width: 2px;
+  max-width: 2px;
+  height: var(--spacing-base);
+  min-height: var(--spacing-tight);
 }
 
 .connectorTrack {
@@ -316,10 +426,22 @@
   transition: transform 150ms ease-out;
 }
 
+.connectorVertical .connectorFill {
+  transform-origin: top center;
+}
+
 .connectorFillIncomplete {
   transform: scaleX(0);
 }
 
 .connectorFillComplete {
   transform: scaleX(1);
+}
+
+.connectorVertical .connectorFillIncomplete {
+  transform: scaleY(0);
+}
+
+.connectorVertical .connectorFillComplete {
+  transform: scaleY(1);
 }

@@ -11,14 +11,15 @@ const meta: Meta<typeof Stepper> = {
     docs: {
       description: {
         component:
-          'Linear progress navigation for wizards. Default layout is **vertical** (badge above label per column). Use `variant="horizontal"` for inline badge + label. The blue connector fill follows `currentStepIndex` only (filled between steps that are strictly before the active step). The check appears only when `completed: true`; otherwise the step number is shown. Steps before the active one use the primary badge (number or check). With `onStepSelect`, `canNavigate: true` allows activating that step; `canNavigate: false` blocks activation without greyed-out disabled styling (use `disabled: true` for that). Without `onStepSelect`, steps are read-only (skipped in tab order). Optional per-step **`tooltip`** shows on hover (e.g. why a step is locked).',
+          'Linear progress navigation for wizards and sidebars. **`variant`** controls step list direction (`horizontal` row vs `vertical` stack). **`size`** controls per-step density (`default` badge above label vs `compact` badge beside label). Vertical lists always use compact per-step layout — prefer `variant="vertical"` with `size="compact"`. The connector fill follows `currentStepIndex` only. The check appears when `completed: true`. With `onStepSelect`, `canNavigate: true` allows activation; `canNavigate: false` blocks without greyed-out styling (`disabled: true` for that). Optional per-step **`description`** renders below the label. Optional **`tooltip`** explains locked steps.',
       },
     },
   },
   argTypes: {
     steps: { control: "object" },
     currentStepIndex: { control: { type: "number", min: 0 } },
-    variant: { control: "radio", options: ["vertical", "horizontal"] },
+    variant: { control: "radio", options: ["horizontal", "vertical"] },
+    size: { control: "radio", options: ["default", "compact"] },
     onStepSelect: { action: "stepSelect" },
   },
 };
@@ -27,10 +28,10 @@ export default meta;
 
 type Story = StoryObj<typeof Stepper>;
 
-/** Mid-wizard: completed, active, and future steps; future steps use `canNavigate: false` (no jump-ahead, not greyed out). */
-export const VerticalDefault: Story = {
+/** Mid-wizard: badge above label in a horizontal row (SSO / storage setup default). */
+export const HorizontalDefault: Story = {
+  name: "Horizontal Default",
   args: {
-    variant: "vertical",
     currentStepIndex: 2,
     steps: [
       { id: "a", label: "Account", canNavigate: true, completed: true },
@@ -43,9 +44,10 @@ export const VerticalDefault: Story = {
   },
 };
 
-export const Horizontal: Story = {
+export const HorizontalCompact: Story = {
+  name: "Horizontal Compact",
   args: {
-    variant: "horizontal",
+    size: "compact",
     currentStepIndex: 1,
     steps: [
       { label: "Select", canNavigate: true, completed: true },
@@ -56,11 +58,70 @@ export const Horizontal: Story = {
   },
 };
 
-/** Future step with `canNavigate: false` and a **tooltip** (e.g. wizard guard). */
-export const VerticalWithStepTooltip: Story = {
-  name: "Vertical With Step Tooltip",
+/** Stacked sidebar-style list with badge-left rows (course page nav). */
+export const VerticalStacked: Story = {
+  name: "Vertical Stacked",
   args: {
     variant: "vertical",
+    size: "compact",
+    currentStepIndex: 1,
+    steps: [
+      { id: "intro", label: "Introduction", canNavigate: true, completed: true },
+      { id: "basics", label: "Labeling basics", canNavigate: true },
+      { id: "review", label: "Review", canNavigate: false },
+    ],
+    onStepSelect: () => {},
+  },
+  decorators: [
+    (StoryComponent) => (
+      <div className="w-64 border border-neutral-border p-base">
+        <StoryComponent />
+      </div>
+    ),
+  ],
+};
+
+export const VerticalStackedWithDescriptions: Story = {
+  name: "Vertical Stacked With Descriptions",
+  args: {
+    variant: "vertical",
+    size: "compact",
+    currentStepIndex: 0,
+    steps: [
+      {
+        id: "intro",
+        label: "Welcome",
+        description: "Overview of the course goals",
+        canNavigate: true,
+      },
+      {
+        id: "setup",
+        label: "Project setup",
+        description: "Configure your labeling interface",
+        canNavigate: false,
+      },
+      {
+        id: "label",
+        label: "Start labeling",
+        description: "Apply what you learned",
+        canNavigate: false,
+      },
+    ],
+    onStepSelect: () => {},
+  },
+  decorators: [
+    (StoryComponent) => (
+      <div className="w-64 border border-neutral-border p-base">
+        <StoryComponent />
+      </div>
+    ),
+  ],
+};
+
+/** Future step with `canNavigate: false` and a **tooltip** (e.g. wizard guard). */
+export const HorizontalWithStepTooltip: Story = {
+  name: "Horizontal With Step Tooltip",
+  args: {
     currentStepIndex: 0,
     steps: [
       { label: "Account", canNavigate: true },

@@ -9,6 +9,8 @@ import styles from "./stepper.module.css";
 export interface StepperStep {
   id?: string;
   label: string;
+  /** Optional secondary line below the label (e.g. page summary). */
+  description?: ReactNode;
   /**
    * When `true` and `onStepSelect` is provided, this step can be activated (click / keyboard).
    * When `false` or omitted, selection is blocked but the step is not shown as disabled — use `disabled` for that.
@@ -40,8 +42,10 @@ export interface StepperProps extends Omit<ComponentPropsWithoutRef<"nav">, "chi
   currentStepIndex: number;
   /** Invoked when a navigable step is activated (`canNavigate: true`, not `disabled`, and this handler is set). */
   onStepSelect?: (index: number) => void;
-  /** @default 'vertical' */
+  /** Step list direction. @default 'horizontal' */
   variant?: "horizontal" | "vertical";
+  /** Per-step badge/label density. Vertical lists always use compact layout. @default 'default' */
+  size?: "default" | "compact";
   className?: string;
   /** Accessible name for the progress navigation region */
   "aria-label"?: string;
@@ -107,9 +111,9 @@ function StepBadge({ index, badgeTone, showCheck }: { index: number; badgeTone: 
   );
 }
 
-function StepConnectorSegment({ complete }: { complete: boolean }) {
+function StepConnectorSegment({ complete, vertical }: { complete: boolean; vertical?: boolean }) {
   return (
-    <div className={styles.connector} role="presentation" aria-hidden>
+    <div className={cnm(styles.connector, vertical && styles.connectorVertical)} role="presentation" aria-hidden>
       <span className={styles.connectorTrack} />
       <span
         className={cnm(styles.connectorFill, complete ? styles.connectorFillComplete : styles.connectorFillIncomplete)}
@@ -122,7 +126,8 @@ export function Stepper({
   steps,
   currentStepIndex,
   onStepSelect,
-  variant = "vertical",
+  variant = "horizontal",
+  size = "default",
   className,
   "aria-label": ariaLabel = "Progress",
   "data-testid": dataTestId = "stepper",
@@ -132,14 +137,23 @@ export function Stepper({
     return null;
   }
 
-  const isHorizontal = variant === "horizontal";
+  const isStacked = variant === "vertical";
+  const isCompact = isStacked || size === "compact";
+  const isHorizontalCompact = !isStacked && isCompact;
 
   return (
-    <nav aria-label={ariaLabel} className={cnm("w-full z-1 flex-1", className)} data-testid={dataTestId} {...navProps}>
+    <nav
+      aria-label={ariaLabel}
+      className={cnm(styles.stepperRoot, "w-full z-1 flex-1", className)}
+      data-testid={dataTestId}
+      {...navProps}
+    >
       <ul
         className={cnm(
-          "m-0 flex list-none flex-row flex-wrap items-start p-0 relative justify-center",
-          !isHorizontal && "w-full",
+          "m-0 flex list-none p-0 relative",
+          isStacked
+            ? cnm("flex-col items-stretch", styles.stepperListStacked)
+            : "flex-row flex-wrap items-start justify-center w-full",
         )}
       >
         {steps.map((step, index) => {
@@ -153,21 +167,72 @@ export function Stepper({
           const stepKey = step.id ?? `step-${index}`;
           const segmentComplete = currentStepIndex > index;
           const isLast = index === steps.length - 1;
+          const hasDescription = step.description != null && step.description !== false && step.description !== "";
 
-          const stepBody = (
-            <>
-              <span className={styles.badgeWrap} data-stepper-badge-wrap-tone={badgeTone}>
-                <StepBadge index={index} badgeTone={badgeTone} showCheck={showCheck} />
-              </span>
+          const descriptionText = typeof step.description === "string" ? step.description : undefined;
+
+          const labelNode = (
+            <Typography
+              as="span"
+              variant="label"
+              size="small"
+              data-stepper-label
+              className={cnm(styles.label, labelActive && styles.labelActive, isStacked && "truncate font-medium")}
+              title={isStacked || hasDescription ? step.label : undefined}
+            >
+              {step.label}
+            </Typography>
+          );
+
+          const descriptionNode =
+            hasDescription && step.description ? (
               <Typography
                 as="span"
-                variant="label"
+                variant="body"
                 size="small"
-                data-stepper-label
-                className={cnm(styles.label, labelActive && styles.labelActive)}
+                data-stepper-description
+                className={styles.description}
+                title={descriptionText}
               >
-                {step.label}
+                {step.description}
               </Typography>
+            ) : null;
+
+          const badgeNode = (
+            <span className={styles.badgeWrap} data-stepper-badge-wrap-tone={badgeTone}>
+              <StepBadge index={index} badgeTone={badgeTone} showCheck={showCheck} />
+            </span>
+          );
+
+          const textBlockNode = (
+            <span className={styles.stepTextBlock}>
+              {labelNode}
+              {descriptionNode}
+            </span>
+          );
+
+          const stepBody = isStacked ? (
+            <>
+              <span className={styles.stackedBadgeCell}>
+                {badgeNode}
+                {!isLast ? (
+                  <span className={styles.stackedConnectorCell} role="presentation" aria-hidden>
+                    <StepConnectorSegment complete={segmentComplete} vertical />
+                  </span>
+                ) : null}
+              </span>
+              <span className={styles.stackedTextCell}>{textBlockNode}</span>
+            </>
+          ) : isCompact ? (
+            <>
+              {badgeNode}
+              {textBlockNode}
+            </>
+          ) : (
+            <>
+              {badgeNode}
+              {labelNode}
+              {descriptionNode}
             </>
           );
 
@@ -182,7 +247,8 @@ export function Stepper({
                 styles.step,
                 navigable && styles.stepNavigable,
                 !navigable && !stepDisabled && styles.stepNonNavigable,
-                isHorizontal ? styles.stepLayoutHorizontal : styles.stepLayoutVertical,
+                isStacked ? styles.stepStackedButton : isCompact ? styles.stepLayoutCompact : styles.stepLayoutDefault,
+                hasDescription && styles.stepHasDescription,
               )}
               aria-current={index === currentStepIndex ? "step" : undefined}
               data-testid={step["data-testid"] ?? `${dataTestId}-step-${index}`}
@@ -194,22 +260,37 @@ export function Stepper({
             </button>
           );
 
+          const stepControl = hasTooltip ? <Tooltip title={step.tooltip}>{stepButton}</Tooltip> : stepButton;
+
           return (
             <li
               key={stepKey}
               className={cnm(
-                "flex min-w-0 list-none flex-row relative",
-                isHorizontal ? "shrink-0 items-center px-tight gap-base" : "flex-1 items-start",
+                "min-w-0 list-none relative",
+                isStacked
+                  ? styles.stepItemStacked
+                  : cnm(
+                      "flex",
+                      isHorizontalCompact
+                        ? "shrink-0 flex-row items-center px-tight gap-base"
+                        : "flex-1 flex-row items-start",
+                    ),
               )}
             >
-              <div className={cnm("flex min-w-0 justify-center", !isHorizontal && "flex-1")}>
-                {hasTooltip ? <Tooltip title={step.tooltip}>{stepButton}</Tooltip> : stepButton}
-              </div>
-              {!isLast ? (
+              {isStacked ? (
+                stepControl
+              ) : (
+                <div className={cnm("flex min-w-0 justify-center", !isHorizontalCompact && "flex-1")}>
+                  {stepControl}
+                </div>
+              )}
+              {!isLast && !isStacked ? (
                 <div
                   className={cnm(
                     "flex h-6 items-center",
-                    isHorizontal ? "w-10 shrink-0" : cnm("min-w-2 flex-1", "absolute left-1/2 w-full mt-tight z-0"),
+                    isHorizontalCompact
+                      ? "w-10 shrink-0"
+                      : cnm("min-w-2 flex-1", "absolute left-1/2 w-full mt-tight z-0"),
                   )}
                   role="presentation"
                   aria-hidden

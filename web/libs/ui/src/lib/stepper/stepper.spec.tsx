@@ -3,11 +3,20 @@ import "@testing-library/jest-dom";
 import { Stepper } from "./stepper";
 
 jest.mock("./stepper.module.css", () => ({
+  stepperRoot: "stepperRoot",
+  stepperListStacked: "stepperListStacked",
   step: "step",
   stepNavigable: "stepNavigable",
   stepNonNavigable: "stepNonNavigable",
-  stepLayoutVertical: "stepLayoutVertical",
-  stepLayoutHorizontal: "stepLayoutHorizontal",
+  stepLayoutDefault: "stepLayoutDefault",
+  stepLayoutCompact: "stepLayoutCompact",
+  stepItemStacked: "stepItemStacked",
+  stepStackedButton: "stepStackedButton",
+  stackedBadgeCell: "stackedBadgeCell",
+  stackedTextCell: "stackedTextCell",
+  stackedConnectorCell: "stackedConnectorCell",
+  stepHasDescription: "stepHasDescription",
+  stepTextBlock: "stepTextBlock",
   badgeWrap: "badgeWrap",
   badgeEntryRipple: "badgeEntryRipple",
   badge: "badge",
@@ -20,7 +29,9 @@ jest.mock("./stepper.module.css", () => ({
   badgeIconEnter: "badgeIconEnter",
   label: "label",
   labelActive: "labelActive",
+  description: "description",
   connector: "connector",
+  connectorVertical: "connectorVertical",
   connectorTrack: "connectorTrack",
   connectorFill: "connectorFill",
   connectorFillComplete: "connectorFillComplete",
@@ -211,5 +222,45 @@ describe("Stepper", () => {
     render(<Stepper steps={withTooltip} currentStepIndex={0} onStepSelect={() => {}} data-testid="stepper" />);
     fireEvent.mouseEnter(screen.getByTestId("stepper-step-1"));
     expect(await screen.findByTestId("tooltip-body")).toHaveTextContent("Complete the previous step first");
+  });
+
+  it("applies stepLayoutCompact when size is compact", () => {
+    render(<Stepper steps={steps} currentStepIndex={0} size="compact" onStepSelect={() => {}} data-testid="stepper" />);
+    expect(screen.getByTestId("stepper-step-0").className).toContain("stepLayoutCompact");
+    expect(screen.getByTestId("stepper-step-0").className).not.toContain("stepLayoutDefault");
+  });
+
+  it("applies stepLayoutDefault by default for horizontal variant", () => {
+    render(<Stepper steps={steps} currentStepIndex={0} onStepSelect={() => {}} data-testid="stepper" />);
+    expect(screen.getByTestId("stepper-step-0").className).toContain("stepLayoutDefault");
+  });
+
+  it("renders vertical connectors in the badge column when variant is vertical", () => {
+    render(
+      <Stepper
+        steps={steps}
+        currentStepIndex={1}
+        variant="vertical"
+        size="compact"
+        onStepSelect={() => {}}
+        data-testid="stepper"
+      />,
+    );
+    const nav = screen.getByTestId("stepper");
+    const connectorCells = nav.querySelectorAll(".stackedConnectorCell");
+    expect(connectorCells).toHaveLength(2);
+    expect(connectorCells[0]?.querySelector(".connectorVertical")).toBeInTheDocument();
+    expect(connectorCells[0]?.closest(".stackedBadgeCell")).toBeInTheDocument();
+    expect(screen.getByTestId("stepper-step-1").className).toContain("stepStackedButton");
+    expect(screen.getByTestId("stepper-step-1").querySelector(".stackedBadgeCell")).toBeInTheDocument();
+  });
+
+  it("renders description below the label", () => {
+    const withDescription = [{ label: "Intro", description: "Course overview", canNavigate: true }];
+    render(<Stepper steps={withDescription} currentStepIndex={0} onStepSelect={() => {}} data-testid="stepper" />);
+    expect(screen.getByText("Course overview")).toBeInTheDocument();
+    expect(screen.getByTestId("stepper-step-0").querySelector("[data-stepper-description]")).toHaveTextContent(
+      "Course overview",
+    );
   });
 });

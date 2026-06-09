@@ -422,7 +422,7 @@ function WizardTopAlignedDemo() {
       >
         <div className="border-b border-neutral-border px-wide pb-tight pt-wide">
           <Stepper
-            variant="horizontal"
+            size="compact"
             aria-label="Wizard progress"
             steps={WIZARD_STEPS.map((s, i) => ({
               id: s.id,

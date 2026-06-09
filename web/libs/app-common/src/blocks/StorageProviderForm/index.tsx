@@ -282,7 +282,6 @@ export const StorageProviderForm = forwardRef<unknown, StorageProviderFormProps>
             <Stepper
               aria-label="Storage setup progress"
               className="w-auto"
-              variant="vertical"
               steps={stepperSteps}
               currentStepIndex={currentStep}
               onStepSelect={handleStepClick}
