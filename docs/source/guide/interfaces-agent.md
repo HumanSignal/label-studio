@@ -16,6 +16,8 @@ You can create Interfaces in two ways:
 
 * **Developed locally** - Install the `create-interface-skill` and use an agent of your choice to vibe code an Interface that you can then import into Label Studio. For more information, see [Develop an Interface locally](interfaces-local).
 
+<iframe width="560" height="315" src="https://www.youtube.com/embed/pdcZ6HDwpiI?si=ZpeuyeKYx71q1vCR" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+
 To begin, select **Interfaces** in the main menu and then select **Create Interface > Create with Agent**. 
 
 !!! info Tip
