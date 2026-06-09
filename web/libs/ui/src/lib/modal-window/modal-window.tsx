@@ -299,7 +299,7 @@ export function ModalWindow({
           {footer ? (
             <div
               className={cnm(
-                "shrink-0 border-t bg-neutral-surface border-neutral-border px-wide py-base",
+                "shrink-0 border-t bg-neutral-surface rounded-b-medium border-neutral-border px-wide py-base",
                 footerClassName,
               )}
               data-slot="modal-window-footer"
