@@ -14,7 +14,7 @@ The Interfaces builder allows you to build highly customized labeling UIs to use
 
 Instead of choosing a template and tuning [out-of-the-box XML tags](/tags), with Interfaces you describe the experience you want and Label Studio builds a fully interactive React-based labeling UI that you can preview, refine, save, and share across projects.
 
-ADD VIDEO
+<iframe width="560" height="315" src="https://www.youtube.com/embed/pdcZ6HDwpiI?si=ZpeuyeKYx71q1vCR" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
 
 ## When to use Interfaces
 
