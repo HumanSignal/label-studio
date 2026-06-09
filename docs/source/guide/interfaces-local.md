@@ -21,6 +21,8 @@ Developing locally is useful when you want to:
 - Bring an existing React mockup into Label Studio.
 - Run automated validation and Playwright scenarios against your Interface before publishing.
 
+<iframe width="560" height="315" src="https://www.youtube.com/embed/-xOjbN4PAhk?si=CUtfpYCxYQc0lRmx" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+
 ## 1. Install the label-studio-sdk package and check your setup
 
 Before you begin, make sure you have:
