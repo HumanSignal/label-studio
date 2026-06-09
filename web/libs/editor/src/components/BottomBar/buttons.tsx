@@ -56,7 +56,7 @@ export const AcceptButton = memo(
     const annotation = store.annotationStore.selected;
     // changes in current sessions or saved draft
     const hasChanges = history.canUndo || annotation.versions.draft;
-    const hasIncompleteRegions = annotation.hasIncompletePolygons;
+    const hasIncompleteRegions = annotation.hasIncompleteRegions;
     const isDisabled = disabled || hasIncompleteRegions;
     const tooltip = hasIncompleteRegions ? INCOMPLETE_ACCEPT_TOOLTIP : "Accept annotation: [ Ctrl+Enter ]";
 

@@ -36,6 +36,22 @@ import { LinkingModes } from "./LinkingModes";
 const hotkeys = Hotkey("Annotations", "Annotations");
 
 /**
+ * Submission gate (BROS-1194): any region still being drawn — an unclosed
+ * polygon/vector, or a vector below its `minPoints` — must block submission,
+ * not only polygons. Extracted as a pure helper so the gate logic is unit
+ * testable without booting a full editor store, whose MST reference unions are
+ * import-order sensitive in the test runner.
+ *
+ * @param {Iterable<{ incomplete?: boolean }>} areas
+ */
+export function hasIncompleteRegion(areas) {
+  for (const area of areas) {
+    if (area?.incomplete) return true;
+  }
+  return false;
+}
+
+/**
  * Omit value fields from the object.
  *
  * This should fix a problem with wrong region type detection caused by overlapping fields from a result and from an area.
@@ -299,12 +315,9 @@ const _Annotation = types
       return results;
     },
 
-    get hasIncompletePolygons() {
+    get hasIncompleteRegions() {
       if (!isAlive(self)) return false;
-      for (const area of self.areas.values()) {
-        if (area.type === "polygonregion" && area.incomplete) return true;
-      }
-      return false;
+      return hasIncompleteRegion(self.areas.values());
     },
 
     get serialized() {

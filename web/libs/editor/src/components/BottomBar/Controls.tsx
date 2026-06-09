@@ -82,7 +82,7 @@ export const Controls = controlsInjector<{ annotation: MSTAnnotation }>(
     const [isInProgress, setIsInProgress] = useState(false);
     const disabled = !annotationEditable || store.isSubmitting || historySelected || isInProgress;
     const submitDisabled = store.hasInterface("annotations:deny-empty") && results.length === 0;
-    const hasIncompleteRegions = annotation.hasIncompletePolygons;
+    const hasIncompleteRegions = annotation.hasIncompleteRegions;
 
     /** Check all things related to comments and then call the action if all is good */
     const handleActionWithComments = useCallback(
