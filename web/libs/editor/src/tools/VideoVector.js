@@ -218,9 +218,32 @@ const _Tool = types
 
       stopListening() {
         for (const disposer of disposers) {
-          disposer();
+          try {
+            disposer();
+          } catch {
+            // The observed region may already be destroyed (e.g. deleted from
+            // the sidebar); disposing its observers is then a no-op.
+          }
         }
         disposers.length = 0;
+      },
+
+      /**
+       * Reset the tool back to a clean, non-drawing state.
+       *
+       * Used both when finishing normally and when the in-progress region is
+       * removed out from under the tool (sidebar delete). Clearing `mode`,
+       * `currentArea` and the annotation-level drawing flag is what lets the
+       * next click start a fresh region. BROS-1207.
+       */
+      resetDrawingState() {
+        down = false;
+        initialCursorPosition = null;
+        self.currentArea = null;
+        self.mode = "viewing";
+        self.stopListening();
+        self.annotation?.setIsDrawing(false);
+        self.annotation?.history?.unfreeze();
       },
 
       startDrawing(x, y) {
@@ -283,10 +306,19 @@ const _Tool = types
         if (ev?.shiftKey || ev?.altKey) return;
 
         if (self.mode === "drawing") {
-          self.annotation?.history?.freeze();
-          down = true;
-          initialCursorPosition = { x, y };
-          return;
+          // If the region we were drawing has been deleted or closed externally
+          // (e.g. removed from the regions sidebar while still unfinished), the
+          // tool's drawing state is stale. Without resetting it, this early
+          // return would silently swallow every subsequent click and no new
+          // region could ever be drawn. BROS-1207.
+          if (self.getActiveVector) {
+            self.annotation?.history?.freeze();
+            down = true;
+            initialCursorPosition = { x, y };
+            return;
+          }
+
+          self.resetDrawingState();
         }
 
         // Check for selected unclosed region to resume drawing

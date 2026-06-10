@@ -330,6 +330,14 @@ const Model = types
       const selectedTool = manager?.findSelectedTool?.();
       selectedTool?.enable?.();
 
+      // If this region is the tool's active (still unfinished) drawing area,
+      // clear the tool's drawing state before it is destroyed. Otherwise the
+      // tool stays stuck in "drawing" mode pointing at a dead region and no new
+      // region can be started afterwards. BROS-1207.
+      if (selectedTool?.getCurrentArea?.() === self || selectedTool?.currentArea === self) {
+        selectedTool.resetDrawingState?.();
+      }
+
       if (self.annotation?.isReadOnly()) return;
       if (self.isReadOnly()) return;
       if (self.selected) self.annotation.unselectAll(true);
