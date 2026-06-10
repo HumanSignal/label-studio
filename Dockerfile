@@ -126,7 +126,7 @@ ENV LS_DIR=/label-studio \
 WORKDIR $LS_DIR
 
 # install prerequisites for app
-RUN apk add --no-cache \
+RUN apk upgrade --no-cache && apk add --no-cache \
     expat \
     glib \
     nginx \
