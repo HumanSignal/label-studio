@@ -49,6 +49,7 @@ const obtainWatcher = (node) => {
     case "videovectorregion":
       return createPropertyWatcher(["sequence", "hidden", { parent: ["frame", "workingArea"] }]);
     case "videoregion":
+    case "videorectangleregion":
       return createPropertyWatcher(["sequence", "hidden", { parent: ["frame", "workingArea"] }]);
     default:
       return null;

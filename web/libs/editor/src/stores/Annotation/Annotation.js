@@ -1409,14 +1409,19 @@ const _Annotation = types
         }
 
         for (const obj of objAnnotation) {
-          if (obj.type === "relation") {
-            self.relationStore.deserializeRelation(
-              `${obj.from_id}#${self.id}`,
-              `${obj.to_id}#${self.id}`,
-              obj.direction,
-              obj.labels,
+          if (obj.type !== "relation") continue;
+
+          const fromId = `${obj.from_id}#${self.id}`;
+          const toId = `${obj.to_id}#${self.id}`;
+
+          if (!areas.has(fromId) || !areas.has(toId)) {
+            console.warn(
+              `Skipping relation ${obj.id ?? ""}: region not found (from_id=${obj.from_id}, to_id=${obj.to_id})`,
             );
+            continue;
           }
+
+          self.relationStore.deserializeRelation(fromId, toId, obj.direction, obj.labels);
         }
       } catch (e) {
         console.error(e);

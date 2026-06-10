@@ -165,7 +165,8 @@ const _detect = (region) => {
         return shapeBbox;
       });
     }
-    case "videoregion": {
+    case "videoregion":
+    case "videorectangleregion": {
       return videoRegionBBox(region, () => {
         const frame = region.parent?.currentFrame ?? region.parent?.frame;
         const shape = region.getShape?.(frame);

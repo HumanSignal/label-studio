@@ -165,6 +165,28 @@ describe("BoundingBox", () => {
       expect(result).toEqual([{ x: 205, y: 110, width: 20, height: 8 }]);
     });
 
+    it("returns video bbox for videorectangleregion (BROS-1393)", () => {
+      const stageEl = document.createElement("div");
+      Geometry.getDOMBBox.mockReturnValue({ x: 100, y: 50, width: 800, height: 600 });
+
+      const region = {
+        type: "videorectangleregion",
+        parent: {
+          currentFrame: 0,
+          workingArea: { x: 10, y: 20, scale: 2, realWidth: 400, realHeight: 300 },
+          stageRef: { content: stageEl },
+        },
+        getShape: () => ({ x: 10, y: 20, width: 30, height: 40 }),
+      };
+
+      const result = BoundingBox.bbox(region);
+      expect(result).toHaveLength(1);
+      expect(result[0].x).toBe(190);
+      expect(result[0].y).toBe(190);
+      expect(result[0].width).toBe(240);
+      expect(result[0].height).toBe(240);
+    });
+
     it("returns default bbox for brushregion without parent stageRef", () => {
       const region = {
         type: "brushregion",
