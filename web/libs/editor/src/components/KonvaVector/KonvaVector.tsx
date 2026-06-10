@@ -18,7 +18,7 @@ import {
   handlePointSelection,
 } from "./eventHandlers/pointSelection";
 import { handlePointSelectionFromIndex } from "./eventHandlers/mouseHandlers";
-import { handleShiftClickPointConversion } from "./eventHandlers/drawing";
+import { canInsertPointOnSegment, handleShiftClickPointConversion } from "./eventHandlers/drawing";
 import { deletePoint } from "./pointManagement";
 import type { BezierPoint, GhostPoint as GhostPointType, KonvaVectorProps, KonvaVectorRef } from "./types";
 import { ShapeType, ExportFormat, PathType } from "./types";
@@ -282,6 +282,7 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
     transformMode = false,
     isMultiRegionSelected = false,
     disableInternalPointAddition = false,
+    allowShiftPointInsertWhenUnselected = false,
     disableGhostLine = false,
     allowOutsideBounds = false,
     pointRadius,
@@ -472,13 +473,17 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
   useEffect(() => {
     // Clear ghost point when:
     // - Shape is disabled
-    // - Shape is not selected
+    // - Shape is not selected (unless the caller opts into unselected Shift+Click insertion)
     // - Max points reached
     // Note: Shift key release is handled in handleKeyUp, not here
-    if (disabled || !selected || (maxPoints !== undefined && initialPoints.length >= maxPoints)) {
+    if (
+      disabled ||
+      (!selected && !allowShiftPointInsertWhenUnselected) ||
+      (maxPoints !== undefined && initialPoints.length >= maxPoints)
+    ) {
       setGhostPoint(null);
     }
-  }, [disabled, selected, maxPoints, initialPoints.length]);
+  }, [disabled, selected, allowShiftPointInsertWhenUnselected, maxPoints, initialPoints.length]);
 
   const [_newPointDragIndex, setNewPointDragIndex] = useState<number | null>(null);
   const [isDraggingNewBezier, setIsDraggingNewBezier] = useState(false);
@@ -810,6 +815,7 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
     disabled,
     onFinish,
     isShiftKeyHeld,
+    allowShiftPointInsertWhenUnselected,
   });
 
   // Update refs on every render
@@ -838,6 +844,7 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
     disabled,
     onFinish,
     isShiftKeyHeld,
+    allowShiftPointInsertWhenUnselected,
   };
 
   // Determine if drawing should be disabled based on current interaction context
@@ -2223,9 +2230,16 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
         selected,
         disabled,
         isShiftKeyHeld: refShiftState,
+        allowShiftPointInsertWhenUnselected: refAllowUnselectedInsert,
       } = currentValuesRef.current;
 
-      if (disabled || !selected || isDragging.current || isDraggingNewBezier || ghostPointDragInfo?.isDragging) {
+      if (
+        disabled ||
+        (!selected && !refAllowUnselectedInsert) ||
+        isDragging.current ||
+        isDraggingNewBezier ||
+        ghostPointDragInfo?.isDragging
+      ) {
         return;
       }
 
@@ -2706,6 +2720,8 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
         width,
         height,
         disabled,
+        selected,
+        allowShiftPointInsertWhenUnselected,
       } = currentValuesRef.current;
 
       // Prevent all interactions when disabled (but allow cursor position updates for ghost line)
@@ -2839,7 +2855,7 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
           !isDragging.current &&
           !isDraggingNewBezier &&
           !ghostPointDragInfo?.isDragging &&
-          selected &&
+          (selected || allowShiftPointInsertWhenUnselected) &&
           !disabled
         ) {
           const scale = transform.zoom * fitScale;
@@ -3006,6 +3022,7 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
         width,
         height,
         selected: stageSelected,
+        allowShiftPointInsertWhenUnselected: stageAllowUnselectedInsert,
       } = currentValuesRef.current;
 
       // Prevent all interactions when disabled
@@ -3017,12 +3034,16 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
       // The layer-level click handler may not fire when the click misses
       // the thin VectorShape hit area, so we handle it here instead.
       if (
-        e.evt.shiftKey &&
-        !e.evt.altKey &&
-        stageSelected &&
-        disableInternalPointAddition &&
-        initialPoints.length >= 2 &&
-        (maxPoints === undefined || initialPoints.length < maxPoints)
+        canInsertPointOnSegment({
+          shiftKey: e.evt.shiftKey,
+          altKey: e.evt.altKey,
+          selected: stageSelected,
+          disabled,
+          disableInternalPointAddition,
+          allowShiftPointInsertWhenUnselected: stageAllowUnselectedInsert,
+          pointCount: initialPoints.length,
+          maxPoints,
+        })
       ) {
         const clickPos = e.target.getStage()?.getPointerPosition();
         if (clickPos && !isDragging.current) {

@@ -376,6 +376,10 @@ const VideoVectorPure = ({
         pointStrokeWidth={selected ? 2 : 1}
         pointStyle={control?.pointstyle ?? "circle"}
         disableInternalPointAddition={true}
+        // Allow Shift+Click to insert a point on a segment even when the region
+        // is not selected — the ghost-point handler commits straight to the store,
+        // so selection isn't required to add a vertex (BROS-1200).
+        allowShiftPointInsertWhenUnselected={!isReadOnly}
         disableGhostLine={isDraggingRef.current}
         allowOutsideBounds={allowOutsideBounds}
         onFinish={handleFinish}

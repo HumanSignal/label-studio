@@ -4,6 +4,60 @@ import { PointType } from "../types";
 import { HIT_RADIUS } from "../constants";
 import { getDistance, isPointInCanvasBounds, snapToPixel, stageToImageCoordinates } from "./utils";
 
+export interface ShiftInsertGateState {
+  /** Whether the Shift key is held (Shift+Click inserts a point on a segment) */
+  shiftKey: boolean;
+  /** Whether the Alt key is held — reserved for other interactions, blocks insertion */
+  altKey: boolean;
+  /** Whether the region is currently selected in the editor */
+  selected: boolean;
+  /** Whether the vector is disabled (read-only) */
+  disabled: boolean;
+  /** Whether point creation is managed externally (true for video/image vector regions) */
+  disableInternalPointAddition: boolean;
+  /**
+   * Opt-in: allow Shift+Click point insertion even when the region is not selected.
+   * Video Vectors set this so points can be added to a deselected region (BROS-1200);
+   * image vectors leave it false and keep requiring selection.
+   */
+  allowShiftPointInsertWhenUnselected: boolean;
+  /** Current number of vertices on the path */
+  pointCount: number;
+  /** Optional maximum number of points the region may hold */
+  maxPoints?: number;
+}
+
+/**
+ * Decide whether a Shift+Click on a path segment should insert a new vertex.
+ *
+ * Centralizes the gate used by KonvaVector's stage-level mouseup handler so the
+ * "insert point on segment" decision is unit-testable. The key BROS-1200 change
+ * is that a non-selected region accepts insertion when the caller opts in via
+ * allowShiftPointInsertWhenUnselected (Video Vectors); otherwise the region must
+ * be selected, preserving the existing image-vector behavior.
+ */
+export function canInsertPointOnSegment(state: ShiftInsertGateState): boolean {
+  const {
+    shiftKey,
+    altKey,
+    selected,
+    disabled,
+    disableInternalPointAddition,
+    allowShiftPointInsertWhenUnselected,
+    pointCount,
+    maxPoints,
+  } = state;
+
+  if (disabled) return false;
+  if (!shiftKey || altKey) return false;
+  if (!disableInternalPointAddition) return false;
+  if (!selected && !allowShiftPointInsertWhenUnselected) return false;
+  if (pointCount < 2) return false;
+  if (maxPoints !== undefined && pointCount >= maxPoints) return false;
+
+  return true;
+}
+
 export interface AddPointOptions {
   x: number;
   y: number;
