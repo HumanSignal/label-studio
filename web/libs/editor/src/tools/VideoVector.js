@@ -292,12 +292,11 @@ const _Tool = types
         self.annotation?.history?.freeze();
 
         self.listenForClose();
-
-        if (!currentArea || (currentArea.sequence?.[0]?.vertices?.length ?? 0) === 0) {
-          setTimeout(() => {
-            self.currentArea?.startPoint(x, y);
-          });
-        }
+        // The first vertex is added by mouseupEv (store-backed append, with a
+        // KonvaVector fallback). We intentionally don't pre-start a point here:
+        // a lone startPoint with no matching commit left the shared point-creation
+        // manager in a half-open state and was part of the dropped-click race
+        // (BROS-1206).
       },
 
       mousedownEv(ev, [x, y]) {
@@ -361,8 +360,14 @@ const _Tool = types
 
           if (dx < 5 && dy < 5) {
             setTimeout(() => {
-              self.currentArea?.startPoint(x, y);
-              self.currentArea?.commitPoint(x, y);
+              // Prefer the store-backed append, which reads the live vertices on
+              // every click so rapid clicks never drop a point (BROS-1206). Fall
+              // back to the KonvaVector path only on the very first click, before
+              // the region's view has registered its handler.
+              if (!self.currentArea?.addVertexAtCanvasPoint(x, y)) {
+                self.currentArea?.startPoint(x, y);
+                self.currentArea?.commitPoint(x, y);
+              }
               self.annotation?.history?.unfreeze();
               self.finishDrawing();
             });

@@ -214,6 +214,38 @@ const VideoVectorPure = ({
     [commitPoints],
   );
 
+  // Append a single vertex on click. Reads the current vertices directly from
+  // the MobX store on every call (rather than a captured React-prop snapshot),
+  // so rapid clicks that arrive before a re-render each produce a point instead
+  // of clobbering the previous one (BROS-1206).
+  const appendVertex = useCallback(
+    (px, py) => {
+      if (isReadOnly) return;
+
+      const { waWidth: w, waHeight: h, frame: f } = commitContextRef.current;
+      if (!w || !h) return;
+
+      const shape = reg.getShape(f);
+      if (shape?.closed) return;
+
+      const currentPixels = percentToPixelVertices(shape?.vertices ?? [], w, h);
+
+      const max = getMaxPoints(control);
+      if (max && currentPixels.length >= max) return;
+
+      const last = currentPixels[currentPixels.length - 1];
+      const newPoint = { id: generatePointId(), x: px, y: py, prevPointId: last?.id };
+
+      commitPoints([...currentPixels, newPoint]);
+    },
+    [reg, control, commitPoints, isReadOnly],
+  );
+
+  useEffect(() => {
+    reg.setAppendVertexFn(appendVertex);
+    return () => reg.setAppendVertexFn(null);
+  }, [reg, appendVertex]);
+
   const handleTransformStart = useCallback(() => {
     isDraggingRef.current = true;
     latestDragPixelsRef.current = null;

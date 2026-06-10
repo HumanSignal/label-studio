@@ -229,4 +229,65 @@ describe("VideoVectorRegion", () => {
       expect(root.region.getShape(10)).toBeNull();
     });
   });
+
+  describe("addVertexAtCanvasPoint — rapid clicks accumulate (BROS-1206)", () => {
+    const makeRoot = () =>
+      TestRoot.create({
+        video: { id: "vid1" },
+        region: { id: "vvr1", pid: "p1", object: "vid1", sequence: [] },
+      });
+
+    // Mirrors the production handler registered by the view: it reads the LIVE
+    // store on every call (never a captured snapshot), so consecutive clicks
+    // that arrive before a re-render still each produce a vertex.
+    const registerFreshAppender = (region) =>
+      region.setAppendVertexFn((x, y) => {
+        const shape = region.getShape(0) ?? { vertices: [], closed: false };
+        const current = shape.vertices;
+        const last = current[current.length - 1];
+        region.updateShape(
+          {
+            vertices: [...current, { id: `v${current.length}`, x, y, prevPointId: last?.id }],
+            closed: shape.closed,
+          },
+          0,
+        );
+      });
+
+    it("returns false when no append handler is registered", () => {
+      const root = makeRoot();
+      expect(root.region.addVertexAtCanvasPoint(10, 10)).toBe(false);
+      expect(root.region.getShape(0)).toBeNull();
+    });
+
+    it("adds one vertex per call without dropping earlier ones", () => {
+      const root = makeRoot();
+      registerFreshAppender(root.region);
+
+      expect(root.region.addVertexAtCanvasPoint(10, 10)).toBe(true);
+      expect(root.region.addVertexAtCanvasPoint(20, 20)).toBe(true);
+      expect(root.region.addVertexAtCanvasPoint(30, 30)).toBe(true);
+
+      const shape = root.region.getShape(0);
+      expect(shape.vertices).toHaveLength(3);
+      expect(shape.vertices.map((v) => [v.x, v.y])).toEqual([
+        [10, 10],
+        [20, 20],
+        [30, 30],
+      ]);
+      // each new vertex links back to the previous one
+      expect(shape.vertices[1].prevPointId).toBe(shape.vertices[0].id);
+      expect(shape.vertices[2].prevPointId).toBe(shape.vertices[1].id);
+    });
+
+    it("clears the handler when set to null", () => {
+      const root = makeRoot();
+      registerFreshAppender(root.region);
+      expect(root.region.addVertexAtCanvasPoint(10, 10)).toBe(true);
+
+      root.region.setAppendVertexFn(null);
+      expect(root.region.addVertexAtCanvasPoint(20, 20)).toBe(false);
+      expect(root.region.getShape(0).vertices).toHaveLength(1);
+    });
+  });
 });

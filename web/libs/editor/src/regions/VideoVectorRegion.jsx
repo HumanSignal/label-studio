@@ -66,6 +66,9 @@ const Model = types
     supportsScale: true,
     vectorRef: null,
     groupRef: null,
+    // Set by the view (VideoVector.jsx). Appends a single vertex at canvas pixel
+    // coords, reading the live store each call so rapid clicks never drop a point.
+    appendVertexFn: null,
   }))
   .views((self) => ({
     // --- Video-specific views ---
@@ -256,6 +259,26 @@ const Model = types
 
     setKonvaVectorRef(ref) {
       self.vectorRef = ref;
+    },
+
+    setAppendVertexFn(fn) {
+      self.appendVertexFn = fn;
+    },
+
+    /**
+     * Append a vertex at the given canvas pixel coordinates.
+     *
+     * Delegates to the handler registered by the view, which reads the current
+     * vertices straight from the MobX store on every call. This avoids the race
+     * where point creation rebuilt the list from a stale React-prop snapshot and
+     * silently dropped points during rapid clicking (BROS-1206). Returns false
+     * when no handler is registered yet (e.g. the very first click before the
+     * region's view has mounted), letting the caller fall back to the legacy path.
+     */
+    addVertexAtCanvasPoint(x, y) {
+      if (typeof self.appendVertexFn !== "function") return false;
+      self.appendVertexFn(x, y);
+      return true;
     },
 
     selectRegion(preserveTransformMode = false) {
