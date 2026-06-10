@@ -158,3 +158,8 @@ export const FF_ECHO_466_TAXONOMY_ANTD_REMOVAL = "fflag_feat_all_echo_466_taxono
  * Use `ff.isActive(FF_MODAL_WINDOW_APP_CHROME)` next to each migrated modal (not a global switch in app Modal.tsx).
  */
 export const FF_MODAL_WINDOW_APP_CHROME = "fflag_feat_front_fit_1559_modal_window_short";
+
+/**
+ * Annotation course builder for project onboarding and workforce learning.
+ */
+export const FF_ANNOTATION_COURSE_BUILDER = "fflag_feat_annotation_course_builder";

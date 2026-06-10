@@ -204,6 +204,9 @@ export default types
     initialized: false,
     hydrated: false,
     suggestionsRequest: null,
+    onDemandCourses: [],
+    hideInstructionsForCourses: false,
+    onOpenOnDemandCourse: null,
     // @todo should be removed along with the FF; it's used to detect FF in other parts
     simpleInit: isFF(FF_SIMPLE_INIT),
   }))

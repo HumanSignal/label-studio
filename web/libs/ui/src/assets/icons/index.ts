@@ -94,6 +94,7 @@ export { ReactComponent as IconContentCopy } from "./content-copy.svg";
 export { ReactComponent as IconContrastTool } from "./contrast-tool.svg";
 export { ReactComponent as IconCopy } from "./copy.svg";
 export { ReactComponent as IconCopyOutline } from "./copy-outline.svg";
+export { ReactComponent as IconCourses } from "./courses.svg";
 export { ReactComponent as IconCross } from "./cross.svg";
 export { ReactComponent as IconCrossAlt } from "./cross-alt.svg";
 export { ReactComponent as IconCrossBold } from "./cross-bold.svg";

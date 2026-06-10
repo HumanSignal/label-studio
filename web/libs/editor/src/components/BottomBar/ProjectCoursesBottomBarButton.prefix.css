@@ -1,0 +1,30 @@
+.project-courses-modal__list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.project-courses-modal__course-button {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  padding: 12px 16px;
+  border: 1px solid var(--color-neutral-border-subtle, #e0e0e0);
+  border-radius: 8px;
+  background: var(--color-neutral-background, #fff);
+  color: inherit;
+  cursor: pointer;
+  text-align: left;
+}
+
+.project-courses-modal__course-button:hover {
+  background: var(--color-neutral-background-subtle, #f5f5f5);
+}
+
+.project-courses-modal__course-button:focus-visible {
+  outline: 2px solid var(--color-primary-border, #0057ff);
+  outline-offset: 2px;
+}

@@ -6,6 +6,7 @@ import { AutoAcceptToggle } from "../AnnotationTab/AutoAcceptToggle";
 import { DynamicPreannotationsToggle } from "../AnnotationTab/DynamicPreannotationsToggle";
 import { GroundTruth } from "../CurrentEntity/GroundTruth";
 import { EditingHistory } from "./HistoryActions";
+import { ProjectCoursesBottomBarButton } from "./ProjectCoursesBottomBarButton";
 import "./Actions.prefix.css";
 
 export const Actions = ({ store }) => {
@@ -14,13 +15,16 @@ export const Actions = ({ store }) => {
   const isPrediction = entity?.type === "prediction";
   const isViewAll = annotationStore.viewingAll === true;
   const isBulkMode = !isStarterCloudPlan() && store.hasInterface("annotation:bulk");
+  const hideInstructionsForCourses = store.hideInstructionsForCourses === true && !store.hasInterface("review");
+  const showInstructions = store.description && store.hasInterface("instruction") && !hideInstructionsForCourses;
 
   return (
     <div className={cn("bottombar").elem("section").toClassName()}>
       {!isPrediction && !isViewAll && store.hasInterface("edit-history") && <EditingHistory entity={entity} />}
 
       <div className={cn("action-buttons").toClassName()}>
-        {store.description && store.hasInterface("instruction") && (
+        <ProjectCoursesBottomBarButton store={store} />
+        {showInstructions && (
           <Button
             type="text"
             aria-label="Instructions"

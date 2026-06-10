@@ -112,6 +112,7 @@ export const IconContentCopy = IconStub;
 export const IconContrastTool = IconStub;
 export const IconCopy = IconStub;
 export const IconCopyOutline = IconStub;
+export const IconCourses = IconStub;
 export const IconCross = IconStub;
 export const IconCrossAlt = IconStub;
 export const IconCrossBold = IconStub;
