@@ -125,7 +125,7 @@ logger = logging.getLogger(__name__)
                 location='query',
                 description='Additional query to filter tasks. It must be JSON encoded string of dict containing '
                 'one of the following parameters: `{"filters": ..., "selectedItems": ..., "ordering": ...}`. Check '
-                '[Data Manager > Create View > see `data` field](#tag/Data-Manager/operation/api_dm_views_create) '
+                '[Data Manager > Create View > see `data` field](api:POST/api/dm/views/) '
                 'for more details about filters, selectedItems and ordering.\n\n'
                 '* **filters**: dict with `"conjunction"` string (`"or"` or `"and"`) and list of filters in `"items"` array. '
                 'Each filter is a dictionary with keys: `"filter"`, `"operator"`, `"type"`, `"value"`. '

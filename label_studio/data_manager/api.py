@@ -454,7 +454,7 @@ class TaskListAPI(generics.ListCreateAPIView):
         summary='Get data manager columns',
         description=(
             'Retrieve the data manager columns available for the tasks in a specific project. '
-            'For more details, see [GET api/actions](#/Data%20Manager/get_api_actions).'
+            'For more details, see [GET api/actions](api:GET/api/dm/actions/).'
         ),
         parameters=[
             OpenApiParameter(

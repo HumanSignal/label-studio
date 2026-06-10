@@ -235,7 +235,7 @@ filters_schema = {
                             'e.g. `filter:tasks:agreement`. '
                             'For `task.data` fields it may look like `filter:tasks:data.field_name`. '
                             'If you need more info about columns, check the '
-                            '[Get data manager columns](#tag/Data-Manager/operation/api_dm_columns_list) API endpoint. '
+                            '[Get data manager columns](api:GET/api/dm/columns/) API endpoint. '
                             'Possible values:<br>'
                             + '<br>'.join(
                                 [
