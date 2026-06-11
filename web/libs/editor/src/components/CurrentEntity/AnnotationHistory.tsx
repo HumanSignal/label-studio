@@ -82,16 +82,16 @@ const DraftState: FC<{
       date={annotation.draftSaved}
       extra={
         annotation.isDraftSaving ? (
-          <div className={cn("annotation-history").elem("saving").toClassName()}>
-            <div className={cn("annotation-history").elem("spin").toClassName()} />
+          <div className={cn("history-item").elem("saving").toClassName()}>
+            <div className={cn("history-item").elem("spin").toClassName()} />
           </div>
         ) : hasUnsavedChanges ? (
-          <div className={cn("annotation-history").elem("saving").toClassName()}>
-            <div className={cn("annotation-history").elem("dot").toClassName()} />
+          <div className={cn("history-item").elem("saving").toClassName()}>
+            <div className={cn("history-item").elem("dot").toClassName()} />
           </div>
         ) : hasChanges ? (
-          <div className={cn("annotation-history").elem("saving").toClassName()}>
-            <IconCheck className={cn("annotation-history").elem("saved").toClassName()} />
+          <div className={cn("history-item").elem("saving").toClassName()}>
+            <IconCheck className={cn("history-item").elem("saved").toClassName()} />
           </div>
         ) : null
       }
