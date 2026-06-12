@@ -562,22 +562,9 @@ export class LSFWrapper {
 
   /** @private */
   async setAnnotation(annotationID, selectAnnotation = false, selectPrediction = false) {
-    console.log(
-      "FIT-1949 SDK: setAnnotation called with annotationID =",
-      annotationID,
-      "selectAnnotation =",
-      selectAnnotation,
-      "selectPrediction =",
-      selectPrediction,
-    );
     const id = annotationID ? annotationID.toString() : null;
     const { annotationStore: cs } = this.lsf;
     let annotation;
-    console.log("FIT-1949 SDK: id =", id);
-    console.log(
-      "FIT-1949 SDK: available annotations =",
-      this.annotations?.map((a) => ({ pk: a.pk, id: a.id })),
-    );
     const activeDrafts = cs.annotations.map((a) => a.draftId).filter(Boolean);
 
     if (this.task.drafts) {
@@ -658,7 +645,6 @@ export class LSFWrapper {
         annotation = cs.createAnnotation();
       }
     }
-    console.log("FIT-1949 SDK: matched annotation =", annotation ? { pk: annotation.pk, id: annotation.id } : null);
 
     if (annotation) {
       // We want to be sure this is explicitly understood to be a prediction and the
