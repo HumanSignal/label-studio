@@ -11,6 +11,7 @@ import { TabStore } from "./Tabs";
 import { CustomJSON } from "./types";
 import { User } from "./Users";
 import { ActivityObserver } from "../utils/ActivityObserver";
+import { parseDmQueryParam } from "../utils/helpers";
 
 /**
  * @type {ActivityObserver | null}
@@ -607,7 +608,7 @@ export const AppStore = types
           requests.push(self.viewsStore.fetchTabs(tab, task, labeling));
         }
       } else if (isLabelStream && !!tab) {
-        const { selectedItems } = JSON.parse(decodeURIComponent(query ?? "{}"));
+        const { selectedItems } = parseDmQueryParam(query);
 
         requests.push(self.viewsStore.fetchSingleTab(tab, selectedItems ?? {}));
       }

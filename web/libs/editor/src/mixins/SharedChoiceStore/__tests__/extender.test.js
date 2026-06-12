@@ -50,4 +50,21 @@ describe("SharedChoiceStore StoreExtender", () => {
     expect(() => root.addSharedStore(store)).not.toThrow();
     expect(root.sharedStores.get("taxonomy")).toBe(store);
   });
+
+  it("label stream task switch: afterReset then taxonomy afterCreate path is safe", () => {
+    root = AnnotationStoreRoot.create({ sharedStores: {} });
+    const store = SharedStoreModel.create({ id: "taxonomy", children: [] });
+
+    Stores.set("taxonomy", store);
+    root.addSharedStore(store);
+
+    // resetAnnotationStore / initializeStore: clear map, re-attach from module cache
+    root.beforeReset();
+    root.afterReset();
+
+    expect(root.sharedStores.has("taxonomy")).toBe(true);
+    // Taxonomy afterCreate when tryReference fails but store is already registered
+    expect(() => root.addSharedStore(store)).not.toThrow();
+    expect(root.sharedStores.get("taxonomy")).toBe(store);
+  });
 });
