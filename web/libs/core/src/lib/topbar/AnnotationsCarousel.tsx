@@ -203,7 +203,7 @@ export function AnnotationsCarousel({
     const maxPosition = Math.max(0, carouselWidth - containerW);
     const newPosition = Math.max(0, Math.min(targetPosition, maxPosition));
     setCurrentPosition(newPosition);
-  }, [selectedId, filteredEntities, shouldVirtualize, suppressScrollToSelected]);
+  }, [selectedId, filteredEntities, shouldVirtualize, suppressScrollToSelected, containerWidth]);
 
   // Suppress-scroll branch: keep strip pinned to the left
   useEffect(() => {
@@ -211,7 +211,7 @@ export function AnnotationsCarousel({
     setCurrentPosition(0);
     setScrollOffset(0);
     if (shouldVirtualize && listRef.current) listRef.current.scrollTo(0);
-  }, [suppressScrollToSelected, shouldVirtualize]);
+  }, [suppressScrollToSelected, shouldVirtualize, containerWidth]);
 
   const itemData = useMemo<ItemData>(
     () => ({ entities: filteredEntities, capabilities, handlers, renderItem: renderRow }),

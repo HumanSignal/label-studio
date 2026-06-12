@@ -244,24 +244,31 @@ export const AppStore = types
         }
 
         if (self.LSF) {
-          const annotation = self.LSF?.currentAnnotation;
-          const id = annotation?.pk ?? annotation?.id;
-
-          self.LSF?.setLSFTask(self.taskStore.selected, id);
-
           const { annotation: annIDFromUrl, region: regionIDFromUrl } = History.getParams();
-          const annotationStore = self.LSF?.lsf?.annotationStore;
+          const task = self.taskStore.selected;
 
-          if (annIDFromUrl && annotationStore) {
-            const lsfAnnotation = [...annotationStore.annotations, ...annotationStore.predictions].find((a) => {
-              return a.pk === annIDFromUrl || a.id === annIDFromUrl;
-            });
+          let targetAnnotationID = annIDFromUrl;
+          let isPrediction = false;
 
-            if (lsfAnnotation) {
-              const annID = lsfAnnotation.pk ?? lsfAnnotation.id;
-              self.LSF?.setLSFTask(self.taskStore.selected, annID, undefined, lsfAnnotation.type === "prediction");
+          if (annIDFromUrl && task) {
+            const annotationObj = task.annotations?.find((a) => String(a.id) === String(annIDFromUrl));
+            const predictionObj = task.predictions?.find((p) => String(p.id) === String(annIDFromUrl));
+
+            if (predictionObj && !annotationObj) {
+              isPrediction = true;
+              targetAnnotationID = predictionObj.id;
+            } else if (annotationObj) {
+              targetAnnotationID = annotationObj.id;
             }
           }
+
+          if (!targetAnnotationID) {
+            const annotation = self.LSF?.currentAnnotation;
+            targetAnnotationID = annotation?.pk ?? annotation?.id;
+          }
+
+          await self.LSF?.setLSFTask(self.taskStore.selected, targetAnnotationID, undefined, isPrediction);
+
           if (regionIDFromUrl) {
             const currentAnn = self.LSF?.currentAnnotation;
             // Focus on the region by hiding all other regions
@@ -271,6 +278,7 @@ export const AppStore = types
           }
 
           // Enable viewingAll mode if interface option is "annotations:view-all"
+          const annotationStore = self.LSF?.lsf?.annotationStore;
           if (interfaceOption === "annotations:view-all" && annotationStore) {
             if (!annotationStore.viewingAll) {
               annotationStore.toggleViewingAllAnnotations();

@@ -23,7 +23,7 @@ describe("Sentry Configuration (Open Source)", () => {
 
   beforeAll(async () => {
     Sentry = sentryBrowserModule;
-    const SentryModule = await import("./Sentry");
+    const SentryModule = await import(`./Sentry?bun_reload=${Date.now()}`);
     captureException = SentryModule.captureException;
   });
 

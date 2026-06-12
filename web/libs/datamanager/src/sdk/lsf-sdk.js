@@ -8,7 +8,7 @@ import { errorHandlerAllowSpecialErrors } from "./special-errors";
 // import { LSFHistory } from "./lsf-history";
 import { annotationToServer, formatDraftCreatedUsernameFromUser, taskToLSFormat } from "./lsf-utils";
 import { when, runInAction } from "mobx";
-import { isAlive } from "mobx-state-tree";
+
 import { imageCache } from "@humansignal/core";
 import {
   invalidateAnnotationCachesForTask,
@@ -562,9 +562,22 @@ export class LSFWrapper {
 
   /** @private */
   async setAnnotation(annotationID, selectAnnotation = false, selectPrediction = false) {
+    console.log(
+      "FIT-1949 SDK: setAnnotation called with annotationID =",
+      annotationID,
+      "selectAnnotation =",
+      selectAnnotation,
+      "selectPrediction =",
+      selectPrediction,
+    );
     const id = annotationID ? annotationID.toString() : null;
     const { annotationStore: cs } = this.lsf;
     let annotation;
+    console.log("FIT-1949 SDK: id =", id);
+    console.log(
+      "FIT-1949 SDK: available annotations =",
+      this.annotations?.map((a) => ({ pk: a.pk, id: a.id })),
+    );
     const activeDrafts = cs.annotations.map((a) => a.draftId).filter(Boolean);
 
     if (this.task.drafts) {
@@ -576,7 +589,7 @@ export class LSFWrapper {
           // Annotation existed - add draft to existed annotation
           const draftAnnotationPk = String(draft.annotation);
 
-          c = cs.annotations.find((c) => c.pk === draftAnnotationPk);
+          c = cs.annotations.find((c) => String(c.pk) === String(draftAnnotationPk));
           if (c) {
             c.history.freeze();
             c.addVersions({ draft: draft.result });
@@ -624,7 +637,7 @@ export class LSFWrapper {
         // not submitted draft, most likely from previous labeling session
         annotation = first;
       } else if (isDefined(annotationID) && selectAnnotation) {
-        annotation = this.annotations.find(({ pk }) => pk === annotationID);
+        annotation = this.annotations.find(({ pk }) => String(pk) === String(annotationID));
       } else if (showPredictions && this.predictions.length > 0 && !this.isInteractivePreannotations) {
         annotation = cs.addAnnotationFromPrediction(this.predictions[0]);
       } else {
@@ -632,19 +645,20 @@ export class LSFWrapper {
       }
     } else {
       if (selectPrediction) {
-        annotation = this.predictions.find((p) => p.pk === id);
+        annotation = this.predictions.find((p) => String(p.pk) === String(id));
         annotation ??= first; // if prediction not found, select first annotation and resume existing behaviour
       } else if (this.annotations.length === 0 && this.predictions.length > 0 && !this.isInteractivePreannotations) {
         const predictionByModelVersion = this.predictions.find((p) => p.createdBy === this.project.model_version);
         annotation = cs.addAnnotationFromPrediction(predictionByModelVersion ?? this.predictions[0]);
       } else if (this.annotations.length > 0 && id && id !== "auto") {
-        annotation = this.annotations.find((c) => c.pk === id || c.id === id);
+        annotation = this.annotations.find((c) => String(c.pk) === String(id) || String(c.id) === String(id));
       } else if (this.annotations.length > 0 && (id === "auto" || hasAutoAnnotations)) {
         annotation = first;
       } else {
         annotation = cs.createAnnotation();
       }
     }
+    console.log("FIT-1949 SDK: matched annotation =", annotation ? { pk: annotation.pk, id: annotation.id } : null);
 
     if (annotation) {
       // We want to be sure this is explicitly understood to be a prediction and the
