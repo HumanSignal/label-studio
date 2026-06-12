@@ -14,6 +14,7 @@ export const StoreExtender = types
   })
   .actions((self) => ({
     addSharedStore(store) {
+      if (self.sharedStores.has(store.id)) return;
       self.sharedStores.set(store.id, store);
     },
     beforeReset() {

@@ -34,7 +34,7 @@
     "lsf:unit": "bun test --dom libs/editor/src",
     "dm:unit": "bun test --dom libs/datamanager/src",
     "test:unit": "bun test --dom",
-    "test:unit:coverage": "bun run test:unit --coverage",
+    "test:unit:coverage": "TZ=UTC node scripts/bun-test-ordered.mjs . -- --dom --coverage --max-concurrency=1",
     "test:unit:editor": "bun test --dom libs/editor/src",
     "test:unit:core": "bun test --dom libs/core/src",
     "test:unit:datamanager": "bun test --dom libs/datamanager/src",

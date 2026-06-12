@@ -356,6 +356,7 @@ export class Visualizer extends Events<VisualizerEvents> {
       );
     }
 
+    this.getSamplesPerPx();
     this.invoke("initialized", [this]);
     setTimeout(() => this.draw(), 10);
   }

@@ -208,6 +208,10 @@ export class WaveformRenderer implements Renderer<WaveformRendererConfig> {
         const chunks = slice.slice(chunkStart, chunkEnd);
         const l = chunks.length - 1;
         let i = l + 1;
+        const step = context.samplesPerPx;
+        if (step <= 0) {
+          continue;
+        }
         while (i > 0) {
           const index = l - i;
           const chunk = chunks.slice(index, index + context.samplesPerPx);
@@ -218,7 +222,7 @@ export class WaveformRenderer implements Renderer<WaveformRendererConfig> {
             this.renderChunk(chunk, layer, height, x + paddingLeft, zero, context);
           }
           x += 1;
-          i = clamp(i - context.samplesPerPx, 0, l);
+          i = clamp(i - step, 0, l);
         }
       } catch {
         // Ignore any out-of-bounds errors if they occur

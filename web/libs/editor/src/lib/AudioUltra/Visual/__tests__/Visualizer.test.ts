@@ -6,6 +6,9 @@ import type { Waveform } from "../../Waveform";
 import type { WaveformAudio } from "../../Media/WaveformAudio";
 import type { Mock } from "bun:test";
 import * as uiModule from "@humansignal/ui";
+import { FF_AUDIO_SPECTROGRAMS } from "../../../../utils/feature-flags";
+
+const ff = mockFF();
 
 if (typeof globalThis.CanvasRenderingContext2D === "undefined") {
   (globalThis as any).CanvasRenderingContext2D = class {};
@@ -80,13 +83,16 @@ describe("Visualizer", () => {
   let mockWaveform: Partial<Waveform>;
 
   beforeEach(() => {
+    // Later files (e.g. Audio/view.test.tsx) set FF at module scope; Bun loads the
+    // full suite before running tests, so reset flags to a known baseline here.
+    ff.reset();
+    ff.set({ [FF_AUDIO_SPECTROGRAMS]: false });
     rafCbs = [];
     const raf = (cb: FrameRequestCallback) => {
       rafCbs.push(cb);
       return rafCbs.length;
     };
     (window as any).requestAnimationFrame = raf;
-    useFakeTimers();
     container = createContainer();
     mockWaveform = createMockWaveform();
     const mockCtx = mockCanvas2DContext();
@@ -97,7 +103,6 @@ describe("Visualizer", () => {
   afterEach(() => {
     if (container?.parentNode) container.parentNode.removeChild(container);
     mock.restore();
-    useRealTimers();
   });
 
   function createVisualizer(
@@ -177,7 +182,6 @@ describe("Visualizer", () => {
       vis.init(audio);
       expect(vis.getLayer("regions")).toBeDefined();
       flushRaf();
-      advanceTimersByTime(20);
       vis.destroy();
     });
 
@@ -719,7 +723,6 @@ describe("Visualizer", () => {
       if (wrapper) {
         wrapper.dispatchEvent(new WheelEvent("wheel", { deltaY: -10, ctrlKey: true, bubbles: true }));
       }
-      advanceTimersByTime(20);
       flushRaf();
       vis.destroy();
     });

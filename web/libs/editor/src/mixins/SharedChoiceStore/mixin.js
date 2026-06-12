@@ -75,17 +75,21 @@ export const SharedStoreMixin = types
     afterCreate() {
       const currentStore = tryReference(() => self.store);
 
-      if (!currentStore) {
-        const store = Stores.get(self.storeId);
-        const annotationStore = Types.getParentOfTypeString(self, "AnnotationStore");
+      if (currentStore) return;
 
-        // It means that an element is not connected to the store tree,
-        // most probably as it is a temporal clone of the model
-        if (!annotationStore) return;
+      const store = Stores.get(self.storeId);
+      const annotationStore = Types.getParentOfTypeString(self, "AnnotationStore");
+
+      // It means that an element is not connected to the store tree,
+      // most probably as it is a temporal clone of the model
+      if (!annotationStore || !store) return;
+
+      // afterReset() may have already re-attached cached shared stores (label stream task switch).
+      if (!annotationStore.sharedStores.has(self.storeId)) {
         annotationStore.addSharedStore(store);
-        StoreIds.add(self.storeId);
-        self.store = self.storeId;
       }
+      StoreIds.add(self.storeId);
+      self.store = self.storeId;
     },
   }))
   .preProcessSnapshot((sn) => {
