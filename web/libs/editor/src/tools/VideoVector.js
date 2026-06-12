@@ -414,8 +414,12 @@ const _Tool = types
       },
 
       complete() {
-        self._finishDrawing({ skipAfterCreate: true });
-        self.annotation?.unselectAll();
+        // Mirror the image Vector tool: finishing a drawing should run the
+        // standard after-create behavior (which selects the region when
+        // `selectAfterCreate` is enabled). Leaving the region unselected here
+        // disabled Shift+Click point insertion on finished video vectors,
+        // because KonvaVector only allows point editing on a selected region.
+        self._finishDrawing();
       },
 
       cleanupUncloseableShape() {

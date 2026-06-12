@@ -81,6 +81,8 @@ describe("Visualizer", () => {
   let container: HTMLElement;
   let rafCbs: FrameRequestCallback[];
   let mockWaveform: Partial<Waveform>;
+  let origRaf: typeof globalThis.requestAnimationFrame;
+  let origCancelRaf: typeof globalThis.cancelAnimationFrame;
 
   beforeEach(() => {
     // Later files (e.g. Audio/view.test.tsx) set FF at module scope; Bun loads the
@@ -92,6 +94,15 @@ describe("Visualizer", () => {
       rafCbs.push(cb);
       return rafCbs.length;
     };
+    const cancelRaf = () => {};
+    // Production code (renderers, playhead) calls bare `requestAnimationFrame`,
+    // which resolves to `globalThis` — and under bun's `--dom` env
+    // `window !== globalThis`, so overriding only `window.requestAnimationFrame`
+    // leaves the real rAF in place and the renderer draw loops run forever
+    // (hanging the suite until the CI job timeout). Capture on both objects so
+    // every scheduled frame lands in `rafCbs` and is controlled by `flushRaf`.
+    origRaf = globalThis.requestAnimationFrame;
+    origCancelRaf = globalThis.cancelAnimationFrame;
     (window as any).requestAnimationFrame = raf;
     container = createContainer();
     mockWaveform = createMockWaveform();
