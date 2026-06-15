@@ -118,8 +118,10 @@ export function useInteractiveTrack(
       if (item.isRectangle) {
         return maskToBBox(data, width, height);
       }
-      const isSkeleton = item.selectedControl?.skeleton === true;
-      return maskToLargestShape(data, width, height, item.traceResolution, item.smoothing, isSkeleton);
+      // Boundary contour; `closable` controls closed polygon vs open path
+      // (BROS-1221). Keep this in sync with `acceptInteractiveMask`.
+      const closed = item.selectedControl?.closable === true;
+      return maskToLargestShape(data, width, height, item.traceResolution, item.smoothing, closed);
     };
 
     // ── Create the region on the FIRST frame ──
@@ -139,15 +141,14 @@ export function useInteractiveTrack(
 
     let trackedRegion: any = null;
     try {
-      // For closable vector controls, force `closed: true` so the region
-      // doesn't show up as `incomplete` in the Outliner — the mask-traced
-      // polygon is always a closed contour.
+      // `firstShape.closed` already mirrors the control's `closable` attribute
+      // (closed polygon when closable, open boundary otherwise — BROS-1221),
+      // so no closed-flag override is needed here.
       const firstKeyframe: Record<string, any> = {
         frame: currentFrame,
         enabled: true,
         ...firstShape,
       };
-      if (control?.closable === true) firstKeyframe.closed = true;
       const areaValue = { sequence: [firstKeyframe] };
       trackedRegion = item.annotation.createResult(areaValue, resultValue, control, imageTag, true);
     } catch (err: any) {

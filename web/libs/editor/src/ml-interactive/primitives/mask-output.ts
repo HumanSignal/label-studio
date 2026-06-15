@@ -3,10 +3,18 @@
  * polygon vertices, bitmask PNG data URLs, and bounding boxes.
  */
 
-import { maskToClosedVectors, maskToSkeletonVectors } from "./MaskConverter";
+import { maskToClosedVectors } from "./MaskConverter";
 
 /**
  * Downsample + trace the mask, returning contour shape data for all detected shapes.
+ *
+ * Always traces the region's boundary contour (marching squares) so the
+ * vector reflects the detected region. `closed` mirrors the control's
+ * `closable` attribute: a closable vector becomes a closed polygon, a
+ * non-closable one is the same boundary left open. We intentionally do NOT
+ * derive a medial-axis skeleton here — a centerline doesn't reflect the
+ * region, and skeletonising a SAM mask produces noisy spur branches
+ * (BROS-1221).
  */
 export function maskToShapes(
   maskData: Uint8Array,
@@ -14,7 +22,7 @@ export function maskToShapes(
   maskHeight: number,
   traceResolution: number,
   smoothing: number,
-  isSkeleton: boolean,
+  closed: boolean,
 ): Array<{ vertices: any[]; closed: boolean }> {
   const downscale = Math.min(1, traceResolution / Math.max(maskWidth, maskHeight));
   let traceMask = maskData;
@@ -35,9 +43,7 @@ export function maskToShapes(
     }
   }
 
-  const contours = isSkeleton
-    ? maskToSkeletonVectors(traceMask, traceW, traceH, smoothing)
-    : maskToClosedVectors(traceMask, traceW, traceH, smoothing);
+  const contours = maskToClosedVectors(traceMask, traceW, traceH, smoothing);
 
   if (contours.length === 0) return [];
 
@@ -53,7 +59,7 @@ export function maskToShapes(
       prevPointId: i === 0 ? null : `sa-${ts}-${i - 1}`,
       isBezier: false,
     }));
-    return { vertices, closed: !isSkeleton };
+    return { vertices, closed };
   });
 }
 
@@ -66,9 +72,9 @@ export function maskToLargestShape(
   maskHeight: number,
   traceResolution: number,
   smoothing: number,
-  isSkeleton: boolean,
+  closed: boolean,
 ): { vertices: any[]; closed: boolean } | null {
-  const shapes = maskToShapes(maskData, maskWidth, maskHeight, traceResolution, smoothing, isSkeleton);
+  const shapes = maskToShapes(maskData, maskWidth, maskHeight, traceResolution, smoothing, closed);
   if (shapes.length === 0) return null;
   return shapes.reduce((best, s) => (s.vertices.length > best.vertices.length ? s : best));
 }

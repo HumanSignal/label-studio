@@ -96,14 +96,17 @@ export function acceptInteractiveMask(control: any, binding: InteractiveBinding,
   // dominant contour (largest connected component, outer boundary only) so
   // fragmented or Swiss-cheese SAM output can't produce hundreds of tiny
   // regions on Accept.
-  const isSkeleton = control.skeleton === true;
+  // Trace the region boundary; `closable` decides closed polygon vs open path
+  // (BROS-1221 — a non-closable vector is the boundary left open, never a
+  // medial-axis skeleton).
+  const closed = control.closable === true;
   const shapeData = maskToLargestShape(
     maskData,
     maskWidth,
     maskHeight,
     control.interactiveTraceResolution,
     control.interactiveSmoothing,
-    isSkeleton,
+    closed,
   );
   if (!shapeData) {
     control.clearInteractiveMask();
