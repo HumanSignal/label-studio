@@ -41,6 +41,24 @@ describe("InstructionsModal Component", () => {
     expect(screen.queryByText("color: red")).toBeNull();
   });
 
+  it("themes the antd-fallback modal with semantic tokens instead of hardcoded white", () => {
+    const title = "Test Title";
+    render(
+      <InstructionsModal title={title} visible={true} onCancel={() => {}}>
+        <p>Test Children</p>
+      </InstructionsModal>,
+    );
+
+    // Scoped class drives the .ant-modal-content / close-button token overrides
+    // (theme-aware in dark mode via the prefix CSS).
+    expect(document.querySelector(".lsf-instructions-modal")).toBeTruthy();
+
+    // Header no longer hardcodes a light background. (jsdom's CSSOM drops `var()` values,
+    // so we can only assert the hardcoded "white" is gone, not the resolved token.)
+    const headingStyle = screen.getByText(title).getAttribute("style") ?? "";
+    expect(headingStyle).not.toContain("white");
+  });
+
   it("should call onCancel when the modal is cancelled", () => {
     const onCancel = mock();
     const { getByLabelText } = render(

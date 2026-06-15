@@ -3,6 +3,7 @@ import * as ff from "@humansignal/core/lib/utils/feature-flags";
 import { Modal } from "antd";
 import type React from "react";
 import { sanitizeHtml } from "../../utils/html";
+import "./InstructionsModal.prefix.css";
 
 export const InstructionsModal = ({
   title,
@@ -18,6 +19,7 @@ export const InstructionsModal = ({
   const contentStyle: Record<string, string> = {
     padding: "0 24px 24px",
     whiteSpace: "pre-wrap",
+    color: "var(--color-neutral-content)",
   };
 
   const body =
@@ -57,6 +59,7 @@ export const InstructionsModal = ({
         footer={null}
         closable={true}
         onCancel={() => onCancel()}
+        wrapClassName="lsf-instructions-modal"
         width="70%"
         style={{
           maxHeight: "calc(100vh - 250px)",
@@ -76,7 +79,8 @@ export const InstructionsModal = ({
           style={{
             position: "sticky",
             top: "0px",
-            background: "white",
+            background: "var(--color-neutral-background)",
+            color: "var(--color-neutral-content)",
             padding: "24px 24px 20px",
             margin: "0px",
             fontWeight: "400",
