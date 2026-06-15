@@ -163,14 +163,23 @@ class OrganizationMemberAdmin(admin.ModelAdmin):
         self.ordering = ('id',)
 
 
+class OrganizationAdmin(admin.ModelAdmin):
+    search_fields = ('title', 'created_by__email')
+
+
+class ProjectAdmin(admin.ModelAdmin):
+    autocomplete_fields = ('created_by', 'organization', 'deleted_by')
+    search_fields = ('title', 'organization__title', 'organization__created_by__email', 'created_by__email')
+
+
 admin.site.register(User, UserAdminShort)
-admin.site.register(Project)
+admin.site.register(Project, ProjectAdmin)
 admin.site.register(MLBackend)
 admin.site.register(MLBackendTrainJob)
 admin.site.register(Task)
 admin.site.register(Annotation)
 admin.site.register(Prediction)
-admin.site.register(Organization)
+admin.site.register(Organization, OrganizationAdmin)
 admin.site.register(OrganizationMember, OrganizationMemberAdmin)
 admin.site.register(AsyncMigrationStatus, AsyncMigrationStatusAdmin)
 
