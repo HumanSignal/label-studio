@@ -58,6 +58,51 @@ export function canInsertPointOnSegment(state: ShiftInsertGateState): boolean {
   return true;
 }
 
+export interface ResolveActivePointIdState {
+  /** The activePointId KonvaVector currently holds (the ghost-line origin) */
+  currentActivePointId: string | null;
+  /** The current point list (only `id` is needed for this decision) */
+  points: { id: string }[];
+  /** Whether skeleton mode is enabled (drawing can branch from any point) */
+  skeletonEnabled: boolean;
+  /** The id of the last point the previous time this ran (to detect appends) */
+  previousLastPointId: string | null;
+}
+
+/**
+ * Decide which point the drawing "pointing line" (GhostLine) should originate
+ * from when KonvaVector's init effect re-runs on a point-count change.
+ *
+ * FIT-1924: Video Vectors append vertices through the MobX store rather than
+ * KonvaVector's internal point-creation manager (disableInternalPointAddition),
+ * so nothing advances activePointId and it stays pinned to the FIRST point —
+ * the pointing line then always draws from the first point instead of the last.
+ *
+ * Rules:
+ * - No points → null.
+ * - Active point missing/stale → fall back to the last point.
+ * - Non-skeleton mode + a new point was appended at the end (last id changed)
+ *   → advance to the last point so the line follows the most recent point.
+ * - Otherwise keep the current active point (preserves skeleton mode and the
+ *   internal image-vector flow, where the creation manager already advanced it,
+ *   and mid-segment inserts that don't change the last point).
+ */
+export function resolveActivePointId(state: ResolveActivePointIdState): string | null {
+  const { currentActivePointId, points, skeletonEnabled, previousLastPointId } = state;
+
+  if (points.length === 0) return null;
+
+  const lastPointId = points[points.length - 1].id;
+  const activeIsValid = currentActivePointId !== null && points.some((p) => p.id === currentActivePointId);
+
+  if (!activeIsValid) return lastPointId;
+
+  const lastPointChanged = lastPointId !== previousLastPointId;
+  if (!skeletonEnabled && lastPointChanged) return lastPointId;
+
+  return currentActivePointId;
+}
+
 export interface AddPointOptions {
   x: number;
   y: number;

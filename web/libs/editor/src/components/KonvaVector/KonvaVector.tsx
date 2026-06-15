@@ -18,7 +18,11 @@ import {
   handlePointSelection,
 } from "./eventHandlers/pointSelection";
 import { handlePointSelectionFromIndex } from "./eventHandlers/mouseHandlers";
-import { canInsertPointOnSegment, handleShiftClickPointConversion } from "./eventHandlers/drawing";
+import {
+  canInsertPointOnSegment,
+  handleShiftClickPointConversion,
+  resolveActivePointId,
+} from "./eventHandlers/drawing";
 import { deletePoint } from "./pointManagement";
 import type { BezierPoint, GhostPoint as GhostPointType, KonvaVectorProps, KonvaVectorRef } from "./types";
 import { ShapeType, ExportFormat, PathType } from "./types";
@@ -377,18 +381,33 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
     }
   }, [rawInitialPoints, arePointsEqual]);
 
+  // Tracks the last point's id between runs of the init effect so we can detect
+  // when a new point was appended at the end (vs. a mid-segment insert) — see FIT-1924.
+  const prevLastPointIdRef = useRef<string | null>(null);
+
   // Initialize lastAddedPointId and activePointId when component loads with existing points
   useEffect(() => {
     if (initialPoints.length > 0) {
       const lastPoint = initialPoints[initialPoints.length - 1];
       setLastAddedPointId(lastPoint.id);
-      // Set activePointId to last point only if it's not already set to a valid point
-      // This prevents overriding activePointId when a new point is created (which sets it immediately)
-      // In skeleton mode: allows drawing from any point
-      // In non-skeleton mode: allows drawing from last point (can be changed by selecting first point)
-      if (!activePointId || !initialPoints.find((p) => p.id === activePointId)) {
-        setActivePointId(lastPoint.id);
+      // Decide which point the ghost (pointing) line should draw from. In non-skeleton
+      // mode the active point must follow the most-recently appended point. This matters
+      // when points are added externally (e.g. VideoVector commits to the MobX store and
+      // sets disableInternalPointAddition, so KonvaVector's internal creation manager —
+      // which normally advances activePointId — never runs). Without this the pointing
+      // line stays pinned to the first point (FIT-1924).
+      const resolved = resolveActivePointId({
+        currentActivePointId: activePointId,
+        points: initialPoints,
+        skeletonEnabled: Boolean(skeletonEnabled),
+        previousLastPointId: prevLastPointIdRef.current,
+      });
+      prevLastPointIdRef.current = lastPoint.id;
+      if (resolved && resolved !== activePointId) {
+        setActivePointId(resolved);
       }
+    } else {
+      prevLastPointIdRef.current = null;
     }
   }, [initialPoints.length, skeletonEnabled]); // Only run when the number of points changes or skeleton mode changes
 

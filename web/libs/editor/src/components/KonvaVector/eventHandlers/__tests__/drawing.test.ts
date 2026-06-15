@@ -7,7 +7,7 @@
  * opts in via allowShiftPointInsertWhenUnselected, while image vectors (which do
  * not opt in) keep requiring selection.
  */
-import { canInsertPointOnSegment } from "../drawing";
+import { canInsertPointOnSegment, resolveActivePointId } from "../drawing";
 
 const baseState = {
   shiftKey: true,
@@ -76,5 +76,89 @@ describe("canInsertPointOnSegment", () => {
   it("blocks insertion once maxPoints is reached", () => {
     expect(canInsertPointOnSegment({ ...baseState, pointCount: 14, maxPoints: 14 })).toBe(false);
     expect(canInsertPointOnSegment({ ...baseState, pointCount: 13, maxPoints: 14 })).toBe(true);
+  });
+});
+
+/**
+ * resolveActivePointId decides which point the drawing "pointing line" (GhostLine)
+ * originates from when KonvaVector's init effect re-runs on a point-count change.
+ *
+ * FIT-1924: Video Vectors append vertices through the MobX store (not KonvaVector's
+ * internal point-creation manager), so activePointId is never advanced and the
+ * pointing line stays pinned to the FIRST point. In non-skeleton mode the active
+ * point must follow the most-recently appended (last) point. Skeleton mode and the
+ * internal image-vector flow must keep their existing behavior.
+ */
+const p = (id: string) => ({ id });
+
+describe("resolveActivePointId", () => {
+  it("returns null when there are no points", () => {
+    expect(
+      resolveActivePointId({
+        currentActivePointId: null,
+        points: [],
+        skeletonEnabled: false,
+        previousLastPointId: null,
+      }),
+    ).toBeNull();
+  });
+
+  it("falls back to the last point on fresh init (no active point yet)", () => {
+    expect(
+      resolveActivePointId({
+        currentActivePointId: null,
+        points: [p("a"), p("b"), p("c")],
+        skeletonEnabled: false,
+        previousLastPointId: null,
+      }),
+    ).toBe("c");
+  });
+
+  it("falls back to the last point when the active point is stale (missing)", () => {
+    expect(
+      resolveActivePointId({
+        currentActivePointId: "gone",
+        points: [p("a"), p("b")],
+        skeletonEnabled: false,
+        previousLastPointId: "a",
+      }),
+    ).toBe("b");
+  });
+
+  it("advances to the newly appended last point in non-skeleton mode (FIT-1924)", () => {
+    // Active point is pinned to the first point ("a") and is still valid, but a new
+    // point ("b") was appended at the end — the pointing line must follow it.
+    expect(
+      resolveActivePointId({
+        currentActivePointId: "a",
+        points: [p("a"), p("b")],
+        skeletonEnabled: false,
+        previousLastPointId: "a",
+      }),
+    ).toBe("b");
+  });
+
+  it("keeps the current active point when the last point is unchanged (mid-segment insert)", () => {
+    // A vertex was inserted in the middle: the array grew but the last point id is
+    // the same, so the active point must not jump.
+    expect(
+      resolveActivePointId({
+        currentActivePointId: "a",
+        points: [p("a"), p("mid"), p("b")],
+        skeletonEnabled: false,
+        previousLastPointId: "b",
+      }),
+    ).toBe("a");
+  });
+
+  it("keeps a valid active point in skeleton mode even when the last point changed", () => {
+    expect(
+      resolveActivePointId({
+        currentActivePointId: "a",
+        points: [p("a"), p("b")],
+        skeletonEnabled: true,
+        previousLastPointId: "a",
+      }),
+    ).toBe("a");
   });
 });
