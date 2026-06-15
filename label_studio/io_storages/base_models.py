@@ -603,6 +603,13 @@ class ImportStorage(Storage):
                         annotation.pop('completed_by', None)
 
             for annotation in annotations:
+                # Storage sync must accept JSON exported by Label Studio. Manual import
+                # ignores export identity fields; reusing exported unique_id violates the
+                # DB unique constraint. Map export id -> import_id for parity with bulk import.
+                annotation.pop('unique_id', None)
+                export_id = annotation.pop('id', None)
+                if export_id is not None and annotation.get('import_id') is None:
+                    annotation['import_id'] = export_id
                 annotation['task'] = task.id
                 annotation['project'] = project.id
             annotation_ser = AnnotationSerializer(data=annotations, many=True)
