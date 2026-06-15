@@ -1,7 +1,7 @@
 ---
 title: Skills overview
 short: Overview
-tier: all
+tier: enterprise
 type: skills
 order: 1
 meta_title: Label Studio agent skills

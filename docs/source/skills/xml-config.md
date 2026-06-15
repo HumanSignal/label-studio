@@ -1,7 +1,7 @@
 ---
 title: create-xml-labeling-config-skill
 short: XML labeling config
-tier: all
+tier: enterprise
 type: skills
 order: 2
 meta_title: Create a Label Studio labeling config from your AI coding agent
