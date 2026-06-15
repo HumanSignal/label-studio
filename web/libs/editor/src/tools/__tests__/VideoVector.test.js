@@ -32,6 +32,11 @@ const MockRegion = types
     finished: types.optional(types.boolean, false),
     sequence: types.frozen([]),
   })
+  // Records points appended via addVertexAtCanvasPoint so tests can assert that
+  // a click actually produced a vertex (BROS-1408).
+  .volatile(() => ({
+    appendedPoints: [],
+  }))
   .views((self) => ({
     get closed() {
       return self.closedFlag;
@@ -50,6 +55,10 @@ const MockRegion = types
     startPoint() {},
     commitPoint() {},
     deleteRegion() {},
+    addVertexAtCanvasPoint(x, y) {
+      self.appendedPoints.push({ x, y });
+      return true;
+    },
   }));
 
 // Compose the real tool with an env-backed annotation getter so we can drive it
@@ -167,6 +176,58 @@ describe("VideoVector tool", () => {
 
       expect(obj.addVideoVectorRegion).toHaveBeenCalledTimes(1);
       expect(tool.currentArea).toBe(region1);
+    });
+  });
+
+  describe("each click produces a vertex (BROS-1408)", () => {
+    // The point is committed inside a setTimeout in mouseupEv; flush the macro
+    // task queue so the assertion runs after it fires.
+    const flush = () => new Promise((resolve) => setTimeout(resolve, 0));
+
+    it("adds a vertex even when the cursor moves more than 5px between mousedown and mouseup", async () => {
+      const { tool } = createTool();
+
+      tool.mousedownEv({ button: 0 }, [10, 10]);
+      const region = tool.currentArea;
+      expect(region).not.toBeNull();
+
+      // Fast click: the cursor is still in motion, so mouseup lands well beyond
+      // 5px from mousedown. The point must still be created — previously this
+      // delta silently dropped the click.
+      tool.mouseupEv({}, [40, 60]);
+      await flush();
+
+      expect(region.appendedPoints).toEqual([{ x: 40, y: 60 }]);
+    });
+
+    it("adds a vertex on a clean (no-movement) click", async () => {
+      const { tool } = createTool();
+
+      tool.mousedownEv({ button: 0 }, [10, 10]);
+      const region = tool.currentArea;
+
+      tool.mouseupEv({}, [11, 11]);
+      await flush();
+
+      expect(region.appendedPoints).toEqual([{ x: 11, y: 11 }]);
+    });
+
+    it("does not append a vertex for a shift+click (handled by KonvaVector)", async () => {
+      const { tool } = createTool();
+
+      // A normal click adds the first vertex.
+      tool.mousedownEv({ button: 0 }, [10, 10]);
+      const region = tool.currentArea;
+      tool.mouseupEv({}, [10, 10]);
+      await flush();
+      expect(region.appendedPoints).toHaveLength(1);
+
+      // Shift+click is handled by KonvaVector (ghost-point insertion): mousedown
+      // returns early without arming `down`, so the mouseup must not append.
+      tool.mousedownEv({ button: 0, shiftKey: true }, [20, 20]);
+      tool.mouseupEv({ shiftKey: true }, [20, 20]);
+      await flush();
+      expect(region.appendedPoints).toHaveLength(1);
     });
   });
 });
