@@ -100,6 +100,9 @@ export function acceptInteractiveMask(control: any, binding: InteractiveBinding,
   // (BROS-1221 — a non-closable vector is the boundary left open, never a
   // medial-axis skeleton).
   const closed = control.closable === true;
+  // Respect the control's `maxPoints` cap (VideoVector / VideoVectorLabels) so
+  // accepted SAM2 vectors don't exceed the configured budget (BROS-1222).
+  const maxPoints = control.maxpoints ? Number(control.maxpoints) : null;
   const shapeData = maskToLargestShape(
     maskData,
     maskWidth,
@@ -107,6 +110,7 @@ export function acceptInteractiveMask(control: any, binding: InteractiveBinding,
     control.interactiveTraceResolution,
     control.interactiveSmoothing,
     closed,
+    maxPoints,
   );
   if (!shapeData) {
     control.clearInteractiveMask();

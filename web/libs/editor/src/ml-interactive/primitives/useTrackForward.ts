@@ -121,7 +121,11 @@ export function useInteractiveTrack(
       // Boundary contour; `closable` controls closed polygon vs open path
       // (BROS-1221). Keep this in sync with `acceptInteractiveMask`.
       const closed = item.selectedControl?.closable === true;
-      return maskToLargestShape(data, width, height, item.traceResolution, item.smoothing, closed);
+      // Cap every tracked keyframe to the control's `maxPoints` budget so
+      // tracked SAM2 vectors respect the config the same way Accept does
+      // (BROS-1222).
+      const maxPoints = item.selectedControl?.maxpoints ? Number(item.selectedControl.maxpoints) : null;
+      return maskToLargestShape(data, width, height, item.traceResolution, item.smoothing, closed, maxPoints);
     };
 
     // ── Create the region on the FIRST frame ──

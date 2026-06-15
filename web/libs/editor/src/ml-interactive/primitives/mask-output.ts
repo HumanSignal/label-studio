@@ -64,7 +64,55 @@ export function maskToShapes(
 }
 
 /**
+ * Evenly downsample a contour's vertices to at most `maxPoints`, rebuilding
+ * the `prevPointId` linked-list chain so the result is a valid polyline.
+ *
+ * SAM2 traces emit one vertex per contour step (often hundreds), ignoring the
+ * `maxPoints` cap declared by VideoVector / VideoVectorLabels. Manual drawing
+ * enforces that cap in KonvaVector, but the Accept / track paths bypass it
+ * entirely (BROS-1222). This brings them back in line by sampling the contour
+ * down to the configured budget.
+ *
+ * Open lines (skeletons) keep their first and last vertex; closed contours are
+ * sampled evenly around the loop. No-op when `maxPoints` is unset or the input
+ * already fits.
+ */
+export function resampleVerticesToMax<T extends { id: string; prevPointId: string | null }>(
+  vertices: T[],
+  maxPoints: number | null | undefined,
+  closed: boolean,
+): T[] {
+  if (!maxPoints || maxPoints <= 0) return vertices;
+  const n = vertices.length;
+  if (n <= maxPoints) return vertices;
+
+  const indices: number[] = [];
+  if (maxPoints === 1) {
+    indices.push(0);
+  } else if (closed) {
+    // Evenly spaced around the loop; no duplicated wrap-around vertex.
+    const step = n / maxPoints;
+    for (let i = 0; i < maxPoints; i++) indices.push(Math.round(i * step) % n);
+  } else {
+    // Keep both endpoints of an open polyline.
+    for (let i = 0; i < maxPoints; i++) indices.push(Math.round((i * (n - 1)) / (maxPoints - 1)));
+  }
+
+  // Guard against rounding collisions producing duplicate indices.
+  const unique = Array.from(new Set(indices)).sort((a, b) => a - b);
+
+  return unique.map((srcIdx, i) => ({
+    ...vertices[srcIdx],
+    prevPointId: i === 0 ? null : vertices[unique[i - 1]].id,
+  }));
+}
+
+/**
  * Returns shape data for the single largest contour (by vertex count).
+ *
+ * When `maxPoints` is provided, the chosen contour is downsampled to that
+ * budget (after the largest-contour pick, so selection still uses the original
+ * vertex counts).
  */
 export function maskToLargestShape(
   maskData: Uint8Array,
@@ -73,10 +121,12 @@ export function maskToLargestShape(
   traceResolution: number,
   smoothing: number,
   closed: boolean,
+  maxPoints?: number | null,
 ): { vertices: any[]; closed: boolean } | null {
   const shapes = maskToShapes(maskData, maskWidth, maskHeight, traceResolution, smoothing, closed);
   if (shapes.length === 0) return null;
-  return shapes.reduce((best, s) => (s.vertices.length > best.vertices.length ? s : best));
+  const best = shapes.reduce((acc, s) => (s.vertices.length > acc.vertices.length ? s : acc));
+  return { ...best, vertices: resampleVerticesToMax(best.vertices, maxPoints, best.closed) };
 }
 
 /**
