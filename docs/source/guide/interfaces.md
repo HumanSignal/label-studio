@@ -21,7 +21,7 @@ Instead of choosing a template and tuning [out-of-the-box XML tags](/tags), with
 Interfaces are Label Studio's most powerful UI builder. Use them when:
 
 * [Label Studio's XML tags](/tags) don't support your use case. For example, if you want to annotate data types that do not have a corresponding object tag (3D files, GEOTiff, DICOM, etc). 
-* When you want to be able to vibe code your labeling UI either within Label Studio or using your own tools and agent outside of Label Studio. 
+* When you want to be able to vibe code your labeling UI either within Label Studio or using your own tools and agent outside of Label Studio. To work with a coding agent like Claude Code, Codex, or Cursor, install the [`create-interface-skill`](/skills/interface.html) — or see the full [agent skills overview](/skills/).
 * When you need to be able to version your labeling UIs. 
 * When you need more custom logic. 
 

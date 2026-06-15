@@ -44,7 +44,7 @@ To begin, select **Interfaces** in the main menu and then select **Create Interf
 
 ## 2. Install the create-interface skill
 
-Install the `create-interface-skill` for your local coding agent. The skill includes the commands and conventions for working with Interfaces locally so your agent can author a valid Interface module.
+Install the [`create-interface-skill`](/skills/interface.html) for your local coding agent. The skill includes the commands and conventions for working with Interfaces locally so your agent can author a valid Interface module.
 
 In the **Develop Locally** modal, choose your agent and copy the install command:
 
