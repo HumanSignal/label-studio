@@ -779,7 +779,8 @@ export function createMouseUpHandler(props: EventHandlerProps) {
     if (props.draggedPointIndex !== null && !props.isDragging.current) {
       // Check if this point click should trigger path closing instead of selection
       const pointIndex = props.draggedPointIndex;
-      const shouldClose = shouldClosePathOnPointClick(pointIndex, props, e) && isActivePointEligibleForClosing(props);
+      const shouldClose =
+        shouldClosePathOnPointClick(pointIndex, props, e) && isActivePointEligibleForClosing(props, pointIndex);
 
       if (shouldClose) {
         // Try to close the path instead of selecting the point
