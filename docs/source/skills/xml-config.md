@@ -144,7 +144,7 @@ A note on updates: if the existing project already has annotations, Label Studio
 ## What this skill does NOT do
 
 - **Import your data.** The skill pushes the labeling configuration only. After you have the project URL, import tasks via Data Manager, the [Label Studio SDK](https://labelstud.io/sdk/) (`ls.projects.import_tasks(...)`), or **Project Settings → Cloud Storage**.
-- **Generate custom React interfaces.** That's 🔒 [`create-interface-skill`](https://github.com/HumanSignal/create-interface-skill)'s job (Label Studio Enterprise only). If your ask mentions ReactCode or a custom interface, this skill hands off to that one.
+- **Generate custom React interfaces.** That's 🔒 [`create-interface-skill`](/skills/interface.html)'s job (Label Studio Enterprise only). If your ask mentions ReactCode or a custom interface, this skill hands off to that one.
 - **Sync changes back from Label Studio.** The flow is one-way: skill → Label Studio. If you tweak the config in the Label Studio UI after pushing, the skill won't pull those changes back.
 
 ## Troubleshooting

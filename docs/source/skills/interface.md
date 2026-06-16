@@ -1,14 +1,17 @@
 ---
 title: create-interface-skill 🔒
 short: Interface builder 🔒
-tier: enterprise
+tier: all
 type: skills
 order: 3
 meta_title: Create a Label Studio Enterprise Interface from your AI coding agent
 meta_description: The create-interface-skill generates a HumanSignal Interface — a single-file JSX annotation screen — from a plain-English description, validates it locally, and is ready to paste into the Interfaces editor or sync via the Label Studio SDK CLI.
 ---
 
-`create-interface-skill` is an agent skill that generates a [HumanSignal Interface](/guide/interfaces.html): a single-file JSX annotation screen for Label Studio Enterprise. The output is one `.jsx` source file whose final expression is a parenthesized object literal exporting a `default` React component plus the optional `paramsSchema`, `outputSchema`, `getResults`, and `parseResults` hooks the Interfaces runtime expects.
+`create-interface-skill` is an agent skill that generates a [HumanSignal Interface](https://docs.humansignal.com/guide/interfaces.html): a single-file JSX annotation screen for Label Studio Enterprise. The output is one `.jsx` source file whose final expression is a parenthesized object literal exporting a `default` React component plus the optional `paramsSchema`, `outputSchema`, `getResults`, and `parseResults` hooks the Interfaces runtime expects.
+
+!!! note
+    Interfaces are a Label Studio Enterprise feature. This skill page is visible on the open-source docs so OSS readers can learn what the skill does, but the generated Interface itself only runs on a Label Studio Enterprise instance.
 
 Use this skill when you want an agent to create or iterate on a labeling UI: text classification, NER/span labeling, Document AI workflows, data review screens, or conversions from a React or Claude Design prototype into the Interface format.
 
