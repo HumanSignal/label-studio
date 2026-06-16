@@ -77,14 +77,21 @@ export const formatFileSize = (bytes: number): string => {
  *   322   -> "5m 22s"
  *   45    -> "45s"
  *   3600  -> "1h"
+ *   0.851 -> "<1s"
  *   0     -> ""
  */
 export const formatTime = (totalSeconds: number): string => {
-  const seconds = Math.floor(totalSeconds);
-
-  if (seconds <= 0) {
+  if (!Number.isFinite(totalSeconds) || totalSeconds <= 0) {
     return "";
   }
+
+  // Sub-second durations are real values but floor to 0 seconds; render "<1s"
+  // instead of an empty string so they don't show as a blank "—" (FIT-1670).
+  if (totalSeconds < 1) {
+    return "<1s";
+  }
+
+  const seconds = Math.floor(totalSeconds);
 
   const hours = Math.floor(seconds / 3600);
   const minutes = Math.floor((seconds % 3600) / 60);
