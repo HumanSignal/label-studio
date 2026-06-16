@@ -40,7 +40,7 @@ Before you begin, make sure you have:
 To begin, select **Interfaces** in the main menu and then select **Create Interface > Develop Locally**. 
 
 !!! info Tip
-    To iterate on an Interface that already exists in Label Studio, open the Interface details page and click **Develop Locally** in the top bar. The dialog respects the version currently selected in the [version navigator](interface-details#Versions).
+    To iterate on an Interface that already exists in Label Studio, open the Interface details page and click **Develop Locally** in the top bar. The dialog respects the version currently selected in the [version navigator](interfaces-details#Versions).
 
 ## 2. Install the create-interface skill
 
@@ -79,7 +79,7 @@ label-studio-sdk interface preview .
 
 #### Start from an existing Interface
 
-To iterate on an Interface that already exists in Label Studio, open the Interface details page and click **Develop Locally** in the top bar. The dialog respects the version currently selected in the [version navigator](interface-details#Versions).
+To iterate on an Interface that already exists in Label Studio, open the Interface details page and click **Develop Locally** in the top bar. The dialog respects the version currently selected in the [version navigator](interfaces-details#Versions).
 
 Alternatively, you can use:
     
