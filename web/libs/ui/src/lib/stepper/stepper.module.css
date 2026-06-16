@@ -85,7 +85,7 @@
 
 .stepLayoutCompact {
   flex-direction: row;
-  align-items: flex-start;
+  align-items: center;
   gap: var(--spacing-tight);
   padding: var(--spacing-tight);
   text-align: left;

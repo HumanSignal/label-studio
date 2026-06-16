@@ -153,7 +153,7 @@ export function Stepper({
           "m-0 flex list-none p-0 relative",
           isStacked
             ? cnm("flex-col items-stretch", styles.stepperListStacked)
-            : "flex-row flex-wrap items-start justify-center w-full",
+            : cnm("flex-row flex-wrap justify-center w-full", isHorizontalCompact ? "items-center" : "items-start"),
         )}
       >
         {steps.map((step, index) => {
