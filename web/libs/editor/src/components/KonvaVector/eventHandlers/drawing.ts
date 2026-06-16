@@ -63,7 +63,11 @@ export interface ResolveActivePointIdState {
   currentActivePointId: string | null;
   /** The current point list (only `id` is needed for this decision) */
   points: { id: string }[];
-  /** Whether skeleton mode is enabled (drawing can branch from any point) */
+  /**
+   * Whether skeleton mode is enabled. Retained for caller compatibility, but the
+   * decision no longer branches on it: an append at the end advances the active
+   * point in both modes (BROS-1410).
+   */
   skeletonEnabled: boolean;
   /** The id of the last point the previous time this ran (to detect appends) */
   previousLastPointId: string | null;
@@ -81,14 +85,18 @@ export interface ResolveActivePointIdState {
  * Rules:
  * - No points → null.
  * - Active point missing/stale → fall back to the last point.
- * - Non-skeleton mode + a new point was appended at the end (last id changed)
- *   → advance to the last point so the line follows the most recent point.
- * - Otherwise keep the current active point (preserves skeleton mode and the
- *   internal image-vector flow, where the creation manager already advanced it,
- *   and mid-segment inserts that don't change the last point).
+ * - A new point was appended at the end (last id changed) → advance to the last
+ *   point so the line follows the most recent point. This applies in both
+ *   non-skeleton and skeleton modes: skeleton Video Vectors append through the
+ *   same externally-managed store, and the region geometry continues from the
+ *   last point, so the pointing line must too (BROS-1410). The internal
+ *   image-vector flow is unaffected — its creation manager already advances
+ *   activePointId to the new last point, so this is a no-op there.
+ * - Otherwise keep the current active point (mid-segment inserts that don't
+ *   change the last point).
  */
 export function resolveActivePointId(state: ResolveActivePointIdState): string | null {
-  const { currentActivePointId, points, skeletonEnabled, previousLastPointId } = state;
+  const { currentActivePointId, points, previousLastPointId } = state;
 
   if (points.length === 0) return null;
 
@@ -98,7 +106,7 @@ export function resolveActivePointId(state: ResolveActivePointIdState): string |
   if (!activeIsValid) return lastPointId;
 
   const lastPointChanged = lastPointId !== previousLastPointId;
-  if (!skeletonEnabled && lastPointChanged) return lastPointId;
+  if (lastPointChanged) return lastPointId;
 
   return currentActivePointId;
 }

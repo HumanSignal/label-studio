@@ -390,12 +390,12 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
     if (initialPoints.length > 0) {
       const lastPoint = initialPoints[initialPoints.length - 1];
       setLastAddedPointId(lastPoint.id);
-      // Decide which point the ghost (pointing) line should draw from. In non-skeleton
-      // mode the active point must follow the most-recently appended point. This matters
-      // when points are added externally (e.g. VideoVector commits to the MobX store and
-      // sets disableInternalPointAddition, so KonvaVector's internal creation manager —
-      // which normally advances activePointId — never runs). Without this the pointing
-      // line stays pinned to the first point (FIT-1924).
+      // Decide which point the ghost (pointing) line should draw from. The active point
+      // must follow the most-recently appended point in both non-skeleton and skeleton
+      // modes (BROS-1410). This matters when points are added externally (e.g. VideoVector
+      // commits to the MobX store and sets disableInternalPointAddition, so KonvaVector's
+      // internal creation manager — which normally advances activePointId — never runs).
+      // Without this the pointing line stays pinned to the first point (FIT-1924).
       const resolved = resolveActivePointId({
         currentActivePointId: activePointId,
         points: initialPoints,

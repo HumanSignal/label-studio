@@ -85,9 +85,10 @@ describe("canInsertPointOnSegment", () => {
  *
  * FIT-1924: Video Vectors append vertices through the MobX store (not KonvaVector's
  * internal point-creation manager), so activePointId is never advanced and the
- * pointing line stays pinned to the FIRST point. In non-skeleton mode the active
- * point must follow the most-recently appended (last) point. Skeleton mode and the
- * internal image-vector flow must keep their existing behavior.
+ * pointing line stays pinned to the FIRST point. The active point must follow the
+ * most-recently appended (last) point in both non-skeleton and skeleton modes
+ * (BROS-1410). Only mid-segment inserts (last point unchanged) keep the current
+ * active point.
  */
 const p = (id: string) => ({ id });
 
@@ -151,13 +152,30 @@ describe("resolveActivePointId", () => {
     ).toBe("a");
   });
 
-  it("keeps a valid active point in skeleton mode even when the last point changed", () => {
+  it("advances to the newly appended last point in skeleton mode (BROS-1410)", () => {
+    // Skeleton Video Vectors also append through the MobX store, so the active point
+    // (pinned to the first point "a") must follow the most-recently appended point "b"
+    // instead of staying on the first point — matching the region geometry, which
+    // continues from the last point.
     expect(
       resolveActivePointId({
         currentActivePointId: "a",
         points: [p("a"), p("b")],
         skeletonEnabled: true,
         previousLastPointId: "a",
+      }),
+    ).toBe("b");
+  });
+
+  it("keeps the current active point on a mid-segment insert in skeleton mode (BROS-1410)", () => {
+    // The array grew but the last point id is unchanged (insert in the middle), so the
+    // active point must not jump even in skeleton mode.
+    expect(
+      resolveActivePointId({
+        currentActivePointId: "a",
+        points: [p("a"), p("mid"), p("b")],
+        skeletonEnabled: true,
+        previousLastPointId: "b",
       }),
     ).toBe("a");
   });
