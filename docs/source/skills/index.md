@@ -10,20 +10,20 @@ meta_description: Use HumanSignal agent skills to set up labeling projects and c
 
 HumanSignal publishes a small set of **agent skills** that let you set up and iterate on Label Studio projects from inside an AI coding agent (Claude Code, Codex, Cursor, and other agents supported by the `skills` CLI). Each skill is a self-contained package: a workflow prompt, baked-in reference material, and small Python helper scripts that talk to your Label Studio instance over its public API.
 
-> ✨ marks a skill that is for **Label Studio Enterprise** only.
+Skills with the lock emoji 🔒 next to their name are only available for Label Studio Enterprise users.
 
 Two skills are currently published:
 
 | Skill | What it does | Tier |
 |---|---|---|
 | [`create-xml-labeling-config-skill`](/skills/xml-config.html) | Drafts a Label Studio XML labeling configuration from a plain-English task description, validates it locally and against your running Label Studio instance, and (after explicit approval) pushes it as a new project or as an update to an existing one. | OSS + Enterprise |
-| ✨ [`create-interface-skill`](https://github.com/HumanSignal/create-interface-skill) | Generates a HumanSignal Interface — a single-file JSX annotation screen for Label Studio Enterprise — exporting `paramsSchema` / `outputSchema` / `getResults` / `parseResults` and the parenthesized-object-literal trailer the runtime requires. | Enterprise |
+| 🔒 [`create-interface-skill`](https://github.com/HumanSignal/create-interface-skill) | Generates a HumanSignal Interface — a single-file JSX annotation screen for Label Studio Enterprise — exporting `paramsSchema` / `outputSchema` / `getResults` / `parseResults` and the parenthesized-object-literal trailer the runtime requires. | Enterprise |
 
 ## When to use which
 
 - **You want a standard labeling project** — text classification, NER/span labeling, image bounding boxes, audio transcription, taxonomy review, ranking, pairwise comparison, time-series segmentation. Use [`create-xml-labeling-config-skill`](/skills/xml-config.html). It writes an XML config using Label Studio's built-in tags, which is the right runtime for the vast majority of projects.
 
-- **You need a custom React-based UI** — the built-in tags don't cover your case, you're working with data types that don't have a standard object tag (3D, GEOTiff, DICOM), or you want to vibe-code your labeling screen. Use ✨ [`create-interface-skill`](https://github.com/HumanSignal/create-interface-skill). The output is a single JSX file you can paste into the Label Studio Enterprise Interfaces editor or sync with the [`label-studio-sdk` CLI](https://github.com/HumanSignal/label-studio-sdk).
+- **You need a custom React-based UI** — the built-in tags don't cover your case, you're working with data types that don't have a standard object tag (3D, GEOTiff, DICOM), or you want to vibe-code your labeling screen. Use 🔒 [`create-interface-skill`](https://github.com/HumanSignal/create-interface-skill). The output is a single JSX file you can paste into the Label Studio Enterprise Interfaces editor or sync with the [`label-studio-sdk` CLI](https://github.com/HumanSignal/label-studio-sdk).
 
 If you're not sure which to start with, start with the XML config skill. It's the lighter-weight path and works on every Label Studio install.
 

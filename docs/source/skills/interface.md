@@ -1,6 +1,6 @@
 ---
-title: create-interface-skill
-short: Interface builder
+title: create-interface-skill 🔒
+short: Interface builder 🔒
 tier: enterprise
 type: skills
 order: 3
