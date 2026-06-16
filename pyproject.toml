@@ -23,7 +23,7 @@ dependencies = [
     "boto3 (>=1.28.58,<2.0.0)",
     "botocore (>=1.39.3,<2.0.0)",
     "bleach (>=5.0.0,<5.1.0)",
-    "cryptography (>=44.0.1)",
+    "cryptography (>=48.0.1)",
     "Django (>=5.1.8,<5.2.0)",
     "django-storages (==1.12.3)",
     "django-annoying (==0.10.6)",
