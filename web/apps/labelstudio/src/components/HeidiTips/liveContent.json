@@ -214,7 +214,7 @@
   "authPage": [
     {
       "title": "Vibe code any interface!",
-      "description": "You can use Label Studio's agent or SDK to build any UI for labeling and evaluation. Explore examples",
+      "description": "You can use Label Studio's agent or SDK to build any UI for labeling and evaluation.",
       "link": {
         "label": "Explore examples",
         "url": "https://docs.humansignal.com/templates/gallery_interfaces",
@@ -226,7 +226,7 @@
     },
     {
       "title": "Need help with data creation?",
-      "description": "HumanSignal's data operations experts can create highly-specialized data and add extra capacity to your AI projects. Learn more",
+      "description": "HumanSignal's data operations experts can create highly-specialized data and add extra capacity to your AI projects.",
       "link": {
         "label": "Learn more",
         "url": "https://humansignal.com/data-services/",
