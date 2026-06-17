@@ -121,6 +121,25 @@ if DOMAIN_FROM_REQUEST:
     if HOSTNAME and not HOSTNAME.startswith('/'):
         raise ImproperlyConfigured('LABEL_STUDIO_HOST must be a subpath if DOMAIN_FROM_REQUEST is True')
 
+
+def _get_secure_proxy_ssl_header():
+    value = get_env('SECURE_PROXY_SSL_HEADER')
+    if not value:
+        return None
+
+    parts = [part.strip() for part in value.split(',')]
+    if len(parts) != 2 or not all(parts):
+        raise ImproperlyConfigured(
+            'SECURE_PROXY_SSL_HEADER must be configured as "<header>,<value>", '
+            'for example "HTTP_X_FORWARDED_PROTO,https".'
+        )
+    return tuple(parts)
+
+
+SECURE_PROXY_SSL_HEADER = _get_secure_proxy_ssl_header()
+USE_X_FORWARDED_HOST = get_bool_env('USE_X_FORWARDED_HOST', False)
+USE_X_FORWARDED_PORT = get_bool_env('USE_X_FORWARDED_PORT', False)
+
 INTERNAL_PORT = '8080'
 
 # SECURITY WARNING: don't run with debug turned on in production!
