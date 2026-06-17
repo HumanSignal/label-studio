@@ -29,6 +29,10 @@ FOUND_US_OPTIONS = (
 logger = logging.getLogger(__name__)
 
 
+def normalize_user_email(email):
+    return (email or '').strip().lower()
+
+
 class LoginForm(forms.Form):
     """For logging in to the app and all - session based"""
 
@@ -80,11 +84,11 @@ class UserSignupForm(forms.Form):
         return username
 
     def clean_email(self):
-        email = self.cleaned_data.get('email').lower()
+        email = normalize_user_email(self.cleaned_data.get('email'))
         if len(email) >= EMAIL_MAX_LENGTH:
             raise forms.ValidationError('Email is too long')
 
-        if email and User.objects.filter(email=email).exists():
+        if email and User.objects.filter(email__iexact=email).exists():
             raise forms.ValidationError('User with this email already exists')
 
         return email
@@ -92,7 +96,7 @@ class UserSignupForm(forms.Form):
     def save(self):
         cleaned = self.cleaned_data
         password = cleaned['password']
-        email = cleaned['email'].lower()
+        email = normalize_user_email(cleaned['email'])
         allow_newsletters = None
         how_find_us = None
         if 'allow_newsletters' in cleaned:
