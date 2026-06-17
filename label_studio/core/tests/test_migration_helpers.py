@@ -1,7 +1,7 @@
 from unittest.mock import MagicMock, patch
 
 import pytest
-from core.migration_helpers import execute_sql_job, make_sql_migration
+from core.migration_helpers import execute_sql_job, make_sql_migration, run_migration_job, start_migration_job
 from core.models import AsyncMigrationStatus
 from django.test import TestCase, override_settings
 
@@ -358,3 +358,123 @@ class TestMakeSqlMigration(TestCase):
 
         _, kwargs = mock_start.call_args
         assert kwargs['queue_name'] == 'service'
+
+
+class TestStartMigrationJob(TestCase):
+    """Test start_migration_job delay wrapper."""
+
+    @override_settings(MIGRATION_JOB_START_DELAY_SECONDS=900)
+    @patch('core.migration_helpers.start_job_async_or_sync')
+    def test_applies_default_delay(self, mock_start):
+        """Default in_seconds comes from MIGRATION_JOB_START_DELAY_SECONDS."""
+        job = MagicMock(__name__='my_job')
+
+        start_migration_job(job, 1, queue_name='service')
+
+        args, kwargs = mock_start.call_args
+        assert args == (job, 1)
+        assert kwargs['queue_name'] == 'service'
+        assert kwargs['in_seconds'] == 900
+
+    @override_settings(MIGRATION_JOB_START_DELAY_SECONDS=900)
+    @patch('core.migration_helpers.start_job_async_or_sync')
+    def test_explicit_in_seconds_overrides_default(self, mock_start):
+        """An explicit in_seconds is not overwritten by the default."""
+        job = MagicMock(__name__='my_job')
+
+        start_migration_job(job, in_seconds=0)
+
+        _, kwargs = mock_start.call_args
+        assert kwargs['in_seconds'] == 0
+
+    @override_settings(ALLOW_SCHEDULED_MIGRATIONS=False, MIGRATION_JOB_START_DELAY_SECONDS=900)
+    @patch('core.migration_helpers.start_job_async_or_sync')
+    def test_make_sql_migration_forwards_uses_delay(self, mock_start):
+        """make_sql_migration forwards enqueues the job with the default delay."""
+        forwards, _ = make_sql_migration(
+            'CREATE INDEX test_idx ON test_table (col1);',
+            'DROP INDEX test_idx;',
+            migration_name='test.migrations.test_migration',
+        )
+
+        apps = MagicMock()
+        schema_editor = MagicMock()
+        schema_editor.connection.vendor = 'postgresql'
+
+        forwards(apps, schema_editor)
+
+        _, kwargs = mock_start.call_args
+        assert kwargs['in_seconds'] == 900
+
+    @override_settings(CI=True, ALLOW_SCHEDULED_MIGRATIONS=False)
+    @patch('core.migration_helpers.connection')
+    def test_ci_runs_synchronously_ignoring_delay(self, mock_connection):
+        """In CI the job runs synchronously; the delay must not block execution."""
+        mock_cursor = MagicMock()
+        mock_connection.cursor.return_value.__enter__.return_value = mock_cursor
+        mock_connection.vendor = 'postgresql'
+
+        forwards, _ = make_sql_migration(
+            'CREATE INDEX test_idx ON test_table (col1);',
+            'DROP INDEX test_idx;',
+            migration_name='test.migrations.ci_migration',
+        )
+
+        apps = MagicMock()
+        schema_editor = MagicMock()
+        schema_editor.connection.vendor = 'postgresql'
+
+        forwards(apps, schema_editor)
+
+        # SQL executed inline (sync path), proving the delay didn't defer it.
+        mock_cursor.execute.assert_called_once()
+        migration = AsyncMigrationStatus.objects.get(name='test.migrations.ci_migration')
+        assert migration.status == AsyncMigrationStatus.STATUS_FINISHED
+
+    @override_settings(MIGRATION_JOB_START_DELAY_SECONDS=900)
+    @patch('core.migration_helpers.start_job_async_or_sync')
+    def test_string_job_routes_through_runner(self, mock_start):
+        """A dotted-path string is enqueued as run_migration_job with the string as first arg."""
+        start_migration_job('some.module.func', migration_name='test_mig', queue_name='service')
+
+        args, kwargs = mock_start.call_args
+        assert args == (run_migration_job, 'some.module.func')
+        assert kwargs['migration_name'] == 'test_mig'
+        assert kwargs['queue_name'] == 'service'
+        assert kwargs['in_seconds'] == 900
+
+
+class TestRunMigrationJob(TestCase):
+    """Test run_migration_job dynamic-import runner."""
+
+    def test_imports_and_runs_target(self):
+        """Successful import executes the target with forwarded kwargs."""
+        mock_func = MagicMock()
+
+        with patch('django.utils.module_loading.import_string', return_value=mock_func) as mock_import:
+            run_migration_job('some.module.func', migration_name='test_mig', custom_param='hello')
+
+        mock_import.assert_called_once_with('some.module.func')
+        mock_func.assert_called_once_with(migration_name='test_mig', custom_param='hello')
+
+    @override_settings(MIGRATION_JOB_RESCHEDULE_DELAY_SECONDS=30)
+    @patch('core.migration_helpers.start_job_async_or_sync')
+    def test_import_error_reschedules_preserving_params(self, mock_start):
+        """On import failure it reschedules itself, re-deriving queue/timeout from the RQ job."""
+        mock_job = MagicMock()
+        mock_job.origin = 'service'
+        mock_job.timeout = 1800
+
+        with (
+            patch('django.utils.module_loading.import_string', side_effect=ImportError('not found')),
+            patch('rq.get_current_job', return_value=mock_job),
+        ):
+            run_migration_job('some.missing.func', migration_name='test_mig', custom_param='hello')
+
+        args, kwargs = mock_start.call_args
+        assert args == (run_migration_job, 'some.missing.func')
+        assert kwargs['in_seconds'] == 30
+        assert kwargs['queue_name'] == 'service'
+        assert kwargs['job_timeout'] == 1800
+        assert kwargs['migration_name'] == 'test_mig'
+        assert kwargs['custom_param'] == 'hello'

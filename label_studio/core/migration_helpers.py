@@ -9,6 +9,73 @@ from rq import Retry
 logger = logging.getLogger(__name__)
 
 
+def run_migration_job(target_func_path, *args, **kwargs):
+    """Worker-side runner for migration jobs scheduled by dotted-path string.
+
+    Imports target_func_path dynamically and runs it. Solves two deploy-time problems:
+    1. RQ can't deserialize a direct function reference from a digit-prefixed migration
+       module (e.g. 0005_...); Python doesn't bind such submodules as attributes on their
+       parent package, so RQ's import_attribute raises AttributeError/ValueError. A
+       dotted-path string imported via import_string sidesteps that.
+    2. If the worker hasn't been upgraded yet (import fails), reschedule self after a short
+       delay, preserving queue/timeout from the current RQ job.
+    """
+    from django.utils.module_loading import import_string
+
+    try:
+        func = import_string(target_func_path)
+    except (ImportError, AttributeError) as e:
+        logger.warning(
+            f'Failed to import migration function {target_func_path}; worker codebase '
+            f'may not be updated yet. Rescheduling. Error: {e}'
+        )
+
+        # start_job_async_or_sync consumes queue_name/job_timeout itself, so they are not
+        # forwarded to us. Re-derive them from the current RQ job to preserve enqueue params.
+        queue_name = 'default'
+        job_timeout = None
+        try:
+            import rq
+
+            current_job = rq.get_current_job()
+            if current_job:
+                queue_name = current_job.origin
+                job_timeout = current_job.timeout
+        except Exception as rq_err:
+            logger.debug(f'Failed to read current RQ job: {rq_err}')
+
+        start_job_async_or_sync(
+            run_migration_job,
+            target_func_path,
+            *args,
+            in_seconds=settings.MIGRATION_JOB_RESCHEDULE_DELAY_SECONDS,
+            queue_name=queue_name,
+            job_timeout=job_timeout,
+            **kwargs,
+        )
+        return
+
+    func(*args, **kwargs)
+
+
+def start_migration_job(job, *args, **kwargs):
+    """Enqueue a migration RQ job delayed by MIGRATION_JOB_START_DELAY_SECONDS.
+
+    Use this from data migrations instead of start_job_async_or_sync so the job starts AFTER a
+    rolling deploy finishes (avoids stale workers running it on old code). `in_seconds` can be
+    passed explicitly to override the default; sync/CI execution ignores the delay.
+
+    If `job` is a dotted-path string, it is routed through run_migration_job so the target is
+    imported on the worker by string. Use this form when the job function is defined inside a
+    digit-prefixed migration module (e.g. 0005_...), which RQ cannot deserialize by direct
+    reference.
+    """
+    kwargs.setdefault('in_seconds', settings.MIGRATION_JOB_START_DELAY_SECONDS)
+    if isinstance(job, str):
+        return start_job_async_or_sync(run_migration_job, job, *args, **kwargs)
+    return start_job_async_or_sync(job, *args, **kwargs)
+
+
 def execute_sql_job(*, migration_name: str, sql: str, apply_on_sqlite: bool = False, reverse: bool = False) -> None:
     from core.models import AsyncMigrationStatus
 
@@ -85,7 +152,7 @@ def make_sql_migration(
             job_kwargs = {}
             if queue_name is not None:
                 job_kwargs['queue_name'] = queue_name
-            start_job_async_or_sync(
+            start_migration_job(
                 execute_sql_job,
                 migration_name=mig_key,
                 sql=sql_forwards,

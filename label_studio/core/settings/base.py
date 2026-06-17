@@ -985,3 +985,11 @@ FSM_INITIALIZATION_TRANSITION_NAME = 'fsm.utils._get_initialization_transition_n
 # Used for async migrations. In LSE this is set to a real queue name, including here so we
 # can use settings.SERVICE_QUEUE_NAME in async migrations in LSO
 SERVICE_QUEUE_NAME = get_env('SERVICE_QUEUE_NAME', 'default')
+
+# Delay (seconds) before a migration-scheduled RQ job actually starts. Gives a rolling deploy
+# time to finish so the job runs on NEW workers, not stale ones still alive during the deploy.
+MIGRATION_JOB_START_DELAY_SECONDS = int(get_env('MIGRATION_JOB_START_DELAY_SECONDS', 15 * 60))
+
+# Delay (seconds) before a migration runner retries when the target import fails (stale worker
+# not yet upgraded during a rolling deploy). Short, since this is a fast retry loop.
+MIGRATION_JOB_RESCHEDULE_DELAY_SECONDS = int(get_env('MIGRATION_JOB_RESCHEDULE_DELAY_SECONDS', 30))
