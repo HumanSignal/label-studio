@@ -39,6 +39,12 @@ type AuthState = {
 
 const AuthContext = createContext<AuthState | null>(null);
 
+export const DENY_ALL_PERMISSIONS: AuthPermissions = {
+  can: () => false,
+  canAny: () => false,
+  canAll: () => false,
+};
+
 const makePermissionChecker = (list?: (Ability | string)[]) => {
   const abilities = new Set<string>((list as string[]) ?? []);
   const has = (a: string) => {
@@ -115,6 +121,6 @@ export const useAuth = () => {
     isLoading: ctx?.isLoading ?? false,
     refetch: ctx.refetch,
     update: ctx.update,
-    permissions: ctx.permissions,
+    permissions: ctx?.permissions ?? DENY_ALL_PERMISSIONS,
   };
 };
