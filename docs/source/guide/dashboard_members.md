@@ -6,87 +6,140 @@ type: guide
 order: 0
 order_enterprise: 70
 meta_title: Members dashboard
-meta_description: Use the member dashboard to monitor project annotation quality. 
+meta_description: Use the Members dashboard to monitor annotator and reviewer performance, agreement, and quality metrics within a project.
 section: "Project Management"
 parent: "dashboards"
 parent_enterprise: "dashboards"
-date: 2025-08-05 19:55:41
+date: 2026-06-17 00:00:00
 ---
 
-> Get insight into the productivity, agreement, and performance of members annotating in a project. 
+> Get insight into the performance, agreement, and quality of members working on a project.
 
-While the [Project Dashboard](dashboard_project) provides insight into project task progress and throughput, the Members Dashboard provides more information on annotation agreement and outcome.
+The Members dashboard gives you two views of your project's workforce: a **Performance** tab with separate tables for annotators and reviewers, and an **Agreement Matrix** tab for inter-annotator reliability.
 
-This can be useful in a number of ways: 
+This can be useful in a number of ways:
 
-- **Track annotator performance and agreement**: View key metrics like agreement rate, review score, and performance score to identify which annotators are aligned or need support.
-- **Monitor annotation progress**: See how many annotations are finished, skipped, or reviewed, along with annotation time and progress percentages to manage annotator backlogs.
-- **Identify quality and consistency issues**: Use the agreement matrix and distribution chart to spot disagreements or edge cases that may require further review or clearer guidelines.
+- **Track annotator and reviewer performance**: View key metrics like agreement, acceptance score, performance score, GT agreement, and time spent to identify who is aligned or needs support.
+- **Monitor annotation and review progress**: See how many annotations have been submitted, accepted, rejected, or are still pending review for both annotators and reviewers.
+- **Identify quality and consistency issues**: Use the Agreement Matrix tab to spot disagreements between members, then click into cells to view the specific tasks where they diverged.
 
-For annotator metrics across projects and over time, see the [Annotator Performance Dashboard](dashboard_annotator).
+For member metrics across projects and over time, see the [Member Performance dashboard](dashboard_annotator).
 
 ## Access the dashboard
 
-The dashboard is available from the Members tab inside a project.
+From the project, open the **Dashboard** tab and select **Members** from the dashboard navigation.
 
 ![Screenshot of Members Dashboard](/images/project/project_members_dashboard.png)
 
-## Annotation Summary
+## Filter by participants
 
-The Annotation Summary shows annotation progress and quality metrics for each member in the project. The values reflect current project data, i.e. any changes to annotations or reviews will be updated in the metrics.
+A participant filter is available in the top right of the dashboard. By default it shows **All participants**.
+
+- Click the dropdown to expand it. Annotators are listed under **All Annotators**; if the project has model predictions, model versions appear under **All Model Versions**.
+- Selecting specific participants narrows both the Performance tables and the Agreement Matrix to only those members.
+
+## Performance tab
+
+The dashboard has two top-level tabs: **Performance** and **Agreement Matrix**.
+
+The **Performance** tab has two sub-tabs:
+
+- **Annotations** — metrics for each annotator's submission activity
+- **Reviews** — metrics for each reviewer's review activity
+
+Use the **Export** button on the right of the sub-tab row to download the currently visible table as a CSV.
+
+### Annotation Summary
+
+The **Annotation Summary** table shows annotation metrics for each project member. The table is sortable and includes a totals row at the bottom. Use the **Columns** picker to show or hide columns.
 
 | Column | Description |
 |--------|-------------|
-| **Paused** | Toggle indicating whether the member is currently paused in the project. Learn more about [pausing an annotator](quality.html#Pause-an-annotator). |
-| **Agreement Score** | Average agreement score against other members. Calculated as the average of the member's pairwise agreement scores with other members in the project. <br>Pairwise agreement scores are found in the [Annotator Agreement Matrix](#Annotator_agreement_matrix).|
-| **Finished** | Total number of submitted annotations. Excludes any skipped annotations. Does not consider annotation updates or review outcomes. |
-| **Skipped** | Total number of tasks currently skipped. |
-| **Accepted** | Total number of annotations accepted by reviewers. Only counts annotations with the current review state of 'Accepted'. |
-| **Rejected** | Total number of annotations rejected by reviewers. Only counts annotations with the current review state of 'Rejected'. |
-| **Review Score** | Percentage of reviewed annotations that are currently accepted. Offers two options:<ul><li><strong>Overall</strong>: (total number of accepted annotations) / (total number of reviewed annotations)</li><li><strong>Per-label</strong>: (total number of accepted annotations where label is present) / (total number of reviewed annotations where label is present)</li></ul> |
-| **Performance Score** | Percentage calculation considering overall performance of annotations in terms of review outcome (Accept, Reject, Fix+Accept). A higher score indicates better overall annotation quality. See [Annotator Performance summaries](dashboard_annotator#Performance-summaries) for more detail on the calculation method. Offers two modes:<ul><li><strong>Overall</strong>: considers all reviewed annotations</li><li><strong>Per-label</strong>: considers only reviewed annotations where label is present</li></ul> |
-| **Annotation Progress** | Member's annotation progress, calculated based on the project's [label distribution setting](project_settings_lse.html#Annotation):<ul><li><strong>Auto</strong>: (total submitted annotations) / (total submitted annotations by member + total tasks where annotation is not complete - total tasks where member has a draft annotation)</li><li><strong>Manual</strong>: (total assigned annotations submitted) / (total assigned tasks)</li></ul> |
-| **Time** | Time spent annotating based on [`lead_time`](dashboard_annotator#Performance-summaries), which includes time to submit and time spent updating. Offers three modes:<ul><li><strong>Mean Time</strong>: Average time spent per annotation</li><li><strong>Median Time</strong>: Median time spent on an annotation</li><li><strong>Total Time</strong>: Total time spent across all annotations</li></ul> |
-| **Ground Truth** | Average agreement score against ground truth annotations. [Ground truth](ground_truths.html) acts as a way to assess the accuracy of other annotations. |
-| **Predictions** | Average agreement score against model predictions. The model used for comparison is selected in the [Live Predictions setting](project_settings_lse#Annotation). |
-
-
-### Export Annotation Summary table
-
-You can use the **Export CSV** button to export the Annotation Summary table.
-
-## Annotator Agreement Matrix
-
-The Annotator Agreement Matrix helps you see how consistently different members annotate the same tasks.
-
-- **Agreement scores** are shown as percentages between members who have both annotated the same task. Higher percentages reflect stronger alignment in their annotations. See more on how [agreement score is calculated](stats).
-- **Hover over any cell** to view more information including the number of tasks where both members made an annotation. If a member made more than one annotation in a task, the additional annotation(s) are also considered. 
-- **Use the label dropdown** to filter and explore agreement when at least one annotation contains the specified label.
+| **Annotator** | Member name. Click to open this member's [Member Performance dashboard](dashboard_annotator) filtered to this project. |
+| **ID** | Member's numeric user ID. |
+| **Paused** | Toggle to manually pause or unpause an annotator. See [Pause an annotator](quality.html#Pause-an-annotator). |
+| **Agreement** | Average agreement score with other annotators on tasks where multiple annotations exist. |
+| **Assigned** | Number of tasks manually assigned to the member or containing a submitted annotation by the member. |
+| **Pending** | Number of tasks manually assigned to the member that do not yet have a submitted or skipped annotation. |
+| **Submitted** | Total annotations submitted by the member. Includes submitted, updated, and reviewed annotations. |
+| **Skipped** | Number of tasks skipped by the member. |
+| **Accepted** | Number of submitted annotations accepted by reviewers. |
+| **Fix + Accepted** | Number of submitted annotations fixed then accepted by reviewers. |
+| **Rejected** | Number of submitted annotations rejected by reviewers. |
+| **Acceptance Score** | Total accepted annotations divided by total reviewed annotations. |
+| **Performance Score** | Overall annotation performance based on review outcomes (Accept, Reject, Fix+Accept). See [Annotation performance summaries](dashboard_annotator#Annotation-performance-summaries) for the calculation. |
+| **Total Lead Time** | Total elapsed time from task open to submit across all annotations. Includes time spent updating. |
+| **Avg Lead Time** | Average elapsed time per submitted annotation. |
+| **Median Lead Time** | Median elapsed time per annotation. |
+| **GT Agreement** | Agreement between this member's annotations and ground truth annotations on overlapping tasks. |
+| **Prediction Agreement** | Agreement between this member's annotations and model predictions on overlapping tasks. |
+| **Last Active** | Date and time of the member's most recent activity in the project. |
 
 !!! note
-    Agreement in the Members Dashboard reflects the [Pairwise agreement](stats#Pairwise) between annotators, regardless of what methodology you have selected for the project. 
+    The following columns are hidden by default and can be shown using the **Columns** picker: **ID**, **Assigned**, **Pending**, **Median Lead Time**, **Prediction Agreement**.
 
-## Agreement Distribution
+### Review Summary
 
-The Agreement Distribution visualizes how agreement scores vary across tasks in your project. The bar chart displays the number of tasks at each agreement score range.
+The **Review Summary** table shows review activity for each member who has performed reviews on the project.
 
-- Taller bars toward the right indicate stronger consensus and likely higher data quality.
-- Clusters in the lower agreement ranges may signal ambiguous or difficult tasks, or annotation guideline gaps
+| Column | Description |
+|--------|-------------|
+| **Reviewer** | Member name. Click to open this member's [Member Performance dashboard](dashboard_annotator) filtered to this project. |
+| **ID** | Member's numeric user ID. |
+| **Paused** | Toggle to pause or unpause a reviewer. |
+| **Reviewed** | Total annotations reviewed. Sum of accepted, fix+accepted, and rejected. |
+| **Pending** | Number of tasks manually assigned to the reviewer that have not yet been reviewed. |
+| **Accepted** | Number of annotations accepted by the reviewer. |
+| **Fix + Accept** | Number of annotations fixed then accepted by the reviewer. |
+| **Rejected** | Number of annotations rejected by the reviewer. |
+| **Avg time** | Average time spent reviewing an annotation. Includes time spent fixing annotations. |
+| **Total time** | Total time spent reviewing. |
+| **Median time** | Median time spent reviewing an annotation. |
+| **Last active** | Date and time of the reviewer's most recent review activity. |
+| **Performance** | Overall review performance score. |
+| **Submitted tasks** | Number of annotation tasks the reviewer also submitted annotations on. |
 
-## Include model predictions
+!!! note
+    The following columns are hidden by default and can be shown using the **Columns** picker: **ID**, **Performance**, **Submitted tasks**.
 
-If your project includes predictions, you will see a **Show Models** toggle:
+!!! note
+    Review time data collection began on September 25, 2025 for cloud environments, or version 2.30.0 for on-prem deployments. Filtering for earlier dates will not include review time.
 
-![Screenshot of toggle](/images/project/models-toggle.png)
+### Performance by Dimension
 
-When enabled, you will see the following information in model rows of the **Annotation Summary** table:
+The **Performance by Dimension** table appears below the Annotation Summary on the Annotations sub-tab. It breaks down each member's performance score per labeling dimension  configured in the project.
 
-* **Agreement**: Average agreement between the model and all annotators.
-* **Ground truth**: Average agreement between the model and ground-truth (GT) tasks.
+Use the **Compare with** dropdown to choose how scores are calculated:
 
-    If you click the link in the Ground Truth column of a model row, you are taken to a filter view of the Data Manager showing tasks with both a GT annotation and this model’s prediction.
-* **Predictions**: Average agreement between the model and all other models.
+- **Compare with GT** — scores reflect each member's agreement with ground truth annotations on overlapping tasks.
+- **Compare with All Annotators** — scores reflect each member's agreement with other annotators on the same tasks.
 
-    If you click the link in the Predictions column of a model row, you are taken to a filter view of the Data Manager showing tasks with this model’s prediction plus at least one other model’s prediction.
+An **Avg** column shows each member's overall average across all dimensions. A footer row shows the average per dimension across all members. Scores are color-coded using the same Low / Moderate / High bands as the Agreement Matrix (red, yellow, green). Use the **Columns** picker to show or hide individual dimensions.
 
-Select or deselect model rows to include them in the **Annotator/Model Agreement Matrix**, were you can see model–annotator and model–model agreements.
+## Agreement Matrix tab
+
+The **Agreement Matrix** tab shows the **Member / Model Agreement Matrix**, a heatmap of pairwise agreement scores between all members (and models, if included via the participant filter) in the project.
+
+Click on any cell to open the Data Manager filtered to tasks where both members annotated, so you can inspect disagreements directly.
+
+!!! note
+    Agreement in the Members dashboard reflects [Pairwise agreement](stats#Pairwise) between annotators, regardless of the agreement methodology configured for the project.
+
+### Filters
+
+- **Dimension**: Filter agreement by a specific labeling dimension (control tag). Defaults to **All dimensions**.
+- **Label**: Filter to tasks where at least one annotation contains the specified label. Only available when a specific dimension is selected.
+
+### Reading the matrix
+
+Cells are color-coded by agreement band:
+
+- **Green** — High (≥ 66%)
+- **Yellow** — Moderate (33–66%)
+- **Red** — Low (< 33%)
+
+Hover over any cell to see the agreement percentage and the number of tasks where both members annotated. If a **Ground Truth** column is present, it shows each member's agreement against the project's [ground truth](ground_truths.html) annotations.
+
+An **Avg** row at the bottom shows the average agreement per column across all members.
+
+The participant filter (top right) applies to this tab — select specific annotators or model versions to narrow the matrix.
