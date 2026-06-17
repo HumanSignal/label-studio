@@ -1,4 +1,10 @@
-import { FF_NEW_STORAGES, FF_SEGMENT_ANYTHING_ML_BACKEND, FF_THEME_TOGGLE } from "./flags";
+import {
+  FF_INTERFACES,
+  FF_INTERFACES_AGENT_WORKFLOW,
+  FF_NEW_STORAGES,
+  FF_SEGMENT_ANYTHING_ML_BACKEND,
+  FF_THEME_TOGGLE,
+} from "./flags";
 
 const FLAGS_OVERRIDE: Record<string, boolean> = {
   // While it's safe to have overrides living here forever,
@@ -55,5 +61,8 @@ export function isFF(id: string) {
 
 /** True when the editor should render the SAM interactive UI. */
 export const isSegmentAnythingEditorEnabled = () => isActive(FF_SEGMENT_ANYTHING_ML_BACKEND);
+
+/** Agent chat/plan flow inside Interfaces; gated separately from the base Interfaces product flag. */
+export const isInterfacesAgentWorkflowEnabled = () => isActive(FF_INTERFACES) && isActive(FF_INTERFACES_AGENT_WORKFLOW);
 
 export * from "./flags";

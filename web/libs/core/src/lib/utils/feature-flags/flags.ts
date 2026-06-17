@@ -163,3 +163,14 @@ export const FF_MODAL_WINDOW_APP_CHROME = "fflag_feat_front_fit_1559_modal_windo
  * Annotation course builder for project onboarding and workforce learning.
  */
 export const FF_ANNOTATION_COURSE_BUILDER = "fflag_feat_annotation_course_builder";
+
+/**
+ * Enable Interfaces section for custom labeling interface builder.
+ */
+export const FF_INTERFACES = "fflag_feat_all_optic_interfaces_short";
+
+/**
+ * AI agent workflow inside Custom Interfaces (chat, plan mode, tool loop).
+ * Requires FF_INTERFACES; when off, users can still author interfaces manually in the code editor.
+ */
+export const FF_INTERFACES_AGENT_WORKFLOW = "fflag_feat_interfaces_agent_workflow";
