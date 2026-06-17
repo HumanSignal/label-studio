@@ -214,7 +214,7 @@
   "authPage": [
     {
       "title": "Vibe code any interface!",
-      "description": "You can use Label Studio's agent or SDK and skills to build any UI for labeling and evaluation.",
+      "description": "Build any UI with Label Studio's agent on the web or skill for local development.",
       "link": {
         "label": "Explore examples",
         "url": "https://docs.humansignal.com/templates/gallery_interfaces",
