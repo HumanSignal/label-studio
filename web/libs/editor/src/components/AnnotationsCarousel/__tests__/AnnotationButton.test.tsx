@@ -282,7 +282,7 @@ describe("AnnotationButton", () => {
     });
     const store = {
       ...defaultStore,
-      task: { dataObj: { source: taskSource } },
+      task: { source: taskSource },
     };
     const entity = createEntity({ pk: 1 });
     renderWithProviders(
@@ -342,7 +342,7 @@ describe("AnnotationButton", () => {
       annotators: [{ review: "rejected" }],
       annotations: [{ id: 1 }],
     });
-    const store = { ...defaultStore, task: { dataObj: { source: taskSource } } };
+    const store = { ...defaultStore, task: { source: taskSource } };
     const entity = createEntity({ pk: 1 });
     renderWithProviders(
       <AnnotationButton
@@ -362,7 +362,7 @@ describe("AnnotationButton", () => {
       annotators: [{ review: "fixed" }],
       annotations: [{ id: 1 }],
     });
-    const store = { ...defaultStore, task: { dataObj: { source: taskSource } } };
+    const store = { ...defaultStore, task: { source: taskSource } };
     const entity = createEntity({ pk: 1 });
     renderWithProviders(
       <AnnotationButton
@@ -382,7 +382,7 @@ describe("AnnotationButton", () => {
       annotators: [{ review: "fixed_and_accepted" }],
       annotations: [{ id: 1 }],
     });
-    const store = { ...defaultStore, task: { dataObj: { source: taskSource } } };
+    const store = { ...defaultStore, task: { source: taskSource } };
     const entity = createEntity({ pk: 1 });
     renderWithProviders(
       <AnnotationButton
@@ -813,7 +813,7 @@ describe("AnnotationButton", () => {
     (window as any).APP_SETTINGS = { version: { edition: "Enterprise" } };
     const store = {
       ...defaultStore,
-      task: { dataObj: { source: "not valid json" } },
+      task: { source: "not valid json" },
     };
     const entity = createEntity({ pk: 1 });
     renderWithProviders(
@@ -831,7 +831,7 @@ describe("AnnotationButton", () => {
     const origAppSettings = (window as any).APP_SETTINGS;
     (window as any).APP_SETTINGS = { version: { edition: "Enterprise" } };
     const taskSource = JSON.stringify({ annotators: null, annotations: [] });
-    const store = { ...defaultStore, task: { dataObj: { source: taskSource } } };
+    const store = { ...defaultStore, task: { source: taskSource } };
     const entity = createEntity({ pk: 1 });
     renderWithProviders(
       <AnnotationButton

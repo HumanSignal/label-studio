@@ -9,7 +9,7 @@
  *   - Live MST → SharedAnnotation mapping (snake_case → camelCase, isAlive guard).
  *   - Delete confirmation via `editor/common/Modal/Modal#confirm` (B9).
  *   - Performance Dashboard URL construction (LSE-only, capability-gated, B6/B13).
- *   - LSE review-status read from `task.dataObj.source` (preserves existing tooltip
+ *   - LSE review-status read from `task.source` (preserves existing tooltip
  *     accepted/rejected/fixed badges).
  *
  * The exported component name and props (`entity, capabilities, annotationStore,
@@ -57,7 +57,7 @@ function readReviewStatus(entity: any, annotationStore: any): SharedAnnotation["
   const isLSE = (window as any).APP_SETTINGS?.version?.edition === "Enterprise";
   if (!isLSE || !entity || entity.type === "prediction") return null;
 
-  const sourceStr = annotationStore?.store?.task?.dataObj?.source;
+  const sourceStr = annotationStore?.store?.task?.source;
   if (!sourceStr) return null;
   try {
     const parsed = typeof sourceStr === "string" ? JSON.parse(sourceStr) : sourceStr;
