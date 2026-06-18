@@ -372,6 +372,8 @@ describe("AnnotationButton", () => {
       />,
     );
     expect(screen.getByText("Test User")).toBeInTheDocument();
+    const badge = screen.getByTestId("annotation-review-badge");
+    expect(badge.className).toContain("userpic-badge_fixed");
     (window as any).APP_SETTINGS = origAppSettings;
   });
 
@@ -392,6 +394,8 @@ describe("AnnotationButton", () => {
       />,
     );
     expect(screen.getByText("Test User")).toBeInTheDocument();
+    const badge = screen.getByTestId("annotation-review-badge");
+    expect(badge.className).toContain("userpic-badge_fixed");
     (window as any).APP_SETTINGS = origAppSettings;
   });
 
