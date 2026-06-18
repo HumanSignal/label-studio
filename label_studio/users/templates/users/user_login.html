@@ -18,5 +18,14 @@
     </p>
     <p><button type="submit" aria-label="Log In" class="lsf-button-ls lsf-button-ls_look_primary">Log in</button></p>
   </form>
+  {% if settings.OIDC_ENABLED %}
+  {% if request.GET.oidc_error %}
+  <p class="error">{{ settings.OIDC_PROVIDER_NAME }} sign-in failed. Please try again or contact your administrator.</p>
+  {% endif %}
+  <div class="sso-separator"><span>or</span></div>
+  <a href="{% url 'oidc_authentication_init' %}" class="lsf-button-ls lsf-button-ls_look_primary sso-button">
+    Log in with {{ settings.OIDC_PROVIDER_NAME }}
+  </a>
+  {% endif %}
 
 {% endblock %}

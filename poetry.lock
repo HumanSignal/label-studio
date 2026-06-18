@@ -2075,6 +2075,24 @@ files = [
 ]
 
 [[package]]
+name = "josepy"
+version = "2.2.0"
+description = "JOSE protocol implementation in Python"
+optional = false
+python-versions = ">=3.9.2"
+groups = ["main"]
+files = [
+    {file = "josepy-2.2.0-py3-none-any.whl", hash = "sha256:63e9dd116d4078778c25ca88f880cc5d95f1cab0099bebe3a34c2e299f65d10b"},
+    {file = "josepy-2.2.0.tar.gz", hash = "sha256:74c033151337c854f83efe5305a291686cef723b4b970c43cfe7270cf4a677a9"},
+]
+
+[package.dependencies]
+cryptography = ">=1.5"
+
+[package.extras]
+docs = ["sphinx (>=4.3.0)", "sphinx-rtd-theme (>=1.0)"]
+
+[[package]]
 name = "jsf"
 version = "0.11.2"
 description = "Creates fake JSON files from a JSON schema"
@@ -2575,6 +2593,24 @@ s3crc32c = ["PyYAML (>=5.1)", "crc32c", "py-partiql-parser (==0.4.1)"]
 server = ["PyYAML (>=5.1)", "aws-xray-sdk (>=0.93,!=0.96)", "cfn-lint (>=0.40.0)", "docker (>=3.0.0)", "ecdsa (!=0.15)", "flask (!=2.2.0,!=2.2.1)", "flask-cors", "graphql-core", "jsondiff (>=1.1.2)", "openapi-spec-validator (>=0.5.0)", "py-partiql-parser (==0.4.1)", "pyparsing (>=3.0.7)", "python-jose[cryptography] (>=3.1.0,<4.0.0)", "setuptools", "sshpubkeys (>=3.1.0)"]
 ssm = ["PyYAML (>=5.1)"]
 xray = ["aws-xray-sdk (>=0.93,!=0.96)", "setuptools"]
+
+[[package]]
+name = "mozilla-django-oidc"
+version = "4.0.1"
+description = "A lightweight authentication and access management library for integration with OpenID Connect enabled authentication services."
+optional = false
+python-versions = "*"
+groups = ["main"]
+files = [
+    {file = "mozilla-django-oidc-4.0.1.tar.gz", hash = "sha256:4ff8c64069e3e05c539cecf9345e73225a99641a25e13b7a5f933ec897b58918"},
+    {file = "mozilla_django_oidc-4.0.1-py2.py3-none-any.whl", hash = "sha256:04ef58759be69f22cdc402d082480aaebf193466cad385dc9e4f8df2a0b187ca"},
+]
+
+[package.dependencies]
+cryptography = "*"
+Django = ">=3.2"
+josepy = "*"
+requests = "*"
 
 [[package]]
 name = "mypy-extensions"
@@ -5210,4 +5246,4 @@ uwsgi = ["pyuwsgi", "uwsgitop"]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.10,<4"
-content-hash = "67630147c84123681a9f8f1fe2d4448377708db8138dcb82e8c075f591395946"
+content-hash = "ec4395576fa88cba82f45fc48d9c26f806de10223e5eb53cf308246a422e6cd9"

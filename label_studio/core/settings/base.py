@@ -316,6 +316,49 @@ USE_USERNAME_FOR_LOGIN = False
 
 DISABLE_SIGNUP_WITHOUT_LINK = get_bool_env('DISABLE_SIGNUP_WITHOUT_LINK', False)
 
+# Login URL defaults — the OIDC block below may override LOGIN_REDIRECT_URL.
+# Placing these before the block ensures the OIDC assignments take precedence.
+LOGIN_REDIRECT_URL = '/'
+LOGIN_URL = '/user/login/'
+
+# ── OIDC SSO ──────────────────────────────────────────────────────────────────
+OIDC_ENABLED = get_bool_env('OIDC_ENABLED', False)
+
+if OIDC_ENABLED:
+    INSTALLED_APPS += ['mozilla_django_oidc', 'oidc_provider']  # noqa: F821
+    AUTHENTICATION_BACKENDS += ['oidc_provider.auth.LabelStudioOIDCBackend']
+
+    OIDC_RP_CLIENT_ID = get_env('OIDC_RP_CLIENT_ID')
+    OIDC_RP_CLIENT_SECRET = get_env('OIDC_RP_CLIENT_SECRET')
+    OIDC_RP_SIGN_ALGO = get_env('OIDC_RP_SIGN_ALGO', 'RS256')
+    OIDC_RP_SCOPES = get_env('OIDC_RP_SCOPES', 'openid email profile')
+
+    # Provider-agnostic discovery — works for Okta, Auth0, Azure AD, Keycloak, Google Workspace.
+    # Set OIDC_ISSUER to the base issuer URL; the standard discovery document will be fetched from
+    # {issuer}/.well-known/openid-configuration automatically. Individual endpoints can be overridden
+    # if the IdP uses non-standard paths.
+    _oidc_issuer = get_env('OIDC_ISSUER', '')
+    OIDC_OP_DISCOVERY_ENDPOINT = get_env(
+        'OIDC_OP_DISCOVERY_ENDPOINT',
+        f'{_oidc_issuer}/.well-known/openid-configuration' if _oidc_issuer else '',
+    )
+    OIDC_OP_AUTHORIZATION_ENDPOINT = get_env('OIDC_OP_AUTHORIZATION_ENDPOINT', '')
+    OIDC_OP_TOKEN_ENDPOINT = get_env('OIDC_OP_TOKEN_ENDPOINT', '')
+    OIDC_OP_USER_ENDPOINT = get_env('OIDC_OP_USER_ENDPOINT', '')
+    OIDC_OP_JWKS_ENDPOINT = get_env('OIDC_OP_JWKS_ENDPOINT', '')
+
+    OIDC_VERIFY_SSL = get_bool_env('OIDC_VERIFY_SSL', True)
+    OIDC_STORE_ID_TOKEN = False  # avoid inflating the session cookie
+    OIDC_DISABLE_LOCAL_AUTH = get_bool_env('OIDC_DISABLE_LOCAL_AUTH', False)
+    OIDC_PROVIDER_NAME = get_env('OIDC_PROVIDER_NAME', 'SSO')
+
+    LOGIN_REDIRECT_URL = get_env('OIDC_LOGIN_REDIRECT_URL', '/')
+
+    # Switch to DB-backed sessions: the default signed_cookies backend has a 4 KB browser limit.
+    # mozilla-django-oidc stores state nonces and (optionally) ID tokens in the session during the
+    # OIDC flow, which can silently exceed that limit and break the callback CSRF check.
+    SESSION_ENGINE = 'django.contrib.sessions.backends.db'
+
 # Password validation settings
 AUTH_PASSWORD_MIN_LENGTH = 8
 AUTH_PASSWORD_MAX_LENGTH = 128
@@ -588,8 +631,6 @@ IMPORT_BATCH_SIZE = int(get_env('IMPORT_BATCH_SIZE', 500))
 PREDICTION_IMPORT_BATCH_SIZE = int(get_env('PREDICTION_IMPORT_BATCH_SIZE', 500))
 PROJECT_TITLE_MIN_LEN = 3
 PROJECT_TITLE_MAX_LEN = 50
-LOGIN_REDIRECT_URL = '/'
-LOGIN_URL = '/user/login/'
 
 MIN_GROUND_TRUTH = 10
 DATA_UNDEFINED_NAME = '$undefined$'

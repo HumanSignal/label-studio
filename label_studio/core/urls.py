@@ -104,6 +104,14 @@ urlpatterns = [
     re_path(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     re_path(r'^', include('jwt_auth.urls')),
     re_path(r'^', include('session_policy.urls')),
+]
+
+if getattr(settings, 'OIDC_ENABLED', False):
+    urlpatterns += [
+        re_path(r'^', include('oidc_provider.urls')),
+    ]
+
+urlpatterns += [
     path('docs/api/schema/', SpectacularAPIView.as_view(), name='schema'),
     path('docs/api/schema/swagger-ui/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
     path('docs/api/schema/redoc/', SpectacularRedocView.as_view(url_name='schema'), name='redoc'),

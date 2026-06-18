@@ -38,6 +38,15 @@
       </div>
       <button type="submit" aria-label="Log In" class="login-button">Log in</button>
     </form>
+    {% if settings.OIDC_ENABLED %}
+    {% if request.GET.oidc_error %}
+    <p class="error">{{ settings.OIDC_PROVIDER_NAME }} sign-in failed. Please try again or contact your administrator.</p>
+    {% endif %}
+    <div class="sso-separator"><span>or</span></div>
+    <a href="{% url 'oidc_authentication_init' %}" class="login-button sso-button">
+      Log in with {{ settings.OIDC_PROVIDER_NAME }}
+    </a>
+    {% endif %}
   </div>
   {% if not settings.DISABLE_SIGNUP_WITHOUT_LINK %}
   <div class="text-wrapper">

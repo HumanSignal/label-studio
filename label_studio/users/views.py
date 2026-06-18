@@ -1,7 +1,7 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license."""
 
 import logging
-from urllib.parse import quote
+from urllib.parse import quote, urlencode
 
 from core.feature_flags import flag_set
 from core.middleware import enforce_csrf_checks
@@ -103,6 +103,18 @@ def user_signup(request):
 @enforce_csrf_checks
 def user_login(request):
     """Login page"""
+    if (
+        getattr(settings, 'OIDC_ENABLED', False)
+        and getattr(settings, 'OIDC_DISABLE_LOCAL_AUTH', False)
+        and not request.user.is_authenticated
+        and 'oidc_error' not in request.GET
+    ):
+        next_param = request.GET.get('next')
+        target = reverse('oidc_authentication_init')
+        if next_param and url_has_allowed_host_and_scheme(url=next_param, allowed_hosts=request.get_host()):
+            target += '?' + urlencode({'next': next_param})
+        return redirect(target)
+
     user = request.user
     next_page = request.GET.get('next')
 
