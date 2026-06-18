@@ -11,6 +11,13 @@ import { ff } from "@humansignal/core";
 const DOUBLE_CLICK_MAX_MS = 300;
 /** Max pixel distance between two clicks to treat as same position */
 const DOUBLE_CLICK_MAX_PIXEL_DIST = 5;
+/**
+ * How long (ms) after finishing a region a trailing close-gesture click is
+ * suppressed from toggling its selection. Comfortably exceeds KonvaVector's
+ * ~150ms click-debounce while staying short enough that it can never block a
+ * genuine later click on the region. BROS-1411.
+ */
+const SELECT_AFTER_CLOSE_GUARD_MS = 400;
 
 const _Tool = types
   .model("VideoVectorTool", {
@@ -139,6 +146,10 @@ const _Tool = types
     const disposers = [];
     let down = false;
     let lastClick = { ts: 0, x: 0, y: 0 };
+    // One-shot guard so the trailing (debounced) click of the gesture that just
+    // closed/finished a region can't toggle its selection. BROS-1411.
+    let suppressSelectRegionId = null;
+    let suppressSelectAt = 0;
 
     return {
       // Video passes [x, y] pixel coords (not [x, y, canvasX, canvasY])
@@ -389,6 +400,13 @@ const _Tool = types
 
         const { currentArea, control } = self;
 
+        // Selection after creation is owned by afterCreateResult (which honors
+        // the "Select region after creating it" setting). Arm a one-shot guard
+        // so the trailing close-gesture click can't separately toggle this
+        // region's selection out from under that decision. BROS-1411.
+        suppressSelectRegionId = currentArea.id;
+        suppressSelectAt = Date.now();
+
         down = false;
         self.currentArea?.notifyDrawingFinished?.();
         self.setDrawing(false);
@@ -400,6 +418,21 @@ const _Tool = types
         if (!skipAfterCreate && currentArea && !currentArea.incomplete) {
           self.annotation?.afterCreateResult?.(currentArea, control);
         }
+      },
+
+      /**
+       * Whether a click on `regionId` is the trailing click of the gesture that
+       * just finished it and should therefore be ignored for selection. Returns
+       * true at most once per finish (single-shot) and only within the guard
+       * window, so it can never block a genuine later click. BROS-1411.
+       */
+      consumeSelectSuppression(regionId) {
+        if (suppressSelectRegionId !== regionId) return false;
+
+        const recent = Date.now() - suppressSelectAt < SELECT_AFTER_CLOSE_GUARD_MS;
+        suppressSelectRegionId = null;
+        suppressSelectAt = 0;
+        return recent;
       },
 
       setDrawing(drawing) {

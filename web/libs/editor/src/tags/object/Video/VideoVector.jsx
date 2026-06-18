@@ -318,6 +318,13 @@ const VideoVectorPure = ({
       const mgr = objTag ? ToolsManager.getInstance({ name: objTag.name }) : null;
       const tool = mgr?.findSelectedTool?.();
 
+      // The gesture that closes/finishes a region emits a trailing (debounced)
+      // click that lands here once `isDrawing` has already flipped to false, so
+      // the guard above no longer catches it. Dropping it keeps selection after
+      // creation owned by afterCreateResult, which honors the "Select region
+      // after creating it" setting. BROS-1411.
+      if (tool?.consumeSelectSuppression?.(reg.id)) return;
+
       if (tool?.currentArea && tool.currentArea !== reg && tool.complete) {
         tool.complete();
       }

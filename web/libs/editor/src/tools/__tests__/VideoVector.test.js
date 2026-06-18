@@ -83,6 +83,7 @@ function createTool() {
       annotation.isDrawing = value;
     }),
     unselectAreas: mock(),
+    afterCreateResult: mock(),
     history: { freeze: mock(), unfreeze: mock() },
     selectedRegions: [],
     regions: [],
@@ -228,6 +229,68 @@ describe("VideoVector tool", () => {
       tool.mouseupEv({ shiftKey: true }, [20, 20]);
       await flush();
       expect(region.appendedPoints).toHaveLength(1);
+    });
+  });
+
+  // After a region is closed/finished, the closing pointer gesture emits a
+  // trailing (debounced) click that reaches the region's onClick handler once
+  // `isDrawing` has already flipped to false. Without a guard that click runs
+  // onClickRegion → _selectArea, which *toggles* selection: it selects a region
+  // that "Select region after creating it" is off for (the reported bug), and
+  // would unselect a region the setting is on for. Selection after creation must
+  // be owned solely by afterCreateResult, which honors the setting. BROS-1411.
+  describe("selection after closing respects the setting (BROS-1411)", () => {
+    function finishCurrentRegion(tool) {
+      tool.mousedownEv({ button: 0 }, [10, 10]);
+      const region = tool.currentArea;
+      tool._finishDrawing();
+      return region;
+    }
+
+    it("delegates post-close selection to afterCreateResult (setting-aware)", () => {
+      const { tool, annotation } = createTool();
+
+      const region = finishCurrentRegion(tool);
+
+      // The tool never selects/unselects the region directly — it hands off to
+      // afterCreateResult, which is the single place that reads selectAfterCreate.
+      expect(annotation.afterCreateResult).toHaveBeenCalledTimes(1);
+      expect(annotation.afterCreateResult.mock.calls[0][0]).toBe(region);
+    });
+
+    it("suppresses the trailing close-gesture click once (single-shot)", () => {
+      const { tool } = createTool();
+
+      const region = finishCurrentRegion(tool);
+
+      // The first click on the just-finished region (the trailing close click)
+      // is suppressed so it cannot toggle selection…
+      expect(tool.consumeSelectSuppression(region.id)).toBe(true);
+      // …but only once — a later genuine click selects normally.
+      expect(tool.consumeSelectSuppression(region.id)).toBe(false);
+    });
+
+    it("does not suppress clicks on a different region", () => {
+      const { tool } = createTool();
+
+      finishCurrentRegion(tool);
+
+      expect(tool.consumeSelectSuppression("some-other-region")).toBe(false);
+    });
+
+    it("does not suppress once the guard window has elapsed", () => {
+      const { tool } = createTool();
+
+      setSystemTime(new Date("2024-01-01T00:00:00.000Z"));
+      try {
+        const region = finishCurrentRegion(tool);
+
+        // Well beyond the debounce/guard window — a real later click must select.
+        setSystemTime(new Date("2024-01-01T00:00:01.000Z"));
+        expect(tool.consumeSelectSuppression(region.id)).toBe(false);
+      } finally {
+        setSystemTime();
+      }
     });
   });
 });
