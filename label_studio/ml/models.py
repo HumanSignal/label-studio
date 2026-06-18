@@ -339,6 +339,14 @@ class MLBackend(models.Model):
         return predictions
 
     def predict_tasks(self, tasks):
+        # Interactive backends (e.g. SAM2) only respond to per-prompt requests via
+        # `interactive_annotating`. Running them through batch prediction (e.g. when
+        # one is selected as the project's pre-labeling model) yields an empty result
+        # that gets persisted as a useless blank prediction with no score (BROS-1227).
+        if self.is_interactive:
+            logger.debug(f'ML backend {self} is interactive; skipping batch prediction')
+            return []
+
         model_version = self.update_state()
         if self.not_ready:
             logger.debug(f'ML backend {self} is not ready')
