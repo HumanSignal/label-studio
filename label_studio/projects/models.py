@@ -1485,6 +1485,12 @@ class ProjectSummary(models.Model):
     created_labels_drafts = JSONField(
         _('created labels in drafts'), null=True, default=dict, help_text='Unique drafts labels'
     )
+    dimension_value_counts = JSONField(
+        _('dimension value counts'),
+        null=True,
+        blank=True,
+        help_text='Dimension-backed label distribution counts cache',
+    )
 
     def has_permission(self, user):
         user.project = self.project  # link for activity log
@@ -1497,6 +1503,7 @@ class ProjectSummary(models.Model):
         self.created_annotations = {}
         self.created_labels = {}
         self.created_labels_drafts = {}
+        self.dimension_value_counts = {}
         self.save()
 
     def update_data_columns(self, tasks):
