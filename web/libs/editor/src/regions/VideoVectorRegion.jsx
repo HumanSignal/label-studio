@@ -119,7 +119,11 @@ const Model = types
     // --- Ported from image VectorRegion ---
 
     get closable() {
-      return self.control?.closable ?? false;
+      // A region that is already a closed contour is, by definition, closable —
+      // e.g. SAM2 always produces closed polygons (BROS-1422) even when the
+      // control's `closable` attribute is false. Without this, finished/incomplete
+      // would treat such a region as an unfinished open path.
+      return self.closed || (self.control?.closable ?? false);
     },
     get minPoints() {
       const min = self.control?.minpoints;

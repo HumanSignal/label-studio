@@ -230,6 +230,49 @@ describe("VideoVectorRegion", () => {
     });
   });
 
+  describe("closable — a closed contour is always closable (BROS-1422)", () => {
+    it("reports closable=true for a closed keyframe even without a closable control", () => {
+      const root = TestRoot.create({
+        video: { id: "vid1" },
+        region: {
+          id: "vvr1",
+          pid: "p1",
+          object: "vid1",
+          sequence: [
+            {
+              frame: 0,
+              enabled: true,
+              vertices: mkVertices([
+                [10, 10],
+                [20, 20],
+                [30, 10],
+              ]),
+              closed: true,
+            },
+          ],
+        },
+      });
+      // SAM2 produces closed polygons regardless of `closable=false`; the region
+      // must treat such a shape as closable so finished/incomplete are correct.
+      expect(root.region.closable).toBe(true);
+      expect(root.region.incomplete).toBeFalsy();
+      expect(root.region.finished).toBe(true);
+    });
+
+    it("reports closable=false for an open contour with no closable control", () => {
+      const root = TestRoot.create({
+        video: { id: "vid1" },
+        region: {
+          id: "vvr1",
+          pid: "p1",
+          object: "vid1",
+          sequence: [{ frame: 0, enabled: true, vertices: mkVertices([[1, 2]]), closed: false }],
+        },
+      });
+      expect(root.region.closable).toBe(false);
+    });
+  });
+
   describe("addVertexAtCanvasPoint — rapid clicks accumulate (BROS-1206)", () => {
     const makeRoot = () =>
       TestRoot.create({

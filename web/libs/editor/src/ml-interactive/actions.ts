@@ -96,10 +96,13 @@ export function acceptInteractiveMask(control: any, binding: InteractiveBinding,
   // dominant contour (largest connected component, outer boundary only) so
   // fragmented or Swiss-cheese SAM output can't produce hundreds of tiny
   // regions on Accept.
-  // Trace the region boundary; `closable` decides closed polygon vs open path
-  // (BROS-1221 — a non-closable vector is the boundary left open, never a
-  // medial-axis skeleton).
-  const closed = control.closable === true;
+  // Trace the region boundary as a closed polygon. `acceptInteractiveMask` is
+  // the SAM2-only accept path, and a SAM2 segmentation result is always a
+  // closed region — an open boundary (closable=false) produced unexpected
+  // behavior. So when the vector comes from interactive ML we ignore the
+  // control's `closable` and always close the contour (BROS-1422, superseding
+  // the open-boundary behavior of BROS-1221).
+  const closed = true;
   // Respect the control's `maxPoints` cap (VideoVector / VideoVectorLabels) so
   // accepted SAM2 vectors don't exceed the configured budget (BROS-1222).
   const maxPoints = control.maxpoints ? Number(control.maxpoints) : null;
