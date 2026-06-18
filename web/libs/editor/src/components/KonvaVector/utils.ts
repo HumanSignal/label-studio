@@ -276,3 +276,54 @@ const getBezierPointAtT = (startPoint: BezierPoint, endPoint: BezierPoint, t: nu
     y: uuu * startPoint.y + 3 * uu * t * cp1.y + 3 * u * tt * cp2.y + ttt * endPoint.y,
   };
 };
+
+/**
+ * Resolve the existing point that the next drawing action (preview ghost line OR a
+ * newly committed segment) should originate from.
+ *
+ * BROS-1412: the ghost-line preview and the actual point-creation logic used to resolve
+ * this independently with diverging fallback chains, so the dashed preview could start
+ * from one point (e.g. the selected first endpoint) while the committed segment connected
+ * from another (the last point in the array). Both call sites now share this single
+ * resolver so the preview always reflects where the segment will actually be drawn from.
+ *
+ * Priority: explicit active point → currently selected point → last added point →
+ * the last point in the array.
+ */
+export const resolveDrawingOriginPointId = (
+  points: BezierPoint[],
+  opts: {
+    activePointId?: string | null;
+    selectedPointIndex?: number | null;
+    lastAddedPointId?: string | null;
+  },
+): string | null => {
+  const { activePointId, selectedPointIndex, lastAddedPointId } = opts;
+
+  // 1. Explicit active point (the endpoint the user is currently drawing from)
+  if (activePointId && points.some((p) => p.id === activePointId)) {
+    return activePointId;
+  }
+
+  // 2. Currently selected point (e.g. an endpoint clicked to resume drawing)
+  if (
+    selectedPointIndex !== null &&
+    selectedPointIndex !== undefined &&
+    selectedPointIndex >= 0 &&
+    selectedPointIndex < points.length
+  ) {
+    return points[selectedPointIndex].id;
+  }
+
+  // 3. Last added point (backward compatibility, primarily skeleton mode)
+  if (lastAddedPointId && points.some((p) => p.id === lastAddedPointId)) {
+    return lastAddedPointId;
+  }
+
+  // 4. Final fallback: the last point in the array
+  if (points.length > 0) {
+    return points[points.length - 1].id;
+  }
+
+  return null;
+};
