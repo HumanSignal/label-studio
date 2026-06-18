@@ -249,6 +249,10 @@ const VideoVectorPure = ({
   const handleTransformStart = useCallback(() => {
     isDraggingRef.current = true;
     latestDragPixelsRef.current = null;
+    // Mark this gesture as a point/shape edit so the VideoVector tool doesn't
+    // append a stray vertex on mouse-up when the user is only adjusting an
+    // existing point on a selected open region. BROS-1413.
+    reg.setEditingPointGesture?.(true);
     reg.annotation?.history?.freeze?.();
   }, [reg]);
 
@@ -391,6 +395,13 @@ const VideoVectorPure = ({
         allowOutsideBounds={allowOutsideBounds}
         onFinish={handleFinish}
         onPointsChange={handlePointsChange}
+        // Grabbing an existing point — even a click or a sub-threshold nudge that
+        // never crosses the drag threshold (so onTransformStart doesn't fire) —
+        // is still a point edit, not a placement. Mark it so the tool won't append
+        // a stray vertex on mouse-up. BROS-1413.
+        onPointSelected={(pointIndex) => {
+          if (pointIndex != null) reg.setEditingPointGesture?.(true);
+        }}
         onTransformStart={handleTransformStart}
         onTransformEnd={handleTransformEnd}
         onPathClosedChange={handlePathClosedChange}

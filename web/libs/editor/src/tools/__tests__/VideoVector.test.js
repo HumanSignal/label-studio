@@ -29,13 +29,20 @@ const MockRegion = types
     type: types.optional(types.string, "videovectorregion"),
     closedFlag: types.optional(types.boolean, false),
     drawingFlag: types.optional(types.boolean, false),
+    selectedFlag: types.optional(types.boolean, false),
     finished: types.optional(types.boolean, false),
+    // Vertices returned by getShape(); lets tests stand up a finished, selected
+    // open region that the tool treats as "resume drawing" (BROS-1413).
+    verticesData: types.frozen([]),
     sequence: types.frozen([]),
   })
   // Records points appended via addVertexAtCanvasPoint so tests can assert that
   // a click actually produced a vertex (BROS-1408).
   .volatile(() => ({
     appendedPoints: [],
+    // Set true by the view when an existing point/shape is being dragged so the
+    // tool can tell an edit gesture from a placement click (BROS-1413).
+    editingPointGesture: false,
   }))
   .views((self) => ({
     get closed() {
@@ -44,13 +51,19 @@ const MockRegion = types
     get isDrawing() {
       return self.drawingFlag;
     },
+    get selected() {
+      return self.selectedFlag;
+    },
     getShape() {
-      return { closed: self.closedFlag, vertices: [] };
+      return { closed: self.closedFlag, vertices: self.verticesData };
     },
   }))
   .actions((self) => ({
     setDrawing(value) {
       self.drawingFlag = value;
+    },
+    setEditingPointGesture(value) {
+      self.editingPointGesture = value;
     },
     startPoint() {},
     commitPoint() {},
@@ -291,6 +304,86 @@ describe("VideoVector tool", () => {
       } finally {
         setSystemTime();
       }
+    });
+  });
+
+  describe("adjusting points on a selected region (BROS-1413)", () => {
+    const flush = () => new Promise((resolve) => setTimeout(resolve, 0));
+
+    // Stand up a finished, selected, open (non-closable → never `closed`) region
+    // with existing vertices, matching the reviewer scenario from the ticket: the
+    // region is selected for editing, not actively being drawn.
+    const addSelectedOpenRegion = (obj) => {
+      const region = MockRegion.create({
+        id: "selected-open",
+        selectedFlag: true,
+        verticesData: [
+          { id: "a", x: 1, y: 1 },
+          { id: "b", x: 2, y: 2 },
+          { id: "c", x: 3, y: 3 },
+          { id: "d", x: 4, y: 4 },
+        ],
+      });
+      obj.regs.push(region);
+      return region;
+    };
+
+    it("does not append a vertex when an existing point is dragged to adjust it", async () => {
+      const { tool, obj } = createTool();
+      const region = addSelectedOpenRegion(obj);
+
+      // Press on the region: the tool resumes "drawing" on the selected open region.
+      tool.mousedownEv({ button: 0 }, [12, 12]);
+      expect(tool.currentArea).toBe(region);
+      expect(tool.mode).toBe("drawing");
+
+      // KonvaVector starts dragging the grabbed point — the view marks the gesture
+      // as a point edit via onTransformStart.
+      region.setEditingPointGesture(true);
+
+      // Release after moving the point. No new vertex must be created; the user
+      // only adjusted an existing point.
+      tool.mouseupEv({}, [40, 40]);
+      await flush();
+
+      expect(region.appendedPoints).toEqual([]);
+      // The flag is reset so the next genuine click can append again.
+      expect(region.editingPointGesture).toBe(false);
+    });
+
+    it("does not append a vertex for a sub-threshold nudge/click that selects a point", async () => {
+      const { tool, obj } = createTool();
+      const region = addSelectedOpenRegion(obj);
+
+      tool.mousedownEv({ button: 0 }, [12, 12]);
+      expect(tool.currentArea).toBe(region);
+
+      // A small nudge / click on an existing point never crosses KonvaVector's
+      // drag threshold, so the view marks the gesture via onPointSelected during
+      // KonvaVector's own mouse-up — which can run AFTER the tool's mouseupEv.
+      // Simulate that ordering: the tool's mouseupEv runs first, then the flag is
+      // set before the deferred append fires. No vertex must be appended.
+      tool.mouseupEv({}, [14, 14]);
+      region.setEditingPointGesture(true);
+      await flush();
+
+      expect(region.appendedPoints).toEqual([]);
+      expect(region.editingPointGesture).toBe(false);
+    });
+
+    it("still appends a vertex when clicking empty canvas on a selected open region", async () => {
+      const { tool, obj } = createTool();
+      const region = addSelectedOpenRegion(obj);
+
+      // Resume drawing on the selected open region, then click empty canvas (no
+      // point grabbed → no edit gesture). A new vertex must be added.
+      tool.mousedownEv({ button: 0 }, [80, 80]);
+      expect(tool.currentArea).toBe(region);
+
+      tool.mouseupEv({}, [80, 80]);
+      await flush();
+
+      expect(region.appendedPoints).toEqual([{ x: 80, y: 80 }]);
     });
   });
 });

@@ -248,6 +248,10 @@ const _Tool = types
        */
       resetDrawingState() {
         down = false;
+        // Guard with isAlive: in the BROS-1207 path the region was destroyed
+        // externally, and optional chaining alone still triggers an MST
+        // detached-node warning. Matches the rest of this file.
+        if (self.currentArea && isAlive(self.currentArea)) self.currentArea.setEditingPointGesture(false);
         self.currentArea = null;
         self.mode = "viewing";
         self.stopListening();
@@ -338,6 +342,9 @@ const _Tool = types
         if (selectedUnclosed) {
           self.currentArea = selectedUnclosed;
           self.mode = "drawing";
+          // Start each gesture as a placement click; the view flips this to an
+          // edit if it ends up dragging an existing point. BROS-1413.
+          selectedUnclosed.setEditingPointGesture?.(false);
           selectedUnclosed.setDrawing(true);
           self.annotation?.setIsDrawing(true);
           self.listenForClose();
@@ -360,21 +367,35 @@ const _Tool = types
         down = false;
 
         // Add a vertex on every mouse-up while drawing, matching the image
-        // Vector tool. The previous version only added a point when the cursor
+        // Vector tool. An earlier version only added a point when the cursor
         // moved less than 5px between mousedown and mouseup, so fast clicks —
         // where the cursor is still in motion during the click — exceeded that
         // delta and were silently dropped (BROS-1408). The `down` guard above
         // still excludes shift/alt clicks (handled by KonvaVector) and mouseups
         // that did not originate from a drawing mousedown.
+        //
+        // The exception is a point edit: if this gesture grabbed an existing
+        // point/shape (the view marks it via onPointSelected / onTransformStart),
+        // the reviewer was adjusting the region, not placing a new point, so
+        // appending would drop a stray vertex. The flag is read inside the
+        // deferred callback because the view may set it during KonvaVector's own
+        // mouse-up handling, which can run after this stage-level handler.
+        // BROS-1413.
         setTimeout(() => {
-          // Prefer the store-backed append, which reads the live vertices on
-          // every click so rapid clicks never drop a point (BROS-1206). Fall
-          // back to the KonvaVector path only on the very first click, before
-          // the region's view has registered its handler.
-          if (!self.currentArea?.addVertexAtCanvasPoint(x, y)) {
-            self.currentArea?.startPoint(x, y);
-            self.currentArea?.commitPoint(x, y);
+          // currentArea may have been destroyed between mouse-up and this tick.
+          const area = self.currentArea;
+          const areaAlive = area && isAlive(area);
+          if (areaAlive && !area.editingPointGesture) {
+            // Prefer the store-backed append, which reads the live vertices on
+            // every click so rapid clicks never drop a point (BROS-1206). Fall
+            // back to the KonvaVector path only on the very first click, before
+            // the region's view has registered its handler.
+            if (!area.addVertexAtCanvasPoint(x, y)) {
+              area.startPoint(x, y);
+              area.commitPoint(x, y);
+            }
           }
+          if (areaAlive) area.setEditingPointGesture(false);
           self.annotation?.history?.unfreeze();
           self.finishDrawing();
         });
@@ -408,6 +429,7 @@ const _Tool = types
         suppressSelectAt = Date.now();
 
         down = false;
+        if (self.currentArea && isAlive(self.currentArea)) self.currentArea.setEditingPointGesture(false);
         self.currentArea?.notifyDrawingFinished?.();
         self.setDrawing(false);
         self.mode = "viewing";

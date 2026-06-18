@@ -69,6 +69,13 @@ const Model = types
     // Set by the view (VideoVector.jsx). Appends a single vertex at canvas pixel
     // coords, reading the live store each call so rapid clicks never drop a point.
     appendVertexFn: null,
+    // True while an existing point/shape is being edited — a drag (view sets it
+    // on transform start) or a sub-threshold click/nudge that only selects a
+    // point (view sets it on point selection). Lets the VideoVector tool tell a
+    // point-adjust gesture apart from a placement click so it doesn't append a
+    // stray vertex when the reviewer is only moving points on a selected open
+    // region. BROS-1413.
+    editingPointGesture: false,
   }))
   .views((self) => ({
     // --- Video-specific views ---
@@ -267,6 +274,13 @@ const Model = types
 
     setAppendVertexFn(fn) {
       self.appendVertexFn = fn;
+    },
+
+    // Flag a mouse gesture as an existing-point/shape edit (drag) rather than a
+    // placement click, so the tool suppresses the vertex it would otherwise
+    // append on mouse-up while drawing. BROS-1413.
+    setEditingPointGesture(value) {
+      self.editingPointGesture = value;
     },
 
     /**
