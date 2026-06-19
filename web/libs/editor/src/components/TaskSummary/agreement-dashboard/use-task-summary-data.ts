@@ -38,8 +38,11 @@ import type {
  *          and (in LSE) dimension agreement data.
  * @throws Error when the HTTP response is not OK.
  */
-const fetchTaskSummary = async (taskId: number | string): Promise<TaskSummaryResponse> => {
-  const response = await fetch(`/api/tasks/${taskId}/summary/`);
+const fetchTaskSummary = async (taskId: number | string, includePredictions: boolean): Promise<TaskSummaryResponse> => {
+  const url = includePredictions
+    ? `/api/tasks/${taskId}/summary/?include_predictions=true`
+    : `/api/tasks/${taskId}/summary/`;
+  const response = await fetch(url);
   if (!response.ok) {
     throw new Error(`Failed to fetch task summary: ${response.status}`);
   }
@@ -53,10 +56,14 @@ const fetchTaskSummary = async (taskId: number | string): Promise<TaskSummaryRes
  * @returns Parsed GroundTruthInferenceResponse with per-dimension inferred values.
  * @throws Error when the HTTP response is not OK.
  */
-const fetchGroundTruthInference = async (taskId: number | string): Promise<GroundTruthInferenceResponse> => {
+const fetchGroundTruthInference = async (
+  taskId: number | string,
+  includePredictions: boolean,
+): Promise<GroundTruthInferenceResponse> => {
   const response = await fetch(`/api/tasks/${taskId}/ground-truth-inference/`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ include_predictions: includePredictions }),
   });
   if (!response.ok) {
     throw new Error(`Failed to fetch ground truth inference: ${response.status}`);
@@ -102,6 +109,7 @@ interface UseTaskSummaryDataOptions {
   conflictFilter: ConflictFilter;
   visibleColumnIds: number[] | null;
   hideInfo: boolean;
+  includePredictions: boolean;
 }
 
 export interface AgreementData {
@@ -162,16 +170,18 @@ export function useTaskSummaryData({
   conflictFilter,
   visibleColumnIds,
   hideInfo,
+  includePredictions,
 }: UseTaskSummaryDataOptions): AgreementData {
   const currentUser = window.APP_SETTINGS?.user;
+  const predictionsIncluded = includePredictions === true;
 
   const {
     data: apiResponse,
     isLoading,
     error,
   } = useQuery({
-    queryKey: ["task-summary-dashboard", taskId],
-    queryFn: () => fetchTaskSummary(taskId!),
+    queryKey: ["task-summary-dashboard", taskId, predictionsIncluded],
+    queryFn: () => fetchTaskSummary(taskId!, predictionsIncluded),
     enabled: !!taskId,
     staleTime: 30_000,
     gcTime: 5 * 60 * 1000,
@@ -179,8 +189,8 @@ export function useTaskSummaryData({
   });
 
   const { data: gtInferenceResponse } = useQuery({
-    queryKey: ["task-gt-inference", taskId],
-    queryFn: () => fetchGroundTruthInference(taskId!),
+    queryKey: ["task-gt-inference", taskId, predictionsIncluded],
+    queryFn: () => fetchGroundTruthInference(taskId!, predictionsIncluded),
     enabled: !!taskId,
     staleTime: 30_000,
     gcTime: 5 * 60 * 1000,
@@ -244,8 +254,11 @@ export function useTaskSummaryData({
       }
     }
 
-    return agreementResult.annotator_ids.map((id, index) => {
-      const user = userMap.get(id);
+    const k = agreementResult.annotator_ids.length;
+    const predVersions = agreementResult.prediction_model_versions ?? [];
+
+    const humanRows: AnnotatorInfo[] = agreementResult.annotator_ids.map((id, index) => {
+      const user = userMap.get(id) ?? null;
       let displayName: string;
 
       if (hideInfo) {
@@ -261,8 +274,20 @@ export function useTaskSummaryData({
         index,
         displayName,
         user: user ? { id: user.id, email: user.email, first_name: user.first_name, last_name: user.last_name } : null,
+        isPrediction: false,
       };
     });
+
+    const predRows: AnnotatorInfo[] = predVersions.map((version, i) => ({
+      id: -(i + 1),
+      index: k + i,
+      displayName: version.trim() || `Prediction #${i + 1}`,
+      user: null,
+      isPrediction: true,
+      modelVersion: version,
+    }));
+
+    return [...humanRows, ...predRows];
   }, [agreementResult, summaryAnnotations, hideInfo, currentUser]);
 
   const annotationForRow = useMemo<(SummaryAnnotation | null)[]>(() => {
@@ -271,7 +296,14 @@ export function useTaskSummaryData({
     for (const ann of summaryAnnotations) {
       annotationById.set(ann.id, ann);
     }
-    return agreementResult.annotation_ids.map((id) => annotationById.get(id) ?? null);
+    const rows: (SummaryAnnotation | null)[] = agreementResult.annotation_ids.map(
+      (id) => annotationById.get(id) ?? null,
+    );
+    const predCount = agreementResult.prediction_model_versions?.length ?? 0;
+    for (let i = 0; i < predCount; i++) {
+      rows.push(null);
+    }
+    return rows;
   }, [agreementResult, summaryAnnotations]);
 
   const dimensions = useMemo<DimensionInfo[]>(() => {
@@ -324,7 +356,7 @@ export function useTaskSummaryData({
   const hasAgreementData =
     agreementResult !== null &&
     agreementResult.dimension_results.length > 0 &&
-    agreementResult.annotator_ids.length > 0;
+    (agreementResult.annotator_ids.length > 0 || (agreementResult.prediction_model_versions?.length ?? 0) > 0);
 
   return {
     apiResponse,

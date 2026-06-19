@@ -15,6 +15,8 @@ export interface TaskSummaryResponse {
   total_annotations: number;
   total_predictions: number;
   annotations: SummaryAnnotation[];
+  /** Separate predictions list (only present when include_predictions=true). */
+  predictions?: SummaryPrediction[];
   distributions: Record<string, DistributionEntry>;
 
   /** LSE extension: dimension agreement (empty object when unavailable) */
@@ -28,13 +30,19 @@ export interface TaskMeta {
 
 export interface SummaryAnnotation {
   id: number;
-  type: "annotation" | "prediction";
+  type: "annotation";
   user: SummaryUser | null;
   result: RawResult[];
   ground_truth: boolean;
   lead_time: number | null;
   reviews: { accepted: boolean }[];
   comments: { text: string | null; region_ref: Record<string, unknown> | null; classifications: unknown[] | null }[];
+}
+
+export interface SummaryPrediction {
+  id: number;
+  model_version: string;
+  result: RawResult[];
 }
 
 export interface SummaryUser {
@@ -69,11 +77,13 @@ export interface DistributionEntry {
 export interface TaskAgreementResult {
   dimension_results: DimensionMatchResult[];
   aggregation: AggregationResult;
+  /** Human annotator user IDs only (matrix rows 0..k-1). */
   annotator_ids: number[];
-  /** Annotation database IDs aligned with annotator_ids. Used to look up
-   *  the full SummaryAnnotation (with reviews, ground_truth, etc.) from
-   *  the top-level annotations list. */
+  /** Annotation database IDs aligned with annotator_ids (annotation rows only). */
   annotation_ids?: number[];
+  /** Model version strings for prediction participants (matrix rows k..k+m-1).
+   *  Only present when include_predictions=true and predictions exist. */
+  prediction_model_versions?: string[];
   /** Added by LseTaskSummaryAPI: dimension_id -> metadata */
   dimension_meta: Record<number, DimensionMeta>;
   /** Agreement methodology configured for the project ("consensus" or "pairwise"). */
@@ -173,6 +183,10 @@ export interface AnnotatorInfo {
   index: number;
   displayName: string;
   user: Record<string, unknown> | null;
+  /** True when this row represents a model prediction rather than a human annotation. */
+  isPrediction?: boolean;
+  /** Model version string for prediction rows. */
+  modelVersion?: string;
 }
 
 /** A single dimension's agreement score for the bar chart */

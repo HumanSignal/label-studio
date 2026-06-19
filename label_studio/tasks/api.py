@@ -666,6 +666,8 @@ class TaskSummaryAPI(generics.RetrieveAPIView):
         if not flag_set('fflag_fix_all_fit_720_lazy_load_annotations', user=request.user):
             raise PermissionDenied('Feature not enabled')
 
+        include_predictions = bool_from_request(request.GET, 'include_predictions', False)
+
         try:
             task = Task.objects.get(pk=pk)
         except Task.DoesNotExist:
@@ -761,6 +763,14 @@ class TaskSummaryAPI(generics.RetrieveAPIView):
                 continue
             merge_result_into_distributions(ann.result)
 
+        if include_predictions:
+            prediction_results = Prediction.objects.filter(task=task, result__isnull=False).values_list(
+                'result', flat=True
+            )
+            for result in prediction_results:
+                if isinstance(result, list):
+                    merge_result_into_distributions(result)
+
         # Post-process: calculate averages for numeric types
         for from_name, dist in distributions.items():
             if dist['values']:
@@ -792,6 +802,19 @@ class TaskSummaryAPI(generics.RetrieveAPIView):
             for ann in annotation_objs
         ]
 
+        predictions_list = None
+        if include_predictions:
+            predictions_list = [
+                {
+                    'id': pred.id,
+                    'model_version': pred.model_version,
+                    'result': pred.result or [],
+                }
+                for pred in Prediction.objects.filter(task=task, result__isnull=False).only(
+                    'id', 'result', 'model_version'
+                )
+            ]
+
         agreement_score = None
         raw_agreement = getattr(task, 'precomputed_agreement', None)
         if raw_agreement is not None:
@@ -799,19 +822,21 @@ class TaskSummaryAPI(generics.RetrieveAPIView):
             # DM / LSE task payloads expose agreement as 0–100; DB may store 0–1 or percent
             agreement_score = val * 100.0 if val <= 1.0 else val
 
-        return Response(
-            {
-                'task': {
-                    'id': task.id,
-                    'agreement': getattr(task, 'agreement', None),
-                },
-                'total_annotations': total_annotations,
-                'total_predictions': total_predictions,
-                'annotations': annotations_list,
-                'distributions': distributions,
-                'agreement': agreement_score,
-            }
-        )
+        response_data = {
+            'task': {
+                'id': task.id,
+                'agreement': getattr(task, 'agreement', None),
+            },
+            'total_annotations': total_annotations,
+            'total_predictions': total_predictions,
+            'annotations': annotations_list,
+            'distributions': distributions,
+            'agreement': agreement_score,
+        }
+        if predictions_list is not None:
+            response_data['predictions'] = predictions_list
+
+        return Response(response_data)
 
 
 @method_decorator(

@@ -13,7 +13,7 @@ type CardProps = {
 
 const Card = ({ title, value, info, loading, valueWarningTooltip }: CardProps) => {
   return (
-    <div className="flex-1 border border-neutral-border rounded-small p-base bg-neutral-surface">
+    <div className="w-40 shrink-0 border border-neutral-border rounded-small p-base bg-neutral-surface">
       <div className="flex flex-row gap-tighter items-center text-xs font-semibold text-neutral-content-subtle uppercase tracking-wide mb-2">
         {title}
         {info && (
@@ -47,7 +47,7 @@ type Props = {
 
 export const NumbersSummary = ({ values }: Props) => {
   return (
-    <div className="flex flex-row gap-base">
+    <div className="flex flex-row flex-wrap gap-base w-fit max-w-full">
       {values.map((value) => (
         <Card key={value.title} {...value} />
       ))}

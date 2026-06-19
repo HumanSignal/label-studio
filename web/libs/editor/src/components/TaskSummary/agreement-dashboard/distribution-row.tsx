@@ -107,6 +107,8 @@ interface DistributionRowProps {
   getColSize?: (id: string) => number;
   /** Per-dimension label colors keyed by dimension name. */
   dimensionLabelColors?: DimensionLabelColors;
+  /** Whether predictions are included in the distribution denominator. */
+  includePredictions?: boolean;
 }
 
 /**
@@ -122,6 +124,7 @@ export const DistributionRow = ({
   totalAnnotations,
   getColSize,
   dimensionLabelColors,
+  includePredictions = false,
 }: DistributionRowProps) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [hasOverflow, setHasOverflow] = useState(false);
@@ -164,7 +167,9 @@ export const DistributionRow = ({
           ) : (
             <span className="font-semibold text-neutral-content">Distribution</span>
           )}
-          <span className="text-xs text-neutral-content-subtle">{totalAnnotations} annotations</span>
+          <span className="text-xs text-neutral-content-subtle">
+            {includePredictions ? `${totalAnnotations} participants` : `${totalAnnotations} annotations`}
+          </span>
         </div>
       </td>
       {dimensions.map((dim) => (

@@ -11,7 +11,7 @@ import type { ReactNode } from "react";
 import { useMemo } from "react";
 import { flexRender, getCoreRowModel, useReactTable, createColumnHelper } from "@tanstack/react-table";
 import { cnm, Tooltip, Userpic } from "@humansignal/ui";
-import { IconAnnotationGroundTruth, IconCheckAlt, IconCrossAlt, IconInfoOutline } from "@humansignal/icons";
+import { IconAnnotationGroundTruth, IconCheckAlt, IconCrossAlt, IconInfoOutline, IconSparks } from "@humansignal/icons";
 import { formatMetricType } from "./agreement-utils";
 import { DistributionRow } from "./distribution-row";
 import { GroundTruthRow, MajorityVoteRow } from "./ground-truth-row";
@@ -100,6 +100,8 @@ interface AnnotatorsDimensionsTableProps {
   distributions?: Record<string, DistributionEntry>;
   /** Denominator for percentage-based distributions (matches backend TaskSummaryAPI). */
   totalAnnotations?: number;
+  /** Whether predictions are included as table rows and in the agreement row. */
+  includePredictions?: boolean;
 }
 
 // ---------------------------------------------------------------------------
@@ -130,6 +132,7 @@ export const AnnotatorsDimensionsTable = ({
   dimensionLabelColors,
   distributions,
   totalAnnotations,
+  includePredictions = false,
 }: AnnotatorsDimensionsTableProps) => {
   const scoreMap = useMemo(() => {
     if (!dimensionScores) return null;
@@ -286,7 +289,13 @@ export const AnnotatorsDimensionsTable = ({
                     onClick={isClickable ? () => onAnnotationClick(ann.id) : undefined}
                   >
                     <div className="flex gap-tight items-center">
-                      <Userpic user={annotator.user} badge={reviewBadge ? { bottomRight: reviewBadge } : undefined} />
+                      <Userpic
+                        user={annotator.user}
+                        badge={reviewBadge ? { bottomRight: reviewBadge } : undefined}
+                        className={annotator.isPrediction ? "!bg-accent-plum-subtle text-accent-plum-bold" : undefined}
+                      >
+                        {annotator.isPrediction && <IconSparks size={18} />}
+                      </Userpic>
                       <span className="text-label-small font-medium flex-1 truncate">{annotator.displayName}</span>
                       {ann?.ground_truth && (
                         <Tooltip title="Ground Truth">
@@ -386,9 +395,15 @@ export const AnnotatorsDimensionsTable = ({
                   style={{ minWidth: getColSize("annotator") }}
                 >
                   {groundTruthStatus === "saved" ? (
-                    <Tooltip title="Inter-annotator agreement (excludes the ground truth annotation)">
+                    <Tooltip
+                      title={
+                        includePredictions
+                          ? "Agreement between participants (excludes the ground truth annotation)"
+                          : "Inter-annotator agreement (excludes the ground truth annotation)"
+                      }
+                    >
                       <span className="cursor-default inline-flex items-center gap-tighter">
-                        Annotator Agreement
+                        {includePredictions ? "Agreement" : "Annotator Agreement"}
                         <IconInfoOutline
                           size={12}
                           style={{ width: 16, height: 16 }}
@@ -397,7 +412,7 @@ export const AnnotatorsDimensionsTable = ({
                       </span>
                     </Tooltip>
                   ) : (
-                    <span className="cursor-default">Annotator Agreement</span>
+                    <span className="cursor-default">{includePredictions ? "Agreement" : "Annotator Agreement"}</span>
                   )}
                 </td>
                 {dimensions.map((dim) => {
@@ -426,7 +441,8 @@ export const AnnotatorsDimensionsTable = ({
                   const metricLabel = formatMetricType(dim.metricType);
                   const methodologyLabel = agreementMethodology === "consensus" ? "Consensus" : "Pairwise";
 
-                  let cellTooltip = `${methodologyLabel} ${metricLabel} between ${displayAnnotators.length} annotators.`;
+                  const participantLabel = includePredictions ? "participants" : "annotators";
+                  let cellTooltip = `${methodologyLabel} ${metricLabel} between ${displayAnnotators.length} ${participantLabel}.`;
                   if (isExcluded) cellTooltip += " Not included in overall agreement (weight 0).";
                   else if (notFullyWeighted) cellTooltip += ` Weight ${dim.overallWeight * 100}%.`;
 
@@ -468,6 +484,7 @@ export const AnnotatorsDimensionsTable = ({
                 totalAnnotations={totalAnnotations ?? 0}
                 getColSize={getColSize}
                 dimensionLabelColors={dimensionLabelColors}
+                includePredictions={includePredictions}
               />
             )}
 

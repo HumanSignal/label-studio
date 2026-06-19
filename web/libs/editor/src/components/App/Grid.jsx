@@ -107,7 +107,7 @@ export const VirtualizedAnnotationPanel = observer(
 );
 
 // FIT-720: Virtualized Grid component
-const VirtualizedGrid = observer(({ store, annotations, root }) => {
+const VirtualizedGrid = observer(({ store, annotations, root, includePredictions = false }) => {
   const listRef = useRef(null);
   const [hydratingIds, setHydratingIds] = useState(new Set());
   const [containerWidth, setContainerWidth] = useState(0);
@@ -174,8 +174,11 @@ const VirtualizedGrid = observer(({ store, annotations, root }) => {
     });
   }, [taskId, viewingAll, annotations, getCachedAnnotation]); // Re-run when task / compare mode changes
 
-  // Filter visible annotations
-  const visibleAnnotations = useMemo(() => annotations.filter((c) => !c.hidden), [annotations]);
+  // Filter visible annotations (optionally exclude predictions)
+  const visibleAnnotations = useMemo(
+    () => annotations.filter((c) => !c.hidden && (includePredictions || c.type !== "prediction")),
+    [annotations, includePredictions],
+  );
 
   // Calculate panel width based on container (aim for ~50% width, min PANEL_WIDTH)
   const panelWidth = useMemo(() => {
@@ -549,7 +552,7 @@ class GridClassComponent extends Component {
 
   render() {
     const i = this.state.item;
-    const { annotations } = this.props;
+    const { annotations, includePredictions = false } = this.props;
     const selected = isFF(FF_DEV_3391) ? null : this.props.store.selected;
     const isRenderingNext = i < annotations.length && annotations[i] === selected;
 
@@ -557,7 +560,7 @@ class GridClassComponent extends Component {
       <div className={styles.container}>
         <div ref={this.container} className={styles.grid}>
           {annotations
-            .filter((c) => !c.hidden)
+            .filter((c) => !c.hidden && (includePredictions || c.type !== "prediction"))
             .map((c) => (
               <div id={`c-${c.id}`} key={`anno-${c.id}`} style={{ position: "relative" }}>
                 <Tooltip title="Open Annotation Tab">

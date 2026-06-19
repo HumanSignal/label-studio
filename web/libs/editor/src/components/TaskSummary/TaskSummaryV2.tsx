@@ -44,6 +44,8 @@ import { CollapsiblePanel } from "@humansignal/ui";
 type TaskSummaryProps = {
   annotations: MSTAnnotation[];
   store: MSTStore["annotationStore"];
+  /** When true, predictions participate in agreement metrics, table rows, and distributions. */
+  includePredictions?: boolean;
 };
 
 // ---------------------------------------------------------------------------
@@ -61,18 +63,25 @@ const DashboardSkeleton = () => (
 // Main Component
 // ---------------------------------------------------------------------------
 
-const TaskSummary = ({ annotations: allAnnotations, store: annotationStore }: TaskSummaryProps) => {
+const TaskSummary = ({
+  annotations: allAnnotations,
+  store: annotationStore,
+  includePredictions = false,
+}: TaskSummaryProps) => {
   const storeTask = annotationStore.store.task;
   const hideInfo = annotationStore.store.hasInterface("annotations:hide-info");
 
-  // Annotations with a database pk — used only for click-to-navigate.
-  const navigableAnnotations = allAnnotations.filter((a) => a.pk);
+  // Submitted annotations and predictions with a database pk — used for click-to-navigate.
+  const navigableAnnotations = allAnnotations.filter((a) => a.pk && (a.type !== "prediction" || includePredictions));
   const allTags = [...annotationStore.names];
 
   const handleAnnotationClick = useCallback(
     (annotationPk: number) => {
       const match = navigableAnnotations.find((a) => String(a.pk) === String(annotationPk));
-      if (match) {
+      if (!match) return;
+      if (match.type === "prediction") {
+        annotationStore.selectPrediction(match.id, { exitViewAll: true });
+      } else {
         annotationStore.selectAnnotation(match.id, { exitViewAll: true });
       }
     },
@@ -120,6 +129,7 @@ const TaskSummary = ({ annotations: allAnnotations, store: annotationStore }: Ta
     conflictFilter: "custom",
     visibleColumnIds,
     hideInfo,
+    includePredictions,
   });
 
   const method = agreementData.agreementMethodology;
@@ -244,8 +254,10 @@ const TaskSummary = ({ annotations: allAnnotations, store: annotationStore }: Ta
   const summaryCards = useMemo(() => {
     const cards: { title: string; value: number | string; info: string }[] = [];
 
-    if (typeof agreementData.task?.agreement === "number") {
-      const agreement = agreementData.task.agreement;
+    const usePrecomputedTaskAgreement = !includePredictions && typeof agreementData.task?.agreement === "number";
+
+    if (usePrecomputedTaskAgreement) {
+      const agreement = agreementData.task!.agreement!;
       const agreementPercent = agreement <= 1 ? agreement * 100 : agreement;
       cards.push({
         title: `Agreement (${method})`,
@@ -256,7 +268,9 @@ const TaskSummary = ({ annotations: allAnnotations, store: annotationStore }: Ta
       cards.push({
         title: `Agreement (${method})`,
         value: `${(agreementData.overallAgreement * 100).toFixed(1)}%`,
-        info: `Overall ${method} agreement across all dimensions`,
+        info: includePredictions
+          ? `Overall ${method} agreement across annotations and predictions`
+          : `Overall ${method} agreement across all dimensions`,
       });
     }
 
@@ -266,14 +280,23 @@ const TaskSummary = ({ annotations: allAnnotations, store: annotationStore }: Ta
       info: "Number of submitted annotations. Table shows only submitted results, not current drafts.",
     });
 
-    cards.push({
-      title: "Predictions",
-      value: agreementData.apiResponse?.total_predictions ?? 0,
-      info: "Number of predictions. They are not included in the agreement calculation.",
-    });
+    if (includePredictions) {
+      cards.push({
+        title: "Predictions",
+        value: agreementData.agreementResult?.prediction_model_versions?.length ?? 0,
+        info: "Number of predictions included in the agreement calculation.",
+      });
+    }
 
     return cards;
-  }, [agreementData, method]);
+  }, [agreementData, method, includePredictions]);
+
+  const distributionParticipantCount = useMemo(() => {
+    if (!agreementData.agreementResult) return agreementData.apiResponse?.total_annotations ?? 0;
+    const k = agreementData.agreementResult.annotator_ids.length;
+    const m = includePredictions ? (agreementData.agreementResult.prediction_model_versions?.length ?? 0) : 0;
+    return k + m;
+  }, [agreementData, includePredictions]);
 
   // ---------------------------------------------------------------------------
   // Render
@@ -302,6 +325,7 @@ const TaskSummary = ({ annotations: allAnnotations, store: annotationStore }: Ta
                 conflictingDimensionIds={agreementData.conflictingDimensionIds}
                 hasNonCategoricalDimensions={hasNonCategoricalDimensions}
                 hasExistingGt={hasExistingGt}
+                includePredictions={includePredictions}
               />
             </div>
 
@@ -310,7 +334,8 @@ const TaskSummary = ({ annotations: allAnnotations, store: annotationStore }: Ta
               annotators={agreementData.annotators}
               dimensionLabelColors={dimensionLabelColors}
               distributions={agreementData.apiResponse?.distributions}
-              totalAnnotations={agreementData.apiResponse?.total_annotations ?? 0}
+              totalAnnotations={distributionParticipantCount}
+              includePredictions={includePredictions}
               annotationForRow={agreementData.annotationForRow}
               onAnnotationClick={handleAnnotationClick}
               dimensionScores={agreementData.dimensionScores}

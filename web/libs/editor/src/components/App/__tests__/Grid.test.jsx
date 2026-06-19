@@ -180,7 +180,7 @@ describe("Grid", () => {
 
     render(
       <Provider store={store}>
-        <Grid store={store} annotations={annotations} root={root} />
+        <Grid store={store} annotations={annotations} root={root} includePredictions={true} />
       </Provider>,
     );
 

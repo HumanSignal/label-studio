@@ -36,6 +36,8 @@ interface ColumnPickerProps {
   hasNonCategoricalDimensions?: boolean;
   /** Whether a saved ground truth annotation exists for this task */
   hasExistingGt?: boolean;
+  /** Whether predictions are included in agreement calculations */
+  includePredictions?: boolean;
 }
 
 // ---------------------------------------------------------------------------
@@ -51,6 +53,7 @@ export const ColumnPicker = ({
   conflictingDimensionIds,
   hasNonCategoricalDimensions,
   hasExistingGt,
+  includePredictions = false,
 }: ColumnPickerProps) => {
   const options = useMemo(
     () =>
@@ -185,7 +188,9 @@ export const ColumnPicker = ({
     <div className="flex items-center gap-tight w-full">
       {/* Submitted-annotations note — clarifies that drafts are not part of agreement */}
       <span className="inline-flex items-center text-label-small text-neutral-content-subtle leading-none whitespace-nowrap">
-        Agreement is only calculated for submitted annotations, not drafts
+        {includePredictions
+          ? "Agreement includes submitted annotations and predictions, not drafts"
+          : "Agreement is only calculated for submitted annotations, not drafts"}
       </span>
 
       {/* Right cluster: conflict legend + columns dropdown */}
