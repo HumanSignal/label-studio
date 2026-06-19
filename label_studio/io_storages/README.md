@@ -253,7 +253,9 @@ The Storage Proxy API behavior can be configured using the following environment
 | `RESOLVER_PROXY_CACHE_TIMEOUT` | Cache TTL in seconds for proxy responses (Django) | 3600 |
 | `STORAGE_BUFFER_SIZE` | Read buffer size in bytes used by the streamer when reading from S3 | 524288 |
 | `STORAGE_STREAM_TIMEOUT` | Maximum duration a single streamer→S3 object stream may remain open | 300s |
-| `DJANGO_INTERNAL_TIMEOUT` | Streamer → Django delegation request timeout | 10s |
+| `DJANGO_INTERNAL_DEADLINE` | Total deadline across all streamer → Django delegation attempts | 30s |
+| `DJANGO_INTERNAL_RETRY_MAX` | Maximum retries for transient 5xx / timeout failures during delegation | 3 |
+| `DJANGO_INTERNAL_INITIAL_TIMEOUT` | Timeout for the first delegation attempt; doubles each retry | 1s |
 | `AWS_EXTERNAL_STORAGE_ROLE_ARN` | Bridge role assumed by the streamer before assuming an LSE `s3s` storage's `role_arn` (cross-account). Empty unless an LSE IAM-role storage is configured. | empty |
 
 These optimizations ensure that the Proxy API remains responsive and resource-efficient, even when handling large files or many concurrent requests.
