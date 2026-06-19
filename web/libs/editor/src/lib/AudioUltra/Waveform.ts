@@ -1,4 +1,5 @@
 import type { TimelineSettings } from "../../components/Timeline/Types";
+import { ff } from "@humansignal/core";
 import { Events } from "./Common/Events";
 import { MediaLoader } from "./Media/MediaLoader";
 import type { Player } from "./Controls/Player";
@@ -238,10 +239,20 @@ export class Waveform extends Events<WaveformEventTypes> {
       params.timeline = { placement: "top" };
     }
 
+    if (!params.decoderType && ff.isActive(ff.FF_FIT_2003_WASM_STREAMING_DECODER)) {
+      const isWav = params.src.split("?")[0].toLowerCase().endsWith(".wav");
+      if (!isWav) {
+        params.decoderType = "wasm-stream";
+      }
+    }
+
     params.decoderType = params.decoderType ?? "webaudio";
-    // Need to restrict ffmpeg to html5 player as it doesn't support webaudio
+    // Need to restrict ffmpeg and wasm-stream to html5 player as they don't support webaudio
     // because of chunked decoding raw Float32Arrays and no AudioBuffer support
-    params.playerType = params.decoderType === "ffmpeg" ? "html5" : (params.playerType ?? "html5");
+    params.playerType =
+      params.decoderType === "ffmpeg" || params.decoderType === "wasm-stream"
+        ? "html5"
+        : (params.playerType ?? "html5");
 
     this.src = params.src;
     this.params = params;
@@ -291,6 +302,13 @@ export class Waveform extends Events<WaveformEventTypes> {
 
   renderTimeline() {
     this.timeline.render();
+  }
+
+  draw(force = false) {
+    if (force) {
+      this.visualizer.clearRenderCache();
+    }
+    this.visualizer.draw();
   }
 
   loadingState() {
@@ -344,6 +362,19 @@ export class Waveform extends Events<WaveformEventTypes> {
 
       this.player.init(audio);
       this.visualizer.init(audio);
+
+      // Implement automatic pre-zooming for wasm-stream decoders
+      if (this.params.decoderType === "wasm-stream") {
+        const totalDuration = this.duration;
+        if (totalDuration > 1800) {
+          // 30 minutes
+          // Zoom to a range proportional to total duration (e.g. 10%),
+          // clamped between 5 minutes (300s) and 20 minutes (1200s) for optimal usability and performance.
+          const targetVisible = Math.min(1200, Math.max(300, totalDuration * 0.1));
+          this.zoom = totalDuration / targetVisible;
+        }
+      }
+
       this.loaded = true;
       this.invoke("load");
     }

@@ -174,3 +174,8 @@ export const FF_INTERFACES = "fflag_feat_all_optic_interfaces_short";
  * Requires FF_INTERFACES; when off, users can still author interfaces manually in the code editor.
  */
 export const FF_INTERFACES_AGENT_WORKFLOW = "fflag_feat_interfaces_agent_workflow";
+
+/**
+ * WASM FFmpeg Streaming Decoder (progressive seek/decode) for long compressed audio files
+ */
+export const FF_FIT_2003_WASM_STREAMING_DECODER = "fflag_feat_front_fit_2003_wasm_streaming_decoder";

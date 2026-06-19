@@ -114,7 +114,7 @@ const TagAttrs = types.model({
   autocenter: types.optional(types.boolean, true),
   scrollparent: types.optional(types.boolean, true),
   splitchannels: types.optional(types.boolean, false),
-  decoder: types.optional(types.enumeration(["ffmpeg", "webaudio", "none"]), "webaudio"),
+  decoder: types.optional(types.enumeration(["ffmpeg", "webaudio", "none", "wasm-stream"]), "webaudio"),
   player: types.optional(types.enumeration(["html5", "webaudio"]), "html5"),
   spectrogram: types.optional(types.boolean, false),
 });

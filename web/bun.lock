@@ -7,7 +7,7 @@
       "dependencies": {
         "@ant-design/colors": "6.0.0",
         "@ant-design/icons": "4.8.1",
-        "@humansignal/audio-file-decoder": "0.1.5",
+        "@humansignal/audio-file-decoder": "1.0.0-rc.2",
         "@phosphor-icons/react": "^2.1.10",
         "@radix-ui/react-accordion": "^1.2.11",
         "@radix-ui/react-dialog": "^1.1.6",
@@ -499,7 +499,7 @@
 
     "@hono/node-server": ["@hono/node-server@1.19.11", "", { "peerDependencies": { "hono": "^4" } }, "sha512-dr8/3zEaB+p0D2n/IUrlPF1HZm586qgJNXK1a9fhg/PzdtkK7Ksd5l312tJX2yBuALqDYBlG20QEbayqPyxn+g=="],
 
-    "@humansignal/audio-file-decoder": ["@humansignal/audio-file-decoder@0.1.5", "", { "dependencies": { "@babel/runtime": "^7.13.10" } }, "sha512-oQ46MWo/QdNvNEc9rP8tuivsCn1341tNpBMQVo9CuARWCNAveuisTDWBvkNhI4k+1L7/xdV0C45lSTZfhEe/gw=="],
+    "@humansignal/audio-file-decoder": ["@humansignal/audio-file-decoder@1.0.0-rc.2", "", { "dependencies": { "@babel/runtime": "^7.13.10" } }, "sha512-6Jmbcym28XhXtCN5lXmTeXS1be/t2bXeqBgX72jDB3X9wk46Tfj23kU6KsnFipBQ7U0RNU5lsSh882D7h7f8Fw=="],
 
     "@hypnosphi/create-react-context": ["@hypnosphi/create-react-context@0.3.1", "", { "dependencies": { "gud": "^1.0.0", "warning": "^4.0.3" }, "peerDependencies": { "prop-types": "^15.0.0", "react": ">=0.14.0" } }, "sha512-V1klUed202XahrWJLLOT3EXNeCpFHCcJntdFGI15ntCwau+jfT386w7OFTMaCqOgXUH1fa0w/I1oZs+i/Rfr0A=="],
 

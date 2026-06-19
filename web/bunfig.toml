@@ -1,7 +1,7 @@
 [install]
 minimumReleaseAge = 604800
 # These packages will bypass the 7-day minimum age requirement
-minimumReleaseAgeExcludes = ["@types/bun", "typescript"]
+minimumReleaseAgeExcludes = ["@types/bun", "typescript", "@humansignal/audio-file-decoder"]
 
 [test]
 preload = ["./test/bun/preload.ts"]
