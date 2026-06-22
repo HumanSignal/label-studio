@@ -13,6 +13,13 @@ import { cnm, Tooltip } from "@humansignal/ui";
 // Props
 // ---------------------------------------------------------------------------
 
+export interface ReviewStats {
+  reviewedCount: number;
+  totalCount: number;
+  acceptedCount: number;
+  rejectedCount: number;
+}
+
 export interface TaskSummaryControlPanelProps {
   groundTruthStatus: "draft" | "saved" | undefined;
   isComplete: boolean;
@@ -20,6 +27,8 @@ export interface TaskSummaryControlPanelProps {
   totalCount: number;
   hasExistingGt: boolean;
   hasNonCategoricalDimensions?: boolean;
+  /** Pre-computed review statistics for annotations (excluding the GT annotation). */
+  reviewStats?: ReviewStats;
   onSaveGroundTruth: () => void;
   onCancel: () => void;
   onAutoReview: () => void;
@@ -36,6 +45,7 @@ export const TaskSummaryControlPanel = ({
   totalCount,
   hasExistingGt,
   hasNonCategoricalDimensions,
+  reviewStats,
   onSaveGroundTruth,
   onCancel,
   onAutoReview,
@@ -49,8 +59,20 @@ export const TaskSummaryControlPanel = ({
       ? "Accept or reject annotations based on ground truth match"
       : "Create a ground truth annotation first";
 
+    const showReviewCounter = reviewStats && reviewStats.reviewedCount > 0;
+
     return (
       <div className="flex items-center gap-2 px-base py-tight border-t border-neutral-border bg-neutral-surface">
+        {showReviewCounter && (
+          <span className="text-label-small text-neutral-content-subtle">
+            {reviewStats.reviewedCount} / {reviewStats.totalCount} reviewed
+            {" ("}
+            <span className="text-positive-content">{reviewStats.acceptedCount} accepted</span>
+            {", "}
+            <span className="text-negative-content">{reviewStats.rejectedCount} rejected</span>
+            {")"}
+          </span>
+        )}
         <div className="flex items-center gap-2 ml-auto">
           <Tooltip title={reviewTooltip}>
             <button
@@ -64,7 +86,7 @@ export const TaskSummaryControlPanel = ({
                   : "bg-neutral-surface border-neutral-border text-neutral-content-subtlest cursor-not-allowed",
               )}
             >
-              Bulk Review against Ground Truth
+              Bulk Review Against Ground Truth
             </button>
           </Tooltip>
         </div>

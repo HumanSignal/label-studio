@@ -32,6 +32,7 @@ import { useTaskSummaryData } from "./agreement-dashboard/use-task-summary-data"
 import { useGroundTruth } from "./agreement-dashboard/use-ground-truth";
 import { useEffectiveGroundTruth } from "./agreement-dashboard/use-effective-ground-truth";
 import { TaskSummaryControlPanel } from "./agreement-dashboard/task-summary-control-panel";
+import type { ReviewStats } from "./agreement-dashboard/task-summary-control-panel";
 import { openCommitGroundTruthDialog, commitGroundTruth } from "./agreement-dashboard/commit-ground-truth-dialog";
 import { openAutoReviewDialog } from "./agreement-dashboard/auto-review-dialog";
 
@@ -209,6 +210,53 @@ const TaskSummary = ({
     agreementData.annotators,
   ]);
 
+  // ---------------------------------------------------------------------------
+  // Review statistics (for the control panel counter)
+  // ---------------------------------------------------------------------------
+
+  const reviewStats = useMemo<ReviewStats | undefined>(() => {
+    const annotationRows = agreementData.annotationForRow;
+    if (!annotationRows?.length) return undefined;
+
+    let totalCount = 0;
+    let reviewedCount = 0;
+    let acceptedCount = 0;
+    let rejectedCount = 0;
+
+    for (let i = 0; i < annotationRows.length; i++) {
+      if (i === existingGtAnnotationIndex) continue;
+      const ann = annotationRows[i];
+      if (!ann) continue;
+      totalCount++;
+      if (ann.reviews?.length) {
+        reviewedCount++;
+        const lastReview = ann.reviews[ann.reviews.length - 1];
+        if (lastReview.accepted) acceptedCount++;
+        else rejectedCount++;
+      }
+    }
+
+    return { reviewedCount, totalCount, acceptedCount, rejectedCount };
+  }, [agreementData.annotationForRow, existingGtAnnotationIndex]);
+
+  // ---------------------------------------------------------------------------
+  // Existing reviews map (for the auto-review overwrite warning)
+  // ---------------------------------------------------------------------------
+
+  const existingReviews = useMemo<Map<number, boolean>>(() => {
+    const map = new Map<number, boolean>();
+    const annotationRows = agreementData.annotationForRow;
+    if (!annotationRows?.length) return map;
+    for (let i = 0; i < annotationRows.length; i++) {
+      if (i === existingGtAnnotationIndex) continue;
+      const ann = annotationRows[i];
+      if (!ann || !ann.reviews?.length) continue;
+      const lastReview = ann.reviews[ann.reviews.length - 1];
+      map.set(ann.id, lastReview.accepted);
+    }
+    return map;
+  }, [agreementData.annotationForRow, existingGtAnnotationIndex]);
+
   const handleAutoReview = useCallback(() => {
     if (!taskId || !existingGtObject) return;
     openAutoReviewDialog({
@@ -223,6 +271,7 @@ const TaskSummary = ({
       // can appear multiple times in the agreement arrays).
       annotationIds: agreementData.agreementResult?.annotation_ids ?? [],
       annotators: agreementData.annotators,
+      existingReviews,
       onCommit: () => {
         window.location.reload();
       },
@@ -234,6 +283,7 @@ const TaskSummary = ({
     agreementData.categoricalDimensions,
     agreementData.agreementResult,
     agreementData.annotators,
+    existingReviews,
   ]);
 
   // ---------------------------------------------------------------------------
@@ -362,6 +412,7 @@ const TaskSummary = ({
                     totalCount={effectiveTotalCount}
                     hasExistingGt={hasExistingGt}
                     hasNonCategoricalDimensions={hasNonCategoricalDimensions}
+                    reviewStats={reviewStats}
                     onSaveGroundTruth={handleSaveGroundTruth}
                     onCancel={handleCancel}
                     onAutoReview={handleAutoReview}
