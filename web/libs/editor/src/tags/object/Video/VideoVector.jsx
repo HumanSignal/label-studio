@@ -3,7 +3,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Group } from "react-konva";
 import { useRegionStyles } from "../../../hooks/useRegionColor";
 import { KonvaVector } from "../../../components/KonvaVector/KonvaVector";
-import { generatePointId } from "../../../components/KonvaVector/utils";
+import { generatePointId, resolveVideoAppendOriginId } from "../../../components/KonvaVector/utils";
 import { LabelOnVideoBbox } from "../../../components/ImageView/LabelOnRegion";
 import ToolsManager from "../../../tools/Manager";
 
@@ -124,6 +124,10 @@ const VideoVectorPure = ({
   const latestDragPixelsRef = useRef(null);
   const [dragPixels, setDragPixels] = useState(null);
   const lastCommittedRef = useRef(null);
+  // Endpoint the user deliberately selected to resume drawing from. Captured on point
+  // selection (which never fires during rapid free-draw) and consumed by the next
+  // appendVertex so the committed segment matches the dashed preview line. BROS-1432.
+  const resumeOriginIdRef = useRef(null);
 
   const style = useRegionStyles(reg, { includeFill: true });
   const { realWidth: waWidth, realHeight: waHeight, scale: waScale, x: waX, y: waY } = workingArea;
@@ -233,8 +237,18 @@ const VideoVectorPure = ({
       const max = getMaxPoints(control);
       if (max && currentPixels.length >= max) return;
 
-      const last = currentPixels[currentPixels.length - 1];
-      const newPoint = { id: generatePointId(), x: px, y: py, prevPointId: last?.id };
+      // Connect the new segment from the point the user selected (matching the dashed
+      // preview line) instead of always the last vertex. In skeleton mode that can be any
+      // node (a new branch); otherwise only an endpoint resumes drawing. The selection is
+      // consumed here so the following clicks continue from the just-added vertex rather
+      // than forking off the same point again. BROS-1432.
+      const prevPointId = resolveVideoAppendOriginId(
+        currentPixels,
+        resumeOriginIdRef.current,
+        control?.skeleton ?? false,
+      );
+      resumeOriginIdRef.current = null;
+      const newPoint = { id: generatePointId(), x: px, y: py, prevPointId };
 
       commitPoints([...currentPixels, newPoint]);
     },
@@ -400,7 +414,19 @@ const VideoVectorPure = ({
         // is still a point edit, not a placement. Mark it so the tool won't append
         // a stray vertex on mouse-up. BROS-1413.
         onPointSelected={(pointIndex) => {
-          if (pointIndex != null) reg.setEditingPointGesture?.(true);
+          if (pointIndex != null) {
+            reg.setEditingPointGesture?.(true);
+            // Remember the selected vertex so the next vertex placed on the canvas
+            // continues from it (and the dashed preview), not from the last vertex.
+            // Read straight from the store (rather than a possibly-stale closure) since
+            // KonvaVector's stage handlers are attached once. resolveVideoAppendOriginId
+            // ignores it unless it is an endpoint. BROS-1432.
+            const { frame: f } = commitContextRef.current;
+            const vertex = reg.getShape?.(f)?.vertices?.[pointIndex];
+            resumeOriginIdRef.current = vertex?.id ?? null;
+          } else {
+            resumeOriginIdRef.current = null;
+          }
         }}
         onTransformStart={handleTransformStart}
         onTransformEnd={handleTransformEnd}

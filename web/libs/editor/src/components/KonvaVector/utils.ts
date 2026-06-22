@@ -327,3 +327,45 @@ export const resolveDrawingOriginPointId = (
 
   return null;
 };
+
+/**
+ * Whether a vertex sits at one of the two ends of an open vector path, using the same
+ * prevPointId topology the renderer relies on (see getAllLineSegments): an endpoint
+ * either starts the chain (no prevPointId) or ends it (no other vertex references it as
+ * its prevPointId).
+ */
+export const isEndpointVertexId = (points: Array<{ id: string; prevPointId?: string | null }>, id: string): boolean => {
+  const vertex = points.find((p) => p.id === id);
+  if (!vertex) return false;
+  const isHead = !vertex.prevPointId;
+  const isTail = !points.some((p) => p.prevPointId === id);
+  return isHead || isTail;
+};
+
+/**
+ * Resolve which existing vertex a newly placed video-vector point should connect from.
+ *
+ * Video vectors append straight to the MobX store (disableInternalPointAddition), so the
+ * shared point-creation manager — which already honors the active drawing point via
+ * resolveDrawingOriginPointId — never runs for them. Without this the committed segment
+ * always extended from the last vertex while the dashed preview line started from the
+ * user's selected point, so the two disagreed (BROS-1432). Prefer the deliberately
+ * selected point so the segment matches the preview; otherwise fall back to the last
+ * vertex (also the rapid free-draw path, which never selects a point).
+ *
+ * In skeleton mode any selected node can start a new branch, so any existing vertex is a
+ * valid origin. In a plain open polyline only an endpoint can resume drawing, matching
+ * what the selection logic and ghost line allow.
+ */
+export const resolveVideoAppendOriginId = (
+  points: Array<{ id: string; prevPointId?: string | null }>,
+  selectedPointId: string | null | undefined,
+  skeletonEnabled = false,
+): string | undefined => {
+  if (selectedPointId && points.some((p) => p.id === selectedPointId)) {
+    if (skeletonEnabled || isEndpointVertexId(points, selectedPointId)) {
+      return selectedPointId;
+    }
+  }
+  return points.length > 0 ? points[points.length - 1].id : undefined;
+};
