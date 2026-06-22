@@ -163,7 +163,7 @@
     "cypress": "^15.13.0",
     "cypress-multi-reporters": "^2.0.5",
     "cypress-terminal-report": "^5.1.1",
-    "esbuild": "^0.25.5",
+    "esbuild": "^0.28.1",
     "identity-obj-proxy": "^3.0.0",
     "jsdoc-to-markdown": "8.0.1",
     "jsdom": "~22.1.0",
