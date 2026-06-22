@@ -10,6 +10,7 @@ import { KonvaRegionMixin } from "../mixins/KonvaRegion";
 import { RELATIVE_STAGE_HEIGHT, RELATIVE_STAGE_WIDTH } from "../components/ImageView/Image";
 import { KonvaVector } from "../components/KonvaVector/KonvaVector";
 import { generatePointId } from "../components/KonvaVector/utils";
+import { isVectorSkeletonEnabled } from "../components/KonvaVector/skeleton";
 import { observer } from "mobx-react";
 import Constants from "../core/Constants";
 import { RegionWrapper } from "./RegionWrapper";
@@ -753,7 +754,7 @@ const HtxVectorView = observer(({ item, suggestion }) => {
           allowBezier={item.control?.curves ?? false}
           minPoints={item.minPoints}
           maxPoints={item.maxPoints}
-          skeletonEnabled={item.control?.skeleton ?? false}
+          skeletonEnabled={isVectorSkeletonEnabled(item.control)}
           stroke={item.selected ? "#ff0000" : regionStyles.strokeColor}
           fill={regionStyles.fillColor}
           strokeWidth={regionStyles.strokeWidth}

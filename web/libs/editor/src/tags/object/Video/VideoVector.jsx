@@ -3,6 +3,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Group } from "react-konva";
 import { useRegionStyles } from "../../../hooks/useRegionColor";
 import { KonvaVector } from "../../../components/KonvaVector/KonvaVector";
+import { isVectorSkeletonEnabled } from "../../../components/KonvaVector/skeleton";
 import { generatePointId, resolveVideoAppendOriginId } from "../../../components/KonvaVector/utils";
 import { LabelOnVideoBbox } from "../../../components/ImageView/LabelOnRegion";
 import ToolsManager from "../../../tools/Manager";
@@ -386,7 +387,7 @@ const VideoVectorPure = ({
         allowBezier={false}
         minPoints={getMinPoints(control)}
         maxPoints={getMaxPoints(control)}
-        skeletonEnabled={control?.skeleton ?? false}
+        skeletonEnabled={isVectorSkeletonEnabled(control)}
         stroke={selected ? "#ff0000" : style.strokeColor}
         fill={style.fillColor ?? "transparent"}
         strokeWidth={style.strokeWidth}

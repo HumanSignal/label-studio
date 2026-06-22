@@ -106,6 +106,13 @@ export const InteractivePromptMixinImpl = types
     get hasInteractiveMask(): boolean {
       return self.interactiveMaskData !== null;
     },
+    // True whenever an interactive-ML (SAM2) backend is bound to this control.
+    // SAM2 always emits a closed mask, so skeleton mode (branching open paths)
+    // is meaningless while it's driving the control — vector renderers read
+    // this to suppress the control's `skeleton` attribute (BROS-1434).
+    get hasInteractiveBackend(): boolean {
+      return self.interactiveBackendId !== null;
+    },
   }))
   .actions((self) => ({
     setInteractiveBackend(id: number | null) {

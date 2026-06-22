@@ -90,6 +90,29 @@ describe("InteractivePromptMixinImpl", () => {
     });
   });
 
+  describe("hasInteractiveBackend", () => {
+    // Drives skeleton suppression for vector controls: SAM2 always emits a
+    // closed mask, so a bound backend means skeleton mode must be ignored
+    // (BROS-1434).
+    it("is false when idle / unbound", () => {
+      const m = TestModel.create({});
+      expect(m.hasInteractiveBackend).toBe(false);
+    });
+
+    it("is true once a backend is bound", () => {
+      const m = TestModel.create({});
+      m.setInteractiveBackend(7);
+      expect(m.hasInteractiveBackend).toBe(true);
+    });
+
+    it("is false again after unbinding", () => {
+      const m = TestModel.create({});
+      m.setInteractiveBackend(7);
+      m.setInteractiveBackend(null);
+      expect(m.hasInteractiveBackend).toBe(false);
+    });
+  });
+
   describe("setInteractiveError", () => {
     it("rolls back the last prompt and returns to `started` when no mask exists", () => {
       const m = TestModel.create({});
