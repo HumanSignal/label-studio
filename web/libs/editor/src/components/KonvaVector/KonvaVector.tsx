@@ -4,7 +4,7 @@ import { Group, Shape } from "react-konva";
 import { ControlPoints, GhostLine, GhostPoint, type GhostPointRef, VectorPoints, VectorShape } from "./components";
 import { createEventHandlers } from "./eventHandlers";
 import { convertPoint } from "./pointManagement";
-import { normalizePoints, convertBezierToSimplePoints, isPointInPolygon } from "./utils";
+import { normalizePoints, convertBezierToSimplePoints, isPointInPolygon, resolveDrawingOriginPointId } from "./utils";
 import { findClosestPointOnPath, getDistance, snapToPixel } from "./eventHandlers/utils";
 import { constrainAnchorPointsToBounds, constrainPointToBounds } from "./utils/boundsChecking";
 import { stageToImageCoordinates } from "./eventHandlers/utils";
@@ -1600,6 +1600,16 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
       });
       return selectedIds;
     },
+    // The id of the vertex the dashed preview (ghost) line currently draws from, resolved
+    // with the exact same precedence GhostLine uses (active → selected → last-added → last).
+    // Externally-managed regions (VideoVector appends straight to the MobX store) read this
+    // so the committed segment starts from the point the preview drew from. BROS-1438.
+    getDrawingOriginPointId: () =>
+      resolveDrawingOriginPointId(initialPoints, {
+        activePointId,
+        selectedPointIndex,
+        lastAddedPointId,
+      }),
     exportShape: () => {
       const exportedPoints = initialPoints.map((point) => {
         const controlPoints: Array<{ x: number; y: number }> = [];

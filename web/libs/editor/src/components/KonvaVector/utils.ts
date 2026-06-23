@@ -369,3 +369,28 @@ export const resolveVideoAppendOriginId = (
   }
   return points.length > 0 ? points[points.length - 1].id : undefined;
 };
+
+/**
+ * Resolve the vertex a newly placed video-vector point should connect from, keeping the
+ * committed segment in lock-step with the dashed preview (ghost) line.
+ *
+ * BROS-1438: the ghost line draws from the origin KonvaVector resolves live via
+ * resolveDrawingOriginPointId (active → selected → last-added → last vertex). The append
+ * used to read only a cached "resume" id captured through the onPointSelected callback,
+ * which desynced from the ghost whenever the active point was set WITHOUT that callback
+ * firing — programmatic selection (suppressed via isProgrammaticSelection), the
+ * "clear selection when not selected" effect, or a first-click ref race. The preview then
+ * pointed at the user's selected endpoint while the segment still connected from the last
+ * vertex (the "second attempt works" report).
+ *
+ * Prefer the live ghost origin; fall back to the cached resume id only when the ghost
+ * origin is unavailable (e.g. the very first click, before KonvaVector's ref resolves).
+ * Either way the chosen id is validated as a legal resume vertex by
+ * resolveVideoAppendOriginId (endpoint-only in non-skeleton mode).
+ */
+export const resolveVideoAppendOriginIdFromGhost = (
+  points: Array<{ id: string; prevPointId?: string | null }>,
+  ghostOriginId: string | null | undefined,
+  resumeOriginId: string | null | undefined,
+  skeletonEnabled = false,
+): string | undefined => resolveVideoAppendOriginId(points, ghostOriginId ?? resumeOriginId, skeletonEnabled);

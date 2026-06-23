@@ -4,7 +4,7 @@ import { Group } from "react-konva";
 import { useRegionStyles } from "../../../hooks/useRegionColor";
 import { KonvaVector } from "../../../components/KonvaVector/KonvaVector";
 import { isVectorSkeletonEnabled } from "../../../components/KonvaVector/skeleton";
-import { generatePointId, resolveVideoAppendOriginId } from "../../../components/KonvaVector/utils";
+import { generatePointId, resolveVideoAppendOriginIdFromGhost } from "../../../components/KonvaVector/utils";
 import { LabelOnVideoBbox } from "../../../components/ImageView/LabelOnRegion";
 import ToolsManager from "../../../tools/Manager";
 
@@ -238,13 +238,18 @@ const VideoVectorPure = ({
       const max = getMaxPoints(control);
       if (max && currentPixels.length >= max) return;
 
-      // Connect the new segment from the point the user selected (matching the dashed
-      // preview line) instead of always the last vertex. In skeleton mode that can be any
-      // node (a new branch); otherwise only an endpoint resumes drawing. The selection is
-      // consumed here so the following clicks continue from the just-added vertex rather
-      // than forking off the same point again. BROS-1432.
-      const prevPointId = resolveVideoAppendOriginId(
+      // Connect the new segment from the exact vertex the dashed preview (ghost) line is
+      // drawing from, so the committed segment always matches the preview. KonvaVector
+      // resolves that origin live (active → selected → last-added → last); reading it here
+      // fixes the case where the active point was set without firing onPointSelected, which
+      // left resumeOriginIdRef stale so the segment forked off the last vertex while the
+      // preview pointed at the selected endpoint (BROS-1438). The cached resume id remains a
+      // fallback for the very first click before KonvaVector's ref resolves. In skeleton mode
+      // the origin can be any node (a new branch); otherwise only an endpoint resumes drawing.
+      const ghostOriginId = vectorRef.current?.getDrawingOriginPointId?.() ?? null;
+      const prevPointId = resolveVideoAppendOriginIdFromGhost(
         currentPixels,
+        ghostOriginId,
         resumeOriginIdRef.current,
         control?.skeleton ?? false,
       );
