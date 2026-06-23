@@ -8,7 +8,7 @@ from core.permissions import AllPermissions
 from core.redis import start_job_async_or_sync
 from core.utils.common import load_func
 from core.utils.db import delete_annotations_queryset_with_retry
-from data_manager.actions import DataManagerAction
+from data_manager.actions import DataManagerAction, user_option_label
 from data_manager.functions import evaluate_predictions
 from django.conf import settings
 from projects.models import Project
@@ -170,10 +170,7 @@ def delete_tasks_annotations_form(user, project):
                     'type': 'select',
                     'name': 'annotator',
                     'label': 'Annotator',
-                    'options': [
-                        {'value': str(user.id), 'label': user.get_full_name() or user.username or user.email}
-                        for user in users
-                    ],
+                    'options': [{'value': str(user.id), 'label': user_option_label(user)} for user in users],
                     'placeholder': 'All',
                     'searchable': True,
                 }

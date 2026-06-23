@@ -33,6 +33,12 @@ class DataManagerAction(TypedDict):
     enterprise_badge: Optional[bool]
 
 
+def user_option_label(user):
+    """Label for a user option in action dropdowns, keeping name and email searchable."""
+    display = user.get_full_name() or user.username
+    return f'{display} ({user.email})' if display else user.email
+
+
 def check_action_permission(user, action, project):
     """Actions must have permissions, if only one is in the user role then the action is allowed"""
     if 'permission' not in action:
