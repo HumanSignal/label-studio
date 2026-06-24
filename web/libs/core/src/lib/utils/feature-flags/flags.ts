@@ -160,6 +160,15 @@ export const FF_ECHO_466_TAXONOMY_ANTD_REMOVAL = "fflag_feat_all_echo_466_taxono
 export const FF_MODAL_WINDOW_APP_CHROME = "fflag_feat_front_fit_1559_modal_window_short";
 
 /**
+ * New drafts + undo/redo architecture in the new editor (`editor-shell`).
+ * When OFF, both editors behave exactly as today (existing draft / `screenHistoryAtom` path).
+ * When ON, the editor-shell routes changes through the Canvas / UndoRedoStack / Draft / DraftBridge
+ * model (per-annotation undo/redo, draft as a separate concept, host-owned debounce/persistence).
+ * See docs/drafts/DRAFTS.md.
+ */
+export const FF_INTERFACES_NEW_DRAFTS = "fflag_feat_interfaces_new_drafts";
+
+/**
  * Annotation course builder for project onboarding and workforce learning.
  */
 export const FF_ANNOTATION_COURSE_BUILDER = "fflag_feat_annotation_course_builder";
