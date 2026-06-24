@@ -114,7 +114,7 @@ const UsersInjector = inject(({ store }) => {
 Annotators.filterItems = (items) => {
   return items.filter((userId) => {
     const user = DM.usersMap.get(userId);
-    return !(user?.firstName === "Deleted" && user?.lastName === "User");
+    return !(user?.firstName === "Deleted" && user?.lastName?.startsWith("User"));
   });
 };
 

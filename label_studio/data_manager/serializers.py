@@ -656,7 +656,7 @@ class DataManagerTaskSerializer(TaskSerializer):
             user_obj = users_by_id.get(pk)
             if not user_obj:
                 continue
-            user_data = CompletedByDMSerializer(user_obj).data
+            user_data = CompletedByDMSerializer(user_obj, context=self.context).data
             out.append(
                 {
                     'user_id': pk,

@@ -35,29 +35,59 @@ class BaseUserSerializer(FlexFieldsModelSerializer):
         return {'title': title, 'email': email}
 
     def _is_deleted(self, instance):
-        if 'user' in self.context:
-            org_id = self.context['user'].active_organization_id
-        elif 'request' in self.context:
-            org_id = self.context['request'].user.active_organization_id
-        else:
-            org_id = None
+        if 'deleted_user_ids' in self.context:
+            return instance.id in self.context['deleted_user_ids']
+
+        org_id = None
+        project = self.context.get('project')
+        if project:
+            org_id = getattr(project, 'organization_id', None)
 
         if not org_id:
-            return False
+            organization = self.context.get('organization')
+            if organization:
+                org_id = getattr(organization, 'id', organization)
 
-        # Will use prefetched objects if available
-        organization_members = instance.om_through.all()
-        organization_member_for_user = next(
-            (
-                organization_member
-                for organization_member in organization_members
-                if organization_member.organization_id == org_id
-            ),
-            None,
-        )
-        if not organization_member_for_user:
-            return True
-        return bool(organization_member_for_user.deleted_at)
+        if not org_id:
+            org_id = self.context.get('organization_id')
+
+        if not org_id:
+            if 'user' in self.context:
+                org_id = getattr(self.context['user'], 'active_organization_id', None)
+            elif (
+                'request' in self.context and hasattr(self.context['request'], 'user') and self.context['request'].user
+            ):
+                org_id = getattr(self.context['request'].user, 'active_organization_id', None)
+
+        if not org_id:
+            if 'is_deleted_cache' not in self.context:
+                self.context['is_deleted_cache'] = {}
+            if instance.id in self.context['is_deleted_cache']:
+                return self.context['is_deleted_cache'][instance.id]
+
+            if 'om_through' in getattr(instance, '_prefetched_objects_cache', {}):
+                organization_members = list(instance.om_through.all())
+                is_del = bool(organization_members and all(om.deleted_at for om in organization_members))
+            else:
+                has_active = instance.om_through.filter(deleted_at__isnull=True).exists()
+                has_any = instance.om_through.exists()
+                is_del = has_any and not has_active
+
+            self.context['is_deleted_cache'][instance.id] = is_del
+            return is_del
+
+        cache_key = f'deleted_user_ids_{org_id}'
+        if cache_key not in self.context:
+            from organizations.models import OrganizationMember
+
+            deleted_ids = set(
+                OrganizationMember.objects.filter(organization_id=org_id, deleted_at__isnull=False).values_list(
+                    'user_id', flat=True
+                )
+            )
+            self.context[cache_key] = deleted_ids
+
+        return instance.id in self.context[cache_key]
 
     def _get_requester(self):
         """The user making the request (the viewer), from serializer context."""
@@ -77,18 +107,34 @@ class BaseUserSerializer(FlexFieldsModelSerializer):
         if uid not in self.context[key]:
             self.context[key][uid] = super().to_representation(instance)
 
+        representation = self.context[key][uid]
+        is_modified = False
+
         if self._is_deleted(instance):
+            representation = dict(representation)
+            is_modified = True
             for field in ['username', 'first_name', 'last_name', 'email']:
-                self.context[key][uid][field] = 'User' if field == 'last_name' else 'Deleted'
+                if field == 'last_name':
+                    representation[field] = f'User {uid}'
+                elif field == 'username':
+                    representation[field] = f'deleted-{uid}'
+                elif field == 'email':
+                    representation[field] = f'deleted-{uid}-user@example.com'
+                else:
+                    representation[field] = 'Deleted'
 
         # Annotator/reviewer firewall: hide other users' identity entirely (id-less role stub)
         requester = self._get_requester()
         if AnnotatorReviewerFirewall.should_anonymize(user=instance, requester=requester):
-            self.context[key][uid] = AnnotatorReviewerFirewall.anonymize_user_data(
-                self.context[key][uid], user=instance, requester=requester
+            representation = AnnotatorReviewerFirewall.anonymize_user_data(
+                representation, user=instance, requester=requester
             )
+            is_modified = True
 
-        return self.context[key][uid]
+        if is_modified:
+            self.context[key][uid] = representation
+
+        return representation
 
     class Meta:
         model = User
