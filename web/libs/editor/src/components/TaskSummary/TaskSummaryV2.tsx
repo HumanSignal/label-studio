@@ -358,7 +358,7 @@ const TaskSummary = ({
         <NumbersSummary values={summaryCards} />
       </div>
 
-      {agreementData.isLoading ? (
+      {agreementData.isDashboardLoading ? (
         <div className="mb-relaxed">
           <DashboardSkeleton />
         </div>

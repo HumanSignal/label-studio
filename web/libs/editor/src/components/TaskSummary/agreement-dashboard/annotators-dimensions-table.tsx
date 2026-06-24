@@ -26,6 +26,7 @@ import type {
   GroundTruthSource,
   MajorityVoteResult,
   SummaryAnnotation,
+  SummaryPrediction,
 } from "./types";
 import type { ValueCount } from "./use-ground-truth";
 
@@ -54,7 +55,7 @@ interface AnnotatorsDimensionsTableProps {
   annotators: AnnotatorInfo[];
   /** Per-row annotation data aligned with annotators (by index). Provides
    *  ground_truth, reviews, comments, and the annotation ID for click handling. */
-  annotationForRow?: (SummaryAnnotation | null)[];
+  annotationForRow?: (SummaryAnnotation | SummaryPrediction | null)[];
   /** Called when a row is clicked with the annotation's database ID (pk) */
   onAnnotationClick?: (annotationId: number) => void;
   /** Optional per-dimension scores to render as agreement bars under the table */
@@ -249,7 +250,7 @@ export const AnnotatorsDimensionsTable = ({
             {displayAnnotators.map((annotator, rowIndex) => {
               const isEvenRow = rowIndex % 2 === 0;
               const ann = annotationForRow?.[annotator.index];
-              const lastReview = ann?.reviews?.length ? ann.reviews[ann.reviews.length - 1] : null;
+              const lastReview = ann?.reviews?.at?.(-1) ?? null;
 
               const reviewBadge = lastReview ? (
                 <div

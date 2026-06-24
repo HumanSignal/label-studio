@@ -20,6 +20,7 @@ import type {
   DimensionScore,
   GroundTruthInferenceResponse,
   SummaryAnnotation,
+  SummaryPrediction,
   SummaryUser,
   TaskAgreementResult,
   TaskMeta,
@@ -136,7 +137,7 @@ export interface AgreementData {
   /** Per-row annotation data aligned with annotators (by annotator index).
    *  Built from annotation_ids + summaryAnnotations so the table can access
    *  ground_truth, reviews, etc. without a separate annotations_meta. */
-  annotationForRow: (SummaryAnnotation | null)[];
+  annotationForRow: (SummaryAnnotation | SummaryPrediction | null)[];
   /** Per-dimension scores for the bar chart, sorted ascending */
   dimensionScores: DimensionScore[];
   /** Overall agreement score for the selected method */
@@ -159,6 +160,8 @@ export interface AgreementData {
   gtCompletedByName: string | undefined;
   /** Loading state */
   isLoading: boolean;
+  /** True while the dashboard should show a loading skeleton (initial load or include_predictions refetch). */
+  isDashboardLoading: boolean;
   /** Error state */
   error: Error | null;
   /** Whether the agreement data has meaningful content */
@@ -178,6 +181,7 @@ export function useTaskSummaryData({
   const {
     data: apiResponse,
     isLoading,
+    isFetching,
     error,
   } = useQuery({
     queryKey: ["task-summary-dashboard", taskId, predictionsIncluded],
@@ -290,21 +294,27 @@ export function useTaskSummaryData({
     return [...humanRows, ...predRows];
   }, [agreementResult, summaryAnnotations, hideInfo, currentUser]);
 
-  const annotationForRow = useMemo<(SummaryAnnotation | null)[]>(() => {
+  const annotationForRow = useMemo<(SummaryAnnotation | SummaryPrediction | null)[]>(() => {
     if (!agreementResult?.annotation_ids) return [];
     const annotationById = new Map<number, SummaryAnnotation>();
     for (const ann of summaryAnnotations) {
       annotationById.set(ann.id, ann);
     }
-    const rows: (SummaryAnnotation | null)[] = agreementResult.annotation_ids.map(
+    const rows: (SummaryAnnotation | SummaryPrediction | null)[] = agreementResult.annotation_ids.map(
       (id) => annotationById.get(id) ?? null,
     );
     const predCount = agreementResult.prediction_model_versions?.length ?? 0;
-    for (let i = 0; i < predCount; i++) {
-      rows.push(null);
+    if (predCount > 0) {
+      const sortedPredictions = [...(apiResponse?.predictions ?? [])].sort((a, b) => {
+        const versionCmp = (a.model_version ?? "").localeCompare(b.model_version ?? "");
+        return versionCmp !== 0 ? versionCmp : a.id - b.id;
+      });
+      for (let i = 0; i < predCount; i++) {
+        rows.push(sortedPredictions[i] ?? null);
+      }
     }
     return rows;
-  }, [agreementResult, summaryAnnotations]);
+  }, [agreementResult, summaryAnnotations, apiResponse?.predictions]);
 
   const dimensions = useMemo<DimensionInfo[]>(() => {
     if (!agreementResult) return [];
@@ -358,6 +368,11 @@ export function useTaskSummaryData({
     agreementResult.dimension_results.length > 0 &&
     (agreementResult.annotator_ids.length > 0 || (agreementResult.prediction_model_versions?.length ?? 0) > 0);
 
+  const isDashboardLoading =
+    isLoading ||
+    (isFetching && !apiResponse) ||
+    (includePredictions && isFetching && apiResponse?.predictions === undefined);
+
   return {
     apiResponse,
     task,
@@ -380,6 +395,7 @@ export function useTaskSummaryData({
     gtInferenceStatus,
     gtCompletedByName,
     isLoading,
+    isDashboardLoading,
     error: error as Error | null,
     hasAgreementData,
   };
