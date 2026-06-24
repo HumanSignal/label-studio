@@ -30,7 +30,7 @@ from tasks.ordering import apply_annotation_ordering, apply_prediction_ordering
 from tasks.result_utils import dedupe_annotation_result_list
 from tasks.validation import TaskValidator
 from users.models import User
-from users.serializers import UserSerializer
+from users.serializers import AnnotatorReviewerFirewall, AnonymizedUserPrimaryKeyRelatedField, UserSerializer
 
 logger = logging.getLogger(__name__)
 
@@ -157,7 +157,13 @@ class AnnotationSerializer(FlexFieldsModelSerializer):
     result = AnnotationResultField(required=False)
     created_username = serializers.SerializerMethodField(default='', read_only=True, help_text='Username string')
     created_ago = serializers.CharField(default='', read_only=True, help_text='Time delta from creation time')
-    completed_by = serializers.PrimaryKeyRelatedField(required=False, queryset=User.objects.all())
+    completed_by = AnonymizedUserPrimaryKeyRelatedField(required=False, queryset=User.objects.all())
+    updated_by = AnonymizedUserPrimaryKeyRelatedField(
+        required=False,
+        allow_null=True,
+        queryset=User.objects.all(),
+        help_text='Last user who updated this annotation',
+    )
     unique_id = serializers.CharField(required=False, write_only=True)
 
     def create(self, *args, **kwargs):
@@ -218,6 +224,11 @@ class AnnotationSerializer(FlexFieldsModelSerializer):
         if not user:
             return ''
 
+        request = self.context.get('request')
+        requester = getattr(request, 'user', None) if request is not None else None
+        if AnnotatorReviewerFirewall.should_anonymize(user=user, requester=requester):
+            return AnnotatorReviewerFirewall.role_label(user=user, requester=requester)
+
         name = user.first_name
         if len(user.last_name):
             name = name + ' ' + user.last_name
@@ -263,7 +274,7 @@ class AnnotationStubSerializer(FlexFieldsModelSerializer):
 
     created_username = serializers.SerializerMethodField(default='', read_only=True, help_text='Username string')
     created_ago = serializers.CharField(default='', read_only=True, help_text='Time delta from creation time')
-    completed_by = serializers.PrimaryKeyRelatedField(required=False, queryset=User.objects.all())
+    completed_by = AnonymizedUserPrimaryKeyRelatedField(required=False, queryset=User.objects.all())
     # Mark this as a stub so frontend knows to fetch full data on selection
     is_stub = serializers.SerializerMethodField(read_only=True)
 
@@ -271,6 +282,11 @@ class AnnotationStubSerializer(FlexFieldsModelSerializer):
         user = annotation.completed_by
         if not user:
             return ''
+
+        request = self.context.get('request')
+        requester = getattr(request, 'user', None) if request is not None else None
+        if AnnotatorReviewerFirewall.should_anonymize(user=user, requester=requester):
+            return AnnotatorReviewerFirewall.role_label(user=user, requester=requester)
 
         name = user.first_name
         if len(user.last_name):
@@ -1004,6 +1020,11 @@ class AnnotationDraftSerializer(ModelSerializer):
         if not user:
             return ''
 
+        request = self.context.get('request')
+        requester = getattr(request, 'user', None) if request is not None else None
+        if AnnotatorReviewerFirewall.should_anonymize(user=user, requester=requester):
+            return AnnotatorReviewerFirewall.role_label(user=user, requester=requester)
+
         name = user.first_name
         last_name = user.last_name
         if len(last_name):
@@ -1020,6 +1041,13 @@ class AnnotationDraftSerializer(ModelSerializer):
             and flag_set('fflag_feat_fit_710_fsm_state_fields', user=user)
         ):
             ret.pop('state', None)
+        # Firewall: the `user` field serializes to str(user) (username/email); hide it for others.
+        draft_user = getattr(obj, 'user', None)
+        if draft_user is not None and 'user' in ret:
+            request = self.context.get('request')
+            requester = getattr(request, 'user', None) if request is not None else None
+            if AnnotatorReviewerFirewall.should_anonymize(user=draft_user, requester=requester):
+                ret['user'] = AnnotatorReviewerFirewall.role_label(user=draft_user, requester=requester)
         return ret
 
     class Meta:

@@ -59,6 +59,13 @@ class BaseUserSerializer(FlexFieldsModelSerializer):
             return True
         return bool(organization_member_for_user.deleted_at)
 
+    def _get_requester(self):
+        """The user making the request (the viewer), from serializer context."""
+        if 'user' in self.context:
+            return self.context['user']
+        request = self.context.get('request')
+        return getattr(request, 'user', None) if request is not None else None
+
     def to_representation(self, instance):
         """Returns user with cache, this helps to avoid multiple s3/gcs links resolving for avatars"""
 
@@ -73,6 +80,13 @@ class BaseUserSerializer(FlexFieldsModelSerializer):
         if self._is_deleted(instance):
             for field in ['username', 'first_name', 'last_name', 'email']:
                 self.context[key][uid][field] = 'User' if field == 'last_name' else 'Deleted'
+
+        # Annotator/reviewer firewall: hide other users' identity entirely (id-less role stub)
+        requester = self._get_requester()
+        if AnnotatorReviewerFirewall.should_anonymize(user=instance, requester=requester):
+            self.context[key][uid] = AnnotatorReviewerFirewall.anonymize_user_data(
+                self.context[key][uid], user=instance, requester=requester
+            )
 
         return self.context[key][uid]
 
@@ -237,3 +251,39 @@ class HotkeysSerializer(serializers.Serializer):
 UserSerializer = load_func(settings.USER_SERIALIZER)
 WhoAmIUserSerializer = load_func(settings.WHOAMI_USER_SERIALIZER)
 UserSerializerUpdate = load_func(settings.USER_SERIALIZER_UPDATE)
+AnnotatorReviewerFirewall = load_func(settings.ANNOTATOR_REVIEWER_FIREWALL)
+
+
+class AnonymizedUserPrimaryKeyRelatedField(serializers.PrimaryKeyRelatedField):
+    """``PrimaryKeyRelatedField`` for a user FK (e.g. ``completed_by``/``updated_by``).
+
+    Serializes to the related user's pk, except when the annotator/reviewer firewall
+    hides that user from the requester -- then it returns a stable, role-keyed
+    *negative* id (the same value the user serializer puts on the hidden user object)
+    so the real, correlatable id never leaks while ``completed_by``/``updated_by`` stay
+    numeric and resolvable on the frontend. Write behaviour is inherited unchanged.
+
+    When the firewall is active we disable DRF's pk-only optimization so we receive the
+    full related user instance and can derive its role (and therefore its negative id).
+    When the firewall is inactive the optimization stays on and there is no extra query.
+    """
+
+    def _get_requester(self):
+        if 'user' in self.context:
+            return self.context['user']
+        request = self.context.get('request')
+        return getattr(request, 'user', None) if request is not None else None
+
+    def use_pk_only_optimization(self):
+        # Resolving the role-keyed id needs the user instance, not just its pk; only
+        # pay for loading it when the firewall is actually active for this requester.
+        return not AnnotatorReviewerFirewall.is_active(self._get_requester())
+
+    def to_representation(self, value):
+        requester = self._get_requester()
+        if AnnotatorReviewerFirewall.is_active(requester):
+            # pk-only optimization is off, so ``value`` is the full related user.
+            if AnnotatorReviewerFirewall.should_anonymize(user=value, requester=requester):
+                return AnnotatorReviewerFirewall.anonymized_user_id(user=value, requester=requester)
+            return value.pk
+        return super().to_representation(value)

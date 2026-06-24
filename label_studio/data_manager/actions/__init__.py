@@ -34,7 +34,18 @@ class DataManagerAction(TypedDict):
 
 
 def user_option_label(user):
-    """Label for a user option in action dropdowns, keeping name and email searchable."""
+    """Label for a user option in action dropdowns, keeping name and email searchable.
+
+    When the annotator/reviewer firewall is active for the current requester, the
+    label is reduced to the user's role so no name/email leaks (these actions are
+    permission-gated, so this is defense-in-depth)."""
+    from core.current_request import CurrentContext
+    from users.serializers import AnnotatorReviewerFirewall
+
+    requester = CurrentContext.get_user()
+    if AnnotatorReviewerFirewall.should_anonymize(user=user, requester=requester):
+        return AnnotatorReviewerFirewall.role_label(user=user, requester=requester)
+
     display = user.get_full_name() or user.username
     return f'{display} ({user.email})' if display else user.email
 

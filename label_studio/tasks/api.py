@@ -778,15 +778,20 @@ class TaskSummaryAPI(generics.RetrieveAPIView):
                 dist['count'] = len(dist['values'])
             del dist['values']
 
+        from users.serializers import AnnotatorReviewerFirewall
+
         def _serialize_user(user):
             if user is None:
                 return None
-            return {
+            data = {
                 'id': user.id,
                 'email': user.email,
                 'first_name': user.first_name,
                 'last_name': user.last_name,
             }
+            if AnnotatorReviewerFirewall.should_anonymize(user=user, requester=request.user):
+                return AnnotatorReviewerFirewall.anonymize_user_data(data, user=user, requester=request.user)
+            return data
 
         annotations_list = [
             {
