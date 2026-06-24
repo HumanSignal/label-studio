@@ -1,6 +1,10 @@
 import { Button } from "@humansignal/ui";
 import { FF_DEV_1752, FF_DEV_2186, FF_FIT_1304_STRICT_OVERLAP, isFF } from "../utils/feature-flags";
-import { isActive, FF_FIT_720_LAZY_LOAD_ANNOTATIONS } from "@humansignal/core/lib/utils/feature-flags";
+import {
+  isActive,
+  FF_FIT_720_LAZY_LOAD_ANNOTATIONS,
+  FF_UTC_950_FIREWALL,
+} from "@humansignal/core/lib/utils/feature-flags";
 import { isDefined } from "../utils/utils";
 import { Modal } from "../components/Common/Modal/Modal";
 import { CommentsSdk } from "./comments-sdk";
@@ -162,7 +166,7 @@ export class LSFWrapper {
       interfaces.push("annotations:deny-empty");
     }
 
-    if (window.APP_SETTINGS.annotator_reviewer_firewall_enabled && this.labelStream) {
+    if (window.APP_SETTINGS.annotator_reviewer_firewall_enabled && this.labelStream && !isActive(FF_UTC_950_FIREWALL)) {
       interfaces.push("annotations:hide-info");
     }
 

@@ -179,3 +179,9 @@ export const FF_INTERFACES_AGENT_WORKFLOW = "fflag_feat_interfaces_agent_workflo
  * WASM FFmpeg Streaming Decoder (progressive seek/decode) for long compressed audio files
  */
 export const FF_FIT_2003_WASM_STREAMING_DECODER = "fflag_feat_front_fit_2003_wasm_streaming_decoder";
+
+/**
+ * Annotator/reviewer firewall — backend anonymizes PII, so frontend no longer needs
+ * to suppress userpics or hide annotation info when this flag is on.
+ */
+export const FF_UTC_950_FIREWALL = "fflag_feat_utc_950_annotator_reviewer_firewall_short";
