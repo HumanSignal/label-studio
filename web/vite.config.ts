@@ -13,6 +13,13 @@ import { CSS_PREFIX, cssModulesGenerateScopedName } from "./vite-prefix-css-modu
 import postcssImport from "postcss-import";
 import { jsxJsPlugin, optimizeDepsAutomaticJsxPlugin } from "./vite-lib-jsx-plugins";
 
+const codemirrorDedupe = [
+  "@codemirror/state",
+  "@codemirror/view",
+  "@codemirror/language",
+  "@uiw/react-codemirror",
+] as const;
+
 /**
  * Enforces the loading order of global stylesheets (Tailwind reset/utilities and core variables).
  * By explicitly injecting these at the very top of the entrypoint modules within the build system,
@@ -142,6 +149,7 @@ export default defineConfig(({ mode }) => {
           replacement: path.resolve(__dirname, "design-tokens.json"),
         },
       ],
+      dedupe: [...codemirrorDedupe],
       extensions: [".ts", ".tsx", ".mjs", ".js", ".jsx", ".json"],
     },
     css: {

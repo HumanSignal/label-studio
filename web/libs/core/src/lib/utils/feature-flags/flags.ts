@@ -190,6 +190,12 @@ export const FF_INTERFACES_AGENT_WORKFLOW = "fflag_feat_interfaces_agent_workflo
 export const FF_FIT_2003_WASM_STREAMING_DECODER = "fflag_feat_front_fit_2003_wasm_streaming_decoder";
 
 /**
+ * Virtualized JSON viewer (Task Source, Code tab) and CodeMirror 6 editor path.
+ * When off, JsonViewer and CodeEditor use the legacy json-edit-react / CM5 implementations.
+ */
+export const FF_FIT_2007_VIRTUALIZED_JSON_EDITOR = "fflag_feat_fit_2007_virtualized_json_editor_short";
+
+/**
  * Annotator/reviewer firewall — backend anonymizes PII, so frontend no longer needs
  * to suppress userpics or hide annotation info when this flag is on.
  */

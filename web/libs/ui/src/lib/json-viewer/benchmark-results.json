@@ -1,0 +1,79 @@
+{
+  "generatedAt": "2026-06-19T19:04:31.406Z",
+  "environment": {
+    "runtime": "Bun 1.3.11",
+    "viewportHeight": 500,
+    "initialExpandDepth": 2,
+    "warmupRuns": 1,
+    "measuredRuns": 3,
+    "note": "jsdom mount benchmark — approximates initial render cost; scroll perf validated manually in spike doc."
+  },
+  "results": [
+    {
+      "library": "json-edit-react",
+      "fixture": "large-task-source-10kb.json",
+      "mountMs": {
+        "min": 22.01,
+        "max": 28.37,
+        "median": 27.74,
+        "samples": [28.37, 22.01, 27.74]
+      },
+      "domNodes": 1112
+    },
+    {
+      "library": "react-json-virtualization",
+      "fixture": "large-task-source-10kb.json",
+      "mountMs": {
+        "min": 2.85,
+        "max": 6.09,
+        "median": 2.92,
+        "samples": [6.09, 2.85, 2.92]
+      },
+      "domNodes": 5
+    },
+    {
+      "library": "json-edit-react",
+      "fixture": "large-task-source-100kb.json",
+      "mountMs": {
+        "min": 119.78,
+        "max": 130.35,
+        "median": 129.05,
+        "samples": [129.05, 119.78, 130.35]
+      },
+      "domNodes": 8548
+    },
+    {
+      "library": "react-json-virtualization",
+      "fixture": "large-task-source-100kb.json",
+      "mountMs": {
+        "min": 14.33,
+        "max": 16.77,
+        "median": 15.45,
+        "samples": [15.45, 16.77, 14.33]
+      },
+      "domNodes": 5
+    },
+    {
+      "library": "json-edit-react",
+      "fixture": "large-task-source-1mb.json",
+      "mountMs": {
+        "min": 1151.65,
+        "max": 1306.05,
+        "median": 1214.19,
+        "samples": [1214.19, 1306.05, 1151.65]
+      },
+      "domNodes": 85416
+    },
+    {
+      "library": "react-json-virtualization",
+      "fixture": "large-task-source-1mb.json",
+      "mountMs": {
+        "min": 141.72,
+        "max": 189.7,
+        "median": 182.11,
+        "samples": [182.11, 189.7, 141.72]
+      },
+      "domNodes": 5
+    }
+  ]
+}

@@ -211,6 +211,32 @@ describe("TaskSourceViewer Component", () => {
         expect(screen.getByTestId("code-view")).toBeInTheDocument();
       });
     });
+
+    it("should keep interactive view mounted after switching to code", async () => {
+      const mockRenderToggle = mock();
+      let capturedOnViewChange: ((view: string) => void) | null = null;
+
+      mockRenderToggle.mockImplementation((toggle: any) => {
+        if (toggle?.props?.onViewChange) {
+          capturedOnViewChange = toggle.props.onViewChange;
+        }
+      });
+
+      render(<TaskSourceViewer {...defaultProps} renderToggle={mockRenderToggle} />);
+
+      await waitFor(() => {
+        expect(screen.getByTestId("json-viewer")).toBeInTheDocument();
+      });
+
+      capturedOnViewChange!("code");
+
+      await waitFor(() => {
+        expect(screen.getByTestId("code-view")).toBeInTheDocument();
+      });
+
+      // Interactive view stays mounted (hidden) so switching back avoids re-parsing.
+      expect(screen.getByTestId("json-viewer")).toBeInTheDocument();
+    });
   });
 
   describe("Data Explorer Mode", () => {

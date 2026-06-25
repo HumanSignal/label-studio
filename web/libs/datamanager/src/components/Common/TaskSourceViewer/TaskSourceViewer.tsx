@@ -143,6 +143,40 @@ export const TaskSourceViewer: FC<TaskSourceViewerProps> = ({
     return totalItems > 100 ? 2 : undefined;
   }, [taskData]);
 
+  // Keep each view mounted after first visit so Code ↔ Interactive does not re-parse MB JSON.
+  const [interactiveMounted, setInteractiveMounted] = useState(view === "interactive");
+  const [codeMounted, setCodeMounted] = useState(view === "code");
+
+  useEffect(() => {
+    if (view === "interactive") {
+      setInteractiveMounted(true);
+    }
+    if (view === "code") {
+      setCodeMounted(true);
+    }
+  }, [view]);
+
+  // Warm the inactive view after load so the first Code ↔ Interactive switch is fast.
+  useEffect(() => {
+    if (loading || !taskData) return;
+
+    const mountBothViews = () => {
+      setInteractiveMounted(true);
+      setCodeMounted(true);
+    };
+
+    if (typeof requestIdleCallback === "function") {
+      const idleId = requestIdleCallback(mountBothViews, { timeout: 2000 });
+      return () => cancelIdleCallback(idleId);
+    }
+
+    const timeoutId = window.setTimeout(mountBothViews, 200);
+    return () => clearTimeout(timeoutId);
+  }, [loading, taskData]);
+
+  const interactivePaneClassName = view === "interactive" ? styles.viewPaneActive : styles.viewPaneHidden;
+  const codePaneClassName = view === "code" ? styles.viewPaneActive : styles.viewPaneHidden;
+
   return (
     <div className={styles.taskSourceView}>
       <div className={styles.viewContent}>
@@ -152,26 +186,36 @@ export const TaskSourceViewer: FC<TaskSourceViewerProps> = ({
               <div key={i} className={styles.skeletonLine} style={{ width: `${65 + Math.sin(i * 1.8) * 25}%` }} />
             ))}
           </div>
-        ) : view === "code" ? (
-          <CodeView data={taskData} />
         ) : (
-          <JsonViewer
-            data={taskData}
-            inset={true}
-            viewOnly={true}
-            showSearch={true}
-            customFilters={TASK_SOURCE_FILTERS}
-            minHeight={560}
-            maxHeight={560}
-            collapse={collapseDepth}
-            readerViewThreshold={100}
-            storageKey={storageKey}
-            toolbarExtra={
-              <div style={{ marginLeft: "auto" }}>
-                <Toggle label="Resolve URIs" checked={resolveUrls} onChange={handleResolveUrlsChange} />
+          <>
+            {interactiveMounted && (
+              <div className={interactivePaneClassName} aria-hidden={view !== "interactive"}>
+                <JsonViewer
+                  data={taskData}
+                  className={styles.taskSourceJsonViewer}
+                  minHeight={null}
+                  maxHeight={null}
+                  inset={true}
+                  viewOnly={true}
+                  showSearch={true}
+                  customFilters={TASK_SOURCE_FILTERS}
+                  collapse={collapseDepth}
+                  readerViewThreshold={100}
+                  storageKey={storageKey}
+                  toolbarExtra={
+                    <div style={{ marginLeft: "auto" }}>
+                      <Toggle label="Resolve URIs" checked={resolveUrls} onChange={handleResolveUrlsChange} />
+                    </div>
+                  }
+                />
               </div>
-            }
-          />
+            )}
+            {codeMounted && (
+              <div className={codePaneClassName} aria-hidden={view !== "code"}>
+                <CodeView data={taskData} />
+              </div>
+            )}
+          </>
         )}
       </div>
     </div>
