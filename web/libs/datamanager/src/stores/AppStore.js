@@ -270,11 +270,13 @@ export const AppStore = types
           await self.LSF?.setLSFTask(self.taskStore.selected, targetAnnotationID, undefined, isPrediction);
 
           if (regionIDFromUrl) {
-            const currentAnn = self.LSF?.currentAnnotation;
-            // Focus on the region by hiding all other regions
-            currentAnn?.regionStore?.setRegionVisible(regionIDFromUrl);
-            // Select the region so outliner details are visible
-            currentAnn?.regionStore?.selectRegionByID(regionIDFromUrl);
+            setTimeout(() => {
+              const currentAnn = self.LSF?.currentAnnotation;
+              // Focus on the region by hiding all other regions
+              currentAnn?.regionStore?.setRegionVisible(regionIDFromUrl);
+              // Select the region so outliner details are visible
+              currentAnn?.regionStore?.selectRegionByID(regionIDFromUrl);
+            }, 0);
           }
 
           // Enable viewingAll mode if interface option is "annotations:view-all"

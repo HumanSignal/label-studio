@@ -107,4 +107,36 @@ describe("AppStore setTask annotation matching (FIT-1949)", () => {
     getParamsSpy.mockRestore();
     navigateSpy.mockRestore();
   });
+
+  it("should select region if region URL parameter is present", async () => {
+    const setRegionVisibleMock = mock(() => {});
+    const selectRegionByIDMock = mock(() => {});
+
+    mockLsf.currentAnnotation = {
+      pk: 97375393,
+      id: "abcde",
+      regionStore: {
+        setRegionVisible: setRegionVisibleMock,
+        selectRegionByID: selectRegionByIDMock,
+      },
+    };
+
+    const getParamsSpy = spyOn(History, "getParams").mockReturnValue({
+      annotation: "97375393",
+      region: "r1",
+    });
+
+    const navigateSpy = spyOn(History, "navigate").mockImplementation(() => {});
+
+    await store.setTask({ taskID: 1, annotationID: 97375393, pushState: false });
+
+    // Wait for the next tick for setTimeout(..., 0) to execute
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    expect(setRegionVisibleMock).toHaveBeenCalledWith("r1");
+    expect(selectRegionByIDMock).toHaveBeenCalledWith("r1");
+
+    getParamsSpy.mockRestore();
+    navigateSpy.mockRestore();
+  });
 });
