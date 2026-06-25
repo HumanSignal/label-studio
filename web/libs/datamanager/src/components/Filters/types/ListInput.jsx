@@ -1,6 +1,6 @@
 import { Badge } from "@humansignal/ui";
 import { observer } from "mobx-react";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 const SPLIT_RE = /[\n,;\t ]+/;
 
@@ -62,6 +62,17 @@ export const ListInput = observer(({ value, onChange, type = "string", placehold
   // Local text state — the textarea is the source of truth. The parent receives
   // only the parsed valid array.
   const [text, setText] = useState(() => joinList(value));
+
+  useEffect(() => {
+    setText((prev) => {
+      const nextText = joinList(value);
+      const { valid: prevValid } = parseListInput(prev, type);
+      if (JSON.stringify(prevValid) !== JSON.stringify(value)) {
+        return nextText;
+      }
+      return prev;
+    });
+  }, [value, type]);
 
   const { valid, invalid } = useMemo(() => parseListInput(text, type), [text, type]);
 

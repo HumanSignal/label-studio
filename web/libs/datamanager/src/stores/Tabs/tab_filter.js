@@ -7,6 +7,7 @@ import { debounce } from "@humansignal/core/lib/utils/debounce";
 import { isBlank, isDefined } from "../../utils/utils";
 import { FilterValueRange, FilterValueType, TabFilterType } from "./tab_filter_type";
 import { resolveFilterTransition } from "./filter_snapshot_utils";
+import { guidGenerator } from "../../utils/random";
 
 /**
  * BROS-1203 — operators that strictly require a JSON array on the wire.
@@ -60,6 +61,7 @@ const getOperatorDefaultValue = (operator) => {
 
 export const TabFilter = types
   .model("TabFilter", {
+    id: types.optional(types.identifier, guidGenerator),
     filter: types.reference(TabFilterType),
     operator: types.maybeNull(Operators),
     value: types.maybeNull(FilterValueType),
