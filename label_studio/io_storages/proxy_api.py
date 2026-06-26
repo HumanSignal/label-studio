@@ -26,7 +26,7 @@ logger = logging.getLogger(__name__)
 # credentials from Postgres by storage_id and streams bytes from cloud
 # storage itself. Must stay in sync with the `providers` map in
 # services/streamer/internal/storageproxy/storages/storages.go.
-STREAMER_DELEGATED_STORAGE_TYPES = {'s3', 's3s'}
+STREAMER_DELEGATED_STORAGE_TYPES = {'s3', 's3s', 'gcs', 'gcs_sa', 'gcswif'}
 
 
 def get_streamer_storage_type(storage):
