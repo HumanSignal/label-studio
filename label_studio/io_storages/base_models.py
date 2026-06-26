@@ -893,10 +893,19 @@ class ExportStorage(Storage, ProjectStorageMixin):
     def save_annotation(self, annotation):
         raise NotImplementedError
 
-    def save_annotations(self, annotations: models.QuerySet[Annotation]):
+    def save_annotations(self, annotations: models.QuerySet[Annotation], update_status: bool = True):
+        """Export a queryset of annotations to this storage.
+
+        :param update_status: when True (the default, used by full syncs) the storage's sync status
+            (QUEUED -> IN_PROGRESS -> COMPLETED) and last_sync_count are updated. Pass False for
+            partial exports (e.g. bulk review) that should not touch the storage sync status, which
+            also avoids the QUEUED precondition required by ``info_set_in_progress``.
+        """
         annotation_exported = 0
+        failed = 0
         total_annotations = annotations.count()
-        self.info_set_in_progress()
+        if update_status:
+            self.info_set_in_progress()
         self.cached_user = self.project.organization.created_by
 
         # Calculate optimal batch size based on project data and worker count
@@ -921,10 +930,28 @@ class ExportStorage(Storage, ProjectStorageMixin):
                     futures.append(executor.submit(self.save_annotation, annotation))
 
                 for future in concurrent.futures.as_completed(futures):
+                    # Resolve the future so exceptions raised inside save_annotation worker threads
+                    # are not silently swallowed. Best-effort: keep exporting the rest of the batch.
+                    try:
+                        future.result()
+                    except Exception:
+                        failed += 1
+                        logger.error(f'Export storage {self.id}: failed to export annotation', exc_info=True)
+                        continue
                     annotation_exported += 1
-                    self.info_update_progress(last_sync_count=annotation_exported, total_annotations=total_annotations)
+                    if update_status:
+                        self.info_update_progress(
+                            last_sync_count=annotation_exported, total_annotations=total_annotations
+                        )
 
-        self.info_set_completed(last_sync_count=annotation_exported, total_annotations=total_annotations)
+        # Surface worker-thread failures by re-raising so the RQ job is marked failed. Full syncs set the
+        # storage FAILED via on_failure=storage_background_failure; partial exports (update_status=False)
+        # leave the shared storage status untouched, which is the intended contract.
+        if failed:
+            raise RuntimeError(f'Export storage {self.id}: {failed} annotation(s) failed to export')
+
+        if update_status:
+            self.info_set_completed(last_sync_count=annotation_exported, total_annotations=total_annotations)
 
     def save_all_annotations(self):
         self.save_annotations(Annotation.objects.filter(project=self.project))
