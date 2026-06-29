@@ -37,6 +37,11 @@
     "xpath-range": "^1.1.1"
   },
   "main": "src/index.js",
+  "exports": {
+    ".": "./src/index.js",
+    "./bottom-bar": "./src/bottom-bar.js",
+    "./src/*": "./src/*"
+  },
   "devDependencies": {
     "babel-plugin-istanbul": "^7.0.0"
   }

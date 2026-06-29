@@ -1,0 +1,25 @@
+.projectCoursesMenu {
+  width: 16rem;
+  max-width: 16rem;
+  padding: var(--spacing-tighter, 4px);
+  overflow-x: hidden;
+}
+
+.projectCoursesMenu li {
+  margin: 0;
+  padding: 0;
+}
+
+.projectCoursesMenu :global(.menu__item) {
+  min-width: 0;
+  max-width: 100%;
+  margin: 0;
+}
+
+.courseItemLabel {
+  min-width: 0;
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

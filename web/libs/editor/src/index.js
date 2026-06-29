@@ -6,3 +6,4 @@ window.LabelStudio = LabelStudio;
 export default LabelStudio;
 
 export { LabelStudio };
+export { ProjectCoursesMenu, CourseListBadge } from "./bottom-bar.js";

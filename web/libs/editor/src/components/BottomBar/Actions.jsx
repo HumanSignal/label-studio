@@ -15,7 +15,7 @@ export const Actions = ({ store }) => {
   const isPrediction = entity?.type === "prediction";
   const isViewAll = annotationStore.viewingAll === true;
   const isBulkMode = !isStarterCloudPlan() && store.hasInterface("annotation:bulk");
-  const hideInstructionsForCourses = store.hideInstructionsForCourses === true && !store.hasInterface("review");
+  const hideInstructionsForCourses = store.hideInstructionsForCourses === true;
   const showInstructions = store.description && store.hasInterface("instruction") && !hideInstructionsForCourses;
 
   return (
