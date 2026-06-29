@@ -343,6 +343,79 @@ export const isEndpointVertexId = (points: Array<{ id: string; prevPointId?: str
 };
 
 /**
+ * Reorder an open vector path so the array runs head → tail with prevPointId flowing in a
+ * single consistent direction (head has none, every other vertex references its predecessor).
+ *
+ * BROS-1439: resuming a drawing from the FIRST vertex (a head endpoint with no prevPointId)
+ * appends the new vertex with prevPointId = head, so the head ends up referenced by two
+ * vertices. The prevPointId graph stays a simple path geometrically, but its pointer
+ * direction now flows *inward* to the original head, which sits in the middle of the line.
+ * The close logic (closePathBetweenFirstAndLast / isPathClosed) is index-based and assumes
+ * index 0 = head and the last index = tail, so that fork makes "click an end to close" wire
+ * up the wrong vertices and the region can never be closed. Renderer and endpoint detection
+ * are topology-based, so the line still looks correct — only closing breaks.
+ *
+ * This restores the index invariant: if the graph is a simple open path with exactly two
+ * endpoints, walk it end-to-end and rebuild the array + prevPointId in traversal order.
+ * `tailId` (the freshly appended vertex) is oriented to land last so drawing keeps continuing
+ * from it. Paths that are already linear are returned effectively unchanged; closed cycles and
+ * branched/skeleton graphs (≠ 2 endpoints) are left untouched.
+ */
+export const linearizeOpenVectorPath = <T extends { id: string; prevPointId?: string | null }>(
+  vertices: T[],
+  tailId?: string,
+): T[] => {
+  if (vertices.length < 3) return vertices;
+
+  const byId = new Map(vertices.map((v) => [v.id, v]));
+  const childrenOf = new Map<string, string[]>();
+  for (const v of vertices) {
+    if (v.prevPointId && byId.has(v.prevPointId)) {
+      const arr = childrenOf.get(v.prevPointId) ?? [];
+      arr.push(v.id);
+      childrenOf.set(v.prevPointId, arr);
+    }
+  }
+
+  // Undirected neighbours: a vertex connects to its prev (if valid) and to every child.
+  const neighbours = (id: string): string[] => {
+    const v = byId.get(id);
+    if (!v) return [];
+    const out: string[] = [];
+    if (v.prevPointId && byId.has(v.prevPointId)) out.push(v.prevPointId);
+    for (const c of childrenOf.get(id) ?? []) out.push(c);
+    return out;
+  };
+
+  const endpoints = vertices.filter((v) => neighbours(v.id).length === 1).map((v) => v.id);
+  // ≠ 2 endpoints → closed cycle or a real branch (skeleton); not a simple path to linearize.
+  if (endpoints.length !== 2) return vertices;
+
+  // Orient so the freshly appended vertex ends up last (drawing continues from the tail).
+  let startId = endpoints[0];
+  if (tailId && endpoints.includes(tailId)) {
+    startId = endpoints.find((e) => e !== tailId) ?? endpoints[0];
+  }
+
+  const order: string[] = [];
+  const visited = new Set<string>();
+  let current: string | undefined = startId;
+  while (current && !visited.has(current)) {
+    order.push(current);
+    visited.add(current);
+    current = neighbours(current).find((n) => !visited.has(n));
+  }
+
+  // Safety: if the walk didn't cover every vertex it isn't a clean single path — leave as-is.
+  if (order.length !== vertices.length) return vertices;
+
+  return order.map((id, i) => ({
+    ...(byId.get(id) as T),
+    prevPointId: i === 0 ? undefined : order[i - 1],
+  }));
+};
+
+/**
  * Resolve which existing vertex a newly placed video-vector point should connect from.
  *
  * Video vectors append straight to the MobX store (disableInternalPointAddition), so the

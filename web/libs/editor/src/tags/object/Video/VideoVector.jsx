@@ -4,7 +4,11 @@ import { Group } from "react-konva";
 import { useRegionStyles } from "../../../hooks/useRegionColor";
 import { KonvaVector } from "../../../components/KonvaVector/KonvaVector";
 import { isVectorSkeletonEnabled } from "../../../components/KonvaVector/skeleton";
-import { generatePointId, resolveVideoAppendOriginIdFromGhost } from "../../../components/KonvaVector/utils";
+import {
+  generatePointId,
+  linearizeOpenVectorPath,
+  resolveVideoAppendOriginIdFromGhost,
+} from "../../../components/KonvaVector/utils";
 import { LabelOnVideoBbox } from "../../../components/ImageView/LabelOnRegion";
 import ToolsManager from "../../../tools/Manager";
 
@@ -256,7 +260,14 @@ const VideoVectorPure = ({
       resumeOriginIdRef.current = null;
       const newPoint = { id: generatePointId(), x: px, y: py, prevPointId };
 
-      commitPoints([...currentPixels, newPoint]);
+      // Resuming from the first vertex forks the prevPointId graph (the head ends up with two
+      // children), which breaks the index-based close logic so the region can't be closed.
+      // Linearize back to a clean head→tail chain, keeping the new vertex last so drawing
+      // continues from it. Skeleton vectors keep their branches, so skip them. BROS-1439.
+      const nextPoints = [...currentPixels, newPoint];
+      const orderedPoints = control?.skeleton ? nextPoints : linearizeOpenVectorPath(nextPoints, newPoint.id);
+
+      commitPoints(orderedPoints);
     },
     [reg, control, commitPoints, isReadOnly],
   );
