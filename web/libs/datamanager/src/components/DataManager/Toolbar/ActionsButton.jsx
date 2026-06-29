@@ -1,5 +1,5 @@
 import { CaretDownIcon, IconChevronRight, IconTrash } from "@humansignal/icons";
-import { Button, Spinner, EnterpriseBadge } from "@humansignal/ui";
+import { Button, Spinner, EnterpriseBadge, Message } from "@humansignal/ui";
 import { inject, observer } from "mobx-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useActions } from "../../../hooks/useActions";
@@ -8,7 +8,7 @@ import { FF_LOPS_E_3, isFF } from "../../../utils/feature-flags";
 import { Dropdown } from "@humansignal/ui";
 import Form from "../../Common/Form/Form";
 import { Menu } from "../../Common/Menu/Menu";
-import { Modal } from "../../Common/Modal/ModalPopup";
+import { modal, useModalControls } from "../../Common/Modal/Modal";
 import "./ActionsButton.prefix.css";
 
 const isFFLOPSE3 = isFF(FF_LOPS_E_3);
@@ -17,9 +17,10 @@ const injector = inject(({ store }) => ({
   hasSelected: store.currentView?.selected?.hasSelected ?? false,
 }));
 
-const DialogContent = ({ text, form, formRef, store, action }) => {
+const DialogContent = ({ text, form, formRef, store, action, validateApi }) => {
   const [formData, setFormData] = useState(form);
   const [isLoading, setIsLoading] = useState(false);
+  const [errors, setErrors] = useState([]);
 
   useEffect(() => {
     if (!formData) {
@@ -34,6 +35,25 @@ const DialogContent = ({ text, form, formRef, store, action }) => {
         });
     }
   }, [formData, store, action.id]);
+
+  // Expose a validate() to the dialog footer. It runs the form's own validators
+  // (e.g. required fields), hides the form's built-in (unstyled) message block,
+  // and surfaces any errors here using the shared <Message> component so the
+  // feedback is styled and sits right under the form.
+  useEffect(() => {
+    if (!validateApi) return;
+    validateApi.validate = () => {
+      const f = formRef.current;
+      if (!f?.validateFields) return true;
+      const valid = f.validateFields();
+      f.disableValidationMessage?.();
+      setErrors(valid ? [] : Array.from(f.validation.values()));
+      return valid;
+    };
+    return () => {
+      validateApi.validate = null;
+    };
+  }, [validateApi, formRef]);
 
   const fields = formData?.toJSON ? formData.toJSON() : formData;
 
@@ -53,6 +73,57 @@ const DialogContent = ({ text, form, formRef, store, action }) => {
           <Form.Builder ref={formRef} fields={fields} autosubmit={false} withActions={false} />
         </div>
       )}
+      {errors.length > 0 && (
+        <Message variant="error" look="ghost" size="small" style={{ marginTop: 8 }}>
+          {errors.length === 1 ? (
+            errors[0].messages[0]
+          ) : (
+            <ul style={{ margin: 0, paddingInlineStart: 16 }}>
+              {errors.map((error) => (
+                <li key={error.label}>{error.messages[0]}</li>
+              ))}
+            </ul>
+          )}
+        </Message>
+      )}
+    </div>
+  );
+};
+
+/**
+ * Footer for action dialogs. Unlike `Modal.confirm` (whose OK button always closes),
+ * this runs the form's own client-side validation (e.g. required fields) and keeps the
+ * dialog open when invalid, surfacing the form's existing validation messages.
+ */
+const DialogFooter = ({ destructive, okText, validateApi, onOk }) => {
+  const controls = useModalControls();
+
+  const handleOk = () => {
+    if (validateApi?.validate && !validateApi.validate()) return;
+    onOk();
+    controls?.hide();
+  };
+
+  return (
+    <div className="flex gap-2 justify-end">
+      <Button
+        onClick={() => controls?.hide()}
+        look="outlined"
+        variant="neutral"
+        autoFocus
+        aria-label="Cancel"
+        data-testid="dialog-cancel-button"
+      >
+        Cancel
+      </Button>
+      <Button
+        onClick={handleOk}
+        variant={destructive ? "negative" : "primary"}
+        aria-label={okText ?? "Confirm"}
+        data-testid="dialog-ok-button"
+      >
+        {okText ?? "OK"}
+      </Button>
     </div>
   );
 };
@@ -156,8 +227,7 @@ const ActionButton = ({ action, parentRef, store, formRef }) => {
 
 const invokeAction = (action, destructive, store, formRef) => {
   if (action.dialog) {
-    const { type: dialogType, text, form, title } = action.dialog;
-    const dialog = Modal[dialogType] ?? Modal.confirm;
+    const { text, form, title } = action.dialog;
 
     // Generate dynamic content for destructive actions
     let dialogTitle = title;
@@ -193,17 +263,38 @@ const invokeAction = (action, destructive, store, formRef) => {
       dialogText = `You are about to delete the selected ${objectType}.\n\nThis can't be undone.`;
     }
 
-    dialog({
-      title: dialogTitle ? dialogTitle : destructive ? "Destructive action" : "Confirm action",
-      body: <DialogContent text={dialogText} form={form} formRef={formRef} store={store} action={action} />,
-      buttonLook: destructive ? "negative" : "primary",
-      okText: destructive ? okButtonText : undefined,
-      onOk() {
-        const body = formRef.current?.assembleFormData({ asJSON: true });
+    const submit = () => {
+      const body = formRef.current?.assembleFormData({ asJSON: true });
 
-        store.SDK.invoke("actionDialogOk", action.id, { body });
-        store.invokeAction(action.id, { body });
-      },
+      store.SDK.invoke("actionDialogOk", action.id, { body });
+      store.invokeAction(action.id, { body });
+    };
+
+    // Shared bridge so the footer's OK button can trigger the form's validation
+    // (rendered in DialogContent) and keep the dialog open when invalid.
+    const validateApi = { validate: null };
+
+    modal({
+      title: dialogTitle ? dialogTitle : destructive ? "Destructive action" : "Confirm action",
+      body: (
+        <DialogContent
+          text={dialogText}
+          form={form}
+          formRef={formRef}
+          store={store}
+          action={action}
+          validateApi={validateApi}
+        />
+      ),
+      footer: (
+        <DialogFooter
+          destructive={destructive}
+          okText={destructive ? okButtonText : undefined}
+          validateApi={validateApi}
+          onOk={submit}
+        />
+      ),
+      allowClose: false,
       closeOnClickOutside: false,
     });
   } else {
