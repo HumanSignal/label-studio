@@ -123,6 +123,10 @@ export const AppStore = types
   }))
   .volatile(() => ({
     needsDataFetch: false,
+    // Set when an action opts out of the automatic reload (result.reload === false), e.g. async Bulk
+    // Review. Kept separate from needsDataFetch so the periodic project poll (which recomputes
+    // needsDataFetch from counts) can't clear it; cleared only by an explicit/forced refresh.
+    backgroundActionPending: false,
     projectFetch: false,
     requestsInFlight: new Map(),
   }))
@@ -490,6 +494,12 @@ export const AppStore = types
     fetchProject: flow(function* (options = {}) {
       self.projectFetch = options.force === true;
 
+      // A forced fetch is an explicit refresh (e.g. the Refresh button), which fully reloads the view,
+      // so any pending background-action highlight is now resolved.
+      if (options.force === true) {
+        self.backgroundActionPending = false;
+      }
+
       const isTimer = options.interaction === "timer";
       const params =
         options && options.interaction
@@ -783,7 +793,11 @@ export const AppStore = types
       });
 
       if (result.async) {
-        self.SDK.invoke("toast", { message: "Your action is being processed in the background.", type: "info" });
+        const message =
+          result.reload === false
+            ? "Your action is being processed in the background. Refresh to see the latest results."
+            : "Your action is being processed in the background.";
+        self.SDK.invoke("toast", { message, type: "info" });
       }
 
       if (result.reload) {
@@ -794,6 +808,21 @@ export const AppStore = types
           project: projectFetched,
         });
         return;
+      }
+
+      // The action explicitly opted out of an automatic reload (e.g. async Bulk Review): reloading now
+      // would only refresh the first page while the background job is still running. Highlight the
+      // Refresh button instead so the user can reload once the job has finished.
+      if (result.reload === false) {
+        self.backgroundActionPending = true;
+        view?.clearSelection?.();
+        view?.unlock?.();
+        self.SDK.invoke("actionDialogOkComplete", actionId, {
+          result,
+          view: viewReloaded,
+          project: projectFetched,
+        });
+        return result;
       }
 
       if (options.reload !== false) {
