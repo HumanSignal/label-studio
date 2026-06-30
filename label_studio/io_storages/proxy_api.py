@@ -26,6 +26,12 @@ logger = logging.getLogger(__name__)
 # credentials from Postgres by storage_id and streams bytes from cloud
 # storage itself. Must stay in sync with the `providers` map in
 # services/streamer/internal/storageproxy/storages/storages.go.
+#
+# Note: uploaded files (the default/persistent bucket) use a separate
+# 's3_default' type emitted by DownloadStorageData.build_streamer_delegation in
+# data_import/api.py. It is NOT in this set: it has no io_storages row / no
+# storage_id, and the streamer streams it with ambient credentials via its
+# DefaultS3Streamer rather than a storage_id-keyed provider.
 STREAMER_DELEGATED_STORAGE_TYPES = {'s3', 's3s', 'gcs', 'gcs_sa', 'gcswif'}
 
 

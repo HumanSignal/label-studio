@@ -1021,6 +1021,17 @@ class DownloadStorageData(APIView):
         if file_obj is None:
             return Response(status=status.HTTP_403_FORBIDDEN)
 
+        # When the request comes from the streamer service (validated by
+        # StreamerSecretMiddleware), hand off S3-backed uploads to the streamer:
+        # it streams bytes from the default/persistent bucket itself, with Range
+        # support and bounded concurrency. Permission checks above already ran,
+        # so RBAC is preserved. Non-S3 backends return None and fall through to
+        # the existing NGINX/Django path (the streamer relays that verbatim).
+        if getattr(request, 'is_streamer_delegation', False):
+            delegation = self.build_streamer_delegation(file_obj, filepath)
+            if delegation is not None:
+                return delegation
+
         # NGINX handling is the default for better performance
         if settings.USE_NGINX_FOR_UPLOADS:
             if isinstance(file_obj.storage, FileSystemStorage):
@@ -1053,3 +1064,46 @@ class DownloadStorageData(APIView):
             response['Content-Disposition'] = f'inline; filename="{filepath}"'
             response['filename'] = filepath
             return response
+
+    def build_streamer_delegation(self, file_obj, filepath):
+        """Build a JSON delegation payload for the Go streamer (S3 uploads only).
+
+        Returns a JsonResponse with ``X-Streamer-Action: delegate`` when the
+        file lives in an S3 (or S3-compatible, e.g. MinIO) default/persistent
+        bucket, so the streamer streams it itself with the pod's ambient AWS
+        identity. Returns None for any other backend (GCS, Azure, local
+        FileSystemStorage), so the caller falls back to the existing
+        NGINX/Django path — which the streamer relays verbatim.
+
+        The default bucket has no io_storages row, so there is no storage_id and
+        no DB credential lookup: storage_id is sent as 0, and region/endpoint are
+        read from the storage instance (the values django-storages resolved),
+        not a DB row the way import storages do. The key is normalized exactly
+        the way django-storages computes the S3 object key, matching what boto3
+        uploaded.
+        """
+        from django.http import JsonResponse
+        from storages.backends.s3boto3 import S3Boto3Storage
+
+        storage = file_obj.storage
+        if not isinstance(storage, S3Boto3Storage):
+            return None
+
+        # Canonical S3 object key — same normalization django-storages uses on
+        # write, so the streamer fetches the exact object that was uploaded.
+        key = storage._normalize_name(storage._clean_name(file_obj.name))
+
+        response = JsonResponse(
+            {
+                'action': 'proxy',
+                'storage_type': 's3_default',
+                'storage_id': 0,
+                'bucket': storage.bucket_name,
+                'key': key,
+                'region': storage.region_name or '',
+                'endpoint': storage.endpoint_url or '',
+                'content_type': mimetypes.guess_type(filepath)[0] or 'application/octet-stream',
+            }
+        )
+        response['X-Streamer-Action'] = 'delegate'
+        return response
