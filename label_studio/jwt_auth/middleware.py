@@ -42,6 +42,9 @@ class JWTAuthenticationMiddleware:
                 JWT_ACCESS_TOKEN_ENABLED = flag_set(
                     'fflag__feature_develop__prompts__dia_1829_jwt_token_auth', user=user
                 )
+                if JWT_ACCESS_TOKEN_ENABLED and user.active_organization is None:
+                    logger.info('JWT authentication failed: user has no active organization')
+                    return JsonResponse({'detail': 'User not found'}, status=status.HTTP_401_UNAUTHORIZED)
                 if JWT_ACCESS_TOKEN_ENABLED and user.active_organization.jwt.api_tokens_enabled:
                     request.user = user
                     request.is_jwt = True
