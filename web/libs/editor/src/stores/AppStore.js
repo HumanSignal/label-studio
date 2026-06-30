@@ -310,6 +310,18 @@ export default types
       }
     }
 
+    function setCourseBottomBar({ courses, hideInstructionsForCourses, onOpenOnDemandCourse }) {
+      self.onDemandCourses = courses;
+      self.hideInstructionsForCourses = hideInstructionsForCourses;
+      self.onOpenOnDemandCourse = onOpenOnDemandCourse;
+      toggleInterface("learning:on-demand", courses.length > 0);
+      toggleInterface("instruction", false);
+    }
+
+    function setDescription(value) {
+      self.description = value;
+    }
+
     function toggleComments(state) {
       return (self.showComments = state);
     }
@@ -1076,6 +1088,8 @@ export default types
       addInterface,
       hasInterface,
       toggleInterface,
+      setCourseBottomBar,
+      setDescription,
 
       afterCreate,
       assignTask,

@@ -767,6 +767,54 @@ describe("AppStore", () => {
     });
   });
 
+  describe("setCourseBottomBar", () => {
+    it("sets volatile course fields and toggles interfaces via action", () => {
+      const store = createStore({ interfaces: ["basic", "instruction"] });
+      const onOpen = mock();
+
+      store.setCourseBottomBar({
+        courses: [{ id: 1, title: "Course A" }],
+        hideInstructionsForCourses: true,
+        onOpenOnDemandCourse: onOpen,
+      });
+
+      expect(store.onDemandCourses).toEqual([{ id: 1, title: "Course A" }]);
+      expect(store.hideInstructionsForCourses).toBe(true);
+      expect(store.onOpenOnDemandCourse).toBe(onOpen);
+      expect(store.interfaces).toContain("learning:on-demand");
+      expect(store.interfaces).not.toContain("instruction");
+    });
+
+    it("removes learning:on-demand when courses is empty", () => {
+      const store = createStore({ interfaces: ["basic", "learning:on-demand"] });
+
+      store.setCourseBottomBar({
+        courses: [],
+        hideInstructionsForCourses: false,
+        onOpenOnDemandCourse: null,
+      });
+
+      expect(store.onDemandCourses).toEqual([]);
+      expect(store.hideInstructionsForCourses).toBe(false);
+      expect(store.interfaces).not.toContain("learning:on-demand");
+    });
+  });
+
+  describe("setDescription", () => {
+    it("sets description to a string value", () => {
+      const store = createStore();
+      store.setDescription("New instructions text");
+      expect(store.description).toBe("New instructions text");
+    });
+
+    it("clears description when set to undefined", () => {
+      const store = createStore();
+      store.setDescription("Some text");
+      store.setDescription(undefined);
+      expect(store.description).toBeNull();
+    });
+  });
+
   describe("submit/update/accept/reject/handleCustomButton when isSubmitting", () => {
     it("updateAnnotation returns early when isSubmitting", () => {
       const store = createStore();
