@@ -22,7 +22,8 @@ Agreement helps you determine the quality of your dataset, its readiness to be u
 
 You can view agreement in the following ways:
 - **Data Manager** - Displays per-task agreements and inter-annotator agreement for each task. See [Agreement columns in the Data Manager](manage_data#Agreement-columns). 
-- **Members Dashboard** - Displays an inter-annotator agreement matrix and agreement distribution. See [Members dashboard](dashboard_members). 
+- **Data quality dashboard** - Displays task agreement distribution, agreement by dimension, top confusion pairs, and a confusion matrix. See [Data quality dashboard](dashboard_data_quality).
+- **Members dashboard** - Displays a member and model agreement matrix. See [Members dashboard](dashboard_members).
 
 !!! note
     All agreement scores displayed in the Members Dashboard are calculated using the **Pairwise** methodology.

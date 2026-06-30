@@ -112,6 +112,7 @@ The **Performance by Dimension** table appears below the Annotation Summary on t
 Use the **Compare with** dropdown to choose how scores are calculated:
 
 - **Compare with GT** — scores reflect each member's agreement with ground truth annotations on overlapping tasks.
+- **Compare with Accepted** — scores reflect each member's agreement with annotations that have been accepted through review.
 - **Compare with All Annotators** — scores reflect each member's agreement with other annotators on the same tasks.
 
 An **Avg** column shows each member's overall average across all dimensions. A footer row shows the average per dimension across all members. Scores are color-coded using the same Low / Moderate / High bands as the Agreement Matrix (red, yellow, green). Use the **Columns** picker to show or hide individual dimensions.

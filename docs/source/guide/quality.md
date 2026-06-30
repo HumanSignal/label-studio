@@ -113,15 +113,15 @@ As an administrator or project manager, you can assign reviewers to tasks, or pe
 
 You can assign reviewers to multiple tasks at once, but you cannot remove reviewers from multiple tasks at once.
 
-## Review annotator activity on the project dashboard
+## Review project quality dashboards
 
-Use the project dashboard to review annotator activity. For a project, click **Dashboard** to view the dashboard.
+Use project dashboards to review annotator activity, agreement, and label distribution. For a project, click **Dashboard** to view project-level dashboards.
 
-If you don't see an annotator's activity reflected on the dashboard, make sure they have been added as a member to the project.
+If you don't see an annotator's activity reflected on a dashboard, make sure they have been added as a member to the project.
 
 ### Review label distribution
 
-For specific labels, you can see in a donut chart how many labels of each type were applied to the tasks. Use this chart to identify possible problems with your dataset distribution, if some labels are overrepresented in an annotated dataset compared with others.
+Use the [Label Distribution dashboard](dashboard_distribution) to see how labels and dimension values are distributed across annotations and predictions. Use this dashboard to identify possible problems with your dataset distribution, such as labels that are overrepresented in annotated data.
 
 For example, if you're developing a dataset of OCR images, and 90% of your tasks have **Text** labels and 10% have **Handwriting** labels, you might want to increase the number of images of handwriting in your dataset, to improve the eventual accuracy of a machine learning model trained on this dataset.
 
@@ -164,30 +164,30 @@ For more information, see [Plugins - Spam and Bot Detection](/plugins/pause_anno
 
 ## Verify model and annotator performance
 
-To verify the performance of specific annotators, review the **Members** section for a specific project. If you don't see an annotator's activity reflected, make sure they have been added as a member to the project.
+To verify the performance of specific annotators, review the [Members dashboard](dashboard_members) for a specific project. If you don't see an annotator's activity reflected, make sure they have been added as a member to the project.
 
 ### Review annotator performance
 
-For each project, you can review the project dashboard and review the Annotator Performance section to learn more about the annotators and their annotations, as well as overall annotator consensus.
+For each project, use the [Members dashboard](dashboard_members) to learn more about annotators, reviewers, models, review outcomes, and overall agreement.
 
-Discover how many annotators have worked on the project, and how many hours they cumulatively spent labeling. You can also see the total number of annotations produced by the annotators, separate from the total number of tasks in the project.
+Discover who has worked on the project, how many annotations and reviews they have completed, how much time they spent, and how their work compares against other annotators, ground truth annotations, or model predictions.
 
 Review a table to see the following for each annotator:
 
-- The total agreement for one annotator with all other annotators. See more about [how annotator agreement is calculated](stats.html).
-- The number of tasks that they finished annotating.
+- The total agreement for one annotator with other annotators. See more about [how annotator agreement is calculated](stats.html).
+- The number of tasks assigned, pending, submitted, or skipped.
 - The number of tasks that they skipped.
 - The outcome of reviews for the annotations they performed.
-- The total annotation progress across all tasks in the project.
-- The mean time to annotate the tasks. Select this header to view the `median time` instead. Mean time and median time are calculated using the total time spent on each task by an annotator, including idle time.
+- Their performance score and acceptance score.
+- Their average, median, and total time spent.
 - The agreement of their annotations with the ground truth annotations, if there are any.
 - The agreement of their annotations with predicted annotations, if there are any.
 
 ### Review annotator agreement matrix
 
-You can also review the overall annotator agreement on a more individual basis with the annotator agreement matrix.
+You can also review overall annotator agreement on a more individual basis with the [Members dashboard](dashboard_members) agreement matrix.
 
-Review the annotator agreement matrix to understand which annotator's annotations consistently agree with or don't agree with other annotator's annotations. You can also filter the matrix to show specific agreement statistics for each label, or view the **Overall** agreement matrix. See more about [how annotator agreement is calculated](stats).
+Review the agreement matrix to understand which annotator's annotations consistently agree with or don't agree with other annotator's annotations. You can filter the matrix by dimension and label, or include model versions when predictions are available. See more about [how annotator agreement is calculated](stats).
 
 To see the specific annotations contributing to the agreement, do the following:
 
@@ -198,7 +198,7 @@ To see the specific annotations contributing to the agreement, do the following:
 
 ### Review agreement distribution across tasks
 
-You can also review the distribution of agreement percentages across project tasks. A bar chart depicts the number of tasks with a specific agreement percentage. The more tasks with higher agreement, the higher quality your dataset is likely to be. Clusters of agreement percentages for specific tasks might mean that some tasks are easier to label than others, while other tasks are more confusing and difficult to label consistently.
+Use the [Data quality dashboard](dashboard_data_quality) to review the distribution of agreement percentages across project tasks. The more tasks with higher agreement, the higher quality your dataset is likely to be. Clusters of lower agreement scores might mean that some tasks are confusing, difficult to label consistently, or need clearer instructions.
 
 ## Review annotations against ground truth annotations
 
