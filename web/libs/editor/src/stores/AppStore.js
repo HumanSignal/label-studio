@@ -505,9 +505,37 @@ export default types
           .map((m) => m.findSelectedTool())
           .filter(Boolean)
           .filter((t) => t.isDrawing);
+        const selectedCompleteDrawingRegions =
+          c?.selectedRegions?.filter((region) => region?.isDrawing && !region.incomplete) ?? [];
+        const shouldUnselectAfterCompletingDrawing =
+          tools.some((t) => t.currentArea?.selected) || selectedCompleteDrawingRegions.length > 0;
+        const clearSelectedCompleteDrawingRegions = () => {
+          // Defer until tool completion and after-create selection have settled.
+          setTimeout(() => {
+            selectedCompleteDrawingRegions.forEach((region) => {
+              region.setDrawing(false);
+              region.notifyDrawingFinished?.();
+            });
+            c?.setIsDrawing(false);
+            c?.unselectAll();
+          });
+        };
 
         if (tools.length > 0) {
           tools.forEach((t) => t.complete?.());
+
+          // BROS-1451: VideoVector skeleton editing can resume drawing from an
+          // already-selected region while the user is adding a branch. In that state
+          // Esc used to only complete the tool, forcing a second Esc to unselect.
+          if (shouldUnselectAfterCompletingDrawing && c) {
+            if (selectedCompleteDrawingRegions.length > 0) {
+              clearSelectedCompleteDrawingRegions();
+            } else {
+              setTimeout(() => c.unselectAll());
+            }
+          }
+        } else if (selectedCompleteDrawingRegions.length > 0) {
+          clearSelectedCompleteDrawingRegions();
         } else if (c && c.isLinkingMode) {
           c.stopLinkingMode();
         } else if (!c.isDrawing) {

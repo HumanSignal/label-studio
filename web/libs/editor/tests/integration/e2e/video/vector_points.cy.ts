@@ -1,4 +1,4 @@
-import { Labels, LabelStudio, Sidebar, VideoView } from "@humansignal/frontend-test/helpers/LSF/index";
+import { Hotkeys, Labels, LabelStudio, Sidebar, VideoView } from "@humansignal/frontend-test/helpers/LSF/index";
 import { videoVectorConfig, videoVectorData } from "../../data/video_segmentation/vector";
 
 const suiteConfig = {
@@ -43,7 +43,7 @@ describe("Video vector - Shift+Click point insertion", suiteConfig, () => {
     pointCount().should("eq", 4);
 
     // Finish the drawing (Esc). The region must stay selected afterwards.
-    cy.get("body").type("{esc}");
+    Hotkeys.unselectAllRegions();
     Sidebar.hasSelectedRegions(1);
 
     // Shift+Click on the midpoint of the right-edge segment (x≈61%, y≈40%)
@@ -51,5 +51,38 @@ describe("Video vector - Shift+Click point insertion", suiteConfig, () => {
     VideoView.clickAtRelative(0.6, 0.4, { shiftKey: true });
 
     pointCount().should("eq", 5);
+  });
+
+  it("unselects a resumed skeleton vector with one Esc after adding a branch", () => {
+    LabelStudio.params().config(videoVectorConfig).data(videoVectorData).withResult([]).init();
+
+    LabelStudio.waitForObjectsReady();
+    Sidebar.hasNoRegions();
+
+    cy.window().then((win) => {
+      if (!win.Htx.settings.selectAfterCreate) win.Htx.settings.toggleSelectAfterCreate();
+    });
+
+    Labels.select("Road");
+
+    // Draw and finish the initial open skeleton vector so it is selected.
+    VideoView.clickAtRelative(0.2, 0.2);
+    VideoView.clickAtRelative(0.6, 0.2);
+    VideoView.clickAtRelative(0.6, 0.6);
+    VideoView.clickAtRelative(0.2, 0.6);
+    pointCount().should("eq", 4);
+    Hotkeys.unselectAllRegions();
+    Sidebar.hasSelectedRegions(1);
+
+    // Resume from an existing skeleton point, then add one branch segment.
+    VideoView.clickAtRelative(0.2, 0.2);
+    VideoView.clickAtRelative(0.4, 0.4);
+    pointCount().should("eq", 5);
+    Sidebar.hasSelectedRegions(1);
+
+    // Regression: this used to only complete the VideoVector drawing state,
+    // leaving the selected region active until a second Esc press.
+    Hotkeys.unselectAllRegions();
+    Sidebar.hasSelectedRegions(0);
   });
 });
