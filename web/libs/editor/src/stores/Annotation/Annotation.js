@@ -446,8 +446,10 @@ const _Annotation = types
       return (
         isFF(FF_REVIEWER_FLOW) &&
         // not a current user — we can only review others' annotations
-        self.user?.email &&
-        store.user?.email !== self.user?.email &&
+        // when PII is hidden, user ids are fake and negative,
+        // but current user id is real so comparison will work anyway
+        self.user?.id &&
+        store.user?.id !== self.user?.id &&
         // we have this only in LSE
         getEnv(self).events.hasEvent("acceptAnnotation") &&
         // Quick View — we don't have View All in Label Stream
