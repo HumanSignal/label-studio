@@ -6,50 +6,46 @@ type: guide
 order: 0
 order_enterprise: 135
 meta_title: Dashboard in Label Studio
-meta_description: Use Label Studio dashboards to monitor performance and progress.
+meta_description: Use the project Dashboard tab to monitor project throughput, quality, and member performance.
 section: "Create & Manage Projects"
 ---
 
-You can use the Label Studio Enterprise dashboards to help visualize your labeling progress across projects and resources. 
+> Use project dashboards to monitor throughput, data quality, and member performance for a single project.
 
-See the following video for a brief overview of the analytics available in Label Studio Enterprise:
+The project **Dashboard** tab gives managers, administrators, and owners a project-level view of how work is moving, where quality issues are appearing, and how members are performing.
 
-<iframe width="560" height="315" src="https://www.youtube.com/embed/mkaLdrF1Pn8?si=jAqTUOyNu0lkw3E-" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+Open a project and select **Dashboard** to access the project dashboards:
 
-### Project dashboard
+- **Throughput**: Track velocity, remaining work, and time spent.
+- **Data quality**: Analyze agreement, dimension-level quality, and label confusion.
+- **Members**: Review annotator, reviewer, and model performance within the project.
 
-The Project dashboard is a project-level analytics view that tracks overall progress and performance for a single labeling project. 
+## Choose a project dashboard
 
-It aggregates KPIs such as total annotations, lead time, average time per task, label distribution, and reviewed/accepted/rejected counts. Its purpose is to give managers and project owners a quick, data-driven way to monitor throughput, spot bottlenecks, and adjust staffing, timelines, or workflows to keep the project on track. 
+| Dashboard | Use it to |
+|-----------|-----------|
+| [**Throughput**](dashboard_throughput) | Understand whether the project is moving at the expected pace, where work is blocked, and how annotation and review time are trending. |
+| [**Data quality**](dashboard_data_quality) | Investigate agreement, confusion between labels, quality by dimension, and the tasks behind quality issues. |
+| [**Members**](dashboard_members) | Compare annotator, reviewer, and model performance, including agreement, review outcomes, time spent, and per-dimension performance. |
 
-Available to Managers, Administrators, and Owners.  
+## Access by user role
 
-For more information, see [Project dashboard](dashboard_project). 
+Project dashboards are available to users who can manage or monitor the project, such as Owners, Administrators, and Managers.
 
-<img src="/images/FullDashboardPage.png" alt="" class="gif-border" />
+Annotators and Reviewers generally do not use the project Dashboard tab. For individual work history across projects, see the [Member Performance dashboard](dashboard_annotator).
 
-#### Members dashboard
+## Filtering and drilldowns
 
-The Members dashboard is another project-level analytics page that shows how each annotator, reviewer, and (optionally) each model is performing on that project. It surfaces key metrics like inter‑annotator agreement, review/accept/reject patterns, lead time, and per‑member quality scores, plus an agreement matrix so you can compare people (and models) against one another. 
+Each project dashboard has filters that apply to the metrics on that page. Depending on the dashboard, you can filter by date range, task data, annotator, model, review outcome, ground truth status, labeling dimension, or label.
 
-Its purpose is to help managers quickly spot outliers, understand who is performing well or poorly, and make better decisions about assignments, training, and QA workflows. 
+Many cards, charts, and tables link to the Data Manager with relevant filters applied. Use these drilldowns to move from a summary metric to the exact tasks, annotations, predictions, or labels behind it.
 
-Available to Managers, Administrators, and Owners. 
+## Analytics dashboards
 
-For more information, see [Members dashboard](dashboard_members). 
+Analytics dashboards are available from the main **Analytics** navigation and can include data across projects, workspaces, or individual members depending on your role.
 
-![Screenshot of Members Dashboard](/images/project/project_members_dashboard.png)
-
-
-### Member performance dashboard
-
-The Member Performance dashboard shows how a specific user is performing across one or more projects over a chosen time period. It summarizes their annotation and review activity, and lets you filter by date range, workspace, and project. 
-
-Its purpose is to help managers and individual contributors track productivity and quality over time so they can spot issues early, adjust staffing or training, and validate things like timesheets. 
-
-Available to all users, but the information available depends on your user role. 
-
-For more information, see [Member Performance dashboard](dashboard_annotator). 
-
-![Screenshot of annotator dashboard](/images/analytics/member-perf.png)
-
+| Dashboard | Description |
+|-----------|-------------|
+| [**Projects overview dashboard**](dashboard_overview) | Monitor progress across multiple projects and workspaces. |
+| [**Label Distribution dashboard**](dashboard_distribution) | Compare annotation and prediction value distributions for project dimensions. |
+| [**Member Performance dashboard**](dashboard_annotator) | Review an individual member's annotation and review activity across projects. |
