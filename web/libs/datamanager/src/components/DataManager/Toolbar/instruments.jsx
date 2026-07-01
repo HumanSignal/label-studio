@@ -7,6 +7,7 @@ import { Interface } from "../../Common/Interface";
 import { ExportButton, ImportButton } from "../../Common/SDKButtons";
 import { Tooltip } from "@humansignal/ui";
 import { ActionsButton } from "./ActionsButton";
+import { GridSelectAll } from "./GridSelectAll";
 import { DensityToggle } from "./DensityToggle";
 import { GridWidthButton } from "./GridWidthButton";
 import { LabelButton } from "./LabelButton";
@@ -93,6 +94,9 @@ export const instruments = {
   },
   "label-button": ({ size }) => {
     return <LabelButton size={size} />;
+  },
+  "grid-select-all": () => {
+    return <GridSelectAll />;
   },
   actions: ({ size }) => {
     return <ActionsButton size={size} style={style} />;
