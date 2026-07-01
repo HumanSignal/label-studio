@@ -4,7 +4,7 @@ short: Members dashboard
 tier: enterprise
 type: guide
 order: 0
-order_enterprise: 70
+order_enterprise: 72
 meta_title: Members dashboard
 meta_description: Use the Members dashboard to monitor annotator and reviewer performance, agreement, and quality metrics within a project.
 section: "Project Management"
@@ -29,25 +29,28 @@ For member metrics across projects and over time, see the [Member Performance da
 
 From the project, open the **Dashboard** tab and select **Members** from the dashboard navigation.
 
+The Data quality dashboard has two tabs:
+
+- **Performance**: Review key metrics for individual annotators and reviewers in the project.
+- **Agreement Matrix**: Compare pairwise agreement scores between members, models, and ground truth.
+
 ![Screenshot of Members Dashboard](/images/project/project_members_dashboard.png)
 
 ## Filter by participants
 
 A participant filter is available in the top right of the dashboard. By default it shows **All participants**.
 
-- Click the dropdown to expand it. Annotators are listed under **All Annotators**; if the project has model predictions, model versions appear under **All Model Versions**.
+- Annotators are listed under **All Annotators**; if the project has model predictions, model versions appear under **All Model Versions**.
 - Selecting specific participants narrows both the Performance tables and the Agreement Matrix to only those members.
 
-## Performance tab
+## Performance
 
-The dashboard has two top-level tabs: **Performance** and **Agreement Matrix**.
+The **Performance** tab has a toggle to switch between:
 
-The **Performance** tab has two sub-tabs:
+- **Annotations**: metrics for each member's submission activity
+- **Reviews**: metrics for each member's review activity
 
-- **Annotations** — metrics for each annotator's submission activity
-- **Reviews** — metrics for each reviewer's review activity
-
-Use the **Export** button on the right of the sub-tab row to download the currently visible table as a CSV.
+Use the **Export** button to download the currently visible table as a CSV.
 
 ### Annotation Summary
 
@@ -96,8 +99,6 @@ The **Review Summary** table shows review activity for each member who has perfo
 | **Total time** | Total time spent reviewing. |
 | **Median time** | Median time spent reviewing an annotation. |
 | **Last active** | Date and time of the reviewer's most recent review activity. |
-| **Performance** | Overall review performance score. |
-| **Submitted tasks** | Number of annotation tasks the reviewer also submitted annotations on. |
 
 !!! note
     The following columns are hidden by default and can be shown using the **Columns** picker: **ID**, **Performance**, **Submitted tasks**.
@@ -112,19 +113,18 @@ The **Performance by Dimension** table appears below the Annotation Summary on t
 Use the **Compare with** dropdown to choose how scores are calculated:
 
 - **Compare with GT** — scores reflect each member's agreement with ground truth annotations on overlapping tasks.
-- **Compare with Accepted** — scores reflect each member's agreement with annotations that have been accepted through review.
 - **Compare with All Annotators** — scores reflect each member's agreement with other annotators on the same tasks.
 
-An **Avg** column shows each member's overall average across all dimensions. A footer row shows the average per dimension across all members. Scores are color-coded using the same Low / Moderate / High bands as the Agreement Matrix (red, yellow, green). Use the **Columns** picker to show or hide individual dimensions.
+An **Avg** column shows each member's overall average across all dimensions. A footer row shows the average per dimension across all members. Use the **Columns** picker to show or hide individual dimensions.
 
-## Agreement Matrix tab
+## Agreement Matrix 
 
 The **Agreement Matrix** tab shows the **Member / Model Agreement Matrix**, a heatmap of pairwise agreement scores between all members (and models, if included via the participant filter) in the project.
 
 Click on any cell to open the Data Manager filtered to tasks where both members annotated, so you can inspect disagreements directly.
 
 !!! note
-    Agreement in the Members dashboard reflects [Pairwise agreement](stats#Pairwise) between annotators, regardless of the agreement methodology configured for the project.
+    Agreement in the Members dashboard reflects an agreement score between annotators, regardless of the [agreement methodology](stats#Methodology) configured for the project.
 
 ### Filters
 

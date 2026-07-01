@@ -262,7 +262,7 @@ Label Studio is available to everyone as open source software (Label Studio Comm
     <td colspan="4" style="text-align:center"><b>Analytics and Reporting</b></td>
   </tr>
   <tr>
-    <td><b>Project dashboards</b><br/><a href="https://docs.humansignal.com/guide/dashboard_project">Dashboards for monitoring project progress.</a></td>
+    <td><b>Project dashboards</b><br/><a href="https://docs.humansignal.com/guide/dashboards">Dashboards for monitoring project progress.</a></td>
     <td style="text-align:center">❌</td>
     <td style="text-align:center">❌</td>
     <td style="text-align:center">✅</td>

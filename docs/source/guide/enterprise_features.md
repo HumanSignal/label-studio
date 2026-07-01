@@ -252,7 +252,7 @@ To learn how different team structures use agreement metrics to scale high-quali
  
 ### Project performance dashboards
 
-The [project dashboard](https://docs.humansignal.com/guide/dashboard_project) provides a high-level view of project status over time, including metrics like tasks completed, annotations submitted, reviews performed, label distribution, and lead times. Users can filter by date ranges and reorder visualizations to focus on key indicators.
+The [project dashboard](https://docs.humansignal.com/guide/dashboards) provides a high-level view of project status over time, including metrics like tasks completed, annotations submitted, reviews performed, label distribution, and lead times. Users can filter by date ranges and reorder visualizations to focus on key indicators.
 
 <img src="/images/FullDashboardPage.png" alt="" class="gif-border" />
 
