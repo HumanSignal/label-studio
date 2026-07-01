@@ -43,11 +43,11 @@ class AZURE(object):
         if start is None and end is None:
             streaming = False
             start, end = 0, total_size
-        elif start == 0 and end == 0:
-            start, end = 0, 1
         elif start == 0 and (end == '' or end is None):
             mr = max_range_size if max_range_size is not None else settings.RESOLVER_PROXY_MAX_RANGE_SIZE
-            end = start + mr
+            # ``end`` is an inclusive byte index, so the last byte of an mr-sized
+            # window starting at ``start`` is ``start + mr - 1`` (length == mr).
+            end = start + mr - 1
 
         if start is None:
             start = 0
@@ -58,7 +58,10 @@ class AZURE(object):
             pass
 
         if end is not None and end != '':
-            length = end - start
+            # HTTP Range is inclusive on both ends, but Azure's download_blob(length=...)
+            # expects a byte count. For bytes=A-B the count is B - A + 1 (so bytes=N-N is
+            # 1 byte, not 0 -> avoids the invalid backwards range bytes=N-(N-1)).
+            length = end - start + 1
         else:
             length = None
 
