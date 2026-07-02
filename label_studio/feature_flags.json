@@ -5093,7 +5093,7 @@
     },
     "fflag_fix_utc_1011_reviewed_then_updated_short": {
       "key": "fflag_fix_utc_1011_reviewed_then_updated_short",
-      "on": false,
+      "on": true,
       "prerequisites": [],
       "targets": [],
       "contextTargets": [],
@@ -5115,7 +5115,7 @@
       "trackEvents": false,
       "trackEventsFallthrough": false,
       "debugEventsUntilDate": null,
-      "version": 2,
+      "version": 3,
       "deleted": false
     },
     "fflag_fix_utc_838_duplicate_project_skip_members_when_manual_management_disabled": {
