@@ -4,6 +4,7 @@ import { python } from "@codemirror/lang-python";
 import { xml } from "@codemirror/lang-xml";
 import { indentUnit } from "@codemirror/language";
 import { searchKeymap } from "@codemirror/search";
+import { history, historyKeymap } from "@codemirror/commands";
 import { Compartment, EditorState, type Extension, StateEffect, StateField } from "@codemirror/state";
 import { Decoration, type DecorationSet, EditorView, keymap, lineNumbers, placeholder } from "@codemirror/view";
 import type { Editor } from "codemirror";
@@ -311,6 +312,8 @@ export function buildCm6Extensions(
 
   // CM5 extraKeys: Ctrl-F / Cmd-F → findPersistent
   extensions.push(keymap.of(searchKeymap));
+  extensions.push(history());
+  extensions.push(keymap.of(historyKeymap));
 
   if (options.lineNumbers) {
     extensions.push(lineNumbers());

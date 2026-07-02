@@ -184,6 +184,32 @@ describe("Cm6CodeEditor", () => {
     expect(onBeforeChange).toHaveBeenCalledTimes(callCountAfterAck);
   });
 
+  it("clears readOnly after options.readOnly flips from true to false", async () => {
+    const { rerender } = render(
+      <Cm6CodeEditor controlled value="hello" options={{ mode: { name: "javascript", json: true }, readOnly: true }} />,
+    );
+
+    await act(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 0));
+    });
+
+    rerender(
+      <Cm6CodeEditor
+        controlled
+        value="hello"
+        options={{ mode: { name: "javascript", json: true }, readOnly: false }}
+      />,
+    );
+
+    await act(async () => {
+      mockEditorDoc = "hello!";
+      mockOnChange?.("hello!");
+      await new Promise((resolve) => setTimeout(resolve, PARENT_SYNC_DEBOUNCE_MS + 50));
+    });
+
+    expect(mockEditorDoc).toBe("hello!");
+  });
+
   it("does not revert editor when parent pushes stale value after user typed ahead", async () => {
     const { rerender } = render(
       <Cm6CodeEditor controlled value="hello" options={{ mode: "xml", hintOptions: { schemaInfo: tags } }} />,

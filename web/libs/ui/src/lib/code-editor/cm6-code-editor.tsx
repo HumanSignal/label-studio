@@ -114,6 +114,12 @@ export const Cm6CodeEditor = forwardRef<unknown, Cm6CodeEditorProps>((props, ref
     setLightweightMode((prev) => (prev === nextLightweight ? prev : nextLightweight));
   }, [cm5Options.hintOptions?.schemaInfo, value]);
 
+  // CM5 parity: react-codemirror2 reapplies options.readOnly after async loads; CM6 must too.
+  useEffect(() => {
+    if (!editorRef.current?.view) return;
+    editorShimRef.current.setOption("readOnly", cm5Options.readOnly);
+  }, [cm5Options.readOnly]);
+
   const extensions = useMemo(
     () =>
       buildCm6Extensions(cm5Options, {
