@@ -586,6 +586,10 @@ REIMPORT_BATCH_SIZE = int(get_env('REIMPORT_BATCH_SIZE', 1000))
 IMPORT_BATCH_SIZE = int(get_env('IMPORT_BATCH_SIZE', 500))
 # Batch size for processing prediction imports to avoid memory issues with large datasets
 PREDICTION_IMPORT_BATCH_SIZE = int(get_env('PREDICTION_IMPORT_BATCH_SIZE', 500))
+# When True, ImportStorage.add_task preserves created_at / updated_at supplied by the
+# source annotation JSON instead of overwriting them with now(). Missing timestamps
+# still fall back to now(). Default False preserves current behavior.
+PRESERVE_IMPORT_TIMESTAMPS = get_bool_env('LABEL_STUDIO_PRESERVE_IMPORT_TIMESTAMPS', False)
 PROJECT_TITLE_MIN_LEN = 3
 PROJECT_TITLE_MAX_LEN = 50
 LOGIN_REDIRECT_URL = '/'

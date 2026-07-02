@@ -60,6 +60,7 @@ The following command line arguments are optional and must be specified with `la
 | `--enable-legacy-api-token` | `LABEL_STUDIO_ENABLE_LEGACY_API_TOKEN` | `False` | Enable legacy API token authentication. Useful for running with a pre-existing token via `--user-token`. |
 | N/A | `LABEL_STUDIO_LOCAL_FILES_SERVING_ENABLED` | `False` | Allow Label Studio to access local file directories to import storage. See [Run Label Studio on Docker and use local storage](start.html#Run_Label_Studio_on_Docker_and_use_local_storage). |
 | N/A | `LABEL_STUDIO_LOCAL_FILES_DOCUMENT_ROOT` | `/` | Specify the root directory for Label Studio to use when accessing local file directories. See [Run Label Studio on Docker and use local storage](start.html#Run_Label_Studio_on_Docker_and_use_local_storage). |
+| N/A | `LABEL_STUDIO_PRESERVE_IMPORT_TIMESTAMPS` | `False` | When `True`, preserve `created_at` and `updated_at` values supplied in the source annotation JSON when tasks are added by a storage sync (`ImportStorage.add_task`). When `False` (the default), those fields are set to the sync time via `auto_now_add` / `auto_now` on the `Annotation` model. Missing values in the source JSON fall back to the sync time regardless of this setting. |
 
 ### Set environment variables
 How you set environment variables depends on the operating system and the environment in which you deploy Label Studio. 
