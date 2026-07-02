@@ -202,7 +202,10 @@ export default types
   .volatile(() => ({
     version: typeof LSF_VERSION === "string" ? LSF_VERSION : "0.0.0",
     initialized: false,
-    hydrated: false,
+    // Submit/skip hotkeys are inert while false. Defaults to true so hosts that
+    // don't manage it keep hotkeys live; hosts with async task loading (DM) hold
+    // it false until the task and its annotations are fully presented.
+    hydrated: true,
     suggestionsRequest: null,
     onDemandCourses: [],
     hideInstructionsForCourses: false,
@@ -285,6 +288,10 @@ export default types
       for (const n of names) if (n in flags) self[n] = flags[n];
     }
 
+    function setHydrated(value) {
+      self.hydrated = value;
+    }
+
     /**
      * Check for interfaces
      * @param {string} name
@@ -340,6 +347,59 @@ export default types
       getEnv(self).events.invoke("labelStudioLoad", self);
     }
 
+    function handleSubmitHotkey() {
+      // Stay inert until the host marks the task fully presented (hydrated):
+      // before that the selected annotation can be a blank placeholder, and
+      // submitting it would create a duplicate instead of updating the existing one.
+      if (!self.hydrated || self.isLoading || self.noTask) return;
+      const annotationStore = self.annotationStore;
+      const shouldDenyEmptyAnnotation = self.hasInterface("annotations:deny-empty");
+      const entity = annotationStore.selected;
+      const areResultsEmpty = entity.results.length === 0;
+      const isReview = self.hasInterface("review") || entity.canBeReviewed;
+      const isUpdate = !isReview && isDefined(entity.pk);
+      // no changes were made over previously submitted version — no drafts, no pending changes
+      const noChanges = !entity.history.canUndo && !entity.draftId;
+      const isUpdateDisabled = isFF(FF_REVIEWER_FLOW) && isUpdate && noChanges;
+
+      if (shouldDenyEmptyAnnotation && areResultsEmpty) return;
+      if (annotationStore.viewingAll) return;
+      if (isUpdateDisabled) return;
+      if (entity.isReadOnly()) return;
+      if (entity.hasIncompleteRegions) return;
+
+      entity?.submissionInProgress();
+
+      if (self.hasInterface("annotation:bulk")) {
+        const customButtons = self.customButtons?.get("_replace");
+        const submitButton = customButtons?.find((btn) => btn.name === "submit");
+        if (submitButton && !submitButton.disabled) {
+          self.handleCustomButton?.(submitButton);
+        }
+      } else if (isReview) {
+        self.acceptAnnotation();
+      } else if (!isUpdate && self.hasInterface("submit")) {
+        self.submitAnnotation();
+      } else if (self.hasInterface("update")) {
+        self.updateAnnotation();
+      }
+    }
+
+    function handleSkipHotkey() {
+      if (!self.hydrated || self.isLoading || self.noTask) return;
+      if (self.annotationStore.viewingAll) return;
+
+      const entity = self.annotationStore.selected;
+
+      entity?.submissionInProgress();
+
+      if (self.hasInterface("review")) {
+        self.rejectAnnotation();
+      } else {
+        self.skipTask();
+      }
+    }
+
     function attachHotkeys() {
       // Unbind previous keys in case LS was re-initialized
       hotkeys.unbindAll();
@@ -348,58 +408,14 @@ export default types
        * Hotkey for submit
        */
       if (self.hasInterface("submit", "update", "review")) {
-        hotkeys.addNamed("annotation:submit", () => {
-          const annotationStore = self.annotationStore;
-          const shouldDenyEmptyAnnotation = self.hasInterface("annotations:deny-empty");
-          const entity = annotationStore.selected;
-          const areResultsEmpty = entity.results.length === 0;
-          const isReview = self.hasInterface("review") || entity.canBeReviewed;
-          const isUpdate = !isReview && isDefined(entity.pk);
-          // no changes were made over previously submitted version — no drafts, no pending changes
-          const noChanges = !entity.history.canUndo && !entity.draftId;
-          const isUpdateDisabled = isFF(FF_REVIEWER_FLOW) && isUpdate && noChanges;
-
-          if (shouldDenyEmptyAnnotation && areResultsEmpty) return;
-          if (annotationStore.viewingAll) return;
-          if (isUpdateDisabled) return;
-          if (entity.isReadOnly()) return;
-          if (entity.hasIncompleteRegions) return;
-
-          entity?.submissionInProgress();
-
-          if (self.hasInterface("annotation:bulk")) {
-            const customButtons = self.customButtons?.get("_replace");
-            const submitButton = customButtons?.find((btn) => btn.name === "submit");
-            if (submitButton && !submitButton.disabled) {
-              self.handleCustomButton?.(submitButton);
-            }
-          } else if (isReview) {
-            self.acceptAnnotation();
-          } else if (!isUpdate && self.hasInterface("submit")) {
-            self.submitAnnotation();
-          } else if (self.hasInterface("update")) {
-            self.updateAnnotation();
-          }
-        });
+        hotkeys.addNamed("annotation:submit", self.handleSubmitHotkey);
       }
 
       /**
        * Hotkey for skip task
        */
       if (self.hasInterface("skip", "review")) {
-        hotkeys.addNamed("annotation:skip", () => {
-          if (self.annotationStore.viewingAll) return;
-
-          const entity = self.annotationStore.selected;
-
-          entity?.submissionInProgress();
-
-          if (self.hasInterface("review")) {
-            self.rejectAnnotation();
-          } else {
-            self.skipTask();
-          }
-        });
+        hotkeys.addNamed("annotation:skip", self.handleSkipHotkey);
       }
 
       /**
@@ -640,7 +656,7 @@ export default types
     // to prevent from sending duplicating requests.
     // Better to return request's Promise from SDK to make this work perfect.
     function handleSubmittingFlag(fn, defaultMessage = "Error during submit") {
-      if (self.isSubmitting) return;
+      if (self.isSubmitting || self.isLoading) return;
       self.setFlags({ isSubmitting: true });
       const res = fn();
 
@@ -661,7 +677,7 @@ export default types
     }
 
     function submitAnnotation() {
-      if (self.isSubmitting) return;
+      if (self.isSubmitting || self.isLoading) return;
 
       const entity = self.annotationStore.selected;
       const event = entity.exists ? "updateAnnotation" : "submitAnnotation";
@@ -693,7 +709,7 @@ export default types
     }
 
     function updateAnnotation(extraData) {
-      if (self.isSubmitting) return;
+      if (self.isSubmitting || self.isLoading) return;
 
       const entity = self.annotationStore.selected;
 
@@ -722,7 +738,7 @@ export default types
     }
 
     function skipTask(extraData) {
-      if (self.isSubmitting) return;
+      if (self.isSubmitting || self.isLoading) return;
       const isEnterprise = window.APP_SETTINGS?.billing?.enterprise;
 
       // Manager roles that can force-skip unskippable tasks (OW=Owner, AD=Admin, MA=Manager)
@@ -743,14 +759,14 @@ export default types
     }
 
     function unskipTask() {
-      if (self.isSubmitting) return;
+      if (self.isSubmitting || self.isLoading) return;
       handleSubmittingFlag(() => {
         getEnv(self).events.invoke("unskipTask", self);
       }, "Error during cancel skipping task, try again");
     }
 
     function acceptAnnotation() {
-      if (self.isSubmitting) return;
+      if (self.isSubmitting || self.isLoading) return;
 
       handleSubmittingFlag(async () => {
         const entity = self.annotationStore.selected;
@@ -774,7 +790,7 @@ export default types
     }
 
     function rejectAnnotation({ comment = null }) {
-      if (self.isSubmitting) return;
+      if (self.isSubmitting || self.isLoading) return;
 
       handleSubmittingFlag(async () => {
         const entity = self.annotationStore.selected;
@@ -797,7 +813,7 @@ export default types
     }
 
     function handleCustomButton(button) {
-      if (self.isSubmitting) return;
+      if (self.isSubmitting || self.isLoading) return;
       const buttonName = button.name;
 
       handleSubmittingFlag(async () => {
@@ -1113,6 +1129,7 @@ export default types
 
     return {
       setFlags,
+      setHydrated,
       addInterface,
       hasInterface,
       toggleInterface,
@@ -1128,6 +1145,8 @@ export default types
       setHistory,
       hydrateHistoryItem,
       attachHotkeys,
+      handleSubmitHotkey,
+      handleSkipHotkey,
 
       skipTask,
       unskipTask,

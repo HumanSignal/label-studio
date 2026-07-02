@@ -402,6 +402,11 @@ export class LSFWrapper {
     const hasChangedTasks = this.lsf?.task?.id !== task?.id && task?.id;
 
     this.setLoading(true);
+    // Disarm hotkeys while the store is mutated; re-armed at the end of this load
+    // unless a newer load has started (seq) or an error left the store partial.
+    this._setLSFTaskSeq = (this._setLSFTaskSeq ?? 0) + 1;
+    const loadSeq = this._setLSFTaskSeq;
+    this.lsf.setHydrated?.(false);
 
     if (isActive(FF_FIT_720_LAZY_LOAD_ANNOTATIONS)) {
       // Invalidate in-flight stub hydrations from annotation tab switches so their finally
@@ -480,6 +485,13 @@ export class LSFWrapper {
 
       if (isFF(FF_FIT_1304_STRICT_OVERLAP) && this.overlapReached) {
         this.showOverlapReachedMessage();
+      }
+
+      // The task is fully presented: annotations deserialized, the right one selected
+      // and hydrated. Only now submit/skip hotkeys may fire. Deliberately not in
+      // `finally` — a failed load must leave hotkeys inert.
+      if (loadSeq === this._setLSFTaskSeq) {
+        this.lsf.setHydrated?.(true);
       }
     } catch (error) {
       console.error("[LSFWrapper] setLSFTask failed", error);
@@ -724,6 +736,11 @@ export class LSFWrapper {
   onLabelStudioLoad = async (ls) => {
     this.datamanager.invoke("labelStudioLoad", ls);
     this.lsf = ls;
+
+    // Runs synchronously within store creation (events.invoke dispatches inline), so
+    // submit/skip hotkeys are inert from the editor's very first moment until
+    // setLSFTask fully presents a task and re-arms them.
+    this.lsf.setHydrated?.(false);
 
     if (!this.lsf.task) this.setLoading(true);
 

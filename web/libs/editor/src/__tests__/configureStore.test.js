@@ -110,7 +110,7 @@ describe("configureStore", () => {
     expect(mockRootElement).toHaveBeenCalledWith("root");
   });
 
-  it("calls store.initializeStore with task and hydrated", async () => {
+  it("calls store.initializeStore with task, without the legacy hydrated key", async () => {
     const task = { id: 1, data: {} };
     const { configureStore } = await import("../configureStore");
     await configureStore({ config: "<View></View>", task });
@@ -118,11 +118,11 @@ describe("configureStore", () => {
       expect.objectContaining({
         id: 1,
         data: "{}",
-        hydrated: true,
         users: [],
         annotationHistory: [],
       }),
     );
+    expect(mockInitializeStore.mock.calls[0][0]).not.toHaveProperty("hydrated");
   });
 
   it("calls env.getExample when config is missing and getExample is defined", async () => {
@@ -141,20 +141,18 @@ describe("configureStore", () => {
     window.__LSF_INTEGRATION_TEST__ = undefined;
   });
 
-  it("passes hydrated, users, and annotationHistory to initializeStore", async () => {
+  it("passes users and annotationHistory to initializeStore", async () => {
     const users = [{ id: 1, username: "u" }];
     const history = [{ annotationId: 1 }];
     const { configureStore } = await import("../configureStore");
     await configureStore({
       config: "<View></View>",
       task: { id: 1 },
-      hydrated: false,
       users,
       history,
     });
     expect(mockInitializeStore).toHaveBeenCalledWith(
       expect.objectContaining({
-        hydrated: false,
         users,
         annotationHistory: history,
       }),

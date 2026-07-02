@@ -859,6 +859,106 @@ describe("AppStore", () => {
     });
   });
 
+  describe("isLoading guard", () => {
+    it("submitAnnotation returns early when isLoading", () => {
+      const store = createStore();
+      store.initializeStore({ annotations: [{ result: [] }] });
+      store.setFlags({ isLoading: true });
+      store.submitAnnotation();
+      expect(mockInvoke).not.toHaveBeenCalledWith("submitAnnotation", expect.anything(), expect.anything());
+    });
+
+    it("updateAnnotation returns early when isLoading", () => {
+      const store = createStore();
+      store.initializeStore({ annotations: [{ result: [] }] });
+      store.setFlags({ isLoading: true });
+      store.updateAnnotation();
+      expect(mockInvoke).not.toHaveBeenCalledWith(
+        "updateAnnotation",
+        expect.anything(),
+        expect.anything(),
+        expect.anything(),
+      );
+    });
+
+    it("acceptAnnotation returns early when isLoading", () => {
+      const store = createStore();
+      store.initializeStore({ annotations: [{ result: [] }] });
+      store.setFlags({ isLoading: true });
+      store.acceptAnnotation();
+      expect(mockInvoke).not.toHaveBeenCalledWith("acceptAnnotation", expect.anything(), expect.anything());
+    });
+
+    it("skipTask returns early when isLoading", () => {
+      const store = createStore();
+      store.initializeStore({});
+      store.assignTask({ id: 1, data: "{}" });
+      store.setFlags({ isLoading: true });
+      store.skipTask();
+      expect(mockInvoke).not.toHaveBeenCalledWith("skipTask", expect.anything(), expect.anything());
+    });
+  });
+
+  describe("hydrated hotkey latch", () => {
+    const createSubmitStore = () => {
+      const store = createStore({ interfaces: ["submit", "update", "skip"] });
+      store.initializeStore({ annotations: [{ result: [] }] });
+      return store;
+    };
+
+    it("setHydrated toggles the flag and it defaults to true", () => {
+      const store = createSubmitStore();
+      expect(store.hydrated).toBe(true);
+      store.setHydrated(false);
+      expect(store.hydrated).toBe(false);
+      store.setHydrated(true);
+      expect(store.hydrated).toBe(true);
+    });
+
+    it("submit hotkey fires when hydrated", () => {
+      const store = createSubmitStore();
+      store.handleSubmitHotkey();
+      expect(mockInvoke).toHaveBeenCalledWith("submitAnnotation", expect.anything(), expect.anything());
+    });
+
+    it("submit hotkey is inert while not hydrated", () => {
+      const store = createSubmitStore();
+      store.setHydrated(false);
+      store.handleSubmitHotkey();
+      expect(mockInvoke).not.toHaveBeenCalledWith("submitAnnotation", expect.anything(), expect.anything());
+    });
+
+    it("submit hotkey is inert when there is no task to label", () => {
+      const store = createSubmitStore();
+      store.setFlags({ noTask: true });
+      store.handleSubmitHotkey();
+      expect(mockInvoke).not.toHaveBeenCalledWith("submitAnnotation", expect.anything(), expect.anything());
+    });
+
+    it("submit hotkey fires again once re-hydrated", () => {
+      const store = createSubmitStore();
+      store.setHydrated(false);
+      store.handleSubmitHotkey();
+      expect(mockInvoke).not.toHaveBeenCalledWith("submitAnnotation", expect.anything(), expect.anything());
+      store.setHydrated(true);
+      store.handleSubmitHotkey();
+      expect(mockInvoke).toHaveBeenCalledWith("submitAnnotation", expect.anything(), expect.anything());
+    });
+
+    it("skip hotkey is inert while not hydrated", () => {
+      const store = createSubmitStore();
+      store.setHydrated(false);
+      store.handleSkipHotkey();
+      expect(mockInvoke).not.toHaveBeenCalledWith("skipTask", expect.anything(), expect.anything());
+    });
+
+    it("skip hotkey fires when hydrated", () => {
+      const store = createSubmitStore();
+      store.handleSkipHotkey();
+      expect(mockInvoke.mock.calls.some(([event]) => event === "skipTask")).toBe(true);
+    });
+  });
+
   describe("submitAnnotation when validate fails", () => {
     it("does not invoke event when entity.validate returns false", () => {
       const store = createStore();
