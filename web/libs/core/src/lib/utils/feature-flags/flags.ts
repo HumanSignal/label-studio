@@ -1,3 +1,10 @@
+/**
+ * Canonical registry for all frontend feature flag constants (FF_*).
+ * Add new flags here only — do not define new constants in editor, datamanager,
+ * LSE, or app-level feature-flags files. Use via `import { ff } from "@humansignal/core"`.
+ * See `.agents/skills/feature-flags/SKILL.md`.
+ */
+
 //// LEGACY FLAGS ////
 // Consider all pre-XFN flags legacy. Should be revised and removed.
 
