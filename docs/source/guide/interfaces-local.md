@@ -10,7 +10,7 @@ meta_description: "Build and iterate on custom labeling Interfaces from your ter
 section: "Interfaces"
 ---
 
-You can build or iterate on an Interface from your own editor and your own coding agent (Claude, Codex, or Cursor) instead of using the in-product agent. 
+You can build or iterate on an Interface from your own editor and your own coding agent (Claude, Codex, or Cursor) instead of using the in-product agent. **This is a first-class option on any deployment — many teams prefer it — and it's the way to build Interfaces on self-hosted or on-prem (including air-gapped) deployments, where Create with Agent (a Label Studio Cloud feature) isn't available.**
 
 You write JSX on disk, preview it live against your Label Studio instance, and sync the result back when you're ready to publish.
 
@@ -188,7 +188,7 @@ The full command reference is in the [**Interface CLI Guide**](https://github.co
 | --- | --- |
 | `node is required for interface validation` | Install Node.js and make sure `node` is on your `PATH`. |
 | `npm is required to install validator dependencies` | Install npm and re-run `interface doctor`. |
-| `source did not compile` | Fix JSX syntax errors. Interface files are compiled as self-contained JSX snippets — `import` statements and bundler-specific syntax aren't supported. |
+| `source did not compile` | Fix JSX syntax errors. Interface files are compiled as self-contained JSX snippets — `import` / `require` and bundler-specific syntax aren't supported. To use a third-party library, **pre-bundle it into the single source file** (or load it from an allow-listed host). See [Use external libraries and services](interfaces-libraries). |
 | `Module did not return an object` | Make the final expression in the file an object literal wrapped in parentheses, for example `({ default: Screen })`. |
 | `Missing getResults` or `Missing parseResults` | Warnings during static validation, but required for scenario validation. Add both functions when you need reliable save/load behavior. |
 | `no sidecar entry` | Run `interface sync` against the target Label Studio URL, or pass `--id` to commands that support it. |
