@@ -221,17 +221,20 @@ export const Cm6CodeEditor = forwardRef<unknown, Cm6CodeEditorProps>((props, ref
   );
 
   const isReadOnly = cm5Options.readOnly === true || cm5Options.readOnly === "nocursor";
-  const wrapperProps = pickCm6WrapperProps(restProps as Record<string, unknown>);
+  const pickedWrapperProps = pickCm6WrapperProps(restProps as Record<string, unknown>);
+  const callerTestId = pickedWrapperProps["data-testid"] as string | undefined;
+  const { "data-testid": _callerTestId, ...wrapperProps } = pickedWrapperProps;
 
   return (
     <div
       className={cn(styles.codeEditor, styles.cm6CodeEditor, {
         [styles.border]: border,
       })}
-      data-testid="cm6-code-editor"
       data-large-document={lightweightMode ? "true" : undefined}
       onBlur={flushToParent}
       {...wrapperProps}
+      data-testid="cm6-code-editor"
+      data-editor-testid={callerTestId}
     >
       <CodeMirror
         ref={editorRef}

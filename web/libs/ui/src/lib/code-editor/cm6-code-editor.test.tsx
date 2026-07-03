@@ -287,6 +287,21 @@ describe("Cm6CodeEditor", () => {
     expect(getByTestId("mock-cm6").getAttribute("data-value")).toBe("hello world");
   });
 
+  it("preserves canonical cm6-code-editor test id when caller passes data-testid", () => {
+    const { container } = render(
+      <Cm6CodeEditor
+        controlled
+        value="hello"
+        data-testid="custom-agreement-metric-code-editor"
+        options={{ mode: { name: "javascript", json: true } }}
+      />,
+    );
+
+    const wrapper = container.querySelector("[data-testid='cm6-code-editor']");
+    expect(wrapper).toBeTruthy();
+    expect(wrapper).toHaveAttribute("data-editor-testid", "custom-agreement-metric-code-editor");
+  });
+
   it("rebuilds extensions when hintOptions schema loads after mount", () => {
     const { getByTestId, rerender } = render(
       <Cm6CodeEditor controlled value="<View></View>" options={{ mode: "xml" }} />,
