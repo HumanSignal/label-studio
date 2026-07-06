@@ -108,6 +108,7 @@ export class WasmStreamingDecoder extends BaseAudioDecoder {
       return new Proxy(targetArray, {
         get(target, prop) {
           if (prop === "__rawTarget") return target;
+          if (typeof prop === "symbol") return target[prop as any];
 
           const chunkIndex = Number(prop);
           if (!isNaN(chunkIndex) && chunkIndex >= 0 && chunkIndex < totalChunks) {

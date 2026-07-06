@@ -96,6 +96,31 @@ describe("WasmStreamingDecoder", () => {
     });
   });
 
+  describe("chunks proxy symbol and array property access", () => {
+    it("allows standard array iteration and symbol access without throwing TypeError", async () => {
+      await decoder.init();
+
+      const chunks = decoder.chunks;
+      expect(chunks).toBeDefined();
+
+      // Accessing standard length property
+      expect(chunks?.length).toBe(2);
+
+      // Accessing symbol property (e.g. Symbol.iterator) should not throw
+      expect(() => {
+        const it = chunks?.[Symbol.iterator as any];
+        expect(it).toBeDefined();
+      }).not.toThrow();
+
+      // Testing array iteration using for...of on the proxy itself
+      expect(() => {
+        for (const chunk of chunks?.[0] || []) {
+          // Accessing each chunk
+        }
+      }).not.toThrow();
+    });
+  });
+
   describe("url refresh and request coalescing", () => {
     let mockFetch: any;
 
