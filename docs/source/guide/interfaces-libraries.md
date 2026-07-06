@@ -10,7 +10,9 @@ meta_description: "How to call external APIs, load third-party packages, or bund
 section: "Interfaces"
 ---
 
-An Interface runs as a **sandboxed module** inside the Label Studio editor. By default that sandbox has **no outbound network and cannot load third-party code**. This is a deliberate security posture that you can relax when your Interface needs it. When your Interface needs an external API or a third-party library, you enable exactly what you need in one of three ways.
+An Interface runs as a **sandboxed module** inside the Label Studio editor. By default that sandbox has **no outbound network and cannot load third-party code**. This is a deliberate security posture that you can relax when your Interface needs it.
+
+Common cases are small and specific: fetching predictions from your ML backend, formatting dates with `date-fns`, validating a payload with `zod`, pulling map tiles from a tile server, or drawing a chart with `d3`. When your Interface needs an external API or a third-party library, you enable exactly what you need in one of three ways.
 
 The single most common point of confusion: **"call an external API" and "use an external package" are configured in different places.** Allow-listing a host in the wrong section silently does nothing. This page explains which is which.
 
@@ -22,7 +24,13 @@ The single most common point of confusion: **"call an external API" and "use an 
 | **Load a third-party package from a CDN** at runtime | Pull `three.js` or `d3` from `cdn.jsdelivr.net` via a `<script>` tag | **Organization > Settings > Interfaces → Advanced: external scripts** |
 | **Use a third-party package with no external network** | Bundle `three.js` *into* the Interface and publish it | Nothing to configure. The code is self-contained. |
 
-You can combine them. A point-cloud Interface might **bundle `three.js` locally** (path 3) *and* **allow-list your tile/asset server** under **API origins** (path 1) so it can fetch the data to render.
+## Choosing a path
+
+- **Calling a service over HTTP?** → **API origins** (Path 1).
+- **Need a third-party library and OK trusting a CDN?** → **Advanced: external scripts** (Path 2).
+- **Need a third-party library with no external dependencies / air-gapped / strict security?** → **Bundle locally** (Path 3). *Preferred default.*
+
+You can also combine them. A point-cloud Interface might **bundle `three.js` locally** (path 3) *and* **allow-list your tile/asset server** under **API origins** (path 1) so it can fetch the data to render.
 
 !!! info Can I use a third-party library?
     Yes. Interface source code can't use `import` / `require`, because each Interface is one self-contained module rather than an ES module. That's a limit on **module syntax**; third-party code is still fine. Bring a library in by loading it from an allow-listed CDN (path 2) or by bundling it into the Interface (path 3).
@@ -112,12 +120,6 @@ Point-cloud **rendering** works because WebGL is available in the sandbox. The r
     A heavy third-party renderer already ships inside a stock Interface today: the **Document AI** template renders PDFs with **PDF.js** from its bundled code. This is a concrete precedent that large libraries run inside Interfaces, including ones that compile internally or offload work to a web worker.
 
 ---
-
-## Choosing a path
-
-- **Calling a service over HTTP?** → **API origins** (Path 1).
-- **Need a third-party library and OK trusting a CDN?** → **Advanced: external scripts** (Path 2).
-- **Need a third-party library with no external dependencies / air-gapped / strict security?** → **Bundle locally** (Path 3). *Preferred default.*
 
 ## Troubleshooting
 
