@@ -38,6 +38,9 @@ export const shouldSaveDraftOnSelectionChange = (annotation) => {
 /** Upper bound for lazy stub GET /api/annotations/:id/ so loading state cannot hang forever (FIT-1570). */
 const STUB_ANNOTATION_FETCH_TIMEOUT_MS = 120_000;
 
+/** Upper bound for awaiting another save's in-flight draft create before proceeding independently. */
+const DRAFT_CREATE_AWAIT_TIMEOUT_MS = 30_000;
+
 function promiseWithTimeout(promise, ms, label = "Operation") {
   return Promise.race([
     promise,
@@ -118,6 +121,9 @@ export class LSFWrapper {
    * Used so an older in-flight fetch does not clear loading after a newer selection.
    */
   _hydrateStubAnnotationSeq = 0;
+
+  /** In-flight draft-create requests by annotation id — single-flight guard in _submitDraft. */
+  _draftCreateRequests = new Map();
 
   /**
    *
@@ -583,10 +589,31 @@ export class LSFWrapper {
     let annotation;
     const activeDrafts = cs.annotations.map((a) => a.draftId).filter(Boolean);
 
+    // The user's real submitted annotation, if any — reopening it (instead of restoring an
+    // orphan draft or creating a blank) is what prevents duplicate annotations on revisits.
+    // Annotator-only, mirroring the backend guard: elevated roles may legitimately hold an
+    // annotation and a second draft at once. Inert when the user id is unresolvable, since
+    // an undefined id would match userless rows.
+    const currentUserId = this.lsf.user?.id ?? window.APP_SETTINGS?.user?.id;
+    const isAnnotator = window.APP_SETTINGS?.user?.role === "AN";
+    const ownSubmittedAnnotation =
+      isAnnotator && isDefined(currentUserId)
+        ? cs.annotations.find((a) => isDefined(a.pk) && !a.skipped && !a.ground_truth && a.user?.id === currentUserId)
+        : undefined;
+
     if (this.task.drafts) {
       for (const draft of this.task.drafts) {
         if (activeDrafts.includes(draft.id)) continue;
         let c;
+
+        // An orphan draft restored over the owner's submitted annotation becomes a Submit
+        // state that persists a duplicate; keep it server-side. No created_by means own
+        // draft (the API scopes task.drafts to the requesting user).
+        const draftIsOwn = draft.created_by?.id == null || draft.created_by.id === currentUserId;
+        if (!draft.annotation && ownSubmittedAnnotation && draftIsOwn) {
+          console.warn(`Skipping orphan draft ${draft.id}: owner already has an annotation on task ${this.task.id}`);
+          continue;
+        }
 
         if (draft.annotation) {
           // Annotation existed - add draft to existed annotation
@@ -644,7 +671,8 @@ export class LSFWrapper {
       } else if (showPredictions && this.predictions.length > 0 && !this.isInteractivePreannotations) {
         annotation = cs.addAnnotationFromPrediction(this.predictions[0]);
       } else {
-        annotation = cs.createAnnotation();
+        // Reopen the user's own annotation on revisits — a blank create persists a duplicate.
+        annotation = ownSubmittedAnnotation ?? cs.createAnnotation();
       }
     } else {
       if (selectPrediction) {
@@ -658,7 +686,7 @@ export class LSFWrapper {
       } else if (this.annotations.length > 0 && (id === "auto" || hasAutoAnnotations)) {
         annotation = first;
       } else {
-        annotation = cs.createAnnotation();
+        annotation = ownSubmittedAnnotation ?? cs.createAnnotation();
       }
     }
 
@@ -1063,19 +1091,27 @@ export class LSFWrapper {
   };
 
   onSubmitDraft = async (_studio, annotation, params = {}) => {
+    return this._submitDraft(annotation, params);
+  };
+
+  async _submitDraft(annotation, params = {}) {
     // It should be preserved as soon as possible because each `await` will allow it to be changed
     const taskId = this.task.id;
-    const annotationDoesntExist = !annotation.pk;
     const data = { body: this.prepareData(annotation, { isNewDraft: true }) }; // serializedAnnotation
     const hasChanges = this.needsDraftSave(annotation);
     const showToast = params?.useToast && hasChanges;
-    // console.log('onSubmitDraft', params?.useToast, hasChanges);
 
     if (params?.useToast) delete params.useToast;
 
     Object.assign(data.body, params);
 
     await this.saveUserLabels();
+
+    // Single-flight: overlapping saves would both see draftId=0 and create two drafts,
+    // orphaning one. Waiting (bounded, so a hung request can't wedge later saves) lets the
+    // newer payload flow through the update branch instead.
+    const pendingCreate = this._draftCreateRequests.get(annotation.id);
+    if (pendingCreate) await promiseWithTimeout(pendingCreate, DRAFT_CREATE_AWAIT_TIMEOUT_MS).catch(() => {});
 
     if (annotation.draftId > 0) {
       // draft has been already created
@@ -1085,23 +1121,25 @@ export class LSFWrapper {
       this.datamanager.invoke("submitDraft", this, annotation, res);
       return res;
     }
-    let response;
 
-    if (annotationDoesntExist) {
-      response = await this.datamanager.apiCall("createDraftForTask", { taskID: taskId }, data);
-    } else {
-      response = await this.datamanager.apiCall(
-        "createDraftForAnnotation",
-        { taskID: taskId, annotationID: annotation.pk },
-        data,
-      );
+    // Fresh pk read: a submit during the awaits above must not yield a task-level orphan.
+    const createRequest = !annotation.pk
+      ? this.datamanager.apiCall("createDraftForTask", { taskID: taskId }, data)
+      : this.datamanager.apiCall("createDraftForAnnotation", { taskID: taskId, annotationID: annotation.pk }, data);
+
+    this._draftCreateRequests.set(annotation.id, createRequest);
+    let response;
+    try {
+      response = await createRequest;
+    } finally {
+      this._draftCreateRequests.delete(annotation.id);
     }
     response?.id && annotation.setDraftId(response?.id);
     showToast && this.draftToast(response.$meta?.status, response);
     this.datamanager.invoke("submitDraft", this, annotation, response);
 
     return response;
-  };
+  }
 
   onSkipTask = async (_, { comment } = {}) => {
     // Prevent skipping if overlap is reached (only when feature flag is enabled)
