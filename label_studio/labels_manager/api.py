@@ -92,6 +92,7 @@ logger = logging.getLogger(__name__)
 )
 @method_decorator(name='update', decorator=extend_schema(exclude=True))
 class LabelAPI(viewsets.ModelViewSet):
+    queryset = Label.objects.none()
     pagination_class = PageNumberPagination
     serializer_class = LabelSerializer
     permission_required = ViewClassPermission(
@@ -193,6 +194,7 @@ class LabelAPI(viewsets.ModelViewSet):
 )
 @method_decorator(name='update', decorator=extend_schema(exclude=True))
 class LabelLinkAPI(viewsets.ModelViewSet):
+    queryset = LabelLink.objects.none()
     filter_backends = [DjangoFilterBackend]
     filterset_fields = {
         'project': ['exact'],

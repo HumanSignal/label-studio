@@ -6,6 +6,7 @@ from core.permissions import all_permissions
 from django.conf import settings
 from django.utils.decorators import method_decorator
 from drf_spectacular.utils import OpenApiResponse, extend_schema
+from io_storages.s3.models import S3ExportStorage, S3ImportStorage
 from rest_framework import generics
 from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
 from rest_framework.response import Response
@@ -125,6 +126,7 @@ class AllExportStorageTypesAPI(APIView):
     ),
 )
 class AllImportStorageListAPI(generics.ListAPIView):
+    queryset = S3ImportStorage.objects.none()
     parser_classes = (JSONParser, FormParser, MultiPartParser)
     permission_required = all_permissions.storages_view
 
@@ -162,6 +164,7 @@ class AllImportStorageListAPI(generics.ListAPIView):
     ),
 )
 class AllExportStorageListAPI(generics.ListAPIView):
+    queryset = S3ExportStorage.objects.none()
     parser_classes = (JSONParser, FormParser, MultiPartParser)
     permission_required = all_permissions.storages_view
 

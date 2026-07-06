@@ -122,6 +122,9 @@ class MLBackendListAPI(generics.ListCreateAPIView):
     filterset_fields = ['is_interactive']
 
     def get_queryset(self):
+        if getattr(self, 'swagger_fake_view', False):
+            return MLBackend.objects.none()
+
         project_pk = self.request.query_params.get('project')
         project = generics.get_object_or_404(Project, pk=project_pk)
 

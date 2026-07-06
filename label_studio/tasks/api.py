@@ -1332,6 +1332,7 @@ class AnnotationDraftAPI(generics.RetrieveUpdateDestroyAPIView):
     ),
 )
 class PredictionAPI(viewsets.ModelViewSet):
+    queryset = Prediction.objects.none()
     serializer_class = PredictionSerializer
     permission_required = all_permissions.predictions_any
     filter_backends = [DjangoFilterBackend]

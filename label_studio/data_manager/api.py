@@ -154,6 +154,7 @@ _view_request_body = {
     ),
 )
 class ViewAPI(viewsets.ModelViewSet):
+    queryset = View.objects.none()
     serializer_class = ViewSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['project']
