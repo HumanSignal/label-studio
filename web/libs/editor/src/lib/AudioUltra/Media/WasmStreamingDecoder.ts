@@ -15,6 +15,7 @@ export class WasmStreamingDecoder extends BaseAudioDecoder {
   private pendingThrottles = new Map<number, any>();
   private waveforms = new Set<any>();
   private wf?: any;
+  private refreshPromise: Promise<string> | null = null;
 
   constructor(src: string, wf?: any) {
     super(src);
@@ -202,6 +203,35 @@ export class WasmStreamingDecoder extends BaseAudioDecoder {
     this.pendingThrottles.set(chunkIndex, timer);
   }
 
+  private async refreshPresignedUrl(): Promise<string> {
+    if (this.refreshPromise) {
+      return this.refreshPromise;
+    }
+
+    this.refreshPromise = (async () => {
+      try {
+        const response = await fetch(this.src, {
+          cache: "no-store",
+          headers: {
+            Range: "bytes=0-0",
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+
+        const freshUrl = response.url;
+        this.worker?.updateUrl(freshUrl);
+        return freshUrl;
+      } finally {
+        this.refreshPromise = null;
+      }
+    })();
+
+    return this.refreshPromise;
+  }
+
   private async fetchChunkData(chunkIndex: number, isRetry = false) {
     if (!this.worker) {
       return;
@@ -242,14 +272,7 @@ export class WasmStreamingDecoder extends BaseAudioDecoder {
       if (isAuthError && !isRetry) {
         console.warn("WasmStreamingDecoder: Presigned URL expired (403/401). Refreshing URL and retrying...");
         try {
-          const response = await fetch(this.src);
-          if (response.body) {
-            response.body.cancel().catch(() => {});
-          }
-          const freshUrl = response.url;
-
-          // Update the worker URL
-          this.worker?.updateUrl(freshUrl);
+          await this.refreshPresignedUrl();
 
           // Retry decoding this chunk
           await this.fetchChunkData(chunkIndex, true);

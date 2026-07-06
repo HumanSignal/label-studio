@@ -8,6 +8,7 @@ const mockDecodeAudioData = mock().mockImplementation(() => {
   return Promise.resolve(new Float32Array(882000));
 });
 
+const mockUpdateUrl = mock();
 const mockDispose = mock();
 
 mock.module("@humansignal/audio-file-decoder", () => {
@@ -17,6 +18,7 @@ mock.module("@humansignal/audio-file-decoder", () => {
       sampleRate: 44100,
       duration: 100, // 100 seconds
       decodeAudioData: mockDecodeAudioData,
+      updateUrl: mockUpdateUrl,
       dispose: mockDispose,
     }),
   };
@@ -91,6 +93,58 @@ describe("WasmStreamingDecoder", () => {
       expect(rawChunks[0][0]).toBeUndefined();
       expect(rawChunks[0][1]).toBeDefined();
       expect(rawChunks[0][2]).toBeDefined();
+    });
+  });
+
+  describe("url refresh and request coalescing", () => {
+    let mockFetch: any;
+
+    beforeEach(() => {
+      mockFetch = spyOn(globalThis, "fetch").mockImplementation(() => {
+        return Promise.resolve({
+          ok: true,
+          url: "https://example.com/fresh-audio.mp3",
+        } as any);
+      });
+    });
+
+    it("coalesces concurrent URL refresh requests and sends Range bytes=0-0 headers", async () => {
+      await decoder.init();
+
+      // Make the worker throw a 403 error on first attempt
+      let attempts = 0;
+      mockDecodeAudioData.mockImplementation(() => {
+        attempts++;
+        if (attempts <= 2) {
+          // Both concurrent chunks fail on the first attempt
+          return Promise.reject(new Error("HTTP_STATUS_403"));
+        }
+        return Promise.resolve(new Float32Array(882000));
+      });
+
+      // Trigger lazy load on two chunks concurrently
+      decoder.chunks?.[0][0];
+      decoder.chunks?.[0][1];
+
+      // Wait for the timers and the fetches to resolve
+      await new Promise((resolve) => setTimeout(resolve, 150));
+
+      // Assertions:
+      // 1. fetch should be called exactly once to refresh the URL
+      expect(mockFetch).toHaveBeenCalledTimes(1);
+
+      // 2. fetch should be called with correct arguments: Range header and no-cache
+      const [fetchUrl, fetchInit] = mockFetch.mock.calls[0];
+      expect(fetchUrl).toBe(src);
+      expect(fetchInit).toEqual({
+        cache: "no-store",
+        headers: {
+          Range: "bytes=0-0",
+        },
+      });
+
+      // 3. The worker updateUrl should have been called
+      expect(mockUpdateUrl).toHaveBeenCalledWith("https://example.com/fresh-audio.mp3");
     });
   });
 
