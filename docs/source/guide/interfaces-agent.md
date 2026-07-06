@@ -10,16 +10,16 @@ meta_description: "Build custom labeling interfaces with React"
 section: "Interfaces"
 ---
 
-You can create Interfaces in two ways — pick whichever you prefer:
+You can create Interfaces in two ways. Pick whichever you prefer:
 
 * **Within Label Studio** - Use Label Studio's out-of-the-box Interface builder to prompt our agent to build and refine your Interface. 
 
 * **Developed locally** - Install the [`create-interface-skill`](/skills/interface.html) and use an agent of your choice to vibe code an Interface that you can then import into Label Studio. For more information, see [Develop an Interface locally](interfaces-local).
 
 !!! note
-    These are two independent ways to build the same thing, and the resulting Interface is identical either way — only the authoring path differs.
+    These are two independent ways to build the same thing, and the resulting Interface is identical either way; only the authoring path differs.
 
-    On Label Studio Cloud, both **Create with Agent** and [Develop Locally](interfaces-local) are available — choose whichever fits your workflow. **Create with Agent** is a Label Studio Cloud feature: on self-hosted or on-prem deployments it isn't available, so build your Interface with **Develop Locally** instead.
+    On Label Studio Cloud, both **Create with Agent** and [Develop Locally](interfaces-local) are available; choose whichever fits your workflow. **Create with Agent** is a Label Studio Cloud feature: on self-hosted or on-prem deployments it isn't available, so build your Interface with **Develop Locally** instead.
 
 <iframe width="560" height="315" src="https://www.youtube.com/embed/pdcZ6HDwpiI?si=ZpeuyeKYx71q1vCR" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
 

@@ -21,10 +21,10 @@ Instead of choosing a template and tuning [out-of-the-box XML tags](/tags), with
 
     There are two ways to build an Interface:
 
-    - **Create with Agent** — the in-product builder. Available on **Label Studio Cloud only**.
-    - **[Develop Locally](interfaces-local)** — build with your own coding agent and sync the result to Label Studio. Available on any deployment.
+    - **Create with Agent**: the in-product builder. Available on **Label Studio Cloud only**.
+    - **[Develop Locally](interfaces-local)**: build with your own coding agent and sync the result to Label Studio. Available on any deployment.
 
-    On Label Studio Cloud you can use either path, whichever you prefer. On self-hosted or on-prem deployments (including air-gapped), **Develop Locally is the way to build Interfaces** — Create with Agent is a Cloud-only feature.
+    On Label Studio Cloud you can use either path, whichever you prefer. On self-hosted or on-prem deployments (including air-gapped), **Develop Locally is the way to build Interfaces**, since Create with Agent is a Cloud-only feature.
 
     Everything else about Interfaces (versioning, projects, exports) works the same across both paths. See [Create with the agent](interfaces-agent).
 
@@ -111,7 +111,7 @@ You can enable or disable the ability to create and edit Interfaces for your org
 
 Interfaces run as sandboxed modules rendered inside the Label Studio editor shell. To keep them safe, portable, and upgrade-friendly, the runtime enforces a narrow contract:
 
-- **React-only source, closed by default.** The code runs with `React` and the standard hooks (`useState`, `useRef`, `useEffect`, `useCallback`, `useMemo`) plus a small `getField` helper. You can't `import` npm packages in the source — but you *can* use a third-party library by **bundling it into the Interface** or by **loading it from a host you allow-list**. See [Use external libraries and services](interfaces-libraries).
+- **React-only source, closed by default.** The code runs with `React` and the standard hooks (`useState`, `useRef`, `useEffect`, `useCallback`, `useMemo`) plus a small `getField` helper. You can't `import` npm packages in the source. You *can* still use a third-party library by **bundling it into the Interface** or by **loading it from a host you allow-list**. See [Use external libraries and services](interfaces-libraries).
 - **Plain JavaScript with JSX.** No TypeScript, no type annotations, no `import` / `export` statements. The module is compiled and evaluated at runtime, and must expose a default component plus optional helpers (`getResults`, `parseResults`, `outputSchema`, `inputSchema`, `paramsSchema`, `GridCell`).
 - **No network access by default.** Out of the box an Interface can only reach your Label Studio server. To let it call an external service (for example an ML backend), an Owner/Admin allow-lists that origin under **Organization > Settings > Interfaces → API origins**. See [Use external libraries and services](interfaces-libraries).
 - **Limited persistence.** State lives only for the duration of a labeling session. Anything you want to keep has to come back out through the annotation results.
