@@ -117,6 +117,11 @@ class PredictionSerializer(ModelSerializer):
             logger.info(f'Skipping prediction validation in PredictionSerializer for user {ff_user}')
             return super().validate(data)
 
+        # Custom Interface projects normally keep the default <View></View>
+        # label_config and are validated above against output_schema instead.
+        if not project.label_config_is_not_default:
+            return super().validate(data)
+
         # Validate prediction using LabelInterface
         li = LabelInterface(project.label_config)
         validation_errors = li.validate_prediction(data, return_errors=True)

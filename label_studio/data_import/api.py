@@ -599,7 +599,10 @@ class ImportPredictionsAPI(generics.CreateAPIView):
             f'Importing {len(self.request.data)} predictions to project {project} with {len(tasks_ids)} tasks (legacy mode)'
         )
 
-        li = LabelInterface(project.label_config)
+        # Custom Interface projects normally keep the default <View></View>
+        # label_config and are validated below against output_schema instead.
+        should_validate_label_config = project.label_config_is_not_default
+        li = LabelInterface(project.label_config) if should_validate_label_config else None
 
         # Validate all predictions before creating any
         validation_errors = []
@@ -621,20 +624,20 @@ class ImportPredictionsAPI(generics.CreateAPIView):
                         f'from project {project} tasks'
                     )
 
-            # Validate prediction using LabelInterface only
-            try:
-                validation_errors_list = li.validate_prediction(item, return_errors=True)
+            if should_validate_label_config:
+                try:
+                    validation_errors_list = li.validate_prediction(item, return_errors=True)
 
-                # If prediction is invalid, add error to validation_errors list and continue to next prediction
-                if validation_errors_list:
-                    # Format errors for better readability
-                    for error in validation_errors_list:
-                        validation_errors.append(f'Prediction {i}: {error}')
+                    # If prediction is invalid, add error to validation_errors list and continue to next prediction
+                    if validation_errors_list:
+                        # Format errors for better readability
+                        for error in validation_errors_list:
+                            validation_errors.append(f'Prediction {i}: {error}')
+                        continue
+
+                except Exception as e:
+                    validation_errors.append(f'Prediction {i}: Error validating prediction - {extract_message(e)}')
                     continue
-
-            except Exception as e:
-                validation_errors.append(f'Prediction {i}: Error validating prediction - {extract_message(e)}')
-                continue
 
             custom_interface_errors = self._validate_custom_interface_prediction(project, item, i)
             if custom_interface_errors:
