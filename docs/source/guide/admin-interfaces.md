@@ -19,6 +19,11 @@ These settings apply uniformly to every Interface in your organization — embed
 
 Access these settings from  **Organization > Settings > Interfaces**.
 
+!!! info Which section do I need?
+    - To let an Interface **call an external API/service** (`fetch`/XHR/WebSocket) → **API origins**.
+    - To let an Interface **load a third-party script/stylesheet** from a CDN → **Advanced: external scripts**.
+    - To use a library with **no external network at all**, bundle it into the Interface. Nothing to configure here. See [Use external libraries and services](interfaces-libraries).
+
 
 ## Enable Interfaces
 
