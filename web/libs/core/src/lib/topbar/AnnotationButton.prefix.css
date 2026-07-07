@@ -1,3 +1,5 @@
+@import "../../../../ui/src/styles/userpic-badge.prefix.css";
+
 .annotation-button {
   display: flex;
   padding: var(--spacing-tighter) var(--spacing-tight);
@@ -37,14 +39,6 @@
 
     & .annotation-button__userpic {
       .userpic-badge {
-        width: 10px;
-        height: 10px;
-        color: var(--color-neutral-background);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        border-radius: 2px;
-        box-shadow: 0 0 0 2px var(--color-neutral-background);
         transform: translate(2px, 2px);
       }
     }
