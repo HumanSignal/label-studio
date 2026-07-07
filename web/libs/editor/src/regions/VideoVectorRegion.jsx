@@ -37,6 +37,10 @@ const interpolateVertices = (prevKeyframe, nextKeyframe, frame) => {
   });
 };
 
+export const resolveVideoVectorRegionControl = (results = [], objectTag) => {
+  return results.find((result) => result.from_name?.tools)?.from_name ?? objectTag?.videoVectorControl;
+};
+
 /**
  * VideoVectorRegion — Vector graphics region for video annotation.
  *
@@ -110,7 +114,15 @@ const Model = types
     },
 
     get control() {
-      return self.results.find((result) => result.from_name.tools)?.from_name;
+      let objectTag;
+
+      try {
+        objectTag = self.object;
+      } catch {
+        objectTag = undefined;
+      }
+
+      return resolveVideoVectorRegionControl(self.results, objectTag);
     },
 
     get vertices() {

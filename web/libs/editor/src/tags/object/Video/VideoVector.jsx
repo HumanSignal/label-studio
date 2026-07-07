@@ -111,18 +111,14 @@ const getMaxPoints = (control) => {
  * doesn't cause KonvaVector to re-initialize (its arePointsEqual uses strict ===).
  */
 const VideoVectorPure = ({
-  id,
   reg,
   box,
   frame,
   workingArea,
   selected,
-  draggable,
   listening,
   onClick: onClickProp,
-  onDragMove,
   allowOutsideBounds = false,
-  ...rest
 }) => {
   const vectorRef = useRef(null);
   const isDraggingRef = useRef(false);
@@ -165,7 +161,7 @@ const VideoVectorPure = ({
 
   const bbox = useMemo(() => computeBBox(pixelVertices), [pixelVertices]);
 
-  const control = reg.results?.[0]?.from_name;
+  const control = reg.control ?? reg.results?.[0]?.from_name;
 
   const stageTransform = useMemo(
     () => ({

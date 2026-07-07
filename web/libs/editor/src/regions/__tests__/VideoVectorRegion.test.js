@@ -27,11 +27,12 @@ const mkVertices = (pts) => pts.map(([x, y], i) => ({ id: `v${i}`, x, y }));
 
 describe("VideoVectorRegion", () => {
   let VideoVectorRegionModel;
+  let resolveVideoVectorRegionControl;
   let VideoModel;
   let TestRoot;
 
   beforeAll(() => {
-    VideoVectorRegionModel = require("../VideoVectorRegion").VideoVectorRegionModel;
+    ({ VideoVectorRegionModel, resolveVideoVectorRegionControl } = require("../VideoVectorRegion"));
     VideoModel = require("../../tags/object/Video").VideoModel;
 
     TestRoot = types
@@ -227,6 +228,32 @@ describe("VideoVectorRegion", () => {
       });
       expect(root.region.getShape(0)).toBeNull();
       expect(root.region.getShape(10)).toBeNull();
+    });
+  });
+
+  describe("control fallback", () => {
+    it("uses the video object's VideoVector control when label results no longer include it", () => {
+      const labelsControl = { type: "labels", closable: false };
+      const videoVectorControl = { type: "videovectorlabels", tools: { VideoVector: {} }, closable: true };
+
+      // BROS-1485: removing the VideoVectorLabels label can leave only generic
+      // Labels results attached to the region. Drawing mechanics still belong
+      // to the configured VideoVectorLabels control on the video object.
+      expect(resolveVideoVectorRegionControl([{ from_name: labelsControl }], { videoVectorControl })).toBe(
+        videoVectorControl,
+      );
+    });
+
+    it("prefers the region's tool-owning result when it is still attached", () => {
+      const labelsControl = { type: "labels", closable: false };
+      const videoVectorControl = { type: "videovectorlabels", tools: { VideoVector: {} }, closable: true };
+      const fallbackControl = { type: "videovectorlabels", tools: { VideoVector: {} }, closable: true };
+
+      expect(
+        resolveVideoVectorRegionControl([{ from_name: labelsControl }, { from_name: videoVectorControl }], {
+          videoVectorControl: fallbackControl,
+        }),
+      ).toBe(videoVectorControl);
     });
   });
 
