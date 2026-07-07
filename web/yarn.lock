@@ -5592,9 +5592,9 @@
     yauzl "^3.1.2"
 
 "@xhmikosr/decompress@^10.2.0":
-  version "10.2.0"
-  resolved "https://registry.yarnpkg.com/@xhmikosr/decompress/-/decompress-10.2.0.tgz#f67bf32a5e0e8064a665c17259af3431f85fadf9"
-  integrity sha512-MmDBvu0+GmADyQWHolcZuIWffgfnuTo4xpr2I/Qw5Ox0gt+e1Be7oYqJM4te5ylL6mzlcoicnHVDvP27zft8tg==
+  version "10.2.1"
+  resolved "https://registry.yarnpkg.com/@xhmikosr/decompress/-/decompress-10.2.1.tgz#d893caec9298743435f11ff0089baff9e345ffcf"
+  integrity sha512-ceGT3K2JR73Usj5o+HM2RRZw0XPUes4rhb7uVTY9PefUQQMpuj8x+V29XVG09JnS7EOj9SIBhHn3K4bFNNb7hA==
   dependencies:
     "@xhmikosr/decompress-tar" "^8.1.0"
     "@xhmikosr/decompress-tarbz2" "^8.1.0"
