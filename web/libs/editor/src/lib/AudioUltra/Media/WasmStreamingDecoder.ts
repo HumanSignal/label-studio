@@ -56,12 +56,18 @@ export class WasmStreamingDecoder extends BaseAudioDecoder {
     const chunkStart = chunkIndex * 10;
     const chunkEnd = chunkStart + 10;
 
+    let maxVisibleDuration = 0;
+    let loaded = false;
+
     for (const wf of activeWfs) {
       const zoom = wf.zoom;
       const visibleDuration = this._duration / zoom;
+      maxVisibleDuration = Math.max(maxVisibleDuration, visibleDuration);
 
-      // Check if zoomed in enough to load (threshold: 30 minutes / 1800s)
-      if (visibleDuration <= 1800) {
+      const threshold = wf.loadingThreshold ?? 1800;
+
+      // Check if zoomed in enough to load (threshold: 30 minutes / 1800s, or custom)
+      if (visibleDuration <= threshold) {
         const scrollLeft = wf.visualizer?.getScrollLeft() ?? 0;
         const visibleStart = scrollLeft * this._duration;
         const visibleEnd = visibleStart + visibleDuration;
@@ -71,12 +77,18 @@ export class WasmStreamingDecoder extends BaseAudioDecoder {
         const paddedEnd = Math.min(this._duration, visibleEnd + 30);
 
         if (chunkEnd >= paddedStart && chunkStart <= paddedEnd) {
-          return true;
+          loaded = true;
         }
       }
     }
 
-    return false;
+    // Dynamically adjust MAX_CACHED_CHUNKS to prevent cache thrashing/eviction loop when zoomed out
+    if (maxVisibleDuration > 0) {
+      const visibleChunks = Math.ceil(maxVisibleDuration / 10);
+      this.MAX_CACHED_CHUNKS = Math.max(200, Math.min(this.totalChunks, visibleChunks + 10));
+    }
+
+    return loaded;
   }
 
   async init(arraybuffer?: ArrayBuffer): Promise<void> {
@@ -211,6 +223,16 @@ export class WasmStreamingDecoder extends BaseAudioDecoder {
 
     this.refreshPromise = (async () => {
       try {
+        if (this.wf && typeof this.wf.refreshUrl === "function") {
+          const freshUrl = await this.wf.refreshUrl(this.src);
+          if (freshUrl) {
+            this.src = freshUrl;
+            this.worker?.updateUrl(freshUrl);
+            this.invoke("urlRefreshed", [freshUrl]);
+            return freshUrl;
+          }
+        }
+
         const response = await fetch(this.src, {
           cache: "no-store",
           headers: {
