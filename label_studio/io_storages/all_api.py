@@ -117,7 +117,12 @@ class AllExportStorageTypesAPI(APIView):
         tags=['Storage'],
         summary='List all import storages from the project',
         description='Retrieve a list of the import storages of all types with their IDs.',
-        responses={200: 'List of ImportStorageSerializer'},
+        responses={
+            200: OpenApiResponse(
+                response={'type': 'object'},
+                description='List of import storages of all types with their IDs.',
+            ),
+        },
         extensions={
             'x-fern-sdk-group-name': ['import_storage'],
             'x-fern-sdk-method-name': 'list',
@@ -155,7 +160,12 @@ class AllImportStorageListAPI(generics.ListAPIView):
         tags=['Storage'],
         summary='List all export storages from the project',
         description='Retrieve a list of the export storages of all types with their IDs.',
-        responses={200: 'List of ExportStorageSerializer'},
+        responses={
+            200: OpenApiResponse(
+                response={'type': 'object'},
+                description='List of export storages of all types with their IDs.',
+            ),
+        },
         extensions={
             'x-fern-sdk-group-name': ['export_storage'],
             'x-fern-sdk-method-name': 'list',

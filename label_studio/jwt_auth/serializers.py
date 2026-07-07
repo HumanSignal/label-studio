@@ -51,3 +51,7 @@ class LSAPITokenRotateSerializer(serializers.Serializer):
 
 class TokenRotateResponseSerializer(serializers.Serializer):
     refresh = serializers.CharField()
+
+
+class TokenDetailErrorSerializer(serializers.Serializer):
+    detail = serializers.CharField()
