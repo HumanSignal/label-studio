@@ -18,7 +18,7 @@ class JWTSettingsSerializer(serializers.ModelSerializer):
 class LSAPITokenCreateSerializer(serializers.Serializer):
     token = serializers.SerializerMethodField()
 
-    def get_token(self, obj):
+    def get_token(self, obj) -> str:
         return obj.get_full_jwt()
 
     class Meta:
@@ -27,7 +27,7 @@ class LSAPITokenCreateSerializer(serializers.Serializer):
 
 
 class LSAPITokenListSerializer(LSAPITokenCreateSerializer):
-    def get_token(self, obj):
+    def get_token(self, obj) -> str:
         # only return header/payload portion of token, using LSTokenBackend
         return str(obj)
 

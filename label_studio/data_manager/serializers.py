@@ -1,6 +1,7 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license."""
 
 import os
+from typing import Any
 
 import ujson as json
 from core.current_request import CurrentContext
@@ -555,7 +556,7 @@ class DataManagerTaskSerializer(TaskSerializer):
             ret.pop('state', None)
         return ret
 
-    def _pretty_results(self, task, field, unique=False):
+    def _pretty_results(self, task, field, unique=False) -> str:
         if not hasattr(task, field) or getattr(task, field) is None:
             return ''
 
@@ -577,18 +578,18 @@ class DataManagerTaskSerializer(TaskSerializer):
 
         return output[: self.CHAR_LIMITS].replace(',"', ', "').replace('],[', '] [').replace('"', '')
 
-    def get_annotations_results(self, task):
+    def get_annotations_results(self, task) -> str:
         return self._pretty_results(task, 'annotations_results')
 
-    def get_predictions_results(self, task):
+    def get_predictions_results(self, task) -> str:
         return self._pretty_results(task, 'predictions_results')
 
-    def get_predictions(self, task):
+    def get_predictions(self, task) -> list[dict[str, Any]]:
         ordering = self.context.get('annotations_ordering')
         predictions = get_task_predictions_queryset(task, ordering)
         return PredictionSerializer(predictions, many=True, default=[], read_only=True).data
 
-    def get_annotations(self, task):
+    def get_annotations(self, task) -> list[dict[str, Any]]:
         """Return annotations for the task.
 
         If annotations_stub=True is in context (via feature flag
@@ -619,21 +620,21 @@ class DataManagerTaskSerializer(TaskSerializer):
         ).data
 
     @staticmethod
-    def get_file_upload(task):
+    def get_file_upload(task) -> str | None:
         if hasattr(task, 'file_upload_field'):
             file_upload = task.file_upload_field
             return os.path.basename(task.file_upload_field) if file_upload else None
         return None
 
     @staticmethod
-    def get_storage_filename(task):
+    def get_storage_filename(task) -> str | None:
         return task.get_storage_filename()
 
     @staticmethod
-    def get_updated_by(obj):
+    def get_updated_by(obj) -> list[dict[str, int]]:
         return [{'user_id': obj.updated_by_id}] if obj.updated_by_id else []
 
-    def get_annotators(self, obj):
+    def get_annotators(self, obj) -> list[dict[str, Any]]:
         if not hasattr(obj, 'annotators'):
             return []
 
@@ -668,10 +669,10 @@ class DataManagerTaskSerializer(TaskSerializer):
             )
         return out
 
-    def get_annotations_ids(self, task):
+    def get_annotations_ids(self, task) -> str:
         return self._pretty_results(task, 'annotations_ids', unique=True)
 
-    def get_predictions_model_versions(self, task):
+    def get_predictions_model_versions(self, task) -> str:
         return self._pretty_results(task, 'predictions_model_versions', unique=True)
 
     def get_drafts_serializer(self):

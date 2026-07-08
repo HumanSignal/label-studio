@@ -20,7 +20,7 @@ class MLBackendSerializer(serializers.ModelSerializer):
     def get_basic_auth_pass_is_set(self, obj):
         return bool(obj.basic_auth_pass)
 
-    def get_readable_state(self, obj):
+    def get_readable_state(self, obj) -> str:
         return obj.get_state_display()
 
     def validate_basic_auth_pass(self, value):

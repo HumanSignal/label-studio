@@ -15,13 +15,13 @@ class BaseUserSerializer(FlexFieldsModelSerializer):
     active_organization_meta = serializers.SerializerMethodField(read_only=True)
     last_activity = serializers.DateTimeField(read_only=True, source='last_activity_cached')
 
-    def get_avatar(self, instance):
+    def get_avatar(self, instance) -> str | None:
         return instance.avatar_url
 
-    def get_initials(self, instance):
+    def get_initials(self, instance) -> str:
         return instance.get_initials(self._is_deleted(instance))
 
-    def get_active_organization_meta(self, instance):
+    def get_active_organization_meta(self, instance) -> dict[str, str]:
         organization = instance.active_organization
         if organization is None:
             return {'title': '', 'email': ''}
