@@ -26,8 +26,10 @@ const mockStore = {
         canUndo: false,
       },
     },
+    selectedHistory: null,
   },
   customButtons: new Map(),
+  rejectAnnotation: mock(),
 };
 
 const mockHistory = {
@@ -235,6 +237,54 @@ describe("Controls", () => {
     );
 
     expect(getByLabelText("skip-task")).toBeDisabled();
+  });
+
+  test("disables accept and reject in review when viewing submitted while a draft exists (FIT-2105)", () => {
+    mockStore.hasInterface = (a: string) => a === "review" || a === "controls";
+
+    const annotation = {
+      ...mockAnnotation,
+      canBeReviewed: true,
+      draftSelected: false,
+      versions: { draft: [{ id: "r1" }] },
+      submissionInProgress: mock(),
+      history: { canUndo: false },
+    };
+    mockStore.annotationStore.selectedHistory = null;
+    mockStore.annotationStore.selected = annotation;
+
+    const { getByLabelText } = render(
+      <Provider store={mockStore}>
+        <Controls annotation={annotation} />
+      </Provider>,
+    );
+
+    expect(getByLabelText("accept-annotation")).toBeDisabled();
+    expect(getByLabelText("reject-annotation")).toBeDisabled();
+  });
+
+  test("keeps accept and reject enabled in review when draft is the active view (FIT-2105)", () => {
+    mockStore.hasInterface = (a: string) => a === "review" || a === "controls";
+
+    const annotation = {
+      ...mockAnnotation,
+      canBeReviewed: true,
+      draftSelected: true,
+      versions: { draft: [{ id: "r1" }] },
+      submissionInProgress: mock(),
+      history: { canUndo: true },
+    };
+    mockStore.annotationStore.selectedHistory = null;
+    mockStore.annotationStore.selected = annotation;
+
+    const { getByLabelText } = render(
+      <Provider store={mockStore}>
+        <Controls annotation={annotation} />
+      </Provider>,
+    );
+
+    expect(getByLabelText("accept-annotation")).not.toBeDisabled();
+    expect(getByLabelText("reject-annotation")).not.toBeDisabled();
   });
 
   test("Skip triggers skipTask when allow_skip=false but user is Manager (MA) in LSE", async () => {

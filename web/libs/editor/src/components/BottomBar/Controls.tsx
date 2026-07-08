@@ -74,13 +74,22 @@ export const Controls = controlsInjector<{ annotation: MSTAnnotation }>(
     const isReview = store.hasInterface("review") || annotation.canBeReviewed;
     const isNotQuickView = store.hasInterface("topbar:prevnext");
     const historySelected = isDefined(store.annotationStore.selectedHistory);
-    const { userGenerate, sentUserGenerate, versions, results, editable: annotationEditable } = annotation;
+    const {
+      userGenerate,
+      sentUserGenerate,
+      versions,
+      results,
+      editable: annotationEditable,
+      draftSelected,
+    } = annotation;
+    const viewingSubmittedWhileDraftExists = !historySelected && Boolean(versions?.draft) && !draftSelected;
+    const reviewActionsBlocked = historySelected || viewingSubmittedWhileDraftExists;
     const dropdownTrigger = cn("dropdown").elem("trigger").toClassName();
     const customButtons: CustomButtonsField = store.customButtons;
     const buttons: React.ReactNode[] = [];
 
     const [isInProgress, setIsInProgress] = useState(false);
-    const disabled = !annotationEditable || store.isSubmitting || historySelected || isInProgress;
+    const disabled = !annotationEditable || store.isSubmitting || reviewActionsBlocked || isInProgress;
     const submitDisabled = store.hasInterface("annotations:deny-empty") && results.length === 0;
     const hasIncompleteRegions = annotation.hasIncompleteRegions;
 
