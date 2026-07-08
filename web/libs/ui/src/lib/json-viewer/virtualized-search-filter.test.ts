@@ -21,6 +21,22 @@ describe("virtualized-search-filter", () => {
     expect(visible.has("$.meta")).toBe(false);
   });
 
+  it("includes full ancestor chain for deeply nested Task Source matches (FIT-2107)", () => {
+    const matchPath = "$.annotations[0].result[0].value.reactcode.fields.review_dimensions";
+    const visible = buildSearchVisiblePaths([matchPath]);
+
+    expect(visible.has(matchPath)).toBe(true);
+    expect(visible.has("$.annotations[0].result[0].value.reactcode.fields")).toBe(true);
+    expect(visible.has("$.annotations[0].result[0].value.reactcode")).toBe(true);
+    expect(visible.has("$.annotations[0].result[0].value")).toBe(true);
+    expect(visible.has("$.annotations[0].result[0]")).toBe(true);
+    expect(visible.has("$.annotations[0].result")).toBe(true);
+    expect(visible.has("$.annotations[0]")).toBe(true);
+    expect(visible.has("$.annotations")).toBe(true);
+    expect(visible.has("$")).toBe(true);
+    expect(visible.has("$.data")).toBe(false);
+  });
+
   it("returns empty set when there are no matches", () => {
     expect(buildSearchVisiblePaths([]).size).toBe(0);
   });

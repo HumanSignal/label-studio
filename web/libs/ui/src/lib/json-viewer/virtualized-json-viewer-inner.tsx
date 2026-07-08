@@ -6,7 +6,6 @@ import {
   type JSONViewerRowDecorator,
   type JSONViewerRowFilter,
   type JSONViewerRowRenderer,
-  type JSONViewerSearchMetadata,
 } from "react-json-virtualization";
 import "react-json-virtualization/styles.css";
 import { CopyNodeButton } from "./copy-node-button";
@@ -18,11 +17,8 @@ import {
   resolvePathFilterQuery,
   resolveStringTruncate,
 } from "./virtualized-json-viewer-utils";
-import {
-  buildSearchVisiblePaths,
-  VIRTUALIZED_SEARCH_DEBOUNCE_MS,
-  areSearchVisiblePathsEqual,
-} from "./virtualized-search-filter";
+import { scheduleDeepSearchExpansionPaths } from "./deep-search";
+import { VIRTUALIZED_SEARCH_DEBOUNCE_MS } from "./virtualized-search-filter";
 import { labelStudioVirtualizedTheme } from "./virtualized-json-viewer-theme";
 import styles from "./json-viewer.module.css";
 
@@ -59,7 +55,7 @@ export const VirtualizedJsonViewerInner = ({
 }: VirtualizedJsonViewerInnerProps) => {
   const previewTruncate = resolveStringTruncate(stringTruncate);
   const [debouncedSearchText, setDebouncedSearchText] = useState(searchText);
-  const [searchVisiblePaths, setSearchVisiblePaths] = useState<Set<string> | null>(null);
+  const [deepSearchExpansionPaths, setDeepSearchExpansionPaths] = useState<Set<string> | null>(null);
   const pendingSearchQuery = searchText.trim();
   const activeSearchQuery = debouncedSearchText.trim();
   const isSearchPending = pendingSearchQuery !== activeSearchQuery;
@@ -68,13 +64,8 @@ export const VirtualizedJsonViewerInner = ({
     const trimmed = searchText.trim();
     if (!trimmed) {
       setDebouncedSearchText("");
-      setSearchVisiblePaths(null);
       return;
     }
-
-    // Drop stale match paths immediately so a prior query (or zero-match set) cannot
-    // keep hiding rows while the debounced searchQuery catches up.
-    setSearchVisiblePaths(null);
 
     const timeoutId = window.setTimeout(() => {
       setDebouncedSearchText(searchText);
@@ -87,13 +78,41 @@ export const VirtualizedJsonViewerInner = ({
   const json = useMemo(() => JSON.stringify(data ?? null), [data]);
   const initialExpandDepth = resolveInitialExpandDepth(collapseDepth);
   const pathFilterQuery = resolvePathFilterQuery(activeFilterId);
-  const activePathFilterQuery = pathFilterQuery ?? "";
 
-  // Path filter changes alter the searchable row set; stale searchVisiblePaths (especially
-  // an empty Set from zero matches) would otherwise hide the entire tree until remount.
+  // The library only searches flattened (expanded) rows. Walk the full payload so deep
+  // nested keys like review_dimensions stay searchable at default expand depth.
   useEffect(() => {
-    setSearchVisiblePaths(null);
-  }, [activePathFilterQuery]);
+    if (!activeSearchQuery || isSearchPending) {
+      setDeepSearchExpansionPaths(null);
+      return;
+    }
+
+    let cancelled = false;
+    setDeepSearchExpansionPaths(null);
+
+    const scheduled = scheduleDeepSearchExpansionPaths(data, activeSearchQuery, {
+      pathFilterPrefix: pathFilterQuery,
+    });
+
+    void scheduled.promise.then((paths) => {
+      if (!cancelled) {
+        setDeepSearchExpansionPaths(paths);
+      }
+    });
+
+    return () => {
+      cancelled = true;
+      scheduled.cancel();
+    };
+  }, [activeSearchQuery, data, isSearchPending, pathFilterQuery]);
+
+  const searchVisiblePaths = useMemo(() => {
+    if (!activeSearchQuery || isSearchPending || deepSearchExpansionPaths === null) {
+      return null;
+    }
+
+    return deepSearchExpansionPaths;
+  }, [activeSearchQuery, deepSearchExpansionPaths, isSearchPending]);
 
   const rowDecorator = useCallback<JSONViewerRowDecorator>(
     (context: JSONViewerRowContext) => {
@@ -116,39 +135,6 @@ export const VirtualizedJsonViewerInner = ({
       return { actions: <>{actions}</> };
     },
     [readerViewThreshold],
-  );
-
-  const handleSearchMetadata = useCallback(
-    (metadata: JSONViewerSearchMetadata) => {
-      if (!activeSearchQuery) {
-        setSearchVisiblePaths(null);
-        return;
-      }
-
-      if (isSearchPending) {
-        return;
-      }
-
-      if (metadata.searchQuery !== activeSearchQuery) {
-        return;
-      }
-
-      if ((metadata.pathFilterQuery ?? "") !== activePathFilterQuery) {
-        return;
-      }
-
-      const nextVisiblePaths =
-        metadata.matchCount === 0 ? new Set<string>() : buildSearchVisiblePaths(metadata.matchedPaths);
-
-      setSearchVisiblePaths((previous) => {
-        if (previous && areSearchVisiblePathsEqual(previous, nextVisiblePaths)) {
-          return previous;
-        }
-
-        return nextVisiblePaths;
-      });
-    },
-    [activeSearchQuery, activePathFilterQuery, isSearchPending],
   );
 
   const rowFilter = useCallback<JSONViewerRowFilter>(
@@ -246,12 +232,14 @@ export const VirtualizedJsonViewerInner = ({
         rowHeight={24}
         className={styles.virtualizedJsonViewerTree}
         initialExpandDepth={initialExpandDepth}
+        expandedPaths={
+          deepSearchExpansionPaths && deepSearchExpansionPaths.size > 0 ? deepSearchExpansionPaths : undefined
+        }
         pathFilterQuery={pathFilterQuery}
         pathFilterMode={pathFilterQuery ? "prefix" : undefined}
         searchQuery={activeSearchQuery || undefined}
         searchMode="includes"
         rowFilter={rowFilter}
-        onSearchMetadata={handleSearchMetadata}
         theme={labelStudioVirtualizedTheme}
         rowRenderer={rowRenderer}
         rowDecorator={rowDecorator}
