@@ -290,9 +290,15 @@ const HtxVideoView = ({ item, store }) => {
         const nextZoom = zoom + delta;
         const scale = nextZoom / zoom;
 
+        const rawPointer = stageRef.current.getPointerPosition?.();
+        const resolvedPointer = rawPointer ?? {
+          x: item.ref.current.width / 2,
+          y: item.ref.current.height / 2,
+        };
+
         const pointerPos = {
-          x: stageRef.current.pointerPos.x - item.ref.current.width / 2,
-          y: stageRef.current.pointerPos.y - item.ref.current.height / 2,
+          x: resolvedPointer.x - item.ref.current.width / 2,
+          y: resolvedPointer.y - item.ref.current.height / 2,
         };
 
         return {

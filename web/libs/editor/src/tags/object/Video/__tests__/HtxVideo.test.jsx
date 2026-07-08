@@ -86,8 +86,15 @@ mockModule("../../../../components/VideoCanvas/VideoCanvas", () => ({
   },
 }));
 
+let mockKonvaStage = null;
+
 mockModule("../VideoRegions", () => ({
-  VideoRegions: () => <div data-testid="video-regions">VideoRegions</div>,
+  VideoRegions: ({ stageRef }) => {
+    if (stageRef && mockKonvaStage) {
+      stageRef.current = mockKonvaStage;
+    }
+    return <div data-testid="video-regions">VideoRegions</div>;
+  },
 }));
 
 mockModule("../../../../hooks/useFullscreen", () => ({
@@ -191,6 +198,7 @@ function createMockStore() {
 describe("HtxVideoView", () => {
   beforeEach(() => {
     clearAllMocks();
+    mockKonvaStage = null;
     mockTimelineProps.current = {};
     mockVideoCanvasProps.current = {};
   });
@@ -469,6 +477,48 @@ describe("HtxVideoView", () => {
       fireEvent.wheel(main, { deltaY: 100, shiftKey: false });
     }
     expect(mockVideoCanvasProps.onLoad).toBeDefined();
+  });
+
+  it("onZoomChange zooms toward canvas center when pointer is outside the stage", async () => {
+    mockKonvaStage = {
+      getPointerPosition: () => null,
+    };
+    const item = createMockItem({ videoControl: true });
+    const store = createMockStore();
+    const { container } = render(<HtxVideoView item={item} store={store} />);
+    await flushRaf();
+    await triggerVideoLoad();
+    await flushRaf();
+
+    const initialZoom = mockVideoCanvasProps.zoom ?? 1;
+    const main = container.querySelector('[class*="main"]');
+
+    expect(main).toBeTruthy();
+    fireEvent.wheel(main, { deltaY: 100, shiftKey: true });
+    await flushRaf();
+
+    expect(mockVideoCanvasProps.zoom).toBeGreaterThan(initialZoom);
+  });
+
+  it("onZoomChange zooms toward pointer when it is over the stage", async () => {
+    mockKonvaStage = {
+      getPointerPosition: () => ({ x: 200, y: 150 }),
+    };
+    const item = createMockItem({ videoControl: true });
+    const store = createMockStore();
+    const { container } = render(<HtxVideoView item={item} store={store} />);
+    await flushRaf();
+    await triggerVideoLoad();
+    await flushRaf();
+
+    const initialZoom = mockVideoCanvasProps.zoom ?? 1;
+    const main = container.querySelector('[class*="main"]');
+
+    fireEvent.wheel(main, { deltaY: 100, shiftKey: true });
+    await flushRaf();
+
+    expect(mockVideoCanvasProps.zoom).toBeGreaterThan(initialZoom);
+    expect(mockVideoCanvasProps.pan).toBeDefined();
   });
 
   it("supportsRegions is true when item.videoControl is defined", async () => {
