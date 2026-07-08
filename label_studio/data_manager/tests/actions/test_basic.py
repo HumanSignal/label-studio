@@ -101,6 +101,33 @@ class TestDeleteTasksAnnotations(TestCase):
             job_timeout=60 * 60 * 5,
         )
 
+    @patch('projects.mixins.start_job_async_or_sync')
+    def test_counters_reset_even_if_async_counter_job_is_lost(self, mock_start_job_async_or_sync):
+        """Regression (Emerald / TRIAG-2440 over-count).
+
+        The counter reset must run inline in the delete job, not as a separate fire-and-forget
+        job that can be dropped. We simulate the separate job being lost by mocking
+        start_job_async_or_sync to a no-op; total_annotations must still return to 0 because the
+        delete path now recomputes synchronously (run_sync=True).
+        """
+        AnnotationFactory(task=self.task_1, completed_by=self.user_1)
+        AnnotationFactory(task=self.task_2, completed_by=self.user_1)
+        self.task_1.refresh_from_db()
+        self.task_2.refresh_from_db()
+        assert self.task_1.total_annotations == 1
+        assert self.task_2.total_annotations == 1
+
+        delete_tasks_annotations_job(self.project.id, [self.task_1.id, self.task_2.id], None, self.user_1.id)
+
+        # If the counter reset had been dispatched as a separate job, the mock would have
+        # swallowed it and the counters would remain stale at 1.
+        mock_start_job_async_or_sync.assert_not_called()
+        self.task_1.refresh_from_db()
+        self.task_2.refresh_from_db()
+        assert Annotation.objects.count() == 0
+        assert self.task_1.total_annotations == 0
+        assert self.task_2.total_annotations == 0
+
     @patch('data_manager.actions.basic.start_job_async_or_sync')
     def test_schedules_job_when_selection_only_has_drafts(self, mock_start_job_async_or_sync):
         AnnotationDraftFactory(task=self.task_1, user=self.user_1)

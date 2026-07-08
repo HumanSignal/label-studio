@@ -1466,6 +1466,45 @@ def update_project_summary_annotations_and_is_labeled(sender, instance, created,
     logger.debug(f'Updated total_annotations and cancelled_annotations for {instance.task.id}.')
 
 
+@receiver(post_delete, sender=Annotation)
+def update_task_counters_after_annotation_delete(sender, instance, **kwargs):
+    """Safety net: keep task.total_annotations / cancelled_annotations correct on deletion.
+
+    Counter upkeep on delete otherwise lives only in ``Annotation.delete()`` (single) and the
+    explicit recompute calls in the bulk delete jobs. A raw ``Annotation.objects.filter(...).delete()``
+    (SDK/script) or a dropped async recompute job would leave ``total_annotations`` stale above the
+    real annotation count — the drift surfaced in the Data Manager (e.g. a task showing 1 annotation
+    while empty).
+
+    The first-class paths set ``bulk_annotation_delete_in_progress`` and either recompute counters
+    themselves (single ``Annotation.delete()``, bulk DM/API delete) or intentionally leave them alone
+    (task/project CASCADE deletion, where the tasks are being removed anyway). We no-op in that case to
+    avoid redundant per-row work and to avoid touching tasks that are mid-deletion; we only recompute
+    for the unguarded paths that would otherwise drift.
+    """
+    if CurrentContext.get('bulk_annotation_delete_in_progress'):
+        return
+
+    task_id = instance.task_id
+    if task_id is None:
+        return
+
+    task = Task.objects.filter(id=task_id).first()
+    if task is None:
+        return
+
+    task.total_annotations = task.annotations.filter(was_cancelled=False).count()
+    task.cancelled_annotations = task.annotations.filter(was_cancelled=True).count()
+    task.update_is_labeled()
+    # Use .update() (not .save()) to avoid re-triggering Task save signals / summary recounting.
+    Task.objects.filter(id=task_id).update(
+        total_annotations=task.total_annotations,
+        cancelled_annotations=task.cancelled_annotations,
+        is_labeled=task.is_labeled,
+    )
+    logger.debug(f'post_delete recomputed counters for task {task_id} after annotation deletion.')
+
+
 @receiver(pre_delete, sender=Prediction)
 def remove_predictions_from_project(sender, instance, **kwargs):
     """Remove predictions counters"""

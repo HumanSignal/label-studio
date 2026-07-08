@@ -3,6 +3,7 @@
 import logging
 from datetime import datetime
 
+from core.current_request import CurrentContext
 from core.feature_flags import flag_set
 from core.permissions import AllPermissions
 from core.redis import start_job_async_or_sync
@@ -100,14 +101,24 @@ def delete_tasks_annotations_job(project_id, task_ids, annotator_id, user_id):
     # Retry on deadlock / FK violation from concurrent background workers (e.g.
     # dimension score recomputation) that may INSERT rows referencing annotations
     # being deleted, causing either a deadlock or a dangling FK constraint error.
-    delete_annotations_queryset_with_retry(annotations)
+    # Flag this as a managed bulk delete so the Annotation post_delete safety-net signal
+    # skips per-row recomputation — we reset counters explicitly (and reliably) below.
+    previous_bulk_delete = CurrentContext.get('bulk_annotation_delete_in_progress')
+    CurrentContext.set('bulk_annotation_delete_in_progress', True)
+    try:
+        delete_annotations_queryset_with_retry(annotations)
+    finally:
+        CurrentContext.set('bulk_annotation_delete_in_progress', previous_bulk_delete)
     drafts.delete()  # since task-level annotation drafts will not have been deleted by CASCADE
     emit_webhooks_for_instance(project.organization, project, WebhookAction.ANNOTATIONS_DELETED, annotations_ids)
 
     tasks = Task.objects.filter(id__in=real_task_ids)
     tasks.update(updated_at=datetime.now(), updated_by=user)
-    # Update tasks counter and is_labeled. It should be a single operation as counters affect bulk is_labeled update
-    project.update_tasks_counters_and_is_labeled(tasks_queryset=real_task_ids)
+    # Update tasks counter and is_labeled. It should be a single operation as counters affect bulk is_labeled update.
+    # Run inline (run_sync=True): we already deleted the annotations above, so the counter reset must not be a
+    # separate droppable job. If the fire-and-forget 'default'-queue job is lost, annotations are gone but
+    # total_annotations stays > 0 forever (stale counter shown in the Data Manager). (Emerald / TRIAG-2440)
+    project.update_tasks_counters_and_is_labeled(tasks_queryset=real_task_ids, run_sync=True)
 
     # LSE postprocess
     postprocess = load_func(settings.DELETE_TASKS_ANNOTATIONS_POSTPROCESS)

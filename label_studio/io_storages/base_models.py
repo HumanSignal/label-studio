@@ -558,8 +558,9 @@ class ImportStorage(Storage):
                 flag_set('fflag_feat_utc_210_prediction_validation_15082025', user=project.organization.created_by)
                 or raise_exception
             )
+            created_predictions = []
             if prediction_ser.is_valid(raise_exception=raise_prediction_exception):
-                prediction_ser.save()
+                created_predictions = prediction_ser.save()
 
             # add annotations
             logger.debug(f'Create {len(annotations)} annotations for task={task}')
@@ -615,13 +616,39 @@ class ImportStorage(Storage):
             annotation_ser = AnnotationSerializer(data=annotations, many=True)
 
             # Always validate annotations, but control error handling based on FF
+            created_annotations = []
             if annotation_ser.is_valid():
-                annotation_ser.save()
+                created_annotations = annotation_ser.save()
             else:
                 # Log validation errors but don't save invalid annotations
                 logger.error(f'Invalid annotations for task {task.id}: {annotation_ser.errors}')
                 if raise_exception:
                     raise ValidationError(annotation_ser.errors)
+
+            # Reconcile the denormalized task counters with what actually persisted. The task
+            # above is seeded with counts taken from the *payload* annotations/predictions, but
+            # rows can be silently skipped when invalid (under
+            # ff_fix_back_dev_3342_storage_scan_with_invalid_annotations, is_valid() fails and we
+            # don't raise). Without this, a task whose only annotation was skipped keeps
+            # total_annotations=1 while having zero annotation rows — a stale counter the Data
+            # Manager reads directly (per-task column and tab totals). Recompute from the rows we
+            # actually created so the cached counters can't drift above reality.
+            actual_total_annotations = sum(1 for a in created_annotations if not a.was_cancelled)
+            actual_cancelled_annotations = sum(1 for a in created_annotations if a.was_cancelled)
+            actual_total_predictions = len(created_predictions)
+            if (
+                task.total_annotations != actual_total_annotations
+                or task.cancelled_annotations != actual_cancelled_annotations
+                or task.total_predictions != actual_total_predictions
+            ):
+                task.total_annotations = actual_total_annotations
+                task.cancelled_annotations = actual_cancelled_annotations
+                task.total_predictions = actual_total_predictions
+                task.update_is_labeled()
+                task.save(
+                    update_fields=['total_annotations', 'cancelled_annotations', 'total_predictions', 'is_labeled'],
+                    skip_fsm=True,
+                )
         return task
         # FIXME: add_annotation_history / post_process_annotations should be here
 

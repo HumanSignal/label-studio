@@ -16,14 +16,21 @@ class ProjectMixin:
         """
         start_job_async_or_sync(self._rearrange_overlap_cohort)
 
-    def update_tasks_counters_and_is_labeled(self, tasks_queryset, from_scratch=True):
+    def update_tasks_counters_and_is_labeled(self, tasks_queryset, from_scratch=True, run_sync=False):
         """
         Async start updating tasks counters and than is_labeled
         :param tasks_queryset: Tasks to update queryset
         :param from_scratch: Skip calculated tasks
+        :param run_sync: Run the counter update inline instead of dispatching a separate job.
+            Callers that mutate annotations and MUST NOT lose the counter update (e.g. bulk
+            annotation deletion) should pass True: the default fire-and-forget job on the
+            'default' queue can be dropped/failed independently of the delete, which leaves
+            total_annotations stale (annotations gone, counter stuck > 0).
         """
         # get only id from queryset to decrease data size in job
         task_ids = get_unique_ids_list(tasks_queryset)
+        if run_sync:
+            return self._update_tasks_counters_and_is_labeled(task_ids, from_scratch=from_scratch)
         start_job_async_or_sync(self._update_tasks_counters_and_is_labeled, task_ids, from_scratch=from_scratch)
 
     def update_tasks_counters_and_task_states(

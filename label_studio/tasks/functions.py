@@ -84,7 +84,15 @@ def bulk_create_annotations_with_side_effects(
             Task.objects.filter(id__in=task_ids).update(**update_fields)
 
     if update_task_counters and tasks_queryset is not None:
-        project.update_tasks_counters_and_is_labeled(tasks_queryset=tasks_queryset)
+        # Derive the tasks to recount from the annotations we just created instead of
+        # re-evaluating tasks_queryset. tasks_queryset may be a lazy, state-dependent
+        # Data Manager filter (e.g. "Annotations = 0" / a "not labeled" view). Re-running
+        # it here — after bulk_create already added the annotations — would match zero rows
+        # and skip the counter update, leaving total_annotations / is_labeled stale. The
+        # freshly created annotations always point at exactly the tasks that need recounting.
+        # (TRIAG-2440)
+        counter_task_ids = list({annotation.task_id for annotation in db_annotations if annotation.task_id})
+        project.update_tasks_counters_and_is_labeled(tasks_queryset=counter_task_ids)
 
     if recalculate_stats:
         try:
