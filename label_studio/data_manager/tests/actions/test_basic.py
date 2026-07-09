@@ -1,6 +1,7 @@
 from unittest.mock import patch
 
 from data_manager.actions.basic import (
+    delete_tasks,
     delete_tasks_annotations,
     delete_tasks_annotations_form,
     delete_tasks_annotations_job,
@@ -139,3 +140,35 @@ class TestDeleteTasksAnnotations(TestCase):
 
         assert result == mock_start_job_async_or_sync.return_value
         mock_start_job_async_or_sync.assert_called_once()
+
+
+class TestDeleteTasks(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.project = ProjectFactory()
+        cls.task_1 = TaskFactory(project=cls.project)
+        cls.task_2 = TaskFactory(project=cls.project)
+        cls.task_3 = TaskFactory(project=cls.project)
+
+    @patch('data_manager.actions.basic.start_job_async_or_sync')
+    def test_partial_delete_returns_reload_false_without_async(self, mock_start_job_async_or_sync):
+        """UTC-1043: a partial delete must not pair `reload: False` with `async: True`.
+
+        The frontend (AppStore.js invokeAction) only skips its automatic Data Manager reload when
+        both are set together, matching the genuinely async Bulk Review action. delete_tasks
+        returns reload: False here for an unrelated reason (whether project tabs were reset), so it
+        must fall through to the normal synchronous reload path.
+        """
+        queryset = Task.objects.filter(id=self.task_1.id)
+
+        result = delete_tasks(self.project, queryset)
+
+        assert result['reload'] is False
+        assert 'async' not in result
+
+    def test_full_delete_returns_reload_true(self):
+        queryset = Task.objects.filter(project=self.project)
+
+        result = delete_tasks(self.project, queryset)
+
+        assert result['reload'] is True

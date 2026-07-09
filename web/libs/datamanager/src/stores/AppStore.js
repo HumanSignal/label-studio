@@ -810,10 +810,12 @@ export const AppStore = types
         return;
       }
 
-      // The action explicitly opted out of an automatic reload (e.g. async Bulk Review): reloading now
-      // would only refresh the first page while the background job is still running. Highlight the
-      // Refresh button instead so the user can reload once the job has finished.
-      if (result.reload === false) {
+      // An async action can explicitly opt out of an automatic reload (e.g. async Bulk Review): reloading
+      // now would only refresh the first page while the background job is still running. Highlight the
+      // Refresh button instead so the user can reload once the job has finished. Synchronous actions
+      // (e.g. delete_tasks) may also return reload: false for unrelated reasons, so require async: true
+      // here to avoid skipping the normal refresh below for them.
+      if (result.async && result.reload === false) {
         self.backgroundActionPending = true;
         view?.clearSelection?.();
         view?.unlock?.();
@@ -827,7 +829,11 @@ export const AppStore = types
 
       if (options.reload !== false) {
         yield view.reload();
-        yield self.fetchProject();
+        // A synchronous action has fully applied by the time it returns, and we just reloaded the view,
+        // so the displayed data is current — fetch the project forced to skip the count-drift check that
+        // would otherwise flag the Refresh button as stale just because the action changed the counts.
+        // Async actions keep the non-forced fetch so their still-running job can legitimately highlight it.
+        yield self.fetchProject(result.async ? {} : { force: true });
         projectFetched = self.project;
         view.clearSelection();
       }
