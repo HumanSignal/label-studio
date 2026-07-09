@@ -1,7 +1,7 @@
 import { when } from "mobx";
 import { getEnv } from "mobx-state-tree";
 import { inject, observer } from "mobx-react";
-import { type FC, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import { type FC, useCallback, useLayoutEffect, useMemo, useRef, useState } from "react";
 import {
   IconAnnotationAccepted,
   IconAnnotationImported,
@@ -63,15 +63,13 @@ const DraftState: FC<{
   const hiddenUser = infoIsHidden ? { email: "Me" } : null;
   const currentUser = window.APP_SETTINGS?.user;
 
-  const [hasUnsavedChanges, setChanges] = useState(false);
-
-  // turn it on when changes just made; off when they we saved
-  useEffect(() => {
-    setChanges(true);
-  }, [annotation.history.history.length]);
-  useEffect(() => {
-    setChanges(false);
-  }, [annotation.draftSaved]);
+  // BROS-1477: Derive the "unsaved changes" state from the store's own change tracking
+  // (`needsDraftSave` compares the last edit time to the last draft save) instead of
+  // reacting to raw `history.history.length` deltas. Non-edit operations such as
+  // `reinitHistory` (fired on image resize/zoom) or switching Annotation History items
+  // change the undo-stack length without any real edit; the old heuristic turned the
+  // indicator on for those and never turned it back off, leaving it stuck indefinitely.
+  const hasUnsavedChanges = annotation.needsDraftSave?.() ?? false;
 
   if (!hasChanges && !annotation.versions.draft) return null;
 
