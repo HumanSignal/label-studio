@@ -1,4 +1,5 @@
 import {
+  FF_FIT_ANNOTATIONS_VERTICAL_LAYOUT,
   FF_INTERFACES,
   FF_INTERFACES_AGENT_WORKFLOW,
   FF_NEW_STORAGES,
@@ -15,6 +16,8 @@ const FLAGS_OVERRIDE: Record<string, boolean> = {
   // [FF_FLAG_NAME]: boolean
   [FF_NEW_STORAGES]: true,
   [FF_THEME_TOGGLE]: true,
+  // Remove before merging — local dev testing for vertical annotations sidebar
+  [FF_FIT_ANNOTATIONS_VERTICAL_LAYOUT]: true,
 };
 
 /**

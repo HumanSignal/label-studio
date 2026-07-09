@@ -38,6 +38,41 @@
     }
   }
 
+  &__scroll {
+    overflow-x: auto;
+    overflow-y: hidden !important;
+    scrollbar-width: none;
+
+    &::-webkit-scrollbar {
+      display: none;
+    }
+
+    &:hover {
+      scrollbar-width: thin;
+      scrollbar-color: var(--color-neutral-border-bold) transparent;
+    }
+
+    &:hover::-webkit-scrollbar {
+      display: block;
+      width: 6px;
+      height: 6px;
+      background: transparent;
+    }
+
+    &:hover::-webkit-scrollbar-thumb {
+      background-color: var(--color-neutral-border-bold);
+      border-radius: 999px;
+    }
+
+    &:hover::-webkit-scrollbar-track,
+    &:hover::-webkit-scrollbar-track-piece,
+    &:hover::-webkit-scrollbar-corner {
+      background: transparent;
+      box-shadow: none;
+      border: none;
+    }
+  }
+
   &__container {
     display: flex;
     width: 100%;
@@ -71,6 +106,121 @@
     & button:not(:disabled) {
       box-shadow: 0 2px 6px rgba(var(--color-neutral-shadow-raw) / 20%);
     }
+  }
+
+  &_vertical {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 0;
+    min-height: 0;
+    overflow: hidden;
+    height: 100%;
+    align-items: stretch;
+    width: 100%;
+
+    &::before {
+      display: none;
+    }
+
+    .annotations-carousel__container {
+      display: flex;
+      flex: 1 1 0;
+      min-height: 0;
+      flex-direction: column;
+      justify-content: flex-start;
+      align-items: stretch;
+      gap: var(--annotation-item-gap, var(--spacing-tighter));
+      padding: var(--spacing-tight) var(--spacing-tight) 0;
+      overflow-x: clip;
+      overflow-y: auto;
+
+      .annotations-carousel__scroll {
+        overflow-y: auto;
+      }
+
+      > * {
+        flex: 0 0 auto;
+      }
+
+      > .annotations-carousel__virtualizedList {
+        flex: 1 1 0;
+        min-height: 0;
+        margin-right: calc(-1 * var(--spacing-tight));
+
+        .annotations-carousel__scroll {
+          overflow-y: auto !important;
+          scrollbar-width: thin;
+        }
+      }
+
+      .annotation-button {
+        height: var(--annotation-item-height, 42px);
+        flex-shrink: 0;
+        animation: annotations-carousel-item-appear 200ms ease-out;
+
+        &_selected {
+          height: var(--annotation-item-height, 42px);
+        }
+      }
+    }
+
+    &.annotations-carousel_virtualized {
+      .annotations-carousel__container {
+        overflow: hidden;
+      }
+    }
+
+    .annotations-carousel__carousel-controls {
+      display: none;
+    }
+  }
+
+  &__addNewRow {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-tight);
+    width: 100%;
+    padding: var(--spacing-tighter) var(--spacing-tight);
+    border-radius: var(--corner-radius-small);
+    border: 1px dashed var(--color-primary-border-subtler);
+    background-color: var(--color-neutral-surface);
+    cursor: pointer;
+    transition: all 150ms ease-out;
+
+    &:hover,
+    &:focus-visible {
+      background-color: var(--color-primary-emphasis-subtle);
+      border-color: var(--color-primary-border);
+      outline: none;
+
+      & .annotations-carousel__addNewRowIcon {
+        background-color: var(--color-primary-emphasis);
+        color: var(--color-primary-content);
+      }
+    }
+  }
+
+  &__addNewRowIcon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background-color: var(--color-primary-emphasis-subtle);
+    color: var(--color-primary-content);
+    transition:
+      color 150ms ease-out,
+      background-color 150ms ease-out;
+  }
+
+  &__addNewRowLabel {
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 16px;
+    letter-spacing: 0.4px;
+    color: var(--color-neutral-content-subtle);
   }
 
   &__nav {
@@ -112,5 +262,23 @@
         }
       }
     }
+  }
+}
+
+@keyframes annotations-carousel-item-appear {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .annotations-carousel_vertical .annotation-button {
+    animation: none;
   }
 }

@@ -14,7 +14,17 @@
  * whether to confirm before invoking the real action.
  */
 
-import { forwardRef, useCallback, useContext, useEffect, useMemo, useRef, useState, type ForwardedRef } from "react";
+import {
+  forwardRef,
+  useCallback,
+  useContext,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+  type ForwardedRef,
+} from "react";
 import { createPortal } from "react-dom";
 import { format, isValid } from "date-fns";
 import {
@@ -38,9 +48,20 @@ import { Badge, DropdownTrigger, Tooltip, ToastContext, ToastType, Userpic, useD
 import { cnb as cn } from "../utils/bem";
 import { useCopyText } from "../hooks/useCopyText";
 import { isDefined, userDisplayName } from "../utils/helpers";
-import type { AnnotationActionHandlers, AnnotationCapabilities, SharedAnnotation, SharedUser } from "./types";
+import type {
+  AnnotationActionHandlers,
+  AnnotationCapabilities,
+  AnnotationsListLayout,
+  SharedAnnotation,
+  SharedUser,
+} from "./types";
 import "./AnnotationButton.prefix.css";
 import contextMenuStyles from "./ContextMenu.module.css";
+import {
+  computeVerticalRightTooltipPosition,
+  VERTICAL_TOOLTIP_ESTIMATED_SIZE,
+  type TooltipPosition,
+} from "./vertical-tooltip-position";
 
 const NAME_TRUNCATE_START = 8;
 const NAME_TRUNCATE_END = 6;
@@ -183,7 +204,7 @@ interface TooltipProps {
   isOpen: boolean;
   onMouseEnter: (e: React.MouseEvent) => void;
   onMouseLeave: () => void;
-  position: { top: number; left: number } | null;
+  position: TooltipPosition | null;
 }
 
 function AnnotationButtonTooltip({
@@ -274,11 +295,21 @@ function AnnotationButtonTooltip({
 
   const tooltipContent = (
     <div
-      className={cn("annotation-button").elem("tooltipContainer").mod({ open: isOpen }).toClassName()}
+      className={cn("annotation-button")
+        .elem("tooltipContainer")
+        .mod({ open: isOpen, placementRight: position.placement === "right" })
+        .toClassName()}
       ref={containerRef as any}
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
-      style={{ position: "fixed", top: `${position.top}px`, left: `${position.left}px` }}
+      style={{
+        position: "fixed",
+        top: `${position.top}px`,
+        left: `${position.left}px`,
+        ...(position.arrowOffset != null
+          ? ({ "--tooltip-arrow-offset": `${position.arrowOffset}px` } as React.CSSProperties)
+          : {}),
+      }}
     >
       {tooltipBadges.length > 0 && (
         <div className={cn("annotation-button").elem("tooltipBadges").toClassName()}>
@@ -492,6 +523,7 @@ export interface AnnotationButtonProps {
   annotation: SharedAnnotation;
   capabilities: AnnotationCapabilities;
   handlers: AnnotationActionHandlers;
+  layout?: AnnotationsListLayout;
 }
 
 /**
@@ -527,7 +559,7 @@ function setForwardedRef<T>(externalRef: ForwardedRef<T>, value: T | null): void
 }
 
 function AnnotationButtonImpl(
-  { annotation, capabilities, handlers }: AnnotationButtonProps,
+  { annotation, capabilities, handlers, layout }: AnnotationButtonProps,
   forwardedRef: ForwardedRef<HTMLDivElement>,
 ) {
   const isPrediction = annotation.type === "prediction";
@@ -562,7 +594,7 @@ function AnnotationButtonImpl(
   const enterTimeoutRef = useRef<number | undefined>();
   const leaveTimeoutRef = useRef<number | undefined>();
   const [isTooltipOpen, setTooltipOpen] = useState(false);
-  const [tooltipPosition, setTooltipPosition] = useState<{ top: number; left: number } | null>(null);
+  const [tooltipPosition, setTooltipPosition] = useState<TooltipPosition | null>(null);
   const [isContextMenuOpen, setContextMenuOpen] = useState(false);
 
   useEffect(() => {
@@ -575,16 +607,35 @@ function AnnotationButtonImpl(
   const recalcTooltipPosition = useCallback(() => {
     if (!buttonRef.current) return;
     const rect = buttonRef.current.getBoundingClientRect();
-    const estimatedWidth = 250;
-    const estimatedHeight = 100;
+    const viewportPadding = 12;
+    const gap = 12;
+    const tooltipEl = tooltipRef.current;
+    const tooltipWidth = tooltipEl?.offsetWidth ?? VERTICAL_TOOLTIP_ESTIMATED_SIZE.width;
+    const tooltipHeight = tooltipEl?.offsetHeight ?? VERTICAL_TOOLTIP_ESTIMATED_SIZE.height;
+
+    if (layout === "vertical") {
+      const { top, left, arrowOffset } = computeVerticalRightTooltipPosition(
+        rect,
+        { width: tooltipWidth, height: tooltipHeight },
+        { width: window.innerWidth, height: window.innerHeight },
+      );
+      setTooltipPosition({ top, left, placement: "right", arrowOffset });
+      return;
+    }
+
     const spaceBelow = window.innerHeight - rect.bottom;
     const spaceAbove = rect.top;
-    const top =
-      spaceBelow < estimatedHeight + 20 && spaceAbove > spaceBelow ? rect.top - estimatedHeight - 12 : rect.bottom + 12;
-    let left = rect.left + rect.width / 2 - estimatedWidth / 2;
-    left = Math.max(20, Math.min(left, window.innerWidth - estimatedWidth - 20));
-    setTooltipPosition({ top, left });
-  }, []);
+    const showAbove = spaceBelow < tooltipHeight + gap && spaceAbove > spaceBelow;
+    const top = showAbove ? rect.top - tooltipHeight - gap : rect.bottom + gap;
+    let left = rect.left + rect.width / 2 - tooltipWidth / 2;
+    left = Math.max(viewportPadding, Math.min(left, window.innerWidth - tooltipWidth - viewportPadding));
+    setTooltipPosition({ top, left, placement: showAbove ? "above" : "below" });
+  }, [layout]);
+
+  useLayoutEffect(() => {
+    if (!isTooltipOpen) return;
+    recalcTooltipPosition();
+  }, [isTooltipOpen, recalcTooltipPosition]);
 
   const handleTooltipEnter = useCallback(
     (e: React.MouseEvent) => {
@@ -644,6 +695,7 @@ function AnnotationButtonImpl(
           submitted: isSubmitted,
           skipped: isSkipped,
           triggerOpened: isContextMenuOpen,
+          vertical: layout === "vertical",
         })
         .toClassName()}
       data-annotation-id={annotation.pk ?? annotation.id}

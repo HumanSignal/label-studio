@@ -2,6 +2,12 @@ import { render, screen } from "@testing-library/react";
 import { AnnotationsCarousel } from "../AnnotationsCarousel";
 import type { AnnotationActionHandlers, AnnotationCapabilities, SharedAnnotation } from "../types";
 
+mockModule("react-virtualized-auto-sizer", () => ({
+  __esModule: true,
+  default: ({ children }: { children: (size: { width: number; height: number }) => unknown }) =>
+    children({ width: 400, height: 300 }),
+}));
+
 const fullCapabilities: AnnotationCapabilities = {
   groundTruthEnabled: true,
   enableCreateAnnotation: true,
@@ -103,6 +109,22 @@ describe("shared AnnotationsCarousel", () => {
       />,
     );
     expect(container.querySelector(".ls-annotations-carousel_virtualized")).not.toBeNull();
+    expect(container.querySelector(".ls-annotations-carousel__scroll")).not.toBeNull();
+  });
+
+  it("applies scroll class to non-virtualized vertical container", () => {
+    const { container } = render(
+      <AnnotationsCarousel
+        entities={[makeAnnotation("a")]}
+        selectedId={null}
+        capabilities={fullCapabilities}
+        handlers={makeHandlers()}
+        layout="vertical"
+      />,
+    );
+    const listContainer = container.querySelector(".ls-annotations-carousel__container");
+    expect(listContainer).not.toBeNull();
+    expect(listContainer?.classList.contains("ls-annotations-carousel__scroll")).toBe(true);
   });
 
   it("does NOT use the virtualized branch when virtualizationEnabled is false even with many items", () => {

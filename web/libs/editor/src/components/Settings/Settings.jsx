@@ -6,13 +6,12 @@ import { Hotkey } from "../../core/Hotkey";
 
 import "./Settings.prefix.css";
 import { cn } from "../../utils/bem";
-import { triggerResizeEvent } from "../../utils/utilities";
 
 import EditorSettings from "../../core/settings/editorsettings";
 import * as TagSettings from "./TagSettings";
 import { IconClose } from "@humansignal/icons";
-import { Checkbox, ModalWindow, Toggle } from "@humansignal/ui";
-import { ff } from "@humansignal/core";
+import { ModalWindow, Toggle } from "@humansignal/ui";
+import { ff, isAnnotatorRole } from "@humansignal/core";
 
 const HotkeysDescription = () => {
   const columns = [
@@ -83,6 +82,10 @@ const SettingsTag = ({ children }) => {
 };
 
 const GeneralSettings = observer(({ store }) => {
+  const showVerticalLayoutToggle =
+    ff.isActive(ff.FF_FIT_ANNOTATIONS_VERTICAL_LAYOUT) && store.hasInterface("annotations:tabs") && !isAnnotatorRole();
+  const isVerticalLayout = store.settings.annotationsListLayout === "vertical";
+
   return (
     <div className={cn("settings").mod(newUI).toClassName()}>
       {editorSettingsKeys.map((obj, index) => {
@@ -110,67 +113,27 @@ const GeneralSettings = observer(({ store }) => {
           </label>
         );
       })}
-    </div>
-  );
-});
-
-const _LayoutSettings = observer(({ store }) => {
-  return (
-    <div className={cn("settings").mod(newUI).toClassName()}>
-      <div className={cn("settings").elem("field").toClassName()}>
-        <Checkbox
-          checked={store.settings.bottomSidePanel}
-          onChange={() => {
-            store.settings.toggleBottomSP();
-            setTimeout(triggerResizeEvent);
-          }}
-        >
-          Move sidepanel to the bottom
-        </Checkbox>
-      </div>
-
-      <div className={cn("settings").elem("field").toClassName()}>
-        <Checkbox checked={store.settings.displayLabelsByDefault} onChange={store.settings.toggleSidepanelModel}>
-          Display Labels by default in Results panel
-        </Checkbox>
-      </div>
-
-      <div className={cn("settings").elem("field").toClassName()}>
-        <Checkbox
-          value="Show Annotations panel"
-          defaultChecked={store.settings.showAnnotationsPanel}
-          onChange={() => {
-            store.settings.toggleAnnotationsPanel();
-          }}
-        >
-          Show Annotations panel
-        </Checkbox>
-      </div>
-
-      <div className={cn("settings").elem("field").toClassName()}>
-        <Checkbox
-          value="Show Predictions panel"
-          defaultChecked={store.settings.showPredictionsPanel}
-          onChange={() => {
-            store.settings.togglePredictionsPanel();
-          }}
-        >
-          Show Predictions panel
-        </Checkbox>
-      </div>
-
-      {/* Saved for future use */}
-      {/* <div className={cn("settings").elem("field").toClassName()}>
-        <Checkbox
-          value="Show image in fullsize"
-          defaultChecked={store.settings.imageFullSize}
-          onChange={() => {
-            store.settings.toggleImageFS();
-          }}
-        >
-          Show image in fullsize
-        </Checkbox>
-      </div> */}
+      {showVerticalLayoutToggle && (
+        <label className={cn("settings").elem("field").toClassName()}>
+          <div className={cn("settings__label").toClassName()}>
+            <div className={cn("settings__label").elem("title").toClassName()}>
+              Display annotations in vertical panel
+            </div>
+            <div className={cn("settings__label").elem("description").toClassName()}>
+              Shows annotations as a vertical list on the left side of the labeling UI
+            </div>
+          </div>
+          <Toggle
+            checked={isVerticalLayout}
+            onChange={(event) =>
+              store.settings.setAnnotationsListLayout(event.target.checked ? "vertical" : "horizontal")
+            }
+            description="Display annotations in vertical panel"
+            aria-label="Display annotations in vertical panel"
+            data-testid="annotations-list-layout-toggle"
+          />
+        </label>
+      )}
     </div>
   );
 });

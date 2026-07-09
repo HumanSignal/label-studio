@@ -40,6 +40,18 @@
     & .annotation-button__userpic {
       .userpic-badge {
         transform: translate(2px, 2px);
+
+        &_accepted {
+          background-color: var(--color-accent-kale-base);
+        }
+
+        &_rejected {
+          background-color: var(--color-accent-persimmon-base);
+        }
+
+        &_fixed {
+          background-color: var(--color-accent-grape-base);
+        }
       }
     }
   }
@@ -210,6 +222,77 @@
     }
   }
 
+  &_vertical {
+    border-radius: var(--corner-radius-small);
+    border-width: 1px;
+    border-bottom-width: 1px;
+    height: var(--annotation-item-height, 42px);
+    margin-top: 0;
+    min-width: 0;
+    width: 100%;
+    flex-shrink: 0;
+    align-self: stretch;
+    overflow: hidden;
+
+    &::before {
+      width: 12px;
+      height: 100%;
+      top: 0;
+      left: -1px;
+      border-top: none;
+      border-left-style: solid;
+      border-left-width: 3px;
+      border-top-left-radius: var(--corner-radius-small);
+      border-bottom-left-radius: var(--corner-radius-small);
+      border-top-right-radius: 0;
+    }
+
+    &.annotation-button_selected {
+      border-color: var(--color-primary-border);
+      border-bottom-color: var(--color-primary-border);
+      height: var(--annotation-item-height, 42px);
+      box-shadow: none;
+
+      &::before {
+        border-color: var(--color-primary-content);
+      }
+    }
+
+    &.annotation-button_draft,
+    &.annotation-button_draftSaved {
+      &::before {
+        border-left-color: var(--accent-base);
+      }
+
+      &::after {
+        top: 0;
+        left: -1px;
+        width: 16px;
+        height: 100%;
+        background-image: repeating-linear-gradient(
+          150deg,
+          transparent 1px,
+          var(--accent-base) 2px,
+          var(--accent-base) 7px,
+          var(--accent-subtle) 8px,
+          var(--accent-subtle) 12px
+        );
+        background-repeat: repeat-y;
+        background-position: left top;
+        background-size: 3px 100%;
+        overflow: hidden;
+        transform: none;
+        border-top-left-radius: var(--corner-radius-small);
+        border-bottom-left-radius: var(--corner-radius-small);
+        border-top-right-radius: 0;
+      }
+    }
+
+    &:hover {
+      border-bottom-color: var(--color-primary-border-subtler);
+    }
+  }
+
   &__icons {
     display: inline-flex;
     align-items: center;
@@ -312,6 +395,19 @@
       left: 0;
       bottom: 99%;
       translate: var(--tooltip-arrow-position, 2px);
+    }
+
+    &_placementRight {
+      &::after {
+        top: var(--tooltip-arrow-offset, 50%);
+        bottom: auto;
+        left: 0;
+        translate: -100% -50%;
+        border-left: none;
+        border-right: 5px solid var(--color-neutral-inverted-background);
+        border-top: 5px solid transparent;
+        border-bottom: 5px solid transparent;
+      }
     }
   }
 

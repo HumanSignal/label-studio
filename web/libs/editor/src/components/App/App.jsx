@@ -46,6 +46,8 @@ import { RelationsOverlay } from "../InteractiveOverlays/RelationsOverlay";
 import Settings from "../Settings/Settings";
 import { SideTabsPanels } from "../SidePanels/TabPanels/SideTabsPanels";
 import { TopBar } from "../TopBar/TopBar";
+import { CompareAllHeader } from "../TopBar/CompareAllHeader";
+import { ClassicAnnotationsSidebar } from "./ClassicAnnotationsSidebar";
 import { ViewAll } from "./ViewAll";
 
 /**
@@ -235,7 +237,10 @@ class App extends Component {
     const root = as.selected && as.selected.root;
     const { settings } = store;
 
-    if (store.isLoading) return this.renderLoader();
+    // Full-page blocking states — no annotation context exists yet.
+    // Annotation-level hydration (stub selected, isLoading=true) falls through so the
+    // sidebar stays visible and only the main canvas area shows the loading indicator.
+    if (store.isLoading && !as.selected) return this.renderLoader();
 
     if (store.noTask) return this.renderNothingToLabel(store);
 
@@ -243,7 +248,7 @@ class App extends Component {
 
     if (store.labeledSuccess) return this.renderSuccess();
 
-    if (!root) return this.renderNoAnnotation();
+    if (!root && !store.isLoading) return this.renderNoAnnotation();
 
     const viewingAll = as.viewingAll;
 
@@ -254,13 +259,39 @@ class App extends Component {
           .mix(...(store.awaitingSuggestions ? ["requesting"] : []))
           .toClassName()}
       >
-        {as.validation === null
-          ? this._renderUI(as.selectedHistory?.root ?? root, as)
-          : this.renderConfigValidationException(store)}
+        {store.isLoading
+          ? this.renderLoader()
+          : as.validation === null
+            ? this._renderUI(as.selectedHistory?.root ?? root, as)
+            : this.renderConfigValidationException(store)}
       </div>
     );
 
     const isBulkMode = !isStarterCloudPlan() && store.hasInterface("annotation:bulk");
+    const isVertical =
+      ff.isActive(ff.FF_FIT_ANNOTATIONS_VERTICAL_LAYOUT) && settings.annotationsListLayout === "vertical";
+    const showVerticalSidebar = isVertical && store.hasInterface("topbar") && !viewingAll && !isBulkMode;
+
+    const wrapperContent =
+      isBulkMode || !store.hasInterface("side-column") ? (
+        <>
+          {mainContent}
+          {store.hasInterface("topbar") && <BottomBar store={store} />}
+        </>
+      ) : (
+        <SideTabsPanels
+          panelsHidden={viewingAll}
+          currentEntity={as.selectedHistory ?? as.selected}
+          regions={as.selected.regionStore}
+          showComments={store.hasInterface("annotations:comments")}
+          showCustomTab={hasTagInSidebar(as.selected)}
+          focusTab={store.commentStore.tooltipMessage ? "comments" : null}
+        >
+          {mainContent}
+          {store.hasInterface("topbar") && <BottomBar store={store} />}
+        </SideTabsPanels>
+      );
+
     return (
       <div className={cn("editor").mod({ fullscreen: settings.fullscreen }).toClassName()} ref={null}>
         <QueryClientProvider client={queryClient}>
@@ -276,33 +307,28 @@ class App extends Component {
                 {store.description}
               </InstructionsModal>
 
-              {isDefined(store) && store.hasInterface("topbar") && <TopBar store={store} />}
+              {isDefined(store) &&
+                store.hasInterface("topbar") &&
+                (isVertical && viewingAll ? (
+                  <CompareAllHeader store={store} />
+                ) : !showVerticalSidebar ? (
+                  <TopBar store={store} />
+                ) : null)}
               <div
                 className={cn("wrapper")
                   .mod({
                     viewAll: viewingAll,
                     bsp: settings.effectiveBottomSidePanel,
                     showingBottomBar: true,
+                    annotationsSidebar: showVerticalSidebar,
                   })
                   .toClassName()}
               >
-                {isBulkMode || !store.hasInterface("side-column") ? (
-                  <>
-                    {mainContent}
-                    {store.hasInterface("topbar") && <BottomBar store={store} />}
-                  </>
+                {showVerticalSidebar && <ClassicAnnotationsSidebar store={store} />}
+                {showVerticalSidebar ? (
+                  <div className={cn("wrapper").elem("main").toClassName()}>{wrapperContent}</div>
                 ) : (
-                  <SideTabsPanels
-                    panelsHidden={viewingAll}
-                    currentEntity={as.selectedHistory ?? as.selected}
-                    regions={as.selected.regionStore}
-                    showComments={store.hasInterface("annotations:comments")}
-                    showCustomTab={hasTagInSidebar(as.selected)}
-                    focusTab={store.commentStore.tooltipMessage ? "comments" : null}
-                  >
-                    {mainContent}
-                    {store.hasInterface("topbar") && <BottomBar store={store} />}
-                  </SideTabsPanels>
+                  wrapperContent
                 )}
               </div>
               <ToastViewport />

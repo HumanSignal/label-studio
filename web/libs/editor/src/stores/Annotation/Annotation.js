@@ -160,6 +160,8 @@ const _Annotation = types
     type: types.enumeration(["annotation", "prediction", "history"]),
 
     createdDate: types.optional(types.string, Utils.UDate.currentISODate()),
+    /** ISO timestamp of the last update (server `updated_at`). */
+    updatedDate: types.optional(types.string, ""),
     createdAgo: types.maybeNull(types.string),
     createdBy: types.optional(types.string, "Admin"),
     user: types.optional(types.maybeNull(UserOrReference), null),
@@ -257,6 +259,10 @@ const _Annotation = types
       return snapshot.draft_created_at ?? snapshot.created_at ?? snapshot.createdDate;
     };
 
+    const getUpdatedAt = (snapshot) => {
+      return snapshot.updated_at ?? snapshot.updatedDate ?? getCreatedAt(snapshot) ?? "";
+    };
+
     return {
       ...sn,
       ...(isFF(FF_DEV_3391) ? { root } : {}),
@@ -264,6 +270,7 @@ const _Annotation = types
       editable: sn.editable ?? sn.type === "annotation",
       createdBy: getCreatedBy(sn),
       createdDate: getCreatedAt(sn),
+      updatedDate: getUpdatedAt(sn),
       ground_truth: sn.honeypot ?? sn.ground_truth ?? false,
       skipped: sn.skipped || sn.was_cancelled,
       acceptedState: sn.accepted_state ?? sn.acceptedState ?? null,

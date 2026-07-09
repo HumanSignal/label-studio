@@ -55,6 +55,11 @@
     color: var(--color-neutral-content-subtle);
   }
 
+  &__caret {
+    color: var(--color-neutral-content-subtler);
+    flex-shrink: 0;
+  }
+
   &:hover {
     background-color: var(--color-primary-emphasis-subtle);
     border-color: var(--color-primary-border-subtler);
@@ -93,6 +98,35 @@
       cursor: default;
       background-color: var(--color-neutral-background);
       border-color: var(--color-neutral-border);
+    }
+  }
+
+  /* ── Sidebar variant: full-width button, all corners rounded ── */
+  &_sidebar {
+    width: 100%;
+    border-radius: var(--corner-radius-small);
+    border-width: 1px;
+    margin-top: 0;
+    height: auto;
+    padding-right: var(--spacing-tight);
+
+    &:hover {
+      border-bottom-color: var(--color-primary-border-subtler);
+    }
+
+    &.view-all-toggle_selected {
+      background-color: var(--color-primary-emphasis-subtle);
+      border-color: var(--color-primary-border-subtler);
+      transform: none;
+      margin-top: 0;
+      height: auto;
+      box-shadow: none;
+
+      &:hover {
+        cursor: default;
+        background-color: var(--color-primary-emphasis-subtle);
+        border-color: var(--color-primary-border-subtler);
+      }
     }
   }
 }

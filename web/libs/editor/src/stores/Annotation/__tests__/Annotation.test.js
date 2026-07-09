@@ -68,6 +68,22 @@ describe("Annotation model", () => {
       expect(annotation.id).toBeDefined();
     });
 
+    it("maps updated_at from the API snapshot into updatedDate", () => {
+      const { annotation } = createStoreWithAnnotation({
+        created_at: "2024-01-01T00:00:00.000Z",
+        updated_at: "2024-06-15T12:00:00.000Z",
+      });
+      expect(annotation.createdDate).toBe("2024-01-01T00:00:00.000Z");
+      expect(annotation.updatedDate).toBe("2024-06-15T12:00:00.000Z");
+    });
+
+    it("falls back updatedDate to created_at when updated_at is missing", () => {
+      const { annotation } = createStoreWithAnnotation({
+        created_at: "2024-01-01T00:00:00.000Z",
+      });
+      expect(annotation.updatedDate).toBe("2024-01-01T00:00:00.000Z");
+    });
+
     it("creates prediction with editable false", () => {
       const env = createTestEnv();
       const store = AppStore.create(

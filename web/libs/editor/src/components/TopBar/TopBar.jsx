@@ -7,10 +7,11 @@
  *   2. Computes the classic visibility gates (`isBulkMode`, `isStarterCloudPlan`,
  *      `hasInterface("annotations:view-all")`) and passes the result as
  *      `visible` to the shared layer.
- *   3. Renders the AnnotationsCarousel wrapper inside the children slot.
+ *   3. Renders the AnnotationsCarousel wrapper inside the children slot
+ *      (horizontal mode only — vertical mode places it in the App sidebar).
  */
 import { observer } from "mobx-react";
-import { TopBar as SharedTopBar, isStarterCloudPlan } from "@humansignal/core";
+import { TopBar as SharedTopBar, isStarterCloudPlan, ff } from "@humansignal/core";
 import { AnnotationsCarousel } from "../AnnotationsCarousel/AnnotationsCarousel";
 
 export const TopBar = observer(({ store }) => {
@@ -20,15 +21,13 @@ export const TopBar = observer(({ store }) => {
   const isViewAll = annotationStore?.viewingAll === true;
   const isBulkMode = !isStarterCloudPlan() && store.hasInterface("annotation:bulk");
 
-  // Hide TopBar in bulk mode (preserves classic behavior).
   if (isBulkMode) return null;
 
-  // Hide TopBar for Labeling Stream when annotations:view-all is absent
-  // (Review Stream and Quick View keep it visible).
   const visible = store.hasInterface("annotations:view-all");
-
   const showViewAll = store.hasInterface("annotations:view-all");
   const showAddNew = store.hasInterface("annotations:add-new");
+  const isVertical =
+    ff.isActive(ff.FF_FIT_ANNOTATIONS_VERTICAL_LAYOUT) && store.settings.annotationsListLayout === "vertical";
 
   const onAddNew = () => {
     const created = annotationStore.createAnnotation();
@@ -44,7 +43,9 @@ export const TopBar = observer(({ store }) => {
       showAddNew={showAddNew}
       onAddNew={onAddNew}
     >
-      <AnnotationsCarousel store={store} annotationStore={annotationStore} commentStore={store.commentStore} />
+      {!isVertical && (
+        <AnnotationsCarousel store={store} annotationStore={annotationStore} commentStore={store.commentStore} />
+      )}
     </SharedTopBar>
   );
 });

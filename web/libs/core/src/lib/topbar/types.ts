@@ -41,6 +41,8 @@ export interface SharedAnnotation {
   /** Display name fallback when `user` lacks resolvable data (typically email/username). */
   createdBy: string;
   createdDate: string;
+  /** ISO timestamp of the last update (server `updated_at` or draft save time). */
+  updatedDate?: string;
   user: SharedUser | null;
   groundTruth: boolean;
   skipped: boolean;
@@ -94,6 +96,8 @@ export interface AnnotationCapabilities {
   enableCompareAllAnnotations?: boolean;
   /** When true, the "Open Performance Dashboard" item is shown (LSE only, with project id). */
   enablePerformanceDashboard?: boolean;
+  /** When true, show Accepted / Rejected / Fix + Accepted filters (LSE only). */
+  enableReviewStatusFilters?: boolean;
   /** When false, the user-info row is rendered as "Me"/"User" (annotations:hide-info). */
   showUserInfo: boolean;
 }
@@ -118,6 +122,63 @@ export interface AnnotationActionHandlers {
   onOpenPerformanceDashboard?: (annotation: SharedAnnotation) => void;
   /** Optional: invoked after any menu item closes the dropdown — used by classic for refresh hooks. */
   onAnnotationChange?: () => void;
+}
+
+/** Annotation list layout orientation. */
+export type AnnotationsListLayout = "horizontal" | "vertical";
+
+/** Sort field for the annotations list. */
+export type AnnotationsListSortField = "createdAt" | "updatedAt" | "name";
+
+/** Sort direction for the annotations list. */
+export type AnnotationsListSortDirection = "asc" | "desc";
+
+/** Persisted sort state for the annotations list. */
+export interface AnnotationsListSortState {
+  field: AnnotationsListSortField;
+  direction: AnnotationsListSortDirection;
+}
+
+/** @deprecated Use {@link AnnotationsListSortField} */
+export type AnnotationsListSort = AnnotationsListSortField;
+
+/** Type filter for the annotation list. */
+export type AnnotationsListTypeFilter = "all" | "annotation" | "prediction";
+
+/** Tri-state boolean filter: `null` = any, `true` / `false` = match that value. */
+export type AnnotationsListBooleanFilter = true | false | null;
+
+/** Status field keys for the annotation list boolean filters. */
+export type AnnotationsListStatusField =
+  | "draft"
+  | "groundTruth"
+  | "skipped"
+  | "unresolvedComments"
+  | "reviewed"
+  | "accepted"
+  | "rejected"
+  | "fixedAndAccepted";
+
+/** @deprecated Use {@link AnnotationsListStatusField} */
+export type AnnotationsListStatusFilter = AnnotationsListStatusField;
+
+/** Boolean status filters for the annotation list (AND semantics across active fields). */
+export interface AnnotationsListStatusFilters {
+  draft: AnnotationsListBooleanFilter;
+  groundTruth: AnnotationsListBooleanFilter;
+  skipped: AnnotationsListBooleanFilter;
+  unresolvedComments: AnnotationsListBooleanFilter;
+  reviewed: AnnotationsListBooleanFilter;
+  accepted: AnnotationsListBooleanFilter;
+  rejected: AnnotationsListBooleanFilter;
+  fixedAndAccepted: AnnotationsListBooleanFilter;
+}
+
+/** Persisted filter state for the annotations list. */
+export interface AnnotationsListFilter {
+  query: string;
+  type: AnnotationsListTypeFilter;
+  statuses: AnnotationsListStatusFilters;
 }
 
 /**

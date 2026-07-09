@@ -50,6 +50,11 @@
   padding-block: 6px;
   height: 36px;
   color: var(--color-neutral-content);
+  border: none;
+  background: transparent;
+  font-family: inherit;
+  text-align: left;
+  box-sizing: border-box;
 
   &:hover {
     background-color: var(--color-primary-emphasis-subtle);
@@ -63,6 +68,21 @@
     background-color: var(--color-negative-emphasis-subtle);
     color: var(--color-neutral-content);
   }
+}
+
+.selected {
+  color: var(--color-neutral-content);
+  background-color: var(--color-primary-emphasis);
+
+  &:hover {
+    background-color: var(--color-primary-emphasis);
+  }
+}
+
+.trailing {
+  display: flex;
+  align-items: center;
+  margin-left: auto;
 }
 
 .disabled {

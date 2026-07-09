@@ -207,3 +207,8 @@ export const FF_FIT_2007_VIRTUALIZED_JSON_EDITOR = "fflag_feat_fit_2007_virtuali
  * to suppress userpics or hide annotation info when this flag is on.
  */
 export const FF_UTC_950_FIREWALL = "fflag_feat_utc_950_annotator_reviewer_firewall_short";
+
+/**
+ * Vertical annotations sidebar with filtering and resizable column in labeling UI.
+ */
+export const FF_FIT_ANNOTATIONS_VERTICAL_LAYOUT = "fflag_feat_front_fit_annotations_vertical_layout_short";

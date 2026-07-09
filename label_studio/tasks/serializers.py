@@ -271,6 +271,7 @@ class AnnotationStubSerializer(FlexFieldsModelSerializer):
     - created_username: for display in annotation list
     - created_ago: for display in annotation list (relative time string)
     - created_at: for TimeAgo component (actual timestamp)
+    - updated_at: for Updated-at sorting in the annotations list
     - completed_by: user id for avatar lookup
     - ground_truth: for showing star indicator
     - was_cancelled: for skip queue / cancel-skip button display
@@ -306,12 +307,13 @@ class AnnotationStubSerializer(FlexFieldsModelSerializer):
     class Meta:
         model = Annotation
         # Minimal fields for annotation list display only
-        # ground_truth, created_at, and was_cancelled are simple model fields (no extra query)
+        # ground_truth, created_at, updated_at, and was_cancelled are simple model fields (no extra query)
         fields = [
             'id',
             'created_username',
             'created_ago',
             'created_at',
+            'updated_at',
             'completed_by',
             'ground_truth',
             'was_cancelled',

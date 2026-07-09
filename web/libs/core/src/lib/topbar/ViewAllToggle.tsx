@@ -6,7 +6,7 @@
  * preserving customer whitelabel CSS and Cypress selectors.
  */
 
-import { IntersectSquareIcon } from "@humansignal/icons";
+import { CaretRightIcon, IntersectSquareIcon } from "@humansignal/icons";
 import { Typography } from "@humansignal/ui";
 import { cnb as cn } from "../utils/bem";
 import "./ViewAllToggle.prefix.css";
@@ -14,13 +14,16 @@ import "./ViewAllToggle.prefix.css";
 export interface ViewAllToggleProps {
   isActive: boolean;
   onClick: () => void;
+  variant?: "topbar" | "sidebar";
 }
 
-export function ViewAllToggle({ isActive, onClick }: ViewAllToggleProps) {
+export function ViewAllToggle({ isActive, onClick, variant = "topbar" }: ViewAllToggleProps) {
+  const isSidebar = variant === "sidebar";
+
   return (
     <button
       type="button"
-      className={cn("view-all-toggle").mod({ selected: isActive }).toClassName()}
+      className={cn("view-all-toggle").mod({ selected: isActive, sidebar: isSidebar }).toClassName()}
       onClick={onClick}
       aria-label="Compare all annotations"
       aria-pressed={isActive}
@@ -36,6 +39,7 @@ export function ViewAllToggle({ isActive, onClick }: ViewAllToggleProps) {
           </Typography>
         </div>
       </div>
+      {isSidebar && <CaretRightIcon size={14} className={cn("view-all-toggle").elem("caret").toClassName()} />}
     </button>
   );
 }

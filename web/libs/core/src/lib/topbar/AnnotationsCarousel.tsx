@@ -23,10 +23,15 @@ import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } fro
 import { FixedSizeList as List, type ListChildComponentProps } from "react-window";
 import AutoSizer from "react-virtualized-auto-sizer";
 import { Button } from "@humansignal/ui";
-import { IconChevronLeft, IconChevronRight } from "@humansignal/icons";
+import { IconChevronLeft, IconChevronRight, PlusIcon } from "@humansignal/icons";
 import { cnb as cn } from "../utils/bem";
 import { AnnotationButton } from "./AnnotationButton";
-import type { AnnotationActionHandlers, AnnotationCapabilities, SharedAnnotation } from "./types";
+import type {
+  AnnotationActionHandlers,
+  AnnotationCapabilities,
+  AnnotationsListLayout,
+  SharedAnnotation,
+} from "./types";
 import "./AnnotationsCarousel.prefix.css";
 
 /**
@@ -38,8 +43,14 @@ import "./AnnotationsCarousel.prefix.css";
 export type AnnotationRenderItem = (entity: SharedAnnotation) => ReactNode;
 
 const ITEM_WIDTH = 200;
+const ITEM_HEIGHT = 42;
 const ITEM_GAP = 4;
 const VIRTUALIZATION_THRESHOLD = 50;
+
+const verticalItemSizeStyle = {
+  "--annotation-item-height": `${ITEM_HEIGHT}px`,
+  "--annotation-item-gap": `${ITEM_GAP}px`,
+} as React.CSSProperties;
 
 export interface SharedAnnotationsCarouselProps {
   entities: SharedAnnotation[];
@@ -63,6 +74,13 @@ export interface SharedAnnotationsCarouselProps {
    * hydration and user resolution still run.
    */
   renderItem?: AnnotationRenderItem;
+  /** Layout orientation. Default 'horizontal' preserves existing carousel behavior. */
+  layout?: AnnotationsListLayout;
+  /** When true (vertical layout only), render an add-new row as the first list item. */
+  showAddNew?: boolean;
+  onAddNew?: () => void;
+  /** Rendered inside the scroll container after the entity rows (vertical layout only). */
+  emptyState?: ReactNode;
 }
 
 interface ItemData {
@@ -70,11 +88,52 @@ interface ItemData {
   capabilities: AnnotationCapabilities;
   handlers: AnnotationActionHandlers;
   renderItem: AnnotationRenderItem;
+  layout: AnnotationsListLayout;
 }
 
 function VirtualizedAnnotationRow({ index, style, data }: ListChildComponentProps<ItemData>) {
   const entity = data.entities[index];
-  return <div style={{ ...(style as React.CSSProperties), paddingRight: ITEM_GAP }}>{data.renderItem(entity)}</div>;
+  const isVertical = data.layout === "vertical";
+  const padding = isVertical ? { paddingBottom: ITEM_GAP } : { paddingRight: ITEM_GAP };
+  return <div style={{ ...(style as React.CSSProperties), ...padding }}>{data.renderItem(entity)}</div>;
+}
+
+function AddAnnotationRow({ onAddNew }: { onAddNew: () => void }) {
+  const handleClick = useCallback(
+    (event: React.MouseEvent) => {
+      event.preventDefault();
+      onAddNew();
+    },
+    [onAddNew],
+  );
+
+  const handleKeyDown = useCallback(
+    (event: React.KeyboardEvent) => {
+      if (event.key === "Enter" || event.key === " ") {
+        event.preventDefault();
+        onAddNew();
+      }
+    },
+    [onAddNew],
+  );
+
+  return (
+    <div
+      role="button"
+      tabIndex={0}
+      aria-label="Create a new annotation"
+      title="Create a new annotation"
+      data-testid="annotations-sidebar-add-new"
+      className={cn("annotations-carousel").elem("addNewRow").toClassName()}
+      onClick={handleClick}
+      onKeyDown={handleKeyDown}
+    >
+      <div className={cn("annotations-carousel").elem("addNewRowIcon").toClassName()}>
+        <PlusIcon size={16} aria-hidden="true" />
+      </div>
+      <span className={cn("annotations-carousel").elem("addNewRowLabel").toClassName()}>New Annotation</span>
+    </div>
+  );
 }
 
 export function AnnotationsCarousel({
@@ -85,14 +144,25 @@ export function AnnotationsCarousel({
   virtualizationEnabled = false,
   suppressScrollToSelected = false,
   renderItem,
+  layout = "horizontal",
+  showAddNew,
+  onAddNew,
+  emptyState,
 }: SharedAnnotationsCarouselProps) {
+  const isVertical = layout === "vertical";
   const renderRow = useMemo<AnnotationRenderItem>(
     () =>
       renderItem ??
       ((entity: SharedAnnotation) => (
-        <AnnotationButton key={entity.id} annotation={entity} capabilities={capabilities} handlers={handlers} />
+        <AnnotationButton
+          key={entity.id}
+          annotation={entity}
+          capabilities={capabilities}
+          handlers={handlers}
+          layout={layout}
+        />
       )),
-    [renderItem, capabilities, handlers],
+    [renderItem, capabilities, handlers, layout],
   );
 
   const listRef = useRef<List>(null);
@@ -214,14 +284,67 @@ export function AnnotationsCarousel({
   }, [suppressScrollToSelected, shouldVirtualize, containerWidth]);
 
   const itemData = useMemo<ItemData>(
-    () => ({ entities: filteredEntities, capabilities, handlers, renderItem: renderRow }),
-    [filteredEntities, capabilities, handlers, renderRow],
+    () => ({ entities: filteredEntities, capabilities, handlers, renderItem: renderRow, layout }),
+    [filteredEntities, capabilities, handlers, renderRow, layout],
   );
 
   if (!(capabilities.enableAnnotations || capabilities.enablePredictions || capabilities.enableCreateAnnotation)) {
     return null;
   }
 
+  const addNewRow = showAddNew && onAddNew ? <AddAnnotationRow key="add-new" onAddNew={onAddNew} /> : null;
+  const scrollClassName = cn("annotations-carousel").elem("scroll").toClassName();
+  const containerClassName = cn("annotations-carousel").elem("container").toClassName();
+  const scrollContainerClassName = cn("annotations-carousel").elem("container").mix(scrollClassName).toClassName();
+
+  // --- Vertical layout branch ---
+  if (isVertical) {
+    if (shouldVirtualize) {
+      return (
+        <div
+          className={cn("annotations-carousel").mod({ vertical: true, virtualized: true }).toClassName()}
+          style={verticalItemSizeStyle}
+        >
+          <div className={containerClassName}>
+            {addNewRow}
+            <div className={cn("annotations-carousel").elem("virtualizedList").toClassName()}>
+              <AutoSizer>
+                {({ width, height }) => (
+                  // @ts-expect-error - react-window types incompatible with React 18
+                  <List
+                    ref={listRef}
+                    className={scrollClassName}
+                    layout="vertical"
+                    height={height}
+                    width={width}
+                    itemCount={filteredEntities.length}
+                    itemSize={ITEM_HEIGHT + ITEM_GAP}
+                    itemData={itemData}
+                    overscanCount={5}
+                  >
+                    {VirtualizedAnnotationRow}
+                  </List>
+                )}
+              </AutoSizer>
+            </div>
+          </div>
+          {emptyState}
+        </div>
+      );
+    }
+
+    return (
+      <div className={cn("annotations-carousel").mod({ vertical: true }).toClassName()} style={verticalItemSizeStyle}>
+        <div className={scrollContainerClassName}>
+          {addNewRow}
+          {filteredEntities.map((entity) => renderRow(entity))}
+          {emptyState}
+        </div>
+      </div>
+    );
+  }
+
+  // --- Horizontal layout branches (existing) ---
   if (shouldVirtualize) {
     return (
       <div
@@ -229,7 +352,7 @@ export function AnnotationsCarousel({
           .mod({ scrolled: scrollOffset > 0, virtualized: true })
           .toClassName()}
       >
-        <div className={cn("annotations-carousel").elem("container").toClassName()}>
+        <div className={containerClassName}>
           <AutoSizer>
             {({ width, height }) => {
               if (width !== containerWidth) {
@@ -239,6 +362,7 @@ export function AnnotationsCarousel({
                 // @ts-expect-error - react-window types incompatible with React 18
                 <List
                   ref={listRef}
+                  className={scrollClassName}
                   layout="horizontal"
                   height={height}
                   width={width - 77}

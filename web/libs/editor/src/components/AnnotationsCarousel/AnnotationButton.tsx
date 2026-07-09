@@ -24,7 +24,9 @@ import {
   AnnotationButton as SharedAnnotationButton,
   type AnnotationActionHandlers,
   type AnnotationCapabilities,
+  type AnnotationsListLayout,
   type SharedAnnotation,
+  resolveClassicEntityReviewState,
 } from "@humansignal/core";
 import { isDefined } from "@humansignal/core/lib/utils/helpers";
 import { FF_FIT_720_LAZY_LOAD_ANNOTATIONS } from "@humansignal/core/lib/utils/feature-flags";
@@ -45,32 +47,10 @@ interface AnnotationButtonInterface {
   annotationStore?: any;
   store?: any;
   onAnnotationChange?: () => void;
+  layout?: AnnotationsListLayout;
 }
 
 const injector = inject(({ store }) => ({ store }));
-
-/**
- * Pull the LSE review status from the encoded task source (preserves the existing
- * accepted/rejected/fixed badge in the tooltip).
- */
-function readReviewStatus(entity: any, annotationStore: any): SharedAnnotation["acceptedState"] {
-  const isLSE = (window as any).APP_SETTINGS?.version?.edition === "Enterprise";
-  if (!isLSE || !entity || entity.type === "prediction") return null;
-
-  const sourceStr = annotationStore?.store?.task?.source;
-  if (!sourceStr) return null;
-  try {
-    const parsed = typeof sourceStr === "string" ? JSON.parse(sourceStr) : sourceStr;
-    const annotators = parsed?.annotators;
-    const backendAnnotations = parsed?.annotations;
-    if (!Array.isArray(annotators) || !Array.isArray(backendAnnotations)) return null;
-    const idx = backendAnnotations.findIndex((a: any) => entity.pk && a.id && String(a.id) === String(entity.pk));
-    if (idx < 0 || idx >= annotators.length) return null;
-    return (annotators[idx]?.review ?? null) as SharedAnnotation["acceptedState"];
-  } catch {
-    return null;
-  }
-}
 
 /**
  * Map a live MST `entity` node to the plain `SharedAnnotation` shape consumed by the
@@ -80,7 +60,7 @@ function readReviewStatus(entity: any, annotationStore: any): SharedAnnotation["
  */
 function mapEntityToShared(entity: any, annotationStore: any, infoIsHidden: boolean): SharedAnnotation {
   const isPrediction = entity.type === "prediction";
-  const acceptedState = readReviewStatus(entity, annotationStore);
+  const acceptedState = resolveClassicEntityReviewState(entity, annotationStore?.store);
 
   // Resolve a clean SharedUser shape; respect `infoIsHidden` (annotations:hide-info).
   let user: SharedAnnotation["user"] = null;
@@ -126,161 +106,164 @@ function mapEntityToShared(entity: any, annotationStore: any, infoIsHidden: bool
 }
 
 const AnnotationButtonInner = injector(
-  observer(({ entity, capabilities = {}, annotationStore, store, onAnnotationChange }: AnnotationButtonInterface) => {
-    const buttonContainerRef = useRef<HTMLDivElement | null>(null);
-    const toast = useToast();
-    const { fetchAnnotationCached } = useAnnotationFetcher(store?.task?.id);
+  observer(
+    ({ entity, capabilities = {}, annotationStore, store, onAnnotationChange, layout }: AnnotationButtonInterface) => {
+      const buttonContainerRef = useRef<HTMLDivElement | null>(null);
+      const toast = useToast();
+      const { fetchAnnotationCached } = useAnnotationFetcher(store?.task?.id);
 
-    const enrichUser = useCallback(
-      (userData: any) => annotationStore?.store?.enrichUsers?.([userData]),
-      [annotationStore],
-    );
-    useResolveUser({
-      user: entity?.user,
-      onUserResolved: enrichUser,
-      elementRef: buttonContainerRef as unknown as React.RefObject<HTMLElement | undefined>,
-    });
+      const enrichUser = useCallback(
+        (userData: any) => annotationStore?.store?.enrichUsers?.([userData]),
+        [annotationStore],
+      );
+      useResolveUser({
+        user: entity?.user,
+        onUserResolved: enrichUser,
+        elementRef: buttonContainerRef as unknown as React.RefObject<HTMLElement | undefined>,
+      });
 
-    const entityIsAlive = entity ? isAlive(entity) : false;
-    const isPrediction = entityIsAlive ? entity.type === "prediction" : false;
-    const infoIsHidden = annotationStore?.store?.hasInterface?.("annotations:hide-info");
+      const entityIsAlive = entity ? isAlive(entity) : false;
+      const isPrediction = entityIsAlive ? entity.type === "prediction" : false;
+      const infoIsHidden = annotationStore?.store?.hasInterface?.("annotations:hide-info");
 
-    // Building the shared shape every render keeps MobX subscriptions on the entity's
-    // live properties — memoizing on the entity reference would make the strip stop
-    // updating when MST mutates fields in place.
-    const sharedAnnotation: SharedAnnotation | null = entityIsAlive
-      ? mapEntityToShared(entity, annotationStore, Boolean(infoIsHidden))
-      : null;
+      // Building the shared shape every render keeps MobX subscriptions on the entity's
+      // live properties — memoizing on the entity reference would make the strip stop
+      // updating when MST mutates fields in place.
+      const sharedAnnotation: SharedAnnotation | null = entityIsAlive
+        ? mapEntityToShared(entity, annotationStore, Boolean(infoIsHidden))
+        : null;
 
-    const isLSE = (window as any).APP_SETTINGS?.version?.edition === "Enterprise";
-    const hasProjectId = !!window.location.pathname.match(/\/projects\/(\d+)/);
+      const isLSE = (window as any).APP_SETTINGS?.version?.edition === "Enterprise";
+      const hasProjectId = !!window.location.pathname.match(/\/projects\/(\d+)/);
 
-    const sharedCapabilities: AnnotationCapabilities = useMemo(
-      () => ({
-        groundTruthEnabled: Boolean(capabilities.groundTruthEnabled),
-        enableCreateAnnotation: Boolean(capabilities.enableCreateAnnotation),
-        enableAnnotationDelete: Boolean(capabilities.enableAnnotationDelete),
-        enablePredictionDelete: Boolean(capabilities.enablePredictionDelete),
-        enableAnnotations: capabilities.enableAnnotations !== false,
-        enablePredictions: capabilities.enablePredictions !== false,
-        enableCopyLink: Boolean(store?.hasInterface?.("annotations:copy-link")),
-        // Mirror the gate used by the left-side ViewAllToggle in
-        // `editor/src/components/TopBar/TopBar.jsx` so the menu item is
-        // hidden when the project's interfaces don't include
-        // `annotations:view-all` (otherwise the action would silently
-        // toggle a state with no UI to leave it).
-        enableCompareAllAnnotations: Boolean(store?.hasInterface?.("annotations:view-all")),
-        enablePerformanceDashboard: isLSE && hasProjectId,
-        showUserInfo: !infoIsHidden,
-      }),
-      [capabilities, store, isLSE, hasProjectId, infoIsHidden],
-    );
+      const sharedCapabilities: AnnotationCapabilities = useMemo(
+        () => ({
+          groundTruthEnabled: Boolean(capabilities.groundTruthEnabled),
+          enableCreateAnnotation: Boolean(capabilities.enableCreateAnnotation),
+          enableAnnotationDelete: Boolean(capabilities.enableAnnotationDelete),
+          enablePredictionDelete: Boolean(capabilities.enablePredictionDelete),
+          enableAnnotations: capabilities.enableAnnotations !== false,
+          enablePredictions: capabilities.enablePredictions !== false,
+          enableCopyLink: Boolean(store?.hasInterface?.("annotations:copy-link")),
+          // Mirror the gate used by the left-side ViewAllToggle in
+          // `editor/src/components/TopBar/TopBar.jsx` so the menu item is
+          // hidden when the project's interfaces don't include
+          // `annotations:view-all` (otherwise the action would silently
+          // toggle a state with no UI to leave it).
+          enableCompareAllAnnotations: Boolean(store?.hasInterface?.("annotations:view-all")),
+          enablePerformanceDashboard: isLSE && hasProjectId,
+          showUserInfo: !infoIsHidden,
+        }),
+        [capabilities, store, isLSE, hasProjectId, infoIsHidden],
+      );
 
-    const handlers: AnnotationActionHandlers = useMemo(
-      () => ({
-        onSelect: () => {
-          if (!entityIsAlive) return;
-          const { selected, id, type } = entity;
-          if (selected) return;
-          if (type === "prediction") {
-            annotationStore.selectPrediction(id, { exitViewAll: true });
-          } else {
-            annotationStore.selectAnnotation(id, { exitViewAll: true });
-          }
-        },
-        onSetGroundTruth: (_a, value) => {
-          if (!entityIsAlive) return;
-          entity.setGroundTruth(value);
-        },
-        onDuplicate: async () => {
-          if (!entityIsAlive) return;
-          try {
-            // FF_FIT_720_LAZY_LOAD_ANNOTATIONS: hydrate stub annotations before duplicating
-            // so the resulting copy has region results, not an empty shell.
-            if (
-              isFF(FF_FIT_720_LAZY_LOAD_ANNOTATIONS) &&
-              entity.type === "annotation" &&
-              entity.pk &&
-              annotationNeedsHydration(entity)
-            ) {
-              const data = await fetchAnnotationCached(entity.pk);
-              if (!data || (data as { error?: unknown }).error) {
-                toast?.show({
-                  message: "Could not load annotation to duplicate. Try selecting it first.",
-                  type: ToastType.error,
-                });
-                return;
-              }
-              applyAnnotationHydrationFromApi(annotationStore.annotations, entity.pk, data);
+      const handlers: AnnotationActionHandlers = useMemo(
+        () => ({
+          onSelect: () => {
+            if (!entityIsAlive) return;
+            const { selected, id, type } = entity;
+            if (selected) return;
+            if (type === "prediction") {
+              annotationStore.selectPrediction(id, { exitViewAll: true });
+            } else {
+              annotationStore.selectAnnotation(id, { exitViewAll: true });
             }
-            if (!isAlive(entity)) return;
-            const c = annotationStore.addAnnotationFromPrediction(entity);
-            window.setTimeout(() => {
-              annotationStore.selectAnnotation(c.id, { exitViewAll: true });
-            });
-          } catch {
-            toast?.show({ message: "Could not duplicate annotation.", type: ToastType.error });
-          }
-        },
-        onDelete: () => {
-          if (!entityIsAlive) return;
-          const isPredictionLocal = entity.type === "prediction";
-          confirm({
-            title: isPredictionLocal ? "Delete prediction?" : "Delete annotation?",
-            body: (
-              <>
-                This will <strong>delete all existing regions</strong>. Are you sure you want to delete them?
-                <br />
-                This action cannot be undone.
-              </>
-            ),
-            buttonLook: "negative",
-            okText: "Delete",
-            onOk: () => {
-              if (isPredictionLocal) {
-                entity.list.deletePrediction(entity);
-              } else {
-                entity.list.deleteAnnotation(entity);
+          },
+          onSetGroundTruth: (_a, value) => {
+            if (!entityIsAlive) return;
+            entity.setGroundTruth(value);
+          },
+          onDuplicate: async () => {
+            if (!entityIsAlive) return;
+            try {
+              // FF_FIT_720_LAZY_LOAD_ANNOTATIONS: hydrate stub annotations before duplicating
+              // so the resulting copy has region results, not an empty shell.
+              if (
+                isFF(FF_FIT_720_LAZY_LOAD_ANNOTATIONS) &&
+                entity.type === "annotation" &&
+                entity.pk &&
+                annotationNeedsHydration(entity)
+              ) {
+                const data = await fetchAnnotationCached(entity.pk);
+                if (!data || (data as { error?: unknown }).error) {
+                  toast?.show({
+                    message: "Could not load annotation to duplicate. Try selecting it first.",
+                    type: ToastType.error,
+                  });
+                  return;
+                }
+                applyAnnotationHydrationFromApi(annotationStore.annotations, entity.pk, data);
               }
-            },
-          });
-        },
-        onShowOtherAnnotations: () => {
-          annotationStore.toggleViewingAllAnnotations();
-        },
-        onOpenPerformanceDashboard: () => {
-          if (!isLSE) return;
-          const url = new URL(window.location.origin);
-          const useNewAnalytics = isFF("fflag_feat_all_fit_778_analytics_short");
-          url.pathname = useNewAnalytics ? "/analytics/member-performance" : "/performance";
-          if (entity?.user?.id) url.searchParams.set("user", String(entity.user.id));
-          const projectMatch = window.location.pathname.match(/\/projects\/(\d+)/);
-          if (projectMatch) url.searchParams.set("project", projectMatch[1]);
-          window.open(url.toString(), "_blank");
-        },
-        onAnnotationChange,
-      }),
-      [entityIsAlive, entity, annotationStore, fetchAnnotationCached, toast, isLSE, onAnnotationChange],
-    );
+              if (!isAlive(entity)) return;
+              const c = annotationStore.addAnnotationFromPrediction(entity);
+              window.setTimeout(() => {
+                annotationStore.selectAnnotation(c.id, { exitViewAll: true });
+              });
+            } catch {
+              toast?.show({ message: "Could not duplicate annotation.", type: ToastType.error });
+            }
+          },
+          onDelete: () => {
+            if (!entityIsAlive) return;
+            const isPredictionLocal = entity.type === "prediction";
+            confirm({
+              title: isPredictionLocal ? "Delete prediction?" : "Delete annotation?",
+              body: (
+                <>
+                  This will <strong>delete all existing regions</strong>. Are you sure you want to delete them?
+                  <br />
+                  This action cannot be undone.
+                </>
+              ),
+              buttonLook: "negative",
+              okText: "Delete",
+              onOk: () => {
+                if (isPredictionLocal) {
+                  entity.list.deletePrediction(entity);
+                } else {
+                  entity.list.deleteAnnotation(entity);
+                }
+              },
+            });
+          },
+          onShowOtherAnnotations: () => {
+            annotationStore.toggleViewingAllAnnotations();
+          },
+          onOpenPerformanceDashboard: () => {
+            if (!isLSE) return;
+            const url = new URL(window.location.origin);
+            const useNewAnalytics = isFF("fflag_feat_all_fit_778_analytics_short");
+            url.pathname = useNewAnalytics ? "/analytics/member-performance" : "/performance";
+            if (entity?.user?.id) url.searchParams.set("user", String(entity.user.id));
+            const projectMatch = window.location.pathname.match(/\/projects\/(\d+)/);
+            if (projectMatch) url.searchParams.set("project", projectMatch[1]);
+            window.open(url.toString(), "_blank");
+          },
+          onAnnotationChange,
+        }),
+        [entityIsAlive, entity, annotationStore, fetchAnnotationCached, toast, isLSE, onAnnotationChange],
+      );
 
-    if (!entityIsAlive || !sharedAnnotation) return null;
+      if (!entityIsAlive || !sharedAnnotation) return null;
 
-    // IMPORTANT: do NOT introduce any wrapper element here. Selenium page objects
-    // (`label-studio-test-automation/.../QuickViewTabManagement.java`) rely on the
-    // direct-child relationship `lsf-annotations-carousel__carosel > .lsf-annotation-button`,
-    // and break (silently returning empty annotation IDs from the active tab) when
-    // any DOM element sits between the carousel container and the button. The
-    // shared `SharedAnnotationButton` accepts a `ref` to its outer container so
-    // `useResolveUser`'s IntersectionObserver still has the correct target.
-    return (
-      <SharedAnnotationButton
-        ref={buttonContainerRef as React.MutableRefObject<HTMLDivElement | null>}
-        annotation={sharedAnnotation}
-        capabilities={sharedCapabilities}
-        handlers={handlers}
-      />
-    );
-  }),
+      // IMPORTANT: do NOT introduce any wrapper element here. Selenium page objects
+      // (`label-studio-test-automation/.../QuickViewTabManagement.java`) rely on the
+      // direct-child relationship `lsf-annotations-carousel__carosel > .lsf-annotation-button`,
+      // and break (silently returning empty annotation IDs from the active tab) when
+      // any DOM element sits between the carousel container and the button. The
+      // shared `SharedAnnotationButton` accepts a `ref` to its outer container so
+      // `useResolveUser`'s IntersectionObserver still has the correct target.
+      return (
+        <SharedAnnotationButton
+          ref={buttonContainerRef as React.MutableRefObject<HTMLDivElement | null>}
+          annotation={sharedAnnotation}
+          capabilities={sharedCapabilities}
+          handlers={handlers}
+          layout={layout}
+        />
+      );
+    },
+  ),
 );
 
 export const AnnotationButton = AnnotationButtonInner;
