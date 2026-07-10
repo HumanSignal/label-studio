@@ -4740,6 +4740,33 @@
       "version": 3,
       "deleted": false
     },
+    "fflag_fix_bros_1486_react_code_external_apps_duplicate_regions": {
+      "key": "fflag_fix_bros_1486_react_code_external_apps_duplicate_regions",
+      "on": false,
+      "prerequisites": [],
+      "targets": [],
+      "contextTargets": [],
+      "rules": [],
+      "fallthrough": {
+        "variation": 0
+      },
+      "offVariation": 1,
+      "variations": [
+        true,
+        false
+      ],
+      "clientSideAvailability": {
+        "usingMobileKey": false,
+        "usingEnvironmentId": false
+      },
+      "clientSide": false,
+      "salt": "61071c1a223c4b0b8fc857b831320fad",
+      "trackEvents": false,
+      "trackEventsFallthrough": false,
+      "debugEventsUntilDate": null,
+      "version": 2,
+      "deleted": false
+    },
     "fflag_fix_bros_528_num_tasks_with_annotations_short": {
       "key": "fflag_fix_bros_528_num_tasks_with_annotations_short",
       "on": false,
