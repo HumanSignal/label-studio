@@ -209,6 +209,13 @@ export const FF_FIT_2007_VIRTUALIZED_JSON_EDITOR = "fflag_feat_fit_2007_virtuali
 export const FF_UTC_950_FIREWALL = "fflag_feat_utc_950_annotator_reviewer_firewall_short";
 
 /**
+ * LSE-only "Description (Internal)" project field — a manager-only notes field stored on
+ * LseProject, editable in Project Settings and Create Project, and displayed on the Projects
+ * page (cards/table) under the public description.
+ */
+export const FF_LSE_PROJECT_INTERNAL_DESCRIPTION = "fflag_feat_lse_project_internal_description_short";
+
+/**
  * Vertical annotations sidebar with filtering and resizable column in labeling UI.
  */
 export const FF_FIT_ANNOTATIONS_VERTICAL_LAYOUT = "fflag_feat_front_fit_annotations_vertical_layout_short";
