@@ -197,6 +197,12 @@ const HtxVideoView = ({ item, store }) => {
     [videoLength],
   );
 
+  useEffect(() => {
+    if (isDefined(item.frame) && item.frame !== position && videoLength) {
+      setPosition(item.frame);
+    }
+  }, [item.frame, position, setPosition, videoLength]);
+
   const supportsRegions = useMemo(() => {
     return isDefined(item?.videoControl) || isDefined(item?.videoVectorControl);
   }, [item]);

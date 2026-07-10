@@ -1,5 +1,4 @@
 import { render, screen, fireEvent, act } from "@testing-library/react";
-import { HtxVideoView } from "../HtxVideo";
 
 async function flushRaf() {
   await act(async () => {
@@ -69,6 +68,14 @@ mockModule("../../../../components/Timeline/Controls/VideoConfigControl", () => 
   VideoConfigControl: () => <div data-testid="video-config-control" />,
 }));
 
+mockModule("../../../../ml-interactive/InteractiveOverlayHost", () => ({
+  InteractiveOverlayHost: () => <div data-testid="interactive-overlay-host" />,
+}));
+
+mockModule("../../../../ml-interactive/InteractiveActionsBar", () => ({
+  InteractiveActionsBar: () => <div data-testid="interactive-actions-bar" />,
+}));
+
 const mockTimelineProps = {};
 mockModule("../../../../components/Timeline/Timeline", () => ({
   Timeline: (props) => {
@@ -134,6 +141,8 @@ mockModule("../../../../utils/resize-observer", () => ({
   }),
 }));
 
+const { HtxVideoView } = require("../HtxVideo");
+
 function createMockItem(overrides = {}) {
   const ref = {
     current: {
@@ -182,6 +191,7 @@ function createMockItem(overrides = {}) {
     annotation: { isReadOnly: () => false, selectionSize: 0 },
     drawingRegion: null,
     timelineControl: null,
+    frame: 1,
     ...overrides,
   };
 }
@@ -310,6 +320,23 @@ describe("HtxVideoView", () => {
     expect(onPositionChange).toBeDefined();
     onPositionChange(25);
     expect(item.setFrame).toHaveBeenCalledWith(25);
+  });
+
+  it("syncs Timeline position when item frame changes outside Timeline controls", async () => {
+    const item = createMockItem({ frame: 1 });
+    const store = createMockStore();
+    const { rerender } = render(<HtxVideoView item={item} store={store} />);
+    await flushRaf();
+    await triggerVideoLoad();
+
+    expect(mockTimelineProps.position).toBe(1);
+
+    item.frame = 25;
+    await act(async () => {
+      rerender(<HtxVideoView item={item} store={store} />);
+    });
+
+    expect(mockTimelineProps.position).toBe(25);
   });
 
   it("Timeline onPlay and onPause are called from play/pause buttons", async () => {
