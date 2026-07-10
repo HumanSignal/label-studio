@@ -464,9 +464,25 @@ export class DataManager {
 
   async _destroyLSFImpl() {
     try {
-      await this.lsf?.saveDraft?.();
-      await this.invoke("beforeLsfDestroy", this, this.lsf?.lsfInstance);
-      this.lsf?.destroy();
+      // A failed draft save (network error, page teardown) must never abort
+      // teardown: skipping lsf.destroy() leaves a fully alive second editor
+      // (store, message listeners, autosave) parked on the old task, which then
+      // absorbs postMessage mutations meant for the next session.
+      try {
+        await this.lsf?.saveDraft?.();
+      } catch (err) {
+        console.error("destroyLSF: saveDraft failed, continuing teardown", err);
+      }
+      try {
+        await this.invoke("beforeLsfDestroy", this, this.lsf?.lsfInstance);
+      } catch (err) {
+        console.error("destroyLSF: beforeLsfDestroy failed, continuing teardown", err);
+      }
+      try {
+        this.lsf?.destroy();
+      } catch (err) {
+        console.error("destroyLSF: lsf.destroy failed, continuing teardown", err);
+      }
       this.lsf = undefined;
     } finally {
       this._destroyLSFInFlight = null;

@@ -1,6 +1,6 @@
 import { configure } from "mobx";
 import { destroy } from "mobx-state-tree";
-import { render } from "react-dom";
+import { render, unmountComponentAtNode } from "react-dom";
 import { createRoot } from "react-dom/client";
 import { camelCase } from "@humansignal/core/lib/utils/string";
 import { LabelStudio as LabelStudioReact } from "./Component";
@@ -134,6 +134,12 @@ export class LabelStudio {
     renderApp();
 
     this.destroy = () => {
+      // Unmount the React tree first (same order as createAppV18), while the
+      // stores are still alive for cleanup effects. Without the unmount,
+      // mounted components keep window-level listeners (e.g. ReactCode's
+      // message handler) alive, and a lingering editor absorbs postMessage
+      // mutations meant for the next one.
+      unmountComponentAtNode(rootElement);
       destroySharedStore();
       window.Htx = null;
       destroy(this.store);
