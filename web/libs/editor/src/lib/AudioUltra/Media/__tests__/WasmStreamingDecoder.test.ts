@@ -121,6 +121,34 @@ describe("WasmStreamingDecoder", () => {
     });
   });
 
+  describe("chunk load prioritization", () => {
+    it("decodes the in-view chunk before out-of-view chunks regardless of access order", async () => {
+      // Visible window = 10s at scrollLeft 0.5 → 50s–60s (chunk 5).
+      const wf = {
+        isDestroyed: false,
+        zoom: 10,
+        loadingThreshold: 3600,
+        visualizer: { getScrollLeft: () => 0.5 },
+      };
+      const dec = new WasmStreamingDecoder(src, wf as any);
+      await dec.init();
+
+      // Touch out-of-view chunks first, then the in-view one.
+      dec.chunks?.[0][2]; // 20–30s (out of view)
+      dec.chunks?.[0][9]; // 90–100s (out of view)
+      dec.chunks?.[0][5]; // 50–60s (in view)
+
+      await new Promise((resolve) => setTimeout(resolve, 200));
+
+      const decodedStarts = mockDecodeAudioData.mock.calls.map((c: any[]) => c[0]);
+      // The in-view chunk (start=50s) must be decoded first even though it was
+      // requested last.
+      expect(decodedStarts[0]).toBe(50);
+
+      dec.destroy();
+    });
+  });
+
   describe("url refresh and request coalescing", () => {
     let mockFetch: any;
 
@@ -170,6 +198,110 @@ describe("WasmStreamingDecoder", () => {
 
       // 3. The worker updateUrl should have been called
       expect(mockUpdateUrl).toHaveBeenCalledWith("https://example.com/fresh-audio.mp3");
+
+      // 4. Stable resolve src must be kept for subsequent refresh probes (not overwritten with presigned URL)
+      expect((decoder as any).src).toBe(src);
+    });
+
+    it("stops refreshing after the consecutive refresh cap is exceeded", async () => {
+      await decoder.init();
+
+      mockFetch.mockImplementation(() =>
+        Promise.resolve({
+          ok: false,
+          status: 403,
+          statusText: "Forbidden",
+        } as any),
+      );
+
+      let attempts = 0;
+      mockDecodeAudioData.mockImplementation(() => {
+        attempts++;
+        return Promise.reject(new Error("HTTP_STATUS_403"));
+      });
+
+      for (let i = 0; i < 8; i++) {
+        decoder.chunks?.[0][i % 3];
+        await new Promise((resolve) => setTimeout(resolve, 120));
+      }
+
+      expect(mockFetch.mock.calls.length).toBeLessThanOrEqual(5);
+      expect(attempts).toBeGreaterThan(0);
+    });
+
+    it("serializes decodes so only one runs at a time (no worker backlog)", async () => {
+      await decoder.init();
+
+      let concurrent = 0;
+      let maxConcurrent = 0;
+      mockDecodeAudioData.mockImplementation(() => {
+        concurrent++;
+        maxConcurrent = Math.max(maxConcurrent, concurrent);
+        return new Promise((resolve) => {
+          setTimeout(() => {
+            concurrent--;
+            resolve(new Float32Array(882000));
+          }, 20);
+        });
+      });
+
+      // Request several chunks "simultaneously"
+      decoder.chunks?.[0][0];
+      decoder.chunks?.[0][1];
+      decoder.chunks?.[0][2];
+      decoder.chunks?.[0][3];
+
+      await new Promise((resolve) => setTimeout(resolve, 300));
+
+      // Decodes must never overlap — the worker queue stays empty.
+      expect(maxConcurrent).toBe(1);
+    });
+  });
+
+  describe("proactive presigned URL refresh", () => {
+    let mockFetch: any;
+
+    beforeEach(() => {
+      mockFetch = spyOn(globalThis, "fetch").mockImplementation(() => {
+        return Promise.resolve({
+          ok: true,
+          url: "https://example.com/fresh-audio.mp3",
+        } as any);
+      });
+    });
+
+    it("parses AWS SigV4 expiry from a presigned URL", async () => {
+      await decoder.init();
+      const url =
+        "https://bucket.s3.amazonaws.com/audio.mp3?X-Amz-Date=20260709T194043Z&X-Amz-Expires=60&X-Amz-Signature=abc";
+      const expiry = (decoder as any).parsePresignExpiry(url);
+      expect(expiry).toBe(Date.UTC(2026, 6, 9, 19, 40, 43) + 60_000);
+    });
+
+    it("parses an absolute epoch Expires parameter", async () => {
+      await decoder.init();
+      const url = "https://bucket.example.com/audio.mp3?Expires=1799999999&Signature=xyz";
+      const expiry = (decoder as any).parsePresignExpiry(url);
+      expect(expiry).toBe(1799999999 * 1000);
+    });
+
+    it("returns 0 when no expiry information is present", async () => {
+      await decoder.init();
+      const expiry = (decoder as any).parsePresignExpiry("https://example.com/audio.mp3");
+      expect(expiry).toBe(0);
+    });
+
+    it("schedules a proactive refresh timer on init", async () => {
+      await decoder.init();
+      // init() falls back to a conservative TTL and arms a timer.
+      expect((decoder as any).proactiveTimer).not.toBeNull();
+    });
+
+    it("clears the proactive timer on dispose", async () => {
+      await decoder.init();
+      decoder.destroy();
+      expect((decoder as any).proactiveTimer).toBeNull();
+      expect((decoder as any).isDisposed).toBe(true);
     });
   });
 

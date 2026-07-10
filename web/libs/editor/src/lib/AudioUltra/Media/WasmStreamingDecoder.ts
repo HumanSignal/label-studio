@@ -12,10 +12,42 @@ export class WasmStreamingDecoder extends BaseAudioDecoder {
   private totalChunks = 0;
 
   private loadingChunks = new Set<number>();
-  private pendingThrottles = new Map<number, any>();
+  // Priority load queue (chunkIndex -> isPrefetch). A single drain worker
+  // decodes the highest-priority pending chunk first: in-view chunks ascending
+  // (left-to-right), then the nearest out-of-view prefetch. This keeps the
+  // visible waveform filling in predictably instead of jumping to off-screen
+  // chunks (which makes decoding feel stuck/broken to the user).
+  private loadQueue = new Map<number, boolean>();
+  private draining = false;
   private waveforms = new Set<any>();
   private wf?: any;
   private refreshPromise: Promise<string> | null = null;
+  private lastRefreshAt = 0;
+  private consecutiveRefreshAttempts = 0;
+  private static readonly REFRESH_COOLDOWN_MS = 2000;
+  private static readonly MAX_CONSECUTIVE_REFRESHES = 5;
+
+  // Decode serialization: the WASM worker is single-threaded and reads byte
+  // ranges via *synchronous* (blocking) XHR. If we post many decode requests
+  // they queue in the worker and each one re-scans the file from byte 0 with
+  // whatever URL is current. Worse, an updateUrl() message posted after a
+  // refresh sits behind that backlog, so a freshly-refreshed URL is not applied
+  // until every stale decode drains — producing seconds of redundant, doomed
+  // requests. Serializing decode calls keeps the worker's queue empty so a
+  // refresh takes effect on the very next decode.
+  private decodeChain: Promise<unknown> = Promise.resolve();
+
+  // Refresh gate: while a URL refresh is in flight, all decodes wait on this so
+  // none run against the known-stale URL.
+  private refreshGate: { promise: Promise<void>; resolve: () => void } | null = null;
+
+  // Proactive refresh: presigned URLs carry an expiry. Refresh shortly before
+  // it lapses so steady-state playback never hits a 403 storm.
+  private urlExpiresAt = 0;
+  private proactiveTimer: ReturnType<typeof setTimeout> | null = null;
+  private isDisposed = false;
+  private static readonly PROACTIVE_MIN_LEAD_MS = 10000;
+  private static readonly PROACTIVE_FALLBACK_TTL_MS = 45000;
 
   constructor(src: string, wf?: any) {
     super(src);
@@ -136,6 +168,11 @@ export class WasmStreamingDecoder extends BaseAudioDecoder {
       }) as any;
     });
 
+    // Schedule a proactive refresh so the initial presigned URL is replaced
+    // before it expires (falls back to a conservative TTL since the resolve URL
+    // itself carries no expiry).
+    this.scheduleProactiveRefresh(this.src);
+
     info("decode:worker:ready", this.src);
   }
 
@@ -183,72 +220,257 @@ export class WasmStreamingDecoder extends BaseAudioDecoder {
 
   private loadChunk(chunkIndex: number, isPrefetch = false) {
     if (this.loadingChunks.has(chunkIndex) || this.rawChunks[0][chunkIndex]) return;
-    if (this.pendingThrottles.has(chunkIndex)) return;
 
     // Check if zoomed in enough to load and if the chunk is in the visible padded range
     if (!this.shouldLoadChunk(chunkIndex)) {
       return;
     }
 
-    const timer = setTimeout(async () => {
-      this.pendingThrottles.delete(chunkIndex);
-      if (this.loadingChunks.has(chunkIndex) || this.rawChunks[0][chunkIndex]) {
-        return;
-      }
-      if (!this.shouldLoadChunk(chunkIndex)) {
-        return;
-      }
-      this.loadingChunks.add(chunkIndex);
-
-      try {
-        await this.fetchChunkData(chunkIndex);
-        if (!isPrefetch) {
-          this.prefetchAdjacent(chunkIndex);
-        }
-        this.evictLRU();
-      } catch (e) {
-        console.error(`Error loading WASM stream chunk ${chunkIndex}:`, e);
-      } finally {
-        this.loadingChunks.delete(chunkIndex);
-      }
-    }, 50);
-
-    this.pendingThrottles.set(chunkIndex, timer);
+    // Enqueue for the ordered drain. A direct (non-prefetch) request always
+    // outranks a prefetch one for the same chunk.
+    const existing = this.loadQueue.get(chunkIndex);
+    this.loadQueue.set(chunkIndex, existing === undefined ? isPrefetch : existing && isPrefetch);
+    this.kickDrain();
   }
 
-  private async refreshPresignedUrl(): Promise<string> {
+  private kickDrain() {
+    if (this.draining || this.isDisposed) return;
+    this.draining = true;
+    // Coalesce a burst of loadChunk calls (e.g. a full waveform render pass that
+    // touches every visible chunk) into a single ordered drain rather than
+    // racing many independent timers that resolve in arrival order.
+    Promise.resolve().then(() => this.drainQueue());
+  }
+
+  /** Current unpadded visible window in seconds, or null when unknown. */
+  private computeVisibleRange(): { start: number; end: number } | null {
+    const activeWfs = this.getActiveWaveforms();
+    const wf = activeWfs[0] ?? (this.wf && !this.wf.isDestroyed ? this.wf : undefined);
+    if (!wf || !this._duration) return null;
+    const zoom = wf.zoom || 1;
+    const visibleDuration = this._duration / zoom;
+    const scrollLeft = wf.visualizer?.getScrollLeft?.() ?? 0;
+    const start = scrollLeft * this._duration;
+    return { start, end: start + visibleDuration };
+  }
+
+  /**
+   * Pick the highest-priority queued chunk: in-view chunks first, ascending by
+   * time (left-to-right fill), then the nearest out-of-view prefetch chunk.
+   */
+  private pickNextChunk(): number | undefined {
+    const vis = this.computeVisibleRange();
+    let best: number | undefined;
+    let bestScore = Number.POSITIVE_INFINITY;
+    for (const idx of this.loadQueue.keys()) {
+      const chunkStart = idx * 10;
+      const chunkEnd = chunkStart + 10;
+      let score: number;
+      if (vis && chunkEnd >= vis.start && chunkStart <= vis.end) {
+        // In view: fill left-to-right.
+        score = chunkStart;
+      } else if (vis) {
+        // Out of view (prefetch/padding): nearest to the viewport first, but
+        // always after every in-view chunk (large base offset).
+        const dist = chunkStart > vis.end ? chunkStart - vis.end : vis.start - chunkEnd;
+        score = 1e9 + dist;
+      } else {
+        score = chunkStart;
+      }
+      if (score < bestScore) {
+        bestScore = score;
+        best = idx;
+      }
+    }
+    return best;
+  }
+
+  private async drainQueue() {
+    try {
+      while (!this.isDisposed && this.worker && this.loadQueue.size > 0) {
+        const chunkIndex = this.pickNextChunk();
+        if (chunkIndex === undefined) break;
+        const isPrefetch = this.loadQueue.get(chunkIndex) ?? false;
+        this.loadQueue.delete(chunkIndex);
+
+        if (this.loadingChunks.has(chunkIndex) || this.rawChunks[0][chunkIndex]) continue;
+        if (!this.shouldLoadChunk(chunkIndex)) continue;
+
+        this.loadingChunks.add(chunkIndex);
+        try {
+          await this.fetchChunkData(chunkIndex);
+          if (!isPrefetch) {
+            this.prefetchAdjacent(chunkIndex);
+          }
+          this.evictLRU();
+        } catch (e) {
+          console.error(`Error loading WASM stream chunk ${chunkIndex}:`, e);
+        } finally {
+          this.loadingChunks.delete(chunkIndex);
+        }
+      }
+    } finally {
+      this.draining = false;
+      // Chunks enqueued during the final await (e.g. prefetch or a view change)
+      // get their own ordered pass.
+      if (!this.isDisposed && this.loadQueue.size > 0) this.kickDrain();
+    }
+  }
+
+  private openRefreshGate() {
+    if (this.refreshGate) return;
+    let resolve!: () => void;
+    const promise = new Promise<void>((r) => {
+      resolve = r;
+    });
+    this.refreshGate = { promise, resolve };
+  }
+
+  private closeRefreshGate() {
+    const gate = this.refreshGate;
+    this.refreshGate = null;
+    gate?.resolve();
+  }
+
+  /**
+   * Runs a decode exclusively: waits for any prior decode and any in-flight URL
+   * refresh so the worker's message queue stays empty and every decode uses the
+   * current (never stale) URL.
+   */
+  private async runDecodeExclusive<T>(fn: () => Promise<T>): Promise<T> {
+    const prior = this.decodeChain;
+    let release!: () => void;
+    this.decodeChain = new Promise<void>((r) => {
+      release = r;
+    });
+    try {
+      await prior.catch(() => {});
+      // Hold decodes until any refresh has applied a fresh URL to the worker.
+      while (this.refreshGate) {
+        await this.refreshGate.promise;
+      }
+      return await fn();
+    } finally {
+      release();
+    }
+  }
+
+  /** Parse a presigned URL's absolute expiry (epoch ms), or 0 if unknown. */
+  private parsePresignExpiry(url: string): number {
+    try {
+      const base = typeof location !== "undefined" ? location.href : "http://localhost";
+      const q = new URL(url, base).searchParams;
+
+      const parseCompactDate = (s: string): number => {
+        const m = /^(\d{4})(\d{2})(\d{2})T(\d{2})(\d{2})(\d{2})Z$/.exec(s);
+        if (m) return Date.UTC(+m[1], +m[2] - 1, +m[3], +m[4], +m[5], +m[6]);
+        const t = Date.parse(s);
+        return Number.isNaN(t) ? 0 : t;
+      };
+
+      // AWS SigV4
+      const amzDate = q.get("X-Amz-Date");
+      const amzExp = q.get("X-Amz-Expires");
+      if (amzDate && amzExp) {
+        const start = parseCompactDate(amzDate);
+        if (start) return start + Number(amzExp) * 1000;
+      }
+      // GCS V4
+      const gDate = q.get("X-Goog-Date");
+      const gExp = q.get("X-Goog-Expires");
+      if (gDate && gExp) {
+        const start = parseCompactDate(gDate);
+        if (start) return start + Number(gExp) * 1000;
+      }
+      // S3 legacy / GCS V2: absolute epoch seconds
+      const expires = q.get("Expires");
+      if (expires && /^\d+$/.test(expires)) return Number(expires) * 1000;
+      // Azure SAS
+      const se = q.get("se");
+      if (se) {
+        const t = Date.parse(se);
+        if (!Number.isNaN(t)) return t;
+      }
+    } catch {
+      // ignore malformed URLs
+    }
+    return 0;
+  }
+
+  private scheduleProactiveRefresh(url: string) {
+    if (this.isDisposed) return;
+
+    const expiresAt = this.parsePresignExpiry(url);
+    this.urlExpiresAt = expiresAt;
+
+    if (this.proactiveTimer) {
+      clearTimeout(this.proactiveTimer);
+      this.proactiveTimer = null;
+    }
+
+    const now = Date.now();
+    const ttl = expiresAt > now ? expiresAt - now : WasmStreamingDecoder.PROACTIVE_FALLBACK_TTL_MS;
+    const lead = Math.max(WasmStreamingDecoder.PROACTIVE_MIN_LEAD_MS, ttl * 0.2);
+    const delay = Math.max(1000, ttl - lead);
+
+    this.proactiveTimer = setTimeout(() => {
+      this.proactiveTimer = null;
+      // Non-reactive refresh: does not count against the reactive retry cap.
+      this.refreshPresignedUrl(false).catch((e) => {
+        console.warn("WasmStreamingDecoder: proactive URL refresh failed", e);
+      });
+    }, delay);
+  }
+
+  private async refreshPresignedUrl(reactive = true): Promise<string> {
     if (this.refreshPromise) {
       return this.refreshPromise;
     }
 
+    if (reactive && this.consecutiveRefreshAttempts >= WasmStreamingDecoder.MAX_CONSECUTIVE_REFRESHES) {
+      throw new Error("WasmStreamingDecoder: refresh cap exceeded");
+    }
+
+    const now = Date.now();
+    if (reactive && now - this.lastRefreshAt < WasmStreamingDecoder.REFRESH_COOLDOWN_MS) {
+      // A refresh applied very recently; the worker already holds a fresh URL.
+      return this.src;
+    }
+
+    // Gate decodes for the duration of the refresh so none run against a stale URL.
+    this.openRefreshGate();
+
     this.refreshPromise = (async () => {
+      if (reactive) this.consecutiveRefreshAttempts += 1;
       try {
+        let freshUrl: string | undefined;
+
         if (this.wf && typeof this.wf.refreshUrl === "function") {
-          const freshUrl = await this.wf.refreshUrl(this.src);
-          if (freshUrl) {
-            this.src = freshUrl;
-            this.worker?.updateUrl(freshUrl);
-            this.invoke("urlRefreshed", [freshUrl]);
-            return freshUrl;
+          freshUrl = await this.wf.refreshUrl(this.src);
+        }
+
+        if (!freshUrl) {
+          const response = await fetch(this.src, {
+            cache: "no-store",
+            headers: {
+              Range: "bytes=0-0",
+            },
+          });
+
+          if (!response.ok) {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
           }
+
+          freshUrl = response.url;
         }
 
-        const response = await fetch(this.src, {
-          cache: "no-store",
-          headers: {
-            Range: "bytes=0-0",
-          },
-        });
-
-        if (!response.ok) {
-          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-        }
-
-        const freshUrl = response.url;
         this.worker?.updateUrl(freshUrl);
+        this.lastRefreshAt = Date.now();
+        this.scheduleProactiveRefresh(freshUrl);
         return freshUrl;
       } finally {
         this.refreshPromise = null;
+        this.closeRefreshGate();
       }
     })();
 
@@ -256,7 +478,8 @@ export class WasmStreamingDecoder extends BaseAudioDecoder {
   }
 
   private async fetchChunkData(chunkIndex: number, isRetry = false) {
-    if (!this.worker) {
+    const worker = this.worker;
+    if (!worker) {
       return;
     }
 
@@ -265,10 +488,14 @@ export class WasmStreamingDecoder extends BaseAudioDecoder {
     if (chunkDuration <= 0) return;
 
     try {
-      // Decode this chunk. Since we want all channels separated, we set multiChannel: true
-      const decodedSamples = await this.worker.decodeAudioData(startSeconds, chunkDuration, {
-        multiChannel: true,
-      });
+      // Decode this chunk. Since we want all channels separated, we set multiChannel: true.
+      // Serialize decodes so the single-threaded worker never backs up and always
+      // decodes with the current URL.
+      const decodedSamples = await this.runDecodeExclusive(() =>
+        worker.decodeAudioData(startSeconds, chunkDuration, {
+          multiChannel: true,
+        }),
+      );
 
       const samplesInChunk = Math.round(chunkDuration * this._sampleRate);
 
@@ -286,6 +513,7 @@ export class WasmStreamingDecoder extends BaseAudioDecoder {
 
       this.invoke("progress", [chunkIndex, this.totalChunks]);
       this.invoke("chunkLoaded", [chunkIndex]);
+      this.consecutiveRefreshAttempts = 0;
     } catch (e: any) {
       const isAuthError =
         e?.message?.includes("HTTP_STATUS_403") ||
@@ -295,9 +523,9 @@ export class WasmStreamingDecoder extends BaseAudioDecoder {
       if (isAuthError && !isRetry) {
         console.warn("WasmStreamingDecoder: Presigned URL expired (403/401). Refreshing URL and retrying...");
         try {
-          await this.refreshPresignedUrl();
+          await this.refreshPresignedUrl(true);
 
-          // Retry decoding this chunk
+          // Retry decoding this chunk (serialized; runs once the fresh URL is applied)
           await this.fetchChunkData(chunkIndex, true);
           return;
         } catch (refreshErr) {
@@ -326,8 +554,14 @@ export class WasmStreamingDecoder extends BaseAudioDecoder {
   }
 
   protected dispose() {
-    this.pendingThrottles.forEach(clearTimeout);
-    this.pendingThrottles.clear();
+    this.isDisposed = true;
+    if (this.proactiveTimer) {
+      clearTimeout(this.proactiveTimer);
+      this.proactiveTimer = null;
+    }
+    // Release any decodes waiting on a refresh so they don't hang forever.
+    this.closeRefreshGate();
+    this.loadQueue.clear();
     this.loadingChunks.clear();
     if (this.worker) {
       this.worker.dispose();
