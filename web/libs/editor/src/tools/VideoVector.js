@@ -438,7 +438,9 @@ const _Tool = types
         self.annotation?.history?.unfreeze();
 
         if (!skipAfterCreate && currentArea && !currentArea.incomplete) {
-          self.annotation?.afterCreateResult?.(currentArea, control);
+          const afterCreateControl = currentArea.labeling?.from_name ?? control;
+
+          self.annotation?.afterCreateResult?.(currentArea, afterCreateControl);
         }
       },
 

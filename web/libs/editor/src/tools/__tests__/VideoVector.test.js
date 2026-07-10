@@ -43,6 +43,7 @@ const MockRegion = types
     // Set true by the view when an existing point/shape is being dragged so the
     // tool can tell an edit gesture from a placement click (BROS-1413).
     editingPointGesture: false,
+    labelingControl: null,
   }))
   .views((self) => ({
     get closed() {
@@ -57,6 +58,9 @@ const MockRegion = types
     getShape() {
       return { closed: self.closedFlag, vertices: self.verticesData };
     },
+    get labeling() {
+      return self.labelingControl ? { from_name: self.labelingControl } : undefined;
+    },
   }))
   .actions((self) => ({
     setDrawing(value) {
@@ -64,6 +68,9 @@ const MockRegion = types
     },
     setEditingPointGesture(value) {
       self.editingPointGesture = value;
+    },
+    setLabelingControl(control) {
+      self.labelingControl = control;
     },
     startPoint() {},
     commitPoint() {},
@@ -120,11 +127,12 @@ function createTool() {
   // control.type differs from tagTypes.stateTypes ("videovectorlabels") so the
   // tool's isIncorrectControl() resolves to false.
   const control = { type: "videovector", isSelected: true };
+  const labelControl = { type: "labels", isLabeling: true };
   const manager = {};
 
   const store = Store.create({ tool: {} }, { object: obj, control, manager, annotation });
 
-  return { tool: store.tool, obj, annotation, regs };
+  return { tool: store.tool, obj, annotation, regs, control, labelControl };
 }
 
 describe("VideoVector tool", () => {
@@ -260,8 +268,8 @@ describe("VideoVector tool", () => {
       return region;
     }
 
-    it("delegates post-close selection to afterCreateResult (setting-aware)", () => {
-      const { tool, annotation } = createTool();
+    it("delegates post-close region selection to afterCreateResult (setting-aware)", () => {
+      const { tool, annotation, control } = createTool();
 
       const region = finishCurrentRegion(tool);
 
@@ -269,6 +277,25 @@ describe("VideoVector tool", () => {
       // afterCreateResult, which is the single place that reads selectAfterCreate.
       expect(annotation.afterCreateResult).toHaveBeenCalledTimes(1);
       expect(annotation.afterCreateResult.mock.calls[0][0]).toBe(region);
+      expect(annotation.afterCreateResult.mock.calls[0][1]).toBe(control);
+    });
+
+    it("uses the region labeling control for setting-aware label cleanup on separated VideoVector", () => {
+      const { tool, annotation, labelControl } = createTool();
+
+      tool.mousedownEv({ button: 0 }, [10, 10]);
+      const region = tool.currentArea;
+      region.setLabelingControl(labelControl);
+
+      tool._finishDrawing();
+
+      // Standalone <VideoVector> is a separated drawing control; its sibling
+      // <Labels> control owns the selected label state. Passing that labeling
+      // control lets afterCreateResult() clear labels when continuousLabeling is
+      // off and keep them when it is on. BROS-1470.
+      expect(annotation.afterCreateResult).toHaveBeenCalledTimes(1);
+      expect(annotation.afterCreateResult.mock.calls[0][0]).toBe(region);
+      expect(annotation.afterCreateResult.mock.calls[0][1]).toBe(labelControl);
     });
 
     it("suppresses the trailing close-gesture click once (single-shot)", () => {
