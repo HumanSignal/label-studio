@@ -3,6 +3,8 @@
 import os
 
 from django.conf import settings
+from drf_spectacular.types import OpenApiTypes
+from drf_spectacular.utils import extend_schema_field
 from io_storages.base_models import ExportStorage, ImportStorage
 from rest_framework import serializers
 from tasks.models import Task
@@ -12,8 +14,13 @@ from users.models import User
 from label_studio.core.utils.common import load_func
 
 
+@extend_schema_field(OpenApiTypes.STR)
+class StorageTypeField(serializers.ReadOnlyField):
+    pass
+
+
 class ImportStorageSerializer(serializers.ModelSerializer):
-    type = serializers.ReadOnlyField(default=os.path.basename(os.path.dirname(__file__)))
+    type = StorageTypeField(default=os.path.basename(os.path.dirname(__file__)))
     synchronizable = serializers.BooleanField(required=False, default=True)
 
     def validate(self, data):
@@ -29,7 +36,7 @@ class ImportStorageSerializer(serializers.ModelSerializer):
 
 
 class ExportStorageSerializer(serializers.ModelSerializer):
-    type = serializers.ReadOnlyField(default=os.path.basename(os.path.dirname(__file__)))
+    type = StorageTypeField(default=os.path.basename(os.path.dirname(__file__)))
     synchronizable = serializers.BooleanField(required=False, default=True)
 
     class Meta:
