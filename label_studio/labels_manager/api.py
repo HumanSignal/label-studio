@@ -7,6 +7,7 @@ from django.utils.decorators import method_decorator
 from django_filters.rest_framework import DjangoFilterBackend
 from drf_spectacular.utils import extend_schema
 from labels_manager.serializers import (
+    LabelBulkUpdateResponseSerializer,
     LabelBulkUpdateSerializer,
     LabelCreateSerializer,
     LabelLinkSerializer,
@@ -237,6 +238,8 @@ class LabelLinkAPI(viewsets.ModelViewSet):
         description="""
         If you want to update the labels in saved annotations, use this endpoint.
         """,
+        request=LabelBulkUpdateSerializer,
+        responses={200: LabelBulkUpdateResponseSerializer},
         extensions={
             'x-fern-sdk-group-name': ['projects', 'labels'],
             'x-fern-sdk-method-name': 'update_many',

@@ -402,7 +402,8 @@ class OrganizationInviteAPI(generics.RetrieveAPIView):
         tags=['Invites'],
         summary='Reset organization token',
         description='Reset the token used in the invitation link to invite someone to an organization.',
-        responses={200: OrganizationInviteSerializer()},
+        request=None,
+        responses={201: OrganizationInviteSerializer()},
         extensions={
             'x-fern-sdk-group-name': 'organizations',
             'x-fern-sdk-method-name': 'reset_token',

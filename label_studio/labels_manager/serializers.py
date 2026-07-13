@@ -119,3 +119,7 @@ class LabelBulkUpdateSerializer(serializers.Serializer):
     project = serializers.PrimaryKeyRelatedField(queryset=Project.objects.all(), required=False, default=None)
     old_label = serializers.JSONField()
     new_label = serializers.JSONField()
+
+
+class LabelBulkUpdateResponseSerializer(serializers.Serializer):
+    annotations_updated = serializers.IntegerField()
