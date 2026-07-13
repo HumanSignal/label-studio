@@ -649,8 +649,13 @@ class ImportStorage(Storage):
                     update_fields=['total_annotations', 'cancelled_annotations', 'total_predictions', 'is_labeled'],
                     skip_fsm=True,
                 )
+
+            if created_annotations:
+                post_process_user = project.created_by or project.organization.created_by
+                post_process = load_func(settings.TASK_SERIALIZER_BULK).post_process_annotations
+                post_process(post_process_user, created_annotations, 'imported')
+
         return task
-        # FIXME: add_annotation_history / post_process_annotations should be here
 
     def _scan_and_create_links(self, link_class):
         """
