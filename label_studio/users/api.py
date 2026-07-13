@@ -63,6 +63,17 @@ _user_schema = {
     },
 }
 
+_user_update_schema = {
+    **_user_schema,
+    'properties': {
+        **_user_schema['properties'],
+        'id': {
+            **_user_schema['properties']['id'],
+            'x-fern-property-name': 'request_user_id',
+        },
+    },
+}
+
 
 @method_decorator(
     name='update',
@@ -141,7 +152,7 @@ _user_schema = {
             OpenApiParameter(name='id', type=OpenApiTypes.INT, location='path', description='User ID'),
         ],
         request={
-            'application/json': _user_schema,
+            'application/json': _user_update_schema,
         },
         responses={200: UserSerializer},
         extensions={
