@@ -51,6 +51,17 @@ const dataCleanup = (tab, columns) => {
   return { ...tab, data };
 };
 
+const nextTempTabId = (views) => {
+  const usedIds = new Set(views.map((view) => view.id));
+  let candidate = -Date.now();
+
+  while (usedIds.has(candidate)) {
+    candidate -= 1;
+  }
+
+  return candidate;
+};
+
 const createNameCopy = (name) => {
   let newName = name;
   const matcher = /Copy(\s\(([\d]+)\))?/;
@@ -193,9 +204,8 @@ export const TabStore = types
         tab: existingTabKey,
         ...(existingTab ?? viewSnapshot ?? {}),
       };
-      const lastView = self.views[self.views.length - 1];
       const newTitle = snapshot.title ?? `New Tab ${self.views.length + 1}`;
-      const newID = snapshot.id ?? (lastView?.id ? lastView.id + 1 : 0);
+      const newID = nextTempTabId(self.views);
 
       const defaultHiddenColumns = self.defaultHidden
         ? clone(self.defaultHidden)
@@ -317,6 +327,17 @@ export const TabStore = types
       };
 
       if (result.id !== view.id) {
+        const existingView = self.views.find((v) => v !== view && v.id === result.id);
+
+        if (existingView) {
+          applySnapshot(existingView, { ...newViewSnapshot, saved: true, virtual: false });
+          root.SDK.hasInterface("tabs") && existingView.reload();
+          self.setSelected(existingView);
+          destroy(view);
+
+          return existingView;
+        }
+
         self.views.push({ ...newViewSnapshot, saved: true, virtual: false });
         const newView = self.views[self.views.length - 1];
 
