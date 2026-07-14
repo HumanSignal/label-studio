@@ -45,7 +45,7 @@ const meta: Meta<typeof Badge> = {
     },
     size: {
       control: "select",
-      options: ["medium", "small"],
+      options: ["large", "medium", "small"],
       // Note: "default" and "compact" are still supported as hidden fallbacks for backwards compatibility
     },
   },
@@ -62,6 +62,20 @@ export const Default: Story = {
   args: {
     children: "Default",
   },
+};
+
+export const LargeSize: Story = {
+  render: () => (
+    <div className="flex flex-wrap items-center gap-3">
+      <Badge look="outline" variant="neutral" shape="rounded" size="large">
+        English
+      </Badge>
+      <Badge look="outline" variant="neutral" shape="rounded" size="large">
+        <span>English</span>
+        <span className="text-neutral-content-subtler">· Native</span>
+      </Badge>
+    </div>
+  ),
 };
 
 /**

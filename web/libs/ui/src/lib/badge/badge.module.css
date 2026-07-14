@@ -40,6 +40,15 @@
 }
 
 /* Size variants */
+.size-large {
+  padding: var(--spacing-tighter) var(--spacing-tight);
+  font-size: var(--font-size-label-smaller);
+  min-height: 28px;
+  height: auto;
+  white-space: normal;
+  align-items: center;
+}
+
 .size-small,
 .size-compact {
   padding: 0 var(--spacing-tighter);

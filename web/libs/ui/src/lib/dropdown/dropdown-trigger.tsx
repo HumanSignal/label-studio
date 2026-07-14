@@ -119,6 +119,8 @@ export const DropdownTrigger = forwardRef<DropdownRef, DropdownTriggerProps>(
       (e: any) => {
         if (disabled) return;
 
+        if (isChildValid(e.target)) return;
+
         const inDropdown = dropdownRef.current?.dropdown?.contains?.(e.target);
 
         if (inDropdown) return e.stopPropagation();
@@ -129,7 +131,7 @@ export const DropdownTrigger = forwardRef<DropdownRef, DropdownTriggerProps>(
 
         dropdownRef?.current?.toggle();
       },
-      [dropdownRef, disabled, toggle],
+      [dropdownRef, disabled, toggle, isChildValid],
     );
 
     const handleContextMenu = useCallback(

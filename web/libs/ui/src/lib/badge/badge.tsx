@@ -57,7 +57,7 @@ export type BadgeVariant =
 
 export type BadgeLook = "filled" | "outline" | "ghost" | "solid";
 export type BadgeShape = "rounded" | "square" | "squared";
-export type BadgeSize = "medium" | "small" | "compact" | "default"; // "default" is deprecated, use "medium"; "compact" is deprecated, use "small"
+export type BadgeSize = "large" | "medium" | "small" | "compact" | "default"; // "default" is deprecated, use "medium"; "compact" is deprecated, use "small"
 
 export interface BadgeProps extends Omit<React.HTMLAttributes<HTMLDivElement>, "style"> {
   variant?: BadgeVariant;

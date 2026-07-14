@@ -22,6 +22,32 @@ export * from "./lib/label/label";
 export * from "./lib/message/message";
 export * from "./lib/select/select";
 export * from "./lib/tag-autocomplete";
+// Named exports only — avoid `export *` so MultiTreeSelect's internal TreeSelect
+// does not collide with the public TreeSelect from ./lib/tree-select.
+export {
+  IdDelimiter,
+  IndexedSymbol,
+  MultiTreeSelect,
+  MultiTreeSelectDropdown,
+  MultiTreeSelectProvider,
+  RootSymbol,
+  TreeSearch,
+  TreeSearchIndex,
+  TreeSearchMatch,
+  TreeSelected,
+  TreeNode,
+  getChildrenIds,
+  useMultiTreeSelectProvider,
+  useTreeContext,
+  type Action,
+  type IndexedNode,
+  type MultiTreeSelectProps,
+  type MultiTreeSelectProviderProps,
+  type MultiTreeSelectSchema,
+  type TreeAction,
+  type TreeNodeProps,
+} from "./lib/multi-tree-select";
+export * from "./lib/taxonomy-multi-tree-select";
 export * from "./lib/skeleton/skeleton";
 export * from "./lib/state-chip/state-chip";
 export * from "./lib/stepper";

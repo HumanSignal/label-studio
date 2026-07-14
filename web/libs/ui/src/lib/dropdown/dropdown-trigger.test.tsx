@@ -291,6 +291,51 @@ describe("DropdownTrigger - Context Menu Mode", () => {
   });
 
   describe("Toggle Behavior", () => {
+    it("should not toggle when clicking a child matched by isChildValid", () => {
+      const toggleSpy = mock();
+
+      spyOn(dropdownModule, "Dropdown").mockImplementation(({ children, ref }: any) => {
+        if (ref) {
+          const mockRef: any = {
+            dropdown: createMockDropdownElement(),
+            visible: false,
+            toggle: toggleSpy,
+            open: mock(),
+            close: mock(),
+          };
+          if (typeof ref === "function") {
+            ref(mockRef);
+          } else {
+            ref.current = mockRef;
+          }
+        }
+        return <div data-testid="dropdown-content">{children}</div>;
+      });
+
+      const TestComponent = () => {
+        const dropdownRef = useRef<DropdownRef>(null);
+        return (
+          <DropdownTrigger
+            content={<div>Menu</div>}
+            dropdown={dropdownRef}
+            isChildValid={(target) => Boolean(target?.closest?.("[data-chip-interactive]"))}
+          >
+            <div data-testid="trigger-wrapper">
+              <button type="button" data-chip-interactive data-testid="chip-select">
+                Chip Select
+              </button>
+            </div>
+          </DropdownTrigger>
+        );
+      };
+
+      render(<TestComponent />);
+
+      fireEvent.click(screen.getByTestId("chip-select"));
+
+      expect(toggleSpy).not.toHaveBeenCalled();
+    });
+
     it("should toggle dropdown when toggle prop is true (default)", () => {
       const TestComponent = () => {
         const dropdownRef = useRef<DropdownRef>(null);
