@@ -2,6 +2,7 @@
 
 import logging
 import re
+from dataclasses import dataclass
 from datetime import datetime
 from functools import reduce
 from typing import ClassVar
@@ -62,6 +63,20 @@ class _Operator(BaseModel):
 
 
 Operator = _Operator()
+
+
+@dataclass(frozen=True)
+class CustomFilterResult:
+    """Result from an enterprise filter hook that handled the current filter.
+
+    ``expression=None`` deliberately drops an unavailable filter line. Hooks
+    that compile a parent and child into one expression set
+    ``consume_child_filter`` so the generic loop does not apply the child again.
+    """
+
+    expression: Q | None
+    consume_child_filter: bool = False
+
 
 operators = {
     Operator.EQUAL: '',
@@ -509,7 +524,14 @@ def apply_filters(queryset, filters, project, request):
                 project,
                 request=request,
                 is_child_filter=is_child_filter,
+                child_filter=parent_filter.child_filter if not is_child_filter else None,
             )
+            if isinstance(filter_expression, CustomFilterResult):
+                if filter_expression.expression is not None:
+                    filter_expressions.append(filter_expression.expression)
+                if filter_expression.consume_child_filter:
+                    break
+                continue
             if filter_expression:
                 filter_expressions.append(filter_expression)
                 continue

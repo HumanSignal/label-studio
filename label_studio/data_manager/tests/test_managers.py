@@ -520,6 +520,50 @@ class TestApplyFiltersStaleAgreementFields(TestCase):
         queryset.filter.assert_not_called()
 
 
+class TestApplyFiltersCustomResult(TestCase):
+    """Custom hooks can consume a parent/child pair as one expression."""
+
+    def test_custom_result_consumes_child_filter(self):
+        from data_manager.managers import CustomFilterResult, apply_filters
+        from django.db.models import Q
+
+        queryset = Mock()
+        queryset.query.annotations = {}
+        queryset.filter.return_value = queryset
+        project = Mock()
+        parent = Filter(
+            filter='filter:tasks:annotations_dimension_results.dimension_1',
+            operator='contains',
+            type='List',
+            value=['positive'],
+            child_filter=Filter(
+                filter='filter:tasks:annotators',
+                operator='contains',
+                type='List',
+                value=7,
+            ),
+        )
+        filters = Filters(conjunction=ConjunctionEnum.AND, items=[parent])
+        custom_hook = Mock(return_value=CustomFilterResult(Q(id=123), consume_child_filter=True))
+
+        def _load_func(path):
+            if path == settings.DATA_MANAGER_CUSTOM_FILTER_EXPRESSIONS:
+                return custom_hook
+            if path == settings.PREPROCESS_FIELD_NAME:
+                return lambda raw, _project: (raw.removeprefix('filter:tasks:'), True)
+            if path == settings.DATA_MANAGER_PREPROCESS_FILTER:
+                return lambda filter_, _field_name: filter_
+            raise AssertionError(f'unexpected load_func path: {path}')
+
+        with patch('data_manager.managers.load_func', side_effect=_load_func):
+            result = apply_filters(queryset=queryset, filters=filters, project=project, request=Mock())
+
+        self.assertIs(result, queryset)
+        custom_hook.assert_called_once()
+        self.assertIs(custom_hook.call_args.kwargs['child_filter'], parent.child_filter)
+        queryset.filter.assert_called_once()
+
+
 class TestNormalizeInListValue(TestCase):
     """Unit tests for `_normalize_in_list_value` (BROS-1203)."""
 
