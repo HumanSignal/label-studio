@@ -2,13 +2,14 @@
  * Unit tests for ImageView (components/ImageView/ImageView.jsx)
  */
 import React from "react";
-import { render, screen, fireEvent } from "@testing-library/react";
+import { act, render, screen, fireEvent } from "@testing-library/react";
 import ImageView, { splitRegions } from "../ImageView";
 
 jest.mock("../../../utils/feature-flags", () => ({
   isFF: jest.fn(() => false),
   FF_DEV_1442: "fflag_dev_1442",
   FF_LSDV_4930: "fflag_lsdv_4930",
+  FF_POLYGON_FREEHAND: "fflag_feat_front_polygon_freehand",
   FF_ZOOM_OPTIM: "fflag_zoom_optim",
 }));
 
@@ -204,6 +205,56 @@ function createStore(overrides = {}) {
     settings: { setSmoothing: jest.fn(), enableSmoothing: true, fullscreen: true },
     annotationStore: { viewingAll: false, addErrors: jest.fn() },
     ...overrides,
+  };
+}
+
+function createFreehandPointerHarness() {
+  const store = createStore();
+  const commitFreehand = jest.fn();
+  const tool = {
+    toolName: "PolygonTool",
+    canStartFreehand: jest.fn(() => true),
+    commitFreehand,
+  };
+  let pointerPosition = { x: 10, y: 10 };
+  let transformOffset = 0;
+  const captureTarget = {
+    addEventListener: jest.fn(),
+    removeEventListener: jest.fn(),
+    setPointerCapture: jest.fn(),
+    hasPointerCapture: jest.fn(() => true),
+    releasePointerCapture: jest.fn(),
+  };
+  const stageRef = {
+    content: captureTarget,
+    getPointerPosition: () => pointerPosition,
+    setPointersPositions: (event) => {
+      pointerPosition = { x: event.clientX, y: event.clientY };
+    },
+    on: jest.fn(),
+    off: jest.fn(),
+    getStage: () => null,
+    position: () => ({ x: 0, y: 0 }),
+    scale: () => ({ x: 1, y: 1 }),
+  };
+  const item = createItem({
+    stageRef,
+    getToolsManager: () => ({ findSelectedTool: () => tool, allTools: () => [tool] }),
+    fixZoomedCoords: ([x, y]) => [x + transformOffset, y + transformOffset],
+    canvasToInternalX: (x) => x,
+    canvasToInternalY: (y) => y,
+  });
+  item.store = store;
+  let viewRef;
+
+  render(<ImageView ref={(ref) => (viewRef = ref)} item={item} store={store} />);
+  return {
+    commitFreehand,
+    item,
+    setTransformOffset: (offset) => {
+      transformOffset = offset;
+    },
+    view: () => viewRef,
   };
 }
 
@@ -1221,5 +1272,71 @@ describe("ImageView with feature flags", () => {
     jest.advanceTimersByTime(150);
     expect(item.event).toHaveBeenCalledWith("mousedown", expect.anything(), 20, 30);
     jest.useRealTimers();
+  });
+
+  it("creates points from a pointer drag only when freehand drawing is enabled", () => {
+    const { isFF } = require("../../../utils/feature-flags");
+    const { commitFreehand, view } = createFreehandPointerHarness();
+    const drag = () => {
+      act(() => {
+        view().handlePointerDown({ pointerId: 1, isPrimary: true, button: 0, clientX: 10, clientY: 10 });
+        view().handlePointerMove({
+          pointerId: 1,
+          clientX: 40,
+          clientY: 10,
+          getCoalescedEvents: () => [],
+          preventDefault: jest.fn(),
+        });
+        view().handlePointerMove({ pointerId: 1, clientX: 40, clientY: 40, preventDefault: jest.fn() });
+        view().handlePointerUp({ pointerId: 1, clientX: 10, clientY: 40, preventDefault: jest.fn() });
+      });
+    };
+
+    isFF.mockReturnValue(false);
+    drag();
+    expect(commitFreehand).not.toHaveBeenCalled();
+
+    isFF.mockImplementation((flag) => flag === "fflag_feat_front_polygon_freehand");
+    drag();
+    expect(commitFreehand).toHaveBeenCalledTimes(1);
+    expect(commitFreehand.mock.calls[0][0]).toHaveLength(4);
+  });
+
+  it("keeps each sample in the coordinate transform active when it was collected", () => {
+    const { isFF } = require("../../../utils/feature-flags");
+    const { commitFreehand, setTransformOffset, view } = createFreehandPointerHarness();
+
+    isFF.mockImplementation((flag) => flag === "fflag_feat_front_polygon_freehand");
+    act(() => {
+      view().handlePointerDown({ pointerId: 1, isPrimary: true, button: 0, clientX: 10, clientY: 10 });
+      view().handlePointerMove({ pointerId: 1, clientX: 40, clientY: 10, preventDefault: jest.fn() });
+      setTransformOffset(100);
+      view().handlePointerMove({ pointerId: 1, clientX: 40, clientY: 40, preventDefault: jest.fn() });
+      view().handlePointerUp({ pointerId: 1, clientX: 10, clientY: 40, preventDefault: jest.fn() });
+    });
+
+    expect(commitFreehand).toHaveBeenCalledWith([
+      [10, 10],
+      [40, 10],
+      [140, 140],
+      [110, 140],
+    ]);
+  });
+
+  it("lets a below-threshold pointer gesture continue through the stock click path", () => {
+    const { isFF } = require("../../../utils/feature-flags");
+    const { commitFreehand, item, view } = createFreehandPointerHarness();
+
+    isFF.mockImplementation((flag) => flag === "fflag_feat_front_polygon_freehand");
+    act(() => {
+      view().handlePointerDown({ pointerId: 1, isPrimary: true, button: 0, clientX: 10, clientY: 10 });
+      view().handlePointerMove({ pointerId: 1, clientX: 13, clientY: 10, preventDefault: jest.fn() });
+      view().handlePointerUp({ pointerId: 1, clientX: 13, clientY: 10, preventDefault: jest.fn() });
+    });
+
+    expect(commitFreehand).not.toHaveBeenCalled();
+    expect(view().shouldSuppressFreehandCompatibilityEvent({ clientX: 13, clientY: 10 })).toBe(false);
+    view().handleOnClick({ evt: { offsetX: 13, offsetY: 10, clientX: 13, clientY: 10 } });
+    expect(item.event).toHaveBeenCalledWith("click", expect.anything(), 13, 10);
   });
 });

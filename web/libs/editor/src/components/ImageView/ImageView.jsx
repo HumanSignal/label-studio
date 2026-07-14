@@ -20,14 +20,23 @@ import ResizeObserver from "../../utils/resize-observer";
 import { debounce } from "@humansignal/core/lib/utils/debounce";
 import Constants from "../../core/Constants";
 import { fixRectToFit, mapKonvaBrightness } from "../../utils/image";
-import { FF_DEV_1442, FF_LSDV_4930, FF_ZOOM_OPTIM, isFF } from "../../utils/feature-flags";
+import { FF_DEV_1442, FF_LSDV_4930, FF_POLYGON_FREEHAND, FF_ZOOM_OPTIM, isFF } from "../../utils/feature-flags";
 import { Pagination } from "../../common/Pagination/Pagination";
 import { Image } from "./Image";
+import {
+  appendFreehandPoint,
+  FREEHAND_MIN_DISTANCE,
+  FREEHAND_SIMPLIFY_EPSILON,
+  simplifyFreehandPoints,
+} from "../../utils/freehand";
 
 Konva.showWarnings = false;
 
 const hotkeys = Hotkey("Image");
 const imgDefaultProps = { crossOrigin: "anonymous" };
+const FREEHAND_COMPATIBILITY_GUARD_MS = 500;
+const FREEHAND_COMPATIBILITY_GUARD_DISTANCE = 25;
+const FREEHAND_DRAG_THRESHOLD = 5;
 
 export const splitRegions = (regions) => {
   const brushRegions = [];
@@ -516,6 +525,7 @@ export default observer(
     state = {
       imgStyle: {},
       pointer: [0, 0],
+      freehandPoints: [],
     };
 
     imageRef = createRef();
@@ -527,6 +537,12 @@ export default observer(
     skipNextMouseUp = false;
     mouseDownPoint = null;
     mouseDown = false;
+    freehandPointerId = null;
+    freehandCaptureTarget = null;
+    freehandTool = null;
+    freehandTrace = [];
+    freehandDragging = false;
+    freehandCompatibilityGuard = null;
 
     constructor(props) {
       super(props);
@@ -535,8 +551,212 @@ export default observer(
         props.store.settings.setSmoothing(props.item.smoothingEnabled);
     }
 
+    getFreehandTool = () => {
+      if (!isFF(FF_POLYGON_FREEHAND)) return null;
+      const tool = this.props.item.getToolsManager().findSelectedTool();
+
+      return tool?.toolName === "PolygonTool" && tool.canStartFreehand && tool.commitFreehand ? tool : null;
+    };
+
+    getFreehandPoint = (event) => {
+      const { item } = this.props;
+      const stage = item.stageRef;
+
+      if (!stage) return null;
+      if (Number.isFinite(event?.clientX) && Number.isFinite(event?.clientY)) stage.setPointersPositions(event);
+
+      const screen = stage.getPointerPosition();
+
+      if (!screen || !Number.isFinite(screen.x) || !Number.isFinite(screen.y)) return null;
+
+      const [canvasX, canvasY] = item.fixZoomedCoords([screen.x, screen.y]);
+
+      return {
+        screen,
+        canvas: { x: canvasX, y: canvasY },
+        internal: [item.canvasToInternalX(canvasX), item.canvasToInternalY(canvasY)],
+      };
+    };
+
+    appendFreehandEventPoint = (event, force = false) => {
+      const point = this.getFreehandPoint(event);
+
+      if (!point) return false;
+
+      const nextTrace = appendFreehandPoint(
+        this.freehandTrace,
+        { ...point.screen, internal: point.internal },
+        FREEHAND_MIN_DISTANCE,
+        force,
+      );
+
+      if (nextTrace === this.freehandTrace) return false;
+      this.freehandTrace = nextTrace;
+      if (!this.freehandDragging) {
+        const first = this.freehandTrace[0];
+        const last = this.freehandTrace[this.freehandTrace.length - 1];
+        const deltaX = last.x - first.x;
+        const deltaY = last.y - first.y;
+
+        this.freehandDragging = deltaX * deltaX + deltaY * deltaY >= FREEHAND_DRAG_THRESHOLD * FREEHAND_DRAG_THRESHOLD;
+      }
+      this.setState(({ freehandPoints }) => ({
+        freehandPoints: [...freehandPoints, point.canvas.x, point.canvas.y],
+      }));
+      return true;
+    };
+
+    attachFreehandFallback = () => {
+      window.addEventListener("pointermove", this.handlePointerMove, true);
+      window.addEventListener("pointerup", this.handlePointerUp, true);
+      window.addEventListener("pointercancel", this.handlePointerCancel, true);
+    };
+
+    detachFreehandFallback = () => {
+      window.removeEventListener("pointermove", this.handlePointerMove, true);
+      window.removeEventListener("pointerup", this.handlePointerUp, true);
+      window.removeEventListener("pointercancel", this.handlePointerCancel, true);
+    };
+
+    resetFreehand = ({ updateState = true } = {}) => {
+      const pointerId = this.freehandPointerId;
+      const captureTarget = this.freehandCaptureTarget;
+
+      this.freehandPointerId = null;
+      this.freehandCaptureTarget = null;
+      this.freehandTool = null;
+      this.freehandTrace = [];
+      this.freehandDragging = false;
+      this.detachFreehandFallback();
+      captureTarget?.removeEventListener?.("lostpointercapture", this.handleLostPointerCapture);
+      if (pointerId !== null && captureTarget?.hasPointerCapture?.(pointerId)) {
+        try {
+          captureTarget.releasePointerCapture(pointerId);
+        } catch {
+          // Synthetic events and capture-less browsers may not own native capture.
+        }
+      }
+
+      if (updateState) this.setState({ freehandPoints: [] });
+    };
+
+    rememberFreehandCompatibilityEvent = (event) => {
+      const clientX = Number.isFinite(event?.clientX) ? event.clientX : event?.offsetX;
+      const clientY = Number.isFinite(event?.clientY) ? event.clientY : event?.offsetY;
+
+      if (!Number.isFinite(clientX) || !Number.isFinite(clientY)) return;
+      this.freehandCompatibilityGuard = {
+        clientX,
+        clientY,
+        expiresAt: Date.now() + FREEHAND_COMPATIBILITY_GUARD_MS,
+      };
+    };
+
+    shouldSuppressFreehandCompatibilityEvent = (event) => {
+      if (!isFF(FF_POLYGON_FREEHAND)) return false;
+      if (this.freehandDragging) return true;
+
+      const guard = this.freehandCompatibilityGuard;
+
+      if (!guard || Date.now() > guard.expiresAt) return false;
+
+      const clientX = Number.isFinite(event?.clientX) ? event.clientX : event?.offsetX;
+      const clientY = Number.isFinite(event?.clientY) ? event.clientY : event?.offsetY;
+      const deltaX = clientX - guard.clientX;
+      const deltaY = clientY - guard.clientY;
+
+      return (
+        Number.isFinite(deltaX) &&
+        Number.isFinite(deltaY) &&
+        deltaX * deltaX + deltaY * deltaY <=
+          FREEHAND_COMPATIBILITY_GUARD_DISTANCE * FREEHAND_COMPATIBILITY_GUARD_DISTANCE
+      );
+    };
+
+    handlePointerDown = (eventLike) => {
+      const event = eventLike.evt || eventLike;
+
+      if (this.freehandPointerId !== null || event.isPrimary === false || (event.button ?? 0) !== 0) return;
+
+      const tool = this.getFreehandTool();
+
+      if (!tool?.canStartFreehand()) return;
+
+      const point = this.getFreehandPoint(event);
+
+      if (!point) return;
+
+      this.freehandCompatibilityGuard = null;
+      this.freehandPointerId = event.pointerId;
+      this.freehandTool = tool;
+      this.freehandTrace = appendFreehandPoint([], { ...point.screen, internal: point.internal });
+      this.setState({ freehandPoints: [point.canvas.x, point.canvas.y] });
+
+      const captureTarget = this.props.item.stageRef?.content;
+
+      this.freehandCaptureTarget = captureTarget ?? null;
+      captureTarget?.addEventListener?.("lostpointercapture", this.handleLostPointerCapture);
+      try {
+        captureTarget?.setPointerCapture?.(event.pointerId);
+      } catch {
+        // Continue with window listeners when pointer capture is unavailable.
+      }
+
+      if (!captureTarget?.hasPointerCapture?.(event.pointerId)) this.attachFreehandFallback();
+    };
+
+    handlePointerMove = (eventLike) => {
+      const event = eventLike.evt || eventLike;
+
+      if (event.pointerId !== this.freehandPointerId) return;
+
+      const coalescedSamples = event.getCoalescedEvents?.();
+      const samples = coalescedSamples?.length ? coalescedSamples : [event];
+
+      for (const sample of samples) this.appendFreehandEventPoint(sample);
+      if (this.freehandDragging) event.preventDefault?.();
+    };
+
+    handlePointerUp = (eventLike) => {
+      const event = eventLike.evt || eventLike;
+
+      if (event.pointerId !== this.freehandPointerId) return;
+
+      this.appendFreehandEventPoint(event, true);
+      const wasDragging = this.freehandDragging;
+
+      if (wasDragging) {
+        event.preventDefault?.();
+        this.rememberFreehandCompatibilityEvent(event);
+        const points = simplifyFreehandPoints(this.freehandTrace, FREEHAND_SIMPLIFY_EPSILON).map(
+          ({ internal }) => internal,
+        );
+
+        if (points.length >= 3 && this.freehandTool === this.getFreehandTool() && isAlive(this.freehandTool)) {
+          this.freehandTool.commitFreehand(points);
+        }
+      }
+
+      this.resetFreehand();
+    };
+
+    handlePointerCancel = (eventLike) => {
+      const event = eventLike.evt || eventLike;
+
+      if (event.pointerId !== this.freehandPointerId) return;
+      if (this.freehandDragging) this.rememberFreehandCompatibilityEvent(event);
+      this.resetFreehand();
+    };
+
+    handleLostPointerCapture = (event) => {
+      if (event.pointerId === this.freehandPointerId) this.resetFreehand();
+    };
+
     handleOnClick = (e) => {
       const { item } = this.props;
+      const evt = e.evt || e;
+
+      if (this.shouldSuppressFreehandCompatibilityEvent(evt)) return;
 
       if (isFF(FF_DEV_1442)) {
         this.handleDeferredMouseDown?.(true);
@@ -546,7 +766,6 @@ export default observer(
         return;
       }
 
-      const evt = e.evt || e;
       const { offsetX: x, offsetY: y } = evt;
 
       if (isFF(FF_LSDV_4930)) {
@@ -617,6 +836,7 @@ export default observer(
     };
 
     handleMouseDown = (e) => {
+      if (this.shouldSuppressFreehandCompatibilityEvent(e.evt || e)) return true;
       this.mouseDown = true;
       const { item } = this.props;
       const isPanTool = item.getToolsManager().findSelectedTool()?.fullName === "ZoomPanTool";
@@ -753,6 +973,7 @@ export default observer(
      */
     handleMouseUp = (e) => {
       this.mouseDown = false;
+      if (this.shouldSuppressFreehandCompatibilityEvent(e.evt || e)) return;
       const { item } = this.props;
 
       if (isFF(FF_DEV_1442)) {
@@ -775,6 +996,7 @@ export default observer(
     };
 
     handleMouseMove = (e) => {
+      if (this.shouldSuppressFreehandCompatibilityEvent(e.evt || e)) return;
       const { item } = this.props;
 
       item.freezeHistory();
@@ -984,6 +1206,7 @@ export default observer(
     };
 
     componentWillUnmount() {
+      this.resetFreehand({ updateState: false });
       this.detachObserver();
       window.removeEventListener("resize", this.onResize);
       window.removeEventListener("mousemove", this.handleGlobalMouseMove);
@@ -1152,6 +1375,10 @@ export default observer(
                 onMouseDown={this.handleMouseDown}
                 onMouseMove={this.handleMouseMove}
                 onMouseUp={this.handleMouseUp}
+                onPointerDown={this.handlePointerDown}
+                onPointerMove={this.handlePointerMove}
+                onPointerUp={this.handlePointerUp}
+                onPointerCancel={this.handlePointerCancel}
                 onWheel={item.zoom ? this.handleZoom : () => {}}
               />
             ) : null}
@@ -1191,6 +1418,10 @@ const EntireStage = observer(
     onMouseDown,
     onMouseMove,
     onMouseUp,
+    onPointerDown,
+    onPointerMove,
+    onPointerUp,
+    onPointerCancel,
     onWheel,
     crosshairRef,
   }) => {
@@ -1220,7 +1451,13 @@ const EntireStage = observer(
         ref={(ref) => {
           item.setStageRef(ref);
         }}
-        className={[styles["image-element"], ...imagePositionClassnames].join(" ")}
+        className={[
+          styles["image-element"],
+          ...imagePositionClassnames,
+          isFF(FF_POLYGON_FREEHAND) ? styles["freehand-enabled"] : null,
+        ]
+          .filter(Boolean)
+          .join(" ")}
         width={size.width}
         height={size.height}
         scaleX={item.zoomScale}
@@ -1237,6 +1474,10 @@ const EntireStage = observer(
         onMouseDown={onMouseDown}
         onMouseMove={onMouseMove}
         onMouseUp={onMouseUp}
+        onPointerDown={onPointerDown}
+        onPointerMove={onPointerMove}
+        onPointerUp={onPointerUp}
+        onPointerCancel={onPointerCancel}
         onWheel={onWheel}
       >
         <StageContent item={item} store={store} state={state} crosshairRef={crosshairRef} />
@@ -1440,6 +1681,19 @@ const StageContent = observer(({ item, store, state, crosshairRef }) => {
           <Fragment key={groupName} />
         );
       })}
+      {state.freehandPoints.length >= 4 && (
+        <Layer name="freehand-preview" listening={false}>
+          <Line
+            points={state.freehandPoints}
+            stroke="#1890ff"
+            strokeWidth={2}
+            strokeScaleEnabled={false}
+            lineCap="round"
+            lineJoin="round"
+            listening={false}
+          />
+        </Layer>
+      )}
       <Selection item={item} isPanning={state.isPanning} />
       <DrawingRegion item={item} />
       {item.smoothingEnabled === false && <PixelGridLayer item={item} />}

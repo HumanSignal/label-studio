@@ -12,6 +12,10 @@ Use with the following data types: image.
 
 {% insertmd includes/tags/polygon.md %}
 
+### Freehand drawing
+
+When the `fflag_feat_front_polygon_freehand` feature flag is enabled, select the Polygon tool and press and drag to draw a contour with a mouse, pen, or primary touch. The contour is simplified when the pointer is released and is saved as one undoable polygon. The flag is off by default; with it disabled, the existing click-to-place behavior is unchanged.
+
 ### Example
 
 Basic labeling configuration for polygonal image segmentation
