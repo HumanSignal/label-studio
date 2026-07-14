@@ -1,12 +1,16 @@
 import {
+  type CellContext,
   type Column,
   type ColumnDef,
+  type ColumnDefTemplate,
+  type ColumnSizingColumnDef,
   flexRender,
   getCoreRowModel,
   getSortedRowModel,
   type HeaderContext,
   type Row,
   type SortingState,
+  type StringOrTemplateHeader,
   type Table,
   type TableMeta,
   useReactTable,
@@ -32,6 +36,21 @@ import { Typography } from "../typography/typography";
 import styles from "./data-table.module.css";
 
 export type DataShape = Record<string, any>[];
+export type DataTableHeaders<T extends DataShape> = {
+  [key in keyof T[number]]?: StringOrTemplateHeader<T[number], unknown>;
+};
+
+export type DataTableCells<T extends DataShape> = {
+  [key in keyof T[number]]?: ColumnDefTemplate<CellContext<T[number], T[number][key]>>;
+} & {
+  restCells?: ColumnDefTemplate<CellContext<T[number], T[number][string]>>;
+};
+
+export type DataTableSizes<T extends DataShape> = {
+  [key in keyof T[number]]?: ColumnSizingColumnDef;
+} & {
+  restColumns?: ColumnSizingColumnDef;
+};
 
 /**
  * Extended ColumnDef type that includes custom properties for generic DataTable
@@ -44,6 +63,9 @@ export type DataTableProps<T extends DataShape> = {
   data: T;
   meta?: TableMeta<any>;
   columns?: ExtendedDataTableColumnDef<T[number]>[];
+  headers?: DataTableHeaders<T>;
+  cells?: DataTableCells<T>;
+  sizes?: DataTableSizes<T>;
   extraColumns?: ColumnDef<any>[];
   includeColumns?: (keyof T[number])[];
   excludeColumns?: (keyof T[number])[];
@@ -56,8 +78,10 @@ export type DataTableProps<T extends DataShape> = {
   cellSizesStorageKey?: string;
   /** Fires after layout with pixel widths from TanStack (resize, visibility, pin). Use to align external footer rows. */
   onLeafColumnSizesChange?: (sizesByColumnId: Record<string, number>) => void;
-  onRowClick?: (row?: Row<T[number]>) => void;
+  onRowClick?: (row?: Row<T[number]>, event?: React.MouseEvent<HTMLDivElement>) => void;
   rowClassName?: (row: Row<T[number]>) => string | undefined;
+  rowDataTestId?: (row: Row<T[number]>) => string | undefined;
+  bodyCellClassName?: string;
   selectable?: boolean;
   rowSelection?: Record<string, boolean>;
   onRowSelectionChange?: (
@@ -425,10 +449,10 @@ export const DataTable = <T extends DataShape>(props: DataTableProps<T>) => {
   const rows = table.getRowModel().rows;
 
   const handleRowClick = useCallback(
-    (row?: Row<T[number]>) => {
+    (row?: Row<T[number]>, event?: React.MouseEvent<HTMLDivElement>) => {
       // Call parent's onRowClick handler if provided
       if (props.onRowClick) {
-        props.onRowClick(row);
+        props.onRowClick(row, event);
       }
       // Active state is only enabled when onRowClick is provided
       // No internal state management for active rows
@@ -483,6 +507,8 @@ export const DataTable = <T extends DataShape>(props: DataTableProps<T>) => {
         <MemoizedDataTableBody
           rows={rows}
           rowClassName={props.rowClassName}
+          rowDataTestId={props.rowDataTestId}
+          bodyCellClassName={props.bodyCellClassName}
           onRowClick={props.onRowClick ? handleRowClick : undefined}
           columnVisibility={props.columnVisibility}
           columnSizing={columnSizing}
@@ -580,12 +606,22 @@ const DataTableHead = <T extends Record<string, unknown>>({ table }: DataTableHe
 interface DataTableRowProps<T> {
   row: Row<T>;
   className?: string;
-  onRowClick?: (row?: Row<T>) => void;
+  onRowClick?: (row?: Row<T>, event?: React.MouseEvent<HTMLDivElement>) => void;
+  dataTestId?: string;
+  bodyCellClassName?: string;
   isSelected?: boolean;
   isActive?: boolean;
 }
 
-const DataTableRow = <T,>({ row, className, onRowClick, isSelected, isActive }: DataTableRowProps<T>) => {
+const DataTableRow = <T,>({
+  row,
+  className,
+  onRowClick,
+  dataTestId,
+  bodyCellClassName,
+  isSelected,
+  isActive,
+}: DataTableRowProps<T>) => {
   const isError = className?.includes("error") || className?.includes("bodyRowError");
 
   const handleRowClick = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -594,7 +630,7 @@ const DataTableRow = <T,>({ row, className, onRowClick, isSelected, isActive }: 
     if (target.closest('input[type="checkbox"]') || target.closest(".checkbox")) {
       return;
     }
-    onRowClick?.(row);
+    onRowClick?.(row, e);
   };
 
   return (
@@ -608,7 +644,7 @@ const DataTableRow = <T,>({ row, className, onRowClick, isSelected, isActive }: 
         className,
       )}
       onClick={onRowClick ? handleRowClick : undefined}
-      data-testid={`data-table-row-${row.id}`}
+      data-testid={dataTestId ?? `data-table-row-${row.id}`}
     >
       {row.getVisibleCells().map((cell) => {
         const pinSide = cell.column.getIsPinned();
@@ -629,6 +665,7 @@ const DataTableRow = <T,>({ row, className, onRowClick, isSelected, isActive }: 
               styles.bodyCell,
               pinSide === "right" && styles.bodyCellPinnedRight,
               pinSide === "left" && styles.bodyCellPinnedLeft,
+              bodyCellClassName,
             )}
             key={cell.id}
             style={style}
@@ -645,8 +682,10 @@ const DataTableRow = <T,>({ row, className, onRowClick, isSelected, isActive }: 
 
 interface DataTableBodyProps<T> {
   rows: Row<T>[];
-  onRowClick?: (row?: Row<T>) => void;
+  onRowClick?: (row?: Row<T>, event?: React.MouseEvent<HTMLDivElement>) => void;
   rowClassName?: (row: Row<T>) => string | undefined;
+  rowDataTestId?: (row: Row<T>) => string | undefined;
+  bodyCellClassName?: string;
   columnVisibility?: Record<string, boolean>;
   columnSizing?: Record<string, number>;
   rowSelection?: Record<string, boolean>;
@@ -660,6 +699,8 @@ const DataTableBody = <T,>({
   rows,
   onRowClick,
   rowClassName,
+  rowDataTestId,
+  bodyCellClassName,
   columnVisibility: _columnVisibility, // used to retrigger memo
   columnSizing: _columnSizing,
   rowSelection, // used to retrigger memo when selection changes
@@ -674,6 +715,8 @@ const DataTableBody = <T,>({
           key={row.id}
           row={row}
           className={rowClassName?.(row) ?? ""}
+          dataTestId={rowDataTestId?.(row)}
+          bodyCellClassName={bodyCellClassName}
           onRowClick={onRowClick}
           isSelected={rowSelection?.[row.id] === true}
           isActive={activeRowId === row.id}
@@ -690,6 +733,8 @@ const MemoizedDataTableBody = memo(DataTableBody, (prev, next) => {
     JSON.stringify(prev.columnSizing) === JSON.stringify(next.columnSizing) &&
     JSON.stringify(prev.rowSelection) === JSON.stringify(next.rowSelection) &&
     prev.activeRowId === next.activeRowId &&
+    prev.rowDataTestId === next.rowDataTestId &&
+    prev.bodyCellClassName === next.bodyCellClassName &&
     prev.bodyClassName === next.bodyClassName &&
     prev.onBodyScroll === next.onBodyScroll
   );
