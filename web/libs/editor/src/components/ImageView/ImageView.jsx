@@ -558,6 +558,35 @@ export default observer(
       return tool?.toolName === "PolygonTool" && tool.canStartFreehand && tool.commitFreehand ? tool : null;
     };
 
+    isRightElementToCatchToolInteractions = (element, isMoveTool) => {
+      // Bitmask is like Brush, so treat it the same. The only difference is
+      // that Bitmask doesn't have a group inside.
+      if (element.nodeType === "Layer" && !isMoveTool && element.attrs?.name === "bitmask") return true;
+
+      if (element.nodeType === "Group") {
+        // It could be ruler or segmentation.
+        if (element.attrs?.name === "ruler") return true;
+
+        // Segmentation is specific for Brushes, but click interaction on the
+        // region covers the same MoveTool interaction, so ignore MoveTool here
+        // to prevent conflicts.
+        if (!isMoveTool && element.attrs?.name === "segmentation") return true;
+      }
+
+      return false;
+    };
+
+    isToolInteractionTarget = (target, isMoveTool = false) => {
+      const { item } = this.props;
+
+      if (!target) return false;
+      return (
+        item.getSkipInteractions() ||
+        target === item.stageRef ||
+        findClosestParent(target, (element) => this.isRightElementToCatchToolInteractions(element, isMoveTool))
+      );
+    };
+
     getFreehandPoint = (event) => {
       const { item } = this.props;
       const stage = item.stageRef;
@@ -681,6 +710,13 @@ export default observer(
       const tool = this.getFreehandTool();
 
       if (!tool?.canStartFreehand()) return;
+
+      const { item } = this.props;
+
+      item.updateSkipInteractions(eventLike);
+      if (item.annotation.isReadOnly()) return;
+      if (eventLike.target?.getParent?.()?.className === "Transformer") return;
+      if (!this.isToolInteractionTarget(eventLike.target)) return;
 
       const point = this.getFreehandPoint(event);
 
@@ -860,34 +896,7 @@ export default observer(
           e.evt.preventDefault();
         }
 
-        const isRightElementToCatchToolInteractions = (el) => {
-          // Bitmask is like Brush, so treat it the same
-          // The only difference is that Bitmask doesn't have a group inside
-          if (el.nodeType === "Layer" && !isMoveTool && el.attrs?.name === "bitmask") {
-            return true;
-          }
-
-          // It could be ruler ot segmentation
-          if (el.nodeType === "Group") {
-            if (el?.attrs?.name === "ruler") {
-              return true;
-            }
-            // segmentation is specific for Brushes
-            // but click interaction on the region covers the case of the same MoveTool interaction here,
-            // so it should ignore move tool interaction to prevent conflicts
-            if (!isMoveTool && el?.attrs?.name === "segmentation") {
-              return true;
-            }
-          }
-          return false;
-        };
-
-        if (
-          // create regions over another regions with Cmd/Ctrl pressed
-          item.getSkipInteractions() ||
-          e.target === item.stageRef ||
-          findClosestParent(e.target, isRightElementToCatchToolInteractions)
-        ) {
+        if (this.isToolInteractionTarget(e.target, isMoveTool)) {
           window.addEventListener("mousemove", this.handleGlobalMouseMove);
           window.addEventListener("mouseup", this.handleGlobalMouseUp);
           const { offsetX: x, offsetY: y } = e.evt;
@@ -1426,6 +1435,8 @@ const EntireStage = observer(
     crosshairRef,
   }) => {
     const { store } = item;
+    const selectedTool = item.getToolsManager().findSelectedTool();
+    const freehandEnabled = isFF(FF_POLYGON_FREEHAND) && selectedTool?.toolName === "PolygonTool";
     let size;
     let position;
 
@@ -1454,7 +1465,7 @@ const EntireStage = observer(
         className={[
           styles["image-element"],
           ...imagePositionClassnames,
-          isFF(FF_POLYGON_FREEHAND) ? styles["freehand-enabled"] : null,
+          freehandEnabled ? styles["freehand-enabled"] : null,
         ]
           .filter(Boolean)
           .join(" ")}

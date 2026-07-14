@@ -251,6 +251,7 @@ function createFreehandPointerHarness() {
   return {
     commitFreehand,
     item,
+    stageRef,
     setTransformOffset: (offset) => {
       transformOffset = offset;
     },
@@ -1276,10 +1277,17 @@ describe("ImageView with feature flags", () => {
 
   it("creates points from a pointer drag only when freehand drawing is enabled", () => {
     const { isFF } = require("../../../utils/feature-flags");
-    const { commitFreehand, view } = createFreehandPointerHarness();
+    const { commitFreehand, stageRef, view } = createFreehandPointerHarness();
     const drag = () => {
       act(() => {
-        view().handlePointerDown({ pointerId: 1, isPrimary: true, button: 0, clientX: 10, clientY: 10 });
+        view().handlePointerDown({
+          target: stageRef,
+          pointerId: 1,
+          isPrimary: true,
+          button: 0,
+          clientX: 10,
+          clientY: 10,
+        });
         view().handlePointerMove({
           pointerId: 1,
           clientX: 40,
@@ -1304,11 +1312,18 @@ describe("ImageView with feature flags", () => {
 
   it("keeps each sample in the coordinate transform active when it was collected", () => {
     const { isFF } = require("../../../utils/feature-flags");
-    const { commitFreehand, setTransformOffset, view } = createFreehandPointerHarness();
+    const { commitFreehand, setTransformOffset, stageRef, view } = createFreehandPointerHarness();
 
     isFF.mockImplementation((flag) => flag === "fflag_feat_front_polygon_freehand");
     act(() => {
-      view().handlePointerDown({ pointerId: 1, isPrimary: true, button: 0, clientX: 10, clientY: 10 });
+      view().handlePointerDown({
+        target: stageRef,
+        pointerId: 1,
+        isPrimary: true,
+        button: 0,
+        clientX: 10,
+        clientY: 10,
+      });
       view().handlePointerMove({ pointerId: 1, clientX: 40, clientY: 10, preventDefault: jest.fn() });
       setTransformOffset(100);
       view().handlePointerMove({ pointerId: 1, clientX: 40, clientY: 40, preventDefault: jest.fn() });
@@ -1325,11 +1340,18 @@ describe("ImageView with feature flags", () => {
 
   it("lets a below-threshold pointer gesture continue through the stock click path", () => {
     const { isFF } = require("../../../utils/feature-flags");
-    const { commitFreehand, item, view } = createFreehandPointerHarness();
+    const { commitFreehand, item, stageRef, view } = createFreehandPointerHarness();
 
     isFF.mockImplementation((flag) => flag === "fflag_feat_front_polygon_freehand");
     act(() => {
-      view().handlePointerDown({ pointerId: 1, isPrimary: true, button: 0, clientX: 10, clientY: 10 });
+      view().handlePointerDown({
+        target: stageRef,
+        pointerId: 1,
+        isPrimary: true,
+        button: 0,
+        clientX: 10,
+        clientY: 10,
+      });
       view().handlePointerMove({ pointerId: 1, clientX: 13, clientY: 10, preventDefault: jest.fn() });
       view().handlePointerUp({ pointerId: 1, clientX: 13, clientY: 10, preventDefault: jest.fn() });
     });
@@ -1338,5 +1360,112 @@ describe("ImageView with feature flags", () => {
     expect(view().shouldSuppressFreehandCompatibilityEvent({ clientX: 13, clientY: 10 })).toBe(false);
     view().handleOnClick({ evt: { offsetX: 13, offsetY: 10, clientX: 13, clientY: 10 } });
     expect(item.event).toHaveBeenCalledWith("click", expect.anything(), 13, 10);
+  });
+
+  it("does not start freehand drawing from an existing region or transformer", () => {
+    const { isFF } = require("../../../utils/feature-flags");
+    const { commitFreehand, view } = createFreehandPointerHarness();
+    const dragFrom = (target, pointerId) => {
+      act(() => {
+        view().handlePointerDown({
+          target,
+          pointerId,
+          isPrimary: true,
+          button: 0,
+          clientX: 10,
+          clientY: 10,
+        });
+        view().handlePointerMove({ pointerId, clientX: 40, clientY: 10, preventDefault: jest.fn() });
+        view().handlePointerMove({ pointerId, clientX: 40, clientY: 40, preventDefault: jest.fn() });
+        view().handlePointerUp({ pointerId, clientX: 10, clientY: 40, preventDefault: jest.fn() });
+      });
+    };
+    const region = { parent: null, getParent: () => null };
+    const transformer = { className: "Transformer" };
+    const anchor = { parent: transformer, getParent: () => transformer };
+
+    isFF.mockImplementation((flag) => flag === "fflag_feat_front_polygon_freehand");
+    dragFrom(region, 1);
+    dragFrom(anchor, 2);
+
+    expect(commitFreehand).not.toHaveBeenCalled();
+    expect(view().freehandPointerId).toBeNull();
+  });
+
+  it("does not start freehand drawing on a read-only annotation", () => {
+    const { isFF } = require("../../../utils/feature-flags");
+    const { commitFreehand, item, stageRef, view } = createFreehandPointerHarness();
+
+    item.annotation.isReadOnly = () => true;
+    isFF.mockImplementation((flag) => flag === "fflag_feat_front_polygon_freehand");
+    act(() => {
+      view().handlePointerDown({
+        target: stageRef,
+        pointerId: 1,
+        isPrimary: true,
+        button: 0,
+        clientX: 10,
+        clientY: 10,
+      });
+      view().handlePointerMove({ pointerId: 1, clientX: 40, clientY: 10, preventDefault: jest.fn() });
+      view().handlePointerUp({ pointerId: 1, clientX: 40, clientY: 40, preventDefault: jest.fn() });
+    });
+
+    expect(commitFreehand).not.toHaveBeenCalled();
+    expect(view().freehandPointerId).toBeNull();
+  });
+
+  it("allows freehand drawing over a region when Cmd/Ctrl interaction skipping is active", () => {
+    const { isFF } = require("../../../utils/feature-flags");
+    const { commitFreehand, item, view } = createFreehandPointerHarness();
+    const region = { parent: null, getParent: () => null };
+    let skipInteractions = false;
+
+    item.updateSkipInteractions = jest.fn(({ evt }) => {
+      skipInteractions = evt.metaKey || evt.ctrlKey;
+    });
+    item.getSkipInteractions = () => skipInteractions;
+    isFF.mockImplementation((flag) => flag === "fflag_feat_front_polygon_freehand");
+    act(() => {
+      view().handlePointerDown({
+        target: region,
+        evt: {
+          pointerId: 1,
+          isPrimary: true,
+          button: 0,
+          clientX: 10,
+          clientY: 10,
+          metaKey: true,
+        },
+      });
+      view().handlePointerMove({ pointerId: 1, clientX: 40, clientY: 10, preventDefault: jest.fn() });
+      view().handlePointerMove({ pointerId: 1, clientX: 40, clientY: 40, preventDefault: jest.fn() });
+      view().handlePointerUp({ pointerId: 1, clientX: 10, clientY: 40, preventDefault: jest.fn() });
+    });
+
+    expect(item.updateSkipInteractions).toHaveBeenCalledTimes(1);
+    expect(commitFreehand).toHaveBeenCalledTimes(1);
+  });
+
+  it("enables touch-action suppression only while Polygon is selected", () => {
+    const { isFF } = require("../../../utils/feature-flags");
+    const store = createStore();
+    const polygonTool = { toolName: "PolygonTool" };
+    const polygonItem = createItem({
+      getToolsManager: () => ({ findSelectedTool: () => polygonTool, allTools: () => [polygonTool] }),
+    });
+    const rectangleTool = { toolName: "RectangleTool" };
+    const rectangleItem = createItem({
+      getToolsManager: () => ({ findSelectedTool: () => rectangleTool, allTools: () => [rectangleTool] }),
+    });
+
+    polygonItem.store = store;
+    rectangleItem.store = store;
+    isFF.mockImplementation((flag) => flag === "fflag_feat_front_polygon_freehand");
+    const { rerender } = render(<ImageView item={polygonItem} store={store} />);
+    expect(screen.getByTestId("konva-stage").className).toContain("freehand-enabled");
+
+    rerender(<ImageView item={rectangleItem} store={store} />);
+    expect(screen.getByTestId("konva-stage").className).not.toContain("freehand-enabled");
   });
 });
