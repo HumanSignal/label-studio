@@ -1,5 +1,7 @@
+from types import SimpleNamespace
+
 import pytest
-from data_export.models import Export
+from data_export.models import DataExport, Export
 
 STORED_BASENAME = 'project-198575-at-2026-01-23-16-16-48a6bac9.json'
 STORED_PATH = f'198575/{STORED_BASENAME}'
@@ -95,3 +97,22 @@ def test_get_download_filename_strips_path_components():
     assert '/' not in result
     assert '\\' not in result
     assert '..' not in result
+
+
+@pytest.mark.parametrize(
+    ('use_custom_interface', 'disabled'),
+    [
+        (False, True),
+        (True, False),
+    ],
+)
+def test_doclang_export_format_applicability_for_empty_configs(use_custom_interface, disabled):
+    project = SimpleNamespace(
+        get_parsed_config=lambda: {},
+        lse_project=SimpleNamespace(use_custom_interface=use_custom_interface),
+    )
+
+    formats = DataExport.get_export_formats(project)
+    doclang = next(format_info for format_info in formats if format_info['name'] == 'DOCLANG')
+
+    assert doclang.get('disabled', False) is disabled

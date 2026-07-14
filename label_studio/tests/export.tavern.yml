@@ -233,6 +233,15 @@ stages:
           - "brush annotations"
         name: "BRUSH_TO_COCO"
         disabled: true
+      - title: DocLang (.dclx)
+        description: Package annotations from the Docling Interface as DocLang OPC archives
+          (document.xml + page image) for downstream Docling model training.
+        link: https://github.com/doclang-project/doclang/blob/main/spec.md#doclang-archive-format
+        tags:
+        - document
+        - docling
+        name: DOCLANG
+        disabled: true
 
 
     status_code: 200
