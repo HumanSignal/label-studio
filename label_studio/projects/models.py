@@ -724,6 +724,32 @@ class Project(ProjectMixin, FsmHistoryStateModel):
                 return None
             return f'{count} {type}{"s" if count > 1 else ""}'
 
+        parsed_config = parse_config(config_string)
+        tag_types = {tag_info['type'] for _, tag_info in parsed_config.items()}
+
+        def add_separated_video_object_labels(control_tag_from_config, labels_from_config_by_tag):
+            # DEV-1990 Workaround for Video labels as there are no labels in separated VideoRectangle/VideoVector tags.
+            # Their annotation results store selected labels under the VideoRectangle/VideoVector control name, while
+            # the label values are declared by a sibling Labels tag targeting the same Video object.
+            control_tag_info = parsed_config.get(control_tag_from_config)
+            if (
+                labels_from_config_by_tag
+                or not control_tag_info
+                or control_tag_info.get('type') not in {'VideoRectangle', 'VideoVector'}
+            ):
+                return labels_from_config_by_tag
+
+            control_to_names = set(control_tag_info.get('to_name') or [])
+            if not control_to_names:
+                return labels_from_config_by_tag
+
+            for sibling_tag, sibling_tag_info in parsed_config.items():
+                if sibling_tag_info.get('type') != 'Labels':
+                    continue
+                if control_to_names.intersection(sibling_tag_info.get('to_name') or []):
+                    labels_from_config_by_tag |= set(labels_from_config.get(sibling_tag, []))
+            return labels_from_config_by_tag
+
         for control_tag_from_data, labels_from_data in created_labels.items():
             # Check if labels created in annotations, and their control tag has been removed
             if (
@@ -738,15 +764,11 @@ class Project(ProjectMixin, FsmHistoryStateModel):
                     f'There are {sum(labels_from_data.values(), 0)} annotation(s) created with tag '
                     f'"{control_tag_from_data}", you can\'t remove it'
                 )
-            labels_from_config_by_tag = set(
-                labels_from_config[get_original_fromname_by_regex(config_string, control_tag_from_data)]
+            control_tag_from_config = get_original_fromname_by_regex(config_string, control_tag_from_data)
+            labels_from_config_by_tag = set(labels_from_config[control_tag_from_config])
+            labels_from_config_by_tag = add_separated_video_object_labels(
+                control_tag_from_config, labels_from_config_by_tag
             )
-            parsed_config = parse_config(config_string)
-            tag_types = [tag_info['type'] for _, tag_info in parsed_config.items()]
-            # DEV-1990 Workaround for Video labels as there are no labels in VideoRectangle/VideoVectorLabels tag
-            if 'VideoRectangle' in tag_types or 'VideoVectorLabels' in tag_types:
-                for key in labels_from_config:
-                    labels_from_config_by_tag |= set(labels_from_config[key])
             if 'Taxonomy' in tag_types:
                 custom_tags = Label.objects.filter(links__project=self).values_list('value', flat=True)
                 flat_custom_tags = set([item for sublist in custom_tags for item in sublist])
@@ -1574,7 +1596,7 @@ class ProjectSummary(models.Model):
         if not isinstance(result, dict):
             return []
         result_type = result.get('type')
-        # DEV-1990 Workaround for Video labels as there are no labels in VideoRectangle tag
+        # DEV-1990 Workaround for Video labels as there are no labels in VideoRectangle/VideoVector tags
         if result_type in ['videorectangle', 'videovector']:
             result_type = 'labels'
         value = result.get('value')
