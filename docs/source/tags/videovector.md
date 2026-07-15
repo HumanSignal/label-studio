@@ -11,6 +11,8 @@ The `VideoVector` tag brings vector annotation capabilities to videos. It works 
 
 Use with the following data types: video.
 
+<iframe class="video-border" width="100%" height="400vh" src="https://www.youtube.com/embed/NR0CkXODEbk" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+
 ## How keyframes work
 
 You annotate a vector on a single frame and Label Studio stores that frame as a keyframe. When you move points, add points, or close the path on a later frame, a new keyframe is created. Label Studio linearly interpolates each vertex position (including bezier control points) between keyframes, so the vector follows your object as the video plays.
