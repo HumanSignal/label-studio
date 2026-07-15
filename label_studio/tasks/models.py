@@ -241,9 +241,17 @@ class Task(TaskMixin, FsmHistoryStateModel):
                 # tasks where there is no predictions matching current
                 # model version. In case it will return a model_version
                 # and we can grab predictions explicitly
-                if isinstance(new_predictions, str):
+                #
+                # A backend may report model_version as a non-string scalar
+                # (e.g. an int from its setup response), so treat any scalar
+                # as the model_version fast-path rather than only ``str``.
+                if isinstance(new_predictions, (str, int)):
                     model_version = new_predictions
                     return predictions.filter(model_version=model_version)
+                elif new_predictions is None:
+                    # predict_tasks() returns None when the backend is not
+                    # ready; degrade to an empty (iterable) result.
+                    return []
                 else:
                     return new_predictions
             else:
