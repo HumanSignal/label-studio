@@ -11,7 +11,16 @@ The `VideoVector` tag brings vector annotation capabilities to videos. It works 
 
 Use with the following data types: video.
 
+!!! note Availability
+    The `VideoVector` and `VideoVectorLabels` tags are currently available in Label Studio Enterprise (including self-hosted) and Starter Cloud only.
+
 <iframe class="video-border" width="100%" height="400vh" src="https://www.youtube.com/embed/NR0CkXODEbk" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+
+## Use with SAM2 for video segmentation
+
+`VideoVector` is especially powerful when paired with [Segment Anything Model 2 (SAM2)](/guide/ml_tutorials/segment_anything_2_video.html). Instead of drawing and adjusting vectors on every frame by hand, you place a vector on a keyframe and let SAM2 track and propagate the object across the video, so you only fix up the frames where the model drifts. This combination is where these tags really shine for object tracking and video segmentation workflows.
+
+For a step-by-step setup, see the [SAM2 with Videos ML backend tutorial](/guide/ml_tutorials/segment_anything_2_video.html). A dedicated blog post walking through `VideoVector` + SAM2 is coming soon.
 
 ## How keyframes work
 

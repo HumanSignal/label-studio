@@ -11,6 +11,11 @@ The `VideoVectorLabels` tag creates labeled vectors on video frames. It combines
 
 Use with the following data types: video.
 
+!!! note Availability
+    The `VideoVector` and `VideoVectorLabels` tags are currently available in Label Studio Enterprise (including self-hosted) and Starter Cloud only.
+
+These tags pair well with [SAM2](/guide/ml_tutorials/segment_anything_2_video.html) for video segmentation and object tracking. See [VideoVector](/tags/videovector.html#Use-with-SAM2-for-video-segmentation) for details.
+
 ## Parameters
 
 {% insertmd includes/tags/videovectorlabels.md %}
