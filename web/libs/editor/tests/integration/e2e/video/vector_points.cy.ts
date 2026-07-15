@@ -85,4 +85,43 @@ describe("Video vector - Shift+Click point insertion", suiteConfig, () => {
     Hotkeys.unselectAllRegions();
     Sidebar.hasSelectedRegions(0);
   });
+
+  it("keeps the video viewport and frame counter in sync after selecting a vector from the outliner", () => {
+    LabelStudio.params().config(videoVectorConfig).data(videoVectorData).withResult([]).init();
+
+    LabelStudio.waitForObjectsReady();
+    Sidebar.hasNoRegions();
+
+    cy.window().then((win) => {
+      if (!win.Htx.settings.selectAfterCreate) win.Htx.settings.toggleSelectAfterCreate();
+    });
+
+    Labels.select("Road");
+
+    // Draw a vector on frame 1, then finish and unselect it so the outliner
+    // selection path runs the video-region seek hook.
+    VideoView.clickAtRelative(0.2, 0.2);
+    VideoView.clickAtRelative(0.6, 0.2);
+    VideoView.clickAtRelative(0.6, 0.6);
+    VideoView.clickAtRelative(0.2, 0.6);
+    pointCount().should("eq", 4);
+    Hotkeys.unselectAllRegions();
+    Sidebar.hasSelectedRegions(1);
+    Hotkeys.unselectAllRegions();
+    Sidebar.hasSelectedRegions(0);
+
+    VideoView.clickAtFrame(16);
+    VideoView.frameCounter.should("contain.text", "16 of ");
+
+    Sidebar.toggleRegionSelection(0);
+    Sidebar.hasSelectedRegions(1);
+
+    cy.window().should((win) => {
+      const video = win.Htx.annotationStore.selected.names.get("video");
+      const counterText = win.document.querySelector(".lsf-video-segmentation .lsf-frames-control")?.textContent;
+
+      expect(video.ref.current.currentFrame).to.equal(video.frame);
+      expect(counterText).to.contain(`${video.frame} of `);
+    });
+  });
 });

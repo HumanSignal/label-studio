@@ -53,6 +53,8 @@ const TimelineComponent: FC<TimelineProps> = ({
     return currentPosition;
   });
 
+  getCurrentPosition.current = () => currentPosition;
+
   const step = useMemo(() => defaultStepSize * zoom, [zoom, defaultStepSize]);
 
   const handlers = useMemoizedHandlers({
