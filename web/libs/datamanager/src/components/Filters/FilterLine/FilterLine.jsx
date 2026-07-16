@@ -1,7 +1,7 @@
 import React from "react";
 import { observer } from "mobx-react";
 import { cn } from "../../../utils/bem";
-import { Button, Badge } from "@humansignal/ui";
+import { Badge, Button, EnterpriseBadge, Typography } from "@humansignal/ui";
 import { IconClose } from "@humansignal/icons";
 import { FilterDropdown } from "../FilterDropdown";
 import "./FilterLine.prefix.css";
@@ -17,6 +17,20 @@ import { filterFieldSearchHandler, findSelectedOption } from "../filter-helpers"
 import { RECENT_VALUE_PREFIX } from "../../../hooks/useRecentFilters";
 
 const RECENTS_AUTOSAVE_DELAY_MS = 500;
+
+export const isFilterEditingDisabled = (field) => field?.disabled || field?.filter_available === false;
+
+export const UnavailableFilterNotice = ({ reason }) => (
+  <Typography
+    as="div"
+    variant="body"
+    size="smallest"
+    role="status"
+    className={cn("filterLine").elem("unavailable").toClassName()}
+  >
+    {reason}
+  </Typography>
+);
 
 const Conjunction = observer(({ index, view, disabled }) => {
   return (
@@ -69,13 +83,18 @@ const FilterColumnPicker = observer(
         onChange={handleChange}
         placeholder={filter.field?.title || "Column"}
         size="small"
-        disabled={disabled || filter.field.disabled}
+        disabled={disabled || isFilterEditingDisabled(filter.field)}
         triggerProps={{
           style: { minWidth: 80 },
         }}
         renderSelected={(selectedOptions, placeholder) => {
           const opt = selectedOptions?.[0];
-          if (!opt) return <span>{placeholder}</span>;
+          if (!opt)
+            return (
+              <Typography as="span" variant="body" size="smallest">
+                {placeholder}
+              </Typography>
+            );
           const field = filter.field;
           const rawGroup = field ? getFilterGroupTitle(field) : null;
           const groupTitle = rawGroup ? rawGroup.charAt(0).toUpperCase() + rawGroup.slice(1) : undefined;
@@ -100,26 +119,19 @@ function filterFieldOptionRender({ item }) {
 
   if (original?._isHeader) {
     return (
-      <span
-        style={{
-          fontSize: 13,
-          fontWeight: 700,
-          color: "#8C8F9A",
-        }}
-      >
+      <Typography as="span" variant="label" size="small" className="text-neutral-content-subtler">
         {original?.field?.title ?? original?.title ?? "Recent"}
-      </span>
+      </Typography>
     );
   }
 
   const filter = original;
   const showEnterpriseBadge = filter?.field?.enterprise_badge;
   return (
-    <div
-      className={cn("filterLine").elem("selector").toClassName()}
-      style={{ display: "flex", alignItems: "center", gap: "6px" }}
-    >
-      <span>{filter?.field?.title}</span>
+    <div className={cn("filterLine").elem("selector").toClassName()}>
+      <Typography as="span" variant="body" size="small">
+        {filter?.field?.title}
+      </Typography>
       {showEnterpriseBadge && <EnterpriseBadge look="ghost" />}
       {filter?.field?.parent && (
         <Badge size="small" className="ml-tightest">
@@ -186,8 +198,12 @@ export const FilterLine = observer(
     disabledTooltip,
   }) => {
     const childFilter = filter.child_filter;
-    const isDisabled = disabled || filter.field.disabled;
+    // Editing controls are disabled when the tab is locked (UTC-949) or the filter is
+    // unavailable (FIT-2173); removal stays governed by lock only so unavailable filters
+    // remain removable.
+    const isDisabled = disabled || isFilterEditingDisabled(filter.field);
     const lockTooltip = disabled ? disabledTooltip : undefined;
+    const unavailableReason = filter.field.filter_available === false ? filter.field.unavailable_reason : null;
 
     // Debounced auto-save: persist current filter state to recents after it settles.
     const saveTimerRef = React.useRef(null);
@@ -214,7 +230,9 @@ export const FilterLine = observer(
           {/* Main filter row */}
           <div className={cn("filterLine").elem("column").mix("conjunction").toClassName()}>
             {index === 0 ? (
-              <span style={{ fontSize: 12, paddingRight: 5 }}>Where</span>
+              <Typography as="span" variant="body" size="smallest" className="pr-tightest">
+                Where
+              </Typography>
             ) : (
               <Conjunction index={index} view={view} disabled={disabled} />
             )}
@@ -222,7 +240,7 @@ export const FilterLine = observer(
 
           <div className={cn("filterLine").elem("column").mix("field").toClassName()}>
             <FilterDropdown
-              placeholder="Column"
+              placeholder={filter.field?.title || "Column"}
               defaultValue={filter.filter.id}
               items={availableFilters}
               dropdownClassName={dropdownClassName}
@@ -256,6 +274,7 @@ export const FilterLine = observer(
                   e.stopPropagation();
                   filter.delete();
                 }}
+                aria-label="Remove filter"
                 icon={<Icon icon={IconClose} size={12} />}
               />
             </div>
@@ -263,12 +282,16 @@ export const FilterLine = observer(
             <div className={cn("filterLine").elem("remove").toClassName()} />
           )}
 
+          {unavailableReason && <UnavailableFilterNotice reason={unavailableReason} />}
+
           {/* Child filter row */}
           {childFilter && (
             <>
               {/* Conjunction */}
               <div className={cn("filterLine").elem("column").mix("conjunction").toClassName()}>
-                <span style={{ fontSize: 12, paddingRight: 5 }}>and</span>
+                <Typography as="span" variant="body" size="smallest" className="pr-tightest">
+                  and
+                </Typography>
               </div>
 
               {/* Field — disabled, just shows the linked column name */}
@@ -303,6 +326,7 @@ export const FilterLine = observer(
                     e.stopPropagation();
                     filter.delete();
                   }}
+                  aria-label="Remove filter"
                   icon={<Icon icon={IconClose} size={12} />}
                 />
               </div>
@@ -317,7 +341,9 @@ export const FilterLine = observer(
       <div className={cn("filterLine").mod({ hasChild: !!childFilter }).toClassName()} data-testid="filter-line">
         <div className={cn("filterLine").elem("column").mix("conjunction").toClassName()}>
           {index === 0 ? (
-            <span style={{ fontSize: 12, paddingRight: 5 }}>Where</span>
+            <Typography as="span" variant="body" size="smallest" className="pr-tightest">
+              Where
+            </Typography>
           ) : (
             <Conjunction index={index} view={view} disabled={disabled} />
           )}
@@ -355,10 +381,13 @@ export const FilterLine = observer(
                 e.stopPropagation();
                 filter.delete();
               }}
+              aria-label="Remove filter"
               icon={<Icon icon={IconClose} size={12} />}
             />
           </div>
         )}
+
+        {unavailableReason && <UnavailableFilterNotice reason={unavailableReason} />}
 
         {/* Render child filters as additional grid items on new row */}
         {childFilter && (
@@ -367,7 +396,9 @@ export const FilterLine = observer(
             <div className={cn("filterLine").elem("remove").toClassName()} />
 
             <div className={cn("filterLine").elem("column").mix("conjunction").toClassName()}>
-              <span style={{ fontSize: 12, paddingRight: 5 }}>and</span>
+              <Typography as="span" variant="body" size="smallest" className="pr-tightest">
+                and
+              </Typography>
             </div>
 
             <div className={cn("filterLine").elem("column").mix("field child-field").toClassName()}>
@@ -400,6 +431,7 @@ export const FilterLine = observer(
                   e.stopPropagation();
                   filter.delete();
                 }}
+                aria-label="Remove filter"
                 icon={<Icon icon={IconClose} size={12} />}
               />
             </div>

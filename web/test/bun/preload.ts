@@ -417,7 +417,8 @@ const ensureHotkeyKeymapGuard = async () => {
 
 await ensureHotkeyKeymapGuard();
 
-globalThis.fetch = mock(async () => new Response("{}", { status: 200 })) as any;
+const createDefaultFetchMock = () => mock(async () => new Response("{}", { status: 200 })) as any;
+globalThis.fetch = createDefaultFetchMock();
 if (!(globalThis as any).customElements) {
   (globalThis as any).customElements = {
     define: mock(),
@@ -786,6 +787,7 @@ afterEach(() => {
   if (typeof (mock as any).restore === "function") {
     (mock as any).restore();
   }
+  globalThis.fetch = createDefaultFetchMock();
   resetMockState();
   if (typeof fetchMock.resetMocks === "function") fetchMock.resetMocks();
   if (destroySharedStores) destroySharedStores();

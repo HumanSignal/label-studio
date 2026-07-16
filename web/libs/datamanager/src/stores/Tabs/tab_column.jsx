@@ -86,6 +86,11 @@ export const TabColumn = types
     child_filter: types.maybeNull(types.string),
     // Whether filtering and selection is disabled for the column
     disabled: types.optional(types.boolean, false),
+    // Whether this field can be selected when creating or changing a filter.
+    available_for_new_filters: types.optional(types.boolean, true),
+    // Whether a persisted filter can currently be evaluated and edited.
+    filter_available: types.optional(types.boolean, true),
+    unavailable_reason: types.maybeNull(types.string),
     // Whether the column is hidden in the data manager, can't be toggled by the user
     hidden: types.optional(types.boolean, false),
     // Whether to show an EnterpriseBadge for the column
@@ -177,21 +182,21 @@ export const TabColumn = types
     get icon() {
       switch (self.alias) {
         case "total_annotations":
-          return <IconAnnotation width="20" height="20" style={{ color: "#617ADA" }} />;
+          return <IconAnnotation width="20" height="20" className="text-primary-icon" />;
         case "cancelled_annotations":
-          return <IconBanSquare width="20" height="20" style={{ color: "#DD0000" }} />;
+          return <IconBanSquare width="20" height="20" className="text-negative-icon" />;
         case "total_predictions":
-          return <IconSparkSquare width="20" height="20" style={{ color: "#944BFF" }} />;
+          return <IconSparkSquare width="20" height="20" className="text-accent-plum-bold" />;
         case "reviews_accepted":
-          return <IconThumbsUp width="20" height="20" style={{ color: "#2AA000" }} />;
+          return <IconThumbsUp width="20" height="20" className="text-positive-icon" />;
         case "reviews_rejected":
-          return <IconThumbsDown width="20" height="20" style={{ color: "#DD0000" }} />;
+          return <IconThumbsDown width="20" height="20" className="text-negative-icon" />;
         case "ground_truth":
-          return <IconStarSquare width="20" height="20" style={{ color: "#FFB700" }} />;
+          return <IconStarSquare width="20" height="20" className="text-warning-icon" />;
         case "comment_count":
-          return <IconCommentCheck width="20" height="20" style={{ color: "#FFB700" }} />;
+          return <IconCommentCheck width="20" height="20" className="text-warning-icon" />;
         case "unresolved_comment_count":
-          return <IconCommentRed width="20" height="20" style={{ color: "#FFB700" }} />;
+          return <IconCommentRed width="20" height="20" className="text-warning-icon" />;
         default:
           return null;
       }
@@ -219,7 +224,12 @@ export const TabColumn = types
 
     get isAnnotationResultsFilterColumn() {
       // these columns are not visible in the column selector, but are used for filtering
-      const hidden_column_ids = ["annotations_results_json", "predictions_results_json"];
+      const hidden_column_ids = [
+        "annotations_results_json",
+        "predictions_results_json",
+        "annotations_dimension_results",
+        "predictions_dimension_results",
+      ];
       return hidden_column_ids.some((id) => self.id.includes(`${id}.`) || self.id.endsWith(`:${id}`));
     },
   }))

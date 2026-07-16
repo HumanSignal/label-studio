@@ -100,7 +100,7 @@ export const Tab = types
     },
 
     get availableFilters() {
-      return self.parent.availableFilters;
+      return self.parent.availableFilters.filter((filter) => filter.field.available_for_new_filters);
     },
 
     get dataStore() {
@@ -482,7 +482,7 @@ export const Tab = types
     createFilter() {
       if (self.isLockedByManager) return self.notifyLocked();
       const lastFilter = self.filters.length > 0 ? self.filters[self.filters.length - 1] : null;
-      const filterType = lastFilter?.filter ?? self.availableFilters[0];
+      const filterType = lastFilter?.field.available_for_new_filters ? lastFilter.filter : self.availableFilters[0];
       const filter = TabFilter.create({
         filter: filterType,
         view: self.id,
