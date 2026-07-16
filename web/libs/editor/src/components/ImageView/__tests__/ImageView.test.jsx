@@ -1362,6 +1362,23 @@ describe("ImageView with feature flags", () => {
     expect(item.event).toHaveBeenCalledWith("click", expect.anything(), 13, 10);
   });
 
+  it("prunes a compatibility guard after its TTL", () => {
+    const { isFF } = require("../../../utils/feature-flags");
+    const { view } = createFreehandPointerHarness();
+    let now = 1000;
+
+    isFF.mockImplementation((flag) => flag === "fflag_feat_front_polygon_freehand");
+    view().freehandCompatibilityClock = () => now;
+    view().rememberFreehandCompatibilityEvent({ clientX: 10, clientY: 20 });
+
+    expect(view().freehandCompatibilityGuard.expiresAt).toBe(2500);
+    now = 2499;
+    expect(view().shouldSuppressFreehandCompatibilityEvent({ clientX: 10, clientY: 20 })).toBe(true);
+    now = 2501;
+    expect(view().shouldSuppressFreehandCompatibilityEvent({ clientX: 10, clientY: 20 })).toBe(false);
+    expect(view().freehandCompatibilityGuard).toBeNull();
+  });
+
   it("does not start freehand drawing from an existing region or transformer", () => {
     const { isFF } = require("../../../utils/feature-flags");
     const { commitFreehand, view } = createFreehandPointerHarness();

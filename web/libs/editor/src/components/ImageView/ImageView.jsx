@@ -34,7 +34,7 @@ Konva.showWarnings = false;
 
 const hotkeys = Hotkey("Image");
 const imgDefaultProps = { crossOrigin: "anonymous" };
-const FREEHAND_COMPATIBILITY_GUARD_MS = 500;
+const FREEHAND_COMPATIBILITY_GUARD_MS = 1500;
 const FREEHAND_COMPATIBILITY_GUARD_DISTANCE = 25;
 const FREEHAND_DRAG_THRESHOLD = 5;
 
@@ -543,6 +543,7 @@ export default observer(
     freehandTrace = [];
     freehandDragging = false;
     freehandCompatibilityGuard = null;
+    freehandCompatibilityClock = Date.now;
 
     constructor(props) {
       super(props);
@@ -677,7 +678,7 @@ export default observer(
       this.freehandCompatibilityGuard = {
         clientX,
         clientY,
-        expiresAt: Date.now() + FREEHAND_COMPATIBILITY_GUARD_MS,
+        expiresAt: this.freehandCompatibilityClock() + FREEHAND_COMPATIBILITY_GUARD_MS,
       };
     };
 
@@ -687,7 +688,11 @@ export default observer(
 
       const guard = this.freehandCompatibilityGuard;
 
-      if (!guard || Date.now() > guard.expiresAt) return false;
+      if (!guard) return false;
+      if (this.freehandCompatibilityClock() >= guard.expiresAt) {
+        this.freehandCompatibilityGuard = null;
+        return false;
+      }
 
       const clientX = Number.isFinite(event?.clientX) ? event.clientX : event?.offsetX;
       const clientY = Number.isFinite(event?.clientY) ? event.clientY : event?.offsetY;
