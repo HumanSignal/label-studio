@@ -79,7 +79,6 @@ Data in Label Studio is stored in one or two places, depending on your deploymen
 
 !!! info Tip
     There are several advanced security options for AWS and GCP storage, including: 
-    * [Application Default Credentials for GCP](storage_gcp#Application-Default-Credentials-for-enhanced-security-for-GCS) (on-prem only)
     * [IP filtering for GCP storage](storage_gcp#IP-filtering-for-enhanced-security-for-GCS)
     * [IP filtering and VPN for S3](storage_s3#IP-filtering-and-VPN-for-enhanced-security-for-S3-storage)
 
@@ -136,8 +135,8 @@ To ensure maximum security and isolation of your data behind a VPC, only allow a
     - Or limit your storage access to certain IPs or VPCs.
 
 **Configuration examples:**
-  - [AWS S3 Storage: IP Filtering and VPN for Enhanced Security](storage#IP-Filtering-and-VPN-for-Enhanced-Security-for-S3-storage).
-  - [Google Cloud Storage: IP Filtering for Enhanced Security](storage#IP-Filtering-for-Enhanced-Security-for-GCS-storage).
+  - [AWS S3 Storage: IP Filtering and VPN for Enhanced Security](storage_s3#IP-filtering-and-VPN-for-enhanced-security-for-S3-storage).
+  - [Google Cloud Storage: IP Filtering for Enhanced Security](storage_gcp#IP-filtering-for-enhanced-security-for-GCS).
 
 <i>This image shows how you can securely configure source cloud storages with Label Studio using your VPC and IP restrictions</i>
 
