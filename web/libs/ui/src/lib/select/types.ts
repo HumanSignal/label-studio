@@ -2,10 +2,14 @@ import type { FC, ReactNode } from "react";
 
 export type SelectOptionData<T = any> = {
   value: T;
-  label?: string;
+  label?: ReactNode;
   hidden?: boolean;
   disabled?: boolean;
   children?: SelectOptionData<T>[];
+  /** Optional badge shown next to the option label. */
+  badge?: string;
+  /** Optional explanation shown in an info tooltip next to the option label. */
+  description?: string;
   /** Custom row height (px) for virtual-list mode; defaults to VARIABLE_LIST_ITEM_HEIGHT (40). */
   height?: number;
 };
@@ -34,6 +38,10 @@ export type OptionProps = {
   option?: any;
   /** Index passed to optionRenderer */
   optionIndex?: number;
+  /** Optional icon rendered before the option label. */
+  leadingIcon?: ReactNode;
+  /** Applies a persistent emphasis treatment to the option. */
+  highlighted?: boolean;
 };
 
 type ExtractStructOption<T> = T extends SelectOptionData ? T["value"] : never;
@@ -70,6 +78,10 @@ export type SelectProps<T, A extends SelectOption<T>[]> = {
   error?: boolean;
   autoSelectFirst?: boolean;
   searchable?: boolean;
+  /** Allow a search value that does not match an option to be selected as a new option. */
+  creatable?: boolean;
+  /** Label template for the create option; `{value}` is replaced with the search value. */
+  createOptionLabel?: string;
   searchPlaceholder?: string;
   /** Initial value for the search input field. Useful for restoring a previous search state. */
   defaultSearchValue?: string;

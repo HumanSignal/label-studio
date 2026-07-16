@@ -1,5 +1,5 @@
 import { isDefined } from "@humansignal/core/lib/utils/helpers";
-import { CaretDownIcon } from "@humansignal/icons";
+import { CaretDownIcon, IconPlus, InfoIcon } from "@humansignal/icons";
 import {
   Command,
   CommandEmpty,
@@ -19,6 +19,7 @@ import { Button } from "../button/button";
 import { Checkbox } from "../checkbox/checkbox";
 import { Label } from "../label/label";
 import { Typography } from "../typography/typography";
+import { Tooltip } from "../Tooltip/Tooltip";
 import styles from "./select.module.css";
 import type { OptionProps, SelectOption, SelectProps } from "./types.ts";
 
@@ -247,6 +248,8 @@ export const Select = forwardRef(
       labelProps,
       defaultValue,
       searchable,
+      creatable = false,
+      createOptionLabel = 'Add "{value}"',
       searchPlaceholder,
       defaultSearchValue = "",
       value: externalValue,
@@ -295,6 +298,7 @@ export const Select = forwardRef(
     const isOpen = controlledOpen !== undefined ? controlledOpen : internalIsOpen;
     const [selectedGroupExpanded, setSelectedGroupExpanded] = useState<boolean>(false);
     const [value, setValue] = useState<any>(initialValue);
+    const [createdOptions, setCreatedOptions] = useState<any[]>([]);
 
     valueRef.current = value;
     useEffect(() => {
@@ -314,9 +318,10 @@ export const Select = forwardRef(
       setValue(val);
     }, [externalValue, multiple]);
 
+    const allOptions = useMemo(() => [...options, ...createdOptions], [options, createdOptions]);
     const flatOptions = useMemo(() => {
-      return options.flatMap((option) => option?.children ?? option);
-    }, [options]);
+      return allOptions.flatMap((option) => option?.children ?? option);
+    }, [allOptions]);
 
     useEffect(() => {
       if (valueRef.current || !selectFirstIfEmpty || !flatOptions?.[0]) return;
@@ -439,6 +444,43 @@ export const Select = forwardRef(
       return result;
     }, [flatOptions, isSelected, value, multiple]);
 
+    const createValue = query.trim();
+    const canCreate =
+      creatable &&
+      !multiple &&
+      createValue.length > 0 &&
+      !flatOptions.some((option) => {
+        const optionValue = option?.value ?? option;
+        return String(optionValue).toLowerCase() === createValue.toLowerCase();
+      });
+    const [createLabelPrefix, createLabelSuffix = ""] = createOptionLabel.split("{value}");
+
+    const createOption = canCreate ? (
+      <Option
+        value={createValue}
+        label={
+          <>
+            {createLabelPrefix}
+            <strong className="inline-block max-w-[200px] truncate align-bottom">{createValue}</strong>
+            {createLabelSuffix}
+          </>
+        }
+        isOptionSelected={false}
+        multiple={false}
+        leadingIcon={
+          <IconPlus aria-hidden="true" className="!h-4 !w-4 shrink-0 self-center text-neutral-content-subtle" />
+        }
+        highlighted
+        onSelect={() => {
+          setCreatedOptions((previous) => {
+            if (previous.some((option) => option.value === createValue)) return previous;
+            return [...previous, { value: createValue, label: createValue }];
+          });
+          _onChange(createValue, false);
+        }}
+      />
+    ) : null;
+
     const onSearchInputHandler = useCallback(
       (e: React.ChangeEvent<HTMLInputElement>) => {
         const val = e.target.value;
@@ -468,8 +510,14 @@ export const Select = forwardRef(
                 const optionValue = option?.value ?? option;
 
                 return (
-                  <span key={`${optionValue}_${index}`} className="truncate only:w-full">
-                    {option?.label ?? optionValue}
+                  <span key={`${optionValue}_${index}`} className="flex min-w-0 items-center gap-2">
+                    <span className="truncate">{option?.label ?? optionValue}</span>
+                    {option?.badge && <Badge size="small">{option.badge}</Badge>}
+                    {option?.description && (
+                      <Tooltip title={option.description}>
+                        <InfoIcon className="h-4 w-4 shrink-0 cursor-help text-neutral-content-subtler" />
+                      </Tooltip>
+                    )}
                   </span>
                 );
               })}
@@ -500,9 +548,9 @@ export const Select = forwardRef(
                 key={`${val}_${idx}`}
                 value={val}
                 label={lab}
+                option={item}
                 {...(optionRenderer && {
                   optionRenderer,
-                  option: item,
                   optionIndex: idx,
                 })}
                 isOptionSelected={isOptionSelected}
@@ -581,9 +629,9 @@ export const Select = forwardRef(
                       key={`${val}_${i}`}
                       value={val}
                       label={lab}
+                      option={item}
                       {...(optionRenderer && {
                         optionRenderer,
-                        option: item,
                         optionIndex: i,
                       })}
                       isOptionSelected={isChildOptionSelected}
@@ -605,9 +653,9 @@ export const Select = forwardRef(
             key={`${optionValue}_${index}`}
             value={optionValue}
             label={label}
+            option={option}
             {...(optionRenderer && {
               optionRenderer,
-              option,
               optionIndex: index,
             })}
             isOptionSelected={isOptionSelected}
@@ -760,7 +808,10 @@ export const Select = forwardRef(
                       }}
                     </InfiniteLoader>
                   ) : (
-                    renderedOptions
+                    <>
+                      {renderedOptions}
+                      {createOption}
+                    </>
                   )}
                 </CommandGroup>
                 {footer && <div className="p-tight border-t border-neutral-border flex">{footer}</div>}
@@ -770,7 +821,7 @@ export const Select = forwardRef(
         </PopoverContent>
         <select
           name={props?.name}
-          value={selectedOptions.join(",") ?? ""}
+          value={selectedOptions.map((option) => option?.value ?? option).join(",")}
           ref={ref}
           disabled={disabled}
           className={styles.valueInput}
@@ -857,6 +908,8 @@ const Option = ({
   optionRenderer,
   option,
   optionIndex = 0,
+  leadingIcon,
+  highlighted,
 }: OptionProps) => {
   const keyDownHandler = useCallback(
     (e: any) => {
@@ -885,6 +938,8 @@ const Option = ({
     [onSelect, value],
   );
   const labelContent = optionRenderer && option ? optionRenderer({ option, index: optionIndex }) : (label ?? value);
+  const badge = option?.badge;
+  const description = option?.description;
   return (
     <CommandItem
       value={value}
@@ -932,9 +987,11 @@ const Option = ({
             "duration-150 ease-out",
           ],
           !multiple && isOptionSelected && ["bg-primary-emphasis"],
+          highlighted && "bg-primary-emphasis-subtle",
         )}
         data-disabled={disabled}
       >
+        {leadingIcon}
         {multiple && (
           <Checkbox
             tabIndex={-1}
@@ -944,8 +1001,14 @@ const Option = ({
             disabled={disabled}
           />
         )}
-        <div data-testid="select-option-label" className="w-full min-w-0 truncate">
-          {labelContent}
+        <div data-testid="select-option-label" className="flex w-full min-w-0 items-center gap-2">
+          <span className="truncate">{labelContent}</span>
+          {badge && <Badge size="small">{badge}</Badge>}
+          {description && (
+            <Tooltip title={description}>
+              <InfoIcon className="h-4 w-4 shrink-0 cursor-help text-neutral-content-subtler" />
+            </Tooltip>
+          )}
         </div>
       </div>
     </CommandItem>

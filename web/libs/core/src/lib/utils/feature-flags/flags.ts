@@ -86,6 +86,11 @@ export const FF_AGREEMENT_FILTERED = "fflag_feat_utc_239_filterable_agreement_co
 export const FF_UTC_428_CONSENSUS_CONTROL_TAG_AGREEMENT = "fflag_utc_428_consensus_control_tag_agreement";
 
 /**
+ * Add or update task-data columns from the Data Manager.
+ */
+export const FF_UTC_1012_ADD_OR_MODIFY_COLUMNS = "fflag_utc_1012_add_or_modify_columns";
+
+/**
  * FSM State Fields
  */
 export const FF_FSM_STATE_FIELDS = "fflag_feat_fit_710_fsm_state_fields";

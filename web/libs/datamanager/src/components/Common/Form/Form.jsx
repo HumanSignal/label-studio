@@ -431,7 +431,7 @@ Form.Builder = forwardRef(
       // bare value for our custom Select (Radix-based). Normalize to a string.
       const val =
         raw !== null && typeof raw === "object" && "target" in raw
-          ? String(raw?.target?.value ?? "")
+          ? String(raw?.target?.type === "checkbox" ? raw.target.checked : (raw?.target?.value ?? ""))
           : String(raw ?? "");
       setLiveValues((prev) => (prev[fieldName] === val ? prev : { ...prev, [fieldName]: val }));
     };
@@ -439,16 +439,19 @@ Form.Builder = forwardRef(
     const renderFields = (fields) => {
       return fields.map((field, index) => {
         if (!field) return <div key={`spacer-${index}`} />;
-        const { trigger_form_update, visible_when, ...restProps } = field;
+        const { trigger_form_update, visible_when, value: fieldDefaultValue, ...restProps } = field;
 
         // Conditional visibility — applied before any other processing so we
         // never register a hidden field with the parent Form (avoids stale
         // fields contributing values to ``assembleFormData``).
         if (visible_when) {
-          const current = String(liveValues[visible_when.field] ?? formData?.[visible_when.field] ?? "");
+          const controllingField = fields.find((candidate) => candidate?.name === visible_when.field);
+          const current = String(
+            liveValues[visible_when.field] ?? formData?.[visible_when.field] ?? controllingField?.value ?? "",
+          );
           const allowed = [].concat(visible_when.values);
           if (!allowed.includes(current)) {
-            return <div key={`hidden-${field.name ?? index}`} />;
+            return null;
           }
         }
 
@@ -465,7 +468,7 @@ Form.Builder = forwardRef(
             return null;
           }
 
-          return currentValue ?? field.value;
+          return currentValue ?? fieldDefaultValue;
         };
 
         const commonProps = {};

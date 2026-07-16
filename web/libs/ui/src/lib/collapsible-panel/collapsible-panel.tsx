@@ -90,6 +90,7 @@ export const CollapsiblePanel = ({
         data-testid={dataTestId ? `${dataTestId}-header` : undefined}
       >
         <Button
+          type="button"
           variant="neutral"
           look="string"
           size="small"

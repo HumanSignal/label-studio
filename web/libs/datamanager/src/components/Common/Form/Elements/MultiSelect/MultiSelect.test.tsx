@@ -161,6 +161,21 @@ describe("DM Form.Builder — visible_when conditional visibility", () => {
     expect(screen.getByTestId("users-multiselect")).toBeInTheDocument();
   });
 
+  it("shows the field when the controlling field has a default value", () => {
+    render(
+      <Form.Builder
+        fields={[
+          {
+            columnCount: 1,
+            fields: [{ ...selectionModeField, value: "include" }, usersMultiselect],
+          },
+        ]}
+      />,
+    );
+
+    expect(screen.getByTestId("users-multiselect")).toBeInTheDocument();
+  });
+
   it("reacts to user input on the controlling field", () => {
     render(
       <Form.Builder
@@ -179,6 +194,31 @@ describe("DM Form.Builder — visible_when conditional visibility", () => {
     fireEvent.change(modeInput, { target: { value: "exclude" } });
 
     expect(screen.getByTestId("users-multiselect")).toBeInTheDocument();
+  });
+
+  it("reacts to a toggle controlling field", () => {
+    render(
+      <Form.Builder
+        fields={[
+          {
+            columnCount: 1,
+            fields: [
+              { type: "toggle", name: "advanced_settings", label: "Advanced Settings" },
+              {
+                type: "input",
+                name: "value_type",
+                "data-testid": "advanced-value-type",
+                visible_when: { field: "advanced_settings", values: "true" },
+              },
+            ],
+          },
+        ]}
+      />,
+    );
+
+    expect(screen.queryByTestId("advanced-value-type")).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole("checkbox"));
+    expect(screen.getByTestId("advanced-value-type")).toBeInTheDocument();
   });
 
   it("hides the field again when the controlling value moves out of the allowed set", () => {

@@ -185,6 +185,64 @@ describe("AppStore invokeAction reload handling (UTC-1043)", () => {
     expect(mockView.clearSelection).toHaveBeenCalled();
   });
 
+  it("sends the active page task IDs for Add or Update Columns", async () => {
+    mockView.dataStore = { list: [{ id: 101 }, { id: 102 }] };
+
+    await store.invokeAction("add_data_field");
+
+    const [, request] = store._sdk.api.invokeAction.mock.calls[0];
+    expect(request.body.visibleTaskIds).toEqual([101, 102]);
+  });
+
+  it("asks the user to refresh the page after adding a column", async () => {
+    store._sdk.api.invokeAction = mock(() =>
+      Promise.resolve({ column_operation: "add", manual_refresh_required: true }),
+    );
+
+    await store.invokeAction("add_data_field");
+
+    expect(mockView.reload).not.toHaveBeenCalled();
+    expect(store._sdk.api.project).not.toHaveBeenCalled();
+    expect(store._sdk.invoke).toHaveBeenCalledWith("toast", {
+      message: "Column added. Refresh the page to see the new column.",
+      type: "success",
+    });
+  });
+
+  it("asks the user to use Refresh after updating a column", async () => {
+    store._sdk.api.invokeAction = mock(() =>
+      Promise.resolve({ column_operation: "update", manual_refresh_required: true }),
+    );
+
+    await store.invokeAction("add_data_field");
+
+    expect(mockView.reload).not.toHaveBeenCalled();
+    expect(store.backgroundActionPending).toBe(true);
+    expect(store._sdk.invoke).toHaveBeenCalledWith("toast", {
+      message: "Column updated. Use the Refresh button to see the latest data.",
+      type: "success",
+    });
+  });
+
+  it("returns the specific error for a failed column action without reloading or toasting", async () => {
+    store._sdk.api.invokeAction = mock(() =>
+      Promise.resolve({
+        error: "Bad request",
+        response: { detail: "Validation error", validation_errors: { value: "Enter a valid number value." } },
+      }),
+    );
+
+    const result = await store.invokeAction("add_data_field");
+
+    expect(mockView.reload).not.toHaveBeenCalled();
+    expect(mockView.unlock).toHaveBeenCalled();
+    expect(result.error).toBe(true);
+    // Surfaces the field-level message, not the generic "Validation error" label.
+    // Message extraction itself is covered in utils/__tests__/column-action-errors.test.ts.
+    expect(result.errorMessages).toEqual([{ label: "column-error-0", messages: ["Enter a valid number value."] }]);
+    expect(store._sdk.invoke).not.toHaveBeenCalled();
+  });
+
   it("skips the reload for an async action that returns reload: false (e.g. bulk Review)", async () => {
     store._sdk.api.invokeAction = mock(() => Promise.resolve({ async: true, reload: false }));
 

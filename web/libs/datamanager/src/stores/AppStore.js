@@ -11,6 +11,7 @@ import { TabStore } from "./Tabs";
 import { CustomJSON } from "./types";
 import { User } from "./Users";
 import { ActivityObserver } from "../utils/ActivityObserver";
+import { normalizeColumnActionErrors } from "../utils/column-action-errors";
 import { parseDmQueryParam } from "../utils/helpers";
 
 /**
@@ -750,6 +751,10 @@ export const AppStore = types
         },
       };
 
+      if (actionId === "add_data_field") {
+        actionParams.visibleTaskIds = view.dataStore?.list?.map((task) => task.id) ?? [];
+      }
+
       if (actionId === "next_task") {
         const isSelectAll = actionParams.selectedItems.all === true;
         const isAllLabelStreamMode = labelStreamMode === "all";
@@ -788,9 +793,47 @@ export const AppStore = types
         Object.assign(actionParams, options.body);
       }
 
-      const result = yield self.apiCall("invokeAction", requestParams, {
-        body: actionParams,
-      });
+      const result = yield self.apiCall(
+        "invokeAction",
+        requestParams,
+        {
+          body: actionParams,
+        },
+        {
+          errorHandler: () => actionId === "add_data_field",
+        },
+      );
+
+      if (actionId === "add_data_field") {
+        if (!result || result.error) {
+          // Keep the dialog open and let it render the specific message(s) instead of a
+          // transient toast, so the user can correct their input without re-entering it.
+          view?.unlock?.();
+          return { error: true, errorMessages: normalizeColumnActionErrors(result) };
+        }
+
+        if (result.manual_refresh_required) {
+          const isAddOperation = result.column_operation === "add";
+
+          self.SDK.invoke("toast", {
+            message: isAddOperation
+              ? "Column added. Refresh the page to see the new column."
+              : "Column updated. Use the Refresh button to see the latest data.",
+            type: "success",
+          });
+          if (!isAddOperation) {
+            self.backgroundActionPending = true;
+          }
+          view?.clearSelection?.();
+          view?.unlock?.();
+          self.SDK.invoke("actionDialogOkComplete", actionId, {
+            result,
+            view: viewReloaded,
+            project: projectFetched,
+          });
+          return result;
+        }
+      }
 
       if (result.async) {
         const message =

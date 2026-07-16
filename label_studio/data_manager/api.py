@@ -737,7 +737,7 @@ class ProjectActionsAPI(APIView):
             return Response(response, status=422)
 
         # perform action and return the result dict
-        kwargs = {'request': request}  # pass advanced params to actions
+        kwargs = {'request': request, 'prepare_params': prepare_params}
         result = perform_action(action_id, project, queryset, request.user, **kwargs)
         code = result.pop('response_code', 200)
 

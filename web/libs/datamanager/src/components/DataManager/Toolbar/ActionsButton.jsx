@@ -1,5 +1,5 @@
 import { CaretDownIcon, IconChevronRight, IconTrash } from "@humansignal/icons";
-import { Button, Spinner, EnterpriseBadge, Message } from "@humansignal/ui";
+import { Button, Spinner, EnterpriseBadge, Message, Typography } from "@humansignal/ui";
 import { inject, observer } from "mobx-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useActions } from "../../../hooks/useActions";
@@ -17,7 +17,7 @@ const injector = inject(({ store }) => ({
   hasSelected: store.currentView?.selected?.hasSelected ?? false,
 }));
 
-const DialogContent = ({ text, form, formRef, store, action, validateApi }) => {
+const DialogContent = ({ text, details = [], form, formRef, store, action, validateApi, ctaApi, errorApi }) => {
   const [formData, setFormData] = useState(form);
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState([]);
@@ -55,11 +55,53 @@ const DialogContent = ({ text, form, formRef, store, action, validateApi }) => {
     };
   }, [validateApi, formRef]);
 
+  // Let the footer push server-side errors (e.g. an invalid Expression/Number value returned by
+  // the action) into the same styled <Message> block used for client-side validation.
+  useEffect(() => {
+    if (!errorApi) return;
+    errorApi.setErrors = setErrors;
+    return () => {
+      errorApi.setErrors = null;
+    };
+  }, [errorApi]);
+
   const fields = formData?.toJSON ? formData.toJSON() : formData;
+  const formFields = useMemo(
+    () => (fields ?? []).flatMap((section) => (Array.isArray(section?.fields) ? section.fields : section)),
+    [fields],
+  );
+  const existingColumns = useMemo(
+    () =>
+      new Set(
+        formFields.find((field) => field?.name === "column_name")?.options?.map((option) => option.value ?? option),
+      ),
+    [formFields],
+  );
+
+  const handleFormChange = useCallback(
+    (event) => {
+      if (event.target?.name !== "column_name") return;
+      ctaApi?.setText?.(existingColumns.has(event.target.value) ? "Update Column" : "Add Column");
+    },
+    [ctaApi, existingColumns],
+  );
 
   return (
     <div className={cn("dialog-content").toClassName()}>
-      <div className={cn("dialog-content").elem("text").toClassName()}>{text}</div>
+      {text && (
+        <Typography variant="body" size="medium" className={cn("dialog-content").elem("text").toClassName()}>
+          {text}
+        </Typography>
+      )}
+      {details.length > 0 && (
+        <div className="flex flex-col gap-tight mt-base">
+          {details.map(({ title, description }) => (
+            <Typography key={title} variant="body" size="small">
+              <strong>{title}</strong> {description}
+            </Typography>
+          ))}
+        </div>
+      )}
       {isLoading && (
         <div
           className={cn("dialog-content").elem("loading").toClassName()}
@@ -70,7 +112,13 @@ const DialogContent = ({ text, form, formRef, store, action, validateApi }) => {
       )}
       {formData && (
         <div className={cn("dialog-content").elem("form").toClassName()} style={{ paddingTop: 16 }}>
-          <Form.Builder ref={formRef} fields={fields} autosubmit={false} withActions={false} />
+          <Form.Builder
+            ref={formRef}
+            fields={fields}
+            autosubmit={false}
+            withActions={false}
+            onChange={handleFormChange}
+          />
         </div>
       )}
       {errors.length > 0 && (
@@ -95,12 +143,28 @@ const DialogContent = ({ text, form, formRef, store, action, validateApi }) => {
  * this runs the form's own client-side validation (e.g. required fields) and keeps the
  * dialog open when invalid, surfacing the form's existing validation messages.
  */
-const DialogFooter = ({ destructive, okText, validateApi, onOk }) => {
+const DialogFooter = ({ destructive, okText, validateApi, ctaApi, errorApi, onOk }) => {
   const controls = useModalControls();
+  const [currentOkText, setCurrentOkText] = useState(okText);
 
-  const handleOk = () => {
+  useEffect(() => {
+    if (!ctaApi) return;
+    ctaApi.setText = setCurrentOkText;
+    return () => {
+      ctaApi.setText = null;
+    };
+  }, [ctaApi]);
+
+  const handleOk = async () => {
     if (validateApi?.validate && !validateApi.validate()) return;
-    onOk();
+    const result = await onOk();
+    // A failed action returns structured messages; surface them in the dialog and keep it open
+    // so the user can fix their input rather than losing it to a closed modal. Every other
+    // outcome closes the dialog (client-side invalid input already returned above).
+    if (result?.errorMessages?.length) {
+      errorApi?.setErrors?.(result.errorMessages);
+      return;
+    }
     controls?.hide();
   };
 
@@ -119,10 +183,10 @@ const DialogFooter = ({ destructive, okText, validateApi, onOk }) => {
       <Button
         onClick={handleOk}
         variant={destructive ? "negative" : "primary"}
-        aria-label={okText ?? "Confirm"}
+        aria-label={currentOkText ?? "Confirm"}
         data-testid="dialog-ok-button"
       >
-        {okText ?? "OK"}
+        {currentOkText ?? "OK"}
       </Button>
     </div>
   );
@@ -227,12 +291,12 @@ const ActionButton = ({ action, parentRef, store, formRef }) => {
 
 const invokeAction = (action, destructive, store, formRef) => {
   if (action.dialog) {
-    const { text, form, title } = action.dialog;
+    const { text, form, title, details, ok_text: actionOkText } = action.dialog;
 
     // Generate dynamic content for destructive actions
     let dialogTitle = title;
     let dialogText = text;
-    let okButtonText = "OK";
+    let okButtonText = actionOkText ?? "OK";
 
     if (destructive && !title) {
       // Extract object type from action ID and title
@@ -267,30 +331,37 @@ const invokeAction = (action, destructive, store, formRef) => {
       const body = formRef.current?.assembleFormData({ asJSON: true });
 
       store.SDK.invoke("actionDialogOk", action.id, { body });
-      store.invokeAction(action.id, { body });
+      return store.invokeAction(action.id, { body });
     };
 
     // Shared bridge so the footer's OK button can trigger the form's validation
     // (rendered in DialogContent) and keep the dialog open when invalid.
     const validateApi = { validate: null };
+    const ctaApi = { setText: null };
+    const errorApi = { setErrors: null };
 
     modal({
       title: dialogTitle ? dialogTitle : destructive ? "Destructive action" : "Confirm action",
       body: (
         <DialogContent
           text={dialogText}
+          details={details}
           form={form}
           formRef={formRef}
           store={store}
           action={action}
           validateApi={validateApi}
+          ctaApi={ctaApi}
+          errorApi={errorApi}
         />
       ),
       footer: (
         <DialogFooter
           destructive={destructive}
-          okText={destructive ? okButtonText : undefined}
+          okText={okButtonText}
           validateApi={validateApi}
+          ctaApi={ctaApi}
+          errorApi={errorApi}
           onOk={submit}
         />
       ),

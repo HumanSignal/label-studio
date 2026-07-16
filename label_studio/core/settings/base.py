@@ -664,6 +664,10 @@ REACT_APP_ROOT = os.path.join(BASE_DIR, '../../web/dist/apps/labelstudio')
 
 # per project settings
 BATCH_SIZE = 1000
+# Stage Add or Update Columns mutations above 100 tasks so the current Data Manager page updates promptly.
+ADD_OR_MODIFY_COLUMNS_ASYNC_THRESHOLD = int(get_env('ADD_OR_MODIFY_COLUMNS_ASYNC_THRESHOLD', 100))
+# Batch size for updating data columns in the DB using jsonb_set, to not timeout on large projects
+UPDATE_COLUMN_BATCH_SIZE = int(get_env('UPDATE_COLUMN_BATCH_SIZE', 100))
 # Maximum number of tasks to process in a single batch during export operations
 MAX_TASK_BATCH_SIZE = int(get_env('MAX_TASK_BATCH_SIZE', 1000))
 # Total size of task data (in bytes) to process per batch - used to calculate dynamic batch sizes
