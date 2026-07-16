@@ -1,7 +1,6 @@
 import { inject } from "mobx-react";
 import { useCallback } from "react";
-import { Button } from "@humansignal/ui";
-import { Dropdown } from "@humansignal/ui";
+import { Button, Dropdown, Tooltip } from "@humansignal/ui";
 import { Counter, Toggle } from "../../Common/Form";
 import { SlidersHorizontalIcon } from "@humansignal/icons";
 
@@ -21,24 +20,31 @@ const injector = inject(({ store }) => {
 });
 
 export const GridWidthButton = injector(({ view, isGrid, gridWidth, fitImagesToWidth, hasImage, size }) => {
+  const isLocked = view?.isLockedByManager;
+  const lockedTooltip = view?.lockedUpdateMessage;
   const setGridWidth = useCallback(
     (width) => {
+      if (isLocked) return;
       const newWidth = Math.max(1, Math.min(width, 10));
 
       view.setGridWidth(newWidth);
     },
-    [view],
+    [isLocked, view],
   );
 
   const handleFitImagesToWidthToggle = useCallback(
     (e) => {
+      if (isLocked) return;
       view.setFitImagesToWidth(e.target.checked);
     },
-    [view],
+    [isLocked, view],
   );
 
-  return isGrid ? (
+  if (!isGrid) return null;
+
+  const button = (
     <Dropdown.Trigger
+      disabled={isLocked}
       content={
         <div className="p-tight min-w-wide space-y-base">
           <div className="grid grid-cols-[1fr_min-content] gap-base items-center">
@@ -66,10 +72,13 @@ export const GridWidthButton = injector(({ view, isGrid, gridWidth, fitImagesToW
         size={size}
         variant="neutral"
         look="outlined"
+        disabled={isLocked}
         aria-label="Grid settings"
         leading={<SlidersHorizontalIcon size={20} />}
         data-testid="dm-grid-width-button"
       />
     </Dropdown.Trigger>
-  ) : null;
+  );
+
+  return isLocked ? <Tooltip title={lockedTooltip}>{button}</Tooltip> : button;
 });

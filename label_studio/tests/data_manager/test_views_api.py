@@ -1,6 +1,7 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license."""
 
 import json
+from unittest.mock import patch
 
 import pytest
 from rest_framework import status
@@ -660,7 +661,7 @@ def test_update_views_order(business_client, project_id):
         data=json.dumps(new_order),
         content_type='application/json',
     )
-    assert response.status_code == status.HTTP_200_OK
+    assert response.status_code == status.HTTP_204_NO_CONTENT
 
     # Verify the new order
     response = business_client.get('/api/dm/views/')
@@ -669,3 +670,222 @@ def test_update_views_order(business_client, project_id):
 
     returned_ids = [view['id'] for view in data]
     assert returned_ids == new_order['ids']
+
+
+def test_manager_can_lock_and_unlock_view(business_client, project_id):
+    response = business_client.post(
+        '/api/dm/views/',
+        data=json.dumps(dict(project=project_id, data={'title': 'Review queue'})),
+        content_type='application/json',
+    )
+    assert response.status_code == status.HTTP_201_CREATED
+    view_id = response.json()['id']
+
+    response = business_client.patch(
+        f'/api/dm/views/{view_id}/',
+        data=json.dumps({'is_locked': True}),
+        content_type='application/json',
+    )
+
+    assert response.status_code == status.HTTP_200_OK, response.content
+    assert response.json()['is_locked'] is True
+    assert response.json()['locked_by'] == {
+        'id': business_client.user.id,
+        'name': business_client.user.email,
+        'email': business_client.user.email,
+    }
+    assert response.json()['locked_at'] is not None
+
+    response = business_client.patch(
+        f'/api/dm/views/{view_id}/',
+        data=json.dumps({'is_locked': False}),
+        content_type='application/json',
+    )
+
+    assert response.status_code == status.HTTP_200_OK, response.content
+    assert response.json()['is_locked'] is False
+    assert response.json()['locked_by'] is None
+    assert response.json()['locked_at'] is None
+
+
+def test_non_manager_cannot_lock_view(business_client, project_id):
+    response = business_client.post(
+        '/api/dm/views/',
+        data=json.dumps(dict(project=project_id, data={'title': 'Review queue'})),
+        content_type='application/json',
+    )
+    assert response.status_code == status.HTTP_201_CREATED
+    view_id = response.json()['id']
+
+    with patch('data_manager.serializers.user_can_manage_view_lock', return_value=False):
+        response = business_client.patch(
+            f'/api/dm/views/{view_id}/',
+            data=json.dumps({'is_locked': True}),
+            content_type='application/json',
+        )
+
+    assert response.status_code == status.HTTP_403_FORBIDDEN
+    assert response.json()['detail'] == 'Only managers can lock or unlock tabs.'
+
+
+def test_locked_view_ignores_configuration_update(business_client, project_id):
+    response = business_client.post(
+        '/api/dm/views/',
+        data=json.dumps(dict(project=project_id, data={'title': 'Review queue'})),
+        content_type='application/json',
+    )
+    assert response.status_code == status.HTTP_201_CREATED
+    view_id = response.json()['id']
+
+    response = business_client.patch(
+        f'/api/dm/views/{view_id}/',
+        data=json.dumps({'is_locked': True}),
+        content_type='application/json',
+    )
+    assert response.status_code == status.HTTP_200_OK, response.content
+
+    response = business_client.patch(
+        f'/api/dm/views/{view_id}/',
+        data=json.dumps({'data': {'title': 'Review queue', 'type': 'grid'}}),
+        content_type='application/json',
+    )
+
+    # Locked views silently ignore non-allowed configuration changes and return 200.
+    # The frontend always sends full snapshots, so silent-ignore avoids false 409s
+    # when stale snapshot fields happen to differ from current DB state.
+    assert response.status_code == status.HTTP_200_OK
+    view = business_client.get(f'/api/dm/views/{view_id}/').json()
+    assert view['data'].get('type') != 'grid'
+
+
+def test_locked_view_can_still_be_reordered(business_client, project_id):
+    view_ids = []
+    for index in range(3):
+        response = business_client.post(
+            '/api/dm/views/',
+            data=json.dumps(dict(project=project_id, data={'title': f'View {index}'})),
+            content_type='application/json',
+        )
+        assert response.status_code == status.HTTP_201_CREATED
+        view_ids.append(response.json()['id'])
+
+    response = business_client.patch(
+        f'/api/dm/views/{view_ids[0]}/',
+        data=json.dumps({'is_locked': True}),
+        content_type='application/json',
+    )
+    assert response.status_code == status.HTTP_200_OK, response.content
+
+    new_order = {'project': project_id, 'ids': [view_ids[2], view_ids[0], view_ids[1]]}
+    response = business_client.post(
+        '/api/dm/views/order/',
+        data=json.dumps(new_order),
+        content_type='application/json',
+    )
+
+    assert response.status_code == status.HTTP_204_NO_CONTENT
+    response = business_client.get('/api/dm/views/')
+    assert [view['id'] for view in response.json()] == new_order['ids']
+
+
+def test_locked_view_allows_column_width_update(business_client, project_id):
+    response = business_client.post(
+        '/api/dm/views/',
+        data=json.dumps(dict(project=project_id, data={'title': 'Review queue'})),
+        content_type='application/json',
+    )
+    assert response.status_code == status.HTTP_201_CREATED
+    view_id = response.json()['id']
+
+    response = business_client.patch(
+        f'/api/dm/views/{view_id}/',
+        data=json.dumps({'is_locked': True}),
+        content_type='application/json',
+    )
+    assert response.status_code == status.HTTP_200_OK, response.content
+
+    response = business_client.patch(
+        f'/api/dm/views/{view_id}/',
+        data=json.dumps({'data': {'title': 'Review queue', 'columnsWidth': {'tasks:id': 120}}}),
+        content_type='application/json',
+    )
+    assert response.status_code == status.HTTP_200_OK, response.content
+    assert response.json()['data']['columnsWidth'] == {'tasks:id': 120}
+
+
+def test_locked_view_ignores_non_width_data_changes(business_client, project_id):
+    response = business_client.post(
+        '/api/dm/views/',
+        data=json.dumps(dict(project=project_id, data={'title': 'Review queue'})),
+        content_type='application/json',
+    )
+    assert response.status_code == status.HTTP_201_CREATED
+    view_id = response.json()['id']
+
+    response = business_client.patch(
+        f'/api/dm/views/{view_id}/',
+        data=json.dumps({'is_locked': True}),
+        content_type='application/json',
+    )
+    assert response.status_code == status.HTTP_200_OK, response.content
+
+    # Locked tab: columnsWidth is applied, non-allowlisted fields (type) are silently ignored
+    response = business_client.patch(
+        f'/api/dm/views/{view_id}/',
+        data=json.dumps({'data': {'title': 'Review queue', 'columnsWidth': {'tasks:id': 120}, 'type': 'grid'}}),
+        content_type='application/json',
+    )
+    assert response.status_code == status.HTTP_200_OK, response.content
+    view_data = response.json().get('data', {})
+    assert view_data.get('columnsWidth') == {'tasks:id': 120}, 'columnsWidth should be updated'
+    assert 'type' not in view_data, 'non-allowlisted field should not be persisted'
+
+
+def test_create_view_with_filters_uses_max_order_not_count(business_client, project_id):
+    """Creating a filtered view must use Max(order)+1, not count(), when orders have gaps."""
+    from data_manager.models import View
+
+    response = business_client.post(
+        '/api/dm/views/',
+        data=json.dumps(dict(project=project_id, data={'title': 'First'})),
+        content_type='application/json',
+    )
+    assert response.status_code == status.HTTP_201_CREATED
+    first_id = response.json()['id']
+
+    response = business_client.post(
+        '/api/dm/views/',
+        data=json.dumps(dict(project=project_id, data={'title': 'Second'})),
+        content_type='application/json',
+    )
+    assert response.status_code == status.HTTP_201_CREATED
+    second_id = response.json()['id']
+
+    # Create a gap: two views remain but max order is 5 (count would be 2).
+    View.objects.filter(id=first_id).update(order=0)
+    View.objects.filter(id=second_id).update(order=5)
+
+    payload = {
+        'project': project_id,
+        'data': {
+            'title': 'Filtered',
+            'filters': {
+                'conjunction': 'and',
+                'items': [
+                    {
+                        'filter': 'filter:tasks:id',
+                        'operator': 'equal',
+                        'type': 'Number',
+                        'value': 1,
+                    }
+                ],
+            },
+        },
+    }
+    response = business_client.post(
+        '/api/dm/views/',
+        data=json.dumps(payload),
+        content_type='application/json',
+    )
+    assert response.status_code == status.HTTP_201_CREATED, response.content
+    assert response.json()['order'] == 6, 'order must be Max+1 (6), not count() (2)'

@@ -35,7 +35,7 @@
  * toolbar?: string,
  * spinner?: import("react").ReactNode
  * apiTransform?: Record<string, Record<string, Function>
- * tabControls?: { add?: boolean, delete?: boolean, edit?: boolean, duplicate?: boolean },
+ * tabControls?: { add?: boolean, delete?: boolean, edit?: boolean, duplicate?: boolean, lock?: boolean },
  * AgreementSettingsSummary?: import("react").ComponentType<{ filters: unknown }>,
  * }} DMConfig
  */
@@ -132,6 +132,7 @@ export class DataManager {
     delete: true,
     edit: true,
     duplicate: true,
+    lock: true,
   };
 
   /** @type {"dm" | "labelops"} */

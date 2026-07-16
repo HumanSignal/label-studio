@@ -46,6 +46,7 @@ export const Table = observer(
     focusedItem,
     decoration,
     stopInteractions,
+    stopRowInteractions = stopInteractions,
     onColumnResize,
     onColumnReset,
     headerExtra,
@@ -342,7 +343,7 @@ export const Table = observer(
               data={row}
               even={isEven}
               onClick={(row, e) => props.onRowClick(row, e)}
-              stopInteractions={stopInteractions}
+              stopInteractions={stopRowInteractions}
               wrapperStyle={{ ...style, height: props.rowHeight }}
               style={{
                 height: props.rowHeight,
@@ -363,7 +364,7 @@ export const Table = observer(
             data={row}
             even={shouldApplyBackground}
             onClick={(row, e) => props.onRowClick(row, e)}
-            stopInteractions={stopInteractions}
+            stopInteractions={stopRowInteractions}
             wrapperStyle={{ ...style, height: props.rowHeight }}
             style={{
               height: props.rowHeight,
@@ -379,7 +380,7 @@ export const Table = observer(
         props.fitContent,
         props.onRowClick,
         props.rowHeight,
-        stopInteractions,
+        stopRowInteractions,
         selectedItems,
         view,
         view.selected.list,

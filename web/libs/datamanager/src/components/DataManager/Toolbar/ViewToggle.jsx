@@ -9,6 +9,9 @@ const viewInjector = inject(({ store }) => ({
 
 export const ViewToggle = viewInjector(
   observer(({ view, size, ...rest }) => {
+    const isLocked = view?.isLockedByManager;
+    const lockedTooltip = view?.lockedUpdateMessage;
+
     return (
       <RadioGroup
         size={size}
@@ -17,16 +20,26 @@ export const ViewToggle = viewInjector(
         {...rest}
         style={{ "--button-padding": "0 var(--spacing-tighter)" }}
       >
-        <Tooltip title="List view">
+        <Tooltip title={isLocked ? lockedTooltip : "List view"}>
           <div>
-            <RadioGroup.Button value="list" aria-label="Switch to list view" data-testid="dm-view-toggle-list">
+            <RadioGroup.Button
+              value="list"
+              aria-label="Switch to list view"
+              data-testid="dm-view-toggle-list"
+              disabled={isLocked}
+            >
               <ListIcon size={20} />
             </RadioGroup.Button>
           </div>
         </Tooltip>
-        <Tooltip title="Grid view">
+        <Tooltip title={isLocked ? lockedTooltip : "Grid view"}>
           <div>
-            <RadioGroup.Button value="grid" aria-label="Switch to grid view" data-testid="dm-view-toggle-grid">
+            <RadioGroup.Button
+              value="grid"
+              aria-label="Switch to grid view"
+              data-testid="dm-view-toggle-grid"
+              disabled={isLocked}
+            >
               <SquaresFourIcon size={20} />
             </RadioGroup.Button>
           </div>

@@ -49,7 +49,8 @@ const injector = inject(({ store }) => {
     data: dataStore?.list ?? [],
     total: dataStore?.total ?? 0,
     isLoading: dataStore?.loading ?? true,
-    isLocked: currentView?.locked ?? false,
+    isSavingView: currentView?.locked ?? false,
+    isTabLocked: currentView?.isLockedByManager ?? false,
     hasData: (store.project?.task_count ?? store.project?.task_number ?? dataStore?.total ?? 0) > 0,
     focusedItem: dataStore?.selected ?? dataStore?.highlighted,
     // Role-based empty state props
@@ -79,7 +80,8 @@ function DataViewInner({
   isLabeling,
   hiddenColumns = [],
   hasData = false,
-  isLocked,
+  isSavingView,
+  isTabLocked,
   role,
   project,
   hasFilters,
@@ -412,7 +414,8 @@ function DataViewInner({
         onSelectRow={onRowSelect}
         onRangeSelect={onRangeSelect}
         onRowClick={onRowClick}
-        stopInteractions={isLocked}
+        stopInteractions={isSavingView || isTabLocked}
+        stopRowInteractions={isSavingView}
         onTypeChange={(col, type) => col.original.setType(type)}
         onColumnResize={(col, width) => {
           col.original.setWidth(width);
@@ -433,7 +436,7 @@ function DataViewInner({
         loadMore={loadMore}
         onChange={(id) => view.toggleSelected(id)}
         hiddenFields={hiddenColumns}
-        stopInteractions={isLocked}
+        stopInteractions={isSavingView}
       />
     );
 
@@ -479,7 +482,7 @@ function DataViewInner({
   return (
     <div
       className={cn("data-view-dm").mix("dm-content").toClassName()}
-      style={{ pointerEvents: isLocked ? "none" : "auto" }}
+      style={{ pointerEvents: isSavingView ? "none" : "auto" }}
     >
       {renderContent(content)}
     </div>

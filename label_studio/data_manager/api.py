@@ -20,7 +20,7 @@ from data_manager.serializers import (
     ViewSerializer,
 )
 from django.conf import settings
-from django.db.models import Sum
+from django.db.models import Max, Sum
 from django.db.models.functions import Coalesce
 from django.utils.decorators import method_decorator
 from django_filters.rest_framework import DjangoFilterBackend
@@ -167,7 +167,10 @@ class ViewAPI(viewsets.ModelViewSet):
     )
 
     def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
+        project = serializer.validated_data.get('project')
+        max_order = View.objects.filter(project=project).aggregate(Max('order'))['order__max']
+        order = (max_order if max_order is not None else -1) + 1
+        serializer.save(user=self.request.user, order=order)
 
     @extend_schema(
         tags=['Data Manager'],
@@ -238,7 +241,7 @@ class ViewAPI(viewsets.ModelViewSet):
         # Bulk update views
         View.objects.bulk_update(views, ['order'])
 
-        return Response(status=200)
+        return Response(status=204)
 
     def get_queryset(self):
         return View.objects.filter(project__organization=self.request.user.active_organization).order_by('order', 'id')

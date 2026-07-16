@@ -96,7 +96,7 @@ Agreement.userSelectable = false;
 
 const AGREEMENT_HEADER_DEFAULT_TOOLTIP = "Adjust calculation and display of all agreement columns";
 
-Agreement.HeaderCell = ({ agreementFilters, onSave, children }) => {
+Agreement.HeaderCell = ({ agreementFilters, onSave, children, disabled = false, disabledTooltip }) => {
   const sdk = useSDK();
   const AgreementSettingsSummary = sdk?.AgreementSettingsSummary ?? null;
 
@@ -116,7 +116,11 @@ Agreement.HeaderCell = ({ agreementFilters, onSave, children }) => {
     )
   ) : null;
 
-  const tooltipTitle = showCustomSummary && customTooltipTitle ? customTooltipTitle : AGREEMENT_HEADER_DEFAULT_TOOLTIP;
+  const tooltipTitle = disabled
+    ? disabledTooltip
+    : showCustomSummary && customTooltipTitle
+      ? customTooltipTitle
+      : AGREEMENT_HEADER_DEFAULT_TOOLTIP;
 
   return (
     <Tooltip
@@ -130,7 +134,8 @@ Agreement.HeaderCell = ({ agreementFilters, onSave, children }) => {
         look="outlined"
         variant="neutral"
         size="small"
-        onClick={() => sdk.invoke("AgreementHeaderClick", { agreementFilters, onSave })}
+        disabled={disabled}
+        onClick={() => !disabled && sdk.invoke("AgreementHeaderClick", { agreementFilters, onSave })}
         className="flex w-full cursor-pointer items-center justify-between gap-tight overflow-hidden"
       >
         {children}

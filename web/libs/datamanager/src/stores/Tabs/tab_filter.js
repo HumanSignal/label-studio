@@ -314,12 +314,19 @@ export const TabFilter = types
     },
 
     save: flow(function* (force = false) {
+      // Defense in depth: locked tabs must not PATCH filter changes even if UI
+      // disable is bypassed. Skip no-op early returns first so mount-time
+      // setOperator→save does not toast on already-saved locked filters.
       const isValid = self.isValidFilter;
 
       if (force !== true) {
         if (self.saved === true) return;
         if (isValid === false) return;
         if (self.wasValid === false && isValid === false) return;
+      }
+
+      if (self.view?.isLockedByManager) {
+        return self.view.notifyLocked();
       }
 
       if (self.saving) return;

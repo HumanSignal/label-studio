@@ -9,10 +9,13 @@ from core.feature_flags import flag_set
 from data_manager.models import Filter, FilterGroup, View
 from django.conf import settings
 from django.db import transaction
+from django.db.models import Max
+from django.utils import timezone
 from drf_spectacular.utils import extend_schema_field
 from fsm.serializer_fields import FSMStateField
 from projects.models import Project
-from rest_framework import serializers
+from rest_framework import serializers, status
+from rest_framework.exceptions import APIException, PermissionDenied
 from tasks.models import Task
 from tasks.ordering import (
     get_task_annotations_queryset,
@@ -29,6 +32,38 @@ from tasks.serializers import (
 from users.models import User
 
 from label_studio.core.utils.common import round_floats
+
+LOCKED_VIEW_MESSAGE = 'This tab has been locked. Refresh to see the latest tab settings.'
+LOCK_PERMISSION_MESSAGE = 'Only managers can lock or unlock tabs.'
+LOCKED_VIEW_ALLOWED_DATA_KEYS = frozenset({'columnsWidth'})
+
+
+class LockedViewError(APIException):
+    status_code = status.HTTP_409_CONFLICT
+    default_detail = LOCKED_VIEW_MESSAGE
+    default_code = 'view_locked'
+
+
+def view_lock_project(instance_or_data):
+    """Resolve a project for lock permission checks.
+
+    ``View`` has ``project``; ``DatasetView`` has ``dataset`` only. Returning
+    ``None`` lets ``get_user_role`` fall back to an org-level role check.
+    """
+    if isinstance(instance_or_data, dict):
+        return instance_or_data.get('project')
+    return getattr(instance_or_data, 'project', None)
+
+
+def user_can_manage_view_lock(user, project):
+    try:
+        from lse_organizations.functions import get_user_role
+        from lse_organizations.models import OrganizationRole
+    except ImportError:
+        return True
+
+    role = get_user_role(user=user, organization_or_pk=user.active_organization_id, project=project)
+    return role in (OrganizationRole.OWNER, OrganizationRole.ADMINISTRATOR, OrganizationRole.MANAGER)
 
 
 class ChildFilterSerializer(serializers.ModelSerializer):
@@ -199,10 +234,32 @@ class FilterGroupSerializer(serializers.ModelSerializer):
 
 class ViewSerializer(serializers.ModelSerializer):
     filter_group = FilterGroupSerializer(required=False)
+    locked_by = serializers.SerializerMethodField()
 
     class Meta:
         model = View
         fields = '__all__'
+
+    @extend_schema_field(
+        {
+            'type': 'object',
+            'nullable': True,
+            'title': 'Locked by user',
+            'properties': {
+                'id': {'type': 'integer', 'title': 'User ID'},
+                'name': {'type': 'string', 'title': 'Display name'},
+                'email': {'type': 'string', 'format': 'email', 'title': 'Email'},
+            },
+        }
+    )
+    def get_locked_by(self, instance):
+        if not instance.locked_by:
+            return None
+        return {
+            'id': instance.locked_by_id,
+            'name': instance.locked_by.name_or_email(),
+            'email': instance.locked_by.email,
+        }
 
     def to_internal_value(self, data):
         """
@@ -226,7 +283,10 @@ class ViewSerializer(serializers.ModelSerializer):
            }
         }
         """
-        _data = data.get('data', {})
+        _data = data.get('data')
+
+        if not isinstance(_data, dict):
+            return super().to_internal_value(data)
 
         filters = _data.pop('filters', {})
         conjunction = filters.get('conjunction')
@@ -320,15 +380,67 @@ class ViewSerializer(serializers.ModelSerializer):
                 self._create_filters(filter_group=filter_group, filters_data=filters_data)
 
                 validated_data['filter_group_id'] = filter_group.id
-                # rather than defaulting to 0, we should get the current count and set it as the index
-                validated_data['order'] = View.objects.filter(project=validated_data['project']).count()
+
+            # Trust caller / perform_create order (Max+1). Never use count(), which
+            # collides when order values have gaps. If order is still absent, assign
+            # Max+1 for project-scoped views only (DatasetView has no project).
+            if 'order' not in validated_data:
+                project = view_lock_project(validated_data)
+                if project is not None:
+                    max_order = View.objects.filter(project=project).aggregate(Max('order'))['order__max']
+                    validated_data['order'] = (max_order if max_order is not None else -1) + 1
+
+            if validated_data.get('is_locked'):
+                request = self.context.get('request')
+                user = getattr(request, 'user', None)
+                if not user_can_manage_view_lock(user, view_lock_project(validated_data)):
+                    raise PermissionDenied(LOCK_PERMISSION_MESSAGE)
+                validated_data['locked_by'] = user
+                validated_data['locked_at'] = timezone.now()
             view = self.Meta.model.objects.create(**validated_data)
 
             return view
 
     def update(self, instance, validated_data):
         with transaction.atomic():
+            request = self.context.get('request')
+            user = getattr(request, 'user', None)
+            is_locked = validated_data.pop('is_locked', serializers.empty)
             filter_group_data = validated_data.pop('filter_group', None)
+
+            instance = self.Meta.model.objects.select_for_update().get(pk=instance.pk)
+
+            if is_locked is not serializers.empty and bool(is_locked) != bool(instance.is_locked):
+                if not user_can_manage_view_lock(user, view_lock_project(instance)):
+                    raise PermissionDenied(LOCK_PERMISSION_MESSAGE)
+
+            # If the tab is locked and this request is not unlocking it, only apply
+            # the allowlisted fields from `data` and silently ignore everything else.
+            # The frontend always sends the full view snapshot, so mutation-detection
+            # is unreliable — a stale snapshot looks like a mutation even when the
+            # user only resized a column.
+            is_unlocking = is_locked is not serializers.empty and not bool(is_locked) and bool(instance.is_locked)
+            if instance.is_locked and not is_unlocking:
+                incoming_data = validated_data.get('data', serializers.empty)
+                if incoming_data is not serializers.empty:
+                    current_data = dict(instance.data or {})
+                    changed = False
+                    for key in LOCKED_VIEW_ALLOWED_DATA_KEYS:
+                        if key in incoming_data and current_data.get(key) != incoming_data[key]:
+                            current_data[key] = incoming_data[key]
+                            changed = True
+                    if changed:
+                        instance.data = current_data
+                        instance.save(update_fields=['data'])
+                return instance
+
+            if is_locked is not serializers.empty and bool(is_locked) != bool(instance.is_locked):
+                if is_locked:
+                    instance.lock(user)
+                else:
+                    instance.unlock()
+                instance.save(update_fields=['is_locked', 'locked_by', 'locked_at'])
+
             if filter_group_data:
                 filters_data = filter_group_data.pop('filters', [])
 
@@ -337,8 +449,6 @@ class ViewSerializer(serializers.ModelSerializer):
                 # row lock the filter replacement below (delete + recreate) interleaves
                 # across requests and leaves duplicate root filters in the group's M2M,
                 # which the user sees as filters multiplying on every reload.
-                instance = self.Meta.model.objects.select_for_update().get(pk=instance.pk)
-
                 filter_group = instance.filter_group
                 if filter_group is None:
                     filter_group = FilterGroup.objects.create(**filter_group_data)
@@ -359,11 +469,12 @@ class ViewSerializer(serializers.ModelSerializer):
             ordering = validated_data.pop('ordering', None)
             if ordering and ordering != instance.ordering:
                 instance.ordering = ordering
-                instance.save()
+                instance.save(update_fields=['ordering'])
 
-            if validated_data['data'] != instance.data:
-                instance.data = validated_data['data']
-                instance.save()
+            data = validated_data.get('data', serializers.empty)
+            if data is not serializers.empty and data != instance.data:
+                instance.data = data
+                instance.save(update_fields=['data'])
 
             return instance
 

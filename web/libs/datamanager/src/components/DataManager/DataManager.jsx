@@ -65,6 +65,10 @@ const ProjectSummary = summaryInjector((props) => {
   );
 });
 
+const ConnectedTabsItem = observer(function ConnectedTabsItem({ tab, ...props }) {
+  return <TabsItem {...props} tab={tab.key} isLocked={tab.isLockedByManager} lockedTooltip={tab.lockedIconTooltip} />;
+});
+
 const TabsSwitch = switchInjector(
   observer(({ sdk, views, tabs, selectedKey }) => {
     const editable = sdk.tabControls;
@@ -100,9 +104,9 @@ const TabsSwitch = switchInjector(
                   ...provided.draggableProps.style,
                 }}
               >
-                <TabsItem
+                <ConnectedTabsItem
                   key={tab.key}
-                  tab={tab.key}
+                  tab={tab}
                   title={tab.title}
                   onFinishEditing={(title) => {
                     tab.setTitle(title);
@@ -111,6 +115,7 @@ const TabsSwitch = switchInjector(
                   onDuplicate={() => views.duplicateView(tab)}
                   onClose={() => views.deleteView(tab)}
                   onSave={() => tab.virtual && tab.saveVirtual()}
+                  onToggleLock={() => tab.toggleLock()}
                   active={tab.key === selectedKey}
                   editable={tab.editable}
                   deletable={tab.deletable}

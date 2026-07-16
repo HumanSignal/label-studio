@@ -18,14 +18,14 @@ import { RECENT_VALUE_PREFIX } from "../../../hooks/useRecentFilters";
 
 const RECENTS_AUTOSAVE_DELAY_MS = 500;
 
-const Conjunction = observer(({ index, view }) => {
+const Conjunction = observer(({ index, view, disabled }) => {
   return (
     <FilterDropdown
       items={[
         { value: "and", label: "And" },
         { value: "or", label: "Or" },
       ]}
-      disabled={index > 1}
+      disabled={index > 1 || disabled}
       value={view.conjunction}
       style={{ textAlign: "right" }}
       onChange={(value) => view.setConjunction(value)}
@@ -40,49 +40,51 @@ const Conjunction = observer(({ index, view }) => {
  * filtersToPickerGroups always gets {id, field, ...} objects, not the recents-grouped
  * structure that `availableFilters` (fields) uses for FilterDropdown.
  */
-const FilterColumnPicker = observer(({ filter, pickerFilters, recentEntries, onSaveOnSwitch, onSaveInPlace }) => {
-  const handleChange = (id) => {
-    const departingId = filter.filter.id;
-    const departingOperator = filter.operator;
-    const departingValue = filter.value;
-    // Only persist the departing filter if it's fully valid — prevents leaking
-    // default/auto-assigned fields that the user never intentionally configured.
-    const departingIsValid = filter.isValidFilter;
+const FilterColumnPicker = observer(
+  ({ filter, pickerFilters, recentEntries, onSaveOnSwitch, onSaveInPlace, disabled }) => {
+    const handleChange = (id) => {
+      const departingId = filter.filter.id;
+      const departingOperator = filter.operator;
+      const departingValue = filter.value;
+      // Only persist the departing filter if it's fully valid — prevents leaking
+      // default/auto-assigned fields that the user never intentionally configured.
+      const departingIsValid = filter.isValidFilter;
 
-    if (id?.startsWith(RECENT_COLUMN_PREFIX)) {
-      const realId = id.slice(RECENT_COLUMN_PREFIX.length);
-      const entry = recentEntries?.find((e) => e.id === realId);
-      if (departingIsValid) onSaveInPlace?.(departingId, departingOperator, departingValue);
-      filter.setFilterFromRecent(realId, entry?.operator ?? null, entry?.value ?? null);
-    } else {
-      if (departingIsValid) onSaveOnSwitch?.(departingId, departingOperator, departingValue);
-      filter.setFilterDelayed(id);
-    }
-  };
+      if (id?.startsWith(RECENT_COLUMN_PREFIX)) {
+        const realId = id.slice(RECENT_COLUMN_PREFIX.length);
+        const entry = recentEntries?.find((e) => e.id === realId);
+        if (departingIsValid) onSaveInPlace?.(departingId, departingOperator, departingValue);
+        filter.setFilterFromRecent(realId, entry?.operator ?? null, entry?.value ?? null);
+      } else {
+        if (departingIsValid) onSaveOnSwitch?.(departingId, departingOperator, departingValue);
+        filter.setFilterDelayed(id);
+      }
+    };
 
-  return (
-    <ColumnPicker
-      availableFilters={pickerFilters}
-      recentEntries={recentEntries}
-      value={filter.filter.id ?? null}
-      onChange={handleChange}
-      placeholder={filter.field?.title || "Column"}
-      size="small"
-      disabled={filter.field.disabled}
-      triggerProps={{
-        style: { minWidth: 80 },
-      }}
-      renderSelected={(selectedOptions, placeholder) => {
-        const opt = selectedOptions?.[0];
-        if (!opt) return <span>{placeholder}</span>;
-        const field = filter.field;
-        const rawGroup = field ? getFilterGroupTitle(field) : null;
-        const groupTitle = rawGroup ? rawGroup.charAt(0).toUpperCase() + rawGroup.slice(1) : undefined;
-        return <ColumnPickerOptionContent option={{ ...opt, groupTitle }} />;
-      }}
-    />
-  );
-});
+    return (
+      <ColumnPicker
+        availableFilters={pickerFilters}
+        recentEntries={recentEntries}
+        value={filter.filter.id ?? null}
+        onChange={handleChange}
+        placeholder={filter.field?.title || "Column"}
+        size="small"
+        disabled={disabled || filter.field.disabled}
+        triggerProps={{
+          style: { minWidth: 80 },
+        }}
+        renderSelected={(selectedOptions, placeholder) => {
+          const opt = selectedOptions?.[0];
+          if (!opt) return <span>{placeholder}</span>;
+          const field = filter.field;
+          const rawGroup = field ? getFilterGroupTitle(field) : null;
+          const groupTitle = rawGroup ? rawGroup.charAt(0).toUpperCase() + rawGroup.slice(1) : undefined;
+          return <ColumnPickerOptionContent option={{ ...opt, groupTitle }} />;
+        }}
+      />
+    );
+  },
+);
 
 /** Custom renderer for the column dropdown items: section header or column label.
  *  Headers are styled to visually match the Select component's native group headers
@@ -180,8 +182,12 @@ export const FilterLine = observer(
     dropdownClassName,
     onSaveOnSwitch,
     onSaveInPlace,
+    disabled = false,
+    disabledTooltip,
   }) => {
     const childFilter = filter.child_filter;
+    const isDisabled = disabled || filter.field.disabled;
+    const lockTooltip = disabled ? disabledTooltip : undefined;
 
     // Debounced auto-save: persist current filter state to recents after it settles.
     const saveTimerRef = React.useRef(null);
@@ -210,7 +216,7 @@ export const FilterLine = observer(
             {index === 0 ? (
               <span style={{ fontSize: 12, paddingRight: 5 }}>Where</span>
             ) : (
-              <Conjunction index={index} view={view} />
+              <Conjunction index={index} view={view} disabled={disabled} />
             )}
           </div>
 
@@ -225,7 +231,7 @@ export const FilterLine = observer(
                 handleColumnChange(filter, availableFilters, selectedValue, onSaveOnSwitch, onSaveInPlace)
               }
               optionRender={filterFieldOptionRender}
-              disabled={filter.field.disabled}
+              disabled={isDisabled}
             />
           </div>
 
@@ -234,7 +240,7 @@ export const FilterLine = observer(
             value={filter.currentValue}
             operator={filter.operator}
             field={filter.field}
-            disabled={filter.field.disabled}
+            disabled={isDisabled}
           />
 
           {/* Remove button — only show if no child filter, otherwise empty space */}
@@ -244,6 +250,8 @@ export const FilterLine = observer(
                 look="string"
                 size="small"
                 style={{ border: "none" }}
+                disabled={disabled}
+                tooltip={lockTooltip}
                 onClick={(e) => {
                   e.stopPropagation();
                   filter.delete();
@@ -281,7 +289,7 @@ export const FilterLine = observer(
                 value={childFilter.currentValue}
                 operator={childFilter.operator}
                 field={childFilter.field}
-                disabled={filter.field.disabled}
+                disabled={isDisabled}
               />
 
               {/* Remove — deletes the entire filter group including child */}
@@ -289,6 +297,8 @@ export const FilterLine = observer(
                 <Button
                   look="danger"
                   size="smaller"
+                  disabled={disabled}
+                  tooltip={lockTooltip}
                   onClick={(e) => {
                     e.stopPropagation();
                     filter.delete();
@@ -309,7 +319,7 @@ export const FilterLine = observer(
           {index === 0 ? (
             <span style={{ fontSize: 12, paddingRight: 5 }}>Where</span>
           ) : (
-            <Conjunction index={index} view={view} />
+            <Conjunction index={index} view={view} disabled={disabled} />
           )}
         </div>
 
@@ -320,6 +330,7 @@ export const FilterLine = observer(
             recentEntries={recentEntries}
             onSaveOnSwitch={onSaveOnSwitch}
             onSaveInPlace={onSaveInPlace}
+            disabled={disabled}
           />
         </div>
 
@@ -328,7 +339,7 @@ export const FilterLine = observer(
           value={filter.currentValue}
           operator={filter.operator}
           field={filter.field}
-          disabled={filter.field.disabled}
+          disabled={isDisabled}
         />
 
         {/* Only show remove button if there's no child filter */}
@@ -338,6 +349,8 @@ export const FilterLine = observer(
               look="string"
               size="small"
               style={{ border: "none" }}
+              disabled={disabled}
+              tooltip={lockTooltip}
               onClick={(e) => {
                 e.stopPropagation();
                 filter.delete();
@@ -372,7 +385,7 @@ export const FilterLine = observer(
               value={childFilter.currentValue}
               operator={childFilter.operator}
               field={childFilter.field}
-              disabled={filter.field.disabled}
+              disabled={isDisabled}
             />
 
             {/* Remove button on child filter row — removes the entire filter group */}
@@ -381,6 +394,8 @@ export const FilterLine = observer(
                 look="string"
                 size="small"
                 style={{ border: "none" }}
+                disabled={disabled}
+                tooltip={lockTooltip}
                 onClick={(e) => {
                   e.stopPropagation();
                   filter.delete();

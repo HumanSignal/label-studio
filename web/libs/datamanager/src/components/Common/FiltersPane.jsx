@@ -2,7 +2,7 @@ import { inject, observer } from "mobx-react";
 import React, { useEffect, useRef } from "react";
 import { CaretDownIcon } from "@humansignal/icons";
 import { Filters } from "../Filters/Filters";
-import { Badge, Button, Dropdown } from "@humansignal/ui";
+import { Badge, Button, Dropdown, Tooltip } from "@humansignal/ui";
 import { Icon } from "./Icon/Icon";
 
 const buttonInjector = inject(({ store }) => {
@@ -10,6 +10,7 @@ const buttonInjector = inject(({ store }) => {
 
   return {
     viewsStore,
+    currentView,
     sidebarEnabled: viewsStore?.sidebarEnabled ?? false,
     activeFiltersNumber: currentView?.filtersApplied ?? false,
   };
@@ -17,15 +18,16 @@ const buttonInjector = inject(({ store }) => {
 
 export const FiltersButton = buttonInjector(
   observer(
-    React.forwardRef(({ activeFiltersNumber, size, sidebarEnabled, viewsStore, ...rest }, ref) => {
+    React.forwardRef(({ activeFiltersNumber, size, sidebarEnabled, viewsStore, currentView, ...rest }, ref) => {
       const hasFilters = activeFiltersNumber > 0;
-
-      return (
+      const isLocked = currentView?.isLockedByManager;
+      const button = (
         <Button
           ref={ref}
           size="small"
           variant="neutral"
           look="outlined"
+          disabled={isLocked}
           onClick={() => sidebarEnabled && viewsStore.toggleSidebar()}
           trailing={<CaretDownIcon size={16} />}
           aria-label="Filters"
@@ -40,6 +42,14 @@ export const FiltersButton = buttonInjector(
           )}
         </Button>
       );
+
+      return isLocked ? (
+        <Tooltip title={currentView.lockedUpdateMessage}>
+          <div>{button}</div>
+        </Tooltip>
+      ) : (
+        button
+      );
     }),
   ),
 );
@@ -47,11 +57,12 @@ export const FiltersButton = buttonInjector(
 const injector = inject(({ store }) => {
   return {
     sidebarEnabled: store?.viewsStore?.sidebarEnabled ?? false,
+    currentView: store?.currentView,
   };
 });
 
 export const FiltersPane = injector(
-  observer(({ sidebarEnabled, size, ...rest }) => {
+  observer(({ currentView, sidebarEnabled, size, ...rest }) => {
     const dropdown = useRef();
 
     useEffect(() => {
@@ -63,7 +74,7 @@ export const FiltersPane = injector(
     return (
       <Dropdown.Trigger
         ref={dropdown}
-        disabled={sidebarEnabled}
+        disabled={sidebarEnabled || currentView?.isLockedByManager}
         content={<Filters />}
         openUpwardForShortViewport={false}
         isChildValid={(ele) => {

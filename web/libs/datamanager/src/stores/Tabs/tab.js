@@ -10,6 +10,8 @@ import { CustomJSON, StringOrNumberID, ThresholdType } from "../types";
 import { clamp } from "../../utils/helpers";
 const THRESHOLD_MIN = 0;
 const THRESHOLD_MIN_DIFF = 0.001;
+const LOCKED_TAB_UPDATE_MESSAGE = "This tab is locked. Unlock it to update.";
+const LOCKED_TAB_READONLY_MESSAGE = "This tab is locked. Changes are not allowed.";
 
 import { validateFilterSnapshot } from "./filter_snapshot_utils";
 
@@ -42,6 +44,9 @@ export const Tab = types
     saved: false,
     virtual: false,
     locked: false,
+    is_locked: types.optional(types.maybeNull(types.boolean), false),
+    locked_by: types.optional(types.maybeNull(CustomJSON), null),
+    locked_at: types.optional(types.maybeNull(types.string), null),
     editable: true,
     deletable: true,
     semantic_search: types.optional(types.array(CustomJSON), []),
@@ -135,6 +140,27 @@ export const Tab = types
 
     get filtersApplied() {
       return self.validFilters.length;
+    },
+
+    get isLockedByManager() {
+      return self.is_locked === true;
+    },
+
+    get lockedByName() {
+      return self.locked_by?.name || self.locked_by?.email || null;
+    },
+
+    get canManageLock() {
+      return self.root.SDK?.tabControls?.lock !== false;
+    },
+
+    get lockedIconTooltip() {
+      if (!self.canManageLock) return "Tab locked";
+      return self.lockedByName ? `Locked by ${self.lockedByName}` : "Locked";
+    },
+
+    get lockedUpdateMessage() {
+      return self.canManageLock ? LOCKED_TAB_UPDATE_MESSAGE : LOCKED_TAB_READONLY_MESSAGE;
     },
 
     get validFilters() {
@@ -284,7 +310,26 @@ export const Tab = types
       self.locked = false;
     },
 
+    notifyLocked() {
+      self.root.SDK.invoke("toast", {
+        message: self.lockedUpdateMessage,
+        type: "error",
+      });
+      return false;
+    },
+
+    setLockState(isLocked, lockedBy = null, lockedAt = null) {
+      self.is_locked = isLocked;
+      self.locked_by = lockedBy;
+      self.locked_at = lockedAt;
+    },
+
+    toggleLock: flow(function* () {
+      yield self.parent.updateViewLock(self, !self.isLockedByManager);
+    }),
+
     setType(type) {
+      if (self.isLockedByManager) return self.notifyLocked();
       self.type = type;
       self.root.SDK.invoke("tabTypeChanged", { tab: self.id, type });
       self.save({ reload: false });
@@ -309,11 +354,13 @@ export const Tab = types
     },
 
     setConjunction(value) {
+      if (self.isLockedByManager) return self.notifyLocked();
       self.conjunction = value;
       self.save();
     },
 
     setOrdering(value) {
+      if (self.isLockedByManager) return self.notifyLocked();
       if (value === null) {
         self.ordering = [];
       } else {
@@ -337,11 +384,13 @@ export const Tab = types
     },
 
     setGridWidth(width) {
+      if (self.isLockedByManager) return self.notifyLocked();
       self.gridWidth = width;
       self.save();
     },
 
     setFitImagesToWidth(responsive) {
+      if (self.isLockedByManager) return self.notifyLocked();
       self.gridFitImagesToWidth = responsive;
       self.save();
     },
@@ -351,6 +400,7 @@ export const Tab = types
     },
 
     setSemanticSearch(semanticSearchList, min, max) {
+      if (self.isLockedByManager) return self.notifyLocked();
       self.semantic_search = semanticSearchList ?? [];
       /* if no semantic search we have to clean up threshold */
       if (self.semantic_search.length === 0) {
@@ -363,6 +413,7 @@ export const Tab = types
     },
 
     setSemanticSearchThreshold(_min, max) {
+      if (self.isLockedByManager) return self.notifyLocked();
       const min = clamp(_min ?? THRESHOLD_MIN, THRESHOLD_MIN, max - THRESHOLD_MIN_DIFF);
 
       if (self.semantic_search?.length && !isNaN(min) && !isNaN(max)) {
@@ -372,6 +423,7 @@ export const Tab = types
     },
 
     clearSemanticSearchThreshold(save = true) {
+      if (self.isLockedByManager) return self.notifyLocked();
       self.threshold = null;
       return save && self.save();
     },
@@ -406,6 +458,7 @@ export const Tab = types
     },
 
     setColumnDisplayType(columnID, type) {
+      if (self.isLockedByManager) return self.notifyLocked();
       if (type !== null) {
         const filters = self.filters.filter(({ filter }) => {
           return columnID === filter.field.id;
@@ -427,6 +480,7 @@ export const Tab = types
      * repetitive re-selection when the user adds multiple filters for the same column.
      */
     createFilter() {
+      if (self.isLockedByManager) return self.notifyLocked();
       const lastFilter = self.filters.length > 0 ? self.filters[self.filters.length - 1] : null;
       const filterType = lastFilter?.filter ?? self.availableFilters[0];
       const filter = TabFilter.create({
@@ -463,6 +517,7 @@ export const Tab = types
     },
 
     toggleColumn(column) {
+      if (self.isLockedByManager) return self.notifyLocked();
       if (self.hiddenColumns.hasColumn(column)) {
         self.hiddenColumns.remove(column);
       } else {
@@ -476,6 +531,7 @@ export const Tab = types
       annotators = { all: true, ids: [] },
       models = { all: true, ids: [] },
     }) {
+      if (self.isLockedByManager) return self.notifyLocked();
       self.agreement_selected = {
         ground_truth,
         annotators: {
@@ -501,6 +557,7 @@ export const Tab = types
     }),
 
     deleteFilter(filter) {
+      if (self.isLockedByManager) return self.notifyLocked();
       // Recursively delete child filter first
       if (filter.child_filter) {
         self.deleteFilter(filter.child_filter);
@@ -522,6 +579,7 @@ export const Tab = types
      * @returns {boolean} false if no valid filters could be imported
      */
     importFilters(snapshot) {
+      if (self.isLockedByManager) return self.notifyLocked();
       const validItems = validateFilterSnapshot(snapshot, self.availableFilters);
       if (!validItems) return false;
 
