@@ -788,8 +788,10 @@ PROJECT_DELETE = project_delete
 USER_AUTH = user_auth
 COLLECT_VERSIONS = collect_versions_dummy
 
-WEBHOOK_TIMEOUT = float(get_env('WEBHOOK_TIMEOUT', 1.0))
+WEBHOOK_TIMEOUT = float(get_env('WEBHOOK_TIMEOUT', 10.0))
 WEBHOOK_BATCH_SIZE = int(get_env('WEBHOOK_BATCH_SIZE', 5000))
+# Auto-disable a webhook after this many consecutive failed deliveries (<= 0 disables the feature)
+WEBHOOK_MAX_CONSECUTIVE_FAILURES = int(get_env('WEBHOOK_MAX_CONSECUTIVE_FAILURES', 50))
 WEBHOOK_SERIALIZERS = {
     'project': 'webhooks.serializers_for_hooks.ProjectWebhookSerializer',
     'task': 'webhooks.serializers_for_hooks.TaskWebhookSerializer',

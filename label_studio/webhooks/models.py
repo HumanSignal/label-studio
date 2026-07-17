@@ -62,6 +62,14 @@ class Webhook(models.Model):
         help_text=('If value is False the webhook is disabled'),
     )
 
+    consecutive_failures = models.PositiveIntegerField(
+        _('consecutive failures'),
+        db_default=0,
+        default=0,
+        null=True,
+        help_text=_('Number of consecutive failed deliveries; the webhook auto-disables at the configured threshold'),
+    )
+
     created_at = models.DateTimeField(_('created at'), auto_now_add=True, help_text=_('Creation time'), db_index=True)
     updated_at = models.DateTimeField(_('updated at'), auto_now=True, help_text=_('Last update time'), db_index=True)
 

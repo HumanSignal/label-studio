@@ -6,7 +6,8 @@ from core.redis import start_job_async_or_sync
 from core.utils.common import load_func
 from core.utils.io import ssrf_safe_post
 from django.conf import settings
-from django.db.models import Q
+from django.db.models import F, Q
+from django.db.models.functions import Coalesce
 from django.db.models.query import QuerySet
 
 from .models import Webhook, WebhookAction
@@ -50,9 +51,11 @@ def run_webhook_sync(webhook, action, payload=None):
     }
     if webhook.send_payload and payload:
         data.update(payload)
+
+    response = None
     try:
         logging.debug('Run webhook %s for action %s', webhook.id, action)
-        return ssrf_safe_post(
+        response = ssrf_safe_post(
             webhook.url,
             headers=webhook.headers,
             json=data,
@@ -60,7 +63,38 @@ def run_webhook_sync(webhook, action, payload=None):
         )
     except Exception as exc:
         logging.error(exc, exc_info=True)
+
+    _record_webhook_delivery_result(webhook, response)
+    return response
+
+
+def _record_webhook_delivery_result(webhook, response):
+    """Track consecutive delivery failures and auto-disable the webhook at the configured threshold.
+
+    A delivery is a failure on any exception (response is None) or any non-2xx response.
+    A 2xx response resets the counter. Deliveries run as parallel RQ jobs, so counter updates use
+    atomic F() expressions to avoid races. This function must not raise any exceptions.
+    """
+    threshold = settings.WEBHOOK_MAX_CONSECUTIVE_FAILURES
+    if threshold <= 0:  # feature disabled / kill-switch
         return
+    try:
+        succeeded = response is not None and 200 <= response.status_code < 300
+        if succeeded:
+            # Only write when there is something to reset (avoid a query on the happy path)
+            if webhook.consecutive_failures:
+                Webhook.objects.filter(pk=webhook.pk).update(consecutive_failures=0)
+            return
+
+        # Coalesce keeps the increment correct for pre-existing rows where the column is still NULL
+        Webhook.objects.filter(pk=webhook.pk).update(consecutive_failures=Coalesce(F('consecutive_failures'), 0) + 1)
+        new_count = Webhook.objects.filter(pk=webhook.pk).values_list('consecutive_failures', flat=True).first()
+        if new_count is not None and new_count >= threshold:
+            # Conditional update keeps the disable idempotent under concurrent deliveries
+            Webhook.objects.filter(pk=webhook.pk, is_active=True).update(is_active=False)
+            logger.warning('Webhook %s auto-disabled after %s consecutive failures', webhook.pk, new_count)
+    except Exception as exc:
+        logging.error('Failed to record webhook delivery result for webhook %s: %s', webhook.pk, exc, exc_info=True)
 
 
 def emit_webhooks_sync(organization, project, action, payload):
