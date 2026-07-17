@@ -13,7 +13,7 @@ from data_manager.functions import evaluate_predictions
 from data_manager.models import PrepareParams
 from data_manager.serializers import DataManagerTaskSerializer
 from django.db import transaction
-from django.db.models import Prefetch, Q
+from django.db.models import Prefetch, Q, prefetch_related_objects
 from django.utils import timezone
 from django.utils.decorators import method_decorator
 from django_filters.rest_framework import DjangoFilterBackend
@@ -347,17 +347,50 @@ class TaskAPI(generics.RetrieveUpdateDestroyAPIView):
             'request': request,
         }
 
+    def maybe_evaluate_predictions(self, project, request):
+        """Ask the ML backend for predictions when the task has none yet.
+
+        get_object() runs the whole PreparedTaskManager query, which takes tens of
+        seconds on tasks with thousands of annotations, so it must run exactly once
+        per GET. Instead of re-running it, refresh only the prediction-derived values.
+        """
+        if not (project.evaluate_predictions_automatically or project.show_collab_predictions):
+            return
+
+        # prefetched by prefetch(); .exists() would issue an extra query on every GET
+        if self.task.predictions.all():
+            return
+
+        # project.ml_backend slices the queryset, which bypasses the prefetch cache
+        if not project.ml_backends.all():
+            return
+
+        evaluate_predictions([self.task])
+        self.refresh_predictions(request)
+
+    def refresh_predictions(self, request):
+        """Reload predictions and the prediction-derived DM annotations in place.
+
+        Keeps every other prefetch and DM annotation from the single get_object() call.
+        """
+        _, prediction_children = get_task_children_prefetch(parse_annotations_ordering_request(request))
+        getattr(self.task, '_prefetched_objects_cache', {}).pop('predictions', None)
+        prefetch_related_objects([self.task], prediction_children)
+
+        predictions = self.task.predictions.all()
+        self.task.total_predictions = len(predictions)
+        self.task.predictions_model_versions = [p.model_version for p in predictions]
+        # This path only runs when the task had no predictions, so every prediction here
+        # was just created by the project's own backend. That is exactly the set
+        # annotate_predictions_score() would average over its model_version filter.
+        scores = [p.score for p in predictions if p.score is not None]
+        self.task.predictions_score = sum(scores) / len(scores) if scores else None
+
     def get(self, request, pk):
         context = self.get_retrieve_serializer_context(request)
         context['project'] = project = self.task.project
 
-        # get prediction
-        if (
-            project.evaluate_predictions_automatically or project.show_collab_predictions
-        ) and not self.task.predictions.exists():
-            evaluate_predictions([self.task])
-            # refresh task from db with prefetches
-            self.task = self.get_object()
+        self.maybe_evaluate_predictions(project, request)
 
         # Don't use expand for annotations when using stub mode (FIT-720)
         # The expand mechanism would override get_annotations and use AnnotationSerializer
