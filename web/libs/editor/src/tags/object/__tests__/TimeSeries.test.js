@@ -1302,6 +1302,87 @@ describe("TimeSeries persistentValues, dataSlices, and panView no-op", () => {
     expect(fp).toHaveProperty("task");
   });
 
+  it("persistentFingerprint includes tag name and overviewwidth", () => {
+    const model = TimeSeriesModel.create(
+      {
+        name: "ts1",
+        value: "$timeseries",
+        timecolumn: "time",
+        overviewwidth: "50%",
+        children: [],
+      },
+      mockEnv,
+    );
+    const fp = model.persistentFingerprint;
+    expect(fp.tag).toBe("ts1");
+    expect(fp.overviewwidth).toBe("50%");
+  });
+
+  it("does not store values when there is no task id", () => {
+    localStorage.clear();
+    const model = TimeSeriesModel.create(
+      {
+        name: "timeseries",
+        value: "$timeseries",
+        timecolumn: "time",
+        children: [],
+      },
+      mockEnv,
+    );
+    model.setData({ time: [0, 100], value: [1, 2] });
+    model.updateTR([10, 90]);
+    model.storeValues();
+    expect(localStorage.getItem(model.persistentValuesKey)).toBeNull();
+  });
+
+  it("does not restore stored view when overviewwidth changed", () => {
+    localStorage.clear();
+    const MockStoreWithTask = types
+      .model({ timeseries: TimeSeriesModel })
+      .volatile(() => ({ task: { id: 1, dataObj: {} } }));
+
+    const m1 = TimeSeriesModel.create(
+      { name: "ts", value: "$timeseries", timecolumn: "time", overviewwidth: "25%", children: [] },
+      mockEnv,
+    );
+    MockStoreWithTask.create({ timeseries: m1 }, mockEnv);
+    m1.setData({ time: [0, 100], value: [1, 2] });
+    m1.updateTR([0, 25]);
+    m1.storeValues();
+
+    const m2 = TimeSeriesModel.create(
+      { name: "ts", value: "$timeseries", timecolumn: "time", overviewwidth: "100%", children: [] },
+      mockEnv,
+    );
+    MockStoreWithTask.create({ timeseries: m2 }, mockEnv);
+    m2.restoreValues();
+    expect(m2.brushRange.length).toBe(0);
+  });
+
+  it("restores stored view for the same task, tag and config", () => {
+    localStorage.clear();
+    const MockStoreWithTask = types
+      .model({ timeseries: TimeSeriesModel })
+      .volatile(() => ({ task: { id: 1, dataObj: {} } }));
+
+    const m1 = TimeSeriesModel.create(
+      { name: "ts", value: "$timeseries", timecolumn: "time", overviewwidth: "25%", children: [] },
+      mockEnv,
+    );
+    MockStoreWithTask.create({ timeseries: m1 }, mockEnv);
+    m1.setData({ time: [0, 100], value: [1, 2] });
+    m1.updateTR([0, 25]);
+    m1.storeValues();
+
+    const m2 = TimeSeriesModel.create(
+      { name: "ts", value: "$timeseries", timecolumn: "time", overviewwidth: "25%", children: [] },
+      mockEnv,
+    );
+    MockStoreWithTask.create({ timeseries: m2 }, mockEnv);
+    m2.restoreValues();
+    expect([...m2.brushRange]).toEqual([0, 25]);
+  });
+
   it("dataSlices returns array of slices", () => {
     const model = TimeSeriesModel.create(
       {
