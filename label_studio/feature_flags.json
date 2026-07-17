@@ -268,7 +268,7 @@
       "trackEvents": false,
       "trackEventsFallthrough": false,
       "debugEventsUntilDate": null,
-      "version": 4,
+      "version": 5,
       "deleted": false
     },
     "ff_front_dev_1442_unselect_shape_on_click_outside_080622_short": {
@@ -4794,6 +4794,33 @@
       "version": 2,
       "deleted": false
     },
+    "fflag_fix_bros_1496_scim_stale_seats": {
+      "key": "fflag_fix_bros_1496_scim_stale_seats",
+      "on": false,
+      "prerequisites": [],
+      "targets": [],
+      "contextTargets": [],
+      "rules": [],
+      "fallthrough": {
+        "variation": 0
+      },
+      "offVariation": 1,
+      "variations": [
+        true,
+        false
+      ],
+      "clientSideAvailability": {
+        "usingMobileKey": false,
+        "usingEnvironmentId": false
+      },
+      "clientSide": false,
+      "salt": "c9781a4b453c4dcf9be277b814d70208",
+      "trackEvents": false,
+      "trackEventsFallthrough": false,
+      "debugEventsUntilDate": null,
+      "version": 2,
+      "deleted": false
+    },
     "fflag_fix_bros_528_num_tasks_with_annotations_short": {
       "key": "fflag_fix_bros_528_num_tasks_with_annotations_short",
       "on": false,
@@ -5440,6 +5467,33 @@
       "trackEventsFallthrough": false,
       "debugEventsUntilDate": null,
       "version": 3,
+      "deleted": false
+    },
+    "fflag_utc_1012_add_or_modify_columns": {
+      "key": "fflag_utc_1012_add_or_modify_columns",
+      "on": false,
+      "prerequisites": [],
+      "targets": [],
+      "contextTargets": [],
+      "rules": [],
+      "fallthrough": {
+        "variation": 0
+      },
+      "offVariation": 1,
+      "variations": [
+        true,
+        false
+      ],
+      "clientSideAvailability": {
+        "usingMobileKey": false,
+        "usingEnvironmentId": false
+      },
+      "clientSide": false,
+      "salt": "ece405af8d6d4f11a5639c670ba6a30b",
+      "trackEvents": false,
+      "trackEventsFallthrough": false,
+      "debugEventsUntilDate": null,
+      "version": 2,
       "deleted": false
     },
     "fflag_utc_428_consensus_control_tag_agreement": {
