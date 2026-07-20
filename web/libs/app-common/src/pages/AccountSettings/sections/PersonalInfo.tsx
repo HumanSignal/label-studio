@@ -1,6 +1,6 @@
 import { type FormEventHandler, useCallback, useEffect, useRef, useState } from "react";
 import { format } from "date-fns";
-import { Button, InputFile, ToastType, Typography, useToast, Userpic } from "@humansignal/ui";
+import { Badge, Button, InputFile, ToastType, Typography, useToast, Userpic } from "@humansignal/ui";
 import { getApiInstance } from "@humansignal/core";
 import { useAccountSettingsExtension } from "../extensions";
 import { useReportProfileDirty } from "../ProfileDirtyContext";
@@ -20,20 +20,20 @@ const PROVIDER_DISPLAY_NAMES: Record<string, string> = {
   github: "GitHub",
 };
 
-const PROFILE_FIELD_LABELS: Record<string, string> = {
-  first_name: "First Name",
-  last_name: "Last Name",
-  phone: "Phone",
-};
-
 const isRequiredProfileValueMissing = (isRequired: boolean, value: string) => isRequired && value.trim().length === 0;
 
-const RequiredFieldLabel = ({ label, isMissing }: { label: string; isMissing: boolean }) => (
+const RequiredFieldLabel = ({ label }: { label: string }) => (
   <span className={styles.requiredLabel}>
     <span>{label}</span>
-    <span className={styles.requiredBadge} data-required-missing={isMissing || undefined}>
+    <Badge variant="neutral" look="outline" shape="square" size="small">
       Required
-    </span>
+    </Badge>
+  </span>
+);
+
+const RequiredFieldError = ({ id, label }: { id: string; label: string }) => (
+  <span id={id} className="text-negative-content" role="alert">
+    {label} is required.
   </span>
 );
 
@@ -75,15 +75,17 @@ export const PersonalInfo = () => {
   const [fname, setFname] = useState(user?.first_name ?? "");
   const [lname, setLname] = useState(user?.last_name ?? "");
   const [phone, setPhone] = useState(user?.phone ?? "");
+  // Required-field errors only surface after the user attempts to Save with missing fields.
+  const [hasAttemptedSave, setHasAttemptedSave] = useState(false);
   // Report unsaved changes to the page-level guard (avatar saves immediately, so it's excluded).
   const isDirty =
     fname !== (user?.first_name ?? "") || lname !== (user?.last_name ?? "") || phone !== (user?.phone ?? "");
   useReportProfileDirty(isDirty);
   const { requiredProfileFields = [] } = useAccountSettingsExtension();
   const isFieldRequired = (key: string) => requiredProfileFields.includes(key);
-  const isFirstNameMissing = isRequiredProfileValueMissing(isFieldRequired("first_name"), fname);
-  const isLastNameMissing = isRequiredProfileValueMissing(isFieldRequired("last_name"), lname);
-  const isPhoneMissing = isRequiredProfileValueMissing(isFieldRequired("phone"), phone);
+  const isFirstNameMissing = hasAttemptedSave && isRequiredProfileValueMissing(isFieldRequired("first_name"), fname);
+  const isLastNameMissing = hasAttemptedSave && isRequiredProfileValueMissing(isFieldRequired("last_name"), lname);
+  const isPhoneMissing = hasAttemptedSave && isRequiredProfileValueMissing(isFieldRequired("phone"), phone);
   const canDeleteAvatar = Boolean(user?.avatar);
   const avatarRef = useRef<HTMLInputElement>();
   const fileChangeHandler: FormEventHandler<HTMLInputElement> = useCallback(
@@ -130,11 +132,7 @@ export const PersonalInfo = () => {
       });
 
       if (missingFields.length > 0) {
-        const missingFieldLabels = missingFields.map((key) => PROFILE_FIELD_LABELS[key] ?? key);
-        toast?.show({
-          message: `${missingFieldLabels.join(", ")} ${missingFieldLabels.length === 1 ? "is" : "are"} required.`,
-          type: ToastType.error,
-        });
+        setHasAttemptedSave(true);
         return;
       }
 
@@ -183,44 +181,36 @@ export const PersonalInfo = () => {
         <form onSubmit={userFormSubmitHandler} className={styles.sectionContent}>
           <div className={styles.formGrid}>
             <Input
-              label={
-                isFieldRequired("first_name") ? (
-                  <RequiredFieldLabel label="First Name" isMissing={isFirstNameMissing} />
-                ) : (
-                  "First Name"
-                )
-              }
+              label={isFieldRequired("first_name") ? <RequiredFieldLabel label="First Name" /> : "First Name"}
               value={fname}
               onChange={(e: React.KeyboardEvent<HTMLInputElement>) => setFname(e.currentTarget.value)}
               name="first_name"
               aria-required={isFieldRequired("first_name")}
               aria-invalid={isFirstNameMissing || undefined}
+              aria-describedby={isFirstNameMissing ? "first-name-error" : undefined}
+              footer={isFirstNameMissing ? <RequiredFieldError id="first-name-error" label="First Name" /> : undefined}
             />
             <Input
-              label={
-                isFieldRequired("last_name") ? (
-                  <RequiredFieldLabel label="Last Name" isMissing={isLastNameMissing} />
-                ) : (
-                  "Last Name"
-                )
-              }
+              label={isFieldRequired("last_name") ? <RequiredFieldLabel label="Last Name" /> : "Last Name"}
               value={lname}
               onChange={(e: React.KeyboardEvent<HTMLInputElement>) => setLname(e.currentTarget.value)}
               name="last_name"
               aria-required={isFieldRequired("last_name")}
               aria-invalid={isLastNameMissing || undefined}
+              aria-describedby={isLastNameMissing ? "last-name-error" : undefined}
+              footer={isLastNameMissing ? <RequiredFieldError id="last-name-error" label="Last Name" /> : undefined}
             />
             <Input label="E-mail" type="email" readOnly={true} value={user?.email ?? ""} />
             <Input
-              label={
-                isFieldRequired("phone") ? <RequiredFieldLabel label="Phone" isMissing={isPhoneMissing} /> : "Phone"
-              }
+              label={isFieldRequired("phone") ? <RequiredFieldLabel label="Phone" /> : "Phone"}
               type="phone"
               onChange={(e: React.KeyboardEvent<HTMLInputElement>) => setPhone(e.currentTarget.value)}
               value={phone}
               name="phone"
               aria-required={isFieldRequired("phone")}
               aria-invalid={isPhoneMissing || undefined}
+              aria-describedby={isPhoneMissing ? "phone-error" : undefined}
+              footer={isPhoneMissing ? <RequiredFieldError id="phone-error" label="Phone" /> : undefined}
             />
             {user?.social_accounts?.map((account) => (
               <div className={`${styles.formGrid} ${styles.fullWidth}`} key={account.provider}>

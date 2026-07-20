@@ -101,7 +101,7 @@ describe("PersonalInfo", () => {
     });
   });
 
-  it("requires the full basic profile before workforce users can save", async () => {
+  it("shows under-field errors when required profile fields are missing", async () => {
     setupUser(makeUser());
     setupRequiredFields(["first_name", "last_name", "phone"]);
 
@@ -110,43 +110,67 @@ describe("PersonalInfo", () => {
     fireEvent.change(screen.getByLabelText(/First Name/), { target: { value: "Mika" } });
     fireEvent.submit(screen.getByRole("button", { name: "Save" }).closest("form") as HTMLFormElement);
 
-    await waitFor(() => {
-      expect(mockToastShow).toHaveBeenCalledWith(
-        expect.objectContaining({
-          message: "Last Name, Phone are required.",
-        }),
-      );
-    });
+    expect(await screen.findByText("Last Name is required.")).toHaveAttribute("role", "alert");
+    expect(screen.getByText("Phone is required.")).toHaveAttribute("role", "alert");
+    expect(screen.queryByText("First Name is required.")).not.toBeInTheDocument();
+    expect(mockToastShow).not.toHaveBeenCalled();
     expect(mockUpdateUser).not.toHaveBeenCalled();
   });
 
-  it("marks missing required profile fields until they are filled", () => {
+  it("does not flag required fields before the user attempts to save", () => {
     setupUser(makeUser());
     setupRequiredFields(["first_name", "last_name", "phone"]);
 
     render(<PersonalInfo />);
 
-    const firstName = screen.getByLabelText(/First Name/);
-    const lastName = screen.getByLabelText(/Last Name/);
-    const phone = screen.getByLabelText(/Phone/);
-
-    expect(firstName).toHaveAttribute("aria-invalid", "true");
-    expect(lastName).toHaveAttribute("aria-invalid", "true");
-    expect(phone).toHaveAttribute("aria-invalid", "true");
-    for (const badge of screen.getAllByText("Required")) {
-      expect(badge).toHaveAttribute("data-required-missing", "true");
-    }
-
-    fireEvent.change(firstName, { target: { value: "Mika" } });
-    fireEvent.change(lastName, { target: { value: "Kim" } });
-    fireEvent.change(phone, { target: { value: "+1 555 0100" } });
-
-    expect(screen.getByLabelText(/First Name/)).not.toHaveAttribute("aria-invalid", "true");
-    expect(screen.getByLabelText(/Last Name/)).not.toHaveAttribute("aria-invalid", "true");
-    expect(screen.getByLabelText(/Phone/)).not.toHaveAttribute("aria-invalid", "true");
+    expect(screen.getByLabelText(/First Name/)).not.toHaveAttribute("aria-invalid");
+    expect(screen.getByLabelText(/Last Name/)).not.toHaveAttribute("aria-invalid");
+    expect(screen.getByLabelText(/Phone/)).not.toHaveAttribute("aria-invalid");
+    expect(screen.queryByText("First Name is required.")).not.toBeInTheDocument();
+    expect(screen.queryByText("Last Name is required.")).not.toBeInTheDocument();
+    expect(screen.queryByText("Phone is required.")).not.toBeInTheDocument();
     for (const badge of screen.getAllByText("Required")) {
       expect(badge).not.toHaveAttribute("data-required-missing");
     }
+
+    fireEvent.change(screen.getByLabelText(/First Name/), { target: { value: "Mika" } });
+    fireEvent.change(screen.getByLabelText(/First Name/), { target: { value: "" } });
+
+    expect(screen.getByLabelText(/First Name/)).not.toHaveAttribute("aria-invalid");
+    for (const badge of screen.getAllByText("Required")) {
+      expect(badge).not.toHaveAttribute("data-required-missing");
+    }
+  });
+
+  it("flags missing required fields after a save attempt and clears them once filled", async () => {
+    setupUser(makeUser());
+    setupRequiredFields(["first_name", "last_name", "phone"]);
+
+    render(<PersonalInfo />);
+
+    fireEvent.change(screen.getByLabelText(/First Name/), { target: { value: "Mika" } });
+    fireEvent.submit(screen.getByRole("button", { name: "Save" }).closest("form") as HTMLFormElement);
+
+    expect(await screen.findByText("Last Name is required.")).toBeInTheDocument();
+    expect(screen.getByText("Phone is required.")).toBeInTheDocument();
+    expect(mockToastShow).not.toHaveBeenCalled();
+    expect(mockUpdateUser).not.toHaveBeenCalled();
+
+    expect(screen.getByLabelText(/First Name/)).not.toHaveAttribute("aria-invalid");
+    expect(screen.getByLabelText(/Last Name/)).toHaveAttribute("aria-invalid", "true");
+    expect(screen.getByLabelText(/Phone/)).toHaveAttribute("aria-invalid", "true");
+    // Badges never react to validation state.
+    for (const badge of screen.getAllByText("Required")) {
+      expect(badge).not.toHaveAttribute("data-required-missing");
+    }
+
+    fireEvent.change(screen.getByLabelText(/Last Name/), { target: { value: "Kim" } });
+    fireEvent.change(screen.getByLabelText(/Phone/), { target: { value: "+1 555 0100" } });
+
+    expect(screen.getByLabelText(/Last Name/)).not.toHaveAttribute("aria-invalid");
+    expect(screen.getByLabelText(/Phone/)).not.toHaveAttribute("aria-invalid");
+    expect(screen.queryByText("Last Name is required.")).not.toBeInTheDocument();
+    expect(screen.queryByText("Phone is required.")).not.toBeInTheDocument();
   });
 
   describe("unsaved changes", () => {
