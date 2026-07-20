@@ -132,6 +132,10 @@ const VideoConfig = observer(({ item }) => {
   );
 });
 
+const hasOpenDrawingClosableVideoVector = (item) => {
+  return item.regs?.some((reg) => reg.type === "videovectorregion" && reg.isDrawing && !reg.closed && reg.closable);
+};
+
 const HtxVideoView = ({ item, store }) => {
   if (!item._value) return null;
 
@@ -369,6 +373,15 @@ const HtxVideoView = ({ item, store }) => {
   // VIDEO EVENT HANDLERS
   const handleFrameChange = useCallback(
     (position, length) => {
+      if (hasOpenDrawingClosableVideoVector(item)) {
+        if (item.ref.current?.playing) {
+          item.ref.current.pause();
+          item.triggerSyncPause();
+        }
+        setVideoLength(length);
+        return;
+      }
+
       setPosition(position);
       setVideoLength(length);
       item.setOnlyFrame(position);
@@ -400,6 +413,8 @@ const HtxVideoView = ({ item, store }) => {
 
   // TIMELINE EVENT HANDLERS
   const handlePlay = useCallback(() => {
+    if (hasOpenDrawingClosableVideoVector(item)) return;
+
     setPlaying((_playing) => {
       if (!item.ref.current.playing) {
         // @todo item.ref.current.playing? could be buffering and other states
@@ -474,6 +489,8 @@ const HtxVideoView = ({ item, store }) => {
 
   const handleTimelinePositionChange = useCallback(
     (newPosition) => {
+      if (hasOpenDrawingClosableVideoVector(item)) return false;
+
       if (position !== newPosition) {
         const now = Date.now();
         const state = scrubStateRef.current;

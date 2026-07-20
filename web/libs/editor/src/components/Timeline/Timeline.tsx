@@ -79,7 +79,7 @@ const TimelineComponent: FC<TimelineProps> = ({
       const clampedValue = clamp(newPosition, 1, length);
 
       if (clampedValue !== currentPosition) {
-        handlers.onPositionChange?.(clampedValue);
+        if (handlers.onPositionChange?.(clampedValue) === false) return currentPosition;
         return clampedValue;
       }
 

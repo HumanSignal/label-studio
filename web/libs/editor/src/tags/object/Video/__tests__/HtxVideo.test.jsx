@@ -205,6 +205,26 @@ function createMockStore() {
   };
 }
 
+function createMockVideoVectorRegion(overrides = {}) {
+  return {
+    labels: [],
+    selected: false,
+    inSelection: false,
+    style: {},
+    tag: {},
+    type: "videovectorregion",
+    sequence: [{ frame: 1, enabled: true, vertices: [{ id: "p1", x: 10, y: 10 }], closed: false }],
+    cleanId: "vv1",
+    region_index: 0,
+    hidden: false,
+    locked: false,
+    isDrawing: true,
+    closed: false,
+    closable: true,
+    ...overrides,
+  };
+}
+
 describe("HtxVideoView", () => {
   beforeEach(() => {
     clearAllMocks();
@@ -320,6 +340,74 @@ describe("HtxVideoView", () => {
     expect(onPositionChange).toBeDefined();
     onPositionChange(25);
     expect(item.setFrame).toHaveBeenCalledWith(25);
+  });
+
+  it("blocks Timeline frame changes while an open VideoVector is being drawn", async () => {
+    const item = createMockItem({ regs: [createMockVideoVectorRegion()] });
+    const store = createMockStore();
+    render(<HtxVideoView item={item} store={store} />);
+    await flushRaf();
+    await triggerVideoLoad();
+
+    item.setFrame.mockClear();
+    const onPositionChange = mockTimelineProps.onPositionChange;
+    expect(onPositionChange).toBeDefined();
+
+    expect(onPositionChange(25)).toBe(false);
+
+    expect(item.setFrame).not.toHaveBeenCalled();
+    expect(mockTimelineProps.position).toBe(1);
+  });
+
+  it("allows Timeline frame changes after the VideoVector drawing is closed", async () => {
+    const item = createMockItem({
+      regs: [createMockVideoVectorRegion({ isDrawing: false, closed: true, sequence: [{ frame: 1, closed: true }] })],
+    });
+    const store = createMockStore();
+    render(<HtxVideoView item={item} store={store} />);
+    await flushRaf();
+    await triggerVideoLoad();
+
+    item.setFrame.mockClear();
+    const onPositionChange = mockTimelineProps.onPositionChange;
+    onPositionChange(25);
+
+    expect(item.setFrame).toHaveBeenCalledWith(25);
+  });
+
+  it("allows Timeline frame changes while a non-closable VideoVector is being drawn", async () => {
+    const item = createMockItem({ regs: [createMockVideoVectorRegion({ closable: false })] });
+    const store = createMockStore();
+    render(<HtxVideoView item={item} store={store} />);
+    await flushRaf();
+    await triggerVideoLoad();
+
+    item.setFrame.mockClear();
+    const onPositionChange = mockTimelineProps.onPositionChange;
+    expect(onPositionChange).toBeDefined();
+
+    expect(onPositionChange(25)).not.toBe(false);
+
+    expect(item.setFrame).toHaveBeenCalledWith(25);
+  });
+
+  it("blocks video frame updates and playback while an open VideoVector is being drawn", async () => {
+    const item = createMockItem({ regs: [createMockVideoVectorRegion()] });
+    const store = createMockStore();
+    render(<HtxVideoView item={item} store={store} />);
+    await flushRaf();
+    await triggerVideoLoad();
+
+    item.setOnlyFrame.mockClear();
+    item.ref.current.play.mockClear();
+
+    await act(async () => {
+      mockVideoCanvasProps.onFrameChange?.(25, 100);
+      mockTimelineProps.onPlay?.();
+    });
+
+    expect(item.setOnlyFrame).not.toHaveBeenCalledWith(25);
+    expect(item.ref.current.play).not.toHaveBeenCalled();
   });
 
   it("syncs Timeline position when item frame changes outside Timeline controls", async () => {

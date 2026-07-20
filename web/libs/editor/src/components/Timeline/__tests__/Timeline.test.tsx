@@ -105,6 +105,33 @@ describe("Timeline", () => {
     expect(framesControl()?.textContent).toContain("1 of 100");
   });
 
+  it("keeps the current internal position when onPositionChange vetoes the change", async () => {
+    (viewsModule.default as any).frames = {
+      View: ({ onPositionChange }: TimelineViewProps) => (
+        <button type="button" data-testid="seek-frame-16" onClick={() => onPositionChange(16)}>
+          Seek
+        </button>
+      ),
+      Minimap: undefined,
+      Controls: MockControls,
+      settings: { leftOffset: 0 },
+    };
+    const onPositionChange = mock(() => false);
+    const { container } = render(
+      <Timeline
+        {...defaultProps}
+        position={1}
+        onPositionChange={onPositionChange}
+        controls={{ FramesControl: true }}
+      />,
+    );
+
+    await userEvent.click(screen.getByTestId("seek-frame-16"));
+
+    expect(onPositionChange).toHaveBeenCalledWith(16);
+    expect(container.querySelector('[class*="frames-control"]')?.textContent).toContain("1 of 100");
+  });
+
   it("calls onPositionChange when position is set internally", async () => {
     const onPositionChange = mock();
     render(<Timeline {...defaultProps} position={10} onPositionChange={onPositionChange} allowSeek />);
