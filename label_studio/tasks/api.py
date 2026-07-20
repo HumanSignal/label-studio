@@ -305,7 +305,37 @@ class TaskAPI(generics.RetrieveUpdateDestroyAPIView):
 
     def prefetch(self, queryset, request=None):
         ordering = parse_annotations_ordering_request(request)
-        annotation_children, prediction_children = get_task_children_prefetch(ordering)
+        annotations_stub = False
+        if request and flag_set('fflag_fix_all_fit_720_lazy_load_annotations', user=request.user):
+            annotations_stub = bool_from_request(request.GET, 'annotations_stub', False)
+
+        if annotations_stub:
+            from tasks.ordering import (
+                ANNOTATION_ORDERING_ID_ASC,
+                ANNOTATION_ORDERING_ID_DESC,
+                order_annotations,
+                order_annotations_asc,
+            )
+
+            annotations_qs = Annotation.objects.only(
+                'id',
+                'completed_by',
+                'ground_truth',
+                'was_cancelled',
+                'created_at',
+                'updated_at',
+                'task_id',
+            )
+            if ordering == ANNOTATION_ORDERING_ID_DESC:
+                annotations_qs = order_annotations(annotations_qs)
+            elif ordering == ANNOTATION_ORDERING_ID_ASC:
+                annotations_qs = order_annotations_asc(annotations_qs)
+
+            annotation_children = Prefetch('annotations', queryset=annotations_qs)
+            prediction_children = 'predictions'
+        else:
+            annotation_children, prediction_children = get_task_children_prefetch(ordering)
+
         return queryset.prefetch_related(
             annotation_children,
             prediction_children,
@@ -408,12 +438,20 @@ class TaskAPI(generics.RetrieveUpdateDestroyAPIView):
         task = generics.get_object_or_404(Task, pk=task_id)
         review = bool_from_request(self.request.GET, 'review', False)
         selected = {'all': False, 'included': [self.kwargs.get('pk')]}
+
+        annotations_stub = False
+        if flag_set('fflag_fix_all_fit_720_lazy_load_annotations', user=self.request.user):
+            annotations_stub = bool_from_request(self.request.GET, 'annotations_stub', False)
+
         if review:
             kwargs = {'fields_for_evaluation': ['annotators', 'reviewed']}
         else:
+            excluded = self.get_excluded_fields_for_evaluation()
+            if annotations_stub:
+                excluded = excluded + ['annotators', 'annotations_ids', 'avg_lead_time']
             kwargs = {
                 'all_fields': True,
-                'excluded_fields_for_evaluation': self.get_excluded_fields_for_evaluation(),
+                'excluded_fields_for_evaluation': excluded,
             }
         project = self.request.query_params.get('project') or self.request.data.get('project')
         if not project:
