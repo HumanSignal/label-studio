@@ -74,9 +74,16 @@
     min-height: 40px;
     white-space: normal;
     overflow: visible;
-    align-items: flex-start;
+    align-items: center;
     padding-top: var(--spacing-tighter);
     padding-bottom: var(--spacing-tighter);
+  }
+
+  &__input_growable &__selection {
+    flex: 1 1 auto;
+    min-width: 0;
+    flex-wrap: wrap;
+    align-items: center;
   }
 
   &__input_growable &__icon {
