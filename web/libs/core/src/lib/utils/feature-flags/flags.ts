@@ -233,3 +233,9 @@ export const FF_FIT_ANNOTATIONS_VERTICAL_LAYOUT = "fflag_feat_front_fit_annotati
  * mutation. Gated for per-org rollout (affected orgs first).
  */
 export const FF_BROS_1486_REACTCODE_DUP_REGIONS = "fflag_fix_bros_1486_react_code_external_apps_duplicate_regions";
+
+/**
+ * Contributor opt-in to projects: project setting that lets contributors join
+ * eligible projects themselves (workforce/services organizations only).
+ */
+export const FF_CONTRIBUTOR_OPT_IN = "fflag_feat_utc_1064_contributor_opt_in";
