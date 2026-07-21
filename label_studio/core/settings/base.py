@@ -464,7 +464,21 @@ SPECTACULAR_SETTINGS = {
             ('COMPLETED', 'Completed'),
             ('FAILED', 'Failed'),
         ),
+        # Stored organization roles: includes the hidden VIEW_ONLY backing role ('VO',
+        # FIT-2196), which can appear in responses but is never assignable via role APIs.
         'OrganizationRoleEnum': (
+            ('OW', 'Owner'),
+            ('AD', 'Administrator'),
+            ('MA', 'Manager'),
+            ('RE', 'Reviewer'),
+            ('AN', 'Annotator'),
+            ('DI', 'Deactivated'),
+            ('NO', 'Not Activated'),
+            ('VO', 'View Only'),
+        ),
+        # Assignable roles (OrganizationRole.public_choices()): what role-assignment
+        # inputs accept — hidden backing roles are excluded.
+        'AssignableOrganizationRoleEnum': (
             ('OW', 'Owner'),
             ('AD', 'Administrator'),
             ('MA', 'Manager'),
@@ -481,6 +495,7 @@ SPECTACULAR_SETTINGS = {
             'AN',
             'DI',
             'NO',
+            'VO',
         ),
         'ProjectImportStatusEnum': (
             ('created', 'Created'),

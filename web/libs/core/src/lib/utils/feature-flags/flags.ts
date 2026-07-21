@@ -235,6 +235,13 @@ export const FF_FIT_ANNOTATIONS_VERTICAL_LAYOUT = "fflag_feat_front_fit_annotati
 export const FF_BROS_1486_REACTCODE_DUP_REGIONS = "fflag_fix_bros_1486_react_code_external_apps_duplicate_regions";
 
 /**
+ * View-Only users: free, bounded read-only billing seat type.
+ * Rollout flag for the backend foundation (membership type,
+ * `max_view_only_users` entitlement, paid-seat exclusion, reporting).
+ */
+export const FF_VIEW_ONLY_USERS = "fflag_feat_back_fit_2196_view_only_users_short";
+
+/**
  * Contributor opt-in to projects: project setting that lets contributors join
  * eligible projects themselves (workforce/services organizations only).
  */
