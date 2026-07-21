@@ -56,8 +56,19 @@ const columnsRaw = [
   },
 ];
 
-const createUnavailableFilter = () => {
-  const root = RootStore.create({ viewsStore: { columnsRaw } });
+const createFilter = ({ available = false, multiple = true }: { available?: boolean; multiple?: boolean } = {}) => {
+  const configuredColumns = columnsRaw.map((column) =>
+    column.id === "dimension_42"
+      ? {
+          ...column,
+          available_for_new_filters: available,
+          filter_available: available,
+          unavailable_reason: available ? undefined : column.unavailable_reason,
+          schema: { items: [{ value: "positive", title: "positive" }], multiple },
+        }
+      : column,
+  );
+  const root = RootStore.create({ viewsStore: { columnsRaw: configuredColumns } });
   root.viewsStore.fetchColumns();
   unprotect(root);
   root.viewsStore.views.push({
@@ -77,6 +88,8 @@ const createUnavailableFilter = () => {
   return { root, view: root.viewsStore.views[0], filter: root.viewsStore.views[0].filters[0] };
 };
 
+const createUnavailableFilter = () => createFilter();
+
 const FilterLineHarness = observer(
   ({ view, sidebar }: { view: ReturnType<typeof createUnavailableFilter>["view"]; sidebar: boolean }) => (
     <>
@@ -94,6 +107,28 @@ const FilterLineHarness = observer(
     </>
   ),
 );
+
+describe("Dimension result filter cardinality (FIT-2241)", () => {
+  let root: ReturnType<typeof RootStore.create> | null = null;
+
+  afterEach(() => {
+    if (root) destroy(root);
+    root = null;
+  });
+
+  for (const { multiple, label } of [
+    { multiple: false, label: "is" },
+    { multiple: true, label: "includes all" },
+  ]) {
+    it(`shows ${label} for ${multiple ? "set-valued" : "scalar"} Dimensions`, () => {
+      const setup = createFilter({ available: true, multiple });
+      root = setup.root;
+      render(<FilterLineHarness view={setup.view} sidebar={false} />);
+
+      expect(within(screen.getByTestId("filter-line-operator")).getByRole("button")).toHaveTextContent(label);
+    });
+  }
+});
 
 describe("unavailable saved filters (FIT-2173)", () => {
   let root: ReturnType<typeof RootStore.create> | null = null;
