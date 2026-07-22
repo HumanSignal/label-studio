@@ -132,8 +132,12 @@ const VideoConfig = observer(({ item }) => {
   );
 });
 
-const hasOpenDrawingClosableVideoVector = (item) => {
-  return item.regs?.some((reg) => reg.type === "videovectorregion" && reg.isDrawing && !reg.closed && reg.closable);
+const hasFrameBlockingClosableVideoVector = (item) => {
+  return item.regs?.some((reg) => {
+    if (reg.type !== "videovectorregion" || !reg.closable || reg.closed) return false;
+    if (reg.isDrawing) return true;
+    return reg.incomplete && (reg.selected || reg.inSelection);
+  });
 };
 
 const HtxVideoView = ({ item, store }) => {
@@ -373,7 +377,7 @@ const HtxVideoView = ({ item, store }) => {
   // VIDEO EVENT HANDLERS
   const handleFrameChange = useCallback(
     (position, length) => {
-      if (hasOpenDrawingClosableVideoVector(item)) {
+      if (hasFrameBlockingClosableVideoVector(item)) {
         if (item.ref.current?.playing) {
           item.ref.current.pause();
           item.triggerSyncPause();
@@ -413,7 +417,7 @@ const HtxVideoView = ({ item, store }) => {
 
   // TIMELINE EVENT HANDLERS
   const handlePlay = useCallback(() => {
-    if (hasOpenDrawingClosableVideoVector(item)) return;
+    if (hasFrameBlockingClosableVideoVector(item)) return;
 
     setPlaying((_playing) => {
       if (!item.ref.current.playing) {
@@ -455,10 +459,15 @@ const HtxVideoView = ({ item, store }) => {
     (_, id, select) => {
       const region = item.findRegion(id);
       const selected = region?.selected || region?.inSelection;
+      const wasNotSelected = !selected;
 
       if (!region || (isDefined(select) && selected === select)) return;
 
       region.onClickRegion();
+
+      if (wasNotSelected && region.incomplete) {
+        region.onSelectInOutliner?.(wasNotSelected);
+      }
     },
     [item],
   );
@@ -489,7 +498,7 @@ const HtxVideoView = ({ item, store }) => {
 
   const handleTimelinePositionChange = useCallback(
     (newPosition) => {
-      if (hasOpenDrawingClosableVideoVector(item)) return false;
+      if (hasFrameBlockingClosableVideoVector(item)) return false;
 
       if (position !== newPosition) {
         const now = Date.now();

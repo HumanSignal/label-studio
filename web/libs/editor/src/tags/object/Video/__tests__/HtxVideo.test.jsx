@@ -375,6 +375,41 @@ describe("HtxVideoView", () => {
     expect(item.setFrame).toHaveBeenCalledWith(25);
   });
 
+  it("blocks Timeline frame changes for a selected incomplete VideoVector after drawing state is restored", async () => {
+    const item = createMockItem({
+      regs: [createMockVideoVectorRegion({ isDrawing: false, incomplete: true, selected: true })],
+    });
+    const store = createMockStore();
+    render(<HtxVideoView item={item} store={store} />);
+    await flushRaf();
+    await triggerVideoLoad();
+
+    item.setFrame.mockClear();
+    const onPositionChange = mockTimelineProps.onPositionChange;
+    expect(onPositionChange).toBeDefined();
+
+    expect(onPositionChange(25)).toBe(false);
+
+    expect(item.setFrame).not.toHaveBeenCalled();
+    expect(mockTimelineProps.position).toBe(1);
+  });
+
+  it("allows Timeline frame changes for an unselected incomplete VideoVector after drawing state is restored", async () => {
+    const item = createMockItem({ regs: [createMockVideoVectorRegion({ isDrawing: false, incomplete: true })] });
+    const store = createMockStore();
+    render(<HtxVideoView item={item} store={store} />);
+    await flushRaf();
+    await triggerVideoLoad();
+
+    item.setFrame.mockClear();
+    const onPositionChange = mockTimelineProps.onPositionChange;
+    expect(onPositionChange).toBeDefined();
+
+    expect(onPositionChange(25)).not.toBe(false);
+
+    expect(item.setFrame).toHaveBeenCalledWith(25);
+  });
+
   it("allows Timeline frame changes while a non-closable VideoVector is being drawn", async () => {
     const item = createMockItem({ regs: [createMockVideoVectorRegion({ closable: false })] });
     const store = createMockStore();
@@ -458,6 +493,27 @@ describe("HtxVideoView", () => {
     const onSelectRegion = mockTimelineProps.onSelectRegion;
     onSelectRegion(null, "r1", true);
     expect(onClickRegion).toHaveBeenCalled();
+  });
+
+  it("Timeline onSelectRegion sends a newly-selected incomplete VideoVector back to its first frame", async () => {
+    const onClickRegion = mock();
+    const onSelectInOutliner = mock();
+    const item = createMockItem({
+      findRegion: (id) =>
+        id === "r1"
+          ? { selected: false, inSelection: false, incomplete: true, onClickRegion, onSelectInOutliner }
+          : null,
+    });
+    const store = createMockStore();
+    render(<HtxVideoView item={item} store={store} />);
+    await flushRaf();
+    await triggerVideoLoad();
+
+    const onSelectRegion = mockTimelineProps.onSelectRegion;
+    onSelectRegion(null, "r1", true);
+
+    expect(onClickRegion).toHaveBeenCalled();
+    expect(onSelectInOutliner).toHaveBeenCalledWith(true);
   });
 
   it("Timeline onSelectRegion does nothing when region not found", async () => {
