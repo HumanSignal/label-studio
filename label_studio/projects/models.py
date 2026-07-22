@@ -504,6 +504,9 @@ class Project(ProjectMixin, FsmHistoryStateModel):
         :param overlap_cohort_percentage_changed: If cohort_percentage param changed
         :param tasks_number_changed: If tasks number changed in project
         """
+        # Async RQ jobs pickle the Project instance; refresh so concurrent settings
+        # changes (e.g. during duplication) are not overwritten with stale values.
+        self.refresh_from_db(fields=['maximum_annotations', 'overlap_cohort_percentage'])
         logger.info(
             f'Starting _update_tasks_states with params: Project {str(self)} maximum_annotations '
             f'{self.maximum_annotations} and percentage {self.overlap_cohort_percentage}'
@@ -558,6 +561,9 @@ class Project(ProjectMixin, FsmHistoryStateModel):
         """
         Rearrange overlap depending on annotation count in tasks
         """
+        # Async RQ jobs pickle the Project instance; refresh so concurrent settings
+        # changes (e.g. during duplication) are not overwritten with stale values.
+        self.refresh_from_db(fields=['maximum_annotations', 'overlap_cohort_percentage'])
         all_project_tasks = Task.objects.filter(project=self)
         max_annotations = self.maximum_annotations
         must_tasks = int(self.tasks.count() * self.overlap_cohort_percentage / 100 + 0.5)
