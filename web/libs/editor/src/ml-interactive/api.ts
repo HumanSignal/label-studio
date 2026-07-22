@@ -23,7 +23,7 @@ export interface InteractiveBackendSummary {
 
 export async function fetchInteractiveBackends(projectId: number): Promise<InteractiveBackendSummary[]> {
   const res = await fetch(`${API_BASE}/api/ml/?project=${projectId}&is_interactive=true`);
-  if (!res.ok) return [];
+  if (!res.ok) throw new Error(`Failed to fetch interactive ML backends: ${res.status}`);
   const data = await res.json();
   const list = data.results ?? data ?? [];
   return list.map((b: any) => ({ id: b.id, title: b.title }));
@@ -37,22 +37,18 @@ export async function fetchInteractiveBackends(projectId: number): Promise<Inter
  * the task — it's purely a carrier. Pass any current task id from the view.
  */
 export async function fetchCapabilities(backendId: number, taskId: number): Promise<Capabilities | null> {
-  try {
-    const res = await fetch(`${API_BASE}/api/ml/${backendId}/interactive-annotating`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "X-CSRFToken": getCsrfToken(),
-      },
-      credentials: "same-origin",
-      body: JSON.stringify({ task: taskId, context: { event: "capabilities" } }),
-    });
-    if (!res.ok) return null;
-    const data = await res.json();
-    const value = data?.data?.result?.[0]?.value;
-    if (!value || !Array.isArray(value.prompts) || !Array.isArray(value.targets)) return null;
-    return value as Capabilities;
-  } catch {
-    return null;
-  }
+  const res = await fetch(`${API_BASE}/api/ml/${backendId}/interactive-annotating`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "X-CSRFToken": getCsrfToken(),
+    },
+    credentials: "same-origin",
+    body: JSON.stringify({ task: taskId, context: { event: "capabilities" } }),
+  });
+  if (!res.ok) throw new Error(`Failed to fetch ML backend capabilities: ${res.status}`);
+  const data = await res.json();
+  const value = data?.data?.result?.[0]?.value;
+  if (!value || !Array.isArray(value.prompts) || !Array.isArray(value.targets)) return null;
+  return value as Capabilities;
 }
