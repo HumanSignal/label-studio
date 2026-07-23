@@ -487,6 +487,16 @@ SPECTACULAR_SETTINGS = {
             ('DI', 'Deactivated'),
             ('NO', 'Not Activated'),
         ),
+        # Seat types assignable through invite/membership APIs
+        # (UserType.assignable_choices()): Service Accounts are provisioned via
+        # their dedicated API and are excluded.
+        'AssignableUserTypeEnum': (
+            ('standard', 'Standard'),
+            ('viewonly', 'View Only'),
+        ),
+        # Membership updates support only the paid upgrade direction. View-Only
+        # creation is exposed separately through the invite contract.
+        'StandardUserTypeEnum': (('standard', 'Standard'),),
         'OrganizationPermissionRoleEnum': (
             'OW',
             'AD',
