@@ -1581,6 +1581,33 @@
       "version": 2,
       "deleted": false
     },
+    "fflag_feat_back_fit_2187_verified_domain_sso_redirect": {
+      "key": "fflag_feat_back_fit_2187_verified_domain_sso_redirect",
+      "on": true,
+      "prerequisites": [],
+      "targets": [],
+      "contextTargets": [],
+      "rules": [],
+      "fallthrough": {
+        "variation": 0
+      },
+      "offVariation": 1,
+      "variations": [
+        true,
+        false
+      ],
+      "clientSideAvailability": {
+        "usingMobileKey": false,
+        "usingEnvironmentId": false
+      },
+      "clientSide": false,
+      "salt": "1a10abea8f9446f49d67cd0ec27db80f",
+      "trackEvents": false,
+      "trackEventsFallthrough": false,
+      "debugEventsUntilDate": null,
+      "version": 3,
+      "deleted": false
+    },
     "fflag_feat_back_fit_2196_view_only_users_short": {
       "key": "fflag_feat_back_fit_2196_view_only_users_short",
       "on": false,
