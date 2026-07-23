@@ -47,6 +47,12 @@
   height: auto;
   white-space: normal;
   align-items: center;
+
+  .icon svg,
+  .iconTrailing svg {
+    width: 16px;
+    height: 16px;
+  }
 }
 
 .size-small,
@@ -492,6 +498,7 @@
   display: inline-flex;
   align-items: center;
   flex-shrink: 0;
+  margin-right: var(--spacing-tighter);
 
   & svg {
     width: 14px;

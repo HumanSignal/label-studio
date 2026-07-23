@@ -1,7 +1,7 @@
 import { useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import type { ColumnDef } from "@tanstack/react-table";
-import { IconChevronRight } from "@humansignal/icons";
+import { IconChevronRight, IconWarning } from "@humansignal/icons";
 import { Badge } from "./badge";
 import { EnterpriseBadge } from "../enterprise-badge/enterprise-badge";
 import { DataTable } from "../data-table";
@@ -304,21 +304,43 @@ export const ShapeVariants: Story = {
  * Badges support two sizes: medium (default) and small. Small should be used sparingly, only when real estate is minimal—e.g. inside input fields, dropdowns, or beside field labels.
  */
 /**
- *
- * When `trailingIcon` is set, an icon renders after the label (e.g. chevron for interactive chips).
+ * Badges accept both a leading `icon` (rendered before the label, e.g. a warning for a status
+ * badge) and a `trailingIcon` (rendered after the label, e.g. a chevron on interactive chips).
+ * Either can be used on its own or both together, and both work at every size.
  */
-export const WithTrailingIcon: Story = {
+export const WithIcons: Story = {
   render: () => (
-    <div className="flex flex-wrap items-center gap-3">
-      <Badge variant="grape" shape="rounded" look="filled" trailingIcon={<IconChevronRight aria-hidden />}>
-        Annotation in progress
-      </Badge>
-      <Badge variant="grape" shape="rounded" look="solid" trailingIcon={<IconChevronRight aria-hidden />}>
-        Solid look
-      </Badge>
-      <Badge variant="kale" shape="rounded" size="small" trailingIcon={<IconChevronRight aria-hidden />}>
-        Small
-      </Badge>
+    <div className="flex flex-col gap-4">
+      {/* Placement: leading, trailing, and both. */}
+      <div className="flex flex-wrap items-center gap-3">
+        <Badge variant="negative" icon={<IconWarning aria-hidden />}>
+          Needs attention
+        </Badge>
+        <Badge variant="grape" shape="rounded" look="filled" trailingIcon={<IconChevronRight aria-hidden />}>
+          Annotation in progress
+        </Badge>
+        <Badge
+          variant="grape"
+          shape="rounded"
+          look="solid"
+          icon={<IconWarning aria-hidden />}
+          trailingIcon={<IconChevronRight aria-hidden />}
+        >
+          Leading and trailing
+        </Badge>
+      </div>
+      {/* Sizes: the leading icon scales with the badge size. */}
+      <div className="flex flex-wrap items-center gap-3">
+        <Badge variant="negative" size="large" icon={<IconWarning aria-hidden />}>
+          Large
+        </Badge>
+        <Badge variant="negative" size="medium" icon={<IconWarning aria-hidden />}>
+          Medium
+        </Badge>
+        <Badge variant="negative" size="small" icon={<IconWarning aria-hidden />}>
+          Small
+        </Badge>
+      </div>
     </div>
   ),
 };
