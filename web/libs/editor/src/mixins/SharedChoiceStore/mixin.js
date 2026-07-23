@@ -114,3 +114,13 @@ export const destroy = () => {
   Stores.clear();
   StoreIds.clear();
 };
+
+/**
+ * Purge a single stale entry from both caches so the next `preProcessSnapshot` recreates
+ * a fresh store for the current tree instead of adopting one that still lives in another
+ * (foreign or dead) state tree (BROS-849).
+ */
+export const purgeStaleStore = (id) => {
+  Stores.delete(id);
+  StoreIds.delete(id);
+};
