@@ -160,6 +160,7 @@ exclude = [
     "venv",
     "**/migrations/*.py",
     "scripts",
+    "*.md",
 ]
 
 [tool.ruff.lint]
