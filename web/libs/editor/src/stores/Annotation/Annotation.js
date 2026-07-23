@@ -910,6 +910,8 @@ const _Annotation = types
           res = await Promise.resolve(events.invokeFirst("submitDraft", root, self, params));
         }
 
+        if (!isAlive(self)) return res;
+
         self.onDraftSaved(res);
 
         return res;

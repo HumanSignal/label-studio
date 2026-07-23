@@ -22,7 +22,7 @@ import "../../../tags/visual/View";
 import "../../../tags/object/RichText";
 import "../../../tags/object/Image/Image.js";
 import "../../../tags/control/Labels/Labels.jsx";
-import { getEnv, getSnapshot, unprotect, protect } from "mobx-state-tree";
+import { getEnv, getSnapshot, isAlive, protect, setLivelinessChecking, unprotect } from "mobx-state-tree";
 import AppStore from "../../AppStore";
 
 const MINIMAL_CONFIG =
@@ -526,6 +526,36 @@ describe("Annotation model", () => {
 
         expect(env.events.invokeFirst).toHaveBeenCalled();
         expect(annotation.isDraftSaving).toBe(false);
+      });
+    });
+
+    describe("saveDraft lifecycle (BROS-1477)", () => {
+      it("does not update an annotation destroyed while the draft request is in flight", async () => {
+        setLivelinessChecking("error");
+        try {
+          const { annotation, store, env } = createStoreWithAnnotation();
+          let resolveDraft;
+          const draftResponse = new Promise((resolve) => {
+            resolveDraft = resolve;
+          });
+          const submitDraft = mock(() => draftResponse);
+
+          env.events.hasEvent = mock((name) => name === "submitDraft");
+          store.submitDraft = submitDraft;
+
+          const savePromise = annotation.saveDraft();
+
+          await new Promise((resolve) => setTimeout(resolve, 0));
+          expect(submitDraft).toHaveBeenCalled();
+
+          store.annotationStore.resetAnnotations();
+          expect(isAlive(annotation)).toBe(false);
+          resolveDraft({ id: 99 });
+
+          await expect(savePromise).resolves.toEqual({ id: 99 });
+        } finally {
+          setLivelinessChecking("warn");
+        }
       });
     });
 
