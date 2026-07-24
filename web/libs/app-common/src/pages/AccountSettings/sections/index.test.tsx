@@ -1,5 +1,7 @@
+import { describe, expect, it } from "bun:test";
 import { accountSettingsSections } from "./index";
 import type { AuthPermissions } from "@humansignal/core/providers/AuthProvider";
+import { ABILITY } from "@humansignal/core/providers/AuthProvider";
 import type { AuthTokenSettings } from "../types";
 
 const settings: AuthTokenSettings = {
@@ -33,5 +35,24 @@ describe("accountSettingsSections", () => {
 
     expect(sections.map((section) => section.id).slice(0, 2)).toEqual(["personal-info", "skills"]);
     expect(sections.slice(0, 2).map((section) => section.title)).toEqual(["Profile", "Skills & Expertise"]);
+  });
+
+  it("hides PAT and legacy token sections when the user cannot create tokens (View-Only)", () => {
+    const tokenSettings: AuthTokenSettings = {
+      api_tokens_enabled: true,
+      legacy_api_tokens_enabled: true,
+      api_token_ttl_days: 30,
+    };
+    const denyTokenPermissions: AuthPermissions = {
+      can: (ability) => ability !== ABILITY.can_create_tokens,
+      canAny: () => false,
+      canAll: () => false,
+    };
+
+    const sections = accountSettingsSections(tokenSettings, denyTokenPermissions, []);
+    const ids = sections.map((section) => section.id);
+
+    expect(ids).not.toContain("personal-access-token");
+    expect(ids).not.toContain("legacy-token");
   });
 });
