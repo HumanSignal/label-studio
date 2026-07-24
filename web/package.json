@@ -255,7 +255,7 @@
     "qs": ">=6.14.2",
     "rollup": ">=4.59.0",
     "@isaacs/brace-expansion": ">=5.0.1",
-    "immutable": ">=5.1.5",
+    "immutable": ">=5.1.9",
     "axios": ">=1.13.5",
     "lodash": ">=4.18.1",
     "serialize-javascript": ">=7.0.3",
