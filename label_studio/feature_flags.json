@@ -5307,6 +5307,33 @@
       "version": 2,
       "deleted": false
     },
+    "fflag_fix_plt_1241_gt_agreement_from_annotations_22072026_short": {
+      "key": "fflag_fix_plt_1241_gt_agreement_from_annotations_22072026_short",
+      "on": false,
+      "prerequisites": [],
+      "targets": [],
+      "contextTargets": [],
+      "rules": [],
+      "fallthrough": {
+        "variation": 0
+      },
+      "offVariation": 1,
+      "variations": [
+        true,
+        false
+      ],
+      "clientSideAvailability": {
+        "usingMobileKey": false,
+        "usingEnvironmentId": false
+      },
+      "clientSide": false,
+      "salt": "d2dd3715eeb84b6aa1f9469755627cf9",
+      "trackEvents": false,
+      "trackEventsFallthrough": false,
+      "debugEventsUntilDate": null,
+      "version": 2,
+      "deleted": false
+    },
     "fflag_fix_utc_1011_reviewed_then_updated_short": {
       "key": "fflag_fix_utc_1011_reviewed_then_updated_short",
       "on": true,
