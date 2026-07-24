@@ -404,5 +404,36 @@ describe("resolveFilterTransition — full type×type matrix", () => {
       expect(result.value).toBe("hello");
       expect(result.valueReset).toBe(false);
     });
+
+    it("FIT-2275 gap 1: Number→Number different column id resets stale value", () => {
+      const result = resolveFilterTransition({
+        prevType: "Number",
+        prevOperator: "greater",
+        prevValue: 10,
+        newType: "Number",
+        newOperators: OPERATORS.Number,
+        prevColumnId: "filter:tasks:total_annotations",
+        newColumnId: "filter:tasks:id",
+      });
+
+      expect(result.operator).toBe("greater");
+      expect(result.valueReset).toBe(true);
+      expect(result.value).toBeUndefined();
+    });
+
+    it("FIT-2275 gap 1: same column id still preserves value for schemaless Number", () => {
+      const result = resolveFilterTransition({
+        prevType: "Number",
+        prevOperator: "greater",
+        prevValue: 10,
+        newType: "Number",
+        newOperators: OPERATORS.Number,
+        prevColumnId: "filter:tasks:id",
+        newColumnId: "filter:tasks:id",
+      });
+
+      expect(result.value).toBe(10);
+      expect(result.valueReset).toBe(false);
+    });
   });
 });

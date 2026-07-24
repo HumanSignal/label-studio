@@ -1,4 +1,5 @@
 import { isListMembershipOperator, LIST_MEMBERSHIP_OPERATORS, recoverFilterSnapshot } from "./tab_filter";
+import { fieldAliasFromFilterId, sanitizeIntegerUserListValue } from "./filter_snapshot_utils";
 
 // `recoverFilterSnapshot` runs in TabFilter.preProcessSnapshot on every view load.
 // Its job: heal views that were saved with bad shape for `in_list` / `not_in_list`
@@ -67,6 +68,26 @@ describe("recoverFilterSnapshot (BROS-1203 legacy view recovery)", () => {
     expect(out.value).toEqual([99]);
     expect(out.child_filter).toEqual(sn.child_filter);
   });
+
+  it("FIT-2275 gap 4: resets annotators filter with model-version strings on load", () => {
+    const sn = {
+      filter: "filter:tasks:annotators",
+      operator: "contains",
+      value: ["gpt-4"],
+    };
+    const out = recoverFilterSnapshot(sn);
+    expect(out.value).toBeNull();
+  });
+
+  it("FIT-2275 gap 4: keeps valid integer annotators ids on load", () => {
+    const sn = {
+      filter: "filter:tasks:annotators",
+      operator: "contains",
+      value: [1, 2],
+    };
+    const out = recoverFilterSnapshot(sn);
+    expect(out.value).toEqual([1, 2]);
+  });
 });
 
 // The list-membership predicate is the linchpin of three defensive paths
@@ -107,5 +128,39 @@ describe("isListMembershipOperator (BROS-1203 / TC1792 scope guard)", () => {
     expect(LIST_MEMBERSHIP_OPERATORS.size).toBe(2);
     expect(LIST_MEMBERSHIP_OPERATORS.has("in_list")).toBe(true);
     expect(LIST_MEMBERSHIP_OPERATORS.has("not_in_list")).toBe(true);
+  });
+});
+
+describe("sanitizeIntegerUserListValue (FIT-2275 gap 3)", () => {
+  it("returns null for annotators filter with model-version strings (recent-restore shape)", () => {
+    const result = sanitizeIntegerUserListValue(["gpt-4"], {
+      fieldAlias: "annotators",
+      operator: "contains",
+    });
+    expect(result).toBeNull();
+  });
+
+  it("passes through valid integer user id arrays", () => {
+    expect(
+      sanitizeIntegerUserListValue([1, 2], {
+        fieldAlias: "annotators",
+        operator: "contains",
+      }),
+    ).toEqual([1, 2]);
+  });
+
+  it("does not touch non-user-list columns (model versions keep strings)", () => {
+    expect(
+      sanitizeIntegerUserListValue(["gpt-4"], {
+        fieldAlias: "model_versions",
+        operator: "contains",
+      }),
+    ).toEqual(["gpt-4"]);
+  });
+});
+
+describe("fieldAliasFromFilterId", () => {
+  it("extracts annotators alias from filter id", () => {
+    expect(fieldAliasFromFilterId("filter:tasks:annotators")).toBe("annotators");
   });
 });

@@ -6,7 +6,12 @@ import { allowedFilterOperations } from "../../components/Filters/types/Utility"
 import { debounce } from "@humansignal/core/lib/utils/debounce";
 import { isBlank, isDefined } from "../../utils/utils";
 import { FilterValueRange, FilterValueType, TabFilterType } from "./tab_filter_type";
-import { resolveFilterTransition } from "./filter_snapshot_utils";
+import {
+  resolveFilterTransition,
+  resolveOperatorValueTransition,
+  sanitizeIntegerUserListValue,
+  fieldAliasFromFilterId,
+} from "./filter_snapshot_utils";
 import { guidGenerator } from "../../utils/random";
 
 /**
@@ -44,6 +49,8 @@ export function recoverFilterSnapshot(sn) {
   if (isListMembershipOperator(sn.operator) && value !== null && !Array.isArray(value)) {
     value = [value];
   }
+  const fieldAlias = fieldAliasFromFilterId(sn.filter);
+  value = sanitizeIntegerUserListValue(value, { fieldAlias, operator: sn.operator });
   return { ...sn, value };
 }
 
@@ -196,6 +203,7 @@ export const TabFilter = types
       const prevOperator = self.operator;
       const prevValue = self.value;
       const prevType = self.filter.currentType;
+      const prevColumnId = self.filter.id;
 
       self.filter = value;
 
@@ -209,6 +217,8 @@ export const TabFilter = types
         newType: self.filter.currentType,
         newOperators: self.component,
         newSchema: self.filter.schema,
+        prevColumnId,
+        newColumnId: self.filter.id,
       });
 
       self.operator = result.operator;
@@ -249,8 +259,14 @@ export const TabFilter = types
         self.operator = newOperators[0].key;
       }
 
-      if (value !== undefined && value !== null) {
-        self.setValue(value);
+      const fieldAlias = self.filter?.field?.alias;
+      const sanitizedValue =
+        value !== undefined && value !== null
+          ? sanitizeIntegerUserListValue(value, { fieldAlias, operator: self.operator })
+          : value;
+
+      if (sanitizedValue !== undefined && sanitizedValue !== null) {
+        self.setValue(sanitizedValue);
       } else {
         self.setDefaultValue();
       }
@@ -259,6 +275,7 @@ export const TabFilter = types
     },
 
     setOperator(operator) {
+      const previousOperator = self.operator;
       const previousValueType = self.componentValueType;
       const previousValue = self.value;
 
@@ -268,26 +285,19 @@ export const TabFilter = types
       }
 
       const nextValueType = self.componentValueType;
-      if (previousValueType !== nextValueType) {
-        // BROS-1203: when crossing single ↔ list boundary, seed the new shape from the
-        // previous value instead of nuking it. Skip non-meaningful single values
-        // (null / empty string / NaN) so we don't seed ["" ] into the list.
-        const isMeaningfulSingle =
-          previousValue != null &&
-          typeof previousValue !== "object" &&
-          !(typeof previousValue === "string" && previousValue.trim() === "");
-        if (nextValueType === "list" && previousValueType === "single" && isMeaningfulSingle) {
-          self.setValue([previousValue]);
-        } else if (
-          nextValueType === "single" &&
-          previousValueType === "list" &&
-          Array.isArray(previousValue) &&
-          previousValue.length > 0
-        ) {
-          self.setValue(previousValue[0]);
-        } else {
-          self.setDefaultValue();
-        }
+      const transition = resolveOperatorValueTransition({
+        previousOperator,
+        nextOperator: operator,
+        previousValueType,
+        nextValueType,
+        previousValue,
+        isListMembershipOperator,
+      });
+
+      if (transition.action === "set") {
+        self.setValue(transition.value);
+      } else if (transition.action === "default") {
+        self.setDefaultValue();
       }
 
       self.save();
