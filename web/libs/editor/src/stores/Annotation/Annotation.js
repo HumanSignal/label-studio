@@ -817,17 +817,33 @@ const _Annotation = types
       self.autosave.flush();
       self.pauseAutosave();
 
-      // reinit annotation from required state
-      self.deleteAllRegions({ deleteReadOnly: true });
-      if (shouldSelectDraft) {
-        self.deserializeResults(self.versions.draft);
-      } else {
-        self.deserializeResults(self.versions.result);
-      }
-      self.draftSelected = shouldSelectDraft;
+      // BROS-1477: History navigation must not count as an annotation edit.
+      // deleteAllRegions + deserializeResults + updateObjects emit multiple
+      // onSnapshot events (including MST's post-action flush). A single
+      // setSkipNextUndoState only covers one event, so lastAdditionTime still
+      // advances and needsDraftSave() sticks true (QA 93466: Updated → Draft).
+      // Keep the same swap as before; only suppress undo recording through the
+      // post-action flush (next macrotask), same timing pattern as startAutosave.
+      self.history.beginSuppressUndo();
+      try {
+        // reinit annotation from required state
+        self.deleteAllRegions({ deleteReadOnly: true });
+        if (shouldSelectDraft) {
+          self.deserializeResults(self.versions.draft);
+        } else {
+          self.deserializeResults(self.versions.result);
+        }
+        self.draftSelected = shouldSelectDraft;
 
-      // reinit objects
-      self.updateObjects();
+        // reinit objects
+        self.updateObjects();
+      } finally {
+        setTimeout(() => {
+          if (!isAlive(self)) return;
+          self.history.endSuppressUndo();
+        }, 0);
+      }
+
       self.startAutosave();
     },
 

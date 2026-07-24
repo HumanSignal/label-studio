@@ -150,6 +150,23 @@ describe("TimeTraveller", () => {
       expect(root.timeTraveller.history.length).toBe(len);
     });
 
+    it("beginSuppressUndo suppresses multiple addUndoState calls until ended", () => {
+      const { root, store } = createRoot();
+      addHistoryStates(root.timeTraveller, [{ value: 1 }]);
+      const len = root.timeTraveller.history.length;
+      const before = root.timeTraveller.lastAdditionTime.getTime();
+
+      root.timeTraveller.beginSuppressUndo();
+      applySnapshot(store, { value: 2 });
+      applySnapshot(store, { value: 3 });
+      expect(root.timeTraveller.history.length).toBe(len);
+      expect(root.timeTraveller.lastAdditionTime.getTime()).toBe(before);
+
+      root.timeTraveller.endSuppressUndo();
+      applySnapshot(store, { value: 4 });
+      expect(root.timeTraveller.history.length).toBe(len + 1);
+    });
+
     it("setReplaceNextUndoState replaces current index instead of appending", () => {
       const { root, store } = createRoot();
       addHistoryStates(root.timeTraveller, [{ value: 1 }, { value: 2 }]);

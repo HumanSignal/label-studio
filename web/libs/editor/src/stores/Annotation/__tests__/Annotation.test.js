@@ -559,6 +559,63 @@ describe("Annotation model", () => {
       });
     });
 
+    describe("toggleDraft history navigation (BROS-1477 QA 93466)", () => {
+      /** Simulate a second undo state (requires unprotecting the store root in MST 3). */
+      function pushDuplicateHistoryState(store, annotation) {
+        unprotect(store);
+        try {
+          const tt = annotation.history;
+          const snap = getSnapshot(annotation.trackedState);
+          tt.history.push(snap);
+          tt.undoIdx = tt.history.length - 1;
+        } finally {
+          protect(store);
+        }
+      }
+
+      it("does not leave needsDraftSave stuck after Updated → Draft navigation", async () => {
+        const { store, annotation } = createStoreWithAnnotation();
+        const draftSavedAt = "2026-07-24T12:00:00.000Z";
+        const labelResult = (id) => [{ id, type: "labels", from_name: "l", to_name: "img", value: { labels: ["A"] } }];
+
+        annotation.addVersions({
+          result: labelResult("submitted"),
+          draft: labelResult("draft"),
+        });
+        annotation.autosave = { flush: mock(), cancel: mock(), paused: false };
+        // Avoid full RectangleLabels registry (flaky under ordered coverage); still exercise
+        // multi-snapshot undo recording that made the indicator stick.
+        annotation.deleteAllRegions = mock();
+        annotation.deserializeResults = mock(() => {
+          annotation.history.addUndoState(getSnapshot(annotation.trackedState));
+          annotation.history.addUndoState(getSnapshot(annotation.trackedState));
+        });
+        annotation.updateObjects = mock();
+
+        // Start on the submitted/updated snapshot (History "Updated" row).
+        annotation.setDraftSelected(false);
+        annotation.setDraftSaved(draftSavedAt);
+        pushDuplicateHistoryState(store, annotation);
+        unprotect(store);
+        try {
+          annotation.history.lastAdditionTime = new Date("2026-07-24T11:59:00.000Z");
+        } finally {
+          protect(store);
+        }
+        expect(annotation.needsDraftSave()).toBe(false);
+
+        // Clicking the live Draft row calls toggleDraft(true).
+        annotation.toggleDraft(true);
+        // MST flushes post-action onSnapshot after the action; suppress lifts on next tick.
+        await new Promise((resolve) => setTimeout(resolve, 0));
+
+        expect(annotation.draftSelected).toBe(true);
+        expect(annotation.deserializeResults).toHaveBeenCalled();
+        expect(annotation.history.lastAdditionTime.getTime()).toBe(new Date("2026-07-24T11:59:00.000Z").getTime());
+        expect(annotation.needsDraftSave()).toBe(false);
+      });
+    });
+
     it("deserializeAnnotation warns and delegates to deserializeResults", () => {
       const consoleSpy = spyOn(console, "warn").mockImplementation(() => {});
       const { annotation } = createStoreWithAnnotation();
