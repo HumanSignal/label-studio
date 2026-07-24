@@ -8,7 +8,9 @@ the raw `filter:tasks:*` column string. Both must agree on the allowlist to keep
 the public contract consistent.
 """
 
-from data_manager.serializers import _column_supports_list_membership
+import pytest
+from data_manager.serializers import FilterSerializer, _column_supports_list_membership
+from django.test import override_settings
 
 
 class TestColumnSupportsListMembership:
@@ -55,3 +57,65 @@ class TestColumnSupportsListMembership:
     def test_descending_marker_tolerated(self):
         """The `-` descending marker is stripped (consistent with validate_column)."""
         assert _column_supports_list_membership('filter:tasks:-id') is True
+
+
+class TestUserFilterValueValidation:
+    @staticmethod
+    def _filter(column='filter:tasks:annotators', value=None, operator='contains'):
+        return {
+            'column': column,
+            'type': 'List',
+            'operator': operator,
+            'value': [1, 2] if value is None else value,
+        }
+
+    @pytest.mark.parametrize(
+        'column',
+        [
+            'filter:tasks:annotators',
+            'filter:tasks:updated_by',
+            'filter:tasks:reviewers',
+            'filter:tasks:comment_authors',
+            'filter:tasks:skipped_by_annotator',
+        ],
+    )
+    def test_user_filter_lists_accept_integer_ids(self, column):
+        serializer = FilterSerializer(data=self._filter(column=column))
+
+        assert serializer.is_valid(), serializer.errors
+
+    @pytest.mark.parametrize('value', [['invalid'], [1, None], [True], [1.5]])
+    def test_user_filter_lists_reject_malformed_ids(self, value):
+        serializer = FilterSerializer(data=self._filter(value=value))
+
+        assert not serializer.is_valid()
+
+    @override_settings(DATA_MANAGER_LIST_FILTER_MAX_VALUES=2)
+    def test_user_filter_lists_reject_oversized_values(self):
+        serializer = FilterSerializer(data=self._filter(value=[1, 2, 3]))
+
+        assert not serializer.is_valid()
+
+    @override_settings(DATA_MANAGER_LIST_FILTER_MAX_VALUES=1)
+    def test_child_user_filter_uses_same_validation(self):
+        payload = self._filter(column='filter:tasks:annotations_results_json.choice', value=['A'])
+        payload['child_filter'] = self._filter(value=[1, 2])
+        serializer = FilterSerializer(data=payload)
+
+        assert not serializer.is_valid()
+
+    @pytest.mark.parametrize('operator', ['equal', 'not_equal', 'regex'])
+    def test_user_filters_reject_unsupported_operators(self, operator):
+        serializer = FilterSerializer(data=self._filter(operator=operator))
+
+        assert not serializer.is_valid()
+
+    def test_user_filters_keep_empty_operator(self):
+        serializer = FilterSerializer(data=self._filter(operator='empty', value=True))
+
+        assert serializer.is_valid(), serializer.errors
+
+    def test_user_filters_keep_legacy_scalar_equal_operator(self):
+        serializer = FilterSerializer(data=self._filter(column='filter:tasks:updated_by', operator='equal', value=1))
+
+        assert serializer.is_valid(), serializer.errors

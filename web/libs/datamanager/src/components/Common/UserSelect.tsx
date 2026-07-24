@@ -9,9 +9,19 @@ import { userDisplayName } from "@humansignal/core/lib/utils/helpers";
 
 const DEBOUNCE_DELAY = 300;
 
+const normalizeSelectedValue = (value, multiple) => {
+  if (!multiple) {
+    return Array.isArray(value) ? value[0] : value;
+  }
+  return Array.isArray(value) ? value : value != null ? [value] : [];
+};
+
+export const getUserOptionLabel = (user: { email?: string | null }, displayName: string) =>
+  user.email && user.email !== displayName ? `${displayName} (${user.email})` : displayName;
+
 export const UserSelect = observer(({ filter, onChange, multiple, value, placeholder, disabled }) => {
   const [search, setSearch] = useState(null);
-  const [selectedValue, setSelectedValue] = useState(value);
+  const selectedValue = useMemo(() => normalizeSelectedValue(value, multiple), [multiple, value]);
 
   // Get project ID from the filter context or use a default
   const projectId = filter?.view?.project?.id || 1;
@@ -33,16 +43,17 @@ export const UserSelect = observer(({ filter, onChange, multiple, value, placeho
   const options = useMemo(() => {
     return users.filter(Boolean).map((user) => {
       const displayName = userDisplayName(user);
+      const optionLabel = getUserOptionLabel(user, displayName);
       const displayUser = { ...user, displayName };
 
       return {
         value: user.id,
         raw: { id: user.id, email: user.email, displayName, username: user.username },
         label: (
-          <Tooltip title={displayName} alignment="top-left">
+          <Tooltip title={optionLabel} alignment="top-left">
             <div className="flex gap-2 w-full items-center">
               <Userpic user={displayUser} size={16} key={`user-${user.id}`} showName={true} />
-              <span className="text-ellipsis text-nowrap overflow-hidden w-full">{displayName}</span>
+              <span className="text-ellipsis text-nowrap overflow-hidden w-full">{optionLabel}</span>
             </div>
           </Tooltip>
         ),
@@ -52,11 +63,11 @@ export const UserSelect = observer(({ filter, onChange, multiple, value, placeho
 
   const _onChange = useCallback(
     (val) => {
-      setSelectedValue(val);
-      onChange?.(val);
+      const nextValue = multiple ? (val ? [].concat(val) : []) : val;
+      onChange?.(nextValue);
       setSearch(null);
     },
-    [onChange],
+    [multiple, onChange],
   );
 
   const searchFilter = useCallback((option: any, queryString: string) => {

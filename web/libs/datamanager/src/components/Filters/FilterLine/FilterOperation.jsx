@@ -79,6 +79,9 @@ export const FilterOperation = observer(({ filter, field, operator, value, disab
         if (key === "contains") label = "is";
         if (key === "not_contains") label = "is not";
       }
+    } else if ((filter.schema?.multiple ?? false) && filter.cellView?.customOperators) {
+      if (key === "contains") label = "is any of";
+      if (key === "not_contains") label = "is none of";
     }
     return { value: key, label };
   });

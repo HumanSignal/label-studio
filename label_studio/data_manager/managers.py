@@ -63,6 +63,14 @@ class _Operator(BaseModel):
 
 
 Operator = _Operator()
+USER_FILTER_FIELDS = frozenset({'annotators', 'updated_by', 'reviewers', 'comment_authors', 'skipped_by_annotator'})
+USER_FILTER_VALUE_OPERATORS = frozenset({Operator.CONTAINS, Operator.NOT_CONTAINS})
+
+
+def validate_user_filter_operator(field_name, operator, value):
+    if field_name in USER_FILTER_FIELDS and isinstance(value, list) and operator not in USER_FILTER_VALUE_OPERATORS:
+        allowed = ', '.join(sorted(USER_FILTER_VALUE_OPERATORS))
+        raise ValidationError(f'List-valued user filters support only these operators: {allowed}.')
 
 
 @dataclass(frozen=True)
@@ -460,16 +468,49 @@ def add_result_filter(field_name, _filter, filter_expressions, project):
         return 'continue'
 
 
+def parse_user_filter_ids(value):
+    """Parse a scalar or list user-filter value into deduped integer user ids (FIT-2253)."""
+    if value is None:
+        return []
+    if isinstance(value, list) and len(value) > settings.DATA_MANAGER_LIST_FILTER_MAX_VALUES:
+        raise ValidationError(
+            f'User filter list exceeds maximum size of {settings.DATA_MANAGER_LIST_FILTER_MAX_VALUES}.'
+        )
+    raw = value if isinstance(value, list) else [value]
+    ids = []
+    seen = set()
+    for item in raw:
+        try:
+            if isinstance(item, bool) or (isinstance(item, float) and not item.is_integer()):
+                raise ValueError
+            user_id = int(item)
+        except (TypeError, ValueError):
+            raise ValidationError('User filter values must be integer ids.') from None
+        if user_id not in seen:
+            seen.add(user_id)
+            ids.append(user_id)
+    return ids
+
+
 def add_user_filter(enabled, key, _filter, filter_expressions):
-    if enabled and _filter.operator == Operator.CONTAINS:
-        filter_expressions.append(Q(**{key: int(_filter.value)}))
-        return 'continue'
-    elif enabled and _filter.operator == Operator.NOT_CONTAINS:
-        filter_expressions.append(~Q(**{key: int(_filter.value)}))
-        return 'continue'
-    elif enabled and _filter.operator == Operator.EMPTY:
+    if not enabled:
+        return
+
+    if _filter.operator == Operator.EMPTY:
         value = cast_bool_from_str(_filter.value)
         filter_expressions.append(Q(**{key + '__isnull': value}))
+        return 'continue'
+
+    user_ids = parse_user_filter_ids(_filter.value)
+    if not user_ids:
+        return 'continue'
+
+    lookup = f'{key}__in'
+    if _filter.operator == Operator.CONTAINS:
+        filter_expressions.append(Q(**{lookup: user_ids}))
+        return 'continue'
+    elif _filter.operator == Operator.NOT_CONTAINS:
+        filter_expressions.append(~Q(**{lookup: user_ids}))
         return 'continue'
 
 
@@ -499,6 +540,7 @@ def apply_filters(queryset, filters, project, request):
             if _is_stale_agreement_field(queryset, field_name):
                 logger.warning('Skipping stale agreement filter field: %s', field_name)
                 continue
+            validate_user_filter_operator(field_name, _filter.operator, _filter.value)
 
             # filter pre-processing, value type conversion, etc..
             preprocess_filter = load_func(settings.DATA_MANAGER_PREPROCESS_FILTER)

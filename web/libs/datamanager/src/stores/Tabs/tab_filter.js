@@ -134,6 +134,9 @@ export const TabFilter = types
       if (isListMembershipOperator(self.operator) && Array.isArray(value) && value.length === 0) {
         return false;
       }
+      if (self.schema?.multiple && Array.isArray(value) && value.length === 0) {
+        return false;
+      }
 
       return true;
     },

@@ -112,6 +112,15 @@ def _column_supports_list_membership(column: str) -> bool:
     return field in ('id', 'inner_id') or field.startswith('data.')
 
 
+def _column_filter_field_name(column: str) -> str | None:
+    if not column.startswith('filter:tasks:'):
+        return None
+    field = column[len('filter:tasks:') :]
+    if field.startswith('-'):
+        field = field[1:]
+    return field
+
+
 class FilterSerializer(serializers.ModelSerializer):
     child_filter = ChildFilterSerializer(required=False)
 
@@ -149,6 +158,25 @@ class FilterSerializer(serializers.ModelSerializer):
                         )
                     }
                 )
+        else:
+            from data_manager.managers import (
+                USER_FILTER_FIELDS,
+                USER_FILTER_VALUE_OPERATORS,
+                parse_user_filter_ids,
+                validate_user_filter_operator,
+            )
+
+            field_name = _column_filter_field_name(attrs.get('column', ''))
+            if field_name in USER_FILTER_FIELDS:
+                try:
+                    validate_user_filter_operator(field_name, operator, attrs.get('value'))
+                except serializers.ValidationError as exc:
+                    raise serializers.ValidationError({'operator': exc.detail}) from None
+                if operator in USER_FILTER_VALUE_OPERATORS:
+                    try:
+                        parse_user_filter_ids(attrs.get('value'))
+                    except serializers.ValidationError as exc:
+                        raise serializers.ValidationError({'value': exc.detail}) from None
         return attrs
 
     def validate_column(self, column: str) -> str:

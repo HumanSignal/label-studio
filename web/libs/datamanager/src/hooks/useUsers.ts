@@ -14,7 +14,7 @@ declare global {
   }
 }
 
-interface APIUser {
+export interface APIUser {
   id: number;
   username: string;
   first_name: string;
@@ -25,18 +25,56 @@ interface APIUser {
 interface UsersResponse {
   results: APIUser[];
   count: number;
+  displayCount?: number;
 }
+
+type SelectedUserValue = number | number[] | null | undefined;
+
+export const normalizeSelectedUserIds = (selectedValue: SelectedUserValue): number[] => {
+  const values = Array.isArray(selectedValue) ? selectedValue : selectedValue == null ? [] : [selectedValue];
+  return [...new Set(values)];
+};
+
+export const getUsersPageSize = (pageSize: number, selectedUserIds: number[]): number =>
+  Math.max(pageSize, selectedUserIds.length);
+
+export const mergeSelectedUsers = (
+  response: UsersResponse,
+  cachedUsers: APIUser[],
+  selectedUserIds: number[],
+): UsersResponse => {
+  const selectedIds = new Set(selectedUserIds);
+  const responseIds = new Set(response.results.map(({ id }) => id));
+  const selectedUsers = cachedUsers.filter(({ id }) => selectedIds.has(id) && !responseIds.has(id));
+
+  return {
+    ...response,
+    results: [...response.results, ...selectedUsers],
+    displayCount: response.count + selectedUsers.length,
+  };
+};
+
+export const deduplicateUsers = (users: APIUser[]): APIUser[] => {
+  const usersById = new Map<number, APIUser>();
+  users.forEach((user) => usersById.set(user.id, user));
+  return Array.from(usersById.values());
+};
+
+export const getUsersItemCount = (serverCount: number, loadedUserCount: number, hasNextPage?: boolean): number =>
+  hasNextPage === false ? loadedUserCount : serverCount;
 
 // DataManager-style user fetching with pagination using React Query
 export const useDataManagerUsers = (
-  projectId: string,
+  projectId: string | number,
   pageSize = 20,
   isDeleted = false,
   role = null,
   search = null,
-  selectedValue = null,
+  selectedValue: SelectedUserValue = null,
 ) => {
-  const queryKey = ["users", projectId, pageSize, isDeleted, role, search, selectedValue];
+  const selectedUserIds = normalizeSelectedUserIds(selectedValue);
+  const requestPageSize = getUsersPageSize(pageSize, selectedUserIds);
+  const queryKey = ["users", projectId, requestPageSize, isDeleted, role, search, selectedUserIds];
 
   const { data, isLoading, isError, error, refetch, hasNextPage, fetchNextPage, isFetchingNextPage } = useInfiniteQuery(
     {
@@ -51,34 +89,32 @@ export const useDataManagerUsers = (
 
         const params: any = {
           page: pageParam,
-          page_size: pageSize,
+          page_size: requestPageSize,
           project: projectId,
           is_deleted: isDeleted,
         };
 
         if (role) params.role = role;
         if (search) params.search = search;
-        if (selectedValue) params.selected_value = selectedValue;
+        if (selectedUserIds.length) params.selected_value = selectedUserIds;
         const response = await store.apiCall?.("users", params);
 
         if (!response) {
           throw new Error("No users found in response or response is invalid");
         }
-        if (search && selectedValue && response.count) {
-          const users: any = queryClient.getQueryData([
+        if (pageParam === 1 && search && selectedUserIds.length && response.count) {
+          const cachedData = queryClient.getQueryData<{ pages: UsersResponse[] }>([
             "users",
             projectId,
-            pageSize,
+            requestPageSize,
             isDeleted,
             role,
             null,
-            selectedValue,
-          ])?.pages?.[0];
-          if (users) {
-            const selectedUser = users.find((user: any) => user.id === selectedValue);
-            const results = [...response.filter((user: any) => user.id !== selectedValue), selectedUser];
-            results.count = results.length;
-            return results;
+            selectedUserIds,
+          ]);
+          if (cachedData) {
+            const cachedUsers = cachedData.pages.flatMap((page) => page.results);
+            return mergeSelectedUsers(response, cachedUsers, selectedUserIds);
           }
         }
 
@@ -87,7 +123,7 @@ export const useDataManagerUsers = (
       getNextPageParam: (lastPage, allPages) => {
         const totalCount = lastPage.count || 0;
         const currentPage = allPages.length;
-        const hasMore = currentPage * pageSize < totalCount;
+        const hasMore = currentPage * requestPageSize < totalCount;
         return hasMore ? currentPage + 1 : undefined;
       },
       enabled: !!projectId,
@@ -97,8 +133,9 @@ export const useDataManagerUsers = (
   );
 
   // Flatten all pages into a single array
-  const users = data?.pages.flatMap((page) => page.results ?? page) ?? [];
-  const total = data?.pages[0]?.count ?? 0;
+  const users = deduplicateUsers(data?.pages.flatMap((page) => page.results ?? page) ?? []);
+  const serverTotal = data?.pages[0]?.displayCount ?? data?.pages[0]?.count ?? 0;
+  const total = getUsersItemCount(serverTotal, users.length, hasNextPage);
 
   const loadMore = useCallback(() => {
     if (!isFetchingNextPage && hasNextPage) {

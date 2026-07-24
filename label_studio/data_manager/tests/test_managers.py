@@ -9,7 +9,12 @@ from unittest.mock import Mock, patch
 from data_manager.prepare_params import ConjunctionEnum, Filter, Filters
 from django.conf import settings
 from django.core.exceptions import FieldDoesNotExist, FieldError
+from django.db.models import Q
 from django.test import TestCase, override_settings
+from projects.tests.factories import ProjectFactory
+from tasks.models import Task
+from tasks.tests.factories import AnnotationFactory, TaskFactory
+from users.tests.factories import UserFactory
 
 
 class TestExcludedFieldsLogic(TestCase):
@@ -604,6 +609,131 @@ class TestNormalizeInListValue(TestCase):
         f = self._filter('not a list')
         _normalize_in_list_value(f)
         self.assertEqual(f.value, [])
+
+
+class TestParseUserFilterIds(TestCase):
+    def test_scalar_value(self):
+        from data_manager.managers import parse_user_filter_ids
+
+        self.assertEqual(parse_user_filter_ids(7), [7])
+        self.assertEqual(parse_user_filter_ids('9'), [9])
+
+    def test_list_value_dedupes(self):
+        from data_manager.managers import parse_user_filter_ids
+
+        self.assertEqual(parse_user_filter_ids([1, 2, 2, '3']), [1, 2, 3])
+
+    def test_invalid_entries_rejected(self):
+        from data_manager.managers import parse_user_filter_ids
+        from rest_framework.exceptions import ValidationError
+
+        with self.assertRaises(ValidationError):
+            parse_user_filter_ids([1, 'bad', None])
+
+    def test_empty_and_none(self):
+        from data_manager.managers import parse_user_filter_ids
+
+        self.assertEqual(parse_user_filter_ids(None), [])
+        self.assertEqual(parse_user_filter_ids([]), [])
+
+    @override_settings(DATA_MANAGER_LIST_FILTER_MAX_VALUES=2)
+    def test_list_value_size_is_bounded(self):
+        from data_manager.managers import parse_user_filter_ids
+        from rest_framework.exceptions import ValidationError
+
+        with self.assertRaises(ValidationError):
+            parse_user_filter_ids([1, 2, 3])
+
+
+class TestAddUserFilter(TestCase):
+    def test_contains_list_uses_in_lookup(self):
+        from data_manager.managers import Operator, add_user_filter
+
+        expressions = []
+        _filter = Filter(filter='filter:tasks:annotators', operator=Operator.CONTAINS, type='List', value=[1, 2])
+        result = add_user_filter(True, 'annotations__completed_by', _filter, expressions)
+        self.assertEqual(result, 'continue')
+        self.assertEqual(len(expressions), 1)
+        self.assertEqual(str(expressions[0]), str(Q(annotations__completed_by__in=[1, 2])))
+
+    def test_scalar_value_backward_compatible(self):
+        from data_manager.managers import Operator, add_user_filter
+
+        expressions = []
+        _filter = Filter(filter='filter:tasks:updated_by', operator=Operator.CONTAINS, type='List', value=5)
+        result = add_user_filter(True, 'updated_by', _filter, expressions)
+        self.assertEqual(result, 'continue')
+        self.assertEqual(str(expressions[0]), str(Q(updated_by__in=[5])))
+
+
+class TestUserFilterResults(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.project = ProjectFactory()
+        cls.user_a = UserFactory()
+        cls.user_b = UserFactory()
+        cls.user_c = UserFactory()
+        cls.task_a = TaskFactory(project=cls.project, updated_by=cls.user_a)
+        cls.task_b = TaskFactory(project=cls.project, updated_by=cls.user_b)
+        cls.task_c = TaskFactory(project=cls.project, updated_by=cls.user_c)
+        AnnotationFactory(task=cls.task_a, project=cls.project, completed_by=cls.user_a)
+        AnnotationFactory(task=cls.task_b, project=cls.project, completed_by=cls.user_b)
+        AnnotationFactory(task=cls.task_c, project=cls.project, completed_by=cls.user_c)
+
+    def _filter(self, field, operator, value):
+        from data_manager.managers import apply_filters
+
+        filters = Filters(
+            conjunction='and',
+            items=[
+                Filter(
+                    filter=f'filter:tasks:{field}',
+                    operator=operator,
+                    type='List',
+                    value=value,
+                )
+            ],
+        )
+        return apply_filters(Task.objects.filter(project=self.project), filters, self.project, request=None)
+
+    def test_contains_matches_any_selected_user(self):
+        expected = {self.task_a.id, self.task_b.id}
+
+        annotator_ids = set(
+            self._filter('annotators', 'contains', [self.user_a.id, self.user_b.id]).values_list('id', flat=True)
+        )
+        updated_by_ids = set(
+            self._filter('updated_by', 'contains', [self.user_a.id, self.user_b.id]).values_list('id', flat=True)
+        )
+        self.assertSetEqual(annotator_ids, expected)
+        self.assertSetEqual(updated_by_ids, expected)
+
+    def test_not_contains_excludes_every_selected_user(self):
+        expected = {self.task_c.id}
+
+        annotator_ids = set(
+            self._filter('annotators', 'not_contains', [self.user_a.id, self.user_b.id]).values_list('id', flat=True)
+        )
+        updated_by_ids = set(
+            self._filter('updated_by', 'not_contains', [self.user_a.id, self.user_b.id]).values_list('id', flat=True)
+        )
+        self.assertSetEqual(annotator_ids, expected)
+        self.assertSetEqual(updated_by_ids, expected)
+
+    def test_empty_list_adds_no_user_constraint(self):
+        expected = {self.task_a.id, self.task_b.id, self.task_c.id}
+
+        for field in ('annotators', 'updated_by'):
+            for operator in ('contains', 'not_contains'):
+                actual = set(self._filter(field, operator, []).values_list('id', flat=True))
+                self.assertSetEqual(actual, expected)
+
+    def test_unsupported_user_filter_operator_is_rejected(self):
+        from rest_framework.exceptions import ValidationError
+
+        for field in ('annotators', 'updated_by'):
+            with self.subTest(field=field), self.assertRaises(ValidationError):
+                self._filter(field, 'equal', [self.user_a.id])
 
 
 class TestValidateInListFilter(TestCase):

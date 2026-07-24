@@ -24,6 +24,7 @@ const RootStore = types
     apiCall(_method, _params, _body) {
       return Promise.resolve(self._apiResult ?? { id: 100, title: "New Tab 2" });
     },
+    unsetSelection() {},
   }));
 
 describe("TabStore createSnapshot / saveView (BROS-1491)", () => {
@@ -185,5 +186,132 @@ describe("saved filter availability (FIT-2173)", () => {
     view.createFilter();
 
     expect(view.filters[1].filter.id).toBe("filter:tasks:id");
+  });
+});
+
+describe("multiselect filter validation (FIT-2253)", () => {
+  let root;
+
+  afterEach(() => {
+    if (root) {
+      destroy(root);
+      root = null;
+    }
+  });
+
+  it("persists clearing a root multiselect by omitting the invalid filter", async () => {
+    const apiCall = mock(async () => ({ id: 1, title: "Saved" }));
+    root = RootStore.create({
+      viewsStore: {
+        columnsRaw: [
+          {
+            id: "annotators",
+            title: "Annotators",
+            type: "List",
+            target: "tasks",
+            schema: { multiple: true },
+            visibility_defaults: { filter: true },
+          },
+        ],
+      },
+    });
+    root.viewsStore.fetchColumns();
+    unprotect(root);
+    root.apiCall = apiCall;
+    root.viewsStore.views.push({
+      id: 1,
+      title: "Saved",
+      saved: true,
+      key: "saved",
+      filters: [
+        {
+          filter: "filter:tasks:annotators",
+          operator: "contains",
+          value: [1],
+        },
+      ],
+    });
+    root.viewsStore.selected = 1;
+    const filter = root.viewsStore.views[0].filters[0];
+
+    expect(filter.schema?.multiple).toBe(true);
+    apiCall.mockClear();
+    filter.setValue([]);
+    expect(root.viewsStore.views[0].serializedFilters).toEqual([]);
+    await filter.save(true);
+
+    expect(filter.isValidFilter).toBe(false);
+    expect(apiCall).toHaveBeenCalled();
+  });
+
+  it("persists clearing a child multiselect while retaining its parent", async () => {
+    const apiCall = mock(async () => ({ id: 1, title: "Saved" }));
+    root = RootStore.create({
+      viewsStore: {
+        columnsRaw: [
+          {
+            id: "annotations_results",
+            title: "Annotations",
+            type: "List",
+            target: "tasks",
+            children: ["sentiment"],
+            hidden: true,
+          },
+          {
+            id: "sentiment",
+            title: "Sentiment",
+            type: "List",
+            target: "tasks",
+            parent: "annotations_results",
+            child_filter: "annotators",
+            schema: { items: [{ value: "positive", title: "Positive" }], multiple: true },
+            visibility_defaults: { filter: true },
+          },
+          {
+            id: "annotators",
+            title: "Annotators",
+            type: "List",
+            target: "tasks",
+            alias: "annotators",
+            schema: { multiple: true },
+            visibility_defaults: { filter: true },
+          },
+        ],
+      },
+    });
+    root.viewsStore.fetchColumns();
+    unprotect(root);
+    root.apiCall = apiCall;
+    root.viewsStore.views.push({
+      id: 1,
+      title: "Saved",
+      saved: true,
+      key: "saved",
+      filters: [
+        {
+          filter: "filter:tasks:annotations_results.sentiment",
+          operator: "contains",
+          value: ["positive"],
+          child_filter: {
+            filter: "filter:tasks:annotators",
+            operator: "contains",
+            value: [1],
+          },
+        },
+      ],
+    });
+    root.viewsStore.selected = 1;
+    const parent = root.viewsStore.views[0].filters[0];
+    const child = parent.child_filter;
+
+    apiCall.mockClear();
+    child.setValue([]);
+    expect(root.viewsStore.views[0].serializedFilters).toHaveLength(1);
+    expect(root.viewsStore.views[0].serializedFilters[0].value).toEqual(["positive"]);
+    expect(root.viewsStore.views[0].serializedFilters[0].child_filter).toBeNull();
+    await child.save(true);
+
+    expect(child.isValidFilter).toBe(false);
+    expect(apiCall).toHaveBeenCalled();
   });
 });
