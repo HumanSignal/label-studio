@@ -134,9 +134,11 @@ const VideoConfig = observer(({ item }) => {
 
 const hasFrameBlockingClosableVideoVector = (item) => {
   return item.regs?.some((reg) => {
+    // Closed contours must not block scrubbing even when `incomplete` stays true
+    // (e.g. closable + unmet minPoints).
     if (reg.type !== "videovectorregion" || !reg.closable || reg.closed) return false;
     if (reg.isDrawing) return true;
-    return reg.incomplete && (reg.selected || reg.inSelection);
+    return reg.incomplete;
   });
 };
 

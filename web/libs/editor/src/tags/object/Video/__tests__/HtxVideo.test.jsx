@@ -375,6 +375,30 @@ describe("HtxVideoView", () => {
     expect(item.setFrame).toHaveBeenCalledWith(25);
   });
 
+  it("allows Timeline frame changes for a closed VideoVector that is still incomplete (minPoints)", async () => {
+    const item = createMockItem({
+      regs: [
+        createMockVideoVectorRegion({
+          isDrawing: false,
+          closed: true,
+          incomplete: true,
+          sequence: [{ frame: 1, closed: true, vertices: [{ id: "p1", x: 10, y: 10 }] }],
+        }),
+      ],
+    });
+    const store = createMockStore();
+    render(<HtxVideoView item={item} store={store} />);
+    await flushRaf();
+    await triggerVideoLoad();
+
+    item.setFrame.mockClear();
+    const onPositionChange = mockTimelineProps.onPositionChange;
+    expect(onPositionChange).toBeDefined();
+
+    expect(onPositionChange(25)).not.toBe(false);
+    expect(item.setFrame).toHaveBeenCalledWith(25);
+  });
+
   it("blocks Timeline frame changes for a selected incomplete VideoVector after drawing state is restored", async () => {
     const item = createMockItem({
       regs: [createMockVideoVectorRegion({ isDrawing: false, incomplete: true, selected: true })],
@@ -394,7 +418,7 @@ describe("HtxVideoView", () => {
     expect(mockTimelineProps.position).toBe(1);
   });
 
-  it("allows Timeline frame changes for an unselected incomplete VideoVector after drawing state is restored", async () => {
+  it("blocks Timeline frame changes for an unselected incomplete VideoVector after drawing state is restored", async () => {
     const item = createMockItem({ regs: [createMockVideoVectorRegion({ isDrawing: false, incomplete: true })] });
     const store = createMockStore();
     render(<HtxVideoView item={item} store={store} />);
@@ -405,9 +429,10 @@ describe("HtxVideoView", () => {
     const onPositionChange = mockTimelineProps.onPositionChange;
     expect(onPositionChange).toBeDefined();
 
-    expect(onPositionChange(25)).not.toBe(false);
+    expect(onPositionChange(25)).toBe(false);
 
-    expect(item.setFrame).toHaveBeenCalledWith(25);
+    expect(item.setFrame).not.toHaveBeenCalled();
+    expect(mockTimelineProps.position).toBe(1);
   });
 
   it("allows Timeline frame changes while a non-closable VideoVector is being drawn", async () => {

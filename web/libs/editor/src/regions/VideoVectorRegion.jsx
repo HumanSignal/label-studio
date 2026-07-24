@@ -201,6 +201,10 @@ const Model = types
   .actions((self) => ({
     // --- Video-specific actions ---
 
+    setClosed(closed) {
+      self.sequence = self.sequence.map((keypoint) => ({ ...keypoint, closed }));
+    },
+
     updateShape(data, frame) {
       const newItem = {
         ...data,

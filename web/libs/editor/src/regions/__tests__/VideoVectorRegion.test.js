@@ -300,6 +300,60 @@ describe("VideoVectorRegion", () => {
     });
   });
 
+  describe("closed state across keyframes (BROS-1497)", () => {
+    const createRegionWithOpenKeyframes = () =>
+      TestRoot.create({
+        video: { id: "vid1" },
+        region: {
+          id: "vvr1",
+          pid: "p1",
+          object: "vid1",
+          sequence: [
+            {
+              frame: 1,
+              enabled: true,
+              vertices: mkVertices([
+                [10, 10],
+                [20, 20],
+                [30, 10],
+              ]),
+              closed: false,
+            },
+            {
+              frame: 5,
+              enabled: true,
+              vertices: mkVertices([
+                [15, 10],
+                [25, 20],
+                [35, 10],
+              ]),
+              closed: false,
+            },
+          ],
+        },
+      });
+
+    it("closes every keyframe when the path is closed on a later frame", () => {
+      const root = createRegionWithOpenKeyframes();
+
+      root.region.setClosed(true);
+
+      expect(root.region.sequence.map(({ closed }) => closed)).toEqual([true, true]);
+      expect(root.region.closed).toBe(true);
+      expect(root.region.incomplete).toBeFalsy();
+    });
+
+    it("reopens every keyframe when a closed path is broken", () => {
+      const root = createRegionWithOpenKeyframes();
+      root.region.setClosed(true);
+
+      root.region.setClosed(false);
+
+      expect(root.region.sequence.map(({ closed }) => closed)).toEqual([false, false]);
+      expect(root.region.closed).toBe(false);
+    });
+  });
+
   describe("addVertexAtCanvasPoint — rapid clicks accumulate (BROS-1206)", () => {
     const makeRoot = () =>
       TestRoot.create({

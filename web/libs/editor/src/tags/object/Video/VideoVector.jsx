@@ -310,7 +310,7 @@ const VideoVectorPure = ({
       if (!shape) return;
       if (shape.closed === isClosed) return;
 
-      reg.updateShape({ vertices: shape.vertices, closed: isClosed }, frame);
+      reg.setClosed(isClosed);
     },
     [reg, frame],
   );
