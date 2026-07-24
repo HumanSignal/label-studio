@@ -27,6 +27,9 @@ export function validateFilterSnapshot(snapshot, availableFilters) {
  *     Columns with a schema (List, etc.) have dropdown values specific to each column
  *     (user IDs, model names, label choices…). Carrying them across columns is
  *     meaningless and can crash the backend (e.g. int() on a list of strings).
+ *  4. Neither column uses the List type — List filters (annotators, model versions, etc.)
+ *     have column-specific value shapes even when the target has no static schema
+ *     (e.g. UserSelect for annotators).
  *
  * When value cannot be preserved, it is reset to the column default.
  * Operator is always preserved if it exists in the target column's operator set,
@@ -43,7 +46,11 @@ export function validateFilterSnapshot(snapshot, availableFilters) {
  */
 export function resolveFilterTransition({ prevType, prevOperator, prevValue, newType, newOperators, newSchema }) {
   const typeChanged = prevType !== newType;
-  const schemaBound = newSchema != null;
+  // List columns (annotators, model versions, etc.) use column-specific value shapes even
+  // when the target column has no static schema (e.g. UserSelect). Never carry values
+  // across List-typed columns — doing so sends strings to integer user-id filters and
+  // triggers a view-save 400 surfaced as a Runtime error modal.
+  const schemaBound = newSchema != null || prevType === "List" || newType === "List";
   const operatorStillValid = prevOperator && newOperators.some((op) => op.key === prevOperator);
   const canPreserveValue = !typeChanged && !schemaBound;
 

@@ -348,6 +348,21 @@ describe("resolveFilterTransition — full type×type matrix", () => {
       expect(result.value).toBeUndefined();
     });
 
+    it("List → List without static schema (UserSelect annotators): resets stale values", () => {
+      const result = resolveFilterTransition({
+        prevType: "List",
+        prevOperator: "contains",
+        prevValue: ["gpt-4"],
+        newType: "List",
+        newOperators: OPERATORS.List,
+        newSchema: null,
+      });
+
+      expect(result.operator).toBe("contains");
+      expect(result.valueReset).toBe(true);
+      expect(result.value).toBeUndefined();
+    });
+
     it("String(no schema) → List(schema): different type + schema → value reset", () => {
       const result = resolveFilterTransition({
         prevType: "String",
