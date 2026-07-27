@@ -153,7 +153,10 @@
     @apply bg-neutral-surface;
   }
 
-  &:hover:not(.bodyRowError, .bodyRowActive) {
+  /* Keep hover look while a row-owned UI (e.g. context menu) is open — pointer
+     may leave the row when interacting with a portal menu. */
+  &:hover:not(.bodyRowError, .bodyRowActive),
+  &.bodyRowHovered:not(.bodyRowError, .bodyRowActive) {
     @apply bg-primary-emphasis-subtle;
   }
 
@@ -226,7 +229,9 @@
 }
 
 .bodyRow:hover:not(.bodyRowError, .bodyRowActive) .bodyCellPinnedLeft,
-.bodyRow:hover:not(.bodyRowError, .bodyRowActive) .bodyCellPinnedRight {
+.bodyRow:hover:not(.bodyRowError, .bodyRowActive) .bodyCellPinnedRight,
+.bodyRowHovered:not(.bodyRowError, .bodyRowActive) .bodyCellPinnedLeft,
+.bodyRowHovered:not(.bodyRowError, .bodyRowActive) .bodyCellPinnedRight {
   @apply bg-primary-emphasis-subtle;
 }
 

@@ -25,7 +25,16 @@ declare module "@tanstack/react-table" {
 }
 
 import { ArrowDownIcon, ArrowUpIcon, InfoIcon, MagnifyingGlassIcon } from "@humansignal/icons";
-import { type CSSProperties, memo, type UIEventHandler, useCallback, useLayoutEffect, useMemo, useState } from "react";
+import {
+  type CSSProperties,
+  type HTMLAttributes,
+  memo,
+  type UIEventHandler,
+  useCallback,
+  useLayoutEffect,
+  useMemo,
+  useState,
+} from "react";
 import { useColumnSizing, useDataColumns } from "../../hooks/data-table";
 import { cn } from "../../utils/utils";
 import { Checkbox } from "../checkbox/checkbox";
@@ -81,6 +90,17 @@ export type DataTableProps<T extends DataShape> = {
   onRowClick?: (row?: Row<T[number]>, event?: React.MouseEvent<HTMLDivElement>) => void;
   rowClassName?: (row: Row<T[number]>) => string | undefined;
   rowDataTestId?: (row: Row<T[number]>) => string | undefined;
+  /**
+   * Extra props merged onto each body row root (e.g. context-menu trigger handlers).
+   * Prefer this over wrapping rows when the host already owns the row element.
+   */
+  getRowProps?: (row: Row<T[number]>) => HTMLAttributes<HTMLDivElement> | undefined;
+  /**
+   * Row id that should keep the hover appearance even when the pointer leaves
+   * the row (e.g. while a context menu opened from that row is open).
+   * Compared against TanStack `row.id` (see `getRowId`).
+   */
+  hoveredRowId?: string;
   bodyCellClassName?: string;
   selectable?: boolean;
   rowSelection?: Record<string, boolean>;
@@ -508,12 +528,14 @@ export const DataTable = <T extends DataShape>(props: DataTableProps<T>) => {
           rows={rows}
           rowClassName={props.rowClassName}
           rowDataTestId={props.rowDataTestId}
+          getRowProps={props.getRowProps}
           bodyCellClassName={props.bodyCellClassName}
           onRowClick={props.onRowClick ? handleRowClick : undefined}
           columnVisibility={props.columnVisibility}
           columnSizing={columnSizing}
           rowSelection={rowSelection}
           activeRowId={activeRowId}
+          hoveredRowId={props.hoveredRowId}
           bodyClassName={bodyShellClassName}
           onBodyScroll={props.onBodyScroll}
         />
@@ -608,9 +630,11 @@ interface DataTableRowProps<T> {
   className?: string;
   onRowClick?: (row?: Row<T>, event?: React.MouseEvent<HTMLDivElement>) => void;
   dataTestId?: string;
+  rowProps?: HTMLAttributes<HTMLDivElement>;
   bodyCellClassName?: string;
   isSelected?: boolean;
   isActive?: boolean;
+  isHovered?: boolean;
 }
 
 const DataTableRow = <T,>({
@@ -618,9 +642,11 @@ const DataTableRow = <T,>({
   className,
   onRowClick,
   dataTestId,
+  rowProps,
   bodyCellClassName,
   isSelected,
   isActive,
+  isHovered,
 }: DataTableRowProps<T>) => {
   const isError = className?.includes("error") || className?.includes("bodyRowError");
 
@@ -633,6 +659,8 @@ const DataTableRow = <T,>({
     onRowClick?.(row, e);
   };
 
+  const { className: rowPropsClassName, onClick: rowPropsOnClick, ...restRowProps } = rowProps ?? {};
+
   return (
     <div
       className={cn(
@@ -641,10 +669,21 @@ const DataTableRow = <T,>({
         isError && styles.bodyRowError,
         isSelected && styles.bodyRowSelected,
         isActive && styles.bodyRowActive,
+        isHovered && styles.bodyRowHovered,
         className,
+        rowPropsClassName,
       )}
-      onClick={onRowClick ? handleRowClick : undefined}
+      onClick={
+        onRowClick || rowPropsOnClick
+          ? (e) => {
+              rowPropsOnClick?.(e);
+              if (onRowClick) handleRowClick(e);
+            }
+          : undefined
+      }
       data-testid={dataTestId ?? `data-table-row-${row.id}`}
+      {...(isHovered ? { "data-hovered": "" } : {})}
+      {...restRowProps}
     >
       {row.getVisibleCells().map((cell) => {
         const pinSide = cell.column.getIsPinned();
@@ -685,11 +724,13 @@ interface DataTableBodyProps<T> {
   onRowClick?: (row?: Row<T>, event?: React.MouseEvent<HTMLDivElement>) => void;
   rowClassName?: (row: Row<T>) => string | undefined;
   rowDataTestId?: (row: Row<T>) => string | undefined;
+  getRowProps?: (row: Row<T>) => HTMLAttributes<HTMLDivElement> | undefined;
   bodyCellClassName?: string;
   columnVisibility?: Record<string, boolean>;
   columnSizing?: Record<string, number>;
   rowSelection?: Record<string, boolean>;
   activeRowId?: string;
+  hoveredRowId?: string;
   /** Merged `styles.body` (+ pinned scroll shell when column pinning is on) */
   bodyClassName: string;
   onBodyScroll?: UIEventHandler<HTMLDivElement>;
@@ -700,11 +741,13 @@ const DataTableBody = <T,>({
   onRowClick,
   rowClassName,
   rowDataTestId,
+  getRowProps,
   bodyCellClassName,
   columnVisibility: _columnVisibility, // used to retrigger memo
   columnSizing: _columnSizing,
   rowSelection, // used to retrigger memo when selection changes
   activeRowId,
+  hoveredRowId,
   bodyClassName,
   onBodyScroll,
 }: DataTableBodyProps<T>) => {
@@ -716,10 +759,12 @@ const DataTableBody = <T,>({
           row={row}
           className={rowClassName?.(row) ?? ""}
           dataTestId={rowDataTestId?.(row)}
+          rowProps={getRowProps?.(row)}
           bodyCellClassName={bodyCellClassName}
           onRowClick={onRowClick}
           isSelected={rowSelection?.[row.id] === true}
           isActive={activeRowId === row.id}
+          isHovered={hoveredRowId === row.id}
         />
       ))}
     </div>
@@ -733,7 +778,9 @@ const MemoizedDataTableBody = memo(DataTableBody, (prev, next) => {
     JSON.stringify(prev.columnSizing) === JSON.stringify(next.columnSizing) &&
     JSON.stringify(prev.rowSelection) === JSON.stringify(next.rowSelection) &&
     prev.activeRowId === next.activeRowId &&
+    prev.hoveredRowId === next.hoveredRowId &&
     prev.rowDataTestId === next.rowDataTestId &&
+    prev.getRowProps === next.getRowProps &&
     prev.bodyCellClassName === next.bodyCellClassName &&
     prev.bodyClassName === next.bodyClassName &&
     prev.onBodyScroll === next.onBodyScroll
