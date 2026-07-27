@@ -412,6 +412,149 @@ describe("Annotation store (store.js)", () => {
       expect(childAnn.parent_annotation).toBe(100);
     });
 
+    it("duplicates current live annotation results when the initial snapshot is empty", () => {
+      const store = createStore();
+      store.initializeStore({});
+      const parentAnn = store.annotationStore.addAnnotation({ result: [], pk: "100" });
+      const liveResult = {
+        id: "live-region",
+        from_name: "l",
+        to_name: "img",
+        type: "labels",
+        value: { labels: ["A"] },
+      };
+      parentAnn._initialAnnotationObj = [];
+      spyOn(parentAnn, "serializeAnnotation").mockReturnValue([liveResult]);
+
+      const childAnn = store.annotationStore.addAnnotationFromPrediction(parentAnn);
+
+      expect(childAnn._initialAnnotationObj).toHaveLength(1);
+      expect(childAnn._initialAnnotationObj[0]).toMatchObject({
+        id: "live-region",
+        value: { labels: ["A"] },
+      });
+    });
+
+    it("duplicates live edits instead of stale initial annotation results", () => {
+      const store = createStore();
+      store.initializeStore({});
+      const parentAnn = store.annotationStore.addAnnotation({ result: [], pk: "100" });
+      parentAnn._initialAnnotationObj = [
+        {
+          id: `region#${parentAnn.id}`,
+          from_name: "l",
+          to_name: "img",
+          type: "labels",
+          value: { labels: ["stale"] },
+        },
+      ];
+      spyOn(parentAnn, "serializeAnnotation").mockReturnValue([
+        {
+          id: "region",
+          from_name: "l",
+          to_name: "img",
+          type: "labels",
+          value: { labels: ["live"] },
+        },
+      ]);
+
+      const childAnn = store.annotationStore.addAnnotationFromPrediction(parentAnn);
+
+      expect(childAnn._initialAnnotationObj[0].value.labels).toEqual(["live"]);
+    });
+
+    it("does not restore stale initial results when all live annotation results were deleted", () => {
+      const store = createStore();
+      store.initializeStore({});
+      const parentAnn = store.annotationStore.addAnnotation({ result: [], pk: "100" });
+      parentAnn._initialAnnotationObj = [
+        {
+          id: `deleted-region#${parentAnn.id}`,
+          from_name: "l",
+          to_name: "img",
+          type: "labels",
+          value: { labels: ["A"] },
+        },
+      ];
+      spyOn(parentAnn, "serializeAnnotation").mockReturnValue([]);
+
+      const childAnn = store.annotationStore.addAnnotationFromPrediction(parentAnn);
+
+      expect(childAnn._initialAnnotationObj).toEqual([]);
+    });
+
+    it("preserves live annotation result IDs, parent references, and relations", () => {
+      const store = createStore();
+      store.initializeStore({});
+      const parentAnn = store.annotationStore.addAnnotation({ result: [], pk: "100" });
+      const parentRegionId = "parent-region";
+      const childRegionId = "child-region";
+      parentAnn._initialAnnotationObj = [];
+      spyOn(parentAnn, "serializeAnnotation").mockReturnValue([
+        {
+          id: parentRegionId,
+          from_name: "l",
+          to_name: "img",
+          type: "labels",
+          value: { labels: ["A"] },
+        },
+        {
+          id: childRegionId,
+          parent_id: parentRegionId,
+          from_name: "l",
+          to_name: "img",
+          type: "labels",
+          value: { labels: ["A"] },
+        },
+        {
+          type: "relation",
+          from_id: "parent-region",
+          to_id: "child-region",
+          direction: "right",
+        },
+      ]);
+
+      const childAnn = store.annotationStore.addAnnotationFromPrediction(parentAnn);
+
+      expect(childAnn._initialAnnotationObj).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({ id: "parent-region" }),
+          expect.objectContaining({
+            id: "child-region",
+            parent_id: "parent-region",
+          }),
+          expect.objectContaining({
+            type: "relation",
+            from_id: "parent-region",
+            to_id: "child-region",
+          }),
+        ]),
+      );
+    });
+
+    it("continues duplicating predictions from their initial results", () => {
+      const store = createStore();
+      store.initializeStore({});
+      const pred = store.annotationStore.addPrediction({ result: [], pk: "50" });
+      pred._initialAnnotationObj = [
+        {
+          id: `prediction-region#${pred.id}`,
+          from_name: "l",
+          to_name: "img",
+          type: "labels",
+          value: { labels: ["A"] },
+        },
+      ];
+      const serializeAnnotation = spyOn(pred, "serializeAnnotation").mockReturnValue([]);
+
+      const childAnn = store.annotationStore.addAnnotationFromPrediction(pred);
+
+      expect(serializeAnnotation).not.toHaveBeenCalled();
+      expect(childAnn._initialAnnotationObj[0].id).toBe(`prediction-region#${childAnn.id}`);
+      expect(childAnn._initialAnnotationObj[0].value.labels).toEqual(["A"]);
+      expect(childAnn.parent_prediction).toBe(50);
+    });
+
     it("createAnnotation with non-interactive prediction result deserializes and selects", () => {
       const store = createStore();
       store.initializeStore({});

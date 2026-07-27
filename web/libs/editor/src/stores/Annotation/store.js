@@ -540,9 +540,18 @@ const AnnotationStoreModel = types
       getEnv(self).events.invoke("selectHistory", self.store, self.selected, self.selectedHistory);
     }
 
+    /**
+     * Create a new draft annotation from a prediction or an existing annotation.
+     * Used both when converting a prediction ("Duplicate as Annotation") and when
+     * duplicating an annotation ("Duplicate Annotation") from the annotation menu.
+     * For annotations, copy live serialized results — not `_initialAnnotationObj`,
+     * which can be stale after SAM2 / model-accepted regions are added.
+     */
     function addAnnotationFromPrediction(entity) {
+      // Annotations: live serialize. Predictions: load-time snapshot is the source of truth.
+      const source = entity.type === "annotation" ? entity.serializeAnnotation() : (entity._initialAnnotationObj ?? []);
       // immutable work, because we'll change ids soon
-      const s = entity._initialAnnotationObj.map((r) => ({ ...r }));
+      const s = source.map((r) => ({ ...r }));
       const c = self.addAnnotation({ userGenerate: true, result: s });
 
       const ids = {};
