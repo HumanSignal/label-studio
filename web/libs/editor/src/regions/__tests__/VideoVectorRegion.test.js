@@ -14,10 +14,23 @@ mockModule("../../tags/object/Video", () => {
       })
       .volatile(() => ({
         ref: { current: { duration: 10.5 } },
+        // Default drawing control so incomplete/minPoints views are exercised
+        // even when another suite's Video mockModule pollutes this path (CI
+        // ordered runner). Tests that need "no closable control" clear it.
+        videoVectorControl: {
+          type: "videovectorlabels",
+          closable: true,
+          minpoints: "2",
+          maxpoints: "15",
+          tools: { VideoVector: {} },
+        },
       }))
       .actions((self) => ({
         setFrame(frame) {
           self._lastSetFrame = frame;
+        },
+        setVideoVectorControl(control) {
+          self.videoVectorControl = control;
         },
       })),
   };
@@ -87,6 +100,61 @@ describe("VideoVectorRegion", () => {
       const shape24 = root.region.getShape(24);
       expect(shape24.vertices[0].x).toBe(50);
       expect(shape24.closed).toBe(true);
+    });
+  });
+
+  describe("getShape — lifespan terminators (BROS-1513)", () => {
+    it("resolves an empty right terminator from the preceding vector geometry", () => {
+      const vertices = mkVertices([
+        [10, 20],
+        [30, 40],
+      ]);
+      const root = TestRoot.create({
+        video: { id: "vid1" },
+        region: {
+          id: "vvr1",
+          pid: "p1",
+          object: "vid1",
+          sequence: [
+            { frame: 5, enabled: true, vertices, closed: true },
+            { frame: 6, enabled: false },
+          ],
+        },
+      });
+
+      expect(root.region.getShape(6)).toEqual({ vertices, closed: true });
+    });
+
+    it("preserves geometry on an exact disabled boundary keyframe", () => {
+      const vertices = mkVertices([[10, 20]]);
+      const root = TestRoot.create({
+        video: { id: "vid1" },
+        region: {
+          id: "vvr1",
+          pid: "p1",
+          object: "vid1",
+          sequence: [{ frame: 5, enabled: false, vertices, closed: false }],
+        },
+      });
+
+      expect(root.region.getShape(5)).toEqual({ vertices, closed: false });
+    });
+
+    it("does not invent geometry for a left terminator before the first tracked frame", () => {
+      const root = TestRoot.create({
+        video: { id: "vid1" },
+        region: {
+          id: "vvr1",
+          pid: "p1",
+          object: "vid1",
+          sequence: [
+            { frame: 4, enabled: false },
+            { frame: 5, enabled: true, vertices: mkVertices([[10, 20]]), closed: false },
+          ],
+        },
+      });
+
+      expect(root.region.getShape(4)).toEqual({ vertices: [], closed: false });
     });
   });
 
@@ -296,7 +364,70 @@ describe("VideoVectorRegion", () => {
           sequence: [{ frame: 0, enabled: true, vertices: mkVertices([[1, 2]]), closed: false }],
         },
       });
+      root.video.setVideoVectorControl(undefined);
       expect(root.region.closable).toBe(false);
+    });
+  });
+
+  describe("incomplete vs lifespan terminators (BROS-1511)", () => {
+    // Uses the Video mock's default closable videoVectorControl (see mockModule above).
+
+    it("does not mark incomplete when sequence[0] is a lifespan terminator and a later keyframe is valid", () => {
+      const root = TestRoot.create({
+        video: { id: "vid1" },
+        region: {
+          id: "vvr1",
+          pid: "p1",
+          object: "vid1",
+          sequence: [
+            // Track Both left-cap: { frame, enabled: false } with no geometry
+            { frame: 4, enabled: false },
+            {
+              frame: 5,
+              enabled: true,
+              vertices: mkVertices([
+                [10, 10],
+                [20, 20],
+                [30, 10],
+              ]),
+              closed: true,
+            },
+          ],
+        },
+      });
+
+      expect(root.region.closed).toBe(true);
+      expect(root.region.incomplete).toBeFalsy();
+      expect(root.region.vertices).toHaveLength(3);
+    });
+
+    it("still selects the earliest geometric keyframe when it is malformed", () => {
+      const root = TestRoot.create({
+        video: { id: "vid1" },
+        region: {
+          id: "vvr1",
+          pid: "p1",
+          object: "vid1",
+          sequence: [
+            { frame: 4, enabled: false },
+            { frame: 5, enabled: true, vertices: mkVertices([[1, 2]]), closed: false },
+            {
+              frame: 50,
+              enabled: true,
+              vertices: mkVertices([
+                [10, 10],
+                [20, 20],
+                [30, 10],
+              ]),
+              closed: true,
+            },
+          ],
+        },
+      });
+
+      expect(root.region.shapeKeyframe.frame).toBe(5);
+      expect(root.region.closed).toBe(false);
+      expect(root.region.vertices).toHaveLength(1);
     });
   });
 

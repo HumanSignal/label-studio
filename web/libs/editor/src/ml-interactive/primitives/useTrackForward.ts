@@ -8,6 +8,13 @@ import { computeCentroidFromMask, findVideoElement, getNativeDimensions } from "
 import { maskToLargestShape, maskToBBox } from "./mask-output";
 import type { InteractiveController } from "../controller";
 import type { TrackFn } from "./useBackendInference";
+import {
+  backendFrameToDisplayFrame,
+  finalizeTrackSequence,
+  getTrackLifespanCutoffs,
+  isValidTrackKeyframe,
+  type TrackDirection,
+} from "./trackFinalize";
 
 async function decodePngToMaskLocal(
   dataURL: string,
@@ -36,7 +43,8 @@ async function decodePngToMaskLocal(
   });
 }
 
-export type TrackDirection = "forward" | "backward" | "both";
+export type { TrackDirection };
+export { backendFrameToDisplayFrame, getTrackLifespanCutoffs, finalizeTrackSequence, isValidTrackKeyframe };
 
 export function useInteractiveTrack(
   item: InteractiveController | null,
@@ -109,6 +117,11 @@ export function useInteractiveTrack(
       : undefined;
 
     item.startTracking(remainingFrames);
+
+    const shapeConstraints = {
+      closable: control.closable === true,
+      minPoints: control.minpoints ? Number(control.minpoints) : undefined,
+    };
 
     const getShape = (maskData?: Uint8Array, mw?: number, mh?: number) => {
       const data = maskData ?? item.maskData;
@@ -232,8 +245,7 @@ export function useInteractiveTrack(
             // differ from the video's actual fps, so fm.frame in BE space
             // doesn't translate 1:1 to FE frame space. Fall back to frame+1
             // only for older backends that don't send time_ms.
-            const displayFrame =
-              fm.time_ms != null ? Math.max(1, Math.round((fm.time_ms / 1000) * fps) + 1) : fm.frame + 1;
+            const displayFrame = backendFrameToDisplayFrame(fm, fps);
 
             const mask = await decodePngToMaskLocal(fm.imageDataURL);
             if (!mask || mask.data.every((v: number) => v === 0)) continue;
@@ -242,24 +254,31 @@ export function useInteractiveTrack(
             // through item.maskData during tracking, which would re-render the
             // whole observer view on every frame.
             const shape = getShape(mask.data, mask.width, mask.height);
-            if (shape) {
-              try {
-                // updateShape replaces the keyframe at `displayFrame`, so the
-                // prompt-frame keyframe is rewritten with the backend's mask
-                // instead of staying on the local image-predictor mask.
-                trackedRegion.updateShape(shape, displayFrame);
-                if (lastAppliedDisplayFrame == null || displayFrame > lastAppliedDisplayFrame) {
-                  lastAppliedDisplayFrame = displayFrame;
-                }
-                if (firstAppliedDisplayFrame == null || displayFrame < firstAppliedDisplayFrame) {
-                  firstAppliedDisplayFrame = displayFrame;
-                }
-                batchLastApplied = displayFrame;
-                appliedCount += 1;
-                item.setTrackingProgress(appliedCount);
-              } catch (err: any) {
-                console.error("[SAM track] updateShape failed", displayFrame, err);
+            if (!shape) continue;
+
+            // Skip incomplete geometry before it lands in the sequence
+            // (BROS-1511). Rectangle tracks use bbox props, not vertices.
+            if (!item.isRectangle) {
+              const candidate = { frame: displayFrame, enabled: true, ...shape };
+              if (!isValidTrackKeyframe(candidate, shapeConstraints)) continue;
+            }
+
+            try {
+              // updateShape replaces the keyframe at `displayFrame`, so the
+              // prompt-frame keyframe is rewritten with the backend's mask
+              // instead of staying on the local image-predictor mask.
+              trackedRegion.updateShape(shape, displayFrame);
+              if (lastAppliedDisplayFrame == null || displayFrame > lastAppliedDisplayFrame) {
+                lastAppliedDisplayFrame = displayFrame;
               }
+              if (firstAppliedDisplayFrame == null || displayFrame < firstAppliedDisplayFrame) {
+                firstAppliedDisplayFrame = displayFrame;
+              }
+              batchLastApplied = displayFrame;
+              appliedCount += 1;
+              item.setTrackingProgress(appliedCount);
+            } catch (err: any) {
+              console.error("[SAM track] updateShape failed", displayFrame, err);
             }
           }
 
@@ -275,10 +294,42 @@ export function useInteractiveTrack(
         },
       );
 
+      // Finalize after cancel or completion: drop malformed keyframes, keep
+      // valid shapes + the original prompt frame when valid, delete if empty
+      // (BROS-1511). Always run — cancel and natural stop share this path.
+      try {
+        if (!item.isRectangle && Array.isArray(trackedRegion.sequence)) {
+          const finalized = finalizeTrackSequence(trackedRegion.sequence, shapeConstraints);
+
+          if (finalized.shouldDelete) {
+            trackedRegion.deleteRegion?.();
+            item.setEncodedFrame(imageTag.frame ?? imageTag.currentFrame ?? -1);
+            item.setState("stopped");
+            return;
+          }
+
+          trackedRegion.replaceSequence(finalized.retained);
+
+          firstAppliedDisplayFrame = finalized.firstValidFrame;
+          lastAppliedDisplayFrame = finalized.lastValidFrame;
+        }
+
+        trackedRegion.setDrawing?.(false);
+        if (
+          shapeConstraints.closable &&
+          trackedRegion.closed === false &&
+          typeof trackedRegion.setClosed === "function"
+        ) {
+          trackedRegion.setClosed(true);
+        }
+      } catch (err: any) {
+        console.error("Interactive track: failed to finalize region after tracking", err);
+      }
+
       // Terminate the region's lifespan after tracking stops so the region
       // doesn't visually persist past the last tracked frame. We compute
       // cutoffs entirely in FE display-frame space (using the first /
-      // last applied keyframes) so fps mismatch between FE config and the
+      // last retained valid keyframes) so fps mismatch between FE config and the
       // video file doesn't scatter terminators across the timeline.
       //   forward:  disable one frame after the last tracked keyframe
       //   backward: disable one frame before the earliest tracked keyframe
@@ -287,17 +338,15 @@ export function useInteractiveTrack(
       //  so the region keeps its default "continues forever" lifespan —
       //  matches the user's expectation for non-tracked regions.)
       if (typeof trackedRegion.setLifespanAt === "function") {
-        const capRight = direction === "forward" || direction === "both";
-        const capLeft = direction === "backward" || direction === "both";
+        const cutoffs = getTrackLifespanCutoffs(
+          direction,
+          firstAppliedDisplayFrame,
+          lastAppliedDisplayFrame,
+          totalFrames,
+        );
         try {
-          if (capRight && lastAppliedDisplayFrame !== null) {
-            const cutoff = lastAppliedDisplayFrame + 1;
-            if (cutoff <= totalFrames) trackedRegion.setLifespanAt(cutoff, false);
-          }
-          if (capLeft && firstAppliedDisplayFrame !== null) {
-            const cutoff = firstAppliedDisplayFrame - 1;
-            if (cutoff >= 1) trackedRegion.setLifespanAt(cutoff, false);
-          }
+          if (cutoffs.right !== undefined) trackedRegion.setLifespanAt(cutoffs.right, false);
+          if (cutoffs.left !== undefined) trackedRegion.setLifespanAt(cutoffs.left, false);
         } catch (err: any) {
           console.error("Interactive track: failed to terminate region lifespan", err);
         }
@@ -306,5 +355,5 @@ export function useInteractiveTrack(
       item.setEncodedFrame(imageTag.frame ?? imageTag.currentFrame ?? -1);
       item.setState("stopped");
     }
-  }, [item, trackFn]);
+  }, [item, trackFn, direction, labelSource]);
 }

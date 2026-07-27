@@ -130,6 +130,14 @@ const Model = types
       self.sequence = self.sequence.filter((closestKeypoint) => closestKeypoint.frame !== frame);
     },
 
+    /**
+     * Replace the entire keyframe sequence atomically (e.g. after tracking
+     * cancel prune — BROS-1511).
+     */
+    replaceSequence(next) {
+      self.sequence = Array.isArray(next) ? next : [];
+    },
+
     isInLifespan(targetFrame) {
       const closestKeypoint = self.closestKeypoint(targetFrame);
 

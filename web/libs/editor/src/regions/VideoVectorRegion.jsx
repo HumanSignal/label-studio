@@ -90,7 +90,11 @@ const Model = types
 
       for (const item of self.sequence) {
         if (item.frame === frame) {
-          return { vertices: item.vertices || [], closed: item.closed ?? false };
+          // A disabled keyframe marks the inclusive end of a lifespan. Tracking
+          // terminators contain no shape, so render that endpoint with the
+          // nearest preceding geometry to keep it aligned with the timeline.
+          const shape = !item.enabled && !item.vertices?.length && prev ? prev : item;
+          return { vertices: shape.vertices || [], closed: shape.closed ?? false };
         }
 
         if (item.frame > frame) {
@@ -125,13 +129,22 @@ const Model = types
       return resolveVideoVectorRegionControl(self.results, objectTag);
     },
 
+    /**
+     * First keyframe that carries drawable geometry. Lifespan terminators are
+     * `{ frame, enabled: false }` with no vertices and must not drive
+     * closed/vertices/incomplete (BROS-1511 — Track Both left-cap).
+     */
+    get shapeKeyframe() {
+      return self.sequence.find((kf) => Array.isArray(kf?.vertices) && kf.vertices.length > 0) ?? self.sequence[0];
+    },
+
     get vertices() {
-      const kf = self.sequence[0];
+      const kf = self.shapeKeyframe;
       return kf?.vertices ?? [];
     },
 
     get closed() {
-      const kf = self.sequence[0];
+      const kf = self.shapeKeyframe;
       return kf?.closed ?? false;
     },
 
