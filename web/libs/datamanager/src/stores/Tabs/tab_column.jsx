@@ -84,6 +84,8 @@ export const TabColumn = types
     help: types.maybeNull(types.string),
     // Column alias whose filter should be joined automatically when a filter is created for this column
     child_filter: types.maybeNull(types.string),
+    // Column aliases that can be selected for sibling child-filter rows
+    allowed_child_filters: types.optional(types.maybeNull(types.array(types.string)), []),
     // Whether filtering and selection is disabled for the column
     disabled: types.optional(types.boolean, false),
     // Whether this field can be selected when creating or changing a filter.

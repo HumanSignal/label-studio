@@ -2,7 +2,7 @@ import React from "react";
 import { observer } from "mobx-react";
 import { cn } from "../../../utils/bem";
 import { Badge, Button, EnterpriseBadge, Typography } from "@humansignal/ui";
-import { IconClose } from "@humansignal/icons";
+import { IconClose, PlusIcon } from "@humansignal/icons";
 import { FilterDropdown } from "../FilterDropdown";
 import "./FilterLine.prefix.css";
 import { FilterOperation } from "./FilterOperation";
@@ -197,7 +197,36 @@ export const FilterLine = observer(
     disabled = false,
     disabledTooltip,
   }) => {
-    const childFilter = filter.child_filter;
+    const childFilters = filter.child_filters;
+    const configuredChildAliases =
+      filter.field.allowed_child_filters?.length > 0
+        ? filter.field.allowed_child_filters
+        : filter.field.child_filter
+          ? [filter.field.child_filter]
+          : [];
+    const canConfigureChildren = filter.field.allowed_child_filters?.length > 0;
+    const allFilterTypes = view.parent?.availableFilters ?? view.availableFilters;
+    const childFilterTypes = configuredChildAliases
+      .map((alias) =>
+        allFilterTypes.find(
+          (filterType) => filterType.field.alias === alias && filterType.field.target === filter.target,
+        ),
+      )
+      .filter(Boolean);
+    const childColumnItems = childFilterTypes.map((filterType) => ({
+      value: filterType.id,
+      label: filterType.field.title,
+      disabled:
+        filterType.field.disabled ||
+        !filterType.field.available_for_new_filters ||
+        filterType.field.filter_available === false,
+    }));
+    const defaultChildFilterType = childFilterTypes.find(
+      (filterType) =>
+        !filterType.field.disabled &&
+        filterType.field.available_for_new_filters &&
+        filterType.field.filter_available !== false,
+    );
     // Editing controls are disabled when the tab is locked (UTC-949) or the filter is
     // unavailable (FIT-2173); removal stays governed by lock only so unavailable filters
     // remain removable.
@@ -223,122 +252,37 @@ export const FilterLine = observer(
       return () => clearTimeout(saveTimerRef.current);
     }, [filterId, filterOperator, filterValue, isValid, onSaveOnSwitch]);
 
-    if (sidebar) {
-      // Sidebar layout uses grid structure like main layout
-      return (
-        <div className={cn("filterLine").mod({ hasChild: !!childFilter }).toClassName()}>
-          {/* Main filter row */}
-          <div className={cn("filterLine").elem("column").mix("conjunction").toClassName()}>
-            {index === 0 ? (
-              <Typography as="span" variant="body" size="smallest" className="pr-tightest">
-                Where
-              </Typography>
-            ) : (
-              <Conjunction index={index} view={view} disabled={disabled} />
-            )}
-          </div>
+    const rootColumnPicker = sidebar ? (
+      <FilterDropdown
+        placeholder={filter.field?.title || "Column"}
+        defaultValue={filter.filter.id}
+        items={availableFilters}
+        dropdownClassName={dropdownClassName}
+        searchFilter={filterFieldSearchHandler}
+        onChange={(selectedValue) =>
+          handleColumnChange(filter, availableFilters, selectedValue, onSaveOnSwitch, onSaveInPlace)
+        }
+        optionRender={filterFieldOptionRender}
+        disabled={isDisabled}
+      />
+    ) : (
+      <FilterColumnPicker
+        filter={filter}
+        pickerFilters={pickerFilters ?? availableFilters}
+        recentEntries={recentEntries}
+        onSaveOnSwitch={onSaveOnSwitch}
+        onSaveInPlace={onSaveInPlace}
+        disabled={disabled}
+      />
+    );
 
-          <div className={cn("filterLine").elem("column").mix("field").toClassName()}>
-            <FilterDropdown
-              placeholder={filter.field?.title || "Column"}
-              defaultValue={filter.filter.id}
-              items={availableFilters}
-              dropdownClassName={dropdownClassName}
-              searchFilter={filterFieldSearchHandler}
-              onChange={(selectedValue) =>
-                handleColumnChange(filter, availableFilters, selectedValue, onSaveOnSwitch, onSaveInPlace)
-              }
-              optionRender={filterFieldOptionRender}
-              disabled={isDisabled}
-            />
-          </div>
-
-          <FilterOperation
-            filter={filter}
-            value={filter.currentValue}
-            operator={filter.operator}
-            field={filter.field}
-            disabled={isDisabled}
-          />
-
-          {/* Remove button — only show if no child filter, otherwise empty space */}
-          {!childFilter ? (
-            <div className={cn("filterLine").elem("remove").toClassName()}>
-              <Button
-                look="string"
-                size="small"
-                style={{ border: "none" }}
-                disabled={disabled}
-                tooltip={lockTooltip}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  filter.delete();
-                }}
-                aria-label="Remove filter"
-                icon={<Icon icon={IconClose} size={12} />}
-              />
-            </div>
-          ) : (
-            <div className={cn("filterLine").elem("remove").toClassName()} />
-          )}
-
-          {unavailableReason && <UnavailableFilterNotice reason={unavailableReason} />}
-
-          {/* Child filter row */}
-          {childFilter && (
-            <>
-              {/* Conjunction */}
-              <div className={cn("filterLine").elem("column").mix("conjunction").toClassName()}>
-                <Typography as="span" variant="body" size="smallest" className="pr-tightest">
-                  and
-                </Typography>
-              </div>
-
-              {/* Field — disabled, just shows the linked column name */}
-              <div className={cn("filterLine").elem("column").mix("field child-field").toClassName()}>
-                <FilterDropdown
-                  placeholder={childFilter.field.title}
-                  value={childFilter.field.title}
-                  items={[{ value: childFilter.field.title, label: childFilter.field.title }]}
-                  disabled={true}
-                  onChange={() => {}} // No-op since it's disabled
-                  style={{ minWidth: "80px" }}
-                />
-              </div>
-
-              {/* Operation and Value */}
-              <FilterOperation
-                filter={childFilter}
-                value={childFilter.currentValue}
-                operator={childFilter.operator}
-                field={childFilter.field}
-                disabled={isDisabled}
-              />
-
-              {/* Remove — deletes the entire filter group including child */}
-              <div className={cn("filterLine").elem("remove").toClassName()}>
-                <Button
-                  look="danger"
-                  size="smaller"
-                  disabled={disabled}
-                  tooltip={lockTooltip}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    filter.delete();
-                  }}
-                  aria-label="Remove filter"
-                  icon={<Icon icon={IconClose} size={12} />}
-                />
-              </div>
-            </>
-          )}
-        </div>
-      );
-    }
-
-    // Main layout uses parent grid structure — render children as direct grid items
     return (
-      <div className={cn("filterLine").mod({ hasChild: !!childFilter }).toClassName()} data-testid="filter-line">
+      <div
+        className={cn("filterLine")
+          .mod({ hasChild: childFilters.length > 0 })
+          .toClassName()}
+        data-testid={sidebar ? undefined : "filter-line"}
+      >
         <div className={cn("filterLine").elem("column").mix("conjunction").toClassName()}>
           {index === 0 ? (
             <Typography as="span" variant="body" size="smallest" className="pr-tightest">
@@ -349,15 +293,11 @@ export const FilterLine = observer(
           )}
         </div>
 
-        <div className={cn("filterLine").elem("column").mix("field").toClassName()} data-testid="filter-line-column">
-          <FilterColumnPicker
-            filter={filter}
-            pickerFilters={pickerFilters ?? availableFilters}
-            recentEntries={recentEntries}
-            onSaveOnSwitch={onSaveOnSwitch}
-            onSaveInPlace={onSaveInPlace}
-            disabled={disabled}
-          />
+        <div
+          className={cn("filterLine").elem("column").mix("field").toClassName()}
+          data-testid={sidebar ? undefined : "filter-line-column"}
+        >
+          {rootColumnPicker}
         </div>
 
         <FilterOperation
@@ -368,74 +308,89 @@ export const FilterLine = observer(
           disabled={isDisabled}
         />
 
-        {/* Only show remove button if there's no child filter */}
-        {!childFilter && (
-          <div className={cn("filterLine").elem("remove").toClassName()}>
-            <Button
-              look="string"
-              size="small"
-              style={{ border: "none" }}
-              disabled={disabled}
-              tooltip={lockTooltip}
-              onClick={(e) => {
-                e.stopPropagation();
-                filter.delete();
-              }}
-              aria-label="Remove filter"
-              icon={<Icon icon={IconClose} size={12} />}
-            />
-          </div>
-        )}
+        <div className={cn("filterLine").elem("remove").toClassName()}>
+          <Button
+            look="string"
+            size="small"
+            disabled={disabled}
+            tooltip={lockTooltip}
+            onClick={(event) => {
+              event.stopPropagation();
+              filter.delete();
+            }}
+            aria-label="Remove filter"
+            icon={<Icon icon={IconClose} size={12} />}
+          />
+        </div>
 
         {unavailableReason && <UnavailableFilterNotice reason={unavailableReason} />}
 
-        {/* Render child filters as additional grid items on new row */}
-        {childFilter && (
-          <>
-            {/* Empty column to maintain grid alignment for main filter row */}
-            <div className={cn("filterLine").elem("remove").toClassName()} />
+        {childFilters.map((childFilter) => {
+          const childAliasIsAllowed = configuredChildAliases.includes(childFilter.field.alias);
+          const childIsDisabled =
+            isDisabled || !canConfigureChildren || !childAliasIsAllowed || isFilterEditingDisabled(childFilter.field);
+          const childUnavailableReason =
+            childFilter.field.filter_available === false ? childFilter.field.unavailable_reason : null;
 
-            <div className={cn("filterLine").elem("column").mix("conjunction").toClassName()}>
-              <Typography as="span" variant="body" size="smallest" className="pr-tightest">
-                and
-              </Typography>
-            </div>
+          return (
+            <React.Fragment key={childFilter.id}>
+              <div className={cn("filterLine").elem("column").mix("conjunction").toClassName()}>
+                <Typography as="span" variant="body" size="smallest" className="pr-tightest">
+                  and
+                </Typography>
+              </div>
 
-            <div className={cn("filterLine").elem("column").mix("field child-field").toClassName()}>
-              <FilterDropdown
-                placeholder={childFilter.field.title}
-                value={childFilter.field.title}
-                items={[{ value: childFilter.field.title, label: childFilter.field.title }]}
-                disabled={true}
-                onChange={() => {}} // No-op since it's disabled
+              <div className={cn("filterLine").elem("column").mix("field child-field").toClassName()}>
+                <FilterDropdown
+                  placeholder={childFilter.field.title}
+                  value={childFilter.filter.id}
+                  items={childColumnItems}
+                  disabled={childIsDisabled}
+                  onChange={(filterTypeId) => childFilter.setFilterDelayed(filterTypeId)}
+                />
+              </div>
+
+              <FilterOperation
+                filter={childFilter}
+                value={childFilter.currentValue}
+                operator={childFilter.operator}
+                field={childFilter.field}
+                disabled={childIsDisabled}
               />
-            </div>
 
-            <FilterOperation
-              filter={childFilter}
-              value={childFilter.currentValue}
-              operator={childFilter.operator}
-              field={childFilter.field}
-              disabled={isDisabled}
-            />
+              <div className={cn("filterLine").elem("remove").toClassName()}>
+                <Button
+                  look="string"
+                  size="small"
+                  disabled={disabled}
+                  tooltip={lockTooltip}
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    view.removeChildFilter(filter, childFilter);
+                  }}
+                  aria-label="Remove child filter"
+                  icon={<Icon icon={IconClose} size={12} />}
+                />
+              </div>
 
-            {/* Remove button on child filter row — removes the entire filter group */}
-            <div className={cn("filterLine").elem("remove").toClassName()}>
-              <Button
-                look="string"
-                size="small"
-                style={{ border: "none" }}
-                disabled={disabled}
-                tooltip={lockTooltip}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  filter.delete();
-                }}
-                aria-label="Remove filter"
-                icon={<Icon icon={IconClose} size={12} />}
-              />
-            </div>
-          </>
+              {childUnavailableReason && <UnavailableFilterNotice reason={childUnavailableReason} />}
+            </React.Fragment>
+          );
+        })}
+
+        {canConfigureChildren && (
+          <div className={cn("filterLine").elem("child-actions").toClassName()}>
+            <Button
+              look="string"
+              size="small"
+              disabled={isDisabled || !defaultChildFilterType}
+              tooltip={disabled ? lockTooltip : unavailableReason}
+              onClick={() => view.addChildFilter(filter, defaultChildFilterType)}
+              leading={<PlusIcon size={14} weight="bold" aria-hidden="true" />}
+            >
+              Add child filter
+            </Button>
+          </div>
         )}
       </div>
     );

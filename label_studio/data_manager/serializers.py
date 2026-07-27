@@ -72,22 +72,26 @@ class ChildFilterSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
     def to_representation(self, value):
-        parent = self.parent  # the owning FilterSerializer instance
-        serializer = parent.__class__(instance=value, context=self.context)
+        serializer = FilterSerializer(instance=value, context=self.context)
         return serializer.data
 
     def to_internal_value(self, data):
-        """Allow ChildFilterSerializer to be writable.
+        """Validate each child like a root while enforcing one nesting level."""
+        if isinstance(data, dict):
+            if 'child_filters' in data:
+                nested_children = data['child_filters']
+            elif 'child_filter' in data:
+                nested_child = data['child_filter']
+                nested_children = [] if nested_child is None else [nested_child]
+            else:
+                nested_children = []
+            if nested_children:
+                raise serializers.ValidationError(
+                    {'child_filters': 'Child filters cannot contain nested child filters.'}
+                )
+            data = {key: value for key, value in data.items() if key not in ('child_filter', 'child_filters')}
 
-        We instantiate the *parent* serializer class (which in this case is
-        ``FilterSerializer``) to validate the nested payload. The validated
-        data produced by that serializer is returned so that the enclosing
-        serializer (``FilterSerializer``) can include it in its own
-        ``validated_data`` structure.
-        """
-
-        parent_cls = self.parent.__class__  # FilterSerializer
-        serializer = parent_cls(data=data, context=self.context)
+        serializer = FilterSerializer(data=data, context=self.context)
         serializer.is_valid(raise_exception=True)
         return serializer.validated_data
 
@@ -122,11 +126,24 @@ def _column_filter_field_name(column: str) -> str | None:
 
 
 class FilterSerializer(serializers.ModelSerializer):
-    child_filter = ChildFilterSerializer(required=False)
+    child_filters = ChildFilterSerializer(many=True, required=False)
 
     class Meta:
         model = Filter
         fields = '__all__'
+
+    def to_internal_value(self, data):
+        if not isinstance(data, dict):
+            return super().to_internal_value(data)
+
+        normalized = dict(data)
+        if 'child_filters' in normalized:
+            # The canonical plural field wins deterministically when both are supplied.
+            normalized.pop('child_filter', None)
+        elif 'child_filter' in normalized:
+            child_filter = normalized.pop('child_filter')
+            normalized['child_filters'] = [] if child_filter is None else [child_filter]
+        return super().to_internal_value(normalized)
 
     def validate(self, attrs):
         """Object-level validation for `in_list` / `not_in_list` filters (BROS-1203).
@@ -227,26 +244,32 @@ class FilterGroupSerializer(serializers.ModelSerializer):
     filters = FilterSerializer(many=True)
 
     def to_representation(self, instance):
-        def _build_filter_tree(filter_obj):
-            """Build hierarchical filter representation."""
-            item = {
+        def _build_filter_item(filter_obj):
+            from data_manager.managers import normalize_persisted_user_filter
+
+            field_name = _column_filter_field_name(filter_obj.column)
+            operator, value = normalize_persisted_user_filter(field_name, filter_obj.operator, filter_obj.value)
+            return {
                 'filter': filter_obj.column,
-                'operator': filter_obj.operator,
+                'operator': operator,
                 'type': filter_obj.type,
-                'value': filter_obj.value,
+                'value': value,
             }
 
-            # Add child filter if exists (only one level of nesting)
-            child_filters = filter_obj.children.all()
-            if child_filters:
-                child = child_filters[0]  # Only support one child
-                child_item = {
-                    'filter': child.column,
-                    'operator': child.operator,
-                    'type': child.type,
-                    'value': child.value,
-                }
-                item['child_filter'] = child_item
+        def _build_filter_tree(filter_obj):
+            """Build hierarchical filter representation."""
+            item = _build_filter_item(filter_obj)
+
+            # Child indexes preserve canonical wire order; PK stabilizes legacy rows with no index.
+            child_filters = sorted(
+                filter_obj.children.all(),
+                key=lambda child: (
+                    child.index is None,
+                    child.index if child.index is not None else 0,
+                    child.pk,
+                ),
+            )
+            item['child_filters'] = [_build_filter_item(child) for child in child_filters]
 
             return item
 
@@ -333,8 +356,20 @@ class ViewSerializer(serializers.ModelSerializer):
                         'value': src_filter.get('value', {}),
                     }
 
-                    if child_filter := src_filter.get('child_filter'):
-                        filter_payload['child_filter'] = _convert_filter(child_filter)
+                    if 'child_filters' in src_filter:
+                        child_filters = src_filter['child_filters']
+                    elif 'child_filter' in src_filter:
+                        child_filter = src_filter['child_filter']
+                        child_filters = [] if child_filter is None else [child_filter]
+                    else:
+                        child_filters = None
+
+                    if child_filters is not None:
+                        filter_payload['child_filters'] = (
+                            [_convert_filter(child) for child in child_filters]
+                            if isinstance(child_filters, list)
+                            else child_filters
+                        )
 
                     return filter_payload
 
@@ -368,35 +403,22 @@ class ViewSerializer(serializers.ModelSerializer):
     def _create_filters(filter_group, filters_data):
         """Create Filter objects inside the provided ``filter_group``.
 
-        * For **root** filters (``parent`` is ``None``) we enumerate the
-          ``index`` so that the UI can preserve left-to-right order.
-        * For **child** filters we leave ``index`` as ``None`` – they are not
-          shown in the top-level ordering bar.
+        Root and child indexes preserve the order of their respective wire lists.
         """
 
-        def _create_recursive(data, parent=None, index=None):
-            # Extract nested children early (if any) and remove them from payload
-            child_filter = data.pop('child_filter', None)
+        for root_index, data in enumerate(filters_data):
+            child_filters = data.pop('child_filters', [])
+            data['index'] = root_index
+            root = Filter.objects.create(parent=None, **data)
+            filter_group.filters.add(root)
 
-            # Handle explicit parent reference present in the JSON payload only
-            # for root elements. For nested structures we rely on the actual
-            # ``parent`` FK object instead of its primary key.
-            if parent is not None:
-                data.pop('parent', None)
-
-            # Assign display order for root filters
-            if parent is None:
-                data['index'] = index
-
-            # Persist the filter
-            obj = Filter.objects.create(parent=parent, **data)
-            filter_group.filters.add(obj)
-
-            if child_filter:
-                _create_recursive(child_filter, parent=obj)
-
-        for index, data in enumerate(filters_data):
-            _create_recursive(data, index=index)
+            for child_index, child_data in enumerate(child_filters):
+                if child_data.pop('child_filters', []):
+                    raise serializers.ValidationError('Child filters cannot contain nested child filters.')
+                child_data.pop('parent', None)
+                child_data['index'] = child_index
+                child = Filter.objects.create(parent=root, **child_data)
+                filter_group.filters.add(child)
 
     def create(self, validated_data):
         with transaction.atomic():

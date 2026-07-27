@@ -65,6 +65,12 @@ class _Operator(BaseModel):
 Operator = _Operator()
 USER_FILTER_FIELDS = frozenset({'annotators', 'updated_by', 'reviewers', 'comment_authors', 'skipped_by_annotator'})
 USER_FILTER_VALUE_OPERATORS = frozenset({Operator.CONTAINS, Operator.NOT_CONTAINS})
+LEGACY_USER_FILTER_OPERATORS = {
+    Operator.EQUAL: Operator.CONTAINS,
+    Operator.IN_LIST: Operator.CONTAINS,
+    Operator.NOT_EQUAL: Operator.NOT_CONTAINS,
+    Operator.NOT_IN_LIST: Operator.NOT_CONTAINS,
+}
 
 
 def validate_user_filter_operator(field_name, operator, value):
@@ -73,13 +79,70 @@ def validate_user_filter_operator(field_name, operator, value):
         raise ValidationError(f'List-valued user filters support only these operators: {allowed}.')
 
 
+def normalize_persisted_user_filter(field_name, operator, value):
+    """Recover historical user-filter shapes without relaxing validation for new writes."""
+    if field_name not in USER_FILTER_FIELDS:
+        return operator, value
+    if operator == Operator.EMPTY:
+        try:
+            empty_value = cast_bool_from_str(value)
+        except ValueError:
+            return Operator.CONTAINS, []
+        if isinstance(empty_value, bool):
+            return operator, empty_value
+        if isinstance(empty_value, int) and empty_value in (0, 1):
+            return operator, bool(empty_value)
+        return Operator.CONTAINS, []
+
+    normalized_operator = LEGACY_USER_FILTER_OPERATORS.get(operator, operator)
+    if normalized_operator not in USER_FILTER_VALUE_OPERATORS:
+        return Operator.CONTAINS, []
+
+    ids = []
+    seen = set()
+    max_values = settings.DATA_MANAGER_LIST_FILTER_MAX_VALUES
+    collection_value = isinstance(value, (list, tuple)) or (
+        isinstance(value, dict) and isinstance(value.get('items'), list)
+    )
+
+    def collect(candidate):
+        if len(ids) >= max_values or candidate is None or isinstance(candidate, bool):
+            return
+        if isinstance(candidate, dict):
+            if isinstance(candidate.get('items'), list):
+                collect(candidate['items'])
+            elif 'id' in candidate:
+                collect(candidate['id'])
+            elif 'value' in candidate:
+                collect(candidate['value'])
+            return
+        if isinstance(candidate, (list, tuple)):
+            for item in candidate:
+                collect(item)
+            return
+        if isinstance(candidate, float) and not candidate.is_integer():
+            return
+        try:
+            user_id = int(candidate)
+        except (TypeError, ValueError):
+            return
+        if user_id not in seen:
+            seen.add(user_id)
+            ids.append(user_id)
+
+    collect(value)
+    if collection_value or not ids:
+        return normalized_operator, ids
+    return normalized_operator, ids[0]
+
+
 @dataclass(frozen=True)
 class CustomFilterResult:
     """Result from an enterprise filter hook that handled the current filter.
 
     ``expression=None`` deliberately drops an unavailable filter line. Hooks
-    that compile a parent and child into one expression set
-    ``consume_child_filter`` so the generic loop does not apply the child again.
+    that compile a parent and its children into one expression set
+    ``consume_child_filter`` so the generic loop does not apply any child again.
     """
 
     expression: Q | None
@@ -204,7 +267,7 @@ def _set_prefilter_task_ids_for_agreement(request, queryset, prepare_params, pro
     narrowed_items = []
     for _filter in non_agreement_filters:
         copied_filter = _filter.copy(deep=True)
-        copied_filter.child_filter = None
+        copied_filter.child_filters = []
         narrowed_items.append(copied_filter)
 
     if prefilter_annotation_fields:
@@ -503,7 +566,7 @@ def add_user_filter(enabled, key, _filter, filter_expressions):
 
     user_ids = parse_user_filter_ids(_filter.value)
     if not user_ids:
-        return 'continue'
+        return 'skip_line'
 
     lookup = f'{key}__in'
     if _filter.operator == Operator.CONTAINS:
@@ -521,17 +584,24 @@ def apply_filters(queryset, filters, project, request):
     # convert conjunction to orm statement
     custom_filter_expressions = load_func(settings.DATA_MANAGER_CUSTOM_FILTER_EXPRESSIONS)
 
-    # combine child filters with their parent in the same filter expression
+    # Combine child filters with their parent in the same filter expression.
+    # Result-parent hooks consume this complete line and compile one correlated
+    # expression; the generic path remains for legacy/non-result filter trees.
     filter_line_expressions: list[list[Q]] = []
     for parent_filter in filters.items:
-        filter_line = [parent_filter, parent_filter.child_filter] if parent_filter.child_filter else [parent_filter]
+        child_filters = list(parent_filter.child_filters)
+        filter_line = [parent_filter, *child_filters]
         filter_expressions: list[Q] = []
 
         for _filter in filter_line:
-            is_child_filter = parent_filter.child_filter is not None and _filter is parent_filter.child_filter
+            is_child_filter = _filter is not parent_filter
 
             # we can also have annotations filters
             if not _filter.filter.startswith('filter:tasks:') or _filter.value is None:
+                # Children never become standalone task filters when their parent
+                # is empty or malformed.
+                if not is_child_filter:
+                    break
                 continue
 
             # django orm loop expression attached to column name
@@ -567,6 +637,7 @@ def apply_filters(queryset, filters, project, request):
                 request=request,
                 is_child_filter=is_child_filter,
                 child_filter=parent_filter.child_filter if not is_child_filter else None,
+                child_filters=child_filters if not is_child_filter else None,
             )
             if isinstance(filter_expression, CustomFilterResult):
                 if filter_expression.expression is not None:
@@ -582,11 +653,19 @@ def apply_filters(queryset, filters, project, request):
             result = add_user_filter(
                 field_name == 'annotators', 'annotations__completed_by', _filter, filter_expressions
             )
+            if result == 'skip_line':
+                if not is_child_filter:
+                    break
+                continue
             if result == 'continue':
                 continue
 
             # updated_by
             result = add_user_filter(field_name == 'updated_by', 'updated_by', _filter, filter_expressions)
+            if result == 'skip_line':
+                if not is_child_filter:
+                    break
+                continue
             if result == 'continue':
                 continue
 

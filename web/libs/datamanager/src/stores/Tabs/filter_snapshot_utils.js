@@ -7,7 +7,20 @@
  * @returns {Array|null} valid items, or null on failure
  */
 /** User-select List columns (annotators, reviewers, …) require integer user IDs on the wire. */
-export const INTEGER_USER_LIST_ALIASES = new Set(["annotators", "reviewers", "comment_authors"]);
+export const INTEGER_USER_LIST_ALIASES = new Set([
+  "annotators",
+  "updated_by",
+  "reviewers",
+  "comment_authors",
+  "skipped_by_annotator",
+]);
+const USER_FILTER_VALUE_OPERATORS = new Set(["contains", "not_contains"]);
+const LEGACY_USER_FILTER_OPERATORS = new Map([
+  ["equal", "contains"],
+  ["in_list", "contains"],
+  ["not_equal", "not_contains"],
+  ["not_in_list", "not_contains"],
+]);
 
 export function fieldAliasFromFilterId(filterId) {
   if (typeof filterId !== "string") return null;
@@ -19,23 +32,77 @@ export function isIntegerUserListField(fieldAlias) {
   return INTEGER_USER_LIST_ALIASES.has(fieldAlias);
 }
 
+export function normalizeIntegerUserListOperator(operator, fieldAlias) {
+  if (!isIntegerUserListField(fieldAlias) || operator === "empty") return operator;
+  const normalized = LEGACY_USER_FILTER_OPERATORS.get(operator) ?? operator;
+  return USER_FILTER_VALUE_OPERATORS.has(normalized) ? normalized : "contains";
+}
+
 /**
  * Drop values that cannot be valid integer user-id lists (e.g. model-version strings
- * accidentally persisted on an annotators filter). Returns null to signal reset.
+ * accidentally persisted on an annotators filter). Recover exact historical option
+ * shapes and reset an unrecoverable selection to an empty list.
  */
 export function sanitizeIntegerUserListValue(value, { fieldAlias, operator }) {
   if (!isIntegerUserListField(fieldAlias)) return value;
-  if (!operator || !["contains", "not_contains"].includes(operator)) return value;
+  if (operator === "empty") return value;
+  if (!USER_FILTER_VALUE_OPERATORS.has(operator)) return [];
   if (value == null) return value;
-  if (!Array.isArray(value)) return value;
 
-  const hasInvalidElement = value.some((element) => {
-    if (typeof element === "number" && Number.isInteger(element)) return false;
-    if (typeof element === "string" && element !== "" && /^\d+$/.test(element)) return false;
-    return true;
-  });
+  const ids = [];
+  const seen = new Set();
+  const collectionValue = Array.isArray(value) || (typeof value === "object" && Array.isArray(value?.items));
+  const configuredMax = Number(window.APP_SETTINGS?.data_manager?.list_filter_max_values);
+  const maxValues = Number.isSafeInteger(configuredMax) && configuredMax > 0 ? configuredMax : 5000;
+  const collect = (candidate) => {
+    if (ids.length >= maxValues || candidate == null || typeof candidate === "boolean") return;
+    if (Array.isArray(candidate)) {
+      candidate.forEach(collect);
+      return;
+    }
+    if (typeof candidate === "object") {
+      if (Array.isArray(candidate.items)) {
+        collect(candidate.items);
+      } else if ("id" in candidate) {
+        collect(candidate.id);
+      } else if ("value" in candidate) {
+        collect(candidate.value);
+      }
+      return;
+    }
+    if (typeof candidate === "number" && !Number.isInteger(candidate)) return;
+    const text = String(candidate).trim();
+    if (!/^-?\d+$/.test(text)) return;
+    const id = Number(text);
+    if (!Number.isSafeInteger(id) || seen.has(id)) return;
+    seen.add(id);
+    ids.push(id);
+  };
 
-  return hasInvalidElement ? null : value;
+  collect(value);
+  return collectionValue || ids.length === 0 ? ids : ids[0];
+}
+
+export function normalizeIntegerUserFilter({ fieldAlias, operator, value }) {
+  if (!isIntegerUserListField(fieldAlias)) return { operator, value };
+  if (operator === "empty") {
+    if (typeof value === "boolean") return { operator, value };
+    if (value === 0 || value === 1) return { operator, value: Boolean(value) };
+    if (typeof value === "string") {
+      const normalized = value.toLowerCase();
+      if (["true", "yes", "on", "1"].includes(normalized)) return { operator, value: true };
+      if (["false", "no", "not", "off", "0"].includes(normalized)) return { operator, value: false };
+    }
+    return { operator: "contains", value: [] };
+  }
+  if (!USER_FILTER_VALUE_OPERATORS.has(operator) && !LEGACY_USER_FILTER_OPERATORS.has(operator)) {
+    return { operator: "contains", value: [] };
+  }
+  const normalizedOperator = normalizeIntegerUserListOperator(operator, fieldAlias);
+  return {
+    operator: normalizedOperator,
+    value: sanitizeIntegerUserListValue(value, { fieldAlias, operator: normalizedOperator }),
+  };
 }
 
 export function validateFilterSnapshot(snapshot, availableFilters) {

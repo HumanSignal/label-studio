@@ -1,4 +1,4 @@
-import { flow, getParent, getRoot, types } from "mobx-state-tree";
+import { flow, getParent, getRoot, isAlive, types } from "mobx-state-tree";
 import * as CellViews from "../../components/CellViews";
 import { normalizeCellAlias } from "../../components/CellViews";
 import * as Filters from "../../components/Filters/types";
@@ -11,6 +11,7 @@ import {
   resolveOperatorValueTransition,
   sanitizeIntegerUserListValue,
   fieldAliasFromFilterId,
+  normalizeIntegerUserFilter,
 } from "./filter_snapshot_utils";
 import { guidGenerator } from "../../utils/random";
 
@@ -50,8 +51,33 @@ export function recoverFilterSnapshot(sn) {
     value = [value];
   }
   const fieldAlias = fieldAliasFromFilterId(sn.filter);
-  value = sanitizeIntegerUserListValue(value, { fieldAlias, operator: sn.operator });
-  return { ...sn, value };
+  const normalized = normalizeIntegerUserFilter({ fieldAlias, operator: sn.operator, value });
+  const { operator } = normalized;
+  value = normalized.value;
+  return { ...sn, operator, value };
+}
+
+function normalizeChildFilterSnapshot(sn) {
+  if (!sn) return sn;
+
+  const hasPluralChildren = Object.hasOwn(sn, "child_filters");
+  const hasLegacyChild = Object.hasOwn(sn, "child_filter");
+  const childFilters = hasPluralChildren
+    ? Array.isArray(sn.child_filters)
+      ? sn.child_filters
+      : []
+    : sn.child_filter
+      ? [sn.child_filter]
+      : [];
+  const snapshot = { ...sn };
+
+  delete snapshot.child_filter;
+
+  return {
+    ...snapshot,
+    child_filters: childFilters,
+    apply_legacy_child_filter: !hasPluralChildren && !hasLegacyChild,
+  };
 }
 
 const operatorNames = Array.from(new Set([].concat(...Object.values(Filters).map((f) => f.map((op) => op.key)))));
@@ -73,11 +99,16 @@ export const TabFilter = types
     operator: types.maybeNull(Operators),
     value: types.maybeNull(FilterValueType),
 
-    child_filter: types.maybeNull(types.late(() => TabFilter)),
+    child_filters: types.optional(types.array(types.late(() => TabFilter)), []),
+    apply_legacy_child_filter: types.optional(types.boolean, false),
   })
   .views((self) => ({
     get field() {
       return self.filter.field;
+    },
+
+    get child_filter() {
+      return self.child_filters[0] ?? null;
     },
 
     get schema() {
@@ -180,9 +211,8 @@ export const TabFilter = types
         self.setOperator(self.component[0].key);
       }
 
-      // If this filter's column has child_filter metadata and no child filter exists, create it
-      // This ensures child filters are automatically recreated after navigation
-      if (!self.child_filter && self.filter?.field?.child_filter) {
+      // Legacy column metadata still auto-materializes its one compatibility child.
+      if (self.apply_legacy_child_filter && self.child_filters.length === 0 && self.filter?.field?.child_filter) {
         self.view?.applyChildFilter(self);
       }
     },
@@ -198,7 +228,7 @@ export const TabFilter = types
     setFilter(value, save = true) {
       if (!isDefined(value)) return;
 
-      self.view.clearChildFilter(self);
+      self.view.clearChildFilters(self);
 
       const prevOperator = self.operator;
       const prevValue = self.value;
@@ -246,24 +276,25 @@ export const TabFilter = types
     setFilterFromRecent(filterTypeId, operator, value) {
       if (!isDefined(filterTypeId)) return;
 
-      self.view.clearChildFilter(self);
+      self.view.clearChildFilters(self);
       self.filter = filterTypeId;
       self.view.applyChildFilter(self);
       self.markUnsaved();
 
       const newOperators = self.component;
+      const fieldAlias = self.filter?.field?.alias;
+      const normalized = normalizeIntegerUserFilter({ fieldAlias, operator, value });
 
-      if (operator && newOperators.some((op) => op.key === operator)) {
-        self.operator = operator;
+      if (normalized.operator && newOperators.some((op) => op.key === normalized.operator)) {
+        self.operator = normalized.operator;
       } else {
         self.operator = newOperators[0].key;
       }
 
-      const fieldAlias = self.filter?.field?.alias;
       const sanitizedValue =
-        value !== undefined && value !== null
-          ? sanitizeIntegerUserListValue(value, { fieldAlias, operator: self.operator })
-          : value;
+        normalized.value !== undefined && normalized.value !== null
+          ? sanitizeIntegerUserListValue(normalized.value, { fieldAlias, operator: self.operator })
+          : normalized.value;
 
       if (sanitizedValue !== undefined && sanitizedValue !== null) {
         self.setValue(sanitizedValue);
@@ -350,6 +381,7 @@ export const TabFilter = types
       getRoot(self)?.unsetSelection();
       self.view?.clearSelection();
       yield self.view?.save({ interaction: "filter" });
+      if (!isAlive(self)) return;
       self.saving = false;
     }),
 
@@ -371,7 +403,14 @@ export const TabFilter = types
     },
 
     saveDelayed: debounce(() => {
+      if (!isAlive(self)) return;
       self.save();
     }, 300),
   }))
-  .preProcessSnapshot(recoverFilterSnapshot);
+  .preProcessSnapshot((snapshot) => normalizeChildFilterSnapshot(recoverFilterSnapshot(snapshot)))
+  .postProcessSnapshot((snapshot) => {
+    const canonicalSnapshot = { ...snapshot };
+
+    delete canonicalSnapshot.apply_legacy_child_filter;
+    return canonicalSnapshot;
+  });

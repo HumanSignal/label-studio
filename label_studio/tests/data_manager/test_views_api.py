@@ -4,6 +4,7 @@ import json
 from unittest.mock import patch
 
 import pytest
+from data_manager.models import View
 from rest_framework import status
 
 from ..utils import project_id  # noqa
@@ -123,12 +124,14 @@ def test_views_api_filters(business_client, project_id):
                         'operator': 'contains',
                         'type': 'Image',
                         'value': {},
+                        'child_filters': [],
                     },
                     {
                         'filter': 'filter:tasks:data.image',
                         'operator': 'equal',
                         'type': 'Image',
                         'value': {},
+                        'child_filters': [],
                     },
                 ],
             }
@@ -163,12 +166,14 @@ def test_views_api_filters(business_client, project_id):
                         'operator': 'equal',
                         'type': 'Text',
                         'value': {},
+                        'child_filters': [],
                     },
                     {
                         'filter': 'filter:tasks:data.text',
                         'operator': 'contains',
                         'type': 'Text',
                         'value': {},
+                        'child_filters': [],
                     },
                 ],
             }
@@ -189,6 +194,158 @@ def test_views_api_filters(business_client, project_id):
 
     assert response.status_code == 200, response.content
     assert response.json()['data'] == updated_payload['data']
+
+
+def _wire_filter(name):
+    return {
+        'filter': f'filter:tasks:data.{name}',
+        'operator': 'equal',
+        'type': 'String',
+        'value': name,
+    }
+
+
+def test_views_api_accepts_legacy_singular_child_filter(business_client, project_id):
+    """Legacy singular input is accepted but read responses use the canonical plural field."""
+    child = _wire_filter('legacy-child')
+    parent = {**_wire_filter('parent'), 'child_filter': child}
+    payload = {
+        'project': project_id,
+        'data': {'filters': {'conjunction': 'and', 'items': [parent]}},
+    }
+
+    response = business_client.post('/api/dm/views/', data=json.dumps(payload), content_type='application/json')
+
+    assert response.status_code == status.HTTP_201_CREATED, response.content
+    response = business_client.get(f'/api/dm/views/{response.json()["id"]}/')
+    assert response.status_code == status.HTTP_200_OK, response.content
+    serialized_parent = response.json()['data']['filters']['items'][0]
+    assert 'child_filter' not in serialized_parent
+    assert serialized_parent['child_filters'] == [child]
+
+
+def test_views_api_persists_ordered_child_filters(business_client, project_id):
+    """Plural child filters persist as siblings and preserve wire order through read and runtime paths."""
+    children = [_wire_filter('first-child'), _wire_filter('second-child')]
+    parent = {**_wire_filter('parent'), 'child_filters': children}
+    payload = {
+        'project': project_id,
+        'data': {'filters': {'conjunction': 'and', 'items': [parent]}},
+    }
+
+    response = business_client.post('/api/dm/views/', data=json.dumps(payload), content_type='application/json')
+
+    assert response.status_code == status.HTTP_201_CREATED, response.content
+    view = View.objects.get(pk=response.json()['id'])
+    persisted_parent = view.filter_group.filters.get(parent__isnull=True)
+    assert persisted_parent.children.count() == 2
+    assert set(persisted_parent.children.values_list('column', flat=True)) == {child['filter'] for child in children}
+
+    response = business_client.get(f'/api/dm/views/{view.id}/')
+    assert response.status_code == status.HTTP_200_OK, response.content
+    serialized_parent = response.json()['data']['filters']['items'][0]
+    assert 'child_filter' not in serialized_parent
+    assert serialized_parent['child_filters'] == children
+
+    runtime_parent = view.get_prepare_tasks_params().filters.items[0]
+    assert [child.filter for child in runtime_parent.child_filters] == [child['filter'] for child in children]
+
+
+def test_views_api_emits_explicit_empty_child_filters(business_client, project_id):
+    """An empty plural list must survive a round trip so legacy defaults are not resurrected."""
+    parent = {**_wire_filter('parent'), 'child_filters': []}
+    payload = {
+        'project': project_id,
+        'data': {'filters': {'conjunction': 'and', 'items': [parent]}},
+    }
+
+    response = business_client.post('/api/dm/views/', data=json.dumps(payload), content_type='application/json')
+
+    assert response.status_code == status.HTTP_201_CREATED, response.content
+    response = business_client.get(f'/api/dm/views/{response.json()["id"]}/')
+    assert response.status_code == status.HTTP_200_OK, response.content
+    serialized_parent = response.json()['data']['filters']['items'][0]
+    assert 'child_filter' not in serialized_parent
+    assert serialized_parent['child_filters'] == []
+
+
+def test_persisted_invalid_user_filter_is_recovered_without_weakening_new_writes(business_client, project_id):
+    """Historical ORM rows recover safely, while equivalent new API writes remain strict."""
+    valid_filter = {
+        'filter': 'filter:tasks:annotators',
+        'operator': 'contains',
+        'type': 'List',
+        'value': [business_client.user.id],
+        'child_filters': [],
+    }
+    payload = {
+        'project': project_id,
+        'data': {'filters': {'conjunction': 'and', 'items': [valid_filter]}},
+    }
+    response = business_client.post('/api/dm/views/', data=json.dumps(payload), content_type='application/json')
+    assert response.status_code == status.HTTP_201_CREATED, response.content
+    view = View.objects.get(pk=response.json()['id'])
+
+    persisted_filter = view.filter_group.filters.get(parent__isnull=True)
+    persisted_filter.value = ['yes']
+    persisted_filter.save(update_fields=['value'])
+
+    response = business_client.get(f'/api/dm/views/{view.id}/')
+    assert response.status_code == status.HTTP_200_OK, response.content
+    assert response.json()['data']['filters']['items'][0]['value'] == []
+
+    response = business_client.get(f'/api/tasks?view={view.id}')
+    assert response.status_code == status.HTTP_200_OK, response.content
+
+    invalid_payload = {
+        'project': project_id,
+        'data': {
+            'filters': {
+                'conjunction': 'and',
+                'items': [{**valid_filter, 'value': ['yes']}],
+            }
+        },
+    }
+    response = business_client.post(
+        '/api/dm/views/',
+        data=json.dumps(invalid_payload),
+        content_type='application/json',
+    )
+    assert response.status_code == status.HTTP_400_BAD_REQUEST, response.content
+
+
+def test_persisted_invalid_child_user_filter_is_recovered_recursively(business_client, project_id):
+    """The same compatibility normalization applies to child rows without dropping the parent."""
+    child = {
+        'filter': 'filter:tasks:annotators',
+        'operator': 'contains',
+        'type': 'List',
+        'value': [business_client.user.id],
+    }
+    parent = {**_wire_filter('parent'), 'child_filters': [child]}
+    payload = {
+        'project': project_id,
+        'data': {'filters': {'conjunction': 'and', 'items': [parent]}},
+    }
+    response = business_client.post('/api/dm/views/', data=json.dumps(payload), content_type='application/json')
+    assert response.status_code == status.HTTP_201_CREATED, response.content
+    view = View.objects.get(pk=response.json()['id'])
+
+    persisted_child = view.filter_group.filters.get(parent__isnull=False)
+    persisted_child.value = {
+        'items': [{'value': str(business_client.user.id), 'title': 'Current user'}],
+        'multiple': True,
+    }
+    persisted_child.save(update_fields=['value'])
+
+    response = business_client.get(f'/api/dm/views/{view.id}/')
+    assert response.status_code == status.HTTP_200_OK, response.content
+    serialized_parent = response.json()['data']['filters']['items'][0]
+    assert serialized_parent['value'] == 'parent'
+    assert serialized_parent['child_filters'][0]['value'] == [business_client.user.id]
+
+    response = business_client.get(f'/api/tasks?view={view.id}')
+    assert response.status_code == status.HTTP_200_OK, response.content
 
 
 def test_views_api_nested_filters(business_client, project_id):
@@ -304,9 +461,10 @@ def test_views_api_nested_filters(business_client, project_id):
     assert root_filter['type'] == 'String'
     assert root_filter['value'] == 'A'
 
-    # Verify child filter structure
-    assert 'child_filter' in root_filter
-    child_filter = root_filter['child_filter']
+    # Legacy singular input is emitted in the canonical plural shape.
+    assert 'child_filter' not in root_filter
+    assert len(root_filter['child_filters']) == 1
+    child_filter = root_filter['child_filters'][0]
     assert child_filter['filter'] == 'filter:tasks:data.text'
     assert child_filter['operator'] == 'contains'
     assert child_filter['type'] == 'String'
@@ -547,9 +705,10 @@ def test_views_api_patch_add_child_filter(business_client, project_id):
     assert root_filter['type'] == 'String'
     assert root_filter['value'] == 'A'
 
-    # Verify child filter was added
-    assert 'child_filter' in root_filter
-    child_filter = root_filter['child_filter']
+    # Verify child filter was added using the canonical plural response shape.
+    assert 'child_filter' not in root_filter
+    assert len(root_filter['child_filters']) == 1
+    child_filter = root_filter['child_filters'][0]
     assert child_filter['filter'] == 'filter:tasks:data.text'
     assert child_filter['operator'] == 'contains'
     assert child_filter['type'] == 'String'
@@ -603,7 +762,7 @@ def test_views_api_patch_add_child_filter(business_client, project_id):
     filter_data = view_data['filters']
 
     root_filter = filter_data['items'][0]
-    child_filter = root_filter['child_filter']
+    child_filter = root_filter['child_filters'][0]
     assert child_filter['value'] == 'task'  # Updated value
 
     # Test that the updated view filters tasks correctly

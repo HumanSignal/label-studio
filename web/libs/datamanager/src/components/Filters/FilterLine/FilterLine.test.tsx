@@ -1,4 +1,5 @@
 import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { destroy, types, unprotect } from "mobx-state-tree";
 import { afterEach, describe, expect, it, mock } from "bun:test";
 import { observer } from "mobx-react";
@@ -24,6 +25,10 @@ const RootStore = types
     apiCall: mock(async () => ({ id: 1, title: "Saved" })),
     unsetSelection() {},
   }));
+
+afterEach(() => {
+  delete (window as any).DM;
+});
 
 const columnsRaw = [
   {
@@ -90,6 +95,84 @@ const createFilter = ({ available = false, multiple = true }: { available?: bool
 
 const createUnavailableFilter = () => createFilter();
 
+const childFilterColumnsRaw = [
+  {
+    id: "id",
+    title: "ID",
+    type: "Number",
+    target: "tasks",
+    visibility_defaults: { filter: true },
+  },
+  {
+    id: "annotations_results",
+    title: "Annotations",
+    type: "List",
+    target: "tasks",
+    children: ["sentiment"],
+    hidden: true,
+  },
+  {
+    id: "sentiment",
+    title: "Sentiment",
+    type: "List",
+    target: "tasks",
+    parent: "annotations_results",
+    allowed_child_filters: ["annotators", "ground_truth"],
+    schema: { items: [{ value: "positive", title: "Positive" }], multiple: true },
+    visibility_defaults: { filter: true },
+  },
+  {
+    id: "annotators",
+    title: "Annotators",
+    type: "List",
+    target: "tasks",
+    schema: { multiple: true },
+    visibility_defaults: { filter: true },
+  },
+  {
+    id: "ground_truth",
+    title: "Ground Truth",
+    type: "Boolean",
+    target: "tasks",
+    visibility_defaults: { filter: true },
+  },
+];
+
+const createMultiChildFilter = ({ childCount = 2 }: { childCount?: number } = {}) => {
+  const children = [
+    {
+      filter: "filter:tasks:annotators",
+      operator: "contains",
+      value: [1],
+    },
+    {
+      filter: "filter:tasks:ground_truth",
+      operator: "equal",
+      value: true,
+    },
+  ].slice(0, childCount);
+  const root = RootStore.create({ viewsStore: { columnsRaw: childFilterColumnsRaw } });
+  root.viewsStore.fetchColumns();
+  unprotect(root);
+  root.viewsStore.views.push({
+    id: 1,
+    title: "Saved",
+    saved: true,
+    key: "saved",
+    filters: [
+      {
+        filter: "filter:tasks:annotations_results.sentiment",
+        operator: "contains",
+        value: ["positive"],
+        child_filters: children,
+      },
+    ],
+  });
+  root.viewsStore.selected = 1;
+
+  return { root, view: root.viewsStore.views[0], filter: root.viewsStore.views[0].filters[0] };
+};
+
 const FilterLineHarness = observer(
   ({ view, sidebar }: { view: ReturnType<typeof createUnavailableFilter>["view"]; sidebar: boolean }) => (
     <>
@@ -108,6 +191,24 @@ const FilterLineHarness = observer(
   ),
 );
 
+const renderFilterLine = (view: ReturnType<typeof createUnavailableFilter>["view"], sidebar: boolean) => {
+  const queryClient = new QueryClient({
+    defaultOptions: { queries: { retry: false } },
+  });
+  (window as any).DM = {
+    apiCall: mock(async () => ({
+      count: 1,
+      results: [{ id: 1, email: "annotator@example.com", first_name: "Test", last_name: "Annotator" }],
+    })),
+  };
+
+  return render(
+    <QueryClientProvider client={queryClient}>
+      <FilterLineHarness view={view} sidebar={sidebar} />
+    </QueryClientProvider>,
+  );
+};
+
 describe("Dimension result filter cardinality (FIT-2241)", () => {
   let root: ReturnType<typeof RootStore.create> | null = null;
 
@@ -123,11 +224,59 @@ describe("Dimension result filter cardinality (FIT-2241)", () => {
     it(`shows ${label} for ${multiple ? "set-valued" : "scalar"} Dimensions`, () => {
       const setup = createFilter({ available: true, multiple });
       root = setup.root;
-      render(<FilterLineHarness view={setup.view} sidebar={false} />);
+      renderFilterLine(setup.view, false);
 
       expect(within(screen.getByTestId("filter-line-operator")).getByRole("button")).toHaveTextContent(label);
     });
   }
+});
+
+describe("multiple child filter controls (FIT-2273)", () => {
+  let root: ReturnType<typeof RootStore.create> | null = null;
+
+  afterEach(() => {
+    if (root) destroy(root);
+    root = null;
+  });
+
+  it("renders an enabled allowed-child dropdown and add-child control", () => {
+    const setup = createMultiChildFilter({ childCount: 1 });
+    root = setup.root;
+    renderFilterLine(setup.view, false);
+
+    const childColumnDropdown = screen.getByRole("button", { name: "Annotators" });
+    expect(childColumnDropdown).toBeEnabled();
+    expect(screen.getByRole("button", { name: "Add child filter" })).toBeEnabled();
+
+    const originalScrollIntoView = Element.prototype.scrollIntoView;
+    Element.prototype.scrollIntoView = mock();
+    try {
+      fireEvent.click(childColumnDropdown);
+
+      expect(screen.getByText("Ground Truth")).toBeInTheDocument();
+      expect(screen.queryByText("ID")).not.toBeInTheDocument();
+    } finally {
+      Element.prototype.scrollIntoView = originalScrollIntoView;
+    }
+  });
+
+  it("renders multiple child rows and removes only the selected row", () => {
+    const setup = createMultiChildFilter();
+    root = setup.root;
+    renderFilterLine(setup.view, false);
+
+    expect(screen.getByRole("button", { name: "Annotators" })).toBeEnabled();
+    expect(screen.getByRole("button", { name: "Ground Truth" })).toBeEnabled();
+    const removeButtons = screen.getAllByRole("button", { name: "Remove child filter" });
+    expect(removeButtons).toHaveLength(2);
+
+    fireEvent.click(removeButtons[0]);
+
+    expect(setup.view.filters).toHaveLength(1);
+    expect(setup.filter.child_filters).toHaveLength(1);
+    expect(screen.queryByRole("button", { name: "Annotators" })).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Ground Truth" })).toBeEnabled();
+  });
 });
 
 describe("unavailable saved filters (FIT-2173)", () => {
@@ -159,7 +308,7 @@ describe("unavailable saved filters (FIT-2173)", () => {
     } layout`, async () => {
       const setup = createUnavailableFilter();
       root = setup.root;
-      render(<FilterLineHarness view={setup.view} sidebar={sidebar} />);
+      renderFilterLine(setup.view, sidebar);
 
       expect(screen.getByText("Sentiment")).toBeInTheDocument();
       expect(screen.getByRole("status")).toHaveTextContent("saved value is preserved");

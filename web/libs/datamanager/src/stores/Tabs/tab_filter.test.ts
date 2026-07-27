@@ -76,7 +76,7 @@ describe("recoverFilterSnapshot (BROS-1203 legacy view recovery)", () => {
       value: ["gpt-4"],
     };
     const out = recoverFilterSnapshot(sn);
-    expect(out.value).toBeNull();
+    expect(out.value).toEqual([]);
   });
 
   it("FIT-2275 gap 4: keeps valid integer annotators ids on load", () => {
@@ -132,12 +132,12 @@ describe("isListMembershipOperator (BROS-1203 / TC1792 scope guard)", () => {
 });
 
 describe("sanitizeIntegerUserListValue (FIT-2275 gap 3)", () => {
-  it("returns null for annotators filter with model-version strings (recent-restore shape)", () => {
+  it("returns an empty selection for annotators with model-version strings (recent-restore shape)", () => {
     const result = sanitizeIntegerUserListValue(["gpt-4"], {
       fieldAlias: "annotators",
       operator: "contains",
     });
-    expect(result).toBeNull();
+    expect(result).toEqual([]);
   });
 
   it("passes through valid integer user id arrays", () => {
@@ -156,6 +156,88 @@ describe("sanitizeIntegerUserListValue (FIT-2275 gap 3)", () => {
         operator: "contains",
       }),
     ).toEqual(["gpt-4"]);
+  });
+
+  it("covers every integer user-list field and recovers historical scalar/object shapes", () => {
+    for (const fieldAlias of ["annotators", "updated_by", "reviewers", "comment_authors", "skipped_by_annotator"]) {
+      expect(
+        sanitizeIntegerUserListValue(
+          [1, "2", 3.0, { id: "4", email: "deleted@example.com" }, { value: 5, label: "Former user" }, ["6"]],
+          { fieldAlias, operator: "contains" },
+        ),
+      ).toEqual([1, 2, 3, 4, 5, 6]);
+    }
+  });
+
+  it("resets booleans, fractional numbers, labels, and unsupported operators", () => {
+    for (const value of [["yes"], "", false, 1.5, { label: "Matt" }]) {
+      expect(sanitizeIntegerUserListValue(value, { fieldAlias: "annotators", operator: "contains" })).toEqual([]);
+    }
+    expect(sanitizeIntegerUserListValue([7], { fieldAlias: "annotators", operator: "regex" })).toEqual([]);
+  });
+
+  it("bounds recovered virtual/recent selections to the server-advertised maximum", () => {
+    const originalSettings = window.APP_SETTINGS;
+    window.APP_SETTINGS = {
+      ...originalSettings,
+      data_manager: {
+        ...originalSettings?.data_manager,
+        list_filter_max_values: 2,
+      },
+    };
+    try {
+      expect(
+        sanitizeIntegerUserListValue([1, 2, 3], {
+          fieldAlias: "annotators",
+          operator: "contains",
+        }),
+      ).toEqual([1, 2]);
+    } finally {
+      window.APP_SETTINGS = originalSettings;
+    }
+  });
+});
+
+describe("recoverFilterSnapshot user-filter compatibility", () => {
+  it("maps unambiguous legacy operators to current user-filter operators", () => {
+    expect(
+      recoverFilterSnapshot({
+        filter: "filter:tasks:updated_by",
+        operator: "equal",
+        value: { id: "7" },
+      }),
+    ).toMatchObject({ operator: "contains", value: 7 });
+    expect(
+      recoverFilterSnapshot({
+        filter: "filter:tasks:skipped_by_annotator",
+        operator: "not_equal",
+        value: { value: 8 },
+      }),
+    ).toMatchObject({ operator: "not_contains", value: 8 });
+  });
+
+  it("resets unsupported legacy operators without affecting empty checks", () => {
+    expect(
+      recoverFilterSnapshot({
+        filter: "filter:tasks:annotators",
+        operator: "regex",
+        value: "7",
+      }),
+    ).toMatchObject({ operator: "contains", value: [] });
+    expect(
+      recoverFilterSnapshot({
+        filter: "filter:tasks:annotators",
+        operator: "empty",
+        value: "yes",
+      }),
+    ).toMatchObject({ operator: "empty", value: true });
+    expect(
+      recoverFilterSnapshot({
+        filter: "filter:tasks:annotators",
+        operator: "empty",
+        value: "O",
+      }),
+    ).toMatchObject({ operator: "contains", value: [] });
   });
 });
 

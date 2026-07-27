@@ -169,19 +169,14 @@ export const Tab = types
 
     get serializedFilters() {
       const serialize = (filterModel) => {
+        const snapshot = getSnapshot(filterModel);
         const item = {
-          ...getSnapshot(filterModel),
+          ...snapshot,
           type: filterModel.filter.currentType,
+          child_filters: filterModel.child_filters
+            .filter((childFilter) => childFilter.isValidFilter)
+            .map((childFilter) => serialize(childFilter)),
         };
-
-        // cleanup or recurse on child_filter
-        if (item.child_filter) {
-          if (!filterModel.child_filter?.isValidFilter) {
-            item.child_filter = null;
-          } else {
-            item.child_filter = serialize(filterModel.child_filter);
-          }
-        }
 
         item.value = normalizeFilterValue(item.type, item.operator, item.value);
         return item;
@@ -219,10 +214,8 @@ export const Tab = types
         const item = {
           ...getSnapshot(filterModel),
           type: filterModel.filter.currentType,
+          child_filters: filterModel.child_filters.map((childFilter) => serialize(childFilter)),
         };
-        if (item.child_filter) {
-          item.child_filter = filterModel.child_filter ? serialize(filterModel.child_filter) : null;
-        }
         return item;
       };
       return {
@@ -510,10 +503,60 @@ export const Tab = types
         view: self.id,
       });
 
-      // Don't add to main filters array - child is owned by parent
-      parentFilter.child_filter = filter;
+      // Child rows are ordered siblings owned by their root filter.
+      parentFilter.child_filters.push(filter);
 
       return filter;
+    },
+
+    /**
+     * Add one child row using an allowed column. Repeated aliases are valid because
+     * each row represents an independent condition.
+     */
+    addChildFilter(rootFilter, filterTypeOrAlias) {
+      if (self.isLockedByManager) return self.notifyLocked();
+
+      const allowedAliases = rootFilter?.field?.allowed_child_filters ?? [];
+      if (allowedAliases.length === 0) return null;
+
+      const filterType =
+        typeof filterTypeOrAlias === "object"
+          ? filterTypeOrAlias
+          : self.availableFilters.find(
+              (candidate) =>
+                candidate.id === filterTypeOrAlias ||
+                candidate.field.alias === filterTypeOrAlias ||
+                (!filterTypeOrAlias && allowedAliases.includes(candidate.field.alias)),
+            );
+
+      if (
+        !filterType ||
+        !allowedAliases.includes(filterType.field.alias) ||
+        filterType.field.disabled ||
+        !filterType.field.available_for_new_filters ||
+        filterType.field.filter_available === false
+      ) {
+        return null;
+      }
+
+      return self.createChildFilterForType(filterType, rootFilter);
+    },
+
+    /** Remove exactly one child row and preserve its root and siblings. */
+    removeChildFilter(rootFilterOrChild, maybeChildFilter) {
+      if (self.isLockedByManager) return self.notifyLocked();
+
+      const childFilter = maybeChildFilter ?? rootFilterOrChild;
+      const parentFilter = maybeChildFilter
+        ? rootFilterOrChild
+        : self.filters.find((candidate) => candidate.child_filters.some((child) => child === childFilter));
+      const index = parentFilter?.child_filters.indexOf(childFilter) ?? -1;
+
+      if (index === -1) return false;
+
+      destroy(childFilter);
+      self.save();
+      return true;
     },
 
     toggleColumn(column) {
@@ -558,17 +601,16 @@ export const Tab = types
 
     deleteFilter(filter) {
       if (self.isLockedByManager) return self.notifyLocked();
-      // Recursively delete child filter first
-      if (filter.child_filter) {
-        self.deleteFilter(filter.child_filter);
-      }
 
       const index = self.filters.indexOf(filter);
       if (index > -1) {
         self.filters.splice(index, 1);
         destroy(filter);
         self.save();
+        return;
       }
+
+      self.removeChildFilter(filter);
     },
 
     /**
@@ -584,6 +626,24 @@ export const Tab = types
       if (!validItems) return false;
 
       const { conjunction } = snapshot;
+      const availableFilterIds = new Set(self.parent.availableFilters.map((filterType) => filterType.id));
+      const toModelSnapshot = (item) => {
+        if (!item?.filter || !availableFilterIds.has(item.filter)) return null;
+
+        const hasChildCollection = Object.hasOwn(item, "child_filters") || Object.hasOwn(item, "child_filter");
+        const childItems = Array.isArray(item.child_filters)
+          ? item.child_filters
+          : item.child_filter
+            ? [item.child_filter]
+            : [];
+
+        return {
+          filter: item.filter,
+          operator: item.operator ?? null,
+          value: item.value ?? null,
+          ...(hasChildCollection && { child_filters: childItems.map(toModelSnapshot).filter(Boolean) }),
+        };
+      };
 
       // Destroy existing filters before importing
       while (self.filters.length > 0) {
@@ -598,13 +658,11 @@ export const Tab = types
 
       for (const item of validItems) {
         try {
-          const filter = TabFilter.create({
-            filter: item.filter,
-            operator: item.operator ?? null,
-            value: item.value ?? null,
-          });
+          const modelSnapshot = toModelSnapshot(item);
+          if (!modelSnapshot) continue;
+
+          const filter = TabFilter.create(modelSnapshot);
           self.filters.push(filter);
-          self.applyChildFilter(filter);
         } catch (e) {
           console.warn("importFilters: failed to create filter for", item.filter, e);
         }
@@ -671,35 +729,36 @@ export const Tab = types
       self.saved = true;
     },
 
-    /**
-     * Create child filters for a given root filter according to its column's `child_filter` metadata.
-     */
+    /** Create the compatibility child declared by legacy singular column metadata. */
     applyChildFilter(rootFilter) {
       if (!rootFilter || !rootFilter.filter || !rootFilter.filter.field) return;
 
       const column = rootFilter.field;
-      const childFilter = column?.child_filter;
+      const childFilterAlias = column?.child_filter;
 
-      if (!childFilter) return;
+      if (!childFilterAlias || rootFilter.child_filters.length > 0) return;
 
-      // NOTE: using targetColumns instead of columns means that annotation results columns cannot be used in child_filters, but seems fine for now
-      const firstChildColumn = self.targetColumns.find((c) => c.alias === childFilter);
+      const firstChildColumn = self.targetColumns.find((candidate) => candidate.alias === childFilterAlias);
 
-      if (firstChildColumn && !rootFilter.child_filter) {
+      if (firstChildColumn) {
         const filterType = self.availableFilters.find((ft) => ft.field.id === firstChildColumn.id);
 
         if (filterType) {
-          const _childFilter = self.createChildFilterForType(filterType, rootFilter);
+          self.createChildFilterForType(filterType, rootFilter);
         }
       }
     },
 
-    /** Remove any child filters previously created */
-    clearChildFilter(rootFilter) {
-      if (rootFilter.child_filter) {
-        self.deleteFilter(rootFilter.child_filter);
-        rootFilter.child_filter = null;
+    /** Remove all children without saving; the root transition performs the write. */
+    clearChildFilters(rootFilter) {
+      while (rootFilter?.child_filters.length > 0) {
+        destroy(rootFilter.child_filters[0]);
       }
+    },
+
+    // Compatibility action for integrations that still call the singular method name.
+    clearChildFilter(rootFilter) {
+      self.clearChildFilters(rootFilter);
     },
   }))
   .preProcessSnapshot((snapshot) => {

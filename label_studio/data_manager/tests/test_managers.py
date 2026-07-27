@@ -6,7 +6,7 @@ feature that optimizes task API performance by excluding expensive fields.
 
 from unittest.mock import Mock, patch
 
-from data_manager.prepare_params import ConjunctionEnum, Filter, Filters
+from data_manager.prepare_params import ConjunctionEnum, Filter, Filters, PrepareParams
 from django.conf import settings
 from django.core.exceptions import FieldDoesNotExist, FieldError
 from django.db.models import Q
@@ -525,6 +525,39 @@ class TestApplyFiltersStaleAgreementFields(TestCase):
         queryset.filter.assert_not_called()
 
 
+class TestPrepareParamsChildFilters(TestCase):
+    """The runtime Pydantic contract normalizes both child-filter wire formats."""
+
+    @staticmethod
+    def _filter(column):
+        return {
+            'filter': f'filter:tasks:data.{column}',
+            'operator': 'equal',
+            'type': 'String',
+            'value': column,
+        }
+
+    def test_legacy_singular_child_filter_is_normalized_to_plural(self):
+        """Legacy `child_filter` input remains valid and is exposed through `child_filters`."""
+        child = self._filter('legacy-child')
+        parent = {**self._filter('parent'), 'child_filter': child}
+
+        params = PrepareParams(project=1, filters={'conjunction': 'and', 'items': [parent]})
+
+        normalized_children = params.filters.items[0].child_filters
+        self.assertEqual([item.filter for item in normalized_children], [child['filter']])
+
+    def test_plural_child_filters_preserve_order(self):
+        """Plural wire input accepts siblings and keeps their order in the normalized list."""
+        children = [self._filter('first-child'), self._filter('second-child')]
+        parent = {**self._filter('parent'), 'child_filters': children}
+
+        params = PrepareParams(project=1, filters={'conjunction': 'and', 'items': [parent]})
+
+        normalized_children = params.filters.items[0].child_filters
+        self.assertEqual([item.filter for item in normalized_children], [item['filter'] for item in children])
+
+
 class TestApplyFiltersCustomResult(TestCase):
     """Custom hooks can consume a parent/child pair as one expression."""
 
@@ -645,6 +678,79 @@ class TestParseUserFilterIds(TestCase):
             parse_user_filter_ids([1, 2, 3])
 
 
+class TestNormalizePersistedUserFilter(TestCase):
+    def test_recovers_historical_user_id_shapes_for_every_user_field(self):
+        from data_manager.managers import USER_FILTER_FIELDS, normalize_persisted_user_filter
+
+        historical_value = [
+            1,
+            '2',
+            3.0,
+            {'id': '4', 'email': 'deleted@example.com'},
+            {'value': 5, 'label': 'Former user'},
+            {'items': [{'value': '6', 'title': 'User 6'}], 'multiple': True},
+            'yes',
+            None,
+            True,
+            7.5,
+            ['8'],
+        ]
+
+        for field_name in USER_FILTER_FIELDS:
+            with self.subTest(field_name=field_name):
+                operator, value = normalize_persisted_user_filter(field_name, 'contains', historical_value)
+                self.assertEqual(operator, 'contains')
+                self.assertEqual(value, [1, 2, 3, 4, 5, 6, 8])
+
+    def test_resets_unrecoverable_values_and_operators(self):
+        from data_manager.managers import normalize_persisted_user_filter
+
+        cases = [
+            ('contains', ['yes'], 'contains', []),
+            ('contains', '', 'contains', []),
+            ('contains', {'label': 'Matt'}, 'contains', []),
+            ('contains', False, 'contains', []),
+            ('contains', 1.5, 'contains', []),
+            ('regex', '7', 'contains', []),
+            ('unknown', [7], 'contains', []),
+        ]
+        for operator, value, expected_operator, expected_value in cases:
+            with self.subTest(operator=operator, value=value):
+                self.assertEqual(
+                    normalize_persisted_user_filter('annotators', operator, value),
+                    (expected_operator, expected_value),
+                )
+
+    def test_maps_unambiguous_legacy_operators_and_preserves_empty(self):
+        from data_manager.managers import normalize_persisted_user_filter
+
+        self.assertEqual(normalize_persisted_user_filter('updated_by', 'equal', '7'), ('contains', 7))
+        self.assertEqual(
+            normalize_persisted_user_filter('skipped_by_annotator', 'not_equal', {'id': 8}),
+            ('not_contains', 8),
+        )
+        self.assertEqual(normalize_persisted_user_filter('annotators', 'empty', 'yes'), ('empty', True))
+        self.assertEqual(normalize_persisted_user_filter('annotators', 'empty', 'O'), ('contains', []))
+
+    @override_settings(DATA_MANAGER_LIST_FILTER_MAX_VALUES=3)
+    def test_deduplicates_and_bounds_recovered_ids(self):
+        from data_manager.managers import normalize_persisted_user_filter
+
+        self.assertEqual(
+            normalize_persisted_user_filter('reviewers', 'contains', [1, '1', 2, 3, 4]),
+            ('contains', [1, 2, 3]),
+        )
+
+    def test_does_not_change_non_user_filters(self):
+        from data_manager.managers import normalize_persisted_user_filter
+
+        value = {'items': ['yes']}
+        self.assertEqual(
+            normalize_persisted_user_filter('predictions_model_versions', 'contains', value),
+            ('contains', value),
+        )
+
+
 class TestAddUserFilter(TestCase):
     def test_contains_list_uses_in_lookup(self):
         from data_manager.managers import Operator, add_user_filter
@@ -727,6 +833,67 @@ class TestUserFilterResults(TestCase):
             for operator in ('contains', 'not_contains'):
                 actual = set(self._filter(field, operator, []).values_list('id', flat=True))
                 self.assertSetEqual(actual, expected)
+
+    def test_empty_root_user_filter_does_not_apply_child_standalone(self):
+        from data_manager.managers import apply_filters
+
+        expected = {self.task_a.id, self.task_b.id, self.task_c.id}
+        for conjunction in ('and', 'or'):
+            with self.subTest(conjunction=conjunction):
+                filters = Filters(
+                    conjunction=conjunction,
+                    items=[
+                        Filter(
+                            filter='filter:tasks:annotators',
+                            operator='contains',
+                            type='List',
+                            value=[],
+                            child_filters=[
+                                Filter(
+                                    filter='filter:tasks:updated_by',
+                                    operator='contains',
+                                    type='List',
+                                    value=[self.user_a.id],
+                                )
+                            ],
+                        )
+                    ],
+                )
+                actual = set(
+                    apply_filters(Task.objects.filter(project=self.project), filters, self.project, request=None)
+                    .values_list('id', flat=True)
+                    .distinct()
+                )
+                self.assertSetEqual(actual, expected)
+
+    def test_empty_child_user_filter_keeps_valid_parent_constraint(self):
+        from data_manager.managers import apply_filters
+
+        filters = Filters(
+            conjunction='and',
+            items=[
+                Filter(
+                    filter='filter:tasks:annotators',
+                    operator='contains',
+                    type='List',
+                    value=[self.user_a.id],
+                    child_filters=[
+                        Filter(
+                            filter='filter:tasks:updated_by',
+                            operator='contains',
+                            type='List',
+                            value=[],
+                        )
+                    ],
+                )
+            ],
+        )
+        actual = set(
+            apply_filters(Task.objects.filter(project=self.project), filters, self.project, request=None)
+            .values_list('id', flat=True)
+            .distinct()
+        )
+        self.assertSetEqual(actual, {self.task_a.id})
 
     def test_unsupported_user_filter_operator_is_rejected(self):
         from rest_framework.exceptions import ValidationError

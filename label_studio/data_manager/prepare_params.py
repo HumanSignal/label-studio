@@ -3,7 +3,7 @@
 from enum import Enum
 from typing import Any, List, Optional, Union
 
-from pydantic import BaseModel, StrictBool, StrictFloat, StrictInt, StrictStr
+from pydantic import BaseModel, Field, StrictBool, StrictFloat, StrictInt, StrictStr, model_validator
 
 
 class FilterIn(BaseModel):
@@ -12,12 +12,37 @@ class FilterIn(BaseModel):
 
 
 class Filter(BaseModel):
-    child_filter: Optional['Filter'] = None
+    child_filters: List['Filter'] = Field(default_factory=list)
 
     filter: str
     operator: str
     type: str
     value: Union[StrictInt, StrictFloat, StrictBool, StrictStr, FilterIn, list]
+
+    @model_validator(mode='before')
+    @classmethod
+    def normalize_child_filters(cls, data):
+        """Normalize the legacy singular child into the canonical ordered list."""
+        if not isinstance(data, dict):
+            return data
+
+        normalized = dict(data)
+        if 'child_filters' in normalized:
+            # The canonical plural field wins deterministically when both are supplied.
+            normalized.pop('child_filter', None)
+        elif 'child_filter' in normalized:
+            child_filter = normalized.pop('child_filter')
+            normalized['child_filters'] = [] if child_filter is None else [child_filter]
+        return normalized
+
+    @property
+    def child_filter(self) -> Optional['Filter']:
+        """Compatibility accessor for callers that still consume one child."""
+        return self.child_filters[0] if self.child_filters else None
+
+    @child_filter.setter
+    def child_filter(self, value: Optional['Filter']) -> None:
+        self.child_filters = [] if value is None else [value]
 
 
 class ConjunctionEnum(Enum):
@@ -28,6 +53,13 @@ class ConjunctionEnum(Enum):
 class Filters(BaseModel):
     conjunction: ConjunctionEnum
     items: List[Filter]
+
+    @model_validator(mode='after')
+    def validate_one_nesting_level(self):
+        for item in self.items:
+            if any(child.child_filters for child in item.child_filters):
+                raise ValueError('Child filters cannot contain nested child filters')
+        return self
 
 
 class SelectedItems(BaseModel):
@@ -298,6 +330,19 @@ filters_schema = {
         'Example: `{"conjunction": "or", "items": [{"filter": "filter:tasks:completed_at", "operator": "greater", '
         '"type": "Datetime", "value": "2021-01-01T00:00:00.000Z"}]}`'
     ),
+}
+
+# Keep the public schema canonical and explicitly limit children to one nesting level.
+_filter_item_schema = filters_schema['properties']['items']['items']
+_child_filter_item_schema = {
+    'type': 'object',
+    'properties': dict(_filter_item_schema['properties']),
+    'required': list(_filter_item_schema['required']),
+}
+_filter_item_schema['properties']['child_filters'] = {
+    'type': 'array',
+    'items': _child_filter_item_schema,
+    'description': 'Ordered child filters AND-merged with their parent. Child filters cannot be nested.',
 }
 
 selected_items_schema = {

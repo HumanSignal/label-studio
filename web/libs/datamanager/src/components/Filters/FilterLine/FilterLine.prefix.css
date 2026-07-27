@@ -69,6 +69,12 @@
     padding-block: var(--spacing-tightest);
   }
 
+  &__child-actions {
+    grid-column: 2 / -1;
+    display: flex;
+    align-items: center;
+  }
+
   .selectTrigger {
     padding: 0 4px;
   }
