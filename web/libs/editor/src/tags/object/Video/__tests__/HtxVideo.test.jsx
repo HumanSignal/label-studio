@@ -413,12 +413,13 @@ describe("HtxVideoView", () => {
     expect(onPositionChange).toBeDefined();
 
     expect(onPositionChange(25)).toBe(false);
-
     expect(item.setFrame).not.toHaveBeenCalled();
     expect(mockTimelineProps.position).toBe(1);
+    expect(mockTimelineProps.navigationBlocked).toBe(true);
+    expect(mockTimelineProps.navigationBlockedTooltip).toBe("Close the open VideoVector or delete it to change frames");
   });
 
-  it("blocks Timeline frame changes for an unselected incomplete VideoVector after drawing state is restored", async () => {
+  it("blocks frame navigation and playback for an unselected incomplete VideoVector after drawing state is restored", async () => {
     const item = createMockItem({ regs: [createMockVideoVectorRegion({ isDrawing: false, incomplete: true })] });
     const store = createMockStore();
     render(<HtxVideoView item={item} store={store} />);
@@ -426,13 +427,24 @@ describe("HtxVideoView", () => {
     await triggerVideoLoad();
 
     item.setFrame.mockClear();
+    item.setOnlyFrame.mockClear();
+    item.ref.current.play.mockClear();
     const onPositionChange = mockTimelineProps.onPositionChange;
     expect(onPositionChange).toBeDefined();
 
     expect(onPositionChange(25)).toBe(false);
-
     expect(item.setFrame).not.toHaveBeenCalled();
     expect(mockTimelineProps.position).toBe(1);
+    expect(mockTimelineProps.navigationBlocked).toBe(true);
+    expect(mockTimelineProps.navigationBlockedTooltip).toBe("Close the open VideoVector or delete it to change frames");
+
+    await act(async () => {
+      mockVideoCanvasProps.onFrameChange?.(25, 100);
+      mockTimelineProps.onPlay?.();
+    });
+
+    expect(item.setOnlyFrame).not.toHaveBeenCalledWith(25);
+    expect(item.ref.current.play).not.toHaveBeenCalled();
   });
 
   it("allows Timeline frame changes while a non-closable VideoVector is being drawn", async () => {

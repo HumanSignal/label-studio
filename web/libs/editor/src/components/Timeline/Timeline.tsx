@@ -34,6 +34,8 @@ const TimelineComponent: FC<TimelineProps> = ({
   className,
   formatPosition,
   readonly = false,
+  navigationBlocked = false,
+  navigationBlockedTooltip,
   ...props
 }) => {
   const View = Views[mode];
@@ -153,6 +155,8 @@ const TimelineComponent: FC<TimelineProps> = ({
         onPositionChange={setInternalPosition}
         onToggleCollapsed={setViewCollapsed}
         formatPosition={formatPosition}
+        navigationBlocked={navigationBlocked}
+        navigationBlockedTooltip={navigationBlockedTooltip}
         extraControls={
           View.Controls && !disableView ? (
             <View.Controls
@@ -175,6 +179,8 @@ const TimelineComponent: FC<TimelineProps> = ({
           seekVisible={seekVisibleWidth}
           onIndicatorMove={setSeekOffset}
           onSeek={setInternalPosition}
+          disabled={navigationBlocked}
+          title={navigationBlocked ? navigationBlockedTooltip : undefined}
           minimap={View.Minimap ? <View.Minimap /> : null}
         />
       )}

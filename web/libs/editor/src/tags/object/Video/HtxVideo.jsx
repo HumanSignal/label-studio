@@ -132,6 +132,8 @@ const VideoConfig = observer(({ item }) => {
   );
 });
 
+export const VIDEO_VECTOR_FRAME_BLOCKED_TOOLTIP = "Close the open VideoVector or delete it to change frames";
+
 const hasFrameBlockingClosableVideoVector = (item) => {
   return item.regs?.some((reg) => {
     // Closed contours must not block scrubbing even when `incomplete` stays true
@@ -683,6 +685,8 @@ const HtxVideoView = ({ item, store }) => {
             framerate={item.framerate}
             controls={{ FramesControl: true }}
             readonly={item.annotation?.isReadOnly()}
+            navigationBlocked={hasFrameBlockingClosableVideoVector(item)}
+            navigationBlockedTooltip={VIDEO_VECTOR_FRAME_BLOCKED_TOOLTIP}
             customControls={[
               {
                 position: "left",

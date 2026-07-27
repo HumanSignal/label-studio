@@ -439,6 +439,36 @@ describe("Controls", () => {
       expect(onStepForward).toHaveBeenCalledWith(expect.any(Object), stepSize);
     });
   });
+
+  describe("navigationBlocked", () => {
+    it("disables play and step controls so blocked clicks do nothing", async () => {
+      const onPlay = mock();
+      const onStepForward = mock();
+      const onStepBackward = mock();
+
+      renderControls({
+        position: 50,
+        navigationBlocked: true,
+        navigationBlockedTooltip: "Close the open VideoVector or delete it to change frames",
+        onPlay,
+        onStepForward,
+        onStepBackward,
+      });
+
+      const play = screen.getByRole("button", { name: /play/i });
+      const stepForward = screen.getByRole("button", { name: /step forward/i });
+      const stepBackward = screen.getByRole("button", { name: /step backward/i });
+
+      expect(play).toBeDisabled();
+      expect(stepForward).toBeDisabled();
+      expect(stepBackward).toBeDisabled();
+
+      await userEvent.click(play);
+      await userEvent.click(stepForward);
+      expect(onPlay).not.toHaveBeenCalled();
+      expect(onStepForward).not.toHaveBeenCalled();
+    });
+  });
 });
 
 describe("ControlButton", () => {
