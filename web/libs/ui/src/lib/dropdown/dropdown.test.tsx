@@ -222,6 +222,68 @@ describe("Dropdown - Cursor Position Support", () => {
         expect((dropdown as HTMLElement).style.top).toBe("600px");
       });
     });
+
+    it("should use fixed cursor coordinates even when CSS anchor positioning is supported", async () => {
+      // Regression: useAnchor previously ignored cursorPosition and anchored to the
+      // trigger element in modern browsers, forcing consumers to fake triggerRef.
+      CSS.supports = mock((property: string, value?: string) => {
+        const check = value !== undefined ? `${property}: ${value}` : property;
+        return check.includes("anchor-name") || check.includes("position-anchor");
+      });
+
+      const triggerElement = document.createElement("button");
+      Object.defineProperty(triggerElement, "getBoundingClientRect", {
+        value: () => ({
+          left: 10,
+          top: 20,
+          right: 110,
+          bottom: 60,
+          width: 100,
+          height: 40,
+          x: 10,
+          y: 20,
+          toJSON: () => ({}),
+        }),
+      });
+
+      const TestComponent = () => {
+        const dropdownRef = useRef<DropdownRef>(null);
+        const triggerRef = useRef<HTMLElement>(triggerElement);
+
+        const contextValue: DropdownContextValue = {
+          triggerRef,
+          dropdown: dropdownRef,
+          minIndex: 1000,
+          cursorPosition: { x: 222, y: 333 },
+          hasTarget: () => false,
+          addChild: () => {},
+          removeChild: () => {},
+          open: () => {},
+          close: () => {},
+        };
+
+        useEffect(() => {
+          dropdownRef.current?.open(true);
+        }, []);
+
+        return (
+          <DropdownContext.Provider value={contextValue}>
+            <Dropdown ref={dropdownRef} visible={true} animated={false} dataTestId="dropdown">
+              <div>Menu Content</div>
+            </Dropdown>
+          </DropdownContext.Provider>
+        );
+      };
+
+      render(<TestComponent />);
+
+      await waitFor(() => {
+        const dropdown = screen.getByTestId("dropdown") as HTMLElement;
+        expect(dropdown.style.left).toBe("222px");
+        expect(dropdown.style.top).toBe("333px");
+        expect(dropdown.style.position).toBe("fixed");
+      });
+    });
   });
 
   describe("Visibility States", () => {

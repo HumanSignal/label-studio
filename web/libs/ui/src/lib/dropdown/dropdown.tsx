@@ -353,9 +353,9 @@ const DropdownComponent = forwardRef<DropdownRef, DropdownProps>(
     }, [visibility, visible]);
 
     const compositeStyles = useMemo(() => {
-      // Determine if we should use anchor positioning for this dropdown
-      // Only use anchor positioning when there's a trigger element to anchor to
-      const useAnchor = supportsAnchorPositioning && hasTrigger;
+      // Align with isAnchorEnabled: never use CSS anchor positioning when
+      // cursorPosition is set — cursor mode requires fixed JS coordinates.
+      const useAnchor = supportsAnchorPositioning && hasTrigger && !cursorPosition;
 
       // Build anchor positioning styles when enabled
       const anchorStyles: Record<string, string> = {};

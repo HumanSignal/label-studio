@@ -13,6 +13,7 @@ export * from "./lib/code-block/code-block";
 export * from "./lib/code-block/code-block";
 export * from "./lib/code-editor/code-editor";
 export * from "./lib/collapsible-panel";
+export * from "./lib/context-menu";
 export * from "./lib/dropdown";
 export * from "./lib/empty-state/empty-state";
 export * from "./lib/enterprise-badge/enterprise-badge";

@@ -1,11 +1,10 @@
 import { observer } from "mobx-react";
-import { createContext, forwardRef, memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { createPortal } from "react-dom";
+import { createContext, forwardRef, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useSDK } from "../../../providers/SDKProvider";
 import { isDefined } from "../../../utils/utils";
 import { modal } from "../Modal/Modal";
 import { BracketsCurlyIcon } from "@humansignal/icons";
-import { AutoSizerTable, Button } from "@humansignal/ui";
+import { AutoSizerTable, Button, useContextMenu } from "@humansignal/ui";
 import "./Table.prefix.css";
 import { TableCheckboxCell } from "./TableCheckbox";
 import { tableCN, TableContext } from "./TableContext";
@@ -69,8 +68,10 @@ export const Table = observer(
     // Track last clicked row ID for shift-click range selection
     const lastClickedId = useRef(null);
 
-    // Global context menu state
+    // Table-level context menu state (DM-local: x/y + row + column).
+    // Positioning/open/close lives in useContextMenu; domain payload stays here.
     const [contextMenu, setContextMenu] = useState(null);
+    const pendingContextRowRef = useRef(null);
     // Maintain hover appearance on row while its context menu is open for better visual feedback
     const contextMenuRowId = contextMenu?.row?.id ?? null;
 
@@ -220,65 +221,107 @@ export const Table = observer(
       localStorage.setItem(colOrderKey, JSON.stringify(colOrder));
     }, [colOrder]);
 
-    // Store columns in a ref to avoid recreating handleContextMenu
+    // Store columns in a ref to avoid recreating context-menu open handler
     const columnsRef = useRef(columns);
     columnsRef.current = columns;
 
-    // Handle context menu - defined after columns are initialized
-    const handleContextMenu = useCallback((e, row) => {
-      e.preventDefault();
-      e.stopPropagation();
+    const MenuComponent = RowContextMenuComponent || RowContextMenu;
 
-      // Find which column was clicked (actual class: lsf-table__cell)
-      const cell = e.target.closest(".lsf-table__cell");
-      const cellIndex = cell ? Array.from(cell.parentElement.children).indexOf(cell) : -1;
+    const closeContextMenu = useCallback(() => {
+      setContextMenu(null);
+      pendingContextRowRef.current = null;
+    }, []);
+
+    const handleContextMenuOpenChange = useCallback(
+      (open) => {
+        if (!open) closeContextMenu();
+      },
+      [closeContextMenu],
+    );
+
+    const handleContextMenuOpen = useCallback((event, position) => {
+      // Column lookup stays in DM — primitive stays table-agnostic.
+      const target = event.target;
+      const cell = target instanceof Element ? target.closest(".lsf-table__cell") : null;
+      const cellIndex = cell?.parentElement ? Array.from(cell.parentElement.children).indexOf(cell) : -1;
       const column = cellIndex >= 0 ? columnsRef.current[cellIndex] : null;
 
       setContextMenu({
-        x: e.clientX,
-        y: e.clientY,
-        row,
+        x: position.x,
+        y: position.y,
+        row: pendingContextRowRef.current,
         column,
       });
-    }, []); // Empty deps - stable callback
+    }, []);
 
-    // Close context menu on click outside or escape
-    useEffect(() => {
-      if (!contextMenu) return;
+    // Stable content identity while the menu is open — Table is a MobX observer and
+    // re-renders often; a fresh JSX tree each tick remounts Dropdown (flicker / lost clicks).
+    // Clearing contextMenu flips controlled `open` false; no need to also call hook.close().
+    const contextMenuContent = useMemo(() => {
+      if (!contextMenu?.row) return null;
 
-      const handleClose = (e) => {
-        // Don't close if clicking inside the menu
-        if (e.target.closest("[data-context-menu]")) return;
-        setContextMenu(null);
-      };
+      return (
+        <MenuComponent
+          row={contextMenu.row}
+          column={contextMenu.column}
+          view={view}
+          api={api}
+          sdkType={type}
+          projectId={projectId}
+          onViewAnalytics={onViewAnalytics}
+          onViewReviewerAnalytics={onViewReviewerAnalytics}
+          onClose={closeContextMenu}
+        />
+      );
+    }, [
+      MenuComponent,
+      api,
+      closeContextMenu,
+      contextMenu,
+      onViewAnalytics,
+      onViewReviewerAnalytics,
+      projectId,
+      type,
+      view,
+    ]);
 
-      const handleEscape = (e) => {
-        if (e.key === "Escape") {
-          setContextMenu(null);
-        }
-      };
+    const contextMenuPosition = useMemo(
+      () => (contextMenu ? { x: contextMenu.x, y: contextMenu.y } : null),
+      [contextMenu],
+    );
 
-      // Use capture phase and add slight delay to prevent immediate closing
-      const timerId = setTimeout(() => {
-        document.addEventListener("click", handleClose, true);
-        document.addEventListener("contextmenu", handleClose, true);
-        document.addEventListener("keydown", handleEscape);
-      }, 0);
+    const { getTriggerProps, menu: contextMenuPortal } = useContextMenu({
+      open: Boolean(contextMenu),
+      position: contextMenuPosition,
+      onOpenChange: handleContextMenuOpenChange,
+      onOpen: handleContextMenuOpen,
+      content: contextMenuContent,
+    });
 
-      return () => {
-        clearTimeout(timerId);
-        document.removeEventListener("click", handleClose, true);
-        document.removeEventListener("contextmenu", handleClose, true);
-        document.removeEventListener("keydown", handleEscape);
-      };
-    }, [contextMenu]);
+    // Stable across open/close so StickyList's row Renderer identity does not
+    // change (changing Renderer remounts rows → avatar flicker).
+    const getRowContextMenuTriggerProps = useCallback(
+      (row) =>
+        getTriggerProps({
+          onContextMenu: () => {
+            pendingContextRowRef.current = row;
+          },
+          onKeyDown: () => {
+            pendingContextRowRef.current = row;
+          },
+        }),
+      [getTriggerProps],
+    );
 
-    const contextValue = {
-      columns,
-      data,
-      cellViews,
-      contextMenuRowId,
-    };
+    const contextValue = useMemo(
+      () => ({
+        columns,
+        data,
+        cellViews,
+        contextMenuRowId,
+      }),
+      [columns, data, cellViews, contextMenuRowId],
+    );
 
     const headerHeight = 43;
 
@@ -335,6 +378,7 @@ export const Table = observer(
         const dataIndex = index - 1;
         const row = data[dataIndex];
         const isEven = dataIndex % 2 === 0;
+        const contextMenuTriggerProps = getRowContextMenuTriggerProps(row);
 
         if (isQuickView) {
           return (
@@ -350,7 +394,7 @@ export const Table = observer(
                 width: props.fitContent ? "fit-content" : "auto",
               }}
               decoration={Decoration}
-              onContextMenu={handleContextMenu}
+              contextMenuTriggerProps={contextMenuTriggerProps}
             />
           );
         }
@@ -371,7 +415,7 @@ export const Table = observer(
               width: props.fitContent ? "fit-content" : "auto",
             }}
             decoration={Decoration}
-            onContextMenu={handleContextMenu}
+            contextMenuTriggerProps={contextMenuTriggerProps}
           />
         );
       },
@@ -387,7 +431,7 @@ export const Table = observer(
         view.selected.all,
         isQuickView,
         Decoration,
-        handleContextMenu,
+        getRowContextMenuTriggerProps,
       ],
     );
 
@@ -476,19 +520,7 @@ export const Table = observer(
             </StickyList>
           </TableContext.Provider>
         </div>
-        {contextMenu &&
-          typeof document !== "undefined" &&
-          createPortal(
-            <ContextMenuPortal
-              contextMenu={contextMenu}
-              view={view}
-              onViewAnalytics={onViewAnalytics}
-              onViewReviewerAnalytics={onViewReviewerAnalytics}
-              RowContextMenuComponent={RowContextMenuComponent}
-              onClose={() => setContextMenu(null)}
-            />,
-            document.body,
-          )}
+        {contextMenuPortal}
       </>
     );
   },
@@ -634,26 +666,3 @@ const innerElementType = forwardRef(({ children, ...rest }, ref) => {
     </StickyListContext.Consumer>
   );
 });
-
-// Context menu portal component - positioning now handled by Dropdown component
-const ContextMenuPortal = memo(
-  ({ contextMenu, view, onViewAnalytics, onViewReviewerAnalytics, onClose, RowContextMenuComponent }) => {
-    const MenuComponent = RowContextMenuComponent || RowContextMenu;
-    const { api, type, projectId } = useSDK();
-
-    return (
-      <MenuComponent
-        row={contextMenu.row}
-        column={contextMenu.column}
-        view={view}
-        api={api}
-        sdkType={type}
-        projectId={projectId}
-        onViewAnalytics={onViewAnalytics}
-        onViewReviewerAnalytics={onViewReviewerAnalytics}
-        cursorPosition={{ x: contextMenu.x, y: contextMenu.y }}
-        onClose={onClose}
-      />
-    );
-  },
-);

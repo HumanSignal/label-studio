@@ -196,14 +196,19 @@ describe("TableRow", () => {
   });
 
   describe("Context Menu Integration", () => {
-    it("should call onContextMenu when right-clicked", () => {
+    it("should apply contextMenuTriggerProps handlers", () => {
       const mockOnContextMenu = mock();
-      renderWithContext({ onContextMenu: mockOnContextMenu });
+      renderWithContext({
+        contextMenuTriggerProps: {
+          onContextMenu: mockOnContextMenu,
+          onKeyDown: mock(),
+        },
+      });
 
       const rowWrapper = screen.getByTestId("table-row-wrapper");
       fireEvent.contextMenu(rowWrapper);
 
-      expect(mockOnContextMenu).toHaveBeenCalledWith(expect.any(Object), mockData);
+      expect(mockOnContextMenu).toHaveBeenCalled();
     });
 
     it("should apply context-menu-open modifier when contextMenuRowId matches", () => {
@@ -218,18 +223,38 @@ describe("TableRow", () => {
       expect(screen.getByTestId("table-row-wrapper")).toBeInTheDocument();
     });
 
-    it("should pass event and data to onContextMenu callback", () => {
-      const mockOnContextMenu = mock();
-      renderWithContext({ onContextMenu: mockOnContextMenu });
+    it("should keep the same row DOM node when contextMenuRowId opens and closes", () => {
+      const { rerender } = renderWithContext({}, { contextMenuRowId: null });
+      const rowNode = screen.getByTestId("table-row-wrapper");
+
+      rerender(
+        <TableContext.Provider value={{ ...contextValue, contextMenuRowId: mockData.id }}>
+          <TableRow {...defaultProps} />
+        </TableContext.Provider>,
+      );
+      expect(screen.getByTestId("table-row-wrapper")).toBe(rowNode);
+
+      rerender(
+        <TableContext.Provider value={{ ...contextValue, contextMenuRowId: null }}>
+          <TableRow {...defaultProps} />
+        </TableContext.Provider>,
+      );
+      expect(screen.getByTestId("table-row-wrapper")).toBe(rowNode);
+    });
+
+    it("should forward keyboard events via contextMenuTriggerProps", () => {
+      const mockOnKeyDown = mock();
+      renderWithContext({
+        contextMenuTriggerProps: {
+          onContextMenu: mock(),
+          onKeyDown: mockOnKeyDown,
+        },
+      });
 
       const rowWrapper = screen.getByTestId("table-row-wrapper");
-      const event = new MouseEvent("contextmenu", { bubbles: true });
-      fireEvent(rowWrapper, event);
+      fireEvent.keyDown(rowWrapper, { key: "F10", shiftKey: true });
 
-      expect(mockOnContextMenu).toHaveBeenCalledTimes(1);
-      const [eventArg, dataArg] = mockOnContextMenu.mock.calls[0];
-      expect(eventArg).toBeDefined();
-      expect(dataArg).toEqual(mockData);
+      expect(mockOnKeyDown).toHaveBeenCalled();
     });
   });
 
