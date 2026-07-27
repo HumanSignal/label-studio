@@ -382,6 +382,79 @@ describe("Annotation model", () => {
       expect(annotation.history.reinit).toHaveBeenCalledWith(true);
     });
 
+    it("does not leave needsDraftSave stuck after Updated → Draft navigation (BROS-1477, QA 93466)", () => {
+      const saveTime = new Date("2026-07-24T12:00:00.000Z");
+      const navigationTime = new Date("2026-07-24T12:01:00.000Z");
+      const result = (id) => [
+        {
+          id,
+          from_name: "l",
+          to_name: "img",
+          type: "labels",
+          value: { labels: ["A"] },
+        },
+      ];
+
+      setSystemTime(saveTime);
+      try {
+        const { annotation } = createStoreWithAnnotation({ result: result("draft-version") });
+
+        annotation.addVersions({
+          result: result("updated-version"),
+          draft: result("draft-version"),
+        });
+        annotation.autosave = { flush: mock(), cancel: mock(), paused: false };
+        annotation.history.recordNow();
+        annotation.setDraftSaved(saveTime.toISOString());
+
+        setSystemTime(navigationTime);
+        annotation.toggleDraft(false);
+        annotation.toggleDraft(true);
+
+        // Version swap reinitializes undo to the loaded snapshot — not an unsaved edit.
+        expect(annotation.history.hasChanges).toBe(false);
+        expect(annotation.needsDraftSave()).toBe(false);
+      } finally {
+        setSystemTime();
+      }
+    });
+
+    it("clears dirty state after editing Updated then returning to Draft (BROS-1477, QA 93940)", async () => {
+      const draftSavedAt = "2026-07-24T12:00:00.000Z";
+      const labelResult = (id) => [{ id, type: "labels", from_name: "l", to_name: "img", value: { labels: ["A"] } }];
+      const { store, annotation } = createStoreWithAnnotation();
+
+      annotation.addVersions({ result: labelResult("submitted"), draft: labelResult("draft") });
+      annotation.autosave = { flush: mock(), cancel: mock(), paused: false };
+      annotation.deleteAllRegions = mock();
+      annotation.deserializeResults = mock();
+      annotation.updateObjects = mock();
+
+      // Viewing Updated / submitted while a server draft exists (FIT-1685 preview).
+      annotation.setDraftSelected(false);
+      annotation.setDraftSaved(draftSavedAt);
+
+      // User edits while on Updated — save is blocked, but lastAdditionTime advances.
+      unprotect(store);
+      try {
+        const tt = annotation.history;
+        tt.history.push(getSnapshot(annotation.trackedState));
+        tt.undoIdx = tt.history.length - 1;
+        tt.lastAdditionTime = new Date("2026-07-24T12:05:00.000Z");
+      } finally {
+        protect(store);
+      }
+
+      expect(annotation.needsDraftSave()).toBe(false);
+
+      annotation.toggleDraft(true);
+      await new Promise((resolve) => setTimeout(resolve, 0));
+
+      expect(annotation.draftSelected).toBe(true);
+      expect(annotation.history.hasChanges).toBe(false);
+      expect(annotation.needsDraftSave()).toBe(false);
+    });
+
     describe("needsDraftSave view (FIT-1685)", () => {
       /** Simulate a second undo state (requires unprotecting the store root in MST 3). */
       function pushDuplicateHistoryState(store, annotation) {
@@ -556,63 +629,6 @@ describe("Annotation model", () => {
         } finally {
           setLivelinessChecking("warn");
         }
-      });
-    });
-
-    describe("toggleDraft history navigation (BROS-1477 QA 93466)", () => {
-      /** Simulate a second undo state (requires unprotecting the store root in MST 3). */
-      function pushDuplicateHistoryState(store, annotation) {
-        unprotect(store);
-        try {
-          const tt = annotation.history;
-          const snap = getSnapshot(annotation.trackedState);
-          tt.history.push(snap);
-          tt.undoIdx = tt.history.length - 1;
-        } finally {
-          protect(store);
-        }
-      }
-
-      it("does not leave needsDraftSave stuck after Updated → Draft navigation", async () => {
-        const { store, annotation } = createStoreWithAnnotation();
-        const draftSavedAt = "2026-07-24T12:00:00.000Z";
-        const labelResult = (id) => [{ id, type: "labels", from_name: "l", to_name: "img", value: { labels: ["A"] } }];
-
-        annotation.addVersions({
-          result: labelResult("submitted"),
-          draft: labelResult("draft"),
-        });
-        annotation.autosave = { flush: mock(), cancel: mock(), paused: false };
-        // Avoid full RectangleLabels registry (flaky under ordered coverage); still exercise
-        // multi-snapshot undo recording that made the indicator stick.
-        annotation.deleteAllRegions = mock();
-        annotation.deserializeResults = mock(() => {
-          annotation.history.addUndoState(getSnapshot(annotation.trackedState));
-          annotation.history.addUndoState(getSnapshot(annotation.trackedState));
-        });
-        annotation.updateObjects = mock();
-
-        // Start on the submitted/updated snapshot (History "Updated" row).
-        annotation.setDraftSelected(false);
-        annotation.setDraftSaved(draftSavedAt);
-        pushDuplicateHistoryState(store, annotation);
-        unprotect(store);
-        try {
-          annotation.history.lastAdditionTime = new Date("2026-07-24T11:59:00.000Z");
-        } finally {
-          protect(store);
-        }
-        expect(annotation.needsDraftSave()).toBe(false);
-
-        // Clicking the live Draft row calls toggleDraft(true).
-        annotation.toggleDraft(true);
-        // MST flushes post-action onSnapshot after the action; suppress lifts on next tick.
-        await new Promise((resolve) => setTimeout(resolve, 0));
-
-        expect(annotation.draftSelected).toBe(true);
-        expect(annotation.deserializeResults).toHaveBeenCalled();
-        expect(annotation.history.lastAdditionTime.getTime()).toBe(new Date("2026-07-24T11:59:00.000Z").getTime());
-        expect(annotation.needsDraftSave()).toBe(false);
       });
     });
 

@@ -63,7 +63,8 @@ describe("Controls", () => {
   beforeEach(() => {
     mock.clearAllMocks();
     spyOn(uiModule, "Button").mockImplementation(({ children, ...props }: any) => (
-      <button {...props} data-testid="button">
+      // Preserve caller data-testid (e.g. bottombar-update-button); default only when absent.
+      <button data-testid="button" {...props}>
         {children}
       </button>
     ));
@@ -261,6 +262,57 @@ describe("Controls", () => {
 
     expect(getByLabelText("accept-annotation")).toBeDisabled();
     expect(getByLabelText("reject-annotation")).toBeDisabled();
+  });
+
+  test("keeps Update enabled when viewing submitted while a draft exists (BROS-1477 QA 93973)", () => {
+    mockStore.hasInterface = (a: string) => a === "update" || a === "controls";
+    mockStore.updateAnnotation = mock();
+    mockStore.commentStore.commentFormSubmit = mock(() => Promise.resolve());
+
+    const annotation = {
+      ...mockAnnotation,
+      userGenerate: false,
+      draftSelected: false,
+      draftId: 99,
+      versions: { draft: [{ id: "r1" }], result: [{ id: "s1" }] },
+      submissionInProgress: mock(),
+    };
+    mockStore.annotationStore.selectedHistory = null;
+    mockStore.annotationStore.selected = annotation;
+    mockHistory.canUndo = true;
+
+    const { getByTestId } = render(
+      <Provider store={mockStore}>
+        <Controls history={mockHistory} annotation={annotation} />
+      </Provider>,
+    );
+
+    expect(getByTestId("bottombar-update-button")).not.toBeDisabled();
+  });
+
+  test("disables Update when a non-live history item is selected", () => {
+    mockStore.hasInterface = (a: string) => a === "update" || a === "controls";
+    mockStore.updateAnnotation = mock();
+
+    const annotation = {
+      ...mockAnnotation,
+      userGenerate: false,
+      draftSelected: false,
+      draftId: 99,
+      versions: { draft: [{ id: "r1" }], result: [{ id: "s1" }] },
+      submissionInProgress: mock(),
+    };
+    mockStore.annotationStore.selectedHistory = { id: "hist-1" };
+    mockStore.annotationStore.selected = annotation;
+    mockHistory.canUndo = true;
+
+    const { getByTestId } = render(
+      <Provider store={mockStore}>
+        <Controls history={mockHistory} annotation={annotation} />
+      </Provider>,
+    );
+
+    expect(getByTestId("bottombar-update-button")).toBeDisabled();
   });
 
   test("keeps accept and reject enabled in review when draft is the active view (FIT-2105)", () => {

@@ -82,14 +82,17 @@ export const Controls = controlsInjector<{ annotation: MSTAnnotation }>(
       editable: annotationEditable,
       draftSelected,
     } = annotation;
+    // FIT-2105: viewing the submitted snapshot while a draft exists must block review
+    // Accept/Reject (Fix+Accept from the wrong view). It must NOT disable annotator Update
+    // (BROS-1477 / QA 93973 — that worked on 2.34 when only historySelected blocked actions).
     const viewingSubmittedWhileDraftExists = !historySelected && Boolean(versions?.draft) && !draftSelected;
-    const reviewActionsBlocked = historySelected || viewingSubmittedWhileDraftExists;
     const dropdownTrigger = cn("dropdown").elem("trigger").toClassName();
     const customButtons: CustomButtonsField = store.customButtons;
     const buttons: React.ReactNode[] = [];
 
     const [isInProgress, setIsInProgress] = useState(false);
-    const disabled = !annotationEditable || store.isSubmitting || reviewActionsBlocked || isInProgress;
+    const disabled = !annotationEditable || store.isSubmitting || historySelected || isInProgress;
+    const reviewDisabled = disabled || viewingSubmittedWhileDraftExists;
     const submitDisabled = store.hasInterface("annotations:deny-empty") && results.length === 0;
     const hasIncompleteRegions = annotation.hasIncompleteRegions;
 
@@ -145,7 +148,7 @@ export const Controls = controlsInjector<{ annotation: MSTAnnotation }>(
           if (customButton === "accept") {
             // just an example of internal button usage
             // @todo move buttons to separate components
-            buttons.push(<AcceptButton key={customButton} disabled={disabled} history={history} store={store} />);
+            buttons.push(<AcceptButton key={customButton} disabled={reviewDisabled} history={history} store={store} />);
           }
         } else {
           buttons.push(
@@ -189,9 +192,9 @@ export const Controls = controlsInjector<{ annotation: MSTAnnotation }>(
           }
         };
 
-        buttons.push(<ControlButton key={button.name} button={button} disabled={disabled} onClick={onReject} />);
+        buttons.push(<ControlButton key={button.name} button={button} disabled={reviewDisabled} onClick={onReject} />);
       });
-      buttons.push(<AcceptButton key="review-accept" disabled={disabled} history={history} store={store} />);
+      buttons.push(<AcceptButton key="review-accept" disabled={reviewDisabled} history={history} store={store} />);
     } else if (annotation.skipped) {
       buttons.push(
         <div className={cn("controls").elem("skipped-info").toClassName()} key="skipped">

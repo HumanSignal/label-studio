@@ -817,32 +817,23 @@ const _Annotation = types
       self.autosave.flush();
       self.pauseAutosave();
 
-      // BROS-1477: History navigation must not count as an annotation edit.
-      // deleteAllRegions + deserializeResults + updateObjects emit multiple
-      // onSnapshot events (including MST's post-action flush). A single
-      // setSkipNextUndoState only covers one event, so lastAdditionTime still
-      // advances and needsDraftSave() sticks true (QA 93466: Updated → Draft).
-      // Keep the same swap as before; only suppress undo recording through the
-      // post-action flush (next macrotask), same timing pattern as startAutosave.
-      self.history.beginSuppressUndo();
-      try {
-        // reinit annotation from required state
-        self.deleteAllRegions({ deleteReadOnly: true });
-        if (shouldSelectDraft) {
-          self.deserializeResults(self.versions.draft);
-        } else {
-          self.deserializeResults(self.versions.result);
-        }
-        self.draftSelected = shouldSelectDraft;
-
-        // reinit objects
-        self.updateObjects();
-      } finally {
-        setTimeout(() => {
-          if (!isAlive(self)) return;
-          self.history.endSuppressUndo();
-        }, 0);
+      // reinit annotation from required state
+      self.history.setSkipNextUndoState();
+      self.deleteAllRegions({ deleteReadOnly: true });
+      if (shouldSelectDraft) {
+        self.deserializeResults(self.versions.draft);
+      } else {
+        self.deserializeResults(self.versions.result);
       }
+      self.draftSelected = shouldSelectDraft;
+
+      // reinit objects
+      self.updateObjects();
+
+      // History navigation loads a version snapshot — it is not an unsaved draft edit.
+      // Reset undo/dirty tracking to the loaded content so needsDraftSave() stays false
+      // (BROS-1477 QA 93466; QA 93940: edits while previewing Updated under FIT-1685).
+      self.history.reinit(false);
 
       self.startAutosave();
     },

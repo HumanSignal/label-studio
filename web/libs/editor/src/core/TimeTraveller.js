@@ -35,9 +35,6 @@ const TimeTraveller = types
     const freezingLockSet = new Set();
     let changesDuringFreeze = false;
     let replaceNextUndoState = false;
-    // Suppress undo recording across an entire operation, including MST's
-    // post-action onSnapshot flush (unlike skipNextUndoState which is one-shot).
-    let undoSuppressCount = 0;
 
     function triggerHandlers(force = true) {
       updateHandlers.forEach((handler) => handler(force));
@@ -69,14 +66,6 @@ const TimeTraveller = types
         self.skipNextUndoState = value;
       },
 
-      beginSuppressUndo() {
-        undoSuppressCount += 1;
-      },
-
-      endSuppressUndo() {
-        undoSuppressCount = Math.max(0, undoSuppressCount - 1);
-      },
-
       setReplaceNextUndoState(value = true) {
         replaceNextUndoState = value;
       },
@@ -97,9 +86,6 @@ const TimeTraveller = types
       addUndoState(recorder) {
         if (self.isFrozen) {
           changesDuringFreeze = true;
-          return;
-        }
-        if (undoSuppressCount > 0) {
           return;
         }
         if (self.skipNextUndoState) {
