@@ -246,3 +246,10 @@ export const FF_VIEW_ONLY_USERS = "fflag_feat_back_fit_2196_view_only_users_shor
  * eligible projects themselves (workforce/services organizations only).
  */
 export const FF_CONTRIBUTOR_OPT_IN = "fflag_feat_utc_1064_contributor_opt_in";
+
+/**
+ * Configurable Annotator Evaluation metric (No-GT Evaluation): lets a project
+ * choose the metric that drives Annotator Evaluation — ground truth agreement
+ * (default, today's behavior), review acceptance score, or rejection rate.
+ */
+export const FF_ANNOTATOR_EVALUATION_METRIC = "fflag_feat_utc_1085_annotator_evaluation_metric";
