@@ -2,7 +2,7 @@ import { observer } from "mobx-react";
 import { useState, useCallback, useMemo } from "react";
 import { debounce } from "@humansignal/core/lib/utils/debounce";
 import { useDataManagerUsers } from "../../hooks/useUsers";
-import { Select, Tooltip, Userpic } from "@humansignal/ui";
+import { Select, Tooltip, Typography, Userpic } from "@humansignal/ui";
 import { cn } from "../../utils/bem";
 import { SelectSize } from "@humansignal/ui/lib/select/types";
 import { userDisplayName } from "@humansignal/core/lib/utils/helpers";
@@ -32,7 +32,7 @@ export const UserSelect = observer(({ filter, onChange, multiple, value, placeho
     [],
   );
 
-  const { users, hasMore, total, loadMore } = useDataManagerUsers(
+  const { users, hasMore, total, loadMore, isLoading } = useDataManagerUsers(
     projectId,
     optionsPerRequest,
     false,
@@ -53,7 +53,9 @@ export const UserSelect = observer(({ filter, onChange, multiple, value, placeho
           <Tooltip title={optionLabel} alignment="top-left">
             <div className="flex gap-2 w-full items-center">
               <Userpic user={displayUser} size={16} key={`user-${user.id}`} showName={true} />
-              <span className="text-ellipsis text-nowrap overflow-hidden w-full">{optionLabel}</span>
+              <Typography as="span" size="smallest" className="text-ellipsis text-nowrap overflow-hidden w-full">
+                {optionLabel}
+              </Typography>
             </div>
           </Tooltip>
         ),
@@ -65,7 +67,7 @@ export const UserSelect = observer(({ filter, onChange, multiple, value, placeho
     (val) => {
       const nextValue = multiple ? (val ? [].concat(val) : []) : val;
       onChange?.(nextValue);
-      setSearch(null);
+      if (!multiple) setSearch(null);
     },
     [multiple, onChange],
   );
@@ -94,6 +96,7 @@ export const UserSelect = observer(({ filter, onChange, multiple, value, placeho
       multiple={multiple}
       isVirtualList={true}
       searchable={true}
+      isLoading={isLoading}
       onSearch={debouncedSearch}
       searchFilter={searchFilter}
       itemCount={total}

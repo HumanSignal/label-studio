@@ -5,6 +5,7 @@ import {
   getUsersPageSize,
   mergeSelectedUsers,
   normalizeSelectedUserIds,
+  normalizeUsersResponse,
 } from "./useUsers";
 
 const user = (id: number) => ({
@@ -30,6 +31,23 @@ describe("Data Manager user multiselect helpers", () => {
         Array.from({ length: 12 }, (_, index) => index + 1),
       ),
     ).toBe(12);
+  });
+
+  it("normalizes array-shaped paginated responses without losing counts", () => {
+    const results = [user(1), user(2)];
+    const response = Object.assign(results, { count: 25, displayCount: 27 });
+
+    expect(normalizeUsersResponse(response)).toEqual({
+      results,
+      count: 25,
+      displayCount: 27,
+    });
+  });
+
+  it("preserves object-shaped paginated responses", () => {
+    const response = { results: [user(1), user(2)], count: 25, displayCount: 27 };
+
+    expect(normalizeUsersResponse(response)).toEqual(response);
   });
 
   it("preserves selected users during search without corrupting the server count", () => {
