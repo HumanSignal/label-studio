@@ -98,11 +98,19 @@ const Model = types
 
       for (const item of self.sequence) {
         if (item.frame === frame) {
-          // A disabled keyframe marks the inclusive end of a lifespan. Tracking
-          // terminators contain no shape, so render that endpoint with the
-          // nearest preceding geometry to keep it aligned with the timeline.
-          const shape = !item.enabled && !item.vertices?.length && prev ? prev : item;
-          return { vertices: shape.vertices || [], closed: shape.closed ?? false };
+          // Empty lifespan terminators (`enabled: false`, no vertices) are still
+          // in-lifespan for timeline endpoints. Resolve drawable geometry from the
+          // nearest shape-bearing keyframe so canvas matches the timeline
+          // (BROS-1513): prefer preceding (right/forward caps), else following
+          // (left/backward caps — no preceding keyframe exists).
+          if (!item.enabled && !item.vertices?.length) {
+            const following = self.sequence.find(
+              (kf) => kf.frame > frame && Array.isArray(kf.vertices) && kf.vertices.length > 0,
+            );
+            const shape = prev?.vertices?.length ? prev : following || item;
+            return { vertices: shape.vertices || [], closed: shape.closed ?? false };
+          }
+          return { vertices: item.vertices || [], closed: item.closed ?? false };
         }
 
         if (item.frame > frame) {

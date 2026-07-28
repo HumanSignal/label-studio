@@ -140,7 +140,11 @@ describe("VideoVectorRegion", () => {
       expect(root.region.getShape(5)).toEqual({ vertices, closed: false });
     });
 
-    it("does not invent geometry for a left terminator before the first tracked frame", () => {
+    it("resolves an empty left terminator from the following vector geometry", () => {
+      const vertices = mkVertices([
+        [10, 20],
+        [30, 40],
+      ]);
       const root = TestRoot.create({
         video: { id: "vid1" },
         region: {
@@ -149,12 +153,41 @@ describe("VideoVectorRegion", () => {
           object: "vid1",
           sequence: [
             { frame: 4, enabled: false },
-            { frame: 5, enabled: true, vertices: mkVertices([[10, 20]]), closed: false },
+            { frame: 5, enabled: true, vertices, closed: true },
           ],
         },
       });
 
-      expect(root.region.getShape(4)).toEqual({ vertices: [], closed: false });
+      // Left lifespan caps sit before the first tracked keyframe, so there is no
+      // preceding geometry — fall back to the next shape-bearing keyframe so the
+      // canvas matches the timeline endpoint (BROS-1513 follow-up).
+      expect(root.region.getShape(4)).toEqual({ vertices, closed: true });
+    });
+
+    it("resolves empty left and right terminators after Track Both-style caps", () => {
+      const vertices = mkVertices([
+        [10, 20],
+        [30, 40],
+      ]);
+      const root = TestRoot.create({
+        video: { id: "vid1" },
+        region: {
+          id: "vvr1",
+          pid: "p1",
+          object: "vid1",
+          sequence: [
+            { frame: 14, enabled: false },
+            { frame: 15, enabled: true, vertices, closed: true },
+            { frame: 25, enabled: true, vertices, closed: true },
+            { frame: 26, enabled: false },
+          ],
+        },
+      });
+
+      expect(root.region.getShape(14)).toEqual({ vertices, closed: true });
+      expect(root.region.getShape(15)).toEqual({ vertices, closed: true });
+      expect(root.region.getShape(25)).toEqual({ vertices, closed: true });
+      expect(root.region.getShape(26)).toEqual({ vertices, closed: true });
     });
   });
 
