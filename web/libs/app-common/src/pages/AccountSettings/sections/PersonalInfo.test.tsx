@@ -36,11 +36,16 @@ mockModule("@humansignal/ui", () => ({
 }));
 
 import { PersonalInfo } from "./PersonalInfo";
-import { ProfileDirtyProvider, useProfileFormsDirty } from "../ProfileDirtyContext";
+import { ProfileDirtyProvider, useDiscardProfileDrafts, useProfileFormsDirty } from "../ProfileDirtyContext";
 
 const DirtyReadout = () => {
   const anyDirty = useProfileFormsDirty();
   return <div data-testid="readout">{anyDirty ? "dirty" : "clean"}</div>;
+};
+
+const DiscardButton = () => {
+  const discard = useDiscardProfileDrafts();
+  return <button onClick={discard}>Discard profile changes</button>;
 };
 
 const makeUser = (overrides = {}) => ({
@@ -213,6 +218,53 @@ describe("PersonalInfo", () => {
 
       fireEvent.change(firstName, { target: { value: "Mika" } });
       expect(screen.getByTestId("readout")).toHaveTextContent("clean");
+    });
+
+    it("discards edited account details back to the saved user values", () => {
+      setupUser(makeUser({ first_name: "Mika", last_name: "Kim", phone: "+1 555 0100" }));
+
+      render(
+        <ProfileDirtyProvider>
+          <PersonalInfo />
+          <DirtyReadout />
+          <DiscardButton />
+        </ProfileDirtyProvider>,
+      );
+
+      fireEvent.change(screen.getByLabelText(/First Name/), { target: { value: "Mika Updated" } });
+      fireEvent.change(screen.getByLabelText(/Phone/), { target: { value: "" } });
+      expect(screen.getByTestId("readout")).toHaveTextContent("dirty");
+
+      fireEvent.click(screen.getByRole("button", { name: "Discard profile changes" }));
+
+      expect(screen.getByLabelText(/First Name/)).toHaveValue("Mika");
+      expect(screen.getByLabelText(/Last Name/)).toHaveValue("Kim");
+      expect(screen.getByLabelText(/Phone/)).toHaveValue("+1 555 0100");
+      expect(screen.getByTestId("readout")).toHaveTextContent("clean");
+    });
+  });
+
+  describe("validation state", () => {
+    it("clears attempted-save validation when profile changes are discarded", async () => {
+      setupUser(makeUser({ first_name: "Mika", last_name: "Kim", phone: "+1 555 0100" }));
+      setupRequiredFields(["first_name", "last_name", "phone"]);
+
+      render(
+        <ProfileDirtyProvider>
+          <PersonalInfo />
+          <DiscardButton />
+        </ProfileDirtyProvider>,
+      );
+
+      fireEvent.change(screen.getByLabelText(/Last Name/), { target: { value: "" } });
+      fireEvent.submit(screen.getByRole("button", { name: "Save" }).closest("form") as HTMLFormElement);
+
+      expect(await screen.findByText("Last Name is required.")).toBeInTheDocument();
+
+      fireEvent.click(screen.getByRole("button", { name: "Discard profile changes" }));
+
+      expect(screen.getByLabelText(/Last Name/)).toHaveValue("Kim");
+      expect(screen.queryByText("Last Name is required.")).not.toBeInTheDocument();
     });
   });
 });

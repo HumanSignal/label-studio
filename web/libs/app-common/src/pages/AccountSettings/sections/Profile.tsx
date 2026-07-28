@@ -1,7 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@humansignal/ui/lib/card-new/card";
 import { PersonalInfo } from "./PersonalInfo";
 import { getAccountSettingsProfileExtras } from "../extensions";
-import { ProfileDirtyProvider, useProfileFormsDirty } from "../ProfileDirtyContext";
+import { ProfileDirtyProvider, useDiscardProfileDrafts, useProfileFormsDirty } from "../ProfileDirtyContext";
 
 /**
  * FIXME: This is a legacy import. We're not supposed to reach into the app from app-common;
@@ -17,11 +17,12 @@ import { UnsavedChanges } from "apps/labelstudio/src/pages/CreateProject/Config/
  */
 const ProfileUnsavedGuard = () => {
   const anyDirty = useProfileFormsDirty();
+  const discardProfileDrafts = useDiscardProfileDrafts();
 
   return (
     <UnsavedChanges
       hasChanges={anyDirty}
-      onDiscard={() => {}}
+      onDiscard={discardProfileDrafts}
       modalBody="You have unsaved changes on this page. If you leave, your changes will be lost."
       modalDiscardText="Leave"
       modalCancelText="Stay"

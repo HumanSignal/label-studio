@@ -80,7 +80,13 @@ export const PersonalInfo = () => {
   // Report unsaved changes to the page-level guard (avatar saves immediately, so it's excluded).
   const isDirty =
     fname !== (user?.first_name ?? "") || lname !== (user?.last_name ?? "") || phone !== (user?.phone ?? "");
-  useReportProfileDirty(isDirty);
+  const discardChanges = useCallback(() => {
+    setFname(user?.first_name ?? "");
+    setLname(user?.last_name ?? "");
+    setPhone(user?.phone ?? "");
+    setHasAttemptedSave(false);
+  }, [user?.first_name, user?.last_name, user?.phone]);
+  useReportProfileDirty(isDirty, discardChanges);
   const { requiredProfileFields = [] } = useAccountSettingsExtension();
   const isFieldRequired = (key: string) => requiredProfileFields.includes(key);
   const isFirstNameMissing = hasAttemptedSave && isRequiredProfileValueMissing(isFieldRequired("first_name"), fname);
