@@ -41,6 +41,14 @@ export const resolveVideoVectorRegionControl = (results = [], objectTag) => {
   return results.find((result) => result.from_name?.tools)?.from_name ?? objectTag?.videoVectorControl;
 };
 
+export const isVideoVectorRegionValue = (value = {}) => {
+  if (value.vertices !== undefined || value.value?.vertices !== undefined) return true;
+
+  const sequence = value.sequence ?? value.value?.sequence;
+
+  return Array.isArray(sequence) && sequence.some((keyframe) => keyframe?.vertices !== undefined);
+};
+
 /**
  * VideoVectorRegion — Vector graphics region for video annotation.
  *
@@ -425,10 +433,6 @@ const VideoVectorRegionModel = types.compose(
   Model,
 );
 
-Registry.addRegionType(VideoVectorRegionModel, "video", (value) => {
-  if (value.vertices) return true;
-  if (value.sequence?.[0]?.vertices !== undefined) return true;
-  return false;
-});
+Registry.addRegionType(VideoVectorRegionModel, "video", isVideoVectorRegionValue);
 
 export { VideoVectorRegionModel };

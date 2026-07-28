@@ -325,6 +325,38 @@ describe("VideoVectorRegion", () => {
     });
   });
 
+  describe("registry detector", () => {
+    it("detects persisted Track Both VideoVector when the first keyframe is a lifespan terminator", () => {
+      const value = {
+        sequence: [
+          // Track Both left-cap after submit/reload: first keyframe has no geometry.
+          { frame: 4, enabled: false },
+          {
+            frame: 5,
+            enabled: true,
+            vertices: mkVertices([
+              [10, 10],
+              [20, 20],
+              [30, 10],
+            ]),
+            closed: true,
+          },
+        ],
+      };
+
+      expect(VideoVectorRegionModel.detectByValue(value)).toBe(true);
+      expect(VideoVectorRegionModel.detectByValue({ value })).toBe(true);
+    });
+
+    it("does not detect VideoRectangle-style sequences as VideoVector", () => {
+      expect(
+        VideoVectorRegionModel.detectByValue({
+          sequence: [{ frame: 1, enabled: true, x: 10, y: 10, width: 20, height: 20 }],
+        }),
+      ).toBe(false);
+    });
+  });
+
   describe("closable — a closed contour is always closable (BROS-1422)", () => {
     it("reports closable=true for a closed keyframe even without a closable control", () => {
       const root = TestRoot.create({
