@@ -2418,6 +2418,33 @@
       "version": 2,
       "deleted": false
     },
+    "fflag_feat_fit_1790_fsm_membership_tracking": {
+      "key": "fflag_feat_fit_1790_fsm_membership_tracking",
+      "on": true,
+      "prerequisites": [],
+      "targets": [],
+      "contextTargets": [],
+      "rules": [],
+      "fallthrough": {
+        "variation": 0
+      },
+      "offVariation": 1,
+      "variations": [
+        true,
+        false
+      ],
+      "clientSideAvailability": {
+        "usingMobileKey": false,
+        "usingEnvironmentId": false
+      },
+      "clientSide": false,
+      "salt": "f85051f789484852a9ad6dffa3b3f6b6",
+      "trackEvents": false,
+      "trackEventsFallthrough": false,
+      "debugEventsUntilDate": null,
+      "version": 3,
+      "deleted": false
+    },
     "fflag_feat_fit_1955_project_pause": {
       "key": "fflag_feat_fit_1955_project_pause",
       "on": false,
