@@ -8,6 +8,13 @@ import { TaskSourceViewer, getTaskSourceViewerStorageKey } from "../../TaskSourc
 // @ts-expect-error - utils is JS module
 import { getProperty } from "../utils";
 
+const formatCellValueForClipboard = (value: unknown) => {
+  if (typeof value === "string") return value;
+  if (typeof value !== "object") return String(value);
+
+  return JSON.stringify(value, null, 2) ?? String(value);
+};
+
 export interface RowContextMenuProps {
   /** Task data object */
   row: any;
@@ -105,7 +112,7 @@ export const RowContextMenu: FC<RowContextMenuProps> = ({
       const fieldName = column?.id?.includes(":") ? column.id.split(":")[1] : column?.id;
       const isAnnotationsOrPredictions = fieldName === "annotations_results" || fieldName === "predictions_results";
 
-      let textToCopy = typeof cellValue === "string" ? cellValue : String(cellValue);
+      let textToCopy = formatCellValueForClipboard(cellValue);
 
       // If annotations/predictions appear truncated, fetch full data from API
       if (isAnnotationsOrPredictions && textToCopy.length > 0 && !textToCopy.endsWith("]")) {
