@@ -1,4 +1,4 @@
-title: "Human Preference collection for RLHF"
+title: "Human Preference collection "
 type: community
 group: Generative AI
 order: 2
@@ -95,7 +95,7 @@ config: |
   </View>
   <!--{ "data" : {
     "prompt": "What are the key benefits of using Reinforcement Learning from Human Feedback (RLHF) for dataset collection in the context of Large Language Model (LLM) generation?",
-    "answer1": "Reinforcement Learning from Human Feedback (RLHF) for dataset collection in Large Language Model (LLM) generation provides key benefits such as improved model performance through direct optimization, better alignment with human values by incorporating human feedback, and the ability to iteratively refine the model based on user interactions, resulting in a more user-friendly and efficient language model.",
+    "answer1": "Reinforcement Learning from Human Feedback jbbc for dataset collection in Large Language Model (LLM) generation provides key benefits such as improved model performance through direct optimization, better alignment with human values by incorporating human feedback, and the ability to iteratively refine the model based on user interactions, resulting in a more user-friendly and efficient language model.",
     "answer2": "Using Reinforcement Learning from Human Feedback (RLHF) for dataset collection in Large Language Model (LLM) generation offers advantages such as enhanced model capabilities by optimizing for desired outcomes, greater adaptability to human preferences through the inclusion of human feedback, and the opportunity to continuously improve the model based on user experiences, ultimately leading to a more effective and responsive language model."
   }}
   -->
