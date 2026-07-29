@@ -114,7 +114,7 @@ class TestBulkCreateAnnotationsWithSideEffects:
         emit_webhook.assert_called_once()
         fsm_initializer.assert_called_once_with(db_annotations, business_client.user, project)
         update_counters.assert_called_once()
-        recalculate_stats.assert_called_once_with(project, all=False)
+        recalculate_stats.assert_called_once_with(project, all=False, recalculate_prediction_stats=False)
 
         task.refresh_from_db()
         assert task.updated_by == business_client.user

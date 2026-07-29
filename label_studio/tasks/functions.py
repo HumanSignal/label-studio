@@ -97,7 +97,10 @@ def bulk_create_annotations_with_side_effects(
     if recalculate_stats:
         try:
             recalculate_stats_async_or_sync = import_module('stats.functions.stats').recalculate_stats_async_or_sync
-            recalculate_stats_async_or_sync(project, all=False)
+            # AnnotationStats updates PredictionStats for the new annotations and
+            # predictions on their tasks. Do not additionally enqueue a
+            # project-wide prediction stats rebuild for this annotation-only flow.
+            recalculate_stats_async_or_sync(project, all=False, recalculate_prediction_stats=False)
         except (ModuleNotFoundError, ImportError):
             logger.info('Bulk annotations created in LSO, stats recomputation skipped')
 
