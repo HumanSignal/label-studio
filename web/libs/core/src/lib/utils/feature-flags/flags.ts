@@ -197,6 +197,12 @@ export const FF_INTERFACES = "fflag_feat_all_optic_interfaces_short";
 export const FF_INTERFACES_AGENT_WORKFLOW = "fflag_feat_interfaces_agent_workflow";
 
 /**
+ * Local WebLLM intent gate for Create Interface — classifies once per session in a Web Worker
+ * and composes a slim skill pack. When off, keeps today's full regex compose path.
+ */
+export const FF_INTERFACES_WEBLLM_INTENT = "fflag_feat_interfaces_webllm_intent";
+
+/**
  * WASM FFmpeg Streaming Decoder (progressive seek/decode) for long compressed audio files
  */
 export const FF_FIT_2003_WASM_STREAMING_DECODER = "fflag_feat_front_fit_2003_wasm_streaming_decoder";
