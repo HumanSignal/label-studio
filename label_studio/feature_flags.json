@@ -3363,6 +3363,33 @@
       "version": 3,
       "deleted": false
     },
+    "fflag_feat_interfaces_webllm_intent": {
+      "key": "fflag_feat_interfaces_webllm_intent",
+      "on": false,
+      "prerequisites": [],
+      "targets": [],
+      "contextTargets": [],
+      "rules": [],
+      "fallthrough": {
+        "variation": 0
+      },
+      "offVariation": 1,
+      "variations": [
+        true,
+        false
+      ],
+      "clientSideAvailability": {
+        "usingMobileKey": false,
+        "usingEnvironmentId": false
+      },
+      "clientSide": false,
+      "salt": "ed5309d851f6410f88cbbe0d20624772",
+      "trackEvents": false,
+      "trackEventsFallthrough": false,
+      "debugEventsUntilDate": null,
+      "version": 2,
+      "deleted": false
+    },
     "fflag_feat_lse_project_dashboards_v3_data_quality_short": {
       "key": "fflag_feat_lse_project_dashboards_v3_data_quality_short",
       "on": false,
@@ -3627,6 +3654,33 @@
       },
       "clientSide": false,
       "salt": "8b21cb7ff1ee47e5b67650d4c7100190",
+      "trackEvents": false,
+      "trackEventsFallthrough": false,
+      "debugEventsUntilDate": null,
+      "version": 2,
+      "deleted": false
+    },
+    "fflag_feat_utc_1085_annotator_evaluation_metric": {
+      "key": "fflag_feat_utc_1085_annotator_evaluation_metric",
+      "on": false,
+      "prerequisites": [],
+      "targets": [],
+      "contextTargets": [],
+      "rules": [],
+      "fallthrough": {
+        "variation": 0
+      },
+      "offVariation": 1,
+      "variations": [
+        true,
+        false
+      ],
+      "clientSideAvailability": {
+        "usingMobileKey": false,
+        "usingEnvironmentId": false
+      },
+      "clientSide": false,
+      "salt": "8bacccf35cc4407882ecc86394714405",
       "trackEvents": false,
       "trackEventsFallthrough": false,
       "debugEventsUntilDate": null,
