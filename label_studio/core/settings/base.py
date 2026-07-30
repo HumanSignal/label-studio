@@ -492,6 +492,7 @@ SPECTACULAR_SETTINGS = {
         # their dedicated API and are excluded.
         'AssignableUserTypeEnum': (
             ('standard', 'Standard'),
+            ('flex', 'Flex'),
             ('viewonly', 'View Only'),
         ),
         # Membership updates support only the paid upgrade direction. View-Only

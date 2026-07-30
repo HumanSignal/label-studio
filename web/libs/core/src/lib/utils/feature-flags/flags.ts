@@ -248,6 +248,11 @@ export const FF_BROS_1486_REACTCODE_DUP_REGIONS = "fflag_fix_bros_1486_react_cod
 export const FF_VIEW_ONLY_USERS = "fflag_feat_back_fit_2196_view_only_users_short";
 
 /**
+ * Flex Seats: enterprise-only, time-boxed working memberships.
+ */
+export const FF_FLEX_SEATS = "fflag_feat_back_fit_2313_flex_seats_short";
+
+/**
  * Contributor opt-in to projects: project setting that lets contributors join
  * eligible projects themselves (workforce/services organizations only).
  */
