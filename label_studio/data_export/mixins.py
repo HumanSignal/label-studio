@@ -19,7 +19,6 @@ from data_manager.models import View
 from django.conf import settings
 from django.core.files import File
 from django.core.files import temp as tempfile
-from django.db import transaction
 from django.db.models import Prefetch
 from django.db.models.query_utils import Q
 from django.utils import dateformat, timezone
@@ -240,45 +239,44 @@ class ExportMixin:
         logger.debug('Run get_task_queryset')
 
         start = datetime.now()
-        with transaction.atomic():
-            # TODO: make counters from queryset
-            # counters = Project.objects.with_counts().filter(id=self.project.id)[0].get_counters()
-            self.counters = {'task_number': 0}
-            all_tasks = self.project.tasks
-            logger.debug('Tasks filtration')
-            task_ids = list(
-                self._get_filtered_tasks(all_tasks, task_filter_options=task_filter_options)
-                .distinct()
-                .values_list('id', flat=True)
-            )
-            base_export_serializer_option = self._get_export_serializer_option(serialization_options)
-            i = 0
+        # TODO: make counters from queryset
+        # counters = Project.objects.with_counts().filter(id=self.project.id)[0].get_counters()
+        self.counters = {'task_number': 0}
+        all_tasks = self.project.tasks
+        logger.debug('Tasks filtration')
+        task_ids = list(
+            self._get_filtered_tasks(all_tasks, task_filter_options=task_filter_options)
+            .distinct()
+            .values_list('id', flat=True)
+        )
+        base_export_serializer_option = self._get_export_serializer_option(serialization_options)
+        i = 0
 
-            if flag_set('fflag_fix_back_plt_807_batch_size_26062025_short', self.project.organization.created_by):
-                BATCH_SIZE = self.project.get_task_batch_size()
-            else:
-                BATCH_SIZE = settings.BATCH_SIZE
+        if flag_set('fflag_fix_back_plt_807_batch_size_26062025_short', self.project.organization.created_by):
+            BATCH_SIZE = self.project.get_task_batch_size()
+        else:
+            BATCH_SIZE = settings.BATCH_SIZE
 
-            for ids in batch(task_ids, BATCH_SIZE):
-                i += 1
-                tasks = list(self.get_task_queryset(ids, annotation_filter_options))
-                logger.debug(f'Batch: {i * BATCH_SIZE}')
-                if isinstance(task_filter_options, dict) and task_filter_options.get('only_with_annotations'):
-                    tasks = [task for task in tasks if task.annotations.exists()]
+        for ids in batch(task_ids, BATCH_SIZE):
+            i += 1
+            tasks = list(self.get_task_queryset(ids, annotation_filter_options))
+            logger.debug(f'Batch: {i * BATCH_SIZE}')
+            if isinstance(task_filter_options, dict) and task_filter_options.get('only_with_annotations'):
+                tasks = [task for task in tasks if task.annotations.exists()]
 
-                tasks = self.prepare_export_tasks(tasks, task_filter_options=task_filter_options)
+            tasks = self.prepare_export_tasks(tasks, task_filter_options=task_filter_options)
 
-                if serialization_options and serialization_options.get('include_annotation_history') is True:
-                    task_ids = [task.id for task in tasks]
-                    annotation_ids = Annotation.objects.filter(task_id__in=task_ids).values_list('id', flat=True)
-                    base_export_serializer_option = self.update_export_serializer_option(
-                        base_export_serializer_option, annotation_ids
-                    )
+            if serialization_options and serialization_options.get('include_annotation_history') is True:
+                task_ids = [task.id for task in tasks]
+                annotation_ids = Annotation.objects.filter(task_id__in=task_ids).values_list('id', flat=True)
+                base_export_serializer_option = self.update_export_serializer_option(
+                    base_export_serializer_option, annotation_ids
+                )
 
-                serializer = ExportDataSerializer(tasks, many=True, **base_export_serializer_option)
-                self.counters['task_number'] += len(tasks)
-                for task in serializer.data:
-                    yield task
+            serializer = ExportDataSerializer(tasks, many=True, **base_export_serializer_option)
+            self.counters['task_number'] += len(tasks)
+            for task in serializer.data:
+                yield task
         duration = datetime.now() - start
         logger.info(
             f'{self.counters["task_number"]} tasks from project {self.project_id} exported in {duration.total_seconds():.2f} seconds'
