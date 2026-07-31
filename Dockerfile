@@ -6,15 +6,15 @@ ARG UV_VERSION=0.10.2
 ################################ Overview
 
 # This Dockerfile builds a Label Studio environment.
-# Build context is the SuperRepo root.
+# Build context is the repository root.
 # Stages:
 # 1. "uv" - Pinned uv binary.
-# 2. "frontend-builder" - Compiles the frontend assets using Node.
+# 2. "frontend-builder" - Compiles the frontend assets using Bun.
 # 3. "venv-builder" - Prepares the virtualenv environment.
-# 4. "prod" - Creates the final production image with the Label Studio, Nginx, and other dependencies.
+# 4. "production" - Final image with Label Studio, Nginx, and other dependencies.
 
-# SuperRepo workspace path (../../libs/label-studio-sdk) is patched
-# via sed to match the container layout under /label-studio/.
+# label-studio-sdk is a git-pinned dependency in pyproject.toml/uv.lock
+# (maintained by the monorepo sync); uv fetches it during the build.
 
 ################################ Stage: uv (pinned uv binary)
 FROM ghcr.io/astral-sh/uv:${UV_VERSION} AS uv
@@ -32,16 +32,16 @@ WORKDIR /label-studio/web
 
 RUN apk add --no-cache git
 
-COPY services/lso/web/package.json \
-     services/lso/web/bun.lock \
+COPY web/package.json \
+     web/bun.lock \
      ./
 RUN --mount=type=cache,target=/root/.bun/install/cache,id=bun-install-cache-lso,sharing=locked \
     bun install --frozen-lockfile --prefer-offline
 
-COPY services/lso/web ./
+COPY web ./
 # Target path for django-manifest-plugin → label_studio/core/static/js/manifest.json (collectstatic input).
 RUN mkdir -p /label-studio/label_studio/core/static/js
-COPY services/lso/pyproject.toml ../pyproject.toml
+COPY pyproject.toml ../pyproject.toml
 RUN --mount=type=cache,target=/root/.bun/install/cache,id=bun-install-cache-lso,sharing=locked \
     bun run build
 
@@ -69,32 +69,23 @@ COPY --from=uv /uv /usr/local/bin/uv
 
 WORKDIR /label-studio
 
-# --- Phase 1: Install external dependencies (highly cacheable) ---
+# --- Phase 1: Install dependencies (highly cacheable) ---
 # Copy only manifest files — no source code. This layer is invalidated only
 # when pyproject.toml or uv.lock change, preserving expensive C-extension
-# builds across source edits.
-COPY libs/lso-client-generator/fern/.preview/fern-python-sdk/pyproject.toml \
-     libs/lso-client-generator/fern/.preview/fern-python-sdk/README.md \
-     ./label-studio-sdk/
-COPY services/lso/pyproject.toml services/lso/uv.lock services/lso/README.md ./
-
-# Patch SuperRepo workspace path → container layout:
-#   ../../libs/label-studio-sdk → label-studio-sdk   (in pyproject.toml + uv.lock)
-RUN sed -i 's|"../../libs/label-studio-sdk"|"label-studio-sdk"|g' pyproject.toml uv.lock
+# builds across source edits. label-studio-sdk comes from its git pin.
+COPY pyproject.toml uv.lock README.md ./
 
 ARG INCLUDE_DEV=false
 
-# Install external deps only; skip root project and the SDK (path dep whose source isn't present yet).
 RUN --mount=type=cache,target=/.uv-cache,id=uv-cache-alpine,sharing=locked \
     if [ "$INCLUDE_DEV" = "true" ]; then \
-        uv sync --frozen --no-install-project --no-install-package label-studio-sdk --group test --extra uwsgi; \
+        uv sync --frozen --no-install-project --group test --extra uwsgi; \
     else \
-        uv sync --frozen --no-install-project --no-install-package label-studio-sdk --no-dev --extra uwsgi; \
+        uv sync --frozen --no-install-project --no-dev --extra uwsgi; \
     fi
 
-# --- Phase 2: Install project + SDK (only reruns on source changes) ---
-COPY libs/lso-client-generator/fern/.preview/fern-python-sdk/src ./label-studio-sdk/src
-COPY services/lso/label_studio ./label_studio
+# --- Phase 2: Install project (only reruns on source changes) ---
+COPY label_studio ./label_studio
 
 # Vite emits this path in frontend-builder; collectstatic must see it before STATIC_ROOT is populated.
 COPY --from=frontend-builder /label-studio/label_studio/core/static/js/manifest.json ./label_studio/core/static/js/manifest.json
@@ -137,11 +128,11 @@ RUN set -eux; \
     mkdir -p $LS_DIR $LABEL_STUDIO_BASE_DATA_DIR $OPT_DIR && \
     chown -R 1001:0 $LS_DIR $LABEL_STUDIO_BASE_DATA_DIR $OPT_DIR /var/log/nginx /etc/nginx
 
-COPY --chown=1001:0 services/lso/deploy/default.conf /etc/nginx/nginx.conf
+COPY --chown=1001:0 deploy/default.conf /etc/nginx/nginx.conf
 
-COPY --chown=1001:0 services/lso/LICENSE LICENSE
-COPY --chown=1001:0 services/lso/licenses licenses
-COPY --chown=1001:0 services/lso/deploy deploy
+COPY --chown=1001:0 LICENSE LICENSE
+COPY --chown=1001:0 licenses licenses
+COPY --chown=1001:0 deploy deploy
 
 # Copy files from build stages
 COPY --chown=1001:0 --from=venv-builder               /label-studio                                  $LS_DIR
