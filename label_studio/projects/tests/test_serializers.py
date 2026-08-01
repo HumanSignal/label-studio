@@ -1,9 +1,14 @@
-"""Tests for projects.serializers (control_weights validation)."""
+"""Tests for project serializers."""
 
 import pytest
+from django.db import connection
 from django.test import TestCase
+from django.test.utils import CaptureQueriesContext
 from projects.serializers import ControlTagWeightSerializer, ProjectSerializer
+from projects.tests.factories import ProjectFactory
 from rest_framework.exceptions import ValidationError
+from tasks.tests.factories import AnnotationFactory, TaskFactory
+from users.tests.factories import UserFactory
 
 
 class TestControlTagWeightSerializer(TestCase):
@@ -84,7 +89,7 @@ class TestControlTagWeightSerializer(TestCase):
 
 
 class TestProjectSerializer(TestCase):
-    """Validates the cross-field validate_control_weights on ProjectSerializer."""
+    """Validates project serializer behavior, including weights and queue counts."""
 
     def _validate(self, value):
         """Run validate_control_weights from a ProjectSerializer instance."""
@@ -124,3 +129,30 @@ class TestProjectSerializer(TestCase):
     def test_accepts_empty_dict(self):
         """Empty dict passes through unchanged."""
         assert self._validate({}) == {}
+
+    def test_queue_total_uses_correlated_user_annotation_lookup(self):
+        project = ProjectFactory()
+        current_user = project.created_by
+        other_user = UserFactory()
+        TaskFactory(project=project, is_labeled=False)
+        current_user_task = TaskFactory(project=project, is_labeled=True)
+        other_user_task = TaskFactory(project=project, is_labeled=True)
+        unlabeled_other_user_task = TaskFactory(project=project, is_labeled=False)
+        mixed_user_task = TaskFactory(project=project, is_labeled=True)
+        AnnotationFactory(task=current_user_task, completed_by=current_user)
+        AnnotationFactory(task=other_user_task, completed_by=other_user)
+        AnnotationFactory(task=unlabeled_other_user_task, completed_by=other_user)
+        AnnotationFactory(task=mixed_user_task, completed_by=other_user)
+        AnnotationFactory(task=mixed_user_task, completed_by=current_user)
+        project.tasks.filter(pk__in=[current_user_task.pk, other_user_task.pk, mixed_user_task.pk]).update(
+            is_labeled=True
+        )
+        serializer = ProjectSerializer(context={'user_cache': {current_user.id: current_user}})
+
+        with CaptureQueriesContext(connection) as captured_queries:
+            queue_total = serializer.get_queue_total(project)
+
+        assert len(captured_queries) == 1
+        assert queue_total == 4, captured_queries[0]['sql']
+        assert 'EXISTS' in captured_queries[0]['sql']
+        assert 'DISTINCT' not in captured_queries[0]['sql']
