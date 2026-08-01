@@ -13,7 +13,8 @@ jobs:
     steps:
       - uses: hmarr/debug-action@v3.0.0
 
-      - env:
+      - name: Post GitHub issue comment to Zendesk ticket
+        env:
           ZENDESK_HOST: ${{ vars.ZENDESK_HOST }}
           ZENDESK_USER: ${{ vars.ZENDESK_USER }}
           ZENDESK_TOKEN: ${{ secrets.ZENDESK_TOKEN }}
