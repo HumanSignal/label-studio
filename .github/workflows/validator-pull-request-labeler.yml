@@ -30,10 +30,11 @@ jobs:
       - name: "Validate PR's title"
         uses: thehanimo/pr-title-checker@v1.4.3
         with:
+          GITHUB_TOKEN: ${{ github.token }}
           pass_on_octokit_error: false
           configuration_path: ".github/pr-title-checker-config.json"
 
       - name: "Set PR's label based on title"
-        uses: release-drafter/release-drafter/autolabeler@v7.6.0
+        uses: release-drafter/release-drafter/autolabeler@v7.7.0
         with:
           config-name: autolabeler.yml
