@@ -34,6 +34,6 @@ jobs:
           configuration_path: ".github/pr-title-checker-config.json"
 
       - name: "Set PR's label based on title"
-        uses: release-drafter/release-drafter/autolabeler@v7.6.0
+        uses: release-drafter/release-drafter/autolabeler@v7.7.0
         with:
           config-name: autolabeler.yml
