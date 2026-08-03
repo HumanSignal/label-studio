@@ -118,6 +118,8 @@ export type SelectProps<T, A extends SelectOption<T>[]> = {
   open?: boolean;
   alwaysShowSelectedGroup?: boolean;
   onSelectAllClick?: () => void;
+  /** Accessible name for the "Select All" button, for consumers whose select-all reaches past the rendered items. */
+  selectAllLabel?: string;
   /** When true (requires `multiple` + `groupBy`), shows "All" / "None" bulk-toggle buttons on group header hover. Fires a single `onChange` with the full updated array. */
   showGroupActions?: boolean;
 } & SelectVirtualizedProps &

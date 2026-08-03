@@ -296,6 +296,43 @@ describe("Select Component", () => {
     });
   });
 
+  describe("Select All", () => {
+    const openSelectAllDropdown = (extraProps: Record<string, unknown> = {}) => {
+      render(
+        <Select
+          options={["Apple", "Banana"] as any}
+          placeholder="Select fruits"
+          multiple={true}
+          searchable={true}
+          isVirtualList={true}
+          alwaysShowSelectedGroup={true}
+          onSelectAllClick={mock()}
+          {...extraProps}
+        />,
+      );
+
+      fireEvent.click(screen.getAllByRole("button")[0]);
+    };
+
+    it("describes the select all action as covering the rendered items by default", async () => {
+      openSelectAllDropdown();
+
+      await waitFor(() => {
+        expect(screen.getByRole("button", { name: "Select all rendered items" })).toBeInTheDocument();
+      });
+    });
+
+    it("lets consumers describe what select all covers", async () => {
+      openSelectAllDropdown({ selectAllLabel: "Select all members matching the current filters" });
+
+      await waitFor(() => {
+        expect(
+          screen.getByRole("button", { name: "Select all members matching the current filters" }),
+        ).toBeInTheDocument();
+      });
+    });
+  });
+
   describe("Selection Behavior", () => {
     it("selects an option when clicked", async () => {
       const onChange = mock();

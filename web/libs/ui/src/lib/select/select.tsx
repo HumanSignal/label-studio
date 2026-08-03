@@ -65,6 +65,7 @@ type SelectedItemsGroupProps = {
   onDeselectAll: () => void;
   disabled?: boolean;
   onSelectAllClick?: () => void;
+  selectAllLabel?: string;
 };
 
 /**
@@ -79,6 +80,7 @@ const SelectedItemsGroup = ({
   onDeselectAll,
   disabled,
   onSelectAllClick,
+  selectAllLabel = "Select all rendered items",
 }: SelectedItemsGroupProps) => {
   const handleItemClick = useCallback(
     (option: any) => {
@@ -161,7 +163,7 @@ const SelectedItemsGroup = ({
             type="button"
             onClick={handleSelectAllClick}
             disabled={disabled}
-            aria-label="Select all rendered items"
+            aria-label={selectAllLabel}
             look="string"
             size="smaller"
           >
@@ -278,6 +280,7 @@ export const Select = forwardRef(
       alwaysShowSelectedGroup = false,
       optionRenderer,
       onSelectAllClick,
+      selectAllLabel,
       showGroupActions = false,
       open: controlledOpen,
       ...props
@@ -751,6 +754,7 @@ export const Select = forwardRef(
                     }}
                     disabled={disabled}
                     onSelectAllClick={onSelectAllClick}
+                    selectAllLabel={selectAllLabel}
                   />
                 )}
 
