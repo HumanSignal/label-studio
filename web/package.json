@@ -201,7 +201,7 @@
     "nx": "22.7.2",
     "pixelmatch": "7.1.0",
     "pngjs": "^7.0.0",
-    "postcss": "8.5.18",
+    "postcss": "8.5.23",
     "postcss-import": "^16.1.0",
     "postcss-loader": "^7.3.3",
     "postcss-nested": "^7.0.2",
