@@ -27,7 +27,7 @@ from rest_framework.settings import api_settings
 from tasks.exceptions import AnnotationDuplicateError
 from tasks.models import Annotation, AnnotationDraft, Prediction, PredictionMeta, Task
 from tasks.ordering import apply_annotation_ordering, apply_prediction_ordering
-from tasks.result_utils import dedupe_annotation_result_list
+from tasks.result_utils import dedupe_annotation_result_list, sanitize_null_bytes
 from tasks.validation import TaskValidator
 from users.models import User
 from users.serializers import AnnotatorReviewerFirewall, AnonymizedUserPrimaryKeyRelatedField, UserSerializer
@@ -844,6 +844,10 @@ class BaseTaskSerializerBulk(serializers.ListSerializer):
                         'created_by',
                     ]
                 ]
+                # bulk_create bypasses AnnotationDraft.save(), so strip NUL bytes here too
+                # (Postgres JSONB rejects \u0000). See FIT-2353.
+                if 'result' in draft:
+                    draft['result'] = sanitize_null_bytes(draft['result'])
                 db_drafts.append(AnnotationDraft(**draft))
 
         self.db_drafts = AnnotationDraft.objects.bulk_create(db_drafts, batch_size=settings.BATCH_SIZE)

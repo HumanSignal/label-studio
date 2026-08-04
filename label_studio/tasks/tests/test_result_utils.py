@@ -10,7 +10,7 @@ yet - that is the initial RED.
 """
 
 # Import fails on baseline (module not yet created). That is the first red.
-from tasks.result_utils import dedupe_annotation_result_list
+from tasks.result_utils import dedupe_annotation_result_list, sanitize_null_bytes
 
 FIT_1669_DUPLICATE_RESULT = [
     {
@@ -87,3 +87,53 @@ def test_dedupe_keeps_entries_without_an_id():
         {'from_name': 'label', 'to_name': 'text', 'type': 'labels', 'value': {'labels': ['B']}},
     ]
     assert dedupe_annotation_result_list(payload) == payload
+
+
+# ---------------------------------------------------------------------------
+# FIT-2353: NUL (U+0000) sanitization for JSONB result payloads
+# ---------------------------------------------------------------------------
+
+
+def test_sanitize_null_bytes_strips_literal_nul_from_nested_result():
+    """A NUL char anywhere in a nested result structure is removed, shape preserved."""
+    payload = [
+        {
+            'id': 'r1',
+            'from_name': 'ocr',
+            'to_name': 'image',
+            'type': 'textarea',
+            'value': {'text': ['page 1\x00 line 2', 'clean']},
+        }
+    ]
+    cleaned = sanitize_null_bytes(payload)
+    assert cleaned == [
+        {
+            'id': 'r1',
+            'from_name': 'ocr',
+            'to_name': 'image',
+            'type': 'textarea',
+            'value': {'text': ['page 1 line 2', 'clean']},
+        }
+    ]
+
+
+def test_sanitize_null_bytes_strips_nul_from_dict_keys():
+    """NUL characters embedded in dict keys are also removed."""
+    assert sanitize_null_bytes({'a\x00b': 'c\x00d'}) == {'ab': 'cd'}
+
+
+def test_sanitize_null_bytes_noop_when_clean():
+    """Clean payloads are returned unchanged (and equal)."""
+    payload = [{'id': 'r1', 'value': {'choices': ['neg']}}]
+    assert sanitize_null_bytes(payload) == payload
+
+
+def test_sanitize_null_bytes_passthrough_for_none_and_non_serializable():
+    """None and non-JSON-serializable inputs are returned as-is without raising."""
+    assert sanitize_null_bytes(None) is None
+
+    class NotSerializable:
+        pass
+
+    obj = NotSerializable()
+    assert sanitize_null_bytes(obj) is obj

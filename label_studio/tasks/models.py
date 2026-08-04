@@ -42,6 +42,7 @@ from fsm.queryset_mixins import FSMStateQuerySetMixin
 from label_studio_sdk.label_interface.objects import PredictionValue
 from rest_framework.exceptions import ValidationError
 from tasks.choices import ActionType
+from tasks.result_utils import sanitize_null_bytes
 
 logger = logging.getLogger(__name__)
 
@@ -1015,6 +1016,10 @@ class AnnotationDraft(FsmHistoryStateModel):
         return self.task.project.has_permission(user)
 
     def save(self, *args, **kwargs):
+        # Strip NUL (U+0000) bytes that Postgres JSONB cannot store. Source PDFs with an
+        # embedded OCR/text layer can leak \x00 into value.ocrtext, which otherwise 500s the
+        # draft write with a DataError. See FIT-2353.
+        self.result = sanitize_null_bytes(self.result)
         if flag_set('fflag_fix_plt_1048_concurrent_project_summary_update_19032026_short', user='auto'):
             # Atomic path: skip SELECT FOR UPDATE since update_created_labels_drafts
             # will use atomic SQL (jsonb_set) instead of read-modify-write
