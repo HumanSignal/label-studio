@@ -49,8 +49,9 @@ jobs:
               echo "skip $sha: exported change"
               continue
             fi
-            if ! jq -r '.added[], .modified[], .removed[]' <<<"$c" \
-                | grep -qE '^(label_studio/|web/|deploy/|tools/|licenses/|LICENSE$|README\.md$)'; then
+            # the actions event context omits per-commit file lists — ask the API
+            files=$(gh api "repos/$GITHUB_REPOSITORY/commits/$sha" --jq '.files[].filename' || true)
+            if [ -n "$files" ] && ! grep -qE '^(label_studio/|web/|deploy/|tools/|licenses/|LICENSE$|README\.md$)' <<<"$files"; then
               echo "skip $sha: no synced paths"
               continue
             fi
