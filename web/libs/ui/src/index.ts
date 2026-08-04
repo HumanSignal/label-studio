@@ -10,7 +10,6 @@ export * from "./lib/button/button";
 export * from "./lib/callout/callout";
 export * from "./lib/checkbox/checkbox";
 export * from "./lib/code-block/code-block";
-export * from "./lib/code-block/code-block";
 export * from "./lib/code-editor/code-editor";
 export * from "./lib/collapsible-panel";
 export * from "./lib/context-menu";
