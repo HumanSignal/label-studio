@@ -1,0 +1,67 @@
+name: Sync
+
+on:
+  push:
+    branches:
+      - copybara/lso-sync
+    paths:
+      - "label_studio/**"
+      - "web/**"
+      - "deploy/**"
+      - "tools/**"
+      - "licenses/**"
+      - "LICENSE"
+      - "README.md"
+  workflow_dispatch:
+    inputs:
+      sha:
+        description: "Commit SHA to sync"
+        required: true
+        type: string
+
+jobs:
+  dispatch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Dispatch sync runs
+        env:
+          GH_TOKEN: ${{ secrets.GIT_PAT }}
+          TARGET_REPO: ${{ vars.SYNC_REPO }}
+          BEFORE: ${{ github.event.before }}
+          AFTER: ${{ github.event.after }}
+          MANUAL_SHA: ${{ inputs.sha }}
+        run: |
+          set -euo pipefail
+
+          if [ -n "${MANUAL_SHA:-}" ]; then
+            COMMITS="$MANUAL_SHA"
+          elif [ "$BEFORE" = "0000000000000000000000000000000000000000" ]; then
+            # branch (re)created — nothing incremental to sync
+            echo "branch bootstrap push, skipping"
+            exit 0
+          else
+            COMMITS=$(git rev-list --reverse "$BEFORE".."$AFTER")
+          fi
+
+          for sha in $COMMITS; do
+            # exported changes come back with a GitOrigin-RevId trailer
+            if git log -1 --format=%B "$sha" | grep -q '^GitOrigin-RevId:'; then
+              echo "skip $sha: exported change"
+              continue
+            fi
+            if ! git diff-tree --no-commit-id --name-only -r "$sha" -- \
+                label_studio web deploy tools licenses LICENSE README.md | grep -q .; then
+              echo "skip $sha: no synced paths"
+              continue
+            fi
+            echo "dispatch $sha"
+            gh workflow run copybara_sync.yaml -R "$TARGET_REPO" \
+              -f copybara_workflow=lso-push-reverse \
+              -f source_ref="$sha"
+          done
