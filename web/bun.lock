@@ -135,7 +135,7 @@
         "jsdom": "~22.1.0",
         "pixelmatch": "7.1.0",
         "pngjs": "^7.0.0",
-        "postcss": "8.5.20",
+        "postcss": "^8.5.23",
         "postcss-import": "^16.1.0",
         "postcss-nested": "^7.0.2",
         "postcss-selector-parser": "^7.0.0",
@@ -189,7 +189,7 @@
     "merge": "2.1.1",
     "moment": "2.29.4",
     "on-headers": "1.1.0",
-    "postcss": "8.5.20",
+    "postcss": ">=8.5.23 <9.0.0",
     "qs": ">=6.14.2",
     "serialize-javascript": ">=7.0.3",
     "svgo": ">=3.3.3",
@@ -2339,7 +2339,7 @@
 
     "possible-typed-array-names": ["possible-typed-array-names@1.1.0", "", {}, "sha512-/+5VFTchJDoVj3bhoqi6UeymcD00DAwb1nJwamzPvHEszJ4FpF6SNNbUbOS8yI56qHzdV8eK0qEfOSiodkTdxg=="],
 
-    "postcss": ["postcss@8.5.20", "", { "dependencies": { "nanoid": "^3.3.16", "picocolors": "^1.1.1", "source-map-js": "^1.2.1" } }, "sha512-lW616l85ucIQL+FocMmL7pQFPqBmwejrCMg+iPxyImlrANNJG9NHq/RkyCZopDhd8C3LA03PHRJDjkbGu8vvug=="],
+    "postcss": ["postcss@8.5.23", "", { "dependencies": { "nanoid": "^3.3.16", "picocolors": "^1.1.1", "source-map-js": "^1.2.1" } }, "sha512-g50586zr4bZmwFiTlflMu8E0bDTb5I5gertgwAKmsdUlTQIhZtunzUlD1WSzwcVWPoAVpsrA6vlfCD7oXvRwgg=="],
 
     "postcss-import": ["postcss-import@16.1.1", "", { "dependencies": { "postcss-value-parser": "^4.0.0", "read-cache": "^1.0.0", "resolve": "^1.1.7" }, "peerDependencies": { "postcss": "^8.0.0" } }, "sha512-2xVS1NCZAfjtVdvXiyegxzJ447GyqCeEI5V7ApgQVOWnros1p5lGNovJNapwPpMombyFBfqDwt7AD3n2l0KOfQ=="],
 
