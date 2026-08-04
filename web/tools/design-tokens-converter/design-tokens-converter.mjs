@@ -63,6 +63,9 @@ const __dirname = path.dirname(__filename);
 
 const RAW_COLOR_VALUE_TOKENS = ["primary", "shadow", "outline", "surface", "accent", "background"];
 
+/** Typography semantic tokens ship desktop + mobile modes; mobile applies below Tailwind's `md` (768px). */
+const MOBILE_MEDIA_QUERY = "@media (max-width: 767px)";
+
 const shouldGenerateRawColorValue = (name) => {
   return RAW_COLOR_VALUE_TOKENS.some((token) => name.includes(token));
 };
@@ -149,6 +152,7 @@ function processDesignVariables(variables) {
     cssVariables: {
       light: [],
       dark: [],
+      mobile: [],
     },
     jsTokens: {
       colors: {},
@@ -474,6 +478,35 @@ function processSizingTokens(sizingObj, result, variables, parentKey = "") {
   }
 }
 
+/**
+ * Resolve a design-token value to a CSS declaration value.
+ * Handles Figma references (`{@...}`), @primitives → CSS var aliases, font-family quoting, and rem conversion.
+ * @param {string|number} value - Raw token value or reference
+ * @param {{ isNumber: boolean, subCollectionKey: string, collectionKey: string, variables: Object }} options
+ * @returns {string|number} - CSS-ready value
+ */
+function resolveTokenCssValue(value, { isNumber, subCollectionKey, collectionKey, variables }) {
+  if (typeof value === "string" && value.startsWith("{") && value.endsWith("}")) {
+    const reference = value.substring(1, value.length - 1);
+    // Strip `$typography.` (etc.) so `@primitives.$typography.$font-size.16` → `@primitives.$font-size.16`
+    const parts = reference.replace(`$${collectionKey}.`, "").split(".");
+
+    if (parts[0] === "@primitives") {
+      const primitiveCollection = parts[1].replace("$", "");
+      const valueKey = parts[2].replace("$", "");
+      return `var(--${primitiveCollection}-${valueKey})`;
+    }
+
+    value = resolveReference(value, variables);
+  }
+
+  if (subCollectionKey === "font-family" && typeof value === "string") {
+    return formatFontFamilyForCss(value);
+  }
+
+  return isNumber ? convertToRem(value) : value;
+}
+
 function processTokenCollection(collectionKey, subCollectionKey) {
   const collectionJsKey = camelCase(collectionKey);
   const subCollectionJsKey = camelCase(subCollectionKey);
@@ -501,38 +534,16 @@ function processTokenCollection(collectionKey, subCollectionKey) {
           continue;
         }
 
-        let resolvedValue;
-        if (typeof value === "string" && value.startsWith("{") && value.endsWith("}")) {
-          const reference = value.substring(1, value.length - 1);
-          const parts = reference.replace(`$${collectionKey}.`, "").split(".");
+        const resolveOptions = { isNumber, subCollectionKey, collectionKey, variables };
+        const desktopCssValue = resolveTokenCssValue(value, resolveOptions);
+        result.cssVariables.light.push(`${cssVarName}: ${desktopCssValue};`);
 
-          // If it's a reference to a primitive spacing value, directly use the corresponding CSS variable
-          if (parts[0] === "@primitives") {
-            const collectionKey = parts[1].replace("$", "");
-            const valueKey = parts[2].replace("$", "");
-            resolvedValue = `var(--${collectionKey}-${valueKey})`;
-            result.cssVariables.light.push(`${cssVarName}: ${resolvedValue};`);
-          } else {
-            // Otherwise, try to resolve the value normally
-            resolvedValue = resolveReference(value, variables);
-            const cssValue =
-              subCollectionKey === "font-family" && typeof resolvedValue === "string"
-                ? formatFontFamilyForCss(resolvedValue)
-                : isNumber
-                  ? convertToRem(resolvedValue)
-                  : resolvedValue;
-            result.cssVariables.light.push(`${cssVarName}: ${cssValue};`);
+        const mobileValue = tokenCollection[key].$variable_metadata?.modes?.mobile;
+        if (mobileValue !== undefined) {
+          const mobileCssValue = resolveTokenCssValue(mobileValue, resolveOptions);
+          if (mobileCssValue !== desktopCssValue) {
+            result.cssVariables.mobile.push(`${cssVarName}: ${mobileCssValue};`);
           }
-        } else {
-          // Not a reference, use directly
-          resolvedValue = value;
-          const cssValue =
-            subCollectionKey === "font-family" && typeof resolvedValue === "string"
-              ? formatFontFamilyForCss(resolvedValue)
-              : isNumber
-                ? convertToRem(resolvedValue)
-                : resolvedValue;
-          result.cssVariables.light.push(`${cssVarName}: ${cssValue};`);
         }
 
         // Add to JavaScript tokens
@@ -958,6 +969,15 @@ function generateCssContent(result) {
     content += `  ${variable}\n`;
   });
   content += "}\n";
+
+  // Mobile typography overrides (below Tailwind `md` / 768px)
+  if (result.cssVariables.mobile.length > 0) {
+    content += `\n${MOBILE_MEDIA_QUERY} {\n  :root {\n`;
+    result.cssVariables.mobile.forEach((variable) => {
+      content += `    ${variable}\n`;
+    });
+    content += "  }\n}\n";
+  }
 
   return content;
 }
