@@ -24,39 +24,33 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
       - name: Dispatch sync runs
         env:
           GH_TOKEN: ${{ secrets.GIT_PAT }}
           TARGET_REPO: ${{ vars.SYNC_REPO }}
-          BEFORE: ${{ github.event.before }}
-          AFTER: ${{ github.event.after }}
           MANUAL_SHA: ${{ inputs.sha }}
+          # everything we need is in the push payload — no checkout required
+          COMMITS_JSON: ${{ toJSON(github.event.commits) }}
         run: |
           set -euo pipefail
 
           if [ -n "${MANUAL_SHA:-}" ]; then
-            COMMITS="$MANUAL_SHA"
-          elif [ "$BEFORE" = "0000000000000000000000000000000000000000" ]; then
-            # branch (re)created — nothing incremental to sync
-            echo "branch bootstrap push, skipping"
+            echo "dispatch $MANUAL_SHA (manual)"
+            gh workflow run copybara_sync.yaml -R "$TARGET_REPO" \
+              -f copybara_workflow=lso-push-reverse \
+              -f source_ref="$MANUAL_SHA"
             exit 0
-          else
-            COMMITS=$(git rev-list --reverse "$BEFORE".."$AFTER")
           fi
 
-          for sha in $COMMITS; do
+          echo "$COMMITS_JSON" | jq -c '.[]' | while read -r c; do
+            sha=$(jq -r '.id' <<<"$c")
             # exported changes come back with a GitOrigin-RevId trailer
-            if git log -1 --format=%B "$sha" | grep -q '^GitOrigin-RevId:'; then
+            if jq -r '.message' <<<"$c" | grep -q '^GitOrigin-RevId:'; then
               echo "skip $sha: exported change"
               continue
             fi
-            if ! git diff-tree --no-commit-id --name-only -r "$sha" -- \
-                label_studio web deploy tools licenses LICENSE README.md | grep -q .; then
+            if ! jq -r '.added[], .modified[], .removed[]' <<<"$c" \
+                | grep -qE '^(label_studio/|web/|deploy/|tools/|licenses/|LICENSE$|README\.md$)'; then
               echo "skip $sha: no synced paths"
               continue
             fi
