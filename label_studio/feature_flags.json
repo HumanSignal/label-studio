@@ -5442,6 +5442,33 @@
       "version": 2,
       "deleted": false
     },
+    "fflag_fix_plt_1259_annotation_reviews_list_skip_history_results_04082026_short": {
+      "key": "fflag_fix_plt_1259_annotation_reviews_list_skip_history_results_04082026_short",
+      "on": true,
+      "prerequisites": [],
+      "targets": [],
+      "contextTargets": [],
+      "rules": [],
+      "fallthrough": {
+        "variation": 0
+      },
+      "offVariation": 1,
+      "variations": [
+        true,
+        false
+      ],
+      "clientSideAvailability": {
+        "usingMobileKey": false,
+        "usingEnvironmentId": false
+      },
+      "clientSide": false,
+      "salt": "d2031fea9a48455a910be51bede4b3e2",
+      "trackEvents": false,
+      "trackEventsFallthrough": false,
+      "debugEventsUntilDate": null,
+      "version": 2,
+      "deleted": false
+    },
     "fflag_fix_utc_1011_reviewed_then_updated_short": {
       "key": "fflag_fix_utc_1011_reviewed_then_updated_short",
       "on": true,
