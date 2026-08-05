@@ -1,3 +1,4 @@
+import contextlib
 import itertools
 import logging
 import time
@@ -201,3 +202,27 @@ def signal_clear_column_presence_cache(**_kwargs):
     so that the next migration can introspect the new column using has_column_cached()."""
     logger.debug('Clearing column presence cache in post_migrate signal')
     _column_presence_cache.clear()
+
+
+@contextlib.contextmanager
+def suppress_autotime(model, fields):
+    """Temporarily disable auto_now / auto_now_add on the named model fields.
+
+    Use as a context manager around a .save() call when you need to persist
+    caller-supplied timestamps on fields that are otherwise stamped
+    automatically by Django (e.g., importing rows with historical
+    created_at / updated_at values).
+    """
+    _original_values = {}
+    for field in model._meta.local_fields:
+        if field.name in fields:
+            _original_values[field.name] = {'auto_now': field.auto_now, 'auto_now_add': field.auto_now_add}
+            field.auto_now = False
+            field.auto_now_add = False
+    try:
+        yield
+    finally:
+        for field in model._meta.local_fields:
+            if field.name in fields:
+                field.auto_now = _original_values[field.name]['auto_now']
+                field.auto_now_add = _original_values[field.name]['auto_now_add']

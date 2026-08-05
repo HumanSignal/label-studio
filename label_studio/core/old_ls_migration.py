@@ -1,10 +1,10 @@
-import contextlib
 import datetime
 import io
 import json
 import os
 import pathlib
 
+from core.utils.db import suppress_autotime
 from core.utils.io import get_data_dir
 from core.utils.params import get_env
 from data_import.models import FileUpload
@@ -16,24 +16,6 @@ from io_storages.redis.models import RedisExportStorage, RedisImportStorage
 from io_storages.s3.models import S3ExportStorage, S3ImportStorage
 from ml.models import MLBackend
 from tasks.models import Annotation, Prediction, Task
-
-
-@contextlib.contextmanager
-def suppress_autotime(model, fields):
-    """allow to keep original created_at value for auto_now_add=True field"""
-    _original_values = {}
-    for field in model._meta.local_fields:
-        if field.name in fields:
-            _original_values[field.name] = {'auto_now': field.auto_now, 'auto_now_add': field.auto_now_add}
-            field.auto_now = False
-            field.auto_now_add = False
-    try:
-        yield
-    finally:
-        for field in model._meta.local_fields:
-            if field.name in fields:
-                field.auto_now = _original_values[field.name]['auto_now']
-                field.auto_now_add = _original_values[field.name]['auto_now_add']
 
 
 def _migrate_tasks(project_path, project):

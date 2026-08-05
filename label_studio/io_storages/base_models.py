@@ -20,6 +20,7 @@ import rq.exceptions
 from core.feature_flags import flag_set
 from core.redis import redis_connected, start_job_async_or_sync
 from core.utils.common import load_func
+from core.utils.db import suppress_autotime
 from core.utils.iterators import iterate_queryset
 from data_export.serializers import ExportDataSerializer
 from django.conf import settings
@@ -31,6 +32,7 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from fsm.functions import backfill_fsm_states_for_tasks
 from io_storages.utils import StorageObject, get_all_uris_via_regex, get_uri_via_regex, parse_bucket_uri
+from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 from rq.job import Job
 from tasks.models import Annotation, Task
@@ -41,6 +43,20 @@ from webhooks.utils import emit_webhooks_for_instance
 from .exceptions import UnsupportedFileFormatError
 
 logger = logging.getLogger(__name__)
+
+
+class _ImportAnnotationSerializer(AnnotationSerializer):
+    """Variant of AnnotationSerializer used by ImportStorage.add_task when
+    settings.PRESERVE_IMPORT_TIMESTAMPS is True. Overrides created_at and
+    updated_at so caller-supplied timestamps in the source JSON are not
+    silently dropped as read-only fields. The serializer.save() call must
+    still be wrapped in suppress_autotime(Annotation, ['created_at',
+    'updated_at']) so that Django's auto_now / auto_now_add flags don't
+    overwrite the values at the model layer.
+    """
+
+    created_at = serializers.DateTimeField(required=False)
+    updated_at = serializers.DateTimeField(required=False)
 
 
 class StorageInfo(models.Model):
@@ -544,14 +560,30 @@ class ImportStorage(Storage):
 
             # add annotations
             logger.debug(f'Create {len(annotations)} annotations for task={task}')
+            preserve_timestamps: bool = settings.PRESERVE_IMPORT_TIMESTAMPS
+            now_ts: datetime | None = timezone.now() if preserve_timestamps else None
             for annotation in annotations:
                 annotation['task'] = task.id
                 annotation['project'] = project.id
-            annotation_ser = AnnotationSerializer(data=annotations, many=True)
+                if preserve_timestamps:
+                    # Fill in 'now' for any missing timestamp so that
+                    # suppress_autotime never writes a NULL value.
+                    # Caller-supplied values (when present) win.
+                    annotation.setdefault('created_at', now_ts)
+                    annotation.setdefault('updated_at', now_ts)
+
+            if preserve_timestamps:
+                annotation_ser = _ImportAnnotationSerializer(data=annotations, many=True)
+            else:
+                annotation_ser = AnnotationSerializer(data=annotations, many=True)
 
             # Always validate annotations, but control error handling based on FF
             if annotation_ser.is_valid():
-                annotation_ser.save()
+                if preserve_timestamps:
+                    with suppress_autotime(Annotation, ['created_at', 'updated_at']):
+                        annotation_ser.save()
+                else:
+                    annotation_ser.save()
             else:
                 # Log validation errors but don't save invalid annotations
                 logger.error(f'Invalid annotations for task {task.id}: {annotation_ser.errors}')
