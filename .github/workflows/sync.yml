@@ -52,8 +52,8 @@ jobs:
               continue
             fi
             # the actions event context omits per-commit file lists — ask the API
-            files=$(gh api "repos/$GITHUB_REPOSITORY/commits/$sha" --jq '.files[].filename' | grep -v '^label_studio/feature_flags\.json$' || true)
-            if [ -n "$files" ] && ! grep -qE '^(label_studio/|web/|deploy/|tools/|licenses/|LICENSE$|README\.md$)' <<<"$files"; then
+            files=$(gh api "repos/$GITHUB_REPOSITORY/commits/$sha" --jq '.files[].filename' || true)
+            if [ -n "$files" ] && ! grep -v '^label_studio/feature_flags\.json$' <<<"$files" | grep -qE '^(label_studio/|web/|deploy/|tools/|licenses/|LICENSE$|README\.md$)'; then
               echo "skip $sha: no synced paths"
               continue
             fi
