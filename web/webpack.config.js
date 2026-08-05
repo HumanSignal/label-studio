@@ -97,7 +97,8 @@ module.exports = composePlugins(
       config.output = {
         ...config.output,
         uniqueName: "labelstudio",
-        publicPath:
+        chunkFilename: isDevelopment ? "[name].js" : "[name].[contenthash].js",
+          publicPath:
           isDevelopment && FRONTEND_HOSTNAME
             ? `${FRONTEND_HOSTNAME}/react-app/`
             : process.env.MODE === "standalone-playground"

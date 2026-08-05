@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { Circle, Group, Image, Layer, Rect } from "react-konva";
+import { Circle, Group, Image, Rect } from "react-konva";
 import { IconCheck, IconCross } from "@humansignal/icons";
 import Konva from "konva";
 import chroma from "chroma-js";
@@ -28,7 +28,7 @@ const getItemPosition = (item) => {
   };
 };
 
-export const SuggestionControls = observer(({ item, useLayer }) => {
+export const SuggestionControls = observer(({ item }) => {
   const position = getItemPosition(item);
   const [hovered, setHovered] = useState(false);
   const scale = 1 / item.parent.zoomScale;
@@ -39,33 +39,13 @@ export const SuggestionControls = observer(({ item, useLayer }) => {
       height: 32,
     };
 
-    const groupPosition = useLayer
-      ? {
-          x: 0,
-          y: 0,
-          scaleX: 1,
-          scaleY: 1,
-        }
-      : {
-          x: position.x,
-          y: position.y,
-          scaleX: scale,
-          scaleY: scale,
-        };
-
-    const layerPosition = useLayer
-      ? {
-          x: position.x,
-          y: position.y,
-          scaleX: scale,
-          scaleY: scale,
-        }
-      : {};
-
     const content = (
       <Group
         {...size}
-        {...groupPosition}
+        x={position.x}
+        y={position.y}
+        scaleX={scale}
+        scaleY={scale}
         opacity={item.highlighted || hovered ? 1 : 0.5}
         onMouseEnter={() => setHovered(true)}
         onMouseLeave={() => setHovered(false)}
@@ -87,13 +67,7 @@ export const SuggestionControls = observer(({ item, useLayer }) => {
       </Group>
     );
 
-    return useLayer ? (
-      <Layer {...size} {...layerPosition}>
-        {content}
-      </Layer>
-    ) : (
-      content
-    );
+    return content;
   }
   return null;
 });
