@@ -6,6 +6,9 @@ import ToolMixin from "../mixins/Tool";
 import { MultipleClicksDrawingTool } from "../mixins/DrawingTool";
 import { NodeViews } from "../components/Node/Node";
 import { observe } from "mobx";
+import { FF_POLYGON_FREEHAND, isFF } from "../utils/feature-flags";
+
+const FREEHAND_HISTORY_KEY = "polygon-freehand";
 
 const _Tool = types
   .model("PolygonTool", {
@@ -75,10 +78,76 @@ const _Tool = types
   .actions((self) => {
     let disposer;
     let closed;
+    let freehandHistoryFrozen = false;
+    let freehandFinishTimer = null;
+
+    const releaseFreehandHistory = () => {
+      if (!freehandHistoryFrozen) return;
+      freehandHistoryFrozen = false;
+      self.annotation.history.unfreeze(FREEHAND_HISTORY_KEY);
+    };
+
+    const finishFreehandDrawing = () => {
+      if (!self.isDrawing || !self.getCurrentArea()) {
+        releaseFreehandHistory();
+        return false;
+      }
+
+      self.annotation.regionStore.selection.drawingUnselect();
+      self.closeCurrent();
+      freehandFinishTimer = setTimeout(() => {
+        freehandFinishTimer = null;
+        if (!isAlive(self) || !self.isDrawing || !self.annotation.isDrawing || !self.getCurrentArea()) {
+          releaseFreehandHistory();
+          return;
+        }
+        self._finishDrawing();
+      });
+      return true;
+    };
 
     return {
+      canStartFreehand() {
+        return isFF(FF_POLYGON_FREEHAND) && self.canStartDrawing();
+      },
+      commitFreehand(points) {
+        if (!Array.isArray(points) || points.length < 3 || !self.canStartFreehand()) return false;
+
+        const validPoints = points.filter(
+          (point) => Array.isArray(point) && Number.isFinite(point[0]) && Number.isFinite(point[1]),
+        );
+
+        if (validPoints.length < 3) return false;
+
+        self.stopListening();
+        closed = false;
+        self.annotation.history.freeze(FREEHAND_HISTORY_KEY);
+        freehandHistoryFrozen = true;
+        try {
+          self.startDrawing(validPoints[0][0], validPoints[0][1]);
+
+          if (!self.isDrawing || !self.getCurrentArea()) {
+            releaseFreehandHistory();
+            return false;
+          }
+
+          validPoints.slice(1).forEach(([x, y]) => self.nextPoint(x, y));
+          if (self.getCurrentArea().points.length < 3) {
+            self.cleanupUncloseableShape();
+            releaseFreehandHistory();
+            return false;
+          }
+
+          return finishFreehandDrawing();
+        } catch (error) {
+          releaseFreehandHistory();
+          throw error;
+        }
+      },
       handleToolSwitch(tool) {
         self.stopListening();
+        releaseFreehandHistory();
+        if (freehandFinishTimer !== null) return;
         if (self.getCurrentArea()?.isDrawing && tool.toolName !== "ZoomPanTool") {
           const shape = self.getCurrentArea()?.toJSON();
 
@@ -100,7 +169,16 @@ const _Tool = types
         );
       },
       stopListening() {
-        if (disposer) disposer();
+        if (disposer) {
+          disposer();
+          disposer = null;
+        }
+      },
+      beforeDestroy() {
+        self.stopListening();
+        if (freehandFinishTimer !== null) clearTimeout(freehandFinishTimer);
+        freehandFinishTimer = null;
+        releaseFreehandHistory();
       },
       closeCurrent() {
         self.stopListening();
@@ -121,13 +199,17 @@ const _Tool = types
       },
 
       _finishDrawing() {
-        const { currentArea, control } = self;
+        try {
+          const { currentArea, control } = self;
 
-        self.currentArea.notifyDrawingFinished();
-        self.setDrawing(false);
-        self.currentArea = null;
-        self.mode = "viewing";
-        self.annotation.afterCreateResult(currentArea, control);
+          self.currentArea.notifyDrawingFinished();
+          self.setDrawing(false);
+          self.currentArea = null;
+          self.mode = "viewing";
+          self.annotation.afterCreateResult(currentArea, control);
+        } finally {
+          releaseFreehandHistory();
+        }
       },
 
       setDrawing(drawing) {

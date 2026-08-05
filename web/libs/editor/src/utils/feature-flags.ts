@@ -144,6 +144,9 @@ export const FF_VIDEO_FRAME_SEEK_PRECISION = "fflag_fix_front_optic_1608_improve
  */
 export const FF_FIT_1304_STRICT_OVERLAP = "fflag_feat_all_fit_1304_strict_overlap";
 
+/** Enable press-and-drag freehand drawing for Polygon tools. */
+export const FF_POLYGON_FREEHAND = "fflag_feat_front_polygon_freehand";
+
 Object.assign(window, {
   APP_SETTINGS: {
     ...(window.APP_SETTINGS ?? {}),

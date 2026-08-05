@@ -52,6 +52,10 @@
   position: absolute;
 }
 
+.freehand-enabled {
+  touch-action: none;
+}
+
 .image_position {
   position: absolute;
 
