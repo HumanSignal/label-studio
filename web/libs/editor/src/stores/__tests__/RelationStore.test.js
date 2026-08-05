@@ -227,6 +227,15 @@ describe("RelationStore", () => {
       expect(ser[0].labels).toEqual(["parent"]);
     });
 
+    it("serialize includes note when relation has a note", () => {
+      const { relationStore, regions } = createStoreWithTwoRectRegionsAndRelations();
+      const [r1, r2] = regions;
+      const rl = relationStore.addRelation(r1, r2);
+      rl.setNote("Review this relationship");
+      const ser = relationStore.serialize();
+      expect(ser[0].note).toBe("Review this relationship");
+    });
+
     it("deserializeRelation adds relation with direction and labels", () => {
       const { relationStore, regions } = createStoreWithTwoRectRegionsAndRelations();
       const [r1, r2] = regions;
@@ -235,6 +244,14 @@ describe("RelationStore", () => {
       const rl = relationStore.relations[0];
       expect(rl.direction).toBe("left");
       expect(rl.labels).toEqual(["child"]);
+    });
+
+    it("deserializeRelation restores note", () => {
+      const { relationStore, regions } = createStoreWithTwoRectRegionsAndRelations();
+      const [r1, r2] = regions;
+      relationStore.deserializeRelation(r1, r2, "left", ["child"], "Needs reviewer context");
+      const rl = relationStore.relations[0];
+      expect(rl.note).toBe("Needs reviewer context");
     });
 
     it("deserializeRelation does nothing when relation already exists", () => {
@@ -436,6 +453,14 @@ describe("Relation (model)", () => {
       const rl = relationStore.addRelation(r1, r2);
       rl.setRelations(["parent", "child"]);
       expect(rl.labels).toEqual(["parent", "child"]);
+    });
+
+    it("setNote updates note", () => {
+      const { relationStore, regions } = createStoreWithTwoRectRegionsAndRelations();
+      const [r1, r2] = regions;
+      const rl = relationStore.addRelation(r1, r2);
+      rl.setNote("This relationship is uncertain");
+      expect(rl.note).toBe("This relationship is uncertain");
     });
 
     it("toggleVisibility toggles visible", () => {

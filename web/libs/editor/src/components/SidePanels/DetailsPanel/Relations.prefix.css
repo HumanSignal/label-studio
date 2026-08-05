@@ -85,16 +85,43 @@
 
 .relation-meta {
   display: flex;
+  flex-direction: column;
+  gap: 8px;
   padding-left: 64px;
+  padding-right: 8px;
   padding-bottom: 5px;
-  align-items: center;
+  align-items: stretch;
 
   &__title {
     flex: none;
     padding-right: 8px;
   }
 
+  &__field {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  &__label {
+    color: var(--color-neutral-content-subtle);
+    font-size: 12px;
+    line-height: 16px;
+  }
+
   &__select {
     flex: 1;
+  }
+
+  &__note {
+    width: 100%;
+    min-height: 48px !important;
+    padding: 6px 8px !important;
+    border: 1px solid var(--color-neutral-border) !important;
+    border-radius: 4px !important;
+    background-color: var(--color-neutral-background) !important;
+    color: var(--color-neutral-content) !important;
+    font-size: 12px !important;
+    line-height: 18px !important;
   }
 }
