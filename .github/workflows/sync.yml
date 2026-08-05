@@ -3,9 +3,10 @@ name: Sync
 on:
   push:
     branches:
-      - copybara/lso-sync
+      - develop
     paths:
       - "label_studio/**"
+      - "!label_studio/feature_flags.json"
       - "web/**"
       - "deploy/**"
       - "tools/**"
@@ -51,7 +52,7 @@ jobs:
               continue
             fi
             # the actions event context omits per-commit file lists — ask the API
-            files=$(gh api "repos/$GITHUB_REPOSITORY/commits/$sha" --jq '.files[].filename' || true)
+            files=$(gh api "repos/$GITHUB_REPOSITORY/commits/$sha" --jq '.files[].filename' | grep -v '^label_studio/feature_flags\.json$' || true)
             if [ -n "$files" ] && ! grep -qE '^(label_studio/|web/|deploy/|tools/|licenses/|LICENSE$|README\.md$)' <<<"$files"; then
               echo "skip $sha: no synced paths"
               continue
