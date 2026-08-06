@@ -17,7 +17,7 @@ on:
 env:
   NODE: "22"
   CACHE_NAME_PREFIX: v1
-  POETRY_VERSION: 2.3.2
+  UV_VERSION: 0.10.2
   DJANGO_SETTINGS_MODULE: core.settings.label_studio
   COVERAGE_PROCESS_START: 1
   LOG_DIR: pytest_logs
@@ -52,15 +52,13 @@ jobs:
         with:
           ref: ${{ inputs.head_sha }}
 
-      - name: "Install poetry"
-        run: pipx install "poetry==${{ env.POETRY_VERSION }}"
-
-      - name: "Set up Python ${{ matrix.python-version }}"
-        id: setup_python
-        uses: actions/setup-python@v7
+      - name: "Set up uv with Python ${{ matrix.python-version }}"
+        uses: astral-sh/setup-uv@v7
         with:
+          version: ${{ env.UV_VERSION }}
           python-version: '${{ matrix.python-version }}'
-          cache: 'poetry'
+          enable-cache: true
+          cache-dependency-glob: "uv.lock"
 
       - name: Install OS dependencies
         run: |
@@ -68,14 +66,14 @@ jobs:
           sudo apt-get install libffi8 libldap2-dev libsasl2-dev libssl-dev libxml2-dev libxslt-dev python3-dev
 
       - name: Install Python dependencies
-        run: poetry install --with test
+        run: uv sync --frozen --group test
 
       - name: Generate version file
-        run: poetry run python label_studio/core/version.py
+        run: uv run --no-sync python label_studio/core/version.py
 
       - name: Run functional tests
         working-directory: label_studio
-        run: poetry run pytest --disable-warnings --durations=30 -n auto
+        run: uv run --no-sync pytest --disable-warnings --durations=30 -n auto
 
   run_pytest_postgresql:
     name: LS PostgreSQL Ubuntu
@@ -113,15 +111,13 @@ jobs:
         with:
           ref: ${{ inputs.head_sha }}
 
-      - name: "Install poetry"
-        run: pipx install "poetry==${{ env.POETRY_VERSION }}"
-
-      - name: "Set up Python ${{ matrix.python-version }}"
-        id: setup_python
-        uses: actions/setup-python@v7
+      - name: "Set up uv with Python ${{ matrix.python-version }}"
+        uses: astral-sh/setup-uv@v7
         with:
+          version: ${{ env.UV_VERSION }}
           python-version: '${{ matrix.python-version }}'
-          cache: 'poetry'
+          enable-cache: true
+          cache-dependency-glob: "uv.lock"
 
       - name: Install OS dependencies
         run: |
@@ -129,14 +125,14 @@ jobs:
           sudo apt-get install libffi8 libldap2-dev libsasl2-dev libssl-dev libxml2-dev libxslt-dev python3-dev
 
       - name: Install Python dependencies
-        run: poetry install --with test
+        run: uv sync --frozen --group test
 
       - name: Generate version file
-        run: poetry run python label_studio/core/version.py
+        run: uv run --no-sync python label_studio/core/version.py
 
       - name: Run functional tests
         working-directory: label_studio
-        run: poetry run pytest --disable-warnings --cov=. --cov-report=xml --junitxml=functional.xml --durations=30 -n auto
+        run: uv run --no-sync pytest --disable-warnings --cov=. --cov-report=xml --junitxml=functional.xml --durations=30 -n auto
 
       - name: Upload coverage to Codecov
         if: ${{ github.event.pull_request.head.repo.fork == false && github.event.pull_request.user.login != 'dependabot[bot]' }}
@@ -181,26 +177,24 @@ jobs:
         with:
           ref: ${{ inputs.head_sha }}
 
-      - name: "Install poetry"
-        run: pipx install "poetry==${{ env.POETRY_VERSION }}"
-
-      - name: "Set up Python ${{ matrix.python-version }}"
-        id: setup_python
-        uses: actions/setup-python@v7
+      - name: "Set up uv with Python ${{ matrix.python-version }}"
+        uses: astral-sh/setup-uv@v7
         with:
+          version: ${{ env.UV_VERSION }}
           python-version: '${{ matrix.python-version }}'
-          cache: 'poetry'
+          enable-cache: true
+          cache-dependency-glob: "uv.lock"
 
       - name: Install Python dependencies
-        run: poetry install --with test
+        run: uv sync --frozen --group test
 
       - name: Init project
         run: |
           set PYTHONIOENCODING=utf-8
           set PYTHONLEGACYWINDOWSSTDIO=utf-8
-          bash -c "poetry run label-studio init my_project --username test@test.com --password testpwd"
+          bash -c "uv run --no-sync label-studio init my_project --username test@test.com --password testpwd"
         shell: cmd
 
       - name: Test with pytest
         working-directory: label_studio
-        run: poetry run pytest --disable-warnings --durations=30 -n auto
+        run: uv run --no-sync pytest --disable-warnings --durations=30 -n auto

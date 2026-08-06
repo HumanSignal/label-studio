@@ -1,18 +1,18 @@
 # Run Django dev server with Sqlite
 run-dev:
-	DJANGO_DB=sqlite LOG_DIR=tmp DEBUG=true LOG_LEVEL=DEBUG DJANGO_SETTINGS_MODULE=core.settings.label_studio poetry run python label_studio/manage.py runserver
+	DJANGO_DB=sqlite LOG_DIR=tmp DEBUG=true LOG_LEVEL=DEBUG DJANGO_SETTINGS_MODULE=core.settings.label_studio uv run python label_studio/manage.py runserver
 
 # Run Django dev migrations with Sqlite
 migrate-dev:
-	DJANGO_DB=sqlite LOG_DIR=tmp DEBUG=true LOG_LEVEL=DEBUG DJANGO_SETTINGS_MODULE=core.settings.label_studio poetry run python label_studio/manage.py migrate
+	DJANGO_DB=sqlite LOG_DIR=tmp DEBUG=true LOG_LEVEL=DEBUG DJANGO_SETTINGS_MODULE=core.settings.label_studio uv run python label_studio/manage.py migrate
 
 # Run Django dev make migrations with Sqlite
 makemigrations-dev:
-	DJANGO_DB=sqlite LOG_DIR=tmp DEBUG=true LOG_LEVEL=DEBUG DJANGO_SETTINGS_MODULE=core.settings.label_studio poetry run python label_studio/manage.py makemigrations
+	DJANGO_DB=sqlite LOG_DIR=tmp DEBUG=true LOG_LEVEL=DEBUG DJANGO_SETTINGS_MODULE=core.settings.label_studio uv run python label_studio/manage.py makemigrations
 
 # Run Django dev shell environment with Sqlite
 shell-dev:
-	DJANGO_DB=sqlite LOG_DIR=tmp DEBUG=true LOG_LEVEL=DEBUG DJANGO_SETTINGS_MODULE=core.settings.label_studio poetry run python label_studio/manage.py shell_plus
+	DJANGO_DB=sqlite LOG_DIR=tmp DEBUG=true LOG_LEVEL=DEBUG DJANGO_SETTINGS_MODULE=core.settings.label_studio uv run python label_studio/manage.py shell_plus
 
 env-dev-setup:
 	if [ ! -f .env ]; then \
@@ -38,7 +38,7 @@ docker-collectstatic-dev:
 
 # Install modules
 frontend-install:
-	cd web && yarn install --frozen-lockfile;
+	cd web && bun install --frozen-lockfile;
 
 # Alias for backward compatibility
 frontend-setup: frontend-install
@@ -47,18 +47,18 @@ frontend-setup: frontend-install
 # For more information on HMR, see the "Environment Configuration" section in:
 # web/README.md
 frontend-dev:
-	cd web && yarn run dev
+	cd web && bun run dev
 
 # Build frontend continuously on files changes
 frontend-watch:
-	cd web && yarn run watch
+	cd web && bun run watch
 
 # Build production-ready optimized bundle
 frontend-build: frontend-setup
-	cd web && yarn run build
+	cd web && bun run build
 
 frontend-storybook-serve: frontend-setup
-	cd web && yarn run ui:serve
+	cd web && bun run ui:serve
 
 # Run tests
 test:
@@ -75,7 +75,7 @@ docker-testing-shell:
 
 # Update urls
 update-urls:
-	DJANGO_DB=sqlite LOG_DIR=tmp DEBUG=true LOG_LEVEL=DEBUG DJANGO_SETTINGS_MODULE=core.settings.label_studio poetry run python label_studio/manage.py show_urls --format pretty-json > ./label_studio/core/all_urls.json
+	DJANGO_DB=sqlite LOG_DIR=tmp DEBUG=true LOG_LEVEL=DEBUG DJANGO_SETTINGS_MODULE=core.settings.label_studio uv run python label_studio/manage.py show_urls --format pretty-json > ./label_studio/core/all_urls.json
 
 # Format changed files on branch
 fmt:
@@ -99,4 +99,4 @@ configure-hooks:
 
 # Generate swagger.json
 generate-swagger:
-	DJANGO_DB=sqlite LOG_DIR=tmp DEBUG=true LOG_LEVEL=DEBUG DJANGO_SETTINGS_MODULE=core.settings.label_studio poetry run python label_studio/manage.py generate_swagger swagger.json
+	DJANGO_DB=sqlite LOG_DIR=tmp DEBUG=true LOG_LEVEL=DEBUG DJANGO_SETTINGS_MODULE=core.settings.label_studio uv run python label_studio/manage.py generate_swagger swagger.json
