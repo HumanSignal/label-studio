@@ -70,8 +70,7 @@ jobs:
         run: uv run --no-sync python label_studio/core/version.py
 
       - name: Run functional tests
-        working-directory: label_studio
-        run: uv run --no-sync pytest --disable-warnings --durations=30 -n auto
+        run: uv run --no-sync pytest label_studio --disable-warnings --durations=30 -n auto
 
   run_pytest_postgresql:
     name: LS PostgreSQL Ubuntu
@@ -82,8 +81,8 @@ jobs:
         python-version: [ '3.13' ]
     env:
       DJANGO_DB: default
-      COVERAGE_PROCESS_START: .coveragerc
-      PYTHONPATH: .
+      COVERAGE_PROCESS_START: label_studio/.coveragerc
+      PYTHONPATH: label_studio
       LOG_LEVEL: ERROR
       SENTRY_ENVIRONMENT: tests-ubuntu-postgresql
 
@@ -128,8 +127,7 @@ jobs:
         run: uv run --no-sync python label_studio/core/version.py
 
       - name: Run functional tests
-        working-directory: label_studio
-        run: uv run --no-sync pytest --disable-warnings --cov=. --cov-report=xml --junitxml=functional.xml --durations=30 -n auto
+        run: uv run --no-sync pytest label_studio --disable-warnings --cov=label_studio --cov-report=xml --junitxml=functional.xml --durations=30 -n auto
 
       - name: Upload coverage to Codecov
         if: ${{ github.event.pull_request.head.repo.fork == false && github.event.pull_request.user.login != 'dependabot[bot]' }}
@@ -137,7 +135,7 @@ jobs:
         with:
           name: codecov-python-${{ matrix.python-version }}
           flags: pytests
-          files: ./label_studio/coverage.xml
+          files: ./coverage.xml
           token: ${{ secrets.CODECOV_TOKEN }}
           verbose: true
           fail_ci_if_error: true
@@ -146,7 +144,7 @@ jobs:
         if: ${{ github.event.pull_request.head.repo.fork == false && github.event.pull_request.user.login != 'dependabot[bot]' }}
         uses: codecov/test-results-action@v1
         with:
-          files: ./label_studio/functional.xml
+          files: ./functional.xml
           name: codecov-general-test-results
           flags: functional
           token: ${{ secrets.CODECOV_TOKEN }}
@@ -192,5 +190,4 @@ jobs:
         shell: cmd
 
       - name: Test with pytest
-        working-directory: label_studio
-        run: uv run --no-sync pytest --disable-warnings --durations=30 -n auto
+        run: uv run --no-sync pytest label_studio --disable-warnings --durations=30 -n auto

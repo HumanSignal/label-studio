@@ -62,7 +62,7 @@ frontend-storybook-serve: frontend-setup
 
 # Run tests
 test:
-	cd label_studio && DJANGO_DB=sqlite pytest -v -m "not integration_tests"
+	DJANGO_DB=sqlite uv run pytest label_studio -v -m "not integration_tests"
 
 # Build image which includes test dependencies, for unit testing within docker
 build-testing-image:
