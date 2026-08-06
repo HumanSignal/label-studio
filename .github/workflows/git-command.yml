@@ -52,7 +52,7 @@ jobs:
           base_branch: ${{ github.event.client_payload.slash_command.args.unnamed.arg2 || github.event.client_payload.pull_request.base.ref }}
           base_repository: ${{ github.event.client_payload.pull_request.base.repo.full_name }}
           head_sha: ${{ github.event.client_payload.pull_request.head.sha }}
-          our_files: "pyproject.toml poetry.lock web"
+          our_files: "pyproject.toml uv.lock web"
 
       - name: Git Push
         if: steps.merge.outputs.result == 'true'

@@ -33,7 +33,7 @@ jobs:
             const base_sha = '${{ github.event.merge_group.base_sha || github.event.pull_request.base.sha || github.event.before }}'
             const pyProjectPath = 'pyproject.toml';
             
-            async function getPoetryVersion(ref) {
+            async function getProjectVersion(ref) {
               const {data: commit} = await github.rest.repos.getCommit({
                 owner,
                 repo,
@@ -72,10 +72,10 @@ jobs:
               return 0;
             }
             
-            const base_version = await getPoetryVersion(base_sha);
+            const base_version = await getProjectVersion(base_sha);
             console.log(`Base version: ${base_version}`);
             
-            const head_version = await getPoetryVersion(head_sha);
+            const head_version = await getProjectVersion(head_sha);
             console.log(`Head version: ${head_version}`);
             
             const compare = await compareVersions(base_version, head_version);

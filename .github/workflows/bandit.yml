@@ -32,7 +32,7 @@ jobs:
 
       - name: Install Bandit
         run: |
-          pip install bandit
+          pip install bandit==1.9.4
 
       - name: Install custom bandit plugins
         run: pip install ./tools/bandit_ls_custom_checks
