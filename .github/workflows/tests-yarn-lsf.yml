@@ -128,8 +128,8 @@ jobs:
           echo "Build output:"
           ls -la dist/libs/editor/
           test -f dist/libs/editor/index.html || (echo "Missing index.html" && exit 1)
-          # Ensure CSS is present (webpack emits main.css or similar)
-          if ! find dist/libs/editor -maxdepth 1 -name "*.css" -print -quit | grep -q .; then
+          # Ensure CSS is present (vite emits hashed CSS under assets/)
+          if ! find dist/libs/editor -name "*.css" -print -quit | grep -q .; then
             echo "No CSS file in build - styles may not load. Contents:"
             ls dist/libs/editor/
             exit 1
