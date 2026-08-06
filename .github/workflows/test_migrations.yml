@@ -16,7 +16,6 @@ env:
   LABEL_STUDIO_TEST_ENVIRONMENT: false
   SENTRY_RATE: 0
   JSON_LOG: 0
-  POETRY_VERSION: 2.3.2
 
 jobs:
   sqlite-migrations:
@@ -35,15 +34,12 @@ jobs:
         with:
           ref: ${{ inputs.ref }}
 
-      - name: "Install poetry"
-        run: pipx install "poetry==${{ env.POETRY_VERSION }}"
-
-      - name: "Set up Python"
-        id: setup_python
-        uses: actions/setup-python@v7
+      - name: "Set up uv"
+        uses: astral-sh/setup-uv@v7
         with:
           python-version: '3.13'
-          cache: 'poetry'
+          enable-cache: true
+          cache-dependency-glob: "uv.lock"
 
       - name: "Install OS dependencies"
         run: |
@@ -51,11 +47,11 @@ jobs:
           sudo apt-get install libsasl2-dev python3-dev libldap2-dev libssl-dev libxml2-dev libxslt-dev
 
       - name: "Install dependencies"
-        run: poetry install
+        run: uv sync --frozen
 
       - name: "Test migrations"
         run: |
-          output=$(poetry run python label_studio/manage.py makemigrations)
+          output=$(uv run --no-sync python label_studio/manage.py makemigrations)
           if ! grep 'No changes detected' <<< "${output}"; then
             error="${output}"
             error="${error//'%'/'%25'}"
@@ -98,15 +94,12 @@ jobs:
           ref: ${{ inputs.ref }}
           fetch-depth: 2147483647
 
-      - name: "Install poetry"
-        run: pipx install "poetry==${{ env.POETRY_VERSION }}"
-
-      - name: "Set up Python"
-        id: setup_python
-        uses: actions/setup-python@v7
+      - name: "Set up uv"
+        uses: astral-sh/setup-uv@v7
         with:
           python-version: '3.13'
-          cache: 'poetry'
+          enable-cache: true
+          cache-dependency-glob: "uv.lock"
 
       - name: "Install OS dependencies"
         run: |
@@ -115,12 +108,12 @@ jobs:
 
       - name: "Install dependencies"
         run: |
-          poetry install
+          uv sync --frozen
 
       - name: "Test migrations"
         run: |
-          poetry run python label_studio/manage.py makemigrations
+          uv run --no-sync python label_studio/manage.py makemigrations
 
       - name: "Lint migrations"
         run: |
-          poetry run python label_studio/manage.py lintmigrations --warnings-as-errors --project-root-path '.' --git-commit-id ${{ github.event.pull_request.base.sha || github.event.before }}
+          uv run --no-sync python label_studio/manage.py lintmigrations --warnings-as-errors --project-root-path '.' --git-commit-id ${{ github.event.pull_request.base.sha || github.event.before }}

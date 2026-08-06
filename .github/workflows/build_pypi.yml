@@ -64,7 +64,6 @@ env:
   PYTHON_VERSION_FILE: "pyproject.toml"
   FRONTEND_MONOREPO_DIR: "web"
   NODE: "22"
-  POETRY_VERSION: 2.3.2
 
 jobs:
   pypi:
@@ -105,33 +104,30 @@ jobs:
 
       - name: "Build"
         working-directory: "${{ env.FRONTEND_MONOREPO_DIR }}"
-        run: yarn build
+        run: bun run build
 
       - name: "Generate version files"
         continue-on-error: true
         working-directory: "${{ env.FRONTEND_MONOREPO_DIR }}"
-        run: yarn version:libs
+        run: bun run version:libs
 
-      - name: "Install poetry"
-        run: pipx install "poetry==${{ env.POETRY_VERSION }}"
-
-      - name: "Set up Python"
-        id: setup_python
-        uses: actions/setup-python@v7
+      - name: "Set up uv"
+        uses: astral-sh/setup-uv@v7
         with:
           python-version: '3.13'
-          cache: 'poetry'
+          enable-cache: true
+          cache-dependency-glob: "uv.lock"
 
       - name: Install Python dependencies
-        run: poetry install --with build
+        run: uv sync --frozen --group build
 
       - name: Collect static
-        run: poetry run python label_studio/manage.py collectstatic
+        run: uv run --no-sync python label_studio/manage.py collectstatic
 
       - name: Package
         env:
           VERSION_OVERRIDE: ${{ inputs.version }}
-        run: poetry build
+        run: uv build
 
       - name: Attach artifacts to release
         if: inputs.release-id
@@ -155,10 +151,12 @@ jobs:
 
       - name: Check SDK version is not git sha
         if: inputs.release_type == 'release'
-        run: grep 'label-studio-sdk (==[0-9]\+\.[0-9]\+\.[0-9]\+)' pyproject.toml
+        run: |
+          grep -E 'label-studio-sdk\s*(\(==|==)\s*[0-9]+\.[0-9]+\.[0-9]+' pyproject.toml
+          ! grep -q 'label-studio-sdk = { git' pyproject.toml
 
       - name: Check Build
-        run: poetry run twine check dist/*
+        run: uv run --no-sync twine check dist/*
 
       - name: Upload to PYPI
         if: inputs.upload_to_pypi
@@ -166,7 +164,7 @@ jobs:
           TWINE_USERNAME: __token__
           TWINE_PASSWORD: ${{ inputs.upload_to_pypi && secrets.PYPI_APIKEY || secrets.PYPI_APIKEY_TEST }}
           TWINE_REPOSITORY_URL: ${{ inputs.upload_to_pypi && 'https://upload.pypi.org/legacy/' || 'https://test.pypi.org/legacy/' }}
-        run: poetry run twine upload dist/*
+        run: uv run --no-sync twine upload dist/*
 
       - name: Get PyPI package details
         id: pypi-package-details
