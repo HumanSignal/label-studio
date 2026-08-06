@@ -17,7 +17,6 @@ on:
 env:
   NODE: "22"
   CACHE_NAME_PREFIX: v1
-  UV_VERSION: 0.10.2
   DJANGO_SETTINGS_MODULE: core.settings.label_studio
   COVERAGE_PROCESS_START: 1
   LOG_DIR: pytest_logs
@@ -55,7 +54,6 @@ jobs:
       - name: "Set up uv with Python ${{ matrix.python-version }}"
         uses: astral-sh/setup-uv@v7
         with:
-          version: ${{ env.UV_VERSION }}
           python-version: '${{ matrix.python-version }}'
           enable-cache: true
           cache-dependency-glob: "uv.lock"
@@ -114,7 +112,6 @@ jobs:
       - name: "Set up uv with Python ${{ matrix.python-version }}"
         uses: astral-sh/setup-uv@v7
         with:
-          version: ${{ env.UV_VERSION }}
           python-version: '${{ matrix.python-version }}'
           enable-cache: true
           cache-dependency-glob: "uv.lock"
@@ -180,7 +177,6 @@ jobs:
       - name: "Set up uv with Python ${{ matrix.python-version }}"
         uses: astral-sh/setup-uv@v7
         with:
-          version: ${{ env.UV_VERSION }}
           python-version: '${{ matrix.python-version }}'
           enable-cache: true
           cache-dependency-glob: "uv.lock"

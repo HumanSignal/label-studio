@@ -16,7 +16,6 @@ env:
   LABEL_STUDIO_TEST_ENVIRONMENT: false
   SENTRY_RATE: 0
   JSON_LOG: 0
-  UV_VERSION: 0.10.2
 
 jobs:
   sqlite-migrations:
@@ -38,7 +37,6 @@ jobs:
       - name: "Set up uv"
         uses: astral-sh/setup-uv@v7
         with:
-          version: ${{ env.UV_VERSION }}
           python-version: '3.13'
           enable-cache: true
           cache-dependency-glob: "uv.lock"
@@ -99,7 +97,6 @@ jobs:
       - name: "Set up uv"
         uses: astral-sh/setup-uv@v7
         with:
-          version: ${{ env.UV_VERSION }}
           python-version: '3.13'
           enable-cache: true
           cache-dependency-glob: "uv.lock"

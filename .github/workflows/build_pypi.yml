@@ -64,7 +64,6 @@ env:
   PYTHON_VERSION_FILE: "pyproject.toml"
   FRONTEND_MONOREPO_DIR: "web"
   NODE: "22"
-  UV_VERSION: 0.10.2
 
 jobs:
   pypi:
@@ -115,7 +114,6 @@ jobs:
       - name: "Set up uv"
         uses: astral-sh/setup-uv@v7
         with:
-          version: ${{ env.UV_VERSION }}
           python-version: '3.13'
           enable-cache: true
           cache-dependency-glob: "uv.lock"

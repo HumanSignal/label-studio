@@ -9,7 +9,6 @@ on:
 
 env:
   CACHE_NAME_PREFIX: v1
-  UV_VERSION: 0.10.2
 
 jobs:
   conda:
@@ -48,7 +47,6 @@ jobs:
       - name: "Set up uv"
         uses: astral-sh/setup-uv@v7
         with:
-          version: ${{ env.UV_VERSION }}
           python-version: '3.13'
           enable-cache: true
           cache-dependency-glob: "uv.lock"
