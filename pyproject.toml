@@ -109,6 +109,7 @@ test = [
     "moto>=4.2.6",
     "requests-mock==1.12.1",
     "factory-boy>=3.3.3,<4",
+    "grpcio-reflection==1.78.0 ; python_full_version < '3.11'",
 ]
 build = [
     "twine>=6.1.0",
