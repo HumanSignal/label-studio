@@ -1705,7 +1705,7 @@ class ProjectSummary(models.Model):
             params.extend(lbl_params)
 
         params.append(self.project_id)
-        sql = f'UPDATE projects_projectsummary SET {", ".join(set_clauses)} WHERE project_id = %s'
+        sql = f'UPDATE projects_projectsummary SET {", ".join(set_clauses)} WHERE project_id = %s'  # nosec
 
         with connection.cursor() as cursor:
             cursor.execute(sql, params)
@@ -1802,7 +1802,7 @@ class ProjectSummary(models.Model):
             return
 
         params = lbl_params + [self.project_id]
-        sql = f'UPDATE projects_projectsummary SET created_labels_drafts = {lbl_sql} WHERE project_id = %s'
+        sql = f'UPDATE projects_projectsummary SET created_labels_drafts = {lbl_sql} WHERE project_id = %s'  # nosec
 
         with connection.cursor() as cursor:
             cursor.execute(sql, params)

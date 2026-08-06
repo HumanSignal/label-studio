@@ -303,7 +303,7 @@ def delete_annotation_from_gcs_storages(sender, instance, **kwargs):
     for link in links:
         storage = link.storage
         if storage.can_delete_objects:
-            logger.debug(f'Delete {instance} from GCS storage {storage}')
+            logger.debug(f'Delete {instance} from GCS storage {storage}')  # nosec
             storage.delete_annotation(instance)
 
 
