@@ -9,9 +9,14 @@ meta_description: Annotate document images into a DoclingDocument with layout re
 ---
 
 
-This template creates a Docling document annotation Interface for turning document images into a structured [`DoclingDocument`](https://github.com/docling-project/docling) — layout regions, reading order, table structure, and key/value pairs — with in-browser OCR and a live DocLang XML preview.
+This template creates a Docling document annotation Interface for turning document images into a structured `DoclingDocument` — layout regions, reading order, table structure, and key/value pairs — with in-browser OCR and a live DocLang XML preview.
 
 Annotators draw layout regions (text, section headers, lists, tables, pictures, formulas, code, key/value, and more), set the reading order and other element relationships with paths, mark up table grid and semantic structure, transcribe text with one-click in-browser OCR, and watch the resulting `<doclang>` XML render in real time — producing the structured output that document-conversion and Document AI teams need to build DoclingDocument datasets.
+
+!!! info Part of the Docling ecosystem
+    [Docling](https://docling-project.github.io/docling/) is an open-source toolkit that parses documents (PDFs, images, and more) into a structured `DoclingDocument`. This Interface is the human-in-the-loop annotation and review layer for that format.
+
+    To pre-label documents automatically before review, pair it with the [Docling ML backend](https://github.com/HumanSignal/label-studio-ml-backend/tree/master/label_studio_ml/examples/docling). It sends each document to **IBM Docling SaaS** — the hosted Docling conversion service you connect to with a tenant URL and API key from [Docling Workbench](https://docling-project.github.io/docling/) — and returns the layout as `rectanglelabels` / `polygonlabels` predictions this Interface reads, so annotators correct Docling's output instead of starting from a blank page.
 
 ![Screenshot](/images/templates-misc/interface-docling.png)
 
