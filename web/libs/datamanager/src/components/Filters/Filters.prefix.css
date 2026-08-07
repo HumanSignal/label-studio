@@ -5,6 +5,8 @@
   &:not(&_sidebar) {
     padding-top: var(--spacing-tight);
     min-width: 400px;
+    max-width: min(640px, calc(100vw - 32px));
+    overflow-x: hidden;
     border-radius: var(--corner-radius-small);
     box-shadow:
       0 3px 6px -4px rgb(0 0 0 / 12%),

@@ -340,4 +340,49 @@ describe("Data Manager user multi-select search", () => {
     const selectedItemsGroup = await screen.findByRole("button", { name: /Selected items group/ });
     expect(selectedItemsGroup).toHaveAttribute("aria-label", "Selected items group, 3 items selected");
   });
+
+  it("FIT-2394: truncates the closed trigger for many selected users", async () => {
+    const allUsers = [users.mattOne, users.mattTwo, users.other, users.reviewer];
+    const selectedIds = allUsers.map(({ id }) => id);
+    const apiCall = mock((_method: string, _params: Record<string, unknown>) => {
+      return Promise.resolve({ results: allUsers, count: allUsers.length });
+    });
+    window.DM = { store: { apiCall } };
+    const queryClient = new QueryClient({
+      defaultOptions: { queries: { retry: false, cacheTime: 0 } },
+    });
+    queryClient.setQueryData(["users", 42, 10, false, null, null, selectedIds], {
+      pages: [{ results: allUsers, count: allUsers.length }],
+      pageParams: [undefined],
+    });
+
+    render(
+      <QueryClientProvider client={queryClient}>
+        <UserSelect
+          filter={{ view: { project: { id: 42 } } }}
+          multiple={true}
+          value={selectedIds}
+          onChange={() => {}}
+          placeholder="Select annotators"
+        />
+      </QueryClientProvider>,
+    );
+
+    const summary = await screen.findByTestId("user-select-trigger-summary");
+    expect(summary).toHaveTextContent("Matt One");
+    expect(summary).toHaveTextContent("+3");
+    expect(screen.getByLabelText("3 more selected")).toBeInTheDocument();
+
+    // Closed trigger must not dump every selected name/email (overflow / page-edge break).
+    expect(summary).not.toHaveTextContent("Matt Two");
+    expect(summary).not.toHaveTextContent("Other User");
+    expect(summary).not.toHaveTextContent("Review User");
+    expect(summary).not.toHaveTextContent("matt.two@example.test");
+    expect(summary).not.toHaveTextContent("other@example.test");
+    expect(summary).not.toHaveTextContent("reviewer@example.test");
+
+    // Wired into Select's closed-trigger slot (not a detached node).
+    expect(screen.getByTestId("select-display-value")).toContainElement(summary);
+    expect(screen.getByRole("button", { name: /Matt One/ })).toContainElement(summary);
+  });
 });

@@ -19,6 +19,24 @@ const normalizeSelectedValue = (value, multiple) => {
 export const getUserOptionLabel = (user: { email?: string | null }, displayName: string) =>
   user.email && user.email !== displayName ? `${displayName} (${user.email})` : displayName;
 
+/** Compact closed-trigger summary for multi-select — first user + overflow count (FIT-2394). */
+export type UserSelectSelectedOption = {
+  raw?: { displayName?: string | null; email?: string | null } | null;
+  label?: unknown;
+};
+
+export const summarizeSelectedUsers = (
+  selectedOptions: UserSelectSelectedOption[] | undefined,
+  placeholder?: string,
+): { primaryLabel: string; overflowCount: number } => {
+  if (!selectedOptions?.length) {
+    return { primaryLabel: placeholder ?? "", overflowCount: 0 };
+  }
+  const first = selectedOptions[0];
+  const primaryLabel = first.raw?.displayName?.trim() || first.raw?.email?.trim() || placeholder || "Selected";
+  return { primaryLabel, overflowCount: Math.max(0, selectedOptions.length - 1) };
+};
+
 export const UserSelect = observer(({ filter, onChange, multiple, value, placeholder, disabled }) => {
   const [search, setSearch] = useState(null);
   const selectedValue = useMemo(() => normalizeSelectedValue(value, multiple), [multiple, value]);
@@ -82,13 +100,53 @@ export const UserSelect = observer(({ filter, onChange, multiple, value, placeho
     );
   }, []);
 
+  const renderSelected = useCallback(
+    (selectedOptions, selectPlaceholder) => {
+      if (!selectedOptions?.length) {
+        return <span className="truncate w-full">{selectPlaceholder ?? placeholder}</span>;
+      }
+
+      // Single selection: keep the rich option label in the trigger.
+      if (!multiple || selectedOptions.length === 1) {
+        return (
+          selectedOptions[0]?.label ?? (
+            <span className="truncate w-full">
+              {summarizeSelectedUsers(selectedOptions, selectPlaceholder).primaryLabel}
+            </span>
+          )
+        );
+      }
+
+      const { primaryLabel, overflowCount } = summarizeSelectedUsers(selectedOptions, selectPlaceholder);
+      const firstUser = selectedOptions[0]?.raw;
+
+      return (
+        <span
+          className="flex min-w-0 max-w-full items-center gap-1 overflow-hidden"
+          data-testid="user-select-trigger-summary"
+        >
+          {firstUser ? <Userpic user={firstUser} size={16} /> : null}
+          <Typography as="span" size="smallest" className="min-w-0 truncate">
+            {primaryLabel}
+          </Typography>
+          {overflowCount > 0 ? (
+            <span className="shrink-0 text-neutral-content-subtler" aria-label={`${overflowCount} more selected`}>
+              +{overflowCount}
+            </span>
+          ) : null}
+        </span>
+      );
+    },
+    [multiple, placeholder],
+  );
+
   // Convert users data to options format for Select component
   return (
     <Select
       options={options}
       value={selectedValue}
       onChange={_onChange}
-      triggerClassName={`${cn("form-select").elem("list").toString()} w-[200px]`}
+      triggerClassName={`${cn("form-select").elem("list").toString()} w-full max-w-[200px] min-w-0`}
       loadMore={loadMore}
       size={SelectSize.SMALL}
       placeholder={placeholder}
@@ -100,6 +158,7 @@ export const UserSelect = observer(({ filter, onChange, multiple, value, placeho
       onSearch={debouncedSearch}
       searchFilter={searchFilter}
       itemCount={total}
+      renderSelected={renderSelected}
     />
   );
 });
