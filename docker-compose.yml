@@ -4,8 +4,7 @@ services:
     image: heartexlabs/label-studio:latest
     restart: unless-stopped
     ports:
-      - "8080:8085"
-      - "8081:8086"
+      - "8085:8085"
     depends_on:
       - app
     environment:
@@ -19,6 +18,7 @@ services:
     #      - NGINX_SSL_CERT_KEY=/certs/cert.key
     volumes:
       - ./mydata:/label-studio/data:rw
+      - E:/data:/label-studio/data/external:ro
       - ./deploy/nginx/certs:/certs:ro
     #   Optional: Override nginx default conf
     #      - ./deploy/my.conf:/etc/nginx/nginx.conf
@@ -43,9 +43,12 @@ services:
       - POSTGRE_HOST=db
       - LABEL_STUDIO_HOST=${LABEL_STUDIO_HOST:-}
       - JSON_LOG=1
+      - LABEL_STUDIO_LOCAL_FILES_DOCUMENT_ROOT=/label-studio/data
+      - LABEL_STUDIO_LOCAL_FILES_SERVING_ENABLED=true
     #      - LOG_LEVEL=DEBUG
     volumes:
       - ./mydata:/label-studio/data:rw
+      - E:/data:/label-studio/data/external:ro
     command: label-studio-uwsgi
 
   db:

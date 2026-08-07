@@ -14,6 +14,7 @@ import { isDefined } from "../../utils/helpers";
 import { ImportModal } from "../CreateProject/Import/ImportModal";
 import { ExportPage } from "../ExportPage/ExportPage";
 import { APIConfig } from "./api-config";
+import { getInteractiveContextResult } from "./interactive-context";
 
 import "./DataManager.prefix.css";
 
@@ -157,8 +158,8 @@ export const DataManagerPage = ({ ...props }) => {
     if (interactiveBacked) {
       dataManager.on("lsf:regionFinishedDrawing", (reg, group) => {
         const { lsf, task, currentAnnotation: annotation } = dataManager.lsf;
-        const ids = group.map((r) => r.cleanId);
-        const result = annotation.serializeAnnotation().filter((res) => ids.includes(res.id));
+        const serializedAnnotation = annotation.serializeAnnotation();
+        const result = getInteractiveContextResult(serializedAnnotation, reg, group);
 
         const suggestionsRequest = api.callApi("mlInteractive", {
           params: { pk: interactiveBacked.id },
