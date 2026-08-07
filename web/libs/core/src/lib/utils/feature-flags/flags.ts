@@ -9,11 +9,6 @@
 // Consider all pre-XFN flags legacy. Should be revised and removed.
 
 /**
- * Model version selector per model backend
- */
-export const FF_DEV_1682 = "ff_front_dev_1682_model_version_dropdown_070622_short";
-
-/**
  * Enables "Enterprise Awareness" features
  */
 export const FF_LSDV_E_297 = "fflag_feat_front_lsdv_e_297_increase_oss_to_enterprise_adoption_short";
