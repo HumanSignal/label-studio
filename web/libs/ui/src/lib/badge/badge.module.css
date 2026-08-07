@@ -48,6 +48,10 @@
   white-space: normal;
   align-items: center;
 
+  .closeButton {
+    --badge-close-icon-size: 18px;
+  }
+
   .icon svg,
   .iconTrailing svg {
     width: 16px;
@@ -528,6 +532,9 @@
 
 /* Close button */
 .closeButton {
+  --badge-close-icon-size: 12px;
+
+  position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -545,8 +552,19 @@
     opacity: 1;
   }
 
+  /* Reaches the 24px minimum target size without growing the badge or shifting its content. */
+  &::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 24px;
+    height: 24px;
+    transform: translate(-50%, -50%);
+  }
+
   & svg {
-    width: 12px;
-    height: 12px;
+    width: var(--badge-close-icon-size);
+    height: var(--badge-close-icon-size);
   }
 }
