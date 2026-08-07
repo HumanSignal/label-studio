@@ -247,3 +247,9 @@ export const FF_CONTRIBUTOR_OPT_IN = "fflag_feat_utc_1064_contributor_opt_in";
  * (default, today's behavior), review acceptance score, or rejection rate.
  */
 export const FF_ANNOTATOR_EVALUATION_METRIC = "fflag_feat_utc_1085_annotator_evaluation_metric";
+
+/**
+ * Review stream "By Annotator" task ordering: review one annotator's work at a
+ * time for a configured coverage percent before rotating to another annotator.
+ */
+export const FF_UTC_1079_REVIEW_ORDER_BY_ANNOTATOR = "fflag_feat_utc_1079_review_order_by_annotator";
