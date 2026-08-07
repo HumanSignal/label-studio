@@ -52,22 +52,6 @@
     }
   }
 
-  &__group {
-    flex: 0;
-    display: grid;
-    grid-template-columns: min-content 1fr;
-    grid-gap: 2px;
-    align-items: flex-start;
-  }
-
-  &__selector {
-    flex: 1;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: var(--spacing-tightest);
-  }
-
   &__unavailable {
     grid-column: 2 / -1;
     color: var(--color-neutral-content-subtler);

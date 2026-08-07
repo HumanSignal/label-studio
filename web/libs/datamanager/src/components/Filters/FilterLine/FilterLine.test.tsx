@@ -5,6 +5,8 @@ import { afterEach, describe, expect, it, mock } from "bun:test";
 import { observer } from "mobx-react";
 import { TabStore } from "../../../stores/Tabs/store";
 import { FilterLine, UnavailableFilterNotice, isFilterEditingDisabled } from "./FilterLine";
+import { useRecentFilters } from "../../../hooks/useRecentFilters";
+import { filtersToPickerGroups } from "../../Common/ColumnPicker";
 
 const RootStore = types
   .model({
@@ -173,25 +175,15 @@ const createMultiChildFilter = ({ childCount = 2 }: { childCount?: number } = {}
   return { root, view: root.viewsStore.views[0], filter: root.viewsStore.views[0].filters[0] };
 };
 
-const FilterLineHarness = observer(
-  ({ view, sidebar }: { view: ReturnType<typeof createUnavailableFilter>["view"]; sidebar: boolean }) => (
-    <>
-      {view.filters.map((filter, index) => (
-        <FilterLine
-          key={filter.id}
-          filter={filter}
-          availableFilters={[]}
-          pickerFilters={view.availableFilters}
-          index={index}
-          view={view}
-          sidebar={sidebar}
-        />
-      ))}
-    </>
-  ),
-);
+const FilterLineHarness = observer(({ view }: { view: ReturnType<typeof createUnavailableFilter>["view"] }) => (
+  <>
+    {view.filters.map((filter, index) => (
+      <FilterLine key={filter.id} filter={filter} pickerFilters={view.availableFilters} index={index} view={view} />
+    ))}
+  </>
+));
 
-const renderFilterLine = (view: ReturnType<typeof createUnavailableFilter>["view"], sidebar: boolean) => {
+const renderFilterLine = (view: ReturnType<typeof createUnavailableFilter>["view"]) => {
   const queryClient = new QueryClient({
     defaultOptions: { queries: { retry: false } },
   });
@@ -204,7 +196,7 @@ const renderFilterLine = (view: ReturnType<typeof createUnavailableFilter>["view
 
   return render(
     <QueryClientProvider client={queryClient}>
-      <FilterLineHarness view={view} sidebar={sidebar} />
+      <FilterLineHarness view={view} />
     </QueryClientProvider>,
   );
 };
@@ -224,7 +216,7 @@ describe("Dimension result filter cardinality (FIT-2241)", () => {
     it(`shows ${label} for ${multiple ? "set-valued" : "scalar"} Dimensions`, () => {
       const setup = createFilter({ available: true, multiple });
       root = setup.root;
-      renderFilterLine(setup.view, false);
+      renderFilterLine(setup.view);
 
       expect(within(screen.getByTestId("filter-line-operator")).getByRole("button")).toHaveTextContent(label);
     });
@@ -242,7 +234,7 @@ describe("multiple child filter controls (FIT-2273)", () => {
   it("renders an enabled allowed-child dropdown and add-child control", () => {
     const setup = createMultiChildFilter({ childCount: 1 });
     root = setup.root;
-    renderFilterLine(setup.view, false);
+    renderFilterLine(setup.view);
 
     const childColumnDropdown = screen.getByRole("button", { name: "Annotators" });
     expect(childColumnDropdown).toBeEnabled();
@@ -263,7 +255,7 @@ describe("multiple child filter controls (FIT-2273)", () => {
   it("renders multiple child rows and removes only the selected row", () => {
     const setup = createMultiChildFilter();
     root = setup.root;
-    renderFilterLine(setup.view, false);
+    renderFilterLine(setup.view);
 
     expect(screen.getByRole("button", { name: "Annotators" })).toBeEnabled();
     expect(screen.getByRole("button", { name: "Ground Truth" })).toBeEnabled();
@@ -302,24 +294,139 @@ describe("unavailable saved filters (FIT-2173)", () => {
     expect(isFilterEditingDisabled({ disabled: false, filter_available: true })).toBe(false);
   });
 
-  for (const sidebar of [false, true]) {
-    it(`identifies, disables, preserves, and removes an unavailable filter in the ${
-      sidebar ? "sidebar" : "main"
-    } layout`, async () => {
-      const setup = createUnavailableFilter();
-      root = setup.root;
-      renderFilterLine(setup.view, sidebar);
+  it("identifies, disables, preserves, and removes an unavailable filter", async () => {
+    const setup = createUnavailableFilter();
+    root = setup.root;
+    renderFilterLine(setup.view);
 
-      expect(screen.getByText("Sentiment")).toBeInTheDocument();
-      expect(screen.getByRole("status")).toHaveTextContent("saved value is preserved");
-      expect(within(screen.getByTestId("filter-line-operator")).getByRole("button")).toBeDisabled();
-      expect(within(screen.getByTestId("filter-line-value")).getByRole("button")).toBeDisabled();
-      expect(setup.filter.currentValue).toEqual(["positive"]);
-      await waitFor(() => expect(setup.filter.saving).toBe(false));
+    expect(screen.getByText("Sentiment")).toBeInTheDocument();
+    expect(screen.getByRole("status")).toHaveTextContent("saved value is preserved");
+    expect(within(screen.getByTestId("filter-line-operator")).getByRole("button")).toBeDisabled();
+    expect(within(screen.getByTestId("filter-line-value")).getByRole("button")).toBeDisabled();
+    expect(setup.filter.currentValue).toEqual(["positive"]);
+    await waitFor(() => expect(setup.filter.saving).toBe(false));
 
-      fireEvent.click(screen.getByRole("button", { name: "Remove filter" }));
+    fireEvent.click(screen.getByRole("button", { name: "Remove filter" }));
 
-      expect(setup.view.filters).toHaveLength(0);
-    });
-  }
+    expect(setup.view.filters).toHaveLength(0);
+  });
+});
+
+const dataParentColumnsRaw = [
+  {
+    id: "id",
+    title: "ID",
+    type: "Number",
+    target: "tasks",
+    visibility_defaults: { filter: true },
+  },
+  {
+    id: "data",
+    title: "Data",
+    type: "List",
+    target: "tasks",
+    children: ["image"],
+    hidden: true,
+  },
+  {
+    id: "image",
+    title: "image",
+    type: "Image",
+    target: "tasks",
+    parent: "data",
+    visibility_defaults: { filter: true },
+  },
+  {
+    id: "total_annotations",
+    title: "Annotations",
+    type: "Number",
+    target: "tasks",
+    visibility_defaults: { filter: true },
+  },
+];
+
+const createDataParentFilter = () => {
+  const root = RootStore.create({ viewsStore: { columnsRaw: dataParentColumnsRaw } });
+  root.viewsStore.fetchColumns();
+  unprotect(root);
+  root.viewsStore.views.push({
+    id: 1,
+    title: "Saved",
+    saved: true,
+    key: "saved",
+    filters: [
+      {
+        filter: "filter:tasks:id",
+        operator: "equal",
+        value: 1,
+      },
+    ],
+  });
+  root.viewsStore.selected = 1;
+  return { root, view: root.viewsStore.views[0], filter: root.viewsStore.views[0].filters[0] };
+};
+
+/**
+ * Filter rows always use ColumnPicker with parent-hierarchy groups (FIT-2433).
+ */
+const UnifiedFilterLineHarness = observer(({ view }: { view: ReturnType<typeof createDataParentFilter>["view"] }) => {
+  const { recentEntries } = useRecentFilters(1);
+  return (
+    <>
+      {view.filters.map((filter, index) => (
+        <FilterLine
+          key={filter.id}
+          filter={filter}
+          pickerFilters={view.availableFilters}
+          recentEntries={recentEntries}
+          index={index}
+          view={view}
+        />
+      ))}
+    </>
+  );
+});
+
+describe("filter column dropdown (FIT-2433)", () => {
+  let root: ReturnType<typeof RootStore.create> | null = null;
+
+  afterEach(() => {
+    if (root) destroy(root);
+    root = null;
+  });
+
+  it("uses ColumnPicker parent-hierarchy section headers (e.g. Data, not target-based Tasks)", () => {
+    const setup = createDataParentFilter();
+    root = setup.root;
+
+    const expectedGroups = filtersToPickerGroups(setup.view.availableFilters as any)
+      .map((group) => group.title)
+      .filter(Boolean);
+
+    expect(expectedGroups).toContain("Data");
+    expect(expectedGroups).toContain("Task");
+
+    const originalScrollIntoView = Element.prototype.scrollIntoView;
+    Element.prototype.scrollIntoView = mock();
+
+    try {
+      const queryClient = new QueryClient({
+        defaultOptions: { queries: { retry: false } },
+      });
+      (window as any).DM = { apiCall: mock(async () => ({ count: 0, results: [] })) };
+
+      render(
+        <QueryClientProvider client={queryClient}>
+          <UnifiedFilterLineHarness view={setup.view} />
+        </QueryClientProvider>,
+      );
+
+      fireEvent.click(screen.getByTestId("select-trigger-col:filter:tasks:id"));
+
+      expect(screen.getAllByText("Data").length).toBeGreaterThan(0);
+      expect(screen.queryByText("Tasks")).not.toBeInTheDocument();
+    } finally {
+      Element.prototype.scrollIntoView = originalScrollIntoView;
+    }
+  });
 });
