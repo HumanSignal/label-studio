@@ -19,7 +19,13 @@ const injector = inject(({ store }) => {
 
 export const FieldsButton = injector(
   observer(({ view, columns, title, icon, filter, tooltip, className, "data-testid": dataTestId }) => {
-    const value = useMemo(() => columns.filter((c) => !c.is_hidden).map((c) => c.key), [columns]);
+    // `is_hidden` is observable, so it has to be read on every render: memoizing on `columns`
+    // alone froze the selection at whatever was visible when the column list was last rebuilt,
+    // and the picker restored that stale selection whenever it remounted (FIT-2406). The memo
+    // only keeps the array reference stable, since ColumnPicker re-seeds on a new `value`.
+    const visibleColumnKeys = columns.filter((c) => !c.is_hidden).map((c) => c.key);
+    const visibleColumnsSignature = visibleColumnKeys.join("\u0000");
+    const value = useMemo(() => visibleColumnKeys, [visibleColumnsSignature]);
     const disabled = view?.isLockedByManager;
     const effectiveTooltip = disabled ? view.lockedUpdateMessage : tooltip;
 
