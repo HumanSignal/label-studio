@@ -527,6 +527,11 @@ SPECTACULAR_SETTINGS = {
             ('completed', 'Completed'),
             ('completed_with_errors', 'Completed with errors'),
         ),
+        # Task assignment type (Annotate / Review) used by assignees mutation APIs.
+        'AssignmentTypeEnum': (
+            ('AN', 'Annotate'),
+            ('RE', 'Review'),
+        ),
     },
 }
 

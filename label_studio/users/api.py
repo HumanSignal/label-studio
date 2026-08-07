@@ -21,59 +21,6 @@ from users.serializers import HotkeysSerializer, UserSerializer, UserSerializerU
 
 logger = logging.getLogger(__name__)
 
-_user_schema = {
-    'type': 'object',
-    'properties': {
-        'id': {
-            'type': 'integer',
-            'description': 'User ID',
-        },
-        'first_name': {
-            'type': 'string',
-            'description': 'First name of the user',
-        },
-        'last_name': {
-            'type': 'string',
-            'description': 'Last name of the user',
-        },
-        'username': {
-            'type': 'string',
-            'description': 'Username of the user',
-        },
-        'email': {
-            'type': 'string',
-            'description': 'Email of the user',
-        },
-        'avatar': {
-            'type': 'string',
-            'description': 'Avatar URL of the user',
-        },
-        'initials': {
-            'type': 'string',
-            'description': 'Initials of the user',
-        },
-        'phone': {
-            'type': 'string',
-            'description': 'Phone number of the user',
-        },
-        'allow_newsletters': {
-            'type': 'boolean',
-            'description': 'Whether the user allows newsletters',
-        },
-    },
-}
-
-_user_update_schema = {
-    **_user_schema,
-    'properties': {
-        **_user_schema['properties'],
-        'id': {
-            **_user_schema['properties']['id'],
-            'x-fern-property-name': 'request_user_id',
-        },
-    },
-}
-
 
 @method_decorator(
     name='update',
@@ -111,9 +58,7 @@ _user_update_schema = {
         tags=['Users'],
         summary='Create new user',
         description='Create a user in Label Studio.',
-        request={
-            'application/json': _user_schema,
-        },
+        request=UserSerializer,
         responses={201: UserSerializer},
         extensions={
             'x-fern-sdk-group-name': 'users',
@@ -151,9 +96,7 @@ _user_update_schema = {
         parameters=[
             OpenApiParameter(name='id', type=OpenApiTypes.INT, location='path', description='User ID'),
         ],
-        request={
-            'application/json': _user_update_schema,
-        },
+        request=UserSerializerUpdate,
         responses={200: UserSerializer},
         extensions={
             'x-fern-sdk-group-name': 'users',

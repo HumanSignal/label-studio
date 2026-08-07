@@ -69,34 +69,6 @@ logger = logging.getLogger(__name__)
 
 ProjectImportPermission = load_func(settings.PROJECT_IMPORT_PERMISSION)
 
-_result_schema = {
-    'title': 'Labeling result',
-    'description': 'Labeling result (choices, labels, bounding boxes, etc.)',
-    'type': 'object',
-    'properties': {
-        'from_name': {
-            'type': 'string',
-            'description': 'The name of the labeling tag from the project config',
-        },
-        'to_name': {
-            'type': 'string',
-            'description': 'The name of the labeling tag from the project config',
-        },
-        'value': {
-            'type': 'object',
-            'description': 'Labeling result value. Format depends on chosen ML backend',
-        },
-    },
-    'example': {'from_name': 'image_class', 'to_name': 'image', 'value': {'labels': ['Cat']}},
-}
-
-_task_data_schema = {
-    'title': 'Task data',
-    'description': 'Task data',
-    'type': 'object',
-    'example': {'id': 1, 'my_image_url': '/static/samples/kittens.jpg'},
-}
-
 
 class ProjectListPagination(PageNumberPagination):
     page_size = 30

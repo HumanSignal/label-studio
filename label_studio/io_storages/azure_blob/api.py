@@ -17,13 +17,12 @@ from io_storages.api import (
 )
 from io_storages.azure_blob.models import AzureBlobExportStorage, AzureBlobImportStorage
 from io_storages.azure_blob.serializers import AzureBlobExportStorageSerializer, AzureBlobImportStorageSerializer
+from io_storages.serializers import build_storage_validate_serializer, build_storage_write_serializer
 
-from .openapi_schema import (
-    _azure_blob_export_storage_schema,
-    _azure_blob_export_storage_schema_with_id,
-    _azure_blob_import_storage_schema,
-    _azure_blob_import_storage_schema_with_id,
-)
+AzureBlobImportStorageWriteSerializer = build_storage_write_serializer(AzureBlobImportStorageSerializer)
+AzureBlobImportStorageValidateSerializer = build_storage_validate_serializer(AzureBlobImportStorageSerializer)
+AzureBlobExportStorageWriteSerializer = build_storage_write_serializer(AzureBlobExportStorageSerializer)
+AzureBlobExportStorageValidateSerializer = build_storage_validate_serializer(AzureBlobExportStorageSerializer)
 
 
 @method_decorator(
@@ -55,9 +54,7 @@ from .openapi_schema import (
         tags=['Storage: Azure'],
         summary='Create new storage',
         description='Create new Azure import storage',
-        request={
-            'application/json': _azure_blob_import_storage_schema,
-        },
+        request=AzureBlobImportStorageWriteSerializer,
         extensions={
             'x-fern-sdk-group-name': ['import_storage', 'azure'],
             'x-fern-sdk-method-name': 'create',
@@ -90,9 +87,7 @@ class AzureBlobImportStorageListAPI(ImportStorageListAPI):
         tags=['Storage: Azure'],
         summary='Update import storage',
         description='Update a specific Azure import storage connection.',
-        request={
-            'application/json': _azure_blob_import_storage_schema,
-        },
+        request=AzureBlobImportStorageWriteSerializer,
         extensions={
             'x-fern-sdk-group-name': ['import_storage', 'azure'],
             'x-fern-sdk-method-name': 'update',
@@ -169,9 +164,7 @@ class AzureBlobExportStorageSyncAPI(ExportStorageSyncAPI):
         tags=['Storage: Azure'],
         summary='Validate import storage',
         description='Validate a specific Azure import storage connection.',
-        request={
-            'application/json': _azure_blob_import_storage_schema_with_id,
-        },
+        request=AzureBlobImportStorageValidateSerializer,
         responses={200: OpenApiResponse(description='Validation successful')},
         extensions={
             'x-fern-sdk-group-name': ['import_storage', 'azure'],
@@ -190,9 +183,7 @@ class AzureBlobImportStorageValidateAPI(ImportStorageValidateAPI):
         tags=['Storage: Azure'],
         summary='Validate export storage',
         description='Validate a specific Azure export storage connection.',
-        request={
-            'application/json': _azure_blob_export_storage_schema_with_id,
-        },
+        request=AzureBlobExportStorageValidateSerializer,
         responses={200: OpenApiResponse(description='Validation successful')},
         extensions={
             'x-fern-sdk-group-name': ['export_storage', 'azure'],
@@ -233,9 +224,7 @@ class AzureBlobExportStorageValidateAPI(ExportStorageValidateAPI):
         tags=['Storage: Azure'],
         summary='Create export storage',
         description='Create a new Azure export storage connection to store annotations.',
-        request={
-            'application/json': _azure_blob_export_storage_schema,
-        },
+        request=AzureBlobExportStorageWriteSerializer,
         extensions={
             'x-fern-sdk-group-name': ['export_storage', 'azure'],
             'x-fern-sdk-method-name': 'create',
@@ -268,9 +257,7 @@ class AzureBlobExportStorageListAPI(ExportStorageListAPI):
         tags=['Storage: Azure'],
         summary='Update export storage',
         description='Update a specific Azure export storage connection.',
-        request={
-            'application/json': _azure_blob_export_storage_schema,
-        },
+        request=AzureBlobExportStorageWriteSerializer,
         extensions={
             'x-fern-sdk-group-name': ['export_storage', 'azure'],
             'x-fern-sdk-method-name': 'update',

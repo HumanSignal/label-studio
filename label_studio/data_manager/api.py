@@ -12,10 +12,11 @@ from data_manager.actions import get_action_form, get_all_actions, perform_actio
 from data_manager.functions import evaluate_predictions, get_prepare_params
 from data_manager.managers import get_fields_for_evaluation
 from data_manager.models import View
-from data_manager.prepare_params import filters_schema, ordering_schema, prepare_params_schema
 from data_manager.serializers import (
     DataManagerTaskSerializer,
+    PrepareParamsRequestSerializer,
     ViewOrderSerializer,
+    ViewRequestSerializer,
     ViewResetSerializer,
     ViewSerializer,
 )
@@ -42,20 +43,6 @@ from tasks.ordering import (
 
 logger = logging.getLogger(__name__)
 
-_view_request_body = {
-    'application/json': {
-        'type': 'object',
-        'properties': {
-            'data': {
-                'type': 'object',
-                'description': 'Custom view data',
-                'properties': {'filters': filters_schema, 'ordering': ordering_schema},
-            },
-            'project': {'type': 'integer', 'description': 'Project ID'},
-        },
-    },
-}
-
 
 @method_decorator(
     name='list',
@@ -79,7 +66,7 @@ _view_request_body = {
         tags=['Data Manager'],
         summary='Create view',
         description='Create a view for a specific project.',
-        request=_view_request_body,
+        request=ViewRequestSerializer,
         responses={201: ViewSerializer},
         extensions={
             'x-fern-sdk-group-name': 'views',
@@ -110,7 +97,7 @@ _view_request_body = {
         tags=['Data Manager'],
         summary='Put view',
         description='Overwrite view data with updated filters and other information for a specific project.',
-        request=_view_request_body,
+        request=ViewRequestSerializer,
         parameters=[
             OpenApiParameter(name='id', type=OpenApiTypes.STR, location='path', description='View ID'),
         ],
@@ -128,7 +115,7 @@ _view_request_body = {
         parameters=[
             OpenApiParameter(name='id', type=OpenApiTypes.STR, location='path', description='View ID'),
         ],
-        request=_view_request_body,
+        request=ViewRequestSerializer,
         responses={200: ViewSerializer},
         extensions={
             'x-fern-sdk-group-name': 'views',
@@ -165,6 +152,11 @@ class ViewAPI(viewsets.ModelViewSet):
         PUT=all_permissions.views_change,
         DELETE=all_permissions.views_delete,
     )
+
+    def get_serializer_class(self):
+        if self.action == 'update_order':
+            return ViewOrderSerializer
+        return super().get_serializer_class()
 
     def perform_create(self, serializer):
         project = serializer.validated_data.get('project')
@@ -656,9 +648,7 @@ class ProjectStateAPI(APIView):
             'Call `GET api/actions?project=<id>` to explore them. <br>'
             'Example: `GET api/actions?id=delete_tasks&project=1`'
         ),
-        request={
-            'application/json': prepare_params_schema,
-        },
+        request=PrepareParamsRequestSerializer,
         parameters=[
             OpenApiParameter(
                 name='id',
