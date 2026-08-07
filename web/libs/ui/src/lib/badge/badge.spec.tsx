@@ -9,6 +9,17 @@ jest.mock("./badge.module.css", () => ({
 }));
 
 describe("Badge close button", () => {
+  it("is reachable in the tab order", () => {
+    render(<Badge onClose={() => {}}>Apple</Badge>);
+
+    const close = screen.getByRole("button", { name: "Remove Apple" });
+    close.focus();
+
+    expect(close).toHaveFocus();
+    // A negative tabindex left keyboard users with no way to remove a chip at all.
+    expect(close).not.toHaveAttribute("tabindex");
+  });
+
   it("names itself after plain text content", () => {
     render(<Badge onClose={() => {}}>Fluent</Badge>);
 

@@ -552,6 +552,12 @@
     opacity: 1;
   }
 
+  &:focus-visible {
+    opacity: 1;
+    outline: 2px solid var(--color-primary-focus-outline);
+    outline-offset: 1px;
+  }
+
   /* Reaches the 24px minimum target size without growing the badge or shifting its content. */
   &::after {
     content: "";

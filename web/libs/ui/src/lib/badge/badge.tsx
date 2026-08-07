@@ -176,7 +176,6 @@ export const Badge = forwardRef<HTMLDivElement, BadgeProps>(
                   onClose(e);
                 }}
                 aria-label={closeLabel ?? (typeof children === "string" ? `Remove ${children}` : "Remove")}
-                tabIndex={-1}
               >
                 <IconClose />
               </button>
