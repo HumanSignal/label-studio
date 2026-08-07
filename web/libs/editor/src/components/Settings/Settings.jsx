@@ -10,10 +10,13 @@ import { cn } from "../../utils/bem";
 import EditorSettings from "../../core/settings/editorsettings";
 import * as TagSettings from "./TagSettings";
 import { IconClose } from "@humansignal/icons";
-import { ModalWindow, Toggle } from "@humansignal/ui";
+import { ModalWindow, Toggle, Typography } from "@humansignal/ui";
 import { ff, isAnnotatorRole } from "@humansignal/core";
+import { getProjectHotkeysSettingsPath, getProjectIdFromPathname } from "@humansignal/core/lib/utils/hotkeysProject";
 
 const HotkeysDescription = () => {
+  const projectId = getProjectIdFromPathname(window.location.pathname);
+  const customizationPath = projectId ? getProjectHotkeysSettingsPath(projectId) : "/user/account/hotkeys";
   const columns = [
     { title: "Shortcut", dataIndex: "combo", key: "combo" },
     { title: "Description", dataIndex: "descr", key: "descr" },
@@ -57,6 +60,15 @@ const HotkeysDescription = () => {
           );
         })}
       </Tabs>
+      <Typography
+        as="a"
+        variant="body"
+        size="small"
+        href={customizationPath}
+        className="text-primary-content hover:underline hover:text-primary-content-hover"
+      >
+        {projectId ? "Customize for this project" : "Customize hotkeys"}
+      </Typography>
     </div>
   );
 };

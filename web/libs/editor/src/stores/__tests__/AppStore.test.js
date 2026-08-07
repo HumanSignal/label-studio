@@ -38,6 +38,7 @@ const hotkeyMockFactory = () => {
   HotkeyFn.setScope = mock();
   HotkeyFn.DEFAULT_SCOPE = "default";
   HotkeyFn.keymap = keymap;
+  HotkeyFn.namespaces = mock(() => ({}));
   HotkeyFn.unbindAll = mock();
   return {
     __esModule: true,

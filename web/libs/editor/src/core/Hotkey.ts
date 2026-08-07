@@ -415,7 +415,9 @@ Hotkey.keymap = { ...defaultKeymap } as Keymap;
 Hotkey.setKeymap = (newKeymap: Keymap) => {
   validateKeymap(newKeymap);
 
-  Object.assign(Hotkey.keymap, newKeymap);
+  // Replace (do not Object.assign-merge) so sparse overlays from a prior project
+  // cannot leak keys that are absent from the new map.
+  Hotkey.keymap = { ...defaultKeymap, ...newKeymap } as Keymap;
 };
 
 Hotkey.keysDescipritions = () => _hotkeys_desc;

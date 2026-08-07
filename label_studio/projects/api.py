@@ -28,6 +28,7 @@ from drf_spectacular.utils import OpenApiExample, OpenApiParameter, OpenApiRespo
 from label_studio_sdk.label_interface.interface import LabelInterface
 from ml.serializers import MLBackendSerializer
 from projects.functions.next_task import get_next_task
+from projects.functions.search import search_projects
 from projects.functions.stream_history import get_label_stream_history
 from projects.functions.utils import recalculate_created_annotations_and_labels_from_scratch
 from projects.models import Project, ProjectImport, ProjectManager, ProjectReimport, ProjectSummary
@@ -143,25 +144,68 @@ class ProjectListAPI(generics.ListCreateAPIView):
     )
     pagination_class = ProjectListPagination
 
+    def get_sparse_fields(self):
+        """Return fields selected by rest-flex-fields, or None for the normal full response."""
+        sparse_fields = self.request.query_params.get('fields')
+        if not sparse_fields:
+            return None
+        return [field.strip() for field in sparse_fields.split(',') if field.strip()]
+
+    def get_requested_fields(self, serializer=None):
+        """Return fields needed for list enrichment, preferring sparse response fields over count includes."""
+        sparse_fields = self.get_sparse_fields()
+        if sparse_fields is not None:
+            return sparse_fields
+
+        if serializer is None:
+            serializer = GetFieldsSerializer(data=self.request.query_params)
+            serializer.is_valid(raise_exception=True)
+        return serializer.validated_data.get('include')
+
     def get_queryset(self):
         serializer = GetFieldsSerializer(data=self.request.query_params)
         serializer.is_valid(raise_exception=True)
-        fields = serializer.validated_data.get('include')
+        fields = self.get_requested_fields(serializer)
+        sparse_fields = self.get_sparse_fields()
         filter = serializer.validated_data.get('filter')
         projects = Project.objects.filter(organization=self.request.user.active_organization).order_by(
             F('pinned_at').desc(nulls_last=True), '-created_at'
         )
+        search = serializer.validated_data.get('search')
+        if search:
+            projects = search_projects(projects, search)
         if filter in ['pinned_only', 'exclude_pinned']:
             projects = projects.filter(pinned_at__isnull=filter == 'exclude_pinned')
-        projects = ProjectManager.with_counts_annotate(projects, fields=fields)
+        if fields is None or set(fields) & set(ProjectManager.COUNTER_FIELDS):
+            projects = ProjectManager.with_counts_annotate(projects, fields=fields)
 
         # Only annotate FSM state for UI/API consumption when both feature flags are enabled
-        if flag_set('fflag_feat_fit_568_finite_state_management', user=self.request.user) and flag_set(
-            'fflag_feat_fit_710_fsm_state_fields', user=self.request.user
+        state_requested = (
+            sparse_fields is None
+            or 'state' in sparse_fields
+            or 'state' in self.request.query_params.get('ordering', '')
+            or bool(self.request.query_params.get('state'))
+        )
+        if (
+            state_requested
+            and flag_set('fflag_feat_fit_568_finite_state_management', user=self.request.user)
+            and flag_set('fflag_feat_fit_710_fsm_state_fields', user=self.request.user)
         ):
             projects = projects.with_state()
 
-        return projects.prefetch_related('members', 'created_by')
+        prefetch_fields = []
+        if sparse_fields is None or 'members' in sparse_fields:
+            prefetch_fields.append('members')
+        if sparse_fields is None or 'created_by' in sparse_fields:
+            prefetch_fields.append('created_by')
+        return projects.prefetch_related(*prefetch_fields) if prefetch_fields else projects
+
+    def get_serializer(self, *args, **kwargs):
+        sparse_fields = self.get_sparse_fields()
+        if self.request.method == 'GET' and sparse_fields is not None:
+            fields_param = settings.REST_FLEX_FIELDS.get('FIELDS_PARAM', 'fields')
+            kwargs[fields_param] = sparse_fields
+        return super().get_serializer(*args, **kwargs)
 
     def get_serializer_context(self):
         context = super(ProjectListAPI, self).get_serializer_context()

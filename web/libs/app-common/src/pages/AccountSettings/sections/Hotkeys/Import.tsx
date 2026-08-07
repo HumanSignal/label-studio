@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Button, ModalWindow, Message } from "@humansignal/ui";
+import { Button, ModalWindow, Message, Typography } from "@humansignal/ui";
 import { ff } from "@humansignal/core";
 import {
   Dialog,
@@ -33,7 +33,7 @@ interface ImportData {
 interface ImportDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onImport: (data: ImportData | Hotkey[]) => void | Promise<void>;
+  onImport: (data: ImportData | Hotkey[]) => boolean | Promise<boolean>;
 }
 
 /**
@@ -50,6 +50,7 @@ export const ImportDialog = ({ open, onOpenChange, onImport }: ImportDialogProps
   const [importText, setImportText] = useState<string>("");
   // State for validation errors
   const [error, setError] = useState<string>("");
+  const [isImporting, setIsImporting] = useState(false);
 
   /**
    * Validates a single hotkey object structure
@@ -74,7 +75,7 @@ export const ImportDialog = ({ open, onOpenChange, onImport }: ImportDialogProps
    * Handles the import process
    * Parses JSON, validates structure, and calls the onImport callback
    */
-  const handleImport = (): void => {
+  const handleImport = async (): Promise<void> => {
     try {
       // Clear any previous errors
       setError("");
@@ -120,14 +121,15 @@ export const ImportDialog = ({ open, onOpenChange, onImport }: ImportDialogProps
       });
 
       // If validation passes, proceed with import
-      onImport(parsedData as ImportData | Hotkey[]);
-
-      // Reset the dialog state
-      resetDialogState();
+      setIsImporting(true);
+      const imported = await onImport(parsedData as ImportData | Hotkey[]);
+      if (imported) resetDialogState();
     } catch (err: unknown) {
       // Set error message for display
       const errorMessage = err instanceof Error ? err.message : "Unknown error occurred";
       setError(errorMessage);
+    } finally {
+      setIsImporting(false);
     }
   };
 
@@ -203,7 +205,7 @@ export const ImportDialog = ({ open, onOpenChange, onImport }: ImportDialogProps
             <Button
               variant="primary"
               onClick={handleImport}
-              disabled={!importText.trim()}
+              disabled={!importText.trim() || isImporting}
               data-testid="hotkeys-import-submit"
             >
               Import Hotkeys
@@ -212,9 +214,14 @@ export const ImportDialog = ({ open, onOpenChange, onImport }: ImportDialogProps
         }
       >
         <div className="grid gap-4">
-          <p className="typography-body-small text-neutral-content-subtle m-0" id="hotkeys-import-instructions">
+          <Typography
+            variant="body"
+            size="small"
+            className="text-neutral-content-subtle m-0"
+            id="hotkeys-import-instructions"
+          >
             {importInstructions}
-          </p>
+          </Typography>
           {importFormBody}
         </div>
       </ModalWindow>
@@ -223,15 +230,15 @@ export const ImportDialog = ({ open, onOpenChange, onImport }: ImportDialogProps
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[525px] bg-neutral-surface">
+      <DialogContent className="sm:max-w-[525px] bg-neutral-surface" aria-describedby="hotkeys-import-instructions">
         <DialogHeader>
           <DialogTitle>Import Hotkeys</DialogTitle>
         </DialogHeader>
 
         <div className="grid gap-4 py-4">
-          <DialogDescription className="m-0" id="hotkeys-import-instructions">
-            {importInstructions}
-          </DialogDescription>
+          <div id="hotkeys-import-instructions">
+            <DialogDescription className="m-0">{importInstructions}</DialogDescription>
+          </div>
           {importFormBody}
         </div>
 
@@ -239,7 +246,7 @@ export const ImportDialog = ({ open, onOpenChange, onImport }: ImportDialogProps
           <Button variant="neutral" onClick={handleCancel}>
             Cancel
           </Button>
-          <Button onClick={handleImport} disabled={!importText.trim()}>
+          <Button onClick={handleImport} disabled={!importText.trim() || isImporting}>
             Import Hotkeys
           </Button>
         </DialogFooter>
