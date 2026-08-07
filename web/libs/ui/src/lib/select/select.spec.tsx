@@ -836,6 +836,112 @@ describe("Select Component", () => {
     });
   });
 
+  describe("readOnly", () => {
+    const groupedOptions = [
+      { key: "id", title: "ID", value: "id" },
+      { key: "agreement", title: "Agreement", value: "agreement", group: "Agreement" },
+      { key: "dim_1", title: "Dimension 1", value: "dim_1", group: "Agreement" },
+    ];
+
+    it("keeps the trigger enabled so the dropdown can open", async () => {
+      render(
+        <Select
+          options={["Apple", "Banana"] as any}
+          placeholder="Select"
+          value="Apple"
+          readOnly
+          dataTestid="readonly-select"
+        />,
+      );
+
+      const trigger = screen.getByTestId("readonly-select");
+      expect(trigger).not.toBeDisabled();
+      fireEvent.click(trigger);
+      await waitFor(() => expect(screen.getByTestId("select-popup")).toBeInTheDocument());
+    });
+
+    it("does not call onChange when an option is clicked", async () => {
+      const onChange = mock();
+      render(
+        <Select
+          options={["Apple", "Banana"] as any}
+          placeholder="Select"
+          value="Apple"
+          multiple
+          readOnly
+          onChange={onChange}
+          dataTestid="readonly-select"
+        />,
+      );
+
+      fireEvent.click(screen.getByTestId("readonly-select"));
+      await waitFor(() => expect(screen.getByTestId("select-option-Banana")).toBeInTheDocument());
+      fireEvent.click(screen.getByTestId("select-option-Banana"));
+      expect(onChange).not.toHaveBeenCalled();
+    });
+
+    it("keeps search enabled while blocking selection", async () => {
+      const onSearch = mock();
+      render(
+        <Select
+          options={["Apple", "Banana", "Apricot"] as any}
+          placeholder="Select"
+          value={["Apple"]}
+          multiple
+          searchable
+          readOnly
+          onSearch={onSearch}
+          dataTestid="readonly-select"
+        />,
+      );
+
+      fireEvent.click(screen.getByTestId("readonly-select"));
+      const searchInput = await screen.findByTestId("select-search-field");
+      expect(searchInput).not.toBeDisabled();
+      fireEvent.change(searchInput, { target: { value: "Ap" } });
+      await waitFor(() => expect(onSearch).toHaveBeenCalledWith("Ap"));
+    });
+
+    it("hides group All/None actions when readOnly", async () => {
+      render(
+        <Select
+          options={groupedOptions as any}
+          placeholder="Select"
+          value={["id", "agreement"]}
+          multiple
+          groupBy="group"
+          showGroupActions
+          readOnly
+          dataTestid="readonly-select"
+        />,
+      );
+
+      fireEvent.click(screen.getByTestId("readonly-select"));
+      await waitFor(() => expect(screen.getByTestId("select-option-dim_1")).toBeInTheDocument());
+      expect(screen.queryByRole("button", { name: "All" })).toBeNull();
+      expect(screen.queryByRole("button", { name: "None" })).toBeNull();
+    });
+
+    it("shows group All/None actions when editable", async () => {
+      render(
+        <Select
+          options={groupedOptions as any}
+          placeholder="Select"
+          value={["id", "agreement"]}
+          multiple
+          groupBy="group"
+          showGroupActions
+          dataTestid="editable-select"
+        />,
+      );
+
+      fireEvent.click(screen.getByTestId("editable-select"));
+      await waitFor(() => expect(screen.getByTestId("select-option-dim_1")).toBeInTheDocument());
+      expect(screen.getAllByRole("button", { name: "All" }).length).toBeGreaterThan(0);
+      expect(screen.getAllByRole("button", { name: "None" }).length).toBeGreaterThan(0);
+    });
+  });
+
   describe("Native select and form", () => {
     it("renders hidden native select with name and value for form submission", async () => {
       render(<Select options={["Apple", "Banana"] as any} placeholder="Select" name="fruit" />);

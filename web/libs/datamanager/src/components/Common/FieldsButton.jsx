@@ -26,12 +26,11 @@ export const FieldsButton = injector(
     const visibleColumnKeys = columns.filter((c) => !c.is_hidden).map((c) => c.key);
     const visibleColumnsSignature = visibleColumnKeys.join("\u0000");
     const value = useMemo(() => visibleColumnKeys, [visibleColumnsSignature]);
-    const disabled = view?.isLockedByManager;
-    const effectiveTooltip = disabled ? view.lockedUpdateMessage : tooltip;
+    const readOnly = view?.isLockedByManager;
 
     const handleChange = useCallback(
       (keys) => {
-        if (disabled) return;
+        if (readOnly) return;
         const selectedSet = new Set(keys ?? []);
         flushSync(() => {
           for (const col of columns) {
@@ -42,7 +41,7 @@ export const FieldsButton = injector(
           }
         });
       },
-      [columns, disabled],
+      [columns, readOnly],
     );
 
     const picker = (
@@ -63,7 +62,7 @@ export const FieldsButton = injector(
           )
         }
         dataTestid={dataTestId}
-        disabled={disabled}
+        readOnly={readOnly}
         triggerClassName={className}
         triggerProps={{
           style: {
@@ -73,12 +72,9 @@ export const FieldsButton = injector(
       />
     );
 
-    return effectiveTooltip ? (
-      <Tooltip title={effectiveTooltip}>
-        <div
-          className={`${cn("field-button").toClassName()} flex items-center`}
-          style={{ zIndex: 1000, ...(disabled && { opacity: 0.5 }) }}
-        >
+    return tooltip && !readOnly ? (
+      <Tooltip title={tooltip}>
+        <div className={`${cn("field-button").toClassName()} flex items-center`} style={{ zIndex: 1000 }}>
           {picker}
         </div>
       </Tooltip>

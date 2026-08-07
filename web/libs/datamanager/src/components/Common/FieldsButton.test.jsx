@@ -105,12 +105,13 @@ const closePicker = async () => {
 const dimensionIsChecked = () =>
   within(screen.getByTestId(DIMENSION_OPTION)).getByRole("checkbox").getAttribute("aria-checked") === "true";
 
-/** Locking disables the picker, which is what forces it to remount. */
+/** Locking switches the picker to readOnly (openable, non-editable). */
 const setLocked = async (view, locked) => {
   await act(async () => {
     await view.toggleLock();
   });
-  await waitFor(() => expect(trigger().hasAttribute("disabled")).toBe(locked));
+  await waitFor(() => expect(trigger().hasAttribute("aria-readonly")).toBe(locked));
+  expect(trigger().hasAttribute("disabled")).toBe(false);
 };
 
 describe("FieldsButton (Columns picker)", () => {
@@ -131,6 +132,22 @@ describe("FieldsButton (Columns picker)", () => {
     await openPicker();
     expect(view.hiddenColumns.explore).toEqual([DIMENSION_COLUMN_ID]);
     expect(dimensionIsChecked()).toBe(false);
+  });
+
+  it("allows opening Columns on a locked tab but blocks visibility changes (FIT-2396)", async () => {
+    const { view } = renderColumnsPicker();
+
+    await setLocked(view, true);
+
+    expect(trigger()).not.toBeDisabled();
+    await openPicker();
+    expect(dimensionIsChecked()).toBe(true);
+
+    fireEvent.click(screen.getByTestId(DIMENSION_OPTION));
+    expect(view.hiddenColumns.explore).toEqual([]);
+    expect(dimensionIsChecked()).toBe(true);
+    expect(screen.queryByRole("button", { name: "All" })).toBeNull();
+    expect(screen.queryByRole("button", { name: "None" })).toBeNull();
   });
 
   it("reflects visibility changes made outside the picker", async () => {
