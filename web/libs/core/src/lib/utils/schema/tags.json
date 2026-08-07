@@ -319,7 +319,7 @@
       },
       "resolveUrls": {
         "name": "resolveUrls",
-        "description": "Whether to resolve cloud storage URIs (s3://, gs://, etc.) in the loaded content when valueType is \"url\"",
+        "description": "Whether to resolve cloud storage URIs in the loaded content when valueType is url",
         "type": ["true", "false"],
         "required": false,
         "default": true
@@ -1157,13 +1157,6 @@
         "description": "Layout of the choices: `select` for dropdown/select box format, `inline` for horizontal single row display, `vertical` for vertically stacked display (default)",
         "type": ["select", "inline", "vertical"],
         "required": false
-      },
-      "randomize": {
-        "name": "randomize",
-        "description": "Shuffle the order in which `Choice` options are displayed to the annotator on every task open to reduce position bias. The shuffle is ephemeral (a fresh order on each task load and on every annotator's session) and never affects serialized results - selecting a choice still serializes that choice's configured `value`/`alias`. Auto-assigned hotkeys follow the visible order so the `[1]`, `[2]`, `[3]` hints always read sequentially top-to-bottom, eliminating muscle-memory bias toward any specific option. Explicit `hotkey=\"...\"` on a `<Choice>` is honored unchanged. Only direct top-level `<Choice>` children participate in the shuffle: non-`<Choice>` siblings (`<Header>`, `<View>`, `<HyperText>`) keep their layout position, and nested choices (`allowNested`) stay nested inside their parent `<Choice>`.",
-        "type": ["true", "false"],
-        "required": false,
-        "default": false
       }
     }
   },
@@ -2443,16 +2436,9 @@
       },
       "legacy": {
         "name": "legacy",
-        "description": "**Deprecated.** Enables the legacy Taxonomy UI (annotators can add labels as needed). When true, the `apiUrl` parameter is not usable. Prefer the default Taxonomy UI.",
+        "description": "Use this tag to enable the legacy version of the Taxonomy tag. The legacy version supports the ability for annotators to add labels as needed. However, when true, the `apiUrl` parameter is not usable.",
         "type": ["true", "false"],
         "required": false
-      },
-      "allowAddLabels": {
-        "name": "allowAddLabels",
-        "description": "**New taxonomy UI only.** When `true`, annotators can add and remove user-defined labels where the project supports it. Defaults to `false` so choices stay limited to the configured taxonomy unless you opt in. If you omit this attribute but set `legacy`, `allowAddLabels` defaults to the same value as `legacy`. Ignored when `legacy` is `true` and when `apiUrl` is set (external taxonomies are expected to be managed at their source).",
-        "type": ["true", "false"],
-        "required": false,
-        "default": false
       }
     }
   },

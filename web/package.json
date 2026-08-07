@@ -27,7 +27,7 @@
     "lsf:integration:watch:slow": "DEFAULT_CPU_THROTTLING=10 DEFAULT_NETWORK_THROTTLING=4g bun --bun run cypress open --config-file libs/editor/cypress.config.ts",
     "dm:watch": "bun run watch",
     "version:libs": "(cd apps/labelstudio && bun ../../tools/version/version.mjs) && (cd libs/editor && bun ../../tools/version/version.mjs) && (cd libs/datamanager && bun ../../tools/version/version.mjs)",
-    "docs": "sh -c 'export SCHEMA_JSON_PATH=\"$PWD/libs/core/src/lib/utils/schema/tags.json\" && cd libs/editor && bun scripts/create-docs.js ../../../docs/source/includes/tags' && bun --bun run biome check --write libs/core/src/lib/utils/schema/tags.json",
+    "docs": "sh -c 'export SCHEMA_JSON_PATH=\"$PWD/libs/core/src/lib/utils/schema/tags.json\" && cd libs/editor && bun ../../tools/create-docs/create-docs.mjs ../../../docs/source/includes/tags' && bun --bun run biome check --write libs/core/src/lib/utils/schema/tags.json",
     "test:e2e": "NODE_ENV=production MODE=standalone bun run ls:e2e && NODE_ENV=production MODE=standalone bun run lsf:integration",
     "test:integration": "bun run lsf:integration",
     "ls:unit": "bun test --dom apps/labelstudio/src",

@@ -10,7 +10,7 @@ resolution-markers = [
 ]
 
 [options]
-exclude-newer = "2026-08-02T13:18:03.773218Z"
+exclude-newer = "2026-08-03T13:40:14.242387909Z"
 exclude-newer-span = "P4D"
 
 [[package]]
@@ -1275,19 +1275,6 @@ wheels = [
 ]
 
 [[package]]
-name = "grpcio-reflection"
-version = "1.78.0"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "grpcio", marker = "python_full_version < '3.11'" },
-    { name = "protobuf", marker = "python_full_version < '3.11'" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/31/06/337546aae558675f79cae2a8c1ce0c9b1952cbc5c28b01878f68d040f5bb/grpcio_reflection-1.78.0.tar.gz", hash = "sha256:e6e60c0b85dbcdf963b4d4d150c0f1d238ba891d805b575c52c0365d07fc0c40", size = 19098, upload-time = "2026-02-06T10:01:52.225Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/df/6d/4d095d27ccd049865ecdafc467754e9e47ad0f677a30dda969c3590f6582/grpcio_reflection-1.78.0-py3-none-any.whl", hash = "sha256:06fcfde9e6888cdd12e9dd1cf6dc7c440c2e9acf420f696ccbe008672ed05b60", size = 22800, upload-time = "2026-02-06T10:01:33.822Z" },
-]
-
-[[package]]
 name = "grpcio-status"
 version = "1.78.0"
 source = { registry = "https://pypi.org/simple" }
@@ -1830,7 +1817,6 @@ test = [
     { name = "factory-boy" },
     { name = "fakeredis" },
     { name = "freezegun" },
-    { name = "grpcio-reflection", marker = "python_full_version < '3.11'" },
     { name = "mock" },
     { name = "moto" },
     { name = "pre-commit" },
@@ -1884,7 +1870,7 @@ requires-dist = [
     { name = "google-cloud-logging", specifier = ">=3.10.0,<4.0.0" },
     { name = "google-cloud-storage", specifier = ">=3.8.0,<4.0.0" },
     { name = "ijson", specifier = ">=3.4.0,<4.0.0" },
-    { name = "label-studio-sdk", git = "https://github.com/HumanSignal/label-studio-sdk.git?rev=ef1fda62d579958ba9389b743286c55be60c3032" },
+    { name = "label-studio-sdk", git = "https://github.com/HumanSignal/label-studio-sdk.git?rev=3113502312e4a7fc04e5c781e361640fb545d821" },
     { name = "launchdarkly-server-sdk", specifier = "==8.2.1" },
     { name = "lxml", extras = ["html-clean"], specifier = ">=6.1.0" },
     { name = "numpy", specifier = ">=2.2.6,<3.0.0" },
@@ -1924,7 +1910,6 @@ test = [
     { name = "factory-boy", specifier = ">=3.3.3,<4" },
     { name = "fakeredis", specifier = "~=2.26.1" },
     { name = "freezegun", specifier = "~=1.5.1" },
-    { name = "grpcio-reflection", marker = "python_full_version < '3.11'", specifier = "==1.78.0" },
     { name = "mock", specifier = ">=5.1.0" },
     { name = "moto", specifier = ">=4.2.6" },
     { name = "pre-commit", specifier = "==3.3.3" },
@@ -1947,7 +1932,7 @@ test = [
 [[package]]
 name = "label-studio-sdk"
 version = "2.1.3"
-source = { git = "https://github.com/HumanSignal/label-studio-sdk.git?rev=ef1fda62d579958ba9389b743286c55be60c3032#ef1fda62d579958ba9389b743286c55be60c3032" }
+source = { git = "https://github.com/HumanSignal/label-studio-sdk.git?rev=3113502312e4a7fc04e5c781e361640fb545d821#3113502312e4a7fc04e5c781e361640fb545d821" }
 dependencies = [
     { name = "appdirs" },
     { name = "datamodel-code-generator" },
