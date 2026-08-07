@@ -73,6 +73,10 @@ LEGACY_USER_FILTER_OPERATORS = {
 }
 
 
+class ResolvedUserFilterIds(list):
+    """Marker for IDs expanded by trusted backend code after client-input validation."""
+
+
 def validate_user_filter_operator(field_name, operator, value):
     if field_name in USER_FILTER_FIELDS and isinstance(value, list) and operator not in USER_FILTER_VALUE_OPERATORS:
         allowed = ', '.join(sorted(USER_FILTER_VALUE_OPERATORS))
@@ -535,7 +539,11 @@ def parse_user_filter_ids(value):
     """Parse a scalar or list user-filter value into deduped integer user ids (FIT-2253)."""
     if value is None:
         return []
-    if isinstance(value, list) and len(value) > settings.DATA_MANAGER_LIST_FILTER_MAX_VALUES:
+    if (
+        isinstance(value, list)
+        and not isinstance(value, ResolvedUserFilterIds)
+        and len(value) > settings.DATA_MANAGER_LIST_FILTER_MAX_VALUES
+    ):
         raise ValidationError(
             f'User filter list exceeds maximum size of {settings.DATA_MANAGER_LIST_FILTER_MAX_VALUES}.'
         )

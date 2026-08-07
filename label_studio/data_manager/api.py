@@ -40,8 +40,56 @@ from tasks.ordering import (
     get_task_children_prefetch,
     parse_annotations_ordering_request,
 )
+from users.list_mixins import UserListMixin, UsersListPagination
+from users.list_query import ProjectUsersOptionsQuerySerializer
+from users.models import User
+from users.serializers import UserSimpleSerializer
 
 logger = logging.getLogger(__name__)
+
+
+@extend_schema(exclude=True)
+class ProjectUsersOptionsAPI(UserListMixin, generics.ListAPIView):
+    """Lightweight project-scoped users transport for Data Manager filter options."""
+
+    action = 'list'
+    pagination_class = UsersListPagination
+    permission_required = all_permissions.projects_view
+    serializer_class = UserSimpleSerializer
+    list_query_serializer_class = ProjectUsersOptionsQuerySerializer
+
+    def uses_list_filtering(self, request=None):
+        return True
+
+    def get_list_query_params(self):
+        if not hasattr(self, '_list_query_params'):
+            query_params = self.request.query_params.copy()
+            query_params['project'] = self.kwargs['pk']
+            serializer = self.list_query_serializer_class(data=query_params)
+            serializer.is_valid(raise_exception=True)
+            self._list_query_params = serializer.validated_data
+        return self._list_query_params
+
+    def get_queryset(self):
+        organization = self.request.user.active_organization
+        return User.objects.filter(
+            om_through__organization=organization,
+            om_through__deleted_at__isnull=True,
+        ).distinct()
+
+    def get_project(self, project_id):
+        if not hasattr(self, '_project_users_project'):
+            organization_id = self.request.user.active_organization_id
+            project = generics.get_object_or_404(Project, pk=project_id, organization_id=organization_id)
+            self.check_object_permissions(self.request, project)
+            self._project_users_project = project
+        return self._project_users_project
+
+    def filter_queryset_by_project(self, queryset, project_id):
+        project = self.get_project(project_id)
+        get_user_ids_in_projects = load_func(settings.DATA_MANAGER_GET_PROJECT_USER_IDS)
+        user_ids = get_user_ids_in_projects([project.id], project.organization_id)
+        return queryset.filter(pk__in=user_ids)
 
 
 @method_decorator(

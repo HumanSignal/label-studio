@@ -53,10 +53,11 @@ export const UserSelect = observer(({ filter, onChange, multiple, value, placeho
   const { users, hasMore, total, loadMore, isLoading } = useDataManagerUsers(
     projectId,
     optionsPerRequest,
-    false,
-    null,
     search,
     selectedValue,
+    {
+      column: filter?.field?.alias,
+    },
   );
   const options = useMemo(() => {
     return users.filter(Boolean).map((user) => {
