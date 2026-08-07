@@ -123,7 +123,7 @@ def test_parse_all_configs():
     result = [y for x in os.walk(folder_wildcard) for y in glob.glob(os.path.join(x[0], '*.xml'))]
     for file in result:
         print(f'Parsing config: {file}')
-        with open(file, mode='r') as f:
+        with open(file, mode='r', encoding='utf-8') as f:
             config = f.read()
             assert parse_config(config)
             assert parse_config_to_json(config)
