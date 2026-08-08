@@ -1,4 +1,4 @@
-from django.db.models import BooleanField, Case, Value, When
+from django.db.models import BooleanField, Case, Q, Value, When
 from projects.models import Project
 from rest_framework import filters
 from rest_framework.exceptions import ValidationError
@@ -79,17 +79,28 @@ class UserListMixin:
         params = self.get_list_query_params()
 
         project_id = params.get('project')
-        if project_id is not None:
+        column = params.get('column')
+        if column is not None and project_id is None:
+            raise ValidationError({'project': 'This parameter is required when column is set.'})
+
+        if project_id is not None and column is not None:
+            # FIT-2450: membership ∪ column candidates (not intersection).
+            # Soft-deleted org members may remain in ``queryset`` so historical
+            # column candidates stay selectable, but they must not ride in via the
+            # membership half of the union (unrelated columns).
+            organization = self.request.user.active_organization
+            active_members = queryset.filter(
+                om_through__organization=organization,
+                om_through__deleted_at__isnull=True,
+            )
+            membership_qs = self.filter_queryset_by_project(active_members, project_id)
+            column_qs = self.filter_queryset_by_column(queryset, project_id, column)
+            queryset = queryset.filter(Q(pk__in=membership_qs.values('pk')) | Q(pk__in=column_qs.values('pk')))
+        elif project_id is not None:
             queryset = self.filter_queryset_by_project(queryset, project_id)
 
-        column = params.get('column')
-        if column is not None:
-            if project_id is None:
-                raise ValidationError({'project': 'This parameter is required when column is set.'})
-            queryset = self.filter_queryset_by_column(queryset, project_id, column)
-
-        # Membership → column → firewall aggregation (FIT-2282). Collapse must not
-        # run inside filter_queryset_by_project or column scoping can drop the
+        # Membership ∪ column → firewall aggregation. Collapse must not run
+        # inside filter_queryset_by_project or column scoping can drop the
         # Min(user_id) representative for a still-eligible role.
         queryset = self.filter_queryset_after_scope(queryset, project_id)
 

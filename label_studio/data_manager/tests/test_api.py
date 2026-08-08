@@ -235,19 +235,24 @@ class TestProjectUsersColumnOptionsAPI(APITestCase):
     def _user_ids(response):
         return [user['id'] for user in response.json()['results']]
 
-    def test_annotators_intersects_project_membership_with_annotation_authors(self):
+    def test_annotators_unions_project_membership_with_annotation_authors(self):
+        """Options are current members ∪ annotation authors (including departed authors)."""
         response = self._list('annotators')
 
         assert response.status_code == 200
-        assert self._user_ids(response) == [self.annotator.id]
+        assert set(self._user_ids(response)) == self._membership_user_ids() | {
+            self.annotator.id,
+            self.departed_annotator.id,
+        }
 
-    def test_updated_by_unions_task_and_annotation_updaters(self):
+    def test_updated_by_unions_membership_with_task_and_annotation_updaters(self):
+        """Membership half keeps non-updaters; updater sources stay included."""
         response = self._list('updated_by')
 
         assert response.status_code == 200
-        assert set(self._user_ids(response)) == {self.updated_by.id, self.annotation_updated_by.id}
+        assert set(self._user_ids(response)) == self._membership_user_ids()
 
-    def test_search_pagination_and_selected_value_keep_predicate_scope(self):
+    def test_search_still_narrows_union_options(self):
         response = self._list(
             'annotators',
             search=self.annotator.email,
@@ -258,6 +263,31 @@ class TestProjectUsersColumnOptionsAPI(APITestCase):
         assert response.status_code == 200
         assert response.json()['count'] == 1
         assert self._user_ids(response) == [self.annotator.id]
+
+    def test_selected_value_rehydrates_departed_column_candidate(self):
+        response = self._list(
+            'annotators',
+            page_size=1,
+            selected_value=str(self.departed_annotator.id),
+        )
+
+        assert response.status_code == 200
+        assert self.departed_annotator.id in self._user_ids(response)
+
+    def test_soft_deleted_member_only_appears_via_column_predicate(self):
+        """Soft-deleted ProjectMembers must not leak into unrelated column pickers."""
+        soft_deleted = UserFactory(active_organization=self.project.organization)
+        ProjectMember.objects.create(project=self.project, user=soft_deleted)
+        AnnotationFactory(task=TaskFactory(project=self.project), completed_by=soft_deleted)
+        soft_deleted.om_through.get(organization=self.project.organization).soft_delete()
+
+        annotators = self._list('annotators')
+        updated_by = self._list('updated_by')
+
+        assert annotators.status_code == 200
+        assert updated_by.status_code == 200
+        assert soft_deleted.id in set(self._user_ids(annotators))
+        assert soft_deleted.id not in set(self._user_ids(updated_by))
 
     def test_unknown_column_is_rejected(self):
         response = self._list('created_by')
@@ -271,6 +301,7 @@ class TestProjectUsersColumnOptionsAPI(APITestCase):
                 assert self._list(column).status_code == 400
 
     def test_project_member_can_list_column_options(self):
+        expected = self._membership_user_ids() | {self.departed_annotator.id}
         self.client.force_authenticate(self.annotator)
         response = self.client.get(
             f'/api/dm/projects/{self.project.id}/user-options/',
@@ -278,10 +309,17 @@ class TestProjectUsersColumnOptionsAPI(APITestCase):
         )
 
         assert response.status_code == 200
-        assert self._user_ids(response) == [self.annotator.id]
+        assert set(self._user_ids(response)) == expected
 
     def test_non_member_follows_lso_organization_wide_project_visibility(self):
         ProjectMember.objects.filter(project=self.project, user=self.annotator).delete()
+        expected = {
+            self.updated_by.id,
+            self.annotation_updated_by.id,
+            self.non_participant.id,
+            self.annotator.id,
+            self.departed_annotator.id,
+        }
         self.client.force_authenticate(self.annotator)
         response = self.client.get(
             f'/api/dm/projects/{self.project.id}/user-options/',
@@ -289,7 +327,7 @@ class TestProjectUsersColumnOptionsAPI(APITestCase):
         )
 
         assert response.status_code == 200
-        assert self._user_ids(response) == []
+        assert set(self._user_ids(response)) == expected
 
     def _membership_user_ids(self):
         self.client.force_authenticate(self.owner)
@@ -319,15 +357,16 @@ class TestProjectUsersColumnOptionsAPI(APITestCase):
             return set(annotations.exclude(updated_by_id=None).values_list('updated_by_id', flat=True))
         raise AssertionError(f'Unsupported column {column}')
 
-    def test_column_options_cover_root_and_child_predicate_matchers(self):
-        """Every project-access user who can match a root/child predicate is in options."""
+    def test_column_options_cover_membership_and_predicate_matchers(self):
+        """Options include all current members and every root/child predicate matcher."""
         access_ids = self._membership_user_ids()
 
         for column in ('annotators', 'updated_by'):
             with self.subTest(column=column):
                 option_ids = set(self._user_ids(self._list(column)))
                 root_matchers = {user_id for user_id in access_ids if self._root_filter_matches(column, user_id)}
-                child_matchers = self._child_matcher_ids(column) & access_ids
+                child_matchers = self._child_matcher_ids(column)
 
+                assert access_ids <= option_ids
                 assert root_matchers <= option_ids
                 assert child_matchers <= option_ids

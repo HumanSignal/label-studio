@@ -72,10 +72,14 @@ class ProjectUsersOptionsAPI(UserListMixin, generics.ListAPIView):
 
     def get_queryset(self):
         organization = self.request.user.active_organization
-        return User.objects.filter(
-            om_through__organization=organization,
-            om_through__deleted_at__isnull=True,
-        ).distinct()
+        queryset = User.objects.filter(om_through__organization=organization)
+        # FIT-2450: when column-scoping, keep soft-deleted org members so historical
+        # predicate actors remain selectable via the column-candidate half of the
+        # membership ∪ candidates union. Membership half still requires active OM
+        # (see UserListMixin.filter_queryset).
+        if 'column' not in self.request.query_params:
+            queryset = queryset.filter(om_through__deleted_at__isnull=True)
+        return queryset.distinct()
 
     def get_project(self, project_id):
         if not hasattr(self, '_project_users_project'):

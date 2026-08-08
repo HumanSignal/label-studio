@@ -8,8 +8,9 @@ def filter_user_queryset(
     project_id: int,
     column: str,
 ) -> QuerySet:
-    """Restrict users to a context-independent superset of DM filter candidates.
+    """Restrict users to context-independent DM filter candidates for ``column``.
 
+    Used as the column half of the options union (membership ∪ candidates).
     ``column`` must already be validated against ``COLUMN_USER_ID_SOURCES``
     (see ``UsersListQuerySerializer``).
     """
