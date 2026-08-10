@@ -5,6 +5,8 @@ import { afterEach, describe, expect, it, mock } from "bun:test";
 import { observer } from "mobx-react";
 import { TabStore } from "../../../stores/Tabs/store";
 import { FilterLine, UnavailableFilterNotice, isFilterEditingDisabled } from "./FilterLine";
+import { useRecentFilters } from "../../../hooks/useRecentFilters";
+import { filtersToPickerGroups } from "../../Common/ColumnPicker";
 
 const RootStore = types
   .model({
@@ -174,24 +176,27 @@ const createMultiChildFilter = ({ childCount = 2 }: { childCount?: number } = {}
 };
 
 const FilterLineHarness = observer(
-  ({ view, sidebar }: { view: ReturnType<typeof createUnavailableFilter>["view"]; sidebar: boolean }) => (
+  ({ view, disabled = false }: { view: ReturnType<typeof createUnavailableFilter>["view"]; disabled?: boolean }) => (
     <>
       {view.filters.map((filter, index) => (
         <FilterLine
           key={filter.id}
           filter={filter}
-          availableFilters={[]}
           pickerFilters={view.availableFilters}
           index={index}
           view={view}
-          sidebar={sidebar}
+          disabled={disabled}
+          disabledTooltip="This tab is locked. Unlock it to change filters."
         />
       ))}
     </>
   ),
 );
 
-const renderFilterLine = (view: ReturnType<typeof createUnavailableFilter>["view"], sidebar: boolean) => {
+const renderFilterLine = (
+  view: ReturnType<typeof createUnavailableFilter>["view"],
+  { disabled = false }: { disabled?: boolean } = {},
+) => {
   const queryClient = new QueryClient({
     defaultOptions: { queries: { retry: false } },
   });
@@ -204,9 +209,30 @@ const renderFilterLine = (view: ReturnType<typeof createUnavailableFilter>["view
 
   return render(
     <QueryClientProvider client={queryClient}>
-      <FilterLineHarness view={view} sidebar={sidebar} />
+      <FilterLineHarness view={view} disabled={disabled} />
     </QueryClientProvider>,
   );
+};
+
+const createNumberFilter = () => {
+  const root = RootStore.create({ viewsStore: { columnsRaw } });
+  root.viewsStore.fetchColumns();
+  unprotect(root);
+  root.viewsStore.views.push({
+    id: 1,
+    title: "Saved",
+    saved: true,
+    key: "saved",
+    filters: [
+      {
+        filter: "filter:tasks:id",
+        operator: "equal",
+        value: 42,
+      },
+    ],
+  });
+  root.viewsStore.selected = 1;
+  return { root, view: root.viewsStore.views[0], filter: root.viewsStore.views[0].filters[0] };
 };
 
 describe("Dimension result filter cardinality (FIT-2241)", () => {
@@ -224,7 +250,7 @@ describe("Dimension result filter cardinality (FIT-2241)", () => {
     it(`shows ${label} for ${multiple ? "set-valued" : "scalar"} Dimensions`, () => {
       const setup = createFilter({ available: true, multiple });
       root = setup.root;
-      renderFilterLine(setup.view, false);
+      renderFilterLine(setup.view);
 
       expect(within(screen.getByTestId("filter-line-operator")).getByRole("button")).toHaveTextContent(label);
     });
@@ -242,7 +268,7 @@ describe("multiple child filter controls (FIT-2273)", () => {
   it("renders an enabled allowed-child dropdown and add-child control", () => {
     const setup = createMultiChildFilter({ childCount: 1 });
     root = setup.root;
-    renderFilterLine(setup.view, false);
+    renderFilterLine(setup.view);
 
     const childColumnDropdown = screen.getByRole("button", { name: "Annotators" });
     expect(childColumnDropdown).toBeEnabled();
@@ -263,7 +289,7 @@ describe("multiple child filter controls (FIT-2273)", () => {
   it("renders multiple child rows and removes only the selected row", () => {
     const setup = createMultiChildFilter();
     root = setup.root;
-    renderFilterLine(setup.view, false);
+    renderFilterLine(setup.view);
 
     expect(screen.getByRole("button", { name: "Annotators" })).toBeEnabled();
     expect(screen.getByRole("button", { name: "Ground Truth" })).toBeEnabled();
@@ -276,6 +302,58 @@ describe("multiple child filter controls (FIT-2273)", () => {
     expect(setup.filter.child_filters).toHaveLength(1);
     expect(screen.queryByRole("button", { name: "Annotators" })).not.toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Ground Truth" })).toBeEnabled();
+  });
+});
+
+describe("locked filter value controls (FIT-2447)", () => {
+  let root: ReturnType<typeof RootStore.create> | null = null;
+
+  afterEach(() => {
+    if (root) destroy(root);
+    root = null;
+  });
+
+  it("disables single-select list value control when the tab is locked", () => {
+    const setup = createFilter({ available: true, multiple: false });
+    root = setup.root;
+    renderFilterLine(setup.view, { disabled: true });
+
+    expect(within(screen.getByTestId("filter-line-value")).getByRole("button")).toBeDisabled();
+  });
+
+  it("marks multi-select list value control as read-only when the tab is locked", () => {
+    const setup = createFilter({ available: true, multiple: true });
+    root = setup.root;
+    renderFilterLine(setup.view, { disabled: true });
+
+    const trigger = within(screen.getByTestId("filter-line-value")).getByRole("button");
+    expect(trigger).not.toBeDisabled();
+    expect(trigger).toHaveAttribute("aria-readonly", "true");
+  });
+
+  it("disables number value input when the tab is locked", () => {
+    const setup = createNumberFilter();
+    root = setup.root;
+    renderFilterLine(setup.view, { disabled: true });
+
+    expect(within(screen.getByTestId("filter-line-value")).getByRole("spinbutton")).toBeDisabled();
+  });
+
+  it("keeps multi-select values inspectable but unchanged when locked (FIT-2396 pattern)", async () => {
+    const setup = createFilter({ available: true, multiple: true });
+    root = setup.root;
+    renderFilterLine(setup.view, { disabled: true });
+
+    const trigger = within(screen.getByTestId("filter-line-value")).getByRole("button");
+    expect(trigger).toHaveAttribute("aria-readonly", "true");
+    fireEvent.click(trigger);
+
+    const option = await screen.findByRole("option", { name: /positive/i });
+    fireEvent.click(option);
+
+    expect(setup.filter.currentValue).toEqual(["positive"]);
+    expect(screen.queryByRole("button", { name: "All" })).toBeNull();
+    expect(screen.queryByRole("button", { name: "None" })).toBeNull();
   });
 });
 
@@ -302,24 +380,142 @@ describe("unavailable saved filters (FIT-2173)", () => {
     expect(isFilterEditingDisabled({ disabled: false, filter_available: true })).toBe(false);
   });
 
-  for (const sidebar of [false, true]) {
-    it(`identifies, disables, preserves, and removes an unavailable filter in the ${
-      sidebar ? "sidebar" : "main"
-    } layout`, async () => {
-      const setup = createUnavailableFilter();
-      root = setup.root;
-      renderFilterLine(setup.view, sidebar);
+  it("identifies, disables, preserves, and removes an unavailable filter", async () => {
+    const setup = createUnavailableFilter();
+    root = setup.root;
+    renderFilterLine(setup.view);
 
-      expect(screen.getByText("Sentiment")).toBeInTheDocument();
-      expect(screen.getByRole("status")).toHaveTextContent("saved value is preserved");
-      expect(within(screen.getByTestId("filter-line-operator")).getByRole("button")).toBeDisabled();
-      expect(within(screen.getByTestId("filter-line-value")).getByRole("button")).toBeDisabled();
-      expect(setup.filter.currentValue).toEqual(["positive"]);
-      await waitFor(() => expect(setup.filter.saving).toBe(false));
+    expect(screen.getByText("Sentiment")).toBeInTheDocument();
+    expect(screen.getByRole("status")).toHaveTextContent("saved value is preserved");
+    expect(within(screen.getByTestId("filter-line-operator")).getByRole("button")).toBeDisabled();
+    // Multi-select value controls use readOnly (inspectable) when editing is blocked (FIT-2447).
+    const valueTrigger = within(screen.getByTestId("filter-line-value")).getByRole("button");
+    expect(valueTrigger).not.toBeDisabled();
+    expect(valueTrigger).toHaveAttribute("aria-readonly", "true");
+    expect(setup.filter.currentValue).toEqual(["positive"]);
+    await waitFor(() => expect(setup.filter.saving).toBe(false));
 
-      fireEvent.click(screen.getByRole("button", { name: "Remove filter" }));
+    fireEvent.click(screen.getByRole("button", { name: "Remove filter" }));
 
-      expect(setup.view.filters).toHaveLength(0);
-    });
-  }
+    expect(setup.view.filters).toHaveLength(0);
+  });
+});
+
+const dataParentColumnsRaw = [
+  {
+    id: "id",
+    title: "ID",
+    type: "Number",
+    target: "tasks",
+    visibility_defaults: { filter: true },
+  },
+  {
+    id: "data",
+    title: "Data",
+    type: "List",
+    target: "tasks",
+    children: ["image"],
+    hidden: true,
+  },
+  {
+    id: "image",
+    title: "image",
+    type: "Image",
+    target: "tasks",
+    parent: "data",
+    visibility_defaults: { filter: true },
+  },
+  {
+    id: "total_annotations",
+    title: "Annotations",
+    type: "Number",
+    target: "tasks",
+    visibility_defaults: { filter: true },
+  },
+];
+
+const createDataParentFilter = () => {
+  const root = RootStore.create({ viewsStore: { columnsRaw: dataParentColumnsRaw } });
+  root.viewsStore.fetchColumns();
+  unprotect(root);
+  root.viewsStore.views.push({
+    id: 1,
+    title: "Saved",
+    saved: true,
+    key: "saved",
+    filters: [
+      {
+        filter: "filter:tasks:id",
+        operator: "equal",
+        value: 1,
+      },
+    ],
+  });
+  root.viewsStore.selected = 1;
+  return { root, view: root.viewsStore.views[0], filter: root.viewsStore.views[0].filters[0] };
+};
+
+/**
+ * Filter rows always use ColumnPicker with parent-hierarchy groups (FIT-2433).
+ */
+const UnifiedFilterLineHarness = observer(({ view }: { view: ReturnType<typeof createDataParentFilter>["view"] }) => {
+  const { recentEntries } = useRecentFilters(1);
+  return (
+    <>
+      {view.filters.map((filter, index) => (
+        <FilterLine
+          key={filter.id}
+          filter={filter}
+          pickerFilters={view.availableFilters}
+          recentEntries={recentEntries}
+          index={index}
+          view={view}
+        />
+      ))}
+    </>
+  );
+});
+
+describe("filter column dropdown (FIT-2433)", () => {
+  let root: ReturnType<typeof RootStore.create> | null = null;
+
+  afterEach(() => {
+    if (root) destroy(root);
+    root = null;
+  });
+
+  it("uses ColumnPicker parent-hierarchy section headers (e.g. Data, not target-based Tasks)", () => {
+    const setup = createDataParentFilter();
+    root = setup.root;
+
+    const expectedGroups = filtersToPickerGroups(setup.view.availableFilters as any)
+      .map((group) => group.title)
+      .filter(Boolean);
+
+    expect(expectedGroups).toContain("Data");
+    expect(expectedGroups).toContain("Task");
+
+    const originalScrollIntoView = Element.prototype.scrollIntoView;
+    Element.prototype.scrollIntoView = mock();
+
+    try {
+      const queryClient = new QueryClient({
+        defaultOptions: { queries: { retry: false } },
+      });
+      (window as any).DM = { apiCall: mock(async () => ({ count: 0, results: [] })) };
+
+      render(
+        <QueryClientProvider client={queryClient}>
+          <UnifiedFilterLineHarness view={setup.view} />
+        </QueryClientProvider>,
+      );
+
+      fireEvent.click(screen.getByTestId("select-trigger-col:filter:tasks:id"));
+
+      expect(screen.getAllByText("Data").length).toBeGreaterThan(0);
+      expect(screen.queryByText("Tasks")).not.toBeInTheDocument();
+    } finally {
+      Element.prototype.scrollIntoView = originalScrollIntoView;
+    }
+  });
 });

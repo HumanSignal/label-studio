@@ -62,6 +62,31 @@ export const Disabled: Story = {
   },
 };
 
+/**
+ * Read-only: trigger stays clickable so the dropdown can open for inspection,
+ * but options and bulk actions cannot change the value. Search remains available.
+ * Contrast with `Disabled`, which greys out the trigger and blocks opening.
+ */
+export const ReadOnly: Story = {
+  args: {
+    placeholder: "Select columns",
+    options: [
+      { key: "id", title: "ID", value: "id" },
+      { key: "agreement", title: "Agreement", value: "agreement", group: "Agreement" },
+      { key: "dim_1", title: "Dimension 1", value: "dim_1", group: "Agreement" },
+      { key: "annot_completed", title: "Annotation Completed At", value: "annot_completed", group: "Annotations" },
+    ] as any[],
+    value: ["id", "agreement"],
+    multiple: true,
+    searchable: true,
+    searchPlaceholder: "Search columns",
+    groupBy: "group",
+    showGroupActions: true,
+    readOnly: true,
+    label: "read-only select (openable, non-editable)",
+  },
+};
+
 export const WithComplexOptions: Story = {
   args: {
     placeholder: "Select a fruit",

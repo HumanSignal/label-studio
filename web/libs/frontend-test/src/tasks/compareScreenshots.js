@@ -26,6 +26,14 @@ const runComparison = async (options) => {
   const img1 = files.find(({ path }) => path.match("-orig")).file;
   const img2 = files.find(({ path }) => path.match("-comp")).file;
   const { width, height } = img1;
+
+  if (img1.width !== img2.width || img1.height !== img2.height) {
+    throw new Error(
+      `Image sizes do not match: orig=${img1.width}x${img1.height} vs comp=${img2.width}x${img2.height}. ` +
+        "Capture and compare only after the subject element has a stable layout size.",
+    );
+  }
+
   const diff = new PNG({ width, height });
 
   const totalPixels = width * height;

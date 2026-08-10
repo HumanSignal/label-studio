@@ -104,16 +104,75 @@ class TestUserFilterValueValidation:
 
         assert not serializer.is_valid()
 
-    @pytest.mark.parametrize('operator', ['equal', 'not_equal', 'regex'])
-    def test_user_filters_reject_unsupported_operators(self, operator):
-        serializer = FilterSerializer(data=self._filter(operator=operator))
+    @pytest.mark.parametrize(
+        'column',
+        [
+            'filter:tasks:annotators',
+            'filter:tasks:updated_by',
+            'filter:tasks:reviewers',
+            'filter:tasks:comment_authors',
+            'filter:tasks:skipped_by_annotator',
+        ],
+    )
+    @pytest.mark.parametrize('operator', ['equal', 'not_equal', 'regex', 'less', 'greater', 'in', 'not_in'])
+    def test_user_filters_reject_unsupported_list_operators(self, column, operator):
+        """FIT-2435: list-valued user filters only allow contains / not_contains."""
+        serializer = FilterSerializer(data=self._filter(column=column, operator=operator))
+
+        assert not serializer.is_valid()
+        assert 'operator' in serializer.errors
+
+    @pytest.mark.parametrize(
+        'column',
+        [
+            'filter:tasks:annotators',
+            'filter:tasks:updated_by',
+            'filter:tasks:reviewers',
+            'filter:tasks:comment_authors',
+        ],
+    )
+    def test_user_filters_keep_empty_operator(self, column):
+        serializer = FilterSerializer(data=self._filter(column=column, operator='empty', value=True))
+
+        assert serializer.is_valid(), serializer.errors
+
+    def test_skipped_by_annotator_rejects_empty_operator(self):
+        """FIT-2435: empty is not supported for skipped_by_annotator."""
+        serializer = FilterSerializer(
+            data=self._filter(column='filter:tasks:skipped_by_annotator', operator='empty', value=True)
+        )
+
+        assert not serializer.is_valid()
+        assert 'operator' in serializer.errors
+
+    def test_skipped_by_annotator_empty_child_filter_is_rejected(self):
+        """Child filters use the same unified operator allowlist."""
+        payload = self._filter(column='filter:tasks:annotations_results', value='x')
+        payload['child_filter'] = self._filter(
+            column='filter:tasks:skipped_by_annotator',
+            operator='empty',
+            value=True,
+        )
+        serializer = FilterSerializer(data=payload)
 
         assert not serializer.is_valid()
 
-    def test_user_filters_keep_empty_operator(self):
-        serializer = FilterSerializer(data=self._filter(operator='empty', value=True))
+    @pytest.mark.parametrize(
+        'column',
+        [
+            'filter:tasks:annotators',
+            'filter:tasks:updated_by',
+            'filter:tasks:reviewers',
+            'filter:tasks:comment_authors',
+            'filter:tasks:skipped_by_annotator',
+        ],
+    )
+    @pytest.mark.parametrize('operator', ['regex', 'less', 'greater'])
+    def test_user_filters_reject_unsupported_scalar_operators(self, column, operator):
+        serializer = FilterSerializer(data=self._filter(column=column, operator=operator, value=1))
 
-        assert serializer.is_valid(), serializer.errors
+        assert not serializer.is_valid()
+        assert 'operator' in serializer.errors
 
     def test_user_filters_keep_legacy_scalar_equal_operator(self):
         serializer = FilterSerializer(data=self._filter(column='filter:tasks:updated_by', operator='equal', value=1))

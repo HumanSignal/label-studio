@@ -53,7 +53,7 @@ jobs:
       - name: "Generate docs tags files"
         if: inputs.generate_doc_tags_files
         working-directory: "${{ env.FRONTEND_MONOREPO_DIR }}"
-        run: yarn docs
+        run: bun run docs
 
       - name: "Commit and Push"
         env:

@@ -5,6 +5,7 @@ const mockUpdateUser = mock();
 const mockRefetchUser = mock();
 const mockAvatarMutation = mock();
 const mockToastShow = mock();
+const mockToast = { show: mockToastShow };
 const mockUseAccountSettingsExtension = mock(() => ({ requiredProfileFields: [] as string[] }));
 
 mockModule("@humansignal/core/providers/AuthProvider", () => ({
@@ -30,9 +31,7 @@ mockModule("jotai-tanstack-query", () => ({
 
 mockModule("@humansignal/ui", () => ({
   ...requireActual("@humansignal/ui"),
-  useToast: () => ({
-    show: mockToastShow,
-  }),
+  useToast: () => mockToast,
 }));
 
 import { PersonalInfo } from "./PersonalInfo";

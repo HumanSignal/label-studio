@@ -73,6 +73,8 @@ export interface BadgeProps extends Omit<React.HTMLAttributes<HTMLDivElement>, "
   trailingIcon?: React.ReactNode;
   /** When provided, renders a close button and fires when clicked. */
   onClose?: (e: React.MouseEvent<HTMLButtonElement>) => void;
+  /** Accessible name for the close button. Defaults to `Remove {children}` when children is plain text. */
+  closeLabel?: string;
   /** Caps the text at this width, adds ellipsis truncation, and shows a tooltip only when text is actually clipped. */
   maxWidth?: number | string;
 }
@@ -94,6 +96,7 @@ export const Badge = forwardRef<HTMLDivElement, BadgeProps>(
       icon,
       trailingIcon,
       onClose,
+      closeLabel,
       maxWidth,
       ...props
     },
@@ -172,8 +175,7 @@ export const Badge = forwardRef<HTMLDivElement, BadgeProps>(
                   e.stopPropagation();
                   onClose(e);
                 }}
-                aria-label="Remove"
-                tabIndex={-1}
+                aria-label={closeLabel ?? (typeof children === "string" ? `Remove ${children}` : "Remove")}
               >
                 <IconClose />
               </button>

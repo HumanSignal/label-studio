@@ -7,6 +7,7 @@ import ujson as json
 from core.current_request import CurrentContext
 from core.feature_flags import flag_set
 from data_manager.models import Filter, FilterGroup, View
+from data_manager.prepare_params import filters_schema, ordering_schema, selected_items_schema
 from django.conf import settings
 from django.db import transaction
 from django.db.models import Max
@@ -859,6 +860,7 @@ class DataManagerTaskSerializer(TaskSerializer):
         return serializer_class(drafts, many=True, read_only=True, default=True, context=self.context).data
 
 
+@extend_schema_field(selected_items_schema)
 class SelectedItemsSerializer(serializers.Serializer):
     all = serializers.BooleanField()
     included = serializers.ListField(child=serializers.IntegerField(), required=False)
@@ -889,3 +891,53 @@ class ViewOrderSerializer(serializers.Serializer):
     ids = serializers.ListField(
         child=serializers.IntegerField(), allow_empty=False, help_text='A list of view IDs in the desired order.'
     )
+
+
+class PrepareParamsChildFilterItemSerializer(serializers.Serializer):
+    """Canonical public Data Manager filter item without recursive children."""
+
+    filter = serializers.CharField(help_text='Filter identifier, e.g. filter:tasks:completed_at')
+    operator = serializers.CharField(help_text='Filter operator, e.g. equal, greater, in_list')
+    type = serializers.CharField(help_text='Type of the filter value')
+    value = serializers.JSONField(help_text='Value to filter by')
+
+
+class PrepareParamsFilterItemSerializer(PrepareParamsChildFilterItemSerializer):
+    """Canonical public root filter item with one supported level of children."""
+
+    child_filters = serializers.ListField(
+        child=PrepareParamsChildFilterItemSerializer(),
+        required=False,
+        help_text='Ordered child filters AND-merged with their parent (one nesting level).',
+    )
+
+
+@extend_schema_field(filters_schema, component_name='PrepareParamsFiltersRequest')
+class PrepareParamsFiltersSerializer(serializers.Serializer):
+    conjunction = serializers.ChoiceField(choices=['or', 'and'])
+    items = PrepareParamsFilterItemSerializer(many=True)
+
+
+@extend_schema_field(ordering_schema, component_name='PrepareParamsOrderingRequest')
+class PrepareParamsOrderingField(serializers.ListField):
+    """Runtime list validation with the established public ordering schema."""
+
+
+class PrepareParamsRequestSerializer(serializers.Serializer):
+    filters = PrepareParamsFiltersSerializer(required=False, allow_null=True)
+    selectedItems = SelectedItemsSerializer(required=False, allow_null=True)
+    ordering = PrepareParamsOrderingField(child=serializers.CharField(), required=False, allow_null=True)
+
+
+class ViewDataRequestSerializer(serializers.Serializer):
+    """Established public view payload nested under ``data``."""
+
+    filters = PrepareParamsFiltersSerializer(required=False, allow_null=True)
+    ordering = PrepareParamsOrderingField(child=serializers.CharField(), required=False, allow_null=True)
+
+
+class ViewRequestSerializer(serializers.Serializer):
+    """Public view write contract; runtime conversion remains in ``ViewSerializer``."""
+
+    data = ViewDataRequestSerializer(required=False)
+    project = serializers.IntegerField(required=False, help_text='Project ID')

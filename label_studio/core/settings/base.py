@@ -527,6 +527,11 @@ SPECTACULAR_SETTINGS = {
             ('completed', 'Completed'),
             ('completed_with_errors', 'Completed with errors'),
         ),
+        # Task assignment type (Annotate / Review) used by assignees mutation APIs.
+        'AssignmentTypeEnum': (
+            ('AN', 'Annotate'),
+            ('RE', 'Review'),
+        ),
     },
 }
 
@@ -758,6 +763,7 @@ ANNOTATOR_REVIEWER_FIREWALL = 'users.firewall.AnnotatorReviewerFirewall'
 TASK_SERIALIZER = 'tasks.serializers.BaseTaskSerializer'
 EXPORT_DATA_SERIALIZER = 'data_export.serializers.BaseExportDataSerializer'
 DATA_MANAGER_GET_ALL_COLUMNS = 'data_manager.functions.get_all_columns'
+DATA_MANAGER_GET_PROJECT_USER_IDS = 'users.project_access.get_user_ids_in_projects'
 DATA_MANAGER_ANNOTATIONS_MAP = {}
 DATA_MANAGER_ACTIONS = {}
 DATA_MANAGER_CUSTOM_FILTER_EXPRESSIONS = 'data_manager.functions.custom_filter_expressions'

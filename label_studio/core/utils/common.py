@@ -608,10 +608,24 @@ class temporary_disconnect_all_signals(object):
     def disconnect(self, signal):
         self.stashed_signals[signal] = signal.receivers
         signal.receivers = []
+        # Django caches resolved receivers per sender in ``sender_receivers_cache``.
+        # Mutating ``receivers`` directly bypasses ``Signal.connect``/``disconnect``
+        # (which clear that cache), so any ``signal.send(sender=...)`` during the
+        # disconnected window would cache an empty receiver list for that sender and
+        # keep it after reconnect — permanently silencing the signal for that sender
+        # (FIT-2368: cascade deletes fired here poisoned ProjectRole delete signals).
+        self._invalidate_cache(signal)
 
     def reconnect(self, signal):
         signal.receivers = self.stashed_signals.get(signal, [])
         del self.stashed_signals[signal]
+        self._invalidate_cache(signal)
+
+    @staticmethod
+    def _invalidate_cache(signal):
+        cache = getattr(signal, 'sender_receivers_cache', None)
+        if cache is not None:
+            cache.clear()
 
 
 def batch(iterable, n=1):

@@ -6,6 +6,7 @@ export {
   Annotators as Reviewers,
   Annotators as UpdatedBy,
   Annotators as CommentAuthors,
+  SkippedByAnnotator,
 } from "./Annotators/Annotators";
 export { AudioCell as Audio, AudioPlusCell as AudioPlus } from "./AudioCell";
 export { BooleanCell as Boolean } from "./BooleanCell";
@@ -29,10 +30,6 @@ export function normalizeCellAlias(alias) {
   // so they use the same percentage formatting and coloring.
   if (safeAlias === "agreement" || safeAlias.startsWith("dimension_agreement_")) {
     return "Agreement";
-  }
-
-  if (safeAlias === "skipped_by_annotator") {
-    return "Annotators";
   }
 
   return pascalCase(safeAlias);

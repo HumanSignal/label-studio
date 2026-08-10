@@ -17,6 +17,7 @@ export const DatePicker = ({
   dateFormat = "MM.dd.yyyy",
   timeFormat = "HH:mm",
   onChange,
+  disabled = false,
 }) => {
   const finalFormat = showTime ? `${dateFormat} ${timeFormat}` : dateFormat;
 
@@ -46,6 +47,7 @@ export const DatePicker = ({
   const [endDate, setEndDate] = useState(formatDate(realEndDate));
 
   const updateDate = (date, dateSetter, realDateSetter) => {
+    if (disabled) return;
     if (date.length > finalFormat.length) return;
 
     dateSetter?.(date);
@@ -85,6 +87,7 @@ export const DatePicker = ({
   }, [realStartDate, realEndDate]);
 
   const onChangeHandler = useCallback((date) => {
+    if (disabled) return;
     if (realStartDate !== null && realEndDate === null && selectRange) {
       setRealEndDate(date);
       dropdownRef.current?.close();
@@ -99,10 +102,11 @@ export const DatePicker = ({
   });
 
   return (
-    <div className={cn("datepicker").toClassName()}>
+    <div className={cn("datepicker").mod({ disabled }).toClassName()}>
       <Dropdown.Trigger
         ref={dropdownRef}
         toggle={false}
+        disabled={disabled}
         content={
           <div className={cn("datepicker").elem("wrapper").toClassName()}>
             <DP
@@ -124,6 +128,7 @@ export const DatePicker = ({
           <Input
             size={size}
             value={startDate || ""}
+            disabled={disabled}
             onChange={(e) => updateDate(e.target.value, setStartDate, setRealStartDate)}
           />
           {selectRange && (
@@ -132,6 +137,7 @@ export const DatePicker = ({
               <Input
                 size={size}
                 value={endDate || ""}
+                disabled={disabled}
                 onChange={(e) => updateDate(e.target.value, setEndDate, setRealEndDate)}
               />
             </>

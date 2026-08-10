@@ -85,6 +85,7 @@ export const TaxonomySelectionChip = ({
       className={cnm(styles.compoundChip, chipLayout === "stacked" && styles.compoundChipStacked)}
       data-taxonomy-chip-state={isComplete ? "filled" : highlightIncomplete ? "invalid" : "unfilled"}
       onClose={handleClose}
+      closeLabel={`Remove ${displayLabel}`}
     >
       <span className={styles.chipLabel} title={displayLabel}>
         {displayLabel}

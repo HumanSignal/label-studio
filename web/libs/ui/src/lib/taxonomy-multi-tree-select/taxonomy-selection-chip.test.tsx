@@ -153,7 +153,7 @@ describe("TaxonomySelectionChip", () => {
       />,
     );
 
-    fireEvent.click(screen.getByRole("button", { name: "Remove" }));
+    fireEvent.click(screen.getByRole("button", { name: "Remove Category" }));
     expect(onRemove).toHaveBeenCalledWith("cat-1");
   });
 });

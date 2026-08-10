@@ -1,11 +1,121 @@
+from unittest.mock import patch
+
 from django.test import TestCase
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.http import urlencode
+from projects.api import ProjectListAPI
+from projects.models import ProjectManager, ProjectQuerySetWithFSM
 from projects.tests.factories import ProjectFactory
-from rest_framework.test import APIClient, APITestCase
+from rest_framework.test import APIClient, APIRequestFactory, APITestCase, force_authenticate
 from tasks.models import Task
 from tasks.tests.factories import PredictionFactory, TaskFactory
+
+
+class TestProjectListAPI(APITestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.matching_project = ProjectFactory(title='Needle Project')
+        cls.user = cls.matching_project.created_by
+        cls.other_project = ProjectFactory(
+            title='Unrelated Project',
+            organization=cls.matching_project.organization,
+            created_by=cls.user,
+        )
+
+    def setUp(self):
+        self.client.force_authenticate(user=self.user)
+
+    def get_view_queryset(self, **params):
+        request = APIRequestFactory().get(reverse('projects:api:project-list'), params)
+        force_authenticate(request, user=self.user)
+        view = ProjectListAPI()
+        view.request = view.initialize_request(request)
+        view.args = ()
+        view.kwargs = {}
+        return view.get_queryset()
+
+    def test_search_filters_projects_by_title(self):
+        """The project list search parameter returns only projects whose title matches."""
+        response = self.client.get(reverse('projects:api:project-list'), {'search': 'needle'})
+
+        assert response.status_code == 200
+        assert [project['id'] for project in response.json()['results']] == [self.matching_project.id]
+
+    def test_fields_returns_sparse_project_shape(self):
+        """The project list fields parameter limits each serialized project to the requested fields."""
+        response = self.client.get(reverse('projects:api:project-list'), {'fields': 'id,title'})
+
+        assert response.status_code == 200
+        assert response.json()['results']
+        assert all(set(project) == {'id', 'title'} for project in response.json()['results'])
+
+    def test_fields_with_whitespace_matches_enrichment_skips(self):
+        """Whitespace around fields tokens must not desync serializer flex-fields vs enrichment gating."""
+        with (
+            patch('projects.api.flag_set', return_value=True),
+            patch(
+                'projects.api.ProjectManager.with_counts_annotate',
+                wraps=ProjectManager.with_counts_annotate,
+            ) as with_counts,
+            patch.object(
+                ProjectQuerySetWithFSM,
+                'with_state',
+                autospec=True,
+                side_effect=ProjectQuerySetWithFSM.with_state,
+            ) as with_state,
+        ):
+            queryset = self.get_view_queryset(fields='id, title')
+            response = self.client.get(reverse('projects:api:project-list'), {'fields': 'id, title'})
+
+        with_counts.assert_not_called()
+        with_state.assert_not_called()
+        assert queryset._prefetch_related_lookups == ()
+        assert response.status_code == 200
+        assert response.json()['results']
+        assert all(set(project) == {'id', 'title'} for project in response.json()['results'])
+
+    def test_sparse_fields_skip_counts_state_and_related_prefetches(self):
+        """The picker shape avoids unrelated list enrichment work."""
+        with (
+            patch('projects.api.flag_set', return_value=True),
+            patch(
+                'projects.api.ProjectManager.with_counts_annotate',
+                wraps=ProjectManager.with_counts_annotate,
+            ) as with_counts,
+            patch.object(
+                ProjectQuerySetWithFSM,
+                'with_state',
+                autospec=True,
+                side_effect=ProjectQuerySetWithFSM.with_state,
+            ) as with_state,
+        ):
+            queryset = self.get_view_queryset(fields='id,title', search='needle')
+
+        with_counts.assert_not_called()
+        with_state.assert_not_called()
+        assert queryset._prefetch_related_lookups == ()
+
+    def test_default_fields_preserve_project_list_enrichment(self):
+        """The normal project list keeps its existing counts, state, and related prefetches."""
+        with (
+            patch('projects.api.flag_set', return_value=True),
+            patch(
+                'projects.api.ProjectManager.with_counts_annotate',
+                wraps=ProjectManager.with_counts_annotate,
+            ) as with_counts,
+            patch.object(
+                ProjectQuerySetWithFSM,
+                'with_state',
+                autospec=True,
+                side_effect=ProjectQuerySetWithFSM.with_state,
+            ) as with_state,
+        ):
+            queryset = self.get_view_queryset()
+
+        with_counts.assert_called_once()
+        with_state.assert_called_once()
+        assert queryset._prefetch_related_lookups == ('members', 'created_by')
 
 
 class TestProjectCountsListAPI(TestCase):

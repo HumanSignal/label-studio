@@ -166,12 +166,13 @@ export const PersonalInfo = () => {
     <div className={styles.section} id="personal-info">
       <div className={styles.sectionContent}>
         <div className={styles.profilePhotoRow}>
-          <Userpic user={user} isInProgress={userInProgress} size={88} style={{ flex: "none" }} />
-          <div className={styles.sectionContent}>
-            <Typography variant="label" size="medium">
+          <Userpic user={user} isInProgress={userInProgress} size={88} className={styles.userPic} />
+          <div className={`${styles.sectionContent} ${styles.profilePhotoControls}`}>
+            <Typography className={styles.profilePhotoLabel} variant="label" size="medium">
               Profile Photo
             </Typography>
             <InputFile
+              className={styles.profilePhotoUpload}
               name="avatar"
               onChange={fileChangeHandler}
               accept="image/png, image/jpeg, image/jpg"
@@ -179,7 +180,14 @@ export const PersonalInfo = () => {
             />
           </div>
           {canDeleteAvatar && (
-            <Button type="submit" variant="negative" look="outlined" size="medium" onClick={deleteUserAvatar}>
+            <Button
+              className={styles.profilePhotoDelete}
+              type="submit"
+              variant="negative"
+              look="outlined"
+              size="medium"
+              onClick={deleteUserAvatar}
+            >
               Delete Photo
             </Button>
           )}

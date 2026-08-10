@@ -38,19 +38,9 @@ jobs:
           node-version: "${{ env.NODE }}"
           directory: "${{ env.FRONTEND_MONOREPO_DIR }}"
 
-      # Nx cache is restored/saved here. With Nx's db cache, artifacts from other runners are not used
-      # (machine ID mismatch). For shared CI cache, use Nx Cloud (Nx Replay) instead.
-      - name: Cache Nx
-        uses: actions/cache@v6
-        with:
-          path: ${{ env.FRONTEND_MONOREPO_DIR }}/.nx/cache
-          key: nx-v2-lsf-${{ runner.os }}-${{ env.NODE }}-${{ hashFiles('web/package.json', 'web/yarn.lock') }}
-          restore-keys: |
-            nx-v2-lsf-${{ runner.os }}-${{ env.NODE }}-
-
       - name: Build editor (production)
         working-directory: ${{ env.FRONTEND_MONOREPO_DIR }}
-        run: BABEL_ENV=test MODE=standalone yarn nx run editor:build:production
+        run: bun run lsf:build:coverage
 
       - name: Upload editor build
         uses: actions/upload-artifact@v7
@@ -118,7 +108,7 @@ jobs:
         id: cypress-binary
         with:
           path: ~/.cache/Cypress
-          key: cypress-${{ runner.os }}-${{ hashFiles('web/yarn.lock') }}
+          key: cypress-${{ runner.os }}-${{ hashFiles('web/bun.lock') }}
 
       - name: Install Cypress binary
         if: steps.cypress-binary.outputs.cache-hit != 'true'
@@ -138,8 +128,8 @@ jobs:
           echo "Build output:"
           ls -la dist/libs/editor/
           test -f dist/libs/editor/index.html || (echo "Missing index.html" && exit 1)
-          # Ensure CSS is present (webpack emits main.css or similar)
-          if ! find dist/libs/editor -maxdepth 1 -name "*.css" -print -quit | grep -q .; then
+          # Ensure CSS is present (vite emits hashed CSS under assets/)
+          if ! find dist/libs/editor -name "*.css" -print -quit | grep -q .; then
             echo "No CSS file in build - styles may not load. Contents:"
             ls dist/libs/editor/
             exit 1
@@ -172,14 +162,22 @@ jobs:
 
       - name: Run Cypress (chunk ${{ matrix.chunk }})
         working-directory: ${{ env.FRONTEND_MONOREPO_DIR }}
-        run: COLLECT_COVERAGE=1 npx nx run editor:integration -- --spec "${{ matrix.specs }}"
+        run: COLLECT_COVERAGE=1 bun run lsf:integration --spec "${{ matrix.specs }}"
 
       - name: Upload coverage chunk
         if: always()
         working-directory: ${{ env.FRONTEND_MONOREPO_DIR }}
         run: |
           mkdir -p coverage-chunks
-          cp libs/editor/.nyc_output/out.json coverage-chunks/${{ matrix.chunk }}.json 2>/dev/null || touch coverage-chunks/${{ matrix.chunk }}.json
+          # Coverage lands in .nyc_output relative to the Cypress process cwd;
+          # accept both the project-local and the web-root location.
+          for src in libs/editor/.nyc_output/out.json .nyc_output/out.json; do
+            if [ -f "$src" ]; then
+              cp "$src" coverage-chunks/${{ matrix.chunk }}.json
+              break
+            fi
+          done
+          [ -f coverage-chunks/${{ matrix.chunk }}.json ] || touch coverage-chunks/${{ matrix.chunk }}.json
       - name: Upload coverage artifact
         uses: actions/upload-artifact@v7
         if: always()
@@ -193,8 +191,8 @@ jobs:
         with:
           name: cypress-output-${{ matrix.chunk }}
           path: |
-            ${{ env.FRONTEND_MONOREPO_DIR }}/dist/cypress/libs/frontend-test/src/screenshots
-            ${{ env.FRONTEND_MONOREPO_DIR }}/dist/cypress/libs/frontend-test/src/videos
+            ${{ env.FRONTEND_MONOREPO_DIR }}/libs/editor/output/screenshots
+            ${{ env.FRONTEND_MONOREPO_DIR }}/libs/editor/output/video
 
       - name: Kill server
         if: always()

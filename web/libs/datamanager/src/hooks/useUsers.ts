@@ -30,6 +30,11 @@ export interface UsersResponse {
 export type UsersApiResponse = UsersResponse | (APIUser[] & { count?: number; displayCount?: number });
 
 type SelectedUserValue = number | number[] | null | undefined;
+const MAX_USERS_PAGE_SIZE = 100;
+
+interface DataManagerUserScope {
+  column?: string;
+}
 
 export const normalizeUsersResponse = (response: UsersApiResponse): UsersResponse => {
   const normalized: UsersResponse = Array.isArray(response)
@@ -48,12 +53,21 @@ export const normalizeSelectedUserIds = (selectedValue: SelectedUserValue): numb
 };
 
 export const getUsersPageSize = (pageSize: number, selectedUserIds: number[]): number =>
-  Math.max(pageSize, selectedUserIds.length);
+  Math.min(Math.max(pageSize, selectedUserIds.length), MAX_USERS_PAGE_SIZE);
+
+export const chunkSelectedUserIds = (selectedUserIds: number[]): number[][] => {
+  const chunks: number[][] = [];
+  for (let index = 0; index < selectedUserIds.length; index += MAX_USERS_PAGE_SIZE) {
+    chunks.push(selectedUserIds.slice(index, index + MAX_USERS_PAGE_SIZE));
+  }
+  return chunks;
+};
 
 export const mergeSelectedUsers = (
   response: UsersResponse,
   cachedUsers: APIUser[],
   selectedUserIds: number[],
+  inflateDisplayCount = true,
 ): UsersResponse => {
   const selectedIds = new Set(selectedUserIds);
   const responseIds = new Set(response.results.map(({ id }) => id));
@@ -62,7 +76,7 @@ export const mergeSelectedUsers = (
   return {
     ...response,
     results: [...response.results, ...selectedUsers],
-    displayCount: response.count + selectedUsers.length,
+    displayCount: response.count + (inflateDisplayCount ? selectedUsers.length : 0),
   };
 };
 
@@ -79,15 +93,17 @@ export const getUsersItemCount = (serverCount: number, loadedUserCount: number, 
 export const useDataManagerUsers = (
   projectId: string | number,
   pageSize = 20,
-  isDeleted = false,
-  role = null,
   search = null,
   selectedValue: SelectedUserValue = null,
+  scope: DataManagerUserScope = {},
 ) => {
   const seenUsersRef = useRef(new Map<number, APIUser>());
   const selectedUserIds = normalizeSelectedUserIds(selectedValue);
+  const selectedUserIdChunks = chunkSelectedUserIds(selectedUserIds);
   const requestPageSize = getUsersPageSize(pageSize, selectedUserIds);
-  const queryKey = ["users", projectId, requestPageSize, isDeleted, role, search, selectedUserIds];
+  // Include column so predicate-scoped pickers do not share React Query cache entries.
+  // Do not reintroduce removed isDeleted/role — those were dropped from the options contract (FIT-2282).
+  const queryKey = ["projectUsers", projectId, scope.column, requestPageSize, search, selectedUserIds];
 
   const { data, isLoading, isError, error, refetch, hasNextPage, fetchNextPage, isFetchingNextPage } = useInfiniteQuery(
     {
@@ -104,36 +120,47 @@ export const useDataManagerUsers = (
           page: pageParam,
           page_size: requestPageSize,
           project: projectId,
-          is_deleted: isDeleted,
+          ordering: "id",
         };
 
-        if (role) params.role = role;
         if (search) params.search = search;
-        if (selectedUserIds.length) params.selected_value = selectedUserIds;
-        const apiResponse = await store.apiCall?.("users", params);
+        if (scope.column) params.column = scope.column;
+        if (selectedUserIdChunks.length) params.selected_value = selectedUserIdChunks[0];
+        const apiResponse = await store.apiCall?.("projectUsers", params);
 
         if (!apiResponse) {
           throw new Error("No users found in response or response is invalid");
         }
         const response = normalizeUsersResponse(apiResponse);
         response.results.forEach((user) => seenUsersRef.current.set(user.id, user));
-        if (pageParam === 1 && search && selectedUserIds.length) {
-          const hasMissingSelectedUsers = selectedUserIds.some((id) => !seenUsersRef.current.has(id));
-          if (hasMissingSelectedUsers) {
-            const selectedParams = { ...params };
-            delete selectedParams.search;
-            const selectedApiResponse = await store.apiCall?.("users", selectedParams);
-            if (selectedApiResponse) {
-              normalizeUsersResponse(selectedApiResponse).results.forEach((user) =>
-                seenUsersRef.current.set(user.id, user),
-              );
-            }
-          }
+        if (pageParam === 1 && selectedUserIdChunks.length && (search || selectedUserIdChunks.length > 1)) {
+          const chunksToFetch = search ? selectedUserIdChunks : selectedUserIdChunks.slice(1);
+          await Promise.all(
+            chunksToFetch.map(async (selectedIds) => {
+              const missingSelectedIds = selectedIds.filter((id) => !seenUsersRef.current.has(id));
+              if (!missingSelectedIds.length) return;
+
+              const selectedParams = {
+                ...params,
+                page: 1,
+                page_size: MAX_USERS_PAGE_SIZE,
+                selected_value: missingSelectedIds,
+              };
+              delete selectedParams.search;
+              const selectedApiResponse = await store.apiCall?.("projectUsers", selectedParams);
+              if (selectedApiResponse) {
+                const missingIds = new Set(missingSelectedIds);
+                normalizeUsersResponse(selectedApiResponse)
+                  .results.filter(({ id }) => missingIds.has(id))
+                  .forEach((user) => seenUsersRef.current.set(user.id, user));
+              }
+            }),
+          );
           const selectedUsers = selectedUserIds.flatMap((id) => {
             const user = seenUsersRef.current.get(id);
             return user ? [user] : [];
           });
-          return mergeSelectedUsers(response, selectedUsers, selectedUserIds);
+          return mergeSelectedUsers(response, selectedUsers, selectedUserIds, Boolean(search));
         }
 
         return response;

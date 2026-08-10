@@ -14,6 +14,18 @@ import ToolsManager from "../../../tools/Manager";
 
 export const MIN_SIZE = 5;
 
+/**
+ * BROS-1527: VideoVectorTool is auto-selected whenever VideoVectorLabels exists.
+ * Only consume empty-stage events when the vector tool is actively drawing/resuming
+ * or when it can actually start (correct control + label). Otherwise fall through to
+ * VideoRectangle drag creation.
+ */
+export const shouldRouteToVectorTool = (vectorTool) => {
+  if (!vectorTool) return false;
+  if (vectorTool.isDrawing || vectorTool.canResumeDrawing) return true;
+  return typeof vectorTool.canStartDrawing === "function" ? vectorTool.canStartDrawing() : true;
+};
+
 const SelectionRect = (props) => {
   return (
     <>
@@ -182,7 +194,7 @@ const VideoRegionsPure = ({
 
     if (!isInBounds) return;
 
-    if (vectorTool) {
+    if (shouldRouteToVectorTool(vectorTool)) {
       vectorTool.event("mousedown", e.evt, [x, y]);
       return;
     }
@@ -239,7 +251,7 @@ const VideoRegionsPure = ({
     (e) => {
       const vectorTool = getVectorTool();
 
-      if (vectorTool) {
+      if (shouldRouteToVectorTool(vectorTool)) {
         const { x, y } = limitCoordinates(normalizeMouseOffsets(e.evt.offsetX, e.evt.offsetY));
 
         vectorTool.event("click", e.evt, [x, y]);

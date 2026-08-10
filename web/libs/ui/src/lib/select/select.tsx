@@ -256,6 +256,7 @@ export const Select = forwardRef(
       defaultSearchValue = "",
       value: externalValue,
       disabled = false,
+      readOnly = false,
       multiple = false,
       isInline = false,
       isLoading = false,
@@ -353,9 +354,11 @@ export const Select = forwardRef(
         onSearch?.(defaultSearchValue || "");
       }
     }, [isOpen, defaultSearchValue, onSearch]);
+    const interactionDisabled = disabled || readOnly;
+
     const _onChange = useCallback(
       (val: string, isSelected: boolean) => {
-        if (disabled) return;
+        if (interactionDisabled) return;
 
         if (multiple) {
           valueRef.current = isSelected
@@ -380,7 +383,7 @@ export const Select = forwardRef(
           ref?.current?.dispatchEvent?.(changeEvent);
         }, 0);
       },
-      [props?.onChange, multiple, disabled],
+      [props?.onChange, multiple, interactionDisabled],
     );
 
     const filterHandler = useCallback((option: any, queryString: string) => {
@@ -557,7 +560,7 @@ export const Select = forwardRef(
                   optionIndex: idx,
                 })}
                 isOptionSelected={isOptionSelected}
-                disabled={typeof item === "object" && item?.disabled}
+                disabled={readOnly || (typeof item === "object" && item?.disabled)}
                 style={typeof item === "object" ? item?.style : undefined}
                 multiple={multiple}
                 onSelect={() => {
@@ -568,7 +571,7 @@ export const Select = forwardRef(
           });
 
           const hasHeader = group.groupKey !== null;
-          const hasActions = hasHeader && showGroupActions && multiple;
+          const hasActions = hasHeader && showGroupActions && multiple && !readOnly;
 
           return (
             <div
@@ -612,6 +615,7 @@ export const Select = forwardRef(
                   label={label}
                   isIndeterminate={!isOptionSelected && isIndeterminate}
                   isOptionSelected={isOptionSelected}
+                  disabled={readOnly}
                   onSelect={() => {
                     children.forEach((child: SelectOption<T>) => {
                       const childVal = child?.value ?? child;
@@ -638,7 +642,7 @@ export const Select = forwardRef(
                         optionIndex: i,
                       })}
                       isOptionSelected={isChildOptionSelected}
-                      disabled={item?.disabled}
+                      disabled={readOnly || item?.disabled}
                       style={item?.style}
                       multiple={multiple}
                       onSelect={() => {
@@ -662,7 +666,7 @@ export const Select = forwardRef(
               optionIndex: index,
             })}
             isOptionSelected={isOptionSelected}
-            disabled={option?.disabled}
+            disabled={readOnly || option?.disabled}
             style={option?.style}
             multiple={multiple}
             onSelect={() => {
@@ -671,7 +675,17 @@ export const Select = forwardRef(
           />
         );
       });
-    }, [_options, groupedOptions, multiple, isSelected, _onChange, optionRenderer, showGroupActions, props?.onChange]);
+    }, [
+      _options,
+      groupedOptions,
+      multiple,
+      isSelected,
+      _onChange,
+      optionRenderer,
+      showGroupActions,
+      props?.onChange,
+      readOnly,
+    ]);
 
     const combobox = (
       <Popover
@@ -702,6 +716,7 @@ export const Select = forwardRef(
             ref={triggerRef}
             data-name={props?.name}
             data-value={value ?? ""}
+            aria-readonly={readOnly || undefined}
             {...triggerProps}
           >
             <span className="flex flex-1 text-left gap-2 max-w-full overflow-hidden" data-testid="select-display-value">
@@ -752,7 +767,7 @@ export const Select = forwardRef(
                         _onChange(val, true);
                       });
                     }}
-                    disabled={disabled}
+                    disabled={interactionDisabled}
                     onSelectAllClick={onSelectAllClick}
                     selectAllLabel={selectAllLabel}
                   />

@@ -8,14 +8,14 @@ on:
         type: string
 
 env:
-  PROJECT_PATH: 'label_studio/'
-  REPORT_PATH: 'bandit_results/bandit_security_report.txt'
+  PROJECT_PATH: 'label_studio'
+  PYTHON_VERSION: '3.13'
   ACTIONS_STEP_DEBUG: '${{ secrets.ACTIONS_STEP_DEBUG }}'
 
 jobs:
   bandit:
     name: "Bandit"
-    timeout-minutes: 5
+    timeout-minutes: 10
     runs-on: ubuntu-latest
     steps:
       - uses: hmarr/debug-action@v3.0.0
@@ -28,27 +28,71 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v7
         with:
-          python-version: '3.13'
+          python-version: ${{ env.PYTHON_VERSION }}
 
       - name: Install Bandit
-        run: |
-          pip install bandit
+        run: pip install bandit
 
       - name: Install custom bandit plugins
         run: pip install ./tools/bandit_ls_custom_checks
 
-      - name: Run Bandit
+      - name: List installed custom plugins
         run: |
-          mkdir -p bandit_results
-          touch ${{ env.REPORT_PATH }}
-          bandit -r $PROJECT_PATH -o ${{ env.REPORT_PATH }} -f 'txt' -ll
+          python3 -c "from bandit.core.extension_loader import MANAGER; import bandit; [print(f'{k}: {v.name}') for k, v in sorted(MANAGER.plugins_by_id.items()) if not v.plugin.__module__.startswith('bandit.')]"
 
-      - name: Print scan results
-        if: always()
-        run: cat ${{ env.REPORT_PATH }}
+      - name: Run Bandit
+        run: bandit -r ${{ env.PROJECT_PATH }} -v -f json -o bandit-report.json || true
 
-      - uses: actions/upload-artifact@v7
+      - name: Publish results
         if: always()
+        shell: python
+        run: |
+          import json, os
+
+          with open("bandit-report.json") as f:
+              report = json.load(f)
+
+          results = report.get("results", [])
+          metrics = report.get("metrics", {}).get("_totals", {})
+          severity_counts = {
+              "HIGH": metrics.get("SEVERITY.HIGH", 0),
+              "MEDIUM": metrics.get("SEVERITY.MEDIUM", 0),
+              "LOW": metrics.get("SEVERITY.LOW", 0),
+          }
+
+          # Job summary and annotations — only if HIGH severity issues exist
+          high_results = [r for r in results if r["issue_severity"] == "HIGH"]
+
+          if high_results:
+              summary = []
+              summary.append("## Bandit Results\n")
+              summary.append(f"🔴 **{len(high_results)}** high severity issue(s) found\n")
+              summary.append("| Severity | Confidence | File | Line | Issue |")
+              summary.append("|----------|------------|------|------|-------|")
+              for r in high_results:
+                  fname = r["filename"].removeprefix("./")
+                  line = r["line_number"]
+                  text = r["issue_text"]
+                  tid = r["test_id"]
+                  summary.append(f"| 🔴 HIGH | {r['issue_confidence']} | `{fname}` | {line} | {tid}: {text} |")
+
+              with open(os.environ["GITHUB_STEP_SUMMARY"], "a") as f:
+                  f.write("\n".join(summary) + "\n")
+
+              for r in high_results:
+                  fname = r["filename"].removeprefix("./")
+                  line = r["line_number"]
+                  msg = f"[{r['test_id']}] {r['issue_text']}"
+                  print(f"::error file={fname},line={line}::{msg}")
+
+          # Fail the job if any HIGH severity issues found
+          if severity_counts["HIGH"] > 0:
+              raise SystemExit(f"Found {severity_counts['HIGH']} HIGH severity issue(s)")
+
+      - name: Upload report
+        if: always()
+        uses: actions/upload-artifact@v7
         with:
-          name: Security check results
-          path: ${{ env.REPORT_PATH }}
+          name: bandit-report
+          path: bandit-report.json
+          retention-days: 7

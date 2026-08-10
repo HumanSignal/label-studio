@@ -2,7 +2,7 @@ import { confirm } from "@humansignal/ui/lib/modal";
 import { ToastType, useToast } from "@humansignal/ui/lib/toast/toast";
 // @ts-ignore
 import { useAPI } from "@humansignal/core";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
   type ApiResponse,
   type ExportData,
@@ -13,155 +13,294 @@ import {
   type SaveResult,
 } from "../sections/Hotkeys/utils";
 
-// Type the imported defaults and convert numeric ids to strings
 const typedDefaultHotkeys: Hotkey[] = getTypedDefaultHotkeys();
 
-export const useHotkeys = () => {
+interface CustomHotkey {
+  key: string;
+  active: boolean;
+  description?: string;
+}
+
+type CustomHotkeys = Record<string, CustomHotkey>;
+type RuntimeKeymap = Record<string, Record<string, unknown>>;
+interface HotkeyApiResponse extends ApiResponse {
+  $meta?: {
+    status?: number;
+    ok?: boolean;
+  };
+}
+interface ApiRequestError {
+  response?: {
+    status?: number;
+    data?: {
+      error?: string;
+    };
+  };
+  request?: unknown;
+}
+type HotkeyRuntimeWindow = Window & {
+  Htx?: {
+    Hotkey?: {
+      setKeymap: (keymap: RuntimeKeymap) => void;
+    };
+  };
+};
+
+export type HotkeyScope = { kind: "account" } | { kind: "project"; projectId: number };
+
+export const getResetSuccessMessage = (projectId: number | undefined): string =>
+  projectId === undefined
+    ? "All hotkeys and settings have been reset to defaults and saved"
+    : "This project's hotkey override has been reset and saved";
+
+export const getSaveSuccessMessage = (sectionName: string, projectId: number | undefined): string =>
+  projectId === undefined ? `${sectionName} account defaults saved` : `${sectionName} project override saved`;
+
+const isApiFailure = (response: HotkeyApiResponse | null): boolean =>
+  response === null || Boolean(response.error) || response.$meta?.ok === false;
+
+const isProjectAccessStatus = (status: number | undefined): boolean => status === 403 || status === 404;
+
+const getHotkeyId = (hotkey: Hotkey): string => `${hotkey.section}:${hotkey.element}`;
+
+const cloneCustomHotkeys = (hotkeys: CustomHotkeys): CustomHotkeys =>
+  Object.fromEntries(Object.entries(hotkeys).map(([id, hotkey]) => [id, { ...hotkey }]));
+
+const hotkeysToCustomHotkeys = (hotkeys: Hotkey[]): CustomHotkeys =>
+  Object.fromEntries(
+    hotkeys.map((hotkey) => [
+      getHotkeyId(hotkey),
+      {
+        key: hotkey.key,
+        active: hotkey.active,
+        ...(hotkey.description && { description: hotkey.description }),
+      },
+    ]),
+  );
+
+const updateHotkeysWithCustomSettings = (defaultHotkeys: Hotkey[], customHotkeys: CustomHotkeys): Hotkey[] =>
+  defaultHotkeys.map((hotkey) => {
+    const customSetting = customHotkeys[getHotkeyId(hotkey)];
+    if (!customSetting) return hotkey;
+
+    return {
+      ...hotkey,
+      key: customSetting.key,
+      active: customSetting.active,
+      ...(customSetting.description && { description: customSetting.description }),
+    };
+  });
+
+export const mergeCustomHotkeys = (account: CustomHotkeys, project: CustomHotkeys): CustomHotkeys => ({
+  ...cloneCustomHotkeys(account),
+  ...cloneCustomHotkeys(project),
+});
+
+export const computeProjectOverrides = (hotkeys: Hotkey[], accountHotkeys: CustomHotkeys): CustomHotkeys => {
+  const accountEffectiveHotkeys = hotkeysToCustomHotkeys(
+    updateHotkeysWithCustomSettings(typedDefaultHotkeys, accountHotkeys),
+  );
+  const currentHotkeys = hotkeysToCustomHotkeys(hotkeys);
+
+  return Object.fromEntries(
+    Object.entries(currentHotkeys).filter(([id, current]) => {
+      const accountEffective = accountEffectiveHotkeys[id] ?? accountHotkeys[id];
+      if (!accountEffective) return true;
+
+      return (
+        current.key !== accountEffective.key ||
+        current.active !== accountEffective.active ||
+        current.description !== accountEffective.description
+      );
+    }),
+  );
+};
+
+const EDITOR_HOTKEY_PREFIX = /^(annotation|timeseries|audio|regions|video|image_gallery|tools):(.*)/;
+
+const toEditorKeymap = (customHotkeys: CustomHotkeys): RuntimeKeymap => {
+  const editorKeymap: RuntimeKeymap = {};
+
+  for (const [id, hotkey] of Object.entries(customHotkeys)) {
+    const match = id.match(EDITOR_HOTKEY_PREFIX);
+    if (!match) continue;
+
+    const shortKey = match[2];
+    editorKeymap[shortKey] = hotkey.active === false ? { ...hotkey, key: null } : { ...hotkey };
+  }
+
+  return editorKeymap;
+};
+
+const cloneRuntimeKeymap = (keymap: RuntimeKeymap): RuntimeKeymap =>
+  Object.fromEntries(Object.entries(keymap).map(([id, hotkey]) => [id, { ...hotkey }]));
+
+const appSettingsCustomHotkeys = (): CustomHotkeys =>
+  (window.APP_SETTINGS?.user?.customHotkeys as CustomHotkeys | undefined) ?? {};
+
+const appSettingsEditorKeymap = (): RuntimeKeymap =>
+  (window.APP_SETTINGS?.editor_keymap as RuntimeKeymap | undefined) ?? {};
+
+const initialAccountHotkeys = cloneCustomHotkeys(appSettingsCustomHotkeys());
+let accountHotkeyBaseline = initialAccountHotkeys;
+const appSettingsLookupHotkey = window.APP_SETTINGS?.lookupHotkey;
+const initialLookupHotkey =
+  typeof appSettingsLookupHotkey === "function" ? (appSettingsLookupHotkey as (lookup: string) => unknown) : undefined;
+const defaultEditorKeymap = toEditorKeymap(hotkeysToCustomHotkeys(typedDefaultHotkeys));
+const initialAccountEditorKeymap = toEditorKeymap(initialAccountHotkeys);
+const builtInEditorKeymapBaseline = cloneRuntimeKeymap(appSettingsEditorKeymap());
+
+for (const id of Object.keys(initialAccountEditorKeymap)) {
+  if (defaultEditorKeymap[id]) {
+    builtInEditorKeymapBaseline[id] = { ...defaultEditorKeymap[id] };
+  }
+}
+
+const setAccountHotkeyBaseline = (hotkeys: CustomHotkeys): void => {
+  accountHotkeyBaseline = cloneCustomHotkeys(hotkeys);
+  if (window.APP_SETTINGS?.user) {
+    window.APP_SETTINGS.user.customHotkeys = cloneCustomHotkeys(hotkeys);
+  }
+};
+
+const applyRuntimeHotkeys = (customHotkeys: CustomHotkeys): void => {
+  const effectiveHotkeys = cloneCustomHotkeys(customHotkeys);
+  const effectiveEditorKeymap = {
+    ...cloneRuntimeKeymap(builtInEditorKeymapBaseline),
+    ...toEditorKeymap(effectiveHotkeys),
+  };
+
+  if (window.APP_SETTINGS) {
+    window.APP_SETTINGS.editor_keymap = effectiveEditorKeymap;
+    window.APP_SETTINGS.lookupHotkey = (lookup: string) => {
+      const hotkey = effectiveHotkeys[lookup];
+      if (hotkey) return hotkey.active === false ? { ...hotkey, key: null } : { ...hotkey };
+      return initialLookupHotkey?.(lookup) ?? null;
+    };
+  }
+
+  try {
+    (window as HotkeyRuntimeWindow).Htx?.Hotkey?.setKeymap?.(effectiveEditorKeymap);
+  } catch (error) {
+    console.warn("Failed to update hotkeys:", error);
+  }
+};
+
+let projectHotkeyRequestToken = 0;
+
+/**
+ * Drop project-scoped runtime overlays (Help / editor_keymap / Hotkey.keymap) back to the
+ * account baseline. Call when leaving a project (DM destroy/unmount) so project overrides
+ * do not stick on non-project pages. Invalidates in-flight loadAndApplyProjectHotkeys.
+ */
+export function clearProjectHotkeysRuntime(): void {
+  projectHotkeyRequestToken += 1;
+  applyRuntimeHotkeys(accountHotkeyBaseline);
+}
+
+export async function loadAndApplyProjectHotkeys(projectId: number | string): Promise<void> {
+  const requestToken = ++projectHotkeyRequestToken;
+
+  try {
+    const response = await fetch(`/api/current-user/hotkeys/?project=${encodeURIComponent(String(projectId))}`, {
+      credentials: "same-origin",
+    });
+    if (!response.ok) {
+      throw new Error(`Project hotkey request failed with status ${response.status}`);
+    }
+
+    const data = (await response.json()) as ApiResponse;
+    if (requestToken !== projectHotkeyRequestToken) return;
+
+    applyRuntimeHotkeys(mergeCustomHotkeys(accountHotkeyBaseline, data.custom_hotkeys ?? {}));
+  } catch (error) {
+    if (requestToken !== projectHotkeyRequestToken) return;
+
+    applyRuntimeHotkeys(accountHotkeyBaseline);
+    console.warn("Failed to load project hotkeys; using account defaults:", error);
+  }
+}
+
+export const useHotkeys = (scope: HotkeyScope = { kind: "account" }) => {
   const toast = useToast();
   const [hotkeys, setHotkeys] = useState<Hotkey[]>([]);
   const [hotkeySettings, setHotkeySettings] = useState<HotkeySettings>({});
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [hasProjectAccessError, setHasProjectAccessError] = useState(false);
+  const [isReadOnly, setIsReadOnly] = useState(scope.kind === "project");
   const api = useAPI();
+  const loadAbortRef = useRef<AbortController | null>(null);
+  const projectId = scope.kind === "project" ? scope.projectId : undefined;
 
-  // Update hotkeys with custom settings
-  const updateHotkeysWithCustomSettings = useCallback(
-    (
-      defaultHotkeys: Hotkey[],
-      customHotkeys: Record<string, { key: string; active: boolean; description?: string }>,
-    ): Hotkey[] => {
-      return defaultHotkeys.map((hotkey: Hotkey) => {
-        // Create the lookup key format used in the API response (section:element)
-        const lookupKey = `${hotkey.section}:${hotkey.element}`;
-
-        // Check if there's a custom setting for this hotkey
-        if (customHotkeys[lookupKey]) {
-          const customSetting = customHotkeys[lookupKey];
-          // Create a new object with the default properties and override with custom ones
-          return {
-            ...hotkey,
-            key: customSetting.key,
-            active: customSetting.active,
-            // Preserve the original label, only update description if provided
-            ...(customSetting.description && {
-              description: customSetting.description,
-            }),
-          };
-        }
-
-        // If no custom setting exists, return the default hotkey unchanged
-        return hotkey;
-      });
-    },
-    [],
-  );
-
-  // Simple hotkey reload - just update global state and call setKeymap
-  const reloadHotkeysInRuntime = useCallback(
-    (customHotkeys: Record<string, { key: string; active: boolean; description?: string }>) => {
-      // Update APP_SETTINGS.user.customHotkeys (for Help modal and fallback)
-      if (window.APP_SETTINGS?.user) {
-        window.APP_SETTINGS.user.customHotkeys = customHotkeys;
-      }
-
-      const EditorHotkey = window.Htx?.Hotkey;
-
-      // Transform custom hotkeys to editor format (same logic as base.html)
-      const editorCustomHotkeys: Record<string, any> = {};
-      const prefixRegex = /^(annotation|timeseries|audio|regions|video|image_gallery|tools):(.*)/;
-
-      for (const key in customHotkeys) {
-        const match = key.match(prefixRegex);
-        if (match) {
-          const [, , shortKey] = match;
-          const value = customHotkeys[key];
-
-          if (value && value.active === false) {
-            editorCustomHotkeys[shortKey] = { ...value, key: null };
-          } else {
-            editorCustomHotkeys[shortKey] = value;
-          }
-        }
-      }
-
-      // Get current keymap and merge with custom hotkeys
-      const currentKeymap = EditorHotkey?.keymap ? { ...EditorHotkey.keymap } : {};
-      const mergedKeymap = Object.assign({}, currentKeymap, editorCustomHotkeys);
-
-      // Update APP_SETTINGS.editor_keymap (for DataManager/Explorer)
-      if (window.APP_SETTINGS) {
-        window.APP_SETTINGS.editor_keymap = mergedKeymap;
-      }
-
-      // Call Hotkey.setKeymap() - the main propagation path
-      try {
-        EditorHotkey?.setKeymap(mergedKeymap as any);
-      } catch (error) {
-        console.warn("Failed to update hotkeys:", error);
-      }
-    },
-    [],
-  );
-
-  // Load hotkeys from API
   const loadHotkeysFromAPI = useCallback(async () => {
+    loadAbortRef.current?.abort();
+    const controller = new AbortController();
+    loadAbortRef.current = controller;
+
     try {
       setIsLoading(true);
-
-      // Use proper API endpoint name from the config
-      const response = await api.callApi("hotkeys" as any);
-
-      if (response && (response as ApiResponse).custom_hotkeys) {
-        // Use API data
-        const apiResponse = response as ApiResponse;
-        const updatedHotkeys = updateHotkeysWithCustomSettings(typedDefaultHotkeys, apiResponse.custom_hotkeys || {});
-        setHotkeys(updatedHotkeys);
-        // Store current settings from API response
-        setHotkeySettings(apiResponse.hotkey_settings || {});
-      } else {
-        // Fallback to window.APP_SETTINGS
-        const customHotkeys = window.APP_SETTINGS?.user?.customHotkeys || {};
-        const updatedHotkeys = updateHotkeysWithCustomSettings(typedDefaultHotkeys, customHotkeys);
-        setHotkeys(updatedHotkeys);
-        // No settings available in fallback
-        setHotkeySettings({});
+      if (projectId !== undefined) {
+        setHasProjectAccessError(false);
+        setIsReadOnly(true);
       }
-    } catch (error) {
-      console.error("Error loading hotkeys from API:", error);
 
-      // Fallback to window.APP_SETTINGS on error
-      const customHotkeys = window.APP_SETTINGS?.user?.customHotkeys || {};
-      const updatedHotkeys = updateHotkeysWithCustomSettings(typedDefaultHotkeys, customHotkeys);
-      setHotkeys(updatedHotkeys);
-      // No settings available in fallback
+      const accountResponse = (await api.callApi("hotkeys")) as HotkeyApiResponse | null;
+      if (controller.signal.aborted) return;
+      if (projectId !== undefined && isApiFailure(accountResponse)) {
+        throw new Error("The account hotkey baseline could not be loaded");
+      }
+
+      const accountHotkeys = isApiFailure(accountResponse)
+        ? appSettingsCustomHotkeys()
+        : (accountResponse?.custom_hotkeys ?? appSettingsCustomHotkeys());
+      setAccountHotkeyBaseline(accountHotkeys);
+
+      let effectiveHotkeys = accountHotkeys;
+      if (projectId !== undefined) {
+        const projectResponse = (await api.callApi("hotkeys", {
+          params: { project: projectId },
+          suppressError: true,
+        })) as HotkeyApiResponse | null;
+        if (controller.signal.aborted) return;
+        if (isApiFailure(projectResponse)) {
+          throw new Error("The project hotkey preference could not be loaded");
+        }
+
+        effectiveHotkeys = mergeCustomHotkeys(accountHotkeys, projectResponse?.custom_hotkeys ?? {});
+      }
+
+      setHotkeys(updateHotkeysWithCustomSettings(typedDefaultHotkeys, effectiveHotkeys));
+      setHotkeySettings(accountResponse?.hotkey_settings ?? {});
+      setIsReadOnly(false);
+    } catch (error) {
+      if (controller.signal.aborted) return;
+
+      console.error("Error loading hotkeys from API:", error);
+      setHotkeys(updateHotkeysWithCustomSettings(typedDefaultHotkeys, accountHotkeyBaseline));
       setHotkeySettings({});
 
-      // Show non-blocking error notification
-      if (toast) {
+      if (projectId !== undefined) {
+        setHasProjectAccessError(true);
+        setIsReadOnly(true);
+      } else if (toast) {
         toast.show({
           message: "Could not load custom hotkeys from server, using cached settings",
           type: ToastType.error,
         });
       }
     } finally {
-      setIsLoading(false);
+      if (!controller.signal.aborted) {
+        setIsLoading(false);
+      }
     }
-  }, [api, toast, updateHotkeysWithCustomSettings]);
+  }, [api, projectId, toast]);
 
-  // Save hotkeys to API function (handles both save and reset operations)
   const saveHotkeysToAPI = useCallback(
     async (currentHotkeys: Hotkey[], currentSettings: HotkeySettings): Promise<SaveResult> => {
-      // Convert current hotkeys to API format - INCLUDE description to maintain API compatibility
-      const customHotkeys: Record<string, { key: string; active: boolean; description?: string }> = {};
-
-      // Process all current hotkeys (if empty, this results in reset)
-      currentHotkeys.forEach((hotkey: Hotkey) => {
-        const keyId = `${hotkey.section}:${hotkey.element}`;
-        customHotkeys[keyId] = {
-          key: hotkey.key,
-          active: hotkey.active,
-          ...(hotkey.description && { description: hotkey.description }),
-        };
-      });
+      const customHotkeys =
+        projectId === undefined
+          ? hotkeysToCustomHotkeys(currentHotkeys)
+          : computeProjectOverrides(currentHotkeys, accountHotkeyBaseline);
 
       const requestBody = {
         custom_hotkeys: customHotkeys,
@@ -169,22 +308,32 @@ export const useHotkeys = () => {
       };
 
       try {
-        // Use proper API endpoint name from the config
-        const response = await api.callApi("updateHotkeys" as any, {
+        const response = (await api.callApi("updateHotkeys", {
+          ...(projectId !== undefined && { params: { project: projectId } }),
+          ...(projectId !== undefined && { suppressError: true }),
           body: requestBody,
-        });
+        })) as HotkeyApiResponse | null;
 
-        // Check for API-level errors
-        if (response?.error) {
+        if (isApiFailure(response)) {
+          const projectAccessLost = projectId !== undefined && isProjectAccessStatus(response?.$meta?.status);
+          if (projectAccessLost) {
+            setHasProjectAccessError(true);
+            setIsReadOnly(true);
+          }
           return {
             ok: false,
-            error: response.error,
+            error: response?.error || "Failed to save hotkeys",
             data: response,
+            projectAccessLost,
           };
         }
 
-        // Apply hotkeys immediately without page refresh
-        reloadHotkeysInRuntime(customHotkeys);
+        if (projectId === undefined) {
+          setAccountHotkeyBaseline(customHotkeys);
+          applyRuntimeHotkeys(customHotkeys);
+        } else {
+          applyRuntimeHotkeys(mergeCustomHotkeys(accountHotkeyBaseline, customHotkeys));
+        }
 
         return {
           ok: true,
@@ -196,11 +345,13 @@ export const useHotkeys = () => {
         const operation = isReset ? "resetting" : "saving";
         console.error(`Error ${operation} hotkeys:`, error);
 
-        // Provide more specific error messages
         let errorMessage = `Failed to ${isReset ? "reset" : "save"} hotkeys`;
         if (error && typeof error === "object" && "response" in error) {
-          const err = error as any;
-          // Server responded with error status
+          const err = error as ApiRequestError;
+          if (projectId !== undefined && isProjectAccessStatus(err.response?.status)) {
+            setHasProjectAccessError(true);
+            setIsReadOnly(true);
+          }
           if (err.response?.status === 400) {
             errorMessage = err.response.data?.error || `Invalid ${isReset ? "reset request" : "hotkeys configuration"}`;
           } else if (err.response?.status === 401) {
@@ -209,7 +360,6 @@ export const useHotkeys = () => {
             errorMessage = "Server error - please try again later";
           }
         } else if (error && typeof error === "object" && "request" in error) {
-          // Network error
           errorMessage = "Network error - please check your connection";
         }
 
@@ -219,59 +369,58 @@ export const useHotkeys = () => {
         };
       }
     },
-    [api],
+    [api, projectId],
   );
 
-  // Handle resetting all hotkeys to defaults
-  const handleResetToDefaults = useCallback(() => {
-    confirm({
-      title: "Reset Hotkeys to Defaults?",
-      body: "Are you sure you want to reset all hotkeys and settings to their default values? This action cannot be undone.",
-      okText: "Reset to Defaults",
-      buttonLook: "negative",
-      style: { width: 500 },
-      onOk: async () => {
-        setIsLoading(true);
+  const handleResetToDefaults = useCallback(
+    (onSuccess?: () => void) => {
+      confirm({
+        title: projectId === undefined ? "Reset Hotkeys to Defaults?" : "Reset Project Hotkey Override?",
+        body:
+          projectId === undefined
+            ? "Are you sure you want to reset all hotkeys and settings to their default values? This action cannot be undone."
+            : "Are you sure you want to reset only this project's hotkey override? Your account defaults and other projects will not be changed.",
+        okText: projectId === undefined ? "Reset to Defaults" : "Reset Project Override",
+        buttonLook: "negative",
+        style: { width: 500 },
+        onOk: async () => {
+          setIsLoading(true);
 
-        try {
-          // Reset hotkeys to defaults in the backend API (sets custom_hotkeys to {})
-          const result = await saveHotkeysToAPI([], {});
-
-          if (result.ok) {
-            if (toast) {
-              toast.show({
-                message: "All hotkeys and settings have been reset to defaults and saved",
-                type: ToastType.info,
-              });
-            }
-            // Update local state to reflect the reset
-            setHotkeys([...typedDefaultHotkeys]);
-          } else {
-            if (toast) {
+          try {
+            const result = await saveHotkeysToAPI([], {});
+            if (result.ok) {
+              if (toast) {
+                toast.show({
+                  message: getResetSuccessMessage(projectId),
+                  type: ToastType.info,
+                });
+              }
+              setHotkeys(updateHotkeysWithCustomSettings(typedDefaultHotkeys, accountHotkeyBaseline));
+              onSuccess?.();
+            } else if (toast) {
               toast.show({
                 message: `Failed to save reset hotkeys: ${result.error || "Unknown error"}`,
                 type: ToastType.error,
               });
             }
+          } catch (error: unknown) {
+            if (toast) {
+              const errorMessage = error instanceof Error ? error.message : "Unknown error";
+              toast.show({
+                message: `Error resetting hotkeys: ${errorMessage}`,
+                type: ToastType.error,
+              });
+            }
+          } finally {
+            setIsLoading(false);
           }
-        } catch (error: unknown) {
-          if (toast) {
-            const errorMessage = error instanceof Error ? error.message : "Unknown error";
-            toast.show({
-              message: `Error resetting hotkeys: ${errorMessage}`,
-              type: ToastType.error,
-            });
-          }
-        } finally {
-          setIsLoading(false);
-        }
-      },
-    });
-  }, [saveHotkeysToAPI, toast]);
+        },
+      });
+    },
+    [projectId, saveHotkeysToAPI, toast],
+  );
 
-  // Handle exporting hotkeys
   const handleExportHotkeys = useCallback(() => {
-    // Create export data including current settings
     const exportData: ExportData = {
       hotkeys: hotkeys,
       settings: hotkeySettings,
@@ -279,21 +428,14 @@ export const useHotkeys = () => {
       version: "1.0",
     };
 
-    // Create a JSON string of the export data
     const exportJson = JSON.stringify(exportData, null, 2);
-
-    // Create a blob with the JSON
     const blob = new Blob([exportJson], { type: "application/json" });
     const url = URL.createObjectURL(blob);
-
-    // Create a temporary link and click it to download the file
     const link = document.createElement("a");
     link.href = url;
-    link.download = "hotkeys-export.json";
+    link.download = projectId === undefined ? "hotkeys-export.json" : `hotkeys-export-project-${projectId}.json`;
     document.body.appendChild(link);
     link.click();
-
-    // Clean up
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
 
@@ -303,26 +445,21 @@ export const useHotkeys = () => {
         type: ToastType.info,
       });
     }
-  }, [hotkeys, hotkeySettings, toast]);
+  }, [hotkeys, hotkeySettings, projectId, toast]);
 
-  // Handle importing hotkeys
   const handleImportHotkeys = useCallback(
-    async (importedData: ImportData | Hotkey[]) => {
+    async (importedData: ImportData | Hotkey[], onSuccess?: () => void): Promise<boolean> => {
       try {
         setIsLoading(true);
 
-        // Handle both old format (just hotkeys array) and new format (with settings)
         const importedHotkeys = Array.isArray(importedData) ? importedData : importedData.hotkeys || [];
         const importedSettings: HotkeySettings = Array.isArray(importedData) ? {} : importedData.settings || {};
 
-        // Save all imported data to API
         const result = await saveHotkeysToAPI(importedHotkeys, importedSettings);
-
         if (!result.ok) {
           throw new Error(result.error || "Failed to save imported hotkeys");
         }
 
-        // Update local state
         setHotkeys(importedHotkeys);
 
         if (toast) {
@@ -332,8 +469,9 @@ export const useHotkeys = () => {
           });
         }
 
-        // Reload from API to ensure consistency
         await loadHotkeysFromAPI();
+        onSuccess?.();
+        return true;
       } catch (error: unknown) {
         if (toast) {
           const errorMessage = error instanceof Error ? error.message : "Unknown error";
@@ -342,6 +480,7 @@ export const useHotkeys = () => {
             type: ToastType.error,
           });
         }
+        return false;
       } finally {
         setIsLoading(false);
       }
@@ -349,9 +488,9 @@ export const useHotkeys = () => {
     [saveHotkeysToAPI, loadHotkeysFromAPI, toast],
   );
 
-  // Load hotkeys on hook mount
   useEffect(() => {
     loadHotkeysFromAPI();
+    return () => loadAbortRef.current?.abort();
   }, [loadHotkeysFromAPI]);
 
   return {
@@ -360,6 +499,8 @@ export const useHotkeys = () => {
     hotkeySettings,
     setHotkeySettings,
     isLoading,
+    hasProjectAccessError,
+    isReadOnly,
     setIsLoading,
     loadHotkeysFromAPI,
     saveHotkeysToAPI,

@@ -65,6 +65,8 @@ class _Operator(BaseModel):
 Operator = _Operator()
 USER_FILTER_FIELDS = frozenset({'annotators', 'updated_by', 'reviewers', 'comment_authors', 'skipped_by_annotator'})
 USER_FILTER_VALUE_OPERATORS = frozenset({Operator.CONTAINS, Operator.NOT_CONTAINS})
+# Fields whose root/child hooks implement "is empty". skipped_by_annotator does not (FIT-2435).
+USER_FILTER_EMPTY_FIELDS = frozenset({'annotators', 'updated_by', 'reviewers', 'comment_authors'})
 LEGACY_USER_FILTER_OPERATORS = {
     Operator.EQUAL: Operator.CONTAINS,
     Operator.IN_LIST: Operator.CONTAINS,
@@ -73,10 +75,45 @@ LEGACY_USER_FILTER_OPERATORS = {
 }
 
 
+def allowed_user_filter_operators(field_name):
+    """Operators permitted for a user-list filter field (serializer + apply_filters)."""
+    allowed = set(USER_FILTER_VALUE_OPERATORS)
+    if field_name in USER_FILTER_EMPTY_FIELDS:
+        allowed.add(Operator.EMPTY)
+    return frozenset(allowed)
+
+
+class ResolvedUserFilterIds(list):
+    """Marker for IDs expanded by trusted backend code after client-input validation."""
+
+
 def validate_user_filter_operator(field_name, operator, value):
-    if field_name in USER_FILTER_FIELDS and isinstance(value, list) and operator not in USER_FILTER_VALUE_OPERATORS:
-        allowed = ', '.join(sorted(USER_FILTER_VALUE_OPERATORS))
-        raise ValidationError(f'List-valued user filters support only these operators: {allowed}.')
+    """Reject unsupported operators for user-list filters (FIT-2435).
+
+    List-valued membership filters only support contains / not_contains.
+    Empty is allowed only for fields in USER_FILTER_EMPTY_FIELDS.
+    Legacy scalar equal/not_equal/in_list remain accepted so normalize_persisted_user_filter
+    can recover historical views.
+    """
+    if field_name not in USER_FILTER_FIELDS:
+        return
+
+    if isinstance(value, list):
+        if operator not in USER_FILTER_VALUE_OPERATORS:
+            allowed = ', '.join(sorted(USER_FILTER_VALUE_OPERATORS))
+            raise ValidationError(f'List-valued user filters support only these operators: {allowed}.')
+        return
+
+    allowed = allowed_user_filter_operators(field_name)
+    if operator in allowed:
+        return
+    if operator in LEGACY_USER_FILTER_OPERATORS:
+        return
+
+    allowed_label = ', '.join(sorted(allowed))
+    raise ValidationError(
+        f'User filter "{field_name}" does not support operator "{operator}". Allowed: {allowed_label}.'
+    )
 
 
 def normalize_persisted_user_filter(field_name, operator, value):
@@ -84,6 +121,9 @@ def normalize_persisted_user_filter(field_name, operator, value):
     if field_name not in USER_FILTER_FIELDS:
         return operator, value
     if operator == Operator.EMPTY:
+        if field_name not in USER_FILTER_EMPTY_FIELDS:
+            # Drop unsupported empty (e.g. skipped_by_annotator) to a no-op contains.
+            return Operator.CONTAINS, []
         try:
             empty_value = cast_bool_from_str(value)
         except ValueError:
@@ -535,7 +575,11 @@ def parse_user_filter_ids(value):
     """Parse a scalar or list user-filter value into deduped integer user ids (FIT-2253)."""
     if value is None:
         return []
-    if isinstance(value, list) and len(value) > settings.DATA_MANAGER_LIST_FILTER_MAX_VALUES:
+    if (
+        isinstance(value, list)
+        and not isinstance(value, ResolvedUserFilterIds)
+        and len(value) > settings.DATA_MANAGER_LIST_FILTER_MAX_VALUES
+    ):
         raise ValidationError(
             f'User filter list exceeds maximum size of {settings.DATA_MANAGER_LIST_FILTER_MAX_VALUES}.'
         )

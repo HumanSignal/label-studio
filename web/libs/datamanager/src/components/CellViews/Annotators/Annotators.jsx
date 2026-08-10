@@ -143,8 +143,7 @@ Annotators.searchFilter = (option, queryString) => {
   );
 };
 
-Annotators.filterable = true;
-Annotators.customOperators = [
+const USER_LIST_OPERATORS = [
   {
     key: "contains",
     label: "contains",
@@ -157,5 +156,18 @@ Annotators.customOperators = [
     valueType: "list",
     input: (props) => <UserSelect {...props} />,
   },
-  ...Common,
 ];
+
+Annotators.filterable = true;
+Annotators.customOperators = [...USER_LIST_OPERATORS, ...Common];
+
+/**
+ * Filter-only column for cancelled annotations by a specific annotator (FIT-2435).
+ * Same user-select UX as Annotators, but without "is empty" (unsupported / 500s).
+ */
+export const SkippedByAnnotator = (cell) => Annotators(cell);
+SkippedByAnnotator.filterItems = Annotators.filterItems;
+SkippedByAnnotator.FilterItem = Annotators.FilterItem;
+SkippedByAnnotator.searchFilter = Annotators.searchFilter;
+SkippedByAnnotator.filterable = true;
+SkippedByAnnotator.customOperators = [...USER_LIST_OPERATORS];

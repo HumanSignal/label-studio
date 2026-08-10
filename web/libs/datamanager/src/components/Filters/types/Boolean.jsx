@@ -14,6 +14,7 @@ export const BooleanFilter = [
           { value: false, label: "no" },
         ]}
         disabled={props.disabled}
+        readOnly={props.readOnly}
       />
     ),
   },

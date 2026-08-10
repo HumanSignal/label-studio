@@ -358,9 +358,10 @@ export const TabFilter = types
     },
 
     save: flow(function* (force = false) {
-      // Defense in depth: locked tabs must not PATCH filter changes even if UI
-      // disable is bypassed. Skip no-op early returns first so mount-time
-      // setOperator→save does not toast on already-saved locked filters.
+      // Defense in depth: locked tabs must not PATCH. Opening Filters remounts
+      // FilterOperation which may call setOperator→save for hydrated rows
+      // (volatile `saved` starts false) — do not toast; the Filters Message banner
+      // is the inspect UX (FIT-2396).
       const isValid = self.isValidFilter;
 
       if (force !== true) {
@@ -370,7 +371,7 @@ export const TabFilter = types
       }
 
       if (self.view?.isLockedByManager) {
-        return self.view.notifyLocked();
+        return;
       }
 
       if (self.saving) return;

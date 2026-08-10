@@ -41,12 +41,24 @@ const dataCleanup = (tab, columns) => {
     );
   });
 
-  Object.entries(data.hiddenColumns ?? {}).forEach(([key, list]) => {
-    data.hiddenColumns[key] = list.filter((k) => {
-      const match = columns.find((c) => c.id === k);
-      return !!match && !match.isAnnotationResultsFilterColumn;
-    });
-  });
+  // Only compatibility filter columns are pruned from the hidden lists. IDs of columns this
+  // session cannot see stay untouched: agreement columns are role-gated and dimension columns
+  // follow the project's dimensions, so dropping them would erase a manager's saved column
+  // configuration as soon as such a session saves the view (FIT-2406).
+  if (data.hiddenColumns) {
+    const hiddenColumns = Object.fromEntries(
+      Object.entries(data.hiddenColumns).map(([key, list]) => [
+        key,
+        (list ?? []).filter((columnID) => {
+          const match = columns.find((c) => c.id === columnID);
+
+          return !match?.isAnnotationResultsFilterColumn;
+        }),
+      ]),
+    );
+
+    return { ...tab, data: { ...data, hiddenColumns } };
+  }
 
   return { ...tab, data };
 };

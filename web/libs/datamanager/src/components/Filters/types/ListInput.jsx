@@ -97,7 +97,7 @@ export const ListInput = observer(({ value, onChange, type = "string", placehold
         onChange={handleChange}
         placeholder={placeholder ?? "Paste values separated by newline, comma, or space"}
         disabled={disabled}
-        className="w-full min-w-[200px] resize-y rounded border border-neutral-border bg-neutral-background px-2 py-1 text-xs"
+        className="w-full min-w-[200px] resize-y rounded border border-neutral-border bg-neutral-background px-2 py-1 text-xs disabled:cursor-not-allowed disabled:bg-neutral-surface disabled:text-neutral-content-subtlest"
         data-testid="list-input-textarea"
         aria-label="List of filter values"
       />

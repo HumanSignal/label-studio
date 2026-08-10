@@ -326,6 +326,7 @@ export function ColumnPicker({
   multiple = false,
   size = "medium",
   disabled,
+  readOnly,
   placeholder,
   renderSelected,
   triggerProps,
@@ -373,6 +374,7 @@ export function ColumnPicker({
       placeholder={placeholder}
       size={size}
       disabled={disabled}
+      readOnly={readOnly}
       dataTestid={dataTestid}
       triggerClassName={triggerClassName}
       showGroupActions={multiple}
