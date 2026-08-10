@@ -1,3 +1,9 @@
+# Skip the build (and the PR deploy preview) when nothing under docs/ changed.
+# Exit 0 = skip, non-zero = build. ':/docs' is anchored to the repo root, so it
+# works no matter which base directory the command runs from.
+[build]
+ignore = "git diff --quiet $CACHED_COMMIT_REF $COMMIT_REF -- ':/docs'"
+
 [[edge_functions]]
 path = "/*"
 function = "content-negotiation"
