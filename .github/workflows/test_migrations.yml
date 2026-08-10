@@ -9,7 +9,7 @@ on:
 
 env:
   DJANGO_SETTINGS_MODULE: core.settings.label_studio
-  COVERAGE_PROCESS_START: 1
+  COVERAGE_PROCESS_START: label_studio/.coveragerc
   LOG_DIR: pytest_logs
   COLLECT_ANALYTICS: true
   DEBUG_CONTEXTLOG: true
