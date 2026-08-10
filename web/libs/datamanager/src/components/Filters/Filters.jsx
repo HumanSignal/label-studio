@@ -1,7 +1,7 @@
 import React from "react";
 import { inject } from "mobx-react";
 import { cn } from "../../utils/bem";
-import { Button } from "@humansignal/ui";
+import { Button, Message } from "@humansignal/ui";
 import { FilterLine } from "./FilterLine/FilterLine";
 import { IconChevronRight, IconPlus, IconCopyOutline, IconClipboardCheck, IconUndo } from "@humansignal/icons";
 import { useRecentFilters } from "../../hooks/useRecentFilters";
@@ -19,6 +19,7 @@ export const Filters = injector(({ store, views, currentView, filters, projectId
   const { sidebarEnabled } = views;
   const isLocked = currentView?.isLockedByManager;
   const lockedTooltip = currentView?.lockedUpdateMessage;
+  const lockedFiltersMessage = currentView?.lockedFiltersMessage;
   const { fields, recentEntries, saveOnSwitch, saveInPlace } = useRecentFilters(
     projectId,
     currentView.availableFilters,
@@ -88,6 +89,11 @@ export const Filters = injector(({ store, views, currentView, filters, projectId
 
   return (
     <div className={cn("filters").mod({ sidebar: sidebarEnabled }).toClassName()}>
+      {isLocked && lockedFiltersMessage ? (
+        <Message variant="warning" size="small" data-testid="filters-locked-message" className="m-base mb-0">
+          {lockedFiltersMessage}
+        </Message>
+      ) : null}
       <div className={cn("filters").elem("list").mod({ withFilters: !!filters.length }).toClassName()}>
         {filters.length ? (
           filters.map((filter, i) => (
@@ -95,13 +101,9 @@ export const Filters = injector(({ store, views, currentView, filters, projectId
               index={i}
               filter={filter}
               view={currentView}
-              sidebar={sidebarEnabled}
-              value={filter.currentValue}
               key={filter.id}
-              availableFilters={fields}
               pickerFilters={currentView.availableFilters}
               recentEntries={recentEntries}
-              dropdownClassName={cn("filters").elem("selector").toClassName()}
               onSaveOnSwitch={saveOnSwitch}
               onSaveInPlace={saveInPlace}
               disabled={isLocked}

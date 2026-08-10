@@ -1,4 +1,5 @@
 import { describe, expect, it } from "bun:test";
+import * as userHooks from "./useUsers";
 import {
   deduplicateUsers,
   getUsersItemCount,
@@ -31,6 +32,19 @@ describe("Data Manager user multiselect helpers", () => {
         Array.from({ length: 12 }, (_, index) => index + 1),
       ),
     ).toBe(12);
+  });
+
+  it("caps option requests and chunks large selected-value sets", () => {
+    const selectedIds = Array.from({ length: 205 }, (_, index) => index + 1);
+    const chunkSelectedUserIds = (
+      userHooks as typeof userHooks & {
+        chunkSelectedUserIds?: (ids: number[]) => number[][];
+      }
+    ).chunkSelectedUserIds;
+
+    expect(getUsersPageSize(10, selectedIds)).toBe(100);
+    expect(typeof chunkSelectedUserIds).toBe("function");
+    expect(chunkSelectedUserIds?.(selectedIds).map((chunk) => chunk.length)).toEqual([100, 100, 5]);
   });
 
   it("normalizes array-shaped paginated responses without losing counts", () => {

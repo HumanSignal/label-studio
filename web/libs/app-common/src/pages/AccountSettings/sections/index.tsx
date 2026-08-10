@@ -45,8 +45,7 @@ export const accountSettingsSections = (
       ),
       id: "hotkeys",
       component: HotkeysManager,
-      description: () =>
-        "Customize your keyboard shortcuts to speed up your workflow. Click on any hotkey below to assign a new key combination that works best for you.",
+      rendersOwnCards: true,
     },
     {
       title: "Email Preferences",

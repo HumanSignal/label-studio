@@ -37,9 +37,12 @@ export const FilterOperation = observer(({ filter, field, operator, value, disab
       result = types[0];
     }
 
-    filter.setOperator(result.key);
+    // Skip when read-only/locked: mount-time setOperator→save must not run (FIT-2396).
+    if (!disabled && result?.key != null && filter.operator !== result.key) {
+      filter.setOperator(result.key);
+    }
     return result;
-  }, [operator, types, filter]);
+  }, [operator, types, filter, disabled]);
 
   const saveFilter = useCallback(
     debounce(() => {

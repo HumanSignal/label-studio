@@ -80,13 +80,23 @@
 
 .userPic {
   flex: none;
+  grid-area: avatar;
 }
 
 .profilePhotoRow {
   display: grid;
+  grid-template-areas: "avatar controls delete";
   grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: center;
   gap: var(--spacing-wide);
+}
+
+.profilePhotoControls {
+  grid-area: controls;
+}
+
+.profilePhotoDelete {
+  grid-area: delete;
 }
 
 .formGrid {
@@ -109,22 +119,45 @@
   .accountSettings {
     &__content {
       width: 100%;
+      padding-inline: var(--spacing-tight);
     }
   }
 
   .accountSettingsPadding {
-    padding-left: 0;
-    padding-right: 0;
-  }
-
-  .flexRow,
-  .profilePhotoRow {
-    align-items: stretch;
-    grid-template-columns: 1fr;
+    padding-inline: var(--spacing-tight);
   }
 
   .flexRow {
+    align-items: stretch;
     flex-direction: column;
+  }
+
+  .profilePhotoRow {
+    grid-template-areas:
+      "avatar upload"
+      "label delete";
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: center;
+    gap: var(--spacing-tight) var(--spacing-wide);
+  }
+
+  .profilePhotoControls {
+    display: contents;
+  }
+
+  .profilePhotoLabel {
+    grid-area: label;
+  }
+
+  .profilePhotoUpload {
+    grid-area: upload;
+    min-width: 0;
+    width: 100%;
+  }
+
+  .profilePhotoDelete {
+    grid-area: delete;
+    width: 100%;
   }
 
   .formGrid {
@@ -133,5 +166,11 @@
 
   .formActions {
     justify-content: stretch;
+  }
+
+  .formActions > :global(button),
+  .formActions > :global([type="submit"]) {
+    width: 100%;
+    max-width: none;
   }
 }

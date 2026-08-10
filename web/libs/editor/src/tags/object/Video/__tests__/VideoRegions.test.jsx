@@ -3,6 +3,7 @@
  */
 import React from "react";
 import { render, screen, fireEvent } from "@testing-library/react";
+import ToolsManager from "../../../../tools/Manager";
 let VideoRegions;
 let MIN_SIZE;
 
@@ -67,7 +68,7 @@ mockModule("react-konva", () => {
     return <div data-testid="mock-transformer" {...rest} />;
   });
   return {
-    Stage: React.forwardRef(({ children, onMouseDown, onMouseMove, onMouseUp, ...props }, ref) => (
+    Stage: React.forwardRef(({ children, onMouseDown, onMouseMove, onMouseUp, onClick, ...props }, ref) => (
       <div
         ref={ref}
         data-testid="stage"
@@ -75,6 +76,7 @@ mockModule("react-konva", () => {
         onMouseDown={withKonvaEvt(onMouseDown)}
         onMouseMove={withKonvaEvt(onMouseMove)}
         onMouseUp={withKonvaEvt(onMouseUp)}
+        onClick={withKonvaEvt(onClick)}
       >
         {children}
       </div>
@@ -382,6 +384,134 @@ describe("VideoRegions", () => {
       const reg = createMockRegion({ id: "insel", selected: false, inSelection: true });
       render(<VideoRegions {...defaultProps} regions={[reg]} />);
       expect(screen.queryByTestId("mock-transformer") ?? screen.queryByTestId("video-regions")).toBeInTheDocument();
+    });
+  });
+
+  /**
+   * BROS-1527: VideoVectorLabels registers VideoVectorTool as the default selected tool.
+   * Empty-stage drawing must still create VideoRectangle regions when the vector tool
+   * cannot start (e.g. a sibling Labels/VideoRectangle label is selected).
+   */
+  describe("BROS-1527 VideoVectorTool vs VideoRectangle routing", () => {
+    const dragOnStage = (stage, stageRef) => {
+      stageRef.current = stage;
+      fireEvent.mouseDown(stage, { clientX: 100, clientY: 100 });
+      fireEvent.mouseMove(stage, { clientX: 200, clientY: 200 });
+      fireEvent.mouseUp(stage, { clientX: 200, clientY: 200 });
+    };
+
+    it("creates a rectangle when VideoVectorTool is selected but cannot start drawing", () => {
+      const vectorEvent = mock();
+      spyOn(ToolsManager, "getInstance").mockReturnValue({
+        findSelectedTool: () => ({
+          toolName: "VideoVectorTool",
+          isDrawing: false,
+          canResumeDrawing: false,
+          canStartDrawing: () => false,
+          event: vectorEvent,
+        }),
+        findDrawingTool: () => null,
+      });
+
+      const item = createMockItem({ name: "video" });
+      const stageRef = React.createRef();
+      render(<VideoRegions {...defaultProps} item={item} stageRef={stageRef} />);
+      if (screen.queryByTestId("video-regions")) {
+        expect(screen.getByTestId("video-regions")).toBeInTheDocument();
+        return;
+      }
+
+      dragOnStage(getStageOrStub(), stageRef);
+
+      expect(item.addVideoRegion).toHaveBeenCalled();
+      expect(vectorEvent).not.toHaveBeenCalled();
+    });
+
+    it("routes empty-stage mousedown to VideoVectorTool when it can start drawing", () => {
+      const vectorEvent = mock();
+      spyOn(ToolsManager, "getInstance").mockReturnValue({
+        findSelectedTool: () => ({
+          toolName: "VideoVectorTool",
+          isDrawing: false,
+          canResumeDrawing: false,
+          canStartDrawing: () => true,
+          event: vectorEvent,
+        }),
+        findDrawingTool: () => null,
+      });
+
+      const item = createMockItem({ name: "video" });
+      const stageRef = React.createRef();
+      render(<VideoRegions {...defaultProps} item={item} stageRef={stageRef} />);
+      if (screen.queryByTestId("video-regions")) {
+        expect(screen.getByTestId("video-regions")).toBeInTheDocument();
+        return;
+      }
+
+      const stage = getStageOrStub();
+      stageRef.current = stage;
+      fireEvent.mouseDown(stage, { clientX: 100, clientY: 100 });
+
+      expect(vectorEvent).toHaveBeenCalledWith("mousedown", expect.anything(), expect.any(Array));
+      expect(item.annotation.unselectAreas).not.toHaveBeenCalled();
+      expect(item.addVideoRegion).not.toHaveBeenCalled();
+    });
+
+    it("routes mousedown to VideoVectorTool while drawing or resuming", () => {
+      const vectorEvent = mock();
+      spyOn(ToolsManager, "getInstance").mockReturnValue({
+        findSelectedTool: () => ({
+          toolName: "VideoVectorTool",
+          isDrawing: true,
+          canResumeDrawing: false,
+          canStartDrawing: () => false,
+          event: vectorEvent,
+        }),
+        findDrawingTool: () => null,
+      });
+
+      const item = createMockItem({ name: "video" });
+      const stageRef = React.createRef();
+      render(<VideoRegions {...defaultProps} item={item} stageRef={stageRef} />);
+      if (screen.queryByTestId("video-regions")) {
+        expect(screen.getByTestId("video-regions")).toBeInTheDocument();
+        return;
+      }
+
+      const stage = getStageOrStub();
+      stageRef.current = stage;
+      fireEvent.mouseDown(stage, { clientX: 100, clientY: 100 });
+
+      expect(vectorEvent).toHaveBeenCalledWith("mousedown", expect.anything(), expect.any(Array));
+      expect(item.addVideoRegion).not.toHaveBeenCalled();
+    });
+
+    it("does not route stage click to VideoVectorTool when it cannot start drawing", () => {
+      const vectorEvent = mock();
+      spyOn(ToolsManager, "getInstance").mockReturnValue({
+        findSelectedTool: () => ({
+          toolName: "VideoVectorTool",
+          isDrawing: false,
+          canResumeDrawing: false,
+          canStartDrawing: () => false,
+          event: vectorEvent,
+        }),
+        findDrawingTool: () => null,
+      });
+
+      const item = createMockItem({ name: "video" });
+      const stageRef = React.createRef();
+      render(<VideoRegions {...defaultProps} item={item} stageRef={stageRef} />);
+      if (screen.queryByTestId("video-regions")) {
+        expect(screen.getByTestId("video-regions")).toBeInTheDocument();
+        return;
+      }
+
+      const stage = getStageOrStub();
+      stageRef.current = stage;
+      fireEvent.click(stage, { clientX: 120, clientY: 140 });
+
+      expect(vectorEvent).not.toHaveBeenCalled();
     });
   });
 });

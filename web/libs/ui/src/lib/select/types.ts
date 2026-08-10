@@ -97,6 +97,13 @@ export type SelectProps<T, A extends SelectOption<T>[]> = {
   footer?: ReactNode;
   multiple?: boolean;
   disabled?: boolean;
+  /**
+   * When true, the trigger stays enabled so the dropdown can open for inspection,
+   * but option selection and bulk actions (Select all / group All/None) are blocked.
+   * Distinct from `disabled`, which greys out the trigger and prevents opening.
+   * Search remains available when `searchable` is set.
+   */
+  readOnly?: boolean;
   triggerProps?: any;
   isInline?: boolean;
   isLoading?: boolean;

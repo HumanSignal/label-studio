@@ -671,11 +671,12 @@ class TestParseUserFilterIds(TestCase):
 
     @override_settings(DATA_MANAGER_LIST_FILTER_MAX_VALUES=2)
     def test_list_value_size_is_bounded(self):
-        from data_manager.managers import parse_user_filter_ids
+        from data_manager.managers import ResolvedUserFilterIds, parse_user_filter_ids
         from rest_framework.exceptions import ValidationError
 
         with self.assertRaises(ValidationError):
             parse_user_filter_ids([1, 2, 3])
+        self.assertEqual(parse_user_filter_ids(ResolvedUserFilterIds([1, 2, 3])), [1, 2, 3])
 
 
 class TestNormalizePersistedUserFilter(TestCase):

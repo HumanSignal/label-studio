@@ -1,10 +1,12 @@
 .filterLine {
   position: relative;
   width: 100%;
+  min-width: 0;
+  max-width: 100%;
 
   /* Apply the same grid layout as the parent filters container */
   display: grid;
-  grid-template-columns: 80px minmax(120px, max-content) minmax(100px, max-content) 1fr 24px;
+  grid-template-columns: 80px minmax(120px, max-content) minmax(100px, max-content) minmax(0, 1fr) 24px;
   grid-gap: var(--spacing-tightest);
   align-items: start;
 
@@ -39,28 +41,15 @@
     &.value {
       display: flex;
       align-items: center;
+      min-width: 0;
+      max-width: 100%;
+      overflow: hidden;
     }
 
     &.field {
       display: flex;
       align-items: center;
     }
-  }
-
-  &__group {
-    flex: 0;
-    display: grid;
-    grid-template-columns: min-content 1fr;
-    grid-gap: 2px;
-    align-items: flex-start;
-  }
-
-  &__selector {
-    flex: 1;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: var(--spacing-tightest);
   }
 
   &__unavailable {

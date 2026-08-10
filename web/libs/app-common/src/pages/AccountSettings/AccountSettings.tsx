@@ -5,7 +5,6 @@ import { useUpdatePageTitle, createTitleFromSegments } from "@humansignal/core";
 import { useAccountSettingsExtension } from "./extensions";
 import styles from "./AccountSettings.module.css";
 import { accountSettingsSections } from "./sections";
-import { HotkeysHeaderButtons } from "./sections/Hotkeys";
 import clsx from "clsx";
 import { useAtomValue } from "jotai";
 import { settingsAtom } from "./atoms";
@@ -37,16 +36,13 @@ const AccountSettingsSection = () => {
     [resolvedSections, sectionId],
   );
 
-  // Update page title to reflect the current section
   const pageTitleText = useMemo(() => {
     if (!currentSection) return "My Account";
 
-    // If title is a string, use it directly
     if (typeof currentSection.title === "string") {
       return createTitleFromSegments([currentSection.title, "My Account"]);
     }
 
-    // For non-string titles (like JSX elements), derive from the section ID
     const titleFromId = currentSection.id
       .split("-")
       .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
@@ -74,14 +70,7 @@ const AccountSettingsSection = () => {
       <Card key={currentSection.id} className="!w-full">
         <CardHeader>
           <div className="flex flex-col gap-tight">
-            <div className="flex justify-between items-center">
-              <CardTitle>{currentSection.title}</CardTitle>
-              {currentSection.id === "hotkeys" && (
-                <div className="flex-shrink-0">
-                  <HotkeysHeaderButtons />
-                </div>
-              )}
-            </div>
+            <CardTitle>{currentSection.title}</CardTitle>
             {currentSection.description && (
               <CardDescription>
                 {isValidElement(currentSection.description) ? (

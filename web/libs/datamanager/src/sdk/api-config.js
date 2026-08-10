@@ -8,6 +8,9 @@ export const APIConfig = {
     /** users list */
     users: "/../users",
 
+    /** Project-scoped users for Data Manager filter options */
+    projectUsers: "/projects/:project/user-options",
+
     /** user info */
     user: "/../users/:pk",
 

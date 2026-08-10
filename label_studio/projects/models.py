@@ -1421,6 +1421,35 @@ class LabelStreamHistory(models.Model):
         constraints = [models.UniqueConstraint(fields=['user', 'project'], name='unique_history')]
 
 
+class ProjectHotkeyPreference(models.Model):
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='project_hotkey_preferences',
+    )
+    project = models.ForeignKey(
+        Project,
+        on_delete=models.CASCADE,
+        related_name='hotkey_preferences',
+    )
+    custom_hotkeys = models.JSONField(
+        _('custom hotkeys'),
+        default=dict,
+        blank=True,
+        help_text=_('Personal keyboard shortcut overrides for this project'),
+    )
+    created_at = models.DateTimeField(_('created at'), auto_now_add=True)
+    updated_at = models.DateTimeField(_('updated at'), auto_now=True)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=['user', 'project'],
+                name='unique_user_project_hotkeys',
+            )
+        ]
+
+
 class ProjectMember(models.Model):
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='project_memberships', help_text='User ID'

@@ -19,13 +19,18 @@ const injector = inject(({ store }) => {
 
 export const FieldsButton = injector(
   observer(({ view, columns, title, icon, filter, tooltip, className, "data-testid": dataTestId }) => {
-    const value = useMemo(() => columns.filter((c) => !c.is_hidden).map((c) => c.key), [columns]);
-    const disabled = view?.isLockedByManager;
-    const effectiveTooltip = disabled ? view.lockedUpdateMessage : tooltip;
+    // `is_hidden` is observable, so it has to be read on every render: memoizing on `columns`
+    // alone froze the selection at whatever was visible when the column list was last rebuilt,
+    // and the picker restored that stale selection whenever it remounted (FIT-2406). The memo
+    // only keeps the array reference stable, since ColumnPicker re-seeds on a new `value`.
+    const visibleColumnKeys = columns.filter((c) => !c.is_hidden).map((c) => c.key);
+    const visibleColumnsSignature = visibleColumnKeys.join("\u0000");
+    const value = useMemo(() => visibleColumnKeys, [visibleColumnsSignature]);
+    const readOnly = view?.isLockedByManager;
 
     const handleChange = useCallback(
       (keys) => {
-        if (disabled) return;
+        if (readOnly) return;
         const selectedSet = new Set(keys ?? []);
         flushSync(() => {
           for (const col of columns) {
@@ -36,7 +41,7 @@ export const FieldsButton = injector(
           }
         });
       },
-      [columns, disabled],
+      [columns, readOnly],
     );
 
     const picker = (
@@ -57,7 +62,7 @@ export const FieldsButton = injector(
           )
         }
         dataTestid={dataTestId}
-        disabled={disabled}
+        readOnly={readOnly}
         triggerClassName={className}
         triggerProps={{
           style: {
@@ -67,12 +72,9 @@ export const FieldsButton = injector(
       />
     );
 
-    return effectiveTooltip ? (
-      <Tooltip title={effectiveTooltip}>
-        <div
-          className={`${cn("field-button").toClassName()} flex items-center`}
-          style={{ zIndex: 1000, ...(disabled && { opacity: 0.5 }) }}
-        >
+    return tooltip && !readOnly ? (
+      <Tooltip title={tooltip}>
+        <div className={`${cn("field-button").toClassName()} flex items-center`} style={{ zIndex: 1000 }}>
           {picker}
         </div>
       </Tooltip>

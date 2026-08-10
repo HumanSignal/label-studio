@@ -1,7 +1,7 @@
 import React from "react";
 import { observer } from "mobx-react";
 import { cn } from "../../../utils/bem";
-import { Badge, Button, EnterpriseBadge, Typography } from "@humansignal/ui";
+import { Button, Typography } from "@humansignal/ui";
 import { IconClose, PlusIcon } from "@humansignal/icons";
 import { FilterDropdown } from "../FilterDropdown";
 import "./FilterLine.prefix.css";
@@ -13,8 +13,6 @@ import {
   RECENT_COLUMN_PREFIX,
   getFilterGroupTitle,
 } from "../../Common/ColumnPicker";
-import { filterFieldSearchHandler, findSelectedOption } from "../filter-helpers";
-import { RECENT_VALUE_PREFIX } from "../../../hooks/useRecentFilters";
 
 const RECENTS_AUTOSAVE_DELAY_MS = 500;
 
@@ -48,11 +46,10 @@ const Conjunction = observer(({ index, view, disabled }) => {
 });
 
 /**
- * Column picker for a single filter row (main layout).
+ * Column picker for a single filter row (pinned sidebar and unpinned popup).
  * Uses core Select with groupBy, optionRenderer, and badge shown in the closed trigger.
  * Receives `pickerFilters` — the plain flat currentView.availableFilters list — so that
- * filtersToPickerGroups always gets {id, field, ...} objects, not the recents-grouped
- * structure that `availableFilters` (fields) uses for FilterDropdown.
+ * filtersToPickerGroups always gets {id, field, ...} objects.
  */
 const FilterColumnPicker = observer(
   ({ filter, pickerFilters, recentEntries, onSaveOnSwitch, onSaveInPlace, disabled }) => {
@@ -105,66 +102,6 @@ const FilterColumnPicker = observer(
   },
 );
 
-/** Custom renderer for the column dropdown items: section header or column label.
- *  Headers are styled to visually match the Select component's native group headers
- *  (see select.tsx line 473: pl-3 font-bold text-neutral-content-subtler pt-2).
- *  Since our headers render inside the Option wrapper (which adds p-1 + px-4 py-1),
- *  we only style the text — no margin hacks that would be clipped by overflow-hidden. */
-function filterFieldOptionRender({ item }) {
-  const original = item?.original ?? item;
-
-  if (original?._isSeparator) {
-    return null;
-  }
-
-  if (original?._isHeader) {
-    return (
-      <Typography as="span" variant="label" size="small" className="text-neutral-content-subtler">
-        {original?.field?.title ?? original?.title ?? "Recent"}
-      </Typography>
-    );
-  }
-
-  const filter = original;
-  const showEnterpriseBadge = filter?.field?.enterprise_badge;
-  return (
-    <div className={cn("filterLine").elem("selector").toClassName()}>
-      <Typography as="span" variant="body" size="small">
-        {filter?.field?.title}
-      </Typography>
-      {showEnterpriseBadge && <EnterpriseBadge look="ghost" />}
-      {filter?.field?.parent && (
-        <Badge size="small" className="ml-tightest">
-          {filter.field.parent.title}
-        </Badge>
-      )}
-    </div>
-  );
-}
-
-/**
- * Handle column selection in the filter dropdown.
- * Saves the departing column's state to recents, then applies the new column.
- *
- * - Recent target → save departing in-place (no reorder) + restore stored state
- * - Non-recent target → save departing to front (reorder) + smart carry-over
- */
-function handleColumnChange(filter, availableFilters, selectedValue, onSaveOnSwitch, onSaveInPlace) {
-  const selected = findSelectedOption(availableFilters, selectedValue);
-  const departingId = filter.filter.id;
-  const departingOperator = filter.operator;
-  const departingValue = filter.value;
-
-  if (selected?._isRecent) {
-    const realId = selectedValue.replace(RECENT_VALUE_PREFIX, "");
-    onSaveInPlace?.(departingId, departingOperator, departingValue);
-    filter.setFilterFromRecent(realId, selected._recentOperator, selected._recentValue);
-  } else {
-    onSaveOnSwitch?.(departingId, departingOperator, departingValue);
-    filter.setFilterDelayed(selectedValue);
-  }
-}
-
 /**
  * A single filter row: column selector + operator + value input + delete button.
  *
@@ -179,19 +116,16 @@ function handleColumnChange(filter, availableFilters, selectedValue, onSaveOnSwi
  *  - Non-recent item -> save departing column to front of recents (reorder);
  *    apply new column with smart operator/value carry-over via setFilterDelayed.
  *
- * Main layout uses ColumnPicker (with badge-in-trigger support).
- * Sidebar layout uses FilterDropdown (with recents + custom option renderer).
+ * Both pinned (sidebar) and unpinned (popup) layouts use ColumnPicker so the
+ * filter field list and section headers stay identical (FIT-2433).
  */
 export const FilterLine = observer(
   ({
     filter,
-    availableFilters,
     pickerFilters,
     recentEntries,
     index,
     view,
-    sidebar,
-    dropdownClassName,
     onSaveOnSwitch,
     onSaveInPlace,
     disabled = false,
@@ -252,36 +186,12 @@ export const FilterLine = observer(
       return () => clearTimeout(saveTimerRef.current);
     }, [filterId, filterOperator, filterValue, isValid, onSaveOnSwitch]);
 
-    const rootColumnPicker = sidebar ? (
-      <FilterDropdown
-        placeholder={filter.field?.title || "Column"}
-        defaultValue={filter.filter.id}
-        items={availableFilters}
-        dropdownClassName={dropdownClassName}
-        searchFilter={filterFieldSearchHandler}
-        onChange={(selectedValue) =>
-          handleColumnChange(filter, availableFilters, selectedValue, onSaveOnSwitch, onSaveInPlace)
-        }
-        optionRender={filterFieldOptionRender}
-        disabled={isDisabled}
-      />
-    ) : (
-      <FilterColumnPicker
-        filter={filter}
-        pickerFilters={pickerFilters ?? availableFilters}
-        recentEntries={recentEntries}
-        onSaveOnSwitch={onSaveOnSwitch}
-        onSaveInPlace={onSaveInPlace}
-        disabled={disabled}
-      />
-    );
-
     return (
       <div
         className={cn("filterLine")
           .mod({ hasChild: childFilters.length > 0 })
           .toClassName()}
-        data-testid={sidebar ? undefined : "filter-line"}
+        data-testid="filter-line"
       >
         <div className={cn("filterLine").elem("column").mix("conjunction").toClassName()}>
           {index === 0 ? (
@@ -293,11 +203,15 @@ export const FilterLine = observer(
           )}
         </div>
 
-        <div
-          className={cn("filterLine").elem("column").mix("field").toClassName()}
-          data-testid={sidebar ? undefined : "filter-line-column"}
-        >
-          {rootColumnPicker}
+        <div className={cn("filterLine").elem("column").mix("field").toClassName()} data-testid="filter-line-column">
+          <FilterColumnPicker
+            filter={filter}
+            pickerFilters={pickerFilters}
+            recentEntries={recentEntries}
+            onSaveOnSwitch={onSaveOnSwitch}
+            onSaveInPlace={onSaveInPlace}
+            disabled={disabled}
+          />
         </div>
 
         <FilterOperation

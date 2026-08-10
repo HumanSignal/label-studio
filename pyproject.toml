@@ -73,7 +73,7 @@ dependencies = [
 ]
 
 [tool.uv.sources]
-label-studio-sdk = { git = "https://github.com/HumanSignal/label-studio-sdk.git", rev = "ef1fda62d579958ba9389b743286c55be60c3032" }
+label-studio-sdk = { git = "https://github.com/HumanSignal/label-studio-sdk.git", rev = "d7a18ef394abc8d6465bad00423896af36dd842f" }
 
 [project.optional-dependencies]
 uwsgi = [
@@ -96,6 +96,9 @@ test = [
     "pytest-mock==3.15.1",
     "tavern==3.3.3; python_version >= '3.11'",
     "tavern==2.17.0; python_version < '3.11'",
+    # tavern 2.x (py3.10) unconditionally loads its grpc plugin because grpcio is
+    # present transitively; without grpc_reflection every tavern test errors at setup
+    "grpcio-reflection==1.78.0 ; python_full_version < '3.11'",
     "fakeredis~=2.26.1",
     "pytest-env==1.6.0; python_version >= '3.11'",
     "pytest-env==0.6.2; python_version < '3.11'",
