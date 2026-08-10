@@ -22,7 +22,7 @@ const NumberInput = observer(({ onChange, ...rest }) => {
   return <FilterInput {...rest} type="number" onChange={(value) => onChange(valueFilter(value))} />;
 });
 
-const RangeInput = observer(({ schema, value, onChange }) => {
+const RangeInput = observer(({ schema, value, onChange, disabled, readOnly }) => {
   const min = value?.min ?? null;
   const max = value?.max ?? null;
 
@@ -40,9 +40,25 @@ const RangeInput = observer(({ schema, value, onChange }) => {
 
   return (
     <div className="flex w-full min-w-[100px]">
-      <NumberInput placeholder="Min" value={min} onChange={onChangeMin} schema={schema} style={{ flex: 1 }} />
+      <NumberInput
+        placeholder="Min"
+        value={min}
+        onChange={onChangeMin}
+        schema={schema}
+        style={{ flex: 1 }}
+        disabled={disabled}
+        readOnly={readOnly}
+      />
       <span style={{ padding: "0 10px" }}>and</span>
-      <NumberInput placeholder="Max" value={max} onChange={onChangeMax} schema={schema} style={{ flex: 1 }} />
+      <NumberInput
+        placeholder="Max"
+        value={max}
+        onChange={onChangeMax}
+        schema={schema}
+        style={{ flex: 1 }}
+        disabled={disabled}
+        readOnly={readOnly}
+      />
     </div>
   );
 });

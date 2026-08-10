@@ -3,7 +3,7 @@ import { Select, Badge } from "@humansignal/ui";
 import { stateRegistry, formatStateName, getStateVariant } from "@humansignal/app-common";
 import { useMemo } from "react";
 
-const BaseInput = observer(({ value, onChange, placeholder }) => {
+const BaseInput = observer(({ value, onChange, placeholder, disabled, readOnly }) => {
   const options = useMemo(() => {
     return stateRegistry.getStatesByEntityType("task").map((state) => {
       const textLabel = formatStateName(state);
@@ -28,6 +28,8 @@ const BaseInput = observer(({ value, onChange, placeholder }) => {
       onChange={onChange}
       placeholder={placeholder}
       searchable={true}
+      disabled={disabled}
+      readOnly={readOnly}
       onSearch={(value) => {
         // Search against textLabel which should match any of the state labels
         return options.filter((option) => option.textLabel.toLowerCase().includes(value.toLowerCase()));

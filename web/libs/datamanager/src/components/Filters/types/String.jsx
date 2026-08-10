@@ -2,8 +2,17 @@ import { observer } from "mobx-react";
 import { FilterInput } from "../FilterInput";
 import { ListInput } from "./ListInput";
 
-const BaseInput = observer(({ value, onChange, placeholder }) => {
-  return <FilterInput type="text" value={value} onChange={onChange} placeholder={placeholder} />;
+const BaseInput = observer(({ value, onChange, placeholder, disabled, readOnly }) => {
+  return (
+    <FilterInput
+      type="text"
+      value={value}
+      onChange={onChange}
+      placeholder={placeholder}
+      disabled={disabled}
+      readOnly={readOnly}
+    />
+  );
 });
 
 export const StringFilter = [

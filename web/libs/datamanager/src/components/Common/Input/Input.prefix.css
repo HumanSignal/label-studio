@@ -34,6 +34,16 @@
   min-height: 50px;
 }
 
+/* Match the disabled Select trigger (select.module.css .isDisabled) so locked
+   filter value controls read as disabled regardless of control type (FIT-2447). */
+.input-dm:disabled,
+.textarea-dm:disabled {
+  color: var(--color-neutral-content-subtlest);
+  background: var(--color-neutral-surface);
+  box-shadow: 0 1px 2px 1px rgb(0 0 0 / 6%) inset;
+  cursor: not-allowed;
+}
+
 .input-dm:focus,
 .textarea-dm:focus {
   outline: none;

@@ -52,15 +52,23 @@ export const FilterOperation = observer(({ filter, field, operator, value, disab
   );
 
   const onChange = (newValue) => {
+    // Locked / unavailable filters must not mutate local state (FIT-2447). Persistence
+    // already no-ops in tab_filter.save(); this keeps the UI from looking editable.
+    if (disabled) return;
     filter.setValue(newValue);
     saveFilter();
   };
 
   const onOperatorSelected = (selectedKey) => {
+    if (disabled) return;
     filter.setOperator(selectedKey);
   };
   const availableOperators = filter.cellView?.filterOperators;
   const Input = selected?.input;
+  const multiple = filter.schema?.multiple ?? false;
+  // Match Columns picker (FIT-2396): single-select → disabled; multi-select → readOnly.
+  const valueDisabled = Boolean(disabled && !multiple);
+  const valueReadOnly = Boolean(disabled && multiple);
   let operatorList = allowedFilterOperations(types, getRoot(filter)?.SDK?.type);
   // BROS-1203 — hide list-membership operators unless FF is on AND the column is allowlisted.
   if (!isFF(FF_BROS_1203) || !supportsListMembership(filter)) {
@@ -107,11 +115,12 @@ export const FilterOperation = observer(({ filter, field, operator, value, disab
           key={`${filter.filter.id}-${filter.filter.currentType}`}
           schema={filter.schema}
           filter={filter}
-          multiple={filter.schema?.multiple ?? false}
+          multiple={multiple}
           value={value}
           onChange={onChange}
           size="small"
-          disabled={disabled}
+          disabled={valueDisabled}
+          readOnly={valueReadOnly}
         />
       </div>
     </>

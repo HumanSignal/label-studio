@@ -175,15 +175,28 @@ const createMultiChildFilter = ({ childCount = 2 }: { childCount?: number } = {}
   return { root, view: root.viewsStore.views[0], filter: root.viewsStore.views[0].filters[0] };
 };
 
-const FilterLineHarness = observer(({ view }: { view: ReturnType<typeof createUnavailableFilter>["view"] }) => (
-  <>
-    {view.filters.map((filter, index) => (
-      <FilterLine key={filter.id} filter={filter} pickerFilters={view.availableFilters} index={index} view={view} />
-    ))}
-  </>
-));
+const FilterLineHarness = observer(
+  ({ view, disabled = false }: { view: ReturnType<typeof createUnavailableFilter>["view"]; disabled?: boolean }) => (
+    <>
+      {view.filters.map((filter, index) => (
+        <FilterLine
+          key={filter.id}
+          filter={filter}
+          pickerFilters={view.availableFilters}
+          index={index}
+          view={view}
+          disabled={disabled}
+          disabledTooltip="This tab is locked. Unlock it to change filters."
+        />
+      ))}
+    </>
+  ),
+);
 
-const renderFilterLine = (view: ReturnType<typeof createUnavailableFilter>["view"]) => {
+const renderFilterLine = (
+  view: ReturnType<typeof createUnavailableFilter>["view"],
+  { disabled = false }: { disabled?: boolean } = {},
+) => {
   const queryClient = new QueryClient({
     defaultOptions: { queries: { retry: false } },
   });
@@ -196,9 +209,30 @@ const renderFilterLine = (view: ReturnType<typeof createUnavailableFilter>["view
 
   return render(
     <QueryClientProvider client={queryClient}>
-      <FilterLineHarness view={view} />
+      <FilterLineHarness view={view} disabled={disabled} />
     </QueryClientProvider>,
   );
+};
+
+const createNumberFilter = () => {
+  const root = RootStore.create({ viewsStore: { columnsRaw } });
+  root.viewsStore.fetchColumns();
+  unprotect(root);
+  root.viewsStore.views.push({
+    id: 1,
+    title: "Saved",
+    saved: true,
+    key: "saved",
+    filters: [
+      {
+        filter: "filter:tasks:id",
+        operator: "equal",
+        value: 42,
+      },
+    ],
+  });
+  root.viewsStore.selected = 1;
+  return { root, view: root.viewsStore.views[0], filter: root.viewsStore.views[0].filters[0] };
 };
 
 describe("Dimension result filter cardinality (FIT-2241)", () => {
@@ -271,6 +305,58 @@ describe("multiple child filter controls (FIT-2273)", () => {
   });
 });
 
+describe("locked filter value controls (FIT-2447)", () => {
+  let root: ReturnType<typeof RootStore.create> | null = null;
+
+  afterEach(() => {
+    if (root) destroy(root);
+    root = null;
+  });
+
+  it("disables single-select list value control when the tab is locked", () => {
+    const setup = createFilter({ available: true, multiple: false });
+    root = setup.root;
+    renderFilterLine(setup.view, { disabled: true });
+
+    expect(within(screen.getByTestId("filter-line-value")).getByRole("button")).toBeDisabled();
+  });
+
+  it("marks multi-select list value control as read-only when the tab is locked", () => {
+    const setup = createFilter({ available: true, multiple: true });
+    root = setup.root;
+    renderFilterLine(setup.view, { disabled: true });
+
+    const trigger = within(screen.getByTestId("filter-line-value")).getByRole("button");
+    expect(trigger).not.toBeDisabled();
+    expect(trigger).toHaveAttribute("aria-readonly", "true");
+  });
+
+  it("disables number value input when the tab is locked", () => {
+    const setup = createNumberFilter();
+    root = setup.root;
+    renderFilterLine(setup.view, { disabled: true });
+
+    expect(within(screen.getByTestId("filter-line-value")).getByRole("spinbutton")).toBeDisabled();
+  });
+
+  it("keeps multi-select values inspectable but unchanged when locked (FIT-2396 pattern)", async () => {
+    const setup = createFilter({ available: true, multiple: true });
+    root = setup.root;
+    renderFilterLine(setup.view, { disabled: true });
+
+    const trigger = within(screen.getByTestId("filter-line-value")).getByRole("button");
+    expect(trigger).toHaveAttribute("aria-readonly", "true");
+    fireEvent.click(trigger);
+
+    const option = await screen.findByRole("option", { name: /positive/i });
+    fireEvent.click(option);
+
+    expect(setup.filter.currentValue).toEqual(["positive"]);
+    expect(screen.queryByRole("button", { name: "All" })).toBeNull();
+    expect(screen.queryByRole("button", { name: "None" })).toBeNull();
+  });
+});
+
 describe("unavailable saved filters (FIT-2173)", () => {
   let root: ReturnType<typeof RootStore.create> | null = null;
 
@@ -302,7 +388,10 @@ describe("unavailable saved filters (FIT-2173)", () => {
     expect(screen.getByText("Sentiment")).toBeInTheDocument();
     expect(screen.getByRole("status")).toHaveTextContent("saved value is preserved");
     expect(within(screen.getByTestId("filter-line-operator")).getByRole("button")).toBeDisabled();
-    expect(within(screen.getByTestId("filter-line-value")).getByRole("button")).toBeDisabled();
+    // Multi-select value controls use readOnly (inspectable) when editing is blocked (FIT-2447).
+    const valueTrigger = within(screen.getByTestId("filter-line-value")).getByRole("button");
+    expect(valueTrigger).not.toBeDisabled();
+    expect(valueTrigger).toHaveAttribute("aria-readonly", "true");
     expect(setup.filter.currentValue).toEqual(["positive"]);
     await waitFor(() => expect(setup.filter.saving).toBe(false));
 

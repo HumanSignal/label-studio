@@ -3,9 +3,10 @@ import { observer } from "mobx-react";
 import React from "react";
 import { DatePicker } from "../../Common/DatePicker/DatePicker";
 
-export const DateTimeInput = observer(({ value, range, time, onChange }) => {
+export const DateTimeInput = observer(({ value, range, time, onChange, disabled }) => {
   const onValueChange = React.useCallback(
     (selectedDate) => {
+      if (disabled) return;
       let value;
 
       if (Array.isArray(selectedDate)) {
@@ -20,7 +21,7 @@ export const DateTimeInput = observer(({ value, range, time, onChange }) => {
 
       onChange(value);
     },
-    [onChange],
+    [onChange, disabled],
   );
 
   const dateValue = React.useMemo(() => {
@@ -38,7 +39,14 @@ export const DateTimeInput = observer(({ value, range, time, onChange }) => {
   }, [range, value]);
 
   return (
-    <DatePicker value={dateValue} selectRange={range} showTime={time === true} onChange={onValueChange} size="small" />
+    <DatePicker
+      value={dateValue}
+      selectRange={range}
+      showTime={time === true}
+      onChange={onValueChange}
+      size="small"
+      disabled={disabled}
+    />
   );
 });
 
