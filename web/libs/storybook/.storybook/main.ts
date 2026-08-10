@@ -60,6 +60,13 @@ const config: StorybookConfig = {
       jsx: "automatic",
       jsxImportSource: "react",
     } as ESBuildOptions;
+    // lightningcss (rolldown-vite's default minifier) crashes on the
+    // anchor-positioning CSS in libs/ui (@position-try); use esbuild like
+    // vite.config.playground.ts does.
+    viteConfig.build = {
+      ...(viteConfig.build ?? {}),
+      cssMinify: "esbuild",
+    };
     viteConfig.resolve = viteConfig.resolve ?? {};
     viteConfig.resolve.alias = {
       ...viteConfig.resolve.alias,
