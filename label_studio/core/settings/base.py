@@ -487,6 +487,15 @@ SPECTACULAR_SETTINGS = {
             ('DI', 'Deactivated'),
             ('NO', 'Not Activated'),
         ),
+        # Provenance for how a member/project role was set (RoleSource.choices).
+        'RoleSourceEnum': (
+            ('manual', 'Manual'),
+            ('saml', 'SAML'),
+            ('scim', 'SCIM'),
+            ('ldap', 'LDAP'),
+            ('api', 'API'),
+            ('billing', 'Billing'),
+        ),
         # Seat types assignable through invite/membership APIs
         # (UserType.assignable_choices()): Service Accounts are provisioned via
         # their dedicated API and are excluded.
