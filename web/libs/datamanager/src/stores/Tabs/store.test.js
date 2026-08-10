@@ -102,6 +102,62 @@ describe("TabStore createSnapshot / saveView (BROS-1491)", () => {
   });
 });
 
+describe("hidden filter-only columns in Columns picker (FIT-2435)", () => {
+  let root;
+
+  afterEach(() => {
+    if (root) {
+      destroy(root);
+      root = null;
+    }
+  });
+
+  it("excludes API-hidden columns from targetColumns while keeping them filterable", () => {
+    root = RootStore.create({
+      viewsStore: {
+        columnsRaw: [
+          {
+            id: "id",
+            title: "ID",
+            type: "Number",
+            target: "tasks",
+            visibility_defaults: { explore: true, filter: true },
+          },
+          {
+            id: "skipped_by_annotator",
+            title: "Skipped by Annotator",
+            type: "List",
+            target: "tasks",
+            hidden: true,
+            visibility_defaults: { explore: false, labeling: false, filter: true },
+            schema: { multiple: true },
+          },
+          {
+            id: "annotators",
+            title: "Annotated by",
+            type: "List",
+            target: "tasks",
+            visibility_defaults: { explore: true, filter: true },
+            schema: { multiple: true },
+          },
+        ],
+      },
+    });
+    root.viewsStore.fetchColumns();
+    unprotect(root);
+    root.viewsStore.views.push({ id: 1, title: "Saved", saved: true, key: "saved" });
+    root.viewsStore.selected = 1;
+
+    const view = root.viewsStore.views[0];
+    const targetAliases = view.targetColumns.map((column) => column.alias);
+
+    expect(targetAliases).toContain("id");
+    expect(targetAliases).toContain("annotators");
+    expect(targetAliases).not.toContain("skipped_by_annotator");
+    expect(view.availableFilters.map((filter) => filter.id)).toContain("filter:tasks:skipped_by_annotator");
+  });
+});
+
 describe("saved filter availability (FIT-2173)", () => {
   let root;
 

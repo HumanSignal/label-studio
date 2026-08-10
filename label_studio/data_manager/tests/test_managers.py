@@ -679,6 +679,86 @@ class TestParseUserFilterIds(TestCase):
         self.assertEqual(parse_user_filter_ids(ResolvedUserFilterIds([1, 2, 3])), [1, 2, 3])
 
 
+class TestValidateUserFilterOperator(TestCase):
+    """FIT-2435: unified allowlist for user-list filter + operator combos."""
+
+    # Operators that must never reach ORM fallthrough for these fields.
+    NAUGHTY_SCALAR_OPERATORS = (
+        'regex',
+        'less',
+        'greater',
+        'less_or_equal',
+        'greater_or_equal',
+        'in',
+        'not_in',
+        'unknown_op',
+    )
+    NAUGHTY_LIST_OPERATORS = (
+        'empty',
+        'equal',
+        'not_equal',
+        'regex',
+        'in_list',
+        'not_in_list',
+        'less',
+        'greater',
+    )
+
+    def test_empty_allowed_only_for_fields_that_implement_it(self):
+        from data_manager.managers import (
+            USER_FILTER_EMPTY_FIELDS,
+            USER_FILTER_FIELDS,
+            validate_user_filter_operator,
+        )
+        from rest_framework.exceptions import ValidationError
+
+        for field_name in USER_FILTER_FIELDS:
+            with self.subTest(field_name=field_name):
+                if field_name in USER_FILTER_EMPTY_FIELDS:
+                    validate_user_filter_operator(field_name, 'empty', True)
+                    validate_user_filter_operator(field_name, 'empty', False)
+                else:
+                    with self.assertRaises(ValidationError):
+                        validate_user_filter_operator(field_name, 'empty', True)
+
+    def test_rejects_naughty_scalar_operators_for_every_user_field(self):
+        from data_manager.managers import USER_FILTER_FIELDS, validate_user_filter_operator
+        from rest_framework.exceptions import ValidationError
+
+        for field_name in USER_FILTER_FIELDS:
+            for operator in self.NAUGHTY_SCALAR_OPERATORS:
+                with self.subTest(field_name=field_name, operator=operator):
+                    with self.assertRaises(ValidationError):
+                        validate_user_filter_operator(field_name, operator, 1)
+
+    def test_rejects_naughty_list_operators_for_every_user_field(self):
+        from data_manager.managers import USER_FILTER_FIELDS, validate_user_filter_operator
+        from rest_framework.exceptions import ValidationError
+
+        for field_name in USER_FILTER_FIELDS:
+            for operator in self.NAUGHTY_LIST_OPERATORS:
+                with self.subTest(field_name=field_name, operator=operator):
+                    with self.assertRaises(ValidationError):
+                        validate_user_filter_operator(field_name, operator, [1])
+
+    def test_allows_contains_and_not_contains_for_every_user_field(self):
+        from data_manager.managers import USER_FILTER_FIELDS, validate_user_filter_operator
+
+        for field_name in USER_FILTER_FIELDS:
+            for operator in ('contains', 'not_contains'):
+                with self.subTest(field_name=field_name, operator=operator):
+                    validate_user_filter_operator(field_name, operator, [1, 2])
+                    validate_user_filter_operator(field_name, operator, 1)
+
+    def test_allows_legacy_scalar_equal_family_for_normalization(self):
+        from data_manager.managers import USER_FILTER_FIELDS, validate_user_filter_operator
+
+        for field_name in USER_FILTER_FIELDS:
+            for operator in ('equal', 'not_equal', 'in_list', 'not_in_list'):
+                with self.subTest(field_name=field_name, operator=operator):
+                    validate_user_filter_operator(field_name, operator, 1)
+
+
 class TestNormalizePersistedUserFilter(TestCase):
     def test_recovers_historical_user_id_shapes_for_every_user_field(self):
         from data_manager.managers import USER_FILTER_FIELDS, normalize_persisted_user_filter
@@ -732,6 +812,8 @@ class TestNormalizePersistedUserFilter(TestCase):
         )
         self.assertEqual(normalize_persisted_user_filter('annotators', 'empty', 'yes'), ('empty', True))
         self.assertEqual(normalize_persisted_user_filter('annotators', 'empty', 'O'), ('contains', []))
+        # FIT-2435: unsupported empty on skipped_by_annotator becomes a no-op contains.
+        self.assertEqual(normalize_persisted_user_filter('skipped_by_annotator', 'empty', True), ('contains', []))
 
     @override_settings(DATA_MANAGER_LIST_FILTER_MAX_VALUES=3)
     def test_deduplicates_and_bounds_recovered_ids(self):

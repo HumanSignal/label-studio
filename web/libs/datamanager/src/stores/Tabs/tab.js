@@ -82,8 +82,10 @@ export const Tab = types
     },
 
     get targetColumns() {
+      // `hidden` columns are filter-only (or otherwise non-toggleable) and must not
+      // appear in the Columns / Order By pickers (FIT-2435).
       return self.columns.filter((c) => {
-        return c.target === self.target && !c.isAnnotationResultsFilterColumn;
+        return c.target === self.target && !c.hidden;
       });
     },
 
