@@ -9,18 +9,23 @@ import * as transitionUtils from "@humansignal/core/lib/utils/transition";
 const originalCSSSupports = CSS.supports;
 
 describe("Dropdown - Cursor Position Support", () => {
+  let alignElementsSpy: ReturnType<typeof spyOn> | undefined;
+  let aroundTransitionSpy: ReturnType<typeof spyOn> | undefined;
+
   beforeEach(() => {
     mock.clearAllMocks();
+    // Drop leftover portaled menus from prior cases (RTL container unmount may leave body portals).
+    document.querySelectorAll('[data-testid="dropdown"]').forEach((el) => el.remove());
     // Reset CSS.supports to default (no anchor positioning support)
     CSS.supports = mock(() => false);
-    spyOn(domUtils, "alignElements").mockImplementation(
+    alignElementsSpy = spyOn(domUtils, "alignElements").mockImplementation(
       mock(() => ({
         left: 100,
         top: 200,
         maxHeight: 500,
       })),
     );
-    spyOn(transitionUtils, "aroundTransition").mockImplementation(
+    aroundTransitionSpy = spyOn(transitionUtils, "aroundTransition").mockImplementation(
       mock((_element: any, callbacks: any) => {
         callbacks.beforeTransition?.();
         callbacks.transition?.();
@@ -31,6 +36,9 @@ describe("Dropdown - Cursor Position Support", () => {
 
   afterEach(() => {
     CSS.supports = originalCSSSupports;
+    alignElementsSpy?.mockRestore();
+    aroundTransitionSpy?.mockRestore();
+    document.querySelectorAll('[data-testid="dropdown"]').forEach((el) => el.remove());
   });
 
   describe("Basic Rendering", () => {

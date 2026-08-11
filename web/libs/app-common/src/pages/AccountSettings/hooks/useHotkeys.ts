@@ -3,6 +3,7 @@ import { ToastType, useToast } from "@humansignal/ui/lib/toast/toast";
 // @ts-ignore
 import { useAPI } from "@humansignal/core";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { type CustomHotkeys, effectiveHotkeys, mergeCustomHotkeys } from "../hotkeys/effectiveHotkeys";
 import {
   type ApiResponse,
   type ExportData,
@@ -15,14 +16,6 @@ import {
 
 const typedDefaultHotkeys: Hotkey[] = getTypedDefaultHotkeys();
 
-interface CustomHotkey {
-  key: string;
-  active: boolean;
-  description?: string;
-}
-
-type CustomHotkeys = Record<string, CustomHotkey>;
-type RuntimeKeymap = Record<string, Record<string, unknown>>;
 interface HotkeyApiResponse extends ApiResponse {
   $meta?: {
     status?: number;
@@ -38,13 +31,6 @@ interface ApiRequestError {
   };
   request?: unknown;
 }
-type HotkeyRuntimeWindow = Window & {
-  Htx?: {
-    Hotkey?: {
-      setKeymap: (keymap: RuntimeKeymap) => void;
-    };
-  };
-};
 
 export type HotkeyScope = { kind: "account" } | { kind: "project"; projectId: number };
 
@@ -62,9 +48,6 @@ const isApiFailure = (response: HotkeyApiResponse | null): boolean =>
 const isProjectAccessStatus = (status: number | undefined): boolean => status === 403 || status === 404;
 
 const getHotkeyId = (hotkey: Hotkey): string => `${hotkey.section}:${hotkey.element}`;
-
-const cloneCustomHotkeys = (hotkeys: CustomHotkeys): CustomHotkeys =>
-  Object.fromEntries(Object.entries(hotkeys).map(([id, hotkey]) => [id, { ...hotkey }]));
 
 const hotkeysToCustomHotkeys = (hotkeys: Hotkey[]): CustomHotkeys =>
   Object.fromEntries(
@@ -91,11 +74,6 @@ const updateHotkeysWithCustomSettings = (defaultHotkeys: Hotkey[], customHotkeys
     };
   });
 
-export const mergeCustomHotkeys = (account: CustomHotkeys, project: CustomHotkeys): CustomHotkeys => ({
-  ...cloneCustomHotkeys(account),
-  ...cloneCustomHotkeys(project),
-});
-
 export const computeProjectOverrides = (hotkeys: Hotkey[], accountHotkeys: CustomHotkeys): CustomHotkeys => {
   const accountEffectiveHotkeys = hotkeysToCustomHotkeys(
     updateHotkeysWithCustomSettings(typedDefaultHotkeys, accountHotkeys),
@@ -116,75 +94,8 @@ export const computeProjectOverrides = (hotkeys: Hotkey[], accountHotkeys: Custo
   );
 };
 
-const EDITOR_HOTKEY_PREFIX = /^(annotation|timeseries|audio|regions|video|image_gallery|tools):(.*)/;
-
-const toEditorKeymap = (customHotkeys: CustomHotkeys): RuntimeKeymap => {
-  const editorKeymap: RuntimeKeymap = {};
-
-  for (const [id, hotkey] of Object.entries(customHotkeys)) {
-    const match = id.match(EDITOR_HOTKEY_PREFIX);
-    if (!match) continue;
-
-    const shortKey = match[2];
-    editorKeymap[shortKey] = hotkey.active === false ? { ...hotkey, key: null } : { ...hotkey };
-  }
-
-  return editorKeymap;
-};
-
-const cloneRuntimeKeymap = (keymap: RuntimeKeymap): RuntimeKeymap =>
-  Object.fromEntries(Object.entries(keymap).map(([id, hotkey]) => [id, { ...hotkey }]));
-
 const appSettingsCustomHotkeys = (): CustomHotkeys =>
   (window.APP_SETTINGS?.user?.customHotkeys as CustomHotkeys | undefined) ?? {};
-
-const appSettingsEditorKeymap = (): RuntimeKeymap =>
-  (window.APP_SETTINGS?.editor_keymap as RuntimeKeymap | undefined) ?? {};
-
-const initialAccountHotkeys = cloneCustomHotkeys(appSettingsCustomHotkeys());
-let accountHotkeyBaseline = initialAccountHotkeys;
-const appSettingsLookupHotkey = window.APP_SETTINGS?.lookupHotkey;
-const initialLookupHotkey =
-  typeof appSettingsLookupHotkey === "function" ? (appSettingsLookupHotkey as (lookup: string) => unknown) : undefined;
-const defaultEditorKeymap = toEditorKeymap(hotkeysToCustomHotkeys(typedDefaultHotkeys));
-const initialAccountEditorKeymap = toEditorKeymap(initialAccountHotkeys);
-const builtInEditorKeymapBaseline = cloneRuntimeKeymap(appSettingsEditorKeymap());
-
-for (const id of Object.keys(initialAccountEditorKeymap)) {
-  if (defaultEditorKeymap[id]) {
-    builtInEditorKeymapBaseline[id] = { ...defaultEditorKeymap[id] };
-  }
-}
-
-const setAccountHotkeyBaseline = (hotkeys: CustomHotkeys): void => {
-  accountHotkeyBaseline = cloneCustomHotkeys(hotkeys);
-  if (window.APP_SETTINGS?.user) {
-    window.APP_SETTINGS.user.customHotkeys = cloneCustomHotkeys(hotkeys);
-  }
-};
-
-const applyRuntimeHotkeys = (customHotkeys: CustomHotkeys): void => {
-  const effectiveHotkeys = cloneCustomHotkeys(customHotkeys);
-  const effectiveEditorKeymap = {
-    ...cloneRuntimeKeymap(builtInEditorKeymapBaseline),
-    ...toEditorKeymap(effectiveHotkeys),
-  };
-
-  if (window.APP_SETTINGS) {
-    window.APP_SETTINGS.editor_keymap = effectiveEditorKeymap;
-    window.APP_SETTINGS.lookupHotkey = (lookup: string) => {
-      const hotkey = effectiveHotkeys[lookup];
-      if (hotkey) return hotkey.active === false ? { ...hotkey, key: null } : { ...hotkey };
-      return initialLookupHotkey?.(lookup) ?? null;
-    };
-  }
-
-  try {
-    (window as HotkeyRuntimeWindow).Htx?.Hotkey?.setKeymap?.(effectiveEditorKeymap);
-  } catch (error) {
-    console.warn("Failed to update hotkeys:", error);
-  }
-};
 
 let projectHotkeyRequestToken = 0;
 
@@ -195,7 +106,7 @@ let projectHotkeyRequestToken = 0;
  */
 export function clearProjectHotkeysRuntime(): void {
   projectHotkeyRequestToken += 1;
-  applyRuntimeHotkeys(accountHotkeyBaseline);
+  effectiveHotkeys.apply({ account: effectiveHotkeys.getAccountBaseline() });
 }
 
 export async function loadAndApplyProjectHotkeys(projectId: number | string): Promise<void> {
@@ -212,11 +123,14 @@ export async function loadAndApplyProjectHotkeys(projectId: number | string): Pr
     const data = (await response.json()) as ApiResponse;
     if (requestToken !== projectHotkeyRequestToken) return;
 
-    applyRuntimeHotkeys(mergeCustomHotkeys(accountHotkeyBaseline, data.custom_hotkeys ?? {}));
+    effectiveHotkeys.apply({
+      account: effectiveHotkeys.getAccountBaseline(),
+      project: data.custom_hotkeys ?? {},
+    });
   } catch (error) {
     if (requestToken !== projectHotkeyRequestToken) return;
 
-    applyRuntimeHotkeys(accountHotkeyBaseline);
+    effectiveHotkeys.apply({ account: effectiveHotkeys.getAccountBaseline() });
     console.warn("Failed to load project hotkeys; using account defaults:", error);
   }
 }
@@ -253,9 +167,8 @@ export const useHotkeys = (scope: HotkeyScope = { kind: "account" }) => {
       const accountHotkeys = isApiFailure(accountResponse)
         ? appSettingsCustomHotkeys()
         : (accountResponse?.custom_hotkeys ?? appSettingsCustomHotkeys());
-      setAccountHotkeyBaseline(accountHotkeys);
 
-      let effectiveHotkeys = accountHotkeys;
+      let effective = accountHotkeys;
       if (projectId !== undefined) {
         const projectResponse = (await api.callApi("hotkeys", {
           params: { project: projectId },
@@ -266,17 +179,20 @@ export const useHotkeys = (scope: HotkeyScope = { kind: "account" }) => {
           throw new Error("The project hotkey preference could not be loaded");
         }
 
-        effectiveHotkeys = mergeCustomHotkeys(accountHotkeys, projectResponse?.custom_hotkeys ?? {});
+        effective = mergeCustomHotkeys(accountHotkeys, projectResponse?.custom_hotkeys ?? {});
+        effectiveHotkeys.apply({ account: accountHotkeys, project: projectResponse?.custom_hotkeys ?? {} });
+      } else {
+        effectiveHotkeys.apply({ account: accountHotkeys });
       }
 
-      setHotkeys(updateHotkeysWithCustomSettings(typedDefaultHotkeys, effectiveHotkeys));
+      setHotkeys(updateHotkeysWithCustomSettings(typedDefaultHotkeys, effective));
       setHotkeySettings(accountResponse?.hotkey_settings ?? {});
       setIsReadOnly(false);
     } catch (error) {
       if (controller.signal.aborted) return;
 
       console.error("Error loading hotkeys from API:", error);
-      setHotkeys(updateHotkeysWithCustomSettings(typedDefaultHotkeys, accountHotkeyBaseline));
+      setHotkeys(updateHotkeysWithCustomSettings(typedDefaultHotkeys, effectiveHotkeys.getAccountBaseline()));
       setHotkeySettings({});
 
       if (projectId !== undefined) {
@@ -300,7 +216,7 @@ export const useHotkeys = (scope: HotkeyScope = { kind: "account" }) => {
       const customHotkeys =
         projectId === undefined
           ? hotkeysToCustomHotkeys(currentHotkeys)
-          : computeProjectOverrides(currentHotkeys, accountHotkeyBaseline);
+          : computeProjectOverrides(currentHotkeys, effectiveHotkeys.getAccountBaseline());
 
       const requestBody = {
         custom_hotkeys: customHotkeys,
@@ -329,10 +245,12 @@ export const useHotkeys = (scope: HotkeyScope = { kind: "account" }) => {
         }
 
         if (projectId === undefined) {
-          setAccountHotkeyBaseline(customHotkeys);
-          applyRuntimeHotkeys(customHotkeys);
+          effectiveHotkeys.apply({ account: customHotkeys });
         } else {
-          applyRuntimeHotkeys(mergeCustomHotkeys(accountHotkeyBaseline, customHotkeys));
+          effectiveHotkeys.apply({
+            account: effectiveHotkeys.getAccountBaseline(),
+            project: customHotkeys,
+          });
         }
 
         return {
@@ -395,7 +313,7 @@ export const useHotkeys = (scope: HotkeyScope = { kind: "account" }) => {
                   type: ToastType.info,
                 });
               }
-              setHotkeys(updateHotkeysWithCustomSettings(typedDefaultHotkeys, accountHotkeyBaseline));
+              setHotkeys(updateHotkeysWithCustomSettings(typedDefaultHotkeys, effectiveHotkeys.getAccountBaseline()));
               onSuccess?.();
             } else if (toast) {
               toast.show({

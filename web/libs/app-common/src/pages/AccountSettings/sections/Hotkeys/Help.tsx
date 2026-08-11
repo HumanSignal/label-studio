@@ -1,7 +1,8 @@
-import { useMemo, useCallback } from "react";
+import { useCallback, useMemo, useSyncExternalStore } from "react";
 import { modal } from "@humansignal/ui/lib/modal";
 import clsx from "clsx";
 import { getProjectHotkeysSettingsPath, getProjectIdFromPathname } from "@humansignal/core/lib/utils/hotkeysProject";
+import { effectiveHotkeys } from "../../hotkeys/effectiveHotkeys";
 import { KeyboardKey } from "./Key";
 // @ts-ignore
 import { HOTKEY_SECTIONS, URL_TO_SECTION_MAPPING } from "./defaults";
@@ -17,14 +18,8 @@ interface GroupedHotkeys {
   [subgroup: string]: Hotkey[];
 }
 
-interface EffectiveHotkey {
-  key?: string | null;
-  active?: boolean;
-  description?: string;
-}
-
 interface ModalReturn {
-  close: () => void;
+  close: () => void | Promise<void>;
 }
 
 interface HotkeyHelpModalProps {
@@ -34,31 +29,39 @@ interface HotkeyHelpModalProps {
 const sections = HOTKEY_SECTIONS as Section[];
 const urlMappings = URL_TO_SECTION_MAPPING as UrlMapping[];
 
-const useCurrentHotkeys = (): Hotkey[] => {
-  return useMemo(() => {
-    const defaultHotkeys = getTypedDefaultHotkeys();
-    const customHotkeys = window.APP_SETTINGS?.user?.customHotkeys || {};
-    const lookupHotkey = window.APP_SETTINGS?.lookupHotkey;
+const resolveCurrentHotkeys = (): Hotkey[] => {
+  const defaultHotkeys = getTypedDefaultHotkeys();
 
-    return defaultHotkeys.map((hotkey: Hotkey) => {
-      const lookupKey = `${hotkey.section}:${hotkey.element}`;
-      const runtimeSetting =
-        typeof lookupHotkey === "function" ? (lookupHotkey(lookupKey) as EffectiveHotkey | null) : null;
-      const customSetting = runtimeSetting != null ? runtimeSetting : customHotkeys[lookupKey];
-      if (customSetting) {
-        return {
-          ...hotkey,
-          key: customSetting.key ?? "",
-          active: customSetting.active ?? hotkey.active,
-          ...(customSetting.description && {
-            description: customSetting.description,
-          }),
-        };
-      }
-      return hotkey;
-    });
-  }, []);
+  return defaultHotkeys.map((hotkey: Hotkey) => {
+    const lookupKey = `${hotkey.section}:${hotkey.element}`;
+    const customSetting = effectiveHotkeys.get(lookupKey);
+    if (customSetting) {
+      return {
+        ...hotkey,
+        key: customSetting.key ?? "",
+        active: customSetting.active ?? hotkey.active,
+        ...(customSetting.description && {
+          description: customSetting.description,
+        }),
+      };
+    }
+    return hotkey;
+  });
 };
+
+let helpSnapshot: Hotkey[] | null = null;
+let helpSnapshotVersion = -1;
+
+const getHelpHotkeysSnapshot = (): Hotkey[] => {
+  const version = effectiveHotkeys.getVersion();
+  if (helpSnapshot && version === helpSnapshotVersion) return helpSnapshot;
+  helpSnapshot = resolveCurrentHotkeys();
+  helpSnapshotVersion = version;
+  return helpSnapshot;
+};
+
+const useCurrentHotkeys = (): Hotkey[] =>
+  useSyncExternalStore(effectiveHotkeys.subscribe, getHelpHotkeysSnapshot, getHelpHotkeysSnapshot);
 
 const HotkeyHelpModal = ({ sectionsToShow }: HotkeyHelpModalProps) => {
   const hotkeys = useCurrentHotkeys();

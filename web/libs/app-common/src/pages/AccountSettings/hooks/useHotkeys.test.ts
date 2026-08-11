@@ -2,6 +2,7 @@ import { ApiContext } from "@humansignal/core";
 import { ToastProvider } from "@humansignal/ui";
 import { act, renderHook, waitFor } from "@testing-library/react";
 import { createElement, type PropsWithChildren } from "react";
+import { effectiveHotkeys, mergeCustomHotkeys } from "../hotkeys/effectiveHotkeys";
 import type { Hotkey } from "../sections/Hotkeys/utils";
 import {
   clearProjectHotkeysRuntime,
@@ -9,7 +10,6 @@ import {
   getResetSuccessMessage,
   getSaveSuccessMessage,
   loadAndApplyProjectHotkeys,
-  mergeCustomHotkeys,
   useHotkeys,
 } from "./useHotkeys";
 
@@ -185,9 +185,15 @@ describe("useHotkeys reset confirmation copy", () => {
 });
 
 describe("loadAndApplyProjectHotkeys", () => {
+  beforeEach(() => {
+    effectiveHotkeys.resetForTests();
+  });
+
   it("merges project overrides onto the account baseline", async () => {
-    setAppCustomHotkeys({ "annotation:annotation:submit": { key: "ctrl+enter", active: true } });
+    const accountHotkeys = { "annotation:annotation:submit": { key: "ctrl+enter", active: true } };
+    setAppCustomHotkeys(accountHotkeys);
     window.APP_SETTINGS.editor_keymap = {};
+    effectiveHotkeys.apply({ account: accountHotkeys });
     globalThis.fetch = mock(async () =>
       jsonResponse({ "annotation:annotation:submit": { key: "shift+enter", active: true } }),
     ) as typeof fetch;
@@ -313,5 +319,37 @@ describe("loadAndApplyProjectHotkeys", () => {
     await pending;
 
     expect(window.APP_SETTINGS.lookupHotkey?.("annotation:annotation:submit")?.key).not.toBe("shift+enter");
+  });
+
+  it("ignores a stale project A fetch that completes after project B load starts", async () => {
+    setAppCustomHotkeys({});
+    window.APP_SETTINGS.editor_keymap = {};
+    effectiveHotkeys.apply({ account: {} });
+
+    let resolveProjectA: (value: Response) => void = () => undefined;
+    globalThis.fetch = mock(async (input: RequestInfo) => {
+      const url = String(input);
+      if (url.includes("project=1")) {
+        return new Promise<Response>((resolve) => {
+          resolveProjectA = resolve;
+        });
+      }
+      return jsonResponse({ "annotation:annotation:submit": { key: "ctrl+s", active: true } });
+    }) as typeof fetch;
+
+    const pendingA = loadAndApplyProjectHotkeys(1);
+    await loadAndApplyProjectHotkeys(2);
+    expect(window.APP_SETTINGS.lookupHotkey?.("annotation:annotation:submit")).toEqual({
+      key: "ctrl+s",
+      active: true,
+    });
+
+    resolveProjectA(jsonResponse({ "annotation:annotation:submit": { key: "shift+enter", active: true } }));
+    await pendingA;
+
+    expect(window.APP_SETTINGS.lookupHotkey?.("annotation:annotation:submit")).toEqual({
+      key: "ctrl+s",
+      active: true,
+    });
   });
 });

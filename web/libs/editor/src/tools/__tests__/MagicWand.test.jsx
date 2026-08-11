@@ -129,9 +129,12 @@ describe("MagicWand tool", () => {
   let control;
   let obj;
   let annotation;
+  /** Tools left in `drawing` keep a capture-phase Escape listener that swallows keys for later suites. */
+  const liveTools = [];
 
   beforeEach(() => {
     clearAllMocks();
+    liveTools.length = 0;
     const canvasModule = require("../../utils/canvas");
     const Canvas = canvasModule.default ?? canvasModule;
     mask2DataURLSpy = spyOn(Canvas, "mask2DataURL").mockImplementation((...args) => mockMask2DataURL(...args));
@@ -153,13 +156,29 @@ describe("MagicWand tool", () => {
   });
 
   afterEach(() => {
+    for (const tool of liveTools) {
+      try {
+        if (tool.mode === "drawing") {
+          // Invoke the tool's own Escape handler so the capture listener
+          // reference matches what mousedownEv registered (MST-bound action).
+          tool.keydownEv({
+            key: "Escape",
+            preventDefault() {},
+            stopPropagation() {},
+          });
+        }
+      } catch {
+        // Tool may already be torn down.
+      }
+    }
+    liveTools.length = 0;
     // Bun keeps module cache across files; drop mocked modules so later files get clean actuals.
     mask2DataURLSpy?.mockRestore?.();
     delete require.cache[require.resolve("../MagicWand")];
   });
 
   function createMagicWand(envOverrides = {}) {
-    return MagicWand.create(
+    const tool = MagicWand.create(
       {},
       {
         manager,
@@ -168,6 +187,8 @@ describe("MagicWand tool", () => {
         ...envOverrides,
       },
     );
+    liveTools.push(tool);
+    return tool;
   }
 
   describe("model defaults and views", () => {
