@@ -1658,7 +1658,11 @@ class ProjectSummary(models.Model):
         return labels
 
     def update_created_annotations_and_labels(self, annotations):
-        if flag_set('fflag_fix_plt_1048_concurrent_project_summary_update_19032026_short', user='auto'):
+        # the atomic increment SQL is PostgreSQL-only (jsonb_set, :: casts),
+        # other backends would raise OperationalError on every call
+        if connection.vendor == 'postgresql' and flag_set(
+            'fflag_fix_plt_1048_concurrent_project_summary_update_19032026_short', user='auto'
+        ):
             try:
                 self._atomic_update_created_annotations_and_labels(annotations)
                 return
@@ -1780,7 +1784,11 @@ class ProjectSummary(models.Model):
         self.save(update_fields=['created_annotations', 'created_labels'])
 
     def update_created_labels_drafts(self, drafts):
-        if flag_set('fflag_fix_plt_1048_concurrent_project_summary_update_19032026_short', user='auto'):
+        # the atomic increment SQL is PostgreSQL-only (jsonb_set, :: casts),
+        # other backends would raise OperationalError on every call
+        if connection.vendor == 'postgresql' and flag_set(
+            'fflag_fix_plt_1048_concurrent_project_summary_update_19032026_short', user='auto'
+        ):
             try:
                 self._atomic_update_created_labels_drafts(drafts)
                 return
