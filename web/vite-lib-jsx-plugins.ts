@@ -5,7 +5,10 @@ import type { Plugin } from "vite";
 function pathLooksLikeLsoLibJs(id: string): boolean {
   const n = id.replace(/\\/g, "/");
   if (!/\.js$/.test(n)) return false;
-  return /\/lso\/web\/libs\//.test(n) || /\/label-studio\/web\/libs\//.test(n);
+  if (n.includes("/node_modules/")) return false;
+  // Must match any checkout location (`/opt/build/repo` on Netlify, arbitrary CI
+  // paths), not just working copies named `lso` or `label-studio`.
+  return /\/web\/libs\//.test(n);
 }
 
 function looksLikeJsxInJsSource(code: string): boolean {
@@ -62,7 +65,7 @@ export function optimizeDepsAutomaticJsxPlugin(): Plugin {
       if (!id.endsWith(".js")) return null;
       const p = id.replace(/\\/g, "/");
       const inNodeModules = p.includes("/node_modules/");
-      const inLsoLibs = p.includes("/lso/web/libs/") || p.includes("/label-studio/web/libs/");
+      const inLsoLibs = p.includes("/web/libs/");
       if (!inNodeModules && !inLsoLibs) return null;
 
       try {
