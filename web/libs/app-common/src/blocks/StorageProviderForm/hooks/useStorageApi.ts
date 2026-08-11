@@ -1,7 +1,7 @@
 import { useCallback } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { isDefined, useAPI } from "@humansignal/core";
-import { getProviderConfig } from "../providers";
+import { cleanStorageFormDataForSubmission } from "./cleanStorageFormData";
 
 interface UseStorageApiProps {
   target?: "import" | "export";
@@ -54,51 +54,7 @@ export const useStorageApi = ({
 
   // Clean form data for submission
   const cleanFormDataForSubmission = useCallback(
-    (data: any) => {
-      if (!isEditMode) return data;
-
-      const cleanedData = { ...data };
-
-      // Get the current provider config to identify access key fields
-      const providerConfig = getProviderConfig(data.provider);
-
-      // Get all field names from the current provider schema
-      const validFieldNames = new Set([
-        "project", // Always include project
-        "provider", // Always include provider
-        "title", // Always include title
-        "prefix", // Common field for bucket prefix
-        "path", // Common field for file path (used by redis)
-        "use_blob_urls", // Common field for import method
-        "regex_filter", // Common field for file filtering
-        "recursive_scan", // Common field for recursive scanning
-        "can_delete_objects", // Common field for export
-        ...(providerConfig?.fields.map((field) => field.name) || []),
-      ]);
-
-      // Remove fields that aren't in the current provider's schema
-      Object.keys(cleanedData).forEach((key) => {
-        if (!validFieldNames.has(key)) {
-          delete cleanedData[key];
-        }
-      });
-
-      // Remove empty values only for access key fields in edit mode
-      Object.keys(cleanedData).forEach((key) => {
-        const field = providerConfig?.fields.find((f) => f.name === key);
-        const isAccessKey = field && "type" in field && (field as any).accessKey;
-
-        // Only remove empty values for access key fields
-        if (
-          isAccessKey &&
-          (cleanedData[key] === "" || cleanedData[key] === undefined || cleanedData[key] === "••••••••••••••••")
-        ) {
-          delete cleanedData[key];
-        }
-      });
-
-      return cleanedData;
-    },
+    (data: any) => cleanStorageFormDataForSubmission(data, isEditMode),
     [isEditMode],
   );
 

@@ -17,6 +17,7 @@ logger = logging.getLogger(__name__)
 
 class S3StorageSerializerMixin:
     secure_fields = ['aws_access_key_id', 'aws_secret_access_key']
+    credential_pair_error = 'Access Key ID and Secret Access Key must be provided together.'
 
     def to_representation(self, instance):
         result = super().to_representation(instance)
@@ -35,6 +36,11 @@ class S3StorageSerializerMixin:
 
     def validate(self, data):
         data = super().validate(data)
+        supplied_secure_fields = {field for field in self.secure_fields if field in self.initial_data}
+        if supplied_secure_fields and supplied_secure_fields != set(self.secure_fields):
+            missing_field = next(field for field in self.secure_fields if field not in supplied_secure_fields)
+            raise ValidationError({missing_field: self.credential_pair_error})
+
         if not data.get('bucket', None):
             return data
 
@@ -46,8 +52,14 @@ class S3StorageSerializerMixin:
             if 'id' in self.initial_data:
                 storage_object = self.Meta.model.objects.get(id=self.initial_data['id'])
                 for attr in self.secure_fields:
-                    data[attr] = data.get(attr) or getattr(storage_object, attr)
+                    if attr not in data:
+                        data[attr] = getattr(storage_object, attr)
             storage = self.Meta.model(**data)
+
+        if bool(storage.aws_access_key_id) != bool(storage.aws_secret_access_key):
+            missing_field = 'aws_secret_access_key' if storage.aws_access_key_id else 'aws_access_key_id'
+            raise ValidationError({missing_field: self.credential_pair_error})
+
         try:
             storage.validate_connection()
         except ParamValidationError:
