@@ -12,6 +12,9 @@ meta_title: On-premises release notes for Label Studio Enterprise
 meta_description: Review new features, enhancements, and bug fixes for on-premises Label Studio Enterprise installations. 
 ---
 
+!!! attention "Release support lifecycle"
+    Each Label Studio Enterprise on-premises release version is supported for up to 12 months from its release date. After this period, please contact your HumanSignal representative to upgrade to a currently supported release.
+
 !!! note 
     The release notes for Label Studio Community Edition are available from the <a href="https://github.com/HumanSignal/label-studio/releases">Label Studio GitHub repository</a>.
 

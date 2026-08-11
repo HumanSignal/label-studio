@@ -13,6 +13,9 @@ parent_enterprise: "install_enterprise"
 date: 2023-09-27 10:57:03
 ---
 
+!!! attention "Release support lifecycle"
+    Each Label Studio Enterprise on-premises release version is supported for up to 12 months from its release date. After this period, please contact your HumanSignal representative to upgrade to a currently supported release.
+
 If you are using Label Studio Enterprise Cloud, all upgrades and updates are automatically deployed. 
 
 If you are using the on-premises version of Label Studio, you will need to take additional steps. 
