@@ -1,15 +1,27 @@
 .selectTrigger {
-  --select-trigger-height: 40px;
-  --select-trigger-font-size: 1rem;
+  /*
+   * Sizes mirror Button (medium 40px, small 32px, smaller 24px) so a Select lines up with the
+   * controls next to it. Everything that varies per size is a variable, overridden below.
+   */
+  --select-trigger-height: var(--spacing-1000);
+  --select-trigger-font-size: var(--font-size-label-medium);
+  --select-trigger-line-height: var(--line-height-label-medium);
+  --select-trigger-caret-size: var(--spacing-400);
 
   display: flex;
   align-items: center;
-  padding: var(--spacing-tight) var(--spacing-tight) var(--spacing-tight) var(--spacing-base);
+  padding: 0 var(--spacing-tight) 0 var(--spacing-base);
   gap: var(--spacing-tight);
-  flex: 1 0 0;
   overflow: hidden;
   color: var(--color-neutral-content-subtler);
   text-overflow: ellipsis;
+
+  /*
+   * Height is declared, never flexed. A `flex` shorthand here would govern the parent's main axis,
+   * so a column-flex or grid parent would take over the block axis and stretch or collapse the
+   * trigger. Width fills the parent instead, and the default shrink still lets row layouts share
+   * space with siblings.
+   */
   height: var(--select-trigger-height);
   width: 100%;
   min-width: 0;
@@ -18,11 +30,10 @@
     background 150ms ease-out,
     border-color 150ms ease-out;
 
-  /* body/medium */
   font-size: var(--select-trigger-font-size);
   font-style: normal;
   font-weight: var(--font-weight-400);
-  line-height: var(--line-height-24); /* 150% */
+  line-height: var(--select-trigger-line-height);
   letter-spacing: var(--letter-spacing-base);
   border-radius: var(--corner-radius-smaller);
   border: 1px solid var(--color-neutral-border);
@@ -55,19 +66,27 @@
   }
 
   &.sizeSmall {
-    --select-trigger-height: 24px;
-    --select-trigger-font-size: var(--font-size-12);
+    --select-trigger-height: var(--spacing-800);
+    --select-trigger-font-size: var(--font-size-label-small);
+    --select-trigger-line-height: var(--line-height-label-small);
   }
 
-  &.sizeLarge {
-    --select-trigger-height: 60px;
-    --select-trigger-font-size: var(--font-size-20);
+  &.sizeSmaller {
+    --select-trigger-height: var(--spacing-600);
+    --select-trigger-font-size: var(--font-size-label-smaller);
+    --select-trigger-line-height: var(--line-height-label-smaller);
+    --select-trigger-caret-size: var(--spacing-300);
   }
 
   &.isInline {
     display: inline-flex;
     width: auto;
   }
+}
+
+.selectCaret {
+  height: var(--select-trigger-caret-size);
+  width: var(--select-trigger-caret-size);
 }
 
 .selectLoading {

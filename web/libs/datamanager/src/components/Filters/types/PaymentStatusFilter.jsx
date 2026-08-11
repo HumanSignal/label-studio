@@ -17,7 +17,7 @@ const BaseInput = ({ schema, value, onChange, placeholder, disabled, readOnly })
       disabled={disabled}
       readOnly={readOnly}
       onSearch={(query) => options.filter((option) => option.textLabel.toLowerCase().includes(query.toLowerCase()))}
-      size="small"
+      size="smaller"
       triggerClassName="min-w-[100px]"
     />
   );

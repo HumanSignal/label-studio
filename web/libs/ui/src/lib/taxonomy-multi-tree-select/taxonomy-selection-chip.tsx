@@ -95,7 +95,7 @@ export const TaxonomySelectionChip = ({
           <Select
             placeholder="Select"
             searchable
-            size="small"
+            size="smaller"
             isInline
             dataTestid={controlId ? `${controlId}-${selection.code}-accent` : undefined}
             triggerClassName={accentSelectClassName}
@@ -118,7 +118,7 @@ export const TaxonomySelectionChip = ({
         )}
         {withLevel && (
           <Select
-            size="small"
+            size="smaller"
             isInline
             placeholder={TAXONOMY_LEVEL_PLACEHOLDER}
             triggerClassName={levelSelectClassName}

@@ -10,7 +10,7 @@ resolution-markers = [
 ]
 
 [options]
-exclude-newer = "2026-08-06T21:09:21.636282111Z"
+exclude-newer = "2026-08-07T01:01:05.226700517Z"
 exclude-newer-span = "P4D"
 
 [[package]]

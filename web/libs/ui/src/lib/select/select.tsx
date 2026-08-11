@@ -703,9 +703,8 @@ export const Select = forwardRef(
               [styles.isInline]: isInline,
               [styles.isOpen]: isOpen,
               [styles.isDisabled]: disabled,
+              [styles.sizeSmaller]: size === "smaller",
               [styles.sizeSmall]: size === "small",
-              [styles.sizeMedium]: size === "medium",
-              [styles.sizeLarge]: size === "large",
             })}
             type="button"
             data-testid={
@@ -725,7 +724,8 @@ export const Select = forwardRef(
             <CaretDownIcon
               weight="bold"
               className={cnm(
-                "h-4 w-4 shrink-0 text-neutral-content-subtler pointer-events-none transition-transform ease-out duration-150",
+                styles.selectCaret,
+                "shrink-0 text-neutral-content-subtler pointer-events-none transition-transform ease-out duration-150",
                 isOpen && "rotate-180",
               )}
             />

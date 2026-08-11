@@ -14,10 +14,11 @@ export type SelectOptionData<T = any> = {
   height?: number;
 };
 
+/** Heights match the Button of the same name: smaller 24px, small 32px, medium 40px (default). */
 export enum SelectSize {
+  SMALLER = "smaller",
   SMALL = "small",
   MEDIUM = "medium",
-  LARGE = "large",
 }
 
 export type SelectOption<T> = string | number | SelectOptionData<T>;

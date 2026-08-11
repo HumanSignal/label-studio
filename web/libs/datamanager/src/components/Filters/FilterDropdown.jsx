@@ -55,7 +55,7 @@ export const FilterDropdown = observer(
         onChange={(value) => onChange(outputFormat?.(value) ?? value)}
         disabled={disabled}
         readOnly={readOnly}
-        size="small"
+        size="smaller"
         options={options}
         searchable={true}
         triggerClassName="whitespace-nowrap"

@@ -295,10 +295,17 @@ export const ColumnPickerOptionContent = ({ option }) => {
 
 // ── Unified component ─────────────────────────────────────────────────────────
 
-const MEDIUM_TRIGGER_STYLE = {
-  height: 32,
+/**
+ * Data Manager's scale runs one step denser than the shared one: a "medium" toolbar control is 32px
+ * and a "small" filter row is 24px.
+ */
+const SELECT_SIZE_BY_DM_SIZE = {
+  medium: "small",
+  small: "smaller",
+};
+
+const MEDIUM_TRIGGER_EMPHASIS = {
   color: "var(--color-neutral-content)",
-  fontSize: "var(--font-size-14)",
   fontWeight: "var(--font-weight-medium)",
 };
 
@@ -372,7 +379,7 @@ export function ColumnPicker({
       optionRenderer={ColumnPickerOptionContent}
       renderSelected={renderSelected}
       placeholder={placeholder}
-      size={size}
+      size={SELECT_SIZE_BY_DM_SIZE[size] ?? size}
       disabled={disabled}
       readOnly={readOnly}
       dataTestid={dataTestid}
@@ -381,7 +388,7 @@ export function ColumnPicker({
       triggerProps={{
         ...triggerProps,
         style: {
-          ...(size === "medium" && MEDIUM_TRIGGER_STYLE),
+          ...(size === "medium" && MEDIUM_TRIGGER_EMPHASIS),
           ...triggerProps?.style,
         },
       }}

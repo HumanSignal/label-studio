@@ -17,9 +17,9 @@ mockModule("./select.module.css", () => ({
   isInline: "isInline",
   isOpen: "isOpen",
   isDisabled: "isDisabled",
+  sizeSmaller: "sizeSmaller",
   sizeSmall: "sizeSmall",
-  sizeMedium: "sizeMedium",
-  sizeLarge: "sizeLarge",
+  selectCaret: "selectCaret",
   selectLoading: "selectLoading",
   valueInput: "valueInput",
   selectedItemsGroup: "selectedItemsGroup",
@@ -778,16 +778,16 @@ describe("Select Component", () => {
   });
 
   describe("Trigger size and props", () => {
+    it("applies size smaller to trigger", () => {
+      render(<Select options={["A"] as any} placeholder="Select" size="smaller" />);
+      const trigger = screen.getByRole("button");
+      expect(trigger).toHaveClass("sizeSmaller");
+    });
+
     it("applies size small to trigger", () => {
       render(<Select options={["A"] as any} placeholder="Select" size="small" />);
       const trigger = screen.getByRole("button");
       expect(trigger).toHaveClass("sizeSmall");
-    });
-
-    it("applies size large to trigger", () => {
-      render(<Select options={["A"] as any} placeholder="Select" size="large" />);
-      const trigger = screen.getByRole("button");
-      expect(trigger).toHaveClass("sizeLarge");
     });
 
     it("spreads triggerProps onto trigger", () => {
