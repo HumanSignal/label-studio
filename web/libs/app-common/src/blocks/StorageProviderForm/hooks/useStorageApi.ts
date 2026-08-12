@@ -12,8 +12,6 @@ interface UseStorageApiProps {
   onValidationError?: (errors: Record<string, string>) => void;
 }
 
-const PROTECTED_VALUE_PLACEHOLDER = "••••••••••••••••";
-
 const normalizeValidationErrors = (errors: Record<string, string | string[]>) => {
   const normalized: Record<string, string> = {};
 
@@ -87,17 +85,13 @@ export const useStorageApi = ({
 
       // Remove empty values only for access key fields in edit mode
       Object.keys(cleanedData).forEach((key) => {
-        const field = providerConfig?.fields.find((candidate) => candidate.name === key);
-        const isAccessKey = field?.type !== "message" && field?.accessKey;
-        const isEmptyS3Credential = cleanedData[key] === "" && data.provider === "s3";
+        const field = providerConfig?.fields.find((f) => f.name === key);
+        const isAccessKey = field && "type" in field && (field as any).accessKey;
 
         // Only remove empty values for access key fields
         if (
           isAccessKey &&
-          !isEmptyS3Credential &&
-          (cleanedData[key] === "" ||
-            cleanedData[key] === undefined ||
-            cleanedData[key] === PROTECTED_VALUE_PLACEHOLDER)
+          (cleanedData[key] === "" || cleanedData[key] === undefined || cleanedData[key] === "••••••••••••••••")
         ) {
           delete cleanedData[key];
         }

@@ -46,7 +46,7 @@ def validate_storage_instance(request, serializer_class):
             raise PermissionDenied()
 
     # combine instance fields with request.data
-    serializer = serializer_class(data=request.data, context={'storage_instance': instance})
+    serializer = serializer_class(data=request.data)
     serializer.is_valid(raise_exception=True)
 
     # if storage exists, we have to use instance from DB,
@@ -55,9 +55,6 @@ def validate_storage_instance(request, serializer_class):
         instance = serializer.update(instance, serializer.validated_data)
     else:
         instance = serializer_class.Meta.model(**serializer.validated_data)
-
-    if getattr(serializer_class, 'skip_client_cache_during_validation', False):
-        instance._skip_client_cache = True
 
     # double check: not all storages validate connection in serializer, just make another explicit check here
     try:
