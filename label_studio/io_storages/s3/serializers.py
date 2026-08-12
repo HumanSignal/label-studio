@@ -16,7 +16,8 @@ logger = logging.getLogger(__name__)
 
 
 class S3StorageSerializerMixin:
-    secure_fields = ['aws_access_key_id', 'aws_secret_access_key']
+    credential_fields = ['aws_access_key_id', 'aws_secret_access_key']
+    secure_fields = [*credential_fields, 'aws_session_token']
     credential_pair_error = 'Access Key ID and Secret Access Key must be provided together.'
 
     def to_representation(self, instance):
@@ -36,10 +37,13 @@ class S3StorageSerializerMixin:
 
     def validate(self, data):
         data = super().validate(data)
-        supplied_secure_fields = {field for field in self.secure_fields if field in self.initial_data}
-        if supplied_secure_fields and supplied_secure_fields != set(self.secure_fields):
-            missing_field = next(field for field in self.secure_fields if field not in supplied_secure_fields)
+        supplied_credential_fields = {field for field in self.credential_fields if field in self.initial_data}
+        if supplied_credential_fields and supplied_credential_fields != set(self.credential_fields):
+            missing_field = next(field for field in self.credential_fields if field not in supplied_credential_fields)
             raise ValidationError({missing_field: self.credential_pair_error})
+
+        if supplied_credential_fields and 'aws_session_token' not in data:
+            data['aws_session_token'] = ''
 
         if not data.get('bucket', None):
             return data
@@ -59,6 +63,10 @@ class S3StorageSerializerMixin:
         if bool(storage.aws_access_key_id) != bool(storage.aws_secret_access_key):
             missing_field = 'aws_secret_access_key' if storage.aws_access_key_id else 'aws_access_key_id'
             raise ValidationError({missing_field: self.credential_pair_error})
+        if storage.aws_session_token and not storage.aws_access_key_id:
+            raise ValidationError(
+                {'aws_session_token': 'Session Token requires an Access Key ID and Secret Access Key.'}
+            )
 
         try:
             storage.validate_connection()
@@ -85,6 +93,14 @@ class S3StorageSerializerMixin:
         except KeyError:
             raise ValidationError(f'{storage.url_scheme}://{storage.bucket}/{storage.prefix} not found.')
         return data
+
+    def update(self, instance, validated_data):
+        if self.instance is None:
+            # Validation endpoints call update directly; connection checks must not persist candidate values.
+            for attr, value in validated_data.items():
+                setattr(instance, attr, value)
+            return instance
+        return super().update(instance, validated_data)
 
 
 class S3ImportStorageSerializer(S3StorageSerializerMixin, ImportStorageSerializer):

@@ -29,8 +29,13 @@ export const cleanStorageFormDataForSubmission = (data: any, isEditMode: boolean
   Object.keys(cleanedData).forEach((key) => {
     const field = providerConfig?.fields.find((candidate) => candidate.name === key);
     const isAccessKey = field?.type !== "message" && field?.accessKey;
+    const isEmptyS3Credential = cleanedData[key] === "" && data.provider === "s3";
 
-    if (isAccessKey && (cleanedData[key] === undefined || cleanedData[key] === PROTECTED_VALUE_PLACEHOLDER)) {
+    if (
+      isAccessKey &&
+      !isEmptyS3Credential &&
+      (cleanedData[key] === "" || cleanedData[key] === undefined || cleanedData[key] === PROTECTED_VALUE_PLACEHOLDER)
+    ) {
       delete cleanedData[key];
     }
   });
