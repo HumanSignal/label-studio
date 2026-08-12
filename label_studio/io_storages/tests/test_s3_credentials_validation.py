@@ -4,9 +4,11 @@ from unittest.mock import MagicMock, patch
 import pytest
 from botocore.exceptions import NoCredentialsError
 from io_storages.functions import validate_storage_instance
+from io_storages.s3.api import S3ExportStorageListAPI
 from io_storages.s3.models import S3StorageMixin, clients_cache
 from io_storages.s3.serializers import S3ExportStorageSerializer, S3ImportStorageSerializer
 from io_storages.s3.utils import get_client_and_resource
+from rest_framework.exceptions import ValidationError
 from tests.utils import make_project
 
 STORAGE_SERIALIZERS = [S3ImportStorageSerializer, S3ExportStorageSerializer]
@@ -406,4 +408,31 @@ def test_s3_validation_does_not_cache_candidate_credentials(business_client, ser
         candidate = validate_storage_instance(request, serializer_class)
 
     assert candidate._skip_client_cache
+    assert clients_cache == {}
+
+
+@pytest.mark.django_db
+def test_failed_s3_export_creation_does_not_cache_candidate_credentials(business_client):
+    project = make_project({}, business_client.user, use_ml_backend=False)
+    serializer = S3ExportStorageSerializer(
+        data=storage_payload(
+            project,
+            aws_access_key_id='candidate-access-key',
+            aws_secret_access_key='candidate-secret-key',
+        )
+    )
+    view = S3ExportStorageListAPI()
+    view.request = SimpleNamespace(user=business_client.user)
+    client = MagicMock()
+    client.head_bucket.side_effect = [None, RuntimeError('connection failed')]
+    clients_cache.clear()
+
+    with patch(
+        'io_storages.s3.models.get_client_and_resource',
+        return_value=(client, MagicMock()),
+    ):
+        assert serializer.is_valid(), serializer.errors
+        with pytest.raises(ValidationError):
+            view.perform_create(serializer)
+
     assert clients_cache == {}
