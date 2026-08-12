@@ -2,7 +2,7 @@ from types import SimpleNamespace
 from unittest.mock import MagicMock, patch
 
 import pytest
-from botocore.exceptions import NoCredentialsError
+from botocore.exceptions import ClientError, NoCredentialsError
 from io_storages.functions import validate_storage_instance
 from io_storages.s3.api import S3ExportStorageListAPI
 from io_storages.s3.models import S3StorageMixin, clients_cache
@@ -436,3 +436,55 @@ def test_failed_s3_export_creation_does_not_cache_candidate_credentials(business
             view.perform_create(serializer)
 
     assert clients_cache == {}
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize('serializer_class', STORAGE_SERIALIZERS)
+def test_s3_credentials_reject_unhandled_client_error_on_create(business_client, serializer_class):
+    project = make_project({}, business_client.user, use_ml_backend=False)
+    serializer = serializer_class(
+        data=storage_payload(
+            project,
+            aws_access_key_id='expired-access-key',
+            aws_secret_access_key='expired-secret-key',
+        )
+    )
+    error = ClientError(
+        {'Error': {'Code': 'ExpiredToken'}, 'ResponseMetadata': {'HTTPStatusCode': 400}},
+        'HeadBucket',
+    )
+
+    with patch.object(S3StorageMixin, 'validate_connection', autospec=True, side_effect=error):
+        assert not serializer.is_valid()
+
+    assert serializer.errors['non_field_errors'] == ['Cannot connect to S3 pytest-s3-images']
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize('serializer_class', STORAGE_SERIALIZERS)
+def test_s3_credentials_reject_unhandled_client_error_on_patch(business_client, serializer_class):
+    project = make_project({}, business_client.user, use_ml_backend=False)
+    storage = serializer_class.Meta.model.objects.create(
+        project=project,
+        title='S3 source',
+        bucket='pytest-s3-images',
+        aws_access_key_id='stored-access-key',
+        aws_secret_access_key='stored-secret-key',
+    )
+    serializer = serializer_class(
+        storage,
+        data={
+            'aws_access_key_id': 'expired-access-key',
+            'aws_secret_access_key': 'expired-secret-key',
+        },
+        partial=True,
+    )
+    error = ClientError(
+        {'Error': {'Code': 'ExpiredToken'}, 'ResponseMetadata': {'HTTPStatusCode': 400}},
+        'HeadBucket',
+    )
+
+    with patch.object(S3StorageMixin, 'validate_connection', autospec=True, side_effect=error):
+        assert not serializer.is_valid()
+
+    assert serializer.errors['non_field_errors'] == ['Cannot connect to S3 pytest-s3-images']

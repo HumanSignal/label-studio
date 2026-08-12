@@ -101,6 +101,7 @@ class S3StorageSerializerMixin:
                 or e.response.get('ResponseMetadata').get('HTTPStatusCode') == 404
             ):
                 raise ValidationError('Cannot find bucket {bucket_name} in S3'.format(bucket_name=storage.bucket))
+            raise ValidationError('Cannot connect to S3 {bucket_name}'.format(bucket_name=storage.bucket))
         except TypeError as e:
             logger.info(f'It seems access keys are incorrect: {e}', exc_info=True)
             raise ValidationError('It seems access keys are incorrect')
