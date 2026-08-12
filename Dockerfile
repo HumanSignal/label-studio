@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1
 ARG NODE_VERSION=22
 ARG PYTHON_VERSION=3.13
-ARG UV_VERSION=0.10.2
+ARG UV_VERSION=0.12.3
 
 ################################ Overview
 
