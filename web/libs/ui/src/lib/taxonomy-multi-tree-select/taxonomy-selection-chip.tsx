@@ -60,7 +60,14 @@ export const TaxonomySelectionChip = ({
 
   if (!isCompound) {
     return (
-      <Badge variant="primary" size="large" maxWidth={240} title={displayLabel} onClose={handleClose}>
+      <Badge
+        variant="primary"
+        size="large"
+        className={styles.simpleChip}
+        maxWidth="100%"
+        title={displayLabel}
+        onClose={handleClose}
+      >
         {displayLabel}
       </Badge>
     );

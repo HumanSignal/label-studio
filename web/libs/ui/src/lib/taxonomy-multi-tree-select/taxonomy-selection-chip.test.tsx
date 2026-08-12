@@ -140,6 +140,14 @@ describe("TaxonomySelectionChip", () => {
     );
   });
 
+  it("caps a plain chip's label by available width rather than a fixed pixel width", () => {
+    render(<TaxonomySelectionChip selection={{ code: "cat-1", label: "Category" }} displayLabel="A very long label" />);
+
+    // A fixed cap truncated chips even when the container had room to spare, which is unusable at
+    // narrow viewports.
+    expect(screen.getByText("A very long label")).toHaveStyle({ maxWidth: "100%" });
+  });
+
   it("calls onRemove when the badge close button is clicked", () => {
     const onRemove = mock();
 
