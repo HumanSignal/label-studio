@@ -56,6 +56,9 @@ def validate_storage_instance(request, serializer_class):
     else:
         instance = serializer_class.Meta.model(**serializer.validated_data)
 
+    if getattr(serializer_class, 'skip_client_cache_during_validation', False):
+        instance._skip_client_cache = True
+
     # double check: not all storages validate connection in serializer, just make another explicit check here
     try:
         instance.validate_connection()

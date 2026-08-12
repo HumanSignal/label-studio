@@ -389,12 +389,13 @@ def test_s3_client_preserves_prefixed_credential_aliases(prefix):
 @pytest.mark.parametrize('serializer_class', STORAGE_SERIALIZERS)
 def test_s3_validation_does_not_cache_candidate_credentials(business_client, serializer_class):
     project = make_project({}, business_client.user, use_ml_backend=False)
-    serializer = serializer_class(
+    request = SimpleNamespace(
+        user=business_client.user,
         data=storage_payload(
             project,
             aws_access_key_id='candidate-access-key',
             aws_secret_access_key='candidate-secret-key',
-        )
+        ),
     )
     clients_cache.clear()
 
@@ -402,6 +403,7 @@ def test_s3_validation_does_not_cache_candidate_credentials(business_client, ser
         'io_storages.s3.models.get_client_and_resource',
         return_value=(MagicMock(), MagicMock()),
     ):
-        assert serializer.is_valid(), serializer.errors
+        candidate = validate_storage_instance(request, serializer_class)
 
+    assert candidate._skip_client_cache
     assert clients_cache == {}

@@ -26,6 +26,7 @@ class S3StorageSerializerMixin:
     credential_fields = ['aws_access_key_id', 'aws_secret_access_key']
     secure_fields = [*credential_fields, 'aws_session_token']
     credential_pair_error = 'Access Key ID and Secret Access Key must be provided together.'
+    skip_client_cache_during_validation = True
 
     def to_representation(self, instance):
         result = super().to_representation(instance)
