@@ -1,7 +1,7 @@
 import { useCallback } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { isDefined, useAPI } from "@humansignal/core";
-import { cleanStorageFormDataForSubmission } from "./cleanStorageFormData";
+import { getProviderConfig } from "../providers";
 
 interface UseStorageApiProps {
   target?: "import" | "export";
@@ -11,6 +11,8 @@ interface UseStorageApiProps {
   onClose: () => void;
   onValidationError?: (errors: Record<string, string>) => void;
 }
+
+const PROTECTED_VALUE_PLACEHOLDER = "••••••••••••••••";
 
 const normalizeValidationErrors = (errors: Record<string, string | string[]>) => {
   const normalized: Record<string, string> = {};
@@ -54,7 +56,48 @@ export const useStorageApi = ({
 
   // Clean form data for submission
   const cleanFormDataForSubmission = useCallback(
-    (data: any) => cleanStorageFormDataForSubmission(data, isEditMode),
+    (data: any) => {
+      if (!isEditMode) return data;
+
+      const cleanedData = { ...data };
+      const providerConfig = getProviderConfig(data.provider);
+      const validFieldNames = new Set([
+        "project",
+        "provider",
+        "title",
+        "prefix",
+        "path",
+        "use_blob_urls",
+        "regex_filter",
+        "recursive_scan",
+        "can_delete_objects",
+        ...(providerConfig?.fields.map((field) => field.name) || []),
+      ]);
+
+      Object.keys(cleanedData).forEach((key) => {
+        if (!validFieldNames.has(key)) {
+          delete cleanedData[key];
+        }
+      });
+
+      Object.keys(cleanedData).forEach((key) => {
+        const field = providerConfig?.fields.find((candidate) => candidate.name === key);
+        const isAccessKey = field?.type !== "message" && field?.accessKey;
+        const isEmptyS3Credential = cleanedData[key] === "" && data.provider === "s3";
+
+        if (
+          isAccessKey &&
+          !isEmptyS3Credential &&
+          (cleanedData[key] === "" ||
+            cleanedData[key] === undefined ||
+            cleanedData[key] === PROTECTED_VALUE_PLACEHOLDER)
+        ) {
+          delete cleanedData[key];
+        }
+      });
+
+      return cleanedData;
+    },
     [isEditMode],
   );
 
