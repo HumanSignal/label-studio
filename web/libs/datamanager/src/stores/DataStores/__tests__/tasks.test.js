@@ -15,7 +15,7 @@ mockModule("../Assignee", () => {
 mockModule("../DynamicModel", () => {
   const { types } = require("mobx-state-tree");
   return {
-    DynamicModel: (name, columns, attrs) => types.model(name, attrs),
+    DynamicModel: (name, _columns, attrs) => types.model(name, attrs),
     registerModel: jest.fn(),
   };
 });
@@ -57,11 +57,16 @@ mockModule("../../mixins/DataStore", () => {
         })
         .actions((self) => ({
           updateItem(id, item) {
+            const index = self.list.findIndex((existing) => existing.id === id);
+            if (index >= 0) {
+              Object.assign(self.list[index], item);
+              return self.list[index];
+            }
             self.list.push(item);
             return self.list[self.list.length - 1];
           },
-          setLoading(id) {},
-          finishLoading(id) {},
+          setLoading(_id) {},
+          finishLoading(_id) {},
         }));
     },
   };
@@ -75,6 +80,50 @@ describe("tasks DataStore", () => {
     // Need to require the actual module under test after mocking dependencies
     tasksMod = require("../tasks");
     TasksStoreMock = tasksMod.create([]);
+  });
+
+  it("preserves Data Manager user chips when quick view task details have empty chip arrays", () => {
+    const rootModel = types
+      .model("Root", {
+        taskStore: types.optional(TasksStoreMock, {}),
+        annotationStore: types.optional(types.model({ selected: types.frozen() }), {}),
+        SDK: types.frozen({ mode: "explorer", invoke: jest.fn() }),
+      })
+      .actions(() => ({
+        apiCall: jest.fn(),
+        invokeAction: jest.fn(),
+      }));
+
+    const root = rootModel.create({ taskStore: { list: [] } });
+
+    root.taskStore.applyTaskSnapshot({
+      id: 10,
+      data: { text: "DM row" },
+      annotators: [{ user_id: 101, email: "annotator@example.test", firstName: "Ada", lastName: "Annotator" }],
+      reviewers: [{ user_id: 202, email: "reviewer@example.test", firstName: "Rae", lastName: "Reviewer" }],
+      updated_by: [{ user_id: 303, email: "updater@example.test", firstName: "Uma", lastName: "Updater" }],
+      annotators_count: 1,
+      reviewers_count: 1,
+      annotations: [],
+    });
+
+    const task = root.taskStore.applyTaskSnapshot({
+      id: 10,
+      data: { text: "Quick view detail" },
+      annotators: [],
+      reviewers: [],
+      updated_by: [],
+      annotators_count: 0,
+      reviewers_count: 0,
+      annotations: [{ id: 1, result: [{ value: "loaded" }] }],
+    });
+
+    expect(task.annotations).toEqual([{ id: 1, result: [{ value: "loaded" }] }]);
+    expect(task.annotators.map((chip) => chip.id)).toEqual([101]);
+    expect(task.reviewers.map((chip) => chip.id)).toEqual([202]);
+    expect(task.updated_by.map((chip) => chip.id)).toEqual([303]);
+    expect(task.annotators_count).toBe(1);
+    expect(task.reviewers_count).toBe(1);
   });
 
   it("loadTask gracefully exits and doesn't crash when node is destroyed", async () => {
