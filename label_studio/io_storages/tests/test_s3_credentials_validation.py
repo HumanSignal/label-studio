@@ -7,8 +7,7 @@ from io_storages.functions import validate_storage_instance
 from io_storages.s3.api import S3ExportStorageListAPI
 from io_storages.s3.models import S3StorageMixin, clients_cache
 from io_storages.s3.serializers import S3ExportStorageSerializer, S3ImportStorageSerializer
-from io_storages.s3.utils import get_client_and_resource
-from rest_framework.exceptions import ValidationError
+from io_storages.s3.utils import S3StorageError, get_client_and_resource
 from tests.utils import make_project
 
 STORAGE_SERIALIZERS = [S3ImportStorageSerializer, S3ExportStorageSerializer]
@@ -412,7 +411,7 @@ def test_s3_validation_does_not_cache_candidate_credentials(business_client, ser
 
 
 @pytest.mark.django_db
-def test_failed_s3_export_creation_does_not_cache_candidate_credentials(business_client):
+def test_s3_export_creation_does_not_repeat_connection_validation(business_client):
     project = make_project({}, business_client.user, use_ml_backend=False)
     serializer = S3ExportStorageSerializer(
         data=storage_payload(
@@ -423,19 +422,12 @@ def test_failed_s3_export_creation_does_not_cache_candidate_credentials(business
     )
     view = S3ExportStorageListAPI()
     view.request = SimpleNamespace(user=business_client.user)
-    client = MagicMock()
-    client.head_bucket.side_effect = [None, RuntimeError('connection failed')]
-    clients_cache.clear()
 
-    with patch(
-        'io_storages.s3.models.get_client_and_resource',
-        return_value=(client, MagicMock()),
-    ):
+    with patch.object(S3StorageMixin, 'validate_connection', autospec=True) as validate_connection:
         assert serializer.is_valid(), serializer.errors
-        with pytest.raises(ValidationError):
-            view.perform_create(serializer)
+        view.perform_create(serializer)
 
-    assert clients_cache == {}
+    validate_connection.assert_called_once()
 
 
 @pytest.mark.django_db
@@ -505,3 +497,20 @@ def test_s3_credentials_report_default_chain_configuration_error(business_client
         assert not serializer.is_valid()
 
     assert serializer.errors['non_field_errors'] == ['Unable to configure the AWS connection for this S3 storage.']
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize('serializer_class', STORAGE_SERIALIZERS)
+def test_s3_credentials_report_custom_endpoint_error(business_client, serializer_class):
+    project = make_project({}, business_client.user, use_ml_backend=False)
+    serializer = serializer_class(data=storage_payload(project, aws_access_key_id='', aws_secret_access_key=''))
+
+    with patch.object(
+        S3StorageMixin,
+        'validate_connection',
+        autospec=True,
+        side_effect=S3StorageError('internal custom endpoint details'),
+    ):
+        assert not serializer.is_valid()
+
+    assert serializer.errors['non_field_errors'] == ['Unable to connect to the custom S3 endpoint.']

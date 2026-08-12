@@ -16,6 +16,7 @@ from botocore.handlers import validate_bucket_name
 from core.utils.io import validate_url_for_ssrf
 from django.conf import settings
 from io_storages.s3.models import S3ExportStorage, S3ImportStorage
+from io_storages.s3.utils import S3StorageError
 from io_storages.serializers import ExportStorageSerializer, ImportStorageSerializer, StorageTypeField
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
@@ -28,6 +29,7 @@ class S3StorageSerializerMixin:
     secure_fields = [*credential_fields, 'aws_session_token']
     credential_pair_error = 'Access Key ID and Secret Access Key must be provided together.'
     skip_client_cache_during_validation = True
+    validates_connection = True
 
     def to_representation(self, instance):
         result = super().to_representation(instance)
@@ -103,6 +105,8 @@ class S3StorageSerializerMixin:
             ):
                 raise ValidationError('Cannot find bucket {bucket_name} in S3'.format(bucket_name=storage.bucket))
             raise ValidationError('Cannot connect to S3 {bucket_name}'.format(bucket_name=storage.bucket))
+        except S3StorageError as exc:
+            raise ValidationError('Unable to connect to the custom S3 endpoint.') from exc
         except BotoCoreError as exc:
             raise ValidationError('Unable to configure the AWS connection for this S3 storage.') from exc
         except TypeError as e:
