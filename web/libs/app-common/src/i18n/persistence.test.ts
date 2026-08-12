@@ -1,4 +1,4 @@
-import { afterEach, beforeEach, expect, it, mock } from "bun:test";
+import { afterEach, beforeEach, expect, it } from "bun:test";
 import { clearStoredLanguage, getStoredLanguage, setStoredLanguage } from "./persistence";
 
 beforeEach(() => {

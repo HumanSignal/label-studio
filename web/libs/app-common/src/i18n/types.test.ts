@@ -1,11 +1,5 @@
 import { expect, it } from "bun:test";
-import {
-  APP_LOCALES,
-  DEFAULT_LOCALE,
-  FALLBACK_LOCALE,
-  isSupportedLocale,
-  type SupportedLocale,
-} from "./types";
+import { APP_LOCALES, DEFAULT_LOCALE, FALLBACK_LOCALE, isSupportedLocale, type SupportedLocale } from "./types";
 
 it("exports English as both default and fallback locale", () => {
   expect(DEFAULT_LOCALE).toBe("en");
