@@ -46,7 +46,7 @@ def validate_storage_instance(request, serializer_class):
             raise PermissionDenied()
 
     # combine instance fields with request.data
-    serializer = serializer_class(data=request.data)
+    serializer = serializer_class(data=request.data, context={'storage_instance': instance})
     serializer.is_valid(raise_exception=True)
 
     # if storage exists, we have to use instance from DB,

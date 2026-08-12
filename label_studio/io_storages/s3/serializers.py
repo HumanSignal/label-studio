@@ -1,9 +1,16 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license."""
 
+import copy
 import logging
 import os
 
-from botocore.exceptions import ClientError, ParamValidationError
+from botocore.exceptions import (
+    ClientError,
+    CredentialRetrievalError,
+    NoCredentialsError,
+    ParamValidationError,
+    PartialCredentialsError,
+)
 from botocore.handlers import validate_bucket_name
 from core.utils.io import validate_url_for_ssrf
 from django.conf import settings
@@ -45,20 +52,23 @@ class S3StorageSerializerMixin:
         if supplied_credential_fields and 'aws_session_token' not in data:
             data['aws_session_token'] = ''
 
-        if not data.get('bucket', None):
-            return data
-
         storage = self.instance
         if storage:
             for key, value in data.items():
                 setattr(storage, key, value)
         else:
             if 'id' in self.initial_data:
-                storage_object = self.Meta.model.objects.get(id=self.initial_data['id'])
-                for attr in self.secure_fields:
-                    if attr not in data:
-                        data[attr] = getattr(storage_object, attr)
-            storage = self.Meta.model(**data)
+                storage = self.context.get('storage_instance')
+                if storage is None or str(storage.id) != str(self.initial_data['id']):
+                    raise ValidationError({'id': 'Invalid storage ID.'})
+                storage = copy.copy(storage)
+                for key, value in data.items():
+                    setattr(storage, key, value)
+            else:
+                storage = self.Meta.model(**data)
+
+        if not storage.bucket:
+            return data
 
         if bool(storage.aws_access_key_id) != bool(storage.aws_secret_access_key):
             missing_field = 'aws_secret_access_key' if storage.aws_access_key_id else 'aws_access_key_id'
@@ -70,6 +80,8 @@ class S3StorageSerializerMixin:
 
         try:
             storage.validate_connection()
+        except (CredentialRetrievalError, NoCredentialsError, PartialCredentialsError) as exc:
+            raise ValidationError('Unable to resolve AWS credentials for this S3 connection.') from exc
         except ParamValidationError:
             raise ValidationError('Wrong credentials for S3 {bucket_name}'.format(bucket_name=storage.bucket))
         except ClientError as e:

@@ -2,9 +2,11 @@ from types import SimpleNamespace
 from unittest.mock import patch
 
 import pytest
+from botocore.exceptions import NoCredentialsError
 from io_storages.functions import validate_storage_instance
 from io_storages.s3.models import S3StorageMixin
 from io_storages.s3.serializers import S3ExportStorageSerializer, S3ImportStorageSerializer
+from io_storages.s3.utils import get_client_and_resource
 from tests.utils import make_project
 
 STORAGE_SERIALIZERS = [S3ImportStorageSerializer, S3ExportStorageSerializer]
@@ -74,7 +76,8 @@ def test_s3_validation_uses_explicit_empty_credentials_when_clearing_existing_st
         data={
             **storage_payload(project, aws_access_key_id='', aws_secret_access_key=''),
             'id': storage.id,
-        }
+        },
+        context={'storage_instance': storage},
     )
 
     with patch.object(S3StorageMixin, 'validate_connection', autospec=True) as validate_connection:
@@ -98,7 +101,10 @@ def test_s3_validation_reuses_stored_credentials_when_fields_are_unchanged(busin
         aws_secret_access_key='stored-secret-key',
         aws_session_token='stored-session-token',
     )
-    serializer = serializer_class(data={**storage_payload(project), 'id': storage.id})
+    serializer = serializer_class(
+        data={**storage_payload(project), 'id': storage.id},
+        context={'storage_instance': storage},
+    )
 
     with patch.object(S3StorageMixin, 'validate_connection', autospec=True) as validate_connection:
         assert serializer.is_valid(), serializer.errors
@@ -129,7 +135,8 @@ def test_s3_validation_clears_stored_session_token_when_credentials_change(busin
                 aws_secret_access_key='replacement-secret-key',
             ),
             'id': storage.id,
-        }
+        },
+        context={'storage_instance': storage},
     )
 
     with patch.object(S3StorageMixin, 'validate_connection', autospec=True) as validate_connection:
@@ -244,3 +251,109 @@ def test_s3_storage_update_persists_cleared_credentials(business_client, seriali
     assert storage.aws_access_key_id == ''
     assert storage.aws_secret_access_key == ''
     assert storage.aws_session_token == ''
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize('serializer_class', STORAGE_SERIALIZERS)
+def test_s3_validation_rejects_storage_id_without_permission_checked_context(business_client, serializer_class):
+    project = make_project({}, business_client.user, use_ml_backend=False)
+    storage = serializer_class.Meta.model.objects.create(
+        project=project,
+        title='S3 source',
+        bucket='pytest-s3-images',
+        aws_access_key_id='stored-access-key',
+        aws_secret_access_key='stored-secret-key',
+    )
+    serializer = serializer_class(data={**storage_payload(project), 'id': storage.id})
+
+    with patch.object(S3StorageMixin, 'validate_connection', autospec=True) as validate_connection:
+        assert not serializer.is_valid()
+
+    assert serializer.errors['id'] == ['Invalid storage ID.']
+    validate_connection.assert_not_called()
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize('serializer_class', STORAGE_SERIALIZERS)
+def test_s3_credentials_reject_invalid_partial_patch_without_bucket(business_client, serializer_class):
+    project = make_project({}, business_client.user, use_ml_backend=False)
+    storage = serializer_class.Meta.model.objects.create(
+        project=project,
+        title='S3 source',
+        bucket='pytest-s3-images',
+        aws_access_key_id='stored-access-key',
+        aws_secret_access_key='stored-secret-key',
+    )
+    serializer = serializer_class(
+        storage,
+        data={'aws_access_key_id': 'replacement-access-key', 'aws_secret_access_key': ''},
+        partial=True,
+    )
+
+    with patch.object(S3StorageMixin, 'validate_connection', autospec=True) as validate_connection:
+        assert not serializer.is_valid()
+
+    assert serializer.errors['aws_secret_access_key'] == [
+        'Access Key ID and Secret Access Key must be provided together.'
+    ]
+    validate_connection.assert_not_called()
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize('serializer_class', STORAGE_SERIALIZERS)
+def test_s3_credentials_reject_token_only_patch_for_default_chain_storage(business_client, serializer_class):
+    project = make_project({}, business_client.user, use_ml_backend=False)
+    storage = serializer_class.Meta.model.objects.create(
+        project=project,
+        title='S3 source',
+        bucket='pytest-s3-images',
+    )
+    serializer = serializer_class(
+        storage,
+        data={'aws_session_token': 'orphaned-session-token'},
+        partial=True,
+    )
+
+    with patch.object(S3StorageMixin, 'validate_connection', autospec=True) as validate_connection:
+        assert not serializer.is_valid()
+
+    assert serializer.errors['aws_session_token'] == ['Session Token requires an Access Key ID and Secret Access Key.']
+    validate_connection.assert_not_called()
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize('serializer_class', STORAGE_SERIALIZERS)
+def test_s3_credentials_report_missing_default_chain(business_client, serializer_class):
+    project = make_project({}, business_client.user, use_ml_backend=False)
+    serializer = serializer_class(data=storage_payload(project, aws_access_key_id='', aws_secret_access_key=''))
+
+    with patch.object(
+        S3StorageMixin,
+        'validate_connection',
+        autospec=True,
+        side_effect=NoCredentialsError(),
+    ):
+        assert not serializer.is_valid()
+
+    assert serializer.errors['non_field_errors'] == ['Unable to resolve AWS credentials for this S3 connection.']
+
+
+def test_s3_client_uses_default_chain_when_explicit_credentials_are_omitted():
+    with patch('io_storages.s3.utils.boto3.Session') as session_class:
+        get_client_and_resource()
+
+    session_class.assert_called_once_with()
+
+
+def test_s3_client_does_not_mix_explicit_credentials_with_ambient_session_token():
+    with patch('io_storages.s3.utils.boto3.Session') as session_class:
+        get_client_and_resource(
+            aws_access_key_id='access-key',
+            aws_secret_access_key='secret-key',
+        )
+
+    session_class.assert_called_once_with(
+        aws_access_key_id='access-key',
+        aws_secret_access_key='secret-key',
+        aws_session_token=None,
+    )
