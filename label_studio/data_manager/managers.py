@@ -627,6 +627,8 @@ def apply_filters(queryset, filters, project, request):
 
     # convert conjunction to orm statement
     custom_filter_expressions = load_func(settings.DATA_MANAGER_CUSTOM_FILTER_EXPRESSIONS)
+    preprocess_field_name = load_func(settings.PREPROCESS_FIELD_NAME)
+    preprocess_filter = load_func(settings.DATA_MANAGER_PREPROCESS_FILTER)
 
     # Combine child filters with their parent in the same filter expression.
     # Result-parent hooks consume this complete line and compile one correlated
@@ -649,7 +651,6 @@ def apply_filters(queryset, filters, project, request):
                 continue
 
             # django orm loop expression attached to column name
-            preprocess_field_name = load_func(settings.PREPROCESS_FIELD_NAME)
             field_name, _ = preprocess_field_name(_filter.filter, project)
             if _is_stale_agreement_field(queryset, field_name):
                 logger.warning('Skipping stale agreement filter field: %s', field_name)
@@ -657,7 +658,6 @@ def apply_filters(queryset, filters, project, request):
             validate_user_filter_operator(field_name, _filter.operator, _filter.value)
 
             # filter pre-processing, value type conversion, etc..
-            preprocess_filter = load_func(settings.DATA_MANAGER_PREPROCESS_FILTER)
             _filter = preprocess_filter(_filter, field_name)
 
             # Semantic validation for in_list / not_in_list (BROS-1203). Runs *before*
@@ -1214,6 +1214,8 @@ class PreparedTaskManager(models.Manager):
             if project is None:
                 first_task = queryset.first()
                 project = None if first_task is None else first_task.project
+                if project is not None:
+                    queryset.project = project
             overlay_map = overlay_func(request=request, project=project) or {}
             if isinstance(overlay_map, dict) and overlay_map:
                 # Only add overlay_map keys if they're explicitly requested in fields_for_evaluation
@@ -1243,6 +1245,8 @@ class PreparedTaskManager(models.Manager):
         if project is None:
             first_task = queryset.first()
             project = None if first_task is None else first_task.project
+            if project is not None:
+                queryset.project = project
 
         # db annotations applied only if we need them in ordering or filters
         for field in annotations_map.keys():
@@ -1296,9 +1300,13 @@ class PreparedTaskManager(models.Manager):
         # Support both single and multiple projects
         if prepare_params.is_multi_project:
             queryset = TaskQuerySet(self.model).filter(project__in=prepare_params.projects)
+            project = Project.objects.get(pk=prepare_params.projects[0])
+            queryset.project = project
         else:
             queryset = TaskQuerySet(self.model).filter(project=prepare_params.project)
             project = Project.objects.get(pk=prepare_params.project)
+            # Attach project before annotate_queryset so it does not call queryset.first().
+            queryset.project = project
             _set_prefilter_task_ids_for_agreement(request, queryset, prepare_params, project)
         fields_for_filter_ordering = get_fields_for_filter_ordering(prepare_params)
         queryset = self.annotate_queryset(queryset, fields_for_evaluation=fields_for_filter_ordering, request=request)
