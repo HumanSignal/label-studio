@@ -14,6 +14,7 @@ LSE-specific transitions (reviews, project settings, annotation drafts) are test
 
 import pytest
 from core.current_request import CurrentContext
+from django.core.cache import cache
 from fsm.state_choices import AnnotationStateChoices, ProjectStateChoices, TaskStateChoices
 from fsm.state_manager import StateManager
 from label_studio_sdk.client import LabelStudio
@@ -21,6 +22,14 @@ from projects.models import Project
 from tasks.models import Annotation, Task
 
 pytestmark = pytest.mark.django_db
+
+
+@pytest.fixture(autouse=True)
+def clear_fsm_cache():
+    cache.clear()
+    yield
+    CurrentContext.clear()
+    cache.clear()
 
 
 @pytest.fixture
