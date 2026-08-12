@@ -113,6 +113,21 @@ describe("resolveClassicEntityReviewState", () => {
     );
   });
 
+  it("uses accepted_state when stub payload has empty annotators", () => {
+    (window as { APP_SETTINGS?: unknown }).APP_SETTINGS = { version: { edition: "Enterprise" } };
+    const store = {
+      task: {
+        source: JSON.stringify({
+          annotators: [],
+          annotations: [{ id: 1 }],
+        }),
+      },
+    };
+    expect(resolveClassicEntityReviewState({ pk: 1, type: "annotation", accepted_state: "rejected" }, store)).toBe(
+      "rejected",
+    );
+  });
+
   it("falls back to task source when entity field is missing", () => {
     (window as { APP_SETTINGS?: unknown }).APP_SETTINGS = { version: { edition: "Enterprise" } };
     const store = {

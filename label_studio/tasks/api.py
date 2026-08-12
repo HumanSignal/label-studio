@@ -310,7 +310,7 @@ class TaskAPI(generics.RetrieveUpdateDestroyAPIView):
                 order_annotations_asc,
             )
 
-            annotations_qs = Annotation.objects.only(
+            annotations_qs = Annotation.objects.select_related('completed_by').only(
                 'id',
                 'completed_by',
                 'ground_truth',
@@ -318,6 +318,7 @@ class TaskAPI(generics.RetrieveUpdateDestroyAPIView):
                 'created_at',
                 'updated_at',
                 'task_id',
+                'last_action',
             )
             if ordering == ANNOTATION_ORDERING_ID_DESC:
                 annotations_qs = order_annotations(annotations_qs)
