@@ -36,6 +36,7 @@ export function createI18nConfig(options: I18nConfigOptions = {}): i18next.InitO
       escapeValue: false,
     },
     returnEmptyString: false,
+    appendNamespaceToMissingKey: true,
     parseMissingKeyHandler: (key) => key,
   };
 }

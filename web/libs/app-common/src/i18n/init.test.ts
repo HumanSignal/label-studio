@@ -17,7 +17,7 @@ it("falls back to English key when translation is missing", () => {
   const instance = getI18n();
   // Switch to zh-CN then look up an unknown key
   instance.changeLanguage("zh-CN");
-  expect(instance.t("does.not.exist")).toBe("does.not.exist");
+  expect(instance.t("does.not.exist")).toBe("menubar:does.not.exist");
   // Restore default
   instance.changeLanguage("en");
 });
