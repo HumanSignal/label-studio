@@ -250,6 +250,8 @@ def has_column_cached(table_name: str, column_name: str) -> bool:
         present = any(getattr(col, 'name', '').lower() == col_key for col in cols)
     except (DatabaseError, ProgrammingError):
         present = False
+    except RuntimeError:
+        return False
     finally:
         # Restore the previous value
         if in_async_context:
