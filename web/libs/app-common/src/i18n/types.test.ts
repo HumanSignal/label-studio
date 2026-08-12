@@ -17,12 +17,21 @@ it("includes en and zh-CN in APP_LOCALES", () => {
   expect(APP_LOCALES).toContain("zh-CN");
 });
 
-it("isSupportedLocale narrows unknown strings back to false", () => {
+it("isSupportedLocale returns true for supported locales", () => {
   expect(isSupportedLocale("en")).toBe(true);
   expect(isSupportedLocale("zh-CN")).toBe(true);
+});
+
+it("isSupportedLocale returns false for unsupported strings and non-string inputs", () => {
+  // unsupported strings
   expect(isSupportedLocale("fr")).toBe(false);
   expect(isSupportedLocale("zh")).toBe(false);
   expect(isSupportedLocale("")).toBe(false);
+  // non-string inputs (the unknown-type boundary path)
+  expect(isSupportedLocale(null)).toBe(false);
+  expect(isSupportedLocale(undefined)).toBe(false);
+  expect(isSupportedLocale(123)).toBe(false);
+  expect(isSupportedLocale({ locale: "en" })).toBe(false);
 });
 
 it("SupportedLocale type accepts the two known values at compile time", () => {
