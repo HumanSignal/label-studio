@@ -97,12 +97,13 @@ class ExportStorageListAPI(generics.ListCreateAPIView):
         if project is not None and not project.has_permission(self.request.user):
             raise PermissionDenied('You do not have permission to create storages for this project.')
 
-        if not getattr(self.serializer_class, 'validates_connection', False):
-            instance = serializer.Meta.model(**serializer.validated_data)
-            try:
-                instance.validate_connection()
-            except Exception as exc:
-                raise ValidationError(exc)
+        # double check: not export storages don't validate connection in serializer,
+        # just make another explicit check here, note: in this create API we have credentials in request.data
+        instance = serializer.Meta.model(**serializer.validated_data)
+        try:
+            instance.validate_connection()
+        except Exception as exc:
+            raise ValidationError(exc)
 
         storage = serializer.save()
         if settings.SYNC_ON_TARGET_STORAGE_CREATION:

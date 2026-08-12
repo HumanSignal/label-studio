@@ -4,7 +4,6 @@ from unittest.mock import MagicMock, patch
 import pytest
 from botocore.exceptions import ClientError, NoCredentialsError, ProfileNotFound
 from io_storages.functions import validate_storage_instance
-from io_storages.s3.api import S3ExportStorageListAPI
 from io_storages.s3.models import S3StorageMixin, clients_cache
 from io_storages.s3.serializers import S3ExportStorageSerializer, S3ImportStorageSerializer
 from io_storages.s3.utils import S3StorageError, get_client_and_resource
@@ -408,26 +407,6 @@ def test_s3_validation_does_not_cache_candidate_credentials(business_client, ser
 
     assert candidate._skip_client_cache
     assert clients_cache == {}
-
-
-@pytest.mark.django_db
-def test_s3_export_creation_does_not_repeat_connection_validation(business_client):
-    project = make_project({}, business_client.user, use_ml_backend=False)
-    serializer = S3ExportStorageSerializer(
-        data=storage_payload(
-            project,
-            aws_access_key_id='candidate-access-key',
-            aws_secret_access_key='candidate-secret-key',
-        )
-    )
-    view = S3ExportStorageListAPI()
-    view.request = SimpleNamespace(user=business_client.user)
-
-    with patch.object(S3StorageMixin, 'validate_connection', autospec=True) as validate_connection:
-        assert serializer.is_valid(), serializer.errors
-        view.perform_create(serializer)
-
-    validate_connection.assert_called_once()
 
 
 @pytest.mark.django_db
