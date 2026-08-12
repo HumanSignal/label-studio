@@ -1,10 +1,10 @@
 from types import SimpleNamespace
-from unittest.mock import patch
+from unittest.mock import MagicMock, patch
 
 import pytest
 from botocore.exceptions import NoCredentialsError
 from io_storages.functions import validate_storage_instance
-from io_storages.s3.models import S3StorageMixin
+from io_storages.s3.models import S3StorageMixin, clients_cache
 from io_storages.s3.serializers import S3ExportStorageSerializer, S3ImportStorageSerializer
 from io_storages.s3.utils import get_client_and_resource
 from tests.utils import make_project
@@ -339,14 +339,20 @@ def test_s3_credentials_report_missing_default_chain(business_client, serializer
 
 
 def test_s3_client_uses_default_chain_when_explicit_credentials_are_omitted():
-    with patch('io_storages.s3.utils.boto3.Session') as session_class:
+    with (
+        patch.dict('os.environ', {}, clear=True),
+        patch('io_storages.s3.utils.boto3.Session') as session_class,
+    ):
         get_client_and_resource()
 
     session_class.assert_called_once_with()
 
 
 def test_s3_client_does_not_mix_explicit_credentials_with_ambient_session_token():
-    with patch('io_storages.s3.utils.boto3.Session') as session_class:
+    with (
+        patch.dict('os.environ', {'LABEL_STUDIO_AWS_SESSION_TOKEN': 'ambient-session-token'}, clear=True),
+        patch('io_storages.s3.utils.boto3.Session') as session_class,
+    ):
         get_client_and_resource(
             aws_access_key_id='access-key',
             aws_secret_access_key='secret-key',
@@ -357,3 +363,45 @@ def test_s3_client_does_not_mix_explicit_credentials_with_ambient_session_token(
         aws_secret_access_key='secret-key',
         aws_session_token=None,
     )
+
+
+@pytest.mark.parametrize('prefix', ['LABEL_STUDIO_', 'HEARTEX_'])
+def test_s3_client_preserves_prefixed_credential_aliases(prefix):
+    environment = {
+        f'{prefix}AWS_ACCESS_KEY_ID': 'prefixed-access-key',
+        f'{prefix}AWS_SECRET_ACCESS_KEY': 'prefixed-secret-key',
+        f'{prefix}AWS_SESSION_TOKEN': 'prefixed-session-token',
+    }
+    with (
+        patch.dict('os.environ', environment, clear=True),
+        patch('io_storages.s3.utils.boto3.Session') as session_class,
+    ):
+        get_client_and_resource()
+
+    session_class.assert_called_once_with(
+        aws_access_key_id='prefixed-access-key',
+        aws_secret_access_key='prefixed-secret-key',
+        aws_session_token='prefixed-session-token',
+    )
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize('serializer_class', STORAGE_SERIALIZERS)
+def test_s3_validation_does_not_cache_candidate_credentials(business_client, serializer_class):
+    project = make_project({}, business_client.user, use_ml_backend=False)
+    serializer = serializer_class(
+        data=storage_payload(
+            project,
+            aws_access_key_id='candidate-access-key',
+            aws_secret_access_key='candidate-secret-key',
+        )
+    )
+    clients_cache.clear()
+
+    with patch(
+        'io_storages.s3.models.get_client_and_resource',
+        return_value=(MagicMock(), MagicMock()),
+    ):
+        assert serializer.is_valid(), serializer.errors
+
+    assert clients_cache == {}

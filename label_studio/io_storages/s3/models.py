@@ -1,5 +1,6 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license."""
 
+import hashlib
 import json
 import logging
 import re
@@ -68,8 +69,21 @@ class S3StorageMixin(models.Model):
 
     @catch_and_reraise_from_none
     def get_client_and_resource(self):
+        if getattr(self, '_skip_client_cache', False):
+            return get_client_and_resource(
+                self.aws_access_key_id,
+                self.aws_secret_access_key,
+                self.aws_session_token,
+                self.region_name,
+                self.s3_endpoint,
+            )
+
         # s3 client initialization ~ 100 ms, for 30 tasks it's a 3 seconds, so we need to cache it
-        cache_key = f'{self.aws_access_key_id}:{self.aws_secret_access_key}:{self.aws_session_token}:{self.region_name}:{self.s3_endpoint}'
+        credential_state = (
+            f'{self.aws_access_key_id}:{self.aws_secret_access_key}:'
+            f'{self.aws_session_token}:{self.region_name}:{self.s3_endpoint}'
+        )
+        cache_key = hashlib.sha256(credential_state.encode()).hexdigest()
         if cache_key in clients_cache:
             return clients_cache[cache_key]
 

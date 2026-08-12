@@ -78,6 +78,7 @@ class S3StorageSerializerMixin:
                 {'aws_session_token': 'Session Token requires an Access Key ID and Secret Access Key.'}
             )
 
+        storage._skip_client_cache = True
         try:
             storage.validate_connection()
         except (CredentialRetrievalError, NoCredentialsError, PartialCredentialsError) as exc:
@@ -104,6 +105,8 @@ class S3StorageSerializerMixin:
             raise ValidationError('It seems access keys are incorrect')
         except KeyError:
             raise ValidationError(f'{storage.url_scheme}://{storage.bucket}/{storage.prefix} not found.')
+        finally:
+            del storage._skip_client_cache
         return data
 
     def update(self, instance, validated_data):

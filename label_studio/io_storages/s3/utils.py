@@ -4,6 +4,7 @@ import base64
 import fnmatch
 import logging
 import mimetypes
+import os
 import re
 from urllib.parse import urlparse
 
@@ -16,9 +17,26 @@ from tldextract import TLDExtract
 logger = logging.getLogger(__name__)
 
 
+def _get_prefixed_aws_credentials():
+    for prefix in ('LABEL_STUDIO_', 'HEARTEX_'):
+        credentials = (
+            os.environ.get(f'{prefix}AWS_ACCESS_KEY_ID'),
+            os.environ.get(f'{prefix}AWS_SECRET_ACCESS_KEY'),
+            os.environ.get(f'{prefix}AWS_SESSION_TOKEN'),
+        )
+        if any(credentials):
+            return credentials
+    return None, None, None
+
+
 def get_client_and_resource(
     aws_access_key_id=None, aws_secret_access_key=None, aws_session_token=None, region_name=None, s3_endpoint=None
 ):
+    credentials = (aws_access_key_id, aws_secret_access_key, aws_session_token)
+    if not any(credentials):
+        credentials = _get_prefixed_aws_credentials()
+    aws_access_key_id, aws_secret_access_key, aws_session_token = credentials
+
     logger.debug(
         f'Create boto3 session with '
         f'access key id={aws_access_key_id}, '
