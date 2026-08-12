@@ -4,10 +4,12 @@
  * Pure props in / pure callbacks out. No MST, no Jotai. Visuals follow the classic
  * editor (BEM `.prefix.css`, `lsf-annotations-carousel*` selectors after PostCSS).
  *
- * Both branches (virtualized via react-window above 50 items, non-virtualized via CSS
- * transform) are preserved from the classic editor. The wrapper decides whether to
- * enable virtualization at all (classic gates on FF_FIT_720_LAZY_LOAD_ANNOTATIONS;
- * shell wrapper passes `virtualizationEnabled={true}` unconditionally).
+ * Vertical layout: both branches pin the add-new row in `__container` and put
+ * annotation rows in an inner scroll region (`__virtualizedList` + react-window
+ * above 50 items, or `__listScroll` with native overflow below that). Horizontal
+ * layout keeps the classic transform carousel and the virtualized react-window
+ * strip. The wrapper decides whether to enable virtualization at all (classic
+ * gates on FF_FIT_720_LAZY_LOAD_ANNOTATIONS; shell passes `virtualizationEnabled={true}`).
  *
  * Sort order: rendered in the order the wrapper supplies. Wrappers MUST place
  * predictions before annotations; sort within type matches the API's order. This is
@@ -295,7 +297,7 @@ export function AnnotationsCarousel({
   const addNewRow = showAddNew && onAddNew ? <AddAnnotationRow key="add-new" onAddNew={onAddNew} /> : null;
   const scrollClassName = cn("annotations-carousel").elem("scroll").toClassName();
   const containerClassName = cn("annotations-carousel").elem("container").toClassName();
-  const scrollContainerClassName = cn("annotations-carousel").elem("container").mix(scrollClassName).toClassName();
+  const listScrollClassName = cn("annotations-carousel").elem("listScroll").mix(scrollClassName).toClassName();
 
   // --- Vertical layout branch ---
   if (isVertical) {
@@ -335,10 +337,12 @@ export function AnnotationsCarousel({
 
     return (
       <div className={cn("annotations-carousel").mod({ vertical: true }).toClassName()} style={verticalItemSizeStyle}>
-        <div className={scrollContainerClassName}>
+        <div className={containerClassName}>
           {addNewRow}
-          {filteredEntities.map((entity) => renderRow(entity))}
-          {emptyState}
+          <div className={listScrollClassName}>
+            {filteredEntities.map((entity) => renderRow(entity))}
+            {emptyState}
+          </div>
         </div>
       </div>
     );
