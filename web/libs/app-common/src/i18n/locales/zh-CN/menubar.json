@@ -1,0 +1,17 @@
+{
+  "logoAlt": "Label Studio 标志",
+  "keyboardShortcuts": "快捷键",
+  "keyboardShortcutsTooltip": "快捷键",
+  "account": "账户与设置",
+  "logOut": "退出登录",
+  "newsletterNotice": "请在账户与设置页面查看新的通知设置",
+  "home": "首页",
+  "projects": "项目",
+  "organization": "组织",
+  "api": "API",
+  "docs": "文档",
+  "github": "GitHub",
+  "slackCommunity": "Slack 社区",
+  "pinMenu": "固定菜单",
+  "unpinMenu": "取消固定菜单"
+}

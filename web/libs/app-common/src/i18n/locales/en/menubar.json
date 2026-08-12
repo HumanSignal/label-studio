@@ -1,0 +1,17 @@
+{
+  "logoAlt": "Label Studio Logo",
+  "keyboardShortcuts": "Keyboard Shortcuts",
+  "keyboardShortcutsTooltip": "Keyboard Shortcuts",
+  "account": "Account & Settings",
+  "logOut": "Log Out",
+  "newsletterNotice": "Please check new notification settings in the Account & Settings page",
+  "home": "Home",
+  "projects": "Projects",
+  "organization": "Organization",
+  "api": "API",
+  "docs": "Docs",
+  "github": "GitHub",
+  "slackCommunity": "Slack Community",
+  "pinMenu": "Pin menu",
+  "unpinMenu": "Unpin menu"
+}
