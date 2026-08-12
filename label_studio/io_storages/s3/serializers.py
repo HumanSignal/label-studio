@@ -5,6 +5,7 @@ import logging
 import os
 
 from botocore.exceptions import (
+    BotoCoreError,
     ClientError,
     CredentialRetrievalError,
     NoCredentialsError,
@@ -102,6 +103,8 @@ class S3StorageSerializerMixin:
             ):
                 raise ValidationError('Cannot find bucket {bucket_name} in S3'.format(bucket_name=storage.bucket))
             raise ValidationError('Cannot connect to S3 {bucket_name}'.format(bucket_name=storage.bucket))
+        except BotoCoreError as exc:
+            raise ValidationError('Unable to configure the AWS connection for this S3 storage.') from exc
         except TypeError as e:
             logger.info(f'It seems access keys are incorrect: {e}', exc_info=True)
             raise ValidationError('It seems access keys are incorrect')

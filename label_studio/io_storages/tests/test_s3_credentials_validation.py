@@ -2,7 +2,7 @@ from types import SimpleNamespace
 from unittest.mock import MagicMock, patch
 
 import pytest
-from botocore.exceptions import ClientError, NoCredentialsError
+from botocore.exceptions import ClientError, NoCredentialsError, ProfileNotFound
 from io_storages.functions import validate_storage_instance
 from io_storages.s3.api import S3ExportStorageListAPI
 from io_storages.s3.models import S3StorageMixin, clients_cache
@@ -488,3 +488,20 @@ def test_s3_credentials_reject_unhandled_client_error_on_patch(business_client, 
         assert not serializer.is_valid()
 
     assert serializer.errors['non_field_errors'] == ['Cannot connect to S3 pytest-s3-images']
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize('serializer_class', STORAGE_SERIALIZERS)
+def test_s3_credentials_report_default_chain_configuration_error(business_client, serializer_class):
+    project = make_project({}, business_client.user, use_ml_backend=False)
+    serializer = serializer_class(data=storage_payload(project, aws_access_key_id='', aws_secret_access_key=''))
+
+    with patch.object(
+        S3StorageMixin,
+        'validate_connection',
+        autospec=True,
+        side_effect=ProfileNotFound(profile='missing-profile'),
+    ):
+        assert not serializer.is_valid()
+
+    assert serializer.errors['non_field_errors'] == ['Unable to configure the AWS connection for this S3 storage.']
