@@ -43,7 +43,7 @@ const BaseInput = observer(({ value, onChange, placeholder, disabled, readOnly }
           </Badge>
         );
       }}
-      size="small"
+      size="smaller"
       triggerClassName="min-w-[100px]"
     />
   );

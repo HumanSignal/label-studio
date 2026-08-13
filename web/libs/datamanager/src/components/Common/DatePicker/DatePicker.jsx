@@ -4,7 +4,7 @@ import { default as DP } from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { cn } from "../../../utils/bem";
 import { isDefined } from "../../../utils/utils";
-import { Dropdown } from "@humansignal/ui";
+import { Dropdown, Typography } from "@humansignal/ui";
 import Input from "../Input/Input";
 import "./DatePicker.global.prefix.css";
 import "./DatePicker.prefix.css";
@@ -133,7 +133,9 @@ export const DatePicker = ({
           />
           {selectRange && (
             <>
-              <div className={cn("datepicker").elem("separator").toClassName()}>and</div>
+              <Typography as="span" variant="body" size="smallest" className="text-neutral-content-subtler shrink-0">
+                and
+              </Typography>
               <Input
                 size={size}
                 value={endDate || ""}

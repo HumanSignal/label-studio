@@ -2,21 +2,20 @@ import React from "react";
 import { observer } from "mobx-react";
 import { cn } from "../../../utils/bem";
 import { Button, Typography } from "@humansignal/ui";
-import { IconClose, PlusIcon } from "@humansignal/icons";
+import { PlusIcon, XIcon } from "@humansignal/icons";
 import { FilterDropdown } from "../FilterDropdown";
 import "./FilterLine.prefix.css";
 import { FilterOperation } from "./FilterOperation";
-import { Icon } from "../../Common/Icon/Icon";
-import {
-  ColumnPicker,
-  ColumnPickerOptionContent,
-  RECENT_COLUMN_PREFIX,
-  getFilterGroupTitle,
-} from "../../Common/ColumnPicker";
+import { ColumnPicker, ColumnPickerOptionContent, RECENT_COLUMN_PREFIX } from "../../Common/ColumnPicker";
 
 const RECENTS_AUTOSAVE_DELAY_MS = 500;
+/** Chrome action icons in the Filters pane (remove, add child, pin/unpin). */
+export const FILTER_CHROME_ICON_SIZE = 20;
 
 export const isFilterEditingDisabled = (field) => field?.disabled || field?.filter_available === false;
+
+/** Title-case label for the shared view conjunction ("and" | "or"). */
+export const formatConjunctionLabel = (conjunction) => (conjunction === "or" ? "Or" : "And");
 
 export const UnavailableFilterNotice = ({ reason }) => (
   <Typography
@@ -30,16 +29,31 @@ export const UnavailableFilterNotice = ({ reason }) => (
   </Typography>
 );
 
+const ConjunctionLabel = ({ children }) => (
+  <Typography as="span" variant="body" size="smaller" className="block w-full text-right">
+    {children}
+  </Typography>
+);
+
+/**
+ * Row 1: editable And/Or (shared across all top-level filters).
+ * Rows 2+: static text matching view.conjunction — avoids a disabled Select that looks broken.
+ */
 const Conjunction = observer(({ index, view, disabled }) => {
+  const label = formatConjunctionLabel(view.conjunction);
+
+  if (index > 1) {
+    return <ConjunctionLabel>{label}</ConjunctionLabel>;
+  }
+
   return (
     <FilterDropdown
       items={[
         { value: "and", label: "And" },
         { value: "or", label: "Or" },
       ]}
-      disabled={index > 1 || disabled}
+      disabled={disabled}
       value={view.conjunction}
-      style={{ textAlign: "right" }}
       onChange={(value) => view.setConjunction(value)}
     />
   );
@@ -81,21 +95,24 @@ const FilterColumnPicker = observer(
         placeholder={filter.field?.title || "Column"}
         size="small"
         disabled={disabled || isFilterEditingDisabled(filter.field)}
-        triggerProps={{
-          style: { minWidth: 80 },
-        }}
         renderSelected={(selectedOptions, placeholder) => {
           const opt = selectedOptions?.[0];
           if (!opt)
             return (
-              <Typography as="span" variant="body" size="smallest">
+              <Typography as="span" variant="body" size="smallest" className="truncate block min-w-0">
                 {placeholder}
               </Typography>
             );
-          const field = filter.field;
-          const rawGroup = field ? getFilterGroupTitle(field) : null;
-          const groupTitle = rawGroup ? rawGroup.charAt(0).toUpperCase() + rawGroup.slice(1) : undefined;
-          return <ColumnPickerOptionContent option={{ ...opt, groupTitle }} />;
+          // Closed trigger shows Group > Field (same as Recent items); label truncates when narrow.
+          return (
+            <ColumnPickerOptionContent
+              option={{
+                ...opt,
+                groupTitle: opt.groupTitle ?? opt.group ?? undefined,
+              }}
+              truncate
+            />
+          );
         }}
       />
     );
@@ -186,6 +203,8 @@ export const FilterLine = observer(
       return () => clearTimeout(saveTimerRef.current);
     }, [filterId, filterOperator, filterValue, isValid, onSaveOnSwitch]);
 
+    const showNest = childFilters.length > 0 || canConfigureChildren;
+
     return (
       <div
         className={cn("filterLine")
@@ -195,9 +214,7 @@ export const FilterLine = observer(
       >
         <div className={cn("filterLine").elem("column").mix("conjunction").toClassName()}>
           {index === 0 ? (
-            <Typography as="span" variant="body" size="smallest" className="pr-tightest">
-              Where
-            </Typography>
+            <ConjunctionLabel>Where</ConjunctionLabel>
           ) : (
             <Conjunction index={index} view={view} disabled={disabled} />
           )}
@@ -225,7 +242,8 @@ export const FilterLine = observer(
         <div className={cn("filterLine").elem("remove").toClassName()}>
           <Button
             look="string"
-            size="small"
+            variant="negative"
+            size="smaller"
             disabled={disabled}
             tooltip={lockTooltip}
             onClick={(event) => {
@@ -233,77 +251,88 @@ export const FilterLine = observer(
               filter.delete();
             }}
             aria-label="Remove filter"
-            icon={<Icon icon={IconClose} size={12} />}
+            data-testid="filter-line-remove"
+            icon={<XIcon size={FILTER_CHROME_ICON_SIZE} aria-hidden="true" />}
           />
         </div>
 
         {unavailableReason && <UnavailableFilterNotice reason={unavailableReason} />}
 
-        {childFilters.map((childFilter) => {
-          const childAliasIsAllowed = configuredChildAliases.includes(childFilter.field.alias);
-          const childIsDisabled =
-            isDisabled || !canConfigureChildren || !childAliasIsAllowed || isFilterEditingDisabled(childFilter.field);
-          const childUnavailableReason =
-            childFilter.field.filter_available === false ? childFilter.field.unavailable_reason : null;
+        {/* Nest under the field column so children read as refinements of the parent, not peers */}
+        {showNest && (
+          <div className={cn("filterLine").elem("nest").toClassName()} data-testid="filter-line-nest">
+            {childFilters.map((childFilter) => {
+              const childAliasIsAllowed = configuredChildAliases.includes(childFilter.field.alias);
+              const childIsDisabled =
+                isDisabled ||
+                !canConfigureChildren ||
+                !childAliasIsAllowed ||
+                isFilterEditingDisabled(childFilter.field);
+              const childUnavailableReason =
+                childFilter.field.filter_available === false ? childFilter.field.unavailable_reason : null;
 
-          return (
-            <React.Fragment key={childFilter.id}>
-              <div className={cn("filterLine").elem("column").mix("conjunction").toClassName()}>
-                <Typography as="span" variant="body" size="smallest" className="pr-tightest">
-                  and
-                </Typography>
-              </div>
+              return (
+                <React.Fragment key={childFilter.id}>
+                  <div className={cn("filterLine").elem("column").mix("conjunction").toClassName()}>
+                    <ConjunctionLabel>And</ConjunctionLabel>
+                  </div>
 
-              <div className={cn("filterLine").elem("column").mix("field child-field").toClassName()}>
-                <FilterDropdown
-                  placeholder={childFilter.field.title}
-                  value={childFilter.filter.id}
-                  items={childColumnItems}
-                  disabled={childIsDisabled}
-                  onChange={(filterTypeId) => childFilter.setFilterDelayed(filterTypeId)}
-                />
-              </div>
+                  <div className={cn("filterLine").elem("column").mix("field").toClassName()}>
+                    <FilterDropdown
+                      placeholder={childFilter.field.title}
+                      value={childFilter.filter.id}
+                      items={childColumnItems}
+                      disabled={childIsDisabled}
+                      onChange={(filterTypeId) => childFilter.setFilterDelayed(filterTypeId)}
+                    />
+                  </div>
 
-              <FilterOperation
-                filter={childFilter}
-                value={childFilter.currentValue}
-                operator={childFilter.operator}
-                field={childFilter.field}
-                disabled={childIsDisabled}
-              />
+                  <FilterOperation
+                    filter={childFilter}
+                    value={childFilter.currentValue}
+                    operator={childFilter.operator}
+                    field={childFilter.field}
+                    disabled={childIsDisabled}
+                  />
 
-              <div className={cn("filterLine").elem("remove").toClassName()}>
+                  <div className={cn("filterLine").elem("remove").toClassName()}>
+                    <Button
+                      look="string"
+                      variant="negative"
+                      size="smaller"
+                      disabled={disabled}
+                      tooltip={lockTooltip}
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        view.removeChildFilter(filter, childFilter);
+                      }}
+                      aria-label="Remove child filter"
+                      data-testid="filter-line-remove-child"
+                      icon={<XIcon size={FILTER_CHROME_ICON_SIZE} aria-hidden="true" />}
+                    />
+                  </div>
+
+                  {childUnavailableReason && <UnavailableFilterNotice reason={childUnavailableReason} />}
+                </React.Fragment>
+              );
+            })}
+
+            {canConfigureChildren && (
+              <div className={cn("filterLine").elem("child-actions").toClassName()}>
                 <Button
                   look="string"
-                  size="small"
-                  disabled={disabled}
-                  tooltip={lockTooltip}
-                  onClick={(event) => {
-                    event.stopPropagation();
-                    view.removeChildFilter(filter, childFilter);
-                  }}
-                  aria-label="Remove child filter"
-                  icon={<Icon icon={IconClose} size={12} />}
-                />
+                  size="smaller"
+                  disabled={isDisabled || !defaultChildFilterType}
+                  tooltip={disabled ? lockTooltip : unavailableReason}
+                  onClick={() => view.addChildFilter(filter, defaultChildFilterType)}
+                  data-testid="filter-line-add-child"
+                  className="text-neutral-content-subtle [&_em]:size-500"
+                  leading={<PlusIcon size={FILTER_CHROME_ICON_SIZE} className="shrink-0" aria-hidden="true" />}
+                >
+                  Add Child Filter
+                </Button>
               </div>
-
-              {childUnavailableReason && <UnavailableFilterNotice reason={childUnavailableReason} />}
-            </React.Fragment>
-          );
-        })}
-
-        {canConfigureChildren && (
-          <div className={cn("filterLine").elem("child-actions").toClassName()}>
-            <Button
-              look="string"
-              size="small"
-              disabled={isDisabled || !defaultChildFilterType}
-              tooltip={disabled ? lockTooltip : unavailableReason}
-              onClick={() => view.addChildFilter(filter, defaultChildFilterType)}
-              leading={<PlusIcon size={14} weight="bold" aria-hidden="true" />}
-            >
-              Add child filter
-            </Button>
+            )}
           </div>
         )}
       </div>

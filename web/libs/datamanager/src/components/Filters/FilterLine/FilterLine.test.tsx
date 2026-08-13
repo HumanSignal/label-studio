@@ -4,7 +4,7 @@ import { destroy, types, unprotect } from "mobx-state-tree";
 import { afterEach, describe, expect, it, mock } from "bun:test";
 import { observer } from "mobx-react";
 import { TabStore } from "../../../stores/Tabs/store";
-import { FilterLine, UnavailableFilterNotice, isFilterEditingDisabled } from "./FilterLine";
+import { FilterLine, UnavailableFilterNotice, formatConjunctionLabel, isFilterEditingDisabled } from "./FilterLine";
 import { useRecentFilters } from "../../../hooks/useRecentFilters";
 import { filtersToPickerGroups } from "../../Common/ColumnPicker";
 
@@ -272,7 +272,8 @@ describe("multiple child filter controls (FIT-2273)", () => {
 
     const childColumnDropdown = screen.getByRole("button", { name: "Annotators" });
     expect(childColumnDropdown).toBeEnabled();
-    expect(screen.getByRole("button", { name: "Add child filter" })).toBeEnabled();
+    expect(screen.getByRole("button", { name: "Add Child Filter" })).toBeEnabled();
+    expect(screen.getByTestId("filter-line-add-child")).toBeEnabled();
 
     const originalScrollIntoView = Element.prototype.scrollIntoView;
     Element.prototype.scrollIntoView = mock();
@@ -354,6 +355,73 @@ describe("locked filter value controls (FIT-2447)", () => {
     expect(setup.filter.currentValue).toEqual(["positive"]);
     expect(screen.queryByRole("button", { name: "All" })).toBeNull();
     expect(screen.queryByRole("button", { name: "None" })).toBeNull();
+  });
+});
+
+describe("Filters pane chrome UX (FIT-2448)", () => {
+  let root: ReturnType<typeof RootStore.create> | null = null;
+
+  afterEach(() => {
+    if (root) destroy(root);
+    root = null;
+  });
+
+  it("keeps remove controls labeled and consistent conjunction typography for child rows", () => {
+    const setup = createMultiChildFilter({ childCount: 1 });
+    root = setup.root;
+    renderFilterLine(setup.view, false);
+
+    expect(screen.getByTestId("filter-line-remove")).toHaveAccessibleName("Remove filter");
+    expect(screen.getByTestId("filter-line-remove-child")).toHaveAccessibleName("Remove child filter");
+    expect(screen.getByTestId("filter-line-add-child")).toHaveTextContent("Add Child Filter");
+    expect(screen.getByText("Where")).toBeInTheDocument();
+    expect(screen.getByText("And")).toBeInTheDocument();
+  });
+
+  it("renders remove controls as negative string buttons at the field height", () => {
+    const setup = createMultiChildFilter({ childCount: 1 });
+    root = setup.root;
+    renderFilterLine(setup.view, false);
+
+    for (const testId of ["filter-line-remove", "filter-line-remove-child"]) {
+      const button = screen.getByTestId(testId);
+      expect(button).toHaveAttribute("data-variant", "negative");
+      expect(button).toHaveAttribute("data-look", "string");
+      expect(button.className).toContain("size-smaller");
+    }
+  });
+
+  it("uses static conjunction text on rows after the first And/Or control", () => {
+    const setup = createMultiChildFilter({ childCount: 0 });
+    root = setup.root;
+    unprotect(root);
+    setup.view.createFilter();
+    setup.view.createFilter();
+    setup.view.setConjunction("or");
+    renderFilterLine(setup.view, false);
+
+    expect(formatConjunctionLabel("or")).toBe("Or");
+    expect(formatConjunctionLabel("and")).toBe("And");
+    // Row 0: Where; row 1: editable Or select; row 2+: static "Or" (not a disabled select)
+    expect(screen.getByText("Where")).toBeInTheDocument();
+    const orLabels = screen.getAllByText("Or");
+    expect(orLabels.length).toBeGreaterThanOrEqual(2);
+    // Only one conjunction dropdown (row 1); later rows are plain text
+    const conjunctionButtons = screen
+      .getAllByRole("button")
+      .filter((el) => el.textContent === "Or" || el.textContent === "And");
+    expect(conjunctionButtons).toHaveLength(1);
+  });
+
+  it("nests child filters under the parent field column", () => {
+    const setup = createMultiChildFilter({ childCount: 1 });
+    root = setup.root;
+    renderFilterLine(setup.view, false);
+
+    const nest = screen.getByTestId("filter-line-nest");
+    expect(nest).toBeInTheDocument();
+    expect(nest).toContainElement(screen.getByRole("button", { name: "Annotators" }));
+    expect(nest).toContainElement(screen.getByTestId("filter-line-add-child"));
   });
 });
 

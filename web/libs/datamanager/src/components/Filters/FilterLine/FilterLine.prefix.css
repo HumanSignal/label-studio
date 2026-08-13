@@ -4,38 +4,64 @@
   min-width: 0;
   max-width: 100%;
 
-  /* Apply the same grid layout as the parent filters container */
   display: grid;
-  grid-template-columns: 80px minmax(120px, max-content) minmax(100px, max-content) minmax(0, 1fr) 24px;
-  grid-gap: var(--spacing-tightest);
-  align-items: start;
+  grid-column: 1 / -1;
+  grid-template-columns: subgrid;
+  column-gap: inherit;
+  row-gap: var(--spacing-tightest);
+  align-items: center;
+
+  /* Spacing only — no row hairlines (list uses gap) */
+  padding-block: 0;
 
   &__remove {
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-top: -4px;
-
-    .button-dm {
-      height: 24px;
-      width: 24px;
-      padding: 0;
-      flex: none;
-    }
+    height: 24px;
   }
 
   &__column {
     min-height: 24px;
+    min-width: 0;
+
+    & > * {
+      width: 100%;
+      max-width: 100%;
+    }
 
     &.conjunction {
       display: flex;
       align-items: center;
       justify-content: flex-end;
+      padding-right: var(--spacing-tightest);
+      color: var(--color-neutral-content-subtler);
+
+      button {
+        padding-left: var(--spacing-tighter);
+        gap: var(--spacing-tighter);
+        padding-block: 0;
+        width: 100%;
+        min-width: 0;
+        --focus-shadow: 0 0 0 2px var(--color-primary-focus-outline);
+      }
+
+      [data-testid="select-display-value"] {
+        justify-content: flex-end;
+        text-align: right;
+      }
     }
 
     &.operation {
       display: flex;
       align-items: center;
+
+      button {
+        padding-inline: var(--spacing-tighter);
+        gap: var(--spacing-tighter);
+        padding-block: 0;
+        --focus-shadow: 0 0 0 2px var(--color-primary-focus-outline);
+      }
     }
 
     &.value {
@@ -43,13 +69,65 @@
       align-items: center;
       min-width: 0;
       max-width: 100%;
-      overflow: hidden;
+
+      button {
+        padding-inline: var(--spacing-tighter);
+        gap: var(--spacing-tighter);
+        padding-block: 0;
+        --focus-shadow: 0 0 0 2px var(--color-primary-focus-outline);
+
+        &:focus {
+          box-shadow: 0 0 0 2px var(--color-primary-focus-outline) !important;
+        }
+      }
     }
 
     &.field {
       display: flex;
       align-items: center;
+      min-width: 0;
+
+      button {
+        padding-inline: var(--spacing-tighter);
+        gap: var(--spacing-tighter);
+        padding-block: 0;
+        min-width: 0;
+        --focus-shadow: 0 0 0 2px var(--color-primary-focus-outline);
+
+        &:focus {
+          box-shadow: 0 0 0 2px var(--color-primary-focus-outline) !important;
+        }
+      }
+
+      [data-testid="select-display-value"] {
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
     }
+  }
+
+  /*
+   * Child refinements sit under the field column (not the conjunction column),
+   * with a quiet left rail — hierarchy without boxing the parent in a card.
+   */
+  &__nest {
+    grid-column: 2 / -1;
+    display: grid;
+    grid-template-columns:
+      calc(var(--filter-col-conjunction) - var(--spacing-base))
+      calc(var(--filter-col-field) - var(--filter-col-conjunction) + var(--spacing-tightest))
+      var(--filter-col-operation)
+      minmax(0, 1fr)
+      var(--filter-col-remove);
+    column-gap: var(--spacing-tighter);
+    row-gap: var(--spacing-tightest);
+    align-items: center;
+    margin-block-start: var(--spacing-tightest);
+    padding-block: var(--spacing-tightest);
+    padding-inline-start: var(--spacing-tight);
+    border-inline-start: 2px solid var(--color-neutral-border);
   }
 
   &__unavailable {
@@ -58,14 +136,14 @@
     padding-block: var(--spacing-tightest);
   }
 
-  &__child-actions {
-    grid-column: 2 / -1;
-    display: flex;
-    align-items: center;
+  &__nest &__unavailable {
+    grid-column: 1 / -1;
   }
 
-  .selectTrigger {
-    padding: 0 4px;
+  &__child-actions {
+    grid-column: 1 / -1;
+    display: flex;
+    align-items: center;
   }
 
   .datepicker {

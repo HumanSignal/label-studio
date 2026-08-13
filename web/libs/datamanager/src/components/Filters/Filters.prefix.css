@@ -1,11 +1,19 @@
 .filters {
+  --filter-col-conjunction: 60px;
+  --filter-col-field: 210px;
+  --filter-col-operation: 100px;
+  --filter-col-remove: 28px;
+
   background-color: var(--color-neutral-background);
   position: relative;
 
   &:not(&_sidebar) {
+    display: flex;
+    flex-direction: column;
     padding-top: var(--spacing-tight);
-    min-width: 400px;
-    max-width: min(640px, calc(100vw - 32px));
+    min-width: 480px;
+    max-width: min(720px, calc(100vw - 32px));
+    max-height: min(70vh, 720px);
     overflow-x: hidden;
     border-radius: var(--corner-radius-small);
     box-shadow:
@@ -16,6 +24,8 @@
 
   &_sidebar {
     width: 100%;
+    --filter-col-field: 210px;
+    --filter-col-operation: 116px;
 
     .filterLine {
       .datepicker__output_range {
@@ -32,9 +42,11 @@
   &__actions {
     display: flex;
     align-items: center;
-    margin-top: var(--spacing-base);
-    padding: 0 var(--spacing-tight) var(--spacing-tight);
+    flex-shrink: 0;
+    margin-top: 0;
+    padding: var(--spacing-tight);
     justify-content: space-between;
+    border-top: 1px solid var(--color-neutral-border-subtle);
 
     .button-dm {
       border: 1px solid var(--color-neutral-border);
@@ -49,6 +61,9 @@
     display: flex;
     align-items: center;
     gap: 2px;
+    padding-inline-start: var(--spacing-tight);
+    margin-inline-start: var(--spacing-tight);
+    border-inline-start: 1px solid var(--color-neutral-border-subtle);
   }
 
   &__empty {
@@ -58,22 +73,43 @@
   }
 
   &__list {
-    padding: var(--spacing-tight) var(--spacing-tight) var(--spacing-tighter);
+    padding: var(--spacing-tight) var(--spacing-tight) var(--spacing-base);
 
+    /* Shared column tracks — each FilterLine row uses subgrid */
     &_withFilters {
-      display: flex;
-      flex-flow: column nowrap;
-      gap: var(--spacing-tight);
+      display: grid;
+      grid-template-columns:
+        var(--filter-col-conjunction)
+        var(--filter-col-field)
+        var(--filter-col-operation)
+        minmax(0, 1fr)
+        var(--filter-col-remove);
+      column-gap: var(--spacing-tighter);
+      row-gap: var(--spacing-tight);
     }
+  }
+
+  /* Popover: scroll the filter list; keep actions pinned below */
+  &:not(&_sidebar) &__list {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    max-height: min(60vh, 560px);
   }
 
   &_sidebar &__list {
     padding: var(--spacing-base) var(--spacing-tight) var(--spacing-tighter);
 
     &_withFilters {
-      display: flex;
-      flex-flow: column nowrap;
-      gap: var(--spacing-tight);
+      display: grid;
+      grid-template-columns:
+        var(--filter-col-conjunction)
+        var(--filter-col-field)
+        var(--filter-col-operation)
+        minmax(0, 1fr)
+        var(--filter-col-remove);
+      column-gap: var(--spacing-tightest);
+      row-gap: var(--spacing-tight);
     }
   }
 }

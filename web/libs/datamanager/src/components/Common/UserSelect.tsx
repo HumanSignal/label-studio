@@ -6,6 +6,7 @@ import { Select, Tooltip, Typography, Userpic } from "@humansignal/ui";
 import { cn } from "../../utils/bem";
 import { SelectSize } from "@humansignal/ui/lib/select/types";
 import { userDisplayName } from "@humansignal/core/lib/utils/helpers";
+import "./UserSelect.prefix.css";
 
 const DEBOUNCE_DELAY = 300;
 
