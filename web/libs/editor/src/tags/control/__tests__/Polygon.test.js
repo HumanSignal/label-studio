@@ -6,6 +6,8 @@ mockModule("../../../core/Hotkey", () => {
   Hotkey.setScope = mock();
   Hotkey.DEFAULT_SCOPE = "all";
   Hotkey.keymap = {};
+  Hotkey.namespaces = () => ({});
+  Hotkey.unbindAll = mock();
   Hotkey._testInstance = instance;
   return {
     __esModule: true,
