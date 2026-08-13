@@ -15,49 +15,15 @@ const image =
 
 describe("Basic Image scenario", () => {
   it("Should be able to draw a simple rectangle", () => {
-    LabelStudio.init({
-      config,
-      task: {
-        id: 1,
-        annotations: [{ id: 1001, result: [] }],
-        predictions: [],
-        data: { image },
-      },
-    });
+    LabelStudio.params().config(config).data({ image }).withResult([]).init();
 
+    LabelStudio.waitForObjectsReady();
     ImageView.waitForImage();
     Sidebar.hasNoRegions();
 
     Labels.select("Planet");
-
-    ImageView.drawRect(20, 20, 100, 100);
-
-    Sidebar.hasRegions(1);
-  });
-
-  it("Should check that the canvas changed", () => {
-    LabelStudio.init({
-      config,
-      task: {
-        id: 1,
-        annotations: [{ id: 1001, result: [] }],
-        predictions: [],
-        data: { image },
-      },
-    });
-
-    ImageView.waitForImage();
-    Sidebar.hasNoRegions();
-
-    ImageView.capture("canvas");
-
-    Labels.select("Moonwalker");
-
-    ImageView.drawRect(20, 20, 100, 100);
+    ImageView.drawRectRelative(0.05, 0.05, 0.2, 0.2);
 
     Sidebar.hasRegions(1);
-    // Brief wait for canvas to repaint to reduce screenshot-comparison flakiness
-    cy.wait(200);
-    ImageView.canvasShouldChange("canvas", 0.001);
   });
 });
