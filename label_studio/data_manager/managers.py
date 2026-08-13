@@ -210,9 +210,16 @@ KNOWN_FILTER_VALUE_TYPES = {
     'reviewed': 'bool',
 }
 
-# Fields supported by the public `in_list` / `not_in_list` operators (BROS-1203).
+# Fields supported by the public `in_list` / `not_in_list` operators (BROS-1203 / FIT-2416).
 # `data__*` keys are accepted via _is_supported_in_list_field.
-SUPPORTED_IN_LIST_FIELDS = {'id', 'inner_id'}
+# Number counter columns use Django `__in` directly (avoids N OR'd equal filters).
+SUPPORTED_IN_LIST_FIELDS = {
+    'id',
+    'inner_id',
+    'total_annotations',
+    'total_predictions',
+    'cancelled_annotations',
+}
 
 
 def get_fields_for_filter_ordering(prepare_params):
@@ -373,6 +380,45 @@ def get_fields_for_evaluation(prepare_params, user, skip_regular=True):
     return result
 
 
+def get_visible_data_column_keys(prepare_params, user):
+    """Return task.data keys that are visible in the current DM view, or None if unrestricted.
+
+    When ``hiddenColumns`` is present, keys hidden in both explore and labeling modes are
+    excluded so list responses can skip URI resolution / payload for those columns (FIT-2416).
+    Returns None when visibility cannot be determined (no hiddenColumns / multi-project).
+    """
+    if prepare_params is None or getattr(prepare_params, 'is_multi_project', False):
+        return None
+    data = getattr(prepare_params, 'data', None) or {}
+    hidden_columns = data.get('hiddenColumns')
+    if not hidden_columns:
+        return None
+
+    from projects.models import Project
+
+    from label_studio.data_manager.functions import TASKS
+
+    GET_ALL_COLUMNS = load_func(settings.DATA_MANAGER_GET_ALL_COLUMNS)
+    project = Project.objects.get(id=prepare_params.project)
+    all_columns = GET_ALL_COLUMNS(project, user)['columns']
+    data_column_ids = {c['id'] for c in all_columns if c.get('parent') == 'data'}
+    if not data_column_ids:
+        return frozenset()
+
+    hidden = set(hidden_columns.get('explore', [])) & set(hidden_columns.get('labeling', []))
+    # hiddenColumns store ids as ``tasks:data.<key>`` or ``tasks:<id>`` for non-data.
+    hidden_data_keys = set()
+    prefix = f'{TASKS}data.'
+    for column_id in hidden:
+        if column_id.startswith(prefix):
+            hidden_data_keys.add(column_id[len(prefix) :])
+        elif column_id.startswith(TASKS) and column_id[len(TASKS) :] in data_column_ids:
+            # Rare: data child listed without data. prefix
+            hidden_data_keys.add(column_id[len(TASKS) :])
+
+    return frozenset(data_column_ids - hidden_data_keys)
+
+
 def apply_ordering(queryset, ordering, project, request, view_data=None):
     if ordering:
         preprocess_field_name = load_func(settings.PREPROCESS_FIELD_NAME)
@@ -515,7 +561,8 @@ def validate_in_list_filter(_filter, field_name: str) -> str:
         return 'ok'
     if not _is_supported_in_list_field(field_name):
         raise ValidationError(
-            '`is any of` / `is none of` support only Task ID, Inner ID, and task.data.* fields in this release.'
+            '`is any of` / `is none of` support Task ID, Inner ID, annotation/prediction counters, '
+            'and task.data.* fields.'
         )
     if not isinstance(_filter.value, list):
         raise ValidationError('Filter value must be a list for `is any of` / `is none of`.')

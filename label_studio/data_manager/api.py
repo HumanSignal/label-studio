@@ -2,7 +2,6 @@
 
 import logging
 
-from asgiref.sync import async_to_sync, sync_to_async
 from core.current_request import CurrentContext
 from core.feature_flags import flag_set
 from core.permissions import ViewClassPermission, all_permissions
@@ -10,7 +9,7 @@ from core.utils.common import int_from_request, load_func
 from core.utils.params import bool_from_request
 from data_manager.actions import get_action_form, get_all_actions, perform_action
 from data_manager.functions import evaluate_predictions, get_prepare_params
-from data_manager.managers import get_fields_for_evaluation
+from data_manager.managers import get_fields_for_evaluation, get_visible_data_column_keys
 from data_manager.models import View
 from data_manager.serializers import (
     DataManagerTaskSerializer,
@@ -35,7 +34,7 @@ from rest_framework.decorators import action
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from tasks.models import Annotation, Prediction, Task
+from tasks.models import Annotation, Task
 from tasks.ordering import (
     get_task_children_prefetch,
     parse_annotations_ordering_request,
@@ -292,31 +291,20 @@ class ViewAPI(viewsets.ModelViewSet):
 
 
 class TaskPagination(PageNumberPagination):
+    """Paginate DM task lists and compute annotation/prediction totals.
+
+    Totals use a single Sum over denormalized ``Task.total_annotations`` /
+    ``Task.total_predictions`` (via ``paginate_totals_queryset``). The old
+    ``sync_paginate_queryset`` / ``async_paginate_queryset`` helpers that ran
+    separate ``Prediction`` / ``Annotation`` COUNT queries over
+    ``task_id__in=queryset`` were unused on the live path and removed (FIT-2416).
+    """
+
     page_size = 100
     page_size_query_param = 'page_size'
     total_annotations = 0
     total_predictions = 0
     max_page_size = settings.TASK_API_PAGE_SIZE_MAX
-
-    @async_to_sync
-    async def async_paginate_queryset(self, queryset, request, view=None):
-        predictions_count_qs = Prediction.objects.filter(task_id__in=queryset)
-        self.total_predictions = await sync_to_async(predictions_count_qs.count, thread_sensitive=True)()
-
-        annotations_count_qs = Annotation.objects.filter(task_id__in=queryset, was_cancelled=False)
-        self.total_annotations = await sync_to_async(annotations_count_qs.count, thread_sensitive=True)()
-        # Use .only('id') to avoid loading heavy task.data fields during pagination
-        # Full task objects are loaded later with proper annotations
-        id_only_queryset = queryset.only('id')
-        return await sync_to_async(super().paginate_queryset, thread_sensitive=True)(id_only_queryset, request, view)
-
-    def sync_paginate_queryset(self, queryset, request, view=None):
-        self.total_predictions = Prediction.objects.filter(task_id__in=queryset).count()
-        self.total_annotations = Annotation.objects.filter(task_id__in=queryset, was_cancelled=False).count()
-        # Use .only('id') to avoid loading heavy task.data fields during pagination
-        # Full task objects are loaded later with proper annotations
-        id_only_queryset = queryset.only('id')
-        return super().paginate_queryset(id_only_queryset, request, view)
 
     def paginate_totals_queryset(self, queryset, request, view=None):
         totals = queryset.values('id').aggregate(
@@ -390,10 +378,10 @@ class TaskListAPI(generics.ListCreateAPIView):
             fields_for_evaluation.append('state')
         return fields_for_evaluation
 
-    def get_task_serializer_context(self, request, project, queryset):
+    def get_task_serializer_context(self, request, project, queryset, prepare_params=None):
         all_fields = request.GET.get('fields', None) == 'all'  # false by default
 
-        return {
+        context = {
             'resolve_uri': bool_from_request(request.GET, 'resolve_uri', True),
             'request': request,
             'project': project,
@@ -402,6 +390,11 @@ class TaskListAPI(generics.ListCreateAPIView):
             'annotations': all_fields,
             'annotations_ordering': parse_annotations_ordering_request(request),
         }
+        if prepare_params is not None:
+            visible_data_keys = get_visible_data_column_keys(prepare_params, request.user)
+            if visible_data_keys is not None:
+                context['dm_visible_data_keys'] = visible_data_keys
+        return context
 
     def get_task_queryset(self, request, prepare_params):
         return Task.prepared.only_filtered(prepare_params=prepare_params)
@@ -481,7 +474,7 @@ class TaskListAPI(generics.ListCreateAPIView):
                 evaluate_predictions(tasks_for_predictions)
                 [tasks_by_ids[_id].refresh_from_db() for _id in ids]
 
-            context = self.get_task_serializer_context(self.request, project, tasks)
+            context = self.get_task_serializer_context(self.request, project, tasks, prepare_params=prepare_params)
             serializer = self.task_serializer_class(page, many=True, context=context)
             return self.get_paginated_response(serializer.data)
         # all tasks
@@ -490,7 +483,7 @@ class TaskListAPI(generics.ListCreateAPIView):
         queryset = Task.prepared.annotate_queryset(
             queryset, fields_for_evaluation=fields_for_evaluation, all_fields=all_fields, request=request
         )
-        context = self.get_task_serializer_context(self.request, project, queryset)
+        context = self.get_task_serializer_context(self.request, project, queryset, prepare_params=prepare_params)
         serializer = self.task_serializer_class(queryset, many=True, context=context)
         return Response(serializer.data)
 

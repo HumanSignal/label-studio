@@ -1,7 +1,7 @@
 """Test data_manager.api module functionality.
 
-This file tests the TaskPagination class optimizations that prevent
-loading heavy task.data fields during pagination.
+This file tests TaskPagination: .only('id') during pagination and the
+single-Sum totals path (FIT-2416) used by the live DM list endpoint.
 """
 
 from unittest.mock import MagicMock, patch
@@ -16,7 +16,7 @@ from projects.tests.factories import ProjectFactory
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.test import APITestCase
 from tasks.models import Annotation, Task
-from tasks.tests.factories import AnnotationFactory, TaskFactory
+from tasks.tests.factories import AnnotationFactory, PredictionFactory, TaskFactory
 from users.tests.factories import UserFactory
 
 
@@ -37,90 +37,126 @@ class TestTaskPaginationMemoryOptimization(TestCase):
         self.mock_request = MagicMock()
         self.mock_request.query_params = {'page': '1', 'page_size': '30'}
 
-    def test_sync_paginate_queryset_uses_only_id(self):
-        """Test sync_paginate_queryset applies .only('id') optimization.
+    def test_live_path_uses_sum_aggregate_and_only_id(self):
+        """FIT-2416: live pagination uses Sum over task counters and .only('id') for the page.
 
-        This test validates:
-        - The queryset passed to parent's paginate_queryset has .only('id') applied
-        - Count queries still work with the original queryset
-        - The optimization is always applied (no feature flag)
-        """
-        mock_queryset = MagicMock()
-        mock_id_only_queryset = MagicMock()
-        mock_queryset.only.return_value = mock_id_only_queryset
-
-        with patch('data_manager.api.Prediction') as mock_prediction:
-            with patch('data_manager.api.Annotation') as mock_annotation:
-                # Setup count mocks
-                mock_prediction.objects.filter.return_value.count.return_value = 10
-                mock_annotation.objects.filter.return_value.count.return_value = 5
-
-                # Mock the parent's paginate_queryset
-                with patch.object(PageNumberPagination, 'paginate_queryset', return_value=[]) as mock_parent_paginate:
-                    self.pagination.sync_paginate_queryset(mock_queryset, self.mock_request)
-
-                    # Verify .only('id') was called on the queryset
-                    mock_queryset.only.assert_called_once_with('id')
-
-                    # Verify parent's paginate_queryset was called with the id-only queryset
-                    mock_parent_paginate.assert_called_once()
-                    call_args = mock_parent_paginate.call_args
-                    assert call_args[0][0] is mock_id_only_queryset
-
-    def test_paginate_totals_queryset_uses_only_id(self):
-        """Test paginate_totals_queryset applies .only('id') optimization.
-
-        This test validates:
-        - Pagination totals use .only('id') for the page slice
-        - Aggregate queries work correctly
+        Totals must come from a single Sum aggregate over denormalized
+        task.total_annotations / total_predictions (not Prediction/Annotation COUNT).
+        The page slice must defer heavy task.data via .only('id').
         """
         mock_queryset = MagicMock()
         mock_id_only_queryset = MagicMock()
         mock_queryset.only.return_value = mock_id_only_queryset
         mock_queryset.values.return_value.aggregate.return_value = {
-            'total_annotations': 10,
-            'total_predictions': 5,
+            'total_annotations': 7,
+            'total_predictions': 3,
         }
 
         with patch.object(PageNumberPagination, 'paginate_queryset', return_value=[]) as mock_parent_paginate:
-            self.pagination.paginate_totals_queryset(mock_queryset, self.mock_request)
+            self.pagination.paginate_queryset(mock_queryset, self.mock_request)
 
-            # Verify .only('id') was called on the queryset
-            mock_queryset.only.assert_called_once_with('id')
+        mock_queryset.values.assert_called_once_with('id')
+        mock_queryset.values.return_value.aggregate.assert_called_once()
+        mock_queryset.only.assert_called_once_with('id')
+        mock_parent_paginate.assert_called_once_with(mock_id_only_queryset, self.mock_request, None)
+        assert self.pagination.total_annotations == 7
+        assert self.pagination.total_predictions == 3
 
-            # Verify parent's paginate_queryset was called with the id-only queryset
-            mock_parent_paginate.assert_called_once()
-            call_args = mock_parent_paginate.call_args
-            assert call_args[0][0] is mock_id_only_queryset
+    def test_legacy_triple_count_paginate_helpers_removed(self):
+        """Dead sync/async COUNT helpers must not remain on TaskPagination."""
+        assert not hasattr(TaskPagination, 'sync_paginate_queryset')
+        assert not hasattr(TaskPagination, 'async_paginate_queryset')
 
-    def test_count_queries_use_original_queryset(self):
-        """Test that count queries use the original queryset (for correct subqueries).
 
-        This test validates:
-        - Prediction count query uses the original queryset, not the .only('id') version
-        - Annotation count query uses the original queryset
-        - This ensures subquery counts work correctly
-        """
-        mock_queryset = MagicMock()
-        mock_id_only_queryset = MagicMock()
-        mock_queryset.only.return_value = mock_id_only_queryset
+class TestTaskPaginationTotalsIntegration(APITestCase):
+    """Integration: paginated DM response totals match Sum over filtered tasks."""
 
-        with patch('data_manager.api.Prediction') as mock_prediction:
-            with patch('data_manager.api.Annotation') as mock_annotation:
-                mock_prediction.objects.filter.return_value.count.return_value = 10
-                mock_annotation.objects.filter.return_value.count.return_value = 5
+    @classmethod
+    def setUpTestData(cls):
+        cls.project = ProjectFactory()
+        cls.owner = cls.project.created_by
+        cls.tasks = [
+            TaskFactory(project=cls.project, data={'text': f't{i}'}, total_annotations=0, total_predictions=0)
+            for i in range(4)
+        ]
 
-                with patch.object(PageNumberPagination, 'paginate_queryset', return_value=[]):
-                    self.pagination.sync_paginate_queryset(mock_queryset, self.mock_request)
+        # Task 0: 2 annotations + 1 prediction
+        AnnotationFactory(task=cls.tasks[0], project=cls.project, completed_by=cls.owner)
+        AnnotationFactory(task=cls.tasks[0], project=cls.project, completed_by=cls.owner)
+        PredictionFactory(task=cls.tasks[0], project=cls.project)
+        # Task 1: 1 cancelled (excluded) + 1 live annotation + 2 predictions
+        AnnotationFactory(task=cls.tasks[1], project=cls.project, completed_by=cls.owner, was_cancelled=True)
+        AnnotationFactory(task=cls.tasks[1], project=cls.project, completed_by=cls.owner)
+        PredictionFactory(task=cls.tasks[1], project=cls.project)
+        PredictionFactory(task=cls.tasks[1], project=cls.project)
+        # Task 2: predictions only
+        PredictionFactory(task=cls.tasks[2], project=cls.project)
 
-                    # Verify count queries used the ORIGINAL queryset (not id-only)
-                    mock_prediction.objects.filter.assert_called_once()
-                    prediction_filter_kwargs = mock_prediction.objects.filter.call_args[1]
-                    assert prediction_filter_kwargs['task_id__in'] is mock_queryset
+        for task in cls.tasks:
+            task.refresh_from_db()
 
-                    mock_annotation.objects.filter.assert_called_once()
-                    annotation_filter_kwargs = mock_annotation.objects.filter.call_args[1]
-                    assert annotation_filter_kwargs['task_id__in'] is mock_queryset
+    def test_dm_list_totals_match_annotated_sum(self):
+        """GET /api/tasks totals equal Sum of task counters for the filtered set."""
+        self.client.force_authenticate(self.owner)
+        expected_annotations = sum(t.total_annotations for t in self.tasks)
+        expected_predictions = sum(t.total_predictions for t in self.tasks)
+        assert expected_annotations == 3
+        assert expected_predictions == 4
+
+        response = self.client.get(
+            '/api/tasks/',
+            {'project': self.project.id, 'page_size': 2, 'page': 1},
+        )
+
+        assert response.status_code == 200
+        body = response.json()
+        assert body['total'] == 4
+        assert body['total_annotations'] == expected_annotations
+        assert body['total_predictions'] == expected_predictions
+        assert len(body['tasks']) == 2
+
+
+class TestTaskListVisibleDataPayload(APITestCase):
+    """FIT-2416: DM list omits task.data keys hidden in both explore and labeling."""
+
+    def test_hidden_data_columns_omitted_from_list_response(self):
+        """GET /api/tasks with View.hiddenColumns drops keys before URI resolve."""
+        from data_manager.models import View
+
+        project = ProjectFactory(
+            label_config="""
+            <View>
+              <Text name="text" value="$keep"/>
+              <Choices name="label" toName="text">
+                <Choice value="a"/>
+              </Choices>
+            </View>
+            """
+        )
+        task = TaskFactory(project=project, data={'keep': 'yes', 'drop': 'no'})
+        summary = project.summary
+        summary.all_data_columns = {'keep': 1, 'drop': 1}
+        summary.save(update_fields=['all_data_columns'])
+        view = View.objects.create(
+            project=project,
+            data={
+                'hiddenColumns': {
+                    'explore': ['tasks:data.drop'],
+                    'labeling': ['tasks:data.drop'],
+                }
+            },
+        )
+
+        self.client.force_authenticate(project.created_by)
+        response = self.client.get(
+            '/api/tasks/',
+            {'project': project.id, 'view': view.id, 'resolve_uri': '0', 'page_size': 10},
+        )
+
+        assert response.status_code == 200
+        task_payload = next(t for t in response.json()['tasks'] if t['id'] == task.id)
+        assert task_payload['data'] == {'keep': 'yes'}
+        assert 'drop' not in task_payload['data']
 
 
 class TestProjectUsersOptionsAPI(APITestCase):

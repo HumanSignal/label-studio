@@ -30,6 +30,14 @@ class TestColumnSupportsListMembership:
         """`filter:tasks:data` (no dot) is NOT a data.* field and must be rejected."""
         assert _column_supports_list_membership('filter:tasks:data') is False
 
+    def test_counter_columns_supported(self):
+        for column in (
+            'filter:tasks:total_annotations',
+            'filter:tasks:total_predictions',
+            'filter:tasks:cancelled_annotations',
+        ):
+            assert _column_supports_list_membership(column) is True, column
+
     def test_unsupported_columns(self):
         unsupported = [
             'filter:tasks:annotations_ids',
@@ -37,7 +45,6 @@ class TestColumnSupportsListMembership:
             'filter:tasks:reviewers',
             'filter:tasks:created_at',
             'filter:tasks:completed_at',
-            'filter:tasks:total_annotations',
             'filter:tasks:updated_by',
             'filter:tasks:payment_status',
         ]
