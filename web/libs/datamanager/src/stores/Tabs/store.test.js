@@ -454,8 +454,7 @@ describe("multiselect filter validation (FIT-2253)", () => {
     }
   });
 
-  it("persists clearing a root multiselect by omitting the invalid filter", async () => {
-    const apiCall = mock(async () => ({ id: 1, title: "Saved" }));
+  const setupAnnotatorsFilter = (apiCall, value = [1]) => {
     root = RootStore.create({
       viewsStore: {
         columnsRaw: [
@@ -478,16 +477,15 @@ describe("multiselect filter validation (FIT-2253)", () => {
       title: "Saved",
       saved: true,
       key: "saved",
-      filters: [
-        {
-          filter: "filter:tasks:annotators",
-          operator: "contains",
-          value: [1],
-        },
-      ],
+      filters: [{ filter: "filter:tasks:annotators", operator: "contains", value }],
     });
     root.viewsStore.selected = 1;
-    const filter = root.viewsStore.views[0].filters[0];
+    return root.viewsStore.views[0].filters[0];
+  };
+
+  it("persists clearing a root multiselect by omitting the invalid filter", async () => {
+    const apiCall = mock(async () => ({ id: 1, title: "Saved" }));
+    const filter = setupAnnotatorsFilter(apiCall);
 
     expect(filter.schema?.multiple).toBe(true);
     apiCall.mockClear();
@@ -568,6 +566,39 @@ describe("multiselect filter validation (FIT-2253)", () => {
 
     expect(child.isValidFilter).toBe(false);
     expect(apiCall).toHaveBeenCalled();
+  });
+
+  it("re-saves the latest value when save() races an in-flight PATCH", async () => {
+    let release;
+    const gate = new Promise((resolve) => {
+      release = resolve;
+    });
+    const values = [];
+    const apiCall = mock(async (method, _params, body) => {
+      if (method === "updateTab") {
+        values.push(body?.body?.data?.filters?.items?.[0]?.value);
+        if (values.length === 1) await gate;
+      }
+      return { id: 1, title: "Saved" };
+    });
+    const filter = setupAnnotatorsFilter(apiCall);
+
+    filter.setValue([2]);
+    const first = filter.save(true);
+    filter.setValue([2, 3]);
+    filter.save(true);
+    expect(filter.pendingSave).toBe(true);
+
+    release();
+    await first;
+    // Follow-up save is scheduled with setTimeout(0) after the first flow exits.
+    await new Promise((resolve) => {
+      const poll = () => (values.length >= 2 ? resolve() : setTimeout(poll, 0));
+      setTimeout(poll, 0);
+    });
+
+    expect(filter.pendingSave).toBe(false);
+    expect(values).toEqual([[2], [2, 3]]);
   });
 });
 

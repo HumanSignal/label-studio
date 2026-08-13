@@ -201,6 +201,9 @@ export const TabFilter = types
     wasValid: false,
     saved: false,
     saving: false,
+    // When save() races an in-flight PATCH, schedule one follow-up write after
+    // this flow exits (setTimeout) — no loop, no recursive yield.
+    pendingSave: false,
   }))
   .actions((self) => ({
     afterAttach() {
@@ -374,16 +377,34 @@ export const TabFilter = types
         return;
       }
 
-      if (self.saving) return;
+      // Coalesce races onto the in-flight PATCH. A follow-up is scheduled with
+      // setTimeout (same idea as setValueDelayed) so we neither recurse into
+      // this flow nor yield another save from finally.
+      if (self.saving) {
+        self.pendingSave = true;
+        return;
+      }
 
       self.saving = true;
       self.wasValid = isValid;
       self.markSaved();
       getRoot(self)?.unsetSelection();
       self.view?.clearSelection();
-      yield self.view?.save({ interaction: "filter" });
-      if (!isAlive(self)) return;
-      self.saving = false;
+      try {
+        yield self.view?.save({ interaction: "filter" });
+      } finally {
+        if (isAlive(self)) {
+          self.saving = false;
+          if (self.pendingSave) {
+            self.pendingSave = false;
+            self.markUnsaved();
+            setTimeout(() => {
+              if (!isAlive(self)) return;
+              self.save(true);
+            }, 0);
+          }
+        }
+      }
     }),
 
     setDefaultValue() {
