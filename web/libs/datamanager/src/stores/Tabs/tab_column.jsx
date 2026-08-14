@@ -1,3 +1,4 @@
+import i18next from "i18next";
 import { getRoot, getSnapshot, types } from "mobx-state-tree";
 import {
   IconCommentCheck,
@@ -51,22 +52,24 @@ const typeShortMap = {
 
 export const ViewColumnTypeShort = (type) => typeShortMap[type] || "str";
 
+// Maps the ViewColumnType identifier to a dataManager i18n key; resolved lazily
+// against the shared singleton so store code (non-React) picks up the active language.
 const typeNameMap = {
-  String: "String",
-  Number: "Number",
-  Boolean: "Boolean",
-  Datetime: "Date Time",
-  Image: "Image",
-  Audio: "Audio",
-  AudioPlus: "Audio",
-  Video: "Video",
-  Text: "Text",
-  HyperText: "Hyper Text",
-  TimeSeries: "Time Series",
-  Time: "Time",
+  String: "typeString",
+  Number: "typeNumber",
+  Boolean: "typeBoolean",
+  Datetime: "typeDateTime",
+  Image: "typeImage",
+  Audio: "typeAudio",
+  AudioPlus: "typeAudio",
+  Video: "typeVideo",
+  Text: "typeText",
+  HyperText: "typeHyperText",
+  TimeSeries: "typeTimeSeries",
+  Time: "typeTime",
 };
 
-export const ViewColumnTypeName = (type) => typeNameMap[type] || "String";
+export const ViewColumnTypeName = (type) => i18next.t(`dataManager:${typeNameMap[type] ?? "typeString"}`);
 
 export const TabColumn = types
   .model("ViewColumn", {
@@ -208,7 +211,7 @@ export const TabColumn = types
       // Show a friendly tag for per-dimension agreement columns
       if (typeof self.alias === "string") {
         if (self.alias.startsWith("dimension_agreement_")) {
-          return "agreement";
+          return i18next.t("dataManager:agreementBadge");
         }
       }
       return ViewColumnTypeShort(self.currentType);

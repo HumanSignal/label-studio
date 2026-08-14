@@ -1,6 +1,7 @@
 import { ArrowDownIcon, ArrowUpIcon } from "@humansignal/icons";
 import { Button, ButtonGroup, Tooltip } from "@humansignal/ui";
 import { inject, observer } from "mobx-react";
+import { useTranslation } from "react-i18next";
 import { ColumnPicker } from "../../Common/ColumnPicker";
 import { Space } from "../../Common/Space/Space";
 import "./OrderButton.prefix.css";
@@ -19,6 +20,7 @@ const injector = inject(({ store }) => {
 
 export const OrderButton = injector(
   observer(({ size, ordering, view, columns, ...rest }) => {
+    const { t } = useTranslation();
     const isLocked = view?.isLockedByManager;
     const lockedTooltip = view?.lockedUpdateMessage;
     const content = (
@@ -28,7 +30,7 @@ export const OrderButton = injector(
           columnFilter={orderableFilter}
           value={ordering?.field ?? null}
           onChange={(key) => view.setOrdering(key)}
-          placeholder="Order by"
+          placeholder={t("dataManager:orderBy")}
           disabled={isLocked}
           triggerProps={{
             style: {
@@ -37,14 +39,18 @@ export const OrderButton = injector(
           }}
         />
 
-        <Tooltip title={isLocked ? lockedTooltip : ordering?.desc ? "Sort ascending" : "Sort descending"}>
+        <Tooltip
+          title={
+            isLocked ? lockedTooltip : ordering?.desc ? t("dataManager:sortAscending") : t("dataManager:sortDescending")
+          }
+        >
           <Button
             size={size}
             look="outlined"
             variant="neutral"
             disabled={!ordering || isLocked}
             onClick={() => view.setOrdering(ordering?.field)}
-            aria-label={ordering?.desc ? "Sort ascending" : "Sort descending"}
+            aria-label={ordering?.desc ? t("dataManager:sortAscending") : t("dataManager:sortDescending")}
             data-testid="dm-order-button"
           >
             {ordering?.desc ? <ArrowUpIcon size={14} weight="bold" /> : <ArrowDownIcon size={14} weight="bold" />}

@@ -1,5 +1,6 @@
 import { inject, observer } from "mobx-react";
 import React, { useEffect, useRef } from "react";
+import { useTranslation } from "react-i18next";
 import { CaretDownIcon } from "@humansignal/icons";
 import { Filters } from "../Filters/Filters";
 import { Badge, Button, Dropdown } from "@humansignal/ui";
@@ -17,6 +18,7 @@ const buttonInjector = inject(({ store }) => {
 export const FiltersButton = buttonInjector(
   observer(
     React.forwardRef(({ activeFiltersNumber, size, sidebarEnabled, viewsStore, ...rest }, ref) => {
+      const { t } = useTranslation();
       const hasFilters = activeFiltersNumber > 0;
       return (
         <Button
@@ -26,11 +28,11 @@ export const FiltersButton = buttonInjector(
           look="outlined"
           onClick={() => sidebarEnabled && viewsStore.toggleSidebar()}
           trailing={<CaretDownIcon size={16} />}
-          aria-label="Filters"
+          aria-label={t("dataManager:filters")}
           data-testid="dm-filters-button"
           {...rest}
         >
-          Filters{" "}
+          {t("dataManager:filters")}{" "}
           {hasFilters && (
             <Badge size="small" className="ml-tightest">
               {activeFiltersNumber}

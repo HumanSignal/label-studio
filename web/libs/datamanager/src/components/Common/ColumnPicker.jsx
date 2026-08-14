@@ -1,6 +1,12 @@
+import i18next from "i18next";
 import { Badge, Select } from "@humansignal/ui";
 import { IconSpark } from "@humansignal/icons";
 import { useCallback, useMemo } from "react";
+import { useTranslation } from "react-i18next";
+
+// Fallback translator for module-scope helpers invoked outside a component render
+// (tests, FilterLine). Resolves against the shared singleton at call time.
+const fallbackT = (key, opts) => i18next.t(key, opts);
 
 // ── Adapters ─────────────────────────────────────────────────────────────────
 
@@ -29,7 +35,7 @@ function isAgreementAlias(alias) {
  *   root leaf columns (e.g. orderable-only for Order By).
  * @returns {ColumnPickerGroup[]}
  */
-export function columnsToPickerGroups(columns, filterFn) {
+export function columnsToPickerGroups(columns, filterFn, t = fallbackT) {
   const rootItems = [];
   const agreementItems = [];
   const groups = new Map(); // parentKey → {key, title, items[]}
@@ -40,7 +46,7 @@ export function columnsToPickerGroups(columns, filterFn) {
       // filterFn applied to the parent; if it passes, ALL children are included
       // (mirrors the original flat-list filter behaviour of FieldsMenu).
       if (!filterFn || filterFn(col)) {
-        const items = col.children.map(toTabColumnItem);
+        const items = col.children.map((child) => toTabColumnItem(child, t));
         if (items.length) {
           groups.set(col.key, { key: col.key, title: col.title, items });
         }
@@ -50,12 +56,12 @@ export function columnsToPickerGroups(columns, filterFn) {
     } else if (isAgreementAlias(col.alias)) {
       // Agreement-family column → synthetic "Agreement" group.
       if (!filterFn || filterFn(col)) {
-        agreementItems.push(toTabColumnItem(col));
+        agreementItems.push(toTabColumnItem(col, t));
       }
     } else {
       // Plain root leaf column.
       if (!filterFn || filterFn(col)) {
-        rootItems.push(toTabColumnItem(col));
+        rootItems.push(toTabColumnItem(col, t));
       }
     }
   }
@@ -65,7 +71,7 @@ export function columnsToPickerGroups(columns, filterFn) {
     result.push({ key: "__root__", title: null, items: rootItems });
   }
   if (agreementItems.length) {
-    result.push({ key: "__agreement__", title: "Agreement", items: agreementItems });
+    result.push({ key: "__agreement__", title: t("dataManager:agreementGroup"), items: agreementItems });
   }
   result.push(...groups.values());
   return result;
@@ -76,10 +82,10 @@ export function columnsToPickerGroups(columns, filterFn) {
  * logic in filtersToPickerGroups and is used to build "Group > Label" prefixes
  * for items shown in the "Recent" group.
  */
-export function getFilterGroupTitle(field) {
-  if (isAgreementAlias(field.alias)) return "Agreement";
+export function getFilterGroupTitle(field, t = fallbackT) {
+  if (isAgreementAlias(field.alias)) return t("dataManager:agreementGroup");
   if (field.parent) return field.parent.title;
-  return "Task";
+  return t("dataManager:taskGroup");
 }
 
 /**
@@ -99,10 +105,10 @@ export function getFilterGroupTitle(field) {
  * @param {Array<{id: string, operator: string|null, value: unknown}>} [recentEntries]
  * @returns {ColumnPickerGroup[]}
  */
-export function filtersToPickerGroups(availableFilters, recentEntries = []) {
+export function filtersToPickerGroups(availableFilters, recentEntries = [], t = fallbackT) {
   const rootItems = [];
   const agreementItems = [];
-  const groups = new Map(); // parent column key → {key, title, items[]}
+  const groups = new Map(); // parent column key → {key, title, items: []}
   const filtersById = new Map(availableFilters.map((f) => [f.id, f]));
 
   for (const filter of availableFilters) {
@@ -110,7 +116,7 @@ export function filtersToPickerGroups(availableFilters, recentEntries = []) {
     const item = {
       key: filter.id,
       title: field.title,
-      readableType: shouldShowBadge(field) ? (agreementBadgeLabel(field) ?? field.readableType) : undefined,
+      readableType: shouldShowBadge(field) ? (agreementBadgeLabel(field, t) ?? field.readableType) : undefined,
       icon: field.icon,
       enterpriseBadge: field.enterprise_badge,
       disabled: field.disabled,
@@ -144,7 +150,7 @@ export function filtersToPickerGroups(availableFilters, recentEntries = []) {
           key: RECENT_COLUMN_PREFIX + filter.id,
           title: field.title,
           groupTitle: rawGroup.charAt(0).toUpperCase() + rawGroup.slice(1),
-          readableType: shouldShowBadge(field) ? (agreementBadgeLabel(field) ?? field.readableType) : undefined,
+          readableType: shouldShowBadge(field) ? (agreementBadgeLabel(field, t) ?? field.readableType) : undefined,
           icon: field.icon,
           enterpriseBadge: field.enterprise_badge,
           disabled: field.disabled,
@@ -154,16 +160,16 @@ export function filtersToPickerGroups(availableFilters, recentEntries = []) {
       .filter(Boolean);
 
     if (recentItems.length > 0) {
-      result.push({ key: "__recent__", title: "Recent", items: recentItems });
+      result.push({ key: "__recent__", title: t("dataManager:recentGroup"), items: recentItems });
     }
   }
 
   // Ungrouped root filters are labelled "Task" so they have a visible section heading.
   if (rootItems.length) {
-    result.push({ key: "__root__", title: "Task", items: rootItems });
+    result.push({ key: "__root__", title: t("dataManager:taskGroup"), items: rootItems });
   }
   if (agreementItems.length) {
-    result.push({ key: "__agreement__", title: "Agreement", items: agreementItems });
+    result.push({ key: "__agreement__", title: t("dataManager:agreementGroup"), items: agreementItems });
   }
   result.push(...groups.values());
   return result;
@@ -182,17 +188,18 @@ function shouldShowBadge(col) {
  * For dimension agreement columns the badge label should always read "Agreement"
  * regardless of the underlying readableType.  Returns null for all other columns.
  */
-function agreementBadgeLabel(col) {
-  if (typeof col.alias === "string" && col.alias.startsWith("dimension_agreement_")) return "agreement";
+function agreementBadgeLabel(col, t = fallbackT) {
+  if (typeof col.alias === "string" && col.alias.startsWith("dimension_agreement_"))
+    return t("dataManager:agreementBadge");
   return null;
 }
 
-function toTabColumnItem(col) {
+function toTabColumnItem(col, t = fallbackT) {
   const enterpriseBadge = col.enterprise_badge ?? col.original?.enterprise_badge;
   return {
     key: col.key,
     title: col.title,
-    readableType: shouldShowBadge(col) ? (agreementBadgeLabel(col) ?? col.readableType) : undefined,
+    readableType: shouldShowBadge(col) ? (agreementBadgeLabel(col, t) ?? col.readableType) : undefined,
     icon: col.icon,
     enterpriseBadge,
     disabled: col.disabled || !!enterpriseBadge,
@@ -261,6 +268,7 @@ export const searchFilterByLabel = (option, queryString) => {
  * Option content for ColumnPicker: title + icon/tag + EnterpriseBadge.
  */
 export const ColumnPickerOptionContent = ({ option }) => {
+  const { t } = useTranslation();
   const { enterpriseBadge, icon, readableType, label, groupTitle } = option ?? {};
   const badge = icon ? (
     <div className="w-5 h-5 flex items-center justify-center flex-shrink-0">{icon}</div>
@@ -284,7 +292,7 @@ export const ColumnPickerOptionContent = ({ option }) => {
       <div className="flex items-center gap-tight flex-shrink-0 pointer-events-none">
         {enterpriseBadge && (
           <Badge variant="gradient" look="ghost" icon={<IconSpark />}>
-            Enterprise
+            {t("dataManager:enterprise")}
           </Badge>
         )}
         {badge}
@@ -340,13 +348,14 @@ export function ColumnPicker({
   triggerClassName,
   dataTestid,
 }) {
+  const { t } = useTranslation();
   const groups = useMemo(() => {
-    if (columns) return columnsToPickerGroups(columns, columnFilter);
-    if (availableFilters) return filtersToPickerGroups(availableFilters, recentEntries);
+    if (columns) return columnsToPickerGroups(columns, columnFilter, t);
+    if (availableFilters) return filtersToPickerGroups(availableFilters, recentEntries, t);
     return [];
     // columnFilter is intentionally omitted from deps — callers must pass a stable reference
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [columns, availableFilters, recentEntries]);
+  }, [columns, availableFilters, recentEntries, t]);
 
   const flatOptions = useMemo(() => pickerGroupsToFlatOptions(groups), [groups]);
 
@@ -373,7 +382,7 @@ export function ColumnPicker({
       onChange={handleChange}
       multiple={multiple}
       searchable
-      searchPlaceholder="Search columns"
+      searchPlaceholder={t("dataManager:searchColumns")}
       searchFilter={searchFilterByLabel}
       groupBy="group"
       optionRenderer={ColumnPickerOptionContent}
