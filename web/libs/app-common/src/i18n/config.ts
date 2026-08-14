@@ -3,13 +3,16 @@ import enMenubar from "./locales/en/menubar.json";
 import zhCnMenubar from "./locales/zh-CN/menubar.json";
 import enProjects from "./locales/en/projects.json";
 import zhCnProjects from "./locales/zh-CN/projects.json";
+import enDataManager from "./locales/en/dataManager.json";
+import zhCnDataManager from "./locales/zh-CN/dataManager.json";
 import { resolveBrowserLocale } from "./detection";
 import { getStoredLanguage } from "./persistence";
 import { APP_LOCALES, FALLBACK_LOCALE, type SupportedLocale } from "./types";
 
 export const MENUBAR_NAMESPACE = "menubar";
 export const PROJECTS_NAMESPACE = "projects";
-export const NAMESPACES = [MENUBAR_NAMESPACE, PROJECTS_NAMESPACE] as const;
+export const DATA_MANAGER_NAMESPACE = "dataManager";
+export const NAMESPACES = [MENUBAR_NAMESPACE, PROJECTS_NAMESPACE, DATA_MANAGER_NAMESPACE] as const;
 
 export function resolveInitialLanguage(browserLanguages: readonly string[]): SupportedLocale {
   const stored = getStoredLanguage();
@@ -32,8 +35,16 @@ export function createI18nConfig(options: I18nConfigOptions = {}): i18next.InitO
     ns: [...NAMESPACES],
     defaultNS: MENUBAR_NAMESPACE,
     resources: {
-      en: { [MENUBAR_NAMESPACE]: enMenubar, [PROJECTS_NAMESPACE]: enProjects },
-      "zh-CN": { [MENUBAR_NAMESPACE]: zhCnMenubar, [PROJECTS_NAMESPACE]: zhCnProjects },
+      en: {
+        [MENUBAR_NAMESPACE]: enMenubar,
+        [PROJECTS_NAMESPACE]: enProjects,
+        [DATA_MANAGER_NAMESPACE]: enDataManager,
+      },
+      "zh-CN": {
+        [MENUBAR_NAMESPACE]: zhCnMenubar,
+        [PROJECTS_NAMESPACE]: zhCnProjects,
+        [DATA_MANAGER_NAMESPACE]: zhCnDataManager,
+      },
     },
     interpolation: {
       escapeValue: false,

@@ -7,6 +7,12 @@ import { afterEach, expect, mock, spyOn } from "bun:test";
 import { JSDOM } from "jsdom";
 import fetchMock from "../../libs/editor/__mocks__/jest-fetch-mock.js";
 
+// Initialize the shared i18next singleton (en resources + fallbacks) so that
+// components under test can call useTranslation()/i18next.t() and resolve real
+// English strings instead of raw keys. Mirrors the production boot import in
+// apps/labelstudio/src/main.tsx. Idempotent.
+import "@humansignal/app-common/i18n/init";
+
 // ---------------------------------------------------------------------------
 // Module mock helper — merges factory output with real module exports so that
 // unmocked exports remain available (unlike Bun's native mock.module which
