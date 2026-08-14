@@ -11,5 +11,17 @@
   "emptyStateHeading": "Heidi 在这里没有看到任何项目！",
   "emptyStateBody": "创建一个项目，开始标注你的数据吧。",
   "heidiAlt": "Heidi 正在寻找项目",
-  "taskProgress": "{{done}} / {{total}}"
+  "taskProgress": "{{done}} / {{total}}",
+  "projectName": "项目名称",
+  "description": "描述",
+  "descriptionPlaceholder": "项目描述，可选填写",
+  "workspace": "工作区",
+  "selectAnOption": "请选择一项",
+  "workspaceHint": "通过将项目组织到工作区中来简化项目管理。",
+  "learnMore": "了解更多",
+  "dataImport": "数据导入",
+  "labelingSetup": "标注设置",
+  "cancelProjectCreation": "取消创建项目",
+  "cancel": "取消",
+  "save": "保存"
 }

@@ -11,5 +11,17 @@
   "emptyStateHeading": "Heidi doesn't see any projects here!",
   "emptyStateBody": "Create one and start labeling your data.",
   "heidiAlt": "Heidi looking for projects",
-  "taskProgress": "{{done}} / {{total}}"
+  "taskProgress": "{{done}} / {{total}}",
+  "projectName": "Project Name",
+  "description": "Description",
+  "descriptionPlaceholder": "Optional description of your project",
+  "workspace": "Workspace",
+  "selectAnOption": "Select an option",
+  "workspaceHint": "Simplify project management by organizing projects into workspaces.",
+  "learnMore": "Learn more",
+  "dataImport": "Data Import",
+  "labelingSetup": "Labeling Setup",
+  "cancelProjectCreation": "Cancel project creation",
+  "cancel": "Cancel",
+  "save": "Save"
 }

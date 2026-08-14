@@ -13,7 +13,7 @@
       "distinctSources": 925,
       "conflictSources": 2,
       "droppedArtifacts": 7,
-      "cleanEntries": 921,
+      "cleanEntries": 922,
       "patternEntries": 40,
       "bySurface": {
         "storage": 68,
@@ -26,7 +26,7 @@
         "import": 42,
         "export": 7,
         "templates": 33,
-        "projects": 37,
+        "projects": 38,
         "dataManager": 49,
         "settings": 49,
         "menubar": 10,
@@ -34,7 +34,7 @@
       }
     },
     "usage": "When migrating a component: 1) scan the matching surface bucket for the strings you encounter; 2) copy the Chinese into the component's locales/zh-CN/<namespace>.json under a stable camelCase key; 3) wrap the source string with t('namespace:key'). Dynamic text (counts, dates) should be modeled with i18next interpolation/plurals — see 'patterns' for intent.",
-    "pilotAdditions": "3 empty-state strings used by the Projects list page were absent from the upstream patch and were translated during the feat/i18n-foundation pilot migration, then fed back here: \"Heidi doesn't see any projects here!\", \"Create one and start labeling your data.\", \"Heidi looking for projects\"."
+    "pilotAdditions": "Strings absent from the upstream patch were translated during the feat/i18n-foundation pilot migrations and fed back here: the 3 Projects-list empty-state strings, plus \"Cancel project creation\" from the CreateProject modal."
   },
   "bySurface": {
     "storage": {
@@ -505,7 +505,8 @@
       "Projects contributed to": "参与项目数",
       "Heidi doesn't see any projects here!": "Heidi 在这里没有看到任何项目！",
       "Create one and start labeling your data.": "创建一个项目，开始标注你的数据吧。",
-      "Heidi looking for projects": "Heidi 正在寻找项目"
+      "Heidi looking for projects": "Heidi 正在寻找项目",
+      "Cancel project creation": "取消创建项目"
     },
     "dataManager": {
       "Remove Duplicated Tasks": "移除重复任务",
@@ -1257,6 +1258,7 @@
     "Can't find an export format?": "找不到需要的导出格式？",
     "Cancel": "取消",
     "Cancel import": "取消导入",
+    "Cancel project creation": "取消创建项目",
     "Cancel webhook deletion": "取消删除 Webhook",
     "Cancel webhook edit": "取消编辑 Webhook",
     "Cancelled": "已取消",
