@@ -659,6 +659,7 @@ describe("RichText view", () => {
         identifier: "r1",
         styles: "border: 1px dashed;",
         selected: true,
+        isReadOnly: () => false,
         _spans: [],
       };
       const mockItem = createMockItem({
@@ -685,6 +686,41 @@ describe("RichText view", () => {
       expect(setStyles).toHaveBeenCalled();
       fireEvent.mouseMove(root, { buttons: 1 });
       fireEvent.mouseUp(root, { buttons: 1 });
+    });
+
+    it("does not start resize when mousedown is on a read-only region handle", () => {
+      const setStyles = mock();
+      const mockRegion = {
+        find: (el) => el?.classList?.contains?.("htx-highlight") && !el.classList?.contains?.("__resize_left"),
+        getColors: () => ({ resizeBackground: "#eee", activeText: "#000" }),
+        resizeStyles: "cursor: col-resize;",
+        identifier: "r1",
+        styles: "border: 1px dashed;",
+        selected: true,
+        isReadOnly: () => true,
+        _spans: [],
+      };
+      const mockItem = createMockItem({
+        _value: '<span class="htx-highlight"><span class="__resize_left">L</span>text</span>',
+        type: "richtext",
+        inline: true,
+        canResizeSpans: true,
+        setStyles,
+        regs: [mockRegion],
+      });
+      const store = { settings: {} };
+      const HyperTextView = Registry.getViewByTag("hypertext");
+
+      const { container } = render(
+        <Provider store={store}>
+          <HyperTextView item={mockItem} store={store} />
+        </Provider>,
+      );
+
+      const handle = container.querySelector(".htx-highlight .__resize_left");
+      expect(handle).toBeInTheDocument();
+      fireEvent.mouseDown(handle, { buttons: 1 });
+      expect(setStyles).not.toHaveBeenCalled();
     });
 
     it("clears doubleClickSelection when second mouseup is after timeout", () => {

@@ -206,7 +206,7 @@ export const HighlightMixin = types
 
       if (!first) return;
 
-      if (self.parent?.canResizeSpans) {
+      if (self.parent?.canResizeSpans && !self.isReadOnly?.()) {
         self.attachHandles();
       }
 
