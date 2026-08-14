@@ -32,7 +32,11 @@ it("createI18nConfig produces a config with en as fallback", () => {
   expect(config.resources["zh-CN"].menubar).toBeDefined();
   expect(config.resources.en.menubar.home).toBe("Home");
   expect(config.resources["zh-CN"].menubar.home).toBe("首页");
-  expect(config.ns).toEqual(["menubar"]);
+  expect(config.resources.en.projects).toBeDefined();
+  expect(config.resources["zh-CN"].projects).toBeDefined();
+  expect(config.resources.en.projects.pageTitle).toBe("Projects");
+  expect(config.resources["zh-CN"].projects.pageTitle).toBe("项目");
+  expect(config.ns).toEqual(["menubar", "projects"]);
   expect(config.defaultNS).toBe("menubar");
   expect(config.interpolation.escapeValue).toBe(false);
 });

@@ -1,0 +1,15 @@
+{
+  "pageTitle": "Projects",
+  "paginationLabel": "Projects",
+  "create": "Create",
+  "createProject": "Create Project",
+  "createNewProject": "Create new project",
+  "newProject": "New project",
+  "projectOptions": "Project options",
+  "settings": "Settings",
+  "label": "Label",
+  "emptyStateHeading": "Heidi doesn't see any projects here!",
+  "emptyStateBody": "Create one and start labeling your data.",
+  "heidiAlt": "Heidi looking for projects",
+  "taskProgress": "{{done}} / {{total}}"
+}

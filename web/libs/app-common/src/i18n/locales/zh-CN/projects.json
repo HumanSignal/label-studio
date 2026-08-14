@@ -1,0 +1,15 @@
+{
+  "pageTitle": "项目",
+  "paginationLabel": "项目",
+  "create": "创建",
+  "createProject": "创建项目",
+  "createNewProject": "创建新项目",
+  "newProject": "新项目",
+  "projectOptions": "项目选项",
+  "settings": "设置",
+  "label": "标注",
+  "emptyStateHeading": "Heidi 在这里没有看到任何项目！",
+  "emptyStateBody": "创建一个项目，开始标注你的数据吧。",
+  "heidiAlt": "Heidi 正在寻找项目",
+  "taskProgress": "{{done}} / {{total}}"
+}

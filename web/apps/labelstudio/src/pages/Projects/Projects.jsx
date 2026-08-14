@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useParams as useRouterParams } from "react-router";
 import { Redirect } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { Button } from "@humansignal/ui";
 import { Oneof } from "../../components/Oneof/Oneof";
 import { Spinner } from "../../components/Spinner/Spinner";
@@ -28,8 +29,9 @@ export const ProjectsPage = () => {
   const [currentPage, setCurrentPage] = useState(getCurrentPage());
   const [totalItems, setTotalItems] = useState(1);
   const setContextProps = useContextProps();
+  const { t } = useTranslation();
 
-  useUpdatePageTitle("Projects");
+  useUpdatePageTitle(t("projects:pageTitle"));
   const defaultPageSize = Number.parseInt(localStorage.getItem("pages:projects-list") ?? 30);
 
   const [modal, setModal] = React.useState(false);
@@ -141,6 +143,8 @@ export const ProjectsPage = () => {
   );
 };
 
+// NOTE: route metadata title is intentionally left in English. It is read by the
+// routing/breadcrumb system outside of a React component, so it cannot call t().
 ProjectsPage.title = "Projects";
 ProjectsPage.path = "/projects";
 ProjectsPage.exact = true;
@@ -161,10 +165,11 @@ ProjectsPage.routes = ({ store }) => [
   },
 ];
 ProjectsPage.context = ({ openModal, showButton }) => {
+  const { t } = useTranslation();
   if (!showButton) return null;
   return (
-    <Button onClick={openModal} size="small" aria-label="Create new project">
-      Create
+    <Button onClick={openModal} size="small" aria-label={t("projects:createNewProject")}>
+      {t("projects:create")}
     </Button>
   );
 };
