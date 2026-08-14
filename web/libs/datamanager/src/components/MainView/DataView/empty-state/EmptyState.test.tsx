@@ -1,5 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import i18next from "i18next";
+import { I18nProvider } from "@humansignal/app-common";
 import { EmptyState } from "./EmptyState";
 import * as uiModule from "@humansignal/ui";
 import * as iconsModule from "@humansignal/icons";
@@ -385,6 +387,39 @@ describe("EmptyState Component", () => {
       // Should render fallback state
       expect(screen.getByText("No tasks available")).toBeInTheDocument();
       expect(screen.getByText("Tasks will appear here when they become available")).toBeInTheDocument();
+    });
+  });
+
+  describe("i18n", () => {
+    // The i18next singleton is shared across tests in this file — restore English
+    // so later/other tests asserting English strings are not affected.
+    afterEach(() => {
+      i18next.changeLanguage("en");
+    });
+
+    it("renders the default import empty state in zh-CN", () => {
+      render(
+        <I18nProvider browserLanguages={["zh-CN"]}>
+          <EmptyState {...defaultProps} />
+        </I18nProvider>,
+      );
+
+      expect(screen.getByText("导入数据，开始使用项目")).toBeInTheDocument();
+      expect(screen.getByText("连接你的云存储，或从电脑上传文件")).toBeInTheDocument();
+      expect(screen.getByTestId("dm-connect-source-storage-button")).toHaveTextContent("连接云存储");
+      expect(screen.getByTestId("dm-import-button")).toHaveTextContent("导入");
+    });
+
+    it("renders the filter empty state in zh-CN", () => {
+      render(
+        <I18nProvider browserLanguages={["zh-CN"]}>
+          <EmptyState {...defaultProps} hasFilters onClearFilters={mock()} />
+        </I18nProvider>,
+      );
+
+      expect(screen.getByText("未找到任务")).toBeInTheDocument();
+      expect(screen.getByText("尝试调整或清除筛选条件以查看更多结果")).toBeInTheDocument();
+      expect(screen.getByTestId("dm-clear-filters-button")).toHaveTextContent("清除筛选");
     });
   });
 });

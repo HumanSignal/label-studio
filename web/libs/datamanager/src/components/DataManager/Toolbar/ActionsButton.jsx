@@ -1,7 +1,9 @@
+import i18next from "i18next";
 import { CaretDownIcon, IconChevronRight, IconTrash } from "@humansignal/icons";
 import { Button, Spinner, EnterpriseBadge, Message, Typography } from "@humansignal/ui";
 import { inject, observer } from "mobx-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useActions } from "../../../hooks/useActions";
 import { cn } from "../../../utils/bem";
 import { FF_LOPS_E_3, isFF } from "../../../utils/feature-flags";
@@ -18,6 +20,7 @@ const injector = inject(({ store }) => ({
 }));
 
 const DialogContent = ({ text, details = [], form, formRef, store, action, validateApi, ctaApi, errorApi }) => {
+  const { t } = useTranslation();
   const [formData, setFormData] = useState(form);
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState([]);
@@ -81,9 +84,11 @@ const DialogContent = ({ text, details = [], form, formRef, store, action, valid
   const handleFormChange = useCallback(
     (event) => {
       if (event.target?.name !== "column_name") return;
-      ctaApi?.setText?.(existingColumns.has(event.target.value) ? "Update Column" : "Add Column");
+      ctaApi?.setText?.(
+        existingColumns.has(event.target.value) ? t("dataManager:updateColumn") : t("dataManager:addColumn"),
+      );
     },
-    [ctaApi, existingColumns],
+    [ctaApi, existingColumns, t],
   );
 
   return (
@@ -144,6 +149,7 @@ const DialogContent = ({ text, details = [], form, formRef, store, action, valid
  * dialog open when invalid, surfacing the form's existing validation messages.
  */
 const DialogFooter = ({ destructive, okText, validateApi, ctaApi, errorApi, onOk }) => {
+  const { t } = useTranslation();
   const controls = useModalControls();
   const [currentOkText, setCurrentOkText] = useState(okText);
 
@@ -175,18 +181,18 @@ const DialogFooter = ({ destructive, okText, validateApi, ctaApi, errorApi, onOk
         look="outlined"
         variant="neutral"
         autoFocus
-        aria-label="Cancel"
+        aria-label={t("dataManager:cancel")}
         data-testid="dialog-cancel-button"
       >
-        Cancel
+        {t("dataManager:cancel")}
       </Button>
       <Button
         onClick={handleOk}
         variant={destructive ? "negative" : "primary"}
-        aria-label={currentOkText ?? "Confirm"}
+        aria-label={currentOkText ?? t("dataManager:confirm")}
         data-testid="dialog-ok-button"
       >
-        {currentOkText ?? "OK"}
+        {currentOkText ?? t("dataManager:ok")}
       </Button>
     </div>
   );
@@ -296,35 +302,43 @@ const invokeAction = (action, destructive, store, formRef) => {
     // Generate dynamic content for destructive actions
     let dialogTitle = title;
     let dialogText = text;
-    let okButtonText = actionOkText ?? "OK";
+    let okButtonText = actionOkText ?? i18next.t("dataManager:ok");
+    // Resolved once and threaded through — never re-parsed out of a (translated) title.
+    let objectType = null;
 
     if (destructive && !title) {
-      // Extract object type from action ID and title
+      // Extract the object-type i18n key from the action ID
       const objectMap = {
-        delete_tasks: "tasks",
-        delete_annotations: "annotations",
-        delete_predictions: "predictions",
-        delete_reviews: "reviews",
-        delete_reviewers: "review assignments",
-        delete_annotators: "annotator assignments",
-        delete_ground_truths: "ground truths",
+        delete_tasks: "objectTasks",
+        delete_annotations: "objectAnnotations",
+        delete_predictions: "objectPredictions",
+        delete_reviews: "objectReviews",
+        delete_reviewers: "objectReviewAssignments",
+        delete_annotators: "objectAnnotatorAssignments",
+        delete_ground_truths: "objectGroundTruths",
       };
 
-      const objectType = objectMap[action.id] || action.title.toLowerCase().replace("delete ", "");
-      dialogTitle = `Delete selected ${objectType}?`;
+      // Unknown delete actions fall back to the raw (English) noun derived from the
+      // server-provided action title, matching the pre-i18n behaviour.
+      objectType = objectMap[action.id]
+        ? i18next.t(`dataManager:${objectMap[action.id]}`)
+        : action.title.toLowerCase().replace("delete ", "");
+      dialogTitle = i18next.t("dataManager:deleteSelectedTitle", { objectType });
 
-      // Convert to title case for button text
+      // Title-case the noun for the confirm button. charAt(0).toUpperCase() is a
+      // no-op for CJK text, so this stays correct in every locale.
       const titleCaseObject = objectType
         .split(" ")
         .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
         .join(" ");
-      okButtonText = `Delete ${titleCaseObject}`;
+      okButtonText = i18next.t("dataManager:deleteCta", { object: titleCaseObject });
     }
 
     if (destructive && !form) {
       // Use standardized warning message for simple delete actions
-      const objectType = dialogTitle ? dialogTitle.replace("Delete selected ", "").replace("?", "") : "items";
-      dialogText = `You are about to delete the selected ${objectType}.\n\nThis can't be undone.`;
+      dialogText = i18next.t("dataManager:deleteWarning", {
+        objectType: objectType ?? i18next.t("dataManager:objectItems"),
+      });
     }
 
     const submit = () => {
@@ -341,7 +355,11 @@ const invokeAction = (action, destructive, store, formRef) => {
     const errorApi = { setErrors: null };
 
     modal({
-      title: dialogTitle ? dialogTitle : destructive ? "Destructive action" : "Confirm action",
+      title: dialogTitle
+        ? dialogTitle
+        : destructive
+          ? i18next.t("dataManager:destructiveAction")
+          : i18next.t("dataManager:confirmAction"),
       body: (
         <DialogContent
           text={dialogText}
@@ -375,6 +393,7 @@ const invokeAction = (action, destructive, store, formRef) => {
 
 export const ActionsButton = injector(
   observer(({ store, size, hasSelected, ...rest }) => {
+    const { t } = useTranslation();
     const formRef = useRef();
     const selectedCount = store.currentView.selectedCount;
     const [isOpen, setIsOpen] = useState(false);
@@ -395,7 +414,7 @@ export const ActionsButton = injector(
     const actionButtons = actions.map((action) => (
       <ActionButton key={action.id} action={action} parentRef={formRef} store={store} formRef={formRef} />
     ));
-    const recordTypeLabel = isFFLOPSE3 && store.SDK.type === "DE" ? "Record" : "Task";
+    const isRecordMode = isFFLOPSE3 && store.SDK.type === "DE";
 
     return (
       <Dropdown.Trigger
@@ -403,7 +422,7 @@ export const ActionsButton = injector(
           <Menu size="compact">
             {isLoading || isFetching ? (
               <Menu.Item data-testid="loading-actions" disabled>
-                Loading actions...
+                {t("dataManager:loadingActions")}
               </Menu.Item>
             ) : (
               actionButtons
@@ -420,11 +439,13 @@ export const ActionsButton = injector(
           look="outlined"
           disabled={!hasSelected}
           trailing={<CaretDownIcon />}
-          aria-label="Tasks Actions"
+          aria-label={t("dataManager:tasksActionsAria")}
           data-testid="dm-actions-button"
           {...rest}
         >
-          {selectedCount > 0 ? `${selectedCount} ${recordTypeLabel}${selectedCount > 1 ? "s" : ""}` : "Actions"}
+          {selectedCount > 0
+            ? t(isRecordMode ? "dataManager:selectedRecords" : "dataManager:selectedTasks", { count: selectedCount })
+            : t("dataManager:actions")}
         </Button>
       </Dropdown.Trigger>
     );

@@ -1,6 +1,7 @@
 import { observer, useLocalStore } from "mobx-react";
 import { toJS } from "mobx";
 import React, { forwardRef, useCallback, useEffect, useRef } from "react";
+import { useTranslation } from "react-i18next";
 import { ViewColumnType, ViewColumnTypeName, ViewColumnTypeShort } from "../../../../stores/Tabs/tab_column";
 import { Button, Dropdown, Tooltip } from "@humansignal/ui";
 import { Menu } from "../../Menu/Menu";
@@ -26,6 +27,7 @@ import { isStarterCloudPlan } from "@humansignal/core";
 const tableHeadCN = cn("table-head");
 
 const DropdownWrapper = observer(({ column, cellViews, children, onChange, disabled, disabledTooltip }) => {
+  const { t } = useTranslation();
   const types = ViewColumnType._types
     .map((t) => t.value)
     .filter((t) => {
@@ -50,7 +52,7 @@ const DropdownWrapper = observer(({ column, cellViews, children, onChange, disab
   return (
     <Dropdown.Trigger
       content={
-        <Menu title="Display as" size="compact" selectedKeys={[column.currentType]}>
+        <Menu title={t("dataManager:displayAs")} size="compact" selectedKeys={[column.currentType]}>
           {types.map((type) => {
             return (
               <Menu.Item key={type} onClick={() => onChange?.(column, type)}>
