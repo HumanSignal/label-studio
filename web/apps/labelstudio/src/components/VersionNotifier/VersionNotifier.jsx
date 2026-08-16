@@ -5,6 +5,7 @@ import { useAPI } from "../../providers/ApiProvider";
 import { cn } from "../../utils/bem";
 import "./VersionNotifier.prefix.css";
 import { IconBell } from "@humansignal/icons";
+import { useTranslation } from "react-i18next";
 
 const VersionContext = createContext();
 
@@ -43,6 +44,7 @@ export const VersionProvider = ({ children }) => {
 };
 
 export const VersionNotifier = ({ showNewVersion, showCurrentVersion }) => {
+  const { t } = useTranslation();
   const { newVersion, updateTime, latestVersion, version } = useContext(VersionContext) ?? {};
   const url = `https://labelstud.io/redirect/update?version=${version}`;
 
@@ -54,9 +56,11 @@ export const VersionNotifier = ({ showNewVersion, showCurrentVersion }) => {
         </div>
         <div className={cn("version-notifier").elem("content").toClassName()}>
           <div className={cn("version-notifier").elem("title").toClassName()} data-date={updateTime}>
-            {latestVersion} Available
+            {t("versionNotifier.updateAvailable", { version: latestVersion })}
           </div>
-          <div className={cn("version-notifier").elem("description").toClassName()}>Current version: {version}</div>
+          <div className={cn("version-notifier").elem("description").toClassName()}>
+            {t("versionNotifier.currentVersion", { version })}
+          </div>
         </div>
       </a>
     </li>
