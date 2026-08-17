@@ -7,6 +7,7 @@
  */
 
 import { CaretRightIcon, IntersectSquareIcon } from "@humansignal/icons";
+import i18next from "i18next";
 import { Typography } from "@humansignal/ui";
 import { cnb as cn } from "../utils/bem";
 import "./ViewAllToggle.prefix.css";
@@ -35,7 +36,7 @@ export function ViewAllToggle({ isActive, onClick, variant = "topbar" }: ViewAll
         </div>
         <div className={cn("view-all-toggle").elem("content").toClassName()}>
           <Typography variant="label" size="small" className={cn("view-all-toggle").elem("label").toClassName()}>
-            Compare All
+            {i18next.t("editor:compareAll")}
           </Typography>
         </div>
       </div>

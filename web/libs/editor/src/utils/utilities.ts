@@ -1,4 +1,6 @@
 import { formatDistanceToNow } from "date-fns";
+import i18next from "i18next";
+import { getDateFnsLocale } from "@humansignal/app-common/i18n/dateLocale";
 import { destroy, detach } from "mobx-state-tree";
 import { camelCase, snakeCase } from "@humansignal/core/lib/utils/string";
 
@@ -247,9 +249,9 @@ export const triggerResizeEvent = () => {
 };
 
 export const humanDateDiff = (date: string | number): string => {
-  const fnsDate = formatDistanceToNow(new Date(date), { addSuffix: true });
+  const fnsDate = formatDistanceToNow(new Date(date), { addSuffix: true, locale: getDateFnsLocale() });
 
-  if (fnsDate === "less than a minute ago") return "just now";
+  if (fnsDate === "less than a minute ago") return i18next.t("dataManager:justNow");
   return fnsDate;
 };
 

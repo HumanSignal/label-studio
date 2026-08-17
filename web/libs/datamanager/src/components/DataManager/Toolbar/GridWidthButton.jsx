@@ -1,4 +1,5 @@
 import { inject } from "mobx-react";
+import { useTranslation } from "react-i18next";
 import { useCallback } from "react";
 import { Button, Dropdown, Tooltip } from "@humansignal/ui";
 import { Counter, Toggle } from "../../Common/Form";
@@ -20,6 +21,7 @@ const injector = inject(({ store }) => {
 });
 
 export const GridWidthButton = injector(({ view, isGrid, gridWidth, fitImagesToWidth, hasImage, size }) => {
+  const { t } = useTranslation();
   const isLocked = view?.isLockedByManager;
   const lockedTooltip = view?.lockedUpdateMessage;
   const setGridWidth = useCallback(
@@ -48,14 +50,14 @@ export const GridWidthButton = injector(({ view, isGrid, gridWidth, fitImagesToW
       content={
         <div className="p-tight min-w-wide space-y-base">
           <div className="grid grid-cols-[1fr_min-content] gap-base items-center">
-            <span>Columns</span>
+            <span>{t("dataManager:columns")}</span>
             <Counter
               min={1}
               max={10}
               step={1}
               value={gridWidth}
-              increaseAriaLabel="Increase columns number"
-              decreaseAriaLabel="Decrease columns number"
+              increaseAriaLabel={t("dataManager:increaseColumns")}
+              decreaseAriaLabel={t("dataManager:decreaseColumns")}
               onChange={(e) => setGridWidth(Number(e.target.value))}
             />
           </div>

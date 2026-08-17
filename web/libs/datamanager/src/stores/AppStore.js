@@ -1,6 +1,7 @@
 import { destroy, flow, types } from "mobx-state-tree";
 import { runInAction } from "mobx";
 import { Modal } from "../components/Common/Modal/Modal";
+import i18next from "i18next";
 import { FF_LOPS_E_3, isFF } from "../utils/feature-flags";
 import { History } from "../utils/history";
 import { isDefined } from "../utils/utils";
@@ -349,12 +350,13 @@ export const AppStore = types
 
       if (self.LSF?.lsf?.annotationStore?.selected?.commentStore?.hasUnsaved) {
         Modal.confirm({
-          title: "You have unsaved changes",
-          body: "There are comments which are not persisted. Please submit the annotation. Continuing will discard these comments.",
+          title: i18next.t("dataManager:unsavedChangesTitle"),
+          body: i18next.t("dataManager:unsavedCommentsBody"),
+          cancelText: i18next.t("dataManager:cancel"),
           onOk() {
             nextAction();
           },
-          okText: "Discard and continue",
+          okText: i18next.t("dataManager:discardAndContinue"),
         });
         return;
       }
@@ -395,12 +397,13 @@ export const AppStore = types
 
       if (self.LSF?.lsf?.annotationStore?.selected?.commentStore?.hasUnsaved) {
         Modal.confirm({
-          title: "You have unsaved changes",
-          body: "There are comments which are not persisted. Please submit the annotation. Continuing will discard these comments.",
+          title: i18next.t("dataManager:unsavedChangesTitle"),
+          body: i18next.t("dataManager:unsavedCommentsBody"),
+          cancelText: i18next.t("dataManager:cancel"),
           onOk() {
             nextAction();
           },
-          okText: "Discard and continue",
+          okText: i18next.t("dataManager:discardAndContinue"),
         });
         return;
       }
@@ -411,12 +414,13 @@ export const AppStore = types
     confirmLabelingConfigured() {
       if (!self.labelingIsConfigured) {
         Modal.confirm({
-          title: "You're almost there!",
-          body: "Before you can annotate the data, set up labeling configuration",
+          title: i18next.t("dataManager:setupTitle"),
+          body: i18next.t("dataManager:setupBody"),
+          cancelText: i18next.t("dataManager:cancel"),
           onOk() {
             self.SDK.invoke("settingsClicked");
           },
-          okText: "Go to setup",
+          okText: i18next.t("dataManager:goToSetup"),
         });
         return false;
       }

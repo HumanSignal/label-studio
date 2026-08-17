@@ -7,6 +7,7 @@ import {
 } from "@humansignal/core/lib/utils/feature-flags";
 import { isDefined } from "../utils/utils";
 import { Modal } from "../components/Common/Modal/Modal";
+import i18next from "i18next";
 import { CommentsSdk } from "./comments-sdk";
 import { errorHandlerAllowSpecialErrors } from "./special-errors";
 // import { LSFHistory } from "./lsf-history";
@@ -366,12 +367,13 @@ export class LSFWrapper {
 
     if (this.lsf?.commentStore?.hasUnsaved) {
       Modal.confirm({
-        title: "You have unsaved changes",
-        body: "There are comments which are not persisted. Please submit the annotation. Continuing will discard these comments.",
+        title: i18next.t("dataManager:unsavedChangesTitle"),
+        body: i18next.t("dataManager:unsavedCommentsBody"),
+        cancelText: i18next.t("dataManager:cancel"),
         onOk() {
           nextAction();
         },
-        okText: "Discard and continue",
+        okText: i18next.t("dataManager:discardAndContinue"),
       });
       return;
     }

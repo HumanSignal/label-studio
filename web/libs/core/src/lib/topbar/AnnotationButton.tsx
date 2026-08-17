@@ -14,6 +14,7 @@
  * whether to confirm before invoking the real action.
  */
 
+import i18next from "i18next";
 import {
   forwardRef,
   useCallback,
@@ -27,6 +28,8 @@ import {
 } from "react";
 import { createPortal } from "react-dom";
 import { format, isValid } from "date-fns";
+import zhCN from "date-fns/locale/zh-CN";
+import enUS from "date-fns/locale/en-US";
 import {
   ChartBarIcon,
   IconAnnotationGroundTruth,
@@ -131,11 +134,11 @@ function formatAnnotationDate(dateStr: string | null | undefined): string {
     if (!isValid(d)) return dateStr;
     const now = new Date();
     const diffMs = now.getTime() - d.getTime();
-    if (diffMs < 60_000) return "just now";
-    if (diffMs < 3_600_000) return `${Math.floor(diffMs / 60_000)}m ago`;
-    if (diffMs < 86_400_000) return `${Math.floor(diffMs / 3_600_000)}h ago`;
-    if (diffMs < 604_800_000) return `${Math.floor(diffMs / 86_400_000)}d ago`;
-    return format(d, "MMM d");
+    if (diffMs < 60_000) return i18next.t("editor:coreJustNow");
+    if (diffMs < 3_600_000) return i18next.t("editor:coreMinutesAgo", { count: Math.floor(diffMs / 60_000) });
+    if (diffMs < 86_400_000) return i18next.t("editor:coreHoursAgo", { count: Math.floor(diffMs / 3_600_000) });
+    if (diffMs < 604_800_000) return i18next.t("editor:coreDaysAgo", { count: Math.floor(diffMs / 86_400_000) });
+    return format(d, "MMM d", { locale: i18next.language?.startsWith("zh") ? zhCN : enUS });
   } catch {
     return dateStr;
   }
@@ -143,10 +146,10 @@ function formatAnnotationDate(dateStr: string | null | undefined): string {
 
 function getCommentIconAndTooltip(annotation: SharedAnnotation) {
   if ((annotation.unresolvedCommentCount ?? 0) > 0) {
-    return { Icon: IconCommentUnresolved, tooltip: "Unresolved Comments" };
+    return { Icon: IconCommentUnresolved, tooltip: i18next.t("editor:tooltipUnresolvedComments") };
   }
   if ((annotation.commentCount ?? 0) > 0) {
-    return { Icon: IconCommentResolved, tooltip: "All Comments Resolved" };
+    return { Icon: IconCommentResolved, tooltip: i18next.t("editor:tooltipAllCommentsResolved") };
   }
   return null;
 }
@@ -228,21 +231,21 @@ function AnnotationButtonTooltip({
 }: TooltipProps) {
   const statusBadge = useMemo(() => {
     if (isPrediction) return null;
-    if (isDraft || isDraftSaved) return { label: "Draft", variant: "primary" as const };
+    if (isDraft || isDraftSaved) return { label: i18next.t("editor:statusDraft"), variant: "primary" as const };
     if (acceptedState) {
       switch (acceptedState) {
         case "accepted":
-          return { label: "Accepted", variant: "positive" as const };
+          return { label: i18next.t("editor:statusAccepted"), variant: "positive" as const };
         case "rejected":
-          return { label: "Rejected", variant: "negative" as const };
+          return { label: i18next.t("editor:statusRejected"), variant: "negative" as const };
         case "fixed":
         case "fixed_and_accepted":
-          return { label: "Fixed", variant: "warning" as const };
+          return { label: i18next.t("editor:statusFixed"), variant: "warning" as const };
         default:
           break;
       }
     }
-    if (isSubmitted && !isSkipped) return { label: "Submitted", variant: "positive" as const };
+    if (isSubmitted && !isSkipped) return { label: i18next.t("editor:statusSubmitted"), variant: "positive" as const };
     return null;
   }, [isPrediction, isDraft, isDraftSaved, acceptedState, isSubmitted, isSkipped]);
 
@@ -268,16 +271,16 @@ function AnnotationButtonTooltip({
       });
     }
     if (isPrediction) {
-      rows.push({ label: "Type", value: "Prediction" });
+      rows.push({ label: i18next.t("editor:infoType"), value: i18next.t("editor:valuePrediction") });
       if (isDefined(predictionScore)) {
-        rows.push({ label: "Prediction Score", value: `${(predictionScore * 100).toFixed(2)}%` });
+        rows.push({ label: i18next.t("editor:infoPredictionScore"), value: `${(predictionScore * 100).toFixed(2)}%` });
       }
     } else {
-      rows.push({ label: "Type", value: "Annotation" });
+      rows.push({ label: i18next.t("editor:infoType"), value: i18next.t("editor:valueAnnotation") });
     }
     if (lastUpdated) {
       const formattedDate = formatDate(lastUpdated);
-      if (formattedDate) rows.push({ label: "Last Updated", value: formattedDate });
+      if (formattedDate) rows.push({ label: i18next.t("editor:infoLastUpdated"), value: formattedDate });
     }
     return rows;
   }, [annotationId, annotationIdFull, isPrediction, predictionScore, lastUpdated, formatDate]);
@@ -285,8 +288,8 @@ function AnnotationButtonTooltip({
   const tooltipBadges = useMemo(() => {
     const badges: Array<{ label: string; variant: "primary" | "positive" | "negative" | "warning" }> = [];
     if (statusBadge) badges.push(statusBadge);
-    if (isSkipped) badges.push({ label: "Skipped", variant: "negative" });
-    if (isGroundTruth) badges.push({ label: "Ground Truth", variant: "warning" });
+    if (isSkipped) badges.push({ label: i18next.t("editor:statusSkipped"), variant: "negative" });
+    if (isGroundTruth) badges.push({ label: i18next.t("editor:statusGroundTruth"), variant: "warning" });
     return badges;
   }, [statusBadge, isSkipped, isGroundTruth]);
 
@@ -451,7 +454,7 @@ function AnnotationContextMenu({ annotation, capabilities, handlers }: Annotatio
         dataTestId: "annotation-button-menu-copy-link",
       },
       {
-        label: "Open Performance Dashboard",
+        label: i18next.t("editor:menuOpenPerformanceDashboard"),
         icon: <ChartBarIcon size={20} />,
         onClick: () => {
           handlers.onOpenPerformanceDashboard?.(annotation);
@@ -461,7 +464,7 @@ function AnnotationContextMenu({ annotation, capabilities, handlers }: Annotatio
         dataTestId: "annotation-button-menu-performance-dashboard",
       },
       {
-        label: "Compare All Annotations",
+        label: i18next.t("editor:menuCompareAllAnnotations"),
         icon: <IntersectSquareIcon size="20" />,
         onClick: () => {
           handlers.onShowOtherAnnotations();
@@ -471,7 +474,7 @@ function AnnotationContextMenu({ annotation, capabilities, handlers }: Annotatio
         dataTestId: "annotation-button-menu-compare-all",
       },
       {
-        label: isPrediction ? "Delete Prediction" : "Delete Annotation",
+        label: isPrediction ? i18next.t("editor:menuDeletePrediction") : i18next.t("editor:menuDeleteAnnotation"),
         icon: <TrashIcon size="20" />,
         onClick: () => {
           handlers.onDelete(annotation);

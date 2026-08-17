@@ -189,5 +189,21 @@
   "exportLabelStudioEnterprise": "Label Studio Enterprise",
   "exportEnterpriseSuffix": "since it is designed for large-scale projects and asynchronous exports.",
   "exportMoreDetailsDocs": "More details in the documentation:",
-  "exportTimeoutDocsLink": "Export timeout in Community Edition"
+  "exportTimeoutDocsLink": "Export timeout in Community Edition",
+  "unsavedChangesTitle": "You have unsaved changes",
+  "unsavedCommentsBody": "There are comments which are not persisted. Please submit the annotation. Continuing will discard these comments.",
+  "discardAndContinue": "Discard and continue",
+  "setupTitle": "You're almost there!",
+  "setupBody": "Before you can annotate the data, set up labeling configuration",
+  "goToSetup": "Go to setup",
+  "toggleOpen": "Toggle open",
+  "selectAllRows": "Select all rows",
+  "unselectAllRows": "Unselect all rows",
+  "selectTask": "Select Task {{id}}",
+  "unselectTask": "Unselect Task {{id}}",
+  "backToProjects": "Back to projects",
+  "justNow": "just now",
+  "increaseColumns": "Increase columns number",
+  "decreaseColumns": "Decrease columns number",
+  "customizeColumns": "Customize Columns"
 }

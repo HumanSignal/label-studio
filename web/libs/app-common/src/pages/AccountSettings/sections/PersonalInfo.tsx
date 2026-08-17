@@ -191,6 +191,7 @@ export const PersonalInfo = () => {
             <InputFile
               className={styles.profilePhotoUpload}
               name="avatar"
+              text={t("account:uploadImage")}
               onChange={fileChangeHandler}
               accept="image/png, image/jpeg, image/jpg"
               ref={avatarRef}

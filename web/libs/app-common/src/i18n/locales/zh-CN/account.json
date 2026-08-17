@@ -182,5 +182,6 @@
   "accountHotkeySectionImageGalleryTitle": "图像画廊导航",
   "accountHotkeySectionImageGalleryDesc": "用于在多图任务中切换图像的快捷键",
   "accountHotkeySectionParagraphsTitle": "段落导航",
-  "accountHotkeySectionParagraphsDesc": "用于在段落/对话视图中导航短语和区域的快捷键"
+  "accountHotkeySectionParagraphsDesc": "用于在段落/对话视图中导航短语和区域的快捷键",
+  "uploadImage": "上传图片"
 }

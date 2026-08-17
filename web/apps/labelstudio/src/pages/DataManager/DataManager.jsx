@@ -216,7 +216,7 @@ export const DataManagerPage = ({ ...props }) => {
     <div className={cn("crash").toClassName()}>
       <div className={cn("crash").elem("info").toClassName()}>Project was deleted or not yet created</div>
 
-      <Button to="/projects" aria-label="Back to projects">
+      <Button to="/projects" aria-label={t("dataManager:backToProjects")}>
         Back to projects
       </Button>
     </div>

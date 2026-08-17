@@ -3,7 +3,9 @@
   "version": "0.0.0",
   "license": "MIT",
   "private": true,
-  "dependencies": {},
+  "dependencies": {
+    "i18next": "^26.3.6"
+  },
   "main": "src/index.ts",
   "files": [
     "src/lib",

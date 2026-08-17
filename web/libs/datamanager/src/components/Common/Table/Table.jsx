@@ -1,5 +1,7 @@
 import { observer } from "mobx-react";
 import { createContext, forwardRef, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
+import { translateColumnTitle } from "../../../i18n/backendTitles";
 import { useSDK } from "../../../providers/SDKProvider";
 import { isDefined } from "../../../utils/utils";
 import { modal } from "../Modal/Modal";
@@ -56,6 +58,7 @@ export const Table = observer(
     RowContextMenuComponent,
     ...props
   }) => {
+    const { t } = useTranslation();
     const colOrderKey = "dm:columnorder";
     const tableHead = useRef();
     const [colOrder, setColOrder] = useState(JSON.parse(localStorage.getItem(colOrderKey)) ?? {});
@@ -89,10 +92,10 @@ export const Table = observer(
           indeterminate={selectedItems.isIndeterminate}
           onChange={() => props.onSelectAll()}
           className="select-all"
-          ariaLabel={`${selectedItems.isAllSelected ? "Unselect" : "Select"} all rows`}
+          ariaLabel={selectedItems.isAllSelected ? t("dataManager:unselectAllRows") : t("dataManager:selectAllRows")}
         />
       );
-    }, [props.onSelectAll, selectedItems]);
+    }, [props.onSelectAll, selectedItems, t]);
 
     const rowCheckBoxCell = useCallback(
       ({ data: rowData }) => {
@@ -123,7 +126,11 @@ export const Table = observer(
               // Always remember last clicked for shift-click range
               lastClickedId.current = rowData.id;
             }}
-            ariaLabel={`${isChecked ? "Unselect" : "Select"} Task ${rowData.id}`}
+            ariaLabel={
+              isChecked
+                ? t("dataManager:unselectTask", { id: rowData.id })
+                : t("dataManager:selectTask", { id: rowData.id })
+            }
           />
         );
       },
@@ -330,15 +337,15 @@ export const Table = observer(
         <div className={cn("table-toolbar").mod({ visible: toolbarVisible }).toClassName()}>
           <FieldsButton
             multiSelect={true}
-            title={"Columns"}
+            title={t("dataManager:columns")}
             size="small"
-            tooltip={"Customize Columns"}
+            tooltip={t("dataManager:customizeColumns")}
             data-testid="columns-picker-quickview"
           />
           <DensityToggle size="small" onChange={onDensityChange} data-testid="density-toggle-quickview" />
         </div>
       );
-    }, [toolbarVisible, onDensityChange]);
+    }, [toolbarVisible, onDensityChange, t]);
 
     const renderTableHeader = useCallback(
       ({ style }) => (

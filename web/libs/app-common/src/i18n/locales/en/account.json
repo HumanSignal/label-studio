@@ -182,5 +182,6 @@
   "accountHotkeySectionImageGalleryTitle": "Image Gallery Navigation",
   "accountHotkeySectionImageGalleryDesc": "Shortcuts for navigating between images in multi-image tasks",
   "accountHotkeySectionParagraphsTitle": "Paragraph Navigation",
-  "accountHotkeySectionParagraphsDesc": "Shortcuts for navigating phrases and regions in paragraph/dialogue view"
+  "accountHotkeySectionParagraphsDesc": "Shortcuts for navigating phrases and regions in paragraph/dialogue view",
+  "uploadImage": "Upload Image"
 }

@@ -189,5 +189,21 @@
   "exportLabelStudioEnterprise": "Label Studio 企业版",
   "exportEnterpriseSuffix": "，它专为大规模项目和异步导出而设计。",
   "exportMoreDetailsDocs": "更多详情请参阅文档：",
-  "exportTimeoutDocsLink": "社区版导出超时"
+  "exportTimeoutDocsLink": "社区版导出超时",
+  "unsavedChangesTitle": "你有未保存的修改",
+  "unsavedCommentsBody": "存在尚未提交的评论。请先提交标注，继续操作将丢弃这些评论。",
+  "discardAndContinue": "丢弃并继续",
+  "setupTitle": "就差一步了！",
+  "setupBody": "在标注数据之前，请先完成标注界面配置",
+  "goToSetup": "前往配置",
+  "toggleOpen": "打开下拉",
+  "selectAllRows": "全选所有行",
+  "unselectAllRows": "取消全选",
+  "selectTask": "选择任务 {{id}}",
+  "unselectTask": "取消选择任务 {{id}}",
+  "backToProjects": "返回项目列表",
+  "justNow": "刚刚",
+  "increaseColumns": "增加列数",
+  "decreaseColumns": "减少列数",
+  "customizeColumns": "自定义列"
 }

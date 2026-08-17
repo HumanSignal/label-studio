@@ -1,4 +1,5 @@
 import { QuestionIcon, SlidersHorizontalIcon } from "@humansignal/icons";
+import { translateColumnTitle } from "../../../i18n/backendTitles";
 import { Tooltip, Badge, EnterpriseBadge } from "@humansignal/ui";
 import { inject, observer } from "mobx-react";
 import { getRoot } from "mobx-state-tree";
@@ -328,10 +329,10 @@ function DataViewInner({
     const column = col.original;
 
     if (column.icon) {
-      return <Tooltip title={column.help ?? col.title}>{column.icon}</Tooltip>;
+      return <Tooltip title={column.help ?? translateColumnTitle(col.title)}>{column.icon}</Tooltip>;
     }
 
-    return column.title;
+    return translateColumnTitle(column.title);
   };
 
   const commonDecoration = useCallback(

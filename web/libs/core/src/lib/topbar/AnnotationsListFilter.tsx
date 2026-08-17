@@ -11,6 +11,7 @@
  */
 
 import { useCallback, useRef, useState } from "react";
+import i18next from "i18next";
 import {
   ArrowDownIcon,
   ArrowUpIcon,
@@ -56,45 +57,41 @@ export interface AnnotationsListFilterProps {
   onSortChange: (sort: AnnotationsListSortState) => void;
 }
 
-const BASE_STATUS_ROWS: { field: AnnotationsListStatusField; label: string }[] = [
-  { field: "draft", label: "Draft" },
-  { field: "groundTruth", label: "Ground Truth" },
-  { field: "skipped", label: "Skipped" },
-  { field: "unresolvedComments", label: "Unresolved comments" },
-  { field: "accepted", label: "Accepted" },
-  { field: "rejected", label: "Rejected" },
-  { field: "fixedAndAccepted", label: "Fix + Accepted" },
-];
-
-const STATUS_DISABLED_TOOLTIPS: Partial<Record<AnnotationsListStatusField, string>> = {
-  draft: "Only Annotations can be drafts.",
-  groundTruth: "Only Annotations can be Ground Truth.",
-  skipped: "Only Annotations can be skipped.",
-  unresolvedComments: "Only Annotations can have unresolved comments.",
-  accepted: "Only Annotations can be accepted.",
-  rejected: "Only Annotations can be rejected.",
-  fixedAndAccepted: "Only Annotations can be Fix + Accepted.",
+const STATUS_LABEL_KEYS: Record<AnnotationsListStatusField, string> = {
+  draft: "editor:statusDraft",
+  groundTruth: "editor:statusGroundTruth",
+  skipped: "editor:statusSkipped",
+  unresolvedComments: "editor:unresolvedComments",
+  accepted: "editor:statusAccepted",
+  rejected: "editor:statusRejected",
+  fixedAndAccepted: "editor:statusFixAccepted",
 };
 
+const getBASE_STATUS_ROWS = () =>
+  (Object.keys(STATUS_LABEL_KEYS) as AnnotationsListStatusField[]).map((field) => ({
+    field,
+    label: i18next.t(STATUS_LABEL_KEYS[field]),
+  }));
+
 function getVisibleStatusRows(enableReviewStatusFilters: boolean) {
-  if (enableReviewStatusFilters) return BASE_STATUS_ROWS;
-  return BASE_STATUS_ROWS.filter((row) => !REVIEW_STATUS_FIELDS.includes(row.field));
+  if (enableReviewStatusFilters) return getBASE_STATUS_ROWS();
+  return getBASE_STATUS_ROWS().filter((row) => !REVIEW_STATUS_FIELDS.includes(row.field));
 }
 
 function isReviewStatusField(field: AnnotationsListStatusField, enableReviewStatusFilters: boolean): boolean {
   return !enableReviewStatusFilters && REVIEW_STATUS_FIELDS.includes(field);
 }
 
-const TYPE_FILTER_OPTIONS: { value: AnnotationsListTypeFilter; label: string }[] = [
-  { value: "all", label: "Any" },
-  { value: "annotation", label: "Annotations Only" },
-  { value: "prediction", label: "Predictions Only" },
+const TYPE_FILTER_OPTIONS = (): { value: AnnotationsListTypeFilter; label: string }[] => [
+  { value: "all", label: i18next.t("editor:filterAny") },
+  { value: "annotation", label: i18next.t("editor:filterAnnotationsOnly") },
+  { value: "prediction", label: i18next.t("editor:filterPredictionsOnly") },
 ];
 
-const SORT_OPTIONS: { value: AnnotationsListSortField; label: string }[] = [
-  { value: "createdAt", label: "Created at" },
-  { value: "updatedAt", label: "Updated at" },
-  { value: "name", label: "Name" },
+const SORT_OPTIONS = (): { value: AnnotationsListSortField; label: string }[] => [
+  { value: "createdAt", label: i18next.t("editor:infoCreatedAt") },
+  { value: "updatedAt", label: i18next.t("editor:infoUpdatedAt") },
+  { value: "name", label: i18next.t("editor:infoName") },
 ];
 
 // ─── Filter tooltip helpers ────────────────────────────────────────────────
@@ -210,7 +207,7 @@ function TypeFilterControl({ value, onChange }: TypeFilterControlProps) {
     <Label text="Result type" flat simple className={cn("annotations-list-filter").elem("typeFilter").toClassName()}>
       <Tabs value={value} variant="default" className={cn("annotations-list-filter").elem("typeTabs").toClassName()}>
         <TabsList className={cn("annotations-list-filter").elem("typeTabsList").toClassName()}>
-          {TYPE_FILTER_OPTIONS.map((option) => (
+          {TYPE_FILTER_OPTIONS().map((option) => (
             <TabsTrigger
               key={option.value}
               value={option.value}
@@ -348,7 +345,8 @@ export function AnnotationsListFilter({
     [onSortChange, sort.direction, sort.field],
   );
 
-  const currentSortLabel = SORT_OPTIONS.find((o) => o.value === sort.field)?.label ?? "Created at";
+  const currentSortLabel =
+    SORT_OPTIONS().find((o) => o.value === sort.field)?.label ?? i18next.t("editor:infoCreatedAt");
   const SortDirectionIcon = sort.direction === "asc" ? SortAscendingIcon : SortDescendingIcon;
   const sortDirectionLabel = sort.direction === "asc" ? "ascending" : "descending";
 
@@ -448,7 +446,9 @@ export function AnnotationsListFilter({
               </div>
               {statusRows.map((row) => {
                 const disabled = baseStatusRowsDisabled;
-                const disabledTooltip = disabled ? STATUS_DISABLED_TOOLTIPS[row.field] : undefined;
+                const disabledTooltip = disabled
+                  ? i18next.t("editor:onlyAnnotationsCan", { x: i18next.t(STATUS_LABEL_KEYS[row.field]) })
+                  : undefined;
                 return (
                   <Tooltip key={row.field} title={disabledTooltip} disabled={!disabledTooltip}>
                     <div
@@ -507,7 +507,7 @@ export function AnnotationsListFilter({
               data-testid="annotations-list-sort-popover"
               className="p-tight flex flex-col gap-tighter"
             >
-              {SORT_OPTIONS.map((opt) => {
+              {SORT_OPTIONS().map((opt) => {
                 const isSelected = sort.field === opt.value;
                 const TrailingIcon = isSelected ? (sort.direction === "asc" ? ArrowUpIcon : ArrowDownIcon) : null;
 

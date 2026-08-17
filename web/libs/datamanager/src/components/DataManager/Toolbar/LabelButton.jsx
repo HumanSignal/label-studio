@@ -108,7 +108,7 @@ export const LabelButton = injector(({ store, canLabel, size, target, selectedCo
               </Menu>
             }
           >
-            <Button size={size} look="outlined" variant="primary" aria-label={"Toggle open"}>
+            <Button size={size} look="outlined" variant="primary" aria-label={t("dataManager:toggleOpen")}>
               <IconChevronDown />
             </Button>
           </Dropdown.Trigger>
