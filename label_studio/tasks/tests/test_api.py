@@ -6,7 +6,9 @@ from organizations.tests.factories import OrganizationFactory
 from projects.models import Project
 from projects.tests.factories import ProjectFactory
 from rest_framework.test import APITestCase
+from tasks.models import Task
 from tasks.tests.factories import AnnotationFactory, PredictionFactory, TaskFactory
+from users.tests.factories import UserFactory
 
 
 class TestTaskAPI(APITestCase):
@@ -801,3 +803,107 @@ class TestTaskSummaryAPI(APITestCase):
         data = response.json()
         assert data['total_annotations'] == 2
         assert data['distributions']['label']['labels'] == {'Car': 1}
+
+
+LABEL_CONFIG = (
+    '<View><Text name="text" value="$text"/><Choices name="label" toName="text">'
+    '<Choice value="pos"/><Choice value="neg"/></Choices></View>'
+)
+ANNOTATION_RESULT = [{'value': {'choices': ['pos']}, 'from_name': 'label', 'to_name': 'text', 'type': 'choices'}]
+
+
+class TestTaskCreateOverlapInitialization(APITestCase):
+    """ROOT-62: Task create must seed overlap from Quality settings.
+
+    Full-overlap projects never rearrange on task add, so API create is the only
+    assignment path. Import/storage already seed overlap=maximum_annotations.
+    """
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.organization = OrganizationFactory()
+        cls.user = cls.organization.created_by
+        cls.label_config = LABEL_CONFIG
+
+    def _post_task(self, project, **extra):
+        self.client.force_authenticate(user=self.user)
+        payload = {'project': project.id, 'data': {'text': 'mid-project task'}, **extra}
+        response = self.client.post('/api/tasks/', data=payload, format='json')
+        assert response.status_code == 201, response.content
+        return Task.objects.get(id=response.json()['id'])
+
+    def test_full_overlap_project_seeds_overlap_and_stays_unlabeled_after_one_annotation(self):
+        """100% overlap / max=3: new task overlap=3; one annotation leaves is_labeled False."""
+        project = ProjectFactory(
+            organization=self.organization,
+            created_by=self.user,
+            label_config=self.label_config,
+            maximum_annotations=3,
+            overlap_cohort_percentage=100,
+        )
+        task = self._post_task(project)
+
+        assert task.overlap == 3
+        assert task.is_labeled is False
+
+        response = self.client.post(
+            f'/api/tasks/{task.id}/annotations/',
+            {'result': ANNOTATION_RESULT},
+            format='json',
+        )
+        assert response.status_code == 201, response.content
+        task.refresh_from_db()
+        assert task.overlap == 3
+        assert task.is_labeled is False
+
+        for _ in range(2):
+            annotator = UserFactory(active_organization=self.organization)
+            AnnotationFactory(task=task, project=project, completed_by=annotator, result=ANNOTATION_RESULT)
+        task.refresh_from_db()
+        task.update_is_labeled()
+        assert task.is_labeled is True
+
+    def test_partial_overlap_project_keeps_default_overlap_when_omitted(self):
+        """Cohort < 100% is not rearranged on single-task create; omitted overlap stays 1."""
+        project = ProjectFactory(
+            organization=self.organization,
+            created_by=self.user,
+            label_config=self.label_config,
+            maximum_annotations=3,
+            overlap_cohort_percentage=50,
+        )
+        task = self._post_task(project)
+        assert task.overlap == 1
+        assert task.is_labeled is False
+
+    def test_explicit_overlap_in_payload_is_preserved(self):
+        """Client-supplied overlap is not overwritten by project.maximum_annotations."""
+        project = ProjectFactory(
+            organization=self.organization,
+            created_by=self.user,
+            label_config=self.label_config,
+            maximum_annotations=3,
+            overlap_cohort_percentage=100,
+        )
+        task = self._post_task(project, overlap=2)
+        assert task.overlap == 2
+
+    def test_full_overlap_project_nested_create_seeds_overlap(self):
+        """POST /api/projects/{id}/tasks/ also seeds overlap when the field is omitted."""
+        project = ProjectFactory(
+            organization=self.organization,
+            created_by=self.user,
+            label_config=self.label_config,
+            maximum_annotations=3,
+            overlap_cohort_percentage=100,
+        )
+        self.client.force_authenticate(user=self.user)
+        response = self.client.post(
+            f'/api/projects/{project.id}/tasks/',
+            {'data': {'text': 'nested mid-project task'}},
+            format='json',
+        )
+        assert response.status_code == 201, response.content
+        task = Task.objects.get(id=response.json()['id'])
+        assert task.overlap == 3
+        assert task.is_labeled is False
