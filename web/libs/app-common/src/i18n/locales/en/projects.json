@@ -23,5 +23,22 @@
   "labelingSetup": "Labeling Setup",
   "cancelProjectCreation": "Cancel project creation",
   "cancel": "Cancel",
-  "save": "Save"
+  "save": "Save",
+  "welcomeTitle": "Welcome 👋",
+  "welcomeSubtitle": "Let's get you started.",
+  "inviteMembers": "Invite Members",
+  "recentProjects": "Recent Projects",
+  "viewAll": "View All",
+  "cantLoadProjects": "can't load projects",
+  "createFirstProject": "Create your first project",
+  "firstProjectHint": "Import your data and set up the labeling interface to start annotating",
+  "resourcesTitle": "Resources",
+  "resourcesDescription": "Learn, explore and get help",
+  "resourceDocumentation": "Documentation",
+  "resourceApiDocumentation": "API Documentation",
+  "resourceReleaseNotes": "Release Notes",
+  "resourceBlog": "LabelStud.io Blog",
+  "resourceSlack": "Slack Community",
+  "versionCommunity": "Label Studio Version: Community",
+  "homeProgress": "{{finished}} of {{total}} Tasks ({{percent}}%)"
 }

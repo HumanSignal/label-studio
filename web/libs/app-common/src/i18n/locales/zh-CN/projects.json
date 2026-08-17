@@ -23,5 +23,22 @@
   "labelingSetup": "标注设置",
   "cancelProjectCreation": "取消创建项目",
   "cancel": "取消",
-  "save": "保存"
+  "save": "保存",
+  "welcomeTitle": "欢迎 👋",
+  "welcomeSubtitle": "让我们开始吧。",
+  "inviteMembers": "邀请成员",
+  "recentProjects": "最近项目",
+  "viewAll": "查看全部",
+  "cantLoadProjects": "无法加载项目",
+  "createFirstProject": "创建你的第一个项目",
+  "firstProjectHint": "导入数据并设置标注界面，开始标注",
+  "resourcesTitle": "资源",
+  "resourcesDescription": "学习、探索并获取帮助",
+  "resourceDocumentation": "使用文档",
+  "resourceApiDocumentation": "API 文档",
+  "resourceReleaseNotes": "版本说明",
+  "resourceBlog": "LabelStud.io 博客",
+  "resourceSlack": "Slack 社区",
+  "versionCommunity": "Label Studio 版本：社区版",
+  "homeProgress": "{{finished}} / {{total}} 个任务（{{percent}}%）"
 }
