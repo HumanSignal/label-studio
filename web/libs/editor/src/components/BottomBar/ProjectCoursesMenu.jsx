@@ -1,10 +1,9 @@
 import { cloneElement, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { DropdownTrigger, Tooltip, Typography } from "@humansignal/ui";
 import { Menu } from "../../common/Menu/Menu";
 import { CourseListBadge } from "./CourseListBadge";
 import styles from "./project-courses-menu.module.css";
-
-const PROJECT_COURSES_TOOLTIP = "View Project Course(s)";
 
 /**
  * @typedef {{ id: number, title: string, color?: string | null }} OnDemandCourseItem
@@ -17,16 +16,23 @@ const PROJECT_COURSES_TOOLTIP = "View Project Course(s)";
  * }} props
  */
 function ProjectCoursesMenuContent({ courses, onSelectCourse }) {
+  const { t } = useTranslation();
+
   if (courses.length === 0) {
     return (
       <Typography variant="body" size="medium" className="text-neutral-content-subtle p-tight">
-        No courses are available to open on demand for this project.
+        {t("editor:noCoursesAvailable")}
       </Typography>
     );
   }
 
   return (
-    <Menu closeDropdownOnItemClick className={styles.projectCoursesMenu} role="menu" aria-label="Project courses">
+    <Menu
+      closeDropdownOnItemClick
+      className={styles.projectCoursesMenu}
+      role="menu"
+      aria-label={t("editor:projectCourses")}
+    >
       {courses.map((course) => (
         <Menu.Item
           key={course.id}
@@ -52,13 +58,14 @@ function ProjectCoursesMenuContent({ courses, onSelectCourse }) {
  */
 export function ProjectCoursesMenu({ courses, onSelectCourse, children }) {
   const [open, setOpen] = useState(false);
+  const { t } = useTranslation();
 
   const trigger = cloneElement(children, {
     "aria-expanded": open,
   });
 
   return (
-    <Tooltip title={PROJECT_COURSES_TOOLTIP} disabled={open}>
+    <Tooltip title={t("editor:viewProjectCourses")} disabled={open}>
       <span className="inline-flex aspect-square">
         <DropdownTrigger
           alignment="top-center"

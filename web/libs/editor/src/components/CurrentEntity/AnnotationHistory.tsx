@@ -17,6 +17,7 @@ import {
   IconHistoryRewind,
 } from "@humansignal/icons";
 import { Tooltip, Userpic } from "@humansignal/ui";
+import { useTranslation } from "react-i18next";
 import { Space } from "../../common/Space/Space";
 import { cn } from "../../utils/bem";
 import { userDisplayName } from "@humansignal/core";
@@ -57,10 +58,11 @@ const DraftState: FC<{
   inline?: boolean;
   isSelected?: boolean;
 }> = observer(({ annotation, inline, isSelected }: { annotation: any; inline?: boolean; isSelected?: boolean }) => {
+  const { t } = useTranslation();
   const hasChanges = annotation.history.hasChanges;
   const store = annotation.list; // @todo weird name
   const infoIsHidden = store.store.hasInterface("annotations:hide-info");
-  const hiddenUser = infoIsHidden ? { email: "Me" } : null;
+  const hiddenUser = infoIsHidden ? { email: t("editor:me") } : null;
   const currentUser = window.APP_SETTINGS?.user;
 
   // BROS-1477: Derive the "unsaved changes" state from the store's own change tracking
@@ -117,6 +119,7 @@ const AnnotationHistoryComponent: FC<any> = ({
   sectionHeader,
   renderEmptyState,
 }) => {
+  const { t } = useTranslation();
   const annotation = annotationStore.selected;
   const lastItem = history?.length ? history[0] : null;
   const hasChanges = annotation.history.hasChanges;
@@ -136,8 +139,8 @@ const AnnotationHistoryComponent: FC<any> = ({
   const defaultEmptyState = (
     <EmptyState
       icon={<IconHistoryRewind width={24} height={24} />}
-      header="View annotation activity"
-      description={<>See a log of user actions for this annotation</>}
+      header={t("editor:viewAnnotationActivity")}
+      description={<>{t("editor:seeLogOfUserActions")}</>}
     />
   );
 
@@ -167,7 +170,9 @@ const AnnotationHistoryComponent: FC<any> = ({
           const { id, user, createdDate } = item;
           const isLastItem = lastItem?.id === item.id;
           const isSelected = isLastItem && !selectedHistory ? !isDraftSelected : selectedHistory?.id === item.id;
-          const hiddenUser = infoIsHidden ? { email: currentUser?.id === user.id ? "Me" : "User" } : null;
+          const hiddenUser = infoIsHidden
+            ? { email: currentUser?.id === user.id ? t("editor:me") : t("editor:user") }
+            : null;
 
           const isStub = !!item.is_stub;
           const disabled = !isStub && item.results.length === 0;
@@ -245,36 +250,37 @@ const HistoryItemComponent: FC<{
   hideInfo: infoIsHidden,
   onClick,
 }) => {
+  const { t } = useTranslation();
   const isPrediction = entity?.type === "prediction";
 
   const reason = useMemo(() => {
     switch (acceptedState) {
       case "accepted":
-        return "Accepted";
+        return t("editor:historyAccepted");
       case "rejected":
-        return "Rejected";
+        return t("editor:historyRejected");
       case "fixed_and_accepted":
-        return "Fixed";
+        return t("editor:historyFixed");
       case "updated":
-        return "Updated";
+        return t("editor:historyUpdated");
       case "submitted":
-        return "Submitted";
+        return t("editor:historySubmitted");
       case "prediction":
-        return "From prediction";
+        return t("editor:historyFromPrediction");
       case "imported":
-        return "Imported";
+        return t("editor:historyImported");
       case "skipped":
-        return "Skipped";
+        return t("editor:historySkipped");
       case "draft_created":
-        return "Draft";
+        return t("editor:historyDraft");
       case "deleted_review":
-        return "Review deleted";
+        return t("editor:historyReviewDeleted");
       case "propagated_annotation":
-        return "Propagated";
+        return t("editor:historyPropagated");
       default:
         return null;
     }
-  }, []);
+  }, [acceptedState, t]);
 
   const handleClick = useCallback(
     (e) => {
@@ -329,6 +335,7 @@ const HistoryComment: FC<{
   reason: string | null;
   comment: string;
 }> = ({ reason, comment }) => {
+  const { t } = useTranslation();
   const [collapsed, setCollapsed] = useState(false);
   const [collapsible, setCollapsible] = useState(false);
   const commentRef = useRef();
@@ -361,7 +368,7 @@ const HistoryComment: FC<{
             setCollapsed((v) => !v);
           }}
         >
-          {collapsed ? "Show more" : "Show less"}
+          {collapsed ? t("editor:showMore") : t("editor:showLess")}
         </div>
       )}
     </div>

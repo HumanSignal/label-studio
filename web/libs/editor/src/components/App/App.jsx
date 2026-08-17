@@ -3,6 +3,7 @@
  */
 import React, { Component } from "react";
 import { Result, Spin } from "antd";
+import i18next from "i18next";
 import { getEnv, getRoot } from "mobx-state-tree";
 import { observer, Provider } from "mobx-react";
 import { QueryClientProvider } from "@tanstack/react-query";
@@ -90,7 +91,7 @@ class App extends Component {
           variant="positive"
           icon={<IconCheck />}
           title={messages.DONE}
-          description="Your annotation has been submitted."
+          description={i18next.t("editor:annotationSubmitted")}
         />
       </div>
     );
@@ -104,7 +105,7 @@ class App extends Component {
           variant="positive"
           icon={<IconCheck />}
           title={messages.NO_COMP_LEFT}
-          description="You've viewed all annotations for this task."
+          description={i18next.t("editor:viewedAllAnnotations")}
         />
       </div>
     );
@@ -127,16 +128,16 @@ class App extends Component {
           variant="positive"
           icon={<IconCheck />}
           title={messages.NO_NEXT_TASK}
-          description="All tasks in the queue have been completed"
+          description={i18next.t("editor:allTasksCompleted")}
           actions={
             store.taskHistory.length > 0 ? (
               <Button
                 onClick={(e) => store.prevTask(e, true)}
                 variant="primary"
-                aria-label="Previous task"
+                aria-label={i18next.t("editor:previousTask")}
                 data-testid="editor-empty-queue-previous-task"
               >
-                Go to Previous Task
+                {i18next.t("editor:goToPreviousTask")}
               </Button>
             ) : undefined
           }

@@ -9,8 +9,10 @@
 import { observer } from "mobx-react";
 import { IntersectSquareIcon, XIcon } from "@humansignal/icons";
 import { Button, Typography } from "@humansignal/ui";
+import { useTranslation } from "react-i18next";
 
 export const CompareAllHeader = observer(({ store }) => {
+  const { t } = useTranslation();
   const onClose = () => store.annotationStore.toggleViewingAllAnnotations();
 
   return (
@@ -33,14 +35,14 @@ export const CompareAllHeader = observer(({ store }) => {
       <div style={{ display: "flex", alignItems: "center", gap: "var(--spacing-tight, 8px)" }}>
         <IntersectSquareIcon size={20} className="text-primary-icon" />
         <Typography variant="title" size="small">
-          Compare All
+          {t("editor:compareAll")}
         </Typography>
       </div>
       <Button
         variant="primary"
         look="string"
         size="small"
-        aria-label="Close Compare All"
+        aria-label={t("editor:closeCompareAll")}
         onClick={onClose}
         className="p-0"
         leading={<XIcon size={20} />}

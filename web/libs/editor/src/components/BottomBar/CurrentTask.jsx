@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { observer } from "mobx-react";
+import { useTranslation } from "react-i18next";
 import { Button, Tooltip } from "@humansignal/ui";
 import { CaretLeftIcon, CaretRightIcon } from "@humansignal/icons";
 import { cn } from "../../utils/bem";
@@ -13,6 +14,7 @@ import { reaction } from "mobx";
 const MANAGER_ROLES = ["OW", "AD", "MA"];
 
 export const CurrentTask = observer(({ store }) => {
+  const { t } = useTranslation();
   const currentIndex = useMemo(() => {
     return store.taskHistory.findIndex((x) => x.taskId === store.task.id) + 1;
   }, [store.taskHistory]);
@@ -72,25 +74,25 @@ export const CurrentTask = observer(({ store }) => {
 
   // Memoized messages for previous button
   const prevButtonMessage = useMemo(() => {
-    return !store.canGoPrevTask ? "No previous task" : "Previous task";
-  }, [store.canGoPrevTask]);
+    return !store.canGoPrevTask ? t("editor:noPreviousTask") : t("editor:previousTask");
+  }, [store.canGoPrevTask, t]);
 
   // Memoized messages for next button
   const nextButtonMessage = useMemo(() => {
     if (requiresAnnotationSubmission) {
-      return "Submit an annotation to continue";
+      return t("editor:submitAnnotationToContinue");
     }
     if (canNavigateNext) {
-      return "Next task";
+      return t("editor:nextTask");
     }
     if (canPostponeTask) {
-      return "Postpone task";
+      return t("editor:postponeTask");
     }
     if (!canSkipOrPostpone) {
-      return "Cannot postpone: task cannot be skipped";
+      return t("editor:cannotPostponeTaskCannotBeSkipped");
     }
-    return "No next task available";
-  }, [requiresAnnotationSubmission, canNavigateNext, canPostponeTask, canSkipOrPostpone]);
+    return t("editor:noNextTaskAvailable");
+  }, [requiresAnnotationSubmission, canNavigateNext, canPostponeTask, canSkipOrPostpone, t]);
 
   if (store.hasInterface("annotations:comments") && isFF(FF_DEV_4174)) {
     canPostpone = canPostpone && store.commentStore.addedCommentThisSession && visibleComments >= initialCommentLength;
@@ -105,11 +107,11 @@ export const CurrentTask = observer(({ store }) => {
             showCounter &&
             (isFF(FF_TASK_COUNT_FIX) ? (
               <div className={cn("current-task").elem("task-count").toClassName()}>
-                {store.queuePosition} of {store.queueTotal}
+                {t("editor:taskCounter", { current: store.queuePosition, total: store.queueTotal })}
               </div>
             ) : (
               <div className={cn("current-task").elem("task-count").toClassName()}>
-                {currentIndex} of {store.taskHistory.length}
+                {t("editor:taskCounter", { current: currentIndex, total: store.taskHistory.length })}
               </div>
             ))}
         </div>

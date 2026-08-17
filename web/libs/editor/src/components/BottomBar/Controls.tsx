@@ -7,6 +7,7 @@
 import { observer } from "mobx-react";
 import type React from "react";
 import { useCallback, useState } from "react";
+import { useTranslation } from "react-i18next";
 
 import { Button, ButtonGroup, type ButtonProps } from "@humansignal/ui";
 import { CaretDownIcon, IconBan, IconChevronDown } from "@humansignal/icons";
@@ -71,6 +72,7 @@ const ControlButton = observer(({ button, disabled, onClick, variant, look }: Co
 
 export const Controls = controlsInjector<{ annotation: MSTAnnotation }>(
   observer(({ store, history, annotation }) => {
+    const { t } = useTranslation();
     const isReview = store.hasInterface("review") || annotation.canBeReviewed;
     const isNotQuickView = store.hasInterface("topbar:prevnext");
     const historySelected = isDefined(store.annotationStore.selectedHistory);
@@ -184,7 +186,7 @@ export const Controls = controlsInjector<{ annotation: MSTAnnotation }>(
           const selected = store.annotationStore?.selected;
 
           if (store.hasInterface("comments:reject")) {
-            handleActionWithComments(e, action, "Please enter a comment before rejecting");
+            handleActionWithComments(e, action, t("editor:commentBeforeRejecting"));
           } else {
             selected?.submissionInProgress();
             await store.commentStore.commentFormSubmit();
@@ -198,14 +200,14 @@ export const Controls = controlsInjector<{ annotation: MSTAnnotation }>(
     } else if (annotation.skipped) {
       buttons.push(
         <div className={cn("controls").elem("skipped-info").toClassName()} key="skipped">
-          <IconBan /> Was skipped
+          <IconBan /> {t("editor:wasSkipped")}
         </div>,
       );
       buttons.push(<UnskipButton key="unskip" disabled={disabled} store={store} />);
     } else {
       if (store.hasInterface("skip")) {
         const onSkipWithComment = (e: React.MouseEvent, action: () => any) => {
-          handleActionWithComments(e, action, "Please enter a comment before skipping");
+          handleActionWithComments(e, action, t("editor:commentBeforeSkipping"));
         };
 
         buttons.push(<SkipButton key="skip" disabled={disabled} store={store} onSkipWithComment={onSkipWithComment} />);
@@ -246,7 +248,7 @@ export const Controls = controlsInjector<{ annotation: MSTAnnotation }>(
               }}
               data-testid={`bottombar-${isUpdate ? "update" : "submit"}-and-exit-button`}
             >
-              {`${isUpdate ? "Update" : "Submit"} and exit`}
+              {isUpdate ? t("editor:updateAndExit") : t("editor:submitAndExit")}
             </Button>
           </div>
         );
@@ -254,19 +256,19 @@ export const Controls = controlsInjector<{ annotation: MSTAnnotation }>(
 
       if (userGenerate || (store.explore && !userGenerate && store.hasInterface("submit"))) {
         const title = hasIncompleteRegions
-          ? INCOMPLETE_SUBMIT_TOOLTIP
+          ? t("editor:incompleteSubmitTooltip")
           : overlapDisabled
             ? store.overlapReachedMessage
             : submitDisabled
-              ? EMPTY_SUBMIT_TOOLTIP
-              : "Save results: [ Ctrl+Enter ]";
+              ? t("editor:emptySubmitTooltip")
+              : t("editor:saveResultsTooltip");
 
         buttons.push(
           <ButtonTooltip key="submit" title={title} className="whitespace-nowrap max-w-none">
             <div className={cn("controls").elem("tooltip-wrapper").toClassName()}>
               <ButtonGroup>
                 <Button
-                  aria-label="Submit current annotation"
+                  aria-label={t("editor:submitCurrentAnnotation")}
                   name="submit"
                   className="w-[150px]"
                   disabled={isDisabled}
@@ -280,7 +282,7 @@ export const Controls = controlsInjector<{ annotation: MSTAnnotation }>(
                   }}
                   data-testid="bottombar-submit-button"
                 >
-                  Submit
+                  {t("editor:submit")}
                 </Button>
                 {useExitOption ? (
                   <Dropdown.Trigger
@@ -293,7 +295,7 @@ export const Controls = controlsInjector<{ annotation: MSTAnnotation }>(
                   >
                     <Button
                       disabled={isDisabled}
-                      aria-label="Submit annotation"
+                      aria-label={t("editor:submitAnnotation")}
                       data-testid="bottombar-submit-dropdown"
                       leading={<CaretDownIcon size={24} />}
                     />
@@ -309,18 +311,18 @@ export const Controls = controlsInjector<{ annotation: MSTAnnotation }>(
         const noChanges = isFF(FF_REVIEWER_FLOW) && !history.canUndo && !annotation.draftId;
         const isUpdateDisabled = isDisabled || noChanges;
         const updateTitle = hasIncompleteRegions
-          ? INCOMPLETE_UPDATE_TOOLTIP
+          ? t("editor:incompleteUpdateTooltip")
           : overlapDisabled
             ? store.overlapReachedMessage
             : noChanges
-              ? "No changes were made"
-              : "Update this task: [ Ctrl+Enter ]";
+              ? t("editor:noChangesTooltip")
+              : t("editor:updateTaskTooltip");
         const button = (
           <ButtonTooltip key="update" title={updateTitle} className="whitespace-nowrap max-w-none">
             <div className={cn("controls").elem("tooltip-wrapper").toClassName()}>
               <ButtonGroup>
                 <Button
-                  aria-label="submit"
+                  aria-label={t("editor:submit")}
                   name="submit"
                   className="w-[150px]"
                   disabled={isUpdateDisabled}
@@ -334,7 +336,7 @@ export const Controls = controlsInjector<{ annotation: MSTAnnotation }>(
                   }}
                   data-testid="bottombar-update-button"
                 >
-                  {isUpdate ? "Update" : "Submit"}
+                  {isUpdate ? t("editor:update") : t("editor:submit")}
                 </Button>
                 {useExitOption ? (
                   <Dropdown.Trigger
@@ -343,7 +345,7 @@ export const Controls = controlsInjector<{ annotation: MSTAnnotation }>(
                   >
                     <Button
                       disabled={isUpdateDisabled}
-                      aria-label="Update annotation"
+                      aria-label={t("editor:updateAnnotation")}
                       data-testid="bottombar-update-dropdown"
                     >
                       <IconChevronDown />

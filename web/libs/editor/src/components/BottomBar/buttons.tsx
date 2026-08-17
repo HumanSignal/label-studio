@@ -5,13 +5,14 @@
  */
 
 import { inject, observer } from "mobx-react";
+import i18next from "i18next";
 import type React from "react";
 import { memo, type ReactElement } from "react";
+import { useTranslation } from "react-i18next";
 import { Tooltip, Button } from "@humansignal/ui";
 import { IconInfoOutline } from "@humansignal/icons";
 import type { MSTStore } from "../../stores/types";
 import { FF_FIT_1304_STRICT_OVERLAP, isFF } from "../../utils/feature-flags";
-import { INCOMPLETE_ACCEPT_TOOLTIP } from "./Controls";
 
 type MixedInParams = {
   store: MSTStore;
@@ -53,12 +54,13 @@ type AcceptButtonProps = {
 
 export const AcceptButton = memo(
   observer(({ disabled, history, store }: AcceptButtonProps) => {
+    const { t } = useTranslation();
     const annotation = store.annotationStore.selected;
     // changes in current sessions or saved draft
     const hasChanges = history.canUndo || annotation.versions.draft;
     const hasIncompleteRegions = annotation.hasIncompleteRegions;
     const isDisabled = disabled || hasIncompleteRegions;
-    const tooltip = hasIncompleteRegions ? INCOMPLETE_ACCEPT_TOOLTIP : "Accept annotation: [ Ctrl+Enter ]";
+    const tooltip = hasIncompleteRegions ? t("editor:incompleteAcceptTooltip") : t("editor:acceptAnnotationTooltip");
 
     return (
       <Tooltip title={tooltip} disabled={!store.settings.enableTooltips} className="whitespace-nowrap max-w-none">
@@ -73,7 +75,7 @@ export const AcceptButton = memo(
           }}
           data-testid="bottombar-accept-button"
         >
-          {hasChanges ? "Fix + Accept" : "Accept"}
+          {hasChanges ? t("editor:fixAndAccept") : t("editor:accept")}
         </Button>
       </Tooltip>
     );
@@ -83,11 +85,15 @@ export const AcceptButton = memo(
 export const RejectButtonDefinition = {
   id: "reject",
   name: "reject",
-  title: "Reject",
+  get title() {
+    return i18next.t("editor:reject");
+  },
   variant: "negative",
   look: "outlined",
   ariaLabel: "reject-annotation",
-  tooltip: "Reject annotation: [ Ctrl+Space ]",
+  get tooltip() {
+    return i18next.t("editor:rejectAnnotationTooltip");
+  },
   // @todo we need this for types compatibility, but better to fix CustomButtonType
   disabled: false,
 };
@@ -107,6 +113,7 @@ const MANAGER_ROLES = ["OW", "AD", "MA"];
 
 export const SkipButton = memo(
   observer(({ disabled, store, onSkipWithComment }: SkipButtonProps) => {
+    const { t } = useTranslation();
     const task = store.task;
     const isEnterprise = (window as any).APP_SETTINGS?.billing?.enterprise;
     const skipDisabled = isEnterprise ? (task as any)?.allow_skip === false : false;
@@ -120,15 +127,15 @@ export const SkipButton = memo(
     const tooltip: string = overlapReached
       ? store.overlapReachedMessage
       : canSkip
-        ? "Cancel (skip) task [ Ctrl+Space ]"
-        : "This task cannot be skipped";
+        ? t("editor:skipTaskTooltip")
+        : t("editor:taskCannotBeSkipped");
 
     const showInfoIcon = skipDisabled && hasForceSkipPermission;
 
     return (
       <>
         {showInfoIcon && (
-          <Tooltip title="Annotators and Reviewers will not be able to skip this task">
+          <Tooltip title={t("editor:skipDisabledForAnnotators")}>
             <IconInfoOutline width={20} height={20} className="text-neutral-content ml-auto cursor-pointer" />
           </Tooltip>
         )}
@@ -152,7 +159,7 @@ export const SkipButton = memo(
           }}
           data-testid="bottombar-skip-button"
         >
-          Skip
+          {t("editor:skip")}
         </Button>
       </>
     );
@@ -161,10 +168,11 @@ export const SkipButton = memo(
 
 export const UnskipButton = memo(
   observer(({ disabled, store }: { disabled: boolean; store: MSTStore }) => {
+    const { t } = useTranslation();
     return (
       <Button
         key="cancel-skip"
-        tooltip="Cancel skip: []"
+        tooltip={t("editor:cancelSkipTooltip")}
         aria-label="cancel-skip"
         look="outlined"
         disabled={disabled}
@@ -177,7 +185,7 @@ export const UnskipButton = memo(
         }}
         data-testid="bottombar-unskip-button"
       >
-        Cancel skip
+        {t("editor:cancelSkip")}
       </Button>
     );
   }),
