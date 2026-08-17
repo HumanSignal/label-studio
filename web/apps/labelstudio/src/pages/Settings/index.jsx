@@ -1,3 +1,4 @@
+import i18next from "i18next";
 import { SidebarMenu } from "../../components/SidebarMenu/SidebarMenu";
 import { WebhookPage } from "../WebhookPage/WebhookPage";
 import { DangerZone } from "./DangerZone";
@@ -39,7 +40,9 @@ const pages = {
 };
 
 export const SettingsPage = {
-  title: "Settings",
+  get title() {
+    return i18next.t("settings:settingsPageTitle");
+  },
   path: "/settings",
   exact: true,
   layout: MenuLayout,

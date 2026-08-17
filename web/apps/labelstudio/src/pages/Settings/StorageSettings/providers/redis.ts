@@ -1,47 +1,66 @@
 import { z } from "zod";
+import i18next from "i18next";
 import type { ProviderConfig } from "@humansignal/app-common/blocks/StorageProviderForm/types/provider";
 import { IconCloudProviderRedis } from "@humansignal/icons";
 
 export const redisProvider: ProviderConfig = {
   name: "redis",
-  title: "Redis Storage",
-  description: "Configure your Redis storage connection with all required Label Studio settings",
+  get title() {
+    return i18next.t("dataManager:storageRedis");
+  },
+  get description() {
+    return i18next.t("settings:redisProviderDesc");
+  },
   icon: IconCloudProviderRedis,
   fields: [
     {
       name: "db",
       type: "text",
-      label: "Database Number (db)",
+      get label() {
+        return i18next.t("settings:databaseNumberLabel");
+      },
       placeholder: "1",
       schema: z.string().default("1"),
     },
     {
       name: "password",
       type: "password",
-      label: "Password",
+      get label() {
+        return i18next.t("settings:passwordLabel");
+      },
       autoComplete: "new-password",
-      placeholder: "Your redis password",
+      get placeholder() {
+        return i18next.t("settings:redisPasswordPlaceholder");
+      },
       schema: z.string().optional().default(""),
     },
     {
       name: "host",
       type: "text",
-      label: "Host",
+      get label() {
+        return i18next.t("settings:hostLabel");
+      },
       required: true,
       placeholder: "redis://example.com",
-      schema: z.string().min(1, "Host is required"),
+      get schema() {
+        return z.string().min(1, i18next.t("settings:hostRequired"));
+      },
     },
     {
       name: "port",
       type: "text",
-      label: "Port",
+      get label() {
+        return i18next.t("settings:portLabel");
+      },
       placeholder: "6379",
       schema: z.string().default("6379"),
     },
     {
       name: "prefix",
       type: "text",
-      label: "Bucket prefix",
+      get label() {
+        return i18next.t("settings:bucketPrefixLabel");
+      },
       placeholder: "path/to/files",
       schema: z.string().optional().default(""),
       target: "export",

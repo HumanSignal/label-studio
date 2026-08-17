@@ -1,4 +1,6 @@
 import { useCallback, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
+import i18next from "i18next";
 import { useUpdatePageTitle, createTitleFromSegments } from "@humansignal/core";
 import { useProject } from "../../providers/ProjectProvider";
 import { isEmptyString } from "../../utils/helpers";
@@ -6,11 +8,12 @@ import { ConfigPage } from "../CreateProject/Config/Config";
 
 export const LabelingSettings = () => {
   const { project, updateProject } = useProject();
+  const { t } = useTranslation();
   const [config, setConfig] = useState("");
   const [essentialDataChanged, setEssentialDataChanged] = useState(false);
   const hasChanges = config !== project.label_config;
 
-  useUpdatePageTitle(createTitleFromSegments([project?.title, "Labeling Interface Settings"]));
+  useUpdatePageTitle(createTitleFromSegments([project?.title, t("settings:labelingInterfacePageTitle")]));
 
   const saveConfig = useCallback(async () => {
     const res = await updateProject({
@@ -65,5 +68,9 @@ export const LabelingSettings = () => {
   );
 };
 
-LabelingSettings.title = "Labeling Interface";
+// Route metadata is read by the routing/sidebar system outside of a React
+// component, so it resolves through the shared i18next singleton lazily.
+Object.defineProperty(LabelingSettings, "title", {
+  get: () => i18next.t("settings:navLabelingInterface"),
+});
 LabelingSettings.path = "/labeling";

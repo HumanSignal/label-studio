@@ -1,12 +1,35 @@
 import { EnterpriseBadge, Message } from "@humansignal/ui";
+import { useTranslation } from "react-i18next";
+import i18next from "i18next";
 import { IconCloudProviderAzure } from "@humansignal/icons";
 import type { ProviderConfig } from "@humansignal/app-common/blocks/StorageProviderForm/types/provider";
 
+const AzureSpiEnterpriseMessage = () => {
+  const { t } = useTranslation();
+
+  return (
+    <Message variant="enterprise" title={t("settings:enterpriseFeatureTitle")}>
+      {t("settings:azureSpiEnterpriseMsg")}{" "}
+      <a
+        href="https://docs.humansignal.com/guide/storage.html#Azure-Blob-Storage-with-Service-Principal-authentication"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="underline hover:no-underline"
+      >
+        {t("settings:learnMore")}
+      </a>
+    </Message>
+  );
+};
+
 const azureSpiProvider: ProviderConfig = {
   name: "azure_spi",
-  title: "Azure Blob Storage\nwith Service Principal",
-  description:
-    "Configure your Azure Blob Storage connection using Service Principal authentication for enhanced security (proxy only)",
+  get title() {
+    return i18next.t("settings:azureSpiProviderTitle");
+  },
+  get description() {
+    return i18next.t("settings:azureSpiProviderDesc");
+  },
   icon: IconCloudProviderAzure,
   disabled: true,
   badge: <EnterpriseBadge />,
@@ -14,19 +37,7 @@ const azureSpiProvider: ProviderConfig = {
     {
       name: "enterprise_info",
       type: "message",
-      content: (
-        <Message variant="enterprise" title="Enterprise Feature">
-          Azure Blob Storage with Service Principal is available in Label Studio Enterprise.{" "}
-          <a
-            href="https://docs.humansignal.com/guide/storage.html#Azure-Blob-Storage-with-Service-Principal-authentication"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="underline hover:no-underline"
-          >
-            Learn more
-          </a>
-        </Message>
-      ),
+      content: AzureSpiEnterpriseMessage,
     },
   ],
   layout: [{ fields: ["enterprise_info"] }],

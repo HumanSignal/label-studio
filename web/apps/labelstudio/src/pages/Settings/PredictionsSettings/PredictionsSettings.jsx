@@ -1,4 +1,6 @@
 import { useCallback, useContext, useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
+import i18next from "i18next";
 import { Divider } from "../../../components/Divider/Divider";
 import { EmptyState, SimpleCard } from "@humansignal/ui";
 import { Typography } from "@humansignal/ui";
@@ -13,11 +15,12 @@ import { ImportPredictionsExample } from "./ImportPredictionsExample";
 export const PredictionsSettings = () => {
   const api = useAPI();
   const { project } = useContext(ProjectContext);
+  const { t } = useTranslation();
   const [versions, setVersions] = useState([]);
   const [loading, setLoading] = useState(false);
   const [loaded, setLoaded] = useState(false);
 
-  useUpdatePageTitle(createTitleFromSegments([project?.title, "Predictions Settings"]));
+  useUpdatePageTitle(createTitleFromSegments([project?.title, t("settings:predictionsSettingsPageTitle")]));
 
   const fetchVersions = useCallback(async () => {
     setLoading(true);
@@ -42,7 +45,7 @@ export const PredictionsSettings = () => {
   return (
     <section className="max-w-[42rem]">
       <Typography variant="headline" size="medium" className="mb-tight">
-        Predictions
+        {t("settings:predictionsHeadline")}
       </Typography>
       <div>
         {loading && <Spinner size={32} />}
@@ -50,10 +53,10 @@ export const PredictionsSettings = () => {
         {loaded && versions.length > 0 && (
           <>
             <Typography variant="title" size="medium">
-              Predictions List
+              {t("settings:predictionsListTitle")}
             </Typography>
             <Typography size="small" className="text-neutral-content-subtler mt-base mb-wider">
-              List of predictions available in the project. Each card is associated with a separate model version.
+              {t("settings:predictionsListDescription")}
             </Typography>
           </>
         )}
@@ -64,8 +67,8 @@ export const PredictionsSettings = () => {
               size="medium"
               variant="primary"
               icon={<IconPredictions />}
-              title="No predictions uploaded yet"
-              description="Upload predictions to automatically prelabel your data and speed up annotation. Import predictions from multiple model versions to compare their performance, or connect live models from the Model page to generate predictions on demand."
+              title={t("settings:noPredictionsTitle")}
+              description={t("settings:noPredictionsDescription")}
               footer={
                 !window.APP_SETTINGS?.whitelabel_is_active && (
                   <Typography variant="label" size="small" className="text-primary-link">
@@ -74,10 +77,10 @@ export const PredictionsSettings = () => {
                       target="_blank"
                       rel="noopener noreferrer"
                       data-testid="predictions-help-link"
-                      aria-label="Learn more about predictions (opens in new window)"
+                      aria-label={t("settings:learnMorePredictionsAria")}
                       className="inline-flex items-center gap-1 hover:underline"
                     >
-                      Learn more
+                      {t("settings:learnMore")}
                       <IconExternal width={16} height={16} />
                     </a>
                   </Typography>
@@ -97,5 +100,9 @@ export const PredictionsSettings = () => {
   );
 };
 
-PredictionsSettings.title = "Predictions";
+// Route metadata is read by the routing/sidebar system outside of a React
+// component, so it resolves through the shared i18next singleton lazily.
+Object.defineProperty(PredictionsSettings, "title", {
+  get: () => i18next.t("settings:navPredictions"),
+});
 PredictionsSettings.path = "/predictions";

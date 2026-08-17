@@ -1,25 +1,36 @@
 import type { ProviderConfig } from "@humansignal/app-common/blocks/StorageProviderForm/types/provider";
 import { IconCloudProviderAzure } from "@humansignal/icons";
+import i18next from "i18next";
 import { z } from "zod";
 
 export const azureProvider: ProviderConfig = {
   name: "azure",
-  title: "Azure Blob Storage",
-  description: "Configure your Azure Blob Storage connection with all required Label Studio settings",
+  get title() {
+    return i18next.t("dataManager:storageAzureBlob");
+  },
+  get description() {
+    return i18next.t("settings:azureProviderDesc");
+  },
   icon: IconCloudProviderAzure,
   fields: [
     {
       name: "container",
       type: "text",
-      label: "Container Name",
+      get label() {
+        return i18next.t("settings:containerNameLabel");
+      },
       required: true,
       placeholder: "my-azure-container",
-      schema: z.string().min(1, "Container name is required"),
+      get schema() {
+        return z.string().min(1, i18next.t("settings:containerNameRequired"));
+      },
     },
     {
       name: "prefix",
       type: "text",
-      label: "Bucket prefix",
+      get label() {
+        return i18next.t("settings:bucketPrefixLabel");
+      },
       placeholder: "path/to/files",
       schema: z.string().optional().default(""),
       target: "export",
@@ -27,7 +38,9 @@ export const azureProvider: ProviderConfig = {
     {
       name: "account_name",
       type: "password",
-      label: "Account Name",
+      get label() {
+        return i18next.t("settings:accountNameLabel");
+      },
       autoComplete: "off",
       accessKey: true,
       placeholder: "mystorageaccount",
@@ -36,18 +49,25 @@ export const azureProvider: ProviderConfig = {
     {
       name: "account_key",
       type: "password",
-      label: "Account Key",
+      get label() {
+        return i18next.t("settings:accountKeyLabel");
+      },
       autoComplete: "new-password",
       accessKey: true,
-      placeholder: "Your storage account key",
+      get placeholder() {
+        return i18next.t("settings:accountKeyPlaceholder");
+      },
       schema: z.string().optional().default(""),
     },
     {
       name: "presign",
       type: "toggle",
-      label: "Use pre-signed URLs (On) / Proxy through the platform (Off)",
-      description:
-        "When pre-signed URLs are enabled, all data bypasses the platform and user browsers directly read data from storage",
+      get label() {
+        return i18next.t("settings:presignLabel");
+      },
+      get description() {
+        return i18next.t("settings:presignDescription");
+      },
       schema: z.boolean().default(true),
       target: "import",
       resetConnection: false,
@@ -55,7 +75,9 @@ export const azureProvider: ProviderConfig = {
     {
       name: "presign_ttl",
       type: "counter",
-      label: "Expire pre-signed URLs (minutes)",
+      get label() {
+        return i18next.t("settings:presignTtlLabel");
+      },
       min: 1,
       max: 10080,
       step: 1,

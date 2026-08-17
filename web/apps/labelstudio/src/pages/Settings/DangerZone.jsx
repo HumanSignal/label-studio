@@ -1,5 +1,7 @@
 import { useMemo, useState } from "react";
 import { useHistory } from "react-router";
+import { Trans, useTranslation } from "react-i18next";
+import i18next from "i18next";
 import { Button, Typography, useToast } from "@humansignal/ui";
 import { useUpdatePageTitle, createTitleFromSegments } from "@humansignal/core";
 import { Label } from "../../components/Form";
@@ -17,9 +19,10 @@ export const DangerZone = () => {
   const api = useAPI();
   const history = useHistory();
   const toast = useToast();
+  const { t } = useTranslation();
   const [processing, setProcessing] = useState(null);
 
-  useUpdatePageTitle(createTitleFromSegments([project?.title, "Danger Zone"]));
+  useUpdatePageTitle(createTitleFromSegments([project?.title, t("settings:dangerZonePageTitle")]));
 
   const showDangerConfirmation = ({ title, message, requiredWord, buttonText, onConfirm }) => {
     const isDev = process.env.NODE_ENV === "development";
@@ -38,7 +41,7 @@ export const DangerZone = () => {
               {message}
             </Typography>
             <Input
-              label={`To proceed, type "${requiredWord}" in the field below:`}
+              label={t("settings:typeWordToProceed", { word: requiredWord })}
               value={inputValue}
               onChange={(e) => ctrl?.setState({ inputValue: e.target.value })}
               autoFocus
@@ -61,7 +64,7 @@ export const DangerZone = () => {
               onClick={() => ctrl?.hide()}
               data-testid="danger-zone-cancel-button"
             >
-              Cancel
+              {t("settings:cancelButton")}
             </Button>
             <Button
               variant="negative"
@@ -81,36 +84,44 @@ export const DangerZone = () => {
   };
 
   const handleOnClick = (type) => () => {
+    // Confirmation words stay in English on purpose: users must type them
+    // exactly, and translating them would complicate IME input.
     const actionConfig = {
       reset_cache: {
-        title: "Reset Cache",
+        title: t("settings:resetCacheTitle"),
         message: (
-          <>
-            You are about to reset the cache for <strong>{project.title}</strong>. This action cannot be undone.
-          </>
+          <Trans
+            i18nKey="settings:resetCacheConfirmMsg"
+            values={{ title: project.title }}
+            components={{ strong: <strong /> }}
+          />
         ),
         requiredWord: "cache",
-        buttonText: "Reset Cache",
+        buttonText: t("settings:resetCacheTitle"),
       },
       tabs: {
-        title: "Drop All Tabs",
+        title: t("settings:dropAllTabsTitle"),
         message: (
-          <>
-            You are about to drop all tabs for <strong>{project.title}</strong>. This action cannot be undone.
-          </>
+          <Trans
+            i18nKey="settings:dropAllTabsConfirmMsg"
+            values={{ title: project.title }}
+            components={{ strong: <strong /> }}
+          />
         ),
         requiredWord: "tabs",
-        buttonText: "Drop All Tabs",
+        buttonText: t("settings:dropAllTabsTitle"),
       },
       project: {
-        title: "Delete Project",
+        title: t("settings:deleteProjectTitle"),
         message: (
-          <>
-            You are about to delete the project <strong>{project.title}</strong>. This action cannot be undone.
-          </>
+          <Trans
+            i18nKey="settings:deleteProjectConfirmMsg"
+            values={{ title: project.title }}
+            components={{ strong: <strong /> }}
+          />
         ),
         requiredWord: "delete",
-        buttonText: "Delete Project",
+        buttonText: t("settings:deleteProjectTitle"),
       },
     };
 
@@ -131,25 +142,25 @@ export const DangerZone = () => {
                 pk: project.id,
               },
             });
-            toast.show({ message: "Cache reset successfully" });
+            toast.show({ message: t("settings:cacheResetSuccessToast") });
           } else if (type === "tabs") {
             await api.callApi("deleteTabs", {
               body: {
                 project: project.id,
               },
             });
-            toast.show({ message: "All tabs dropped successfully" });
+            toast.show({ message: t("settings:tabsDroppedSuccessToast") });
           } else if (type === "project") {
             await api.callApi("deleteProject", {
               params: {
                 pk: project.id,
               },
             });
-            toast.show({ message: "Project deleted successfully" });
+            toast.show({ message: t("settings:projectDeletedSuccessToast") });
             history.replace("/projects");
           }
         } catch (error) {
-          toast.show({ message: `Error: ${error.message}`, type: "error" });
+          toast.show({ message: t("settings:errorToast", { message: error.message }), type: "error" });
         } finally {
           setProcessing(null);
         }
@@ -162,48 +173,44 @@ export const DangerZone = () => {
       {
         type: "annotations",
         disabled: true, //&& !project.total_annotations_number,
-        label: `Delete ${project.total_annotations_number} Annotations`,
+        label: t("settings:deleteAnnotationsCount", { count: project.total_annotations_number }),
       },
       {
         type: "tasks",
         disabled: true, //&& !project.task_number,
-        label: `Delete ${project.task_number} Tasks`,
+        label: t("settings:deleteTasksCount", { count: project.task_number }),
       },
       {
         type: "predictions",
         disabled: true, //&& !project.total_predictions_number,
-        label: `Delete ${project.total_predictions_number} Predictions`,
+        label: t("settings:deletePredictionsCount", { count: project.total_predictions_number }),
       },
       {
         type: "reset_cache",
-        help:
-          "Reset Cache may help in cases like if you are unable to modify the labeling configuration due " +
-          "to validation errors concerning existing labels, but you are confident that the labels don't exist. You can " +
-          "use this action to reset the cache and try again.",
-        label: "Reset Cache",
+        help: t("settings:resetCacheHelp"),
+        label: t("settings:resetCacheTitle"),
       },
       {
         type: "tabs",
-        help: "If the Data Manager is not loading, dropping all Data Manager tabs can help.",
-        label: "Drop All Tabs",
+        help: t("settings:dropAllTabsHelp"),
+        label: t("settings:dropAllTabsTitle"),
       },
       {
         type: "project",
-        help: "Deleting a project removes all tasks, annotations, and project data from the database.",
-        label: "Delete Project",
+        help: t("settings:deleteProjectHelp"),
+        label: t("settings:deleteProjectTitle"),
       },
     ],
-    [project],
+    [project, t],
   );
 
   return (
     <div className={cn("simple-settings").toClassName()}>
       <Typography variant="headline" size="medium" className="mb-tighter">
-        Danger Zone
+        {t("settings:dangerZonePageTitle")}
       </Typography>
       <Typography variant="body" size="medium" className="text-neutral-content-subtler !mb-base">
-        Perform these actions at your own risk. Actions you take on this page can't be reverted. Make sure your data is
-        backed up.
+        {t("settings:dangerZoneWarning")}
       </Typography>
 
       {project.id ? (
@@ -244,5 +251,9 @@ export const DangerZone = () => {
   );
 };
 
-DangerZone.title = "Danger Zone";
+// Route metadata is read by the routing/sidebar system outside of a React
+// component, so it resolves through the shared i18next singleton lazily.
+Object.defineProperty(DangerZone, "title", {
+  get: () => i18next.t("settings:navDangerZone"),
+});
 DangerZone.path = "/danger-zone";

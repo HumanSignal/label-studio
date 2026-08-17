@@ -1,24 +1,35 @@
 import { z } from "zod";
+import i18next from "i18next";
 import type { ProviderConfig } from "@humansignal/app-common/blocks/StorageProviderForm/types/provider";
 import { IconCloudProviderGCS } from "@humansignal/icons";
 
 export const gcsProvider: ProviderConfig = {
   name: "gcs",
-  title: "Google Cloud Storage",
-  description: "Configure your Google Cloud Storage connection with all required Label Studio settings",
+  get title() {
+    return i18next.t("dataManager:storageGoogleCloud");
+  },
+  get description() {
+    return i18next.t("settings:gcsProviderDesc");
+  },
   icon: IconCloudProviderGCS,
   fields: [
     {
       name: "bucket",
       type: "text",
-      label: "Bucket Name",
+      get label() {
+        return i18next.t("settings:bucketNameLabel");
+      },
       required: true,
-      schema: z.string().min(1, "Bucket name is required"),
+      get schema() {
+        return z.string().min(1, i18next.t("settings:bucketNameRequired"));
+      },
     },
     {
       name: "prefix",
       type: "text",
-      label: "Bucket prefix",
+      get label() {
+        return i18next.t("settings:bucketPrefixLabel");
+      },
       placeholder: "path/to/files",
       schema: z.string().optional().default(""),
       target: "export",
@@ -26,8 +37,12 @@ export const gcsProvider: ProviderConfig = {
     {
       name: "google_application_credentials",
       type: "password",
-      label: "Google Application Credentials",
-      description: "Paste the contents of credentials.json in this field OR leave it blank to use ADC.",
+      get label() {
+        return i18next.t("settings:googleCredentialsLabel");
+      },
+      get description() {
+        return i18next.t("settings:googleCredentialsDescription");
+      },
       autoComplete: "new-password",
       accessKey: true,
       schema: z.string().optional().default(""), // JSON validation could be added if needed
@@ -35,16 +50,23 @@ export const gcsProvider: ProviderConfig = {
     {
       name: "google_project_id",
       type: "text",
-      label: "Google Project ID",
-      description: "Leave blank to inherit from Google Application Credentials.",
+      get label() {
+        return i18next.t("settings:googleProjectIdLabel");
+      },
+      get description() {
+        return i18next.t("settings:googleProjectIdDescription");
+      },
       schema: z.string().optional().default(""),
     },
     {
       name: "presign",
       type: "toggle",
-      label: "Use pre-signed URLs (On) / Proxy through the platform (Off)",
-      description:
-        "When pre-signed URLs are enabled, all data bypasses the platform and user browsers directly read data from storage",
+      get label() {
+        return i18next.t("settings:presignLabel");
+      },
+      get description() {
+        return i18next.t("settings:presignDescription");
+      },
       schema: z.boolean().default(true),
       target: "import",
       resetConnection: false,
@@ -52,7 +74,9 @@ export const gcsProvider: ProviderConfig = {
     {
       name: "presign_ttl",
       type: "counter",
-      label: "Expire pre-signed URLs (minutes)",
+      get label() {
+        return i18next.t("settings:presignTtlLabel");
+      },
       min: 1,
       max: 10080,
       step: 1,

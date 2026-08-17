@@ -40,7 +40,11 @@ it("createI18nConfig produces a config with en as fallback", () => {
   expect(config.resources["zh-CN"].dataManager).toBeDefined();
   expect(config.resources.en.dataManager.columns).toBe("Columns");
   expect(config.resources["zh-CN"].dataManager.columns).toBe("列");
-  expect(config.ns).toEqual(["menubar", "projects", "dataManager"]);
+  expect(config.resources.en.settings).toBeDefined();
+  expect(config.resources["zh-CN"].settings).toBeDefined();
+  expect(config.resources.en.settings.navGeneral).toBe("General");
+  expect(config.resources["zh-CN"].settings.navGeneral).toBe("常规");
+  expect(config.ns).toEqual(["menubar", "projects", "dataManager", "settings"]);
   expect(config.defaultNS).toBe("menubar");
   expect(config.interpolation.escapeValue).toBe(false);
 });

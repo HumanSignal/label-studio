@@ -1,4 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
+import i18next from "i18next";
 
 import { useAPI } from "../../providers/ApiProvider";
 
@@ -17,8 +19,9 @@ const Webhook = () => {
 
   const api = useAPI();
   const { project } = useProject();
+  const { t } = useTranslation();
 
-  useUpdatePageTitle(createTitleFromSegments([project?.title, "Webhooks Settings"]));
+  useUpdatePageTitle(createTitleFromSegments([project?.title, t("settings:webhooksSettingsPageTitle")]));
 
   const projectId = useMemo(() => {
     if (history.location.pathname.startsWith("/projects")) {
@@ -113,7 +116,11 @@ const Webhook = () => {
 };
 
 export const WebhookPage = {
-  title: "Webhooks",
+  // Route metadata is read by the routing/sidebar system outside of a React
+  // component, so it resolves through the shared i18next singleton lazily.
+  get title() {
+    return i18next.t("settings:navWebhooks");
+  },
   path: "/webhooks",
   component: Webhook,
 };

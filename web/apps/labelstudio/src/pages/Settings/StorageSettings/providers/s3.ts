@@ -1,39 +1,58 @@
 import { z } from "zod";
+import i18next from "i18next";
 import type { ProviderConfig } from "@humansignal/app-common/blocks/StorageProviderForm/types/provider";
 import { IconCloudProviderS3 } from "@humansignal/icons";
 
 export const s3Provider: ProviderConfig = {
   name: "s3",
-  title: "Amazon S3",
-  description: "Configure your AWS S3 connection with all required Label Studio settings",
+  get title() {
+    return i18next.t("dataManager:storageAmazonS3");
+  },
+  get description() {
+    return i18next.t("settings:s3ProviderDesc");
+  },
   icon: IconCloudProviderS3,
   fields: [
     {
       name: "bucket",
       type: "text",
-      label: "Bucket Name",
+      get label() {
+        return i18next.t("settings:bucketNameLabel");
+      },
       required: true,
       placeholder: "my-storage-bucket",
-      schema: z.string().min(1, "Bucket name is required"),
+      get schema() {
+        return z.string().min(1, i18next.t("settings:bucketNameRequired"));
+      },
     },
     {
       name: "region_name",
       type: "text",
-      label: "Region Name",
-      placeholder: "us-east-1 (default)",
+      get label() {
+        return i18next.t("settings:regionNameLabel");
+      },
+      get placeholder() {
+        return i18next.t("settings:regionNamePlaceholder");
+      },
       schema: z.string().optional().default(""),
     },
     {
       name: "s3_endpoint",
       type: "text",
-      label: "S3 Endpoint",
-      placeholder: "https://s3.amazonaws.com (default)",
+      get label() {
+        return i18next.t("settings:s3EndpointLabel");
+      },
+      get placeholder() {
+        return i18next.t("settings:s3EndpointPlaceholder");
+      },
       schema: z.string().optional().default(""),
     },
     {
       name: "prefix",
       type: "text",
-      label: "Bucket prefix",
+      get label() {
+        return i18next.t("settings:bucketPrefixLabel");
+      },
       placeholder: "path/to/files",
       schema: z.string().optional().default(""),
       target: "export",
@@ -41,37 +60,52 @@ export const s3Provider: ProviderConfig = {
     {
       name: "aws_access_key_id",
       type: "password",
-      label: "Access Key ID",
+      get label() {
+        return i18next.t("settings:accessKeyIdLabel");
+      },
       required: true,
       placeholder: "AKIAIOSFODNN7EXAMPLE",
       autoComplete: "off",
       accessKey: true,
-      schema: z.string().min(1, "Access Key ID is required"),
+      get schema() {
+        return z.string().min(1, i18next.t("settings:accessKeyIdRequired"));
+      },
     },
     {
       name: "aws_secret_access_key",
       type: "password",
-      label: "Secret Access Key",
+      get label() {
+        return i18next.t("settings:secretAccessKeyLabel");
+      },
       required: true,
       placeholder: "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY",
       autoComplete: "new-password",
       accessKey: true,
-      schema: z.string().min(1, "Secret Access Key is required"),
+      get schema() {
+        return z.string().min(1, i18next.t("settings:secretAccessKeyRequired"));
+      },
     },
     {
       name: "aws_session_token",
       type: "password",
-      label: "Session Token",
-      placeholder: "Session token (optional)",
+      get label() {
+        return i18next.t("settings:sessionTokenLabel");
+      },
+      get placeholder() {
+        return i18next.t("settings:sessionTokenPlaceholder");
+      },
       autoComplete: "new-password",
       schema: z.string().optional().default(""),
     },
     {
       name: "presign",
       type: "toggle",
-      label: "Use pre-signed URLs (On) / Proxy through the platform (Off)",
-      description:
-        "When pre-signed URLs are enabled, all data bypasses the platform and user browsers directly read data from storage",
+      get label() {
+        return i18next.t("settings:presignLabel");
+      },
+      get description() {
+        return i18next.t("settings:presignDescription");
+      },
       schema: z.boolean().default(true),
       target: "import",
       resetConnection: false,
@@ -79,7 +113,9 @@ export const s3Provider: ProviderConfig = {
     {
       name: "presign_ttl",
       type: "counter",
-      label: "Expire pre-signed URLs (minutes)",
+      get label() {
+        return i18next.t("settings:presignTtlLabel");
+      },
       min: 1,
       max: 10080,
       step: 1,
