@@ -37,6 +37,7 @@ jobs:
 
   build-docker:
     name: "Build"
+    if: github.repository_owner == 'HumanSignal'
     permissions:
       contents: read
       checks: write

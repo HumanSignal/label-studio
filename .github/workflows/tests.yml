@@ -85,6 +85,7 @@ jobs:
       PYTHONPATH: label_studio
       LOG_LEVEL: ERROR
       SENTRY_ENVIRONMENT: tests-ubuntu-postgresql
+      CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
     services:
       postgres:
@@ -130,7 +131,7 @@ jobs:
         run: uv run --no-sync pytest label_studio --disable-warnings --cov=label_studio --cov-report=xml --junitxml=functional.xml --durations=30 -n auto
 
       - name: Upload coverage to Codecov
-        if: ${{ github.event.pull_request.head.repo.fork == false && github.event.pull_request.user.login != 'dependabot[bot]' }}
+        if: ${{ env.CODECOV_TOKEN != '' && github.event.pull_request.user.login != 'dependabot[bot]' }}
         uses: codecov/codecov-action@v7
         with:
           name: codecov-python-${{ matrix.python-version }}
@@ -141,7 +142,7 @@ jobs:
           fail_ci_if_error: true
 
       - name: "Upload functional tests results to Codecov"
-        if: ${{ github.event.pull_request.head.repo.fork == false && github.event.pull_request.user.login != 'dependabot[bot]' }}
+        if: ${{ env.CODECOV_TOKEN != '' && github.event.pull_request.user.login != 'dependabot[bot]' }}
         uses: codecov/test-results-action@v1
         with:
           files: ./functional.xml

@@ -116,4 +116,9 @@ jobs:
 
       - name: "Lint migrations"
         run: |
-          uv run --no-sync python label_studio/manage.py lintmigrations --warnings-as-errors --project-root-path '.' --git-commit-id ${{ github.event.pull_request.base.sha || github.event.before }}
+          BASE_SHA="${{ github.event.pull_request.base.sha || github.event.before }}"
+          if ! git cat-file -e "$BASE_SHA" 2>/dev/null; then
+            echo "Base commit $BASE_SHA is not reachable (force-push or new branch), skipping migration lint"
+            exit 0
+          fi
+          uv run --no-sync python label_studio/manage.py lintmigrations --warnings-as-errors --project-root-path '.' --git-commit-id "$BASE_SHA"

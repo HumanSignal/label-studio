@@ -160,7 +160,7 @@ jobs:
     name: "Build"
     needs:
       - changed_files
-    if: startsWith(github.ref_name, 'ls-release/')
+    if: github.repository_owner == 'HumanSignal' && startsWith(github.ref_name, 'ls-release/')
     permissions:
       contents: read
       checks: write
