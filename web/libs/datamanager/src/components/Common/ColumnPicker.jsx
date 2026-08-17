@@ -3,6 +3,7 @@ import { Badge, Select } from "@humansignal/ui";
 import { IconSpark } from "@humansignal/icons";
 import { useCallback, useMemo } from "react";
 import { useTranslation } from "react-i18next";
+import { translateColumnTitle } from "../../i18n/backendTitles";
 
 // Fallback translator for module-scope helpers invoked outside a component render
 // (tests, FilterLine). Resolves against the shared singleton at call time.
@@ -231,7 +232,7 @@ export function pickerGroupsToFlatOptions(groups, groupByField = "group") {
     for (const item of group.items) {
       result.push({
         value: COLUMN_VALUE_PREFIX + item.key,
-        label: item.title,
+        label: translateColumnTitle(item.title),
         groupTitle: item.groupTitle,
         [groupByField]: groupKey,
         readableType: item.readableType,

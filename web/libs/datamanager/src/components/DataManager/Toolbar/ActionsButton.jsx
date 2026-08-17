@@ -4,6 +4,7 @@ import { Button, Spinner, EnterpriseBadge, Message, Typography } from "@humansig
 import { inject, observer } from "mobx-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { translateActionTitle } from "../../../i18n/backendTitles";
 import { useActions } from "../../../hooks/useActions";
 import { cn } from "../../../utils/bem";
 import { FF_LOPS_E_3, isFF } from "../../../utils/feature-flags";
@@ -230,14 +231,14 @@ const ActionButton = ({ action, parentRef, store, formRef }) => {
         .toClassName()}
       size="small"
       onClick={onClick}
-      aria-label={action.title}
+      aria-label={translateActionTitle(action.title)}
     >
       <div
         className={cn("actionButton").elem("titleContainer").toClassName()}
         {...(action.disabled ? { title: action.disabledReason } : {})}
       >
         <div className={cn("actionButton").elem("title").toClassName()}>
-          {action.title}
+          {translateActionTitle(action.title)}
           {action.enterprise_badge && <EnterpriseBadge className="ml-tightest" look="ghost" />}
         </div>
         {hasChildren ? <IconChevronRight className={cn("actionButton").elem("icon").toClassName()} /> : null}
@@ -282,13 +283,13 @@ const ActionButton = ({ action, parentRef, store, formRef }) => {
       }`}
       icon={isDeleteAction && <IconTrash />}
       title={action.disabled ? action.disabledReason : null}
-      aria-label={action.title}
+      aria-label={translateActionTitle(action.title)}
       disabled={action.disabled}
       tooltip={action.disabled_reason}
       tooltipAlignment="bottom-center"
     >
       <span className="flex items-center justify-between gap-base w-full">
-        {action.title}
+        {translateActionTitle(action.title)}
         {action.enterprise_badge && <EnterpriseBadge look="ghost" children="" />}
       </span>
     </Menu.Item>
