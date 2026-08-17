@@ -7,6 +7,8 @@ import { atom, useSetAtom } from "jotai";
 
 interface ThemeToggleProps {
   className?: string;
+  /** Optional display labels keyed by theme option ("Auto" | "Light" | "Dark"). */
+  labels?: Record<string, string>;
 }
 
 const THEME_OPTIONS = ["Auto", "Light", "Dark"];
@@ -26,7 +28,7 @@ export const getStoredThemePreference = () =>
 
 export const getCurrentTheme = () => resolveThemePreference(getStoredThemePreference());
 export const themeAtom = atom<string>(getCurrentTheme());
-export const ThemeToggle: React.FC<ThemeToggleProps> = ({ className }) => {
+export const ThemeToggle: React.FC<ThemeToggleProps> = ({ className, labels }) => {
   const presetTheme = getStoredThemePreference();
   const [theme, setTheme] = useState(presetTheme);
   const systemMode = useMemo(
@@ -55,10 +57,10 @@ export const ThemeToggle: React.FC<ThemeToggleProps> = ({ className }) => {
     setThemeAtom(newTheme);
   }, [theme]);
 
-  const themeLabel = useMemo(
-    () => THEME_OPTIONS.find((option) => option.toLowerCase() === theme.toLowerCase()),
-    [theme],
-  );
+  const themeLabel = useMemo(() => {
+    const option = THEME_OPTIONS.find((option) => option.toLowerCase() === theme.toLowerCase());
+    return (labels?.[option ?? ""] as string | undefined) ?? option;
+  }, [theme, labels]);
 
   return (
     <button

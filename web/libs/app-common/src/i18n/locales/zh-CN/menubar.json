@@ -13,5 +13,8 @@
   "github": "GitHub",
   "slackCommunity": "Slack 社区",
   "pinMenu": "固定菜单",
-  "unpinMenu": "取消固定菜单"
+  "unpinMenu": "取消固定菜单",
+  "themeAuto": "自动",
+  "themeLight": "浅色",
+  "themeDark": "深色"
 }

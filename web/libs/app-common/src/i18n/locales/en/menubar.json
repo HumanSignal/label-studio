@@ -13,5 +13,8 @@
   "github": "GitHub",
   "slackCommunity": "Slack Community",
   "pinMenu": "Pin menu",
-  "unpinMenu": "Unpin menu"
+  "unpinMenu": "Unpin menu",
+  "themeAuto": "Auto",
+  "themeLight": "Light",
+  "themeDark": "Dark"
 }
