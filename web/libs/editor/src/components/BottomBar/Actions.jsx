@@ -1,6 +1,7 @@
 import { InfoIcon, SlidersHorizontalIcon } from "@humansignal/icons";
 import { Button } from "@humansignal/ui";
 import { isStarterCloudPlan } from "@humansignal/core";
+import { useTranslation } from "react-i18next";
 import { cn } from "../../utils/bem";
 import { AutoAcceptToggle } from "../AnnotationTab/AutoAcceptToggle";
 import { DynamicPreannotationsToggle } from "../AnnotationTab/DynamicPreannotationsToggle";
@@ -10,6 +11,7 @@ import { ProjectCoursesBottomBarButton } from "./ProjectCoursesBottomBarButton";
 import "./Actions.prefix.css";
 
 export const Actions = ({ store }) => {
+  const { t } = useTranslation();
   const annotationStore = store.annotationStore;
   const entity = annotationStore.selected;
   const isPrediction = entity?.type === "prediction";
@@ -27,11 +29,11 @@ export const Actions = ({ store }) => {
         {showInstructions && (
           <Button
             type="text"
-            aria-label="Instructions"
+            aria-label={t("editor:instructions")}
             size="small"
             variant="neutral"
             look="string"
-            tooltip="Show instructions"
+            tooltip={t("editor:showInstructions")}
             onClick={() => store.toggleDescription()}
             className="aspect-square"
             leading={<InfoIcon size={24} />}
@@ -40,12 +42,12 @@ export const Actions = ({ store }) => {
         )}
         <Button
           type="text"
-          aria-label="Settings"
+          aria-label={t("editor:settings")}
           size="small"
           look="string"
           variant="neutral"
           onClick={() => store.toggleSettings()}
-          tooltip="Settings"
+          tooltip={t("editor:settings")}
           className="aspect-square"
           leading={<SlidersHorizontalIcon size={24} />}
           data-testid="bottombar-settings-button"

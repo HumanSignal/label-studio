@@ -1,7 +1,9 @@
 import keymaster from "keymaster";
+import i18next from "i18next";
 import { inject } from "mobx-react";
 import { observer } from "mobx-react";
 import { createElement, Fragment } from "react";
+import { useTranslation } from "react-i18next";
 import { Tooltip } from "@humansignal/ui";
 import Hint from "../components/Hint/Hint";
 import { cn } from "../utils/bem";
@@ -52,11 +54,45 @@ const DEFAULT_SCOPE = "__main__";
 const INPUT_SCOPE = "__input__";
 
 const _hotkeys_desc: { [key: string]: string } = {};
+// Maps a bound key combination (e.g. "ctrl+enter") back to the keymap id
+// (e.g. "annotation:submit") that registered it, so renderers can translate
+// descriptions with stable id-based i18n keys.
+const _hotkeys_names: { [key: string]: string } = {};
 const _namespaces: { [key: string]: HotkeyNamespace } = {};
 const _destructors: (() => void)[] = [];
 const _scopes: HotkeyScopes = {
   [DEFAULT_SCOPE]: {},
   [INPUT_SCOPE]: {},
+};
+
+const slugify = (value: string) =>
+  value
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/(^-+|-+$)/g, "");
+
+// Namespace titles (e.g. "Global Hotkeys") are stored in English; translate
+// them lazily on access with an id derived from the title itself.
+const translateNamespaceTitle = (title: string) => {
+  const translated = i18next.t(`editor:hotkeysTitle_${slugify(title)}`, { defaultValue: title });
+
+  return translated ?? title;
+};
+
+// Translate a keymap description using its stable keymap id; hotkey ids contain
+// ":" (e.g. "audio:back"), so namespace/key separators must be disabled.
+export const translateHotkeyDescription = (name: string, description: string) => {
+  if (!name) return description;
+
+  const translated = i18next.t(`hotkey_${name}`, {
+    ns: "editor",
+    nsSeparator: false,
+    keySeparator: false,
+    defaultValue: description,
+  });
+
+  return translated ?? description;
 };
 
 const translateNumpad = (event: any) => {
@@ -95,7 +131,9 @@ export const Hotkey = (namespace = "global", description = "Hotkeys") => {
   let _hotkeys_map: HotkeyMap = {};
 
   _namespaces[namespace] = _namespaces[namespace] ?? {
-    description,
+    get description() {
+      return translateNamespaceTitle(description);
+    },
     get keys() {
       return _hotkeys_map;
     },
@@ -164,6 +202,7 @@ export const Hotkey = (namespace = "global", description = "Hotkeys") => {
           keymaster.unbind(key, scope);
           rebindKeyHandlers(scope, key);
           delete _hotkeys_desc[key];
+          delete _hotkeys_names[key];
         }
       }
     }
@@ -189,7 +228,7 @@ export const Hotkey = (namespace = "global", description = "Hotkeys") => {
     /**
      * Add key
      */
-    addKey(key: string, func: keymaster.KeyHandler, desc?: string, scope: string = DEFAULT_SCOPE) {
+    addKey(key: string, func: keymaster.KeyHandler, desc?: string, scope: string = DEFAULT_SCOPE, name?: string) {
       if (!isDefined(key)) return;
 
       if (_hotkeys_map[key]) {
@@ -200,6 +239,7 @@ export const Hotkey = (namespace = "global", description = "Hotkeys") => {
 
       _hotkeys_map[keyName] = func;
       if (desc) _hotkeys_desc[keyName] = desc;
+      if (name) _hotkeys_names[keyName] = name;
 
       scope
         .split(",")
@@ -224,14 +264,14 @@ export const Hotkey = (namespace = "global", description = "Hotkeys") => {
      * Given a key temp overwrites the function, the overwrite is removed
      * after the returning function is called
      */
-    overwriteKey(key: string, func: keymaster.KeyHandler, desc?: string, scope: string = DEFAULT_SCOPE) {
+    overwriteKey(key: string, func: keymaster.KeyHandler, desc?: string, scope: string = DEFAULT_SCOPE, name?: string) {
       if (!isDefined(key)) return;
 
       if (this.hasKey(key)) {
         this.removeKey(key, scope);
       }
 
-      this.addKey(key, func, desc, scope);
+      this.addKey(key, func, desc, scope, name);
     },
 
     /**
@@ -255,6 +295,7 @@ export const Hotkey = (namespace = "global", description = "Hotkeys") => {
 
         delete _hotkeys_map[keyName];
         delete _hotkeys_desc[keyName];
+        delete _hotkeys_names[keyName];
       }
     },
 
@@ -267,10 +308,10 @@ export const Hotkey = (namespace = "global", description = "Hotkeys") => {
       if (isDefined(hotkey)) {
         const shortcut = isMacOS() ? (hotkey.mac ?? hotkey.key) : hotkey.key;
 
-        this.addKey(shortcut, func, hotkey.description, scope);
+        this.addKey(shortcut, func, hotkey.description, scope, name);
 
         if (hotkey.modifier) {
-          this.addKey(`${hotkey.modifier}+${shortcut}`, func, hotkey.modifierDescription, scope);
+          this.addKey(`${hotkey.modifier}+${shortcut}`, func, hotkey.modifierDescription, scope, name);
         }
       } else {
         throw new Error(`Unknown named hotkey ${hotkey}`);
@@ -315,10 +356,10 @@ export const Hotkey = (namespace = "global", description = "Hotkeys") => {
       if (isDefined(hotkey)) {
         const shortcut = isMacOS() ? (hotkey.mac ?? hotkey.key) : hotkey.key;
 
-        this.overwriteKey(shortcut, func, hotkey.description, scope);
+        this.overwriteKey(shortcut, func, hotkey.description, scope, name);
 
         if (hotkey.modifier) {
-          this.overwriteKey(`${hotkey.modifier}+${shortcut}`, func, hotkey.modifierDescription, scope);
+          this.overwriteKey(`${hotkey.modifier}+${shortcut}`, func, hotkey.modifierDescription, scope, name);
         }
       } else {
         throw new Error(`Unknown named hotkey ${name}`);
@@ -422,6 +463,13 @@ Hotkey.setKeymap = (newKeymap: Keymap) => {
 
 Hotkey.keysDescipritions = () => _hotkeys_desc;
 
+/**
+ * Map of bound key combinations (e.g. "ctrl+enter") to the keymap ids
+ * (e.g. "annotation:submit") that registered them. Used to translate
+ * hotkey descriptions in the settings table.
+ */
+Hotkey.comboNames = () => _hotkeys_names;
+
 Hotkey.namespaces = () => {
   return _namespaces;
 };
@@ -443,13 +491,23 @@ Hotkey.setScope = (scope: string) => {
  */
 Hotkey.Tooltip = inject("store")(
   observer(({ store, name, children, ...props }: any) => {
+    const { t } = useTranslation("editor");
     const hotkey = Hotkey.keymap[name as keyof Keymap];
     const enabled = store.settings.enableTooltips && store.settings.enableHotkeys;
 
     if (isDefined(hotkey)) {
       const shortcut = isMacOS() ? (hotkey.mac ?? hotkey.key) : hotkey.key;
 
-      const description = props.title ?? hotkey.description;
+      // Prefer an explicitly provided title; otherwise translate the keymap
+      // description via its stable keymap id (ids contain ":", so separators
+      // must be disabled), falling back to the original English description.
+      const description = isDefined(props.title)
+        ? props.title
+        : t(`hotkey_${String(name)}`, {
+            nsSeparator: false,
+            keySeparator: false,
+            defaultValue: hotkey.description,
+          });
       const hotkeys: JSX.Element[] = [];
 
       if (enabled) {

@@ -125,7 +125,7 @@ export const SkipButton = memo(
     const isDisabled = disabled || !canSkip || overlapReached;
 
     const tooltip: string = overlapReached
-      ? store.overlapReachedMessage
+      ? t("editor:overlapReachedMessage", { defaultValue: store.overlapReachedMessage })
       : canSkip
         ? t("editor:skipTaskTooltip")
         : t("editor:taskCannotBeSkipped");

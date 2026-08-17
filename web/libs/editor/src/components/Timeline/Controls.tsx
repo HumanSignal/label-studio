@@ -16,6 +16,7 @@ import {
 } from "@humansignal/icons";
 import { Button, type ButtonProps, Space } from "@humansignal/ui";
 import { type FC, memo, type MouseEvent, useCallback, useContext, useEffect, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { WithHotkey } from "../../common/Hotkey/WithHotkey";
 import { Hotkey, type HotkeyList } from "../../core/Hotkey";
 import { cn } from "../../utils/bem";
@@ -77,6 +78,7 @@ export const Controls: FC<TimelineControlsProps> = memo(
     navigationBlockedTooltip,
     ...props
   }) => {
+    const { t } = useTranslation();
     const { settings } = useContext(TimelineContext);
     const [altControlsMode, setAltControlsMode] = useState(false);
     const [configModal, setConfigModal] = useState(false);
@@ -185,7 +187,7 @@ export const Controls: FC<TimelineControlsProps> = memo(
         {buffering && (
           <div
             className={cn("timeline-controls").elem("buffering").toClassName()}
-            aria-label="Buffering Media Source"
+            aria-label={t("editor:bufferingMediaSource")}
           />
         )}
         {mediaType === "audio" ? (
@@ -228,7 +230,7 @@ export const Controls: FC<TimelineControlsProps> = memo(
                       hotkey={settings?.stepAltBack}
                       disabled={navigationBlocked || startReached}
                       tooltip={transportDisabledTooltip}
-                      aria-label="Hop backward"
+                      aria-label={t("editor:hopBackward")}
                     >
                       {<IconPrev />}
                     </ControlButton>
@@ -238,7 +240,7 @@ export const Controls: FC<TimelineControlsProps> = memo(
                     hotkey={settings?.stepBackHotkey}
                     disabled={navigationBlocked || startReached}
                     tooltip={transportDisabledTooltip}
-                    aria-label="Step backward"
+                    aria-label={t("editor:stepBackward")}
                   >
                     <IconChevronLeft />
                   </ControlButton>
@@ -251,7 +253,7 @@ export const Controls: FC<TimelineControlsProps> = memo(
                     disabled={navigationBlocked || startReached}
                     tooltip={transportDisabledTooltip}
                     hotkey={settings?.skipToBeginning}
-                    aria-label="Skip to start"
+                    aria-label={t("editor:skipToStart")}
                   >
                     <IconRewind />
                   </ControlButton>
@@ -260,7 +262,7 @@ export const Controls: FC<TimelineControlsProps> = memo(
                     disabled={navigationBlocked || startReached}
                     tooltip={transportDisabledTooltip}
                     hotkey={settings?.hopBackward}
-                    aria-label="Media rewind"
+                    aria-label={t("editor:mediaRewind")}
                   >
                     <IconBackward />
                   </ControlButton>
@@ -274,7 +276,7 @@ export const Controls: FC<TimelineControlsProps> = memo(
               hotkeyScope={Hotkey.ALL_SCOPES}
               disabled={navigationBlocked}
               tooltip={transportDisabledTooltip}
-              aria-label="Play"
+              aria-label={t("editor:play")}
             >
               {playing ? <IconTimelinePause /> : <IconTimelinePlay />}
             </ControlButton>
@@ -287,7 +289,7 @@ export const Controls: FC<TimelineControlsProps> = memo(
                     hotkey={settings?.stepForwardHotkey}
                     disabled={navigationBlocked || endReached}
                     tooltip={transportDisabledTooltip}
-                    aria-label="Step forward"
+                    aria-label={t("editor:stepForward")}
                   >
                     <IconChevronRight />
                   </ControlButton>
@@ -297,7 +299,7 @@ export const Controls: FC<TimelineControlsProps> = memo(
                       tooltip={transportDisabledTooltip}
                       onClick={stepHandlerWrapper(onStepForward, settings.stepSize)}
                       hotkey={settings?.stepAltForward}
-                      aria-label="Hop forward"
+                      aria-label={t("editor:hopForward")}
                     >
                       <IconNext />
                     </ControlButton>
@@ -311,12 +313,12 @@ export const Controls: FC<TimelineControlsProps> = memo(
                     disabled={navigationBlocked || endReached}
                     tooltip={transportDisabledTooltip}
                     hotkey={settings?.hopForward}
-                    aria-label="Media fast forward"
+                    aria-label={t("editor:mediaFastForward")}
                   >
                     <IconForward />
                   </ControlButton>
                   <ControlButton
-                    aria-label="Skip to end"
+                    aria-label={t("editor:skipToEnd")}
                     onClick={() => onForward?.()}
                     disabled={navigationBlocked || endReached}
                     tooltip={transportDisabledTooltip}
@@ -331,12 +333,12 @@ export const Controls: FC<TimelineControlsProps> = memo(
           </Space>
           <Space className={cn("timeline-controls").elem("group").toClassName()} collapsed>
             {!disableFrames && allowViewCollapse && (
-              <ControlButton tooltip="Toggle Timeline" onClick={() => onToggleCollapsed?.(!collapsed)}>
+              <ControlButton tooltip={t("editor:toggleTimeline")} onClick={() => onToggleCollapsed?.(!collapsed)}>
                 {collapsed ? <IconExpand /> : <IconCollapse />}
               </ControlButton>
             )}
             {allowFullscreen && (
-              <ControlButton tooltip="Fullscreen" onClick={() => onFullScreenToggle?.(false)}>
+              <ControlButton tooltip={t("editor:fullscreen")} onClick={() => onFullScreenToggle?.(false)}>
                 {fullscreen ? <IconFullscreenExit /> : <IconFullscreen />}
               </ControlButton>
             )}

@@ -16,6 +16,7 @@ import {
   useState,
   memo,
 } from "react";
+import { useTranslation } from "react-i18next";
 import Registry from "../../../core/Registry";
 import { PER_REGION_MODES } from "../../../mixins/PerRegionModes";
 import { cn } from "../../../utils/bem";
@@ -412,6 +413,7 @@ const RootTitle: FC<any> = observer(
     isClassification,
     ...props
   }) => {
+    const { t } = useTranslation();
     const [collapsed, setCollapsed] = useState(false);
 
     const controls = useMemo(() => {
@@ -446,7 +448,7 @@ const RootTitle: FC<any> = observer(
             )}
             {incomplete && (
               <span className={cn("outliner-item").elem("incomplete").toClassName()}>
-                <Tooltip title={`Incomplete ${item.type?.replace("region", "") ?? "region"}`}>
+                <Tooltip title={t("editor:incompleteType", { type: item.type?.replace("region", "") ?? "region" })}>
                   <IconWarning />
                 </Tooltip>
               </span>
@@ -520,6 +522,7 @@ const injector = inject(({ store }) => {
 
 const RegionControls: FC<RegionControlsProps> = injector(
   observer(({ hovered, item, entity, collapsed, regions, hasControls, type, toggleCollapsed, store }) => {
+    const { t } = useTranslation();
     const { regions: regionStore } = useContext(OutlinerContext);
 
     const hidden = useMemo(() => {
@@ -557,7 +560,7 @@ const RegionControls: FC<RegionControlsProps> = injector(
       <div
         className={cn("outliner-item").elem("controls").mod({ withControls: hasControls, newUI: true }).toClassName()}
       >
-        <Tooltip title={"Confidence Score"}>
+        <Tooltip title={t("editor:confidenceScore")}>
           <div className={cn("outliner-item").elem("control-wrapper").toClassName()}>
             <div className={cn("outliner-item").elem("control").mod({ type: "predict" }).toClassName()}>
               {item?.origin === "prediction" && <IconSparks style={{ width: 18, height: 18 }} />}
@@ -583,7 +586,7 @@ const RegionControls: FC<RegionControlsProps> = injector(
                 onClick={onToggleLocked}
                 variant="neutral"
                 look="string"
-                tooltip={item?.locked ? "Unlock Region" : "Lock Region"}
+                tooltip={item?.locked ? t("editor:unlockRegion") : t("editor:lockRegion")}
               />
             </div>
           )}
@@ -593,8 +596,8 @@ const RegionControls: FC<RegionControlsProps> = injector(
                 variant="neutral"
                 look="string"
                 onClick={onToggleHidden}
-                aria-label={hidden ? "Show" : "Hide"}
-                title={hidden ? "Show" : "Hide"}
+                aria-label={hidden ? t("editor:show") : t("editor:hide")}
+                title={hidden ? t("editor:show") : t("editor:hide")}
               >
                 {hidden ? (
                   <IconEyeClosed style={{ width: 20, height: 20 }} />

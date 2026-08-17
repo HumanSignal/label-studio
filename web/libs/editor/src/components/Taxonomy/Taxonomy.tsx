@@ -1,5 +1,6 @@
 import React, { type FormEvent, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { Dropdown, Menu } from "antd";
+import { useTranslation } from "react-i18next";
 
 import { IconChevron } from "@humansignal/icons";
 import { Button, Tooltip } from "@humansignal/ui";
@@ -172,6 +173,7 @@ export const HintTooltip: React.FC<HintTooltipProps> = ({ title, wrapper: Wrappe
 };
 
 const Item: React.FC<RowProps> = ({ style, item, dimensionCallback, maxWidth, isEditable }: RowProps) => {
+  const { t } = useTranslation();
   const {
     row: { id, isOpen, childCount, isFiltering, name, path, padding, isLeaf, hint },
     toggle,
@@ -288,11 +290,11 @@ const Item: React.FC<RowProps> = ({ style, item, dimensionCallback, maxWidth, is
                                 addChild(id);
                               }}
                             >
-                              Add Inside
+                              {t("editor:addInside")}
                             </Menu.Item>
                             {item.row.origin === "session" && (
                               <Menu.Item key="delete" className={styles.taxonomy__action} onClick={onDelete}>
-                                Delete
+                                {t("editor:delete")}
                               </Menu.Item>
                             )}
                           </Menu>
@@ -361,6 +363,7 @@ const filterTreeByPredicate = (flatten: TaxonomyItem[], predicate: (item: Taxono
 };
 
 const TaxonomyDropdown = ({ show, flatten, items, dropdownRef, isEditable }: TaxonomyDropdownProps) => {
+  const { t } = useTranslation();
   const inputRef = useRef<HTMLInputElement>(null);
   const [search, setSearch] = useState("");
   const predicate = (item: TaxonomyItem) => item.label.toLocaleLowerCase().includes(search);
@@ -413,7 +416,7 @@ const TaxonomyDropdown = ({ show, flatten, items, dropdownRef, isEditable }: Tax
         autoComplete="off"
         className={styles.taxonomy__search}
         name="taxonomy__search"
-        placeholder="Search..."
+        placeholder={t("editor:searchPlaceholder")}
         onInput={onInput}
         ref={inputRef}
       />
@@ -441,9 +444,9 @@ const TaxonomyDropdown = ({ show, flatten, items, dropdownRef, isEditable }: Tax
                 look="string"
                 type="button"
                 onClick={addInside}
-                aria-label="Add new label"
+                aria-label={t("editor:addNewLabel")}
               >
-                Add
+                {t("editor:add")}
               </Button>
             </div>
           ) : null}

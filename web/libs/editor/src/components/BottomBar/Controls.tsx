@@ -258,7 +258,7 @@ export const Controls = controlsInjector<{ annotation: MSTAnnotation }>(
         const title = hasIncompleteRegions
           ? t("editor:incompleteSubmitTooltip")
           : overlapDisabled
-            ? store.overlapReachedMessage
+            ? t("editor:overlapReachedMessage", { defaultValue: store.overlapReachedMessage })
             : submitDisabled
               ? t("editor:emptySubmitTooltip")
               : t("editor:saveResultsTooltip");
@@ -313,7 +313,7 @@ export const Controls = controlsInjector<{ annotation: MSTAnnotation }>(
         const updateTitle = hasIncompleteRegions
           ? t("editor:incompleteUpdateTooltip")
           : overlapDisabled
-            ? store.overlapReachedMessage
+            ? t("editor:overlapReachedMessage", { defaultValue: store.overlapReachedMessage })
             : noChanges
               ? t("editor:noChangesTooltip")
               : t("editor:updateTaskTooltip");

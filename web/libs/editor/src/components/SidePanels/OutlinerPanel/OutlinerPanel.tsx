@@ -1,5 +1,6 @@
 import { observer } from "mobx-react";
 import { type FC, useCallback, useEffect, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { cn } from "../../../utils/bem";
 import { PanelBase, type PanelProps } from "../PanelBase";
 import { OutlinerTree } from "./OutlinerTree";
@@ -26,6 +27,7 @@ const OutlinerFFClasses: string[] = [];
 OutlinerFFClasses.push("ff_hide_all_regions");
 
 const OutlinerPanelComponent: FC<OutlinerPanelProps> = ({ regions, ...props }) => {
+  const { t } = useTranslation();
   const [group, setGroup] = useState<GroupingOptions>(regions.group);
   const onOrderingChange = useCallback(
     (value: OrderingOptions) => {
@@ -49,7 +51,7 @@ const OutlinerPanelComponent: FC<OutlinerPanelProps> = ({ regions, ...props }) =
   regions.setGrouping(group);
 
   return (
-    <PanelBase {...props} name="outliner" mix={OutlinerFFClasses} title="Outliner">
+    <PanelBase {...props} name="outliner" mix={OutlinerFFClasses} title={t("editor:outlinerTitle")}>
       <ViewControls
         ordering={regions.sort}
         regions={regions}
@@ -95,24 +97,33 @@ const OutlinerStandAlone: FC<OutlinerPanelProps> = ({ regions }) => {
   );
 };
 
-const OutlinerEmptyState = () => (
-  <EmptyState
-    icon={<IconLsLabeling width={24} height={24} />}
-    header="Labeled regions will appear here"
-    description={
-      <>
-        <span>
-          Start labeling and track your results
-          <br />
-          using this panel
-        </span>
-      </>
-    }
-    learnMore={{ href: getDocsUrl("guide/labeling"), text: "Learn more", testId: "regions-panel-learn-more" }}
-  />
-);
+const OutlinerEmptyState = () => {
+  const { t } = useTranslation();
+
+  return (
+    <EmptyState
+      icon={<IconLsLabeling width={24} height={24} />}
+      header={t("editor:outlinerEmptyHeader")}
+      description={
+        <>
+          <span>
+            {t("editor:outlinerEmptyDescription1")}
+            <br />
+            {t("editor:outlinerEmptyDescription2")}
+          </span>
+        </>
+      }
+      learnMore={{
+        href: getDocsUrl("guide/labeling"),
+        text: t("editor:learnMore"),
+        testId: "regions-panel-learn-more",
+      }}
+    />
+  );
+};
 
 const OutlinerTreeComponent: FC<OutlinerTreeComponentProps> = observer(({ regions }) => {
+  const { t } = useTranslation();
   const allRegionsHidden = regions?.regions?.length > 0 && regions?.filter?.length === 0;
   const hasClassifications = regions?.classificationAreas?.length > 0;
   const hasContent = regions?.regions?.length > 0 || hasClassifications;
@@ -128,9 +139,9 @@ const OutlinerTreeComponent: FC<OutlinerTreeComponentProps> = observer(({ region
       {allRegionsHidden && !hasClassifications ? (
         <div className={cn("filters-info").toClassName()}>
           <IconInfo width={21} height={20} />
-          <div className={cn("filters-info").elem("filters-title").toClassName()}>All regions hidden</div>
+          <div className={cn("filters-info").elem("filters-title").toClassName()}>{t("editor:allRegionsHidden")}</div>
           <div className={cn("filters-info").elem("filters-description").toClassName()}>
-            Adjust or remove the filters to view
+            {t("editor:adjustOrRemoveTheFiltersToView")}
           </div>
         </div>
       ) : hasContent ? (
@@ -142,10 +153,10 @@ const OutlinerTreeComponent: FC<OutlinerTreeComponentProps> = observer(({ region
                 <div className={cn("filters-info").toClassName()}>
                   <IconInfo width={21} height={20} />
                   <div className={cn("filters-info").elem("filters-title").toClassName()}>
-                    There {hiddenRegions === 1 ? "is" : "are"} {hiddenRegions} hidden region{hiddenRegions > 1 && "s"}
+                    {t("editor:hiddenRegionsCount", { count: hiddenRegions })}
                   </div>
                   <div className={cn("filters-info").elem("filters-description").toClassName()}>
-                    Adjust or remove filters to view
+                    {t("editor:adjustOrRemoveFiltersToView")}
                   </div>
                 </div>
               )

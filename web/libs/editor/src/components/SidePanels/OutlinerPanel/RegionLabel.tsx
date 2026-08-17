@@ -1,5 +1,6 @@
 import { observer } from "mobx-react";
 import { memo } from "react";
+import { useTranslation } from "react-i18next";
 import { cn } from "../../../utils/bem";
 
 export type RegionLabelProps = {
@@ -7,9 +8,10 @@ export type RegionLabelProps = {
 };
 
 const ClassificationLabel = observer(({ item }: { item: any }) => {
+  const { t } = useTranslation();
   const results = item.results ?? [];
 
-  if (!results.length) return "Classification";
+  if (!results.length) return t("editor:classification");
 
   return (
     <div className={cn("labels-list").toClassName()}>
@@ -17,7 +19,7 @@ const ClassificationLabel = observer(({ item }: { item: any }) => {
         const values = result.mainValue;
 
         if (!values || !Array.isArray(values) || values.length === 0) {
-          return <span key={result.id}>{result.from_name?.name ?? "Classification"}</span>;
+          return <span key={result.id}>{result.from_name?.name ?? t("editor:classification")}</span>;
         }
         return values.map((val: any, vIdx: number) => {
           const display = Array.isArray(val) ? val.join(" > ") : String(val);
@@ -31,12 +33,13 @@ const ClassificationLabel = observer(({ item }: { item: any }) => {
 
 export const RegionLabel = memo(
   observer(({ item }: RegionLabelProps) => {
+    const { t } = useTranslation();
     const { type } = item ?? {};
     if (item?.classification) {
       return <ClassificationLabel item={item} />;
     }
     if (!type) {
-      return "No Label";
+      return t("editor:noLabel");
     }
     if (type.includes("label")) {
       return item.value;
@@ -70,7 +73,7 @@ export const RegionLabel = memo(
               // This comes from an Elem tag that was set without a name. The CSS was fixed to make it work,
               // but this is clearly bad CSS usage.
               <div key={label.id} className={cn("labels-list").toClassName()} style={{ color }}>
-                {label.value || "No label"}
+                {label.value || t("editor:noLabelLower")}
               </div>,
             ];
           })}

@@ -1,6 +1,7 @@
 import { type FC, useEffect, useRef } from "react";
 import { observer } from "mobx-react";
 import { Spin } from "antd";
+import { useTranslation } from "react-i18next";
 
 import { cn } from "../../utils/bem";
 import { CommentForm } from "./Comment/CommentForm";
@@ -11,20 +12,25 @@ import { FF_FIT_720_LAZY_LOAD_ANNOTATIONS, isFF } from "@humansignal/core/lib/ut
 import "./Comments.prefix.css";
 
 // FIT-720: Skeleton loader for comments while fetching
-const CommentsLoadingSkeleton: FC = () => (
-  <div className={cn("comments").elem("loading").toClassName()}>
-    <div style={{ display: "flex", justifyContent: "center", alignItems: "center", padding: "40px 0" }}>
-      <Spin size="default" />
-      <span style={{ marginLeft: 12, color: "#999" }}>Loading comments...</span>
+const CommentsLoadingSkeleton: FC = () => {
+  const { t } = useTranslation();
+
+  return (
+    <div className={cn("comments").elem("loading").toClassName()}>
+      <div style={{ display: "flex", justifyContent: "center", alignItems: "center", padding: "40px 0" }}>
+        <Spin size="default" />
+        <span style={{ marginLeft: 12, color: "#999" }}>{t("editor:loadingComments")}</span>
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
 export const Comments: FC<{
   annotationStore: any;
   commentStore: any;
   isActive?: boolean; // FIT-720: Only fetch comments when tab is active (when FF enabled)
 }> = observer(({ annotationStore, commentStore, isActive = true }) => {
+  const { t } = useTranslation();
   const mounted = useMounted();
   const taskId = commentStore.task?.id;
   const annotationId = commentStore.annotation?.id;
@@ -79,7 +85,7 @@ export const Comments: FC<{
   useEffect(() => {
     const confirmCommentsLoss = (e: any) => {
       if (commentStore.hasUnsaved) {
-        e.returnValue = "You have unpersisted comments which will be lost if continuing.";
+        e.returnValue = t("editor:unsavedCommentsWarning");
       }
 
       return e;
@@ -90,7 +96,7 @@ export const Comments: FC<{
     return () => {
       window.removeEventListener("beforeunload", confirmCommentsLoss);
     };
-  }, [commentStore.hasUnsaved]);
+  }, [commentStore.hasUnsaved, t]);
 
   return (
     <div className={cn("comments").toClassName()}>

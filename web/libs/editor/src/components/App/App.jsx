@@ -303,7 +303,11 @@ class App extends Component {
               <InstructionsModal
                 visible={store.showingDescription}
                 onCancel={() => store.toggleDescription()}
-                title={store.hasInterface("review") ? "Review Instructions" : "Labeling Instructions"}
+                title={
+                  store.hasInterface("review")
+                    ? i18next.t("editor:reviewInstructions")
+                    : i18next.t("editor:labelingInstructions")
+                }
               >
                 {store.description}
               </InstructionsModal>

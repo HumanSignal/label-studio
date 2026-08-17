@@ -12,6 +12,7 @@ import {
 } from "@humansignal/icons";
 import { Button } from "@humansignal/ui";
 import { type FC, useCallback, useContext, useEffect, useMemo } from "react";
+import { useTranslation } from "react-i18next";
 import { Dropdown } from "@humansignal/ui";
 // eslint-disable-next-line
 // @ts-ignore
@@ -44,6 +45,7 @@ const mediaStartTimeSupportedTags = [
 
 export const ViewControls: FC<ViewControlsProps> = observer(
   ({ ordering, regions, orderingDirection, onOrderingChange, onGroupingChange }) => {
+    const { t } = useTranslation();
     const grouping = regions.group;
     const context = useContext(SidePanelsContext);
 
@@ -66,78 +68,84 @@ export const ViewControls: FC<ViewControlsProps> = observer(
       }
     }, [ordering, mediaTimeSupport, onOrderingChange]);
 
-    const getGroupingLabels = useCallback((value: GroupingOptions): LabelInfo => {
-      switch (value) {
-        case "manual":
-          return {
-            label: (
-              <>
-                <IconList /> Group Manually
-              </>
-            ),
-            selectedLabel: "Manual",
-            icon: <IconList width={16} height={16} />,
-            tooltip: "Manually Grouped",
-          };
-        case "label":
-          return {
-            label: (
-              <>
-                <IconBoundingBox /> Group by Label
-              </>
-            ),
-            selectedLabel: "By Label",
-            icon: <IconBoundingBox width={16} height={16} />,
-            tooltip: "Grouped by Label",
-          };
-        case "type":
-          return {
-            label: (
-              <>
-                <IconCursor /> Group by Tool
-              </>
-            ),
-            selectedLabel: "By Tool",
-            icon: <IconCursor width={16} height={16} />,
-            tooltip: "Grouped by Tool",
-          };
-      }
-    }, []);
+    const getGroupingLabels = useCallback(
+      (value: GroupingOptions): LabelInfo => {
+        switch (value) {
+          case "manual":
+            return {
+              label: (
+                <>
+                  <IconList /> {t("editor:groupManually")}
+                </>
+              ),
+              selectedLabel: t("editor:manualGroup"),
+              icon: <IconList width={16} height={16} />,
+              tooltip: t("editor:manuallyGrouped"),
+            };
+          case "label":
+            return {
+              label: (
+                <>
+                  <IconBoundingBox /> {t("editor:groupByLabel")}
+                </>
+              ),
+              selectedLabel: t("editor:byLabel"),
+              icon: <IconBoundingBox width={16} height={16} />,
+              tooltip: t("editor:groupedByLabel"),
+            };
+          case "type":
+            return {
+              label: (
+                <>
+                  <IconCursor /> {t("editor:groupByTool")}
+                </>
+              ),
+              selectedLabel: t("editor:byTool"),
+              icon: <IconCursor width={16} height={16} />,
+              tooltip: t("editor:groupedByTool"),
+            };
+        }
+      },
+      [t],
+    );
 
-    const getOrderingLabels = useCallback((value: OrderingOptions): LabelInfo => {
-      switch (value) {
-        case "date":
-          return {
-            label: (
-              <>
-                <IconClockTimeFourOutline /> Order by Time
-              </>
-            ),
-            selectedLabel: "By Time",
-            icon: <IconClockTimeFourOutline width={16} height={16} />,
-          };
-        case "score":
-          return {
-            label: (
-              <>
-                <IconPredictions /> Order by Score
-              </>
-            ),
-            selectedLabel: "By Score",
-            icon: <IconPredictions width={16} height={16} />,
-          };
-        case "mediaStartTime":
-          return {
-            label: (
-              <>
-                <IconTimelineRegion /> Order by Media Start Time
-              </>
-            ),
-            selectedLabel: "By Media Start Time",
-            icon: <IconTimelineRegion width={16} height={16} />,
-          };
-      }
-    }, []);
+    const getOrderingLabels = useCallback(
+      (value: OrderingOptions): LabelInfo => {
+        switch (value) {
+          case "date":
+            return {
+              label: (
+                <>
+                  <IconClockTimeFourOutline /> {t("editor:orderByTime")}
+                </>
+              ),
+              selectedLabel: t("editor:byTime"),
+              icon: <IconClockTimeFourOutline width={16} height={16} />,
+            };
+          case "score":
+            return {
+              label: (
+                <>
+                  <IconPredictions /> {t("editor:orderByScore")}
+                </>
+              ),
+              selectedLabel: t("editor:byScore"),
+              icon: <IconPredictions width={16} height={16} />,
+            };
+          case "mediaStartTime":
+            return {
+              label: (
+                <>
+                  <IconTimelineRegion /> {t("editor:orderByMediaStartTime")}
+                </>
+              ),
+              selectedLabel: t("editor:byMediaStartTime"),
+              icon: <IconTimelineRegion width={16} height={16} />,
+            };
+        }
+      },
+      [t],
+    );
 
     const renderOrderingDirectionIcon = orderingDirection === "asc" ? <IconSortUp /> : <IconSortDown />;
 
@@ -287,6 +295,7 @@ interface ToggleRegionsVisibilityButton {
 }
 
 const ToggleRegionsVisibilityButton = observer<FC<ToggleRegionsVisibilityButton>>(({ regions }) => {
+  const { t } = useTranslation();
   const toggleRegionsVisibility = useCallback(
     (e) => {
       e.preventDefault();
@@ -306,8 +315,8 @@ const ToggleRegionsVisibilityButton = observer<FC<ToggleRegionsVisibilityButton>
       look="string"
       disabled={isDisabled}
       onClick={toggleRegionsVisibility}
-      aria-label={isAllHidden ? "Show all regions" : "Hide all regions"}
-      tooltip={isAllHidden ? "Show all regions" : "Hide all regions"}
+      aria-label={isAllHidden ? t("editor:showAllRegions") : t("editor:hideAllRegions")}
+      tooltip={isAllHidden ? t("editor:showAllRegions") : t("editor:hideAllRegions")}
     >
       {isAllHidden ? (
         <IconOutlinerEyeClosed width={16} height={16} />

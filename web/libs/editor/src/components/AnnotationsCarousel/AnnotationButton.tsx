@@ -19,6 +19,7 @@
 import { useCallback, useMemo, useRef } from "react";
 import { inject, observer } from "mobx-react";
 import { isAlive } from "mobx-state-tree";
+import { useTranslation } from "react-i18next";
 import { ToastType, useToast } from "@humansignal/ui";
 import {
   AnnotationButton as SharedAnnotationButton,
@@ -108,6 +109,7 @@ function mapEntityToShared(entity: any, annotationStore: any, infoIsHidden: bool
 const AnnotationButtonInner = injector(
   observer(
     ({ entity, capabilities = {}, annotationStore, store, onAnnotationChange, layout }: AnnotationButtonInterface) => {
+      const { t } = useTranslation();
       const buttonContainerRef = useRef<HTMLDivElement | null>(null);
       const toast = useToast();
       const { fetchAnnotationCached } = useAnnotationFetcher(store?.task?.id);
@@ -187,7 +189,7 @@ const AnnotationButtonInner = injector(
                 const data = await fetchAnnotationCached(entity.pk);
                 if (!data || (data as { error?: unknown }).error) {
                   toast?.show({
-                    message: "Could not load annotation to duplicate. Try selecting it first.",
+                    message: t("editor:couldNotLoadAnnotationToDuplicate"),
                     type: ToastType.error,
                   });
                   return;
@@ -200,23 +202,25 @@ const AnnotationButtonInner = injector(
                 annotationStore.selectAnnotation(c.id, { exitViewAll: true });
               });
             } catch {
-              toast?.show({ message: "Could not duplicate annotation.", type: ToastType.error });
+              toast?.show({ message: t("editor:couldNotDuplicateAnnotation"), type: ToastType.error });
             }
           },
           onDelete: () => {
             if (!entityIsAlive) return;
             const isPredictionLocal = entity.type === "prediction";
             confirm({
-              title: isPredictionLocal ? "Delete prediction?" : "Delete annotation?",
+              title: isPredictionLocal ? t("editor:deletePredictionConfirm") : t("editor:deleteAnnotationConfirm"),
               body: (
                 <>
-                  This will <strong>delete all existing regions</strong>. Are you sure you want to delete them?
+                  {t("editor:deleteConfirmLead")}
+                  <strong>{t("editor:deleteConfirmRegions")}</strong>
+                  {t("editor:deleteConfirmTail")}
                   <br />
-                  This action cannot be undone.
+                  {t("editor:actionCannotBeUndone")}
                 </>
               ),
               buttonLook: "negative",
-              okText: "Delete",
+              okText: t("editor:delete"),
               onOk: () => {
                 if (isPredictionLocal) {
                   entity.list.deletePrediction(entity);
@@ -241,7 +245,7 @@ const AnnotationButtonInner = injector(
           },
           onAnnotationChange,
         }),
-        [entityIsAlive, entity, annotationStore, fetchAnnotationCached, toast, isLSE, onAnnotationChange],
+        [entityIsAlive, entity, annotationStore, fetchAnnotationCached, toast, isLSE, onAnnotationChange, t],
       );
 
       if (!entityIsAlive || !sharedAnnotation) return null;

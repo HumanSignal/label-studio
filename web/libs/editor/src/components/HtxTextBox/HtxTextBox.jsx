@@ -1,8 +1,11 @@
 import React from "react";
+import i18next from "i18next";
 import { IconPencil, IconTrashAlt, IconCheck } from "@humansignal/icons";
 import { Button, Tooltip, Typography } from "@humansignal/ui";
 import { throttle } from "@humansignal/core/lib/utils/lodash-replacements";
 import { cn } from "../../utils/bem";
+
+const t = (key) => i18next.t(`editor:${key}`);
 
 // used for correct auto-height calculation
 const BORDER_WIDTH = 1;
@@ -152,7 +155,7 @@ export class HtxTextBox extends React.Component {
       <div className={cn("textarea").elem("region").toClassName()} data-testid="htx-textbox-edit">
         {rows > 1 ? <textarea {...inputProps} /> : <input {...inputProps} />}
         {!onlyEdit && (
-          <Tooltip title="Save: [shift+enter]">
+          <Tooltip title={t("saveShiftEnter")}>
             <Button
               type="text"
               variant="primary"
@@ -160,7 +163,7 @@ export class HtxTextBox extends React.Component {
               size="small"
               className="absolute right-tight top-tighter"
               icon={<IconCheck />}
-              aria-label="Save"
+              aria-label={t("save")}
               data-testid="htx-textbox-save"
               onClick={this.save}
             />
@@ -206,10 +209,10 @@ export class HtxTextBox extends React.Component {
               variant="neutral"
               look="outlined"
               size="small"
-              tooltip="Edit"
+              tooltip={t("edit")}
               tooltipTheme="Dark"
               leading={<IconPencil />}
-              aria-label="Edit Region"
+              aria-label={t("editRegion")}
               data-testid="htx-textbox-edit-button"
               onClick={this.startEditing}
             />
@@ -220,10 +223,10 @@ export class HtxTextBox extends React.Component {
               variant="negative"
               look="outlined"
               size="small"
-              tooltip="Delete"
+              tooltip={t("delete")}
               tooltipTheme="Dark"
               leading={<IconTrashAlt />}
-              aria-label="Delete Region"
+              aria-label={t("deleteRegion")}
               data-testid="htx-textbox-delete-button"
               onClick={onDelete}
             />

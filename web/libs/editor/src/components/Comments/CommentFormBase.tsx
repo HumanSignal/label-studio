@@ -1,4 +1,5 @@
 import { type FC, type RefObject, useCallback, useRef } from "react";
+import { useTranslation } from "react-i18next";
 import { cn } from "../../utils/bem";
 import { IconSend } from "@humansignal/icons";
 
@@ -19,6 +20,7 @@ export type CommentFormProps = {
 
 export const CommentFormBase: FC<CommentFormProps> = observer(
   ({ value = "", inline = true, onChange, onSubmit, onBlur, rows = 1, maxRows = 4, classifications }) => {
+    const { t } = useTranslation();
     const formRef = useRef<HTMLFormElement>(null);
     const actionRef = useRef<{ update?: (text?: string) => void; el?: RefObject<HTMLTextAreaElement> }>({});
 
@@ -49,7 +51,7 @@ export const CommentFormBase: FC<CommentFormProps> = observer(
         <TextArea
           actionRef={actionRef}
           name="comment"
-          placeholder="Add a comment"
+          placeholder={t("editor:addAComment")}
           value={value}
           rows={rows}
           maxRows={maxRows}
@@ -66,7 +68,7 @@ export const CommentFormBase: FC<CommentFormProps> = observer(
           onBlur={(e) => onBlur?.(e)}
         />
         <div className={cn("comment-form").elem("primary-action").toClassName()}>
-          <Button type="submit" aria-label="Submit comment" variant="neutral" look="string">
+          <Button type="submit" aria-label={t("editor:submitComment")} variant="neutral" look="string">
             <IconSend />
           </Button>
         </div>

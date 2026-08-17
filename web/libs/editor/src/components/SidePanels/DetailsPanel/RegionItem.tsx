@@ -3,6 +3,7 @@ import { Button, type ButtonProps } from "@humansignal/ui";
 import chroma from "chroma-js";
 import { observer } from "mobx-react";
 import { type FC, forwardRef, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { WithHotkey } from "../../../common/Hotkey/WithHotkey";
 import { CREATE_RELATION_MODE } from "../../../stores/Annotation/LinkingModes";
 import { cn } from "../../../utils/bem";
@@ -33,6 +34,7 @@ export const RegionItem: FC<RegionItemProps> = observer(
     mainDetails: MainDetails,
     metaDetails: MetaDetails,
   }) => {
+    const { t } = useTranslation();
     const { annotation } = region;
     const { selectedRegions: nodes } = annotation;
     const [editMode, setEditMode] = useState(false);
@@ -70,7 +72,7 @@ export const RegionItem: FC<RegionItemProps> = observer(
           <div className={cn("detailed-region").elem("warning").toClassName()}>
             <IconWarning />
             <div className={cn("detailed-region").elem("warning-text").toClassName()}>
-              Incomplete {region.type?.replace("region", "") ?? "region"}
+              {t("editor:incompleteType", { type: region.type?.replace("region", "") ?? "region" })}
             </div>
           </div>
         )}
@@ -99,6 +101,7 @@ export const RegionItem: FC<RegionItemProps> = observer(
 );
 
 const RegionAction: FC<any> = observer(({ region, annotation, editMode, onEditModeChange }) => {
+  const { t } = useTranslation();
   const entityButtons: JSX.Element[] = [];
 
   entityButtons.push(
@@ -116,7 +119,7 @@ const RegionAction: FC<any> = observer(({ region, annotation, editMode, onEditMo
             annotation.startLinkingMode(CREATE_RELATION_MODE, region);
           }
         }}
-        aria-label="Create Relation"
+        aria-label={t("editor:createRelation")}
       >
         <IconRelationLink />
       </RegionActionButton>
@@ -130,7 +133,7 @@ const RegionAction: FC<any> = observer(({ region, annotation, editMode, onEditMo
         look={editMode ? "filled" : "string"}
         variant={editMode ? "primary" : "neutral"}
         onClick={() => onEditModeChange(!editMode)}
-        aria-label="Edit region's meta"
+        aria-label={t("editor:editRegionMeta")}
       >
         <IconPlus />
       </RegionActionButton>
@@ -153,17 +156,17 @@ const RegionAction: FC<any> = observer(({ region, annotation, editMode, onEditMo
             displayedHotkey="region:lock"
             variant="neutral"
             look="string"
-            aria-label="Unlock Region"
-            tooltip="Unlock Region"
+            aria-label={region?.locked ? t("editor:unlockRegion") : t("editor:lockRegion")}
+            tooltip={region?.locked ? t("editor:unlockRegion") : t("editor:lockRegion")}
           />
         )}
         {!region.incomplete && region.hideable && (
           <RegionActionButton
-            aria-label={`${region.hidden ? "Show" : "Hide"} selected region`}
+            aria-label={region.hidden ? t("editor:showSelectedRegion") : t("editor:hideSelectedRegion")}
             variant="neutral"
             look="string"
             onClick={region.toggleHidden}
-            tooltip={`${region.hidden ? "Show" : "Hide"} selected region`}
+            tooltip={region.hidden ? t("editor:showSelectedRegion") : t("editor:hideSelectedRegion")}
           >
             {region.hidden ? <IconEyeClosed /> : <IconEyeOpened />}
           </RegionActionButton>
@@ -171,9 +174,9 @@ const RegionAction: FC<any> = observer(({ region, annotation, editMode, onEditMo
         <RegionActionButton
           variant="negative"
           look="string"
-          aria-label="Delete selected region"
+          aria-label={t("editor:deleteSelectedRegion")}
           disabled={region.isReadOnly()}
-          tooltip="Delete selected region"
+          tooltip={t("editor:deleteSelectedRegion")}
           onClick={() => annotation.deleteRegion(region)}
         >
           <IconTrash />

@@ -1,8 +1,9 @@
 import React, { useMemo } from "react";
 import { Modal, Table, Tabs } from "antd";
 import { observer } from "mobx-react";
+import { useTranslation } from "react-i18next";
 
-import { Hotkey } from "../../core/Hotkey";
+import { Hotkey, translateHotkeyDescription } from "../../core/Hotkey";
 
 import "./Settings.prefix.css";
 import { cn } from "../../utils/bem";
@@ -15,14 +16,16 @@ import { ff, isAnnotatorRole } from "@humansignal/core";
 import { getProjectHotkeysSettingsPath, getProjectIdFromPathname } from "@humansignal/core/lib/utils/hotkeysProject";
 
 const HotkeysDescription = () => {
+  const { t } = useTranslation();
   const projectId = getProjectIdFromPathname(window.location.pathname);
   const customizationPath = projectId ? getProjectHotkeysSettingsPath(projectId) : "/user/account/hotkeys";
   const columns = [
-    { title: "Shortcut", dataIndex: "combo", key: "combo" },
-    { title: "Description", dataIndex: "descr", key: "descr" },
+    { title: t("editor:shortcutColumn"), dataIndex: "combo", key: "combo" },
+    { title: t("editor:descriptionColumn"), dataIndex: "descr", key: "descr" },
   ];
 
   const keyNamespaces = Hotkey.namespaces();
+  const comboNames = Hotkey.comboNames();
 
   const getData = (descr) =>
     Object.keys(descr)
@@ -43,7 +46,7 @@ const HotkeysDescription = () => {
             </div>
           );
         }),
-        descr: descr[k],
+        descr: translateHotkeyDescription(comboNames[k], descr[k]),
       }));
 
   return (
@@ -67,7 +70,7 @@ const HotkeysDescription = () => {
         href={customizationPath}
         className="text-primary-content hover:underline hover:text-primary-content-hover"
       >
-        {projectId ? "Customize for this project" : "Customize hotkeys"}
+        {projectId ? t("editor:customizeForThisProject") : t("editor:customizeHotkeys")}
       </Typography>
     </div>
   );
@@ -94,6 +97,7 @@ const SettingsTag = ({ children }) => {
 };
 
 const GeneralSettings = observer(({ store }) => {
+  const { t } = useTranslation();
   const showVerticalLayoutToggle =
     ff.isActive(ff.FF_FIT_ANNOTATIONS_VERTICAL_LAYOUT) && store.hasInterface("annotations:tabs") && !isAnnotatorRole();
   const isVerticalLayout = store.settings.annotationsListLayout === "vertical";
@@ -129,10 +133,10 @@ const GeneralSettings = observer(({ store }) => {
         <label className={cn("settings").elem("field").toClassName()}>
           <div className={cn("settings__label").toClassName()}>
             <div className={cn("settings__label").elem("title").toClassName()}>
-              Display annotations in vertical panel
+              {t("editor:displayAnnotationsInVerticalPanel")}
             </div>
             <div className={cn("settings__label").elem("description").toClassName()}>
-              Shows annotations as a vertical list on the left side of the labeling UI
+              {t("editor:verticalPanelDescription")}
             </div>
           </div>
           <Toggle
@@ -140,8 +144,8 @@ const GeneralSettings = observer(({ store }) => {
             onChange={(event) =>
               store.settings.setAnnotationsListLayout(event.target.checked ? "vertical" : "horizontal")
             }
-            description="Display annotations in vertical panel"
-            aria-label="Display annotations in vertical panel"
+            description={t("editor:displayAnnotationsInVerticalPanel")}
+            aria-label={t("editor:displayAnnotationsInVerticalPanel")}
             data-testid="annotations-list-layout-toggle"
           />
         </label>
@@ -151,19 +155,19 @@ const GeneralSettings = observer(({ store }) => {
 });
 
 const Settings = {
-  General: { name: "General", component: GeneralSettings },
-  Hotkeys: { name: "Hotkeys", component: HotkeysDescription },
+  General: { name: "General", nameKey: "editor:settingsTabGeneral", component: GeneralSettings },
+  Hotkeys: { name: "Hotkeys", nameKey: "editor:settingsTabHotkeys", component: HotkeysDescription },
 };
 
 const DEFAULT_ACTIVE = Object.keys(Settings)[0];
 
 const DEFAULT_MODAL_SETTINGS = {
   name: "settings-modal",
-  title: "Labeling Interface Settings",
   closeIcon: <IconClose />,
 };
 
 export default observer(({ store }) => {
+  const { t } = useTranslation();
   const availableSettings = useMemo(() => {
     const availableTags = Object.values(store.annotationStore.names.toJSON());
     const settingsScreens = Object.values(TagSettings);
@@ -180,8 +184,8 @@ export default observer(({ store }) => {
 
   const settingsTabs = (
     <Tabs defaultActiveKey={DEFAULT_ACTIVE}>
-      {Object.entries(Settings).map(([key, { name, component }]) => (
-        <Tabs.TabPane tab={name} key={key}>
+      {Object.entries(Settings).map(([key, { nameKey, component }]) => (
+        <Tabs.TabPane tab={t(nameKey)} key={key}>
           {React.createElement(component, { store })}
         </Tabs.TabPane>
       ))}
@@ -201,7 +205,7 @@ export default observer(({ store }) => {
         onOpenChange={(open) => {
           if (!open && store.showingSettings) store.toggleSettings();
         }}
-        title={DEFAULT_MODAL_SETTINGS.title}
+        title={t("editor:labelingInterfaceSettings")}
         size="large"
         contentClassName="max-w-[568px]"
         bodyClassName="min-h-0 p-0"
@@ -218,7 +222,7 @@ export default observer(({ store }) => {
       open={store.showingSettings}
       onCancel={store.toggleSettings}
       footer=""
-      title={DEFAULT_MODAL_SETTINGS.title}
+      title={t("editor:labelingInterfaceSettings")}
       closeIcon={DEFAULT_MODAL_SETTINGS.closeIcon}
     >
       {settingsTabs}

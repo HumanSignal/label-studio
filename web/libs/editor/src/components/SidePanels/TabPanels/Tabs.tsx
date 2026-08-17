@@ -1,5 +1,6 @@
 import { useRef, useState } from "react";
 import { IconCollapseSmall, IconExpandSmall, IconOutlinerDrag } from "@humansignal/icons";
+import { useTranslation } from "react-i18next";
 import { useDrag } from "../../../hooks/useDrag";
 import { cn } from "../../../utils/bem";
 import { DEFAULT_PANEL_HEIGHT } from "../constants";
@@ -53,6 +54,7 @@ const Tab = ({
   setActiveTab,
   checkSnap,
 }: TabProps) => {
+  const { t } = useTranslation();
   const tabRef = useRef<HTMLDivElement>();
   const ghostTabRef = useRef<HTMLDivElement>();
   const dragging = useRef(false);
@@ -166,7 +168,7 @@ const Tab = ({
         .toClassName()}
     >
       {!locked && <IconOutlinerDrag className={cn("panel-tabs").elem("icon").toClassName()} />}
-      {tabText}
+      {t(`editor:panelTitle_${name}`, { defaultValue: tabText })}
     </div>
   );
 

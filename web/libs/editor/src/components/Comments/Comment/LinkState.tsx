@@ -1,6 +1,7 @@
 import { type FC, useMemo } from "react";
 import { observer } from "mobx-react";
 import chroma from "chroma-js";
+import { useTranslation } from "react-i18next";
 import { Button } from "@humansignal/ui";
 import { IconCommentLinkTo, IconClose } from "@humansignal/icons";
 import { cn } from "../../../utils/bem";
@@ -18,6 +19,7 @@ type LinkStateProps = {
 };
 
 export const LinkState: FC<LinkStateProps> = ({ linking, region, result, onUnlink, interactive }) => {
+  const { t } = useTranslation();
   const isVisible = linking || region;
   const mod = useMemo(() => {
     if (linking) return { action: true };
@@ -30,7 +32,7 @@ export const LinkState: FC<LinkStateProps> = ({ linking, region, result, onUnlin
       <div className={cn("link-state").elem("prefix").toClassName()}>
         <IconCommentLinkTo />
       </div>
-      {mod?.action && "Select an object to link it to this comment."}
+      {mod?.action && t("editor:selectObjectToLink")}
       {mod?.display && <LinkedRegion region={region} result={result} onUnlink={onUnlink} interactive={interactive} />}
     </div>
   );
@@ -44,6 +46,7 @@ type LinkedRegionProps = {
 };
 
 const LinkedRegion: FC<LinkedRegionProps> = observer(({ region, result, interactive, onUnlink }) => {
+  const { t } = useTranslation();
   const itemColor = region?.background ?? region?.getOneColor?.();
   const isClassification: boolean = region.classification;
 
@@ -111,7 +114,7 @@ const LinkedRegion: FC<LinkedRegionProps> = observer(({ region, result, interact
             look="string"
             leading={<IconClose />}
             onClick={onUnlink}
-            aria-label="Unlink comment"
+            aria-label={t("editor:unlinkComment")}
           />
         </div>
       )}
