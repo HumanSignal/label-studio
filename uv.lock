@@ -667,16 +667,16 @@ wheels = [
 
 [[package]]
 name = "django"
-version = "5.1.15"
+version = "5.2.17"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "asgiref" },
     { name = "sqlparse" },
     { name = "tzdata", marker = "sys_platform == 'win32'" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/10/45/1ac68964193cfcc0b0912a0f68025d5bdb54f71ba7b8716e85b959874bd0/django-5.1.15.tar.gz", hash = "sha256:46a356b5ff867bece73fc6365e081f21c569973403ee7e9b9a0316f27d0eb947", size = 10719662, upload-time = "2025-12-02T14:01:31.931Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/d5/d8/43e9d000519adceb189620b6869ff88031e046df91c2e9da72f8f6918399/django-5.2.17.tar.gz", hash = "sha256:9d4d93be539a18ab80d058eb515900e10951e04c537c5a6b394fc49528d3251f", size = 10889740, upload-time = "2026-08-04T15:04:03.173Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/27/79/372e091f0eba4ddb8228245ccd1baaa140e9658711f5e3a0056e540b4c1e/django-5.1.15-py3-none-any.whl", hash = "sha256:117871e58d6eda37f09870b7d73a3d66567b03aecd515b386b1751177c413432", size = 8260901, upload-time = "2025-12-02T14:01:27.352Z" },
+    { url = "https://files.pythonhosted.org/packages/df/f8/ce120525ca78f12b07daf65786679c5d0b54a75285a8958d3ae55e39da35/django-5.2.17-py3-none-any.whl", hash = "sha256:f04fb3b36ee119e1af4fa1d397d5fd6cf12700f49321e84d4f4c642c5b1973db", size = 8315563, upload-time = "2026-08-04T15:03:59.1Z" },
 ]
 
 [[package]]
@@ -1862,7 +1862,7 @@ requires-dist = [
     { name = "colorama", specifier = ">=0.4.4" },
     { name = "cryptography", specifier = ">=44.0.1" },
     { name = "defusedxml", specifier = ">=0.7.1" },
-    { name = "django", specifier = ">=5.1.8,<5.2.0" },
+    { name = "django", specifier = ">=5.2.16,<5.3.0" },
     { name = "django-annoying", specifier = "==0.10.6" },
     { name = "django-cors-headers", specifier = "==4.7.0" },
     { name = "django-csp", specifier = "==3.7" },
@@ -1884,7 +1884,7 @@ requires-dist = [
     { name = "google-cloud-logging", specifier = ">=3.10.0,<4.0.0" },
     { name = "google-cloud-storage", specifier = ">=3.8.0,<4.0.0" },
     { name = "ijson", specifier = ">=3.4.0,<4.0.0" },
-    { name = "label-studio-sdk", git = "https://github.com/HumanSignal/label-studio-sdk.git?rev=fd3128fc749433da6c32e1d7e0e033f6c4fb7bcf" },
+    { name = "label-studio-sdk", git = "https://github.com/HumanSignal/label-studio-sdk.git?rev=23bab2b7394fc1e71653115aba7561d9908c904b" },
     { name = "launchdarkly-server-sdk", specifier = "==8.2.1" },
     { name = "lxml", extras = ["html-clean"], specifier = ">=6.1.0" },
     { name = "numpy", specifier = ">=2.2.6,<3.0.0" },
@@ -1947,7 +1947,7 @@ test = [
 [[package]]
 name = "label-studio-sdk"
 version = "2.1.3"
-source = { git = "https://github.com/HumanSignal/label-studio-sdk.git?rev=fd3128fc749433da6c32e1d7e0e033f6c4fb7bcf#fd3128fc749433da6c32e1d7e0e033f6c4fb7bcf" }
+source = { git = "https://github.com/HumanSignal/label-studio-sdk.git?rev=23bab2b7394fc1e71653115aba7561d9908c904b#23bab2b7394fc1e71653115aba7561d9908c904b" }
 dependencies = [
     { name = "appdirs" },
     { name = "datamodel-code-generator" },

@@ -22,7 +22,7 @@ dependencies = [
     "botocore (>=1.39.3,<2.0.0)",
     "bleach (>=6.4.0)",
     "cryptography (>=44.0.1)",
-    "Django (>=5.1.8,<5.2.0)",
+    "Django (>=5.2.16,<5.3.0)",
     "django-storages (==1.12.3)",
     "django-annoying (==0.10.6)",
     "django-debug-toolbar (==3.2.1)",
@@ -73,7 +73,7 @@ dependencies = [
 ]
 
 [tool.uv.sources]
-label-studio-sdk = { git = "https://github.com/HumanSignal/label-studio-sdk.git", rev = "fd3128fc749433da6c32e1d7e0e033f6c4fb7bcf" }
+label-studio-sdk = { git = "https://github.com/HumanSignal/label-studio-sdk.git", rev = "23bab2b7394fc1e71653115aba7561d9908c904b" }
 
 [project.optional-dependencies]
 uwsgi = [

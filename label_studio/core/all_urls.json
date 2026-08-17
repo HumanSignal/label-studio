@@ -1284,7 +1284,7 @@
         "decorators": ""
     },
     {
-        "url": "/admin/r/<int:content_type_id>/<path:object_id>/",
+        "url": "/admin/r/<path:content_type_id>/<path:object_id>/",
         "module": "django.contrib.contenttypes.views.shortcut",
         "name": "admin:view_on_site",
         "decorators": ""
