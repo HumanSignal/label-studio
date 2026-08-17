@@ -1309,3 +1309,46 @@ class TestVisibleDataColumnKeys(TestCase):
         assert 'text' in visible
         # image is only hidden in explore, not both — still visible
         assert 'image' in visible
+
+
+class TestApplyFiltersInvalidRegex(TestCase):
+    """FIT-2460: invalid regex fails closed before custom emitters run."""
+
+    def test_invalid_child_regex_empties_queryset_before_custom_hook(self):
+        """Invalid child regex under OR returns none before custom emitters load."""
+        from data_manager.managers import apply_filters
+
+        queryset = Mock()
+        queryset.none.return_value = 'EMPTY'
+        filters = Filters(
+            conjunction=ConjunctionEnum.OR,
+            items=[
+                Filter(
+                    filter='filter:tasks:annotations_results',
+                    operator='contains',
+                    type='String',
+                    value='Airplane',
+                    child_filters=[
+                        Filter(
+                            filter='filter:tasks:comments',
+                            operator='regex',
+                            type='String',
+                            value='[',
+                        )
+                    ],
+                ),
+                Filter(
+                    filter='filter:tasks:id',
+                    operator='equal',
+                    type='Number',
+                    value=1,
+                ),
+            ],
+        )
+
+        with patch('data_manager.managers.load_func') as load_func:
+            result = apply_filters(queryset=queryset, filters=filters, project=Mock(), request=Mock())
+
+        assert result == 'EMPTY'
+        load_func.assert_not_called()
+        queryset.none.assert_called_once_with()

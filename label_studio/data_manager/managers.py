@@ -189,6 +189,23 @@ class CustomFilterResult:
     consume_child_filter: bool = False
 
 
+def filters_contain_invalid_regex(filters) -> bool:
+    """Return True when any parent or child filter has an uncompilable regex pattern.
+
+    Runs before custom emitters so consumed child regexes cannot reach PostgreSQL.
+    """
+    for parent in filters.items:
+        for _filter in (parent, *parent.child_filters):
+            if _filter.value is None or _filter.operator != Operator.REGEX:
+                continue
+            try:
+                re.compile(pattern=str(_filter.value))
+            except Exception as e:
+                logger.info('Incorrect regex for filter: %s: %s', _filter.value, str(e))
+                return True
+    return False
+
+
 operators = {
     Operator.EQUAL: '',
     Operator.NOT_EQUAL: '',
@@ -672,6 +689,10 @@ def apply_filters(queryset, filters, project, request):
     if not filters:
         return queryset
 
+    # Fail closed before custom emitters build ``__regex`` Q objects (FIT-2460).
+    if filters_contain_invalid_regex(filters):
+        return queryset.none()
+
     # convert conjunction to orm statement
     custom_filter_expressions = load_func(settings.DATA_MANAGER_CUSTOM_FILTER_EXPRESSIONS)
     preprocess_field_name = load_func(settings.PREPROCESS_FIELD_NAME)
@@ -852,14 +873,6 @@ def apply_filters(queryset, filters, project, request):
 
                 filter_expressions.append(q)
                 continue
-
-            # regex pattern check
-            elif _filter.operator == 'regex':
-                try:
-                    re.compile(pattern=str(_filter.value))
-                except Exception as e:
-                    logger.info('Incorrect regex for filter: %s: %s', _filter.value, str(e))
-                    return queryset.none()
 
             # append operator
             field_name = f'{clean_field_name}{operators.get(_filter.operator, "")}'
