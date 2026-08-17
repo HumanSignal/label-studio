@@ -72,7 +72,7 @@ jobs:
 
     services:
       postgres:
-        image: postgres:13.8
+        image: postgres:17
         env:
           POSTGRES_PASSWORD: postgres
           POSTGRES_USER: postgres
