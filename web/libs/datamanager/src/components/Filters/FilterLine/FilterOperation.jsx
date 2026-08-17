@@ -19,24 +19,22 @@ import { LIST_MEMBERSHIP_OPS, supportsListMembership } from "./list-membership";
  *
  * @param {{field: FieldConfig}} param0
  */
-export const FilterOperation = observer(({ filter, field, operator, value, disabled }) => {
+export const FilterOperation = observer(({ filter, field, operator, value, disabled, inputType }) => {
   const cellView = filter.cellView;
-  const types = cellView?.customOperators ?? [
-    ...(FilterInputs[filter.filter.currentType] ?? FilterInputs.String),
-    ...Common,
-  ];
+  // Child review indicators reuse Number columns for top-level counts; override the
+  // value widgets to Boolean yes/no without changing the shared column type.
+  const resolvedType = inputType ?? filter.filter.currentType;
+  const types = cellView?.customOperators ?? [...(FilterInputs[resolvedType] ?? FilterInputs.String), ...Common];
 
   const selected = useMemo(() => {
-    let result;
-
     if (operator) {
-      result = types.find((t) => t.key === operator);
+      // Saved operators that are not in this widget set must stay as-is
+      // (FIT-2480: do not rewrite `reviews_accepted > 1` into `is yes`).
+      return types.find((t) => t.key === operator);
     }
 
-    if (!result) {
-      result = types[0];
-    }
-
+    const result = types[0];
+    // New filters with no operator yet default to the first widget.
     // Skip when read-only/locked: mount-time setOperator→save must not run (FIT-2396).
     if (!disabled && result?.key != null && filter.operator !== result.key) {
       filter.setOperator(result.key);
@@ -98,7 +96,9 @@ export const FilterOperation = observer(({ filter, field, operator, value, disab
   });
   const columnClass = cn("filterLine").elem("column");
 
-  return Input ? (
+  if (!types.length) return null;
+
+  return (
     <>
       <div className={columnClass.mix("operation").toClassName()} data-testid="filter-line-operator">
         <FilterDropdown
@@ -109,20 +109,22 @@ export const FilterOperation = observer(({ filter, field, operator, value, disab
           onChange={onOperatorSelected}
         />
       </div>
-      <div className={columnClass.mix("value").toClassName()} data-testid="filter-line-value">
-        <Input
-          {...field}
-          key={`${filter.filter.id}-${filter.filter.currentType}`}
-          schema={filter.schema}
-          filter={filter}
-          multiple={multiple}
-          value={value}
-          onChange={onChange}
-          size="small"
-          disabled={valueDisabled}
-          readOnly={valueReadOnly}
-        />
-      </div>
+      {Input ? (
+        <div className={columnClass.mix("value").toClassName()} data-testid="filter-line-value">
+          <Input
+            {...field}
+            key={`${filter.filter.id}-${resolvedType}`}
+            schema={filter.schema}
+            filter={filter}
+            multiple={multiple}
+            value={value}
+            onChange={onChange}
+            size="small"
+            disabled={valueDisabled}
+            readOnly={valueReadOnly}
+          />
+        </div>
+      ) : null}
     </>
-  ) : null;
+  );
 });

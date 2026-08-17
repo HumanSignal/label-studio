@@ -7,6 +7,7 @@ import { FilterDropdown } from "../FilterDropdown";
 import "./FilterLine.prefix.css";
 import { FilterOperation } from "./FilterOperation";
 import { ColumnPicker, ColumnPickerOptionContent, RECENT_COLUMN_PREFIX } from "../../Common/ColumnPicker";
+import { REVIEW_INDICATOR_CHILD_ALIASES } from "../../../stores/Tabs/tab_filter";
 
 const RECENTS_AUTOSAVE_DELAY_MS = 500;
 /** Chrome action icons in the Filters pane (remove, add child, pin/unpin). */
@@ -263,6 +264,7 @@ export const FilterLine = observer(
           <div className={cn("filterLine").elem("nest").toClassName()} data-testid="filter-line-nest">
             {childFilters.map((childFilter) => {
               const childAliasIsAllowed = configuredChildAliases.includes(childFilter.field.alias);
+              const isReviewIndicatorChild = REVIEW_INDICATOR_CHILD_ALIASES.has(childFilter.field.alias);
               const childIsDisabled =
                 isDisabled ||
                 !canConfigureChildren ||
@@ -293,6 +295,7 @@ export const FilterLine = observer(
                     operator={childFilter.operator}
                     field={childFilter.field}
                     disabled={childIsDisabled}
+                    inputType={isReviewIndicatorChild ? "Boolean" : undefined}
                   />
 
                   <div className={cn("filterLine").elem("remove").toClassName()}>

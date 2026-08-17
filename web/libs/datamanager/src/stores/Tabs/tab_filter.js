@@ -33,6 +33,9 @@ export function isListMembershipOperator(operator) {
   return LIST_MEMBERSHIP_OPERATORS.has(operator);
 }
 
+/** Number columns reused as annotation-child yes/no indicators (FIT-2480). */
+export const REVIEW_INDICATOR_CHILD_ALIASES = new Set(["reviews_accepted", "reviews_rejected"]);
+
 /**
  * BROS-1203 — defensive snapshot recovery on TabFilter rehydration.
  *
@@ -195,6 +198,16 @@ export const TabFilter = types
       const col = self.filter.field;
 
       return CellViews[col.type] ?? CellViews[normalizeCellAlias(col.alias)];
+    },
+
+    get isNestedChildFilter() {
+      try {
+        const parentCollection = getParent(self);
+        const owner = getParent(self, 2);
+        return owner?.child_filters === parentCollection;
+      } catch {
+        return false;
+      }
     },
   }))
   .volatile(() => ({
@@ -408,6 +421,14 @@ export const TabFilter = types
     }),
 
     setDefaultValue() {
+      // Child review indicators use Boolean widgets on Number columns, so they
+      // do not get Boolean defaultValue=false. Default to no so the child is
+      // valid and serialized (otherwise the UI shows "no" while the child is dropped).
+      const alias = self.filter?.field?.alias;
+      if (self.isNestedChildFilter && REVIEW_INDICATOR_CHILD_ALIASES.has(alias)) {
+        self.setValue(false);
+        return;
+      }
       self.setValue(getOperatorDefaultValue(self.operator) ?? self.filter.defaultValue);
     },
 
