@@ -15,7 +15,7 @@ from core.utils.common import collect_versions
 from core.utils.io import find_file
 from django.conf import settings
 from django.contrib.auth import logout
-from django.http import HttpResponse, HttpResponseForbidden, JsonResponse
+from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden, JsonResponse
 from django.shortcuts import redirect, render, reverse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
@@ -192,6 +192,29 @@ def static_file_with_host_resolver(path_on_disk, content_type):
             return response
 
     return serve_file
+
+
+_DEV_SUPPORTED_LANGUAGES = {'en', 'zh-CN'}
+
+
+def dev_switch_language(request):
+    """Dev-only (DEBUG=true): seed localStorage["label-studio.lang"] for the React app."""
+    if not settings.DEBUG:
+        return HttpResponseForbidden('dev only')
+
+    lang = request.GET.get('to', '')
+    if lang not in _DEV_SUPPORTED_LANGUAGES:
+        return HttpResponseBadRequest(f'unsupported language: {lang}')
+
+    from django.utils.http import url_has_allowed_host_and_scheme
+
+    next_url = request.GET.get('next', '/')
+    if not next_url.startswith('/') or not url_has_allowed_host_and_scheme(
+        next_url, allowed_hosts={request.get_host()}, require_https=request.is_secure()
+    ):
+        next_url = '/'
+
+    return render(request, 'core/dev_switch_language.html', {'lang': lang, 'next_url': next_url})
 
 
 def feature_flags(request):

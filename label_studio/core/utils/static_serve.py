@@ -65,7 +65,7 @@ def serve(request, path, document_root=None, show_indexes=False, manifest_asset_
             f'/{manifest_asset_prefix}' if not manifest_asset_prefix.startswith('/') else manifest_asset_prefix
         )
         if possible_asset.startswith(manifest_asset_prefix):
-            possible_asset = possible_asset[len(manifest_asset_prefix) :]
+            possible_asset = possible_asset[len(manifest_asset_prefix) :].lstrip('/')
         fullpath = Path(safe_join(document_root, possible_asset))
     if not fullpath.exists():
         raise Http404(_('“%(path)s” does not exist') % {'path': fullpath})
