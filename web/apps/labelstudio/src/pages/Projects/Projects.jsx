@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useParams as useRouterParams } from "react-router";
 import { Redirect } from "react-router-dom";
+import i18next from "i18next";
 import { useTranslation } from "react-i18next";
 import { Button } from "@humansignal/ui";
 import { Oneof } from "../../components/Oneof/Oneof";
@@ -143,9 +144,11 @@ export const ProjectsPage = () => {
   );
 };
 
-// NOTE: route metadata title is intentionally left in English. It is read by the
-// routing/breadcrumb system outside of a React component, so it cannot call t().
-ProjectsPage.title = "Projects";
+// Route metadata title is read by the routing/breadcrumb system outside of a React
+// component, so it resolves through the shared i18next singleton lazily on each access.
+Object.defineProperty(ProjectsPage, "title", {
+  get: () => i18next.t("projects:pageTitle"),
+});
 ProjectsPage.path = "/projects";
 ProjectsPage.exact = true;
 ProjectsPage.routes = ({ store }) => [

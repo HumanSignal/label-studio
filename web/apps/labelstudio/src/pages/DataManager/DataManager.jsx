@@ -1,5 +1,6 @@
 import { Button, buttonVariant, ToastContext, ToastType } from "@humansignal/ui";
 import { useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { generatePath, useHistory } from "react-router";
 import { Link, NavLink } from "react-router-dom";
 import { Spinner } from "../../components";
@@ -239,10 +240,11 @@ DataManagerPage.pages = {
 };
 DataManagerPage.context = ({ dmRef }) => {
   const { project } = useProject();
+  const { t } = useTranslation();
   const [mode, setMode] = useState(dmRef?.mode ?? "explorer");
 
   const links = {
-    "/settings": "Settings",
+    "/settings": t("projects:settings"),
   };
 
   const updateCrumbs = (currentMode) => {
@@ -253,7 +255,7 @@ DataManagerPage.context = ({ dmRef }) => {
     } else {
       addCrumb({
         key: "dm-crumb",
-        title: "Labeling",
+        title: t("dataManager:labelingCrumb"),
       });
     }
   };
@@ -264,7 +266,7 @@ DataManagerPage.context = ({ dmRef }) => {
 
     if (isLabelStream && show_instruction && expert_instruction) {
       modal({
-        title: "Labeling Instructions",
+        title: t("dataManager:labelingInstructionsTitle"),
         body: <div dangerouslySetInnerHTML={{ __html: expert_instruction }} />,
         style: { width: 680 },
       });
@@ -295,7 +297,7 @@ DataManagerPage.context = ({ dmRef }) => {
           look="outlined"
           onClick={() => {
             modal({
-              title: "Instructions",
+              title: t("dataManager:instructionsTitle"),
               body: () => (
                 <div
                   dangerouslySetInnerHTML={{
@@ -306,7 +308,7 @@ DataManagerPage.context = ({ dmRef }) => {
             });
           }}
         >
-          Instructions
+          {t("dataManager:instructionsTitle")}
         </Button>
       )}
 

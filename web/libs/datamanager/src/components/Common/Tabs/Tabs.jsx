@@ -1,5 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { observer } from "mobx-react";
+import { useTranslation } from "react-i18next";
 import { DragDropContext, Droppable } from "react-beautiful-dnd";
 import { DotsThreeVerticalIcon, DotsSixVerticalIcon, IconLockLocked, PlusIcon } from "@humansignal/icons";
 import { cn } from "../../../utils/bem";
@@ -22,6 +23,7 @@ export const Tabs = ({
   allowedActions,
   addIcon,
 }) => {
+  const { t } = useTranslation();
   const [selectedTab, setSelectedTab] = useState(activeTab);
 
   const switchTab = useCallback((tab) => {
@@ -61,14 +63,14 @@ export const Tabs = ({
             </Droppable>
           </DragDropContext>
           {allowedActions.add !== false && (
-            <Tooltip title="Open New Tab" alignment="bottom-center">
+            <Tooltip title={t("dataManager:openNewTab")} alignment="bottom-center">
               <Button
                 className={tabsCN.elem("add").toClassName()}
                 size="smaller"
                 look="outline"
                 variant="neutral"
                 onClick={onAdd}
-                aria-label="Open New Tab"
+                aria-label={t("dataManager:openNewTab")}
                 data-leave
                 data-testid="dm-add-tab"
               >
@@ -101,6 +103,7 @@ export const TabsItem = observer(
     virtual = false,
   }) => {
     const { switchTab, selectedTab, lastTab, allowedActions } = useContext(TabsContext);
+    const { t } = useTranslation();
     const [currentTitle, setCurrentTitle] = useState(title);
     const [savedTitle, setSavedTitle] = useState(title); // Track the last saved title
     const [renameMode, setRenameMode] = useState(false);
@@ -171,11 +174,18 @@ export const TabsItem = observer(
       [renameMode, switchTab, tab],
     );
 
-    const tabLabel = virtual ? `${currentTitle} (unsaved)` : currentTitle;
+    // Known default tab titles are persisted English data; map them for display only.
+    const displayTitle = useMemo(() => {
+      if (currentTitle === "Tasks") return t("dataManager:tabTitleTasks");
+      if (currentTitle === "Default") return t("dataManager:tabTitleDefault");
+      return currentTitle;
+    }, [currentTitle, t]);
+
+    const tabLabel = virtual ? t("dataManager:unsavedTabTitle", { title: displayTitle }) : displayTitle;
 
     const tabTooltipTitle = useMemo(() => {
-      return isLocked ? `${tabLabel} · ${lockedTooltip ?? "Locked"}` : tabLabel;
-    }, [isLocked, tabLabel, lockedTooltip]);
+      return isLocked ? `${tabLabel} · ${lockedTooltip ?? t("dataManager:lockedTabShort")}` : tabLabel;
+    }, [isLocked, tabLabel, lockedTooltip, t]);
 
     return (
       <div
@@ -213,7 +223,7 @@ export const TabsItem = observer(
                 autoFocus={true}
                 data-testid="dm-tab-name-input"
                 value={currentTitle}
-                aria-label="Tab name"
+                aria-label={t("dataManager:tabName")}
                 onKeyDown={saveTabTitle}
                 onBlur={saveTabTitle}
                 onChange={(ev) => {
@@ -232,7 +242,7 @@ export const TabsItem = observer(
                   </div>
                 )}
                 <span className={tabsCN.elem("item-title").toClassName()} aria-hidden="true">
-                  {currentTitle}
+                  {displayTitle}
                 </span>
               </>
             )}
@@ -276,7 +286,7 @@ export const TabsItem = observer(
                   look="outline"
                   size="smaller"
                   variant="neutral"
-                  aria-label="Tab options"
+                  aria-label={t("dataManager:tabOptions")}
                   data-testid="dm-tab-options"
                 >
                   <DotsThreeVerticalIcon size={16} weight="bold" aria-hidden="true" />

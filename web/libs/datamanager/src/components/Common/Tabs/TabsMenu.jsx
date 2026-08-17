@@ -1,7 +1,6 @@
 import { useMemo } from "react";
+import { useTranslation } from "react-i18next";
 import { Menu } from "../Menu/Menu";
-
-const lockedActionTooltip = (action) => `Unlock this tab before ${action}`;
 
 export const TabsMenu = ({
   onClick,
@@ -12,39 +11,41 @@ export const TabsMenu = ({
   locked = false,
   virtual = false,
 }) => {
+  const { t } = useTranslation();
+
   const items = useMemo(
     () => [
       {
         key: "edit",
-        title: "Rename",
+        title: t("dataManager:renameTab"),
         visible: editable && !virtual,
         disabled: locked,
-        tooltip: locked ? lockedActionTooltip("renaming") : undefined,
+        tooltip: locked ? t("dataManager:unlockBeforeRenaming") : undefined,
         action: () => onClick("edit"),
       },
       {
         key: "duplicate",
-        title: "Duplicate",
+        title: t("dataManager:duplicateTab"),
         visible: !virtual && clonable,
         action: () => onClick("duplicate"),
         willLeave: true,
       },
       {
         key: "lock",
-        title: locked ? "Unlock" : "Lock",
+        title: locked ? t("dataManager:unlockTab") : t("dataManager:lockTab"),
         visible: lockable && !virtual,
         action: () => onClick("lock"),
         willLeave: true,
       },
       {
         key: "save",
-        title: "Save",
+        title: t("dataManager:saveTab"),
         visible: virtual,
         action: () => onClick("save"),
         willLeave: true,
       },
     ],
-    [editable, clonable, lockable, locked, virtual, onClick],
+    [editable, clonable, lockable, locked, virtual, onClick, t],
   );
 
   const showDivider = useMemo(() => closable && items.some(({ visible }) => visible), [closable, items]);
@@ -71,10 +72,10 @@ export const TabsMenu = ({
           <Menu.Item
             onClick={() => !locked && onClick("close")}
             disabled={locked}
-            tooltip={locked ? lockedActionTooltip("closing") : undefined}
+            tooltip={locked ? t("dataManager:unlockBeforeClosing") : undefined}
             data-leave
           >
-            Close
+            {t("dataManager:closeTab")}
           </Menu.Item>
         </>
       ) : null}

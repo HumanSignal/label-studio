@@ -1,5 +1,6 @@
 import { inject, observer } from "mobx-react";
 import { useCallback } from "react";
+import { useTranslation } from "react-i18next";
 import { Draggable } from "react-beautiful-dnd";
 import { cn } from "../../utils/bem";
 import { Interface } from "../Common/Interface";
@@ -43,22 +44,29 @@ const switchInjector = inject(({ store }) => {
 });
 
 const ProjectSummary = summaryInjector((props) => {
+  const { t } = useTranslation();
+
   return (
     <Space size="large" style={{ paddingRight: "1em", color: "var(--color-neutral-content-subtle)" }}>
       {props.cloudSync && (
         <Space size="small" style={{ fontSize: 12, fontWeight: 400, opacity: 0.8 }}>
-          Storage sync
+          {t("dataManager:storageSync")}
           <Spinner size="small" />
         </Space>
       )}
       <span style={{ display: "flex", alignItems: "center", fontSize: 12 }}>
         <Space size="compact">
           <span>
-            Tasks: <span title="Filtered tasks">{props.totalFoundTasks}</span> /{" "}
-            <span title="Total tasks in the project">{props.totalTasks}</span>
+            {t("dataManager:statsTasksLabel")}
+            <span title={t("dataManager:statsFilteredTooltip")}>{props.totalFoundTasks}</span> /{" "}
+            <span title={t("dataManager:statsTotalTooltip")}>{props.totalTasks}</span>
           </span>
-          <span>Submitted annotations: {props.totalAnnotations}</span>
-          <span>Predictions: {props.totalPredictions}</span>
+          <span>
+            {t("dataManager:statsSubmittedAnnotations")}: {props.totalAnnotations}
+          </span>
+          <span>
+            {t("dataManager:statsPredictions")}: {props.totalPredictions}
+          </span>
         </Space>
       </span>
     </Space>

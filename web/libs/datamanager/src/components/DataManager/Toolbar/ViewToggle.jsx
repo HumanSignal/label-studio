@@ -2,6 +2,7 @@ import { inject, observer } from "mobx-react";
 import { RadioGroup } from "../../Common/RadioGroup/RadioGroup";
 import { SquaresFourIcon, ListIcon } from "@humansignal/icons";
 import { Tooltip } from "@humansignal/ui";
+import { useTranslation } from "react-i18next";
 
 const viewInjector = inject(({ store }) => ({
   view: store.currentView,
@@ -9,6 +10,7 @@ const viewInjector = inject(({ store }) => ({
 
 export const ViewToggle = viewInjector(
   observer(({ view, size, ...rest }) => {
+    const { t } = useTranslation();
     const isLocked = view?.isLockedByManager;
     const lockedTooltip = view?.lockedUpdateMessage;
 
@@ -20,11 +22,11 @@ export const ViewToggle = viewInjector(
         {...rest}
         style={{ "--button-padding": "0 var(--spacing-tighter)" }}
       >
-        <Tooltip title={isLocked ? lockedTooltip : "List view"}>
+        <Tooltip title={isLocked ? lockedTooltip : t("dataManager:listView")}>
           <div>
             <RadioGroup.Button
               value="list"
-              aria-label="Switch to list view"
+              aria-label={t("dataManager:switchToListView")}
               data-testid="dm-view-toggle-list"
               disabled={isLocked}
             >
@@ -32,11 +34,11 @@ export const ViewToggle = viewInjector(
             </RadioGroup.Button>
           </div>
         </Tooltip>
-        <Tooltip title={isLocked ? lockedTooltip : "Grid view"}>
+        <Tooltip title={isLocked ? lockedTooltip : t("dataManager:gridView")}>
           <div>
             <RadioGroup.Button
               value="grid"
-              aria-label="Switch to grid view"
+              aria-label={t("dataManager:switchToGridView")}
               data-testid="dm-view-toggle-grid"
               disabled={isLocked}
             >
@@ -50,11 +52,13 @@ export const ViewToggle = viewInjector(
 );
 
 export const DataStoreToggle = viewInjector(({ view, size, ...rest }) => {
+  const { t } = useTranslation();
+
   return (
     <RadioGroup value={view.target} size={size} onChange={(e) => view.setTarget(e.target.value)} {...rest}>
-      <RadioGroup.Button value="tasks">Tasks</RadioGroup.Button>
+      <RadioGroup.Button value="tasks">{t("dataManager:tabTitleTasks")}</RadioGroup.Button>
       <RadioGroup.Button value="annotations" disabled>
-        Annotations
+        {t("dataManager:annotationsTarget")}
       </RadioGroup.Button>
     </RadioGroup>
   );
