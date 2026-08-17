@@ -1,7 +1,14 @@
 import { format, isMatch, isValid } from "date-fns";
+import { enUS, zhCN } from "date-fns/locale";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { default as DP } from "react-datepicker";
+import { registerLocale } from "react-datepicker";
+import i18next from "i18next";
 import "react-datepicker/dist/react-datepicker.css";
+
+registerLocale("ls-en", enUS);
+registerLocale("ls-zh-cn", zhCN);
+
 import { cn } from "../../../utils/bem";
 import { isDefined } from "../../../utils/utils";
 import { Dropdown } from "@humansignal/ui";
@@ -20,6 +27,7 @@ export const DatePicker = ({
   disabled = false,
 }) => {
   const finalFormat = showTime ? `${dateFormat} ${timeFormat}` : dateFormat;
+  const currentLocale = i18next.language?.startsWith("zh") ? "ls-zh-cn" : "ls-en";
 
   /**@type {import("react").RefObject<DP>} */
   const datepickerRef = useRef();
@@ -118,6 +126,7 @@ export const DatePicker = ({
               monthsShown={2}
               selectsRange={selectRange}
               showTimeSelect={showTime}
+              locale={currentLocale}
               inline
             />
           </div>

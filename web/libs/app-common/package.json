@@ -3,7 +3,9 @@
   "version": "0.0.0",
   "license": "MIT",
   "private": true,
-  "dependencies": {},
+  "dependencies": {
+    "date-fns": "^2.20.1"
+  },
   "main": "src/index.ts",
   "files": [
     "src/lib",

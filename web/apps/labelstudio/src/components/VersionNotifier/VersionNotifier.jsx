@@ -1,4 +1,5 @@
 import { format } from "date-fns";
+import { getDateFnsLocale } from "@humansignal/app-common/i18n/dateLocale";
 import { createContext, useCallback, useContext, useEffect, useReducer } from "react";
 import { Link } from "react-router-dom";
 import { useAPI } from "../../providers/ApiProvider";
@@ -29,7 +30,7 @@ export const VersionProvider = ({ children }) => {
           version: data.version,
           latestVersion: data.latest_version_from_pypi,
           newVersion: data.current_version_is_outdated,
-          updateTime: format(new Date(data.latest_version_upload_time), "MMM d"),
+          updateTime: format(new Date(data.latest_version_upload_time), "MMM d", { locale: getDateFnsLocale() }),
         },
       });
     }

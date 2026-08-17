@@ -1,4 +1,5 @@
 import { formatDistance } from "date-fns";
+import { getDateFnsLocale } from "@humansignal/app-common/i18n/dateLocale";
 import { useCallback, useEffect, useState } from "react";
 import { Userpic } from "@humansignal/ui";
 import { Pagination, Spinner } from "../../../components";
@@ -87,7 +88,7 @@ export const PeopleList = ({ onSelect, selectedUser, defaultSelected }) => {
                         {user.first_name} {user.last_name}
                       </div>
                       <div className={cn("people-list").elem("field").mix("last-activity").toClassName()}>
-                        {formatDistance(new Date(user.last_activity), new Date(), { addSuffix: true })}
+                        {formatDistance(new Date(user.last_activity), new Date(), { addSuffix: true, locale: getDateFnsLocale() })}
                       </div>
                     </div>
                   );

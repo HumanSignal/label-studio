@@ -1,4 +1,5 @@
 import { format } from "date-fns";
+import { getDateFnsLocale } from "@humansignal/app-common/i18n/dateLocale";
 import { NavLink } from "react-router-dom";
 import { IconCross } from "@humansignal/icons";
 import { Userpic, Button } from "@humansignal/ui";
@@ -70,7 +71,7 @@ export const SelectedUser = ({ user, onClose }) => {
       )}
 
       <p className={cn("user-info").elem("last-active").toClassName()}>
-        Last activity on: {format(new Date(user.last_activity), "dd MMM yyyy, KK:mm a")}
+        Last activity on: {format(new Date(user.last_activity), "dd MMM yyyy, KK:mm a", { locale: getDateFnsLocale() })}
       </p>
     </div>
   );
