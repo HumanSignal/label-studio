@@ -1,13 +1,15 @@
 import { useCallback, useMemo, useSyncExternalStore } from "react";
 import { modal } from "@humansignal/ui/lib/modal";
 import clsx from "clsx";
+import i18next from "i18next";
+import { useTranslation } from "react-i18next";
 import { getProjectHotkeysSettingsPath, getProjectIdFromPathname } from "@humansignal/core/lib/utils/hotkeysProject";
 import { effectiveHotkeys } from "../../hotkeys/effectiveHotkeys";
 import { KeyboardKey } from "./Key";
 // @ts-ignore
 import { HOTKEY_SECTIONS, URL_TO_SECTION_MAPPING } from "./defaults";
 import type { Hotkey, Section } from "./utils";
-import { getTypedDefaultHotkeys } from "./utils";
+import { getTypedDefaultHotkeys, hotkeySectionDescription, hotkeySectionTitle } from "./utils";
 
 interface UrlMapping {
   regex: RegExp;
@@ -64,10 +66,11 @@ const useCurrentHotkeys = (): Hotkey[] =>
   useSyncExternalStore(effectiveHotkeys.subscribe, getHelpHotkeysSnapshot, getHelpHotkeysSnapshot);
 
 const HotkeyHelpModal = ({ sectionsToShow }: HotkeyHelpModalProps) => {
+  const { t } = useTranslation();
   const hotkeys = useCurrentHotkeys();
   const projectId = getProjectIdFromPathname(window.location.pathname);
   const customizationPath = projectId ? getProjectHotkeysSettingsPath(projectId) : "/user/account/hotkeys";
-  const customizationLabel = projectId ? "Customize for this project" : "Customize hotkeys";
+  const customizationLabel = projectId ? t("account:accountCustomizeForProject") : t("account:accountCustomizeHotkeys");
 
   const handleCustomizeClick = useCallback(
     (e: React.MouseEvent) => {
@@ -103,8 +106,10 @@ const HotkeyHelpModal = ({ sectionsToShow }: HotkeyHelpModalProps) => {
       return (
         <div key={sectionId} className="border border-neutral-border rounded-lg">
           <div className="px-4 py-3 border-b border-neutral-border">
-            <h3 className="font-medium">{section.title}</h3>
-            <p className="text-sm text-neutral-content-subtler">{section.description}</p>
+            <h3 className="font-medium">{hotkeySectionTitle(section.id, section.title)}</h3>
+            <p className="text-sm text-neutral-content-subtler">
+              {hotkeySectionDescription(section.id, section.description)}
+            </p>
           </div>
 
           <div className="p-4">
@@ -117,13 +122,21 @@ const HotkeyHelpModal = ({ sectionsToShow }: HotkeyHelpModalProps) => {
                   {subgroup !== "default" && (
                     <div className="mb-3">
                       <div className="text-sm font-medium mb-1 capitalize">
-                        {sections.find((s: Section) => s.id === subgroup)?.title || subgroup}
+                        {(() => {
+                          const subgroupSection = sections.find((s: Section) => s.id === subgroup);
+                          return subgroupSection
+                            ? hotkeySectionTitle(subgroupSection.id, subgroupSection.title)
+                            : subgroup;
+                        })()}
                       </div>
-                      {sections.find((s: Section) => s.id === subgroup)?.description && (
-                        <div className="text-xs text-neutral-content-subtler">
-                          {sections.find((s: Section) => s.id === subgroup)?.description}
-                        </div>
-                      )}
+                      {(() => {
+                        const subgroupSection = sections.find((s: Section) => s.id === subgroup);
+                        const description =
+                          subgroupSection && hotkeySectionDescription(subgroupSection.id, subgroupSection.description);
+                        return description ? (
+                          <div className="text-xs text-neutral-content-subtler">{description}</div>
+                        ) : null;
+                      })()}
                     </div>
                   )}
 
@@ -136,7 +149,9 @@ const HotkeyHelpModal = ({ sectionsToShow }: HotkeyHelpModalProps) => {
                         )}
                       </div>
                       {hotkey.active === false || !hotkey.key ? (
-                        <span className="text-sm text-neutral-content-subtler">Disabled</span>
+                        <span className="text-sm text-neutral-content-subtler">
+                          {t("account:accountDisabledLabel")}
+                        </span>
                       ) : (
                         <KeyboardKey>{hotkey.key}</KeyboardKey>
                       )}
@@ -149,7 +164,7 @@ const HotkeyHelpModal = ({ sectionsToShow }: HotkeyHelpModalProps) => {
         </div>
       );
     },
-    [hotkeys],
+    [hotkeys, t],
   );
 
   const modalContent = useMemo(
@@ -157,10 +172,10 @@ const HotkeyHelpModal = ({ sectionsToShow }: HotkeyHelpModalProps) => {
       <div className="max-w-3xl max-h-[90vh] h-full overflow-hidden w-full mx-4 flex flex-col">
         <div className="px-wide py-base border-b border-neutral-border">
           <div className="flex justify-between items-center">
-            <h2 className="text-lg font-semibold">Keyboard Shortcuts</h2>
+            <h2 className="text-lg font-semibold">{t("account:accountKeyboardShortcutsTitle")}</h2>
           </div>
           <p className="text-sm text-neutral-content-subtler mt-1">
-            View all available keyboard shortcuts.&nbsp;
+            {t("account:accountViewAllShortcuts")}&nbsp;
             <a
               href={customizationPath}
               onClick={handleCustomizeClick}
@@ -176,7 +191,7 @@ const HotkeyHelpModal = ({ sectionsToShow }: HotkeyHelpModalProps) => {
         </div>
       </div>
     ),
-    [sectionsToShow, renderSection, customizationPath, customizationLabel, handleCustomizeClick],
+    [sectionsToShow, renderSection, customizationPath, customizationLabel, handleCustomizeClick, t],
   );
 
   return modalContent;
@@ -225,7 +240,7 @@ export const openHotkeyHelp = (sectionOrUrl?: string | string[]): ModalReturn =>
   const sectionsToShow = determineSectionsToShow(sectionOrUrl);
 
   const modalInstance = modal({
-    title: "Keyboard Shortcuts",
+    title: i18next.t("account:accountKeyboardShortcutsTitle"),
     body: () => <HotkeyHelpModal sectionsToShow={sectionsToShow} />,
     bare: true,
     allowClose: true,

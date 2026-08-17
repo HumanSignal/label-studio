@@ -1,5 +1,6 @@
 import { useEffect, useState, useRef } from "react";
 import clsx from "clsx";
+import { useTranslation } from "react-i18next";
 
 // UI components
 import { Button, Tooltip } from "@humansignal/ui";
@@ -36,6 +37,7 @@ interface HotkeyItemProps {
  * @returns {React.ReactElement} The HotkeyItem component
  */
 export const HotkeyItem = ({ hotkey, onEdit, isEditing, onSave, onCancel, onToggle }: HotkeyItemProps) => {
+  const { t } = useTranslation();
   const [editedKey, setEditedKey] = useState<string>(hotkey.key);
   const [keyRecordingMode, setKeyRecordingMode] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
@@ -144,21 +146,21 @@ export const HotkeyItem = ({ hotkey, onEdit, isEditing, onSave, onCancel, onTogg
             )}
             onClick={startRecordingKeys}
             onKeyDown={handleKeyPress}
-            aria-label="Click to record keyboard shortcut"
+            aria-label={t("account:accountRecordShortcutAria")}
           >
             {keyRecordingMode ? (
-              <span className="text-primary-content font-medium animate-pulse">Press keys now...</span>
+              <span className="text-primary-content font-medium animate-pulse">{t("account:accountPressKeysNow")}</span>
             ) : editedKey ? (
               <KeyboardKey>{editedKey}</KeyboardKey>
             ) : (
-              <span className="text-neutral-content-subtler">Click to set shortcut</span>
+              <span className="text-neutral-content-subtler">{t("account:accountClickToSetShortcut")}</span>
             )}
           </Button>
 
           {/* Action buttons */}
           <div className="flex flex-row gap-2">
             <Button variant="primary" onClick={handleSave} disabled={!editedKey || !!error}>
-              Apply
+              {t("account:accountApplyButton")}
             </Button>
             <Button variant="neutral" icon={<IconClose />} onClick={handleCancel} />
           </div>
@@ -178,7 +180,9 @@ export const HotkeyItem = ({ hotkey, onEdit, isEditing, onSave, onCancel, onTogg
         <UiToggle
           checked={hotkey.active}
           onChange={handleToggle}
-          aria-label={`${hotkey.active ? "Disable" : "Enable"} ${hotkey.label}`}
+          aria-label={t(hotkey.active ? "account:accountDisableHotkeyAria" : "account:accountEnableHotkeyAria", {
+            label: hotkey.label,
+          })}
         />
       </div>
 
@@ -189,7 +193,7 @@ export const HotkeyItem = ({ hotkey, onEdit, isEditing, onSave, onCancel, onTogg
       </div>
 
       {/* Current hotkey display (clickable to edit) */}
-      <Tooltip title="Click to edit hotkey">
+      <Tooltip title={t("account:accountClickToEditHotkey")}>
         <div
           className="flex items-center gap-2 cursor-pointer hover:opacity-80 hover:bg-primary-emphasis-subtle px-base py-base rounded-small"
           onClick={handleEdit}

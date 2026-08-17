@@ -1,4 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@humansignal/ui/lib/card-new/card";
+import { useTranslation } from "react-i18next";
 import { PersonalInfo } from "./PersonalInfo";
 import { getAccountSettingsProfileExtras } from "../extensions";
 import { ProfileDirtyProvider, useDiscardProfileDrafts, useProfileFormsDirty } from "../ProfileDirtyContext";
@@ -16,6 +17,7 @@ import { UnsavedChanges } from "apps/labelstudio/src/pages/CreateProject/Config/
  * this reads the aggregate so one react-router blocker covers both. Warn-only: Stay / Leave.
  */
 const ProfileUnsavedGuard = () => {
+  const { t } = useTranslation();
   const anyDirty = useProfileFormsDirty();
   const discardProfileDrafts = useDiscardProfileDrafts();
 
@@ -23,14 +25,15 @@ const ProfileUnsavedGuard = () => {
     <UnsavedChanges
       hasChanges={anyDirty}
       onDiscard={discardProfileDrafts}
-      modalBody="You have unsaved changes on this page. If you leave, your changes will be lost."
-      modalDiscardText="Leave"
-      modalCancelText="Stay"
+      modalBody={t("account:accountUnsavedChangesBody")}
+      modalDiscardText={t("account:accountUnsavedChangesLeave")}
+      modalCancelText={t("account:accountUnsavedChangesStay")}
     />
   );
 };
 
 export const Profile = () => {
+  const { t } = useTranslation();
   // Enterprise features register extra profile cards (e.g. the workforce contributor profile) here.
   // Each registered component self-gates, so OSS renders them unconditionally.
   const profileExtras = getAccountSettingsProfileExtras();
@@ -39,7 +42,7 @@ export const Profile = () => {
     <ProfileDirtyProvider>
       <Card className="!w-full">
         <CardHeader>
-          <CardTitle>Account Details</CardTitle>
+          <CardTitle>{t("account:accountDetailsTitle")}</CardTitle>
         </CardHeader>
         <CardContent>
           <PersonalInfo />

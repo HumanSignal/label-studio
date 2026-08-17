@@ -4,6 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@huma
 import { confirm } from "@humansignal/ui/lib/modal";
 import { IconWarning } from "@humansignal/icons";
 import { useLocation } from "react-router-dom";
+import { Trans, useTranslation } from "react-i18next";
 import { LeaveBlocker, type LeaveBlockerCallbacks } from "apps/labelstudio/src/components/LeaveBlocker/LeaveBlocker";
 import {
   Card as ShadCard,
@@ -23,6 +24,7 @@ import {
 import { HotkeySection } from "./Hotkeys/Section";
 import { ImportDialog } from "./Hotkeys/Import";
 import { KeyboardKey } from "./Hotkeys/Key";
+import { hotkeySectionTitle } from "./Hotkeys/utils";
 import type { Hotkey, Section, DirtyState, DuplicateConfirmDialog, ImportData } from "./Hotkeys/utils";
 // @ts-ignore
 import { HOTKEY_SECTIONS } from "./Hotkeys/defaults";
@@ -37,6 +39,7 @@ import {
 const typedHotkeySections = HOTKEY_SECTIONS as Section[];
 
 export const HotkeysManager = () => {
+  const { t } = useTranslation();
   const location = useLocation();
   const [isDirty, setIsDirty] = useState(false);
   const [resolution, setResolution] = useState<ProjectHotkeyScopeResolution>(() =>
@@ -47,19 +50,22 @@ export const HotkeysManager = () => {
     setResolution(nextResolution);
   }, []);
 
-  const handleDirtyNavigation = useCallback(({ continueCallback, cancelCallback }: LeaveBlockerCallbacks) => {
-    confirm({
-      title: "Discard unsaved hotkey changes?",
-      body: "Changing hotkey scope will discard your unsaved changes.",
-      okText: "Discard Changes",
-      buttonLook: "negative",
-      onOk: () => {
-        setIsDirty(false);
-        continueCallback?.();
-      },
-      onCancel: cancelCallback,
-    });
-  }, []);
+  const handleDirtyNavigation = useCallback(
+    ({ continueCallback, cancelCallback }: LeaveBlockerCallbacks) => {
+      confirm({
+        title: t("account:accountDiscardHotkeyChangesTitle"),
+        body: t("account:accountDiscardHotkeyChangesBody"),
+        okText: t("account:accountDiscardChangesButton"),
+        buttonLook: "negative",
+        onOk: () => {
+          setIsDirty(false);
+          continueCallback?.();
+        },
+        onCancel: cancelCallback,
+      });
+    },
+    [t],
+  );
 
   const scope: HotkeyScope | null =
     resolution.status === "account"
@@ -74,16 +80,13 @@ export const HotkeysManager = () => {
         <div className="flex flex-col gap-tight">
           <CardTitle>
             <div className="flex items-center gap-tight">
-              <span>Hotkeys</span>
+              <span>{t("account:accountSectionHotkeys")}</span>
               <Badge variant="beta" look="solid" shape="rounded">
-                Beta
+                {t("account:commonBeta")}
               </Badge>
             </div>
           </CardTitle>
-          <CardDescription>
-            Customize your keyboard shortcuts to speed up your workflow. Click on any hotkey below to assign a new key
-            combination that works best for you.
-          </CardDescription>
+          <CardDescription>{t("account:accountHotkeysDescription")}</CardDescription>
         </div>
       </CardHeader>
       <CardContent>
@@ -93,10 +96,10 @@ export const HotkeysManager = () => {
           {resolution.status === "project" && (
             <div className="flex flex-col gap-tighter">
               <Typography variant="headline" size="small">
-                Project override for {resolution.projectTitle}
+                {t("account:accountProjectOverrideFor", { project: resolution.projectTitle })}
               </Typography>
               <Typography variant="body" className="text-neutral-content-subtle">
-                Only shortcuts that differ from your account defaults apply while you work in this project.
+                {t("account:accountProjectOverrideHint")}
               </Typography>
             </div>
           )}
@@ -119,6 +122,7 @@ interface PropsScopedHotkeysContent {
 }
 
 const ScopedHotkeysContent = ({ scope, onDirtyChange }: PropsScopedHotkeysContent) => {
+  const { t } = useTranslation();
   const toast = useToast();
   const [importDialogOpen, setImportDialogOpen] = useState(false);
   const [editingHotkeyId, setEditingHotkeyId] = useState<string | null>(null);
@@ -187,7 +191,7 @@ const ScopedHotkeysContent = ({ scope, onDirtyChange }: PropsScopedHotkeysConten
 
   const getSectionTitle = (sectionId: string): string => {
     const section = typedHotkeySections.find((s: Section) => s.id === sectionId);
-    return section ? section.title : sectionId;
+    return section ? hotkeySectionTitle(sectionId, section.title) : sectionId;
   };
 
   const updateHotkeyKey = (hotkeyId: string, newKey: string) => {
@@ -266,13 +270,18 @@ const ScopedHotkeysContent = ({ scope, onDirtyChange }: PropsScopedHotkeysConten
         delete newDirtyState[sectionId];
         setDirtyState(newDirtyState);
 
-        const sectionName =
-          sectionId === "settings" ? "Settings" : typedHotkeySections.find((s: Section) => s.id === sectionId)?.title;
+        const section =
+          sectionId === "settings"
+            ? t("account:accountHotkeySectionSettings")
+            : (() => {
+                const found = typedHotkeySections.find((s: Section) => s.id === sectionId);
+                return found ? hotkeySectionTitle(sectionId, found.title) : undefined;
+              })();
 
         if (toast) {
           toast.show({
             message: getSaveSuccessMessage(
-              sectionName ?? "Hotkeys",
+              section ?? t("account:accountSectionHotkeys"),
               scope.kind === "project" ? scope.projectId : undefined,
             ),
             type: ToastType.info,
@@ -280,15 +289,17 @@ const ScopedHotkeysContent = ({ scope, onDirtyChange }: PropsScopedHotkeysConten
         }
       } else if (toast) {
         toast.show({
-          message: `Failed to save: ${result.error || "Unknown error"}`,
+          message: t("account:accountFailedToSaveError", {
+            error: result.error || t("account:commonUnknownError"),
+          }),
           type: ToastType.error,
         });
       }
     } catch (error: unknown) {
       if (toast) {
-        const errorMessage = error instanceof Error ? error.message : "Unknown error";
+        const errorMessage = error instanceof Error ? error.message : t("account:commonUnknownError");
         toast.show({
-          message: `Error saving: ${errorMessage}`,
+          message: t("account:accountErrorSaving", { message: errorMessage }),
           type: ToastType.error,
         });
       }
@@ -310,21 +321,21 @@ const ScopedHotkeysContent = ({ scope, onDirtyChange }: PropsScopedHotkeysConten
           onClick={() => setImportDialogOpen(true)}
           disabled={isLoading || isReadOnly}
         >
-          Import
+          {t("account:accountImportButton")}
         </Button>
         <Button variant="neutral" look="outlined" onClick={handleExportHotkeys} disabled={isLoading || isReadOnly}>
-          Export
+          {t("account:accountExportButton")}
         </Button>
         <Button variant="negative" look="outlined" onClick={handleScopedReset} disabled={isLoading || isReadOnly}>
-          Reset to Defaults
+          {t("account:accountResetToDefaults")}
         </Button>
       </div>
 
       <ImportDialog open={importDialogOpen} onOpenChange={setImportDialogOpen} onImport={handleScopedImport} />
 
       {hasProjectAccessError && (
-        <Message variant="negative" title="Project unavailable">
-          You no longer have access to this project
+        <Message variant="negative" title={t("account:accountProjectUnavailable")}>
+          {t("account:accountProjectUnavailableBody")}
         </Message>
       )}
       <fieldset
@@ -386,9 +397,13 @@ const ScopedHotkeysContent = ({ scope, onDirtyChange }: PropsScopedHotkeysConten
       <Dialog open={duplicateConfirmDialog.open} onOpenChange={handleCancelDuplicate}>
         <DialogContent className="bg-neutral-surface">
           <DialogHeader>
-            <DialogTitle>Warning: Duplicate Hotkey Detected</DialogTitle>
+            <DialogTitle>{t("account:accountDuplicateHotkeyTitle")}</DialogTitle>
             <DialogDescription>
-              The hotkey combination "<strong>{duplicateConfirmDialog.newKey}</strong>" is already being used by:
+              <Trans
+                i18nKey="account:accountDuplicateHotkeyBody"
+                values={{ key: duplicateConfirmDialog.newKey ?? "" }}
+                components={{ key: <strong /> }}
+              />
             </DialogDescription>
           </DialogHeader>
 
@@ -419,16 +434,14 @@ const ScopedHotkeysContent = ({ scope, onDirtyChange }: PropsScopedHotkeysConten
             <div>
               <IconWarning className="text-warning-icon" />
             </div>
-            <div>
-              Having duplicate hotkeys may cause conflicts and unexpected behavior. Are you sure you want to proceed?
-            </div>
+            <div>{t("account:accountDuplicateHotkeyWarning")}</div>
           </DialogDescription>
 
           <DialogFooter>
             <Button variant="neutral" onClick={handleCancelDuplicate}>
-              Cancel
+              {t("account:commonCancel")}
             </Button>
-            <Button onClick={handleConfirmDuplicate}>Allow Duplicate</Button>
+            <Button onClick={handleConfirmDuplicate}>{t("account:accountAllowDuplicateButton")}</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

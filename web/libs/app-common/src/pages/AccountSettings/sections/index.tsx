@@ -4,6 +4,7 @@ import { PersonalAccessToken, PersonalAccessTokenDescription } from "./PersonalA
 import { MembershipInfo } from "./MembershipInfo";
 import { HotkeysManager } from "./Hotkeys";
 import type React from "react";
+import i18next from "i18next";
 import { PersonalJWTToken } from "./PersonalJWTToken";
 import type { AuthTokenSettings } from "../types";
 import { ABILITY, type AuthPermissions } from "@humansignal/core/providers/AuthProvider";
@@ -27,7 +28,7 @@ export const accountSettingsSections = (
 
   return [
     {
-      title: "Profile",
+      title: i18next.t("account:accountSectionProfile"),
       id: "personal-info",
       component: Profile,
       rendersOwnCards: true,
@@ -37,9 +38,9 @@ export const accountSettingsSections = (
     {
       title: (
         <div className="flex items-center gap-tight">
-          <span>Hotkeys</span>
+          <span>{i18next.t("account:accountSectionHotkeys")}</span>
           <Badge variant="beta" look="solid" shape="rounded">
-            Beta
+            {i18next.t("account:commonBeta")}
           </Badge>
         </div>
       ),
@@ -48,26 +49,28 @@ export const accountSettingsSections = (
       rendersOwnCards: true,
     },
     {
-      title: "Email Preferences",
+      title: i18next.t("account:accountSectionEmailPreferences"),
       id: "email-preferences",
       component: EmailPreferences,
     },
     {
-      title: "Membership Info",
+      title: i18next.t("account:accountSectionMembershipInfo"),
       id: "membership-info",
       component: MembershipInfo,
     },
     settings.api_tokens_enabled &&
       canCreateTokens &&
       ff.isActive(ff.FF_AUTH_TOKENS) && {
-        title: "Personal Access Token",
+        title: i18next.t("account:accountSectionPersonalAccessToken"),
         id: "personal-access-token",
         component: PersonalJWTToken,
         description: PersonalAccessTokenDescription,
       },
     settings.legacy_api_tokens_enabled &&
       canCreateTokens && {
-        title: ff.isActive(ff.FF_AUTH_TOKENS) ? "Legacy Token" : "Access Token",
+        title: ff.isActive(ff.FF_AUTH_TOKENS)
+          ? i18next.t("account:accountSectionLegacyToken")
+          : i18next.t("account:accountSectionAccessToken"),
         id: "legacy-token",
         component: PersonalAccessToken,
         description: PersonalAccessTokenDescription,

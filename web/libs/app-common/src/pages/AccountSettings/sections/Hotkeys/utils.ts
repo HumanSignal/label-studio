@@ -1,3 +1,4 @@
+import i18next from "i18next";
 import { DEFAULT_HOTKEYS } from "./defaults";
 
 // Type definitions - centralized here to avoid duplication
@@ -93,4 +94,60 @@ export const setupGlobalHotkeys = (): void => {
       window.DEFAULT_HOTKEYS = getTypedDefaultHotkeys();
     }
   }
+};
+
+/**
+ * HOTKEY_SECTIONS in defaults.js is a module-level data catalog (also mirrored by
+ * editor-side help surfaces), so its English titles stay in the data file and are
+ * translated display-side via these keys — the same pattern the Data Manager uses
+ * for backend-driven titles.
+ */
+const HOTKEY_SECTION_KEYS: Record<string, { titleKey: string; descriptionKey?: string }> = {
+  annotation: {
+    titleKey: "account:accountHotkeySectionAnnotationTitle",
+    descriptionKey: "account:accountHotkeySectionAnnotationDesc",
+  },
+  data_manager: {
+    titleKey: "account:accountHotkeySectionDataManagerTitle",
+    descriptionKey: "account:accountHotkeySectionDataManagerDesc",
+  },
+  regions: {
+    titleKey: "account:accountHotkeySectionRegionsTitle",
+    descriptionKey: "account:accountHotkeySectionRegionsDesc",
+  },
+  tools: {
+    titleKey: "account:accountHotkeySectionToolsTitle",
+    descriptionKey: "account:accountHotkeySectionToolsDesc",
+  },
+  audio: {
+    titleKey: "account:accountHotkeySectionAudioTitle",
+    descriptionKey: "account:accountHotkeySectionAudioDesc",
+  },
+  video: {
+    titleKey: "account:accountHotkeySectionVideoTitle",
+    descriptionKey: "account:accountHotkeySectionVideoDesc",
+  },
+  timeseries: {
+    titleKey: "account:accountHotkeySectionTimeseriesTitle",
+    descriptionKey: "account:accountHotkeySectionTimeseriesDesc",
+  },
+  image_gallery: {
+    titleKey: "account:accountHotkeySectionImageGalleryTitle",
+    descriptionKey: "account:accountHotkeySectionImageGalleryDesc",
+  },
+  paragraphs: {
+    titleKey: "account:accountHotkeySectionParagraphsTitle",
+    descriptionKey: "account:accountHotkeySectionParagraphsDesc",
+  },
+};
+
+export const hotkeySectionTitle = (sectionId: string, fallbackTitle: string): string => {
+  const titleKey = HOTKEY_SECTION_KEYS[sectionId]?.titleKey;
+  return titleKey ? i18next.t(titleKey, { defaultValue: fallbackTitle }) : fallbackTitle;
+};
+
+export const hotkeySectionDescription = (sectionId: string, fallbackDescription?: string): string | undefined => {
+  if (!fallbackDescription) return undefined;
+  const descriptionKey = HOTKEY_SECTION_KEYS[sectionId]?.descriptionKey;
+  return descriptionKey ? i18next.t(descriptionKey, { defaultValue: fallbackDescription }) : fallbackDescription;
 };

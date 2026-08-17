@@ -6,6 +6,7 @@ import { API } from "apps/labelstudio/src/providers/ApiProvider";
 import { useAtomValue } from "jotai";
 import { atomWithQuery } from "jotai-tanstack-query";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { Trans, useTranslation } from "react-i18next";
 import { Input } from "../../../components/Form";
 
 const linkAtom = atomWithQuery(() => ({
@@ -27,6 +28,7 @@ export function InviteLink({
   onOpened?: () => void;
   onClosed?: () => void;
 }) {
+  const { t } = useTranslation();
   const modalRef = useRef<Modal>();
   useEffect(() => {
     if (modalRef.current && opened) {
@@ -39,7 +41,7 @@ export function InviteLink({
   return (
     <Modal
       ref={modalRef}
-      title="Invite members"
+      title={t("account:orgInviteMembersTitle")}
       opened={opened}
       bareFooter={true}
       body={<InvitationModal />}
@@ -57,28 +59,32 @@ const InvitationModal = () => {
     <div className={cn("invite").toClassName()}>
       <Input value={link} style={{ width: "100%" }} readOnly />
       <Typography size="small" className="text-neutral-content-subtler mt-base mb-wider">
-        Invite members to join your Label Studio instance. People that you invite have full access to all of your
-        projects.{" "}
-        <a
-          href="https://labelstud.io/guide/signup.html"
-          target="_blank"
-          rel="noreferrer"
-          className="hover:underline"
-          onClick={() =>
-            __lsa("docs.organization.add_people.learn_more", {
-              href: "https://labelstud.io/guide/signup.html",
-            })
-          }
-        >
-          Learn more
-        </a>
-        .
+        <Trans
+          i18nKey="account:orgInviteMembersDescription"
+          components={{
+            link: (
+              // biome-ignore lint/a11y/useAnchorContent: Link text is provided by the translation string
+              <a
+                href="https://labelstud.io/guide/signup.html"
+                target="_blank"
+                rel="noreferrer"
+                className="hover:underline"
+                onClick={() =>
+                  __lsa("docs.organization.add_people.learn_more", {
+                    href: "https://labelstud.io/guide/signup.html",
+                  })
+                }
+              />
+            ),
+          }}
+        />
       </Typography>
     </div>
   );
 };
 
 const InvitationFooter = () => {
+  const { t } = useTranslation();
   const { copyText, copied } = useTextCopy();
   const { refetch, data: link } = useAtomValue(linkAtom);
 
@@ -90,9 +96,9 @@ const InvitationFooter = () => {
           look="outlined"
           style={{ width: 170 }}
           onClick={() => refetch()}
-          aria-label="Refresh invite link"
+          aria-label={t("account:orgRefreshInviteLinkAria")}
         >
-          Reset Link
+          {t("account:orgResetLinkButton")}
         </Button>
       </Space>
       <Space>
@@ -100,9 +106,9 @@ const InvitationFooter = () => {
           variant={copied ? "positive" : "primary"}
           className="w-[170px]"
           onClick={() => copyText(link!)}
-          aria-label="Copy invite link"
+          aria-label={t("account:orgCopyInviteLinkAria")}
         >
-          {copied ? "Copied!" : "Copy link"}
+          {copied ? t("account:commonCopied") : t("account:orgCopyLinkButton")}
         </Button>
       </Space>
     </Space>

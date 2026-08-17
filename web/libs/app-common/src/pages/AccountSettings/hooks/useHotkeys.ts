@@ -2,6 +2,8 @@ import { confirm } from "@humansignal/ui/lib/modal";
 import { ToastType, useToast } from "@humansignal/ui/lib/toast/toast";
 // @ts-ignore
 import { useAPI } from "@humansignal/core";
+import i18next from "i18next";
+import { useTranslation } from "react-i18next";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { type CustomHotkeys, effectiveHotkeys, mergeCustomHotkeys } from "../hotkeys/effectiveHotkeys";
 import {
@@ -34,13 +36,17 @@ interface ApiRequestError {
 
 export type HotkeyScope = { kind: "account" } | { kind: "project"; projectId: number };
 
+// Fallback translators for module-scope helpers invoked outside a component render
+// (tests, toasts). Resolve against the shared i18next singleton at call time.
 export const getResetSuccessMessage = (projectId: number | undefined): string =>
   projectId === undefined
-    ? "All hotkeys and settings have been reset to defaults and saved"
-    : "This project's hotkey override has been reset and saved";
+    ? i18next.t("account:accountResetAllSuccess")
+    : i18next.t("account:accountResetProjectSuccess");
 
 export const getSaveSuccessMessage = (sectionName: string, projectId: number | undefined): string =>
-  projectId === undefined ? `${sectionName} account defaults saved` : `${sectionName} project override saved`;
+  projectId === undefined
+    ? i18next.t("account:accountSaveAccountDefaultsSuccess", { section: sectionName })
+    : i18next.t("account:accountSaveProjectOverrideSuccess", { section: sectionName });
 
 const isApiFailure = (response: HotkeyApiResponse | null): boolean =>
   response === null || Boolean(response.error) || response.$meta?.ok === false;
@@ -136,6 +142,7 @@ export async function loadAndApplyProjectHotkeys(projectId: number | string): Pr
 }
 
 export const useHotkeys = (scope: HotkeyScope = { kind: "account" }) => {
+  const { t } = useTranslation();
   const toast = useToast();
   const [hotkeys, setHotkeys] = useState<Hotkey[]>([]);
   const [hotkeySettings, setHotkeySettings] = useState<HotkeySettings>({});
@@ -200,7 +207,7 @@ export const useHotkeys = (scope: HotkeyScope = { kind: "account" }) => {
         setIsReadOnly(true);
       } else if (toast) {
         toast.show({
-          message: "Could not load custom hotkeys from server, using cached settings",
+          message: t("account:accountLoadHotkeysFailed"),
           type: ToastType.error,
         });
       }
@@ -209,7 +216,7 @@ export const useHotkeys = (scope: HotkeyScope = { kind: "account" }) => {
         setIsLoading(false);
       }
     }
-  }, [api, projectId, toast]);
+  }, [api, projectId, toast, t]);
 
   const saveHotkeysToAPI = useCallback(
     async (currentHotkeys: Hotkey[], currentSettings: HotkeySettings): Promise<SaveResult> => {
@@ -238,7 +245,7 @@ export const useHotkeys = (scope: HotkeyScope = { kind: "account" }) => {
           }
           return {
             ok: false,
-            error: response?.error || "Failed to save hotkeys",
+            error: response?.error || t("account:accountFailedToSaveHotkeys"),
             data: response,
             projectAccessLost,
           };
@@ -263,7 +270,7 @@ export const useHotkeys = (scope: HotkeyScope = { kind: "account" }) => {
         const operation = isReset ? "resetting" : "saving";
         console.error(`Error ${operation} hotkeys:`, error);
 
-        let errorMessage = `Failed to ${isReset ? "reset" : "save"} hotkeys`;
+        let errorMessage = t("account:accountFailedToSaveHotkeys");
         if (error && typeof error === "object" && "response" in error) {
           const err = error as ApiRequestError;
           if (projectId !== undefined && isProjectAccessStatus(err.response?.status)) {
@@ -271,14 +278,16 @@ export const useHotkeys = (scope: HotkeyScope = { kind: "account" }) => {
             setIsReadOnly(true);
           }
           if (err.response?.status === 400) {
-            errorMessage = err.response.data?.error || `Invalid ${isReset ? "reset request" : "hotkeys configuration"}`;
+            errorMessage =
+              err.response.data?.error ||
+              t(`account:${isReset ? "accountInvalidResetRequest" : "accountInvalidHotkeysConfig"}`);
           } else if (err.response?.status === 401) {
-            errorMessage = "Authentication required";
+            errorMessage = t("account:accountAuthenticationRequired");
           } else if (err.response?.status >= 500) {
-            errorMessage = "Server error - please try again later";
+            errorMessage = t("account:accountServerError");
           }
         } else if (error && typeof error === "object" && "request" in error) {
-          errorMessage = "Network error - please check your connection";
+          errorMessage = t("account:accountNetworkError");
         }
 
         return {
@@ -287,18 +296,22 @@ export const useHotkeys = (scope: HotkeyScope = { kind: "account" }) => {
         };
       }
     },
-    [api, projectId],
+    [api, projectId, t],
   );
 
   const handleResetToDefaults = useCallback(
     (onSuccess?: () => void) => {
       confirm({
-        title: projectId === undefined ? "Reset Hotkeys to Defaults?" : "Reset Project Hotkey Override?",
-        body:
+        title:
           projectId === undefined
-            ? "Are you sure you want to reset all hotkeys and settings to their default values? This action cannot be undone."
-            : "Are you sure you want to reset only this project's hotkey override? Your account defaults and other projects will not be changed.",
-        okText: projectId === undefined ? "Reset to Defaults" : "Reset Project Override",
+            ? t("account:accountResetHotkeysTitle")
+            : t("account:accountResetProjectHotkeysTitle"),
+        body:
+          projectId === undefined ? t("account:accountResetHotkeysBody") : t("account:accountResetProjectHotkeysBody"),
+        okText:
+          projectId === undefined
+            ? t("account:accountResetToDefaults")
+            : t("account:accountResetProjectOverrideButton"),
         buttonLook: "negative",
         style: { width: 500 },
         onOk: async () => {
@@ -317,15 +330,17 @@ export const useHotkeys = (scope: HotkeyScope = { kind: "account" }) => {
               onSuccess?.();
             } else if (toast) {
               toast.show({
-                message: `Failed to save reset hotkeys: ${result.error || "Unknown error"}`,
+                message: t("account:accountFailedToSaveResetHotkeys", {
+                  error: result.error || t("account:commonUnknownError"),
+                }),
                 type: ToastType.error,
               });
             }
           } catch (error: unknown) {
             if (toast) {
-              const errorMessage = error instanceof Error ? error.message : "Unknown error";
+              const errorMessage = error instanceof Error ? error.message : t("account:commonUnknownError");
               toast.show({
-                message: `Error resetting hotkeys: ${errorMessage}`,
+                message: t("account:accountErrorResettingHotkeys", { message: errorMessage }),
                 type: ToastType.error,
               });
             }
@@ -335,7 +350,7 @@ export const useHotkeys = (scope: HotkeyScope = { kind: "account" }) => {
         },
       });
     },
-    [projectId, saveHotkeysToAPI, toast],
+    [projectId, saveHotkeysToAPI, toast, t],
   );
 
   const handleExportHotkeys = useCallback(() => {
@@ -359,11 +374,11 @@ export const useHotkeys = (scope: HotkeyScope = { kind: "account" }) => {
 
     if (toast) {
       toast.show({
-        message: "Hotkeys exported successfully",
+        message: t("account:accountHotkeysExported"),
         type: ToastType.info,
       });
     }
-  }, [hotkeys, hotkeySettings, projectId, toast]);
+  }, [hotkeys, hotkeySettings, projectId, toast, t]);
 
   const handleImportHotkeys = useCallback(
     async (importedData: ImportData | Hotkey[], onSuccess?: () => void): Promise<boolean> => {
@@ -375,14 +390,14 @@ export const useHotkeys = (scope: HotkeyScope = { kind: "account" }) => {
 
         const result = await saveHotkeysToAPI(importedHotkeys, importedSettings);
         if (!result.ok) {
-          throw new Error(result.error || "Failed to save imported hotkeys");
+          throw new Error(result.error || t("account:accountFailedToSaveHotkeys"));
         }
 
         setHotkeys(importedHotkeys);
 
         if (toast) {
           toast.show({
-            message: "Hotkeys imported successfully",
+            message: t("account:accountHotkeysImported"),
             type: ToastType.info,
           });
         }
@@ -392,9 +407,9 @@ export const useHotkeys = (scope: HotkeyScope = { kind: "account" }) => {
         return true;
       } catch (error: unknown) {
         if (toast) {
-          const errorMessage = error instanceof Error ? error.message : "Unknown error";
+          const errorMessage = error instanceof Error ? error.message : t("account:commonUnknownError");
           toast.show({
-            message: `Error importing hotkeys: ${errorMessage}`,
+            message: t("account:accountErrorImportingHotkeys", { message: errorMessage }),
             type: ToastType.error,
           });
         }
@@ -403,7 +418,7 @@ export const useHotkeys = (scope: HotkeyScope = { kind: "account" }) => {
         setIsLoading(false);
       }
     },
-    [saveHotkeysToAPI, loadHotkeysFromAPI, toast],
+    [saveHotkeysToAPI, loadHotkeysFromAPI, toast, t],
   );
 
   useEffect(() => {

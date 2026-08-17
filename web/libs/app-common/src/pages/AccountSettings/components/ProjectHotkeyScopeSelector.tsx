@@ -1,6 +1,7 @@
 import { useAPI } from "@humansignal/core";
 import { Message, Select, Typography } from "@humansignal/ui";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useHistory, useLocation } from "react-router-dom";
 
 const ACCOUNT_VALUE = "account";
@@ -50,6 +51,7 @@ export const ProjectHotkeyScopeSelector = ({
   onResolutionChange,
   disabled = false,
 }: PropsProjectHotkeyScopeSelector) => {
+  const { t } = useTranslation();
   const api = useAPI();
   const history = useHistory();
   const location = useLocation();
@@ -197,8 +199,8 @@ export const ProjectHotkeyScopeSelector = ({
   }, [projects, selectedProject]);
 
   const options = useMemo(
-    () => [{ value: ACCOUNT_VALUE, label: "Account defaults (all projects)" }, ...projectOptions],
-    [projectOptions],
+    () => [{ value: ACCOUNT_VALUE, label: t("account:accountAccountDefaultsOption") }, ...projectOptions],
+    [projectOptions, t],
   );
   const selectedValue =
     parsedProject.status === "account" ? ACCOUNT_VALUE : selectedProject ? `project:${selectedProject.id}` : undefined;
@@ -207,12 +209,12 @@ export const ProjectHotkeyScopeSelector = ({
     <div className="flex flex-col gap-tight">
       <Select
         name="hotkey-scope"
-        label="Hotkeys for"
-        placeholder={hasAccessError ? "Project unavailable" : "Select hotkey scope"}
+        label={t("account:accountHotkeysForLabel")}
+        placeholder={hasAccessError ? t("account:accountProjectUnavailable") : t("account:accountSelectHotkeyScope")}
         options={options}
         value={selectedValue}
         searchable
-        searchPlaceholder="Search projects"
+        searchPlaceholder={t("account:accountSearchProjects")}
         searchFilter={() => true}
         onSearch={(value) => {
           setSearch(value);
@@ -242,14 +244,14 @@ export const ProjectHotkeyScopeSelector = ({
         footer={
           !isSearching && projects.length === 0 ? (
             <Typography variant="body" size="small" className="text-neutral-content-subtle">
-              No accessible projects found
+              {t("account:accountNoAccessibleProjects")}
             </Typography>
           ) : undefined
         }
       />
       {hasAccessError && (
-        <Message variant="negative" title="Project unavailable">
-          You no longer have access to this project
+        <Message variant="negative" title={t("account:accountProjectUnavailable")}>
+          {t("account:accountProjectUnavailableBody")}
         </Message>
       )}
     </div>

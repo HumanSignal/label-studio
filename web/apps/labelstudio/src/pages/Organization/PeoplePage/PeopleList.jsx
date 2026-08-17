@@ -1,6 +1,7 @@
 import { formatDistance } from "date-fns";
 import { getDateFnsLocale } from "@humansignal/app-common/i18n/dateLocale";
 import { useCallback, useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Userpic } from "@humansignal/ui";
 import { Pagination, Spinner } from "../../../components";
 import { usePage, usePageSize } from "../../../components/Pagination/Pagination";
@@ -11,6 +12,7 @@ import "./PeopleList.prefix.css";
 import { CopyableTooltip } from "../../../components/CopyableTooltip/CopyableTooltip";
 
 export const PeopleList = ({ onSelect, selectedUser, defaultSelected }) => {
+  const { t } = useTranslation();
   const api = useAPI();
   const [usersList, setUsersList] = useState();
   const [currentPage] = usePage("page", 1);
@@ -64,9 +66,15 @@ export const PeopleList = ({ onSelect, selectedUser, defaultSelected }) => {
             <div className={cn("people-list").elem("users").toClassName()}>
               <div className={cn("people-list").elem("header").toClassName()}>
                 <div className={cn("people-list").elem("column").mix("avatar").toClassName()} />
-                <div className={cn("people-list").elem("column").mix("email").toClassName()}>Email</div>
-                <div className={cn("people-list").elem("column").mix("name").toClassName()}>Name</div>
-                <div className={cn("people-list").elem("column").mix("last-activity").toClassName()}>Last Activity</div>
+                <div className={cn("people-list").elem("column").mix("email").toClassName()}>
+                  {t("account:orgColumnEmail")}
+                </div>
+                <div className={cn("people-list").elem("column").mix("name").toClassName()}>
+                  {t("account:orgColumnName")}
+                </div>
+                <div className={cn("people-list").elem("column").mix("last-activity").toClassName()}>
+                  {t("account:orgColumnLastActivity")}
+                </div>
               </div>
               <div className={cn("people-list").elem("body").toClassName()}>
                 {usersList.map(({ user }) => {
@@ -79,7 +87,7 @@ export const PeopleList = ({ onSelect, selectedUser, defaultSelected }) => {
                       onClick={() => selectUser(user)}
                     >
                       <div className={cn("people-list").elem("field").mix("avatar").toClassName()}>
-                        <CopyableTooltip title={`User ID: ${user.id}`} textForCopy={user.id}>
+                        <CopyableTooltip title={t("account:orgUserIdTooltip", { id: user.id })} textForCopy={user.id}>
                           <Userpic user={user} style={{ width: 28, height: 28 }} />
                         </CopyableTooltip>
                       </div>
@@ -88,7 +96,10 @@ export const PeopleList = ({ onSelect, selectedUser, defaultSelected }) => {
                         {user.first_name} {user.last_name}
                       </div>
                       <div className={cn("people-list").elem("field").mix("last-activity").toClassName()}>
-                        {formatDistance(new Date(user.last_activity), new Date(), { addSuffix: true, locale: getDateFnsLocale() })}
+                        {formatDistance(new Date(user.last_activity), new Date(), {
+                          addSuffix: true,
+                          locale: getDateFnsLocale(),
+                        })}
                       </div>
                     </div>
                   );

@@ -1,5 +1,6 @@
 import clsx from "clsx";
 import { Button } from "@humansignal/ui";
+import { useTranslation } from "react-i18next";
 import {
   Card,
   CardContent,
@@ -9,6 +10,7 @@ import {
   CardFooter,
 } from "@humansignal/shad/components/ui/card";
 import { HotkeyItem } from "./Item";
+import { hotkeySectionDescription, hotkeySectionTitle } from "./utils";
 
 // Type definitions
 interface Hotkey {
@@ -81,6 +83,8 @@ export const HotkeySection = ({
   onToggleHotkey,
   hasChanges,
 }: HotkeySectionProps) => {
+  const { t } = useTranslation();
+
   /**
    * Groups hotkeys by their subgroup property
    * Hotkeys without a subgroup are placed in the 'default' group
@@ -118,8 +122,8 @@ export const HotkeySection = ({
   return (
     <Card className="mb-6">
       <CardHeader className="pb-2">
-        <CardTitle>{section.title}</CardTitle>
-        <CardDescription>{section.description}</CardDescription>
+        <CardTitle>{hotkeySectionTitle(section.id, section.title)}</CardTitle>
+        <CardDescription>{hotkeySectionDescription(section.id, section.description)}</CardDescription>
       </CardHeader>
 
       <CardContent>
@@ -144,14 +148,16 @@ export const HotkeySection = ({
           ))}
 
           {hotkeys.length === 0 && (
-            <div className="py-8 text-center text-muted-foreground italic">No hotkeys in this section</div>
+            <div className="py-8 text-center text-muted-foreground italic">
+              {t("account:accountNoHotkeysInSection")}
+            </div>
           )}
         </div>
       </CardContent>
 
       <CardFooter className="flex justify-end">
         <Button variant="primary" onClick={handleSaveSection} disabled={!hasChanges}>
-          Save
+          {t("account:commonSave")}
         </Button>
       </CardFooter>
     </Card>

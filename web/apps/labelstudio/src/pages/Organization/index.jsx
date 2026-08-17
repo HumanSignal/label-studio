@@ -1,3 +1,4 @@
+import i18next from "i18next";
 import { SidebarMenu } from "../../components/SidebarMenu/SidebarMenu";
 import { PeoplePage } from "./PeoplePage/PeoplePage";
 import { WebhookPage } from "../WebhookPage/WebhookPage";
@@ -19,11 +20,16 @@ if (ALLOW_ORGANIZATION_WEBHOOKS) {
   organizationPages[WebhookPage] = WebhookPage;
 }
 
+// Route metadata is read by the routing/sidebar system outside of a React
+// component, so it resolves through the shared i18next singleton lazily.
 export const OrganizationPage = {
-  title: "Organization",
   path: "/organization",
   exact: true,
   layout: MenuLayout,
   component: PeoplePage,
   pages: organizationPages,
 };
+
+Object.defineProperty(OrganizationPage, "title", {
+  get: () => i18next.t("account:orgTitle"),
+});

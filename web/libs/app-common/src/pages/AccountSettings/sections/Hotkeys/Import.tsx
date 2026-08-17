@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Button, ModalWindow, Message, Typography } from "@humansignal/ui";
 import { ff } from "@humansignal/core";
+import { useTranslation } from "react-i18next";
 import {
   Dialog,
   DialogContent,
@@ -46,6 +47,7 @@ interface ImportDialogProps {
  * @returns {React.ReactElement} The ImportDialog component
  */
 export const ImportDialog = ({ open, onOpenChange, onImport }: ImportDialogProps) => {
+  const { t } = useTranslation();
   // State for the import text input
   const [importText, setImportText] = useState<string>("");
   // State for validation errors
@@ -59,7 +61,7 @@ export const ImportDialog = ({ open, onOpenChange, onImport }: ImportDialogProps
    */
   const validateHotkey = (hotkey: unknown): void => {
     if (!hotkey || typeof hotkey !== "object") {
-      throw new Error("Invalid hotkey object");
+      throw new Error(t("account:accountInvalidHotkeyObject"));
     }
 
     const hotkeyObj = hotkey as Record<string, unknown>;
@@ -67,7 +69,7 @@ export const ImportDialog = ({ open, onOpenChange, onImport }: ImportDialogProps
     const missingFields = requiredFields.filter((field) => !hotkeyObj[field]);
 
     if (missingFields.length > 0) {
-      throw new Error(`Missing required fields: ${missingFields.join(", ")}`);
+      throw new Error(t("account:accountMissingRequiredFields", { fields: missingFields.join(", ") }));
     }
   };
 
@@ -82,7 +84,7 @@ export const ImportDialog = ({ open, onOpenChange, onImport }: ImportDialogProps
 
       // Validate input exists
       if (!importText.trim()) {
-        throw new Error("Please enter JSON data to import");
+        throw new Error(t("account:accountEnterJsonError"));
       }
 
       // Parse the JSON
@@ -98,16 +100,16 @@ export const ImportDialog = ({ open, onOpenChange, onImport }: ImportDialogProps
         // New format: object with hotkeys property
         const dataObj = parsedData as { hotkeys?: unknown };
         if (!Array.isArray(dataObj.hotkeys)) {
-          throw new Error("Invalid format: hotkeys property must be an array");
+          throw new Error(t("account:accountInvalidHotkeysArrayError"));
         }
         hotkeys = dataObj.hotkeys;
       } else {
-        throw new Error("Invalid format: expected an array of hotkeys or an object with a hotkeys property");
+        throw new Error(t("account:accountInvalidHotkeysFormatError"));
       }
 
       // Validate it's not empty
       if (hotkeys.length === 0) {
-        throw new Error("No hotkeys found in the imported data");
+        throw new Error(t("account:accountNoHotkeysFound"));
       }
 
       // Validate each hotkey object
@@ -115,8 +117,9 @@ export const ImportDialog = ({ open, onOpenChange, onImport }: ImportDialogProps
         try {
           validateHotkey(hotkey);
         } catch (validationError: unknown) {
-          const errorMessage = validationError instanceof Error ? validationError.message : "Unknown validation error";
-          throw new Error(`Hotkey at index ${index}: ${errorMessage}`);
+          const errorMessage =
+            validationError instanceof Error ? validationError.message : t("account:accountUnknownValidationError");
+          throw new Error(t("account:accountHotkeyAtIndex", { index, message: errorMessage }));
         }
       });
 
@@ -126,7 +129,7 @@ export const ImportDialog = ({ open, onOpenChange, onImport }: ImportDialogProps
       if (imported) resetDialogState();
     } catch (err: unknown) {
       // Set error message for display
-      const errorMessage = err instanceof Error ? err.message : "Unknown error occurred";
+      const errorMessage = err instanceof Error ? err.message : t("account:accountUnknownErrorOccurred");
       setError(errorMessage);
     } finally {
       setIsImporting(false);
@@ -161,8 +164,7 @@ export const ImportDialog = ({ open, onOpenChange, onImport }: ImportDialogProps
     }
   };
 
-  const importInstructions =
-    "Paste your exported hotkeys JSON below. This will replace your current hotkeys. Make sure the JSON contains an array of hotkey objects with the required fields.";
+  const importInstructions = t("account:accountImportInstructions");
 
   const importFormBody = (
     <>
@@ -170,7 +172,7 @@ export const ImportDialog = ({ open, onOpenChange, onImport }: ImportDialogProps
         htmlFor="import-json"
         className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
       >
-        Hotkeys JSON
+        {t("account:accountHotkeysJsonLabel")}
       </label>
       <textarea
         id="import-json"
@@ -182,7 +184,7 @@ export const ImportDialog = ({ open, onOpenChange, onImport }: ImportDialogProps
       />
 
       {error && (
-        <Message variant="negative" title="Import Error" id="import-error">
+        <Message variant="negative" title={t("account:accountImportErrorTitle")} id="import-error">
           {error}
         </Message>
       )}
@@ -195,12 +197,12 @@ export const ImportDialog = ({ open, onOpenChange, onImport }: ImportDialogProps
         open={open}
         onOpenChange={onOpenChange}
         size="small"
-        title="Import Hotkeys"
+        title={t("account:accountImportHotkeys")}
         dataTestId="hotkeys-import-modal"
         footer={
           <div className="flex w-full justify-end gap-tight">
             <Button variant="neutral" onClick={handleCancel} data-testid="hotkeys-import-cancel">
-              Cancel
+              {t("account:commonCancel")}
             </Button>
             <Button
               variant="primary"
@@ -208,7 +210,7 @@ export const ImportDialog = ({ open, onOpenChange, onImport }: ImportDialogProps
               disabled={!importText.trim() || isImporting}
               data-testid="hotkeys-import-submit"
             >
-              Import Hotkeys
+              {t("account:accountImportHotkeys")}
             </Button>
           </div>
         }
@@ -232,7 +234,7 @@ export const ImportDialog = ({ open, onOpenChange, onImport }: ImportDialogProps
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[525px] bg-neutral-surface" aria-describedby="hotkeys-import-instructions">
         <DialogHeader>
-          <DialogTitle>Import Hotkeys</DialogTitle>
+          <DialogTitle>{t("account:accountImportHotkeys")}</DialogTitle>
         </DialogHeader>
 
         <div className="grid gap-4 py-4">
@@ -244,10 +246,10 @@ export const ImportDialog = ({ open, onOpenChange, onImport }: ImportDialogProps
 
         <DialogFooter>
           <Button variant="neutral" onClick={handleCancel}>
-            Cancel
+            {t("account:commonCancel")}
           </Button>
           <Button onClick={handleImport} disabled={!importText.trim() || isImporting}>
-            Import Hotkeys
+            {t("account:accountImportHotkeys")}
           </Button>
         </DialogFooter>
       </DialogContent>

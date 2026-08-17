@@ -2,6 +2,7 @@ import { useCallback, useMemo, useRef, useState } from "react";
 import { Checkbox, Spinner } from "@humansignal/ui";
 import { useAuth } from "@humansignal/core/providers/AuthProvider";
 import { ff, useAPI } from "@humansignal/core";
+import { useTranslation } from "react-i18next";
 
 /**
  * FIXME: This is legacy imports. We're not supposed to use such statements
@@ -30,6 +31,7 @@ const NotificationCheckbox = ({ id, label, checked, onToggle }: NotificationChec
 };
 
 export const EmailPreferences = () => {
+  const { t } = useTranslation();
   const isEnterpriseEmailNotificationsEnabled =
     ff.isActive(ff.FF_ENTERPRISE_EMAIL_NOTIFICATIONS) && window.APP_SETTINGS?.billing?.enterprise;
   const config = useConfig();
@@ -68,9 +70,9 @@ export const EmailPreferences = () => {
 
   const message = useMemo(() => {
     return window.APP_SETTINGS?.whitelabel_is_active
-      ? "Subscribe for news and tips"
-      : "Subscribe to HumanSignal news and tips from Heidi";
-  }, []);
+      ? t("account:accountSubscribeNewsTips")
+      : t("account:accountSubscribeHumanSignalNews");
+  }, [t]);
 
   return (
     <div id="email-preferences" className="flex flex-col gap-4">

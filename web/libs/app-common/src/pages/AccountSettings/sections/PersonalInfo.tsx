@@ -1,5 +1,7 @@
 import { type FormEventHandler, useCallback, useEffect, useRef, useState } from "react";
 import { format } from "date-fns";
+import { getDateFnsLocale } from "@humansignal/app-common/i18n/dateLocale";
+import { useTranslation } from "react-i18next";
 import { Badge, Button, InputFile, ToastType, Typography, useToast, Userpic } from "@humansignal/ui";
 import { getApiInstance } from "@humansignal/core";
 import { useAccountSettingsExtension } from "../extensions";
@@ -22,20 +24,28 @@ const PROVIDER_DISPLAY_NAMES: Record<string, string> = {
 
 const isRequiredProfileValueMissing = (isRequired: boolean, value: string) => isRequired && value.trim().length === 0;
 
-const RequiredFieldLabel = ({ label }: { label: string }) => (
-  <span className={styles.requiredLabel}>
-    <span>{label}</span>
-    <Badge variant="neutral" look="outline" shape="square" size="small">
-      Required
-    </Badge>
-  </span>
-);
+const RequiredFieldLabel = ({ label }: { label: string }) => {
+  const { t } = useTranslation();
 
-const RequiredFieldError = ({ id, label }: { id: string; label: string }) => (
-  <span id={id} className="text-negative-content" role="alert">
-    {label} is required.
-  </span>
-);
+  return (
+    <span className={styles.requiredLabel}>
+      <span>{label}</span>
+      <Badge variant="neutral" look="outline" shape="square" size="small">
+        {t("account:commonRequired")}
+      </Badge>
+    </span>
+  );
+};
+
+const RequiredFieldError = ({ id, label }: { id: string; label: string }) => {
+  const { t } = useTranslation();
+
+  return (
+    <span id={id} className="text-negative-content" role="alert">
+      {t("account:accountFieldRequired", { field: label })}
+    </span>
+  );
+};
 
 function formatProvider(provider: string): string {
   return PROVIDER_DISPLAY_NAMES[provider] ?? provider.charAt(0).toUpperCase() + provider.slice(1);
@@ -68,6 +78,7 @@ const updateUserAvatarAtom = atomWithMutation(() => ({
 }));
 
 export const PersonalInfo = () => {
+  const { t } = useTranslation();
   const toast = useToast();
   const { user, refetch: refetchUser, isLoading: userInProgress, update: updateUser } = useAuth();
   const updateUserAvatar = useAtomValue(updateUserAvatarAtom);
@@ -107,13 +118,16 @@ export const PersonalInfo = () => {
       });
 
       if (!response.$meta.ok) {
-        toast?.show({ message: response?.response?.detail ?? "Error updating avatar", type: ToastType.error });
+        toast?.show({
+          message: response?.response?.detail ?? t("account:accountErrorUpdatingAvatar"),
+          type: ToastType.error,
+        });
       } else {
         refetchUser();
       }
       input.value = "";
     },
-    [user?.id],
+    [user?.id, t],
   );
 
   const deleteUserAvatar = async () => {
@@ -146,10 +160,13 @@ export const PersonalInfo = () => {
 
       refetchUser();
       if (!response?.$meta.ok) {
-        toast?.show({ message: response?.response?.detail ?? "Error updating user", type: ToastType.error });
+        toast?.show({
+          message: response?.response?.detail ?? t("account:accountErrorUpdatingUser"),
+          type: ToastType.error,
+        });
       }
     },
-    [fname, lname, phone, user?.id, requiredProfileFields, updateUser, refetchUser, toast],
+    [fname, lname, phone, user?.id, requiredProfileFields, updateUser, refetchUser, toast, t],
   );
 
   useEffect(() => {
@@ -169,7 +186,7 @@ export const PersonalInfo = () => {
           <Userpic user={user} isInProgress={userInProgress} size={88} className={styles.userPic} />
           <div className={`${styles.sectionContent} ${styles.profilePhotoControls}`}>
             <Typography className={styles.profilePhotoLabel} variant="label" size="medium">
-              Profile Photo
+              {t("account:accountProfilePhoto")}
             </Typography>
             <InputFile
               className={styles.profilePhotoUpload}
@@ -188,35 +205,61 @@ export const PersonalInfo = () => {
               size="medium"
               onClick={deleteUserAvatar}
             >
-              Delete Photo
+              {t("account:accountDeletePhoto")}
             </Button>
           )}
         </div>
         <form onSubmit={userFormSubmitHandler} className={styles.sectionContent}>
           <div className={styles.formGrid}>
             <Input
-              label={isFieldRequired("first_name") ? <RequiredFieldLabel label="First Name" /> : "First Name"}
+              label={
+                isFieldRequired("first_name") ? (
+                  <RequiredFieldLabel label={t("account:accountFirstName")} />
+                ) : (
+                  t("account:accountFirstName")
+                )
+              }
               value={fname}
               onChange={(e: React.KeyboardEvent<HTMLInputElement>) => setFname(e.currentTarget.value)}
               name="first_name"
               aria-required={isFieldRequired("first_name")}
               aria-invalid={isFirstNameMissing || undefined}
               aria-describedby={isFirstNameMissing ? "first-name-error" : undefined}
-              footer={isFirstNameMissing ? <RequiredFieldError id="first-name-error" label="First Name" /> : undefined}
+              footer={
+                isFirstNameMissing ? (
+                  <RequiredFieldError id="first-name-error" label={t("account:accountFirstName")} />
+                ) : undefined
+              }
             />
             <Input
-              label={isFieldRequired("last_name") ? <RequiredFieldLabel label="Last Name" /> : "Last Name"}
+              label={
+                isFieldRequired("last_name") ? (
+                  <RequiredFieldLabel label={t("account:accountLastName")} />
+                ) : (
+                  t("account:accountLastName")
+                )
+              }
               value={lname}
               onChange={(e: React.KeyboardEvent<HTMLInputElement>) => setLname(e.currentTarget.value)}
               name="last_name"
               aria-required={isFieldRequired("last_name")}
               aria-invalid={isLastNameMissing || undefined}
               aria-describedby={isLastNameMissing ? "last-name-error" : undefined}
-              footer={isLastNameMissing ? <RequiredFieldError id="last-name-error" label="Last Name" /> : undefined}
+              footer={
+                isLastNameMissing ? (
+                  <RequiredFieldError id="last-name-error" label={t("account:accountLastName")} />
+                ) : undefined
+              }
             />
-            <Input label="E-mail" type="email" readOnly={true} value={user?.email ?? ""} />
+            <Input label={t("account:accountEmailLabel")} type="email" readOnly={true} value={user?.email ?? ""} />
             <Input
-              label={isFieldRequired("phone") ? <RequiredFieldLabel label="Phone" /> : "Phone"}
+              label={
+                isFieldRequired("phone") ? (
+                  <RequiredFieldLabel label={t("account:accountPhoneLabel")} />
+                ) : (
+                  t("account:accountPhoneLabel")
+                )
+              }
               type="phone"
               onChange={(e: React.KeyboardEvent<HTMLInputElement>) => setPhone(e.currentTarget.value)}
               value={phone}
@@ -224,22 +267,30 @@ export const PersonalInfo = () => {
               aria-required={isFieldRequired("phone")}
               aria-invalid={isPhoneMissing || undefined}
               aria-describedby={isPhoneMissing ? "phone-error" : undefined}
-              footer={isPhoneMissing ? <RequiredFieldError id="phone-error" label="Phone" /> : undefined}
+              footer={
+                isPhoneMissing ? (
+                  <RequiredFieldError id="phone-error" label={t("account:accountPhoneLabel")} />
+                ) : undefined
+              }
             />
             {user?.social_accounts?.map((account) => (
               <div className={`${styles.formGrid} ${styles.fullWidth}`} key={account.provider}>
-                <Input label="Connected Account" readOnly={true} value={formatProvider(account.provider)} />
                 <Input
-                  label="Connected Since"
+                  label={t("account:accountConnectedAccount")}
                   readOnly={true}
-                  value={format(new Date(account.date_joined), "dd MMM yyyy")}
+                  value={formatProvider(account.provider)}
+                />
+                <Input
+                  label={t("account:accountConnectedSince")}
+                  readOnly={true}
+                  value={format(new Date(account.date_joined), "dd MMM yyyy", { locale: getDateFnsLocale() })}
                 />
               </div>
             ))}
           </div>
           <div className={styles.formActions}>
             <Button className="w-[120px]" waiting={isInProgress}>
-              Save
+              {t("account:commonSave")}
             </Button>
           </div>
         </form>
