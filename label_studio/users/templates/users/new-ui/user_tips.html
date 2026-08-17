@@ -1,4 +1,4 @@
-{% load filters %}
+{% load i18n %}{% load filters %}
 
 <script nonce="{{request.csp_nonce}}">
 
@@ -13,11 +13,11 @@
   const defaultTipsCollection = {
     authPage: [
       {
-        title: "Did you know?",
+        title: "{% trans "Did you know?" %}",
         description:
-          "You can sync data from all popular cloud storage providers to collect new items for labeling as they are uploaded, and return the annotation results to train and continuously improve models.",
+          "{% trans "You can sync data from all popular cloud storage providers to collect new items for labeling as they are uploaded, and return the annotation results to train and continuously improve models." %}",
         link: {
-          label: "Learn more",
+          label: "{% trans "Learn more" %}",
           url: "https://labelstud.io/guide/storage",
           params: {
             experiment: "login_revamp",
@@ -26,11 +26,11 @@
         },
       },
       {
-        title: "Did you know?",
+        title: "{% trans "Did you know?" %}",
         description:
-          "There's an Enterprise version of Label Studio packed with more features and automation to label data faster while ensuring the highest quality.",
+          "{% trans "There's an Enterprise version of Label Studio packed with more features and automation to label data faster while ensuring the highest quality." %}",
         link: {
-          label: "Learn more",
+          label: "{% trans "Learn more" %}",
           url: "https://humansignal.com/goenterprise/",
           params: {
             experiment: "login_revamp",
@@ -39,11 +39,11 @@
         },
       },
       {
-        title: "Did you know?",
+        title: "{% trans "Did you know?" %}",
         description:
-          "Label Studio has dozens of pre-built templates for all data types you can use to configure your labeling UI, from image classification to sentiment analysis to supervised LLM fine-tuning. ",
+          "{% trans "Label Studio has dozens of pre-built templates for all data types you can use to configure your labeling UI, from image classification to sentiment analysis to supervised LLM fine-tuning." %}",
         link: {
-          label: "See all templates",
+          label: "{% trans "See all templates" %}",
           url: "https://labelstud.io/templates",
           params: {
             experiment: "login_revamp",
@@ -52,10 +52,10 @@
         },
       },
       {
-        title: "Did you know?",
-        description: "Label Studio now has a Starter Cloud offering optimized for small teams and projects.",
+        title: "{% trans "Did you know?" %}",
+        description: "{% trans "Label Studio now has a Starter Cloud offering optimized for small teams and projects." %}",
         link: {
-          label: "Learn more",
+          label: "{% trans "Learn more" %}",
           url: "https://humansignal.com/pricing/",
           params: {
             experiment: "login_revamp",

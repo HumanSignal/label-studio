@@ -1,0 +1,121 @@
+# Chinese (Simplified) translations for the Label Studio auth pages.
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Language-Team: zh-Hans\n"
+"Language: zh_Hans\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+msgid "Log in"
+msgstr "登录"
+
+msgid "Email Address"
+msgstr "邮箱地址"
+
+msgid "Password"
+msgstr "密码"
+
+msgid "Keep me logged in this browser"
+msgstr "在此浏览器中保持登录状态"
+
+msgid "Don't have an account?"
+msgstr "还没有账号？"
+
+msgid "Sign up"
+msgstr "注册"
+
+msgid "Sign Up"
+msgstr "注册"
+
+msgid "How did you hear about Label Studio?"
+msgstr "你是如何了解到 Label Studio 的？"
+
+msgid "Select an option"
+msgstr "请选择一项"
+
+msgid "Please elaborate"
+msgstr "请具体说明"
+
+msgid "Get the latest news from Heidi"
+msgstr "获取来自 Heidi 的最新动态"
+
+msgctxt "mascot name"
+msgid "Heidi"
+msgstr "Heidi"
+
+msgid "Create Account"
+msgstr "创建账号"
+
+msgid "Already have an account?"
+msgstr "已有账号？"
+
+msgid "A full-fledged open source solution for data labeling"
+msgstr "功能完备的开源数据标注解决方案"
+
+msgid "Brought to you by"
+msgstr "由以下团队提供"
+
+msgid "Did you know?"
+msgstr "你知道吗？"
+
+msgid "Learn more"
+msgstr "了解更多"
+
+msgid "See all templates"
+msgstr "查看全部模板"
+
+msgid ""
+"You can sync data from all popular cloud storage providers to collect new "
+"items for labeling as they are uploaded, and return the annotation results "
+"to train and continuously improve models."
+msgstr "你可以连接各大云存储服务商，自动同步新上传的数据用于标注，并将标注结果回流用于模型训练与持续优化。"
+
+msgid ""
+"There's an Enterprise version of Label Studio packed with more features and "
+"automation to label data faster while ensuring the highest quality."
+msgstr "Label Studio 提供功能更丰富的企业版，借助更多自动化能力在保证最高质量的同时更快完成数据标注。"
+
+msgid ""
+"Label Studio has dozens of pre-built templates for all data types you can "
+"use to configure your labeling UI, from image classification to sentiment "
+"analysis to supervised LLM fine-tuning."
+msgstr "Label Studio 内置数十种覆盖各类数据类型的预制模板，可用于快速配置标注界面——从图像分类、情感分析到大模型监督微调。"
+
+msgid ""
+"Label Studio now has a Starter Cloud offering optimized for small teams and "
+"projects."
+msgstr "Label Studio 现已推出面向小团队和小型项目的 Starter Cloud 版本。"
+
+# forms.py
+msgid "The email and password you entered don't match."
+msgstr "你输入的邮箱和密码不匹配。"
+
+msgid "Email is too long"
+msgstr "邮箱过长"
+
+msgid "User with username already exists"
+msgstr "该用户名已被占用"
+
+msgid "User with this email already exists"
+msgstr "该邮箱已注册"
+
+msgid "Invalid email"
+msgstr "邮箱无效"
+
+msgid "Work Email"
+msgstr "工作邮箱"
+
+msgid "Email"
+msgstr "邮箱"
+
+msgid "User"
+msgstr "用户"
+
+msgid "Please enter a username {} characters or fewer in length"
+msgstr "用户名长度不能超过 {} 个字符"
+
+msgid "Please enter a display name {} characters or fewer in length"
+msgstr "显示名称长度不能超过 {} 个字符"

@@ -1,4 +1,5 @@
 {% extends 'users/new-ui/user_base.html' %}
+{% load i18n %}
 {% load static %}
 
 {% block content %}
@@ -15,14 +16,14 @@
 
 {% block user_content %}
   <div class="form-wrapper">
-    <h2>Sign Up</h2>
+    <h2>{% trans "Sign Up" %}</h2>
     <form id="signup-form"
         action="{% url 'user-signup' %}?next={{ next }}{% if token %}&token={{ token }}{% endif %}"
         method="post"
     >
     {% csrf_token %}
       <div class="input-wrapper">
-        <label>Email Address</label>
+        <label>{% trans "Email Address" %}</label>
         <input type="text" class="lsf-input-ls" name="email" id="email" value="{{ user_form.data.email }}">
         {% if user_form.errors.email %}
           <ul class="field_errors">
@@ -33,7 +34,7 @@
         {% endif %}
         </div>
       <div class="input-wrapper">
-        <label>Password</label>
+        <label>{% trans "Password" %}</label>
         <input type="password" class="lsf-input-ls" name="password" id="password">
         {% if user_form.errors.password %}
           <ul class="field_errors">
@@ -44,16 +45,16 @@
         {% endif %}
       </div>
       <div class="input-wrapper">
-        <label>How did you hear about Label Studio?</label>
+        <label>{% trans "How did you hear about Label Studio?" %}</label>
         <select class="lsf-select-ls" name="how_find_us" id="how_find_us">
-          <option disabled value="" {% if not form.data.how_find_us %}selected{% endif %}>Select an option</option>
+          <option disabled value="" {% if not form.data.how_find_us %}selected{% endif %}>{% trans "Select an option" %}</option>
           {% for choice in found_us_options %}
             <option value="{{ choice.1 }}" {% if choice.1 == user_form.data.how_find_us %}selected{% endif %}>{{ choice.1 }}</option>
           {% endfor %}
         </select>
       </div>
-      <div class="input-wrapper" id="elaborateContainer" {% if user_form.data.how_find_us != elaborate %}style="display:none;"{% endif %}> 
-        <label>Please elaborate</label>
+      <div class="input-wrapper" id="elaborateContainer" {% if user_form.data.how_find_us != elaborate %}style="display:none;"{% endif %}>
+        <label>{% trans "Please elaborate" %}</label>
         <input class="lsf-input-ls" name="elaborate" id="elaborate" {% if user_form.data.how_find_us == elaborate %}value="{{ user_form.data.elaborate }}"{% endif %}>
         </select>
       </div>
@@ -63,8 +64,8 @@
                 type="checkbox" style="width: auto" {% if user_form.data.allow_newsletters == 'false' %}{% else %}checked="checked{% endif %}"
                 onchange="document.getElementById('allow_newsletters').value=document.getElementById('allow_newsletters_visual').checked">
         <label for="allow_newsletters_visual" style="display: inline-block; cursor: pointer;">
-          Get the latest news from Heidi
-          <img src="{{ settings.HOSTNAME }}{% static 'images/heidi.png' %}" alt="Heidi"
+          {% trans "Get the latest news from Heidi" %}
+          <img src="{{ settings.HOSTNAME }}{% static 'images/heidi.png' %}" alt="{% trans "Heidi" context "mascot name" %}"
               width="25" style="position: absolute; right: -2.5em; top: -.25rem;">
         </label>
       </div>
@@ -76,12 +77,12 @@
           </p>
         {% endfor %}
       {% endif %}
-      <p><button type="submit" aria-label="Create Account" class="lsf-button-ls lsf-button-ls_look_primary">Create Account</button></p>
+      <p><button type="submit" aria-label="{% trans "Create Account" %}" class="lsf-button-ls lsf-button-ls_look_primary">{% trans "Create Account" %}</button></p>
     </form>
   </div>
   <div class="text-wrapper">
-    <p class="">Already have an account?</p>
-    <a href="{% url 'user-login' %}{% querystring %}">Log in</a>
+    <p class="">{% trans "Already have an account?" %}</p>
+    <a href="{% url 'user-login' %}{% querystring %}">{% trans "Log in" %}</a>
   </div>
   <script>
     document.querySelector("#how_find_us").addEventListener('change', function(e) {
