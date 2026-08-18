@@ -1,24 +1,24 @@
 ---
-title: Docling 🔒
+title: Doclang 🔒
 type: templates
 category: Interfaces
 order: 378
 is_new: t
-meta_title: Template for Docling document annotation interfaces
+meta_title: Template for Doclang document annotation interfaces
 meta_description: Annotate document images into a DoclingDocument with layout regions, reading order, table structure, in-browser OCR, and a live DocLang XML preview.
 ---
 
 
-This template creates a Docling document annotation Interface for turning document images into a structured `DoclingDocument` — layout regions, reading order, table structure, and key/value pairs — with in-browser OCR and a live DocLang XML preview.
+This template creates a Doclang document annotation Interface for turning document images into a structured `DoclingDocument` — layout regions, reading order, table structure, and key/value pairs — with in-browser OCR and a live DocLang XML preview.
 
 Annotators draw layout regions (text, section headers, lists, tables, pictures, formulas, code, key/value, and more), set the reading order and other element relationships with paths, mark up table grid and semantic structure, transcribe text with one-click in-browser OCR, and watch the resulting `<doclang>` XML render in real time — producing the structured output that document-conversion and Document AI teams need to build DoclingDocument datasets.
 
 !!! info Part of the Docling ecosystem
-    [Docling](https://docling-project.github.io/docling/) is an open-source toolkit that parses documents (PDFs, images, and more) into a structured `DoclingDocument`. This Interface is the human-in-the-loop annotation and review layer for that format.
+    [Docling](https://docling.ai) is an open-source toolkit that parses documents (PDFs, images, and more) into a structured `DoclingDocument`. This Interface is the human-in-the-loop annotation and review layer for that format.
 
-    To pre-label documents automatically before review, pair it with the [Docling ML backend](https://github.com/HumanSignal/label-studio-ml-backend/tree/master/label_studio_ml/examples/docling). It sends each document to **IBM Docling SaaS** — the hosted Docling conversion service you connect to with a tenant URL and API key from [Docling Workbench](https://docling-project.github.io/docling/) — and returns the layout as `rectanglelabels` / `polygonlabels` predictions this Interface reads, so annotators correct Docling's output instead of starting from a blank page.
+    To pre-label documents automatically before review, pair it with the [Docling ML backend](https://github.com/HumanSignal/label-studio-ml-backend/tree/master/label_studio_ml/examples/docling). It sends each document to [**IBM Docling SaaS**](https://www.ibm.com/products/docling) — the hosted Docling conversion service you connect to with a tenant URL and API key from [Docling Workbench](https://docling.ai) — and returns the layout as `rectanglelabels` / `polygonlabels` predictions this Interface reads, so annotators correct Docling's output instead of starting from a blank page.
 
-![Screenshot](/images/templates-misc/interface-docling.png)
+![Screenshot](/images/templates-misc/interface-doclang.png)
 
 !!! error Requires an allowlist change
     This Interface loads two third-party libraries from public CDNs at runtime, so it will **not work until an Owner or Admin adds those CDN hosts to your organization's Interfaces allowlist**. See [Before you start: allowlist the required domains](#before-you-start-allowlist-the-required-domains) below — this is the first thing to do, and the most common reason the preview or OCR appears broken.
@@ -29,7 +29,7 @@ The example Interface includes:
 - **Layout labels** grouped by purpose — Common (text, section header, list item, table, picture, caption), Other (footnote, formula, code, form, index, handwritten text), Page (page header/footer), Table structure and Table region semantics, Key-Value, and Checkboxes — with single-key hotkeys for the most-used labels.
 - **Reading order and relationship paths** — draw `reading_order`, `merge`, `group`, and container/link paths (`to_caption`, `to_footnote`, `to_value`) between regions.
 - **In-browser OCR** via Tesseract.js — no OCR service to stand up; text-bearing boxes can auto-transcribe the moment you finish drawing them.
-- **Live DocLang preview** with two tabs: **DocLang** (the raw `<doclang>` XML markup with syntax highlighting) and **Reading view** (the rendered, human-readable document), both driven by the official DocLang viewer.
+- **Live DocLang preview** with two tabs: **xml** (the raw `<doclang>` XML markup with syntax highlighting) and **Reading view** (the rendered, human-readable document), both driven by the official DocLang viewer.
 - **Configurable OCR language and model**, color theme, default content layer, and default picture type via Interface params.
 
 !!! error Enterprise
@@ -47,7 +47,7 @@ There is nothing to install — the whole render and OCR pipeline runs in the br
 
 | Host | What it provides | Why it's needed | Roughly how much |
 | --- | --- | --- | --- |
-| `https://cdn.jsdelivr.net` | The [DocLang viewer](https://github.com/docling-project/docling) (a SHA-pinned mirror of the official viewer) | Renders the **DocLang** and **Reading view** preview tabs. **The preview will not render without it.** | ~165 KB of JS + CSS, loaded per render but cached forever (the URL is SHA-pinned and jsDelivr serves it `immutable`). |
+| `https://cdn.jsdelivr.net` | The [DocLang viewer](https://github.com/docling-project/docling) (a SHA-pinned mirror of the official viewer) | Renders the **xml** and **Reading view** preview tabs. **The preview will not render without it.** | ~165 KB of JS + CSS, loaded per render but cached forever (the URL is SHA-pinned and jsDelivr serves it `immutable`). |
 | `https://unpkg.com` | [Tesseract.js](https://github.com/naptha/tesseract.js) (JS + WASM + language model) | Runs the **in-browser OCR** that transcribes regions. **OCR will not run without it.** | ~3–11 MB, downloaded once on the first OCR click (or when you switch OCR language/model) and cached for the session. |
 
 These are the only two external hosts the Interface requires. Your own Label Studio server origin is always allowed automatically, so you don't need to add it.
@@ -85,7 +85,7 @@ The main annotation surface.
 
 A right-side panel with two tabs, both rendered by the official DocLang viewer loaded from jsDelivr:
 
-- **DocLang** — the raw serialized `<doclang>` XML for the current annotation, with syntax highlighting. This is the DoclingDocument snapshot the Interface saves.
+- **xml** — the raw serialized `<doclang>` XML for the current annotation, with syntax highlighting. This is the DoclingDocument snapshot the Interface saves.
 - **Reading view** — the same document rendered as a human-readable page, so annotators can sanity-check that their regions and reading order produce a sensible document.
 
 ## React code
@@ -185,7 +185,7 @@ const customOcr = async ({ image_data, lang, model_variant }) =>
 
 ### Result shape
 
-`getResults` emits Label Studio results under two `from_name`s: spatial annotations under `docling` and the serialized DocLang XML snapshot under `doclang`. Boxes are `rectanglelabels`, paths (reading order, links) are `polygonlabels`, and the DoclingDocument XML is a single hidden `textarea` region.
+`getResults` emits Label Studio results under two `from_name`s: spatial annotations under `doclang` and the serialized DocLang XML snapshot under `doclang_xml`. Boxes are `rectanglelabels`, paths (reading order, links) are `polygonlabels`, and the DoclingDocument XML is a single hidden `textarea` region.
 
 ```js
 function getResults(regions, relations) {
@@ -193,7 +193,7 @@ function getResults(regions, relations) {
   for (const r of regions || []) {
     if (r._kind === "rectangle") {
       out.push({
-        id: r.id, from_name: "docling", to_name: "docling",
+        id: r.id, from_name: "doclang", to_name: "doclang",
         type: "rectanglelabels",
         value: {
           x: r._x, y: r._y, width: r._width, height: r._height,
@@ -205,13 +205,13 @@ function getResults(regions, relations) {
       });
     } else if (r._kind === "polyline") {
       out.push({
-        id: r.id, from_name: "docling", to_name: "docling",
+        id: r.id, from_name: "doclang", to_name: "doclang",
         type: "polygonlabels",
         value: { points: r._points, polygonlabels: r.labels, closed: false },
       });
     } else if (r._kind === "doclang_xml") {
       out.push({
-        id: r.id, from_name: "doclang", to_name: "docling",
+        id: r.id, from_name: "doclang_xml", to_name: "doclang",
         type: "textarea",
         value: { text: [r._doclang_xml || ""] },
       });
@@ -241,15 +241,15 @@ The Interface expects a task `data` object with a document image URL. The field 
 
 ## Example output
 
-The saved annotation contains one result per region under `from_name: "docling"`, plus a single `from_name: "doclang"` result holding the serialized DoclingDocument XML.
+The saved annotation contains one result per region under `from_name: "doclang"`, plus a single `from_name: "doclang_xml"` result holding the serialized DoclingDocument XML.
 
 ```json
 {
   "result": [
     {
       "id": "r1",
-      "from_name": "docling",
-      "to_name": "docling",
+      "from_name": "doclang",
+      "to_name": "doclang",
       "type": "rectanglelabels",
       "value": {
         "x": 12.5, "y": 8.2, "width": 75.0, "height": 4.8,
@@ -261,8 +261,8 @@ The saved annotation contains one result per region under `from_name: "docling"`
     },
     {
       "id": "r2",
-      "from_name": "docling",
-      "to_name": "docling",
+      "from_name": "doclang",
+      "to_name": "doclang",
       "type": "polygonlabels",
       "value": {
         "points": [[14.0, 10.0], [14.0, 42.0], [86.0, 42.0]],
@@ -272,8 +272,8 @@ The saved annotation contains one result per region under `from_name: "docling"`
     },
     {
       "id": "r3",
-      "from_name": "doclang",
-      "to_name": "docling",
+      "from_name": "doclang_xml",
+      "to_name": "doclang",
       "type": "textarea",
       "value": {
         "text": ["<doclang>\n  <section_header>Quarterly Revenue Summary</section_header>\n  <!-- ... -->\n</doclang>"]
