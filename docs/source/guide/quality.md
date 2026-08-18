@@ -159,8 +159,6 @@ You can use **Settings > Quality > Annotation Limit** to set limits on how many 
 
 You can use **Settings > Quality > Annotator Evaluation** to automatically pause annotators who do not meet a ground truth agreement or acceptance score threshold. For more information, see [Annotator Evaluation](project_settings_lse#annotator-eval).
 
-When users are paused as part of annotator evaluation, you cannot manually unpause them from the Members dashboard. They are unpaused automatically if their score recovers. If your project requeues rejected annotations, paused annotators can still receive and update their rejected work from the labeling stream and the Data Manager.
-
 #### Behavior-based triggers
 
 If you have [plugins](plugins) enabled, you can automatically pause an annotator based on certain behaviors and then customize the message that appears on their screen. 
