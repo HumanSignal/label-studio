@@ -19,7 +19,7 @@ The Members dashboard gives you two views of your project's workforce: a **Perfo
 
 This can be useful in a number of ways:
 
-- **Track annotator and reviewer performance**: View key metrics like agreement, acceptance score, performance score, GT agreement, and time spent to identify who is aligned or needs support.
+- **Track annotator and reviewer performance**: View key metrics like evaluation status, agreement, acceptance score, performance score, GT agreement, and time spent to identify who is aligned or needs support.
 - **Monitor annotation and review progress**: See how many annotations have been submitted, accepted, rejected, or are still pending review for both annotators and reviewers.
 - **Identify quality and consistency issues**: Use the Agreement Matrix tab to spot disagreements between members, then click into cells to view the specific tasks where they diverged.
 
@@ -61,6 +61,7 @@ The **Annotation Summary** table shows annotation metrics for each project membe
 | **Annotator** | Member name. Click to open this member's [Member Performance dashboard](dashboard_annotator) filtered to this project. |
 | **ID** | Member's numeric user ID. |
 | **Paused** | Toggle to manually pause or unpause an annotator. See [Pause an annotator](quality.html#Pause-an-annotator). |
+| **Evaluation** | Shown when [Annotator Evaluation](project_settings_lse.html#annotator-eval) is enabled. Status for annotators and reviewers: **Passed**, **Failed**, **Not started**, or **In progress**. Hover for the metric, score or sample progress, and when they were last evaluated. You cannot use the **Paused** toggle to unpause someone paused by evaluation. |
 | **Agreement** | Average agreement score with other annotators on tasks where multiple annotations exist. |
 | **Assigned** | Number of tasks manually assigned to the member or containing a submitted annotation by the member. |
 | **Pending** | Number of tasks manually assigned to the member that do not yet have a submitted or skipped annotation. |
@@ -69,7 +70,8 @@ The **Annotation Summary** table shows annotation metrics for each project membe
 | **Accepted** | Number of submitted annotations accepted by reviewers. |
 | **Fix + Accepted** | Number of submitted annotations fixed then accepted by reviewers. |
 | **Rejected** | Number of submitted annotations rejected by reviewers. |
-| **Acceptance Score** | Total accepted annotations divided by total reviewed annotations. |
+| **Updated** | Shown when [Annotator Evaluation](project_settings_lse.html#annotator-eval) is enabled. Number of annotations whose last action is Updated, including updates before or after a review. |
+| **Acceptance Score** | Accepted annotations (including Fix + Accepted) divided by total reviewed annotations. Uses the latest review outcome per annotation. |
 | **Performance Score** | Overall annotation performance based on review outcomes (Accept, Reject, Fix+Accept). See [Annotation performance summaries](dashboard_annotator#Annotation-performance-summaries) for the calculation. |
 | **Total Lead Time** | Total elapsed time from task open to submit across all annotations. Includes time spent updating. |
 | **Avg Lead Time** | Average elapsed time per submitted annotation. |

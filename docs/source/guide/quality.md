@@ -155,6 +155,12 @@ When a user is paused, the following occurs:
 
 You can use **Settings > Quality > Annotation Limit** to set limits on how many tasks an annotator is able to complete before they are paused. For more information, see [Annotation Limit](project_settings_lse#annotation-limit). 
 
+#### Annotator Evaluation settings
+
+You can use **Settings > Quality > Annotator Evaluation** to automatically pause annotators who do not meet a ground truth agreement or acceptance score threshold. For more information, see [Annotator Evaluation](project_settings_lse#annotator-eval).
+
+When users are paused as part of annotator evaluation, you cannot manually unpause them from the Members dashboard. They are unpaused automatically if their score recovers. If your project requeues rejected annotations, paused annotators can still receive and update their rejected work from the labeling stream and the Data Manager.
+
 #### Behavior-based triggers
 
 If you have [plugins](plugins) enabled, you can automatically pause an annotator based on certain behaviors and then customize the message that appears on their screen. 
@@ -179,6 +185,7 @@ Review a table to see the following for each annotator:
 - The number of tasks that they skipped.
 - The outcome of reviews for the annotations they performed.
 - Their performance score and acceptance score.
+- Their annotator evaluation status, if [Annotator Evaluation](project_settings_lse#annotator-eval) is enabled.
 - Their average, median, and total time spent.
 - The agreement of their annotations with the ground truth annotations, if there are any.
 - The agreement of their annotations with predicted annotations, if there are any.
