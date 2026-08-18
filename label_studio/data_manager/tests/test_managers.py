@@ -1074,6 +1074,33 @@ class TestValidateInListFilter(TestCase):
         self.assertEqual(validate_in_list_filter(f, 'id'), 'none')
 
 
+class TestAnnotationIdFilterQ(TestCase):
+    """Unit tests for `annotation_id_filter_q` (FIT-2432)."""
+
+    def test_not_contains_skips_blank_tokens_from_trailing_separators(self):
+        """Empty fragments are not malformed; ``"12,"`` still excludes only 12."""
+        from data_manager.managers import Operator, annotation_id_filter_q
+
+        expression = annotation_id_filter_q('pk', Operator.NOT_CONTAINS, '12,')
+
+        assert expression == ~Q(pk__in=[12])
+
+    def test_contains_skips_blank_tokens_from_trailing_separators(self):
+        from data_manager.managers import Operator, annotation_id_filter_q
+
+        expression = annotation_id_filter_q('pk', Operator.CONTAINS, '12,')
+
+        assert expression == Q(pk__in=[12])
+
+    def test_not_contains_malformed_token_still_fail_closes(self):
+        """Dropping a malformed token would broaden not_contains, so reject the line."""
+        from data_manager.managers import Operator, annotation_id_filter_q
+
+        expression = annotation_id_filter_q('pk', Operator.NOT_CONTAINS, '12, malformed')
+
+        assert expression == Q(pk__in=[])
+
+
 class TestApplyFiltersInList(TestCase):
     """Integration of in_list / not_in_list with the apply_filters() pipeline (BROS-1203)."""
 
@@ -1140,10 +1167,10 @@ class TestApplyFiltersInList(TestCase):
         """Legacy `annotations_ids` smart-contains hack must remain intact.
 
         The validator only fires when the *original* operator is in_list / not_in_list, so
-        `{annotations_ids, contains, "1 2,3"}` still hits the existing rewrite path at
-        `data_manager.managers.apply_filters` line ~458.
+        `{annotations_ids, contains, "1 2,3"}` still hits the annotation-ID compiler
+        in `data_manager.managers.apply_filters`.
         """
-        # `contains` (not in_list) — validator returns 'ok', rewrite proceeds.
+        # `contains` (not in_list) — validator returns 'ok', compiler proceeds.
         _filter = Filter(
             filter='filter:tasks:annotations_ids',
             operator='contains',
@@ -1152,7 +1179,6 @@ class TestApplyFiltersInList(TestCase):
         )
         result, queryset = self._run(_filter)
         self.assertIs(result, queryset)
-        # The rewrite turns `contains` into `in_list` and emits a Q expression.
         queryset.filter.assert_called_once()
 
 

@@ -4,6 +4,7 @@ import logging
 import re
 from dataclasses import dataclass
 from datetime import datetime
+from decimal import Decimal, InvalidOperation
 from functools import reduce
 from typing import ClassVar
 
@@ -571,8 +572,8 @@ def validate_in_list_filter(_filter, field_name: str) -> str:
       - 'skip' — empty `not_in_list` after normalization: drop the filter entirely.
 
     Raises ValidationError for unsupported fields. Only triggers when the *original*
-    operator is in_list / not_in_list, so the legacy `annotations_ids contains→in_list`
-    rewrite (below) remains unaffected.
+    operator is in_list / not_in_list, so legacy ``annotations_ids`` contains/not_contains
+    filters handled by ``annotation_id_filter_q`` remain unaffected.
     """
     if _filter.operator not in (Operator.IN_LIST, Operator.NOT_IN_LIST):
         return 'ok'
@@ -663,6 +664,81 @@ def parse_user_filter_ids(value):
     return ids
 
 
+def _annotation_id(value):
+    """Return an exact integer ID, accepting integer-valued Number representations only."""
+    if isinstance(value, bool):
+        return None
+    if isinstance(value, int):
+        return value
+    try:
+        number = Decimal(str(value).strip())
+    except (AttributeError, InvalidOperation, ValueError):
+        return None
+    if not number.is_finite() or number != number.to_integral_value():
+        return None
+    return int(number)
+
+
+def annotation_id_filter_q(field_name, operator, value):
+    """Compile an annotation-ID filter in a strict integer domain.
+
+    Positive legacy ``contains`` filters keep valid tokens for compatibility.
+    Negative membership rejects the whole mixed list because dropping an invalid
+    token would broaden the result. Empty fragments from trailing separators are
+    skipped, not treated as malformed. Every other malformed value is a contradiction.
+    """
+    contradiction = Q(pk__in=[])
+    if operator in {Operator.CONTAINS, Operator.NOT_CONTAINS}:
+        raw_values = value if isinstance(value, list) else re.split(r'[,;\s]+', str(value))
+        ids = []
+        invalid = False
+        for raw_value in raw_values:
+            if str(raw_value).strip() == '':
+                continue
+            annotation_id = _annotation_id(raw_value)
+            if annotation_id is None:
+                invalid = True
+                continue
+            ids.append(annotation_id)
+        if not ids or (operator == Operator.NOT_CONTAINS and invalid):
+            return contradiction
+        expression = Q(**{f'{field_name}__in': list(dict.fromkeys(ids))})
+        return ~expression if operator == Operator.NOT_CONTAINS else expression
+
+    if operator == Operator.EMPTY:
+        try:
+            return Q(**{f'{field_name}__isnull': cast_bool_from_str(value)})
+        except ValueError:
+            return contradiction
+
+    if operator in {Operator.IN, Operator.NOT_IN}:
+        if not hasattr(value, 'min') or not hasattr(value, 'max'):
+            return contradiction
+        minimum = _annotation_id(value.min)
+        maximum = _annotation_id(value.max)
+        if minimum is None or maximum is None:
+            return contradiction
+        expression = Q(**{f'{field_name}__gte': minimum, f'{field_name}__lte': maximum})
+        return ~expression if operator == Operator.NOT_IN else expression
+
+    annotation_id = _annotation_id(value)
+    if annotation_id is None:
+        return contradiction
+    lookups = {
+        Operator.EQUAL: '',
+        Operator.NOT_EQUAL: '',
+        Operator.LESS: '__lt',
+        Operator.GREATER: '__gt',
+        Operator.LESS_OR_EQUAL: '__lte',
+        Operator.GREATER_OR_EQUAL: '__gte',
+    }
+    lookup = lookups.get(operator)
+    if lookup is None:
+        return contradiction
+    expression = Q(**{f'{field_name}{lookup}': annotation_id})
+    return ~expression if operator == Operator.NOT_EQUAL else expression
+
+
 def add_user_filter(enabled, key, _filter, filter_expressions):
     if not enabled:
         return
@@ -729,8 +805,8 @@ def apply_filters(queryset, filters, project, request):
             _filter = preprocess_filter(_filter, field_name)
 
             # Semantic validation for in_list / not_in_list (BROS-1203). Runs *before*
-            # the LSE custom hook and *before* the legacy `annotations_ids contains→in_list`
-            # rewrite so the rewrite path remains untouched.
+            # the LSE custom hook and *before* the annotations_ids compiler so public
+            # in_list allowlisting stays independent of annotation-ID filter semantics.
             in_list_status = validate_in_list_filter(_filter, field_name)
             if in_list_status == 'none':
                 # Empty `in_list`: this filter line matches no rows. Append a contradiction
@@ -791,16 +867,8 @@ def apply_filters(queryset, filters, project, request):
 
             # annotation ids
             if field_name == 'annotations_ids':
-                field_name = 'annotations__id'
-                if 'contains' in _filter.operator:
-                    # convert string like "1 2,3" => [1,2,3]
-                    _filter.value = [
-                        int(value) for value in re.split(',|;| ', _filter.value) if value and value.isdigit()
-                    ]
-                    _filter.operator = 'in_list' if _filter.operator == 'contains' else 'not_in_list'
-                elif 'equal' in _filter.operator:
-                    if not _filter.value.isdigit():
-                        _filter.value = 0
+                filter_expressions.append(annotation_id_filter_q('annotations__id', _filter.operator, _filter.value))
+                continue
 
             # predictions model versions
             if field_name == 'predictions_model_versions' and _filter.operator == Operator.CONTAINS:
