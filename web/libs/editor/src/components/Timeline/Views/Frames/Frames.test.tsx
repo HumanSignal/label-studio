@@ -171,4 +171,73 @@ describe("Frames", () => {
     rerender(<Frames {...defaultProps} position={50} offset={0} onScroll={onScroll} />);
     expect(onScroll).toHaveBeenCalled();
   });
+
+  it("clamps edited timeline region start frame to the first frame", async () => {
+    const setRange = mock();
+    const onStartDrawing = mock(() => ({
+      id: "r1",
+      ranges: [{ start: 5, end: 10 }],
+      object: { length: 100 },
+      setRange,
+    }));
+
+    render(
+      <Frames
+        {...defaultProps}
+        onStartDrawing={onStartDrawing}
+        regions={[
+          {
+            ...defaultProps.regions[0],
+            sequence: [
+              { frame: 5, enabled: true },
+              { frame: 10, enabled: false },
+            ],
+          },
+        ]}
+      />,
+    );
+
+    const scrollArea = document.querySelector(sel("timeline-frames", "scroll")) as HTMLElement;
+    const regionRow = document.createElement("div");
+    regionRow.dataset.id = "r1";
+    regionRow.dataset.start = "5";
+    regionRow.dataset.end = "10";
+    scrollArea.appendChild(regionRow);
+    expect(scrollArea).toBeInTheDocument();
+
+    scrollArea.getBoundingClientRect = () => ({
+      left: 0,
+      top: 0,
+      width: 400,
+      height: 200,
+      right: 400,
+      bottom: 200,
+      x: 0,
+      y: 0,
+      toJSON: () => ({}),
+    });
+
+    await act(async () => {
+      const mouseDown = new MouseEvent("mousedown", {
+        bubbles: true,
+        clientX: 190,
+        clientY: 10,
+      });
+      Object.defineProperty(mouseDown, "pageX", { value: 190, configurable: true });
+      Object.defineProperty(mouseDown, "target", { value: regionRow, configurable: true });
+      scrollArea.dispatchEvent(mouseDown);
+
+      const mouseMove = new MouseEvent("mousemove", {
+        bubbles: true,
+        clientX: 100,
+        clientY: 10,
+      });
+      Object.defineProperty(mouseMove, "pageX", { value: 100, configurable: true });
+      document.dispatchEvent(mouseMove);
+      document.dispatchEvent(new MouseEvent("mouseup", { bubbles: true }));
+    });
+
+    expect(onStartDrawing).toHaveBeenCalledWith({ region: "r1", frame: 5 });
+    expect(setRange).toHaveBeenCalledWith([1, 10], { mode: "edit" });
+  });
 });
