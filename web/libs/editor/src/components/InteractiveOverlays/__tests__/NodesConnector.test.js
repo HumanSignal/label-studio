@@ -244,6 +244,29 @@ describe("NodesConnector", () => {
       expect(pathCommand.length).toBeGreaterThan(0);
     });
 
+    it("uses classic orthogonal top arch for same-band adjacent spans with Y drift (FIT-2426)", () => {
+      // padBBox-equivalent overlap + subpixel Y used to force a mid-height side path.
+      const start = { x: 497, y: 137, width: 46, height: 30 };
+      const end = { x: 540, y: 137.25, width: 41, height: 30 };
+      const [pathCommand] = NodesConnector.calculatePath(start, end);
+      expect(pathCommand).toMatch(/a 5 5 0 0/);
+      expect(pathCommand).not.toMatch(/ Q /);
+      const startY = Number(pathCommand.trim().split(/\s+/)[2]);
+      expect(startY).toBeLessThanOrEqual(Math.min(start.y, end.y) + 0.01);
+      expect(startY).toBeLessThan(start.y + start.height / 2 - 1);
+    });
+
+    it("arches above nested same-band spans instead of midpoints (FIT-2426)", () => {
+      const outer = { x: 497, y: 137, width: 106, height: 34 };
+      const inner = { x: 517, y: 139, width: 46, height: 30 };
+      const [pathCommand] = NodesConnector.calculatePath(outer, inner);
+      expect(pathCommand).toMatch(/a 5 5 0 0/);
+      expect(pathCommand).not.toMatch(/ Q /);
+      const startY = Number(pathCommand.trim().split(/\s+/)[2]);
+      expect(startY).toBeLessThanOrEqual(Math.min(outer.y, inner.y) + 0.01);
+      expect(startY).toBeLessThan(outer.y + outer.height / 2 - 1);
+    });
+
     it("uses left rendering side when min(x1,x2)-limit >= 0", () => {
       const start = { x: 100, y: 50, width: 30, height: 20 };
       const end = { x: 150, y: 50, width: 30, height: 20 };
