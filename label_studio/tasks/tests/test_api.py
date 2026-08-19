@@ -907,3 +907,57 @@ class TestTaskCreateOverlapInitialization(APITestCase):
         task = Task.objects.get(id=response.json()['id'])
         assert task.overlap == 3
         assert task.is_labeled is False
+
+
+class TestAnnotationDraftCreateWithMissingAnnotation(APITestCase):
+    """Regression tests for the annotation-scoped draft-creation endpoint."""
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.organization = OrganizationFactory()
+        cls.project = ProjectFactory(organization=cls.organization)
+        cls.user = cls.organization.created_by
+
+    def test_create_draft_for_missing_annotation_does_not_violate_fk(self):
+        # Reproduces: ENTERPRISE-V2-BACKEND-5S0
+        # POST /api/tasks/{pk}/annotations/{annotation_id}/drafts blindly passes the URL's
+        # annotation_id straight into serializer.save(). When that annotation does not exist
+        # (e.g. it was deleted between the client loading the task and submitting the draft),
+        # the INSERT into tasks_annotationdraft violates the annotation_id foreign key:
+        #   insert or update on table "tasks_annotationdraft" violates foreign key constraint
+        #   "tasks_annotationdraf_annotation_id_86db74e5_fk_task_comp"
+        #   DETAIL: Key (annotation_id)=(...) is not present in table "task_completion".
+        #
+        # RED (unpatched): the endpoint persists a draft pointing at the missing annotation.
+        # On production Postgres the FK is checked immediately, so the request raises
+        # IntegrityError (the Sentry crash). SQLite (used by the test suite) defers FK
+        # enforcement, so connection.check_constraints() below surfaces the identical
+        # IntegrityError, failing this test with the same violation.
+        # GREEN (fixed): the endpoint validates the annotation and rejects the request
+        # gracefully (4xx) without persisting a dangling draft, so no violation occurs.
+        from django.db import connection
+        from tasks.models import AnnotationDraft
+
+        task = TaskFactory(project=self.project, data={'text': 'test'})
+
+        # An annotation that was created and then deleted — its id is now dangling.
+        annotation = AnnotationFactory(task=task, project=self.project, result=[])
+        missing_annotation_id = annotation.id
+        annotation.delete()
+
+        self.client.force_authenticate(user=self.user)
+
+        # On Postgres this call itself raises IntegrityError inside the request.
+        response = self.client.post(
+            f'/api/tasks/{task.id}/annotations/{missing_annotation_id}/drafts',
+            data={'result': []},
+            format='json',
+        )
+
+        # On SQLite the FK check is deferred; surface the same violation explicitly.
+        connection.check_constraints()
+
+        # A fixed endpoint should refuse to create a draft for a non-existent annotation
+        # instead of leaving a dangling reference behind.
+        assert not AnnotationDraft.objects.filter(annotation_id=missing_annotation_id).exists()
+        assert response.status_code in (400, 404), response.status_code
