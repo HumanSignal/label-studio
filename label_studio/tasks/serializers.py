@@ -835,7 +835,11 @@ class BaseTaskSerializerBulk(serializers.ListSerializer):
                 draft.update(
                     {
                         'task_id': db_tasks[i].id,
-                        'annotation_id': annotation_mapping[draft.get('annotation')],
+                        # Use .get() so a draft that references an annotation not present in this
+                        # import batch (e.g. its parent annotation was dropped/never imported)
+                        # degrades to an unlinked draft (annotation_id=None) instead of raising
+                        # KeyError. See ENTERPRISE-V2-BACKEND-6G5.
+                        'annotation_id': annotation_mapping.get(draft.get('annotation')),
                         'project': self.project,
                         'import_id': draft.get('id'),
                     }
