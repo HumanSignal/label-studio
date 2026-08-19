@@ -39,9 +39,9 @@ export interface AiChatPromptBarProps extends Omit<HTMLAttributes<HTMLDivElement
   layout?: AiChatPromptBarLayout;
   /** Leading actions (e.g. attach / @ sources). */
   leadingSlot?: ReactNode;
-  /** Trailing chrome (e.g. model picker). */
+  /** Trailing chrome (e.g. model picker, mic, send). */
   trailingSlot?: ReactNode;
-  /** Plan-mode toggle or similar affordance. */
+  /** Plan-mode toggle — rendered in the trailing cluster (Replit: Plan, then mic/send). */
   planToggleSlot?: ReactNode;
   submitLabel?: string;
   stopLabel?: string;
@@ -79,7 +79,7 @@ export function AiChatPromptBar({
   const value = isControlled ? controlledValue : internalValue;
   const isBusy = status === "streaming" || status === "submitting";
   const showStop = status === "streaming" && typeof onStop === "function";
-  const hasLeading = Boolean(leadingSlot || planToggleSlot);
+  const hasLeading = Boolean(leadingSlot);
 
   const setValue = (next: string) => {
     if (!isControlled) {
@@ -143,15 +143,9 @@ export function AiChatPromptBar({
         />
 
         <div className={styles.actions}>
-          {hasLeading ? (
-            <div className={styles.leading}>
-              {leadingSlot}
-              {planToggleSlot}
-            </div>
-          ) : (
-            <div className={styles.leading} />
-          )}
+          {hasLeading ? <div className={styles.leading}>{leadingSlot}</div> : <div className={styles.leading} />}
           <div className={styles.trailing}>
+            {planToggleSlot}
             {trailingSlot}
             {primaryAction}
           </div>

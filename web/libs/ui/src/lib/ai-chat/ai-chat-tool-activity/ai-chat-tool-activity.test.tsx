@@ -50,6 +50,19 @@ describe("AiChatToolActivity", () => {
     expect(summary.querySelector("[data-testid='ai-chat-loading-icon']")).toBeInTheDocument();
   });
 
+  it("keeps a single throbber: header when collapsed, active step when expanded", () => {
+    render(<AiChatToolActivity summary="Generating…" items={items} />);
+    const summary = screen.getByRole("button", { name: /Generating/i });
+    expect(summary.querySelectorAll("[data-testid='ai-chat-loading-icon']")).toHaveLength(1);
+
+    fireEvent.click(summary);
+    expect(summary.querySelector("[data-testid='ai-chat-loading-icon']")).not.toBeInTheDocument();
+    expect(
+      screen.getByTestId("ai-chat-tool-item-2").querySelector("[data-testid='ai-chat-loading-icon']"),
+    ).toBeInTheDocument();
+    expect(document.querySelectorAll("[data-testid='ai-chat-loading-icon']")).toHaveLength(1);
+  });
+
   it("uses dots loading icon for in-progress rows instead of a custom icon", () => {
     render(
       <AiChatToolActivity

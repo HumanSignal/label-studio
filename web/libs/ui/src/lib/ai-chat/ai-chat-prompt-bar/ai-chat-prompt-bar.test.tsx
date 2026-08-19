@@ -47,6 +47,23 @@ describe("AiChatPromptBar", () => {
     expect(screen.getByRole("button", { name: "Plan" })).toBeInTheDocument();
   });
 
+  it("places the Plan toggle in the trailing cluster before other trailing chrome", () => {
+    render(
+      <AiChatPromptBar
+        leadingSlot={<button type="button">Attach</button>}
+        trailingSlot={<button type="button">Mic</button>}
+        planToggleSlot={<button type="button">Plan</button>}
+        showPrimaryAction={false}
+      />,
+    );
+    const attach = screen.getByRole("button", { name: "Attach" });
+    const plan = screen.getByRole("button", { name: "Plan" });
+    const mic = screen.getByRole("button", { name: "Mic" });
+    expect(attach.compareDocumentPosition(plan) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(plan.compareDocumentPosition(mic) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(attach.parentElement).not.toBe(plan.parentElement);
+  });
+
   it("notifies onValueChange for controlled typing", () => {
     const onValueChange = jest.fn();
     render(<AiChatPromptBar value="" onValueChange={onValueChange} />);

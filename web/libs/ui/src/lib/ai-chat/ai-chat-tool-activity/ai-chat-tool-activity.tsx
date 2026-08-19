@@ -5,8 +5,9 @@
  * (https://beautiful-ui-five.vercel.app) — adapted for HumanSignal semantic tokens.
  * Presentation-only: no tool execution or session logic.
  *
- * In-progress highwater rows use AiChatLoadingIcon (dots) — same affordance as
- * “Writing code…” — so agent work never feels stuck (Replit/Lovable-shaped UX).
+ * In-progress work uses a single AiChatLoadingIcon (dots) — Replit/Lovable:
+ * collapsed highwater shows the throbber; expanded view moves it to the active
+ * step so the header and children never animate at the same time.
  */
 import { CaretDownIcon, CheckCircleIcon, XCircleIcon } from "@humansignal/icons";
 import { type HTMLAttributes, type ReactNode, useState } from "react";
@@ -128,7 +129,7 @@ export function AiChatToolActivity({
           className={cn(styles.chevron, !isExpanded && styles.chevronClosed)}
           aria-hidden
         />
-        {isBusy ? <AiChatLoadingIcon variant="dots" className={styles.statusBusy} /> : null}
+        {isBusy && !isExpanded ? <AiChatLoadingIcon variant="dots" className={styles.statusBusy} /> : null}
         <Typography variant="label" size="small" as="span" className={styles.summaryLabel}>
           {summary}
         </Typography>

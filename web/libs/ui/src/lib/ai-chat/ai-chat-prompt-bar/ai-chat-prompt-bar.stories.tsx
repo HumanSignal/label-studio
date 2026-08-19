@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import { useState } from "react";
 import { Button } from "../../button/button";
-import { Toggle } from "../../toggle/toggle";
+import { Checkbox } from "../../checkbox/checkbox";
 import { Typography } from "../../typography/typography";
 import { AiChatPromptBar } from "./ai-chat-prompt-bar";
 
@@ -77,12 +77,11 @@ export const WithPlanToggle: Story = {
           </Button>
         }
         planToggleSlot={
-          <Toggle
-            label="Plan"
-            checked={planMode}
-            onChange={(event) => setPlanMode(event.target.checked)}
-            aria-label="Plan mode"
-          />
+          <Checkbox checked={planMode} onChange={(event) => setPlanMode(event.target.checked)} ariaLabel="Plan">
+            <Typography variant="label" size="small" as="span">
+              Plan
+            </Typography>
+          </Checkbox>
         }
         trailingSlot={
           <Typography variant="label" size="smaller" as="span">
