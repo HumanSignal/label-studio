@@ -335,3 +335,23 @@ class HumanSignalCspMiddleware(CSPMiddleware):
                 del response['Content-Security-Policy-Report-Only']
             delattr(response, '_override_report_only_csp')
         return response
+
+
+class DevStaticNoCacheMiddleware:
+    """
+    Mark /static/ responses no-cache in DEBUG.
+
+    The dev staticfile serving sends no Cache-Control, so browsers fall back to
+    heuristic freshness and keep using stale CSS/JS after files are edited,
+    which makes UI changes appear "broken" until the cache happens to expire.
+    no-cache still allows cheap 304 revalidation via If-Modified-Since.
+    """
+
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+        response = self.get_response(request)
+        if settings.DEBUG and request.path.startswith(settings.STATIC_URL):
+            response['Cache-Control'] = 'no-cache'
+        return response

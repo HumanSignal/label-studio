@@ -276,6 +276,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'core.middleware.NoindexUrlMiddleware',
+    'core.middleware.DevStaticNoCacheMiddleware',
     'core.middleware.CommonMiddlewareAppendSlashWithoutRedirect',  # instead of 'CommonMiddleware'
     'django_user_agents.middleware.UserAgentMiddleware',
     'core.middleware.SetSessionUIDMiddleware',

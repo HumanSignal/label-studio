@@ -77,7 +77,8 @@ gtag('config', 'UA-129877673-1');
 
 <div class="login_page_new_ui">
   {% get_current_language as CURRENT_LANGUAGE %}
-  <div class="lang-switch" data-testid="login-lang-switch">
+  <div class="lang-switch" data-testid="login-lang-switch"
+       style="position: fixed; top: 20px; right: 24px; z-index: 10; display: flex; align-items: center; gap: 4px; font-size: 14px;">
     <button type="button" data-lang="zh-CN" aria-label="切换到中文"
             class="{% if CURRENT_LANGUAGE|slice:':2' == 'zh' %}active{% endif %}">中文</button>
     <span aria-hidden="true">/</span>
