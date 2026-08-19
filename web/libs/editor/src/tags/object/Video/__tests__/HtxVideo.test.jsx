@@ -141,6 +141,18 @@ mockModule("../../../../utils/resize-observer", () => ({
   }),
 }));
 
+mockModule("mobx-state-tree", () => {
+  const actual = requireActual("mobx-state-tree");
+  return {
+    ...actual,
+    getEnv: () => ({
+      messages: {
+        ERR_LOADING_HTTP: ({ attr, url, error }) => `Failed to load ${attr}: ${url} (${error})`,
+      },
+    }),
+  };
+});
+
 const { HtxVideoView } = require("../HtxVideo");
 
 function createMockItem(overrides = {}) {
@@ -157,7 +169,7 @@ function createMockItem(overrides = {}) {
       videoRef: { current: null },
     },
   };
-  return {
+  const item = {
     _value: "https://example.com/video.mp4",
     ref,
     height: 600,
@@ -194,6 +206,14 @@ function createMockItem(overrides = {}) {
     frame: 1,
     ...overrides,
   };
+
+  item.handleLoadError =
+    overrides.handleLoadError ??
+    mock((message) => {
+      item.errors = [message];
+    });
+
+  return item;
 }
 
 function createMockStore() {
@@ -268,6 +288,21 @@ describe("HtxVideoView", () => {
     expect(item.setLength).toHaveBeenCalledWith(100);
     expect(item.setReady).toHaveBeenCalledWith(true);
     expect(screen.getByTestId("timeline")).toBeInTheDocument();
+  });
+
+  it("handles video load errors and marks the object ready for prediction review", async () => {
+    const item = createMockItem({ value: "$video" });
+    const store = createMockStore();
+    render(<HtxVideoView item={item} store={store} />);
+    await flushRaf();
+    const { onError } = mockVideoCanvasProps;
+    expect(onError).toBeDefined();
+    await act(() => {
+      onError(new Error("404"));
+    });
+    expect(item.handleLoadError).toHaveBeenCalledWith(expect.stringContaining("Failed to load"));
+    expect(item.errors).toHaveLength(1);
+    expect(item.setReady).toHaveBeenCalledWith(true);
   });
 
   it("calls onFrameChange when VideoCanvas triggers it", async () => {
