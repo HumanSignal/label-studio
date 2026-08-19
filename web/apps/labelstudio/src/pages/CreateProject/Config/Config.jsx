@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState, useRef } from "react";
+import { useTranslation } from "react-i18next";
 import CM from "codemirror";
 import { Button, cnm, Typography } from "@humansignal/ui";
 import { IconTrash, IconInfoOutline } from "@humansignal/icons";
@@ -37,6 +38,7 @@ const configClass = cn("configure");
  */
 const AdaptivePreview = React.memo(
   ({ config, editorConfig, hasPendingUpdate, onUpdatePreview, isUpdating, previewKey, ...previewProps }) => {
+    const { t } = useTranslation();
     // Use editor config for tag count when provided so banner appears as soon as user pastes large content
     const configForTagCount = editorConfig !== undefined ? editorConfig : config;
     const tagCount = useMemo(() => countConfigTags(configForTagCount || ""), [configForTagCount]);
@@ -51,9 +53,9 @@ const AdaptivePreview = React.memo(
         <div className={configClass.elem("preview-container").toClassName()}>
           <div className={configClass.elem("preview-info-banner").toClassName()}>
             <IconInfoOutline width={16} height={16} />
-            <span>{LARGE_CONFIG_MESSAGE}</span>
+            <span>{t("projects:cfgLargeConfig", { defaultValue: LARGE_CONFIG_MESSAGE })}</span>
             <Button size="small" onClick={onUpdatePreview} waiting={isUpdating} disabled={isUpdating}>
-              {isUpdating ? "Updating..." : "Update Preview"}
+              {isUpdating ? t("projects:cfgUpdating") : t("projects:cfgUpdatePreview")}
             </Button>
           </div>
           <Preview key={previewKeyProp} config={config} {...previewProps} />
@@ -65,21 +67,25 @@ const AdaptivePreview = React.memo(
   },
 );
 
-const EmptyConfigPlaceholder = () => (
-  <div className={configClass.elem("empty-config").toClassName()}>
-    <p>Your labeling configuration is empty. It is required to label your data.</p>
-    <p>
-      Start from one of our predefined templates or create your own config on the Code panel. The labeling config is
-      XML-based and you can{" "}
-      <a href="https://labelstud.io/tags/" target="_blank" rel="noreferrer">
-        read about the available tags in our documentation
-      </a>
-      .
-    </p>
-  </div>
-);
+const EmptyConfigPlaceholder = () => {
+  const { t } = useTranslation();
+
+  return (
+    <div className={configClass.elem("empty-config").toClassName()}>
+      <p>{t("projects:cfgEmptyConfigTitle")}</p>
+      <p>
+        {t("projects:cfgEmptyConfigBody")}{" "}
+        <a href="https://labelstud.io/tags/" target="_blank" rel="noreferrer">
+          {t("projects:cfgEmptyConfigLink")}
+        </a>
+        {t("projects:cfgEmptyConfigSuffix")}
+      </p>
+    </div>
+  );
+};
 
 const Label = ({ label, template, color }) => {
+  const { t } = useTranslation();
   const value = label.getAttribute("value");
 
   return (
@@ -109,7 +115,7 @@ const Label = ({ label, template, color }) => {
         size="smaller"
         variant="negative"
         onClick={() => template.removeLabel(label)}
-        aria-label="delete label"
+        aria-label={t("projects:cfgDeleteLabelAria")}
         className="hidden !p-0 z-10 absolute right-0 [&_span]:!p-0 group-hover:inline-flex"
         leading={<IconTrash className="w-4 h-4 fill-[currentColor]" />}
       />
@@ -118,6 +124,7 @@ const Label = ({ label, template, color }) => {
 };
 
 const ConfigureControl = ({ control, template }) => {
+  const { t } = useTranslation();
   const refLabels = React.useRef();
   const tagname = control.tagName;
 
@@ -139,8 +146,8 @@ const ConfigureControl = ({ control, template }) => {
   return (
     <div className={configClass.elem("labels").toClassName()}>
       <form className={configClass.elem("add-labels").toClassName()} action="">
-        <h4>{tagname === "Choices" ? "Add choices" : "Add label names"}</h4>
-        <span>Use new line as a separator to add multiple labels</span>
+        <h4>{tagname === "Choices" ? t("projects:cfgAddChoices") : t("projects:cfgAddLabelNames")}</h4>
+        <span>{t("projects:cfgAddLabelsHint")}</span>
         <textarea
           name="labels"
           id=""
@@ -150,13 +157,20 @@ const ConfigureControl = ({ control, template }) => {
           onKeyPress={onKeyPress}
           className="lsf-textarea-ls p-2 px-3"
         />
-        <Button type="button" size="small" look="outlined" onClick={onAddLabels} aria-label="Add labels">
-          Add
+        <Button
+          type="button"
+          size="small"
+          look="outlined"
+          onClick={onAddLabels}
+          aria-label={t("projects:cfgAddLabelsAria")}
+        >
+          {t("projects:cfgAddButton")}
         </Button>
       </form>
       <div className={configClass.elem("current-labels").toClassName()}>
         <h3 className={configClass.elem("current-labels-header").toClassName()}>
-          {tagname === "Choices" ? "Choices" : "Labels"} ({control.children.length})
+          {tagname === "Choices" ? t("projects:cfgChoicesHeader") : t("projects:cfgLabelsHeader")} (
+          {control.children.length})
         </h3>
         <ul className={configClass.elem("labels-list").toClassName()}>
           {Array.from(control.children).map((label) => (
@@ -174,6 +188,7 @@ const ConfigureControl = ({ control, template }) => {
 };
 
 const ConfigureSettings = ({ template }) => {
+  const { t } = useTranslation();
   const { settings } = template;
 
   if (!settings) return null;
@@ -262,7 +277,7 @@ const ConfigureSettings = ({ template }) => {
   return (
     <ul className={configClass.elem("settings").toClassName()}>
       <li>
-        <h4>Configure settings</h4>
+        <h4>{t("projects:cfgConfigureSettings")}</h4>
         <ul className={configClass.elem("object-settings").toClassName()}>{items}</ul>
       </li>
     </ul>
@@ -271,6 +286,7 @@ const ConfigureSettings = ({ template }) => {
 
 // configure value source for `obj` object tag
 const ConfigureColumn = ({ template, obj, columns }) => {
+  const { t } = useTranslation();
   const valueAttr = obj.hasAttribute("valueList") ? "valueList" : "value";
   const value = obj.getAttribute(valueAttr)?.replace(/^\$/, "");
   // if there is a value set already and it's not in the columns
@@ -325,21 +341,22 @@ const ConfigureColumn = ({ template, obj, columns }) => {
     const columnOptions =
       columns?.map((column) => ({
         value: column,
-        label: column === DEFAULT_COLUMN ? "<imported file>" : `$${column}`,
+        label: column === DEFAULT_COLUMN ? t("projects:cfgImportedFile") : `$${column}`,
       })) ?? [];
     if (!columns?.length) {
-      columnOptions.push({ value, label: "<imported file>" });
+      columnOptions.push({ value, label: t("projects:cfgImportedFile") });
     }
-    columnOptions.push({ value: "-", label: "<set manually>" });
+    columnOptions.push({ value: "-", label: t("projects:cfgSetManually") });
     return columnOptions;
-  }, [columns, value]);
+  }, [columns, value, t]);
 
   return (
     <p>
-      Use {obj.tagName.toLowerCase()}
-      {template.objects > 1 && ` for ${obj.getAttribute("name")}`}
-      {" from "}
-      {columns?.length > 0 && columns[0] !== DEFAULT_COLUMN && "field "}
+      {t("projects:cfgUseTagPrefix")}
+      {obj.tagName.toLowerCase()}
+      {template.objects > 1 && t("projects:cfgUseTagFor", { name: obj.getAttribute("name") })}
+      {t("projects:cfgUseTagFrom")}
+      {columns?.length > 0 && columns[0] !== DEFAULT_COLUMN && t("projects:cfgUseTagField")}
       <Select
         triggerClassName="border"
         onChange={selectValue}
@@ -354,21 +371,18 @@ const ConfigureColumn = ({ template, obj, columns }) => {
 };
 
 const ConfigureColumns = ({ columns, template }) => {
+  const { t } = useTranslation();
+
   if (!template.objects.length) return null;
 
   return (
     <div className={configClass.elem("object").toClassName()}>
-      <h4>Configure data</h4>
+      <h4>{t("projects:cfgConfigureData")}</h4>
       {template.objects.length > 1 && columns?.length > 0 && columns.length < template.objects.length && (
-        <p className={configClass.elem("object-error").toClassName()}>
-          This template requires more data then you have for now
-        </p>
+        <p className={configClass.elem("object-error").toClassName()}>{t("projects:cfgNeedMoreData")}</p>
       )}
       {columns?.length === 0 && (
-        <p className={configClass.elem("object-error").toClassName()}>
-          To select which field(s) to label you need to upload the data. Alternatively, you can provide it using Code
-          mode.
-        </p>
+        <p className={configClass.elem("object-error").toClassName()}>{t("projects:cfgUploadDataHint")}</p>
       )}
       {template.objects.map((obj) => (
         <ConfigureColumn key={obj.getAttribute("name")} {...{ obj, template, columns }} />
@@ -390,6 +404,7 @@ const Configurator = ({
   warning,
   hasChanges,
 }) => {
+  const { t } = useTranslation();
   const [configure, setConfigure] = React.useState(isEmptyConfig(config) ? "code" : "visual");
   const [visualLoaded, loadVisual] = React.useState(configure === "visual");
   const [waiting, setWaiting] = React.useState(false);
@@ -564,7 +579,7 @@ const Configurator = ({
         setTemplate(config);
       } catch (e) {
         setParserError({
-          detail: "Parser error",
+          detail: t("projects:cfgParserError"),
           validation_errors: [e.message],
         });
       }
@@ -620,11 +635,11 @@ const Configurator = ({
 
   const extra = (
     <p className={configClass.elem("tags-link").toClassName()}>
-      Configure the labeling interface with tags.&nbsp;
+      {t("projects:cfgTagsLinkPrefix")}&nbsp;
       <a href="https://labelstud.io/tags/" target="_blank" rel="noreferrer">
-        See all tags
+        {t("projects:cfgTagsLinkSeeAll")}
       </a>
-      .
+      {t("projects:cfgEmptyConfigSuffix")}
     </p>
   );
 
@@ -638,7 +653,10 @@ const Configurator = ({
         }}
       >
         <div className="flex flex-col">
-          <h1>Labeling Interface{hasChanges ? " *" : ""}</h1>
+          <h1>
+            {t("projects:cfgLabelingInterface")}
+            {hasChanges ? " *" : ""}
+          </h1>
           <header>
             <Button
               type="button"
@@ -646,11 +664,15 @@ const Configurator = ({
               onClick={onBrowse}
               size="small"
               look="outlined"
-              aria-label="Browse templates"
+              aria-label={t("projects:cfgBrowseTemplatesAria")}
             >
-              Browse Templates
+              {t("projects:cfgBrowseTemplates")}
             </Button>
-            <ToggleItems items={{ code: "Code", visual: "Visual" }} active={configure} onSelect={onSelect} />
+            <ToggleItems
+              items={{ code: t("projects:cfgCodeMode"), visual: t("projects:cfgVisualMode") }}
+              active={configure}
+              onSelect={onSelect}
+            />
           </header>
           <div className={configClass.elem("editor").toClassName()}>
             {configure === "code" && (
@@ -703,12 +725,12 @@ const Configurator = ({
               {saved && (
                 <div className={cn("form-indicator").toClassName()}>
                   <span className={cn("form-indicator").elem("item").mod({ type: "success" }).toClassName()}>
-                    Saved!
+                    {t("projects:cfgSavedIndicator")}
                   </span>
                 </div>
               )}
-              <Button className="w-[120px]" onClick={onSave} waiting={waiting} aria-label="Save configuration">
-                {waiting ? "Saving..." : "Save"}
+              <Button className="w-[120px]" onClick={onSave} waiting={waiting} aria-label={t("projects:cfgSaveAria")}>
+                {waiting ? t("projects:cfgSaving") : t("projects:save")}
               </Button>
               <UnsavedChanges hasChanges={hasChanges} onSave={onSave} />
             </Form.Actions>
@@ -728,7 +750,7 @@ const Configurator = ({
               data-testid="preview-updating-placeholder"
             >
               <div className={configClass.elem("preview-updating").toClassName()}>
-                <Typography color="secondary">Updating preview…</Typography>
+                <Typography color="secondary">{t("projects:cfgUpdatingPreview")}</Typography>
               </div>
             </div>
           ) : (

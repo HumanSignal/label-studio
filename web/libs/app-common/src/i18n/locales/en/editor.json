@@ -343,5 +343,10 @@
   "filterPredictionsOnly": "Predictions Only",
   "filterAny": "Any",
   "unresolvedComments": "Unresolved comments",
-  "onlyAnnotationsCan": "Only Annotations can be {{x}}."
+  "onlyAnnotationsCan": "Only Annotations can be {{x}}.",
+  "zoomPanImage": "Pan Image",
+  "zoomIn": "Zoom In",
+  "zoomOut": "Zoom Out",
+  "zoomToFit": "Zoom to fit",
+  "zoomToActualSize": "Zoom to actual size"
 }

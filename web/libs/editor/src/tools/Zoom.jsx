@@ -1,6 +1,7 @@
 import { Fragment } from "react";
 import { observer } from "mobx-react";
 import { types } from "mobx-state-tree";
+import { useTranslation } from "react-i18next";
 
 import BaseTool from "./Base";
 import ToolMixin from "../mixins/Tool";
@@ -9,13 +10,15 @@ import { FlyoutMenu } from "../components/Toolbar/FlyoutMenu";
 import { IconExpandTool, IconHandTool, IconZoomIn, IconZoomOut } from "@humansignal/icons";
 
 const ToolView = observer(({ item }) => {
+  const { t } = useTranslation();
+
   return (
     <Fragment>
       <Tool
         active={item.selected}
         icon={<IconHandTool />}
         ariaLabel="pan"
-        label="Pan Image"
+        label={t("editor:zoomPanImage")}
         shortcut="tool:pan-image"
         onClick={() => {
           const sel = item.selected;
@@ -26,7 +29,7 @@ const ToolView = observer(({ item }) => {
       <Tool
         icon={<IconZoomIn />}
         ariaLabel="zoom-in"
-        label="Zoom In"
+        label={t("editor:zoomIn")}
         shortcut="tool:zoom-in"
         onClick={() => {
           item.handleZoom(1);
@@ -36,14 +39,14 @@ const ToolView = observer(({ item }) => {
         icon={<IconExpandTool />}
         items={[
           {
-            label: "Zoom to fit",
+            label: t("editor:zoomToFit"),
             shortcut: "tool:zoom-to-fit",
             onClick: () => {
               item.sizeToFit();
             },
           },
           {
-            label: "Zoom to actual size",
+            label: t("editor:zoomToActualSize"),
             shortcut: "tool:zoom-to-actual",
             onClick: () => {
               item.sizeToOriginal();
@@ -54,7 +57,7 @@ const ToolView = observer(({ item }) => {
       <Tool
         icon={<IconZoomOut />}
         ariaLabel="zoom-out"
-        label="Zoom Out"
+        label={t("editor:zoomOut")}
         shortcut="tool:zoom-out"
         onClick={() => {
           item.handleZoom(-1);

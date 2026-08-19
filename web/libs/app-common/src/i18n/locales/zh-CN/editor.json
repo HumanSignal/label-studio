@@ -343,5 +343,10 @@
   "filterPredictionsOnly": "仅预测",
   "filterAny": "全部",
   "unresolvedComments": "未解决评论",
-  "onlyAnnotationsCan": "只有标注才能{{x}}。"
+  "onlyAnnotationsCan": "只有标注才能{{x}}。",
+  "zoomPanImage": "平移图像",
+  "zoomIn": "放大",
+  "zoomOut": "缩小",
+  "zoomToFit": "适应窗口",
+  "zoomToActualSize": "实际大小"
 }
