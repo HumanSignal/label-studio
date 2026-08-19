@@ -14,6 +14,7 @@
   "slackCommunity": "Slack Community",
   "pinMenu": "Pin menu",
   "unpinMenu": "Unpin menu",
+  "switchLanguageTooltip": "Switch language",
   "themeAuto": "Auto",
   "themeLight": "Light",
   "themeDark": "Dark"

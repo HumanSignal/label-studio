@@ -25,6 +25,7 @@ import { Dropdown } from "@humansignal/ui";
 import { Hamburger } from "../Hamburger/Hamburger";
 import { Menu } from "../Menu/Menu";
 import { VersionNotifier, VersionProvider } from "../VersionNotifier/VersionNotifier";
+import { LanguageSwitcher } from "./LanguageSwitcher";
 import "./Menubar.prefix.css";
 import "./MenuContent.prefix.css";
 import "./MenuSidebar.prefix.css";
@@ -171,6 +172,9 @@ export const Menubar = ({ enabled, defaultOpened, defaultPinned, children, onSid
                 }}
                 icon={<IconHotkeys />}
               />
+            </div>
+            <div className={[menubarClass.elem("hotkeys-button"), menubarClass.elem("language")].join(" ")}>
+              <LanguageSwitcher />
             </div>
           </div>
 

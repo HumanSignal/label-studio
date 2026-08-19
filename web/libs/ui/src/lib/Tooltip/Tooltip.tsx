@@ -184,6 +184,9 @@ const TooltipInner = forwardRef(
       ...child.props,
       ref(el: any) {
         setRef(triggerElement, el);
+        // cloneElement replaces the child's ref; keep any ref the child already
+        // carried (e.g. one a Dropdown.Trigger injected into this element) working
+        setRef((child as any).ref, el);
         setRef(ref, el);
       },
       ...(!needFallback ? { onMouseEnter, onMouseLeave } : {}),

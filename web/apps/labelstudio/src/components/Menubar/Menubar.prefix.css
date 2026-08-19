@@ -63,6 +63,10 @@
     }
   }
 
+  &__language {
+    margin-left: var(--spacing-base);
+  }
+
   &__trigger {
     display: flex;
     padding: 0 20px;
