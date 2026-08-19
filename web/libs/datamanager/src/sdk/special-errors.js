@@ -4,8 +4,8 @@ import { FF_FIT_1304_STRICT_OVERLAP, isFF } from "../utils/feature-flags";
 // (ApiProvider) so it can show modals:
 // - 403 PAUSED: user is paused in the project
 // - 400 OVERLAP_REACHED: annotation overlap limit reached (only when the feature flag is enabled)
-// Shared by lsf-sdk (annotation submit/skip) and comments-sdk (comment create/update) so a paused
-// user gets the same pause modal regardless of which write they attempt.
+// Used by lsf-sdk (annotation submit/skip) so 403 PAUSED / overlap errors bubble to the app's
+// ApiProvider handler (DataManager "error" event) instead of being swallowed as a generic DM error.
 export const errorHandlerAllowSpecialErrors = (result) => {
   const isPaused =
     result?.status === 403 &&
