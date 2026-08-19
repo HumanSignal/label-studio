@@ -76,6 +76,26 @@ gtag('config', 'UA-129877673-1');
 </script>
 
 <div class="login_page_new_ui">
+  {% get_current_language as CURRENT_LANGUAGE %}
+  <div class="lang-switch" data-testid="login-lang-switch">
+    <button type="button" data-lang="zh-CN" aria-label="切换到中文"
+            class="{% if CURRENT_LANGUAGE|slice:':2' == 'zh' %}active{% endif %}">中文</button>
+    <span aria-hidden="true">/</span>
+    <button type="button" data-lang="en" aria-label="Switch to English"
+            class="{% if CURRENT_LANGUAGE|slice:':2' != 'zh' %}active{% endif %}">English</button>
+  </div>
+  <script nonce="{{request.csp_nonce}}">
+    document.querySelectorAll('.lang-switch button[data-lang]').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var lang = btn.getAttribute('data-lang');
+        // Django pages follow the cookie (LocaleMiddleware); the React app
+        // follows localStorage — set both so the choice survives login
+        document.cookie = 'django_language=' + lang + '; path=/; max-age=31536000; samesite=lax';
+        try { localStorage.setItem('label-studio.lang', lang); } catch (e) {}
+        window.location.reload();
+      });
+    });
+  </script>
   <div class="left">
     <svg role="img" aria-label="Label Studio Logo" class="ls-logo" width="194" height="30" viewBox="0 0 194 30" fill="none" xmlns="http://www.w3.org/2000/svg">
       <title>Label Studio Logo</title>

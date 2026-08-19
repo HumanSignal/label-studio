@@ -376,3 +376,38 @@ label {
 .text-wrapper a:hover {
   text-decoration: none;
 }
+
+.lang-switch {
+  position: fixed;
+  top: 20px;
+  right: 24px;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 14px;
+}
+
+.lang-switch span {
+  color: var(--color-neutral-content-subtle);
+}
+
+.lang-switch button {
+  border: none;
+  background: none;
+  padding: 4px 8px;
+  cursor: pointer;
+  font: inherit;
+  color: var(--color-neutral-content-subtle);
+  border-radius: 6px;
+}
+
+.lang-switch button:hover {
+  color: var(--color-neutral-content);
+}
+
+.lang-switch button.active {
+  color: var(--color-neutral-content);
+  font-weight: 600;
+  background: var(--color-neutral-surface-hovering, rgba(0, 0, 0, 0.05));
+}

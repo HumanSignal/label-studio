@@ -5,10 +5,22 @@ describe("menubar language switcher", () => {
     // The app's service worker precaches ~9MB of assets on registration and
     // starves the API requests under Cypress. Block it from ever registering.
     cy.intercept("GET", "/sw.js", { statusCode: 404, body: "" }).as("blocked-sw");
+  });
 
-    cy.visit("/user/login/");
+  it("switches the Django-rendered login page language", () => {
     cy.clearCookie("django_language");
-    cy.window({ log: false }).then((win) => win.localStorage.removeItem(STORAGE_KEY));
+    cy.visit("/user/login/");
+    cy.get("[data-testid=login-lang-switch]").should("exist");
+
+    // click 中文; the page reloads in Chinese regardless of the starting locale
+    cy.contains("button", "中文").click();
+    cy.contains("h2", "登录", { timeout: 10000 }).should("exist");
+    cy.getCookie("django_language").should("have.property", "value", "zh-CN");
+
+    // and back to English
+    cy.contains("button", "English").click();
+    cy.contains("h2", "Log in", { timeout: 10000 }).should("exist");
+    cy.getCookie("django_language").should("have.property", "value", "en");
   });
 
   const login = () => {
