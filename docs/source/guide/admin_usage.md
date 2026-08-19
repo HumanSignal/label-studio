@@ -21,6 +21,9 @@ Here you can see the number of seats compared with the number of active users.
 
 Each organization has a set amount of Label Studio seats in their license. To increase your seats, contact your HumanSignal account representative. 
 
+!!! note On-premise
+    On-premise deployments can use fewer seats than their license allows by setting the `LICENSE_MAX_USERS_OVERRIDE` environment variable. It can only lower the licensed seat count, and the deployment does not start if you set it higher. Seats are counted across all organizations in the deployment. See [Available Helm values](helm_values#The-global-extraEnvironmentVars-usage).
+
 ### License info
 
 This section includes general information about your Label Studio license, such as when it was issued and when it expires. 
