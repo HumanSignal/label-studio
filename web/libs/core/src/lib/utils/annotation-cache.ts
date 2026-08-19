@@ -78,3 +78,29 @@ export const invalidateTaskAgreementCache = (taskId?: number | string) => {
     queryClient.invalidateQueries({ queryKey: ["task-agreement"] });
   }
 };
+
+type TaskAnnotationCacheSource = {
+  id?: number | string;
+  is_stub?: boolean;
+  result?: unknown;
+};
+
+type TaskCacheSource = {
+  id?: number | string;
+  annotations?: Array<TaskAnnotationCacheSource | null | undefined> | null;
+};
+
+/**
+ * Seed GET /api/annotations/:id/ cache from an already-hydrated task payload (FIT-2532).
+ * Skips stubs so FIT-720 lazy-load can still fetch the selected row.
+ */
+export const primeAnnotationCachesFromTask = (task?: TaskCacheSource | null) => {
+  if (task?.id == null || task.id === "" || !Array.isArray(task.annotations)) return;
+  for (const annotation of task.annotations) {
+    if (annotation?.id == null || annotation.id === "") continue;
+    if (annotation.is_stub) continue;
+    if (annotation.result === undefined) continue;
+    queryClient.setQueryData(annotationKeys.detail(task.id, annotation.id), annotation);
+    queryClient.setQueryData(annotationKeys.detail(undefined, annotation.id), annotation);
+  }
+};
