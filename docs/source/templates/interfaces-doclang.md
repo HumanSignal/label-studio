@@ -59,7 +59,7 @@ Both hosts must be added in **two** places on the **Organization > Settings > In
 1. **Advanced: external scripts** — enable **Allow external scripts / stylesheets**, then add `https://cdn.jsdelivr.net` and `https://unpkg.com`. This lets the Interface load the viewer and OCR libraries as `<script>`/`<style>` tags (the CSP `script-src` directive).
 2. **API origins** — add `https://cdn.jsdelivr.net` and `https://unpkg.com` here as well. This lets the Interface `fetch` the viewer assets and the OCR WASM/model files (the CSP `connect-src` directive).
 
-Only Owners and Admins can change these settings, and they apply to every Interface in the organization. Use the exact origins (scheme + host, no paths or wildcards). For full details on each section, see [Interface admin settings](admin-interfaces) and [Use external libraries and services](interfaces-libraries).
+Only Owners and Admins can change these settings, and they apply to every Interface in the organization. Use the exact origins (scheme + host, no paths or wildcards). For full details on each section, see [Interface admin settings](/guide/admin-interfaces) and [Use external libraries and services](/guide/interfaces-libraries).
 
 !!! info How to tell it's an allowlist problem
     If the preview pane shows *"Failed to load DocLang viewer … from cdn.jsdelivr.net … has not been added to the LSE org allowlist"*, or clicking OCR never returns text, the hosts above are almost certainly missing from one of the two sections. Add them to **both** and reload.
