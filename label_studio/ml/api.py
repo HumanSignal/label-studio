@@ -89,6 +89,17 @@ class MLBackendListAPI(generics.ListCreateAPIView):
 
         return ml_backends
 
+    def create(self, request, *args, **kwargs):
+        # MLBackendSerializer.validate() calls setup() on the submitted URL, handing it the
+        # project creator's API token, so authorize the target project before that runs.
+        try:
+            project = Project.objects.filter(pk=request.data.get('project')).first()
+        except (AttributeError, TypeError, ValueError):
+            project = None  # malformed payload: let the serializer reject it
+        if project is not None:
+            self.check_object_permissions(request, project)
+        return super().create(request, *args, **kwargs)
+
     def perform_create(self, serializer):
         ml_backend = serializer.save()
         ml_backend.update_state()
