@@ -545,10 +545,6 @@ class TaskAgreementAPI(generics.RetrieveAPIView):
     queryset = Task.objects.all()
 
     def get(self, request, pk):
-        # This endpoint is gated by feature flag
-        if not flag_set('fflag_fix_all_fit_720_lazy_load_annotations', user=request.user):
-            raise PermissionDenied('Feature not enabled')
-
         try:
             task = Task.objects.get(pk=pk)
         except Task.DoesNotExist:
@@ -727,10 +723,6 @@ class TaskSummaryAPI(generics.RetrieveAPIView):
     queryset = Task.objects.all()
 
     def get(self, request, pk):
-        # This endpoint is gated by feature flag
-        if not flag_set('fflag_fix_all_fit_720_lazy_load_annotations', user=request.user):
-            raise PermissionDenied('Feature not enabled')
-
         include_predictions = bool_from_request(request.GET, 'include_predictions', False)
 
         try:

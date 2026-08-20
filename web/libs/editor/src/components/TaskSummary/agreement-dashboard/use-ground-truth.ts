@@ -66,7 +66,7 @@ export interface ValueCount {
  * @param values - Per-annotator values from a DimensionInfo (null entries skipped).
  * @returns Sorted array of {value, count} pairs, descending by count.
  */
-export function computeValueCounts(values: (string | number | boolean | null)[] | null): ValueCount[] {
+export function computeValueCounts(values: unknown[] | null): ValueCount[] {
   if (!values) return [];
   const counts = new Map<string, { original: string | number | boolean; count: number }>();
 
@@ -84,7 +84,7 @@ export function computeValueCounts(values: (string | number | boolean | null)[] 
       const key = String(v);
       const entry = counts.get(key);
       if (entry) entry.count++;
-      else counts.set(key, { original: v, count: 1 });
+      else counts.set(key, { original: v as string | number | boolean, count: 1 });
     }
   }
 

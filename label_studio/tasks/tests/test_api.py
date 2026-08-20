@@ -1,7 +1,5 @@
-import unittest
 from unittest.mock import patch
 
-from core.feature_flags import flag_set
 from organizations.tests.factories import OrganizationFactory
 from projects.models import Project
 from projects.tests.factories import ProjectFactory
@@ -242,31 +240,8 @@ class TestTaskAPIResolveUri(APITestCase):
         assert response_data['text'] == 'Plain text field'
 
 
-class TestTaskAgreementAPIFeatureOff(APITestCase):
-    """When feature flag is off, agreement endpoint returns 403. Always run this test."""
-
-    @classmethod
-    def setUpTestData(cls):
-        cls.organization = OrganizationFactory()
-        cls.project = ProjectFactory(organization=cls.organization)
-        cls.user = cls.organization.created_by
-
-    @patch('tasks.api.flag_set')
-    def test_distribution_returns_403_when_feature_flag_disabled(self, mock_flag_set):
-        mock_flag_set.return_value = False
-        task = TaskFactory(project=self.project)
-        self.client.force_authenticate(user=self.user)
-        response = self.client.get(f'/api/tasks/{task.id}/agreement/')
-        assert response.status_code == 403
-        assert 'detail' in response.json() or 'error' in response.json()
-
-
-@unittest.skipUnless(
-    flag_set('fflag_fix_all_fit_720_lazy_load_annotations', user=None),
-    'Agreement API tests require fflag_fix_all_fit_720_lazy_load_annotations to be on',
-)
 class TestTaskAgreementAPI(APITestCase):
-    """Tests for TaskAgreementAPI (GET /api/tasks/<id>/agreement/). Run only when feature flag is on."""
+    """Tests for TaskAgreementAPI (GET /api/tasks/<id>/agreement/)."""
 
     @classmethod
     def setUpTestData(cls):
@@ -349,31 +324,8 @@ class TestTaskAgreementAPI(APITestCase):
         assert data['distributions']['label']['labels'] == {'Car': 3}
 
 
-class TestTaskSummaryAPIFeatureOff(APITestCase):
-    """When feature flag is off, summary endpoint returns 403. Always run this test."""
-
-    @classmethod
-    def setUpTestData(cls):
-        cls.organization = OrganizationFactory()
-        cls.project = ProjectFactory(organization=cls.organization)
-        cls.user = cls.organization.created_by
-
-    @patch('tasks.api.flag_set')
-    def test_distribution_returns_403_when_feature_flag_disabled(self, mock_flag_set):
-        mock_flag_set.return_value = False
-        task = TaskFactory(project=self.project)
-        self.client.force_authenticate(user=self.user)
-        response = self.client.get(f'/api/tasks/{task.id}/summary/')
-        assert response.status_code == 403
-        assert 'detail' in response.json() or 'error' in response.json()
-
-
-@unittest.skipUnless(
-    flag_set('fflag_fix_all_fit_720_lazy_load_annotations', user=None),
-    'Summary API tests require fflag_fix_all_fit_720_lazy_load_annotations to be on',
-)
 class TestTaskSummaryAPI(APITestCase):
-    """Tests for TaskSummaryAPI (GET /api/tasks/<id>/summary/). Run only when feature flag is on."""
+    """Tests for TaskSummaryAPI (GET /api/tasks/<id>/summary/)."""
 
     @classmethod
     def setUpTestData(cls):

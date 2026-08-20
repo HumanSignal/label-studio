@@ -22,6 +22,8 @@ export interface SharedTopBarProps {
   showViewAll: boolean;
   isViewAll: boolean;
   onToggleViewAll: () => void;
+  /** Overrides the view-all button caption; see `ViewAllToggle`. */
+  viewAllLabel?: string;
   showAddNew: boolean;
   onAddNew: () => void;
   /** Carousel slot — usually the shared AnnotationsCarousel composed by the wrapper. */
@@ -33,6 +35,7 @@ export function TopBar({
   showViewAll,
   isViewAll,
   onToggleViewAll,
+  viewAllLabel,
   showAddNew,
   onAddNew,
   children,
@@ -42,7 +45,7 @@ export function TopBar({
   return (
     <div className={cn("topbar").mod({ newLabelingUI: true }).toClassName()}>
       <div className={cn("topbar").elem("group").toClassName()}>
-        {showViewAll && <ViewAllToggle isActive={isViewAll} onClick={onToggleViewAll} />}
+        {showViewAll && <ViewAllToggle isActive={isViewAll} onClick={onToggleViewAll} label={viewAllLabel} />}
         {showAddNew && (
           <Button
             className={cn("topbar").elem("button").toClassName()}
