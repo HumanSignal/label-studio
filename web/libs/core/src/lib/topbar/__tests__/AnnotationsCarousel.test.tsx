@@ -112,19 +112,40 @@ describe("shared AnnotationsCarousel", () => {
     expect(container.querySelector(".ls-annotations-carousel__scroll")).not.toBeNull();
   });
 
-  it("applies scroll class to non-virtualized vertical container", () => {
+  it("puts annotation rows in a dedicated scroll region for non-virtualized vertical layout", () => {
+    const onAddNew = mock();
     const { container } = render(
       <AnnotationsCarousel
-        entities={[makeAnnotation("a")]}
+        entities={[makeAnnotation("a"), makeAnnotation("b")]}
         selectedId={null}
         capabilities={fullCapabilities}
         handlers={makeHandlers()}
         layout="vertical"
+        showAddNew
+        onAddNew={onAddNew}
+        emptyState={<div data-testid="carousel-empty-state">No matching results</div>}
       />,
     );
+
     const listContainer = container.querySelector(".ls-annotations-carousel__container");
+    const scrollRegion = container.querySelector(".ls-annotations-carousel__listScroll");
+    const addNewRow = screen.getByTestId("annotations-sidebar-add-new");
+    const emptyState = screen.getByTestId("carousel-empty-state");
+    const rows = Array.from(container.querySelectorAll("[data-annotation-id]"));
+
     expect(listContainer).not.toBeNull();
-    expect(listContainer?.classList.contains("ls-annotations-carousel__scroll")).toBe(true);
+    expect(scrollRegion).not.toBeNull();
+    expect(listContainer?.classList.contains("ls-annotations-carousel__scroll")).toBe(false);
+    expect(scrollRegion?.classList.contains("ls-annotations-carousel__scroll")).toBe(true);
+
+    expect(listContainer?.contains(addNewRow)).toBe(true);
+    expect(scrollRegion?.contains(addNewRow)).toBe(false);
+
+    expect(rows).toHaveLength(2);
+    for (const row of rows) {
+      expect(scrollRegion?.contains(row)).toBe(true);
+    }
+    expect(scrollRegion?.contains(emptyState)).toBe(true);
   });
 
   it("does NOT use the virtualized branch when virtualizationEnabled is false even with many items", () => {

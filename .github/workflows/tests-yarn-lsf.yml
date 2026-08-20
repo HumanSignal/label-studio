@@ -204,6 +204,8 @@ jobs:
     needs: cypress
     runs-on: ubuntu-latest
     if: always() && needs.cypress.result != 'failure'
+    env:
+      CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
     steps:
       - name: Checkout
         uses: actions/checkout@v7
@@ -240,7 +242,7 @@ jobs:
           node scripts/merge-cypress-coverage.js --chunks-dir coverage-chunks --out libs/editor/.nyc_output/out.json
 
       - name: Upload coverage to Codecov
-        if: github.event.pull_request.head.repo.fork == false && github.event.pull_request.user.login != 'dependabot[bot]'
+        if: ${{ env.CODECOV_TOKEN != '' && github.event.pull_request.user.login != 'dependabot[bot]' }}
         uses: codecov/codecov-action@v7
         with:
           name: lsf-integration

@@ -20,7 +20,13 @@ const HotkeyMock = Object.assign(
     hotkeyInstances.push(instance);
     return instance;
   },
-  { setScope: mock(), DEFAULT_SCOPE: "all" as const, keymap: {} as Record<string, any>, unbindAll: mock() },
+  {
+    setScope: mock(),
+    DEFAULT_SCOPE: "all" as const,
+    keymap: {} as Record<string, any>,
+    namespaces: () => ({}),
+    unbindAll: mock(),
+  },
 );
 
 mockModule("../../../../core/Hotkey", () => ({

@@ -40,10 +40,15 @@ describe("supportsListMembership", () => {
     expect(supportsListMembership(make("filter:tasks:updated_by"))).toBe(false);
   });
 
-  it("returns false for created_at, completed_at, total_annotations", () => {
+  it("returns true for annotation/prediction counter columns", () => {
+    expect(supportsListMembership(make("filter:tasks:total_annotations"))).toBe(true);
+    expect(supportsListMembership(make("filter:tasks:total_predictions"))).toBe(true);
+    expect(supportsListMembership(make("filter:tasks:cancelled_annotations"))).toBe(true);
+  });
+
+  it("returns false for created_at and completed_at", () => {
     expect(supportsListMembership(make("filter:tasks:created_at"))).toBe(false);
     expect(supportsListMembership(make("filter:tasks:completed_at"))).toBe(false);
-    expect(supportsListMembership(make("filter:tasks:total_annotations"))).toBe(false);
   });
 
   it("returns false for prefix-spoofing strings", () => {

@@ -16,6 +16,8 @@ jobs:
     name: "yarn unit"
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    env:
+      CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
     steps:
       - uses: hmarr/debug-action@v3.0.0
 
@@ -45,7 +47,7 @@ jobs:
           bun run test:unit:coverage
 
       - name: Upload coverage to Codecov
-        if: ${{ always() && github.event.pull_request.head.repo.fork == false && github.event.pull_request.user.login != 'dependabot[bot]' }}
+        if: ${{ always() && env.CODECOV_TOKEN != '' && github.event.pull_request.user.login != 'dependabot[bot]' }}
         uses: codecov/codecov-action@v7
         with:
           name: lsf-unit

@@ -336,6 +336,12 @@
         "decorators": ""
     },
     {
+        "url": "/api/dm/projects/<int:pk>/user-options/",
+        "module": "data_manager.api.ProjectUsersOptionsAPI",
+        "name": "data_manager:dm-project-user-options",
+        "decorators": ""
+    },
+    {
         "url": "/api/dm/project/",
         "module": "data_manager.api.ProjectStateAPI",
         "name": "data_manager:dm-project",
@@ -1278,7 +1284,7 @@
         "decorators": ""
     },
     {
-        "url": "/admin/r/<int:content_type_id>/<path:object_id>/",
+        "url": "/admin/r/<path:content_type_id>/<path:object_id>/",
         "module": "django.contrib.contenttypes.views.shortcut",
         "name": "admin:view_on_site",
         "decorators": ""

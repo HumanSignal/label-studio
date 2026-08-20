@@ -79,11 +79,10 @@ class ProjectMixin:
         )
 
     def has_permission(self, user):
-        """
-        Dummy stub for has_permission
-        """
+        # LSO always runs a single organization, so cross-org access does not exist by design;
+        # the only membership this has to reject is one that was revoked.
         user.project = self  # link for activity log
-        return True
+        return not (self.organization_id and self.organization.has_deleted(user))
 
     def _can_use_overlap(self):
         """

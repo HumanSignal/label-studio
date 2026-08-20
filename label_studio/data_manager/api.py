@@ -2,7 +2,6 @@
 
 import logging
 
-from asgiref.sync import async_to_sync, sync_to_async
 from core.current_request import CurrentContext
 from core.feature_flags import flag_set
 from core.permissions import ViewClassPermission, all_permissions
@@ -10,12 +9,13 @@ from core.utils.common import int_from_request, load_func
 from core.utils.params import bool_from_request
 from data_manager.actions import get_action_form, get_all_actions, perform_action
 from data_manager.functions import evaluate_predictions, get_prepare_params
-from data_manager.managers import get_fields_for_evaluation
+from data_manager.managers import get_fields_for_evaluation, get_visible_data_column_keys
 from data_manager.models import View
-from data_manager.prepare_params import filters_schema, ordering_schema, prepare_params_schema
 from data_manager.serializers import (
     DataManagerTaskSerializer,
+    PrepareParamsRequestSerializer,
     ViewOrderSerializer,
+    ViewRequestSerializer,
     ViewResetSerializer,
     ViewSerializer,
 )
@@ -34,27 +34,65 @@ from rest_framework.decorators import action
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from tasks.models import Annotation, Prediction, Task
+from tasks.models import Annotation, Task
 from tasks.ordering import (
     get_task_children_prefetch,
     parse_annotations_ordering_request,
 )
+from users.list_mixins import UserListMixin, UsersListPagination
+from users.list_query import ProjectUsersOptionsQuerySerializer
+from users.models import User
+from users.serializers import UserSimpleSerializer
 
 logger = logging.getLogger(__name__)
 
-_view_request_body = {
-    'application/json': {
-        'type': 'object',
-        'properties': {
-            'data': {
-                'type': 'object',
-                'description': 'Custom view data',
-                'properties': {'filters': filters_schema, 'ordering': ordering_schema},
-            },
-            'project': {'type': 'integer', 'description': 'Project ID'},
-        },
-    },
-}
+
+@extend_schema(exclude=True)
+class ProjectUsersOptionsAPI(UserListMixin, generics.ListAPIView):
+    """Lightweight project-scoped users transport for Data Manager filter options."""
+
+    action = 'list'
+    pagination_class = UsersListPagination
+    permission_required = all_permissions.projects_view
+    serializer_class = UserSimpleSerializer
+    list_query_serializer_class = ProjectUsersOptionsQuerySerializer
+
+    def uses_list_filtering(self, request=None):
+        return True
+
+    def get_list_query_params(self):
+        if not hasattr(self, '_list_query_params'):
+            query_params = self.request.query_params.copy()
+            query_params['project'] = self.kwargs['pk']
+            serializer = self.list_query_serializer_class(data=query_params)
+            serializer.is_valid(raise_exception=True)
+            self._list_query_params = serializer.validated_data
+        return self._list_query_params
+
+    def get_queryset(self):
+        organization = self.request.user.active_organization
+        queryset = User.objects.filter(om_through__organization=organization)
+        # FIT-2450: when column-scoping, keep soft-deleted org members so historical
+        # predicate actors remain selectable via the column-candidate half of the
+        # membership ∪ candidates union. Membership half still requires active OM
+        # (see UserListMixin.filter_queryset).
+        if 'column' not in self.request.query_params:
+            queryset = queryset.filter(om_through__deleted_at__isnull=True)
+        return queryset.distinct()
+
+    def get_project(self, project_id):
+        if not hasattr(self, '_project_users_project'):
+            organization_id = self.request.user.active_organization_id
+            project = generics.get_object_or_404(Project, pk=project_id, organization_id=organization_id)
+            self.check_object_permissions(self.request, project)
+            self._project_users_project = project
+        return self._project_users_project
+
+    def filter_queryset_by_project(self, queryset, project_id):
+        project = self.get_project(project_id)
+        get_user_ids_in_projects = load_func(settings.DATA_MANAGER_GET_PROJECT_USER_IDS)
+        user_ids = get_user_ids_in_projects([project.id], project.organization_id)
+        return queryset.filter(pk__in=user_ids)
 
 
 @method_decorator(
@@ -79,7 +117,7 @@ _view_request_body = {
         tags=['Data Manager'],
         summary='Create view',
         description='Create a view for a specific project.',
-        request=_view_request_body,
+        request=ViewRequestSerializer,
         responses={201: ViewSerializer},
         extensions={
             'x-fern-sdk-group-name': 'views',
@@ -110,7 +148,7 @@ _view_request_body = {
         tags=['Data Manager'],
         summary='Put view',
         description='Overwrite view data with updated filters and other information for a specific project.',
-        request=_view_request_body,
+        request=ViewRequestSerializer,
         parameters=[
             OpenApiParameter(name='id', type=OpenApiTypes.STR, location='path', description='View ID'),
         ],
@@ -128,7 +166,7 @@ _view_request_body = {
         parameters=[
             OpenApiParameter(name='id', type=OpenApiTypes.STR, location='path', description='View ID'),
         ],
-        request=_view_request_body,
+        request=ViewRequestSerializer,
         responses={200: ViewSerializer},
         extensions={
             'x-fern-sdk-group-name': 'views',
@@ -165,6 +203,11 @@ class ViewAPI(viewsets.ModelViewSet):
         PUT=all_permissions.views_change,
         DELETE=all_permissions.views_delete,
     )
+
+    def get_serializer_class(self):
+        if self.action == 'update_order':
+            return ViewOrderSerializer
+        return super().get_serializer_class()
 
     def perform_create(self, serializer):
         project = serializer.validated_data.get('project')
@@ -248,31 +291,20 @@ class ViewAPI(viewsets.ModelViewSet):
 
 
 class TaskPagination(PageNumberPagination):
+    """Paginate DM task lists and compute annotation/prediction totals.
+
+    Totals use a single Sum over denormalized ``Task.total_annotations`` /
+    ``Task.total_predictions`` (via ``paginate_totals_queryset``). The old
+    ``sync_paginate_queryset`` / ``async_paginate_queryset`` helpers that ran
+    separate ``Prediction`` / ``Annotation`` COUNT queries over
+    ``task_id__in=queryset`` were unused on the live path and removed (FIT-2416).
+    """
+
     page_size = 100
     page_size_query_param = 'page_size'
     total_annotations = 0
     total_predictions = 0
     max_page_size = settings.TASK_API_PAGE_SIZE_MAX
-
-    @async_to_sync
-    async def async_paginate_queryset(self, queryset, request, view=None):
-        predictions_count_qs = Prediction.objects.filter(task_id__in=queryset)
-        self.total_predictions = await sync_to_async(predictions_count_qs.count, thread_sensitive=True)()
-
-        annotations_count_qs = Annotation.objects.filter(task_id__in=queryset, was_cancelled=False)
-        self.total_annotations = await sync_to_async(annotations_count_qs.count, thread_sensitive=True)()
-        # Use .only('id') to avoid loading heavy task.data fields during pagination
-        # Full task objects are loaded later with proper annotations
-        id_only_queryset = queryset.only('id')
-        return await sync_to_async(super().paginate_queryset, thread_sensitive=True)(id_only_queryset, request, view)
-
-    def sync_paginate_queryset(self, queryset, request, view=None):
-        self.total_predictions = Prediction.objects.filter(task_id__in=queryset).count()
-        self.total_annotations = Annotation.objects.filter(task_id__in=queryset, was_cancelled=False).count()
-        # Use .only('id') to avoid loading heavy task.data fields during pagination
-        # Full task objects are loaded later with proper annotations
-        id_only_queryset = queryset.only('id')
-        return super().paginate_queryset(id_only_queryset, request, view)
 
     def paginate_totals_queryset(self, queryset, request, view=None):
         totals = queryset.values('id').aggregate(
@@ -346,10 +378,10 @@ class TaskListAPI(generics.ListCreateAPIView):
             fields_for_evaluation.append('state')
         return fields_for_evaluation
 
-    def get_task_serializer_context(self, request, project, queryset):
+    def get_task_serializer_context(self, request, project, queryset, prepare_params=None):
         all_fields = request.GET.get('fields', None) == 'all'  # false by default
 
-        return {
+        context = {
             'resolve_uri': bool_from_request(request.GET, 'resolve_uri', True),
             'request': request,
             'project': project,
@@ -358,6 +390,11 @@ class TaskListAPI(generics.ListCreateAPIView):
             'annotations': all_fields,
             'annotations_ordering': parse_annotations_ordering_request(request),
         }
+        if prepare_params is not None:
+            visible_data_keys = get_visible_data_column_keys(prepare_params, request.user)
+            if visible_data_keys is not None:
+                context['dm_visible_data_keys'] = visible_data_keys
+        return context
 
     def get_task_queryset(self, request, prepare_params):
         return Task.prepared.only_filtered(prepare_params=prepare_params)
@@ -437,7 +474,7 @@ class TaskListAPI(generics.ListCreateAPIView):
                 evaluate_predictions(tasks_for_predictions)
                 [tasks_by_ids[_id].refresh_from_db() for _id in ids]
 
-            context = self.get_task_serializer_context(self.request, project, tasks)
+            context = self.get_task_serializer_context(self.request, project, tasks, prepare_params=prepare_params)
             serializer = self.task_serializer_class(page, many=True, context=context)
             return self.get_paginated_response(serializer.data)
         # all tasks
@@ -446,7 +483,7 @@ class TaskListAPI(generics.ListCreateAPIView):
         queryset = Task.prepared.annotate_queryset(
             queryset, fields_for_evaluation=fields_for_evaluation, all_fields=all_fields, request=request
         )
-        context = self.get_task_serializer_context(self.request, project, queryset)
+        context = self.get_task_serializer_context(self.request, project, queryset, prepare_params=prepare_params)
         serializer = self.task_serializer_class(queryset, many=True, context=context)
         return Response(serializer.data)
 
@@ -656,9 +693,7 @@ class ProjectStateAPI(APIView):
             'Call `GET api/actions?project=<id>` to explore them. <br>'
             'Example: `GET api/actions?id=delete_tasks&project=1`'
         ),
-        request={
-            'application/json': prepare_params_schema,
-        },
+        request=PrepareParamsRequestSerializer,
         parameters=[
             OpenApiParameter(
                 name='id',

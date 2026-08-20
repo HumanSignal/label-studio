@@ -14,10 +14,11 @@ export type SelectOptionData<T = any> = {
   height?: number;
 };
 
+/** Heights match the Button of the same name: smaller 24px, small 32px, medium 40px (default). */
 export enum SelectSize {
+  SMALLER = "smaller",
   SMALL = "small",
   MEDIUM = "medium",
-  LARGE = "large",
 }
 
 export type SelectOption<T> = string | number | SelectOptionData<T>;
@@ -97,6 +98,13 @@ export type SelectProps<T, A extends SelectOption<T>[]> = {
   footer?: ReactNode;
   multiple?: boolean;
   disabled?: boolean;
+  /**
+   * When true, the trigger stays enabled so the dropdown can open for inspection,
+   * but option selection and bulk actions (Select all / group All/None) are blocked.
+   * Distinct from `disabled`, which greys out the trigger and prevents opening.
+   * Search remains available when `searchable` is set.
+   */
+  readOnly?: boolean;
   triggerProps?: any;
   isInline?: boolean;
   isLoading?: boolean;

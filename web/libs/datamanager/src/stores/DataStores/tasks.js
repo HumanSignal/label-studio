@@ -10,6 +10,12 @@ import { isActive, FF_FIT_720_LAZY_LOAD_ANNOTATIONS } from "@humansignal/core/li
 import { logLabelStreamDebug } from "@humansignal/core/lib/utils/streamDebugLog";
 
 const SIMILARITY_UPPER_LIMIT_PRECISION = 1000;
+const DM_USER_CHIP_FIELDS = ["annotators", "reviewers", "updated_by", "comment_authors"];
+const DM_USER_CHIP_COUNT_FIELDS = {
+  annotators_count: "annotators",
+  reviewers_count: "reviewers",
+  comment_authors_count: "comment_authors",
+};
 const fileAttributes = types.model({
   certainty: types.optional(types.maybeNull(types.number), 0),
   distance: types.optional(types.maybeNull(types.number), 0),
@@ -305,9 +311,36 @@ export const create = (columns) => {
 
       mergeSnapshot(taskID, taskData) {
         const task = self.list.find(({ id }) => id === taskID);
-        const snapshot = task ? { ...getSnapshot(task) } : {};
+        const existingSnapshot = task ? getSnapshot(task) : null;
+        const snapshot = existingSnapshot ? { ...existingSnapshot } : {};
 
         Object.assign(snapshot, taskData);
+
+        if (existingSnapshot) {
+          const preservedUserChipFields = new Set();
+
+          for (const field of DM_USER_CHIP_FIELDS) {
+            if (
+              Array.isArray(existingSnapshot[field]) &&
+              existingSnapshot[field].length > 0 &&
+              Array.isArray(taskData?.[field]) &&
+              taskData[field].length === 0
+            ) {
+              snapshot[field] = existingSnapshot[field];
+              preservedUserChipFields.add(field);
+            }
+          }
+
+          for (const [field, chipField] of Object.entries(DM_USER_CHIP_COUNT_FIELDS)) {
+            if (
+              preservedUserChipFields.has(chipField) &&
+              (existingSnapshot[field] ?? 0) > 0 &&
+              taskData?.[field] === 0
+            ) {
+              snapshot[field] = existingSnapshot[field];
+            }
+          }
+        }
 
         if (snapshot.predictions) {
           snapshot.predictions.forEach((p) => {

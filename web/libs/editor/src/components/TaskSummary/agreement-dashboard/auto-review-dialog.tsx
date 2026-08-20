@@ -15,7 +15,7 @@ import { cnm, Userpic } from "@humansignal/ui";
 import { IconWarning } from "@humansignal/icons";
 import { computeReviewDecisions } from "./annotation-review-logic";
 import type { AnnotatorInfo, DimensionInfo, ExistingGroundTruth } from "./types";
-import type { MSTAnnotation } from "../../../stores/types";
+import type { TaskSummaryAnnotationRef } from "../TaskSummaryDashboard";
 
 // ---------------------------------------------------------------------------
 // Per-annotator decision (for the dialog body)
@@ -112,7 +112,7 @@ const DialogBody = ({
 interface OpenAutoReviewDialogOptions {
   taskId: number | string;
   existingGt: ExistingGroundTruth;
-  annotations: MSTAnnotation[];
+  annotations: TaskSummaryAnnotationRef[];
   /** Full list of categorical dimensions — must NOT be UI-filtered.
    *  See annotation-review-logic.ts for why filtering is incorrect here. */
   dimensions: DimensionInfo[];

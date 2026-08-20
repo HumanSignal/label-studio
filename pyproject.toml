@@ -22,7 +22,7 @@ dependencies = [
     "botocore (>=1.39.3,<2.0.0)",
     "bleach (>=6.4.0)",
     "cryptography (>=44.0.1)",
-    "Django (>=5.1.8,<5.2.0)",
+    "Django (>=5.2.16,<5.3.0)",
     "django-storages (==1.12.3)",
     "django-annoying (==0.10.6)",
     "django-debug-toolbar (==3.2.1)",
@@ -73,7 +73,7 @@ dependencies = [
 ]
 
 [tool.uv.sources]
-label-studio-sdk = { git = "https://github.com/HumanSignal/label-studio-sdk.git", rev = "ef1fda62d579958ba9389b743286c55be60c3032" }
+label-studio-sdk = { git = "https://github.com/HumanSignal/label-studio-sdk.git", rev = "afc9affad1a59005c9708c8659593af383730e42" }
 
 [project.optional-dependencies]
 uwsgi = [
@@ -96,6 +96,9 @@ test = [
     "pytest-mock==3.15.1",
     "tavern==3.3.3; python_version >= '3.11'",
     "tavern==2.17.0; python_version < '3.11'",
+    # tavern 2.x (py3.10) unconditionally loads its grpc plugin because grpcio is
+    # present transitively; without grpc_reflection every tavern test errors at setup
+    "grpcio-reflection==1.78.0 ; python_full_version < '3.11'",
     "fakeredis~=2.26.1",
     "pytest-env==1.6.0; python_version >= '3.11'",
     "pytest-env==0.6.2; python_version < '3.11'",
@@ -109,7 +112,6 @@ test = [
     "moto>=4.2.6",
     "requests-mock==1.12.1",
     "factory-boy>=3.3.3,<4",
-    "grpcio-reflection==1.78.0 ; python_full_version < '3.11'",
 ]
 build = [
     "twine>=6.1.0",
@@ -117,10 +119,11 @@ build = [
 ]
 
 [build-system]
-requires = ["uv_build>=0.11.2,<0.12.0"]
+requires = ["uv_build<0.13.0"]
 build-backend = "uv_build"
 
 [tool.uv]
+required-version = ">=0.11.8"
 exclude-newer = "4 days"
 
 

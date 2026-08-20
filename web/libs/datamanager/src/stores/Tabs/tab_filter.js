@@ -33,6 +33,9 @@ export function isListMembershipOperator(operator) {
   return LIST_MEMBERSHIP_OPERATORS.has(operator);
 }
 
+/** Number columns reused as annotation-child yes/no indicators (FIT-2480). */
+export const REVIEW_INDICATOR_CHILD_ALIASES = new Set(["reviews_accepted", "reviews_rejected"]);
+
 /**
  * BROS-1203 — defensive snapshot recovery on TabFilter rehydration.
  *
@@ -196,11 +199,24 @@ export const TabFilter = types
 
       return CellViews[col.type] ?? CellViews[normalizeCellAlias(col.alias)];
     },
+
+    get isNestedChildFilter() {
+      try {
+        const parentCollection = getParent(self);
+        const owner = getParent(self, 2);
+        return owner?.child_filters === parentCollection;
+      } catch {
+        return false;
+      }
+    },
   }))
   .volatile(() => ({
     wasValid: false,
     saved: false,
     saving: false,
+    // When save() races an in-flight PATCH, schedule one follow-up write after
+    // this flow exits (setTimeout) — no loop, no recursive yield.
+    pendingSave: false,
   }))
   .actions((self) => ({
     afterAttach() {
@@ -358,9 +374,10 @@ export const TabFilter = types
     },
 
     save: flow(function* (force = false) {
-      // Defense in depth: locked tabs must not PATCH filter changes even if UI
-      // disable is bypassed. Skip no-op early returns first so mount-time
-      // setOperator→save does not toast on already-saved locked filters.
+      // Defense in depth: locked tabs must not PATCH. Opening Filters remounts
+      // FilterOperation which may call setOperator→save for hydrated rows
+      // (volatile `saved` starts false) — do not toast; the Filters Message banner
+      // is the inspect UX (FIT-2396).
       const isValid = self.isValidFilter;
 
       if (force !== true) {
@@ -370,22 +387,48 @@ export const TabFilter = types
       }
 
       if (self.view?.isLockedByManager) {
-        return self.view.notifyLocked();
+        return;
       }
 
-      if (self.saving) return;
+      // Coalesce races onto the in-flight PATCH. A follow-up is scheduled with
+      // setTimeout (same idea as setValueDelayed) so we neither recurse into
+      // this flow nor yield another save from finally.
+      if (self.saving) {
+        self.pendingSave = true;
+        return;
+      }
 
       self.saving = true;
       self.wasValid = isValid;
       self.markSaved();
       getRoot(self)?.unsetSelection();
       self.view?.clearSelection();
-      yield self.view?.save({ interaction: "filter" });
-      if (!isAlive(self)) return;
-      self.saving = false;
+      try {
+        yield self.view?.save({ interaction: "filter" });
+      } finally {
+        if (isAlive(self)) {
+          self.saving = false;
+          if (self.pendingSave) {
+            self.pendingSave = false;
+            self.markUnsaved();
+            setTimeout(() => {
+              if (!isAlive(self)) return;
+              self.save(true);
+            }, 0);
+          }
+        }
+      }
     }),
 
     setDefaultValue() {
+      // Child review indicators use Boolean widgets on Number columns, so they
+      // do not get Boolean defaultValue=false. Default to no so the child is
+      // valid and serialized (otherwise the UI shows "no" while the child is dropped).
+      const alias = self.filter?.field?.alias;
+      if (self.isNestedChildFilter && REVIEW_INDICATOR_CHILD_ALIASES.has(alias)) {
+        self.setValue(false);
+        return;
+      }
       self.setValue(getOperatorDefaultValue(self.operator) ?? self.filter.defaultValue);
     },
 

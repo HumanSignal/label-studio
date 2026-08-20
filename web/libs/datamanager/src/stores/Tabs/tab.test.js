@@ -179,6 +179,7 @@ describe("Tab locked copy by role (tabControls.lock)", () => {
     expect(tab.canManageLock).toBe(true);
     expect(tab.lockedIconTooltip).toBe("Locked by Ada Manager");
     expect(tab.lockedUpdateMessage).toBe("This tab is locked. Unlock it to update.");
+    expect(tab.lockedFiltersMessage).toBe("This tab is locked. Unlock it to change filters.");
 
     tab.notifyLocked();
     expect(toastInvoke).toHaveBeenCalledWith("toast", {
@@ -194,6 +195,7 @@ describe("Tab locked copy by role (tabControls.lock)", () => {
     expect(tab.lockedIconTooltip).toBe("Tab locked");
     expect(tab.lockedIconTooltip).not.toContain("Ada Manager");
     expect(tab.lockedUpdateMessage).toBe("This tab is locked. Changes are not allowed.");
+    expect(tab.lockedFiltersMessage).toBe("This tab is locked. Filters cannot be changed.");
 
     tab.notifyLocked();
     expect(toastInvoke).toHaveBeenCalledWith("toast", {

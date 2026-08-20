@@ -161,8 +161,14 @@ def delete_tasks_annotations(project, queryset, **kwargs):
         job_timeout=60 * 60 * 5,
     )
     if isinstance(job, Job):
+        # Skip the automatic Data Manager reload for this async action (FIT-1855): the background
+        # job is still running when the response returns, so an immediate reload would show the
+        # annotations as still present and look like the delete "did not execute on the first
+        # attempt". The frontend highlights the Refresh button instead so the user reloads once the
+        # job has finished. Mirrors the async Bulk Review action.
         return {
             'async': True,
+            'reload': False,
             'processed_items': count,
             'detail': 'Deleting ' + str(count) + ' annotations in the background',
         }

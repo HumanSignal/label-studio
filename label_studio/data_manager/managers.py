@@ -4,6 +4,7 @@ import logging
 import re
 from dataclasses import dataclass
 from datetime import datetime
+from decimal import Decimal, InvalidOperation
 from functools import reduce
 from typing import ClassVar
 
@@ -65,6 +66,8 @@ class _Operator(BaseModel):
 Operator = _Operator()
 USER_FILTER_FIELDS = frozenset({'annotators', 'updated_by', 'reviewers', 'comment_authors', 'skipped_by_annotator'})
 USER_FILTER_VALUE_OPERATORS = frozenset({Operator.CONTAINS, Operator.NOT_CONTAINS})
+# Fields whose root/child hooks implement "is empty". skipped_by_annotator does not (FIT-2435).
+USER_FILTER_EMPTY_FIELDS = frozenset({'annotators', 'updated_by', 'reviewers', 'comment_authors'})
 LEGACY_USER_FILTER_OPERATORS = {
     Operator.EQUAL: Operator.CONTAINS,
     Operator.IN_LIST: Operator.CONTAINS,
@@ -73,10 +76,45 @@ LEGACY_USER_FILTER_OPERATORS = {
 }
 
 
+def allowed_user_filter_operators(field_name):
+    """Operators permitted for a user-list filter field (serializer + apply_filters)."""
+    allowed = set(USER_FILTER_VALUE_OPERATORS)
+    if field_name in USER_FILTER_EMPTY_FIELDS:
+        allowed.add(Operator.EMPTY)
+    return frozenset(allowed)
+
+
+class ResolvedUserFilterIds(list):
+    """Marker for IDs expanded by trusted backend code after client-input validation."""
+
+
 def validate_user_filter_operator(field_name, operator, value):
-    if field_name in USER_FILTER_FIELDS and isinstance(value, list) and operator not in USER_FILTER_VALUE_OPERATORS:
-        allowed = ', '.join(sorted(USER_FILTER_VALUE_OPERATORS))
-        raise ValidationError(f'List-valued user filters support only these operators: {allowed}.')
+    """Reject unsupported operators for user-list filters (FIT-2435).
+
+    List-valued membership filters only support contains / not_contains.
+    Empty is allowed only for fields in USER_FILTER_EMPTY_FIELDS.
+    Legacy scalar equal/not_equal/in_list remain accepted so normalize_persisted_user_filter
+    can recover historical views.
+    """
+    if field_name not in USER_FILTER_FIELDS:
+        return
+
+    if isinstance(value, list):
+        if operator not in USER_FILTER_VALUE_OPERATORS:
+            allowed = ', '.join(sorted(USER_FILTER_VALUE_OPERATORS))
+            raise ValidationError(f'List-valued user filters support only these operators: {allowed}.')
+        return
+
+    allowed = allowed_user_filter_operators(field_name)
+    if operator in allowed:
+        return
+    if operator in LEGACY_USER_FILTER_OPERATORS:
+        return
+
+    allowed_label = ', '.join(sorted(allowed))
+    raise ValidationError(
+        f'User filter "{field_name}" does not support operator "{operator}". Allowed: {allowed_label}.'
+    )
 
 
 def normalize_persisted_user_filter(field_name, operator, value):
@@ -84,6 +122,9 @@ def normalize_persisted_user_filter(field_name, operator, value):
     if field_name not in USER_FILTER_FIELDS:
         return operator, value
     if operator == Operator.EMPTY:
+        if field_name not in USER_FILTER_EMPTY_FIELDS:
+            # Drop unsupported empty (e.g. skipped_by_annotator) to a no-op contains.
+            return Operator.CONTAINS, []
         try:
             empty_value = cast_bool_from_str(value)
         except ValueError:
@@ -149,6 +190,23 @@ class CustomFilterResult:
     consume_child_filter: bool = False
 
 
+def filters_contain_invalid_regex(filters) -> bool:
+    """Return True when any parent or child filter has an uncompilable regex pattern.
+
+    Runs before custom emitters so consumed child regexes cannot reach PostgreSQL.
+    """
+    for parent in filters.items:
+        for _filter in (parent, *parent.child_filters):
+            if _filter.value is None or _filter.operator != Operator.REGEX:
+                continue
+            try:
+                re.compile(pattern=str(_filter.value))
+            except Exception as e:
+                logger.info('Incorrect regex for filter: %s: %s', _filter.value, str(e))
+                return True
+    return False
+
+
 operators = {
     Operator.EQUAL: '',
     Operator.NOT_EQUAL: '',
@@ -170,9 +228,16 @@ KNOWN_FILTER_VALUE_TYPES = {
     'reviewed': 'bool',
 }
 
-# Fields supported by the public `in_list` / `not_in_list` operators (BROS-1203).
+# Fields supported by the public `in_list` / `not_in_list` operators (BROS-1203 / FIT-2416).
 # `data__*` keys are accepted via _is_supported_in_list_field.
-SUPPORTED_IN_LIST_FIELDS = {'id', 'inner_id'}
+# Number counter columns use Django `__in` directly (avoids N OR'd equal filters).
+SUPPORTED_IN_LIST_FIELDS = {
+    'id',
+    'inner_id',
+    'total_annotations',
+    'total_predictions',
+    'cancelled_annotations',
+}
 
 
 def get_fields_for_filter_ordering(prepare_params):
@@ -333,6 +398,45 @@ def get_fields_for_evaluation(prepare_params, user, skip_regular=True):
     return result
 
 
+def get_visible_data_column_keys(prepare_params, user):
+    """Return task.data keys that are visible in the current DM view, or None if unrestricted.
+
+    When ``hiddenColumns`` is present, keys hidden in both explore and labeling modes are
+    excluded so list responses can skip URI resolution / payload for those columns (FIT-2416).
+    Returns None when visibility cannot be determined (no hiddenColumns / multi-project).
+    """
+    if prepare_params is None or getattr(prepare_params, 'is_multi_project', False):
+        return None
+    data = getattr(prepare_params, 'data', None) or {}
+    hidden_columns = data.get('hiddenColumns')
+    if not hidden_columns:
+        return None
+
+    from projects.models import Project
+
+    from label_studio.data_manager.functions import TASKS
+
+    GET_ALL_COLUMNS = load_func(settings.DATA_MANAGER_GET_ALL_COLUMNS)
+    project = Project.objects.get(id=prepare_params.project)
+    all_columns = GET_ALL_COLUMNS(project, user)['columns']
+    data_column_ids = {c['id'] for c in all_columns if c.get('parent') == 'data'}
+    if not data_column_ids:
+        return frozenset()
+
+    hidden = set(hidden_columns.get('explore', [])) & set(hidden_columns.get('labeling', []))
+    # hiddenColumns store ids as ``tasks:data.<key>`` or ``tasks:<id>`` for non-data.
+    hidden_data_keys = set()
+    prefix = f'{TASKS}data.'
+    for column_id in hidden:
+        if column_id.startswith(prefix):
+            hidden_data_keys.add(column_id[len(prefix) :])
+        elif column_id.startswith(TASKS) and column_id[len(TASKS) :] in data_column_ids:
+            # Rare: data child listed without data. prefix
+            hidden_data_keys.add(column_id[len(TASKS) :])
+
+    return frozenset(data_column_ids - hidden_data_keys)
+
+
 def apply_ordering(queryset, ordering, project, request, view_data=None):
     if ordering:
         preprocess_field_name = load_func(settings.PREPROCESS_FIELD_NAME)
@@ -468,14 +572,15 @@ def validate_in_list_filter(_filter, field_name: str) -> str:
       - 'skip' — empty `not_in_list` after normalization: drop the filter entirely.
 
     Raises ValidationError for unsupported fields. Only triggers when the *original*
-    operator is in_list / not_in_list, so the legacy `annotations_ids contains→in_list`
-    rewrite (below) remains unaffected.
+    operator is in_list / not_in_list, so legacy ``annotations_ids`` contains/not_contains
+    filters handled by ``annotation_id_filter_q`` remain unaffected.
     """
     if _filter.operator not in (Operator.IN_LIST, Operator.NOT_IN_LIST):
         return 'ok'
     if not _is_supported_in_list_field(field_name):
         raise ValidationError(
-            '`is any of` / `is none of` support only Task ID, Inner ID, and task.data.* fields in this release.'
+            '`is any of` / `is none of` support Task ID, Inner ID, annotation/prediction counters, '
+            'and task.data.* fields.'
         )
     if not isinstance(_filter.value, list):
         raise ValidationError('Filter value must be a list for `is any of` / `is none of`.')
@@ -535,7 +640,11 @@ def parse_user_filter_ids(value):
     """Parse a scalar or list user-filter value into deduped integer user ids (FIT-2253)."""
     if value is None:
         return []
-    if isinstance(value, list) and len(value) > settings.DATA_MANAGER_LIST_FILTER_MAX_VALUES:
+    if (
+        isinstance(value, list)
+        and not isinstance(value, ResolvedUserFilterIds)
+        and len(value) > settings.DATA_MANAGER_LIST_FILTER_MAX_VALUES
+    ):
         raise ValidationError(
             f'User filter list exceeds maximum size of {settings.DATA_MANAGER_LIST_FILTER_MAX_VALUES}.'
         )
@@ -553,6 +662,81 @@ def parse_user_filter_ids(value):
             seen.add(user_id)
             ids.append(user_id)
     return ids
+
+
+def _annotation_id(value):
+    """Return an exact integer ID, accepting integer-valued Number representations only."""
+    if isinstance(value, bool):
+        return None
+    if isinstance(value, int):
+        return value
+    try:
+        number = Decimal(str(value).strip())
+    except (AttributeError, InvalidOperation, ValueError):
+        return None
+    if not number.is_finite() or number != number.to_integral_value():
+        return None
+    return int(number)
+
+
+def annotation_id_filter_q(field_name, operator, value):
+    """Compile an annotation-ID filter in a strict integer domain.
+
+    Positive legacy ``contains`` filters keep valid tokens for compatibility.
+    Negative membership rejects the whole mixed list because dropping an invalid
+    token would broaden the result. Empty fragments from trailing separators are
+    skipped, not treated as malformed. Every other malformed value is a contradiction.
+    """
+    contradiction = Q(pk__in=[])
+    if operator in {Operator.CONTAINS, Operator.NOT_CONTAINS}:
+        raw_values = value if isinstance(value, list) else re.split(r'[,;\s]+', str(value))
+        ids = []
+        invalid = False
+        for raw_value in raw_values:
+            if str(raw_value).strip() == '':
+                continue
+            annotation_id = _annotation_id(raw_value)
+            if annotation_id is None:
+                invalid = True
+                continue
+            ids.append(annotation_id)
+        if not ids or (operator == Operator.NOT_CONTAINS and invalid):
+            return contradiction
+        expression = Q(**{f'{field_name}__in': list(dict.fromkeys(ids))})
+        return ~expression if operator == Operator.NOT_CONTAINS else expression
+
+    if operator == Operator.EMPTY:
+        try:
+            return Q(**{f'{field_name}__isnull': cast_bool_from_str(value)})
+        except ValueError:
+            return contradiction
+
+    if operator in {Operator.IN, Operator.NOT_IN}:
+        if not hasattr(value, 'min') or not hasattr(value, 'max'):
+            return contradiction
+        minimum = _annotation_id(value.min)
+        maximum = _annotation_id(value.max)
+        if minimum is None or maximum is None:
+            return contradiction
+        expression = Q(**{f'{field_name}__gte': minimum, f'{field_name}__lte': maximum})
+        return ~expression if operator == Operator.NOT_IN else expression
+
+    annotation_id = _annotation_id(value)
+    if annotation_id is None:
+        return contradiction
+    lookups = {
+        Operator.EQUAL: '',
+        Operator.NOT_EQUAL: '',
+        Operator.LESS: '__lt',
+        Operator.GREATER: '__gt',
+        Operator.LESS_OR_EQUAL: '__lte',
+        Operator.GREATER_OR_EQUAL: '__gte',
+    }
+    lookup = lookups.get(operator)
+    if lookup is None:
+        return contradiction
+    expression = Q(**{f'{field_name}{lookup}': annotation_id})
+    return ~expression if operator == Operator.NOT_EQUAL else expression
 
 
 def add_user_filter(enabled, key, _filter, filter_expressions):
@@ -581,8 +765,14 @@ def apply_filters(queryset, filters, project, request):
     if not filters:
         return queryset
 
+    # Fail closed before custom emitters build ``__regex`` Q objects (FIT-2460).
+    if filters_contain_invalid_regex(filters):
+        return queryset.none()
+
     # convert conjunction to orm statement
     custom_filter_expressions = load_func(settings.DATA_MANAGER_CUSTOM_FILTER_EXPRESSIONS)
+    preprocess_field_name = load_func(settings.PREPROCESS_FIELD_NAME)
+    preprocess_filter = load_func(settings.DATA_MANAGER_PREPROCESS_FILTER)
 
     # Combine child filters with their parent in the same filter expression.
     # Result-parent hooks consume this complete line and compile one correlated
@@ -605,7 +795,6 @@ def apply_filters(queryset, filters, project, request):
                 continue
 
             # django orm loop expression attached to column name
-            preprocess_field_name = load_func(settings.PREPROCESS_FIELD_NAME)
             field_name, _ = preprocess_field_name(_filter.filter, project)
             if _is_stale_agreement_field(queryset, field_name):
                 logger.warning('Skipping stale agreement filter field: %s', field_name)
@@ -613,12 +802,11 @@ def apply_filters(queryset, filters, project, request):
             validate_user_filter_operator(field_name, _filter.operator, _filter.value)
 
             # filter pre-processing, value type conversion, etc..
-            preprocess_filter = load_func(settings.DATA_MANAGER_PREPROCESS_FILTER)
             _filter = preprocess_filter(_filter, field_name)
 
             # Semantic validation for in_list / not_in_list (BROS-1203). Runs *before*
-            # the LSE custom hook and *before* the legacy `annotations_ids contains→in_list`
-            # rewrite so the rewrite path remains untouched.
+            # the LSE custom hook and *before* the annotations_ids compiler so public
+            # in_list allowlisting stays independent of annotation-ID filter semantics.
             in_list_status = validate_in_list_filter(_filter, field_name)
             if in_list_status == 'none':
                 # Empty `in_list`: this filter line matches no rows. Append a contradiction
@@ -679,16 +867,8 @@ def apply_filters(queryset, filters, project, request):
 
             # annotation ids
             if field_name == 'annotations_ids':
-                field_name = 'annotations__id'
-                if 'contains' in _filter.operator:
-                    # convert string like "1 2,3" => [1,2,3]
-                    _filter.value = [
-                        int(value) for value in re.split(',|;| ', _filter.value) if value and value.isdigit()
-                    ]
-                    _filter.operator = 'in_list' if _filter.operator == 'contains' else 'not_in_list'
-                elif 'equal' in _filter.operator:
-                    if not _filter.value.isdigit():
-                        _filter.value = 0
+                filter_expressions.append(annotation_id_filter_q('annotations__id', _filter.operator, _filter.value))
+                continue
 
             # predictions model versions
             if field_name == 'predictions_model_versions' and _filter.operator == Operator.CONTAINS:
@@ -761,14 +941,6 @@ def apply_filters(queryset, filters, project, request):
 
                 filter_expressions.append(q)
                 continue
-
-            # regex pattern check
-            elif _filter.operator == 'regex':
-                try:
-                    re.compile(pattern=str(_filter.value))
-                except Exception as e:
-                    logger.info('Incorrect regex for filter: %s: %s', _filter.value, str(e))
-                    return queryset.none()
 
             # append operator
             field_name = f'{clean_field_name}{operators.get(_filter.operator, "")}'
@@ -1170,6 +1342,8 @@ class PreparedTaskManager(models.Manager):
             if project is None:
                 first_task = queryset.first()
                 project = None if first_task is None else first_task.project
+                if project is not None:
+                    queryset.project = project
             overlay_map = overlay_func(request=request, project=project) or {}
             if isinstance(overlay_map, dict) and overlay_map:
                 # Only add overlay_map keys if they're explicitly requested in fields_for_evaluation
@@ -1199,6 +1373,8 @@ class PreparedTaskManager(models.Manager):
         if project is None:
             first_task = queryset.first()
             project = None if first_task is None else first_task.project
+            if project is not None:
+                queryset.project = project
 
         # db annotations applied only if we need them in ordering or filters
         for field in annotations_map.keys():
@@ -1252,9 +1428,13 @@ class PreparedTaskManager(models.Manager):
         # Support both single and multiple projects
         if prepare_params.is_multi_project:
             queryset = TaskQuerySet(self.model).filter(project__in=prepare_params.projects)
+            project = Project.objects.get(pk=prepare_params.projects[0])
+            queryset.project = project
         else:
             queryset = TaskQuerySet(self.model).filter(project=prepare_params.project)
             project = Project.objects.get(pk=prepare_params.project)
+            # Attach project before annotate_queryset so it does not call queryset.first().
+            queryset.project = project
             _set_prefilter_task_ids_for_agreement(request, queryset, prepare_params, project)
         fields_for_filter_ordering = get_fields_for_filter_ordering(prepare_params)
         queryset = self.annotate_queryset(queryset, fields_for_evaluation=fields_for_filter_ordering, request=request)

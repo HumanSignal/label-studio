@@ -53,6 +53,11 @@
   align-items: stretch;
 }
 
+/* Lets the chip use the width the container offers and truncate only when it runs out. */
+.simpleChip {
+  max-width: 100%;
+}
+
 .compoundChip {
   display: inline-flex;
   align-items: center;
@@ -84,8 +89,10 @@
 }
 
 .chipSelect {
-  min-height: 24px !important;
-  height: 24px !important;
+  /* Steps of Select's own size scale: `smaller` by default, `small` where a touch target is needed. */
+  --chip-select-height: var(--spacing-600);
+
+  height: var(--chip-select-height) !important;
   min-width: auto;
   width: auto;
   padding-left: var(--spacing-tighter);
@@ -129,4 +136,10 @@
 
 .dropdown {
   min-width: min(480px, calc(100vw - var(--spacing-wider)));
+}
+
+@media (max-width: 720px) {
+  .chipSelect {
+    --chip-select-height: var(--spacing-800);
+  }
 }

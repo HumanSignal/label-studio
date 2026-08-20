@@ -1,0 +1,14 @@
+/* Replace the Select component's inset focus shadow with an outset focus ring. */
+.form-select__list button:focus {
+  box-shadow: 0 0 0 4px var(--color-primary-focus-outline) !important;
+}
+
+/* Inside Filters (popover + sidebar) the ring tightens to 2px to match the
+   other filter controls; everywhere else UserSelect keeps the 4px default. */
+.filters .form-select__list:focus {
+  box-shadow: 0 0 0 2px var(--color-primary-focus-outline) !important;
+}
+
+.filters .form-select__list button:focus {
+  box-shadow: 0 0 0 2px var(--color-primary-focus-outline) !important;
+}

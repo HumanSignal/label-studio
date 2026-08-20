@@ -307,6 +307,7 @@ export const VideoCanvas = memo(
       } else if (video) {
         // If the video never loaded and errored, we can't do anything about it
         // so report it to the consumer
+        setLoading(false);
         props.onError?.(video.error);
       }
     }, [props.onError]);

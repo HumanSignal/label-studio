@@ -62,10 +62,21 @@ export type DataTableSizes<T extends DataShape> = {
 };
 
 /**
+ * Which edge a column's header label sits against.
+ *
+ * Numeric columns are conventionally right-aligned in their cells, and the header has to follow or the
+ * label floats away from the figures underneath it. Declare it here rather than reaching into the header's
+ * internal layout from a consumer stylesheet.
+ */
+export type DataTableColumnAlign = "left" | "right";
+
+/**
  * Extended ColumnDef type that includes custom properties for generic DataTable
  */
 export type ExtendedDataTableColumnDef<T> = ColumnDef<T> & {
   help?: string; // Optional help text to display in a tooltip with info icon
+  /** Header label alignment within the header cell. Defaults to "left". */
+  align?: DataTableColumnAlign;
 };
 
 export type DataTableProps<T extends DataShape> = {
@@ -276,6 +287,7 @@ export const DataTable = <T extends DataShape>(props: DataTableProps<T>) => {
             enableSorting={columnSortingEnabled}
             originalHeader={originalHeader}
             help={extendedCol.help}
+            align={extendedCol.align}
           />
         ),
       };
@@ -918,6 +930,8 @@ export type HeaderProps<T> = {
   enableSorting?: boolean;
   originalHeader?: string | React.ReactNode;
   help?: string; // Optional help text to display in a tooltip with info icon
+  /** Header label alignment within the header cell. Defaults to "left". */
+  align?: DataTableColumnAlign;
 };
 
 export const Header = <T,>({
@@ -927,6 +941,7 @@ export const Header = <T,>({
   enableSorting = false,
   originalHeader,
   help,
+  align = "left",
 }: HeaderProps<T>) => {
   // Get header label - use originalHeader if provided, otherwise try to extract from columnDef
   let headerLabel: string | React.ReactNode;
@@ -949,7 +964,11 @@ export const Header = <T,>({
 
   const headerContent = (
     <div className={cn(styles.headerContent, help && "gap-tighter")}>
-      <div className="flex items-center gap-2">
+      {/* Right-aligned labels reach the far edge via an auto left margin rather than by stretching this
+          group: stretching it lets the label shrink, and since the overflow is clipped from the start of a
+          right-aligned string, a long label in a narrow column loses its first words ("ed to pay (est.)").
+          An auto margin keeps the label at its content width and pushes it over instead. */}
+      <div className={cn("flex items-center gap-2", align === "right" && "ml-auto")}>
         {isStringHeader ? (
           <Typography variant="label" size="small" className={cn(isSorted && styles.headerTextSorted)}>
             {headerLabel}

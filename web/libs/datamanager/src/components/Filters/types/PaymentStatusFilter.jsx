@@ -1,6 +1,6 @@
 import { Select } from "@humansignal/ui";
 
-const BaseInput = ({ schema, value, onChange, placeholder }) => {
+const BaseInput = ({ schema, value, onChange, placeholder, disabled, readOnly }) => {
   const options = (schema?.items ?? []).map((item) => ({
     value: item.value,
     label: item.title,
@@ -14,8 +14,10 @@ const BaseInput = ({ schema, value, onChange, placeholder }) => {
       onChange={onChange}
       placeholder={placeholder}
       searchable={true}
+      disabled={disabled}
+      readOnly={readOnly}
       onSearch={(query) => options.filter((option) => option.textLabel.toLowerCase().includes(query.toLowerCase()))}
-      size="small"
+      size="smaller"
       triggerClassName="min-w-[100px]"
     />
   );

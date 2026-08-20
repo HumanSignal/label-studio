@@ -1,4 +1,4 @@
-import { Badge, Select } from "@humansignal/ui";
+import { Badge, Select, cnm } from "@humansignal/ui";
 import { IconSpark } from "@humansignal/icons";
 import { useCallback, useMemo } from "react";
 
@@ -260,25 +260,27 @@ export const searchFilterByLabel = (option, queryString) => {
 /**
  * Option content for ColumnPicker: title + icon/tag + EnterpriseBadge.
  */
-export const ColumnPickerOptionContent = ({ option }) => {
+export const ColumnPickerOptionContent = ({ option, truncate = false }) => {
   const { enterpriseBadge, icon, readableType, label, groupTitle } = option ?? {};
   const badge = icon ? (
-    <div className="w-5 h-5 flex items-center justify-center flex-shrink-0">{icon}</div>
+    <div className="w-3.5 h-3.5 flex items-center justify-center flex-shrink-0 [&_svg]:max-w-full [&_svg]:max-h-full [&_svg]:w-full [&_svg]:h-full">
+      {icon}
+    </div>
   ) : readableType ? (
     <Badge size="small" variant="primary">
       {readableType}
     </Badge>
   ) : null;
   return (
-    <span className="flex items-center justify-between w-full gap-base">
-      <span className="flex items-center gap-tighter">
+    <span className={cnm("flex items-center justify-between w-full gap-base", truncate && "min-w-0 overflow-hidden")}>
+      <span className={cnm("flex items-center gap-tighter", truncate && "min-w-0 overflow-hidden")}>
         {groupTitle && (
           <>
             <span className="text-neutral-content-subtler">{groupTitle}</span>
             <span className="text-neutral-content-subtlest">{" > "}</span>
           </>
         )}
-        <span className="text-neutral-content">{label}</span>
+        <span className={cnm("text-neutral-content", truncate && "truncate")}>{label}</span>
       </span>
 
       <div className="flex items-center gap-tight flex-shrink-0 pointer-events-none">
@@ -295,10 +297,17 @@ export const ColumnPickerOptionContent = ({ option }) => {
 
 // ── Unified component ─────────────────────────────────────────────────────────
 
-const MEDIUM_TRIGGER_STYLE = {
-  height: 32,
+/**
+ * Data Manager's scale runs one step denser than the shared one: a "medium" toolbar control is 32px
+ * and a "small" filter row is 24px.
+ */
+const SELECT_SIZE_BY_DM_SIZE = {
+  medium: "small",
+  small: "smaller",
+};
+
+const MEDIUM_TRIGGER_EMPHASIS = {
   color: "var(--color-neutral-content)",
-  fontSize: "var(--font-size-14)",
   fontWeight: "var(--font-weight-medium)",
 };
 
@@ -326,6 +335,7 @@ export function ColumnPicker({
   multiple = false,
   size = "medium",
   disabled,
+  readOnly,
   placeholder,
   renderSelected,
   triggerProps,
@@ -371,15 +381,16 @@ export function ColumnPicker({
       optionRenderer={ColumnPickerOptionContent}
       renderSelected={renderSelected}
       placeholder={placeholder}
-      size={size}
+      size={SELECT_SIZE_BY_DM_SIZE[size] ?? size}
       disabled={disabled}
+      readOnly={readOnly}
       dataTestid={dataTestid}
       triggerClassName={triggerClassName}
       showGroupActions={multiple}
       triggerProps={{
         ...triggerProps,
         style: {
-          ...(size === "medium" && MEDIUM_TRIGGER_STYLE),
+          ...(size === "medium" && MEDIUM_TRIGGER_EMPHASIS),
           ...triggerProps?.style,
         },
       }}

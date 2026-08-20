@@ -26,7 +26,7 @@ env:
 jobs:
   build:
     name: "Yarn docs"
-    if: "${{ github.event.commit.message != 'docs: Update tag docs and autocomplete dictionary' }}"
+    if: "${{ github.repository_owner == 'HumanSignal' && github.event.commit.message != 'docs: Update tag docs and autocomplete dictionary' }}"
     runs-on: ubuntu-latest
     steps:
       - uses: hmarr/debug-action@v3.0.0

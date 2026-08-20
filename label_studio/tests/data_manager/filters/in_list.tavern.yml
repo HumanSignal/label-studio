@@ -243,7 +243,7 @@ stages:
     response:
       status_code: 400
 
-  - name: setup_view_unsupported_field_total_annotations
+  - name: setup_view_unsupported_field_created_at
     request:
       method: POST
       url: '{django_live_url}/api/dm/views/?project={project_pk}'
@@ -253,10 +253,10 @@ stages:
             "conjunction": "and",
             "items": [
             {
-              "filter": "filter:tasks:total_annotations",
+              "filter": "filter:tasks:created_at",
               "operator": "in_list",
-              "type": "Number",
-              "value": [0, 1]
+              "type": "Datetime",
+              "value": ["2024-01-01"]
             }
             ]
           }

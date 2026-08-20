@@ -12,7 +12,6 @@ STALE_FEATURE_FLAGS = {
     'fflag_fix_front_dev_3377_image_regions_shift_on_resize_280922_short': True,
     # Jan 5
     'fflag_feat_all_fit_524_review_time_chart': True,
-    'fflag_feat_523_emitting_task_events_for_annotation_and_review': True,
     'fflag_feat_all_fit_162_workspaces_projects_ui_improvements': True,
     'fflag_feat_front_fit_183_email_notifications_short': True,
     'fflag_fix_back_optic_1380_dashboard_task_chart_grouped_by_completed_at_reviewed_at_short': True,
@@ -61,7 +60,6 @@ STALE_FEATURE_FLAGS = {
     'fflag_fix_front_fit_31_synced_media_buffering': False,
     # May 11
     'ff_front_dev_2669_paragraph_author_filter_210622_short': True,
-    'fflag_feat_front_lsdv_5038_enhanced_review_contextual_scrolling_short': True,
     'fflag_fix_all_optic_18_dashboard_label_distribution_chart_async_22082023_short': False,
     'fflag_fix_all_optic_79_task_count_is_wrong_short': True,
 }

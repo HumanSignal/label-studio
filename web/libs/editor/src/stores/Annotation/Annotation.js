@@ -177,6 +177,9 @@ const _Annotation = types
     loadedDate: types.optional(types.Date, () => new Date()),
     leadTime: types.maybeNull(types.number),
 
+    // LSE review badge / filter state from API accepted_state (stub and full payloads).
+    acceptedState: types.maybeNull(types.string),
+
     // @todo use types.Date
     draftSaved: types.maybe(types.string),
 

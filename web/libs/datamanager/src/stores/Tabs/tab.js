@@ -12,6 +12,8 @@ const THRESHOLD_MIN = 0;
 const THRESHOLD_MIN_DIFF = 0.001;
 const LOCKED_TAB_UPDATE_MESSAGE = "This tab is locked. Unlock it to update.";
 const LOCKED_TAB_READONLY_MESSAGE = "This tab is locked. Changes are not allowed.";
+const LOCKED_TAB_FILTERS_UPDATE_MESSAGE = "This tab is locked. Unlock it to change filters.";
+const LOCKED_TAB_FILTERS_READONLY_MESSAGE = "This tab is locked. Filters cannot be changed.";
 
 import { validateFilterSnapshot } from "./filter_snapshot_utils";
 
@@ -80,8 +82,10 @@ export const Tab = types
     },
 
     get targetColumns() {
+      // `hidden` columns are filter-only (or otherwise non-toggleable) and must not
+      // appear in the Columns / Order By pickers (FIT-2435).
       return self.columns.filter((c) => {
-        return c.target === self.target && !c.isAnnotationResultsFilterColumn;
+        return c.target === self.target && !c.hidden;
       });
     },
 
@@ -161,6 +165,10 @@ export const Tab = types
 
     get lockedUpdateMessage() {
       return self.canManageLock ? LOCKED_TAB_UPDATE_MESSAGE : LOCKED_TAB_READONLY_MESSAGE;
+    },
+
+    get lockedFiltersMessage() {
+      return self.canManageLock ? LOCKED_TAB_FILTERS_UPDATE_MESSAGE : LOCKED_TAB_FILTERS_READONLY_MESSAGE;
     },
 
     get validFilters() {

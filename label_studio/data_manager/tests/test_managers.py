@@ -671,11 +671,92 @@ class TestParseUserFilterIds(TestCase):
 
     @override_settings(DATA_MANAGER_LIST_FILTER_MAX_VALUES=2)
     def test_list_value_size_is_bounded(self):
-        from data_manager.managers import parse_user_filter_ids
+        from data_manager.managers import ResolvedUserFilterIds, parse_user_filter_ids
         from rest_framework.exceptions import ValidationError
 
         with self.assertRaises(ValidationError):
             parse_user_filter_ids([1, 2, 3])
+        self.assertEqual(parse_user_filter_ids(ResolvedUserFilterIds([1, 2, 3])), [1, 2, 3])
+
+
+class TestValidateUserFilterOperator(TestCase):
+    """FIT-2435: unified allowlist for user-list filter + operator combos."""
+
+    # Operators that must never reach ORM fallthrough for these fields.
+    NAUGHTY_SCALAR_OPERATORS = (
+        'regex',
+        'less',
+        'greater',
+        'less_or_equal',
+        'greater_or_equal',
+        'in',
+        'not_in',
+        'unknown_op',
+    )
+    NAUGHTY_LIST_OPERATORS = (
+        'empty',
+        'equal',
+        'not_equal',
+        'regex',
+        'in_list',
+        'not_in_list',
+        'less',
+        'greater',
+    )
+
+    def test_empty_allowed_only_for_fields_that_implement_it(self):
+        from data_manager.managers import (
+            USER_FILTER_EMPTY_FIELDS,
+            USER_FILTER_FIELDS,
+            validate_user_filter_operator,
+        )
+        from rest_framework.exceptions import ValidationError
+
+        for field_name in USER_FILTER_FIELDS:
+            with self.subTest(field_name=field_name):
+                if field_name in USER_FILTER_EMPTY_FIELDS:
+                    validate_user_filter_operator(field_name, 'empty', True)
+                    validate_user_filter_operator(field_name, 'empty', False)
+                else:
+                    with self.assertRaises(ValidationError):
+                        validate_user_filter_operator(field_name, 'empty', True)
+
+    def test_rejects_naughty_scalar_operators_for_every_user_field(self):
+        from data_manager.managers import USER_FILTER_FIELDS, validate_user_filter_operator
+        from rest_framework.exceptions import ValidationError
+
+        for field_name in USER_FILTER_FIELDS:
+            for operator in self.NAUGHTY_SCALAR_OPERATORS:
+                with self.subTest(field_name=field_name, operator=operator):
+                    with self.assertRaises(ValidationError):
+                        validate_user_filter_operator(field_name, operator, 1)
+
+    def test_rejects_naughty_list_operators_for_every_user_field(self):
+        from data_manager.managers import USER_FILTER_FIELDS, validate_user_filter_operator
+        from rest_framework.exceptions import ValidationError
+
+        for field_name in USER_FILTER_FIELDS:
+            for operator in self.NAUGHTY_LIST_OPERATORS:
+                with self.subTest(field_name=field_name, operator=operator):
+                    with self.assertRaises(ValidationError):
+                        validate_user_filter_operator(field_name, operator, [1])
+
+    def test_allows_contains_and_not_contains_for_every_user_field(self):
+        from data_manager.managers import USER_FILTER_FIELDS, validate_user_filter_operator
+
+        for field_name in USER_FILTER_FIELDS:
+            for operator in ('contains', 'not_contains'):
+                with self.subTest(field_name=field_name, operator=operator):
+                    validate_user_filter_operator(field_name, operator, [1, 2])
+                    validate_user_filter_operator(field_name, operator, 1)
+
+    def test_allows_legacy_scalar_equal_family_for_normalization(self):
+        from data_manager.managers import USER_FILTER_FIELDS, validate_user_filter_operator
+
+        for field_name in USER_FILTER_FIELDS:
+            for operator in ('equal', 'not_equal', 'in_list', 'not_in_list'):
+                with self.subTest(field_name=field_name, operator=operator):
+                    validate_user_filter_operator(field_name, operator, 1)
 
 
 class TestNormalizePersistedUserFilter(TestCase):
@@ -731,6 +812,8 @@ class TestNormalizePersistedUserFilter(TestCase):
         )
         self.assertEqual(normalize_persisted_user_filter('annotators', 'empty', 'yes'), ('empty', True))
         self.assertEqual(normalize_persisted_user_filter('annotators', 'empty', 'O'), ('contains', []))
+        # FIT-2435: unsupported empty on skipped_by_annotator becomes a no-op contains.
+        self.assertEqual(normalize_persisted_user_filter('skipped_by_annotator', 'empty', True), ('contains', []))
 
     @override_settings(DATA_MANAGER_LIST_FILTER_MAX_VALUES=3)
     def test_deduplicates_and_bounds_recovered_ids(self):
@@ -947,13 +1030,13 @@ class TestValidateInListFilter(TestCase):
         with self.assertRaises(ValidationError):
             validate_in_list_filter(f, 'annotators')
 
-    def test_rejects_unsupported_total_annotations(self):
+    def test_allowlisted_counter_columns_return_ok(self):
+        """FIT-2416: denormalized annotation/prediction counters accept in_list."""
         from data_manager.managers import validate_in_list_filter
-        from rest_framework.exceptions import ValidationError
 
-        f = Filter(filter='filter:tasks:total_annotations', operator='in_list', type='Number', value=[1])
-        with self.assertRaises(ValidationError):
-            validate_in_list_filter(f, 'total_annotations')
+        for field in ('total_annotations', 'total_predictions', 'cancelled_annotations'):
+            f = Filter(filter=f'filter:tasks:{field}', operator='in_list', type='Number', value=[1, 2])
+            assert validate_in_list_filter(f, field) == 'ok', field
 
     def test_rejects_unsupported_created_at(self):
         from data_manager.managers import validate_in_list_filter
@@ -989,6 +1072,33 @@ class TestValidateInListFilter(TestCase):
 
         f = Filter(filter='filter:tasks:id', operator='in_list', type='Number', value=['foo', 'bar'])
         self.assertEqual(validate_in_list_filter(f, 'id'), 'none')
+
+
+class TestAnnotationIdFilterQ(TestCase):
+    """Unit tests for `annotation_id_filter_q` (FIT-2432)."""
+
+    def test_not_contains_skips_blank_tokens_from_trailing_separators(self):
+        """Empty fragments are not malformed; ``"12,"`` still excludes only 12."""
+        from data_manager.managers import Operator, annotation_id_filter_q
+
+        expression = annotation_id_filter_q('pk', Operator.NOT_CONTAINS, '12,')
+
+        assert expression == ~Q(pk__in=[12])
+
+    def test_contains_skips_blank_tokens_from_trailing_separators(self):
+        from data_manager.managers import Operator, annotation_id_filter_q
+
+        expression = annotation_id_filter_q('pk', Operator.CONTAINS, '12,')
+
+        assert expression == Q(pk__in=[12])
+
+    def test_not_contains_malformed_token_still_fail_closes(self):
+        """Dropping a malformed token would broaden not_contains, so reject the line."""
+        from data_manager.managers import Operator, annotation_id_filter_q
+
+        expression = annotation_id_filter_q('pk', Operator.NOT_CONTAINS, '12, malformed')
+
+        assert expression == Q(pk__in=[])
 
 
 class TestApplyFiltersInList(TestCase):
@@ -1057,10 +1167,10 @@ class TestApplyFiltersInList(TestCase):
         """Legacy `annotations_ids` smart-contains hack must remain intact.
 
         The validator only fires when the *original* operator is in_list / not_in_list, so
-        `{annotations_ids, contains, "1 2,3"}` still hits the existing rewrite path at
-        `data_manager.managers.apply_filters` line ~458.
+        `{annotations_ids, contains, "1 2,3"}` still hits the annotation-ID compiler
+        in `data_manager.managers.apply_filters`.
         """
-        # `contains` (not in_list) — validator returns 'ok', rewrite proceeds.
+        # `contains` (not in_list) — validator returns 'ok', compiler proceeds.
         _filter = Filter(
             filter='filter:tasks:annotations_ids',
             operator='contains',
@@ -1069,7 +1179,6 @@ class TestApplyFiltersInList(TestCase):
         )
         result, queryset = self._run(_filter)
         self.assertIs(result, queryset)
-        # The rewrite turns `contains` into `in_list` and emits a Q expression.
         queryset.filter.assert_called_once()
 
 
@@ -1153,3 +1262,119 @@ class TestApplyFiltersInListDB(TestCase):
         result = self._apply(_filter)
 
         assert result.count() == 3
+
+    def test_total_annotations_in_list_returns_matching_tasks(self):
+        """FIT-2416: counter columns use a single __in filter instead of N OR equals."""
+        from tasks.models import Task
+
+        Task.objects.filter(id=self.tasks[0].id).update(total_annotations=2)
+        Task.objects.filter(id=self.tasks[1].id).update(total_annotations=5)
+        Task.objects.filter(id=self.tasks[2].id).update(total_annotations=2)
+
+        _filter = Filter(
+            filter='filter:tasks:total_annotations',
+            operator='in_list',
+            type='Number',
+            value=[2, 9],
+        )
+        result = self._apply(_filter)
+        assert set(result.values_list('id', flat=True)) == {self.tasks[0].id, self.tasks[2].id}
+
+
+class TestVisibleDataColumnKeys(TestCase):
+    """FIT-2416: visible task.data keys from hiddenColumns for payload trimming."""
+
+    @classmethod
+    def setUpTestData(cls):
+        from projects.tests.factories import ProjectFactory
+        from tasks.tests.factories import TaskFactory
+
+        cls.project = ProjectFactory(
+            label_config="""
+            <View>
+              <Text name="text" value="$text"/>
+              <Image name="image" value="$image"/>
+              <Choices name="label" toName="text">
+                <Choice value="a"/>
+              </Choices>
+            </View>
+            """
+        )
+        TaskFactory(project=cls.project, data={'text': 'hello', 'image': 's3://bucket/a.jpg', 'extra': 'x'})
+        summary = cls.project.summary
+        summary.all_data_columns = {'text': 1, 'image': 1, 'extra': 1}
+        summary.save(update_fields=['all_data_columns'])
+
+    def test_returns_none_without_hidden_columns(self):
+        from data_manager.managers import get_visible_data_column_keys
+        from data_manager.prepare_params import PrepareParams
+        from users.tests.factories import UserFactory
+
+        user = UserFactory()
+        prepare_params = PrepareParams(project=self.project.id, data={})
+        assert get_visible_data_column_keys(prepare_params, user) is None
+
+    def test_excludes_data_keys_hidden_in_both_modes(self):
+        from data_manager.managers import get_visible_data_column_keys
+        from data_manager.prepare_params import PrepareParams
+        from users.tests.factories import UserFactory
+
+        user = UserFactory()
+        prepare_params = PrepareParams(
+            project=self.project.id,
+            data={
+                'hiddenColumns': {
+                    'explore': ['tasks:data.extra', 'tasks:data.image'],
+                    'labeling': ['tasks:data.extra', 'tasks:id'],
+                }
+            },
+        )
+        visible = get_visible_data_column_keys(prepare_params, user)
+        assert visible is not None
+        assert 'extra' not in visible
+        assert 'text' in visible
+        # image is only hidden in explore, not both — still visible
+        assert 'image' in visible
+
+
+class TestApplyFiltersInvalidRegex(TestCase):
+    """FIT-2460: invalid regex fails closed before custom emitters run."""
+
+    def test_invalid_child_regex_empties_queryset_before_custom_hook(self):
+        """Invalid child regex under OR returns none before custom emitters load."""
+        from data_manager.managers import apply_filters
+
+        queryset = Mock()
+        queryset.none.return_value = 'EMPTY'
+        filters = Filters(
+            conjunction=ConjunctionEnum.OR,
+            items=[
+                Filter(
+                    filter='filter:tasks:annotations_results',
+                    operator='contains',
+                    type='String',
+                    value='Airplane',
+                    child_filters=[
+                        Filter(
+                            filter='filter:tasks:comments',
+                            operator='regex',
+                            type='String',
+                            value='[',
+                        )
+                    ],
+                ),
+                Filter(
+                    filter='filter:tasks:id',
+                    operator='equal',
+                    type='Number',
+                    value=1,
+                ),
+            ],
+        )
+
+        with patch('data_manager.managers.load_func') as load_func:
+            result = apply_filters(queryset=queryset, filters=filters, project=Mock(), request=Mock())
+
+        assert result == 'EMPTY'
+        load_func.assert_not_called()
+        queryset.none.assert_called_once_with()

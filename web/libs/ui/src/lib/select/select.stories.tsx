@@ -14,6 +14,27 @@ const meta = {
   component: Select,
   parameters: {
     layout: "centered",
+    // Keep declaration order: without this, Storybook alphabetizes and buries `size`.
+    controls: { sort: "none" },
+  },
+  args: {
+    size: "medium",
+  },
+  // Select's generic forwardRef signature defeats docgen, so controls must be declared by hand.
+  // `size` is first so it stays at the top of the Controls panel.
+  argTypes: {
+    size: {
+      control: "select",
+      options: ["smaller", "small", "medium"],
+      description: "Heights match the Button of the same name: smaller 24px, small 32px, medium 40px.",
+      table: { defaultValue: { summary: "medium" } },
+    },
+    placeholder: { control: "text" },
+    disabled: { control: "boolean" },
+    searchable: { control: "boolean" },
+    multiple: { control: "boolean" },
+    isInline: { control: "boolean" },
+    isLoading: { control: "boolean" },
   },
 } satisfies Meta<typeof Select>;
 
@@ -22,6 +43,7 @@ type Story = StoryObj<typeof Select>;
 
 export const Default: Story = {
   args: {
+    size: "medium",
     placeholder: "Select a fruit",
     options: ["Apple", "Banana", "Blueberry", "Grapes", "Pineapple"] as any[],
     label: "default",
@@ -59,6 +81,31 @@ export const Disabled: Story = {
     options: ["Apple", "Banana", "Blueberry", "Grapes", "Pineapple"] as any[],
     label: "disabled select",
     disabled: true,
+  },
+};
+
+/**
+ * Read-only: trigger stays clickable so the dropdown can open for inspection,
+ * but options and bulk actions cannot change the value. Search remains available.
+ * Contrast with `Disabled`, which greys out the trigger and blocks opening.
+ */
+export const ReadOnly: Story = {
+  args: {
+    placeholder: "Select columns",
+    options: [
+      { key: "id", title: "ID", value: "id" },
+      { key: "agreement", title: "Agreement", value: "agreement", group: "Agreement" },
+      { key: "dim_1", title: "Dimension 1", value: "dim_1", group: "Agreement" },
+      { key: "annot_completed", title: "Annotation Completed At", value: "annot_completed", group: "Annotations" },
+    ] as any[],
+    value: ["id", "agreement"],
+    multiple: true,
+    searchable: true,
+    searchPlaceholder: "Search columns",
+    groupBy: "group",
+    showGroupActions: true,
+    readOnly: true,
+    label: "read-only select (openable, non-editable)",
   },
 };
 
@@ -426,6 +473,75 @@ export const ControlledOpenWithFooterApply: Story = {
           }
         />
         <p className="text-sm text-neutral-content">Applied: {applied.length > 0 ? applied.join(", ") : "none"}</p>
+      </div>
+    );
+  },
+};
+
+/**
+ * The trigger keeps its declared height whichever axis the parent flexes along. Column-flex and
+ * grid parents used to hand the block axis to the trigger's own `flex` basis/grow, which stretched
+ * or collapsed it away from that height.
+ */
+export const TriggerHeightInFlexParents: Story = {
+  render: () => {
+    const options = ["Apple", "Banana", "Blueberry"] as any[];
+
+    return (
+      <div className="flex flex-col gap-6 w-[420px]">
+        <div className="flex flex-col gap-2">
+          <span className="text-sm text-neutral-content-subtler">Column-flex parent</span>
+          <Select placeholder="Select a fruit" options={options} />
+        </div>
+
+        <div className="flex flex-col gap-2">
+          <span className="text-sm text-neutral-content-subtler">Row-flex parent, sharing space</span>
+          <div className="flex flex-row gap-2">
+            <Select placeholder="Select a fruit" options={options} />
+            <Button look="outlined">Action</Button>
+          </div>
+        </div>
+
+        <div className="flex flex-col gap-2">
+          <span className="text-sm text-neutral-content-subtler">Grid parent</span>
+          <div className="grid grid-cols-2 gap-2">
+            <Select placeholder="Select a fruit" options={options} />
+            <Select placeholder="Select a fruit" options={options} size="small" />
+          </div>
+        </div>
+      </div>
+    );
+  },
+};
+
+/**
+ * Each size matches the Button of the same name — medium 40px, small 32px, smaller 24px — so the
+ * two line up when they sit side by side. `triggerClassName` still wins for the rare layout that
+ * needs a height outside the scale.
+ */
+export const SizesMatchButton: Story = {
+  render: () => {
+    const options = ["Apple", "Banana", "Blueberry"] as any[];
+    const sizes = ["medium", "small", "smaller"] as const;
+
+    return (
+      <div className="flex flex-col gap-6 w-[480px]">
+        {sizes.map((size) => (
+          <div key={size} className="flex flex-col gap-2">
+            <span className="text-sm text-neutral-content-subtler">{size}</span>
+            <div className="flex flex-row items-center gap-2">
+              <Select placeholder="Select a fruit" options={options} size={size} />
+              <Button look="outlined" size={size}>
+                Action
+              </Button>
+            </div>
+          </div>
+        ))}
+
+        <div className="flex flex-col gap-2">
+          <span className="text-sm text-neutral-content-subtler">Custom height via triggerClassName</span>
+          <Select placeholder="Select a fruit" options={options} triggerClassName="!h-[36px]" />
+        </div>
       </div>
     );
   },

@@ -228,6 +228,9 @@ const Model = types
     setWorkingArea(wa) {
       self.workingArea = wa;
     },
+    handleLoadError(message) {
+      self.errors = [message];
+    },
   }))
   ////// Sync actions
   .actions((self) => ({

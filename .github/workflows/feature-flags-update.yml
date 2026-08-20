@@ -24,7 +24,7 @@ env:
 jobs:
   commit-feature-flags:
     name: "Commit Feature Flags"
-
+    if: github.repository_owner == 'HumanSignal'
     runs-on: ubuntu-latest
     steps:
       - uses: hmarr/debug-action@v3.0.0

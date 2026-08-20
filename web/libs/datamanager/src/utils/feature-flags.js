@@ -22,7 +22,7 @@ export const FF_FIT_1304_STRICT_OVERLAP = "fflag_feat_all_fit_1304_strict_overla
 
 /**
  * Data Manager `is any of` / `is none of` list-membership filter operators.
- * Gates the operator dropdown for Task ID, Inner ID, and task.data.* columns.
+ * Gates the operator dropdown for Task ID, Inner ID, annotation counters, and task.data.* columns.
  */
 export const FF_BROS_1203 = "fflag_feat_bros_1203_dm_is_any_of_filter_short";
 

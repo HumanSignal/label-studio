@@ -1,29 +1,27 @@
-import { render, screen, waitFor } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import * as transitionUtils from "@humansignal/core/lib/utils/transition";
 import { MultiTreeSelectDropdown } from "./multi-tree-select-dropdown";
 
-mockModule("../dropdown/dropdown", () => {
-  const Dropdown = Object.assign(
-    ({ children }: { children: React.ReactNode }) => <div data-testid="dropdown">{children}</div>,
-    {
-      Trigger: ({
-        children,
-        content,
-        ref: _ref,
-      }: {
-        children: React.ReactNode;
-        content?: React.ReactNode;
-        ref?: React.RefObject<unknown>;
-      }) => (
-        <div data-testid="dropdown-trigger">
-          {children}
-          {content && <div data-testid="dropdown-content">{content}</div>}
-        </div>
-      ),
-    },
-  );
-  return {
-    Dropdown,
+type TransitionCallbacks = {
+  beforeTransition?: () => void;
+  transition?: () => void;
+  afterTransition?: () => void;
+};
+
+/**
+ * Do not `mockModule` Dropdown — Bun keeps that replacement for the rest of the process,
+ * and it leaked into `dropdown.test.tsx` once `data-table.test.tsx` joined the suite.
+ * Animate open/close synchronously; the spy is restored by preload `afterEach`.
+ */
+beforeEach(() => {
+  const runTransitionSync = (_element: unknown, callbacks: TransitionCallbacks) => {
+    callbacks.beforeTransition?.();
+    callbacks.transition?.();
+    callbacks.afterTransition?.();
   };
+  spyOn(transitionUtils, "aroundTransition").mockImplementation(
+    runTransitionSync as typeof transitionUtils.aroundTransition,
+  );
 });
 
 const mockData = [
@@ -36,18 +34,23 @@ const mockData = [
 
 const mockSchema = { id: "id", label: "label", children: "children" };
 
+function renderDropdown(props: Record<string, unknown> = {}) {
+  return render(
+    <MultiTreeSelectDropdown
+      data={structuredClone(mockData)}
+      schema={mockSchema}
+      selected={[]}
+      onChange={mock()}
+      inline
+      triggerTestId="dropdown-trigger"
+      {...props}
+    />,
+  );
+}
+
 describe("MultiTreeSelectDropdown", () => {
   it("renders with placeholder when disableAllOption (no selection)", async () => {
-    render(
-      <MultiTreeSelectDropdown
-        data={structuredClone(mockData)}
-        schema={mockSchema}
-        selected={[]}
-        onChange={mock()}
-        placeholder="Select workspaces"
-        disableAllOption={true}
-      />,
-    );
+    renderDropdown({ placeholder: "Select workspaces", disableAllOption: true });
 
     await waitFor(() => {
       expect(screen.getByText("Select workspaces")).toBeInTheDocument();
@@ -55,34 +58,25 @@ describe("MultiTreeSelectDropdown", () => {
   });
 
   it("renders dropdown trigger and tree content", async () => {
-    render(
-      <MultiTreeSelectDropdown
-        data={structuredClone(mockData)}
-        schema={mockSchema}
-        selected={[]}
-        onChange={mock()}
-        placeholder="Choose..."
-      />,
-    );
+    renderDropdown({ placeholder: "Choose..." });
 
-    expect(screen.getByTestId("dropdown-trigger")).toBeInTheDocument();
+    const trigger = screen.getByTestId("dropdown-trigger");
+    expect(trigger).toBeInTheDocument();
+    fireEvent.click(trigger);
+
     await waitFor(() => {
       expect(screen.getByText("Workspace 1")).toBeInTheDocument();
     });
   });
 
   it("accepts allLabel and searchPlaceholder props", async () => {
-    render(
-      <MultiTreeSelectDropdown
-        data={structuredClone(mockData)}
-        schema={mockSchema}
-        selected={[]}
-        onChange={mock()}
-        placeholder="Select"
-        allLabel="All workspaces"
-        searchPlaceholder="Search workspaces..."
-      />,
-    );
+    renderDropdown({
+      placeholder: "Select",
+      allLabel: "All workspaces",
+      searchPlaceholder: "Search workspaces...",
+    });
+
+    fireEvent.click(screen.getByTestId("dropdown-trigger"));
 
     await waitFor(() => {
       expect(screen.getByPlaceholderText("Search workspaces...")).toBeInTheDocument();
@@ -90,16 +84,10 @@ describe("MultiTreeSelectDropdown", () => {
   });
 
   it("accepts isRadio and preventAutoChildSelection", () => {
-    const { container } = render(
-      <MultiTreeSelectDropdown
-        data={structuredClone(mockData)}
-        schema={mockSchema}
-        selected={[]}
-        onChange={mock()}
-        isRadio={true}
-        preventAutoChildSelection={true}
-      />,
-    );
+    const { container } = renderDropdown({
+      isRadio: true,
+      preventAutoChildSelection: true,
+    });
 
     expect(container.querySelector(".ls-multi-tree-select")).toBeInTheDocument();
   });

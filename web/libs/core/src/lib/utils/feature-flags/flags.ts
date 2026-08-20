@@ -9,11 +9,6 @@
 // Consider all pre-XFN flags legacy. Should be revised and removed.
 
 /**
- * Model version selector per model backend
- */
-export const FF_DEV_1682 = "ff_front_dev_1682_model_version_dropdown_070622_short";
-
-/**
  * Enables "Enterprise Awareness" features
  */
 export const FF_LSDV_E_297 = "fflag_feat_front_lsdv_e_297_increase_oss_to_enterprise_adoption_short";
@@ -118,12 +113,6 @@ export const FF_FIT_720_LAZY_LOAD_ANNOTATIONS = "fflag_fix_all_fit_720_lazy_load
  */
 export const FF_UTC_554_AGREEMENT_V2_IN_TASK_SUMMARY_VIEW = "fflag_feat_utc_554_agreement_v2_in_task_summary_view";
 /**
- * Analytics Label Distribution page
- */
-export const FF_FIT_1443_ANALYTICS_LABEL_DISTRIBUTION_PAGE =
-  "fflag_feat_all_fit_1443_analytics_label_distribution_page";
-
-/**
  * LSE project hub: Dashboard + Members under a shared layout
  */
 export const FF_LSE_PROJECT_DASHBOARDS_V3 = "fflag_feat_front_lse_project_dashboards_v3_short";
@@ -197,12 +186,6 @@ export const FF_INTERFACES = "fflag_feat_all_optic_interfaces_short";
 export const FF_INTERFACES_AGENT_WORKFLOW = "fflag_feat_interfaces_agent_workflow";
 
 /**
- * Local WebLLM intent gate for Create Interface — classifies once per session in a Web Worker
- * and composes a slim skill pack. When off, keeps today's full regex compose path.
- */
-export const FF_INTERFACES_WEBLLM_INTENT = "fflag_feat_interfaces_webllm_intent";
-
-/**
  * WASM FFmpeg Streaming Decoder (progressive seek/decode) for long compressed audio files
  */
 export const FF_FIT_2003_WASM_STREAMING_DECODER = "fflag_feat_front_fit_2003_wasm_streaming_decoder";
@@ -264,3 +247,9 @@ export const FF_CONTRIBUTOR_OPT_IN = "fflag_feat_utc_1064_contributor_opt_in";
  * (default, today's behavior), review acceptance score, or rejection rate.
  */
 export const FF_ANNOTATOR_EVALUATION_METRIC = "fflag_feat_utc_1085_annotator_evaluation_metric";
+
+/**
+ * Review stream "By Annotator" task ordering: review one annotator's work at a
+ * time for a configured coverage percent before rotating to another annotator.
+ */
+export const FF_UTC_1079_REVIEW_ORDER_BY_ANNOTATOR = "fflag_feat_utc_1079_review_order_by_annotator";

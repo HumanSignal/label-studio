@@ -98,58 +98,9 @@
 <script id="app-settings" nonce="{{request.csp_nonce}}">
   var __customHotkeys = {{ user.custom_hotkeys|json_dumps_ensure_ascii|escape_lt_gt|safe }};
 
-  // Filter custom hotkeys for editor-specific ones
-  var editorCustomHotkeys = {};
-  var prefixRegex = /^(annotation|timeseries|audio|regions|video|image_gallery|tools):(.*)/;
-
-  for (let key in __customHotkeys) {
-      const match = key.match(prefixRegex);
-      if (match) {
-          const [, prefix, shortKey] = match;
-
-          // Get the current value
-          const value = __customHotkeys[key];
-
-          // Check if value has active property set to false
-          if (value && value.active === false) {
-              // Create a copy of the value with key set to null
-              const modifiedValue = {...value, key: null};
-              editorCustomHotkeys[shortKey] = modifiedValue;
-          } else {
-              // Use the original value
-              editorCustomHotkeys[shortKey] = value;
-          }
-      }
-  }
-
-  function lookupHotkey (lookup) {
-      // Check if custom hotkeys exist and the lookup is in there
-      if (window.APP_SETTINGS?.user?.customHotkeys && lookup in window.APP_SETTINGS.user.customHotkeys) {
-          const hotkeyValue = window.APP_SETTINGS.user.customHotkeys[lookup];
-
-          // If active is explicitly false, return a copy with key set to null
-          if (hotkeyValue && hotkeyValue.active === false) {
-              return {...hotkeyValue, key: null};
-          }
-
-          // Otherwise return the original value
-          return hotkeyValue;
-      }
-      // Fallback to default hotkeys if available
-      else if (window.DEFAULT_HOTKEYS && lookup in window.DEFAULT_HOTKEYS) {
-          return window.DEFAULT_HOTKEYS[lookup];
-      }
-      // No hotkey found
-      else {
-          return null;
-      }
-  }
-
-  // Parse the default editor keymap
+  // Seed only: account customs + product editor defaults.
+  // Runtime merge is owned by effectiveHotkeys.bootstrap()/apply() in the FE bundle.
   var defaultEditorKeymap = JSON.parse({{ settings.EDITOR_KEYMAP|safe }});
-
-  // Merge the default keymap with custom editor hotkeys
-  var mergedEditorKeymap = Object.assign({}, defaultEditorKeymap, editorCustomHotkeys);
 
   window.APP_SETTINGS = Object.assign({
 
@@ -168,7 +119,8 @@
       {% endif %}
       {% block app_user_extra %}{% endblock %}
     },
-    lookupHotkey: lookupHotkey,
+    // Stub until effectiveHotkeys.bootstrap() wires the real lookup.
+    lookupHotkey: function () { return null; },
     debug: {{settings.DEBUG|yesno:"true,false"}},
     polling: {% if feature_flags.fflag_dev_disable_polling_killswitch_short %}false{% else %}true{% endif %},
     hostname: "{{settings.HOSTNAME}}",
@@ -176,7 +128,7 @@
     sentry_dsn: {% if settings.FRONTEND_SENTRY_DSN %}"{{ settings.FRONTEND_SENTRY_DSN }}"{% else %}null{% endif %},
     sentry_rate: "{{ settings.FRONTEND_SENTRY_RATE }}",
     sentry_environment: "{{ settings.FRONTEND_SENTRY_ENVIRONMENT }}",
-    editor_keymap: mergedEditorKeymap,
+    editor_keymap: defaultEditorKeymap,
     feature_flags: {{ feature_flags|json_dumps_ensure_ascii|safe }},
     feature_flags_default_value: {{ settings.FEATURE_FLAGS_DEFAULT_VALUE|json_dumps_ensure_ascii|safe }},
     version_edition: "{{ settings.VERSION_EDITION }}",

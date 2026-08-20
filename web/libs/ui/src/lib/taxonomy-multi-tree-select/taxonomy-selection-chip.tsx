@@ -60,7 +60,14 @@ export const TaxonomySelectionChip = ({
 
   if (!isCompound) {
     return (
-      <Badge variant="primary" size="large" maxWidth={240} title={displayLabel} onClose={handleClose}>
+      <Badge
+        variant="primary"
+        size="large"
+        className={styles.simpleChip}
+        maxWidth="100%"
+        title={displayLabel}
+        onClose={handleClose}
+      >
         {displayLabel}
       </Badge>
     );
@@ -85,6 +92,7 @@ export const TaxonomySelectionChip = ({
       className={cnm(styles.compoundChip, chipLayout === "stacked" && styles.compoundChipStacked)}
       data-taxonomy-chip-state={isComplete ? "filled" : highlightIncomplete ? "invalid" : "unfilled"}
       onClose={handleClose}
+      closeLabel={`Remove ${displayLabel}`}
     >
       <span className={styles.chipLabel} title={displayLabel}>
         {displayLabel}
@@ -94,7 +102,7 @@ export const TaxonomySelectionChip = ({
           <Select
             placeholder="Select"
             searchable
-            size="small"
+            size="smaller"
             isInline
             dataTestid={controlId ? `${controlId}-${selection.code}-accent` : undefined}
             triggerClassName={accentSelectClassName}
@@ -117,7 +125,7 @@ export const TaxonomySelectionChip = ({
         )}
         {withLevel && (
           <Select
-            size="small"
+            size="smaller"
             isInline
             placeholder={TAXONOMY_LEVEL_PLACEHOLDER}
             triggerClassName={levelSelectClassName}

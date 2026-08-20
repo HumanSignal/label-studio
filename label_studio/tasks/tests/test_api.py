@@ -1,12 +1,12 @@
-import unittest
 from unittest.mock import patch
 
-from core.feature_flags import flag_set
 from organizations.tests.factories import OrganizationFactory
 from projects.models import Project
 from projects.tests.factories import ProjectFactory
 from rest_framework.test import APITestCase
+from tasks.models import Task
 from tasks.tests.factories import AnnotationFactory, PredictionFactory, TaskFactory
+from users.tests.factories import UserFactory
 
 
 class TestTaskAPI(APITestCase):
@@ -240,31 +240,8 @@ class TestTaskAPIResolveUri(APITestCase):
         assert response_data['text'] == 'Plain text field'
 
 
-class TestTaskAgreementAPIFeatureOff(APITestCase):
-    """When feature flag is off, agreement endpoint returns 403. Always run this test."""
-
-    @classmethod
-    def setUpTestData(cls):
-        cls.organization = OrganizationFactory()
-        cls.project = ProjectFactory(organization=cls.organization)
-        cls.user = cls.organization.created_by
-
-    @patch('tasks.api.flag_set')
-    def test_distribution_returns_403_when_feature_flag_disabled(self, mock_flag_set):
-        mock_flag_set.return_value = False
-        task = TaskFactory(project=self.project)
-        self.client.force_authenticate(user=self.user)
-        response = self.client.get(f'/api/tasks/{task.id}/agreement/')
-        assert response.status_code == 403
-        assert 'detail' in response.json() or 'error' in response.json()
-
-
-@unittest.skipUnless(
-    flag_set('fflag_fix_all_fit_720_lazy_load_annotations', user=None),
-    'Agreement API tests require fflag_fix_all_fit_720_lazy_load_annotations to be on',
-)
 class TestTaskAgreementAPI(APITestCase):
-    """Tests for TaskAgreementAPI (GET /api/tasks/<id>/agreement/). Run only when feature flag is on."""
+    """Tests for TaskAgreementAPI (GET /api/tasks/<id>/agreement/)."""
 
     @classmethod
     def setUpTestData(cls):
@@ -347,31 +324,8 @@ class TestTaskAgreementAPI(APITestCase):
         assert data['distributions']['label']['labels'] == {'Car': 3}
 
 
-class TestTaskSummaryAPIFeatureOff(APITestCase):
-    """When feature flag is off, summary endpoint returns 403. Always run this test."""
-
-    @classmethod
-    def setUpTestData(cls):
-        cls.organization = OrganizationFactory()
-        cls.project = ProjectFactory(organization=cls.organization)
-        cls.user = cls.organization.created_by
-
-    @patch('tasks.api.flag_set')
-    def test_distribution_returns_403_when_feature_flag_disabled(self, mock_flag_set):
-        mock_flag_set.return_value = False
-        task = TaskFactory(project=self.project)
-        self.client.force_authenticate(user=self.user)
-        response = self.client.get(f'/api/tasks/{task.id}/summary/')
-        assert response.status_code == 403
-        assert 'detail' in response.json() or 'error' in response.json()
-
-
-@unittest.skipUnless(
-    flag_set('fflag_fix_all_fit_720_lazy_load_annotations', user=None),
-    'Summary API tests require fflag_fix_all_fit_720_lazy_load_annotations to be on',
-)
 class TestTaskSummaryAPI(APITestCase):
-    """Tests for TaskSummaryAPI (GET /api/tasks/<id>/summary/). Run only when feature flag is on."""
+    """Tests for TaskSummaryAPI (GET /api/tasks/<id>/summary/)."""
 
     @classmethod
     def setUpTestData(cls):
@@ -801,3 +755,161 @@ class TestTaskSummaryAPI(APITestCase):
         data = response.json()
         assert data['total_annotations'] == 2
         assert data['distributions']['label']['labels'] == {'Car': 1}
+
+
+LABEL_CONFIG = (
+    '<View><Text name="text" value="$text"/><Choices name="label" toName="text">'
+    '<Choice value="pos"/><Choice value="neg"/></Choices></View>'
+)
+ANNOTATION_RESULT = [{'value': {'choices': ['pos']}, 'from_name': 'label', 'to_name': 'text', 'type': 'choices'}]
+
+
+class TestTaskCreateOverlapInitialization(APITestCase):
+    """ROOT-62: Task create must seed overlap from Quality settings.
+
+    Full-overlap projects never rearrange on task add, so API create is the only
+    assignment path. Import/storage already seed overlap=maximum_annotations.
+    """
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.organization = OrganizationFactory()
+        cls.user = cls.organization.created_by
+        cls.label_config = LABEL_CONFIG
+
+    def _post_task(self, project, **extra):
+        self.client.force_authenticate(user=self.user)
+        payload = {'project': project.id, 'data': {'text': 'mid-project task'}, **extra}
+        response = self.client.post('/api/tasks/', data=payload, format='json')
+        assert response.status_code == 201, response.content
+        return Task.objects.get(id=response.json()['id'])
+
+    def test_full_overlap_project_seeds_overlap_and_stays_unlabeled_after_one_annotation(self):
+        """100% overlap / max=3: new task overlap=3; one annotation leaves is_labeled False."""
+        project = ProjectFactory(
+            organization=self.organization,
+            created_by=self.user,
+            label_config=self.label_config,
+            maximum_annotations=3,
+            overlap_cohort_percentage=100,
+        )
+        task = self._post_task(project)
+
+        assert task.overlap == 3
+        assert task.is_labeled is False
+
+        response = self.client.post(
+            f'/api/tasks/{task.id}/annotations/',
+            {'result': ANNOTATION_RESULT},
+            format='json',
+        )
+        assert response.status_code == 201, response.content
+        task.refresh_from_db()
+        assert task.overlap == 3
+        assert task.is_labeled is False
+
+        for _ in range(2):
+            annotator = UserFactory(active_organization=self.organization)
+            AnnotationFactory(task=task, project=project, completed_by=annotator, result=ANNOTATION_RESULT)
+        task.refresh_from_db()
+        task.update_is_labeled()
+        assert task.is_labeled is True
+
+    def test_partial_overlap_project_keeps_default_overlap_when_omitted(self):
+        """Cohort < 100% is not rearranged on single-task create; omitted overlap stays 1."""
+        project = ProjectFactory(
+            organization=self.organization,
+            created_by=self.user,
+            label_config=self.label_config,
+            maximum_annotations=3,
+            overlap_cohort_percentage=50,
+        )
+        task = self._post_task(project)
+        assert task.overlap == 1
+        assert task.is_labeled is False
+
+    def test_explicit_overlap_in_payload_is_preserved(self):
+        """Client-supplied overlap is not overwritten by project.maximum_annotations."""
+        project = ProjectFactory(
+            organization=self.organization,
+            created_by=self.user,
+            label_config=self.label_config,
+            maximum_annotations=3,
+            overlap_cohort_percentage=100,
+        )
+        task = self._post_task(project, overlap=2)
+        assert task.overlap == 2
+
+    def test_full_overlap_project_nested_create_seeds_overlap(self):
+        """POST /api/projects/{id}/tasks/ also seeds overlap when the field is omitted."""
+        project = ProjectFactory(
+            organization=self.organization,
+            created_by=self.user,
+            label_config=self.label_config,
+            maximum_annotations=3,
+            overlap_cohort_percentage=100,
+        )
+        self.client.force_authenticate(user=self.user)
+        response = self.client.post(
+            f'/api/projects/{project.id}/tasks/',
+            {'data': {'text': 'nested mid-project task'}},
+            format='json',
+        )
+        assert response.status_code == 201, response.content
+        task = Task.objects.get(id=response.json()['id'])
+        assert task.overlap == 3
+        assert task.is_labeled is False
+
+
+class TestAnnotationDraftCreateWithMissingAnnotation(APITestCase):
+    """Regression tests for the annotation-scoped draft-creation endpoint."""
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.organization = OrganizationFactory()
+        cls.project = ProjectFactory(organization=cls.organization)
+        cls.user = cls.organization.created_by
+
+    def test_create_draft_for_missing_annotation_does_not_violate_fk(self):
+        # Reproduces: ENTERPRISE-V2-BACKEND-5S0
+        # POST /api/tasks/{pk}/annotations/{annotation_id}/drafts blindly passes the URL's
+        # annotation_id straight into serializer.save(). When that annotation does not exist
+        # (e.g. it was deleted between the client loading the task and submitting the draft),
+        # the INSERT into tasks_annotationdraft violates the annotation_id foreign key:
+        #   insert or update on table "tasks_annotationdraft" violates foreign key constraint
+        #   "tasks_annotationdraf_annotation_id_86db74e5_fk_task_comp"
+        #   DETAIL: Key (annotation_id)=(...) is not present in table "task_completion".
+        #
+        # RED (unpatched): the endpoint persists a draft pointing at the missing annotation.
+        # On production Postgres the FK is checked immediately, so the request raises
+        # IntegrityError (the Sentry crash). SQLite (used by the test suite) defers FK
+        # enforcement, so connection.check_constraints() below surfaces the identical
+        # IntegrityError, failing this test with the same violation.
+        # GREEN (fixed): the endpoint validates the annotation and rejects the request
+        # gracefully (4xx) without persisting a dangling draft, so no violation occurs.
+        from django.db import connection
+        from tasks.models import AnnotationDraft
+
+        task = TaskFactory(project=self.project, data={'text': 'test'})
+
+        # An annotation that was created and then deleted — its id is now dangling.
+        annotation = AnnotationFactory(task=task, project=self.project, result=[])
+        missing_annotation_id = annotation.id
+        annotation.delete()
+
+        self.client.force_authenticate(user=self.user)
+
+        # On Postgres this call itself raises IntegrityError inside the request.
+        response = self.client.post(
+            f'/api/tasks/{task.id}/annotations/{missing_annotation_id}/drafts',
+            data={'result': []},
+            format='json',
+        )
+
+        # On SQLite the FK check is deferred; surface the same violation explicitly.
+        connection.check_constraints()
+
+        # A fixed endpoint should refuse to create a draft for a non-existent annotation
+        # instead of leaving a dangling reference behind.
+        assert not AnnotationDraft.objects.filter(annotation_id=missing_annotation_id).exists()
+        assert response.status_code in (400, 404), response.status_code

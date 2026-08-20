@@ -1421,6 +1421,35 @@ class LabelStreamHistory(models.Model):
         constraints = [models.UniqueConstraint(fields=['user', 'project'], name='unique_history')]
 
 
+class ProjectHotkeyPreference(models.Model):
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='project_hotkey_preferences',
+    )
+    project = models.ForeignKey(
+        Project,
+        on_delete=models.CASCADE,
+        related_name='hotkey_preferences',
+    )
+    custom_hotkeys = models.JSONField(
+        _('custom hotkeys'),
+        default=dict,
+        blank=True,
+        help_text=_('Personal keyboard shortcut overrides for this project'),
+    )
+    created_at = models.DateTimeField(_('created at'), auto_now_add=True)
+    updated_at = models.DateTimeField(_('updated at'), auto_now=True)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=['user', 'project'],
+                name='unique_user_project_hotkeys',
+            )
+        ]
+
+
 class ProjectMember(models.Model):
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='project_memberships', help_text='User ID'
@@ -1629,7 +1658,11 @@ class ProjectSummary(models.Model):
         return labels
 
     def update_created_annotations_and_labels(self, annotations):
-        if flag_set('fflag_fix_plt_1048_concurrent_project_summary_update_19032026_short', user='auto'):
+        # the atomic increment SQL is PostgreSQL-only (jsonb_set, :: casts),
+        # other backends would raise OperationalError on every call
+        if connection.vendor == 'postgresql' and flag_set(
+            'fflag_fix_plt_1048_concurrent_project_summary_update_19032026_short', user='auto'
+        ):
             try:
                 self._atomic_update_created_annotations_and_labels(annotations)
                 return
@@ -1751,7 +1784,11 @@ class ProjectSummary(models.Model):
         self.save(update_fields=['created_annotations', 'created_labels'])
 
     def update_created_labels_drafts(self, drafts):
-        if flag_set('fflag_fix_plt_1048_concurrent_project_summary_update_19032026_short', user='auto'):
+        # the atomic increment SQL is PostgreSQL-only (jsonb_set, :: casts),
+        # other backends would raise OperationalError on every call
+        if connection.vendor == 'postgresql' and flag_set(
+            'fflag_fix_plt_1048_concurrent_project_summary_update_19032026_short', user='auto'
+        ):
             try:
                 self._atomic_update_created_labels_drafts(drafts)
                 return

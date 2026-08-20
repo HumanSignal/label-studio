@@ -143,6 +143,8 @@ mockModule("../../../core/Hotkey", () => {
       setScope: mock(),
       DEFAULT_SCOPE: "all",
       keymap: {},
+      namespaces: () => ({}),
+      unbindAll: mock(),
     },
   );
   return {

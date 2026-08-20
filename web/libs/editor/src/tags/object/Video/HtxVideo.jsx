@@ -1,4 +1,5 @@
 import { observer } from "mobx-react";
+import { getEnv } from "mobx-state-tree";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { IconZoomIn } from "@humansignal/icons";
@@ -410,6 +411,21 @@ const HtxVideoView = ({ item, store }) => {
     [item, setVideoLength],
   );
 
+  const handleVideoError = useCallback(
+    (error) => {
+      setLoaded(true);
+      const message = getEnv(store).messages.ERR_LOADING_HTTP({
+        attr: item.value,
+        url: item._value,
+        error: error?.message ?? String(error ?? ""),
+      });
+
+      item.handleLoadError(message);
+      item.setReady(true);
+    },
+    [item, store],
+  );
+
   const handleVideoResize = useCallback((videoDimensions) => {
     setVideoDimensions(videoDimensions);
   }, []);
@@ -651,6 +667,7 @@ const HtxVideoView = ({ item, store }) => {
                   allowPanOffscreen={!limitCanvasDrawingBoundaries}
                   onFrameChange={handleFrameChange}
                   onLoad={handleVideoLoad}
+                  onError={handleVideoError}
                   onResize={handleVideoResize}
                   // onClick={togglePlaying}
                   onEnded={handleVideoEnded}

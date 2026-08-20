@@ -14,7 +14,7 @@ Design doc for adding a list-membership filter operator to Data Manager (DM) so 
 
 - Add two DM filter operators: **`is any of`** and **`is none of`**.
 - They accept a **pasted multiline / comma / semicolon / whitespace-separated** list of values (IDs, internal object IDs, etc.).
-- MVP support is intentionally narrow: **Task ID**, **Inner ID**, and **`task.data.*` fields** only.
+- MVP support is intentionally narrow: **Task ID**, **Inner ID**, **`task.data.*` fields**, and the denormalized Number counter columns **`total_annotations`**, **`total_predictions`**, and **`cancelled_annotations`** (FIT-2416).
 - Backend operator engine already has a generic list-membership primitive (`in_list` / `not_in_list` map to Django `__in`), but it is currently too permissive and under-validated for public use. The feature should add a clear support contract, validation, and UI exposure.
 - No DB migration required. `Filter.value` is a `JSONField` and already accepts lists.
 - Existing `annotations_ids` "smart contains" behaviour is useful evidence that list filtering is already needed, but it should stay a legacy special case and **not** be part of the MVP support surface.
@@ -34,6 +34,9 @@ Design doc for adding a list-membership filter operator to Data Manager (DM) so 
   - `filter:tasks:id`
   - `filter:tasks:inner_id`
   - `filter:tasks:data.<field>`
+  - `filter:tasks:total_annotations`
+  - `filter:tasks:total_predictions`
+  - `filter:tasks:cancelled_annotations`
 - First-class in UI, OpenAPI schema, and SDK.
 - Persists into a saved DM tab (`View`) so it can be shared, re-used, and pre-applied for assignments / next-task / actions.
 - Predictable AND/OR composition with other filters.
@@ -46,7 +49,7 @@ Design doc for adding a list-membership filter operator to Data Manager (DM) so 
 - Datetime list membership ("any of these 50 timestamps").
 - Direct deep links of the form `…/tasks/?data.object_id=123` (related but separate; see the user request item 2.3.1).
 - Dataset / vector DB filtering: datasets module already has its own filter engine.
-- Annotation / prediction / review / assignment derived fields, including `annotations_ids`, `annotations_results`, `predictions_results`, `annotators`, `reviewers`, `updated_by`, `agreement`, `state`, counters, and payment fields. Some may already work by accident or via special logic, but they are not part of the MVP contract.
+- Annotation / prediction / review / assignment derived fields, including `annotations_ids`, `annotations_results`, `predictions_results`, `annotators`, `reviewers`, `updated_by`, `agreement`, `state`, scores, and payment fields. The denormalized Task counters (`total_annotations`, `total_predictions`, `cancelled_annotations`) are in the MVP allowlist (FIT-2416); other derived / joined metrics stay out.
 
 ---
 
@@ -154,12 +157,15 @@ The first supported release should allow `in_list` / `not_in_list` only for thes
 | Task ID | `filter:tasks:id` | Number list | Primary spreadsheet-to-DM workflow; indexed and fast. |
 | Inner ID | `filter:tasks:inner_id` | Number list | Useful when users refer to project-local task numbers. In multi-project queries it is ambiguous unless the queryset is already project-scoped. |
 | Task data field | `filter:tasks:data.<field>` | String / Unknown / Number list | Main customer workflow: external object IDs, batch IDs, internal IDs, QA findings. |
+| Total annotations | `filter:tasks:total_annotations` | Number list | Denormalized `Task.total_annotations` IntegerField (`db_index=True`); no join/fan-out (FIT-2416). |
+| Total predictions | `filter:tasks:total_predictions` | Number list | Denormalized `Task.total_predictions` IntegerField (`db_index=True`); no join/fan-out (FIT-2416). |
+| Cancelled annotations | `filter:tasks:cancelled_annotations` | Number list | Denormalized `Task.cancelled_annotations` IntegerField (`db_index=True`); no join/fan-out (FIT-2416). |
 
 Everything else should be rejected by the API for these operators in the first release with a clear error:
 
 ```json
 {
-  "detail": "`is any of` and `is none of` support only Task ID, Inner ID, and task.data.* fields in this release."
+  "detail": "`is any of` and `is none of` support only Task ID, Inner ID, total_annotations / total_predictions / cancelled_annotations, and task.data.* fields in this release."
 }
 ```
 
@@ -233,7 +239,7 @@ Three viable approaches; ordered from cheapest to most disruptive.
 
 ### Option A — "Expose the existing primitive with a narrow support contract" (recommended MVP)
 
-**Idea:** add `in_list` / `not_in_list` to the public `Operator` enum, add backend validation that only allows Task ID / Inner ID / `task.data.*`, add frontend operator entries only for those columns, and ship behind a feature flag.
+**Idea:** add `in_list` / `not_in_list` to the public `Operator` enum, add backend validation that only allows Task ID / Inner ID / denormalized counters (`total_annotations`, `total_predictions`, `cancelled_annotations`) / `task.data.*`, add frontend operator entries only for those columns, and ship behind a feature flag.
 
 - **Pros**
   - Reuses the existing backend query primitive while avoiding unsupported fields.
@@ -243,7 +249,7 @@ Three viable approaches; ordered from cheapest to most disruptive.
   - Easy to gate with a feature flag in the UI while keeping backend validation deterministic.
 - **Cons**
   - Does **not** rationalise the `in` (between) vs `in_list` (membership) overlap in the wire vocabulary; relies on UX wording to make them distinct.
-  - Does **not** support potentially useful secondary fields (`annotations_ids`, `updated_by`, counters, etc.) until we explicitly test and opt them in.
+  - Does **not** support potentially useful secondary fields (`annotations_ids`, `updated_by`, scores, agreement, etc.) until we explicitly test and opt them in.
 
 ### Option B — "Replace `in` with `between`, free up `in` for membership"
 
@@ -282,7 +288,7 @@ Three viable approaches; ordered from cheapest to most disruptive.
 
 Ship **Option A**. Do not present this as a general-purpose list membership operator for every DM column yet. Product copy should say:
 
-> Filter Task ID, Inner ID, or a `task.data` field by a pasted list of values.
+> Filter Task ID, Inner ID, annotation/prediction counters, or a `task.data` field by a pasted list of values.
 
 ---
 
@@ -329,6 +335,9 @@ Add a thin validation layer for `in_list` / `not_in_list` values, ideally in `da
 - Reject unsupported fields before building a Django lookup. For MVP, only allow:
   - `id`
   - `inner_id`
+  - `total_annotations`
+  - `total_predictions`
+  - `cancelled_annotations`
   - fields that start with `data__` after `preprocess_field_name()`
 - `value` must be a `list`.
 - Reject `len(value) > settings.DATA_MANAGER_LIST_FILTER_MAX_VALUES` (default `5000`, env-overridable, see §10).
@@ -344,7 +353,13 @@ The validation should live before the generic `Q(**{f'{field_name}__in': value})
 Suggested helper shape:
 
 ```python
-SUPPORTED_IN_LIST_FIELDS = {'id', 'inner_id'}
+SUPPORTED_IN_LIST_FIELDS = {
+    'id',
+    'inner_id',
+    'total_annotations',
+    'total_predictions',
+    'cancelled_annotations',
+}
 
 def validate_in_list_filter(_filter, field_name):
     if _filter.operator not in {Operator.IN_LIST, Operator.NOT_IN_LIST}:
@@ -352,7 +367,9 @@ def validate_in_list_filter(_filter, field_name):
 
     if field_name not in SUPPORTED_IN_LIST_FIELDS and not field_name.startswith('data__'):
         raise ValidationError(
-            '`is any of` and `is none of` support only Task ID, Inner ID, and task.data.* fields in this release.'
+            '`is any of` and `is none of` support only Task ID, Inner ID, '
+            'total_annotations / total_predictions / cancelled_annotations, '
+            'and task.data.* fields in this release.'
         )
 
     if not isinstance(_filter.value, list):
@@ -414,13 +431,23 @@ The UI should not expose these operators just because a column is `String` or `N
 - `filter:tasks:id`
 - `filter:tasks:inner_id`
 - `filter:tasks:data.<field>`
+- `filter:tasks:total_annotations`
+- `filter:tasks:total_predictions`
+- `filter:tasks:cancelled_annotations`
 
 This probably means adding a small filter-column predicate near `FilterOperation.jsx` or in the filter type model:
 
 ```js
 function supportsListMembership(filter) {
   const id = filter?.filter?.id ?? filter?.filter?.field?.id;
-  return id === "filter:tasks:id" || id === "filter:tasks:inner_id" || id?.startsWith("filter:tasks:data.");
+  return (
+    id === "filter:tasks:id" ||
+    id === "filter:tasks:inner_id" ||
+    id?.startsWith("filter:tasks:data.") ||
+    id === "filter:tasks:total_annotations" ||
+    id === "filter:tasks:total_predictions" ||
+    id === "filter:tasks:cancelled_annotations"
+  );
 }
 ```
 
@@ -524,7 +551,8 @@ uv run --directory services/lse label-studio-sdk tasks list \
 | `annotations_ids` | ❌ MVP | Legacy `contains` path rewrites to `annotations__id__in=[...]`; direct `in_list` should be rejected for now. | Relation-backed; can duplicate rows and is outside the core ask. |
 | `annotations_results`, `predictions_results`, `*_results_json.*` | ❌ | Custom JSON/result filtering paths do not handle `in_list`. | Needs separate semantics and tests. |
 | `annotators`, `reviewers`, `updated_by`, `predictions_model_versions` | ❌ | These use custom dropdown / relation logic. | Existing multi-select or custom filter behaviour is the right UX. |
-| `total_annotations`, `total_predictions`, counters, scores, agreement | ❌ MVP | Some may work through generic `__in` or annotations, but not guaranteed. | Avoid expanding the contract until there is a concrete use case. |
+| `total_annotations`, `total_predictions`, `cancelled_annotations` | ✅ | `total_annotations__in=[...]` (and likewise for predictions / cancelled) | Denormalized Task IntegerFields with `db_index=True`; no join/fan-out (FIT-2416). |
+| scores, agreement | ❌ MVP | Custom / annotated metrics; not on the allowlist. | Keep out of MVP until there is a concrete use case and join-safe semantics. |
 | `Datetime` (`created_at`, `updated_at`, `completed_at`) | ❌ | Range operators already exist. | Pasted timestamp list is not a clear MVP workflow. |
 | `Boolean`, `TaskState` | ❌ | Existing dedicated operators are enough. | Not useful for arbitrary pasted lists. |
 
@@ -681,8 +709,9 @@ Pick lenient for MVP — it matches how spreadsheet pasting actually works (stra
   - `annotations_results`
   - `annotators`
   - `reviewers`
-  - `total_annotations`
   - `created_at`
+  - scores / agreement (still out of MVP)
+- Allowlisted counters (`total_annotations`, `total_predictions`, `cancelled_annotations`) accept `in_list` / `not_in_list`.
 - Empty list:
   - `in_list` → no tasks.
   - `not_in_list` → all tasks.
@@ -726,7 +755,7 @@ Add to `services/lso/label_studio/tests/data_manager/api_tasks.tavern.yml`:
 - Create a view, add `is any of` filter on `Task ID`, paste 5 known IDs, save view, assert correct rows visible.
 - Same for `data.<custom>` field.
 - Switch to `is none of`, assert exclusion.
-- Confirm the operator is **not shown** for non-MVP columns such as `Annotation IDs`, `Created at`, `Annotators`, and `Total annotations`.
+- Confirm the operator is **not shown** for non-MVP columns such as `Annotation IDs`, `Created at`, `Annotators`, and agreement/scores. Counter columns (`Total annotations`, etc.) **are** eligible.
 
 ### 15.6. Performance smoke test
 

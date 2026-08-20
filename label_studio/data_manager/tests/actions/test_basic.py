@@ -9,6 +9,7 @@ from data_manager.actions.basic import (
 from django.http import HttpRequest
 from django.test import TestCase
 from projects.tests.factories import ProjectFactory
+from rq.job import Job
 from tasks.models import Annotation, AnnotationDraft, Task
 from tasks.tests.factories import AnnotationDraftFactory, AnnotationFactory, TaskFactory
 from users.tests.factories import UserFactory
@@ -128,6 +129,24 @@ class TestDeleteTasksAnnotations(TestCase):
         assert Annotation.objects.count() == 0
         assert self.task_1.total_annotations == 0
         assert self.task_2.total_annotations == 0
+
+    @patch('data_manager.actions.basic.start_job_async_or_sync')
+    def test_async_delete_opts_out_of_immediate_reload(self, mock_start_job_async_or_sync):
+        """FIT-1855: when the deletion runs as a background job, the action must return
+        reload=False so the Data Manager does NOT auto-reload immediately (which would show
+        the not-yet-deleted annotations and look like the delete failed). Mirrors the async
+        Bulk Review action, which highlights the Refresh button instead."""
+        AnnotationFactory(task=self.task_1, completed_by=self.user_1)
+        # Simulate the deletion being enqueued as a background job (async path).
+        mock_start_job_async_or_sync.return_value = Job.__new__(Job)
+
+        request = HttpRequest()
+        request.user = self.user_1
+        request.data = {}
+        result = delete_tasks_annotations(self.project, Task.objects.filter(id=self.task_1.id), request=request)
+
+        assert result['async'] is True
+        assert result['reload'] is False, result
 
     @patch('data_manager.actions.basic.start_job_async_or_sync')
     def test_schedules_job_when_selection_only_has_drafts(self, mock_start_job_async_or_sync):

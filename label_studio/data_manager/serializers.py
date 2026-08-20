@@ -7,6 +7,7 @@ import ujson as json
 from core.current_request import CurrentContext
 from core.feature_flags import flag_set
 from data_manager.models import Filter, FilterGroup, View
+from data_manager.prepare_params import filters_schema, ordering_schema, selected_items_schema
 from django.conf import settings
 from django.db import transaction
 from django.db.models import Max
@@ -101,7 +102,7 @@ PRIMITIVE_LIST_ELEMENT_TYPES = (str, int, float, bool)
 
 
 def _column_supports_list_membership(column: str) -> bool:
-    """Return True if `column` is in the MVP allowlist for `in_list` / `not_in_list`.
+    """Return True if `column` is in the allowlist for `in_list` / `not_in_list`.
 
     Mirrors `data_manager.managers._is_supported_in_list_field` but operates on the
     raw `filter:tasks:*` column string so the serializer can reject bad views before
@@ -113,7 +114,16 @@ def _column_supports_list_membership(column: str) -> bool:
     field = column[len('filter:tasks:') :]
     if field.startswith('-'):
         field = field[1:]
-    return field in ('id', 'inner_id') or field.startswith('data.')
+    if field.startswith('data.'):
+        return True
+    # Keep in sync with managers.SUPPORTED_IN_LIST_FIELDS
+    return field in {
+        'id',
+        'inner_id',
+        'total_annotations',
+        'total_predictions',
+        'cancelled_annotations',
+    }
 
 
 def _column_filter_field_name(column: str) -> str | None:
@@ -170,8 +180,8 @@ class FilterSerializer(serializers.ModelSerializer):
                 raise serializers.ValidationError(
                     {
                         'column': (
-                            '`is any of` / `is none of` support only Task ID, Inner ID, '
-                            'and task.data.* fields in this release.'
+                            '`is any of` / `is none of` support Task ID, Inner ID, '
+                            'annotation/prediction counters, and task.data.* fields.'
                         )
                     }
                 )
@@ -703,6 +713,11 @@ class DataManagerTaskSerializer(TaskSerializer):
 
     def to_representation(self, obj):
         """Dynamically manage including of some fields in the API result"""
+        # Restrict task.data to visible DM columns before URI resolve (FIT-2416).
+        visible_data_keys = self.context.get('dm_visible_data_keys')
+        if visible_data_keys is not None and isinstance(getattr(obj, 'data', None), dict):
+            obj.data = {key: value for key, value in obj.data.items() if key in visible_data_keys}
+
         ret = super(DataManagerTaskSerializer, self).to_representation(obj)
         if not self.context.get('annotations'):
             ret.pop('annotations', None)
@@ -859,6 +874,7 @@ class DataManagerTaskSerializer(TaskSerializer):
         return serializer_class(drafts, many=True, read_only=True, default=True, context=self.context).data
 
 
+@extend_schema_field(selected_items_schema)
 class SelectedItemsSerializer(serializers.Serializer):
     all = serializers.BooleanField()
     included = serializers.ListField(child=serializers.IntegerField(), required=False)
@@ -889,3 +905,53 @@ class ViewOrderSerializer(serializers.Serializer):
     ids = serializers.ListField(
         child=serializers.IntegerField(), allow_empty=False, help_text='A list of view IDs in the desired order.'
     )
+
+
+class PrepareParamsChildFilterItemSerializer(serializers.Serializer):
+    """Canonical public Data Manager filter item without recursive children."""
+
+    filter = serializers.CharField(help_text='Filter identifier, e.g. filter:tasks:completed_at')
+    operator = serializers.CharField(help_text='Filter operator, e.g. equal, greater, in_list')
+    type = serializers.CharField(help_text='Type of the filter value')
+    value = serializers.JSONField(help_text='Value to filter by')
+
+
+class PrepareParamsFilterItemSerializer(PrepareParamsChildFilterItemSerializer):
+    """Canonical public root filter item with one supported level of children."""
+
+    child_filters = serializers.ListField(
+        child=PrepareParamsChildFilterItemSerializer(),
+        required=False,
+        help_text='Ordered child filters AND-merged with their parent (one nesting level).',
+    )
+
+
+@extend_schema_field(filters_schema, component_name='PrepareParamsFiltersRequest')
+class PrepareParamsFiltersSerializer(serializers.Serializer):
+    conjunction = serializers.ChoiceField(choices=['or', 'and'])
+    items = PrepareParamsFilterItemSerializer(many=True)
+
+
+@extend_schema_field(ordering_schema, component_name='PrepareParamsOrderingRequest')
+class PrepareParamsOrderingField(serializers.ListField):
+    """Runtime list validation with the established public ordering schema."""
+
+
+class PrepareParamsRequestSerializer(serializers.Serializer):
+    filters = PrepareParamsFiltersSerializer(required=False, allow_null=True)
+    selectedItems = SelectedItemsSerializer(required=False, allow_null=True)
+    ordering = PrepareParamsOrderingField(child=serializers.CharField(), required=False, allow_null=True)
+
+
+class ViewDataRequestSerializer(serializers.Serializer):
+    """Established public view payload nested under ``data``."""
+
+    filters = PrepareParamsFiltersSerializer(required=False, allow_null=True)
+    ordering = PrepareParamsOrderingField(child=serializers.CharField(), required=False, allow_null=True)
+
+
+class ViewRequestSerializer(serializers.Serializer):
+    """Public view write contract; runtime conversion remains in ``ViewSerializer``."""
+
+    data = ViewDataRequestSerializer(required=False)
+    project = serializers.IntegerField(required=False, help_text='Project ID')

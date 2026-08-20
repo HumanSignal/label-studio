@@ -114,8 +114,14 @@ const getNodesBBox = ({ start, end, root }) => {
   };
 };
 
-const shapesIntersect = ({ x1, y1, w1, x2, y2, w2 }) => {
-  if (y1 === y2) return false;
+/**
+ * True when boxes should use a side (mid-height) route instead of an arch above.
+ * Same-band spans always use the classic top arch (FIT-2426).
+ * Only vertically separated X-overlapping boxes need the side path.
+ */
+const shapesIntersect = ({ x1, y1, w1, h1, x2, y2, w2, h2 }) => {
+  const verticalOverlap = Math.min(y1 + h1, y2 + h2) - Math.max(y1, y2);
+  if (verticalOverlap > 0) return false;
 
   const leftIntersection = x1 <= x2 && x2 <= x1 + w1;
   const rightIntersection = x1 <= x2 + w2 && x2 + w2 <= x1 + w1;
@@ -261,13 +267,17 @@ const calculatePath = (start, end) => {
 
   const limit = 15;
 
+  // Same-band NER uses the classic orthogonal top arch (not a mid-height or
+  // quadratic gap bow) so Interfaces match standard LSO relation styling.
   const intersecting = shapesIntersect({
     x1,
     y1,
     w1,
+    h1,
     x2,
     y2,
     w2,
+    h2,
   });
 
   const coordinatesCalculator = intersecting ? calculateSidePath : calculateTopPath;

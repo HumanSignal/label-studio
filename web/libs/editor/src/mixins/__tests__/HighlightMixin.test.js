@@ -69,10 +69,14 @@ const Base = types
     hidden: false,
     highlighted: false,
     _highlighted: false,
+    _readOnly: false,
   }))
   .views((self) => ({
     get highlighted() {
       return self._highlighted;
+    },
+    isReadOnly() {
+      return self._readOnly;
     },
   }))
   .actions((self) => ({
@@ -105,6 +109,9 @@ const Base = types
     },
     setHighlighted(v) {
       self._highlighted = v;
+    },
+    setReadOnly(v) {
+      self._readOnly = v;
     },
     setStyle(s) {
       self.style = s;
@@ -457,6 +464,18 @@ describe("HighlightMixin", () => {
       model.setParent({ canResizeSpans: true });
       model.selectRegion();
       expect(first.prepend).toHaveBeenCalled();
+    });
+
+    it("does not attach handles when the selected region is read-only", () => {
+      const { model } = getTestTree();
+      const first = mockSpan();
+      const last = mockSpan();
+      model.setSpans([first, last]);
+      model.setParent({ canResizeSpans: true });
+      model.setReadOnly(true);
+      model.selectRegion();
+      expect(first.prepend).not.toHaveBeenCalled();
+      expect(last.append).not.toHaveBeenCalled();
     });
 
     it("calls scrollIntoViewIfNeeded when available", () => {

@@ -758,12 +758,14 @@ For more information about pausing annotators, including how to manually pause s
     
     If you switch a project from Automatic to Manual distribution, annotator evaluation is automatically disabled.
 
-Evaluate annotators against [ground truths](ground_truths) within a project. A "ground truth" annotation is a verified, high-quality annotation that serves as the correct answer for a specific task.
+Evaluate annotators against [ground truths](ground_truths) or against their **acceptance score** from review outcomes. You can then automatically pause annotators who do not meet the threshold you set.
 
-When enabled, this setting looks at the agreement score for the annotator when compared solely against ground truth annotations. You can decide to automatically pause an annotator within the project if their ground truth agreement score falls below a certain threshold. 
+Use ground truth evaluation when the project has verified labels to score against. Use acceptance score when you want to evaluate annotators from review outcomes instead, including projects that do not have ground truth.
+
+The **Members** dashboard shows each annotator's evaluation status. If you do not enable pausing, scores are still calculated and can be reviewed there. See [Members dashboard](dashboard_members).
 
 !!! note 
-    Enabling annotator evaluation means that ground truth tasks are not constrained by the [annotator overlap](#overlap). For example, if you set overlap to `2`, but you have 10 annotators, all 10 will still be able to add annotations to ground truth tasks. 
+    When you evaluate against ground truth, those tasks are not constrained by the [annotator overlap](#overlap). For example, if you set overlap to `2`, but you have 10 annotators, all 10 will still be able to add annotations to ground truth tasks. 
 
 !!! info Tip
     You can specify that ground truth tasks should be unskippable by adding `"allow_skip": false` as part of the JSON task definition that you import to your project. For more information, see [Individual unskippable tasks](skip#Individual-unskippable-tasks)
@@ -778,11 +780,17 @@ When enabled, this setting looks at the agreement score for the annotator when c
 <tr>
 <td>
 
-**Evaluate all annotators against ground truth** 
+**Evaluation** 
 </td>
 <td>
 
-Select this to enable annotator evaluation for the project. 
+Select how annotators should be evaluated:
+
+* **Don't evaluate annotators**: Evaluation is turned off.
+* **Evaluate against ground truth**: Require annotators to complete ground truth tasks. Overlap is ignored for these tasks.
+* **Evaluate against acceptance score (accepted / reviewed)**: Score annotators by how often their submitted annotations are accepted during review. This includes annotations that were fixed and then accepted.
+
+Acceptance score is calculated as (accepted + fix and accepted) / reviewed. The score uses the latest review outcome for each annotation. If an annotator updates a rejected annotation, that rejection still counts until a reviewer records a new verdict.
 
 </td>
 </tr>
@@ -792,6 +800,8 @@ Select this to enable annotator evaluation for the project.
 **Onboarding evaluation**
 </td>
 <td>
+
+Only available when evaluating against ground truth.
 
 When annotators enter the labeling stream, they are first presented with tasks that have a ground truth annotation. This ensures that annotators meet your evaluation standards before progressing through the remaining project tasks. 
 
@@ -807,6 +817,8 @@ Set this counter to zero if you want to skip onboarding and only use continuous 
 </td>
 <td>
 
+Only available when evaluating against ground truth.
+
 Annotators are presented with ground truth tasks in the order that is configured under [**Task Ordering Method**](#task-ordering). 
 
 To have all ground truths presented as part of continuous evaluation, set the **Onboarding evaluation** counter to zero and set this number equal to the number of ground truth tasks in your project. 
@@ -818,56 +830,60 @@ You can also use a combination of both, so that annotators see a subset of groun
 <tr>
 <td>
 
+**Number of tasks for evaluation** / **Minimum reviewed annotations before evaluation**
+</td>
+<td>
+
+The minimum sample an annotator must complete before they can fail evaluation (and be paused, if pausing is enabled).
+
+When evaluating against ground truth, this is the number of ground truth tasks they must complete. For example, if you set this to `10`, even if the annotator gets every single task wrong, they will not be paused until after they have completed 10 ground truth tasks.
+
+When evaluating against acceptance score, this is the number of **reviewed** annotations they must have. Evaluation does not start until reviewers have recorded that many verdicts.
+
+</td>
+</tr>
+<tr>
+<td>
+
+**Score required to pass evaluation** / **Minimum acceptance score**
+</td>
+<td>
+
+The percent threshold an annotator must meet to pass evaluation.
+
+When evaluating against ground truth, this is the agreement score threshold compared to ground truth annotations. How agreement is calculated depends on what you select in the [**Agreement** section](#task-agreement).
+
+When evaluating against acceptance score, this is the minimum acceptance score. Annotators below this threshold fail evaluation.
+
+</td>
+</tr>
+<tr>
+<td>
+
 **Pause annotator on failed evaluation** 
 </td>
 <td>
 
-Determines whether annotators should be paused if they do not meet the required score set below. If they fail to meet the score, they are immediately paused and unable to access the project. 
+Determines whether annotators should be paused if they do not meet the required score. If they fail to meet the score, they are paused and cannot submit additional annotations.
 
-If you do not enable pausing, the other **Annotator Evaluation** options are simply calculated in the background and can be reviewed in the [Members dashboard](dashboard_members).
-
-</td>
-</tr>
-<tr>
-<td>
-
-**Score required to pass evaluation** 
-</td>
-<td>
-
-This is the agreement score threshold that an annotator must meet when evaluated against ground truth annotations. How agreement is calculated depends on what you select in the [**Agreement** section](#task-agreement). 
-
-If they do not meet this score, they are paused. 
-
-</td>
-</tr>
-<tr>
-<td>
-
-**Number of tasks for evaluation** 
-</td>
-<td>
-
-This is the number of tasks a user has to complete before they can potentially be paused.  
-
-For example, if you set this to `10`, even if the annotator gets every single task wrong, they will not be paused until after they have completed 10 ground truth tasks. 
-
-If they reach 10 tasks and meet the required score, they will continue progressing through the remaining ground truth tasks until they either fall below the score (in which case they are paused), or they finish their evaluation and continue on to the rest of the project queue. 
+If you do not enable pausing, evaluation still runs and the results can be reviewed in the [Members dashboard](dashboard_members).
 
 </td>
 </tr>
 </table> 
 
-You can see which users are paused from the **Members** page. 
+You can see each annotator's evaluation status and who is paused from the **Members** page. 
 
-When users are paused as part of the annotator evaluation workflow, you cannot manually unpause them. To unpause a user, you will need to relax the evaluation settings for the project by increasing the minimum number of tasks or the score threshold.  
+When users are paused as part of the annotator evaluation workflow, you cannot manually unpause them from the Members pause toggle. They are unpaused automatically if their score recovers. You can also relax the evaluation settings for the project, for example by increasing the minimum sample or changing the score threshold.
+
+If your project requeues rejected annotations, paused annotators can still receive and update their rejected work from the labeling stream and the Data Manager. When you evaluate against acceptance score, updating a rejected annotation does not lift the pause by itself; a reviewer has to record a new verdict that improves the score.
 
 For more information about pausing annotators, including how to manually pause specific annotators, see [Pause an annotator](quality#Pause-an-annotator).
 
 !!! note
     Pauses are enforced for users in Annotator and Reviewer roles.  
     
-    So, for example, if a Reviewer is also annotating tasks and they fail to meet the required ground truth agreement score, they will be unable to regain access to the project to review annotations unless they are unpaused. 
+    So, for example, if a Reviewer is also annotating tasks and they fail evaluation, they will be unable to regain access to the project to review annotations unless they are unpaused. 
 
     Users in the Manager, Administrator, or Owner role are unaffected by evaluation requirements. 
 

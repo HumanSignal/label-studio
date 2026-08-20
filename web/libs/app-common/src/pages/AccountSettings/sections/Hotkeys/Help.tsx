@@ -1,13 +1,14 @@
-import { useMemo, useCallback } from "react";
+import { useCallback, useMemo, useSyncExternalStore } from "react";
 import { modal } from "@humansignal/ui/lib/modal";
 import clsx from "clsx";
+import { getProjectHotkeysSettingsPath, getProjectIdFromPathname } from "@humansignal/core/lib/utils/hotkeysProject";
+import { effectiveHotkeys } from "../../hotkeys/effectiveHotkeys";
 import { KeyboardKey } from "./Key";
 // @ts-ignore
 import { HOTKEY_SECTIONS, URL_TO_SECTION_MAPPING } from "./defaults";
 import type { Hotkey, Section } from "./utils";
 import { getTypedDefaultHotkeys } from "./utils";
 
-// Type definitions for imported constants
 interface UrlMapping {
   regex: RegExp;
   section: string | string[];
@@ -18,61 +19,64 @@ interface GroupedHotkeys {
 }
 
 interface ModalReturn {
-  close: () => void;
+  close: () => void | Promise<void>;
 }
 
 interface HotkeyHelpModalProps {
   sectionsToShow: string[];
 }
 
-// Type the imported constants
 const sections = HOTKEY_SECTIONS as Section[];
 const urlMappings = URL_TO_SECTION_MAPPING as UrlMapping[];
 
-/**
- * Hook to get current hotkeys with customizations
- */
-const useCurrentHotkeys = (): Hotkey[] => {
-  return useMemo(() => {
-    const defaultHotkeys = getTypedDefaultHotkeys();
-    const customHotkeys = window.APP_SETTINGS?.user?.customHotkeys || {};
+const resolveCurrentHotkeys = (): Hotkey[] => {
+  const defaultHotkeys = getTypedDefaultHotkeys();
 
-    return defaultHotkeys.map((hotkey: Hotkey) => {
-      const lookupKey = `${hotkey.section}:${hotkey.element}`;
-      if (customHotkeys[lookupKey]) {
-        const customSetting = customHotkeys[lookupKey];
-        return {
-          ...hotkey,
-          key: customSetting.key,
-          active: customSetting.active,
-          ...(customSetting.description && {
-            description: customSetting.description,
-          }),
-        };
-      }
-      return hotkey;
-    });
-  }, []);
+  return defaultHotkeys.map((hotkey: Hotkey) => {
+    const lookupKey = `${hotkey.section}:${hotkey.element}`;
+    const customSetting = effectiveHotkeys.get(lookupKey);
+    if (customSetting) {
+      return {
+        ...hotkey,
+        key: customSetting.key ?? "",
+        active: customSetting.active ?? hotkey.active,
+        ...(customSetting.description && {
+          description: customSetting.description,
+        }),
+      };
+    }
+    return hotkey;
+  });
 };
 
-/**
- * Main modal component that displays keyboard shortcuts
- * Renders shortcuts organized by sections and subgroups
- */
+let helpSnapshot: Hotkey[] | null = null;
+let helpSnapshotVersion = -1;
+
+const getHelpHotkeysSnapshot = (): Hotkey[] => {
+  const version = effectiveHotkeys.getVersion();
+  if (helpSnapshot && version === helpSnapshotVersion) return helpSnapshot;
+  helpSnapshot = resolveCurrentHotkeys();
+  helpSnapshotVersion = version;
+  return helpSnapshot;
+};
+
+const useCurrentHotkeys = (): Hotkey[] =>
+  useSyncExternalStore(effectiveHotkeys.subscribe, getHelpHotkeysSnapshot, getHelpHotkeysSnapshot);
+
 const HotkeyHelpModal = ({ sectionsToShow }: HotkeyHelpModalProps) => {
   const hotkeys = useCurrentHotkeys();
+  const projectId = getProjectIdFromPathname(window.location.pathname);
+  const customizationPath = projectId ? getProjectHotkeysSettingsPath(projectId) : "/user/account/hotkeys";
+  const customizationLabel = projectId ? "Customize for this project" : "Customize hotkeys";
 
-  /**
-   * Navigates to hotkey customization page
-   */
-  const handleCustomizeClick = useCallback((e: React.MouseEvent) => {
-    e.preventDefault();
-    window.location.href = "/user/account/hotkeys";
-  }, []);
+  const handleCustomizeClick = useCallback(
+    (e: React.MouseEvent) => {
+      e.preventDefault();
+      window.location.href = customizationPath;
+    },
+    [customizationPath],
+  );
 
-  /**
-   * Renders a single hotkey section with its shortcuts
-   */
   const renderSection = useCallback(
     (sectionId: string) => {
       const section = sections.find((s: Section) => s.id === sectionId);
@@ -81,7 +85,6 @@ const HotkeyHelpModal = ({ sectionsToShow }: HotkeyHelpModalProps) => {
       const sectionHotkeys = hotkeys.filter((h: Hotkey) => h.section === sectionId);
       if (sectionHotkeys.length === 0) return null;
 
-      // Group hotkeys by subgroup for better organization
       const groupedHotkeys = sectionHotkeys.reduce((groups: GroupedHotkeys, hotkey: Hotkey) => {
         const subgroup = hotkey.subgroup || "default";
         if (!groups[subgroup]) {
@@ -91,7 +94,6 @@ const HotkeyHelpModal = ({ sectionsToShow }: HotkeyHelpModalProps) => {
         return groups;
       }, {});
 
-      // Sort subgroups with 'default' always first
       const subgroups = Object.keys(groupedHotkeys).sort((a, b) => {
         if (a === "default") return -1;
         if (b === "default") return 1;
@@ -100,13 +102,11 @@ const HotkeyHelpModal = ({ sectionsToShow }: HotkeyHelpModalProps) => {
 
       return (
         <div key={sectionId} className="border border-neutral-border rounded-lg">
-          {/* Section Header */}
           <div className="px-4 py-3 border-b border-neutral-border">
             <h3 className="font-medium">{section.title}</h3>
             <p className="text-sm text-neutral-content-subtler">{section.description}</p>
           </div>
 
-          {/* Section Content */}
           <div className="p-4">
             <div className="space-y-2">
               {subgroups.map((subgroup) => (
@@ -114,7 +114,6 @@ const HotkeyHelpModal = ({ sectionsToShow }: HotkeyHelpModalProps) => {
                   key={subgroup}
                   className={clsx(subgroup !== "default" && "mt-4 pt-2 border rounded-md border-neutral-border p-3")}
                 >
-                  {/* Subgroup Header */}
                   {subgroup !== "default" && (
                     <div className="mb-3">
                       <div className="text-sm font-medium mb-1 capitalize">
@@ -128,7 +127,6 @@ const HotkeyHelpModal = ({ sectionsToShow }: HotkeyHelpModalProps) => {
                     </div>
                   )}
 
-                  {/* Hotkey Items */}
                   {groupedHotkeys[subgroup].map((hotkey: Hotkey) => (
                     <div key={`${section.id}-${hotkey.element}`} className="flex items-center justify-between py-2">
                       <div>
@@ -137,7 +135,11 @@ const HotkeyHelpModal = ({ sectionsToShow }: HotkeyHelpModalProps) => {
                           <div className="text-sm text-neutral-content-subtler">{hotkey.description}</div>
                         )}
                       </div>
-                      <KeyboardKey>{hotkey.key}</KeyboardKey>
+                      {hotkey.active === false || !hotkey.key ? (
+                        <span className="text-sm text-neutral-content-subtler">Disabled</span>
+                      ) : (
+                        <KeyboardKey>{hotkey.key}</KeyboardKey>
+                      )}
                     </div>
                   ))}
                 </div>
@@ -160,11 +162,11 @@ const HotkeyHelpModal = ({ sectionsToShow }: HotkeyHelpModalProps) => {
           <p className="text-sm text-neutral-content-subtler mt-1">
             View all available keyboard shortcuts.&nbsp;
             <a
-              href="/user/account/hotkeys"
+              href={customizationPath}
               onClick={handleCustomizeClick}
               className="text-primary-content hover:underline hover:text-primary-content-hover"
             >
-              Customize
+              {customizationLabel}
             </a>
           </p>
         </div>
@@ -174,22 +176,17 @@ const HotkeyHelpModal = ({ sectionsToShow }: HotkeyHelpModalProps) => {
         </div>
       </div>
     ),
-    [sectionsToShow, renderSection, handleCustomizeClick],
+    [sectionsToShow, renderSection, customizationPath, customizationLabel, handleCustomizeClick],
   );
 
   return modalContent;
 };
 
-/**
- * Determines which hotkey sections to display based on URL or explicit section names
- */
 const determineSectionsToShow = (sectionOrUrl?: string | string[]): string[] => {
   let sectionsToShow: string[] = [];
 
   if (sectionOrUrl) {
-    // Check if input is a URL
     if (typeof sectionOrUrl === "string" && (sectionOrUrl.startsWith("http") || sectionOrUrl.startsWith("/"))) {
-      // Apply URL-to-section mapping
       for (const mapping of urlMappings) {
         if (mapping.regex.test(sectionOrUrl)) {
           if (Array.isArray(mapping.section)) {
@@ -200,11 +197,9 @@ const determineSectionsToShow = (sectionOrUrl?: string | string[]): string[] => 
         }
       }
     } else {
-      // Input is section name(s)
       sectionsToShow = Array.isArray(sectionOrUrl) ? sectionOrUrl : [sectionOrUrl];
     }
   } else {
-    // Use current URL if no input provided
     const currentUrl = window.location.pathname + window.location.search;
     for (const mapping of urlMappings) {
       if (mapping.regex.test(currentUrl)) {
@@ -217,10 +212,8 @@ const determineSectionsToShow = (sectionOrUrl?: string | string[]): string[] => 
     }
   }
 
-  // Remove duplicates
   sectionsToShow = [...new Set(sectionsToShow)];
 
-  // Show all sections if none were identified
   if (sectionsToShow.length === 0) {
     sectionsToShow = sections.map((section: Section) => section.id);
   }
@@ -228,30 +221,6 @@ const determineSectionsToShow = (sectionOrUrl?: string | string[]): string[] => 
   return sectionsToShow;
 };
 
-/**
- * Creates and displays a modal with keyboard shortcuts
- * Automatically determines which shortcuts to show based on current page or provided sections
- * The modal automatically gets current hotkeys including any customizations
- *
- * @param {string|string[]} [sectionOrUrl] - Optional URL or section name(s) to determine which shortcuts to display
- *                                         - If URL: uses regex mapping to find relevant sections
- *                                         - If string: shows that specific section
- *                                         - If array: shows multiple specific sections
- *                                         - If undefined: auto-detects from current URL
- *
- * @example
- * // Show shortcuts for current page
- * openHotkeyHelp();
- *
- * // Show shortcuts for specific section
- * openHotkeyHelp('annotation');
- *
- * // Show shortcuts for multiple sections
- * openHotkeyHelp(['annotation', 'regions']);
- *
- * // Show shortcuts based on URL
- * openHotkeyHelp('/projects/123/data/?task=456');
- */
 export const openHotkeyHelp = (sectionOrUrl?: string | string[]): ModalReturn => {
   const sectionsToShow = determineSectionsToShow(sectionOrUrl);
 
