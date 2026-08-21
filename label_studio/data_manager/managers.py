@@ -11,6 +11,7 @@ from typing import ClassVar
 import ujson as json
 from core.feature_flags import flag_set
 from core.utils.db import fast_first
+from data_manager.column_names import UNQUERYABLE_COLUMN_NAME_CHARACTERS, is_queryable_column_name
 from data_manager.prepare_params import ConjunctionEnum
 from django.conf import settings
 from django.contrib.postgres.aggregates import ArrayAgg
@@ -891,6 +892,16 @@ def apply_filters(queryset, filters, project, request):
             # use other name because of model names conflict
             if field_name == 'file_upload':
                 field_name = 'file_upload_field'
+
+            # From here on the column name becomes an ORM path and query alias, which Django
+            # rejects with a bare ValueError for names holding whitespace, quotes, control
+            # characters and the like — for instance a task.data key imported from a spreadsheet
+            # header. Report it as a client error instead of failing the request (UTC-1221).
+            if not is_queryable_column_name(field_name):
+                raise ValidationError(
+                    f'Cannot filter on column "{_filter.filter.removeprefix("filter:tasks:")}": '
+                    f'column names cannot contain {UNQUERYABLE_COLUMN_NAME_CHARACTERS}.'
+                )
 
             # annotate with cast to number if need
             if _filter.type == 'Number' and field_name.startswith('data__'):

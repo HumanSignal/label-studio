@@ -1337,6 +1337,59 @@ class TestVisibleDataColumnKeys(TestCase):
         assert 'image' in visible
 
 
+class TestApplyFiltersUnqueryableDataColumns(TestCase):
+    """UTC-1221: imported task.data keys can hold characters Django refuses in query aliases.
+
+    Those filters used to crash with `ValueError: Column aliases cannot contain whitespace
+    characters, ...` (a 500), so they must surface as a client validation error instead.
+    """
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.project = ProjectFactory()
+        cls.task = TaskFactory(project=cls.project, data={'my column': 'keep me', 'my number': 1})
+
+    def _apply(self, column, operator, filter_type, value):
+        from data_manager.managers import apply_filters
+
+        filters = Filters(
+            conjunction=ConjunctionEnum.AND,
+            items=[
+                Filter(
+                    filter=f'filter:tasks:data.{column}',
+                    operator=operator,
+                    type=filter_type,
+                    value=value,
+                )
+            ],
+        )
+        queryset = apply_filters(Task.objects.filter(project=self.project), filters, self.project, request=None)
+        return list(queryset.values_list('id', flat=True))
+
+    def test_string_filter_on_unqueryable_column_reports_validation_error(self):
+        from rest_framework.exceptions import ValidationError
+
+        with self.assertRaises(ValidationError):
+            self._apply('my column', 'contains', 'String', 'keep')
+
+    def test_empty_operator_on_unqueryable_column_reports_validation_error(self):
+        from rest_framework.exceptions import ValidationError
+
+        with self.assertRaises(ValidationError):
+            self._apply('my column', 'empty', 'String', 'true')
+
+    def test_number_filter_on_unqueryable_column_reports_validation_error(self):
+        from rest_framework.exceptions import ValidationError
+
+        with self.assertRaises(ValidationError):
+            self._apply('my number', 'equal', 'Number', '1')
+
+    def test_queryable_data_column_filters_are_unaffected(self):
+        task = TaskFactory(project=self.project, data={'safe_column': 'keep me'})
+
+        assert self._apply('safe_column', 'contains', 'String', 'keep') == [task.id]
+
+
 class TestApplyFiltersInvalidRegex(TestCase):
     """FIT-2460: invalid regex fails closed before custom emitters run."""
 

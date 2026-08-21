@@ -159,6 +159,52 @@ class TestTaskListVisibleDataPayload(APITestCase):
         assert 'drop' not in task_payload['data']
 
 
+class TestTaskListUnqueryableDataColumnFilter(APITestCase):
+    """UTC-1221: a saved filter on an unqueryable task.data key must not crash the task list."""
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.project = ProjectFactory()
+        cls.task = TaskFactory(project=cls.project, data={'my column': 'keep me', 'safe_column': 'keep me'})
+
+    def _list_with_filter(self, column):
+        self.client.force_authenticate(self.project.created_by)
+        view = self.client.post(
+            f'/api/dm/views/?project={self.project.id}',
+            {
+                'project': self.project.id,
+                'data': {
+                    'filters': {
+                        'conjunction': 'and',
+                        'items': [
+                            {
+                                'filter': f'filter:tasks:data.{column}',
+                                'operator': 'contains',
+                                'type': 'String',
+                                'value': 'keep',
+                            }
+                        ],
+                    }
+                },
+            },
+            format='json',
+        )
+        assert view.status_code == 201
+        return self.client.get('/api/tasks/', {'project': self.project.id, 'view': view.json()['id'], 'page_size': 10})
+
+    def test_filter_on_unqueryable_column_returns_bad_request(self):
+        response = self._list_with_filter('my column')
+
+        assert response.status_code == 400
+        assert 'my column' in str(response.json())
+
+    def test_filter_on_queryable_column_still_returns_tasks(self):
+        response = self._list_with_filter('safe_column')
+
+        assert response.status_code == 200
+        assert [task['id'] for task in response.json()['tasks']] == [self.task.id]
+
+
 class TestProjectUsersOptionsAPI(APITestCase):
     @classmethod
     def setUpTestData(cls):
