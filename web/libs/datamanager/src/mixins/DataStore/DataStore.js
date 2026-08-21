@@ -126,6 +126,8 @@ const MixinBase = types
       self.list = [];
       self.page = 0;
       self.total = 0;
+      // FIT-2376: keep Spinner (not EmptyState) while tab switch fetch is in flight
+      self.loading = true;
     },
   }));
 
