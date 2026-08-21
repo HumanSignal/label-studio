@@ -343,10 +343,26 @@ def get_next_task_without_dm_queue(
     return next_task, use_task_lock, queue_info
 
 
+def _eligible_unfinished_or_gt_q(*, include_gt: bool) -> Q:
+    """Match unfinished tasks, and (when in GT eval window) labeled GT tasks too.
+
+    Postponed/skipped queues historically required ``task__is_labeled=False``. With
+    Annotator Evaluation, overlap-full GT tasks are still eligible for the user
+    (FIT-1631 main pool); postponed drafts on those tasks must re-enter the same way
+    (FIT-2612).
+    """
+    if include_gt:
+        return Q(task__is_labeled=False) | Q(task__annotations__ground_truth=True)
+    return Q(task__is_labeled=False)
+
+
 def skipped_queue(next_task, prepared_tasks, project, user, assigned_flag, queue_info):
     if not next_task and project.skip_queue == project.SkipQueue.REQUEUE_FOR_ME:
-        q = Q(project=project, task__isnull=False, was_cancelled=True, task__is_labeled=False)
-        skipped_tasks = user.annotations.filter(q).order_by('updated_at').values_list('task__pk', flat=True)
+        include_gt = is_user_in_gt_evaluation_window(user, project)
+        q = Q(project=project, task__isnull=False, was_cancelled=True) & _eligible_unfinished_or_gt_q(
+            include_gt=include_gt
+        )
+        skipped_tasks = user.annotations.filter(q).order_by('updated_at').values_list('task__pk', flat=True).distinct()
         if skipped_tasks.exists():
             preserved_order = Case(*[When(pk=pk, then=pos) for pos, pk in enumerate(skipped_tasks)])
             skipped_tasks = prepared_tasks.filter(pk__in=skipped_tasks).order_by(preserved_order)
@@ -366,8 +382,11 @@ def skipped_queue(next_task, prepared_tasks, project, user, assigned_flag, queue
 
 def postponed_queue(next_task, prepared_tasks, project, user, assigned_flag, queue_info):
     if not next_task:
-        q = Q(task__project=project, task__isnull=False, was_postponed=True, task__is_labeled=False)
-        postponed_tasks = user.drafts.filter(q).order_by('updated_at').values_list('task__pk', flat=True)
+        include_gt = is_user_in_gt_evaluation_window(user, project)
+        q = Q(task__project=project, task__isnull=False, was_postponed=True) & _eligible_unfinished_or_gt_q(
+            include_gt=include_gt
+        )
+        postponed_tasks = user.drafts.filter(q).order_by('updated_at').values_list('task__pk', flat=True).distinct()
         if postponed_tasks.exists():
             preserved_order = Case(*[When(pk=pk, then=pos) for pos, pk in enumerate(postponed_tasks)])
             postponed_tasks = prepared_tasks.filter(pk__in=postponed_tasks).order_by(preserved_order)
