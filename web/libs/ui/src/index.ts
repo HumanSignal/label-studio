@@ -12,6 +12,7 @@ export * from "./lib/checkbox/checkbox";
 export * from "./lib/code-block/code-block";
 export * from "./lib/code-editor/code-editor";
 export * from "./lib/collapsible-panel";
+export * from "./lib/collection-uploader/collection-uploader";
 export * from "./lib/context-menu";
 export * from "./lib/dropdown";
 export * from "./lib/empty-state/empty-state";
