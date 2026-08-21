@@ -219,7 +219,9 @@ export const TabColumn = types
     },
 
     get filterable() {
-      const cellView = CellViews[self.type] ?? CellViews[normalizeCellAlias(self.alias)];
+      const byAlias = CellViews[normalizeCellAlias(self.alias)];
+      const byType = CellViews[self.type];
+      const cellView = byAlias?.customOperators ? byAlias : (byType ?? byAlias);
 
       return cellView?.filterable !== false;
     },

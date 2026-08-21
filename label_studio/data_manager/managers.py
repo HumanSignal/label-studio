@@ -994,6 +994,10 @@ def apply_filters(queryset, filters, project, request):
 
             # empty
             elif _filter.operator == 'empty':
+                # FIT-2525: task-level ground_truth is Exists(...), never NULL.
+                # Skip legacy empty so it does not become __isnull (match-all / match-none).
+                if clean_field_name == 'ground_truth':
+                    continue
                 if cast_bool_from_str(_filter.value):
                     filter_expressions.append(Q(**{field_name: True}))
                 else:

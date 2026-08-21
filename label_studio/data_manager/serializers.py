@@ -194,6 +194,11 @@ class FilterSerializer(serializers.ModelSerializer):
             )
 
             field_name = _column_filter_field_name(attrs.get('column', ''))
+            # FIT-2525: Ground Truth is never null (task Exists / annotation BooleanField).
+            if field_name == 'ground_truth' and operator == 'empty':
+                raise serializers.ValidationError(
+                    {'operator': 'Ground Truth does not support operator "empty". Allowed: equal.'}
+                )
             if field_name in USER_FILTER_FIELDS:
                 try:
                     validate_user_filter_operator(field_name, operator, attrs.get('value'))

@@ -197,8 +197,11 @@ export const TabFilter = types
 
     get cellView() {
       const col = self.filter.field;
-
-      return CellViews[col.type] ?? CellViews[normalizeCellAlias(col.alias)];
+      const byAlias = CellViews[normalizeCellAlias(col.alias)];
+      const byType = CellViews[col.type];
+      // Prefer alias views that customize operators (e.g. GroundTruth without "is empty").
+      if (byAlias?.customOperators) return byAlias;
+      return byType ?? byAlias;
     },
 
     get isNestedChildFilter() {
