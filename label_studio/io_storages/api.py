@@ -42,6 +42,14 @@ class ImportStorageListAPI(generics.ListCreateAPIView):
         StorageClass.ensure_storage_statuses(storages)
         return storages
 
+    def perform_create(self, serializer):
+        from rest_framework.exceptions import PermissionDenied
+
+        project = serializer.validated_data.get('project')
+        if project is not None and not project.has_permission(self.request.user):
+            raise PermissionDenied('You do not have permission to create storages for this project.')
+        super().perform_create(serializer)
+
 
 class ImportStorageDetailAPI(generics.RetrieveUpdateDestroyAPIView):
     """RUD storage by pk specified in URL"""
@@ -83,6 +91,12 @@ class ExportStorageListAPI(generics.ListCreateAPIView):
         return storages
 
     def perform_create(self, serializer):
+        from rest_framework.exceptions import PermissionDenied
+
+        project = serializer.validated_data.get('project')
+        if project is not None and not project.has_permission(self.request.user):
+            raise PermissionDenied('You do not have permission to create storages for this project.')
+
         # double check: not export storages don't validate connection in serializer,
         # just make another explicit check here, note: in this create API we have credentials in request.data
         instance = serializer.Meta.model(**serializer.validated_data)

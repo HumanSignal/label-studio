@@ -1,285 +1,199 @@
-import { Button, IconChevronLeft, IconChevronRight } from "@humansignal/ui";
+/**
+ * Classic editor (MST) AnnotationsCarousel wrapper.
+ *
+ * Maps live MST `annotationStore.predictions` + `annotationStore.annotations` into the
+ * plain SharedAnnotation array consumed by the shared `AnnotationsCarousel`. Each
+ * row is rendered through the per-row classic `AnnotationButton` wrapper (passed via
+ * `renderItem`) so per-row hooks for lazy hydration, user resolution, MST `enrichUsers`,
+ * and the delete confirmation modal still run.
+ *
+ * Behaviors preserved:
+ * - Predictions before annotations (B2; classic order, no date sort)
+ * - Virtualization gated by FF_FIT_720_LAZY_LOAD_ANNOTATIONS (B3)
+ * - Suppress scroll-to-selected on Task Summary tab (B5; same persistent-state key)
+ */
 import { observer } from "mobx-react";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { FixedSizeList as List, type ListChildComponentProps } from "react-window";
-import AutoSizer from "react-virtualized-auto-sizer";
-import { cn } from "../../utils/bem";
-import { clamp, sortAnnotations } from "../../utils/utilities";
+import { isAlive } from "mobx-state-tree";
+import { useMemo, useCallback, type ReactNode } from "react";
+import {
+  AnnotationsCarousel as SharedAnnotationsCarousel,
+  type AnnotationActionHandlers,
+  type AnnotationCapabilities,
+  type AnnotationsListLayout,
+  type SharedAnnotation,
+  resolveClassicEntityReviewState,
+} from "@humansignal/core";
 import { isActive, FF_FIT_720_LAZY_LOAD_ANNOTATIONS } from "@humansignal/core/lib/utils/feature-flags";
+import { usePersistentState } from "@humansignal/core/lib/hooks/usePersistentState";
 import { AnnotationButton } from "./AnnotationButton";
-import "./AnnotationsCarousel.prefix.css";
-
-const ITEM_WIDTH = 200; // Approximate width of each annotation button (min-width: 186px + gap)
-const ITEM_GAP = 4; // Gap between items (--spacing-tighter)
-const VIRTUALIZATION_THRESHOLD = 50; // Only virtualize if more than this many items
 
 interface AnnotationsCarouselInterface {
   store: any;
   annotationStore: any;
   commentStore?: any;
+  layout?: AnnotationsListLayout;
+  /** When provided (from sidebar filter/sort pipeline), skip internal entity computation. */
+  entities?: SharedAnnotation[];
+  /** Forwarded into the shared carousel to render inside the scroll container (vertical only). */
+  emptyState?: ReactNode;
 }
 
-interface ItemData {
-  entities: any[];
-  capabilities: any;
-  annotationStore: any;
-  store: any;
+/**
+ * Lightweight summary of a live MST entity used only for the carousel layout/scroll
+ * state — every per-row interaction goes through the classic `AnnotationButton`
+ * wrapper which receives the live MST entity directly.
+ */
+function entityToSummary(entity: any, store: any): SharedAnnotation {
+  return {
+    id: String(entity.id),
+    pk: entity.pk != null ? String(entity.pk) : null,
+    type: entity.type === "prediction" ? "prediction" : "annotation",
+    selected: Boolean(entity.selected),
+    createdBy: entity.createdBy ?? "",
+    createdDate: entity.createdDate ?? "",
+    updatedDate: entity.draftSaved ?? entity.updatedDate ?? entity.createdDate ?? "",
+    user: null,
+    groundTruth: Boolean(entity.ground_truth),
+    skipped: Boolean(entity.skipped),
+    draftId: entity.draftId ?? 0,
+    score: typeof entity.score === "number" ? entity.score : null,
+    commentCount: entity.comment_count ?? 0,
+    unresolvedCommentCount: entity.unresolved_comment_count ?? 0,
+    acceptedState: resolveClassicEntityReviewState(entity, store),
+  };
 }
 
-const VirtualizedAnnotationButton = ({ index, style, data }: ListChildComponentProps<ItemData>) => {
-  const entity = data.entities[index];
-  return (
-    <div style={{ ...(style as React.CSSProperties), paddingRight: ITEM_GAP }}>
-      <AnnotationButton
-        key={entity?.id}
-        entity={entity}
-        capabilities={data.capabilities}
-        annotationStore={data.annotationStore}
-        store={data.store}
-      />
-    </div>
-  );
-};
+export const AnnotationsCarousel = observer(
+  ({ store, annotationStore, layout, entities: entitiesOverride, emptyState }: AnnotationsCarouselInterface) => {
+    const enableAnnotations = store.hasInterface("annotations:tabs");
+    const enablePredictions = store.hasInterface("predictions:tabs");
+    const enableCreateAnnotation = store.hasInterface("annotations:add-new");
+    const groundTruthEnabled = store.hasInterface("ground-truth");
+    const enableAnnotationDelete = store.hasInterface("annotations:delete");
+    const enablePredictionDelete = store.hasInterface("predictions:delete");
 
-export const AnnotationsCarousel = observer(({ store, annotationStore }: AnnotationsCarouselInterface) => {
-  const [entities, setEntities] = useState<any[]>([]);
-  const enableAnnotations = store.hasInterface("annotations:tabs");
-  const enablePredictions = store.hasInterface("predictions:tabs");
-  const enableCreateAnnotation = store.hasInterface("annotations:add-new");
-  const groundTruthEnabled = store.hasInterface("ground-truth");
-  const enableAnnotationDelete = store.hasInterface("annotations:delete");
-  const listRef = useRef<List>(null);
-  const carouselRef = useRef<HTMLElement>();
-  const containerRef = useRef<HTMLElement>();
-
-  const [scrollOffset, setScrollOffset] = useState(0);
-  const [containerWidth, setContainerWidth] = useState(0);
-
-  // Original: Track position for non-virtualized CSS transform scrolling
-  const [currentPosition, setCurrentPosition] = useState(0);
-  const [isLeftDisabledOriginal, setIsLeftDisabledOriginal] = useState(false);
-  const [isRightDisabledOriginal, setIsRightDisabledOriginal] = useState(false);
-
-  const capabilities = useMemo(
-    () => ({
-      enablePredictions,
-      enableCreateAnnotation,
-      groundTruthEnabled,
-      enableAnnotations,
-      enableAnnotationDelete,
-    }),
-    [enablePredictions, enableCreateAnnotation, groundTruthEnabled, enableAnnotations, enableAnnotationDelete],
-  );
-
-  const sortedEntities = useMemo(() => sortAnnotations(entities), [entities]);
-
-  const totalWidth = sortedEntities.length * (ITEM_WIDTH + ITEM_GAP);
-  const shouldVirtualize =
-    isActive(FF_FIT_720_LAZY_LOAD_ANNOTATIONS) && sortedEntities.length > VIRTUALIZATION_THRESHOLD;
-
-  const isLeftDisabled = scrollOffset <= 0;
-  const isRightDisabled = scrollOffset >= totalWidth - containerWidth;
-  const showControls = totalWidth > containerWidth;
-
-  const handleScroll = useCallback(({ scrollOffset: newOffset }: { scrollOffset: number }) => {
-    setScrollOffset(newOffset);
-  }, []);
-
-  const scrollLeft = useCallback(() => {
-    if (listRef.current) {
-      const newOffset = Math.max(0, scrollOffset - containerWidth);
-      listRef.current.scrollTo(newOffset);
-    }
-  }, [scrollOffset, containerWidth]);
-
-  const scrollRight = useCallback(() => {
-    if (listRef.current) {
-      const maxOffset = totalWidth - containerWidth;
-      const newOffset = Math.min(maxOffset, scrollOffset + containerWidth);
-      listRef.current.scrollTo(newOffset);
-    }
-  }, [scrollOffset, containerWidth, totalWidth]);
-
-  // Original: Update position for non-virtualized CSS transform scrolling
-  const updatePosition = useCallback(
-    (_e: React.MouseEvent, goLeft = true) => {
-      if (containerRef.current && carouselRef.current) {
-        const step = containerRef.current.clientWidth;
-        const carouselWidth = carouselRef.current.clientWidth;
-        const newPos = clamp(goLeft ? currentPosition - step : currentPosition + step, 0, carouselWidth - step);
-
-        setCurrentPosition(newPos);
-      }
-    },
-    [containerRef, carouselRef, currentPosition],
-  );
-
-  // Original: Update button disabled states for non-virtualized scrolling
-  useEffect(() => {
-    if (!shouldVirtualize) {
-      setIsLeftDisabledOriginal(currentPosition <= 0);
-      setIsRightDisabledOriginal(
-        currentPosition >= (carouselRef.current?.clientWidth ?? 0) - (containerRef.current?.clientWidth ?? 0),
-      );
-    }
-  }, [sortedEntities.length, containerRef.current, carouselRef.current, currentPosition, shouldVirtualize]);
-
-  useEffect(() => {
-    if (shouldVirtualize && listRef.current && annotationStore.selected) {
-      const selectedIndex = sortedEntities.findIndex((e: any) => e?.id === annotationStore.selected?.id);
-      if (selectedIndex >= 0) {
-        listRef.current.scrollToItem(selectedIndex, "center");
+    // Build live entity list inside the observer body so MobX subscribes to changes on
+    // both arrays + the predictions/annotations themselves.
+    const liveEntities: any[] = [];
+    if (enablePredictions) {
+      for (const p of annotationStore.predictions) {
+        if (isAlive(p)) liveEntities.push(p);
       }
     }
-  }, [annotationStore.selected?.id, sortedEntities, shouldVirtualize]);
+    if (enableAnnotations) {
+      for (const a of annotationStore.annotations) {
+        if (isAlive(a)) liveEntities.push(a);
+      }
+    }
 
-  // Non-virtualized: scroll carousel to bring selected annotation tab into view
-  useEffect(() => {
-    if (shouldVirtualize) return;
-    if (!carouselRef.current || !containerRef.current || !annotationStore.selected) return;
+    const internalEntities = liveEntities.map((entity) => entityToSummary(entity, store));
+    const sharedEntities = entitiesOverride ?? internalEntities;
+    const entityById = new Map<string, any>(liveEntities.map((e) => [String(e.id), e]));
+    const selectedId = annotationStore.selected ? String(annotationStore.selected.id) : null;
 
-    const selectedId = annotationStore.selected.pk ?? annotationStore.selected.id;
-    const selectedEl = carouselRef.current.querySelector(`[data-annotation-id="${selectedId}"]`);
-    if (!selectedEl) return;
+    // Same key as ViewAll — keep carousel pinned at scroll 0 on Task Summary; side-by-side
+    // centers the selected tab.
+    const hasSummaryTab = store.hasInterface("annotations:summary");
+    const [viewAllTab] = usePersistentState<"summary" | "compare">("view-all-tab", "summary");
+    const suppressScrollToSelected = annotationStore.viewingAll && hasSummaryTab && viewAllTab === "summary";
 
-    const containerWidth = containerRef.current.clientWidth;
-    const elLeft = (selectedEl as HTMLElement).offsetLeft;
-    const elWidth = (selectedEl as HTMLElement).offsetWidth;
-    const carouselWidth = carouselRef.current.clientWidth;
+    const virtualizationEnabled = isActive(FF_FIT_720_LAZY_LOAD_ANNOTATIONS);
 
-    // Center the selected tab in the container, clamped to valid scroll range
-    const targetPosition = elLeft - (containerWidth - elWidth) / 2;
-    const maxPosition = Math.max(0, carouselWidth - containerWidth);
-    const newPosition = clamp(targetPosition, 0, maxPosition);
-    setCurrentPosition(newPosition);
-  }, [annotationStore.selected?.id, shouldVirtualize]);
-
-  useEffect(() => {
-    const newEntities = [];
-
-    if (enablePredictions) newEntities.push(...annotationStore.predictions);
-
-    if (enableAnnotations) newEntities.push(...annotationStore.annotations);
-    setEntities(newEntities);
-  }, [annotationStore, JSON.stringify(annotationStore.predictions), JSON.stringify(annotationStore.annotations)]);
-
-  const itemData = useMemo(
-    () => ({
-      entities: sortedEntities,
-      capabilities,
-      annotationStore,
-      store,
-    }),
-    [sortedEntities, capabilities, annotationStore, store],
-  );
-
-  if (!(enableAnnotations || enablePredictions || enableCreateAnnotation)) {
-    return null;
-  }
-
-  if (shouldVirtualize) {
-    return (
-      <div
-        className={cn("annotations-carousel")
-          .mod({ scrolled: scrollOffset > 0, virtualized: true })
-          .toClassName()}
-      >
-        <div className={cn("annotations-carousel").elem("container").toClassName()}>
-          <AutoSizer>
-            {({ width, height }) => {
-              // Update container width for navigation calculations
-              if (width !== containerWidth) {
-                setContainerWidth(width - 77); // Account for controls width
-              }
-              return (
-                // @ts-expect-error - react-window types incompatible with React 18
-                <List
-                  ref={listRef}
-                  layout="horizontal"
-                  height={height}
-                  width={width - 77} // Account for controls
-                  itemCount={sortedEntities.length}
-                  itemSize={ITEM_WIDTH + ITEM_GAP}
-                  itemData={itemData}
-                  onScroll={handleScroll}
-                  overscanCount={5} // Render 5 extra items on each side for smooth scrolling
-                  style={{ paddingLeft: ITEM_GAP }}
-                >
-                  {VirtualizedAnnotationButton}
-                </List>
-              );
-            }}
-          </AutoSizer>
-        </div>
-        {showControls && (
-          <div className={cn("annotations-carousel").elem("carousel-controls").toClassName()}>
-            <Button
-              disabled={isLeftDisabled}
-              aria-label="Carousel left"
-              size="small"
-              variant="neutral"
-              onClick={scrollLeft}
-            >
-              <IconChevronLeft />
-            </Button>
-            <Button
-              disabled={isRightDisabled}
-              aria-label="Carousel right"
-              size="small"
-              variant="neutral"
-              onClick={scrollRight}
-            >
-              <IconChevronRight />
-            </Button>
-          </div>
-        )}
-      </div>
+    const sharedCapabilities: AnnotationCapabilities = useMemo(
+      () => ({
+        groundTruthEnabled,
+        enableCreateAnnotation,
+        enableAnnotationDelete,
+        enableAnnotations,
+        enablePredictions,
+        enableCopyLink: Boolean(store?.hasInterface?.("annotations:copy-link")),
+        // Same gate as the left-side ViewAllToggle (`TopBar.jsx`); when the
+        // host omits `annotations:view-all` we hide the matching context
+        // menu row that the per-row `AnnotationButton` wrapper renders.
+        enableCompareAllAnnotations: Boolean(store?.hasInterface?.("annotations:view-all")),
+        enableReviewStatusFilters: (window as any).APP_SETTINGS?.version?.edition === "Enterprise",
+        showUserInfo: !store?.hasInterface?.("annotations:hide-info"),
+      }),
+      [groundTruthEnabled, enableCreateAnnotation, enableAnnotationDelete, enableAnnotations, enablePredictions, store],
     );
-  }
 
-  // Original: Non-virtualized rendering (FF off or small lists)
-  return (
-    <div
-      className={cn("annotations-carousel")
-        .mod({ scrolled: currentPosition > 0 })
-        .toClassName()}
-      style={{ "--carousel-left": `${currentPosition}px` } as any}
-    >
-      <div ref={containerRef as any} className={cn("annotations-carousel").elem("container").toClassName()}>
-        <div ref={carouselRef as any} className={cn("annotations-carousel").elem("carosel").toClassName()}>
-          {sortedEntities.map((entity) => (
-            <AnnotationButton
-              key={entity?.id}
-              entity={entity}
-              capabilities={capabilities}
-              annotationStore={annotationStore}
-              store={store}
-            />
-          ))}
-        </div>
-      </div>
-      {(!isLeftDisabledOriginal || !isRightDisabledOriginal) && (
-        <div className={cn("annotations-carousel").elem("carousel-controls").toClassName()}>
-          <Button
-            disabled={isLeftDisabledOriginal}
-            aria-label="Carousel left"
-            size="small"
-            variant="neutral"
-            onClick={(e) => !isLeftDisabledOriginal && updatePosition(e, true)}
-          >
-            <IconChevronLeft />
-          </Button>
-          <Button
-            disabled={isRightDisabledOriginal}
-            aria-label="Carousel right"
-            size="small"
-            variant="neutral"
-            onClick={(e) => !isRightDisabledOriginal && updatePosition(e, false)}
-          >
-            <IconChevronRight />
-          </Button>
-        </div>
-      )}
-    </div>
-  );
-});
+    // Carousel-level handlers are only used for snap/scroll bookkeeping and the
+    // shared internal SharedAnnotationButton fallback. Per-row interactions go
+    // through the classic `AnnotationButton` wrapper supplied via `renderItem`.
+    const carouselHandlers: AnnotationActionHandlers = useMemo(
+      () => ({
+        onSelect: () => {},
+        onSetGroundTruth: () => {},
+        onDuplicate: () => {},
+        onDelete: () => {},
+        onShowOtherAnnotations: () => annotationStore.toggleViewingAllAnnotations(),
+      }),
+      [annotationStore],
+    );
+
+    // Each row maps back to its live MST entity and renders through the classic
+    // `AnnotationButton` wrapper so per-row MobX observers, hydration, user resolution,
+    // and the delete confirm() modal still run.
+    const renderItem = useMemo(
+      () => (sharedEntity: SharedAnnotation) => {
+        const liveEntity = entityById.get(sharedEntity.id);
+        if (!liveEntity) return null;
+        return (
+          <AnnotationButton
+            key={sharedEntity.id}
+            entity={liveEntity}
+            layout={layout}
+            capabilities={{
+              groundTruthEnabled,
+              enableCreateAnnotation,
+              enableAnnotationDelete,
+              enablePredictionDelete,
+              enableAnnotations,
+              enablePredictions,
+            }}
+            annotationStore={annotationStore}
+            store={store}
+          />
+        );
+      },
+      [
+        entityById,
+        groundTruthEnabled,
+        enableCreateAnnotation,
+        enableAnnotationDelete,
+        enablePredictionDelete,
+        enableAnnotations,
+        enablePredictions,
+        annotationStore,
+        store,
+        layout,
+      ],
+    );
+
+    const handleAddNew = useCallback(() => {
+      const created = annotationStore.createAnnotation();
+      annotationStore.selectAnnotation(created.id, { exitViewAll: true });
+    }, [annotationStore]);
+
+    if (!(enableAnnotations || enablePredictions || enableCreateAnnotation)) return null;
+
+    return (
+      <SharedAnnotationsCarousel
+        entities={sharedEntities}
+        selectedId={selectedId}
+        capabilities={sharedCapabilities}
+        handlers={carouselHandlers}
+        virtualizationEnabled={virtualizationEnabled}
+        suppressScrollToSelected={suppressScrollToSelected}
+        renderItem={renderItem}
+        layout={layout}
+        showAddNew={layout === "vertical" && enableCreateAnnotation}
+        onAddNew={handleAddNew}
+        emptyState={emptyState}
+      />
+    );
+  },
+);
+
+// Re-export the per-row wrapper so existing imports / tests keep working.
+export { AnnotationButton };

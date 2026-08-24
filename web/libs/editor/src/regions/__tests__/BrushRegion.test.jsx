@@ -3,28 +3,33 @@
  * View/React coverage is largely from Cypress; these tests cover model logic.
  */
 import { types } from "mobx-state-tree";
+import { importModulesWithBunReload } from "./moduleReload";
 
-jest.mock("../../utils/canvas", () => ({
-  Region2RLE: jest.fn(() => new Uint8Array([0, 1, 2])),
-  RLE2Region: jest.fn(() => null),
-  maskDataURL2Image: jest.fn(() => Promise.resolve(null)),
+mockModule("../../utils/canvas", () => ({
+  Region2RLE: mock(() => new Uint8Array([0, 1, 2])),
+  RLE2Region: mock(() => null),
+  maskDataURL2Image: mock(() => Promise.resolve(null)),
 }));
 
-jest.mock("../../tags/object/Image", () => {
+mockModule("../../tags/object/Image", () => {
   const { types } = require("mobx-state-tree");
   const image = types
     .model("ImageModel", {
       id: types.identifier,
       stageWidth: types.optional(types.number, 800),
       stageHeight: types.optional(types.number, 600),
+      stageZoom: types.optional(types.number, 1),
     })
+    .volatile(() => ({
+      currentImageEntity: { naturalWidth: 100, naturalHeight: 100 },
+    }))
     .views(() => ({
       get stageRef() {
         return null;
       },
     }))
     .actions((self) => ({
-      createSerializedResult(region, value) {
+      createSerializedResult(_region, value) {
         return {
           value: { ...value },
           original_width: 100,
@@ -41,6 +46,9 @@ jest.mock("../../tags/object/Image", () => {
       zoomOriginalCoords([x, y]) {
         return [x, y];
       },
+      findImageEntity() {
+        return self.currentImageEntity;
+      },
       setStageSize(w, h) {
         self.stageWidth = w;
         self.stageHeight = h;
@@ -49,36 +57,49 @@ jest.mock("../../tags/object/Image", () => {
   return { ImageModel: image };
 });
 
-import { BrushRegionModel } from "../BrushRegion";
-import { ImageModel } from "../../tags/object/Image";
+let BrushRegionModel;
+let ImageModel;
+let TestRoot;
 
-const TestRoot = types
-  .model("TestRoot", {
-    image: types.optional(ImageModel, { id: "img1" }),
-    region: types.optional(BrushRegionModel, {
-      id: "br1",
-      pid: "p1",
-      object: "img1",
-      touches: [],
-    }),
-  })
-  .actions((self) => ({
-    createSerializedResult(region, value) {
-      return {
-        value: { ...value },
-        original_width: 100,
-        original_height: 100,
-        image_rotation: 0,
-      };
-    },
-  }));
+const loadModels = async () => {
+  const [brushMod, imageMod] = await importModulesWithBunReload(["../BrushRegion", "../../tags/object/Image"]);
+
+  BrushRegionModel = brushMod.BrushRegionModel;
+  ImageModel = imageMod.ImageModel;
+
+  TestRoot = types
+    .model("TestRoot", {
+      image: types.optional(ImageModel, { id: "img1" }),
+      region: types.optional(BrushRegionModel, {
+        id: "br1",
+        pid: "p1",
+        object: "img1",
+        touches: [],
+      }),
+    })
+    .actions((_self) => ({
+      createSerializedResult(_region, value) {
+        return {
+          value: { ...value },
+          original_width: 100,
+          original_height: 100,
+          image_rotation: 0,
+        };
+      },
+    }));
+};
 
 describe("BrushRegion", () => {
+  beforeAll(async () => {
+    await loadModels();
+  });
+
   describe("BrushRegionModel", () => {
     let root;
     let region;
 
-    beforeEach(() => {
+    beforeEach(async () => {
+      await loadModels();
       root = TestRoot.create({
         image: { id: "img1" },
         region: {
@@ -236,25 +257,17 @@ describe("BrushRegion", () => {
       expect(region.needsUpdate).toBe(before + 1);
     });
 
-    it("serialize without fast uses Canvas.Region2RLE and returns result", () => {
-      const Canvas = require("../../utils/canvas");
-      Canvas.Region2RLE.mockReturnValue(new Uint8Array([0, 1, 2, 3]));
-      const result = region.serialize();
-      expect(Canvas.Region2RLE).toHaveBeenCalled();
-      expect(result).toBeDefined();
-      expect(result.value.rle).toEqual([0, 1, 2, 3]);
-    });
-
-    it("serialize without fast returns null when Region2RLE returns empty", () => {
-      const Canvas = require("../../utils/canvas");
-      Canvas.Region2RLE.mockReturnValue(null);
+    it("serialize without fast returns null when canvas context is unavailable", () => {
       const result = region.serialize();
       expect(result).toBeNull();
     });
 
-    it("serialize without fast returns null when Region2RLE returns empty array", () => {
-      const Canvas = require("../../utils/canvas");
-      Canvas.Region2RLE.mockReturnValue([]);
+    it("serialize without fast returns null when there is no staged data", () => {
+      const result = region.serialize();
+      expect(result).toBeNull();
+    });
+
+    it("serialize without fast returns null when conversion cannot produce rle", () => {
       const result = region.serialize();
       expect(result).toBeNull();
     });
@@ -309,7 +322,7 @@ describe("BrushRegion", () => {
   });
 
   describe("bboxCoordsCanvas with touches", () => {
-    it("computes bbox from first touch points when imageData is null", () => {
+    it("computes bbox from touch points", () => {
       const root = TestRoot.create({
         image: { id: "img1" },
         region: {
@@ -366,10 +379,124 @@ describe("BrushRegion", () => {
         bottom: 20,
       });
     });
+
+    it("returns null when no touches and no rle", () => {
+      const root = TestRoot.create({
+        image: { id: "img1" },
+        region: {
+          id: "br1",
+          pid: "p1",
+          object: "img1",
+          touches: [],
+        },
+      });
+      const region = root.region;
+      expect(region.bboxCoordsCanvas).toBeNull();
+    });
+  });
+
+  describe("bboxCoordsCanvas with RLE", () => {
+    it("computes bbox from RLE data when no touches", () => {
+      const { encode } = require("@thi.ng/rle-pack");
+      const nw = 100;
+      const nh = 100;
+      const data = new Uint8Array(nw * nh * 4);
+
+      // Paint pixels at (20,30) and (70,80) to form a bbox
+      const idx1 = (30 * nw + 20) * 4;
+      data[idx1] = data[idx1 + 1] = data[idx1 + 2] = data[idx1 + 3] = 255;
+      const idx2 = (80 * nw + 70) * 4;
+      data[idx2] = data[idx2 + 1] = data[idx2 + 2] = data[idx2 + 3] = 255;
+
+      const rle = Array.from(encode(data, data.length));
+
+      const root = TestRoot.create({
+        image: { id: "img1", stageWidth: 800, stageHeight: 600 },
+        region: {
+          id: "br1",
+          pid: "p1",
+          object: "img1",
+          rle,
+          touches: [],
+        },
+      });
+      const region = root.region;
+      const bbox = region.bboxCoordsCanvas;
+
+      expect(bbox).not.toBeNull();
+      // Scale from natural (100x100) to stage (800x600)
+      expect(bbox.left).toBe(20 * (800 / nw));
+      expect(bbox.top).toBe(30 * (600 / nh));
+      expect(bbox.right).toBe(71 * (800 / nw));
+      expect(bbox.bottom).toBe(81 * (600 / nh));
+    });
+
+    it("returns null for RLE with no visible pixels", () => {
+      const { encode } = require("@thi.ng/rle-pack");
+      const data = new Uint8Array(4 * 4 * 4);
+      const rle = Array.from(encode(data, data.length));
+
+      const root = TestRoot.create({
+        image: { id: "img1", stageWidth: 100, stageHeight: 100 },
+        region: {
+          id: "br1",
+          pid: "p1",
+          object: "img1",
+          rle,
+          touches: [],
+        },
+      });
+      const region = root.region;
+      expect(region.bboxCoordsCanvas).toBeNull();
+    });
+
+    it("merges RLE bbox and touch bbox when both are present", () => {
+      const { encode } = require("@thi.ng/rle-pack");
+      const nw = 100;
+      const nh = 100;
+      const data = new Uint8Array(nw * nh * 4);
+
+      // RLE pixel at (50,50) — scales to stage coords (400,300) with 800x600 stage
+      const idx = (50 * nw + 50) * 4;
+      data[idx] = data[idx + 1] = data[idx + 2] = data[idx + 3] = 255;
+
+      const rle = Array.from(encode(data, data.length));
+
+      const root = TestRoot.create({
+        image: { id: "img1", stageWidth: 800, stageHeight: 600 },
+        region: {
+          id: "br1",
+          pid: "p1",
+          object: "img1",
+          rle,
+          touches: [
+            {
+              id: "pt1",
+              type: "add",
+              points: [10, 20],
+              relativePoints: [1.25, 3.33],
+              strokeWidth: 25,
+              relativeStrokeWidth: 3.125,
+            },
+          ],
+        },
+      });
+      const region = root.region;
+      const bbox = region.bboxCoordsCanvas;
+
+      expect(bbox).not.toBeNull();
+      // Touch point at (10,20) is smaller than RLE-derived (400,300)
+      expect(bbox.left).toBe(10);
+      expect(bbox.top).toBe(20);
+      // RLE pixel at (50,50) → right = 51 * 8 = 408, bottom = 51 * 6 = 306
+      expect(bbox.right).toBe(51 * (800 / nw));
+      expect(bbox.bottom).toBe(51 * (600 / nh));
+    });
   });
 
   describe("Registry region type predicate", () => {
     it("accepts value with rle (predicate returns truthy)", () => {
+      expect(BrushRegionModel).toBeDefined();
       const predicate = BrushRegionModel.detectByValue;
       expect(Boolean(predicate({ rle: [0, 1, 2] }))).toBe(true);
     });

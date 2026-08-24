@@ -1,12 +1,14 @@
 import { useCallback, useContext, useEffect, useState } from "react";
 import { Divider } from "../../../components/Divider/Divider";
 import { EmptyState, SimpleCard } from "@humansignal/ui";
-import { IconPredictions, Typography, IconExternal } from "@humansignal/ui";
+import { Typography } from "@humansignal/ui";
+import { IconExternal, IconPredictions } from "@humansignal/icons";
 import { useUpdatePageTitle, createTitleFromSegments } from "@humansignal/core";
 import { useAPI } from "../../../providers/ApiProvider";
 import { ProjectContext } from "../../../providers/ProjectProvider";
 import { Spinner } from "../../../components/Spinner/Spinner";
 import { PredictionsList } from "./PredictionsList";
+import { ImportPredictionsExample } from "./ImportPredictionsExample";
 
 export const PredictionsSettings = () => {
   const api = useAPI();
@@ -51,12 +53,7 @@ export const PredictionsSettings = () => {
               Predictions List
             </Typography>
             <Typography size="small" className="text-neutral-content-subtler mt-base mb-wider">
-              List of predictions available in the project. Each card is associated with a separate model version. To
-              learn about how to import predictions,{" "}
-              <a href="https://labelstud.io/guide/predictions.html" target="_blank" rel="noreferrer">
-                see&nbsp;the&nbsp;documentation
-              </a>
-              .
+              List of predictions available in the project. Each card is associated with a separate model version.
             </Typography>
           </>
         )}
@@ -91,6 +88,8 @@ export const PredictionsSettings = () => {
         )}
 
         <PredictionsList project={project} versions={versions} fetchVersions={fetchVersions} />
+
+        <ImportPredictionsExample />
 
         <Divider height={32} />
       </div>

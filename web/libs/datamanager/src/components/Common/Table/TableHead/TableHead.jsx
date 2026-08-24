@@ -2,7 +2,7 @@ import { observer, useLocalStore } from "mobx-react";
 import { toJS } from "mobx";
 import React, { forwardRef, useCallback, useEffect, useRef } from "react";
 import { ViewColumnType, ViewColumnTypeName, ViewColumnTypeShort } from "../../../../stores/Tabs/tab_column";
-import { Button, Dropdown } from "@humansignal/ui";
+import { Button, Dropdown, Tooltip } from "@humansignal/ui";
 import { Menu } from "../../Menu/Menu";
 import { Resizer } from "../../Resizer/Resizer";
 import { Space } from "../../Space/Space";
@@ -25,7 +25,7 @@ import { isStarterCloudPlan } from "@humansignal/core";
 
 const tableHeadCN = cn("table-head");
 
-const DropdownWrapper = observer(({ column, cellViews, children, onChange }) => {
+const DropdownWrapper = observer(({ column, cellViews, children, onChange, disabled, disabledTooltip }) => {
   const types = ViewColumnType._types
     .map((t) => t.value)
     .filter((t) => {
@@ -36,6 +36,16 @@ const DropdownWrapper = observer(({ column, cellViews, children, onChange }) => 
 
       return cellView && selectable && displayType;
     });
+
+  if (disabled) {
+    return (
+      <Tooltip title={disabledTooltip}>
+        <Button look="string" variant="neutral" size="small" disabled>
+          {children}
+        </Button>
+      </Tooltip>
+    );
+  }
 
   return (
     <Dropdown.Trigger
@@ -66,12 +76,18 @@ const AgreementWrapper = observer(({ column, children }) => {
   const selectedView = root.viewsStore.selected;
   const agreementFilters = selectedView.agreement_selected;
   const onSave = (filters) => {
+    if (selectedView?.isLockedByManager) return selectedView.notifyLocked();
     selectedView.setAgreementFilters(filters);
     return selectedView.save();
   };
 
   return (
-    <Agreement.HeaderCell agreementFilters={agreementFilters} onSave={onSave}>
+    <Agreement.HeaderCell
+      agreementFilters={agreementFilters}
+      onSave={onSave}
+      disabled={selectedView?.isLockedByManager}
+      disabledTooltip={selectedView?.lockedUpdateMessage}
+    >
       {children}
     </Agreement.HeaderCell>
   );
@@ -83,6 +99,7 @@ const AgreementSelectedWrapper = observer(({ column, children }) => {
   const selectedView = root.viewsStore.selected;
   const agreementFilters = selectedView.agreement_selected;
   const ref = useRef(null);
+  const isLocked = selectedView?.isLockedByManager;
 
   if (isStarterCloudPlan()) {
     return (
@@ -97,10 +114,34 @@ const AgreementSelectedWrapper = observer(({ column, children }) => {
   };
 
   const onSave = (agreementFilters) => {
+    if (isLocked) return selectedView.notifyLocked();
     selectedView.setAgreementFilters(agreementFilters);
     closeHandler();
     return selectedView.save();
   };
+
+  const triggerButton = (
+    <Button
+      look="outlined"
+      variant="neutral"
+      size="small"
+      trailing={<IconChevronDown />}
+      align="left"
+      disabled={isLocked}
+      style={{
+        minWidth: 200,
+        paddingLeft: "0.5rem",
+        flexGrow: 1,
+        width: "100%",
+      }}
+    >
+      {children}
+    </Button>
+  );
+
+  if (isLocked) {
+    return <Tooltip title={selectedView.lockedUpdateMessage}>{triggerButton}</Tooltip>;
+  }
 
   return (
     <Dropdown.Trigger
@@ -114,21 +155,7 @@ const AgreementSelectedWrapper = observer(({ column, children }) => {
         />
       }
     >
-      <Button
-        look="outlined"
-        variant="neutral"
-        size="small"
-        trailing={<IconChevronDown />}
-        align="left"
-        style={{
-          minWidth: 200,
-          paddingLeft: "0.5rem",
-          flexGrow: 1,
-          width: "100%",
-        }}
-      >
-        {children}
-      </Button>
+      {triggerButton}
     </Dropdown.Trigger>
   );
 });
@@ -159,22 +186,25 @@ const ColumnRenderer = observer(
 
     const root = getRoot(column.original);
     const isDE = root.SDK.type === "DE";
+    const selectedView = root.viewsStore.selected;
+    const isTabLocked = selectedView?.isLockedByManager;
+    const lockedTooltip = selectedView?.lockedUpdateMessage;
     const canOrder = sortingEnabled && column.original?.canOrder;
     const Decoration = decoration?.get?.(column);
     const extra = !isDE && columnHeaderExtra ? columnHeaderExtra(column, Decoration) : null;
     const content = Decoration?.content ? Decoration.content(column) : column.title;
     const style = getStyle(cellViews, column, Decoration);
+    const isAgreementV2Enabled =
+      root.project?.is_dimensions_enabled ?? isActive(FF_UTC_428_CONSENSUS_CONTROL_TAG_AGREEMENT);
 
     const isAgreementColumn =
       isActive(FF_AGREEMENT_FILTERED) &&
-      isActive(FF_UTC_428_CONSENSUS_CONTROL_TAG_AGREEMENT) &&
+      isAgreementV2Enabled &&
       (column.original?.alias === "agreement" ||
         (typeof column.original?.alias === "string" && column.original.alias.startsWith("dimension_agreement_")));
 
     const isAgreementSelected =
-      isActive(FF_AGREEMENT_FILTERED) &&
-      !isActive(FF_UTC_428_CONSENSUS_CONTROL_TAG_AGREEMENT) &&
-      column.type === "AgreementSelected";
+      isActive(FF_AGREEMENT_FILTERED) && !isAgreementV2Enabled && column.type === "AgreementSelected";
 
     const headContent = (
       <>
@@ -203,7 +233,13 @@ const ColumnRenderer = observer(
           onReset={() => onReset?.(column)}
         >
           {!isDE && column.parent && !isAgreementColumn && !isAgreementSelected ? (
-            <DropdownWrapper column={column} cellViews={cellViews} onChange={onTypeChange}>
+            <DropdownWrapper
+              column={column}
+              cellViews={cellViews}
+              onChange={onTypeChange}
+              disabled={isTabLocked}
+              disabledTooltip={lockedTooltip}
+            >
               {headContent}
             </DropdownWrapper>
           ) : isAgreementSelected ? (
@@ -313,10 +349,11 @@ export const TableHead = observer(
             return (
               <span
                 className={tableHeadCN.elem("draggable").toClassName()}
-                draggable={true}
+                draggable={!stopInteractions}
                 ref={(ele) => (colRefs.current[col.id] = ele)}
                 key={col.id}
                 onDragStart={(e) => {
+                  if (stopInteractions) return;
                   e.dataTransfer.effectAllowed = "none";
                   const ele = colRefs.current[col.id];
 
@@ -327,6 +364,7 @@ export const TableHead = observer(
                   states.setDraggedCol(col.id);
                 }}
                 onDragEnd={(e) => {
+                  if (stopInteractions) return;
                   e.stopPropagation();
                   const draggedCol = states.getDraggedCol();
                   const curColumns = columns.filter((curCol) => curCol.id !== draggedCol);

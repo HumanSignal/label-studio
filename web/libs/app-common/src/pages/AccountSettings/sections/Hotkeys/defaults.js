@@ -36,6 +36,15 @@ export const DEFAULT_HOTKEYS = [
     description: "Redo previously undone action",
     active: true,
   },
+  {
+    id: 450,
+    section: "annotation",
+    element: "annotation:toggle-auto-annotation",
+    label: "Toggle Auto-Annotation",
+    key: "shift+alt+a",
+    description: "Turn Auto-Annotation on or off",
+    active: true,
+  },
 
   // Data Manager
   {

@@ -62,6 +62,14 @@ class Webhook(models.Model):
         help_text=('If value is False the webhook is disabled'),
     )
 
+    consecutive_failures = models.PositiveIntegerField(
+        _('consecutive failures'),
+        db_default=0,
+        default=0,
+        null=True,
+        help_text=_('Number of consecutive failed deliveries; the webhook auto-disables at the configured threshold'),
+    )
+
     created_at = models.DateTimeField(_('created at'), auto_now_add=True, help_text=_('Creation time'), db_index=True)
     updated_at = models.DateTimeField(_('updated at'), auto_now=True, help_text=_('Last update time'), db_index=True)
 
@@ -87,7 +95,13 @@ class Webhook(models.Model):
 
     def has_permission(self, user):
         user.project = self.project  # link for activity log
-        return self.organization.has_user(user)
+        if not self.organization.has_user(user):
+            return False
+        # If this webhook belongs to a project, also enforce project-level access.
+        # In LSE, LseProjectMixin.has_permission checks that Managers are project members.
+        if self.project is not None and not self.project.has_permission(user):
+            return False
+        return True
 
     class Meta:
         db_table = 'webhook'

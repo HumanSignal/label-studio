@@ -10,9 +10,9 @@ import "../../visual/View";
 import "../Label";
 import "../../object/RichText";
 import "../Labels/Labels";
-import { HtxLabelView, LabelModel } from "../Label";
+import { HtxLabelView } from "../Label";
 
-const mockAddErrors = jest.fn();
+const mockAddErrors = mock();
 const mockRegions = [{ hasLabel: (v) => v === "A" }, { hasLabel: (v) => v === "B" }];
 const mockRegionStore = { regions: mockRegions };
 const mockAnnotation = {
@@ -21,7 +21,7 @@ const mockAnnotation = {
   regionStore: mockRegionStore,
   selectedRegions: [],
   selectedDrawingRegions: [],
-  unselectAll: jest.fn(),
+  unselectAll: mock(),
 };
 const mockRoot = {
   task: { dataObj: { text: "Hello" } },
@@ -32,38 +32,25 @@ const mockRoot = {
   },
 };
 
-jest.mock("mobx-state-tree", () => {
-  const actual = jest.requireActual("mobx-state-tree");
-  return {
-    ...actual,
-    getRoot: (node) => {
-      if (node && node.type === "label") {
-        return mockRoot;
-      }
-      return actual.getRoot(node);
-    },
-  };
+import { getRoot } from "mobx-state-tree";
+beforeEach(() => {
+  getRoot.mockImplementation((node) => {
+    if (node && node.type === "label") return mockRoot;
+    return globalThis.__mstOriginals.getRoot(node);
+  });
 });
 
-jest.mock("../../../utils/feature-flags", () => ({
-  FF_DEV_3391: "FF_DEV_3391",
-  isFF: jest.fn(() => false),
+mockModule("../../../components/Infomodal/Infomodal", () => ({
+  __esModule: true,
+  __skipMerge: true,
+  default: { error: mock(), warning: mock(), success: mock(), info: mock() },
 }));
 
-jest.mock("../../../components/Infomodal/Infomodal", () => ({
-  __esModule: true,
-  default: { warning: jest.fn() },
-}));
-
-jest.mock("../../../tools/Manager", () => ({
-  __esModule: true,
-  default: {
-    getInstance: jest.fn(() => ({
-      findSelectedTool: jest.fn(() => null),
-      selectTool: jest.fn(),
-    })),
-  },
-}));
+import ToolsManager from "../../../tools/Manager";
+spyOn(ToolsManager, "getInstance").mockReturnValue({
+  findSelectedTool: mock(() => null),
+  selectTool: mock(),
+});
 
 const CONFIG_WITH_LABELS = `<View>
   <Labels name="lbl" toName="t1">
@@ -82,7 +69,7 @@ function createLabelNode(storeRef = { task: { dataObj: { text: "Hello" } } }) {
 }
 
 beforeEach(() => {
-  jest.clearAllMocks();
+  clearAllMocks();
   window.STORE_INIT_OK = true;
 });
 afterEach(() => {
@@ -158,7 +145,7 @@ describe("Label model", () => {
 
   it("onHotKey and onClick call onLabelInteract", () => {
     const label = createLabelNode();
-    const spy = jest.spyOn(label, "toggleSelected");
+    const spy = spyOn(label, "toggleSelected");
     label.onHotKey();
     expect(spy).toHaveBeenCalled();
     spy.mockClear();
@@ -229,8 +216,8 @@ describe("Label model", () => {
         isReadOnly: () => false,
         labelings: [{}],
         results: [],
-        setValue: jest.fn(),
-        notifyDrawingFinished: jest.fn(),
+        setValue: mock(),
+        notifyDrawingFinished: mock(),
       },
     ];
     mockAnnotation.selectedDrawingRegions = [];
@@ -284,8 +271,8 @@ describe("Label model", () => {
         isReadOnly: () => false,
         labelings: [],
         results: [{ type: "rectangle" }],
-        setValue: jest.fn(),
-        notifyDrawingFinished: jest.fn(),
+        setValue: mock(),
+        notifyDrawingFinished: mock(),
       },
     ];
     mockAnnotation.selectedDrawingRegions = [];
@@ -297,8 +284,8 @@ describe("Label model", () => {
   });
 
   it("toggleSelected uses selectedDrawingRegions when present", () => {
-    const setValue = jest.fn();
-    const notifyDrawingFinished = jest.fn();
+    const setValue = mock();
+    const notifyDrawingFinished = mock();
     mockAnnotation.selectedRegions = [];
     mockAnnotation.selectedDrawingRegions = [
       {
@@ -313,7 +300,7 @@ describe("Label model", () => {
     ];
     const label = createLabelNode();
     const labels = label.parent;
-    jest.spyOn(labels, "unselectAll");
+    spyOn(labels, "unselectAll");
     label.toggleSelected();
     expect(setValue).toHaveBeenCalledWith(labels);
     expect(notifyDrawingFinished).toHaveBeenCalled();
@@ -322,8 +309,8 @@ describe("Label model", () => {
   });
 
   it("toggleSelected applies label to selected region when region matches parent toName", () => {
-    const setValue = jest.fn();
-    const notifyDrawingFinished = jest.fn();
+    const setValue = mock();
+    const notifyDrawingFinished = mock();
     mockAnnotation.selectedRegions = [
       {
         parent: { name: "t1" },
@@ -338,7 +325,7 @@ describe("Label model", () => {
     mockAnnotation.selectedDrawingRegions = [];
     const label = createLabelNode();
     const labels = label.parent;
-    const unselectAllSpy = jest.spyOn(labels, "unselectAll");
+    const unselectAllSpy = spyOn(labels, "unselectAll");
     label.toggleSelected();
     expect(unselectAllSpy).toHaveBeenCalled();
     expect(setValue).toHaveBeenCalledWith(labels);
@@ -366,15 +353,15 @@ describe("Label model", () => {
         isReadOnly: () => false,
         labelings: [{}],
         results: [],
-        setValue: jest.fn(),
-        notifyDrawingFinished: jest.fn(),
+        setValue: mock(),
+        notifyDrawingFinished: mock(),
       },
     ];
     mockAnnotation.selectedDrawingRegions = [];
-    const findLabelSpy = jest.spyOn(labels, "findLabel");
+    const findLabelSpy = spyOn(labels, "findLabel");
     const emptyLabel = labels.children.find((c) => c.isEmpty);
     if (emptyLabel) {
-      const setSelectedSpy = jest.spyOn(emptyLabel, "setSelected");
+      const setSelectedSpy = spyOn(emptyLabel, "setSelected");
       labelA.toggleSelected();
       expect(findLabelSpy).toHaveBeenCalled();
       setSelectedSpy.mockRestore();
@@ -393,15 +380,15 @@ describe("Label model", () => {
     const root = ViewModel.create(config);
     const labels = root.children.find((c) => c.type === "labels");
     const labelA = labels.children.find((c) => c.value === "A");
-    const findLabelSpy = jest.spyOn(labels, "findLabel");
+    const findLabelSpy = spyOn(labels, "findLabel");
     mockAnnotation.selectedRegions = [
       {
         parent: { name: "t" },
         isReadOnly: () => false,
         labelings: [],
         results: [],
-        setValue: jest.fn(),
-        notifyDrawingFinished: jest.fn(),
+        setValue: mock(),
+        notifyDrawingFinished: mock(),
       },
     ];
     mockAnnotation.selectedDrawingRegions = [];
@@ -418,7 +405,7 @@ describe("Label model", () => {
     label.setSelected(true);
     const labels = label.parent;
     expect(labels.shouldBeUnselected).toBe(true);
-    const unselectAllSpy = jest.spyOn(labels, "unselectAll");
+    const unselectAllSpy = spyOn(labels, "unselectAll");
     label.toggleSelected();
     expect(unselectAllSpy).toHaveBeenCalledTimes(1);
     expect(label.selected).toBe(false);
@@ -432,7 +419,7 @@ describe("Label model", () => {
     label.setEmpty();
     expect(label.isEmpty).toBe(true);
     const labels = label.parent;
-    const unselectAllSpy = jest.spyOn(labels, "unselectAll");
+    const unselectAllSpy = spyOn(labels, "unselectAll");
     label.toggleSelected();
     expect(unselectAllSpy).toHaveBeenCalled();
     expect(label.selected).toBe(true);
@@ -462,7 +449,7 @@ describe("HtxLabelView", () => {
       isEmpty: false,
       visible: true,
       selected: false,
-      onClick: jest.fn(),
+      onClick: mock(),
       hotkey: null,
       html: null,
       showalias: false,
@@ -486,7 +473,7 @@ describe("HtxLabelView", () => {
 
   it("calls onClick when label is clicked", async () => {
     const user = userEvent.setup();
-    const onClick = jest.fn();
+    const onClick = mock();
     const item = createMockItem({ _value: "Click me", onClick });
     const store = createMockStore();
     render(

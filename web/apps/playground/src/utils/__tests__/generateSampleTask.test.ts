@@ -33,7 +33,7 @@ describe("generateSampleTaskFromConfig", () => {
     `;
     const result = await generateSampleTaskFromConfig(config);
     expect(result.data).toHaveProperty("image");
-    expect(result.data.image).toBe("https://app.heartex.ai/static/samples/sample.jpg");
+    expect(result.data.image).toBe("https://labelstud.io/static/samples/sample.jpg");
   });
 
   it("should generate sample data for audio config", async () => {
@@ -153,5 +153,26 @@ describe("generateSampleTaskFromConfig", () => {
     const result = await generateSampleTaskFromConfig(config);
     expect(result.data).toHaveProperty("videoSource");
     expect(result.data.videoSource).toBe("https://app.heartex.ai/static/samples/opossum_snow_alt.mp4");
+  });
+
+  // app.heartex.ai was retired and now serves 502 for every sample asset, which broke
+  // the playground preview on labelstud.io. Sample hosts must also send CORS headers
+  // because the Image tag loads with crossOrigin="anonymous" by default.
+  it("should not reference the retired app.heartex.ai host in any generated sample data", async () => {
+    const configs = [
+      '<View><Image name="image" value="$image"/></View>',
+      '<View><Image name="image" valueList="$images"/></View>',
+      '<View><Video name="video" value="$video"/></View>',
+      '<View><HyperText name="pdf" value="$pdf"/></View>',
+      '<View><HyperText name="video" value="$video"/></View>',
+      '<View><TimeSeries name="ts" value="$csv" valueType="url" timeColumn="time"><Channel column="value"/></TimeSeries></View>',
+    ];
+
+    for (const config of configs) {
+      const result = await generateSampleTaskFromConfig(config);
+      const values = Object.values(result.data).flat().join(" ");
+
+      expect(values).not.toContain("app.heartex.ai");
+    }
   });
 });

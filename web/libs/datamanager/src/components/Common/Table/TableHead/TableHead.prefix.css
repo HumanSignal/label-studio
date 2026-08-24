@@ -16,15 +16,17 @@
   &__extra {
     flex: 1;
     display: flex;
-    padding-right: 14px;
+    padding-right: var(--spacing-base);
     align-items: center;
     justify-content: flex-end;
   }
 
   &__column-extra {
-    margin: 0 2px 0 10px;
+    margin: 0 var(--spacing-tightest) 0 var(--spacing-tight);
     display: flex;
     align-items: center;
+    gap: var(--spacing-tighter);
+    flex-grow: 1;
   }
 
   &__draggable {

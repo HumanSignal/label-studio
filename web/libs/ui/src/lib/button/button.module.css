@@ -23,7 +23,7 @@
     @apply inline-flex;
 
     & > svg {
-      @apply h-full aspect-square;
+      @apply h-full aspect-square min-w-500;
     }
   }
 
@@ -49,6 +49,104 @@
     box-shadow: none;
     text-shadow: none;
     cursor: not-allowed;
+  }
+}
+
+/* / VARIANT LOOK */
+.look-outlined {
+  &:not(:disabled),
+  &.waiting {
+    --background-color: var(--color-neutral-background);
+    --border-color: var(--border-outline);
+    --text-color: var(--text-outline);
+    --background-color-hover: var(--background-color-hover-outline);
+    --background-color-active: var(--background-color-active-outline);
+    --wait-color-value: var(--wait-color-value-outline);
+    --wait-color-opacity: 40%;
+    --emboss-shadow: 0 0 0 transparent;
+
+    text-shadow: none;
+
+    &:active {
+      box-shadow: inset 0 1px 0 rgb(var(--black-raw) / 10%);
+    }
+  }
+}
+
+.look-string {
+  &:not(:disabled),
+  &.waiting {
+    --border-color: transparent;
+    --background-color: transparent;
+    --text-color: var(--text-outline);
+    --background-color-hover: var(--background-color-hover-outline);
+    --background-color-active: var(--background-color-active-outline);
+    --wait-color-value: var(--wait-color-value-outline);
+    --wait-color-opacity: 40%;
+
+    box-shadow: none;
+    text-shadow: none;
+
+    &.waiting {
+      border-color: var(--border-outline);
+    }
+
+    &:not(&:disabled) {
+      color: var(--text-outline);
+    }
+
+    &:focus {
+      border-color: var(--border-color-hover);
+    }
+  }
+
+  &:disabled:not(.waiting),
+  &:disabled:not(.waiting):hover,
+  &:disabled:not(.waiting):focus,
+  &:disabled:not(.waiting):active {
+    --background-color-hover: transparent;
+    --background-color-active: transparent;
+    --border-color-hover: transparent;
+    --background-color: transparent;
+    --border-color: transparent;
+  }
+}
+
+/* / SIZES */
+
+.size-medium {
+  @apply p-tight text-label-medium h-1000;
+
+  & > span {
+    @apply px-tight gap-tight;
+  }
+
+  & > em {
+    @apply gap-tight h-600 min-w-600;
+  }
+}
+
+.size-small {
+  @apply p-tighter text-label-small h-800;
+
+  & > span {
+    @apply px-tighter gap-tighter;
+  }
+
+  & > em {
+    @apply gap-tighter h-400 min-w-400;
+  }
+}
+
+.size-smaller {
+  @apply p-tightest text-label-smaller h-600;
+
+  & > span {
+    @apply px-tightest gap-tightest;
+  }
+
+  & > em {
+    @apply gap-tighter h-400 min-w-400;
   }
 }
 
@@ -151,53 +249,42 @@
 
 .base.variant-gradient {
   --background-color: var(--color-neutral-background);
-  --border-color: var(--color-accent-canteloupe-bold);
-  --focus-outline: var(--color-warning-focus-outline);
+  --border-color: var(--color-primary-border-bold);
+  --focus-outline: var(--color-primary-focus-outline);
 
-  @apply transition-all;
+  background-size: 220% 100%;
+  background-position: 0 0;
+
+  @apply transition-all duration-300 ease-in-out;
 
   background-image: linear-gradient(
-    90deg,
-    color-mix(in srgb, var(--color-accent-canteloupe-base), transparent 10%),
-    color-mix(in srgb, var(--color-accent-persimmon-base), transparent 10%),
+    50deg,
+    color-mix(in srgb, var(--color-primary-surface), transparent 10%),
+    color-mix(in srgb, var(--color-primary-surface), transparent 10%),
+    color-mix(in srgb, var(--color-accent-plum-base), transparent 10%),
+    color-mix(in srgb, var(--color-primary-surface), transparent 10%),
     color-mix(in srgb, var(--color-accent-plum-base), transparent 10%) 100%
   );
 
   &:hover:not(.waiting) {
-    --background-color: var(--color-warning-emphasis-subtle);
-
-    background-image: linear-gradient(
-      90deg,
-      var(--color-accent-canteloupe-base, #ffa663) 0%,
-      var(--color-accent-persimmon-base, #ff7557) 50%,
-      var(--color-accent-plum-base, #e37bd3) 100%
-    );
+    background-size: 220% 100%;
+    background-position: 30% 50%;
   }
 
   &.waiting {
+    --border-color: var(--color-primary-border-bold);
+
     background-image: linear-gradient(
       90deg,
-      var(--color-accent-canteloupe-base, #ffa663) 0%,
-      var(--color-accent-persimmon-base, #ff7557) 25%,
-      var(--color-accent-plum-base, #e37bd3) 50%,
-      var(--color-accent-persimmon-base, #ff7557) 75%,
-      var(--color-accent-canteloupe-base, #ffa663) 100%
+      color-mix(in srgb, var(--color-primary-surface), transparent 10%),
+      color-mix(in srgb, var(--color-accent-plum-base), transparent 10%),
+      color-mix(in srgb, var(--color-primary-surface), transparent 10%),
+      color-mix(in srgb, var(--color-accent-plum-base), transparent 10%),
+      color-mix(in srgb, var(--color-primary-surface), transparent 10%) 100%
     );
-    background-size: 200% 100%;
+    background-size: 300% 100%;
     background-position: 0 0;
-    animation: none;
-    animation: gradient-button-waiting 2s linear infinite;
-  }
-
-  &:active {
-    --background-color: var(--color-warning-emphasis-subtle,);
-
-    background-image: linear-gradient(
-      90deg,
-      var(--color-accent-canteloupe-dark, #664228) 0%,
-      var(--color-accent-persimmon-dark, #803b2c) 50%,
-      var(--color-accent-plum-dark, #723e6a) 100%
-    );
+    animation: gradient-button-waiting 4s linear infinite;
   }
 
   &:disabled:not(.waiting) {
@@ -205,37 +292,70 @@
   }
 }
 
-.base.variant-gradient.look-outlined:not(:disabled) {
-  --text-color: var(--color-accent-canteloupe-dark,);
-  --border-color: var(--color-warning-border-subtle);
+.base.variant-gradient.look-outlined {
+  --text-color: var(--color-primary-content);
+  --border-color: var(--color-primary-border-bold);
+  --focus-outline: var(--color-primary-focus-outline);
 
-  text-shadow: none;
-  background-image: linear-gradient(
-    90deg,
-    color-mix(in srgb, var(--color-accent-canteloupe-base), transparent 75%),
-    color-mix(in srgb, var(--color-accent-persimmon-base), transparent 75%),
-    color-mix(in srgb, var(--color-accent-plum-base), transparent 75%) 100%
-  );
+  &:not(:disabled) {
+    & > span {
+      color: transparent;
+      background-clip: text;
+      background-image: linear-gradient(
+        50deg,
+        color-mix(in srgb, var(--color-accent-grape-bold), transparent 10%),
+        color-mix(in srgb, var(--color-accent-fig-bold), transparent 10%),
+        color-mix(in srgb, var(--color-accent-plum-bold), transparent 10%) 100%
+      );
+      background-position: 0 0;
+      background-size: 150% 100%;
+    }
 
-  &:hover:not(.waiting) {
-    background-image: linear-gradient(
-      90deg,
-      color-mix(in srgb, var(--color-accent-canteloupe-base), transparent 80%),
-      color-mix(in srgb, var(--color-accent-persimmon-base), transparent 80%),
-      color-mix(in srgb, var(--color-accent-plum-base), transparent 75%) 100%
-    );
+    text-shadow: none;
+    background-image: unset;
+
+    &:hover:not(.waiting) {
+      background-image: unset;
+
+      & > span {
+        background-position: 100% 0;
+        background-size: 100% 100%;
+      }
+    }
+
+    &.waiting {
+      --text-color: var(--color-primary-surface-content);
+      --text-outline: var(--color-primary-surface-content);
+
+      background-image: linear-gradient(
+        90deg,
+        color-mix(in srgb, var(--color-primary-surface), transparent 10%),
+        color-mix(in srgb, var(--color-accent-plum-base), transparent 10%),
+        color-mix(in srgb, var(--color-primary-surface), transparent 10%),
+        color-mix(in srgb, var(--color-accent-plum-base), transparent 10%),
+        color-mix(in srgb, var(--color-primary-surface), transparent 10%) 100%
+      );
+      background-size: 220% 100%;
+      background-position: 0 0;
+      animation: gradient-button-waiting 4s linear infinite;
+
+      & > span {
+        color: var(--color-primary-surface-content);
+      }
+    }
   }
 
-  &.waiting {
-    background-image: linear-gradient(
-      90deg,
-      color-mix(in srgb, var(--color-accent-canteloupe-base), transparent 80%) 0%,
-      color-mix(in srgb, var(--color-accent-persimmon-base), transparent 80%) 25%,
-      color-mix(in srgb, var(--color-accent-plum-base), transparent 75%) 50%,
-      color-mix(in srgb, var(--color-accent-persimmon-base), transparent 80%) 75%,
-      color-mix(in srgb, var(--color-accent-canteloupe-base), transparent 80%) 100%
-    );
-    background-size: 200% 100%;
+  &:disabled {
+    &.waiting {
+      --border-color: var(--color-primary-border-bold);
+      --border-outline: var(--color-primary-border-bold);
+      --text-color: var(--color-primary-surface-content);
+      --text-outline: var(--color-primary-surface-content);
+
+      & > span {
+        color: var(--color-primary-surface-content);
+      }
+    }
   }
 
   &:disabled:not(.waiting) {
@@ -252,7 +372,11 @@
 
 .base.variant-gradient.look-string {
   &:not(:disabled) {
-    --text-color: transparent;
+    --text-color: var(--color-primary-content);
+    --text-outline: var(--color-primary-content);
+    --border-color: transparent;
+    --border-outline: transparent;
+    --focus-outline: var(--color-primary-focus-outline);
 
     background-image: none;
 
@@ -261,144 +385,63 @@
       background-clip: text;
       background-image: linear-gradient(
         90deg,
-        color-mix(in srgb, var(--color-accent-canteloupe-base), transparent 10%),
-        color-mix(in srgb, var(--color-accent-persimmon-base), transparent 10%),
-        color-mix(in srgb, var(--color-accent-plum-base), transparent 10%) 100%
+        color-mix(in srgb, var(--color-accent-grape-bold), transparent 10%),
+        color-mix(in srgb, var(--color-accent-fig-bold), transparent 10%),
+        color-mix(in srgb, var(--color-accent-plum-bold), transparent 10%) 100%
       );
+      background-position: 0 0;
+      background-size: 150% 100%;
+    }
+
+    &:hover:not(.waiting) {
+      & > span {
+        background-position: 100% 0;
+        background-size: 100% 100%;
+      }
     }
 
     &.waiting {
-      border-color: transparent;
+      background-image: linear-gradient(
+        90deg,
+        color-mix(in srgb, var(--color-primary-surface), transparent 10%),
+        color-mix(in srgb, var(--color-accent-plum-base), transparent 10%),
+        color-mix(in srgb, var(--color-primary-surface), transparent 10%),
+        color-mix(in srgb, var(--color-accent-plum-base), transparent 10%),
+        color-mix(in srgb, var(--color-primary-surface), transparent 10%) 100%
+      );
+      background-size: 300% 100%;
+      background-position: 0 0;
+      animation: gradient-button-waiting 4s linear infinite;
 
       & > span {
-        background-image: linear-gradient(
-          90deg,
-          color-mix(in srgb, var(--color-accent-canteloupe-base), transparent 10%),
-          color-mix(in srgb, var(--color-accent-persimmon-base), transparent 10%),
-          color-mix(in srgb, var(--color-accent-plum-base), transparent 10%) 100%,
-          color-mix(in srgb, var(--color-accent-persimmon-base), transparent 10%),
-          color-mix(in srgb, var(--color-accent-canteloupe-base), transparent 10%)
-        );
-        background-size: 200% 100%;
-        animation: gradient-button-waiting 2s linear infinite;
+        color: var(--color-primary-surface-content);
       }
     }
 
     &:focus {
-      --border-color: var(--color-warning-border-subtle);
-      --focus-outline: var(--color-warning-focus-outline);
+      --border-color: var(--color-primary-border-bold);
+      --focus-outline: var(--color-primary-focus-outline);
 
       box-shadow: var(--focus-shadow);
 
       & > span {
-        color: var(--color-accent-canteloupe-dark,);
+        background-position: 100% 0;
+        background-size: 100% 100%;
       }
-
-      background-image: linear-gradient(
-        90deg,
-        color-mix(in srgb, var(--color-accent-canteloupe-base), transparent 75%),
-        color-mix(in srgb, var(--color-accent-persimmon-base), transparent 75%),
-        color-mix(in srgb, var(--color-accent-plum-base), transparent 75%) 100%
-      );
     }
   }
-}
 
-/* / VARIANT LOOK */
-.look-outlined {
-  &:not(:disabled),
-  &.waiting {
-    --background-color: var(--color-neutral-background);
-    --border-color: var(--border-outline);
-    --text-color: var(--text-outline);
-    --background-color-hover: var(--background-color-hover-outline);
-    --background-color-active: var(--background-color-active-outline);
-    --wait-color-value: var(--wait-color-value-outline);
-    --wait-color-opacity: 40%;
-    --emboss-shadow: 0 0 0 transparent;
-
-    text-shadow: none;
-
-    &:active {
-      box-shadow: inset 0 1px 0 rgb(var(--black-raw) / 10%);
-    }
-  }
-}
-
-.look-string {
-  &:not(:disabled),
-  &.waiting {
-    --border-color: transparent;
-    --background-color: transparent;
-    --text-color: var(--text-outline);
-    --background-color-hover: var(--background-color-hover-outline);
-    --background-color-active: var(--background-color-active-outline);
-    --wait-color-value: var(--wait-color-value-outline);
-    --wait-color-opacity: 40%;
-
-    box-shadow: none;
-    text-shadow: none;
-
+  &:disabled {
     &.waiting {
-      border-color: var(--border-outline);
+      --border-color: var(--color-primary-border-bold);
+      --border-outline: var(--color-primary-border-bold);
+      --text-color: var(--color-primary-surface-content);
+      --text-outline: var(--color-primary-surface-content);
+
+      & > span {
+        color: var(--color-primary-surface-content);
+      }
     }
-
-    &:not(&:disabled) {
-      color: var(--text-outline);
-    }
-
-    &:focus {
-      border-color: var(--border-color-hover);
-    }
-  }
-
-  &:disabled:not(.waiting),
-  &:disabled:not(.waiting):hover,
-  &:disabled:not(.waiting):focus,
-  &:disabled:not(.waiting):active {
-    --background-color-hover: transparent;
-    --background-color-active: transparent;
-    --border-color-hover: transparent;
-    --background-color: transparent;
-    --border-color: transparent;
-  }
-}
-
-/* / SIZES */
-
-.size-medium {
-  @apply p-tight text-label-medium h-1000;
-
-  & > span {
-    @apply px-tight gap-tight;
-  }
-
-  & > em {
-    @apply gap-tight h-600 min-w-600;
-  }
-}
-
-.size-small {
-  @apply p-tighter text-label-small h-800;
-
-  & > span {
-    @apply px-tighter gap-tighter;
-  }
-
-  & > em {
-    @apply gap-tighter h-400 min-w-400;
-  }
-}
-
-.size-smaller {
-  @apply p-tightest text-label-smaller h-600;
-
-  & > span {
-    @apply px-tightest gap-tightest;
-  }
-
-  & > em {
-    @apply gap-tighter h-400 min-w-400;
   }
 }
 
@@ -440,7 +483,7 @@
 
 @keyframes gradient-button-waiting {
   to {
-    background-position: -200%;
+    background-position: -300%;
   }
 }
 

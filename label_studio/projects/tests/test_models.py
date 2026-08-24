@@ -1,10 +1,57 @@
 """Tests for projects.models (Project model and related logic)."""
 
 from django.test import TestCase
+from projects.models import Project
 from projects.tests.factories import ProjectFactory
 from tasks.models import Task
 from tasks.tests.factories import AnnotationFactory, TaskFactory
 from tests.utils import mock_feature_flag
+from users.tests.factories import UserFactory
+
+
+class TestUpdateTasksStatesStaleProjectInstance(TestCase):
+    """
+    Async overlap rewrite jobs pickle a Project instance. If Quality settings
+    change concurrently (e.g. during duplication), the job must apply current
+    DB values, not stale in-memory maximum_annotations.
+    """
+
+    def test_update_tasks_states_uses_db_maximum_annotations(self):
+        project = ProjectFactory(
+            maximum_annotations=3,
+            overlap_cohort_percentage=100,
+        )
+        TaskFactory.create_batch(5, project=project, overlap=1)
+        assert project.maximum_annotations == 3
+
+        Project.objects.filter(pk=project.pk).update(maximum_annotations=2)
+        # In-memory instance still has the stale value (as after RQ unpickle).
+        assert project.maximum_annotations == 3
+
+        project._update_tasks_states(
+            maximum_annotations_changed=True,
+            overlap_cohort_percentage_changed=False,
+            tasks_number_changed=False,
+        )
+
+        assert project.maximum_annotations == 2
+        assert set(Task.objects.filter(project=project).values_list('overlap', flat=True)) == {2}
+
+    def test_rearrange_overlap_cohort_uses_db_maximum_annotations(self):
+        project = ProjectFactory(
+            maximum_annotations=3,
+            overlap_cohort_percentage=100,
+        )
+        TaskFactory.create_batch(5, project=project, overlap=1)
+        assert project.maximum_annotations == 3
+
+        Project.objects.filter(pk=project.pk).update(maximum_annotations=2)
+        assert project.maximum_annotations == 3
+
+        project._rearrange_overlap_cohort()
+
+        assert project.maximum_annotations == 2
+        assert set(Task.objects.filter(project=project).values_list('overlap', flat=True)) == {2}
 
 
 class TestRearrangeOverlapCohort(TestCase):
@@ -101,3 +148,27 @@ class TestRearrangeOverlapCohort(TestCase):
         assert len(cohort_ids) == expected_cohort_size
         assert tasks[0].id in cohort_ids
         assert tasks[1].id in cohort_ids
+
+
+class TestProjectHasPermission(TestCase):
+    """LSO has one organization, so has_permission only has to reject revoked membership."""
+
+    def test_member_is_allowed(self):
+        project = ProjectFactory()
+        user = UserFactory(active_organization=project.organization)
+
+        assert project.has_permission(user) is True
+
+    def test_removed_member_is_rejected(self):
+        project = ProjectFactory()
+        user = UserFactory(active_organization=project.organization)
+
+        user.om_through.get(organization=project.organization).soft_delete()
+
+        assert project.has_permission(user) is False
+
+    def test_project_without_organization_is_allowed(self):
+        project = Project.objects.create(title='No organization')
+        user = UserFactory()
+
+        assert project.has_permission(user) is True

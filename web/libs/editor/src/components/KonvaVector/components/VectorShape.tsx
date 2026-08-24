@@ -226,11 +226,11 @@ export const VectorShape: React.FC<VectorShapeProps> = ({
   // Track hover state to prevent rapid toggling
   const hoverTimeoutRef = useRef<{ [key: number]: NodeJS.Timeout | null }>({});
 
-  const effectiveZoom = transform.zoom * fitScale;
+  const _effectiveZoom = transform.zoom * fitScale;
 
   // For skeleton mode, render each segment as a separate line to avoid path ordering issues
   // For non-skeleton mode, use the grouped path approach
-  const isSkeletonMode = segments.some((segment) => {
+  const isSkeletonMode = segments.some((_segment) => {
     // Check if we have branching (multiple segments with the same from point)
     const fromPoints = segments.map((s) => s.from.id);
     const uniqueFromPoints = new Set(fromPoints);
@@ -325,7 +325,7 @@ export const VectorShape: React.FC<VectorShapeProps> = ({
               {/* This Shape is invisible but uses hitFunc to detect mouse events over the entire fill area */}
               <Shape
                 key={`fill-shape-${index}`}
-                sceneFunc={(ctx, shape) => {
+                sceneFunc={(_ctx, _shape) => {
                   // Don't render anything visually - Path already renders the fill
                   // This Shape is only for capturing mouse events over the fill area
                 }}

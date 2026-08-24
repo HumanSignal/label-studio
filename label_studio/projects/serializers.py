@@ -4,7 +4,7 @@ from decimal import Decimal
 
 import bleach
 from constants import SAFE_HTML_ATTRIBUTES, SAFE_HTML_TAGS
-from django.db.models import Q
+from django.db.models import Exists, OuterRef, Q
 from drf_spectacular.utils import extend_schema_field, extend_schema_serializer
 from fsm.serializer_fields import FSMStateField
 from label_studio_sdk.label_interface import LabelInterface
@@ -35,7 +35,7 @@ from projects.models import Project, ProjectImport, ProjectOnboarding, ProjectRe
 from rest_flex_fields import FlexFieldsModelSerializer
 from rest_framework import serializers
 from rest_framework.serializers import SerializerMethodField
-from tasks.models import Task
+from tasks.models import Annotation, Task
 from users.serializers import UserSimpleSerializer
 
 
@@ -350,10 +350,8 @@ class ProjectSerializer(FlexFieldsModelSerializer):
         return super().update(instance, validated_data)
 
     def get_queue_total(self, project) -> int:
-        remain = project.tasks.filter(
-            Q(is_labeled=False) & ~Q(annotations__completed_by_id=self.user_id)
-            | Q(annotations__completed_by_id=self.user_id)
-        ).distinct()
+        user_annotations = Annotation.objects.filter(task_id=OuterRef('pk'), completed_by_id=self.user_id)
+        remain = project.tasks.filter(Q(is_labeled=False) | Exists(user_annotations))
         return remain.count()
 
     def get_queue_done(self, project) -> int:

@@ -31,7 +31,6 @@ env:
   DOCKER_CLI_EXPERIMENTAL: enabled
   IMAGE_NAME: "${{ vars.DOCKERHUB_ORG }}/label-studio"
   DOCKER_IMAGE_TAG_CHECK_NAME: "Docker image tag"
-  POETRY_VERSION: 2.3.2
 
 jobs:
   calculate_version:
@@ -44,7 +43,7 @@ jobs:
       sha: ${{ steps.version.outputs.sha }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           submodules: 'recursive'
           ref: ${{ inputs.sha }}
@@ -102,7 +101,7 @@ jobs:
           echo "PLATFORM_PAIR=${platform//\//-}" >> $GITHUB_ENV
 
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           submodules: 'recursive'
           ref: ${{ inputs.sha }}
@@ -160,7 +159,6 @@ jobs:
           build-args: |
             BRANCH_OVERRIDE=${{ inputs.branch_name }}
             VERSION_OVERRIDE=${{ needs.calculate_version.outputs.build_version }}
-            POETRY_VERSION=${{ env.POETRY_VERSION }}
 
       - name: Export digest
         run: |
@@ -264,7 +262,7 @@ jobs:
           GITHUB_REPOSITORY: "${{ github.repository }}"
           GITHUB_RUN_ID: "${{ github.run_id }}"
           GITHUB_SHA: "${{ github.sha }}"
-        uses: slackapi/slack-github-action@v3.0
+        uses: slackapi/slack-github-action@v4.0
         with:
           method: chat.postMessage
           token: ${{ secrets.SLACK_LSE_BOT_TOKEN }}

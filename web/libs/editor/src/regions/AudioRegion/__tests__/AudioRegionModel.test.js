@@ -4,7 +4,7 @@
  */
 import { types } from "mobx-state-tree";
 
-jest.mock("../../../tags/object/Audio/model", () => {
+mockModule("../../../tags/object/Audio/model", () => {
   const { types } = require("mobx-state-tree");
   return {
     AudioModel: types
@@ -19,12 +19,32 @@ jest.mock("../../../tags/object/Audio/model", () => {
 });
 
 import { AudioRegionModel } from "../AudioRegionModel";
-import { AudioRegionModel as ComposedAudioRegionModel } from "../../AudioRegion";
+import NormalizationMixin from "../../../mixins/Normalization";
+import RegionsMixin from "../../../mixins/Regions";
+import { AreaMixin } from "../../../mixins/AreaMixin";
+import { EditableRegion } from "../../EditableRegion";
 import { AudioModel } from "../../../tags/object/Audio/model";
+
+const EditableAudioModel = types.model("EditableAudioModel", {}).volatile(() => ({
+  editableFields: [
+    { property: "start", label: "Start" },
+    { property: "end", label: "End" },
+  ],
+}));
+
+const ComposedAudioRegionModel = types.compose(
+  "TestAudioRegionModel",
+  RegionsMixin,
+  AreaMixin,
+  NormalizationMixin,
+  EditableRegion,
+  EditableAudioModel,
+  AudioRegionModel,
+);
 
 function createMockAnnotation(overrides = {}) {
   return {
-    deleteRegion: jest.fn(),
+    deleteRegion: mock(),
     isLinkingMode: false,
     isReadOnly: () => false,
     ...overrides,
@@ -36,8 +56,9 @@ const TestRoot = types
     annotationStore: types.optional(
       types.model({
         selected: types.frozen(),
+        selectedHistory: types.maybeNull(types.frozen()),
       }),
-      { selected: createMockAnnotation() },
+      { selected: createMockAnnotation(), selectedHistory: null },
     ),
     audio: types.optional(AudioModel, { id: "a1" }),
     region: types.optional(ComposedAudioRegionModel, {
@@ -52,6 +73,7 @@ const TestRoot = types
   .actions((self) => ({
     setAnnotation(ann) {
       self.annotationStore.selected = ann;
+      self.annotationStore.selectedHistory = ann;
     },
   }));
 
@@ -61,8 +83,9 @@ describe("AudioRegionModel", () => {
     let region;
 
     beforeEach(() => {
+      const ann = createMockAnnotation();
       root = TestRoot.create({
-        annotationStore: { selected: createMockAnnotation() },
+        annotationStore: { selected: ann, selectedHistory: ann },
         audio: { id: "a1" },
         region: {
           id: "ar1",
@@ -115,7 +138,7 @@ describe("AudioRegionModel", () => {
 
       it("returns null when _ws_region.inViewport is false", () => {
         region.setWSRegion({
-          on: jest.fn(),
+          on: mock(),
           inViewport: false,
           xStart: 10,
           xEnd: 50,
@@ -128,7 +151,7 @@ describe("AudioRegionModel", () => {
 
       it("returns clamped coords when _ws_region in viewport", () => {
         region.setWSRegion({
-          on: jest.fn(),
+          on: mock(),
           inViewport: true,
           xStart: 10,
           xEnd: 90,
@@ -147,7 +170,7 @@ describe("AudioRegionModel", () => {
 
       it("clamps left/right to visualizer width", () => {
         region.setWSRegion({
-          on: jest.fn(),
+          on: mock(),
           inViewport: true,
           xStart: -10,
           xEnd: 150,
@@ -193,8 +216,8 @@ describe("AudioRegionModel", () => {
       });
 
       it("calls _ws_region.updateColor when set", () => {
-        const updateColor = jest.fn();
-        region.setWSRegion({ on: jest.fn(), updateColor });
+        const updateColor = mock();
+        region.setWSRegion({ on: mock(), updateColor });
         region.updateColor(0.8);
         expect(updateColor).toHaveBeenCalledWith(expect.any(String));
       });
@@ -207,15 +230,15 @@ describe("AudioRegionModel", () => {
       });
 
       it("calls _ws_region.updatePosition with start and end", () => {
-        const updatePosition = jest.fn();
-        region.setWSRegion({ on: jest.fn(), updatePosition });
+        const updatePosition = mock();
+        region.setWSRegion({ on: mock(), updatePosition });
         region.updatePosition(2, 7);
         expect(updatePosition).toHaveBeenCalledWith(2, 7);
       });
 
       it("uses self.start/self.end when args omitted", () => {
-        const updatePosition = jest.fn();
-        region.setWSRegion({ on: jest.fn(), updatePosition });
+        const updatePosition = mock();
+        region.setWSRegion({ on: mock(), updatePosition });
         region.updatePosition();
         expect(updatePosition).toHaveBeenCalledWith(1.5, 5.2);
       });
@@ -227,11 +250,11 @@ describe("AudioRegionModel", () => {
       });
 
       it("calls handleSelected, bringToFront, scrollToRegion when _ws_region set", () => {
-        const handleSelected = jest.fn();
-        const bringToFront = jest.fn();
-        const scrollToRegion = jest.fn();
+        const handleSelected = mock();
+        const bringToFront = mock();
+        const scrollToRegion = mock();
         region.setWSRegion({
-          on: jest.fn(),
+          on: mock(),
           handleSelected,
           bringToFront,
           scrollToRegion,
@@ -256,8 +279,8 @@ describe("AudioRegionModel", () => {
       });
 
       it("calls _ws_region.handleSelected(false) when set", () => {
-        const handleSelected = jest.fn();
-        region.setWSRegion({ on: jest.fn(), handleSelected });
+        const handleSelected = mock();
+        region.setWSRegion({ on: mock(), handleSelected });
         region.afterUnselectRegion();
         expect(handleSelected).toHaveBeenCalledWith(false);
       });
@@ -272,8 +295,8 @@ describe("AudioRegionModel", () => {
       });
 
       it("calls _ws_region.handleHighlighted when set", () => {
-        const handleHighlighted = jest.fn();
-        region.setWSRegion({ on: jest.fn(), handleHighlighted });
+        const handleHighlighted = mock();
+        region.setWSRegion({ on: mock(), handleHighlighted });
         region.setHighlight(true);
         expect(handleHighlighted).toHaveBeenCalledWith(true);
       });
@@ -285,8 +308,8 @@ describe("AudioRegionModel", () => {
       });
 
       it("calls _ws_region.remove when set", () => {
-        const remove = jest.fn();
-        region.setWSRegion({ on: jest.fn(), remove });
+        const remove = mock();
+        region.setWSRegion({ on: mock(), remove });
         region.beforeDestroy();
         expect(remove).toHaveBeenCalled();
       });
@@ -294,8 +317,8 @@ describe("AudioRegionModel", () => {
 
     describe("setLocked", () => {
       it("updates locked and calls _ws_region.setLocked when set", () => {
-        const setLocked = jest.fn();
-        region.setWSRegion({ on: jest.fn(), setLocked });
+        const setLocked = mock();
+        region.setWSRegion({ on: mock(), setLocked });
         region.setLocked(true);
         expect(region.locked).toBe(true);
         expect(setLocked).toHaveBeenCalledWith(true);
@@ -309,9 +332,9 @@ describe("AudioRegionModel", () => {
 
       it("when annotation.isLinkingMode sets highlight and switchCursor", () => {
         root.setAnnotation(createMockAnnotation({ isLinkingMode: true }));
-        const switchCursor = jest.fn();
-        const handleHighlighted = jest.fn();
-        region.setWSRegion({ on: jest.fn(), switchCursor, handleHighlighted });
+        const switchCursor = mock();
+        const handleHighlighted = mock();
+        region.setWSRegion({ on: mock(), switchCursor, handleHighlighted });
         region.onMouseOver();
         expect(region._highlighted).toBe(true);
         expect(switchCursor).toHaveBeenCalledWith("crosshair");
@@ -321,9 +344,9 @@ describe("AudioRegionModel", () => {
     describe("onMouseLeave", () => {
       it("when annotation.isLinkingMode clears highlight and switchCursor", () => {
         root.setAnnotation(createMockAnnotation({ isLinkingMode: true }));
-        const switchCursor = jest.fn();
-        const handleHighlighted = jest.fn();
-        region.setWSRegion({ on: jest.fn(), switchCursor, handleHighlighted });
+        const switchCursor = mock();
+        const handleHighlighted = mock();
+        region.setWSRegion({ on: mock(), switchCursor, handleHighlighted });
         region.setHighlight(true);
         region.onMouseLeave();
         expect(region._highlighted).toBe(false);
@@ -333,9 +356,9 @@ describe("AudioRegionModel", () => {
 
     describe("onUpdateEnd", () => {
       it("updates start/end from _ws_region and calls notifyDrawingFinished", () => {
-        const notifyDrawingFinished = jest.fn();
+        const notifyDrawingFinished = mock();
         region.notifyDrawingFinished = notifyDrawingFinished;
-        region.setWSRegion({ on: jest.fn(), start: 2, end: 6 });
+        region.setWSRegion({ on: mock(), start: 2, end: 6 });
         region.onUpdateEnd();
         expect(region.start).toBe(2);
         expect(region.end).toBe(6);
@@ -353,14 +376,14 @@ describe("AudioRegionModel", () => {
       });
 
       it("accepts event and stops propagation", () => {
-        const e = { stopPropagation: jest.fn() };
+        const e = { stopPropagation: mock() };
         region.toggleHidden(e);
         expect(e.stopPropagation).toHaveBeenCalled();
       });
 
       it("calls _ws_region.setVisibility when set", () => {
-        const setVisibility = jest.fn();
-        region.setWSRegion({ on: jest.fn(), setVisibility });
+        const setVisibility = mock();
+        region.setWSRegion({ on: mock(), setVisibility });
         region.toggleHidden();
         expect(region.hidden).toBe(true);
         expect(setVisibility).toHaveBeenCalledWith(false);
@@ -369,8 +392,8 @@ describe("AudioRegionModel", () => {
 
     describe("setProperty", () => {
       it("updates position when start or end changed", () => {
-        const updatePosition = jest.fn();
-        region.setWSRegion({ on: jest.fn(), updatePosition });
+        const updatePosition = mock();
+        region.setWSRegion({ on: mock(), updatePosition });
         region.setProperty("start", 2);
         expect(region.start).toBe(2);
         expect(updatePosition).toHaveBeenCalled();
@@ -381,7 +404,7 @@ describe("AudioRegionModel", () => {
 
     describe("setWSRegion", () => {
       it("sets _ws_region and attaches mouseOver/mouseLeave when wsRegion provided", () => {
-        const on = jest.fn();
+        const on = mock();
         const wsRegion = { on };
         region.setWSRegion(wsRegion);
         expect(region._ws_region).toBe(wsRegion);
@@ -390,7 +413,7 @@ describe("AudioRegionModel", () => {
       });
 
       it("allows setting null", () => {
-        region.setWSRegion({ on: jest.fn() });
+        region.setWSRegion({ on: mock() });
         region.setWSRegion(null);
         expect(region._ws_region).toBeNull();
       });

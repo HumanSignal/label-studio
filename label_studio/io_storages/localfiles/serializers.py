@@ -9,8 +9,7 @@ from io_storages.localfiles.models import (
     LocalFilesImportStorage,
     normalize_storage_path,
 )
-from io_storages.serializers import ExportStorageSerializer, ImportStorageSerializer
-from rest_framework import serializers  # type: ignore[import]
+from io_storages.serializers import ExportStorageSerializer, ImportStorageSerializer, StorageTypeField
 from rest_framework.exceptions import ValidationError as DRFValidationError  # type: ignore[import]
 
 
@@ -24,7 +23,7 @@ def _stringify_detail(detail):
 
 
 class LocalFilesImportStorageSerializer(ImportStorageSerializer):
-    type = serializers.ReadOnlyField(default=os.path.basename(os.path.dirname(__file__)))
+    type = StorageTypeField(default=os.path.basename(os.path.dirname(__file__)))
 
     class Meta:
         model = LocalFilesImportStorage
@@ -47,7 +46,7 @@ class LocalFilesImportStorageSerializer(ImportStorageSerializer):
 
 
 class LocalFilesExportStorageSerializer(ExportStorageSerializer):
-    type = serializers.ReadOnlyField(default=os.path.basename(os.path.dirname(__file__)))
+    type = StorageTypeField(default=os.path.basename(os.path.dirname(__file__)))
 
     class Meta:
         model = LocalFilesExportStorage

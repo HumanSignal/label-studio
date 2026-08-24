@@ -3,11 +3,31 @@
   display: flex;
   flex-direction: column;
 
+  & :global(.label-ls[data-required] .label-ls__text span::after) {
+    display: inline-flex;
+    align-items: center;
+    min-height: 18px;
+    margin-left: var(--spacing-tightest);
+    padding: 1px 6px;
+    border: 1px solid var(--account-settings-required-label-border, var(--color-neutral-border));
+    border-radius: var(--corner-radius-smallest);
+    background: var(--account-settings-required-label-background, var(--color-neutral-background));
+    box-shadow: var(--account-settings-required-label-shadow, none);
+    color: var(--account-settings-required-label-color, var(--color-neutral-content-subtle));
+    font-size: var(--font-size-label-smallest);
+    font-weight: var(--font-weight-medium);
+    line-height: var(--line-height-label-smallest);
+    letter-spacing: var(--letter-spacing-base);
+    vertical-align: text-bottom;
+  }
+
   &__content {
     display: flex;
     flex-direction: column;
     gap: var(--spacing-wide);
-    max-width: 660px;
+    width: min(56rem, 100%);
+    margin-inline: auto;
+    padding-block: var(--spacing-wide);
 
     & h1 {
       font-size: var(--font-size-header, 28px);
@@ -17,7 +37,23 @@
 }
 
 .accountSettingsPadding {
-  padding: var(--spacing-wide);
+  padding-left: 0;
+  padding-right: 0;
+}
+
+.section {
+  width: 100%;
+}
+
+.requiredLabel {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-tighter);
+}
+
+.section :global(.lsf-input-ls[aria-invalid="true"]) {
+  border-color: var(--color-negative-border-subtle);
+  box-shadow: 0 0 0 1px var(--color-negative-border-subtle);
 }
 
 .sectionContent {
@@ -39,12 +75,102 @@
 
 .flex1 {
   flex: 1;
+  min-width: 0;
 }
 
 .userPic {
   flex: none;
+  grid-area: avatar;
 }
 
-.saveButton {
-  width: 125px;
+.profilePhotoRow {
+  display: grid;
+  grid-template-areas: "avatar controls delete";
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--spacing-wide);
+}
+
+.profilePhotoControls {
+  grid-area: controls;
+}
+
+.profilePhotoDelete {
+  grid-area: delete;
+}
+
+.formGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--spacing-wide);
+}
+
+.fullWidth {
+  grid-column: 1 / -1;
+}
+
+.formActions {
+  display: flex;
+  justify-content: flex-end;
+  padding-top: var(--spacing-tight);
+}
+
+@media (max-width: 720px) {
+  .accountSettings {
+    &__content {
+      width: 100%;
+      padding-inline: var(--spacing-tight);
+    }
+  }
+
+  .accountSettingsPadding {
+    padding-inline: var(--spacing-tight);
+  }
+
+  .flexRow {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .profilePhotoRow {
+    grid-template-areas:
+      "avatar upload"
+      "label delete";
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: center;
+    gap: var(--spacing-tight) var(--spacing-wide);
+  }
+
+  .profilePhotoControls {
+    display: contents;
+  }
+
+  .profilePhotoLabel {
+    grid-area: label;
+  }
+
+  .profilePhotoUpload {
+    grid-area: upload;
+    min-width: 0;
+    width: 100%;
+  }
+
+  .profilePhotoDelete {
+    grid-area: delete;
+    width: 100%;
+  }
+
+  .formGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .formActions {
+    justify-content: stretch;
+  }
+
+  .formActions > :global(button),
+  .formActions > :global([type="submit"]) {
+    width: 100%;
+    max-width: none;
+  }
 }

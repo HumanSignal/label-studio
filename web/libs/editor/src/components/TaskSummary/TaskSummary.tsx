@@ -1,4 +1,9 @@
+import { useQuery } from "@tanstack/react-query";
+import { observer } from "mobx-react";
+import { FF_FIT_720_LAZY_LOAD_ANNOTATIONS } from "@humansignal/core/lib/utils/feature-flags";
+import { isFF } from "../../utils/feature-flags";
 import type { MSTAnnotation, MSTControlTag, MSTStore } from "../../stores/types";
+import { fetchTaskAgreementDistribution } from "./Aggregation";
 import { DataSummary } from "./DataSummary";
 import { LabelingSummary } from "./LabelingSummary";
 import { NumbersSummary } from "./NumbersSummary";
@@ -15,8 +20,23 @@ interface Annotation {
   type: "annotation" | "prediction";
 }
 
-const TaskSummary = ({ annotations: all, store: annotationStore }: TaskSummaryProps) => {
+const TaskSummary = observer(({ annotations: all, store: annotationStore }: TaskSummaryProps) => {
   const task = annotationStore.store.task;
+  const taskId = task?.id;
+  // Use editor `isFF` (reads `APP_SETTINGS` live) so unit tests can toggle the flag; core `isActive` snapshots flags at import time.
+  const agreementQueryEnabled = isFF(FF_FIT_720_LAZY_LOAD_ANNOTATIONS) && taskId != null;
+
+  const { data: agreementPayload, isFetching: agreementQueryFetching } = useQuery({
+    queryKey: ["task-agreement", taskId],
+    queryFn: () => fetchTaskAgreementDistribution(taskId as number | string),
+    enabled: agreementQueryEnabled,
+    staleTime: 30000,
+    cacheTime: 5 * 60 * 1000,
+  });
+
+  /** First fetch for this task — show skeletons; avoid flashing stale `task.agreement` before `/agreement/` returns. */
+  const agreementHeadlineLoading = agreementQueryEnabled && agreementQueryFetching;
+
   // skip unsubmitted drafts
   const annotations = all.filter((a) => a.pk);
   const allTags = [...annotationStore.names];
@@ -62,7 +82,7 @@ const TaskSummary = ({ annotations: all, store: annotationStore }: TaskSummaryPr
   const controls = Object.entries(grouped).flatMap(([_, controls]) => sortControls(controls ?? []));
 
   const objectTags: ObjectTagEntry[] = allTags.filter(
-    ([_, tag]) => tag.isObjectTag && (tag.value.includes("$") || tag.loadedData),
+    ([_, tag]) => tag.isObjectTag && (tag.value?.includes("$") || tag.valueList?.includes("$") || tag.loadedData),
   ) as ObjectTagEntry[];
   const dataTypes: ObjectTypes = Object.fromEntries(
     objectTags.map(([name, object]) => [
@@ -81,26 +101,57 @@ const TaskSummary = ({ annotations: all, store: annotationStore }: TaskSummaryPr
     ]),
   );
 
+  const agreementFromQuery = agreementPayload?.agreement;
+
+  const roundAgreementDisplay = (n: number) => Math.round(n * 100) / 100;
+
+  const agreementPercent = agreementHeadlineLoading
+    ? undefined
+    : typeof agreementFromQuery === "number"
+      ? agreementFromQuery
+      : typeof task?.agreement === "number"
+        ? task.agreement
+        : undefined;
+
+  const taskAgreementNum = typeof task?.agreement === "number" ? task.agreement : undefined;
+  const endpointAgreementNum = typeof agreementFromQuery === "number" ? agreementFromQuery : undefined;
+  const agreementTaskAndEndpointDiffer =
+    agreementQueryEnabled &&
+    !agreementHeadlineLoading &&
+    taskAgreementNum !== undefined &&
+    endpointAgreementNum !== undefined &&
+    roundAgreementDisplay(taskAgreementNum) !== roundAgreementDisplay(endpointAgreementNum);
+
+  const agreementMismatchTooltip =
+    "The task API and agreement endpoint currently show different scores; they should align after background processing finishes.";
+
+  const annotationCount = annotations.filter((a) => a.type === "annotation").length;
+  const predictionCount = annotations.filter((a) => a.type === "prediction").length;
+
   const values = [
     // if agreement is unavailable for current user it's undefined
-    ...(typeof task?.agreement === "number"
+    ...(agreementHeadlineLoading || typeof agreementPercent === "number"
       ? [
           {
             title: "Agreement",
+            loading: agreementHeadlineLoading,
             // 2 decimals but without trailing zeros
-            value: `${Math.round(task.agreement * 100) / 100}%`,
+            value: agreementHeadlineLoading ? "" : `${roundAgreementDisplay(agreementPercent as number)}%`,
             info: "Overall agreement over all submitted annotations",
+            valueWarningTooltip: agreementTaskAndEndpointDiffer ? agreementMismatchTooltip : undefined,
           },
         ]
       : []),
     {
       title: "Annotations",
-      value: annotations.filter((a) => a.type === "annotation").length,
+      loading: agreementHeadlineLoading,
+      value: agreementHeadlineLoading ? 0 : annotationCount,
       info: "Number of submitted annotations. Table shows only submitted results, not current drafts.",
     },
     {
       title: "Predictions",
-      value: annotations.filter((a) => a.type === "prediction").length,
+      loading: agreementHeadlineLoading,
+      value: agreementHeadlineLoading ? 0 : predictionCount,
       info: "Number of predictions. They are not included in the agreement calculation.",
     },
   ];
@@ -126,6 +177,6 @@ const TaskSummary = ({ annotations: all, store: annotationStore }: TaskSummaryPr
       </div>
     </div>
   );
-};
+});
 
 export default TaskSummary;

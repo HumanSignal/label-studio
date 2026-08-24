@@ -39,12 +39,6 @@ body :global(.ant-select-tree) {
   background-color: var(--color-neutral-background);
 }
 
-body :global(.lsf-taxonomy-search-input) {
-  background-color: var(--color-neutral-surface);
-  border-color: var(--color-neutral-border);
-  color: var(--color-neutral-content);
-}
-
 body :global(.ant-select-tree) {
   color: var(--color-neutral-content);
 }

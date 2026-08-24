@@ -1,13 +1,12 @@
-import unittest
 from unittest.mock import patch
 
-from core.feature_flags import flag_set
 from organizations.tests.factories import OrganizationFactory
 from projects.models import Project
 from projects.tests.factories import ProjectFactory
 from rest_framework.test import APITestCase
+from tasks.models import Task
 from tasks.tests.factories import AnnotationFactory, PredictionFactory, TaskFactory
-from tests.utils import mock_feature_flag
+from users.tests.factories import UserFactory
 
 
 class TestTaskAPI(APITestCase):
@@ -145,14 +144,13 @@ class TestTaskAPIResolveUri(APITestCase):
         cls.project = ProjectFactory(organization=cls.organization)
         cls.user = cls.organization.created_by
 
-    @mock_feature_flag('fflag_fix_fit_1511_resolve_multiple_cloud_uris', False, parent_module='tasks.serializers')
     def test_get_task_resolve_uri_default_true(self):
         """Test that resolve_uri defaults to True when not specified.
 
         This test validates:
         - Creating a task with a storage-like URL in data
         - Fetching the task without resolve_uri parameter
-        - Verifying that Task.resolve_uri method is called (default behavior)
+        - Verifying that Task.resolve_uris method is called (default behavior)
 
         Critical validation: By default, URLs should be resolved for security,
         preventing direct exposure of storage credentials.
@@ -160,28 +158,27 @@ class TestTaskAPIResolveUri(APITestCase):
         task = TaskFactory(project=self.project, data={'image': 's3://bucket/image.jpg'})
         self.client.force_authenticate(user=self.user)
 
-        with patch.object(task.__class__, 'resolve_uri', return_value={'image': '/resolved/url'}) as mock_resolve:
+        with patch.object(task.__class__, 'resolve_uris', return_value={'image': '/resolved/url'}) as mock_resolve:
             response = self.client.get(f'/api/tasks/{task.id}/')
 
         assert response.status_code == 200
-        # resolve_uri should be called by default
+        # resolve_uris should be called by default
         mock_resolve.assert_called_once()
 
-    @mock_feature_flag('fflag_fix_fit_1511_resolve_multiple_cloud_uris', False, parent_module='tasks.serializers')
     def test_get_task_resolve_uri_explicit_true(self):
         """Test that resolve_uri=true explicitly enables URL resolution.
 
         This test validates:
         - Creating a task with a storage-like URL in data
         - Fetching the task with resolve_uri=true
-        - Verifying that Task.resolve_uri method is called
+        - Verifying that Task.resolve_uris method is called
 
         Critical validation: Explicit resolve_uri=true should resolve URLs.
         """
         task = TaskFactory(project=self.project, data={'image': 's3://bucket/image.jpg'})
         self.client.force_authenticate(user=self.user)
 
-        with patch.object(task.__class__, 'resolve_uri', return_value={'image': '/resolved/url'}) as mock_resolve:
+        with patch.object(task.__class__, 'resolve_uris', return_value={'image': '/resolved/url'}) as mock_resolve:
             response = self.client.get(f'/api/tasks/{task.id}/?resolve_uri=true')
 
         assert response.status_code == 200
@@ -193,7 +190,7 @@ class TestTaskAPIResolveUri(APITestCase):
         This test validates:
         - Creating a task with a storage-like URL in data
         - Fetching the task with resolve_uri=false
-        - Verifying that Task.resolve_uri method is NOT called
+        - Verifying that Task.resolve_uris method is NOT called
         - Original URL is preserved in the response
 
         Critical validation: When resolve_uri=false, users should see original
@@ -203,11 +200,11 @@ class TestTaskAPIResolveUri(APITestCase):
         task = TaskFactory(project=self.project, data={'image': original_url, 'text': 'test'})
         self.client.force_authenticate(user=self.user)
 
-        with patch.object(task.__class__, 'resolve_uri') as mock_resolve:
+        with patch.object(task.__class__, 'resolve_uris') as mock_resolve:
             response = self.client.get(f'/api/tasks/{task.id}/?resolve_uri=false')
 
         assert response.status_code == 200
-        # resolve_uri should NOT be called when resolve_uri=false
+        # resolve_uris should NOT be called when resolve_uri=false
         mock_resolve.assert_not_called()
         # Original URL should be preserved
         assert response.json()['data']['image'] == original_url
@@ -243,31 +240,8 @@ class TestTaskAPIResolveUri(APITestCase):
         assert response_data['text'] == 'Plain text field'
 
 
-class TestTaskAgreementAPIFeatureOff(APITestCase):
-    """When feature flag is off, agreement endpoint returns 403. Always run this test."""
-
-    @classmethod
-    def setUpTestData(cls):
-        cls.organization = OrganizationFactory()
-        cls.project = ProjectFactory(organization=cls.organization)
-        cls.user = cls.organization.created_by
-
-    @patch('tasks.api.flag_set')
-    def test_distribution_returns_403_when_feature_flag_disabled(self, mock_flag_set):
-        mock_flag_set.return_value = False
-        task = TaskFactory(project=self.project)
-        self.client.force_authenticate(user=self.user)
-        response = self.client.get(f'/api/tasks/{task.id}/agreement/')
-        assert response.status_code == 403
-        assert 'detail' in response.json() or 'error' in response.json()
-
-
-@unittest.skipUnless(
-    flag_set('fflag_fix_all_fit_720_lazy_load_annotations', user=None),
-    'Agreement API tests require fflag_fix_all_fit_720_lazy_load_annotations to be on',
-)
 class TestTaskAgreementAPI(APITestCase):
-    """Tests for TaskAgreementAPI (GET /api/tasks/<id>/agreement/). Run only when feature flag is on."""
+    """Tests for TaskAgreementAPI (GET /api/tasks/<id>/agreement/)."""
 
     @classmethod
     def setUpTestData(cls):
@@ -291,9 +265,11 @@ class TestTaskAgreementAPI(APITestCase):
         other_project = ProjectFactory(organization=other_org)
         task = TaskFactory(project=other_project)
 
-        # In OSS Project.has_permission is a stub that always returns True; patch so other_project denies access
-        def has_perm(project, user):
-            return project.id != other_project.id
+        def has_perm(*args):
+            if len(args) == 2:
+                project, _ = args
+                return project.id != other_project.id
+            return False
 
         mock_has_permission.side_effect = has_perm
         self.client.force_authenticate(user=self.user)
@@ -310,6 +286,96 @@ class TestTaskAgreementAPI(APITestCase):
         data = response.json()
         assert data['total_annotations'] == 0
         assert data['distributions'] == {}
+
+    @patch('tasks.api.flag_set')
+    def test_distribution_includes_predictions_in_label_counts(self, mock_flag_set):
+        """Predictions are merged into distributions so aggregate matches client-side (develop / FF off)."""
+        mock_flag_set.return_value = True
+        task = TaskFactory(project=self.project)
+        AnnotationFactory(
+            task=task,
+            project=self.project,
+            result=[
+                {
+                    'from_name': 'label',
+                    'to_name': 'image',
+                    'type': 'rectanglelabels',
+                    'value': {'rectanglelabels': ['Car', 'Car']},
+                }
+            ],
+        )
+        PredictionFactory(
+            task=task,
+            project=self.project,
+            result=[
+                {
+                    'from_name': 'label',
+                    'to_name': 'image',
+                    'type': 'rectanglelabels',
+                    'value': {'rectanglelabels': ['Car']},
+                }
+            ],
+        )
+        self.client.force_authenticate(user=self.user)
+        response = self.client.get(f'/api/tasks/{task.id}/agreement/')
+        assert response.status_code == 200
+        data = response.json()
+        assert data['total_annotations'] == 1
+        assert data['distributions']['label']['labels'] == {'Car': 3}
+
+
+class TestTaskSummaryAPI(APITestCase):
+    """Tests for TaskSummaryAPI (GET /api/tasks/<id>/summary/)."""
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.organization = OrganizationFactory()
+        cls.project = ProjectFactory(organization=cls.organization)
+        cls.user = cls.organization.created_by
+
+    @patch('tasks.api.flag_set')
+    def test_distribution_returns_404_for_nonexistent_task(self, mock_flag_set):
+        mock_flag_set.return_value = True
+        self.client.force_authenticate(user=self.user)
+        response = self.client.get('/api/tasks/99999/summary/')
+        assert response.status_code == 404
+        assert response.json() == {'error': 'Task not found'}
+
+    @patch('tasks.api.flag_set')
+    @patch.object(Project, 'has_permission')
+    def test_distribution_permission_denied_for_other_project(self, mock_has_permission, mock_flag_set):
+        mock_flag_set.return_value = True
+        other_org = OrganizationFactory()
+        other_project = ProjectFactory(organization=other_org)
+        task = TaskFactory(project=other_project)
+
+        # In OSS Project.has_permission is a stub that always returns True; patch so other_project denies access.
+        # Class-level patch: the mock is invoked with (user) only, not (self, user).
+        def has_perm(*args):
+            if len(args) == 2:
+                project, _ = args
+                return project.id != other_project.id
+            # Class-level method patch: mock is called as (user,) only.
+            return False
+
+        mock_has_permission.side_effect = has_perm
+        self.client.force_authenticate(user=self.user)
+        response = self.client.get(f'/api/tasks/{task.id}/summary/')
+        assert response.status_code == 403
+
+    @patch('tasks.api.flag_set')
+    def test_distribution_empty_task_returns_zero_annotations(self, mock_flag_set):
+        mock_flag_set.return_value = True
+        task = TaskFactory(project=self.project)
+        self.client.force_authenticate(user=self.user)
+        response = self.client.get(f'/api/tasks/{task.id}/summary/')
+        assert response.status_code == 200
+        data = response.json()
+        assert data['total_annotations'] == 0
+        assert data['total_predictions'] == 0
+        assert data['distributions'] == {}
+        assert data['annotations'] == []
+        assert data['task']['id'] == task.id
 
     @patch('tasks.api.flag_set')
     def test_distribution_with_rectanglelabels(self, mock_flag_set):
@@ -340,7 +406,7 @@ class TestTaskAgreementAPI(APITestCase):
             ],
         )
         self.client.force_authenticate(user=self.user)
-        response = self.client.get(f'/api/tasks/{task.id}/agreement/')
+        response = self.client.get(f'/api/tasks/{task.id}/summary/')
         assert response.status_code == 200
         data = response.json()
         assert data['total_annotations'] == 2
@@ -390,7 +456,7 @@ class TestTaskAgreementAPI(APITestCase):
             ],
         )
         self.client.force_authenticate(user=self.user)
-        response = self.client.get(f'/api/tasks/{task.id}/agreement/')
+        response = self.client.get(f'/api/tasks/{task.id}/summary/')
         assert response.status_code == 200
         data = response.json()
         assert data['total_annotations'] == 3
@@ -428,7 +494,7 @@ class TestTaskAgreementAPI(APITestCase):
             ],
         )
         self.client.force_authenticate(user=self.user)
-        response = self.client.get(f'/api/tasks/{task.id}/agreement/')
+        response = self.client.get(f'/api/tasks/{task.id}/summary/')
         assert response.status_code == 200
         data = response.json()
         assert data['total_annotations'] == 2
@@ -466,7 +532,7 @@ class TestTaskAgreementAPI(APITestCase):
             ],
         )
         self.client.force_authenticate(user=self.user)
-        response = self.client.get(f'/api/tasks/{task.id}/agreement/')
+        response = self.client.get(f'/api/tasks/{task.id}/summary/')
         assert response.status_code == 200
         data = response.json()
         assert data['total_annotations'] == 2
@@ -503,7 +569,7 @@ class TestTaskAgreementAPI(APITestCase):
             ],
         )
         self.client.force_authenticate(user=self.user)
-        response = self.client.get(f'/api/tasks/{task.id}/agreement/')
+        response = self.client.get(f'/api/tasks/{task.id}/summary/')
         assert response.status_code == 200
         data = response.json()
         assert data['total_annotations'] == 2
@@ -541,7 +607,7 @@ class TestTaskAgreementAPI(APITestCase):
             ],
         )
         self.client.force_authenticate(user=self.user)
-        response = self.client.get(f'/api/tasks/{task.id}/agreement/')
+        response = self.client.get(f'/api/tasks/{task.id}/summary/')
         assert response.status_code == 200
         data = response.json()
         assert data['total_annotations'] == 2
@@ -580,15 +646,15 @@ class TestTaskAgreementAPI(APITestCase):
             ],
         )
         self.client.force_authenticate(user=self.user)
-        response = self.client.get(f'/api/tasks/{task.id}/agreement/')
+        response = self.client.get(f'/api/tasks/{task.id}/summary/')
         assert response.status_code == 200
         data = response.json()
         assert data['total_annotations'] == 1
         assert data['distributions']['label']['labels'] == {'Car': 1}
 
     @patch('tasks.api.flag_set')
-    def test_distribution_includes_predictions_in_label_counts(self, mock_flag_set):
-        """Predictions are merged into distributions so aggregate matches client-side (develop / FF off)."""
+    def test_distribution_excludes_predictions_from_label_counts(self, mock_flag_set):
+        """Predictions are not merged into distributions; only annotations are counted."""
         mock_flag_set.return_value = True
         task = TaskFactory(project=self.project)
         AnnotationFactory(
@@ -616,8 +682,234 @@ class TestTaskAgreementAPI(APITestCase):
             ],
         )
         self.client.force_authenticate(user=self.user)
-        response = self.client.get(f'/api/tasks/{task.id}/agreement/')
+        response = self.client.get(f'/api/tasks/{task.id}/summary/')
         assert response.status_code == 200
         data = response.json()
         assert data['total_annotations'] == 1
-        assert data['distributions']['label']['labels'] == {'Car': 3}
+        assert data['total_predictions'] == 1
+        assert data['distributions']['label']['labels'] == {'Car': 2}
+
+    @patch('tasks.api.flag_set')
+    def test_distribution_excludes_ground_truth_annotations(self, mock_flag_set):
+        """Ground truth annotations are excluded from distributions to match agreement filter."""
+        mock_flag_set.return_value = True
+        task = TaskFactory(project=self.project)
+        AnnotationFactory(
+            task=task,
+            project=self.project,
+            result=[
+                {
+                    'from_name': 'label',
+                    'to_name': 'image',
+                    'type': 'rectanglelabels',
+                    'value': {'rectanglelabels': ['Car']},
+                }
+            ],
+        )
+        AnnotationFactory(
+            task=task,
+            project=self.project,
+            ground_truth=True,
+            result=[
+                {
+                    'from_name': 'label',
+                    'to_name': 'image',
+                    'type': 'rectanglelabels',
+                    'value': {'rectanglelabels': ['Person']},
+                }
+            ],
+        )
+        self.client.force_authenticate(user=self.user)
+        response = self.client.get(f'/api/tasks/{task.id}/summary/')
+        assert response.status_code == 200
+        data = response.json()
+        assert data['total_annotations'] == 2
+        assert data['distributions']['label']['labels'] == {'Car': 1}
+        assert 'Person' not in data['distributions']['label']['labels']
+
+    @patch('tasks.api.flag_set')
+    def test_distribution_excludes_null_result_annotations(self, mock_flag_set):
+        """Annotations with null results are excluded from distributions to match agreement filter."""
+        mock_flag_set.return_value = True
+        task = TaskFactory(project=self.project)
+        AnnotationFactory(
+            task=task,
+            project=self.project,
+            result=[
+                {
+                    'from_name': 'label',
+                    'to_name': 'image',
+                    'type': 'rectanglelabels',
+                    'value': {'rectanglelabels': ['Car']},
+                }
+            ],
+        )
+        AnnotationFactory(
+            task=task,
+            project=self.project,
+            result=None,
+        )
+        self.client.force_authenticate(user=self.user)
+        response = self.client.get(f'/api/tasks/{task.id}/summary/')
+        assert response.status_code == 200
+        data = response.json()
+        assert data['total_annotations'] == 2
+        assert data['distributions']['label']['labels'] == {'Car': 1}
+
+
+LABEL_CONFIG = (
+    '<View><Text name="text" value="$text"/><Choices name="label" toName="text">'
+    '<Choice value="pos"/><Choice value="neg"/></Choices></View>'
+)
+ANNOTATION_RESULT = [{'value': {'choices': ['pos']}, 'from_name': 'label', 'to_name': 'text', 'type': 'choices'}]
+
+
+class TestTaskCreateOverlapInitialization(APITestCase):
+    """ROOT-62: Task create must seed overlap from Quality settings.
+
+    Full-overlap projects never rearrange on task add, so API create is the only
+    assignment path. Import/storage already seed overlap=maximum_annotations.
+    """
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.organization = OrganizationFactory()
+        cls.user = cls.organization.created_by
+        cls.label_config = LABEL_CONFIG
+
+    def _post_task(self, project, **extra):
+        self.client.force_authenticate(user=self.user)
+        payload = {'project': project.id, 'data': {'text': 'mid-project task'}, **extra}
+        response = self.client.post('/api/tasks/', data=payload, format='json')
+        assert response.status_code == 201, response.content
+        return Task.objects.get(id=response.json()['id'])
+
+    def test_full_overlap_project_seeds_overlap_and_stays_unlabeled_after_one_annotation(self):
+        """100% overlap / max=3: new task overlap=3; one annotation leaves is_labeled False."""
+        project = ProjectFactory(
+            organization=self.organization,
+            created_by=self.user,
+            label_config=self.label_config,
+            maximum_annotations=3,
+            overlap_cohort_percentage=100,
+        )
+        task = self._post_task(project)
+
+        assert task.overlap == 3
+        assert task.is_labeled is False
+
+        response = self.client.post(
+            f'/api/tasks/{task.id}/annotations/',
+            {'result': ANNOTATION_RESULT},
+            format='json',
+        )
+        assert response.status_code == 201, response.content
+        task.refresh_from_db()
+        assert task.overlap == 3
+        assert task.is_labeled is False
+
+        for _ in range(2):
+            annotator = UserFactory(active_organization=self.organization)
+            AnnotationFactory(task=task, project=project, completed_by=annotator, result=ANNOTATION_RESULT)
+        task.refresh_from_db()
+        task.update_is_labeled()
+        assert task.is_labeled is True
+
+    def test_partial_overlap_project_keeps_default_overlap_when_omitted(self):
+        """Cohort < 100% is not rearranged on single-task create; omitted overlap stays 1."""
+        project = ProjectFactory(
+            organization=self.organization,
+            created_by=self.user,
+            label_config=self.label_config,
+            maximum_annotations=3,
+            overlap_cohort_percentage=50,
+        )
+        task = self._post_task(project)
+        assert task.overlap == 1
+        assert task.is_labeled is False
+
+    def test_explicit_overlap_in_payload_is_preserved(self):
+        """Client-supplied overlap is not overwritten by project.maximum_annotations."""
+        project = ProjectFactory(
+            organization=self.organization,
+            created_by=self.user,
+            label_config=self.label_config,
+            maximum_annotations=3,
+            overlap_cohort_percentage=100,
+        )
+        task = self._post_task(project, overlap=2)
+        assert task.overlap == 2
+
+    def test_full_overlap_project_nested_create_seeds_overlap(self):
+        """POST /api/projects/{id}/tasks/ also seeds overlap when the field is omitted."""
+        project = ProjectFactory(
+            organization=self.organization,
+            created_by=self.user,
+            label_config=self.label_config,
+            maximum_annotations=3,
+            overlap_cohort_percentage=100,
+        )
+        self.client.force_authenticate(user=self.user)
+        response = self.client.post(
+            f'/api/projects/{project.id}/tasks/',
+            {'data': {'text': 'nested mid-project task'}},
+            format='json',
+        )
+        assert response.status_code == 201, response.content
+        task = Task.objects.get(id=response.json()['id'])
+        assert task.overlap == 3
+        assert task.is_labeled is False
+
+
+class TestAnnotationDraftCreateWithMissingAnnotation(APITestCase):
+    """Regression tests for the annotation-scoped draft-creation endpoint."""
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.organization = OrganizationFactory()
+        cls.project = ProjectFactory(organization=cls.organization)
+        cls.user = cls.organization.created_by
+
+    def test_create_draft_for_missing_annotation_does_not_violate_fk(self):
+        # Reproduces: ENTERPRISE-V2-BACKEND-5S0
+        # POST /api/tasks/{pk}/annotations/{annotation_id}/drafts blindly passes the URL's
+        # annotation_id straight into serializer.save(). When that annotation does not exist
+        # (e.g. it was deleted between the client loading the task and submitting the draft),
+        # the INSERT into tasks_annotationdraft violates the annotation_id foreign key:
+        #   insert or update on table "tasks_annotationdraft" violates foreign key constraint
+        #   "tasks_annotationdraf_annotation_id_86db74e5_fk_task_comp"
+        #   DETAIL: Key (annotation_id)=(...) is not present in table "task_completion".
+        #
+        # RED (unpatched): the endpoint persists a draft pointing at the missing annotation.
+        # On production Postgres the FK is checked immediately, so the request raises
+        # IntegrityError (the Sentry crash). SQLite (used by the test suite) defers FK
+        # enforcement, so connection.check_constraints() below surfaces the identical
+        # IntegrityError, failing this test with the same violation.
+        # GREEN (fixed): the endpoint validates the annotation and rejects the request
+        # gracefully (4xx) without persisting a dangling draft, so no violation occurs.
+        from django.db import connection
+        from tasks.models import AnnotationDraft
+
+        task = TaskFactory(project=self.project, data={'text': 'test'})
+
+        # An annotation that was created and then deleted — its id is now dangling.
+        annotation = AnnotationFactory(task=task, project=self.project, result=[])
+        missing_annotation_id = annotation.id
+        annotation.delete()
+
+        self.client.force_authenticate(user=self.user)
+
+        # On Postgres this call itself raises IntegrityError inside the request.
+        response = self.client.post(
+            f'/api/tasks/{task.id}/annotations/{missing_annotation_id}/drafts',
+            data={'result': []},
+            format='json',
+        )
+
+        # On SQLite the FK check is deferred; surface the same violation explicitly.
+        connection.check_constraints()
+
+        # A fixed endpoint should refuse to create a draft for a non-existent annotation
+        # instead of leaving a dangling reference behind.
+        assert not AnnotationDraft.objects.filter(annotation_id=missing_annotation_id).exists()
+        assert response.status_code in (400, 404), response.status_code

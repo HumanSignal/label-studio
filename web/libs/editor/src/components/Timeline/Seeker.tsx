@@ -12,6 +12,8 @@ export interface SeekerProps {
   seekVisible: number;
   step: number;
   leftOffset?: number;
+  disabled?: boolean;
+  title?: string;
   minimap?: ReactElement<TimelineMinimapProps> | null;
   onIndicatorMove: (position: number) => void;
   onSeek: (position: number) => void;
@@ -26,6 +28,8 @@ export const Seeker: FC<SeekerProps> = ({
   onSeek,
   minimap,
   step,
+  disabled = false,
+  title,
   ...props
 }) => {
   const leftOffset = (props.leftOffset ?? 150) / step;
@@ -115,6 +119,7 @@ export const Seeker: FC<SeekerProps> = ({
     (e: MouseEvent) => {
       e.preventDefault();
       e.stopPropagation();
+      if (disabled) return;
 
       if (e.target === viewRef.current) {
         onIndicatorDrag(e);
@@ -122,11 +127,17 @@ export const Seeker: FC<SeekerProps> = ({
         onSeekerDrag(e);
       }
     },
-    [onIndicatorDrag, onSeekerDrag],
+    [disabled, onIndicatorDrag, onSeekerDrag],
   );
 
   return (
-    <div className={cn("seeker").toClassName()} ref={rootRef as any} onMouseDown={onDrag}>
+    <div
+      className={cn("seeker").mod({ disabled }).toClassName()}
+      ref={rootRef as any}
+      onMouseDown={onDrag}
+      title={title}
+      aria-disabled={disabled || undefined}
+    >
       <div className={cn("seeker").elem("track").toClassName()} />
       {showIndicator && (
         <div

@@ -262,7 +262,7 @@ export const Phrases = observer(({ item, playingId, activeRef, setIsInViewPort, 
                   disabled={!hasSelectedLabels}
                   className={styles.selectAllBtn}
                   aria-label={hasSelectedLabels ? "Label whole utterance" : "Label whole utterance (disabled)"}
-                  onClick={(e) => {
+                  onClick={(_e) => {
                     if (hasSelectedLabels) {
                       item.selectAndAnnotatePhrase?.(idx);
                     }

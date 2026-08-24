@@ -99,6 +99,13 @@ export const Frames: FC<TimelineViewProps> = ({
     [offsetX, offsetY, step, length],
   );
 
+  const offsetToFrame = useCallback(
+    (value: number) => {
+      return clamp(toSteps(value, step) + 1, 1, length);
+    },
+    [step, length],
+  );
+
   const setIndicatorOffset = useCallback(
     (value) => {
       const frame = toSteps(roundToStep(value, step), step);
@@ -238,7 +245,7 @@ export const Frames: FC<TimelineViewProps> = ({
       };
 
       const offset = getMouseToOffset(e);
-      let baseFrame = toSteps(offset, step) + 1;
+      let baseFrame = offsetToFrame(offset);
       let isInstant = false;
 
       // don't scroll if we select region clicking on keyframes, outside of scrollable area
@@ -266,7 +273,7 @@ export const Frames: FC<TimelineViewProps> = ({
 
       const onMouseMove = (e: globalThis.MouseEvent) => {
         const offset = getMouseToOffset(e);
-        const frame = toSteps(offset, step) + 1;
+        const frame = offsetToFrame(offset);
 
         if (offset >= currentOffsetX && offset <= rightLimit + currentOffsetX) {
           setHoverEnabled(false);
@@ -295,7 +302,7 @@ export const Frames: FC<TimelineViewProps> = ({
       document.addEventListener("mousemove", onMouseMove);
       document.addEventListener("mouseup", onMouseUp);
     },
-    [currentOffsetX, setIndicatorOffset],
+    [currentOffsetX, setIndicatorOffset, offsetToFrame],
   );
 
   useEffect(() => {

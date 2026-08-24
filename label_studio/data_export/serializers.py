@@ -23,6 +23,16 @@ class CompletedBySerializer(serializers.ModelSerializer):
         model = User
         fields = ['id', 'email', 'first_name', 'last_name']
 
+    def to_representation(self, instance):
+        ret = super().to_representation(instance)
+        from users.serializers import AnnotatorReviewerFirewall
+
+        request = self.context.get('request')
+        requester = getattr(request, 'user', None) if request is not None else None
+        if AnnotatorReviewerFirewall.should_anonymize(user=instance, requester=requester):
+            ret = AnnotatorReviewerFirewall.anonymize_user_data(ret, user=instance, requester=requester)
+        return ret
+
 
 class AnnotationSerializer(FlexFieldsModelSerializer):
     completed_by = serializers.PrimaryKeyRelatedField(read_only=True)

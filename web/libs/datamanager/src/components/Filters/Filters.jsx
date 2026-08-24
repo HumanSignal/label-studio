@@ -1,9 +1,15 @@
 import React from "react";
 import { inject } from "mobx-react";
 import { cn } from "../../utils/bem";
-import { Button } from "@humansignal/ui";
-import { FilterLine } from "./FilterLine/FilterLine";
-import { IconChevronRight, IconPlus, IconCopyOutline, IconClipboardCheck, IconUndo } from "@humansignal/icons";
+import { Button, Message } from "@humansignal/ui";
+import { FilterLine, FILTER_CHROME_ICON_SIZE } from "./FilterLine/FilterLine";
+import {
+  ArrowCounterClockwiseIcon,
+  ClipboardTextIcon,
+  CopySimpleIcon,
+  PlusIcon,
+  SidebarSimpleIcon,
+} from "@humansignal/icons";
 import { useRecentFilters } from "../../hooks/useRecentFilters";
 import "./Filters.prefix.css";
 
@@ -17,6 +23,9 @@ const injector = inject(({ store }) => ({
 
 export const Filters = injector(({ store, views, currentView, filters, projectId }) => {
   const { sidebarEnabled } = views;
+  const isLocked = currentView?.isLockedByManager;
+  const lockedTooltip = currentView?.lockedUpdateMessage;
+  const lockedFiltersMessage = currentView?.lockedFiltersMessage;
   const { fields, recentEntries, saveOnSwitch, saveInPlace } = useRecentFilters(
     projectId,
     currentView.availableFilters,
@@ -86,6 +95,11 @@ export const Filters = injector(({ store, views, currentView, filters, projectId
 
   return (
     <div className={cn("filters").mod({ sidebar: sidebarEnabled }).toClassName()}>
+      {isLocked && lockedFiltersMessage ? (
+        <Message variant="warning" size="small" data-testid="filters-locked-message" className="m-base mb-0">
+          {lockedFiltersMessage}
+        </Message>
+      ) : null}
       <div className={cn("filters").elem("list").mod({ withFilters: !!filters.length }).toClassName()}>
         {filters.length ? (
           filters.map((filter, i) => (
@@ -93,15 +107,13 @@ export const Filters = injector(({ store, views, currentView, filters, projectId
               index={i}
               filter={filter}
               view={currentView}
-              sidebar={sidebarEnabled}
-              value={filter.currentValue}
-              key={`${filter.filter.id}-${i}`}
-              availableFilters={fields}
+              key={filter.id}
               pickerFilters={currentView.availableFilters}
               recentEntries={recentEntries}
-              dropdownClassName={cn("filters").elem("selector").toClassName()}
               onSaveOnSwitch={saveOnSwitch}
               onSaveInPlace={saveInPlace}
+              disabled={isLocked}
+              disabledTooltip={isLocked ? lockedTooltip : undefined}
             />
           ))
         ) : (
@@ -112,8 +124,12 @@ export const Filters = injector(({ store, views, currentView, filters, projectId
         <Button
           size="small"
           look="string"
+          disabled={isLocked}
+          tooltip={isLocked ? lockedTooltip : undefined}
           onClick={() => currentView.createFilter()}
-          leading={<IconPlus className="!h-3 !w-3" />}
+          data-testid="filters-add-filter"
+          className="p-tighter [&_em]:size-500"
+          leading={<PlusIcon size={FILTER_CHROME_ICON_SIZE} className="shrink-0" aria-hidden="true" />}
         >
           Add {filters.length ? "Another Filter" : "Filter"}
         </Button>
@@ -123,47 +139,48 @@ export const Filters = injector(({ store, views, currentView, filters, projectId
             <Button
               size="small"
               look="string"
-              tooltip={copyFeedback ? "Copied!" : "Copy filters to clipboard; Tip: Use it in Label Studio SDK"}
+              tooltip={copyFeedback ? "Copied!" : "Copy filters as JSON (SDK)"}
               onClick={handleCopyFilters}
-              aria-label="Copy filters"
-            >
-              <IconCopyOutline className="!w-4 !h-4" />
-            </Button>
+              aria-label="Copy filters as JSON for SDK"
+              leading={<CopySimpleIcon size={FILTER_CHROME_ICON_SIZE} aria-hidden="true" />}
+              data-testid="filters-copy"
+            />
           )}
 
           <Button
             size="small"
             look="string"
-            tooltip={pasteFeedback ? "Pasted!" : "Paste filters from clipboard"}
+            disabled={isLocked}
+            tooltip={isLocked ? lockedTooltip : pasteFeedback ? "Pasted!" : "Paste filters from JSON"}
             onClick={handlePasteFilters}
-            aria-label="Paste filters"
-          >
-            <IconClipboardCheck className="!w-4 !h-4" />
-          </Button>
+            aria-label="Paste filters from JSON"
+            leading={<ClipboardTextIcon size={FILTER_CHROME_ICON_SIZE} aria-hidden="true" />}
+            data-testid="filters-paste"
+          />
 
           {prePasteSnapshot && (
             <Button
               size="small"
               look="string"
-              tooltip="Undo paste — restore previous filters"
+              disabled={isLocked}
+              tooltip={isLocked ? lockedTooltip : "Undo paste — restore previous filters"}
               onClick={handleUndoPaste}
               aria-label="Undo paste"
-            >
-              <IconUndo className="!w-4 !h-4" />
-            </Button>
+              leading={<ArrowCounterClockwiseIcon size={FILTER_CHROME_ICON_SIZE} aria-hidden="true" />}
+              data-testid="filters-undo-paste"
+            />
           )}
 
           {!sidebarEnabled ? (
             <Button
               look="string"
-              type="link"
               size="small"
-              tooltip="Pin to sidebar"
+              tooltip="Pin filters to sidebar"
               onClick={() => views.expandFilters()}
               aria-label="Pin filters to sidebar"
-            >
-              <IconChevronRight className="!w-4 !h-4" />
-            </Button>
+              leading={<SidebarSimpleIcon size={FILTER_CHROME_ICON_SIZE} className="rotate-180" aria-hidden="true" />}
+              data-testid="filters-pin-sidebar"
+            />
           ) : null}
         </div>
       </div>

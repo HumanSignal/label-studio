@@ -1,5 +1,4 @@
-import { EnterpriseBadge, IconSpark } from "@humansignal/ui";
-import { Alert, AlertTitle, AlertDescription } from "@humansignal/shad/components/ui/alert";
+import { EnterpriseBadge, Message } from "@humansignal/ui";
 import { IconCloudProviderS3 } from "@humansignal/icons";
 import type { ProviderConfig } from "@humansignal/app-common/blocks/StorageProviderForm/types/provider";
 
@@ -15,21 +14,17 @@ const s3sProvider: ProviderConfig = {
       name: "enterprise_info",
       type: "message",
       content: (
-        <Alert variant="gradient">
-          <IconSpark />
-          <AlertTitle>Enterprise Feature</AlertTitle>
-          <AlertDescription>
-            Amazon S3 with IAM Role is available in Label Studio Enterprise.{" "}
-            <a
-              href="https://docs.humansignal.com/guide/storage.html#Set-up-an-S3-connection-with-IAM-role-access"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="underline hover:no-underline"
-            >
-              Learn more
-            </a>
-          </AlertDescription>
-        </Alert>
+        <Message variant="enterprise" title="Enterprise Feature">
+          Amazon S3 with IAM Role is available in Label Studio Enterprise.{" "}
+          <a
+            href="https://docs.humansignal.com/guide/storage.html#Set-up-an-S3-connection-with-IAM-role-access"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="underline hover:no-underline"
+          >
+            Learn more
+          </a>
+        </Message>
       ),
     },
   ],

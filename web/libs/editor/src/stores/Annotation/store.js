@@ -9,7 +9,7 @@ import Types from "../../core/Types";
 import { StoreExtender } from "../../mixins/SharedChoiceStore/extender";
 import { ViewModel } from "../../tags/visual";
 import Utils from "../../utils";
-import { FF_DEV_3034, FF_DEV_3391, FF_SIMPLE_INIT, isFF } from "../../utils/feature-flags";
+import { FF_DEV_3391, FF_SIMPLE_INIT, isFF } from "../../utils/feature-flags";
 import { emailFromCreatedBy } from "../../utils/utilities";
 import ToolsManager from "../../tools/Manager";
 import { Annotation } from "./Annotation";
@@ -107,7 +107,12 @@ const AnnotationStoreModel = types
           a.editable = false;
         });
       } else {
-        selectAnnotation(self.annotations.at(isFF(FF_SIMPLE_INIT) ? -1 : 0).id, { fromViewAll: true });
+        // API order is newest-first; re-select the newest item when leaving View All.
+        if (self.annotations.length) {
+          selectAnnotation(self.annotations[0].id, { fromViewAll: true });
+        } else if (self.predictions.length) {
+          selectPrediction(self.predictions[0].id, { fromViewAll: true });
+        }
       }
     }
 
@@ -251,6 +256,25 @@ const AnnotationStoreModel = types
        * Select other annotation
        */
       if (self.annotations.length > 0) {
+        self.selectAnnotation(self.annotations[0].id);
+      }
+    }
+
+    function deletePrediction(prediction) {
+      getEnv(self).events.invoke("deletePrediction", self.store, prediction);
+
+      /**
+       * MST destroy prediction
+       */
+      destroy(prediction);
+
+      self.selected = null;
+      /**
+       * Select another tab — prefer a remaining prediction, then fall back to an annotation.
+       */
+      if (self.predictions.length > 0) {
+        self.selectPrediction(self.predictions[0].id);
+      } else if (self.annotations.length > 0) {
         self.selectAnnotation(self.annotations[0].id);
       }
     }
@@ -402,17 +426,9 @@ const AnnotationStoreModel = types
 
       const item = createItem(options);
 
-      if (isFF(FF_SIMPLE_INIT)) {
-        self.predictions.push(item);
+      self.predictions.push(item);
 
-        return self.predictions.at(-1);
-      }
-
-      self.predictions.unshift(item);
-
-      const record = self.predictions[0];
-
-      return record;
+      return self.predictions.at(-1);
     }
 
     function addAnnotation(options = {}) {
@@ -423,24 +439,24 @@ const AnnotationStoreModel = types
       if (item.userGenerate) {
         let actual_user;
 
-        if (isFF(FF_DEV_3034)) {
-          // drafts can be created by other user, but we don't have much info
-          // so parse "id", get email and find user by it
-          const email = emailFromCreatedBy(item.createdBy);
-          const user = email && self.store.users.find((user) => user.email === email);
+        // drafts can be created by other user, but we don't have much info
+        // so parse "id", get email and find user by it
+        const email = emailFromCreatedBy(item.createdBy);
+        const user = email && self.store.users.find((user) => user.email === email);
 
-          if (user) actual_user = user.id;
-        }
+        if (user) actual_user = user.id;
         item.completed_by = actual_user ?? getRoot(self).user?.id ?? undefined;
       }
 
-      if (isFF(FF_SIMPLE_INIT)) {
-        self.annotations.push(item);
-      } else {
+      // Server payloads (initializeStore) are appended in API order (newest first with -id ordering).
+      // Locally created annotations (userGenerate) must be prepended so they stay at index 0 like the API.
+      if (item.userGenerate) {
         self.annotations.unshift(item);
+      } else {
+        self.annotations.push(item);
       }
 
-      const record = self.annotations.at(isFF(FF_SIMPLE_INIT) ? -1 : 0);
+      const record = item.userGenerate ? self.annotations[0] : self.annotations.at(-1);
 
       record.addVersions({
         result: options.result,
@@ -524,9 +540,18 @@ const AnnotationStoreModel = types
       getEnv(self).events.invoke("selectHistory", self.store, self.selected, self.selectedHistory);
     }
 
+    /**
+     * Create a new draft annotation from a prediction or an existing annotation.
+     * Used both when converting a prediction ("Duplicate as Annotation") and when
+     * duplicating an annotation ("Duplicate Annotation") from the annotation menu.
+     * For annotations, copy live serialized results — not `_initialAnnotationObj`,
+     * which can be stale after SAM2 / model-accepted regions are added.
+     */
     function addAnnotationFromPrediction(entity) {
+      // Annotations: live serialize. Predictions: load-time snapshot is the source of truth.
+      const source = entity.type === "annotation" ? entity.serializeAnnotation() : (entity._initialAnnotationObj ?? []);
       // immutable work, because we'll change ids soon
-      const s = entity._initialAnnotationObj.map((r) => ({ ...r }));
+      const s = source.map((r) => ({ ...r }));
       const c = self.addAnnotation({ userGenerate: true, result: s });
 
       const ids = {};
@@ -638,6 +663,7 @@ const AnnotationStoreModel = types
       _unselectAll,
 
       deleteAnnotation,
+      deletePrediction,
       clearDeletedParents,
       resetAnnotations,
     };

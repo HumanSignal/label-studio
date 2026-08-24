@@ -26,10 +26,6 @@ export const FF_DEV_2755 = "fflag_feat_dev_2755_regions_list_grouped_by_labels_w
  */
 export const FF_DEV_2918 = "fflag_fix_front_dev_2918_labeling_filtered_paragraphs_250822_short";
 
-export const FF_DEV_3034 = "fflag-feat-dev-3034-comments-with-drafts-short";
-
-export const FF_DEV_3077 = "fflag_feat_front_dev_3077_repeater_tag_loading_performance_short";
-
 /**
  * Correction of image and stage size. It also affects the zoom position restrictions.
  * @link https://app.launchdarkly.com/default/production/features/fflag_fix_front_dev_3377_image_regions_shift_on_resize_280922_short
@@ -64,19 +60,6 @@ export const FF_NER_SELECT_ALL = "fflag_feat_front_bros_199_enable_select_all_in
 export const FF_LSDV_4583 = "fflag_feat_front_lsdv_4583_multi_image_segmentation_short";
 
 /**
- * Allows to count time spend on textarea results and store it to lead_time meta field
- * @link https://app.launchdarkly.com/default/production/features/fflag_fix_front_lsdv_4600_lead_time_27072023_short
- */
-export const FF_LEAD_TIME = "fflag_fix_front_lsdv_4600_lead_time_27072023_short";
-
-/**
- * Fixes memory leaks in label studio frontend relative to mobx-state-tree and react usage
- *
- * @link https://app.launchdarkly.com/default/production/features/fflag_fix_front_lsdv_4620_memory_leaks_100723_short
- */
-export const FF_LSDV_4620_3_ML = "fflag_fix_front_lsdv_4620_memory_leaks_100723_short";
-
-/**
  * Fixing issues related to selection tool functional (selecting hidden regions, onClick in Konva, interaction with regions inside selection area)
  *
  * @link https://app.launchdarkly.com/default/production/features/fflag_fix_front_lsdv_4930_selection_tool_fixes_240423_short
@@ -91,12 +74,6 @@ export const FF_LSDV_4930 = "fflag_fix_front_lsdv_4930_selection_tool_fixes_2404
 export const FF_LSDV_4998 = "fflag_fix_front_lsdv_4998_missed_dynamic_children_030523_short";
 
 /**
- * Allow to label NER directly with Taxonomy instead of Labels
- * @link https://app.launchdarkly.com/default/production/features/fflag_feat_front_lsdv_5452_taxonomy_labeling_110823_short
- */
-export const FF_TAXONOMY_LABELING = "fflag_feat_front_lsdv_5452_taxonomy_labeling_110823_short";
-
-/**
  * Fix task count on projects with over 100 tasks (switch from task history to queue count)
  * @link https://app.launchdarkly.com/default/production/features/fflag_fix_all_optic_79_task_count_is_wrong_short/targeting
  */
@@ -107,26 +84,11 @@ export const FF_TASK_COUNT_FIX = "fflag_fix_all_optic_79_task_count_is_wrong_sho
 export const FF_SIMPLE_INIT = "fflag_fix_front_leap_443_select_annotation_once";
 
 /**
- * Optimize stage rendering for large number of regions and zoom interactions
- * @link https://app.launchdarkly.com/default/production/features/fflag_fix_front_leap_32_zoom_perf_190923_short/targeting
- */
-export const FF_ZOOM_OPTIM = "fflag_fix_front_leap_32_zoom_perf_190923_short";
-
-export const FF_SAFE_TEXT = "fflag_fix_leap_466_text_sanitization";
-
-export const FF_MULTI_OBJECT_HOTKEYS = "fflag_fix_leap_246_multi_object_hotkeys_160124_short";
-
-/**
  * It changes the reviewer flow to be more user-friendly and intuitive.
  */
 export const FF_REVIEWER_FLOW = "fflag_feat_all_leap_1081_reviewer_flow_updates";
 
 export const FF_CUSTOM_SCRIPT = "fflag_feat_all_leap_883_custom_script_270524_short";
-
-/**
- * It adds functionality of bulk annotation
- */
-export const FF_BULK_ANNOTATION = "fflag_feat_all_leap_1181_bulk_annotation_short";
 
 /**
  * Disable the postpone option if the skip interface isn't set
@@ -143,6 +105,8 @@ export const FF_VIDEO_FRAME_SEEK_PRECISION = "fflag_fix_front_optic_1608_improve
  * annotations when task overlap limit has been reached
  */
 export const FF_FIT_1304_STRICT_OVERLAP = "fflag_feat_all_fit_1304_strict_overlap";
+
+export const FF_MODAL_WINDOW_APP_CHROME = "fflag_feat_front_fit_1559_modal_window_short";
 
 Object.assign(window, {
   APP_SETTINGS: {
@@ -163,14 +127,6 @@ function getFeatureFlags() {
 
 export function isFF(id: string) {
   const featureFlags = getFeatureFlags();
-  // TODO: remove the override + if statement once LSE and LSO start building react the same way and fflag_fix_front_lsdv_4620_memory_leaks_100723_short is removed
-  const override: Record<string, boolean> = {
-    fflag_fix_front_lsdv_4620_memory_leaks_100723_short: false,
-  };
-
-  if (id in override) {
-    return override[id];
-  }
   if (id in featureFlags) {
     return featureFlags[id] === true;
   }

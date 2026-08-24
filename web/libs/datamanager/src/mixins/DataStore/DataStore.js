@@ -1,4 +1,4 @@
-import { flow, getRoot, types } from "mobx-state-tree";
+import { flow, getRoot, types, isAlive } from "mobx-state-tree";
 import { guidGenerator } from "../../utils/random";
 import { isDefined } from "../../utils/utils";
 import { DEFAULT_PAGE_SIZE, getStoredPageSize } from "../../components/Common/Pagination/Pagination";
@@ -66,7 +66,8 @@ const MixinBase = types
         self.selected = selected;
         self.highlighted = selected;
 
-        getRoot(self).SDK.invoke("taskSelected");
+        const root = getRoot(self);
+        root.SDK?.invoke?.("taskSelected");
       }
     },
 
@@ -125,6 +126,8 @@ const MixinBase = types
       self.list = [];
       self.page = 0;
       self.total = 0;
+      // FIT-2376: keep Spinner (not EmptyState) while tab switch fetch is in flight
+      self.loading = true;
     },
   }));
 
@@ -260,6 +263,8 @@ export const DataStore = (modelName, { listItemType, apiMethod, properties, asso
 
         const data = yield root.apiCall(apiMethod, params, {}, { allowToCancel: root.SDK.type === "DE" });
 
+        if (!isAlive(self)) return;
+
         // We cancel current request processing if request id
         // changed during the request. It indicates that something
         // triggered another request while current one is not yet finished
@@ -301,7 +306,7 @@ export const DataStore = (modelName, { listItemType, apiMethod, properties, asso
         const params = { id, query, pageNumber, reload, interaction, pageSize };
         const root = getRoot(self);
         // Only use debouncing for virtual tabs that use queries (like search/filter tabs)
-        const currentView = root.viewsStore.selected;
+        const _currentView = root.viewsStore.selected;
         // const isVirtualTab = currentView?.virtual && currentView?.query;
 
         // Initialize debounced function if not already done

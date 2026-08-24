@@ -3,9 +3,11 @@
  * Covers treeToModel, Registry.getModelByTag, and Tree.extractNames.
  */
 import Tree from "../Tree";
-import Registry from "../Registry";
+import * as RegistryModule from "../Registry";
 import "../../tags/visual/View";
 import "../../tags/object/RichText";
+
+const Registry = RegistryModule.default ?? RegistryModule;
 
 function createStore(data = {}) {
   return { task: { dataObj: data } };

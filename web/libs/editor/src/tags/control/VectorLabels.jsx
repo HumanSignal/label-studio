@@ -8,6 +8,7 @@ import Types from "../../core/Types";
 import { HtxLabels, LabelsModel } from "./Labels/Labels";
 import { VectorModel } from "./Vector";
 import ControlBase from "./Base";
+import { InteractivePromptMixin } from "../../mixins/InteractivePromptMixin";
 
 /**
  * The `VectorLabels` tag is used to create labeled vectors. Use to apply labels to vectors in semantic segmentation tasks.
@@ -202,6 +203,7 @@ const VectorLabelsModel = types.compose(
   Validation,
   LabelMixin,
   SelectedModelMixin.props({ _child: "LabelModel" }),
+  InteractivePromptMixin,
 );
 
 const HtxVectorLabels = observer(({ item }) => {

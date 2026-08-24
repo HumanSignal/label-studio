@@ -3,6 +3,17 @@
   height: 24px;
   position: relative;
 
+  &_disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+
+    .seeker__indicator,
+    .seeker__position {
+      cursor: not-allowed;
+      pointer-events: none;
+    }
+  }
+
   &__track {
     width: 100%;
     height: 100%;

@@ -9,7 +9,7 @@ import type React from "react";
 import { useCallback, useState } from "react";
 
 import { Button, ButtonGroup, type ButtonProps } from "@humansignal/ui";
-import { IconBan, IconChevronDown } from "@humansignal/icons";
+import { CaretDownIcon, IconBan, IconChevronDown } from "@humansignal/icons";
 import { Dropdown } from "@humansignal/ui";
 import type { CustomButtonType } from "../../stores/CustomButton";
 import { cn } from "../../utils/bem";
@@ -74,15 +74,27 @@ export const Controls = controlsInjector<{ annotation: MSTAnnotation }>(
     const isReview = store.hasInterface("review") || annotation.canBeReviewed;
     const isNotQuickView = store.hasInterface("topbar:prevnext");
     const historySelected = isDefined(store.annotationStore.selectedHistory);
-    const { userGenerate, sentUserGenerate, versions, results, editable: annotationEditable } = annotation;
+    const {
+      userGenerate,
+      sentUserGenerate,
+      versions,
+      results,
+      editable: annotationEditable,
+      draftSelected,
+    } = annotation;
+    // FIT-2105: viewing the submitted snapshot while a draft exists must block review
+    // Accept/Reject (Fix+Accept from the wrong view). It must NOT disable annotator Update
+    // (BROS-1477 / QA 93973 — that worked on 2.34 when only historySelected blocked actions).
+    const viewingSubmittedWhileDraftExists = !historySelected && Boolean(versions?.draft) && !draftSelected;
     const dropdownTrigger = cn("dropdown").elem("trigger").toClassName();
     const customButtons: CustomButtonsField = store.customButtons;
     const buttons: React.ReactNode[] = [];
 
     const [isInProgress, setIsInProgress] = useState(false);
     const disabled = !annotationEditable || store.isSubmitting || historySelected || isInProgress;
+    const reviewDisabled = disabled || viewingSubmittedWhileDraftExists;
     const submitDisabled = store.hasInterface("annotations:deny-empty") && results.length === 0;
-    const hasIncompleteRegions = annotation.hasIncompletePolygons;
+    const hasIncompleteRegions = annotation.hasIncompleteRegions;
 
     /** Check all things related to comments and then call the action if all is good */
     const handleActionWithComments = useCallback(
@@ -136,7 +148,7 @@ export const Controls = controlsInjector<{ annotation: MSTAnnotation }>(
           if (customButton === "accept") {
             // just an example of internal button usage
             // @todo move buttons to separate components
-            buttons.push(<AcceptButton key={customButton} disabled={disabled} history={history} store={store} />);
+            buttons.push(<AcceptButton key={customButton} disabled={reviewDisabled} history={history} store={store} />);
           }
         } else {
           buttons.push(
@@ -180,9 +192,9 @@ export const Controls = controlsInjector<{ annotation: MSTAnnotation }>(
           }
         };
 
-        buttons.push(<ControlButton key={button.name} button={button} disabled={disabled} onClick={onReject} />);
+        buttons.push(<ControlButton key={button.name} button={button} disabled={reviewDisabled} onClick={onReject} />);
       });
-      buttons.push(<AcceptButton key="review-accept" disabled={disabled} history={history} store={store} />);
+      buttons.push(<AcceptButton key="review-accept" disabled={reviewDisabled} history={history} store={store} />);
     } else if (annotation.skipped) {
       buttons.push(
         <div className={cn("controls").elem("skipped-info").toClassName()} key="skipped">
@@ -283,9 +295,8 @@ export const Controls = controlsInjector<{ annotation: MSTAnnotation }>(
                       disabled={isDisabled}
                       aria-label="Submit annotation"
                       data-testid="bottombar-submit-dropdown"
-                    >
-                      <IconChevronDown />
-                    </Button>
+                      leading={<CaretDownIcon size={24} />}
+                    />
                   </Dropdown.Trigger>
                 ) : null}
               </ButtonGroup>

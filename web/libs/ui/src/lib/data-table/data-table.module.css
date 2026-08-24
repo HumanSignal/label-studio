@@ -7,6 +7,25 @@
   max-height: 100%;
 }
 
+/**
+ * Table participates in an ancestor scrollport (no nested vertical scroll on `.body`).
+ * Use with `pinLeftColumns` / sticky header so one outer container owns overflow.
+ */
+.containerInPageScroll {
+  @apply overflow-visible max-h-none;
+}
+
+/*
+ * When columns are pinned, sticky left/right must use the same scrollport as siblings
+ * (e.g. a Total row) outside this table. overflow-y:auto on .body forces overflow-x to
+ * compute to auto, which makes .body its own horizontal scrollport and breaks horizontal
+ * pin. Pinned mode lets the parent handle both axes.
+ */
+.containerWithColumnPins {
+  overflow-x: visible;
+  overflow-y: visible;
+}
+
 .head {
   @apply bg-neutral-background min-w-min flex justify-stretch border-b border-neutral-border flex-shrink-0 sticky top-0 z-[2] shadow-sm;
 
@@ -26,7 +45,7 @@
   height: 32px;
 
   /* Add divider between header cells (except first, pinned, and noDivider) */
-  &:not(:first-child, .headCellPinned, .headCellNoDivider)::after {
+  &:not(:first-child, .headCellPinnedRight, .headCellPinnedLeft, .headCellNoDivider)::after {
     content: "";
     display: block;
     width: 1px;
@@ -47,8 +66,16 @@
   @apply flex items-center flex-1 min-w-0 overflow-hidden;
 }
 
-.headCellPinned {
-  @apply sticky right-0 border-l border-neutral-border bg-neutral-background;
+.headCellPinnedRight {
+  position: -webkit-sticky;
+  position: sticky;
+  @apply z-[3] border-l border-neutral-border bg-neutral-background;
+}
+
+.headCellPinnedLeft {
+  position: -webkit-sticky;
+  position: sticky;
+  @apply z-[3] border-r border-neutral-border bg-neutral-background;
 }
 
 .headCellSortable {
@@ -100,6 +127,23 @@
   border-bottom-right-radius: inherit;
 }
 
+.bodyInPageScroll {
+  @apply overflow-y-visible flex-none min-h-0;
+}
+
+/*
+ * Pinned mode: .body must NOT be a scroll container. Any overflow other than visible on
+ * .body (including overflow-y:auto) makes sticky descendants use .body as their
+ * scrollport; horizontal scroll then happens on an outer ancestor, so position:sticky;
+ * left on body cells does not stick while thead/footer do.
+ * Callers that pin columns should rely on a parent for vertical scroll (e.g. Member
+ * performance wrapper). Pairing: use visible on both axes — do not mix visible + auto.
+ */
+.body.bodyWithColumnPins {
+  overflow-x: visible;
+  overflow-y: visible;
+}
+
 .bodyRow {
   @apply min-w-min flex justify-start transition-all duration-150 ease-out w-full;
 
@@ -109,7 +153,10 @@
     @apply bg-neutral-surface;
   }
 
-  &:hover:not(.bodyRowError, .bodyRowActive) {
+  /* Keep hover look while a row-owned UI (e.g. context menu) is open — pointer
+     may leave the row when interacting with a portal menu. */
+  &:hover:not(.bodyRowError, .bodyRowActive),
+  &.bodyRowHovered:not(.bodyRowError, .bodyRowActive) {
     @apply bg-primary-emphasis-subtle;
   }
 
@@ -158,6 +205,47 @@
   }
 }
 
-.bodyCellPinned {
-  @apply sticky right-0 border-l border-neutral-border bg-neutral-background;
+.bodyCellPinnedRight {
+  position: -webkit-sticky;
+  position: sticky;
+  /* Above unpinned cells in the same row so content does not bleed through when scrolling horizontally */
+  @apply z-[4] border-l border-neutral-border bg-neutral-background;
+}
+
+.bodyCellPinnedLeft {
+  position: -webkit-sticky;
+  position: sticky;
+  @apply z-[4] border-r border-neutral-border bg-neutral-background;
+}
+
+.bodyRow:nth-child(odd):not(.bodyRowError) .bodyCellPinnedLeft,
+.bodyRow:nth-child(odd):not(.bodyRowError) .bodyCellPinnedRight {
+  @apply bg-neutral-background;
+}
+
+.bodyRow:nth-child(2n):not(.bodyRowError) .bodyCellPinnedLeft,
+.bodyRow:nth-child(2n):not(.bodyRowError) .bodyCellPinnedRight {
+  @apply bg-neutral-surface;
+}
+
+.bodyRow:hover:not(.bodyRowError, .bodyRowActive) .bodyCellPinnedLeft,
+.bodyRow:hover:not(.bodyRowError, .bodyRowActive) .bodyCellPinnedRight,
+.bodyRowHovered:not(.bodyRowError, .bodyRowActive) .bodyCellPinnedLeft,
+.bodyRowHovered:not(.bodyRowError, .bodyRowActive) .bodyCellPinnedRight {
+  @apply bg-primary-emphasis-subtle;
+}
+
+.bodyRowSelected:not(.bodyRowError) .bodyCellPinnedLeft,
+.bodyRowSelected:not(.bodyRowError) .bodyCellPinnedRight {
+  @apply bg-primary-emphasis-subtle;
+}
+
+.bodyRowActive:not(.bodyRowError) .bodyCellPinnedLeft,
+.bodyRowActive:not(.bodyRowError) .bodyCellPinnedRight {
+  @apply bg-primary-emphasis;
+}
+
+.bodyRowSelected.bodyRowActive:not(.bodyRowError) .bodyCellPinnedLeft,
+.bodyRowSelected.bodyRowActive:not(.bodyRowError) .bodyCellPinnedRight {
+  @apply bg-primary-emphasis;
 }

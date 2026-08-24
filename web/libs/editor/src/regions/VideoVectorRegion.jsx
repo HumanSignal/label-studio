@@ -5,35 +5,17 @@ import RegionsMixin from "../mixins/Regions";
 import Registry from "../core/Registry";
 import { AreaMixin } from "../mixins/AreaMixin";
 import { VideoRegion } from "./VideoRegion";
+import ToolsManager from "../tools/Manager";
 
 /**
  * Interpolate a single vertex between two keyframes.
- * Linear interpolation: prev + (next - prev) * r (i.e. prev.x + (next.x - prev.x) * r).
- * Also interpolates controlPoint1/controlPoint2 when both keyframes have them (bezier).
+ * Linear interpolation: prev + (next - prev) * r.
  */
-const interpolateVertex = (prev, next, r) => {
-  const result = {
-    ...prev,
-    x: prev.x + (next.x - prev.x) * r,
-    y: prev.y + (next.y - prev.y) * r,
-  };
-
-  if (prev.controlPoint1 && next.controlPoint1) {
-    result.controlPoint1 = {
-      x: prev.controlPoint1.x + (next.controlPoint1.x - prev.controlPoint1.x) * r,
-      y: prev.controlPoint1.y + (next.controlPoint1.y - prev.controlPoint1.y) * r,
-    };
-  }
-
-  if (prev.controlPoint2 && next.controlPoint2) {
-    result.controlPoint2 = {
-      x: prev.controlPoint2.x + (next.controlPoint2.x - prev.controlPoint2.x) * r,
-      y: prev.controlPoint2.y + (next.controlPoint2.y - prev.controlPoint2.y) * r,
-    };
-  }
-
-  return result;
-};
+const interpolateVertex = (prev, next, r) => ({
+  ...prev,
+  x: prev.x + (next.x - prev.x) * r,
+  y: prev.y + (next.y - prev.y) * r,
+});
 
 /**
  * Interpolate all vertices between two keyframes.
@@ -55,20 +37,79 @@ const interpolateVertices = (prevKeyframe, nextKeyframe, frame) => {
   });
 };
 
+export const resolveVideoVectorRegionControl = (results = [], objectTag) => {
+  return results.find((result) => result.from_name?.tools)?.from_name ?? objectTag?.videoVectorControl;
+};
+
+export const isVideoVectorRegionValue = (value = {}) => {
+  if (value.vertices !== undefined || value.value?.vertices !== undefined) return true;
+
+  const sequence = value.sequence ?? value.value?.sequence;
+
+  return Array.isArray(sequence) && sequence.some((keyframe) => keyframe?.vertices !== undefined);
+};
+
+/**
+ * VideoVectorRegion — Vector graphics region for video annotation.
+ *
+ * Follows the same structure as the image VectorRegion, but stores coordinates
+ * as percentages (0-100) in a keyframe `sequence` (via the VideoRegion mixin).
+ * The view component (VideoVectorShape) handles percent-to-pixel conversion.
+ *
+ * Coordinate flow:
+ *   MobX store (% in sequence) <-> VideoVectorShape (px for KonvaVector)
+ */
 const Model = types
   .model("VideoVectorRegionModel", {
     type: "videovectorregion",
+
+    readonly: types.optional(types.boolean, false),
+
+    transformMode: false,
   })
   .volatile(() => ({
+    mouseOverStartPoint: false,
+    selectedPoint: null,
+    hideable: true,
+    _supportsTransform: true,
+    useTransformer: false,
+    preferTransformer: false,
+    supportsRotate: true,
+    supportsScale: true,
     vectorRef: null,
+    groupRef: null,
+    // Set by the view (VideoVector.jsx). Appends a single vertex at canvas pixel
+    // coords, reading the live store each call so rapid clicks never drop a point.
+    appendVertexFn: null,
+    // True while an existing point/shape is being edited — a drag (view sets it
+    // on transform start) or a sub-threshold click/nudge that only selects a
+    // point (view sets it on point selection). Lets the VideoVector tool tell a
+    // point-adjust gesture apart from a placement click so it doesn't append a
+    // stray vertex when the reviewer is only moving points on a selected open
+    // region. BROS-1413.
+    editingPointGesture: false,
   }))
   .views((self) => ({
+    // --- Video-specific views ---
+
     getShape(frame) {
       let prev;
       let next;
 
       for (const item of self.sequence) {
         if (item.frame === frame) {
+          // Empty lifespan terminators (`enabled: false`, no vertices) are still
+          // in-lifespan for timeline endpoints. Resolve drawable geometry from the
+          // nearest shape-bearing keyframe so canvas matches the timeline
+          // (BROS-1513): prefer preceding (right/forward caps), else following
+          // (left/backward caps — no preceding keyframe exists).
+          if (!item.enabled && !item.vertices?.length) {
+            const following = self.sequence.find(
+              (kf) => kf.frame > frame && Array.isArray(kf.vertices) && kf.vertices.length > 0,
+            );
+            const shape = prev?.vertices?.length ? prev : following || item;
+            return { vertices: shape.vertices || [], closed: shape.closed ?? false };
+          }
           return { vertices: item.vertices || [], closed: item.closed ?? false };
         }
 
@@ -93,10 +134,44 @@ const Model = types
     },
 
     get control() {
-      return self.results.find((result) => result.from_name.tools)?.from_name;
+      let objectTag;
+
+      try {
+        objectTag = self.object;
+      } catch {
+        objectTag = undefined;
+      }
+
+      return resolveVideoVectorRegionControl(self.results, objectTag);
     },
+
+    /**
+     * First keyframe that carries drawable geometry. Lifespan terminators are
+     * `{ frame, enabled: false }` with no vertices and must not drive
+     * closed/vertices/incomplete (BROS-1511 — Track Both left-cap).
+     */
+    get shapeKeyframe() {
+      return self.sequence.find((kf) => Array.isArray(kf?.vertices) && kf.vertices.length > 0) ?? self.sequence[0];
+    },
+
+    get vertices() {
+      const kf = self.shapeKeyframe;
+      return kf?.vertices ?? [];
+    },
+
+    get closed() {
+      const kf = self.shapeKeyframe;
+      return kf?.closed ?? false;
+    },
+
+    // --- Ported from image VectorRegion ---
+
     get closable() {
-      return self.control?.closable ?? false;
+      // A region that is already a closed contour is, by definition, closable —
+      // e.g. SAM2 always produces closed polygons (BROS-1422) even when the
+      // control's `closable` attribute is false. Without this, finished/incomplete
+      // would treat such a region as an unfinished open path.
+      return self.closed || (self.control?.closable ?? false);
     },
     get minPoints() {
       const min = self.control?.minpoints;
@@ -105,17 +180,6 @@ const Model = types
     get maxPoints() {
       const max = self.control?.maxpoints;
       return max ? Number.parseInt(max) : undefined;
-    },
-    get vertices() {
-      const kf = self.sequence[0];
-      return kf?.vertices ?? [];
-    },
-    get closed() {
-      const kf = self.sequence[0];
-      return kf?.closed ?? false;
-    },
-    get atMaxLength() {
-      return self.maxPoints && self.vertices.length === self.maxPoints;
     },
     get incomplete() {
       if (self.atMaxLength) return false;
@@ -128,10 +192,46 @@ const Model = types
       if (self.atMaxLength) return true;
       return false;
     },
+    get atMaxLength() {
+      return self.maxPoints && self.vertices.length === self.maxPoints;
+    },
+
+    get pointEnabledSize() {
+      const customEnabledSize = self.control?.pointsizeenabled;
+      return customEnabledSize ? Number.parseInt(customEnabledSize) : 5;
+    },
+    get pointDisabledSize() {
+      const customDisabledSize = self.control?.pointsizedisabled;
+      return customDisabledSize ? Number.parseInt(customDisabledSize) : 3;
+    },
+    get pointRadiusFromSize() {
+      const size = self.control?.pointsize ?? "small";
+      switch (size) {
+        case "small":
+          return { enabled: 4, disabled: 3 };
+        case "medium":
+          return { enabled: 6, disabled: 4 };
+        case "large":
+          return { enabled: 8, disabled: 6 };
+        default:
+          return { enabled: 6, disabled: 4 };
+      }
+    },
+    get pointStyle() {
+      return self.control?.pointstyle ?? "circle";
+    },
+    get disabled() {
+      const objectTag = self.object;
+      const manager = objectTag ? ToolsManager.getInstance({ name: objectTag.name }) : null;
+      const tool = manager?.findSelectedTool?.();
+      return (tool?.disabled ?? false) || self.isReadOnly() || (!self.selected && !self.isDrawing);
+    },
   }))
   .actions((self) => ({
-    setVectorRef(ref) {
-      self.vectorRef = ref;
+    // --- Video-specific actions ---
+
+    setClosed(closed) {
+      self.sequence = self.sequence.map((keypoint) => ({ ...keypoint, closed }));
     },
 
     updateShape(data, frame) {
@@ -162,16 +262,173 @@ const Model = types
       }
     },
 
+    // --- Ported from image VectorRegion ---
+
+    setMouseOverStartPoint(value) {
+      self.mouseOverStartPoint = value;
+    },
+
+    closePoly() {
+      if (!self.closable) return;
+      self.vectorRef?.close();
+    },
+
+    _selectArea(additiveMode = false, preserveTransformMode = false) {
+      const annotation = self.annotation;
+      if (!preserveTransformMode) {
+        self.setTransformMode(false);
+      }
+      if (!annotation) return;
+
+      if (additiveMode) {
+        annotation.toggleRegionSelection(self);
+      } else {
+        const wasNotSelected = !self.selected;
+
+        if (wasNotSelected) {
+          annotation.selectArea(self);
+        } else {
+          annotation.unselectAll();
+        }
+      }
+    },
+
+    setHighlight(val) {
+      self._highlighted = val;
+    },
+
+    isTransforming() {
+      if (!self.vectorRef || !self.selected) {
+        return false;
+      }
+      try {
+        const selection = self.vectorRef.getSelectedPointIds();
+        return selection.length > 1;
+      } catch {
+        return false;
+      }
+    },
+
+    segGroupRef(ref) {
+      self.groupRef = ref;
+    },
+
+    setKonvaVectorRef(ref) {
+      self.vectorRef = ref;
+    },
+
+    setAppendVertexFn(fn) {
+      self.appendVertexFn = fn;
+    },
+
+    // Flag a mouse gesture as an existing-point/shape edit (drag) rather than a
+    // placement click, so the tool suppresses the vertex it would otherwise
+    // append on mouse-up while drawing. BROS-1413.
+    setEditingPointGesture(value) {
+      self.editingPointGesture = value;
+    },
+
+    /**
+     * Append a vertex at the given canvas pixel coordinates.
+     *
+     * Delegates to the handler registered by the view, which reads the current
+     * vertices straight from the MobX store on every call. This avoids the race
+     * where point creation rebuilt the list from a stale React-prop snapshot and
+     * silently dropped points during rapid clicking (BROS-1206). Returns false
+     * when no handler is registered yet (e.g. the very first click before the
+     * region's view has mounted), letting the caller fall back to the legacy path.
+     */
+    addVertexAtCanvasPoint(x, y) {
+      if (typeof self.appendVertexFn !== "function") return false;
+      self.appendVertexFn(x, y);
+      return true;
+    },
+
+    selectRegion(preserveTransformMode = false) {
+      if (!preserveTransformMode) {
+        self.setTransformMode(false);
+      }
+    },
+
     startPoint(x, y) {
+      if (self.isReadOnly()) return;
       self.vectorRef?.startPoint(x, y);
     },
 
     updatePoint(x, y) {
+      if (self.isReadOnly()) return;
       self.vectorRef?.updatePoint(x, y);
     },
 
     commitPoint(x, y) {
+      if (self.isReadOnly()) return;
       self.vectorRef?.commitPoint(x, y);
+    },
+
+    handleFinish() {
+      const objectTag = self.object;
+      const manager = objectTag ? ToolsManager.getInstance({ name: objectTag.name }) : null;
+      const tool = manager?.findSelectedTool?.();
+
+      if (tool?.currentArea) {
+        tool.commitDrawingRegion?.();
+      } else {
+        self.annotation?.toggleRegionSelection(self);
+      }
+      tool?.complete?.();
+    },
+
+    toggleTransformMode() {
+      self.setTransformMode(!self.transformMode);
+    },
+
+    setTransformMode(transformMode) {
+      self.transformMode = transformMode;
+    },
+
+    applyTransform() {
+      if (!self.vectorRef) return;
+
+      if (typeof self.vectorRef.commitMultiRegionTransform === "function") {
+        self.vectorRef.commitMultiRegionTransform();
+      }
+    },
+
+    deleteRegion() {
+      const isMultiRegionSelected = self.object?.selectedRegions?.length > 1;
+
+      if (!isMultiRegionSelected) {
+        if (self.vectorRef && typeof self.vectorRef.getSelectedPointIds === "function") {
+          const selectedPointIds = self.vectorRef.getSelectedPointIds();
+          const totalPoints = self.vertices.length;
+
+          if (selectedPointIds.length > 0 && selectedPointIds.length < totalPoints) {
+            if (typeof self.vectorRef.deletePointsByIds === "function") {
+              self.vectorRef.deletePointsByIds(selectedPointIds);
+              return;
+            }
+          }
+        }
+      }
+
+      const objectTag = self.object;
+      const manager = objectTag ? ToolsManager.getInstance({ name: objectTag.name }) : null;
+      const selectedTool = manager?.findSelectedTool?.();
+      selectedTool?.enable?.();
+
+      // If this region is the tool's active (still unfinished) drawing area,
+      // clear the tool's drawing state before it is destroyed. Otherwise the
+      // tool stays stuck in "drawing" mode pointing at a dead region and no new
+      // region can be started afterwards. BROS-1207.
+      if (selectedTool?.getCurrentArea?.() === self || selectedTool?.currentArea === self) {
+        selectedTool.resetDrawingState?.();
+      }
+
+      if (self.annotation?.isReadOnly()) return;
+      if (self.isReadOnly()) return;
+      if (self.selected) self.annotation.unselectAll(true);
+      if (self.destroyRegion) self.destroyRegion();
+      self.annotation.deleteRegion(self);
     },
   }));
 
@@ -184,10 +441,6 @@ const VideoVectorRegionModel = types.compose(
   Model,
 );
 
-Registry.addRegionType(VideoVectorRegionModel, "video", (value) => {
-  if (value.vertices) return true;
-  if (value.sequence?.[0]?.vertices !== undefined) return true;
-  return false;
-});
+Registry.addRegionType(VideoVectorRegionModel, "video", isVideoVectorRegionValue);
 
 export { VideoVectorRegionModel };

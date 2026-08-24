@@ -47,8 +47,10 @@ class UserProductTourSerializer(serializers.ModelSerializer):
         dependencies = config.get('dependencies', [])
         for dependency in dependencies:
             tour = fast_first(UserProductTour.objects.filter(user=self.context['request'].user, name=dependency))
-            if not tour or tour.state != ProductTourState.COMPLETED:
-                logger.info(f'Tour {dependency} is not completed: skipping tour {self.context["name"]}')
+            if not tour or tour.state not in (ProductTourState.COMPLETED, ProductTourState.SKIPPED):
+                logger.info(
+                    f'Tour {dependency} is not finished (completed/skipped): deferring tour {self.context["name"]}'
+                )
                 return True
         return False
 

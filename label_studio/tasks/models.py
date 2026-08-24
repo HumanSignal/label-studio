@@ -42,6 +42,7 @@ from fsm.queryset_mixins import FSMStateQuerySetMixin
 from label_studio_sdk.label_interface.objects import PredictionValue
 from rest_framework.exceptions import ValidationError
 from tasks.choices import ActionType
+from tasks.result_utils import sanitize_null_bytes
 
 logger = logging.getLogger(__name__)
 
@@ -241,9 +242,17 @@ class Task(TaskMixin, FsmHistoryStateModel):
                 # tasks where there is no predictions matching current
                 # model version. In case it will return a model_version
                 # and we can grab predictions explicitly
-                if isinstance(new_predictions, str):
+                #
+                # A backend may report model_version as a non-string scalar
+                # (e.g. an int from its setup response), so treat any scalar
+                # as the model_version fast-path rather than only ``str``.
+                if isinstance(new_predictions, (str, int)):
                     model_version = new_predictions
                     return predictions.filter(model_version=model_version)
+                elif new_predictions is None:
+                    # predict_tasks() returns None when the backend is not
+                    # ready; degrade to an empty (iterable) result.
+                    return []
                 else:
                     return new_predictions
             else:
@@ -440,61 +449,11 @@ class Task(TaskMixin, FsmHistoryStateModel):
                 'presign_ttl': storage.presign_ttl,
             }
 
-    def resolve_uri(self, task_data, project):
-        # DEPRECATED: use resolve_uris instead.
-        from io_storages.functions import get_storage_by_url
-
-        if project.task_data_login and project.task_data_password:
-            protected_data = {}
-            for key, value in task_data.items():
-                if isinstance(value, str) and string_is_url(value):
-                    path = (
-                        reverse('projects-file-proxy', kwargs={'pk': project.pk})
-                        + '?url='
-                        + base64.urlsafe_b64encode(value.encode()).decode()
-                    )
-                    value = urljoin(settings.HOSTNAME, path)
-                protected_data[key] = value
-            return protected_data
-        else:
-            storage_objects = project.get_all_import_storage_objects
-
-            # try resolve URLs via storage associated with that task
-            for field in task_data:
-                # file saved in django file storage
-                prepared_filename = self.prepare_filename(task_data[field])
-                if settings.CLOUD_FILE_STORAGE_ENABLED and self.is_upload_file(prepared_filename):
-                    # permission check: resolve uploaded files to the project only
-                    file_upload = fast_first(FileUpload.objects.filter(project=project, file=prepared_filename))
-                    if file_upload is not None:
-                        task_data[field] = file_upload.url
-                    # it's very rare case, e.g. user tried to reimport exported file from another project
-                    # or user wrote his django storage path manually
-                    else:
-                        task_data[field] = task_data[field] + '?not_uploaded_project_file'
-                    continue
-
-                # project storage
-                # TODO: to resolve nested lists and dicts we should improve get_storage_by_url(),
-                # Now always using get_storage_by_url to ensure the storage with the correct bucket is used
-                # As a last fallback we can use self.storage which is the storage the Task was imported from
-                storage = get_storage_by_url(task_data[field], storage_objects) or self.storage
-                if storage:
-                    try:
-                        resolved_uri = storage.resolve_uri(task_data[field], self)
-                    except Exception as exc:
-                        logger.debug(exc, exc_info=True)
-                        resolved_uri = None
-                    if resolved_uri:
-                        task_data[field] = resolved_uri
-            return task_data
-
     def resolve_uris(self, task_data, project):
         """Resolve all cloud storage URIs across all project storages.
 
-        Unlike resolve_uri which picks one storage per field and resolves
-        only the first URI, this iterates all storages per field and resolves
-        every URI each storage can handle.
+        Iterates all storages per field and resolves every URI each storage
+        can handle (vs. picking a single storage per field).
         """
         if project.task_data_login and project.task_data_password:
             protected_data = {}
@@ -510,6 +469,7 @@ class Task(TaskMixin, FsmHistoryStateModel):
             return protected_data
 
         storage_objects = project.get_all_import_storage_objects
+        project_storage_keys = {(storage.__class__, storage.id) for storage in storage_objects}
 
         for field in task_data:
             prepared_filename = self.prepare_filename(task_data[field])
@@ -530,17 +490,27 @@ class Task(TaskMixin, FsmHistoryStateModel):
                 if resolved:
                     task_data[field] = resolved
 
-            fallback_storage = self.storage
+            storage_link = self.get_storage_link()
+            if storage_link:
+                storage_model = storage_link._meta.get_field('storage').remote_field.model
+                fallback_storage = (
+                    storage_link.storage
+                    if (storage_model, storage_link.storage_id) not in project_storage_keys
+                    else None
+                )
+            else:
+                fallback_storage = self.storage
+                if fallback_storage and (fallback_storage.__class__, fallback_storage.id) in project_storage_keys:
+                    fallback_storage = None
+
             if fallback_storage:
-                storage_ids = {s.id for s in storage_objects}
-                if fallback_storage.id not in storage_ids:
-                    try:
-                        resolved = fallback_storage.resolve_uris(task_data[field], self)
-                    except Exception as exc:
-                        logger.debug(exc, exc_info=True)
-                        resolved = None
-                    if resolved:
-                        task_data[field] = resolved
+                try:
+                    resolved = fallback_storage.resolve_uris(task_data[field], self)
+                except Exception as exc:
+                    logger.debug(exc, exc_info=True)
+                    resolved = None
+                if resolved:
+                    task_data[field] = resolved
 
         return task_data
 
@@ -607,8 +577,18 @@ class Task(TaskMixin, FsmHistoryStateModel):
             (post_delete, update_all_task_states_after_deleting_task, Task),
             (pre_delete, remove_data_columns, Task),
         ]
-        with temporary_disconnect_list_signal(signals):
-            return batch_delete(queryset, batch_size=500)
+        # Suppress LSE FSM review/annotation state writes during CASCADE deletes.
+        # Without this flag, `handle_review_deletion` tries to persist an
+        # AnnotationState row whose project_id is read from task.project_id —
+        # which is NULL when delete_tasks has just unlinked the task from the
+        # project, causing a NOT NULL violation and leaving orphaned tasks.
+        previous = CurrentContext.get('bulk_annotation_delete_in_progress')
+        CurrentContext.set('bulk_annotation_delete_in_progress', True)
+        try:
+            with temporary_disconnect_list_signal(signals):
+                return batch_delete(queryset, batch_size=500)
+        finally:
+            CurrentContext.set('bulk_annotation_delete_in_progress', previous)
 
     @staticmethod
     def delete_tasks_without_signals_from_task_ids(task_ids):
@@ -617,7 +597,16 @@ class Task(TaskMixin, FsmHistoryStateModel):
 
     def delete(self, *args, **kwargs):
         self.before_delete_actions()
-        result = super().delete(*args, **kwargs)
+        # Task deletion cascades to annotations and reviews. During that cascade,
+        # review post_delete signals may fire before parent annotations are gone.
+        # Guard FSM handlers so they don't create transient AnnotationState rows
+        # that reference annotations being deleted in the same transaction.
+        previous = CurrentContext.get('bulk_annotation_delete_in_progress')
+        CurrentContext.set('bulk_annotation_delete_in_progress', True)
+        try:
+            result = super().delete(*args, **kwargs)
+        finally:
+            CurrentContext.set('bulk_annotation_delete_in_progress', previous)
         # set updated_at field of task to now()
         return result
 
@@ -856,9 +845,17 @@ class Annotation(AnnotationMixin, FsmHistoryStateModel):
         return result
 
     def delete(self, *args, **kwargs):
-        # Store task and project references before deletion
-
-        result = super().delete(*args, **kwargs)
+        # Guard against FK violations from FSM signal handlers during CASCADE.
+        # When Django's collector deletes child AnnotationReviews before this
+        # annotation, the review post_delete handler (handle_review_deletion)
+        # would otherwise try to INSERT new AnnotationState rows referencing
+        # this soon-to-be-deleted annotation, causing an IntegrityError.
+        previous = CurrentContext.get('bulk_annotation_delete_in_progress')
+        CurrentContext.set('bulk_annotation_delete_in_progress', True)
+        try:
+            result = super().delete(*args, **kwargs)
+        finally:
+            CurrentContext.set('bulk_annotation_delete_in_progress', previous)
         self.update_task()
         self.on_delete_update_counters()
 
@@ -1019,17 +1016,29 @@ class AnnotationDraft(FsmHistoryStateModel):
         return self.task.project.has_permission(user)
 
     def save(self, *args, **kwargs):
-        with transaction.atomic():
-            project = self.task.project
-            # Lock projectsummary first to avoid deadlocks with annotation-reviews
-            # which accesses projectsummary before annotationdraft
-            if hasattr(project, 'summary'):
-                from projects.models import ProjectSummary
-
-                ProjectSummary.objects.select_for_update().filter(pk=project.summary.pk).first()
+        # Strip NUL (U+0000) bytes that Postgres JSONB cannot store. Source PDFs with an
+        # embedded OCR/text layer can leak \x00 into value.ocrtext, which otherwise 500s the
+        # draft write with a DataError. See FIT-2353.
+        self.result = sanitize_null_bytes(self.result)
+        if flag_set('fflag_fix_plt_1048_concurrent_project_summary_update_19032026_short', user='auto'):
+            # Atomic path: skip SELECT FOR UPDATE since update_created_labels_drafts
+            # will use atomic SQL (jsonb_set) instead of read-modify-write
             super().save(*args, **kwargs)
+            project = self.task.project
             if hasattr(project, 'summary'):
                 project.summary.update_created_labels_drafts([self])
+        else:
+            with transaction.atomic():
+                project = self.task.project
+                # Lock projectsummary first to avoid deadlocks with annotation-reviews
+                # which accesses projectsummary before annotationdraft
+                if hasattr(project, 'summary'):
+                    from projects.models import ProjectSummary
+
+                    ProjectSummary.objects.select_for_update().filter(pk=project.summary.pk).first()
+                super().save(*args, **kwargs)
+                if hasattr(project, 'summary'):
+                    project.summary.update_created_labels_drafts([self])
 
     def delete(self, *args, **kwargs):
         with transaction.atomic():
@@ -1468,6 +1477,45 @@ def update_project_summary_annotations_and_is_labeled(sender, instance, created,
     instance.task.update_is_labeled()
     instance.task.save(update_fields=['is_labeled', 'total_annotations', 'cancelled_annotations'], skip_fsm=True)
     logger.debug(f'Updated total_annotations and cancelled_annotations for {instance.task.id}.')
+
+
+@receiver(post_delete, sender=Annotation)
+def update_task_counters_after_annotation_delete(sender, instance, **kwargs):
+    """Safety net: keep task.total_annotations / cancelled_annotations correct on deletion.
+
+    Counter upkeep on delete otherwise lives only in ``Annotation.delete()`` (single) and the
+    explicit recompute calls in the bulk delete jobs. A raw ``Annotation.objects.filter(...).delete()``
+    (SDK/script) or a dropped async recompute job would leave ``total_annotations`` stale above the
+    real annotation count — the drift surfaced in the Data Manager (e.g. a task showing 1 annotation
+    while empty).
+
+    The first-class paths set ``bulk_annotation_delete_in_progress`` and either recompute counters
+    themselves (single ``Annotation.delete()``, bulk DM/API delete) or intentionally leave them alone
+    (task/project CASCADE deletion, where the tasks are being removed anyway). We no-op in that case to
+    avoid redundant per-row work and to avoid touching tasks that are mid-deletion; we only recompute
+    for the unguarded paths that would otherwise drift.
+    """
+    if CurrentContext.get('bulk_annotation_delete_in_progress'):
+        return
+
+    task_id = instance.task_id
+    if task_id is None:
+        return
+
+    task = Task.objects.filter(id=task_id).first()
+    if task is None:
+        return
+
+    task.total_annotations = task.annotations.filter(was_cancelled=False).count()
+    task.cancelled_annotations = task.annotations.filter(was_cancelled=True).count()
+    task.update_is_labeled()
+    # Use .update() (not .save()) to avoid re-triggering Task save signals / summary recounting.
+    Task.objects.filter(id=task_id).update(
+        total_annotations=task.total_annotations,
+        cancelled_annotations=task.cancelled_annotations,
+        is_labeled=task.is_labeled,
+    )
+    logger.debug(f'post_delete recomputed counters for task {task_id} after annotation deletion.')
 
 
 @receiver(pre_delete, sender=Prediction)

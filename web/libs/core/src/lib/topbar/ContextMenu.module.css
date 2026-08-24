@@ -1,0 +1,95 @@
+/*
+ * Context menu styles for the shared AnnotationButton menu.
+ *
+ * Implemented as CSS Modules so the generated class names look like
+ * `option--<hash>`, matching the existing classic editor's
+ * `editor/components/ContextMenu/ContextMenu.module.css`. Cypress E2E
+ * (`annotation-id.cy.ts`) uses `[class*="option--"]` to find menu items, so
+ * preserving this naming is what keeps the regression matrix R1/R3 green.
+ *
+ * Everything else in the shared TopBar uses BEM `.prefix.css` (lsf-* classes).
+ */
+
+.menu {
+  border-radius: 4px;
+  box-shadow:
+    0 1px 3px 1px #26262626,
+    0 1px 2px 0 #2626264d;
+}
+
+.seperator {
+  height: 1px;
+  background-color: var(--color-neutral-border);
+}
+
+.icon {
+  display: flex;
+  height: 24px;
+  width: 24px;
+  align-items: center;
+  justify-content: center;
+  margin-inline: 6px;
+
+  & svg {
+    flex-shrink: 0;
+  }
+}
+
+.option {
+  display: flex;
+  margin: 8px;
+  align-items: center;
+  white-space: nowrap;
+  gap: 2px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 22px;
+  border-radius: 4px;
+  padding-right: 32px;
+  padding-block: 6px;
+  height: 36px;
+  color: var(--color-neutral-content);
+  border: none;
+  background: transparent;
+  font-family: inherit;
+  text-align: left;
+  box-sizing: border-box;
+
+  &:hover {
+    background-color: var(--color-primary-emphasis-subtle);
+  }
+}
+
+.danger {
+  color: var(--color-negative-content);
+
+  &:hover {
+    background-color: var(--color-negative-emphasis-subtle);
+    color: var(--color-neutral-content);
+  }
+}
+
+.selected {
+  color: var(--color-neutral-content);
+  background-color: var(--color-primary-emphasis);
+
+  &:hover {
+    background-color: var(--color-primary-emphasis);
+  }
+}
+
+.trailing {
+  display: flex;
+  align-items: center;
+  margin-left: auto;
+}
+
+.disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+
+  &:hover {
+    background-color: transparent;
+  }
+}

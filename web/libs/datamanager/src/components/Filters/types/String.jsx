@@ -1,8 +1,18 @@
 import { observer } from "mobx-react";
 import { FilterInput } from "../FilterInput";
+import { ListInput } from "./ListInput";
 
-const BaseInput = observer(({ value, onChange, placeholder }) => {
-  return <FilterInput type="text" value={value} onChange={onChange} placeholder={placeholder} />;
+const BaseInput = observer(({ value, onChange, placeholder, disabled, readOnly }) => {
+  return (
+    <FilterInput
+      type="text"
+      value={value}
+      onChange={onChange}
+      placeholder={placeholder}
+      disabled={disabled}
+      readOnly={readOnly}
+    />
+  );
 });
 
 export const StringFilter = [
@@ -35,5 +45,18 @@ export const StringFilter = [
     label: "not equal",
     valueType: "single",
     input: (props) => <BaseInput {...props} />,
+  },
+  // BROS-1203 — list membership. Gated per-column in FilterOperation.jsx.
+  {
+    key: "in_list",
+    label: "is any of",
+    valueType: "list",
+    input: (props) => <ListInput {...props} type="string" />,
+  },
+  {
+    key: "not_in_list",
+    label: "is none of",
+    valueType: "list",
+    input: (props) => <ListInput {...props} type="string" />,
   },
 ];

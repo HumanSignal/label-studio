@@ -9,7 +9,6 @@
     "../../node_modules/@nx/react/typings/image.d.ts"
   ],
   "exclude": [
-    "jest.config.ts",
     "src/**/*.spec.ts",
     "src/**/*.test.ts",
     "src/**/*.spec.tsx",

@@ -41,14 +41,72 @@ const dataCleanup = (tab, columns) => {
     );
   });
 
-  Object.entries(data.hiddenColumns ?? {}).forEach(([key, list]) => {
-    data.hiddenColumns[key] = list.filter((k) => {
-      const match = columns.find((c) => c.id === k);
-      return !!match && !match.isAnnotationResultsFilterColumn;
-    });
-  });
+  // Only compatibility filter columns are pruned from the hidden lists. IDs of columns this
+  // session cannot see stay untouched: agreement columns are role-gated and dimension columns
+  // follow the project's dimensions, so dropping them would erase a manager's saved column
+  // configuration as soon as such a session saves the view (FIT-2406).
+  if (data.hiddenColumns) {
+    const hiddenColumns = Object.fromEntries(
+      Object.entries(data.hiddenColumns).map(([key, list]) => [
+        key,
+        (list ?? []).filter((columnID) => {
+          const match = columns.find((c) => c.id === columnID);
+
+          return !match?.isAnnotationResultsFilterColumn;
+        }),
+      ]),
+    );
+
+    return { ...tab, data: { ...data, hiddenColumns } };
+  }
 
   return { ...tab, data };
+};
+
+const nextTempTabId = (views) => {
+  const usedIds = new Set(views.map((view) => view.id));
+  let candidate = -Date.now();
+
+  while (usedIds.has(candidate)) {
+    candidate -= 1;
+  }
+
+  return candidate;
+};
+
+const lockedViewResponseMessage = (result) => {
+  const status = result?.status ?? result?.$meta?.status ?? result?.response?.status ?? result?.response?.status_code;
+  const code = result?.response?.code;
+  const detail = result?.response?.detail;
+
+  if (status === 409 || code === "view_locked") {
+    return typeof detail === "string" ? detail : "This tab has been locked. Refresh to see the latest tab settings.";
+  }
+  return null;
+};
+
+/** Race-condition save toast when an unlocked client discovers the tab is now locked. */
+export const raceConditionLockToastMessage = (result, canManageLock = true) => {
+  const lockedByName = canManageLock ? result.locked_by?.name || result.locked_by?.email : null;
+
+  return lockedByName
+    ? `This tab was locked by ${lockedByName}. Your changes could not be saved.`
+    : "This tab was locked. Your changes could not be saved.";
+};
+
+const serverViewSnapshot = (view, columns, response) => {
+  const { data, ...tab } = dataCleanup(response, columns ?? []);
+
+  return {
+    ...getSnapshot(view),
+    ...tab,
+    ...(data ?? {}),
+    // MST identifiers are immutable; never overwrite id when refreshing an existing view.
+    id: view.id,
+    saved: true,
+    virtual: false,
+    hasData: !!data,
+  };
 };
 
 const createNameCopy = (name) => {
@@ -146,9 +204,18 @@ export const TabStore = types
         self.dataStore.clear();
         self.selected = selected;
 
-        yield selected.reload();
-
         const root = getRoot(self);
+
+        // Fetch fresh tab config from server so changes made by other users
+        // (e.g., another user locking this tab) are reflected immediately.
+        if (selected.saved && selected.id) {
+          const latest = yield root.apiCall("tab", { tabId: selected.id });
+          if (!latest?.error && (latest.id == null || latest.id === selected.id)) {
+            applySnapshot(selected, serverViewSnapshot(selected, self.columns, latest));
+          }
+        }
+
+        yield selected.reload();
 
         root.SDK.invoke("tabChanged", selected);
         selected.selected._invokeChangeEvent();
@@ -193,9 +260,8 @@ export const TabStore = types
         tab: existingTabKey,
         ...(existingTab ?? viewSnapshot ?? {}),
       };
-      const lastView = self.views[self.views.length - 1];
       const newTitle = snapshot.title ?? `New Tab ${self.views.length + 1}`;
-      const newID = snapshot.id ?? (lastView?.id ? lastView.id + 1 : 0);
+      const newID = nextTempTabId(self.views);
 
       const defaultHiddenColumns = self.defaultHidden
         ? clone(self.defaultHidden)
@@ -306,6 +372,48 @@ export const TabStore = types
       if (result.isCanceled) {
         return view;
       }
+
+      const lockedMessage = lockedViewResponseMessage(result);
+
+      if (lockedMessage) {
+        root.SDK.invoke("toast", { message: lockedMessage, type: "error" });
+        view.unlock();
+        if (view.saved) {
+          const latest = yield root.apiCall("tab", { tabId: view.id });
+          if (!latest?.error) {
+            applySnapshot(view, serverViewSnapshot(view, self.columns, latest));
+          }
+        }
+        return view;
+      }
+
+      if (result.error) {
+        view.unlock();
+        return view;
+      }
+
+      // Locked tabs: backend may return 200 while silently ignoring non-allowlisted
+      // config (filters/conjunction). Trust the server payload (including is_locked)
+      // so a stale unlocked client does not keep local filters the backend dropped.
+      // Unlocked tabs keep client filters (optimistic).
+      if (result.is_locked === true && result.id === view.id) {
+        if (!view.isLockedByManager) {
+          const canManageLock = root.SDK?.tabControls?.lock !== false;
+          const message = raceConditionLockToastMessage(result, canManageLock);
+
+          root.SDK.invoke("toast", { message, type: "error" });
+        }
+
+        applySnapshot(view, serverViewSnapshot(view, self.columns, result));
+
+        if (reload !== false) {
+          view.reload({ interaction });
+        }
+
+        view.unlock();
+        return view;
+      }
+
       const viewSnapshot = getSnapshot(view);
       const newViewSnapshot = {
         ...viewSnapshot,
@@ -317,6 +425,17 @@ export const TabStore = types
       };
 
       if (result.id !== view.id) {
+        const existingView = self.views.find((v) => v !== view && v.id === result.id);
+
+        if (existingView) {
+          applySnapshot(existingView, { ...newViewSnapshot, saved: true, virtual: false });
+          root.SDK.hasInterface("tabs") && existingView.reload();
+          self.setSelected(existingView);
+          destroy(view);
+
+          return existingView;
+        }
+
         self.views.push({ ...newViewSnapshot, saved: true, virtual: false });
         const newView = self.views[self.views.length - 1];
 
@@ -335,6 +454,28 @@ export const TabStore = types
       view.unlock();
       return view;
     }),
+    updateViewLock: flow(function* (view, isLocked) {
+      const root = getRoot(self);
+
+      // Optimistically update so the lock icon reacts immediately.
+      const previousLocked = view.is_locked;
+      view.setLockState(isLocked);
+
+      const result = yield root.apiCall("updateTab", { tabID: view.id }, { body: { is_locked: isLocked } });
+
+      if (result.error) {
+        view.setLockState(previousLocked);
+        const detail = result?.response?.detail;
+        root.SDK.invoke("toast", {
+          message: typeof detail === "string" ? detail : "Unable to update the tab lock.",
+          type: "error",
+        });
+        return view;
+      }
+
+      applySnapshot(view, serverViewSnapshot(view, self.columns, result));
+      return view;
+    }),
 
     updateViewOrder: flow(function* (source, destination) {
       // Detach the view from the original position
@@ -344,14 +485,22 @@ export const TabStore = types
       // Insert the view at the new position
       self.views.splice(destination, 0, sn);
 
+      const root = getRoot(self);
       const idList = {
-        project: getRoot(self).project.id,
+        project: root.project.id,
         ids: self.views.map((obj) => {
           return obj.id;
         }),
       };
 
-      getRoot(self).apiCall("orderTab", {}, { body: idList }, { alwaysExpectJSON: false });
+      const result = yield root.apiCall("orderTab", {}, { body: idList }, { alwaysExpectJSON: false });
+
+      if (result?.error) {
+        // Revert the local reorder so the UI matches the server state
+        const [reinserted] = self.views.splice(destination, 1);
+        self.views.splice(source, 0, getSnapshot(reinserted));
+        root.SDK.invoke("toast", { message: "Unable to save tab order.", type: "error" });
+      }
     }),
     duplicateView: flow(function* (view) {
       const sn = getSnapshot(view);

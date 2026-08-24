@@ -129,7 +129,7 @@ export const useStorageForm = ({ project, isEditMode, steps, storage, defaultVal
                   } else {
                     formDataWithPlaceholders[field.name] = field.min || 0;
                   }
-                } catch (error) {
+                } catch (_error) {
                   formDataWithPlaceholders[field.name] = field.min || 0;
                 }
               }

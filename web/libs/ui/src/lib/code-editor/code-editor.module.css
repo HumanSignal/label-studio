@@ -126,6 +126,31 @@
   border: 1px solid var(--color-neutral-border);
 }
 
+.cm6CodeEditor {
+  :global([class^="cm-theme"]) {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    height: 100%;
+    min-height: 0;
+    width: 100%;
+  }
+
+  :global(.cm-editor) {
+    height: 100%;
+    width: 100%;
+    flex: 1;
+    min-height: 0;
+    font-family: var(--font-mono);
+  }
+
+  :global(.cm-scroller) {
+    height: 100%;
+    min-height: 0;
+    overflow: auto;
+  }
+}
+
 :global(.CodeMirror-hints) {
   background-color: var(--color-neutral-background);
   border: 1px solid var(--color-neutral-border);
@@ -158,4 +183,48 @@
 
 :global(.CodeMirror-hints .CodeMirror-hint-description) {
   color: var(--color-neutral-content-subtler);
+}
+
+:global(.cm-tooltip.cm-tooltip-autocomplete) {
+  background-color: var(--color-neutral-background);
+  border: 1px solid var(--color-neutral-border);
+  box-shadow:
+    0 2px 4px rgba(var(--color-neutral-shadow-raw) / calc(30% * var(--shadow-intensity))),
+    0 4px 16px rgba(var(--color-neutral-shadow-raw) / calc(15% * var(--shadow-intensity)));
+  z-index: 11000;
+  max-width: 600px;
+  font-family: var(--font-mono);
+}
+
+:global(.cm-tooltip-autocomplete ul li) {
+  line-height: 1.4em;
+}
+
+:global(.cm-tooltip-autocomplete ul li[aria-selected]) {
+  background: var(--color-primary-emphasis-subtle);
+  color: var(--color-neutral-content);
+}
+
+:global(.cm-completionDetail) {
+  font-style: italic;
+  color: var(--color-neutral-content-subtle);
+}
+
+:global(.cm-completionInfo) {
+  color: var(--color-neutral-content-subtler);
+  max-width: 400px;
+}
+
+:global(.cm-panel.cm-search) {
+  background: var(--color-neutral-background);
+  border-bottom: 1px solid var(--color-neutral-border);
+  color: var(--color-neutral-content);
+  z-index: 11000;
+}
+
+:global(.cm-panel.cm-search input) {
+  font-family: var(--font-mono);
+  background: var(--color-neutral-surface);
+  color: var(--color-neutral-content);
+  border: 1px solid var(--color-neutral-border);
 }

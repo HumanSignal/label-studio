@@ -95,7 +95,10 @@ class ContextLog(object):
     def _secure_data(self, payload, request):
         view_name = payload['view_name']
 
-        if view_name in ('user-signup', 'user-login') and payload['method'] == 'POST':
+        # Downstream apps (e.g. enterprise features) contribute extra secured view names via settings,
+        # so this OSS redaction list carries no feature-specific views.
+        secured_views = ('user-signup', 'user-login', *getattr(settings, 'ADDITIONAL_CONTEXTLOG_SECURED_VIEWS', ()))
+        if view_name in secured_views and payload['method'] == 'POST':
             payload['json'] = None
 
         if payload['status_code'] < 200 or payload['status_code'] > 299:

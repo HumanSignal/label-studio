@@ -1,5 +1,6 @@
 import sys
 from collections import OrderedDict
+from pathlib import Path
 
 import yaml
 
@@ -56,7 +57,7 @@ with open(old_test) as f:
                                 if isinstance(v, str) and 'samples' in v:
                                     if 'files' not in request_data:
                                         request_data['files'] = {}
-                                    request_data['files'][k] = f'tests/test_suites/{v}'
+                                    request_data['files'][k] = str(Path(__file__).parent / v)
                                 else:
                                     if content_type and 'json' in content_type:
                                         if 'json' not in request_data:

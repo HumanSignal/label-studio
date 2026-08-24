@@ -94,7 +94,7 @@ export class APIProxy {
 
     try {
       return new URL(url).toString();
-    } catch (e) {
+    } catch (_e) {
       const gateway = new URL(window.location.href);
 
       gateway.search = "";
@@ -456,7 +456,7 @@ export class APIProxy {
 
       try {
         return JSON.parse(text);
-      } catch (e) {
+      } catch (_e) {
         return text;
       }
     })();
@@ -478,7 +478,7 @@ export class APIProxy {
     const parsedDetails = () => {
       try {
         return JSON.parse(details);
-      } catch (e) {
+      } catch (_e) {
         return details;
       }
     };

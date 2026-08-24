@@ -66,7 +66,7 @@ jobs:
             core.setOutput("sha", details.sha);
 
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           ref: ${{ inputs.release_tag }}
 
@@ -133,7 +133,7 @@ jobs:
             core.setOutput("ubuntu-tags", ubuntuTags);
 
       - name: Set up Python
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@v7
         with:
           python-version: '3.13'
 

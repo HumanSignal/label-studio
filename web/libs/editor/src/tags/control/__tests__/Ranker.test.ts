@@ -1,5 +1,7 @@
 import { types } from "mobx-state-tree";
-
+import "../../visual/View";
+import "../../object/List";
+import "../Ranker";
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 import { ListModel } from "../../object/List";
@@ -22,22 +24,23 @@ afterEach(() => {
   window.STORE_INIT_OK = undefined;
 });
 
-const MockAnnotationStore = types
-  .model("Annotation", {
-    names: types.map(types.union(RankerModel, ListModel)),
-  })
-  .volatile(() => ({
-    results: [] as any[],
-  }));
-
 const MockStore = types
   .model({
     annotationStore: types.model({
-      selected: MockAnnotationStore,
+      selected: types.frozen(),
+      selectedHistory: types.maybeNull(types.frozen()),
     }),
+    list: ListModel,
+    ranker: RankerModel,
   })
   .volatile(() => ({
     task: { dataObj: {} },
+  }))
+  .actions((self) => ({
+    setSelected(selected: any) {
+      self.annotationStore.selected = selected;
+      self.annotationStore.selectedHistory = selected;
+    },
   }));
 
 const items = [
@@ -46,13 +49,30 @@ const items = [
   { id: "item3", title: "333" },
 ];
 
-describe("List + Ranker (rank mode)", () => {
-  const list = ListModel.create({ name: "list", value: "$items", title: "Test List" });
-  const ranker = RankerModel.create({ name: "rank", toname: "list" });
-  const store = MockStore.create({ annotationStore: { selected: { names: { list, ranker } } } });
-
+function createRankerFixture(rankerSnapshot: Record<string, any>) {
+  const listSnapshot = { name: "list", value: "$items", title: "Test List" };
+  const store = MockStore.create({
+    annotationStore: { selected: {}, selectedHistory: null },
+    list: listSnapshot,
+    ranker: rankerSnapshot,
+  });
+  const list = store.list as any;
+  const ranker = store.ranker as any;
+  const selected = {
+    names: new Map([
+      ["list", list],
+      [rankerSnapshot.name, ranker],
+    ]),
+    results: [] as any[],
+  };
+  store.setSelected(selected);
   store.task.dataObj = { items };
   list.updateValue(store);
+  return { store, list, ranker, selected };
+}
+
+describe("List + Ranker (rank mode)", () => {
+  const { list, ranker } = createRankerFixture({ name: "rank", toname: "list", type: "ranker" });
 
   it("List and Ranker should get values from the task", () => {
     expect(list._value).toEqual(items);
@@ -68,19 +88,15 @@ describe("List + Ranker (rank mode)", () => {
 });
 
 describe("List + Ranker + Buckets (pick mode)", () => {
-  const list = ListModel.create({ name: "list", value: "$items", title: "Test List" });
-  const ranker = RankerModel.create({
+  const { store, selected, list, ranker } = createRankerFixture({
     name: "rank",
     toname: "list",
+    type: "ranker",
     children: [
       { id: "B1", type: "bucket", name: "B1", title: "Bucket 1" },
       { id: "B2", type: "bucket", name: "B2", title: "Bucket 2" },
     ],
   });
-  const store = MockStore.create({ annotationStore: { selected: { names: { list, ranker } } } });
-
-  store.task.dataObj = { items };
-  list.updateValue(store);
 
   const columns = [
     { id: "_", title: "Test List" },
@@ -115,7 +131,10 @@ describe("List + Ranker + Buckets (pick mode)", () => {
   });
 
   it("Ranker returns items according to result and puts the rest to _ bucket", () => {
-    store.annotationStore.selected.results.push(result);
+    store.setSelected({
+      ...selected,
+      results: [...selected.results, result],
+    });
 
     expect(ranker.result).toBeTruthy();
     expect(ranker.dataSource).toEqual({
@@ -127,19 +146,15 @@ describe("List + Ranker + Buckets (pick mode)", () => {
 });
 
 describe("List + Ranker + Buckets + default (group mode)", () => {
-  const list = ListModel.create({ name: "list", value: "$items", title: "Test List" });
-  const ranker = RankerModel.create({
+  const { store, selected, list, ranker } = createRankerFixture({
     name: "rank",
     toname: "list",
+    type: "ranker",
     children: [
       { id: "B1", type: "bucket", name: "B1", title: "Bucket 1" },
       { id: "B2", type: "bucket", name: "B2", title: "Bucket 2", default: true },
     ],
   });
-  const store = MockStore.create({ annotationStore: { selected: { names: { list, ranker } } } });
-
-  store.task.dataObj = { items };
-  list.updateValue(store);
 
   const columns = [
     { id: "B1", title: "Bucket 1" },
@@ -173,7 +188,10 @@ describe("List + Ranker + Buckets + default (group mode)", () => {
   });
 
   it("Ranker returns items according to result", () => {
-    store.annotationStore.selected.results.push(result);
+    store.setSelected({
+      ...selected,
+      results: [...selected.results, result],
+    });
 
     expect(ranker.result).toBeTruthy();
     expect(ranker.dataSource).toEqual({

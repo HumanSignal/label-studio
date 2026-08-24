@@ -8,17 +8,15 @@ import redisProvider from "./redis";
 import { s3Provider } from "./s3";
 import s3sProvider from "./s3s";
 
+// Order matches ProviderGrid rows at xl:grid-cols-4: AWS+Azure, then GCS variants+Redis, then rest.
 export const providers = {
-  // Standard providers
   s3: s3Provider,
-  gcs: gcsProvider,
-  azure: azureProvider,
-  redis: redisProvider,
-  // Enterprise providers
   s3s: s3sProvider,
-  gcswif: gcsWifProvider,
+  azure: azureProvider,
   azure_spi: azureSpiProvider,
+  gcs: gcsProvider,
+  gcswif: gcsWifProvider,
+  redis: redisProvider,
   databricks: databricksProvider,
-  // Local provider
   localfiles: localFilesProvider,
 };

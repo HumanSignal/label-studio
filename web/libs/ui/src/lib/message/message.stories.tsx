@@ -12,16 +12,22 @@ const meta: Meta<typeof Message> = {
     docs: {
       description: {
         component:
-          "A reusable message component for displaying inline messages, notifications, and alerts with support for different variants and customizable content.",
+          "A reusable message component for displaying inline messages, notifications, and alerts with support for different variants, looks, and customizable content.",
       },
     },
   },
   argTypes: {
     variant: {
       control: "select",
-      options: ["primary", "neutral", "negative", "positive", "warning", "info", "success", "error"],
+      options: ["primary", "neutral", "negative", "positive", "warning", "enterprise", "info", "success", "error"],
       description:
-        "Visual variant of the message. Primary variants: primary, neutral, negative, positive, warning. Aliases: info (→primary), success (→positive), error (→negative)",
+        "Visual variant of the message. Primary variants: primary, neutral, negative, positive, warning, enterprise. Aliases: info (→primary), success (→positive), error (→negative). Use enterprise exclusively for gated/enterprise-only feature callouts.",
+    },
+    look: {
+      control: "select",
+      options: ["card", "ghost"],
+      description:
+        "Visual look of the message. card: default with background and border. ghost: minimal without card wrapper.",
     },
     size: {
       control: "select",
@@ -107,6 +113,54 @@ export const Warning: Story = {
   },
 };
 
+/**
+ * Use this variant **exclusively** to call out features that are gated behind Label Studio Enterprise.
+ * It uses the enterprise gradient palette (canteloupe → persimmon → plum) and defaults to IconSpark.
+ * Do not use it for general informational or warning messages.
+ */
+export const EnterpriseFeature: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Use `variant="enterprise"` exclusively to call out gated/enterprise-only features. ' +
+          "It uses the enterprise gradient palette (canteloupe → persimmon → plum) and defaults to IconSpark. " +
+          "Do not use it for general informational or warning messages.",
+      },
+    },
+  },
+  args: {
+    variant: "enterprise",
+    title: "Enterprise Feature",
+    children: (
+      <>
+        This feature is available in Label Studio Enterprise.{" "}
+        <a href="https://humansignal.com/enterprise" target="_blank" rel="noopener noreferrer">
+          Learn more
+        </a>
+      </>
+    ),
+  },
+};
+
+// Look Stories
+export const Ghost: Story = {
+  args: {
+    variant: "primary",
+    look: "ghost",
+    title: "Ghost look",
+    children: "This message has no card background or border — just the icon and content inline.",
+  },
+};
+
+export const GhostWarning: Story = {
+  args: {
+    variant: "warning",
+    look: "ghost",
+    children: "A ghost warning message without a card wrapper.",
+  },
+};
+
 // Feature Stories
 export const WithTitle: Story = {
   args: {
@@ -133,7 +187,7 @@ export const WithActions: Story = {
     variant: "warning",
     title: "Unsaved Changes",
     children: (
-      <>
+      <div className="flex flex-col gap-base">
         <Typography>You have unsaved changes. Do you want to save them before leaving?</Typography>
         <div className="flex gap-tight">
           <Button variant="primary" look="filled" size="small">
@@ -143,7 +197,7 @@ export const WithActions: Story = {
             Discard
           </Button>
         </div>
-      </>
+      </div>
     ),
   },
 };
@@ -252,6 +306,37 @@ export const AllVariants: Story = {
       <Message variant="warning" title="Warning">
         This is a warning message.
       </Message>
+
+      <Message variant="enterprise" title="Enterprise Feature">
+        This feature is available in Label Studio Enterprise.{" "}
+        <a href="https://humansignal.com/enterprise" target="_blank" rel="noopener noreferrer">
+          Learn more
+        </a>
+      </Message>
+    </div>
+  ),
+};
+
+export const AllLooks: Story = {
+  render: () => (
+    <div className="space-y-base">
+      <div>
+        <Typography variant="label" size="medium" className="mb-tight">
+          Card Look (Default)
+        </Typography>
+        <Message variant="primary" look="card" title="Card">
+          This message has a background, border and padding.
+        </Message>
+      </div>
+
+      <div>
+        <Typography variant="label" size="medium" className="mb-tight">
+          Ghost Look
+        </Typography>
+        <Message variant="primary" look="ghost" title="Ghost">
+          This message has no card wrapper — just the icon and content.
+        </Message>
+      </div>
     </div>
   ),
 };

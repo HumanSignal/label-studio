@@ -9,53 +9,22 @@ export const FF_DEV_2186 = "ff_front_dev_2186_comments_for_update";
 
 export const FF_DEV_2536 = "fflag_feat_front_dev-2536_comment_notifications_short";
 
-// Comments for annotation editor
-export const FF_DEV_2887 = "fflag-feat-dev-2887-comments-ui-editor-short";
-
-export const FF_DEV_3034 = "fflag-feat-dev-3034-comments-with-drafts-short";
-
 /**
  * Support for Datasets functionality.
  */
 export const FF_LOPS_E_3 = "fflag_feat_all_lops_e_3_datasets_short";
 
 /**
- * Fixes memory leaks in label studio frontend relative to mobx-state-tree and react usage
- *
- * @link https://app.launchdarkly.com/default/production/features/fflag_fix_front_lsdv_4620_memory_leaks_100723_short
- */
-export const FF_LSDV_4620_3_ML = "fflag_fix_front_lsdv_4620_memory_leaks_100723_short";
-
-/**
- * Allow to filter tasks in Data Manager by control tag labels used in annotation results
- * @link https://app.launchdarkly.com/projects/default/flags/fflag_root_13_annotation_results_filtering
- */
-export const FF_ANNOTATION_RESULTS_FILTERING = "fflag_root_13_annotation_results_filtering";
-
-/**
- * Allow to filter tasks in Data Manager by annotation results and user annotated on the same annotation
- * @link https://app.launchdarkly.com/projects/default/flags/fflag_root_45_better_user_filter
- */
-export const FF_BETTER_USER_FILTER = "fflag_root_45_better_user_filter";
-
-/**
- * Disable global user fetching for large-scale deployments
- * @link https://app.launchdarkly.com/projects/default/flags/fflag_all_feat_utc_204_users_performance_improvements_in_dm_for_large_orgs
- */
-export const FF_DISABLE_GLOBAL_USER_FETCHING =
-  "fflag_all_feat_utc_204_users_performance_improvements_in_dm_for_large_orgs";
-
-/**
- * Enable interactive JSON viewer for task source in Data Manager
- * @link TBD - LaunchDarkly flag to be created
- */
-export const FF_INTERACTIVE_JSON_VIEWER = "fflag_feat_front_interactive_json_viewer_short";
-
-/**
  * Strict task overlap enforcement - prevents annotators from submitting
  * annotations when task overlap limit has been reached
  */
 export const FF_FIT_1304_STRICT_OVERLAP = "fflag_feat_all_fit_1304_strict_overlap";
+
+/**
+ * Data Manager `is any of` / `is none of` list-membership filter operators.
+ * Gates the operator dropdown for Task ID, Inner ID, annotation counters, and task.data.* columns.
+ */
+export const FF_BROS_1203 = "fflag_feat_bros_1203_dm_is_any_of_filter_short";
 
 // Customize flags
 const flags = {};
@@ -66,14 +35,6 @@ function getFeatureFlags() {
 
 export function isFF(id) {
   const featureFlags = getFeatureFlags();
-  // TODO: remove the override + if statement once LSE and LSO start building react the same way and fflag_fix_front_lsdv_4620_memory_leaks_100723_short is removed
-  const override = {
-    fflag_fix_front_lsdv_4620_memory_leaks_100723_short: false,
-  };
-  if (window?.APP_SETTINGS?.sentry_environment === "opensource" && id in override) {
-    return override[id];
-  }
-
   if (id in featureFlags) {
     return featureFlags[id] === true;
   }

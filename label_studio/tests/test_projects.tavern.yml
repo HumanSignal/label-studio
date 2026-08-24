@@ -236,7 +236,7 @@ stages:
   - name: Import tasks
     request:
       files:
-        csv: tests/test_suites/samples/image_urls_with_bboxes.json
+        csv: label_studio/tests/test_suites/samples/image_urls_with_bboxes.json
       headers:
         content-type: multipart/form-data
       method: POST
@@ -379,7 +379,7 @@ stages:
   - name: Import tasks
     request:
       files:
-        csv: tests/test_suites/samples/three_tasks_two_gts.json
+        csv: label_studio/tests/test_suites/samples/three_tasks_two_gts.json
       headers:
         content-type: multipart/form-data
       method: POST

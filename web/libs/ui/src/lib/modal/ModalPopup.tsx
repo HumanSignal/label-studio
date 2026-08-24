@@ -47,6 +47,11 @@ type ModalState = {
   transition: "visible" | "appear" | "before-appear" | "disappear" | "before-disappear" | null;
 };
 
+/**
+ * Legacy modal implementation (portal + modal-ls styles).
+ *
+ * @deprecated For app chrome modals, prefer `ModalWindow`. `confirm` / `info` flows still use this class internally.
+ */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export class Modal<BP = unknown> extends Component<ModalProps<BP>, ModalState> {
   static Header = ModalHeader;

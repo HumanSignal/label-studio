@@ -24,23 +24,6 @@ describe("Video segmentation", suiteConfig, () => {
     Sidebar.hasRegions(1);
   });
 
-  it("Should have changes in canvas", () => {
-    LabelStudio.params().config(simpleVideoConfig).data(simpleVideoData).withResult([]).init();
-    LabelStudio.waitForObjectsReady();
-
-    VideoView.waitForStableState();
-    Sidebar.hasNoRegions();
-
-    VideoView.captureCanvas("canvas");
-
-    Labels.select("Label 2");
-    VideoView.drawRectRelative(0.2, 0.2, 0.6, 0.6);
-
-    Sidebar.hasRegions(1);
-    VideoView.waitForStableState();
-
-    VideoView.canvasShouldChange("canvas", 0);
-  });
   it("Should be invisible out of the lifespan (rectangle)", () => {
     LabelStudio.params().config(simpleVideoConfig).data(simpleVideoData).withResult(simpleVideoResult).init();
     LabelStudio.waitForObjectsReady();

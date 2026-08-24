@@ -26,10 +26,13 @@ Note:
 
 from core.current_request import CurrentContext
 from core.feature_flags import flag_set
+from drf_spectacular.types import OpenApiTypes
+from drf_spectacular.utils import extend_schema_field
 from fsm.state_manager import StateManager
 from rest_framework import serializers
 
 
+@extend_schema_field(OpenApiTypes.STR)
 class FSMStateField(serializers.ReadOnlyField):
     """
     Read-only DRF field for exposing FSM state.

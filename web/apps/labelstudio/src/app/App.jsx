@@ -14,9 +14,9 @@ import { RoutesProvider } from "../providers/RoutesProvider";
 import { DRAFT_GUARD_KEY, DraftGuard, draftGuardCallback } from "../components/DraftGuard/DraftGuard";
 import { AsyncPage } from "./AsyncPage/AsyncPage";
 import ErrorBoundary from "./ErrorBoundary";
-import { FF_UNSAVED_CHANGES, isFF } from "../utils/feature-flags";
 import { TourProvider } from "@humansignal/core";
 import { ToastProvider, ToastViewport } from "@humansignal/ui";
+import { IconContext } from "@humansignal/icons";
 import { JotaiProvider, JotaiStore } from "../utils/jotai-store";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { queryClient } from "@humansignal/core/lib/utils/query-client";
@@ -40,11 +40,11 @@ const browserHistory = createBrowserHistory({
     const callbackWrapper = (result) => {
       browserHistory.isBlocking = false;
       callback(result);
-      isFF(FF_UNSAVED_CHANGES) && window.postMessage({ source: "label-studio", payload: UNBLOCK_HISTORY_MESSAGE });
+      window.postMessage({ source: "label-studio", payload: UNBLOCK_HISTORY_MESSAGE });
     };
     if (message === DRAFT_GUARD_KEY) {
       draftGuardCallback.current = callbackWrapper;
-    } else if (isFF(FF_UNSAVED_CHANGES) && message === LEAVE_BLOCKER_KEY) {
+    } else if (message === LEAVE_BLOCKER_KEY) {
       leaveBlockerCallback.current = callbackWrapper;
     } else {
       callbackWrapper(window.confirm(message));
@@ -58,30 +58,32 @@ initSentry(browserHistory);
 
 const App = ({ content }) => {
   return (
-    <ErrorBoundary>
-      <Router history={browserHistory}>
-        <MultiProvider
-          providers={[
-            <QueryClientProvider client={queryClient} key="query" />,
-            <JotaiProvider key="jotai" store={JotaiStore} />,
-            <AuthProvider key="auth" />,
-            <AppStoreProvider key="app-store" />,
-            <ToastProvider key="toast" />,
-            <ApiProvider key="api" />,
-            <ConfigProvider key="config" />,
-            <RoutesProvider key="rotes" />,
-            <ProjectProvider key="project" />,
-            ff.isActive(ff.FF_PRODUCT_TOUR) && <TourProvider useAPI={useAPI} />,
-          ].filter(Boolean)}
-        >
-          <AsyncPage>
-            <DraftGuard />
-            <RootPage content={content} />
-            <ToastViewport />
-          </AsyncPage>
-        </MultiProvider>
-      </Router>
-    </ErrorBoundary>
+    <IconContext.Provider value={{ size: 24, weight: "regular" }}>
+      <ErrorBoundary>
+        <Router history={browserHistory}>
+          <MultiProvider
+            providers={[
+              <QueryClientProvider client={queryClient} key="query" />,
+              <JotaiProvider key="jotai" store={JotaiStore} />,
+              <AuthProvider key="auth" />,
+              <AppStoreProvider key="app-store" />,
+              <ToastProvider key="toast" />,
+              <ApiProvider key="api" />,
+              <ConfigProvider key="config" />,
+              <RoutesProvider key="rotes" />,
+              <ProjectProvider key="project" />,
+              ff.isActive(ff.FF_PRODUCT_TOUR) && <TourProvider useAPI={useAPI} />,
+            ].filter(Boolean)}
+          >
+            <AsyncPage>
+              <DraftGuard />
+              <RootPage content={content} />
+              <ToastViewport />
+            </AsyncPage>
+          </MultiProvider>
+        </Router>
+      </ErrorBoundary>
+    </IconContext.Provider>
   );
 };
 
@@ -89,7 +91,3 @@ const root = document.querySelector(".app-wrapper");
 const content = document.querySelector("#main-content");
 
 render(<App content={content.innerHTML} />, root);
-
-if (module?.hot) {
-  module.hot.accept(); // Enable HMR for React components
-}

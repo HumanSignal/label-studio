@@ -1,7 +1,7 @@
 import { when } from "mobx";
 import { getEnv } from "mobx-state-tree";
 import { inject, observer } from "mobx-react";
-import { type FC, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import { type FC, useCallback, useLayoutEffect, useMemo, useRef, useState } from "react";
 import {
   IconAnnotationAccepted,
   IconAnnotationImported,
@@ -61,36 +61,35 @@ const DraftState: FC<{
   const store = annotation.list; // @todo weird name
   const infoIsHidden = store.store.hasInterface("annotations:hide-info");
   const hiddenUser = infoIsHidden ? { email: "Me" } : null;
+  const currentUser = window.APP_SETTINGS?.user;
 
-  const [hasUnsavedChanges, setChanges] = useState(false);
-
-  // turn it on when changes just made; off when they we saved
-  useEffect(() => {
-    setChanges(true);
-  }, [annotation.history.history.length]);
-  useEffect(() => {
-    setChanges(false);
-  }, [annotation.draftSaved]);
+  // BROS-1477: Derive the "unsaved changes" state from the store's own change tracking
+  // (`needsDraftSave` compares the last edit time to the last draft save) instead of
+  // reacting to raw `history.history.length` deltas. Non-edit operations such as
+  // `reinitHistory` (fired on image resize/zoom) or switching Annotation History items
+  // change the undo-stack length without any real edit; the old heuristic turned the
+  // indicator on for those and never turned it back off, leaving it stuck indefinitely.
+  const hasUnsavedChanges = annotation.needsDraftSave?.() ?? false;
 
   if (!hasChanges && !annotation.versions.draft) return null;
 
   return (
     <HistoryItem
       key="draft"
-      user={hiddenUser ?? annotation.user ?? { email: annotation.createdBy }}
+      user={hiddenUser ?? currentUser ?? annotation.user ?? { email: annotation.createdBy }}
       date={annotation.draftSaved}
       extra={
         annotation.isDraftSaving ? (
-          <div className={cn("annotation-history").elem("saving").toClassName()}>
-            <div className={cn("annotation-history").elem("spin").toClassName()} />
+          <div className={cn("history-item").elem("saving").toClassName()}>
+            <div className={cn("history-item").elem("spin").toClassName()} />
           </div>
         ) : hasUnsavedChanges ? (
-          <div className={cn("annotation-history").elem("saving").toClassName()}>
-            <div className={cn("annotation-history").elem("dot").toClassName()} />
+          <div className={cn("history-item").elem("saving").toClassName()}>
+            <div className={cn("history-item").elem("dot").toClassName()} />
           </div>
         ) : hasChanges ? (
-          <div className={cn("annotation-history").elem("saving").toClassName()}>
-            <IconCheck className={cn("annotation-history").elem("saved").toClassName()} />
+          <div className={cn("history-item").elem("saving").toClassName()}>
+            <IconCheck className={cn("history-item").elem("saved").toClassName()} />
           </div>
         ) : null
       }
@@ -198,12 +197,16 @@ const AnnotationHistoryComponent: FC<any> = ({
                   annotation.toggleDraft(isSelected);
                 } else if (isStub) {
                   // Stub item: host (e.g. LSE) fetches full item and calls back; then we hydrate and select.
-                  // item.pk is the numeric history row id (preserved in HistoryItem preProcessSnapshot); item.id is the MST guid.
+                  // item.pk is the numeric history row id used for the API call.
+                  // item.id is the MST guid (unique per item; pk can be shared across items).
                   const historyPk = item.pk;
+                  const historyItemId = item.id;
                   if (historyPk == null) return;
                   getEnv(store).events.invoke("hydrateHistoryItem", historyPk, (fullItem: any) => {
                     if (fullItem && store.hydrateHistoryItem) {
-                      store.hydrateHistoryItem(historyPk, fullItem);
+                      // Pass the MST guid so hydrateHistoryItem finds the exact item,
+                      // not just the first item that shares the same pk.
+                      store.hydrateHistoryItem(historyItemId, fullItem);
                     }
                   });
                 } else {

@@ -16,6 +16,8 @@ jobs:
     name: "yarn unit"
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    env:
+      CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
     steps:
       - uses: hmarr/debug-action@v3.0.0
 
@@ -27,7 +29,7 @@ jobs:
           git config --global user.email 'robot-ci-heartex@users.noreply.github.com'
 
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           ref: ${{ inputs.head_sha }}
 
@@ -37,24 +39,15 @@ jobs:
           node-version: "${{ env.NODE }}"
           directory: "${{ env.FRONTEND_MONOREPO_DIR }}"
 
-      # Nx db cache ties artifacts to machine ID; restored cache from other runners is not used.
-      - name: Cache Nx
-        uses: actions/cache@v6
-        with:
-          path: ${{ env.FRONTEND_MONOREPO_DIR }}/.nx/cache
-          key: nx-v2-${{ runner.os }}-${{ env.NODE }}-${{ hashFiles('web/package.json', 'web/yarn.lock') }}
-          restore-keys: |
-            nx-v2-${{ runner.os }}-${{ env.NODE }}-
-
       - name: Run tests
         working-directory: ${{ env.FRONTEND_MONOREPO_DIR }}
         env:
           NODE_ENV: "development"
         run: |
-          yarn test:unit:coverage
+          bun run test:unit:coverage
 
       - name: Upload coverage to Codecov
-        if: ${{ always() && github.event.pull_request.head.repo.fork == false && github.event.pull_request.user.login != 'dependabot[bot]' }}
+        if: ${{ always() && env.CODECOV_TOKEN != '' && github.event.pull_request.user.login != 'dependabot[bot]' }}
         uses: codecov/codecov-action@v7
         with:
           name: lsf-unit

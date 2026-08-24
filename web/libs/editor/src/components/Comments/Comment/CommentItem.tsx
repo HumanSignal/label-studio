@@ -12,7 +12,11 @@ import { userDisplayName } from "@humansignal/core";
 import { humanDateDiff } from "../../../utils/utilities";
 import { CommentFormBase } from "../CommentFormBase";
 import { CommentsContext } from "./CommentsList";
-import { NewTaxonomy as Taxonomy, type TaxonomyPath } from "../../../components/NewTaxonomy/NewTaxonomy";
+import { NewTaxonomy } from "../../../components/NewTaxonomy/NewTaxonomy";
+import { TaxonomyEcho466 } from "../../../components/TaxonomyEcho466/TaxonomyEcho466";
+import type { TaxonomyPath } from "../../../components/NewTaxonomy/NewTaxonomy";
+import { FF_ECHO_466_TAXONOMY_ANTD_REMOVAL } from "@humansignal/core/lib/utils/feature-flags";
+import { isFF } from "../../../utils/feature-flags";
 import { taxonomyPathsToSelectedItems, COMMENT_TAXONOMY_OPTIONS } from "../../../utils/commentClassification";
 
 import "./CommentItem.prefix.css";
@@ -194,12 +198,23 @@ export const CommentItem: FC<CommentItemProps> = observer(
                 <CommentFormBase value={text} onSubmit={commentFormBaseOnSubmit} classifications={classifications} />
                 {classificationsItems.length > 0 && (
                   <div className={cn("comment-item").elem("classifications-row").toClassName()}>
-                    <Taxonomy
-                      selected={taxonomySelectedItems}
-                      items={classificationsItems}
-                      onChange={taxonomyOnChange}
-                      options={COMMENT_TAXONOMY_OPTIONS}
-                    />
+                    {isFF(FF_ECHO_466_TAXONOMY_ANTD_REMOVAL) ? (
+                      <TaxonomyEcho466
+                        selected={taxonomySelectedItems}
+                        items={classificationsItems}
+                        onChange={taxonomyOnChange}
+                        options={COMMENT_TAXONOMY_OPTIONS}
+                        isEditable
+                      />
+                    ) : (
+                      <NewTaxonomy
+                        selected={taxonomySelectedItems}
+                        items={classificationsItems}
+                        onChange={taxonomyOnChange}
+                        options={COMMENT_TAXONOMY_OPTIONS}
+                        isEditable
+                      />
+                    )}
                   </div>
                 )}
               </>

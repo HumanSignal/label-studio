@@ -221,7 +221,9 @@
     padding-right: var(--spacing-base);
     display: flex;
     align-items: center;
+    gap: var(--spacing-tightest);
     border-radius: var(--corner-radius-small);
+    min-width: 0;
 
     & span {
       border: 1px solid transparent;
@@ -252,6 +254,28 @@
         }
       }
     }
+  }
+
+  &__item_locked &__item-left {
+    gap: var(--spacing-tightest);
+  }
+
+  &__item-title {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    min-width: 0;
+  }
+
+  &__item-lock {
+    display: flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    width: 16px;
+    height: 16px;
+    padding: 0;
+    color: var(--color-neutral-content-subtler);
   }
 
   &__item-right {

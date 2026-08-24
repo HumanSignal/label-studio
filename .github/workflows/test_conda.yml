@@ -9,7 +9,6 @@ on:
 
 env:
   CACHE_NAME_PREFIX: v1
-  POETRY_VERSION: 2.3.2
 
 jobs:
   conda:
@@ -25,8 +24,6 @@ jobs:
             pip-cache-path: "~/.cache/pip"
           - os: "windows-latest"
             pip-cache-path: "~\\AppData\\Local\\pip\\Cache"
-    # required for poetry action
-    # see https://github.com/marketplace/actions/install-poetry-action#running-on-windows
     defaults:
       run:
         shell: bash
@@ -35,7 +32,7 @@ jobs:
       - uses: hmarr/debug-action@v3.0.0
 
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           fetch-depth: 1
           ref: ${{ inputs.head_sha }}
@@ -47,19 +44,16 @@ jobs:
           python-version: ${{ matrix.python-version }}
           activate-environment: test-environment
 
-      - name: "Install poetry"
-        run: pipx install "poetry==${{ env.POETRY_VERSION }}"
-
-      - name: "Set up Python"
-        id: setup_python
-        uses: actions/setup-python@v6
+      - name: "Set up uv"
+        uses: astral-sh/setup-uv@v7
         with:
           python-version: '3.13'
-          cache: 'poetry'
+          enable-cache: true
+          cache-dependency-glob: "uv.lock"
 
       - name: Install Python dependencies
         run: |
-          poetry install --with test
+          uv sync --frozen --group test
 
       - name: Conda info
         shell: bash -el {0}

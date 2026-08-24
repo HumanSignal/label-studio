@@ -6,9 +6,10 @@ export {
   Annotators as Reviewers,
   Annotators as UpdatedBy,
   Annotators as CommentAuthors,
+  SkippedByAnnotator,
 } from "./Annotators/Annotators";
 export { AudioCell as Audio, AudioPlusCell as AudioPlus } from "./AudioCell";
-export { BooleanCell as Boolean } from "./BooleanCell";
+export { BooleanCell as Boolean, GroundTruth } from "./BooleanCell";
 export { DateTimeCell as Date, DateTimeCell as Datetime } from "./DateTimeCell";
 export { ImageCell as Image } from "./ImageCell";
 export { NumberCell as Number } from "./NumberCell";
@@ -19,6 +20,7 @@ export { VideoCell as Video } from "./VideoCell";
 export { ProjectCell as Project } from "./ProjectCell";
 export { AgreementSelected } from "./AgreementSelected";
 export { TaskState } from "./TaskState";
+export { PaymentStatus } from "./PaymentStatus/PaymentStatus";
 
 export function normalizeCellAlias(alias) {
   // remove trailing separators to make `pascalCase` safe

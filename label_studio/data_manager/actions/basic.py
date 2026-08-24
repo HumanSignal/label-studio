@@ -3,14 +3,17 @@
 import logging
 from datetime import datetime
 
+from core.current_request import CurrentContext
 from core.feature_flags import flag_set
 from core.permissions import AllPermissions
 from core.redis import start_job_async_or_sync
 from core.utils.common import load_func
-from data_manager.actions import DataManagerAction
+from core.utils.db import delete_annotations_queryset_with_retry
+from data_manager.actions import DataManagerAction, user_option_label
 from data_manager.functions import evaluate_predictions
 from django.conf import settings
 from projects.models import Project
+from rq.job import Job
 from tasks.functions import update_tasks_counters
 from tasks.models import Annotation, AnnotationDraft, Prediction, Task
 from users.models import User
@@ -73,16 +76,9 @@ def delete_tasks(project, queryset, **kwargs):
     return {'processed_items': count, 'reload': reload, 'detail': 'Deleted ' + str(count) + ' tasks'}
 
 
-def delete_tasks_annotations(project, queryset, **kwargs):
-    """Delete all annotations and drafts by tasks ids
-
-    :param project: project instance
-    :param queryset: filtered tasks db queryset
-    """
-    request = kwargs['request']
-    annotator_id = request.data.get('annotator')
-
-    task_ids = queryset.values_list('id', flat=True)
+def delete_tasks_annotations_job(project_id, task_ids, annotator_id, user_id):
+    project = Project.objects.get(id=project_id)
+    user = User.objects.get(id=user_id)
     annotations = Annotation.objects.filter(task__id__in=task_ids)
     if annotator_id:
         annotations = annotations.filter(completed_by=int(annotator_id))
@@ -101,23 +97,82 @@ def delete_tasks_annotations(project, queryset, **kwargs):
 
     # count before delete to return the number of deleted items, not including cascade deletions
     count = annotations.count()
-    annotations.delete()
+
+    # Retry on deadlock / FK violation from concurrent background workers (e.g.
+    # dimension score recomputation) that may INSERT rows referencing annotations
+    # being deleted, causing either a deadlock or a dangling FK constraint error.
+    # Flag this as a managed bulk delete so the Annotation post_delete safety-net signal
+    # skips per-row recomputation — we reset counters explicitly (and reliably) below.
+    previous_bulk_delete = CurrentContext.get('bulk_annotation_delete_in_progress')
+    CurrentContext.set('bulk_annotation_delete_in_progress', True)
+    try:
+        delete_annotations_queryset_with_retry(annotations)
+    finally:
+        CurrentContext.set('bulk_annotation_delete_in_progress', previous_bulk_delete)
     drafts.delete()  # since task-level annotation drafts will not have been deleted by CASCADE
     emit_webhooks_for_instance(project.organization, project, WebhookAction.ANNOTATIONS_DELETED, annotations_ids)
-    request = kwargs['request']
 
     tasks = Task.objects.filter(id__in=real_task_ids)
-    tasks.update(updated_at=datetime.now(), updated_by=request.user)
-    # Update tasks counter and is_labeled. It should be a single operation as counters affect bulk is_labeled update
-    project.update_tasks_counters_and_is_labeled(tasks_queryset=real_task_ids)
+    tasks.update(updated_at=datetime.now(), updated_by=user)
+    # Update tasks counter and is_labeled. It should be a single operation as counters affect bulk is_labeled update.
+    # Run inline (run_sync=True): we already deleted the annotations above, so the counter reset must not be a
+    # separate droppable job. If the fire-and-forget 'default'-queue job is lost, annotations are gone but
+    # total_annotations stays > 0 forever (stale counter shown in the Data Manager). (Emerald / TRIAG-2440)
+    project.update_tasks_counters_and_is_labeled(tasks_queryset=real_task_ids, run_sync=True)
 
     # LSE postprocess
     postprocess = load_func(settings.DELETE_TASKS_ANNOTATIONS_POSTPROCESS)
     if postprocess is not None:
         tasks = Task.objects.filter(id__in=task_ids)
-        postprocess(project, tasks, **kwargs)
+        postprocess(project, tasks, user_id=user_id)
 
     return {'processed_items': count, 'detail': 'Deleted ' + str(count) + ' annotations'}
+
+
+def delete_tasks_annotations(project, queryset, **kwargs):
+    """Delete all annotations and drafts by tasks ids
+
+    :param project: project instance
+    :param queryset: filtered tasks db queryset
+    """
+    request = kwargs['request']
+    annotator_id = request.data.get('annotator')
+    task_ids = list(queryset.values_list('id', flat=True))
+
+    annotations = Annotation.objects.filter(task__id__in=task_ids)
+    if annotator_id:
+        annotations = annotations.filter(completed_by=int(annotator_id))
+    count = annotations.count()
+
+    drafts = AnnotationDraft.objects.filter(task__id__in=task_ids)
+    if annotator_id:
+        drafts = drafts.filter(user=int(annotator_id))
+
+    if count == 0 and not drafts.exists():
+        return {'processed_items': 0, 'detail': 'Deleted 0 annotations'}
+
+    job = start_job_async_or_sync(
+        delete_tasks_annotations_job,
+        project.id,
+        task_ids,
+        annotator_id,
+        request.user.id,
+        queue_name='low',
+        job_timeout=60 * 60 * 5,
+    )
+    if isinstance(job, Job):
+        # Skip the automatic Data Manager reload for this async action (FIT-1855): the background
+        # job is still running when the response returns, so an immediate reload would show the
+        # annotations as still present and look like the delete "did not execute on the first
+        # attempt". The frontend highlights the Refresh button instead so the user reloads once the
+        # job has finished. Mirrors the async Bulk Review action.
+        return {
+            'async': True,
+            'reload': False,
+            'processed_items': count,
+            'detail': 'Deleting ' + str(count) + ' annotations in the background',
+        }
+    return job
 
 
 def delete_tasks_annotations_form(user, project):
@@ -132,10 +187,7 @@ def delete_tasks_annotations_form(user, project):
                     'type': 'select',
                     'name': 'annotator',
                     'label': 'Annotator',
-                    'options': [
-                        {'value': str(user.id), 'label': user.get_full_name() or user.username or user.email}
-                        for user in users
-                    ],
+                    'options': [{'value': str(user.id), 'label': user_option_label(user)} for user in users],
                     'placeholder': 'All',
                     'searchable': True,
                 }

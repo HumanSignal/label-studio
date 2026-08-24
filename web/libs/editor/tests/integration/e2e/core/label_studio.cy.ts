@@ -1,5 +1,5 @@
 import { LabelStudio } from "@humansignal/frontend-test/helpers/LSF";
-import { FF_DEV_3873, FF_SIMPLE_INIT } from "libs/editor/src/utils/feature-flags";
+import { FF_SIMPLE_INIT } from "libs/editor/src/utils/feature-flags";
 
 describe("Label Studio UI init", () => {
   it("Initialize empty Label Studio", () => {
@@ -37,10 +37,9 @@ describe("Label Studio UI init", () => {
   it("Initialize Label Studio with simple init FF (LEAP-443)", () => {
     const callApi = cy.spy().as("callApi");
 
-    // testing both new UI and simple init FF
+    // testing new UI with simple init FF
     LabelStudio.setFeatureFlagsOnPageLoad({
       [FF_SIMPLE_INIT]: true,
-      [FF_DEV_3873]: true,
     });
 
     LabelStudio.init({

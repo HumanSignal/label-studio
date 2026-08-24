@@ -5,7 +5,7 @@ import { importFiles } from "./utils";
 
 const DEFAULT_COLUMN = "$undefined$";
 
-export const useImportPage = (project, sample) => {
+export const useImportPage = (project, _sample) => {
   const [uploading, setUploadingStatus] = React.useState(false);
   const [fileIds, setFileIds] = React.useState([]);
   const [_columns, _setColumns] = React.useState([]);

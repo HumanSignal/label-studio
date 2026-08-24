@@ -1,6 +1,6 @@
 import { ff } from "@humansignal/core";
 import { inject } from "mobx-react";
-import { destroy, getRoot, getType, types } from "mobx-state-tree";
+import { destroy, getRoot, getType, isAlive, types } from "mobx-state-tree";
 
 import ImageView from "../../../components/ImageView/ImageView";
 import { customTypes } from "../../../core/CustomTypes";
@@ -16,7 +16,7 @@ import { RectRegionModel } from "../../../regions/RectRegion";
 import * as Tools from "../../../tools";
 import ToolsManager from "../../../tools/Manager";
 import { parseValue } from "../../../utils/data";
-import { FF_DEV_3377, FF_DEV_3391, FF_LSDV_4583, FF_ZOOM_OPTIM, isFF } from "../../../utils/feature-flags";
+import { FF_DEV_3377, FF_DEV_3391, FF_LSDV_4583, isFF } from "../../../utils/feature-flags";
 import { guidGenerator } from "../../../utils/unique";
 import { clamp, isDefined } from "../../../utils/utilities";
 import ObjectBase from "../Base";
@@ -465,26 +465,24 @@ const Model = types
     get alignmentOffset() {
       const offset = { x: 0, y: 0 };
 
-      if (isFF(FF_ZOOM_OPTIM)) {
-        switch (self.horizontalalignment) {
-          case "center": {
-            offset.x = (self.containerWidth - self.canvasSize.width) / 2;
-            break;
-          }
-          case "right": {
-            offset.x = self.containerWidth - self.canvasSize.width;
-            break;
-          }
+      switch (self.horizontalalignment) {
+        case "center": {
+          offset.x = (self.containerWidth - self.canvasSize.width) / 2;
+          break;
         }
-        switch (self.verticalalignment) {
-          case "center": {
-            offset.y = (self.containerHeight - self.canvasSize.height) / 2;
-            break;
-          }
-          case "bottom": {
-            offset.y = self.containerHeight - self.canvasSize.height;
-            break;
-          }
+        case "right": {
+          offset.x = self.containerWidth - self.canvasSize.width;
+          break;
+        }
+      }
+      switch (self.verticalalignment) {
+        case "center": {
+          offset.y = (self.containerHeight - self.canvasSize.height) / 2;
+          break;
+        }
+        case "bottom": {
+          offset.y = self.containerHeight - self.canvasSize.height;
+          break;
         }
       }
       return offset;
@@ -577,7 +575,7 @@ const Model = types
       };
     },
   }))
-  .volatile((self) => ({
+  .volatile((_self) => ({
     manager: null,
   }))
   // actions for the tools
@@ -588,7 +586,13 @@ const Model = types
     function createImageEntities() {
       if (!self.store.task) return;
 
-      // Clear existing entities to prevent duplicates from React StrictMode double mounting
+      // Reset before clearing so the setCurrentImage(0) below cannot
+      // short-circuit on `index === self.currentImage` and skip preloading
+      // the freshly-recreated entities (TRIAG-2331). Also avoids briefly
+      // holding a reference to a node that's about to be destroyed.
+      self.currentImageEntity = null;
+      self.currentImage = undefined;
+
       self.imageEntities.clear();
 
       const parsedValue = self.multiImage ? self.parsedValueList : self.parsedValue;
@@ -654,24 +658,17 @@ const Model = types
     return {
       views: {
         getSkipInteractions() {
-          if (isFF(FF_ZOOM_OPTIM)) {
-            if (skipInteractions) return true;
+          if (skipInteractions) return true;
 
-            const isLinkingMode = self.annotation.isLinkingMode;
+          const isLinkingMode = self.annotation.isLinkingMode;
 
-            if (isLinkingMode) return false;
+          if (isLinkingMode) return false;
 
-            const manager = self.getToolsManager();
-            const tool = manager.findSelectedTool();
-            const canInteractWithRegions = tool?.canInteractWithRegions;
-
-            return !canInteractWithRegions;
-          }
           const manager = self.getToolsManager();
+          const tool = manager.findSelectedTool();
+          const canInteractWithRegions = tool?.canInteractWithRegions;
 
-          const isPanning = manager.findSelectedTool()?.toolName === "ZoomPanTool";
-
-          return skipInteractions || isPanning;
+          return !canInteractWithRegions;
         },
         get smoothingEnabled() {
           const names = self.annotation?.names;
@@ -784,7 +781,12 @@ const Model = types
 
     setCurrentImage(index = 0) {
       index = index ?? 0;
-      if (index === self.currentImage) return;
+      // Only short-circuit when the cached entity is still alive; otherwise
+      // a destroyed-then-recreated entity (e.g. multi-image re-init) would
+      // skip preloading (TRIAG-2331).
+      if (index === self.currentImage && self.currentImageEntity && isAlive(self.currentImageEntity)) {
+        return;
+      }
 
       self.currentImage = index;
       self.currentImageEntity = self.findImageEntity(index);
@@ -884,6 +886,10 @@ const Model = types
           naturalHeight: self.naturalHeight,
         });
       }
+
+      const currentTool = self.getToolsManager().findSelectedTool();
+
+      currentTool?.updateCursor?.();
     },
 
     setZoomPosition(x, y) {
@@ -1145,8 +1151,11 @@ const Model = types
 
       setTimeout(self.annotation.history.unfreeze, 0);
 
-      //sometimes when user zoomed in, annotation was creating a new history. This fix that in case the user has nothing in the history yet
-      if (_historyLength <= 1) {
+      // Sometimes when user zoomed in, annotation was creating a new history. Reinit collapses that
+      // only for unsaved annotations (no server pk). After submit, history legitimately has one baseline
+      // entry — reinit would cancel autosave / drafts and wipe undo needed for Update.
+      const shouldReinitHistoryAfterSizing = _historyLength <= 1 && self.annotation?.pk == null;
+      if (shouldReinitHistoryAfterSizing) {
         // Don't force unselection of regions during the updateObjects callback from history reinit
         setTimeout(() => self.annotation?.reinitHistory(false), 0);
       }

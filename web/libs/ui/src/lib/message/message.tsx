@@ -1,14 +1,8 @@
-import React, { type ReactNode, forwardRef, useMemo } from "react";
+import { CheckCircleIcon, IconClose, IconSpark, InfoIcon, WarningIcon, XCircleIcon, XIcon } from "@humansignal/icons";
+import React, { forwardRef, type ReactNode, useMemo } from "react";
 import { cn } from "../../utils/utils";
-import { Typography } from "../typography/typography";
 import { Button } from "../button/button";
-import {
-  IconInfoOutline,
-  IconWarning,
-  IconCheckCircleOutline,
-  IconCloseCircleOutline,
-  IconClose,
-} from "@humansignal/icons";
+import { Typography } from "../typography/typography";
 import styles from "./message.module.css";
 
 // Variant configuration
@@ -18,6 +12,13 @@ const variants = {
   negative: styles["variant-negative"],
   positive: styles["variant-positive"],
   warning: styles["variant-warning"],
+  enterprise: styles["variant-enterprise"],
+} as const;
+
+// Look configuration
+const looks = {
+  card: styles["look-card"],
+  ghost: styles["look-ghost"],
 } as const;
 
 // Size configuration
@@ -27,6 +28,7 @@ const sizes = {
 } as const;
 
 export type MessageVariant = keyof typeof variants | "info" | "success" | "error";
+export type MessageLook = keyof typeof looks;
 export type MessageSize = keyof typeof sizes;
 
 export interface MessageProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -37,6 +39,9 @@ export interface MessageProps extends React.HTMLAttributes<HTMLDivElement> {
    * - negative: Error/danger variant (red)
    * - positive: Success variant (green)
    * - warning: Warning/caution variant (orange/yellow)
+   * - enterprise: Exclusively for gated/enterprise-only feature callouts.
+   *               Uses the enterprise gradient palette (canteloupe → persimmon → plum)
+   *               and defaults to IconSpark. Do not use for general informational messages.
    *
    * Aliases for backward compatibility:
    * - info → primary
@@ -44,6 +49,13 @@ export interface MessageProps extends React.HTMLAttributes<HTMLDivElement> {
    * - success → positive
    */
   variant?: MessageVariant;
+
+  /**
+   * Visual look of the message
+   * - card: Default look with background, border and padding (default)
+   * - ghost: Minimal look without background, border or padding — just the icon and content
+   */
+  look?: MessageLook;
 
   /**
    * Size of the message
@@ -106,11 +118,12 @@ export interface MessageProps extends React.HTMLAttributes<HTMLDivElement> {
  * Message Component
  *
  * A reusable component for displaying inline messages, notifications, and alerts throughout the application.
- * Supports different variants and customizable content including icons, text, actions, and extra content.
+ * Supports different variants, looks, and customizable content including icons, text, actions, and extra content.
  *
  * Features:
- * - Five primary variants: primary, neutral, negative, positive, warning
+ * - Six primary variants: primary, neutral, negative, positive, warning, enterprise
  * - Backward compatibility aliases: info, success, error
+ * - Two looks: card (default with background/border) and ghost (minimal, no card wrapper)
  * - Optional closable functionality
  * - Flexible content areas for actions and extra elements
  * - Full accessibility support with ARIA attributes
@@ -124,14 +137,10 @@ export interface MessageProps extends React.HTMLAttributes<HTMLDivElement> {
  * ```
  *
  * @example
- * With title and actions:
+ * Ghost look (no card wrapper):
  * ```tsx
- * <Message
- *   variant="positive"
- *   title="Success"
- *   actions={<Button onClick={onContinue}>Continue</Button>}
- * >
- *   Your changes have been saved successfully.
+ * <Message variant="primary" look="ghost">
+ *   Inline informational text without a card background.
  * </Message>
  * ```
  *
@@ -153,6 +162,7 @@ export const Message = forwardRef<HTMLDivElement, MessageProps>(
   (
     {
       variant = "primary",
+      look = "card",
       size = "medium",
       icon,
       iconSize,
@@ -181,17 +191,19 @@ export const Message = forwardRef<HTMLDivElement, MessageProps>(
     const defaultIcon = useMemo(() => {
       switch (normalizedVariant) {
         case "primary":
-          return <IconInfoOutline />;
+          return <InfoIcon />;
         case "warning":
-          return <IconWarning />;
+          return <WarningIcon />;
         case "positive":
-          return <IconCheckCircleOutline />;
+          return <CheckCircleIcon />;
         case "negative":
-          return <IconCloseCircleOutline />;
+          return <XCircleIcon />;
         case "neutral":
-          return <IconInfoOutline />;
+          return <InfoIcon />;
+        case "enterprise":
+          return <IconSpark />;
         default:
-          return <IconInfoOutline />;
+          return <InfoIcon />;
       }
     }, [normalizedVariant]);
 
@@ -215,7 +227,7 @@ export const Message = forwardRef<HTMLDivElement, MessageProps>(
     return (
       <div
         ref={ref}
-        className={cn("message", styles.base, sizes[size], variants[normalizedVariant], className)}
+        className={cn("message", styles.base, sizes[size], variants[normalizedVariant], looks[look], className)}
         data-testid={testId}
         role="alert"
         aria-live="polite"
@@ -258,7 +270,7 @@ export const Message = forwardRef<HTMLDivElement, MessageProps>(
             tooltip="Dismiss"
             aria-label="Dismiss message"
             data-testid="message-dismiss-button"
-            leading={<IconClose />}
+            leading={<XIcon />}
           />
         )}
       </div>

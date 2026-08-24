@@ -15,13 +15,13 @@ class BaseUserSerializer(FlexFieldsModelSerializer):
     active_organization_meta = serializers.SerializerMethodField(read_only=True)
     last_activity = serializers.DateTimeField(read_only=True, source='last_activity_cached')
 
-    def get_avatar(self, instance):
+    def get_avatar(self, instance) -> str | None:
         return instance.avatar_url
 
-    def get_initials(self, instance):
+    def get_initials(self, instance) -> str:
         return instance.get_initials(self._is_deleted(instance))
 
-    def get_active_organization_meta(self, instance):
+    def get_active_organization_meta(self, instance) -> dict[str, str]:
         organization = instance.active_organization
         if organization is None:
             return {'title': '', 'email': ''}
@@ -35,29 +35,66 @@ class BaseUserSerializer(FlexFieldsModelSerializer):
         return {'title': title, 'email': email}
 
     def _is_deleted(self, instance):
-        if 'user' in self.context:
-            org_id = self.context['user'].active_organization_id
-        elif 'request' in self.context:
-            org_id = self.context['request'].user.active_organization_id
-        else:
-            org_id = None
+        if 'deleted_user_ids' in self.context:
+            return instance.id in self.context['deleted_user_ids']
+
+        org_id = None
+        project = self.context.get('project')
+        if project:
+            org_id = getattr(project, 'organization_id', None)
 
         if not org_id:
-            return False
+            organization = self.context.get('organization')
+            if organization:
+                org_id = getattr(organization, 'id', organization)
 
-        # Will use prefetched objects if available
-        organization_members = instance.om_through.all()
-        organization_member_for_user = next(
-            (
-                organization_member
-                for organization_member in organization_members
-                if organization_member.organization_id == org_id
-            ),
-            None,
-        )
-        if not organization_member_for_user:
-            return True
-        return bool(organization_member_for_user.deleted_at)
+        if not org_id:
+            org_id = self.context.get('organization_id')
+
+        if not org_id:
+            if 'user' in self.context:
+                org_id = getattr(self.context['user'], 'active_organization_id', None)
+            elif (
+                'request' in self.context and hasattr(self.context['request'], 'user') and self.context['request'].user
+            ):
+                org_id = getattr(self.context['request'].user, 'active_organization_id', None)
+
+        if not org_id:
+            if 'is_deleted_cache' not in self.context:
+                self.context['is_deleted_cache'] = {}
+            if instance.id in self.context['is_deleted_cache']:
+                return self.context['is_deleted_cache'][instance.id]
+
+            if 'om_through' in getattr(instance, '_prefetched_objects_cache', {}):
+                organization_members = list(instance.om_through.all())
+                is_del = bool(organization_members and all(om.deleted_at for om in organization_members))
+            else:
+                has_active = instance.om_through.filter(deleted_at__isnull=True).exists()
+                has_any = instance.om_through.exists()
+                is_del = has_any and not has_active
+
+            self.context['is_deleted_cache'][instance.id] = is_del
+            return is_del
+
+        cache_key = f'deleted_user_ids_{org_id}'
+        if cache_key not in self.context:
+            from organizations.models import OrganizationMember
+
+            deleted_ids = set(
+                OrganizationMember.objects.filter(organization_id=org_id, deleted_at__isnull=False).values_list(
+                    'user_id', flat=True
+                )
+            )
+            self.context[cache_key] = deleted_ids
+
+        return instance.id in self.context[cache_key]
+
+    def _get_requester(self):
+        """The user making the request (the viewer), from serializer context."""
+        if 'user' in self.context:
+            return self.context['user']
+        request = self.context.get('request')
+        return getattr(request, 'user', None) if request is not None else None
 
     def to_representation(self, instance):
         """Returns user with cache, this helps to avoid multiple s3/gcs links resolving for avatars"""
@@ -70,11 +107,34 @@ class BaseUserSerializer(FlexFieldsModelSerializer):
         if uid not in self.context[key]:
             self.context[key][uid] = super().to_representation(instance)
 
-        if self._is_deleted(instance):
-            for field in ['username', 'first_name', 'last_name', 'email']:
-                self.context[key][uid][field] = 'User' if field == 'last_name' else 'Deleted'
+        representation = self.context[key][uid]
+        is_modified = False
 
-        return self.context[key][uid]
+        if self._is_deleted(instance):
+            representation = dict(representation)
+            is_modified = True
+            for field in ['username', 'first_name', 'last_name', 'email']:
+                if field == 'last_name':
+                    representation[field] = f'User {uid}'
+                elif field == 'username':
+                    representation[field] = f'deleted-{uid}'
+                elif field == 'email':
+                    representation[field] = f'deleted-{uid}-user@example.com'
+                else:
+                    representation[field] = 'Deleted'
+
+        # Annotator/reviewer firewall: hide other users' identity entirely (id-less role stub)
+        requester = self._get_requester()
+        if AnnotatorReviewerFirewall.should_anonymize(user=instance, requester=requester):
+            representation = AnnotatorReviewerFirewall.anonymize_user_data(
+                representation, user=instance, requester=requester
+            )
+            is_modified = True
+
+        if is_modified:
+            self.context[key][uid] = representation
+
+        return representation
 
     class Meta:
         model = User
@@ -237,3 +297,39 @@ class HotkeysSerializer(serializers.Serializer):
 UserSerializer = load_func(settings.USER_SERIALIZER)
 WhoAmIUserSerializer = load_func(settings.WHOAMI_USER_SERIALIZER)
 UserSerializerUpdate = load_func(settings.USER_SERIALIZER_UPDATE)
+AnnotatorReviewerFirewall = load_func(settings.ANNOTATOR_REVIEWER_FIREWALL)
+
+
+class AnonymizedUserPrimaryKeyRelatedField(serializers.PrimaryKeyRelatedField):
+    """``PrimaryKeyRelatedField`` for a user FK (e.g. ``completed_by``/``updated_by``).
+
+    Serializes to the related user's pk, except when the annotator/reviewer firewall
+    hides that user from the requester -- then it returns a stable, role-keyed
+    *negative* id (the same value the user serializer puts on the hidden user object)
+    so the real, correlatable id never leaks while ``completed_by``/``updated_by`` stay
+    numeric and resolvable on the frontend. Write behaviour is inherited unchanged.
+
+    When the firewall is active we disable DRF's pk-only optimization so we receive the
+    full related user instance and can derive its role (and therefore its negative id).
+    When the firewall is inactive the optimization stays on and there is no extra query.
+    """
+
+    def _get_requester(self):
+        if 'user' in self.context:
+            return self.context['user']
+        request = self.context.get('request')
+        return getattr(request, 'user', None) if request is not None else None
+
+    def use_pk_only_optimization(self):
+        # Resolving the role-keyed id needs the user instance, not just its pk; only
+        # pay for loading it when the firewall is actually active for this requester.
+        return not AnnotatorReviewerFirewall.is_active(self._get_requester())
+
+    def to_representation(self, value):
+        requester = self._get_requester()
+        if AnnotatorReviewerFirewall.is_active(requester):
+            # pk-only optimization is off, so ``value`` is the full related user.
+            if AnnotatorReviewerFirewall.should_anonymize(user=value, requester=requester):
+                return AnnotatorReviewerFirewall.anonymized_user_id(user=value, requester=requester)
+            return value.pk
+        return super().to_representation(value)

@@ -1,4 +1,4 @@
-import { resolveFilterTransition } from "./filter_snapshot_utils";
+import { recoverReviewIndicatorSnapshot, resolveFilterTransition } from "./filter_snapshot_utils";
 
 /*
  * Operator definitions per filter type, mirroring the real exports from
@@ -69,6 +69,7 @@ const REPRESENTATIVE_VALUES = {
 const SCHEMA_BOUND_TYPES = new Set(["List", "TaskState"]);
 
 const MOCK_SCHEMA = { items: [{ value: 1, title: "option1" }] };
+const RANGE_OPERATOR_KEYS = new Set(["in", "not_in"]);
 
 describe("resolveFilterTransition — full type×type matrix", () => {
   const operatorKeys = (type) => OPERATORS[type].map((op) => op.key);
@@ -146,7 +147,7 @@ describe("resolveFilterTransition — full type×type matrix", () => {
             expect(result.valueReset).toBe(true);
             expect(result.value).toBeUndefined();
 
-            if (sharedOp) {
+            if (sharedOp && !RANGE_OPERATOR_KEYS.has(fromOp.key)) {
               expect(result.operator).toBe(fromOp.key);
             } else {
               expect(result.operator).toBe(toOps[0].key);
@@ -348,6 +349,21 @@ describe("resolveFilterTransition — full type×type matrix", () => {
       expect(result.value).toBeUndefined();
     });
 
+    it("List → List without static schema (UserSelect annotators): resets stale values", () => {
+      const result = resolveFilterTransition({
+        prevType: "List",
+        prevOperator: "contains",
+        prevValue: ["gpt-4"],
+        newType: "List",
+        newOperators: OPERATORS.List,
+        newSchema: null,
+      });
+
+      expect(result.operator).toBe("contains");
+      expect(result.valueReset).toBe(true);
+      expect(result.value).toBeUndefined();
+    });
+
     it("String(no schema) → List(schema): different type + schema → value reset", () => {
       const result = resolveFilterTransition({
         prevType: "String",
@@ -388,6 +404,105 @@ describe("resolveFilterTransition — full type×type matrix", () => {
       expect(result.operator).toBe("contains");
       expect(result.value).toBe("hello");
       expect(result.valueReset).toBe(false);
+    });
+
+    it("FIT-2275 gap 1: Number→Number different column id resets stale value", () => {
+      const result = resolveFilterTransition({
+        prevType: "Number",
+        prevOperator: "greater",
+        prevValue: 10,
+        newType: "Number",
+        newOperators: OPERATORS.Number,
+        prevColumnId: "filter:tasks:total_annotations",
+        newColumnId: "filter:tasks:id",
+      });
+
+      expect(result.operator).toBe("greater");
+      expect(result.valueReset).toBe(true);
+      expect(result.value).toBeUndefined();
+    });
+
+    it("FIT-2275 gap 1: same column id still preserves value for schemaless Number", () => {
+      const result = resolveFilterTransition({
+        prevType: "Number",
+        prevOperator: "greater",
+        prevValue: 10,
+        newType: "Number",
+        newOperators: OPERATORS.Number,
+        prevColumnId: "filter:tasks:id",
+        newColumnId: "filter:tasks:id",
+      });
+
+      expect(result.value).toBe(10);
+      expect(result.valueReset).toBe(false);
+    });
+  });
+
+  describe("FIT-2604 — stale between-operator on column switch / hydration", () => {
+    const reviewsAcceptedId = "filter:annotations:reviews_accepted";
+    const reviewsRejectedId = "filter:annotations:reviews_rejected";
+
+    it("Date(is between) → reviews_accepted resets to equal", () => {
+      const result = resolveFilterTransition({
+        prevType: "Date",
+        prevOperator: "in",
+        prevValue: { min: "2026-01-01", max: "2026-03-01" },
+        newType: "Number",
+        newOperators: OPERATORS.Number,
+        prevColumnId: "filter:annotations:commented_at",
+        newColumnId: reviewsAcceptedId,
+      });
+
+      expect(result.operator).toBe("equal");
+      expect(result.valueReset).toBe(true);
+    });
+
+    it("Number(is between) → different Number column resets to equal", () => {
+      const result = resolveFilterTransition({
+        prevType: "Number",
+        prevOperator: "in",
+        prevValue: { min: 1, max: 5 },
+        newType: "Number",
+        newOperators: OPERATORS.Number,
+        prevColumnId: "filter:annotations:comment_count",
+        newColumnId: reviewsRejectedId,
+      });
+
+      expect(result.operator).toBe("equal");
+      expect(result.valueReset).toBe(true);
+    });
+
+    it("keeps valid top-level reviews_accepted between range on load", () => {
+      const snapshot = recoverReviewIndicatorSnapshot({
+        filter: reviewsAcceptedId,
+        operator: "in",
+        value: { min: 1, max: 3 },
+      });
+
+      expect(snapshot.operator).toBe("in");
+      expect(snapshot.value).toEqual({ min: 1, max: 3 });
+    });
+
+    it("coerces broken reviews_accepted between snapshot (scalar value)", () => {
+      const snapshot = recoverReviewIndicatorSnapshot({
+        filter: reviewsAcceptedId,
+        operator: "in",
+        value: false,
+      });
+
+      expect(snapshot.operator).toBe("equal");
+      expect(snapshot.value).toBe(false);
+    });
+
+    it("coerces broken reviews_rejected between snapshot (empty range)", () => {
+      const snapshot = recoverReviewIndicatorSnapshot({
+        filter: reviewsRejectedId,
+        operator: "in",
+        value: {},
+      });
+
+      expect(snapshot.operator).toBe("equal");
+      expect(snapshot.value).toBe(false);
     });
   });
 });

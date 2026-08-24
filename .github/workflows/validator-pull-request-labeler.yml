@@ -21,13 +21,12 @@ env:
 jobs:
   autolabel:
     name: "PR label validator"
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
+    timeout-minutes: 5
     permissions:
+      contents: read
       pull-requests: write
     steps:
-
-      - uses: hmarr/debug-action@v3.0.0
-
       - name: "Validate PR's title"
         uses: thehanimo/pr-title-checker@v1.4.3
         with:
@@ -36,9 +35,6 @@ jobs:
           configuration_path: ".github/pr-title-checker-config.json"
 
       - name: "Set PR's label based on title"
-        uses: release-drafter/release-drafter@v6.4.0
+        uses: release-drafter/release-drafter/autolabeler@v7.7.0
         with:
-          disable-releaser: true
           config-name: autolabeler.yml
-        env:
-          GITHUB_TOKEN: ${{ github.token }}

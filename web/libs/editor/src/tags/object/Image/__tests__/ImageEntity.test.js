@@ -2,34 +2,33 @@
  * Unit tests for ImageEntity (tags/object/Image/ImageEntity.js)
  */
 import { types } from "mobx-state-tree";
-import { ImageEntity } from "../ImageEntity";
 import { ImageEntityMixin } from "../ImageEntityMixin";
 import { imageCache } from "@humansignal/core";
 
-jest.mock("@humansignal/core", () => ({
-  imageCache: {
-    get: jest.fn(),
-    addRef: jest.fn(),
-    releaseRef: jest.fn(),
-    forceRemove: jest.fn(),
-    load: jest.fn(),
-    isLoading: jest.fn(),
-    getPendingLoad: jest.fn(),
-  },
-}));
-
-jest.mock("../../../../utils/feature-flags", () => ({
-  FF_IMAGE_MEMORY_USAGE: "fflag_image_memory_usage",
-  isFF: jest.fn(() => false),
-}));
-
-jest.mock("../../../../utils/FileLoader", () => {
+mockModule("@humansignal/core", () => {
+  const actual = requireActual("@humansignal/core");
   return {
-    FileLoader: jest.fn().mockImplementation(() => ({
-      download: jest.fn(),
-      isError: jest.fn(() => false),
-      isPreloaded: jest.fn(() => false),
-      getPreloadedURL: jest.fn(),
+    ...actual,
+    imageCache: {
+      ...(actual.imageCache ?? {}),
+      get: mock(),
+      addRef: mock(),
+      releaseRef: mock(),
+      forceRemove: mock(),
+      load: mock(),
+      isLoading: mock(),
+      getPendingLoad: mock(),
+    },
+  };
+});
+
+mockModule("../../../../utils/FileLoader", () => {
+  return {
+    FileLoader: mock().mockImplementation(() => ({
+      download: mock(),
+      isError: mock(() => false),
+      isPreloaded: mock(() => false),
+      getPreloadedURL: mock(),
     })),
   };
 });
@@ -71,7 +70,7 @@ function createEntityWithParent(imageCrossOrigin = "anonymous") {
 
 describe("ImageEntity", () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    clearAllMocks();
   });
 
   describe("views", () => {
@@ -236,6 +235,37 @@ describe("ImageEntity", () => {
       expect(entity._retryAttempted).toBe(true);
       resolveLoad({ blobUrl: "blob:retry" });
       await loadPromise;
+    });
+  });
+
+  describe("dead node safety (Sentry: async after destroy)", () => {
+    it("does not throw when imageCache.load resolves after entity is destroyed", async () => {
+      imageCache.get.mockReturnValue(null);
+      imageCache.isLoading.mockReturnValue(false);
+      let resolveLoad;
+      const loadPromise = new Promise((resolve) => {
+        resolveLoad = resolve;
+      });
+      imageCache.load.mockReturnValue(loadPromise);
+
+      const RootWithChild = types.model({ child: types.maybe(ModelWithMixin) }).actions((self) => ({
+        clearChild() {
+          self.child = undefined;
+        },
+      }));
+
+      const root = RootWithChild.create({
+        child: {
+          imageEntities: [{ id: "img-1", src: "https://example.com/1.jpg", index: 0 }],
+          currentImageEntity: null,
+        },
+      });
+      const entity = root.child.imageEntities[0];
+      entity.preload();
+      root.clearChild();
+      resolveLoad({ blobUrl: "blob:late" });
+      await loadPromise;
+      await Promise.resolve();
     });
   });
 

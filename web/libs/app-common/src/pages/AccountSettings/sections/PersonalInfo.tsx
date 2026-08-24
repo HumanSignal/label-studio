@@ -1,7 +1,9 @@
 import { type FormEventHandler, useCallback, useEffect, useRef, useState } from "react";
-import clsx from "clsx";
-import { Button, InputFile, ToastType, useToast, Userpic } from "@humansignal/ui";
+import { format } from "date-fns";
+import { Badge, Button, InputFile, ToastType, Typography, useToast, Userpic } from "@humansignal/ui";
 import { getApiInstance } from "@humansignal/core";
+import { useAccountSettingsExtension } from "../extensions";
+import { useReportProfileDirty } from "../ProfileDirtyContext";
 import styles from "../AccountSettings.module.css";
 import { useAuth } from "@humansignal/core/providers/AuthProvider";
 import { atomWithMutation } from "jotai-tanstack-query";
@@ -12,6 +14,32 @@ import { useAtomValue } from "jotai";
  * each one of these eventually has to be migrated to core or ui
  */
 import { Input } from "apps/labelstudio/src/components/Form/Elements";
+
+const PROVIDER_DISPLAY_NAMES: Record<string, string> = {
+  google: "Google",
+  github: "GitHub",
+};
+
+const isRequiredProfileValueMissing = (isRequired: boolean, value: string) => isRequired && value.trim().length === 0;
+
+const RequiredFieldLabel = ({ label }: { label: string }) => (
+  <span className={styles.requiredLabel}>
+    <span>{label}</span>
+    <Badge variant="neutral" look="outline" shape="square" size="small">
+      Required
+    </Badge>
+  </span>
+);
+
+const RequiredFieldError = ({ id, label }: { id: string; label: string }) => (
+  <span id={id} className="text-negative-content" role="alert">
+    {label} is required.
+  </span>
+);
+
+function formatProvider(provider: string): string {
+  return PROVIDER_DISPLAY_NAMES[provider] ?? provider.charAt(0).toUpperCase() + provider.slice(1);
+}
 
 const updateUserAvatarAtom = atomWithMutation(() => ({
   mutationKey: ["update-user"],
@@ -47,6 +75,24 @@ export const PersonalInfo = () => {
   const [fname, setFname] = useState(user?.first_name ?? "");
   const [lname, setLname] = useState(user?.last_name ?? "");
   const [phone, setPhone] = useState(user?.phone ?? "");
+  // Required-field errors only surface after the user attempts to Save with missing fields.
+  const [hasAttemptedSave, setHasAttemptedSave] = useState(false);
+  // Report unsaved changes to the page-level guard (avatar saves immediately, so it's excluded).
+  const isDirty =
+    fname !== (user?.first_name ?? "") || lname !== (user?.last_name ?? "") || phone !== (user?.phone ?? "");
+  const discardChanges = useCallback(() => {
+    setFname(user?.first_name ?? "");
+    setLname(user?.last_name ?? "");
+    setPhone(user?.phone ?? "");
+    setHasAttemptedSave(false);
+  }, [user?.first_name, user?.last_name, user?.phone]);
+  useReportProfileDirty(isDirty, discardChanges);
+  const { requiredProfileFields = [] } = useAccountSettingsExtension();
+  const isFieldRequired = (key: string) => requiredProfileFields.includes(key);
+  const isFirstNameMissing = hasAttemptedSave && isRequiredProfileValueMissing(isFieldRequired("first_name"), fname);
+  const isLastNameMissing = hasAttemptedSave && isRequiredProfileValueMissing(isFieldRequired("last_name"), lname);
+  const isPhoneMissing = hasAttemptedSave && isRequiredProfileValueMissing(isFieldRequired("phone"), phone);
+  const canDeleteAvatar = Boolean(user?.avatar);
   const avatarRef = useRef<HTMLInputElement>();
   const fileChangeHandler: FormEventHandler<HTMLInputElement> = useCallback(
     async (e) => {
@@ -80,8 +126,22 @@ export const PersonalInfo = () => {
     async (e) => {
       e.preventDefault();
       if (!user) return;
-      const body = new FormData(e.currentTarget as HTMLFormElement);
-      const json = Object.fromEntries(body.entries());
+      const json = {
+        first_name: fname,
+        last_name: lname,
+        phone,
+      };
+
+      const missingFields = requiredProfileFields.filter((key) => {
+        const value = (json as Record<string, unknown>)[key];
+        return typeof value !== "string" || value.trim().length === 0;
+      });
+
+      if (missingFields.length > 0) {
+        setHasAttemptedSave(true);
+        return;
+      }
+
       const response = await updateUser(json);
 
       refetchUser();
@@ -89,7 +149,7 @@ export const PersonalInfo = () => {
         toast?.show({ message: response?.response?.detail ?? "Error updating user", type: ToastType.error });
       }
     },
-    [user?.id],
+    [fname, lname, phone, user?.id, requiredProfileFields, updateUser, refetchUser, toast],
   );
 
   useEffect(() => {
@@ -105,57 +165,80 @@ export const PersonalInfo = () => {
   return (
     <div className={styles.section} id="personal-info">
       <div className={styles.sectionContent}>
-        <div className={styles.flexRow}>
-          <Userpic user={user} isInProgress={userInProgress} size={92} style={{ flex: "none" }} />
-          <form className={styles.flex1}>
+        <div className={styles.profilePhotoRow}>
+          <Userpic user={user} isInProgress={userInProgress} size={88} className={styles.userPic} />
+          <div className={`${styles.sectionContent} ${styles.profilePhotoControls}`}>
+            <Typography className={styles.profilePhotoLabel} variant="label" size="medium">
+              Profile Photo
+            </Typography>
             <InputFile
+              className={styles.profilePhotoUpload}
               name="avatar"
               onChange={fileChangeHandler}
               accept="image/png, image/jpeg, image/jpg"
               ref={avatarRef}
             />
-          </form>
-          {user?.avatar && (
-            <Button type="submit" variant="negative" look="outlined" size="medium" onClick={deleteUserAvatar}>
-              Delete
+          </div>
+          {canDeleteAvatar && (
+            <Button
+              className={styles.profilePhotoDelete}
+              type="submit"
+              variant="negative"
+              look="outlined"
+              size="medium"
+              onClick={deleteUserAvatar}
+            >
+              Delete Photo
             </Button>
           )}
         </div>
         <form onSubmit={userFormSubmitHandler} className={styles.sectionContent}>
-          <div className={styles.flexRow}>
-            <div className={styles.flex1}>
-              <Input
-                label="First Name"
-                value={fname}
-                onChange={(e: React.KeyboardEvent<HTMLInputElement>) => setFname(e.currentTarget.value)}
-                name="first_name"
-              />
-            </div>
-            <div className={styles.flex1}>
-              <Input
-                label="Last Name"
-                value={lname}
-                onChange={(e: React.KeyboardEvent<HTMLInputElement>) => setLname(e.currentTarget.value)}
-                name="last_name"
-              />
-            </div>
+          <div className={styles.formGrid}>
+            <Input
+              label={isFieldRequired("first_name") ? <RequiredFieldLabel label="First Name" /> : "First Name"}
+              value={fname}
+              onChange={(e: React.KeyboardEvent<HTMLInputElement>) => setFname(e.currentTarget.value)}
+              name="first_name"
+              aria-required={isFieldRequired("first_name")}
+              aria-invalid={isFirstNameMissing || undefined}
+              aria-describedby={isFirstNameMissing ? "first-name-error" : undefined}
+              footer={isFirstNameMissing ? <RequiredFieldError id="first-name-error" label="First Name" /> : undefined}
+            />
+            <Input
+              label={isFieldRequired("last_name") ? <RequiredFieldLabel label="Last Name" /> : "Last Name"}
+              value={lname}
+              onChange={(e: React.KeyboardEvent<HTMLInputElement>) => setLname(e.currentTarget.value)}
+              name="last_name"
+              aria-required={isFieldRequired("last_name")}
+              aria-invalid={isLastNameMissing || undefined}
+              aria-describedby={isLastNameMissing ? "last-name-error" : undefined}
+              footer={isLastNameMissing ? <RequiredFieldError id="last-name-error" label="Last Name" /> : undefined}
+            />
+            <Input label="E-mail" type="email" readOnly={true} value={user?.email ?? ""} />
+            <Input
+              label={isFieldRequired("phone") ? <RequiredFieldLabel label="Phone" /> : "Phone"}
+              type="phone"
+              onChange={(e: React.KeyboardEvent<HTMLInputElement>) => setPhone(e.currentTarget.value)}
+              value={phone}
+              name="phone"
+              aria-required={isFieldRequired("phone")}
+              aria-invalid={isPhoneMissing || undefined}
+              aria-describedby={isPhoneMissing ? "phone-error" : undefined}
+              footer={isPhoneMissing ? <RequiredFieldError id="phone-error" label="Phone" /> : undefined}
+            />
+            {user?.social_accounts?.map((account) => (
+              <div className={`${styles.formGrid} ${styles.fullWidth}`} key={account.provider}>
+                <Input label="Connected Account" readOnly={true} value={formatProvider(account.provider)} />
+                <Input
+                  label="Connected Since"
+                  readOnly={true}
+                  value={format(new Date(account.date_joined), "dd MMM yyyy")}
+                />
+              </div>
+            ))}
           </div>
-          <div className={styles.flexRow}>
-            <div className={styles.flex1}>
-              <Input label="E-mail" type="email" readOnly={true} value={user?.email ?? ""} />
-            </div>
-            <div className={styles.flex1}>
-              <Input
-                label="Phone"
-                type="phone"
-                onChange={(e: React.KeyboardEvent<HTMLInputElement>) => setPhone(e.currentTarget.value)}
-                value={phone}
-                name="phone"
-              />
-            </div>
-          </div>
-          <div className={clsx(styles.flexRow, styles.flexEnd)}>
-            <Button style={{ width: 125 }} waiting={isInProgress}>
+          <div className={styles.formActions}>
+            <Button className="w-[120px]" waiting={isInProgress}>
               Save
             </Button>
           </div>

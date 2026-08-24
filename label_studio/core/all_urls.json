@@ -336,6 +336,12 @@
         "decorators": ""
     },
     {
+        "url": "/api/dm/projects/<int:pk>/user-options/",
+        "module": "data_manager.api.ProjectUsersOptionsAPI",
+        "name": "data_manager:dm-project-user-options",
+        "decorators": ""
+    },
+    {
         "url": "/api/dm/project/",
         "module": "data_manager.api.ProjectStateAPI",
         "name": "data_manager:dm-project",
@@ -573,6 +579,12 @@
         "url": "/api/tasks/<int:pk>/agreement/",
         "module": "tasks.api.TaskAgreementAPI",
         "name": "tasks:api:task-agreement",
+        "decorators": ""
+    },
+    {
+        "url": "/api/tasks/<int:pk>/summary/",
+        "module": "tasks.api.TaskSummaryAPI",
+        "name": "tasks:api:task-summary",
         "decorators": ""
     },
     {
@@ -1008,6 +1020,18 @@
         "decorators": ""
     },
     {
+        "url": "/api/react-code/token/",
+        "module": "io_storages.react_code_proxy.ReactCodeTokenView",
+        "name": "storages:react-code-token",
+        "decorators": ""
+    },
+    {
+        "url": "/api/react-code/resolve/<str:token>/",
+        "module": "io_storages.react_code_proxy.ReactCodeResolveView",
+        "name": "storages:react-code-resolve",
+        "decorators": ""
+    },
+    {
         "url": "/api/ml/",
         "module": "ml.api.MLBackendListAPI",
         "name": "ml:api:ml-list",
@@ -1260,7 +1284,7 @@
         "decorators": ""
     },
     {
-        "url": "/admin/r/<int:content_type_id>/<path:object_id>/",
+        "url": "/admin/r/<path:content_type_id>/<path:object_id>/",
         "module": "django.contrib.contenttypes.views.shortcut",
         "name": "admin:view_on_site",
         "decorators": ""

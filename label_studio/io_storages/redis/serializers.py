@@ -3,13 +3,12 @@
 import os
 
 from io_storages.redis.models import RedisExportStorage, RedisImportStorage
-from io_storages.serializers import ExportStorageSerializer, ImportStorageSerializer
-from rest_framework import serializers
+from io_storages.serializers import ExportStorageSerializer, ImportStorageSerializer, StorageTypeField
 from rest_framework.exceptions import ValidationError
 
 
 class RedisImportStorageSerializer(ImportStorageSerializer):
-    type = serializers.ReadOnlyField(default=os.path.basename(os.path.dirname(__file__)))
+    type = StorageTypeField(default=os.path.basename(os.path.dirname(__file__)))
 
     class Meta:
         model = RedisImportStorage
@@ -32,7 +31,7 @@ class RedisImportStorageSerializer(ImportStorageSerializer):
 
 
 class RedisExportStorageSerializer(ExportStorageSerializer):
-    type = serializers.ReadOnlyField(default=os.path.basename(os.path.dirname(__file__)))
+    type = StorageTypeField(default=os.path.basename(os.path.dirname(__file__)))
 
     def to_representation(self, instance):
         result = super().to_representation(instance)

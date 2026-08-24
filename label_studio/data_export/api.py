@@ -10,7 +10,6 @@ from core.feature_flags import flag_set
 from core.permissions import all_permissions
 from core.redis import start_job_async_or_sync
 from core.utils.common import batch
-from core.utils.exceptions import extract_message
 from django.conf import settings
 from django.core.files import File
 from django.core.files.storage import FileSystemStorage
@@ -47,7 +46,7 @@ logger = logging.getLogger(__name__)
         summary='[Deprecated] Get export formats',
         description="""
         This endpoint is deprecated in Enterprise. Use the async export API instead:
-        POST /api/projects/{{id}}/exports/ (see [Create new export](/api#operation/api_projects_exports_create)).
+        POST /api/projects/{{id}}/exports/ (see [Create new export](api:POST/api/projects/{id}/exports/)).
 
         In Label Studio Enterprise, this endpoint will always return a 404 Not Found response with instructions to use the async export API.
 
@@ -130,7 +129,7 @@ class ExportFormatsListAPI(generics.RetrieveAPIView):
         summary='[Deprecated] Easy export of tasks and annotations',
         description="""
         This endpoint is deprecated in Enterprise. Use the async export API instead:
-        POST /api/projects/{{id}}/exports/ (see [Create new export](/api#operation/api_projects_exports_create)).
+        POST /api/projects/{{id}}/exports/ (see [Create new export](api:POST/api/projects/{{id}}/exports/)).
 
         In Label Studio Enterprise, this endpoint will always return a 404 Not Found response with instructions to use the async export API.
 
@@ -463,23 +462,6 @@ class ExportDetailAPI(generics.RetrieveDestroyAPIView):
     permission_required = all_permissions.projects_change
 
     def delete(self, *args, **kwargs):
-        if flag_set('ff_back_dev_4664_remove_storage_file_on_export_delete_29032023_short'):
-            try:
-                export = self.get_object()
-                export.file.delete()
-
-                for converted_format in export.converted_formats.all():
-                    if converted_format.file:
-                        converted_format.file.delete()
-            except Exception as e:
-                return Response(
-                    status=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                    data={
-                        'detail': 'Could not delete file from storage. Check that your user has permissions to delete files: %s'
-                        % extract_message(e)
-                    },
-                )
-
         return super().delete(*args, **kwargs)
 
     def _get_project(self):
@@ -505,8 +487,8 @@ class ExportDetailAPI(generics.RetrieveDestroyAPIView):
         parameter in the path and the ID of the export file you want to download using the `export_pk` parameter
         in the path.
 
-        Get the `export_pk` from the response of the request to [Create new export](/api#operation/api_projects_exports_create)
-        or after [listing export files](/api#operation/api_projects_exports_list).
+        Get the `export_pk` from the response of the request to [Create new export](api:POST/api/projects/{id}/exports/)
+        or after [listing export files](api:GET/api/projects/{id}/exports/).
         """,
         parameters=[
             OpenApiParameter(
@@ -583,6 +565,7 @@ class ExportDownloadAPI(generics.RetrieveAPIView):
             else:
                 url = file.storage.url(file.name, storage_url=True)
             protocol = urlparse(url).scheme
+            download_name = snapshot.get_download_filename(file.name)
 
             # NGINX downloads are a solid way to make uwsgi workers free
             if settings.USE_NGINX_FOR_EXPORT_DOWNLOADS:
@@ -591,16 +574,16 @@ class ExportDownloadAPI(generics.RetrieveAPIView):
                 # below header tells NGINX to catch it and serve, see docker-config/nginx-app.conf
                 redirect = '/file_download/' + protocol + '/' + url.replace(protocol + '://', '')
                 response['X-Accel-Redirect'] = redirect
-                response['Content-Disposition'] = 'attachment; filename="{}"'.format(file.name)
-                response['filename'] = os.path.basename(file.name)
+                response['Content-Disposition'] = f'attachment; filename="{download_name}"'
+                response['filename'] = download_name
                 return response
 
             # No NGINX: standard way for export downloads in the community edition
             else:
                 ext = file.name.split('.')[-1]
                 response = RangedFileResponse(request, file, content_type=f'application/{ext}')
-                response['Content-Disposition'] = f'attachment; filename="{file.name}"'
-                response['filename'] = os.path.basename(file.name)
+                response['Content-Disposition'] = f'attachment; filename="{download_name}"'
+                response['filename'] = download_name
                 return response
         else:
             if export_type is None:
@@ -612,10 +595,11 @@ class ExportDownloadAPI(generics.RetrieveAPIView):
                 return HttpResponse("Can't get file", status=404)
 
             ext = file_.name.split('.')[-1]
+            download_name = snapshot.get_download_filename(file_.name)
 
             response = RangedFileResponse(request, file_, content_type=f'application/{ext}')
-            response['Content-Disposition'] = f'attachment; filename="{file_.name}"'
-            response['filename'] = file_.name
+            response['Content-Disposition'] = f'attachment; filename="{download_name}"'
+            response['filename'] = download_name
             return response
 
 
@@ -655,8 +639,7 @@ def set_convert_background_failure(job, connection, type, value, traceback_obj):
     try:
         trace = ''.join(tb.format_exception(type, value, traceback_obj))
     except Exception as e:
-        if flag_set('fflag_fix_back_leap_1818_set_convert_background_failure_logging_02062025_short'):
-            logger.error(f'Failed to format traceback: {job=} {type=} {value=} {traceback_obj=} {e=}', exc_info=True)
+        logger.error(f'Failed to format traceback: {job=} {type=} {value=} {traceback_obj=} {e=}', exc_info=True)
         trace = 'Exception while processing traceback. See stderr for details'
     ConvertedFormat.objects.filter(id=convert_id).update(status=Export.Status.FAILED, traceback=trace)
 

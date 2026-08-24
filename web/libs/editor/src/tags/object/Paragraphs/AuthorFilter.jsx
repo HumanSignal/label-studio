@@ -22,7 +22,7 @@ const AuthorTag = ({ name, selected }) => {
   );
 };
 
-const renderMultipleSelected = (selected) => {
+const _renderMultipleSelected = (selected) => {
   if (selected.length === 0) return null;
 
   return (

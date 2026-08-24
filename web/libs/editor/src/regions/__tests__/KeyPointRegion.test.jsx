@@ -7,11 +7,11 @@ import { applySnapshot, getSnapshot, getRoot, types } from "mobx-state-tree";
 // Avoid pulling in full Image tag (circular deps / heavy union) in unit tests.
 // AreaMixin makes region.parent === region.object (the image), so image must provide createSerializedResult,
 // internalToCanvasX/Y and canvasToInternalX/Y for region canvas getters and setPosition.
-jest.mock("../../tags/object/Image", () => {
+mockModule("../../tags/object/Image", () => {
   const { types } = require("mobx-state-tree");
   return {
-    ImageModel: types.model("ImageModel", { id: types.identifier }).actions((self) => ({
-      createSerializedResult(region, value) {
+    ImageModel: types.model("ImageModel", { id: types.identifier }).actions((_self) => ({
+      createSerializedResult(_region, value) {
         return {
           value: { ...value },
           original_width: 100,
@@ -65,8 +65,8 @@ const TestRoot = types
     }),
   })
   .volatile(() => ({ _testControl: null }))
-  .actions((self) => ({
-    createSerializedResult(region, value) {
+  .actions((_self) => ({
+    createSerializedResult(_region, value) {
       return {
         value: { ...value },
         original_width: 100,
@@ -165,7 +165,7 @@ describe("KeyPointRegion", () => {
         })
         .volatile(() => ({ _testControl: null }))
         .actions((self) => ({
-          createSerializedResult(region, value) {
+          createSerializedResult(_region, value) {
             return {
               value: { ...value },
               original_width: 100,

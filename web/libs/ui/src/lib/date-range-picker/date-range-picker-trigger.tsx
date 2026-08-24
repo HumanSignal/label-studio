@@ -1,10 +1,10 @@
-import type { ReactNode, ComponentPropsWithoutRef } from "react";
+import { CalendarBlankIcon } from "@humansignal/icons";
+import type { ComponentPropsWithoutRef, ReactNode } from "react";
+import { cnm } from "../../utils/utils";
 import { DropdownTrigger } from "../dropdown/dropdown-trigger";
 import { Typography } from "../typography/typography";
-import { IconCalendar } from "@humansignal/icons";
 import type { DateOrDateTimeRange } from "./date-utils";
 import { formatDateString } from "./date-utils";
-import { cnm } from "../../utils/utils";
 
 type DateRangePickerTriggerProps = {
   /**
@@ -21,7 +21,11 @@ type DateRangePickerTriggerProps = {
    * If not provided, uses default formatting.
    */
   formatLabel?: (dates: { fromString: string; toString: string } | null) => ReactNode;
-} & Omit<ComponentPropsWithoutRef<typeof DropdownTrigger>, "children" | "content">;
+  /**
+   * Optional class name applied to the clickable trigger surface.
+   */
+  className?: string;
+} & Omit<ComponentPropsWithoutRef<typeof DropdownTrigger>, "children" | "content" | "className">;
 
 const dateStrings = (dateRange: DateOrDateTimeRange | null): { fromString: string; toString: string } | null => {
   if (!dateRange) {
@@ -67,6 +71,7 @@ export const DateRangePickerTrigger = ({
   disabled,
   dataTestId,
   inline = false,
+  className,
   ...dropdownTriggerProps
 }: DateRangePickerTriggerProps) => {
   const appliedDatesString = dateStrings(selected);
@@ -95,14 +100,15 @@ export const DateRangePickerTrigger = ({
     <DropdownTrigger {...dropdownTriggerProps} disabled={disabled} content={children} inline={inline}>
       <div
         className={cnm(
-          "flex items-center gap-tight py-tight px-base h-10 border border-neutral-border rounded-smaller cursor-pointer",
+          "flex items-center gap-tight py-tight pl-base pr-tight h-10 border border-neutral-border rounded-smaller cursor-pointer",
           "hover:border-neutral-border-bold",
           disabled && "opacity-50 cursor-not-allowed",
+          className,
         )}
         data-testid={dataTestId}
       >
         {label}
-        <IconCalendar height={18} width={18} className="text-neutral-content-subtlest shrink-0" />
+        <CalendarBlankIcon size={24} className="text-neutral-content-subtlest shrink-0" />
       </div>
     </DropdownTrigger>
   );

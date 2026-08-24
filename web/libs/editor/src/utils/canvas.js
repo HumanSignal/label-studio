@@ -534,7 +534,7 @@ const trim = (canvas) => {
     copy.canvas.width = width;
     copy.canvas.height = height;
     copy.putImageData(trimmed, 0, 0);
-  } catch (err) {
+  } catch (_err) {
     /* Gotcha! */
   }
 

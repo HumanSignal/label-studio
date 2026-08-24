@@ -5,8 +5,10 @@ import os
 
 from botocore.exceptions import ClientError, ParamValidationError
 from botocore.handlers import validate_bucket_name
+from core.utils.io import validate_url_for_ssrf
+from django.conf import settings
 from io_storages.s3.models import S3ExportStorage, S3ImportStorage
-from io_storages.serializers import ExportStorageSerializer, ImportStorageSerializer
+from io_storages.serializers import ExportStorageSerializer, ImportStorageSerializer, StorageTypeField
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
@@ -74,8 +76,13 @@ class S3StorageSerializerMixin:
 
 
 class S3ImportStorageSerializer(S3StorageSerializerMixin, ImportStorageSerializer):
-    type = serializers.ReadOnlyField(default=os.path.basename(os.path.dirname(__file__)))
+    type = StorageTypeField(default=os.path.basename(os.path.dirname(__file__)))
     presign = serializers.BooleanField(required=False, default=True)
+
+    def validate_s3_endpoint(self, value):
+        if value and settings.SSRF_PROTECTION_ENABLED:
+            validate_url_for_ssrf(value, block_local_urls=True)
+        return value
 
     class Meta:
         model = S3ImportStorage
@@ -83,7 +90,7 @@ class S3ImportStorageSerializer(S3StorageSerializerMixin, ImportStorageSerialize
 
 
 class S3ExportStorageSerializer(S3StorageSerializerMixin, ExportStorageSerializer):
-    type = serializers.ReadOnlyField(default=os.path.basename(os.path.dirname(__file__)))
+    type = StorageTypeField(default=os.path.basename(os.path.dirname(__file__)))
 
     class Meta:
         model = S3ExportStorage

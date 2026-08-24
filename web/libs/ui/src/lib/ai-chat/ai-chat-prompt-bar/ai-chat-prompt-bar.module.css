@@ -1,0 +1,105 @@
+.root {
+  display: flex;
+  width: 100%;
+  max-width: 40rem;
+}
+
+.form {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--spacing-tighter);
+  width: 100%;
+  padding: var(--spacing-tight) var(--spacing-base) var(--spacing-tighter);
+  border: 1px solid var(--color-neutral-border);
+  border-radius: var(--corner-radius-medium, 12px);
+  background: var(--color-neutral-surface);
+  transition:
+    border-color 150ms ease,
+    box-shadow 150ms ease,
+    background-color 150ms ease;
+}
+
+.root[data-shape="pill"] .form {
+  border-radius: 999px;
+  padding-inline: var(--spacing-wide);
+}
+
+.root[data-layout="inline"] .form {
+  flex-direction: row;
+  align-items: flex-end;
+  gap: var(--spacing-tighter);
+  padding: var(--spacing-tight);
+}
+
+.actions {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-tight);
+  min-height: 2rem;
+}
+
+.root[data-layout="inline"] .actions {
+  display: contents;
+}
+
+.leading,
+.trailing {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: var(--spacing-tighter);
+}
+
+.root[data-layout="inline"] .leading {
+  order: 0;
+}
+
+.root[data-layout="inline"] .textarea {
+  order: 1;
+}
+
+.root[data-layout="inline"] .trailing {
+  order: 2;
+}
+
+.textarea {
+  flex: 1;
+  min-width: 0;
+  /* Match default rows={3} so empty composer stays multi-line */
+  min-height: 4.5rem;
+  max-height: 8rem;
+  padding: 0;
+  border: 0;
+  resize: none;
+  background: transparent;
+  color: var(--color-neutral-content);
+  font: inherit;
+  line-height: 1.45;
+  field-sizing: content;
+}
+
+.textarea::placeholder {
+  color: var(--color-neutral-content-subtler, var(--color-neutral-content-subtle));
+}
+
+.textarea:focus {
+  outline: none;
+}
+
+.textarea:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.form:focus-within {
+  border-color: var(--color-primary-border-subtle, var(--color-primary-border));
+  box-shadow: 0 0 0 1px var(--color-primary-border-subtle, var(--color-primary-border));
+}
+
+.root[data-status="streaming"] .form,
+.root[data-status="submitting"] .form {
+  border-color: var(--color-primary-border-subtle, var(--color-primary-border));
+}

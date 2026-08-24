@@ -73,6 +73,9 @@ export class SpectrogramRenderer implements Renderer<SpectrogramRendererConfig> 
   public lastSpectrogramRenderedScrollLeftPx = 0;
   private isDestroyed = false;
   private lastRenderContext?: RenderContext;
+  private handleChunkLoaded = () => {
+    this.spectrogramNeedsRedraw = true;
+  };
   private readonly spectrogram: Layer;
   private readonly progressContainer: HTMLElement;
   private rateLimitedRenderer: RateLimitedRenderer;
@@ -175,6 +178,7 @@ export class SpectrogramRenderer implements Renderer<SpectrogramRendererConfig> 
   init(context: RenderContext, audio: WaveformAudio): void {
     this.audio = audio;
     this.lastRenderContext = context;
+    this.audio.on("chunkLoaded", this.handleChunkLoaded);
     // Initialize FFT processor if not already set and sampleRate is available
     if (!this.fftProcessor && audio.sampleRate) {
       import("../../Analysis/FFTProcessor").then((processor) => {
@@ -324,6 +328,7 @@ export class SpectrogramRenderer implements Renderer<SpectrogramRendererConfig> 
   }
 
   destroy(): void {
+    this.audio?.off("chunkLoaded", this.handleChunkLoaded);
     this.fftProcessor?.dispose();
     this.fftProcessor = null;
   }
@@ -545,6 +550,24 @@ export class SpectrogramRenderer implements Renderer<SpectrogramRendererConfig> 
     return Math.max(1, Math.floor(visibleLen / maxComputations));
   }
 
+  private isSliceLoaded(channelIndex: number, startSample: number, endSample: number): boolean {
+    if (!this.audio || !this.audio.chunks || !this.audio.chunks[channelIndex]) return false;
+    const proxy = this.audio.chunks[channelIndex];
+    const rawChunks = (proxy as any).__rawTarget;
+    if (!rawChunks) return true; // Not in streaming mode, no proxy, everything is loaded
+
+    const samplesPerChunk = this.audio.sampleRate * 10;
+    const startChunk = Math.floor(startSample / samplesPerChunk);
+    const endChunk = Math.floor((endSample - 1) / samplesPerChunk);
+
+    for (let i = startChunk; i <= endChunk; i++) {
+      if (i >= 0 && i < rawChunks.length && !rawChunks[i]) {
+        return false;
+      }
+    }
+    return true;
+  }
+
   private hasFFTInCache(channelIndex: number, hopStartSample: number): boolean {
     if (!this.fftCache.has(channelIndex)) return false;
     return this.fftCache.get(channelIndex)!.has(hopStartSample);
@@ -575,7 +598,8 @@ export class SpectrogramRenderer implements Renderer<SpectrogramRendererConfig> 
     } else {
       finalSpectrum = linearSpectrum;
     }
-    if (finalSpectrum) {
+    const isLoaded = this.isSliceLoaded(channelIndex, hopStartSample, requiredEndSample);
+    if (finalSpectrum && isLoaded) {
       if (!this.fftCache.has(channelIndex)) {
         this.fftCache.set(channelIndex, new LRUCache<number, Float32Array>(SPECTROGRAM_FFT_CACHE_MAX_ENTRIES));
       }

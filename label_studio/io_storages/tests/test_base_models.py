@@ -1,7 +1,9 @@
 from unittest.mock import patch
 
 from django.test import TestCase, override_settings
-from io_storages.tests.factories import S3ImportStorageFactory
+from io_storages.tests.factories import AzureBlobExportStorageFactory, S3ImportStorageFactory
+from projects.tests.factories import ProjectFactory
+from tasks.models import Annotation
 from tasks.tests.factories import TaskFactory
 
 
@@ -124,3 +126,82 @@ class TestImportStorageResolveUris(TestCase):
         assert result is not None
         assert 's3://test-bucket/images/some directory/sub folder/img.jpg' not in result
         assert 'http://localhost:8080' in result
+
+
+class TestExportStorageSaveAnnotationsStatus(TestCase):
+    """ExportStorage.save_annotations should only mutate sync status when update_status is True."""
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.project = ProjectFactory()
+
+    def _storage(self):
+        return AzureBlobExportStorageFactory(project=self.project)
+
+    def test_update_status_false_skips_sync_status(self):
+        """A partial export (update_status=False) must not touch the storage sync status."""
+        storage = self._storage()
+        with (
+            patch.object(type(storage), 'info_set_in_progress') as m_in_progress,
+            patch.object(type(storage), 'info_update_progress') as m_update,
+            patch.object(type(storage), 'info_set_completed') as m_completed,
+            patch.object(type(storage), 'save_annotation'),
+        ):
+            storage.save_annotations(Annotation.objects.none(), update_status=False)
+
+        m_in_progress.assert_not_called()
+        m_update.assert_not_called()
+        m_completed.assert_not_called()
+
+    def test_update_status_true_updates_sync_status(self):
+        """A full sync (default update_status=True) keeps updating the storage sync status."""
+        storage = self._storage()
+        with (
+            patch.object(type(storage), 'info_set_in_progress') as m_in_progress,
+            patch.object(type(storage), 'info_set_completed') as m_completed,
+            patch.object(type(storage), 'save_annotation'),
+        ):
+            storage.save_annotations(Annotation.objects.none())
+
+        m_in_progress.assert_called_once()
+        m_completed.assert_called_once()
+
+    def _annotation_queryset(self):
+        # Create the annotation before any storage exists so creation does not trigger an export.
+        task = TaskFactory(project=self.project)
+        Annotation.objects.create(task=task, project=self.project, completed_by=self.project.created_by, result=[])
+        return Annotation.objects.filter(task__project=self.project)
+
+    def test_failed_export_partial_raises_and_keeps_status(self):
+        """update_status=False: a failed annotation export raises and leaves the storage status untouched."""
+        annotations = self._annotation_queryset()
+        storage = self._storage()
+        with (
+            patch.object(type(storage), 'info_set_in_progress') as m_in_progress,
+            patch.object(type(storage), 'info_update_progress') as m_update,
+            patch.object(type(storage), 'info_set_completed') as m_completed,
+            patch.object(type(storage), 'save_annotation', side_effect=RuntimeError('boom')),
+        ):
+            with self.assertRaises(RuntimeError):
+                storage.save_annotations(annotations, update_status=False)
+
+        m_in_progress.assert_not_called()
+        m_update.assert_not_called()
+        m_completed.assert_not_called()
+
+    def test_failed_export_full_sync_raises_without_completing(self):
+        """update_status=True: a failed annotation export raises and does not mark the sync completed.
+
+        The storage is marked FAILED out-of-band by the RQ on_failure=storage_background_failure callback.
+        """
+        annotations = self._annotation_queryset()
+        storage = self._storage()
+        with (
+            patch.object(type(storage), 'info_set_in_progress'),
+            patch.object(type(storage), 'info_set_completed') as m_completed,
+            patch.object(type(storage), 'save_annotation', side_effect=RuntimeError('boom')),
+        ):
+            with self.assertRaises(RuntimeError):
+                storage.save_annotations(annotations)
+
+        m_completed.assert_not_called()

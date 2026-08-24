@@ -24,7 +24,7 @@ from core.utils.iterators import iterate_queryset
 from data_export.serializers import ExportDataSerializer
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
-from django.db import models, transaction
+from django.db import IntegrityError, models, transaction
 from django.db.models import JSONField
 from django.shortcuts import reverse
 from django.utils import timezone
@@ -34,7 +34,12 @@ from io_storages.utils import StorageObject, get_all_uris_via_regex, get_uri_via
 from rest_framework.exceptions import ValidationError
 from rq.job import Job
 from tasks.models import Annotation, Task
-from tasks.serializers import AnnotationSerializer, PredictionSerializer
+from tasks.serializers import (
+    FF_BROS_1092_IMPORT_UNKNOWN_COMPLETED_BY,
+    AnnotationSerializer,
+    PredictionSerializer,
+    resolve_completed_by_id,
+)
 from webhooks.models import WebhookAction
 from webhooks.utils import emit_webhooks_for_instance
 
@@ -227,12 +232,19 @@ class StorageInfo(models.Model):
         # iterate over all storages
         storages = storages.only('id', 'last_sync_job', 'status', 'meta')
         for storage in storages:
-            storage.health_check()
+            try:
+                storage.health_check()
+            except Exception:
+                logger.warning(f'Health check failed for storage {storage.id}', exc_info=True)
 
     def health_check(self):
         # get duration between last ping time and now
         now = timezone.now()
-        last_ping = datetime.fromisoformat(self.meta.get('time_last_ping', str(now)))
+        meta = self.meta if self.meta is not None else {}
+        try:
+            last_ping = datetime.fromisoformat(meta.get('time_last_ping', str(now)))
+        except (ValueError, TypeError):
+            last_ping = now
         delta = (now - last_ping).total_seconds()
 
         # check redis connection
@@ -258,12 +270,15 @@ class StorageInfo(models.Model):
         if self.status not in [Status.IN_PROGRESS, Status.QUEUED]:
             return
 
-        queue = django_rq.get_queue('low')
-        try:
-            sync_job = Job.fetch(self.last_sync_job, connection=queue.connection)
-            job_status = sync_job.get_status()
-        except rq.exceptions.NoSuchJobError:
+        if not self.last_sync_job:
             job_status = 'not found'
+        else:
+            queue = django_rq.get_queue('low')
+            try:
+                sync_job = Job.fetch(self.last_sync_job, connection=queue.connection)
+                job_status = sync_job.get_status()
+            except (rq.exceptions.NoSuchJobError, TypeError):
+                job_status = 'not found'
 
         # broken synchronization between storage and job
         # this might happen when job was stopped because of OOM and on_failure wasn't called
@@ -498,6 +513,10 @@ class ImportStorage(Storage):
                 )
             cancelled_annotations = len([a for a in annotations if a.get('was_cancelled', False)])
 
+        storage_task_data_validator = load_func(getattr(settings, 'STORAGE_TASK_DATA_VALIDATOR', None))
+        if storage_task_data_validator:
+            storage_task_data_validator(project, data)
+
         if 'data' in data and isinstance(data['data'], dict):
             if data['data'] is not None:
                 data = data['data']
@@ -539,26 +558,104 @@ class ImportStorage(Storage):
                 flag_set('fflag_feat_utc_210_prediction_validation_15082025', user=project.organization.created_by)
                 or raise_exception
             )
+            created_predictions = []
             if prediction_ser.is_valid(raise_exception=raise_prediction_exception):
-                prediction_ser.save()
+                created_predictions = prediction_ser.save()
 
             # add annotations
             logger.debug(f'Create {len(annotations)} annotations for task={task}')
+
+            # Storage sync must accept JSON exported by Label Studio. Exports can
+            # include ``completed_by`` as a full user object, while
+            # AnnotationSerializer expects a primary key. Keep BROS-1092's broader
+            # unknown/cross-org fallback behind its flag, but always normalize
+            # dict-shaped export values that resolve to an organization member.
+            normalize_completed_by = any(
+                isinstance(annotation.get('completed_by'), dict) for annotation in annotations
+            )
+            fallback_unknown_completed_by = flag_set(
+                FF_BROS_1092_IMPORT_UNKNOWN_COMPLETED_BY, user=project.organization.created_by
+            )
+            if annotations and (normalize_completed_by or fallback_unknown_completed_by):
+                members_email_to_id = dict(project.organization.members.values_list('user__email', 'user__id'))
+                members_ids = set(members_email_to_id.values())
+                default_user_id = project.created_by_id or project.organization.created_by_id
+                if default_user_id is None:
+                    logger.warning(
+                        f'Cannot resolve default user for project {project.id} during storage sync; '
+                        f'annotations with unknown completed_by will be created without an annotator'
+                    )
+                for annotation in annotations:
+                    if 'completed_by' not in annotation:
+                        continue
+                    completed_by = annotation['completed_by']
+                    if not fallback_unknown_completed_by and not isinstance(completed_by, dict):
+                        continue
+                    default_completed_by_id = default_user_id if fallback_unknown_completed_by else None
+                    resolved = resolve_completed_by_id(
+                        completed_by,
+                        members_email_to_id,
+                        members_ids,
+                        default_completed_by_id,
+                    )
+                    if resolved is not None:
+                        annotation['completed_by'] = resolved
+                    elif fallback_unknown_completed_by:
+                        annotation.pop('completed_by', None)
+
             for annotation in annotations:
+                # Storage sync must accept JSON exported by Label Studio. Manual import
+                # ignores export identity fields; reusing exported unique_id violates the
+                # DB unique constraint. Map export id -> import_id for parity with bulk import.
+                annotation.pop('unique_id', None)
+                export_id = annotation.pop('id', None)
+                if export_id is not None and annotation.get('import_id') is None:
+                    annotation['import_id'] = export_id
                 annotation['task'] = task.id
                 annotation['project'] = project.id
             annotation_ser = AnnotationSerializer(data=annotations, many=True)
 
             # Always validate annotations, but control error handling based on FF
+            created_annotations = []
             if annotation_ser.is_valid():
-                annotation_ser.save()
+                created_annotations = annotation_ser.save()
             else:
                 # Log validation errors but don't save invalid annotations
                 logger.error(f'Invalid annotations for task {task.id}: {annotation_ser.errors}')
                 if raise_exception:
                     raise ValidationError(annotation_ser.errors)
+
+            # Reconcile the denormalized task counters with what actually persisted. The task
+            # above is seeded with counts taken from the *payload* annotations/predictions, but
+            # rows can be silently skipped when invalid (under
+            # ff_fix_back_dev_3342_storage_scan_with_invalid_annotations, is_valid() fails and we
+            # don't raise). Without this, a task whose only annotation was skipped keeps
+            # total_annotations=1 while having zero annotation rows — a stale counter the Data
+            # Manager reads directly (per-task column and tab totals). Recompute from the rows we
+            # actually created so the cached counters can't drift above reality.
+            actual_total_annotations = sum(1 for a in created_annotations if not a.was_cancelled)
+            actual_cancelled_annotations = sum(1 for a in created_annotations if a.was_cancelled)
+            actual_total_predictions = len(created_predictions)
+            if (
+                task.total_annotations != actual_total_annotations
+                or task.cancelled_annotations != actual_cancelled_annotations
+                or task.total_predictions != actual_total_predictions
+            ):
+                task.total_annotations = actual_total_annotations
+                task.cancelled_annotations = actual_cancelled_annotations
+                task.total_predictions = actual_total_predictions
+                task.update_is_labeled()
+                task.save(
+                    update_fields=['total_annotations', 'cancelled_annotations', 'total_predictions', 'is_labeled'],
+                    skip_fsm=True,
+                )
+
+            if created_annotations:
+                post_process_user = project.created_by or project.organization.created_by
+                post_process = load_func(settings.TASK_SERIALIZER_BULK).post_process_annotations
+                post_process(post_process_user, created_annotations, 'imported')
+
         return task
-        # FIXME: add_annotation_history / post_process_annotations should be here
 
     def _scan_and_create_links(self, link_class):
         """
@@ -828,10 +925,19 @@ class ExportStorage(Storage, ProjectStorageMixin):
     def save_annotation(self, annotation):
         raise NotImplementedError
 
-    def save_annotations(self, annotations: models.QuerySet[Annotation]):
+    def save_annotations(self, annotations: models.QuerySet[Annotation], update_status: bool = True):
+        """Export a queryset of annotations to this storage.
+
+        :param update_status: when True (the default, used by full syncs) the storage's sync status
+            (QUEUED -> IN_PROGRESS -> COMPLETED) and last_sync_count are updated. Pass False for
+            partial exports (e.g. bulk review) that should not touch the storage sync status, which
+            also avoids the QUEUED precondition required by ``info_set_in_progress``.
+        """
         annotation_exported = 0
+        failed = 0
         total_annotations = annotations.count()
-        self.info_set_in_progress()
+        if update_status:
+            self.info_set_in_progress()
         self.cached_user = self.project.organization.created_by
 
         # Calculate optimal batch size based on project data and worker count
@@ -856,10 +962,28 @@ class ExportStorage(Storage, ProjectStorageMixin):
                     futures.append(executor.submit(self.save_annotation, annotation))
 
                 for future in concurrent.futures.as_completed(futures):
+                    # Resolve the future so exceptions raised inside save_annotation worker threads
+                    # are not silently swallowed. Best-effort: keep exporting the rest of the batch.
+                    try:
+                        future.result()
+                    except Exception:
+                        failed += 1
+                        logger.error(f'Export storage {self.id}: failed to export annotation', exc_info=True)
+                        continue
                     annotation_exported += 1
-                    self.info_update_progress(last_sync_count=annotation_exported, total_annotations=total_annotations)
+                    if update_status:
+                        self.info_update_progress(
+                            last_sync_count=annotation_exported, total_annotations=total_annotations
+                        )
 
-        self.info_set_completed(last_sync_count=annotation_exported, total_annotations=total_annotations)
+        # Surface worker-thread failures by re-raising so the RQ job is marked failed. Full syncs set the
+        # storage FAILED via on_failure=storage_background_failure; partial exports (update_status=False)
+        # leave the shared storage status untouched, which is the intended contract.
+        if failed:
+            raise RuntimeError(f'Export storage {self.id}: {failed} annotation(s) failed to export')
+
+        if update_status:
+            self.info_set_completed(last_sync_count=annotation_exported, total_annotations=total_annotations)
 
     def save_all_annotations(self):
         self.save_annotations(Annotation.objects.filter(project=self.project))
@@ -978,6 +1102,25 @@ class ExportStorageLink(models.Model):
             # update updated_at field
             link.save()
         return link
+
+    @classmethod
+    def create_or_skip_missing_annotation(cls, annotation, storage):
+        """Create export link unless annotation disappeared during async export."""
+        try:
+            return cls.create(annotation, storage)
+        except Exception as exc:
+            if not isinstance(exc, IntegrityError):
+                raise
+            annotation_id = getattr(annotation, 'pk', annotation)
+            if annotation_id and not Annotation.objects.filter(pk=annotation_id).exists():
+                logger.info(
+                    'Skipping export link creation because annotation %s was deleted during export for %s storage %s',
+                    annotation_id,
+                    cls.__name__,
+                    getattr(storage, 'pk', None),
+                )
+                return None
+            raise
 
     def has_permission(self, user):
         user.project = self.annotation.project  # link for activity log

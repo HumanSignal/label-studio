@@ -1,6 +1,17 @@
 import { Modal } from "antd";
+import * as ff from "@humansignal/core/lib/utils/feature-flags";
+import { showInfoModal } from "./infomodal-dispatch";
 
-const wrapper = (_type, value, title) => {
+const DEFAULT_TITLES = {
+  error: "Error",
+  warning: "Warning",
+  success: "Success",
+  info: "Info",
+};
+
+const VARIANTS = ["error", "warning", "success", "info"];
+
+const legacyWrapper = (_type, value, title) => {
   const custom = {
     type: "",
     title: "",
@@ -28,6 +39,19 @@ const wrapper = (_type, value, title) => {
     title: title ? title : custom.title,
     content: value,
   });
+};
+
+const wrapper = (_type, value, title) => {
+  if (ff.isActive(ff.FF_MODAL_WINDOW_APP_CHROME)) {
+    const variant = VARIANTS.includes(_type) ? _type : "info";
+    showInfoModal({
+      variant,
+      content: value,
+      title: title ? title : DEFAULT_TITLES[variant],
+    });
+    return;
+  }
+  return legacyWrapper(_type, value, title);
 };
 
 /**

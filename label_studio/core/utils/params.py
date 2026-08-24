@@ -127,6 +127,16 @@ def has_env(name: str) -> bool:
     return any((prefix + name) in os.environ for prefix in ('LABEL_STUDIO_', 'HEARTEX_', ''))
 
 
+def get_int_env(key, default=None):
+    value = get_env(key)
+    if value is None:
+        return default
+    try:
+        return int(value)
+    except ValueError:
+        raise ValueError(f'Environment variable {key} must be an integer, got: {value}')
+
+
 def get_bool_env(key, default):
     return get_env(key, default, is_bool=True)
 
