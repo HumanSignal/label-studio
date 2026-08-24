@@ -7,7 +7,9 @@
  * this component would have silently broken. The `align` column property is the supported way.
  */
 
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
+import { useState } from "react";
+import type { SortingState } from "@tanstack/react-table";
 
 import { DataTable, type ExtendedDataTableColumnDef } from "./data-table";
 
@@ -79,5 +81,66 @@ describe("DataTable header align", () => {
     expect(screen.getByText("Total")).toBeInTheDocument();
     // `help` renders behind an info icon; alignment must not drop it.
     expect(screen.getByTestId("data-table-header-total").querySelector("svg")).toBeTruthy();
+  });
+});
+
+function clickHeader(columnId: string) {
+  const content = screen.getByTestId(`data-table-header-${columnId}`).firstElementChild;
+  if (!content) throw new Error(`No clickable content for header "${columnId}"`);
+  fireEvent.click(content);
+}
+
+function rowNames(): string[] {
+  return Array.from(document.querySelectorAll<HTMLElement>('[data-testid^="data-table-row-"]')).map(
+    (row) => row.textContent ?? "",
+  );
+}
+
+function SortProbe({ enableSortingRemoval }: { enableSortingRemoval?: boolean }) {
+  const [sorting, setSorting] = useState<SortingState>([]);
+  return (
+    <div>
+      <div data-testid="sort-state">
+        {sorting.length > 0 ? `${sorting[0].id}:${sorting[0].desc ? "desc" : "asc"}` : "none"}
+      </div>
+      <DataTable
+        data={ROWS}
+        columns={[
+          { id: "name", accessorKey: "name", header: "Name", enableSorting: true },
+          { id: "total", accessorKey: "total", header: "Total", enableSorting: true },
+        ]}
+        enableSorting
+        enableSortingRemoval={enableSortingRemoval}
+        sorting={sorting}
+        onSortingChange={setSorting}
+        dataTestId="table"
+      />
+    </div>
+  );
+}
+
+describe("DataTable header sorting cycle", () => {
+  it("keeps the historic two-state cycle (asc ↔ desc) when enableSortingRemoval is off", () => {
+    render(<SortProbe />);
+
+    clickHeader("name");
+    expect(screen.getByTestId("sort-state").textContent).toBe("name:asc");
+    clickHeader("name");
+    expect(screen.getByTestId("sort-state").textContent).toBe("name:desc");
+    clickHeader("name");
+    expect(screen.getByTestId("sort-state").textContent).toBe("name:asc");
+  });
+
+  it("cycles asc → desc → unsorted when enableSortingRemoval is set", () => {
+    render(<SortProbe enableSortingRemoval />);
+
+    clickHeader("name");
+    expect(screen.getByTestId("sort-state").textContent).toBe("name:asc");
+    expect(rowNames()[0]).toContain("Meadow");
+    clickHeader("name");
+    expect(screen.getByTestId("sort-state").textContent).toBe("name:desc");
+    expect(rowNames()[0]).toContain("Wren");
+    clickHeader("name");
+    expect(screen.getByTestId("sort-state").textContent).toBe("none");
   });
 });
