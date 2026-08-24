@@ -143,7 +143,7 @@ class ExportMixin:
         return queryset
 
     @staticmethod
-    def _get_export_serializer_option(serialization_options):
+    def _get_export_serializer_option(serialization_options, project=None):
         options = {'expand': []}
         if isinstance(serialization_options, dict):
             if (
@@ -163,6 +163,8 @@ class ExportMixin:
             ].get('only_id'):
                 options['expand'].append('annotations.completed_by')
             options['context'] = {'interpolate_key_frames': settings.INTERPOLATE_KEY_FRAMES}
+            if project is not None:
+                options['context']['project'] = project
             if 'interpolate_key_frames' in serialization_options:
                 options['context']['interpolate_key_frames'] = serialization_options['interpolate_key_frames']
             if serialization_options.get('include_annotation_history') is False:
@@ -249,7 +251,7 @@ class ExportMixin:
             .distinct()
             .values_list('id', flat=True)
         )
-        base_export_serializer_option = self._get_export_serializer_option(serialization_options)
+        base_export_serializer_option = self._get_export_serializer_option(serialization_options, project=self.project)
         i = 0
 
         if flag_set('fflag_fix_back_plt_807_batch_size_26062025_short', self.project.organization.created_by):

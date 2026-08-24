@@ -8,6 +8,64 @@ from rest_framework import serializers
 from users.models import User
 
 
+def is_user_deleted(user, context=None, project=None, organization=None, organization_id=None):
+    if not user:
+        return False
+    if context is None:
+        context = {}
+
+    if 'deleted_user_ids' in context:
+        return user.id in context['deleted_user_ids']
+
+    org_id = organization_id or context.get('organization_id')
+
+    if not org_id:
+        proj = project or context.get('project')
+        if proj:
+            org_id = getattr(proj, 'organization_id', None)
+
+    if not org_id:
+        org = organization or context.get('organization')
+        if org:
+            org_id = getattr(org, 'id', org)
+
+    if not org_id:
+        if 'user' in context and context['user']:
+            org_id = getattr(context['user'], 'active_organization_id', None)
+        elif 'request' in context and hasattr(context['request'], 'user') and context['request'].user:
+            org_id = getattr(context['request'].user, 'active_organization_id', None)
+
+    if not org_id:
+        if 'is_deleted_cache' not in context:
+            context['is_deleted_cache'] = {}
+        if user.id in context['is_deleted_cache']:
+            return context['is_deleted_cache'][user.id]
+
+        if 'om_through' in getattr(user, '_prefetched_objects_cache', {}):
+            organization_members = list(user.om_through.all())
+            is_del = bool(organization_members and all(om.deleted_at for om in organization_members))
+        else:
+            has_active = user.om_through.filter(deleted_at__isnull=True).exists()
+            has_any = user.om_through.exists()
+            is_del = has_any and not has_active
+
+        context['is_deleted_cache'][user.id] = is_del
+        return is_del
+
+    cache_key = f'deleted_user_ids_{org_id}'
+    if cache_key not in context:
+        from organizations.models import OrganizationMember
+
+        deleted_ids = set(
+            OrganizationMember.objects.filter(organization_id=org_id, deleted_at__isnull=False).values_list(
+                'user_id', flat=True
+            )
+        )
+        context[cache_key] = deleted_ids
+
+    return user.id in context[cache_key]
+
+
 class BaseUserSerializer(FlexFieldsModelSerializer):
     # short form for user presentation
     initials = serializers.SerializerMethodField(default='?', read_only=True)
@@ -35,59 +93,7 @@ class BaseUserSerializer(FlexFieldsModelSerializer):
         return {'title': title, 'email': email}
 
     def _is_deleted(self, instance):
-        if 'deleted_user_ids' in self.context:
-            return instance.id in self.context['deleted_user_ids']
-
-        org_id = None
-        project = self.context.get('project')
-        if project:
-            org_id = getattr(project, 'organization_id', None)
-
-        if not org_id:
-            organization = self.context.get('organization')
-            if organization:
-                org_id = getattr(organization, 'id', organization)
-
-        if not org_id:
-            org_id = self.context.get('organization_id')
-
-        if not org_id:
-            if 'user' in self.context:
-                org_id = getattr(self.context['user'], 'active_organization_id', None)
-            elif (
-                'request' in self.context and hasattr(self.context['request'], 'user') and self.context['request'].user
-            ):
-                org_id = getattr(self.context['request'].user, 'active_organization_id', None)
-
-        if not org_id:
-            if 'is_deleted_cache' not in self.context:
-                self.context['is_deleted_cache'] = {}
-            if instance.id in self.context['is_deleted_cache']:
-                return self.context['is_deleted_cache'][instance.id]
-
-            if 'om_through' in getattr(instance, '_prefetched_objects_cache', {}):
-                organization_members = list(instance.om_through.all())
-                is_del = bool(organization_members and all(om.deleted_at for om in organization_members))
-            else:
-                has_active = instance.om_through.filter(deleted_at__isnull=True).exists()
-                has_any = instance.om_through.exists()
-                is_del = has_any and not has_active
-
-            self.context['is_deleted_cache'][instance.id] = is_del
-            return is_del
-
-        cache_key = f'deleted_user_ids_{org_id}'
-        if cache_key not in self.context:
-            from organizations.models import OrganizationMember
-
-            deleted_ids = set(
-                OrganizationMember.objects.filter(organization_id=org_id, deleted_at__isnull=False).values_list(
-                    'user_id', flat=True
-                )
-            )
-            self.context[cache_key] = deleted_ids
-
-        return instance.id in self.context[cache_key]
+        return is_user_deleted(instance, context=self.context)
 
     def _get_requester(self):
         """The user making the request (the viewer), from serializer context."""
