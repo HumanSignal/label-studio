@@ -105,6 +105,38 @@ export function normalizeIntegerUserFilter({ fieldAlias, operator, value }) {
   };
 }
 
+/** Number columns reused as annotation-child yes/no indicators (FIT-2480 / FIT-2604). */
+export const REVIEW_INDICATOR_CHILD_ALIASES = new Set(["reviews_accepted", "reviews_rejected"]);
+
+const RANGE_OPERATORS = new Set(["in", "not_in"]);
+
+function isRangeShapedValue(value) {
+  return value != null && typeof value === "object" && !Array.isArray(value) && ("min" in value || "max" in value);
+}
+
+function isProperRangeValue(value) {
+  return isRangeShapedValue(value) && (value.min != null || value.max != null);
+}
+
+/**
+ * Coerce broken review-indicator snapshots saved before FIT-2604.
+ * Top-level review counts may keep a valid `in`/`not_in` range; broken between
+ * payloads (`false`, `{}`) reset to equal/false so MST can hydrate.
+ */
+export function recoverReviewIndicatorSnapshot(sn) {
+  if (!sn) return sn;
+
+  const fieldAlias = fieldAliasFromFilterId(sn.filter);
+  if (!REVIEW_INDICATOR_CHILD_ALIASES.has(fieldAlias)) return sn;
+
+  const { operator, value } = sn;
+  if (RANGE_OPERATORS.has(operator) && isProperRangeValue(value)) return sn;
+  if (RANGE_OPERATORS.has(operator) || isRangeShapedValue(value)) {
+    return { ...sn, operator: "equal", value: false };
+  }
+  return sn;
+}
+
 export function validateFilterSnapshot(snapshot, availableFilters) {
   if (!snapshot || typeof snapshot !== "object") return null;
   const { items } = snapshot;
@@ -131,8 +163,9 @@ export function validateFilterSnapshot(snapshot, availableFilters) {
  *     (e.g. UserSelect for annotators).
  *
  * When value cannot be preserved, it is reset to the column default.
- * Operator is always preserved if it exists in the target column's operator set,
- * regardless of type or schema changes.
+ * Operator is preserved when it remains valid for the target column, except range
+ * operators (`in` / `not_in`) which reset on type or column change — their value
+ * shape (FilterValueRange) does not transfer safely across columns.
  *
  * @param {object} params
  * @param {string} params.prevType       - currentType of the column before the switch
@@ -163,9 +196,10 @@ export function resolveFilterTransition({
   // triggers a view-save 400 surfaced as a Runtime error modal.
   const schemaBound = newSchema != null || prevType === "List" || newType === "List";
   const operatorStillValid = prevOperator && newOperators.some((op) => op.key === prevOperator);
+  const rangeOperatorStale = RANGE_OPERATORS.has(prevOperator) && (typeChanged || columnChanged);
   const canPreserveValue = !typeChanged && !schemaBound && !columnChanged;
 
-  if (operatorStillValid) {
+  if (operatorStillValid && !rangeOperatorStale) {
     return {
       operator: prevOperator,
       value: canPreserveValue ? prevValue : undefined,

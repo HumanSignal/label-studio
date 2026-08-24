@@ -83,7 +83,7 @@ function stableKey(v: unknown): string {
  * For multi-select dimensions where each value is an array (e.g. ["a","b"]),
  * uses JSON serialization so structurally equal arrays are counted together.
  */
-export function computeMajorityVote(values: (string | number | boolean | null)[]): MajorityVoteResult {
+export function computeMajorityVote(values: unknown[]): MajorityVoteResult {
   const counts = new Map<
     string,
     { original: string | number | boolean | (string | number | boolean)[] | null; count: number }
@@ -121,7 +121,7 @@ export function computeMajorityVote(values: (string | number | boolean | null)[]
  * Check whether a value conflicts with the majority vote.
  * Uses JSON serialization for structural comparison of arrays (multi-select).
  */
-export function isConflict(value: string | number | boolean | null, majorityVote: MajorityVoteResult): boolean {
+export function isConflict(value: unknown, majorityVote: MajorityVoteResult): boolean {
   if (value === null || value === undefined || majorityVote.value === null) return false;
   return stableKey(value) !== stableKey(majorityVote.value);
 }
@@ -169,6 +169,40 @@ export function countConflicts(aggregation: AggregationResult, method: Agreement
 // Dimension Info Helpers
 // ---------------------------------------------------------------------------
 
+/** Control tag the backend assigns to every dimension of a Custom Interface. */
+export const CUSTOM_INTERFACE_CONTROL_TAG = "CustomInterface";
+
+/**
+ * string, number, boolean, or nested arrays of those — the same shapes the
+ * classic editor groups as Choices / Rating / Taxonomy chips.
+ */
+function isScalarLike(value: unknown): boolean {
+  if (typeof value === "string" || typeof value === "number" || typeof value === "boolean") {
+    return true;
+  }
+  if (Array.isArray(value)) {
+    return value.every(isScalarLike);
+  }
+  return false;
+}
+
+/**
+ * Whether a Custom Interface dimension can be compared like a classification.
+ *
+ * A Custom Interface has no labeling config to inspect, so the backend cannot
+ * tell a classification from a region and reports every one of its dimensions
+ * as non-categorical. The values themselves are the only evidence available:
+ * strings, numbers, and booleans compare exactly the way Choices and Rating do
+ * (including nested arrays of those, like Taxonomy paths), while objects and
+ * arrays of objects are region-shaped and do not.
+ */
+function customInterfaceValuesAreScalar(values: DimensionInfo["values"]): boolean {
+  if (!values) return false;
+  const present = values.filter((value) => value !== null && value !== undefined);
+  if (present.length === 0) return false;
+  return present.every(isScalarLike);
+}
+
 /**
  * Build enriched dimension info by combining API result with metadata.
  */
@@ -182,13 +216,15 @@ export function buildDimensionInfoList(agreementResult: TaskAgreementResult): Di
       metric_type: "unknown",
       is_categorical: false,
     };
+    const isCustomInterface = meta.control_tag === CUSTOM_INTERFACE_CONTROL_TAG;
 
     return {
       dimensionId: dr.dimension_id,
       name: meta.name,
       controlTag: meta.control_tag,
       metricType: meta.metric_type,
-      isCategorical: meta.is_categorical,
+      isCustomInterface,
+      isCategorical: meta.is_categorical || (isCustomInterface && customInterfaceValuesAreScalar(dr.dimension_values)),
       values: dr.dimension_values,
       scores: dr.scores,
       labels: meta.labels,

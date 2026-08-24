@@ -101,10 +101,12 @@ export interface DimensionMatchResult {
   scores: number[][];
   match_metadata: Record<string, unknown>[][] | null;
   /**
-   * Only populated for categorical dimensions (primitive scalar values).
-   * Position i = value from annotator_ids[i]. Null for non-categorical dims.
+   * Per-annotator cell for this dimension (position i = annotator_ids[i]).
+   * Categorical cells are string | number | boolean, or nested arrays of those
+   * (Choices / Rating / Taxonomy). Custom Interfaces may also send region-shaped
+   * objects; those stay non-categorical. Null when the dimension has no values.
    */
-  dimension_values: (string | number | boolean | null)[] | null;
+  dimension_values: unknown[] | null;
 }
 
 /** Aggregated agreement scores across all dimensions */
@@ -161,8 +163,14 @@ export interface DimensionInfo {
   metricType: string;
   /** Whether this dimension has categorical values (non-null dimension_values) */
   isCategorical: boolean;
-  /** Per-annotator values (only for categorical) */
-  values: (string | number | boolean | null)[] | null;
+  /**
+   * Whether the dimension comes from a Custom Interface output schema, where
+   * the backend cannot classify the control and reports everything as
+   * non-categorical.
+   */
+  isCustomInterface: boolean;
+  /** Per-annotator values (only for categorical). Same shape as dimension_values. */
+  values: unknown[] | null;
   /** N×N scores matrix */
   scores: number[][];
   /** All available labels defined in the labeling config (only for categorical) */

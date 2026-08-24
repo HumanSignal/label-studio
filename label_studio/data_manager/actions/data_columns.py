@@ -9,6 +9,7 @@ from core.redis import start_job_async_or_sync
 from core.utils.common import batched_iterator
 from core.utils.iterators import iterate_queryset
 from data_manager.actions import DataManagerAction
+from data_manager.column_names import UNQUERYABLE_COLUMN_NAME_CHARACTERS, is_queryable_column_name
 from data_manager.prepare_params import PrepareParams
 from django.conf import settings
 from django.db.models import Case, F, Func, JSONField, Value, When
@@ -41,6 +42,12 @@ def _validate_column_request(request_data, project):
     if not column_exists:
         column_exists = project.tasks.filter(data__has_key=value_name).exists()
     mode = 'update' if column_exists else 'add'
+    # Existing columns (e.g. imported spreadsheet headers) stay editable, but a new column must be
+    # one the Data Manager can filter and sort on.
+    if mode == 'add' and not is_queryable_column_name(value_name):
+        raise ValidationError(
+            {'column_name': f'Column name cannot contain {UNQUERYABLE_COLUMN_NAME_CHARACTERS}.'},
+        )
     try:
         value = {'String': str, 'Number': float, 'Expression': str}[value_type](value)
     except (TypeError, ValueError) as exc:

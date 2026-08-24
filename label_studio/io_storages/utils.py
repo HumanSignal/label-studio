@@ -24,6 +24,19 @@ class BucketURI:
     scheme: str
 
 
+# Objects written by the collection-submission upload path live under a fully
+# server-derived reserved key layout. Import sync must never turn them into
+# tasks (each uploaded file would become a phantom task), so key iteration
+# skips them regardless of the connection's own prefix/regex settings.
+COLLECTION_SUBMISSION_KEY_REGEX = re.compile(
+    r'(^|/)collection/org-\d+/project-\d+/task-\d+-[0-9a-f]{12}\.[a-z0-9]{1,8}$'
+)
+
+
+def is_collection_submission_key(key: str) -> bool:
+    return bool(COLLECTION_SUBMISSION_KEY_REGEX.search(key or ''))
+
+
 def get_uri_via_regex(data, prefixes=('s3', 'gs')) -> tuple[Union[str, None], Union[str, None]]:
     data = str(data).strip()
     middle_check = False

@@ -15,6 +15,21 @@ logger = logging.getLogger(__name__)
 OrganizationMemberMixin = load_func(settings.ORGANIZATION_MEMBER_MIXIN)
 
 
+def _workforce_closure_blocked(user):
+    """True when this identity has a live workforce account closure.
+
+    ``workforces`` is an enterprise-only app that does not exist in open-source or on-prem builds,
+    so the installed check comes first and nothing below it is ever imported there.
+    """
+    from django.apps import apps
+
+    if not apps.is_installed('workforces'):
+        return False
+    from workforces.offboarding.guards import user_has_active_closure
+
+    return user_has_active_closure(user)
+
+
 class OrganizationMember(OrganizationMemberMixin, models.Model):
     """ """
 
@@ -140,6 +155,14 @@ class Organization(OrganizationMixin, models.Model):
         return OrganizationMember.objects.filter(user=user, organization=self, deleted_at__isnull=True).exists()
 
     def add_user(self, user):
+        if _workforce_closure_blocked(user):
+            # A closed identity must never gain a NEW membership anywhere — this is the one
+            # chokepoint every membership creation goes through (invites, SCIM, SAML, LDAP, admin).
+            logger.warning(
+                'Refusing to add user id=%s to organization id=%s: the account was closed.', user.pk, self.pk
+            )
+            return
+
         if self.users.filter(pk=user.pk).exists():
             logger.debug('User already exists in organization.')
             return

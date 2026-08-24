@@ -125,6 +125,11 @@ export type DataTableProps<T extends DataShape> = {
   sorting?: SortingState;
   onSortingChange?: (updater: SortingState | ((old: SortingState) => SortingState)) => void;
   enableSorting?: boolean; // Global enable/disable sorting
+  /**
+   * When true, a third click on the active sorted header clears sorting (asc → desc → unsorted).
+   * Default is false so existing tables keep the historic two-state cycle (asc ↔ desc, never clear).
+   */
+  enableSortingRemoval?: boolean;
   /** When true, sorting is handled server-side. Bypasses TanStack's getSortedRowModel so data is displayed in the exact order received. Required when column accessors return objects (not primitive values), as TanStack's 'basic' comparator produces inconsistent results for objects with identical string representations. */
   manualSorting?: boolean;
   // Empty state props
@@ -194,6 +199,7 @@ export const DataTable = <T extends DataShape>(props: DataTableProps<T>) => {
     sorting: controlledSorting,
     onSortingChange: controlledOnSortingChange,
     enableSorting = true,
+    enableSortingRemoval = false,
     manualSorting = false,
     isRowSelectable,
     onSelectAllChange,
@@ -464,6 +470,7 @@ export const DataTable = <T extends DataShape>(props: DataTableProps<T>) => {
     columnResizeMode: "onChange",
     enableColumnPinning: columnPinningEnabled,
     enableSorting: enableSorting,
+    enableSortingRemoval,
     manualSorting,
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
@@ -511,7 +518,7 @@ export const DataTable = <T extends DataShape>(props: DataTableProps<T>) => {
       )}
       data-testid={dataTestId}
     >
-      <DataTableHead table={table} />
+      <DataTableHead table={table} enableSortingRemoval={enableSortingRemoval} />
       {props.isLoading ? (
         <DataTableSkeletonBody
           table={table}
@@ -558,9 +565,13 @@ export const DataTable = <T extends DataShape>(props: DataTableProps<T>) => {
 
 interface DataTableHeadProps<T> {
   table: Table<T>;
+  enableSortingRemoval?: boolean;
 }
 
-const DataTableHead = <T extends Record<string, unknown>>({ table }: DataTableHeadProps<T>) => {
+const DataTableHead = <T extends Record<string, unknown>>({
+  table,
+  enableSortingRemoval = false,
+}: DataTableHeadProps<T>) => {
   return (
     <div className={styles.head}>
       {table.getHeaderGroups().map((group) => (
@@ -589,12 +600,15 @@ const DataTableHead = <T extends Record<string, unknown>>({ table }: DataTableHe
             // Don't show divider if this column or previous column has noDivider
             const hideDivider = noDivider || prevNoDivider;
 
-            // Custom click handler for sorting that only toggles between asc/desc (doesn't clear)
+            // Default: toggle only between asc/desc (never clear) so existing tables stay two-state.
+            // `enableSortingRemoval` opts into asc → desc → unsorted so callers can restore a default order.
             const handleHeaderClick = isSortable
               ? () => {
                   const currentSort = column.getIsSorted();
                   if (currentSort === "asc") {
                     column.toggleSorting(true); // Sort descending
+                  } else if (enableSortingRemoval && currentSort === "desc") {
+                    column.clearSorting();
                   } else {
                     column.toggleSorting(false); // Sort ascending
                   }

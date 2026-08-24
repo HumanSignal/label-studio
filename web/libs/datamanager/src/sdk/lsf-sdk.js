@@ -75,8 +75,8 @@ const resolveLabelStudio = () => {
   }
 };
 
-// errorHandlerAllowSpecialErrors lives in ./special-errors so comments-sdk can reuse it without an
-// import cycle (lsf-sdk imports comments-sdk).
+// errorHandlerAllowSpecialErrors lives in ./special-errors so lsf-sdk can share overlap/pause
+// bubbling without inlining the display_context checks.
 
 // Support portal URL constants used to construct error reporting links
 // These are used in showOperationToast() to create support links with request IDs

@@ -9,7 +9,7 @@ export {
   SkippedByAnnotator,
 } from "./Annotators/Annotators";
 export { AudioCell as Audio, AudioPlusCell as AudioPlus } from "./AudioCell";
-export { BooleanCell as Boolean } from "./BooleanCell";
+export { BooleanCell as Boolean, GroundTruth } from "./BooleanCell";
 export { DateTimeCell as Date, DateTimeCell as Datetime } from "./DateTimeCell";
 export { ImageCell as Image } from "./ImageCell";
 export { NumberCell as Number } from "./NumberCell";

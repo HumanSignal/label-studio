@@ -383,6 +383,89 @@ def test_add_column_rejects_invalid_request(mock_flag_set, business_client):
 
 
 @pytest.mark.django_db
+@pytest.mark.parametrize(
+    'column_name',
+    [
+        'my column',
+        'tab\tcolumn',
+        'newline\ncolumn',
+        'hash#column',
+        'double"quote',
+        "single'quote",
+        'back`tick',
+        'bracket[column]',
+        'semi;colon',
+        'dash--comment',
+        'block/*comment',
+        'block*/comment',
+        'control\x01char',
+    ],
+)
+@patch('data_manager.actions.data_columns.flag_set', return_value=True)
+def test_add_column_rejects_names_that_cannot_be_queried(mock_flag_set, business_client, column_name):
+    """Names Django refuses as query aliases are rejected instead of creating an unfilterable column."""
+    project = Project.objects.create(title='Unsafe column name', created_by=business_client.user)
+    task = Task.objects.create(project=project, data={'text': 'Task'})
+
+    with pytest.raises(ValidationError, match='cannot contain'):
+        add_data_field(
+            project,
+            project.tasks.all(),
+            request=RequestStub(
+                business_client.user,
+                {'column_name': column_name, 'value_type': 'String', 'value': 'high'},
+            ),
+        )
+
+    task.refresh_from_db()
+    project.summary.refresh_from_db()
+    assert column_name not in task.data
+    assert column_name not in project.summary.all_data_columns
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize('column_name', ['plain', 'with_underscore', 'with-dash', 'with.dot', 'ünïcode', 'ümlaut42'])
+@patch('data_manager.actions.data_columns.flag_set', return_value=True)
+def test_add_column_accepts_names_the_data_manager_can_query(mock_flag_set, business_client, column_name):
+    """Only characters that break Data Manager queries are rejected; other names still work."""
+    project = Project.objects.create(title='Safe column name', created_by=business_client.user)
+    task = Task.objects.create(project=project, data={'text': 'Task'})
+
+    response = add_data_field(
+        project,
+        project.tasks.all(),
+        request=RequestStub(
+            business_client.user,
+            {'column_name': column_name, 'value_type': 'String', 'value': 'high'},
+        ),
+    )
+
+    task.refresh_from_db()
+    assert response['column_operation'] == 'add'
+    assert task.data[column_name] == 'high'
+
+
+@pytest.mark.django_db
+@patch('data_manager.actions.data_columns.flag_set', return_value=True)
+def test_add_column_trims_surrounding_whitespace_instead_of_rejecting_it(mock_flag_set, business_client):
+    """Surrounding whitespace is still stripped, so padded input keeps creating the trimmed column."""
+    project = Project.objects.create(title='Padded column name', created_by=business_client.user)
+    task = Task.objects.create(project=project, data={'text': 'Task'})
+
+    add_data_field(
+        project,
+        project.tasks.all(),
+        request=RequestStub(
+            business_client.user,
+            {'column_name': '  priority  ', 'value_type': 'String', 'value': 'high'},
+        ),
+    )
+
+    task.refresh_from_db()
+    assert task.data['priority'] == 'high'
+
+
+@pytest.mark.django_db
 @override_settings(ADD_OR_MODIFY_COLUMNS_ASYNC_THRESHOLD=1)
 @patch('data_manager.actions.data_columns.start_job_async_or_sync', return_value=SimpleNamespace(id='job-id'))
 @patch('data_manager.actions.data_columns.flag_set', return_value=True)

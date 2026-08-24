@@ -41,6 +41,7 @@ const buildDimension = (id: number, name: string, values: (string | null)[]): Di
   controlTag: "Choices",
   metricType: "exact_match",
   isCategorical: true,
+  isCustomInterface: false,
   values,
   scores: values.map(() => values.map(() => 1)),
   labels: [...new Set(values.filter(Boolean) as string[])],

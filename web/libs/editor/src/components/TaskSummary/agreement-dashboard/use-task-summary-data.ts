@@ -6,6 +6,11 @@
  *
  * All read-only data (task metadata, annotation info, agreement scores)
  * comes exclusively from the API — no MST store dependency.
+ *
+ * Transport is injectable via `fetchers` so hosts that cannot reach the
+ * authenticated API directly (the Custom Interface sandbox iframe runs on an
+ * opaque origin with credentials stripped) can broker the same requests
+ * through their own channel.
  */
 
 import { useMemo } from "react";
@@ -72,6 +77,32 @@ const fetchGroundTruthInference = async (
   return response.json();
 };
 
+/**
+ * Transport for the two read endpoints backing the dashboard. Defaults to
+ * direct same-origin `fetch`; the sandboxed Custom Interface shell supplies an
+ * implementation that round-trips through the parent frame instead.
+ */
+export interface TaskSummaryFetchers {
+  fetchTaskSummary(taskId: number | string, includePredictions: boolean): Promise<TaskSummaryResponse>;
+  fetchGroundTruthInference(
+    taskId: number | string,
+    includePredictions: boolean,
+  ): Promise<GroundTruthInferenceResponse>;
+}
+
+const defaultFetchers: TaskSummaryFetchers = {
+  fetchTaskSummary,
+  fetchGroundTruthInference,
+};
+
+/** Minimal shape of the signed-in user needed to label the "Me" annotator row. */
+export interface TaskSummaryCurrentUser {
+  id: number;
+  first_name?: string;
+  last_name?: string;
+  email?: string;
+}
+
 // ---------------------------------------------------------------------------
 // Type guard
 // ---------------------------------------------------------------------------
@@ -111,6 +142,10 @@ interface UseTaskSummaryDataOptions {
   visibleColumnIds: number[] | null;
   hideInfo: boolean;
   includePredictions: boolean;
+  /** Overrides the direct `fetch` transport (see {@link TaskSummaryFetchers}). */
+  fetchers?: TaskSummaryFetchers;
+  /** Overrides `window.APP_SETTINGS.user`, which is absent inside the sandbox iframe. */
+  currentUser?: TaskSummaryCurrentUser | null;
 }
 
 export interface AgreementData {
@@ -130,6 +165,8 @@ export interface AgreementData {
   categoricalDimensions: DimensionInfo[];
   /** Only non-categorical dimensions */
   nonCategoricalDimensions: DimensionInfo[];
+  /** Columns shown before the user picks any (categorical + all Custom Interface dims). */
+  defaultVisibleDimensions: DimensionInfo[];
   /** Filtered dimensions based on conflict filter + column visibility */
   filteredDimensions: DimensionInfo[];
   /** Annotator info resolved from API annotations */
@@ -174,8 +211,10 @@ export function useTaskSummaryData({
   visibleColumnIds,
   hideInfo,
   includePredictions,
+  fetchers = defaultFetchers,
+  currentUser: currentUserOverride,
 }: UseTaskSummaryDataOptions): AgreementData {
-  const currentUser = window.APP_SETTINGS?.user;
+  const currentUser = currentUserOverride ?? window.APP_SETTINGS?.user;
   const predictionsIncluded = includePredictions === true;
 
   const {
@@ -185,7 +224,7 @@ export function useTaskSummaryData({
     error,
   } = useQuery({
     queryKey: ["task-summary-dashboard", taskId, predictionsIncluded],
-    queryFn: () => fetchTaskSummary(taskId!, predictionsIncluded),
+    queryFn: () => fetchers.fetchTaskSummary(taskId!, predictionsIncluded),
     enabled: !!taskId,
     staleTime: 30_000,
     gcTime: 5 * 60 * 1000,
@@ -194,7 +233,7 @@ export function useTaskSummaryData({
 
   const { data: gtInferenceResponse } = useQuery({
     queryKey: ["task-gt-inference", taskId, predictionsIncluded],
-    queryFn: () => fetchGroundTruthInference(taskId!, predictionsIncluded),
+    queryFn: () => fetchers.fetchGroundTruthInference(taskId!, predictionsIncluded),
     enabled: !!taskId,
     staleTime: 30_000,
     gcTime: 5 * 60 * 1000,
@@ -325,13 +364,26 @@ export function useTaskSummaryData({
 
   const nonCategoricalDimensions = useMemo(() => dimensions.filter((d) => !d.isCategorical), [dimensions]);
 
+  /**
+   * Columns shown before the user picks any.
+   *
+   * Hiding non-categorical dimensions keeps region-shaped controls such as
+   * RectangleLabels out of a table that can only show scalars. Custom
+   * Interface dimensions are exempt: the backend cannot classify them, so a
+   * dimension left out here would be one the user never learns exists.
+   */
+  const defaultVisibleDimensions = useMemo(
+    () => dimensions.filter((d) => d.isCategorical || d.isCustomInterface),
+    [dimensions],
+  );
+
   const filteredDimensions = useMemo(() => {
     let filtered: DimensionInfo[];
     if (conflictFilter === "custom") {
       filtered =
         visibleColumnIds !== null
           ? dimensions.filter((d) => visibleColumnIds.includes(d.dimensionId))
-          : categoricalDimensions;
+          : defaultVisibleDimensions;
     } else if (conflictFilter === "all_dimensions") {
       filtered = dimensions;
     } else {
@@ -339,7 +391,7 @@ export function useTaskSummaryData({
     }
 
     return filtered;
-  }, [dimensions, categoricalDimensions, conflictFilter, visibleColumnIds]);
+  }, [dimensions, categoricalDimensions, defaultVisibleDimensions, conflictFilter, visibleColumnIds]);
 
   const dimensionScores = useMemo(
     () => (agreementResult ? buildDimensionScores(agreementResult, agreementMethodology) : []),
@@ -382,6 +434,7 @@ export function useTaskSummaryData({
     dimensions,
     categoricalDimensions,
     nonCategoricalDimensions,
+    defaultVisibleDimensions,
     filteredDimensions,
     annotators,
     annotationForRow,

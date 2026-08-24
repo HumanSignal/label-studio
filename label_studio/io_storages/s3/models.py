@@ -26,7 +26,12 @@ from io_storages.s3.utils import (
     get_client_and_resource,
     resolve_s3_url,
 )
-from io_storages.utils import StorageObject, load_tasks_json, storage_can_resolve_bucket_url
+from io_storages.utils import (
+    StorageObject,
+    is_collection_submission_key,
+    load_tasks_json,
+    storage_can_resolve_bucket_url,
+)
 from tasks.models import Annotation
 
 from label_studio.io_storages.s3.utils import AWS
@@ -203,6 +208,9 @@ class S3ImportStorageBase(S3StorageMixin, ImportStorage):
             key = obj.key
             if key.endswith('/'):
                 logger.debug(key + ' is skipped because it is a folder')
+                continue
+            if is_collection_submission_key(key):
+                logger.debug(key + ' is skipped: reserved collection submission object')
                 continue
             if regex and not regex.match(key):
                 logger.debug(key + ' is skipped by regex filter')

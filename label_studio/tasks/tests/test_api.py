@@ -1,7 +1,5 @@
-import unittest
 from unittest.mock import patch
 
-from core.feature_flags import flag_set
 from organizations.tests.factories import OrganizationFactory
 from projects.models import Project
 from projects.tests.factories import ProjectFactory
@@ -242,31 +240,8 @@ class TestTaskAPIResolveUri(APITestCase):
         assert response_data['text'] == 'Plain text field'
 
 
-class TestTaskAgreementAPIFeatureOff(APITestCase):
-    """When feature flag is off, agreement endpoint returns 403. Always run this test."""
-
-    @classmethod
-    def setUpTestData(cls):
-        cls.organization = OrganizationFactory()
-        cls.project = ProjectFactory(organization=cls.organization)
-        cls.user = cls.organization.created_by
-
-    @patch('tasks.api.flag_set')
-    def test_distribution_returns_403_when_feature_flag_disabled(self, mock_flag_set):
-        mock_flag_set.return_value = False
-        task = TaskFactory(project=self.project)
-        self.client.force_authenticate(user=self.user)
-        response = self.client.get(f'/api/tasks/{task.id}/agreement/')
-        assert response.status_code == 403
-        assert 'detail' in response.json() or 'error' in response.json()
-
-
-@unittest.skipUnless(
-    flag_set('fflag_fix_all_fit_720_lazy_load_annotations', user=None),
-    'Agreement API tests require fflag_fix_all_fit_720_lazy_load_annotations to be on',
-)
 class TestTaskAgreementAPI(APITestCase):
-    """Tests for TaskAgreementAPI (GET /api/tasks/<id>/agreement/). Run only when feature flag is on."""
+    """Tests for TaskAgreementAPI (GET /api/tasks/<id>/agreement/)."""
 
     @classmethod
     def setUpTestData(cls):
@@ -349,31 +324,8 @@ class TestTaskAgreementAPI(APITestCase):
         assert data['distributions']['label']['labels'] == {'Car': 3}
 
 
-class TestTaskSummaryAPIFeatureOff(APITestCase):
-    """When feature flag is off, summary endpoint returns 403. Always run this test."""
-
-    @classmethod
-    def setUpTestData(cls):
-        cls.organization = OrganizationFactory()
-        cls.project = ProjectFactory(organization=cls.organization)
-        cls.user = cls.organization.created_by
-
-    @patch('tasks.api.flag_set')
-    def test_distribution_returns_403_when_feature_flag_disabled(self, mock_flag_set):
-        mock_flag_set.return_value = False
-        task = TaskFactory(project=self.project)
-        self.client.force_authenticate(user=self.user)
-        response = self.client.get(f'/api/tasks/{task.id}/summary/')
-        assert response.status_code == 403
-        assert 'detail' in response.json() or 'error' in response.json()
-
-
-@unittest.skipUnless(
-    flag_set('fflag_fix_all_fit_720_lazy_load_annotations', user=None),
-    'Summary API tests require fflag_fix_all_fit_720_lazy_load_annotations to be on',
-)
 class TestTaskSummaryAPI(APITestCase):
-    """Tests for TaskSummaryAPI (GET /api/tasks/<id>/summary/). Run only when feature flag is on."""
+    """Tests for TaskSummaryAPI (GET /api/tasks/<id>/summary/)."""
 
     @classmethod
     def setUpTestData(cls):
@@ -907,3 +859,57 @@ class TestTaskCreateOverlapInitialization(APITestCase):
         task = Task.objects.get(id=response.json()['id'])
         assert task.overlap == 3
         assert task.is_labeled is False
+
+
+class TestAnnotationDraftCreateWithMissingAnnotation(APITestCase):
+    """Regression tests for the annotation-scoped draft-creation endpoint."""
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.organization = OrganizationFactory()
+        cls.project = ProjectFactory(organization=cls.organization)
+        cls.user = cls.organization.created_by
+
+    def test_create_draft_for_missing_annotation_does_not_violate_fk(self):
+        # Reproduces: ENTERPRISE-V2-BACKEND-5S0
+        # POST /api/tasks/{pk}/annotations/{annotation_id}/drafts blindly passes the URL's
+        # annotation_id straight into serializer.save(). When that annotation does not exist
+        # (e.g. it was deleted between the client loading the task and submitting the draft),
+        # the INSERT into tasks_annotationdraft violates the annotation_id foreign key:
+        #   insert or update on table "tasks_annotationdraft" violates foreign key constraint
+        #   "tasks_annotationdraf_annotation_id_86db74e5_fk_task_comp"
+        #   DETAIL: Key (annotation_id)=(...) is not present in table "task_completion".
+        #
+        # RED (unpatched): the endpoint persists a draft pointing at the missing annotation.
+        # On production Postgres the FK is checked immediately, so the request raises
+        # IntegrityError (the Sentry crash). SQLite (used by the test suite) defers FK
+        # enforcement, so connection.check_constraints() below surfaces the identical
+        # IntegrityError, failing this test with the same violation.
+        # GREEN (fixed): the endpoint validates the annotation and rejects the request
+        # gracefully (4xx) without persisting a dangling draft, so no violation occurs.
+        from django.db import connection
+        from tasks.models import AnnotationDraft
+
+        task = TaskFactory(project=self.project, data={'text': 'test'})
+
+        # An annotation that was created and then deleted — its id is now dangling.
+        annotation = AnnotationFactory(task=task, project=self.project, result=[])
+        missing_annotation_id = annotation.id
+        annotation.delete()
+
+        self.client.force_authenticate(user=self.user)
+
+        # On Postgres this call itself raises IntegrityError inside the request.
+        response = self.client.post(
+            f'/api/tasks/{task.id}/annotations/{missing_annotation_id}/drafts',
+            data={'result': []},
+            format='json',
+        )
+
+        # On SQLite the FK check is deferred; surface the same violation explicitly.
+        connection.check_constraints()
+
+        # A fixed endpoint should refuse to create a draft for a non-existent annotation
+        # instead of leaving a dangling reference behind.
+        assert not AnnotationDraft.objects.filter(annotation_id=missing_annotation_id).exists()
+        assert response.status_code in (400, 404), response.status_code

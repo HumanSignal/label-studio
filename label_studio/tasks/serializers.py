@@ -218,7 +218,10 @@ class AnnotationSerializer(FlexFieldsModelSerializer):
         project = self._resolve_project_for_validation(data)
         custom_interface_validator = load_func(getattr(settings, 'CUSTOM_INTERFACE_ANNOTATION_VALIDATOR', None))
         if custom_interface_validator and project:
-            validation_errors = custom_interface_validator(project, data.get('result', []))
+            task = data.get('task') or self.context.get('task') or getattr(self.instance, 'task', None)
+            request = self.context.get('request')
+            user = getattr(request, 'user', None) if request is not None else None
+            validation_errors = custom_interface_validator(project, data.get('result', []), task=task, user=user)
             if validation_errors:
                 raise ValidationError(f'Error validating annotation: {validation_errors}')
 
@@ -835,7 +838,11 @@ class BaseTaskSerializerBulk(serializers.ListSerializer):
                 draft.update(
                     {
                         'task_id': db_tasks[i].id,
-                        'annotation_id': annotation_mapping[draft.get('annotation')],
+                        # Use .get() so a draft that references an annotation not present in this
+                        # import batch (e.g. its parent annotation was dropped/never imported)
+                        # degrades to an unlinked draft (annotation_id=None) instead of raising
+                        # KeyError. See ENTERPRISE-V2-BACKEND-6G5.
+                        'annotation_id': annotation_mapping.get(draft.get('annotation')),
                         'project': self.project,
                         'import_id': draft.get('id'),
                     }

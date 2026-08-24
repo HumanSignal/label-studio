@@ -164,6 +164,50 @@ class TestUserFilterValueValidation:
 
         assert not serializer.is_valid()
 
+    def test_ground_truth_rejects_empty_operator(self):
+        """FIT-2525: ground_truth is a non-nullable bool; is empty is unsupported."""
+        serializer = FilterSerializer(
+            data={
+                'column': 'filter:tasks:ground_truth',
+                'type': 'Boolean',
+                'operator': 'empty',
+                'value': False,
+            }
+        )
+
+        assert not serializer.is_valid()
+        assert 'operator' in serializer.errors
+
+    def test_ground_truth_empty_child_filter_is_rejected(self):
+        """FIT-2525: child Ground Truth also rejects empty."""
+        payload = {
+            'column': 'filter:tasks:annotations_results',
+            'type': 'String',
+            'operator': 'contains',
+            'value': 'PER',
+            'child_filter': {
+                'column': 'filter:tasks:ground_truth',
+                'type': 'Boolean',
+                'operator': 'empty',
+                'value': False,
+            },
+        }
+        serializer = FilterSerializer(data=payload)
+
+        assert not serializer.is_valid()
+
+    def test_ground_truth_keeps_equal_operator(self):
+        serializer = FilterSerializer(
+            data={
+                'column': 'filter:tasks:ground_truth',
+                'type': 'Boolean',
+                'operator': 'equal',
+                'value': True,
+            }
+        )
+
+        assert serializer.is_valid(), serializer.errors
+
     @pytest.mark.parametrize(
         'column',
         [

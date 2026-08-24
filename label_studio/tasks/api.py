@@ -22,7 +22,7 @@ from drf_spectacular.utils import OpenApiExample, OpenApiParameter, OpenApiRespo
 from projects.functions.stream_history import fill_history_annotation
 from projects.models import Project
 from rest_framework import generics, viewsets
-from rest_framework.exceptions import PermissionDenied, ValidationError
+from rest_framework.exceptions import NotFound, PermissionDenied, ValidationError
 from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
 from rest_framework.response import Response
 from tasks.models import Annotation, AnnotationDraft, Prediction, Task
@@ -545,10 +545,6 @@ class TaskAgreementAPI(generics.RetrieveAPIView):
     queryset = Task.objects.all()
 
     def get(self, request, pk):
-        # This endpoint is gated by feature flag
-        if not flag_set('fflag_fix_all_fit_720_lazy_load_annotations', user=request.user):
-            raise PermissionDenied('Feature not enabled')
-
         try:
             task = Task.objects.get(pk=pk)
         except Task.DoesNotExist:
@@ -727,10 +723,6 @@ class TaskSummaryAPI(generics.RetrieveAPIView):
     queryset = Task.objects.all()
 
     def get(self, request, pk):
-        # This endpoint is gated by feature flag
-        if not flag_set('fflag_fix_all_fit_720_lazy_load_annotations', user=request.user):
-            raise PermissionDenied('Feature not enabled')
-
         include_predictions = bool_from_request(request.GET, 'include_predictions', False)
 
         try:
@@ -1217,6 +1209,11 @@ class AnnotationDraftListAPI(generics.ListCreateAPIView):
         annotation_id = self.kwargs.get('annotation_id')
         user = self.request.user
         logger.debug(f'User {user} is going to create draft for task={task_id}, annotation={annotation_id}')
+        # When an annotation_id is supplied in the URL, make sure the annotation still exists before
+        # persisting the draft. Otherwise the INSERT violates the annotation_id foreign key (the
+        # annotation may have been deleted between the client loading the task and submitting the draft).
+        if annotation_id is not None and not Annotation.objects.filter(pk=annotation_id).exists():
+            raise NotFound(f'Annotation {annotation_id} does not exist')
         serializer.save(task_id=self.kwargs['pk'], annotation_id=annotation_id, user=self.request.user)
 
 

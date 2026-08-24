@@ -280,13 +280,13 @@ class TestTaskAgreementAPI(APITestCase):
         cls.task = TaskFactory(project=cls.project, data={'text': 'test'})
 
     @pytest.mark.usefixtures('fflag_fix_all_fit_720_lazy_load_annotations_off')
-    def test_agreement_endpoint_requires_feature_flag(self):
-        """Test that summary endpoint returns 403 when feature flag is disabled."""
+    def test_agreement_endpoint_available_without_lazy_load_flag(self):
+        """Agreement is a summary payload, not a lazy-load concern, so FIT-720 does not gate it."""
         self.client.force_authenticate(user=self.user)
         response = self.client.get(f'/api/tasks/{self.task.id}/agreement/')
 
-        assert response.status_code == 403
-        assert response.json()['detail'] == 'Feature not enabled'
+        assert response.status_code == 200
+        assert response.json()['total_annotations'] == 0
 
     @pytest.mark.usefixtures('fflag_fix_all_fit_720_lazy_load_annotations_on')
     def test_agreement_endpoint_empty_task(self):
@@ -605,11 +605,12 @@ class TestTaskSummaryAPI(APITestCase):
         cls.task = TaskFactory(project=cls.project, data={'text': 'test'})
 
     @pytest.mark.usefixtures('fflag_fix_all_fit_720_lazy_load_annotations_off')
-    def test_summary_endpoint_requires_feature_flag(self):
+    def test_summary_endpoint_available_without_lazy_load_flag(self):
+        """Summary is permissioned by tasks_view; FIT-720 only controls lazy-loading task GET."""
         self.client.force_authenticate(user=self.user)
         response = self.client.get(f'/api/tasks/{self.task.id}/summary/')
-        assert response.status_code == 403
-        assert response.json()['detail'] == 'Feature not enabled'
+        assert response.status_code == 200
+        assert response.json()['task']['id'] == self.task.id
 
     @pytest.mark.usefixtures('fflag_fix_all_fit_720_lazy_load_annotations_on')
     def test_summary_endpoint_includes_annotations_and_task(self):

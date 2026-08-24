@@ -12,6 +12,8 @@ import {
   sanitizeIntegerUserListValue,
   fieldAliasFromFilterId,
   normalizeIntegerUserFilter,
+  recoverReviewIndicatorSnapshot,
+  REVIEW_INDICATOR_CHILD_ALIASES,
 } from "./filter_snapshot_utils";
 import { guidGenerator } from "../../utils/random";
 
@@ -33,8 +35,7 @@ export function isListMembershipOperator(operator) {
   return LIST_MEMBERSHIP_OPERATORS.has(operator);
 }
 
-/** Number columns reused as annotation-child yes/no indicators (FIT-2480). */
-export const REVIEW_INDICATOR_CHILD_ALIASES = new Set(["reviews_accepted", "reviews_rejected"]);
+export { REVIEW_INDICATOR_CHILD_ALIASES };
 
 /**
  * BROS-1203 — defensive snapshot recovery on TabFilter rehydration.
@@ -57,7 +58,7 @@ export function recoverFilterSnapshot(sn) {
   const normalized = normalizeIntegerUserFilter({ fieldAlias, operator: sn.operator, value });
   const { operator } = normalized;
   value = normalized.value;
-  return { ...sn, operator, value };
+  return recoverReviewIndicatorSnapshot({ ...sn, operator, value });
 }
 
 function normalizeChildFilterSnapshot(sn) {
@@ -196,8 +197,11 @@ export const TabFilter = types
 
     get cellView() {
       const col = self.filter.field;
-
-      return CellViews[col.type] ?? CellViews[normalizeCellAlias(col.alias)];
+      const byAlias = CellViews[normalizeCellAlias(col.alias)];
+      const byType = CellViews[col.type];
+      // Prefer alias views that customize operators (e.g. GroundTruth without "is empty").
+      if (byAlias?.customOperators) return byAlias;
+      return byType ?? byAlias;
     },
 
     get isNestedChildFilter() {

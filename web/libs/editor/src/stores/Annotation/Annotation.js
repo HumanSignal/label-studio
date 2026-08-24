@@ -482,6 +482,11 @@ const _Annotation = types
       self.editable = val;
     },
 
+    /** LSE review badge / History — must run inside an MST action (FIT-2498). */
+    setAcceptedState(val) {
+      self.acceptedState = val ?? null;
+    },
+
     setReadonly(val) {
       self.readonly = val;
     },

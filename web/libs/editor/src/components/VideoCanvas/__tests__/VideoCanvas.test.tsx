@@ -530,7 +530,7 @@ describe("VideoCanvas", () => {
 
   it("calls onError when video errors and never loaded", async () => {
     const onError = mock();
-    render(<VideoCanvas src="/test.mp4" speed={1} onError={onError} />);
+    const { container } = render(<VideoCanvas src="/test.mp4" speed={1} onError={onError} />);
     await act(async () => {
       await new Promise((r) => setTimeout(r, 50));
     });
@@ -542,6 +542,7 @@ describe("VideoCanvas", () => {
       triggerError.click();
     });
     expect(onError).toHaveBeenCalled();
+    expect(container.querySelector("[class*='loading']")).toBeNull();
   });
 
   it("calls onResize when ResizeObserver fires", async () => {
