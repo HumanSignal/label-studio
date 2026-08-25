@@ -49,3 +49,36 @@ describe("LSFWrapper.prepareData draft_id normalization", () => {
     expect(payload.draft_id).toBe(42);
   });
 });
+
+describe("LSFWrapper.prepareData work activity", () => {
+  it("sends work_activity_source=stream in label stream", () => {
+    const wrapper = buildWrapper();
+    wrapper.labelStream = true;
+    wrapper.lastWorkActivityMode = "annotation";
+
+    const payload = wrapper.prepareData(buildAnnotation({ draftId: null }));
+
+    expect(payload.work_activity_source).toBe("stream");
+    expect(payload.work_activity_mode).toBe("annotation");
+  });
+
+  it("sends work_activity_source=datamanager in Quick View / explorer", () => {
+    const wrapper = buildWrapper();
+    wrapper.labelStream = false;
+
+    const payload = wrapper.prepareData(buildAnnotation({ draftId: null }));
+
+    expect(payload.work_activity_source).toBe("datamanager");
+    expect(payload.work_activity_mode).toBe("annotation");
+  });
+
+  it("preserves lastWorkActivityMode when set", () => {
+    const wrapper = buildWrapper();
+    wrapper.labelStream = false;
+    wrapper.lastWorkActivityMode = "review";
+
+    const payload = wrapper.prepareData(buildAnnotation({ draftId: null }));
+
+    expect(payload.work_activity_mode).toBe("review");
+  });
+});

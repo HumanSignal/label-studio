@@ -835,7 +835,7 @@ class TaskSummaryAPI(generics.RetrieveAPIView):
                 dist['count'] = len(dist['values'])
             del dist['values']
 
-        from users.serializers import AnnotatorReviewerFirewall
+        from users.serializers import AnnotatorReviewerFirewall, is_user_deleted
 
         def _serialize_user(user):
             if user is None:
@@ -846,7 +846,11 @@ class TaskSummaryAPI(generics.RetrieveAPIView):
                 'first_name': user.first_name,
                 'last_name': user.last_name,
             }
-            if AnnotatorReviewerFirewall.should_anonymize(user=user, requester=request.user):
+            if is_user_deleted(user, context={'project': task.project}, project=task.project):
+                data['first_name'] = 'Deleted'
+                data['last_name'] = f'User {user.id}'
+                data['email'] = f'deleted-{user.id}-user@example.com'
+            elif AnnotatorReviewerFirewall.should_anonymize(user=user, requester=request.user):
                 return AnnotatorReviewerFirewall.anonymize_user_data(data, user=user, requester=request.user)
             return data
 
