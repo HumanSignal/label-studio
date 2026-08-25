@@ -10,6 +10,7 @@ from rest_framework import serializers
 from tasks.models import Task
 from tasks.serializers import AnnotationSerializer, TaskSerializer
 from users.models import User
+from users.serializers import BaseUserSerializer
 
 from label_studio.core.utils.common import load_func
 
@@ -108,7 +109,7 @@ class StorageTaskSerializer(TaskSerializer):
         fields = '__all__'
 
 
-class StorageCompletedBySerializer(serializers.ModelSerializer):
+class StorageCompletedBySerializer(BaseUserSerializer):
     class Meta:
         model = User
         fields = ('id', 'first_name', 'last_name', 'email')

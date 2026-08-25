@@ -197,7 +197,7 @@ def export_project(project_id, export_format, path, serializer_context=None):
     # serializer context
     if isinstance(serializer_context, str):
         serializer_context = json.loads(serializer_context)
-    serializer_options = ExportMixin._get_export_serializer_option(serializer_context)
+    serializer_options = ExportMixin._get_export_serializer_option(serializer_context, project=project)
 
     # export cycle
     tasks = []

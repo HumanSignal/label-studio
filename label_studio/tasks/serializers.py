@@ -30,7 +30,12 @@ from tasks.ordering import apply_annotation_ordering, apply_prediction_ordering
 from tasks.result_utils import dedupe_annotation_result_list, sanitize_null_bytes
 from tasks.validation import TaskValidator
 from users.models import User
-from users.serializers import AnnotatorReviewerFirewall, AnonymizedUserPrimaryKeyRelatedField, UserSerializer
+from users.serializers import (
+    AnnotatorReviewerFirewall,
+    AnonymizedUserPrimaryKeyRelatedField,
+    UserSerializer,
+    is_user_deleted,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -237,6 +242,10 @@ class AnnotationSerializer(FlexFieldsModelSerializer):
         if AnnotatorReviewerFirewall.should_anonymize(user=user, requester=requester):
             return AnnotatorReviewerFirewall.role_label(user=user, requester=requester)
 
+        project = self.context.get('project') or getattr(annotation, 'project', None)
+        if is_user_deleted(user, context=self.context, project=project):
+            return f'Deleted User {user.id} deleted-{user.id}-user@example.com, {user.id}'
+
         name = user.first_name
         if len(user.last_name):
             name = name + ' ' + user.last_name
@@ -296,6 +305,10 @@ class AnnotationStubSerializer(FlexFieldsModelSerializer):
         requester = getattr(request, 'user', None) if request is not None else None
         if AnnotatorReviewerFirewall.should_anonymize(user=user, requester=requester):
             return AnnotatorReviewerFirewall.role_label(user=user, requester=requester)
+
+        project = self.context.get('project') or getattr(annotation, 'project', None)
+        if is_user_deleted(user, context=self.context, project=project):
+            return f'Deleted User {user.id} deleted-{user.id}-user@example.com, {user.id}'
 
         name = user.first_name
         if len(user.last_name):
@@ -1052,6 +1065,12 @@ class AnnotationDraftSerializer(ModelSerializer):
         requester = getattr(request, 'user', None) if request is not None else None
         if AnnotatorReviewerFirewall.should_anonymize(user=user, requester=requester):
             return AnnotatorReviewerFirewall.role_label(user=user, requester=requester)
+
+        project = self.context.get('project')
+        if not project and getattr(draft, 'task', None):
+            project = getattr(draft.task, 'project', None)
+        if is_user_deleted(user, context=self.context, project=project):
+            return f'Deleted User {user.id} deleted-{user.id}-user@example.com, {user.id}'
 
         name = user.first_name
         last_name = user.last_name

@@ -1476,6 +1476,10 @@ export class LSFWrapper {
       parent_prediction: annotation.parent_prediction,
       parent_annotation: annotation.parent_annotation,
       started_at: startedAt.toISOString(),
+      // Parity with custom interface: backend uses these for TaskEvent meta and
+      // label-stream vs Quick View overlap policy (FIT-2625 / FIT-2600).
+      work_activity_source: this.labelStream ? "stream" : "datamanager",
+      work_activity_mode: this.lastWorkActivityMode ?? "annotation",
     };
 
     if (includeId && userGenerate) {

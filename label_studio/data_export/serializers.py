@@ -13,25 +13,15 @@ from rest_framework import serializers
 from tasks.models import Annotation, Task
 from tasks.serializers import AnnotationDraftSerializer, PredictionSerializer
 from users.models import User
-from users.serializers import UserSimpleSerializer
+from users.serializers import BaseUserSerializer, UserSimpleSerializer
 
 from .models import ConvertedFormat, Export
 
 
-class CompletedBySerializer(serializers.ModelSerializer):
+class CompletedBySerializer(BaseUserSerializer):
     class Meta:
         model = User
         fields = ['id', 'email', 'first_name', 'last_name']
-
-    def to_representation(self, instance):
-        ret = super().to_representation(instance)
-        from users.serializers import AnnotatorReviewerFirewall
-
-        request = self.context.get('request')
-        requester = getattr(request, 'user', None) if request is not None else None
-        if AnnotatorReviewerFirewall.should_anonymize(user=instance, requester=requester):
-            ret = AnnotatorReviewerFirewall.anonymize_user_data(ret, user=instance, requester=requester)
-        return ret
 
 
 class AnnotationSerializer(FlexFieldsModelSerializer):
