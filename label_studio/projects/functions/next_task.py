@@ -238,12 +238,14 @@ def get_not_solved_tasks_qs(
             queue_info += (' & ' if queue_info else '') + 'Show overlap first'
 
     # Strict task overlap enforcement: filter out tasks where overlap is already reached
-    # This prevents users entering label stream from getting tasks that are already at their annotation limit
+    # This prevents NEW annotators/reviewers from getting tasks that are already at their annotation limit
+    # Note: Only applies to annotators and reviewers - managers and admins can access all tasks
     # Note: Postponed tasks are NOT filtered here - they are served with overlap_reached flag
     # so users can see their work and understand why they can't submit
     if flag_set('fflag_feat_all_fit_1304_strict_overlap', user=user) and not assigned_flag:
         lse_project = getattr(project, 'lse_project', None)
-        if lse_project and getattr(lse_project, 'strict_task_overlap', False):
+        is_restricted_role = getattr(user, 'is_annotator', False) or getattr(user, 'is_reviewer', False)
+        if lse_project and getattr(lse_project, 'strict_task_overlap', False) and is_restricted_role:
             # Calculate effective overlap limit
             # When agreement_threshold is set, allow additional annotators up to max_additional_annotators_assignable
             max_additional = 0
